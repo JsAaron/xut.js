@@ -4,14 +4,15 @@
   "description": "Vue project example using Webpack as the bundler.",
   "main": "src/main.js",
   "dependencies": {
-    "vue": "yyx990803/vue#next"
+    "vue": "yyx990803/vue#dev"
   },
   "devDependencies": {
-    "css-loader": "^0.9.0",
-    "html-loader": "^0.2.2",
-    "style-loader": "^0.8.1",
-    "stylus-loader": "^0.4.0",
-    "webpack": "^1.4.4"
+    "css-loader": "^0.12.1",
+    "html-loader": "^0.3.0",
+    "node-libs-browser": "^0.5.0",
+    "style-loader": "^0.12.2",
+    "stylus-loader": "^1.1.1",
+    "webpack": "^1.9.7"
   },
   "scripts": {
     "dev": "webpack --watch",

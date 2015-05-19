@@ -21,13 +21,13 @@ function route () {
   var view = window.location.hash.slice(1)
   if (view === 'a') {
     // code split point
-    require.ensure(['./views/a'], function (require) {
-      loadView(require('./views/a'))
+    require(['./views/a'], function (a) {
+      loadView(a)
     })
   } else if (view === 'b') {
     // code split point
-    require.ensure(['./views/b'], function (require) {
-      loadView(require('./views/b'))
+    require(['./views/b'], function (b) {
+      loadView(b)
     })
   }
 }
