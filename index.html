@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8">
     <title>Vue + Webpack</title>
-    <script src="build/build.js"></script>
   </head>
   <body>
-    <div class="nav">
-      <a href="#a">Go to page A</a>
-      <a href="#b">Go to page B</a>
+    <div id="app">
+      <div class="nav">
+        <a href="#a">Go to page A</a>
+        <a href="#b">Go to page B</a>
+      </div>
+      <component is="{{view}}"></component>
     </div>
+    <script src="build/build.js"></script>
   </body>
 </html>

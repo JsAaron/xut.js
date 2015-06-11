@@ -4,47 +4,32 @@
 require('./main.styl')
 
 var Vue = require('vue')
-var currentView = null
+var app = new Vue({
+  el: '#app',
+  data: {
+    view: 'a'
+  },
+  components: {
+    // define the main pages as async components.
+    a: function (resolve) {
+      require(['./views/a'], resolve)
+    },
+    b: function (resolve) {
+      require(['./views/b'], resolve)
+    }
+  }
+})
 
 /**
  * Some really crude routing logic here, just for
  * demonstration purposes. The key thing to note here is
- * that Webpack allows us to split our build output into
- * small chunks that are loaded on demand.
- *
- * In this example, only the matched page component is
- * loaded. You can confirm this by inspecting the network
- * activity in devtools.
+ * that we are simply changing the view of the root app -
+ * Vue's async components and Webpack's code splitting will
+ * automatically handle all the lazy loading for us.
  */
 
 function route () {
-  var view = window.location.hash.slice(1)
-  if (view === 'a') {
-    // code split point
-    require(['./views/a'], function (a) {
-      loadView(a)
-    })
-  } else if (view === 'b') {
-    // code split point
-    require(['./views/b'], function (b) {
-      loadView(b)
-    })
-  }
-}
-
-/**
- * Instantiate current view as a Vue instance.
- *
- * @param {Object} pageOptions
- */
-
-function loadView (pageOptions) {
-  if (currentView) {
-    currentView.$destroy(true)
-  }
-  currentView = new Vue(pageOptions)
-    .$mount()
-    .$appendTo(document.body)
+  app.view = window.location.hash.slice(1) || 'a'
 }
 
 window.addEventListener('hashchange', route)
