@@ -7,14 +7,14 @@ var Vue = require('vue')
 var app = new Vue({
   el: '#app',
   data: {
-    view: 'a'
+    view: 'page-a'
   },
   components: {
     // define the main pages as async components.
-    a: function (resolve) {
+    'page-a': function (resolve) {
       require(['./views/a'], resolve)
     },
-    b: function (resolve) {
+    'page-b': function (resolve) {
       require(['./views/b'], resolve)
     }
   }
@@ -29,7 +29,7 @@ var app = new Vue({
  */
 
 function route () {
-  app.view = window.location.hash.slice(1) || 'a'
+  app.view = window.location.hash.slice(1) || 'page-a'
 }
 
 window.addEventListener('hashchange', route)

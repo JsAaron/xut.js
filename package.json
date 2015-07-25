@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Vue project example using Webpack as the bundler.",
   "main": "src/main.js",
-  "dependencies": {
-    "vue": "yyx990803/vue#dev"
-  },
   "devDependencies": {
     "css-loader": "^0.12.1",
     "html-loader": "^0.3.0",
@@ -31,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/vuejs/vue-webpack-example/issues"
   },
-  "homepage": "https://github.com/vuejs/vue-webpack-example"
+  "homepage": "https://github.com/vuejs/vue-webpack-example",
+  "dependencies": {
+    "vue": "^0.12.8"
+  }
 }
