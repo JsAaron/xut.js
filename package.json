@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/vuejs/vue-webpack-example",
   "dependencies": {
-    "vue": "^0.12.8"
+    "vue": "^0.12.10"
   }
 }
