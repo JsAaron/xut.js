@@ -1,3 +1,3 @@
-var mod = require('./module')
+var fs = require('fs')
 
-console.log(mod)
+var strstr
