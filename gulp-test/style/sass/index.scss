@@ -6,6 +6,7 @@ $primaryColor: #333;
 body {
   font-family: $fontStack;
   color: $primaryColor;
-}1
+     transition :transform 1s;
+}
 
 

@@ -1,10 +1,27 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
+//即时重整
 var livereload = require('gulp-livereload');
 var webserver = require('gulp-webserver');
+//自动加前缀
+var autoprefixer = require('gulp-autoprefixer');
+//压缩css
+var minifycss = require('gulp-minify-css');
+//图片快取，只有更改过得图片会进行压缩
+var cache = require('gulp-cache');
+//更动通知
+var notify = require('gulp-notify');
+//JSHint 错误
+var jshint = require('gulp-jshint');
 //将一系列的 stream 合并成一个
 var combiner = require('stream-combiner2');
+// 丑化(Uglify)
 var uglify = require('gulp-uglify');
+// 合并JS
+var concat = require('gulp-concat');
+//改名
+var rename = require('gulp-rename');
+
 
 //stream-combiner2测试
 gulp.task('test', function() {
@@ -33,11 +50,21 @@ gulp.task('watch', function() {
     gulp.watch('*.html', ['html']) // 监听根目录下所有.html文件
 });
 
-
+// 编译sass
 gulp.task('sass', function() {
-    gulp.src('style/sass/*.sass')
-        .pipe(gulp.dest('style/css/'))
-})
+    return gulp.src('style/sass/index.scss')
+        .pipe(sass())
+        .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
+        .pipe(rename({
+            suffix: '.min'
+        }))
+        .pipe(minifycss())
+        .pipe(gulp.dest('style/css'))
+        // .pipe(notify({
+        //     message: 'Styles task complete'
+        // }));
+});
+
 
 
 
