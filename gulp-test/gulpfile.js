@@ -28,6 +28,8 @@ var plugins = gulpLoadPlugins();
 //浏览器同步监听变化
 var browserSync = require('browser-sync');
 
+//清除目录
+var clean = require('gulp-clean');
 
 
 //stream-combiner2测试
@@ -58,7 +60,7 @@ gulp.task('watch', function() {
 });
 
 // 编译sass
-gulp.task('sass', function() {
+gulp.task('style-sass', function() {
     return gulp.src('style/sass/index.scss')
         .pipe(plugins.sass())
         .pipe(plugins.autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
@@ -72,15 +74,22 @@ gulp.task('sass', function() {
         // }));
 });
 
+//运行之前清除
+//不想要读取已经被删除的档案，我们可以加入read: false选项来防止gulp读取档案内容–让它快一些
+gulp.task('clean', function() {
+    return gulp.src(['style/css/*', 'style/sass/*'], {
+            read: false
+        })
+        .pipe(clean());
+})
 
-gulp.task('watch', function() {
-    gulp.watch('templates/*.html', function(event) {
-        console.log('Event type: ' + event.type); // added, changed, or deleted
-        console.log('Event path: ' + event.path); // The path of the modified fil
-    });
+//兼容sass的变化
+gulp.watch('style/sass/*.scss', function() {
+    gulp.start('style-sass');
 });
 
 
-
 // 默认任务
-gulp.task('default', ['webserver', 'watch']);
+gulp.task('default', ['clean'], function() {
+    gulp.start('watch');
+})
