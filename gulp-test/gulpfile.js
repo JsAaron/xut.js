@@ -21,6 +21,13 @@ var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 //改名
 var rename = require('gulp-rename');
+//插件命名空间
+var gulpLoadPlugins = require('gulp-load-plugins');
+var plugins = gulpLoadPlugins();
+
+//浏览器同步监听变化
+var browserSync = require('browser-sync');
+
 
 
 //stream-combiner2测试
@@ -53,18 +60,25 @@ gulp.task('watch', function() {
 // 编译sass
 gulp.task('sass', function() {
     return gulp.src('style/sass/index.scss')
-        .pipe(sass())
-        .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
-        .pipe(rename({
+        .pipe(plugins.sass())
+        .pipe(plugins.autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
+        .pipe(plugins.rename({
             suffix: '.min'
         }))
-        .pipe(minifycss())
+        .pipe(plugins.minifyCss())
         .pipe(gulp.dest('style/css'))
         // .pipe(notify({
         //     message: 'Styles task complete'
         // }));
 });
 
+
+gulp.task('watch', function() {
+    gulp.watch('templates/*.html', function(event) {
+        console.log('Event type: ' + event.type); // added, changed, or deleted
+        console.log('Event path: ' + event.path); // The path of the modified fil
+    });
+});
 
 
 
