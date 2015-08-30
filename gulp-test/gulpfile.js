@@ -32,19 +32,6 @@ var browserSync = require('browser-sync');
 var clean = require('gulp-clean');
 
 
-//stream-combiner2测试
-gulp.task('test', function() {
-    var combined = combiner.obj([
-        gulp.src('bootstrap/js/*.js'),
-        uglify(),
-        gulp.dest('public/bootstrap')
-    ]);
-    // 任何在上面的 stream 中发生的错误，都不会抛出，
-    // 而是会被监听器捕获
-    combined.on('error', console.error.bind(console));
-    return combined;
-});
-
 // 注册任务
 gulp.task('webserver', function() {
     gulp.src('./') // 服务器目录（./代表根目录）
@@ -61,17 +48,33 @@ gulp.task('watch', function() {
 
 // 编译sass
 gulp.task('style-sass', function() {
-    return gulp.src('style/sass/index.scss')
-        .pipe(plugins.sass())
-        .pipe(plugins.autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
-        .pipe(plugins.rename({
+
+    // gulp.src('style/sass/index.scss')
+    //    .pipe(plugins.sass())
+    //    .pipe(plugins.autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
+    //    .pipe(plugins.rename({
+    //        suffix: '.min'
+    //    }))
+    //    .pipe(plugins.minifyCss())
+    //    .pipe(gulp.dest('style/css'))
+    //    .pipe(notify({
+    //        message: 'Styles task complete'
+    //    }));
+
+    var combined = combiner.obj([
+        gulp.src('style/sass/index.scss'),
+        plugins.sass(),
+        plugins.rename({
             suffix: '.min'
-        }))
-        .pipe(plugins.minifyCss())
-        .pipe(gulp.dest('style/css'))
-        // .pipe(notify({
-        //     message: 'Styles task complete'
-        // }));
+        }),
+        plugins.minifyCss(),
+        gulp.dest('style/css')
+    ]);
+    // 任何在上面的 stream 中发生的错误，都不会抛出，
+    // 而是会被监听器捕获
+    combined.on('error', console.error.bind(console));
+
+    return combined;
 });
 
 //运行之前清除
