@@ -1,7 +1,10 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-//即时重整
+//实时保存刷新
 var livereload = require('gulp-livereload');
+//web测试服务器
+var connect = require('gulp-connect');
+
 var webserver = require('gulp-webserver');
 //自动加前缀
 var autoprefixer = require('gulp-autoprefixer');
@@ -30,6 +33,16 @@ var browserSync = require('browser-sync');
 
 //清除目录
 var clean = require('gulp-clean');
+
+//减少编译打包
+var watchify = require('watchify');
+var browserify = require('browserify');
+
+
+//监听浏览器的刷新
+gulp.task('watch-brower', function() {
+    livereload.listen();
+});
 
 
 // 注册任务
