@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
-
+var zlib = require('zlib');
+var stream = require('stream');
 
 // 写文件
 fs.readFile(__dirname + '/text.txt', 'utf-8', function(err, data) {
@@ -30,9 +31,51 @@ fs.open(__dirname + '/text1.txt', 'r', '0666', function(err, fd) {
 
 
 fs.open(__dirname+'/text.txt','r',function(){
-
 	var buffer = new Buffer(255);
-
-	console.log(buffer.length)
-
 })  
+
+
+// var exec = require('child_process').exec;
+
+// var ls = exec('rd test-pppp', function (error, stdout, stderr) {
+//   if (error) {
+//     console.log(error.stack);
+//     console.log('Error code: ' + error.code);
+//   }
+//   console.log('Child Process STDOUT: ' + stdout);
+// 
+
+
+// var exec = require('child_process').exec;
+// var child = exec('ls -l');
+
+// child.stdout.on('data', function(data) {
+//   console.log('stdout: ' + data);
+// });
+// child.stderr.on('data', function(data) {
+//   console.log('stdout: ' + data);
+// });
+// child.on('close', function(code) {
+//   console.log('closing code: ' + code);
+// 
+// 
+
+// fs.createReadStream('text.txt')
+//   .pipe(zlib.createGzip())
+//   .pipe(fs.createWriteStream('text.gz'));
+
+
+var Stream = stream.Stream;
+
+var ws = new Stream;
+ws.writable = true;
+
+ws.write = function(data) {
+  console.log("input=" + data);
+}
+
+ws.end = function(data) {
+  console.log("bye");
+}
+
+process.stdin.pipe(ws);
