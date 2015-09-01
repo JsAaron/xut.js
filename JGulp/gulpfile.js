@@ -1,7 +1,6 @@
 var lr = require('tiny-lr'),
      server     = lr(),
      gulp       = require('gulp'),
-     compass    = require('gulp-compass'),
      sass       = require('gulp-sass'),
      livereload = require('gulp-livereload'),
      uglify     = require('gulp-uglify'), //js压缩
@@ -51,8 +50,8 @@ gulp.task('webserver', function() {
             webserver({
                 host: config.localserver.host,
                 port: config.localserver.port,
-                // livereload: true,
-                open:true, //开打浏览器
+                livereload: true,
+                open:false, //开打浏览器
                 directoryListing: false //显示目录
             })
         );
@@ -75,7 +74,7 @@ gulp.task('sass', function() {
 
 //多余文件删除
 gulp.task('clean', function() {
-    return gulp.src('build/temp_js/*','build/temp_css/*')
+    return gulp.src(['build/temp_js/*','build/temp_css/*'],{read:false})
         .pipe(clean({
             force: true
         }))
@@ -114,47 +113,55 @@ gulp.task('buildfiles', function() {
         .pipe(gulp.dest('./build/js'));
 });
 
-//文件监控
+
+// 监听任务 运行语句 gulp watch
 gulp.task('watch', function() {
 
-    server.listen(35729, function(err) {
+    server.listen(config.localserver.port, function(err){
         if (err) {
             return console.log(err);
         }
-    });
-
-    gulp.watch('./sass/*.scss', function(e) {
-        gulp.run('compass');
-        server.changed({
-            body: {
-                files: [e.path]
-            }
+        // 监听css
+        gulp.watch('sass/**', function(){
+            gulp.run('sass');
         });
     });
 
-    gulp.watch(['./sass/*.scss', './*.html', './*.php', './*.css', './js/*.js'], function(e) {
-        server.changed({
-            body: {
-                files: [e.path]
-            }
-        });
-    });
+
+
+    // gulp.watch('./sass/*.scss', function(e) {
+    //     gulp.run('sass');
+    //     server.changed({
+    //         body: {
+    //             files: [e.path]
+    //         }
+    //     });
+    // });
+
+    // gulp.watch(['./sass/*.scss', './*.html', './*.php', './*.css', './js/*.js'], function(e) {
+    //     server.changed({
+    //         body: {
+    //             files: [e.path]
+    //         }
+    //     });
+    // });
 
 });
 
 //默认任务
 gulp.task('default', function() {
     console.log('Starting Gulp tasks, enjoy coding!');
-    gulp.run('compass');
-    gulp.run('watch');
+    // gulp.run('sass');
+    // gulp.run('watch');
     gulp.run('webserver');
-    gulp.run('openbrowser');
+    // gulp.run('openbrowser');
 });
+
 
 //项目完成提交任务
 gulp.task('build', function() {
     gulp.run('imagemin');
-    gulp.run('compass');
+    gulp.run('sass');
     gulp.run('minifyjs');
     gulp.run('alljs');
     gulp.run('buildfiles');
@@ -165,7 +172,7 @@ gulp.task('build', function() {
 //项目完成提交任务
 gulp.task('build2', function() {
     gulp.run('tinypng');
-    gulp.run('compass');
+    gulp.run('sass');
     gulp.run('minifyjs');
     gulp.run('alljs');
     gulp.run('buildfiles');
