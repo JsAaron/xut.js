@@ -1,23 +1,25 @@
 var lr = require('tiny-lr'),
-    server     = lr(),
-    gulp       = require('gulp'),
-    compass    = require('gulp-compass'),
-    livereload = require('gulp-livereload'),
-    uglify     = require('gulp-uglify'),
-    plumber    = require('gulp-plumber'),
-    webserver  = require('gulp-webserver'),
-    opn        = require('opn'),
-    concat     = require('gulp-concat'),
-    clean      = require('gulp-clean'),
-    imagemin   = require('gulp-imagemin'),
-    pngquant   = require('imagemin-pngquant'),
-    rename     = require("gulp-rename"),
-    zip        = require('gulp-zip'),
-    copy       = require("gulp-copy"),
-    tinypng    = require('gulp-tinypng'),
-    sftp       = require('gulp-sftp'),
-    connect    = require('gulp-connect'),
-    config     = require('./config.json');
+     server     = lr(),
+     gulp       = require('gulp'),
+     compass    = require('gulp-compass'),
+     sass       = require('gulp-sass'),
+     livereload = require('gulp-livereload'),
+     uglify     = require('gulp-uglify'), //js压缩
+     minifycss  = require('gulp-minify-css'), //css压缩
+     plumber    = require('gulp-plumber'),
+     webserver  = require('gulp-webserver'),
+     opn        = require('opn'),
+     concat     = require('gulp-concat'),//合并文件
+     clean      = require('gulp-clean'), //清空文件夹
+     imagemin   = require('gulp-imagemin'),
+     pngquant   = require('imagemin-pngquant'),
+     rename     = require("gulp-rename"),
+     zip        = require('gulp-zip'),
+     copy       = require("gulp-copy"),
+     tinypng    = require('gulp-tinypng'),
+     sftp       = require('gulp-sftp'),
+     connect    = require('gulp-connect'),
+     config     = require('./config.json');
 
 
 //压缩JS
@@ -31,7 +33,8 @@ gulp.task('minifyjs', function() {
 gulp.task('alljs', function() {
     return gulp.src('build/temp_js/*.js')
         .pipe(concat('xxtppt.min.js'))
-        .pipe(gulp.dest('build'));
+        .pipe(gulp.dest('build'))
+        .pipe(livereload());
 });
 
 //重命名project.md 文件
@@ -48,44 +51,34 @@ gulp.task('webserver', function() {
             webserver({
                 host: config.localserver.host,
                 port: config.localserver.port,
-                livereload: true,
+                // livereload: true,
                 open:true, //开打浏览器
                 directoryListing: false //显示目录
             })
         );
 });
 
-
-gulp.task('test',function(){
-    gulp.run('minifyjs')
-    gulp.run('alljs')
-    gulp.run('webserver')
-})
-
-
-
-
 //通过浏览器打开本地 Web服务器 路径
 gulp.task('openbrowser', function() {
     opn('http://' + config.localserver.host + ':' + config.localserver.port);
 });
 
-//Compass 进行SASS 代码
-gulp.task('compass', function() {
-    gulp.src('./sass/*.scss')
-        .pipe(plumber())
-        .pipe(compass({
-            config_file: './config.rb'
-        }));
+//SASS编译
+gulp.task('sass', function() {
+    gulp.src('sass/*.scss')
+        .pipe(sass())
+        .pipe(gulp.dest('build/temp_css'))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(minifycss())
+        .pipe(gulp.dest('build'))
 });
 
 //多余文件删除
 gulp.task('clean', function() {
-    return gulp.src('./.sass-cache')
+    return gulp.src('build/temp_js/*','build/temp_css/*')
         .pipe(clean({
             force: true
         }))
-        .pipe(gulp.dest('./clean'));
 });
 
 //压缩图片
@@ -98,7 +91,7 @@ gulp.task('imagemin', function() {
             }],
             use: [pngquant()]
         }))
-        .pipe(gulp.dest('./build/images'));
+        .pipe(gulp.dest('build/images'));
 });
 
 //压缩图片 - tinypng
