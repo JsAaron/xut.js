@@ -117,16 +117,10 @@ gulp.task('buildfiles', function() {
 // 监听任务 运行语句 gulp watch
 gulp.task('watch', function() {
 
-    server.listen(config.localserver.port, function(err){
-        if (err) {
-            return console.log(err);
-        }
-        // 监听css
-        gulp.watch('sass/**', function(){
-            gulp.run('sass');
-        });
+    // 监听css
+    gulp.watch('sass/**', function(){
+        gulp.run('sass');
     });
-
 
 
     // gulp.watch('./sass/*.scss', function(e) {
@@ -152,7 +146,7 @@ gulp.task('watch', function() {
 gulp.task('default', function() {
     console.log('Starting Gulp tasks, enjoy coding!');
     // gulp.run('sass');
-    // gulp.run('watch');
+    gulp.run('watch');
     gulp.run('webserver');
     // gulp.run('openbrowser');
 });
