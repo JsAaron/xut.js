@@ -1,17 +1,16 @@
 require('./main.styl')
 
 // var Vue = require('vue')
- 
-Vue.component('child', {
-    // 声明 props
-    props: ['msg'],
-    // 该 prop 可以在模板内部被使用，
-    // 也可以类似 `this.msg` 这样来赋值
-    template: '<span>{{msg}}</span>'
-})
-  
 
-  
+Vue.component('param-demo', {
+    props: ['size', 'myMessage'], // simple syntax
+    compiled: function() {
+        console.log(this.size) // -> 100
+        console.log(this.myMessage) // -> 'hello!'
+    }
+})
+
+
 
 // var app = new Vue({
 //   el: '#app',
