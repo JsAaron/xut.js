@@ -1,0 +1,1099 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node',
+1 verbose cli   'E:\\Program Files\\nodejs\\node_modules\\cnpm\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   '--userconfig=C:\\Users\\Administrator\\.cnpmrc',
+1 verbose cli   '--disturl=https://npm.taobao.org/mirrors/node',
+1 verbose cli   '--cache=C:\\Users\\Administrator\\.cnpm',
+1 verbose cli   '--registry=https://registry.npm.taobao.org',
+1 verbose cli   '--node-gyp=E:\\Program Files\\nodejs\\node_modules\\cnpm\\node_modules\\pangyp\\bin\\node-gyp.js',
+1 verbose cli   'install',
+1 verbose cli   'webpack-dev-server',
+1 verbose cli   '--save-dev' ]
+2 info using npm@2.13.5
+3 info using node@v0.10.36
+4 verbose install initial load of D:\Aaron\github\node-test\webpack-test\package.json
+5 warn package.json webpack-test@1.0.0 No description
+6 warn package.json webpack-test@1.0.0 No repository field.
+7 warn package.json webpack-test@1.0.0 No README data
+8 verbose installManyTop reading scoped package data from D:\Aaron\github\node-test\webpack-test\node_modules\browser-sync\package.json
+9 verbose installManyTop reading scoped package data from D:\Aaron\github\node-test\webpack-test\node_modules\gulp\package.json
+10 verbose installManyTop reading scoped package data from D:\Aaron\github\node-test\webpack-test\node_modules\gulp-notify\package.json
+11 verbose installManyTop reading scoped package data from D:\Aaron\github\node-test\webpack-test\node_modules\gulp-webpack\package.json
+12 verbose installManyTop reading scoped package data from D:\Aaron\github\node-test\webpack-test\node_modules\html-webpack-plugin\package.json
+13 verbose installManyTop reading scoped package data from D:\Aaron\github\node-test\webpack-test\node_modules\webpack\package.json
+14 info package.json gulp-notify@2.2.0 No license field.
+15 verbose readDependencies loading dependencies from D:\Aaron\github\node-test\webpack-test\package.json
+16 silly cache add args [ 'webpack-dev-server', null ]
+17 verbose cache add spec webpack-dev-server
+18 silly cache add parsed spec { raw: 'webpack-dev-server',
+18 silly cache add   scope: null,
+18 silly cache add   name: 'webpack-dev-server',
+18 silly cache add   rawSpec: '',
+18 silly cache add   spec: '*',
+18 silly cache add   type: 'range' }
+19 silly addNamed webpack-dev-server@*
+20 verbose addNamed "*" is a valid semver range for webpack-dev-server
+21 silly addNameRange { name: 'webpack-dev-server', range: '*', hasData: false }
+22 silly mapToRegistry name webpack-dev-server
+23 silly mapToRegistry using default registry
+24 silly mapToRegistry registry https://registry.npm.taobao.org/
+25 silly mapToRegistry uri https://registry.npm.taobao.org/webpack-dev-server
+26 verbose addNameRange registry:https://registry.npm.taobao.org/webpack-dev-server not in flight; fetching
+27 verbose get https://registry.npm.taobao.org/webpack-dev-server not expired, no request
+28 silly addNameRange number 2 { name: 'webpack-dev-server', range: '*', hasData: true }
+29 silly addNameRange versions [ 'webpack-dev-server',
+29 silly addNameRange   [ '1.10.1',
+29 silly addNameRange     '1.10.0',
+29 silly addNameRange     '1.9.0',
+29 silly addNameRange     '1.8.2',
+29 silly addNameRange     '1.8.1',
+29 silly addNameRange     '1.8.0',
+29 silly addNameRange     '1.7.0',
+29 silly addNameRange     '1.6.6',
+29 silly addNameRange     '1.6.5',
+29 silly addNameRange     '1.6.4',
+29 silly addNameRange     '1.6.3',
+29 silly addNameRange     '1.6.2',
+29 silly addNameRange     '1.6.1',
+29 silly addNameRange     '1.6.0',
+29 silly addNameRange     '1.5.0',
+29 silly addNameRange     '1.4.10',
+29 silly addNameRange     '1.4.9',
+29 silly addNameRange     '1.4.7',
+29 silly addNameRange     '1.4.6',
+29 silly addNameRange     '1.4.5',
+29 silly addNameRange     '1.4.4',
+29 silly addNameRange     '1.4.3',
+29 silly addNameRange     '1.4.2',
+29 silly addNameRange     '1.4.1',
+29 silly addNameRange     '1.4.0',
+29 silly addNameRange     '1.3.2',
+29 silly addNameRange     '1.3.1',
+29 silly addNameRange     '1.3.0',
+29 silly addNameRange     '1.2.9',
+29 silly addNameRange     '1.2.8',
+29 silly addNameRange     '1.2.7',
+29 silly addNameRange     '1.2.6',
+29 silly addNameRange     '1.2.5',
+29 silly addNameRange     '1.2.4',
+29 silly addNameRange     '1.2.3',
+29 silly addNameRange     '1.2.2',
+29 silly addNameRange     '1.2.1',
+29 silly addNameRange     '1.2.0',
+29 silly addNameRange     '1.1.0',
+29 silly addNameRange     '1.0.2',
+29 silly addNameRange     '1.0.1',
+29 silly addNameRange     '1.0.0',
+29 silly addNameRange     '0.11.1',
+29 silly addNameRange     '0.11.0',
+29 silly addNameRange     '0.10.1',
+29 silly addNameRange     '0.10.0',
+29 silly addNameRange     '0.9.4',
+29 silly addNameRange     '0.9.3',
+29 silly addNameRange     '0.9.2',
+29 silly addNameRange     '0.9.1',
+29 silly addNameRange     '0.9.0',
+29 silly addNameRange     '0.8.2',
+29 silly addNameRange     '0.8.1',
+29 silly addNameRange     '0.8.0',
+29 silly addNameRange     '0.7.2',
+29 silly addNameRange     '0.7.1',
+29 silly addNameRange     '0.7.0',
+29 silly addNameRange     '0.6.2',
+29 silly addNameRange     '0.6.1',
+29 silly addNameRange     '0.6.0' ] ]
+30 silly addNamed webpack-dev-server@1.10.1
+31 verbose addNamed "1.10.1" is a plain semver version for webpack-dev-server
+32 silly cache afterAdd webpack-dev-server@1.10.1
+33 verbose afterAdd C:\Users\Administrator\.cnpm\webpack-dev-server\1.10.1\package\package.json not in flight; writing
+34 verbose afterAdd C:\Users\Administrator\.cnpm\webpack-dev-server\1.10.1\package\package.json written
+35 silly install resolved [ { name: 'webpack-dev-server',
+35 silly install resolved     version: '1.10.1',
+35 silly install resolved     author: { name: 'Tobias Koppers @sokra' },
+35 silly install resolved     description: 'Serves a webpack app. Updates the browser on changes.',
+35 silly install resolved     peerDependencies: { webpack: '^1.3.0' },
+35 silly install resolved     dependencies:
+35 silly install resolved      { 'connect-history-api-fallback': '1.1.0',
+35 silly install resolved        express: '^4.3.2',
+35 silly install resolved        'http-proxy': '^1.1.4',
+35 silly install resolved        optimist: '~0.6.0',
+35 silly install resolved        'serve-index': '^1.2.0',
+35 silly install resolved        'socket.io': '^1.3.3',
+35 silly install resolved        'socket.io-client': '^1.3.3',
+35 silly install resolved        'stream-cache': '~0.0.1',
+35 silly install resolved        'strip-ansi': '^2.0.1',
+35 silly install resolved        'supports-color': '^1.3.1',
+35 silly install resolved        'webpack-dev-middleware': '^1.0.7' },
+35 silly install resolved     devDependencies:
+35 silly install resolved      { 'css-loader': '~0.15.1',
+35 silly install resolved        'file-loader': '~0.8.4',
+35 silly install resolved        jade: '^1.11.0',
+35 silly install resolved        'jade-loader': '~0.7.1',
+35 silly install resolved        less: '^2.5.1',
+35 silly install resolved        'less-loader': '~2.2.0',
+35 silly install resolved        'style-loader': '~0.12.3',
+35 silly install resolved        'url-loader': '~0.5.5',
+35 silly install resolved        webpack: '^1.10.0' },
+35 silly install resolved     license: 'MIT',
+35 silly install resolved     repository:
+35 silly install resolved      { type: 'git',
+35 silly install resolved        url: 'git://github.com/webpack/webpack-dev-server.git' },
+35 silly install resolved     homepage: 'http://github.com/webpack/webpack-dev-server',
+35 silly install resolved     main: 'lib/Server.js',
+35 silly install resolved     bin: { 'webpack-dev-server': 'bin/webpack-dev-server.js' },
+35 silly install resolved     files: [ 'lib/', 'bin', 'client/', 'ssl/' ],
+35 silly install resolved     scripts: { prepublish: 'webpack ./client/live.js client/live.bundle.js --colors --config client/webpack.config.js -p && webpack ./client/index.js client/index.bundle.js --colors --config client/webpack.config.js -p' },
+35 silly install resolved     gitHead: '8fddb2adbf71582d4728d85021a32bd3175571c4',
+35 silly install resolved     bugs: { url: 'https://github.com/webpack/webpack-dev-server/issues' },
+35 silly install resolved     _id: 'webpack-dev-server@1.10.1',
+35 silly install resolved     _shasum: '55ace76bacc8916749542af439ac4971e4e12691',
+35 silly install resolved     _from: 'webpack-dev-server@*',
+35 silly install resolved     _npmVersion: '2.10.1',
+35 silly install resolved     _nodeVersion: '0.12.4',
+35 silly install resolved     _npmUser: { name: 'sokra', email: 'tobias.koppers@googlemail.com' },
+35 silly install resolved     maintainers: [ [Object] ],
+35 silly install resolved     dist:
+35 silly install resolved      { shasum: '55ace76bacc8916749542af439ac4971e4e12691',
+35 silly install resolved        size: 164375,
+35 silly install resolved        noattachment: false,
+35 silly install resolved        tarball: 'http://registry.npm.taobao.org/webpack-dev-server/download/webpack-dev-server-1.10.1.tgz' },
+35 silly install resolved     directories: {},
+35 silly install resolved     publish_time: 1435473104435,
+35 silly install resolved     _cnpm_publish_time: 1435473104435,
+35 silly install resolved     _resolved: 'https://registry.npm.taobao.org/webpack-dev-server/download/webpack-dev-server-1.10.1.tgz',
+35 silly install resolved     readme: 'ERROR: No README data found!' } ]
+36 info install webpack-dev-server@1.10.1 into D:\Aaron\github\node-test\webpack-test
+37 info installOne webpack-dev-server@1.10.1
+38 verbose installOne of webpack-dev-server to D:\Aaron\github\node-test\webpack-test not in flight; installing
+39 verbose lock using C:\Users\Administrator\.cnpm\_locks\webpack-dev-server-80665ac232bd6e70.lock for D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+40 silly install write writing webpack-dev-server 1.10.1 to D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+41 verbose unbuild node_modules\webpack-dev-server
+42 silly gentlyRm D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server is being purged from base D:\Aaron\github\node-test\webpack-test
+43 verbose gentlyRm don't care about contents; nuking D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+44 verbose tar unpack C:\Users\Administrator\.cnpm\webpack-dev-server\1.10.1\package.tgz
+45 verbose tar unpacking to D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+46 silly gentlyRm D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server is being purged
+47 verbose gentlyRm don't care about contents; nuking D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+48 silly gunzTarPerm modes [ '777', '666' ]
+49 silly gunzTarPerm extractEntry package.json
+50 silly gunzTarPerm extractEntry README.md
+51 silly gunzTarPerm extractEntry bin/webpack-dev-server.js
+52 silly gunzTarPerm extractEntry client/index.bundle.js
+53 silly gunzTarPerm extractEntry client/index.js
+54 silly gunzTarPerm extractEntry client/live.bundle.js
+55 silly gunzTarPerm extractEntry client/live.js
+56 silly gunzTarPerm extractEntry client/webpack.config.js
+57 silly gunzTarPerm extractEntry client/live.html
+58 silly gunzTarPerm extractEntry client/page.jade
+59 silly gunzTarPerm extractEntry client/style.css
+60 silly gunzTarPerm extractEntry client/web_modules/jquery/index.js
+61 silly gunzTarPerm extractEntry client/web_modules/jquery/jquery-1.8.1.js
+62 silly gunzTarPerm extractEntry lib/Server.js
+63 silly gunzTarPerm extractEntry ssl/ca.crt
+64 silly gunzTarPerm extractEntry ssl/ca.csr
+65 silly gunzTarPerm extractEntry ssl/ca.key
+66 silly gunzTarPerm extractEntry ssl/server.crt
+67 silly gunzTarPerm extractEntry ssl/server.csr
+68 silly gunzTarPerm extractEntry ssl/server.key
+69 verbose write writing to D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server\package.json
+70 info preinstall webpack-dev-server@1.10.1
+71 verbose readDependencies loading dependencies from D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server\package.json
+72 silly prepareForInstallMany adding connect-history-api-fallback@1.1.0 from webpack-dev-server dependencies
+73 silly prepareForInstallMany adding express@^4.3.2 from webpack-dev-server dependencies
+74 silly prepareForInstallMany adding http-proxy@^1.1.4 from webpack-dev-server dependencies
+75 silly prepareForInstallMany adding optimist@~0.6.0 from webpack-dev-server dependencies
+76 silly prepareForInstallMany adding serve-index@^1.2.0 from webpack-dev-server dependencies
+77 silly prepareForInstallMany adding socket.io@^1.3.3 from webpack-dev-server dependencies
+78 silly prepareForInstallMany adding socket.io-client@^1.3.3 from webpack-dev-server dependencies
+79 silly prepareForInstallMany adding stream-cache@~0.0.1 from webpack-dev-server dependencies
+80 silly prepareForInstallMany adding strip-ansi@^2.0.1 from webpack-dev-server dependencies
+81 silly prepareForInstallMany adding supports-color@^1.3.1 from webpack-dev-server dependencies
+82 silly prepareForInstallMany adding webpack-dev-middleware@^1.0.7 from webpack-dev-server dependencies
+83 verbose readDependencies loading dependencies from D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server\package.json
+84 silly cache add args [ 'connect-history-api-fallback@1.1.0', null ]
+85 verbose cache add spec connect-history-api-fallback@1.1.0
+86 silly cache add args [ 'express@^4.3.2', null ]
+87 verbose cache add spec express@^4.3.2
+88 silly cache add parsed spec { raw: 'connect-history-api-fallback@1.1.0',
+88 silly cache add   scope: null,
+88 silly cache add   name: 'connect-history-api-fallback',
+88 silly cache add   rawSpec: '1.1.0',
+88 silly cache add   spec: '1.1.0',
+88 silly cache add   type: 'version' }
+89 silly addNamed connect-history-api-fallback@1.1.0
+90 verbose addNamed "1.1.0" is a plain semver version for connect-history-api-fallback
+91 silly mapToRegistry name connect-history-api-fallback
+92 silly mapToRegistry using default registry
+93 silly mapToRegistry registry https://registry.npm.taobao.org/
+94 silly mapToRegistry uri https://registry.npm.taobao.org/connect-history-api-fallback
+95 verbose addNameVersion registry:https://registry.npm.taobao.org/connect-history-api-fallback not in flight; fetching
+96 silly cache add parsed spec { raw: 'express@^4.3.2',
+96 silly cache add   scope: null,
+96 silly cache add   name: 'express',
+96 silly cache add   rawSpec: '^4.3.2',
+96 silly cache add   spec: '>=4.3.2 <5.0.0',
+96 silly cache add   type: 'range' }
+97 silly addNamed express@>=4.3.2 <5.0.0
+98 verbose addNamed ">=4.3.2 <5.0.0" is a valid semver range for express
+99 silly addNameRange { name: 'express', range: '>=4.3.2 <5.0.0', hasData: false }
+100 silly mapToRegistry name express
+101 silly mapToRegistry using default registry
+102 silly mapToRegistry registry https://registry.npm.taobao.org/
+103 silly mapToRegistry uri https://registry.npm.taobao.org/express
+104 verbose addNameRange registry:https://registry.npm.taobao.org/express not in flight; fetching
+105 silly cache add args [ 'http-proxy@^1.1.4', null ]
+106 verbose cache add spec http-proxy@^1.1.4
+107 silly cache add parsed spec { raw: 'http-proxy@^1.1.4',
+107 silly cache add   scope: null,
+107 silly cache add   name: 'http-proxy',
+107 silly cache add   rawSpec: '^1.1.4',
+107 silly cache add   spec: '>=1.1.4 <2.0.0',
+107 silly cache add   type: 'range' }
+108 silly addNamed http-proxy@>=1.1.4 <2.0.0
+109 verbose addNamed ">=1.1.4 <2.0.0" is a valid semver range for http-proxy
+110 silly addNameRange { name: 'http-proxy', range: '>=1.1.4 <2.0.0', hasData: false }
+111 silly mapToRegistry name http-proxy
+112 silly mapToRegistry using default registry
+113 silly mapToRegistry registry https://registry.npm.taobao.org/
+114 silly mapToRegistry uri https://registry.npm.taobao.org/http-proxy
+115 verbose addNameRange registry:https://registry.npm.taobao.org/http-proxy not in flight; fetching
+116 silly cache add args [ 'optimist@~0.6.0', null ]
+117 verbose cache add spec optimist@~0.6.0
+118 silly cache add parsed spec { raw: 'optimist@~0.6.0',
+118 silly cache add   scope: null,
+118 silly cache add   name: 'optimist',
+118 silly cache add   rawSpec: '~0.6.0',
+118 silly cache add   spec: '>=0.6.0 <0.7.0',
+118 silly cache add   type: 'range' }
+119 silly addNamed optimist@>=0.6.0 <0.7.0
+120 verbose addNamed ">=0.6.0 <0.7.0" is a valid semver range for optimist
+121 silly addNameRange { name: 'optimist', range: '>=0.6.0 <0.7.0', hasData: false }
+122 silly mapToRegistry name optimist
+123 silly mapToRegistry using default registry
+124 silly mapToRegistry registry https://registry.npm.taobao.org/
+125 silly mapToRegistry uri https://registry.npm.taobao.org/optimist
+126 verbose addNameRange registry:https://registry.npm.taobao.org/optimist not in flight; fetching
+127 silly cache add args [ 'serve-index@^1.2.0', null ]
+128 verbose cache add spec serve-index@^1.2.0
+129 silly cache add parsed spec { raw: 'serve-index@^1.2.0',
+129 silly cache add   scope: null,
+129 silly cache add   name: 'serve-index',
+129 silly cache add   rawSpec: '^1.2.0',
+129 silly cache add   spec: '>=1.2.0 <2.0.0',
+129 silly cache add   type: 'range' }
+130 silly addNamed serve-index@>=1.2.0 <2.0.0
+131 verbose addNamed ">=1.2.0 <2.0.0" is a valid semver range for serve-index
+132 silly addNameRange { name: 'serve-index', range: '>=1.2.0 <2.0.0', hasData: false }
+133 silly mapToRegistry name serve-index
+134 silly mapToRegistry using default registry
+135 silly mapToRegistry registry https://registry.npm.taobao.org/
+136 silly mapToRegistry uri https://registry.npm.taobao.org/serve-index
+137 verbose addNameRange registry:https://registry.npm.taobao.org/serve-index not in flight; fetching
+138 silly cache add args [ 'socket.io@^1.3.3', null ]
+139 verbose cache add spec socket.io@^1.3.3
+140 silly cache add parsed spec { raw: 'socket.io@^1.3.3',
+140 silly cache add   scope: null,
+140 silly cache add   name: 'socket.io',
+140 silly cache add   rawSpec: '^1.3.3',
+140 silly cache add   spec: '>=1.3.3 <2.0.0',
+140 silly cache add   type: 'range' }
+141 silly addNamed socket.io@>=1.3.3 <2.0.0
+142 verbose addNamed ">=1.3.3 <2.0.0" is a valid semver range for socket.io
+143 silly addNameRange { name: 'socket.io', range: '>=1.3.3 <2.0.0', hasData: false }
+144 silly mapToRegistry name socket.io
+145 silly mapToRegistry using default registry
+146 silly mapToRegistry registry https://registry.npm.taobao.org/
+147 silly mapToRegistry uri https://registry.npm.taobao.org/socket.io
+148 verbose addNameRange registry:https://registry.npm.taobao.org/socket.io not in flight; fetching
+149 silly cache add args [ 'socket.io-client@^1.3.3', null ]
+150 verbose cache add spec socket.io-client@^1.3.3
+151 silly cache add parsed spec { raw: 'socket.io-client@^1.3.3',
+151 silly cache add   scope: null,
+151 silly cache add   name: 'socket.io-client',
+151 silly cache add   rawSpec: '^1.3.3',
+151 silly cache add   spec: '>=1.3.3 <2.0.0',
+151 silly cache add   type: 'range' }
+152 silly addNamed socket.io-client@>=1.3.3 <2.0.0
+153 verbose addNamed ">=1.3.3 <2.0.0" is a valid semver range for socket.io-client
+154 silly addNameRange { name: 'socket.io-client',
+154 silly addNameRange   range: '>=1.3.3 <2.0.0',
+154 silly addNameRange   hasData: false }
+155 silly mapToRegistry name socket.io-client
+156 silly mapToRegistry using default registry
+157 silly mapToRegistry registry https://registry.npm.taobao.org/
+158 silly mapToRegistry uri https://registry.npm.taobao.org/socket.io-client
+159 verbose addNameRange registry:https://registry.npm.taobao.org/socket.io-client not in flight; fetching
+160 silly cache add args [ 'stream-cache@~0.0.1', null ]
+161 verbose cache add spec stream-cache@~0.0.1
+162 silly cache add parsed spec { raw: 'stream-cache@~0.0.1',
+162 silly cache add   scope: null,
+162 silly cache add   name: 'stream-cache',
+162 silly cache add   rawSpec: '~0.0.1',
+162 silly cache add   spec: '>=0.0.1 <0.1.0',
+162 silly cache add   type: 'range' }
+163 silly addNamed stream-cache@>=0.0.1 <0.1.0
+164 verbose addNamed ">=0.0.1 <0.1.0" is a valid semver range for stream-cache
+165 silly addNameRange { name: 'stream-cache', range: '>=0.0.1 <0.1.0', hasData: false }
+166 silly mapToRegistry name stream-cache
+167 silly mapToRegistry using default registry
+168 silly mapToRegistry registry https://registry.npm.taobao.org/
+169 silly mapToRegistry uri https://registry.npm.taobao.org/stream-cache
+170 verbose addNameRange registry:https://registry.npm.taobao.org/stream-cache not in flight; fetching
+171 silly cache add args [ 'strip-ansi@^2.0.1', null ]
+172 verbose cache add spec strip-ansi@^2.0.1
+173 silly cache add parsed spec { raw: 'strip-ansi@^2.0.1',
+173 silly cache add   scope: null,
+173 silly cache add   name: 'strip-ansi',
+173 silly cache add   rawSpec: '^2.0.1',
+173 silly cache add   spec: '>=2.0.1 <3.0.0',
+173 silly cache add   type: 'range' }
+174 silly addNamed strip-ansi@>=2.0.1 <3.0.0
+175 verbose addNamed ">=2.0.1 <3.0.0" is a valid semver range for strip-ansi
+176 silly addNameRange { name: 'strip-ansi', range: '>=2.0.1 <3.0.0', hasData: false }
+177 silly mapToRegistry name strip-ansi
+178 silly mapToRegistry using default registry
+179 silly mapToRegistry registry https://registry.npm.taobao.org/
+180 silly mapToRegistry uri https://registry.npm.taobao.org/strip-ansi
+181 verbose addNameRange registry:https://registry.npm.taobao.org/strip-ansi not in flight; fetching
+182 silly cache add args [ 'supports-color@^1.3.1', null ]
+183 verbose cache add spec supports-color@^1.3.1
+184 silly cache add parsed spec { raw: 'supports-color@^1.3.1',
+184 silly cache add   scope: null,
+184 silly cache add   name: 'supports-color',
+184 silly cache add   rawSpec: '^1.3.1',
+184 silly cache add   spec: '>=1.3.1 <2.0.0',
+184 silly cache add   type: 'range' }
+185 silly addNamed supports-color@>=1.3.1 <2.0.0
+186 verbose addNamed ">=1.3.1 <2.0.0" is a valid semver range for supports-color
+187 silly addNameRange { name: 'supports-color',
+187 silly addNameRange   range: '>=1.3.1 <2.0.0',
+187 silly addNameRange   hasData: false }
+188 silly mapToRegistry name supports-color
+189 silly mapToRegistry using default registry
+190 silly mapToRegistry registry https://registry.npm.taobao.org/
+191 silly mapToRegistry uri https://registry.npm.taobao.org/supports-color
+192 verbose addNameRange registry:https://registry.npm.taobao.org/supports-color not in flight; fetching
+193 silly cache add args [ 'webpack-dev-middleware@^1.0.7', null ]
+194 verbose cache add spec webpack-dev-middleware@^1.0.7
+195 silly cache add parsed spec { raw: 'webpack-dev-middleware@^1.0.7',
+195 silly cache add   scope: null,
+195 silly cache add   name: 'webpack-dev-middleware',
+195 silly cache add   rawSpec: '^1.0.7',
+195 silly cache add   spec: '>=1.0.7 <2.0.0',
+195 silly cache add   type: 'range' }
+196 silly addNamed webpack-dev-middleware@>=1.0.7 <2.0.0
+197 verbose addNamed ">=1.0.7 <2.0.0" is a valid semver range for webpack-dev-middleware
+198 silly addNameRange { name: 'webpack-dev-middleware',
+198 silly addNameRange   range: '>=1.0.7 <2.0.0',
+198 silly addNameRange   hasData: false }
+199 silly mapToRegistry name webpack-dev-middleware
+200 silly mapToRegistry using default registry
+201 silly mapToRegistry registry https://registry.npm.taobao.org/
+202 silly mapToRegistry uri https://registry.npm.taobao.org/webpack-dev-middleware
+203 verbose addNameRange registry:https://registry.npm.taobao.org/webpack-dev-middleware not in flight; fetching
+204 verbose get https://registry.npm.taobao.org/connect-history-api-fallback not expired, no request
+205 verbose get https://registry.npm.taobao.org/http-proxy not expired, no request
+206 silly addNameRange number 2 { name: 'http-proxy', range: '>=1.1.4 <2.0.0', hasData: true }
+207 silly addNameRange versions [ 'http-proxy',
+207 silly addNameRange   [ '1.11.2',
+207 silly addNameRange     '1.11.1',
+207 silly addNameRange     '1.11.0',
+207 silly addNameRange     '1.10.1',
+207 silly addNameRange     '1.10.0',
+207 silly addNameRange     '1.9.1',
+207 silly addNameRange     '1.9.0',
+207 silly addNameRange     '1.8.1',
+207 silly addNameRange     '1.8.0',
+207 silly addNameRange     '1.7.3',
+207 silly addNameRange     '1.7.2',
+207 silly addNameRange     '1.7.1',
+207 silly addNameRange     '1.7.0',
+207 silly addNameRange     '1.6.2',
+207 silly addNameRange     '1.6.1',
+207 silly addNameRange     '1.6.0',
+207 silly addNameRange     '1.5.3',
+207 silly addNameRange     '1.5.2',
+207 silly addNameRange     '1.5.1',
+207 silly addNameRange     '1.5.0',
+207 silly addNameRange     '1.4.3',
+207 silly addNameRange     '1.4.2',
+207 silly addNameRange     '1.4.1',
+207 silly addNameRange     '1.4.0',
+207 silly addNameRange     '1.3.0',
+207 silly addNameRange     '1.2.1',
+207 silly addNameRange     '1.2.0',
+207 silly addNameRange     '1.1.6',
+207 silly addNameRange     '1.1.5',
+207 silly addNameRange     '1.1.4',
+207 silly addNameRange     '1.1.3',
+207 silly addNameRange     '1.1.2',
+207 silly addNameRange     '1.1.1',
+207 silly addNameRange     '1.1.0',
+207 silly addNameRange     '1.0.3',
+207 silly addNameRange     '1.0.2',
+207 silly addNameRange     '1.0.1',
+207 silly addNameRange     '1.0.0',
+207 silly addNameRange     '0.10.4',
+207 silly addNameRange     '0.10.3',
+207 silly addNameRange     '0.10.2',
+207 silly addNameRange     '0.10.1',
+207 silly addNameRange     '0.10.0',
+207 silly addNameRange     '0.9.1',
+207 silly addNameRange     '0.9.0',
+207 silly addNameRange     '0.8.7',
+207 silly addNameRange     '0.8.6',
+207 silly addNameRange     '0.8.5',
+207 silly addNameRange     '0.8.4',
+207 silly addNameRange     '0.8.3',
+207 silly addNameRange     '0.8.2',
+207 silly addNameRange     '0.8.1',
+207 silly addNameRange     '0.8.0',
+207 silly addNameRange     '0.7.6',
+207 silly addNameRange     '0.7.5',
+207 silly addNameRange     '0.7.4',
+207 silly addNameRange     '0.7.3',
+207 silly addNameRange     '0.7.2',
+207 silly addNameRange     '0.6.6',
+207 silly addNameRange     '0.6.5',
+207 silly addNameRange     '0.6.4',
+207 silly addNameRange     '0.6.2',
+207 silly addNameRange     '0.7.0',
+207 silly addNameRange     '0.6.1',
+207 silly addNameRange     '0.6.0',
+207 silly addNameRange     '0.5.11',
+207 silly addNameRange     '0.5.10',
+207 silly addNameRange     '0.5.9' ] ]
+208 silly addNamed http-proxy@1.11.2
+209 verbose addNamed "1.11.2" is a plain semver version for http-proxy
+210 verbose get https://registry.npm.taobao.org/optimist not expired, no request
+211 silly addNameRange number 2 { name: 'optimist', range: '>=0.6.0 <0.7.0', hasData: true }
+212 silly addNameRange versions [ 'optimist',
+212 silly addNameRange   [ '0.6.1',
+212 silly addNameRange     '0.6.0',
+212 silly addNameRange     '0.5.2',
+212 silly addNameRange     '0.5.1',
+212 silly addNameRange     '0.5.0',
+212 silly addNameRange     '0.4.0',
+212 silly addNameRange     '0.3.7',
+212 silly addNameRange     '0.3.6',
+212 silly addNameRange     '0.3.5',
+212 silly addNameRange     '0.3.4',
+212 silly addNameRange     '0.3.3',
+212 silly addNameRange     '0.3.1',
+212 silly addNameRange     '0.3.0',
+212 silly addNameRange     '0.2.8',
+212 silly addNameRange     '0.2.7',
+212 silly addNameRange     '0.2.6',
+212 silly addNameRange     '0.2.5',
+212 silly addNameRange     '0.2.4',
+212 silly addNameRange     '0.2.3',
+212 silly addNameRange     '0.2.2',
+212 silly addNameRange     '0.2.1',
+212 silly addNameRange     '0.2.0',
+212 silly addNameRange     '0.1.9',
+212 silly addNameRange     '0.1.8',
+212 silly addNameRange     '0.1.7',
+212 silly addNameRange     '0.1.6',
+212 silly addNameRange     '0.1.5',
+212 silly addNameRange     '0.1.4',
+212 silly addNameRange     '0.0.2',
+212 silly addNameRange     '0.0.3',
+212 silly addNameRange     '0.1.2',
+212 silly addNameRange     '0.1.1',
+212 silly addNameRange     '0.1.0',
+212 silly addNameRange     '0.0.7',
+212 silly addNameRange     '0.0.6',
+212 silly addNameRange     '0.0.5',
+212 silly addNameRange     '0.0.4',
+212 silly addNameRange     '0.0.1',
+212 silly addNameRange     '0.1.3' ] ]
+213 silly addNamed optimist@0.6.1
+214 verbose addNamed "0.6.1" is a plain semver version for optimist
+215 verbose get https://registry.npm.taobao.org/serve-index not expired, no request
+216 silly addNameRange number 2 { name: 'serve-index', range: '>=1.2.0 <2.0.0', hasData: true }
+217 silly addNameRange versions [ 'serve-index',
+217 silly addNameRange   [ '1.7.2',
+217 silly addNameRange     '1.7.1',
+217 silly addNameRange     '1.7.0',
+217 silly addNameRange     '1.6.4',
+217 silly addNameRange     '1.6.3',
+217 silly addNameRange     '1.6.2',
+217 silly addNameRange     '1.6.1',
+217 silly addNameRange     '1.6.0',
+217 silly addNameRange     '1.5.3',
+217 silly addNameRange     '1.5.2',
+217 silly addNameRange     '1.5.1',
+217 silly addNameRange     '1.5.0',
+217 silly addNameRange     '1.4.1',
+217 silly addNameRange     '1.4.0',
+217 silly addNameRange     '1.3.1',
+217 silly addNameRange     '1.3.0',
+217 silly addNameRange     '1.2.1',
+217 silly addNameRange     '1.2.0',
+217 silly addNameRange     '1.1.6',
+217 silly addNameRange     '1.1.5',
+217 silly addNameRange     '1.1.4',
+217 silly addNameRange     '1.1.3',
+217 silly addNameRange     '1.1.2',
+217 silly addNameRange     '1.1.1',
+217 silly addNameRange     '1.1.0',
+217 silly addNameRange     '1.0.3',
+217 silly addNameRange     '1.0.2',
+217 silly addNameRange     '1.0.1',
+217 silly addNameRange     '1.0.0' ] ]
+218 silly addNamed serve-index@1.7.2
+219 verbose addNamed "1.7.2" is a plain semver version for serve-index
+220 verbose get https://registry.npm.taobao.org/socket.io not expired, no request
+221 silly addNameRange number 2 { name: 'socket.io', range: '>=1.3.3 <2.0.0', hasData: true }
+222 silly addNameRange versions [ 'socket.io',
+222 silly addNameRange   [ '1.3.6',
+222 silly addNameRange     '1.3.5',
+222 silly addNameRange     '1.3.4',
+222 silly addNameRange     '1.3.3',
+222 silly addNameRange     '1.3.2',
+222 silly addNameRange     '1.3.1',
+222 silly addNameRange     '1.3.0',
+222 silly addNameRange     '1.2.1',
+222 silly addNameRange     '1.2.0',
+222 silly addNameRange     '1.1.0',
+222 silly addNameRange     '1.0.6',
+222 silly addNameRange     '1.0.5',
+222 silly addNameRange     '1.0.4',
+222 silly addNameRange     '1.0.3',
+222 silly addNameRange     '1.0.2',
+222 silly addNameRange     '1.0.1',
+222 silly addNameRange     '1.0.0',
+222 silly addNameRange     '0.9.17',
+222 silly addNameRange     '1.0.0-pre5',
+222 silly addNameRange     '1.0.0-pre4',
+222 silly addNameRange     '1.0.0-pre3',
+222 silly addNameRange     '1.0.0-pre2',
+222 silly addNameRange     '1.0.0-pre',
+222 silly addNameRange     '0.9.16',
+222 silly addNameRange     '0.9.15',
+222 silly addNameRange     '0.9.14',
+222 silly addNameRange     '0.9.13',
+222 silly addNameRange     '0.9.12',
+222 silly addNameRange     '0.9.11',
+222 silly addNameRange     '0.9.10',
+222 silly addNameRange     '0.9.9',
+222 silly addNameRange     '0.9.8',
+222 silly addNameRange     '0.9.7',
+222 silly addNameRange     '0.9.6',
+222 silly addNameRange     '0.9.5',
+222 silly addNameRange     '0.9.4',
+222 silly addNameRange     '0.9.3',
+222 silly addNameRange     '0.9.2',
+222 silly addNameRange     '0.9.1-1',
+222 silly addNameRange     '0.9.1',
+222 silly addNameRange     '0.9.0',
+222 silly addNameRange     '0.8.7',
+222 silly addNameRange     '0.8.6',
+222 silly addNameRange     '0.8.5',
+222 silly addNameRange     '0.8.4',
+222 silly addNameRange     '0.8.3',
+222 silly addNameRange     '0.8.2',
+222 silly addNameRange     '0.8.1',
+222 silly addNameRange     '0.8.0',
+222 silly addNameRange     '0.7.11',
+222 silly addNameRange     '0.7.10',
+222 silly addNameRange     '0.7.9',
+222 silly addNameRange     '0.7.8',
+222 silly addNameRange     '0.7.7',
+222 silly addNameRange     '0.7.6',
+222 silly addNameRange     '0.7.5',
+222 silly addNameRange     '0.7.4',
+222 silly addNameRange     '0.7.3',
+222 silly addNameRange     '0.7.2',
+222 silly addNameRange     '0.7.1',
+222 silly addNameRange     '0.7.0',
+222 silly addNameRange     '0.6.18',
+222 silly addNameRange     '0.6.17',
+222 silly addNameRange     '0.6.16',
+222 silly addNameRange     '0.6.15',
+222 silly addNameRange     '0.6.14',
+222 silly addNameRange     '0.6.12',
+222 silly addNameRange     '0.6.11',
+222 silly addNameRange     '0.6.10',
+222 silly addNameRange     '0.6.9',
+222 silly addNameRange     '0.6.8',
+222 silly addNameRange     '0.6.7',
+222 silly addNameRange     '0.6.6',
+222 silly addNameRange     '0.6.5',
+222 silly addNameRange     '0.6.4',
+222 silly addNameRange     '0.4.1',
+222 silly addNameRange     '0.6.3',
+222 silly addNameRange     '0.6.1',
+222 silly addNameRange     '0.6.0',
+222 silly addNameRange     '0.5.3',
+222 silly addNameRange     '0.5.1',
+222 silly addNameRange     '0.4.0',
+222 silly addNameRange     '0.3.8' ] ]
+223 silly addNamed socket.io@1.3.6
+224 verbose addNamed "1.3.6" is a plain semver version for socket.io
+225 verbose get https://registry.npm.taobao.org/stream-cache not expired, no request
+226 silly addNameRange number 2 { name: 'stream-cache', range: '>=0.0.1 <0.1.0', hasData: true }
+227 silly addNameRange versions [ 'stream-cache', [ '0.0.2', '0.0.1' ] ]
+228 silly addNamed stream-cache@0.0.2
+229 verbose addNamed "0.0.2" is a plain semver version for stream-cache
+230 verbose get https://registry.npm.taobao.org/strip-ansi not expired, no request
+231 silly addNameRange number 2 { name: 'strip-ansi', range: '>=2.0.1 <3.0.0', hasData: true }
+232 silly addNameRange versions [ 'strip-ansi',
+232 silly addNameRange   [ '3.0.0',
+232 silly addNameRange     '2.0.1',
+232 silly addNameRange     '2.0.0',
+232 silly addNameRange     '1.0.0',
+232 silly addNameRange     '0.3.0',
+232 silly addNameRange     '0.2.2',
+232 silly addNameRange     '0.2.1',
+232 silly addNameRange     '0.2.0',
+232 silly addNameRange     '0.1.1',
+232 silly addNameRange     '0.1.0' ] ]
+233 silly addNamed strip-ansi@2.0.1
+234 verbose addNamed "2.0.1" is a plain semver version for strip-ansi
+235 verbose get https://registry.npm.taobao.org/socket.io-client not expired, no request
+236 silly addNameRange number 2 { name: 'socket.io-client',
+236 silly addNameRange   range: '>=1.3.3 <2.0.0',
+236 silly addNameRange   hasData: true }
+237 silly addNameRange versions [ 'socket.io-client',
+237 silly addNameRange   [ '1.3.6',
+237 silly addNameRange     '1.3.5',
+237 silly addNameRange     '1.3.4',
+237 silly addNameRange     '1.3.3',
+237 silly addNameRange     '1.3.2',
+237 silly addNameRange     '1.3.1',
+237 silly addNameRange     '1.3.0',
+237 silly addNameRange     '1.2.1',
+237 silly addNameRange     '1.2.0',
+237 silly addNameRange     '1.1.0',
+237 silly addNameRange     '1.0.6',
+237 silly addNameRange     '1.0.5',
+237 silly addNameRange     '1.0.4',
+237 silly addNameRange     '1.0.3',
+237 silly addNameRange     '1.0.2',
+237 silly addNameRange     '1.0.1',
+237 silly addNameRange     '0.9.17',
+237 silly addNameRange     '1.0.0-pre5',
+237 silly addNameRange     '1.0.0-pre4',
+237 silly addNameRange     '1.0.0-pre3',
+237 silly addNameRange     '1.0.0-pre2',
+237 silly addNameRange     '1.0.0-pre',
+237 silly addNameRange     '0.9.16',
+237 silly addNameRange     '0.9.15',
+237 silly addNameRange     '0.9.11',
+237 silly addNameRange     '0.9.10',
+237 silly addNameRange     '0.9.9',
+237 silly addNameRange     '0.9.8',
+237 silly addNameRange     '0.9.7',
+237 silly addNameRange     '0.9.6',
+237 silly addNameRange     '0.9.5',
+237 silly addNameRange     '0.9.4',
+237 silly addNameRange     '0.9.3',
+237 silly addNameRange     '0.9.2',
+237 silly addNameRange     '0.9.1-1',
+237 silly addNameRange     '0.9.1',
+237 silly addNameRange     '0.9.0',
+237 silly addNameRange     '0.8.7',
+237 silly addNameRange     '0.8.6',
+237 silly addNameRange     '0.8.5',
+237 silly addNameRange     '0.8.4',
+237 silly addNameRange     '0.8.3',
+237 silly addNameRange     '0.8.2',
+237 silly addNameRange     '0.8.1',
+237 silly addNameRange     '0.8.0',
+237 silly addNameRange     '0.7.11',
+237 silly addNameRange     '0.7.10',
+237 silly addNameRange     '0.7.9',
+237 silly addNameRange     '0.7.5',
+237 silly addNameRange     '0.7.4',
+237 silly addNameRange     '0.7.3',
+237 silly addNameRange     '0.7.2',
+237 silly addNameRange     '0.7.1',
+237 silly addNameRange     '0.7.0' ] ]
+238 silly addNamed socket.io-client@1.3.6
+239 verbose addNamed "1.3.6" is a plain semver version for socket.io-client
+240 verbose get https://registry.npm.taobao.org/supports-color not expired, no request
+241 silly addNameRange number 2 { name: 'supports-color',
+241 silly addNameRange   range: '>=1.3.1 <2.0.0',
+241 silly addNameRange   hasData: true }
+242 silly addNameRange versions [ 'supports-color',
+242 silly addNameRange   [ '3.1.1',
+242 silly addNameRange     '3.1.0',
+242 silly addNameRange     '3.0.1',
+242 silly addNameRange     '3.0.0',
+242 silly addNameRange     '2.0.0',
+242 silly addNameRange     '1.3.1',
+242 silly addNameRange     '1.3.0',
+242 silly addNameRange     '1.2.1',
+242 silly addNameRange     '1.2.0',
+242 silly addNameRange     '1.1.0',
+242 silly addNameRange     '1.0.0',
+242 silly addNameRange     '0.2.0' ] ]
+243 silly addNamed supports-color@1.3.1
+244 verbose addNamed "1.3.1" is a plain semver version for supports-color
+245 verbose get https://registry.npm.taobao.org/webpack-dev-middleware not expired, no request
+246 silly addNameRange number 2 { name: 'webpack-dev-middleware',
+246 silly addNameRange   range: '>=1.0.7 <2.0.0',
+246 silly addNameRange   hasData: true }
+247 silly addNameRange versions [ 'webpack-dev-middleware',
+247 silly addNameRange   [ '1.2.0',
+247 silly addNameRange     '1.1.0',
+247 silly addNameRange     '1.0.11',
+247 silly addNameRange     '1.0.10',
+247 silly addNameRange     '1.0.9',
+247 silly addNameRange     '1.0.8',
+247 silly addNameRange     '1.0.7',
+247 silly addNameRange     '1.0.6',
+247 silly addNameRange     '1.0.5',
+247 silly addNameRange     '1.0.4',
+247 silly addNameRange     '1.0.3',
+247 silly addNameRange     '1.0.2',
+247 silly addNameRange     '1.0.1',
+247 silly addNameRange     '1.0.0',
+247 silly addNameRange     '0.11.0',
+247 silly addNameRange     '0.10.2',
+247 silly addNameRange     '0.10.1',
+247 silly addNameRange     '0.10.0',
+247 silly addNameRange     '0.9.1',
+247 silly addNameRange     '0.9.0',
+247 silly addNameRange     '0.8.2',
+247 silly addNameRange     '0.8.1',
+247 silly addNameRange     '0.8.0',
+247 silly addNameRange     '0.7.4',
+247 silly addNameRange     '0.7.3',
+247 silly addNameRange     '0.7.2',
+247 silly addNameRange     '0.7.1',
+247 silly addNameRange     '0.7.0',
+247 silly addNameRange     '0.6.2',
+247 silly addNameRange     '0.6.1',
+247 silly addNameRange     '0.6.0',
+247 silly addNameRange     '0.5.1',
+247 silly addNameRange     '0.5.0' ] ]
+248 silly addNamed webpack-dev-middleware@1.2.0
+249 verbose addNamed "1.2.0" is a plain semver version for webpack-dev-middleware
+250 verbose get https://registry.npm.taobao.org/express not expired, no request
+251 silly addNameRange number 2 { name: 'express', range: '>=4.3.2 <5.0.0', hasData: true }
+252 silly addNameRange versions [ 'express',
+252 silly addNameRange   [ '4.13.3',
+252 silly addNameRange     '4.13.2',
+252 silly addNameRange     '3.21.2',
+252 silly addNameRange     '5.0.0-alpha.2',
+252 silly addNameRange     '4.13.1',
+252 silly addNameRange     '3.21.1',
+252 silly addNameRange     '4.13.0',
+252 silly addNameRange     '3.21.0',
+252 silly addNameRange     '4.12.4',
+252 silly addNameRange     '3.20.3',
+252 silly addNameRange     '4.12.3',
+252 silly addNameRange     '3.20.2',
+252 silly addNameRange     '4.12.2',
+252 silly addNameRange     '4.12.1',
+252 silly addNameRange     '3.20.1',
+252 silly addNameRange     '4.12.0',
+252 silly addNameRange     '3.20.0',
+252 silly addNameRange     '4.11.2',
+252 silly addNameRange     '3.19.2',
+252 silly addNameRange     '4.11.1',
+252 silly addNameRange     '3.19.1',
+252 silly addNameRange     '4.11.0',
+252 silly addNameRange     '4.10.8',
+252 silly addNameRange     '3.19.0',
+252 silly addNameRange     '4.10.7',
+252 silly addNameRange     '4.10.6',
+252 silly addNameRange     '3.18.6',
+252 silly addNameRange     '3.18.5',
+252 silly addNameRange     '4.10.5',
+252 silly addNameRange     '4.10.4',
+252 silly addNameRange     '4.10.3',
+252 silly addNameRange     '3.18.4',
+252 silly addNameRange     '4.10.2',
+252 silly addNameRange     '3.18.3',
+252 silly addNameRange     '5.0.0-alpha.1',
+252 silly addNameRange     '4.10.1',
+252 silly addNameRange     '3.18.2',
+252 silly addNameRange     '4.10.0',
+252 silly addNameRange     '3.18.1',
+252 silly addNameRange     '3.18.0',
+252 silly addNameRange     '4.9.8',
+252 silly addNameRange     '3.17.8',
+252 silly addNameRange     '4.9.7',
+252 silly addNameRange     '4.9.6',
+252 silly addNameRange     '3.17.7',
+252 silly addNameRange     '3.17.6',
+252 silly addNameRange     '4.9.5',
+252 silly addNameRange     '3.17.5',
+252 silly addNameRange     '4.9.4',
+252 silly addNameRange     '3.17.4',
+252 silly addNameRange     '4.9.3',
+252 silly addNameRange     '3.17.3',
+252 silly addNameRange     '4.9.2',
+252 silly addNameRange     '4.9.1',
+252 silly addNameRange     '3.17.2',
+252 silly addNameRange     '4.9.0',
+252 silly addNameRange     '3.17.1',
+252 silly addNameRange     '3.17.0',
+252 silly addNameRange     '4.8.8',
+252 silly addNameRange     '3.16.10',
+252 silly addNameRange     '4.8.7',
+252 silly addNameRange     '3.16.9',
+252 silly addNameRange     '4.8.6',
+252 silly addNameRange     '3.16.8',
+252 silly addNameRange     '4.8.5',
+252 silly addNameRange     '3.16.7',
+252 silly addNameRange     '4.8.4',
+252 silly addNameRange     '3.16.6',
+252 silly addNameRange     '3.16.5',
+252 silly addNameRange     '4.8.3',
+252 silly addNameRange     '3.16.4',
+252 silly addNameRange     '3.16.3',
+252 silly addNameRange     '4.8.2',
+252 silly addNameRange     '3.16.2',
+252 silly addNameRange     '4.8.1',
+252 silly addNameRange     '3.16.1',
+252 silly addNameRange     '4.8.0',
+252 silly addNameRange     '3.16.0',
+252 silly addNameRange     '4.7.4',
+252 silly addNameRange     '3.15.3',
+252 silly addNameRange     '4.7.3',
+252 silly addNameRange     '4.7.2',
+252 silly addNameRange     '3.15.2',
+252 silly addNameRange     '4.7.1',
+252 silly addNameRange     '3.15.1',
+252 silly addNameRange     '4.7.0',
+252 silly addNameRange     '3.15.0',
+252 silly addNameRange     '4.6.1',
+252 silly addNameRange     '4.6.0',
+252 silly addNameRange     '3.14.0',
+252 silly addNameRange     '4.5.1',
+252 silly addNameRange     '4.5.0',
+252 silly addNameRange     '3.13.0',
+252 silly addNameRange     '4.4.5',
+252 silly addNameRange     '3.12.1',
+252 silly addNameRange     '3.12.0',
+252 silly addNameRange     '4.4.4',
+252 silly addNameRange     '3.11.0',
+252 silly addNameRange     '4.4.3',
+252 silly addNameRange     '3.10.5',
+252 silly addNameRange     '4.4.2',
+252 silly addNameRange     '3.10.4',
+252 silly addNameRange     '3.10.3',
+252 silly addNameRange     '3.10.2',
+252 silly addNameRange     '3.10.1',
+252 silly addNameRange     '3.10.0',
+252 silly addNameRange     '4.4.1',
+252 silly addNameRange     '4.4.0',
+252 silly addNameRange     '3.9.0',
+252 silly addNameRange     '4.3.2',
+252 silly addNameRange     '3.8.1',
+252 silly addNameRange     '4.3.1',
+252 silly addNameRange     '4.3.0',
+252 silly addNameRange     '3.8.0',
+252 silly addNameRange     '3.7.0',
+252 silly addNameRange     '4.2.0',
+252 silly addNameRange     '3.6.0',
+252 silly addNameRange     '4.1.2',
+252 silly addNameRange     '3.5.3',
+252 silly addNameRange     '4.1.1',
+252 silly addNameRange     '4.1.0',
+252 silly addNameRange     '3.5.2',
+252 silly addNameRange     '4.0.0',
+252 silly addNameRange     '3.5.1',
+252 silly addNameRange     '4.0.0-rc4',
+252 silly addNameRange     '4.0.0-rc3',
+252 silly addNameRange     '3.5.0',
+252 silly addNameRange     '4.0.0-rc2',
+252 silly addNameRange     '4.0.0-rc1',
+252 silly addNameRange     '3.4.8',
+252 silly addNameRange     '3.4.7',
+252 silly addNameRange     '3.4.6',
+252 silly addNameRange     '3.4.5',
+252 silly addNameRange     '3.4.4',
+252 silly addNameRange     '3.4.3',
+252 silly addNameRange     '3.4.2',
+252 silly addNameRange     '3.4.1',
+252 silly addNameRange     '3.4.0',
+252 silly addNameRange     '3.3.8',
+252 silly addNameRange     '3.3.7',
+252 silly addNameRange     '3.0.0-rc4',
+252 silly addNameRange     '3.0.0-rc3',
+252 silly addNameRange     '3.0.0-rc2',
+252 silly addNameRange     '3.0.0-rc1',
+252 silly addNameRange     '3.0.0-beta7',
+252 silly addNameRange     '3.0.0-beta6',
+252 silly addNameRange     '3.0.0-beta4',
+252 silly addNameRange     '3.0.0-beta3',
+252 silly addNameRange     '3.0.0-beta2',
+252 silly addNameRange     '3.0.0-beta1',
+252 silly addNameRange     '3.0.0-alpha5',
+252 silly addNameRange     '3.0.0-alpha4',
+252 silly addNameRange     '3.0.0-alpha3',
+252 silly addNameRange     '3.0.0-alpha2',
+252 silly addNameRange     '3.0.0-alpha1',
+252 silly addNameRange     '2.0.0-rc3',
+252 silly addNameRange     '2.0.0-rc2',
+252 silly addNameRange     '2.0.0-rc',
+252 silly addNameRange     '2.0.0-beta3',
+252 silly addNameRange     '2.0.0-beta2',
+252 silly addNameRange     '2.0.0-beta',
+252 silly addNameRange     '1.0.0-rc4',
+252 silly addNameRange     '1.0.0-rc3',
+252 silly addNameRange     '1.0.0-rc2',
+252 silly addNameRange     '1.0.0-rc',
+252 silly addNameRange     '1.0.0-beta2',
+252 silly addNameRange     '1.0.0-beta',
+252 silly addNameRange     '3.0.0-rc5',
+252 silly addNameRange     '3.3.6',
+252 silly addNameRange     '3.3.5',
+252 silly addNameRange     '3.3.4',
+252 silly addNameRange     '3.3.3',
+252 silly addNameRange     '3.3.2',
+252 silly addNameRange     '3.3.1',
+252 silly addNameRange     '3.3.0',
+252 silly addNameRange     '3.2.6',
+252 silly addNameRange     '3.2.5',
+252 silly addNameRange     '3.2.4',
+252 silly addNameRange     '3.2.3',
+252 silly addNameRange     '3.2.2',
+252 silly addNameRange     '3.2.1',
+252 silly addNameRange     '3.2.0',
+252 silly addNameRange     '3.1.2',
+252 silly addNameRange     '3.1.1',
+252 silly addNameRange     '3.1.0',
+252 silly addNameRange     '3.0.6',
+252 silly addNameRange     '3.0.5',
+252 silly addNameRange     '3.0.4',
+252 silly addNameRange     '3.0.3',
+252 silly addNameRange     '3.0.2',
+252 silly addNameRange     '3.0.1',
+252 silly addNameRange     '3.0.0',
+252 silly addNameRange     '2.5.11',
+252 silly addNameRange     '2.5.10',
+252 silly addNameRange     '2.5.9',
+252 silly addNameRange     '2.5.8',
+252 silly addNameRange     '2.5.7',
+252 silly addNameRange     '2.5.6',
+252 silly addNameRange     '2.5.5',
+252 silly addNameRange     '2.5.4',
+252 silly addNameRange     '2.5.3',
+252 silly addNameRange     '2.5.2',
+252 silly addNameRange     '2.5.1',
+252 silly addNameRange     '2.5.0',
+252 silly addNameRange     '2.4.7',
+252 silly addNameRange     '2.4.6',
+252 silly addNameRange     '2.4.5',
+252 silly addNameRange     '2.4.4',
+252 silly addNameRange     '2.4.3',
+252 silly addNameRange     '2.4.2',
+252 silly addNameRange     '2.4.1',
+252 silly addNameRange     '2.4.0',
+252 silly addNameRange     '2.3.12',
+252 silly addNameRange     '2.3.11',
+252 silly addNameRange     '2.3.10',
+252 silly addNameRange     '2.3.9',
+252 silly addNameRange     '2.3.8',
+252 silly addNameRange     '2.3.7',
+252 silly addNameRange     '2.3.6',
+252 silly addNameRange     '2.3.5',
+252 silly addNameRange     '2.3.4',
+252 silly addNameRange     '2.3.3',
+252 silly addNameRange     '2.3.2',
+252 silly addNameRange     '2.3.1',
+252 silly addNameRange     '2.3.0',
+252 silly addNameRange     '2.2.2',
+252 silly addNameRange     '2.2.1',
+252 silly addNameRange     '2.2.0',
+252 silly addNameRange     '2.1.1',
+252 silly addNameRange     '2.1.0',
+252 silly addNameRange     '2.0.0',
+252 silly addNameRange     '1.0.8',
+252 silly addNameRange     '1.0.7',
+252 silly addNameRange     '1.0.6',
+252 silly addNameRange     '1.0.5',
+252 silly addNameRange     '1.0.4',
+252 silly addNameRange     '1.0.3',
+252 silly addNameRange     '1.0.2',
+252 silly addNameRange     '1.0.1',
+252 silly addNameRange     '1.0.0',
+252 silly addNameRange     '0.14.1',
+252 silly addNameRange     '0.14.0' ] ]
+253 silly addNamed express@4.13.3
+254 verbose addNamed "4.13.3" is a plain semver version for express
+255 silly cache afterAdd connect-history-api-fallback@1.1.0
+256 verbose afterAdd C:\Users\Administrator\.cnpm\connect-history-api-fallback\1.1.0\package\package.json not in flight; writing
+257 silly cache afterAdd optimist@0.6.1
+258 verbose afterAdd C:\Users\Administrator\.cnpm\optimist\0.6.1\package\package.json not in flight; writing
+259 silly cache afterAdd serve-index@1.7.2
+260 verbose afterAdd C:\Users\Administrator\.cnpm\serve-index\1.7.2\package\package.json not in flight; writing
+261 silly cache afterAdd stream-cache@0.0.2
+262 verbose afterAdd C:\Users\Administrator\.cnpm\stream-cache\0.0.2\package\package.json not in flight; writing
+263 silly cache afterAdd socket.io@1.3.6
+264 verbose afterAdd C:\Users\Administrator\.cnpm\socket.io\1.3.6\package\package.json not in flight; writing
+265 silly cache afterAdd socket.io-client@1.3.6
+266 verbose afterAdd C:\Users\Administrator\.cnpm\socket.io-client\1.3.6\package\package.json not in flight; writing
+267 silly cache afterAdd webpack-dev-middleware@1.2.0
+268 verbose afterAdd C:\Users\Administrator\.cnpm\webpack-dev-middleware\1.2.0\package\package.json not in flight; writing
+269 silly cache afterAdd strip-ansi@2.0.1
+270 verbose afterAdd C:\Users\Administrator\.cnpm\strip-ansi\2.0.1\package\package.json not in flight; writing
+271 silly cache afterAdd supports-color@1.3.1
+272 verbose afterAdd C:\Users\Administrator\.cnpm\supports-color\1.3.1\package\package.json not in flight; writing
+273 silly cache afterAdd express@4.13.3
+274 verbose afterAdd C:\Users\Administrator\.cnpm\express\4.13.3\package\package.json not in flight; writing
+275 verbose afterAdd C:\Users\Administrator\.cnpm\connect-history-api-fallback\1.1.0\package\package.json written
+276 verbose afterAdd C:\Users\Administrator\.cnpm\optimist\0.6.1\package\package.json written
+277 verbose afterAdd C:\Users\Administrator\.cnpm\stream-cache\0.0.2\package\package.json written
+278 verbose afterAdd C:\Users\Administrator\.cnpm\serve-index\1.7.2\package\package.json written
+279 verbose afterAdd C:\Users\Administrator\.cnpm\socket.io\1.3.6\package\package.json written
+280 verbose afterAdd C:\Users\Administrator\.cnpm\socket.io-client\1.3.6\package\package.json written
+281 verbose afterAdd C:\Users\Administrator\.cnpm\webpack-dev-middleware\1.2.0\package\package.json written
+282 verbose afterAdd C:\Users\Administrator\.cnpm\strip-ansi\2.0.1\package\package.json written
+283 verbose afterAdd C:\Users\Administrator\.cnpm\supports-color\1.3.1\package\package.json written
+284 verbose afterAdd C:\Users\Administrator\.cnpm\express\4.13.3\package\package.json written
+285 verbose about to build D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+286 verbose unlock done using C:\Users\Administrator\.cnpm\_locks\webpack-dev-server-80665ac232bd6e70.lock for D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+287 verbose stack Error: Failed to parse json
+287 verbose stack Unexpected token '\u0000' at 1:1
+287 verbose stack                                                                                
+287 verbose stack ^
+287 verbose stack     at parseError (E:\Program Files\nodejs\node_modules\cnpm\node_modules\npm\node_modules\read-package-json\read-json.js:379:11)
+287 verbose stack     at parseJson (E:\Program Files\nodejs\node_modules\cnpm\node_modules\npm\node_modules\read-package-json\read-json.js:68:23)
+287 verbose stack     at E:\Program Files\nodejs\node_modules\cnpm\node_modules\npm\node_modules\read-package-json\read-json.js:48:5
+287 verbose stack     at evalmachine.<anonymous>:272:14
+287 verbose stack     at E:\Program Files\nodejs\node_modules\cnpm\node_modules\npm\node_modules\read-package-json\node_modules\graceful-fs\graceful-fs.js:102:5
+287 verbose stack     at Object.oncomplete (evalmachine.<anonymous>:108:15)
+288 verbose cwd D:\Aaron\github\node-test\webpack-test
+289 error Windows_NT 6.1.7601
+290 error argv "node" "E:\\Program Files\\nodejs\\node_modules\\cnpm\\node_modules\\npm\\bin\\npm-cli.js" "--userconfig=C:\\Users\\Administrator\\.cnpmrc" "--disturl=https://npm.taobao.org/mirrors/node" "--cache=C:\\Users\\Administrator\\.cnpm" "--registry=https://registry.npm.taobao.org" "--node-gyp=E:\\Program Files\\nodejs\\node_modules\\cnpm\\node_modules\\pangyp\\bin\\node-gyp.js" "install" "webpack-dev-server" "--save-dev"
+291 error node v0.10.36
+292 error npm  v2.13.5
+293 error file C:\Users\Administrator\.cnpm\http-proxy\1.11.2\package\package.json
+294 error code EJSONPARSE
+295 error Failed to parse json
+295 error Unexpected token '\u0000' at 1:1
+295 error                                                                                
+295 error ^
+296 error File: C:\Users\Administrator\.cnpm\http-proxy\1.11.2\package\package.json
+297 error Failed to parse package.json data.
+297 error package.json must be actual JSON, not just JavaScript.
+297 error
+297 error This is not a bug in npm.
+297 error Tell the package author to fix their package.json file. JSON.parse
+298 verbose exit [ 1, true ]
+299 verbose unbuild node_modules\webpack-dev-server
+300 info preuninstall webpack-dev-server@1.10.1
+301 info uninstall webpack-dev-server@1.10.1
+302 verbose unbuild rmStuff webpack-dev-server@1.10.1 from D:\Aaron\github\node-test\webpack-test\node_modules
+303 silly gentlyRm D:\Aaron\github\node-test\webpack-test\node_modules\.bin\webpack-dev-server.cmd is being gently removed
+304 silly gentlyRm verifying D:\Aaron\github\node-test\webpack-test is an npm working directory
+305 silly gentlyRm containing path D:\Aaron\github\node-test\webpack-test is under npm's control, in D:\Aaron\github\node-test\webpack-test
+306 silly gentlyRm deletion target D:\Aaron\github\node-test\webpack-test\node_modules\.bin\webpack-dev-server.cmd is under D:\Aaron\github\node-test\webpack-test
+307 verbose gentlyRm vacuuming from D:\Aaron\github\node-test\webpack-test\node_modules\.bin\webpack-dev-server.cmd up to D:\Aaron\github\node-test\webpack-test
+308 silly gentlyRm D:\Aaron\github\node-test\webpack-test\node_modules\.bin\webpack-dev-server is being gently removed
+309 silly gentlyRm verifying D:\Aaron\github\node-test\webpack-test is an npm working directory
+310 silly gentlyRm containing path D:\Aaron\github\node-test\webpack-test is under npm's control, in D:\Aaron\github\node-test\webpack-test
+311 silly gentlyRm deletion target D:\Aaron\github\node-test\webpack-test\node_modules\.bin\webpack-dev-server is under D:\Aaron\github\node-test\webpack-test
+312 verbose gentlyRm vacuuming from D:\Aaron\github\node-test\webpack-test\node_modules\.bin\webpack-dev-server up to D:\Aaron\github\node-test\webpack-test
+313 info postuninstall webpack-dev-server@1.10.1
+314 silly gentlyRm D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server is being purged from base D:\Aaron\github\node-test\webpack-test
+315 verbose gentlyRm don't care about contents; nuking D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+316 silly vacuum-fs purging D:\Aaron\github\node-test\webpack-test\node_modules\webpack-dev-server
+317 silly vacuum-fs quitting because other entries in D:\Aaron\github\node-test\webpack-test\node_modules
