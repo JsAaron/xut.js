@@ -1,7 +1,7 @@
-var gulp    = require('gulp');
+var gulp = require('gulp');
 var webpack = require('webpack');
-var path    = require('path');
-var notify  = require('gulp-notify');
+var path = require('path');
+var notify = require('gulp-notify');
 //http://www.browsersync.cn/docs/recipes/
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
@@ -11,34 +11,27 @@ var reload = browserSync.reload;
 var src = './develop/';
 var dest = './release/';
 var config = {
+    src  : src,
+    dest : dest,
     webServer: {
-        server    : dest,
+        server    : './',
         index     : "index.html",
         port      : 3000,
         logLevel  : "debug",
         logPrefix : "Aaron",
-        files     : [dest + "/*.js", dest + "/*.html"]
+        open      : true,
+        files     : [dest + "/*.js", dest + "/*.html"] //监控变化
     },
     script: {
-        watch : src + '*.js',
-        entry : src + 'app.js',
-        dest  : dest,
-        name  : 'bundle.js'
+        entry : src + 'main.js', //入口
+        dest  : dest,  //打包后位置
+        watch : src + '*.js', //监控脚本
+        name  : 'bundle.js'  
     },
     html: {
         watch: dest + '*.html'
     }
 }
-
-//error prompt
-function handleErrors() {
-    var args = Array.prototype.slice.call(arguments);
-    notify.onError({
-        title: '编译错误',
-        message: '<%= error.message %>'
-    }).apply(this, args);
-    this.emit('end');
-};
 
 
 // Webpack packaging
@@ -52,6 +45,17 @@ gulp.task('scripts', function() {
 });
 
 
+//error prompt
+function handleErrors() {
+    var args = Array.prototype.slice.call(arguments);
+    notify.onError({
+        title: '编译错误',
+        message: '<%= error.message %>'
+    }).apply(this, args);
+    this.emit('end');
+};
+
+
 //===================================
 //  web server
 //===================================
@@ -62,7 +66,7 @@ gulp.task('web-server', function() {
     browserSync.init(config.webServer);
 });
 
-gulp.task('watch', ["scripts",'web-server'], function() {
+gulp.task('watch', ["scripts", 'web-server'], function() {
     // gulp.watch(config.script.watch, ['scripts']);
     gulp.watch(config.html.watch).on('change', reload);
 })
