@@ -1,5 +1,5 @@
 
-vue+gulp+webpack配置
+vue+gulp+webpack 单页面 组件开发
 -----------------------------------
 ### 
     命令一：cmd: npm install 
