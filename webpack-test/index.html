@@ -5,6 +5,9 @@
     <title>Vue + Webpack</title>
   </head>
   <body>
+  
+    <div id="replace"></div>
+
     <div id="app">
       <div class="nav">
         <a href="#page-a">Go to page A</a>
@@ -12,6 +15,7 @@
       </div>
       <component is="{{view}}"></component>
     </div>
+    <script type="text/javascript" src="release/vue.min.js"></script>
     <script src="release/bundle.js"></script>
   </body>
 </html>

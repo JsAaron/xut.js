@@ -8,19 +8,23 @@ var reload = browserSync.reload;
 
 
 //config file
-var src = './develop/';
-var dest = './release/';
+var src      = './develop/';
+var dest     = './release/';
+var homepage = "index.html";
 var config = {
     src  : src,
     dest : dest,
     webServer: {
         server    : './',
-        index     : "index.html",
+        index     : homepage,
         port      : 3000,
         logLevel  : "debug",
         logPrefix : "Aaron",
         open      : true,
-        files     : [dest + "/*.js", dest + "/*.html"] //监控变化
+        files     : [dest + "/*.js", "./index.html"] //监控变化
+    },
+    sass: {
+        src: src + '*.sass'
     },
     script: {
         entry : src + 'main.js', //入口
@@ -29,7 +33,7 @@ var config = {
         name  : 'bundle.js'  
     },
     html: {
-        watch: dest + '*.html'
+        watch: homepage
     }
 }
 
@@ -67,7 +71,8 @@ gulp.task('web-server', function() {
 });
 
 gulp.task('watch', ["scripts", 'web-server'], function() {
-    // gulp.watch(config.script.watch, ['scripts']);
+    gulp.watch(config.script.watch, ['scripts']);
+    gulp.watch(config.sass.src, ['scripts']);
     gulp.watch(config.html.watch).on('change', reload);
 })
 
