@@ -3,7 +3,11 @@
 // See webpack.config.js for details.  
 require('./main.sass')
 
-new Vue({
-    el       : '#replace',
-    template : '<p>replaced</p>'
+Vue.config.debug = true // 开启调试模式
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        view: 'page-a'
+    }
 })

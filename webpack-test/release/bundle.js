@@ -49,10 +49,15 @@
 	// See webpack.config.js for details.  
 	__webpack_require__(1)
 
-	new Vue({
-	    el       : '#replace',
-	    template : '<p>replaced</p>'
+	Vue.config.debug = true // 开启调试模式
+
+	var app = new Vue({
+	    el: '#app',
+	    data: {
+	        view: 'page-a'
+	    }
 	})
+
 
 /***/ },
 /* 1 */
@@ -89,7 +94,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  font-family: Helvetica, sans-serif;\n  color: #333;\n  background: red; }\n", ""]);
+	exports.push([module.id, "body {\n  font-family: Helvetica, sans-serif;\n  color: #333; }\n", ""]);
 
 	// exports
 
