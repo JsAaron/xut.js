@@ -1,5 +1,5 @@
 var gulp    = require('gulp');
-var webpack = require('gulp-webpack');
+var webpack = require('webpack');
 var path    = require('path');
 var notify  = require('gulp-notify');
 //http://www.browsersync.cn/docs/recipes/
@@ -8,20 +8,27 @@ var reload = browserSync.reload;
 
 
 //config file
-var src  = './develop/';
+var src = './develop/';
 var dest = './release/';
 var config = {
+    webServer: {
+        server    : dest,
+        index     : "index.html",
+        port      : 3000,
+        logLevel  : "debug",
+        logPrefix : "Aaron",
+        files     : [dest + "/*.js", dest + "/*.html"]
+    },
     script: {
-        watch : src,
-        src   : src + 'app.js',
+        watch : src + '*.js',
+        entry : src + 'app.js',
         dest  : dest,
-        name  : 'build.js'
+        name  : 'bundle.js'
     },
     html: {
-        watch: dest + 'index.html'
+        watch: dest + '*.html'
     }
 }
-
 
 //error prompt
 function handleErrors() {
@@ -37,13 +44,11 @@ function handleErrors() {
 // Webpack packaging
 var webpackConfig = require('./webpack.config')(config);
 gulp.task('scripts', function() {
-    return gulp.src(config.script.src)
-        .pipe(webpack(webpackConfig))
-        .on('error', handleErrors)
-        .pipe(gulp.dest(config.script.dest))
-        .pipe(reload({
-            stream: true
-        }));
+    webpack(webpackConfig, function(err, stats) {
+        if (err) {
+            handleErrors();
+        }
+    });
 });
 
 
@@ -54,20 +59,12 @@ gulp.task('scripts', function() {
 
 // web服务 Server + watching scss/html files
 gulp.task('web-server', function() {
-    browserSync.init({
-        server: {
-            baseDir: './'
-        }
-    });
-
-    // gulp.watch(config.script.watch, ['scripts']);
-    // gulp.watch(config.html.watch).on('change', reload);
+    browserSync.init(config.webServer);
 });
 
-    
-gulp.task('watch',function(){
-
+gulp.task('watch', ["scripts",'web-server'], function() {
+    // gulp.watch(config.script.watch, ['scripts']);
+    gulp.watch(config.html.watch).on('change', reload);
 })
 
-
-gulp.task('default', ['web-server'])
+gulp.task('default', ['watch'])
