@@ -2,7 +2,7 @@
 vue+gulp+webpack配置
 -----------------------------------
 ### 
-    命令一：npm install 
+    命令一：cmd: npm install 
      
 ###  
-    命令二： gulp
+    命令二：cmd: gulp
