@@ -29,5 +29,4 @@ module.exports = function(config) {
         //     new webpack.optimize.CommonsChunkPlugin( /* chunkName= */ config.script.name, /* filename= */ bulid)
         // ]
     }
-
 }

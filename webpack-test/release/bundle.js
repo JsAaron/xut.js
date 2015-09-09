@@ -49,7 +49,7 @@
 	var component = __webpack_require__(1);
 
 
-	document.write(31111111131555556);
+	document.write(1);
 
 /***/ },
 /* 1 */

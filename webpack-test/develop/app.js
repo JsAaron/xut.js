@@ -3,4 +3,4 @@
 var component = require('./component.js');
 
 
-document.write(31111111131555556);
+document.write(1);
