@@ -1,0 +1,1031 @@
+/**
+ *================初始化================
+ */
+
+html,
+body {
+    height: 100%;
+}
+
+
+/* 清除内外边距 */
+
+html,
+body,
+p,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+iframe,
+object,
+video {
+    margin: 0;
+    padding: 0;
+}
+
+
+/*键盘零件中input要可选中*/
+
+input,
+textarea {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+}
+
+
+/*移除ie11输入框中的叉*/
+
+input::-ms-clear {
+    display: none;
+}
+
+
+/* 设置默认字体,禁止选取,移除按下时的背景色 */
+
+body {
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+
+/* 重置列表元素 */
+
+ul,
+ol {
+    list-style: none;
+}
+
+
+/* 重置文本格式元素 */
+
+a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+/*无边框 */
+
+img,
+iframe,
+object,
+svg {
+    border: none;
+}
+
+video {
+    background: #000;
+}
+
+
+/**
+ * ==================复用特性================
+ */
+
+.fullScreen {
+    height: 100%;
+    width: 100%;
+    background-size: 100% 100%;
+    /*overflow: hidden;*/
+}
+
+.xut-overflow {
+    overflow: hidden;
+}
+
+.opacity {
+    opacity: 0;
+}
+
+.hide {
+    display: none;
+}
+
+.left {
+    left: 0px;
+}
+
+.right {
+    right: 0px;
+}
+
+
+/**
+ *================启动页面================
+ */
+
+
+/*忙碌光标*/
+
+.xut-busy-wrap {
+    position: absolute;
+    z-index: 1000001;
+}
+
+.xut-busy-middle {
+    height: 40%;
+    width: 40%;
+    position: relative;
+    margin: 0 auto;
+}
+
+.xut-busy-text {
+    height: 30%;
+    font-weight: bold;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.xut-busy-spinner {
+    width: 12%;
+    height: 26%;
+    background-color: black;
+    position: absolute;
+    left: 44.5%;
+    top: 37%;
+    animation: kfnavControlBar 1s linear infinite;
+    -webkit-animation: kfnavControlBar 1s linear infinite;
+    border-radius: 40%;
+}
+
+
+/*End busy*/
+
+.effectWapper {
+    width: 100%;
+    height: 100%;
+    background-size: 100% 100%;
+    transform-origin: 50% 50%;
+    transition: 0ms;
+    -webkit-transform-origin: 50% 50%;
+    -webkit-transition: 0ms;
+    background-position: 0% 0%;
+    background-repeat: no-repeat;
+}
+
+.textInFloatbar a {
+    font-size: 2em;
+    letter-spacing: .3em;
+    font-weight: bolder;
+    color: white;
+    padding: 16px 8px 16px 8px;
+    text-shadow: 0 1px 0 #CCC, 0 2px 0 #C9C9C9, 0 3px 0 #BBB, 0 4px 0 #B9B9B9, 0 5px 0 #AAA, 0 6px 1px rgba(0, 0, 0, .1), 0 0 5px rgba(0, 0, 0, .1), 0 1px 3px rgba(0, 0, 0, .3), 0 3px 5px rgba(0, 0, 0, .2), 0 5px 10px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .2), 0 20px 20px rgba(0, 0, 0, .15);
+}
+
+
+/*==========================工具栏================*/
+
+.xut-controlBar {
+    position: absolute;
+    z-index: 9999;
+    overflow: hidden;
+    width: 100%;
+    background-color: white;
+    font-size: 1rem;
+}
+
+
+/*函数工具栏*/
+
+.xut-scenario-close,
+.xut-scenario-back,
+.xut-scenario-tips {
+    position: absolute;
+    top: 0.25rem;
+    z-index: 9999;
+}
+
+.xut-Bar-left {
+    float: left;
+    white-space: nowrap;
+}
+
+.xut-Bar-right {
+    float: right;
+}
+
+.xut-Bar-middle {
+    width: 60%;
+    margin: 0 auto;
+}
+
+.xut-Bar-left li,
+.xut-Bar-right li {
+    float: left;
+    background-size: 100%;
+    cursor: pointer;
+}
+
+.xut-controlBar-title {
+    text-align: center;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.xut-controlBar-backDir {
+    background-image: url(../images/icons/directory.png);
+}
+
+
+/*收起工具栏*/
+
+.xut-controlBar-hide {
+    background-image: url(../images/icons/hideToolbar.png);
+}
+
+
+/*场景页关闭按钮*/
+
+.xut-scenario-close {
+    right: 0.25rem;
+}
+
+
+/*返回按钮*/
+
+.xut-scenario-back {
+    left: 0.25rem;
+}
+
+.xut-scenario-close,
+.xut-scenario-back {
+    background-size: 100%;
+}
+
+
+/*场景顶部小圆样式开始*/
+
+.xut-scenario-radius {
+    border-radius: 100%;
+    pointer-events: none;
+}
+
+.xut-scenario-dark >div {
+    background-color: #007aff;
+}
+
+.xut-scenario-light >div {
+    background-color: red;
+}
+
+
+/*场景顶部小圆样式结束*/
+
+.xut-controlBar-pageNum {
+    font-family: sans-serif;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+
+/*======================下拉菜单====================*/
+
+.xut-navBar {
+    background-size: 100% 100%;
+    position: absolute;
+    display: none;
+    left: 0;
+}
+
+.xut-navBar li {
+    display: table;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.xut-navBar-box {
+    opacity: 0.5;
+    color: #007aff;
+    z-index: 9999;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+
+/*======================左右翻页按钮=================*/
+
+.xut-flip-control {
+    position: absolute;
+    top: 50%;
+    z-index: 9998;
+    background-size: 100% 100%;
+}
+
+
+/**
+ * ========================chpter页面============================
+ */
+
+.xut-chapter {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 999999;
+}
+
+
+/**
+ * 等待加载
+ */
+
+.xut-waitLoad {
+    background-size: 100% 100%;
+    background-image: url(../images/icons/waitLoad.png);
+}
+
+
+/**
+ * 翻页控制
+ */
+
+.xut-flip {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    perspective: 1000;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    background-size: 100% 100%;
+}
+
+.xut-flip .xut-page {
+    position: absolute;
+    overflow: hidden;
+    background-size: 100% 100%;
+}
+
+.xut-flip .xut-page p {
+    line-height: 150%;
+    padding: 12px;
+}
+
+
+/**
+ * 视觉差
+ */
+
+.xut-master {
+    z-index: 1
+}
+
+.folddiv {
+    outline: 1px solid transparent;
+}
+
+.xut-floatMaters {
+    z-index: 1000;
+}
+
+.xut-floatPages {
+    z-index: 2000;
+}
+
+.xut-float {
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /*pointer-events:none;*/
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    perspective: 1000;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+}
+
+.contentScrollerImg {
+    width: 99%;
+}
+
+#rightAd {
+    width: 300px;
+    height: 50px;
+    color: white;
+    position: absolute;
+    top: 40px;
+    font-weight: bold;
+    left: 830px;
+}
+
+.out_box {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: table;
+    pointer-events: none;
+}
+
+.red-color-text {
+    color: #ff0000;
+}
+
+.color-gradient {
+    opacity: 1 !important;
+    border-radius: 10px;
+    background: transparent;
+}
+
+.color-gradient p {
+    display: none;
+    opacity: 0;
+    color: #999;
+}
+
+.color-end {
+    background-color: #333 !important;
+    color: #eee !important;
+}
+
+
+/**
+ *  导航条CSS3切换
+ *
+ */
+
+#pane .navControlBar {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    animation-name: kfnavControlBar;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -webkit-animation-name: kfnavControlBar;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: ease-out;
+    -webkit-animation-fill-mode: forwards;
+}
+
+
+/*for firefox*/
+
+@keyframes kfnavControlBar {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+
+/*for chorme,safari,opera*/
+
+@-webkit-keyframes kfnavControlBar {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes wobble {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes wobble {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.removelayer {
+    position: absolute;
+    top: 0px;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    background-image: url(../content/gallery/cover.jpg);
+    background-size: 100% 100%;
+}
+
+
+/********对IOS-webkit-overflow-scrolling 的支持css效果*****************/
+
+.ios5overflow {
+    -webkit-box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/****消息弹出框*****/
+
+.messageBox {
+    border: 1px solid #CCCED1;
+    border-radius: 5px;
+    background-color: #EFF3F8;
+    margin: 25% auto;
+    text-align: center;
+}
+
+.messageTex {
+    padding: 1em 2em;
+    overflow: hidden;
+}
+
+.messageBtn {
+    padding: 0.2em 0;
+    border-top: 1px solid #D1D7DF;
+    color: #007aff;
+    font-weight: bold;
+}
+
+
+/*响应点击动作反弹效果*/
+
+.xut-behavior {
+    animation: behaviorAnim 0.5s;
+    -webkit-animation: behaviorAnim 0.5s;
+}
+
+@keyframes behaviorAnim {
+    0% {
+        transform: scale(1)
+    }
+    50% {
+        transform: scale(1.2)
+    }
+    100% {
+        transform: scale(1)
+    }
+}
+
+@-webkit-keyframes behaviorAnim {
+    0% {
+        -webkit-transform: scale(1)
+    }
+    50% {
+        -webkit-transform: scale(1.2)
+    }
+    100% {
+        -webkit-transform: scale(1)
+    }
+}
+
+
+/*搜索框*/
+
+.xut-form-search {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: rgb(64, 64, 64);
+    height: 100%;
+    z-index: 9999;
+}
+
+
+/*搜索框居中*/
+
+.xut-form-search-wrap {
+    width: 90%;
+    height: 100%;
+    margin: 0 auto;
+    color: white;
+}
+
+
+/*搜索输入框*/
+
+.xut-search-row {
+    width: 99%;
+    height: 40%;
+    border-radius: 0.25em;
+    border: 1px solid white;
+    display: table;
+}
+
+.xut-search-input {
+    height: 100%;
+    width: 100%;
+    display: table-cell;
+    background-color: transparent;
+    border: none;
+    text-indent: 1em;
+    color: white;
+}
+
+
+/*搜索按钮*/
+
+.xut-search-btn {
+    display: table-cell;
+    width: 20%;
+    height: 100%;
+    text-align: center;
+    border-left: 1px solid white;
+}
+
+
+/*搜索提示信息*/
+
+.xut-search-tips {
+    text-align: center;
+    overflow: hidden;
+    font-size: 0.75em;
+    height: 35%;
+}
+
+
+/*搜索结果列表*/
+
+.xut-search-result {
+    border: 1px solid white;
+    height: 100%;
+    overflow-y: auto;
+}
+
+
+/*结果行*/
+
+.xut-search-result li {
+    width: 94%;
+    margin: 0 auto;
+    line-height: 1.5em;
+}
+
+.xut-search-result a {
+    color: white;
+}
+
+
+/*关闭搜索框*/
+
+.xut-search-exit {
+    width: 20%;
+    height: 100%;
+    margin-left: 80%;
+}
+
+.xut-search-btn,
+.xut-search-exit {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+/*end search bar*/
+
+
+/*书签*/
+
+.xut-bookmark-menu {
+    position: absolute;
+    left: 0;
+    z-index: 9998;
+    width: 100%;
+}
+
+
+/*书签居中显示*/
+
+.xut-bookmark-wrap {
+    width: 43%;
+    height: 100%;
+    margin: 0 auto;
+    display: table;
+    background-color: white;
+    border-top-left-radius: 0.25em;
+    border-top-right-radius: 0.25em;
+    border: 1px solid rgb(233, 231, 231);
+}
+
+
+/*书签功能项*/
+
+.xut-bookmark-wrap div {
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 0.75em;
+    text-align: center;
+    font-weight: bold;
+}
+
+
+/*关闭书签*/
+
+.xut-bookmark-off {
+    width: 2em;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom;
+}
+
+
+/*书签列表*/
+
+.xut-bookmark-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    background-color: white;
+    overflow: hidden;
+}
+
+
+/*书签标题栏*/
+
+.xut-bookmark-head {
+    width: 100%;
+    height: 10%;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+    font-size: 0.85em;
+    display: table;
+}
+
+
+/*back-title*/
+
+.xut-bookmark-head li {
+    display: table-cell;
+    height: 100%;
+    width: 50%;
+    vertical-align: bottom;
+    padding-bottom: 0.5em;
+}
+
+
+/*返回按钮*/
+
+.xut-bookmark-back {
+    text-indent: 1em;
+    color: #007aff;
+    font-size: 0.75em;
+}
+
+
+/*书签内容*/
+
+.xut-bookmark-body {
+    width: 94%;
+    height: 89%;
+    margin-left: 6%;
+    font-weight: bold;
+    font-size: 0.75em;
+    overflow-y: auto;
+}
+
+
+/*书签行*/
+
+.xut-bookmark-body li {
+    height: 2em;
+    border-bottom: 1px solid #eee;
+    line-height: 2em;
+}
+
+
+/*书签标题*/
+
+.xut-bookmark-id {
+    float: left;
+    color: #007aff;
+}
+
+
+/*删除书签*/
+
+.xut-bookmark-del {
+    float: right;
+    width: 2em;
+    text-align: center;
+    color: red;
+}
+
+
+/*end bookmark*/
+
+
+/*阅读模式工具栏*/
+
+.xut-book-bar-back,
+.xut-book-bar-dir,
+.xut-book-bar-mark,
+.xut-book-bar-star {
+    width: 48px;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: left center;
+    float: left;
+    cursor: pointer;
+    text-align: center;
+}
+
+.xut-book-bar-back {
+    background-image: url('../images/icons/book-bar-back.svg');
+    background-size: 90% 90%;
+    /*    border-right: 1px solid rgb(63, 59, 59);
+    -webkit-box-shadow:1px 0px 10px #0F0E0E; */
+}
+
+.xut-book-bar-dir {
+    background-image: url('../images/icons/book-bar-list.svg');
+    margin-left: 1.5em;
+    background-size: 70% 70%;
+    background-position: center top;
+}
+
+.xut-book-bar-mark {
+    background-image: url('../images/icons/book-bar-mark.svg');
+    margin: auto 1.5em;
+    background-size: 50% 50%;
+    background-position: center 20%;
+}
+
+.xut-book-bar-star {
+    background-image: url('../images/icons/book-bar-star.svg');
+    background-size: 60% 60%;
+    background-position: center 10%;
+}
+
+
+/*工具栏结束*/
+
+
+/*阅读模式菜单*/
+
+.xut-book-menu {
+    position: relative;
+    width: 40%;
+    height: 100%;
+    z-index: 10000;
+    background-color: white;
+}
+
+.xut-book-menu ul {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.xut-book-menu li {
+    height: auto;
+    line-height: 2em;
+    /*border-bottom: 1px dashed gray;*/
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.xut-book-menu li a {
+    line-height: 1.5em;
+}
+
+.xut-book-menu li section {
+    text-indent: 2em;
+    font-weight: normal;
+}
+
+.xut-book-menu .select {
+    color: orange;
+    font-style: normal;
+}
+
+.xut-book-menu li.title {
+    height: 3em;
+    line-height: 3em;
+    font-size: 1.5em;
+    border-bottom: none;
+}
+
+.xut-book-menu-mask {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 150%;
+    height: 100%;
+    background-color: gray;
+    opacity: 0.7;
+}
+
+.xut-book-menu-item {
+    display: block;
+    color: rgb(64, 64, 64);
+}
+
+
+/*用于遮罩层的模糊效果*/
+
+.filter {
+    -webkit-filter: blur(5px);
+    /* Chrome, Opera */
+    -moz-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+}
+
+
+/**
+ * HTML文本框
+ * 
+ */
+
+.htmlbox_container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 9999;
+    position: absolute;
+    background: #fff;
+}
+
+.htmlbox-toolbar {
+    width: 100%;
+    line-height: 8%;
+    border-bottom: 1px solid #ccc;
+    height: 8%;
+}
+
+
+.htmlbox_close_container {
+    width: 8%;
+    height: 100%;
+    float: left;
+    display: block;
+}
+
+.htmlbox_close::before,
+.htmlbox_close::after {
+    content: '';
+    position: absolute;
+    height: 2px;
+    top: 4%;
+    width: 3%;
+    left: 2%;
+    margin-top: -1px;
+    background: #51aed9;
+    height: 1.1%;
+}
+
+.htmlbox_close::before {
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.htmlbox_close::after {
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.htmlbox_fontsizeUl {
+    float: right;
+    width: 18%;
+    height: 100%;
+    position: relative;
+}
+
+.htmlbox_fontsizeUl li{
+    width: 33%;
+    height: 100%;
+    float: left;
+}
+
+.htmlbox_fontsizeUl li a{
+    display: block;
+/*    width: 50%;
+    height: 50%;*/
+    border-radius: 50%;
+    background:#51aed9;
+    position: absolute;
+    top:50%;
+}
