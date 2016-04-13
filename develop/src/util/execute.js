@@ -29,11 +29,13 @@ function executeDB(sql, callback, errorCB, tName) {
             };
             callback(SQLResultSetRowList);
         } else {
-            errorCB({ tName: ':table not exist!!' });
+            errorCB({
+                tName: ':table not exist!!'
+            });
         }
     } else { //否则分次查询数据
         $.ajax({
-            url: Config.onlineModeUrl,
+            url: Xut.Config.onlineModeUrl,
             dataType: 'json',
             data: {
                 xxtsql: sql
@@ -57,7 +59,7 @@ function executeDB(sql, callback, errorCB, tName) {
 //建立sql查询,
 export function execute(selectSql, callback) {
 
-    var database = Config.db,
+    var database = Xut.Config.db,
         tableName, //表名
         successResults = {}, //成功的数据
         tempClosure = [], //临时收集器
@@ -143,4 +145,3 @@ export function execute(selectSql, callback) {
     }
 
 };
-
