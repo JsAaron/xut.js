@@ -1,8 +1,8 @@
-var gulp = require('gulp');
+var gulp    = require('gulp');
 var webpack = require('webpack');
-var fs = require('fs')
-var rollup = require('rollup')
-var babel = require('rollup-plugin-babel')
+var fs      = require('fs')
+var rollup  = require('rollup')
+var babel   = require('rollup-plugin-babel')
 var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
 
@@ -11,9 +11,9 @@ var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 
 
-var root = './develop'
-var src = root + '/src'
-var dest = root
+var root     = './develop'
+var src      = root + '/src'
+var dest     = root
 var packName = 'build'
 
 

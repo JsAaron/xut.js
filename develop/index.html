@@ -15,22 +15,28 @@
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
     <!-- // <script src="http://192.168.1.113:8888/target/target-script.js"></script> -->
-    <!--数据库的名字-->
-    <script src="src/data/database.js" name="noBuild"></script>
     <!--Iframe加载处理-->
-    <script src="src/config/BootMode.js"></script>
-    <script src="src/core/jQuery.js"></script>
-    <script src="src/core/underscore.js"></script>
-    <script src="src/animate/SVGIcons/snap.min.js"></script>
-    <script src="src/core/Xut.js"></script>
+    
+    <!-- 配置环境 -->
+    <script src="src/environment.js"></script>
+    <script src="src/library/jquery.js"></script>
+    <script src="src/library/underscore.js"></script>
+    <script src="src/library/video.js"></script>
+    <script src="src/library/iscroll.js"></script>
+    <script src="src/library/hammer.js"></script>
+    
+    <!-- 核心 -->
+    <script src="src/core/xut.js"></script>
     <script src="src/core/plat.js"></script>
     <script src="src/core/require.js"></script>
     <script src="src/core/nextTick.js"></script>
-    <script src="src/config/Config.js"></script>
-    <script src="src/core/video.js"></script>
     <!-- 自定义事件，合集处理，iframe通讯 -->
     <script src="src/core/asEvented.js"></script>
     <script src="src/core/pms.js"></script>
+
+    <!-- 配置文件 -->
+    <script src="src/config.js"></script>
+
     <!--插件-->
     <script src="src/plugin/cordova.js"></script>
     <script src="src/plugin/readAssetsFilePlugin.js"></script>
@@ -47,22 +53,25 @@
     <script src="src/plugin/unzipPlugin.js"></script>
     <script src="src/plugin/readPlugin.js"></script>
     <script src="src/plugin/deletePlugin.js"></script>
+
     <!-- 动画库 -->
     <script src="src/animate/pixi.js"></script>
     <script src="src/animate/TweenMax.min.js"></script>
-    <script src="src/animate/plugins/ThrowPropsPlugin.min.js"></script>
-    <script src="src/animate/PptAnimation.js"></script>
-    <script src="src/animate/CanvasAnimation.js"></script>
+    <script src="src/animate/ThrowPropsPlugin.min.js"></script>
+    <script src="src/animate/pptAnimation.js"></script>
+    <script src="src/animate/canvasAnimation.js"></script>
     <script src="src/animate/dragdrop/Draggable.min.js"></script>
     <script src="src/animate/dragdrop/dragdrop.js"></script>
-    <script src="src/animate/iscroll.js"></script>
-    <script src="src/animate/hammer.js"></script>
-    <script src="src/animate/SVGIcons/svgicons-config.js"></script>
-    <script src="src/animate/SVGIcons/svgicons.js"></script>
-    <script src="src/animate/SpriteA.js"></script>
+    <script src="src/animate/svgIcons/snap.min.js"></script>
+    <script src="src/animate/svgIcons/svgicons-config.js"></script>
+    <script src="src/animate/svgIcons/svgicons.js"></script>
+    <script src="src/animate/spriteA.js"></script>
+
+
     <!-- 公共样式 -->
     <link rel="stylesheet" href="css/common.css" type="text/css" />
     <link href="css/video-js.css" rel="stylesheet">
+
 </head>
 
 <body>
