@@ -158,6 +158,120 @@
 	    };
 	}();
 
+	var onlyId;
+	var storage = window.localStorage;
+	var TAG = 'aaron';
+
+	//如果数据库为写入appid ,则创建
+	var createAppid = function createAppid() {
+	    //添加UUID
+	    var appId = 'aaron-' + new Date().getDate();
+	    //写入数据库
+	    Xut.Config.db && Xut.Config.db.transaction(function (tx) {
+	        tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function () {}, function () {});
+	    }, function () {
+	        //  callback && callback();
+	    }, function () {
+	        //  callback && callback();
+	    });
+	    return appId;
+	};
+
+	//过滤
+	var filter = function filter(key) {
+	    //添加头部标示
+	    if (onlyId) {
+	        return key + onlyId;
+	    } else {
+	        if (!Xut.Config.appUUID) {
+	            Xut.Config.appUUID = createAppid();
+	        }
+	        //子文档标记
+	        if (SUbCONFIGT && SUbCONFIGT.dbId) {
+	            onlyId = "-" + Xut.Config.appUUID + "-" + SUbCONFIGT.dbId;
+	        } else {
+	            onlyId = "-" + Xut.Config.appUUID;
+	        }
+	    }
+	    return key + onlyId;
+	};
+
+	/**
+	 * 设置localStorage
+	 * @param {[type]} key [description]
+	 * @param {[type]} val [description]
+	 */
+	function set(key, val) {
+	    var setkey;
+
+	    //ipad ios8.3setItem出问题
+	    function set(key, val) {
+	        try {
+	            storage.setItem(key, val);
+	        } catch (e) {
+	            console.log('storage.setItem(setkey, key[i]);');
+	        }
+	    }
+
+	    if ((typeof key === 'undefined' ? 'undefined' : babelHelpers.typeof(key)) === 'object') {
+	        for (var i in key) {
+	            if (key.hasOwnProperty(i)) {
+	                setkey = filter(i);
+	                set(setkey, key[i]);
+	            }
+	        }
+	    } else {
+	        key = filter(key);
+	        set(key, val);
+	    }
+	};
+
+	/**
+	 * 获取localstorage中的值
+	 * @param  {[type]} key [description]
+	 * @return {[type]}     [description]
+	 */
+	function get(key) {
+	    key = filter(key);
+	    return storage.getItem(key);
+	};
+
+	/**
+	 * 删除localStorage中指定项
+	 * @param  {[type]} key [description]
+	 * @return {[type]}     [description]
+	 */
+	function remove(key) {
+	    key = filter(key);
+	    storage.removeItem(key);
+	};
+
+	function save(name, val) {
+	    set(name || TAG, JSON.stringify(val));
+	}
+
+	/**
+	 * /解析json字符串
+	 * @param  {[type]} itemArray [description]
+	 * @return {[type]}           [description]
+	 */
+	function parseJSON(itemArray) {
+	    var anminJson;
+	    try {
+	        anminJson = JSON.parse(itemArray);
+	    } catch (error) {
+	        anminJson = new Function("return " + itemArray)();
+	    }
+	    return anminJson;
+	}
+
+	/**
+	 * 创建一个纯存的hash对象
+	 */
+	function hash() {
+	    return Object.create(null);
+	}
+
 	/**
 	 * 用css3实现的忙碌光标
 	 * @return {[type]} [description]
@@ -1273,7 +1387,7 @@
 	/**
 	 * 所有页面总数据
 	 */
-	function query() {
+	Store.query = function () {
 		var i,
 		    self = this;
 		return $.Deferred(function (dfd) {
@@ -1297,23 +1411,434 @@
 				});
 			}
 		}).promise();
-	}
+	};
 
-	function createStore(complete) {
+	/**
+	 * 删除数据
+	 * @type {[type]}
+	 */
+	Store.remove = function (tableName, id) {
+		var i,
+		    self = this;
+		var sql = 'delete from ' + tableName + ' where _id = ' + id;
 		return $.Deferred(function (dfd) {
-			query().done(function (data) {
-				var novel = data.Novel;
-				//novel的id
-				var novelId = store.novelId = novel.item(0)['_id'];
-				//数据转换
-				mixToData(data);
-				//转化数据结构
-				conversion();
-				//数据缓存已存在
-				storeMgr.dataCache = true;
-				dfd.resolve(data.Setting, novel.item(0));
+			//查询所有数据
+			execute(sql, function (success, failure) {
+				if (success) {
+					//成功回调
+					dfd.resolve();
+				} else if (failure) {
+					//失败回调
+					dfd.reject();
+				}
 			});
 		}).promise();
+	};
+
+	//数据缓存
+	var dataCache = void 0;
+	//带有场景信息存数
+	var sectionRelated = void 0;
+	//音频的ActivityId信息;
+	var videoActivityIdCache = void 0;
+
+	//混入数据到data中
+	function mixToData(collections) {
+	    Xut.data = dataCache = collections;
+	}
+
+	//计算数据偏移量
+	function dataOffset(tableName) {
+	    var start,
+	        data = dataCache[tableName];
+	    if (data.length) {
+	        if (data.item(0)) {
+	            if (start = data.item(0)._id) {
+	                dataCache[tableName].start = start;
+	            }
+	        }
+	    }
+	}
+
+	//转化video的activtiy信息
+	//因为Video不是靠id关联的 是靠activtiy关联
+	function videoActivity() {
+	    var d,
+	        activityIds = {},
+	        data = dataCache.Video;
+	    _.each(data, function (_, index) {
+	        d = data.item(index);
+	        if (d && d.activityId) {
+	            //确保activityIdID是有值，这样才是靠activity关联的video,而不是动画的video
+	            activityIds[d.activityId] = d._id;
+	        }
+	    });
+	    return activityIds;
+	}
+
+	//chpater分段
+	//转化section信息
+	//带有场景处理
+	function conversionSectionRelated() {
+	    var seasonId,
+	        start,
+	        length,
+	        sid,
+	        i,
+	        id,
+	        seasonInfo,
+	        toolbar,
+	        Chapters,
+	        container = {},
+	        Chapter = dataCache.Chapter,
+	        l = Chapter.length,
+	        end = 0;
+
+	    //找到指定的season信息
+	    var findSeasonInfo = function findSeasonInfo(seasonId) {
+	        var temp,
+	            seasonNum = dataCache.Season.length;
+	        while (seasonNum--) {
+	            if (temp = dataCache.Season.item(seasonNum)) {
+	                if (temp._id == seasonId) {
+	                    return temp;
+	                }
+	            }
+	        }
+	    };
+
+	    for (i = 0; i < l; i++) {
+	        Chapters = Chapter.item(i);
+	        if (Chapters) {
+	            id = Chapters._id - 1; //保存兼容性,用0开头
+	            seasonId = Chapters.seasonId;
+	            sid = 'seasonId->' + seasonId;
+	            //如果不在集合,先创建
+	            if (!container[sid]) {
+	                //场景工具栏配置信息
+	                if (seasonInfo = findSeasonInfo(seasonId)) {
+	                    toolbar = seasonInfo.parameter;
+	                }
+	                container[sid] = {
+	                    start: id,
+	                    length: 1,
+	                    end: id,
+	                    toolbar: toolbar
+	                };
+	            } else {
+	                container[sid].end = id;
+	                container[sid].length = container[sid].length + 1;
+	            }
+	        }
+	    }
+
+	    return container;
+	}
+
+	//转化数据结构
+	function conversion() {
+
+	    //数据段标记
+	    for (var k in dataCache) {
+	        if (dataCache[k].item) {
+	            dataOffset(k);
+	        }
+	    }
+
+	    //============数据特殊处理================
+
+	    //vidoe特殊处理，需要记录chapterId范围
+	    if (dataCache.Video) {
+	        videoActivityIdCache = videoActivity();
+	    }
+
+	    /**
+	     * 带有场景处理
+	     * @type {[type]}
+	     */
+	    sectionRelated = conversionSectionRelated();
+
+	    /**
+	     * 标记应用ID
+	     * @type {[type]}
+	     */
+	    dataCache.novelId = Store.novelId;
+
+	    /**
+	     * 针对数据库content为空的处理
+	     * @return {[type]} [description]
+	     */
+	    dataCache.preventContent = function () {
+	        return dataCache.Content.length ? false : true;
+	    }();
+
+	    //===============================================
+	    // 
+	    //  查询数据接口
+	    //
+	    //  1 video表传递是activityId关联
+	    //  2 其余表都是传递当前表的id
+	    //  type 查询ID的类型, 数据的id或者activityId
+	    //  callback 提供给chapterId使用
+	    //================================================
+
+	    /**
+	     * 通过ID查询方式
+	     * @param  {[type]}  tableName [description]
+	     */
+	    dataCache.query = function (tableName, id, type, callback) {
+	        /**
+	         * 特殊的字段关联
+	         * 1 activityId
+	         * 2 chpaterId
+	         */
+	        switch (type) {
+	            /**
+	             * 通过activityId查询的方式
+	             *
+	             * 表名,ID,类型
+	             * Xut.data.query('Action', id, 'activityId');
+	             *   
+	             * @type {[type]}
+	             */
+	            case 'activityId':
+	                var item;
+	                var activityId = id;
+	                var data = dataCache[tableName];
+	                for (var i = 0, len = data.length; i < len; i++) {
+	                    item = data.item(i);
+	                    if (item) {
+	                        if (item[type] == activityId) {
+	                            return item;
+	                        }
+	                    }
+	                }
+	                return;
+
+	            /**
+	             * 通过chpaterId查询方式
+	             * parser中的scanActivity过滤处理
+	             */
+	            case 'chapterId':
+	            case 'seasonId':
+	                var chapterId = id;
+	                var data = dataCache[tableName];
+	                if (data) {
+	                    var item;
+	                    for (var i = 0, len = data.length; i < len; i++) {
+	                        item = data.item(i);
+	                        if (item) {
+	                            if (item[type] == chapterId) {
+	                                callback && callback(item);
+	                            }
+	                        }
+	                    }
+	                }
+	                return;
+	        }
+
+	        /**
+	         * 通过id查询的方式
+	         */
+	        switch (tableName) {
+	            //////////////////////////
+	            //获取整个一个用的chapter数据 //
+	            //////////////////////////
+	            case 'appPage':
+	                return dataCache.Chapter;
+
+	            //////////////////////////
+	            //获取整个一个用的Section数据 //
+	            //////////////////////////
+	            case 'appSection':
+	                return dataCache.Season;
+
+	            //////////////////////
+	            //如果是是section信息 //
+	            //////////////////////
+	            case 'sectionRelated':
+	                return sectionRelated['seasonId->' + id];
+
+	            //////////////
+	            //如果是音频 //
+	            //////////////
+	            case 'Video':
+	                if (type) {
+	                    return Query();
+	                } else {
+	                    //传递的id是activityId
+	                    var id = videoActivityIdCache[id];
+	                    return dataCache.query('Video', id, true);
+	                }
+
+	            default:
+	                /////////////////
+	                //默认其余所有表 //
+	                /////////////////
+	                return Query();
+	        }
+
+	        //数据信息
+	        function Query() {
+	            var data = dataCache[tableName];
+	            if (id) {
+	                var index = id - data.start;
+	                return data.item(index);
+	            } else {
+	                return data.length ? data.item(0) : null;
+	            }
+	        }
+	    };
+
+	    /**
+	     * 针对动态表查询
+	     * 每次需要重新取数据
+	     * Xut.data.oneQuery('Image',function(){});
+	     * @return {[type]} [description]
+	     */
+	    dataCache.oneQuery = function (tableName, callback) {
+	        Store.oneQuery(tableName, function (data) {
+	            callback && callback(data);
+	        });
+	    };
+
+	    /**
+	     * 删除数据
+	     * 表名,表ID
+	     * @return {[type]} [description]
+	     */
+	    dataCache.remove = function (tableName, id, success, failure) {
+	        var dfd = Store.remove(tableName, id);
+	        dfd.done(success, failure);
+	    };
+	}
+
+	/**
+	 *     初始化数据类
+	    获取ppt总数
+	 * @return {[type]} [description]
+	 */
+	function createStore() {
+	    return $.Deferred(function (dfd) {
+	        Store.query().done(function (data) {
+	            var novel = data.Novel;
+	            //novel的id
+	            var novelId = Store.novelId = novel.item(0)['_id'];
+	            //数据转换
+	            mixToData(data);
+	            //转化数据结构
+	            conversion();
+	            //数据缓存已存在
+	            // storeMgr.dataCache = true
+	            dfd.resolve(data.Setting, novel.item(0));
+	        });
+	    }).promise();
+	}
+
+	/**
+	 * content对象的创建过滤器
+	 * 用于阻断对象的创建
+	 */
+	function contentFilter(filterName) {
+
+	    //过滤的节点
+	    var listFilters = function () {
+	        var values = getCache();
+	        var h = hash();
+	        if (values) {
+	            //keep the listFilters has no property
+	            _.each(values, function (v, i) {
+	                h[i] = v;
+	            });
+	        }
+	        return h;
+	    }();
+
+	    function setCache(listFilters) {
+	        save(filterName, listFilters);
+	    }
+
+	    function getCache() {
+	        var jsonStr = get(filterName);
+	        return parseJSON(jsonStr);
+	    }
+
+	    function access(callback, pageId, contentId) {
+	        //如果是transformFilter,不需要pageIndex处理
+	        if (filterName === 'transformFilter' && contentId === undefined) {
+	            contentId = pageId;
+	            pageId = 'transformFilter';
+	        }
+	        return callback(pageId, Number(contentId));
+	    }
+
+	    return {
+	        add: function add(pageId, contentId) {
+	            access(function (pageId, contentId) {
+	                if (!listFilters[pageId]) {
+	                    listFilters[pageId] = [];
+	                }
+	                //去重
+	                if (-1 === listFilters[pageId].indexOf(contentId)) {
+	                    listFilters[pageId].push(contentId);
+	                    setCache(listFilters);
+	                }
+	            }, pageId, contentId);
+	        },
+
+	        remove: function remove(pageId, contentId) {
+	            access(function (pageId, contentId) {
+	                var target = listFilters[pageId] || [],
+	                    index = target.indexOf(contentId);
+	                if (-1 !== index) {
+	                    target.splice(index, 1);
+	                    setCache(listFilters);
+	                }
+	            }, pageId, contentId);
+	        },
+
+	        has: function has(pageId, contentId) {
+	            return access(function (pageId, contentId) {
+	                var target = listFilters[pageId];
+	                return target ? -1 !== target.indexOf(contentId) ? true : false : false;
+	            }, pageId, contentId);
+	        },
+
+	        /**
+	         * 创建过滤器
+	         * @param  {[type]} pageId [description]
+	         * @return {[type]}        [description]
+	         */
+	        each: function each(pageId) {
+	            return access(function (pageId, contentId) {
+	                var target, indexOf;
+	                if (target = listFilters[pageId]) {
+	                    return function (contentIds, callback) {
+	                        _.each(target, function (ids) {
+	                            var indexOf = contentIds.indexOf(ids);
+	                            if (-1 !== indexOf) {
+	                                callback(indexOf); //如果找到的过滤项目
+	                            }
+	                        });
+	                    };
+	                }
+	            }, pageId);
+	        },
+
+	        //过滤器数量
+	        size: function size() {
+	            return _.keys(listFilters).length;
+	        },
+
+	        empty: function empty() {
+	            remove(filterName);
+	            listFilters = {};
+	        }
+	    };
+	};
+
+	function loadScene() {
+		console.log(1);
 	}
 
 	var config = void 0;
@@ -1351,6 +1876,194 @@
 	        initMain(novelData);
 	    });
 	};
+
+	function getCache(name) {
+	    return parseInt(get(name));
+	}
+
+	/**
+	 * 进入主页面
+	 * @return {[type]} [description]
+	 */
+	function initMain(novelData) {
+
+	    var novelId,
+	        parameter,
+	        pageIndex = getCache('pageIndex'),
+	        pageFlip = getCache('pageFlip') || 0;
+
+	    /**
+	     * IBOOS模式
+	     */
+	    if (Xut.IBooks.Enabled) {
+	        //删除背景图
+	        $("#removelayer").remove();
+	        LoadScene({
+	            "pageIndex": Xut.IBooks.CONFIG.pageIndex
+	        });
+	        return;
+	    }
+
+	    /**
+	     * 多模式判断
+	     * 全局翻页模式
+	     * 0 滑动翻页
+	     * 1 直接换
+	     * 所以pageFlip只有在左面的情况下
+	     */
+	    if (parameter = novelData.parameter) {
+	        //拿出pageflip的值
+	        parameter = parseJSON(parameter);
+	        //获取pageflip的值得
+	        //pageflip用来标
+	        //不能翻页
+	        //直接切换模式
+	        pageFlip = parameter.pageflip;
+	        if (pageFlip !== undefined) {
+	            //设置缓存
+	            set({
+	                'pageFlip': pageFlip
+	            });
+	        }
+	    }
+
+	    //缓存加载
+	    //如果启动recordHistory记录
+	    if (config.recordHistory && pageIndex !== undefined) {
+	        //加强判断
+	        if (novelId = getCache("novelId")) {
+	            return loadScene({
+	                'pageFlip': pageFlip,
+	                "novelId": novelId,
+	                "pageIndex": pageIndex,
+	                'history': LocalStorage.get('history')
+	            });
+	        }
+	    }
+
+	    //第一次加载
+	    //没有缓存
+	    loadScene({
+	        "novelId": novelData._id,
+	        "pageIndex": 0,
+	        'pageFlip': pageFlip
+	    });
+	};
+
+	/**
+	 * 修正尺寸
+	 * 修正实际分辨率
+	 * @return {[type]} [description]
+	 */
+	function fixedSize(novelData) {
+	    if (novelData) {
+	        if (novelData.pptWidth || novelData.pptHeight) {
+	            config.setDbProportion(novelData.pptWidth, novelData.pptHeight);
+	            // fixRem(novelData.pptWidth, novelData.pptHeight)
+	        }
+	    }
+	}
+
+	/**
+	 * 配置默认数据
+	 * @return {[type]} [description]
+	 */
+	function initDefaults(setData) {
+	    var rs,
+	        data = {},
+	        cfg = {},
+
+	    //工具栏默认参数
+	    defaults = {
+	        ToolbarPos: 0, //工具栏[0顶部,1底部]
+	        NavbarPos: 1, //左右翻页按钮[0顶部, 1中间, 2底部]
+	        HomeBut: 1, //主页按钮[0不显示,1显示]
+	        ContentBut: 1, //目录按钮[0不显示,1显示]
+	        PageBut: 1, //页码按钮[0不显示,1显示]
+	        NavLeft: 1, //左翻页按钮[0不显示,1显示]
+	        NavRight: 1, //右翻页按钮[0不显示,1显示]
+	        customButton: 0, //自定义翻页按钮
+	        CloseBut: SUbDOCCONTEXT ? 1 : 0 //关闭按钮[0不显示,1显示]
+	    };
+
+	    for (var i = 0, len = setData.length; i < len; i++) {
+	        rs = setData.item(i);
+	        data[rs.name] = rs.value;
+	    }
+
+	    _.defaults(data, defaults);
+
+	    for (i in defaults) {
+	        cfg[i] = Number(data[i]);
+	    }
+
+	    config.settings = cfg;
+	    config.appId = data.appId; //应用配置唯一标示符
+	    config.shortName = data.shortName;
+	    config.Inapp = data.Inapp; //是否为应用内购买
+
+	    //应用的唯一标识符
+	    //生成时间+appid
+	    config.appUUID = data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.adUpdateTime;
+
+	    //检查是否解锁
+	    Xut.Application.CheckOut();
+
+	    //资源路径配置
+	    config.initResourcesPath();
+
+	    //缓存应用ID
+	    set({
+	        'appId': data.appId
+	    });
+
+	    //新增模式,用于记录浏览器退出记录
+	    cfgHistory(data);
+
+	    //广告Id
+	    //2014.9.2
+	    Xut.Presentation.AdsId = data.adsId;
+
+	    //2015.2.26
+	    //启动画轴模式
+	    //防止是布尔0成立
+	    if (data.scrollPaintingMode && data.scrollPaintingMode == 1) {
+	        config.scrollPaintingMode = true;
+	    }
+
+	    //假如启用了画轴模式，看看是不是竖版的情况，需要切半模版virtualMode
+	    if (config.scrollPaintingMode) {
+	        if (config.screenSize.width < config.screenSize.height) {
+	            config.virtualMode = true;
+	        }
+	    }
+
+	    //创建过滤器
+	    Xut.CreateFilter = contentFilter('createFilter');
+	    Xut.TransformFilter = contentFilter('transformFilter');
+	}
+
+	//新增模式,用于记录浏览器退出记录
+	//默认启动
+	//是否回到退出的页面
+	//set表中写一个recordHistory
+	//是   1
+	//否   0
+	function cfgHistory(data) {
+
+	    var recordHistory = 1; //默认启动
+	    if (data.recordHistory !== undefined) {
+	        recordHistory = Number(data.recordHistory);
+	    }
+
+	    //如果启动桌面调试模式
+	    //自动打开缓存加载
+	    if (!recordHistory && config.isBrowser && config.debugMode) {
+	        recordHistory = 1;
+	    }
+
+	    config.recordHistory = recordHistory;
+	}
 
 	/**
 	 * 初始化

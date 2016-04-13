@@ -4,12 +4,13 @@ var dbId,
 
 const TAG = 'aaron'
 
+
 //如果数据库为写入appid ,则创建
 var createAppid = function() {
     //添加UUID
     var appId = 'aaron-' + new Date().getDate();
     //写入数据库
-    Config.db && Config.db.transaction(function(tx) {
+    Xut.Config.db && Xut.Config.db.transaction(function(tx) {
         tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function() {}, function() {});
     }, function() {
         //  callback && callback();
@@ -25,14 +26,14 @@ var filter = function(key) {
     if (onlyId) {
         return key + onlyId;
     } else {
-        if (!Config.appUUID) {
-            Config.appUUID = createAppid();
+        if (!Xut.Config.appUUID) {
+            Xut.Config.appUUID = createAppid();
         }
         //子文档标记
         if (SUbCONFIGT && SUbCONFIGT.dbId) {
-            onlyId = "-" + Config.appUUID + "-" + SUbCONFIGT.dbId;
+            onlyId = "-" + Xut.Config.appUUID + "-" + SUbCONFIGT.dbId;
         } else {
-            onlyId = "-" + Config.appUUID;
+            onlyId = "-" + Xut.Config.appUUID;
         }
     }
     return key + onlyId;
