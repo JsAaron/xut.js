@@ -28,7 +28,6 @@
     <!-- 核心 -->
     <script src="src/core/xut.js"></script>
     <script src="src/core/plat.js"></script>
-    <script src="src/core/require.js"></script>
     <script src="src/core/nextTick.js"></script>
     <!-- 自定义事件，合集处理，iframe通讯 -->
     <script src="src/core/asEvented.js"></script>
@@ -65,7 +64,7 @@
     <script src="src/animate/svgIcons/snap.min.js"></script>
     <script src="src/animate/svgIcons/svgicons-config.js"></script>
     <script src="src/animate/svgIcons/svgicons.js"></script>
-    <script src="src/animate/spriteA.js"></script>
+    <!-- // <script src="src/animate/spriteA.js"></script> -->
 
 
     <!-- 公共样式 -->
@@ -81,6 +80,9 @@
     <div id="startupPage" class="xut-startup fullScreen"></div>
     <div id="sceneContainer" class="xut-chapter fullScreen xut-overflow"></div>
     <script type="text/javascript" src="build.js"></script>
+    <script type="text/javascript">
+        Xut.app()
+    </script>
 </body>
 
 </html>

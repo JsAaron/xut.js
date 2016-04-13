@@ -3,7 +3,6 @@ var dbId,
     storage = window.localStorage;
 
 const TAG = 'aaron'
-const stroage = {}
 
 //如果数据库为写入appid ,则创建
 var createAppid = function() {
@@ -44,7 +43,7 @@ var filter = function(key) {
  * @param  {[type]} index [description]
  * @return {[type]}       [description]
  */
-stroage.key = function(index) { //本地方法
+export function key(index) { //本地方法
     return storage.key(index);
 };
 
@@ -53,7 +52,7 @@ stroage.key = function(index) { //本地方法
  * @param {[type]} key [description]
  * @param {[type]} val [description]
  */
-stroage.set = function(key, val) {
+export function set(key, val) {
     var setkey;
 
     //ipad ios8.3setItem出问题
@@ -83,7 +82,7 @@ stroage.set = function(key, val) {
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-stroage.get = function(key) {
+export function get(key) {
     key = filter(key);
     return storage.getItem(key);
 };
@@ -93,7 +92,7 @@ stroage.get = function(key) {
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-stroage.remove = function(key) {
+export function remove(key) {
     key = filter(key);
     storage.removeItem(key);
 };
@@ -102,14 +101,11 @@ stroage.remove = function(key) {
  * 序列化
  * @return {[type]} [description]
  */
-stroage.fetch = function() {
+export function fetch() {
     return JSON.parse(get(name || TAG) || '[]');
 }
 
 
-stroage.save = function(name, val) {
+export function save(name, val) {
     set(name || TAG, JSON.stringify(val));
 }
-
-
-export default stroage

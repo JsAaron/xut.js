@@ -314,4 +314,4 @@ DragDropClass.prototype = {
             }
         })[0];
     }
-}
+};

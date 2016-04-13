@@ -2,7 +2,7 @@
  * 资源加载
  * @return {[type]} [description]
  */
-var loader = function() {
+var loader = function () {
     return {
         /**入口函数,动态脚本加载
          * @param fileList:           需要动态加载的资源列表
@@ -10,7 +10,7 @@ var loader = function() {
          * @param scope:              作用范围
          * @param preserveOrder:      是否保持脚本顺序
          */
-        Load: function(fileList, callback, scope, preserveOrder) {
+        load: function(fileList, callback, scope, preserveOrder) {
             //过来数组元素
             if (fileList.length && preserveOrder) {
                 var temp = [];
@@ -83,4 +83,5 @@ var loader = function() {
 }();
 
 
-export function loader
+
+export {loader}
