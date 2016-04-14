@@ -2,36 +2,70 @@
  *
  * 杂志全局API
  *
- *	*** 有方法体的是全局接口，不会被重载***
- *	*** 无方法体的是场景接口，总会切换到当前可视区域场景***
+ *  *** 有方法体的是全局接口，不会被重载***
+ *  *** 无方法体的是场景接口，总会切换到当前可视区域场景***
  *
- * 1.	Xut.Application
- * 			a)	整个应用程序的接口，执行应用级别的操作，例如退出应用之类。
- * 2.	Xut.DocumentWindow
- * 			a)	窗口的接口。窗口就是电子杂志的展示区域，可以操作诸如宽度、高度、长宽比之类。
- * 3.	Xut.View
- * 			a)	视图接口。视图是窗口的展示方式，和页面相关的接口，都在这里。
- * 4.	Xut.Presentation
- * 			a)	数据接口。和电子杂志的数据相关的接口，都在这里。
- * 5.	Xut.Slides
- *			a)	所有页面的集合
- * 6.	Xut.Slide
- * 			a)	单个页面
- * 7.	Xut.Master
- * 			a)	页面的母版
+ * 1.   Xut.Application
+ *          a)  整个应用程序的接口，执行应用级别的操作，例如退出应用之类。
+ * 2.   Xut.DocumentWindow
+ *          a)  窗口的接口。窗口就是电子杂志的展示区域，可以操作诸如宽度、高度、长宽比之类。
+ * 3.   Xut.View
+ *          a)  视图接口。视图是窗口的展示方式，和页面相关的接口，都在这里。
+ * 4.   Xut.Presentation
+ *          a)  数据接口。和电子杂志的数据相关的接口，都在这里。
+ * 5.   Xut.Slides
+ *          a)  所有页面的集合
+ * 6.   Xut.Slide
+ *          a)  单个页面
+ * 7.   Xut.Master
+ *          a)  页面的母版
  *
  *
  * @return {[type]} [description]
  */
+
+//ProcessControl
+
 import {
-    set,
-    get,
-    remove,
-    portExtend
+    _set,
+    _get,
+    _remove,
+    toNumber,
+    portExtend,
+    messageBox
 }
 from './util/index'
 
-var config = Xut.Config,
+//场景管理器
+import {
+    controll
+}
+from './scenario/controller'
+
+//调度器
+import {
+    autoRun, original, suspend
+}
+from './scheduler/index'
+
+import {
+    suspendHandles, promptMessage
+}
+from './dispatcher'
+
+import {
+    loadScene
+}
+from './init/scene'
+
+//主场景工厂方法
+import {
+    sceneFactory
+}
+from './scenario/factory'
+
+
+var config = Xut.config,
     plat = Xut.plat,
     LOCK = 1, //锁定
     UNLOCK = 2, //解除锁定
@@ -41,9 +75,7 @@ var config = Xut.Config,
  * 代码注入空间
  * @type {Object}
  */
-var XXTAPI = {},
-    rewriteMethod = function(pageIndex) {}; //填充默认没有参数的接口
-
+var XXTAPI = {};
 
 /**
  * 桌面绑定鼠标控制
@@ -64,7 +96,7 @@ if (plat.isBrowser) {
 
 //================================================
 //
-//				电子杂志所有接口
+//              电子杂志所有接口
 //
 //=================================================
 Xut.Assist = {}
@@ -126,7 +158,7 @@ function CheckBuyGood(seasonId, chapterId, createMode, pageIndex) {
             return false;
         }
         //判断是否交费
-        if (UNLOCK == data.Inapp || UNLOCK == LocalStorage.get(inAppId)) {
+        if (UNLOCK == data.Inapp || UNLOCK == _get(inAppId)) {
             setUnlock();
             return false;
         }
@@ -155,9 +187,6 @@ function CheckBuyGood(seasonId, chapterId, createMode, pageIndex) {
 }
 
 
-function toNumber(o) {
-    return Number(o) || null;
-};
 
 //重复点击
 var repeatClick = false;
@@ -173,10 +202,10 @@ portExtend(View, {
     CloseScenario: function() {
         if (repeatClick) return;
         repeatClick = true;
-        var serial = Xut.sceneController.takeOutPrevChainId();
+        var serial = controll.takeOutPrevChainId();
         View.LoadScenario({
-            'scenarioId' : serial.scenarioId,
-            'chapterId'  : serial.chapterId,
+            'scenarioId': serial.scenarioId,
+            'chapterId': serial.chapterId,
             'createMode': 'sysClose'
         }, function() {
             repeatClick = false;
@@ -193,6 +222,7 @@ portExtend(View, {
      * isInApp 是否跳转到提示页面
      */
     LoadScenario: function(options, useUnlockCallBack) {
+
         var seasonId = toNumber(options.scenarioId),
             chapterId = toNumber(options.chapterId),
             pageIndex = toNumber(options.pageIndex),
@@ -215,7 +245,7 @@ portExtend(View, {
         }
 
         //处理场景跳转
-        var sceneController = Xut.sceneController,
+        var sceneController = controll,
             //用户指定的跳转入口，而不是通过内部关闭按钮处理的
             userAssign = createMode === 'sysClose' ? false : true,
             //当前活动场景容器对象
@@ -235,8 +265,8 @@ portExtend(View, {
 
         //==================场景内部跳转===============================
         //
-        //	节相同，章与章的跳转
-        //	用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
+        //  节相同，章与章的跳转
+        //  用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
         //
         //=============================================================
         if (userAssign && current && current.scenarioId === seasonId) {
@@ -246,7 +276,7 @@ portExtend(View, {
 
         //==================场景外部跳转===============================
         //
-        //	节与节的跳转,需要对场景的处理
+        //  节与节的跳转,需要对场景的处理
         //
         //=============================================================
 
@@ -275,8 +305,8 @@ portExtend(View, {
          * $multiScenario
          * 场景模式
          * $multiScenario
-         * 		true  多场景
-         * 		false 单场景模式
+         *      true  多场景
+         *      false 单场景模式
          * 如果当前是从主场景加载副场景
          * 关闭系统工具栏
          */
@@ -305,9 +335,9 @@ portExtend(View, {
             //通过chapterId转化为实际页码指标
             //season 2
             //       {
-            //			chapterId : 1  => 0
-            //			chpaterId : 2  => 1
-            //		 }
+            //          chapterId : 1  => 0
+            //          chpaterId : 2  => 1
+            //       }
             //
             parseInitIndex = function() {
                 return chapterId ? (function() {
@@ -332,7 +362,7 @@ portExtend(View, {
          * seasonId    节ID
          * chapterId   页面ID
          * pageIndex   指定页码
-         * isInApp	   是否跳到收费提示页
+         * isInApp     是否跳到收费提示页
          * pageTotal   页面总数
          * barInfo     工具栏配置文件
          * history     历史记录
@@ -362,19 +392,18 @@ portExtend(View, {
             }
         }
 
-        //加载新场景
-        require("SceneFactory", function(Factory) {
-            //主场景判断（第一个节,因为工具栏的配置不同）
-            if (options.main || sceneController.mianId === seasonId) {
-                //清理缓存
-                LocalStorage.remove("history");
-                //确定主场景
-                sceneController.mianId = seasonId;
-                //是否主场景
-                data.isMain = true;
-            }
-            new Factory(data);
-        })
+
+        //主场景判断（第一个节,因为工具栏的配置不同）
+        if (options.main || sceneController.mianId === seasonId) {
+            //清理缓存
+            _remove("history");
+            //确定主场景
+            sceneController.mianId = seasonId;
+            //是否主场景
+            data.isMain = true;
+        }
+        new sceneFactory(data);
+
     }
 })
 
@@ -535,9 +564,8 @@ portExtend(Contents, {
 
 
 
-
 function getStorage(name) {
-    return parseInt(LocalStorage.get(name));
+    return parseInt(_get(name));
 }
 
 /**
@@ -560,7 +588,7 @@ function pass() {
     db.transaction(function(tx) {
         tx.executeSql(sql, [null, 'Inapp']);
     }, function(e) {
-        LocalStorage.set(inAppId, UNLOCK);
+        _set(inAppId, UNLOCK);
     })
 
     setUnlock();
@@ -568,10 +596,11 @@ function pass() {
     View.HideBusy();
 }
 
+
 //购买失败
 function failed() {
     if (!View.busyBarState) return;
-    Utils.messageBox('购买失败');
+    messageBox('购买失败');
     View.HideBusy();
 }
 
@@ -614,7 +643,7 @@ portExtend(Application, {
      */
     CheckOut: function() {
         var Inapp = config.Inapp;
-        if (!Inapp || LocalStorage.get(Inapp) === UNLOCK || Xut.plat.isAndroid) {
+        if (!Inapp || _get(Inapp) === UNLOCK || Xut.plat.isAndroid) {
             setUnlock();
         }
     },
@@ -680,7 +709,7 @@ portExtend(Application, {
     Resize: function() {
 
         //清理对象
-        Xut.sceneController.destroyAllScene()
+        controll.destroyAllScene()
 
         //清理节点
         $("#sceneContainer").empty();
@@ -694,10 +723,10 @@ portExtend(Application, {
             novelId = getStorage("novelId");
             //加强判断
             if (novelId) {
-                require("LoadScene").init({
+                loadScene({
                     "novelId": novelId,
                     "pageIndex": pageIndex,
-                    'history': Utils.LocalStorage.get('history')
+                    'history': _get('history')
                 });
             };
         }
@@ -710,10 +739,8 @@ portExtend(Application, {
      * 用于进来的时候激活Activate
      */
     Original: function() {
-        require("ProcessControl", function(c) {
-            c.suspend();
-            c.original();
-        })
+        suspend();
+        original();
     },
 
     /**
@@ -722,9 +749,7 @@ portExtend(Application, {
      * 激活应用行为
      */
     Activate: function() {
-        require("ProcessControl", function(c) {
-            c.autoRun()
-        })
+        autoRun()
     },
 
     /**
@@ -736,7 +761,7 @@ portExtend(Application, {
             $(document).off()
         }
         //销毁所有场景
-        Xut.sceneController.destroyAllScene();
+        controll.destroyAllScene();
     },
 
     /**
@@ -747,7 +772,7 @@ portExtend(Application, {
         if (DUKUCONFIG) {
             //外部回调通知
             if (DUKUCONFIG.iframeDrop) {
-                var appId = LocalStorage.get('appId');
+                var appId = _get('appId');
                 DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
             }
             DUKUCONFIG = null;
@@ -816,27 +841,25 @@ portExtend(Application, {
      * processed 处理完毕回调
      */
     Suspend: function(opts) {
-        require("Dispatcher", function(c) {
-            if (c.suspendHandles(opts.skipMedia)) { //停止热点动作
-                if (opts.dispose) {
-                    opts.dispose(c.promptMessage);
-                }
-            } else {
-                opts.processed && opts.processed();
+        if (suspendHandles(opts.skipMedia)) { //停止热点动作
+            if (opts.dispose) {
+                opts.dispose(promptMessage);
             }
-        })
+        } else {
+            opts.processed && opts.processed();
+        }
     },
 
 
     //============================================================
     //
-    //	注册所有组件对象
+    //  注册所有组件对象
     //
     //  2 widget 包括 视频 音频 Action 子文档 弹出口 类型
     //    这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
     //
     injectionComponent: function(regData) {
-        var sceneObj = Xut.sceneController.containerObj('current');
+        var sceneObj = controll.containerObj('current');
         sceneObj.vm.$injectionComponent = regData;
     }
 })
@@ -898,24 +921,24 @@ portExtend(Application, {
 
 //========================================================
 //
-//			脚本注入接口
+//          脚本注入接口
 //
 //========================================================
 
 XXTAPI = {
 
     /**
-			读取系统中保存的变量的值。
-			如果变量不存在，则新建这个全局变量
-			如果系统中没有保存的值，用默认值进行赋值
-			这个函数，将是创建全局变量的默认函数。
-		 */
+           读取系统中保存的变量的值。
+           如果变量不存在，则新建这个全局变量
+           如果系统中没有保存的值，用默认值进行赋值
+           这个函数，将是创建全局变量的默认函数。
+         */
     ReadVar: function(variable, defaultValue) {
         var temp;
-        if (temp = LocalStorage.get(variable)) {
+        if (temp = _get(variable)) {
             return temp;
         } else {
-            LocalStorage.set(variable, defaultValue);
+            _set(variable, defaultValue);
             return defaultValue;
         }
     },
@@ -924,15 +947,15 @@ XXTAPI = {
      * 将变量的值保存起来
      */
     SaveVar: function(variable, value) {
-        LocalStorage.set(variable, value)
+        _set(variable, value)
     },
 
     /*
-			对变量赋值，然后保存变量的值
-			对于全局变量，这个函数将是主要使用的，替代简单的“=”赋值
-		 */
+           对变量赋值，然后保存变量的值
+           对于全局变量，这个函数将是主要使用的，替代简单的“=”赋值
+         */
     SetVar: function(variable, value) {
-        LocalStorage.set(variable, value)
+        _set(variable, value)
     }
 
 }

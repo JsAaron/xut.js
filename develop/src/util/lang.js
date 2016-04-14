@@ -1,4 +1,14 @@
 
+
+/**
+ * 转化数组
+ * @param  {[type]} o [description]
+ * @return {[type]}   [description]
+ */
+export function toNumber(o) {
+    return Number(o) || null;
+};
+
 /**
  * 保证有效值
  * @return {[type]} [description]

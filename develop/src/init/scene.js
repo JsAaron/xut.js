@@ -14,7 +14,6 @@ let config
  * @param {[type]} parameter [description]
  */
 function setDataToStorage(parameter) {
-    console.log(config)
     config.pageIndex = parameter.pageIndex;
     config.novelId = parameter.novelId;
     _set({
@@ -22,7 +21,7 @@ function setDataToStorage(parameter) {
         "novelId": parameter.novelId
     });
 };
-
+ 
 
 /**
  * 初始化值

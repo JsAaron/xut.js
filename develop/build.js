@@ -18,6 +18,15 @@
 	babelHelpers;
 
 	/**
+	 * 转化数组
+	 * @param  {[type]} o [description]
+	 * @return {[type]}   [description]
+	 */
+	function toNumber(o) {
+	    return Number(o) || null;
+	};
+
+	/**
 	 * 保证有效值
 	 * @return {[type]} [description]
 	 */
@@ -244,6 +253,16 @@
 	    return storage.getItem(key);
 	};
 
+	/**
+	 * 删除localStorage中指定项
+	 * @param  {[type]} key [description]
+	 * @return {[type]}     [description]
+	 */
+	function _remove$1(key) {
+	    key = filter(key);
+	    storage.removeItem(key);
+	};
+
 	function _save(name, val) {
 	    set(name || TAG, JSON.stringify(val));
 	}
@@ -271,18 +290,103 @@
 	}
 
 	/**
+	 * 提示信息
+	 * @param  {[type]} require [description]
+	 * @param  {[type]} exports [description]
+	 * @param  {[type]} module  [description]
+	 * @return {[type]}         [description]
+	 */
+
+	var msgBox = void 0;
+	var toolTip = void 0;
+	var config = void 0;
+
+	/**
+	 * 显示提示信息
+	 */
+	function show(opts) {
+
+	    var prop = config.proportion,
+	        prefix = Xut.plat.prefixStyle,
+	        fontsize = (prop.width + prop.height) * 0.5 + 'em',
+	        content = opts.content,
+	        time = opts.time || 3000,
+	        css = {
+	        'font-size': fontsize,
+	        'background-image': 'url(images/icons/nodeBig.png)',
+	        'z-index': 99999,
+	        'bottom': '1%',
+	        'left': '5%',
+	        'padding': '0.2em 0.5em',
+	        'color': 'white',
+	        'position': 'absolute'
+	    };
+
+	    if (!toolTip) {
+	        toolTip = $('#toolTip');
+	        toolTip.css(css);
+	        toolTip.css(prefix('border-radius'), '5px');
+	    } else {
+	        toolTip.empty().show();
+	    }
+
+	    Xut.nextTick({
+	        'container': toolTip,
+	        'content': content
+	    }, hide);
+	}
+
+	/**
+	 * [模拟alert提示框]
+	 * @param  {[type]} message [description]
+	 * @return {[type]}         [description]
+	 */
+	function messageBox$1(message) {
+
+	    config = Xut.config;
+
+	    var size = config.screenSize,
+	        width = size.width * 0.25,
+	        Box = msgBox || $('#message'),
+	        html = '<div class="messageBox" style="width:' + width + 'px;">' + '<div class="messageTex" style="line-height:2">' + message + '</div>' + '<div class="messageBtn" style="line-height:1.5">OK</div>' + '</div>';
+
+	    //remove the node when user click
+	    Box.html(html).show().on("touchend mouseup", function (e) {
+	        if (e.target.className === 'messageBtn') {
+	            this.innerHTML = '';
+	            this.style.display = 'none';
+	        }
+	    });
+	}
+
+	function hide() {
+	    setTimeout(function () {
+	        toolTip.hide(1000);
+	    }, 1500);
+	}
+
+	/**
 	 * 执行脚本注入
 	 */
 	function injectScript(code, type) {
-	    //过滤回车符号
-	    var enterReplace = function enterReplace(str) {
-	        return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
-	    };
-	    try {
-	        new Function("(function(){" + enterReplace(code) + "})")();
-	    } catch (e) {
-	        console.log('加载脚本错误', type);
-	    }
+		//过滤回车符号
+		var enterReplace = function enterReplace(str) {
+			return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
+		};
+		try {
+			new Function("(function(){" + enterReplace(code) + "})")();
+		} catch (e) {
+			console.log('加载脚本错误', type);
+		}
+	}
+
+	/**
+	 * [ 消息框]
+	 * @param  {[type]} message [description]
+	 * @return {[type]}         [description]
+	 */
+	function messageBox(message) {
+		messageBox$1(message);
 	}
 
 	/**
@@ -312,13 +416,370 @@
 	    Xut.View.busyIcon = $('#busyIcon').html(html);
 	}
 
-	var config$1 = Xut.Config;
+	/**
+	 * 场景控制器
+	 * 场景对象之间的顺序处理
+	 * @return {[type]} [description]
+	 */
+
+	//场景层级控制
+	var zIndex = 999999;
+
+	//场景合集
+	//主场景
+	//副场景
+	var sceneCollection = {
+	    //场景顺序
+	    scenarioStack: [],
+	    //场景链表
+	    scenarioChain: []
+	};
+
+	var controll = {
+
+	    //场景层级控制
+	    createIndex: function createIndex() {
+	        return --zIndex;
+	    },
+
+	    //设置一个新场景
+	    add: function add(scenarioId, relevant, sceneObj) {
+	        sceneCollection.scenarioStack.push(scenarioId);
+	        sceneCollection['scenarioId->' + scenarioId] = sceneObj;
+	        //场景链表,拥挤记录场景的加载上一页
+	        sceneCollection.scenarioChain.push({
+	            'scenarioId': scenarioId,
+	            'chapterId': relevant
+	        });
+	        return sceneObj;
+	    },
+
+	    //=============== 场景链相关方法 ==========================
+
+	    //取出上一个场景链
+	    takeOutPrevChainId: function takeOutPrevChainId() {
+	        var pre = sceneCollection.scenarioChain.pop();
+	        if (sceneCollection.scenarioChain.length > 1) {
+	            return sceneCollection.scenarioChain.pop();
+	        } else {
+	            return sceneCollection.scenarioChain[0];
+	        }
+	    },
+
+	    //检测重复
+	    checkToRepeat: function checkToRepeat(seasonId) {
+	        var last,
+	            len = sceneCollection.scenarioChain.length;
+	        if (len > 1) {
+	            last = sceneCollection.scenarioChain[len - 2];
+	        } else {
+	            last = sceneCollection.scenarioChain[len - 1];
+	        }
+
+	        //往回跳一级
+	        if (last['scenarioId'] == seasonId) {
+	            this.takeOutPrevChainId();
+	        }
+
+	        //直接会跳到主场景
+	        if (sceneCollection.scenarioStack[0] == seasonId) {
+	            var scenarioChain = sceneCollection.scenarioChain.shift();
+	            sceneCollection.scenarioChain.length = 0;
+	            sceneCollection.scenarioChain.push(scenarioChain);
+	        }
+	    },
+
+	    /**
+	     * 返回活动对象
+	     * @return {[type]} [description]
+	     */
+	    containerObj: function containerObj(scenarioId) {
+	        if (scenarioId === 'current') {
+	            var scenarioStack = sceneCollection.scenarioStack;
+	            scenarioId = scenarioStack[scenarioStack.length - 1];
+	        }
+	        return sceneCollection['scenarioId->' + scenarioId];
+	    },
+
+	    /**
+	     * 找到索引位置的Id
+	     * @param  {[type]} scenarioId [description]
+	     * @return {[type]}            [description]
+	     */
+	    findIndexOfId: function findIndexOfId(scenarioId) {
+	        return sceneCollection.scenarioStack.lastIndexOf(scenarioId);
+	    },
+
+	    //删除指定场景引用
+	    remove: function remove(scenarioId) {
+	        var indexOf = this.findIndexOfId(scenarioId);
+	        //删除索引
+	        sceneCollection.scenarioStack.splice(indexOf, 1);
+	        //删除场景对象区域
+	        delete sceneCollection['scenarioId->' + scenarioId];
+	    },
+
+	    //销毁所有场景
+	    destroyAllScene: function destroyAllScene() {
+	        var cache = _.clone(sceneCollection.scenarioStack);
+	        _.each(cache, function (scenarioId) {
+	            sceneCollection['scenarioId->' + scenarioId].destroy();
+	        });
+	        sceneCollection.scenarioChain = [];
+	    },
+
+	    /**
+	     * 重写场景的顺序编号
+	     * 用于记录最后一次跳转的问题
+	     * @return {[type]} [description]
+	     */
+	    rewrite: function rewrite(scenarioId, chapterId) {
+	        _.each(sceneCollection.scenarioChain, function (scenarioChain) {
+	            if (scenarioChain.scenarioId == scenarioId) {
+	                scenarioChain.chapterId = chapterId;
+	            }
+	        });
+	    },
+
+	    //暴露接口
+	    expose: function expose() {
+	        return sceneCollection;
+	    },
+
+	    //===============================================
+	    //
+	    //			记录历史缓存
+	    //
+	    //===============================================
+
+	    //解析序列
+	    sequence: function sequence(scenarioId, currPageIndex) {
+	        var chains = sceneCollection.scenarioChain;
+	        //有多个场景关系,需要记录
+	        if (chains.length > 1) {
+	            var history = [];
+	            //只刷新当前场景的页面
+	            _.each(chains, function (chain) {
+	                if (chain.scenarioId == scenarioId) {
+	                    history.push(chain.scenarioId + '-' + chain.chapterId + '-' + currPageIndex);
+	                } else {
+	                    history.push(chain.scenarioId + '-' + chain.chapterId);
+	                }
+	            });
+	            return history;
+	        }
+	    },
+
+	    //反解析
+	    seqReverse: function seqReverse(chains) {
+	        var chains = chains.split(",");
+	        var chainsNum = chains.length;
+
+	        if (chainsNum === 1) {
+	            return false;
+	        }
+
+	        //如果只有2层
+	        if (chainsNum === 2) {
+	            return chains[1];
+	        }
+
+	        //拼接作用域链
+	        //排除首页(已存在)
+	        //尾页(新创建)
+	        _.each(chains, function (chain, index) {
+	            if (index >= 1 && index < chainsNum - 1) {
+	                //从1开始吸入,排除最后一个
+	                var chain = chain.split('-');
+	                sceneCollection.scenarioChain.push({
+	                    'scenarioId': chain[0],
+	                    'chapterId': chain[1],
+	                    'pageIndex': chain[2]
+	                });
+	            }
+	        });
+	        return chains[chainsNum - 1];
+	    }
+	};
+
+	Xut.sceneController = controll;
+
+	function autoRun() {}
+	function suspend() {}
+	function original() {}
+	function recovery() {}
+
+	/***********************************************
+	 *	      热点动作控制器模块
+	 *         1 所有content热点停止
+	 *         2 所有content热点销毁
+	 *         3 app应用销毁
+	 * **********************************************/
+
+	//消息提示框
+	function promptMessage(info) {
+	    show({
+	        hindex: Xut.Presentation.GetPageIndex(),
+	        content: info || "再按一次将退回到主页",
+	        time: 3000
+	    });
+	};
+
+	/************************************************************
+	 *
+	 * 			检测媒体的播放状态
+	 * 			1 视频
+	 * 			2 音频
+	 *
+	 * ***********************************************************/
+	function checkMedia(pageId) {
+	    var flag = false; //音频 视频 是否有处理
+
+	    if (Xut.AudioManager.clearAudio(pageId)) {
+	        flag = true;
+	    }
+
+	    if (Xut.VideoManager.clearVideo()) {
+	        flag = true;
+	    }
+
+	    return flag;
+	}
+
+	/************************************************************
+	 *
+	 * 			检测热点的运行状态
+	 *
+	 * ***********************************************************/
+	function checkWidgets(context, pageIndex) {
+	    return recovery();
+	}
+
+	/************************************************************
+	 * 			停止所有热点动作,并返回状态
+	 * 			1 content
+	 * 			2 widget
+	 * 			动画,视频,音频...........................
+	 * 			增加场景模式判断
+	 * ***********************************************************/
+	function suspendHandles(context, pageIndex, skipMedia) {
+
+	    //是否存在运行中
+	    var stateRun = false;
+
+	    //处理音频
+	    if (checkMedia(skipMedia)) {
+	        stateRun = true;
+	    }
+
+	    //正在运行的热点
+	    ///content,Action', 'Widget', 'ShowNote'
+	    if (checkWidgets(context, pageIndex)) {
+	        stateRun = true;
+	    }
+
+	    //处理导航
+	    Navbar.close(function () {
+	        stateRun = true;
+	    });
+
+	    return stateRun;
+	}
+
+	var config$3 = void 0;
+
+	/**
+	 * 设置缓存
+	 * @param {[type]} parameter [description]
+	 */
+	function setDataToStorage(parameter) {
+	    config$3.pageIndex = parameter.pageIndex;
+	    config$3.novelId = parameter.novelId;
+	    _set({
+	        "pageIndex": parameter.pageIndex,
+	        "novelId": parameter.novelId
+	    });
+	};
+
+	/**
+	 * 初始化值
+	 * @param {[type]} options [description]
+	 */
+	function initDefaultValues(options) {
+	    var pageFlip = options.pageFlip;
+	    //配置全局翻页模式
+	    //pageflip可以为0
+	    //兼容pageFlip错误,强制转化成数字类型
+	    if (pageFlip !== undefined) {
+	        config$3.pageFlip = toEmpty(pageFlip);
+	    }
+	    return {
+	        'novelId': toEmpty(options.novelId),
+	        'pageIndex': toEmpty(options.pageIndex),
+	        'history': options.history
+	    };
+	};
+
+	/**
+	 * 检测脚本注入
+	 * @return {[type]} [description]
+	 */
+	function checkInjectScript() {
+	    var preCode,
+	        novels = Xut.data.query('Novel');
+	    if (preCode = novels.preCode) {
+	        injectScript(preCode, 'novelpre脚本');
+	    }
+	}
+
+	function loadScene(options) {
+
+	    config$3 = Xut.config;
+
+	    //获取默认参数
+	    var parameter = initDefaultValues(options || {});
+
+	    //设置缓存
+	    setDataToStorage(parameter);
+
+	    //应用脚本注入
+	    checkInjectScript();
+
+	    //检测下scenarioId的正确性
+	    //scenarioId = 1 找不到chapter数据
+	    //通过sectionRelated递归检测下一条数据
+	    var scenarioId, seasondata, i;
+	    for (i = 0; i < Xut.data.Season.length; i++) {
+	        seasondata = Xut.data.Season.item(i);
+	        if (Xut.data.query('sectionRelated', seasondata._id)) {
+	            scenarioId = seasondata._id;
+	            break;
+	        }
+	    }
+
+	    //加载新的场景
+	    Xut.View.LoadScenario({
+	        'main': true, //主场景入口
+	        'scenarioId': scenarioId,
+	        'pageIndex': parameter.pageIndex,
+	        'history': parameter.history
+	    });
+	}
+
+	function sceneFactory() {}
+
+	var config$2 = Xut.config;
 	var plat = Xut.plat;
 	var LOCK = 1;
 	var UNLOCK = 2;
 	var IsPay = false;
+	//
+
+	/**
+	 * 代码注入空间
+	 * @type {Object}
+	 */
 	var XXTAPI = {};
-	//填充默认没有参数的接口
 
 	/**
 	 * 桌面绑定鼠标控制
@@ -338,7 +799,7 @@
 
 	//================================================
 	//
-	//				电子杂志所有接口
+	//              电子杂志所有接口
 	//
 	//=================================================
 	Xut.Assist = {};
@@ -397,7 +858,7 @@
 	            return false;
 	        }
 	        //判断是否交费
-	        if (UNLOCK == data.Inapp || UNLOCK == LocalStorage.get(inAppId)) {
+	        if (UNLOCK == data.Inapp || UNLOCK == _get(inAppId)) {
 	            setUnlock();
 	            return false;
 	        }
@@ -425,10 +886,6 @@
 	    return true;
 	}
 
-	function toNumber(o) {
-	    return Number(o) || null;
-	};
-
 	//重复点击
 	var repeatClick = false;
 
@@ -443,7 +900,7 @@
 	    CloseScenario: function CloseScenario() {
 	        if (repeatClick) return;
 	        repeatClick = true;
-	        var serial = Xut.sceneController.takeOutPrevChainId();
+	        var serial = controll.takeOutPrevChainId();
 	        _View.LoadScenario({
 	            'scenarioId': serial.scenarioId,
 	            'chapterId': serial.chapterId,
@@ -463,6 +920,7 @@
 	     * isInApp 是否跳转到提示页面
 	     */
 	    LoadScenario: function LoadScenario(options, useUnlockCallBack) {
+
 	        var seasonId = toNumber(options.scenarioId),
 	            chapterId = toNumber(options.chapterId),
 	            pageIndex = toNumber(options.pageIndex),
@@ -483,7 +941,7 @@
 	        }
 
 	        //处理场景跳转
-	        var sceneController = Xut.sceneController,
+	        var sceneController = controll,
 
 	        //用户指定的跳转入口，而不是通过内部关闭按钮处理的
 	        userAssign = createMode === 'sysClose' ? false : true,
@@ -505,8 +963,8 @@
 
 	        //==================场景内部跳转===============================
 	        //
-	        //	节相同，章与章的跳转
-	        //	用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
+	        //  节相同，章与章的跳转
+	        //  用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
 	        //
 	        //=============================================================
 	        if (userAssign && current && current.scenarioId === seasonId) {
@@ -516,7 +974,7 @@
 
 	        //==================场景外部跳转===============================
 	        //
-	        //	节与节的跳转,需要对场景的处理
+	        //  节与节的跳转,需要对场景的处理
 	        //
 	        //=============================================================
 
@@ -543,8 +1001,8 @@
 	         * $multiScenario
 	         * 场景模式
 	         * $multiScenario
-	         * 		true  多场景
-	         * 		false 单场景模式
+	         *      true  多场景
+	         *      false 单场景模式
 	         * 如果当前是从主场景加载副场景
 	         * 关闭系统工具栏
 	         */
@@ -573,9 +1031,9 @@
 	        //通过chapterId转化为实际页码指标
 	        //season 2
 	        //       {
-	        //			chapterId : 1  => 0
-	        //			chpaterId : 2  => 1
-	        //		 }
+	        //          chapterId : 1  => 0
+	        //          chpaterId : 2  => 1
+	        //       }
 	        //
 	        parseInitIndex = function parseInitIndex() {
 	            return chapterId ? function () {
@@ -589,7 +1047,7 @@
 	        };
 
 	        //如果启动了虚拟模式
-	        if (config$1.virtualMode) {
+	        if (config$2.virtualMode) {
 	            pageTotal = pageTotal * 2;
 	        }
 
@@ -598,7 +1056,7 @@
 	         * seasonId    节ID
 	         * chapterId   页面ID
 	         * pageIndex   指定页码
-	         * isInApp	   是否跳到收费提示页
+	         * isInApp     是否跳到收费提示页
 	         * pageTotal   页面总数
 	         * barInfo     工具栏配置文件
 	         * history     历史记录
@@ -628,19 +1086,16 @@
 	            }
 	        };
 
-	        //加载新场景
-	        require("SceneFactory", function (Factory) {
-	            //主场景判断（第一个节,因为工具栏的配置不同）
-	            if (options.main || sceneController.mianId === seasonId) {
-	                //清理缓存
-	                LocalStorage.remove("history");
-	                //确定主场景
-	                sceneController.mianId = seasonId;
-	                //是否主场景
-	                data.isMain = true;
-	            }
-	            new Factory(data);
-	        });
+	        //主场景判断（第一个节,因为工具栏的配置不同）
+	        if (options.main || sceneController.mianId === seasonId) {
+	            //清理缓存
+	            _remove$1("history");
+	            //确定主场景
+	            sceneController.mianId = seasonId;
+	            //是否主场景
+	            data.isMain = true;
+	        }
+	        new sceneFactory(data);
 	    }
 	});
 
@@ -797,7 +1252,7 @@
 	});
 
 	function getStorage(name) {
-	    return parseInt(LocalStorage.get(name));
+	    return parseInt(_get(name));
 	}
 
 	/**
@@ -813,13 +1268,13 @@
 	    //如果提前关闭了忙碌光标说明被用户中止
 	    if (!_View.busyBarState) return;
 	    //将购买记录存入数据库
-	    var db = config$1.db,
+	    var db = config$2.db,
 	        sql = 'UPDATE Setting SET value=? WHERE name=?';
 
 	    db.transaction(function (tx) {
 	        tx.executeSql(sql, [null, 'Inapp']);
 	    }, function (e) {
-	        LocalStorage.set(inAppId, UNLOCK);
+	        _set(inAppId, UNLOCK);
 	    });
 
 	    setUnlock();
@@ -830,7 +1285,7 @@
 	//购买失败
 	function failed() {
 	    if (!_View.busyBarState) return;
-	    Utils.messageBox('购买失败');
+	    messageBox('购买失败');
 	    _View.HideBusy();
 	}
 
@@ -847,7 +1302,7 @@
 	            //嵌套iframe平台
 	            return platformName[0];
 	        } else {
-	            if (config$1.isBrowser) {
+	            if (config$2.isBrowser) {
 	                return platformName[1];
 	            } else if (Xut.plat.isIOS) {
 	                return platformName[2];
@@ -870,8 +1325,8 @@
 	     * @return {[type]}       [description]
 	     */
 	    CheckOut: function CheckOut() {
-	        var Inapp = config$1.Inapp;
-	        if (!Inapp || LocalStorage.get(Inapp) === UNLOCK || Xut.plat.isAndroid) {
+	        var Inapp = config$2.Inapp;
+	        if (!Inapp || _get(Inapp) === UNLOCK || Xut.plat.isAndroid) {
 	            setUnlock();
 	        }
 	    },
@@ -885,7 +1340,7 @@
 	     * @return {[type]}            [description]
 	     */
 	    BuyGood: function BuyGood() {
-	        var inAppId = config$1.Inapp;
+	        var inAppId = config$2.Inapp;
 	        if (_View.busyBarState) return;
 	        _View.ShowTextBusy('请稍候...');
 	        //调式模式
@@ -913,7 +1368,7 @@
 	     * @return {[type]} [description]
 	     */
 	    HasBuyGood: function HasBuyGood() {
-	        var inAppId = config$1.Inapp;
+	        var inAppId = config$2.Inapp;
 	        if (_View.busyBarState) return;
 	        _View.ShowTextBusy('请稍候...');
 	        //调式模式
@@ -937,7 +1392,7 @@
 	    Resize: function Resize() {
 
 	        //清理对象
-	        Xut.sceneController.destroyAllScene();
+	        controll.destroyAllScene();
 
 	        //清理节点
 	        $("#sceneContainer").empty();
@@ -951,10 +1406,10 @@
 	            novelId = getStorage("novelId");
 	            //加强判断
 	            if (novelId) {
-	                require("LoadScene").init({
+	                loadScene({
 	                    "novelId": novelId,
 	                    "pageIndex": pageIndex,
-	                    'history': Utils.LocalStorage.get('history')
+	                    'history': _get('history')
 	                });
 	            };
 	        }
@@ -966,10 +1421,8 @@
 	     * 用于进来的时候激活Activate
 	     */
 	    Original: function Original() {
-	        require("ProcessControl", function (c) {
-	            c.suspend();
-	            c.original();
-	        });
+	        suspend();
+	        original();
 	    },
 
 	    /**
@@ -978,9 +1431,7 @@
 	     * 激活应用行为
 	     */
 	    Activate: function Activate() {
-	        require("ProcessControl", function (c) {
-	            c.autoRun();
-	        });
+	        autoRun();
 	    },
 
 	    /**
@@ -992,7 +1443,7 @@
 	            $(document).off();
 	        }
 	        //销毁所有场景
-	        Xut.sceneController.destroyAllScene();
+	        controll.destroyAllScene();
 	    },
 
 	    /**
@@ -1003,7 +1454,7 @@
 	        if (DUKUCONFIG) {
 	            //外部回调通知
 	            if (DUKUCONFIG.iframeDrop) {
-	                var appId = LocalStorage.get('appId');
+	                var appId = _get('appId');
 	                DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
 	            }
 	            DUKUCONFIG = null;
@@ -1039,8 +1490,8 @@
 	            //并且是安卓情况下
 	            //安卓销毁按键事件
 	            if (Xut.plat.isAndroid) {
-	                GLOBALCONTEXT.document.removeEventListener("backbutton", config$1._event.back, false);
-	                GLOBALCONTEXT.document.removeEventListener("pause", config$1._event.pause, false);
+	                GLOBALCONTEXT.document.removeEventListener("backbutton", config$2._event.back, false);
+	                GLOBALCONTEXT.document.removeEventListener("pause", config$2._event.pause, false);
 	            }
 	        }
 
@@ -1068,27 +1519,25 @@
 	     * processed 处理完毕回调
 	     */
 	    Suspend: function Suspend(opts) {
-	        require("Dispatcher", function (c) {
-	            if (c.suspendHandles(opts.skipMedia)) {
-	                //停止热点动作
-	                if (opts.dispose) {
-	                    opts.dispose(c.promptMessage);
-	                }
-	            } else {
-	                opts.processed && opts.processed();
+	        if (suspendHandles(opts.skipMedia)) {
+	            //停止热点动作
+	            if (opts.dispose) {
+	                opts.dispose(promptMessage);
 	            }
-	        });
+	        } else {
+	            opts.processed && opts.processed();
+	        }
 	    },
 
 	    //============================================================
 	    //
-	    //	注册所有组件对象
+	    //  注册所有组件对象
 	    //
 	    //  2 widget 包括 视频 音频 Action 子文档 弹出口 类型
 	    //    这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
 	    //
 	    injectionComponent: function injectionComponent(regData) {
-	        var sceneObj = Xut.sceneController.containerObj('current');
+	        var sceneObj = controll.containerObj('current');
 	        sceneObj.vm.$injectionComponent = regData;
 	    }
 	});
@@ -1147,24 +1596,24 @@
 
 	//========================================================
 	//
-	//			脚本注入接口
+	//          脚本注入接口
 	//
 	//========================================================
 
 	XXTAPI = {
 
 	    /**
-	    	读取系统中保存的变量的值。
-	    	如果变量不存在，则新建这个全局变量
-	    	如果系统中没有保存的值，用默认值进行赋值
-	    	这个函数，将是创建全局变量的默认函数。
-	    */
+	           读取系统中保存的变量的值。
+	           如果变量不存在，则新建这个全局变量
+	           如果系统中没有保存的值，用默认值进行赋值
+	           这个函数，将是创建全局变量的默认函数。
+	         */
 	    ReadVar: function ReadVar(variable, defaultValue) {
 	        var temp;
-	        if (temp = LocalStorage.get(variable)) {
+	        if (temp = _get(variable)) {
 	            return temp;
 	        } else {
-	            LocalStorage.set(variable, defaultValue);
+	            _set(variable, defaultValue);
 	            return defaultValue;
 	        }
 	    },
@@ -1173,15 +1622,15 @@
 	     * 将变量的值保存起来
 	     */
 	    SaveVar: function SaveVar(variable, value) {
-	        LocalStorage.set(variable, value);
+	        _set(variable, value);
 	    },
 
 	    /*
-	    	对变量赋值，然后保存变量的值
-	    	对于全局变量，这个函数将是主要使用的，替代简单的“=”赋值
-	    */
+	           对变量赋值，然后保存变量的值
+	           对于全局变量，这个函数将是主要使用的，替代简单的“=”赋值
+	         */
 	    SetVar: function SetVar(variable, value) {
-	        LocalStorage.set(variable, value);
+	        _set(variable, value);
 	    }
 
 	};
@@ -1850,88 +2299,7 @@
 	    };
 	};
 
-	var config$2 = void 0;
-
-	/**
-	 * 设置缓存
-	 * @param {[type]} parameter [description]
-	 */
-	function setDataToStorage(parameter) {
-	    console.log(config$2);
-	    config$2.pageIndex = parameter.pageIndex;
-	    config$2.novelId = parameter.novelId;
-	    _set({
-	        "pageIndex": parameter.pageIndex,
-	        "novelId": parameter.novelId
-	    });
-	};
-
-	/**
-	 * 初始化值
-	 * @param {[type]} options [description]
-	 */
-	function initDefaultValues(options) {
-	    var pageFlip = options.pageFlip;
-	    //配置全局翻页模式
-	    //pageflip可以为0
-	    //兼容pageFlip错误,强制转化成数字类型
-	    if (pageFlip !== undefined) {
-	        config$2.pageFlip = toEmpty(pageFlip);
-	    }
-	    return {
-	        'novelId': toEmpty(options.novelId),
-	        'pageIndex': toEmpty(options.pageIndex),
-	        'history': options.history
-	    };
-	};
-
-	/**
-	 * 检测脚本注入
-	 * @return {[type]} [description]
-	 */
-	function checkInjectScript() {
-	    var preCode,
-	        novels = Xut.data.query('Novel');
-	    if (preCode = novels.preCode) {
-	        injectScript(preCode, 'novelpre脚本');
-	    }
-	}
-
-	function loadScene(options) {
-
-	    config$2 = Xut.config;
-
-	    //获取默认参数
-	    var parameter = initDefaultValues(options || {});
-
-	    //设置缓存
-	    setDataToStorage(parameter);
-
-	    //应用脚本注入
-	    checkInjectScript();
-
-	    //检测下scenarioId的正确性
-	    //scenarioId = 1 找不到chapter数据
-	    //通过sectionRelated递归检测下一条数据
-	    var scenarioId, seasondata, i;
-	    for (i = 0; i < Xut.data.Season.length; i++) {
-	        seasondata = Xut.data.Season.item(i);
-	        if (Xut.data.query('sectionRelated', seasondata._id)) {
-	            scenarioId = seasondata._id;
-	            break;
-	        }
-	    }
-
-	    //加载新的场景
-	    Xut.View.LoadScenario({
-	        'main': true, //主场景入口
-	        'scenarioId': scenarioId,
-	        'pageIndex': parameter.pageIndex,
-	        'history': parameter.history
-	    });
-	}
-
-	var config = void 0;
+	var config$1 = void 0;
 
 	function getCache(name) {
 	    return parseInt(_get(name));
@@ -1985,7 +2353,7 @@
 
 	    //缓存加载
 	    //如果启动recordHistory记录
-	    if (config.recordHistory && pageIndex !== undefined) {
+	    if (config$1.recordHistory && pageIndex !== undefined) {
 	        //加强判断
 	        if (novelId = getCache("novelId")) {
 	            return loadScene({
@@ -2051,20 +2419,20 @@
 	        cfg[i] = Number(data[i]);
 	    }
 
-	    config.settings = cfg;
-	    config.appId = data.appId; //应用配置唯一标示符
-	    config.shortName = data.shortName;
-	    config.Inapp = data.Inapp; //是否为应用内购买
+	    config$1.settings = cfg;
+	    config$1.appId = data.appId; //应用配置唯一标示符
+	    config$1.shortName = data.shortName;
+	    config$1.Inapp = data.Inapp; //是否为应用内购买
 
 	    //应用的唯一标识符
 	    //生成时间+appid
-	    config.appUUID = data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.adUpdateTime;
+	    config$1.appUUID = data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.adUpdateTime;
 
 	    //检查是否解锁
 	    Xut.Application.CheckOut();
 
 	    //资源路径配置
-	    config.initResourcesPath();
+	    config$1.initResourcesPath();
 
 	    //缓存应用ID
 	    _set({
@@ -2082,13 +2450,13 @@
 	    //启动画轴模式
 	    //防止是布尔0成立
 	    if (data.scrollPaintingMode && data.scrollPaintingMode == 1) {
-	        config.scrollPaintingMode = true;
+	        config$1.scrollPaintingMode = true;
 	    }
 
 	    //假如启用了画轴模式，看看是不是竖版的情况，需要切半模版virtualMode
-	    if (config.scrollPaintingMode) {
-	        if (config.screenSize.width < config.screenSize.height) {
-	            config.virtualMode = true;
+	    if (config$1.scrollPaintingMode) {
+	        if (config$1.screenSize.width < config$1.screenSize.height) {
+	            config$1.virtualMode = true;
 	        }
 	    }
 
@@ -2112,11 +2480,11 @@
 
 	    //如果启动桌面调试模式
 	    //自动打开缓存加载
-	    if (!recordHistory && config.isBrowser && config.debugMode) {
+	    if (!recordHistory && config$1.isBrowser && config$1.debugMode) {
 	        recordHistory = 1;
 	    }
 
-	    config.recordHistory = recordHistory;
+	    config$1.recordHistory = recordHistory;
 	}
 
 	/**
@@ -2127,7 +2495,7 @@
 	function fixedSize(novelData) {
 	    if (novelData) {
 	        if (novelData.pptWidth || novelData.pptHeight) {
-	            config.setDbProportion(novelData.pptWidth, novelData.pptHeight);
+	            config$1.setDbProportion(novelData.pptWidth, novelData.pptHeight);
 	        }
 	    }
 	}
@@ -2137,7 +2505,7 @@
 	 * @return {[type]} [description]
 	 */
 	function checkTestDB() {
-	    var database = config.db,
+	    var database = config$1.db,
 	        sql = 'SELECT * FROM Novel';
 	    if (database) {
 	        database.transaction(function (tx) {
@@ -2159,7 +2527,7 @@
 	 */
 	function nextTask() {
 
-	    config = Xut.Config;
+	    config$1 = Xut.Config;
 
 	    //加载忙碌光标
 	    if (!Xut.IBooks.Enabled) {
@@ -2169,7 +2537,7 @@
 	    if (window.openDatabase) {
 	        try {
 	            //数据库链接对象
-	            config.db = window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
+	            config$1.db = window.openDatabase(config$1.dbName, "1.0", "Xxtebook Database", config$1.dbSize);
 	        } catch (err) {
 	            console.log('window.openDatabase出错');
 	        }
