@@ -1,0 +1,22 @@
+{
+  "name": "magazine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JsAaron/node-magazine.git"
+  },
+  "author": "Aaron",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JsAaron/node-magazine/issues"
+  },
+  "homepage": "https://github.com/JsAaron/node-magazine#readme",
+  "devDependencies": {
+    "gulp-watch": "^4.3.5"
+  }
+}
