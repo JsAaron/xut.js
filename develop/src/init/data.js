@@ -27,47 +27,12 @@ from '../component/content/filter'
 
 import {
     loadScene
-} from './scene'
+}
+from './scene'
+
 
 let config;
 
-
-//数据库检测
-function testDB() {
-    var database = config.db,
-        sql = 'SELECT * FROM Novel';
-
-    if (database) {
-        database.transaction(function(tx) {
-            tx.executeSql(sql, [], function(tx, rs) {
-                initValue();
-            }, function() {
-                //if not support magazine.db, we need to set the db as null
-                Xut.Config.db = null;
-                initValue();
-            })
-        })
-    } else {
-        //The current environment doesn't support database API
-        //It's done using Ajax and PHP
-        initValue();
-    }
-}
-
-
-
-/**
- * 根据set表初始化数据
- * @return {[type]} [description]
- */
-function initValue() {
-    createStore()
-        .done(function(setData, novelData) {
-            initDefaults(setData);
-            fixedSize(novelData);
-            initMain(novelData);
-        });
-};
 
 
 function getCache(name) {
@@ -84,7 +49,7 @@ function initMain(novelData) {
     var novelId,
         parameter,
         pageIndex = getCache('pageIndex'),
-        pageFlip = getCache('pageFlip') || 0;
+        pageFlip  = getCache('pageFlip') || 0;
 
     /**
      * IBOOS模式
@@ -127,10 +92,10 @@ function initMain(novelData) {
         //加强判断
         if (novelId = getCache("novelId")) {
             return loadScene({
-                'pageFlip': pageFlip,
-                "novelId": novelId,
-                "pageIndex": pageIndex,
-                'history': LocalStorage.get('history')
+                'pageFlip'  : pageFlip,
+                "novelId"   : novelId,
+                "pageIndex" : pageIndex,
+                'history'   : LocalStorage.get('history')
             });
         }
     }
@@ -138,27 +103,25 @@ function initMain(novelData) {
     //第一次加载
     //没有缓存
     loadScene({
-        "novelId": novelData._id,
-        "pageIndex": 0,
-        'pageFlip': pageFlip
+        "novelId"   : novelData._id,
+        "pageIndex" : 0,
+        'pageFlip'  : pageFlip
     });
 };
 
 
-
 /**
- * 修正尺寸
- * 修正实际分辨率
+ * 根据set表初始化数据
  * @return {[type]} [description]
  */
-function fixedSize(novelData) {
-    if (novelData) {
-        if (novelData.pptWidth || novelData.pptHeight) {
-            config.setDbProportion(novelData.pptWidth, novelData.pptHeight);
-            // fixRem(novelData.pptWidth, novelData.pptHeight)
-        }
-    }
-}
+function initValue() {
+    createStore()
+        .done(function(setData, novelData) {
+            initDefaults(setData);
+            fixedSize(novelData);
+            initMain(novelData);
+        });
+};
 
 
 /**
@@ -264,12 +227,46 @@ function cfgHistory(data) {
 }
 
 
+/**
+ * 修正尺寸
+ * 修正实际分辨率
+ * @return {[type]} [description]
+ */
+function fixedSize(novelData) {
+    if (novelData) {
+        if (novelData.pptWidth || novelData.pptHeight) {
+            config.setDbProportion(novelData.pptWidth, novelData.pptHeight);
+        }
+    }
+}
+
+
+/**
+ * 数据库检测
+ * @return {[type]} [description]
+ */
+function checkTestDB() {
+    var database = config.db,
+        sql = 'SELECT * FROM Novel';
+    if (database) {
+        database.transaction(function(tx) {
+            tx.executeSql(sql, [], function(tx, rs) {
+                initValue();
+            }, function() {
+                Xut.Config.db = null;
+                initValue();
+            })
+        })
+    } else {
+        initValue();
+    }
+}
 
 /**
  * 初始化
  * 数据结构
  */
-export function initData() {
+export function nextTask() {
 
     config = Xut.Config
 
@@ -288,5 +285,5 @@ export function initData() {
     }
 
     //检查数据库
-    testDB();
+    checkTestDB();
 }

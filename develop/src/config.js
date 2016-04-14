@@ -705,6 +705,6 @@ _.extend(config, {
     dbSize: 1
 
 });
-Xut.Config = config;
+Xut.Config = Xut.config = config;
 
 

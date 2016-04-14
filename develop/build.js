@@ -1837,45 +1837,99 @@
 	    };
 	};
 
-	function loadScene() {
-		console.log(1);
-	}
+	var config$2 = void 0;
 
-	var config = void 0;
+	/**
+	 * 设置缓存
+	 * @param {[type]} parameter [description]
+	 */
+	function setDataToStorage(parameter) {
+	    console.log(config$2);
+	    config$2.pageIndex = parameter.pageIndex;
+	    config$2.novelId = parameter.novelId;
+	    set({
+	        "pageIndex": parameter.pageIndex,
+	        "novelId": parameter.novelId
+	    });
+	};
 
-	//数据库检测
-	function testDB() {
-	    var database = config.db,
-	        sql = 'SELECT * FROM Novel';
-
-	    if (database) {
-	        database.transaction(function (tx) {
-	            tx.executeSql(sql, [], function (tx, rs) {
-	                initValue();
-	            }, function () {
-	                //if not support magazine.db, we need to set the db as null
-	                Xut.Config.db = null;
-	                initValue();
-	            });
-	        });
-	    } else {
-	        //The current environment doesn't support database API
-	        //It's done using Ajax and PHP
-	        initValue();
-	    }
+	/**
+	 * 保证有效值
+	 * @return {[type]} [description]
+	 */
+	function toEmpty(val) {
+	    return Number(val);
 	}
 
 	/**
-	 * 根据set表初始化数据
+	 * 初始化值
+	 * @param {[type]} options [description]
+	 */
+	function initDefaultValues(options) {
+
+	    var pageFlip = options.pageFlip;
+
+	    //配置全局翻页模式
+	    //pageflip可以为0
+	    //兼容pageFlip错误,强制转化成数字类型
+	    if (pageFlip !== undefined) {
+	        config$2.pageFlip = toEmpty(pageFlip);
+	    }
+
+	    return {
+	        'novelId': toEmpty(options.novelId),
+	        'pageIndex': toEmpty(options.pageIndex),
+	        'history': options.history
+	    };
+	};
+
+	/**
+	 * 检测脚本注入
 	 * @return {[type]} [description]
 	 */
-	function initValue() {
-	    createStore().done(function (setData, novelData) {
-	        initDefaults(setData);
-	        fixedSize(novelData);
-	        initMain(novelData);
+	function checkInjectScript() {
+	    var preCode,
+	        novels = Xut.data.query('Novel');
+	    if (preCode = novels.preCode) {
+	        Utils.injectScript(preCode, 'novelpre脚本');
+	    }
+	}
+
+	function loadScene(options) {
+
+	    config$2 = Xut.config;
+
+	    //获取默认参数
+	    var parameter = initDefaultValues(options || {});
+
+	    //设置缓存
+	    setDataToStorage(parameter);
+
+	    //应用脚本注入
+	    checkInjectScript();
+
+	    //检测下scenarioId的正确性
+	    //scenarioId = 1 找不到chapter数据
+	    //通过sectionRelated递归检测下一条数据
+	    var scenarioId, seasondata, i;
+	    for (i = 0; i < Xut.data.Season.length; i++) {
+	        seasondata = Xut.data.Season.item(i);
+	        if (Xut.data.query('sectionRelated', seasondata._id)) {
+	            scenarioId = seasondata._id;
+	            break;
+	        }
+	    }
+
+	    //加载新的场景
+	    Xut.View.LoadScenario({
+	        'main': true, //主场景入口
+	        'scenarioId': scenarioId,
+	        'pageIndex': parameter.pageIndex,
+	        'history': parameter.history
 	    });
-	};
+	}
+
+	var config = void 0;
 
 	function getCache(name) {
 	    return parseInt(get(name));
@@ -1951,18 +2005,16 @@
 	};
 
 	/**
-	 * 修正尺寸
-	 * 修正实际分辨率
+	 * 根据set表初始化数据
 	 * @return {[type]} [description]
 	 */
-	function fixedSize(novelData) {
-	    if (novelData) {
-	        if (novelData.pptWidth || novelData.pptHeight) {
-	            config.setDbProportion(novelData.pptWidth, novelData.pptHeight);
-	            // fixRem(novelData.pptWidth, novelData.pptHeight)
-	        }
-	    }
-	}
+	function initValue() {
+	    createStore().done(function (setData, novelData) {
+	        initDefaults(setData);
+	        fixedSize(novelData);
+	        initMain(novelData);
+	    });
+	};
 
 	/**
 	 * 配置默认数据
@@ -2066,10 +2118,44 @@
 	}
 
 	/**
+	 * 修正尺寸
+	 * 修正实际分辨率
+	 * @return {[type]} [description]
+	 */
+	function fixedSize(novelData) {
+	    if (novelData) {
+	        if (novelData.pptWidth || novelData.pptHeight) {
+	            config.setDbProportion(novelData.pptWidth, novelData.pptHeight);
+	        }
+	    }
+	}
+
+	/**
+	 * 数据库检测
+	 * @return {[type]} [description]
+	 */
+	function checkTestDB() {
+	    var database = config.db,
+	        sql = 'SELECT * FROM Novel';
+	    if (database) {
+	        database.transaction(function (tx) {
+	            tx.executeSql(sql, [], function (tx, rs) {
+	                initValue();
+	            }, function () {
+	                Xut.Config.db = null;
+	                initValue();
+	            });
+	        });
+	    } else {
+	        initValue();
+	    }
+	}
+
+	/**
 	 * 初始化
 	 * 数据结构
 	 */
-	function initData() {
+	function nextTask() {
 
 	    config = Xut.Config;
 
@@ -2088,56 +2174,94 @@
 	    }
 
 	    //检查数据库
-	    testDB();
+	    checkTestDB();
 	}
 
-	function init(argument) {
-	    var config = Xut.Config;
-	    var isBrowser = config.isBrowser;
+	var preloadVideo = {
+	    //播放状态
+	    state: false,
+	    //地址
+	    path: DUKUCONFIG ? DUKUCONFIG.path + "duku.mp4" : 'android.resource://#packagename#/raw/duku',
 
-	    var preloadVideo = {
-	        //播放状态
-	        state: false,
-	        //地址
-	        path: DUKUCONFIG ? DUKUCONFIG.path + "duku.mp4" : 'android.resource://#packagename#/raw/duku',
+	    //加载视频
+	    load: function load() {
+	        // if (window.localStorage.getItem("videoPlayer") == 'error') {
+	        //       alert("error")
+	        //     return preloadVideo.launchApp();
+	        // }
+	        this.play();
+	        this.state = true;
+	    },
 
-	        //加载视频
-	        load: function load() {
-	            // if (window.localStorage.getItem("videoPlayer") == 'error') {
-	            //       alert("error")
-	            //     return preloadVideo.launchApp();
-	            // }
-	            this.play();
-	            this.state = true;
+	    //播放视频
+	    play: function play() {
+	        //延时应用加载
+	        Xut.Application.delayAppRun();
+	        Xut.Plugin.VideoPlayer.play(function () {
+	            preloadVideo.launchApp();
+	        }, function () {
+	            //捕获出错,下次不进入了,,暂无ID号
+	            // window.localStorage.setItem("videoPlayer", "error")
+	            preloadVideo.launchApp();
+	        }, preloadVideo.path, 1, 0, 0, window.innerHeight, window.innerWidth);
+	    },
+
+	    //清理视频
+	    closeVideo: function closeVideo() {
+	        Xut.Plugin.VideoPlayer.close(function () {
+	            preloadVideo.launchApp();
+	        });
+	    },
+
+	    //加载应用
+	    launchApp: function launchApp() {
+	        this.state = false;
+	        Xut.Application.LaunchApp();
+	    }
+	};
+
+	function loadVideo() {
+	    preloadVideo.load();
+	}
+
+	/**************
+	 * 物理按键处理
+	 **************/
+
+	//退出加锁,防止过快点击
+	var outLock = false;
+
+	//回退按钮状态控制器
+	function controller(state) {
+	    //如果是子文档处理
+	    if (Xut.isRunSubDoc) {
+	        //通过Action动作激活的,需要到Action类中处理
+	        Xut.publish('subdoc:dropApp');
+	        return;
+	    }
+	    //正常逻辑
+	    outLock = true;
+
+	    Xut.Application.Suspend({
+	        dispose: function dispose() {
+	            //停止热点动作
+	            setTimeout(function () {
+	                outLock = false;
+	            }, 100);
 	        },
-
-	        //播放视频
-	        play: function play() {
-	            //延时应用加载
-	            Xut.Application.delayAppRun();
-	            Xut.Plugin.VideoPlayer.play(function () {
-	                preloadVideo.launchApp();
-	            }, function () {
-	                //捕获出错,下次不进入了,,暂无ID号
-	                // window.localStorage.setItem("videoPlayer", "error")
-	                preloadVideo.launchApp();
-	            }, preloadVideo.path, 1, 0, 0, window.innerHeight, window.innerWidth);
-	        },
-
-	        //清理视频
-	        closeVideo: function closeVideo() {
-	            Xut.Plugin.VideoPlayer.close(function () {
-	                preloadVideo.launchApp();
-	            });
-	        },
-
-	        //加载应用
-	        launchApp: function launchApp() {
-	            this.state = false;
-	            Xut.Application.LaunchApp();
+	        processed: function processed() {
+	            //退出应用
+	            state === 'back' && Xut.Application.DropApp();
 	        }
-	    };
+	    });
+	}
 
+	/**
+	 * 绑定控制案例事件
+	 * @param  {[type]} config [description]
+	 * @return {[type]}        [description]
+	 */
+	function bindEvent(config) {
 	    //存放绑定事件
 	    config._event = {
 	        //回退键
@@ -2153,21 +2277,48 @@
 	        pause: function pause() {
 	            controller('pause');
 	        }
-
 	    };
+	}
+
+	/**
+	 *  创建播放器
+	 *  IOS，PC端执行
+	 */
+	function html5Video() {
+	    //延时应用开始
+	    Xut.Application.delayAppRun();
+	    var videoPlay = Xut.Video5({
+	        url: 'duku.mp4',
+	        startBoot: function startBoot() {
+	            Xut.Application.LaunchApp();
+	        }
+	    });
+	    videoPlay.play();
+	}
+
+	function init() {
+
+	    var config = Xut.Config;
+	    var isBrowser = config.isBrowser;
+
+	    //绑定键盘事件
+	    bindEvent(config);
 
 	    //如果不是读库模式
 	    //播放HTML5视频
 	    //在IOS
 	    if (!DUKUCONFIG && !GLOBALIFRAME && Xut.plat.isIOS) {
-	        createHtml5Video();
+	        html5Video();
 	    }
 
 	    //Ifarme嵌套处理
 	    //1 新阅读
 	    //2 子文档
+	    //=======
+	    //3 pc
+	    //4 ios/android
 	    if (GLOBALIFRAME) {
-	        initDB(config);
+	        creatDatabase(config);
 	    } else {
 	        //PC还是移动
 	        if (isBrowser) {
@@ -2176,64 +2327,18 @@
 	            //如果不是iframe加载,则创建空数据库
 	            window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
 	            //等待硬件加载完毕
-	            document.addEventListener("deviceready", initDB, false);
+	            document.addEventListener("deviceready", creatDatabase, false);
 	        }
-	    }
-
-	    /**************
-	     * 物理按键处理
-	     **************/
-
-	    //退出加锁,防止过快点击
-	    var outLock = false;
-
-	    //回退按钮状态控制器
-	    function controller(state) {
-	        //如果是子文档处理
-	        if (Xut.isRunSubDoc) {
-	            //通过Action动作激活的,需要到Action类中处理
-	            Xut.publish('subdoc:dropApp');
-	            return;
-	        }
-	        //正常逻辑
-	        outLock = true;
-
-	        Xut.Application.Suspend({
-	            dispose: function dispose() {
-	                //停止热点动作
-	                setTimeout(function () {
-	                    outLock = false;
-	                }, 100);
-	            },
-	            processed: function processed() {
-	                //退出应用
-	                state === 'back' && Xut.Application.DropApp();
-	            }
-	        });
-	    }
-
-	    /**
-	     *  创建播放器
-	     *  IOS，PC端执行
-	     */
-	    function createHtml5Video() {
-	        //延时应用开始
-	        Xut.Application.delayAppRun();
-	        var videoPlay = Xut.Video5({
-	            url: 'duku.mp4',
-	            startBoot: function startBoot() {
-	                Xut.Application.LaunchApp();
-	            }
-	        });
-	        videoPlay.play();
 	    }
 	}
 
 	/**
 	 * 如果是安卓桌面端
+	 * 绑定事件
+	 * 创建数据库
 	 * @return {[type]} [description]
 	 */
-	function initDB(config) {
+	function creatDatabase(config) {
 
 	    //安卓上
 	    if (Xut.plat.isAndroid) {
@@ -2242,7 +2347,7 @@
 	        //妙妙学不加载视频
 	        //读库不加载视频
 	        if (!MMXCONFIG && !DUKUCONFIG) {
-	            preloadVideo.load();
+	            loadVideo();
 	        }
 
 	        //不是子文档指定绑定按键
@@ -2293,7 +2398,7 @@
 	    loader.load(cssArr, function () {
 	        //修正全局字体
 	        setRootfont();
-	        initData();
+	        nextTask();
 	    }, null, true);
 	}
 

@@ -175,8 +175,8 @@ portExtend(View, {
         repeatClick = true;
         var serial = Xut.sceneController.takeOutPrevChainId();
         View.LoadScenario({
-            'scenarioId': serial.scenarioId,
-            'chapterId': serial.chapterId,
+            'scenarioId' : serial.scenarioId,
+            'chapterId'  : serial.chapterId,
             'createMode': 'sysClose'
         }, function() {
             repeatClick = false;

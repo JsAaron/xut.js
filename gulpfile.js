@@ -5,6 +5,7 @@ var rollup  = require('rollup')
 var babel   = require('rollup-plugin-babel')
 var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
+var  watch  = require('gulp-watch');
 
 //http          ://www.browsersync.cn/docs/recipes/
 var browserSync = require('browser-sync').create();
@@ -94,13 +95,17 @@ function blue(str) {
 }
 
 
+ 
 /**
  * rollup打包
  */
 gulp.task('rollup', ['rollup-pack', 'server'], function() {
-    gulp.watch(src + '/**/*.js', function() {
+    watch(src + '/**/*.js', function () {
         gulp.run('rollup-pack');
-    })
+    });
+  //  gulp.watch(src + '/**/*.js', function() {
+  //      gulp.run('rollup-pack');
+  //  })
 })
 
 
