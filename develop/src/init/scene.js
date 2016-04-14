@@ -1,10 +1,13 @@
 import {
-    set,
-    get
+    _set,
+    _get,
+    injectScript,
+    toEmpty,
 }
 from '../util/index'
 
 let config
+
 
 /**
  * 设置缓存
@@ -14,7 +17,7 @@ function setDataToStorage(parameter) {
     console.log(config)
     config.pageIndex = parameter.pageIndex;
     config.novelId = parameter.novelId;
-    set({
+    _set({
         "pageIndex": parameter.pageIndex,
         "novelId": parameter.novelId
     });
@@ -22,33 +25,21 @@ function setDataToStorage(parameter) {
 
 
 /**
- * 保证有效值
- * @return {[type]} [description]
- */
-function toEmpty(val) {
-    return Number(val);
-}
-
-
-/**
  * 初始化值
  * @param {[type]} options [description]
  */
 function initDefaultValues(options) {
-
     var pageFlip = options.pageFlip;
-
     //配置全局翻页模式
     //pageflip可以为0
     //兼容pageFlip错误,强制转化成数字类型
     if (pageFlip !== undefined) {
         config.pageFlip = toEmpty(pageFlip);
     }
-
     return {
-        'novelId': toEmpty(options.novelId),
-        'pageIndex': toEmpty(options.pageIndex),
-        'history': options.history
+        'novelId'   : toEmpty(options.novelId),
+        'pageIndex' : toEmpty(options.pageIndex),
+        'history'   : options.history
     }
 };
 
@@ -61,7 +52,7 @@ function checkInjectScript() {
     var preCode,
         novels = Xut.data.query('Novel');
     if (preCode = novels.preCode) {
-        Utils.injectScript(preCode, 'novelpre脚本')
+        injectScript(preCode, 'novelpre脚本')
     }
 }
 
@@ -92,10 +83,10 @@ export function loadScene(options) {
 
     //加载新的场景
     Xut.View.LoadScenario({
-        'main': true, //主场景入口
-        'scenarioId': scenarioId,
-        'pageIndex': parameter.pageIndex,
-        'history': parameter.history
+        'main'       : true, //主场景入口
+        'scenarioId' : scenarioId,
+        'pageIndex'  : parameter.pageIndex,
+        'history'    : parameter.history
     });
 
 }

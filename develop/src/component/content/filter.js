@@ -1,5 +1,5 @@
 import {
-    set, get, remove, save, parseJSON, hash
+    _set, _get, remove, _save, parseJSON, hash
 }
 from '../../util/index'
 
@@ -23,11 +23,11 @@ export function contentFilter(filterName) {
     }();
 
     function setCache(listFilters) {
-        save(filterName, listFilters)
+        _save(filterName, listFilters)
     }
 
     function getCache() {
-        var jsonStr = get(filterName);
+        var jsonStr = _get(filterName);
         return parseJSON(jsonStr);
     }
 
@@ -99,7 +99,7 @@ export function contentFilter(filterName) {
         },
 
         empty: function() {
-            remove(filterName);
+            _remove(filterName);
             listFilters = {};
         }
     }

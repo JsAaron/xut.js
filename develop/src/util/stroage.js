@@ -44,7 +44,7 @@ var filter = function(key) {
  * @param  {[type]} index [description]
  * @return {[type]}       [description]
  */
-export function key(index) { //本地方法
+export function _key(index) { //本地方法
     return storage.key(index);
 };
 
@@ -53,7 +53,7 @@ export function key(index) { //本地方法
  * @param {[type]} key [description]
  * @param {[type]} val [description]
  */
-export function set(key, val) {
+export function _set(key, val) {
     var setkey;
 
     //ipad ios8.3setItem出问题
@@ -83,7 +83,7 @@ export function set(key, val) {
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export function get(key) {
+export function _get(key) {
     key = filter(key);
     return storage.getItem(key);
 };
@@ -93,7 +93,7 @@ export function get(key) {
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export function remove(key) {
+export function _remove(key) {
     key = filter(key);
     storage.removeItem(key);
 };
@@ -102,11 +102,11 @@ export function remove(key) {
  * 序列化
  * @return {[type]} [description]
  */
-export function fetch() {
+export function _fetch() {
     return JSON.parse(get(name || TAG) || '[]');
 }
 
 
-export function save(name, val) {
+export function _save(name, val) {
     set(name || TAG, JSON.stringify(val));
 }

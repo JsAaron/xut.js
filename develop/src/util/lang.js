@@ -1,3 +1,12 @@
+
+/**
+ * 保证有效值
+ * @return {[type]} [description]
+ */
+export function toEmpty(val) {
+    return Number(val);
+}
+
 /**
  * 简单继承
  * @return {[type]} [description]

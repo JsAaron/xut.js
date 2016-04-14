@@ -1,6 +1,6 @@
 import {
-    set,
-    get,
+    _set,
+    _get,
     parseJSON
 }
 from '../util/index'
@@ -36,7 +36,7 @@ let config;
 
 
 function getCache(name) {
-    return parseInt(get(name));
+    return parseInt(_get(name));
 }
 
 
@@ -80,7 +80,7 @@ function initMain(novelData) {
         pageFlip = parameter.pageflip
         if (pageFlip !== undefined) {
             //设置缓存
-            set({
+            _set({
                 'pageFlip': pageFlip
             });
         }
@@ -95,7 +95,7 @@ function initMain(novelData) {
                 'pageFlip'  : pageFlip,
                 "novelId"   : novelId,
                 "pageIndex" : pageIndex,
-                'history'   : LocalStorage.get('history')
+                'history'   : _get('history')
             });
         }
     }
@@ -172,7 +172,7 @@ function initDefaults(setData) {
     config.initResourcesPath();
 
     //缓存应用ID
-    set({
+    _set({
         'appId': data.appId
     });
 

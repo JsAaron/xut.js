@@ -18,6 +18,14 @@
 	babelHelpers;
 
 	/**
+	 * 保证有效值
+	 * @return {[type]} [description]
+	 */
+	function toEmpty(val) {
+	    return Number(val);
+	}
+
+	/**
 	 * 全局字体修复
 	 * @return {[type]} [description]
 	 */
@@ -201,7 +209,7 @@
 	 * @param {[type]} key [description]
 	 * @param {[type]} val [description]
 	 */
-	function set(key, val) {
+	function _set(key, val) {
 	    var setkey;
 
 	    //ipad ios8.3setItem出问题
@@ -231,22 +239,12 @@
 	 * @param  {[type]} key [description]
 	 * @return {[type]}     [description]
 	 */
-	function get(key) {
+	function _get(key) {
 	    key = filter(key);
 	    return storage.getItem(key);
 	};
 
-	/**
-	 * 删除localStorage中指定项
-	 * @param  {[type]} key [description]
-	 * @return {[type]}     [description]
-	 */
-	function remove(key) {
-	    key = filter(key);
-	    storage.removeItem(key);
-	};
-
-	function save(name, val) {
+	function _save(name, val) {
 	    set(name || TAG, JSON.stringify(val));
 	}
 
@@ -270,6 +268,21 @@
 	 */
 	function hash() {
 	    return Object.create(null);
+	}
+
+	/**
+	 * 执行脚本注入
+	 */
+	function injectScript(code, type) {
+	    //过滤回车符号
+	    var enterReplace = function enterReplace(str) {
+	        return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
+	    };
+	    try {
+	        new Function("(function(){" + enterReplace(code) + "})")();
+	    } catch (e) {
+	        console.log('加载脚本错误', type);
+	    }
 	}
 
 	/**
@@ -1755,11 +1768,11 @@
 	    }();
 
 	    function setCache(listFilters) {
-	        save(filterName, listFilters);
+	        _save(filterName, listFilters);
 	    }
 
 	    function getCache() {
-	        var jsonStr = get(filterName);
+	        var jsonStr = _get(filterName);
 	        return parseJSON(jsonStr);
 	    }
 
@@ -1831,7 +1844,7 @@
 	        },
 
 	        empty: function empty() {
-	            remove(filterName);
+	            _remove(filterName);
 	            listFilters = {};
 	        }
 	    };
@@ -1847,35 +1860,24 @@
 	    console.log(config$2);
 	    config$2.pageIndex = parameter.pageIndex;
 	    config$2.novelId = parameter.novelId;
-	    set({
+	    _set({
 	        "pageIndex": parameter.pageIndex,
 	        "novelId": parameter.novelId
 	    });
 	};
 
 	/**
-	 * 保证有效值
-	 * @return {[type]} [description]
-	 */
-	function toEmpty(val) {
-	    return Number(val);
-	}
-
-	/**
 	 * 初始化值
 	 * @param {[type]} options [description]
 	 */
 	function initDefaultValues(options) {
-
 	    var pageFlip = options.pageFlip;
-
 	    //配置全局翻页模式
 	    //pageflip可以为0
 	    //兼容pageFlip错误,强制转化成数字类型
 	    if (pageFlip !== undefined) {
 	        config$2.pageFlip = toEmpty(pageFlip);
 	    }
-
 	    return {
 	        'novelId': toEmpty(options.novelId),
 	        'pageIndex': toEmpty(options.pageIndex),
@@ -1891,7 +1893,7 @@
 	    var preCode,
 	        novels = Xut.data.query('Novel');
 	    if (preCode = novels.preCode) {
-	        Utils.injectScript(preCode, 'novelpre脚本');
+	        injectScript(preCode, 'novelpre脚本');
 	    }
 	}
 
@@ -1932,7 +1934,7 @@
 	var config = void 0;
 
 	function getCache(name) {
-	    return parseInt(get(name));
+	    return parseInt(_get(name));
 	}
 
 	/**
@@ -1975,7 +1977,7 @@
 	        pageFlip = parameter.pageflip;
 	        if (pageFlip !== undefined) {
 	            //设置缓存
-	            set({
+	            _set({
 	                'pageFlip': pageFlip
 	            });
 	        }
@@ -1990,7 +1992,7 @@
 	                'pageFlip': pageFlip,
 	                "novelId": novelId,
 	                "pageIndex": pageIndex,
-	                'history': LocalStorage.get('history')
+	                'history': _get('history')
 	            });
 	        }
 	    }
@@ -2065,7 +2067,7 @@
 	    config.initResourcesPath();
 
 	    //缓存应用ID
-	    set({
+	    _set({
 	        'appId': data.appId
 	    });
 
