@@ -100,7 +100,7 @@ function creatDatabase(config) {
 function loadApp(config) {
 
     //修正API接口
-    config.reviseAPI();
+    config.revised();
 
     //加载横版或者竖版css
     var baseCss = './css/' + (config.layoutMode) + '.css';

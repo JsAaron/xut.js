@@ -147,8 +147,8 @@ function fiexdAPI() {
  * 修复缩放比
  * 如果PPT有编辑指定的宽度与高度
  */
-function setDbProportion(pptWidth, pptHeight) {
-
+function setProportion(pptWidth, pptHeight) {
+    
     //计算新的缩放比
     proportion = config.proportion = judgeScale(pptWidth, pptHeight);
 
@@ -156,8 +156,8 @@ function setDbProportion(pptWidth, pptHeight) {
     proportion.calculateContainer = (function() {
 
         var pptWidth = proportion.pptWidth,
-            pptHeight = proportion.pptHeight,
-            scaleWidth = proportion.width,
+            pptHeight   = proportion.pptHeight,
+            scaleWidth  = proportion.width,
             scaleHeight = proportion.height;
 
         return function(width, height, left, top) {
@@ -696,10 +696,10 @@ _.extend(config, {
     iconHeight: isIphone ? 32 : 44,
 
     //修正
-    reviseAPI: fiexdAPI,
+    revised: fiexdAPI,
 
     //修正缩放比
-    setDbProportion: setDbProportion,
+    setProportion: setProportion,
 
     //数据库尺寸
     dbSize: 1

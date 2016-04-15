@@ -276,4 +276,3 @@ Xut.CoreObject.extend = function(props) {
 
     return subObj;
 };
- 

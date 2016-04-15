@@ -7,7 +7,7 @@ var sqlite = require('./sqlite3');
  * @return {[type]}       [description]
  */
 var statement = [];
-'Setting,Parallax,Master,Activity,Content,Video,Image,Action,Animation,Widget,Novel,Season,Chapter'.replace(/[^, ]+/g, function(name) {
+'Setting,Activity,Content,Video,Image,Action,Animation,Widget,Novel,Season,Chapter'.replace(/[^, ]+/g, function(name) {
     statement.push(name, 'select * FROM ' + (name) + ' order by _id ASC')
 })
 

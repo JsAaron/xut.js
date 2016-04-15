@@ -7,15 +7,15 @@
   *
   */
 
-
- var pageIndex = 0,
-     prefix = Xut.plat.prefixStyle,
-     _layoutMode = Config.layoutMode,
-     initializeBusy = false,
-     sectionInstance = null,
-     directory = 'images/icons/directory.png',
-     directory_act = 'images/icons/directory_act.png',
-     lockAnimation; //动画加锁
+ let config = Xut.config
+ let pageIndex = 0
+ let prefix = Xut.plat.prefixStyle
+ let _layoutMode = config.layoutMode
+ let initializeBusy = false
+ let sectionInstance = null
+ let directory = 'images/icons/directory.png'
+ let directory_act = 'images/icons/directory_act.png'
+ let lockAnimation //动画加锁
 
  /*********************************************************************
   *                 下拉章节列表                                      *
@@ -89,7 +89,7 @@
              pageArray = this.pageArray,
              list = this.list,
              maxLen = pageArray.length,
-             path = Config.pathAddress;
+             path = config.pathAddress;
 
          //确保不会溢出
          count = count > maxLen ? maxLen : count;

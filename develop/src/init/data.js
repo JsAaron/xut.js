@@ -235,7 +235,7 @@ function cfgHistory(data) {
 function fixedSize(novelData) {
     if (novelData) {
         if (novelData.pptWidth || novelData.pptHeight) {
-            config.setDbProportion(novelData.pptWidth, novelData.pptHeight);
+            config.setProportion(novelData.pptWidth, novelData.pptHeight);
         }
     }
 }

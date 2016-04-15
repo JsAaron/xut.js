@@ -1,4 +1,29 @@
+//定义属性
+var def = Object.defineProperty;
 
+/**
+ * 定义一个新的对象
+ * 重写属性
+ */
+export function defProtected(obj, key, val, enumerable, writable) {
+    def(obj, key, {
+        value: val,
+        enumerable: enumerable,
+        writable: writable,
+        configurable: true
+    })
+}
+
+/**
+ * 定义访问控制器
+ * @return {[type]} [description]
+ */
+export function defAccess(obj, key, access) {
+    def(obj, key, {
+        get: access.get,
+        set: access.set
+    })
+}
 
 /**
  * 转化数组
@@ -160,3 +185,25 @@ export function portExtend(object, config) {
         }
     }
 };
+
+
+
+/**
+ * 修正判断是否存在处理
+ * @param  {[type]} arr [description]
+ * @return {[type]}     [description]
+ */
+export function arrayUnique(arr) { //去重
+    if (arr && arr.length) {
+        var length = arr.length;
+        while (--length) {
+            //如果在前面已经出现，则将该位置的元素删除
+            if (arr.lastIndexOf(arr[length], length - 1) > -1) {
+                arr.splice(length, 1);
+            }
+        }
+        return arr;
+    } else {
+        return arr
+    }
+}
