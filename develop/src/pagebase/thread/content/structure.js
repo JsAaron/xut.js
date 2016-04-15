@@ -13,7 +13,7 @@
 // ],function(Utils, Xut.config, pixiContainer) {
 
 
-import { parseJSON, arrayUnique } from '../../../util/index'
+import { parseJSON, arrayUnique ,reviseSize,readFile} from '../../../util/index'
 
 // import { pixiContainer } from '../../component/pixi'
 
@@ -175,13 +175,13 @@ function createWapper(data, wrapObj) {
 function externalFile(wrapObj, svgCallback) {
     //svg零件不创建解析具体内容
     if (wrapObj.isSvg) {
-        Utils.ReadFile(wrapObj.data.md5, function(svgdata) {
+        readFile(wrapObj.data.md5, function(svgdata) {
             wrapObj['svgstr'] = svgdata;
             svgCallback(wrapObj);
         });
     } else if (wrapObj.isJs) {
         //如果是.js的svg文件
-        Utils.ReadFile(wrapObj.data.md5, function(htmldata) {
+        readFile(wrapObj.data.md5, function(htmldata) {
             wrapObj['htmlstr'] = htmldata;
             svgCallback(wrapObj);
         }, "js");
@@ -355,7 +355,7 @@ function textContent(data) {
  */
 function createContainerWrap(containerName, contentId, pid) {
     var contentDas = parseContentDas([contentId]),
-        data = Utils.reviseSize(contentDas[0]),
+        data = reviseSize(contentDas[0]),
         wapper = '<div' + ' id="{0}"' + ' data-behavior="click-swipe"' + ' style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">';
 
     return String.format(wapper,
@@ -629,7 +629,7 @@ export function structure(callback, data, context) {
                 contentHtmlBoxIds.push(contentId)
             }
             //转换缩放比
-            sizeResults = Utils.reviseSize(wrapObj.data);
+            sizeResults = reviseSize(wrapObj.data);
 
             //如果启用了virtualMode模式
             //对象需要分离创建

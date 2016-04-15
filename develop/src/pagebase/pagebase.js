@@ -25,12 +25,12 @@ import { Collection } from './collection'
 import { createTransform } from './translation'
 import { create as _create, destroy as _destroy } from './multievent'
 //分配任务
-import {   assignedTasks } from './tasks'
+import { assignedTasks } from './threadtask'
 //canvas相关
 import { Factory as CanvasRelated } from './canvasrelated'
 
-function PageBase() {};
 
+function PageBase() {};
 var baseProto = PageBase.prototype
 
 

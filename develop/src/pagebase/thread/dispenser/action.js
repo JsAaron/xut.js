@@ -16,6 +16,8 @@ let Action = {
             height = activityData.scaleHeight,
             top = activityData.scaleTop,
             left = activityData.scaleLeft;
+            
+        var md5
 
         //热点背景图
         if (md5 = activityData.md5) {

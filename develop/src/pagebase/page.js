@@ -10,7 +10,6 @@ import {
 from './pagebase'
 
 let Page = Xut.extend(PageBase, {
-	//构造器
 	constructor: function(options) {
 		//多线程处理
 		this.initTasks(options);

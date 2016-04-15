@@ -68,11 +68,10 @@ TaskComponents.prototype = {
         //创建
         function startCreate(actType, activityData) {
             //创建DOM元素结构
-            postprocessorstr = Bind[actType]['createDom'](
-                activityData, chpaterData, chapterId, pid, Xut.zIndexlevel(), pageType
-            );
             //返回是拼接字符串
-            widgetRetStr.push(postprocessorstr);
+            widgetRetStr.push(Bind[actType]['createDom'](
+                activityData, chpaterData, chapterId, pid, Xut.zIndexlevel(), pageType
+            ));
         }
 
 

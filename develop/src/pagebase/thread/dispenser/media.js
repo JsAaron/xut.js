@@ -6,7 +6,7 @@ let tempData = {};
 let Media = {
 
     createDom: function(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-        var width = activityData.scaleWidth,
+            var width = activityData.scaleWidth,
             height = activityData.scaleHeight,
             top = activityData.scaleTop,
             left = activityData.scaleLeft,
@@ -70,7 +70,7 @@ let Media = {
         //Webpage_1
         //Audio_1
         //Video_1
-        tpl = String.format(
+        var tpl = String.format(
             '<div id="{0}"' + ' data-belong="{1}"' + ' data-delegate="{2}"' + ' style="width:{3}px;height:{4}px;left:{5}px;top:{6}px;z-index:{7};{8}background-size:100% 100%;position:absolute;">',
             mediaType + "_" + id,
             pageType,
