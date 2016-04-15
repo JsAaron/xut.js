@@ -11,12 +11,13 @@ var  watch  = require('gulp-watch');
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 
-
 var root     = './develop'
 var src      = root + '/src'
 var dest     = root
 var packName = 'build'
 
+//数据解析
+var database = require(root + '/node/index')
 
 /**
  * web server
@@ -54,9 +55,9 @@ gulp.task('rollup-pack', function() {
     rollup.rollup({
             entry: src + '/app.js',
             plugins: [
-                replace({
-                    'process.env.NODE_ENV': "'development'"
-                }),
+                // replace({
+                //     'process.env.NODE_ENV': "'development'"
+                // }),
                 babel({
                     "presets": ["es2015-rollup"]
                 })
@@ -72,7 +73,7 @@ gulp.task('rollup-pack', function() {
         .catch(logError)
 })
 
-
+ 
 
 function write(dest, code) {
     return new Promise(function(resolve, reject) {
@@ -95,11 +96,21 @@ function blue(str) {
 }
 
 
+/**
+ * node数据库
+ * @param  {[type]} 
+ * @return {[type]}
+ */
+gulp.task('database', function(callback) {
+    database.resolve(callback)
+})
+
+
  
 /**
  * rollup打包
  */
-gulp.task('rollup', ['rollup-pack', 'server'], function() {
+gulp.task('develop', ['database','rollup-pack', 'server'], function() {
     watch(src + '/**/*.js', function () {
         gulp.run('rollup-pack');
     });
