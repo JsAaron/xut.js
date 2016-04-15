@@ -609,6 +609,95 @@
 	function original() {}
 	function recovery() {}
 
+	/**
+	 * 目录列表
+	 * @param  {[type]} hindex    [description]
+	 * @param  {[type]} pageArray [description]
+	 * @param  {[type]} modules   [description]
+	 * @return {[type]}           [description]
+	 *
+	 */
+
+	var prefix = Xut.plat.prefixStyle;
+	var sectionInstance = null;
+	var lockAnimation;
+	//执行动画
+	function toAnimation(navControlBar, navhandle, action) {
+	    var end = function end() {
+	        navControlBar.css(prefix('transition'), '');
+	        Xut.View.HideBusy();
+	        lockAnimation = false;
+	    };
+
+	    if (action == 'in') {
+	        sectionInstance.refresh();
+	        sectionInstance.scrollTo();
+	        navControlBar.animate({
+	            'z-index': Xut.zIndexlevel(),
+	            'opacity': 1
+	        }, 'fast', 'linear', function () {
+	            navhandle.attr('fly', 'out');
+	            end();
+	        });
+	    } else {
+	        navhandle.attr('fly', 'in');
+	        navControlBar.hide();
+	        end();
+	    }
+	}
+
+	//控制按钮改变
+	function navControl(action, navhandle) {
+	    navhandle.css('opacity', action === "in" ? 0.5 : 1);
+	}
+
+	function initialize() {
+	    //动画状态
+	    if (lockAnimation) {
+	        return false;
+	    }
+
+	    lockAnimation = true;
+	    Xut.View.ShowBusy();
+	    startpocess();
+	};
+
+	function startpocess() {
+	    //控制按钮
+	    var navhandle = $("#backDir"),
+	        action = navhandle.attr('fly') || 'in',
+	        navControlBar = $("#navBar");
+
+	    //初始化样式
+	    initStyle(navControlBar, action, function () {
+	        //触发控制条
+	        navControl(action, navhandle);
+	        //执行动画
+	        toAnimation(navControlBar, navhandle, action);
+	    });
+	};
+
+	function initStyle(navControlBar, action, fn) {
+	    sectionInstance.state = false;
+	    if (action == 'in') {
+	        sectionInstance.state = true;
+	        navControlBar.css({
+	            'z-index': 0,
+	            'opacity': 0,
+	            'display': 'block'
+	        });
+	    }
+	    fn && fn();
+	}
+
+	//关闭
+	function close(callback) {
+	    if (sectionInstance && sectionInstance.state) {
+	        callback && callback();
+	        initialize();
+	    }
+	}
+
 	/***********************************************
 	 *	      热点动作控制器模块
 	 *         1 所有content热点停止
@@ -679,7 +768,7 @@
 	    }
 
 	    //处理导航
-	    Navbar.close(function () {
+	    close(function () {
 	        stateRun = true;
 	    });
 
