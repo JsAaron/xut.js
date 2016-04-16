@@ -5,8 +5,9 @@ var babel = require('rollup-plugin-babel')
     //var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
 var watch = require('gulp-watch');
-
-//http          ://www.browsersync.cn/docs/recipes/
+var uglify = require('uglify-js')
+var concat = require('gulp-concat')
+    //http          ://www.browsersync.cn/docs/recipes/
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 
@@ -38,6 +39,18 @@ var banner =
     ' * Released under the MIT License.\n' +
     ' */'
 
+
+function write(dest, code) {
+    return new Promise(function(resolve, reject) {
+        fs.writeFile(dest, code, function(err) {
+            if (err) return reject(err)
+            console.log(blue(dest) + ' ' + getSize(code))
+            resolve()
+        })
+    })
+}
+
+
 gulp.task('rollup-pack', function() {
     rollup.rollup({
             entry: src + '/app.js',
@@ -62,15 +75,7 @@ gulp.task('rollup-pack', function() {
 
 
 
-function write(dest, code) {
-    return new Promise(function(resolve, reject) {
-        fs.writeFile(dest, code, function(err) {
-            if (err) return reject(err)
-            console.log(blue(dest) + ' ' + getSize(code))
-            resolve()
-        })
-    })
-}
+
 
 function getSize(code) {
     return (code.length / 1024).toFixed(2) + 'kb'
@@ -93,6 +98,61 @@ gulp.task('develop', ['database', 'rollup-pack', 'server'], function() {
     });
 })
 
+
+gulp.task('build', function() {
+    rollup.rollup({
+            entry: src + '/app.js',
+            plugins: [
+                babel({
+                    "presets": ["es2015-rollup"]
+                })
+            ]
+        })
+        .then(function(bundle) {
+            var code = bundle.generate({
+                format: 'umd',
+                moduleName: 'Aaron'
+            }).code
+            var minified = banner + '\n' + uglify.minify(code, {
+                fromString: true,
+                output: {
+                    ascii_only: true
+                }
+            }).code
+            return write(dest + '/build/xxtppt.js', minified)
+        }).then(function(bundle) {
+            console.log(123)
+        })
+})
+
+
+gulp.task('concat', function() {
+
+    fs.readFile('./index.html', "utf8", function(error, data) {
+        if (error) throw error;
+        var arr = []
+        var path;
+        var cwdPath = escape(process.cwd())
+        var scripts = data.match(/<script.*?>.*?<\/script>/ig);
+        scripts.forEach(function(val) {
+            val = val.match(/src="(.*?.js)/);
+            if (val && val.length) {
+                path = val[1]
+                //有效src
+                if (/^src|build/.test(path)) {
+                    arr.push(val[1])
+                }
+            }
+
+        })
+
+        gulp.src(arr)
+            .pipe(concat('xxtppt.min.js'))
+            .pipe(gulp.dest('./build'))
+
+    });
+
+});
 
 
 /**
