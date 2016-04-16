@@ -11,7 +11,7 @@
 // ], function(Parser, TaskContainer, TaskTaskBackground, TaskComponents, TaskContents) {
 
 //数据解析
-import { query } from '../vm/parser'
+import { query } from '../manager/parser'
 //子任务
 import { TaskContainer, TaskBackground, TaskContents, TaskComponents } from './thread/index'
 

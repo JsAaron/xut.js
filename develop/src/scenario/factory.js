@@ -15,8 +15,8 @@ import {fToolbar as DeputyBar} from '../toolbar/fnbar'
 import {Bar as BookToolBar} from '../toolbar/bookbar'
 
 //vm
-import {ViewModel} from '../vm/core'
-
+import {Manager} from '../manager/core'
+ 
 let config
 
 //========================场景容器,工具栏创建相关================================
@@ -294,7 +294,7 @@ sceneProto.createViewModel = function() {
 	var scenarioMaster = tempfind('masterContainer', 'scenarioMaster-');
 
 	//场景容器对象
-	var vm = this.vm = new ViewModel({
+	var vm = this.vm = new Manager({
 		'container': this.elements[0],
 		'pageMode': pageMode,
 		'multiScenario': !isMain,

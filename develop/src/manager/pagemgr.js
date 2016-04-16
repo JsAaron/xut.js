@@ -5,7 +5,7 @@
  */
 import { injectScript, extend } from '../util/index'
 import { Abstract } from './abstract'
-import { Page } from '../pagebase/page'
+import { constor as Page } from '../pagebase/constor'
 import { translation } from '../pagebase/translation'
 //epub使用
 import { addEdges } from '../util/edge'

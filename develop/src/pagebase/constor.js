@@ -9,7 +9,7 @@ import {
 }
 from './pagebase'
 
-let Page = Xut.extend(PageBase, {
+let constor = Xut.extend(PageBase, {
 	constructor: function(options) {
 		//多线程处理
 		this.initTasks(options);
@@ -17,6 +17,4 @@ let Page = Xut.extend(PageBase, {
 	}
 })
 
-export {
-	Page
-}
+export {constor} 

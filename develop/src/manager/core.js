@@ -32,7 +32,7 @@ let config
 // 'scenarioId'    : scenarioId,
 // 'chapterId'     : this.chapterId,
 // 'isInApp'       : this.isInApp //提示页面
-function ViewModel(parameter) {
+function Manager(parameter) {
 
     config = Xut.config
 
@@ -345,7 +345,7 @@ function ViewModel(parameter) {
 //***************************************************************
 
 
-var VMProto = ViewModel.prototype
+var VMProto = Manager.prototype
 
 /**
  * 扩充事件
@@ -491,4 +491,4 @@ def(VMProto, '$overrideApi', function() {
 })
 
 
-export { ViewModel }
+export { Manager }

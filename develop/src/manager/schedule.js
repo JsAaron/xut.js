@@ -18,6 +18,8 @@
 import {_set} from '../util/stroage'
 //页面管理
 import {PageMgr} from './pagemgr'
+import {MasterMgr} from './mastermgr'
+
 //错误的数据库表
 import {errorTable} from '../data/index'
 //数据解析
@@ -832,7 +834,6 @@ SchedulerProto.loadPage = function(action) {
             trigger();
             return;
         }
-
         //获取应用的状态
         if (Xut.Application.getAppState()) {
             //保留启动方法
