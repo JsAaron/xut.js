@@ -1,41 +1,35 @@
-var gulp    = require('gulp');
-var fs      = require('fs')
-var rollup  = require('rollup')
-var babel   = require('rollup-plugin-babel')
-//var replace = require('rollup-plugin-replace')
+var gulp = require('gulp');
+var fs = require('fs')
+var rollup = require('rollup')
+var babel = require('rollup-plugin-babel')
+    //var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
-var  watch  = require('gulp-watch');
+var watch = require('gulp-watch');
 
 //http          ://www.browsersync.cn/docs/recipes/
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 
-var root     = '.'
-var src      = root + '/src'
-var dest     = root
+var root = '.'
+var src = root + '/src'
+var dest = root
 var packName = 'build'
 
-//数据解析
 var database = require(root + '/node/index')
 
-/**
- * web server
- * @return {[type]}   [description]
- */
 gulp.task('server', function() {
     browserSync.init({
         server: root,
-        index: 'index.html',
+        index: 'horizontal-test.html',
         port: 3000,
         open: true,
-        files: [root + "/build.js", root + "/index.html"] //监控变化
+        files: [root + "/build/xxtppt.js", root + "/horizontal-test.html", root + "/horizontal-test.html"]
     });
 })
 
 function logError(e) {
     console.log(e)
 }
-
 
 var banner =
     '/*!\n' +
@@ -66,7 +60,7 @@ gulp.task('rollup-pack', function() {
         .catch(logError)
 })
 
- 
+
 
 function write(dest, code) {
     return new Promise(function(resolve, reject) {
@@ -88,25 +82,13 @@ function blue(str) {
     return '\x1b[1m\x1b[34m' + str + '\x1b[39m\x1b[22m'
 }
 
-
-/**
- * node数据库
- * @param  {[type]} 
- * @return {[type]}
- */
 gulp.task('database', function(callback) {
     database.resolve(callback)
 })
 
 
- 
-/**
- * rollup打包
- */
-gulp.task('develop', ['database','rollup-pack', 'server'], function() {
-    watch(src + '/**/*.js', function () {
+gulp.task('develop', ['database', 'rollup-pack', 'server'], function() {
+    watch(src + '/**/*.js', function() {
         gulp.run('rollup-pack');
     });
 })
-
-
