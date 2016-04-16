@@ -682,9 +682,9 @@ MasterProto._fixParallaxPox = function(parallaxObj, currPageIndex, targetIndex) 
 
 //扁平化对象到数组
 function toArray(filter) {
-    var arr = [];
+    var arr = []; 
     if (!filter.length) {
-        for (key in filter) {
+        for (var key in filter) {
             arr.push(filter[key]);
         }
         filter = arr;
