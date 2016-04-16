@@ -75,7 +75,7 @@ var config = Xut.config,
  * 代码注入空间
  * @type {Object}
  */
-var XXTAPI = {};
+var external = {};
 
 /**
  * 桌面绑定鼠标控制
@@ -925,7 +925,7 @@ portExtend(Application, {
 //
 //========================================================
 
-XXTAPI = {
+external = {
 
     /**
            读取系统中保存的变量的值。
@@ -980,8 +980,8 @@ Xut.U3d = {
 
 
 //导出注入接口
-window.XXTAPI = XXTAPI;
+window.XXTAPI = external;
 
 export {
-    XXTAPI as external
+    external
 };

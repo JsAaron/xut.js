@@ -12,37 +12,52 @@
  *                  B 处理同步音频
  *                                      *
  ******************************************/
+
+//卷滚
 import {
     iscroll as createIscroll
 }
 from './iscroll'
+
+//事件
 import {
     conversionEventType,
     destroyEvents,
     bindEvents as bindContentEvents
 }
 from './event'
+
+//混入content
 import {
     Mix
 }
 from './mix'
+
+//content自对象
 import {
     Child
 }
 from './child'
+
+//搜索
 import {
     SearchBar
 }
 from './searchbar'
+
+//书签
 import {
     BookMark
 }
 from './bookmark'
+
+//文本框
 import {
     HtmlBox
 }
 from './htmlbox'
 
+//pixi事件
 import {
     bindEvents as bindPixiEvents
 }

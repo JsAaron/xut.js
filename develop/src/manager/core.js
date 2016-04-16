@@ -6,17 +6,40 @@
  **********************************************************************/
 
 // 定义访问器
-import { defProtected as def, defAccess } from '../util/index'
+import {
+    defProtected as def, defAccess
+}
+from '../util/index'
+
 // 观察
-import {observe} from '../observer/observe'
+import {
+    observe
+}
+from '../observer/observe'
+
 //全部交互通知
-import {GlobalEvent} from './globalevent'
+import {
+    GlobalEvent
+}
+from './globalevent'
+
 //动态api
-import {overrideApi} from './overrideapi'
+import {
+    overrideApi
+}
+from './overrideapi'
+
 //调度器
-import {trigger}from '../scheduler/index'
+import {
+    trigger
+}
+from '../scheduler/index'
+
 //调度任务
-import {Scheduler}from './schedule'
+import {
+    Scheduler
+}
+from './schedule'
 
 let config
 
@@ -76,7 +99,7 @@ function Manager(parameter) {
     }
 
     //创建翻页滑动
-    var $globalEvent = vm.$globalEvent = new GlobalEvent(options,config);
+    var $globalEvent = vm.$globalEvent = new GlobalEvent(options, config);
 
     // console.log( $globalEvent)
 
@@ -102,7 +125,7 @@ function Manager(parameter) {
 
         //Action', 'Widget', 'Video', 'ShowNote', 'SubDoc'委托
         'data-delegate': function(target, attribute, rootNode, pageIndex) {
-          trigger.apply(null, arguments);
+            trigger.apply(null, arguments);
         },
 
         //如果是canvas节点
@@ -490,4 +513,6 @@ def(VMProto, '$overrideApi', function() {
 })
 
 
-export { Manager }
+export {
+    Manager
+}

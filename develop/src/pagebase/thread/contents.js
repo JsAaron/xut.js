@@ -11,15 +11,21 @@ import {
     parseJSON, arrayUnique
 }
 from '../../util/index'
+
 import {
     parserRelated as conParser
 }
 from './content/data'
+
 import {
     structure as conStructure
 }
 from './content/structure'
-import  {activityClass } from '../../component/content/activity'
+
+import {
+    activityClass
+}
+from '../../component/content/activity'
 
 
 
@@ -505,7 +511,7 @@ function contentsBehavior(callback, data, contentDas) {
         feedbackBehavior = data.feedbackBehavior, //反馈数据,跟事件相关
         pageBaseHooks = data.pageBaseHooks,
         pageId = data.chapterId;
- 
+
 
     //如果有浮动对象,才需要计算偏移量
     //母版里面可能存在浮动或者不浮动的对象
@@ -549,7 +555,7 @@ function contentsBehavior(callback, data, contentDas) {
         'contentsFragment': data.contentsFragment,
         'contentHtmlBoxIds': data.contentHtmlBoxIds
     }
- 
+
     /**
      * 收集事件信息
      * 为处理动态分段绑定的问题

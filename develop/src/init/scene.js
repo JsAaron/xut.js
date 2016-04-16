@@ -2,7 +2,7 @@ import {
     _set,
     _get,
     injectScript,
-    toEmpty,
+    toEmpty
 }
 from '../util/index'
 

@@ -7,7 +7,7 @@
 import {
     bindEvents
 }
-from '.event'
+from './event'
 
 
 import {
