@@ -9,7 +9,7 @@
 
 import { parseJSON, arrayUnique ,reviseSize,readFile} from '../../../util/index'
 
-import { Container as pixiContainer } from '../../component/pixi'
+import { Container as pixiContainer } from '../../../component/pixi/Container'
 
 let prefix = Xut.plat.prefixStyle;
 
