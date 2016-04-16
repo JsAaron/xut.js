@@ -1,23 +1,26 @@
 /****************************************************
  *
- *         	 构建TaskContents对象
+ *           构建TaskContents对象
  *
- *		依赖数据解析算法类 Algorithm
- *		结构合并创建类	   Structure
- *		行为动画绑定类     Content
+ *      依赖数据解析算法类 Algorithm
+ *      结构合并创建类    Structure
+ *      行为动画绑定类     Content
  * 
  * ***************************************************/
-// define('TaskContents', [
-// 	'Utils',
-// 	'conData',
-// 	'conStructure',
-// 	'activityClass'
-// ],function(Utils,conData, conStructure, activityClass) {
+import {
+    parseJSON, arrayUnique
+}
+from '../../util/index'
+import {
+    parserRelated as conParser
+}
+from './content/data'
+import {
+    structure as conStructure
+}
+from './content/structure'
+import  {activityClass } from '../../component/content/activity'
 
-
-import { parseJSON, arrayUnique } from '../../util/index'
-import { parserRelated as conParser } from './content/data'
-import { structure as conStructure } from './content/structure'
 
 
 function TaskContents(data) {
@@ -125,10 +128,10 @@ function toObject(cachedContentStr) {
 
 /**
  * 行为反馈
- * 	content id = {
- *		弹动
- * 		音频URl
- *	}
+ *  content id = {
+ *      弹动
+ *      音频URl
+ *  }
  */
 function addBehavior(data) {
     var parameter, soundSrc, contentId, isButton,
@@ -210,7 +213,7 @@ taskProto.dataAfterCheck = function(data) {
             data.containerPrefix = containerPrefix;
 
             //2015.5.6暴露到全局
-            //提供给音频字幕上下文				
+            //提供给音频字幕上下文                
             if (!Xut.Contents.contentsFragment[data.chapterId]) {
                 Xut.Contents.contentsFragment[data.chapterId]
             }
@@ -500,8 +503,9 @@ function contentsBehavior(callback, data, contentDas) {
         pid = data.pid,
         activityRelated = data.activityRelated,
         feedbackBehavior = data.feedbackBehavior, //反馈数据,跟事件相关
-        pageBaseHooks = data.pageBaseHooks;
-    pageId = data.chapterId;
+        pageBaseHooks = data.pageBaseHooks,
+        pageId = data.chapterId;
+ 
 
     //如果有浮动对象,才需要计算偏移量
     //母版里面可能存在浮动或者不浮动的对象
@@ -545,7 +549,7 @@ function contentsBehavior(callback, data, contentDas) {
         'contentsFragment': data.contentsFragment,
         'contentHtmlBoxIds': data.contentHtmlBoxIds
     }
-
+ 
     /**
      * 收集事件信息
      * 为处理动态分段绑定的问题
