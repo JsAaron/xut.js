@@ -3717,7 +3717,7 @@
              inputPara.content && _.each(inputPara.content, function (contentId) {
                  contentIds.push(contentId);
              });
-             return Xut.Contents.GetpageWidgetData(this.pageType, contentIds);
+             return Xut.Contents.GetPageWidgetData(this.pageType, contentIds);
          },
 
          /**
@@ -3777,7 +3777,6 @@
           * @return {[type]} [description]
           */
          destroy: function destroy() {
-             console.log(222222);
              if (this._widgetObj && this._widgetObj.destroy) this._widgetObj.destroy();
          }
      };
@@ -8343,7 +8342,7 @@
          //得到一个指定的实例
          specified: function specified(data) {
              var instance;
-             listLength = this._list.length;
+             var listLength = this._list.length;
              while (listLength) {
                  listLength--;
                  if (instance = this._list[listLength]) {

@@ -127,7 +127,7 @@ pageWidget.prototype = {
         inputPara.content && _.each(inputPara.content, function(contentId) {
             contentIds.push(contentId);
         });
-        return Xut.Contents.GetpageWidgetData(this.pageType, contentIds)
+        return Xut.Contents.GetPageWidgetData(this.pageType, contentIds)
     },
 
 
@@ -193,7 +193,6 @@ pageWidget.prototype = {
      * @return {[type]} [description]
      */
     destroy: function() {
-        console.log(222222)
         if (this._widgetObj && this._widgetObj.destroy)
             this._widgetObj.destroy();
     }

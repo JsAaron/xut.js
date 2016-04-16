@@ -24,7 +24,7 @@ Collection.prototype = {
     //得到一个指定的实例
     specified: function(data) {
         var instance;
-        listLength = this._list.length;
+        var listLength = this._list.length;
         while (listLength) {
             listLength--;
             if (instance = this._list[listLength]) {

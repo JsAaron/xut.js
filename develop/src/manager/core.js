@@ -18,7 +18,6 @@ import {trigger}from '../scheduler/index'
 //调度任务
 import {Scheduler}from './schedule'
 
- 
 let config
 
 // 'container'     : this.elements[0],
