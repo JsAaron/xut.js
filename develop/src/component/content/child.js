@@ -4,12 +4,10 @@
  * 2 视觉差作用域
  * @type {Array}
  */
-// define('conScope', [
-//     'conBehavior',
-//     'conParallax'
-// ],function(conBehavior, conParallax) {
 
-import {Effect} from './effects'
+import {Animation} from './animation'
+import {Parallax} from './parallax'
+
 
 /**
  * 预运行动作
@@ -130,7 +128,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
     if (data.processType === 'parallax') {
         //初始化视觉差对象的坐标偏移量
         data.transformOffset = base.relatedData.transformOffset(data.id);
-        return conParallax.call(base, data);
+        return Parallax.call(base, data);
     }
 
     /**
@@ -143,7 +141,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
     /**
      * 生成子作用域对象，用于抽象处理动画,行为
      */
-    return new Effect(data);
+    return new Animation(data);
 }
 
 

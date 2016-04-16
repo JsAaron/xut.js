@@ -342,7 +342,7 @@ activitPro.createActions = function() {
         //如果不是预生成
         //注册动画事件
         if (isRreRun === undefined) {
-            scope.initBehavior(id, context, rootNode, pageId, parameter, pageType);
+            scope.init(id, context, rootNode, pageId, parameter, pageType);
         }
 
         //绑定DOM一些属性
@@ -545,8 +545,8 @@ activitPro.runEffects = function(outComplete, evenyClick) {
             closeAnim = (pageId != Xut.Presentation.GetPageId());
 
             if (closeAnim && scope) {
-                scope.stopBehavior && scope.stopBehavior(pageId);
-                scope.resetBehavior && scope.resetBehavior();
+                scope.stop && scope.stop(pageId);
+                scope.reset && scope.reset();
             }
 
             //捕获动画状态
@@ -613,7 +613,7 @@ activitPro.runEffects = function(outComplete, evenyClick) {
                     })
                     //ppt动画
                     //ppt音频
-                scope.runBehavior(function() {
+                scope.run(function() {
                     captureAnimComplete(scope);
                 });
             }
@@ -631,7 +631,7 @@ activitPro.stopEffects = function() {
     var pageId = this.relatedData.pageId;
     this.runState = false;
     this.eachAssistContents(function(scope) {
-        !scope.isRreRun && scope.stopBehavior && scope.stopBehavior(pageId);
+        !scope.isRreRun && scope.stop && scope.stop(pageId);
     })
 
 }
@@ -671,7 +671,7 @@ activitPro.resetAloneAnim = function() {
 //复位状态
 activitPro.resetAnimation = function() {
     this.eachAssistContents(function(scope) {
-        !scope.isRreRun && scope.resetBehavior && scope.resetBehavior(); //ppt动画
+        !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
     })
 
     this.resetAloneAnim();
@@ -685,8 +685,8 @@ activitPro.destroyEffects = function(elementCallback) {
         drop.destroy();
     })
     this.eachAssistContents(function(scope) {
-        if (scope.destroyBehavior) {
-            scope.destroyBehavior();
+        if (scope.destroy) {
+            scope.destroy();
         }
         elementCallback && elementCallback(scope)
     })

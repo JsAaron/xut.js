@@ -1,5 +1,5 @@
 import { BookMark } from './bookmark'
-import { ToolBar } from './toolBar'
+import { ToolBar } from './base/toolBar'
 import { parseJSON } from '../util/index'
 
 /**

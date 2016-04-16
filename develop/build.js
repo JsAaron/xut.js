@@ -4891,6 +4891,224 @@
          return String.format(wapper, 'scenario-' + id, config$7.virtualMode ? sWidth / 2 : sWidth, sHeight, calculate.top, calculate.left, Xut.sceneController.createIndex(), 'scenarioPage-' + id, 2, 'scenarioMaster-' + id, 1);
      }
 
+     /**
+      * svgicons.js v1.0.0
+      * http://www.codrops.com
+      *
+      * Licensed under the MIT license.
+      * http://www.opensource.org/licenses/mit-license.php
+      *
+      * Copyright 2013, Codrops
+      * http://www.codrops.com
+      */
+
+     /*** helper functions ***/
+
+     // from https://github.com/desandro/classie/blob/master/classie.js
+     function classReg(className) {
+         return new RegExp("(^|\\s+)" + className + "(\\s+|$)");
+     }
+
+     function hasClass(el, c) {
+         return 'classList' in document.documentElement ? el.classList.contains(c) : classReg(c).test(el.className);
+     }
+
+     function extend$1(a, b) {
+         for (var key in b) {
+             if (b.hasOwnProperty(key)) {
+                 a[key] = b[key];
+             }
+         }
+         return a;
+     }
+
+     // http://snipplr.com/view.php?codeview&id=5259
+     function isMouseLeaveOrEnter(e, handler) {
+         if (e.type != 'mouseout' && e.type != 'mouseover') return false;
+         var reltg = e.relatedTarget ? e.relatedTarget : e.type == 'mouseout' ? e.toElement : e.fromElement;
+         while (reltg && reltg != handler) {
+             reltg = reltg.parentNode;
+         }return reltg != handler;
+     }
+
+     /*** svgIcon ***/
+
+     function svgIcon(el, config, options) {
+         this.el = el;
+         this.options = extend$1({}, this.options);
+         extend$1(this.options, options);
+         this.svg = Snap(this.options.size.w, this.options.size.h);
+         this.svg.attr('viewBox', '0 0 32 32');
+         this.el.appendChild(this.svg.node);
+         // state
+         this.toggled = false;
+         // icons configuration
+         this.config = config[this.el.getAttribute('data-icon-name')];
+         // reverse?
+         if (hasClass(this.el, 'si-icon-reverse')) {
+             this.reverse = true;
+         }
+         if (!this.config) return;
+         var self = this;
+         // load external svg
+         Snap.load(this.config.url, function (f) {
+             var g = f.select('g');
+             self.svg.append(g);
+             self.options.onLoad();
+             self._initEvents();
+             if (self.reverse) {
+                 self.toggle(true);
+             }
+         });
+     }
+
+     svgIcon.prototype.options = {
+         speed: 200,
+         easing: mina.linear,
+         evtoggle: 'click', // click || mouseover
+         size: {
+             w: 44,
+             h: 44
+         },
+         onLoad: function onLoad() {
+             return false;
+         },
+         onToggle: function onToggle() {
+             return false;
+         }
+     };
+
+     svgIcon.prototype._initEvents = function () {
+         var self = this,
+             toggleFn = function toggleFn(ev) {
+             if ((ev.type.toLowerCase() === 'mouseover' || ev.type.toLowerCase() === 'mouseout') && isMouseLeaveOrEnter(ev, this) || ev.type.toLowerCase() === 'touchstart' || ev.type.toLowerCase() === 'mousedown') {
+                 self.toggle(true);
+                 self.options.onToggle();
+             }
+             return false;
+         };
+
+         if (this.options.evtoggle === 'mouseover') {
+             this.el.addEventListener('mouseover', toggleFn);
+             this.el.addEventListener('mouseout', toggleFn);
+         } else {
+             Xut.plat.execEvent('on', {
+                 context: this.el,
+                 callback: {
+                     start: function start(e) {
+                         toggleFn(e);
+                     }
+                 }
+             });
+         }
+     };
+
+     svgIcon.prototype.toggle = function (motion) {
+         if (!this.config.animation) return;
+         var self = this;
+         for (var i = 0, len = this.config.animation.length; i < len; ++i) {
+             var a = this.config.animation[i],
+                 el = this.svg.select(a.el),
+                 animProp = this.toggled ? a.animProperties.from : a.animProperties.to,
+                 val = animProp.val,
+                 timeout = motion && animProp.delayFactor ? animProp.delayFactor : 0;
+
+             if (animProp.before) {
+                 el.attr(JSON.parse(animProp.before));
+             }
+
+             if (motion) {
+                 setTimeout(function (el, val, animProp) {
+                     return function () {
+                         el.animate(JSON.parse(val), self.options.speed, self.options.easing, function () {
+                             if (animProp.after) {
+                                 this.attr(JSON.parse(animProp.after));
+                             }
+                             if (animProp.animAfter) {
+                                 this.animate(JSON.parse(animProp.animAfter), self.options.speed, self.options.easing);
+                             }
+                         });
+                     };
+                 }(el, val, animProp), timeout * self.options.speed);
+             } else {
+                 el.attr(JSON.parse(val));
+             }
+         }
+         this.toggled = !this.toggled;
+     };
+
+     /**
+      * [svgIconConfig description]
+      * http://tympanus.net/Development/AnimatedSVGIcons/
+      * @type {Object}
+      */
+     var iconConfig = {
+         nextArrow: {
+             url: 'images/icons/pageback.svg',
+             animation: [{
+                 el: 'path:nth-child(1)',
+                 animProperties: {
+                     from: {
+                         val: '{"transform" : "r0 16 16", "fill-opacity" : "0.9"}',
+                         before: '{"fill-opacity" : "0.9", "stroke-opacity" : "0" , "transform" : "r90 16 16"}'
+                     },
+                     to: {
+                         val: '{"transform" : "r360 16 16", "fill-opacity": "0"}',
+                         before: '{"fill-opacity" : "0", "stroke-opacity" : "1" }'
+                     }
+                 }
+             }]
+         },
+         prevArrow: {
+             url: 'images/icons/pageforward.svg',
+             animation: [{
+                 el: 'path:nth-child(1)',
+                 animProperties: {
+                     from: {
+                         val: '{"transform" : "r0 16 16", "fill-opacity" : "0.9"}',
+                         before: '{"fill-opacity" : "0.9", "stroke-opacity" : "0" , "transform" : "r90 16 16"}'
+                     },
+                     to: {
+                         val: '{"transform" : "r360 16 16", "fill-opacity": "0"}',
+                         before: '{"fill-opacity" : "0", "stroke-opacity" : "1" }'
+                     }
+                 }
+             }]
+         },
+         close: {
+             url: 'images/icons/close.svg',
+             animation: [{
+                 el: 'path:nth-child(1)',
+                 animProperties: {
+                     from: {
+                         val: '{"transform" : "r0 16 16", "fill-opacity" : "0.9"}',
+                         before: '{"fill-opacity" : "0.9", "stroke-opacity" : "0" , "transform" : "r90 16 16"}'
+                     },
+                     to: {
+                         val: '{"transform" : "r360 16 16", "fill-opacity": "0"}',
+                         before: '{"fill-opacity" : "0", "stroke-opacity" : "1" }'
+                     }
+                 }
+             }]
+         },
+         back: {
+             url: 'images/icons/back.svg',
+             animation: [{
+                 el: 'path:nth-child(1)',
+                 animProperties: {
+                     from: {
+                         val: '{"transform" : "r0 16 16", "fill-opacity" : "0.9"}',
+                         before: '{"fill-opacity" : "0.9", "stroke-opacity" : "0" , "transform" : "r90 16 16"}'
+                     },
+                     to: {
+                         val: '{"transform" : "r360 16 16", "fill-opacity": "0"}',
+                         before: '{"fill-opacity" : "0", "stroke-opacity" : "1" }'
+                     }
+                 }
+             }]
+         }
+     };
+
      var isIOS$1 = Xut.plat.isIOS;
 
      //获取翻页按钮位置
@@ -4971,7 +5189,10 @@
          });
 
          this.container.append($dom);
-         this.arrows.prev = { el: $dom, able: true };
+         this.arrows.prev = {
+             el: $dom,
+             able: true
+         };
      };
 
      //右箭头翻页按钮
@@ -4986,7 +5207,10 @@
          });
 
          this.container.append($dom);
-         this.arrows.next = { el: $dom, able: true };
+         this.arrows.next = {
+             el: $dom,
+             able: true
+         };
      };
 
      //自定义左翻页按钮
@@ -5003,7 +5227,10 @@
          });
 
          this.container.append($dom);
-         this.arrows.prev = { el: $dom, able: true };
+         this.arrows.prev = {
+             el: $dom,
+             able: true
+         };
      };
 
      //自定义右翻页按钮
@@ -5020,7 +5247,10 @@
          });
 
          this.container.append($dom);
-         this.arrows.next = { el: $dom, able: true };
+         this.arrows.next = {
+             el: $dom,
+             able: true
+         };
      };
 
      /**
@@ -5176,7 +5406,7 @@
              },
              onToggle: callback
          };
-         return new Xut.svgIcon(el, Xut.svgIconConfig, options);
+         return new svgIcon(el, iconConfig, options);
      };
 
      //重置翻页按钮,状态以工具栏为标准
@@ -11635,12 +11865,12 @@
       * 动画对象控制
       * @param {[type]} options [description]
       */
-     var Behavior = function Behavior(options) {
+     var Animation = function Animation(options) {
          //mix参数
          _.extend(this, options);
      };
 
-     var behaviorProto = Behavior.prototype;
+     var animProto = Animation.prototype;
 
      /**
       * 绑定动画
@@ -11655,7 +11885,7 @@
       * @param  {[type]} pageType  [description]
       * @return {[type]}           [description]
       */
-     behaviorProto.initBehavior = function (id, context, rootNode, chapterId, parameter, pageType) {
+     animProto.init = function (id, context, rootNode, chapterId, parameter, pageType) {
 
          var canvasRelated = this.canvasRelated;
          var pageIndex = this.pageIndex;
@@ -11727,7 +11957,7 @@
       * @param  {[type]} canvasContainer [description]
       * @return {[type]}                 [description]
       */
-     behaviorProto.runBehavior = function (scopeComplete) {
+     animProto.run = function (scopeComplete) {
 
          var self = this,
              defaultIndex,
@@ -11774,7 +12004,7 @@
       * @param  {[type]} chapterId [description]
       * @return {[type]}           [description]
       */
-     behaviorProto.stopBehavior = function (chapterId) {
+     animProto.stop = function (chapterId) {
 
          //ppt动画
          bind(this.pptObj, function (animObj) {
@@ -11798,7 +12028,7 @@
       * 翻页结束，复位上一页动画
       * @return {[type]} [description]
       */
-     behaviorProto.resetBehavior = function () {
+     animProto.reset = function () {
          bind(this.pptObj, function (animObj) {
              animObj.resetAnimation();
          });
@@ -11808,7 +12038,7 @@
       * 销毁动画
       * @return {[type]} [description]
       */
-     behaviorProto.destroyBehavior = function () {
+     animProto.destroy = function () {
 
          //canvas
          bind(this.pixiSpriteObj, function (animObj) {
@@ -11830,6 +12060,160 @@
          this.getParameter = null;
          this.pixiSpriteObj = null;
      };
+
+     /***************************************************************
+      *
+      *          视觉差对象初始化操作
+      *
+      ****************************************************************/
+
+     var screenSize$2 = void 0;
+
+     //变化节点的css3transform属性
+     function transformNodes(rootNode, property, pageOffset) {
+         var style = {},
+             effect = '',
+             parallaxOffset,
+             //最终的偏移量X
+         x = 0,
+             y = 0,
+             z = 0,
+             round = Math.round,
+             prefix = Xut.plat.prefixStyle,
+
+
+         //浮动对象初始化偏移量
+         parallaxOffset = pageOffset;
+
+         if (property.translateX != undefined || property.translateY != undefined || property.translateZ != undefined) {
+             x = round(property.translateX) || 0;
+             y = round(property.translateY) || 0;
+             z = round(property.translateZ) || 0;
+             parallaxOffset += x;
+             effect += String.format('translate3d({0}px,{1}px,{2}px) ', parallaxOffset, y, z);
+         }
+
+         if (property.rotateX != undefined || property.rotateY != undefined || property.rotateZ != undefined) {
+             x = round(property.rotateX);
+             y = round(property.rotateY);
+             z = round(property.rotateZ);
+             effect += x ? 'rotateX(' + x + 'deg) ' : '';
+             effect += y ? 'rotateY(' + y + 'deg) ' : '';
+             effect += z ? 'rotateZ(' + z + 'deg) ' : '';
+         }
+
+         if (property.scaleX != undefined || property.scaleY != undefined || property.scaleZ != undefined) {
+             x = round(property.scaleX * 100) / 100 || 1;
+             y = round(property.scaleY * 100) / 100 || 1;
+             z = round(property.scaleZ * 100) / 100 || 1;
+             effect += String.format('scale3d({0},{1},{2}) ', x, y, z);
+         }
+
+         if (property.opacity != undefined) {
+             style.opacity = round((property.opacityStart + property.opacity) * 100) / 100;
+             effect += ';';
+         }
+
+         if (effect) {
+             style[prefix('transform')] = effect;
+             rootNode.css(style);
+         }
+
+         return parallaxOffset;
+     }
+
+     //转换成比例值
+     function conversionRatio(parameters) {
+         if (parameters.opacityStart > -1) {
+             parameters.opacity = (parameters.opacityEnd || 1) - parameters.opacityStart;
+             delete parameters.opacityEnd;
+         }
+         return parameters;
+     }
+
+     //转化成实际值
+     function conversionValue(parameters, nodeProportion, screenSize) {
+         var results = {},
+             width = -screenSize.width,
+             height = -screenSize.height;
+
+         for (var i in parameters) {
+             switch (i) {
+                 case 'translateX':
+                 case 'translateZ':
+                     results[i] = parameters[i] * nodeProportion * width;
+                     break;
+                 case 'translateY':
+                     results[i] = parameters[i] * nodeProportion * height;
+                     break;
+                 case 'opacityStart':
+                     results[i] = parameters[i];
+                     break;
+                 default:
+                     results[i] = parameters[i] * nodeProportion;
+             }
+         }
+
+         return results;
+     }
+
+     function Parallax(data) {
+
+         screenSize$2 = Xut.config.screenSize;
+
+         try {
+             //转化所有css特效的参数的比例
+             var parameters = JSON.parse(data.getParameter()[0]['parameter']);
+         } catch (err) {
+             return false;
+         }
+         var pid = data.pid,
+             translate = conversionRatio(parameters),
+
+         //页面偏移量
+         pageOffset = this.relatedData.pageOffset && this.relatedData.pageOffset.split("-"),
+
+         //开始的nodes值
+         currPageOffset = pageOffset[0],
+
+         //范围区域
+         pageRange = pageOffset[1],
+
+         //页面偏移比例
+         nodeOffsetProportion = (currPageOffset - 1) / (pageRange - 1),
+
+         //计算出偏移值
+         offsetTranslate = conversionValue(translate, nodeOffsetProportion, screenSize$2),
+
+         //页面分割比
+         nodeProportion = 1 / (pageRange - 1);
+
+         //改变节点的transform属性
+         //返回改变后translateX值
+         var parallaxOffset = transformNodes(data.$contentProcess, _.extend({}, offsetTranslate), data.transformOffset);
+
+         /**
+          * 为了兼容动画，把视觉差当作一种行为处理
+          * 合并data数据
+          * @type {Object}
+          */
+         data.parallax = {
+             //计算页码结束边界值,用于跳转过滤
+             calculateRangePage: function calculateRangePage() {
+                 return {
+                     'start': pid - currPageOffset + 1,
+                     'end': pageRange - currPageOffset + pid
+                 };
+             },
+             'translate': translate,
+             'offsetTranslate': offsetTranslate,
+             'nodeProportion': nodeProportion,
+             'rootNode': data.$contentProcess,
+             'parallaxOffset': parallaxOffset //经过视觉差修正后的偏移量
+         };
+
+         return data;
+     }
 
      /**
       * 预运行动作
@@ -11947,7 +12331,7 @@
          if (data.processType === 'parallax') {
              //初始化视觉差对象的坐标偏移量
              data.transformOffset = base.relatedData.transformOffset(data.id);
-             return conParallax.call(base, data);
+             return Parallax.call(base, data);
          }
 
          /**
@@ -11959,7 +12343,7 @@
          /**
           * 生成子作用域对象，用于抽象处理动画,行为
           */
-         return new Behavior(data);
+         return new Animation(data);
      }
 
      /**
@@ -13122,7 +13506,7 @@
              //如果不是预生成
              //注册动画事件
              if (isRreRun === undefined) {
-                 scope.initBehavior(id, context, rootNode, pageId, parameter, pageType);
+                 scope.init(id, context, rootNode, pageId, parameter, pageType);
              }
 
              //绑定DOM一些属性
@@ -13317,8 +13701,8 @@
                  closeAnim = pageId != Xut.Presentation.GetPageId();
 
                  if (closeAnim && scope) {
-                     scope.stopBehavior && scope.stopBehavior(pageId);
-                     scope.resetBehavior && scope.resetBehavior();
+                     scope.stop && scope.stop(pageId);
+                     scope.reset && scope.reset();
                  }
 
                  //捕获动画状态
@@ -13383,7 +13767,7 @@
                      });
                      //ppt动画
                      //ppt音频
-                     scope.runBehavior(function () {
+                     scope.run(function () {
                          captureAnimComplete(scope);
                      });
                  }
@@ -13400,7 +13784,7 @@
          var pageId = this.relatedData.pageId;
          this.runState = false;
          this.eachAssistContents(function (scope) {
-             !scope.isRreRun && scope.stopBehavior && scope.stopBehavior(pageId);
+             !scope.isRreRun && scope.stop && scope.stop(pageId);
          });
      };
 
@@ -13436,7 +13820,7 @@
      //复位状态
      activitPro.resetAnimation = function () {
          this.eachAssistContents(function (scope) {
-             !scope.isRreRun && scope.resetBehavior && scope.resetBehavior(); //ppt动画
+             !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
          });
 
          this.resetAloneAnim();
@@ -13449,8 +13833,8 @@
              drop.destroy();
          });
          this.eachAssistContents(function (scope) {
-             if (scope.destroyBehavior) {
-                 scope.destroyBehavior();
+             if (scope.destroy) {
+                 scope.destroy();
              }
              elementCallback && elementCallback(scope);
          });
@@ -16884,7 +17268,7 @@
      function toArray$1(filter) {
          var arr = [];
          if (!filter.length) {
-             for (key in filter) {
+             for (var key in filter) {
                  arr.push(filter[key]);
              }
              filter = arr;
@@ -16955,7 +17339,7 @@
 
      MasterProto.removeRecordMasterscope = function (removekey) {
          var me = this;
-         recordMasterscope = me.recordMasterscope[removekey];
+         var recordMasterscope = me.recordMasterscope[removekey];
          //清理页码指示标记
          recordMasterscope.forEach(function (scope) {
              delete me.recordMasterId[scope];

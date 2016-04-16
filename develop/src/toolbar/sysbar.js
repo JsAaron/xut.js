@@ -2,7 +2,7 @@
  * 主场景工具栏
  * 系统工具栏
  */
-import { ToolBar } from './toolBar'
+import { ToolBar } from './base/toolBar'
 
 
 var sToolbar = ToolBar.extend({

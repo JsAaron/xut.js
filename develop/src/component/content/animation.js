@@ -86,13 +86,13 @@ Dep.prototype.notify = function() {
  * 动画对象控制
  * @param {[type]} options [description]
  */
-var Behavior = function(options) {
+var Animation = function(options) {
     //mix参数
     _.extend(this, options);
 }
 
 
-var behaviorProto = Behavior.prototype;
+var animProto = Animation.prototype;
 
 
 /**
@@ -108,7 +108,7 @@ var behaviorProto = Behavior.prototype;
  * @param  {[type]} pageType  [description]
  * @return {[type]}           [description]
  */
-behaviorProto.initBehavior = function(id, context, rootNode, chapterId, parameter, pageType) {
+animProto.init = function(id, context, rootNode, chapterId, parameter, pageType) {
 
     var canvasRelated = this.canvasRelated;
     var pageIndex = this.pageIndex;
@@ -181,7 +181,7 @@ behaviorProto.initBehavior = function(id, context, rootNode, chapterId, paramete
  * @param  {[type]} canvasContainer [description]
  * @return {[type]}                 [description]
  */
-behaviorProto.runBehavior = function(scopeComplete) {
+animProto.run = function(scopeComplete) {
 
     var self = this,
         defaultIndex,
@@ -229,7 +229,7 @@ behaviorProto.runBehavior = function(scopeComplete) {
  * @param  {[type]} chapterId [description]
  * @return {[type]}           [description]
  */
-behaviorProto.stopBehavior = function(chapterId) {
+animProto.stop = function(chapterId) {
 
     //ppt动画
     bind(this.pptObj, function(animObj) {
@@ -254,7 +254,7 @@ behaviorProto.stopBehavior = function(chapterId) {
  * 翻页结束，复位上一页动画
  * @return {[type]} [description]
  */
-behaviorProto.resetBehavior = function() {
+animProto.reset = function() {
     bind(this.pptObj, function(animObj) {
         animObj.resetAnimation();
     })
@@ -265,7 +265,7 @@ behaviorProto.resetBehavior = function() {
  * 销毁动画
  * @return {[type]} [description]
  */
-behaviorProto.destroyBehavior = function() {
+animProto.destroy = function() {
 
     //canvas
     bind(this.pixiSpriteObj, function(animObj) {
@@ -289,6 +289,6 @@ behaviorProto.destroyBehavior = function() {
 }
 
 export {
-    Behavior as Effect
+    Animation
 }
 

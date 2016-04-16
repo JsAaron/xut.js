@@ -743,18 +743,17 @@ MasterProto.register = function(pageIndex, type, hotspotObj) {
         parallaxObj.registerCotents.apply(pageObj, arguments);
     }
 }
-
+ 
 //=======================工具方法==============================
 
 //page转化成母版ID
 MasterProto.conversionMasterId = function(pageIndex) {
     return this.recordMasterId ? this.recordMasterId[pageIndex] : undefined;
 }
- 
+
 MasterProto.removeRecordMasterscope = function(removekey) {
     var me = this;
-    console.log(me,me.recordMasterscope)
-    recordMasterscope = me.recordMasterscope[removekey];
+    var recordMasterscope = me.recordMasterscope[removekey];
     //清理页码指示标记
     recordMasterscope.forEach(function(scope) {
         delete me.recordMasterId[scope];

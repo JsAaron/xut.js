@@ -3,7 +3,7 @@
  */
 
 
-import { ToolBar } from './toolBar'
+import { ToolBar } from './base/toolBar'
 
 var fToolbar = ToolBar.extend({
     init: function(options) {

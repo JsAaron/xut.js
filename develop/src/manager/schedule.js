@@ -9,8 +9,8 @@
  **********************************************************************/
 import {_set} from '../util/stroage'
 //页面管理
-import {PageMgr} from './pagemgr'
-import {MasterMgr} from './mastermgr'
+import {PageMgr} from './page'
+import {MasterMgr} from './master'
 
 //错误的数据库表
 import {errorTable} from '../data/index'
