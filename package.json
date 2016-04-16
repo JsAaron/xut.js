@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/JsAaron/node-magazine#readme",
   "devDependencies": {
-    "gulp-watch": "^4.3.5"
+    "gulp-watch": "^4.3.5",
+    "sql.js": "^0.3.2"
   }
 }
