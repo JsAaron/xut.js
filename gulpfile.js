@@ -1,9 +1,8 @@
 var gulp    = require('gulp');
-var webpack = require('webpack');
 var fs      = require('fs')
 var rollup  = require('rollup')
 var babel   = require('rollup-plugin-babel')
-var replace = require('rollup-plugin-replace')
+//var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
 var  watch  = require('gulp-watch');
 
@@ -11,7 +10,7 @@ var  watch  = require('gulp-watch');
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 
-var root     = './develop'
+var root     = '.'
 var src      = root + '/src'
 var dest     = root
 var packName = 'build'
@@ -37,10 +36,6 @@ function logError(e) {
     console.log(e)
 }
 
-//============
-// rollup部分
-//============
-
 
 var banner =
     '/*!\n' +
@@ -62,10 +57,10 @@ gulp.task('rollup-pack', function() {
             ]
         })
         .then(function(bundle) {
-            return write(dest + '/build.js', bundle.generate({
+            return write(dest + '/build/xxtppt.js', bundle.generate({
                 format: 'umd',
                 banner: banner,
-                moduleName: 'build'
+                moduleName: 'xxtppt'
             }).code)
         })
         .catch(logError)
@@ -112,58 +107,6 @@ gulp.task('develop', ['database','rollup-pack', 'server'], function() {
     watch(src + '/**/*.js', function () {
         gulp.run('rollup-pack');
     });
-  //  gulp.watch(src + '/**/*.js', function() {
-  //      gulp.run('rollup-pack');
-  //  })
 })
 
 
-
-//==================
-//  webpack部分
-//==================
-
-/**
- * webpack打包es6
- * @return {[type]} [description]
- */
-gulp.task('webpack-pack', function() {
-    webpack({
-        // watch: true,
-        //页面入口
-        entry: src + '/app.js',
-        //出口文件输出配置
-        output: {
-            path: dest, //js位置
-            filename: packName
-        },
-        //source map 支持
-        devtool: '#source-map',
-        //加载器
-        module: {
-            loaders: [{
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel',
-                query: {
-                    presets: ['es2015']
-                }
-            }]
-        }
-    }, function(err, stats) {
-        if (err) {
-            logError();
-        }
-    });
-})
-
-
-
-/**
- * webapck打包
- */
-gulp.task('webpack', ['webpack-pack', 'server'], function() {
-    gulp.watch(src + '/**/*.js', function() {
-        gulp.run('webpack-pack');
-    })
-})
