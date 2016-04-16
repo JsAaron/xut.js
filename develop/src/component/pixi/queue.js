@@ -104,7 +104,7 @@ function checkRun(pageIndex) {
  * 单独只刷新一次
  * @return {[type]} [description]
  */
-export function one(fn) {
+export function oneQueue(fn) {
     var start = (+new Date());
     var timeout;
     var state = true
@@ -127,7 +127,7 @@ export function one(fn) {
  * @param {[type]} key       [description]
  * @param {[type]} value     [description]
  */
-export function add(pageIndex, key, value, type) {
+export function addQueue(pageIndex, key, value, type) {
     // console.log('c',pageIndex,key)
     if (!rQueue[pageIndex]) {
         rQueue[pageIndex] = hash();
@@ -154,7 +154,7 @@ export function add(pageIndex, key, value, type) {
  * @param  {[type]} key       [description]
  * @return {[type]}           [description]
  */
-export function remove(pageIndex, key) {
+export function removeQueue(pageIndex, key) {
     if (rQueue[pageIndex] && rQueue[pageIndex]['fns']) {
         delete rQueue[pageIndex]['fns'][key]
         delete rQueue[pageIndex]['types'][key]
@@ -173,7 +173,7 @@ export function remove(pageIndex, key) {
  * 销毁
  * @return {[type]} [description]
  */
-export function destroy(pageIndex) {
+export function destroyQueue(pageIndex) {
     if (rQueue[pageIndex]) {
         if (rQueue[pageIndex].rAF) {
             rQueue[pageIndex].rAF.stop();

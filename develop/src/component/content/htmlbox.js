@@ -3,11 +3,12 @@
  * @param  {[type]} ){} [description]
  * @return {[type]}       [description]
  */
-// define('HtmlBox', [
-//     'Utils',
-//     'Config',
-//     'conEvent'
-// ], function(Utils, Config, conEvent) {
+
+import {
+    bindEvents
+}
+from '.event'
+
 
 import {
     _set,
@@ -80,7 +81,7 @@ function HtmlBox(contentId, element) {
     }
 
     //绑定点击事件
-    conEvent.bindEvents({
+    bindEvents({
         'eventRun': function() {
             Xut.View.HideToolbar();
             self.init(contentId, element)

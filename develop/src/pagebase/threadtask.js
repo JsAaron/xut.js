@@ -3,12 +3,6 @@
 //             多线程任务构建
 //
 //**********************************************************
-// define('AssignedTasks', [
-//     'TaskContainer',
-//     'TaskTaskBackground',
-//     'TaskComponents',
-//     'TaskContents'
-// ], function(Parser, TaskContainer, TaskTaskBackground, TaskComponents, TaskContents) {
 
 //数据解析
 import { query } from '../manager/parser'

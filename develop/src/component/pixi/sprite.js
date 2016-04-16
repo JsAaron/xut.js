@@ -4,9 +4,6 @@
  * @param  {[type]} Config) {}          [description]
  * @return {[type]}         [description]
  */
-// define('pixiSpirit', [
-//     'pixiFactory'
-// ], function(pixiFactory) {
 
 import {
     Factory

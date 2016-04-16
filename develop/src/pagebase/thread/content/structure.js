@@ -6,16 +6,10 @@
  * 2 多个页面引用同一个content的处理，Conetnt_0_1 ,类型+页码+ID的标示
  * @return {[type]} [description]
  */
-// define('conStructure', [
-// 	'Utils',
-// 	'Xut.config',
-// 	'pixiContainer'
-// ],function(Utils, Xut.config, pixiContainer) {
-
 
 import { parseJSON, arrayUnique ,reviseSize,readFile} from '../../../util/index'
 
-// import { pixiContainer } from '../../component/pixi'
+import { Container as pixiContainer } from '../../component/pixi'
 
 let prefix = Xut.plat.prefixStyle;
 

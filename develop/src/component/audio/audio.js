@@ -136,7 +136,7 @@ var _Media = AudioFactory.extend({
 
     init: function(options, controlDoms) {
 
-        var url = Xut.Config.audioPath() + options.url,
+        var url = Xut.config.audioPath() + options.url,
             trackId = options.trackId,
             self = this,
             audio;
@@ -178,7 +178,7 @@ var _Media = AudioFactory.extend({
 var _Flash = AudioFactory.extend({
     init: function(options, controlDoms) {
         var trackId = options.trackId,
-            url = Xut.Config.audioPath() + options.url,
+            url = Xut.config.audioPath() + options.url,
             self = this,
             audio;
 
@@ -228,7 +228,7 @@ var _Flash = AudioFactory.extend({
 var _Audio = AudioFactory.extend({
     init: function(options, controlDoms) {
         var trackId = options.trackId,
-            url = Xut.Config.audioPath() + options.url,
+            url = Xut.config.audioPath() + options.url,
             self = this,
             audio;
 
@@ -316,7 +316,7 @@ var _cordovaMedia = AudioFactory.extend({
 
     init: function(options, controlDoms) {
 
-        var url = Xut.Config.audioPath() + options.url,
+        var url = Xut.config.audioPath() + options.url,
             trackId = options.trackId,
             self = this,
             audio;

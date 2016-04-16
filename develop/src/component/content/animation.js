@@ -8,12 +8,6 @@
  * @return {[type]} [description]
  *
  ********************************************************************/
-// define('conBehavior', [
-//     'Config',
-//     'Sprite',
-//     'pixiSpirit'
-// ], function(Config, Sprite, pixiSpirit) {
-
 
 //dom精灵动画
 import {
