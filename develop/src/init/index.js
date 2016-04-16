@@ -1,3 +1,7 @@
+//预初始化
+import {AudioManager} from '../component/audio/manager'
+import {VideoManager} from '../component/video/manager'
+
 import {
     loader,
     setRootfont

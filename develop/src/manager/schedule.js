@@ -7,14 +7,6 @@
  *                2. MasterMgr 模块
  *                                                                    *
  **********************************************************************/
-// define('Scheduler', [
-//             'MasterMgr',
-//             'SwitchPage',
-//             'Navbar',
-//             'Parser',
-//             'StoreManager'
-//         ], function(Utils, Config, PageMgr, MasterMgr, SwitchPage, Navbar, Parser, StoreManager) {
-
 import {_set} from '../util/stroage'
 //页面管理
 import {PageMgr} from './pagemgr'
@@ -24,6 +16,11 @@ import {MasterMgr} from './mastermgr'
 import {errorTable} from '../data/index'
 //数据解析
 import {query} from './parser'
+//页面切换
+import {SwitchPage} from './switch'
+//Navbar
+import {close as _close} from '../toolbar/navbar'
+
 
 
 //判断是否能整除2
@@ -536,7 +533,7 @@ SchedulerProto.suspend = function(pointers) {
             this.suspend(pointers)
         })
         //目录栏
-    Navbar.close();
+    _close();
     //复位工具栏
     this.vm.$emit('change:resetToolbar')
 }

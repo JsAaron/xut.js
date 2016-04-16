@@ -839,6 +839,1653 @@
      };
 
      /**
+      * 音频动作
+      * @param  {[type]} global [description]
+      * @return {[type]}        [description]
+      */
+
+     //音频动作
+     //替换背景图
+     //指定动画
+     function Action(options) {
+
+         var element = document.querySelector('#Audio_' + options.audioId);
+
+         //页面从属
+         var pageType = element.getAttribute('data-belong');
+
+         //切换背景
+         function toggle(linker) {
+             element.style.backgroundImage = 'url(' + Xut.conifg.pathAddress + linker + ')';
+         }
+
+         function run(ids) {
+             ids = ids.split(',');
+             Xut.Assist.Run(pageType, ids);
+         }
+
+         function stop(ids) {
+             ids = ids.split(',');
+             Xut.Assist.Stop(pageType, ids);
+         }
+         return {
+             play: function play() {
+                 options.startImg && toggle(options.startImg);
+                 options.startScript && run(options.startScript);
+             },
+             pause: function pause() {
+                 options.stopImg && toggle(options.stopImg);
+                 options.stopScript && stop(options.startScript);
+             },
+             destroy: function destroy() {
+                 element = null;
+             }
+         };
+     }
+
+     /**
+      * 音频字幕
+      * @param  {[type]} global [description]
+      * @return {[type]}        [description]
+      */
+     //字幕检测时间
+     var Interval = 50;
+
+     var getStyles = function getStyles(elem, name) {
+         var styles = elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+         return styles.getPropertyValue(name);
+     };
+
+     /**
+      * 字幕类
+      * audio  音频实例
+      * options 参数
+      */
+     function Subtitle(audio, options, controlDoms) {
+
+         var visibility;
+         this.audio = audio;
+         this.options = options;
+         this.parents = controlDoms.parents;
+         this.ancestors = controlDoms.ancestors;
+
+         this.timer = 0;
+         //缓存创建的div节点
+         this.cacheCreateDivs = {};
+
+         //保存原始的属性
+         var orgAncestorVisibility = this.orgAncestorVisibility = {};
+         _.each(this.ancestors, function (node, cid) {
+             visibility = getStyles(node, 'visibility');
+             if (visibility) {
+                 orgAncestorVisibility[cid] = visibility;
+             }
+         });
+
+         //去重记录
+         this.recordRepart = {};
+         //phonegap getCurrentPosition得到的音频播放位置不从0开始 记录起始位置
+         this.changeValue = 0;
+
+         //快速处理匹配数据
+         var checkData = {};
+         _.each(options.subtitles, function (data) {
+             checkData[data.start + '-start'] = data;
+             checkData[data.end + '-end'] = data;
+         });
+         this.createSubtitle(checkData);
+     }
+
+     Subtitle.prototype = {
+         /**
+          * 运行字幕
+          * @return {[type]}
+          */
+         createSubtitle: function createSubtitle(checkData) {
+             var self = this,
+                 audio = this.audio,
+                 options = this.options;
+
+             //准备创建字幕
+             function createAction(audioTime) {
+                 _.each(checkData, function (data, key) {
+                     var match = key.split('-');
+                     //创建动作
+                     self.action(match[0], audioTime, match[1], data);
+                 });
+                 self.createSubtitle(checkData);
+             }
+
+             function JudgePlat() {
+                 var audioTime;
+                 //phonegap
+                 if (audio.getCurrentPosition) {
+                     audio.getCurrentPosition(function (position) {
+                         position = position * 1000;
+                         if (!self.changeValue) {
+                             self.changeValue = position;
+                         }
+                         position -= self.changeValue;
+                         if (position > -1) {
+                             audioTime = Math.round(position);
+                         }
+                         createAction(audioTime);
+                     }, function (e) {
+                         console.log("error:" + e);
+                         //出错继续检测
+                         self.createSubtitle(checkData);
+                     });
+                 } else if (audio.expansionCurrentPosition) {
+                     //扩充的对象
+                     audioTime = Math.round(audio.expansionCurrentPosition() * 1000);
+                     createAction(audioTime);
+                 } else {
+                     //html5
+                     audioTime = Math.round(audio.currentTime * 1000);
+                     createAction(audioTime);
+                 }
+             }
+
+             self.timer = setTimeout(function () {
+                 JudgePlat();
+             }, Interval);
+         },
+
+         //执行动作
+         //创建文本框
+         //显示/隐藏
+         action: function action(currentTime, audioTime, _action, data) {
+             if (audioTime > currentTime - Interval && audioTime < currentTime + Interval) {
+                 //创建
+                 if (!this.recordRepart[data.start] && _action === 'start') {
+                     this.recordRepart[data.start] = true;
+                     //创建字幕dom
+                     this.createDom(data);
+
+                     //如果是一段字幕结束处理
+                 } else if (!this.recordRepart[data.end] && _action === 'end') {
+                         this.recordRepart[data.end] = true;
+                         // //隐藏
+                         var ancestorNode = this.ancestors[data.id];
+                         if (ancestorNode) {
+                             ancestorNode.style.visibility = "hidden";
+                         }
+                     }
+             }
+         },
+
+         createDom: function createDom(data) {
+
+             //屏幕分辨率
+             var proportion = Xut.config.proportion;
+             var proportionWidth = proportion.width;
+             var proportionHeight = proportion.height;
+             var screenWidth = Xut.config.screenSize.width;
+             var screenHeight = Xut.config.screenSize.height;
+
+             var cid = data.id;
+             var parentNode = this.parents[cid];
+             var ancestorNode = this.ancestors[cid];
+             var preDiv = this.cacheCreateDivs[cid];
+             var preP = preDiv && preDiv.children[0];
+
+             //缩放
+             var sTop = data.top * proportion.top;
+             var sLeft = data.left * proportion.left;
+             var sHeight = data.height * proportion.height;
+             var sWidth = data.width * proportion.width;
+
+             //转换行高
+             var sLineHeight = data.lineHeight ? data.lineHeight : '100%';
+
+             //公用同一个contengid,已经存在
+             if (preDiv) {
+                 createContent(preDiv, preP, data);
+             } else {
+                 //创建父元素与子元素
+                 var createDiv = document.createElement('div');
+                 var createP = document.createElement('p');
+                 //设置样式
+                 createContent(createDiv, createP, data);
+                 createDiv.appendChild(createP); //添加到指定的父元素 
+
+                 parentNode.appendChild(createDiv);
+
+                 //保存引用
+                 this.cacheCreateDivs[cid] = createDiv;
+             }
+
+             //创建内容
+             function createContent(parent, p, data) {
+                 createDivStyle(parent, data); //设置div
+                 createPStyle(p, data);
+             }
+
+             //设置父容器div 字体颜色，大小，类型，位置，文本水平、垂直居中
+             function createDivStyle(parent, data) {
+                 var cssText = 'position       :absolute; ' + 'display        :table;' + 'vertical-align :center;' + 'top            :{0}px;' + 'left           :{1}px;' + 'height         :{2}px;' + 'width          :{3}px;';
+
+                 parent.style.cssText = String.format(cssText, sTop, sLeft, sHeight, sWidth);
+             }
+
+             //内容元素的样式
+             function createPStyle(p, data) {
+
+                 var cssText = ' text-align     :center;' + ' display        :table-cell;' + ' vertical-align :middle;' + ' color          :{0};' + ' font-family    :{1};' + ' font-bold      :{2};' + ' font-size      :{3}px;' + ' line-height    :{4}%';
+
+                 //设置字体间距
+                 p.style.cssText = String.format(cssText, data.fontColor, data.fontName, data.fontBold, data.fontSize * proportionWidth, sLineHeight);
+                 //设置文字内容
+                 p.innerHTML = data.title;
+             }
+
+             //操作最外层的content节点
+             if (ancestorNode) {
+                 var ancestorNodeValue = getStyles(ancestorNode, 'visibility');
+                 if (ancestorNodeValue != 'visible') {
+                     ancestorNode.style.visibility = 'visible';
+                 }
+             }
+         },
+
+         /**
+          * 清理音频
+          * @return {[type]}
+          */
+         destroy: function destroy() {
+             var self = this;
+             _.each(this.cacheCreateDivs, function (node) {
+                 node.parentNode.removeChild(node);
+             });
+             //恢复初始状态
+             _.each(this.ancestors, function (node, id) {
+                 var orgValue = self.orgAncestorVisibility[id];
+                 var currValue = getStyles(node, 'visibility');
+                 if (currValue != orgValue) {
+                     node.style.visibility = orgValue;
+                 }
+             });
+             this.ancestors = null;
+             this.cacheCreateDivs = null;
+             this.changeValue = 0;
+             this.parents = null;
+             if (this.timer) {
+                 clearTimeout(this.timer);
+                 this.timer = 0;
+             }
+         }
+
+     };
+
+     var instance = hash(); //存放不同音轨的一个实例
+     var html5Audio = void 0;
+
+     /**
+      * 音频工厂类
+      * @param {[type]} options [description]
+      */
+     var AudioFactory = Xut.CoreObject.extend({
+
+         //构建之前关数据
+         preRelated: function preRelated(trackId, options) {
+             //完成end后 外部回调删除这个对象
+             //单独调用引用对象
+             //传递一个 options.complete
+             this.innerCallback = options.innerCallback;
+             //仅运行一次
+             //外部调用
+             this.outerCallback = trackId == 9999 ? options.complete : null;
+         },
+
+         //构建之后关数据
+         afterRelated: function afterRelated(audio, options, controlDoms) {
+             //音频重复播放次数
+             if (options.data && options.data.repeat) {
+                 this.repeat = Number(options.data.repeat); //需要重复
+             }
+             //音频动作
+             if (options.action) {
+                 this.acitonObj = Action(options);
+             }
+             //字幕对象
+             if (options.subtitles && options.subtitles.length > 0) {
+                 //创建字幕对象
+                 this.subtitleObject = new Subtitle(audio, options, controlDoms);
+             }
+
+             //如果有外部回调处理
+             if (this.outerCallback) {
+                 this.outerCallback.call(this);
+             }
+         },
+         //运行成功失败后处理方法
+         //phoengap会调用callbackProcess
+         //导致乱了
+         callbackProcess: function callbackProcess(sysCommand) {
+             if (this.outerCallback) {
+                 //外部调用结束
+                 this.end();
+             } else {
+                 //安卓没有重复播放
+                 //phonegap未处理
+                 if (!Xut.plat.isAndroid && this.repeat) {
+                     //如果需要重复
+                     this.repeatProcess();
+                 } else {
+                     //外部清理对象
+                     //audioManager中直接删当前对象
+                     this.innerCallback(this);
+                 }
+             }
+         },
+
+         //重复处理
+         repeatProcess: function repeatProcess() {
+             --this.repeat;
+             this.play();
+         },
+
+         //播放
+         play: function play() {
+             //flash模式不执行
+             if (this.audio && !this.isFlash) {
+                 this.status = 'playing';
+                 this.audio.play();
+             }
+             this.acitonObj && this.acitonObj.play();
+         },
+
+         //停止
+         pause: function pause() {
+             this.status = 'paused';
+             this.audio.pause();
+             this.acitonObj && this.acitonObj.pause();
+         },
+
+         //销毁
+         end: function end() {
+             this.status = 'ended';
+             this.audio.end();
+             this.audio = null;
+             this.acitonObj && this.acitonObj.destroy();
+         },
+
+         //相关
+         destroyRelated: function destroyRelated() {
+             //销毁字幕
+             if (this.subtitleObject) {
+                 this.subtitleObject.destroy();
+                 this.subtitleObject = null;
+             }
+             //动作
+             if (this.acitonObj) {
+                 this.acitonObj.destroy();
+                 this.acitonObj = null;
+             }
+         }
+     });
+
+     /**
+      * 使用PhoneGap的Media播放
+      * @param  {string} url 路径
+      * @return {[type]}      [description]
+      */
+     var _Media = AudioFactory.extend({
+
+         init: function init(options, controlDoms) {
+
+             var url = Xut.Config.audioPath() + options.url,
+                 trackId = options.trackId,
+                 self = this,
+                 audio;
+
+             //构建之前处理
+             this.preRelated(trackId, options);
+
+             //音频成功与失败调用
+             audio = new GLOBALCONTEXT.Media(url, function () {
+                 self.callbackProcess(true);
+             }, function () {
+                 self.callbackProcess(true);
+             });
+
+             //autoplay
+             this.audio = audio;
+             this.trackId = trackId;
+             this.options = options;
+
+             //相关数据
+             this.afterRelated(audio, options, controlDoms);
+         },
+         //取反
+         end: function end() {
+             if (this.audio) {
+                 this.audio.release();
+                 this.audio = null;
+             }
+             this.status = 'ended';
+             this.destroyRelated();
+         }
+     });
+
+     /**
+      * 采用Falsh播放
+      * @type {[type]}
+      */
+     var _Flash = AudioFactory.extend({
+         init: function init(options, controlDoms) {
+             var trackId = options.trackId,
+                 url = Xut.Config.audioPath() + options.url,
+                 self = this,
+                 audio;
+
+             //构建之前处理
+             this.preRelated(trackId, options);
+
+             audio = new Audio5js({
+                 swf_path: './lib/data/audio5js.swf',
+                 throw_errors: true,
+                 format_time: true,
+                 ready: function ready(player) {
+                     this.load(url);
+                     //如果调用了播放
+                     this.play();
+                     self.status = "playing";
+                 }
+             });
+
+             this.audio = audio;
+             this.trackId = trackId;
+             this.status = 'playing';
+             this.options = options;
+
+             this.isFlash = true;
+
+             //相关数据
+             this.afterRelated(audio, options, controlDoms);
+         },
+
+         end: function end() {
+             if (this.audio) {
+                 this.audio.destroy();
+                 this.audio = null;
+             }
+             this.status = 'ended';
+             this.destroyRelated();
+         }
+     });
+
+     /**
+      * 使用html5的audio播放
+      * @param  {string} url    音频路径
+      * @param  {object} options 可选参数
+      * @return {object}         [description]
+      */
+     var _Audio = AudioFactory.extend({
+         init: function init(options, controlDoms) {
+             var trackId = options.trackId,
+                 url = Xut.Config.audioPath() + options.url,
+                 self = this,
+                 audio;
+
+             //构建之前处理
+             this.preRelated(trackId, options);
+
+             if (instance[trackId]) {
+                 audio = Xut.fix.audio ? Xut.fix.audio : instance[trackId];
+                 audio.src = url;
+             } else {
+                 //create a new Audio instance
+                 //如果为ios browser 用Xut.fix.audio 指定src 初始化见app.js
+                 if (Xut.fix.audio) {
+                     audio = Xut.fix.audio;
+                     audio.src = url;
+                 } else {
+                     audio = new Audio(url);
+                 }
+
+                 //更新音轨
+                 //妙妙学方式不要音轨处理
+                 if (!Xut.fix.audio) {
+                     instance[trackId] = audio;
+                 }
+
+                 audio.addEventListener('ended', function () {
+                     self.callbackProcess();
+                 }, false);
+
+                 audio.addEventListener('error', function () {
+                     self.callbackProcess();
+                 }, false);
+             }
+
+             this.audio = audio;
+             this.trackId = trackId;
+             this.status = 'playing';
+             this.options = options;
+
+             //相关数据
+             this.afterRelated(audio, options, controlDoms);
+         },
+
+         end: function end() {
+             if (this.audio) {
+                 this.audio.pause();
+                 this.audio.removeEventListener('ended', this.callbackProcess, false);
+                 this.audio.removeEventListener('error', this.callbackProcess, false);
+                 this.audio = null;
+             }
+             this.status = 'ended';
+             this.destroyRelated();
+         }
+     });
+
+     var createUUID = function createUUID() {
+         return UUIDcreatePart(4) + '-' + UUIDcreatePart(2) + '-' + UUIDcreatePart(2) + '-' + UUIDcreatePart(2) + '-' + UUIDcreatePart(6);
+     };
+
+     function UUIDcreatePart(length) {
+         var uuidpart = "";
+         for (var i = 0; i < length; i++) {
+             var uuidchar = parseInt(Math.random() * 256, 10).toString(16);
+             if (uuidchar.length == 1) {
+                 uuidchar = "0" + uuidchar;
+             }
+             uuidpart += uuidchar;
+         }
+         return uuidpart;
+     }
+
+     /**
+      * 使用PhoneGap的 js直接调用 cordova Media播放
+      * @param  {string} url 路径
+      * @return {[type]}      [description]
+      */
+     var _cordovaMedia = AudioFactory.extend({
+
+         init: function init(options, controlDoms) {
+
+             var url = Xut.Config.audioPath() + options.url,
+                 trackId = options.trackId,
+                 self = this,
+                 audio;
+
+             this.id = createUUID();
+
+             //构建之前处理
+             this.preRelated(trackId, options);
+
+             var audio = {
+                 startPlayingAudio: function startPlayingAudio() {
+                     audioHandler.startPlayingAudio(self.id, url);
+                 },
+                 pausePlayingAudio: function pausePlayingAudio() {
+                     audioHandler.pausePlayingAudio(self.id);
+                 },
+                 release: function release() {
+                     audioHandler.release(self.id);
+                 },
+                 /**
+                  * 扩充，获取位置
+                  * @return {[type]} [description]
+                  */
+                 expansionCurrentPosition: function expansionCurrentPosition() {
+                     return getCurrentPosition(self.id);
+                 }
+             };
+
+             //autoplay
+             this.audio = audio;
+             this.trackId = trackId;
+             this.options = options;
+
+             //相关数据
+             this.afterRelated(audio, options, controlDoms);
+         },
+
+         //播放
+         play: function play() {
+             if (this.audio) {
+                 this.status = 'playing';
+                 this.audio.startPlayingAudio();
+             }
+             this.acitonObj && this.acitonObj.play();
+         },
+
+         //停止
+         pause: function pause() {
+             this.status = 'paused';
+             this.audio && this.audio.pausePlayingAudio();
+             this.acitonObj && this.acitonObj.pause();
+         },
+
+         //结束
+         end: function end() {
+             if (this.audio) {
+                 this.audio.release();
+                 this.audio = null;
+             }
+             this.status = 'ended';
+             this.destroyRelated();
+         }
+     });
+
+     //apk的情况下
+     if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
+         html5Audio = _Media;
+     } else {
+
+         //妙妙学的 客户端浏览器模式
+         if (MMXCONFIG && audioHandler) {
+             html5Audio = _cordovaMedia;
+         } else {
+             //pc
+             html5Audio = _Audio;
+         }
+
+         //2015.12.23
+         //如果不支持audio改用flash
+         // supportAudio(function() {
+         //     Xut.Audio = _Flash;
+         // });
+     }
+
+     Xut.Audio = html5Audio;
+
+     function AudioManager() {
+
+         //动作标示
+         var ACTIVIT = 'hot'; //热点音频
+         var ANIMATE = 'content'; //动画音频
+         var SEASON = 'season'; //节音频
+
+         /**
+          * 容器合集
+          * 1 pageBox 当前待播放的热点音频
+          * 2 playBox 播放中的热点音频集合
+          */
+         //[type][pageId][queryId]
+         var pageBox, playBox;
+
+         function initBox() {
+             pageBox = hash();
+             //[type][pageId][queryId]
+             playBox = hash();
+         }
+
+         initBox();
+
+         //===============================================
+         //
+         //              预装配数据
+         //
+         //===============================================
+
+         /**
+          * 解析数据
+          * @param  {[type]} type    [description]
+          * @param  {[type]} queryId [description]
+          * @return {[type]}         [description]
+          */
+         function parseData(type, queryId) {
+             var data;
+             switch (type) {
+                 case ANIMATE:
+                     data = Xut.data.query('Video', queryId, true);
+                     break;
+                 case SEASON:
+                     data = Xut.data.query('Video', queryId, true);
+                     break;
+                 default:
+                     data = Xut.data.query('Video', queryId);
+                     break;
+             }
+             return data;
+         }
+
+         /**
+          * 获取父容器
+          * @return {[type]} [description]
+          */
+         function getParentDom(subtitles, pageId, queryId) {
+             //字幕数据
+             var parentDoms = hash();
+             var ancestorDoms = hash();
+             var contentsFragment;
+             var dom;
+             var pageIndex = pageId - 1;
+             if (subtitles) {
+                 //获取文档节点
+                 contentsFragment = Xut.Contents.contentsFragment[pageId];
+
+                 //如果maskId大于9000默认为处理
+                 var isMask = pageId > 9000;
+                 if (isMask) {
+                     //指定页码编号
+                     pageIndex = Xut.Presentation.GetPageIndex();
+                 }
+
+                 //找到对应的节点
+                 _.each(subtitles, function (data) {
+                     //'Content_0_1' 规则 类型_页码（0开始）_id
+                     if (!parentDoms[data.id]) {
+                         dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
+                         ancestorDoms[data.id] = dom;
+                         var $dom = $(dom);
+                         if ($dom.length) {
+                             var _div = $dom.find('div').last();
+                             if (_div.length) {
+                                 parentDoms[data.id] = _div[0];
+                             }
+                         }
+                     }
+                 });
+             }
+
+             return {
+                 parents: parentDoms,
+                 ancestors: ancestorDoms
+             };
+         }
+
+         /**
+          * 检测数据是否存在
+          * @return {[type]}         [description]
+          */
+         function checkRepeat(pageId, queryId, type) {
+             var pBox = pageBox[type];
+             if (pBox && pBox[pageId] && pBox[pageId][queryId]) {
+                 return true;
+             }
+             return false;
+         }
+
+         /**
+          * 组合热点音频数据结构
+          * data, pageId, queryId, type
+          * 数据，页码编号，videoId, 查询的类型
+          * @return {[type]}         [description]
+          */
+         function combination(data, pageId, queryId, type, eleName) {
+             var tempDoms;
+             if (!pageBox[type]) {
+                 pageBox[type] = hash();
+             }
+             if (!pageBox[type][pageId]) {
+                 pageBox[type][pageId] = hash();
+             }
+             //有字幕处理
+             if (data.theTitle) {
+                 var subtitles = parseJSON(data.theTitle);
+             }
+             //配置音频结构
+             return pageBox[type][pageId][queryId] = {
+                 'trackId': data.track, //音轨
+                 'url': data.md5, //音频名字
+                 'subtitles': subtitles,
+                 'audioId': queryId,
+                 'data': data
+             };
+         }
+
+         /**
+          * 装配音频数据
+          * @param  {int} pageId    页面id或节的分组id
+          * @param  {int} queryId   查询id,支持activityId,audioId
+          * @param  {string} type   音频来源类型[动画音频,节音频,热点音频]
+          */
+         function deployAudio(pageId, queryId, type, actionData) {
+             //避免复重查询
+             if (checkRepeat(pageId, queryId, type)) {
+                 return false;
+             }
+             //解析合集数据
+             var data = parseData(type, queryId);
+             //存在音频文件
+             if (data && data.md5) {
+                 //新的查询
+                 var ret = combination(data, pageId, queryId, type, actionData);
+                 //混入新的动作数据
+                 //2015.9.24
+                 //音频替换图片
+                 //触发动画
+                 if (actionData) {
+                     _.extend(ret, actionData, {
+                         action: true //快速判断存在动作数据
+                     });
+                 }
+             }
+         }
+
+         //===============================================
+         //
+         //              初始化加载音频
+         //
+         //===============================================
+
+         /**
+          * 检查要打断的音频
+          * @param  {[type]} type    音频类型
+          * @param  {[type]} pageId  [description]
+          * @param  {[type]} queryId [description]
+          * @param  {[type]} pageBox [description]
+          * @return {boolen}         不打断返回true,否则返回false
+          */
+         function checkBreakAudio(type, pageId, queryId, pageBox) {
+             var playObj = playBox[type][pageId][queryId],
+                 trackId = pageBox.trackId,
+                 _trackId = playObj.trackId;
+
+             //如果是节音频，且地址相同，则不打断
+             if (type == SEASON && playObj.url == pageBox.url) {
+                 return true;
+             }
+
+             //如果要用零音轨||零音轨有音乐在播||两音轨相同
+             //则打断
+             if (trackId == 0 || _trackId == 0 || trackId == _trackId) {
+                 playObj.end();
+                 delete playBox[type][pageId][queryId];
+             }
+             return false;
+         }
+
+         /**
+          * 播放音频之前检查
+          * @param  {int} pageId    [description]
+          * @param  {int} queryId    查询id
+          * @param  {string} type    决定video表按哪个字段查询
+          * @return {object}         音频对象/不存在为null
+          */
+         function preCheck(pageId, queryId, type) {
+             var t,
+                 p,
+                 q,
+                 playObj = pageBox[type][pageId][queryId],
+                 seasonAudio = null;
+             for (t in playBox) {
+                 for (p in playBox[t]) {
+                     for (q in playBox[t][p]) {
+                         if (checkBreakAudio(t, p, q, playObj)) {
+                             seasonAudio = playBox[t][p][q];
+                         }
+                     }
+                 }
+             }
+             return seasonAudio;
+         }
+
+         /**
+          * 加载音频对象
+          * @return {[type]}         [description]
+          */
+         function loadAudio(pageId, queryId, type) {
+             //找到页面对应的音频
+             //类型=》页面=》指定音频Id
+             var pageObj = pageBox[type][pageId][queryId];
+             //检测
+             var seAudio = preCheck(pageId, queryId, type);
+
+             //播放音频时关掉视频
+             Xut.VideoManager.clearVideo();
+
+             //构建播放列表
+             if (!playBox[type]) {
+                 playBox[type] = hash();
+             }
+             if (!playBox[type][pageId]) {
+                 playBox[type][pageId] = hash();
+             }
+             //假如有字幕信息
+             //找到对应的文档对象
+             if (pageObj.subtitles) {
+                 var tempDoms = getParentDom(pageObj.subtitles, pageId, queryId);
+             }
+
+             //播放完成处理
+             pageObj.innerCallback = function (audio) {
+                 if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
+                     audio.end();
+                     delete playBox[type][pageId][queryId];
+                 }
+             };
+
+             //new播放对象
+             var newObj = seAudio || new html5Audio(pageObj, tempDoms);
+             newObj.play();
+
+             //存入播放对象池
+             playBox[type][pageId][queryId] = newObj;
+         }
+
+         /**
+          * 交互点击
+          * @param  {int} pageId     [description]
+          * @param  {int} queryId    [description]
+          * @param  {string} type    ACTIVIT
+          * @return {[type]}         [description]
+          */
+         function loadTiggerAudio(pageId, queryId, type) {
+             var playObj, status;
+             if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
+                 playObj = playBox[type][pageId][queryId];
+                 status = playObj.audio ? playObj.status : null;
+             }
+             switch (status) {
+                 case 'playing':
+                     playObj.pause();
+                     break;
+                 case 'paused':
+                     playObj.play();
+                     break;
+                 default:
+                     loadAudio(pageId, queryId, type);
+                     break;
+             }
+         }
+
+         /**
+          * 清理全部音频
+          * @return {[type]} [description]
+          */
+         function removeAudio() {
+             var flag = false,
+                 t,
+                 p,
+                 a;
+             for (t in playBox) {
+                 for (p in playBox[t]) {
+                     for (a in playBox[t][p]) {
+                         playBox[t][p][a].end();
+                         flag = true;
+                     }
+                 }
+             }
+             initBox();
+             return flag;
+         }
+
+         var out = {
+
+             ///////////////////
+             //1 独立音频处理, 音轨/跨页面 //
+             //2 动画音频,跟动画一起播放与销毁
+             ///////////////////
+
+             //自动播放触发接口
+             autoPlay: function autoPlay(pageId, activityId, actionData) {
+                 deployAudio(pageId, activityId, ACTIVIT, actionData);
+                 loadAudio(pageId, activityId, ACTIVIT);
+             },
+
+             //手动触发
+             trigger: function trigger(pageId, activityId, actionData) {
+                 deployAudio(pageId, activityId, ACTIVIT, actionData);
+                 loadTiggerAudio(pageId, activityId, ACTIVIT);
+             },
+
+             //动画音频触发接口
+             contentAudio: function contentAudio(pageId, audioId) {
+                 deployAudio(pageId, audioId, ANIMATE);
+                 loadAudio(pageId, audioId, ANIMATE);
+             },
+
+             //节音频触发接口
+             seasonAudio: function seasonAudio(seasonAudioId, audioId) {
+                 deployAudio(seasonAudioId, audioId, SEASON);
+                 loadAudio(seasonAudioId, audioId, SEASON);
+             },
+
+             //挂起音频
+             hangUpAudio: function hangUpAudio() {
+                 var t, p, a;
+                 for (t in playBox) {
+                     for (p in playBox[t]) {
+                         for (a in playBox[t][p]) {
+                             playBox[t][p][a].pause();
+                         }
+                     }
+                 }
+             },
+
+             //销毁动画音频
+             clearContentAudio: function clearContentAudio(pageId) {
+                 if (!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
+                     return false;
+                 }
+                 var playObj = playBox[ANIMATE][pageId];
+                 if (playObj) {
+                     for (var i in playObj) {
+                         playObj[i].end();
+                         delete playBox[ANIMATE][pageId][i];
+                     }
+                 }
+             },
+
+             //清理音频
+             clearAudio: function clearAudio(pageId) {
+                 if (pageId) {
+                     //如果只跳槽关闭动画音频
+                     out.clearContentAudio(pageId);
+                 } else {
+                     removeAudio(); //多场景模式,不处理跨页面
+                 }
+             }
+
+         };
+
+         return out;
+     };
+
+     Xut.AudioManager = AudioManager();
+
+     /**
+      * 视频和网页模块（统一整合到VideoClass里面了）
+      * 这里有四种播放器:
+      *    1：基于html5原生实现的video标签 for ios
+      *    2：基于phoneGap插件实现的media  for android
+      *    3: 基于videoJS用flash实现的播放 for pc
+      *    4: 用于插入一个网页的webview
+      */
+
+     var VideoPlayer = null;
+     var noop$1 = function noop() {};
+     var supportVideo = function () {
+         var video = document.createElement('video'),
+             type = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+         return !!video.canPlayType && "probably" == video.canPlayType(type);
+     }();
+     var supportFlash = function () {
+         var i_flash = false;
+
+         if (navigator.plugins) {
+             for (var i = 0; i < navigator.plugins.length; i++) {
+                 if (navigator.plugins[i].name.toLowerCase().indexOf("shockwave flash") != -1) {
+                     i_flash = true;
+                 }
+             }
+         }
+         return i_flash;
+     }();
+     //移动端浏览器平台
+     if (Xut.plat.isBrowser) {
+         VideoPlayer = Video5;
+     } else {
+         //检测平台
+         if (Xut.plat.isIOS || top.EduStoreClient) {
+             //如果是ibooks模式
+             if (Xut.IBooks.Enabled) {
+                 VideoPlayer = VideoJS;
+             } else {
+                 //如果是ios或读酷pc版则使用html5播放
+                 VideoPlayer = Video5;
+             }
+         } else if (Xut.plat.isAndroid) {
+             //android平台
+             VideoPlayer = _Media$1;
+         }
+     }
+
+     /**
+      * @param {[type]} options   [description]
+      *   options.videoId;
+      *   options.pageId;
+      *   options.pageUrl;
+      *   options.left;
+      *   options.top;
+      *   options.width;
+      *   options.height;
+      *   options.padding;
+      *   options.category;
+      * @param {[type]} container 视频元素容器
+      */
+
+     function VideoClass(options, container) {
+         options.container = container;
+         if ('video' == options.category) {
+             this.video = VideoPlayer(options);
+         } else if ('webpage' == options.category) {
+             this.video = WebPage(options);
+         } else {
+             console.log('options.category must be video or webPage ');
+         }
+     }
+
+     VideoClass.prototype = {
+         play: function play() {
+             //隐藏工具栏
+             Xut.View.Toolbar("hide");
+             this.video.play();
+         },
+         stop: function stop() {
+             //显示工具栏
+             Xut.View.Toolbar("show");
+             this.video.stop();
+         },
+         close: function close() {
+             this.video.close();
+         }
+     };
+
+     // 网页
+     function WebPage(options) {
+
+         var pageUrl = options.pageUrl;
+
+         //跳转app市场
+         //普通网页是1 
+         //跳转app市场就是2
+         if (options.hyperlink == 2) {
+             //跳转到app市场
+             window.open(pageUrl);
+             //数据统计
+             $.get('http://www.appcarrier.cn/index.php/adplugin/recordads?aid=16&esbId=ios');
+         } else {
+
+             var padding = options.padding || 0,
+                 width = options.width,
+                 height = options.height,
+                 videoId = options.videoId,
+                 left = options.left,
+                 top = options.top,
+                 $videoNode,
+                 eleWidth,
+                 eleHeight;
+
+             if (padding) {
+                 eleWidth = width - 2 * padding;
+                 eleHeight = height - 2 * padding;
+             } else {
+                 eleWidth = width;
+                 eleHeight = height;
+             }
+
+             $videoNode = $('<div id="videoWrap_' + videoId + '" style="position:absolute;left:' + left + 'px;top:' + top + 'px;width:' + width + 'px;height:' + height + 'px;z-index:' + Xut.zIndexlevel() + '">' + '<div style="position:absolute;left:' + padding + 'px;top:' + padding + 'px;width:' + eleWidth + 'px;height:' + eleHeight + 'px;">' + '<iframe src="' + pageUrl + '" style="position:absolute;left:0;top:0;width:100%;height:100%;"></iframe>' + '</div>' + '</div>');
+
+             options.container.append($videoNode);
+         }
+
+         function play() {
+             $videoNode && $videoNode.show();
+         }
+
+         function stop() {
+             $videoNode && $videoNode.hide();
+         }
+
+         function close() {
+             if ($videoNode) {
+                 $videoNode.remove();
+                 $videoNode = null;
+             }
+         }
+
+         return {
+             play: play,
+             stop: stop,
+             close: close
+         };
+     }
+
+     /**
+      * 安卓phonegap播放器
+      * @param  {[type]} options [description]
+      * @return {[type]}         [description]
+      */
+     function _Media$1(options) {
+         var url = MMXCONFIG ? options.url : options.url.substring(0, options.url.lastIndexOf('.')),
+             width = options.width,
+             height = options.height,
+             top = options.top || 0,
+             left = options.left || 0;
+
+         function play() {
+             //var calculate = Xut.Config.proportion.calculateContainer();
+             //top += Math.ceil(calculate.top);
+             //left += Math.ceil(calculate.left);
+             Xut.Plugin.VideoPlayer.play(function () {
+                 //成功回调
+             }, function () {
+                 //失败回调
+             }, Xut.Config.videoPath() + url, 1, left, top, height, width);
+         }
+
+         function close() {
+             Xut.Plugin.VideoPlayer.close();
+         }
+
+         play();
+
+         return {
+             play: play,
+             stop: close,
+             close: close
+         };
+     }
+
+     /**
+      *   html5的video播放器
+      *   API :
+      *   play();播放
+      *   stop();    //停止播放并隐藏界面
+      *   destroy(); //清除元素节点及事件绑定
+      *  demo :
+      *  var video = new Video({url:'1.mp4',width:'320',...});
+      *  video.play();
+      */
+
+     function Video5(options) {
+
+         var container = options.container || $('body'),
+             url = Xut.Config.videoPath() + options.url,
+             width = options.width,
+             height = options.height,
+             top = options.top,
+             left = options.left,
+             zIndex = options.zIndex,
+
+         /*创建播放器*/
+         $videoWrap = $('<div></div>');
+
+         var $video = $(document.createElement('video'));
+
+         //音频对象
+         var video = $video[0];
+
+         video.play();
+
+         $video.css({
+             width: width,
+             height: height
+         }).attr({
+             'src': url,
+             'controls': 'controls',
+             'autoplay': 'autoplay'
+         });
+
+         $videoWrap.append($video).css({
+             position: 'absolute',
+             'z-index': -1,
+             top: top,
+             left: left,
+             width: 0,
+             height: 0
+         });
+
+         //播放
+         function play() {
+             $videoWrap.show();
+             video.play();
+         }
+
+         //停止
+         function stop() {
+             video.pause();
+             //复位视频
+             if (video.duration) {
+                 video.currentTime = 0.01;
+             }
+             //在全屏时无法隐藏元素,须先退出
+             //this.video.webkitExitFullScreen();
+             $videoWrap.hide();
+
+             //用于启动视频
+             if (options.startBoot) {
+                 options.startBoot();
+                 destroy();
+             }
+         }
+
+         function error() {
+             //用于启动视频
+             if (options.startBoot) {
+                 options.startBoot();
+                 destroy();
+             }
+         }
+
+         /**
+          * 防止播放错误时播放界面闪现
+          * @return {[type]} [description]
+          */
+         function start() {
+             $videoWrap.css({
+                 width: width + 'px',
+                 height: height + 'px',
+                 zIndex: zIndex
+             });
+         }
+
+         //销毁
+         function destroy() {
+             video.removeEventListener('ended', stop, false);
+             video.removeEventListener('error', error, false);
+             video.removeEventListener('loadeddata', start, false);
+             video.removeEventListener('webkitendfullscreen', stop, false);
+             $videoWrap.hide().remove();
+         }
+
+         container.append($videoWrap);
+
+         video.addEventListener('ended', stop, false);
+         video.addEventListener('error', error, false);
+         video.addEventListener('loadeddata', start, false);
+         video.addEventListener('webkitendfullscreen', stop, false);
+
+         return {
+             play: play,
+             stop: stop,
+             close: destroy
+         };
+     };
+
+     /**
+      * https://github.com/videojs/video.js/blob/master/docs/guides/setup.md
+      * 基于video.js的web播放器,在pc端flash优先
+      * @param {[type]} options [description]
+      */
+
+     function VideoJS(options) {
+         var container = options.container || $('body'),
+             videoId = options.videoId,
+             url = Xut.Config.videoPath() + options.url,
+             width = options.width,
+             height = options.height,
+             zIndex = options.zIndex,
+             top = options.top,
+             left = options.left,
+             video,
+             source,
+             player,
+             api;
+
+         video = document.createElement('video');
+         source = document.createElement('source');
+         source.setAttribute('src', url);
+         source.setAttribute('type', 'video/mp4');
+         video.id = 'video_' + videoId;
+         video.className = "video-js vjs-sublime-skin";
+         video.appendChild(source);
+         container.append(video);
+         //指定本地的swf地址取代网络地址
+         videojs.options.flash.swf = "lib/data/video-js.swf";
+
+         var clear = function clear() {
+             //结束后清理自己
+             Xut.VideoManager.removeVideo(options.pageId);
+         };
+
+         //videojs是videojs定义的全局函数
+         player = videojs(video, {
+             //视频引擎顺序,位置排前面的优先级越高
+             "techOrder": ["html5", "flash"],
+             //预加载
+             "preload": "auto",
+             //是否有控制条
+             "controls": true,
+             "autoplay": true,
+             "width": width,
+             "height": height,
+             //播放元素相关设置
+             children: {
+                 //暂停时是否显示大大的播放按钮
+                 bigPlayButton: false,
+                 //是否显示错误提示
+                 errorDisplay: false,
+                 //是否显示视频快照
+                 posterImage: false,
+                 //是否显示字幕
+                 textTrackDisplay: false
+             },
+             //控制条相关设置
+             controlBar: {
+                 //是否显示字幕按钮
+                 captionsButton: false,
+                 chaptersButton: false,
+                 liveDisplay: false,
+                 //是否显示剩余时间
+                 remainingTimeDisplay: false,
+                 //是否显示子标题按钮
+                 subtitlesButton: false,
+                 //是否显示回放菜单按钮
+                 playbackRateMenuButton: false,
+                 //是否显示时间分隔符"/"
+                 timeDivider: false,
+                 //是否显示当前视频的当前时间值
+                 currentTimeDisplay: false,
+                 //是否显示视频时长
+                 durationDisplay: false
+             }
+         }, function () {
+             //可以播放时提升层级，防止闪现
+             this.on('canplay', function () {
+                 wrap.style.zIndex = zIndex;
+             });
+
+             //播放完毕后自动关闭
+             this.on('ended', function () {
+                 //结束后清理自己
+                 clear();
+             });
+
+             this.on('error', function () {
+                 clear();
+             });
+
+             //因为没有关闭按钮,又不想自己做,就把全屏变成关闭好了.
+             this.on("touchend mouseup", function (e) {
+                 var className = e.target.className.toLowerCase();
+                 if (-1 != className.indexOf('vjs-fullscreen-control')) {
+                     clear();
+                 }
+             });
+         });
+
+         //修正视频样式
+         var wrap = player.el(),
+             videoElement = wrap.children[0];
+         wrap.style.left = left + 'px';
+         wrap.style.top = top + 'px';
+         wrap.style.zIndex = -1;
+
+         api = {
+             play: noop$1,
+
+             stop: function stop() {
+                 player.stop();
+             },
+
+             close: function close() {
+                 player && player.dispose();
+                 player = null;
+             }
+         };
+
+         return api;
+     }
+
+     Xut.Video5 = Video5;
+
+     Xut.Video = VideoClass;
+
+     /*
+         视频和远程网页管理模块
+     */
+
+     //综合管理video, webpage
+     function VideoManager() {
+         this.pageBox = {}; //当前页面包含的视频数据
+         this.playBox = {}; //播放过的视频数据 （播放集合）
+     }
+
+     /**
+      *  参数:
+      *    pageId    就是chapterId,对应每一个页面
+      *    videoId   对应每一个视频热点的ID
+      *    container 容器
+      */
+
+     VideoManager.prototype = {
+
+         //=============消息接口================
+         //
+
+         //自动播放
+         autoPlay: function autoPlay(pageId, activityId, container) {
+             this.initVideo.apply(this, arguments);
+         },
+
+         //手动播放
+         trigger: function trigger(pageId, activityId, container) {
+             this.initVideo.apply(this, arguments);
+         },
+
+         //=================视频调用===========================
+
+         //触发视频
+         initVideo: function initVideo(pageId, activityId, container) {
+             //解析数据
+             this.parseVideo(pageId, activityId);
+             //调用播放
+             this.loadVideo(pageId, activityId, container);
+         },
+
+         //=================视频数据处理===========================
+
+         //处理重复数据
+         // 1:pageBox能找到对应的 videoId
+         // 2:重新查询数据
+         parseVideo: function parseVideo(pageId, activityId) {
+             //复重
+             if (this.checkRepeat(pageId, activityId)) {
+                 return;
+             }
+             var data = Xut.data.query('Video', activityId);
+             //新的查询
+             this.deployVideo(data, pageId, activityId);
+         },
+
+         //检测数据是否存在
+         checkRepeat: function checkRepeat(pageId, activityId) {
+             var chapterData = this.pageBox[pageId];
+             //如果能在pageBox找到对应的数据
+             if (chapterData && chapterData[activityId]) {
+                 return true;
+             }
+             return false;
+         },
+
+         //配置视频结构
+         deployVideo: function deployVideo(data, pageId, activityId) {
+             var proportion = Xut.Config.proportion,
+                 screenSize = Xut.Config.screenSize,
+                 videoInfo = {
+                 'pageId': pageId,
+                 'videoId': activityId,
+                 'url': data.md5,
+                 'pageUrl': data.url,
+                 'left': data.left * proportion.left || 0,
+                 'top': data.top * proportion.top || 0,
+                 'width': data.width * proportion.width || screenSize.width,
+                 'height': data.height * proportion.height || screenSize.height,
+                 'padding': data.padding * proportion.left || 0,
+                 'zIndex': data.zIndex || 2147483647,
+                 'background': data.background,
+                 'category': data.category,
+                 'hyperlink': data.hyperlink
+             };
+
+             if (babelHelpers.typeof(this.pageBox[pageId]) != 'object') {
+                 this.pageBox[pageId] = {};
+             }
+
+             this.pageBox[pageId][activityId] = videoInfo;
+         },
+
+         //=================视频动作处理============================
+
+         //加载视频
+         loadVideo: function loadVideo(pageId, activityId, container) {
+             var playBox = this.playBox,
+                 data = this.pageBox[pageId][activityId];
+
+             //播放视频时停止所有的音频
+             //视频的同时肯能存在音频
+             // Xut.AudioManager.clearAudio();
+
+             //this.beforePlayVideo(pageId,videoId)
+             //search video cache
+             if (playBox[pageId] && playBox[pageId][activityId]) {
+                 //console.log('*********cache*********');
+                 playBox[pageId][activityId].play();
+             } else {
+                 //console.log('=========new=============');
+                 if (babelHelpers.typeof(playBox[pageId]) !== 'object') {
+                     playBox[pageId] = {};
+                 }
+                 //cache video object
+                 playBox[pageId][activityId] = new VideoClass(data, container);
+             }
+         },
+
+         //播放视频之前检查要停的视频
+         beforePlayVideo: function beforePlayVideo(pageId, activityId) {},
+
+         //清理移除页的视频
+         removeVideo: function removeVideo(pageId) {
+             var playBox = this.playBox,
+                 pageBox = this.pageBox;
+
+             //清理视频
+             if (playBox && playBox[pageId]) {
+                 for (var activityId in playBox[pageId]) {
+                     playBox[pageId][activityId].close();
+                 }
+                 delete this.playBox[pageId];
+             }
+             //清理数据
+             if (pageBox && pageBox[pageId]) {
+                 delete this.pageBox[pageId];
+             }
+         },
+
+         //清理全部视频
+         clearVideo: function clearVideo() {
+             var playBox = this.playBox,
+                 flag = false; //记录是否处理过销毁状态
+
+             for (var pageId in playBox) {
+                 for (var activityId in playBox[pageId]) {
+                     playBox[pageId][activityId].close();
+                     flag = true;
+                 }
+             }
+
+             this.playBox = {};
+             this.pageBox = {};
+             return flag;
+         },
+
+         //离开页面
+         leavePage: function leavePage(pageId) {
+             var playBox = this.playBox;
+             if (playBox && playBox[pageId]) {
+                 for (var activityId in playBox[pageId]) {
+                     playBox[pageId][activityId].stop();
+                 }
+             }
+         },
+
+         //显示按钮
+         showIconFlag: function showIconFlag(activityId) {},
+
+         //隐藏按钮
+         hideIconFlag: function hideIconFlag(activityId) {}
+     };
+
+     Xut.VideoManager = new VideoManager();
+
+     /**
       * 用css3实现的忙碌光标
       * @return {[type]} [description]
       */
@@ -1053,11 +2700,1870 @@
 
      Xut.sceneController = sceneControll;
 
-     function trigger() {}
-     function _autoRun() {}
-     function _suspend() {}
-     function _original() {}
-     function recovery() {}
+     /**
+      *
+      *  动作对象
+      *      1 跳转页面
+      *      2 打开系统程序
+      *      3 加载子文档
+      *
+      */
+
+     function Action$2(data) {
+
+         _.extend(this, data);
+
+         this.id = parseInt(this.id);
+
+         this.actType = this.type;
+
+         //加载数据
+         this.setup(Xut.data.query('Action', this.id, 'activityId'));
+     }
+
+     Action$2.prototype = {
+
+         setup: function setup(results) {
+             var para1 = results.para1,
+                 //跳转参数
+             para2 = results.para2,
+                 //ppt
+             dbId = results._id;
+
+             actionType = parseInt(results.actionType);
+
+             //跳转或打开本地程序
+             switch (actionType) {
+                 case 0:
+                     this.toPage(para1);
+                     break;
+                 case 1:
+                     if (Xut.plat.isBrowser) return;
+                     //打开插件
+                     Xut.Plugin.OpenApp.openAppAction(para1, function (r) {}, function (e) {});
+                     break;
+                 case 2:
+                     //子文档处理
+                     this.loadSubdoc(para1, dbId);
+                     break;
+             }
+
+             this.state = true;
+         },
+
+         open: function open() {
+             this.state = true;
+             //打开插件
+             Xut.Plugin.OpenApp.openAppAction(para1, function (r) {}, function (e) {});
+         },
+
+         //跳转页面
+         toPage: function toPage(para1) {
+             para1 = JSON.parse(para1);
+             if (para1.seasonId) {
+                 Xut.View.GotoSlide(para1.seasonId, para1.chapterId);
+             } else {
+                 //向下兼容
+                 Xut.View.GotoSlide(para1);
+             }
+         },
+
+         /***********************************************************
+          *
+          *                   子文档处理
+          *
+          * **********************************************************/
+
+         //加载子文档
+         loadSubdoc: function loadSubdoc(path, dbId) {
+             var self = this,
+                 wapper,
+                 configPath = 'www/content/subdoc/' + path + '/content/gallery/';
+
+             //配置子文档加载路径
+             window.XXTSUbDOC = {
+                 'path': path,
+                 'dbId': dbId
+             };
+
+             this.subPath = path;
+
+             //构建子文档的容器
+             wapper = this.$wapper = this.createWapper();
+
+             Xut.nextTick({
+                 'container': $(this.rootNode),
+                 'content': wapper
+             }, function () {
+                 self.destroyCache();
+             });
+         },
+
+         //iframe加载完毕
+         iframeComplete: function iframeComplete() {
+             var self = this;
+             //关闭事件
+             Xut.one('subdoc:dropApp', function () {
+                 self.destroyCache('iframe', self.iframe[0].contentWindow);
+             });
+             //隐藏全局工具栏
+             Xut.View.HideToolbar();
+             Xut.isRunSubDoc = true;
+             self.$wapper.css({
+                 'opacity': '1'
+             });
+         },
+
+         //获取iframe颞部window上下文
+         destroyCache: function destroyCache(contentWindow) {
+             var self = this,
+                 iframe;
+
+             if (contentWindow) {
+                 iframe = true;
+             } else {
+                 contentWindow = window;
+             }
+
+             function clear() {
+                 Xut.View.ShowToolbar();
+                 self.$wapper.remove();
+                 self.$wapper = null;
+                 self.iframe = null;
+                 self.rootNode = null;
+                 Xut.isRunSubDoc = false;
+             }
+
+             try {
+                 contentWindow.require("Dispatcher", function (c) {
+                     if (iframe) {
+                         //子文档操作
+                         if (c.stopHandles()) {
+                             c.promptMessage('再按一次将退出子目录！');
+                         } else {
+                             clear();
+                         }
+                     } else {
+                         //父级操作
+                         c.stopHandles();
+                     }
+                 });
+             } catch (err) {
+                 clear();
+             }
+         },
+
+         createWapper: function createWapper() {
+             var zIndex, str, dom, ifr;
+
+             //层级设定
+             if (this.zIndex === 0) {
+                 zIndex = this.zIndex;
+             } else {
+                 zIndex = this.zIndex || Xut.zIndexlevel();
+             }
+
+             this.zIndex = zIndex;
+
+             str = '<div id="Subdoc_{0}" style="z-index:{1};width:{2}px;height:{3}px;top:{4}px;left:{5}px;position:absolute;opacity:0" >' + '</div>';
+
+             dom = String.format(str, this.id, zIndex, this.screenSize.width, this.screenSize.height, 0, 0);
+
+             ifr = this.iframe = this.createIframe();
+
+             return $(dom).append(ifr);
+         },
+
+         /**
+          * 加载iframe
+          * @return {[type]} [description]
+          */
+         createIframe: function createIframe() {
+             var me = this,
+                 path = 'content/subdoc/' + this.subPath + '/index.html?xxtParaIn=' + this.key,
+                 ifr = document.createElement('iframe');
+
+             ifr.id = 'iframe_' + this.id;
+             ifr.src = path;
+             ifr.style.width = '100%';
+             ifr.style.height = '100%';
+             ifr.sandbox = "allow-scripts allow-same-origin";
+             ifr.frameborder = 0;
+             if (ifr.attachEvent) {
+                 ifr.attachEvent('onload', function () {
+                     me.iframeComplete();
+                 });
+             } else {
+                 ifr.onload = function () {
+                     me.iframeComplete();
+                 };
+             }
+
+             return $(ifr);
+         }
+     };
+
+     var Action$1 = {
+
+         createDom: function createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
+             var backgroundImage = '',
+
+             //等比缩放
+             width = activityData.scaleWidth,
+                 height = activityData.scaleHeight,
+                 top = activityData.scaleTop,
+                 left = activityData.scaleLeft;
+
+             var md5;
+
+             //热点背景图
+             if (md5 = activityData.md5) {
+                 backgroundImage = "background-image: url(" + Xut.onfig.pathAddress + md5 + ");";
+             }
+
+             //==============创建触发点结构=============
+             return String.format('<div id="{0}"' + ' data-belong = "{1}"' + ' data-delegate="Action"'
+             // +' autoplay="{2}" ' svg打包不可以属性
+              + ' style="cursor: pointer;width:{3}px;height:{4}px;left:{5}px;top:{6}px;background-size:100% 100%;position:absolute;z-index:{7};{8}"></div>', activityData.actType + "_" + activityData._id, pageType, activityData.autoPlay, width, height, left, top, zIndex, backgroundImage);
+         },
+
+         /**
+          * 是否阻止全局事件派发
+          * @type {Boolean}
+          *   false 事件由全局接管派发
+          *   false 事件由hotspot处理触发
+          *   全局提供的事件接口
+          *   {
+          *       globalTouchStart
+          *       globalTouchMove
+          *       globalTouchEnd
+          *   }
+          */
+         stopDelegate: false,
+
+         /**
+          * touchEnd 全局派发的点击事件
+          * 如果stopGlobalEvent == ture 事件由全局派发
+          */
+         eventDelegate: function eventDelegate(data) {
+             new Action$2(data);
+         },
+
+         //========复位对象==========
+         //
+         //  通过按物理键，关闭当前热点
+         //
+         //  @return 如果当前没有需要处理的Action,
+         //  需要返回一个状态标示告诉当前是否应该退出应用
+         //
+         recovery: function recovery(opts) {
+             if (this.state) {
+                 this.state = false;
+                 return true;
+             } else {
+                 return false;
+             }
+         }
+     };
+
+     /**
+      * 文本类型
+      */
+
+     var Content = {
+
+         //==========创建热点元素结构（用于布局可触发点）===============
+         //
+         //   预创建
+         //
+         createDom: function createDom(opts) {
+             var sqlRet = opts.sqlRet,
+                 pageIndex = opts.pageIndex;
+             return function (rootEle, pageIndex) {
+                 sqlRet['container'] = rootEle || opts.rootEle;
+                 return sqlRet;
+             };
+         },
+
+         /**
+          * 绑定热点事件
+          * 用户交互动作产生Action或者widget对象
+          */
+         bindEvent: function bindEvent() {},
+
+         /**
+          * 在当前页面自动触发的通知
+          *
+          * 作用：
+          *   生成Action或者widget触发点对象
+          *
+          * 有一种情况，如果当前Action对象，已存在必须要做重复处理
+          *
+          * Xut.ActionMgr.getOne(key) 接口，是获取当前是否有实例对象的引用
+          *
+          */
+         autoPlay: function autoPlay(scopeComplete) {
+             return this.autoPlay && this.autoPlay(scopeComplete);
+         },
+
+         /**
+          * 开始翻页
+          *
+          * 滑动页面的时候触发
+          *
+          * 处理要关闭的对象
+          *
+          * 比如（音频，视频），不能停留到下一个页面,滑动必须立刻关闭或者清理销毁
+          *
+          * @param  {[type]} this  当前活动对象
+          *
+          */
+         flipOver: function flipOver() {
+             return this.flipOver();
+         },
+
+         /**
+          * 翻页完成
+          * @return {[type]} [description]
+          */
+         flipComplete: function flipComplete() {
+             return this.flipComplete();
+         },
+
+         /**
+          * 销毁接口
+          *
+          * 1 销毁页面绑定的事件
+          *   A hotspotBind 接口绑定的的热点触发事件
+          *   B autoPlay 等接口 产生的具体Action对象事件
+          *
+          * 2 销毁热点元素的在控制器中的引用
+          *
+          * 3 清理页面结构
+          *
+          * 注：
+          *   2,3操作暂时由控制器已经内部统一完成了,暂时只需要处理1销毁绑定的事件
+          *
+          * @param  {[type]} pageIndex    [页码标示]
+          * @param  {[type]} rootEle      [根元素]
+          * @return {[type]}              [description]
+          */
+         destroy: function destroy() {
+             return this.destroy();
+         },
+
+         /**
+          *  复位状态通知
+          *
+          *  作用：用户按页面右上角返回，或者pad手机上的物理返回键
+          *
+          *  那么：
+          *      1 按一次， 如果当前页面有活动热点，并且热点对象还在可视活动状态（比如文本，是显示，音频正在播放）
+          *        那么则调用此方法，做复位处理，即文本隐藏，音频关闭
+          *        然后返回true, 用于反馈给控制器,停止下一步调用
+          *        按第二次,则退出页面
+          *
+          *     2 按一次，如果没有活动的对象，return false,这直接退出页面
+          *
+          * @param  {[type]} activeObejct [description]
+          * @return {[type]}              [description]
+          */
+         recovery: function recovery(opts) {
+             return this.recovery && this.recovery();
+         }
+
+     };
+
+     //临时音频动作数据
+     var tempData = {};
+
+     var Media = {
+
+         createDom: function createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
+             var width = activityData.scaleWidth,
+                 height = activityData.scaleHeight,
+                 top = activityData.scaleTop,
+                 left = activityData.scaleLeft,
+                 actType = activityData.actType,
+                 id = activityData._id;
+
+             //如果没有宽高则不创建绑定节点
+             if (!width || !height) return '';
+
+             var category = activityData.category;
+             var mediaIcon,
+                 mediaIconSize,
+                 posX,
+                 posY,
+                 start,
+                 stop,
+                 itemArray,
+                 startImage = "";
+
+             var screenSize = Xut.config.screenSize;
+
+             //只针对网页插件增加单独的点击界面
+             if (category == 'webpage' && width > 200 && height > 100 && width <= screenSize.width && height <= screenSize.height) {
+                 mediaIcon = 'background-image:url(images/icons/web_hotspot.png)';
+             }
+
+             //解析音乐动作
+             //冒泡动作靠节点传递数据
+             if (itemArray = activityData.itemArray) {
+                 itemArray = parseJSON(itemArray);
+                 start = itemArray[0];
+                 stop = itemArray[1];
+                 tempData[id] = {};
+                 if (start) {
+                     if (start.startImg) {
+                         startImage = start.startImg;
+                         tempData[id]['startImg'] = startImage;
+                         startImage = 'background-image:url(' + startImage + ');';
+                     }
+                     if (start.script) {
+                         tempData[id]['startScript'] = start.script;
+                     }
+                 }
+                 if (stop) {
+                     if (stop.stopImg) {
+                         tempData[id]['stopImg'] = stop.stopImg;
+                     }
+                     if (stop.script) {
+                         tempData[id]['stopScript'] = stop.script;
+                     }
+                 }
+             }
+
+             //首字母大写
+             var mediaType = category.replace(/(\w)/, function (v) {
+                 return v.toUpperCase();
+             });
+
+             //创建音频对象
+             //Webpage_1
+             //Audio_1
+             //Video_1
+             var tpl = String.format('<div id="{0}"' + ' data-belong="{1}"' + ' data-delegate="{2}"' + ' style="width:{3}px;height:{4}px;left:{5}px;top:{6}px;z-index:{7};{8}background-size:100% 100%;position:absolute;">', mediaType + "_" + id, pageType, category, width, height, left, top, zIndex, startImage);
+
+             //如果有视频图标
+             if (mediaIcon) {
+                 mediaIconSize = 74;
+                 posX = (width - mediaIconSize) / 2;
+                 posY = (height - mediaIconSize) / 2;
+
+                 tpl += String.format('<div id="icon_{0}"' + ' type="icon"' + ' style="position:absolute;top:{1}px;left:{2}px;width:{3}px;height:{4}px;{5};">' + ' </div>', id, posY, posX, mediaIconSize, mediaIconSize, mediaIcon);
+             }
+
+             tpl += '</div>';
+
+             return tpl;
+         },
+
+         //仅创建一次
+         //data传递参数问题
+         onlyCreateOnce: function onlyCreateOnce(id) {
+             var data;
+             if (data = tempData[id]) {
+                 delete tempData[id];
+                 return data;
+             }
+         },
+
+         /**
+          * touchEnd 全局派发的点击事件
+          * 如果stopGlobalEvent == ture 事件由全局派发
+          */
+         eventDelegate: function eventDelegate(data) {
+             var category, chapterId;
+             if (category = data.target.getAttribute('data-delegate')) {
+                 //触发类型
+                 chapterId = Xut.Presentation.GetPageId(data.pageIndex);
+                 /**
+                  * 传入chapterId 页面ID
+                  * activityId    视频ID
+                  * eleName       节点名  //切换控制
+                  * 根节点
+                  */
+                 if (category == 'audio') {
+                     Xut.AudioManager.trigger(chapterId, data.activityId, this.onlyCreateOnce(data.id));
+                 } else {
+                     Xut.VideoManager.trigger(chapterId, data.activityId, $(data.rootNode));
+                 }
+             }
+         },
+
+         //自动运行
+         autoPlay: function autoPlay(data) {
+             var category = data.category;
+             if (!category) return;
+             var rootNode = data.rootNode,
+                 pageIndex = data.pageIndex,
+                 chapterId = data.chapterId,
+                 activityId = data.id,
+                 triggerType = category == 'audio' ? 'audioManager' : 'videoManager';
+
+             //数据库视频音频不规则问题导致
+             //首字母大写
+             var mediaType = category.replace(/(\w)/, function (v) {
+                 return v.toUpperCase();
+             });
+
+             //自动音频
+             if (category == 'audio') {
+                 Xut.AudioManager.autoPlay(chapterId, activityId, this.onlyCreateOnce(data.id));
+             } else {
+                 //自动视频
+                 Xut.VideoManager.autoPlay(chapterId, activityId, rootNode);
+             }
+         }
+
+     };
+
+     /**
+      * 创建iframe零件包装器
+      */
+
+     function iframeWidget(data) {
+
+         var self = this;
+
+         //获取数据
+         _.extend(this, data);
+
+         //创建页面零件包装器
+         this.$wapper = this.createWapper();
+
+         Xut.nextTick({
+             'container': self.rootNode,
+             'content': this.$wapper
+         }, function () {
+             self.rootNode = null;
+             self.bindPMS();
+         });
+
+         return this;
+     }
+
+     iframeWidget.prototype = {
+
+         /**
+          * 创建包含容器
+          * @return {[type]} [description]
+          */
+         createWapper: function createWapper() {
+             var zIndex, str, dom, ifr;
+
+             //层级设定
+             if (this.zIndex === 0) {
+                 zIndex = this.zIndex;
+             } else {
+                 zIndex = this.zIndex || Xut.zIndexlevel();
+             }
+
+             this.zIndex = zIndex;
+
+             str = '<div id="iframeWidget_{0}" style="z-index:{1};width:{2}px;height:{3}px;top:{4}px;left:{5}px;position:absolute;" ></div>';
+
+             dom = String.format(str, this.id, zIndex, this.width, this.height, this.top, this.left);
+
+             ifr = this.createIframe();
+
+             this._iframe = ifr;
+
+             return $(dom).append(ifr);
+         },
+
+         /**
+          * 加载iframe
+          * @return {[type]} [description]
+          */
+         createIframe: function createIframe() {
+             var me = this,
+                 path = 'content/widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key,
+                 ifr = document.createElement('iframe');
+
+             ifr.id = 'iframe_' + this.id;
+             ifr.src = path;
+             ifr.style.width = '100%';
+             ifr.style.height = '100%';
+             ifr.sandbox = "allow-scripts allow-same-origin";
+             ifr.frameborder = 0;
+             if (ifr.attachEvent) {
+                 ifr.attachEvent('onload', function () {
+                     me.iframeComplete();
+                 });
+             } else {
+                 ifr.onload = function () {
+                     me.iframeComplete();
+                 };
+             }
+             return ifr;
+         },
+
+         /**
+          * iframe加载完毕回调
+          * @return {[type]} [description]
+          */
+         iframeComplete: function iframeComplete() {
+             var me = this;
+             var dataSource = this.loadData();
+             var width = me._iframe.offsetWidth;
+             var height = me._iframe.offsetHeight;
+
+             if (dataSource.screenSize.width * 0.98 <= width && dataSource.screenSize.height * 0.98 <= height) {
+                 Xut.View.Toolbar({
+                     show: 'button',
+                     hide: 'controlBar'
+                 });
+             } else if (dataSource.screenSize.width * 0.7 <= width && dataSource.screenSize.height * 0.7 <= height) {
+                 Xut.View.Toolbar({
+                     show: 'button'
+                 });
+             }
+
+             this.PMS.send({
+                 target: me._iframe.contentWindow,
+                 origin: '*',
+                 type: 'loadData',
+                 data: dataSource,
+                 //消息传递完毕后的回调
+                 success: success,
+                 error: function error() {}
+             });
+
+             function success() {}
+             // console.log('完毕')
+
+
+             //iframe加载的状态
+             me.state = true;
+         },
+
+         /**
+          * ifarme内部，请求返回数据
+          * @return {[type]} [description]
+          */
+         loadData: function loadData() {
+             var item,
+                 field,
+                 source_export = [],
+                 images = Xut.data['Image'],
+                 token = null,
+                 outputPara = this.inputPara,
+                 items = outputPara.source;
+
+             for (item in items) {
+                 if (items.hasOwnProperty(item)) {
+                     field = {};
+                     token = images.item((parseInt(items[item]) || 1) - 1);
+                     field['img'] = '../gallery/' + token.md5;
+                     field['thumb'] = '';
+                     field['title'] = token.imageTitle;
+                     source_export.push(field);
+                 }
+             }
+
+             outputPara.source = source_export;
+
+             return outputPara;
+         },
+
+         /********************************************************************
+          *
+          *                   与iframe通讯接口
+          *
+          * ********************************************************************/
+
+         /**
+          * 与iframe通讯接口
+          * @return {[type]} [description]
+          */
+         bindPMS: function bindPMS() {
+             var me = this,
+                 PMS = PMS || require("PMS"),
+                 markId = this.id;
+
+             this.PMS = PMS;
+             //隐藏widget
+             PMS.bind("onHideWapper" + markId, function (e) {
+                 var $wapper = me.$wapper;
+                 $wapper.hide();
+                 me.state = false;
+             }, '*');
+
+             //全屏操作
+             PMS.bind("onFullscreen" + markId, function (e) {
+                 var $wapper = me.$wapper,
+                     $iframe = $(me._iframe);
+
+                 if (!$iframe.length) return;
+                 //关闭视频
+                 Xut.VideoManager.clearVideo();
+
+                 $wapper.css({
+                     width: '100%',
+                     height: '100%',
+                     zIndex: Xut.zIndexlevel(),
+                     top: 0,
+                     left: 0
+                 });
+
+                 //Widget全屏尺寸自动调整
+                 if (e.full == false) {
+                     var body = document.body,
+                         width = parseInt(body.clientWidth),
+                         height = parseInt(body.clientHeight),
+                         rote = me.width / me.height,
+                         getRote = function getRote(width, height, rote) {
+                         var w = width,
+                             h = width / rote;
+                         if (h > height) {
+                             h = height;
+                             w = h * rote;
+                         }
+                         return {
+                             w: parseInt(w),
+                             h: parseInt(h)
+                         };
+                     },
+                         size = getRote(width, height, rote),
+                         left = (width - size.w) / 2,
+                         top = (height - size.h) / 2;
+
+                     $iframe.css({
+                         width: size.w,
+                         height: size.h,
+                         position: 'absolute',
+                         top: top,
+                         left: left
+                     });
+                 }
+                 //隐藏工作条
+                 Xut.View.Toolbar("hide");
+             }, '*');
+
+             //还原初始窗口操作
+             PMS.bind("onReset" + markId, function (e) {
+                 var $wapper = me.$wapper,
+                     $iframe = $(me._iframe);
+
+                 if (!$iframe.length) return;
+
+                 $wapper.css({
+                     zIndex: me.zIndex,
+                     width: me.width + 'px',
+                     height: me.height + 'px',
+                     top: me.top + 'px',
+                     left: me.left + 'px'
+                 });
+
+                 //还原iframe样式
+                 $iframe.css({
+                     width: '100%',
+                     height: '100%',
+                     position: '',
+                     top: '0',
+                     left: '0'
+                 });
+
+                 Xut.View.Toolbar("show");
+             }, '*');
+
+             //显示工作条
+             PMS.bind("onShowToolbar" + markId, function (e) {
+                 // Xut.View.ShowToolbar();
+             }, '*');
+
+             //隐藏工作条
+             PMS.bind("onHideToolbar" + markId, function (e) {
+                 Xut.View.HideToolbar();
+             }, '*');
+
+             //跳转页面
+             PMS.bind('scrollToPage' + markId, function (data) {
+                 Xut.View.GotoSlide(data['ppts'], data['pageIndex']);
+             }, '*');
+         },
+
+         //=============外部调用接口===================
+
+         /**
+          * 外部调用接口
+          * 显示隐藏
+          * @return {[type]} [description]
+          */
+         dispatchProcess: function dispatchProcess() {
+             if (this.state) {
+                 this.stop();
+             } else {
+                 this.start();
+             }
+         },
+
+         /**
+          * 开始
+          * @return {[type]} [description]
+          */
+         start: function start() {
+             var me = this;
+             me.domWapper();
+             this.PMS.send({
+                 target: me._iframe.contentWindow,
+                 url: me._iframe.src,
+                 origin: '*',
+                 type: 'onShow',
+                 success: function success() {
+                     // alert(123)
+                 }
+             });
+             setTimeout(function () {
+                 me.state = true;
+             }, 0);
+         },
+
+         /**
+          * 暂停
+          * @return {[type]} [description]
+          */
+         stop: function stop() {
+             var me = this;
+             me.domWapper();
+             this.PMS.send({
+                 target: me._iframe.contentWindow,
+                 url: me._iframe.src,
+                 origin: '*',
+                 type: 'onHide',
+                 success: function success() {}
+             });
+             setTimeout(function () {
+                 me.state = false;
+             }, 0);
+         },
+
+         /**
+          * 处理包装容器的状态
+          * @return {[type]} [description]
+          */
+         domWapper: function domWapper() {
+             if (this.state) {
+                 this.$wapper.hide();
+             } else {
+                 this.$wapper.show();
+             }
+         },
+
+         //复位
+         recovery: function recovery() {
+             var me = this;
+             if (me.state) {
+                 me.PMS.send({
+                     target: me._iframe.contentWindow,
+                     url: me._iframe.src,
+                     origin: '*',
+                     type: 'onHide',
+                     success: function success() {}
+                 });
+                 me.domWapper();
+                 me.state = false;
+                 return true;
+             }
+             return false;
+         },
+
+         //销毁接口
+         destroy: function destroy() {
+
+             var me = this,
+                 iframe = this._iframe,
+                 PMS = this.PMS;
+
+             //销毁内部事件
+             PMS.send({
+                 target: iframe.contentWindow,
+                 url: iframe.src,
+                 origin: '*',
+                 type: 'onDestory',
+                 success: function success() {}
+             });
+
+             //销毁事件绑定
+             PMS.unbind();
+
+             //销魂节点
+             setTimeout(function () {
+                 me._iframe = null;
+                 me.$wapper.remove();
+                 me.$wapper = null;
+             }, 0);
+         }
+
+     };
+
+     /**
+      * 页面零件
+      * @param {[type]} data [description]
+      */
+     function pageWidget(data) {
+
+         //获取数据
+         _.extend(this, data);
+
+         this._widgetObj = null;
+
+         var widgetName = this.widgetName + "Widget";
+
+         //加载文件
+         if (typeof window[this.widgetName + "Widget"] != "function") {
+             this.loadfile(this.executive);
+         } else {
+             this.executive();
+         }
+     }
+
+     pageWidget.prototype = {
+
+         /**
+          * 路径地址
+          * @param  {[type]} name [description]
+          * @return {[type]}      [description]
+          */
+         path: function path(fileName) {
+             return 'content/widget/' + this.widgetId + '/' + fileName;
+         },
+
+         /**
+          * 加载js,css文件
+          * @return {[type]} [description]
+          */
+         loadfile: function loadfile(callback) {
+             var jsPath,
+                 cssPath,
+                 completeCount,
+                 self = this,
+
+             //定义css,js的命名
+             jsName = this.widgetName + '.min.js',
+                 cssName = this.widgetType == 'page' || this.widgetType == 'js' ? 'style.min.css' : 0,
+
+             //需要等待完成
+             completeCount = function () {
+                 var count = 0;
+                 jsName && count++;
+                 cssName && count++;
+                 return function () {
+                     if (count === 1) {
+                         return callback && callback.call(self);
+                     }
+                     count--;
+                 };
+             }();
+
+             //加载css
+             if (cssName) {
+                 cssPath = this.path(cssName);
+                 _loadfile(cssPath, function () {
+                     completeCount();
+                 });
+             }
+
+             //加载js
+             if (jsName) {
+                 jsPath = this.path(jsName);
+                 _loadfile(jsPath, function () {
+                     completeCount();
+                 });
+             }
+         },
+
+         /**
+          * 创建数据
+          * @return {[type]} [description]
+          */
+         createData: function createData() {
+             var item,
+                 field,
+                 source_export = [],
+                 images = Xut.data['Image'],
+                 token = null,
+                 outputPara = this.inputPara,
+                 items = outputPara.source;
+
+             for (item in items) {
+                 if (items.hasOwnProperty(item)) {
+
+                     field = {};
+                     token = images.item((parseInt(items[item]) || 1) - 1);
+                     field['img'] = token.md5;
+                     field['thumb'] = '';
+                     field['title'] = token.imageTitle;
+                     source_export.push(field);
+                 }
+             }
+
+             outputPara.source = source_export;
+             outputPara.scrollPaintingMode = this.scrollPaintingMode;
+             outputPara.calculate = this.calculate;
+
+             return outputPara;
+         },
+
+         /**
+          * 解析数据,获取content对象
+          * @return {[type]} [description]
+          */
+         parseContentObjs: function parseContentObjs() {
+             var contentIds = [],
+                 inputPara = this.inputPara;
+             inputPara.content && _.each(inputPara.content, function (contentId) {
+                 contentIds.push(contentId);
+             });
+             return Xut.Contents.GetpageWidgetData(this.pageType, contentIds);
+         },
+
+         /**
+          * 执行函数
+          * @return {[type]} [description]
+          */
+         executive: function executive() {
+             //得到content对象与数据
+             var data = this.createData();
+             var contentObjs = this.parseContentObjs();
+             if (this.widgetType == 'canvas') {
+                 var id = contentObjs ? contentObjs[0].id : data.frame;
+                 var canvasId = "pageWidget_" + id;
+                 var canvansContent = $("#" + data.contentPrefix + id);
+                 if ($("#" + canvasId).length < 1) {
+                     canvansContent.append("<canvas style='position:absolute; z-index:10' id='" + canvasId + "' width='" + canvansContent.width() + "' height='" + canvansContent.height() + "'></canvas>");
+                 }
+                 canvansContent.canvasId = canvasId;
+             }
+             if (typeof window[this.widgetName + "Widget"] == "function") this._widgetObj = new window[this.widgetName + "Widget"](data, contentObjs);else console.error("Function [" + this.widgetName + "Widget] does not exist.");
+         },
+
+         //================ 外部调用 =====================
+
+         play: function play() {
+             console.log('widget');
+             return this._widgetObj.play();
+         },
+
+         getIdName: function getIdName() {
+             return this._widgetObj.getIdName();
+         },
+
+         /**
+          * 外部调用接口
+          * @return {[type]} [description]
+          */
+         dispatchProcess: function dispatchProcess() {
+             this._widgetObj.toggle();
+         },
+
+         /**
+          * 处理包装容器的状态
+          * @return {[type]} [description]
+          */
+         domWapper: function domWapper() {
+             if (!this.wapper) return;
+             if (this.state) {
+                 this.$wapper.hide();
+             } else {
+                 this.$wapper.show();
+             }
+         },
+
+         /**
+          * 销毁页面零件
+          * @return {[type]} [description]
+          */
+         destroy: function destroy() {
+             console.log(222222);
+             if (this._widgetObj && this._widgetObj.destroy) this._widgetObj.destroy();
+         }
+     };
+
+     var proportion = void 0;
+     var screenSize$1 = void 0;
+     var appId = void 0;
+
+     function loadWidget(type, data, widgetClass) {
+         //pixi webgl模式
+         //2016.4.14
+         //高级精灵动画
+         var pageObj = Xut.Presentation.GetPageObj(data.pageType, data.pageIndex);
+         if (pageObj) {
+             if (pageObj.canvasRelated.enable) {
+                 //高级精灵动画不处理
+                 //已经改成本地化pixi=>content调用了
+                 if (data.widgetName === "spirit") {
+                     return;
+                 }
+             }
+         }
+
+         var widgetObj = new widgetClass(data);
+
+         //特殊的零件，也是只加载脚本
+         if (data.widgetName != "bones") {
+             //保存引用
+             //特殊的2个个零件不保存
+             Xut.Application.injectionComponent({
+                 'pageType': data.pageType, //标记类型区分
+                 'pageIndex': data.pageIndex,
+                 'widget': widgetObj
+             });
+         }
+     }
+
+     /**
+      * 构建5中零件类型
+      * 	1、iframe零件
+      *	2、页面零件
+      *	3、SVG零件
+      *	4、canvas零件
+      *	5、webGL零件
+      * @type {Object}
+      */
+     var adapterType = {
+
+         /**
+          * iframe零件类型
+          * @param  {[type]} data [description]
+          * @return {[type]}      [description]
+          */
+         'iframe': function iframe(data) {
+             loadWidget('widget', data, iframeWidget);
+         },
+         'widget': function widget(data) {
+             loadWidget('widget', data, iframeWidget);
+         },
+
+         /**
+          * js零件类型处理
+          * @param  {[type]} data [description]
+          * @return {[type]}      [description]
+          */
+         'js': function js(data) {
+             loadWidget('js', data, pageWidget);
+         },
+         'page': function page(data) {
+             loadWidget('page', data, pageWidget);
+         },
+         'svg': function svg(data) {
+             loadWidget('svg', data, pageWidget);
+         },
+         'canvas': function canvas(data) {
+             loadWidget('canvas', data, pageWidget);
+         },
+         'webgL': function webgL(data) {
+             loadWidget('webgL', data, pageWidget);
+         }
+     };
+
+     /**
+      * 获取widget数据
+      * @return {[type]} [description]
+      */
+     function filtrateDas(data) {
+         data = filterData(data);
+         return proportion.calculateElement(data);
+     }
+
+     /**
+      * 过滤出数据
+      * @return {[type]} [description]
+      */
+     function filterData(data) {
+         //直接通过id查询数据	
+         if (data.widgetId) {
+             _.extend(data, Xut.data.query('Widget', data.widgetId));
+         } else {
+             //直接通过activityId查询数据	
+             _.extend(data, Xut.data.query('Widget', data.activityId, 'activityId'));
+         }
+         return data;
+     }
+
+     /**
+      * 解析json数据
+      * @param  {[type]} itemArray [description]
+      * @return {[type]}           [description]
+      */
+     function ParseJSON(itemArray) {
+         var anminJson;
+         try {
+             anminJson = JSON.parse(itemArray);
+         } catch (error) {
+             anminJson = new Function("return " + itemArray)();
+         }
+         return anminJson;
+     }
+
+     /**
+      * ifarme内部，请求返回数据
+      * @return {[type]} [description]
+      */
+     function parsePara(data) {
+         var inputPara, //输入数据
+         outputPara; //输出数据
+         if (inputPara = data.inputPara) {
+             outputPara = ParseJSON(inputPara);
+         }
+         return outputPara;
+     }
+
+     function Adapter(para) {
+
+         config = Xut.config;
+         proportion = config.proportion;
+         screenSize$1 = config.screenSize;
+         appId = config.appId;
+
+         //获取数据
+         var data = filtrateDas(para);
+
+         para = null;
+
+         data.id = data.activityId;
+
+         //解析数据
+         data.inputPara = parsePara(data);
+
+         if (!data.inputPara) {
+             data.inputPara = {};
+         }
+
+         //增加属性参数
+         if (data.widgetType === 'page') {
+             data.inputPara.container = data.rootNode;
+         }
+
+         data.inputPara.uuid = appId + '-' + data.activityId; //唯一ID标示
+         data.inputPara.id = data.activityId;
+         data.inputPara.screenSize = screenSize$1;
+         //content的命名前缀
+         data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType);
+
+         //画轴模式
+         data.scrollPaintingMode = config.scrollPaintingMode;
+         data.calculate = config.proportion.calculateContainer();
+
+         //执行类构建
+         adapterType[(data.widgetType || 'widget').toLowerCase()](data);
+     }
+
+     var Widget = {
+         //==========创建热点元素结构（用于布局可触发点）===============
+         //
+         // 根据数据创建自己的热点元素结构（用于拼接结构字符串）
+         //
+         // 要retrun返回这个结构，主要是多人操作时,保证只有最终的dom渲染只有一次
+         //
+         // sqlRet    具体动作对象的数据
+         // pageData  当前页面数据
+         // chaperId  当前页面的chapterId
+         // pageIndex 当前页面索引号
+         // zIndex    热点元素的层级
+         //
+         createDom: function createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
+             var retStr = '',
+                 layerId,
+                 cssStyle,
+                 autoPlay = activityData.autoPlay;
+
+             //如果是自动播放,则不创建结构
+             if (autoPlay) {
+                 return retStr;
+             }
+
+             var backgroundImage = '',
+                 width = activityData.scaleWidth,
+                 height = activityData.scaleHeight,
+                 top = activityData.scaleTop,
+                 left = activityData.scaleLeft,
+                 actType = activityData.actType,
+                 md5 = activityData.md5;
+
+             //热点背景图
+             if (md5) {
+                 backgroundImage = "background-image: url(" + Xut.config.pathAddress + md5 + ");";
+             }
+
+             //创建触发点结构
+             layerId = actType + "_" + activityData._id;
+             cssStyle = 'cursor: pointer;width:' + width + 'px;height:' + height + 'px;left:' + left + 'px;top:' + top + 'px;background-size:100% 100%;position:absolute;z-index:' + zIndex + ';' + backgroundImage + '';
+
+             return String.format('<div id="{0}"' + ' data-belong ="{1}"' + ' data-delegate="{2}"'
+             // +' autoplay="{3}"' svg打包不可以属性
+              + ' style="{4}">' + ' </div>', layerId, pageType, actType, autoPlay, cssStyle);
+         },
+
+         //事件委托
+         //通过点击触发
+         eventDelegate: function eventDelegate(data) {
+             return Adapter(data);
+         },
+
+         //在当前页面自动触发的通知
+         autoPlay: function autoPlay(data) {
+             Adapter({
+                 'rootNode': data.rootNode,
+                 "type": data.type,
+                 "pageType": data.pageType,
+                 "activityId": data.id,
+                 "pageIndex": data.pageIndex,
+                 "isAutoPlay": true
+             });
+         },
+
+         /**
+          *  复位状态通知
+          *
+          *  作用：用户按页面右上角返回，或者pad手机上的物理返回键
+          *
+          *  那么：
+          *      1 按一次， 如果当前页面有活动热点，并且热点对象还在可视活动状态（比如文本，是显示，音频正在播放）
+          *        那么则调用此方法，做复位处理，即文本隐藏，音频关闭
+          *        然后返回true, 用于反馈给控制器,停止下一步调用
+          *        按第二次,则退出页面
+          *
+          *     2 按一次，如果没有活动的对象，return false,这直接退出页面
+          *
+          * @param  {[type]} activeObejct [description]
+          * @return {[type]}              [description]
+          */
+         recovery: function recovery(opts) {
+             return this.recovery();
+         }
+     };
+
+     // *  iscroll 控制
+     // *    传入dom ID
+     // *     [onIscroll description]
+     // * @param  {[type]} contentWrapperDomId [description]
+     // * @return {[type]}                     [description]
+
+     function createIscroll(element) {
+          //是否移动，中途停止了动画
+          var distX = 0,
+              distY = 0,
+              startX,
+              startY,
+              absDistY,
+              absDistX,
+              iscroll,
+              that = this,
+              screenWidth = Xut.config.screenSize.width,
+              useswipeleft = function useswipeleft() {
+               Xut.View.GotoPrevSlide();
+          },
+              useswiperight = function useswiperight() {
+               Xut.View.GotoNextSlide();
+          };
+
+          this.iscroll = iscroll = new iScroll(element, {
+               scrollbars: true,
+               fadeScrollbars: true
+               //click          : true,
+               //tap            : true,
+               //probeType      : 2
+          });
+
+          // this.iscroll.on('scrollStart', function() {
+          //     iscroll.initDirection = false; //初始化一次滑动方向
+          // });
+          // this.iscroll.on('scrollEnd', function(e) {
+          //     //如果是Y轴滑动者不作处理跳过
+          //     if (iscroll.initDirection) {
+          //          startY= startX=distX = distY = 0;
+          //         iscroll.startTime = 0;
+          //         iscroll.initDirection = false;
+          //         return;
+          //     }
+
+          //     var duration, deltaX, validSlide, distance;
+          //     //滑动的距离、
+
+          //     deltaX = distX || 0;
+          //     duration = +new Date - iscroll.startTime;
+          //     distance = Math.abs(deltaX);
+          //     //反弹的边界值
+          //     validSlide = Math.ceil(screenWidth / 5);
+          //     if (distance < validSlide) {
+          //         //快速滑动允许翻页
+          //         if (duration < 200 && distance > 20) {
+          //             iscroll.swipe = true;
+          //             deltaX > 0 ? useswipeleft() : useswiperight();
+          //         } else {
+          //             //反弹
+          //             Xut.View.MovePage(0, 300, deltaX > 0 ? 'prev' : 'next', 'flipRebound')
+          //         }
+          //     } else {
+          //         iscroll.swipe = true;
+          //         deltaX > 0 ? useswipeleft() : useswiperight();
+          //     }
+          //    startY= startX=distX = distY = 0;
+          //     iscroll.startTime = 0;
+          //     iscroll.initDirection = false;
+          // });
+          // this.iscroll.on('scroll', function(e) {
+          //     startX=startX||e.pageX;
+          //     startY=startY||e.pageY;
+
+          //     distX =e.pageX-startX;
+          //     distY = e.pageY-startY;
+
+          //     absDistX = Math.abs(distX);
+          //     absDistY = Math.abs(distY);
+
+          //     iscroll.startTime = iscroll.startTime || e.timeStamp;
+          //     if (absDistY * 1.5 > absDistX) {
+          //           //如果是Y轴滑动则做标记不作处理
+          //         iscroll.initDirection = true;
+          //     } else {
+          //         Xut.View.MovePage(distX, 0, distX > 0 ? 'prev' : 'next', 'flipMove');
+          //         iscroll.initDirection = false
+          //     }
+          // });
+     }
+
+     function ShowNote$1(data) {
+         data.id = parseInt(data.id);
+         data.actType = data.type;
+         _.extend(this, data);
+         this.setup();
+     }
+
+     ShowNote$1.prototype = {
+         setup: function setup() {
+             var that = this,
+                 note = this.data.note,
+                 prop = Xut.config.proportion,
+                 width = Math.round((prop.width + prop.height) / 2 * Xut.config.iconHeight),
+                 space = Math.round(width / 2);
+             retStr = '<div class="xut-shownote-box" style="z-index:' + Xut.zIndexlevel() + '">' + '<div class="close" style="width:' + width + 'px;height:' + width + 'px;top:-' + space + 'px;right:-' + space + 'px"></div>' + '<div class="content">' + note + '</div>' + '</div>';
+
+             this._dom = $(retStr);
+             this._dom.find('.close').on("touchend mouseup", function () {
+                 that.dispatchProcess();
+             });
+             $(this.rootNode).append(this._dom);
+
+             this.show();
+             createIscroll(this._dom.find('.content')[0]);
+             return true;
+         },
+
+         //外部调用接口
+         dispatchProcess: function dispatchProcess() {
+             //自动热点 取消关闭
+             if (this.isAutoPlay) return;
+             //当前对象状态
+             this.state ? this.hide() : this.show();
+         },
+
+         recovery: function recovery() {
+             if (this.state) {
+                 this.dispatchProcess();
+                 return true;
+             }
+             return false;
+         },
+
+         hide: function hide() {
+             this.state = false;
+             $("#ShowNote_" + this.id).css('background-image', 'url(images/icons/hideNote.png)');
+             this._dom.hide();
+         },
+
+         show: function show() {
+             this.state = true;
+             $("#ShowNote_" + this.id).css('background-image', 'url(images/icons/showNote.png)');
+             this._dom.show();
+         },
+
+         destroy: function destroy() {
+             if (this._dom) {
+                 this._dom.find('.close').off();
+                 this._dom && this._dom.hide().remove();
+             }
+         }
+
+     };
+
+     var ShowNote = {
+
+         //==========创建热点元素结构（用于布局可触发点）===============
+         //
+         // 根据数据创建自己的热点元素结构（用于拼接结构字符串）
+         //
+         // 要retrun返回这个结构，主要是多人操作时,保证只有最终的dom渲染只有一次
+         //actType + "_" + _id
+         createDom: function createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
+             var retStr = "",
+                 newWidth,
+                 id = activityData['_id'],
+                 width = activityData.scaleWidth,
+                 height = activityData.scaleHeight,
+                 newWidth = (width + height) / 2 * Xut.config.iconHeight;
+
+             retStr += '<div id="ShowNote_' + id + '" class="xut-showNote" data-belong =' + pageType + ' data-delegate="ShowNote" style="width:' + newWidth + 'px;height:' + newWidth + 'px"></div>';
+             return retStr;
+         },
+
+         /**
+          * touchEnd 全局派发的点击事件
+          * 如果stopGlobalEvent == ture 事件由全局派发
+          */
+         eventDelegate: function eventDelegate(data) {
+             data.data = Xut.Presentation.GetPageData(data.pageIndex);
+             new ShowNote$1(data);
+         },
+
+         //自动运行生成Action或者widget触发点对象
+         autoPlay: function autoPlay(opts) {},
+
+         /**
+          * 翻页后处理页面中活动热点的状态
+          * @param  {[type]} activeObejct [需要处理的活动对象]
+          *
+          * 比如音频,视频 翻页需要暂停，也可以销毁
+          */
+         flipOver: function flipOver(opts) {
+             //console.log('翻页处理活动对象', activeObejct ,pageIndex);
+         },
+
+         /**
+          * 销毁页面hotspot事件与Action或widget事件
+          * @param  {[type]} activeObejct [需要处理的活动对象]
+          * @param  {[type]} pageIndex    [页码标示]
+          * @param  {[type]} rootEle      [根元素]
+          * @return {[type]}              [description]
+          */
+         destroy: function destroy(opts) {
+             this && this.destroy();
+         },
+
+         //========复位对象==========
+         //
+         //  通过按物理键，关闭当前热点
+         //
+         //  @return 如果当前没有需要处理的Action,
+         //  需要返回一个状态标示告诉当前是否应该退出应用
+         //
+         recovery: function recovery(opts) {
+             if (this.state) {
+                 this.dispatchProcess();
+                 return true;
+             }
+             return false;
+         }
+     };
+
+     var Webpage = Media;
+     var Video = Media;
+     var Audio$1 = Media;
+
+     var Bind = {
+         Video: Video,
+         Audio: Audio$1,
+         Action: Action$1,
+         Content: Content,
+         Webpage: Webpage,
+         Widget: Widget,
+         ShowNote: ShowNote
+     };
+
+     var contentTaskOutId;
+     /**
+      * 运行自动的content对象
+      * 延时500毫秒执行
+      * @return {[type]} [description]
+      */
+     function runContent(contentObjs, taskAnimCallback) {
+
+         var contentTaskOutId = setTimeout(function () {
+
+             clearTimeout(contentTaskOutId);
+
+             //完成通知
+             var markComplete = function () {
+                 var completeStatistics = contentObjs.length; //动画完成统计
+                 return function () {
+                     if (completeStatistics === 1) {
+                         taskAnimCallback && taskAnimCallback();
+                         markComplete = null;
+                     }
+                     completeStatistics--;
+                 };
+             }();
+
+             _.each(contentObjs, function (obj, index) {
+                 if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+                     obj.autoPlay(markComplete);
+                 } else {
+                     markComplete();
+                 }
+             });
+         }, 500);
+     }
+     /**
+      * 运行自动的静态类型
+      * @return {[type]} [description]
+      */
+     function runComponent(pageObj, pageIndex, autoRunComponents, pageType) {
+
+         var chapterId = pageObj.baseGetPageId(pageIndex);
+
+         if (pageIndex === undefined) {
+             pageIndex = Xut.Presentation.GetPageIndex();
+         }
+         _.each(autoRunComponents, function (data, index) {
+             var dir = Bind[data.type];
+             if (dir && dir.autoPlay) {
+                 dir.autoPlay({
+                     'id': data.id,
+                     'key': data.key,
+                     'type': data.type,
+                     'pageType': pageType,
+                     'rootNode': pageObj.element,
+                     'chapterId': chapterId,
+                     'category': data.category,
+                     'autoPlay': data.autoPlay,
+                     'pageIndex': pageIndex
+                 });
+             }
+         });
+     }
+
+     function _autoRun(pageObj, pageIndex, taskAnimCallback) {
+
+         /**
+          * 编译IBOOKSCONFIG的时候过滤自动运行的调用
+          * @return {[type]}              [description]
+          */
+         if (Xut.IBooks.compileMode()) {
+             return;
+         }
+
+         //pageType
+         //用于区别触发类型
+         //页面还是母版
+         Xut.accessControl(pageObj, function (pageObj, ContentObjs, ComponentObjs, pageType) {
+
+             //如果是母版对象，一次生命周期种只激活一次
+             if (pageObj.pageType === 'master') {
+                 if (pageObj.onceMaster) {
+                     return;
+                 }
+                 pageObj.onceMaster = true;
+             }
+
+             taskAnimCallback = taskAnimCallback || function () {};
+
+             //自动运行的组件
+             var autoRunComponents;
+             if (autoRunComponents = pageObj.baseAutoRun()) {
+                 runComponent(pageObj, pageIndex, autoRunComponents, pageType);
+             }
+
+             //自动运行content
+             clearTimeout(contentTaskOutId);
+
+             if (ContentObjs) {
+                 runContent(ContentObjs, taskAnimCallback);
+             } else {
+                 taskAnimCallback(); //无动画
+             }
+
+             Xut.log('debug', pageType + '层，第' + (pageIndex + 1) + '页开始,本页面Id为' + pageObj.chapterId);
+         });
+     }
+
+     function trigger(target, attribute, rootNode, pageIndex) {
+
+         var key, tag, type, id, dir, data, pageType, instance;
+
+         if (key = target.id) {
+
+             tag = key.split('_');
+             type = tag[0];
+             id = tag[1];
+             dir = Bind[type];
+
+             if (dir && dir.eventDelegate) {
+
+                 //获取页面类型
+                 pageType = function () {
+                     if (rootNode && rootNode.id) {
+                         return (/page/.test(rootNode.id) ? 'page' : 'master'
+                         );
+                     } else {
+                         return 'page';
+                     }
+                 }();
+
+                 data = {
+                     "id": id,
+                     "activityId": id,
+                     "key": key,
+                     "type": type,
+                     "rootNode": rootNode,
+                     "target": target,
+                     "pageIndex": pageIndex,
+                     'pageType': pageType
+                 };
+
+                 //如果是重复点击
+                 if (instance = Xut.Application.GetSpecifiedObject(pageType, data)) {
+                     if (instance.dispatchProcess) {
+                         //如果有对应的处理方法
+                         return instance.dispatchProcess();
+                     }
+                 }
+
+                 //委派新的任务
+                 dir.eventDelegate(data);
+             }
+         }
+     }
+
+     /**
+      * 暂停控制
+      * @return {[type]} [description]
+      */
+
+     //翻页时,暂停滑动页面的所有热点动作
+     //翻页停止content动作
+     function _suspend(pageObj, pageId) {
+
+         Xut.accessControl(pageObj, function (pageObj, ContentObjs, ComponentObjs) {
+             //多媒体处理
+             if (pageId !== undefined) {
+                 //离开页面销毁视频
+                 Xut.VideoManager.removeVideo(pageId);
+                 //翻页停止母板音频
+                 if (pageObj.pageType === 'master') {
+                     Xut.AudioManager.hangUpAudio();
+                 }
+             }
+
+             //content类型
+             if (ContentObjs) {
+                 _.each(ContentObjs, function (obj) {
+                     obj.flipOver && obj.flipOver();
+                 });
+             }
+         });
+     }
+
+     /**
+      * 复位到初始化的状态
+      * @return {[type]} [description]
+      */
+
+     /////////
+     //优化检测 //
+     /////////
+     function checkOptimize(fn) {
+         if (!Xut.config.scrollPaintingMode) {
+             fn && fn();
+         }
+     }
+
+     //===============================================================
+     //     
+     //           翻一页处理： 翻页完毕触发
+     //
+     //  大量操作DOM结构，所以先隐藏根节点
+     //  1 删除所有widget节点
+     //  2 复位所有content节点
+     // 
+     //==============================================================
+     function _original(pageObj) {
+
+         Xut.accessControl(pageObj, function (pageObj, ContentObjs, ComponentObjs) {
+
+             //母版对象不还原
+             if (pageObj.pageType === 'master') return;
+
+             var element;
+
+             if (element = pageObj.element) {
+                 checkOptimize(function () {
+                     element.hide();
+                 });
+
+                 //销毁所有widget类型的节点
+                 if (ComponentObjs) {
+                     _.each(ComponentObjs, function (obj) {
+                         obj && obj.destroy();
+                     });
+                     //销毁widget对象管理
+                     pageObj.baseRemoveComponent();
+                 }
+
+                 //停止动作
+                 ContentObjs && _.each(ContentObjs, function (obj) {
+                     if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+                         obj.resetAnimation && obj.resetAnimation();
+                     }
+                 });
+
+                 checkOptimize(function () {
+                     setTimeout(function () {
+                         element.show();
+                         element = null;
+                     }, 0);
+                 });
+             }
+         });
+     }
+
+     /**
+      * 动作复位状态
+      * @return {[type]} [description]
+      */
+
+     //========================================================
+     //          复位状态
+     //          状态控制
+     //  如果返回false证明有热点,
+     //  第一次只能关闭热点不能退出页面
+     //=========================================================
+     function recovery(pageObj) {
+         return Xut.accessControl(pageObj, function (pageObj, ContentObjs, ComponentObjs) {
+             var falg = false;
+             _.each([ContentObjs, ComponentObjs], function (collectionObj) {
+                 collectionObj && _.each(collectionObj, function (obj) {
+                     //如果返回值是false,则是算热点处理行为
+                     if (obj.recovery && obj.recovery()) {
+                         falg = true;
+                     }
+                 });
+             });
+             return falg;
+         });
+     }
+
+     /**
+      * 获取访问对象参数
+      *
+      * 如果pageObj 不存在，则取当前页面的
+      * 
+      * @return {[type]} [description]
+      */
+     Xut.accessControl = function (pageObj, callback) {
+         var flag,
+             pageObj = pageObj || Xut.Presentation.GetPageObj();
+         if (pageObj) {
+             var contents = pageObj.baseGetContent();
+             var components = pageObj.baseGetComponent();
+             var pageType = pageObj.pageType || 'page';
+             flag = callback(pageObj, contents.length && contents, components.length && components, pageType);
+         }
+         return flag;
+     };
 
      var prefix = Xut.plat.prefixStyle;
      var sectionInstance = null;
@@ -1131,7 +4637,7 @@
      }
 
      //关闭
-     function close(callback) {
+     function _close(callback) {
          if (sectionInstance && sectionInstance.state) {
              callback && callback();
              initialize();
@@ -1208,7 +4714,7 @@
          }
 
          //处理导航
-         close(function () {
+         _close(function () {
              stateRun = true;
          });
 
@@ -1307,7 +4813,7 @@
      var ratio = void 0;
      var isIOS = void 0;
      var iconHeight$1 = void 0;
-     var proportion = void 0;
+     var proportion$1 = void 0;
      var calculate = void 0;
      var TOP = void 0;
      var sWidth = void 0;
@@ -1321,13 +4827,13 @@
          ratio = 6;
          isIOS = Xut.plat.isIOS;
          iconHeight$1 = config$7.iconHeight;
-         proportion = config$7.proportion;
-         calculate = proportion.calculateContainer();
+         proportion$1 = config$7.proportion;
+         calculate = proportion$1.calculateContainer();
          TOP = isIOS ? 20 : 0;
          sWidth = calculate.width;
          sHeight = calculate.height;
-         proportion = config$7.layoutMode == "horizontal" ? proportion.width : proportion.height;
-         iconHeight$1 = isIOS ? iconHeight$1 : round(proportion * iconHeight$1);
+         proportion$1 = config$7.layoutMode == "horizontal" ? proportion$1.width : proportion$1.height;
+         iconHeight$1 = isIOS ? iconHeight$1 : round(proportion$1 * iconHeight$1);
      }
 
      /**
@@ -7250,96 +10756,6 @@
      // endReturn();  //false 先屏蔽 ，客户端未实现
      // }else{}
 
-     // *  iscroll 控制
-     // *    传入dom ID
-     // *     [onIscroll description]
-     // * @param  {[type]} contentWrapperDomId [description]
-     // * @return {[type]}                     [description]
-
-     function iscroll$1(element) {
-          //是否移动，中途停止了动画
-          var distX = 0,
-              distY = 0,
-              startX,
-              startY,
-              absDistY,
-              absDistX,
-              iscroll,
-              that = this,
-              screenWidth = Xut.config.screenSize.width,
-              useswipeleft = function useswipeleft() {
-               Xut.View.GotoPrevSlide();
-          },
-              useswiperight = function useswiperight() {
-               Xut.View.GotoNextSlide();
-          };
-
-          this.iscroll = iscroll = new iScroll(element, {
-               scrollbars: true,
-               fadeScrollbars: true
-               //click          : true,
-               //tap            : true,
-               //probeType      : 2
-          });
-
-          // this.iscroll.on('scrollStart', function() {
-          //     iscroll.initDirection = false; //初始化一次滑动方向
-          // });
-          // this.iscroll.on('scrollEnd', function(e) {
-          //     //如果是Y轴滑动者不作处理跳过
-          //     if (iscroll.initDirection) {
-          //          startY= startX=distX = distY = 0;
-          //         iscroll.startTime = 0;
-          //         iscroll.initDirection = false;
-          //         return;
-          //     }
-
-          //     var duration, deltaX, validSlide, distance;
-          //     //滑动的距离、
-
-          //     deltaX = distX || 0;
-          //     duration = +new Date - iscroll.startTime;
-          //     distance = Math.abs(deltaX);
-          //     //反弹的边界值
-          //     validSlide = Math.ceil(screenWidth / 5);
-          //     if (distance < validSlide) {
-          //         //快速滑动允许翻页
-          //         if (duration < 200 && distance > 20) {
-          //             iscroll.swipe = true;
-          //             deltaX > 0 ? useswipeleft() : useswiperight();
-          //         } else {
-          //             //反弹
-          //             Xut.View.MovePage(0, 300, deltaX > 0 ? 'prev' : 'next', 'flipRebound')
-          //         }
-          //     } else {
-          //         iscroll.swipe = true;
-          //         deltaX > 0 ? useswipeleft() : useswiperight();
-          //     }
-          //    startY= startX=distX = distY = 0;
-          //     iscroll.startTime = 0;
-          //     iscroll.initDirection = false;
-          // });
-          // this.iscroll.on('scroll', function(e) {
-          //     startX=startX||e.pageX;
-          //     startY=startY||e.pageY;
-
-          //     distX =e.pageX-startX;
-          //     distY = e.pageY-startY;
-
-          //     absDistX = Math.abs(distX);
-          //     absDistY = Math.abs(distY);
-
-          //     iscroll.startTime = iscroll.startTime || e.timeStamp;
-          //     if (absDistY * 1.5 > absDistX) {
-          //           //如果是Y轴滑动则做标记不作处理
-          //         iscroll.initDirection = true;
-          //     } else {
-          //         Xut.View.MovePage(distX, 0, distX > 0 ? 'prev' : 'next', 'flipMove');
-          //         iscroll.initDirection = false
-          //     }
-          // });
-     }
-
      /**
       * 填充缺少的content对象
       * @return {[type]} [description]
@@ -8313,7 +11729,6 @@
       * @return {[type]}                 [description]
       */
      behaviorProto.runBehavior = function (scopeComplete) {
-         console.log(this);
 
          var self = this,
              defaultIndex,
@@ -9782,7 +13197,7 @@
              //ios or pc
              if (!Xut.plat.isAndroid) {
                  return function () {
-                     iscroll$1(element);
+                     createIscroll(element);
                  };
              }
 
@@ -9822,7 +13237,7 @@
              }
 
              return function () {
-                 iscroll$1(element);
+                 createIscroll(element);
                  restore();
                  preEle = null;
                  restore = null;
@@ -11184,1490 +14599,6 @@
          });
          return preCompileContent.length ? preCompileContent : null;
      }
-
-     /**
-      *
-      *  动作对象
-      *      1 跳转页面
-      *      2 打开系统程序
-      *      3 加载子文档
-      *
-      */
-
-     function Action$1(data) {
-
-         _.extend(this, data);
-
-         this.id = parseInt(this.id);
-
-         this.actType = this.type;
-
-         //加载数据
-         this.setup(Xut.data.query('Action', this.id, 'activityId'));
-     }
-
-     Action$1.prototype = {
-
-         setup: function setup(results) {
-             var para1 = results.para1,
-                 //跳转参数
-             para2 = results.para2,
-                 //ppt
-             dbId = results._id;
-
-             actionType = parseInt(results.actionType);
-
-             //跳转或打开本地程序
-             switch (actionType) {
-                 case 0:
-                     this.toPage(para1);
-                     break;
-                 case 1:
-                     if (Xut.plat.isBrowser) return;
-                     //打开插件
-                     Xut.Plugin.OpenApp.openAppAction(para1, function (r) {}, function (e) {});
-                     break;
-                 case 2:
-                     //子文档处理
-                     this.loadSubdoc(para1, dbId);
-                     break;
-             }
-
-             this.state = true;
-         },
-
-         open: function open() {
-             this.state = true;
-             //打开插件
-             Xut.Plugin.OpenApp.openAppAction(para1, function (r) {}, function (e) {});
-         },
-
-         //跳转页面
-         toPage: function toPage(para1) {
-             para1 = JSON.parse(para1);
-             if (para1.seasonId) {
-                 Xut.View.GotoSlide(para1.seasonId, para1.chapterId);
-             } else {
-                 //向下兼容
-                 Xut.View.GotoSlide(para1);
-             }
-         },
-
-         /***********************************************************
-          *
-          *                   子文档处理
-          *
-          * **********************************************************/
-
-         //加载子文档
-         loadSubdoc: function loadSubdoc(path, dbId) {
-             var self = this,
-                 wapper,
-                 configPath = 'www/content/subdoc/' + path + '/content/gallery/';
-
-             //配置子文档加载路径
-             window.XXTSUbDOC = {
-                 'path': path,
-                 'dbId': dbId
-             };
-
-             this.subPath = path;
-
-             //构建子文档的容器
-             wapper = this.$wapper = this.createWapper();
-
-             Xut.nextTick({
-                 'container': $(this.rootNode),
-                 'content': wapper
-             }, function () {
-                 self.destroyCache();
-             });
-         },
-
-         //iframe加载完毕
-         iframeComplete: function iframeComplete() {
-             var self = this;
-             //关闭事件
-             Xut.one('subdoc:dropApp', function () {
-                 self.destroyCache('iframe', self.iframe[0].contentWindow);
-             });
-             //隐藏全局工具栏
-             Xut.View.HideToolbar();
-             Xut.isRunSubDoc = true;
-             self.$wapper.css({
-                 'opacity': '1'
-             });
-         },
-
-         //获取iframe颞部window上下文
-         destroyCache: function destroyCache(contentWindow) {
-             var self = this,
-                 iframe;
-
-             if (contentWindow) {
-                 iframe = true;
-             } else {
-                 contentWindow = window;
-             }
-
-             function clear() {
-                 Xut.View.ShowToolbar();
-                 self.$wapper.remove();
-                 self.$wapper = null;
-                 self.iframe = null;
-                 self.rootNode = null;
-                 Xut.isRunSubDoc = false;
-             }
-
-             try {
-                 contentWindow.require("Dispatcher", function (c) {
-                     if (iframe) {
-                         //子文档操作
-                         if (c.stopHandles()) {
-                             c.promptMessage('再按一次将退出子目录！');
-                         } else {
-                             clear();
-                         }
-                     } else {
-                         //父级操作
-                         c.stopHandles();
-                     }
-                 });
-             } catch (err) {
-                 clear();
-             }
-         },
-
-         createWapper: function createWapper() {
-             var zIndex, str, dom, ifr;
-
-             //层级设定
-             if (this.zIndex === 0) {
-                 zIndex = this.zIndex;
-             } else {
-                 zIndex = this.zIndex || Xut.zIndexlevel();
-             }
-
-             this.zIndex = zIndex;
-
-             str = '<div id="Subdoc_{0}" style="z-index:{1};width:{2}px;height:{3}px;top:{4}px;left:{5}px;position:absolute;opacity:0" >' + '</div>';
-
-             dom = String.format(str, this.id, zIndex, this.screenSize.width, this.screenSize.height, 0, 0);
-
-             ifr = this.iframe = this.createIframe();
-
-             return $(dom).append(ifr);
-         },
-
-         /**
-          * 加载iframe
-          * @return {[type]} [description]
-          */
-         createIframe: function createIframe() {
-             var me = this,
-                 path = 'content/subdoc/' + this.subPath + '/index.html?xxtParaIn=' + this.key,
-                 ifr = document.createElement('iframe');
-
-             ifr.id = 'iframe_' + this.id;
-             ifr.src = path;
-             ifr.style.width = '100%';
-             ifr.style.height = '100%';
-             ifr.sandbox = "allow-scripts allow-same-origin";
-             ifr.frameborder = 0;
-             if (ifr.attachEvent) {
-                 ifr.attachEvent('onload', function () {
-                     me.iframeComplete();
-                 });
-             } else {
-                 ifr.onload = function () {
-                     me.iframeComplete();
-                 };
-             }
-
-             return $(ifr);
-         }
-     };
-
-     var Action = {
-
-         createDom: function createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-             var backgroundImage = '',
-
-             //等比缩放
-             width = activityData.scaleWidth,
-                 height = activityData.scaleHeight,
-                 top = activityData.scaleTop,
-                 left = activityData.scaleLeft;
-
-             var md5;
-
-             //热点背景图
-             if (md5 = activityData.md5) {
-                 backgroundImage = "background-image: url(" + Xut.onfig.pathAddress + md5 + ");";
-             }
-
-             //==============创建触发点结构=============
-             return String.format('<div id="{0}"' + ' data-belong = "{1}"' + ' data-delegate="Action"'
-             // +' autoplay="{2}" ' svg打包不可以属性
-              + ' style="cursor: pointer;width:{3}px;height:{4}px;left:{5}px;top:{6}px;background-size:100% 100%;position:absolute;z-index:{7};{8}"></div>', activityData.actType + "_" + activityData._id, pageType, activityData.autoPlay, width, height, left, top, zIndex, backgroundImage);
-         },
-
-         /**
-          * 是否阻止全局事件派发
-          * @type {Boolean}
-          *   false 事件由全局接管派发
-          *   false 事件由hotspot处理触发
-          *   全局提供的事件接口
-          *   {
-          *       globalTouchStart
-          *       globalTouchMove
-          *       globalTouchEnd
-          *   }
-          */
-         stopDelegate: false,
-
-         /**
-          * touchEnd 全局派发的点击事件
-          * 如果stopGlobalEvent == ture 事件由全局派发
-          */
-         eventDelegate: function eventDelegate(data) {
-             new Action$1(data);
-         },
-
-         //========复位对象==========
-         //
-         //  通过按物理键，关闭当前热点
-         //
-         //  @return 如果当前没有需要处理的Action,
-         //  需要返回一个状态标示告诉当前是否应该退出应用
-         //
-         recovery: function recovery(opts) {
-             if (this.state) {
-                 this.state = false;
-                 return true;
-             } else {
-                 return false;
-             }
-         }
-     };
-
-     /**
-      * 文本类型
-      */
-
-     var Content = {
-
-         //==========创建热点元素结构（用于布局可触发点）===============
-         //
-         //   预创建
-         //
-         createDom: function createDom(opts) {
-             var sqlRet = opts.sqlRet,
-                 pageIndex = opts.pageIndex;
-             return function (rootEle, pageIndex) {
-                 sqlRet['container'] = rootEle || opts.rootEle;
-                 return sqlRet;
-             };
-         },
-
-         /**
-          * 绑定热点事件
-          * 用户交互动作产生Action或者widget对象
-          */
-         bindEvent: function bindEvent() {},
-
-         /**
-          * 在当前页面自动触发的通知
-          *
-          * 作用：
-          *   生成Action或者widget触发点对象
-          *
-          * 有一种情况，如果当前Action对象，已存在必须要做重复处理
-          *
-          * Xut.ActionMgr.getOne(key) 接口，是获取当前是否有实例对象的引用
-          *
-          */
-         autoPlay: function autoPlay(scopeComplete) {
-             return this.autoPlay && this.autoPlay(scopeComplete);
-         },
-
-         /**
-          * 开始翻页
-          *
-          * 滑动页面的时候触发
-          *
-          * 处理要关闭的对象
-          *
-          * 比如（音频，视频），不能停留到下一个页面,滑动必须立刻关闭或者清理销毁
-          *
-          * @param  {[type]} this  当前活动对象
-          *
-          */
-         flipOver: function flipOver() {
-             return this.flipOver();
-         },
-
-         /**
-          * 翻页完成
-          * @return {[type]} [description]
-          */
-         flipComplete: function flipComplete() {
-             return this.flipComplete();
-         },
-
-         /**
-          * 销毁接口
-          *
-          * 1 销毁页面绑定的事件
-          *   A hotspotBind 接口绑定的的热点触发事件
-          *   B autoPlay 等接口 产生的具体Action对象事件
-          *
-          * 2 销毁热点元素的在控制器中的引用
-          *
-          * 3 清理页面结构
-          *
-          * 注：
-          *   2,3操作暂时由控制器已经内部统一完成了,暂时只需要处理1销毁绑定的事件
-          *
-          * @param  {[type]} pageIndex    [页码标示]
-          * @param  {[type]} rootEle      [根元素]
-          * @return {[type]}              [description]
-          */
-         destroy: function destroy() {
-             return this.destroy();
-         },
-
-         /**
-          *  复位状态通知
-          *
-          *  作用：用户按页面右上角返回，或者pad手机上的物理返回键
-          *
-          *  那么：
-          *      1 按一次， 如果当前页面有活动热点，并且热点对象还在可视活动状态（比如文本，是显示，音频正在播放）
-          *        那么则调用此方法，做复位处理，即文本隐藏，音频关闭
-          *        然后返回true, 用于反馈给控制器,停止下一步调用
-          *        按第二次,则退出页面
-          *
-          *     2 按一次，如果没有活动的对象，return false,这直接退出页面
-          *
-          * @param  {[type]} activeObejct [description]
-          * @return {[type]}              [description]
-          */
-         recovery: function recovery(opts) {
-             return this.recovery && this.recovery();
-         }
-
-     };
-
-     //临时音频动作数据
-     var tempData = {};
-
-     var Media = {
-
-         createDom: function createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-             var width = activityData.scaleWidth,
-                 height = activityData.scaleHeight,
-                 top = activityData.scaleTop,
-                 left = activityData.scaleLeft,
-                 actType = activityData.actType,
-                 id = activityData._id;
-
-             //如果没有宽高则不创建绑定节点
-             if (!width || !height) return '';
-
-             var category = activityData.category;
-             var mediaIcon,
-                 mediaIconSize,
-                 posX,
-                 posY,
-                 start,
-                 stop,
-                 itemArray,
-                 startImage = "";
-
-             var screenSize = Xut.config.screenSize;
-
-             //只针对网页插件增加单独的点击界面
-             if (category == 'webpage' && width > 200 && height > 100 && width <= screenSize.width && height <= screenSize.height) {
-                 mediaIcon = 'background-image:url(images/icons/web_hotspot.png)';
-             }
-
-             //解析音乐动作
-             //冒泡动作靠节点传递数据
-             if (itemArray = activityData.itemArray) {
-                 itemArray = parseJSON(itemArray);
-                 start = itemArray[0];
-                 stop = itemArray[1];
-                 tempData[id] = {};
-                 if (start) {
-                     if (start.startImg) {
-                         startImage = start.startImg;
-                         tempData[id]['startImg'] = startImage;
-                         startImage = 'background-image:url(' + startImage + ');';
-                     }
-                     if (start.script) {
-                         tempData[id]['startScript'] = start.script;
-                     }
-                 }
-                 if (stop) {
-                     if (stop.stopImg) {
-                         tempData[id]['stopImg'] = stop.stopImg;
-                     }
-                     if (stop.script) {
-                         tempData[id]['stopScript'] = stop.script;
-                     }
-                 }
-             }
-
-             //首字母大写
-             var mediaType = category.replace(/(\w)/, function (v) {
-                 return v.toUpperCase();
-             });
-
-             //创建音频对象
-             //Webpage_1
-             //Audio_1
-             //Video_1
-             var tpl = String.format('<div id="{0}"' + ' data-belong="{1}"' + ' data-delegate="{2}"' + ' style="width:{3}px;height:{4}px;left:{5}px;top:{6}px;z-index:{7};{8}background-size:100% 100%;position:absolute;">', mediaType + "_" + id, pageType, category, width, height, left, top, zIndex, startImage);
-
-             //如果有视频图标
-             if (mediaIcon) {
-                 mediaIconSize = 74;
-                 posX = (width - mediaIconSize) / 2;
-                 posY = (height - mediaIconSize) / 2;
-
-                 tpl += String.format('<div id="icon_{0}"' + ' type="icon"' + ' style="position:absolute;top:{1}px;left:{2}px;width:{3}px;height:{4}px;{5};">' + ' </div>', id, posY, posX, mediaIconSize, mediaIconSize, mediaIcon);
-             }
-
-             tpl += '</div>';
-
-             return tpl;
-         },
-
-         //仅创建一次
-         //data传递参数问题
-         onlyCreateOnce: function onlyCreateOnce(id) {
-             var data;
-             if (data = tempData[id]) {
-                 delete tempData[id];
-                 return data;
-             }
-         },
-
-         /**
-          * touchEnd 全局派发的点击事件
-          * 如果stopGlobalEvent == ture 事件由全局派发
-          */
-         eventDelegate: function eventDelegate(data) {
-             var category, chapterId;
-             if (category = data.target.getAttribute('data-delegate')) {
-                 //触发类型
-                 chapterId = Xut.Presentation.GetPageId(data.pageIndex);
-                 /**
-                  * 传入chapterId 页面ID
-                  * activityId    视频ID
-                  * eleName       节点名  //切换控制
-                  * 根节点
-                  */
-                 if (category == 'audio') {
-                     Xut.AudioManager.trigger(chapterId, data.activityId, this.onlyCreateOnce(data.id));
-                 } else {
-                     Xut.VideoManager.trigger(chapterId, data.activityId, $(data.rootNode));
-                 }
-             }
-         },
-
-         //自动运行
-         autoPlay: function autoPlay(data) {
-             var category = data.category;
-             if (!category) return;
-             var rootNode = data.rootNode,
-                 pageIndex = data.pageIndex,
-                 chapterId = data.chapterId,
-                 activityId = data.id,
-                 triggerType = category == 'audio' ? 'audioManager' : 'videoManager';
-
-             //数据库视频音频不规则问题导致
-             //首字母大写
-             var mediaType = category.replace(/(\w)/, function (v) {
-                 return v.toUpperCase();
-             });
-
-             //自动音频
-             if (category == 'audio') {
-                 Xut.AudioManager.autoPlay(chapterId, activityId, this.onlyCreateOnce(data.id));
-             } else {
-                 //自动视频
-                 Xut.VideoManager.autoPlay(chapterId, activityId, rootNode);
-             }
-         }
-
-     };
-
-     /**
-      * 创建iframe零件包装器
-      */
-
-     function iframeWidget(data) {
-
-         var self = this;
-
-         //获取数据
-         _.extend(this, data);
-
-         //创建页面零件包装器
-         this.$wapper = this.createWapper();
-
-         Xut.nextTick({
-             'container': self.rootNode,
-             'content': this.$wapper
-         }, function () {
-             self.rootNode = null;
-             self.bindPMS();
-         });
-
-         return this;
-     }
-
-     iframeWidget.prototype = {
-
-         /**
-          * 创建包含容器
-          * @return {[type]} [description]
-          */
-         createWapper: function createWapper() {
-             var zIndex, str, dom, ifr;
-
-             //层级设定
-             if (this.zIndex === 0) {
-                 zIndex = this.zIndex;
-             } else {
-                 zIndex = this.zIndex || Xut.zIndexlevel();
-             }
-
-             this.zIndex = zIndex;
-
-             str = '<div id="iframeWidget_{0}" style="z-index:{1};width:{2}px;height:{3}px;top:{4}px;left:{5}px;position:absolute;" ></div>';
-
-             dom = String.format(str, this.id, zIndex, this.width, this.height, this.top, this.left);
-
-             ifr = this.createIframe();
-
-             this._iframe = ifr;
-
-             return $(dom).append(ifr);
-         },
-
-         /**
-          * 加载iframe
-          * @return {[type]} [description]
-          */
-         createIframe: function createIframe() {
-             var me = this,
-                 path = 'content/widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key,
-                 ifr = document.createElement('iframe');
-
-             ifr.id = 'iframe_' + this.id;
-             ifr.src = path;
-             ifr.style.width = '100%';
-             ifr.style.height = '100%';
-             ifr.sandbox = "allow-scripts allow-same-origin";
-             ifr.frameborder = 0;
-             if (ifr.attachEvent) {
-                 ifr.attachEvent('onload', function () {
-                     me.iframeComplete();
-                 });
-             } else {
-                 ifr.onload = function () {
-                     me.iframeComplete();
-                 };
-             }
-             return ifr;
-         },
-
-         /**
-          * iframe加载完毕回调
-          * @return {[type]} [description]
-          */
-         iframeComplete: function iframeComplete() {
-             var me = this;
-             var dataSource = this.loadData();
-             var width = me._iframe.offsetWidth;
-             var height = me._iframe.offsetHeight;
-
-             if (dataSource.screenSize.width * 0.98 <= width && dataSource.screenSize.height * 0.98 <= height) {
-                 Xut.View.Toolbar({
-                     show: 'button',
-                     hide: 'controlBar'
-                 });
-             } else if (dataSource.screenSize.width * 0.7 <= width && dataSource.screenSize.height * 0.7 <= height) {
-                 Xut.View.Toolbar({
-                     show: 'button'
-                 });
-             }
-
-             this.PMS.send({
-                 target: me._iframe.contentWindow,
-                 origin: '*',
-                 type: 'loadData',
-                 data: dataSource,
-                 //消息传递完毕后的回调
-                 success: success,
-                 error: function error() {}
-             });
-
-             function success() {}
-             // console.log('完毕')
-
-
-             //iframe加载的状态
-             me.state = true;
-         },
-
-         /**
-          * ifarme内部，请求返回数据
-          * @return {[type]} [description]
-          */
-         loadData: function loadData() {
-             var item,
-                 field,
-                 source_export = [],
-                 images = Xut.data['Image'],
-                 token = null,
-                 outputPara = this.inputPara,
-                 items = outputPara.source;
-
-             for (item in items) {
-                 if (items.hasOwnProperty(item)) {
-                     field = {};
-                     token = images.item((parseInt(items[item]) || 1) - 1);
-                     field['img'] = '../gallery/' + token.md5;
-                     field['thumb'] = '';
-                     field['title'] = token.imageTitle;
-                     source_export.push(field);
-                 }
-             }
-
-             outputPara.source = source_export;
-
-             return outputPara;
-         },
-
-         /********************************************************************
-          *
-          *                   与iframe通讯接口
-          *
-          * ********************************************************************/
-
-         /**
-          * 与iframe通讯接口
-          * @return {[type]} [description]
-          */
-         bindPMS: function bindPMS() {
-             var me = this,
-                 PMS = PMS || require("PMS"),
-                 markId = this.id;
-
-             this.PMS = PMS;
-             //隐藏widget
-             PMS.bind("onHideWapper" + markId, function (e) {
-                 var $wapper = me.$wapper;
-                 $wapper.hide();
-                 me.state = false;
-             }, '*');
-
-             //全屏操作
-             PMS.bind("onFullscreen" + markId, function (e) {
-                 var $wapper = me.$wapper,
-                     $iframe = $(me._iframe);
-
-                 if (!$iframe.length) return;
-                 //关闭视频
-                 Xut.VideoManager.clearVideo();
-
-                 $wapper.css({
-                     width: '100%',
-                     height: '100%',
-                     zIndex: Xut.zIndexlevel(),
-                     top: 0,
-                     left: 0
-                 });
-
-                 //Widget全屏尺寸自动调整
-                 if (e.full == false) {
-                     var body = document.body,
-                         width = parseInt(body.clientWidth),
-                         height = parseInt(body.clientHeight),
-                         rote = me.width / me.height,
-                         getRote = function getRote(width, height, rote) {
-                         var w = width,
-                             h = width / rote;
-                         if (h > height) {
-                             h = height;
-                             w = h * rote;
-                         }
-                         return {
-                             w: parseInt(w),
-                             h: parseInt(h)
-                         };
-                     },
-                         size = getRote(width, height, rote),
-                         left = (width - size.w) / 2,
-                         top = (height - size.h) / 2;
-
-                     $iframe.css({
-                         width: size.w,
-                         height: size.h,
-                         position: 'absolute',
-                         top: top,
-                         left: left
-                     });
-                 }
-                 //隐藏工作条
-                 Xut.View.Toolbar("hide");
-             }, '*');
-
-             //还原初始窗口操作
-             PMS.bind("onReset" + markId, function (e) {
-                 var $wapper = me.$wapper,
-                     $iframe = $(me._iframe);
-
-                 if (!$iframe.length) return;
-
-                 $wapper.css({
-                     zIndex: me.zIndex,
-                     width: me.width + 'px',
-                     height: me.height + 'px',
-                     top: me.top + 'px',
-                     left: me.left + 'px'
-                 });
-
-                 //还原iframe样式
-                 $iframe.css({
-                     width: '100%',
-                     height: '100%',
-                     position: '',
-                     top: '0',
-                     left: '0'
-                 });
-
-                 Xut.View.Toolbar("show");
-             }, '*');
-
-             //显示工作条
-             PMS.bind("onShowToolbar" + markId, function (e) {
-                 // Xut.View.ShowToolbar();
-             }, '*');
-
-             //隐藏工作条
-             PMS.bind("onHideToolbar" + markId, function (e) {
-                 Xut.View.HideToolbar();
-             }, '*');
-
-             //跳转页面
-             PMS.bind('scrollToPage' + markId, function (data) {
-                 Xut.View.GotoSlide(data['ppts'], data['pageIndex']);
-             }, '*');
-         },
-
-         //=============外部调用接口===================
-
-         /**
-          * 外部调用接口
-          * 显示隐藏
-          * @return {[type]} [description]
-          */
-         dispatchProcess: function dispatchProcess() {
-             if (this.state) {
-                 this.stop();
-             } else {
-                 this.start();
-             }
-         },
-
-         /**
-          * 开始
-          * @return {[type]} [description]
-          */
-         start: function start() {
-             var me = this;
-             me.domWapper();
-             this.PMS.send({
-                 target: me._iframe.contentWindow,
-                 url: me._iframe.src,
-                 origin: '*',
-                 type: 'onShow',
-                 success: function success() {
-                     // alert(123)
-                 }
-             });
-             setTimeout(function () {
-                 me.state = true;
-             }, 0);
-         },
-
-         /**
-          * 暂停
-          * @return {[type]} [description]
-          */
-         stop: function stop() {
-             var me = this;
-             me.domWapper();
-             this.PMS.send({
-                 target: me._iframe.contentWindow,
-                 url: me._iframe.src,
-                 origin: '*',
-                 type: 'onHide',
-                 success: function success() {}
-             });
-             setTimeout(function () {
-                 me.state = false;
-             }, 0);
-         },
-
-         /**
-          * 处理包装容器的状态
-          * @return {[type]} [description]
-          */
-         domWapper: function domWapper() {
-             if (this.state) {
-                 this.$wapper.hide();
-             } else {
-                 this.$wapper.show();
-             }
-         },
-
-         //复位
-         recovery: function recovery() {
-             var me = this;
-             if (me.state) {
-                 me.PMS.send({
-                     target: me._iframe.contentWindow,
-                     url: me._iframe.src,
-                     origin: '*',
-                     type: 'onHide',
-                     success: function success() {}
-                 });
-                 me.domWapper();
-                 me.state = false;
-                 return true;
-             }
-             return false;
-         },
-
-         //销毁接口
-         destroy: function destroy() {
-
-             var me = this,
-                 iframe = this._iframe,
-                 PMS = this.PMS;
-
-             //销毁内部事件
-             PMS.send({
-                 target: iframe.contentWindow,
-                 url: iframe.src,
-                 origin: '*',
-                 type: 'onDestory',
-                 success: function success() {}
-             });
-
-             //销毁事件绑定
-             PMS.unbind();
-
-             //销魂节点
-             setTimeout(function () {
-                 me._iframe = null;
-                 me.$wapper.remove();
-                 me.$wapper = null;
-             }, 0);
-         }
-
-     };
-
-     /**
-      * 页面零件
-      * @param {[type]} data [description]
-      */
-     function pageWidget(data) {
-
-         //获取数据
-         _.extend(this, data);
-
-         this._widgetObj = null;
-
-         var widgetName = this.widgetName + "Widget";
-
-         //加载文件
-         if (typeof window[this.widgetName + "Widget"] != "function") {
-             this.loadfile(this.executive);
-         } else {
-             this.executive();
-         }
-     }
-
-     pageWidget.prototype = {
-
-         /**
-          * 路径地址
-          * @param  {[type]} name [description]
-          * @return {[type]}      [description]
-          */
-         path: function path(fileName) {
-             return 'content/widget/' + this.widgetId + '/' + fileName;
-         },
-
-         /**
-          * 加载js,css文件
-          * @return {[type]} [description]
-          */
-         loadfile: function loadfile(callback) {
-             var jsPath,
-                 cssPath,
-                 completeCount,
-                 self = this,
-
-             //定义css,js的命名
-             jsName = this.widgetName + '.min.js',
-                 cssName = this.widgetType == 'page' || this.widgetType == 'js' ? 'style.min.css' : 0,
-
-             //需要等待完成
-             completeCount = function () {
-                 var count = 0;
-                 jsName && count++;
-                 cssName && count++;
-                 return function () {
-                     if (count === 1) {
-                         return callback && callback.call(self);
-                     }
-                     count--;
-                 };
-             }();
-
-             //加载css
-             if (cssName) {
-                 cssPath = this.path(cssName);
-                 _loadfile(cssPath, function () {
-                     completeCount();
-                 });
-             }
-
-             //加载js
-             if (jsName) {
-                 jsPath = this.path(jsName);
-                 _loadfile(jsPath, function () {
-                     completeCount();
-                 });
-             }
-         },
-
-         /**
-          * 创建数据
-          * @return {[type]} [description]
-          */
-         createData: function createData() {
-             var item,
-                 field,
-                 source_export = [],
-                 images = Xut.data['Image'],
-                 token = null,
-                 outputPara = this.inputPara,
-                 items = outputPara.source;
-
-             for (item in items) {
-                 if (items.hasOwnProperty(item)) {
-
-                     field = {};
-                     token = images.item((parseInt(items[item]) || 1) - 1);
-                     field['img'] = token.md5;
-                     field['thumb'] = '';
-                     field['title'] = token.imageTitle;
-                     source_export.push(field);
-                 }
-             }
-
-             outputPara.source = source_export;
-             outputPara.scrollPaintingMode = this.scrollPaintingMode;
-             outputPara.calculate = this.calculate;
-
-             return outputPara;
-         },
-
-         /**
-          * 解析数据,获取content对象
-          * @return {[type]} [description]
-          */
-         parseContentObjs: function parseContentObjs() {
-             var contentIds = [],
-                 inputPara = this.inputPara;
-             inputPara.content && _.each(inputPara.content, function (contentId) {
-                 contentIds.push(contentId);
-             });
-             return Xut.Contents.GetpageWidgetData(this.pageType, contentIds);
-         },
-
-         /**
-          * 执行函数
-          * @return {[type]} [description]
-          */
-         executive: function executive() {
-             //得到content对象与数据
-             var data = this.createData();
-             var contentObjs = this.parseContentObjs();
-             if (this.widgetType == 'canvas') {
-                 var id = contentObjs ? contentObjs[0].id : data.frame;
-                 var canvasId = "pageWidget_" + id;
-                 var canvansContent = $("#" + data.contentPrefix + id);
-                 if ($("#" + canvasId).length < 1) {
-                     canvansContent.append("<canvas style='position:absolute; z-index:10' id='" + canvasId + "' width='" + canvansContent.width() + "' height='" + canvansContent.height() + "'></canvas>");
-                 }
-                 canvansContent.canvasId = canvasId;
-             }
-             if (typeof window[this.widgetName + "Widget"] == "function") this._widgetObj = new window[this.widgetName + "Widget"](data, contentObjs);else console.error("Function [" + this.widgetName + "Widget] does not exist.");
-         },
-
-         //================ 外部调用 =====================
-
-         play: function play() {
-             console.log('widget');
-             return this._widgetObj.play();
-         },
-
-         getIdName: function getIdName() {
-             return this._widgetObj.getIdName();
-         },
-
-         /**
-          * 外部调用接口
-          * @return {[type]} [description]
-          */
-         dispatchProcess: function dispatchProcess() {
-             this._widgetObj.toggle();
-         },
-
-         /**
-          * 处理包装容器的状态
-          * @return {[type]} [description]
-          */
-         domWapper: function domWapper() {
-             if (!this.wapper) return;
-             if (this.state) {
-                 this.$wapper.hide();
-             } else {
-                 this.$wapper.show();
-             }
-         },
-
-         /**
-          * 销毁页面零件
-          * @return {[type]} [description]
-          */
-         destroy: function destroy() {
-             console.log(222222);
-             if (this._widgetObj && this._widgetObj.destroy) this._widgetObj.destroy();
-         }
-     };
-
-     var proportion$1 = void 0;
-     var screenSize$1 = void 0;
-     var appId = void 0;
-
-     function loadWidget(type, data, widgetClass) {
-         //pixi webgl模式
-         //2016.4.14
-         //高级精灵动画
-         var pageObj = Xut.Presentation.GetPageObj(data.pageType, data.pageIndex);
-         if (pageObj) {
-             if (pageObj.canvasRelated.enable) {
-                 //高级精灵动画不处理
-                 //已经改成本地化pixi=>content调用了
-                 if (data.widgetName === "spirit") {
-                     return;
-                 }
-             }
-         }
-
-         var widgetObj = new widgetClass(data);
-
-         //特殊的零件，也是只加载脚本
-         if (data.widgetName != "bones") {
-             //保存引用
-             //特殊的2个个零件不保存
-             Xut.Application.injectionComponent({
-                 'pageType': data.pageType, //标记类型区分
-                 'pageIndex': data.pageIndex,
-                 'widget': widgetObj
-             });
-         }
-     }
-
-     /**
-      * 构建5中零件类型
-      * 	1、iframe零件
-      *	2、页面零件
-      *	3、SVG零件
-      *	4、canvas零件
-      *	5、webGL零件
-      * @type {Object}
-      */
-     var adapterType = {
-
-         /**
-          * iframe零件类型
-          * @param  {[type]} data [description]
-          * @return {[type]}      [description]
-          */
-         'iframe': function iframe(data) {
-             loadWidget('widget', data, iframeWidget);
-         },
-         'widget': function widget(data) {
-             loadWidget('widget', data, iframeWidget);
-         },
-
-         /**
-          * js零件类型处理
-          * @param  {[type]} data [description]
-          * @return {[type]}      [description]
-          */
-         'js': function js(data) {
-             loadWidget('js', data, pageWidget);
-         },
-         'page': function page(data) {
-             loadWidget('page', data, pageWidget);
-         },
-         'svg': function svg(data) {
-             loadWidget('svg', data, pageWidget);
-         },
-         'canvas': function canvas(data) {
-             loadWidget('canvas', data, pageWidget);
-         },
-         'webgL': function webgL(data) {
-             loadWidget('webgL', data, pageWidget);
-         }
-     };
-
-     /**
-      * 获取widget数据
-      * @return {[type]} [description]
-      */
-     function filtrateDas(data) {
-         data = filterData(data);
-         return proportion$1.calculateElement(data);
-     }
-
-     /**
-      * 过滤出数据
-      * @return {[type]} [description]
-      */
-     function filterData(data) {
-         //直接通过id查询数据	
-         if (data.widgetId) {
-             _.extend(data, Xut.data.query('Widget', data.widgetId));
-         } else {
-             //直接通过activityId查询数据	
-             _.extend(data, Xut.data.query('Widget', data.activityId, 'activityId'));
-         }
-         return data;
-     }
-
-     /**
-      * 解析json数据
-      * @param  {[type]} itemArray [description]
-      * @return {[type]}           [description]
-      */
-     function ParseJSON(itemArray) {
-         var anminJson;
-         try {
-             anminJson = JSON.parse(itemArray);
-         } catch (error) {
-             anminJson = new Function("return " + itemArray)();
-         }
-         return anminJson;
-     }
-
-     /**
-      * ifarme内部，请求返回数据
-      * @return {[type]} [description]
-      */
-     function parsePara(data) {
-         var inputPara, //输入数据
-         outputPara; //输出数据
-         if (inputPara = data.inputPara) {
-             outputPara = ParseJSON(inputPara);
-         }
-         return outputPara;
-     }
-
-     function Adapter(para) {
-
-         config = Xut.config;
-         proportion$1 = config.proportion;
-         screenSize$1 = config.screenSize;
-         appId = config.appId;
-
-         //获取数据
-         var data = filtrateDas(para);
-
-         para = null;
-
-         data.id = data.activityId;
-
-         //解析数据
-         data.inputPara = parsePara(data);
-
-         if (!data.inputPara) {
-             data.inputPara = {};
-         }
-
-         //增加属性参数
-         if (data.widgetType === 'page') {
-             data.inputPara.container = data.rootNode;
-         }
-
-         data.inputPara.uuid = appId + '-' + data.activityId; //唯一ID标示
-         data.inputPara.id = data.activityId;
-         data.inputPara.screenSize = screenSize$1;
-         //content的命名前缀
-         data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType);
-
-         //画轴模式
-         data.scrollPaintingMode = config.scrollPaintingMode;
-         data.calculate = config.proportion.calculateContainer();
-
-         //执行类构建
-         adapterType[(data.widgetType || 'widget').toLowerCase()](data);
-     }
-
-     var Widget = {
-         //==========创建热点元素结构（用于布局可触发点）===============
-         //
-         // 根据数据创建自己的热点元素结构（用于拼接结构字符串）
-         //
-         // 要retrun返回这个结构，主要是多人操作时,保证只有最终的dom渲染只有一次
-         //
-         // sqlRet    具体动作对象的数据
-         // pageData  当前页面数据
-         // chaperId  当前页面的chapterId
-         // pageIndex 当前页面索引号
-         // zIndex    热点元素的层级
-         //
-         createDom: function createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-             var retStr = '',
-                 layerId,
-                 cssStyle,
-                 autoPlay = activityData.autoPlay;
-
-             //如果是自动播放,则不创建结构
-             if (autoPlay) {
-                 return retStr;
-             }
-
-             var backgroundImage = '',
-                 width = activityData.scaleWidth,
-                 height = activityData.scaleHeight,
-                 top = activityData.scaleTop,
-                 left = activityData.scaleLeft,
-                 actType = activityData.actType,
-                 md5 = activityData.md5;
-
-             //热点背景图
-             if (md5) {
-                 backgroundImage = "background-image: url(" + Xut.config.pathAddress + md5 + ");";
-             }
-
-             //创建触发点结构
-             layerId = actType + "_" + activityData._id;
-             cssStyle = 'cursor: pointer;width:' + width + 'px;height:' + height + 'px;left:' + left + 'px;top:' + top + 'px;background-size:100% 100%;position:absolute;z-index:' + zIndex + ';' + backgroundImage + '';
-
-             return String.format('<div id="{0}"' + ' data-belong ="{1}"' + ' data-delegate="{2}"'
-             // +' autoplay="{3}"' svg打包不可以属性
-              + ' style="{4}">' + ' </div>', layerId, pageType, actType, autoPlay, cssStyle);
-         },
-
-         //事件委托
-         //通过点击触发
-         eventDelegate: function eventDelegate(data) {
-             return Adapter(data);
-         },
-
-         //在当前页面自动触发的通知
-         autoPlay: function autoPlay(data) {
-             Adapter({
-                 'rootNode': data.rootNode,
-                 "type": data.type,
-                 "pageType": data.pageType,
-                 "activityId": data.id,
-                 "pageIndex": data.pageIndex,
-                 "isAutoPlay": true
-             });
-         },
-
-         /**
-          *  复位状态通知
-          *
-          *  作用：用户按页面右上角返回，或者pad手机上的物理返回键
-          *
-          *  那么：
-          *      1 按一次， 如果当前页面有活动热点，并且热点对象还在可视活动状态（比如文本，是显示，音频正在播放）
-          *        那么则调用此方法，做复位处理，即文本隐藏，音频关闭
-          *        然后返回true, 用于反馈给控制器,停止下一步调用
-          *        按第二次,则退出页面
-          *
-          *     2 按一次，如果没有活动的对象，return false,这直接退出页面
-          *
-          * @param  {[type]} activeObejct [description]
-          * @return {[type]}              [description]
-          */
-         recovery: function recovery(opts) {
-             return this.recovery();
-         }
-     };
-
-     function ShowNote$1(data) {
-         data.id = parseInt(data.id);
-         data.actType = data.type;
-         _.extend(this, data);
-         this.setup();
-     }
-
-     ShowNote$1.prototype = {
-         setup: function setup() {
-             var that = this,
-                 note = this.data.note,
-                 prop = Xut.config.proportion,
-                 width = Math.round((prop.width + prop.height) / 2 * Xut.config.iconHeight),
-                 space = Math.round(width / 2);
-             retStr = '<div class="xut-shownote-box" style="z-index:' + Xut.zIndexlevel() + '">' + '<div class="close" style="width:' + width + 'px;height:' + width + 'px;top:-' + space + 'px;right:-' + space + 'px"></div>' + '<div class="content">' + note + '</div>' + '</div>';
-
-             this._dom = $(retStr);
-             this._dom.find('.close').on("touchend mouseup", function () {
-                 that.dispatchProcess();
-             });
-             $(this.rootNode).append(this._dom);
-
-             this.show();
-             iscroll$1(this._dom.find('.content')[0]);
-             return true;
-         },
-
-         //外部调用接口
-         dispatchProcess: function dispatchProcess() {
-             //自动热点 取消关闭
-             if (this.isAutoPlay) return;
-             //当前对象状态
-             this.state ? this.hide() : this.show();
-         },
-
-         recovery: function recovery() {
-             if (this.state) {
-                 this.dispatchProcess();
-                 return true;
-             }
-             return false;
-         },
-
-         hide: function hide() {
-             this.state = false;
-             $("#ShowNote_" + this.id).css('background-image', 'url(images/icons/hideNote.png)');
-             this._dom.hide();
-         },
-
-         show: function show() {
-             this.state = true;
-             $("#ShowNote_" + this.id).css('background-image', 'url(images/icons/showNote.png)');
-             this._dom.show();
-         },
-
-         destroy: function destroy() {
-             if (this._dom) {
-                 this._dom.find('.close').off();
-                 this._dom && this._dom.hide().remove();
-             }
-         }
-
-     };
-
-     var ShowNote = {
-
-         //==========创建热点元素结构（用于布局可触发点）===============
-         //
-         // 根据数据创建自己的热点元素结构（用于拼接结构字符串）
-         //
-         // 要retrun返回这个结构，主要是多人操作时,保证只有最终的dom渲染只有一次
-         //actType + "_" + _id
-         createDom: function createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-             var retStr = "",
-                 newWidth,
-                 id = activityData['_id'],
-                 width = activityData.scaleWidth,
-                 height = activityData.scaleHeight,
-                 newWidth = (width + height) / 2 * Xut.config.iconHeight;
-
-             retStr += '<div id="ShowNote_' + id + '" class="xut-showNote" data-belong =' + pageType + ' data-delegate="ShowNote" style="width:' + newWidth + 'px;height:' + newWidth + 'px"></div>';
-             return retStr;
-         },
-
-         /**
-          * touchEnd 全局派发的点击事件
-          * 如果stopGlobalEvent == ture 事件由全局派发
-          */
-         eventDelegate: function eventDelegate(data) {
-             data.data = Xut.Presentation.GetPageData(data.pageIndex);
-             new ShowNote$1(data);
-         },
-
-         //自动运行生成Action或者widget触发点对象
-         autoPlay: function autoPlay(opts) {},
-
-         /**
-          * 翻页后处理页面中活动热点的状态
-          * @param  {[type]} activeObejct [需要处理的活动对象]
-          *
-          * 比如音频,视频 翻页需要暂停，也可以销毁
-          */
-         flipOver: function flipOver(opts) {
-             //console.log('翻页处理活动对象', activeObejct ,pageIndex);
-         },
-
-         /**
-          * 销毁页面hotspot事件与Action或widget事件
-          * @param  {[type]} activeObejct [需要处理的活动对象]
-          * @param  {[type]} pageIndex    [页码标示]
-          * @param  {[type]} rootEle      [根元素]
-          * @return {[type]}              [description]
-          */
-         destroy: function destroy(opts) {
-             this && this.destroy();
-         },
-
-         //========复位对象==========
-         //
-         //  通过按物理键，关闭当前热点
-         //
-         //  @return 如果当前没有需要处理的Action,
-         //  需要返回一个状态标示告诉当前是否应该退出应用
-         //
-         recovery: function recovery(opts) {
-             if (this.state) {
-                 this.dispatchProcess();
-                 return true;
-             }
-             return false;
-         }
-     };
-
-     var Webpage = Media;
-     var Video = Media;
-     var Audio$1 = Media;
-
-     var Bind = {
-         Video: Video,
-         Audio: Audio$1,
-         Action: Action,
-         Content: Content,
-         Webpage: Webpage,
-         Widget: Widget,
-         ShowNote: ShowNote
-     };
 
      function TaskComponents(data, suspendCallback, successCallback) {
 
@@ -15438,6 +17369,164 @@
          }).promise();
      }
 
+     /**
+      * 页面切换逻辑
+      * @param  {[type]} ) [description]
+      * @return {[type]}   [description]
+      */
+
+     /**
+      * 跳转之前提高层级问题
+      * @return {[type]}          [description]
+      */
+     function prev(complier, data) {
+         var currIndex = data.currIndex;
+         //跳转之前提高层级问题
+         complier.pageMgr.abstractAssistPocess(currIndex, function (pageObj) {
+             pageObj.element.css({
+                 'z-index': 9997
+             });
+         });
+         //提高母版层级
+         complier.callMasterMgr(function () {
+             this.abstractAssistPocess(currIndex, function (pageObj) {
+                 pageObj.element.css({
+                     'z-index': 1
+                 });
+             });
+         });
+     }
+
+     //处理跳转逻辑
+     function calculateFlip(complier, data, createCallback) {
+         //缓存当前页面索引用于销毁
+         var pageIndex,
+             i = 0,
+             collectContainers = [],
+             create = data.create,
+             targetIndex = data.targetIndex;
+
+         //需要创建的页面闭包器
+         for (; i < create.length; i++) {
+             pageIndex = create[i];
+             collectContainers.push(function (targetIndex, pageIndex) {
+                 return function (callback) {
+                     //创建新结构
+                     complier.create([pageIndex], targetIndex, 'toPage', callback, {
+                         'opacity': 0 //同页面切换,规定切换的样式
+                     });
+                 };
+             }(targetIndex, pageIndex));
+         }
+
+         /**
+          * 二维数组保存，创建返回的对象
+          * 1 page对象
+          * 2 母版对象
+          * @type {Array}
+          */
+         data.pageBaseCollect = [];
+
+         var i = 0,
+             collectLength,
+             count,
+             count = collectLength = collectContainers.length;
+
+         if (collectContainers && collectLength) {
+             for (; i < collectLength; i++) {
+                 //收集创建的根节点,异步等待容器的创建
+                 collectContainers[i].call(complier, function (callbackPageBase) {
+                     if (count === 1) {
+                         collectContainers = null;
+                         setTimeout(function () {
+                             createCallback(data);
+                         }, 100);
+                     }
+                     //接受创建后返回的页面对象
+                     data.pageBaseCollect.push(callbackPageBase);
+                     count--;
+                 });
+             }
+         }
+     }
+
+     //节点创建完毕后，切换页面动，执行动作
+     function createContainerView(complier, data) {
+
+         var prveHindex = data.currIndex;
+         var pageMgr = complier.pageMgr;
+
+         //停止当前页面动作
+         complier.suspend({
+             'stopPointer': prveHindex
+         });
+
+         //========处理跳转中逻辑=========
+
+         /**
+          * 清除掉不需要的页面
+          * 排除掉当前提高层次页面
+          */
+         _.each(data['destroy'], function (destroyIndex) {
+             if (destroyIndex !== data.currIndex) {
+                 pageMgr.clearPage(destroyIndex);
+             }
+         });
+
+         //修正翻页2页的页面坐标值
+         _.each(data['ruleOut'], function (pageIndex) {
+             if (pageIndex > data['targetIndex']) {
+                 pageMgr.abstractAssistAppoint(pageIndex, function (pageObj) {
+                     Translation.fix.call(pageObj, 'nextEffect');
+                 });
+             }
+             if (pageIndex < data['targetIndex']) {
+                 pageMgr.abstractAssistAppoint(pageIndex, function (pageObj) {
+                     Translation.fix.call(pageObj, 'prevEffect');
+                 });
+             }
+         });
+
+         var jumpPocesss;
+
+         //母版
+         complier.callMasterMgr(function () {
+             jumpPocesss = this.makeJumpPocesss(data);
+             jumpPocesss.pre();
+         });
+
+         //===========跳槽后逻辑========================
+         pageMgr.clearPage(prveHindex);
+
+         jumpPocesss && jumpPocesss.clean(data.currIndex, data.targetIndex);
+
+         /**
+          * 同页面切换,规定切换的样式复位
+          * @param  {[type]} pageBase [description]
+          * @return {[type]}          [description]
+          */
+         _.each(data.pageBaseCollect, function (pageBase) {
+             _.each(pageBase, function (pageObj) {
+                 pageObj.element && pageObj.element.css({
+                     'opacity': 1
+                 });
+             });
+         });
+
+         data.pageBaseCollect = null;
+         jumpPocesss = null;
+     }
+
+     function SwitchPage(complier, data, success) {
+         //跳前逻辑
+         prev(complier, data);
+         //处理逻辑
+         calculateFlip(complier, data, function (data) {
+             createContainerView(complier, data);
+             success.call(complier, data);
+         });
+     }
+
      //判断是否能整除2
      function offsetPage(num) {
          return num % 2 == 0 ? 'left' : 'right';
@@ -15943,7 +18032,7 @@
              this.suspend(pointers);
          });
          //目录栏
-         Navbar.close();
+         _close();
          //复位工具栏
          this.vm.$emit('change:resetToolbar');
      };

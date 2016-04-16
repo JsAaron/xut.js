@@ -182,7 +182,6 @@ behaviorProto.initBehavior = function(id, context, rootNode, chapterId, paramete
  * @return {[type]}                 [description]
  */
 behaviorProto.runBehavior = function(scopeComplete) {
-    console.log(this)
 
     var self = this,
         defaultIndex,
