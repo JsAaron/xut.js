@@ -1,7 +1,7 @@
 
 import {init} from './init/index'
 
-  
+   
 /**
  * 应用入口
  * @return {[type]} [description]
@@ -41,7 +41,7 @@ Xut.App = function() {
 
     //配置ibooks参数
     Xut.IBooks = {
-
+ 
         /**
          * 当前页面编号
          * @return {[type]} [description]
