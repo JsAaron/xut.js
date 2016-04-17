@@ -7,8 +7,7 @@ var version = process.env.VERSION;
 var uglify = require('uglify-js')
 var concat = require('gulp-concat')
 
-
-var config = require('../config')
+var config     = require('../config')
 var src        = config.src
 var lib        = config.lib
 var entry      = config.entry
@@ -19,35 +18,34 @@ var banner     = config.banner
 
 //dist
 var dist = './dist/'
-var output = dist + 'xxtppt.js'
-var outputmin = dist + 'xxtppt.min.js'
+var output = dist + 'xxtppt.min.js'
 
 
-
-rollup.rollup({
-        entry: entry,
-        plugins: [
-            babel({
-                "presets": ["es2015-rollup"]
-            })
-        ]
-    })
-    .then(function(bundle) {
-        var code = bundle.generate({
-            format: 'umd',
-            moduleName: moduleName
-        }).code
-        var minified = banner + '\n' + uglify.minify(code, {
-            fromString: true,
-            output: {
-                ascii_only: true
-            }
-        }).code
-        return write(outputmin, minified)
-    }).then(function(bundle) {
-        console.log(123)
-    }).catch(logError)
-
+var promise = new Promise(function(resolve, reject) {
+    rollup.rollup({
+            entry: entry,
+            plugins: [
+                babel({
+                    "presets": ["es2015-rollup"]
+                })
+            ]
+        })
+        .then(function(bundle) {
+            var code = bundle.generate({
+                format: 'umd',
+                moduleName: moduleName
+            }).code
+            var minified = banner + '\n' + uglify.minify(code, {
+                fromString: true,
+                output: {
+                    ascii_only: true
+                }
+            }).code
+            return write(dist + 'temp1.js', minified)
+        })
+        .then(resolve)
+        .catch(logError)
+})
 
 
 

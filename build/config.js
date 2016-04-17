@@ -1,3 +1,4 @@
+var fs = require('fs')
 var src = './src/'
 var lib = src + 'lib'
 var entry = lib + '/app.js'
@@ -13,6 +14,17 @@ var banner =
     ' */'
 
 
+function escape(str) {
+    var strs = new Array();
+    var a = str;
+    strs = a.split("");
+    for (var i = 0; i < strs.length; i++) {
+        a = a.replace("\\", "/")
+    }
+    return a;
+}
+
+
 function logError(e) {
     console.log(e)
 }
@@ -23,7 +35,7 @@ function getSize(code) {
 
 
 function blue(str) {
-    return '\x1b[1m\x1b[34m' + str + '\x1b[39m\x1b[22m'
+    return '\x1b[1m\x1b[34m' + escape(process.cwd()) + str + '\x1b[39m\x1b[22m'
 }
 
 
@@ -38,6 +50,12 @@ function write(path, code) {
 }
 
 
+/**
+ * 替换所有反斜杠为斜杠
+ * @return {[type]} [description]
+ */
+module.exports.escape = escape
+
 module.exports.src = src
 module.exports.lib = lib
 module.exports.entry = entry
@@ -45,5 +63,5 @@ module.exports.moduleName = moduleName
 module.exports.version = version
 
 module.exports.logError = logError
-module.exports.write = logError
+module.exports.write = write
 module.exports.banner = banner
