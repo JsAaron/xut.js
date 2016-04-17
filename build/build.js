@@ -8,6 +8,53 @@ var uglify = require('uglify-js')
 var concat = require('gulp-concat')
 
 
+var config = require('../config')
+var src        = config.src
+var lib        = config.lib
+var entry      = config.entry
+var moduleName = config.moduleName
+var logError   = config.logError
+var write      = config.write
+var banner     = config.banner
+
+//dist
+var dist = './dist/'
+var output = dist + 'xxtppt.js'
+var outputmin = dist + 'xxtppt.min.js'
+
+
+
+rollup.rollup({
+        entry: entry,
+        plugins: [
+            babel({
+                "presets": ["es2015-rollup"]
+            })
+        ]
+    })
+    .then(function(bundle) {
+        var code = bundle.generate({
+            format: 'umd',
+            moduleName: moduleName
+        }).code
+        var minified = banner + '\n' + uglify.minify(code, {
+            fromString: true,
+            output: {
+                ascii_only: true
+            }
+        }).code
+        return write(outputmin, minified)
+    }).then(function(bundle) {
+        console.log(123)
+    }).catch(logError)
+
+
+
+
+
+
+
+
 function rollup() {
     rollup.rollup({
             entry: entry,
@@ -35,7 +82,7 @@ function rollup() {
 }
 
 
-function concat() {
+function concatA() {
     fs.readFile('./index.html', "utf8", function(error, data) {
         if (error) throw error;
         var arr = []
