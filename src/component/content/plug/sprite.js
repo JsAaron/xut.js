@@ -10,14 +10,13 @@ from '../../../util/index'
 
 let DOC = document
 let prefix = Xut.plat.prefixStyle
-let keyframes = Xut.plat.KEYFRAMES
+let KEYFRAMES = Xut.plat.KEYFRAMES
 let ANIMATION_EV = Xut.plat.ANIMATION_EV
     //全局样式style
 let styleElement = null
 let playState = prefix('animation-play-state')
     //动画前缀
 let prefixAnims = prefix('animation')
-
 
 //css3模式-单图
 function css3Animate(options) {
@@ -57,7 +56,7 @@ function css3Animate(options) {
                 number = cssRules.length;
                 sheet.insertRule(rule, number);
             } catch (e) {
-                console.log(e.message + rule);
+                console.log(e );
             }
         } else {
             //创建样式文件
@@ -100,6 +99,7 @@ function css3Animate(options) {
 
     //格式化样式表达式
     function setStep(aniName, time, count, loop) {
+        var rule
         if (matrix) {
             rule = '{0} {1}s step-start {2}';
             return String.format(rule, aniName, time, loop);
@@ -116,11 +116,11 @@ function css3Animate(options) {
         //  3 4 5
         //  6 7 8
         if (matrix) {
-            var keyframes = [];
+            var frames = [];
             var base = 100 / count;
             var col = Number(matrix[0]); //列数
             //首次
-            keyframes.push(0 + '% { background-position:0% 0%}')
+            frames.push(0 + '% { background-position:0% 0%}')
             for (var i = 0; i < count; i++) {
                 var currRow = Math.ceil((i + 1) / col); //当前行数
                 var currCol = Math.floor(i / col); //当前列数  
@@ -130,11 +130,11 @@ function css3Animate(options) {
 
                 x = x == 0 ? x : "-" + x;
                 y = y == 0 ? y : "-" + y;
-                keyframes.push(((i + 1) * base) + '% { background-position: ' + x + '% ' + y + '%}')
+                frames.push(((i + 1) * base) + '% { background-position: ' + x + '% ' + y + '%}')
             }
-            return aniName + '{' + keyframes.join("") + '}';
+            return aniName + '{' + frames.join("") + '}';
         } else {
-            rule = '{0} {from { background-position:0 0; } to { background-position: -{1}px 0px}}';
+            var rule = '{0} {from { background-position:0 0; } to { background-position: -{1}px 0px}}';
             return String.format(rule, aniName, Math.round(x));
         }
     }
@@ -147,8 +147,8 @@ function css3Animate(options) {
 
     //添加到样式规则中
     function setKeyframes(rule) {
-        if (keyframes) {
-            insertCSSRule(keyframes + rule);
+        if (KEYFRAMES) {
+            insertCSSRule(KEYFRAMES + rule);
         }
     }
 
