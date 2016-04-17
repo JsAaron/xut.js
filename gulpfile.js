@@ -11,20 +11,29 @@ var concat = require('gulp-concat')
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 
-var root = '.'
-var src = root + '/src'
-var dest = root
-var packName = 'build'
+var src = './src'
+var entry = src + '/app.js'
 
-var database = require(root + '/node/index')
+var dest = './dest/'
+var moduleName = 'Aaron'
+var output = dest + 'xxtppt.js'
+var outputMin = dest + 'xxtppt.min.js'
+
+var database = require( './sqlite/index')
+
+
+gulp.task('database', function(callback) {
+    database.resolve(callback)
+})
+
 
 gulp.task('server', function() {
     browserSync.init({
-        server: root,
+        server: './',
         index: 'horizontal-test.html',
         port: 3000,
         open: true,
-        files: [root + "/build/xxtppt.js", root + "/horizontal-test.html", root + "/horizontal-test.html"]
+        files: [output, "./horizontal-test.html", "./horizontal-test.html"]
     });
 })
 
@@ -40,20 +49,30 @@ var banner =
     ' */'
 
 
-function write(dest, code) {
+function getSize(code) {
+    return (code.length / 1024).toFixed(2) + 'kb'
+}
+
+
+function blue(str) {
+    return '\x1b[1m\x1b[34m' + str + '\x1b[39m\x1b[22m'
+}
+
+
+function write(path, code) {
     return new Promise(function(resolve, reject) {
-        fs.writeFile(dest, code, function(err) {
+        fs.writeFile(path, code, function(err) {
             if (err) return reject(err)
-            console.log(blue(dest) + ' ' + getSize(code))
+            console.log(blue(path) + ' ' + getSize(code))
             resolve()
         })
     })
 }
 
 
-gulp.task('rollup-pack', function() {
+gulp.task('rollup', function() {
     rollup.rollup({
-            entry: src + '/app.js',
+            entry: entry,
             plugins: [
                 // replace({
                 //     'process.env.NODE_ENV': "'development'"
@@ -64,44 +83,26 @@ gulp.task('rollup-pack', function() {
             ]
         })
         .then(function(bundle) {
-            return write(dest + '/build/xxtppt.js', bundle.generate({
+            return write(output, bundle.generate({
                 format: 'umd',
                 banner: banner,
-                moduleName: 'xxtppt'
+                moduleName: moduleName
             }).code)
         })
         .catch(logError)
 })
 
 
-
-
-
-function getSize(code) {
-    return (code.length / 1024).toFixed(2) + 'kb'
-}
-
-
-
-function blue(str) {
-    return '\x1b[1m\x1b[34m' + str + '\x1b[39m\x1b[22m'
-}
-
-gulp.task('database', function(callback) {
-    database.resolve(callback)
-})
-
-
-gulp.task('develop', ['database', 'rollup-pack', 'server'], function() {
+gulp.task('dev', ['database', 'rollup', 'server'], function() {
     watch(src + '/**/*.js', function() {
-        gulp.run('rollup-pack');
+        gulp.run('rollup');
     });
 })
 
 
 gulp.task('build', function() {
     rollup.rollup({
-            entry: src + '/app.js',
+            entry: entry,
             plugins: [
                 babel({
                     "presets": ["es2015-rollup"]
@@ -111,7 +112,7 @@ gulp.task('build', function() {
         .then(function(bundle) {
             var code = bundle.generate({
                 format: 'umd',
-                moduleName: 'Aaron'
+                moduleName: moduleName
             }).code
             var minified = banner + '\n' + uglify.minify(code, {
                 fromString: true,
@@ -119,10 +120,10 @@ gulp.task('build', function() {
                     ascii_only: true
                 }
             }).code
-            return write(dest + '/build/xxtppt.js', minified)
+            return write(outputMin, minified)
         }).then(function(bundle) {
             console.log(123)
-        })
+        }).catch(logError)
 })
 
 
@@ -138,7 +139,7 @@ gulp.task('concat', function() {
             val = val.match(/src="(.*?.js)/);
             if (val && val.length) {
                 path = val[1]
-                //有效src
+                    //有效src
                 if (/^src|build/.test(path)) {
                     arr.push(val[1])
                 }

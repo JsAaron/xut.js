@@ -1,12 +1,12 @@
 
 import {init} from './init/index'
 
-
+  
 /**
  * 应用入口
  * @return {[type]} [description]
  */
-Xut.app = function() {
+Xut.App = function() {
 
 
     //更新版本号记录
