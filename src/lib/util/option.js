@@ -3,7 +3,7 @@ import {
 }
 from './notice'
 
-import {request} from './loader'
+import { request } from './loader'
 
 
 /**
@@ -86,25 +86,38 @@ export function readFile(path, callback, type) {
      * @return {[type]}              [description]
      */
     if (Xut.IBooks.CONFIG) {
-        paths = config.svgPath().replace("svg", 'js') + path;
-        name = path.replace(".svg", '')
-        request(paths.replace(".svg", '.js'), function() {
-            data = Xut.IBooks.CONFIG[name];
+
+        //如果是.svg结尾
+        //把svg替换成js
+        if (/.svg$/.test(path)) {
+            path = path.replace(".svg", '.js')
+        }
+
+        //全路径
+        paths = Config.svgPath().replace("svg", 'js') + path;
+        //文件名
+        name = path.replace(".js", '')
+
+        //加载脚本
+        request(paths, function() {
+            data = HTMLCONFIG[name] || IBOOKSCONFIG[name]
             if (data) {
                 callback(data)
-                delete Xut.IBooks.CONFIG[name];
+                delete HTMLCONFIG[name];
             } else {
-                callback('脚本加载失败,文件名:' + path);
+                callback('编译:脚本加载失败,文件名:' + name);
             }
         })
+
         return
     }
 
-
+    //con str
+    //externalFile使用
     //如果是js动态文件
     //content的html结构
     if (type === "js") {
-        paths = config.svgPath() + path;
+        paths = Config.svgPath() + path;
         name = path.replace(".js", '')
         request(paths, function() {
             data = window.HTMLCONFIG[name];
@@ -112,12 +125,12 @@ export function readFile(path, callback, type) {
                 callback(data)
                 delete window.HTMLCONFIG[name];
             } else {
-                callback('脚本加载失败,文件名:' + path);
+                callback('运行：脚本加载失败,文件名:' + path);
             }
         })
         return
     }
-
+    
     //svg文件
     //游览器模式
     if (Xut.plat.isBrowser) {

@@ -9,7 +9,7 @@ let App = function() {
     
 
     //更新版本号记录
-    Xut.Version = 779;
+    Xut.Version = 780;
 
     /**
      * 动态html文件挂载点

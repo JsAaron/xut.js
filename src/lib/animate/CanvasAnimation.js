@@ -84,14 +84,14 @@ CanvasAnimation.prototype = {
 			try {
 				//获取动画前脚本
 				if (data.preCode && data.preCode.length > 0)
-					this.preCode = new Function("(function(){" + this.enterReplace(data.preCode) + "})");
+					this.preCode = eval("(function(){" + this.enterReplace(data.preCode) + "})");
 				else if (this.parameter0.preCode && this.parameter0.preCode.length > 0)
-					this.preCode = new Function("(function(){" + this.enterReplace(this.parameter0.preCode) + "})");
+					this.preCode = eval("(function(){" + this.enterReplace(this.parameter0.preCode) + "})");
 				//获取动画后脚本
 				if (data.postCode && data.postCode.length > 0)
-					this.postCode = new Function("(function(){" + this.enterReplace(data.postCode) + "})");
+					this.postCode = eval("(function(){" + this.enterReplace(data.postCode) + "})");
 				else if (this.parameter0.postCode && this.parameter0.postCode.length > 0)
-					this.postCode = new Function("(function(){" + this.enterReplace(this.parameter0.postCode) + "})");
+					this.postCode = eval("(function(){" + this.enterReplace(this.parameter0.postCode) + "})");
 				//获取延时时间
 				if (data.codeDelay && data.codeDelay > 0)
 					this.codeDelay = data.codeDelay;

@@ -209,7 +209,6 @@ function activityClass(data) {
         return this;
     }
 
-
     this.monitorComplete();
 }
 
@@ -756,8 +755,8 @@ activitPro.relevantOperation = function() {
             if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
                 setTimeout(function() {
                     Xut.View.LoadScenario({
-                        'scenarioId': scenarioInfo.seasonId,
-                        'chapterId': scenarioInfo.chapterId
+                        'scenarioId' : scenarioInfo.seasonId,
+                        'chapterId'  : scenarioInfo.chapterId
                     })
                 }, Xut.fix.audio ? 1000 : 0)
                 return

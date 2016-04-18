@@ -31,7 +31,7 @@ export function bindEvents(eventData) {
     eventData.eventContext.interactive = true;
     adapter[eventData.eventName](eventData);
 }
-
+ 
 /**
  * 销毁事件
  * @return {[type]} [description]

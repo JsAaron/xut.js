@@ -54,27 +54,6 @@ function bind(instance, success, fail) {
 }
 
 
-var uid = 0
-
-/**
- * 依赖订阅
- */
-function Dep() {
-    this.id = uid++;
-    this.subs = []
-}
-Dep.prototype.addSub = function(sub) {
-    this.subs.push(sub)
-}
-Dep.prototype.removeSub = function(sub) {
-    this.subs = [];
-}
-Dep.prototype.notify = function() {
-    if (this.subs.length) {
-        console.log('依赖队列')
-    }
-}
-
 
 /**
  * 动画对象控制
@@ -83,8 +62,9 @@ Dep.prototype.notify = function() {
 var Animation = function(options) {
     //mix参数
     _.extend(this, options);
-}
+    
 
+}
 
 var animProto = Animation.prototype;
 
@@ -120,6 +100,7 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         this.domSprites = this.contentDas.category === 'Sprite' ? true : false;
     }
 
+
     //canvas模式
     //比较复杂
     //1 普通与ppt组合
@@ -151,20 +132,28 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
             }
         }
 
+        if(actionTypes.widgetId){
+
+            console.log(this,parameter)
+
+        }
+
+      //  console.log(actionTypes.widgetId)
+
         //高级精灵动画
         //这个比较麻烦
         //因为精灵动画是widget创建类型
         //所以代码需要延后，等待高级content先创建
-        if (actionTypes.widgetId) {
-            this.linker = function() {
-                return function widgetppt(context) {
-                    self.pptObj = create(CanvasAnimation, context.sprObjs[0].advSprite);
-                    self.linker.dep.notify(self.pptObj)
-                }
-            }();
-            // 收集依赖
-            this.linker.dep = new Dep()
-        }
+        // if (actionTypes.widgetId) {
+        //     this.linker = function() {
+        //         return function widgetppt(context) {
+        //             self.pptObj = create(CanvasAnimation, context.sprObjs[0].advSprite);
+        //             self.linker.dep.notify(self.pptObj)
+        //         }
+        //     }();
+        //     // 收集依赖
+        //     this.linker.dep = new Dep()
+        // }
     }
 
 };
