@@ -1,6 +1,4 @@
-
-
-import { iscroll } from './content/iscroll'
+import { Iscroll } from './content/iscroll'
 
 function ShowNote(data) {
     data.id = parseInt(data.id);
@@ -28,7 +26,7 @@ ShowNote.prototype = {
         $(this.rootNode).append(this._dom);
 
         this.show();
-        iscroll(this._dom.find('.content')[0]);
+        this.iscroll = Iscroll(this._dom.find('.content')[0]);
         return true;
     },
 
@@ -65,6 +63,12 @@ ShowNote.prototype = {
         if (this._dom) {
             this._dom.find('.close').off();
             this._dom && this._dom.hide().remove();
+        }
+
+        //iscroll销毁
+        if (this.iscroll) {
+            this.iscroll.destroy();
+            this.iscroll = null;
         }
     }
 

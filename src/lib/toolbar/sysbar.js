@@ -3,7 +3,7 @@
  * 系统工具栏
  */
 import { ToolBar } from './base/toolBar'
-
+import { close as navbarClose} from './navbar'
 
 var sToolbar = ToolBar.extend({
     init: function(options) {
@@ -26,13 +26,13 @@ var sToolbar = ToolBar.extend({
         this.initTool();
     }
 });
-
-
+  
+ 
 sToolbar.prototype.initTool = function() {
 
     var bar = this.controlBar,
         setting = this.settings;
-
+ 
     //工具栏的显示状态
     this.barStatus = (bar.css('display') === 'none') ? false : true;
 
@@ -252,19 +252,19 @@ sToolbar.prototype.showTopBar = function() {
         'display': 'block',
         'opacity': 0
     });
-
+  
     setTimeout(function() {
         that.controlBar.animate({
             'opacity': 1
         }, that.delay, 'linear', function() {
-            Navbar.close();
+            navbarClose();
             that.showSystemBar();
             that.barStatus = true;
             that.Lock = false;
         });
-    });
-}
-
+    }); 
+} 
+     
 /**
  * [ 隐藏顶部工具栏]
  * @return {[type]} [description]
@@ -275,21 +275,21 @@ sToolbar.prototype.hideTopBar = function() {
     if (!this.barStatus) {
         this.Lock = false;
         return;
-    }
-
+    } 
+ 
     this.controlBar.animate({
         'opacity': 0
     }, that.delay, 'linear', function() {
-        Navbar.close();
+        navbarClose();
         that.controlBar.hide();
         that.hideSystemBar();
         that.barStatus = false;
         that.Lock = false;
     });
-}
+} 
 
 
-//销毁
+//销毁 
 sToolbar.prototype.destroy = function() {
     this.controlBar.off();
     this.controlBar = null;

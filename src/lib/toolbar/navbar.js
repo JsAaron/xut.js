@@ -317,7 +317,7 @@
  function load() {
      new SectionList($("#navBar"));
  };
-
+ 
 
  //关闭
  function close(callback) {
@@ -343,3 +343,4 @@
      close,
      destroy
  };
+  

@@ -4,9 +4,9 @@
 //  node-webkit 无法x64编译的处理
 //
 
-var fs   = require("fs");
-var SQL  = require('sql.js');
-var _    = require("./underscore");
+var fs = require("fs");
+var SQL = require('sql.js');
+var _ = require("./underscore");
 
 var db;
 
@@ -34,19 +34,28 @@ exports.init = function(path) {
  * @return {[type]}        [description]
  */
 exports.query = function(sql, done, err) {
-    var res = db.exec(sql);
+
+    try {
+        var res = db.exec(sql);
+    } catch (e) {
+        console.log('sql不存在',e)
+        err();
+        return
+    }
+
+
     // //数据域
     var results = {};
     //如果有数据
     if (res[0] && res[0].values) {
         var columns = res[0].columns
         _.each(res[0].values, function(ret, index) {
-            results[index] = {}
-            _.each(ret, function(data, i) {
-                results[index][columns[i]] = data;
+                results[index] = {}
+                _.each(ret, function(data, i) {
+                    results[index][columns[i]] = data;
+                })
             })
-        })
-        // global.$log(sql)
+            // global.$log(sql)
         done(results)
     } else {
         err();

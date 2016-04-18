@@ -2730,7 +2730,7 @@
                  //ppt
              dbId = results._id;
 
-             actionType = parseInt(results.actionType);
+             var actionType = parseInt(results.actionType);
 
              //跳转或打开本地程序
              switch (actionType) {
@@ -3380,7 +3380,6 @@
           */
          bindPMS: function bindPMS() {
              var me = this,
-                 PMS = PMS || require("PMS"),
                  markId = this.id;
 
              this.PMS = PMS;
@@ -4042,7 +4041,7 @@
      // * @param  {[type]} contentWrapperDomId [description]
      // * @return {[type]}                     [description]
 
-     function createIscroll(element) {
+     function Iscroll(element) {
           //是否移动，中途停止了动画
           var distX = 0,
               distY = 0,
@@ -4060,7 +4059,7 @@
                Xut.View.GotoNextSlide();
           };
 
-          this.iscroll = iscroll = new iScroll(element, {
+          return new iScroll(element, {
                scrollbars: true,
                fadeScrollbars: true
                //click          : true,
@@ -4149,7 +4148,7 @@
              $(this.rootNode).append(this._dom);
 
              this.show();
-             createIscroll(this._dom.find('.content')[0]);
+             this.iscroll = Iscroll(this._dom.find('.content')[0]);
              return true;
          },
 
@@ -4185,6 +4184,12 @@
              if (this._dom) {
                  this._dom.find('.close').off();
                  this._dom && this._dom.hide().remove();
+             }
+
+             //iscroll销毁
+             if (this.iscroll) {
+                 this.iscroll.destroy();
+                 this.iscroll = null;
              }
          }
 
@@ -5669,7 +5674,7 @@
              that.controlBar.animate({
                  'opacity': 1
              }, that.delay, 'linear', function () {
-                 Navbar.close();
+                 _close();
                  that.showSystemBar();
                  that.barStatus = true;
                  that.Lock = false;
@@ -5692,7 +5697,7 @@
          this.controlBar.animate({
              'opacity': 0
          }, that.delay, 'linear', function () {
-             Navbar.close();
+             _close();
              that.controlBar.hide();
              that.hideSystemBar();
              that.barStatus = false;
@@ -6576,9 +6581,10 @@
          this.container.append(wrap);
          //是否滚动
          this.isScrolled = false;
+
          //添加滚动条
          //url : http://iscrolljs.com/
-         iscroll = new iScroll(wrap, {
+         this.iscroll = new iScroll(wrap, {
              scrollbars: true,
              fadeScrollbars: true,
              scrollX: false
@@ -6588,17 +6594,15 @@
 
          this.setColor();
 
-         iscroll.on('scrollStart', function (e) {
+         this.iscroll.on('scrollStart', function (e) {
              self.isScrolled = true;
          });
 
-         iscroll.on('scrollEnd', function (e) {
+         this.iscroll.on('scrollEnd', function (e) {
              self.isScrolled = false;
          });
 
          wrap.appendChild(mask);
-
-         this.iscroll = iscroll;
      };
 
      /**
@@ -13861,7 +13865,7 @@
              //ios or pc
              if (!Xut.plat.isAndroid) {
                  return function () {
-                     createIscroll(element);
+                     self.iscroll = Iscroll(element);
                  };
              }
 
@@ -13901,7 +13905,7 @@
              }
 
              return function () {
-                 createIscroll(element);
+                 self.iscroll = Iscroll(element);
                  restore();
                  preEle = null;
                  restore = null;
@@ -21397,7 +21401,7 @@
       * 应用入口
       * @return {[type]} [description]
       */
-     Xut.App = function () {
+     var App = function App() {
 
          //更新版本号记录
          Xut.Version = 779;
@@ -21507,5 +21511,9 @@
 
          init();
      };
+
+     $(function () {
+         App();
+     });
 
 }));

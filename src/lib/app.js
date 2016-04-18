@@ -1,13 +1,12 @@
+import { init } from './init/index'
 
-import {init} from './init/index'
 
-   
 /**
  * 应用入口
  * @return {[type]} [description]
  */
-Xut.App = function() {
-
+let App = function() {
+    
 
     //更新版本号记录
     Xut.Version = 779;
@@ -18,13 +17,13 @@ Xut.App = function() {
      * @type {Object}
      */
     window.HTMLCONFIG = {}
-
+ 
     /**
      * 2015.10.19新增
      * ibooks处理
      */
     var IBOOKSCONFIG = window.IBOOKSCONFIG;
-
+   
     //如果是IBOOS模式处理
     //注入保持与数据库H5查询一致
     if (IBOOKSCONFIG && IBOOKSCONFIG.data) {
@@ -41,7 +40,7 @@ Xut.App = function() {
 
     //配置ibooks参数
     Xut.IBooks = {
- 
+
         /**
          * 当前页面编号
          * @return {[type]} [description]
@@ -118,3 +117,8 @@ Xut.App = function() {
 
     init();
 }
+
+
+$(function() {
+    App()
+})

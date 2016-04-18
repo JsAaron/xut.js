@@ -27,8 +27,9 @@ Action.prototype = {
             para2 = results.para2, //ppt
             dbId = results._id;
 
-        actionType = parseInt(results.actionType);
 
+        var actionType = parseInt(results.actionType);
+ 
         //跳转或打开本地程序
         switch (actionType) {
             case 0:

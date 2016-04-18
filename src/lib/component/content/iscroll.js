@@ -4,7 +4,7 @@
  // * @param  {[type]} contentWrapperDomId [description]
  // * @return {[type]}                     [description]
 
- export function iscroll(element) {
+ export function Iscroll(element) {
      //是否移动，中途停止了动画
      var distX = 0,
          distY = 0,
@@ -22,7 +22,7 @@
              Xut.View.GotoNextSlide()
          };
 
-     this.iscroll = iscroll = new iScroll(element, {
+     return new iScroll(element, {
          scrollbars: true,
          fadeScrollbars: true
              //click          : true,

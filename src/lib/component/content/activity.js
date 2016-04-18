@@ -15,7 +15,7 @@
 
 //卷滚
 import {
-    iscroll as createIscroll
+    Iscroll
 }
 from './iscroll'
 
@@ -435,7 +435,7 @@ activitPro.addIScroll = function(scope, element) {
         //ios or pc
         if (!Xut.plat.isAndroid) {
             return function() {
-                createIscroll(element);
+                self.iscroll = Iscroll(element);
             }
         }
 
@@ -475,7 +475,7 @@ activitPro.addIScroll = function(scope, element) {
         }
 
         return function() {
-            createIscroll(element);
+            self.iscroll = Iscroll(element);
             restore();
             preEle = null;
             restore = null;

@@ -201,9 +201,10 @@ Bar.prototype.createDirMenu = function() {
     this.container.append(wrap);
     //是否滚动
     this.isScrolled = false;
+
     //添加滚动条
     //url : http://iscrolljs.com/
-    iscroll = new iScroll(wrap, {
+    this.iscroll = new iScroll(wrap, {
         scrollbars: true,
         fadeScrollbars: true,
         scrollX: false
@@ -213,17 +214,16 @@ Bar.prototype.createDirMenu = function() {
 
     this.setColor();
 
-    iscroll.on('scrollStart', function(e) {
+    this.iscroll.on('scrollStart', function(e) {
         self.isScrolled = true;
     });
 
-    iscroll.on('scrollEnd', function(e) {
+    this.iscroll.on('scrollEnd', function(e) {
         self.isScrolled = false;
     });
 
     wrap.appendChild(mask);
 
-    this.iscroll = iscroll;
 }
 
 /**

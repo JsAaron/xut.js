@@ -164,7 +164,6 @@ iframeWidget.prototype = {
      */
     bindPMS: function() {
         var me = this,
-            PMS = PMS || require("PMS"),
             markId = this.id;
 
         this.PMS = PMS;
