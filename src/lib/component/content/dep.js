@@ -21,3 +21,5 @@ Dep.prototype.notify = function() {
         console.log('依赖队列')
     }
 }
+
+export {Dep}

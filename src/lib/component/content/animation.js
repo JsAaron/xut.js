@@ -132,12 +132,13 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         }
 
         //高级精灵动画
-        //这个比较麻烦
+        //content需要依赖高级动画pixi创建
         //因为精灵动画是widget创建类型
         //所以代码需要延后，等待高级content先创建
         if (actionTypes.widgetId) {
             this.linker = function() {
-                return function widgetppt(context) {
+                return function pptwidget(context) {
+                    self.linker = null;
                     self.pptObj = create(CanvasAnimation, context.sprObjs[0].advSprite);
                     self.linker.dep.notify(self.pptObj)
                 }
@@ -148,6 +149,7 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
     }
 
 };
+
 
 /**
  * 运行动画
@@ -161,8 +163,7 @@ animProto.run = function(scopeComplete) {
         defaultIndex,
         element = this.$contentProcess;
 
-    var pptRun = function(animObj) {
-
+    var succeed = function(animObj) {
         //优化处理,只针对互斥的情况下
         //处理层级关系
         if (element.prop && element.prop("mutex")) {
@@ -170,15 +171,24 @@ animProto.run = function(scopeComplete) {
                 'display': 'block'
             })
         }
-
         //指定动画
         animObj.runAnimation(scopeComplete);
     }
 
-    //ppt动画
-    bind(this.pptObj, pptRun)
+    //失败增加依赖触发
+    var fail = function() {
+        if(self.linker){
+            self.linker.dep.addSub(succeed)
+        }
+    }
 
-    //canvas精灵动画
+    //ppt动画
+    //dom
+    //canvas =》link => fail
+    bind(this.pptObj, succeed, fail)
+
+
+    //canvas普通精灵动画
     bind(this.pixiSpriteObj, function(animObj) {
         animObj.playPixi(scopeComplete);
     })

@@ -43,7 +43,7 @@ import { HtmlBox } from './htmlbox'
 import { bindEvents as bindPixiEvents } from '../pixi/event'
 
 //任务
-import { createNextTask } from './nextTask'
+import { createNextTask } from './nexttask'
 
 
 /**
@@ -606,7 +606,8 @@ activitProto.createEventRelated = function() {
         function domEvent() {
             pid = this.pid
             contentName = this._makePrefix('Content', pid, this.id)
-                //找到对应绑定事件的元素
+
+            //找到对应绑定事件的元素
             eventContext = this._findContentElement(contentName)
         }
 
@@ -987,7 +988,8 @@ activitProto._addIScroll = function(scope, element) {
     if (contentDas.isScroll) {
         //去掉高度，因为有滚动文本框
         element.find(">").css("height", "")
-            // elementName = this._makePrefix('contentWrapper', scope.pid, scope.id);
+
+        // elementName = this._makePrefix('contentWrapper', scope.pid, scope.id);
         this.relatedCallback.iscrollHooks.push(makeUseFunction(element[0]));
     }
 
