@@ -69,7 +69,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
          * 确保节点存在
          * @type {[type]}
          */
-        if (!($contentProcess = base.findContentElement(actName))) {
+        if (!($contentProcess = base._findContentElement(actName))) {
             return;
         };
     }
@@ -165,7 +165,7 @@ function createHandlers(base, parameter, waitCreate) {
     var para = parameter[0],
         contentId = para['contentId'], //可能有多个动画数据 [Object,Object,Object]
         pid = base.pid,
-        actName = base.makePrefix('Content', pid, contentId),
+        actName = base._makePrefix('Content', pid, contentId),
         contentDas = base.relatedData.contentDas[contentId];
 
     /**

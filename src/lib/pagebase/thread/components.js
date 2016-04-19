@@ -41,13 +41,14 @@ TaskComponents.prototype = {
 
     create: function(data) {
         var actType,
-            pageType = data.pageType,
+            pageType      = data.pageType,
             createWidgets = data.activitys,
-            chpaterData = data.chpaterData,
-            chapterId = data.chapterId,
-            pid = data.pid,
+            chpaterData   = data.chpaterData,
+            chapterId     = data.chapterId,
+            pid           = data.pid,
             virtualOffset = data.virtualOffset,
-            widgetRetStr = [];
+            widgetRetStr  = [];
+            
 
         function virtualCreate(actType, activityData) {
             var scaleLeft = activityData.scaleLeft;

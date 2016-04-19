@@ -91,7 +91,7 @@ var AudioFactory = Xut.CoreObject.extend({
         //flash模式不执行
         if (this.audio && !this.isFlash) {
             this.status = 'playing';
-            this.audio.play();
+            // this.audio.play();
         }
         this.acitonObj && this.acitonObj.play();
     },

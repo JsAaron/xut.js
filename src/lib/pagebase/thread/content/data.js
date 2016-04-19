@@ -17,8 +17,15 @@ _.each("jsWidget content svgWidget canvasWidget path".split(" "), function(key, 
     widgetType[key] = true
 });
 
-function typeExtend(Activity) {
-    return widgetType[Activity.category] ? "JsWidget" : Activity.actType
+
+/**
+ * 类型统一
+ * @param  {[type]} activity [description]
+ * @return {[type]}          [description]
+ */
+function unifyType(activity) {
+    //满足条件统一为零件类型
+    return widgetType[activity.category] ? "JsWidget" : activity.actType
 }
 
 
@@ -82,31 +89,33 @@ function adapterItemArrayRelated(relateds, activitys, tokens) {
 
 ////////////
 //解析相关数据 //
+//解析每一条 Activitys 对应的数据结构
 ////////////
-function parserRelated(preCompileContents, data) {
+function parserRelated(compileActivitys, data) {
+
     var activitys,
-        createType,
+        hookType,
         resultsActivitys, //结果结合
-        i = preCompileContents.length,
+        i        = compileActivitys.length,
         pageType = data.pageType,
-        pid = data.pid,
+        pid      = data.pid,
 
         /**
          * 相关数据合集
          * @type {Object}
          */
         activityRelated = [], //Activit合集相关数据信息
-        tempRelated = [], //临时数据
+        tempRelated     = [], //临时数据
 
         /**
          * 解析出来的相关信息
          * @type {Object}
          */
         relateds = {
-            seasonRelated: {}, //节信息
-            containerRelated: [], //容器合集相关数据信息
-            eventRelated: {}, //多事件容器合集
-            partContentRelated: [] //卷滚conten只创建,不处理行为
+            seasonRelated      : {}, //节信息
+            containerRelated   : [], //容器合集相关数据信息
+            eventRelated       : {}, //多事件容器合集
+            partContentRelated : []  //卷滚conten只创建,不处理行为
         };
 
 
@@ -115,11 +124,12 @@ function parserRelated(preCompileContents, data) {
      * @param  {Function} callback [description]
      * @return {[type]}            [description]
      */
-    function createResolve(callback) {
+    var createResolve = function(callback) {
         return resolveContentToActivity(function(tokens) {
             return callback(tokens);
         }, activitys, pageType, pid)
     }
+
 
     /**
      * 类型处理器
@@ -127,8 +137,13 @@ function parserRelated(preCompileContents, data) {
      * @type {Object}
      */
     var hookResolve = {
-        //单独处理容器类型
-        "Container": function(relateds) {
+
+        /**
+         * 单独处理容器类型
+         * @param  {[type]} relateds [description]
+         * @return {[type]}          [description]
+         */
+        "Container": function() {
             relateds.containerRelated.push(
                 createResolve(function(tokens) {
                     return {
@@ -138,8 +153,12 @@ function parserRelated(preCompileContents, data) {
             )
         },
 
-        //多事件
-        "Contents": function(relateds) {
+        /**
+         * 多事件
+         * @param  {[type]} relateds [description]
+         * @return {[type]}          [description]
+         */
+        "Contents": function() {
             var item;
             if (item = createResolve(function(tokens) {
                     return {
@@ -149,11 +168,11 @@ function parserRelated(preCompileContents, data) {
                 //给content注册多个绑定事件
                 var eventId = activitys.imageId;
                 var eventData = {
-                    'eventContentId': eventId,
-                    'activityId': activitys._id,
-                    'registers': item['activity'],
-                    'eventType': activitys.eventType,
-                    'dragdropPara': activitys.para1 //拖拽对象
+                    'eventContentId' : eventId,
+                    'activityId'     : activitys._id,
+                    'registers'      : item['activity'],
+                    'eventType'      : activitys.eventType,
+                    'dragdropPara'   : activitys.para1 //拖拽对象
                 }
                 var isEvt = relateds.eventRelated['eventContentId->' + eventId];
                 if (isEvt) {
@@ -164,8 +183,12 @@ function parserRelated(preCompileContents, data) {
             }
         },
 
-        //所有js零件
-        "JsWidget": function(relateds) {
+        /**
+         * 所有js零件
+         * @param  {[type]} relateds [description]
+         * @return {[type]}          [description]
+         */
+        "JsWidget": function() {
             var scrollContents = parseJSON(activitys.itemArray);
             if (_.isArray(scrollContents)) {
                 _.each(scrollContents, function(data) {
@@ -177,6 +200,8 @@ function parserRelated(preCompileContents, data) {
         }
     }
 
+
+
     /**
      * 解析出当前页面的所有的Activit表
      * 1个chpater页面 可以对应多个Activit表中的数据
@@ -187,13 +212,18 @@ function parserRelated(preCompileContents, data) {
      * 5 content合集 contents处理
      *
      */
-    while (activitys = preCompileContents.shift()) {
+    while (activitys = compileActivitys.shift()) {
 
-        createType = typeExtend(activitys);
+        //统一类型
+        hookType = unifyType(activitys);
 
-        if (!hookResolve[createType]
-            //钩子事件
-            || (hookResolve[createType] && hookResolve[createType](relateds))) {
+        //类型匹配
+        if (!hookResolve[hookType]
+            /////////////////
+            ///钩子事件
+            ////////////////
+            || (hookResolve[hookType] && hookResolve[hookType](relateds)) ) {
+
 
             /////////////////////
             //Content类型处理 //
@@ -201,8 +231,10 @@ function parserRelated(preCompileContents, data) {
 
             //如果是动画表,视觉差表关联的content类型
             resultsActivitys = createResolve(function(tokens) {
+
                 //解析itemArray字段中的相关的信息
                 adapterItemArrayRelated(relateds, activitys, tokens);
+
                 //解析表数据
                 switch (pageType) {
                     case 'page':
@@ -212,7 +244,9 @@ function parserRelated(preCompileContents, data) {
                         //视觉差支持所有content动画
                         return parseTypeRelation(['Animation', 'Parallax'], tokens);
                 }
+
             });
+
 
             //如果有手动触发器,置于最后
             if (activitys.imageId) {
@@ -231,7 +265,7 @@ function parserRelated(preCompileContents, data) {
     /**
      *	过滤出与创建相关的content合集ID
      *	return [
-     *		createImageIds  主content列表 (用来绑定eventType事件)
+     *		createEventIds  主content列表 (用来绑定eventType事件)
      *	    createContentIds 合并所有content操作后,过滤掉重复的content,得到可以创建的content的ID合集
      *	]
      *
@@ -239,7 +273,7 @@ function parserRelated(preCompileContents, data) {
      * partContentRelated 需要过滤的数据
      */
     // console.log(activityRelated.slice(0))
-    var createImageIds,
+    var createEventIds,
         createContentIds,
         cacheUUID = 'createRelevant-' + data.chapterId,
         createRelevant = contentCache[cacheUUID];
@@ -250,15 +284,15 @@ function parserRelated(preCompileContents, data) {
             toRepeatCombineGroup(activityRelated, relateds.partContentRelated, pageType));
     }
 
-    createImageIds = createRelevant[0].slice(0);
+    createEventIds   = createRelevant[0].slice(0);
     createContentIds = createRelevant[1].slice(0);
 
     //如果存在过滤器
     if (Xut.CreateFilter.size()) {
         var filterEach = Xut.CreateFilter.each(data.chapterId)
         if (filterEach) {
-            filterEach(createImageIds, function(indexOf) {
-                createImageIds.splice(indexOf, 1)
+            filterEach(createEventIds, function(indexOf) {
+                createEventIds.splice(indexOf, 1)
             })
             filterEach(createContentIds, function(indexOf) {
                 createContentIds.splice(indexOf, 1)
@@ -268,10 +302,10 @@ function parserRelated(preCompileContents, data) {
     }
 
     return _.extend(data, relateds, {
-        'createImageIds': createImageIds, //事件ID数
-        'createContentIds': createContentIds, //创建的content总ID数
-        'originalCreateContentIds': createContentIds.slice(0), //保留原始的创建副本
-        'activityRelated': activityRelated
+        'createEventIds'              : createEventIds, //事件ID数
+        'createContentIds'            : createContentIds, //创建的content总ID数
+        // 'originalCreateContentIds' : createContentIds.slice(0), //保留原始的创建副本
+        'createActivitys'             : activityRelated
     });
 };
 
@@ -307,6 +341,7 @@ function resolveContentToActivity(callback, activity, pageType, pid) {
 
         //判断类型
         type = Object.keys(seed)[0];
+
 
     /**
      * 去重事件ID
@@ -428,10 +463,10 @@ function toRepeatCombineGroup(compilerActivitys, mixFilterRelated, pageType) {
     while (i--) {
         //开始执行过滤操作
         activityRelated = compilerActivitys[i];
-        ids = activityRelated.ids;
-        contentIds = ids.content;
-        parallaxId = ids.parallax; //浮动类型的对象
-        imageIds = activityRelated.imageIds;
+        ids             = activityRelated.ids;
+        contentIds      = ids.content;
+        parallaxId      = ids.parallax; //浮动类型的对象
+        imageIds        = activityRelated.imageIds;
 
         //针对普通content对象
         if (contentIds && contentIds.length) { //如果不为空

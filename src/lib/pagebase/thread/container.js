@@ -19,7 +19,8 @@ function createContainer(transform, data) {
         userStyle = data.userStyle,
         baseData = data.baseData,
         url = baseData.md5;
-        config = Xut.config
+
+    var config = Xut.config
 
     var proportion = config.proportion;
     var calculate = proportion.calculateContainer();
@@ -96,7 +97,7 @@ export function TaskContainer(data, successCallback) {
         direction = direction === 'before' ? 'first' : 'last';
 
     //如果启动了wordMode模式,查找伪li
-    if (config.virtualMode) {
+    if (Xut.config.virtualMode) {
         pseudoElement = $element.find('div');
     }
 

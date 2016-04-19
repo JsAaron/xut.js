@@ -10,15 +10,14 @@
  ********************************************************************/
 
 //dom精灵动画
-import {
-    Sprite as domSprite
-}
-from './plug/sprite'
+import { Sprite as domSprite } from './plug/sprite'
+
 //pixi普通精灵动画
-import {
-    Sprite as pixiSpirit
-}
-from '../pixi/sprite'
+import { Sprite as pixiSpirit } from '../pixi/sprite'
+
+//依赖
+import { Dep } from './dep'
+
 
 /**
  * 销毁动画音频
@@ -62,7 +61,7 @@ function bind(instance, success, fail) {
 var Animation = function(options) {
     //mix参数
     _.extend(this, options);
-    
+
 
 }
 
@@ -132,28 +131,20 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
             }
         }
 
-        if(actionTypes.widgetId){
-
-            console.log(this,parameter)
-
-        }
-
-      //  console.log(actionTypes.widgetId)
-
         //高级精灵动画
         //这个比较麻烦
         //因为精灵动画是widget创建类型
         //所以代码需要延后，等待高级content先创建
-        // if (actionTypes.widgetId) {
-        //     this.linker = function() {
-        //         return function widgetppt(context) {
-        //             self.pptObj = create(CanvasAnimation, context.sprObjs[0].advSprite);
-        //             self.linker.dep.notify(self.pptObj)
-        //         }
-        //     }();
-        //     // 收集依赖
-        //     this.linker.dep = new Dep()
-        // }
+        if (actionTypes.widgetId) {
+            this.linker = function() {
+                return function widgetppt(context) {
+                    self.pptObj = create(CanvasAnimation, context.sprObjs[0].advSprite);
+                    self.linker.dep.notify(self.pptObj)
+                }
+            }();
+            // 收集依赖
+            this.linker.dep = new Dep()
+        }
     }
 
 };
@@ -171,17 +162,20 @@ animProto.run = function(scopeComplete) {
         element = this.$contentProcess;
 
     var pptRun = function(animObj) {
-            //优化处理,只针对互斥的情况下
-            //处理层级关系
-            if (element.prop && element.prop("mutex")) {
-                element.css({ //强制提升层级
-                    'display': 'block'
-                })
-            }
-            //指定动画
-            animObj.runAnimation(scopeComplete);
+
+        //优化处理,只针对互斥的情况下
+        //处理层级关系
+        if (element.prop && element.prop("mutex")) {
+            element.css({ //强制提升层级
+                'display': 'block'
+            })
         }
-        //ppt动画
+
+        //指定动画
+        animObj.runAnimation(scopeComplete);
+    }
+
+    //ppt动画
     bind(this.pptObj, pptRun)
 
     //canvas精灵动画
@@ -224,9 +218,10 @@ animProto.stop = function(chapterId) {
 
     //canvas精灵
     bind(this.pixiSpriteObj, function(animObj) {
-            animObj.stopPixi();
-        })
-        //dom精灵
+        animObj.stopPixi();
+    })
+
+    //dom精灵
     bind(this.spriteObj, function(sprObj) {
         sprObj.pauseSprites();
     });
@@ -274,4 +269,3 @@ animProto.destroy = function() {
 export {
     Animation
 }
-

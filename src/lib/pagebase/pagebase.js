@@ -296,7 +296,7 @@ baseProto.initTasks = function(options) {
                         if (contentsFragment = self.createRelated.cacheTasks.contents.contentsFragment) {
                             prefix = 'Content_' + self.pid + "_";
                             _.each(contentsFragment, function(dom) {
-                                makePrefix = prefix + id;
+                                var makePrefix = prefix + id;
                                 if (dom.id == makePrefix) {
                                     contentProcess = dom;
                                 }

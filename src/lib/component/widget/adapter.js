@@ -9,41 +9,36 @@
 
 
 import { iframeWidget } from './iframe'
-import { pageWidget } from './page'
+import { pageWidget } from './page/core'
 
 
 let proportion
 let screenSize
 let appId
 
-
+ 
 function loadWidget(type, data, widgetClass) {
-    //pixi webgl模式
-    //2016.4.14
-    //高级精灵动画
-    var pageObj = Xut.Presentation.GetPageObj(data.pageType, data.pageIndex)
-    if (pageObj) {
-        if (pageObj.canvasRelated.enable) {
-            //高级精灵动画不处理
-            //已经改成本地化pixi=>content调用了
-            if (data.widgetName === "spirit") {
-                return;
-            }
-        }
-    }
 
-    var widgetObj = new widgetClass(data);
 
-    //特殊的零件，也是只加载脚本
-    if (data.widgetName != "bones") {
-        //保存引用
-        //特殊的2个个零件不保存
-        Xut.Application.injectionComponent({
-            'pageType': data.pageType, //标记类型区分
-            'pageIndex': data.pageIndex,
-            'widget': widgetObj
-        });
-    }
+    Xut.Application.injectionComponent({
+        'pageType'  : data.pageType, //标记类型区分
+        'pageIndex' : data.pageIndex,
+        'widget'    : new widgetClass(data)
+    });
+
+
+    // var widgetObj = new widgetClass(data);
+
+    // //特殊的零件，也是只加载脚本
+    // if (data.widgetName != "bones") {
+    //     //保存引用
+    //     //特殊的2个个零件不保存
+    //     Xut.Application.injectionComponent({
+    //         'pageType'  : data.pageType, //标记类型区分
+    //         'pageIndex' : data.pageIndex,
+    //         'widget'    : widgetObj
+    //     });
+    // }
 }
 
 /**
@@ -148,10 +143,11 @@ function parsePara(data) {
 
 export function Adapter(para) {
 
-    config = Xut.config;
+    var  config = Xut.config;
+    
     proportion = config.proportion;
     screenSize = config.screenSize;
-    appId = config.appId;
+    appId      = config.appId;
 
     //获取数据
     var data = filtrateDas(para);

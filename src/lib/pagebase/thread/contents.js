@@ -30,14 +30,14 @@ from '../../component/content/activity'
 
 
 function TaskContents(data) {
-    var preCompileContents;
+    var compileActivitys;
     data = _.extend(this, data);
 
     //如果有预执行动作
     //Activity表数据存在
-    if (preCompileContents = parseContents(data)) {
+    if (compileActivitys = parseContents(data)) {
         //解析动画表数据结构
-        data = conParser(preCompileContents, data);
+        data = conParser(compileActivitys, data);
         //如果有需要构建的content
         //开始多线程处理
         data.createContentIds.length ? this.dataAfterCheck(data) : this.loadComplete();
@@ -504,13 +504,13 @@ function autoUUID() {
  */
 function contentsBehavior(callback, data, contentDas) {
     var compiler,
-        element = data.element,
-        eventRelated = data.eventRelated, //合集事件
-        pid = data.pid,
-        activityRelated = data.activityRelated,
+        element          = data.element,
+        eventRelated     = data.eventRelated, //合集事件
+        pid              = data.pid,
+        createActivitys  = data.createActivitys,
         feedbackBehavior = data.feedbackBehavior, //反馈数据,跟事件相关
-        pageBaseHooks = data.pageBaseHooks,
-        pageId = data.chapterId;
+        pageBaseHooks    = data.pageBaseHooks,
+        pageId           = data.chapterId;
 
 
     //如果有浮动对象,才需要计算偏移量
@@ -540,30 +540,23 @@ function contentsBehavior(callback, data, contentDas) {
 
     //相关数据
     var relatedData = {
-        'floatMaters': data.floatMaters,
-        'seasonId': data.chpaterData.seasonId,
-        'pageId': pageId,
-        'contentDas': contentDas, //所有的content数据合集
-        'container': data.liRootNode,
-        'seasonRelated': data.seasonRelated,
-        'containerPrefix': data.containerPrefix,
-        'nodes': data.nodes,
-        'pageOffset': data.pageOffset,
-        'createContentIds': data.createContentIds,
-        'partContentRelated': data.partContentRelated,
-        'transformOffset': transformOffset,
-        'contentsFragment': data.contentsFragment,
-        'contentHtmlBoxIds': data.contentHtmlBoxIds
+        'floatMaters'        : data.floatMaters,
+        'seasonId'           : data.chpaterData.seasonId,
+        'pageId'             : pageId,
+        'contentDas'         : contentDas, //所有的content数据合集
+        'container'          : data.liRootNode,
+        'seasonRelated'      : data.seasonRelated,
+        'containerPrefix'    : data.containerPrefix,
+        'nodes'              : data.nodes,
+        'pageOffset'         : data.pageOffset,
+        'createContentIds'   : data.createContentIds,
+        'partContentRelated' : data.partContentRelated,
+        'transformOffset'    : transformOffset,
+        'contentsFragment'   : data.contentsFragment,
+        'contentHtmlBoxIds'  : data.contentHtmlBoxIds
     }
 
-    /**
-     * 收集事件信息
-     * 为处理动态分段绑定的问题
-     * @type {Object}
-     */
-    var collectEventRelated = {};
-
-
+ 
     /**
      * 继续下一个任务
      * @return {[type]} [description]
@@ -587,7 +580,7 @@ function contentsBehavior(callback, data, contentDas) {
      * @type {Object}
      */
     var monitor = {
-        total: activityRelated.length,
+        total: createActivitys.length,
         current: 0,
         complete: function() {
             ++monitor.current
@@ -597,17 +590,24 @@ function contentsBehavior(callback, data, contentDas) {
         }
     }
 
+   /**
+     * 收集事件信息
+     * 为处理动态分段绑定的问题
+     * @type {Object}
+     */
+    var collectEventRelated = {};
+
     /**
      * 生成activty控制对象
      * @type {[type]}
      */
-    while (compiler = activityRelated.shift()) {
+    while (compiler = createActivitys.shift()) {
 
         var filters;
-        var imageId = compiler['imageIds']; //父id
-        var activity = compiler['activity'];
-        var eventType = activity.eventType;
-        var dragdropPara = activity.para1;
+        var imageId        = compiler['imageIds']; //父id
+        var activity       = compiler['activity'];
+        var eventType      = activity.eventType;
+        var dragdropPara   = activity.para1;
         var eventContentId = imageId;
 
         /**
@@ -630,10 +630,10 @@ function contentsBehavior(callback, data, contentDas) {
 
         //需要绑定事件的数据
         var eventData = {
-            'eventContentId': eventContentId,
-            'eventType': eventType,
-            'dragdropPara': dragdropPara,
-            'feedbackBehavior': feedbackBehavior
+            'eventContentId'   : eventContentId,
+            'eventType'        : eventType,
+            'dragdropPara'     : dragdropPara,
+            'feedbackBehavior' : feedbackBehavior
         }
 
         //缓存所有的事件数据
@@ -646,20 +646,20 @@ function contentsBehavior(callback, data, contentDas) {
         //注册引用
         pageBaseHooks.registerAbstractActivity(
             new activityClass({
-                'monitorComplete': monitor.complete, //监听完成
-                'pageIndex': data.pageIndex,
-                'canvasRelated': data.canvasRelated, //父类引用
-                'id': imageId || autoUUID(),
-                "type": 'Content',
-                'pageId': pageId,
-                'activityId': activity._id,
-                'rootNode': element,
-                'pageType': compiler['pageType'], //构建类型 page/master
-                'seed': compiler['seed'], //动画表数据 or 视觉差表数据
-                "pid": pid, //页码
-                'eventData': eventData, //事件数据
-                'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
-                'relatedCallback': relatedCallback //相关回调
+                'monitorComplete' : monitor.complete, //监听完成
+                'pageIndex'       : data.pageIndex,
+                'canvasRelated'   : data.canvasRelated, //父类引用
+                'id'              : imageId || autoUUID(),
+                "type"            : 'Content',
+                'pageId'          : pageId,
+                'activityId'      : activity._id,
+                'rootNode'        : element,
+                'pageType'        : compiler['pageType'], //构建类型 page/master
+                'seed'            : compiler['seed'], //动画表数据 or 视觉差表数据
+                "pid"             : pid, //页码
+                'eventData'       : eventData, //事件数据
+                'relatedData'     : relatedData, //相关数据,所有子作用域Activity对象共享
+                'relatedCallback' : relatedCallback //相关回调
             })
         );
     }

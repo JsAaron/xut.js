@@ -104,6 +104,7 @@ export function readFile(path, callback, type) {
             if (data) {
                 callback(data)
                 delete HTMLCONFIG[name];
+                delete IBOOKSCONFIG[name]
             } else {
                 callback('编译:脚本加载失败,文件名:' + name);
             }

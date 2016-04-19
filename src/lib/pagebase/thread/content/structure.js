@@ -385,7 +385,6 @@ function createContainer(containerRelated, pid) {
 //
 //	构建content的序列tokens
 //	createImageIds,
-//	containerRelated,
 //	createContentIds
 //	pid,
 //	pageType,
@@ -401,12 +400,11 @@ export function structure(callback, data, context) {
         contentCollection,
         contentCount,
         cloneContentCount,
-        createImageIds = data.createImageIds,
-        pid = data.pid,
-        pageType = data.pageType,
+        pid              = data.pid,
+        pageType         = data.pageType,
         containerRelated = data.containerRelated,
-        seasonRelated = data.seasonRelated,
-        isMaster = pageType === 'master',
+        seasonRelated    = data.seasonRelated,
+        isMaster         = pageType === 'master',
 
         //容器li生成的位置
         //left,right
@@ -418,7 +416,7 @@ export function structure(callback, data, context) {
         //2.浮动页面对象
         ////////////
         floatMaters = data.floatMaters,
-        floatPages = data.floatPages,
+        floatPages  = data.floatPages,
 
         //文本框
         //2016.1.7

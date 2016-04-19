@@ -25,7 +25,7 @@ export function Mix(base, waitCreateContent, exitCallback) {
             var willCreate = [],
                 prefix;
             _.each(waitCreateContent, function(contentId) {
-                prefix = base.makePrefix('Content', base.pid, contentId)
+                prefix = base._makePrefix('Content', base.pid, contentId)
                 if (!contentsFragment[prefix]) { //如果dom不存在,则创建
                     willCreate.push(contentId)
                 }

@@ -62,12 +62,12 @@ let Widget = {
     //在当前页面自动触发的通知
     autoPlay: function(data) {
         Adapter({
-            'rootNode': data.rootNode,
-            "type": data.type,
-            "pageType": data.pageType,
-            "activityId": data.id,
-            "pageIndex": data.pageIndex,
-            "isAutoPlay": true
+            'rootNode'   : data.rootNode,
+            "type"       : data.type,
+            "pageType"   : data.pageType,
+            "activityId" : data.id,
+            "pageIndex"  : data.pageIndex,
+            "isAutoPlay" : true
         })
     },
 

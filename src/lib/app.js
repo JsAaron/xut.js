@@ -9,18 +9,31 @@ let App = function() {
     
 
     //更新版本号记录
-    Xut.Version = 780;
+    Xut.Version = 781;
 
     /**
      * 动态html文件挂载点
      * 用于content动态加载js文件
+     * 目前暂时给epub使用，文本框
      * @type {Object}
      */
     window.HTMLCONFIG = {}
- 
+
     /**
      * 2015.10.19新增
      * ibooks处理
+     * epub ibooks模式的配置文件
+     * 这个是在index.html中会传入几个值
+     * 
+     *   window.IBOOKSCONFIG = {
+     *       compiled: true,
+     *       pageIndex: 1,
+     *       existSvg: true,
+     *       screenSize: {
+     *           "width": 718,
+     *           "height": 958
+     *       }
+     *   }
      */
     var IBOOKSCONFIG = window.IBOOKSCONFIG;
    

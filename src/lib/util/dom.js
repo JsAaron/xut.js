@@ -14,6 +14,16 @@ export function parseJSON(itemArray) {
 }
 
 
+export function evalJson(itemArray) {
+    var json;
+    try {
+        json = (new Function("return " + itemArray))();
+    } catch (error) {
+        console.log('解析json出错'+ itemArray)
+    }
+    return json;
+}
+
 /**
  * 创建一个纯存的hash对象
  */
