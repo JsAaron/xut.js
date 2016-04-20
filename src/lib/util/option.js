@@ -15,7 +15,7 @@ export function injectScript(code, type) {
         return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
     }
     try {
-        new Function("(function(){" + enterReplace(code) + "})")()
+        (new Function("return " + enterReplace(code)))();
     } catch (e) {
         console.log('加载脚本错误', type)
     }
@@ -131,7 +131,7 @@ export function readFile(path, callback, type) {
         })
         return
     }
-    
+
     //svg文件
     //游览器模式
     if (Xut.plat.isBrowser) {

@@ -8,13 +8,14 @@ export function parseJSON(itemArray) {
     try {
         anminJson = JSON.parse(itemArray);
     } catch (error) {
-        anminJson = (new Function("return " + itemArray))();
+        console.log('parseJSON失败')
+        // anminJson = (new Function("return " + itemArray))();
     }
     return anminJson;
 }
 
 
-export function evalJson(itemArray) {
+export function execJson(itemArray) {
     var json;
     try {
         json = (new Function("return " + itemArray))();

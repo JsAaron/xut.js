@@ -459,19 +459,10 @@
          try {
              anminJson = JSON.parse(itemArray);
          } catch (error) {
-             anminJson = new Function("return " + itemArray)();
+             console.log('parseJSON失败');
+             // anminJson = (new Function("return " + itemArray))();
          }
          return anminJson;
-     }
-
-     function evalJson(itemArray) {
-         var json;
-         try {
-             json = new Function("return " + itemArray)();
-         } catch (error) {
-             console.log('解析json出错' + itemArray);
-         }
-         return json;
      }
 
      /**
@@ -559,7 +550,7 @@
              return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
          };
          try {
-             new Function("(function(){" + enterReplace(code) + "})")();
+             new Function("return " + enterReplace(code))();
          } catch (e) {
              console.log('加载脚本错误', type);
          }
@@ -3707,136 +3698,6 @@
      }
 
      /**
-      * 高级精灵动画
-      */
-
-     var spiritAni = function spiritAni(data, contentPrefix, path) {
-         this.resType = 1;
-         this.data = data;
-         this.contentPrefix = contentPrefix;
-         this.curFPS = 0;
-         this.timer = null;
-         this.loop = 1;
-         this.curLoop = 1;
-         if (this.playerType == "loop") {
-             this.loop = 0;
-         }
-         this.action = this.data.params["actList"].split(",")[0];
-         this.fps = parseInt(this.data.params[this.action].fps);
-         this.playerType = this.data.params[this.action].playerType;
-         this.isSports = parseInt(this.data.params[this.action].isSports);
-         this.imageList = this.data.params[this.action].ImageList;
-         this.obj = $("#" + this.contentPrefix + this.data.framId);
-         this.FPSCount = this.imageList.length;
-         this.resourcePath = path;
-         this.imgArray = [];
-     };
-
-     var p = spiritAni.prototype;
-
-     p.init = function () {};
-
-     /**
-      * 停止动画
-      * @return {[type]} [description]
-      */
-     p.stop = function () {
-         clearTimeout(this.timer);
-     };
-
-     /**
-      * 销毁动画
-      * @return {[type]} [description]
-      */
-     p.destroy = function () {
-         console.log('销毁');
-     };
-
-     /**
-      * 精灵动画合集
-      * @type {Object}
-      */
-     var spiritObjs = {};
-
-     /**
-      * 获取对象id
-      * @param  {[type]} inputPara     [description]
-      * @param  {[type]} contentPrefix [description]
-      * @return {[type]}               [description]
-      */
-     var getId = function getId(inputPara, contentPrefix) {
-         var id = '';
-         if ((typeof inputPara === 'undefined' ? 'undefined' : babelHelpers.typeof(inputPara)) == "object") {
-             id = contentPrefix + inputPara.framId;
-         } else {
-             id = inputPara;
-         }
-         return id;
-     };
-
-     //初始化
-     var createSpirit = function createSpirit(id, inputPara, contentPrefix, path) {
-         if (!spiritObjs[id]) {
-             spiritObjs[id] = new spiritAni(inputPara, contentPrefix, path);
-         } else {
-             console.log('创建高级精灵已存在');
-         }
-     };
-
-     /**
-      * 高级精灵动画
-      * @param  {[type]} data        [description]
-      * @param  {[type]} contentObjs [description]
-      * @return {[type]}             [description]
-      */
-     function spiritSenior(inputPara, contents) {
-
-         var id, para, i, contentPrefix, xhr;
-
-         //合集对象
-         //拿到对象的引用
-         this.combineId = [];
-
-         this.inputPara = inputPara;
-         this.resourcePath = "content/widget/gallery/" + inputPara.id + "/";
-
-         contentPrefix = inputPara.contentPrefix;
-
-         xhr = new XMLHttpRequest();
-         xhr.open('GET', this.resourcePath + 'app.json', false);
-         xhr.send(null);
-
-         //解析零件数据
-         this.option = evalJson(xhr.responseText);
-
-         //生成零件对象爱
-         for (i = 0; i < this.option.spiritList.length; i++) {
-             para = this.option.spiritList[i];
-             id = getId(para, contentPrefix);
-             this.combineId.push(id);
-             createSpirit(id, para, contentPrefix, this.ResourcePath);
-         }
-
-         // console.log(this.combineId)
-     }
-
-     spiritSenior.prototype = {
-         //销毁
-         destroy: function destroy() {
-             this.combineId.forEach(function (id) {
-                 var obj = spiritObjs[id];
-                 if (obj) {
-                     obj.destroy();
-                     spiritObjs[id] = null;
-                     delete spiritObjs[id];
-                 } else {
-                     console.log('精灵动画销毁错误');
-                 }
-             });
-         }
-     };
-
-     /**
       * 解析数据,获取content对象
       * @return {[type]} [description]
       */
@@ -3864,7 +3725,43 @@
 
      pageWidget.prototype = {
 
+         /**
+          * 获取参数
+          * 得到content对象与数据
+          * @return {[type]} [description]
+          */
+         _getArg: function _getArg() {
+             var data = createData(this.inputPara, this.scrollPaintingMode, this.calculate);
+             var contentObjs = parseContentObjs(this.pageType, this.inputPara);
+             return [data, contentObjs];
+         },
+
+         /**
+          * 初始化,加载文件
+          * @return {[type]} [description]
+          */
          _init: function _init() {
+
+             //pixi webgl模式
+             //2016.4.14
+             //高级精灵动画
+             //如果是canvas模式
+             //那么意味着所有的高级精灵动画统一转化pixi模式
+             var pageObj = Xut.Presentation.GetPageObj(this.pageType, this.pageIndex);
+             if (pageObj) {
+                 if (pageObj.canvasRelated.enable) {
+                     //高级精灵动画不处理
+                     //已经改成本地化pixi=>content调用了
+                     if (this.widgetName === "spirit") {
+                         //高级精灵动画创建器
+                         //管理器内部在创建子高级动画
+                         var arg = this._getArg();
+                         this.pageObj = new seniorManage(arg[0], arg[1]);
+                         return;
+                     }
+                 }
+             }
+
              //加载文件
              if (typeof window[this.widgetName + "Widget"] != "function") {
                  loader$1(this._executive, this);
@@ -3878,30 +3775,10 @@
           * @return {[type]} [description]
           */
          _executive: function _executive() {
-             //得到content对象与数据
-             var data = createData(this.inputPara, this.scrollPaintingMode, this.calculate);
-             var contentObjs = parseContentObjs(this.pageType, this.inputPara);
-
-             //pixi webgl模式
-             //2016.4.14
-             //高级精灵动画
-             //如果是canvas模式
-             //那么意味着所有的高级精灵动画统一转化pixi模式
-             var pageObj = Xut.Presentation.GetPageObj(this.pageType, this.pageIndex);
-             if (pageObj) {
-                 if (pageObj.canvasRelated.enable) {
-                     //高级精灵动画不处理
-                     //已经改成本地化pixi=>content调用了
-                     if (this.widgetName === "spirit") {
-                         this.pageObj = new spiritSenior(data, contentObjs);
-                         return;
-                     }
-                 }
-             }
-
              //普通dom模式
              if (typeof window[this.widgetName + "Widget"] == "function") {
-                 this.pageObj = new window[this.widgetName + "Widget"](data, contentObjs);
+                 var arg = this._getArg();
+                 this.pageObj = new window[this.widgetName + "Widget"](arg[0], arg[1]);
              } else {
                  console.error("Function [" + this.widgetName + "Widget] does not exist.");
              }
@@ -12391,11 +12268,9 @@
          //4 普通精灵动画
          //  其中 高级精灵动画是widget创建，需要等待
          if (this.canvasMode) {
-
              //动作类型
              //可能是组合动画
              actionTypes = this.contentDas.actionTypes;
-
              //精灵动画
              if (actionTypes.spiritId) {
                  //加入任务队列
@@ -15702,7 +15577,7 @@
                          var parameter = JSON.parse(pageData.parameter);
                          if (parameter && parameter.contentMode && parameter.contentMode == 1) {
                              //启动dom模式
-                             base.canvasRelated.enable = true;
+                             // base.canvasRelated.enable = true;
                          }
                      } catch (e) {
                          console.log('JSON错误,chpterId为', base.chapterId, pageData.parameter);

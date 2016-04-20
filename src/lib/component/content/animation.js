@@ -19,6 +19,7 @@ import { Sprite as pixiSpirit } from '../pixi/sprite'
 import { Dep } from './dep'
 
 
+
 /**
  * 销毁动画音频
  * @param  {[type]} videoIds  [description]
@@ -108,11 +109,9 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
     //4 普通精灵动画
     //  其中 高级精灵动画是widget创建，需要等待
     if (this.canvasMode) {
-
         //动作类型
         //可能是组合动画
         actionTypes = this.contentDas.actionTypes
-
         //精灵动画
         if (actionTypes.spiritId) {
             //加入任务队列

@@ -1,4 +1,4 @@
-import { evalJson } from '../../../util/dom'
+import { execJson } from '../../../util/dom'
 import { spiritAni } from './spirite'
 
 
@@ -42,7 +42,7 @@ let createSpirit = function(id, inputPara, contentPrefix, path) {
  * @param  {[type]} contentObjs [description]
  * @return {[type]}             [description]
  */
-export function spiritSenior(inputPara, contents) {
+export function seniorManage(inputPara, contents) {
 
     var id, para, i, contentPrefix, xhr;
 
@@ -60,7 +60,7 @@ export function spiritSenior(inputPara, contents) {
     xhr.send(null);
 
     //解析零件数据
-    this.option = evalJson(xhr.responseText);
+    this.option = execJson(xhr.responseText);
 
     //生成零件对象爱
     for (i = 0; i < this.option.spiritList.length; i++) {
@@ -70,15 +70,15 @@ export function spiritSenior(inputPara, contents) {
         createSpirit(id, para, contentPrefix, this.ResourcePath);
     }
 
-    // console.log(this.combineId)
 }
 
 
-spiritSenior.prototype = {
+seniorManage.prototype = {
     //销毁
     destroy: function() {
+        var obj
         this.combineId.forEach(function(id) {
-            var obj = spiritObjs[id];
+            obj = spiritObjs[id];
             if (obj) {
                 obj.destroy()
                 spiritObjs[id] = null;

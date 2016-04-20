@@ -13,22 +13,29 @@ var spiritAni = function(data, contentPrefix, path) {
     if (this.playerType == "loop") {
         this.loop = 0
     }
-    this.action = this.data.params["actList"].split(",")[0];
-    this.fps = parseInt(this.data.params[this.action].fps);
-    this.playerType = (this.data.params[this.action].playerType);
-    this.isSports = parseInt(this.data.params[this.action].isSports);
-    this.imageList = this.data.params[this.action].ImageList;
-    this.obj = $("#" + this.contentPrefix + this.data.framId);
-    this.FPSCount = this.imageList.length;
+    this.action       = this.data.params["actList"].split(",")[0];
+    this.fps          = parseInt(this.data.params[this.action].fps);
+    this.playerType   = (this.data.params[this.action].playerType);
+    this.isSports     = parseInt(this.data.params[this.action].isSports);
+    this.imageList    = this.data.params[this.action].ImageList;
+    this.obj          = $("#" + this.contentPrefix + this.data.framId);
+    this.FPSCount     = this.imageList.length;
     this.resourcePath = path;
-    this.imgArray = []
+    this.imgArray     = []
+
 }
 
 var p = spiritAni.prototype;
 
-p.init = function() {
 
+p.init = function() {
+    if (this.isSports) {
+        this.cutInit();
+    } else {
+        this.switchInit();
+    }
 }
+
 
 /**
  * 停止动画
