@@ -94,7 +94,10 @@ var promise = new Promise(function(resolve, reject) {
             return write(es2015min, minified)
         })
         .then(resolve)
-        .catch(logError)
+        .catch(function(){
+            console.log('错误')
+            logrror()
+        })
 }).then(function() {
     new Promise(combine)
 }).then(function() {

@@ -300,11 +300,11 @@ function maskContent(data, wrapObj) {
 
         var matrixX = 100 * data.thecount;
         var matrixY = 100;
-
+  
         //如果有参数
         //精灵图是矩阵图
         if (data.parameter) {
-            var parameter = Utils.parseJSON(data.parameter);
+            var parameter = parseJSON(data.parameter);
             if (parameter && parameter.matrix) {
                 var matrix = parameter.matrix.split("-")
                 matrixX = 100 * Number(matrix[0])

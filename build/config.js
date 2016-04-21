@@ -63,5 +63,6 @@ module.exports.moduleName = moduleName
 module.exports.version = version
 
 module.exports.logError = logError
+module.exports.log = logError
 module.exports.write = write
 module.exports.banner = banner

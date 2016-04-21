@@ -20,7 +20,7 @@ var write = config.write
 
 //pack for dev 
 var rolluppack = src + 'dev/dev.js'
-var database = require('../sqlite/index')
+var database = require('./sqlite/index')
 
 
 var bable = function(success, fail) {
@@ -34,20 +34,22 @@ var bable = function(success, fail) {
         })
         .then(function(bundle) {
             var result = bundle.generate({
-                    // output format - 'amd', 'cjs', 'es6', 'iife', 'umd'
-                    format: 'umd',
-                    banner: banner,
-                    moduleName: moduleName
-                })
-                //写到src/build 用于调试
+                // output format - 'amd', 'cjs', 'es6', 'iife', 'umd'
+                format: 'umd',
+                banner: banner,
+                moduleName: moduleName
+            })
+
+            //写到src/build 用于调试
             return write(rolluppack, result.code)
         })
         .then(function() {
+            // console.log('打包成功')
             success && success()
         })
         .catch(function() {
+            // console.log('打包失败')
             fail && fail();
-            logError()
         })
 }
 
@@ -71,6 +73,6 @@ var promise = new Promise(function(resolve, reject) {
 
 
 watch(lib + '/**/*.js', function() {
-    console.log('watch file change')
+    console.log(' \n\nwatch file change')
     bable()
 });

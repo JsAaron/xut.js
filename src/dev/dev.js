@@ -10893,7 +10893,7 @@
                  //如果有参数
                  //精灵图是矩阵图
                  if (data.parameter) {
-                     var parameter = Utils.parseJSON(data.parameter);
+                     var parameter = parseJSON(data.parameter);
                      if (parameter && parameter.matrix) {
                          var matrix = parameter.matrix.split("-");
                          matrixX = 100 * Number(matrix[0]);
@@ -15577,7 +15577,7 @@
                          var parameter = JSON.parse(pageData.parameter);
                          if (parameter && parameter.contentMode && parameter.contentMode == 1) {
                              //启动dom模式
-                             // base.canvasRelated.enable = true;
+                             base.canvasRelated.enable = true;
                          }
                      } catch (e) {
                          console.log('JSON错误,chpterId为', base.chapterId, pageData.parameter);
@@ -21513,7 +21513,7 @@
      var App = function App() {
 
          //更新版本号记录
-         Xut.Version = 781;
+         Xut.Version = 782;
 
          /**
           * 动态html文件挂载点

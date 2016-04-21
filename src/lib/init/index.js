@@ -17,7 +17,7 @@ import {
     bindEvent
 }
 from './initprocess'
- 
+     
 export function init() {
 
     var config = Xut.config;
