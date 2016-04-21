@@ -31,12 +31,11 @@
  */
 
 import {
-    parseJSON, hash
+    parseJSON,hash
 }
 from '../../util/index'
 
 import {html5Audio} from './audio'
-
 
 function AudioManager() {
 

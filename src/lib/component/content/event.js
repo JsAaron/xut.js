@@ -68,7 +68,6 @@ function checkDefaultBehavior(supportSwipe, element) {
     } else {
         //如果事件存在
         element.attr('data-behavior', 'disable');
-        this.defaultEvent = false;
     }
 }
 

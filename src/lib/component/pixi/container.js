@@ -1,4 +1,4 @@
-c/*******************************************
+/*******************************************
  *   canvas处理模块
  *   2016.2新增机制
  *   扩充pixi动画
@@ -20,7 +20,7 @@ function makeGuid() {
     return Xut.guid('rAF');
 }
 
-
+ 
 /**
  * 创建pipx对象
  * @param  {[type]} canvasContainer [description]

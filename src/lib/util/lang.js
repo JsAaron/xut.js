@@ -27,15 +27,6 @@ export function defAccess(obj, key, access) {
 
 
 /**
- * 创建一个纯存的hash对象
- */
-export function hash() {
-    return Object.create(null)
-}
-
-
-
-/**
  * 转化数组
  * @param  {[type]} o [description]
  * @return {[type]}   [description]

@@ -7,7 +7,7 @@ import { init } from './init/index'
  */
 let App = function() {
     
-
+ 
     //更新版本号记录
     Xut.Version = 782;
 
@@ -20,6 +20,7 @@ let App = function() {
     window.HTMLCONFIG = {}
 
     /**
+     * 
      * 2015.10.19新增
      * ibooks处理
      * epub ibooks模式的配置文件

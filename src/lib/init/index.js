@@ -1,23 +1,16 @@
 //预初始化
-import {AudioManager} from '../component/audio/manager'
-import {VideoManager} from '../component/video/manager'
-
-import {
-    loader,
-    setRootfont
-}
-from '../util/index'
-import {
-    nextTask 
-}
-from './data'
+import { AudioManager } from '../component/audio/manager'
+import { VideoManager } from '../component/video/manager'
+import { loader, setRootfont } from '../util/index'
+import { nextTask } from './data'
 import {
     loadVideo,
     html5Video,
     bindEvent
 }
 from './initprocess'
-     
+ 
+
 export function init() {
 
     var config = Xut.config;
@@ -32,7 +25,7 @@ export function init() {
     if (!DUKUCONFIG && !GLOBALIFRAME && Xut.plat.isIOS) {
         html5Video();
     }
-
+ 
     //Ifarme嵌套处理
     //1 新阅读
     //2 子文档
@@ -89,7 +82,7 @@ function creatDatabase(config) {
             PMS.unbind();
             Xut.Application.DropApp();
         }, "*")
-    } 
+    }
 
 
 

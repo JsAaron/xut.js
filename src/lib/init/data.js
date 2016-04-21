@@ -5,34 +5,14 @@ import {
 }
 from '../util/index'
 
-import {
-    cursor
-}
-from './cursor'
-
-import {
-    external
-}
-from '../external'
-
-import {
-    createStore
-}
-from '../data/index'
-
-import {
-    contentFilter
-}
-from '../component/content/filter'
-
-import {
-    loadScene
-}
-from './scene'
+import { cursor } from './cursor'
+import { external } from '../external'
+import { createStore } from '../data/index'
+import { contentFilter } from '../component/content/filter'
+import { loadScene } from './scene'
 
 
 let config;
-
 
 
 function getCache(name) {
@@ -49,7 +29,7 @@ function initMain(novelData) {
     var novelId,
         parameter,
         pageIndex = getCache('pageIndex'),
-        pageFlip  = getCache('pageFlip') || 0;
+        pageFlip = getCache('pageFlip') || 0;
 
     /**
      * IBOOS模式
@@ -92,10 +72,10 @@ function initMain(novelData) {
         //加强判断
         if (novelId = getCache("novelId")) {
             return loadScene({
-                'pageFlip'  : pageFlip,
-                "novelId"   : novelId,
-                "pageIndex" : pageIndex,
-                'history'   : _get('history')
+                'pageFlip': pageFlip,
+                "novelId": novelId,
+                "pageIndex": pageIndex,
+                'history': _get('history')
             });
         }
     }
@@ -103,9 +83,9 @@ function initMain(novelData) {
     //第一次加载
     //没有缓存
     loadScene({
-        "novelId"   : novelData._id,
-        "pageIndex" : 0,
-        'pageFlip'  : pageFlip
+        "novelId": novelData._id,
+        "pageIndex": 0,
+        'pageFlip': pageFlip
     });
 };
 
