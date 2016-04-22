@@ -7,7 +7,7 @@ import { init } from './init/index'
  */
 let App = function() {
     
- 
+
     //更新版本号记录
     Xut.Version = 782;
 

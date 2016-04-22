@@ -2,67 +2,29 @@ var gulp = require('gulp');
 var fs = require('fs')
 var rollup = require('rollup')
 var babel = require('rollup-plugin-babel')
-    //var replace = require('rollup-plugin-replace')
+//var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
-var uglify = require('uglify-js')
+// var uglify = require('uglify-js')
+var uglify = require('gulp-uglify');
+var rename = require("gulp-rename");
 var concat = require('gulp-concat')
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 
-
-
-var config = require('./config')
-var src = config.src
-var lib = config.lib
-var entry = config.entry
+var config     = require('./config')
+var src        = config.src
+var lib        = config.lib
+var entry      = config.entry
 var moduleName = config.moduleName
-var logError = config.logError
-var write = config.write
-var banner = config.banner
+var logError   = config.logError
+var write      = config.write
+var banner     = config.banner
 
-//dist
-var dist = './dist/'
-var output = dist + 'xxtppt.min.js'
+//output
+var output = './dist/'
 
-var es2015Js = dist + 'es2015.js'
-var es2015min = dist + 'es2015.min.js'
-var combineJs = dist + 'combine.js'
-
-
-
-function combine(resolve, reject) {
-    fs.readFile('./src/index.html', "utf8", function(error, data) {
-        if (error) throw error;
-        var way = []
-        var path;
-        var cwdPath = escape(process.cwd())
-        var scripts = data.match(/<script.*?>.*?<\/script>/ig);
-        fs.writeFileSync(combineJs, '')
-        scripts.forEach(function(val) {
-            val = val.match(/src="(.*?.js)/);
-            if (val && val.length) {
-                path = val[1]
-                    //有效src
-                if (/^lib/.test(path)) {
-                    way.push(src + path)
-                }
-            }
-        })
-
-        way.push(es2015Js)
-
-        gulp.src(way)
-            .pipe(concat('xxtppt.dev.js'))
-            .on('error', function(err) {
-                console.log('Less Error!', err.message);
-                this.end();
-            })
-            .pipe(gulp.dest(dist))
-            .pipe(gulp.dest(config.src + '/dev/'))
-    });
-}
-
-
+//打包文件
+var rollupjs = output + 'rollup.js'
 
 var promise = new Promise(function(resolve, reject) {
     rollup.rollup({
@@ -74,44 +36,67 @@ var promise = new Promise(function(resolve, reject) {
             ]
         })
         .then(function(bundle) {
-
             var code = bundle.generate({
-                // output format - 'amd', 'cjs', 'es6', 'iife', 'umd'
                 format: 'umd',
                 moduleName: moduleName
             }).code
-
-            return write(es2015Js, code)
-
-            var minified = banner + '\n' + uglify.minify(code, {
-                fromString: true,
-                output: {
-                    ascii_only: true
-                }
-            }).code
-
-            //写到src/build 用于调试
-            return write(es2015min, minified)
+            return write(rollupjs, code)
         })
         .then(resolve)
-        .catch(function(){
+        .catch(function() {
             console.log('错误')
-            logrror()
         })
-}).then(function() {
-    new Promise(combine)
-}).then(function() {
+})
+.then(function() {
+   return new Promise(function combine(resolve, reject) {
+        fs.readFile('./src/index.html', "utf8", function(error, data) {
+            if (error) throw error;
+            var paths = []
+            var path;
+            var cwdPath = escape(process.cwd())
+            var scripts = data.match(/<script.*?>.*?<\/script>/ig);
+
+            scripts.forEach(function(val) {
+                val = val.match(/src="(.*?.js)/);
+                if (val && val.length) {
+                    path = val[1]
+                        //有效src
+                    if (/^lib/.test(path)) {
+                        paths.push(src + path)
+                    }
+                }
+            })
+
+            paths.push(rollupjs)
+
+            gulp.src(paths)
+                .pipe(concat('xxtppt.dev.js'))
+                .on('error', function(err) {
+                    console.log('Less Error!', err.message);
+                    this.end();
+                })
+                // .pipe(gulp.dest(output))
+                // .pipe(gulp.dest(config.src + '/dev/'))
+                .pipe(uglify())
+                .pipe(rename("xxtppt.min.js"))
+                .pipe(gulp.dest(output))
+                .pipe(gulp.dest(config.src + '/dev/'))
+                .on('end',function(){
+                    fs.unlinkSync(rollupjs)
+                    resolve && resolve()
+                })
+
+        });
+    })
+})
+.then(function() {
     browserSync.init({
-        server : src,
-        index  : 'test.html',
-        port   : 4000,
-        open   : true
+        server: src,
+        index: 'test.html',
+        port: 4000,
+        open: true
     });
 })
-
-
-
-
 
 
 
@@ -134,11 +119,11 @@ var escape = function(str) {
 function combine1(resolve, reject) {
     fs.readFile('./src/index.html', "utf8", function(error, data) {
         if (error) throw error;
-        var way = []
+        var paths = []
         var path;
         var cwdPath = escape(process.cwd())
         var scripts = data.match(/<script.*?>.*?<\/script>/ig);
-        fs.writeFileSync(combineJs, '')
+        fs.writeFileSync(dependJs, '')
         scripts.forEach(function(val) {
             val = val.match(/src="(.*?.js)/);
             if (val && val.length) {
@@ -147,7 +132,7 @@ function combine1(resolve, reject) {
                 //有效src
                 if (/^lib/.test(path)) {
                     // console.log(fs.readFileSync(path))
-                    fs.appendFileSync(combineJs, fs.readFileSync(src + path))
+                    fs.appendFileSync(dependJs, fs.readFileSync(src + path))
                 }
             }
         })

@@ -1,20 +1,15 @@
-var path = require("path");
-var config = require('./config')
-var src = config.src
-var lib = config.lib
-var entry = config.entry
+var path       = require("path");
+var config     = require('./config')
+var src        = config.src
+var lib        = config.lib
+var entry      = config.entry
 var moduleName = config.moduleName
-var logError = config.logError
-var banner = config.banner
-var write = config.write
-
-
-
-
+var logError   = config.logError
+var banner     = config.banner
+var write      = config.write
 
 
 module.exports = {
-
     // watch: true,
     //页面入口
     entry: entry,
