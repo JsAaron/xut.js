@@ -3,10 +3,7 @@
  * @param  {[type]} Utils   [description]
  */
 
-import {
-    observe
-}
-from '../../observer/observe'
+import { observe } from '../../observer/observe'
 
 var arr = [];
 var slice = arr.slice;

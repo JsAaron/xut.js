@@ -1,9 +1,9 @@
-var fs = require('fs')
-var src = './src/'
-var lib = src + 'lib'
-var entry = lib + '/app.js'
+var fs         = require('fs')
+var src        = './src/'
+var lib        = src + 'lib'
+var entry      = lib + '/app.js'
 var moduleName = 'Aaron'
-var version = process.env.VERSION;
+var version    = process.env.VERSION;
 
 
 var banner =
