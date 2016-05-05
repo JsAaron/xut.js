@@ -2,8 +2,10 @@ var gulp = require('gulp');
 var fs = require('fs')
 var rollup = require('rollup')
 var babel = require('rollup-plugin-babel')
+
 //var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
+
 // var uglify = require('uglify-js')
 var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
@@ -11,92 +13,118 @@ var concat = require('gulp-concat')
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 
-var config     = require('./config')
-var src        = config.src
-var lib        = config.lib
-var entry      = config.entry
-var moduleName = config.moduleName
-var logError   = config.logError
-var write      = config.write
-var banner     = config.banner
+var config = require('../config')
 
 //output
-var output = './dist/'
+var output = config.build.assetsRoot
 
 //打包文件
 var rollupjs = output + 'rollup.js'
 
-var promise = new Promise(function(resolve, reject) {
-    rollup.rollup({
-            entry: entry,
-            plugins: [
-                babel({
-                    "presets": ["es2015-rollup"]
-                })
-            ]
-        })
-        .then(function(bundle) {
-            var code = bundle.generate({
-                format: 'umd',
-                moduleName: moduleName
-            }).code
-            return write(rollupjs, code)
-        })
-        .then(resolve)
-        .catch(function() {
-            console.log('错误')
-        })
-})
-.then(function() {
-   return new Promise(function combine(resolve, reject) {
-        fs.readFile('./src/index.html', "utf8", function(error, data) {
-            if (error) throw error;
-            var paths = []
-            var path;
-            var cwdPath = escape(process.cwd())
-            var scripts = data.match(/<script.*?>.*?<\/script>/ig);
+var getSize = function(code) {
+    return (code.length / 1024).toFixed(2) + 'kb'
+}
 
-            scripts.forEach(function(val) {
-                val = val.match(/src="(.*?.js)/);
-                if (val && val.length) {
-                    path = val[1]
-                        //有效src
-                    if (/^lib/.test(path)) {
-                        paths.push(src + path)
-                    }
-                }
+
+var blue = function(str) {
+    return '\x1b[1m\x1b[34m' + escape(process.cwd()) + str + '\x1b[39m\x1b[22m'
+}
+
+
+var write = function(path, code) {
+    return new Promise(function(resolve, reject) {
+        fs.writeFile(path, code, function(err) {
+            if (err) return reject(err)
+            console.log('write: ' + blue(path) + ' ' + getSize(code))
+            resolve(code)
+        })
+    })
+}
+
+
+new Promise(function(resolve, reject) {
+        rollup.rollup({
+                entry:  config.build.entry,
+                plugins: [
+                    babel({
+                        "presets": ["es2015-rollup"]
+                    })
+                ]
             })
+            .then(function(bundle) {
 
-            paths.push(rollupjs)
+                if (!fs.existsSync(output)) {
+                    fs.mkdirSync(output);
+                    console.log(output + '目录创建成功');
+                }
 
-            gulp.src(paths)
-                .pipe(concat('xxtppt.dev.js'))
-                .on('error', function(err) {
-                    console.log('Less Error!', err.message);
-                    this.end();
+                var code = bundle.generate({
+                    format: 'umd',
+                    moduleName: 'Aaron'
+                }).code
+
+                return write(rollupjs, code)
+            })
+            .then(resolve)
+            .catch(function() {
+                console.log('错误')
+            })
+    })
+    .then(function() {
+        return new Promise(function combine(resolve, reject) {
+            fs.readFile('./src/index.html', "utf8", function(error, data) {
+                if (error) throw error;
+                var paths = []
+                var path;
+                var cwdPath = escape(process.cwd())
+                var scripts = data.match(/<script.*?>.*?<\/script>/ig);
+
+                scripts.forEach(function(val) {
+                    val = val.match(/src="(.*?.js)/);
+                    if (val && val.length) {
+                        path = val[1]
+                            //有效src
+                        if (/^lib/.test(path)) {
+                            paths.push(config.build.src + path)
+                        }
+                    }
                 })
-                // .pipe(gulp.dest(output))
-                // .pipe(gulp.dest(config.src + '/dev/'))
-                .pipe(uglify())
-                .pipe(rename("xxtppt.min.js"))
-                .pipe(gulp.dest(output))
-                .pipe(gulp.dest(config.src + '/dev/'))
-                .on('end',function(){
-                    fs.unlinkSync(rollupjs)
-                    resolve && resolve()
-                })
 
+                paths.push(rollupjs)
+
+                gulp.src(paths)
+                    .pipe(concat('xxtppt.dev.js'))
+                    .on('error', function(err) {
+                        console.log('Less Error!', err.message);
+                        this.end();
+                    })
+                    // .pipe(gulp.dest(output))
+                    // .pipe(gulp.dest(config.src + '/dev/'))
+                    .pipe(uglify())
+                    .pipe(rename("xxtppt.min.js"))
+                    .pipe(gulp.dest(output))
+                    .pipe(gulp.dest(config.build.assetsRoot))
+                    .pipe(gulp.dest(config.build.src + "/build"))
+                    .on('end', function() {
+                        fs.unlinkSync(rollupjs)
+                        resolve && resolve()
+                    })
+
+            });
+        })
+    })
+    .then(function() {
+        
+        //数据库
+        require('./sqlite/index').resolve()
+
+        browserSync.init({
+            server: config.build.src,
+            index: 'test.html',
+            port: 4000,
+            open: true
         });
     })
-})
-.then(function() {
-    browserSync.init({
-        server: src,
-        index: 'test.html',
-        port: 4000,
-        open: true
-    });
-})
 
 
 

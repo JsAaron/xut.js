@@ -21,7 +21,7 @@ var app    = express()
 
 //配置dev
 var entry = {
-    app: './src/lib/app.js'
+    app: config.build.entry
 }
 Object.keys(entry).forEach(function(name) {
     entry[name] = ['./build/dev-client'].concat(entry[name])
