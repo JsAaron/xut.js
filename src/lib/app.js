@@ -1,6 +1,7 @@
 import { init } from './init/index'
 
 
+
 /**
  * 应用入口
  * @return {[type]} [description]

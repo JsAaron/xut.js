@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1">
+    <!--隐藏浏览器的工具栏和菜单栏,对iso系统起用-->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--禁止把邮箱地址作为邮件发送-->
+    <meta content="email=no" name="format-detection" />
+    <!--禁止把数字转化为拨号链接-->
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <title>AppCarrier</title>
+
+    <!-- 数据库文件 -->
+    <script src="content/SQLResult.js"></script>
+    <!-- 配置环境 -->
+    <script src="lib/environment.js"></script>
+    <script src="lib/library/jquery.js"></script>
+    <script src="lib/library/underscore.js"></script>
+    <script src="lib/library/video.js"></script>
+    <script src="lib/library/audio5.js"></script>
+    <script src="lib/library/iscroll.js"></script>
+    <script src="lib/library/hammer.js"></script>
+    <!-- 核心 -->
+    <script src="lib/core/xut.js"></script>
+    <script src="lib/core/nextTick.js"></script>
+    <script src="lib/core/plat.js"></script>
+    <!-- iframe通讯 -->
+    <script src="lib/core/pms.js"></script>
+    <!-- 配置文件 -->
+    <script src="lib/config.js"></script>
+    <!--插件-->
+    <script src="lib/plugin/cordova.js"></script>
+    <script src="lib/plugin/readAssetsFilePlugin.js"></script>
+    <script src="lib/plugin/initDatabase.js"></script>
+    <script src="lib/plugin/web.js"></script>
+    <script src="lib/plugin/video.js"></script>
+    <script src="lib/plugin/openAppPlugin.js"></script>
+    <script src="lib/plugin/tabletPlugin.js"></script>
+    <script src="lib/plugin/statusbar.js"></script>
+    <script src="lib/plugin/iap.js"></script>
+    <script src="lib/plugin/AppStoreLink.js"></script>
+    <script src="lib/plugin/downloadPlugin.js"></script>
+    <script src="lib/plugin/xxteManager.js"></script>
+    <script src="lib/plugin/unzipPlugin.js"></script>
+    <script src="lib/plugin/readPlugin.js"></script>
+    <script src="lib/plugin/deletePlugin.js"></script>
+    <!-- 动画库 -->
+    <script src="lib/animate/pixi.js"></script>
+    <script src="lib/animate/TweenMax.min.js"></script>
+    <script src="lib/animate/ThrowPropsPlugin.min.js"></script>
+    <script src="lib/animate/pptAnimation.js"></script>
+    <script src="lib/animate/canvasAnimation.js"></script>
+    <script src="lib/animate/dragdrop/Draggable.min.js"></script>
+    <script src="lib/animate/dragdrop/dragdrop.js"></script>
+    <script src="lib/animate/svgIcons/snap.min.js"></script>
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="css/common.css" type="text/css" />
+    <link href="css/video-js.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="busyIcon" class="xut-busy-wrap fullScreen"></div>
+    <div id="message" class="xut-busy-wrap fullScreen hide"></div>
+    <div id="removelayer" class="removelayer"></div>
+    <div id="startupPage" class="xut-startup fullScreen"></div>
+    <div id="sceneContainer" class="xut-chapter fullScreen xut-overflow"></div>
+<script src="/app.js"></script></body>
+
+</html>

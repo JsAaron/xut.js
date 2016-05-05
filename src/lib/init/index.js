@@ -77,7 +77,6 @@ function creatDatabase(config) {
     }
 
     if (DUKUCONFIG) {
-        var PMS = PMS || require("PMS");
         PMS.bind("MagazineExit", function() {
             PMS.unbind();
             Xut.Application.DropApp();
