@@ -41,6 +41,7 @@
     "karma-jasmine": "^1.0.2",
     "karma-mocha": "^1.0.1",
     "mocha": "^2.4.5",
+    "open": "0.0.5",
     "rollup": "^0.25.8",
     "rollup-plugin-babel": "^2.4.0",
     "sql.js": "^0.3.2",
