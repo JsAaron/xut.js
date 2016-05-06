@@ -1,17 +1,19 @@
 var gulp = require('gulp');
-var fs = require('fs')
-var rollup = require('rollup')
-var babel = require('rollup-plugin-babel')
+var fs         = require('fs')
+var rollup     = require('rollup')
+var babel      = require('rollup-plugin-babel')
+var open       = require("open");
+var httpServer = require('http-server')
 
 //var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
+var express = require('express');
+var app = express();
 
 // var uglify = require('uglify-js')
 var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
 var concat = require('gulp-concat')
-var browserSync = require('browser-sync').create();
-var reload = browserSync.reload;
 
 var config = require('../config')
 
@@ -20,6 +22,7 @@ var output = config.build.assetsRoot
 
 //打包文件
 var rollupjs = output + 'rollup.js'
+
 
 var getSize = function(code) {
     return (code.length / 1024).toFixed(2) + 'kb'
@@ -44,7 +47,7 @@ var write = function(path, code) {
 
 new Promise(function(resolve, reject) {
         rollup.rollup({
-                entry:  config.build.entry,
+                entry: config.build.entry,
                 plugins: [
                     babel({
                         "presets": ["es2015-rollup"]
@@ -114,15 +117,25 @@ new Promise(function(resolve, reject) {
         })
     })
     .then(function() {
+        var complete = function() {
+            var port = 3000
+            var host = '0.0.0.0'
+            var server = httpServer.createServer({
+                root: './src/'
+            })
+            server.listen(port, host, function() {
+                console.log('served prot:' + port)
+                open("http://localhost:" + port + "/test.html");
+            });
+        }
         
         //数据库
-        require('./sqlite/index').resolve()
-
-        browserSync.init({
-            server: config.build.src,
-            index: 'test.html',
-            port: 4000,
-            open: true
+        fs.exists("./src/content/SQLResult.js", function(result) {
+            if (!result) {
+                require('./sqlite/index').resolve(complete)
+                return;
+            }
+            complete()
         });
     })
 

@@ -37,39 +37,24 @@ import {
 from './util/index'
 
 //场景管理器
-import {
-    controll
-}
-from './scenario/controller'
+import { controll } from './scenario/controller'
 
 //调度器
-import {
-    autoRun, original, suspend
-}
-from './scheduler/index'
+import { autoRun, original, suspend } from './scheduler/index'
 
-import {
-    suspendHandles, promptMessage
-}
-from './dispatcher'
+import { suspendHandles, promptMessage } from './dispatcher'
 
-import {
-    loadScene
-}
-from './init/scene'
+import { loadScene } from './init/scene'
 
 //主场景工厂方法
-import {
-    sceneFactory
-}
-from './scenario/factory'
+import { sceneFactory } from './scenario/factory'
 
 
 var config = Xut.config,
-    plat = Xut.plat,
-    LOCK = 1, //锁定
+    plat   = Xut.plat,
+    LOCK   = 1, //锁定
     UNLOCK = 2, //解除锁定
-    IsPay = false; //
+    IsPay  = false; //
 
 /**
  * 代码注入空间

@@ -1,23 +1,11 @@
 //调度器
-import {
-    recovery
-}
-from './scheduler/index'
-
-import {
-    show
-}
-from './util/notice'
-
-
-import {
-    close
-}
-from './toolbar/navbar'
+import { recovery } from './scheduler/index'
+import { show } from './util/notice'
+import { close } from './toolbar/navbar'
 
 
 /***********************************************
- *	      热点动作控制器模块
+ *        热点动作控制器模块
  *         1 所有content热点停止
  *         2 所有content热点销毁
  *         3 app应用销毁
@@ -35,9 +23,9 @@ export function promptMessage(info) {
 
 /************************************************************
  *
- * 			检测媒体的播放状态
- * 			1 视频
- * 			2 音频
+ *          检测媒体的播放状态
+ *          1 视频
+ *          2 音频
  *
  * ***********************************************************/
 function checkMedia(pageId) {
@@ -57,7 +45,7 @@ function checkMedia(pageId) {
 
 /************************************************************
  *
- * 			检测热点的运行状态
+ *          检测热点的运行状态
  *
  * ***********************************************************/
 function checkWidgets(context, pageIndex) {
@@ -66,11 +54,11 @@ function checkWidgets(context, pageIndex) {
 
 
 /************************************************************
- * 			停止所有热点动作,并返回状态
- * 			1 content
- * 			2 widget
- * 			动画,视频,音频...........................
- * 			增加场景模式判断
+ *          停止所有热点动作,并返回状态
+ *          1 content
+ *          2 widget
+ *          动画,视频,音频...........................
+ *          增加场景模式判断
  * ***********************************************************/
 export function suspendHandles(context, pageIndex, skipMedia) {
 

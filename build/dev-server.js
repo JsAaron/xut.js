@@ -1,6 +1,4 @@
-//数据库
-require('./sqlite/index').resolve()
-
+var fs      = require('fs')
 var express = require('express')
 var webpack = require('webpack')
 
@@ -13,6 +11,12 @@ var webpacHotMiddleware  = require('webpack-hot-middleware')
 //https://www.npmjs.com/package/write-file-webpack-plugin
 var WriteFilePlugin = require('write-file-webpack-plugin');
 
+//数据库
+fs.exists("./src/content/SQLResult.js", function(result) {
+    if (!result) {
+       require('./sqlite/index').resolve()
+    }
+});
 
 var config = require('../config')
 var port   = process.env.PORT  || config.dev.port

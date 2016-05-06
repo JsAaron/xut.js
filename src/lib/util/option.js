@@ -94,7 +94,7 @@ export function readFile(path, callback, type) {
         }
 
         //全路径
-        paths = Config.svgPath().replace("svg", 'js') + path;
+        paths = config.svgPath().replace("svg", 'js') + path;
         //文件名
         name = path.replace(".js", '')
 
@@ -118,7 +118,7 @@ export function readFile(path, callback, type) {
     //如果是js动态文件
     //content的html结构
     if (type === "js") {
-        paths = Config.svgPath() + path;
+        paths = config.svgPath() + path;
         name = path.replace(".js", '')
         request(paths, function() {
             data = window.HTMLCONFIG[name];
