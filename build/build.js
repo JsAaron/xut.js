@@ -14,6 +14,7 @@ var app = express();
 var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
 var concat = require('gulp-concat')
+var ora    = require('ora')
 
 var config = require('../config')
 
@@ -44,6 +45,13 @@ var write = function(path, code) {
     })
 }
 
+console.log(
+  '  说明:\n' +
+  '       打包分2块 rollup与gulp\n'
+)
+
+var spinner = ora('开始打包')
+spinner.start()
 
 new Promise(function(resolve, reject) {
         rollup.rollup({
@@ -55,6 +63,8 @@ new Promise(function(resolve, reject) {
                 ]
             })
             .then(function(bundle) {
+
+                console.log(111)
 
                 if (!fs.existsSync(output)) {
                     fs.mkdirSync(output);
@@ -127,6 +137,7 @@ new Promise(function(resolve, reject) {
                 console.log('served prot:' + port)
                 open("http://localhost:" + port + "/test.html");
             });
+            spinner.stop()
         }
         
         //数据库

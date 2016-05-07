@@ -6,7 +6,7 @@ import { init } from './init/index'
  * @return {[type]} [description]
  */
 let App = function() {
-    
+     
 
     //更新版本号记录
     Xut.Version = 782;

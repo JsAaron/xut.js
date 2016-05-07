@@ -1,27 +1,42 @@
-var fs      = require('fs')
+var fs = require('fs')
 var express = require('express')
 var webpack = require('webpack')
-
+var ora = require('ora')
+var open = require("open");
 //https://github.com/ampedandwired/html-webpack-plugin
 var HtmlWebpackPlugin = require('html-webpack-plugin')
+
 //https://github.com/webpack/webpack-dev-middleware#usage
 var webpackDevMiddleware = require("webpack-dev-middleware");
-var webpacHotMiddleware  = require('webpack-hot-middleware')
+var webpacHotMiddleware = require('webpack-hot-middleware')
 
 //https://www.npmjs.com/package/write-file-webpack-plugin
 var WriteFilePlugin = require('write-file-webpack-plugin');
 
-//数据库
-fs.exists("./src/content/SQLResult.js", function(result) {
-    if (!result) {
-       require('./sqlite/index').resolve()
-    }
-});
 
 var config = require('../config')
-var port   = process.env.PORT  || config.dev.port
-var app    = express()
+var port = process.env.PORT || config.dev.port
+var app = express()
 
+//数据库
+if (!fs.existsSync("./src/content/xxtebook.db")) {
+    console.log('data not available!')
+    return
+}
+if (!fs.existsSync("./src/content/SQLResult.js")) {
+    var spinner = ora('Begin to process the data\n')
+    spinner.start()
+    require('./sqlite/index').resolve(function() {
+        spinner.stop()
+    })
+}
+
+var packinfo = ora('Begin to pack\n')
+packinfo.start()
+
+setTimeout(function(){
+    packinfo.stop()
+},3000)
 
 //配置dev
 var entry = {
@@ -68,6 +83,7 @@ var webpackConfig = {
 }
 
 var compiler = webpack(webpackConfig)
+
 // compiler.watch({
 //     // aggregateTimeout: 200, 
 //     // poll: true 
@@ -76,7 +92,7 @@ var compiler = webpack(webpackConfig)
 //         console.log('webpack fail')
 //         return
 //     }
-//     console.log('webpack sucess')
+//    
 // });
 
 
@@ -84,6 +100,7 @@ var devMiddleware = webpackDevMiddleware(compiler, {
     //The path where to bind the middleware to the server.
     //In most cases this equals the webpack configuration option output.publicPath
     publicPath: webpackConfig.output.publicPath,
+
     //Output options for the stats. See node.js API.
     //http://webpack.github.io/docs/node.js-api.html
     stats: {
@@ -99,12 +116,16 @@ var devMiddleware = webpackDevMiddleware(compiler, {
 //https://github.com/glenjamin/webpack-hot-middleware
 //Add webpack-hot-middleware attached to the same compiler instance
 var hotMiddleware = webpacHotMiddleware(compiler)
+
 // force page reload when html-webpack-plugin template changes
-compiler.plugin('compilation', function (compilation) {
-  compilation.plugin('html-webpack-plugin-after-emit', function (data, cb) {
-    hotMiddleware.publish({ action: 'reload' })
-    cb()
-  })
+compiler.plugin('compilation', function(compilation) {
+    //https://github.com/ampedandwired/html-webpack-plugin
+    compilation.plugin('html-webpack-plugin-after-emit', function(data, cb) {
+        hotMiddleware.publish({
+            action: 'reload'
+        })
+        cb()
+    })
 })
 
 
@@ -116,10 +137,10 @@ app.use(devMiddleware)
 app.use(hotMiddleware)
 
 
-app.use('/lib',express.static('src/lib'));
-app.use('/css',express.static('src/css'));
-app.use('/images',express.static('src/images'));
-app.use('/content',express.static('src/content'));
+app.use('/lib', express.static('src/lib'));
+app.use('/css', express.static('src/css'));
+app.use('/images', express.static('src/images'));
+app.use('/content', express.static('src/content'));
 
 module.exports = app.listen(port, function(err) {
     if (err) {
