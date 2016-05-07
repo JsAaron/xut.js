@@ -2,6 +2,9 @@
 // Generated on Fri May 06 2016 13:46:39 GMT+0800 (中国标准时间)
 //  karma-coverage
 
+var globalConfig = require('../../config')
+
+
 module.exports = function(config) {
     config.set({
 
@@ -27,6 +30,11 @@ module.exports = function(config) {
         },
         
         webpack: {
+            output: {
+                path: globalConfig.build.assetsRoot,
+                publicPath: globalConfig.build.assetsPublicPath,
+                filename: '[name].js'
+            },
             module: {
                 loaders: [{
                     test: /\.js$/,
@@ -36,7 +44,8 @@ module.exports = function(config) {
                         presets: ['es2015']
                     }
                 }]
-            }
+            },
+            devtool: '#inline-source-map'
         },
 
         // test results reporter to use
@@ -64,7 +73,7 @@ module.exports = function(config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
+        browsers: ['PhantomJS'],
 
 
         // Continuous Integration mode

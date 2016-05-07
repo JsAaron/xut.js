@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var fs         = require('fs')
 var rollup     = require('rollup')
 var babel      = require('rollup-plugin-babel')
-var open       = require("open");
+var open       = require("open")
 var httpServer = require('http-server')
 
 //var replace = require('rollup-plugin-replace')
@@ -50,8 +50,8 @@ console.log(
   '       打包分2块 rollup与gulp\n'
 )
 
-var spinner = ora('开始打包')
-spinner.start()
+// var spinner = ora('开始打包')
+// spinner.start()
 
 new Promise(function(resolve, reject) {
         rollup.rollup({
@@ -63,8 +63,6 @@ new Promise(function(resolve, reject) {
                 ]
             })
             .then(function(bundle) {
-
-                console.log(111)
 
                 if (!fs.existsSync(output)) {
                     fs.mkdirSync(output);
