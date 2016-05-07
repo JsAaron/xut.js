@@ -1,12 +1,12 @@
 {
-  "name": "magazine",
+  "name": "es6-magazine",
   "version": "1.0.0",
-  "description": "",
-  "main": "gulpfile.js",
+  "description": "A es6-magazine project",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node build/dev-server.js",
-    "build": "node build/build.js"
+    "build": "node build/build.js",
+    "unit": "karma start test/unit/karma.conf.js --log-level debug"
   },
   "repository": {
     "type": "git",
@@ -33,13 +33,12 @@
     "gulp-watch": "^4.3.5",
     "html-webpack-plugin": "^2.16.1",
     "http-server": "^0.9.0",
-    "jasmine-core": "^2.4.1",
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^1.0.1",
     "karma-coverage": "^1.0.0",
-    "karma-jasmine": "^1.0.2",
     "karma-mocha": "^1.0.1",
+    "karma-webpack": "^1.7.0",
     "mocha": "^2.4.5",
     "open": "0.0.5",
     "rollup": "^0.25.8",
