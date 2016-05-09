@@ -1,8 +1,12 @@
-var fs = require('fs')
+var fs      = require('fs')
 var express = require('express')
 var webpack = require('webpack')
-var ora = require('ora')
-var open = require("open");
+var ora     = require('ora')
+var open    = require("open");
+var watch   = require('gulp-watch');
+
+var child_process = require('child_process');
+
 //https://github.com/ampedandwired/html-webpack-plugin
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -23,20 +27,18 @@ if (!fs.existsSync("./src/content/xxtebook.db")) {
     console.log('data not available!')
     return
 }
+
+var spinner = ora('Begin to pack , Please wait for\n')
+spinner.start()
+
+setTimeout(function() {
+    spinner.stop()
+}, 5000)
+
 if (!fs.existsSync("./src/content/SQLResult.js")) {
-    var spinner = ora('Begin to process the data\n')
-    spinner.start()
-    require('./sqlite/index').resolve(function() {
-        spinner.stop()
-    })
+    require('./sqlite/index').resolve()
 }
 
-var packinfo = ora('Begin to pack\n')
-packinfo.start()
-
-setTimeout(function(){
-    packinfo.stop()
-},3000)
 
 //配置dev
 var entry = {
@@ -51,7 +53,7 @@ var webpackConfig = {
     output: {
         path: config.build.assetsRoot,
         publicPath: config.build.assetsPublicPath,
-        filename: '[name].js'
+        filename: 'app.js'
     },
     devtool: '#eval-source-map',
     module: {
@@ -149,3 +151,31 @@ module.exports = app.listen(port, function(err) {
     }
     console.log('Listening at http://localhost:' + port + '\n')
 })
+
+
+if (config.debugout) {
+    watch(config.build.assetsRoot + 'app.js', function() {
+
+        console.log(
+            '\n' +
+            '  文件改变,debug模式:\n' +
+            '       打包输出到debug文件夹\n'
+        )
+
+        var child = child_process.spawn('node', ['build/build.js', ['debug=' + config.debugout]]);
+        // 捕获标准输出并将其打印到控制台 
+        child.stdout.on('data', function(data) {
+            console.log('build输出：\n' + data);
+        });
+
+        // 捕获标准错误输出并将其打印到控制台 
+        child.stderr.on('data', function(data) {
+            console.log('build错误输出：\n' + data);
+        });
+
+        child.on('close', function(code) {
+            console.log('子进程build已退出，代码：' + code);
+        });
+
+    })
+}

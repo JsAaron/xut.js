@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node build/dev-server.js",
-    "build": "node build/build.js",
+    "build": "node build/build.js run",
     "unit": "karma start test/unit/karma.conf.js",
     "karma": "karma start karma.conf.js --log-level debug --single-run"
   },
@@ -47,6 +47,7 @@
     "rollup": "^0.25.8",
     "rollup-plugin-babel": "^2.4.0",
     "sql.js": "^0.3.2",
+    "watch": "^0.18.0",
     "webpack": "^1.13.0",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0",

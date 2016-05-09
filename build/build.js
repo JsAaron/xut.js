@@ -19,10 +19,45 @@ var ora    = require('ora')
 var config = require('../config')
 
 //output
-var output = config.build.assetsRoot
+var output = config.build.dist
 
 //打包文件
 var rollupjs = output + 'rollup.js'
+
+//是否debug模式
+var debugout;
+var args = process.argv[process.argv.length - 1]
+var args = args.split('=')
+if (args[0] == 'debug') {
+    debugout = args[1]
+}
+
+
+//发布路径
+//dist 对外使用
+//test 对内测试
+var buildPath = {
+    devName  :'xxtppt.dev.js',
+    distName :'xxtppt.js',
+    dist     : config.build.dist,
+    test     : config.build.src + "build/",
+    //调试目录
+    debug    : debugout 
+}
+
+//delete this existing files
+var delAssets = function(path) {
+    var dev  = path + buildPath.devName
+    var dist = path + buildPath.distName
+
+    ;[dev, dist].forEach(function(file) {
+        if (fs.existsSync(file)) {
+            fs.unlinkSync(file)
+        }
+    })
+}
+delAssets(buildPath.dist)
+delAssets(buildPath.test)
 
 
 var getSize = function(code) {
@@ -45,13 +80,21 @@ var write = function(path, code) {
     })
 }
 
-console.log(
-  '  说明:\n' +
-  '       打包分2块 rollup与gulp\n'
-)
+if(buildPath.debug){
+    console.log(
+        'debug调试打包...'
+    )
+}else{
+    console.log(
+      '  说明:\n' +
+      '       打包分2块 rollup与gulp\n'
+    )    
+}
 
-// var spinner = ora('开始打包')
-// spinner.start()
+
+var spinner = ora('Begin to pack , Please wait for\n')
+spinner.start()
+
 
 new Promise(function(resolve, reject) {
         rollup.rollup({
@@ -63,12 +106,10 @@ new Promise(function(resolve, reject) {
                 ]
             })
             .then(function(bundle) {
-
                 if (!fs.existsSync(output)) {
                     fs.mkdirSync(output);
                     console.log(output + '目录创建成功');
                 }
-
                 var code = bundle.generate({
                     format: 'umd',
                     moduleName: 'Aaron'
@@ -103,19 +144,36 @@ new Promise(function(resolve, reject) {
 
                 paths.push(rollupjs)
 
+
+                if (buildPath.debug) {
+                    gulp.src(paths)
+                        .pipe(concat(buildPath.distName))
+                        .on('error', function(err) {
+                            console.log('Less Error!', err.message);
+                            this.end();
+                        })
+                        .pipe(gulp.dest(buildPath.debug))
+                        .on('end', function() {
+                            fs.unlinkSync(rollupjs)
+                            spinner.stop()
+                        })
+                    return
+                }
+
                 gulp.src(paths)
-                    .pipe(concat('xxtppt.dev.js'))
+                    .pipe(concat(buildPath.devName))
                     .on('error', function(err) {
                         console.log('Less Error!', err.message);
                         this.end();
                     })
-                    // .pipe(gulp.dest(output))
-                    // .pipe(gulp.dest(config.src + '/dev/'))
+                    .pipe(gulp.dest(buildPath.dist))
+                    .pipe(gulp.dest(buildPath.test))
+                    
                     .pipe(uglify())
-                    .pipe(rename("xxtppt.min.js"))
+                    .pipe(rename(buildPath.distName))
                     .pipe(gulp.dest(output))
-                    .pipe(gulp.dest(config.build.assetsRoot))
-                    .pipe(gulp.dest(config.build.src + "/build"))
+                    .pipe(gulp.dest(buildPath.dist))
+                    .pipe(gulp.dest(buildPath.test))
                     .on('end', function() {
                         fs.unlinkSync(rollupjs)
                         resolve && resolve()
@@ -138,6 +196,19 @@ new Promise(function(resolve, reject) {
             spinner.stop()
         }
         
+        //数据库
+        if (!fs.existsSync("./src/content/xxtebook.db")) {
+            console.log("Can't test Because the xxtebook does not exist")
+            spinner.stop()
+            return
+        }
+
+        if (!fs.existsSync("./src/content/SQLResult.js")) {
+            console.log("Can't test Because the SQLResult does not exist")
+            spinner.stop()
+            return
+        }
+
         //数据库
         fs.exists("./src/content/SQLResult.js", function(result) {
             if (!result) {
