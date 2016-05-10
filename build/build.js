@@ -80,11 +80,7 @@ var write = function(path, code) {
     })
 }
 
-if(buildPath.debug){
-    console.log(
-        'debug调试打包...'
-    )
-}else{
+if(!buildPath.debug){
     console.log(
       '  说明:\n' +
       '       打包分2块 rollup与gulp\n'

@@ -25,3 +25,4 @@ export function cursor() {
     Xut.View.busyIcon = $('#busyIcon').html(html);
 
 } 
+

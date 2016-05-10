@@ -154,27 +154,27 @@ module.exports = app.listen(port, function(err) {
 
 
 if (config.debugout) {
-    watch(config.build.assetsRoot + 'app.js', function() {
+
+    watch(config.build.assetsRoot + '/app.js', function() {
 
         console.log(
             '\n' +
-            '  文件改变,debug模式:\n' +
-            '       打包输出到debug文件夹\n'
+            '  file change,debug mode:\n' 
         )
 
         var child = child_process.spawn('node', ['build/build.js', ['debug=' + config.debugout]]);
         // 捕获标准输出并将其打印到控制台 
         child.stdout.on('data', function(data) {
-            console.log('build输出：\n' + data);
+            console.log('build out：\n' + data);
         });
 
         // 捕获标准错误输出并将其打印到控制台 
         child.stderr.on('data', function(data) {
-            console.log('build错误输出：\n' + data);
+            console.log('build fail out：\n' + data);
         });
 
         child.on('close', function(code) {
-            console.log('子进程build已退出，代码：' + code);
+            console.log('build complete：' + code);
         });
 
     })
