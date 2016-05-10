@@ -1,6 +1,6 @@
 import { init } from './init/index'
 
-
+ 
 /**
  * 应用入口
  * @return {[type]} [description]
@@ -35,9 +35,9 @@ let App = function() {
      *           "height": 958
      *       }
      *   }
-     */
+     */ 
     var IBOOKSCONFIG = window.IBOOKSCONFIG;
-   
+     
     //如果是IBOOS模式处理
     //注入保持与数据库H5查询一致
     if (IBOOKSCONFIG && IBOOKSCONFIG.data) {
@@ -50,11 +50,11 @@ let App = function() {
             //直接修改改isBrowser模式
         Xut.plat.isBrowser = true;
         Xut.plat.isIOS = false;
-    }
-
+    }  
+ 
     //配置ibooks参数
     Xut.IBooks = {
-
+  
         /**
          * 当前页面编号
          * @return {[type]} [description]

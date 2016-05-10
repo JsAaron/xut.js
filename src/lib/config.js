@@ -278,6 +278,11 @@ Xut.config = function() {
         }
     }
 
+    var MMXCONFIGPath = './'
+    if (MMXCONFIG && MMXCONFIG.path) {
+        MMXCONFIGPath = rtrim(MMXCONFIG.path)
+    }
+
     //iframe嵌套配置
     //1 新阅读
     //2 子文档
@@ -295,6 +300,8 @@ Xut.config = function() {
                         return sourceUrl;
                     case 'iframeClient':
                         return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
                 }
             }
 
@@ -308,6 +315,8 @@ Xut.config = function() {
                         return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
                     case 'iframeClient':
                         return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
                 }
             }
         },
@@ -324,6 +333,8 @@ Xut.config = function() {
                         return sourceUrl;
                     case 'iframeClient':
                         return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
                 }
             }
 
@@ -338,7 +349,7 @@ Xut.config = function() {
                     case 'iframeClient':
                         return CLIENTCONFIGT.path;
                     case 'iframeMiaomiaoxue':
-                        return rtrim(MMXCONFIG.path) + '/content/gallery/';
+                        return MMXCONFIGPath + '/content/gallery/';
                 }
             }
         },
@@ -355,6 +366,8 @@ Xut.config = function() {
                         return sourceUrl;
                     case 'iframeClient':
                         return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
                 }
             }
             if (isAndroid) {
@@ -368,7 +381,7 @@ Xut.config = function() {
                     case 'iframeClient':
                         return CLIENTCONFIGT.path;
                     case 'iframeMiaomiaoxue':
-                        return rtrim(MMXCONFIG.path) + '/content/gallery/';
+                        return MMXCONFIGPath + '/content/gallery/';
                 }
             }
         },
@@ -386,6 +399,8 @@ Xut.config = function() {
                         return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
                     case 'iframeClient':
                         return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
                 }
             }
 
@@ -399,6 +414,8 @@ Xut.config = function() {
                         return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
                     case 'iframeClient':
                         return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
                 }
             }
         }
