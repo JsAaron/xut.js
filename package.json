@@ -27,6 +27,7 @@
     "chai": "^3.5.0",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.13.4",
+    "fs-extra": "^0.30.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-rename": "^1.2.2",

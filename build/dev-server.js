@@ -153,7 +153,7 @@ module.exports = app.listen(port, function(err) {
 })
 
 
-if (config.debugout) {
+if (config.test.launch) {
 
     watch(config.build.assetsRoot + '/app.js', function() {
 
@@ -162,7 +162,7 @@ if (config.debugout) {
             '  file change,debug mode:\n' 
         )
 
-        var child = child_process.spawn('node', ['build/build.js', ['debug=' + config.debugout]]);
+        var child = child_process.spawn('node', ['build/dev-test-build.js', ['debug=' + config.test.dist]]);
         // 捕获标准输出并将其打印到控制台 
         child.stdout.on('data', function(data) {
             console.log('build out：\n' + data);

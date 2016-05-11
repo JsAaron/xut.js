@@ -470,7 +470,8 @@ video {
     animation-duration: 1s;
     animation-iteration-count: 1;
     animation-timing-function: ease-out;
-    animation-fill-mode: forwards -webkit-transform-style: preserve-3d;
+    animation-fill-mode: forwards; 
+    -webkit-transform-style: preserve-3d;
     -webkit-backface-visibility: hidden;
     -webkit-animation-name: kfnavControlBar;
     -webkit-animation-duration: 1s;

@@ -346,13 +346,15 @@ baseProto.initTasks = function(options) {
                 //////////////
                 self.element = element;
                 self.pseudoElement = pseudoElement;
+
                 //获取根节点
                 self.getElement = function() {
                     return pseudoElement ? pseudoElement : element
                 }
 
                 setNextRunTask('background')
-                    //构建主容器li完毕,可以提前执行翻页动作
+
+                //构建主容器li完毕,可以提前执行翻页动作
                 createRelated.preforkComplete();
                 //视觉差不管
                 if (self.isMaster) {
@@ -369,7 +371,7 @@ baseProto.initTasks = function(options) {
             var nextRun = function() {
                 createRelated.preCreateTasks = false;
                 setNextRunTask('components')
-                    //针对当前页面的检测
+                //针对当前页面的检测
                 if (!createRelated.tasksHang || self.isMaster) {
                     self.nextTasks({
                         'taskName': '外部widgets',
@@ -378,13 +380,12 @@ baseProto.initTasks = function(options) {
                         }
                     });
                 }
-
+ 
                 //如果有挂起任务，则继续执行
                 if (createRelated.tasksHang) {
                     createRelated.tasksHang();
                 }
             }
-
             callContext('Background', nextRun)
         },
         components: function() {

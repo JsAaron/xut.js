@@ -569,7 +569,10 @@ PptAnimation.prototype = {
                     return;
                 }
             }
-            spiritWidget.updateAction(object.attr("id"), params);
+
+            if(window.spiritWidget){
+                spiritWidget.updateAction(object.attr("id"), params);
+            }
         }
 
 

@@ -42,7 +42,9 @@ export function init() {
             //如果不是iframe加载,则创建空数据库
             window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
             //等待硬件加载完毕
-            document.addEventListener("deviceready", creatDatabase, false);
+            document.addEventListener("deviceready", function() {
+                creatDatabase(config)
+            }, false);
         }
     }
 

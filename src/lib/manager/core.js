@@ -6,40 +6,24 @@
  **********************************************************************/
 
 // 定义访问器
-import {
-    defProtected as def, defAccess
-}
-from '../util/index'
+import { defProtected as def, defAccess } from '../util/index'
 
 // 观察
-import {
-    observe
-}
-from '../observer/observe'
+import { observe } from '../observer/observe'
 
 //全部交互通知
-import {
-    GlobalEvent
-}
-from './globalevent'
+import { GlobalEvent } from './globalevent'
 
 //动态api
-import {
-    overrideApi
-}
-from './overrideapi'
+import { overrideApi } from './overrideapi'
 
 //调度器
-import {
-    trigger
-}
-from '../scheduler/index'
+import { trigger } from '../scheduler/index'
 
 //调度任务
-import {
-    Scheduler
-}
-from './schedule'
+import { Scheduler } from './schedule'
+
+
 
 let config
 

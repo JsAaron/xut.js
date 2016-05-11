@@ -27,9 +27,10 @@ import {
 }
 from '../../component/content/activity'
 
-
+ 
 
 function TaskContents(data) {
+
     var compileActivitys;
     data = _.extend(this, data);
 

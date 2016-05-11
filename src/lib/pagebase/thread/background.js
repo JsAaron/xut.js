@@ -39,11 +39,10 @@ function TaskBackground(rootNode, data, suspendCallback, successCallback) {
         return;
     }
 
-
     //背景是否需要SVG解析
-    this.parseMaster(isSVGContent, content, createWarpper);
-    //构建背景
-    function createWarpper(svgContents) {
+    this.parseMaster(isSVGContent, content, function (svgContents) {
+
+        //构建背景
         var backgroundStr = createMaster(svgContents, data);
         if (backgroundStr) {
             svgContents = null;
@@ -51,7 +50,7 @@ function TaskBackground(rootNode, data, suspendCallback, successCallback) {
         } else {
             successCallback();
         }
-    }
+    });
 
 }
 
@@ -84,6 +83,7 @@ TaskBackground.prototype = {
                 nextTasks()
             })
         }
+
         self.callback.suspendCallback(nextTasks, suspendTasks);
     },
 
@@ -121,10 +121,20 @@ function fixSize(data) {
     //缩放比
 	var proportion   = Xut.config.proportion;
 	data.path        = Xut.config.pathAddress;
-	data.imageWidth  = data.imageWidth * proportion.width;
-	data.imageHeight = data.imageHeight * proportion.height;
-	data.imageLeft   = data.imageLeft * proportion.left;
-	data.imageTop    = data.imageTop * proportion.top;
+
+    if (data.imageWidth) {
+        data.imageWidth = data.imageWidth * proportion.width;
+    }
+    if (data.imageHeight) {
+        data.imageHeight = data.imageHeight * proportion.height;
+    }
+    if (data.imageLeft) {
+        data.imageLeft = data.imageLeft * proportion.left;
+    }
+    if (data.imageTop) {
+        data.imageTop = data.imageTop * proportion.top;
+    }
+
 }
 
 
@@ -136,14 +146,16 @@ function fixSize(data) {
  **********************************************************************/
 
 function createMaster(svgContent, data) {
-    var imageLayer, maskLayer, restr = '',
+    var imageLayer, 
+        maskLayer, 
+        restr = '',
         imageLayerData = data["imageLayer"], //图片层
-        imageMaskData = data["imageMask"], //蒙版层
-        backImageData = data["backImage"], //真实图片层
-        backMaskData = data["backMask"], //真实蒙版层
-        masterData = data["master"], //母板
-        backText = data['md5'], //背景文字
-        pptMaster = data['pptMaster']; //母板PPTID
+        imageMaskData  = data["imageMask"], //蒙版层
+        backImageData  = data["backImage"], //真实图片层
+        backMaskData   = data["backMask"], //真实蒙版层
+        masterData     = data["master"], //母板
+        backText       = data['md5'], //背景文字
+        pptMaster      = data['pptMaster']; //母板PPTID
 
 
     //=======================未分层结构===========================

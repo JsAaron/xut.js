@@ -228,6 +228,9 @@ function fixedSize(novelData) {
 function checkTestDB() {
     var database = config.db,
         sql = 'SELECT * FROM Novel';
+
+
+
     if (database) {
         database.transaction(function(tx) {
             tx.executeSql(sql, [], function(tx, rs) {
@@ -258,11 +261,12 @@ export function nextTask() {
     if (window.openDatabase) {
         try {
             //数据库链接对象
-            config.db = window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
+            config.db  = window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
         } catch (err) {
             console.log('window.openDatabase出错')
         }
     }
+
 
     //检查数据库
     checkTestDB();

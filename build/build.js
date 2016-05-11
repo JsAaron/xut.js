@@ -1,9 +1,10 @@
-var gulp = require('gulp');
+var gulp       = require('gulp');
 var fs         = require('fs')
 var rollup     = require('rollup')
 var babel      = require('rollup-plugin-babel')
 var open       = require("open")
 var httpServer = require('http-server')
+var fsextra    = require('fs-extra')
 
 //var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
@@ -120,6 +121,7 @@ new Promise(function(resolve, reject) {
     })
     .then(function() {
         return new Promise(function combine(resolve, reject) {
+            
             fs.readFile('./src/index.html', "utf8", function(error, data) {
                 if (error) throw error;
                 var paths = []
@@ -138,21 +140,44 @@ new Promise(function(resolve, reject) {
                     }
                 })
 
-                paths.push(rollupjs)
+              //  paths.push(rollupjs)
 
-
+                //degbug模式
+                //生成
                 if (buildPath.debug) {
                     gulp.src(paths)
-                        .pipe(concat(buildPath.distName))
+                        .pipe(concat('framework.js'))
                         .on('error', function(err) {
                             console.log('Less Error!', err.message);
                             this.end();
                         })
-                        .pipe(gulp.dest(buildPath.debug))
+                        .pipe(gulp.dest(buildPath.dist))
                         .on('end', function() {
-                            fs.unlinkSync(rollupjs)
-                            spinner.stop()
+
+                                //合成xxtppt.js
+                               paths.push(rollupjs)
+                               gulp.src(paths)
+                                  .pipe(concat('xxtppt.js'))
+                                  .on('error', function(err) {
+                                      console.log('Less Error!', err.message);
+                                      this.end();
+                                  })
+                                  .pipe(gulp.dest(buildPath.dist))
+                                   .on('end', function() {
+
+                                        //复制dist到lib/build
+                                        try {
+                                            fsextra.copySync('dist', buildPath.debug)
+                                            console.log("copySync dist to " + buildPath.debug  + " success!")
+                                        } catch (err) {
+                                            console.error(err)
+                                        }
+
+                                        spinner.stop()
+                                   })
+
                         })
+
                     return
                 }
 
