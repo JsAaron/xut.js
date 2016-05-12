@@ -2,16 +2,8 @@ var gulp = require('gulp');
 var fs = require('fs')
 var rollup = require('rollup')
 var babel = require('rollup-plugin-babel')
-var open = require("open")
-var httpServer = require('http-server')
 var fsextra = require('fs-extra')
 
-//var replace = require('rollup-plugin-replace')
-var version = process.env.VERSION;
-var express = require('express');
-var app = express();
-
-// var uglify = require('uglify-js')
 var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
 var concat = require('gulp-concat')
@@ -51,8 +43,7 @@ var delAssets = function(path) {
     var dev = path + buildPath.devName
     var dist = path + buildPath.distName
 
-    ;
-    [dev, dist].forEach(function(file) {
+    ;[dev, dist].forEach(function(file) {
         if (fs.existsSync(file)) {
             fs.unlinkSync(file)
         }

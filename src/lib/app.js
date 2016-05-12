@@ -9,6 +9,7 @@ Xut.Version = 783;
 //在加载时创建新的audio.video 用的时候更换
 Xut.fix = Xut.fix || {};
 
+
 //移动端浏览器平台
 if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
     var fixaudio = function() {

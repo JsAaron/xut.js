@@ -162,7 +162,7 @@ if (config.test.launch) {
             '  file change,debug mode:\n' 
         )
 
-        var child = child_process.spawn('node', ['build/dev-test-build.js', ['debug=' + config.test.dist]]);
+        var child = child_process.spawn('node', ['build/dev-build.js', ['debug=' + config.test.dist]]);
         // 捕获标准输出并将其打印到控制台 
         child.stdout.on('data', function(data) {
             console.log('build out：\n' + data);

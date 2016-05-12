@@ -140,47 +140,8 @@ new Promise(function(resolve, reject) {
                     }
                 })
 
-              //  paths.push(rollupjs)
-
-                //degbug模式
-                //生成
-                if (buildPath.debug) {
-                    gulp.src(paths)
-                        .pipe(concat('framework.js'))
-                        .on('error', function(err) {
-                            console.log('Less Error!', err.message);
-                            this.end();
-                        })
-                        .pipe(gulp.dest(buildPath.dist))
-                        .on('end', function() {
-
-                                //合成xxtppt.js
-                               paths.push(rollupjs)
-                               gulp.src(paths)
-                                  .pipe(concat('xxtppt.js'))
-                                  .on('error', function(err) {
-                                      console.log('Less Error!', err.message);
-                                      this.end();
-                                  })
-                                  .pipe(gulp.dest(buildPath.dist))
-                                   .on('end', function() {
-
-                                        //复制dist到lib/build
-                                        try {
-                                            fsextra.copySync('dist', buildPath.debug)
-                                            console.log("copySync dist to " + buildPath.debug  + " success!")
-                                        } catch (err) {
-                                            console.error(err)
-                                        }
-
-                                        spinner.stop()
-                                   })
-
-                        })
-
-                    return
-                }
-
+                //合成xxtppt.js
+                paths.push(rollupjs)
                 gulp.src(paths)
                     .pipe(concat(buildPath.devName))
                     .on('error', function(err) {

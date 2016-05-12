@@ -11,8 +11,8 @@ module.exports = {
         dist: '/Users/project/svn/magazine-develop-ios/www/build'
     },
     build: {
-        index: path.resolve(__dirname, 'dev/index.html'),
-        assetsRoot: path.resolve(__dirname, 'dev'),
+        index: path.resolve(__dirname, 'temp/index.html'),
+        assetsRoot: path.resolve(__dirname, 'temp'),
         assetsPublicPath: '/',
         productionSourceMap: true,
         src: './src/',
