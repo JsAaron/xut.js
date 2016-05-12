@@ -7,9 +7,11 @@
  * @return {[type]} [description]
  */
 
-import { parseJSON, arrayUnique ,reviseSize,readFile} from '../../../util/index'
+import { parseJSON, arrayUnique, reviseSize, readFile } from '../../../util/index'
 
 import { Container as pixiContainer } from '../../../component/pixi/Container'
+
+import { parseCanvas } from './parseCanvas'
 
 let prefix = Xut.plat.prefixStyle;
 
@@ -426,19 +428,10 @@ export function structure(callback, data, context) {
         //返回出去给ibooks预编译使用
         idFix = [],
 
-        //默认canvas容器的层级
-        //取精灵动画最高层级
-        //2016.2.25
-        canvasIndex = 1,
-
         //缓存contentDas
         contentDas = {},
         //缓存content结构
         cachedContentStr = [];
-
-
-    //启动cnavas模式
-    var canvasRelatedMode = data.canvasRelated.enable;
 
 
     //容器结构创建 
@@ -481,56 +474,6 @@ export function structure(callback, data, context) {
     }
 
 
-    /**
-     * 设置canvas数据
-     */
-    var createCanvasData = function(type, contentId, conData) {
-        //content收集id标记
-        //cid =>content=> 普通动画 ppt
-        //wid =>widget=>高级动画 
-        if (data.canvasRelated[type].indexOf(contentId) == -1) {
-            data.canvasRelated[type].push(contentId);
-            conData.actionTypes[type] = true;
-        }
-
-        if (data.canvasRelated.cid.indexOf(contentId) == -1) {
-            data.canvasRelated.cid.push(contentId);
-        }
-
-        //给content数据增加直接判断标示
-        conData.canvasMode = true;
-
-        //拿到最高层级
-        if (conData.zIndex) {
-            if (conData.zIndex > canvasIndex) {
-                canvasIndex = conData.zIndex;
-            }
-        }
-    }
-
-    /**
-     * canvas pixi.js类型处理转化
-     * 填充cid, wid
-     * @type {Object}
-     */
-    var pixiType = {
-        //普通精灵动画
-        "Sprite": function(contentId, conData) {
-            //启动精灵模式
-            //在动画处理的时候给initAnimations快速调用
-            createCanvasData('spiritId', contentId, conData)
-        },
-        //ppt=》pixi动画
-        "PPT": function(contentId, conData) {
-            createCanvasData('pptId', contentId, conData)
-        },
-        //高级精灵动画
-        //widget
-        "SeniorSprite": function(contentId, conData) {
-            createCanvasData('widgetId', contentId, conData)
-        },
-    }
-
 
     /**
      * 开始过滤参数
@@ -551,31 +494,12 @@ export function structure(callback, data, context) {
         //1 浮动对象
         //2 canvas对象
         if (conData) {
-            //转成canvas标记
-            //如果有pixi的处理类型
-            //2016.2.25
-            //SeniorSprite,PPT
-            //Sprite,PPT
-            //SeniorSprite
-            //Sprite
-            //PPT
-            //5种处理方式
-            //可以组合
-            if (canvasRelatedMode && category) {
-                var _cat;
-                var cat;
-                var _cats = category.split(",");
-                var i = _cats.length;
-                //动作类型
-                conData.actionTypes = {};
-                if (i) {
-                    while (i--) {
-                        cat = _cats[i]
-                            //匹配数据类型
-                        pixiType[cat] && pixiType[cat](contentId, conData)
-                    }
-                }
-            }
+
+            //匹配canvas对象数据
+            if (category) {
+                //解析canvas先关数据
+                parseCanvas(contentId, category, conData, data)
+            } 
 
             //如果有parameter
             if (conData.parameter) {
@@ -597,10 +521,12 @@ export function structure(callback, data, context) {
     contentCollection = parseContentDas(data.createContentIds, prefilter);
     contentCount = cloneContentCount = contentCollection.length;
 
+
     //创建canvas画布 
-    if (canvasRelatedMode) {
-        pixiContainer(data, canvasIndex)
+    if (data.canvasRelated.enable) {
+        pixiContainer(data, data.canvasRelated.containerIndex)
     }
+
 
     ////////////////
     //开始生成所有的节点 //

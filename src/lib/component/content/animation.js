@@ -99,7 +99,7 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         //普通精灵动画
         this.domSprites = this.contentDas.category === 'Sprite' ? true : false;
     }
-
+console.log(this)
 
     //canvas模式
     //比较复杂
@@ -112,6 +112,7 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         //动作类型
         //可能是组合动画
         actionTypes = this.contentDas.actionTypes
+
         //精灵动画
         if (actionTypes.spiritId) {
             //加入任务队列

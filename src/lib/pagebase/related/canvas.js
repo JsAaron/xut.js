@@ -18,6 +18,16 @@ var Factory = function() {
     this.enable = false
 
     /**
+     * CompSprite非常特殊
+     * 可以在dom的情况下使用
+     * 所以如果是dom模式要强制开始enable‘
+     * 这样会导致 精灵等动画强制转canvas 
+     * 这是错误的，所以增加一个判断
+     * 
+     */
+    this.onlyCompSprite = false
+
+    /**
      * 加载失败content列表
      * @type {Array}
      */
@@ -38,6 +48,14 @@ var Factory = function() {
     //widget零件保存的content id 
     //高级精灵动画
     this.widgetId = []
+
+    //复杂精灵动画
+    this.compSpriteId = []
+
+    //默认canvas容器的层级
+    //取精灵动画最高层级
+    //2016.2.25
+    this.containerIndex = 1
 
     /**
      * cid=>wid
