@@ -3692,6 +3692,8 @@
          return outputPara;
      }
 
+     // import { spiritSenior } from '../../pixi/spiritesenior/manage'
+
      /**
       * 解析数据,获取content对象
       * @return {[type]} [description]
@@ -3742,20 +3744,20 @@
              //高级精灵动画
              //如果是canvas模式
              //那么意味着所有的高级精灵动画统一转化pixi模式
-             var pageObj = Xut.Presentation.GetPageObj(this.pageType, this.pageIndex);
-             if (pageObj) {
-                 if (pageObj.canvasRelated.enable) {
-                     //高级精灵动画不处理
-                     //已经改成本地化pixi=>content调用了
-                     if (this.widgetName === "spirit") {
-                         //高级精灵动画创建器
-                         //管理器内部在创建子高级动画
-                         var arg = this._getArg();
-                         this.pageObj = new seniorManage(arg[0], arg[1]);
-                         return;
-                     }
-                 }
-             }
+             // var pageObj = Xut.Presentation.GetPageObj(this.pageType, this.pageIndex)
+             // if (pageObj) {
+             //     if (pageObj.canvasRelated.enable) {
+             //         //高级精灵动画不处理
+             //         //已经改成本地化pixi=>content调用了
+             //         if (this.widgetName === "spirit") {
+             //             //高级精灵动画创建器
+             //             //管理器内部在创建子高级动画
+             //             var arg = this._getArg()
+             //             this.pageObj = new seniorManage(arg[0], arg[1])
+             //             return;
+             //         }
+             //     }
+             // }
 
              //加载文件
              if (typeof window[this.widgetName + "Widget"] != "function") {
@@ -14736,6 +14738,9 @@
          if (compileActivitys = parseContents(data)) {
              //解析动画表数据结构
              data = parserRelated(compileActivitys, data);
+
+             console.log(data);
+             return;
              //如果有需要构建的content
              //开始多线程处理
              data.createContentIds.length ? this.dataAfterCheck(data) : this.loadComplete();

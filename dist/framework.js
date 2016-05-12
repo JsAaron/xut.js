@@ -64028,7 +64028,10 @@ PptAnimation.prototype = {
                     return;
                 }
             }
-            spiritWidget && spiritWidget.updateAction(object.attr("id"), params);
+
+            if(window.spiritWidget){
+                spiritWidget.updateAction(object.attr("id"), params);
+            }
         }
 
 
@@ -71122,7 +71125,9 @@ CanvasAnimation.prototype = {
 					return;
 				}
 			}
-			spiritWidget && spiritWidget.updateAction(object.attr("id"), params);
+            if(window.spiritWidget){
+                spiritWidget.updateAction(object.attr("id"), params);
+            }
 		}
 
 

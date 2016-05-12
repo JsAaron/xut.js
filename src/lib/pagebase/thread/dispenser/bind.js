@@ -5,8 +5,8 @@ import { Widget } from './widget'
 import { ShowNote } from './shownote'
 
 let Webpage = Media
-let Video   = Media
-let Audio   = Media
+let Video = Media
+let Audio = Media
 
 
 let Bind = {
@@ -16,7 +16,7 @@ let Bind = {
     Content,
     Webpage,
     Widget,
-    ShowNote	
+    ShowNote
 }
 
-export {Bind}
+export { Bind }
