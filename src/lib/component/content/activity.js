@@ -23,25 +23,18 @@ import {
     bindEvents as bindContentEvents
 }
 from './event'
-
 //混入content
 import { Mix } from './mix'
-
 //content自对象
 import { Child } from './child'
-
 //搜索
 import { SearchBar } from './searchbar'
-
 //书签
 import { BookMark } from './bookmark'
-
 //文本框
 import { HtmlBox } from './htmlbox'
-
 //pixi事件
 import { bindEvents as bindPixiEvents } from '../pixi/event'
-
 //任务
 import { createNextTask } from './nexttask'
 
@@ -59,12 +52,10 @@ function activityClass(data) {
 
     /**
      * 2016.4.11
+     * 检测是所有的子任务必须完成
      * 因为canvas模式导致
      * 任务必须等待context上下创建
-     * 完成后执行
-     * 1 事件
-     * 2 预执行
-     * @type {Array}
+     * context就是pixi的直接对象，精灵..都是异步的
      */
     this.nextTask = createNextTask(this.monitorComplete)
 
@@ -114,18 +105,8 @@ function activityClass(data) {
      */
     this._fixAudio = [];
 
-
     /**
-     * 是否正在等待创建的子对象
-     * 如果创建比流程先执行完毕
-     * @return {[type]}   
-     */
-    if (this.nextTask.context.wait) {
-        this.monitorComplete();
-        return this;
-    }
-
-    /**
+     * 如果存在content
      * 等待创建执行
      * @param  {[type]} this.nextTask.context.length() 
      * @return {[type]}                                
@@ -135,6 +116,10 @@ function activityClass(data) {
         return this;
     }
 
+    /**
+     * 如果没有pixi的异步创建
+     * 同步代码直接完成
+     */
     this.monitorComplete();
 }
 
@@ -155,7 +140,7 @@ var activitProto = activityClass.prototype;
  * 检测是HTML文本框处理
  * @return {[type]} [description]
  */
-activitProto.htmlTextBox = function() {
+activitProto.htmlTextBox = function () {
     var self = this;
     var eventData = this.eventData;
     var relatedData = this.relatedData;
@@ -168,7 +153,7 @@ activitProto.htmlTextBox = function() {
     this.htmlBoxInstance = [];
     //创建文本框对象
     if (contentHtmlBoxIds.length && relatedData.contentDas) {
-        _.each(relatedData.contentDas, function(cds) {
+        _.each(relatedData.contentDas, function (cds) {
             if (~contentHtmlBoxIds.indexOf(cds._id)) {
                 contentId = cds._id;
                 contentName = self._makePrefix('Content', self.pid, contentId);
@@ -192,8 +177,8 @@ activitProto.htmlTextBox = function() {
  * 保证正确遍历
  * @return {[type]} [description]
  */
-activitProto.eachAssistContents = function(callback) {
-    _.each(this.abstractContents, function(scope) {
+activitProto.eachAssistContents = function (callback) {
+    _.each(this.abstractContents, function (scope) {
         //保存只能处理动画
         //scope.processType === 'animation' || scope.processType === 'both')
         callback.call(this, scope)
@@ -205,14 +190,14 @@ activitProto.eachAssistContents = function(callback) {
  * 初始化PPT动画与音频
  * @return {[type]} [description]
  */
-activitProto.createActions = function() {
+activitProto.createActions = function () {
 
     var pageId = this.relatedData.pageId,
         rootNode = this.rootNode,
         collectorHooks = this.relatedCallback.contentsHooks,
         pageType = this.pageType;
 
-    this.eachAssistContents(function(scope) {
+    this.eachAssistContents(function (scope) {
 
         var context, type, id, isRreRun, parameter;
 
@@ -249,7 +234,7 @@ activitProto.createActions = function() {
 /**
  * 检测创建完成度
  */
-activitProto._checkCreate = function(callback) {
+activitProto._checkCreate = function (callback) {
     var waitCreateContent = this.waitCreateContent;
     if (waitCreateContent && waitCreateContent.length) {
         Mix(this, waitCreateContent, callback);
@@ -265,7 +250,7 @@ activitProto._checkCreate = function(callback) {
  * @return {[type]}             [description]
  * evenyClick 每次都算有效点击
  */
-activitProto.runEffects = function(outComplete, evenyClick) {
+activitProto.runEffects = function (outComplete, evenyClick) {
 
     var self = this;
     var pageId = this.relatedData.pageId;
@@ -294,8 +279,8 @@ activitProto.runEffects = function(outComplete, evenyClick) {
 
     //制作作用于内动画完成
     //等待动画完毕后执行动作or场景切换
-    var captureAnimComplete = self.captureAnimComplete = function(counts) {
-        return function(scope) {
+    var captureAnimComplete = self.captureAnimComplete = function (counts) {
+        return function (scope) {
             //动画结束,删除这个hack
             scope
                 && scope.$contentProcess && scope.$contentProcess.removeProp && scope.$contentProcess.removeProp('animOffset')
@@ -325,7 +310,7 @@ activitProto.runEffects = function(outComplete, evenyClick) {
             }
 
         }
-    }(this.abstractContents.length);
+    } (this.abstractContents.length);
 
 
     /**
@@ -362,9 +347,9 @@ activitProto.runEffects = function(outComplete, evenyClick) {
      * 递归创建
      * @return {[type]}       [description]
      */
-    self._checkCreate(function() {
+    self._checkCreate(function () {
         //执行动画
-        self.eachAssistContents(function(scope) {
+        self.eachAssistContents(function (scope) {
             if (scope.isRreRun) {
                 isRreRunPocess(scope);
             } else {
@@ -376,7 +361,7 @@ activitProto.runEffects = function(outComplete, evenyClick) {
 
                 //ppt动画
                 //ppt音频
-                scope.run(function() {
+                scope.run(function () {
                     captureAnimComplete(scope);
                 });
             }
@@ -390,10 +375,10 @@ activitProto.runEffects = function(outComplete, evenyClick) {
  * 停止动画
  * @return {[type]} [description]
  */
-activitProto.stopEffects = function() {
+activitProto.stopEffects = function () {
     var pageId = this.relatedData.pageId;
     this.runState = false;
-    this.eachAssistContents(function(scope) {
+    this.eachAssistContents(function (scope) {
         !scope.isRreRun && scope.stop && scope.stop(pageId);
     })
 
@@ -416,15 +401,15 @@ function accessDrop(eventData, callback) {
  * 提供快速翻页复用
  * @return {[type]} [description]
  */
-activitProto.resetAloneAnim = function() {
+activitProto.resetAloneAnim = function () {
     //复位拖动对象
-    accessDrop(this.eventData, function(drop) {
-            drop.reset();
-        })
-        //如果是运行canvas模式
-        //停止绘制
+    accessDrop(this.eventData, function (drop) {
+        drop.reset();
+    })
+    //如果是运行canvas模式
+    //停止绘制
     if (this.canvasRelated.stopRender) {
-        setTimeout(function() {
+        setTimeout(function () {
             this.canvasRelated.stopRender();
         }.bind(this), 0)
     }
@@ -435,8 +420,8 @@ activitProto.resetAloneAnim = function() {
  * 复位状态
  * @return {[type]} [description]
  */
-activitProto.resetAnimation = function() {
-    this.eachAssistContents(function(scope) {
+activitProto.resetAnimation = function () {
+    this.eachAssistContents(function (scope) {
         !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
     })
 
@@ -449,12 +434,12 @@ activitProto.resetAnimation = function() {
  * @param  {[type]} elementCallback [description]
  * @return {[type]}                 [description]
  */
-activitProto.destroyEffects = function(elementCallback) {
+activitProto.destroyEffects = function (elementCallback) {
     //销毁拖动对象
-    accessDrop(this.eventData, function(drop) {
+    accessDrop(this.eventData, function (drop) {
         drop.destroy();
     })
-    this.eachAssistContents(function(scope) {
+    this.eachAssistContents(function (scope) {
         if (scope.destroy) {
             scope.destroy();
         }
@@ -470,7 +455,7 @@ activitProto.destroyEffects = function(elementCallback) {
  * 3 触发搜索工具栏
  * @return {[type]} [description]
  */
-activitProto.relevantOperation = function() {
+activitProto.relevantOperation = function () {
 
     var scenarioInfo,
         eventContentId;
@@ -509,7 +494,7 @@ activitProto.relevantOperation = function() {
 
             //处理新的场景
             if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
-                setTimeout(function() {
+                setTimeout(function () {
                     Xut.View.LoadScenario({
                         'scenarioId': scenarioInfo.seasonId,
                         'chapterId': scenarioInfo.chapterId
@@ -528,7 +513,7 @@ activitProto.relevantOperation = function() {
  * 创建搜索框
  * @return {[type]} [description]
  */
-activitProto.createSearchBar = function() {
+activitProto.createSearchBar = function () {
     var options = {
         parent: this.rootNode
     }
@@ -545,7 +530,7 @@ activitProto.createSearchBar = function() {
  * 创建书签
  * @return {[type]} [description]
  */
-activitProto.createBookMark = function() {
+activitProto.createBookMark = function () {
     var element, seasonId, pageId, pageData;
     if (this.pageType === 'master') {
         //模板取对应的页面上的数据
@@ -583,7 +568,7 @@ activitProto.createBookMark = function() {
  * 构建事件体系
  * @return {[type]} [description]
  */
-activitProto.createEventRelated = function() {
+activitProto.createEventRelated = function () {
 
     //配置事件节点
     var eventId,
@@ -658,7 +643,7 @@ activitProto.createEventRelated = function() {
  * 绑定事件行为
  * @return {[type]} [description]
  */
-activitProto.bindEventBehavior = function(callback) {
+activitProto.bindEventBehavior = function (callback) {
     var self = this,
         eventData = this.eventData,
         eventName = eventData.eventName,
@@ -701,16 +686,16 @@ activitProto.bindEventBehavior = function(callback) {
         //音频地址
         if (behaviorSound = feedbackBehavior.behaviorSound) {
 
-            var createAuido = function() {
-                    return new Xut.Audio({
-                        url: behaviorSound,
-                        trackId: 9999,
-                        complete: function() {
-                            this.play()
-                        }
-                    })
-                }
-                //妙妙学客户端强制删除
+            var createAuido = function () {
+                return new Xut.Audio({
+                    url: behaviorSound,
+                    trackId: 9999,
+                    complete: function () {
+                        this.play()
+                    }
+                })
+            }
+            //妙妙学客户端强制删除
             if (MMXCONFIG && audioHandler) {
                 self._fixAudio.push(createAuido())
             } else {
@@ -722,7 +707,7 @@ activitProto.bindEventBehavior = function(callback) {
             //div通过css实现反弹
             if (eventData.domMode) {
                 eventContext.addClass('xut-behavior');
-                setTimeout(function() {
+                setTimeout(function () {
                     eventContext.removeClass('xut-behavior');
                     startRunAnim();
                 }, 500)
@@ -735,7 +720,7 @@ activitProto.bindEventBehavior = function(callback) {
                 eventContext.position.x -= Math.round(px * 0.05);
                 self.canvasRelated.oneRender();
 
-                setTimeout(function() {
+                setTimeout(function () {
                     eventContext.scale.x = sx;
                     eventContext.position.x = px;
                     self.canvasRelated.oneRender();
@@ -753,15 +738,15 @@ activitProto.bindEventBehavior = function(callback) {
      */
     var eventDrop = {
         //保存引用,方便直接销毁
-        init: function(drag) {
+        init: function (drag) {
             eventData.dragDrop = drag;
         },
         //拖拽开始的处理
-        startRun: function() {
+        startRun: function () {
 
         },
         //拖拽结束的处理
-        stopRun: function(isEnter) {
+        stopRun: function (isEnter) {
             if (isEnter) { //为true表示拖拽进入目标对象区域
                 self.runEffects();
             }
@@ -775,7 +760,7 @@ activitProto.bindEventBehavior = function(callback) {
      * 点击,双击,滑动等等....
      * @return {[type]} [description]
      */
-    var eventRun = function() {
+    var eventRun = function () {
         //如果存在反馈动作
         //优先于动画执行
         var feedbackBehavior;
@@ -791,7 +776,7 @@ activitProto.bindEventBehavior = function(callback) {
      * 事件对象引用
      * @return {[type]} [description]
      */
-    var eventHandler = function(eventReference, eventHandler) {
+    var eventHandler = function (eventReference, eventHandler) {
         eventData.eventReference = eventReference;
         eventData.eventHandler = eventHandler;
     }
@@ -832,7 +817,7 @@ activitProto.bindEventBehavior = function(callback) {
  * 注册事件
  * @return {[type]} [description]
  */
-activitProto.registerEvent = function() {
+activitProto.registerEvent = function () {
     var eventData = this.eventData;
     /**
      * 2016.2.19
@@ -846,7 +831,7 @@ activitProto.registerEvent = function() {
         var makeFunction = function bind() {
             //找到对应的上下文pixi stoge
             eventData.eventContext = {}
-            this.bindEventBehavior(function(eventData) {
+            this.bindEventBehavior(function (eventData) {
                 bindPixiEvents(eventData);
             })
         }
@@ -854,7 +839,7 @@ activitProto.registerEvent = function() {
         this.nextTask.event.push(makeFunction.bind(this))
     } else {
         //dom事件
-        this.bindEventBehavior(function(eventData) {
+        this.bindEventBehavior(function (eventData) {
             bindContentEvents(eventData);
         })
     }
@@ -876,7 +861,7 @@ activitProto.registerEvent = function() {
  * 3 预显示
  * @return {[type]} [description]
  */
-activitProto._repeatBind = function(id, context, isRreRun, scope, collectorHooks, canvasMode) {
+activitProto._repeatBind = function (id, context, isRreRun, scope, collectorHooks, canvasMode) {
     var indexOf,
         relatedData = this.relatedData;
 
@@ -892,10 +877,10 @@ activitProto._repeatBind = function(id, context, isRreRun, scope, collectorHooks
                 // console.log(id,scope)
                 //直接改变元素状态
                 // context.visible = isRreRun === 'visible' ? true : false;
-                this.nextTask.pre[id] = function() {
+                this.nextTask.pre[id] = function () {
                     this.nextTask.pre.push(function pre(context) {
                         console.log('预执行', isRreRun)
-                            //this.canvasRelated.oneRender();
+                        //this.canvasRelated.oneRender();
                     })
                 }
             }
@@ -920,7 +905,7 @@ activitProto._repeatBind = function(id, context, isRreRun, scope, collectorHooks
  * 可能有多个引用关系
  * @return {[type]}         [description]
  */
-activitProto._addIScroll = function(scope, element) {
+activitProto._addIScroll = function (scope, element) {
     var self = this,
         elementName,
         contentDas = scope.contentDas;
@@ -936,7 +921,7 @@ activitProto._addIScroll = function(scope, element) {
 
         //ios or pc
         if (!Xut.plat.isAndroid) {
-            return function() {
+            return function () {
                 self.iscroll = Iscroll(element);
             }
         }
@@ -945,7 +930,7 @@ activitProto._addIScroll = function(scope, element) {
         //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
         //如果是显示的,则不需要处理,
         var visible = preEle.css('visibility'),
-            restore = function() {};
+            restore = function () { };
 
         if (visible == 'hidden') {
             var opacity = preEle.css('opacity');
@@ -955,7 +940,7 @@ activitProto._addIScroll = function(scope, element) {
                 preEle.css({
                     'visibility': 'visible'
                 })
-                restore = function() {
+                restore = function () {
                     preEle.css({
                         'visibility': visible
                     })
@@ -966,7 +951,7 @@ activitProto._addIScroll = function(scope, element) {
                 }).css({
                     'visibility': 'visible'
                 })
-                restore = function() {
+                restore = function () {
                     preEle.css({
                         'opacity': opacity
                     }).css({
@@ -976,7 +961,7 @@ activitProto._addIScroll = function(scope, element) {
             }
         }
 
-        return function() {
+        return function () {
             self.iscroll = Iscroll(element);
             restore();
             preEle = null;
@@ -1006,7 +991,7 @@ activitProto._addIScroll = function(scope, element) {
  * 制作一个查找标示
  * @return {[type]}
  */
-activitProto._makePrefix = function(name, pid, id) {
+activitProto._makePrefix = function (name, pid, id) {
     return name + "_" + pid + "_" + id;
 }
 
@@ -1019,7 +1004,7 @@ activitProto._makePrefix = function(name, pid, id) {
  * @param  {[type]} prefix [description]
  * @return {[type]}        [description]
  */
-activitProto._findContentElement = function(prefix) {
+activitProto._findContentElement = function (prefix) {
     var element, containerPrefix,
         contentsFragment = this.relatedData.contentsFragment;
 
@@ -1028,7 +1013,7 @@ activitProto._findContentElement = function(prefix) {
     } else {
         //容器处理
         if (containerPrefix = this.relatedData.containerPrefix) {
-            _.each(containerPrefix, function(containerName, index) {
+            _.each(containerPrefix, function (containerName, index) {
                 element = contentsFragment[containerName];
                 element = $(element).find('#' + prefix);
                 if (element.length) {
@@ -1053,7 +1038,7 @@ activitProto._findContentElement = function(prefix) {
  * @param  {[type]} outComplete [description]
  * @return {[type]}             [description]
  */
-activitProto.autoPlay = function(outComplete) {
+activitProto.autoPlay = function (outComplete) {
     var eventData = this.eventData;
     if (eventData && eventData.eventName === 'auto') {
         this.runEffects(outComplete);
@@ -1067,14 +1052,14 @@ activitProto.autoPlay = function(outComplete) {
  * 翻页开始
  * @return {[type]} [description]
  */
-activitProto.flipOver = function() {
+activitProto.flipOver = function () {
     if (this.runState) {
         this.stopEffects();
     }
     this.preventRepeat = false
-        //复位盒子
+    //复位盒子
     if (this.htmlBoxInstance.length) {
-        _.each(this.htmlBoxInstance, function(instance) {
+        _.each(this.htmlBoxInstance, function (instance) {
             instance.removeBox();
         })
     }
@@ -1082,8 +1067,8 @@ activitProto.flipOver = function() {
     //没有点击音频结束的回调
     //最多允许播放5秒
     if (this._fixAudio.length) {
-        _.each(this._fixAudio, function(instance) {
-            setTimeout(function() {
+        _.each(this._fixAudio, function (instance) {
+            setTimeout(function () {
                 instance.end();
             }, 5000)
         })
@@ -1096,7 +1081,7 @@ activitProto.flipOver = function() {
  * 翻页完成复位动画
  * @return {[type]} [description]
  */
-activitProto.flipComplete = function() {
+activitProto.flipComplete = function () {
     this.resetAnimation();
 }
 
@@ -1104,7 +1089,7 @@ activitProto.flipComplete = function() {
 //销毁
 //提供一个删除回调
 //用于处理浮动对象的销毁
-activitProto.destroy = function(elementCallback) {
+activitProto.destroy = function (elementCallback) {
 
     //销毁绑定事件
     if (this.eventData.eventContext) {
@@ -1117,7 +1102,7 @@ activitProto.destroy = function(elementCallback) {
     //一个activity允许有多个文本框
     //所以是数组索引
     if (this.htmlBoxInstance.length) {
-        _.each(this.htmlBoxInstance, function(instance) {
+        _.each(this.htmlBoxInstance, function (instance) {
             instance.destroy();
         })
         this.htmlBoxInstance = null;
@@ -1152,7 +1137,7 @@ activitProto.destroy = function(elementCallback) {
  * 复位
  * @return {[type]} [description]
  */
-activitProto.recovery = function() {
+activitProto.recovery = function () {
     if (this.runState) {
         this.stopEffects();
         return true
@@ -1164,5 +1149,5 @@ activitProto.recovery = function() {
 
 
 export {
-    activityClass
+activityClass
 }

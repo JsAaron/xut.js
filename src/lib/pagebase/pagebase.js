@@ -23,8 +23,8 @@
 
 //原型接口
 import { init } from './proto/init'
-import { threadExternal } from './proto/threadExternal'
-import { dataExternal } from './proto/dataExternal'
+import { threadExternal } from './proto/thread'
+import { dataExternal } from './proto/data'
 import { destroy } from './proto/destroy'
  
 
@@ -39,7 +39,6 @@ threadExternal(baseProto)
 dataExternal(baseProto)
 //销毁
 destroy(baseProto)
-
 
 
 export { PageBase }

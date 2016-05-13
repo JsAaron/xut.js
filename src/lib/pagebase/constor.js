@@ -10,7 +10,7 @@ import {
 from './pagebase'
 
 let constor = Xut.extend(PageBase, {
-	constructor: function(options) {
+	constructor: function (options) {
 		//多线程处理
 		this.initTasks(options);
 		return this;

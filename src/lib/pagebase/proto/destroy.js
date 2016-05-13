@@ -1,5 +1,5 @@
 
-import { destroy as _destroy } from '../related/multievent'
+import { destroy as _destroy } from '../depend/multievent'
 
 export function destroy(baseProto) {
 	//销毁页面对象

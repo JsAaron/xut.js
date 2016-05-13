@@ -11,6 +11,9 @@ export function createNextTask(callback) {
     return {
         //子对象上下文
         context: {
+            /**
+             * 状态表示
+             */
             wait: false, //是否等待创建
             statas: false, //是否完成创建
             _ids: [],
@@ -29,13 +32,13 @@ export function createNextTask(callback) {
                     callback && callback()
                     return
                 }
-                //创建比流程先执行完毕
-                //一般几乎不存在
-                //但是不排除
-                if (!this.wait && this.statas) {
-                    this.wait = true;
-                    return;
-                }
+                // //创建比流程先执行完毕
+                // //一般几乎不存在
+                // //但是不排除
+                // if (!this.wait && this.statas) {
+                //     this.wait = true;
+                //     return;
+                // }
             },
             add: function(id) {
                 if (-1 === this._ids.indexOf(id)) {

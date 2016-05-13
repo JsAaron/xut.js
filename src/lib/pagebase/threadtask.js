@@ -7,7 +7,7 @@
 //数据解析
 import { query } from '../manager/parser'
 //子任务
-import { TaskContainer, TaskBackground, TaskContents, TaskComponents } from './thread/index'
+import { TaskContainer, TaskBackground, TaskContents, TaskComponents } from './task/index'
 
 
 //更新数据缓存
@@ -26,7 +26,7 @@ function updataCache(pid, callback) {
                 base.dataCache[namespace][key] = data[key];
             }
         }
-    }
+    } 
 
     //增加数据缓存
     function addCache(data, activitys, autoRunDas) {

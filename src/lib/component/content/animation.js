@@ -11,13 +11,12 @@
 
 //dom精灵动画
 import { Sprite as domSprite } from './plug/sprite'
-
 //pixi普通精灵动画
 import { Sprite as pixiSpirit } from '../pixi/sprite'
-
+//pixi特殊高级动画
+import { specialSprite as pixiSpecial } from '../pixi/special/index'
 //依赖
 import { Dep } from './dep'
-
 
 
 /**
@@ -99,7 +98,6 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         //普通精灵动画
         this.domSprites = this.contentDas.category === 'Sprite' ? true : false;
     }
-console.log(this)
 
     //canvas模式
     //比较复杂
@@ -112,6 +110,7 @@ console.log(this)
         //动作类型
         //可能是组合动画
         actionTypes = this.contentDas.actionTypes
+
 
         //精灵动画
         if (actionTypes.spiritId) {
@@ -130,7 +129,31 @@ console.log(this)
                 })
             }
         }
+        
+        
+        //特殊高级动画
+        if(actionTypes.compSpriteId){    
+            //加入任务队列
+            this.nextTask.context.add(id)
+            this.pixiSpriteObj = new pixiSpecial(this.contentDas, canvasRelated);
+            //ppt动画
 
+            setTimeout(function(){
+                self.nextTask.context.remove(id)
+            },100)
+                //构建精灵动画完毕后
+                //构建ppt对象
+                // this.pixiSpriteObj.$once('load', function() {
+                //     //content=>MovieClip
+                //     self.pptObj = create(CanvasAnimation, this.movie);
+                //     //任务完成
+                //     self.nextTask.context.remove(id)
+                // })
+           
+            
+        }
+        
+        
         //高级精灵动画
         //content需要依赖高级动画pixi创建
         //因为精灵动画是widget创建类型
@@ -146,6 +169,8 @@ console.log(this)
             // 收集依赖
             this.linker.dep = new Dep()
         }
+             
+        
     }
 
 };
