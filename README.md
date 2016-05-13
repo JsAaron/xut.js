@@ -1,7 +1,6 @@
-![mahua](mahua-logo.jpg)
 ##magazine 是什么?
 * 这是一套app生成器模版，可以制作apk/ipa/epub/pc等跨平台应用
-* 采用混合技术 cordova+h5+css3 ，实现是一种SPA架构
+* 采用混合技术 cordova+h5+css3 ，基于SPA架构
 
 
 
