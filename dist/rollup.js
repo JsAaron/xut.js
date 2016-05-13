@@ -8634,123 +8634,6 @@
      };
 
      /**
-      * 页面切换效果
-      * 平移
-      * @return {[type]} [description]
-      */
-     var prefix$1 = Xut.plat.prefixStyle;
-     var xxtTrans = function xxtTrans(offset) {
-         offset = Xut.config.virtualMode ? offset / 2 : offset;
-         return "translate3d(" + offset + "px, 0, 0)";
-     };
-     function dydTransform(distance) {
-         distance = Xut.config.virtualMode ? distance / 2 : distance;
-         return prefix$1('transform') + ':' + 'translate3d(' + distance + 'px,0px,0px)';
-     }
-
-     //保持缩放比,计算缩放比情况下的转化
-     var calculateContainer = void 0;
-     var offsetLeft = void 0;
-     var offsetRight = void 0;
-     var offsetCut = void 0;
-     var prevEffect = void 0;
-     var currEffect = void 0;
-     var nextEffect = void 0;
-
-     function setConfig() {
-         calculateContainer = Xut.config.proportion.calculateContainer(), offsetLeft = -1 * calculateContainer.width, offsetRight = calculateContainer.width, offsetCut = 0, prevEffect = xxtTrans(offsetLeft), currEffect = xxtTrans(offsetCut), nextEffect = xxtTrans(offsetRight);
-     }
-
-     //切换坐标
-     function toTranslate3d(distance, speed, element) {
-         distance = Xut.config.virtualMode ? distance / 2 : distance;
-         if (element = element || this.element || this.$contentProcess) {
-             element.css(prefix$1('transform'), 'translate3d(' + distance + 'px,0px,0px)');
-             if (Xut.config.pageFlip) {
-                 //修正pageFlip切换页面的处理
-                 //没有翻页效果
-                 if (distance === 0) {
-                     var cur = Xut.sceneController.containerObj('current');
-                     cur.vm.$globalEvent.setAnimComplete(element);
-                 }
-             } else {
-                 element.css(prefix$1('transition-duration'), speed + "ms");
-             }
-         }
-     }
-
-     /**
-      * 创建起始坐标
-      * @return {[type]}
-      */
-     function createTransform(currPageIndex, createPageIndex) {
-         setConfig();
-         var translate3d, direction, offset;
-         if (createPageIndex < currPageIndex) {
-             translate3d = prevEffect;
-             offset = offsetLeft;
-             direction = 'before';
-         } else if (createPageIndex > currPageIndex) {
-             translate3d = nextEffect;
-             offset = offsetRight;
-             direction = 'after';
-         } else if (currPageIndex == createPageIndex) {
-             translate3d = currEffect;
-             offset = offsetCut;
-             direction = 'original';
-         }
-         return [translate3d, direction, offset, dydTransform];
-     }
-
-     function reset() {
-         var element;
-         if (element = this.element || this.$contentProcess) {
-             element.css(prefix$1('transition-duration'), '');
-             element.css(prefix$1('transform'), 'translate3d(0px,0px,0px)');
-         }
-     }
-
-     /**
-      * 移动
-      * @return {[type]} [description]
-      */
-     function flipMove(distance, speed, element) {
-         toTranslate3d.apply(this, arguments);
-     }
-
-     /**
-      * 移动反弹
-      * @return {[type]} [description]
-      */
-     function flipRebound(distance, speed) {
-         toTranslate3d.apply(this, arguments);
-     }
-
-     /**
-      * 移动结束
-      * @return {[type]} [description]
-      */
-     function flipOver(distance, speed) {
-         /**
-          * 过滤多个动画回调，保证指向始终是当前页面
-          */
-         if (this.pageType === 'page') {
-             if (distance === 0) {
-                 //目标页面传递属性
-                 this.element.attr('data-view', true);
-             }
-         }
-         toTranslate3d.apply(this, arguments);
-     }
-
-     var translation = {
-         reset: reset,
-         flipMove: flipMove,
-         flipRebound: flipRebound,
-         flipOver: flipOver
-     };
-
-     /**
       * ppt事件接口
       *
       * 允许用户自定义其行为
@@ -9225,7 +9108,7 @@
          combineEvents(pagebase, eventRelated);
      }
 
-     function destroy$2(pagebase) {
+     function _destroy(pagebase) {
          var registerEvents;
          if (registerEvents = pagebase.listenerHooks.registerEvents) {
              _.each(registerEvents, function (edata) {
@@ -9236,6 +9119,189 @@
          }
          pagebase.listenerHooks.registerEvents = null;
      }
+
+     /**
+      * canvas相关处理
+      * 启动canvas,pixi库
+      * 事件，动画等
+      * 需要收集所有content的执行
+      * 因为canvas只能绘制一次
+      * cnavas模式下 category === "Sprite" 转化cid
+      */
+     var Factory = function Factory() {
+
+       /**
+        * 是否启动模式
+        * @type {Boolean}
+        */
+       this.enable = false;
+
+       /**
+        * CompSprite非常特殊
+        * 可以在dom的情况下使用
+        * 所以如果是dom模式要强制开始enable‘
+        * 这样会导致 精灵等动画强制转canvas 
+        * 这是错误的，所以增加一个判断
+        * 
+        */
+       this.onlyCompSprite = false;
+
+       /**
+        * 加载失败content列表
+        * @type {Array}
+        */
+       this.failCid = [];
+
+       //所有contentId
+       this.cid = [];
+
+       //开启了contentMode的节点
+       //对应的content转化成canvas模式
+       //普通精灵动画
+       //ppt动画=>转化
+       this.pptId = [];
+
+       //普通灵精
+       this.spiritId = [];
+
+       //widget零件保存的content id
+       //高级精灵动画
+       this.widgetId = [];
+
+       //复杂精灵动画
+       this.compSpriteId = [];
+
+       //默认canvas容器的层级
+       //取精灵动画最高层级
+       //2016.2.25
+       this.containerIndex = 1;
+
+       /**
+        * cid=>wid
+        * 对应的pixi对象容器
+        * @type {Object}
+        */
+       this.collections = {};
+     };
+
+     observe.call(Factory.prototype);
+
+     /**
+      * 页面切换效果
+      * 平移
+      * @return {[type]} [description]
+      */
+     var prefix$1 = Xut.plat.prefixStyle;
+     var xxtTrans = function xxtTrans(offset) {
+         offset = Xut.config.virtualMode ? offset / 2 : offset;
+         return "translate3d(" + offset + "px, 0, 0)";
+     };
+     function dydTransform(distance) {
+         distance = Xut.config.virtualMode ? distance / 2 : distance;
+         return prefix$1('transform') + ':' + 'translate3d(' + distance + 'px,0px,0px)';
+     }
+
+     //保持缩放比,计算缩放比情况下的转化
+     var calculateContainer = void 0;
+     var offsetLeft = void 0;
+     var offsetRight = void 0;
+     var offsetCut = void 0;
+     var prevEffect = void 0;
+     var currEffect = void 0;
+     var nextEffect = void 0;
+
+     function setConfig() {
+         calculateContainer = Xut.config.proportion.calculateContainer(), offsetLeft = -1 * calculateContainer.width, offsetRight = calculateContainer.width, offsetCut = 0, prevEffect = xxtTrans(offsetLeft), currEffect = xxtTrans(offsetCut), nextEffect = xxtTrans(offsetRight);
+     }
+
+     //切换坐标
+     function toTranslate3d(distance, speed, element) {
+         distance = Xut.config.virtualMode ? distance / 2 : distance;
+         if (element = element || this.element || this.$contentProcess) {
+             element.css(prefix$1('transform'), 'translate3d(' + distance + 'px,0px,0px)');
+             if (Xut.config.pageFlip) {
+                 //修正pageFlip切换页面的处理
+                 //没有翻页效果
+                 if (distance === 0) {
+                     var cur = Xut.sceneController.containerObj('current');
+                     cur.vm.$globalEvent.setAnimComplete(element);
+                 }
+             } else {
+                 element.css(prefix$1('transition-duration'), speed + "ms");
+             }
+         }
+     }
+
+     /**
+      * 创建起始坐标
+      * @return {[type]}
+      */
+     function createTransform(currPageIndex, createPageIndex) {
+         setConfig();
+         var translate3d, direction, offset;
+         if (createPageIndex < currPageIndex) {
+             translate3d = prevEffect;
+             offset = offsetLeft;
+             direction = 'before';
+         } else if (createPageIndex > currPageIndex) {
+             translate3d = nextEffect;
+             offset = offsetRight;
+             direction = 'after';
+         } else if (currPageIndex == createPageIndex) {
+             translate3d = currEffect;
+             offset = offsetCut;
+             direction = 'original';
+         }
+         return [translate3d, direction, offset, dydTransform];
+     }
+
+     function reset() {
+         var element;
+         if (element = this.element || this.$contentProcess) {
+             element.css(prefix$1('transition-duration'), '');
+             element.css(prefix$1('transform'), 'translate3d(0px,0px,0px)');
+         }
+     }
+
+     /**
+      * 移动
+      * @return {[type]} [description]
+      */
+     function flipMove(distance, speed, element) {
+         toTranslate3d.apply(this, arguments);
+     }
+
+     /**
+      * 移动反弹
+      * @return {[type]} [description]
+      */
+     function flipRebound(distance, speed) {
+         toTranslate3d.apply(this, arguments);
+     }
+
+     /**
+      * 移动结束
+      * @return {[type]} [description]
+      */
+     function flipOver(distance, speed) {
+         /**
+          * 过滤多个动画回调，保证指向始终是当前页面
+          */
+         if (this.pageType === 'page') {
+             if (distance === 0) {
+                 //目标页面传递属性
+                 this.element.attr('data-view', true);
+             }
+         }
+         toTranslate3d.apply(this, arguments);
+     }
+
+     var translation = {
+         reset: reset,
+         flipMove: flipMove,
+         flipRebound: flipRebound,
+         flipOver: flipOver
+     };
 
      //查询接口
      function query(tableName, options, callback) {
@@ -10613,7 +10679,123 @@
          _.extend(data.canvasRelated, expandRelated);
      }
 
-     var prefix$3 = Xut.plat.prefixStyle;
+     /**
+      * 设置canvas数据
+      */
+     var createCanvasData = function createCanvasData(type, nextdata) {
+
+     	var data = nextdata.data;
+     	var contentId = nextdata.contentId;
+     	var conData = nextdata.conData;
+
+     	//content收集id标记
+     	//cid =>content=> 普通动画 ppt
+     	//wid =>widget=>高级动画
+     	if (data.canvasRelated[type].indexOf(contentId) == -1) {
+     		data.canvasRelated[type].push(contentId);
+     		conData.actionTypes[type] = true;
+     	}
+
+     	if (data.canvasRelated.cid.indexOf(contentId) == -1) {
+     		data.canvasRelated.cid.push(contentId);
+     	}
+
+     	//给content数据增加直接判断标示
+     	conData.canvasMode = true;
+
+     	//拿到最高层级
+     	if (conData.zIndex) {
+     		if (conData.zIndex > data.canvasRelated.containerIndex) {
+     			data.canvasRelated.containerIndex = conData.zIndex;
+     		}
+     	}
+     };
+
+     /**
+      * canvas pixi.js类型处理转化
+      * 填充cid, wid
+      * @type {Object}
+      */
+     var pixiType = {
+     	//普通精灵动画
+     	"Sprite": function Sprite(nextdata) {
+     		//启动精灵模式
+     		//在动画处理的时候给initAnimations快速调用
+     		createCanvasData('spiritId', nextdata);
+     	},
+     	//ppt=》pixi动画
+     	"PPT": function PPT(nextdata) {
+     		createCanvasData('pptId', nextdata);
+     	},
+     	//高级精灵动画
+     	//widget
+     	"SeniorSprite": function SeniorSprite(nextdata) {
+     		createCanvasData('widgetId', nextdata);
+     	},
+     	//复杂精灵动画
+     	"CompSprite": function CompSprite(nextdata) {
+     		//特殊判断，见canvas.js
+     		if (!nextdata.data.canvasRelated.onlyCompSprite) {
+     			//仅仅只是满足特殊动画
+     			nextdata.data.canvasRelated.onlyCompSprite = true;
+     			//特殊模式，可能chapter表中没有启动canvas模式
+     		}
+     		createCanvasData('compSpriteId', nextdata);
+     	}
+
+     };
+
+     /**
+      * 解析参数
+      */
+     function callResolveArgs(category, nextdata) {
+     	var cat;
+     	var _cats = category.split(",");
+     	var i = _cats.length;
+     	if (i) {
+     		while (i--) {
+     			cat = _cats[i];
+     			//匹配数据类型
+     			pixiType[cat] && pixiType[cat](nextdata);
+     		}
+     	}
+     }
+
+     /**
+      * 解析canvas数据
+      * 
+      */
+     function parseCanvas(contentId, category, conData, data) {
+     	//动作类型
+     	//用于动画判断
+     	conData.actionTypes = {};
+
+     	//下一个数据
+     	var nextdata = {
+     		contentId: contentId,
+     		conData: conData,
+     		data: data
+     	};
+
+     	//复杂精灵动画
+     	if (category === 'CompSprite') {
+     		callResolveArgs(category, nextdata);
+     	}
+
+     	//转成canvas标记
+     	//如果有pixi的处理类型
+     	//2016.2.25
+     	//SeniorSprite,PPT
+     	//Sprite,PPT
+     	//SeniorSprite
+     	//Sprite
+     	//PPT
+     	//5种处理方式
+     	//可以组合
+     	if (data.canvasRelated.enable) {
+     		callResolveArgs(category, nextdata);
+     	}
+     }
 
      /**
       * 解析序列中需要的数据
@@ -10633,66 +10815,158 @@
      }
 
      /**
-      * 制作包装对象
-      * 用于隔绝content数据的引用关系
-      * 导致重复数据被修正的问题
-      * @return {[type]}             [description]
+      * 针对容器类型的处理
+      * @param  {[type]} containerName [description]
+      * @param  {[type]} contentId     [description]
+      * @param  {[type]} pid     [description]
+      * @return {[type]}               [description]
       */
-     function makeWarpObj(contentId, content, pageType, pid, virtualOffset) {
-         //唯一标示符
-         var prefix = "_" + pid + "_" + contentId;
-         return {
-             pageType: pageType,
-             contentId: contentId,
-             isJs: /.js$/i.test(content.md5), //html类型
-             isSvg: /.svg$/i.test(content.md5), //svg类型
-             data: content,
-             pid: pid,
-             virtualOffset: virtualOffset, //布局位置
-             containerName: 'Content' + prefix,
-             makeId: function makeId(name) {
-                 return name + prefix;
-             }
-         };
+     function createContainerWrap(containerName, contentId, pid) {
+         var contentDas = parseContentDas([contentId]),
+             data = reviseSize(contentDas[0]),
+             wapper = '<div' + ' id="{0}"' + ' data-behavior="click-swipe"' + ' style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">';
+
+         return String.format(wapper, containerName, data.scaleWidth, data.scaleHeight, data.scaleTop, data.scaleLeft, data.zIndex);
      }
 
+     function createContainer$1(containerRelated, pid) {
+         var itemIds,
+             uuid,
+             contentId,
+             containerName,
+             containerObj = {
+             createUUID: [],
+             containerName: []
+         };
+
+         containerRelated.forEach(function (data, index) {
+             contentId = data.imageIds;
+             containerName = "Container_" + pid + "_" + contentId;
+             uuid = "aaron" + Math.random();
+             containerObj[uuid] = {
+                 'start': [createContainerWrap(containerName, contentId, pid)],
+                 'end': '</div>'
+             };
+             containerObj.createUUID.push(uuid);
+             containerObj.containerName.push(containerName);
+             data.itemIds.forEach(function (id) {
+                 containerObj[id] = uuid;
+             });
+         });
+         return containerObj;
+     }
+
+     var prefix$3 = Xut.plat.prefixStyle;
+
      /**
-      * 创建图片地址
+      * 蒙版动画
+      * @param  {[type]} data    [description]
+      * @param  {[type]} wrapObj [description]
       * @return {[type]}         [description]
       */
-     function analysisPath(wrapObj, conData) {
-         var pathImg,
-             imgContent = conData.md5,
+     function maskContent(data, wrapObj) {
 
-         //是gif格式
-         isGif = /.gif$/i.test(imgContent),
+         var restr = "",
 
-         //原始地址
-         originalPathImg = Xut.config.pathAddress + imgContent;
+         //如果有蒙版图
+         isMaskImg = data.mask ? prefix$3('mask-box-image') + ":url(" + Xut.config.pathAddress + data.mask + ");" : "";
 
-         if (isGif) {
-             //处理gif图片缓存+随机数
-             pathImg = Xut.createRandomImg(originalPathImg);
-         } else {
-             pathImg = originalPathImg;
-         }
-         wrapObj['imgContent'] = imgContent;
-         wrapObj['isGif'] = isGif;
-         wrapObj['pathImg'] = pathImg;
+         //蒙板图
+         if (data.mask || wrapObj['isGif']) {
+             //蒙版图
+             if (prefix$3('mask-box-image') != undefined) {
+                 restr += String.format('<img' + ' id="img_{1}"' + ' class="contentScrollerImg"' + ' src="{0}"' + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%;{4}"/>', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg);
+             } else {
+                 //canvas
+                 restr += String.format(' <canvas src="{0}"' + ' class="contentScrollerImg edges"' + ' mask="{5}"' + ' id = "img_{1}"' + ' width="{2}"' + ' height="{3}"' + ' style="width:{2}px; height:{3}px;opacity:0; background-size:100% 100%; {4}"' + ' />', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg, Xut.config.pathAddress.replace(/\//g, "\/") + data.mask);
+             }
+             //精灵图
+         } else if (data.category == 'Sprite') {
+
+                 var matrixX = 100 * data.thecount;
+                 var matrixY = 100;
+
+                 //如果有参数
+                 //精灵图是矩阵图
+                 if (data.parameter) {
+                     var parameter = parseJSON(data.parameter);
+                     if (parameter && parameter.matrix) {
+                         var matrix = parameter.matrix.split("-");
+                         matrixX = 100 * Number(matrix[0]);
+                         matrixY = 100 * Number(matrix[1]);
+                     }
+                 }
+                 restr += String.format('<div' + ' class="sprite"' + ' style="height:{0}px;background-image:url({1});background-size:{2}% {3}%;"></div>', data.scaleHeight, wrapObj['pathImg'], matrixX, matrixY);
+             } else {
+                 //普通图片
+                 restr += String.format('<img' + ' src="{0}"' + ' class="contentScrollerImg"' + ' id="img_{1}"' + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%; {4}"/>', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg);
+             }
+
+         return restr;
      }
 
      /**
-      * 组成HTML结构
-      * @param  {[type]} argument [description]
-      * @return {[type]}          [description]
+      * 纯文本内容
+      * @param  {[type]} data [description]
+      * @return {[type]}      [description]
       */
-     function createDom(data, wrapObj) {
-         var restr = '';
-         //创建包装容器
-         restr += createWapper(data, wrapObj);
-         //创建内容
-         restr += createContent(data, wrapObj);
-         restr += "</div></div>";
+     function textContent(data) {
+         return String.format('<div' + ' id = "{0}"' + ' style="background-size:100% 100%;height:auto">{1}</div>', data['_id'], data.content);
+     }
+
+     /**
+      * 如果是.js结尾的
+      * 新增的html文件
+      * @param  {[type]} data    [description]
+      * @param  {[type]} wrapObj [description]
+      * @return {[type]}         [description]
+      */
+     function jsContent(data, wrapObj) {
+         return wrapObj["htmlstr"];
+     }
+
+     /**
+      * 如果内容是svg
+      * @param  {[type]} data    [description]
+      * @param  {[type]} wrapObj [description]
+      * @return {[type]}         [description]
+      */
+     function svgContent(data, wrapObj) {
+         var restr = "",
+             svgstr = wrapObj['svgstr'],
+             scaleWidth = data['scaleWidth'];
+
+         //从SVG文件中，读取Viewport的值
+         if (svgstr != undefined) {
+             var startPos = svgstr.search('viewBox="');
+             var searchTmp = svgstr.substring(startPos, startPos + 64).replace('viewBox="', '').replace('0 0 ', '');
+             var endPos = searchTmp.search('"');
+             var temp = searchTmp.substring(0, endPos);
+             var sptArray = temp.split(" ");
+             var svgwidth = sptArray[0];
+             var svgheight = sptArray[1];
+
+             //svg内容宽度:svg内容高度 = viewBox宽:viewBox高
+             //svg内容高度 = svg内容宽度 * viewBox高 / viewBox宽
+             var svgRealHeight = Math.floor(scaleWidth * svgheight / svgwidth);
+             //如果svg内容高度大于布局高度则添加滚动条
+             if (svgRealHeight > data.scaleHeight + 1) {
+                 var svgRealWidth = Math.floor(scaleWidth);
+                 //if there do need scrollbar, then restore text to its original prop
+                 //布局位置
+                 var marginleft = wrapObj['backMode'] ? data.scaleLeft - data.scaleBackLeft : 0;
+                 var margintop = wrapObj['backMode'] ? data.scaleTop - data.scaleBackTop : 0;
+                 temp = '<div style="width:{0}; height:{1};margin-left:{2}px;margin-top:{3}px;">{4}</div>';
+
+                 if (data.isScroll) {
+                     restr = String.format(temp, svgRealWidth + 'px', svgRealHeight + 'px', marginleft, margintop, svgstr);
+                 } else {
+                     restr = String.format(temp, '100%', '100%', marginleft, margintop, svgstr);
+                 }
+             } else {
+                 restr += svgstr;
+             }
+         }
          return restr;
      }
 
@@ -10758,33 +11032,6 @@
      }
 
      /**
-      * content
-      * 	svg数据
-      * 	html数据
-      * 解析外部文件
-      * @param  {[type]} wrapObj     [description]
-      * @param  {[type]} svgCallback [description]
-      * @return {[type]}             [description]
-      */
-     function externalFile(wrapObj, svgCallback) {
-         //svg零件不创建解析具体内容
-         if (wrapObj.isSvg) {
-             readFile(wrapObj.data.md5, function (svgdata) {
-                 wrapObj['svgstr'] = svgdata;
-                 svgCallback(wrapObj);
-             });
-         } else if (wrapObj.isJs) {
-             //如果是.js的svg文件
-             readFile(wrapObj.data.md5, function (htmldata) {
-                 wrapObj['htmlstr'] = htmldata;
-                 svgCallback(wrapObj);
-             }, "js");
-         } else {
-             svgCallback(wrapObj);
-         }
-     }
-
-     /**
       * 创建内容
       * @param  {[type]} data    [description]
       * @param  {[type]} wrapObj [description]
@@ -10813,155 +11060,101 @@
      }
 
      /**
-      * 如果是.js结尾的
-      * 新增的html文件
-      * @param  {[type]} data    [description]
-      * @param  {[type]} wrapObj [description]
-      * @return {[type]}         [description]
+      * 组成HTML结构
+      * @param  {[type]} argument [description]
+      * @return {[type]}          [description]
       */
-     function jsContent(data, wrapObj) {
-         return wrapObj["htmlstr"];
-     }
-
-     /**
-      * 如果内容是svg
-      * @param  {[type]} data    [description]
-      * @param  {[type]} wrapObj [description]
-      * @return {[type]}         [description]
-      */
-     function svgContent(data, wrapObj) {
-         var restr = "",
-             svgstr = wrapObj['svgstr'],
-             scaleWidth = data['scaleWidth'];
-
-         //从SVG文件中，读取Viewport的值
-         if (svgstr != undefined) {
-             var startPos = svgstr.search('viewBox="');
-             var searchTmp = svgstr.substring(startPos, startPos + 64).replace('viewBox="', '').replace('0 0 ', '');
-             var endPos = searchTmp.search('"');
-             var temp = searchTmp.substring(0, endPos);
-             var sptArray = temp.split(" ");
-             var svgwidth = sptArray[0];
-             var svgheight = sptArray[1];
-
-             //svg内容宽度:svg内容高度 = viewBox宽:viewBox高
-             //svg内容高度 = svg内容宽度 * viewBox高 / viewBox宽
-             var svgRealHeight = Math.floor(scaleWidth * svgheight / svgwidth);
-             //如果svg内容高度大于布局高度则添加滚动条
-             if (svgRealHeight > data.scaleHeight + 1) {
-                 var svgRealWidth = Math.floor(scaleWidth);
-                 //if there do need scrollbar, then restore text to its original prop
-                 //布局位置
-                 var marginleft = wrapObj['backMode'] ? data.scaleLeft - data.scaleBackLeft : 0;
-                 var margintop = wrapObj['backMode'] ? data.scaleTop - data.scaleBackTop : 0;
-                 temp = '<div style="width:{0}; height:{1};margin-left:{2}px;margin-top:{3}px;">{4}</div>';
-
-                 if (data.isScroll) {
-                     restr = String.format(temp, svgRealWidth + 'px', svgRealHeight + 'px', marginleft, margintop, svgstr);
-                 } else {
-                     restr = String.format(temp, '100%', '100%', marginleft, margintop, svgstr);
-                 }
-             } else {
-                 restr += svgstr;
-             }
-         }
+     function createDom(data, wrapObj) {
+         var restr = '';
+         //创建包装容器
+         restr += createWapper(data, wrapObj);
+         //创建内容
+         restr += createContent(data, wrapObj);
+         restr += "</div></div>";
          return restr;
      }
 
      /**
-      * 蒙版动画
-      * @param  {[type]} data    [description]
-      * @param  {[type]} wrapObj [description]
-      * @return {[type]}         [description]
+      * 解析序列中需要的数据
+      * @param  {[type]}   contentIds [description]
+      * @param  {Function} callback   [description]
+      * @return {[type]}              [description]
       */
-     function maskContent(data, wrapObj) {
-
-         var restr = "",
-
-         //如果有蒙版图
-         isMaskImg = data.mask ? prefix$3('mask-box-image') + ":url(" + Xut.config.pathAddress + data.mask + ");" : "";
-
-         //蒙板图
-         if (data.mask || wrapObj['isGif']) {
-             //蒙版图
-             if (prefix$3('mask-box-image') != undefined) {
-                 restr += String.format('<img' + ' id="img_{1}"' + ' class="contentScrollerImg"' + ' src="{0}"' + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%;{4}"/>', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg);
-             } else {
-                 //canvas
-                 restr += String.format(' <canvas src="{0}"' + ' class="contentScrollerImg edges"' + ' mask="{5}"' + ' id = "img_{1}"' + ' width="{2}"' + ' height="{3}"' + ' style="width:{2}px; height:{3}px;opacity:0; background-size:100% 100%; {4}"' + ' />', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg, Xut.config.pathAddress.replace(/\//g, "\/") + data.mask);
-             }
-             //精灵图
-         } else if (data.category == 'Sprite') {
-
-                 var matrixX = 100 * data.thecount;
-                 var matrixY = 100;
-
-                 //如果有参数
-                 //精灵图是矩阵图
-                 if (data.parameter) {
-                     var parameter = parseJSON(data.parameter);
-                     if (parameter && parameter.matrix) {
-                         var matrix = parameter.matrix.split("-");
-                         matrixX = 100 * Number(matrix[0]);
-                         matrixY = 100 * Number(matrix[1]);
-                     }
-                 }
-                 restr += String.format('<div' + ' class="sprite"' + ' style="height:{0}px;background-image:url({1});background-size:{2}% {3}%;"></div>', data.scaleHeight, wrapObj['pathImg'], matrixX, matrixY);
-             } else {
-                 //普通图片
-                 restr += String.format('<img' + ' src="{0}"' + ' class="contentScrollerImg"' + ' id="img_{1}"' + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%; {4}"/>', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg);
-             }
-
-         return restr;
-     }
 
      /**
-      * 纯文本内容
-      * @param  {[type]} data [description]
-      * @return {[type]}      [description]
+      * 制作包装对象
+      * 用于隔绝content数据的引用关系
+      * 导致重复数据被修正的问题
+      * @return {[type]}             [description]
       */
-     function textContent(data) {
-         return String.format('<div' + ' id = "{0}"' + ' style="background-size:100% 100%;height:auto">{1}</div>', data['_id'], data.content);
-     }
-
-     /**
-      * 针对容器类型的处理
-      * @param  {[type]} containerName [description]
-      * @param  {[type]} contentId     [description]
-      * @param  {[type]} pid     [description]
-      * @return {[type]}               [description]
-      */
-     function createContainerWrap(containerName, contentId, pid) {
-         var contentDas = parseContentDas([contentId]),
-             data = reviseSize(contentDas[0]),
-             wapper = '<div' + ' id="{0}"' + ' data-behavior="click-swipe"' + ' style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">';
-
-         return String.format(wapper, containerName, data.scaleWidth, data.scaleHeight, data.scaleTop, data.scaleLeft, data.zIndex);
-     }
-
-     function createContainer$1(containerRelated, pid) {
-         var itemIds,
-             uuid,
-             contentId,
-             containerName,
-             containerObj = {
-             createUUID: [],
-             containerName: []
+     function makeWarpObj(contentId, content, pageType, pid, virtualOffset) {
+         //唯一标示符
+         var prefix = "_" + pid + "_" + contentId;
+         return {
+             pageType: pageType,
+             contentId: contentId,
+             isJs: /.js$/i.test(content.md5), //html类型
+             isSvg: /.svg$/i.test(content.md5), //svg类型
+             data: content,
+             pid: pid,
+             virtualOffset: virtualOffset, //布局位置
+             containerName: 'Content' + prefix,
+             makeId: function makeId(name) {
+                 return name + prefix;
+             }
          };
-         containerRelated.forEach(function (data, index) {
-             contentId = data.imageIds;
-             containerName = "Container_" + pid + "_" + contentId, uuid = "aaron" + Math.random();
-             containerObj[uuid] = {
-                 'start': [createContainerWrap(containerName, contentId, pid)],
-                 'end': '</div>'
-             };
-             containerObj.createUUID.push(uuid);
-             containerObj.containerName.push(containerName);
-             data.itemIds.forEach(function (id) {
-                 containerObj[id] = uuid;
+     }
+
+     /**
+      * 创建图片地址
+      * @return {[type]}         [description]
+      */
+     function analysisPath(wrapObj, conData) {
+         var pathImg,
+             imgContent = conData.md5,
+
+         //是gif格式
+         isGif = /.gif$/i.test(imgContent),
+
+         //原始地址
+         originalPathImg = Xut.config.pathAddress + imgContent;
+
+         if (isGif) {
+             //处理gif图片缓存+随机数
+             pathImg = Xut.createRandomImg(originalPathImg);
+         } else {
+             pathImg = originalPathImg;
+         }
+         wrapObj['imgContent'] = imgContent;
+         wrapObj['isGif'] = isGif;
+         wrapObj['pathImg'] = pathImg;
+     }
+
+     /**
+      * content
+      * 	svg数据
+      * 	html数据
+      * 解析外部文件
+      * @param  {[type]} wrapObj     [description]
+      * @param  {[type]} svgCallback [description]
+      * @return {[type]}             [description]
+      */
+     function externalFile(wrapObj, svgCallback) {
+         //svg零件不创建解析具体内容
+         if (wrapObj.isSvg) {
+             readFile(wrapObj.data.md5, function (svgdata) {
+                 wrapObj['svgstr'] = svgdata;
+                 svgCallback(wrapObj);
              });
-         });
-         return containerObj;
+         } else if (wrapObj.isJs) {
+             //如果是.js的svg文件
+             readFile(wrapObj.data.md5, function (htmldata) {
+                 wrapObj['htmlstr'] = htmldata;
+                 svgCallback(wrapObj);
+             }, "js");
+         } else {
+             svgCallback(wrapObj);
+         }
      }
 
      //=====================================================
@@ -11014,31 +11207,18 @@
          idFix = [],
 
 
-         //默认canvas容器的层级
-         //取精灵动画最高层级
-         //2016.2.25
-         canvasIndex = 1,
-
-
          //缓存contentDas
          contentDas = {},
 
          //缓存content结构
          cachedContentStr = [];
 
-         //启动cnavas模式
-         var canvasRelatedMode = data.canvasRelated.enable;
-
-         //容器结构创建
+         /**
+          * 容器结构创建 
+          */
          if (containerRelated && containerRelated.length) {
              containerObj = createContainer$1(containerRelated, pid);
          }
-
-         //========================================
-         //
-         //	    创建dom结构
-         //
-         //========================================
 
          /**
           * 转化canvas模式 contentMode 0/1
@@ -11067,56 +11247,6 @@
          };
 
          /**
-          * 设置canvas数据
-          */
-         var createCanvasData = function createCanvasData(type, contentId, conData) {
-             //content收集id标记
-             //cid =>content=> 普通动画 ppt
-             //wid =>widget=>高级动画
-             if (data.canvasRelated[type].indexOf(contentId) == -1) {
-                 data.canvasRelated[type].push(contentId);
-                 conData.actionTypes[type] = true;
-             }
-
-             if (data.canvasRelated.cid.indexOf(contentId) == -1) {
-                 data.canvasRelated.cid.push(contentId);
-             }
-
-             //给content数据增加直接判断标示
-             conData.canvasMode = true;
-
-             //拿到最高层级
-             if (conData.zIndex) {
-                 if (conData.zIndex > canvasIndex) {
-                     canvasIndex = conData.zIndex;
-                 }
-             }
-         };
-
-         /**
-          * canvas pixi.js类型处理转化
-          * 填充cid, wid
-          * @type {Object}
-          */
-         var pixiType = {
-             //普通精灵动画
-             "Sprite": function Sprite(contentId, conData) {
-                 //启动精灵模式
-                 //在动画处理的时候给initAnimations快速调用
-                 createCanvasData('spiritId', contentId, conData);
-             },
-             //ppt=》pixi动画
-             "PPT": function PPT(contentId, conData) {
-                 createCanvasData('pptId', contentId, conData);
-             },
-             //高级精灵动画
-             //widget
-             "SeniorSprite": function SeniorSprite(contentId, conData) {
-                 createCanvasData('widgetId', contentId, conData);
-             }
-         };
-
-         /**
           * 开始过滤参数
           * @return {[type]}           [description]
           */
@@ -11135,32 +11265,11 @@
              //1 浮动对象
              //2 canvas对象
              if (conData) {
-                 //转成canvas标记
-                 //如果有pixi的处理类型
-                 //2016.2.25
-                 //SeniorSprite,PPT
-                 //Sprite,PPT
-                 //SeniorSprite
-                 //Sprite
-                 //PPT
-                 //5种处理方式
-                 //可以组合
-                 if (canvasRelatedMode && category) {
-                     var _cat;
-                     var cat;
-                     var _cats = category.split(",");
-                     var i = _cats.length;
-                     //动作类型
-                     conData.actionTypes = {};
-                     if (i) {
-                         while (i--) {
-                             cat = _cats[i];
-                             //匹配数据类型
-                             pixiType[cat] && pixiType[cat](contentId, conData);
-                         }
-                     }
+                 //匹配canvas对象数据
+                 if (category) {
+                     //解析canvas先关数据
+                     parseCanvas(contentId, category, conData, data);
                  }
-
                  //如果有parameter
                  if (conData.parameter) {
                      if (parameter = parseJSON(conData.parameter)) {
@@ -11181,9 +11290,15 @@
          contentCollection = parseContentDas(data.createContentIds, prefilter);
          contentCount = cloneContentCount = contentCollection.length;
 
+         //如果是启动了特殊高精灵动画
+         //强制打开canvas模式设置
+         //这里可以排除掉其余的canvas动画
+         if (data.canvasRelated.onlyCompSprite) {
+             data.canvasRelated.enable = true;
+         }
          //创建canvas画布
-         if (canvasRelatedMode) {
-             Container(data, canvasIndex);
+         if (data.canvasRelated.enable) {
+             Container(data, data.canvasRelated.containerIndex);
          }
 
          ////////////////
@@ -11892,7 +12007,7 @@
       * 子动画基类
       * @param {[type]} options [description]
       */
-     var Factory = Xut.CoreObject.extend({
+     var Factory$1 = Xut.CoreObject.extend({
 
          /**
           * 初始化
@@ -11991,7 +12106,7 @@
 
      });
 
-     observe.call(Factory.prototype);
+     observe.call(Factory$1.prototype);
 
      /**
       * 精灵动画
@@ -11999,7 +12114,7 @@
       * @param  {[type]} canvasRelated [description]
       * @return {[type]}               [description]
       */
-     var Sprite$1 = Factory.extend({
+     var Sprite$1 = Factory$1.extend({
 
          /**
           * 初始化
@@ -12167,6 +12282,70 @@
 
      });
 
+     var specialSprite = Factory$1.extend({
+
+         /**
+          * 初始化
+          * @param  {[type]} data          [description]
+          * @param  {[type]} canvasRelated [description]
+          * @return {[type]}               [description]
+          */
+         constructor: function constructor(successCallback, failCallback, data, canvasRelated) {
+
+             var self = this;
+             this.data = data;
+             this.canvasRelated = canvasRelated;
+             //id标示
+             //可以用来过滤失败的pixi对象
+             this.contentId = data._id;
+
+             successCallback(this.contentId);
+         },
+
+         /**
+          * 运行动画
+          * @return {[type]} [description]
+          */
+         play: function play() {
+             //绘制页面
+             this.uuid = this.canvasRelated.play('sprite');
+         },
+
+         /**
+          * 停止动画
+          * @return {[type]} [description]
+          */
+         stop: function stop() {
+             this.canvasRelated.stop(this.uuid);
+         },
+
+         /**
+          * 销毁动画
+          * @return {[type]} [description]
+          */
+         destroy: function destroy() {
+             //if there are movie sprite, destory it
+             if (this.movie) {
+                 //remove it from stage
+                 if (this.stage) {
+                     this.stage.removeChild(this.movie);
+                 }
+                 //remove texture for movie
+                 for (var i = 0; i < this.movie.textures.length; i++) {
+                     this.movie.textures[i].destroy(true);
+                     if (this.movie.maskSprite) {
+                         this.movie.maskTextures[i].destroy(true);
+                     }
+                 }
+
+                 //remove movie sprite
+                 this.movie.destroy(true, true);
+             }
+             this.canvasRelated.destroy();
+         }
+
+     });
+
      var uid = 0;
 
      /**
@@ -12277,6 +12456,7 @@
              //动作类型
              //可能是组合动画
              actionTypes = this.contentDas.actionTypes;
+
              //精灵动画
              if (actionTypes.spiritId) {
                  //加入任务队列
@@ -12293,6 +12473,26 @@
                          self.nextTask.context.remove(id);
                      });
                  }
+             }
+
+             //特殊高级动画
+             if (actionTypes.compSpriteId) {
+                 //加入任务队列
+                 this.nextTask.context.add(id);
+                 this.pixiSpriteObj = new specialSprite(this.contentDas, canvasRelated);
+                 //ppt动画
+
+                 setTimeout(function () {
+                     self.nextTask.context.remove(id);
+                 }, 100);
+                 //构建精灵动画完毕后
+                 //构建ppt对象
+                 // this.pixiSpriteObj.$once('load', function() {
+                 //     //content=>MovieClip
+                 //     self.pptObj = create(CanvasAnimation, this.movie);
+                 //     //任务完成
+                 //     self.nextTask.context.remove(id)
+                 // })
              }
 
              //高级精灵动画
@@ -13610,6 +13810,9 @@
          return {
              //子对象上下文
              context: {
+                 /**
+                  * 状态表示
+                  */
                  wait: false, //是否等待创建
                  statas: false, //是否完成创建
                  _ids: [],
@@ -13628,13 +13831,13 @@
                          callback && callback();
                          return;
                      }
-                     //创建比流程先执行完毕
-                     //一般几乎不存在
-                     //但是不排除
-                     if (!this.wait && this.statas) {
-                         this.wait = true;
-                         return;
-                     }
+                     // //创建比流程先执行完毕
+                     // //一般几乎不存在
+                     // //但是不排除
+                     // if (!this.wait && this.statas) {
+                     //     this.wait = true;
+                     //     return;
+                     // }
                  },
                  add: function add(id) {
                      if (-1 === this._ids.indexOf(id)) {
@@ -13670,12 +13873,10 @@
 
          /**
           * 2016.4.11
+          * 检测是所有的子任务必须完成
           * 因为canvas模式导致
           * 任务必须等待context上下创建
-          * 完成后执行
-          * 1 事件
-          * 2 预执行
-          * @type {Array}
+          * context就是pixi的直接对象，精灵..都是异步的
           */
          this.nextTask = createNextTask(this.monitorComplete);
 
@@ -13726,16 +13927,7 @@
          this._fixAudio = [];
 
          /**
-          * 是否正在等待创建的子对象
-          * 如果创建比流程先执行完毕
-          * @return {[type]}   
-          */
-         if (this.nextTask.context.wait) {
-             this.monitorComplete();
-             return this;
-         }
-
-         /**
+          * 如果存在content
           * 等待创建执行
           * @param  {[type]} this.nextTask.context.length() 
           * @return {[type]}                                
@@ -13745,6 +13937,10 @@
              return this;
          }
 
+         /**
+          * 如果没有pixi的异步创建
+          * 同步代码直接完成
+          */
          this.monitorComplete();
      }
 
@@ -14738,9 +14934,6 @@
          if (compileActivitys = parseContents(data)) {
              //解析动画表数据结构
              data = parserRelated(compileActivitys, data);
-
-             console.log(data);
-             return;
              //如果有需要构建的content
              //开始多线程处理
              data.createContentIds.length ? this.dataAfterCheck(data) : this.loadComplete();
@@ -15751,423 +15944,373 @@
      };
 
      /**
-      * canvas相关处理
-      * 启动canvas,pixi库
-      * 事件，动画等
-      * 需要收集所有content的执行
-      * 因为canvas只能绘制一次
-      * cnavas模式下 category === "Sprite" 转化cid
+      * 初始化构建
+      * @param  {[type]} baseProto [description]
+      * @return {[type]}           [description]
       */
-
-     var Factory$1 = function Factory() {
-
-         /**
-          * 是否启动模式
-          * @type {Boolean}
-          */
-         this.enable = false;
+     function init$2(baseProto) {
 
          /**
-          * 加载失败content列表
-          * @type {Array}
+          * 初始化多线程任务
+          * @return {[type]} [description]
           */
-         this.failCid = [];
+         baseProto.initTasks = function (options) {
 
-         //所有contentId
-         this.cid = [];
+             var self = this;
 
-         //开启了contentMode的节点
-         //对应的content转化成canvas模式
-         //普通精灵动画
-         //ppt动画=>转化
-         this.pptId = [];
-
-         //普通灵精
-         this.spiritId = [];
-
-         //widget零件保存的content id
-         //高级精灵动画
-         this.widgetId = [];
-
-         /**
-          * cid=>wid
-          * 对应的pixi对象容器
-          * @type {Object}
-          */
-         this.collections = {};
-     };
-
-     observe.call(Factory$1.prototype);
-
-     function PageBase() {};
-     var baseProto = PageBase.prototype;
-
-     /********************************************************************
-      *
-      *                    多线程创建管理
-      *
-      ********************************************************************/
-
-     /**
-      * 初始化多线程任务
-      * @return {[type]} [description]
-      */
-     baseProto.initTasks = function (options) {
-
-         var self = this;
-
-         _.extend(self, options);
-
-         /**
-          * 数据缓存容器
-          * @type {Object}
-          */
-         this.dataCache = {};
-         this.scenarioId = this.chapterDas.seasonId;
-         this.chapterId = this.chapterDas._id;
-
-         /**
-          * 是否开启多线程,默认开启
-          * 如果是非线性，则关闭多线程创建
-          * 启动 true
-          * 关闭 false
-          * @type {[type]}
-          */
-         this.isMultithread = this.multiplePages ? true : false;
-
-         //母版处理
-         if (self.pageType === 'master') {
-             this.isMaster = true;
-         }
-
-         /**
-          * canvas模式
-          * @type {Boolean}
-          */
-         this.canvasRelated = new Factory$1();
-
-         /**
-          * 创建相关的信息
-          * @type {Object}
-          */
-         var createRelated = this.createRelated = {
+             _.extend(self, options);
 
              /**
-              * 主线任务等待
+              * 数据缓存容器
+              * @type {Object}
               */
-             tasksHang: null,
+             this.dataCache = {};
+             this.scenarioId = this.chapterDas.seasonId;
+             this.chapterId = this.chapterDas._id;
+
+             /**
+              * 是否开启多线程,默认开启
+              * 如果是非线性，则关闭多线程创建
+              * 启动 true
+              * 关闭 false
+              * @type {[type]}
+              */
+             this.isMultithread = this.multiplePages ? true : false;
+
+             //母版处理
+             if (self.pageType === 'master') {
+                 this.isMaster = true;
+             }
+
+             /**
+              * canvas模式
+              * @type {Boolean}
+              */
+             this.canvasRelated = new Factory();
 
              /**
               * 创建相关的信息
               * @type {Object}
               */
-             tasksTimer: 0,
+             var createRelated = this.createRelated = {
+
+                 /**
+                  * 主线任务等待
+                  */
+                 tasksHang: null,
+
+                 /**
+                  * 创建相关的信息
+                  * @type {Object}
+                  */
+                 tasksTimer: 0,
+
+                 /**
+                  * 当前任务是否中断
+                  * return
+                  *     true  中断
+                  *     false 没有中断
+                  */
+                 isTaskSuspend: false,
+
+                 /**
+                  * 是否预创建背景中
+                  */
+                 preCreateTasks: false,
+
+                 /**
+                  * 下一个将要运行的任务标示
+                  * 1 主容器任务
+                  * 2 背景任务
+                  * 3 widget热点任务
+                  * 4 content对象任务
+                  */
+                 nextRunTask: 'container',
+
+                 /**
+                  * 缓存构建中断回调
+                  * 构建分2步骤
+                  * 1 构建数据与结构（执行中断处理）
+                  * 2 构建绘制页面
+                  * @type {Object}
+                  */
+                 cacheTasks: function () {
+                     var cacheTasks = {};
+                     _.each(["background", "components", "contents"], function (taskName) {
+                         cacheTasks[taskName] = false;
+                     });
+                     return cacheTasks;
+                 }(),
+
+                 /**
+                  * 与创建相关的信息
+                  * 创建坐标
+                  * 1 创建li位置
+                  * 2 创建浮动对象
+                  * "translate3d(0px, 0, 0)", "original"
+                  */
+                 initTransformParameter: createTransform(this.visiblePid, this.pid),
+
+                 /**
+                  * 预创建
+                  * 构建页面主容器完毕后,此时可以翻页
+                  * @return {[type]} [description]
+                  */
+                 preforkComplete: function preforkComplete() {},
+
+                 /**
+                  * 整个页面都构建完毕通知
+                  * @return {[type]} [description]
+                  */
+                 createTasksComplete: function createTasksComplete() {}
+             };
+
+             //==================内部钩子相关===========================
+             //
+             // * 监听状态的钩子
+             // * 注册所有content对象管理
+             // * 收集所有content对象
+             // * 构建li主结构后,即可翻页
+             // * 构建所有对象完毕后处理
+             //
+
+             //抽象activtiys合集,用于关联各自的content
+             //划分各自的子作用域
+             //1对多的关系
+             this.abActivitys = new Collection();
+
+             //widget热点处理类
+             //1 iframe零件
+             //2 页面零件
+             //只存在当前页面
+             this.components = new Collection();
 
              /**
-              * 当前任务是否中断
-              * return
-              *     true  中断
-              *     false 没有中断
-              */
-             isTaskSuspend: false,
-
-             /**
-              * 是否预创建背景中
-              */
-             preCreateTasks: false,
-
-             /**
-              * 下一个将要运行的任务标示
-              * 1 主容器任务
-              * 2 背景任务
-              * 3 widget热点任务
-              * 4 content对象任务
-              */
-             nextRunTask: 'container',
-
-             /**
-              * 缓存构建中断回调
-              * 构建分2步骤
-              * 1 构建数据与结构（执行中断处理）
-              * 2 构建绘制页面
+              * 缓存所有的content对象引用
+              * 1对1的关系
               * @type {Object}
               */
-             cacheTasks: function () {
-                 var cacheTasks = {};
-                 _.each(["background", "components", "contents"], function (taskName) {
-                     cacheTasks[taskName] = false;
-                 });
-                 return cacheTasks;
-             }(),
+             this.contentsCollector = {};
 
              /**
-              * 与创建相关的信息
-              * 创建坐标
-              * 1 创建li位置
-              * 2 创建浮动对象
-              * "translate3d(0px, 0, 0)", "original"
-              */
-             initTransformParameter: createTransform(this.visiblePid, this.pid),
-
-             /**
-              * 预创建
-              * 构建页面主容器完毕后,此时可以翻页
-              * @return {[type]} [description]
-              */
-             preforkComplete: function preforkComplete() {},
-
-             /**
-              * 整个页面都构建完毕通知
-              * @return {[type]} [description]
-              */
-             createTasksComplete: function createTasksComplete() {}
-         };
-
-         //==================内部钩子相关===========================
-         //
-         // * 监听状态的钩子
-         // * 注册所有content对象管理
-         // * 收集所有content对象
-         // * 构建li主结构后,即可翻页
-         // * 构建所有对象完毕后处理
-         //
-
-         //抽象activtiys合集,用于关联各自的content
-         //划分各自的子作用域
-         //1对多的关系
-         this.abActivitys = new Collection();
-
-         //widget热点处理类
-         //1 iframe零件
-         //2 页面零件
-         //只存在当前页面
-         this.components = new Collection();
-
-         /**
-          * 缓存所有的content对象引用
-          * 1对1的关系
-          * @type {Object}
-          */
-         this.contentsCollector = {};
-
-         /**
-          * 浮动对象
-          * 1 母版中
-          * 2 页面中
-          * 页面中是最高的
-          * [floatContents description]
-          * @type {Object}
-          */
-         var floatContents = this.floatContents = {
-
-             /**
-              * 页面浮动对象容器
-              * @type {[type]}
-              */
-             PageContainer: null,
-
-             /**
-              * 浮动页面对象
+              * 浮动对象
+              * 1 母版中
+              * 2 页面中
+              * 页面中是最高的
+              * [floatContents description]
               * @type {Object}
               */
-             Page: {},
+             var floatContents = this.floatContents = {
+
+                 /**
+                  * 页面浮动对象容器
+                  * @type {[type]}
+                  */
+                 PageContainer: null,
+
+                 /**
+                  * 浮动页面对象
+                  * @type {Object}
+                  */
+                 Page: {},
+
+                 /**
+                  * 浮动母版容器
+                  */
+                 MasterContainer: null,
+
+                 /**
+                  * 浮动母版的content对象
+                  * 用于边界切换,自动加上移动
+                  * @type {Object}
+                  *     1：Object {}      //空对象,零件
+                  *     2: PPTeffect  {}  //行为对象
+                  */
+                 Master: {}
+             };
 
              /**
-              * 浮动母版容器
-              */
-             MasterContainer: null,
-
-             /**
-              * 浮动母版的content对象
-              * 用于边界切换,自动加上移动
+              * 对象的处理情况的内部钩子方法
               * @type {Object}
-              *     1：Object {}      //空对象,零件
-              *     2: PPTeffect  {}  //行为对象
               */
-             Master: {}
-         };
+             this.listenerHooks = {
 
-         /**
-          * 对象的处理情况的内部钩子方法
-          * @type {Object}
-          */
-         this.listenerHooks = {
-
-             //注册抽象Activity类content(大类,总content对象)
-             registerAbstractActivity: function registerAbstractActivity(contentsObjs) {
-                 self.abActivitys.register(contentsObjs);
-             },
-
-             //收集器
-             collector: {
-                 //搜集所有的content(每一个content对象)
-                 //因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
-                 contents: function contents(pid, id, contentScope) {
-                     var scope = self.baseGetContentObject[id];
-                     //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
-                     if (scope && scope.isBindEventHooks) {
-                         self.contentsCollector[id] = contentScope;
-                     }
-                     if (!scope) {
-                         self.contentsCollector[id] = contentScope;
-                     }
+                 //注册抽象Activity类content(大类,总content对象)
+                 registerAbstractActivity: function registerAbstractActivity(contentsObjs) {
+                     self.abActivitys.register(contentsObjs);
                  },
 
-                 //2014.11.7
-                 //新概念，浮动页面对象
-                 //用于是最顶层的，比母版浮动对象还要高
-                 //所以这个浮动对象需要跟随页面动
-                 floatPages: function floatPages(data) {
-                     var contentObj;
-                     //浮动页面对象容器
-                     floatContents.PageContainer = data.container;
-                     _.each(data.ids, function (id) {
-                         if (contentObj = self.baseGetContentObject(id)) {
-                             //初始视察坐标
-                             if (contentObj.parallax) {
-                                 contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
-                             }
-                             floatContents.Page[id] = contentObj;
-                         } else {
-                             console.log('页面浮动对象找不到');
+                 //收集器
+                 collector: {
+                     //搜集所有的content(每一个content对象)
+                     //因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
+                     contents: function contents(pid, id, contentScope) {
+                         var scope = self.baseGetContentObject[id];
+                         //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
+                         if (scope && scope.isBindEventHooks) {
+                             self.contentsCollector[id] = contentScope;
                          }
-                     });
-                 },
-
-                 //浮动母版对象
-                 //1 浮动的对象是有动画数据或者视觉差数据
-                 //2 浮动的对象是用于零件类型,这边只提供创建
-                 //  所以需要制造一个空的容器，用于母版交界动
-                 floatMaters: function floatMaters(data) {
-                     var prefix, contentObj, contentProcess, contentsFragment;
-                     //浮动容器
-                     floatContents.MasterContainer = data.container;
-                     //浮动对象
-                     _.each(data.ids, function (id) {
-                         //转化成实际操作的浮动对象,保存
-                         if (contentObj = self.baseGetContentObject(id)) {
-                             //初始视察坐标
-                             if (contentObj.parallax) {
-                                 contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
-                             }
-                             floatContents.Master[id] = contentObj;
-                         } else {
-                             Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id);
-                             //获取DOM节点
-                             if (contentsFragment = self.createRelated.cacheTasks.contents.contentsFragment) {
-                                 prefix = 'Content_' + self.pid + "_";
-                                 _.each(contentsFragment, function (dom) {
-                                     var makePrefix = prefix + id;
-                                     if (dom.id == makePrefix) {
-                                         contentProcess = dom;
-                                     }
-                                 });
-                             }
-                             //制作一个伪数据
-                             //作为零件类型的空content处理
-                             floatContents.Master[id] = {
-                                 id: id,
-                                 pid: self.pid,
-                                 $contentProcess: $(contentProcess),
-                                 'empty': true //空类型
-                             };
+                         if (!scope) {
+                             self.contentsCollector[id] = contentScope;
                          }
-                     });
-                 }
-             },
+                     },
 
-             //多事件钩子
-             //执行多事件绑定
-             eventBinding: function eventBinding(eventRelated) {
-                 create(self, eventRelated);
-             }
-         };
+                     //2014.11.7
+                     //新概念，浮动页面对象
+                     //用于是最顶层的，比母版浮动对象还要高
+                     //所以这个浮动对象需要跟随页面动
+                     floatPages: function floatPages(data) {
+                         var contentObj;
+                         //浮动页面对象容器
+                         floatContents.PageContainer = data.container;
+                         _.each(data.ids, function (id) {
+                             if (contentObj = self.baseGetContentObject(id)) {
+                                 //初始视察坐标
+                                 if (contentObj.parallax) {
+                                     contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
+                                 }
+                                 floatContents.Page[id] = contentObj;
+                             } else {
+                                 console.log('页面浮动对象找不到');
+                             }
+                         });
+                     },
 
-         /**
-          * 设置下一个标记
-          */
-         function setNextRunTask(taskName) {
-             createRelated.nextRunTask = taskName;
-         }
-
-         function callContext(taskName, fn) {
-             return assignedTasks[taskName](fn, self);
-         }
-
-         /**
-          * 任务钩子
-          * @type {Object}
-          */
-         self.tasks = {
-             container: function container() {
-                 callContext('Container', function (element, pseudoElement) {
-                     //////////////
-                     //li,li-div //
-                     //////////////
-                     self.element = element;
-                     self.pseudoElement = pseudoElement;
-
-                     //获取根节点
-                     self.getElement = function () {
-                         return pseudoElement ? pseudoElement : element;
-                     };
-
-                     setNextRunTask('background');
-
-                     //构建主容器li完毕,可以提前执行翻页动作
-                     createRelated.preforkComplete();
-                     //视觉差不管
-                     if (self.isMaster) {
-                         self.nextTasks({
-                             'taskName': '外部background',
-                             'outNextTasks': function outNextTasks() {
-                                 self.dispatchTasks();
+                     //浮动母版对象
+                     //1 浮动的对象是有动画数据或者视觉差数据
+                     //2 浮动的对象是用于零件类型,这边只提供创建
+                     //  所以需要制造一个空的容器，用于母版交界动
+                     floatMaters: function floatMaters(data) {
+                         var prefix, contentObj, contentProcess, contentsFragment;
+                         //浮动容器
+                         floatContents.MasterContainer = data.container;
+                         //浮动对象
+                         _.each(data.ids, function (id) {
+                             //转化成实际操作的浮动对象,保存
+                             if (contentObj = self.baseGetContentObject(id)) {
+                                 //初始视察坐标
+                                 if (contentObj.parallax) {
+                                     contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
+                                 }
+                                 floatContents.Master[id] = contentObj;
+                             } else {
+                                 Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id);
+                                 //获取DOM节点
+                                 if (contentsFragment = self.createRelated.cacheTasks.contents.contentsFragment) {
+                                     prefix = 'Content_' + self.pid + "_";
+                                     _.each(contentsFragment, function (dom) {
+                                         var makePrefix = prefix + id;
+                                         if (dom.id == makePrefix) {
+                                             contentProcess = dom;
+                                         }
+                                     });
+                                 }
+                                 //制作一个伪数据
+                                 //作为零件类型的空content处理
+                                 floatContents.Master[id] = {
+                                     id: id,
+                                     pid: self.pid,
+                                     $contentProcess: $(contentProcess),
+                                     'empty': true //空类型
+                                 };
                              }
                          });
                      }
-                 });
-             },
-             background: function background() {
-                 var nextRun = function nextRun() {
-                     createRelated.preCreateTasks = false;
-                     setNextRunTask('components');
-                     //针对当前页面的检测
-                     if (!createRelated.tasksHang || self.isMaster) {
+                 },
+
+                 //多事件钩子
+                 //执行多事件绑定
+                 eventBinding: function eventBinding(eventRelated) {
+                     create(self, eventRelated);
+                 }
+             };
+
+             /**
+              * 设置下一个标记
+              */
+             function setNextRunTask(taskName) {
+                 createRelated.nextRunTask = taskName;
+             }
+
+             function callContext(taskName, fn) {
+                 return assignedTasks[taskName](fn, self);
+             }
+
+             /**
+              * 任务钩子
+              * @type {Object}
+              */
+             self.tasks = {
+                 container: function container() {
+                     callContext('Container', function (element, pseudoElement) {
+                         //////////////
+                         //li,li-div //
+                         //////////////
+                         self.element = element;
+                         self.pseudoElement = pseudoElement;
+
+                         //获取根节点
+                         self.getElement = function () {
+                             return pseudoElement ? pseudoElement : element;
+                         };
+
+                         setNextRunTask('background');
+
+                         //构建主容器li完毕,可以提前执行翻页动作
+                         createRelated.preforkComplete();
+                         //视觉差不管
+                         if (self.isMaster) {
+                             self.nextTasks({
+                                 'taskName': '外部background',
+                                 'outNextTasks': function outNextTasks() {
+                                     self.dispatchTasks();
+                                 }
+                             });
+                         }
+                     });
+                 },
+                 background: function background() {
+                     var nextRun = function nextRun() {
+                         createRelated.preCreateTasks = false;
+                         setNextRunTask('components');
+                         //针对当前页面的检测
+                         if (!createRelated.tasksHang || self.isMaster) {
+                             self.nextTasks({
+                                 'taskName': '外部widgets',
+                                 outNextTasks: function outNextTasks() {
+                                     self.dispatchTasks();
+                                 }
+                             });
+                         }
+
+                         //如果有挂起任务，则继续执行
+                         if (createRelated.tasksHang) {
+                             createRelated.tasksHang();
+                         }
+                     };
+                     callContext('Background', nextRun);
+                 },
+                 components: function components() {
+                     //构件零件类型任务
+                     callContext('Components', function () {
+                         setNextRunTask('contents');
                          self.nextTasks({
-                             'taskName': '外部widgets',
+                             'taskName': '外部contents',
                              outNextTasks: function outNextTasks() {
                                  self.dispatchTasks();
                              }
                          });
-                     }
-
-                     //如果有挂起任务，则继续执行
-                     if (createRelated.tasksHang) {
-                         createRelated.tasksHang();
-                     }
-                 };
-                 callContext('Background', nextRun);
-             },
-             components: function components() {
-                 //构件零件类型任务
-                 callContext('Components', function () {
-                     setNextRunTask('contents');
-                     self.nextTasks({
-                         'taskName': '外部contents',
-                         outNextTasks: function outNextTasks() {
-                             self.dispatchTasks();
-                         }
                      });
-                 });
-             },
-             contents: function contents() {
-                 callContext('Contetns', function () {
-                     setNextRunTask('complete');
-                     createRelated.createTasksComplete();
-                 });
-             }
+                 },
+                 contents: function contents() {
+                     callContext('Contetns', function () {
+                         setNextRunTask('complete');
+                         createRelated.createTasksComplete();
+                     });
+                 }
+             };
          };
-     };
+     }
 
      /****************************************************************
       *
@@ -16180,219 +16323,222 @@
       *
       * **************************************************************/
 
-     /**
-      * 开始调用任务
-      * @return {[type]} [description]
-      */
-     baseProto.startThreadTask = function (flipOver, callback) {
+     function threadExternal(baseProto) {
 
-         //制作回调
-         //如果是快速翻页,立刻调用
-         this.createRelated.preforkComplete = function (context) {
-             return function () {
-                 //滑动允许打断创建
-                 flipOver ? callback() :
-                 //所有继续分解任务
-                 context.checkTasksCreate(function () {
-                     callback();
-                 });
-             };
-         }(this);
+     	/**
+       * 开始调用任务
+       * @return {[type]} [description]
+       */
+     	baseProto.startThreadTask = function (flipOver, callback) {
 
-         //继续构建任务
-         this.dispatchTasks();
-     };
+     		//制作回调
+     		//如果是快速翻页,立刻调用
+     		this.createRelated.preforkComplete = function (context) {
+     			return function () {
+     				//滑动允许打断创建
+     				flipOver ? callback() :
+     				//所有继续分解任务
+     				context.checkTasksCreate(function () {
+     					callback();
+     				});
+     			};
+     		}(this);
 
-     /**
-      * 检测任务是否完成
-      * actTasksCallback 活动任务完成
-      * @return {[type]} [description]
-      */
-     baseProto.checkThreadTask = function (actTasksCallback) {
-         var self = this;
-         this.isAutoRun = true;
-         this.checkTasksCreate(function () {
-             self.isAutoRun = false;
-             actTasksCallback();
-         });
-     };
+     		//继续构建任务
+     		this.dispatchTasks();
+     	};
 
-     /**
-      * 后台预创建任务
-      * @param  {[type]} tasksTimer [时间间隔]
-      * @return {[type]}            [description]
-      */
-     baseProto.createPreforkTasks = function (callback, isPreCreate) {
-         var self = this;
-         //2个预创建间隔太短
-         //背景预创建还在进行中，先挂起来等待
-         if (this.createRelated.preCreateTasks) {
-             this.createRelated.tasksHang = function (callback) {
-                 return function () {
-                     self.checkTasksCreate(callback);
-                 };
-             }(callback);
-             return;
-         }
+     	/**
+       * 检测任务是否完成
+       * actTasksCallback 活动任务完成
+       * @return {[type]} [description]
+       */
+     	baseProto.checkThreadTask = function (actTasksCallback) {
+     		var self = this;
+     		this.isAutoRun = true;
+     		this.checkTasksCreate(function () {
+     			self.isAutoRun = false;
+     			actTasksCallback();
+     		});
+     	};
 
-         /**
-          * 翻页完毕后
-          * 预创建背景
-          */
-         if (isPreCreate) {
-             this.createRelated.preCreateTasks = true;
-         }
+     	/**
+       * 后台预创建任务
+       * @param  {[type]} tasksTimer [时间间隔]
+       * @return {[type]}            [description]
+       */
+     	baseProto.createPreforkTasks = function (callback, isPreCreate) {
+     		var self = this;
+     		//2个预创建间隔太短
+     		//背景预创建还在进行中，先挂起来等待
+     		if (this.createRelated.preCreateTasks) {
+     			this.createRelated.tasksHang = function (callback) {
+     				return function () {
+     					self.checkTasksCreate(callback);
+     				};
+     			}(callback);
+     			return;
+     		}
 
-         this.checkTasksCreate(callback);
-     };
+     		/**
+        * 翻页完毕后
+        * 预创建背景
+        */
+     		if (isPreCreate) {
+     			this.createRelated.preCreateTasks = true;
+     		}
 
-     /**
-      * 自动运行：检测是否需要开始创建任务
-      * 1 如果任务全部完成了毕
-      * 2 如果有中断任务,就需要继续创建未完成的任务
-      * 3 如果任务未中断,还在继续创建
-      * currtask 是否为当前任务，加速创建
-      */
-     baseProto.checkTasksCreate = function (callback, context) {
+     		this.checkTasksCreate(callback);
+     	};
 
-         //如果任务全部完成
-         if (this.createRelated.nextRunTask === 'complete') {
-             return callback.call(context);
-         }
+     	/**
+       * 自动运行：检测是否需要开始创建任务
+       * 1 如果任务全部完成了毕
+       * 2 如果有中断任务,就需要继续创建未完成的任务
+       * 3 如果任务未中断,还在继续创建
+       * currtask 是否为当前任务，加速创建
+       */
+     	baseProto.checkTasksCreate = function (callback, context) {
 
-         var self = this;
+     		//如果任务全部完成
+     		if (this.createRelated.nextRunTask === 'complete') {
+     			return callback.call(context);
+     		}
 
-         //开始构未完成的任务
-         this.cancelTaskSuspend();
+     		var self = this;
 
-         //完毕回调
-         this.createRelated.createTasksComplete = function () {
-             callback.call(context);
-         };
+     		//开始构未完成的任务
+     		this.cancelTaskSuspend();
 
-         //派发任务
-         this.nextTasks({
-             outNextTasks: function outNextTasks() {
-                 self.dispatchTasks();
-             }
-         });
-     };
+     		//完毕回调
+     		this.createRelated.createTasksComplete = function () {
+     			callback.call(context);
+     		};
 
-     /**
-      * 设置任务中断
-      */
-     baseProto.setTaskSuspend = function () {
-         this.isAutoRun = false;
-         this.canvasRelated.isTaskSuspend = true;
-         this.createRelated.preCreateTasks = false;
-         this.createRelated.tasksHang = null;
-     };
+     		//派发任务
+     		this.nextTasks({
+     			outNextTasks: function outNextTasks() {
+     				self.dispatchTasks();
+     			}
+     		});
+     	};
 
-     /**
-      * 取消任务中断
-      * @return {[type]} [description]
-      */
-     baseProto.cancelTaskSuspend = function () {
-         this.canvasRelated.isTaskSuspend = false;
-     };
+     	/**
+       * 设置任务中断
+       */
+     	baseProto.setTaskSuspend = function () {
+     		this.isAutoRun = false;
+     		this.canvasRelated.isTaskSuspend = true;
+     		this.createRelated.preCreateTasks = false;
+     		this.createRelated.tasksHang = null;
+     	};
 
-     /**
-      * 检测任务是否需要中断
-      * @return {[type]} [description]
-      */
-     baseProto.checkTaskSuspend = function () {
-         return this.canvasRelated.isTaskSuspend;
-     };
+     	/**
+       * 取消任务中断
+       * @return {[type]} [description]
+       */
+     	baseProto.cancelTaskSuspend = function () {
+     		this.canvasRelated.isTaskSuspend = false;
+     	};
 
-     /**
-      * 多线程检测
-      * @return {[type]} [description]
-      */
-     baseProto.multithreadCheck = function (callbacks, interrupt) {
-         //多线程检测
-         var self = this;
+     	/**
+       * 检测任务是否需要中断
+       * @return {[type]} [description]
+       */
+     	baseProto.checkTaskSuspend = function () {
+     		return this.canvasRelated.isTaskSuspend;
+     	};
 
-         function check() {
-             if (self.checkTaskSuspend()) {
-                 self.tasksTimeOutId && clearTimeout(self.tasksTimeOutId);
-                 callbacks.suspendCallback.call(self);
-             } else {
-                 callbacks.nextTaskCallback.call(self);
-             }
-         }
+     	/**
+       * 多线程检测
+       * @return {[type]} [description]
+       */
+     	baseProto.multithreadCheck = function (callbacks, interrupt) {
+     		//多线程检测
+     		var self = this;
 
-         function next() {
-             self.tasksTimeOutId = setTimeout(function () {
-                 check();
-             }, self.canvasRelated.tasksTimer);
-         }
+     		function check() {
+     			if (self.checkTaskSuspend()) {
+     				self.tasksTimeOutId && clearTimeout(self.tasksTimeOutId);
+     				callbacks.suspendCallback.call(self);
+     			} else {
+     				callbacks.nextTaskCallback.call(self);
+     			}
+     		}
 
-         //自动运行页面构建
-         if (self.isAutoRun) {
-             //自动运行content中断检测 打断一次
-             if (interrupt) {
-                 next();
-             } else {
-                 check();
-             }
-         } else {
-             //后台构建
-             next();
-         }
-     };
+     		function next() {
+     			self.tasksTimeOutId = setTimeout(function () {
+     				check();
+     			}, self.canvasRelated.tasksTimer);
+     		}
 
-     /**
-      * 任务队列挂起
-      * nextTaskCallback 成功回调
-      * suspendCallback  中断回调
-      * @return {[type]} [description]
-      */
-     baseProto.asyTasks = function (callbacks, interrupt) {
+     		//自动运行页面构建
+     		if (self.isAutoRun) {
+     			//自动运行content中断检测 打断一次
+     			if (interrupt) {
+     				next();
+     			} else {
+     				check();
+     			}
+     		} else {
+     			//后台构建
+     			next();
+     		}
+     	};
 
-         //如果关闭多线程,不检测任务调度
-         if (!this.isMultithread) {
-             return callbacks.nextTaskCallback.call(this);
-         }
+     	/**
+       * 任务队列挂起
+       * nextTaskCallback 成功回调
+       * suspendCallback  中断回调
+       * @return {[type]} [description]
+       */
+     	baseProto.asyTasks = function (callbacks, interrupt) {
 
-         //多线程检测
-         this.multithreadCheck(callbacks, interrupt);
-     };
+     		//如果关闭多线程,不检测任务调度
+     		if (!this.isMultithread) {
+     			return callbacks.nextTaskCallback.call(this);
+     		}
 
-     /**
-      * 开始执行下一个线程任务,检测是否中断
-      * outSuspendTasks,
-      * outNextTasks
-      * taskName
-      * @return {[type]} [description]
-      */
-     baseProto.nextTasks = function (callback) {
-         var outSuspendTasks, outNextTasks, taskName;
+     		//多线程检测
+     		this.multithreadCheck(callbacks, interrupt);
+     	};
 
-         this.asyTasks({
-             suspendCallback: function suspendCallback() {
-                 // console.log('@@@@@@@@@@中断创建任务 ' + callback.taskName + ' @@@@@@@@@@@', this.pid + 1, this.element)
-                 if (outSuspendTasks = callback.outSuspendTasks) {
-                     outSuspendTasks();
-                 }
-             },
-             nextTaskCallback: function nextTaskCallback() {
-                 if (outNextTasks = callback.outNextTasks) {
-                     outNextTasks();
-                 }
-             }
-         }, callback.interrupt);
-     };
+     	/**
+       * 开始执行下一个线程任务,检测是否中断
+       * outSuspendTasks,
+       * outNextTasks
+       * taskName
+       * @return {[type]} [description]
+       */
+     	baseProto.nextTasks = function (callback) {
+     		var outSuspendTasks, outNextTasks, taskName;
 
-     /**
-      * 任务调度
-      * @return {[type]} [description]
-      */
-     baseProto.dispatchTasks = function () {
-         var tasks;
-         if (tasks = this.tasks[this.createRelated.nextRunTask]) {
-             tasks();
-         }
-     };
+     		this.asyTasks({
+     			suspendCallback: function suspendCallback() {
+     				// console.log('@@@@@@@@@@中断创建任务 ' + callback.taskName + ' @@@@@@@@@@@', this.pid + 1, this.element)
+     				if (outSuspendTasks = callback.outSuspendTasks) {
+     					outSuspendTasks();
+     				}
+     			},
+     			nextTaskCallback: function nextTaskCallback() {
+     				if (outNextTasks = callback.outNextTasks) {
+     					outNextTasks();
+     				}
+     			}
+     		}, callback.interrupt);
+     	};
+
+     	/**
+       * 任务调度
+       * @return {[type]} [description]
+       */
+     	baseProto.dispatchTasks = function () {
+     		var tasks;
+     		if (tasks = this.tasks[this.createRelated.nextRunTask]) {
+     			tasks();
+     		}
+     	};
+     }
 
      //========================构建模块任务对象=========================
      //
@@ -16401,227 +16547,244 @@
      //
      //==================================================================
 
-     /**
-      * 对象实例内部构建
-      * @return {[type]} [description]
-      */
-     baseProto.checkInstanceTasks = function (taskName) {
-         var tasksObj;
-         if (tasksObj = this.createRelated.cacheTasks[taskName]) {
-             tasksObj.runSuspendTasks();
-             return true;
-         }
-     };
+     function dataExternal(baseProto) {
 
-     //获取页面数据
-     baseProto.baseData = function () {
-         return this.dataCache[this.pageType];
-     };
+     	/**
+       * 对象实例内部构建
+       * @return {[type]} [description]
+       */
+     	baseProto.checkInstanceTasks = function (taskName) {
+     		var tasksObj;
+     		if (tasksObj = this.createRelated.cacheTasks[taskName]) {
+     			tasksObj.runSuspendTasks();
+     			return true;
+     		}
+     	};
 
-     //获取热点数据信息
-     baseProto.baseActivits = function () {
-         return this.dataCache['activitys'];
-     };
+     	//获取页面数据
+     	baseProto.baseData = function () {
+     		return this.dataCache[this.pageType];
+     	};
 
-     //获取自动运行数据
-     baseProto.baseAutoRun = function () {
-         var autoRunDas = this.dataCache['autoRunDas'];
-         return autoRunDas && autoRunDas;
-     };
+     	//获取热点数据信息
+     	baseProto.baseActivits = function () {
+     		return this.dataCache['activitys'];
+     	};
 
-     //获取chapterid
-     baseProto.baseGetPageId = function (pid) {
-         return this.baseData(pid)['_id'];
-     };
+     	//获取自动运行数据
+     	baseProto.baseAutoRun = function () {
+     		var autoRunDas = this.dataCache['autoRunDas'];
+     		return autoRunDas && autoRunDas;
+     	};
 
-     /**
-      * 找到对象的content对象
-      * @param  {[type]}   contentId [description]
-      * @param  {Function} callback  [description]
-      * @return {[type]}             [description]
-      */
-     baseProto.baseGetContentObject = function (contentId) {
-         var contentsObj;
-         if (contentsObj = this.contentsCollector[contentId]) {
-             return contentsObj;
-         } else {
-             //查找浮动母版
-             return this.floatContents.Master[contentId];
-         }
-     };
+     	//获取chapterid
+     	baseProto.baseGetPageId = function (pid) {
+     		return this.baseData(pid)['_id'];
+     	};
 
-     /**
-      * Xut.Content.show/hide 针对互斥效果增加接口
-      * 扩充，显示，隐藏，动画控制接口
-      * @param  {[type]} name [description]
-      * @return {[type]}      [description]
-      */
-     baseProto.baseContentMutex = function (contentId, type) {
-         var contentObj,
-             base = this;
-         if (contentObj = base.baseGetContentObject(contentId)) {
-             var context = contentObj.$contentProcess;
-             var handle = {
-                 'Show': function Show() {
-                     if (contentObj.type === 'dom') {
-                         context.css({
-                             'display': 'blcok',
-                             'visibility': 'visible'
-                         }).prop("mutex", false);
-                     } else {
-                         context.visible = true;
-                         console.log('show');
-                         base.canvasRelated.oneRender();
-                     }
-                 },
-                 'Hide': function Hide() {
-                     if (contentObj.type === 'dom') {
-                         context.css({
-                             'display': 'none',
-                             'visibility': 'hidden'
-                         }).prop("mutex", true);
-                     } else {
-                         console.log('hide');
-                         context.visible = false;
-                         base.canvasRelated.oneRender();
-                     }
-                 },
-                 'StopAnim': function StopAnim() {
-                     contentObj.stopAnims && contentObj.stopAnims();
-                 }
-             };
-             handle[type]();
-         }
-     };
+     	/**
+       * 找到对象的content对象
+       * @param  {[type]}   contentId [description]
+       * @param  {Function} callback  [description]
+       * @return {[type]}             [description]
+       */
+     	baseProto.baseGetContentObject = function (contentId) {
+     		var contentsObj;
+     		if (contentsObj = this.contentsCollector[contentId]) {
+     			return contentsObj;
+     		} else {
+     			//查找浮动母版
+     			return this.floatContents.Master[contentId];
+     		}
+     	};
 
-     //content接口
-     _.each(["Get", "Specified"], function (type) {
-         baseProto['base' + type + 'Content'] = function (data) {
-             switch (type) {
-                 case 'Get':
-                     return this.abActivitys.get();
-                 case 'Specified':
-                     return this.abActivitys.specified(data);
-             }
-         };
-     });
+     	/**
+       * Xut.Content.show/hide 针对互斥效果增加接口
+       * 扩充，显示，隐藏，动画控制接口
+       * @param  {[type]} name [description]
+       * @return {[type]}      [description]
+       */
+     	baseProto.baseContentMutex = function (contentId, type) {
+     		var contentObj,
+     		    base = this;
+     		if (contentObj = base.baseGetContentObject(contentId)) {
+     			var context = contentObj.$contentProcess;
+     			var handle = {
+     				'Show': function Show() {
+     					if (contentObj.type === 'dom') {
+     						context.css({
+     							'display': 'blcok',
+     							'visibility': 'visible'
+     						}).prop("mutex", false);
+     					} else {
+     						context.visible = true;
+     						console.log('show');
+     						base.canvasRelated.oneRender();
+     					}
+     				},
+     				'Hide': function Hide() {
+     					if (contentObj.type === 'dom') {
+     						context.css({
+     							'display': 'none',
+     							'visibility': 'hidden'
+     						}).prop("mutex", true);
+     					} else {
+     						console.log('hide');
+     						context.visible = false;
+     						base.canvasRelated.oneRender();
+     					}
+     				},
+     				'StopAnim': function StopAnim() {
+     					contentObj.stopAnims && contentObj.stopAnims();
+     				}
+     			};
+     			handle[type]();
+     		}
+     	};
 
-     //components零件类型处理
-     //baseGetComponent
-     //baseRemoveComponent
-     //baseRegisterComponent
-     //baseSpecifiedComponent
-     _.each(["Get", "Remove", "Register", "Specified"], function (type) {
-         baseProto['base' + type + 'Component'] = function (data) {
-             switch (type) {
-                 case 'Register':
-                     return this.components.register(data);
-                 case 'Get':
-                     return this.components.get();
-                 case 'Specified':
-                     return this.components.specified(data);
-                 case 'Remove':
-                     return this.components.remove();
-             }
-         };
-     });
+     	//content接口
+     	_.each(["Get", "Specified"], function (type) {
+     		baseProto['base' + type + 'Content'] = function (data) {
+     			switch (type) {
+     				case 'Get':
+     					return this.abActivitys.get();
+     				case 'Specified':
+     					return this.abActivitys.specified(data);
+     			}
+     		};
+     	});
 
-     //***************************************************************
-     //
-     //               运行辅助对象事件
-     //
-     //***************************************************************
-     baseProto.baseAssistRun = function (activityId, outCallBack, actionName) {
-         var activity;
-         if (activity = this.abActivitys) {
-             _.each(activity.get(), function (contentObj, index) {
-                 if (activityId == contentObj.activityId) {
-                     if (actionName == 'Run') {
-                         contentObj.runEffects(outCallBack, true);
-                     }
-                     if (actionName == 'Stop') {
-                         contentObj.stopEffects(outCallBack);
-                     }
-                 }
-             }, this);
-         }
-     };
+     	//components零件类型处理
+     	//baseGetComponent
+     	//baseRemoveComponent
+     	//baseRegisterComponent
+     	//baseSpecifiedComponent
+     	_.each(["Get", "Remove", "Register", "Specified"], function (type) {
+     		baseProto['base' + type + 'Component'] = function (data) {
+     			switch (type) {
+     				case 'Register':
+     					return this.components.register(data);
+     				case 'Get':
+     					return this.components.get();
+     				case 'Specified':
+     					return this.components.specified(data);
+     				case 'Remove':
+     					return this.components.remove();
+     			}
+     		};
+     	});
 
-     //销毁页面对象
-     baseProto.baseDestroy = function () {
+     	//***************************************************************
+     	//
+     	//               运行辅助对象事件
+     	//
+     	//***************************************************************
+     	baseProto.baseAssistRun = function (activityId, outCallBack, actionName) {
+     		var activity;
+     		if (activity = this.abActivitys) {
+     			_.each(activity.get(), function (contentObj, index) {
+     				if (activityId == contentObj.activityId) {
+     					if (actionName == 'Run') {
+     						contentObj.runEffects(outCallBack, true);
+     					}
+     					if (actionName == 'Stop') {
+     						contentObj.stopEffects(outCallBack);
+     					}
+     				}
+     			}, this);
+     		}
+     	};
+     }
 
-         //清理图片缓存
-         //读库快速退出模式下报错修正
-         try {
-             this.element.hide().find('img').each(function (aaa, img) {
-                 img.src = 'images/icons/clearmem.png';
-             });
-         } catch (e) {}
+     function destroy$2(baseProto) {
+     	//销毁页面对象
+     	baseProto.baseDestroy = function () {
 
-         //清理线程任务块
-         var cacheTasks, key, tasks;
-         if (cacheTasks = this.createRelated.cacheTasks) {
-             for (key in cacheTasks) {
-                 if (tasks = cacheTasks[key]) {
-                     tasks.clearReference();
-                 }
-             }
-         }
+     		//清理图片缓存
+     		//读库快速退出模式下报错修正
+     		try {
+     			this.element.hide().find('img').each(function (aaa, img) {
+     				img.src = 'images/icons/clearmem.png';
+     			});
+     		} catch (e) {}
 
-         //浮动对象
-         var floatMaterContents = this.floatContents.Master;
-         //是否有浮动对象
-         var hasFloatMater = !_.isEmpty(floatMaterContents);
+     		//清理线程任务块
+     		var cacheTasks, key, tasks;
+     		if (cacheTasks = this.createRelated.cacheTasks) {
+     			for (key in cacheTasks) {
+     				if (tasks = cacheTasks[key]) {
+     					tasks.clearReference();
+     				}
+     			}
+     		}
 
-         //清理content类型对象
-         var contents;
-         if (contents = this.abActivitys.get()) {
-             contents.forEach(function (contentObj) {
-                 contentObj.destroy(function (destroyObj) {
-                     //如果不是浮动对象,清理元素引用
-                     if (!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
-                         destroyObj.$contentProcess = null;
-                     }
-                 });
-             });
-         }
+     		//浮动对象
+     		var floatMaterContents = this.floatContents.Master;
+     		//是否有浮动对象
+     		var hasFloatMater = !_.isEmpty(floatMaterContents);
 
-         //清除母版浮动容器
-         if (hasFloatMater && this.floatContents.MasterContainer) {
-             this.floatContents.MasterContainer.remove();
-         }
+     		//清理content类型对象
+     		var contents;
+     		if (contents = this.abActivitys.get()) {
+     			contents.forEach(function (contentObj) {
+     				contentObj.destroy(function (destroyObj) {
+     					//如果不是浮动对象,清理元素引用
+     					if (!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
+     						destroyObj.$contentProcess = null;
+     					}
+     				});
+     			});
+     		}
 
-         //清除浮动页面对象
-         if (this.floatContents.Page && this.floatContents.PageContainer) {
-             this.floatContents.PageContainer.remove();
-         }
+     		//清除母版浮动容器
+     		if (hasFloatMater && this.floatContents.MasterContainer) {
+     			this.floatContents.MasterContainer.remove();
+     		}
 
-         //清理零件类型对象
-         var components;
-         if (components = this.baseGetComponent()) {
-             components.length && components.forEach(function (componentObj) {
-                 componentObj.destroy && componentObj.destroy();
-             });
-         }
+     		//清除浮动页面对象
+     		if (this.floatContents.Page && this.floatContents.PageContainer) {
+     			this.floatContents.PageContainer.remove();
+     		}
 
-         //多事件销毁
-         destroy$2(this);
+     		//清理零件类型对象
+     		var components;
+     		if (components = this.baseGetComponent()) {
+     			components.length && components.forEach(function (componentObj) {
+     				componentObj.destroy && componentObj.destroy();
+     			});
+     		}
 
-         //销毁canvas相关
-         if (this.canvasRelated && this.canvasRelated.destroy) {
-             this.canvasRelated.destroy();
-         }
+     		//多事件销毁
+     		_destroy(this);
 
-         //伪li节点
-         if (this.pseudoElement) {
-             this.pseudoElement = null;
-         }
+     		//销毁canvas相关
+     		if (this.canvasRelated && this.canvasRelated.destroy) {
+     			this.canvasRelated.destroy();
+     		}
 
-         //移除li容器节点节点
-         this.element.remove();
-         this.root = null;
-         this.element = null;
-     };
+     		//伪li节点
+     		if (this.pseudoElement) {
+     			this.pseudoElement = null;
+     		}
+
+     		//移除li容器节点节点
+     		this.element.remove();
+     		this.root = null;
+     		this.element = null;
+     	};
+     }
+
+     function PageBase() {};
+     var baseProto = PageBase.prototype;
+
+     //初始化
+     init$2(baseProto);
+     //多线程接口
+     threadExternal(baseProto);
+     //数据接口
+     dataExternal(baseProto);
+     //销毁
+     destroy$2(baseProto);
 
      var Master = Xut.extend(PageBase, {
      	constructor: function constructor(options) {
@@ -21528,18 +21691,18 @@
 
      //移动端浏览器平台
      if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
-         var fixaudio = function fixaudio() {
-             if (!Xut.fix.audio) {
-                 Xut.fix.audio = new Audio();
-                 Xut.fix.video = document.createElement("Video");
-                 document.removeEventListener('touchstart', fixaudio, false);
-             }
-         };
-         document.addEventListener('touchstart', fixaudio, false);
+     	var fixaudio = function fixaudio() {
+     		if (!Xut.fix.audio) {
+     			Xut.fix.audio = new Audio();
+     			Xut.fix.video = document.createElement("Video");
+     			document.removeEventListener('touchstart', fixaudio, false);
+     		}
+     	};
+     	document.addEventListener('touchstart', fixaudio, false);
      }
 
      $(function () {
-         init();
+     	init();
      });
 
 }));

@@ -7,8 +7,8 @@ module.exports = {
     //这里填入目标地址
     //e.g:d:/xxxx
     test: {
-        launch: false,
-        dist: '/Users/project/svn/magazine-develop-ios/www/build'
+        launch: true,
+        dist: '/Users/mac/project/xcode/www/build'
     },
     build: {
         index: path.resolve(__dirname, 'temp/index.html'),

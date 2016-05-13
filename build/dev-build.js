@@ -39,11 +39,12 @@ var buildPath = {
 }
 
 //delete this existing files
-var delAssets = function(path) {
+var delAssets = function (path) {
     var dev = path + buildPath.devName
     var dist = path + buildPath.distName
 
-    ;[dev, dist].forEach(function(file) {
+        ;
+    [dev, dist].forEach(function (file) {
         if (fs.existsSync(file)) {
             fs.unlinkSync(file)
         }
@@ -53,19 +54,19 @@ delAssets(buildPath.dist)
 delAssets(buildPath.test)
 
 
-var getSize = function(code) {
+var getSize = function (code) {
     return (code.length / 1024).toFixed(2) + 'kb'
 }
 
 
-var blue = function(str) {
+var blue = function (str) {
     return '\x1b[1m\x1b[34m' + escape(process.cwd()) + str + '\x1b[39m\x1b[22m'
 }
 
 
-var write = function(path, code) {
-    return new Promise(function(resolve, reject) {
-        fs.writeFile(path, code, function(err) {
+var write = function (path, code) {
+    return new Promise(function (resolve, reject) {
+        fs.writeFile(path, code, function (err) {
             if (err) return reject(err)
             console.log('write: ' + blue(path) + ' ' + getSize(code))
             resolve(code)
@@ -78,46 +79,46 @@ var spinner = ora('Begin to pack , Please wait for\n')
 spinner.start()
 
 
-new Promise(function(resolve, reject) {
-        rollup.rollup({
-                entry: config.build.entry,
-                plugins: [
-                    babel({
-                        "presets": ["es2015-rollup"]
-                    })
-                ]
+new Promise(function (resolve, reject) {
+    rollup.rollup({
+        entry: config.build.entry,
+        plugins: [
+            babel({
+                "presets": ["es2015-rollup"]
             })
-            .then(function(bundle) {
-                if (!fs.existsSync(output)) {
-                    fs.mkdirSync(output);
-                    console.log(output + '目录创建成功');
-                }
-                var code = bundle.generate({
-                    format: 'umd',
-                    moduleName: 'Aaron'
-                }).code
-
-                return write(rollupjs, code)
-            })
-            .then(resolve)
-            .catch(function() {
-                console.log('错误')
-            })
+        ]
     })
-    .then(function() {
+        .then(function (bundle) {
+            if (!fs.existsSync(output)) {
+                fs.mkdirSync(output);
+                console.log(output + '目录创建成功');
+            }
+            var code = bundle.generate({
+                format: 'umd',
+                moduleName: 'Aaron'
+            }).code
 
-        fs.readFile('./src/index.html', "utf8", function(error, data) {
+            return write(rollupjs, code)
+        })
+        .then(resolve)
+        .catch(function () {
+            console.log('错误')
+        })
+})
+    .then(function () {
+
+        fs.readFile('./src/index.html', "utf8", function (error, data) {
             if (error) throw error;
             var paths = []
             var path;
             var cwdPath = escape(process.cwd())
             var scripts = data.match(/<script.*?>.*?<\/script>/ig);
 
-            scripts.forEach(function(val) {
+            scripts.forEach(function (val) {
                 val = val.match(/src="(.*?.js)/);
                 if (val && val.length) {
                     path = val[1]
-                        //有效src
+                    //有效src
                     if (/^lib/.test(path)) {
                         paths.push(config.build.src + path)
                     }
@@ -128,23 +129,24 @@ new Promise(function(resolve, reject) {
             //生成
             gulp.src(paths)
                 .pipe(concat('framework.js'))
-                .on('error', function(err) {
+                .on('error', function (err) {
                     console.log('Less Error!', err.message);
                     this.end();
                 })
                 .pipe(gulp.dest(buildPath.dist))
-                .on('end', function() {
+                .on('end', function () {
 
                     //合成xxtppt.js
                     paths.push(rollupjs)
                     gulp.src(paths)
                         .pipe(concat('xxtppt.js'))
-                        .on('error', function(err) {
+                        .on('error', function (err) {
                             console.log('Less Error!', err.message);
                             this.end();
                         })
+                        .pipe(uglify())
                         .pipe(gulp.dest(buildPath.dist))
-                        .on('end', function() {
+                        .on('end', function () {
 
                             //复制dist到lib/build
                             try {

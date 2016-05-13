@@ -1,6 +1,5 @@
-import {
-	init
-} from './init/index'
+
+import {init} from './init/index'
 
 
 //更新版本号记录
@@ -14,7 +13,7 @@ Xut.fix = Xut.fix || {};
 
 //移动端浏览器平台
 if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
-	var fixaudio = function() {
+	var fixaudio = function () {
 		if (!Xut.fix.audio) {
 			Xut.fix.audio = new Audio();
 			Xut.fix.video = document.createElement("Video");
@@ -24,6 +23,7 @@ if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
 	document.addEventListener('touchstart', fixaudio, false);
 }
 
-$(function() {
+$(function () {
 	init()
 })
+
