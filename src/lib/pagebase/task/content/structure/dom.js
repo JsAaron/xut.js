@@ -1,8 +1,9 @@
 
 
 import { parseJSON } from '../../../../util/index'
-
-
+ 
+let prefix = Xut.plat.prefixStyle;
+ 
 /**
  * 蒙版动画
  * @param  {[type]} data    [description]

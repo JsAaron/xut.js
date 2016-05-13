@@ -17,8 +17,6 @@ import { createDom } from './dom'
 import { parseContentDas } from './parsecontent'
 
 
-let prefix = Xut.plat.prefixStyle;
-
 /**
  * 解析序列中需要的数据
  * @param  {[type]}   contentIds [description]

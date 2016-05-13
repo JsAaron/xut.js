@@ -4,7 +4,7 @@
  */
 
 
-import {Bind} from '../pagebase/thread/dispenser/bind'
+import {Bind} from '../pagebase/task/dispenser/bind'
 
 
 //content任务超时Id

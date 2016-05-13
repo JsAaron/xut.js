@@ -6,7 +6,7 @@
 import {
     Bind
 }
-from '../pagebase/thread/dispenser/bind'
+from '../pagebase/task/dispenser/bind'
 
 export function trigger(target, attribute, rootNode, pageIndex) {
 
