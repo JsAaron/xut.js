@@ -1,15 +1,24 @@
 //预初始化
-import { AudioManager } from '../component/audio/manager'
-import { VideoManager } from '../component/video/manager'
-import { loader, setRootfont } from '../util/index'
-import { nextTask } from './data'
+import {
+    AudioManager
+} from '../component/audio/manager'
+import {
+    VideoManager
+} from '../component/video/manager'
+import {
+    loader,
+    setRootfont
+} from '../util/index'
+import {
+    nextTask
+} from './data'
 import {
     loadVideo,
     html5Video,
     bindEvent
 }
 from './initprocess'
- 
+
 
 export function init() {
 
@@ -25,7 +34,7 @@ export function init() {
     if (!DUKUCONFIG && !GLOBALIFRAME && Xut.plat.isIOS) {
         html5Video();
     }
- 
+
     //Ifarme嵌套处理
     //1 新阅读
     //2 子文档
@@ -105,8 +114,11 @@ function loadApp(config) {
     Xut.config.revised();
 
     //加载横版或者竖版css
-    var baseCss = './css/' + (Xut.config.layoutMode) + '.css';
-    var svgsheet = './content/gallery/svgsheet.css';
+    //nodeBuildMode 是node build下的test.html文件
+    //加载build/*.css压缩文件
+    //否则就是默认的css/*.css
+    var baseCss = window.nodeBuildMode ? window.nodeBuildMode.csspath : './css/' + (Xut.config.layoutMode) + '.css';
+    var svgsheet = 'content/gallery/svgsheet.css';
 
     var cssArr = [baseCss, svgsheet];
     //是否需要加载svg

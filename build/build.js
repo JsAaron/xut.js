@@ -1,10 +1,11 @@
-var gulp       = require('gulp');
-var fs         = require('fs')
-var rollup     = require('rollup')
-var babel      = require('rollup-plugin-babel')
-var open       = require("open")
+var gulp = require('gulp');
+var fs = require('fs')
+var rollup = require('rollup')
+var babel = require('rollup-plugin-babel')
+var open = require("open")
 var httpServer = require('http-server')
-var fsextra    = require('fs-extra')
+var fsextra = require('fs-extra')
+var cleanCSS = require('gulp-clean-css');
 
 //var replace = require('rollup-plugin-replace')
 var version = process.env.VERSION;
@@ -15,7 +16,7 @@ var app = express();
 var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
 var concat = require('gulp-concat')
-var ora    = require('ora')
+var ora = require('ora')
 
 var config = require('../config')
 
@@ -25,33 +26,22 @@ var output = config.build.dist
 //打包文件
 var rollupjs = output + 'rollup.js'
 
-//是否debug模式
-var debugout;
-var args = process.argv[process.argv.length - 1]
-var args = args.split('=')
-if (args[0] == 'debug') {
-    debugout = args[1]
-}
-
 
 //发布路径
 //dist 对外使用
 //test 对内测试
 var buildPath = {
-    devName  :'xxtppt.dev.js',
-    distName :'xxtppt.js',
-    dist     : config.build.dist,
-    test     : config.build.src + "build/",
-    //调试目录
-    debug    : debugout 
+    devName: 'xxtppt.dev.js',
+    distName: 'xxtppt.js',
+    dist: config.build.dist,
+    test: config.build.src + "build/",
 }
 
 //delete this existing files
 var delAssets = function(path) {
-    var dev  = path + buildPath.devName
-    var dist = path + buildPath.distName
-
-    ;[dev, dist].forEach(function(file) {
+    var dev = path + buildPath.devName
+    var dist = path + buildPath.distName;
+    [dev, dist].forEach(function(file) {
         if (fs.existsSync(file)) {
             fs.unlinkSync(file)
         }
@@ -81,16 +71,16 @@ var write = function(path, code) {
     })
 }
 
-if(!buildPath.debug){
-    console.log(
-      '  说明:\n' +
-      '       打包分2块 rollup与gulp\n'
-    )    
-}
+
+console.log(
+    'js  => rollup + gulp\n' +
+    'css => gulp\n'
+)
 
 
 var spinner = ora('Begin to pack , Please wait for\n')
 spinner.start()
+
 
 
 new Promise(function(resolve, reject) {
@@ -121,7 +111,7 @@ new Promise(function(resolve, reject) {
     })
     .then(function() {
         return new Promise(function combine(resolve, reject) {
-            
+
             fs.readFile('./src/index.html', "utf8", function(error, data) {
                 if (error) throw error;
                 var paths = []
@@ -150,8 +140,8 @@ new Promise(function(resolve, reject) {
                     })
                     .pipe(gulp.dest(buildPath.dist))
                     .pipe(gulp.dest(buildPath.test))
-                    
-                    .pipe(uglify())
+
+                .pipe(uglify())
                     .pipe(rename(buildPath.distName))
                     .pipe(gulp.dest(output))
                     .pipe(gulp.dest(buildPath.dist))
@@ -163,6 +153,17 @@ new Promise(function(resolve, reject) {
 
             });
         })
+    })
+    .then(function(resolve) {
+        //css
+        gulp.src('src/css/*.css')
+            .pipe(cleanCSS({
+                compatibility: 'ie8'
+            }))
+            .pipe(gulp.dest('src/build'))
+            .on('end', function() {
+                resolve && resolve()
+            })
     })
     .then(function() {
         var complete = function() {
@@ -177,7 +178,7 @@ new Promise(function(resolve, reject) {
             });
             spinner.stop()
         }
-        
+
         //数据库
         if (!fs.existsSync("./src/content/xxtebook.db")) {
             console.log("Can't test Because the xxtebook does not exist")
