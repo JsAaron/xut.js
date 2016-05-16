@@ -16,7 +16,7 @@ export function Action(options) {
 
     //切换背景
     function toggle(linker) {
-        element.style.backgroundImage = 'url(' + Xut.conifg.pathAddress + linker + ')'
+        element.style.backgroundImage = 'url(' + Xut.config.pathAddress + linker + ')'
     }
 
     function run(ids) {
