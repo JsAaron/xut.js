@@ -111,7 +111,6 @@ new Promise(function(resolve, reject) {
     })
     .then(function() {
         return new Promise(function combine(resolve, reject) {
-
             fs.readFile('./src/index.html', "utf8", function(error, data) {
                 if (error) throw error;
                 var paths = []
@@ -154,16 +153,17 @@ new Promise(function(resolve, reject) {
             });
         })
     })
-    .then(function(resolve) {
-        //css
-        gulp.src('src/css/*.css')
-            .pipe(cleanCSS({
-                compatibility: 'ie8'
-            }))
-            .pipe(gulp.dest('src/build'))
-            .on('end', function() {
-                resolve && resolve()
-            })
+    .then(function() {
+        return new Promise(function(resolve, reject) {
+            //css
+            gulp.src('src/css/*.css')
+                .pipe(cleanCSS({
+                    compatibility: 'ie8'
+                }))
+                .pipe(gulp.dest(buildPath.dist))
+                .pipe(gulp.dest(buildPath.test))
+                .on('end', resolve)
+        })
     })
     .then(function() {
         var complete = function() {
