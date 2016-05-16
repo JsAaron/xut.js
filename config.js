@@ -7,7 +7,7 @@ module.exports = {
     //这里填入目标地址
     //e.g:d:/xxxx
     test: {
-        launch: true,
+        launch: false,
         dist: '/Users/mac/project/xcode/www/build'
     },
     build: {

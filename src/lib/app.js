@@ -4,7 +4,7 @@ import {
 
 
 //更新版本号记录
-Xut.Version = 784;
+Xut.Version = 783;
 
 
 //修复ios 安卓浏览器不能自动播放音频的问题 
