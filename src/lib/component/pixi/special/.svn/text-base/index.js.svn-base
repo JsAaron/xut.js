@@ -5,9 +5,7 @@
  * @return {[type]}         [description]
  */
 
-import {
-    Factory
-} from '../factory'
+import { Factory } from '../factory'
 import {
     parseJSON
 }
@@ -217,7 +215,7 @@ var specialSprite = Factory.extend({
 
         this.option = getResources(this.data);
         this.canvasRelated = canvasRelated;
-
+      
         var spiritList = this.option.spiritList;
 
         this.sprObjs = [];
@@ -254,11 +252,11 @@ var specialSprite = Factory.extend({
         var self = this;
         this.uuid = this.canvasRelated.play('sprite', function() {
             sprObjs.forEach(function(obj, index) {
-                self.timer = setTimeout(function() {
-                    obj.runAnimate();
-                }, 1000 / (obj.FPS || 10))
+                    self.timer = setTimeout(function() {
+                        obj.runAnimate();
+                    }, 1000 / (obj.FPS || 10))
             })
-        })
+        })   
 
     },
 
@@ -276,7 +274,7 @@ var specialSprite = Factory.extend({
      * @return {[type]} [description]
      */
     destroy: function() {
-        //销毁添加到画布上的containers
+       //销毁添加到画布上的containers
         var addedContainers = this.canvasRelated.containerStage.children;
         for (var i = 0; i < addedContainers.length; i++) {
             var temp = addedContainers[i];

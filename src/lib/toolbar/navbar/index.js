@@ -7,12 +7,13 @@
  *
  */
 
-import {nav as navlayout} from '../scenario/layout'
+import {nav as navlayout} from '../../scenario/layout'
 
-let config = Xut.config
+let config
+let _prefix
+let _layoutMode
 let pageIndex = 0
-let prefix = Xut.plat.prefixStyle
-let _layoutMode = config.layoutMode
+
 let initializeBusy = false
 let sectionInstance = null
 let directory = 'images/icons/directory.png'
@@ -47,6 +48,10 @@ function SectionList(artControl) {
 
 
 SectionList.prototype = {
+
+    /**
+     * 卷滚条
+     */
     userIscroll: function () {
         var me = this,
             hBox = this.hBox,
@@ -80,6 +85,8 @@ SectionList.prototype = {
             this.hBox = hBox;
         }
     },
+
+
     /**
      * [ 创建缩略图]
      * @return {[type]} [description]
@@ -125,6 +132,8 @@ SectionList.prototype = {
         this.createNew = createNew;
         this.createBak = createBak;
     },
+
+
     /**
      * [ 清理隐藏的缩略图]
      * @return {[type]} [description]
@@ -182,6 +191,7 @@ SectionList.prototype = {
         return Math.ceil(count) + 1;
     },
 
+
     touchCallback: function (env) {
         var absDistX = this.hBox.absDistX;
         if (!absDistX) {
@@ -228,10 +238,59 @@ SectionList.prototype = {
 
 }
 
+/**
+ * 初始化
+ */
+function initialize() {
+    //动画状态
+    if (lockAnimation) {
+        return false;
+    }
+    lockAnimation = true;
+    Xut.View.ShowBusy();
+    startpocess();
+};
+
+/**
+ * 控制处理
+ */
+function startpocess() {
+    //控制按钮
+    var navhandle = $("#backDir"),
+        action = navhandle.attr('fly') || 'in',
+        navControlBar = $("#navBar");
+
+    //初始化样式
+    initStyle(navControlBar, action, function () {
+        //触发控制条
+        navControl(action, navhandle);
+        //执行动画
+        toAnimation(navControlBar, navhandle, action);
+    })
+};
+
+
+/**
+ * 初始化样式
+ */
+function initStyle(navControlBar, action, fn) {
+    console.log(navControlBar)
+    sectionInstance.state = false;
+    if (action == 'in') {
+        sectionInstance.state = true;
+        navControlBar.css({
+            'z-index': 0,
+            'opacity': 0,
+            'visibility': 'visible'
+        });
+    }
+    fn && fn();
+}
+
 //执行动画
 function toAnimation(navControlBar, navhandle, action) {
     var end = function () {
-        navControlBar.css(prefix('transition'), '');
+        navControlBar.css(_prefix('transition'), '');
         Xut.View.HideBusy();
         lockAnimation = false;
     };
@@ -260,46 +319,8 @@ function navControl(action, navhandle) {
 }
 
 
-function initialize() {
-    //动画状态
-    if (lockAnimation) {
-        return false;
-    }
-
-    lockAnimation = true;
-    Xut.View.ShowBusy();
-    startpocess();
-};
 
 
-function startpocess() {
-    //控制按钮
-    var navhandle = $("#backDir"),
-        action = navhandle.attr('fly') || 'in',
-        navControlBar = $("#navBar");
-
-    //初始化样式
-    initStyle(navControlBar, action, function () {
-        //触发控制条
-        navControl(action, navhandle);
-        //执行动画
-        toAnimation(navControlBar, navhandle, action);
-    })
-};
-
-
-function initStyle(navControlBar, action, fn) {
-    sectionInstance.state = false;
-    if (action == 'in') {
-        sectionInstance.state = true;
-        navControlBar.css({
-            'z-index': 0,
-            'opacity': 0,
-            'display': 'block'
-        });
-    }
-    fn && fn();
-}
 
 /**
  * 销毁对象
@@ -330,7 +351,14 @@ function close(callback) {
     }
 }
 
-function init(index) {
+
+/**
+ * 打开目录
+ */
+function oepn(index) {
+    config = Xut.config
+    _prefix = Xut.plat.prefixStyle
+    _layoutMode = config.layoutMode
     pageIndex = index;
     if (sectionInstance) {
         initialize();
@@ -342,7 +370,7 @@ function init(index) {
 
 export {
 load,
-init,
+oepn,
 close,
 destroy
-};
+}

@@ -19,7 +19,7 @@ import {query} from './parser'
 //页面切换
 import {SwitchPage} from './switch'
 //Navbar
-import {close as _close} from '../toolbar/navbar'
+import {close as _close} from '../toolbar/navbar/index'
 
 
 

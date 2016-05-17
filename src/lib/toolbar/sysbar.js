@@ -3,19 +3,19 @@
  * 系统工具栏
  */
 import { ToolBar } from './base/toolBar'
-import { close as navbarClose ,init as initnavbar} from './navbar'
+import { close as closeNavbar, oepn as oepnNavbar} from './navbar/index'
 
 var sToolbar = ToolBar.extend({
-    init: function(options) {
-        this.arrows      = Object.create(null);
-        this.curTips     = null; //当前页码对象
-        this.Lock        = false; //操作锁
-        this.delay       = 50; //动画延时
-        this.hasTopBar   = true; //有顶部工具条
-        this.controlBar  = options.controlBar;
-        this.container   = options.container;
-        this.pageMode    = options.pageMode;
-        this.pageTotal   = options.pageTotal;
+    init: function (options) {
+        this.arrows = Object.create(null);
+        this.curTips = null; //当前页码对象
+        this.Lock = false; //操作锁
+        this.delay = 50; //动画延时
+        this.hasTopBar = true; //有顶部工具条
+        this.controlBar = options.controlBar;
+        this.container = options.container;
+        this.pageMode = options.pageMode;
+        this.pageTotal = options.pageTotal;
         this.currentPage = options.currentPage;
 
         //配置属性
@@ -26,13 +26,13 @@ var sToolbar = ToolBar.extend({
         this.initTool();
     }
 });
-  
- 
-sToolbar.prototype.initTool = function() {
+
+
+sToolbar.prototype.initTool = function () {
 
     var bar = this.controlBar,
         setting = this.settings;
- 
+
     //工具栏的显示状态
     this.barStatus = (bar.css('display') === 'none') ? false : true;
 
@@ -67,7 +67,7 @@ sToolbar.prototype.initTool = function() {
 }
 
 //工具条的位置
-sToolbar.prototype.toolbarPostion = function(bar, position) {
+sToolbar.prototype.toolbarPostion = function (bar, position) {
     var height = this.iconHeight,
         TOP = this.barHeight;
     if (position == 1) { //在底部
@@ -85,7 +85,7 @@ sToolbar.prototype.toolbarPostion = function(bar, position) {
 }
 
 //创建主页按钮
-sToolbar.prototype.createHomeIcon = function(bar) {
+sToolbar.prototype.createHomeIcon = function (bar) {
     var str = '<div id="backHome" style="float:left;text-indent:0.25em;height:{0}px;line-height:{1}px;color:#007aff">主页</div>',
         height = this.iconHeight,
         html = $(String.format(str, height, height));
@@ -93,7 +93,7 @@ sToolbar.prototype.createHomeIcon = function(bar) {
 }
 
 //创建目录按钮
-sToolbar.prototype.createDirIcon = function(bar) {
+sToolbar.prototype.createDirIcon = function (bar) {
     var str = '<div id="backDir" class="xut-controlBar-backDir" style="float:left;margin-left:4px;width:{0}px;height:{1}px;background-size:cover"></div>',
         height = this.iconHeight,
         html = $(String.format(str, height, height));
@@ -101,7 +101,7 @@ sToolbar.prototype.createDirIcon = function(bar) {
 }
 
 //创建页码数
-sToolbar.prototype.createPageNum = function(bar) {
+sToolbar.prototype.createPageNum = function (bar) {
     var height = this.iconHeight,
         marginTop = height * 0.25,
         iconH = height * 0.5,
@@ -113,7 +113,7 @@ sToolbar.prototype.createPageNum = function(bar) {
 }
 
 //工具栏隐藏按钮
-sToolbar.prototype.createHideToolbar = function(bar) {
+sToolbar.prototype.createHideToolbar = function (bar) {
     var html, style,
         height = this.iconHeight;
     style = 'float:right;width:' + height + 'px;height:' + height + 'px;background-size:cover';
@@ -122,13 +122,13 @@ sToolbar.prototype.createHideToolbar = function(bar) {
 }
 
 //关闭子文档按钮
-sToolbar.prototype.createCloseIcon = function(bar) {
+sToolbar.prototype.createCloseIcon = function (bar) {
     var style, html, height = this.iconHeight;
     style = 'float:right;margin-right:4px;width:' + height + 'px;height:' + height + 'px';
     html = '<div class="si-icon" data-icon-name="close" style="' + style + '"></div>';
     html = $(html);
     this.createSVGIcon(html[0],
-        function() {
+        function () {
             if (SUbDOCCONTEXT) {
                 SUbDOCCONTEXT.Xut.publish('subdoc:dropApp');
             } else {
@@ -140,7 +140,7 @@ sToolbar.prototype.createCloseIcon = function(bar) {
 }
 
 //应用标题
-sToolbar.prototype.createTitle = function(bar) {
+sToolbar.prototype.createTitle = function (bar) {
     var style, html,
         appName = this.appName,
         height = this.iconHeight;
@@ -153,19 +153,19 @@ sToolbar.prototype.createTitle = function(bar) {
  * [ 返回按钮]
  * @return {[type]} [description]
  */
-sToolbar.prototype.createBackIcon = function(container) {
+sToolbar.prototype.createBackIcon = function (container) {
     var style, html,
         height = this.iconHeight;
     style = 'float:left;width:' + height + 'px;height:' + height + 'px';
     html = '<div class="si-icon" data-icon-name="back" style="' + style + '"></div>';
     html = $(html);
     this.createSVGIcon(html[0],
-        function() {
+        function () {
             Xut.Application.Suspend({
-                dispose: function() { //停止热点动作
+                dispose: function () { //停止热点动作
                     Xut.Application.DropApp(); //退出应用
                 },
-                processed: function() {
+                processed: function () {
                     Xut.Application.DropApp(); //退出应用
                 }
             });
@@ -178,13 +178,13 @@ sToolbar.prototype.createBackIcon = function(container) {
  * 更新页码指示
  * @return {[type]} [description]
  */
-sToolbar.prototype.updatePointer = function(pageIndex) {
+sToolbar.prototype.updatePointer = function (pageIndex) {
     this.curTips && this.curTips.html(pageIndex + 1);
 }
 
-sToolbar.prototype.bindButtonsEvent = function(bar) {
+sToolbar.prototype.bindButtonsEvent = function (bar) {
     var that = this;
-    bar.on("touchend mouseup", function(e) {
+    bar.on("touchend mouseup", function (e) {
         var type = Xut.plat.evtTarget(e).id;
         switch (type) {
             case "backHome":
@@ -204,13 +204,13 @@ sToolbar.prototype.bindButtonsEvent = function(bar) {
  * [ 跳转处理]
  * @return {[type]} [description]
  */
-sToolbar.prototype.homeControl = function() {
+sToolbar.prototype.homeControl = function () {
     if (DUKUCONFIG) {
         Xut.Application.Suspend({
-            dispose: function() {
+            dispose: function () {
                 Xut.Application.DropApp() //退出应用
             },
-            processed: function() {
+            processed: function () {
                 Xut.Application.DropApp() //退出应用
             }
         });
@@ -218,11 +218,11 @@ sToolbar.prototype.homeControl = function() {
     }
 
     Xut.Application.Suspend({
-        dispose: function(promptMessage) {
+        dispose: function (promptMessage) {
             //停止热点动作
             //promptMessage('再按一次将跳至首页！')
         },
-        processed: function() {
+        processed: function () {
             Xut.View.GotoSlide(1) //调整到首页
         }
     });
@@ -232,8 +232,8 @@ sToolbar.prototype.homeControl = function() {
  * [ 打开目录关闭当前页面活动热点]
  * @return {[type]} [description]
  */
-sToolbar.prototype.navigationBar = function() {
-   initnavbar(Xut.Presentation.GetPageIndex());
+sToolbar.prototype.navigationBar = function () {
+    oepnNavbar(Xut.Presentation.GetPageIndex());
 }
 
 
@@ -241,7 +241,7 @@ sToolbar.prototype.navigationBar = function() {
  * [ 显示顶部工具栏]
  * @return {[type]} [description]
  */
-sToolbar.prototype.showTopBar = function() {
+sToolbar.prototype.showTopBar = function () {
     var that = this;
 
     if (this.barStatus) {
@@ -252,45 +252,45 @@ sToolbar.prototype.showTopBar = function() {
         'display': 'block',
         'opacity': 0
     });
-  
-    setTimeout(function() {
+
+    setTimeout(function () {
         that.controlBar.animate({
             'opacity': 1
-        }, that.delay, 'linear', function() {
-            navbarClose();
+        }, that.delay, 'linear', function () {
+            closeNavbar();
             that.showSystemBar();
             that.barStatus = true;
             that.Lock = false;
         });
-    }); 
-} 
-     
+    });
+}
+
 /**
  * [ 隐藏顶部工具栏]
  * @return {[type]} [description]
  */
-sToolbar.prototype.hideTopBar = function() {
+sToolbar.prototype.hideTopBar = function () {
     var that = this;
 
     if (!this.barStatus) {
         this.Lock = false;
         return;
-    } 
- 
+    }
+
     this.controlBar.animate({
         'opacity': 0
-    }, that.delay, 'linear', function() {
-        navbarClose();
+    }, that.delay, 'linear', function () {
+        closeNavbar();
         that.controlBar.hide();
         that.hideSystemBar();
         that.barStatus = false;
         that.Lock = false;
     });
-} 
+}
 
 
 //销毁 
-sToolbar.prototype.destroy = function() {
+sToolbar.prototype.destroy = function () {
     this.controlBar.off();
     this.controlBar = null;
     this.arrows = null;
@@ -298,6 +298,6 @@ sToolbar.prototype.destroy = function() {
     this.barStatus = false;
 }
 
- export {
- 	sToolbar
- }
+export {
+sToolbar
+}

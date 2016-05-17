@@ -1,7 +1,7 @@
 //调度器
 import { recovery } from './scheduler/index'
 import { show } from './util/notice'
-import { close } from './toolbar/navbar'
+import { close } from './toolbar/navbar/index'
 
 
 /***********************************************

@@ -1,4 +1,3 @@
-
 /**
  * 布局文件
  * 1 控制条
@@ -111,10 +110,23 @@ export function nav(seasonSqlRet) {
     setOption()
 
     var dirNum = seasonSqlRet.length,
-        retStr, liCss, scroller, wrapper, seasonId, chapterId, data, xxtlink;
+        retStr,
+        liCss,
+        scroller,
+        wrapper,
+        seasonId,
+        chapterId,
+        data,
+        xxtlink;
+
+        
+    //获得wrapper
     (function SectionWrapper() {
-        var width, height, blank,
+        var width,
+            height,
+            blank,
             font = round(proportion * 2);
+            
         if (config.layoutMode == 'horizontal') {
             height = round(navHeight * 0.9);
             width = round(height * sWidth / sHeight); //保持缩略图的宽高比
@@ -131,11 +143,12 @@ export function nav(seasonSqlRet) {
             wrapper = 'height:' + (navHeight - 4) + 'px;overflow:hidden;margin:2px auto;font-size:' + font + 'em';
         }
     })();
+    
 
     retStr = '<div id="SectionWrapper" style="' + wrapper + '">';
-    retStr += '<div id="Sectionscroller" ';
+    retStr += '  <div id="Sectionscroller" style="height:100%;" ';
     retStr += scroller;
-    retStr += '<ul id="SectionThelist">';
+    retStr += '     <ul id="SectionThelist">';
 
     for (var i = 0; i < dirNum; i++) {
         data = seasonSqlRet[i];
