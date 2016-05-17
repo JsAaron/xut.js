@@ -20,7 +20,6 @@ function executeDB(sql, callback, errorCB, tName) {
         if (window.SQLResult[tName]) {
             var data = window.SQLResult[tName],
                 SQLResultSetRowList = {};
-
             SQLResultSetRowList = {
                 length: Object.keys(data).length,
                 item: function(num) {

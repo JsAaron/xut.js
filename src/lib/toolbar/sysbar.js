@@ -3,7 +3,7 @@
  * 系统工具栏
  */
 import { ToolBar } from './base/toolBar'
-import { close as navbarClose} from './navbar'
+import { close as navbarClose ,init as initnavbar} from './navbar'
 
 var sToolbar = ToolBar.extend({
     init: function(options) {
@@ -233,7 +233,7 @@ sToolbar.prototype.homeControl = function() {
  * @return {[type]} [description]
  */
 sToolbar.prototype.navigationBar = function() {
-   initNavBar(Xut.Presentation.GetPageIndex());
+   initnavbar(Xut.Presentation.GetPageIndex());
 }
 
 
