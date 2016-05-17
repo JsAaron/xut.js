@@ -278,9 +278,9 @@ Xut.config = function() {
         }
     }
 
-    var MMXCONFIGPath = './'
+    var MMXCONFIGPath = '.'
     if (MMXCONFIG && MMXCONFIG.path) {
-        MMXCONFIGPath = rtrim(MMXCONFIG.path)
+        MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
     }
 
     //iframe嵌套配置
@@ -725,10 +725,10 @@ Xut.config = function() {
 
 
     /**************************
-    *
-    *   epub新增加
-    * 
-    * *************************/
+     *
+     *   epub新增加
+     * 
+     * *************************/
 
     /**
      * 动态html文件挂载点
