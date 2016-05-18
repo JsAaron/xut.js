@@ -15,17 +15,24 @@ import {
     _get
 }
 from '../../util/stroage'
- 
+
 let defaultFontSize
 let baseValue1
 let baseValue2
 let baseValue3
+let docEl = document.documentElement
+let whiteObject = {
+    "rgb(255, 255, 255)": true,
+    "#ffffff": true,
+    "#FFFFFF": true,
+    "#fff": true,
+    "#FFF": true
 
-let docEl = document.documentElement;
-
+}
 
 function setOption() {
     var proportion = Xut.config.proportion.width;
+
     try {
         defaultFontSize = parseInt(getComputedStyle(docEl).fontSize)
     } catch (er) {
@@ -71,7 +78,6 @@ function createWapper(boxName, textLayer, iscrollName, textContent) {
 function HtmlBox(contentId, element) {
 
     setOption();
-
     this.contentId = contentId;
     this.element = element;
     var self = this;
@@ -95,8 +101,9 @@ function HtmlBox(contentId, element) {
     });
 }
 
-HtmlBox.prototype = {
 
+
+HtmlBox.prototype = {
     /**
      * 调整字体大小
      * @return {[type]} [description]
@@ -105,6 +112,41 @@ HtmlBox.prototype = {
         value = parseInt(value);
         docEl.style.fontSize = value + "px";
         save && _set(this.storageName, value)
+    },
+    /**
+     * 遍历p span文字标签 调整字体颜色
+     * @return {[type]} [description]
+     */
+    adjustColor: function() {
+        this.textLabelArray = ['p', 'span'];
+        var self = this;
+        _.each(self.textLabelArray, function(text) {
+            _.each(self.element.find(text), function(el) {
+                var formerColor = getComputedStyle(el).color;
+                //若字体颜色为白色 调整为黑色
+                if (whiteObject.hasOwnProperty(formerColor)) {
+                    el.hasFormerColor = true;
+                    el.style.color = "black"
+                }
+            })
+        })
+    },
+    /**
+     * 恢复放大过的字体颜色
+     * @return {[type]} [description]
+     */
+    restoreColor: function() {
+        var self = this;
+        _.each(self.textLabelArray, function(text) {
+            _.each(self.element.find(text), function(el) {
+                //将字体由黑色恢复为白色
+                if (el.hasFormerColor) {
+                    el.style.color = "white";
+                    el.hasFormerColor = false;
+                }
+            })
+        });
+
     },
 
     /**
@@ -120,8 +162,9 @@ HtmlBox.prototype = {
     },
 
     init: function(contentId, element) {
-
         var self = this;
+
+        self.adjustColor();
 
         //移除偏移量 存在偏移量造成文字被覆盖
         var textContent = element.find(">").html();
@@ -158,12 +201,15 @@ HtmlBox.prototype = {
             //处理器
         var process = {
                 htmlbox_close_container: function() {
+                    self.restoreColor();
                     self.adjustSize(defaultFontSize)
                     self.removeBox();
                 },
                 htmlbox_close: function() {
+                    self.restoreColor();
                     self.adjustSize(defaultFontSize)
                     self.removeBox();
+
                 },
                 htmlbox_small: function() {
                     change(sizeArray[0]);

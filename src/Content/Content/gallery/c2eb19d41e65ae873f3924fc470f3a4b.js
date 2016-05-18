@@ -1,1 +1,0 @@
-window.HTMLCONFIG['c2eb19d41e65ae873f3924fc470f3a4b']='<div class="_idGenObjectStyleOverride-1-54437">   <p class="小字">原生的大地之母，</p>   <p class="小字">在我们奔波劳累之后，</p>   <p class="小字">依然不变地展开她</p>   <p class="小字">可以供我们依偎的广阔胸怀，</p>   <p class="小字">生命的肇始之处，</p>   <p class="小字">仍是我们的归宿。</p>  </div>'

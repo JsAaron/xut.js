@@ -1,1 +1,0 @@
-window.HTMLCONFIG['9da6719e2343a9e1568789c3bfc26ef3']='<div class="_idGenObjectStyleOverride-1-54391">   <p class="小字">山崩地裂的磅礴气势使人兴叹，</p>   <p class="小字">青山绿水的钟灵毓秀</p>   <p class="小字">也令人感叹造化的神奇。</p>   <p class="小字">奇迹也需要善于发现的双眼，</p>   <p class="小字">而伟大则成就于不断感悟的心灵。</p>  </div>'
