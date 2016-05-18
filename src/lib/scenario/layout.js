@@ -109,18 +109,19 @@ export function nav(seasonSqlRet) {
 
     setOption()
 
-    var dirNum = seasonSqlRet.length,
+    var seasonlist = seasonSqlRet.length,
         retStr,
         liCss,
-        scroller,
+        scroller = '',
         wrapper,
         seasonId,
         chapterId,
         data,
+        overwidth,//溢出总长度
         xxtlink;
 
-        
-    //获得wrapper
+
+    //获得css配置数据
     (function SectionWrapper() {
         var width,
             height,
@@ -131,32 +132,32 @@ export function nav(seasonSqlRet) {
             height = round(navHeight * 0.9);
             width = round(height * sWidth / sHeight); //保持缩略图的宽高比
             blank = round(navHeight * 0.05); //缩略图之间的间距
-            scroller = 'style="width:' + dirNum * (width + blank) + 'px">';
+            scroller = 'width:' + seasonlist * (width + blank) + 'px>';
             liCss = 'float:left;width:' + width + 'px;height:' + height + 'px;margin-left:' + blank + 'px';
             wrapper = 'width:96%;height:' + height + 'px;margin:' + blank + 'px auto;font-size:' + font + 'em';
         } else {
-            scroller = '>';
             width = round(navWidth * 0.9);
             height = round(navWidth * 1.1);
             blank = round(navWidth * 0.05);
             liCss = 'width:' + width + 'px;height:' + height + 'px;margin:' + blank + 'px auto;border-bottom:1px solid rgba(0,0,0,0.3)';
             wrapper = 'height:' + (navHeight - 4) + 'px;overflow:hidden;margin:2px auto;font-size:' + font + 'em';
         }
+        //溢出长度+上偏移量
+        overwidth = (width * seasonlist) + (seasonlist * blank)
     })();
-    
+
 
     retStr = '<div id="SectionWrapper" style="' + wrapper + '">';
-    retStr += '  <div id="Sectionscroller" style="height:100%;" ';
-    retStr += scroller;
+    retStr += '  <div id="Sectionscroller" style="width:'+ overwidth +'px;height:100%;+ ' + scroller + '">';
     retStr += '     <ul id="SectionThelist">';
 
-    for (var i = 0; i < dirNum; i++) {
+    for (var i = 0; i < seasonlist; i++) {
         data = seasonSqlRet[i];
         seasonId = data.seasonId;
         chapterId = data._id;
         xxtlink = seasonId + '-' + chapterId;
         retStr += '<li style="' + liCss + '">';
-        retStr += '<div class="xut-navBar-box" data-xxtlink = "' + xxtlink + '">' + (i + 1) + '</div>';
+        retStr += '    <div class="xut-navBar-box" data-xxtlink = "' + xxtlink + '">' + (i + 1) + '</div>';
         retStr += '</li>';
     }
 

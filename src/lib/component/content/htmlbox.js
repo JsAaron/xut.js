@@ -21,9 +21,11 @@ let baseValue1
 let baseValue2
 let baseValue3
 
+let docEl = document.documentElement;
+
+
 function setOption() {
     var proportion = Xut.config.proportion.width;
-    var docEl = document.documentElement;
     try {
         defaultFontSize = parseInt(getComputedStyle(docEl).fontSize)
     } catch (er) {

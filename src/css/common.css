@@ -294,7 +294,8 @@ video {
 .xut-navBar {
     background-size: 100% 100%;
     position: absolute;
-    display: none;
+    visibility: hidden;
+    /*display: none;*/
     left: 0;
 }
 

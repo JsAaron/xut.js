@@ -7,43 +7,28 @@
  *
  */
 
-import {nav as navlayout} from '../../scenario/layout'
+
+import {createdom} from './dom'
 
 let config
 let _prefix
 let _layoutMode
 let pageIndex = 0
 
-let initializeBusy = false
 let sectionInstance = null
 let directory = 'images/icons/directory.png'
 let directory_act = 'images/icons/directory_act.png'
 let lockAnimation //动画加锁
 
-
+let $navbal
 
 /**
  * 下拉章节列表        
  */
-function SectionList(artControl) {
-    var me = this,
-        pageArray = [];
-
-    Xut.data.query('Chapter', Xut.data.novelId, 'seasonId', function (item) {
-        pageArray.push(item);
-    })
-
-    this.pageArray = pageArray;
-
-    // //显示下拉菜单
-    Xut.nextTick({
-        'container': artControl,
-        'content': navlayout(pageArray)
-    }, function () {
-        me.userIscroll();
-        sectionInstance = me;
-        initialize();
-    });
+function SectionList(pageArray) {
+    this.pageArray = pageArray
+    this.$sectionlist = $('#SectionThelist')
+    this.list = this.$sectionlist.find("li")
 };
 
 
@@ -53,12 +38,9 @@ SectionList.prototype = {
      * 卷滚条
      */
     userIscroll: function () {
-        var me = this,
-            hBox = this.hBox,
-            H = !!(_layoutMode === 'horizontal'),
-            //滑动到指定章节
-            list = this.list = $('#SectionThelist li'),
-            ele = list.eq(pageIndex)[0];
+        var self = this,
+            hBox = self.hBox,
+            H = !!(_layoutMode === 'horizontal')
 
         if (hBox) {
             if (H) {
@@ -76,13 +58,16 @@ SectionList.prototype = {
                 fadeScrollbars: true,
                 stopPropagation: true
             });
+
+            //滑动结束,动态处理缩略图
             hBox.on('scrollEnd', function (e) {
-                me.createThumb();
-                me.removeThumb();
+                self.createThumb();
+                self.removeThumb();
             });
 
-            $('#SectionThelist').on('tap', this.clickElement);
-            this.hBox = hBox;
+            this.$sectionlist.on('tap', self.tojump);
+
+            self.hBox = hBox;
         }
     },
 
@@ -192,21 +177,13 @@ SectionList.prototype = {
     },
 
 
-    touchCallback: function (env) {
-        var absDistX = this.hBox.absDistX;
-        if (!absDistX) {
-            this.hBox.swipe = true;
-            this.clickElement(env);
-        }
-
-    },
-
-    clickElement: function (env) {
-        var target = env.target,
-            xxtlink;
-
-        if (target) {
-            initializeBusy = true;
+    /**
+     * 点击元素跳转
+     */
+    tojump: function (env) {
+        var target
+        var xxtlink
+        if (target = env.target) {
             initialize();
             if (xxtlink = target.getAttribute('data-xxtlink')) {
                 xxtlink = xxtlink.split('-');
@@ -215,21 +192,27 @@ SectionList.prototype = {
         }
     },
 
-    resetList: function () {
-        return initialize();
-    },
 
+    /**
+     * 滚动指定位置
+     */
     scrollTo: function () {
         this.userIscroll();
     },
 
+    /**
+     * 刷新
+     */
     refresh: function () {
         this.hBox && this.hBox.refresh();
     },
 
+    /**
+     * 销毁
+     */
     destroy: function () {
         if (this.hBox) {
-            $('#SectionThelist').off('tap', this.clickElement);
+            $sectionlist.off();
             this.hBox.destroy();
             this.hBox = null;
         }
@@ -237,6 +220,7 @@ SectionList.prototype = {
     }
 
 }
+
 
 /**
  * 初始化
@@ -251,17 +235,36 @@ function initialize() {
     startpocess();
 };
 
+
 /**
  * 控制处理
  */
 function startpocess() {
     //控制按钮
-    var navhandle = $("#backDir"),
-        action = navhandle.attr('fly') || 'in',
-        navControlBar = $("#navBar");
+    var navhandle = $("#backDir")
+    var navControlBar = $("#navBar")
+    //判断点击的动作
+    var action = navhandle.attr('fly') || 'in'
+
+    /**
+     * 初始化目录栏的样式
+     * 能够显示出来
+     */
+    var initStyle = function (callback) {
+        sectionInstance.state = false;
+        if (action == 'in') {
+            sectionInstance.state = true;
+            navControlBar.css({
+                'z-index': 0,
+                'opacity': 0,
+                'visibility': 'visible'
+            });
+        }
+        callback();
+    }
 
     //初始化样式
-    initStyle(navControlBar, action, function () {
+    initStyle(function () {
         //触发控制条
         navControl(action, navhandle);
         //执行动画
@@ -271,55 +274,103 @@ function startpocess() {
 
 
 /**
- * 初始化样式
+ * 控制按钮改变
  */
-function initStyle(navControlBar, action, fn) {
-    console.log(navControlBar)
-    sectionInstance.state = false;
-    if (action == 'in') {
-        sectionInstance.state = true;
-        navControlBar.css({
-            'z-index': 0,
-            'opacity': 0,
-            'visibility': 'visible'
-        });
-    }
-    fn && fn();
-}
-
-//执行动画
-function toAnimation(navControlBar, navhandle, action) {
-    var end = function () {
-        navControlBar.css(_prefix('transition'), '');
-        Xut.View.HideBusy();
-        lockAnimation = false;
-    };
-
-    if (action == 'in') {
-        sectionInstance.refresh();
-        sectionInstance.scrollTo();
-        navControlBar.animate({
-            'z-index': Xut.zIndexlevel(),
-            'opacity': 1
-        }, 'fast', 'linear', function () {
-            navhandle.attr('fly', 'out');
-            end();
-        });
-    } else {
-        navhandle.attr('fly', 'in');
-        navControlBar.hide();
-        end();
-    }
-}
-
-
-//控制按钮改变
 function navControl(action, navhandle) {
     navhandle.css('opacity', action === "in" ? 0.5 : 1);
 }
 
 
+/**
+ * 执行动画
+ */
+function toAnimation(navControlBar, navhandle, action) {
 
+    var complete = function () {
+        navControlBar.css(_prefix('transition'), '');
+        Xut.View.HideBusy();
+        lockAnimation = false;
+    };
+    //出现
+    if (action == 'in') {
+        //导航需要重置
+        //不同的页面定位不一定
+        //sectionInstance.refresh();
+        //sectionInstance.scrollTo();
+        //动画出现
+        navControlBar.animate({
+            'z-index': Xut.zIndexlevel(),
+            'opacity': 1
+        }, 'fast', 'linear', function () {
+            navhandle.attr('fly', 'out');
+            complete();
+        });
+    } else {
+        //隐藏
+        navhandle.attr('fly', 'in');
+        navControlBar.css({
+            'visibility': 'hidden'
+        })
+        complete();
+    }
+}
+
+
+
+
+/**
+ * 预先缓存加载
+ * @return {[type]} [description]
+ */
+function load() {
+    $navbal = $("#navBar")
+    //创建dom
+    //返回页面数据
+    createdom($navbal, function (pageArray) {
+        //目录对象
+        sectionInstance = new SectionList(pageArray)
+        //初始化滑动
+        sectionInstance.userIscroll();
+        //初始化样式
+        initialize()
+    })
+
+};
+
+
+/**
+ * 配置
+ */
+function initconf(index) {
+    config = Xut.config
+    _prefix = Xut.plat.prefixStyle
+    _layoutMode = config.layoutMode
+    pageIndex = index;
+}
+
+
+/**
+ * 打开目录
+ */
+function oepn(index) {
+    initconf(index)
+    if (sectionInstance) {
+        initialize();
+    } else {
+        load();
+    }
+}
+
+
+/**
+ * 关闭
+ */
+function close(callback) {
+    if (sectionInstance && sectionInstance.state) {
+        callback && callback();
+        initialize();
+    }
+}
 
 
 /**
@@ -333,39 +384,6 @@ function destroy() {
     }
 };
 
-
-/**
- * 预先缓存加载
- * @return {[type]} [description]
- */
-function load() {
-    new SectionList($("#navBar"));
-};
-
-
-//关闭
-function close(callback) {
-    if (sectionInstance && sectionInstance.state) {
-        callback && callback();
-        initialize();
-    }
-}
-
-
-/**
- * 打开目录
- */
-function oepn(index) {
-    config = Xut.config
-    _prefix = Xut.plat.prefixStyle
-    _layoutMode = config.layoutMode
-    pageIndex = index;
-    if (sectionInstance) {
-        initialize();
-    } else {
-        load();
-    }
-}
 
 
 export {
