@@ -1,5 +1,9 @@
-// v782   2016.4.20 修正injectScript ppt中eval=fuction
-// 
+﻿// v782   2016.4.20 修正injectScript ppt中eval=fuction
+// v782   2016.5.15 增加压缩css的测试
+// v783   2016.5.16 基于es6的全新代码
+// v784   daiceshi
+// v785   修正妙妙学手机版地址
+// v786   2016.5.28 mac编码客户端有问题，换win打包
 
 
 ////////////////
