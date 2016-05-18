@@ -117,7 +117,8 @@ export function nav(seasonSqlRet) {
         seasonId,
         chapterId,
         data,
-        overwidth,//溢出总长度
+        overwidth,//溢出宽度
+        overHeigth,//溢出高度
         xxtlink;
 
 
@@ -127,7 +128,7 @@ export function nav(seasonSqlRet) {
             height,
             blank,
             font = round(proportion * 2);
-            
+
         if (config.layoutMode == 'horizontal') {
             height = round(navHeight * 0.9);
             width = round(height * sWidth / sHeight); //保持缩略图的宽高比
@@ -135,20 +136,24 @@ export function nav(seasonSqlRet) {
             scroller = 'width:' + seasonlist * (width + blank) + 'px>';
             liCss = 'float:left;width:' + width + 'px;height:' + height + 'px;margin-left:' + blank + 'px';
             wrapper = 'width:96%;height:' + height + 'px;margin:' + blank + 'px auto;font-size:' + font + 'em';
+            //横版左右滑动
+            //溢出长度+上偏移量
+            overwidth = (width * seasonlist) + (seasonlist * blank)
         } else {
             width = round(navWidth * 0.9);
             height = round(navWidth * 1.1);
             blank = round(navWidth * 0.05);
             liCss = 'width:' + width + 'px;height:' + height + 'px;margin:' + blank + 'px auto;border-bottom:1px solid rgba(0,0,0,0.3)';
             wrapper = 'height:' + (navHeight - 4) + 'px;overflow:hidden;margin:2px auto;font-size:' + font + 'em';
+            //竖版上下滑动
+            overHeigth = (height * seasonlist) + (seasonlist * blank)
         }
-        //溢出长度+上偏移量
-        overwidth = (width * seasonlist) + (seasonlist * blank)
+
     })();
 
 
     retStr = '<div id="SectionWrapper" style="' + wrapper + '">';
-    retStr += '  <div id="Sectionscroller" style="width:'+ overwidth +'px;height:100%;+ ' + scroller + '">';
+    retStr += '  <div id="Sectionscroller" style="width:'+ overwidth +'px;height:'+ overHeigth +'px;+ ' + scroller + '">';
     retStr += '     <ul id="SectionThelist">';
 
     for (var i = 0; i < seasonlist; i++) {

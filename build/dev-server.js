@@ -159,7 +159,7 @@ if (config.test.launch) {
 
         console.log(
             '\n' +
-            '  file change,debug mode:\n' 
+            ' watch file change, start debug mode:\n' 
         )
 
         var child = child_process.spawn('node', ['build/dev-build.js', ['debug=' + config.test.dist]]);

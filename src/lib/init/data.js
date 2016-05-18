@@ -37,7 +37,7 @@ function initMain(novelData) {
     if (Xut.IBooks.Enabled) {
         //删除背景图
         $("#removelayer").remove();
-        LoadScene({
+        loadScene({
             "pageIndex": Xut.IBooks.CONFIG.pageIndex
         });
         return

@@ -7,8 +7,10 @@ module.exports = {
     //这里填入目标地址
     //e.g:d:/xxxx
     test: {
-        launch: false,
-        dist: '/Users/mac/project/xcode/www/build'
+        launch: true,
+        //D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
+        ///Users/mac/project/xcode/www/build
+        dist: 'D:/svn/magazine-develop/assets/www/epub/epub/dir/assets/www/lib'
     },
     build: {
         index: path.resolve(__dirname, 'temp/index.html'),
@@ -16,8 +18,10 @@ module.exports = {
         assetsPublicPath: '/',
         productionSourceMap: true,
         src: './src/',
+        entry: './src/lib/app.js',
+        //源码生成位置
         dist: './dist/',
-        entry: './src/lib/app.js'
+        test: './src/test/'
     },
     dev: {
         port: 8888,

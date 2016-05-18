@@ -20,35 +20,20 @@ var ora = require('ora')
 
 var config = require('../config')
 
-//output
-var output = config.build.dist
-
-//打包文件
-var rollupjs = output + 'rollup.js'
-
-
 //发布路径
 //dist 对外使用
 //test 对内测试
 var buildPath = {
+    rollup: config.build.dist + 'rollup.js',
     devName: 'xxtppt.dev.js',
     distName: 'xxtppt.js',
     dist: config.build.dist,
-    test: config.build.src + "build/",
+    test: config.build.test
 }
 
-//delete this existing files
-var delAssets = function(path) {
-    var dev = path + buildPath.devName
-    var dist = path + buildPath.distName;
-    [dev, dist].forEach(function(file) {
-        if (fs.existsSync(file)) {
-            fs.unlinkSync(file)
-        }
-    })
-}
-delAssets(buildPath.dist)
-delAssets(buildPath.test)
+//清空目录
+fsextra.emptyDirSync(buildPath.dist)
+fsextra.emptyDirSync(buildPath.test)
 
 
 var getSize = function(code) {
@@ -73,14 +58,13 @@ var write = function(path, code) {
 
 
 console.log(
-    'js  => rollup + gulp\n' +
-    'css => gulp\n'
+    '压缩js  => rollup and gulp\n' +
+    '压缩css => gulp-uglify\n'
 )
 
 
 var spinner = ora('Begin to pack , Please wait for\n')
 spinner.start()
-
 
 
 new Promise(function(resolve, reject) {
@@ -93,16 +77,19 @@ new Promise(function(resolve, reject) {
                 ]
             })
             .then(function(bundle) {
-                if (!fs.existsSync(output)) {
-                    fs.mkdirSync(output);
-                    console.log(output + '目录创建成功');
+
+                //创建目录,如果不存在
+                if (!fs.existsSync(buildPath.dist)) {
+                    fs.mkdirSync(buildPath.dist);
+                    console.log(buildPath.dist + '目录创建成功');
                 }
+
                 var code = bundle.generate({
                     format: 'umd',
                     moduleName: 'Aaron'
                 }).code
 
-                return write(rollupjs, code)
+                return write(buildPath.rollup, code)
             })
             .then(resolve)
             .catch(function() {
@@ -122,7 +109,8 @@ new Promise(function(resolve, reject) {
                     val = val.match(/src="(.*?.js)/);
                     if (val && val.length) {
                         path = val[1]
-                            //有效src
+
+                        //有效src
                         if (/^lib/.test(path)) {
                             paths.push(config.build.src + path)
                         }
@@ -130,23 +118,24 @@ new Promise(function(resolve, reject) {
                 })
 
                 //合成xxtppt.js
-                paths.push(rollupjs)
+                paths.push(buildPath.rollup)
                 gulp.src(paths)
                     .pipe(concat(buildPath.devName))
                     .on('error', function(err) {
                         console.log('Less Error!', err.message);
                         this.end();
                     })
+                    //dev
                     .pipe(gulp.dest(buildPath.dist))
                     .pipe(gulp.dest(buildPath.test))
-
-                .pipe(uglify())
+                    //min
+                    .pipe(uglify())
                     .pipe(rename(buildPath.distName))
-                    .pipe(gulp.dest(output))
+                    .pipe(gulp.dest(buildPath.dist))
                     .pipe(gulp.dest(buildPath.dist))
                     .pipe(gulp.dest(buildPath.test))
                     .on('end', function() {
-                        fs.unlinkSync(rollupjs)
+                        fs.unlinkSync(buildPath.rollup)
                         resolve && resolve()
                     })
 
@@ -201,7 +190,6 @@ new Promise(function(resolve, reject) {
             complete()
         });
     })
-
 
 
 

@@ -295,8 +295,8 @@ function toAnimation(navControlBar, navhandle, action) {
     if (action == 'in') {
         //导航需要重置
         //不同的页面定位不一定
-        //sectionInstance.refresh();
-        //sectionInstance.scrollTo();
+        sectionInstance.refresh();
+        sectionInstance.scrollTo();
         //动画出现
         navControlBar.animate({
             'z-index': Xut.zIndexlevel(),
@@ -331,6 +331,8 @@ function load() {
         sectionInstance = new SectionList(pageArray)
         //初始化滑动
         sectionInstance.userIscroll();
+        //初始缩略图
+        sectionInstance.createThumb()
         //初始化样式
         initialize()
     })

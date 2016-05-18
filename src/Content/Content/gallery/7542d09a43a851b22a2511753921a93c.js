@@ -1,0 +1,1 @@
+window.HTMLCONFIG['7542d09a43a851b22a2511753921a93c']='<div class="_idGenObjectStyleOverride-1-55017">   <p class="小字">从南极到北极，</p>   <p class="小字">从东半球到西半球，</p>   <p class="小字">从日出到日落，</p>   <p class="小字">从新生代的造山运动</p>   <p class="小字">到略显“安分”的今天，</p>   <p class="小字">自然在动静之间积聚的魅力</p>   <p class="小字">是我们永远阅读不完的华美书卷。</p>  </div>'
