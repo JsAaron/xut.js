@@ -1,5 +1,4 @@
 var path = require('path')
-var test
 
 //   cd Users/project/svn/magazine-develop/assets/www
 module.exports = {
