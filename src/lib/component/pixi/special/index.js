@@ -7,11 +7,18 @@
 
 import {
     Factory
-} from '../factory'
+} from '../core/factory'
 import {
     parseJSON
 }
 from '../../../util/index'
+import {
+    addRenderer,
+    stopRenderer,
+    destroyRenderer
+}
+from '../core/index'
+
 /**
  * 创建高级精灵动画
  * @param  {[type]} data          [description]
@@ -20,6 +27,7 @@ from '../../../util/index'
  * @return {[type]}               [description]
  */
 function spiritAni(data, path) {
+
     this.imagesArray = new Array();
     this.maskArray = new Array();
     //默认png格式资源
@@ -65,14 +73,12 @@ spiritAni.prototype.parseSpiritImages = function(data, path) {
  * @param  {[type]} canvasRelated [description]
  * @return {[type]}               [description]
  */
-spiritAni.prototype.init = function(canvasRelated) {
+spiritAni.prototype.init = function() {
     //初始化位置信息
     this.initPosition();
 
     //精灵场景容器
-    var stage = new PIXI.Container();
-    //加入容器
-    canvasRelated.addChild(stage);
+    this.stage = new PIXI.Container();
 
     this.texture = new Array();
     this.maskTexture = new Array();
@@ -87,7 +93,7 @@ spiritAni.prototype.init = function(canvasRelated) {
         this.maskSprite.position.y = this.startPoint.y;
         this.maskSprite.width = this.spiritWidth;
         this.maskSprite.height = this.spiritHeight;
-        stage.addChild(this.maskSprite);
+        this.stage.addChild(this.maskSprite);
     }
 
 
@@ -101,9 +107,7 @@ spiritAni.prototype.init = function(canvasRelated) {
     this.advSprite.position.y = this.startPoint.y;
     this.advSprite.width = this.spiritWidth;
     this.advSprite.height = this.spiritHeight;
-    stage.addChild(this.advSprite);
-
-    this.stage = stage;
+    this.stage.addChild(this.advSprite);
 };
 
 
@@ -170,7 +174,6 @@ spiritAni.prototype.countNewFrame = function() {
     }
 };
 
-
 function getSpiritAni(inputPara, data) {
     var path = data.resourcePath;
     if (typeof inputPara == "object") {
@@ -206,17 +209,19 @@ var specialSprite = Factory.extend({
      * @param  {[type]} canvasRelated [description]
      * @return {[type]}               [description]
      */
-    constructor: function(successCallback, failCallback, data, canvasRelated) {
+    constructor: function(successCallback, failCallback, options) {
+
         var self = this;
-        this.data = data;
-        this.canvasRelated = canvasRelated;
+
+        this.data = options.data;
+        this.renderer = options.renderer
+        this.pageIndex = options.pageIndex
+
         //id标示
         //可以用来过滤失败的pixi对象
-        this.contentId = data._id;
-
+        this.contentId = this.data._id;
 
         this.option = getResources(this.data);
-        this.canvasRelated = canvasRelated;
 
         var spiritList = this.option.spiritList;
 
@@ -228,7 +233,6 @@ var specialSprite = Factory.extend({
             for (var k = 0; k < actLists.length; k++) {
                 this.sprObjs.push(getSpiritAni(paramObj[actLists[k]], this.data));
             }
-
         }
 
         //运行状态
@@ -237,7 +241,7 @@ var specialSprite = Factory.extend({
 
         //初始化子对象
         this.sprObjs.forEach(function(obj) {
-            obj.init(canvasRelated);
+            obj.init();
         })
 
         successCallback(this.contentId);
@@ -249,43 +253,38 @@ var specialSprite = Factory.extend({
      * @return {[type]} [description]
      */
     play: function() {
-        //绘制页面
-        var sprObjs = this.sprObjs;
-        var self = this;
-        this.uuid = this.canvasRelated.play('sprite', function() {
-            sprObjs.forEach(function(obj, index) {
-                self.timer = setTimeout(function() {
+        var self = this
+        var renderer = self.renderer
+        this.uuid = addRenderer(this.pageIndex, function() {
+            _.each(self.sprObjs, function(obj) {
+                renderer.render(obj.stage);
+                obj.timer = setTimeout(function() {
                     obj.runAnimate();
                 }, 1000 / (obj.FPS || 10))
             })
         })
-
     },
-
+ 
     /**
      * 停止动画
      * @return {[type]} [description]
      */
     stop: function() {
-        this.canvasRelated.stop(this.uuid)
+        stopRenderer(this.pageIndex, this.uuid)
     },
-
 
     /**
      * 销毁动画
      * @return {[type]} [description]
      */
     destroy: function() {
+        destroyRenderer(this.pageIndex, this.uuid)
+        
         //销毁添加到画布上的containers
-        var addedContainers = this.canvasRelated.containerStage.children;
-        for (var i = 0; i < addedContainers.length; i++) {
-            var temp = addedContainers[i];
-            temp.destroy(true);
-        }
-        this.canvasRelated.destroy();
+        // _.each(this.sprObjs, function(obj) {
+        //     obj.stage.destroy(true)
+        // })
     }
-
-
 })
 
 

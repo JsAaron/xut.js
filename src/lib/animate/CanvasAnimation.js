@@ -3661,29 +3661,6 @@ CanvasAnimation.prototype = {
 		}
 
 
-		var callSpiritWidget = function() {
-			var pageObj = Xut.Presentation.GetPageObj(parameter.pageIndex, parameter.pageType)
-			if (pageObj) {
-				//启动了canvas模式
-				if (pageObj.canvasRelated.enable) {
-					var components, domId;
-					if ((components = pageObj.baseGetComponent())) {
-						components.length && components.forEach(function(componentObj) {
-							domId = object.attr('id');
-							if (domId == componentObj.getIdName()) {
-								componentObj.play();
-							}
-						})
-					}
-					return;
-				}
-			}
-            if(window.spiritWidget){
-                spiritWidget.updateAction(object.attr("id"), params);
-            }
-		}
-
-
 		//ppt动画扩展处理
 		if (parameter.pptanimation && parameter.pptanimation.pptapi) {
 			var params = parameter.pptanimation.parameters ? parameter.pptanimation.parameters : {};
@@ -3692,7 +3669,9 @@ CanvasAnimation.prototype = {
 					bonesWidget.updateAction(object.attr("id"), params.actList);
 					break;
 				case "spiritWidget":
-					callSpiritWidget();
+					if (window.spiritWidget) {
+						spiritWidget.updateAction(object.attr("id"), params);
+					}
 					break;
 			}
 		}

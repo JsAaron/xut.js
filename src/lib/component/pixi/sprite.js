@@ -8,7 +8,7 @@
 import {
     Factory
 }
-from './factory'
+from './core/factory'
 
 /**
  * 精灵动画

@@ -7,19 +7,19 @@
  *                2. MasterMgr 模块
  *                                                                    *
  **********************************************************************/
-import {_set} from '../util/stroage'
+import { _set } from '../util/stroage'
 //页面管理
-import {PageMgr} from './page'
-import {MasterMgr} from './master'
+import { PageMgr } from './page'
+import { MasterMgr } from './master'
 
 //错误的数据库表
-import {errorTable} from '../data/index'
+import { errorTable } from '../data/index'
 //数据解析
-import {query} from './parser'
+import { query } from './parser'
 //页面切换
-import {SwitchPage} from './switch'
+import { SwitchPage } from './switch'
 //Navbar
-import {close as _close} from '../toolbar/navbar/index'
+import { close as _close } from '../toolbar/navbar/index'
 
 
 

@@ -11,7 +11,6 @@
 
 import { loader } from './loader'
 import { createData } from './data'
-// import { spiritSenior } from '../../pixi/spiritesenior/manage'
 
 /**
  * 解析数据,获取content对象

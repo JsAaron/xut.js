@@ -81,7 +81,7 @@ export function dataExternal(baseProto) {
 					} else {
 						context.visible = true;
 						console.log('show')
-						base.canvasRelated.oneRender()
+						
 					}
 				},
 				'Hide': function() {
@@ -93,7 +93,6 @@ export function dataExternal(baseProto) {
 					} else {
 						console.log('hide')
 						context.visible = false;
-						base.canvasRelated.oneRender()
 					}
 				},
 				'StopAnim': function() {

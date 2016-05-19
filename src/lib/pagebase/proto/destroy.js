@@ -1,7 +1,9 @@
-
-import { destroy as _destroy } from '../depend/multievent'
+import {
+	destroy as _destroy
+} from '../depend/multievent'
 
 export function destroy(baseProto) {
+
 	//销毁页面对象
 	baseProto.baseDestroy = function() {
 
@@ -27,7 +29,8 @@ export function destroy(baseProto) {
 
 		//浮动对象
 		var floatMaterContents = this.floatContents.Master
-			//是否有浮动对象
+
+		//是否有浮动对象
 		var hasFloatMater = !_.isEmpty(floatMaterContents);
 
 		//清理content类型对象
@@ -63,11 +66,6 @@ export function destroy(baseProto) {
 
 		//多事件销毁
 		_destroy(this);
-
-		//销毁canvas相关
-		if (this.canvasRelated && this.canvasRelated.destroy) {
-			this.canvasRelated.destroy();
-		}
 
 		//伪li节点
 		if (this.pseudoElement) {

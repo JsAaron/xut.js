@@ -9,8 +9,6 @@
 
 import { parseJSON, reviseSize, readFile } from '../../../../util/index'
 
-import { Container as pixiContainer } from '../../../../component/pixi/Container'
-
 import { parseCanvas } from './parsetype'
 import { createContainer } from './container'
 import { createDom } from './dom'
@@ -241,10 +239,11 @@ export function structure(callback, data, context) {
     if (data.canvasRelated.onlyCompSprite) {
         data.canvasRelated.enable = true
     }
+
     //创建canvas画布 
-    if (data.canvasRelated.enable) {
-        pixiContainer(data, data.canvasRelated.containerIndex)
-    }
+    // if (data.canvasRelated.enable) {
+    //     pixiContainer(data, data.canvasRelated.containerIndex)
+    // }
 
 
     ////////////////
@@ -257,6 +256,7 @@ export function structure(callback, data, context) {
         //根据数据创content结构
         if (content = contentCollection[contentCount]) {
             contentId = content['_id'];
+            
             //创建包装器,处理数据引用关系
             wrapObj = makeWarpObj(contentId, content, pageType, pid, virtualOffset);
             idFix.push(wrapObj.containerName)

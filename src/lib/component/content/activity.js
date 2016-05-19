@@ -15,7 +15,6 @@
 
 //卷滚
 import { Iscroll } from './iscroll'
-
 //事件
 import {
     conversionEventType,
@@ -26,7 +25,7 @@ from './event'
 //混入content
 import { Mix } from './mix'
 //content自对象
-import { Child } from './child'
+import { Content } from './content'
 //搜索
 import { SearchBar } from './searchbar'
 //书签
@@ -45,7 +44,7 @@ import { createNextTask } from './nexttask'
  * @return {[type]}      [description]
  */
 function activityClass(data) {
-
+ 
     var self = this;
 
     _.extend(this, data);
@@ -76,7 +75,7 @@ function activityClass(data) {
      * 2 视觉差作用域
      * @type {Array}
      */
-    this.abstractContents = Child(this);
+    this.abstractContents = Content(this);
 
     /**
      * 处理html文本框
@@ -327,7 +326,6 @@ activitProto.runEffects = function (outComplete, evenyClick) {
                 if (scope.canvasMode) {
                     //直接改变元素状态
                     scope.$contentProcess.visible = scope.isRreRun === 'visible' ? true : false;
-                    self.canvasRelated.oneRender();
                 } else {
                     //因为执行的顺序问题，动画与页面零件
                     //isscroll标记控制
@@ -406,13 +404,6 @@ activitProto.resetAloneAnim = function () {
     accessDrop(this.eventData, function (drop) {
         drop.reset();
     })
-    //如果是运行canvas模式
-    //停止绘制
-    if (this.canvasRelated.stopRender) {
-        setTimeout(function () {
-            this.canvasRelated.stopRender();
-        }.bind(this), 0)
-    }
 }
 
 
@@ -712,19 +703,7 @@ activitProto.bindEventBehavior = function (callback) {
                     startRunAnim();
                 }, 500)
             } else {
-                //canvas反弹
-                var sx = eventContext.scale.x;
-                var px = eventContext.position.x;
-
-                eventContext.scale.x += 0.1;
-                eventContext.position.x -= Math.round(px * 0.05);
-                self.canvasRelated.oneRender();
-
-                setTimeout(function () {
-                    eventContext.scale.x = sx;
-                    eventContext.position.x = px;
-                    self.canvasRelated.oneRender();
-                }, 200);
+                console.log('feedbackBehavior')
             }
         } else {
             startRunAnim();
@@ -877,12 +856,7 @@ activitProto._repeatBind = function (id, context, isRreRun, scope, collectorHook
                 // console.log(id,scope)
                 //直接改变元素状态
                 // context.visible = isRreRun === 'visible' ? true : false;
-                this.nextTask.pre[id] = function () {
-                    this.nextTask.pre.push(function pre(context) {
-                        console.log('预执行', isRreRun)
-                        //this.canvasRelated.oneRender();
-                    })
-                }
+                console.log('isRreRun')
             }
         } else {
             //dom模式
@@ -1110,6 +1084,7 @@ activitProto.destroy = function (elementCallback) {
 
     //销毁动画
     this.destroyEffects(elementCallback);
+
 
     //iscroll销毁
     if (this.iscroll) {

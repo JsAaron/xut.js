@@ -4,7 +4,9 @@
  */
 
 
-import {Bind} from '../pagebase/task/dispenser/bind'
+import {
+    Bind
+} from '../pagebase/task/dispenser/bind'
 
 
 //content任务超时Id
@@ -17,35 +19,36 @@ var contentTaskOutId, markComplete;
  */
 function runContent(contentObjs, taskAnimCallback) {
 
-        var contentTaskOutId = setTimeout(function() {
+    var contentTaskOutId = setTimeout(function() {
 
-            clearTimeout(contentTaskOutId);
+        clearTimeout(contentTaskOutId);
 
-            //完成通知
-            var markComplete = function() {
-                var completeStatistics = contentObjs.length; //动画完成统计
-                return function() {
-                    if (completeStatistics === 1) {
-                        taskAnimCallback && taskAnimCallback();
-                        markComplete = null;
-                    }
-                    completeStatistics--;
+        //完成通知
+        var markComplete = function() {
+            var completeStatistics = contentObjs.length; //动画完成统计
+            return function() {
+                if (completeStatistics === 1) {
+                    taskAnimCallback && taskAnimCallback();
+                    markComplete = null;
                 }
-            }();
+                completeStatistics--;
+            }
+        }();
 
-            _.each(contentObjs, function(obj, index) {
-                if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
-                    obj.autoPlay(markComplete)
-                } else {
-                    markComplete();
-                }
-            });
-        }, 500);
-    }
-    /**
-     * 运行自动的静态类型
-     * @return {[type]} [description]
-     */
+        _.each(contentObjs, function(obj, index) {
+            if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+                obj.autoPlay(markComplete)
+            } else {
+                markComplete();
+            }
+        });
+    }, 500);
+}
+
+/**
+ * 运行自动的静态类型
+ * @return {[type]} [description]
+ */
 function runComponent(pageObj, pageIndex, autoRunComponents, pageType) {
 
     var chapterId = pageObj.baseGetPageId(pageIndex);

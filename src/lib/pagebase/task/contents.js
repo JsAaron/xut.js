@@ -408,24 +408,12 @@ taskProto.eventAfterCheck = function (data, delayHooks) {
         var complete = function (data) {
             return function () {
                 if (data.count === 1) {
-                    /**
-                     * 2016.2.16
-                     * 绘制canvas节点
-                     * @return {[type]}                           
-                     */
-                    if (data.canvasRelated.enable && data.canvasRelated.cid.length) {
-                        //初始化绘制canvas 
-                        //页面显示
-                        data.canvasRelated.display();
-                        nextTask();
-                    } else {
-                        nextTask()
-                    }
+                    nextTask()
                     return
                 }
                 data.count--;
             }
-        } (data);
+        } (data); 
 
 
         //浮动页面对
@@ -501,13 +489,13 @@ function autoUUID() {
  */
 function contentsBehavior(callback, data, contentDas) {
     var compiler,
-        element = data.element,
-        eventRelated = data.eventRelated, //合集事件
-        pid = data.pid,
-        createActivitys = data.createActivitys,
+        element          = data.element,
+        eventRelated     = data.eventRelated, //合集事件
+        pid              = data.pid,
+        createActivitys  = data.createActivitys,
         feedbackBehavior = data.feedbackBehavior, //反馈数据,跟事件相关
-        pageBaseHooks = data.pageBaseHooks,
-        pageId = data.chapterId;
+        pageBaseHooks    = data.pageBaseHooks,
+        pageId           = data.chapterId;
 
 
     //如果有浮动对象,才需要计算偏移量
@@ -537,20 +525,20 @@ function contentsBehavior(callback, data, contentDas) {
 
     //相关数据
     var relatedData = {
-        'floatMaters': data.floatMaters,
-        'seasonId': data.chpaterData.seasonId,
-        'pageId': pageId,
-        'contentDas': contentDas, //所有的content数据合集
-        'container': data.liRootNode,
-        'seasonRelated': data.seasonRelated,
-        'containerPrefix': data.containerPrefix,
-        'nodes': data.nodes,
-        'pageOffset': data.pageOffset,
-        'createContentIds': data.createContentIds,
-        'partContentRelated': data.partContentRelated,
-        'transformOffset': transformOffset,
-        'contentsFragment': data.contentsFragment,
-        'contentHtmlBoxIds': data.contentHtmlBoxIds
+        'floatMaters'        : data.floatMaters,
+        'seasonId'           : data.chpaterData.seasonId,
+        'pageId'             : pageId,
+        'contentDas'         : contentDas, //所有的content数据合集
+        'container'          : data.liRootNode,
+        'seasonRelated'      : data.seasonRelated,
+        'containerPrefix'    : data.containerPrefix,
+        'nodes'              : data.nodes,
+        'pageOffset'         : data.pageOffset,
+        'createContentIds'   : data.createContentIds,
+        'partContentRelated' : data.partContentRelated,
+        'transformOffset'    : transformOffset,
+        'contentsFragment'   : data.contentsFragment,
+        'contentHtmlBoxIds'  : data.contentHtmlBoxIds
     }
 
 
@@ -643,20 +631,20 @@ function contentsBehavior(callback, data, contentDas) {
         //注册引用
         pageBaseHooks.registerAbstractActivity(
             new activityClass({
-                'monitorComplete': monitor.complete, //监听完成
-                'pageIndex': data.pageIndex,
-                'canvasRelated': data.canvasRelated, //父类引用
-                'id': imageId || autoUUID(),
-                "type": 'Content',
-                'pageId': pageId,
-                'activityId': activity._id,
-                'rootNode': element,
-                'pageType': compiler['pageType'], //构建类型 page/master
-                'seed': compiler['seed'], //动画表数据 or 视觉差表数据
-                "pid": pid, //页码
-                'eventData': eventData, //事件数据
-                'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
-                'relatedCallback': relatedCallback //相关回调
+                'monitorComplete' : monitor.complete, //监听完成
+                'pageIndex'       : data.pageIndex,
+                'canvasRelated'   : data.canvasRelated, //父类引用
+                'id'              : imageId || autoUUID(),
+                "type"            : 'Content',
+                'pageId'          : pageId,
+                'activityId'      : activity._id,
+                'rootNode'        : element,
+                'pageType'        : compiler['pageType'], //构建类型 page/master
+                'seed'            : compiler['seed'], //动画表数据 or 视觉差表数据
+                "pid"             : pid, //页码
+                'eventData'       : eventData, //事件数据
+                'relatedData'     : relatedData, //相关数据,所有子作用域Activity对象共享
+                'relatedCallback' : relatedCallback //相关回调
             })
         );
     }

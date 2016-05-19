@@ -18,7 +18,7 @@ import { specialSprite as pixiSpecial } from '../pixi/special/index'
 //依赖
 import { Dep } from './dep'
 
-
+ 
 /**
  * 销毁动画音频
  * @param  {[type]} videoIds  [description]
@@ -61,8 +61,6 @@ function bind(instance, success, fail) {
 var Animation = function(options) {
     //mix参数
     _.extend(this, options);
-
-
 }
 
 var animProto = Animation.prototype;
@@ -83,7 +81,6 @@ var animProto = Animation.prototype;
  */
 animProto.init = function(id, context, rootNode, chapterId, parameter, pageType) {
 
-    var canvasRelated = this.canvasRelated;
     var pageIndex = this.pageIndex;
     var self = this;
     var actionTypes;
@@ -111,17 +108,22 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         //可能是组合动画
         actionTypes = this.contentDas.actionTypes
 
+        var nextdata = {
+            data: this.contentDas,
+            renderer: this.$contentProcess,
+            pageIndex: this.pageIndex
+        }
 
         //精灵动画
         if (actionTypes.spiritId) {
             //加入任务队列
             this.nextTask.context.add(id)
-            this.pixiSpriteObj = new pixiSpirit(this.contentDas, canvasRelated);
+            this.pixiObj = new pixiSpirit(this.contentDas);
             //ppt动画
             if (actionTypes.pptId) {
                 //构建精灵动画完毕后
                 //构建ppt对象
-                this.pixiSpriteObj.$once('load', function() {
+                this.pixiObj.$once('load', function() {
                     //content=>MovieClip
                     self.pptObj = create(CanvasAnimation, this.movie);
                     //任务完成
@@ -129,48 +131,18 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
                 })
             }
         }
-        
-        
-        //特殊高级动画
-        if(actionTypes.compSpriteId){    
-            //加入任务队列
-            this.nextTask.context.add(id)
-            this.pixiSpriteObj = new pixiSpecial(this.contentDas, canvasRelated);
-            //ppt动画
 
-            setTimeout(function(){
-                self.nextTask.context.remove(id)
-            },100)
-                //构建精灵动画完毕后
-                //构建ppt对象
-                // this.pixiSpriteObj.$once('load', function() {
-                //     //content=>MovieClip
-                //     self.pptObj = create(CanvasAnimation, this.movie);
-                //     //任务完成
-                //     self.nextTask.context.remove(id)
-                // })
+        //特殊高级动画
+        //必须是ppt与pixi绑定的
+        if(actionTypes.compSpriteId){    
+            this.pixiObj = new pixiSpecial(nextdata);
+            //ppt动画
+            if (actionTypes.pptId) {
+                console.log('compSpriteIdppt动画')
+                self.pptObj = create(CanvasAnimation);
+            }
+        }    
            
-            
-        }
-        
-        
-        //高级精灵动画
-        //content需要依赖高级动画pixi创建
-        //因为精灵动画是widget创建类型
-        //所以代码需要延后，等待高级content先创建
-        if (actionTypes.widgetId) {
-            this.linker = function() {
-                return function pptwidget(context) {
-                    self.linker = null;
-                    self.pptObj = create(CanvasAnimation, context.sprObjs[0].advSprite);
-                    self.linker.dep.notify(self.pptObj)
-                }
-            }();
-            // 收集依赖
-            this.linker.dep = new Dep()
-        }
-             
-        
     }
 
 };
@@ -187,8 +159,10 @@ animProto.run = function(scopeComplete) {
     var self = this,
         defaultIndex,
         element = this.$contentProcess;
-
-    var succeed = function(animObj) {
+ 
+    //ppt动画
+    //dom与canvas
+    bind(this.pptObj, function(ppt) {
         //优化处理,只针对互斥的情况下
         //处理层级关系
         if (element.prop && element.prop("mutex")) {
@@ -197,25 +171,12 @@ animProto.run = function(scopeComplete) {
             })
         }
         //指定动画
-        animObj.runAnimation(scopeComplete);
-    }
+        ppt.runAnimation(scopeComplete);
+    })
 
-    //失败增加依赖触发
-    var fail = function() {
-        if(self.linker){
-            self.linker.dep.addSub(succeed)
-        }
-    }
-
-    //ppt动画
-    //dom
-    //canvas =》link => fail
-    bind(this.pptObj, succeed, fail)
-
-
-    //canvas普通精灵动画
-    bind(this.pixiSpriteObj, function(animObj) {
-        animObj.playPixi(scopeComplete);
+    //pixi动画
+    bind(this.pixiObj, function(pixi) {
+        pixi.play(scopeComplete);
     })
 
     //dom精灵动画
@@ -235,7 +196,6 @@ animProto.run = function(scopeComplete) {
     }
 }
 
-
 /**
  * 停止动画
  * @param  {[type]} chapterId [description]
@@ -244,16 +204,16 @@ animProto.run = function(scopeComplete) {
 animProto.stop = function(chapterId) {
 
     //ppt动画
-    bind(this.pptObj, function(animObj) {
+    bind(this.pptObj, function(ppt) {
         //销毁ppt音频
-        destroyContentAudio(animObj.options, chapterId);
+        destroyContentAudio(ppt.options, chapterId);
         //停止PPT动画
-        animObj.stopAnimation();
+        ppt.stopAnimation();
     })
 
-    //canvas精灵
-    bind(this.pixiSpriteObj, function(animObj) {
-        animObj.stopPixi();
+    //pixi动画
+    bind(this.pixiObj, function(pixi) {
+        pixi.stop()
     })
 
     //dom精灵
@@ -268,8 +228,8 @@ animProto.stop = function(chapterId) {
  * @return {[type]} [description]
  */
 animProto.reset = function() {
-    bind(this.pptObj, function(animObj) {
-        animObj.resetAnimation();
+    bind(this.pptObj, function(ppt) {
+        ppt.resetAnimation();
     })
 }
 
@@ -281,13 +241,13 @@ animProto.reset = function() {
 animProto.destroy = function() {
 
     //canvas
-    bind(this.pixiSpriteObj, function(animObj) {
-        animObj.destroyPixi();
+    bind(this.pixiObj, function(pixi) {
+        pixi.destroy();
     })
 
     //dom ppt
-    bind(this.pptObj, function(animObj) {
-        animObj.destroyAnimation();
+    bind(this.pptObj, function(ppt) {
+        ppt.destroyAnimation();
     })
 
     //dom 精灵
@@ -295,10 +255,10 @@ animProto.destroy = function() {
         sprObj.stopSprites();
     });
 
-    this.pptObj = null;
-    this.spriteObj = null;
-    this.getParameter = null;
-    this.pixiSpriteObj = null;
+    // this.pptObj = null;
+    // this.spriteObj = null;
+    // this.getParameter = null;
+    // this.pixiObj = null;
 }
 
 export {
