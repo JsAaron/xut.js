@@ -1,11 +1,11 @@
 /**
  * 设置canvas数据
  */
-var createCanvasData = function(type,nextdata) {
+var createCanvasData = function(type,opts) {
 
-	var data = nextdata.data
-	var contentId = nextdata.contentId
-	var conData = nextdata.conData
+	var data = opts.data
+	var contentId = opts.contentId
+	var conData = opts.conData
 
 	//content收集id标记
 	//cid =>content=> 普通动画 ppt
@@ -37,30 +37,40 @@ var createCanvasData = function(type,nextdata) {
  */
 var pixiType = {
     //普通精灵动画
-    "Sprite": function(nextdata) {
+    "Sprite": function(opts) {
         //启动精灵模式
         //在动画处理的时候给initAnimations快速调用
-        createCanvasData('spiritId', nextdata)
+        createCanvasData('spiritId', opts)
     },
     //ppt=》pixi动画
-    "PPT": function(nextdata) {
-        createCanvasData('pptId', nextdata)
+    "PPT": function(opts) {
+        createCanvasData('pptId', opts)
     },
     //高级精灵动画
     //widget
-    "SeniorSprite": function(nextdata) {
-        createCanvasData('widgetId', nextdata)
+    "SeniorSprite": function(opts) {
+        createCanvasData('widgetId', opts)
     },
-    //复杂精灵动画
-    "CompSprite": function(nextdata) {
-        //特殊判断，见canvas.js
-        if (!nextdata.data.canvasRelated.onlyCompSprite) {
-        	//仅仅只是满足特殊动画
-            nextdata.data.canvasRelated.onlyCompSprite = true
-            //特殊模式，可能chapter表中没有启动canvas模式
-        }
-        createCanvasData('compSpriteId', nextdata)
-    }
+	//复杂精灵动画
+	"CompSprite": function(opts) {
+		var data = opts.data
+		var conData = opts.conData
+		if(/\./i.test(opts.conData.md5)){
+			console.log('复杂精灵动画数据错误')
+			return
+		}
+
+		//特殊判断，见canvas.js
+		//如果没有启动canvas也能走进这个程序
+		//给上特殊标示
+		if (!data.canvasRelated.enable
+			&& !data.canvasRelated.onlyCompSprite) {
+			//仅仅只是满足特殊动画
+			//特殊模式，可能chapter表中没有启动canvas模式
+			data.canvasRelated.onlyCompSprite = true
+		}
+		createCanvasData('compSpriteId', opts)
+	}
 
 }
 
@@ -68,15 +78,15 @@ var pixiType = {
 /**
  * 解析参数
  */
-function callResolveArgs(category,nextdata) {
+function callResolveArgs(category, opts) {
 	var cat
-	var _cats = category.split(",")
-	var i = _cats.length
-	if (i) {
-		while (i--) {
-			cat = _cats[i]
+	var cats = category.split(",")
+	var len = cats.length
+	if (len) {
+		while (len--) {
+			cat = cats[len]
 			//匹配数据类型
-			pixiType[cat] && pixiType[cat](nextdata)
+			pixiType[cat] && pixiType[cat](opts,category)
 		}
 	}
 }
@@ -92,17 +102,12 @@ export function parseCanvas(contentId, category, conData, data) {
 	conData.actionTypes = {};
 
 	//下一个数据
-	var nextdata = {
+	var opts = {
 		contentId: contentId,
 		conData: conData,
 		data: data
 	}
 
-	//复杂精灵动画
-	if(category === 'CompSprite'){
-		callResolveArgs(category,nextdata)
-	}
-	
 	//转成canvas标记
 	//如果有pixi的处理类型
 	//2016.2.25
@@ -111,9 +116,9 @@ export function parseCanvas(contentId, category, conData, data) {
 	//SeniorSprite
 	//Sprite
 	//PPT
-	//5种处理方式
+	//CompSprite
+	//多种处理方式
 	//可以组合
-	if (data.canvasRelated.enable) {
-		callResolveArgs(category,nextdata)
-	}
+	category &&　callResolveArgs(category, opts)
+	
 }

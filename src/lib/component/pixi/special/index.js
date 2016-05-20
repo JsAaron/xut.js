@@ -107,6 +107,15 @@ var specialSprite = Factory.extend({
         stopQueue(this.pageIndex, this.uuid)
     },
 
+
+    /**
+     * 复位
+     * @return {[type]} [description]
+     */
+    reset:function(){
+
+    },
+
     /**
      * 销毁动画
      * destroyQueue 销毁队列
@@ -114,10 +123,6 @@ var specialSprite = Factory.extend({
      */
     destroy: function(destroyQueue) {
         destroyQueue(this.pageIndex, this.uuid)
-        //销毁添加到画布上的containers
-        _.each(this.sprObjs, function(obj) {
-            obj.stage.destroy(true)
-        })
     }
 })
 

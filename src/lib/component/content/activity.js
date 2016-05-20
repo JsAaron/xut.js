@@ -1085,7 +1085,6 @@ activitProto.destroy = function (elementCallback) {
     //销毁动画
     this.destroyEffects(elementCallback);
 
-
     //iscroll销毁
     if (this.iscroll) {
         this.iscroll.destroy();

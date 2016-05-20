@@ -37,11 +37,13 @@ function TaskContents(data) {
         data = conParser(compileActivitys, data);
         //如果有需要构建的content
         //开始多线程处理
-        data.createContentIds.length ? this.dataAfterCheck(data) : this.loadComplete();
+        data.createContentIds.length 
+            ? this.dataAfterCheck(data) 
+            : this.loadComplete();
     } else {
         this.loadComplete();
     }
-}
+} 
 
 
 var taskProto = TaskContents.prototype;
@@ -254,7 +256,7 @@ taskProto.dataStrCheck = function (data, contentDas) {
         //4 动画音频
         //5 canvas动画
         contentsBehavior(function (delayHooks) {
-            //渲染页面
+           //渲染页面
             this.eventAfterCheck(data, delayHooks);
         }.bind(this), data, contentDas);
     })

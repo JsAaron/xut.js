@@ -5,10 +5,7 @@
  * @return {[type]}         [description]
  */
 
-import {
-    Factory
-}
-from './core/factory'
+import { Factory } from './core/factory'
 
 /**
  * 精灵动画
@@ -24,28 +21,26 @@ var Sprite = Factory.extend({
      * @param  {[type]} canvasRelated [description]
      * @return {[type]}               [description]
      */
-    constructor: function(successCallback, failCallback, data, canvasRelated) {
+    constructor: function(successCallback, failCallback, options) {
 
         var self = this;
-        this.data = data;
-        this.canvasRelated = canvasRelated;
+        var data = this.data = options.data;
+        this.renderer  = options.renderer
+        this.pageIndex = options.pageIndex
         //id标示
-        //可以用来过滤失败的pixi对象
         this.contentId = data._id
 
         //精灵场景容器
-        var spriteTtage = new PIXI.Container();
-        //加入场景容器
-        canvasRelated.addChild(spriteTtage);
+        var stage = this.stage = new PIXI.Container();
 
         //矩形图
         var imgUrl = this.analysisPath(data);
         var imageFilename = imgUrl.replace(/^.*[\\\/]/, '');
 
         //support both png and jpg+mask 
-        var maskFilename = "mask_" + imageFilename;
+        var maskFilename   = "mask_" + imageFilename;
         var imageextension = imgUrl.split('.').pop();
-        var maskUrl = imgUrl.replace('.jpg', '_mask.png');
+        var maskUrl        = imgUrl.replace('.jpg', '_mask.png');
 
         //保证和以前版本的兼容性，旧版本精灵只有一行，因此没有matrix参数
         var matrixCols = data.thecount;
@@ -64,10 +59,12 @@ var Sprite = Factory.extend({
             matrixRows = matrixs[1];
         }
 
-
+        //制作json数据
         var jsonUrl = "lib/data/spritesheet.json" + "?imageurl=" + imgUrl + "&cols=" + matrixCols + "&rows=" + matrixRows + "&total=" + data.thecount + "&fps=" + data.fps;
+
         var movie;
         var contentId = this.contentId;
+
 
         //这里我们动态创建loader，加载完资源之后，就删除了。因此呢，也就没有缓存资源的情况了
         //我觉得这样似乎更好。因为我们整本书的动画很多，如果所有资源都缓存下来，可能内存消耗极大
@@ -87,13 +84,6 @@ var Sprite = Factory.extend({
         loader = null;
 
         function onAssetsLoaded(loader, res) {
-
-
-            //资源加载失败
-            // if (arguments[1] && Object.keys(arguments[1]).length < 2) {
-            //     failCallback(contentId);
-            //     return
-            // }
 
             //zhangyun, get the name of spritesheet
             var textures = [];
@@ -118,10 +108,11 @@ var Sprite = Factory.extend({
             var fps = parseInt((resObject.url).split("fps=")[1]);
 
             movie = new PIXI.extras.MovieClip(textures);
+
             movie.width = data.scaleWidth;
             movie.height = data.scaleHeight;
-            movie.position.x = data.scaleLeft;
-            movie.position.y = data.scaleTop;
+            movie.position.x = data.scaleLeft - data.scaleWidth;
+            movie.position.y = data.scaleTop - data.scaleHeight;
 
             //if there are masks, make mask textures;
             var imageextension = resObject.name.split('.').pop();
@@ -132,13 +123,13 @@ var Sprite = Factory.extend({
                     return maskObject.textures[k];
                 });
                 movie.maskTextures = maskTextures;
-                spriteTtage.addChild(movie.maskSprite);
+                stage.addChild(movie.maskSprite);
             }
 
             //动画速率
             movie.animationSpeed = 0.15 * fps / 10;
             movie.play();
-            spriteTtage.addChild(movie);
+            stage.addChild(movie);
 
             self.movie = movie;
 
@@ -151,45 +142,31 @@ var Sprite = Factory.extend({
      * 运行动画
      * @return {[type]} [description]
      */
-    play: function() {
+    play: function(addQueue) { 
         //绘制页面
-        this.uuid = this.canvasRelated.play('sprite')
+        var self = this
+        var renderer = self.renderer
+        this.uuid = addQueue(this.pageIndex, function() {
+             renderer.render(self.stage);
+        })
     },
 
     /**
      * 停止动画
+     * stopQueue 停止队列
      * @return {[type]} [description]
      */
-    stop: function() {
-        this.canvasRelated.stop(this.uuid)
+    stop: function(stopQueue) {
+        stopQueue(this.pageIndex, this.uuid)
     },
-
 
     /**
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroy: function() {
-        //if there are movie sprite, destory it
-        if (this.movie) {
-            //remove it from stage
-            if (this.stage) {
-                this.stage.removeChild(this.movie);
-            }
-            //remove texture for movie
-            for (var i = 0; i < this.movie.textures.length; i++) {
-                this.movie.textures[i].destroy(true);
-                if (this.movie.maskSprite) {
-                    this.movie.maskTextures[i].destroy(true);
-                }
-            }
-
-            //remove movie sprite
-            this.movie.destroy(true, true);
-        }
-        this.canvasRelated.destroy();
+    destroy: function(destroyQueue) {
+        destroyQueue(this.pageIndex, this.uuid)
     }
-
 
 })
 

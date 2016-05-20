@@ -96,6 +96,7 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         this.domSprites = this.contentDas.category === 'Sprite' ? true : false;
     }
 
+
     //canvas模式
     //比较复杂
     //1 普通与ppt组合
@@ -108,7 +109,8 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         //可能是组合动画
         actionTypes = this.contentDas.actionTypes
 
-        var nextdata = {
+
+        var opts = {
             data: this.contentDas,
             renderer: this.$contentProcess,
             pageIndex: this.pageIndex
@@ -118,27 +120,27 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         if (actionTypes.spiritId) {
             //加入任务队列
             this.nextTask.context.add(id)
-            this.pixiObj = new pixiSpirit(this.contentDas);
-            //ppt动画
-            if (actionTypes.pptId) {
-                //构建精灵动画完毕后
-                //构建ppt对象
-                this.pixiObj.$once('load', function() {
+            this.pixiObj = new pixiSpirit(opts);
+            //构建精灵动画完毕后
+            //构建ppt对象
+            this.pixiObj.$once('load', function() {
+                //ppt动画
+                if (actionTypes.pptId) {
                     //content=>MovieClip
                     self.pptObj = create(CanvasAnimation, this.movie);
-                    //任务完成
-                    self.nextTask.context.remove(id)
-                })
-            }
+                }
+                //任务完成
+                self.nextTask.context.remove(id)
+            })
+
         }
 
         //特殊高级动画
         //必须是ppt与pixi绑定的
         if(actionTypes.compSpriteId){    
-            this.pixiObj = new pixiSpecial(nextdata);
+            this.pixiObj = new pixiSpecial(opts);
             //ppt动画
             if (actionTypes.pptId) {
-                console.log('compSpriteIdppt动画')
                 self.pptObj = create(CanvasAnimation);
             }
         }    
@@ -229,6 +231,9 @@ animProto.stop = function(chapterId) {
 animProto.reset = function() {
     bind(this.pptObj, function(ppt) {
         ppt.resetAnimation();
+    })
+    bind(this.pixiObj, function(ppt) {
+        ppt.resetAnim();
     })
 }
 

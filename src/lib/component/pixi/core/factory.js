@@ -78,13 +78,17 @@ var Factory = Xut.CoreObject.extend({
     //所有pixi动画共享一个刷新器
     //所以在每一个子动画中传递一个刷新器接口
     playAnim: function() {
-        this.play(addRenderer)
+        this.play && this.play(addRenderer)
     },
     stopAnim: function() {
-        this.stop(stopRenderer)
+        this.stop && this.stop(stopRenderer)
+    },
+    //复位
+    resetAnim: function() {
+        this.reset && this.reset()
     },
     destroyAnim: function() {
-        this.destroy(destroyRenderer)
+        this.destroy && this.destroy(destroyRenderer)
     },
 
 });

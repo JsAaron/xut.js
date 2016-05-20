@@ -240,12 +240,6 @@ export function structure(callback, data, context) {
         data.canvasRelated.enable = true
     }
 
-    //创建canvas画布 
-    // if (data.canvasRelated.enable) {
-    //     pixiContainer(data, data.canvasRelated.containerIndex)
-    // }
-
-
     ////////////////
     //开始生成所有的节点 //
     //1:dom

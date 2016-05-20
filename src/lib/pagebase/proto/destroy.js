@@ -40,6 +40,11 @@ export function destroy(baseProto) {
 				contentObj.destroy(function(destroyObj) {
 					//如果不是浮动对象,清理元素引用
 					if (!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
+
+						//清理所有的pixi对象
+						if (destroyObj.$contentProcess.destroy) {
+							destroyObj.$contentProcess.destroy(true)
+						}
 						destroyObj.$contentProcess = null;
 					}
 				});

@@ -27,13 +27,25 @@ export function Container(data, rootelement) {
         transparent: true
     });
 
+    var mark = ''
+    if (data.category) {
+        var cats = data.category.split(",")
+        var len = cats.length
+        if (len) {
+            while (len--) {
+                mark += cats[len]
+            }
+        } 
+    }
+    mark = mark.toLowerCase()
+
     //位置
     renderer.view.style.position = "absolute"
-    renderer.view.style.zIndex = data.zIndex
-    renderer.view.style.left = data.scaleLeft + "px"
-    renderer.view.style.top = data.scaleTop + "px"
+    renderer.view.style.zIndex   = data.zIndex
+    renderer.view.style.left     = data.scaleLeft + "px"
+    renderer.view.style.top      = data.scaleTop + "px"
 
-    renderer.view.setAttribute('id', 'pxix-' + data._id)
+    renderer.view.setAttribute('id',  mark + '-' + data._id)
 
     //放入容器
     rootelement.append(renderer.view)

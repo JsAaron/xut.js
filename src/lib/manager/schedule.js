@@ -352,6 +352,7 @@ SchedulerProto.create = function(createPage, visiblePage, action, toPageCallback
             }
         };
 
+
     ////////////////////
     //pid=>chpterData //
     ////////////////////
@@ -812,7 +813,6 @@ SchedulerProto.jumpPage = function(data) {
 SchedulerProto.loadPage = function(action) {
     var self = this;
 
-
     //触发自动任务
     function trigger() {
         self.autoRun({
@@ -843,7 +843,6 @@ SchedulerProto.loadPage = function(action) {
             trigger();
         }
     }
-
 
     //创建完成回调
     self.vm.$emit('change:createComplete', function() {

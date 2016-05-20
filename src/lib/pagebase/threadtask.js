@@ -152,15 +152,15 @@ var assignedTasks = {
             };
 
         base.createRelated.cacheTasks['components'] = new TaskComponents({
-            'rootNode': base.getElement(),
-            'nodes': chapterDas['nodes'],
-            'pageOffset': chapterDas['pageOffset'],
-            'activitys': base.baseActivits(),
-            'chpaterData': baseData,
-            'chapterId': baseData['_id'],
-            'pid': base.pid,
-            'pageType': base.pageType,
-            'virtualOffset': base.virtualOffset
+            'rootNode'      : base.getElement(),
+            'nodes'         : chapterDas['nodes'],
+            'pageOffset'    : chapterDas['pageOffset'],
+            'activitys'     : base.baseActivits(),
+            'chpaterData'   : baseData,
+            'chapterId'     : baseData['_id'],
+            'pid'           : base.pid,
+            'pageType'      : base.pageType,
+            'virtualOffset' : base.virtualOffset
         }, suspendCallback, successCallback);
     },
 
