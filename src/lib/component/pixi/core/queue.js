@@ -38,6 +38,7 @@ function requestAnimation(activeIndex) {
         //如果停止
         if (!state) {
             clern();
+            state = false
             return
         }
         if (rQueue[activeIndex]) {
@@ -159,7 +160,7 @@ export function removeQueue(pageIndex, key) {
             }
         }
     } else {
-        console.log('删除的页面不存在')
+        console.log('Queue删除的页面不存在')
     }
 }
 
@@ -167,7 +168,7 @@ export function removeQueue(pageIndex, key) {
  * 销毁
  * @return {[type]} [description]
  */
-export function destroyQueue(pageIndex) {
+export function destroyQueue(pageIndex, uuid) {
     if (rQueue[pageIndex]) {
         if (rQueue[pageIndex].rAF) {
             rQueue[pageIndex].rAF.stop();

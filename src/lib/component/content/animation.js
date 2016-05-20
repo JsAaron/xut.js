@@ -176,7 +176,7 @@ animProto.run = function(scopeComplete) {
 
     //pixi动画
     bind(this.pixiObj, function(pixi) {
-        pixi.play(scopeComplete);
+        pixi.playAnim(scopeComplete);
     })
 
     //dom精灵动画
@@ -186,12 +186,11 @@ animProto.run = function(scopeComplete) {
             this.spriteObj.playSprites();
             return;
         }
-        element = this.$contentProcess.find('.sprite').show();
         this.spriteObj = domSprite({
-            element: element,
-            data: this.contentDas,
-            id: this.id,
-            mode: 'css'
+            element : this.$contentProcess.find('.sprite').show(),
+            data    : this.contentDas,
+            id      : this.id,
+            mode    : 'css'
         });
     }
 }
@@ -213,7 +212,7 @@ animProto.stop = function(chapterId) {
 
     //pixi动画
     bind(this.pixiObj, function(pixi) {
-        pixi.stop()
+        pixi.stopAnim()
     })
 
     //dom精灵
@@ -239,15 +238,15 @@ animProto.reset = function() {
  * @return {[type]} [description]
  */
 animProto.destroy = function() {
+    //dom ppt
+    //
+    bind(this.pptObj, function(ppt) {
+        ppt.destroyAnimation();
+    })
 
     //canvas
     bind(this.pixiObj, function(pixi) {
-        pixi.destroy();
-    })
-
-    //dom ppt
-    bind(this.pptObj, function(ppt) {
-        ppt.destroyAnimation();
+        pixi.destroyAnim();
     })
 
     //dom 精灵
@@ -255,10 +254,10 @@ animProto.destroy = function() {
         sprObj.stopSprites();
     });
 
-    // this.pptObj = null;
-    // this.spriteObj = null;
-    // this.getParameter = null;
-    // this.pixiObj = null;
+    this.pptObj = null;
+    this.spriteObj = null;
+    this.getParameter = null;
+    this.pixiObj = null;
 }
 
 export {

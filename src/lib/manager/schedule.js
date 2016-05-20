@@ -719,9 +719,9 @@ SchedulerProto.autoRun = function(para) {
             vm.$emit('change:pageUpdate', currIndex)
             resetToolbar.call(this)
             setTimeout(function() {
-                $("#startupPage").remove();
-                $("#removelayer").remove();
-            }, 2000)
+                $("#startupPage").hide().remove();
+                $("#removelayer").hide().remove();
+            }, 0)
             break;
         case 'toPage':
             //更新页码标示

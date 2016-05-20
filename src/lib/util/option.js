@@ -44,6 +44,12 @@ function fiexdProportion(width, height, left, top) {
     }
 }
 
+
+export function setProportion(width, height, left, top) {
+    return fiexdProportion.apply(this, arguments)
+}
+
+
 /*
  * 修复元素的尺寸
  * @type {[type]}

@@ -50,5 +50,5 @@ export function stopRenderer(pageIndex, uuid) {
  * @return {[type]} [description]
  */
 export function destroyRenderer(pageIndex, uuid) {
-    destroyQueue(pageIndex);
+    destroyQueue(pageIndex, uuid);
 }

@@ -3,9 +3,13 @@
  * @param  {[type]} Utils   [description]
  */
 
+import { observe } from '../../../observer/observe'
 import {
-    observe
-} from '../../../observer/observe'
+    addRenderer,
+    stopRenderer,
+    destroyRenderer
+}
+from '../core/index'
 
 var arr = [];
 var slice = arr.slice;
@@ -69,7 +73,19 @@ var Factory = Xut.CoreObject.extend({
             pathImg = originalPathImg;
         }
         return pathImg;
-    }
+    },
+
+    //所有pixi动画共享一个刷新器
+    //所以在每一个子动画中传递一个刷新器接口
+    playAnim: function() {
+        this.play(addRenderer)
+    },
+    stopAnim: function() {
+        this.stop(stopRenderer)
+    },
+    destroyAnim: function() {
+        this.destroy(destroyRenderer)
+    },
 
 });
 
