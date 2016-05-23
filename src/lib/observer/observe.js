@@ -1,6 +1,8 @@
 /**
  *
  * 基本事件管理
+ * 1 异步
+ * 2 同步
  *
  */
 
@@ -22,6 +24,14 @@ var observe = (function(slice) {
                 events[part].push(fn);
             }
         }
+        
+        //假如存在同步句柄
+        //执行
+        var data
+        if (data = this._handleName[event]) {
+            this.$emit(event,data[0])
+        }
+
         return this;
     }
 
@@ -66,11 +76,17 @@ var observe = (function(slice) {
         var events = this.events,
             handlers;
 
-        if (!events || event in events === false) {
-            return this;
-        }
-
+        //参数
         args = slice.call(arguments, 1);
+
+        if (!events || event in events === false) {
+            // console.log(event)
+            //同步的情况
+            //如果除非了事件，可能事件句柄还没有加载
+            this._handleName[event] = args
+            return this; 
+        }
+        
         handlers = events[event];
         for (i = 0; i < handlers.length; i++) {
             handlers[i].apply(this, args);
@@ -98,6 +114,10 @@ var observe = (function(slice) {
         this.$off = this.unbind = unbind;
         this.$emit = trigger;
         this.$once = one;
+        
+        //触发列表名称
+        //防止同步触发
+        this._handleName = {}
         return this;
     };
 
