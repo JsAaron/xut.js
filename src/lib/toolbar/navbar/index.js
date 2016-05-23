@@ -44,7 +44,7 @@ SectionList.prototype = {
 
         if (hBox) {
             if (H) {
-                hBox.goToPage(pageIndex, 0, 0);
+                //hBox.goToPage(pageIndex, 0, 0)
             } else {
                 hBox.goToPage(0, pageIndex, 0);
             }
@@ -257,7 +257,7 @@ function startpocess() {
             navControlBar.css({
                 'z-index': 0,
                 'opacity': 0,
-                'visibility': 'visible'
+                'display': 'block'
             });
         }
         callback();
@@ -272,7 +272,7 @@ function startpocess() {
     })
 };
 
-
+ 
 /**
  * 控制按钮改变
  */
@@ -287,6 +287,7 @@ function navControl(action, navhandle) {
 function toAnimation(navControlBar, navhandle, action) {
 
     var complete = function () {
+        //恢复css
         navControlBar.css(_prefix('transition'), '');
         Xut.View.HideBusy();
         lockAnimation = false;
@@ -308,9 +309,7 @@ function toAnimation(navControlBar, navhandle, action) {
     } else {
         //隐藏
         navhandle.attr('fly', 'in');
-        navControlBar.css({
-            'visibility': 'hidden'
-        })
+        navControlBar.hide()
         complete();
     }
 }
