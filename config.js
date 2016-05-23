@@ -10,7 +10,7 @@ module.exports = {
         launch: true,
         //D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
         ///Users/mac/project/xcode/www/build
-        dist: 'D:/svn/magazine-develop/assets/www/epub/epub/dir/assets/www/lib'
+        dist: '/Users/mac/project/xcode/www/build'
     },
     build: {
         index: path.resolve(__dirname, 'temp/index.html'),
