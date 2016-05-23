@@ -44,7 +44,7 @@ import { createNextTask } from './nexttask'
  * @return {[type]}      [description]
  */
 function activityClass(data) {
- 
+
     var self = this;
 
     _.extend(this, data);
@@ -318,7 +318,9 @@ activitProto.runEffects = function (outComplete, evenyClick) {
      */
     function isRreRunPocess(scope) {
         //针对空跳过处理
-        if (partContentRelated && partContentRelated.length && (-1 !== partContentRelated.indexOf(scope.id))) {
+        if (partContentRelated
+            && partContentRelated.length
+            && (-1 !== partContentRelated.indexOf(scope.id))) {
             captureAnimComplete()
         } else {
             //必须要修改
@@ -351,7 +353,6 @@ activitProto.runEffects = function (outComplete, evenyClick) {
             if (scope.isRreRun) {
                 isRreRunPocess(scope);
             } else {
-
                 //标记动画正在运行
                 scope.$contentProcess && scope.$contentProcess.prop && scope.$contentProcess.prop({
                     'animOffset': scope.$contentProcess.offset()

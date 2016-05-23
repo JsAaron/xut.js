@@ -110,9 +110,9 @@ var Sprite = Factory.extend({
             movie = new PIXI.extras.MovieClip(textures);
 
             movie.width = data.scaleWidth;
-            movie.height = data.scaleHeight;
-            movie.position.x = data.scaleLeft - data.scaleWidth;
-            movie.position.y = data.scaleTop - data.scaleHeight;
+            movie.height = data.scaleHeight
+            movie.position.x = data.scaleLeft 
+            movie.position.y = data.scaleTop 
 
             //if there are masks, make mask textures;
             var imageextension = resObject.name.split('.').pop();

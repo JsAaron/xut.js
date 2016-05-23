@@ -10,10 +10,7 @@ import { setProportion } from '../../../util/option'
  * @param  {[type]} path          [description]
  * @return {[type]}               [description]
  */
-function spiritAni(data, path, condata) {
-
-    this.canvasX = condata.scaleLeft
-    this.canvasY = condata.scaleTop
+function spiritAni(data, path) {
 
     this.imagesArray = new Array();
     this.maskArray = new Array();
@@ -75,8 +72,8 @@ spiritAni.prototype.initdata = function() {
     this.spiritHeight = parseInt(proportion.height);
 
     this.startPoint = {
-        x: proportion.left - this.canvasX,
-        y: proportion.top - this.canvasY,
+        x: proportion.left,
+        y: proportion.top,
         w: this.spiritWidth,
         h: this.spiritHeight
     };
@@ -128,8 +125,8 @@ spiritAni.prototype.init = function() {
 //修正图片位置
 spiritAni.prototype.changePosition = function(currentFrame) {
     var proportion = setProportion(0,0,this.imageList[currentFrame].X,this.imageList[currentFrame].Y)
-    var x = proportion.left - this.canvasX
-    var y = proportion.top - this.canvasY
+    var x = proportion.left 
+    var y = proportion.top 
 
     if (this.resType) {
         this.maskSprite.position.x = x;

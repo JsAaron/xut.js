@@ -108,13 +108,6 @@ var specialSprite = Factory.extend({
     },
 
 
-    /**
-     * 复位
-     * @return {[type]} [description]
-     */
-    reset:function(){
-
-    },
 
     /**
      * 销毁动画

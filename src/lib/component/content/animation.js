@@ -134,7 +134,7 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
             })
 
         }
-
+  
         //特殊高级动画
         //必须是ppt与pixi绑定的
         if(actionTypes.compSpriteId){    
@@ -161,7 +161,7 @@ animProto.run = function(scopeComplete) {
     var self = this,
         defaultIndex,
         element = this.$contentProcess;
- 
+
     //ppt动画
     //dom与canvas
     bind(this.pptObj, function(ppt) {
