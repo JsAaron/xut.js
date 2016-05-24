@@ -12,7 +12,7 @@
 //dom精灵动画
 import { Sprite as domSprite } from './plug/sprite'
 //pixi普通精灵动画
-import { Sprite as pixiSpirit } from '../pixi/sprite'
+import { Sprite as pixiSpirit } from '../pixi/sprite/index'
 //pixi特殊高级动画
 import { specialSprite as pixiSpecial } from '../pixi/special/index'
 //依赖

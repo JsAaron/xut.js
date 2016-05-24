@@ -305,7 +305,7 @@ iframeWidget.prototype = {
         });
         setTimeout(function() {
             me.state = true;
-        }, 0)
+        }, 0) 
     },
 
     /**

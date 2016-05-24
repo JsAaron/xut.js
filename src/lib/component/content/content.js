@@ -20,10 +20,17 @@ import { Container } from '../pixi/container'
 function preRunAction(data, eventName) {
     var para, scopem,
         parameter = data.getParameter();
+        
     //过滤预生成动画
     if (parameter.length === 1) {
         para = parameter[0];
-        if (para.animationName === 'EffectAppear' && eventName === 'auto' && !para.videoId && !para.delay && data.contentDas.category !== 'Sprite' && !para.preCode //动画前脚本
+        if (para.animationName === 'EffectAppear' 
+            && data.domMode  //并且只有dom模式才可以，canvas排除
+            && eventName === 'auto' 
+            && !para.videoId 
+            && !para.delay 
+            && data.contentDas.category !== 'Sprite' 
+            && !para.preCode //动画前脚本
             && !para.postCode //动画后脚本
             && !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
 

@@ -30,6 +30,7 @@ var Factory = Xut.CoreObject.extend({
      */
     init: function(options) {
         var pixi = this;
+        this.action = 'init'
         var args = [
             /**
              * 成功回调
@@ -55,39 +56,23 @@ var Factory = Xut.CoreObject.extend({
         this.constructor.apply(this, args.concat(slice.call(arguments)))
     },
 
-    /**
-     * 创建图片地址
-     * @return {[type]}         [description]
-     */
-    analysisPath: function(conData) {
-        var pathImg,
-            imgContent = conData.md5,
-            //是gif格式
-            isGif = /.gif$/i.test(imgContent),
-            //原始地址
-            originalPathImg = Xut.config.pathAddress + imgContent;
-        if (isGif) {
-            //处理gif图片缓存+随机数
-            pathImg = Xut.createRandomImg(originalPathImg)
-        } else {
-            pathImg = originalPathImg;
-        }
-        return pathImg;
-    },
-
     //所有pixi动画共享一个刷新器
     //所以在每一个子动画中传递一个刷新器接口
     playAnim: function() {
+        this.action = 'play'
         this.play && this.play(addRenderer)
-    },
+    }, 
     stopAnim: function() {
+        this.action = 'stop'
         this.stop && this.stop(stopRenderer)
     },
     //复位
     resetAnim: function() {
+        this.action = 'reset'
         this.reset && this.reset()
     },
     destroyAnim: function() {
+        this.action = 'destroy'
         this.destroy && this.destroy(destroyRenderer)
     },
 

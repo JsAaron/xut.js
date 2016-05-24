@@ -12,8 +12,8 @@ import { setProportion } from '../../../util/option'
  */
 function spiritAni(data, path, condata) {
 
-    this.canvasX = condata.scaleLeft
-    this.canvasY = condata.scaleTop
+    // this.canvasX = condata.scaleLeft
+    // this.canvasY = condata.scaleTop
 
     this.imagesArray = new Array();
     this.maskArray = new Array();
@@ -52,7 +52,7 @@ function spiritAni(data, path, condata) {
  * @param  {[type]} path          [description]
  * @return {[type]}               [description]
  */
-spiritAni.prototype.parseSpiritImages = function(data, path) {
+spiritAni.prototype.parseSpiritImages = function (data, path) {
     for (var i = 0; i < this.imageList.length; i++) {
         var temp = this.imageList[i];
         this.imagesArray.push(path + temp.name);
@@ -68,15 +68,15 @@ spiritAni.prototype.parseSpiritImages = function(data, path) {
  * @param  {[type]} condata [description]
  * @return {[type]}         [description]
  */
-spiritAni.prototype.initdata = function() {
+spiritAni.prototype.initdata = function () {
     //尺寸
     var proportion = setProportion(this.data.width, this.data.height, this.imageList[0].X, this.imageList[0].Y)
     this.spiritWidth = parseInt(proportion.width);
     this.spiritHeight = parseInt(proportion.height);
 
     this.startPoint = {
-        x: proportion.left - this.canvasX,
-        y: proportion.top - this.canvasY,
+        x: proportion.left,
+        y: proportion.top,
         w: this.spiritWidth,
         h: this.spiritHeight
     };
@@ -88,7 +88,7 @@ spiritAni.prototype.initdata = function() {
  * @param  {[type]} canvasRelated [description]
  * @return {[type]}               [description]
  */
-spiritAni.prototype.init = function() {
+spiritAni.prototype.init = function () {
 
     //精灵场景容器
     this.stage = new PIXI.Container();
@@ -126,10 +126,12 @@ spiritAni.prototype.init = function() {
 
 
 //修正图片位置
-spiritAni.prototype.changePosition = function(currentFrame) {
-    var proportion = setProportion(0,0,this.imageList[currentFrame].X,this.imageList[currentFrame].Y)
-    var x = proportion.left - this.canvasX
-    var y = proportion.top - this.canvasY
+spiritAni.prototype.changePosition = function (currentFrame) {
+
+    var proportion = setProportion(0, 0, this.imageList[currentFrame].X, this.imageList[currentFrame].Y)
+
+    var x = proportion.left
+    var y = proportion.top
 
     if (this.resType) {
         this.maskSprite.position.x = x;
@@ -144,7 +146,7 @@ spiritAni.prototype.changePosition = function(currentFrame) {
  * 运动
  * @return {[type]} [description]
  */
-spiritAni.prototype.runAnimate = function() {
+spiritAni.prototype.runAnimate = function () {
     //第一次不运行
     if (!this.firstTime) {
         this.countNewFrame();
@@ -161,7 +163,7 @@ spiritAni.prototype.runAnimate = function() {
 };
 
 
-spiritAni.prototype.countNewFrame = function() {
+spiritAni.prototype.countNewFrame = function () {
     this.imageIndex++;
     if (this.imageIndex > this.imagesArray.length - 1) {
         if (this.loop == 0) {
@@ -175,5 +177,5 @@ spiritAni.prototype.countNewFrame = function() {
 
 
 export {
-    spiritAni
+spiritAni
 }

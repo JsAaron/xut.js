@@ -23,7 +23,7 @@ function makeGuid() {
  */
 export function Container(data, rootelement) {
 
-    var renderer = PIXI.autoDetectRenderer(data.scaleHeight, data.scaleHeight, {
+    var renderer = PIXI.autoDetectRenderer(data.scaleWidth, data.scaleHeight, {
         transparent: true
     });
 

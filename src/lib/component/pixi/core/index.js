@@ -28,8 +28,11 @@ function makeGuid() {
  * type 执行play的类型 高级，普通精灵
  * @return {[type]} [description]
  */
-export function addRenderer(pageIndex, callback) {
-    var uuid = makeGuid();
+export function addRenderer(pageIndex, callback, mark) {
+    var uuid = makeGuid()
+    if (mark) {
+        uuid = uuid + '-' + mark
+    }
     addQueue(pageIndex, uuid, function play() {
         callback && callback()
     });

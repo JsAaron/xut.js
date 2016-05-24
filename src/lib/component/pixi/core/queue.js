@@ -20,6 +20,10 @@ var rAF = function(callback) {
 //收集绘制内容
 var rQueue = {};
 
+// $('body').on('dblclick',function(){
+//     console.log(rQueue)
+// })
+
 /**
  * 运动动画
  * @param  {[type]} activeIndex [description]
@@ -173,9 +177,7 @@ export function destroyQueue(pageIndex, uuid) {
         if (rQueue[pageIndex].rAF) {
             rQueue[pageIndex].rAF.stop();
         }
-        if (!Object.keys(rQueue[pageIndex]['fns']).length) {
-            delete rQueue[pageIndex];
-        }
+        delete rQueue[pageIndex];
     }
 }
 

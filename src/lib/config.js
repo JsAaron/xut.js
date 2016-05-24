@@ -660,7 +660,13 @@ Xut.config = function() {
         //画轴模式
         //在不同分辨率下，按照正比缩放拼接
         //在一个可视区中，可以看到3个li拼接后的效果
-        scrollPaintingMode: false
+        scrollPaintingMode: false,
+        
+        /**
+         * 为了测试方便  
+         * 可以直接切换到dom模式
+         */
+        onlyDomMode:false
     })
 
 

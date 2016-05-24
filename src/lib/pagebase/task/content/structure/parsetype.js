@@ -1,7 +1,7 @@
 /**
  * 设置canvas数据
  */
-var createCanvasData = function(type,opts) {
+var createCanvasData = function (type, opts) {
 
 	var data = opts.data
 	var contentId = opts.contentId
@@ -37,25 +37,25 @@ var createCanvasData = function(type,opts) {
  */
 var pixiType = {
     //普通精灵动画
-    "Sprite": function(opts) {
+    "Sprite": function (opts) {
         //启动精灵模式
         //在动画处理的时候给initAnimations快速调用
         createCanvasData('spiritId', opts)
     },
     //ppt=》pixi动画
-    "PPT": function(opts) {
+    "PPT": function (opts) {
         createCanvasData('pptId', opts)
     },
     //高级精灵动画
     //widget
-    "SeniorSprite": function(opts) {
+    "SeniorSprite": function (opts) {
         createCanvasData('widgetId', opts)
     },
 	//复杂精灵动画
-	"CompSprite": function(opts) {
+	"CompSprite": function (opts) {
 		var data = opts.data
 		var conData = opts.conData
-		if(/\./i.test(opts.conData.md5)){
+		if (/\./i.test(opts.conData.md5)) {
 			console.log('复杂精灵动画数据错误')
 			return
 		}
@@ -86,7 +86,7 @@ function callResolveArgs(category, opts) {
 		while (len--) {
 			cat = cats[len]
 			//匹配数据类型
-			pixiType[cat] && pixiType[cat](opts,category)
+			pixiType[cat] && pixiType[cat](opts, category)
 		}
 	}
 }
@@ -97,6 +97,26 @@ function callResolveArgs(category, opts) {
  * 
  */
 export function parseCanvas(contentId, category, conData, data) {
+
+	//类型转化
+	//双数据类型转行单个类型
+	if (Xut.config.onlyDomMode) {
+		var cat
+		var cats = category.split(",")
+		var len = cats.length
+
+		if (len) { 
+			while (len--) {
+				cat = cats[len]
+				//匹配数据类型
+				if(cat !== 'PPT'){
+					conData.category = cat
+				}
+			}
+		}
+		return
+	}
+
 	//动作类型
 	//用于动画判断
 	conData.actionTypes = {};
@@ -119,6 +139,6 @@ export function parseCanvas(contentId, category, conData, data) {
 	//CompSprite
 	//多种处理方式
 	//可以组合
-	category &&　callResolveArgs(category, opts)
-	
+	category && 　callResolveArgs(category, opts)
+
 }
