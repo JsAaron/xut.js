@@ -20,16 +20,16 @@ import { Container } from '../pixi/container'
 function preRunAction(data, eventName) {
     var para, scopem,
         parameter = data.getParameter();
-        
+
     //过滤预生成动画
     if (parameter.length === 1) {
         para = parameter[0];
-        if (para.animationName === 'EffectAppear' 
+        if (para.animationName === 'EffectAppear'
             && data.domMode  //并且只有dom模式才可以，canvas排除
-            && eventName === 'auto' 
-            && !para.videoId 
-            && !para.delay 
-            && data.contentDas.category !== 'Sprite' 
+            && eventName === 'auto'
+            && !para.videoId
+            && !para.delay
+            && data.contentDas.category !== 'Sprite'
             && !para.preCode //动画前脚本
             && !para.postCode //动画后脚本
             && !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
@@ -52,12 +52,12 @@ function preRunAction(data, eventName) {
 function createScope(base, contentId, pid, actName, contentDas, parameter, hasParallax) {
     //默认启动dom模式
     var data = {
-            type: 'dom',
-            canvasMode: false,
-            domMode: true
-        },
-        $contentProcess,
-        pageType = base.pageType;
+        type: 'dom',
+        canvasMode: false,
+        domMode: true
+    }
+    var $contentProcess
+    var pageType = base.pageType
 
 
     //如果启动了canvas模式
@@ -66,7 +66,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
         //如果找到对应的canvas对象
         if (-1 !== base.canvasRelated.cid.indexOf(contentId)) {
             //创建canvas容器
-            $contentProcess = Container(contentDas,base.rootNode)
+            $contentProcess = Container(contentDas, base.rootNode)
             data.type = 'canvas';
             data.canvasMode = true;
             data.domMode = false;
@@ -118,17 +118,17 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
 
 
     //生成查询方法
-    data.getParameter = function() {
+    data.getParameter = function () {
         //分区母版与页面的数据结构
         //parameter-master-parallax
         //parameter-master-animation
         //parameter-page-animation
         var fix = 'parameter-' + pageType + '-' + data.processType;
         data[fix] = parameter;
-        return function() {
+        return function () {
             return data[fix];
         }
-    }();
+    } ();
 
 
     /**
@@ -146,7 +146,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
      *  过滤自动热点并且是出现动作，没有时间，用于提升体验
      */
     preRunAction(data, base.eventData.eventName)
- 
+
 
     /**
      * 生成子作用域对象，用于抽象处理动画,行为
@@ -203,7 +203,7 @@ function createHandlers(base, parameter, waitCreate) {
  * @return {[type]} [description]
  */
 function fnCreate(base) {
-    return function(data, callback) {
+    return function (data, callback) {
         var para, handlers;
         if (data && data.length) {
             //生成动画作用域对象
@@ -243,7 +243,7 @@ export function Content(base) {
 
     switch (base.pageType) {
         case 'page':
-            batcheCreate(animation, function(handlers) {
+            batcheCreate(animation, function (handlers) {
                 abstractContents.push(handlers)
             });
             break;
@@ -253,11 +253,11 @@ export function Content(base) {
                 tempAnimationScope = {},
                 tempAssistContents = [];
             //视觉差处理
-            batcheCreate(parallax, function(handlers) {
+            batcheCreate(parallax, function (handlers) {
                 tempParallaxScope[handlers.id] = handlers;
             });
 
-            batcheCreate(animation, function(handlers) {
+            batcheCreate(animation, function (handlers) {
                 tempAnimationScope[handlers.id] = handlers;
             });
 
@@ -267,23 +267,23 @@ export function Content(base) {
             //动画为主
             //合并，同一个对象可能具有动画+视觉差行为
             if (hasParallax && hasAnimation) {
-                _.each(tempAnimationScope, function(target) {
-                        var id = target.id,
-                            source;
-                        if (source = tempParallaxScope[id]) { //如果能找到就需要合并
-                            innerExtend(target, source); //复制方法
-                            target.processType = 'both'; //标记新组合
-                            delete tempParallaxScope[id]; //删除引用
-                        }
-                    })
-                    //剩余的处理
+                _.each(tempAnimationScope, function (target) {
+                    var id = target.id,
+                        source;
+                    if (source = tempParallaxScope[id]) { //如果能找到就需要合并
+                        innerExtend(target, source); //复制方法
+                        target.processType = 'both'; //标记新组合
+                        delete tempParallaxScope[id]; //删除引用
+                    }
+                })
+                //剩余的处理
                 if (_.keys(tempParallaxScope).length) {
                     _.extend(tempAnimationScope, tempParallaxScope);
                 }
                 tempParallaxScope = null;
             }
             //转化成数组
-            _.each(hasAnimation ? tempAnimationScope : tempParallaxScope, function(target) {
+            _.each(hasAnimation ? tempAnimationScope : tempParallaxScope, function (target) {
                 tempAssistContents.push(target);
             })
             abstractContents = tempAssistContents;

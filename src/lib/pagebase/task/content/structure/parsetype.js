@@ -30,6 +30,7 @@ var createCanvasData = function (type, opts) {
 	}
 }
 
+
 /**
  * canvas pixi.js类型处理转化
  * 填充cid, wid
@@ -37,10 +38,12 @@ var createCanvasData = function (type, opts) {
  */
 var pixiType = {
     //普通精灵动画
-    "Sprite": function (opts) {
-        //启动精灵模式
-        //在动画处理的时候给initAnimations快速调用
-        createCanvasData('spiritId', opts)
+    "Sprite": function (opts, data) {
+		if (data.canvasRelated.enable) {
+			//启动精灵模式
+			//在动画处理的时候给initAnimations快速调用
+			createCanvasData('spiritId', opts)
+		}
     },
     //ppt=》pixi动画
     "PPT": function (opts) {
@@ -48,10 +51,14 @@ var pixiType = {
     },
     //高级精灵动画
     //widget
-    "SeniorSprite": function (opts) {
-        createCanvasData('widgetId', opts)
+    "SeniorSprite": function (opts, data) {
+		if (data.canvasRelated.enable) {
+			createCanvasData('widgetId', opts)
+		}
     },
 	//复杂精灵动画
+	//可以在dom模式与canvas混合使用
+	//所以dom下还要强制开始canvasMode
 	"CompSprite": function (opts) {
 		var data = opts.data
 		var conData = opts.conData
@@ -82,11 +89,12 @@ function callResolveArgs(category, opts) {
 	var cat
 	var cats = category.split(",")
 	var len = cats.length
+	var data = opts.data
 	if (len) {
 		while (len--) {
 			cat = cats[len]
 			//匹配数据类型
-			pixiType[cat] && pixiType[cat](opts, category)
+			pixiType[cat] && pixiType[cat](opts, data)
 		}
 	}
 }
@@ -105,11 +113,11 @@ export function parseCanvas(contentId, category, conData, data) {
 		var cats = category.split(",")
 		var len = cats.length
 
-		if (len) { 
+		if (len) {
 			while (len--) {
 				cat = cats[len]
 				//匹配数据类型
-				if(cat !== 'PPT'){
+				if (cat !== 'PPT') {
 					conData.category = cat
 				}
 			}
@@ -139,6 +147,6 @@ export function parseCanvas(contentId, category, conData, data) {
 	//CompSprite
 	//多种处理方式
 	//可以组合
-	category && 　callResolveArgs(category, opts)
+	category && callResolveArgs(category, opts)
 
 }

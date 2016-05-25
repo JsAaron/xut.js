@@ -47,9 +47,6 @@ var specialSprite = Factory.extend({
      */
     constructor: function (successCallback, failCallback, options) {
 
-
-        var self = this;
-
         this.data = options.data;
         this.renderer = options.renderer
         this.pageIndex = options.pageIndex

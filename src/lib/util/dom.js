@@ -21,11 +21,18 @@ export function execJson(itemArray) {
     try {
         json = (new Function("return " + itemArray))();
     } catch (error) {
-        console.log('解析json出错'+ itemArray)
+        console.log('解析json出错' + itemArray)
     }
     return json;
 }
 
+
+/**
+ * 回车符处理
+ */
+export function enterReplace(str) {
+    return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
+}
 
 /**
  * 创建一个纯存的hash对象

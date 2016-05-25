@@ -12,7 +12,7 @@ from '../../../util/index'
  * @return {[type]}              [description]
  */
 
-var rAF = function(callback) {
+var rAF = function (callback) {
     return window.setTimeout(callback, 1000 / 10);
 };
 
@@ -30,15 +30,15 @@ var rQueue = {};
  * @return {[type]}             [description]
  */
 function requestAnimation(activeIndex) {
-    var key, content;
+    var key;
     var queue = rQueue[activeIndex];
     var timeout = 0;
     var state = true
-    var clern = function() {
+    var clern = function () {
         clearTimeout(timeout)
         timeout = null;
     }
-    var run = function() {
+    var run = function () {
         //如果停止
         if (!state) {
             clern();
@@ -52,7 +52,7 @@ function requestAnimation(activeIndex) {
                 fns[key](); //执行刷新
             }
             // console.log('runRequestAnimation....',activeIndex, Object.keys(fns).length)
-            timeout = rAF(function() {
+            timeout = rAF(function () {
                 run()
             })
         }
@@ -60,7 +60,7 @@ function requestAnimation(activeIndex) {
     run();
 
     //停止刷新
-    this.stop = function() {
+    this.stop = function () {
         if (state) {
             state = false
             clern()
@@ -69,7 +69,7 @@ function requestAnimation(activeIndex) {
 
     //刷新停止
     //外部重新激活
-    this.activate = function() {
+    this.activate = function () {
         if (!state) {
             state = true
             run();
@@ -106,11 +106,11 @@ function checkRun(pageIndex) {
  * 单独只刷新一次
  * @return {[type]} [description]
  */
-export function oneQueue(fn) {
+export function oneQueue() {
     var start = (+new Date());
     var timeout;
     var state = true
-    var run = function() {
+    var run = function () {
         if (!state) {
             timeout && clearTimeout(timeout)
         }
@@ -140,7 +140,7 @@ export function addQueue(pageIndex, key, value) {
     }
     if (!rQueue[pageIndex]['fns'][key]) {
         rQueue[pageIndex]['fns'][key] = value;
-            ++rQueue[pageIndex]['length']
+        ++rQueue[pageIndex]['length']
     } else {
         console.log('rQueue' + key + '已存在')
     }
@@ -157,7 +157,7 @@ export function addQueue(pageIndex, key, value) {
 export function removeQueue(pageIndex, key) {
     if (rQueue[pageIndex] && rQueue[pageIndex]['fns']) {
         delete rQueue[pageIndex]['fns'][key]
-            --rQueue[pageIndex]['length']
+        --rQueue[pageIndex]['length']
         if (!Object.keys(rQueue[pageIndex]['fns']).length) {
             if (rQueue[pageIndex].rAF) {
                 rQueue[pageIndex].rAF.stop();
@@ -172,7 +172,7 @@ export function removeQueue(pageIndex, key) {
  * 销毁
  * @return {[type]} [description]
  */
-export function destroyQueue(pageIndex, uuid) {
+export function destroyQueue(pageIndex) {
     if (rQueue[pageIndex]) {
         if (rQueue[pageIndex].rAF) {
             rQueue[pageIndex].rAF.stop();
@@ -186,5 +186,5 @@ export function destroyQueue(pageIndex, uuid) {
  * @return {[type]} [description]
  */
 export function getQueue() {
-    return rQueue;
+    return rQueue
 }

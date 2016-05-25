@@ -5,7 +5,6 @@
  *                                      *
  ******************************************/
 import {
-    oneQueue,
     addQueue,
     removeQueue,
     destroyQueue

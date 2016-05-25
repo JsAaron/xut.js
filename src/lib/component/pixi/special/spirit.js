@@ -10,8 +10,8 @@ import { setProportion } from '../../../util/option'
  * @param  {[type]} path          [description]
  * @return {[type]}               [description]
  */
-function spiritAni(data, path, condata) {
-
+function spiritAni(data, path) {
+ 
     // this.canvasX = condata.scaleLeft
     // this.canvasY = condata.scaleTop
 
@@ -108,12 +108,11 @@ spiritAni.prototype.init = function () {
         this.maskSprite.height = this.spiritHeight;
         this.stage.addChild(this.maskSprite);
     }
-
-
+ 
     //png
-    for (var i = 0; i < this.imagesArray.length; i++) {
-        this.texture[i] = PIXI.Texture.fromImage(this.imagesArray[i]);
-    }
+    for (var j = 0; j < this.imagesArray.length; j++) {
+        this.texture[j] = PIXI.Texture.fromImage(this.imagesArray[j]);
+    } 
 
     this.advSprite = new PIXI.Sprite(this.texture[0]);
     this.advSprite.position.x = this.startPoint.x;

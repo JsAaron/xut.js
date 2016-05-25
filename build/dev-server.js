@@ -1,9 +1,10 @@
-var fs      = require('fs')
+var fs = require('fs')
 var express = require('express')
 var webpack = require('webpack')
-var ora     = require('ora')
-var open    = require("open");
-var watch   = require('gulp-watch');
+var ora = require('ora')
+var open = require("open");
+var watch = require('gulp-watch');
+var path = require('path')
 
 var child_process = require('child_process');
 
@@ -17,10 +18,12 @@ var webpacHotMiddleware = require('webpack-hot-middleware')
 //https://www.npmjs.com/package/write-file-webpack-plugin
 var WriteFilePlugin = require('write-file-webpack-plugin');
 
+var porjectRoot = path.resolve(__dirname, '../src/lib/')
 
 var config = require('../config')
 var port = process.env.PORT || config.dev.port
 var app = express()
+
 
 //数据库
 if (!fs.existsSync("./src/content/xxtebook.db")) {
@@ -31,7 +34,7 @@ if (!fs.existsSync("./src/content/xxtebook.db")) {
 var spinner = ora('Begin to pack , Please wait for\n')
 spinner.start()
 
-setTimeout(function() {
+setTimeout(function () {
     spinner.stop()
 }, 5000)
 
@@ -44,7 +47,7 @@ if (!fs.existsSync("./src/content/SQLResult.js")) {
 var entry = {
     app: config.build.entry
 }
-Object.keys(entry).forEach(function(name) {
+Object.keys(entry).forEach(function (name) {
     entry[name] = ['./build/dev-client'].concat(entry[name])
 })
 
@@ -57,14 +60,24 @@ var webpackConfig = {
     },
     devtool: '#eval-source-map',
     module: {
-        loaders: [{
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-            query: {
-                presets: ['es2015']
+        // preLoaders: [
+        //     {
+        //         test: /\.js$/,
+        //         loader: 'eslint',
+        //         include: porjectRoot,
+        //         exclude: /node_modules/
+        //     }
+        // ],
+        loaders: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'babel-loader',
+                query: {
+                    presets: ['es2015']
+                }
             }
-        }]
+        ]
     },
     plugins: [
         // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
@@ -120,9 +133,9 @@ var devMiddleware = webpackDevMiddleware(compiler, {
 var hotMiddleware = webpacHotMiddleware(compiler)
 
 // force page reload when html-webpack-plugin template changes
-compiler.plugin('compilation', function(compilation) {
+compiler.plugin('compilation', function (compilation) {
     //https://github.com/ampedandwired/html-webpack-plugin
-    compilation.plugin('html-webpack-plugin-after-emit', function(data, cb) {
+    compilation.plugin('html-webpack-plugin-after-emit', function (data, cb) {
         hotMiddleware.publish({
             action: 'reload'
         })
@@ -144,7 +157,7 @@ app.use('/css', express.static('src/css'));
 app.use('/images', express.static('src/images'));
 app.use('/content', express.static('src/content'));
 
-module.exports = app.listen(port, function(err) {
+module.exports = app.listen(port, function (err) {
     if (err) {
         console.log(err)
         return
@@ -155,25 +168,25 @@ module.exports = app.listen(port, function(err) {
 
 if (config.test.launch) {
 
-    watch(config.build.assetsRoot + '/app.js', function() {
+    watch(config.build.assetsRoot + '/app.js', function () {
 
         console.log(
             '\n' +
-            ' watch file change, start debug mode:\n' 
+            ' watch file change, start debug mode:\n'
         )
 
         var child = child_process.spawn('node', ['build/dev-build.js', ['debug=' + config.test.dist]]);
         // 捕获标准输出并将其打印到控制台 
-        child.stdout.on('data', function(data) {
+        child.stdout.on('data', function (data) {
             console.log('build out：\n' + data);
         });
 
         // 捕获标准错误输出并将其打印到控制台 
-        child.stderr.on('data', function(data) {
+        child.stderr.on('data', function (data) {
             console.log('build fail out：\n' + data);
         });
 
-        child.on('close', function(code) {
+        child.on('close', function (code) {
             console.log('build complete：' + code);
         });
 

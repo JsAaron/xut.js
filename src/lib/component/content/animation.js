@@ -10,15 +10,14 @@
  ********************************************************************/
 
 //dom精灵动画
-import { Sprite as domSprite } from './plug/sprite'
+import { Sprite as domSprite } from './plug/domsprite'
+//dom ppt动画
+import { PptAnimation } from './plug/domppt/index'
 //pixi普通精灵动画
 import { Sprite as pixiSpirit } from '../pixi/sprite/index'
 //pixi特殊高级动画
 import { specialSprite as pixiSpecial } from '../pixi/special/index'
-//依赖
-import { Dep } from './dep'
 
- 
 /**
  * 销毁动画音频
  * @param  {[type]} videoIds  [description]
@@ -28,7 +27,7 @@ import { Dep } from './dep'
 function destroyContentAudio(videoIds, chapterId) {
     var isExist = false;
     //如果有音频存在
-    videoIds && _.each(videoIds, function(data, index) {
+    videoIds && _.each(videoIds, function (data, index) {
         //如果存在对象音频
         if (data.videoId) {
             isExist = true;
@@ -58,7 +57,7 @@ function bind(instance, success, fail) {
  * 动画对象控制
  * @param {[type]} options [description]
  */
-var Animation = function(options) {
+var Animation = function (options) {
     //mix参数
     _.extend(this, options);
 }
@@ -79,12 +78,12 @@ var animProto = Animation.prototype;
  * @param  {[type]} pageType  [description]
  * @return {[type]}           [description]
  */
-animProto.init = function(id, context, rootNode, chapterId, parameter, pageType) {
+animProto.init = function (id, context, rootNode, chapterId, parameter, pageType) {
 
     var pageIndex = this.pageIndex;
     var self = this;
     var actionTypes;
-    var create = function(constructor, newContext) {
+    var create = function (constructor, newContext) {
         return new constructor(pageIndex, pageType, chapterId, newContext || context, parameter, rootNode);
     }
 
@@ -95,7 +94,6 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
         //普通精灵动画
         this.domSprites = this.contentDas.category === 'Sprite' ? true : false;
     }
-
 
     //canvas模式
     //比较复杂
@@ -123,11 +121,12 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
             this.pixiObj = new pixiSpirit(opts);
             //构建精灵动画完毕后
             //构建ppt对象
-            this.pixiObj.$once('load', function() {
+            this.pixiObj.$once('load', function () {
                 //ppt动画
-                if (actionTypes.pptId) {
+                if (actionTypes.pptId) { 
                     //content=>MovieClip
-                    self.pptObj = create(CanvasAnimation, this.movie);
+                    self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
+                    self.pptObj.contentId = id
                 }
                 //任务完成
                 self.nextTask.context.remove(id)
@@ -137,14 +136,14 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
 
         //特殊高级动画
         //必须是ppt与pixi绑定的
-        if(actionTypes.compSpriteId){    
+        if (actionTypes.compSpriteId) {
             this.pixiObj = new pixiSpecial(opts);
             //ppt动画
             if (actionTypes.pptId) {
-                self.pptObj = create(CanvasAnimation);
+                self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
             }
-        }    
-           
+        }
+
     }
 
 };
@@ -156,15 +155,15 @@ animProto.init = function(id, context, rootNode, chapterId, parameter, pageType)
  * @param  {[type]} canvasContainer [description]
  * @return {[type]}                 [description]
  */
-animProto.run = function(scopeComplete) {
+animProto.run = function (scopeComplete) {
 
     var self = this,
         defaultIndex,
         element = this.$contentProcess;
- 
+
     //ppt动画
     //dom与canvas
-    bind(this.pptObj, function(ppt) {
+    bind(this.pptObj, function (ppt) {
         //优化处理,只针对互斥的情况下
         //处理层级关系
         if (element.prop && element.prop("mutex")) {
@@ -172,12 +171,13 @@ animProto.run = function(scopeComplete) {
                 'display': 'block'
             })
         }
+
         //指定动画
         ppt.runAnimation(scopeComplete);
     })
 
     //pixi动画
-    bind(this.pixiObj, function(pixi) {
+    bind(this.pixiObj, function (pixi) {
         pixi.playAnim(scopeComplete);
     })
 
@@ -189,10 +189,10 @@ animProto.run = function(scopeComplete) {
             return;
         }
         this.spriteObj = domSprite({
-            element : this.$contentProcess.find('.sprite').show(),
-            data    : this.contentDas,
-            id      : this.id,
-            mode    : 'css'
+            element: this.$contentProcess.find('.sprite').show(),
+            data: this.contentDas,
+            id: this.id,
+            mode: 'css'
         });
     }
 }
@@ -202,10 +202,10 @@ animProto.run = function(scopeComplete) {
  * @param  {[type]} chapterId [description]
  * @return {[type]}           [description]
  */
-animProto.stop = function(chapterId) {
+animProto.stop = function (chapterId) {
 
     //ppt动画
-    bind(this.pptObj, function(ppt) {
+    bind(this.pptObj, function (ppt) {
         //销毁ppt音频
         destroyContentAudio(ppt.options, chapterId);
         //停止PPT动画
@@ -213,12 +213,12 @@ animProto.stop = function(chapterId) {
     })
 
     //pixi动画
-    bind(this.pixiObj, function(pixi) {
+    bind(this.pixiObj, function (pixi) {
         pixi.stopAnim()
     })
 
     //dom精灵
-    bind(this.spriteObj, function(sprObj) {
+    bind(this.spriteObj, function (sprObj) {
         sprObj.pauseSprites();
     });
 }
@@ -228,11 +228,11 @@ animProto.stop = function(chapterId) {
  * 翻页结束，复位上一页动画
  * @return {[type]} [description]
  */
-animProto.reset = function() {
-    bind(this.pptObj, function(ppt) {
+animProto.reset = function () {
+    bind(this.pptObj, function (ppt) {
         ppt.resetAnimation();
     })
-    bind(this.pixiObj, function(ppt) {
+    bind(this.pixiObj, function (ppt) {
         ppt.resetAnim();
     })
 }
@@ -242,20 +242,20 @@ animProto.reset = function() {
  * 销毁动画
  * @return {[type]} [description]
  */
-animProto.destroy = function() {
+animProto.destroy = function () {
     //dom ppt
     //
-    bind(this.pptObj, function(ppt) {
+    bind(this.pptObj, function (ppt) {
         ppt.destroyAnimation();
     })
 
     //canvas
-    bind(this.pixiObj, function(pixi) {
+    bind(this.pixiObj, function (pixi) {
         pixi.destroyAnim();
     })
 
     //dom 精灵
-    bind(this.spriteObj, function(sprObj) {
+    bind(this.spriteObj, function (sprObj) {
         sprObj.stopSprites();
     });
 
@@ -266,5 +266,5 @@ animProto.destroy = function() {
 }
 
 export {
-    Animation
+Animation
 }

@@ -152,6 +152,7 @@ export function structure(callback, data, context) {
         cachedContentStr = [];
 
 
+
     /**
      * 容器结构创建 
      */

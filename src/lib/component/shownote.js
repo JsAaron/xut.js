@@ -6,7 +6,7 @@ function ShowNote(data) {
     _.extend(this, data)
     this.setup();
 }
-
+ 
 ShowNote.prototype = {
     setup: function() {
         var that = this,
@@ -14,7 +14,7 @@ ShowNote.prototype = {
             prop = Xut.config.proportion,
             width = Math.round((prop.width + prop.height) / 2 * Xut.config.iconHeight),
             space = Math.round(width / 2);
-        retStr = '<div class="xut-shownote-box" style="z-index:' + Xut.zIndexlevel() + '">' +
+        var retStr = '<div class="xut-shownote-box" style="z-index:' + Xut.zIndexlevel() + '">' +
             '<div class="close" style="width:' + width + 'px;height:' + width + 'px;top:-' + space + 'px;right:-' + space + 'px"></div>' +
             '<div class="content">' + note + '</div>' +
             '</div>';

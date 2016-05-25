@@ -13,7 +13,6 @@ from '../core/index'
 
 var arr = [];
 var slice = arr.slice;
-var concat = arr.concat;
 
 /**
  * pixi类
@@ -28,7 +27,7 @@ var Factory = Xut.CoreObject.extend({
      * @param  {[type]} canvasRelated [description]
      * @return {[type]}               [description]
      */
-    init: function(options) {
+    init: function() {
         var pixi = this;
         this.action = 'init'
         var args = [
@@ -37,7 +36,7 @@ var Factory = Xut.CoreObject.extend({
              * @param  {[type]} contentId [description]
              * @return {[type]}           [description]
              */
-            function successCallback(contentId) {
+            function successCallback() {
                 //加载完成构建 ppt实例
                 pixi.$emit('load')
             },
@@ -46,7 +45,7 @@ var Factory = Xut.CoreObject.extend({
              * @param  {[type]} contentId [description]
              * @return {[type]}           [description]
              */
-            function failCallback(contentId) {
+            function failCallback() {
                 //删掉对应的cid记录
                 // var index =  canvasRelated.cid.indexOf(contentId)
                 // canvasRelated.cid.splice(index,1);
@@ -74,7 +73,7 @@ var Factory = Xut.CoreObject.extend({
     destroyAnim: function() {
         this.action = 'destroy'
         this.destroy && this.destroy(destroyRenderer)
-    },
+    }
 
 });
 
