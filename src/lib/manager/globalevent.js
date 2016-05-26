@@ -51,11 +51,11 @@ function initPointer(init, pagetotal) {
 //pageIndex 页面索引
 function GlobalEvent(options, config) {
 
-	options.hindex = options.initIndex;
+    options.hindex = options.initIndex;
 
-	this.screenWidth = config.screenSize.width;
+    this.screenWidth = config.screenSize.width;
 
-	_.extend(this, options);
+    _.extend(this, options);
 
     // this.element = options.rootPage;
     this.element = options.container;
@@ -117,7 +117,7 @@ var edProto = GlobalEvent.prototype;
  * @param  {[type]} deltaX [description]
  * @return {[type]}        [description]
  */
-edProto.overstep = function(deltaX) {
+edProto.overstep = function (deltaX) {
     //首页,并且是左滑动
     if (this.hindex === 0 && deltaX > 0) {
         return true;
@@ -131,7 +131,7 @@ edProto.overstep = function(deltaX) {
  * 前翻页接口
  * @return {[type]} [description]
  */
-edProto.prev = function() {
+edProto.prev = function () {
     if (!this.overstep(1)) {
         this.slideTo('prev');
     };
@@ -141,7 +141,7 @@ edProto.prev = function() {
  * 后翻页接口
  * @return {Function} [description]
  */
-edProto.next = function() {
+edProto.next = function () {
     if (!this.overstep(-1)) {
         this.slideTo('next');
     }
@@ -151,7 +151,7 @@ edProto.next = function() {
  * 检车是否还在移动中
  * @return {Boolean} [description]
  */
-edProto.isMove = function() {
+edProto.isMove = function () {
     return this.fliplock;
 }
 
@@ -160,7 +160,7 @@ edProto.isMove = function() {
  * @param  {[type]}  distance [description]
  * @return {Boolean}          [description]
  */
-edProto.isBorder = function(distance) {
+edProto.isBorder = function (distance) {
     //起点左偏移
     if (this.hindex === 0 && distance > 0) {
         return true;
@@ -177,7 +177,7 @@ edProto.isBorder = function(distance) {
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-edProto.findRootElement = function(point, pageType) {
+edProto.findRootElement = function (point, pageType) {
     var liNode, map,
         hindex = this.hindex,
         sectionRang = this.sectionRang,
@@ -203,7 +203,7 @@ edProto.findRootElement = function(point, pageType) {
  * @param  {[type]} direction [description]
  * @return {[type]}           [description]
  */
-edProto.scopePointer = function(direction) {
+edProto.scopePointer = function (direction) {
     var overflow,
         pointer = this.pagePointer,
         fillength = Object.keys(pointer).length;
@@ -230,7 +230,7 @@ edProto.scopePointer = function(direction) {
 //[18 19 20]  转换后
 // 17 销毁
 // 20 创建
-edProto.shiftPointer = function(pointer) {
+edProto.shiftPointer = function (pointer) {
     var createPointer, //创建的页
         destroyPointer; //销毁的页
 
@@ -252,7 +252,7 @@ edProto.shiftPointer = function(pointer) {
 }
 
 //修正页码指示
-edProto.revisedFilpPointer = function(pointer) {
+edProto.revisedFilpPointer = function (pointer) {
 
     //需要停止动作的页面索引
     var stopPointer = pointer.currIndex;
@@ -288,7 +288,7 @@ edProto.revisedFilpPointer = function(pointer) {
 }
 
 //更新页码标示
-edProto.updataPointer = function(leftIndex, currIndex, rightIndex) {
+edProto.updataPointer = function (leftIndex, currIndex, rightIndex) {
     if (arguments.length === 3) {
         this.pagePointer = {
             'leftIndex': leftIndex,
@@ -324,11 +324,11 @@ edProto.updataPointer = function(leftIndex, currIndex, rightIndex) {
 }
 
 //修正页面索引
-edProto.fixHindex = function(currIndex) {
+edProto.fixHindex = function (currIndex) {
     this.hindex = currIndex; //翻页索引
 }
 
-edProto.slideTo = function(direction) {
+edProto.slideTo = function (direction) {
     var resolve;
     //如果在忙碌状态,如果翻页还没完毕
     if (Xut.busyBarState || this.fliplock) {
@@ -339,7 +339,7 @@ edProto.slideTo = function(direction) {
     this.startAnimTo(resolve.pointer, direction);
 }
 
-edProto.startAnimTo = function(pointer, direction) {
+edProto.startAnimTo = function (pointer, direction) {
     this.fliplock = true;
     this.prveHindex = this.hindex;
     this.direction = direction;
@@ -353,7 +353,7 @@ edProto.startAnimTo = function(pointer, direction) {
 
 
 //上翻页
-edProto.preRun = function(pointer) {
+edProto.preRun = function (pointer) {
     var pointers, me = this;
 
     function createPrev() {
@@ -376,7 +376,7 @@ edProto.preRun = function(pointer) {
 }
 
 //下翻页
-edProto.nextRun = function(pointer) {
+edProto.nextRun = function (pointer) {
     var pointers, me = this;
 
     function createNext() {
@@ -403,7 +403,7 @@ edProto.nextRun = function(pointer) {
  * 判断是否快速翻页
  * @return {[type]} [description]
  */
-edProto.judgeQuickTurn = function() {
+edProto.judgeQuickTurn = function () {
 
     var startDate = +new Date();
 
@@ -421,7 +421,7 @@ edProto.judgeQuickTurn = function() {
  * 计算滑动速度
  * @return {[type]} [description]
  */
-edProto.calculatespeed = function() {
+edProto.calculatespeed = function () {
     return (this.screenWidth - (Math.abs(this.deltaX))) * this.speedRate || this.speed;
 }
 
@@ -434,7 +434,7 @@ edProto.calculatespeed = function() {
  * follow    是否为跟随滑动
  * @return {[type]} [description]
  */
-edProto.processorMove = function(data) {
+edProto.processorMove = function (data) {
     var pagePointer = this.pagePointer;
     data.leftIndex = pagePointer.leftIndex;
     data.rightIndex = pagePointer.rightIndex;
@@ -446,7 +446,7 @@ edProto.processorMove = function(data) {
  * 停止动画,视频 音频
  * @return {[type]} [description]
  */
-edProto.sliderStop = function(pointers) {
+edProto.sliderStop = function (pointers) {
     this.$emit('onSwipeUpSlider', pointers);
 }
 
@@ -470,7 +470,7 @@ function compatibilityEvent(e) {
 }
 
 
-edProto.onTouchStart = function(e) {
+edProto.onTouchStart = function (e) {
 
     var interrupt,
         point = compatibilityEvent(e);
@@ -485,7 +485,7 @@ edProto.onTouchStart = function(e) {
      * point 事件对象
      * @return {[type]} [description]
      */
-    this.$emit('filter', function() {
+    this.$emit('filter', function () {
         interrupt = true;
     }, point, e)
 
@@ -495,8 +495,8 @@ edProto.onTouchStart = function(e) {
 
     this.deltaX = 0;
     this.deltaY = 0;
-    this.preventSwipe = false, //是否滑动事件受限
-        this.isoverstep = false; //是否边界溢出
+    this.preventSwipe = false //是否滑动事件受限
+    this.isoverstep = false; //是否边界溢出
     this.isScrollX = false; //是否为X轴滑动
     this.isScrollY = false; //是否为Y轴滑动
     this.isTouching = true; //点击了屏幕
@@ -508,7 +508,7 @@ edProto.onTouchStart = function(e) {
     };
 }
 
-edProto.onTouchMove = function(e) {
+edProto.onTouchMove = function (e) {
 
     //如果没有点击
     //或是Y轴滑动
@@ -539,9 +539,9 @@ edProto.onTouchMove = function(e) {
     e.preventDefault();
 
     this.deltaX = deltaX / ((!this.hindex && deltaX > 0 // 在首页
-            || this.hindex == this.pagetotal - 1 // 尾页
-            && deltaX < 0 // 中间
-        ) ?
+        || this.hindex == this.pagetotal - 1 // 尾页
+        && deltaX < 0 // 中间
+    ) ?
         (absDeltaX / this.screenWidth + 1) : 1);
 
     if (!this.isScrollX && this.deltaX) {
@@ -569,7 +569,7 @@ edProto.onTouchMove = function(e) {
 
 }
 
-edProto.onTouchEnd = function(e) {
+edProto.onTouchEnd = function (e) {
 
     this.isTouching = false;
 
@@ -578,7 +578,7 @@ edProto.onTouchEnd = function(e) {
     //点击
     if (!this.isScrollX && !this.isScrollY) {
         var isReturn = false;
-        this.$emit('onSwipeUp', this.hindex, function() {
+        this.$emit('onSwipeUp', this.hindex, function () {
             isReturn = true;
         });
         if (isReturn) return;
@@ -592,7 +592,7 @@ edProto.onTouchEnd = function(e) {
             //如果是首尾
             isPastBounds = !this.hindex && this.deltaX > 0 || this.hindex == this.pagetotal - 1 && this.deltaX < 0,
             isValidSlide =
-            Number(duration) < 200 && Math.abs(deltaX) > 30 || Math.abs(deltaX) > this.screenWidth / 6;
+                Number(duration) < 200 && Math.abs(deltaX) > 30 || Math.abs(deltaX) > this.screenWidth / 6;
 
 
         //跟随移动
@@ -620,7 +620,7 @@ edProto.onTouchEnd = function(e) {
  * 设置动画完成
  * @param {[type]} element [description]
  */
-edProto.setAnimComplete = function(element) {
+edProto.setAnimComplete = function (element) {
     this.distributed(element[0]);
 }
 
@@ -629,7 +629,7 @@ edProto.setAnimComplete = function(element) {
  * @param  {[type]} e [description]
  * @return {[type]}   [description]
  */
-edProto.onAnimComplete = function(e) {
+edProto.onAnimComplete = function (e) {
     var target = e.target,
         pageType = target.getAttribute('data-pageType'),
         view = target.getAttribute('data-view'); //操作的可视窗口
@@ -650,7 +650,7 @@ edProto.onAnimComplete = function(e) {
  * 派发事件
  * @return {[type]} [description]
  */
-edProto.distributed = function(element) {
+edProto.distributed = function (element) {
 
     //针对拖拽翻页阻止
     this.preventSwipe = true;
@@ -665,38 +665,38 @@ edProto.distributed = function(element) {
     element.removeAttribute('data-view', 'false');
 
     var slef = this;
-    setTimeout(function() {
+    setTimeout(function () {
         slef.$emit('onAnimComplete', slef.direction, slef.pagePointer, slef.unlock.bind(slef), isQuickTurn);
     }, 100)
 }
 
 
-edProto.lock = function() {
+edProto.lock = function () {
     this.fliplock = true;
 }
 
 //解锁翻页
-edProto.unlock = function() {
+edProto.unlock = function () {
     this.fliplock = false;
 }
 
 //快速翻页时间计算
-edProto.setRate = function() {
+edProto.setRate = function () {
     this.speedRate = 50 / this.screenWidth;
     this.isQuickTurn = true;
 }
 
 //复位速率
-edProto.resetRate = function() {
+edProto.resetRate = function () {
     this.speedRate = this.originalRate;
     this.isQuickTurn = false;
 }
 
-edProto.openSwipe = function() {
+edProto.openSwipe = function () {
     this._bindEvt();
 }
 
-edProto.closeSwipe = function() {
+edProto.closeSwipe = function () {
     this.evtDestroy();
 }
 
@@ -749,13 +749,13 @@ function calculationPosition(currIndex, targetIndex, pagetotal) {
         }
     }
 
-    _.each(ruleOut, function(ruleOutIndex) {
+    _.each(ruleOut, function (ruleOutIndex) {
         existpage.splice(existpage.indexOf(ruleOutIndex), 1)
     });
 
     destroy = existpage;
 
-    viewFlip = [].concat(create).concat(ruleOut).sort(function(a, b) {
+    viewFlip = [].concat(create).concat(ruleOut).sort(function (a, b) {
         return a - b
     });
 
@@ -770,7 +770,7 @@ function calculationPosition(currIndex, targetIndex, pagetotal) {
 }
 
 
-edProto.scrollToPage = function(targetIndex, preMode, complete) { //目标页面
+edProto.scrollToPage = function (targetIndex, preMode, complete) { //目标页面
 
     //如果还在翻页中
     if (this.fliplock) return
@@ -785,13 +785,13 @@ edProto.scrollToPage = function(targetIndex, preMode, complete) { //目标页面
                 return this.prev();
             }
             break;
-            //首页
+        //首页
         case currIndex:
             if (currIndex == 0) {
                 this.$emit('onDropApp');
             }
             return
-            //后一页
+        //后一页
         case (currIndex + 1):
             if (this.multiplePages) {
                 return this.next();
@@ -815,18 +815,18 @@ edProto.scrollToPage = function(targetIndex, preMode, complete) { //目标页面
  * @param  {[type]} e [description]
  * @return {[type]}   [description]
  */
-edProto.handleEvent = function(e) {
+edProto.handleEvent = function (e) {
     Xut.plat.handleEvent({
-        start: function(e) {
+        start: function (e) {
             this.onTouchStart(e);
         },
-        move: function(e) {
+        move: function (e) {
             this.onTouchMove(e);
         },
-        end: function(e) {
+        end: function (e) {
             this.onTouchEnd(e);
         },
-        transitionend: function(e) {
+        transitionend: function (e) {
             this.onAnimComplete(e);
         }
     }, this, e)
@@ -836,7 +836,7 @@ edProto.handleEvent = function(e) {
  * 绑定事件
  * @return {[type]} [description]
  */
-edProto._bindEvt = function() {
+edProto._bindEvt = function () {
     var self = this;
     //pageFlip启动，没有滑动处理
     if (this.pageFlip) {
@@ -873,7 +873,7 @@ edProto._bindEvt = function() {
  * 销毁事件
  * @return {[type]} [description]
  */
-edProto.evtDestroy = function() {
+edProto.evtDestroy = function () {
     var self = this;
     Xut.plat.execEvent('off', {
         context: this.element,
@@ -891,7 +891,7 @@ edProto.evtDestroy = function() {
  * 销毁所有
  * @return {[type]} [description]
  */
-edProto.destroy = function() {
+edProto.destroy = function () {
     this.evtDestroy();
     this.$off();
     this.bubbleNode.page = null;

@@ -6,22 +6,22 @@ const TAG = 'aaron'
 
 
 //如果数据库为写入appid ,则创建
-var createAppid = function() {
+var createAppid = function () {
     //添加UUID
     var appId = 'aaron-' + new Date().getDate();
     //写入数据库
-    Xut.config.db && Xut.config.db.transaction(function(tx) {
-        tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function() {}, function() {});
-    }, function() {
+    Xut.config.db && Xut.config.db.transaction(function (tx) {
+        tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function () { }, function () { });
+    }, function () {
         //  callback && callback();
-    }, function() {
+    }, function () {
         //  callback && callback();
     });
     return appId;
 }
 
 //过滤
-var filter = function(key) {
+var filter = function (key) {
     //添加头部标示
     if (onlyId) {
         return key + onlyId;
@@ -30,8 +30,8 @@ var filter = function(key) {
             Xut.config.appUUID = createAppid();
         }
         //子文档标记
-        if (SUbCONFIGT && SUbCONFIGT.dbId) {
-            onlyId = "-" + Xut.config.appUUID + "-" + SUbCONFIGT.dbId;
+        if (window.SUbCONFIGT && window.SUbCONFIGT.dbId) {
+            onlyId = "-" + Xut.config.appUUID + "-" + window.SUbCONFIGT.dbId;
         } else {
             onlyId = "-" + Xut.config.appUUID;
         }
@@ -48,12 +48,8 @@ export function _key(index) { //本地方法
     return storage.key(index);
 };
 
-/**
- * 设置localStorage
- * @param {[type]} key [description]
- * @param {[type]} val [description]
- */
-export function _set(key, val) {
+
+var set = function name(key, val) {
     var setkey;
 
     //ipad ios8.3setItem出问题
@@ -76,17 +72,26 @@ export function _set(key, val) {
         key = filter(key);
         set(key, val);
     }
-};
+}
+
+var get = function (key) {
+    key = filter(key);
+    return storage.getItem(key);
+}
+
+/**
+ * 设置localStorage
+ * @param {[type]} key [description]
+ * @param {[type]} val [description]
+ */
+export {set as _set}
 
 /**
  * 获取localstorage中的值
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export function _get(key) {
-    key = filter(key);
-    return storage.getItem(key);
-};
+export {get as  _get }
 
 /**
  * 删除localStorage中指定项

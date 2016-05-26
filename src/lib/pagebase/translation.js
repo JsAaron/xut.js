@@ -4,7 +4,7 @@
  * @return {[type]} [description]
  */
 var prefix = Xut.plat.prefixStyle,
-    xxtTrans = function(offset) {
+    xxtTrans = function (offset) {
         offset = Xut.config.virtualMode ? offset / 2 : offset;
         return "translate3d(" + offset + "px, 0, 0)";
     };
@@ -25,13 +25,13 @@ let currEffect
 let nextEffect
 
 function setConfig() {
-    calculateContainer = Xut.config.proportion.calculateContainer(),
-    offsetLeft = (-1 * calculateContainer.width),
-    offsetRight = calculateContainer.width,
-    offsetCut = 0,
-    prevEffect = xxtTrans(offsetLeft),
-    currEffect = xxtTrans(offsetCut),
-    nextEffect = xxtTrans(offsetRight);
+    calculateContainer = Xut.config.proportion.calculateContainer()
+    offsetLeft = (-1 * calculateContainer.width)
+    offsetRight = calculateContainer.width
+    offsetCut = 0
+    prevEffect = xxtTrans(offsetLeft)
+    currEffect = xxtTrans(offsetCut)
+    nextEffect = xxtTrans(offsetRight)
 }
 
 //切换坐标
@@ -84,7 +84,7 @@ export function createTransform(currPageIndex, createPageIndex) {
 export function fix(translate3d) {
     var transform = prefix('transform')
     var translate3d = translate3d === 'prevEffect' ? prevEffect : nextEffect
-    this.element.css(transform, translate3dt)
+    this.element.css(transform, translate3d)
 }
 
 export function reset() {
@@ -129,10 +129,11 @@ export function flipOver(distance, speed) {
 
 
 var translation = {
-    reset       : reset,
-    flipMove    : flipMove,
-    flipRebound : flipRebound,
-    flipOver    : flipOver
+    fix: fix,
+    reset: reset,
+    flipMove: flipMove,
+    flipRebound: flipRebound,
+    flipOver: flipOver
 }
 
 export {translation}

@@ -396,12 +396,12 @@ sceneProto.createViewModel = function() {
 
 
     //如果是读酷端加载
-    if (DUKUCONFIG && isMain && DUKUCONFIG.success) {
-        DUKUCONFIG.success();
+    if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
+        window.DUKUCONFIG.success();
         vm.$init();
         //如果是客户端加载
-    } else if (CLIENTCONFIGT && isMain && CLIENTCONFIGT.success) {
-        CLIENTCONFIGT.success();
+    } else if (window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
+        window.CLIENTCONFIGT.success();
         vm.$init();
     } else {
         //正常加载

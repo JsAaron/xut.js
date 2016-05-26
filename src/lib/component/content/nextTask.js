@@ -26,7 +26,7 @@ export function createNextTask(callback) {
                 if (!total.length) {
                     //完成创建
                     this.statas = true;
-                }
+                } 
                 //如果已经等待
                 if (this.wait) {
                     callback && callback()
@@ -39,18 +39,20 @@ export function createNextTask(callback) {
                 //     this.wait = true;
                 //     return;
                 // }
-            },
+            }, 
             add: function(id) {
                 if (-1 === this._ids.indexOf(id)) {
                     this._ids.push(id)
                 }
-            },
+            }, 
             remove: function(id) {
-                if (!id) return;
+                if (!id){
+                    return
+                }  
                 var index = this._ids.indexOf(id)
                 var val = this._ids.splice(index, 1)
                 this.check(val);
-                return val
+                return val;
             },
             length: function() {
                 return this._ids.length;

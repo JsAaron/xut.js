@@ -30,14 +30,10 @@ let parseContentObjs = function(pageType, inputPara) {
  * @param {[type]} data [description]
  */
 function pageWidget(data) {
-
     //获取数据
     _.extend(this, data)
-
-    this.pageObj = null;
-    this.widgetName + "Widget"
+    this.pageObj = null
     this._init()
-
 }
 
 pageWidget.prototype = {

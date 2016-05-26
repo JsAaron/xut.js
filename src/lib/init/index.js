@@ -31,7 +31,7 @@ export function init() {
     //如果不是读库模式
     //播放HTML5视频
     //在IOS
-    if (!DUKUCONFIG && !GLOBALIFRAME && Xut.plat.isIOS) {
+    if (! window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
         html5Video();
     }
 
@@ -41,7 +41,7 @@ export function init() {
     //=======
     //3 pc
     //4 ios/android
-    if (GLOBALIFRAME) {
+    if (window.GLOBALIFRAME) {
         creatDatabase(config);
     } else {
         //PC还是移动
@@ -74,20 +74,20 @@ function creatDatabase(config) {
         //预加载处理视频
         //妙妙学不加载视频
         //读库不加载视频
-        if (!MMXCONFIG && !DUKUCONFIG) {
+        if (!window.MMXCONFIG && ! window.DUKUCONFIG) {
             loadVideo();
         }
 
         //不是子文档指定绑定按键
-        if (!SUbCONFIGT) {
+        if (!window.SUbCONFIGT) {
             Xut.Application.AddEventListener = function() {
-                GLOBALCONTEXT.document.addEventListener("backbutton", config._event.back, false);
-                GLOBALCONTEXT.document.addEventListener("pause", config._event.pause, false);
+                window.GLOBALCONTEXT.document.addEventListener("backbutton", config._event.back, false);
+                window.GLOBALCONTEXT.document.addEventListener("pause", config._event.pause, false);
             }
         }
     }
 
-    if (DUKUCONFIG) {
+    if ( window.DUKUCONFIG) {
         PMS.bind("MagazineExit", function() {
             PMS.unbind();
             Xut.Application.DropApp();

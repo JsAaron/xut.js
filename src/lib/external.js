@@ -143,10 +143,10 @@ function CheckBuyGood(seasonId, chapterId, createMode, pageIndex) {
             return false;
         }
         //判断是否交费
-        if (UNLOCK == data.Inapp || UNLOCK == _get(inAppId)) {
-            setUnlock();
-            return false;
-        }
+        // if (UNLOCK == data.Inapp || UNLOCK == _get(inAppId)) {
+        //     setUnlock();
+        //     return false;
+        // }
         //判断是否收费章节
         if (LOCK == data.Inapp && data.inappInfo) {
             item = _.map(data.inappInfo.split('-'), function(num) {
@@ -278,7 +278,7 @@ portExtend(View, {
         //================加载新的场景=================
 
         //读酷启动时不需要忙碌光标
-        if (DUKUCONFIG && options.main) {
+        if (window.DUKUCONFIG && options.main) {
             Xut.View.HideBusy();
         } else {
             Xut.View.ShowBusy();
@@ -573,7 +573,7 @@ function pass() {
     db.transaction(function(tx) {
         tx.executeSql(sql, [null, 'Inapp']);
     }, function(e) {
-        _set(inAppId, UNLOCK);
+        // _set(inAppId, UNLOCK);
     })
 
     setUnlock();
@@ -599,7 +599,7 @@ portExtend(Application, {
     Platform: (function() {
         //平台缩写
         var platformName = ['duku', 'pc', 'ios', 'android'];
-        if (GLOBALIFRAME) {
+        if (window.GLOBALIFRAME) {
             //嵌套iframe平台
             return platformName[0]
         } else {
@@ -704,7 +704,7 @@ portExtend(Application, {
             pageIndex = getStorage('pageIndex');
 
         //缓存加载
-        if (pageIndex !== void 0) {
+        if (pageIndex !== undefined) {
             novelId = getStorage("novelId");
             //加强判断
             if (novelId) {
@@ -754,37 +754,37 @@ portExtend(Application, {
      */
     DropApp: function() {
         //如果读酷
-        if (DUKUCONFIG) {
+        if (window.DUKUCONFIG) {
             //外部回调通知
-            if (DUKUCONFIG.iframeDrop) {
+            if (window.DUKUCONFIG.iframeDrop) {
                 var appId = _get('appId');
-                DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
+                window.DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
             }
-            DUKUCONFIG = null;
+            window.DUKUCONFIG = null;
             unEvent();
             destroy();
             return;
         }
 
         //客户端模式
-        if (CLIENTCONFIGT) {
+        if (window.CLIENTCONFIGT) {
             //外部回调通知
-            if (CLIENTCONFIGT.iframeDrop) {
-                CLIENTCONFIGT.iframeDrop();
+            if (window.CLIENTCONFIGT.iframeDrop) {
+                window.CLIENTCONFIGT.iframeDrop();
             }
-            CLIENTCONFIGT = null;
+            window.CLIENTCONFIGT = null;
             unEvent();
             destroy();
             return;
         }
 
         //妙妙学客户端
-        if (MMXCONFIG) {
+        if (window.MMXCONFIG) {
             //外部回调通知
-            if (MMXCONFIG.iframeDrop) {
-                MMXCONFIG.iframeDrop();
+            if (window.MMXCONFIG.iframeDrop) {
+                window.MMXCONFIG.iframeDrop();
             }
-            MMXCONFIG = null;
+            window.MMXCONFIG = null;
             destroy();
             return;
         }
@@ -793,8 +793,8 @@ portExtend(Application, {
             //并且是安卓情况下
             //安卓销毁按键事件
             if (Xut.plat.isAndroid) {
-                GLOBALCONTEXT.document.removeEventListener("backbutton", config._event.back, false);
-                GLOBALCONTEXT.document.removeEventListener("pause", config._event.pause, false);
+                window.GLOBALCONTEXT.document.removeEventListener("backbutton", config._event.back, false);
+                window.GLOBALCONTEXT.document.removeEventListener("pause", config._event.pause, false);
             }
         }
 
@@ -802,15 +802,15 @@ portExtend(Application, {
         function destroy() {
             //销毁内存对象
             Application.Destroy();
-            GLOBALCONTEXT = null;
+            window.GLOBALCONTEXT = null;
         }
 
         //单应用dialogs
         if (!plat.isBrowser) {
-            GLOBALCONTEXT.navigator.notification.confirm('您确认要退出吗？',
+            window.GLOBALCONTEXT.navigator.notification.confirm('您确认要退出吗？',
                 function(button) {
                     if (1 == button) {
-                        GLOBALCONTEXT.navigator.app.exitApp();
+                        window.GLOBALCONTEXT.navigator.app.exitApp();
                     }
                 },
                 '退出', ['确定', '取消']
@@ -957,8 +957,8 @@ Xut.U3d = {
      */
     View: function(seasonId, chapterId) {
         View.LoadScenario({
-            'scenarioId': serial.scenarioId,
-            'chapterId': serial.chapterId
+            'scenarioId': seasonId,
+            'chapterId': chapterId
         })
     }
 }

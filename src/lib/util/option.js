@@ -88,7 +88,7 @@ export function readFile(path, callback, type) {
 
     /**
      * ibooks模式 单独处理svg转化策划给你js,加载js文件
-     * @param  {[type]} IBOOKSCONFIG [description]
+     * @param  {[type]} window.IBOOKSCONFIG [description]
      * @return {[type]}              [description]
      */
     if (Xut.IBooks.CONFIG) {
@@ -106,11 +106,11 @@ export function readFile(path, callback, type) {
 
         //加载脚本
         request(paths, function() {
-            data = HTMLCONFIG[name] || IBOOKSCONFIG[name]
+            data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
             if (data) {
                 callback(data)
-                delete HTMLCONFIG[name];
-                delete IBOOKSCONFIG[name]
+                delete window.HTMLCONFIG[name];
+                delete window.IBOOKSCONFIG[name]
             } else {
                 callback('编译:脚本加载失败,文件名:' + name);
             }
@@ -127,10 +127,10 @@ export function readFile(path, callback, type) {
         paths = config.svgPath() + path;
         name = path.replace(".js", '')
         request(paths, function() {
-            data = window.HTMLCONFIG[name];
+            data = window.window.HTMLCONFIG[name];
             if (data) {
                 callback(data)
-                delete window.HTMLCONFIG[name];
+                delete window.window.HTMLCONFIG[name];
             } else {
                 callback('运行：脚本加载失败,文件名:' + path);
             }

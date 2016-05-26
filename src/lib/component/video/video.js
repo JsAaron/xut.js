@@ -189,42 +189,7 @@ function webView(options) {
 }
 
 
-/**
- * ios窗口化canvas播放器
- */
-function VideoCanvas(options) {
 
-    var container = options.container || $('body'),
-        url = Xut.config.videoPath() + options.url,
-        width = options.width,
-        height = options.height,
-        top = options.top,
-        left = options.left,
-        zIndex = options.zIndex;
-
-    var video = new InlineVideo(container, {
-        'loop': false,
-        'autoplay': true,
-        'src': url,
-        'width': width,
-        'height': height,
-        'top': top,
-        'left': left,
-        'zIndex': zIndex
-    })
-
-    return {
-        play: function() {
-            video.play()
-        },
-        stop: function() {
-            video.pause()
-        },
-        close: function() {
-            video.destroy()
-        }
-    }
-}
 
 
 /**
@@ -233,7 +198,7 @@ function VideoCanvas(options) {
  * @return {[type]}         [description]
  */
 function _Media(options) {
-    var url = MMXCONFIG ? options.url : options.url.substring(0, options.url.lastIndexOf('.')),
+    var url = window.MMXCONFIG ? options.url : options.url.substring(0, options.url.lastIndexOf('.')),
         width = options.width,
         height = options.height,
         top = options.top || 0,

@@ -4,21 +4,20 @@
  * 2 视觉差作用域
  * @type {Array}
  */
-
 import { Animation } from './animation'
 import { Parallax } from './parallax'
 
 import { Container } from '../pixi/container'
-
+ 
 
 /**
  * 预运行动作
  * 自动 && 出现 && 无时间 && 无音乐
  *  && 不是精灵动画 && 没有脚本代码 && 并且不能是收费
  * @return {[type]}         [description]
- */
+ */ 
 function preRunAction(data, eventName) {
-    var para, scopem,
+    var para,
         parameter = data.getParameter();
 
     //过滤预生成动画
@@ -39,9 +38,14 @@ function preRunAction(data, eventName) {
              *      满足是静态动画
              * **********************************************/
             //true是显示,false隐藏
-            return data.isRreRun = /"exit":"False"/i.test(para.parameter) === true ? 'visible' : 'hidden';
+            
+            var state = data.isRreRun = /"exit":"False"/i.test(para.parameter) === true 
+                    ? 'visible'
+                    : 'hidden';
+            
+            return state
         }
-    }
+    } 
 }
 
 
@@ -66,7 +70,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
         //如果找到对应的canvas对象
         if (-1 !== base.canvasRelated.cid.indexOf(contentId)) {
             //创建canvas容器
-            $contentProcess = Container(contentDas, base.rootNode)
+            $contentProcess = Container(contentDas, base.rootNode, base.pageIndex)
             data.type = 'canvas';
             data.canvasMode = true;
             data.domMode = false;
@@ -81,7 +85,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
          */
         if (!($contentProcess = base._findContentElement(actName))) {
             return;
-        };
+        }
     }
 
     /**
@@ -212,7 +216,7 @@ function fnCreate(base) {
                     callback(handlers);
                 }
             }
-        }
+        } 
     }
 }
 
@@ -221,6 +225,7 @@ function fnCreate(base) {
  * 源对象复制到目标对象
  */
 function innerExtend(target, source) {
+    var property
     for (property in source) {
         if (target[property] === undefined) {
             target[property] = source[property];
@@ -263,14 +268,14 @@ export function Content(base) {
 
             var hasParallax = _.keys(tempParallaxScope).length,
                 hasAnimation = _.keys(tempAnimationScope).length;
-
+ 
             //动画为主
             //合并，同一个对象可能具有动画+视觉差行为
             if (hasParallax && hasAnimation) {
                 _.each(tempAnimationScope, function (target) {
-                    var id = target.id,
-                        source;
-                    if (source = tempParallaxScope[id]) { //如果能找到就需要合并
+                    var id = target.id
+                    var source = tempParallaxScope[id]
+                    if (source) { //如果能找到就需要合并
                         innerExtend(target, source); //复制方法
                         target.processType = 'both'; //标记新组合
                         delete tempParallaxScope[id]; //删除引用

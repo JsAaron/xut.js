@@ -1,3 +1,6 @@
+
+import { translation } from '../pagebase/translation'
+
 /**
  * 页面切换逻辑
  * @param  {[type]} ) [description]
@@ -11,14 +14,14 @@
 function prev(complier, data) {
     var currIndex = data.currIndex;
     //跳转之前提高层级问题
-    complier.pageMgr.abstractAssistPocess(currIndex, function(pageObj) {
-            pageObj.element.css({
-                'z-index': 9997
-            });
-        })
-        //提高母版层级
-    complier.callMasterMgr(function() {
-        this.abstractAssistPocess(currIndex, function(pageObj) {
+    complier.pageMgr.abstractAssistPocess(currIndex, function (pageObj) {
+        pageObj.element.css({
+            'z-index': 9997
+        });
+    })
+    //提高母版层级
+    complier.callMasterMgr(function () {
+        this.abstractAssistPocess(currIndex, function (pageObj) {
             pageObj.element.css({
                 'z-index': 1
             });
@@ -39,14 +42,14 @@ function calculateFlip(complier, data, createCallback) {
     //需要创建的页面闭包器
     for (; i < create.length; i++) {
         pageIndex = create[i];
-        collectContainers.push(function(targetIndex, pageIndex) {
-            return function(callback) {
+        collectContainers.push(function (targetIndex, pageIndex) {
+            return function (callback) {
                 //创建新结构
                 complier.create([pageIndex], targetIndex, 'toPage', callback, {
                     'opacity': 0 //同页面切换,规定切换的样式
                 });
             }
-        }(targetIndex, pageIndex));
+        } (targetIndex, pageIndex));
     }
 
 
@@ -65,10 +68,10 @@ function calculateFlip(complier, data, createCallback) {
     if (collectContainers && collectLength) {
         for (; i < collectLength; i++) {
             //收集创建的根节点,异步等待容器的创建
-            collectContainers[i].call(complier, function(callbackPageBase) {
+            collectContainers[i].call(complier, function (callbackPageBase) {
                 if (count === 1) {
                     collectContainers = null;
-                    setTimeout(function() {
+                    setTimeout(function () {
                         createCallback(data);
                     }, 100);
                 }
@@ -98,22 +101,22 @@ function createContainerView(complier, data) {
      * 清除掉不需要的页面
      * 排除掉当前提高层次页面
      */
-    _.each(data['destroy'], function(destroyIndex) {
+    _.each(data['destroy'], function (destroyIndex) {
         if (destroyIndex !== data.currIndex) {
             pageMgr.clearPage(destroyIndex)
         }
     })
 
     //修正翻页2页的页面坐标值
-    _.each(data['ruleOut'], function(pageIndex) {
+    _.each(data['ruleOut'], function (pageIndex) {
         if (pageIndex > data['targetIndex']) {
-            pageMgr.abstractAssistAppoint(pageIndex, function(pageObj) {
-                Translation.fix.call(pageObj, 'nextEffect')
+            pageMgr.abstractAssistAppoint(pageIndex, function (pageObj) {
+                translation.fix.call(pageObj, 'nextEffect')
             })
         }
         if (pageIndex < data['targetIndex']) {
-            pageMgr.abstractAssistAppoint(pageIndex, function(pageObj) {
-                Translation.fix.call(pageObj, 'prevEffect')
+            pageMgr.abstractAssistAppoint(pageIndex, function (pageObj) {
+                translation.fix.call(pageObj, 'prevEffect')
             })
         }
     })
@@ -122,7 +125,7 @@ function createContainerView(complier, data) {
     var jumpPocesss;
 
     //母版
-    complier.callMasterMgr(function() {
+    complier.callMasterMgr(function () {
         jumpPocesss = this.makeJumpPocesss(data);
         jumpPocesss.pre();
     })
@@ -137,8 +140,8 @@ function createContainerView(complier, data) {
      * @param  {[type]} pageBase [description]
      * @return {[type]}          [description]
      */
-    _.each(data.pageBaseCollect, function(pageBase) {
-        _.each(pageBase, function(pageObj) {
+    _.each(data.pageBaseCollect, function (pageBase) {
+        _.each(pageBase, function (pageObj) {
             pageObj.element && pageObj.element.css({
                 'opacity': 1
             })
@@ -154,7 +157,7 @@ export function SwitchPage(complier, data, success) {
     //跳前逻辑
     prev(complier, data);
     //处理逻辑
-    calculateFlip(complier, data, function(data) {
+    calculateFlip(complier, data, function (data) {
         createContainerView(complier, data);
         success.call(complier, data)
     })

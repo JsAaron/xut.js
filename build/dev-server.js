@@ -18,8 +18,6 @@ var webpacHotMiddleware = require('webpack-hot-middleware')
 //https://www.npmjs.com/package/write-file-webpack-plugin
 var WriteFilePlugin = require('write-file-webpack-plugin');
 
-var porjectRoot = path.resolve(__dirname, '../src/lib/')
-
 var config = require('../config')
 var port = process.env.PORT || config.dev.port
 var app = express()
@@ -60,14 +58,6 @@ var webpackConfig = {
     },
     devtool: '#eval-source-map',
     module: {
-        // preLoaders: [
-        //     {
-        //         test: /\.js$/,
-        //         loader: 'eslint',
-        //         include: porjectRoot,
-        //         exclude: /node_modules/
-        //     }
-        // ],
         loaders: [
             {
                 test: /\.js$/,
@@ -79,6 +69,7 @@ var webpackConfig = {
             }
         ]
     },
+
     plugins: [
         // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
         // 热替换、错误不退出
@@ -97,18 +88,22 @@ var webpackConfig = {
     ]
 }
 
-var compiler = webpack(webpackConfig)
+//启动代码测试
+//eslint
+if (config.dev.eslint.launch) {
+    webpackConfig.module.preLoaders = [{
+        test: /\.js$/,
+        loader: 'eslint',
+        include: config.dev.eslint.dir,
+        exclude: /node_modules/
+    }]
+    // community formatter
+    webpackConfig.eslint = {
+        formatter: require("eslint-friendly-formatter")
+    }
+}
 
-// compiler.watch({
-//     // aggregateTimeout: 200, 
-//     // poll: true 
-// }, function(err, stats) {
-//     if (err) {
-//         console.log('webpack fail')
-//         return
-//     }
-//    
-// });
+var compiler = webpack(webpackConfig)
 
 
 var devMiddleware = webpackDevMiddleware(compiler, {
@@ -157,6 +152,28 @@ app.use('/css', express.static('src/css'));
 app.use('/images', express.static('src/images'));
 app.use('/content', express.static('src/content'));
 
+
+if (config.dev.debugger.launch) {
+    watch(config.build.assetsRoot + '/app.js', function () {
+        console.log(
+            '\n' +
+            ' watch file change.....await....:\n'
+        )
+        var child = child_process.spawn('node', ['build/dev-build.js', ['debug=' + config.dev.debugger.dir]]);
+        // 捕获标准输出并将其打印到控制台 
+        child.stdout.on('data', function (data) {
+            console.log('pack out：\n' + data);
+        });
+        // 捕获标准错误输出并将其打印到控制台 
+        child.stderr.on('data', function (data) {
+            console.log('pack fail out：\n' + data);
+        });
+        child.on('close', function (code) {
+            console.log('pack complete：' + code);
+        });
+    })
+}
+
 module.exports = app.listen(port, function (err) {
     if (err) {
         console.log(err)
@@ -165,30 +182,3 @@ module.exports = app.listen(port, function (err) {
     console.log('Listening at http://localhost:' + port + '\n')
 })
 
-
-if (config.test.launch) {
-
-    watch(config.build.assetsRoot + '/app.js', function () {
-
-        console.log(
-            '\n' +
-            ' watch file change, start debug mode:\n'
-        )
-
-        var child = child_process.spawn('node', ['build/dev-build.js', ['debug=' + config.test.dist]]);
-        // 捕获标准输出并将其打印到控制台 
-        child.stdout.on('data', function (data) {
-            console.log('build out：\n' + data);
-        });
-
-        // 捕获标准错误输出并将其打印到控制台 
-        child.stderr.on('data', function (data) {
-            console.log('build fail out：\n' + data);
-        });
-
-        child.on('close', function (code) {
-            console.log('build complete：' + code);
-        });
-
-    })
-}

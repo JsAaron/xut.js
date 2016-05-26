@@ -36,7 +36,7 @@ function getResources(data) {
     }
     return option;
 }
-
+ 
 var specialSprite = Factory.extend({
 
     /**
@@ -50,15 +50,15 @@ var specialSprite = Factory.extend({
         this.data = options.data;
         this.renderer = options.renderer
         this.pageIndex = options.pageIndex
-
+ 
         //id标示
         //可以用来过滤失败的pixi对象
         this.contentId = this.data._id;
 
         this.option = getResources(this.data);
-
+ 
         var spiritList = this.option.spiritList;
-
+ 
         this.sprObjs = [];
 
         for (var i = 0; i < spiritList.length; i++) {

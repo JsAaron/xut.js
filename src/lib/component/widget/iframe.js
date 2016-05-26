@@ -167,8 +167,8 @@ iframeWidget.prototype = {
             markId = this.id;
 
         this.PMS = PMS;
-        //隐藏widget
-        PMS.bind("onHideWapper" + markId, function(e) {
+        //隐藏widget 
+        PMS.bind("onHideWapper" + markId, function() {
             var $wapper = me.$wapper;
             $wapper.hide();
             me.state = false;
@@ -228,7 +228,7 @@ iframeWidget.prototype = {
         }, '*');
 
         //还原初始窗口操作
-        PMS.bind("onReset" + markId, function(e) {
+        PMS.bind("onReset" + markId, function() {
             var $wapper = me.$wapper,
                 $iframe = $(me._iframe);
 
@@ -256,12 +256,12 @@ iframeWidget.prototype = {
         }, '*');
 
         //显示工作条
-        PMS.bind("onShowToolbar" + markId, function(e) {
+        PMS.bind("onShowToolbar" + markId, function() {
             // Xut.View.ShowToolbar();
         }, '*');
 
         //隐藏工作条
-        PMS.bind("onHideToolbar" + markId, function(e) {
+        PMS.bind("onHideToolbar" + markId, function() {
             Xut.View.HideToolbar();
         }, '*');
 
@@ -271,7 +271,7 @@ iframeWidget.prototype = {
         }, '*');
     },
 
-
+ 
     //=============外部调用接口===================
 
     /**

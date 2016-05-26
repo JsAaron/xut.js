@@ -16,16 +16,16 @@ let proportion
 let screenSize
 let appId
 
- 
+
 function loadWidget(type, data, widgetClass) {
 
 
     Xut.Application.injectionComponent({
-        'pageType'  : data.pageType, //标记类型区分
-        'pageIndex' : data.pageIndex,
-        'widget'    : new widgetClass(data)
+        'pageType': data.pageType, //标记类型区分
+        'pageIndex': data.pageIndex,
+        'widget': new widgetClass(data)
     });
-
+ 
 
     // var widgetObj = new widgetClass(data);
 
@@ -57,10 +57,10 @@ var adapterType = {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    'iframe': function(data) {
+    'iframe': function (data) {
         loadWidget('widget', data, iframeWidget);
     },
-    'widget': function(data) {
+    'widget': function (data) {
         loadWidget('widget', data, iframeWidget);
     },
 
@@ -69,19 +69,19 @@ var adapterType = {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    'js': function(data) {
+    'js': function (data) {
         loadWidget('js', data, pageWidget);
     },
-    'page': function(data) {
+    'page': function (data) {
         loadWidget('page', data, pageWidget);
     },
-    'svg': function(data) {
+    'svg': function (data) {
         loadWidget('svg', data, pageWidget);
     },
-    'canvas': function(data) {
+    'canvas': function (data) {
         loadWidget('canvas', data, pageWidget);
     },
-    'webgL': function(data) {
+    'webgL': function (data) {
         loadWidget('webgL', data, pageWidget);
     }
 }
@@ -143,11 +143,11 @@ function parsePara(data) {
 
 export function Adapter(para) {
 
-    var  config = Xut.config;
-    
+    var config = Xut.config;
+
     proportion = config.proportion;
     screenSize = config.screenSize;
-    appId      = config.appId;
+    appId = config.appId;
 
     //获取数据
     var data = filtrateDas(para);

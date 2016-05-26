@@ -66,7 +66,7 @@ export function extension(animproto) {
         }
         return t1;
     }
-
+ 
     //出现/消失
     animproto.getEffectAppear = function (parameter, object, isExit, duration, delay, repeat) {
         var t1 = new TimelineMax({
@@ -2772,13 +2772,14 @@ export function extension(animproto) {
             }
 
             var moveEvent = function (e) {
+                var i
                 var currentPoint = {
                     x: (hasTouch ? e.changedTouches[0].pageX : e.clientX),
                     y: (hasTouch ? e.changedTouches[0].pageY : e.clientY)
                 }
                 var d = calculateDistance(currentPoint, historyPoint); //鼠示移动距离
                 var quadrant1 = 0; //对象移动方向
-                for (var i = 0; i < sprotInfo.length; i++) {
+                for ( i = 0; i < sprotInfo.length; i++) {
                     if (currentFrame <= sprotInfo[i].end) {
                         quadrant1 = sprotInfo[i].quadrant;
                         break;
@@ -2849,7 +2850,7 @@ export function extension(animproto) {
                 if (currentFrame >= duration) currentFrame = duration;
                 t1.seek(currentFrame);
                 updateTurnState();
-                historyPoint = currentPoint;
+                historyPoint = currentPoint; 
                 //处理触发点列表
                 for (i = 0; i < cuePoints.length; i++) {
                     if (cuePoints[i].mouseEnter == false && currentFrame >= cuePoints[i].cueStart && currentFrame <= cuePoints[i].cueEnd) {
@@ -2863,8 +2864,8 @@ export function extension(animproto) {
                         if (cuePoints[i].valueEnd > 0) Xut.Assist.Run(parameter.pageType, cuePoints[i].valueEnd, null);
                         break;
                     }
-                }
-            }
+                } 
+            } 
 
             var objectId = object[0].id;
             if (parameter.gesture.controlType == 1) objectId = controlId;
@@ -2927,8 +2928,8 @@ export function extension(animproto) {
                         ease: parameter.tweenEase
                     });
                     break;
-            }
-        }
+            } 
+        } 
         //初始化定位(百分比)
         if (parameter.gesture && parameter.gesture.initPos > 0) {
             currentFrame = duration * parameter.gesture.initPos;
@@ -3050,9 +3051,9 @@ export function extension(animproto) {
             x: x,
             y: y
         };
-    }
-
-    /**
+    }  
+    
+    /** 
      * 获取对象相关信息
      * @param  {[type]} object [description]
      * @return {[type]}        [description]

@@ -212,7 +212,7 @@ SectionList.prototype = {
      */
     destroy: function () {
         if (this.hBox) {
-            $sectionlist.off();
+            this.$sectionlist.off();
             this.hBox.destroy();
             this.hBox = null;
         }

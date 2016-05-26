@@ -129,8 +129,8 @@ sToolbar.prototype.createCloseIcon = function (bar) {
     html = $(html);
     this.createSVGIcon(html[0],
         function () {
-            if (SUbDOCCONTEXT) {
-                SUbDOCCONTEXT.Xut.publish('subdoc:dropApp');
+            if (window.SUbDOCCONTEXT) {
+                window.SUbDOCCONTEXT.Xut.publish('subdoc:dropApp');
             } else {
                 Xut.publish('magazine:dropApp');
             }
@@ -205,7 +205,7 @@ sToolbar.prototype.bindButtonsEvent = function (bar) {
  * @return {[type]} [description]
  */
 sToolbar.prototype.homeControl = function () {
-    if (DUKUCONFIG) {
+    if (window.DUKUCONFIG) {
         Xut.Application.Suspend({
             dispose: function () {
                 Xut.Application.DropApp() //退出应用

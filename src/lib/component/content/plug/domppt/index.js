@@ -2,11 +2,11 @@
 //解析工具
 import { execJson, parseJSON, enterReplace} from '../../../../util/dom'
 //支持
-import {isMacOS, hasTouch, isDesktop, onTouchMove} from './support'
+import {isMacOS, isDesktop} from './support'
 //动画扩展
 import {extension} from './extension'
 
-
+ 
 /**
  * Pptanimation.js - PPT Animation for Zepto/jQuery.
  *requestAnimationFrame
@@ -62,8 +62,8 @@ function PptAnimation(pageIndex, pageType, chapterId, element, itemArray, contai
         //初始对象状态:opacity(visibility)
         this._initElement();
     }
-};
-
+}
+ 
 
 
 PptAnimation.prototype = {
@@ -82,7 +82,7 @@ PptAnimation.prototype = {
         }
 
         var data = this.options[0];
-        var parameter0 = this.parameter0 = parseJSON(data.parameter)
+        this.parameter0 = parseJSON(data.parameter)
 
         //为高级动画修改增加
         //2016.3.16
@@ -494,7 +494,8 @@ PptAnimation.prototype = {
         if (parameter.videoId > 0) {
             Xut.AudioManager.contentAudio(parameter.chapterId, parameter.videoId)
         }
-
+        
+        /*eslint-disable */
 
         //ppt动画扩展处理
         if (parameter.pptanimation && parameter.pptanimation.pptapi) {
@@ -510,6 +511,8 @@ PptAnimation.prototype = {
                     break;
             }
         }
+        
+        /*eslint-enable */
     },
 
 

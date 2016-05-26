@@ -71,7 +71,7 @@ var MasterProto = MasterMgr.prototype;
 
 //====================页面结构处理===========================
 
-MasterProto.create = function(dataOpts, pageIndex, createCallBack) {
+MasterProto.create = function (dataOpts, pageIndex, createCallBack) {
     var masterObj, reuseMasterId, reuseMasterKey,
         pptMaster = dataOpts.chapterDas.pptMaster,
         pageOffset = dataOpts.chapterDas.pageOffset;
@@ -110,7 +110,7 @@ MasterProto.create = function(dataOpts, pageIndex, createCallBack) {
 
 
 //销毁整个页面对象
-MasterProto.destroy = function() {
+MasterProto.destroy = function () {
     this.rootNode = null;
     //销毁对象
     this.abstractDestroyCollection();
@@ -121,7 +121,7 @@ MasterProto.destroy = function() {
  * 找到当前页面的可以需要滑动是视觉页面对象
  * @return {[type]}            [description]
  */
-MasterProto.findMaster = function(leftIndex, currIndex, rightIndex, direction, action) {
+MasterProto.findMaster = function (leftIndex, currIndex, rightIndex, direction, action) {
     var prevFlag,
         nextFlag,
         prevMasterObj,
@@ -160,13 +160,13 @@ MasterProto.findMaster = function(leftIndex, currIndex, rightIndex, direction, a
  * 1 母版之间的切换
  * 2 浮动对象的切换
  */
-MasterProto.move = function(leftIndex, currIndex, rightIndex, direction, moveDistance, action, speed, nodes) {
+MasterProto.move = function (leftIndex, currIndex, rightIndex, direction, moveDistance, action, speed, nodes) {
     var parallaxOffset,
         self = this,
         isBoundary = false; //是边界处理
 
     //找到需要滑动的母版
-    _.each(this.findMaster(leftIndex, currIndex, rightIndex, direction, action), function(pageObj, index) {
+    _.each(this.findMaster(leftIndex, currIndex, rightIndex, direction, action), function (pageObj, index) {
         if (pageObj) {
             isBoundary = true;
             //母版交接判断
@@ -174,7 +174,7 @@ MasterProto.move = function(leftIndex, currIndex, rightIndex, direction, moveDis
             pageObj.onceMaster = false;
             //移动母版
             translation[action].call(pageObj, moveDistance[index], speed)
-                //移动浮动容器
+            //移动浮动容器
             if (pageObj.floatContents.MasterContainer) {
                 translation[action].call(pageObj, moveDistance[index], speed, pageObj.floatContents.MasterContainer)
             }
@@ -208,7 +208,7 @@ MasterProto.move = function(leftIndex, currIndex, rightIndex, direction, moveDis
  * 停止行为
  * @return {[type]} [description]
  */
-MasterProto.suspend = function(pointers) {
+MasterProto.suspend = function (pointers) {
     //如果未越界不需要处理行为
     if (!this.isBoundary) return;
     var masterObj,
@@ -224,7 +224,7 @@ MasterProto.suspend = function(pointers) {
  * 复位初始状态
  * @return {[type]} [description]
  */
-MasterProto.resetOriginal = function(pageIndex) {
+MasterProto.resetOriginal = function (pageIndex) {
     var originalPageObj;
     if (originalPageObj = this.abstractGetPageObj(pageIndex)) {
         _original(originalPageObj);
@@ -234,7 +234,7 @@ MasterProto.resetOriginal = function(pageIndex) {
 /**
  * 	母版自动运行
  */
-MasterProto.autoRun = function(data) {
+MasterProto.autoRun = function (data) {
     var masterObj, element;
     if (masterObj = this.abstractGetPageObj(data.currIndex)) {
         //热点状态复位
@@ -247,7 +247,7 @@ MasterProto.autoRun = function(data) {
 /**
  * 移动内部的视察对象
  */
-MasterProto.moveParallaxs = function(moveDistance, currIndex, action, direction, speed, nodes) {
+MasterProto.moveParallaxs = function (moveDistance, currIndex, action, direction, speed, nodes) {
     var rootNode,
         floatObj,
         contentObj,
@@ -268,23 +268,23 @@ MasterProto.moveParallaxs = function(moveDistance, currIndex, action, direction,
             //移动距离
             currMoveDistance = moveDistance[1];
             //遍历所有活动对象
-            _.each(baseContents, function(content) {
-                content.eachAssistContents(function(scope) {
+            _.each(baseContents, function (content) {
+                content.eachAssistContents(function (scope) {
                     //如果是视察对象移动
                     if (scope.parallax) {
                         rootNode = scope.parallax.rootNode;
                         contentObj = currParallaxObj.baseGetContentObject(scope.id)
-                            /////////////////////
-                            //如果有这个动画效果 //
-                            //先停止否则通过视觉差移动会出问题
-                            // //影响，摩天轮转动APK
-                            // * 重新激动视觉差对象
-                            // * 因为视察滑动对象有动画
-                            // * 2个CSS3动画冲突的
-                            // * 所以在视察滑动的情况下先停止动画
-                            // * 然后给每一个视察对象打上对应的hack=>data-parallaxProcessed
-                            // * 通过动画回调在重新加载动画
-                            /////////////////////
+                        /////////////////////
+                        //如果有这个动画效果 //
+                        //先停止否则通过视觉差移动会出问题
+                        // //影响，摩天轮转动APK
+                        // * 重新激动视觉差对象
+                        // * 因为视察滑动对象有动画
+                        // * 2个CSS3动画冲突的
+                        // * 所以在视察滑动的情况下先停止动画
+                        // * 然后给每一个视察对象打上对应的hack=>data-parallaxProcessed
+                        // * 通过动画回调在重新加载动画
+                        /////////////////////
                         if (action === "flipMove" && contentObj.anminInstance && !contentObj.parallaxProcessed) {
                             //标记
                             var actName = contentObj.actName;
@@ -326,11 +326,11 @@ MasterProto.moveParallaxs = function(moveDistance, currIndex, action, direction,
             case 'flipMove':
                 moveTranslate = self._flipMove(moveTranslate, offsetTranslate);
                 break;
-                //反弹
+            //反弹
             case 'flipRebound':
                 moveTranslate = self._flipRebound(moveTranslate, offsetTranslate);
                 break;
-                //翻页结束,记录上一页的坐标
+            //翻页结束,记录上一页的坐标
             case 'flipOver':
                 if (direction === 'prev') {
                     moveTranslate = self._flipOver(moveTranslate, offsetTranslate);
@@ -359,7 +359,7 @@ MasterProto.moveParallaxs = function(moveDistance, currIndex, action, direction,
  * 通过动画回调在重新加载动画
  * @return {[type]} [description]
  */
-MasterProto.reactivation = function(target) {
+MasterProto.reactivation = function (target) {
     if (this.parallaxProcessedContetns) {
         var actName = target.id;
         var contentObj = this.parallaxProcessedContetns[actName];
@@ -377,7 +377,7 @@ MasterProto.reactivation = function(target) {
 
 
 //变化节点的css3transform属性
-MasterProto._transformNodes = function(rootNode, speed, property, opacityStart) {
+MasterProto._transformNodes = function (rootNode, speed, property, opacityStart) {
     var style = {},
         effect = '',
         x = 0,
@@ -426,11 +426,11 @@ MasterProto._transformNodes = function(rootNode, speed, property, opacityStart) 
 
 //针对跳转页面
 //制作处理器
-MasterProto.makeJumpPocesss = function(data) {
+MasterProto.makeJumpPocesss = function (data) {
     var filter;
     var master = this;
     return {
-        pre: function() {
+        pre: function () {
             var targetIndex = data.targetIndex;
             //目标母板对象
             var targetkey = master.conversionMasterId(targetIndex);
@@ -444,7 +444,7 @@ MasterProto.makeJumpPocesss = function(data) {
             master.currMasterId = targetkey;
         },
         //修正位置
-        clean: function(currIndex, targetIndex) {
+        clean: function (currIndex, targetIndex) {
             master._fixPosition(filter);
             master._checkParallaxPox(currIndex, targetIndex);
         }
@@ -454,7 +454,7 @@ MasterProto.makeJumpPocesss = function(data) {
 //扫描边界
 //扫描key的左右边界
 //当前页面的左右边
-MasterProto.scanBounds = function(currPage, currkey) {
+MasterProto.scanBounds = function (currPage, currkey) {
     var currKey = this.conversionMasterId(currPage),
         filter = {},
         i = currPage,
@@ -487,7 +487,7 @@ MasterProto.scanBounds = function(currPage, currkey) {
 
 
 //修正位置
-MasterProto._fixPosition = function(filter) {
+MasterProto._fixPosition = function (filter) {
 
     var self = this
 
@@ -526,7 +526,7 @@ MasterProto._fixPosition = function(filter) {
 }
 
 
-MasterProto._checkParallaxPox = function(currPageIndex, targetIndex) {
+MasterProto._checkParallaxPox = function (currPageIndex, targetIndex) {
     var key, pageObj,
         pageCollection = this.abstractGetCollection();
     for (key in pageCollection) {
@@ -540,7 +540,7 @@ MasterProto._checkParallaxPox = function(currPageIndex, targetIndex) {
 //=======================去重检测==============================
 
 //当前同一视觉页面作用的范围
-MasterProto._toRepeat = function(reuseMasterKey, pageIndex) {
+MasterProto._toRepeat = function (reuseMasterKey, pageIndex) {
     var temp;
     if (temp = this.recordMasterscope[reuseMasterKey]) {
         return temp;
@@ -554,7 +554,7 @@ MasterProto._toRepeat = function(reuseMasterKey, pageIndex) {
 //	 9002-1:[2,3]
 //	 9001-2:[4,5]
 //}
-MasterProto._updataMasterscope = function(reuseMasterKey, pageIndex) {
+MasterProto._updataMasterscope = function (reuseMasterKey, pageIndex) {
     var scope;
     if (scope = this.recordMasterscope[reuseMasterKey]) {
         if (-1 === scope.indexOf(pageIndex)) {
@@ -566,7 +566,7 @@ MasterProto._updataMasterscope = function(reuseMasterKey, pageIndex) {
 }
 
 //记录页面与模板标示的映射
-MasterProto._updatadParallaxMaster = function(reuseMasterKey, pageIndex) {
+MasterProto._updatadParallaxMaster = function (reuseMasterKey, pageIndex) {
     //记录页面与模板标示的映射
     this.recordMasterId[pageIndex] = reuseMasterKey;
     //更新可视区母板的编号
@@ -574,7 +574,7 @@ MasterProto._updatadParallaxMaster = function(reuseMasterKey, pageIndex) {
 }
 
 //检测是否需要创建视觉差
-MasterProto._checkRepeat = function(reuseMasterKey, pageOffset, pageIndex) {
+MasterProto._checkRepeat = function (reuseMasterKey, pageOffset, pageIndex) {
     var tag = this._toRepeat(reuseMasterKey, pageIndex); //false就是没找到视察对象
     this._updataMasterscope(reuseMasterKey, pageIndex);
     this._updatadParallaxMaster(reuseMasterKey, pageIndex);
@@ -582,7 +582,7 @@ MasterProto._checkRepeat = function(reuseMasterKey, pageOffset, pageIndex) {
 }
 
 //transform转化成相对应的偏移量
-MasterProto._transformConversion = function(property, moveDistance, nodes) {
+MasterProto._transformConversion = function (property, moveDistance, nodes) {
     var temp = {},
         i;
 
@@ -607,7 +607,7 @@ MasterProto._transformConversion = function(property, moveDistance, nodes) {
 }
 
 //移动叠加值
-MasterProto._flipMove = function(property, repairProperty) {
+MasterProto._flipMove = function (property, repairProperty) {
     var temp = {};
     var start = property.opacityStart;
     for (var i in property) {
@@ -618,7 +618,7 @@ MasterProto._flipMove = function(property, repairProperty) {
 }
 
 //反弹
-MasterProto._flipRebound = function(property, repairProperty) {
+MasterProto._flipRebound = function (property, repairProperty) {
     var temp = {};
     for (var i in property) {
         temp[i] = repairProperty[i] || property[i];
@@ -627,12 +627,12 @@ MasterProto._flipRebound = function(property, repairProperty) {
 }
 
 //翻页结束
-MasterProto._flipOver = function(property, repairProperty) {
+MasterProto._flipOver = function (property, repairProperty) {
     return this._flipMove(property, repairProperty);
 }
 
 //结束后缓存上一个记录
-MasterProto._overMemory = function(property, repairProperty) {
+MasterProto._overMemory = function (property, repairProperty) {
     for (var i in property) {
         repairProperty[i] = property[i];
     }
@@ -640,12 +640,12 @@ MasterProto._overMemory = function(property, repairProperty) {
 
 
 //修正跳转后视觉对象坐标
-MasterProto._fixParallaxPox = function(parallaxObj, currPageIndex, targetIndex) {
+MasterProto._fixParallaxPox = function (parallaxObj, currPageIndex, targetIndex) {
     var self = this,
         contentObjs, prevNodes, nodes;
     if (contentObjs = parallaxObj.baseGetContent()) {
-        contentObjs.forEach(function(contentObj) {
-            contentObj.eachAssistContents(function(scope) {
+        contentObjs.forEach(function (contentObj) {
+            contentObj.eachAssistContents(function (scope) {
                 if (scope.parallax) {
                     repairNodes.call(self, scope.parallax, currPageIndex, targetIndex);
                 }
@@ -682,7 +682,7 @@ MasterProto._fixParallaxPox = function(parallaxObj, currPageIndex, targetIndex) 
 
 //扁平化对象到数组
 function toArray(filter) {
-    var arr = []; 
+    var arr = [];
     if (!filter.length) {
         for (var key in filter) {
             arr.push(filter[key]);
@@ -695,7 +695,7 @@ function toArray(filter) {
 //检测是否需要清理
 // 1 普通翻页清理  【数组过滤条件】
 // 2 跳转页面清理  【对象过滤条件】
-MasterProto.checkClear = function(filter, toPage) {
+MasterProto.checkClear = function (filter, toPage) {
     var key, indexOf,
         removeMasterId = _.keys(this.abstractGetCollection());
 
@@ -704,7 +704,7 @@ MasterProto.checkClear = function(filter, toPage) {
         //解析对象
         filter = toArray(filter);
         //过滤
-        _.each(filter, function(masterId) {
+        _.each(filter, function (masterId) {
             if (masterId !== undefined) {
                 indexOf = removeMasterId.indexOf(masterId.toString());
                 if (-1 !== indexOf) {
@@ -719,9 +719,9 @@ MasterProto.checkClear = function(filter, toPage) {
 
 //清理内存
 //需要清理的key合集
-MasterProto.clearMemory = function(removeMasterId) {
+MasterProto.clearMemory = function (removeMasterId) {
     var pageObj, self = this;
-    _.each(removeMasterId, function(removekey) {
+    _.each(removeMasterId, function (removekey) {
         //销毁页面对象事件
         if (pageObj = self.abstractGetPageObj(removekey)) {
             //移除事件
@@ -737,25 +737,25 @@ MasterProto.clearMemory = function(removeMasterId) {
 
 
 //注册状态管理
-MasterProto.register = function(pageIndex, type, hotspotObj) {
-    var parallaxObj;
-    if (parallaxObj = this.abstractGetPageObj(this.conversionMasterId(pageIndex))) {
-        parallaxObj.registerCotents.apply(pageObj, arguments);
+MasterProto.register = function (pageIndex, type, hotspotObj) {
+    var parallaxObj = this.abstractGetPageObj( this.conversionMasterId(pageIndex) )
+    if (parallaxObj) {
+        parallaxObj.registerCotents.apply(parallaxObj, arguments);
     }
 }
- 
+
 //=======================工具方法==============================
 
 //page转化成母版ID
-MasterProto.conversionMasterId = function(pageIndex) {
+MasterProto.conversionMasterId = function (pageIndex) {
     return this.recordMasterId ? this.recordMasterId[pageIndex] : undefined;
 }
 
-MasterProto.removeRecordMasterscope = function(removekey) {
+MasterProto.removeRecordMasterscope = function (removekey) {
     var me = this;
     var recordMasterscope = me.recordMasterscope[removekey];
     //清理页码指示标记
-    recordMasterscope.forEach(function(scope) {
+    recordMasterscope.forEach(function (scope) {
         delete me.recordMasterId[scope];
     })
 }
@@ -766,7 +766,7 @@ extend(MasterMgr, Abstract)
 
 
 export {
-    MasterMgr
+MasterMgr
 }
 
 // })

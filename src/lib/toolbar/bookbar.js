@@ -10,7 +10,7 @@ import { parseJSON } from '../util/index'
  */
 
 var Bar = ToolBar.extend({
-    init: function(options) {
+    init: function (options) {
         //左右箭头
         this.arrows = {};
         //工具栏父容器
@@ -37,7 +37,7 @@ var Bar = ToolBar.extend({
 /**
  * 初始化
  */
-Bar.prototype.initTool = function() {
+Bar.prototype.initTool = function () {
     //工具栏的显示状态
     var display = this.controlBar.css('display');
     this.barStatus = display == 'none' ? false : true;
@@ -67,7 +67,7 @@ Bar.prototype.initTool = function() {
 /**
  * 工具条的样式
  */
-Bar.prototype.setToolbarStyle = function() {
+Bar.prototype.setToolbarStyle = function () {
     var height = this.topBarHeight,
         TOP = this.barHeight; //系统工具栏占用的高度
 
@@ -86,14 +86,14 @@ Bar.prototype.setToolbarStyle = function() {
 /**
  * 更新页码
  */
-Bar.prototype.updatePointer = function() {
+Bar.prototype.updatePointer = function () {
     //预留
 }
 
 /**
  * 创建目录图标
  */
-Bar.prototype.createDirIcon = function(bar) {
+Bar.prototype.createDirIcon = function (bar) {
     var icon = document.createElement('div');
     icon.innerHTML = '目录';
     icon.style.width = this.iconHeight + 'px';
@@ -103,7 +103,7 @@ Bar.prototype.createDirIcon = function(bar) {
 }
 
 //创建书签图标
-Bar.prototype.createMarkIcon = function(bar) {
+Bar.prototype.createMarkIcon = function (bar) {
     var icon = document.createElement('div');
     icon.innerHTML = '书签';
     icon.style.width = this.iconHeight + 'px';
@@ -115,7 +115,7 @@ Bar.prototype.createMarkIcon = function(bar) {
 /**
  * 创建评分图标
  */
-Bar.prototype.createStarIcon = function(bar) {
+Bar.prototype.createStarIcon = function (bar) {
     var icon = document.createElement('div');
     icon.innerHTML = '评分';
     icon.style.width = this.iconHeight + 'px';
@@ -128,7 +128,7 @@ Bar.prototype.createStarIcon = function(bar) {
  * 后退按钮
  * @return {[type]} [description]
  */
-Bar.prototype.createBackIcon = function() {
+Bar.prototype.createBackIcon = function () {
     var icon = document.createElement('div');
     icon.style.width = this.topBarHeight + 'px';
     icon.className = 'xut-book-bar-back';
@@ -139,7 +139,7 @@ Bar.prototype.createBackIcon = function() {
  * 显示顶部工具栏
  * @return {[type]} [description]
  */
-Bar.prototype.showTopBar = function() {
+Bar.prototype.showTopBar = function () {
     var that = this;
 
     if (this.barStatus) {
@@ -152,10 +152,10 @@ Bar.prototype.showTopBar = function() {
         'opacity': 0
     });
 
-    setTimeout(function() {
+    setTimeout(function () {
         that.controlBar.animate({
             'opacity': 1
-        }, that.delay, 'linear', function() {
+        }, that.delay, 'linear', function () {
             that.showSystemBar();
             that.barStatus = true;
             that.Lock = false;
@@ -167,7 +167,7 @@ Bar.prototype.showTopBar = function() {
  * 隐藏顶部工具栏
  * @return {[type]} [description]
  */
-Bar.prototype.hideTopBar = function() {
+Bar.prototype.hideTopBar = function () {
     var that = this;
 
     if (!this.barStatus) {
@@ -177,7 +177,7 @@ Bar.prototype.hideTopBar = function() {
 
     this.controlBar.animate({
         'opacity': 0
-    }, that.delay, 'linear', function() {
+    }, that.delay, 'linear', function () {
         that.controlBar.hide();
         that.hideSystemBar();
         that.barStatus = false;
@@ -188,7 +188,7 @@ Bar.prototype.hideTopBar = function() {
 /**
  * 创建目录菜单
  */
-Bar.prototype.createDirMenu = function() {
+Bar.prototype.createDirMenu = function () {
     var self = this;
     var wrap = document.createElement('div');
     var mask = document.createElement('div');
@@ -214,11 +214,11 @@ Bar.prototype.createDirMenu = function() {
 
     this.setColor();
 
-    this.iscroll.on('scrollStart', function(e) {
+    this.iscroll.on('scrollStart', function (e) {
         self.isScrolled = true;
     });
 
-    this.iscroll.on('scrollEnd', function(e) {
+    this.iscroll.on('scrollEnd', function (e) {
         self.isScrolled = false;
     });
 
@@ -229,7 +229,7 @@ Bar.prototype.createDirMenu = function() {
 /**
  *  显示目录菜单
  */
-Bar.prototype.showDirMenu = function() {
+Bar.prototype.showDirMenu = function () {
     //获取当前页面
     var page = Xut.Presentation.GetPageElement();
 
@@ -255,7 +255,7 @@ Bar.prototype.showDirMenu = function() {
 /**
  *  隐藏目录菜单
  */
-Bar.prototype.hideDirMenu = function() {
+Bar.prototype.hideDirMenu = function () {
     this.menu.style.display = 'none';
     //恢复顶部工具栏
     this.controlBar.show();
@@ -266,7 +266,7 @@ Bar.prototype.hideDirMenu = function() {
 /**
  *  创建目录内容
  */
-Bar.prototype.getDirContent = function() {
+Bar.prototype.getDirContent = function () {
 
     var Api = Xut.Presentation;
     var data = Api.GetAppSectionData();
@@ -314,8 +314,8 @@ Bar.prototype.getDirContent = function() {
         li += '<li>' +
             '<a class="xut-book-menu-item" data-mark="' + mark + '" href="javascript:0">' + seasonTitle + '</a>' +
             //第二级目录
-            secondaryDirectory(startCid, endCid)
-        '</li>';
+            secondaryDirectory(startCid, endCid) +
+            '</li>'
     }
 
     this.contentText = li;
@@ -324,7 +324,7 @@ Bar.prototype.getDirContent = function() {
 /**
  * 突出显示点击颜色
  */
-Bar.prototype.setColor = function(element) {
+Bar.prototype.setColor = function (element) {
     if (this.selectedChild) {
         this.selectedChild.className = 'xut-book-menu-item';
     }
@@ -337,7 +337,7 @@ Bar.prototype.setColor = function(element) {
 /**
  * 跳转到指定书页
  */
-Bar.prototype.turnToPage = function(target) {
+Bar.prototype.turnToPage = function (target) {
     //忽略滚动点击
     if (this.isScrolled) return;
     this.setColor(target);
@@ -355,7 +355,7 @@ Bar.prototype.turnToPage = function(target) {
 /**
  * 显示书签
  */
-Bar.prototype.showBookMark = function() {
+Bar.prototype.showBookMark = function () {
     if (this.bookMark) {
         this.bookMark.restore();
     } else {
@@ -372,14 +372,14 @@ Bar.prototype.showBookMark = function() {
  * 返回首页
  */
 
-Bar.prototype.goBack = function() {
+Bar.prototype.goBack = function () {
     var self = this;
     Xut.Application.Suspend({
-        dispose: function(promptMessage) {
+        dispose: function (promptMessage) {
             //停止热点动作
             //promptMessage('再按一次将跳至首页！')
         },
-        processed: function() {
+        processed: function () {
             Xut.View.GotoSlide(1) //调整到首页
             self.setColor();
         }
@@ -389,7 +389,7 @@ Bar.prototype.goBack = function() {
 /**
  * 事件处理
  */
-Bar.prototype.handleEvent = function(e) {
+Bar.prototype.handleEvent = function (e) {
 
     var target = e.target || e.srcElement;
 
@@ -429,7 +429,7 @@ Bar.prototype.handleEvent = function(e) {
 /**
  * 销毁
  */
-Bar.prototype.destroy = function() {
+Bar.prototype.destroy = function () {
     this.iscroll && this.iscroll.destroy();
     this.bookMark && this.bookMark.destroy();
     var ele = this.container[0];

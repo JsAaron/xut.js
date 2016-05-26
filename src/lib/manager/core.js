@@ -208,7 +208,7 @@ function Manager(parameter) {
         }
         return pageType
     }
-
+ 
     /**
      * 阻止元素的默认行为
      * 在火狐下面image带有href的行为
@@ -220,11 +220,11 @@ function Manager(parameter) {
      */
     function preventDefault(evtObj, target) {
         //var tagName = target.nodeName.toLowerCase();
-        if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !MMXCONFIG) {
+        if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG) {
             evtObj.preventDefault && evtObj.preventDefault();
         }
     }
-
+ 
     /*********************************************************************
      *                对页面事件的调控与状态动作的处理
      *                1 触屏 onswipedown
@@ -322,7 +322,7 @@ function Manager(parameter) {
      * @return {[type]}      [description]
      */
     $globalEvent.$watch('onDropApp', function(data) {
-        GLOBALIFRAME && Xut.publish('magazine:dropApp');
+        window.GLOBALIFRAME && Xut.publish('magazine:dropApp');
     });
 
 

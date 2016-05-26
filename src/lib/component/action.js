@@ -22,14 +22,15 @@ function Action(data) {
 
 Action.prototype = {
 
-    setup: function(results) {
-        var para1 = results.para1, //跳转参数
-            para2 = results.para2, //ppt
-            dbId = results._id;
+    setup: function (results) {
+        var para1, dbId
+        para1 = results.para1//跳转参数
+        // para2 = results.para2 //ppt
+        dbId = results._id
 
 
         var actionType = parseInt(results.actionType);
- 
+
         //跳转或打开本地程序
         switch (actionType) {
             case 0:
@@ -38,7 +39,7 @@ Action.prototype = {
             case 1:
                 if (Xut.plat.isBrowser) return;
                 //打开插件
-                Xut.Plugin.OpenApp.openAppAction(para1, function(r) {}, function(e) {});
+                Xut.Plugin.OpenApp.openAppAction(para1, function () { }, function () { });
                 break;
             case 2:
                 //子文档处理
@@ -50,15 +51,15 @@ Action.prototype = {
     },
 
 
-    open: function() {
-        this.state = true;
+    open: function () {
+        // this.state = true;
         //打开插件
-        Xut.Plugin.OpenApp.openAppAction(para1, function(r) {}, function(e) {});
+        // Xut.Plugin.OpenApp.openAppAction(para1, function() {}, function() {});
     },
 
 
     //跳转页面
-    toPage: function(para1) {
+    toPage: function (para1) {
         para1 = JSON.parse(para1);
         if (para1.seasonId) {
             Xut.View.GotoSlide(para1.seasonId, para1.chapterId);
@@ -75,10 +76,9 @@ Action.prototype = {
      * **********************************************************/
 
     //加载子文档
-    loadSubdoc: function(path, dbId) {
+    loadSubdoc: function (path, dbId) {
         var self = this,
-            wapper,
-            configPath = 'www/content/subdoc/' + path + '/content/gallery/';
+            wapper;
 
         //配置子文档加载路径
         window.XXTSUbDOC = {
@@ -94,16 +94,16 @@ Action.prototype = {
         Xut.nextTick({
             'container': $(this.rootNode),
             'content': wapper
-        }, function() {
+        }, function () {
             self.destroyCache();
         });
     },
 
     //iframe加载完毕
-    iframeComplete: function() {
+    iframeComplete: function () {
         var self = this;
         //关闭事件
-        Xut.one('subdoc:dropApp', function() {
+        Xut.one('subdoc:dropApp', function () {
             self.destroyCache('iframe', self.iframe[0].contentWindow);
         });
         //隐藏全局工具栏
@@ -115,7 +115,7 @@ Action.prototype = {
     },
 
     //获取iframe颞部window上下文
-    destroyCache: function(contentWindow) {
+    destroyCache: function (contentWindow) {
         var self = this,
             iframe;
 
@@ -135,7 +135,7 @@ Action.prototype = {
         }
 
         try {
-            contentWindow.require("Dispatcher", function(c) {
+            contentWindow.require("Dispatcher", function (c) {
                 if (iframe) {
                     //子文档操作
                     if (c.stopHandles()) {
@@ -153,7 +153,7 @@ Action.prototype = {
         }
     },
 
-    createWapper: function() {
+    createWapper: function () {
         var zIndex,
             str,
             dom,
@@ -184,7 +184,7 @@ Action.prototype = {
      * 加载iframe
      * @return {[type]} [description]
      */
-    createIframe: function() {
+    createIframe: function () {
         var me = this,
             path = 'content/subdoc/' + this.subPath + '/index.html?xxtParaIn=' + this.key,
             ifr = document.createElement('iframe');
@@ -196,11 +196,11 @@ Action.prototype = {
         ifr.sandbox = "allow-scripts allow-same-origin";
         ifr.frameborder = 0;
         if (ifr.attachEvent) {
-            ifr.attachEvent('onload', function() {
+            ifr.attachEvent('onload', function () {
                 me.iframeComplete();
             });
         } else {
-            ifr.onload = function() {
+            ifr.onload = function () {
                 me.iframeComplete();
             };
         }
@@ -211,5 +211,5 @@ Action.prototype = {
 
 
 export {
-    Action as ActionClass
+Action as ActionClass
 }

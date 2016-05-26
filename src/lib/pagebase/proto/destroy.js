@@ -14,7 +14,7 @@ export function destroy(baseProto) {
 				img.src = 'images/icons/clearmem.png'
 			})
 		} catch (e) {
-
+			console.log('销毁图片出错')
 		}
 
 		//清理线程任务块

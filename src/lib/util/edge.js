@@ -27,7 +27,8 @@ function _addEdge(canvas) {
 
     var img = new Image(),
         maskimg = new Image();
-    classNames = canvas.className.split(' ');
+        
+    var classNames = canvas.className.split(' ');
     var context = canvas.getContext("2d");
     img.addEventListener("load", loadimg);
     maskimg.addEventListener("load", loadmask);

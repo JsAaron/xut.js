@@ -6,21 +6,21 @@
 
  export function Iscroll(element) {
      //是否移动，中途停止了动画
-     var distX = 0,
-         distY = 0,
-         startX,
-         startY,
-         absDistY,
-         absDistX,
-         iscroll,
-         that = this,
-         screenWidth = Xut.config.screenSize.width,
-         useswipeleft = function() {
-             Xut.View.GotoPrevSlide()
-         },
-         useswiperight = function() {
-             Xut.View.GotoNextSlide()
-         };
+    //  var distX = 0,
+    //      distY = 0,
+    //      startX,
+    //      startY,
+    //      absDistY,
+    //      absDistX,
+    //      iscroll,
+    //      that = this,
+    //      screenWidth = Xut.config.screenSize.width,
+    //      useswipeleft = function() {
+    //          Xut.View.GotoPrevSlide()
+    //      },
+    //      useswiperight = function() {
+    //          Xut.View.GotoNextSlide()
+    //      };
 
      return new iScroll(element, {
          scrollbars: true,

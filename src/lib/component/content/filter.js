@@ -1,5 +1,5 @@
 import {
-    _set, _get, remove, _save, parseJSON, hash
+    _set, _get, _remove, _save, parseJSON, hash
 }
 from '../../util/index'
 
@@ -20,7 +20,7 @@ export function contentFilter(filterName) {
             });
         }
         return h;
-    }();
+    }(); 
 
     function setCache(listFilters) {
         _save(filterName, listFilters)
@@ -103,4 +103,4 @@ export function contentFilter(filterName) {
             listFilters = {};
         }
     }
-};
+} 

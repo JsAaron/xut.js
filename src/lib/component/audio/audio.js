@@ -8,7 +8,7 @@ import { Subtitle } from './subtitle'
 import { hash } from '../../util/dom'
 
 let Player = null
-let noop = function() {}
+let noop = function () { }
 let instance = hash() //存放不同音轨的一个实例
 let html5Audio
 
@@ -19,7 +19,7 @@ let html5Audio
 var AudioFactory = Xut.CoreObject.extend({
 
     //构建之前关数据
-    preRelated: function(trackId, options) {
+    preRelated: function (trackId, options) {
         //完成end后 外部回调删除这个对象
         //单独调用引用对象
         //传递一个 options.complete
@@ -30,7 +30,7 @@ var AudioFactory = Xut.CoreObject.extend({
     },
 
     //构建之后关数据
-    afterRelated: function(audio, options, controlDoms) {
+    afterRelated: function (audio, options, controlDoms) {
         //音频重复播放次数
         if (options.data && options.data.repeat) {
             this.repeat = Number(options.data.repeat); //需要重复
@@ -54,7 +54,7 @@ var AudioFactory = Xut.CoreObject.extend({
     //运行成功失败后处理方法
     //phoengap会调用callbackProcess
     //导致乱了
-    callbackProcess: function(sysCommand) {
+    callbackProcess: function (sysCommand) {
         if (this.outerCallback) { //外部调用结束
             this.end();
         } else {
@@ -72,13 +72,13 @@ var AudioFactory = Xut.CoreObject.extend({
     },
 
     //重复处理
-    repeatProcess: function() {
+    repeatProcess: function () {
         --this.repeat;
         this.play()
     },
 
     //播放
-    play: function() {
+    play: function () {
         //flash模式不执行
         if (this.audio && !this.isFlash) {
             this.status = 'playing';
@@ -88,14 +88,14 @@ var AudioFactory = Xut.CoreObject.extend({
     },
 
     //停止
-    pause: function() {
+    pause: function () {
         this.status = 'paused';
         this.audio.pause();
         this.acitonObj && this.acitonObj.pause();
     },
 
     //销毁
-    end: function() {
+    end: function () {
         this.status = 'ended';
         this.audio.end();
         this.audio = null;
@@ -103,7 +103,7 @@ var AudioFactory = Xut.CoreObject.extend({
     },
 
     //相关
-    destroyRelated: function() {
+    destroyRelated: function () {
         //销毁字幕
         if (this.subtitleObject) {
             this.subtitleObject.destroy()
@@ -125,7 +125,7 @@ var AudioFactory = Xut.CoreObject.extend({
  */
 var _Media = AudioFactory.extend({
 
-    init: function(options, controlDoms) {
+    init: function (options, controlDoms) {
 
         var url = Xut.config.audioPath() + options.url,
             trackId = options.trackId,
@@ -136,9 +136,9 @@ var _Media = AudioFactory.extend({
         this.preRelated(trackId, options);
 
         //音频成功与失败调用
-        audio = new GLOBALCONTEXT.Media(url, function() {
+        audio = new window.GLOBALCONTEXT.Media(url, function () {
             self.callbackProcess(true);
-        }, function() {
+        }, function () {
             self.callbackProcess(true);
         });
 
@@ -151,7 +151,7 @@ var _Media = AudioFactory.extend({
         this.afterRelated(audio, options, controlDoms);
     },
     //取反
-    end: function() {
+    end: function () {
         if (this.audio) {
             this.audio.release();
             this.audio = null;
@@ -167,7 +167,7 @@ var _Media = AudioFactory.extend({
  * @type {[type]}
  */
 var _Flash = AudioFactory.extend({
-    init: function(options, controlDoms) {
+    init: function (options, controlDoms) {
         var trackId = options.trackId,
             url = Xut.config.audioPath() + options.url,
             self = this,
@@ -180,7 +180,7 @@ var _Flash = AudioFactory.extend({
             swf_path: './lib/data/audio5js.swf',
             throw_errors: true,
             format_time: true,
-            ready: function(player) {
+            ready: function (player) {
                 this.load(url);
                 //如果调用了播放
                 this.play()
@@ -199,7 +199,7 @@ var _Flash = AudioFactory.extend({
         this.afterRelated(audio, options, controlDoms);
     },
 
-    end: function() {
+    end: function () {
         if (this.audio) {
             this.audio.destroy();
             this.audio = null;
@@ -217,7 +217,7 @@ var _Flash = AudioFactory.extend({
  * @return {object}         [description]
  */
 var _Audio = AudioFactory.extend({
-    init: function(options, controlDoms) {
+    init: function (options, controlDoms) {
         var trackId = options.trackId,
             url = Xut.config.audioPath() + options.url,
             self = this,
@@ -245,11 +245,11 @@ var _Audio = AudioFactory.extend({
                 instance[trackId] = audio;
             }
 
-            audio.addEventListener('ended', function() {
+            audio.addEventListener('ended', function () {
                 self.callbackProcess()
             }, false);
 
-            audio.addEventListener('error', function() {
+            audio.addEventListener('error', function () {
                 self.callbackProcess()
             }, false);
         }
@@ -263,7 +263,7 @@ var _Audio = AudioFactory.extend({
         this.afterRelated(audio, options, controlDoms);
     },
 
-    end: function() {
+    end: function () {
         if (this.audio) {
             this.audio.pause();
             this.audio.removeEventListener('ended', this.callbackProcess, false)
@@ -277,7 +277,7 @@ var _Audio = AudioFactory.extend({
 
 
 
-var createUUID = function() {
+var createUUID = function () {
     return UUIDcreatePart(4) + '-' +
         UUIDcreatePart(2) + '-' +
         UUIDcreatePart(2) + '-' +
@@ -305,7 +305,7 @@ function UUIDcreatePart(length) {
  */
 var _cordovaMedia = AudioFactory.extend({
 
-    init: function(options, controlDoms) {
+    init: function (options, controlDoms) {
 
         var url = Xut.config.audioPath() + options.url,
             trackId = options.trackId,
@@ -318,21 +318,21 @@ var _cordovaMedia = AudioFactory.extend({
         this.preRelated(trackId, options);
 
         var audio = {
-            startPlayingAudio: function() {
-                audioHandler.startPlayingAudio(self.id, url)
+            startPlayingAudio: function () {
+                window.audioHandler.startPlayingAudio(self.id, url)
             },
-            pausePlayingAudio: function() {
-                audioHandler.pausePlayingAudio(self.id)
+            pausePlayingAudio: function () {
+                window.audioHandler.pausePlayingAudio(self.id)
             },
-            release: function() {
-                audioHandler.release(self.id)
+            release: function () {
+                window.audioHandler.release(self.id)
             },
             /**
              * 扩充，获取位置
              * @return {[type]} [description]
              */
-            expansionCurrentPosition: function() {
-                return getCurrentPosition(self.id)
+            expansionCurrentPosition: function () {
+                return window.getCurrentPosition(self.id)
             }
         }
 
@@ -346,7 +346,7 @@ var _cordovaMedia = AudioFactory.extend({
     },
 
     //播放
-    play: function() {
+    play: function () {
         if (this.audio) {
             this.status = 'playing';
             this.audio.startPlayingAudio();
@@ -355,7 +355,7 @@ var _cordovaMedia = AudioFactory.extend({
     },
 
     //停止
-    pause: function() {
+    pause: function () {
         this.status = 'paused';
         this.audio && this.audio.pausePlayingAudio();
         this.acitonObj && this.acitonObj.pause();
@@ -363,7 +363,7 @@ var _cordovaMedia = AudioFactory.extend({
 
 
     //结束
-    end: function() {
+    end: function () {
         if (this.audio) {
             this.audio.release();
             this.audio = null;
@@ -385,25 +385,25 @@ function supportAudio(fail) {
     try {
         var audio = new Audio("lib/data/support.mp3");
         //如果错误
-        audio.addEventListener('error', function(e) {
+        audio.addEventListener('error', function (e) {
             audio = null;
             fail()
         }, false);
-    } catch (er) {}
+    } catch (er) { }
 };
 
 
 //apk的情况下
 if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
-   html5Audio = _Media;
+    html5Audio = _Media;
 } else {
 
     //妙妙学的 客户端浏览器模式
-    if (MMXCONFIG && audioHandler) {
-       html5Audio = _cordovaMedia;
+    if (window.MMXCONFIG && window.audioHandler) {
+        html5Audio = _cordovaMedia;
     } else {
         //pc
-       html5Audio = _Audio;
+        html5Audio = _Audio;
     }
 
     //2015.12.23
@@ -413,10 +413,10 @@ if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     // });
 }
 
-Xut.Audio =html5Audio
+Xut.Audio = html5Audio
 
 
 
 export {
-   html5Audio
+html5Audio
 }

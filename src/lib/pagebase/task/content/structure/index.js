@@ -367,6 +367,7 @@ export function structure(callback, data, context) {
      * @return {[type]} [description]
      */
     function checkComplete() {
+        var containerName
         if (cloneContentCount === 1) {
             //针对容器处理
             if (containerObj) {

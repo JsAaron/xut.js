@@ -13,29 +13,19 @@
  *                                      *
  ******************************************/
 
-//卷滚
-import { Iscroll } from './iscroll'
-//事件
-import {
-    conversionEventType,
-    destroyEvents,
-    bindEvents as bindContentEvents
-}
-from './event'
-//混入content
-import { Mix } from './mix'
+
 //content自对象
 import { Content } from './content'
-//搜索
-import { SearchBar } from './searchbar'
-//书签
-import { BookMark } from './bookmark'
-//文本框
-import { HtmlBox } from './htmlbox'
-//pixi事件
-import { bindEvents as bindPixiEvents } from '../pixi/event'
+//dom事件
+import { destroyEvents }from './event/event'
 //任务
 import { createNextTask } from './nexttask'
+//扩展
+import {extendEvent} from './event/index'
+import {extendPrivate} from './privateutil'
+import {extendTextBox} from './textbox/index'
+import {extendBookMark} from './bookmark/index'
+import {extendSearchBar} from './searchbar/index'
 
 
 /**
@@ -44,8 +34,7 @@ import { createNextTask } from './nexttask'
  * @return {[type]}      [description]
  */
 function activityClass(data) {
- 
-    var self = this;
+
 
     _.extend(this, data);
 
@@ -62,12 +51,6 @@ function activityClass(data) {
      * 初始化自定义事件
      */
     this.createEventRelated();
-
-    /**
-     * 为分段处理,记录需要加载的分段数据
-     * @type {Array}
-     */
-    this.waitCreateContent = [];
 
     /**
      * 保存子对象（PPT辅助对象）
@@ -126,51 +109,11 @@ function activityClass(data) {
 
 var activitProto = activityClass.prototype;
 
-
-/*********************************************************************
- *                 代码初始化
- *                初始基本参数
- *                构建动画关系作用域
- *                绑定基本事件
- **********************************************************************/
-
-
-/**
- * 检测是HTML文本框处理
- * @return {[type]} [description]
- */
-activitProto.htmlTextBox = function () {
-    var self = this;
-    var eventData = this.eventData;
-    var relatedData = this.relatedData;
-    var contentHtmlBoxIds = relatedData.contentHtmlBoxIds;
-    var contentId;
-    var contentName;
-    var eventElement;
-    //文本框实例对象
-    //允许一个activity有多个
-    this.htmlBoxInstance = [];
-    //创建文本框对象
-    if (contentHtmlBoxIds.length && relatedData.contentDas) {
-        _.each(relatedData.contentDas, function (cds) {
-            if (~contentHtmlBoxIds.indexOf(cds._id)) {
-                contentId = cds._id;
-                contentName = self._makePrefix('Content', self.pid, contentId);
-                //找到对应绑定事件的元素
-                eventElement = self._findContentElement(contentName)
-                if (!eventElement.attr("data-htmlbox")) {
-                    //构建html文本框对象
-                    self.htmlBoxInstance.push(new HtmlBox(contentId, eventElement));
-                    //增加htmlbox标志去重
-                    //多个actictiy共享问题
-                    eventElement.attr("data-htmlbox", "true")
-                }
-            }
-        })
-    }
-}
-
-
+extendEvent(activitProto)
+extendPrivate(activitProto)
+extendTextBox(activitProto)
+extendBookMark(activitProto)
+extendSearchBar(activitProto)
 
 /**
  * 保证正确遍历
@@ -198,7 +141,7 @@ activitProto.createActions = function () {
 
     this.eachAssistContents(function (scope) {
 
-        var context, type, id, isRreRun, parameter;
+        var context, id, isRreRun, parameter;
 
         //针对必须创建
         if (!(context = scope.$contentProcess)) {
@@ -212,9 +155,9 @@ activitProto.createActions = function () {
         }
 
         //如果是动画才处理
-        id = scope.id,
-            isRreRun = scope.isRreRun,
-            parameter = scope.getParameter();
+        id = scope.id
+        isRreRun = scope.isRreRun
+        parameter = scope.getParameter();
 
 
         //如果不是预生成
@@ -229,18 +172,6 @@ activitProto.createActions = function () {
 
 }
 
-
-/**
- * 检测创建完成度
- */
-activitProto._checkCreate = function (callback) {
-    var waitCreateContent = this.waitCreateContent;
-    if (waitCreateContent && waitCreateContent.length) {
-        Mix(this, waitCreateContent, callback);
-    } else {
-        callback();
-    }
-}
 
 
 /**
@@ -340,32 +271,25 @@ activitProto.runEffects = function (outComplete, evenyClick) {
         }
     }
 
-    /**
-     * 检测创建完成度
-     * 递归创建
-     * @return {[type]}       [description]
-     */
-    self._checkCreate(function () {
-        //执行动画
-        self.eachAssistContents(function (scope) {
-            if (scope.isRreRun) {
-                isRreRunPocess(scope);
-            } else {
+    //执行动画
+    this.eachAssistContents(function (scope) {
+        if (scope.isRreRun) {
+            isRreRunPocess(scope);
+        } else {
 
-                //标记动画正在运行
-                scope.$contentProcess && scope.$contentProcess.prop && scope.$contentProcess.prop({
-                    'animOffset': scope.$contentProcess.offset()
-                })
+            //标记动画正在运行
+            scope.$contentProcess && scope.$contentProcess.prop && scope.$contentProcess.prop({
+                'animOffset': scope.$contentProcess.offset()
+            })
 
-                //ppt动画
-                //ppt音频
-                scope.run(function () {
-                    captureAnimComplete(scope);
-                });
-            }
-        })
-        self.runState = true;
-    });
+            //ppt动画
+            //ppt音频
+            scope.run(function () {
+                captureAnimComplete(scope);
+            });
+        }
+    })
+    this.runState = true;
 }
 
 
@@ -500,504 +424,8 @@ activitProto.relevantOperation = function () {
 }
 
 
-/**
- * 创建搜索框
- * @return {[type]} [description]
- */
-activitProto.createSearchBar = function () {
-    var options = {
-        parent: this.rootNode
-    }
-    if (this.searchBar) {
-        //如果上次只是隐藏则可以恢复
-        this.searchBar.restore();
-    } else {
-        this.searchBar = new SearchBar(options);
-    }
-}
 
 
-/**
- * 创建书签
- * @return {[type]} [description]
- */
-activitProto.createBookMark = function () {
-    var element, seasonId, pageId, pageData;
-    if (this.pageType === 'master') {
-        //模板取对应的页面上的数据
-        pageData = Xut.Presentation.GetPageData();
-        element = this.relatedData.floatMaters.container;
-        pageId = pageData._id;
-        seasonId = pageData.seasonId;
-    } else {
-        element = this.rootNode;
-        seasonId = this.relatedData.seasonId
-        pageId = this.pageId
-    }
-    var options = {
-        parent: element,
-        seasonId: seasonId,
-        pageId: pageId
-    }
-
-    if (this.bookMark) {
-        //如果上次只是隐藏则可以恢复
-        this.bookMark.restore();
-    } else {
-        this.bookMark = new BookMark(options);
-    }
-}
-
-
-/*********************************************************************
- *
- *                      用户自定义接口事件
- *                                                                    *
- **********************************************************************/
-
-/**
- * 构建事件体系
- * @return {[type]} [description]
- */
-activitProto.createEventRelated = function () {
-
-    //配置事件节点
-    var eventId,
-        pid,
-        contentName,
-        //事件上下文对象
-        eventContext,
-        eventData = this.eventData;
-
-    //如果存在imageIds才处理,单独绑定事件处理
-    if (eventId = eventData.eventContentId) {
-
-        //默认dom模式
-        _.extend(eventData, {
-            'type': 'dom',
-            'domMode': true,
-            'canvasMode': false
-        })
-
-        function domEvent() {
-            pid = this.pid
-            contentName = this._makePrefix('Content', pid, this.id)
-
-            //找到对应绑定事件的元素
-            eventContext = this._findContentElement(contentName)
-        }
-
-        function canvasEvent() {
-            eventContext = {}
-            eventData.type = 'canvas';
-            eventData.canvasMode = true;
-            eventData.domMode = false;
-        }
-
-        //canvas事件
-        if (-1 !== this.canvasRelated.cid.indexOf(eventId)) {
-            canvasEvent.call(this)
-        } else {
-            //dom事件
-            domEvent.call(this)
-        }
-
-        eventData.eventContext = eventContext;
-
-        if (eventContext) {
-            //绑定事件加入到content钩子
-            this.relatedCallback.contentsHooks(pid, eventId, {
-                $contentProcess: eventContext,
-                //增加外部判断
-                isBindEventHooks: true,
-                type: eventData.type
-            })
-        } else {
-            /**
-             * 针对动态事件处理
-             * 快捷方式引用到父对象
-             * @type {[type]}
-             */
-            eventData.parent = this;
-        }
-    }
-
-    /**
-     * 解析出事件类型
-     */
-    eventData.eventName = conversionEventType(eventData.eventType);
-
-}
-
-
-/**
- * 绑定事件行为
- * @return {[type]} [description]
- */
-activitProto.bindEventBehavior = function (callback) {
-    var self = this,
-        eventData = this.eventData,
-        eventName = eventData.eventName,
-        eventContext = eventData.eventContext;
-
-    /**
-     * 运行动画
-     * @return {[type]} [description]
-     */
-    function startRunAnim() {
-        //当前事件对象没有动画的时候才能触发关联动作
-        var animOffset,
-            boundary = 5; //边界值
-
-        if (eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
-            var originalLeft = animOffset.left;
-            var originalTop = animOffset.top;
-            var newOffset = eventContext.offset();
-            var newLeft = newOffset.left;
-            var newTop = newOffset.top;
-            //在合理的动画范围是允许点击的
-            //比如对象只是一个小范围的内的改变
-            //正负10px的移动是允许接受的
-            if (originalLeft > (newLeft - boundary) && originalLeft < (newLeft + boundary) || originalTop > (newTop - boundary) && originalTop < (newTop + boundary)) {
-                self.runEffects();
-            }
-        } else {
-            self.runEffects();
-        }
-    }
-
-    /**
-     * 设置按钮的行为
-     * 音频
-     * 反弹
-     */
-    function setBehavior(feedbackBehavior) {
-
-        var behaviorSound;
-        //音频地址
-        if (behaviorSound = feedbackBehavior.behaviorSound) {
-
-            var createAuido = function () {
-                return new Xut.Audio({
-                    url: behaviorSound,
-                    trackId: 9999,
-                    complete: function () {
-                        this.play()
-                    }
-                })
-            }
-            //妙妙学客户端强制删除
-            if (MMXCONFIG && audioHandler) {
-                self._fixAudio.push(createAuido())
-            } else {
-                createAuido();
-            }
-        }
-        //反弹效果
-        if (feedbackBehavior.isButton) {
-            //div通过css实现反弹
-            if (eventData.domMode) {
-                eventContext.addClass('xut-behavior');
-                setTimeout(function () {
-                    eventContext.removeClass('xut-behavior');
-                    startRunAnim();
-                }, 500)
-            } else {
-                console.log('feedbackBehavior')
-            }
-        } else {
-            startRunAnim();
-        }
-    }
-
-    /**
-     * 事件引用钩子
-     * 用户注册与执行
-     * @type {Object}
-     */
-    var eventDrop = {
-        //保存引用,方便直接销毁
-        init: function (drag) {
-            eventData.dragDrop = drag;
-        },
-        //拖拽开始的处理
-        startRun: function () {
-
-        },
-        //拖拽结束的处理
-        stopRun: function (isEnter) {
-            if (isEnter) { //为true表示拖拽进入目标对象区域
-                self.runEffects();
-            }
-        }
-    }
-
-
-    /**
-     * 正常动画执行
-     * 除去拖动拖住外的所有事件
-     * 点击,双击,滑动等等....
-     * @return {[type]} [description]
-     */
-    var eventRun = function () {
-        //如果存在反馈动作
-        //优先于动画执行
-        var feedbackBehavior;
-        if (feedbackBehavior = eventData.feedbackBehavior[eventData.eventContentId]) {
-            setBehavior(feedbackBehavior)
-        } else {
-            startRunAnim();
-        }
-    }
-
-
-    /**
-     * 事件对象引用
-     * @return {[type]} [description]
-     */
-    var eventHandler = function (eventReference, eventHandler) {
-        eventData.eventReference = eventReference;
-        eventData.eventHandler = eventHandler;
-    }
-
-
-    //绑定用户自定义事件
-    if (eventContext && eventName) {
-
-        var domName, target,
-            dragdropPara = eventData.dragdropPara;
-
-        //获取拖拽目标对象
-        if (eventName === 'dragTag') {
-            domName = this._makePrefix('Content', this.pid, dragdropPara);
-            target = this._findContentElement(domName);
-        }
-
-        //增加事件绑定标示
-        //针对动态加载节点事件的行为过滤
-        eventData.isBind = true;
-
-
-        callback.call(this, {
-            'eventDrop': eventDrop,
-            'eventRun': eventRun,
-            'eventHandler': eventHandler,
-            'eventContext': eventContext,
-            'eventName': eventName,
-            'parameter': dragdropPara,
-            'target': target,
-            'domMode': eventData.domMode
-        })
-    }
-}
-
-
-/**
- * 注册事件
- * @return {[type]} [description]
- */
-activitProto.registerEvent = function () {
-    var eventData = this.eventData;
-    /**
-     * 2016.2.19
-     * 绑定canvas事件
-     * 由于canvas有异步加载
-     * 这里content创建的时候不阻断加载
-     * 所以canvas的事件体系
-     * 放到所有异步文件加载后才执行
-     */
-    if (eventData.type === "canvas") {
-        var makeFunction = function bind() {
-            //找到对应的上下文pixi stoge
-            eventData.eventContext = {}
-            this.bindEventBehavior(function (eventData) {
-                bindPixiEvents(eventData);
-            })
-        }
-        console.log('content canvas事件')
-        this.nextTask.event.push(makeFunction.bind(this))
-    } else {
-        //dom事件
-        this.bindEventBehavior(function (eventData) {
-            bindContentEvents(eventData);
-        })
-    }
-}
-
-
-
-/*********************************************************************
- *
- *                 私有方法
- *
- **********************************************************************/
-
-/**
- * dom节点去重绑定
- * 在每一次构建activity对象中，不重复处理content一些特性
- * 1 翻页特性
- * 2 注册钩子
- * 3 预显示
- * @return {[type]} [description]
- */
-activitProto._repeatBind = function (id, context, isRreRun, scope, collectorHooks, canvasMode) {
-    var indexOf,
-        relatedData = this.relatedData;
-
-    //过滤重复关系
-    if (-1 !== (indexOf = relatedData.createContentIds.indexOf(id))) {
-        //删除,去重
-        relatedData.createContentIds.splice(indexOf, 1);
-        //收集每一个content注册
-        collectorHooks(scope.pid, id, scope);
-        //canvas模式
-        if (canvasMode) {
-            if (isRreRun) {
-                // console.log(id,scope)
-                //直接改变元素状态
-                // context.visible = isRreRun === 'visible' ? true : false;
-                console.log('isRreRun')
-            }
-        } else {
-            //dom模式
-            //增加翻页特性
-            this._addIScroll(scope, context);
-            //直接复位状态,针对出现动画 show/hide
-            if (isRreRun) {
-                //直接改变元素状态
-                context.css({
-                    'visibility': isRreRun
-                })
-            }
-        }
-    }
-}
-
-
-/**
- * 增加翻页特性
- * 可能有多个引用关系
- * @return {[type]}         [description]
- */
-activitProto._addIScroll = function (scope, element) {
-    var self = this,
-        elementName,
-        contentDas = scope.contentDas;
-
-    //给外部调用处理
-    function makeUseFunction(element) {
-
-        var prePocess = self._makePrefix('Content', scope.pid, scope.id),
-            preEle = self._findContentElement(prePocess)
-
-        //重置元素的翻页处理
-        // defaultBehavior(preEle);
-
-        //ios or pc
-        if (!Xut.plat.isAndroid) {
-            return function () {
-                self.iscroll = Iscroll(element);
-            }
-        }
-
-        //在安卓上滚动文本的互斥不显示做一个补丁处理
-        //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
-        //如果是显示的,则不需要处理,
-        var visible = preEle.css('visibility'),
-            restore = function () { };
-
-        if (visible == 'hidden') {
-            var opacity = preEle.css('opacity');
-            //如果设置了不透明,则简单设为可见的
-            //否则先设为不透明,再设为可见
-            if (opacity == 0) {
-                preEle.css({
-                    'visibility': 'visible'
-                })
-                restore = function () {
-                    preEle.css({
-                        'visibility': visible
-                    })
-                }
-            } else {
-                preEle.css({
-                    'opacity': 0
-                }).css({
-                    'visibility': 'visible'
-                })
-                restore = function () {
-                    preEle.css({
-                        'opacity': opacity
-                    }).css({
-                        'visibility': visible
-                    })
-                }
-            }
-        }
-
-        return function () {
-            self.iscroll = Iscroll(element);
-            restore();
-            preEle = null;
-            restore = null;
-        }
-    }
-
-    //增加卷滚条
-    if (contentDas.isScroll) {
-        //去掉高度，因为有滚动文本框
-        element.find(">").css("height", "")
-
-        // elementName = this._makePrefix('contentWrapper', scope.pid, scope.id);
-        this.relatedCallback.iscrollHooks.push(makeUseFunction(element[0]));
-    }
-
-    //如果是图片则补尝允许范围内的高度
-    if (!contentDas.mask || !contentDas.isGif) {
-        element.find && element.find('img').css({
-            'height': contentDas.scaleHeight
-        });
-    }
-}
-
-
-/**
- * 制作一个查找标示
- * @return {[type]}
- */
-activitProto._makePrefix = function (name, pid, id) {
-    return name + "_" + pid + "_" + id;
-}
-
-
-/**
- * 从文档碎片中找到对应的dom节点
- * 查找的范围
- * 1 文档根节点
- * 2 文档容器节点
- * @param  {[type]} prefix [description]
- * @return {[type]}        [description]
- */
-activitProto._findContentElement = function (prefix) {
-    var element, containerPrefix,
-        contentsFragment = this.relatedData.contentsFragment;
-
-    if (element = (contentsFragment[prefix])) {
-        element = $(element)
-    } else {
-        //容器处理
-        if (containerPrefix = this.relatedData.containerPrefix) {
-            _.each(containerPrefix, function (containerName, index) {
-                element = contentsFragment[containerName];
-                element = $(element).find('#' + prefix);
-                if (element.length) {
-                    return;
-                }
-            })
-        }
-    }
-    return element;
-}
 
 
 

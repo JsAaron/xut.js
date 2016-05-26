@@ -167,7 +167,7 @@ function request(url, callback, charset) {
         node = document.createElement(isCSS ? "link" : "script");
 
     if (charset) {
-        var cs = isFunction(charset) ? charset(url) : charset
+        var cs = $.isFunction(charset) ? charset(url) : charset
         if (cs) {
             node.charset = cs
         }

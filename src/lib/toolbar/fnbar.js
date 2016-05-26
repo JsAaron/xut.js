@@ -227,12 +227,12 @@ fToolbar.prototype.createHideToolbar = function(container) {
     var html, style,
         TOP = this.top,
         height = this.iconHeight,
-        right = iconHeight * 2.5;
+        right = this.iconHeight * 2.5; 
     style = 'position:absolute;right:' + right + 'px;top:' + TOP + 'px;width:' + height + 'px;height:' + height + 'px;background-size:cover';
     html = '<div class="xut-controlBar-hide" style="' + style + '"></div>';
     container.append(html);
 }
-
+ 
 //应用标题
 fToolbar.prototype.createTitle = function(container) {
     var style, html,

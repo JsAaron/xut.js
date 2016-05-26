@@ -12,17 +12,17 @@ let DOC = document
 let prefix = Xut.plat.prefixStyle
 let KEYFRAMES = Xut.plat.KEYFRAMES
 let ANIMATION_EV = Xut.plat.ANIMATION_EV
-    //全局样式style
+//全局样式style
 let styleElement = null
 let playState = prefix('animation-play-state')
-    //动画前缀
+//动画前缀
 let prefixAnims = prefix('animation')
 
 //css3模式-单图
 function css3Animate(options) {
     var $element = options.element,
         data = options.data,
-        callback = options.callback || function() {},
+        callback = options.callback || function () { },
         aniName = 'sprite_' + options.id,
         count = data.thecount,
         fps = data.fps,
@@ -56,7 +56,7 @@ function css3Animate(options) {
                 number = cssRules.length;
                 sheet.insertRule(rule, number);
             } catch (e) {
-                console.log(e );
+                console.log(e);
             }
         } else {
             //创建样式文件
@@ -122,12 +122,12 @@ function css3Animate(options) {
             //首次
             frames.push(0 + '% { background-position:0% 0%}')
             for (var i = 0; i < count; i++) {
-                var currRow = Math.ceil((i + 1) / col); //当前行数
+                // var currRow = Math.ceil((i + 1) / col); //当前行数
                 var currCol = Math.floor(i / col); //当前列数  
                 var period = currCol * col; //每段数量  
-                var x = 100 * (i - period)
+                x = 100 * (i - period)
                 var y = 100 * currCol;
-
+ 
                 x = x == 0 ? x : "-" + x;
                 y = y == 0 ? y : "-" + y;
                 frames.push(((i + 1) * base) + '% { background-position: ' + x + '% ' + y + '%}')
@@ -163,24 +163,24 @@ function css3Animate(options) {
 
     return {
 
-        runSprites: function() {
+        runSprites: function () {
             //运行动画
             $element.show().css(playState, '');
         },
 
-        stopSprites: function() {
+        stopSprites: function () {
             //停止精灵动画
             deleteCSSRule(aniName);
             $element.off(ANIMATION_EV, callback);
             $element = null;
         },
 
-        pauseSprites: function() {
+        pauseSprites: function () {
             //暂停精灵动画
             $element.css(playState, 'paused');
         },
 
-        playSprites: function() {
+        playSprites: function () {
             //恢复精灵动画
             $element.css(playState, '');
         }
@@ -209,7 +209,7 @@ function keyframes(options) {
     $element.append(image);
 
     function runSprites() {
-        timer = setTimeout(function() {
+        timer = setTimeout(function () {
             image.src = url + num + ext;
             num++;
             check();
@@ -226,7 +226,6 @@ function keyframes(options) {
                 runSprites();
             } else {
                 timer = null;
-                callback();
             }
         } else {
             runSprites();
@@ -235,11 +234,13 @@ function keyframes(options) {
 
     //分解路径,得到扩展名和文件名
     function parsePath(path) {
-        var tmp = path.split('.'),
-            ext = '.' + tmp[1],
-            tmp = tmp[0].split('-'),
-            name = tmp[0] + '-',
-            num = tmp[1] - 0;
+        var tmp, ext, name, num
+
+        tmp = path.split('.')
+        ext = '.' + tmp[1]
+        tmp = tmp[0].split('-')
+        name = tmp[0] + '-'
+        num = tmp[1] - 0
         return {
             name: name,
             ext: ext,
@@ -251,12 +252,12 @@ function keyframes(options) {
 
     return {
 
-        runSprites: function() {
+        runSprites: function () {
             status = 'play';
             runSprites();
         },
 
-        stopSprites: function() {
+        stopSprites: function () {
             //停止精灵动画
             clearTimeout(timer);
             status = 'paused';
@@ -265,12 +266,12 @@ function keyframes(options) {
             image = null;
         },
 
-        pauseSprites: function() {
+        pauseSprites: function () {
             //暂停精灵动画
             status = 'paused';
         },
 
-        playSprites: function() {
+        playSprites: function () {
             //恢复精灵动画
             status = 'play';
             check();
@@ -278,94 +279,6 @@ function keyframes(options) {
 
     }
 }
-
-//用pixi库实现的精灵动画
-function pixiAnimate(options) {
-    var $element = options.element.parent(),
-        data = options.data,
-        callback = options.callback || function() {},
-        count = data.thecount,
-        fps = data.fps,
-        width = Math.ceil(data.scaleWidth),
-        height = Math.ceil(data.scaleHeight),
-        loop = data.loop ? true : false;
-
-    var scalex = Xut.config.proportion.width;
-    var scaley = Xut.config.proportion.height;
-    var path = Xut.config.pathAddress + data.md5;
-    var i = 0;
-    var x = 0;
-    var data = [];
-    var stage = new PIXI.Stage(0xFFFFFF);
-    var renderer = PIXI.autoDetectRenderer(width, height, null, true);
-
-    $element.empty().append(renderer.view);
-    var sprite = new PIXI.Sprite.fromImage(path);
-    sprite.scale.x = scalex;
-    sprite.scale.y = scaley;
-
-    for (var i = 0; i < count; i++) {
-        data.push(i * width);
-    }
-
-    stage.addChild(sprite);
-
-    requestAnimFrame(animate);
-
-    function animate() {
-        //控制刷新频率
-        if (i % 15 == 0) {
-            sprite.position.x = -data[x];
-            renderer.render(stage);
-            x++;
-            if (x > data.length - 1) {
-                x = 0;
-                i = 0;
-            }
-        }
-
-        i++;
-        requestAnimFrame(animate);
-    }
-}
-
-function spriteAnimate(options) {
-    var sprite = options.element,
-        data = options.data,
-
-        count = data.thecount,
-
-        width = Math.ceil(data.scaleWidth),
-        height = Math.ceil(data.scaleHeight),
-        loop = data.loop ? true : false;
-
-    var i = 0;
-    var x = 0;
-    var data = [];
-
-    for (var i = 0; i < count; i++) {
-        data.push(i * width);
-    }
-
-    requestAnimFrame(animate);
-
-    function animate() {
-        //控制刷新频率
-        if (i % 15 == 0) {
-            sprite.position.x = -data[x];
-
-            x++;
-            if (x > data.length - 1) {
-                x = 0;
-                i = 0;
-            }
-        }
-
-        i++;
-        //requestAnimFrame(animate);
-    }
-}
-
 
 /**
  * css3动画
@@ -381,9 +294,5 @@ export function Sprite(options) {
             return css3Animate(options);
         case 'timer':
             return keyframes(options);
-        case 'canvas':
-            return spriteAnimate(options);
-        default:
-            return pixiAnimate(options);
     }
 }

@@ -2,7 +2,7 @@ var preloadVideo = {
     //播放状态
     state: false,
     //地址
-    path: DUKUCONFIG ? DUKUCONFIG.path + "duku.mp4" : 'android.resource://#packagename#/raw/duku',
+    path: window.DUKUCONFIG ? window.DUKUCONFIG.path + "duku.mp4" : 'android.resource://#packagename#/raw/duku',
 
     //加载视频
     load: function() {

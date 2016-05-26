@@ -16,10 +16,10 @@ function transformNodes(rootNode, property, pageOffset) {
         y = 0,
         z = 0,
         round = Math.round,
-        prefix = Xut.plat.prefixStyle,
+        prefix = Xut.plat.prefixStyle;
 
-        //浮动对象初始化偏移量
-        parallaxOffset = pageOffset;
+    //浮动对象初始化偏移量
+    parallaxOffset = pageOffset;
 
     if (property.translateX != undefined || property.translateY != undefined || property.translateZ != undefined) {
         x = round(property.translateX) || 0;
@@ -129,7 +129,7 @@ export function Parallax(data) {
      */
     data.parallax = {
         //计算页码结束边界值,用于跳转过滤
-        calculateRangePage: function() {
+        calculateRangePage: function () {
             return {
                 'start': pid - currPageOffset + 1,
                 'end': pageRange - currPageOffset + pid

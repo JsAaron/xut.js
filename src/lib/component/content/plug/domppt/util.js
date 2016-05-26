@@ -37,7 +37,7 @@ export function calculateDirection(currentPoint, historyPoint) {
         quadrant = "4"; //第四象限
     return quadrant;
 }
-
+ 
 
 /**
  * 十六进制颜色转换为RGB颜色

@@ -122,7 +122,7 @@ function initDefaults(setData) {
             NavLeft: 1, //左翻页按钮[0不显示,1显示]
             NavRight: 1, //右翻页按钮[0不显示,1显示]
             customButton: 0, //自定义翻页按钮
-            CloseBut: SUbDOCCONTEXT ? 1 : 0 //关闭按钮[0不显示,1显示]
+            CloseBut: window.SUbDOCCONTEXT ? 1 : 0 //关闭按钮[0不显示,1显示]
         };
 
     for (var i = 0, len = setData.length; i < len; i++) {

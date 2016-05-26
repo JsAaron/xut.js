@@ -27,7 +27,7 @@ import { specialSprite as pixiSpecial } from '../pixi/special/index'
 function destroyContentAudio(videoIds, chapterId) {
     var isExist = false;
     //如果有音频存在
-    videoIds && _.each(videoIds, function (data, index) {
+    videoIds && _.each(videoIds, function (data) {
         //如果存在对象音频
         if (data.videoId) {
             isExist = true;
@@ -157,9 +157,7 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
  */
 animProto.run = function (scopeComplete) {
 
-    var self = this,
-        defaultIndex,
-        element = this.$contentProcess;
+    var element = this.$contentProcess;
 
     //ppt动画
     //dom与canvas

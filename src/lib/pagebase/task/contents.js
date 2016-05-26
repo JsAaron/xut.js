@@ -216,14 +216,16 @@ taskProto.dataAfterCheck = function (data) {
 
             //容器的前缀
             data.containerPrefix = containerPrefix;
-
+            
+            /* eslint-disable */
             //2015.5.6暴露到全局
             //提供给音频字幕上下文                
             if (!Xut.Contents.contentsFragment[data.chapterId]) {
-                Xut.Contents.contentsFragment[data.chapterId]
+                Xut.Contents.contentsFragment[data.chapterId];
             }
             Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment
-
+            /* elist-enable */
+            
             //开始下一个任务
             this.dataStrCheck(data, contentDas);
         }

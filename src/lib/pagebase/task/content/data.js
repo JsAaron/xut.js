@@ -13,7 +13,7 @@ import { parseJSON, arrayUnique, contentCache } from '../../../util/index'
 //类型选择,content有扩充的子类型
 //针对零件类型在category字段中的子分类
 var widgetType = {};
-_.each("jsWidget content svgWidget canvasWidget path".split(" "), function(key, name) {
+_.each("jsWidget content svgWidget canvasWidget path".split(" "), function (key, name) {
     widgetType[key] = true
 });
 
@@ -56,7 +56,7 @@ function adapterItemArrayRelated(relateds, activitys, tokens) {
         values,
         eventId = activitys.imageId;
 
-    _.each(['seasonId', 'Inapp', 'SearchBar', 'BookMarks'], function(type) {
+    _.each(['seasonId', 'Inapp', 'SearchBar', 'BookMarks'], function (type) {
         values = tokens[type];
         //如果有值
         if (values !== undefined) {
@@ -71,8 +71,8 @@ function adapterItemArrayRelated(relateds, activitys, tokens) {
                         chapterId: chapterId ? chapterId[0] : ''
                     };
                     break;
-                    //收费信息,给事件上绑定收费接口
-                    //0 收费 1 已收费
+                //收费信息,给事件上绑定收费接口
+                //0 收费 1 已收费
                 case 'Inapp':
                     relateds.seasonRelated[eventId]['Inapp'] = values[0];
                     break;
@@ -96,26 +96,26 @@ function parserRelated(compileActivitys, data) {
     var activitys,
         hookType,
         resultsActivitys, //结果结合
-        i        = compileActivitys.length,
+        i = compileActivitys.length,
         pageType = data.pageType,
-        pid      = data.pid,
+        pid = data.pid,
 
         /**
          * 相关数据合集
          * @type {Object}
          */
         activityRelated = [], //Activit合集相关数据信息
-        tempRelated     = [], //临时数据
+        tempRelated = [], //临时数据
 
         /**
          * 解析出来的相关信息
          * @type {Object}
          */
         relateds = {
-            seasonRelated      : {}, //节信息
-            containerRelated   : [], //容器合集相关数据信息
-            eventRelated       : {}, //多事件容器合集
-            partContentRelated : []  //卷滚conten只创建,不处理行为
+            seasonRelated: {}, //节信息
+            containerRelated: [], //容器合集相关数据信息
+            eventRelated: {}, //多事件容器合集
+            partContentRelated: []  //卷滚conten只创建,不处理行为
         };
 
 
@@ -124,8 +124,8 @@ function parserRelated(compileActivitys, data) {
      * @param  {Function} callback [description]
      * @return {[type]}            [description]
      */
-    var createResolve = function(callback) {
-        return resolveContentToActivity(function(tokens) {
+    var createResolve = function (callback) {
+        return resolveContentToActivity(function (tokens) {
             return callback(tokens);
         }, activitys, pageType, pid)
     }
@@ -143,9 +143,9 @@ function parserRelated(compileActivitys, data) {
          * @param  {[type]} relateds [description]
          * @return {[type]}          [description]
          */
-        "Container": function() {
+        "Container": function () {
             relateds.containerRelated.push(
-                createResolve(function(tokens) {
+                createResolve(function (tokens) {
                     return {
                         'Container': tokens['Content']
                     }
@@ -158,21 +158,21 @@ function parserRelated(compileActivitys, data) {
          * @param  {[type]} relateds [description]
          * @return {[type]}          [description]
          */
-        "Contents": function() {
+        "Contents": function () {
             var item;
-            if (item = createResolve(function(tokens) {
-                    return {
-                        'Contents': [tokens]
-                    }
-                })[0]) {
+            if (item = createResolve(function (tokens) {
+                return {
+                    'Contents': [tokens]
+                }
+            })[0]) {
                 //给content注册多个绑定事件
                 var eventId = activitys.imageId;
                 var eventData = {
-                    'eventContentId' : eventId,
-                    'activityId'     : activitys._id,
-                    'registers'      : item['activity'],
-                    'eventType'      : activitys.eventType,
-                    'dragdropPara'   : activitys.para1 //拖拽对象
+                    'eventContentId': eventId,
+                    'activityId': activitys._id,
+                    'registers': item['activity'],
+                    'eventType': activitys.eventType,
+                    'dragdropPara': activitys.para1 //拖拽对象
                 }
                 var isEvt = relateds.eventRelated['eventContentId->' + eventId];
                 if (isEvt) {
@@ -188,10 +188,10 @@ function parserRelated(compileActivitys, data) {
          * @param  {[type]} relateds [description]
          * @return {[type]}          [description]
          */
-        "JsWidget": function() {
+        "JsWidget": function () {
             var scrollContents = parseJSON(activitys.itemArray);
             if (_.isArray(scrollContents)) {
-                _.each(scrollContents, function(data) {
+                _.each(scrollContents, function (data) {
                     relateds.partContentRelated.push(data.id)
                 })
             } else {
@@ -222,7 +222,7 @@ function parserRelated(compileActivitys, data) {
             /////////////////
             ///钩子事件
             ////////////////
-            || (hookResolve[hookType] && hookResolve[hookType](relateds)) ) {
+            || (hookResolve[hookType] && hookResolve[hookType](relateds))) {
 
 
             /////////////////////
@@ -230,7 +230,7 @@ function parserRelated(compileActivitys, data) {
             /////////////////////
 
             //如果是动画表,视觉差表关联的content类型
-            resultsActivitys = createResolve(function(tokens) {
+            resultsActivitys = createResolve(function (tokens) {
 
                 //解析itemArray字段中的相关的信息
                 adapterItemArrayRelated(relateds, activitys, tokens);
@@ -284,17 +284,17 @@ function parserRelated(compileActivitys, data) {
             toRepeatCombineGroup(activityRelated, relateds.partContentRelated, pageType));
     }
 
-    createEventIds   = createRelevant[0].slice(0);
+    createEventIds = createRelevant[0].slice(0);
     createContentIds = createRelevant[1].slice(0);
 
     //如果存在过滤器
     if (Xut.CreateFilter.size()) {
         var filterEach = Xut.CreateFilter.each(data.chapterId)
         if (filterEach) {
-            filterEach(createEventIds, function(indexOf) {
+            filterEach(createEventIds, function (indexOf) {
                 createEventIds.splice(indexOf, 1)
             })
-            filterEach(createContentIds, function(indexOf) {
+            filterEach(createContentIds, function (indexOf) {
                 createContentIds.splice(indexOf, 1)
             })
             filterEach = null;
@@ -302,10 +302,9 @@ function parserRelated(compileActivitys, data) {
     }
 
     return _.extend(data, relateds, {
-        'createEventIds'              : createEventIds, //事件ID数
-        'createContentIds'            : createContentIds, //创建的content总ID数
-        // 'originalCreateContentIds' : createContentIds.slice(0), //保留原始的创建副本
-        'createActivitys'             : activityRelated
+        'createEventIds': createEventIds, //事件ID数
+        'createContentIds': createContentIds, //创建的content总ID数
+        'createActivitys': activityRelated
     });
 };
 
@@ -364,7 +363,7 @@ function resolveContentToActivity(callback, activity, pageType, pid) {
             animContentIds = seed.Container;
             toRepeatContents(animContentIds);
             break;
-            //多事件处理
+        //多事件处理
         case 'Contents':
             return seed.Contents;
         default:
@@ -463,10 +462,10 @@ function toRepeatCombineGroup(compilerActivitys, mixFilterRelated, pageType) {
     while (i--) {
         //开始执行过滤操作
         activityRelated = compilerActivitys[i];
-        ids             = activityRelated.ids;
-        contentIds      = ids.content;
-        parallaxId      = ids.parallax; //浮动类型的对象
-        imageIds        = activityRelated.imageIds;
+        ids = activityRelated.ids;
+        contentIds = ids.content;
+        parallaxId = ids.parallax; //浮动类型的对象
+        imageIds = activityRelated.imageIds;
 
         //针对普通content对象
         if (contentIds && contentIds.length) { //如果不为空
@@ -486,7 +485,7 @@ function toRepeatCombineGroup(compilerActivitys, mixFilterRelated, pageType) {
 
     //混入外部合并了逻辑
     if (mixFilterRelated && mixFilterRelated.length) {
-        _.each(mixFilterRelated, function(data) {
+        _.each(mixFilterRelated, function (data) {
             if (data) {
                 combineItemIds = combineItemIds.concat(data)
             }
@@ -501,7 +500,7 @@ function toRepeatCombineGroup(compilerActivitys, mixFilterRelated, pageType) {
     }
 
     //排序
-    needCreateContentIds = needCreateContentIds.sort(function(a, b) {
+    needCreateContentIds = needCreateContentIds.sort(function (a, b) {
         return a - b;
     });
 
@@ -523,7 +522,7 @@ function toRepeatCombineGroup(compilerActivitys, mixFilterRelated, pageType) {
 function parseTypeRelation(tableName, tokenIds) {
     var tokenId;
     var itemData = {};
-    _.each(tableName, function(tName) {
+    _.each(tableName, function (tName) {
         if (tokenId = tokenIds[tName]) {
             if (itemData[tName]) {
                 console.log('未处理解析同一个表')
@@ -547,7 +546,7 @@ function inGroup(tableName, contentIds) {
         ids = [],
         query = Xut.data.query;
 
-    _.each(contentIds, function(id) {
+    _.each(contentIds, function (id) {
         if (data = query(tableName, id)) {
             contentId = data.contentId;
             if (-1 === ids.indexOf(contentId)) {
@@ -584,7 +583,7 @@ function tokenize(itemArray) {
     itemJson = parseJSON(itemArray);
     //解析多个参数
     if (itemJson.length) {
-        _.each(itemJson, function(opts) {
+        _.each(itemJson, function (opts) {
             actType = opts.actType;
             if (!anmins[actType]) {
                 anmins[actType] = [];

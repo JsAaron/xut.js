@@ -46,8 +46,14 @@ var pixiType = {
 		}
     },
     //ppt=》pixi动画
-    "PPT": function (opts) {
-        createCanvasData('pptId', opts)
+    "PPT": function (opts, data) {
+		//双重判断
+		//必须启动cnavas模式
+		//必须数据是canvs模式
+		//因为ppt只支持 高级与复杂精灵
+		if (data.canvasRelated.enable && opts.conData.canvasMode) {
+			createCanvasData('pptId', opts)
+		}
     },
     //高级精灵动画
     //widget
@@ -86,15 +92,28 @@ var pixiType = {
  * 解析参数
  */
 function callResolveArgs(category, opts) {
-	var cat
-	var cats = category.split(",")
-	var len = cats.length
+	var cate
+	var val
 	var data = opts.data
+	var cates = category.split(",")
+	var len = cates.length
+	//判断ppt是不是数组中最后一个
+	//如果不是，需要对调位置
+	var pptindex = cates.indexOf('PPT')
+	if (-1 !== pptindex) {
+		//如果最后不是ppt ,需要调换位置
+		if (pptindex != (len - 1)) {
+			val = cates.splice(pptindex, 1)
+			//ppt永远最后一个
+			cates = cates.concat(val)
+		}
+	}
+
 	if (len) {
 		while (len--) {
-			cat = cats[len]
+			cate = cates[len]
 			//匹配数据类型
-			pixiType[cat] && pixiType[cat](opts, data)
+			pixiType[cate] && pixiType[cate](opts, data)
 		}
 	}
 }

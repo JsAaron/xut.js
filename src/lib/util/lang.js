@@ -48,10 +48,8 @@ export function toEmpty(val) {
  * @return {[type]} [description]
  */
 export function extend(subClass, superClass) {
-    var F = function() {};
-    // 只继承了superClass超级类中的方法并不包括属性（如果是定义在构造函数中，不在prototype里）
-    F.prototype = superClass.prototype;　
-    // 因为F()函数只继承了超级类中prototype中的方法并没有其相关属性，所以subClass.prototype也只有superClass中的方法。　 
+    var F = function() {}
+    F.prototype = superClass.prototype 
     var fProto = new F();
     for (var k in fProto) {
         if (subClass.prototype[k]) {
@@ -63,31 +61,6 @@ export function extend(subClass, superClass) {
     subClass.prototype.constructor = subClass;
     superClass = null;
 }
-
-
-/**
- * 迷你版的deferred
- */
-export function deferred(func, context) {
-    if (this instanceof Deferred === false) {
-        return new Deferred(func)
-    }
-    var tuple = [];
-    var promise = {
-        resolve: function() {
-            var t = tuple.shift(),
-                n;
-            t && (n = t.apply(null, arguments), n instanceof Deferred && (n.tuple = tuple));
-        },
-        then: function(n) {
-            return tuple.push(n), this;
-        }
-    }
-    if (func) {
-        func.call(context || promise, promise.resolve);
-    }
-    return promise;
-};
 
 
 /**
