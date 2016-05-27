@@ -11,7 +11,7 @@ import { setProportion } from '../../../util/option'
  * @return {[type]}               [description]
  */
 function spiritAni(data, path) {
- 
+
     // this.canvasX = condata.scaleLeft
     // this.canvasY = condata.scaleTop
 
@@ -108,11 +108,11 @@ spiritAni.prototype.init = function () {
         this.maskSprite.height = this.spiritHeight;
         this.stage.addChild(this.maskSprite);
     }
- 
+
     //png
     for (var j = 0; j < this.imagesArray.length; j++) {
         this.texture[j] = PIXI.Texture.fromImage(this.imagesArray[j]);
-    } 
+    }
 
     this.advSprite = new PIXI.Sprite(this.texture[0]);
     this.advSprite.position.x = this.startPoint.x;
@@ -174,6 +174,15 @@ spiritAni.prototype.countNewFrame = function () {
     }
 };
 
+/**
+ * 销毁
+ */
+spiritAni.prototype.destroy = function () {
+    if (this.stage) {
+        this.stage.destroy(this.stage.length ? true : false)
+    }
+
+}
 
 export {
 spiritAni

@@ -453,6 +453,7 @@ PptAnimation.prototype = {
      * @return {[type]}           [description]
      */
     startHandler: function (parameter, object, params) {
+
         for (var item in params) {
             switch (item) {
                 case "x":
@@ -490,6 +491,8 @@ PptAnimation.prototype = {
                     break;
             }
         }
+        
+
         //ppt动画音频
         if (parameter.videoId > 0) {
             Xut.AudioManager.contentAudio(parameter.chapterId, parameter.videoId)

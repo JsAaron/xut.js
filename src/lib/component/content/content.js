@@ -7,15 +7,15 @@
 import { Animation } from './animation'
 import { Parallax } from './parallax'
 
-import { Container } from '../pixi/container'
- 
+import { Context } from '../pixi/context'
+
 
 /**
  * 预运行动作
  * 自动 && 出现 && 无时间 && 无音乐
  *  && 不是精灵动画 && 没有脚本代码 && 并且不能是收费
  * @return {[type]}         [description]
- */ 
+ */
 function preRunAction(data, eventName) {
     var para,
         parameter = data.getParameter();
@@ -38,14 +38,14 @@ function preRunAction(data, eventName) {
              *      满足是静态动画
              * **********************************************/
             //true是显示,false隐藏
-            
-            var state = data.isRreRun = /"exit":"False"/i.test(para.parameter) === true 
-                    ? 'visible'
-                    : 'hidden';
-            
+
+            var state = data.isRreRun = /"exit":"False"/i.test(para.parameter) === true
+                ? 'visible'
+                : 'hidden';
+
             return state
         }
-    } 
+    }
 }
 
 
@@ -62,6 +62,8 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
     }
     var $contentProcess
     var pageType = base.pageType
+    var contentName
+    var canvasDom
 
 
     //如果启动了canvas模式
@@ -69,8 +71,10 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
     if (base.canvasRelated.enable) {
         //如果找到对应的canvas对象
         if (-1 !== base.canvasRelated.cid.indexOf(contentId)) {
-            //创建canvas容器
-            $contentProcess = Container(contentDas, base.rootNode, base.pageIndex)
+            contentName = "canvas_" + pid + "_" + contentId
+            canvasDom = base._findContentElement(contentName, 'canvas')[0]
+            //创建上下文pixi
+            $contentProcess = Context(contentDas, canvasDom, base.pageIndex)
             data.type = 'canvas';
             data.canvasMode = true;
             data.domMode = false;
@@ -102,7 +106,8 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
         pageType: pageType,
         pageIndex: base.pageIndex,
         canvasRelated: base.canvasRelated,
-        nextTask: base.nextTask
+        nextTask: base.nextTask,
+        canvasDom: canvasDom
     })
 
 
@@ -216,7 +221,7 @@ function fnCreate(base) {
                     callback(handlers);
                 }
             }
-        } 
+        }
     }
 }
 
@@ -268,7 +273,7 @@ export function Content(base) {
 
             var hasParallax = _.keys(tempParallaxScope).length,
                 hasAnimation = _.keys(tempAnimationScope).length;
- 
+
             //动画为主
             //合并，同一个对象可能具有动画+视觉差行为
             if (hasParallax && hasAnimation) {

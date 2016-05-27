@@ -226,6 +226,7 @@ taskProto.dataAfterCheck = function (data) {
             Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment
             /* elist-enable */
             
+
             //开始下一个任务
             this.dataStrCheck(data, contentDas);
         }

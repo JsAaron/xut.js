@@ -20,7 +20,7 @@ function Sprite(option, callback) {
     //保证和以前版本的兼容性，旧版本精灵只有一行，因此没有matrix参数
     var matrixCols = data.thecount;
     var matrixRows = 1;
-    var paraObject, dataMatrix,matrixs
+    var paraObject, dataMatrix, matrixs
     if (data.parameter) {
         //获取参数, 允许参数为null
         try {
@@ -150,6 +150,25 @@ Sprite.prototype.load = function (loader, res) {
  */
 Sprite.prototype.render = function () {
     this.renderer.render(this.stage);
+}
+
+Sprite.prototype.destroy = function () {
+    //if there are movie sprite, destory it
+    if (this.movie) {
+        //remove it from stage
+        if (this.stage) {
+            this.stage.removeChild(this.movie);
+        }
+        //remove texture for movie
+        for (var i = 0; i < this.movie.textures.length; i++) {
+            this.movie.textures[i].destroy(true);
+            if (this.movie.maskSprite) {
+                this.movie.maskTextures[i].destroy(true);
+            }
+        }
+        //remove movie sprite
+        this.movie.destroy(true, true);
+    }
 }
 
 export {Sprite}

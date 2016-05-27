@@ -96,22 +96,21 @@ function callResolveArgs(category, opts) {
 	var val
 	var data = opts.data
 	var cates = category.split(",")
-	var len = cates.length
+	var length = cates.length
+	var i = 0
 	//判断ppt是不是数组中最后一个
 	//如果不是，需要对调位置
 	var pptindex = cates.indexOf('PPT')
-	if (-1 !== pptindex) {
-		//如果最后不是ppt ,需要调换位置
-		if (pptindex != (len - 1)) {
-			val = cates.splice(pptindex, 1)
-			//ppt永远最后一个
-			cates = cates.concat(val)
-		}
+
+	//如果是首位
+	if (pptindex == 0) {
+		//ppt永远最后一个
+		cates = cates.concat(cates.splice(pptindex, 1))
 	}
 
-	if (len) {
-		while (len--) {
-			cate = cates[len]
+	if (length) {
+		for (var i = 0; i < length; i++) {
+			cate = cates[i]
 			//匹配数据类型
 			pixiType[cate] && pixiType[cate](opts, data)
 		}

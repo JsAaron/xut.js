@@ -80,9 +80,10 @@ var animProto = Animation.prototype;
  */
 animProto.init = function (id, context, rootNode, chapterId, parameter, pageType) {
 
-    var pageIndex = this.pageIndex;
-    var self = this;
-    var actionTypes;
+    var pageIndex = this.pageIndex
+    var self = this
+    var actionTypes
+    var opts
     var create = function (constructor, newContext) {
         return new constructor(pageIndex, pageType, chapterId, newContext || context, parameter, rootNode);
     }
@@ -106,9 +107,7 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
         //动作类型
         //可能是组合动画
         actionTypes = this.contentDas.actionTypes
-
-
-        var opts = {
+        opts = {
             data: this.contentDas,
             renderer: this.$contentProcess,
             pageIndex: this.pageIndex
@@ -123,7 +122,7 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
             //构建ppt对象
             this.pixiObj.$once('load', function () {
                 //ppt动画
-                if (actionTypes.pptId) { 
+                if (actionTypes.pptId) {
                     //content=>MovieClip
                     self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
                     self.pptObj.contentId = id
@@ -256,7 +255,13 @@ animProto.destroy = function () {
     bind(this.spriteObj, function (sprObj) {
         sprObj.stopSprites();
     });
-
+    
+    //销毁renderer = new PIXI.WebGLRenderer
+    if(this.canvasMode){
+        //rederer.destroy()
+        this.$contentProcess.destroy()
+    }
+   
     this.pptObj = null;
     this.spriteObj = null;
     this.getParameter = null;

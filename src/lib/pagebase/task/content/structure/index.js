@@ -12,6 +12,7 @@ import { parseJSON, reviseSize, readFile } from '../../../../util/index'
 import { parseCanvas } from './parsetype'
 import { createContainer } from './container'
 import { createDom } from './dom'
+import { createCanvas } from './canvas'
 import { parseContentDas } from './parsecontent'
 
 
@@ -341,10 +342,12 @@ export function structure(callback, data, context) {
 
             //拼接地址
             analysisPath(wrapObj, conData)
-
-            //dom模式下生成dom节点
-            //canvas模式下不处理，因为要合并到pixi场景中
-            if (!conData.canvasMode) {
+ 
+            //canvas节点
+            if (conData.canvasMode) {
+                contentStr = createCanvas(conData, wrapObj)
+            }else{
+                //dom节点
                 contentStr = createDom(conData, wrapObj)
             }
 

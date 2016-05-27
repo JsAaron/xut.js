@@ -36,7 +36,7 @@ export function extendPrivate(activitProto) {
                 if (isRreRun) {
                     // console.log(id,scope)
                     //直接改变元素状态
-                    // context.visible = isRreRun === 'visible' ? true : false;
+                    context.view.style.visible = isRreRun === 'visible' ? true : false;
                     console.log('isRreRun')
                 }
             } else {
@@ -163,12 +163,12 @@ export function extendPrivate(activitProto) {
 
         var element, containerPrefix, contentsFragment
 
-        //canvas模式
-        if (type === 'canvas') {
-            //直接在root查找，因为canvasdom是pxixi创建的
-            //不能在文档碎片中查找 
-            return element = this.rootNode.find('#' + prefix);
-        }
+        // //canvas模式
+        // if (type === 'canvas') {
+        //     //直接在root查找，因为canvasdom是pxixi创建的
+        //     //不能在文档碎片中查找 
+        //     return element = this.rootNode.find('#' + prefix);
+        // }
 
         //dom模式
         contentsFragment = this.relatedData.contentsFragment;
@@ -188,6 +188,6 @@ export function extendPrivate(activitProto) {
         }
         return element;
     }
-
+    
 
 }

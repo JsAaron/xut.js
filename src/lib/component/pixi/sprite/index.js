@@ -56,6 +56,7 @@ var Sprite = Factory.extend({
      * @return {[type]} [description]
      */
     destroy: function (destroyQueue) {
+        this.sprite.destroy()
         destroyQueue(this.pageIndex, this.uuid)
     }
 

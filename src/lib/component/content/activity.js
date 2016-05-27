@@ -255,8 +255,9 @@ activitProto.runEffects = function (outComplete, evenyClick) {
             //必须要修改
             if (scope.$contentProcess) {
                 if (scope.canvasMode) {
+                    console.log('canvsa isRreRunPocess')
                     //直接改变元素状态
-                    scope.$contentProcess.visible = scope.isRreRun === 'visible' ? true : false;
+                    //scope.$contentProcess.view.style.visible = scope.isRreRun === 'visible' ? true : false;
                 } else {
                     //因为执行的顺序问题，动画与页面零件
                     //isscroll标记控制
