@@ -15,7 +15,7 @@ module.exports = {
         //这里填入目标地址er
         //e.g:d:/xxxx
         debugger: {
-            launch: false,
+            launch: true,
             //D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             ///Users/mac/project/xcode/www/build
             dir: '/Users/mac/project/xcode/www/build'
@@ -27,6 +27,14 @@ module.exports = {
             dir: path.resolve(__dirname, 'src/lib'),
         }
     }, 
+    
+    /**
+     * 远程调试
+     * remoteRemote
+     */
+    remote:{
+        
+    },
 
     /**
      * 发布配置

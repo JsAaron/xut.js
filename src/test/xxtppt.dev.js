@@ -75012,31 +75012,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
    }
 
    /**
-    * 组成HTML结构
-    * @param  {[type]} argument [description]
-    * @return {[type]}          [description]
-    */
-   function createCanvas(data, wrapObj) {
-
-       var mark = '';
-       if (data.category) {
-           var cats = data.category.split(",");
-           var len = cats.length;
-           if (len) {
-               while (len--) {
-                   mark += cats[len];
-               }
-           }
-       }
-
-       var temp = '<canvas id="{0}"' + ' data-ctype={1}' + ' width="{2}"' + ' height="{3}">' + '</canvas>';
-
-       var str = String.format(temp, wrapObj.makeId('canvas'), mark.toLocaleLowerCase(), data.scaleWidth, data.scaleHeight);
-
-       return str;
-   }
-
-   /**
     * 解析序列中需要的数据
     * @param  {[type]}   contentIds [description]
     * @param  {Function} callback   [description]
@@ -75356,11 +75331,9 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
                //拼接地址
                analysisPath(wrapObj, conData);
 
-               //canvas节点
-               if (conData.canvasMode) {
-                   contentStr = createCanvas(conData, wrapObj);
-               } else {
-                   //dom节点
+               //dom模式下生成dom节点
+               //canvas模式下不处理，因为要合并到pixi场景中
+               if (!conData.canvasMode) {
                    contentStr = createDom(conData, wrapObj);
                }
 
@@ -76592,7 +76565,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
         * @return {[type]}           [description]
         */
        startHandler: function startHandler(parameter, object, params) {
-
            for (var item in params) {
                switch (item) {
                    case "x":
@@ -76630,7 +76602,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
                        break;
                }
            }
-
            //ppt动画音频
            if (parameter.videoId > 0) {
                Xut.AudioManager.contentAudio(parameter.chapterId, parameter.videoId);
@@ -77166,25 +77137,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
        this.renderer.render(this.stage);
    };
 
-   Sprite$2.prototype.destroy = function () {
-       //if there are movie sprite, destory it
-       if (this.movie) {
-           //remove it from stage
-           if (this.stage) {
-               this.stage.removeChild(this.movie);
-           }
-           //remove texture for movie
-           for (var i = 0; i < this.movie.textures.length; i++) {
-               this.movie.textures[i].destroy(true);
-               if (this.movie.maskSprite) {
-                   this.movie.maskTextures[i].destroy(true);
-               }
-           }
-           //remove movie sprite
-           this.movie.destroy(true, true);
-       }
-   };
-
    /**
     * 精灵动画
     * @param  {[type]} data          [description]
@@ -77231,7 +77183,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
         * @return {[type]} [description]
         */
        destroy: function destroy(destroyQueue) {
-           this.sprite.destroy();
            destroyQueue(this.pageIndex, this.uuid);
        }
 
@@ -77400,15 +77351,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
        }
    };
 
-   /**
-    * 销毁
-    */
-   spiritAni.prototype.destroy = function () {
-       if (this.stage) {
-           this.stage.destroy(this.stage.length ? true : false);
-       }
-   };
-
    function getSpiritAni(inputPara, data) {
        var path = data.resourcePath;
        if ((typeof inputPara === 'undefined' ? 'undefined' : babelHelpers.typeof(inputPara)) == "object") {
@@ -77510,9 +77452,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
         */
        destroy: function destroy(destroyQueue) {
            destroyQueue(this.pageIndex, this.uuid);
-           _.each(this.sprObjs, function (obj) {
-               obj.destroy();
-           });
        }
    });
 
@@ -77578,7 +77517,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
        var pageIndex = this.pageIndex;
        var self = this;
        var actionTypes;
-       var opts;
        var create = function create(constructor, newContext) {
            return new constructor(pageIndex, pageType, chapterId, newContext || context, parameter, rootNode);
        };
@@ -77602,7 +77540,8 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
            //动作类型
            //可能是组合动画
            actionTypes = this.contentDas.actionTypes;
-           opts = {
+
+           var opts = {
                data: this.contentDas,
                renderer: this.$contentProcess,
                pageIndex: this.pageIndex
@@ -77744,12 +77683,6 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
        bind(this.spriteObj, function (sprObj) {
            sprObj.stopSprites();
        });
-
-       //销毁renderer = new PIXI.WebGLRenderer
-       if (this.canvasMode) {
-           //rederer.destroy()
-           this.$contentProcess.destroy();
-       }
 
        this.pptObj = null;
        this.spriteObj = null;
@@ -77919,16 +77852,15 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
     ******************************************/
 
    /**
-    * 创建pixi上下文
+    * 创建pipx容器
     * @param  {[type]} canvasContainer [description]
     * @param  {[type]} wrapObj         [description]
     * @return {[type]}                 [description]
     */
-   function Context(data, dom, pageIndex) {
+   function Container(data, rootelement, pageIndex) {
 
        var renderer = PIXI.autoDetectRenderer(data.scaleWidth, data.scaleHeight, {
-           transparent: true,
-           view: dom
+           transparent: true
        });
 
        var mark = '';
@@ -77953,6 +77885,9 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
 
        renderer.view.setAttribute('data-ctype', mark);
        renderer.view.setAttribute('id', prefix);
+
+       //放入容器
+       rootelement.append(renderer.view);
 
        return renderer;
    }
@@ -78002,18 +77937,14 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
        };
        var $contentProcess;
        var pageType = base.pageType;
-       var contentName;
-       var canvasDom;
 
        //如果启动了canvas模式
        //改成作用域的一些数据
        if (base.canvasRelated.enable) {
            //如果找到对应的canvas对象
            if (-1 !== base.canvasRelated.cid.indexOf(contentId)) {
-               contentName = "canvas_" + pid + "_" + contentId;
-               canvasDom = base._findContentElement(contentName, 'canvas')[0];
-               //创建上下文pixi
-               $contentProcess = Context(contentDas, canvasDom, base.pageIndex);
+               //创建canvas容器
+               $contentProcess = Container(contentDas, base.rootNode, base.pageIndex);
                data.type = 'canvas';
                data.canvasMode = true;
                data.domMode = false;
@@ -78045,8 +77976,7 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
            pageType: pageType,
            pageIndex: base.pageIndex,
            canvasRelated: base.canvasRelated,
-           nextTask: base.nextTask,
-           canvasDom: canvasDom
+           nextTask: base.nextTask
        });
 
        /**
@@ -78742,12 +78672,12 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
 
            var element, containerPrefix, contentsFragment;
 
-           // //canvas模式
-           // if (type === 'canvas') {
-           //     //直接在root查找，因为canvasdom是pxixi创建的
-           //     //不能在文档碎片中查找
-           //     return element = this.rootNode.find('#' + prefix);
-           // }
+           //canvas模式
+           if (type === 'canvas') {
+               //直接在root查找，因为canvasdom是pxixi创建的
+               //不能在文档碎片中查找
+               return element = this.rootNode.find('#' + prefix);
+           }
 
            //dom模式
            contentsFragment = this.relatedData.contentsFragment;
@@ -79827,18 +79757,17 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
                //必须要修改
                if (scope.$contentProcess) {
                    if (scope.canvasMode) {
-                       console.log('canvsa isRreRunPocess');
                        //直接改变元素状态
-                       //scope.$contentProcess.view.style.visible = scope.isRreRun === 'visible' ? true : false;
+                       scope.$contentProcess.view.style.visible = scope.isRreRun === 'visible' ? true : false;
                    } else {
-                           //因为执行的顺序问题，动画与页面零件
-                           //isscroll标记控制
-                           if (!scope.$contentProcess.attr('isscroll')) {
-                               scope.$contentProcess.css({
-                                   'visibility': scope.isRreRun
-                               });
-                           }
+                       //因为执行的顺序问题，动画与页面零件
+                       //isscroll标记控制
+                       if (!scope.$contentProcess.attr('isscroll')) {
+                           scope.$contentProcess.css({
+                               'visibility': scope.isRreRun
+                           });
                        }
+                   }
                }
                captureAnimComplete();
            }
@@ -81903,6 +81832,11 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
    				contentObj.destroy(function (destroyObj) {
    					//如果不是浮动对象,清理元素引用
    					if (!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
+
+   						//清理所有的pixi对象
+   						if (destroyObj.$contentProcess.destroy) {
+   							destroyObj.$contentProcess.destroy(true);
+   						}
    						destroyObj.$contentProcess = null;
    					}
    				});
@@ -86854,10 +86788,10 @@ return f(a,"object")&&"cx"in a?e.attr(a):null!=a&&e.attr({cx:a,cy:b,rx:c,ry:d}),
        }, null, true);
    }
 
-   Xut.config.onlyDomMode = true;
+   // Xut.config.onlyDomMode = true
 
    //更新版本号记录
-   Xut.Version = 798;
+   Xut.Version = 797;
 
    //修复ios 安卓浏览器不能自动播放音频的问题
    //在加载时创建新的audio.video 用的时候更换
