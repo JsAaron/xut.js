@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node build/dev/server.js",
-    "build": "node build/build.js run",
+    "build": "node build/build/build.js run",
     "remote": "node build/remote/debug.js",
     "lint": "eslint dist/xxtppt.dev.js",
     "unit": "karma start test/unit/karma.conf.js",
@@ -44,7 +44,6 @@
     "gulp-uglify": "^1.5.3",
     "gulp-watch": "^4.3.5",
     "html-webpack-plugin": "^2.16.1",
-    "http-server": "^0.9.0",
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^1.0.1",
