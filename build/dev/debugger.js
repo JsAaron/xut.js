@@ -19,7 +19,7 @@ if (args[0] == 'debug') {
     debugout = args[1]
 }
 
-var paths = []
+var scriptUrl = []
 var conf = _.extend(config.common, {
     rollup: config.common.tarDir + 'rollup.js',
     debug: debugout
@@ -34,7 +34,7 @@ spinner.start()
  * @return {[type]}   [description]
  */
 gulp.task('mergescript', function(cb) {
-    gulp.src(paths)
+    gulp.src(scriptUrl)
         .pipe(concat(conf.devName))
         .on('error', function(err) {
             console.log('Less Error!', err.message);
@@ -50,8 +50,8 @@ gulp.task('mergescript', function(cb) {
  */
 gulp.task('mergeall', ['mergescript'], function(cb) {
     //合成xxtppt.js
-    paths.push(conf.rollup)
-    gulp.src(paths)
+    scriptUrl.push(conf.rollup)
+    gulp.src(scriptUrl)
         .pipe(concat(conf.distName))
         .on('error', function(err) {
             console.log('Less Error!', err.message);
@@ -80,24 +80,7 @@ gulp.task('pack', ['mergeall'], function() {
 
 
 
-base(conf).then(function() {
-    fs.readFile('./src/index.html', "utf8", function(error, data) {
-        if (error) throw error;
-        var paths = []
-        var path;
-        var cwdPath = escape(process.cwd())
-        var scripts = data.match(/<script.*?>.*?<\/script>/ig);
-
-        scripts.forEach(function(val) {
-            val = val.match(/src="(.*?.js)/);
-            if (val && val.length) {
-                path = val[1]
-                    //有效src
-                if (/^lib/.test(path)) {
-                    paths.push(conf.srcDir + path)
-                }
-            }
-        })
-        gulp.run('pack')
-    });
+base(conf).then(function(paths) {
+    scriptUrl = paths
+    gulp.run('pack')
 })

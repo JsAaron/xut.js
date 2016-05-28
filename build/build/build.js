@@ -23,7 +23,7 @@ var conf = _.extend(config.build.conf, {
 });
 
 var spinner = ora('Begin to pack , Please wait for\n')
-spinner.start()
+    // spinner.start()
 
 console.log(
     '压缩js  => rollup and gulp\n' +
@@ -31,50 +31,29 @@ console.log(
 )
 
 
-base(conf).then(function() {
+base(conf).then(function(scriptUrl) {
     return new Promise(function combine(resolve, reject) {
-        fs.readFile('./src/index.html', "utf8", function(error, data) {
-            if (error) throw error;
-            var paths = []
-            var path;
-            var cwdPath = escape(process.cwd())
-            var scripts = data.match(/<script.*?>.*?<\/script>/ig);
-
-            scripts.forEach(function(val) {
-                val = val.match(/src="(.*?.js)/);
-                if (val && val.length) {
-                    path = val[1]
-
-                    //有效src
-                    if (/^lib/.test(path)) {
-                        paths.push(conf.srcDir + path)
-                    }
-                }
+        //合成xxtppt.js
+        scriptUrl.push(conf.rollup)
+        gulp.src(scriptUrl)
+            .pipe(concat(conf.devName))
+            .on('error', function(err) {
+                console.log('Less Error!', err.message);
+                this.end();
             })
-
-            //合成xxtppt.js
-            paths.push(conf.rollup)
-            gulp.src(paths)
-                .pipe(concat(conf.devName))
-                .on('error', function(err) {
-                    console.log('Less Error!', err.message);
-                    this.end();
-                })
-                //dev
-                .pipe(gulp.dest(conf.tarDir))
-                .pipe(gulp.dest(conf.testDir))
-                //min
-                .pipe(uglify())
-                .pipe(rename(conf.distName))
-                .pipe(gulp.dest(conf.tarDir))
-                .pipe(gulp.dest(conf.tarDir))
-                .pipe(gulp.dest(conf.testDir))
-                .on('end', function() {
-                    fs.unlinkSync(conf.rollup)
-                    resolve && resolve()
-                })
-
-        });
+            //dev
+            .pipe(gulp.dest(conf.tarDir))
+            .pipe(gulp.dest(conf.testDir))
+            //min
+            .pipe(uglify())
+            .pipe(rename(conf.distName))
+            .pipe(gulp.dest(conf.tarDir))
+            .pipe(gulp.dest(conf.tarDir))
+            .pipe(gulp.dest(conf.testDir))
+            .on('end', function() {
+                fs.unlinkSync(conf.rollup)
+                resolve && resolve()
+            })
     })
 }).then(function() {
     return new Promise(function(resolve, reject) {
