@@ -1,8 +1,9 @@
-﻿
-import { init } from './init/index'
+﻿import {
+    init
+} from './init/index'
 
 
- Xut.config.onlyDomMode = true
+Xut.config.onlyDomMode = true
 
 //更新版本号记录
 Xut.Version = 798
@@ -21,10 +22,9 @@ if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
         }
     };
     document.addEventListener('touchstart', fixaudio, false);
-}     
+}
 
-    
 $(function() {
-	//进入 
-    init()  
+    //进入 
+    init()
 })

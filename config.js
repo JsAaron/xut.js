@@ -22,6 +22,8 @@ const common = {
 //   cd Users/project/svn/magazine-develop/assets/www
 module.exports = {
 
+    common: common,
+
     /**
      * 开发配置
      */
@@ -67,6 +69,8 @@ module.exports = {
      * 发布配置
      */
     build: {
+        //启动web服务测试
+        server: true,
         conf: _.extend(common)
     }
 }

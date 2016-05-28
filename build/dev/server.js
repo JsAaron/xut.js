@@ -1,22 +1,22 @@
-var fs = require('fs')
-var express = require('express')
-var webpack = require('webpack')
-var ora = require('ora')
-var open = require("open");
-var watch = require('gulp-watch');
-var path = require('path')
-
-var child_process = require('child_process');
+const fs = require('fs')
+const express = require('express')
+const webpack = require('webpack')
+const ora = require('ora')
+const open = require("open");
+const watch = require('gulp-watch');
+const path = require('path')
+const _ = require("underscore");
+const child_process = require('child_process');
 
 //https://github.com/ampedandwired/html-webpack-plugin
-var HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 //https://github.com/webpack/webpack-dev-middleware#usage
-var webpackDevMiddleware = require("webpack-dev-middleware");
-var webpacHotMiddleware = require('webpack-hot-middleware')
+const webpackDevMiddleware = require("webpack-dev-middleware");
+const webpacHotMiddleware = require('webpack-hot-middleware')
 
 //https://www.npmjs.com/package/write-file-webpack-plugin
-var WriteFilePlugin = require('write-file-webpack-plugin');
+const WriteFilePlugin = require('write-file-webpack-plugin');
 
 var config = require('../../config')
 var port = process.env.PORT || config.dev.port
@@ -30,30 +30,26 @@ if (!fs.existsSync("./src/content/xxtebook.db")) {
 }
 
 var spinner = ora('Begin to pack , Please wait for\n')
-spinner.start()
-
-setTimeout(function() {
-    spinner.stop()
-}, 5000)
 
 if (!fs.existsSync("./src/content/SQLResult.js")) {
     require('../sqlite/index').resolve()
 }
 
+var conf = _.extend(config.dev.conf, {
+    rollup: config.dev.conf.tarDir + 'rollup.js'
+});
+//刷新
+conf.entry = ['./build/dev/client'].concat(conf.entry)
 
-//配置dev
-var entry = {
-    app: config.build.entry
-}
-Object.keys(entry).forEach(function(name) {
-    entry[name] = ['./build/dev/client'].concat(entry[name])
-})
-
+/**
+ * webpack
+ * 配置
+ */
 var webpackConfig = {
-    entry: entry,
+    entry: conf.entry,
     output: {
-        path: config.build.assetsRoot,
-        publicPath: config.build.assetsPublicPath,
+        path: conf.assetsRoot,
+        publicPath: conf.assetsPublicPath,
         filename: 'app.js'
     },
     devtool: '#eval-source-map',
@@ -152,12 +148,16 @@ app.use('/content', express.static('src/content'));
 
 
 if (config.dev.debugger.launch) {
-    watch(config.build.assetsRoot + '/app.js', function() {
+    /**
+     * 监控文件变化
+     * 打包
+     */
+    watch(conf.assetsRoot + '/app.js', function() {
         console.log(
             '\n' +
             ' watch file change.....await....:\n'
         )
-        var child = child_process.spawn('node', ['build/dev/build.js', ['debug=' + config.dev.debugger.dir]]);
+        var child = child_process.spawn('node', ['build/dev/debugger.js', ['debug=' + config.dev.debugger.dir]]);
         // 捕获标准输出并将其打印到控制台 
         child.stdout.on('data', function(data) {
             console.log('pack out：\n' + data);
@@ -179,3 +179,8 @@ module.exports = app.listen(port, function(err) {
     }
     console.log('Listening at http://localhost:' + port + '\n')
 })
+
+spinner.start()
+setTimeout(function() {
+    spinner.stop()
+}, 5000)
