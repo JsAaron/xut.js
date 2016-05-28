@@ -23,17 +23,22 @@ var config = require('../config')
 //发布路径
 //dist 对外使用
 //test 对内测试
-var buildPath = {
-    rollup: config.build.dist + 'rollup.js',
-    devName: 'xxtppt.dev.js',
-    distName: 'xxtppt.js',
-    dist: config.build.dist,
-    test: config.build.test
+var conf = {
+
+    entry: config.build.entry,
+    devName: config.build.devName,
+    distName: config.build.distName,
+
+    srcDir: config.build.srcDir,
+    tarDir: config.build.tarDir,
+    testDir: config.build.testDir,
+
+    rollup: config.build.tarDir + 'rollup.js'
 }
 
 //清空目录
-fsextra.emptyDirSync(buildPath.dist)
-fsextra.emptyDirSync(buildPath.test)
+fsextra.emptyDirSync(conf.tarDir)
+fsextra.emptyDirSync(conf.testDir)
 
 
 var getSize = function(code) {
@@ -69,7 +74,7 @@ spinner.start()
 
 new Promise(function(resolve, reject) {
         rollup.rollup({
-                entry: config.build.entry,
+                entry: conf.entry,
                 plugins: [
                     babel({
                         "presets": ["es2015-rollup"]
@@ -79,9 +84,9 @@ new Promise(function(resolve, reject) {
             .then(function(bundle) {
 
                 //创建目录,如果不存在
-                if (!fs.existsSync(buildPath.dist)) {
-                    fs.mkdirSync(buildPath.dist);
-                    console.log(buildPath.dist + '目录创建成功');
+                if (!fs.existsSync(conf.tarDir)) {
+                    fs.mkdirSync(conf.tarDir);
+                    console.log(conf.tarDir + '目录创建成功');
                 }
 
                 var code = bundle.generate({
@@ -89,7 +94,7 @@ new Promise(function(resolve, reject) {
                     moduleName: 'Aaron'
                 }).code
 
-                return write(buildPath.rollup, code)
+                return write(conf.rollup, code)
             })
             .then(resolve)
             .catch(function() {
@@ -112,30 +117,30 @@ new Promise(function(resolve, reject) {
 
                         //有效src
                         if (/^lib/.test(path)) {
-                            paths.push(config.build.src + path)
+                            paths.push(conf.srcDir + path)
                         }
                     }
                 })
 
                 //合成xxtppt.js
-                paths.push(buildPath.rollup)
+                paths.push(conf.rollup)
                 gulp.src(paths)
-                    .pipe(concat(buildPath.devName))
+                    .pipe(concat(conf.devName))
                     .on('error', function(err) {
                         console.log('Less Error!', err.message);
                         this.end();
                     })
                     //dev
-                    .pipe(gulp.dest(buildPath.dist))
-                    .pipe(gulp.dest(buildPath.test))
+                    .pipe(gulp.dest(conf.tarDir))
+                    .pipe(gulp.dest(conf.testDir))
                     //min
                     .pipe(uglify())
-                    .pipe(rename(buildPath.distName))
-                    .pipe(gulp.dest(buildPath.dist))
-                    .pipe(gulp.dest(buildPath.dist))
-                    .pipe(gulp.dest(buildPath.test))
+                    .pipe(rename(conf.distName))
+                    .pipe(gulp.dest(conf.tarDir))
+                    .pipe(gulp.dest(conf.tarDir))
+                    .pipe(gulp.dest(conf.testDir))
                     .on('end', function() {
-                        fs.unlinkSync(buildPath.rollup)
+                        fs.unlinkSync(conf.rollup)
                         resolve && resolve()
                     })
 
@@ -149,8 +154,8 @@ new Promise(function(resolve, reject) {
                 .pipe(cleanCSS({
                     compatibility: 'ie8'
                 }))
-                .pipe(gulp.dest(buildPath.dist))
-                .pipe(gulp.dest(buildPath.test))
+                .pipe(gulp.dest(conf.tarDir))
+                .pipe(gulp.dest(conf.testDir))
                 .on('end', resolve)
         })
     })
@@ -190,83 +195,3 @@ new Promise(function(resolve, reject) {
             complete()
         });
     })
-
-
-
-/**
- * 替换所有反斜杠为斜杠
- * @return {[type]} [description]
- */
-var escape = function(str) {
-    var strs = new Array();
-    var a = str;
-    strs = a.split("");
-    for (var i = 0; i < strs.length; i++) {
-        a = a.replace("\\", "/")
-    }
-    return a;
-}
-
-
-function combine1(resolve, reject) {
-    fs.readFile('./src/index.html', "utf8", function(error, data) {
-        if (error) throw error;
-        var paths = []
-        var path;
-        var cwdPath = escape(process.cwd())
-        var scripts = data.match(/<script.*?>.*?<\/script>/ig);
-        fs.writeFileSync(dependJs, '')
-        scripts.forEach(function(val) {
-            val = val.match(/src="(.*?.js)/);
-            if (val && val.length) {
-                path = val[1]
-
-                //有效src
-                if (/^lib/.test(path)) {
-                    // console.log(fs.readFileSync(path))
-                    fs.appendFileSync(dependJs, fs.readFileSync(src + path))
-                }
-            }
-        })
-        resolve && resolve()
-    });
-}
-
-
-
-//打包
-function command(callback) {
-    fs.readFile('./index.html', "utf8", function(error, data) {
-        if (error) throw error;
-        var arr = []
-        var path;
-        var cwdPath = escape(process.cwd())
-
-        var command = []
-        command.push('cd ' + cwdPath + '/lib')
-        command.push('\n')
-        command.push('java -jar ..\\build\\compiler.jar ')
-
-        var scripts = data.match(/<script.*?>.*?<\/script>/ig);
-        scripts.forEach(function(val) {
-            val = val.match(/lib.*?.js/);
-            if (val && val.length) {
-                path = cwdPath + "/" + val[0]
-                command.push(path + ' ')
-            }
-        })
-
-        command.push('--js_output_file=..\\build\\_file\\xxtppt.js')
-        command.push('\n')
-        command.push('cd ' + cwdPath + '/build')
-        command.push('\n')
-        command.push('Pause')
-
-        command = command.join('');
-
-        fs.writeFile('build/xxtppt.bat', command, function(err) {
-            console('youxi!');
-        });
-
-    })
-}

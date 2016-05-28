@@ -32,12 +32,12 @@ if (!fs.existsSync("./src/content/xxtebook.db")) {
 var spinner = ora('Begin to pack , Please wait for\n')
 spinner.start()
 
-setTimeout(function () {
+setTimeout(function() {
     spinner.stop()
 }, 5000)
 
 if (!fs.existsSync("./src/content/SQLResult.js")) {
-    require('./sqlite/index').resolve()
+    require('../sqlite/index').resolve()
 }
 
 
@@ -45,7 +45,7 @@ if (!fs.existsSync("./src/content/SQLResult.js")) {
 var entry = {
     app: config.build.entry
 }
-Object.keys(entry).forEach(function (name) {
+Object.keys(entry).forEach(function(name) {
     entry[name] = ['./build/dev/client'].concat(entry[name])
 })
 
@@ -58,16 +58,14 @@ var webpackConfig = {
     },
     devtool: '#eval-source-map',
     module: {
-        loaders: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader',
-                query: {
-                    presets: ['es2015']
-                }
+        loaders: [{
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+            query: {
+                presets: ['es2015']
             }
-        ]
+        }]
     },
 
     plugins: [
@@ -92,12 +90,12 @@ var webpackConfig = {
 //eslint
 if (config.dev.eslint.launch) {
     webpackConfig.module.preLoaders = [{
-        test: /\.js$/,
-        loader: 'eslint',
-        include: config.dev.eslint.dir,
-        exclude: /node_modules/
-    }]
-    // community formatter
+            test: /\.js$/,
+            loader: 'eslint',
+            include: config.dev.eslint.dir,
+            exclude: /node_modules/
+        }]
+        // community formatter
     webpackConfig.eslint = {
         formatter: require("eslint-friendly-formatter")
     }
@@ -128,9 +126,9 @@ var devMiddleware = webpackDevMiddleware(compiler, {
 var hotMiddleware = webpacHotMiddleware(compiler)
 
 // force page reload when html-webpack-plugin template changes
-compiler.plugin('compilation', function (compilation) {
+compiler.plugin('compilation', function(compilation) {
     //https://github.com/ampedandwired/html-webpack-plugin
-    compilation.plugin('html-webpack-plugin-after-emit', function (data, cb) {
+    compilation.plugin('html-webpack-plugin-after-emit', function(data, cb) {
         hotMiddleware.publish({
             action: 'reload'
         })
@@ -154,31 +152,30 @@ app.use('/content', express.static('src/content'));
 
 
 if (config.dev.debugger.launch) {
-    watch(config.build.assetsRoot + '/app.js', function () {
+    watch(config.build.assetsRoot + '/app.js', function() {
         console.log(
             '\n' +
             ' watch file change.....await....:\n'
         )
         var child = child_process.spawn('node', ['build/dev/build.js', ['debug=' + config.dev.debugger.dir]]);
         // 捕获标准输出并将其打印到控制台 
-        child.stdout.on('data', function (data) {
+        child.stdout.on('data', function(data) {
             console.log('pack out：\n' + data);
         });
         // 捕获标准错误输出并将其打印到控制台 
-        child.stderr.on('data', function (data) {
+        child.stderr.on('data', function(data) {
             console.log('pack fail out：\n' + data);
         });
-        child.on('close', function (code) {
+        child.on('close', function(code) {
             console.log('pack complete：' + code);
         });
     })
 }
 
-module.exports = app.listen(port, function (err) {
+module.exports = app.listen(port, function(err) {
     if (err) {
         console.log(err)
         return
     }
     console.log('Listening at http://localhost:' + port + '\n')
 })
-

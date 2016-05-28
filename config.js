@@ -1,4 +1,7 @@
 var path = require('path')
+var resolve = path.resolve
+
+var root = resolve(__dirname)
 
 //   cd Users/project/svn/magazine-develop/assets/www
 module.exports = {
@@ -26,28 +29,37 @@ module.exports = {
             launch: true,
             dir: path.resolve(__dirname, 'src/lib'),
         }
-    }, 
-    
+    },
+
     /**
      * 远程调试
      * remoteRemote
      */
-    remote:{
-        
+    remote: {
+
     },
 
     /**
      * 发布配置
      */
     build: {
-        index: path.resolve(__dirname, 'temp/index.html'),
-        assetsRoot: path.resolve(__dirname, 'temp'),
-        assetsPublicPath: '/',
-        productionSourceMap: true,
-        src: './src/',
+        //app.js 执行入口
         entry: './src/lib/app.js',
-        //源码生成位置
-        dist: './dist/',
-        test: './src/test/'
+        //生成名称
+        devName: 'xxtppt.dev.js',
+        distName: 'xxtppt.js',
+        //目录
+        srcDir: './src/',
+        tarDir: './dist/',
+        testDir: './src/test/'
+        // index: path.resolve(__dirname, 'temp/index.html'),
+        // assetsRoot: path.resolve(__dirname, 'temp'),
+        // assetsPublicPath: '/',
+        // productionSourceMap: true,
+        // src: './src/',
+        // entry: './src/lib/app.js',
+        // //源码生成位置
+        // dist: './dist/',
+        // test: './src/test/'
     }
-} 
+}
