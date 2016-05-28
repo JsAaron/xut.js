@@ -1,7 +1,23 @@
-var path = require('path')
-var resolve = path.resolve
+const path = require('path')
+const resolve = path.resolve
+const _ = require("underscore");
 
-var root = resolve(__dirname)
+const root = resolve(__dirname)
+
+/**
+ * 公共配置
+ */
+const common = {
+    //app.js 执行入口
+    entry: './src/lib/app.js',
+    //生成名称
+    devName: 'xxtppt.dev.js',
+    distName: 'xxtppt.js',
+    //目录
+    srcDir: './src/',
+    tarDir: './dist/',
+    testDir: './src/test/'
+}
 
 //   cd Users/project/svn/magazine-develop/assets/www
 module.exports = {
@@ -27,8 +43,16 @@ module.exports = {
         //测试文件地址
         eslint: {
             launch: true,
+            //必须绝对路径
             dir: path.resolve(__dirname, 'src/lib'),
-        }
+        },
+        //路径配置
+        conf: _.extend(common, {
+            index: path.resolve(__dirname, 'temp/index.html'),
+            assetsRoot: path.resolve(__dirname, 'temp'),
+            assetsPublicPath: '/',
+            productionSourceMap: true
+        })
     },
 
     /**
@@ -43,23 +67,6 @@ module.exports = {
      * 发布配置
      */
     build: {
-        //app.js 执行入口
-        entry: './src/lib/app.js',
-        //生成名称
-        devName: 'xxtppt.dev.js',
-        distName: 'xxtppt.js',
-        //目录
-        srcDir: './src/',
-        tarDir: './dist/',
-        testDir: './src/test/'
-        // index: path.resolve(__dirname, 'temp/index.html'),
-        // assetsRoot: path.resolve(__dirname, 'temp'),
-        // assetsPublicPath: '/',
-        // productionSourceMap: true,
-        // src: './src/',
-        // entry: './src/lib/app.js',
-        // //源码生成位置
-        // dist: './dist/',
-        // test: './src/test/'
+        conf: _.extend(common)
     }
 }
