@@ -8,6 +8,8 @@ const root = resolve(__dirname)
  * 公共配置
  */
 const common = {
+    //index入口
+    index: './src/index.html',
     //app.js 执行入口
     entry: './src/lib/app.js',
     //生成名称

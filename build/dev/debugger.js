@@ -1,17 +1,13 @@
 const gulp = require('gulp');
-const fs = require('fs')
-const rollup = require('rollup')
-const babel = require('rollup-plugin-babel')
 const fsextra = require('fs-extra')
 const _ = require("underscore");
 const uglify = require('gulp-uglify');
-const rename = require("gulp-rename");
 const concat = require('gulp-concat')
 const ora = require('ora')
 const base = require('../rollup.base.config.js')
-var config = require('../../config')
+const config = require('../../config')
 
-//是否debug模式
+//debug路径
 var debugout;
 var args = process.argv[process.argv.length - 1]
 var args = args.split('=')
@@ -24,9 +20,6 @@ var conf = _.extend(config.common, {
     rollup: config.common.tarDir + 'rollup.js',
     debug: debugout
 });
-
-var spinner = ora('Begin to pack , Please wait for\n')
-spinner.start()
 
 
 /**
@@ -43,6 +36,7 @@ gulp.task('mergescript', function(cb) {
         .pipe(gulp.dest(conf.tarDir))
         .on('end', cb)
 });
+
 
 /**
  * 合成最终发布的xxtppt
@@ -75,7 +69,6 @@ gulp.task('pack', ['mergeall'], function() {
     } catch (err) {
         console.error(err)
     }
-    spinner.stop()
 });
 
 
