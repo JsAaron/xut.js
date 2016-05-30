@@ -127,18 +127,19 @@ export function parseCanvas(contentId, category, conData, data) {
 	//类型转化
 	//双数据类型转行单个类型
 	if (Xut.config.onlyDomMode) {
-		var cat
-		var cats = category.split(",")
-		var len = cats.length
 
-		if (len) {
-			while (len--) {
-				cat = cats[len]
-				//匹配数据类型
-				if (cat !== 'PPT') {
-					conData.category = cat
+		if (category) {
+			var cat
+			var cats = category.split(",")
+			var len = cats.length
+			if (len > 1) {
+				//删除ppt
+				var pptindex = cats.indexOf('PPT')
+				if(-1 != pptindex){
+					cats.splice(pptindex,1)
 				}
 			}
+			conData.category = cats[0]
 		}
 		return
 	}

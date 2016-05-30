@@ -140,14 +140,13 @@ app.use(devMiddleware)
 // compilation error display
 app.use(hotMiddleware)
 
-
 app.use('/lib', express.static('src/lib'));
 app.use('/css', express.static('src/css'));
 app.use('/images', express.static('src/images'));
 app.use('/content', express.static('src/content'));
 
 
-if (config.dev.debugger.launch) {
+if (config.dev.debug.launch) {
     /**
      * 监控文件变化
      * 打包
@@ -155,19 +154,19 @@ if (config.dev.debugger.launch) {
     watch(conf.assetsRoot + '/app.js', function() {
         console.log(
             '\n' +
-            ' watch file change.....await....:\n'
+            'watch file change.....await....:\n'
         )
-        var child = child_process.spawn('node', ['build/dev/debugger.js', ['debug=' + config.dev.debugger.dir]]);
+        var child = child_process.spawn('node', ['build/dev/debug.js', ['debug=' + config.dev.debug.dir]]);
         // 捕获标准输出并将其打印到控制台 
         child.stdout.on('data', function(data) {
-            console.log('pack out：\n' + data);
+            console.log('\n' + data);
         });
         // 捕获标准错误输出并将其打印到控制台 
         child.stderr.on('data', function(data) {
-            console.log('pack fail out：\n' + data);
+            console.log('fail out：\n' + data);
         });
         child.on('close', function(code) {
-            console.log('pack complete：' + code);
+            console.log('complete：' + code);
         });
     })
 }

@@ -37,7 +37,7 @@ Xut.config = function() {
         }
 
         return {
-            "width": $(window).width(),
+            "width":  $(window).width(),
             // 1024 768
             "height": $(window).height()
         }
@@ -277,10 +277,15 @@ Xut.config = function() {
         }
     }
 
-    var MMXCONFIGPath = '.'
+    // var MMXCONFIGPath = '.'
+    // if (MMXCONFIG && MMXCONFIG.path) {
+    //     MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
+    // }
+    var MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i,'/').replace(/[^\/]*$/,'');
     if (MMXCONFIG && MMXCONFIG.path) {
-        MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
+        MMXCONFIGPath = rtrim(MMXCONFIG.path)
     }
+
 
     //iframe嵌套配置
     //1 新阅读

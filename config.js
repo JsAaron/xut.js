@@ -21,6 +21,7 @@ const common = {
     testDir: './src/test/'
 }
 
+
 //   cd Users/project/svn/magazine-develop/assets/www
 module.exports = {
 
@@ -37,11 +38,13 @@ module.exports = {
         //每次修改都会打包一个完整的文件''
         //这里填入目标地址er
         //e.g:d:/xxxx
-        debugger: {
+        debug: {
             launch: true,
-            //D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
-            ///Users/mac/project/xcode/www/build
-            dir: '/Users/mac/project/xcode/www/build'
+            //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
+            //os:Users/mac/project/xcode/www/build
+            dir: process.platform === 'win32'
+                    ? 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build'
+                    : 'Users/mac/project/xcode/www/build'
         },
         //eslint测试目录
         //测试文件地址

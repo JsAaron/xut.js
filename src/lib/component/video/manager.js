@@ -1,4 +1,6 @@
-import {Html5Video} from './video'
+import {
+    Html5Video
+} from './video'
 
 /*
     视频和远程网页管理模块
@@ -69,23 +71,40 @@ VideoManager.prototype = {
 
     //配置视频结构
     deployVideo: function(data, pageId, activityId) {
-        var proportion = Xut.config.proportion,
-            screenSize = Xut.config.screenSize,
-            videoInfo = {
-                'pageId': pageId,
-                'videoId': activityId,
-                'url': data.md5,
-                'pageUrl': data.url,
-                'left': data.left * proportion.left || 0,
-                'top': data.top * proportion.top || 0,
-                'width': data.width * proportion.width || screenSize.width,
-                'height': data.height * proportion.height || screenSize.height,
-                'padding': data.padding * proportion.left || 0,
-                'zIndex': data.zIndex || 2147483647,
-                'background': data.background,
-                'category': data.category,
-                'hyperlink': data.hyperlink
-            };
+        var config = Xut.config
+        var proportion = config.proportion
+        var screenSize = config.screenSize
+
+        var width = data.width * proportion.width || screenSize.width
+        var height = data.height * proportion.height || screenSize.height
+        var left = data.left * proportion.left || 0
+        var top = data.top * proportion.top || 0
+
+        //如果是安卓平台，视频插件去的分辨率
+        //所以这里要把 可以区尺寸，转成分辨率
+        if (Xut.plat.isAndroid) {
+            var pixelRatio = window.devicePixelRatio
+            width = width * pixelRatio
+            height = height * pixelRatio
+            left = left * pixelRatio
+            top = top * pixelRatio
+        }
+
+        var videoInfo = {
+            'pageId': pageId,
+            'videoId': activityId,
+            'url': data.md5,
+            'pageUrl': data.url,
+            'left': left,
+            'top': top,
+            'width': width,
+            'height': height,
+            'padding': data.padding * proportion.left || 0,
+            'zIndex': data.zIndex || 2147483647,
+            'background': data.background,
+            'category': data.category,
+            'hyperlink': data.hyperlink
+        };
 
         if (typeof this.pageBox[pageId] != 'object') {
             this.pageBox[pageId] = {};

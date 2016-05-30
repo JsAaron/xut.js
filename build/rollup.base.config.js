@@ -48,6 +48,7 @@ var readsrcipt = function(srcDir, url) {
                     }
                 }
             })
+
             resolve(paths)
         });
     })

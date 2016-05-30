@@ -1,12 +1,6 @@
-﻿import {
-    init
-} from './init/index'
+﻿
+import { init } from './init/index'
 
-
-Xut.config.onlyDomMode = true
-
-//更新版本号记录
-Xut.Version = 798
 
 //修复ios 安卓浏览器不能自动播放音频的问题 
 //在加载时创建新的audio.video 用的时候更换
@@ -22,9 +16,13 @@ if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
         }
     };
     document.addEventListener('touchstart', fixaudio, false);
-}
+}     
+
 
 $(function() {
-    //进入 
-    init()
+	//进入 
+    init()  
 })
+
+//更新版本号记录
+Xut.Version = 801;    
