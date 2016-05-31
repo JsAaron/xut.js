@@ -4,7 +4,7 @@
  * @param  {[type]} Config) {}          [description]
  * @return {[type]}         [description]
  */
-
+ 
 /**
  * 动作适配
  * @type {Object}

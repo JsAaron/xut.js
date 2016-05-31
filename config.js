@@ -39,7 +39,7 @@ module.exports = {
         //这里填入目标地址er
         //e.g:d:/xxxx
         debug: {
-            launch: true,
+            launch: false,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: process.platform === 'win32'
@@ -49,7 +49,7 @@ module.exports = {
         //eslint测试目录
         //测试文件地址
         eslint: {
-            launch: true,
+            launch: false,
             //必须绝对路径
             dir: path.resolve(__dirname, 'src/lib'),
         },
