@@ -1,7 +1,7 @@
 ##magazine 是什么?
 * 这是一套app生成器模版，可以制作apk/ipa/epub/pc等跨平台应用软件
 * 采用混合技术 cordova+h5+css3 ，基于SPA架构
-* 集成了目前最新的技术点，node、es6、webpack、karma、css3、html5、wegl等等
+* 集成了目前最新的技术点，node、es6、webpack、karma、css3、html5、webgl等等
 
 
 ##环境
