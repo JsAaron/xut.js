@@ -10,17 +10,15 @@ import { setProportion } from '../../../util/option'
  * @param  {[type]} path          [description]
  * @return {[type]}               [description]
  */
-function spiritAni(data, path, condata) {
+function spiritAni(data, path, loop, canvasEl) {
 
-    this.canvasX = condata.scaleLeft
-    this.canvasY = condata.scaleTop
-
+    this.canvasEl = canvasEl;
     this.imagesArray = new Array();
     this.maskArray = new Array();
     //默认png格式资源
     this.resType = 0;
     //默认循环播放
-    this.loop = 0;
+    this.loop = loop;
     this.data = data;
     //this.contentPrefix = contentPrefix;
     this.ResourcePath = path;
@@ -52,7 +50,7 @@ function spiritAni(data, path, condata) {
  * @param  {[type]} path          [description]
  * @return {[type]}               [description]
  */
-spiritAni.prototype.parseSpiritImages = function (data, path) {
+spiritAni.prototype.parseSpiritImages = function(data, path) {
     for (var i = 0; i < this.imageList.length; i++) {
         var temp = this.imageList[i];
         this.imagesArray.push(path + temp.name);
@@ -68,15 +66,17 @@ spiritAni.prototype.parseSpiritImages = function (data, path) {
  * @param  {[type]} condata [description]
  * @return {[type]}         [description]
  */
-spiritAni.prototype.initdata = function () {
+spiritAni.prototype.initdata = function() {
     //尺寸
     var proportion = setProportion(this.data.width, this.data.height, this.imageList[0].X, this.imageList[0].Y)
     this.spiritWidth = parseInt(proportion.width);
     this.spiritHeight = parseInt(proportion.height);
+    this.canvasEl.width = this.spiritWidth;
+    this.canvasEl.height = this.spiritHeight;
+    this.canvasEl.style.left = parseInt(proportion.left) + 'px';
+    this.canvasEl.style.top = parseInt(proportion.top) + 'px';
 
     this.startPoint = {
-        x: proportion.left - this.canvasX,
-        y: proportion.top  - this.canvasY,
         w: this.spiritWidth,
         h: this.spiritHeight
     };
@@ -88,11 +88,10 @@ spiritAni.prototype.initdata = function () {
  * @param  {[type]} canvasRelated [description]
  * @return {[type]}               [description]
  */
-spiritAni.prototype.init = function () {
+spiritAni.prototype.init = function() {
 
     //精灵场景容器
     this.stage = new PIXI.Container();
-
     this.texture = new Array();
     this.maskTexture = new Array();
 
@@ -102,8 +101,8 @@ spiritAni.prototype.init = function () {
             this.maskTexture[i] = PIXI.Texture.fromImage(this.maskArray[i]);
         }
         this.maskSprite = new PIXI.Sprite(this.maskTexture[0]);
-        this.maskSprite.position.x = this.startPoint.x;
-        this.maskSprite.position.y = this.startPoint.y;
+        this.maskSprite.position.x = 0;
+        this.maskSprite.position.y = 0;
         this.maskSprite.width = this.spiritWidth;
         this.maskSprite.height = this.spiritHeight;
         this.stage.addChild(this.maskSprite);
@@ -115,8 +114,8 @@ spiritAni.prototype.init = function () {
     }
 
     this.advSprite = new PIXI.Sprite(this.texture[0]);
-    this.advSprite.position.x = this.startPoint.x;
-    this.advSprite.position.y = this.startPoint.y;
+    this.advSprite.position.x = 0;
+    this.advSprite.position.y = 0;
     this.advSprite.width = this.spiritWidth;
     this.advSprite.height = this.spiritHeight;
     this.stage.addChild(this.advSprite);
@@ -125,19 +124,17 @@ spiritAni.prototype.init = function () {
 
 
 //修正图片位置
-spiritAni.prototype.changePosition = function (currentFrame) {
+spiritAni.prototype.changePosition = function(currentFrame) {
 
     var proportion = setProportion(0, 0, this.imageList[currentFrame].X, this.imageList[currentFrame].Y)
-
-    var x = proportion.left - this.canvasX
-    var y = proportion.top - this.canvasY
-
+    this.canvasEl.style.left = parseInt(proportion.left) + 'px';
+    this.canvasEl.style.top = parseInt(proportion.top) + 'px';
     if (this.resType) {
-        this.maskSprite.position.x = x;
-        this.maskSprite.position.y = y;
+        this.maskSprite.position.x = 0;
+        this.maskSprite.position.y = 0;
     }
-    this.advSprite.position.x = x;
-    this.advSprite.position.y = y;
+    this.advSprite.position.x = 0;
+    this.advSprite.position.y = 0;
 };
 
 
@@ -145,7 +142,7 @@ spiritAni.prototype.changePosition = function (currentFrame) {
  * 运动
  * @return {[type]} [description]
  */
-spiritAni.prototype.runAnimate = function () {
+spiritAni.prototype.runAnimate = function() {
     //第一次不运行
     if (!this.firstTime) {
         this.countNewFrame();
@@ -162,13 +159,14 @@ spiritAni.prototype.runAnimate = function () {
 };
 
 
-spiritAni.prototype.countNewFrame = function () {
+spiritAni.prototype.countNewFrame = function() {
     this.imageIndex++;
     if (this.imageIndex > this.imagesArray.length - 1) {
-        if (this.loop == 0) {
+        if (this.loop == 1) {
             this.imageIndex = 0;
         } else {
             this.imageIndex = this.imagesArray.length - 1;
+            return;
         }
 
     }
@@ -177,7 +175,7 @@ spiritAni.prototype.countNewFrame = function () {
 /**
  * 销毁
  */
-spiritAni.prototype.destroy = function () {
+spiritAni.prototype.destroy = function() {
     if (this.stage) {
         this.stage.destroy(this.stage.length ? true : false)
     }
@@ -185,5 +183,5 @@ spiritAni.prototype.destroy = function () {
 }
 
 export {
-spiritAni
+    spiritAni
 }

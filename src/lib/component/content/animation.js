@@ -85,7 +85,13 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
     var actionTypes
     var opts
     var create = function (constructor, newContext) {
-        return new constructor(pageIndex, pageType, chapterId, newContext || context, parameter, rootNode);
+        var element =  newContext || context
+        if(element.length){
+            return new constructor(pageIndex, pageType, chapterId, element, parameter, rootNode);
+        }else{
+            console.log(id,self)
+        }
+        
     }
 
     //dom模式
@@ -113,36 +119,50 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
             pageIndex: this.pageIndex
         }
 
+
+        //创建pixi上下文的ppt对象
+        var createPixiPPT = function () {
+            //parameter存在就是ppt动画
+            if ( (parameter || actionTypes.pptId) && self.$contentProcess.view ) {
+                self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
+                self.pptObj.contentId = id
+            }
+        }
+        
+        //多个canvas对应多个ppt
+        //容器不需要重复创建
         //精灵动画
         if (actionTypes.spiritId) {
-            //加入任务队列
-            this.nextTask.context.add(id)
-            this.pixiObj = new pixiSpirit(opts);
-            //构建精灵动画完毕后
-            //构建ppt对象
-            this.pixiObj.$once('load', function () {
-                //ppt动画
-                if (actionTypes.pptId) {
-                    //content=>MovieClip
-                    self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
-                    self.pptObj.contentId = id
-                }
-                //任务完成
-                self.nextTask.context.remove(id)
-            })
-
+            if (this.contentDas.initpixi) {
+                createPixiPPT()
+            } else {
+                //加入任务队列
+                this.nextTask.context.add(id)
+                this.pixiObj = new pixiSpirit(opts);
+                //构建精灵动画完毕后
+                //构建ppt对象
+                this.pixiObj.$once('load', function () {
+                    //ppt动画
+                    createPixiPPT()
+                    //任务完成
+                    self.nextTask.context.remove(id)
+                })
+                this.contentDas.initpixi = true
+            }
         }
 
         //特殊高级动画
         //必须是ppt与pixi绑定的
         if (actionTypes.compSpriteId) {
-            this.pixiObj = new pixiSpecial(opts);
-            //ppt动画
-            if (actionTypes.pptId) {
-                self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
+            if (this.contentDas.initpixi) {
+                createPixiPPT()
+            } else {
+                this.pixiObj = new pixiSpecial(opts);
+                //ppt动画
+                createPixiPPT()
+                this.contentDas.initpixi = true
             }
         }
-
     }
 
 };
@@ -255,13 +275,18 @@ animProto.destroy = function () {
     bind(this.spriteObj, function (sprObj) {
         sprObj.stopSprites();
     });
-    
+
     //销毁renderer = new PIXI.WebGLRenderer
-    if(this.canvasMode){
+    if (this.canvasMode) {
         //rederer.destroy()
-        this.$contentProcess.destroy()
+        this.$contentProcess.view && this.$contentProcess.destroy()
     }
-   
+    
+    if(this.contentDas.$contentProcess){
+        this.contentDas.$contentProcess = null;
+    }
+    
+
     this.pptObj = null;
     this.spriteObj = null;
     this.getParameter = null;

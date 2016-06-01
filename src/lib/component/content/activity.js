@@ -533,6 +533,7 @@ activitProto.destroy = function (elementCallback) {
     }
 
     this.rootNode = null;
+   
 }
 
 

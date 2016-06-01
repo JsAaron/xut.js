@@ -37,13 +37,13 @@ function TaskContents(data) {
         data = conParser(compileActivitys, data);
         //如果有需要构建的content
         //开始多线程处理
-        data.createContentIds.length 
-            ? this.dataAfterCheck(data) 
+        data.createContentIds.length
+            ? this.dataAfterCheck(data)
             : this.loadComplete();
     } else {
         this.loadComplete();
     }
-} 
+}
 
 
 var taskProto = TaskContents.prototype;
@@ -216,7 +216,7 @@ taskProto.dataAfterCheck = function (data) {
 
             //容器的前缀
             data.containerPrefix = containerPrefix;
-            
+
             /* eslint-disable */
             //2015.5.6暴露到全局
             //提供给音频字幕上下文                
@@ -225,7 +225,7 @@ taskProto.dataAfterCheck = function (data) {
             }
             Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment
             /* elist-enable */
-            
+
 
             //开始下一个任务
             this.dataStrCheck(data, contentDas);
@@ -259,7 +259,7 @@ taskProto.dataStrCheck = function (data, contentDas) {
         //4 动画音频
         //5 canvas动画
         contentsBehavior(function (delayHooks) {
-           //渲染页面
+            //渲染页面
             this.eventAfterCheck(data, delayHooks);
         }.bind(this), data, contentDas);
     })
@@ -418,7 +418,7 @@ taskProto.eventAfterCheck = function (data, delayHooks) {
                 }
                 data.count--;
             }
-        } (data); 
+        } (data);
 
 
         //浮动页面对
@@ -494,13 +494,13 @@ function autoUUID() {
  */
 function contentsBehavior(callback, data, contentDas) {
     var compiler,
-        element          = data.element,
-        eventRelated     = data.eventRelated, //合集事件
-        pid              = data.pid,
-        createActivitys  = data.createActivitys,
+        element = data.element,
+        eventRelated = data.eventRelated, //合集事件
+        pid = data.pid,
+        createActivitys = data.createActivitys,
         feedbackBehavior = data.feedbackBehavior, //反馈数据,跟事件相关
-        pageBaseHooks    = data.pageBaseHooks,
-        pageId           = data.chapterId;
+        pageBaseHooks = data.pageBaseHooks,
+        pageId = data.chapterId;
 
 
     //如果有浮动对象,才需要计算偏移量
@@ -530,22 +530,21 @@ function contentsBehavior(callback, data, contentDas) {
 
     //相关数据
     var relatedData = {
-        'floatMaters'        : data.floatMaters,
-        'seasonId'           : data.chpaterData.seasonId,
-        'pageId'             : pageId,
-        'contentDas'         : contentDas, //所有的content数据合集
-        'container'          : data.liRootNode,
-        'seasonRelated'      : data.seasonRelated,
-        'containerPrefix'    : data.containerPrefix,
-        'nodes'              : data.nodes,
-        'pageOffset'         : data.pageOffset,
-        'createContentIds'   : data.createContentIds,
-        'partContentRelated' : data.partContentRelated,
-        'transformOffset'    : transformOffset,
-        'contentsFragment'   : data.contentsFragment,
-        'contentHtmlBoxIds'  : data.contentHtmlBoxIds
+        'floatMaters': data.floatMaters,
+        'seasonId': data.chpaterData.seasonId,
+        'pageId': pageId,
+        'contentDas': contentDas, //所有的content数据合集
+        'container': data.liRootNode,
+        'seasonRelated': data.seasonRelated,
+        'containerPrefix': data.containerPrefix,
+        'nodes': data.nodes,
+        'pageOffset': data.pageOffset,
+        'createContentIds': data.createContentIds,
+        'partContentRelated': data.partContentRelated,
+        'transformOffset': transformOffset,
+        'contentsFragment': data.contentsFragment,
+        'contentHtmlBoxIds': data.contentHtmlBoxIds
     }
-
 
     /**
      * 继续下一个任务
@@ -561,24 +560,6 @@ function contentsBehavior(callback, data, contentDas) {
         callback(relatedCallback)
     }
 
-    /**
-     * 2016.4.11
-     * canvas模式创建的才完成数
-     * 监控完成度
-     * 如果是canvas就需要监听创建
-     * 因为存在异步创建
-     * @type {Object}
-     */
-    var monitor = {
-        total: createActivitys.length,
-        current: 0,
-        complete: function () {
-            ++monitor.current
-            if (monitor.current == monitor.total) {
-                nextTask();
-            }
-        }
-    }
 
     /**
       * 收集事件信息
@@ -587,72 +568,95 @@ function contentsBehavior(callback, data, contentDas) {
       */
     var collectEventRelated = {};
 
+
     /**
      * 生成activty控制对象
      * @type {[type]}
      */
-    while (compiler = createActivitys.shift()) {
+    var makeActivitys = function (compiler) {
+        return function (callback) {
+            var filters;
+            var imageId = compiler['imageIds']; //父id
+            var activity = compiler['activity'];
+            var eventType = activity.eventType;
+            var dragdropPara = activity.para1;
+            var eventContentId = imageId;
 
-        var filters;
-        var imageId = compiler['imageIds']; //父id
-        var activity = compiler['activity'];
-        var eventType = activity.eventType;
-        var dragdropPara = activity.para1;
-        var eventContentId = imageId;
+            /**
+             * 多事件数据过滤
+             * 为了防止数据写入错误数据
+             * 如果当前对象上有多事件的行为
+             * 则默认的事件去掉
+             * @type {[type]}
+             */
+            if (filters = eventRelated['eventContentId->' + imageId]) {
+                _.each(filters, function (edata) {
+                    //id不需要
+                    //eventContentId = void 0;
+                    if (edata.eventType == activity.eventType) {
+                        //写入的是伪数据,此行为让多事件抽象接管
+                        eventType = dragdropPara = void 0;
+                    }
+                })
+            }
 
-        /**
-         * 多事件数据过滤
-         * 为了防止数据写入错误数据
-         * 如果当前对象上有多事件的行为
-         * 则默认的事件去掉
-         * @type {[type]}
-         */
-        if (filters = eventRelated['eventContentId->' + imageId]) {
-            _.each(filters, function (edata) {
-                //id不需要
-                //eventContentId = void 0;
-                if (edata.eventType == activity.eventType) {
-                    //写入的是伪数据,此行为让多事件抽象接管
-                    eventType = dragdropPara = void 0;
-                }
-            })
+            //需要绑定事件的数据
+            var eventData = {
+                'eventContentId': eventContentId,
+                'eventType': eventType,
+                'dragdropPara': dragdropPara,
+                'feedbackBehavior': feedbackBehavior
+            }
+
+            //缓存所有的事件数据
+            if (eventContentId) {
+                collectEventRelated[eventContentId] = eventData;
+                relatedData['collectEventRelated'] = collectEventRelated;
+            }
+
+            var actdata = {
+                'monitorComplete': callback, //监听完成
+                'pageIndex': data.pageIndex,
+                'canvasRelated': data.canvasRelated, //父类引用
+                'id': imageId || autoUUID(),
+                "type": 'Content',
+                'pageId': pageId,
+                'activityId': activity._id,
+                'rootNode': element,
+                'pageType': compiler['pageType'], //构建类型 page/master
+                'seed': compiler['seed'], //动画表数据 or 视觉差表数据
+                "pid": pid, //页码
+                'eventData': eventData, //事件数据
+                'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
+                'relatedCallback': relatedCallback //相关回调 
+            }
+
+            //注册引用
+            pageBaseHooks.registerAbstractActivity(
+                new activityClass(actdata)
+            );
         }
-
-        //需要绑定事件的数据
-        var eventData = {
-            'eventContentId': eventContentId,
-            'eventType': eventType,
-            'dragdropPara': dragdropPara,
-            'feedbackBehavior': feedbackBehavior
-        }
-
-        //缓存所有的事件数据
-        if (eventContentId) {
-            collectEventRelated[eventContentId] = eventData;
-            relatedData['collectEventRelated'] = collectEventRelated;
-        }
-
-
-        //注册引用
-        pageBaseHooks.registerAbstractActivity(
-            new activityClass({
-                'monitorComplete' : monitor.complete, //监听完成
-                'pageIndex'       : data.pageIndex,
-                'canvasRelated'   : data.canvasRelated, //父类引用
-                'id'              : imageId || autoUUID(),
-                "type"            : 'Content',
-                'pageId'          : pageId,
-                'activityId'      : activity._id,
-                'rootNode'        : element,
-                'pageType'        : compiler['pageType'], //构建类型 page/master
-                'seed'            : compiler['seed'], //动画表数据 or 视觉差表数据
-                "pid"             : pid, //页码
-                'eventData'       : eventData, //事件数据
-                'relatedData'     : relatedData, //相关数据,所有子作用域Activity对象共享
-                'relatedCallback' : relatedCallback //相关回调
-            })
-        );
     }
+
+    //制作curry Activity闭包
+    var fnsActivity = []
+    while (compiler = createActivitys.shift()) {
+        fnsActivity.push(makeActivitys(compiler))
+    }
+
+    // 递归解析 activitys
+    var recursiveParse = function () {
+        if(!fnsActivity.length){
+            nextTask()
+            return
+        }     
+        var first = fnsActivity.shift()
+        first(function () {
+            recursiveParse()
+        })
+    }
+    
+    recursiveParse()
 
 }
 

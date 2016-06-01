@@ -73,8 +73,14 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
         if (-1 !== base.canvasRelated.cid.indexOf(contentId)) {
             contentName = "canvas_" + pid + "_" + contentId
             canvasDom = base._findContentElement(contentName, 'canvas')[0]
+
             //创建上下文pixi
-            $contentProcess = Context(contentDas, canvasDom, base.pageIndex)
+            if (contentDas.$contentProcess) {
+                $contentProcess = contentDas.$contentProcess
+            } else {
+                $contentProcess = Context(contentDas, canvasDom, base.pageIndex)
+                contentDas.$contentProcess = $contentProcess
+            }
             data.type = 'canvas';
             data.canvasMode = true;
             data.domMode = false;
