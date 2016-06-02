@@ -83,15 +83,17 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
     var pageIndex = this.pageIndex
     var self = this
     var actionTypes
-    var opts
+    var makeOpts
+    var initstate
+
     var create = function (constructor, newContext) {
-        var element =  newContext || context
-        if(element.length){
+        var element = newContext || context
+        if (element.length) {
             return new constructor(pageIndex, pageType, chapterId, element, parameter, rootNode);
-        }else{
-            console.log(id,self)
+        } else {
+            console.log(id, self)
         }
-        
+
     }
 
     //dom模式
@@ -100,6 +102,7 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
         this.pptObj = create(PptAnimation);
         //普通精灵动画
         this.domSprites = this.contentDas.category === 'Sprite' ? true : false;
+        return
     }
 
     //canvas模式
@@ -113,7 +116,7 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
         //动作类型
         //可能是组合动画
         actionTypes = this.contentDas.actionTypes
-        opts = {
+        makeOpts = {
             data: this.contentDas,
             renderer: this.$contentProcess,
             pageIndex: this.pageIndex
@@ -123,22 +126,33 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
         //创建pixi上下文的ppt对象
         var createPixiPPT = function () {
             //parameter存在就是ppt动画
-            if ( (parameter || actionTypes.pptId) && self.$contentProcess.view ) {
+            if ((parameter || actionTypes.pptId) && self.$contentProcess.view) {
                 self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
                 self.pptObj.contentId = id
             }
+        }
+        
+        var $veiw = this.$contentProcess.view
+        if($veiw){
+            initstate =  $veiw.getAttribute('data-init')
+        }
+
+        var setState  = function () {
+             $veiw.setAttribute('data-init',true)
         }
         
         //多个canvas对应多个ppt
         //容器不需要重复创建
         //精灵动画
         if (actionTypes.spiritId) {
-            if (this.contentDas.initpixi) {
+            
+            if (initstate) {
                 createPixiPPT()
             } else {
                 //加入任务队列
                 this.nextTask.context.add(id)
-                this.pixiObj = new pixiSpirit(opts);
+                this.pixiObj = new pixiSpirit(makeOpts);
+                //防止多条一样的数据绑多个动画
                 //构建精灵动画完毕后
                 //构建ppt对象
                 this.pixiObj.$once('load', function () {
@@ -147,21 +161,26 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
                     //任务完成
                     self.nextTask.context.remove(id)
                 })
-                this.contentDas.initpixi = true
+                setState()
             }
+            
         }
 
         //特殊高级动画
         //必须是ppt与pixi绑定的
         if (actionTypes.compSpriteId) {
-            if (this.contentDas.initpixi) {
-                createPixiPPT()
+            
+            // console.log(this,this.id,this.contentDas.initpixi)
+            //这个dom已经创建了pixi了
+            if (initstate) {
+                 createPixiPPT()
             } else {
-                this.pixiObj = new pixiSpecial(opts);
+                this.pixiObj = new pixiSpecial(makeOpts);
+                setState()
                 //ppt动画
                 createPixiPPT()
-                this.contentDas.initpixi = true
             }
+            
         }
     }
 
@@ -175,8 +194,12 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
  * @return {[type]}                 [description]
  */
 animProto.run = function (scopeComplete) {
+    
+    //div and canvas of nodes
+    var element = this.$contentProcess.view
+        ? this.$contentProcess.view
+        : this.$contentProcess;
 
-    var element = this.$contentProcess;
 
     //ppt动画
     //dom与canvas
@@ -260,8 +283,8 @@ animProto.reset = function () {
  * @return {[type]} [description]
  */
 animProto.destroy = function () {
-    //dom ppt
-    //
+
+    //ppt
     bind(this.pptObj, function (ppt) {
         ppt.destroyAnimation();
     })
@@ -281,12 +304,12 @@ animProto.destroy = function () {
         //rederer.destroy()
         this.$contentProcess.view && this.$contentProcess.destroy()
     }
-    
-    if(this.contentDas.$contentProcess){
+
+    //销毁每一个数据上的canvas上下文引用
+    if (this.contentDas.$contentProcess) {
         this.contentDas.$contentProcess = null;
     }
     
-
     this.pptObj = null;
     this.spriteObj = null;
     this.getParameter = null;

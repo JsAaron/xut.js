@@ -10,18 +10,17 @@ import { setProportion } from '../../../util/option'
  * @param  {[type]} path          [description]
  * @return {[type]}               [description]
  */
-function spiritAni(data, path, loop, canvasEl) {
-
+function spiritAni(data, canvasEl, condata) {
     this.canvasEl = canvasEl;
     this.imagesArray = new Array();
     this.maskArray = new Array();
     //默认png格式资源
     this.resType = 0;
-    //默认循环播放
-    this.loop = loop;
+    //1循环播放 0只播放一次
+    this.loop = condata.loop;
     this.data = data;
     //this.contentPrefix = contentPrefix;
-    this.ResourcePath = path;
+    var path = this.ResourcePath = condata.resourcePath;
     //this.action = this.data.params["actList"].split(",")[0];
     this.FPS = parseInt(data.fps);
     this.imageList = data.ImageList;
@@ -73,13 +72,9 @@ spiritAni.prototype.initdata = function() {
     this.spiritHeight = parseInt(proportion.height);
     this.canvasEl.width = this.spiritWidth;
     this.canvasEl.height = this.spiritHeight;
-    this.canvasEl.style.left = parseInt(proportion.left) + 'px';
+     this.canvasEl.style.left = parseInt(proportion.left) + 'px';
     this.canvasEl.style.top = parseInt(proportion.top) + 'px';
 
-    this.startPoint = {
-        w: this.spiritWidth,
-        h: this.spiritHeight
-    };
 };
 
 
@@ -92,6 +87,7 @@ spiritAni.prototype.init = function() {
 
     //精灵场景容器
     this.stage = new PIXI.Container();
+
     this.texture = new Array();
     this.maskTexture = new Array();
 
@@ -127,14 +123,20 @@ spiritAni.prototype.init = function() {
 spiritAni.prototype.changePosition = function(currentFrame) {
 
     var proportion = setProportion(0, 0, this.imageList[currentFrame].X, this.imageList[currentFrame].Y)
+
+    var x = proportion.left - this.canvasX
+    var y = proportion.top - this.canvasY
+    this.advSprite.position.x = 0;
+    this.advSprite.position.y = 0;
+    console.log(this.canvasEl.id,this.canvasEl.style.transform);
+     // this.canvasEl.style.transform = "translateX("+parseInt(proportion.left)+"px) translateY("+parseInt(proportion.top)+"px)"
     this.canvasEl.style.left = parseInt(proportion.left) + 'px';
     this.canvasEl.style.top = parseInt(proportion.top) + 'px';
     if (this.resType) {
         this.maskSprite.position.x = 0;
         this.maskSprite.position.y = 0;
     }
-    this.advSprite.position.x = 0;
-    this.advSprite.position.y = 0;
+
 };
 
 
@@ -147,7 +149,7 @@ spiritAni.prototype.runAnimate = function() {
     if (!this.firstTime) {
         this.countNewFrame();
         var imageIndex = this.imageIndex;
-        this.changePosition(imageIndex);
+        //this.changePosition(imageIndex);
         //切换精灵的图片对象
         this.advSprite.texture = this.texture[imageIndex];
         if (this.resType) {
@@ -166,7 +168,6 @@ spiritAni.prototype.countNewFrame = function() {
             this.imageIndex = 0;
         } else {
             this.imageIndex = this.imagesArray.length - 1;
-            return;
         }
 
     }

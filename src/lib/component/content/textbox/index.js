@@ -26,9 +26,9 @@ export function extendTextBox(activitProto) {
             _.each(relatedData.contentDas, function (cds) {
                 if (~contentHtmlBoxIds.indexOf(cds._id)) {
                     contentId = cds._id;
-                    contentName = self._makePrefix('Content', self.pid, contentId);
+                    contentName = self.makePrefix('Content', self.pid, contentId);
                     //找到对应绑定事件的元素
-                    eventElement = self._findContentElement(contentName)
+                    eventElement = self.getContextNode(contentName)
                     if (!eventElement.attr("data-htmlbox")) {
                         //构建html文本框对象
                         self.htmlBoxInstance.push(new HtmlBox(contentId, eventElement));

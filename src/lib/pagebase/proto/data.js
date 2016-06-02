@@ -12,7 +12,7 @@ export function dataExternal(baseProto) {
 	 * 对象实例内部构建
 	 * @return {[type]} [description]
 	 */
-	baseProto.checkInstanceTasks = function(taskName) {
+	baseProto.checkInstanceTasks = function (taskName) {
 		var tasksObj;
 		if (tasksObj = this.createRelated.cacheTasks[taskName]) {
 			tasksObj.runSuspendTasks();
@@ -22,23 +22,23 @@ export function dataExternal(baseProto) {
 
 
 	//获取页面数据
-	baseProto.baseData = function() {
+	baseProto.baseData = function () {
 		return this.dataCache[this.pageType];
 	}
 
 	//获取热点数据信息
-	baseProto.baseActivits = function() {
+	baseProto.baseActivits = function () {
 		return this.dataCache['activitys'];
 	}
 
 	//获取自动运行数据
-	baseProto.baseAutoRun = function() {
+	baseProto.baseAutoRun = function () {
 		var autoRunDas = this.dataCache['autoRunDas'];
 		return autoRunDas && autoRunDas;
 	}
 
 	//获取chapterid
-	baseProto.baseGetPageId = function(pid) {
+	baseProto.baseGetPageId = function (pid) {
 		return this.baseData(pid)['_id'];
 	}
 
@@ -49,7 +49,7 @@ export function dataExternal(baseProto) {
 	 * @param  {Function} callback  [description]
 	 * @return {[type]}             [description]
 	 */
-	baseProto.baseGetContentObject = function(contentId) {
+	baseProto.baseGetContentObject = function (contentId) {
 		var contentsObj;
 		if (contentsObj = this.contentsCollector[contentId]) {
 			return contentsObj;
@@ -66,36 +66,40 @@ export function dataExternal(baseProto) {
 	 * @param  {[type]} name [description]
 	 * @return {[type]}      [description]
 	 */
-	baseProto.baseContentMutex = function(contentId, type) {
+	baseProto.baseContentMutex = function (contentId, type) {
 		var contentObj,
 			base = this;
 		if (contentObj = base.baseGetContentObject(contentId)) {
-			var context = contentObj.$contentProcess;
+			
+			var element = contentObj.$contentProcess.view
+				? contentObj.$contentProcess.view
+				: contentObj.$contentProcess
+
 			var handle = {
-				'Show': function() {
+				'Show': function () {
 					if (contentObj.type === 'dom') {
-						context.css({
+						element.css({
 							'display': 'blcok',
 							'visibility': 'visible'
 						}).prop("mutex", false);
 					} else {
-						context.visible = true;
+						element.visible = true;
 						console.log('show')
-						
+
 					}
 				},
-				'Hide': function() {
+				'Hide': function () {
 					if (contentObj.type === 'dom') {
-						context.css({
+						element.css({
 							'display': 'none',
 							'visibility': 'hidden'
 						}).prop("mutex", true);
 					} else {
 						console.log('hide')
-						context.visible = false;
+						element.visible = false;
 					}
 				},
-				'StopAnim': function() {
+				'StopAnim': function () {
 					contentObj.stopAnims && contentObj.stopAnims();
 				}
 			}
@@ -108,8 +112,8 @@ export function dataExternal(baseProto) {
 	_.each([
 		"Get",
 		"Specified"
-	], function(type) {
-		baseProto['base' + type + 'Content'] = function(data) {
+	], function (type) {
+		baseProto['base' + type + 'Content'] = function (data) {
 			switch (type) {
 				case 'Get':
 					return this.abActivitys.get();
@@ -129,8 +133,8 @@ export function dataExternal(baseProto) {
 		"Remove",
 		"Register",
 		"Specified"
-	], function(type) {
-		baseProto['base' + type + 'Component'] = function(data) {
+	], function (type) {
+		baseProto['base' + type + 'Component'] = function (data) {
 			switch (type) {
 				case 'Register':
 					return this.components.register(data);
@@ -149,10 +153,10 @@ export function dataExternal(baseProto) {
 	//               运行辅助对象事件
 	//
 	//***************************************************************
-	baseProto.baseAssistRun = function(activityId, outCallBack, actionName) {
+	baseProto.baseAssistRun = function (activityId, outCallBack, actionName) {
 		var activity;
 		if (activity = this.abActivitys) {
-			_.each(activity.get(), function(contentObj, index) {
+			_.each(activity.get(), function (contentObj, index) {
 				if (activityId == contentObj.activityId) {
 					if (actionName == 'Run') {
 						contentObj.runEffects(outCallBack, true);

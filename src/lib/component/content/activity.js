@@ -21,8 +21,8 @@ import { destroyEvents }from './event/event'
 //任务
 import { createNextTask } from './nexttask'
 //扩展
-import {extendEvent} from './event/index'
-import {extendPrivate} from './privateutil'
+import {extendEvent} from './event/related'
+import {extendPrivate} from './util'
 import {extendTextBox} from './textbox/index'
 import {extendBookMark} from './bookmark/index'
 import {extendSearchBar} from './searchbar/index'
@@ -35,7 +35,6 @@ import {extendSearchBar} from './searchbar/index'
  */
 function activityClass(data) {
 
-
     _.extend(this, data);
 
     /**
@@ -45,17 +44,15 @@ function activityClass(data) {
      * 任务必须等待context上下创建
      * context就是pixi的直接对象，精灵..都是异步的
      */
-    this.nextTask = createNextTask(this.monitorComplete)
+    this.nextTask = createNextTask(this.noticeComplete)
 
     /**
-     * 初始化自定义事件
+     * 填充事件数据
      */
-    this.createEventRelated();
+    this.fillEventData();
 
     /**
-     * 保存子对象（PPT辅助对象）
-     * 1 动画作用域
-     * 2 视觉差作用域
+     * 保存子对象content
      * @type {Array}
      */
     this.abstractContents = Content(this);
@@ -67,16 +64,14 @@ function activityClass(data) {
     this.htmlTextBox();
 
     /**
-     * 注册用户自定义事件
-     * dom
-     * canvas
+     * 绑定事件
      */
-    this.registerEvent();
+    this.bindEventBehavior();
 
     /**
-     * 构建用户行为
+     * 初始化content行为
      */
-    this.createActions();
+    this.initContents();
 
     /**
      * 2016.2.26
@@ -102,7 +97,7 @@ function activityClass(data) {
      * 如果没有pixi的异步创建
      * 同步代码直接完成
      */
-    this.monitorComplete();
+    this.noticeComplete();
 }
 
 
@@ -121,18 +116,16 @@ extendSearchBar(activitProto)
  */
 activitProto.eachAssistContents = function (callback) {
     _.each(this.abstractContents, function (scope) {
-        //保存只能处理动画
-        //scope.processType === 'animation' || scope.processType === 'both')
         callback.call(this, scope)
     }, this)
 }
 
 
 /**
- * 初始化PPT动画与音频
+ * 初始化content行为
  * @return {[type]} [description]
  */
-activitProto.createActions = function () {
+activitProto.initContents = function () {
 
     var pageId = this.relatedData.pageId,
         rootNode = this.rootNode,
@@ -145,8 +138,9 @@ activitProto.createActions = function () {
 
         //针对必须创建
         if (!(context = scope.$contentProcess)) {
+            console.log('$contentProcess不存在')
             return
-        };
+        }
 
         //如果是视觉差对象，也需要实现收集器
         if (scope.processType === 'parallax') {
@@ -160,18 +154,48 @@ activitProto.createActions = function () {
         parameter = scope.getParameter();
 
 
-        //如果不是预生成
-        //注册动画事件
+        //如果不是预生成,注册动画事件
         if (isRreRun === undefined) {
+            //初始化动画
             scope.init(id, context, rootNode, pageId, parameter, pageType);
         }
 
         //绑定DOM一些属性
-        this._repeatBind(id, context, isRreRun, scope, collectorHooks, scope.canvasMode);
+        this.toRepeatBind(id, context, isRreRun, scope, collectorHooks);
     });
 
 }
 
+
+/**
+ * dom节点去重绑定
+ * 在每一次构建activity对象中，不重复处理content一些特性
+ * 1 翻页特性
+ * 2 注册钩子
+ * 3 预显示
+ * @return {[type]} [description]
+ */
+activitProto.toRepeatBind = function (id, context, isRreRun, scope, collectorHooks) {
+    var indexOf
+    var relatedData = this.relatedData
+    //过滤重复关系
+    //每个元素只绑定一次
+    if (-1 !== (indexOf = relatedData.createContentIds.indexOf(id))) {
+        //删除,去重
+        relatedData.createContentIds.splice(indexOf, 1);
+        //收集每一个content注册
+        collectorHooks(scope.pid, id, scope);
+        //增加翻页特性
+        this.addIScroll(scope, context);
+        //直接复位状态,针对出现动画 show/hide
+        if (isRreRun) {
+            //直接改变元素状态
+            context.css({
+                'visibility': isRreRun
+            })
+        }
+    }
+}
 
 
 /**
@@ -425,11 +449,6 @@ activitProto.relevantOperation = function () {
 }
 
 
-
-
-
-
-
 /*********************************************************************
  *
  *                      外部调用接口
@@ -533,7 +552,7 @@ activitProto.destroy = function (elementCallback) {
     }
 
     this.rootNode = null;
-   
+
 }
 
 

@@ -1,4 +1,4 @@
 export * from './container'
 export * from './background'
-export * from './contents'
-export * from './components'
+export * from './contents/index'
+export * from './components' 

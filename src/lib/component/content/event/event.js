@@ -1,3 +1,6 @@
+
+import {DragDropClass} from './drag'
+
 /**
  * ppt事件接口
  *
@@ -11,6 +14,7 @@
  *
  * 此接口函数有作用域隔离
  */
+
 
 /**
  * ie10下面mouse事件怪异
@@ -120,6 +124,7 @@ function compatibilityEvent(e) {
     return point
 }
 
+
 /**
  * 如果是简单的点击事件
  */
@@ -152,7 +157,7 @@ function tapEvent(eventContext, eventHandle, supportSwipe) {
             setCanvasMove(supportSwipe);
         }
     }
-    
+
     var end = function () {
         //触发tap事件
         eventContext.isTap && eventHandle();
@@ -249,6 +254,7 @@ function createHammer(eventContext, eventName, supportSwipe) {
     return eventReference;
 }
 
+
 /**
  * 复杂的事件
  * @return {[type]} [description]
@@ -261,11 +267,16 @@ function complexEvent(eventContext, eventName, eventHandler, supportSwipe) {
     return eventReference;
 }
 
-//绑定事件
+
+/**
+ * 绑定事件
+ */
 function bindEvent(eventDrop, data) {
-    var dragObj, eventHandler, eventReference;
-    var eventContext = data.eventContext;
-    var eventName = data.eventName;
+    var dragObj, eventHandler, eventReference, eventContext, eventName, supportSwipe
+
+    eventContext = data.eventContext;
+    eventName = data.eventName;
+
     switch (eventName) {
         case 'drag': //拖动
             dragObj = new DragDropClass(eventContext, null, data.parameter, eventDrop.startRun, eventDrop.stopRun);
@@ -274,15 +285,21 @@ function bindEvent(eventDrop, data) {
             dragObj = new DragDropClass(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
             break;
         default:
+            supportSwipe = data.supportSwipe
             //事件句柄
             eventHandler = function () {
                 data.eventRun.call(eventContext);
-            };
-            eventReference = eventName === 'tap'
-                ? tapEvent(eventContext, eventHandler, data.supportSwipe)
-                : complexEvent(eventContext, eventName, eventHandler, data.supportSwipe)
+            }
+            //简单单机
+            if (eventName === 'tap') {
+                eventReference = tapEvent(eventContext, eventHandler, supportSwipe)
+            } else {
+                //复杂用hammer
+                eventReference = complexEvent(eventContext, eventName, eventHandler, supportSwipe)
+            }
             break;
     }
+    
     return [dragObj, eventReference, eventHandler]
 }
 
@@ -297,13 +314,17 @@ function bindEvent(eventDrop, data) {
 function applyEvent(data) {
 
     //针对软件培训的操作行为下光标状态需求
-    Xut.plat.isBrowser && data.domMode && addCursor(data.eventName, data.eventContext)
+    Xut.plat.isBrowser
+        && data.domMode
+        && addCursor(data.eventName, data.eventContext)
 
     //绑定事件
-    var eventDrop = data.eventDrop,
-        eventObj = bindEvent(eventDrop, data);
+    var eventDrop = data.eventDropvar
+    //拖动,引用,回调
+    var eventObj = bindEvent(eventDrop, data)
 
     //拖动,拖拽对象处理
+    //动作初始化
     if (eventObj[0] && eventDrop.init) {
         eventDrop.init(eventObj[0]);
     } else {
@@ -339,6 +360,7 @@ export function bindEvents(data) {
     applyEvent(data);
 }
 
+
 //数据库预定义14个事件接口
 //提供给content文件
 //用于过滤数据库字段指定的行为
@@ -349,11 +371,17 @@ export function conversionEventType(eventType) {
 }
 
 
+/**
+ * 增加默认行为
+ */
 export function defaultBehavior(element) {
     element && element.attr('data-behavior', 'disable');
 }
 
-//销毁对象事件
+
+/**
+ * 销毁对象事件
+ */
 export function destroyEvents(eventData, eventName) {
     if (eventData.eventReference) {
         eventData.eventReference.off(eventName || eventData.eventName, eventData.eventHandler)

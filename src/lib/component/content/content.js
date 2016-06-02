@@ -53,7 +53,8 @@ function preRunAction(data, eventName) {
  * 构建动画
  * @return {[type]} [description]
  */
-function createScope(base, contentId, pid, actName, contentDas, parameter, hasParallax) {
+function createScope(base, contentId, pid, actName, parameter, hasParallax) {
+
     //默认启动dom模式
     var data = {
         type: 'dom',
@@ -64,7 +65,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
     var pageType = base.pageType
     var contentName
     var canvasDom
-
+    var contentDas = base.relatedData.contentDas[contentId]
 
     //如果启动了canvas模式
     //改成作用域的一些数据
@@ -72,14 +73,15 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
         //如果找到对应的canvas对象
         if (-1 !== base.canvasRelated.cid.indexOf(contentId)) {
             contentName = "canvas_" + pid + "_" + contentId
-            canvasDom = base._findContentElement(contentName, 'canvas')[0]
+            canvasDom = base.getContextNode(contentName)[0]
 
             //创建上下文pixi
             if (contentDas.$contentProcess) {
                 $contentProcess = contentDas.$contentProcess
             } else {
                 $contentProcess = Context(contentDas, canvasDom, base.pageIndex)
-                contentDas.$contentProcess = $contentProcess
+                //保存canvas pixi的上下文引用
+                base.relatedData.contentDas[contentId].$contentProcess = $contentProcess
             }
             data.type = 'canvas';
             data.canvasMode = true;
@@ -93,7 +95,7 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
          * 确保节点存在
          * @type {[type]}
          */
-        if (!($contentProcess = base._findContentElement(actName))) {
+        if (!($contentProcess = base.getContextNode(actName))) {
             return;
         }
     }
@@ -177,40 +179,19 @@ function createScope(base, contentId, pid, actName, contentDas, parameter, hasPa
  * @param  {[type]} parameter [description]
  * @return {[type]}           [description]
  */
-function createHandlers(base, parameter, waitCreate) {
-    /**
-     * 如果是动态分段创建
-     * 混入新的作用域
-     */
-    if (waitCreate) {
-        return createScope.apply(base, parameter);
-    }
+function createHandlers(base, parameter) {
 
     //dom对象
     var para = parameter[0],
         contentId = para['contentId'], //可能有多个动画数据 [Object,Object,Object]
         pid = base.pid,
-        actName = base._makePrefix('Content', pid, contentId),
-        contentDas = base.relatedData.contentDas[contentId];
-
-    /**
-     * 客户端未实现
-     * 针对分段创建优化
-     * 初始化必要加载数据
-     * 临时占位数据
-     */
-    // if(contentDas && 1==contentDas.visible){
-    //  //记录分段标记,用户合并创建节点
-    //  base.waitCreateContent.push(contentId)
-    //  return [contentId, pid, actName, contentDas, parameter];
-    // }
+        actName = base.makePrefix('Content', pid, contentId)
 
     /**
      * 构建子作用域
      */
-    return createScope(base, contentId, pid, actName, contentDas, parameter, para.masterId);
+    return createScope(base, contentId, pid, actName, parameter, para.masterId);
 }
-
 
 
 /**
@@ -224,7 +205,7 @@ function fnCreate(base) {
             //生成动画作用域对象
             while (para = data.shift()) {
                 if (handlers = createHandlers(base, para)) {
-                    callback(handlers);
+                    callback(handlers)
                 }
             }
         }

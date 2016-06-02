@@ -14,53 +14,11 @@ export function extendPrivate(activitProto) {
 
 
     /**
-     * dom节点去重绑定
-     * 在每一次构建activity对象中，不重复处理content一些特性
-     * 1 翻页特性
-     * 2 注册钩子
-     * 3 预显示
-     * @return {[type]} [description]
-     */
-    activitProto._repeatBind = function (id, context, isRreRun, scope, collectorHooks, canvasMode) {
-        var indexOf,
-            relatedData = this.relatedData;
-
-        //过滤重复关系
-        if (-1 !== (indexOf = relatedData.createContentIds.indexOf(id))) {
-            //删除,去重
-            relatedData.createContentIds.splice(indexOf, 1);
-            //收集每一个content注册
-            collectorHooks(scope.pid, id, scope);
-            //canvas模式
-            if (canvasMode) {
-                if (isRreRun) {
-                    // console.log(id,scope)
-                    //直接改变元素状态
-                    context.view.style.visible = isRreRun === 'visible' ? true : false;
-                    console.log('isRreRun')
-                }
-            } else {
-                //dom模式
-                //增加翻页特性
-                this._addIScroll(scope, context);
-                //直接复位状态,针对出现动画 show/hide
-                if (isRreRun) {
-                    //直接改变元素状态
-                    context.css({
-                        'visibility': isRreRun
-                    })
-                }
-            }
-        }
-    }
-
-
-    /**
      * 增加翻页特性
      * 可能有多个引用关系
      * @return {[type]}         [description]
      */
-    activitProto._addIScroll = function (scope, element) {
+    activitProto.addIScroll = function (scope, element) {
         var self = this,
             // elementName,
             contentDas = scope.contentDas;
@@ -68,8 +26,8 @@ export function extendPrivate(activitProto) {
         //给外部调用处理
         function makeUseFunction(element) {
 
-            var prePocess = self._makePrefix('Content', scope.pid, scope.id),
-                preEle = self._findContentElement(prePocess)
+            var prePocess = self.makePrefix('Content', scope.pid, scope.id),
+                preEle = self.getContextNode(prePocess)
 
             //重置元素的翻页处理
             // defaultBehavior(preEle);
@@ -128,8 +86,6 @@ export function extendPrivate(activitProto) {
         if (contentDas.isScroll) {
             //去掉高度，因为有滚动文本框
             element.find(">").css("height", "")
-
-            // elementName = this._makePrefix('contentWrapper', scope.pid, scope.id);
             this.relatedCallback.iscrollHooks.push(makeUseFunction(element[0]));
         }
 
@@ -146,7 +102,7 @@ export function extendPrivate(activitProto) {
      * 制作一个查找标示
      * @return {[type]}
      */
-    activitProto._makePrefix = function (name, pid, id) {
+    activitProto.makePrefix = function (name, pid, id) {
         return name + "_" + pid + "_" + id;
     }
 
@@ -159,7 +115,7 @@ export function extendPrivate(activitProto) {
      * @param  {[type]} prefix [description]
      * @return {[type]}        [description]
      */
-    activitProto._findContentElement = function (prefix, type) {
+    activitProto.getContextNode = function (prefix, type) {
 
         var element, containerPrefix, contentsFragment
 
@@ -188,6 +144,6 @@ export function extendPrivate(activitProto) {
         }
         return element;
     }
-    
+
 
 }

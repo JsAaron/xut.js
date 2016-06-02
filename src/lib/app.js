@@ -26,5 +26,5 @@ $(function() {
 }) 
 
 //更新版本号记录
-Xut.Version = 801;    
+Xut.Version = 802;    
  

@@ -13,49 +13,39 @@ import { bindEvents as bindPixiEvents } from '../../pixi/event'
 export function extendEvent(activitProto) {
 
 
-    /*********************************************************************
-     *
-     *                      用户自定义接口事件
-     *                                                                    *
-     **********************************************************************/
-
     /**
      * 构建事件体系
      * @return {[type]} [description]
      */
-    activitProto.createEventRelated = function () {
+    activitProto.fillEventData = function () {
 
         //配置事件节点
         var eventId,
+            pid,
             contentName,
             //事件上下文对象
             eventContext,
             eventData = this.eventData;
 
-        var pid = this.pid
+        pid = this.pid
 
         //如果存在imageIds才处理,单独绑定事件处理
         if (eventId = eventData.eventContentId) {
 
-            //默认dom模式
-            _.extend(eventData, {
-                'type': 'dom',
-                'domMode': true,
-                'canvasMode': false
-            })
-
+            //dom
+            //找到对应绑定事件的元素
             var domEvent = function () {
-                contentName = this._makePrefix('Content', pid, this.id)
-                //找到对应绑定事件的元素
-                eventContext = this._findContentElement(contentName)
+                contentName = this.makePrefix('Content', pid, this.id)
+                eventData.type = 'dom';
+                eventData.canvasMode = false;
+                eventData.domMode = true;
             }
 
+            //canvas模式非常特别
+            //canvas容器+内部pixi对象
+            //所以事件绑定在最外面
             var canvasEvent = function () {
-                //canvas模式非常特别
-                //canvas容器+内部pixi对象
-                //所以事件绑定在最外面
-                contentName = "canvas_" + pid + "_" + this.id
-                eventContext = this._findContentElement(contentName, 'canvas')
+                contentName = this.makePrefix('canvas', pid, this.id)
                 eventData.type = 'canvas';
                 eventData.canvasMode = true;
                 eventData.domMode = false;
@@ -69,6 +59,7 @@ export function extendEvent(activitProto) {
                 domEvent.call(this)
             }
 
+            eventContext = this.getContextNode(contentName)
             eventData.eventContext = eventContext;
 
 
@@ -113,7 +104,7 @@ export function extendEvent(activitProto) {
          * 运行动画
          * @return {[type]} [description]
          */
-        function startRunAnim() {
+        var startRunAnim = function () {
             //当前事件对象没有动画的时候才能触发关联动作
             var animOffset,
                 boundary = 5; //边界值
@@ -140,7 +131,7 @@ export function extendEvent(activitProto) {
          * 音频
          * 反弹
          */
-        function setBehavior(feedbackBehavior) {
+        var setBehavior = function (feedbackBehavior) {
 
             var behaviorSound;
             //音频地址
@@ -201,7 +192,6 @@ export function extendEvent(activitProto) {
             }
         }
 
-
         /**
          * 正常动画执行
          * 除去拖动拖住外的所有事件
@@ -233,13 +223,16 @@ export function extendEvent(activitProto) {
         //绑定用户自定义事件
         if (eventContext && eventName) {
 
-            var domName, target,
-                dragdropPara = eventData.dragdropPara;
+            var domName,
+                target,
+                dragdropPara;
+
+            dragdropPara = eventData.dragdropPara;
 
             //获取拖拽目标对象
             if (eventName === 'dragTag') {
-                domName = this._makePrefix('Content', this.pid, dragdropPara);
-                target = this._findContentElement(domName);
+                domName = this.makePrefix('Content', this.pid, dragdropPara);
+                target = this.getContextNode(domName);
             }
 
             //增加事件绑定标示
@@ -247,7 +240,7 @@ export function extendEvent(activitProto) {
             eventData.isBind = true;
 
 
-            callback.call(this, {
+            bindContentEvents({
                 'eventDrop': eventDrop,
                 'eventRun': eventRun,
                 'eventHandler': eventHandler,
@@ -260,42 +253,4 @@ export function extendEvent(activitProto) {
         }
     }
 
-
-    /**
-     * 注册事件
-     * @return {[type]} [description]
-     */
-    activitProto.registerEvent = function () {
-
-        var eventData = this.eventData;
-
-        //dom事件
-        this.bindEventBehavior(function (eventData) {
-            bindContentEvents(eventData);
-        })
-        /**
-         * 2016.2.19
-         * 绑定canvas事件
-         * 由于canvas有异步加载
-         * 这里content创建的时候不阻断加载
-         * 所以canvas的事件体系
-         * 放到所有异步文件加载后才执行
-         */
-        // if (eventData.type === "canvas") {
-        //     var makeFunction = function bind() {
-        //         //找到对应的上下文pixi stoge
-        //         eventData.eventContext = {}
-        //         this.bindEventBehavior(function (eventData) {
-        //             bindPixiEvents(eventData);
-        //         })
-        //     }
-        //     console.log('content canvas事件')
-        //     this.nextTask.event.push(makeFunction.bind(this))
-        // } else {
-        //     //dom事件
-        //     this.bindEventBehavior(function (eventData) {
-        //         bindContentEvents(eventData);
-        //     })
-        // }
-    }
 }
