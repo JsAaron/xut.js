@@ -13,7 +13,7 @@ const concat = require('gulp-concat')
 const ora = require('ora')
 const _ = require("underscore");
 const browserSync = require("browser-sync");
-const base = require('../rollup.base.config.js')
+const base = require('../rollup.base.conf.js')
 
 var config = require('../../config')
 

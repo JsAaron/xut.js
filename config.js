@@ -44,12 +44,12 @@ module.exports = {
             //os:Users/mac/project/xcode/www/build
             dir: process.platform === 'win32'
                     ? 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build'
-                    : 'Users/mac/project/xcode/www/build'
+                    : '/Users/mac/project/xcode/www/build'
         },
         //eslint测试目录
         //测试文件地址
         eslint: {
-            launch: false,
+            launch: true,
             //必须绝对路径
             dir: path.resolve(__dirname, 'src/lib'),
         },
@@ -66,9 +66,7 @@ module.exports = {
      * 远程调试
      * remoteRemote
      */
-    remote: {
-
-    },
+    remote: {},
 
     /**
      * 发布配置

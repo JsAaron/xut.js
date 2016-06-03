@@ -25,6 +25,7 @@ function getSpiritAni(inputPara, data,canvasEl) {
 function getResources(data) {
     var option;
     var ResourcePath = "content/gallery/" + data.md5 + "/";
+
     var xhr = new XMLHttpRequest();
     data.resourcePath = ResourcePath;
 

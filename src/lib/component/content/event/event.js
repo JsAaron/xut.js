@@ -319,7 +319,7 @@ function applyEvent(data) {
         && addCursor(data.eventName, data.eventContext)
 
     //绑定事件
-    var eventDrop = data.eventDropvar
+    var eventDrop = data.eventDrop
     //拖动,引用,回调
     var eventObj = bindEvent(eventDrop, data)
 

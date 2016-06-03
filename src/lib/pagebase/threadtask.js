@@ -11,13 +11,13 @@ import { TaskContainer, TaskBackground, TaskContents, TaskComponents } from './t
 
 
 //更新数据缓存
-function updataCache(pid, callback) {
+var updataCache = function (pid, callback) {
     var fn,
         base = this,
         pageType = base.pageType;
 
     //缓存数据
-    function addCacheDas(namespace, data) {
+    var addCacheDas = function (namespace, data) {
         var key;
         if (!base.dataCache[namespace]) {
             base.dataCache[namespace] = data;
@@ -29,7 +29,7 @@ function updataCache(pid, callback) {
     }
 
     //增加数据缓存
-    function addCache(data, activitys, autoRunDas) {
+    var addCache = function (data, activitys, autoRunDas) {
         addCacheDas(base.pageType, data); //挂载页面容器数据
         addCacheDas('activitys', activitys); //挂载activitys数据
         addCacheDas('autoRunDas', autoRunDas); //挂载自动运行数据

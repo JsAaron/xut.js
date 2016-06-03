@@ -194,7 +194,7 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
  * @return {[type]}                 [description]
  */
 animProto.run = function (scopeComplete) {
-    
+
     //div and canvas of nodes
     var element = this.$contentProcess.view
         ? this.$contentProcess.view

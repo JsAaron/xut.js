@@ -7,21 +7,9 @@ const watch = require('gulp-watch');
 const path = require('path')
 const _ = require("underscore");
 const child_process = require('child_process');
-
-//https://github.com/ampedandwired/html-webpack-plugin
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
-
-//https://www.npmjs.com/package/write-file-webpack-plugin
-const WriteFilePlugin = require('write-file-webpack-plugin');
-
-var config = require('../../config')
-var port = process.env.PORT || config.dev.port
-var app = express()
-
 
 //数据库
 if (!fs.existsSync("./src/content/xxtebook.db")) {
@@ -35,52 +23,15 @@ if (!fs.existsSync("./src/content/SQLResult.js")) {
     require('../sqlite/index').resolve()
 }
 
+var app = express()
+var config = require('../../config')
+var port = process.env.PORT || config.dev.port
 var conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
 });
-//刷新
-conf.entry = ['./build/dev/client'].concat(conf.entry)
 
-/**
- * webpack
- * 配置
- */
-var webpackConfig = {
-    entry: conf.entry,
-    output: {
-        path: conf.assetsRoot,
-        publicPath: conf.assetsPublicPath,
-        filename: 'app.js'
-    },
-    devtool: '#eval-source-map',
-    module: {
-        loaders: [{
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-            query: {
-                presets: ['es2015']
-            }
-        }]
-    },
+var webpackConfig = require('./webpack.dev.conf')
 
-    plugins: [
-        // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
-        // 热替换、错误不退出
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin(),
-
-        // 生成html文件
-        new HtmlWebpackPlugin({
-            filename: './index.html',
-            template: './src/index.html',
-            inject: true
-        }),
-
-        new WriteFilePlugin()
-    ]
-}
 
 //启动代码测试
 //eslint

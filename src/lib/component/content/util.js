@@ -75,7 +75,7 @@ export function extendPrivate(activitProto) {
             }
 
             return function () {
-                self.iscroll = Iscroll(element);
+                
                 restore();
                 preEle = null;
                 restore = null;
