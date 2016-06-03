@@ -5,16 +5,22 @@
  * @return {[type]}         [description]
  */
 
-import { Factory } from '../core/factory'
-import { parseJSON } from '../../../util/index'
-import { spiritAni } from './spirit'
+import {
+    Factory
+} from '../core/factory'
+import {
+    parseJSON
+} from '../../../util/index'
+import {
+    spiritAni
+} from './spirit'
 
 
-function getSpiritAni(inputPara, data,canvasEl) {
+function getSpiritAni(inputPara, data, canvasEl) {
     var path = data.resourcePath;
     var loop = data.loop;
     if (typeof inputPara == "object") {
-        return new spiritAni(inputPara,canvasEl , data);
+        return new spiritAni(inputPara, canvasEl, data);
     } else {
         console.log("inputPara undefine Spirit")
         return {};
@@ -25,17 +31,11 @@ function getSpiritAni(inputPara, data,canvasEl) {
 function getResources(data) {
     var option;
     var ResourcePath = "content/gallery/" + data.md5 + "/";
-
     var xhr = new XMLHttpRequest();
     data.resourcePath = ResourcePath;
-
     xhr.open('GET', ResourcePath + 'app.json', false);
     xhr.send(null);
-    try {
-        option = parseJSON(xhr.responseText);
-    } catch (e) {
-        console.log("app.json get error:" + e);
-    }
+    option = parseJSON(xhr.responseText);
     return option;
 }
 
@@ -47,7 +47,7 @@ var specialSprite = Factory.extend({
      * @param  {[type]} canvasRelated [description]
      * @return {[type]}               [description]
      */
-    constructor: function (successCallback, failCallback, options) {
+    constructor: function(successCallback, failCallback, options) {
 
         this.data = options.data;
         this.renderer = options.renderer
@@ -67,7 +67,7 @@ var specialSprite = Factory.extend({
             var paramObj = spiritList[i].params;
             var actLists = paramObj.actList.split(',');
             for (var k = 0; k < actLists.length; k++) {
-                this.sprObjs.push(getSpiritAni(paramObj[actLists[k]], this.data,this.renderer.view));
+                this.sprObjs.push(getSpiritAni(paramObj[actLists[k]], this.data, this.renderer.view));
             }
         }
 
@@ -84,16 +84,19 @@ var specialSprite = Factory.extend({
      * addQueue  将这个渲染加入队列
      * @return {[type]} [description]
      */
-    play: function (addQueue) {
+    play: function(addQueue) {
         var self = this
         var renderer = self.renderer
-
-        this.uuid = addQueue(this.pageIndex, function () {
-            _.each(self.sprObjs, function (obj) {
-                if (self.action == 'play') {
-                    renderer.render(obj.stage);
-                    obj.timer = setTimeout(function () {
+        this.uuid = addQueue(this.pageIndex, function() {
+            _.each(self.sprObjs, function(obj) {
+                //防止内存溢出
+                //停止后不能再运行了
+                if (!obj.timer && self.action == 'play') {
+                    obj.timer = setTimeout(function() {
                         obj.runAnimate();
+                        renderer.render(obj.stage);
+                        //强制之刷新对应的fps
+                        obj.timer = null;
                     }, 1000 / (obj.FPS || 10))
                 }
             })
@@ -105,7 +108,10 @@ var specialSprite = Factory.extend({
      * stopQueue 销毁队列
      * @return {[type]} [description]
      */
-    stop: function (stopQueue) {
+    stop: function(stopQueue) {
+        _.each(self.sprObjs, function(obj) {
+            clearTimeout(obj.timer)
+        })
         stopQueue(this.pageIndex, this.uuid)
     },
 
@@ -114,9 +120,9 @@ var specialSprite = Factory.extend({
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroy: function (destroyQueue) {
+    destroy: function(destroyQueue) {
         destroyQueue(this.pageIndex, this.uuid)
-        _.each(this.sprObjs, function (obj) {
+        _.each(this.sprObjs, function(obj) {
             obj.destroy();
         })
     }
@@ -124,5 +130,5 @@ var specialSprite = Factory.extend({
 
 
 export {
-specialSprite
+    specialSprite
 }
