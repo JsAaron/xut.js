@@ -11,19 +11,28 @@ import { setProportion } from '../../../util/option'
  * @return {[type]}               [description]
  */
 function spiritAni(data, canvasEl, condata) {
+
     this.canvasEl = canvasEl;
+
     this.imagesArray = new Array();
     this.maskArray = new Array();
+
     //默认png格式资源
     this.resType = 0;
+
     //1循环播放 0只播放一次
     this.loop = condata.loop;
+
     this.data = data;
+
     //this.contentPrefix = contentPrefix;
     this.path = this.ResourcePath = condata.resourcePath;
     //this.action = this.data.params["actList"].split(",")[0];
+
     this.FPS = parseInt(data.fps);
+
     this.imageList = data.ImageList;
+
     //从1开始
     this.allcount = this.imageList.length - 1
 
@@ -36,7 +45,7 @@ function spiritAni(data, canvasEl, condata) {
     this.firstTime = true;
 
     //当前图片的游标
-    this.imgIndex = 1
+    this.vernier = 1
 
     //初始化
     this.setContainer();
@@ -70,8 +79,9 @@ spiritAni.prototype.setContainer = function () {
  * @param  {[type]} path          [description]
  * @return {[type]}               [description]
  */
-spiritAni.prototype.getImages = function (i) {
+spiritAni.prototype.getImageUrl = function (i) {
     var p1, p2, temp
+
     temp = this.imageList[i];
     //普通
     p1 = this.path + temp.name
@@ -98,27 +108,27 @@ spiritAni.prototype.makeSprite = function (pic) {
     this.stage = new PIXI.Container();
 
     //第一次获取图片位置合集
-    var imgArr = this.getImages(this.imgIndex)
+    var imgUrl = this.getImageUrl(1)
 
     //jpg+mask蒙板
     if (this.resType) {
-        this.textureMask = this.getFromImage(imgArr[1]);
-        this.spriteMask = new PIXI.Sprite(this.textureMask);
-        this.spriteMask.position.x = 0;
-        this.spriteMask.position.y = 0;
-        this.spriteMask.width = this.spiritWidth;
-        this.spriteMask.height = this.spiritHeight;
-        this.stage.addChild(this.spriteMask);
+        this.textureMask = this.getFromImage(imgUrl[1])
+        this.spriteMask = new PIXI.Sprite(this.textureMask)
+        this.spriteMask.position.x = 0
+        this.spriteMask.position.y = 0
+        this.spriteMask.width = this.spiritWidth
+        this.spriteMask.height = this.spiritHeight
+        this.stage.addChild(this.spriteMask)
     }
 
     //jpg and mask or png
-    this.textureAdv = this.getFromImage(imgArr[0]);;
-    this.spriteAdv = new PIXI.Sprite(this.textureAdv);
-    this.spriteAdv.position.x = 0;
-    this.spriteAdv.position.y = 0;
-    this.spriteAdv.width = this.spiritWidth;
-    this.spriteAdv.height = this.spiritHeight;
-    this.stage.addChild(this.spriteAdv);
+    this.texturePng = this.getFromImage(imgUrl[0])
+    this.spritePng = new PIXI.Sprite(this.texturePng)
+    this.spritePng.position.x = 0
+    this.spritePng.position.y = 0
+    this.spritePng.width = this.spiritWidth
+    this.spritePng.height = this.spiritHeight
+    this.stage.addChild(this.spritePng);
 }
 
 
@@ -128,26 +138,20 @@ spiritAni.prototype.makeSprite = function (pic) {
 spiritAni.prototype.setTexture = function (texture, sprite, ulr) {
     this['old' + texture] = this[texture]
     this[texture] = this.getFromImage(ulr)
-    this[sprite]['texture'] = this[texture] 
+    this[sprite]['texture'] = this[texture]
 }
-  
-/**
- * 销毁纹理
- */
-spiritAni.prototype.destroyTexture = function () {
 
-}
-  
-  
+
 /**
  * 计算下一个游标
  */
-spiritAni.prototype.nextPox = function () {
-    if (this.imgIndex == this.allcount) {
-        this.imgIndex = 1
+spiritAni.prototype.nextVernier = function () {
+    //循环
+    if (this.vernier == this.allcount) {
+        this.vernier = 1
         return
     }
-    this.imgIndex++
+    this.vernier++
 };
 
 /**
@@ -156,36 +160,36 @@ spiritAni.prototype.nextPox = function () {
  */
 spiritAni.prototype.runAnimate = function () {
 
+    var imgUrl
+
     //第二次运行
     if (!this.firstTime) {
-        this.nextPox();
-        //第一次获取图片位置合集
-        var imgArr = this.getImages(this.imgIndex)
-        if (this.spriteMask) {
-            this.setTexture('textureMask', 'spriteMask', imgArr[1])
-            // this.oldTextureMask = this.textureMask
-            // this.textureMask = this.getFromImage(imgArr[1])
-            // this.spriteMask.texture = this.textureMask
 
-        }  
-        if (this.spriteAdv) {
-            this.setTexture('textureAdv', 'spriteAdv', imgArr[0])
-            // this.oldTextureAdv = this.textureAdv
-            // this.textureAdv = this.getFromImage(imgArr[0])
-            // this.spriteAdv.texture = this.textureAdv
+        //计算游标
+        this.nextVernier();
+
+        //获取下一张图片位置合集
+        imgUrl = this.getImageUrl(this.vernier)
+
+        //带蒙版
+        if (this.spriteMask) {
+            this.oldTextureMask = this.textureMask
+            this.textureMask = this.getFromImage(imgUrl[1])
+            this.spriteMask.texture = this.textureMask
+        }
+        //普通png
+        if (this.spritePng) {
+            this.oldTexturePng = this.texturePng
+            this.texturePng = this.getFromImage(imgUrl[0])
+            this.spritePng.texture = this.texturePng
         }
     }
 
     this.firstTime = false;
 
     //清理旧的texture的内存消耗
-    if (this.oldTextureMask) {
-        this.oldTextureMask.destroy(true);
-    }
-    if (this.oldTextureAdv) {
-        // console.log(1)
-        this.oldTextureAdv.destroy(true);
-    }
+    this.oldTextureMask && this.oldTextureMask.destroy(true)
+    this.oldTexturePng && this.oldTexturePng.destroy(true)
 };
 
 
@@ -197,7 +201,6 @@ spiritAni.prototype.destroy = function () {
     if (this.stage) {
         this.stage.destroy(this.stage.length ? true : false)
     }
-
 }
 
 export {

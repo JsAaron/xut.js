@@ -47,7 +47,7 @@ var specialSprite = Factory.extend({
      * @param  {[type]} canvasRelated [description]
      * @return {[type]}               [description]
      */
-    constructor: function(successCallback, failCallback, options) {
+    constructor: function (successCallback, failCallback, options) {
 
         this.data = options.data;
         this.renderer = options.renderer
@@ -83,19 +83,24 @@ var specialSprite = Factory.extend({
      * 运行动画
      * addQueue  将这个渲染加入队列
      * @return {[type]} [description]
+     * 1000 / (obj.FPS || 10)
      */
-    play: function(addQueue) {
+    play: function (addQueue) {
         var self = this
         var renderer = self.renderer
-        this.uuid = addQueue(this.pageIndex, function() {
-            _.each(self.sprObjs, function(obj) {
+        this.uuid = addQueue(this.pageIndex, function () {
+            _.each(self.sprObjs, function (obj) {
                 //防止内存溢出
                 //停止后不能再运行了
-                if (!obj.timer && self.action == 'play') {
-                    obj.timer = setTimeout(function() {
-                        obj.runAnimate();
-                        renderer.render(obj.stage);
-                        //强制之刷新对应的fps
+                if (!obj.timer) {
+                    obj.timer = setTimeout(function () {
+                        //在定时器事件内正好删除了引用
+                        //必须判断状态
+                        if (self.action == 'play') {
+                            renderer.render(obj.stage)
+                            obj.runAnimate()
+                        }
+                        clearTimeout(obj.timer)
                         obj.timer = null;
                     }, 1000 / (obj.FPS || 10))
                 }
@@ -108,11 +113,11 @@ var specialSprite = Factory.extend({
      * stopQueue 销毁队列
      * @return {[type]} [description]
      */
-    stop: function(stopQueue) {
-        _.each(self.sprObjs, function(obj) {
-            clearTimeout(obj.timer)
-        })
+    stop: function (stopQueue) {
         stopQueue(this.pageIndex, this.uuid)
+        _.each(self.sprObjs, function (obj) {
+            obj.timer && clearTimeout(obj.timer)
+        })
     },
 
 
@@ -120,9 +125,9 @@ var specialSprite = Factory.extend({
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroy: function(destroyQueue) {
+    destroy: function (destroyQueue) {
         destroyQueue(this.pageIndex, this.uuid)
-        _.each(this.sprObjs, function(obj) {
+        _.each(this.sprObjs, function (obj) {
             obj.destroy();
         })
     }
@@ -130,5 +135,5 @@ var specialSprite = Factory.extend({
 
 
 export {
-    specialSprite
+specialSprite
 }
