@@ -6,6 +6,7 @@ const open = require("open");
 const watch = require('gulp-watch');
 const path = require('path')
 const _ = require("underscore");
+const fsextra = require('fs-extra')
 const child_process = require('child_process');
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
@@ -29,6 +30,8 @@ var port = process.env.PORT || config.dev.port
 var conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
 });
+
+fsextra.removeSync(conf.assetsRoot)
 
 var webpackConfig = require('./webpack.dev.conf')
 
@@ -98,6 +101,7 @@ app.use('/content', express.static('src/content'));
 
 
 if (config.dev.debug.launch) {
+    
     /**
      * 监控文件变化
      * 打包

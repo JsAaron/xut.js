@@ -49,7 +49,7 @@ module.exports = {
         //eslint测试目录
         //测试文件地址
         eslint: {
-            launch: true,
+            launch: false,
             //必须绝对路径
             dir: path.resolve(__dirname, 'src/lib'),
         },

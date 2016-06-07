@@ -5,7 +5,7 @@
  * @param  {[type]} module  [description]
  * @return {[type]}         [description]
  */
-Xut.config = function() {
+Xut.config = function () {
     //配置对象
     var config = {},
         layoutMode,
@@ -37,7 +37,7 @@ Xut.config = function() {
         }
 
         return {
-            "width":  $(window).width(),
+            "width": $(window).width(),
             // 1024 768
             "height": $(window).height()
         }
@@ -151,14 +151,14 @@ Xut.config = function() {
         proportion = config.proportion = judgeScale(pptWidth, pptHeight);
 
         //计算容器的宽高比
-        proportion.calculateContainer = (function() {
+        proportion.calculateContainer = (function () {
 
             var pptWidth = proportion.pptWidth,
                 pptHeight = proportion.pptHeight,
                 scaleWidth = proportion.width,
                 scaleHeight = proportion.height;
 
-            return function(width, height, left, top) {
+            return function (width, height, left, top) {
 
                 width = arguments[0] ? arguments[0] : screenSize.width;
                 height = arguments[1] ? arguments[1] : screenSize.height;
@@ -198,7 +198,7 @@ Xut.config = function() {
         })();
 
         //计算元素的缩放比
-        proportion.calculateElement = function(data) {
+        proportion.calculateElement = function (data) {
             var data = _.extend({}, data)
             data.width = CEIL(data.width * proportion.width);
             data.height = CEIL(data.height * proportion.height);
@@ -211,7 +211,7 @@ Xut.config = function() {
 
     //层级关系
     _.extend(Xut, {
-        zIndexlevel: function() {
+        zIndexlevel: function () {
             return ++config.zIndexlevel;
         }
     })
@@ -231,7 +231,7 @@ Xut.config = function() {
      *              3 读酷加载电子杂志打开子文档
      *
      * *******************************************************************/
-    var iframeMode = (function() {
+    var iframeMode = (function () {
         var mode;
         if (SUbCONFIGT && DUKUCONFIG) {
             //通过读酷客户端开打子文档方式
@@ -260,14 +260,14 @@ Xut.config = function() {
 
         }
         return mode;
-    }());
+    } ());
 
 
     //读酷模式下的路径
     DUKUCONFIG && (DUKUCONFIG.path = DUKUCONFIG.path.replace('//', '/'));
 
     //除右端的"/"
-    var rtrim = function(str) {
+    var rtrim = function (str) {
         if (typeof str != 'string') return str;
         var lastIndex = str.length - 1;
         if (str.charAt(lastIndex) === '/') {
@@ -281,7 +281,7 @@ Xut.config = function() {
     // if (MMXCONFIG && MMXCONFIG.path) {
     //     MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
     // }
-    var MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i,'/').replace(/[^\/]*$/,'');
+    var MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
     if (MMXCONFIG && MMXCONFIG.path) {
         MMXCONFIGPath = rtrim(MMXCONFIG.path)
     }
@@ -293,7 +293,7 @@ Xut.config = function() {
     //3 秒秒学
     var iframeConfig = {
         //资源图片
-        resources: function() {
+        resources: function () {
             if (isIOS) {
                 switch (iframeMode) {
                     case 'iframeDuKu':
@@ -326,7 +326,7 @@ Xut.config = function() {
         },
 
         //视频路径
-        video: function() {
+        video: function () {
             if (isIOS) {
                 switch (iframeMode) {
                     case 'iframeDuKu':
@@ -359,7 +359,7 @@ Xut.config = function() {
         },
 
         //音频路径
-        audio: function() {
+        audio: function () {
             if (isIOS) {
                 switch (iframeMode) {
                     case 'iframeDuKu':
@@ -391,7 +391,7 @@ Xut.config = function() {
         },
 
         //调用插件处理
-        svg: function() {
+        svg: function () {
             if (isIOS) {
                 switch (iframeMode) {
                     case 'iframeDuKu':
@@ -430,7 +430,7 @@ Xut.config = function() {
     //杂志直接打开
     var nativeConfig = {
         //资源图片
-        resources: function() {
+        resources: function () {
             if (isIOS) {
                 return sourceUrl;
             }
@@ -449,7 +449,7 @@ Xut.config = function() {
         //视频路径
         // ios平台在缓存
         // 安卓在编译raw中
-        video: function() {
+        video: function () {
             if (isIOS) {
                 return sourceUrl;
             }
@@ -461,7 +461,7 @@ Xut.config = function() {
         //音频路径
         // ios平台在缓存
         // 安卓在缓存中
-        audio: function() {
+        audio: function () {
             if (isIOS) {
                 return sourceUrl;
             }
@@ -471,7 +471,7 @@ Xut.config = function() {
         },
 
         //读取svg路径前缀
-        svg: function() {
+        svg: function () {
             return 'www/' + sourceUrl;
         }
     }
@@ -534,7 +534,7 @@ Xut.config = function() {
             return cacheResourcesPath;
         }
         //移动端模式
-        var mobileMode = function() {
+        var mobileMode = function () {
             return GLOBALIFRAME ? iframeConfig.resources() : nativeConfig.resources();
         };
         return cacheResourcesPath = isBrowser ? pcMode() : mobileMode();
@@ -551,7 +551,7 @@ Xut.config = function() {
         if (cacheVideoPath) {
             return cacheVideoPath;
         }
-        var mobilePath = function() {
+        var mobilePath = function () {
             return GLOBALIFRAME ? iframeConfig.video() : nativeConfig.video();
         };
         return cacheVideoPath = runLoad() ? pcMode() : mobilePath();
@@ -567,7 +567,7 @@ Xut.config = function() {
             return cacheAudioPath;
         }
         //移动端
-        var mobileMode = function() {
+        var mobileMode = function () {
             return GLOBALIFRAME ? iframeConfig.audio() : nativeConfig.audio();
         };
         return cacheAudioPath = runLoad() ? pcMode() : mobileMode();
@@ -582,7 +582,7 @@ Xut.config = function() {
         if (cacheSvgPath) {
             return cacheSvgPath;
         }
-        var mobileMode = function() {
+        var mobileMode = function () {
             return GLOBALIFRAME ? iframeConfig.svg() : nativeConfig.svg();
         };
         return cacheSvgPath = isBrowser ? pcMode() : mobileMode();
@@ -590,9 +590,8 @@ Xut.config = function() {
 
 
     //打印信息
-    Xut.log = function(info, name) {
-        return
-        //  if (!config.debugMode) return;
+    Xut.log = function (info, name) {
+        if (!config.debugMode) return;
         switch (info) {
             case 'error':
                 console.error && console.error(name);
@@ -634,10 +633,9 @@ Xut.config = function() {
     })
 
 
-
-    ///////////
-    //全局模式配置 //
-    ///////////
+    /**
+     * 全局模式配置
+     */
     _.extend(config, {
 
         //支持电子在在线阅读,向服务端取数据
@@ -666,18 +664,22 @@ Xut.config = function() {
         //在不同分辨率下，按照正比缩放拼接
         //在一个可视区中，可以看到3个li拼接后的效果
         scrollPaintingMode: false,
-        
-        /**
-         * 为了测试方便  
-         * 可以直接切换到dom模式
-         */
-        onlyDomMode:false
+
+        //独立canvas模式处理
+        //为了测试方便  
+        //可以直接切换到dom模式
+        onlyDomMode: false,
+
+        //canvas的处理模式
+        //合并模式：merge
+        //单个模式：single
+        canvasProcessMode: 'merge'
     })
 
 
-    /////////
-    //初始化代码//
-    /////////
+    /**
+     * 对应的接口
+     */
     _.extend(config, {
 
         //应用路径唯一标示
@@ -685,53 +687,43 @@ Xut.config = function() {
 
         //配置图片路径地址
         //初始化资源路径
-        initResourcesPath: function() {
+        initResourcesPath: function () {
             this.pathAddress = resourcesPath();
         },
 
         //视频文件路径
-        videoPath: function() {
+        videoPath: function () {
             return videoPath();
         },
 
         //音频文件路径
-        audioPath: function() {
+        audioPath: function () {
             return audioPath();
         },
 
         //配置SVG文件路径
-        svgPath: function() {
+        svgPath: function () {
             return svgPath();
         },
-
+        
         //设备尺寸
         screenSize: screenSize,
-
         //排版模式
         layoutMode: layoutMode,
-
         //缩放比例
         proportion: proportion,
-
         isBrowser: isBrowser,
-
         //全局层级初始值
         zIndexlevel: 1000,
-
         //默认图标高度
         iconHeight: isIphone ? 32 : 44,
-
         //修正
         revised: fiexdAPI,
-
         //修正缩放比
         setProportion: setProportion,
-
         //数据库尺寸
         dbSize: 1
-
     });
 
-
     return config;
-}();
+} ();

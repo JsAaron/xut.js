@@ -16,14 +16,9 @@ if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
         }
     };
     document.addEventListener('touchstart', fixaudio, false);
-}     
+}      
 
+$(init) 
 
-$(function() {
-	//进入 
-    init()  
-}) 
-
-//更新版本号记录
-Xut.Version = 804;    
+Xut.Version = 804;
  

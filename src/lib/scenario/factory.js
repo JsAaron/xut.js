@@ -7,15 +7,15 @@ import { controll as sceneControll } from './controller'
 import { sToolbar as MainBar } from '../toolbar/sysbar'
 import { fToolbar as DeputyBar } from '../toolbar/fnbar'
 import { Bar as BookToolBar } from '../toolbar/bookbar'
- 
+
 
 //vm
-import { Manager } from '../manager/core'
- 
+import { Manager } from '../manager/manager'
+
 let config
-    
+
 //========================场景容器,工具栏创建相关================================
- 
+
 /**
  * 分解工具栏配置文件
  * @return {[type]}          [description]
@@ -26,7 +26,7 @@ function parseTooBar(toolbar, tbType, pageMode) {
         var n = Number(toolbar.pageMode);
         pageMode = _.isFinite(n) ? n : pageMode;
         if (_.isString(toolbar.tbType)) {
-            tbType = _.map(toolbar.tbType.split(','), function(num) {
+            tbType = _.map(toolbar.tbType.split(','), function (num) {
                 return Number(num);
             });
         }
@@ -73,7 +73,7 @@ function pDeputyBar(toolbar, pagetotal) {
  * @return {[type]}            [description]
  */
 function findContainer(elements, scenarioId, isMain) {
-    return function(pane, parallax) {
+    return function (pane, parallax) {
         var node;
         if (isMain) {
             node = '#' + pane;
@@ -140,22 +140,17 @@ function SceneFactory(data) {
         'container': $('#sceneContainer')
     })
 
-    //////////////
-    // 创建场景容器 //
-    //////////////
-    var complete = function() {
+    //创建主场景容器
+    this.createScenario(options, function () {
         //配置工具栏行为
         if (!Xut.IBooks.Enabled) {
             _.extend(this, this.initToolBar());
         }
-
         //构件vm对象
         this.createViewModel();
-
         //注入场景管理
         sceneControll.add(seasonId, chapterId, this);
-    }
-    this.createScenario(complete, options);
+    })
 }
 
 var sceneProto = SceneFactory.prototype;
@@ -165,7 +160,7 @@ var sceneProto = SceneFactory.prototype;
  * 创建场景
  * @return {[type]} [description]
  */
-sceneProto.createScenario = function(callback, options) {
+sceneProto.createScenario = function (options, callback) {
 
     //如果是静态文件执行期
     //支持Xut.IBooks模式
@@ -177,6 +172,7 @@ sceneProto.createScenario = function(callback, options) {
     }
 
     var elements, str, self = this;
+
     if (options.isMain) {
         str = home();
     } else {
@@ -188,7 +184,7 @@ sceneProto.createScenario = function(callback, options) {
     Xut.nextTick({
         'container': self.container,
         'content': elements
-    }, function() {
+    }, function () {
         callback.call(self);
     });
 }
@@ -213,13 +209,13 @@ sceneProto.createScenario = function(callback, options) {
  *
  * @return {[type]} [description]
  */
-sceneProto.initToolBar = function() {
+sceneProto.initToolBar = function () {
     var scenarioId = this.scenarioId;
     var pageTotal = this.pageTotal;
     var pageIndex = this.pageIndex;
     var elements = this.elements;
     var bar;
-    var findControlBar = function() {
+    var findControlBar = function () {
         return elements.find('#controlBar')
     };
 
@@ -272,7 +268,7 @@ sceneProto.initToolBar = function() {
  * 构建创建对象
  * @return {[type]} [description]
  */
-sceneProto.createViewModel = function() {
+sceneProto.createViewModel = function () {
 
     var self = this;
     var scenarioId = this.scenarioId;
@@ -282,7 +278,7 @@ sceneProto.createViewModel = function() {
     var pageMode = this.pageMode;
     var isMain = this.isMain;
     var tempfind = findContainer(elements, scenarioId, isMain)
-        //页面容器
+    //页面容器
     var scenarioPage = tempfind('pageContainer', 'scenarioPage-');
     //视差容器
     var scenarioMaster = tempfind('masterContainer', 'scenarioMaster-');
@@ -314,7 +310,7 @@ sceneProto.createViewModel = function() {
      * 用于更新页码
      * @return {[type]} [description]
      */
-    vm.$bind('pageUpdate', function(pageIndex) {
+    vm.$bind('pageUpdate', function (pageIndex) {
         isToolbar && isToolbar.updatePointer(pageIndex);
     })
 
@@ -323,7 +319,7 @@ sceneProto.createViewModel = function() {
      * 显示下一页按钮
      * @return {[type]} [description]
      */
-    vm.$bind('showNext', function() {
+    vm.$bind('showNext', function () {
         isToolbar && isToolbar.showNext();
     })
 
@@ -332,7 +328,7 @@ sceneProto.createViewModel = function() {
      * 隐藏下一页按钮
      * @return {[type]} [description]
      */
-    vm.$bind('hideNext', function() {
+    vm.$bind('hideNext', function () {
         isToolbar && isToolbar.hideNext();
     })
 
@@ -340,7 +336,7 @@ sceneProto.createViewModel = function() {
      * 显示上一页按钮
      * @return {[type]} [description]
      */
-    vm.$bind('showPrev', function() {
+    vm.$bind('showPrev', function () {
         isToolbar && isToolbar.showPrev();
     })
 
@@ -349,7 +345,7 @@ sceneProto.createViewModel = function() {
      * 隐藏上一页按钮
      * @return {[type]} [description]
      */
-    vm.$bind('hidePrev', function() {
+    vm.$bind('hidePrev', function () {
         isToolbar && isToolbar.hidePrev();
     })
 
@@ -357,7 +353,7 @@ sceneProto.createViewModel = function() {
      * 切换工具栏
      * @return {[type]} [description]
      */
-    vm.$bind('toggleToolbar', function(state, pointer) {
+    vm.$bind('toggleToolbar', function (state, pointer) {
         isToolbar && isToolbar.toggle(state, pointer);
     })
 
@@ -366,7 +362,7 @@ sceneProto.createViewModel = function() {
      * 复位工具栏
      * @return {[type]} [description]
      */
-    vm.$bind('resetToolbar', function() {
+    vm.$bind('resetToolbar', function () {
         self.sToolbar && self.sToolbar.reset();
     })
 
@@ -375,12 +371,12 @@ sceneProto.createViewModel = function() {
      * 监听创建完成
      * @return {[type]} [description]
      */
-    vm.$bind('createComplete', function(nextAction) {
-        self.complete && setTimeout(function() {
+    vm.$bind('createComplete', function (nextAction) {
+        self.complete && setTimeout(function () {
             if (isMain) {
-                self.complete(function() {
+                self.complete(function () {
                     Xut.View.HideBusy()
-                        //检测是不是有缓存加载
+                    //检测是不是有缓存加载
                     if (!checkHistory(self.history)) {
                         //指定自动运行的动作
                         nextAction && nextAction();
@@ -421,11 +417,11 @@ sceneProto.createViewModel = function() {
  * 绑定调试
  * @return {[type]} [description]
  */
-sceneProto.bindWatch = function() {
+sceneProto.bindWatch = function () {
     // for test
     if (Xut.plat.isBrowser) {
         var vm = this.vm;
-        this.testWatch = $(".xut-controlBar-pageNum").click(function() {
+        this.testWatch = $(".xut-controlBar-pageNum").click(function () {
             console.log('主场景', vm)
             console.log('主场景容器', vm.$scheduler.pageMgr.Collections)
             console.log('主场景视觉差容器', vm.$scheduler.parallaxMgr && vm.$scheduler.parallaxMgr.Collections)
@@ -446,7 +442,7 @@ sceneProto.bindWatch = function() {
  * 销毁场景对象
  * @return {[type]} [description]
  */
-sceneProto.destroy = function() {
+sceneProto.destroy = function () {
     /**
      * 桌面调试
      */
@@ -482,5 +478,5 @@ sceneProto.destroy = function() {
 
 
 export {
-    SceneFactory as sceneFactory
+SceneFactory as sceneFactory
 }
