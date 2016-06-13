@@ -270,6 +270,7 @@ function AudioManager() {
      * @return {[type]}         [description]
      */
     function loadAudio(pageId, queryId, type) {
+ 
         //找到页面对应的音频
         //类型=》页面=》指定音频Id
         var pageObj = pageBox[type][pageId][queryId];

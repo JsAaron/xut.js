@@ -1,3 +1,7 @@
+
+import {Video5} from '../component/video/video'
+
+
 var preloadVideo = {
     //播放状态
     state: false,
@@ -5,7 +9,7 @@ var preloadVideo = {
     path: window.DUKUCONFIG ? window.DUKUCONFIG.path + "duku.mp4" : 'android.resource://#packagename#/raw/duku',
 
     //加载视频
-    load: function() {
+    load: function () {
         // if (window.localStorage.getItem("videoPlayer") == 'error') {
         //       alert("error")
         //     return preloadVideo.launchApp();
@@ -15,12 +19,12 @@ var preloadVideo = {
     },
 
     //播放视频
-    play: function() {
+    play: function () {
         //延时应用加载
         Xut.Application.delayAppRun();
-        Xut.Plugin.VideoPlayer.play(function() {
+        Xut.Plugin.VideoPlayer.play(function () {
             preloadVideo.launchApp();
-        }, function() {
+        }, function () {
             //捕获出错,下次不进入了,,暂无ID号
             // window.localStorage.setItem("videoPlayer", "error")
             preloadVideo.launchApp();
@@ -28,14 +32,14 @@ var preloadVideo = {
     },
 
     //清理视频
-    closeVideo: function() {
-        Xut.Plugin.VideoPlayer.close(function() {
+    closeVideo: function () {
+        Xut.Plugin.VideoPlayer.close(function () {
             preloadVideo.launchApp();
         });
     },
 
     //加载应用
-    launchApp: function() {
+    launchApp: function () {
         this.state = false;
         Xut.Application.LaunchApp()
     }
@@ -65,12 +69,12 @@ function controller(state) {
     outLock = true;
 
     Xut.Application.Suspend({
-        dispose: function() { //停止热点动作
-            setTimeout(function() {
+        dispose: function () { //停止热点动作
+            setTimeout(function () {
                 outLock = false;
             }, 100)
         },
-        processed: function() { //退出应用
+        processed: function () { //退出应用
             state === 'back' && Xut.Application.DropApp();
         }
     });
@@ -85,7 +89,7 @@ export function bindEvent(config) {
     //存放绑定事件
     config._event = {
         //回退键
-        back: function() {
+        back: function () {
             //如果是预加载视频
             if (preloadVideo.state) {
                 preloadVideo.closeVideo()
@@ -94,7 +98,7 @@ export function bindEvent(config) {
             }
         },
         //暂停键
-        pause: function() {
+        pause: function () {
             controller('pause');
         }
     }
@@ -109,9 +113,9 @@ export function bindEvent(config) {
 export function html5Video() {
     //延时应用开始
     Xut.Application.delayAppRun();
-    var videoPlay = Xut.Video5({
+    var videoPlay = Video5({
         url: 'duku.mp4',
-        startBoot: function() {
+        startBoot: function () {
             Xut.Application.LaunchApp();
         }
     });

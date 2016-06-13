@@ -198,9 +198,16 @@ spiritAni.prototype.runAnimate = function () {
  * 销毁
  */
 spiritAni.prototype.destroy = function () {
-    if (this.stage) {
-        this.stage.destroy(this.stage.length ? true : false)
-    }
+    this.textureMask && this.textureMask.destroy(true)
+    this.texturePng && this.texturePng.destroy(true)
+    this.oldTextureMask && this.oldTextureMask.destroy(true)
+    this.oldTexturePng && this.oldTexturePng.destroy(true)
+
+    this.stage.destroy(true)
+    this.spritePng = null
+    this.spriteMask = null
+    this.canvasEl = null
+    this.imageList = null
 }
 
 export {

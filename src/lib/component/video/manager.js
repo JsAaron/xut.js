@@ -1,5 +1,5 @@
 import {
-    Html5Video
+    VideoClass
 } from './video'
 
 /*
@@ -135,7 +135,7 @@ VideoManager.prototype = {
                 playBox[pageId] = {};
             }
             //cache video object
-            playBox[pageId][activityId] = new Html5Video(data, container);
+            playBox[pageId][activityId] = new VideoClass(data, container);
 
         }
 

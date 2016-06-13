@@ -393,7 +393,7 @@ function supportAudio(fail) {
 };
 
 
-//apk的情况下
+//安卓客户端apk的情况下
 if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     html5Audio = _Media;
 } else {
@@ -412,10 +412,6 @@ if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     //     Xut.Audio = _Flash;
     // });
 }
-
-Xut.Audio = html5Audio
-
-
 
 export {
 html5Audio

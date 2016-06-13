@@ -8,17 +8,17 @@
  */
 
 var VideoPlayer = null,
-    noop = function() {},
+    noop = function () { },
 
     //检测是否支持HTML5的video播放
-    supportVideo = function() {
+    supportVideo = function () {
         var video = document.createElement('video'),
             type = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
         return !!video.canPlayType && "probably" == video.canPlayType(type);
-    }(),
+    } (),
 
     //检测是否安装了flash插件
-    supportFlash = function() {
+    supportFlash = function () {
         var i_flash = false;
 
         if (navigator.plugins) {
@@ -29,7 +29,7 @@ var VideoPlayer = null,
             }
         }
         return i_flash;
-    }();
+    } ();
 
 
 //移动端浏览器平台
@@ -77,17 +77,17 @@ function VideoClass(options, container) {
 }
 
 VideoClass.prototype = {
-    play: function() {
+    play: function () {
         //隐藏工具栏
         Xut.View.Toolbar("hide");
         this.video.play();
     },
-    stop: function() {
+    stop: function () {
         //显示工具栏
         Xut.View.Toolbar("show");
         this.video.stop();
     },
-    close: function() {
+    close: function () {
         this.video.close();
     }
 }
@@ -104,7 +104,7 @@ function WebPage(options) {
     if (options.hyperlink == 2) {
         //跳转到app市场
         window.open(pageUrl)
-            //数据统计
+        //数据统计
         $.get('http://www.appcarrier.cn/index.php/adplugin/recordads?aid=16&esbId=ios')
     } else {
 
@@ -170,7 +170,7 @@ function webView(options) {
         //打开一个网页的时候，需要关闭其他已经打开过的网页
         Xut.Plugin.WebView.close();
         Xut.VideoManager.openWebView = false;
-        setTimeout(function() {
+        setTimeout(function () {
             Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
             Xut.VideoManager.openWebView = true;
         }, 500);
@@ -208,9 +208,9 @@ function _Media(options) {
         //var calculate = Xut.config.proportion.calculateContainer();
         //top += Math.ceil(calculate.top);
         //left += Math.ceil(calculate.left);
-        Xut.Plugin.VideoPlayer.play(function() {
+        Xut.Plugin.VideoPlayer.play(function () {
             //成功回调
-        }, function() {
+        }, function () {
             //失败回调
         }, Xut.config.videoPath() + url, 1, left, top, height, width);
     }
@@ -372,7 +372,7 @@ function VideoJS(options) {
     videojs.options.flash.swf = "lib/data/video-js.swf";
 
 
-    var clear = function() {
+    var clear = function () {
         //结束后清理自己
         Xut.VideoManager.removeVideo(options.pageId);
     }
@@ -419,24 +419,24 @@ function VideoJS(options) {
             //是否显示视频时长
             durationDisplay: false
         }
-    }, function() {
+    }, function () {
         //可以播放时提升层级，防止闪现
-        this.on('canplay', function() {
+        this.on('canplay', function () {
             wrap.style.zIndex = zIndex;
         });
 
         //播放完毕后自动关闭
-        this.on('ended', function() {
+        this.on('ended', function () {
             //结束后清理自己
             clear()
         });
 
-        this.on('error', function() {
+        this.on('error', function () {
             clear()
         });
 
         //因为没有关闭按钮,又不想自己做,就把全屏变成关闭好了.
-        this.on("touchend mouseup", function(e) {
+        this.on("touchend mouseup", function (e) {
             var className = e.target.className.toLowerCase();
             if (-1 != className.indexOf('vjs-fullscreen-control')) {
                 clear()
@@ -454,11 +454,11 @@ function VideoJS(options) {
     api = {
         play: noop,
 
-        stop: function() {
+        stop: function () {
             player.stop();
         },
 
-        close: function() {
+        close: function () {
             player && player.dispose();
             player = null;
         }
@@ -467,12 +467,7 @@ function VideoJS(options) {
     return api;
 }
 
-Xut.Video5 = Video5;
-
-Xut.Video = VideoClass;
-
-
 export {
-    VideoClass as Html5Video
-
+Video5,
+VideoClass
 }
