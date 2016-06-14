@@ -7,8 +7,9 @@ import { init } from './init/index'
 Xut.fix = Xut.fix || {};
 
 //移动端浏览器平台
-if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
-    var fixaudio = function() {
+if (Xut.plat.isBrowser
+    && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
+    var fixaudio = function () {
         if (!Xut.fix.audio) {
             Xut.fix.audio = new Audio();
             Xut.fix.video = document.createElement("Video");
@@ -16,9 +17,8 @@ if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
         }
     };
     document.addEventListener('touchstart', fixaudio, false);
-}      
+}
 
-$(init) 
+$(init)
 
-Xut.Version = 804;
- 
+Xut.Version = 805

@@ -1,17 +1,11 @@
 //预初始化
-import {
-    AudioManager
-} from '../component/audio/manager'
-import {
-    VideoManager
-} from '../component/video/manager'
+import {AudioManager} from '../component/audio/manager'
+import {VideoManager} from '../component/video/manager'
 import {
     loader,
     setRootfont
 } from '../util/index'
-import {
-    nextTask
-} from './data'
+import {nextTask} from './data'
 import {
     loadVideo,
     html5Video,
@@ -31,7 +25,7 @@ export function init() {
     //如果不是读库模式
     //播放HTML5视频
     //在IOS
-    if (! window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
+    if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
         html5Video();
     }
 
@@ -51,7 +45,7 @@ export function init() {
             //如果不是iframe加载,则创建空数据库
             window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
             //等待硬件加载完毕
-            document.addEventListener("deviceready", function() {
+            document.addEventListener("deviceready", function () {
                 creatDatabase(config)
             }, false);
         }
@@ -74,21 +68,21 @@ function creatDatabase(config) {
         //预加载处理视频
         //妙妙学不加载视频
         //读库不加载视频
-        if (!window.MMXCONFIG && ! window.DUKUCONFIG) {
+        if (!window.MMXCONFIG && !window.DUKUCONFIG) {
             loadVideo();
         }
 
         //不是子文档指定绑定按键
         if (!window.SUbCONFIGT) {
-            Xut.Application.AddEventListener = function() {
+            Xut.Application.AddEventListener = function () {
                 window.GLOBALCONTEXT.document.addEventListener("backbutton", config._event.back, false);
                 window.GLOBALCONTEXT.document.addEventListener("pause", config._event.pause, false);
             }
         }
     }
 
-    if ( window.DUKUCONFIG) {
-        PMS.bind("MagazineExit", function() {
+    if (window.DUKUCONFIG) {
+        PMS.bind("MagazineExit", function () {
             PMS.unbind();
             Xut.Application.DropApp();
         }, "*")
@@ -97,7 +91,7 @@ function creatDatabase(config) {
 
 
     //拷贝数据库
-    Xut.Plugin.XXTEbookInit.startup(config.dbName, loadApp, function() {});
+    Xut.Plugin.XXTEbookInit.startup(config.dbName, loadApp, function () { });
 };
 
 
@@ -130,7 +124,7 @@ function loadApp(config) {
     }
 
     //动态加载脚本
-    loader.load(cssArr, function() {
+    loader.load(cssArr, function () {
         //修正全局字体
         setRootfont();
         nextTask();

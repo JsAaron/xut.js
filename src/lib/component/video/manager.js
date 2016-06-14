@@ -25,19 +25,19 @@ VideoManager.prototype = {
     //
 
     //自动播放
-    autoPlay: function(pageId, activityId, container) {
+    autoPlay: function (pageId, activityId, container) {
         this.initVideo.apply(this, arguments);
     },
 
     //手动播放
-    trigger: function(pageId, activityId, container) {
+    trigger: function (pageId, activityId, container) {
         this.initVideo.apply(this, arguments);
     },
 
     //=================视频调用===========================
 
     //触发视频
-    initVideo: function(pageId, activityId, container) {
+    initVideo: function (pageId, activityId, container) {
         //解析数据
         this.parseVideo(pageId, activityId);
         //调用播放
@@ -49,7 +49,7 @@ VideoManager.prototype = {
     //处理重复数据
     // 1:pageBox能找到对应的 videoId
     // 2:重新查询数据
-    parseVideo: function(pageId, activityId) {
+    parseVideo: function (pageId, activityId) {
         //复重
         if (this.checkRepeat(pageId, activityId)) {
             return;
@@ -60,7 +60,7 @@ VideoManager.prototype = {
     },
 
     //检测数据是否存在
-    checkRepeat: function(pageId, activityId) {
+    checkRepeat: function (pageId, activityId) {
         var chapterData = this.pageBox[pageId];
         //如果能在pageBox找到对应的数据
         if (chapterData && chapterData[activityId]) {
@@ -70,7 +70,7 @@ VideoManager.prototype = {
     },
 
     //配置视频结构
-    deployVideo: function(data, pageId, activityId) {
+    deployVideo: function (data, pageId, activityId) {
         var config = Xut.config
         var proportion = config.proportion
         var screenSize = config.screenSize
@@ -83,11 +83,23 @@ VideoManager.prototype = {
         //如果是安卓平台，视频插件去的分辨率
         //所以这里要把 可以区尺寸，转成分辨率
         if (Xut.plat.isAndroid) {
-            var pixelRatio = window.devicePixelRatio
-            width = width * pixelRatio
-            height = height * pixelRatio
-            left = left * pixelRatio
-            top = top * pixelRatio
+            //读库强制全屏
+            if (window.DUKUCONFIG) {
+                //获取分辨率
+                var screen = window.screen
+                width = screen.width
+                height = screen.height
+                top = 0
+                left = 0
+            } else {
+                //正常的是按照屏幕尺寸的
+                //这是安卓插件问题,按照分辨率计算
+                var pixelRatio = window.devicePixelRatio
+                width = width * pixelRatio
+                height = height * pixelRatio
+                left = left * pixelRatio
+                top = top * pixelRatio
+            }
         }
 
         var videoInfo = {
@@ -116,7 +128,7 @@ VideoManager.prototype = {
     //=================视频动作处理============================
 
     //加载视频
-    loadVideo: function(pageId, activityId, container) {
+    loadVideo: function (pageId, activityId, container) {
         var playBox = this.playBox,
             data = this.pageBox[pageId][activityId];
 
@@ -142,12 +154,12 @@ VideoManager.prototype = {
     },
 
     //播放视频之前检查要停的视频
-    beforePlayVideo: function(pageId, activityId) {
+    beforePlayVideo: function (pageId, activityId) {
 
     },
 
     //清理移除页的视频
-    removeVideo: function(pageId) {
+    removeVideo: function (pageId) {
         var playBox = this.playBox,
             pageBox = this.pageBox;
 
@@ -165,7 +177,7 @@ VideoManager.prototype = {
     },
 
     //清理全部视频
-    clearVideo: function() {
+    clearVideo: function () {
         var playBox = this.playBox,
             flag = false; //记录是否处理过销毁状态
 
@@ -183,29 +195,20 @@ VideoManager.prototype = {
 
 
     //离开页面
-    leavePage: function(pageId) {
+    leavePage: function (pageId) {
         var playBox = this.playBox;
         if (playBox && playBox[pageId]) {
             for (var activityId in playBox[pageId]) {
                 playBox[pageId][activityId].stop();
             }
         }
-    },
-
-    //显示按钮
-    showIconFlag: function(activityId) {
-
-    },
-
-    //隐藏按钮
-    hideIconFlag: function(activityId) {
-
     }
+
 };
 
 Xut.VideoManager = new VideoManager;
 
 
 export {
-    VideoManager
+VideoManager
 }

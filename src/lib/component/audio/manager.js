@@ -31,7 +31,7 @@
  */
 
 import {
-    parseJSON,hash
+    parseJSON, hash
 }
 from '../../util/index'
 
@@ -113,7 +113,7 @@ function AudioManager() {
             }
 
             //找到对应的节点
-            _.each(subtitles, function(data) {
+            _.each(subtitles, function (data) {
                 //'Content_0_1' 规则 类型_页码（0开始）_id
                 if (!parentDoms[data.id]) {
                     dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
@@ -270,7 +270,7 @@ function AudioManager() {
      * @return {[type]}         [description]
      */
     function loadAudio(pageId, queryId, type) {
- 
+
         //找到页面对应的音频
         //类型=》页面=》指定音频Id
         var pageObj = pageBox[type][pageId][queryId];
@@ -294,7 +294,7 @@ function AudioManager() {
         }
 
         //播放完成处理
-        pageObj.innerCallback = function(audio) {
+        pageObj.innerCallback = function (audio) {
             if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
                 audio.end();
                 delete playBox[type][pageId][queryId];
@@ -365,32 +365,32 @@ function AudioManager() {
         ///////////////////
 
         //自动播放触发接口
-        autoPlay: function(pageId, activityId, actionData) {
+        autoPlay: function (pageId, activityId, actionData) {
             deployAudio(pageId, activityId, ACTIVIT, actionData);
             loadAudio(pageId, activityId, ACTIVIT);
         },
 
         //手动触发
-        trigger: function(pageId, activityId, actionData) {
+        trigger: function (pageId, activityId, actionData) {
             deployAudio(pageId, activityId, ACTIVIT, actionData);
             loadTiggerAudio(pageId, activityId, ACTIVIT);
         },
 
 
         //动画音频触发接口
-        contentAudio: function(pageId, audioId) {
+        contentAudio: function (pageId, audioId) {
             deployAudio(pageId, audioId, ANIMATE);
             loadAudio(pageId, audioId, ANIMATE);
         },
 
         //节音频触发接口
-        seasonAudio: function(seasonAudioId, audioId) {
+        seasonAudio: function (seasonAudioId, audioId) {
             deployAudio(seasonAudioId, audioId, SEASON);
             loadAudio(seasonAudioId, audioId, SEASON);
         },
 
         //挂起音频
-        hangUpAudio: function() {
+        hangUpAudio: function () {
             var t, p, a;
             for (t in playBox) {
                 for (p in playBox[t]) {
@@ -402,7 +402,7 @@ function AudioManager() {
         },
 
         //销毁动画音频
-        clearContentAudio: function(pageId) {
+        clearContentAudio: function (pageId) {
             if (!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
                 return false;
             }
@@ -416,7 +416,7 @@ function AudioManager() {
         },
 
         //清理音频
-        clearAudio: function(pageId) {
+        clearAudio: function (pageId) {
             if (pageId) { //如果只跳槽关闭动画音频
                 out.clearContentAudio(pageId);
             } else {
@@ -434,5 +434,5 @@ function AudioManager() {
 Xut.AudioManager = AudioManager();
 
 export {
-    AudioManager
+AudioManager
 }

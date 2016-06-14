@@ -198,13 +198,18 @@ function webView(options) {
  * @return {[type]}         [description]
  */
 function _Media(options) {
-    var url = window.MMXCONFIG ? options.url : options.url.substring(0, options.url.lastIndexOf('.')),
-        width = options.width,
-        height = options.height,
-        top = options.top || 0,
-        left = options.left || 0;
+    //如果是读库或者妙妙学
+    var url = (window.MMXCONFIG || window.DUKUCONFIG)
+        ? options.url
+        //如果是纯apk模式
+        : options.url.substring(0, options.url.lastIndexOf('.'))
 
-    function play() {
+    var width = options.width
+    var height = options.height
+    var top = options.top || 0
+    var left = options.left || 0
+
+    var play = function () {
         //var calculate = Xut.config.proportion.calculateContainer();
         //top += Math.ceil(calculate.top);
         //left += Math.ceil(calculate.left);
@@ -215,7 +220,7 @@ function _Media(options) {
         }, Xut.config.videoPath() + url, 1, left, top, height, width);
     }
 
-    function close() {
+    var close = function () {
         Xut.Plugin.VideoPlayer.close();
     }
 
