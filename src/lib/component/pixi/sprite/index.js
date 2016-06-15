@@ -5,62 +5,54 @@
  * @return {[type]}         [description]
  */
 
-import { Factory } from '../core/factory'
-
+import { Rule } from '../core/rule'
 //普通精灵动画
 import { Sprite as OrdinarySprite } from './sprite'
 
+   
 /**
  * 精灵动画
- * @param  {[type]} data          [description]
- * @param  {[type]} canvasRelated [description]
- * @return {[type]}               [description]
  */
-var Sprite = Factory.extend({
+class Sprite extends Rule {
 
-    /**
-     * 初始化
-     * @param  {[type]} data          [description]
-     * @param  {[type]} canvasRelated [description]
-     * @return {[type]}               [description]
-     */
-    constructor: function (successCallback, failCallback, options) {
+    constructor (options) {
+        super()
         this.pageIndex = options.pageIndex
         //普通精灵动画
-        this.sprite = new OrdinarySprite(options, successCallback)
-    },
-
+        this.sprite = new OrdinarySprite(options, this.successCallback)
+    }
+ 
     /**
      * 运行动画
      * @return {[type]} [description]
      */
-    play: function (addQueue) {
+    play (addQueue) {
         var sprite = this.sprite
         //绘制页面
         this.uuid = addQueue(this.pageIndex, function () {
              sprite.render()
         })
-    },
-
+    }
+ 
     /**
      * 停止动画
      * stopQueue 停止队列
      * @return {[type]} [description]
      */
-    stop: function (stopQueue) {
+    stop (stopQueue) {
         stopQueue(this.pageIndex, this.uuid)
-    },
+    }
 
     /**
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroy: function (destroyQueue) {
+    destroy (destroyQueue) {
         this.sprite.destroy()
         destroyQueue(this.pageIndex, this.uuid)
     }
+}
 
-})
 
 
 export {

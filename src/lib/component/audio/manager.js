@@ -35,7 +35,7 @@ import {
 }
 from '../../util/index'
 
-import {html5Audio} from './audio'
+import {audioPlayer} from './audio'
 
 function AudioManager() {
 
@@ -301,9 +301,8 @@ function AudioManager() {
             }
         }
 
-
         //new播放对象
-        var newObj = seAudio || new html5Audio(pageObj, tempDoms);
+        var newObj = seAudio || new audioPlayer(pageObj, tempDoms);
         newObj.play();
 
         //存入播放对象池

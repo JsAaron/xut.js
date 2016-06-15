@@ -145,7 +145,6 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
         //容器不需要重复创建
         //精灵动画
         if (actionTypes.spiritId) {
-            
             if (initstate) {
                 createPixiPPT()
             } else {
@@ -163,7 +162,6 @@ animProto.init = function (id, context, rootNode, chapterId, parameter, pageType
                 })
                 setState()
             }
-            
         }
 
         //特殊高级动画

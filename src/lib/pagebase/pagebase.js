@@ -22,15 +22,28 @@
 
 
 //原型接口
-import { init } from './proto/init'
-import { threadExternal } from './proto/thread'
-import { dataExternal } from './proto/data'
-import { destroy } from './proto/destroy'
+import {
+    init
+} from './proto/init'
+import {
+    threadExternal
+} from './proto/thread'
+import {
+    dataExternal
+} from './proto/data'
+import {
+    destroy
+} from './proto/destroy'
+
+
+export class Pagebase {
+    constructor(options) {
+        this.initTasks(options)
+    }
+}
+
+var baseProto = Pagebase.prototype
  
-
-function PageBase() {};
-var baseProto = PageBase.prototype
-
 //初始化
 init(baseProto)
 //多线程接口
@@ -41,4 +54,3 @@ dataExternal(baseProto)
 destroy(baseProto)
 
 
-export { PageBase }

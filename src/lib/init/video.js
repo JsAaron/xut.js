@@ -3,8 +3,10 @@ import {Video5} from '../component/video/video'
 
 
 var preloadVideo = {
+
     //播放状态
     state: false,
+
     //地址
     path: window.DUKUCONFIG ? window.DUKUCONFIG.path + "duku.mp4" : 'android.resource://#packagename#/raw/duku',
 
@@ -45,63 +47,26 @@ var preloadVideo = {
     }
 }
 
-export function loadVideo() {
+
+/**
+ * 播放视频插件
+ */
+export function playPlugVideo() {
     preloadVideo.load();
 }
 
-
-/**************
- * 物理按键处理
- **************/
-
-//退出加锁,防止过快点击
-var outLock = false;
-
-//回退按钮状态控制器
-function controller(state) {
-    //如果是子文档处理
-    if (Xut.isRunSubDoc) {
-        //通过Action动作激活的,需要到Action类中处理
-        Xut.publish('subdoc:dropApp');
-        return;
-    }
-    //正常逻辑
-    outLock = true;
-
-    Xut.Application.Suspend({
-        dispose: function () { //停止热点动作
-            setTimeout(function () {
-                outLock = false;
-            }, 100)
-        },
-        processed: function () { //退出应用
-            state === 'back' && Xut.Application.DropApp();
-        }
-    });
+/**
+ * 获取插件视频状态
+ */
+export function getPlugVideoState() {
+    return preloadVideo.state
 }
 
 /**
- * 绑定控制案例事件
- * @param  {[type]} config [description]
- * @return {[type]}        [description]
+ * 关闭插件视频
  */
-export function bindEvent(config) {
-    //存放绑定事件
-    config._event = {
-        //回退键
-        back: function () {
-            //如果是预加载视频
-            if (preloadVideo.state) {
-                preloadVideo.closeVideo()
-            } else {
-                controller('back');
-            }
-        },
-        //暂停键
-        pause: function () {
-            controller('pause');
-        }
-    }
+export function closePlugVideo() {
+    preloadVideo.closeVideo()
 }
 
 
@@ -110,7 +75,7 @@ export function bindEvent(config) {
  *  创建播放器
  *  IOS，PC端执行
  */
-export function html5Video() {
+export function playHtml5Video() {
     //延时应用开始
     Xut.Application.delayAppRun();
     var videoPlay = Video5({

@@ -3,52 +3,50 @@
  * @return {[type]} [description]
  */
 
-export function Abstract() {}
-
-
-Abstract.prototype = {
+export class Abstract {
+    
     /**
      * 创建页面合集
      * @return {[type]} [description]
      */
-    abstractCreateCollection: function() {
+    abstractCreateCollection() {
         this.Collections = {}
-    },
+    }
 
     /**
      * 增加合集管理
      */
-    abstractAddCollection: function(pageIndex, pageObj) {
+    abstractAddCollection(pageIndex, pageObj) {
         this.Collections[pageIndex] = pageObj;
-    },
- 
+    }
+
     /**
      * 得到页面合集
      * @return {[type]} [description]
      */
-    abstractGetCollection: function() {
+    abstractGetCollection() {
         return this.Collections;
-    },
+    }
 
     /**
      * 删除合集管理
      * @return {[type]} [description]
      */
-    abstractRemoveCollection: function(pageIndex) {
+    abstractRemoveCollection(pageIndex) {
         delete this.Collections[pageIndex];
-    },
+    }
 
     /**
      * 销毁合集
      * @return {[type]} [description]
      */
-    abstractDestroyCollection: function() {
+    abstractDestroyCollection() {
         var k, Collections = this.Collections;
         for (k in Collections) {
             Collections[k].baseDestroy();
         }
         this.Collections = null;
-    },
+    }
 
     /**
      * 找到页面对象
@@ -56,7 +54,7 @@ Abstract.prototype = {
      * 2.母版通过母版Id索引
      * @return {[type]} [description]
      */
-    abstractGetPageObj: function(pageIndex, pageType) {
+    abstractGetPageObj(pageIndex, pageType) {
         pageType = pageType || this.pageType;
         //模板传递的可能不是页码
         if (pageType === 'master') {
@@ -65,13 +63,13 @@ Abstract.prototype = {
             }
         }
         return this.Collections[pageIndex];
-    },
+    }
 
     /**
      * 合并处理
      * @return {[type]} [description]
      */
-    abstractAssistPocess: function(pageIndex, callback) {
+    abstractAssistPocess(pageIndex, callback) {
         var pageObj;
         if (pageObj = this.abstractGetPageObj(pageIndex, this.pageType)) {
             if (callback) {
@@ -80,7 +78,7 @@ Abstract.prototype = {
                 return pageObj;
             }
         }
-    },
+    }
 
     /**
      * 获取页面容器ID
@@ -88,15 +86,15 @@ Abstract.prototype = {
      * masterID
      * @return {[type]} [description]
      */
-    abstractGetPageId: function(pageIndex, pageType) {
+    abstractGetPageId(pageIndex, pageType) {
         var key = pageType === 'page' ? '_id' : 'pptMaster'
         return this.abstractGetPageData(pageIndex, key, pageType)
-    },
+    }
 
     /**
      * 获取页面数据
      */
-    abstractGetPageData: function(pageIndex, key, pageType) {
+    abstractGetPageData(pageIndex, key, pageType) {
         var pageObj;
         //如果传递key是 pageType
         if (!pageType && key == 'page' || key == 'master') {
@@ -106,16 +104,16 @@ Abstract.prototype = {
         if (pageObj = this.abstractGetPageObj(pageIndex, pageType)) {
             return key ? pageObj.chapterDas[key] : pageObj.chapterDas;
         }
-    },
+    }
 
     /**
      * 得到页面的nodes数据
      * @param  {[type]} pageIndex [description]
      * @return {[type]}           [description]
      */
-    abstractGetPageNode: function(pageIndex, pageType) {
+    abstractGetPageNode(pageIndex, pageType) {
         return this.abstractGetPageData(pageIndex, 'nodes', pageType);
-    },
+    }
 
 
     //***************************************************************
@@ -123,12 +121,13 @@ Abstract.prototype = {
     //  执行辅助对象事件
     //
     //***************************************************************
-    abstractAssistAppoint: function(activityId, currIndex, outCallBack, actionName) {
+    abstractAssistAppoint(activityId, currIndex, outCallBack, actionName) {
         var pageObj;
         if (pageObj = this.abstractGetPageObj(currIndex)) {
             return pageObj.baseAssistRun(activityId, outCallBack, actionName);
         }
     }
+
 
 
 }

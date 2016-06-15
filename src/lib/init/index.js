@@ -7,11 +7,11 @@ import {
 } from '../util/index'
 import {nextTask} from './data'
 import {
-    loadVideo,
-    html5Video,
-    bindEvent
+    playPlugVideo,
+    playHtml5Video
 }
-from './initprocess'
+from './video'
+import {bindKeyEvent} from './keyevent'
 
 
 export function init() {
@@ -20,13 +20,13 @@ export function init() {
     var isBrowser = config.isBrowser;
 
     //绑定键盘事件
-    bindEvent(config)
+    bindKeyEvent(config)
 
     //如果不是读库模式
     //播放HTML5视频
     //在IOS
     if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
-        html5Video();
+        playHtml5Video();
     }
 
     //Ifarme嵌套处理
@@ -69,7 +69,7 @@ function creatDatabase(config) {
         //妙妙学不加载视频
         //读库不加载视频
         if (!window.MMXCONFIG && !window.DUKUCONFIG) {
-            loadVideo();
+            playPlugVideo();
         }
 
         //不是子文档指定绑定按键

@@ -6,7 +6,7 @@ import {
 }
 from './event'
 //音频
-import {html5Audio} from '../../audio/audio'
+import {audioPlayer} from '../../audio/audio'
 //pixi事件
 import { bindEvents as bindPixiEvents } from '../../pixi/event'
 
@@ -138,7 +138,7 @@ export function extendEvent(activitProto) {
             if (behaviorSound = feedbackBehavior.behaviorSound) {
 
                 var createAuido = function () {
-                    return new html5Audio({
+                    return new audioPlayer({
                         url: behaviorSound,
                         trackId: 9999,
                         complete: function () {

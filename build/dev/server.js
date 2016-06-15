@@ -31,7 +31,9 @@ var conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
 });
 
+
 fsextra.removeSync(conf.assetsRoot)
+fsextra.mkdirSync(conf.assetsRoot);
 
 var webpackConfig = require('./webpack.dev.conf')
 
@@ -101,7 +103,7 @@ app.use('/content', express.static('src/content'));
 
 
 if (config.dev.debug.launch) {
-    
+
     /**
      * 监控文件变化
      * 打包

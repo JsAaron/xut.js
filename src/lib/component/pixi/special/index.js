@@ -6,8 +6,8 @@
  */
 
 import {
-    Factory
-} from '../core/factory'
+    Rule
+} from '../core/rule'
 import {
     parseJSON
 } from '../../../util/index'
@@ -39,15 +39,12 @@ function getResources(data) {
     return option;
 }
 
-var specialSprite = Factory.extend({
 
-    /**
-     * 初始化
-     * @param  {[type]} data          [description]
-     * @param  {[type]} canvasRelated [description]
-     * @return {[type]}               [description]
-     */
-    constructor: function (successCallback, failCallback, options) {
+
+class specialSprite extends Rule {
+
+    constructor(options) {
+        super()
 
         this.data = options.data;
         this.renderer = options.renderer
@@ -56,11 +53,8 @@ var specialSprite = Factory.extend({
         //id标示
         //可以用来过滤失败的pixi对象
         this.contentId = this.data._id;
-
         this.option = getResources(this.data);
-
         var spiritList = this.option.spiritList;
-
         this.sprObjs = [];
 
         for (var i = 0; i < spiritList.length; i++) {
@@ -75,9 +69,9 @@ var specialSprite = Factory.extend({
         this.animState = false;
         this.first = true;
 
-        successCallback(this.contentId);
+        this.successCallback(this.contentId);
 
-    },
+    }
 
     /**
      * 运行动画
@@ -85,15 +79,15 @@ var specialSprite = Factory.extend({
      * @return {[type]} [description]
      * 1000 / (obj.FPS || 10)
      */
-    play: function (addQueue) {
+    play(addQueue) {
         var self = this
         var renderer = self.renderer
-        this.uuid = addQueue(this.pageIndex, function () {
-            _.each(self.sprObjs, function (obj) {
+        this.uuid = addQueue(this.pageIndex, function() {
+            _.each(self.sprObjs, function(obj) {
                 //防止内存溢出
                 //停止后不能再运行了
                 if (!obj.timer) {
-                    obj.timer = setTimeout(function () {
+                    obj.timer = setTimeout(function() {
                         //在定时器事件内正好删除了引用
                         //必须判断状态
                         if (self.action == 'play') {
@@ -106,34 +100,39 @@ var specialSprite = Factory.extend({
                 }
             })
         })
-    },
+    }
 
     /**
      * 销毁动画
      * stopQueue 销毁队列
      * @return {[type]} [description]
      */
-    stop: function (stopQueue) {
+    stop(stopQueue) {
         stopQueue(this.pageIndex, this.uuid)
-        _.each(self.sprObjs, function (obj) {
+        _.each(self.sprObjs, function(obj) {
             obj.timer && clearTimeout(obj.timer)
         })
-    },
+    }
 
 
     /**
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroy: function (destroyQueue) {
+    destroy(destroyQueue) {
         destroyQueue(this.pageIndex, this.uuid)
-        _.each(this.sprObjs, function (obj) {
+        _.each(this.sprObjs, function(obj) {
             obj.destroy();
         })
     }
-})
+
+
+}
+
+
+
 
 
 export {
-specialSprite
+    specialSprite
 }
