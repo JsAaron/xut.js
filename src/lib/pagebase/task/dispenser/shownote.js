@@ -1,5 +1,5 @@
 
-import { ShowNote as ShowNoteClass } from '../../../component/ShowNote'
+import { ShowNote as ShowNoteClass } from '../../../component/note/index'
 
 let ShowNote = {
 

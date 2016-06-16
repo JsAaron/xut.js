@@ -9,7 +9,7 @@
 let ArrayProto = Array.prototype
 let nativeIndexOf = ArrayProto.indexOf
 let slice = ArrayProto.slice
-let _indexOf = function(array, needle) {
+let _indexOf = (array, needle) => {
     var i, l;
     if (nativeIndexOf && array.indexOf === nativeIndexOf) {
         return array.indexOf(needle);

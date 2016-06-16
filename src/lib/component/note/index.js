@@ -1,4 +1,4 @@
-import { Iscroll } from './content/iscroll'
+import { Iscroll } from '../content/iscroll'
 
 export class ShowNote {
 

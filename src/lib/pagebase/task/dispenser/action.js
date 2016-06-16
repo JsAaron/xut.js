@@ -4,7 +4,7 @@
 // 2. 打开系统应用程序
 //
 
-import { ActionClass } from '../../../component/action'
+import { ActionClass } from '../../../component/action/index'
 
 
 let Action = {
@@ -16,7 +16,7 @@ let Action = {
             height = activityData.scaleHeight,
             top = activityData.scaleTop,
             left = activityData.scaleLeft;
-            
+
         var md5
 
         //热点背景图

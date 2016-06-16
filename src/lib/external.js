@@ -47,7 +47,7 @@ import { suspendHandles, promptMessage } from './dispatcher'
 import { loadScene } from './init/scene'
 
 //主场景工厂方法
-import { sceneFactory } from './scenario/factory'
+import { SceneFactory } from './scenario/factory'
 
 
 var config = Xut.config,
@@ -387,7 +387,7 @@ portExtend(View, {
             //是否主场景
             data.isMain = true;
         }
-        new sceneFactory(data);
+        new SceneFactory(data);
 
     }
 })

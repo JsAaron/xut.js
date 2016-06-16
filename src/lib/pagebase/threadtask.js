@@ -11,14 +11,14 @@ import { TaskContainer, TaskBackground, TaskContents, TaskComponents } from './t
 
 
 //更新数据缓存
-var updataCache = function (pid, callback) {
-    var fn,
+let updataCache = function(pid, callback) {
+    let fn,
         base = this,
         pageType = base.pageType;
 
     //缓存数据
-    var addCacheDas = function (namespace, data) {
-        var key;
+    let addCacheDas = (namespace, data) => {
+        let key;
         if (!base.dataCache[namespace]) {
             base.dataCache[namespace] = data;
         } else {
@@ -29,7 +29,7 @@ var updataCache = function (pid, callback) {
     }
 
     //增加数据缓存
-    var addCache = function (data, activitys, autoRunDas) {
+    let addCache = (data, activitys, autoRunDas) => {
         addCacheDas(base.pageType, data); //挂载页面容器数据
         addCacheDas('activitys', activitys); //挂载activitys数据
         addCacheDas('autoRunDas', autoRunDas); //挂载自动运行数据
@@ -39,7 +39,7 @@ var updataCache = function (pid, callback) {
         'pageIndex': pid,
         'pageData': base.chapterDas,
         'pptMaster': base.pptMaster
-    }, function (data, activitys, autoRunDas) {
+    }, function(data, activitys, autoRunDas) {
         addCache.apply(addCache, arguments)
         callback(data);
     })
@@ -54,12 +54,12 @@ var updataCache = function (pid, callback) {
  * 4 等待之后自动创建或者后台空闲创建之后的任务
  * @return {[type]} [description]
  */
-var assignedTasks = {
+let assignedTasks = {
 
-    'Container': function (taskCallback, base) {
+    'Container': function(taskCallback, base) {
         //同步数据
-        updataCache.call(base, [base.pid], function () {
-            var pageData = base.baseData();
+        updataCache.call(base, [base.pid], () => {
+            let pageData = base.baseData();
             if (pageData.parameter) {
                 // contentMode 分为  0 或者 1
                 // 1 是dom模式
@@ -69,7 +69,7 @@ var assignedTasks = {
                 // 针对每一个content中的parameter写入 contentMode 值为 1
                 // 如果是canvas模式的时候，同时也是能够存在dom模式是
                 try {
-                    var parameter = JSON.parse(pageData.parameter);
+                    let parameter = JSON.parse(pageData.parameter);
                     if (parameter && parameter.contentMode && parameter.contentMode == 1) {
                         //非强制dom模式
                         if (!Xut.config.onlyDomMode) {
@@ -107,7 +107,7 @@ var assignedTasks = {
      *    1 构建数据结构 suspendCallback
      *    2 执行innerhtml构建完毕 successCallback
      */
-    'Background': function (taskCallback, base) {
+    'Background': function(taskCallback, base) {
 
         if (base.checkInstanceTasks('background')) {
             return;
@@ -115,7 +115,7 @@ var assignedTasks = {
 
         var data = base.baseData(base.pid),
             //构建中断回调
-            suspendCallback = function (innerNextTasks, innerSuspendTasks) {
+            suspendCallback = (innerNextTasks, innerSuspendTasks) => {
                 base.nextTasks({
                     'taskName': '内部background',
                     'outSuspendTasks': innerSuspendTasks,
@@ -123,7 +123,7 @@ var assignedTasks = {
                 });
             },
             //获取数据成功回调
-            successCallback = function () {
+            successCallback = () => {
                 taskCallback();
             };
 
@@ -134,7 +134,7 @@ var assignedTasks = {
      * 分配Components构建任务
      * @return {[type]} [description]
      */
-    'Components': function (taskCallback, base) {
+    'Components': function(taskCallback, base) {
 
         if (base.checkInstanceTasks('components')) {
             return;
@@ -143,7 +143,7 @@ var assignedTasks = {
         var chapterDas = base.chapterDas,
             baseData = base.baseData(),
             //构建中断回调
-            suspendCallback = function (innerNextTasks, innerSuspendTasks) {
+            suspendCallback = (innerNextTasks, innerSuspendTasks) => {
                 base.nextTasks({
                     'taskName': '内部widgets',
                     'outSuspendTasks': innerSuspendTasks,
@@ -151,7 +151,7 @@ var assignedTasks = {
                 });
             },
             //获取数据成功回调
-            successCallback = function () {
+            successCallback = function() {
                 taskCallback();
             };
 
@@ -172,7 +172,7 @@ var assignedTasks = {
      * 分配contetns构建任务
      * @return {[type]} [description]
      */
-    'Contetns': function (taskCallback, base) {
+    'Contetns': function(taskCallback, base) {
 
         //通过content数据库为空处理
         if (Xut.data.preventContent) {
@@ -197,7 +197,7 @@ var assignedTasks = {
             // suspendCallback          : function (taskName, innerNextTasks, innerSuspendTasks) {
             pageBaseHooks = _.extend({}, {
                 //构建中断回调
-                suspend: function (taskName, innerNextTasks, innerSuspendTasks) {
+                suspend: function(taskName, innerNextTasks, innerSuspendTasks) {
                     //如果是当前页面构建,允许打断一次
                     var interrupt
                     if (base.isAutoRun && taskName === 'strAfter') {
@@ -211,7 +211,7 @@ var assignedTasks = {
                     });
                 },
                 //获取数据成功回调
-                success: function () {
+                success: function() {
                     taskCallback();
                 }
             }, base.listenerHooks);

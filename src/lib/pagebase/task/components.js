@@ -48,7 +48,7 @@ TaskComponents.prototype = {
             pid           = data.pid,
             virtualOffset = data.virtualOffset,
             widgetRetStr  = [];
-            
+
 
         function virtualCreate(actType, activityData) {
             var scaleLeft = activityData.scaleLeft;

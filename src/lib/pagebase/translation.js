@@ -3,13 +3,14 @@
  * 平移
  * @return {[type]} [description]
  */
-var prefix = Xut.plat.prefixStyle,
-    xxtTrans = function (offset) {
-        offset = Xut.config.virtualMode ? offset / 2 : offset;
-        return "translate3d(" + offset + "px, 0, 0)";
-    };
+let prefix = Xut.plat.prefixStyle
 
-function dydTransform(distance) {
+let xxtTrans = (offset) => {
+    offset = Xut.config.virtualMode ? offset / 2 : offset;
+    return "translate3d(" + offset + "px, 0, 0)";
+}
+
+let dydTransform = (distance) => {
     distance = Xut.config.virtualMode ? distance / 2 : distance;
     return prefix('transform') + ':' + 'translate3d(' + distance + 'px,0px,0px)'
 }
@@ -24,7 +25,7 @@ let prevEffect
 let currEffect
 let nextEffect
 
-function setConfig() {
+let setConfig = () => {
     calculateContainer = Xut.config.proportion.calculateContainer()
     offsetLeft = (-1 * calculateContainer.width)
     offsetRight = calculateContainer.width
@@ -35,7 +36,7 @@ function setConfig() {
 }
 
 //切换坐标
-function toTranslate3d(distance, speed, element) {
+let toTranslate3d = (distance, speed, element) => {
     distance = Xut.config.virtualMode ? distance / 2 : distance;
     if (element = element || this.element || this.$contentProcess) {
         element.css(prefix('transform'), 'translate3d(' + distance + 'px,0px,0px)');
@@ -136,4 +137,4 @@ var translation = {
     flipOver: flipOver
 }
 
-export {translation}
+export { translation }
