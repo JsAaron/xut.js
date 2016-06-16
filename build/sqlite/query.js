@@ -13,7 +13,7 @@ var statement = [];
 
 
 function resolve(databasePath,callback) {
-    
+
     //设置数据库路径
     sqlite.init(databasePath);
 

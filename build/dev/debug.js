@@ -26,10 +26,10 @@ var conf = _.extend(config.common, {
  * 合并index引入的js
  * @return {[type]}   [description]
  */
-gulp.task('mergescript', function(cb) {
+gulp.task('mergescript', (cb) => {
     gulp.src(scriptUrl)
         .pipe(concat(conf.devName))
-        .on('error', function(err) {
+        .on('error', (err) => {
             console.log('Less Error!', err.message);
             this.end();
         })
@@ -42,12 +42,12 @@ gulp.task('mergescript', function(cb) {
  * 合成最终发布的xxtppt
  * @return {[type]}   [description]
  */
-gulp.task('mergeall', function(cb) {
+gulp.task('mergeall', (cb) => {
     //合成xxtppt.js
     scriptUrl.push(conf.rollup)
     gulp.src(scriptUrl)
         .pipe(concat(conf.distName))
-        .on('error', function(err) {
+        .on('error', (err) => {
             console.log('Less Error!', err.message);
             this.end();
         })
@@ -61,11 +61,11 @@ gulp.task('mergeall', function(cb) {
  * 复制dist到lib/build
  * @return {[type]} [description]
  */
-var copy = function() {
+var copy = () => {
     try {
         //删除多余的rollup.js
         fsextra.removeSync(conf.rollup)
-        //复制目录文件
+            //复制目录文件
         fsextra.copySync(conf.tarDir, conf.debugDir)
         console.log("copy file dir to " + conf.debugDir + " success!")
     } catch (err) {
@@ -79,12 +79,12 @@ var copy = function() {
  * @param  {Function} cb        [description]
  * @return {[type]}             [description]
  */
-var mergeuglify = function(scriptUrl, cb) {
+var mergeuglify = (scriptUrl, cb) => {
     //合成xxtppt.js
     scriptUrl.push(conf.rollup)
     gulp.src(scriptUrl)
         .pipe(concat(conf.distName))
-        .on('error', function(err) {
+        .on('error', (err) => {
             console.log('Less Error!', err.message);
             this.end();
         })
@@ -94,6 +94,6 @@ var mergeuglify = function(scriptUrl, cb) {
 }
 
 
-base(conf).then(function(paths) {
+base(conf).then((paths) => {
     mergeuglify(paths, copy)
 })

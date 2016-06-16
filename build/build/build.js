@@ -31,13 +31,13 @@ console.log(
 )
 
 
-base(conf).then(function(scriptUrl) {
-    return new Promise(function combine(resolve, reject) {
+base(conf).then((scriptUrl) => {
+    return new Promise((resolve, reject) => {
         //合成xxtppt.js
         scriptUrl.push(conf.rollup)
         gulp.src(scriptUrl)
             .pipe(concat(conf.devName))
-            .on('error', function(err) {
+            .on('error', (err) => {
                 console.log('Less Error!', err.message);
                 this.end();
             })
@@ -50,13 +50,13 @@ base(conf).then(function(scriptUrl) {
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.testDir))
-            .on('end', function() {
+            .on('end', () => {
                 fs.unlinkSync(conf.rollup)
                 resolve && resolve()
             })
     })
-}).then(function() {
-    return new Promise(function(resolve, reject) {
+}).then(() => {
+    return new Promise((resolve, reject) => {
         //css
         gulp.src('src/css/*.css')
             .pipe(cleanCSS({
@@ -67,7 +67,7 @@ base(conf).then(function(scriptUrl) {
             .on('end', resolve)
     })
 }).then(function() {
-    var complete = function() {
+    var complete = () => {
         spinner.stop()
         browserSync({
             port: 3000,
@@ -94,7 +94,7 @@ base(conf).then(function(scriptUrl) {
     }
 
     //数据库
-    fs.exists("./src/content/SQLResult.js", function(result) {
+    fs.exists("./src/content/SQLResult.js", (result) => {
         if (!result) {
             require('./sqlite/index').resolve(complete)
             return;

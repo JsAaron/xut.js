@@ -18,17 +18,17 @@ if (!fs.existsSync("./src/content/xxtebook.db")) {
     return
 }
 
-var spinner = ora('Begin to pack , Please wait for\n')
+const spinner = ora('Begin to pack , Please wait for\n')
 spinner.start()
 
 if (!fs.existsSync("./src/content/SQLResult.js")) {
     require('../sqlite/index').resolve()
 }
 
-var app = express()
-var config = require('../../config')
-var port = process.env.PORT || config.dev.port
-var conf = _.extend(config.dev.conf, {
+let app = express()
+let config = require('../../config')
+let port = process.env.PORT || config.dev.port
+let conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
 });
 
@@ -36,7 +36,7 @@ var conf = _.extend(config.dev.conf, {
 fsextra.removeSync(conf.assetsRoot)
 fsextra.mkdirSync(conf.assetsRoot);
 
-var webpackConfig = require('./webpack.dev.conf')
+let webpackConfig = require('./webpack.dev.conf')
 
 
 //启动代码测试
@@ -55,10 +55,9 @@ if (config.dev.eslint.launch) {
     }
 }
 
-var compiler = webpack(webpackConfig)
+let compiler = webpack(webpackConfig)
 
-
-var devMiddleware = webpackDevMiddleware(compiler, {
+let devMiddleware = webpackDevMiddleware(compiler, {
     //The path where to bind the middleware to the server.
     //In most cases this equals the webpack configuration option output.publicPath
     publicPath: webpackConfig.output.publicPath,
@@ -77,10 +76,10 @@ var devMiddleware = webpackDevMiddleware(compiler, {
 //Webpack热重载连接服务器
 //https://github.com/glenjamin/webpack-hot-middleware
 //Add webpack-hot-middleware attached to the same compiler instance
-var hotMiddleware = webpacHotMiddleware(compiler)
+let hotMiddleware = webpacHotMiddleware(compiler)
 
 // force page reload when html-webpack-plugin template changes
-compiler.plugin('compilation', function(compilation) {
+compiler.plugin('compilation', (compilation) => {
     //https://github.com/ampedandwired/html-webpack-plugin
     compilation.plugin('html-webpack-plugin-after-emit', function(data, cb) {
         hotMiddleware.publish({
@@ -105,38 +104,35 @@ app.use('/content', express.static('src/content'));
 
 
 let first = true
-watch(conf.assetsRoot + '/app.js', function() {
+watch(conf.assetsRoot + '/app.js', () => {
     if (first) {
+        spinner.stop()
         open("http://localhost:" + port)
         first = false
-        spinner.stop()
     }
     if (config.dev.debug.launch) {
         console.log(
             '\n' +
             'watch file change.....await....:\n'
         )
-        var child = child_process.spawn('node', ['build/dev/debug.js', ['debug=' + config.dev.debug.dir]]);
-        child.stdout.on('data', function(data) {
+        let child = child_process.spawn('node', ['build/dev/debug.js', ['debug=' + config.dev.debug.dir]]);
+        child.stdout.on('data', (data) => {
             console.log('\n' + data);
         });
-        child.stderr.on('data', function(data) {
+        child.stderr.on('data', (data) => {
             console.log('fail out：\n' + data);
         });
-        child.on('close', function(code) {
+        child.on('close', (code) => {
             console.log('complete：' + code);
         });
     }
 })
 
 
-module.exports = app.listen(port, function(err) {
+module.exports = app.listen(port, (err) => {
     if (err) {
         console.log(err)
         return
     }
     console.log('Listening at http://localhost:' + port + '\n')
 })
-
-
-

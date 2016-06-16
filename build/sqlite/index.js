@@ -8,8 +8,8 @@ var path = "./src/content/"
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-exports.resolve = function(callback) {
-    query.resolve(path + 'xxtebook.db', function(successResults) {
+exports.resolve = (callback) => {
+    query.resolve(path + 'xxtebook.db', (successResults) => {
         // 转成字符串;
         var results = JSON.stringify(successResults);
         // //挂在数据
