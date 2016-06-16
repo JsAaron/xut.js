@@ -1,24 +1,24 @@
 /**
  * 应用对外接口
  * 此模块的所有方法都是动态修正上下文，自动切换场景
- * 1.	Xut.Application
- * 			a)	整个应用程序的接口，执行应用级别的操作，例如退出应用之类。
- * 2.	Xut.DocumentWindow
- * 			a)	窗口的接口。窗口就是电子杂志的展示区域，可以操作诸如宽度、高度、长宽比之类。
- * 3.	Xut.View
- * 			a)	视图接口。视图是窗口的展示方式，和页面相关的接口，都在这里。
- * 4.	Xut.Presentation
- * 			a)	数据接口。和电子杂志的数据相关的接口，都在这里。
- * 5.	Xut.Slides
- *			a)	所有页面的集合
- * 6.	Xut.Slide
- * 			a)	单个页面
- * 7.	Xut.Master
- * 			a)	页面的母版
+ * 1.   Xut.Application
+ *          a)  整个应用程序的接口，执行应用级别的操作，例如退出应用之类。
+ * 2.   Xut.DocumentWindow
+ *          a)  窗口的接口。窗口就是电子杂志的展示区域，可以操作诸如宽度、高度、长宽比之类。
+ * 3.   Xut.View
+ *          a)  视图接口。视图是窗口的展示方式，和页面相关的接口，都在这里。
+ * 4.   Xut.Presentation
+ *          a)  数据接口。和电子杂志的数据相关的接口，都在这里。
+ * 5.   Xut.Slides
+ *          a)  所有页面的集合
+ * 6.   Xut.Slide
+ *          a)  单个页面
+ * 7.   Xut.Master
+ *          a)  页面的母版
  * @return {[type]} [description]
  */
 
-import {reviseSize} from '../util/option'
+import { reviseSize } from '../util/option'
 
 
 var typeFilter = ['page', 'master'];
@@ -135,11 +135,11 @@ export function overrideApi(vm) {
     }
 
     //==========================================
-    //	四大数据接口
-    //	快速获取一个页面的nodes值
-    //	获取当前页面的页码编号 - chapterId
-    //	快速获取指定页面的chapter数据
-    //	pagebase页面管理对象
+    //  四大数据接口
+    //  快速获取一个页面的nodes值
+    //  获取当前页面的页码编号 - chapterId
+    //  快速获取指定页面的chapter数据
+    //  pagebase页面管理对象
     //==========================================
     _.each([
         "GetPageId",
@@ -564,8 +564,8 @@ export function overrideApi(vm) {
 
     //******************************************
     //
-    //		互斥接口
-    //		直接显示\隐藏\停止动画
+    //      互斥接口
+    //      直接显示\隐藏\停止动画
     //
     //*******************************************
 
@@ -603,8 +603,8 @@ export function overrideApi(vm) {
 
     //******************************************
     //
-    //		Application
-    //		应用接口
+    //      Application
+    //      应用接口
     //
     //*******************************************
 
@@ -613,7 +613,7 @@ export function overrideApi(vm) {
     /**
      * 获取一个存在的实例对象
      * 区分不同层级page/master
-     * 不同类型	   content/widget
+     * 不同类型    content/widget
      */
     Application.GetSpecifiedObject = function(pageType, data) {
         return access(function(manager, pageType) {

@@ -9,7 +9,7 @@ export * from './recovery'
  * 获取访问对象参数
  *
  * 如果pageObj 不存在，则取当前页面的
- * 
+ *
  * @return {[type]} [description]
  */
 Xut.accessControl = function(pageObj, callback) {

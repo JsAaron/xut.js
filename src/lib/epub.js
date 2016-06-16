@@ -4,7 +4,7 @@
  *   需要调用2次
  *   一次是因为打包的关系，全局加载
  *   二次是 实际epub模式加载
- * 
+ *
  * *************************/
 
 /**
@@ -17,12 +17,12 @@ window.HTMLCONFIG = {}
 
 
 /**
- * 
+ *
  * 2015.10.19新增
  * ibooks处理
  * epub ibooks模式的配置文件
  * 这个是在index.html中会传入几个值
- * 
+ *
  *   window.IBOOKSCONFIG = {
  *       compiled: true,
  *       pageIndex: 1,

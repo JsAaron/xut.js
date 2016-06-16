@@ -1,8 +1,6 @@
 // 观察
-import {
-    Observer
-} from '../../observer/index'
-  
+import { Observer } from '../../observer/index'
+
 /**
  * canvas相关处理
  * 启动canvas,pixi库
@@ -15,6 +13,7 @@ export class Factory extends Observer {
 
     constructor() {
         super()
+
         /**
          * 是否启动模式
          * @type {Boolean}
@@ -25,9 +24,9 @@ export class Factory extends Observer {
          * CompSprite非常特殊
          * 可以在dom的情况下使用
          * 所以如果是dom模式要强制开始enable‘
-         * 这样会导致 精灵等动画强制转canvas 
+         * 这样会导致 精灵等动画强制转canvas
          * 这是错误的，所以增加一个判断
-         * 
+         *
          */
         this.onlyCompSprite = false
 
@@ -49,7 +48,7 @@ export class Factory extends Observer {
         //普通灵精
         this.spiritId = []
 
-        //widget零件保存的content id 
+        //widget零件保存的content id
         //高级精灵动画
         this.widgetId = []
 

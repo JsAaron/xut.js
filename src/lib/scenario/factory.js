@@ -10,7 +10,7 @@ import { Bar as BookToolBar } from '../toolbar/bookbar'
 
 
 //vm
-import { Manager } from '../manager/manager'
+import { Controller as Manager  } from '../manager/controller'
 
 let config
 

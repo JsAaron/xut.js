@@ -7,20 +7,12 @@ import {
     injectScript,
     extend
 } from '../util/index'
-import {
-    Abstract
-} from './abstract'
-import {
-    Pagebase
-} from '../pagebase/pagebase'
-import {
-    translation
-} from '../pagebase/translation'
+import { Abstract } from './abstract'
+import { Pagebase } from '../pagebase/pagebase'
+import { translation } from '../pagebase/translation'
 //epub使用
-import {
-    addEdges
-} from '../util/edge'
-//动作热热点派发 
+import { addEdges } from '../util/edge'
+//动作热热点派发
 import {
     suspend as _suspend,
     original as _original,
@@ -32,7 +24,7 @@ import {
  * 检测脚本注入
  * @return {[type]} [description]
  */
-let checkInjectScript = function(pageObject, type) {
+let checkInjectScript = (pageObject, type) => {
     var code;
     if (code = pageObject.chapterDas[type]) {
         injectScript(code, type)
@@ -43,7 +35,7 @@ let checkInjectScript = function(pageObject, type) {
  * 清理视频
  * @return {[type]} [description]
  */
-let removeVideo = function(clearPageIndex) {
+let removeVideo = (clearPageIndex) => {
     //处理视频
     var pageId = Xut.Presentation.GetPageId(clearPageIndex);
     Xut.VideoManager.removeVideo(pageId);

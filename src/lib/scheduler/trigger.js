@@ -3,10 +3,7 @@
  * @return {[type]} [description]
  */
 
-import {
-    Bind
-}
-from '../pagebase/task/dispenser/bind'
+import { Bind } from '../pagebase/task/dispenser/bind'
 
 export function trigger(target, attribute, rootNode, pageIndex) {
 

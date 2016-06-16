@@ -7,33 +7,19 @@
  *                2. MasterMgr 模块
  *                                                                    *
  **********************************************************************/
-import {
-    _set
-} from '../util/stroage'
+import { _set } from '../util/stroage'
 //页面管理
-import {
-    PageMgr
-} from './page'
+import { PageMgr } from './page'
 //母版管理
-import {
-    MasterMgr
-} from './master'
+import { MasterMgr } from './master'
 //错误的数据库表
-import {
-    errorTable
-} from '../data/index'
+import { errorTable } from '../init/data/storemgr'
 //数据解析
-import {
-    query
-} from './parser'
+import { query } from './parser'
 //页面切换
-import {
-    SwitchPage
-} from './switch'
+import { SwitchPage } from './switch'
 //Navbar
-import {
-    close as _close
-} from '../toolbar/navbar/index'
+import { close as _close } from '../toolbar/navbar/index'
 
 
 
@@ -229,7 +215,7 @@ function conversionPids(createPage) {
 
 //检测是否构建母板模块处理
 function checkMasterCreate() {
-    var table = errorTable();
+    var table = errorTable()
     //如果没有Master数据,直接过滤
     if (-1 !== table.indexOf('Master') || !Xut.data['Master'] || !Xut.data['Master'].length) {
         return false;

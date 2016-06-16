@@ -7,8 +7,7 @@ import {
 from './event'
 //音频
 import {audioPlayer} from '../../audio/audio'
-//pixi事件
-import { bindEvents as bindPixiEvents } from '../../pixi/event'
+
 
 export function extendEvent(activitProto) {
 

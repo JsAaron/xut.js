@@ -9,7 +9,7 @@ import { Rule } from '../core/rule'
 //普通精灵动画
 import { Sprite as OrdinarySprite } from './sprite'
 
-   
+
 /**
  * 精灵动画
  */
@@ -21,7 +21,7 @@ class Sprite extends Rule {
         //普通精灵动画
         this.sprite = new OrdinarySprite(options, this.successCallback)
     }
- 
+
     /**
      * 运行动画
      * @return {[type]} [description]
@@ -33,7 +33,7 @@ class Sprite extends Rule {
              sprite.render()
         })
     }
- 
+
     /**
      * 停止动画
      * stopQueue 停止队列

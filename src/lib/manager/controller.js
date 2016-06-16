@@ -11,29 +11,17 @@ import {
     defAccess
 } from '../util/index'
 // 观察
-import {
-    Observer
-} from '../observer/index'
+import { Observer } from '../observer/index'
 //全部交互通知
-import {
-    GlobalEvent
-} from './globalevent.js'
+import { GlobalEvent } from './globalevent.js'
 //动态api
-import {
-    overrideApi
-} from './overrideapi'
+import { overrideApi } from './overrideapi'
 //调度任务
-import {
-    Scheduler
-} from './schedule'
+import { Scheduler } from './schedule'
 //事件钩子
-import {
-    delegateHooks
-} from './hooks'
+import { delegateHooks } from './hooks'
 //委托处理器
-import {
-    filterProcessor
-} from './filter'
+import { filterProcessor } from './filter'
 
 
 /**
@@ -63,96 +51,94 @@ let optConf = {
     'multiplePages': false
 }
 
+/**
+ * 配置多页面参数
+ * @return {[type]} [description]
+ */
+let configMultiple = (options) => {
+    //如果是epub,强制转换为单页面
+    if (Xut.IBooks.Enabled) {
+        options.multiplePages = false
+    } else {
+        //判断多页面情况
+        //1 数据库定义
+        //2 系统优化
+        options.multiplePages =
+            options.pageFlip ? options.pageFlip : options.pageMode ? true : false
+    }
+}
 
-class Manager extends Observer {
+
+/**
+ * 判断处理那个页面层次
+ * 找到pageType类型
+ * 项目分4个层
+ * page mater page浮动 mater浮动
+ * 通过
+ * 因为冒泡的元素，可能是页面层，也可能是母板上的
+ * @return {Boolean} [description]
+ */
+let isBelong = (target) => {
+    var pageType = 'page';
+    if (target.dataset && target.dataset.belong) {
+        pageType = target.dataset.belong;
+    }
+    return pageType
+}
+
+
+/**
+ * 阻止元素的默认行为
+ * 在火狐下面image带有href的行为
+ * 会自动触发另存为
+ * @return {[type]} [description]
+ *
+ * 2016.3.18
+ * 妙妙学 滚动插件默认行为被阻止
+ */
+let preventDefault = (evtObj, target) => {
+    //var tagName = target.nodeName.toLowerCase();
+    if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG) {
+        evtObj.preventDefault && evtObj.preventDefault();
+    }
+}
+
+
+class Controller extends Observer {
 
     constructor(parameter) {
         super()
 
-        var config = Xut.config
-        var vm = this;
+        let config = Xut.config
+        let vm = this;
 
-        //配置文件    
-        var options = vm.options = _.extend(optConf, parameter, {
+        //配置文件
+        let options = vm.options = _.extend(optConf, parameter, {
             pageFlip: config.pageFlip
         })
 
-        //如果是epub,强制转换为单页面
-        if (Xut.IBooks.Enabled) {
-            options.multiplePages = false
-        } else {
-            //判断多页面情况
-            //1 数据库定义
-            //2 系统优化
-            options.multiplePages =
-                options.pageFlip ? options.pageFlip : options.pageMode ? true : false
-        }
+        //配置多页面参数
+        configMultiple(options)
 
         //创建翻页滑动
-        var $globalEvent = vm.$globalEvent = new GlobalEvent(options, config);
+        let $globalEvent = vm.$globalEvent = new GlobalEvent(options, config);
         //创建page页面管理
-        var $scheduler = vm.$scheduler = new Scheduler(vm);
+        let $scheduler = vm.$scheduler = new Scheduler(vm);
 
         //如果是主场景,才能切换系统工具栏
         if (options.multiplePages) {
             this.addTools(vm)
         }
 
-
-        /**
-         * 判断处理那个页面层次
-         * 找到pageType类型
-         * 项目分4个层
-         * page mater page浮动 mater浮动
-         * 通过
-         * 因为冒泡的元素，可能是页面层，也可能是母板上的
-         * @return {Boolean} [description]
-         */
-        var isBelong = function(target) {
-            var pageType = 'page';
-            if (target.dataset && target.dataset.belong) {
-                pageType = target.dataset.belong;
-            }
-            return pageType
-        }
-
-        /**
-         * 阻止元素的默认行为
-         * 在火狐下面image带有href的行为
-         * 会自动触发另存为
-         * @return {[type]} [description]
-         *
-         * 2016.3.18
-         * 妙妙学 滚动插件默认行为被阻止
-         */
-        var preventDefault = function(evtObj, target) {
-            //var tagName = target.nodeName.toLowerCase();
-            if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG) {
-                evtObj.preventDefault && evtObj.preventDefault();
-            }
-        }
-
-        /*********************************************************************
-         *                对页面事件的调控与状态动作的处理
-         *                1 触屏 onswipedown
-         *                2 滑动 onSwipeMove
-         *                3 松手 onSwipeUp
-         *                3 松手继续滑动 onSwipeUpSlider
-         *                4 动画结束后处理 onAnimComplete                                                                               *
-         **********************************************************************/
-
-        /**
-         * 事件句柄对象
-         */
-        var handlerObj = null;
-
+        //事件句柄对象
+        let handlerObj = null;
 
         /**
          * 过滤器.全局控制函数
          * return true 阻止页面滑动
          */
-        $globalEvent.$watch('filter', function(hookCallback, point, evtObj) {
-            var target, pageType, parentNode;
+        $globalEvent.$watch('filter', (hookCallback, point, evtObj) => {
+            let target, pageType, parentNode;
             target = point.target;
             //阻止默认行为
             preventDefault(evtObj, target);
@@ -173,7 +159,7 @@ class Manager extends Observer {
          * 触屏滑动,通知pageMgr处理页面移动
          * @return {[type]} [description]
          */
-        $globalEvent.$watch('onSwipeMove', function() {
+        $globalEvent.$watch('onSwipeMove', () => {
             $scheduler.move.apply($scheduler, arguments);
         });
 
@@ -182,7 +168,7 @@ class Manager extends Observer {
          * 触屏松手点击
          * 无滑动
          */
-        $globalEvent.$watch('onSwipeUp', function(pageIndex, hookCallback) {
+        $globalEvent.$watch('onSwipeUp', (pageIndex, hookCallback) => {
             if (handlerObj) {
                 if (handlerObj.handlers) {
                     handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex);
@@ -196,12 +182,12 @@ class Manager extends Observer {
             }
         });
 
- 
+
         /**
          * 触屏滑动,通知ProcessMgr关闭所有激活的热点
          * @return {[type]}          [description]
          */
-        $globalEvent.$watch('onSwipeUpSlider', function(pointers) {
+        $globalEvent.$watch('onSwipeUpSlider', (pointers) => {
             $scheduler.suspend(pointers)
         });
 
@@ -210,7 +196,7 @@ class Manager extends Observer {
          * 翻页动画完成回调
          * @return {[type]}              [description]
          */
-        $globalEvent.$watch('onAnimComplete', function(direction, pagePointer, unfliplock, isQuickTurn) {
+        $globalEvent.$watch('onAnimComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
             $scheduler.complete.apply($scheduler, arguments);
         });
 
@@ -219,7 +205,7 @@ class Manager extends Observer {
          * 切换页面
          * @return {[type]}      [description]
          */
-        $globalEvent.$watch('onJumpPage', function(data) {
+        $globalEvent.$watch('onJumpPage', (data) => {
             $scheduler.jumpPage(data);
         });
 
@@ -228,7 +214,7 @@ class Manager extends Observer {
          * 退出应用
          * @return {[type]}      [description]
          */
-        $globalEvent.$watch('onDropApp', function(data) {
+        $globalEvent.$watch('onDropApp', (data) => {
             window.GLOBALIFRAME && Xut.publish('magazine:dropApp');
         });
 
@@ -239,7 +225,7 @@ class Manager extends Observer {
          * 才需要重新激活对象
          * 删除parallaxProcessed
          */
-        $globalEvent.$watch('onMasterMove', function(hindex, target) {
+        $globalEvent.$watch('onMasterMove', (hindex, target) => {
             if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
                 $scheduler.masterMgr && $scheduler.masterMgr.reactivation(target);
             }
@@ -255,16 +241,16 @@ class Manager extends Observer {
     addTools(vm) {
         _.extend(delegateHooks, {
             //li节点,多线程创建的时候处理滑动
-            'data-container': function() {
+            'data-container': () => {
                 vm.$emit('change:toggleToolbar')
             },
             //是背景层
-            'data-multilayer': function() {
+            'data-multilayer': () => {
                 //改变工具条状态
                 vm.$emit('change:toggleToolbar')
             },
             //默认content元素可以翻页
-            'data-behavior': function(target, attribute, rootNode, pageIndex) {
+            'data-behavior': (target, attribute, rootNode, pageIndex) => {
                 //没有事件的元素,即可翻页又可点击切换工具栏
                 if (attribute == 'click-swipe') {
                     vm.$emit('change:toggleToolbar')
@@ -276,7 +262,7 @@ class Manager extends Observer {
 }
 
 
-var VMProto = Manager.prototype
+var VMProto = Controller.prototype
 
 
 /**
@@ -419,5 +405,5 @@ def(VMProto, '$overrideApi', function() {
 
 
 export {
-    Manager
+    Controller 
 }

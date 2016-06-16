@@ -70,7 +70,7 @@ export function dataExternal(baseProto) {
 		var contentObj,
 			base = this;
 		if (contentObj = base.baseGetContentObject(contentId)) {
-			
+
 			var element = contentObj.$contentProcess.view
 				? contentObj.$contentProcess.view
 				: contentObj.$contentProcess

@@ -13,7 +13,7 @@ let config
  * 设置缓存
  * @param {[type]} parameter [description]
  */
-function setDataToStorage(parameter) {
+let setDataToStorage = (parameter) => {
     config.pageIndex = parameter.pageIndex;
     config.novelId = parameter.novelId;
     _set({
@@ -21,13 +21,13 @@ function setDataToStorage(parameter) {
         "novelId": parameter.novelId
     });
 };
- 
+
 
 /**
  * 初始化值
  * @param {[type]} options [description]
  */
-function initDefaultValues(options) {
+let initDefaultValues = (options) => {
     var pageFlip = options.pageFlip;
     //配置全局翻页模式
     //pageflip可以为0
@@ -36,9 +36,9 @@ function initDefaultValues(options) {
         config.pageFlip = toEmpty(pageFlip);
     }
     return {
-        'novelId'   : toEmpty(options.novelId),
-        'pageIndex' : toEmpty(options.pageIndex),
-        'history'   : options.history
+        'novelId': toEmpty(options.novelId),
+        'pageIndex': toEmpty(options.pageIndex),
+        'history': options.history
     }
 };
 
@@ -47,7 +47,7 @@ function initDefaultValues(options) {
  * 检测脚本注入
  * @return {[type]} [description]
  */
-function checkInjectScript() {
+let checkInjectScript = () => {
     var preCode,
         novels = Xut.data.query('Novel');
     if (preCode = novels.preCode) {
@@ -56,7 +56,7 @@ function checkInjectScript() {
 }
 
 export function loadScene(options) {
- 
+
     config = Xut.config
 
     //获取默认参数
@@ -82,10 +82,10 @@ export function loadScene(options) {
 
     //加载新的场景
     Xut.View.LoadScenario({
-        'main'       : true, //主场景入口
-        'scenarioId' : scenarioId,
-        'pageIndex'  : parameter.pageIndex,
-        'history'    : parameter.history
+        'main': true, //主场景入口
+        'scenarioId': scenarioId,
+        'pageIndex': parameter.pageIndex,
+        'history': parameter.history
     });
 
 }

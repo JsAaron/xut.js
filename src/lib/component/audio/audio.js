@@ -3,15 +3,9 @@
  * @param  {[type]} global [description]
  * @return {[type]}        [description]
  */
-import {
-    Action
-} from './action'
-import {
-    Subtitle
-} from './subtitle'
-import {
-    hash
-} from '../../util/dom'
+import { Action } from './action'
+import { Subtitle } from './subtitle'
+import { hash } from '../../util/dom'
 
 let Player = null
 let noop = function() {}
@@ -24,8 +18,7 @@ let audioPlayer
  * @param {[type]} options [description]
  */
 class AudioFactory {
-    
-    constructor(){}
+    constructor() {}
 
     //构建之前关数据
     preRelated(trackId, options) {
@@ -407,7 +400,7 @@ function supportAudio(fail) {
         }, false);
     } catch (er) {}
 };
- 
+
 
 //安卓客户端apk的情况下
 if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {

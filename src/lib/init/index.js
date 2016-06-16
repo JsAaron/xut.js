@@ -1,23 +1,96 @@
 //预初始化
-import {AudioManager} from '../component/audio/manager'
-import {VideoManager} from '../component/video/manager'
-import {
-    loader,
-    setRootfont
-} from '../util/index'
-import {nextTask} from './data'
-import {
-    playPlugVideo,
-    playHtml5Video
+import { AudioManager } from '../component/audio/manager'
+import { VideoManager } from '../component/video/manager'
+import initdata from './data'
+import { bindKeyEvent } from './keyevent'
+import { loader, setRootfont } from '../util/index'
+import { playPlugVideo, playHtml5Video } from './video'
+
+/**
+ * 加载css
+ * @return {[type]} [description]
+ */
+let loadcss = (callback) => {
+    //加载横版或者竖版css
+    //nodeBuildMode 是node build下的test.html文件
+    //加载build/*.css压缩文件
+    //否则就是默认的css/*.css
+    let baseCss = window.nodeBuildMode ? window.nodeBuildMode.csspath : './css/' + (Xut.config.layoutMode) + '.css';
+    let svgsheet = 'content/gallery/svgsheet.css';
+
+    let cssArr = [baseCss, svgsheet];
+    //是否需要加载svg
+    //如果是ibooks模式
+    //并且没有svg
+    //兼容安卓2.x
+    if (Xut.IBooks.Enabled && !Xut.IBooks.existSvg) {
+        cssArr = [baseCss]
+    }
+
+    //动态加载脚本
+    loader.load(cssArr, callback, null, true);
 }
-from './video'
-import {bindKeyEvent} from './keyevent'
+
+
+/**
+ * 加载app应用
+ * @param  {[type]} config [description]
+ * @return {[type]}        [description]
+ */
+let loadApp = (config) => {
+    //修正API接口
+    //iframe要要Xut.config
+    Xut.config.revised();
+    //加载css
+    loadcss(() => {
+        //修正字体大小
+        setRootfont()
+        initdata()
+    });
+
+}
+
+
+/**
+ * 如果是安卓桌面端
+ * 绑定事件
+ * 创建数据库
+ * @return {[type]} [description]
+ */
+let creatDatabase = (config) => {
+    //安卓上
+    if (Xut.plat.isAndroid) {
+        //预加载处理视频
+        //妙妙学不加载视频
+        //读库不加载视频
+        if (!window.MMXCONFIG && !window.DUKUCONFIG) {
+            playPlugVideo();
+        }
+
+        //不是子文档指定绑定按键
+        if (!window.SUbCONFIGT) {
+            Xut.Application.AddEventListener = () => {
+                window.GLOBALCONTEXT.document.addEventListener("backbutton", config._event.back, false);
+                window.GLOBALCONTEXT.document.addEventListener("pause", config._event.pause, false);
+            }
+        }
+    }
+
+    if (window.DUKUCONFIG) {
+        PMS.bind("MagazineExit", () => {
+            PMS.unbind();
+            Xut.Application.DropApp();
+        }, "*")
+    }
+
+    //拷贝数据库
+    Xut.Plugin.XXTEbookInit.startup(config.dbName, loadApp, () => {});
+}
 
 
 export function init() {
 
-    var config = Xut.config;
-    var isBrowser = config.isBrowser;
+    let config = Xut.config;
 
     //绑定键盘事件
     bindKeyEvent(config)
@@ -36,97 +109,19 @@ export function init() {
     //3 pc
     //4 ios/android
     if (window.GLOBALIFRAME) {
-        creatDatabase(config);
+        creatDatabase(config)
     } else {
         //PC还是移动
-        if (isBrowser) {
-            loadApp(config);
+        if (config.isBrowser) {
+            loadApp(config)
         } else {
             //如果不是iframe加载,则创建空数据库
             window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
             //等待硬件加载完毕
-            document.addEventListener("deviceready", function () {
+            document.addEventListener("deviceready", () => {
                 creatDatabase(config)
-            }, false);
+            }, false)
         }
     }
 
-}
-
-
-/**
- * 如果是安卓桌面端
- * 绑定事件
- * 创建数据库
- * @return {[type]} [description]
- */
-function creatDatabase(config) {
-
-    //安卓上
-    if (Xut.plat.isAndroid) {
-
-        //预加载处理视频
-        //妙妙学不加载视频
-        //读库不加载视频
-        if (!window.MMXCONFIG && !window.DUKUCONFIG) {
-            playPlugVideo();
-        }
-
-        //不是子文档指定绑定按键
-        if (!window.SUbCONFIGT) {
-            Xut.Application.AddEventListener = function () {
-                window.GLOBALCONTEXT.document.addEventListener("backbutton", config._event.back, false);
-                window.GLOBALCONTEXT.document.addEventListener("pause", config._event.pause, false);
-            }
-        }
-    }
-
-    if (window.DUKUCONFIG) {
-        PMS.bind("MagazineExit", function () {
-            PMS.unbind();
-            Xut.Application.DropApp();
-        }, "*")
-    }
-
-
-
-    //拷贝数据库
-    Xut.Plugin.XXTEbookInit.startup(config.dbName, loadApp, function () { });
-};
-
-
-/**
- * 加载app应用
- * @param  {[type]} config [description]
- * @return {[type]}        [description]
- */
-function loadApp(config) {
-
-
-    //修正API接口
-    //iframe要要Xut.config
-    Xut.config.revised();
-
-    //加载横版或者竖版css
-    //nodeBuildMode 是node build下的test.html文件
-    //加载build/*.css压缩文件
-    //否则就是默认的css/*.css
-    var baseCss = window.nodeBuildMode ? window.nodeBuildMode.csspath : './css/' + (Xut.config.layoutMode) + '.css';
-    var svgsheet = 'content/gallery/svgsheet.css';
-
-    var cssArr = [baseCss, svgsheet];
-    //是否需要加载svg
-    //如果是ibooks模式
-    //并且没有svg
-    //兼容安卓2.x
-    if (Xut.IBooks.Enabled && !Xut.IBooks.existSvg) {
-        cssArr = [baseCss]
-    }
-
-    //动态加载脚本
-    loader.load(cssArr, function () {
-        //修正全局字体
-        setRootfont();
-        nextTask();
-    }, null, true);
 }

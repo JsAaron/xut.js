@@ -13,8 +13,8 @@ import {
 }
 from '../core/index'
 
-var arr = [];
-var slice = arr.slice;
+let arr = [];
+let slice = arr.slice;
 
 
 class Rule extends Observer {

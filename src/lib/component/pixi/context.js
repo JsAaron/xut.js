@@ -13,7 +13,7 @@
  * @return {[type]}                 [description]
  */
 export function Context(data, dom, pageIndex) {
-    
+
     var renderer = PIXI.autoDetectRenderer(data.scaleWidth, data.scaleHeight, {
         transparent: true,
         view: dom
@@ -42,7 +42,7 @@ export function Context(data, dom, pageIndex) {
     renderer.view.setAttribute('data-ctype', mark)
     renderer.view.setAttribute('id', prefix)
 
-    
+
     dom.renderer = renderer
 
     return renderer

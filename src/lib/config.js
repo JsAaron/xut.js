@@ -25,7 +25,7 @@ Xut.config = function () {
      * @return {[type]} [description]
      */
     function judgeScreen() {
-        //如果是IBooks模式处理   
+        //如果是IBooks模式处理
         if (Xut.IBooks.Enabled) {
             var screenSize = Xut.IBooks.CONFIG.screenSize;
             if (screenSize) {

@@ -3,8 +3,8 @@
 //   1 单独杂志
 //   2 新阅读加载
 //   3 子文档加载
-//   4 客户端模式  add 2014.11.26 
-//   
+//   4 客户端模式  add 2014.11.26
+//
 //   GLOBALCONTEXT 插件全局调用接口
 //   GLOBALIFRAME  是否iframe加载
 //
@@ -16,7 +16,6 @@
 //            //iframe退出的处理方法
 //       }
 //   }
-		
 //常量
 ;(function(top) {
 
@@ -49,7 +48,7 @@
 	//2015.3.11
 	//秒秒学客户端配置
 	window.MMXCONFIG = top.mmxConfig;
- 
+
 })(function() {
 
 	var iframeMode = false, //是否为iframe加载
@@ -108,8 +107,7 @@
 			}
 		} catch (er) {
 
-		}		
-	}
+		}	}
 
 	//搜索2层作用域
 	//1 top

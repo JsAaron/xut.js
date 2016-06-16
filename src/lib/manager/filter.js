@@ -1,7 +1,5 @@
 //事件钩子
-import {
-    delegateHooks
-} from './hooks'
+import { delegateHooks } from './hooks'
 
 /**
  * 简化委托处理，默认一层元素只能绑定一个委托事件

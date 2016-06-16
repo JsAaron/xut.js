@@ -4,7 +4,7 @@
  */
 
 export class Abstract {
-    
+
     /**
      * 创建页面合集
      * @return {[type]} [description]

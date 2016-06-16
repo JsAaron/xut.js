@@ -16,9 +16,7 @@ from './queue'
  * 制作uuid
  * @return {[type]} [description]
  */
-function makeGuid() {
-    return Xut.guid('rAF');
-}
+const makeGuid = () => Xut.guid('rAF')
 
 
 /**
@@ -28,7 +26,7 @@ function makeGuid() {
  * @return {[type]} [description]
  */
 export function addRenderer(pageIndex, callback, mark) {
-    var uuid = makeGuid()
+    let uuid = makeGuid()
     if (mark) {
         uuid = uuid + '-' + mark
     }

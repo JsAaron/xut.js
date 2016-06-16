@@ -1,55 +1,42 @@
-import {
-    VideoClass
-} from './video'
-
 /*
     视频和远程网页管理模块
 */
+import { VideoClass } from './video'
 
-//综合管理video, webpage
-function VideoManager() {
-    this.pageBox = {}; //当前页面包含的视频数据
-    this.playBox = {}; //播放过的视频数据 （播放集合）
-}
 
-/**
- *  参数:
- *    pageId    就是chapterId,对应每一个页面
- *    videoId   对应每一个视频热点的ID
- *    container 容器
- */
+class VideoManager {
 
-VideoManager.prototype = {
-
-    //=============消息接口================
-    //
+    constructor() {
+        this.pageBox = {}; //当前页面包含的视频数据
+        this.playBox = {}; //播放过的视频数据 （播放集合）
+    }
 
     //自动播放
-    autoPlay: function (pageId, activityId, container) {
+    autoPlay(pageId, activityId, container) {
         this.initVideo.apply(this, arguments);
-    },
+    }
 
     //手动播放
-    trigger: function (pageId, activityId, container) {
+    trigger(pageId, activityId, container) {
         this.initVideo.apply(this, arguments);
-    },
+    }
 
     //=================视频调用===========================
 
     //触发视频
-    initVideo: function (pageId, activityId, container) {
+    initVideo(pageId, activityId, container) {
         //解析数据
         this.parseVideo(pageId, activityId);
         //调用播放
         this.loadVideo(pageId, activityId, container);
-    },
+    }
 
     //=================视频数据处理===========================
 
     //处理重复数据
     // 1:pageBox能找到对应的 videoId
     // 2:重新查询数据
-    parseVideo: function (pageId, activityId) {
+    parseVideo(pageId, activityId) {
         //复重
         if (this.checkRepeat(pageId, activityId)) {
             return;
@@ -57,20 +44,20 @@ VideoManager.prototype = {
         var data = Xut.data.query('Video', activityId);
         //新的查询
         this.deployVideo(data, pageId, activityId);
-    },
+    }
 
     //检测数据是否存在
-    checkRepeat: function (pageId, activityId) {
+    checkRepeat(pageId, activityId) {
         var chapterData = this.pageBox[pageId];
         //如果能在pageBox找到对应的数据
         if (chapterData && chapterData[activityId]) {
             return true;
         }
         return false;
-    },
+    }
 
     //配置视频结构
-    deployVideo: function (data, pageId, activityId) {
+    deployVideo(data, pageId, activityId) {
         var config = Xut.config
         var proportion = config.proportion
         var screenSize = config.screenSize
@@ -123,12 +110,12 @@ VideoManager.prototype = {
         }
 
         this.pageBox[pageId][activityId] = videoInfo;
-    },
+    }
 
     //=================视频动作处理============================
 
     //加载视频
-    loadVideo: function (pageId, activityId, container) {
+    loadVideo(pageId, activityId, container) {
         var playBox = this.playBox,
             data = this.pageBox[pageId][activityId];
 
@@ -151,15 +138,15 @@ VideoManager.prototype = {
 
         }
 
-    },
+    }
 
     //播放视频之前检查要停的视频
-    beforePlayVideo: function (pageId, activityId) {
+    beforePlayVideo(pageId, activityId) {
 
-    },
+    }
 
     //清理移除页的视频
-    removeVideo: function (pageId) {
+    removeVideo(pageId) {
         var playBox = this.playBox,
             pageBox = this.pageBox;
 
@@ -174,10 +161,10 @@ VideoManager.prototype = {
         if (pageBox && pageBox[pageId]) {
             delete this.pageBox[pageId];
         }
-    },
+    }
 
     //清理全部视频
-    clearVideo: function () {
+    clearVideo() {
         var playBox = this.playBox,
             flag = false; //记录是否处理过销毁状态
 
@@ -191,11 +178,11 @@ VideoManager.prototype = {
         this.playBox = {};
         this.pageBox = {};
         return flag;
-    },
+    }
 
 
     //离开页面
-    leavePage: function (pageId) {
+    leavePage(pageId) {
         var playBox = this.playBox;
         if (playBox && playBox[pageId]) {
             for (var activityId in playBox[pageId]) {
@@ -204,11 +191,12 @@ VideoManager.prototype = {
         }
     }
 
-};
+}
+
 
 Xut.VideoManager = new VideoManager;
 
 
 export {
-VideoManager
+    VideoManager
 }

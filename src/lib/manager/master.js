@@ -3,16 +3,10 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import {
-    Abstract
-} from './abstract'
-import {
-    translation
-} from '../pagebase/translation'
-import {
-    Pagebase
-} from '../pagebase/pagebase'
-//动作热热点派发 
+import { Abstract } from './abstract'
+import { translation } from '../pagebase/translation'
+import { Pagebase } from '../pagebase/pagebase'
+//动作热热点派发
 import {
     suspend as _suspend,
     original as _original,
@@ -20,7 +14,7 @@ import {
 } from '../scheduler/index'
 
 //扁平化对象到数组
-let toArray = function(filter) {
+let toArray = (filter) => {
     var arr = [];
     if (!filter.length) {
         for (var key in filter) {
@@ -37,19 +31,19 @@ let rword = "-"
 
 /**
  * parallaObjsCollection: Object
- *  	0: Page
- *	    1: Page
+ *      0: Page
+ *      1: Page
  *
- *	recordMasterId: Object
- *		0: 9001
- *	 	1: 9001
+ *  recordMasterId: Object
+ *      0: 9001
+ *      1: 9001
  *
- *	recordMasterscope: Object
- *		9001: Array[2]
+ *  recordMasterscope: Object
+ *      9001: Array[2]
  *
- *	rootNode: ul # parallax.xut - parallax xut - flip
+ *  rootNode: ul # parallax.xut - parallax xut - flip
  *
- *	currMasterId: 9001 //实际的可使区
+ *  currMasterId: 9001 //实际的可使区
  */
 
 export class MasterMgr extends Abstract {
@@ -107,7 +101,7 @@ export class MasterMgr extends Abstract {
 
         //通知外部,需要创建的母版
         createCallBack();
- 
+
         masterObj = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
@@ -246,7 +240,7 @@ export class MasterMgr extends Abstract {
     }
 
     /**
-     * 	母版自动运行
+     *  母版自动运行
      */
     autoRun(data) {
         var masterObj, element;
@@ -564,9 +558,9 @@ export class MasterMgr extends Abstract {
 
     //更新母板作用域范围
     //recordMasterscope:{
-    //	 9001-1:[0,1], master 对应记录的页码
-    //	 9002-1:[2,3]
-    //	 9001-2:[4,5]
+    //   9001-1:[0,1], master 对应记录的页码
+    //   9002-1:[2,3]
+    //   9001-2:[4,5]
     //}
     _updataMasterscope(reuseMasterKey, pageIndex) {
         var scope;

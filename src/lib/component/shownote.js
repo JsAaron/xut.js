@@ -1,14 +1,15 @@
 import { Iscroll } from './content/iscroll'
 
-function ShowNote(data) {
-    data.id = parseInt(data.id);
-    data.actType = data.type;
-    _.extend(this, data)
-    this.setup();
-}
- 
-ShowNote.prototype = {
-    setup: function() {
+export class ShowNote {
+
+    constructor(data) {
+        data.id = parseInt(data.id);
+        data.actType = data.type;
+        _.extend(this, data)
+        this.setup();
+    }
+
+    setup() {
         var that = this,
             note = this.data.note,
             prop = Xut.config.proportion,
@@ -28,38 +29,38 @@ ShowNote.prototype = {
         this.show();
         this.iscroll = Iscroll(this._dom.find('.content')[0]);
         return true;
-    },
+    }
 
     //外部调用接口
-    dispatchProcess: function() {
+    dispatchProcess() {
         //自动热点 取消关闭
         if (this.isAutoPlay) return;
         //当前对象状态
         this.state ? this.hide() : this.show();
-    },
+    }
 
-    recovery: function() {
+    recovery() {
         if (this.state) {
             this.dispatchProcess();
             return true;
         }
         return false
-    },
+    }
 
-    hide: function() {
+    hide() {
         this.state = false;
         $("#ShowNote_" + this.id).css('background-image', 'url(images/icons/hideNote.png)');
         this._dom.hide()
-    },
+    }
 
 
-    show: function() {
+    show() {
         this.state = true;
         $("#ShowNote_" + this.id).css('background-image', 'url(images/icons/showNote.png)');
         this._dom.show();
-    },
+    }
 
-    destroy: function() {
+    destroy() {
         if (this._dom) {
             this._dom.find('.close').off();
             this._dom && this._dom.hide().remove();
@@ -73,6 +74,3 @@ ShowNote.prototype = {
     }
 
 }
-
-
-export { ShowNote }

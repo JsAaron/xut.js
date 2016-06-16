@@ -13,7 +13,7 @@ export function query(tableName, options, callback) {
         case 'scenarioChapter':
             return scenarioChapter(options);
     }
-} 
+}
 
 /**
  * 根据指定的chpaterId解析
@@ -25,7 +25,7 @@ function scenarioChapter(chapterId) {
     return rang;
 }
 
- 
+
 /*********************************************************************
  *
  *               1 解析chapter页面数据

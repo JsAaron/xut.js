@@ -19,6 +19,7 @@ if (!fs.existsSync("./src/content/xxtebook.db")) {
 }
 
 var spinner = ora('Begin to pack , Please wait for\n')
+spinner.start()
 
 if (!fs.existsSync("./src/content/SQLResult.js")) {
     require('../sqlite/index').resolve()
@@ -42,12 +43,13 @@ var webpackConfig = require('./webpack.dev.conf')
 //eslint
 if (config.dev.eslint.launch) {
     webpackConfig.module.preLoaders = [{
-            test: /\.js$/,
-            loader: 'eslint',
-            include: config.dev.eslint.dir,
-            exclude: /node_modules/
-        }]
-        // community formatter
+        test: /\.js$/,
+        loader: 'eslint',
+        include: config.dev.eslint.dir,
+        exclude: /node_modules/
+    }]
+
+    // community formatter
     webpackConfig.eslint = {
         formatter: require("eslint-friendly-formatter")
     }
@@ -102,31 +104,31 @@ app.use('/images', express.static('src/images'));
 app.use('/content', express.static('src/content'));
 
 
-if (config.dev.debug.launch) {
-
-    /**
-     * 监控文件变化
-     * 打包
-     */
-    watch(conf.assetsRoot + '/app.js', function() {
+let first = true
+watch(conf.assetsRoot + '/app.js', function() {
+    if (first) {
+        open("http://localhost:" + port)
+        first = false
+        spinner.stop()
+    }
+    if (config.dev.debug.launch) {
         console.log(
             '\n' +
             'watch file change.....await....:\n'
         )
         var child = child_process.spawn('node', ['build/dev/debug.js', ['debug=' + config.dev.debug.dir]]);
-        // 捕获标准输出并将其打印到控制台 
         child.stdout.on('data', function(data) {
             console.log('\n' + data);
         });
-        // 捕获标准错误输出并将其打印到控制台 
         child.stderr.on('data', function(data) {
             console.log('fail out：\n' + data);
         });
         child.on('close', function(code) {
             console.log('complete：' + code);
         });
-    })
-}
+    }
+})
+
 
 module.exports = app.listen(port, function(err) {
     if (err) {
@@ -136,7 +138,5 @@ module.exports = app.listen(port, function(err) {
     console.log('Listening at http://localhost:' + port + '\n')
 })
 
-spinner.start()
-setTimeout(function() {
-    spinner.stop()
-}, 5000)
+
+

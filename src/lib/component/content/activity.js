@@ -85,8 +85,8 @@ function activityClass(data) {
     /**
      * 如果存在content
      * 等待创建执行
-     * @param  {[type]} this.nextTask.context.length() 
-     * @return {[type]}                                
+     * @param  {[type]} this.nextTask.context.length()
+     * @return {[type]}
      */
     if (this.nextTask.context.length()) {
         this.nextTask.context.wait = true;

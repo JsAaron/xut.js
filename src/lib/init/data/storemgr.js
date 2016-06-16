@@ -1,24 +1,33 @@
-import {
-    Store as store
-}
-from './store'
+import { dataQuery, dataRemove, oneQuery } from './store'
 
 //数据缓存
 let dataCache
-    //带有场景信息存数
+
+//带有场景信息存数
 let sectionRelated
-    //音频的ActivityId信息;
+
+//音频的ActivityId信息;
 let videoActivityIdCache
 
+let novelId
+let errortables
 
-//混入数据到data中
-function mixToData(collections) {
+/**
+ * 混入数据到data中
+ * @param  {[type]} collections [description]
+ * @return {[type]}             [description]
+ */
+let mixToData = (collections) => {
     Xut.data = dataCache = collections;
 }
 
 
-//计算数据偏移量
-function dataOffset(tableName) {
+/**
+ * 计算数据偏移量
+ * @param  {[type]} tableName [description]
+ * @return {[type]}           [description]
+ */
+let dataOffset = (tableName) => {
     var start,
         data = dataCache[tableName];
     if (data.length) {
@@ -33,7 +42,7 @@ function dataOffset(tableName) {
 
 //转化video的activtiy信息
 //因为Video不是靠id关联的 是靠activtiy关联
-function videoActivity() {
+let videoActivity = () => {
     var d, activityIds = {},
         data = dataCache.Video;
     _.each(data, function(_, index) {
@@ -49,7 +58,7 @@ function videoActivity() {
 //chpater分段
 //转化section信息
 //带有场景处理
-function conversionSectionRelated() {
+let conversionSectionRelated = () => {
     var seasonId, start, length, sid, i, id, seasonInfo, toolbar, Chapters,
         container = {},
         Chapter = dataCache.Chapter,
@@ -99,7 +108,7 @@ function conversionSectionRelated() {
 
 
 //转化数据结构
-function conversion() {
+let conversion = () => {
 
     //数据段标记
     for (var k in dataCache) {
@@ -128,7 +137,7 @@ function conversion() {
      * 标记应用ID
      * @type {[type]}
      */
-    dataCache.novelId = store.novelId;
+    dataCache.novelId = novelId;
 
     /**
      * 针对数据库content为空的处理
@@ -139,8 +148,7 @@ function conversion() {
     }()
 
     //===============================================
-    //  
-    //  查询数据接口
+    //    //  查询数据接口
     //
     //  1 video表传递是activityId关联
     //  2 其余表都是传递当前表的id
@@ -164,7 +172,7 @@ function conversion() {
              *
              * 表名,ID,类型
              * Xut.data.query('Action', id, 'activityId');
-             *   
+             *
              * @type {[type]}
              */
             case 'activityId':
@@ -266,7 +274,7 @@ function conversion() {
      * @return {[type]} [description]
      */
     dataCache.oneQuery = function(tableName, callback) {
-        store.oneQuery(tableName, function(data) {
+        oneQuery(tableName, function(data) {
             callback && callback(data);
         })
     }
@@ -277,7 +285,7 @@ function conversion() {
      * @return {[type]} [description]
      */
     dataCache.remove = function(tableName, id, success, failure) {
-        var dfd = store.remove(tableName, id)
+        var dfd = dataRemove(tableName, id)
         dfd.done(success, failure)
     }
 }
@@ -288,7 +296,7 @@ function conversion() {
  * @return {[type]} [description]
  */
 export function errorTable() {
-    return store.collectError;
+    return errortables
 }
 
 /**
@@ -297,18 +305,19 @@ export function errorTable() {
  * @return {[type]} [description]
  */
 export function createStore() {
-    return $.Deferred(function(dfd) {
-        store.query().done(function(data) {
-            var novel = data.Novel;
-            //novel的id
-            var novelId = store.novelId = novel.item(0)['_id'];
+    return new Promise(function(resolve, reject) {
+        dataQuery().then(function(successRet, collectError) {
+
+            errortables = collectError || []
+            novelId = successRet.Novel.item(0)['_id']
+
             //数据转换
-            mixToData(data);
+            mixToData(successRet)
+
             //转化数据结构
-            conversion();
-            //数据缓存已存在
-            // storeMgr.dataCache = true
-            dfd.resolve(data.Setting, novel.item(0));
+            conversion()
+
+            resolve(successRet)
         })
-    }).promise();
+    })
 }

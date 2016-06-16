@@ -5,7 +5,7 @@ import { Observer } from '../observer/index'
  * 初始化首次范围
  * @return {[type]} [description]
  */
-let initPointer = function(init, pagetotal) {
+let initPointer = (init, pagetotal) => {
     var leftscope = 0,
         pagePointer = {};
 
@@ -20,7 +20,6 @@ let initPointer = function(init, pagetotal) {
         pagePointer['currIndex'] = init;
         pagePointer['rightIndex'] = init + 1;
     }
- 
     return pagePointer;
 }
 
@@ -28,7 +27,7 @@ let initPointer = function(init, pagetotal) {
  * 兼容事件对象
  * @return {[type]}   [description]
  */
-let compatibilityEvent = function(e) {
+let compatibilityEvent = (e) => {
     var point;
     if (e.touches && e.touches[0]) {
         point = e.touches[0];
@@ -41,7 +40,7 @@ let compatibilityEvent = function(e) {
 /**
  * 计算当前已经创建的页面索引
  */
-let calculationIndex = function(currIndex, targetIndex, pagetotal) {
+let calculationIndex = (currIndex, targetIndex, pagetotal) => {
     var i = 0,
         existpage,
         createpage,
@@ -124,8 +123,7 @@ let calculationIndex = function(currIndex, targetIndex, pagetotal) {
 // //退出应用
 // 'onDropApp'
 
-
-class GlobalEvent extends Observer {
+export class GlobalEvent extends Observer {
 
     constructor(options, config) {
         super()
@@ -896,13 +894,4 @@ class GlobalEvent extends Observer {
         this.element = null;
     }
 
-
-
-}
-
-
-
-
-export {
-    GlobalEvent
 }

@@ -51,10 +51,10 @@ import { sceneFactory } from './scenario/factory'
 
 
 var config = Xut.config,
-    plat   = Xut.plat,
-    LOCK   = 1, //锁定
+    plat = Xut.plat,
+    LOCK = 1, //锁定
     UNLOCK = 2, //解除锁定
-    IsPay  = false; //
+    IsPay = false; //
 
 /**
  * 代码注入空间
