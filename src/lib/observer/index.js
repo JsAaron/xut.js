@@ -24,15 +24,16 @@ let _indexOf = (array, needle) => {
 
 
 
-class Observer {
+export class Observer {
 
     constructor() {
         this.$watch = this.bind
         this.$off = this.unbind
         this.$emit = this.trigger
         this.$once = this.one
-            //触发列表名称
-            //防止同步触发
+
+        //触发列表名称
+        //防止同步触发
         this._handleName = {}
     }
 
@@ -121,7 +122,3 @@ class Observer {
 
 }
 
-
-export {
-    Observer
-}

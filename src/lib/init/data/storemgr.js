@@ -285,8 +285,7 @@ let conversion = () => {
      * @return {[type]} [description]
      */
     dataCache.remove = function(tableName, id, success, failure) {
-        var dfd = dataRemove(tableName, id)
-        dfd.done(success, failure)
+        dataRemove(tableName, id, success, failure)
     }
 }
 
@@ -304,20 +303,19 @@ export function errorTable() {
     获取ppt总数
  * @return {[type]} [description]
  */
-export function createStore() {
-    return new Promise(function(resolve, reject) {
-        dataQuery().then(function(successRet, collectError) {
+export function createStore(callback) {
 
-            errortables = collectError || []
-            novelId = successRet.Novel.item(0)['_id']
+    dataQuery(function(successRet, collectError) {
 
-            //数据转换
-            mixToData(successRet)
+        errortables = collectError || []
+        novelId = successRet.Novel.item(0)['_id']
 
-            //转化数据结构
-            conversion()
+        //数据转换
+        mixToData(successRet)
 
-            resolve(successRet)
-        })
+        //转化数据结构
+        conversion()
+
+        callback(successRet)
     })
 }

@@ -7,107 +7,30 @@
  *    4: 用于插入一个网页的webview
  */
 
-var VideoPlayer = null,
-    noop = function () { },
+import {
+    supportVideo,
+    supportFlash
+} from './support'
 
-    //检测是否支持HTML5的video播放
-    supportVideo = function () {
-        var video = document.createElement('video'),
-            type = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-        return !!video.canPlayType && "probably" == video.canPlayType(type);
-    } (),
-
-    //检测是否安装了flash插件
-    supportFlash = function () {
-        var i_flash = false;
-
-        if (navigator.plugins) {
-            for (var i = 0; i < navigator.plugins.length; i++) {
-                if (navigator.plugins[i].name.toLowerCase().indexOf("shockwave flash") != -1) {
-                    i_flash = true;
-                }
-            }
-        }
-        return i_flash;
-    } ();
-
-
-//移动端浏览器平台
-if (Xut.plat.isBrowser) {
-    VideoPlayer = Video5
-} else {
-    //检测平台
-    if (Xut.plat.isIOS || top.EduStoreClient) {
-        //如果是ibooks模式
-        if (Xut.IBooks.Enabled) {
-            VideoPlayer = VideoJS
-        } else {
-            //如果是ios或读酷pc版则使用html5播放
-            VideoPlayer = Video5;
-        }
-    } else if (Xut.plat.isAndroid) {
-        //android平台
-        VideoPlayer = _Media;
-    }
-}
-
-/**
- * @param {[type]} options   [description]
- *   options.videoId;
- *   options.pageId;
- *   options.pageUrl;
- *   options.left;
- *   options.top;
- *   options.width;
- *   options.height;
- *   options.padding;
- *   options.category;
- * @param {[type]} container 视频元素容器
- */
-
-function VideoClass(options, container) {
-    options.container = container;
-    if ('video' == options.category) {
-        this.video = VideoPlayer(options);
-    } else if ('webpage' == options.category) {
-        this.video = WebPage(options);
-    } else {
-        console.log('options.category must be video or webPage ')
-    }
-}
-
-VideoClass.prototype = {
-    play: function () {
-        //隐藏工具栏
-        Xut.View.Toolbar("hide");
-        this.video.play();
-    },
-    stop: function () {
-        //显示工具栏
-        Xut.View.Toolbar("show");
-        this.video.stop();
-    },
-    close: function () {
-        this.video.close();
-    }
-}
+let VideoPlayer = null
+let noop = () => {}
 
 
 /**
  * 网页
  * @param {[type]} options [description]
  */
-function WebPage(options) {
+let WebPage = (options) => {
 
     var pageUrl = options.pageUrl;
 
     //跳转app市场
-    //普通网页是1  
+    //普通网页是1
     //跳转app市场就是2
     if (options.hyperlink == 2) {
         //跳转到app市场
         window.open(pageUrl)
-        //数据统计
+            //数据统计
         $.get('http://www.appcarrier.cn/index.php/adplugin/recordads?aid=16&esbId=ios')
     } else {
 
@@ -167,7 +90,7 @@ function WebPage(options) {
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-function webView(options) {
+let webView = (options) => {
     var width = options.width,
         height = options.height,
         pageUrl = options.pageUrl,
@@ -178,7 +101,7 @@ function webView(options) {
         //打开一个网页的时候，需要关闭其他已经打开过的网页
         Xut.Plugin.WebView.close();
         Xut.VideoManager.openWebView = false;
-        setTimeout(function () {
+        setTimeout(function() {
             Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
             Xut.VideoManager.openWebView = true;
         }, 500);
@@ -202,10 +125,9 @@ function webView(options) {
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-function _Media(options) {
+let _Media = (options) => {
     //如果是读库或者妙妙学
-    var url = (window.MMXCONFIG || window.DUKUCONFIG)
-        ? options.url
+    var url = (window.MMXCONFIG || window.DUKUCONFIG) ? options.url
         //如果是纯apk模式
         : options.url.substring(0, options.url.lastIndexOf('.'))
 
@@ -214,18 +136,18 @@ function _Media(options) {
     var top = options.top || 0
     var left = options.left || 0
 
-    var play = function () {
+    var play = function() {
         //var calculate = Xut.config.proportion.calculateContainer();
         //top += Math.ceil(calculate.top);
         //left += Math.ceil(calculate.left);
-        Xut.Plugin.VideoPlayer.play(function () {
+        Xut.Plugin.VideoPlayer.play(function() {
             //成功回调
-        }, function () {
+        }, function() {
             //失败回调
         }, Xut.config.videoPath() + url, 1, left, top, height, width);
     }
 
-    var close = function () {
+    var close = function() {
         Xut.Plugin.VideoPlayer.close();
     }
 
@@ -248,7 +170,7 @@ function _Media(options) {
  *  var video = new Video({url:'1.mp4',width:'320',...});
  *  video.play();
  */
-function Video5(options) {
+let _Video5 = (options) => {
 
     var container = options.container || $('body'),
         url = Xut.config.videoPath() + options.url,
@@ -358,7 +280,7 @@ function Video5(options) {
  * 基于video.js的web播放器,在pc端flash优先
  * @param {[type]} options [description]
  */
-function VideoJS(options) {
+let _VideoJS = (options) => {
     var container = options.container || $('body'),
         videoId = options.videoId,
         url = Xut.config.videoPath() + options.url,
@@ -381,7 +303,7 @@ function VideoJS(options) {
     videojs.options.flash.swf = "lib/data/video-js.swf";
 
 
-    var clear = function () {
+    var clear = function() {
         //结束后清理自己
         Xut.VideoManager.removeVideo(options.pageId);
     }
@@ -428,24 +350,24 @@ function VideoJS(options) {
             //是否显示视频时长
             durationDisplay: false
         }
-    }, function () {
+    }, function() {
         //可以播放时提升层级，防止闪现
-        this.on('canplay', function () {
+        this.on('canplay', function() {
             wrap.style.zIndex = zIndex;
         });
 
         //播放完毕后自动关闭
-        this.on('ended', function () {
+        this.on('ended', function() {
             //结束后清理自己
             clear()
         });
 
-        this.on('error', function () {
+        this.on('error', function() {
             clear()
         });
 
         //因为没有关闭按钮,又不想自己做,就把全屏变成关闭好了.
-        this.on("touchend mouseup", function (e) {
+        this.on("touchend mouseup", function(e) {
             var className = e.target.className.toLowerCase();
             if (-1 != className.indexOf('vjs-fullscreen-control')) {
                 clear()
@@ -463,11 +385,11 @@ function VideoJS(options) {
     api = {
         play: noop,
 
-        stop: function () {
+        stop: function() {
             player.stop();
         },
 
-        close: function () {
+        close: function() {
             player && player.dispose();
             player = null;
         }
@@ -476,7 +398,61 @@ function VideoJS(options) {
     return api;
 }
 
+
+
+//移动端浏览器平台
+if (Xut.plat.isBrowser) {
+    VideoPlayer = _Video5
+} else {
+    //检测平台
+    if (Xut.plat.isIOS || top.EduStoreClient) {
+        //如果是ibooks模式
+        if (Xut.IBooks.Enabled) {
+            VideoPlayer = _VideoJS
+        } else {
+            //如果是ios或读酷pc版则使用html5播放
+            VideoPlayer = _Video5;
+        }
+    } else if (Xut.plat.isAndroid) {
+        //android平台
+        VideoPlayer = _Media;
+    }
+}
+
+
+
+class VideoClass {
+
+    constructor(options, container) {
+        options.container = container;
+        if ('video' == options.category) {
+            this.video = VideoPlayer(options)
+        } else if ('webpage' == options.category) {
+            this.video = WebPage(options);
+        } else {
+            console.log('options.category must be video or webPage ')
+        }
+    }
+
+    play() {
+        //隐藏工具栏
+        Xut.View.Toolbar("hide");
+        this.video.play();
+    }
+    stop() {
+        //显示工具栏
+        Xut.View.Toolbar("show");
+        this.video.stop();
+    }
+    close() {
+        this.video.close();
+    }
+
+}
+
+
+
 export {
-Video5,
-VideoClass
+    _Video5 as Video5,
+    VideoClass
 }

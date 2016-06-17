@@ -23,26 +23,26 @@ export function oneQuery(tableName, callback) {
 /**
  * 查询总数据
  */
-export function dataQuery() {
-    return new Promise(function(resolve, reject) {
-        //数据库表重复数据只查询一次
-        if (Object.keys(dataRet).length) {
-            resolve(dataRet);
-            return;
-        }
-        //ibook模式，数据库外部注入的
-        if (Xut.IBooks.CONFIG) {
-            resolve(Xut.IBooks.CONFIG.data);
-        } else {
-            //查询所有数据
-            execute(statement, function(successRet, collectError) {
-                for (let i in successRet) {
-                    dataRet[i] = successRet[i];
-                }
-                resolve(successRet, collectError);
-            })
-        }
-    })
+export function dataQuery(callback) {
+
+    //数据库表重复数据只查询一次
+    if (Object.keys(dataRet).length) {
+        callback(dataRet);
+        return;
+    }
+    //ibook模式，数据库外部注入的
+    if (Xut.IBooks.CONFIG) {
+        callback(Xut.IBooks.CONFIG.data);
+    } else {
+        //查询所有数据
+        execute(statement, function(successRet, collectError) {
+            for (let i in successRet) {
+                dataRet[i] = successRet[i];
+            }
+            callback(successRet, collectError);
+        })
+    }
+
 }
 
 
@@ -50,16 +50,14 @@ export function dataQuery() {
  * 删除数据
  * @type {[type]}
  */
-export function dataRemove(tableName, id) {
-    return new Promise(function(resolve, reject) {
-        var sql = 'delete from ' + tableName + ' where _id = ' + id;
-        //查询所有数据
-        execute(sql, function(success, failure) {
-            if (success) { //成功回调
-                resolve();
-            } else if (failure) { //失败回调
-                reject();
-            }
-        })
+export function dataRemove(tableName, id, success, fail) {
+    var sql = 'delete from ' + tableName + ' where _id = ' + id;
+    //查询所有数据
+    execute(sql, function(success, failure) {
+        if (success) { //成功回调
+            success();
+        } else if (failure) { //失败回调
+            fail();
+        }
     })
 }

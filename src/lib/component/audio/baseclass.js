@@ -1,4 +1,3 @@
-
 import { Action } from './action'
 import { Subtitle } from './subtitle'
 
@@ -6,7 +5,8 @@ import { Subtitle } from './subtitle'
  * 音频工厂类
  * @param {[type]} options [description]
  */
-export class AudioFactory {
+export class BaseClass {
+
     constructor() {}
 
     //构建之前关数据

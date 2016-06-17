@@ -66,7 +66,7 @@ function bind(instance, success, fail) {
  * @param {[type]} options [description]
  */
 export class Animation {
-    
+
     constructor(options) {
         //mix参数
         _.extend(this, options);
@@ -75,7 +75,7 @@ export class Animation {
     /**
      * 绑定动画
      * 为了向上兼容API
-     * element 
+     * element
      *  1 dom动画
      *  2 canvas动画
      * @param  {[type]} context   [description]

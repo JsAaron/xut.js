@@ -208,8 +208,7 @@ let initMain = (novelData) => {
  * @return {[type]} [description]
  */
 let initValue = () => {
-    let promise = createStore()
-    promise.then((dataRet) => {
+    createStore((dataRet) => {
         let novelData = dataRet.Novel.item(0)
         initDefaults(dataRet.Setting)
         fixedSize(novelData)

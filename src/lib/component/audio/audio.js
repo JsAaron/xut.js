@@ -4,7 +4,7 @@
  * @return {[type]}        [description]
  */
 import { hash } from '../../util/dom'
-import { AudioFactory } from './factory'
+import { BaseClass } from './baseclass'
 
 let Player = null
 let noop = function() {}
@@ -56,7 +56,7 @@ let supportAudio = (fail) => {
  * @param  {string} url 路径
  * @return {[type]}      [description]
  */
-class _Media extends AudioFactory {
+class _Media extends BaseClass {
 
     constructor(options, controlDoms) {
         super()
@@ -101,7 +101,7 @@ class _Media extends AudioFactory {
  * 采用Falsh播放
  * @type {[type]}
  */
-class _Flash extends AudioFactory {
+class _Flash extends BaseClass {
 
     constructor(options, controlDoms) {
         super()
@@ -153,14 +153,15 @@ class _Flash extends AudioFactory {
  * @param  {object} options 可选参数
  * @return {object}         [description]
  */
-class _Audio extends AudioFactory {
+class _Audio extends BaseClass {
 
     constructor(options, controlDoms) {
         super()
-        var trackId = options.trackId,
-            url = Xut.config.audioPath() + options.url,
-            self = this,
-            audio;
+
+        let trackId = options.trackId
+        let url = Xut.config.audioPath() + options.url
+        let self = this
+        let audio
 
         //构建之前处理
         this.preRelated(trackId, options);
@@ -220,7 +221,7 @@ class _Audio extends AudioFactory {
  * @param  {string} url 路径
  * @return {[type]}      [description]
  */
-class _cordovaMedia extends AudioFactory {
+class _cordovaMedia extends BaseClass {
 
     constructor(options, controlDoms) {
         super()
@@ -299,18 +300,18 @@ if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     if (window.MMXCONFIG && window.audioHandler) {
         audioPlayer = _cordovaMedia;
     } else {
-        //pc
+        //特殊情况
+        //有客户端的内嵌浏览器模式
         audioPlayer = _Audio;
     }
     //2015.12.23
     //如果不支持audio改用flash
     // supportAudio(function() {
-    //     Xut.Audio = _Flash;
+    //     Xut.Audio = Flash;
     // });
 }
 
 
 export {
     audioPlayer
-
 }
