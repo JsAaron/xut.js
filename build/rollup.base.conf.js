@@ -72,7 +72,7 @@ module.exports = (conf) => {
                 entry: conf.entry,
                 plugins: [
                     babel({
-                        "presets": ["es2015-rollup"]
+                        exclude: 'node_modules/**'
                     })
                 ]
             }).then((bundle) => {
