@@ -138,7 +138,7 @@ Xut.plugins = {};
             return function(subClass, superClass, overrides) {
 
                 //参数移位
-                if(typeof superClass == 'object') {
+                if(typeof (superClass) == 'object') {
                     overrides = superClass;
                     superClass = subClass;
                     //如果overrides中含有constructor就是子类的构造器

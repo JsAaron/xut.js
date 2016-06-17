@@ -1,7 +1,5 @@
-//预初始化
-import { AudioManager } from '../component/audio/manager'
-import { VideoManager } from '../component/video/manager'
-import initdata from './data'
+
+import initdata from './data/index'
 import { bindKeyEvent } from './keyevent'
 import { loader, setRootfont } from '../util/index'
 import { playPlugVideo, playHtml5Video } from './video'
@@ -47,7 +45,6 @@ let loadApp = (config) => {
         setRootfont()
         initdata()
     });
-
 }
 
 

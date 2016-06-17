@@ -23,7 +23,7 @@ var conf = _.extend(config.build.conf, {
 });
 
 var spinner = ora('Begin to pack , Please wait for\n')
-    // spinner.start()
+spinner.start()
 
 console.log(
     '压缩js  => rollup and gulp\n' +
@@ -55,7 +55,7 @@ base(conf).then((scriptUrl) => {
                 resolve && resolve()
             })
     })
-}).then(() => {
+}, () => spinner.stop()).then(() => {
     return new Promise((resolve, reject) => {
         //css
         gulp.src('src/css/*.css')

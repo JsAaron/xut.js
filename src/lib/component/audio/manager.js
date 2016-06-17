@@ -33,401 +33,377 @@
 import { parseJSON, hash } from '../../util/index'
 import { audioPlayer } from './audio'
 
-function AudioManager() {
 
-    //动作标示
-    var ACTIVIT = 'hot'; //热点音频
-    var ANIMATE = 'content'; //动画音频
-    var SEASON = 'season'; //节音频
+//动作标示
+var ACTIVIT = 'hot'; //热点音频
+var ANIMATE = 'content'; //动画音频
+var SEASON = 'season'; //节音频
 
-    /**
-     * 容器合集
-     * 1 pageBox 当前待播放的热点音频
-     * 2 playBox 播放中的热点音频集合
-     */
+/**
+ * 容器合集
+ * 1 pageBox 当前待播放的热点音频
+ * 2 playBox 播放中的热点音频集合
+ */
+//[type][pageId][queryId]
+var pageBox, playBox;
+
+function initBox() {
+    pageBox = hash();
     //[type][pageId][queryId]
-    var pageBox, playBox;
+    playBox = hash();
+}
 
-    function initBox() {
-        pageBox = hash();
-        //[type][pageId][queryId]
-        playBox = hash();
+initBox();
+
+
+/**
+ * 解析数据
+ * @param  {[type]} type    [description]
+ * @param  {[type]} queryId [description]
+ * @return {[type]}         [description]
+ */
+let parseData = (type, queryId) => {
+    var data;
+    switch (type) {
+        case ANIMATE:
+            data = Xut.data.query('Video', queryId, true);
+            break;
+        case SEASON:
+            data = Xut.data.query('Video', queryId, true);
+            break;
+        default:
+            data = Xut.data.query('Video', queryId);
+            break;
     }
+    return data;
+}
 
-    initBox();
+/**
+ * 获取父容器
+ * @return {[type]} [description]
+ */
+let getParentDom = (subtitles, pageId, queryId) => {
+    //字幕数据
+    var parentDoms = hash();
+    var ancestorDoms = hash();
+    var contentsFragment;
+    var dom;
+    var pageIndex = (pageId - 1);
+    if (subtitles) {
+        //获取文档节点
+        contentsFragment = Xut.Contents.contentsFragment[pageId];
 
-
-    //===============================================
-    //
-    //              预装配数据
-    //
-    //===============================================
-
-
-    /**
-     * 解析数据
-     * @param  {[type]} type    [description]
-     * @param  {[type]} queryId [description]
-     * @return {[type]}         [description]
-     */
-    function parseData(type, queryId) {
-        var data;
-        switch (type) {
-            case ANIMATE:
-                data = Xut.data.query('Video', queryId, true);
-                break;
-            case SEASON:
-                data = Xut.data.query('Video', queryId, true);
-                break;
-            default:
-                data = Xut.data.query('Video', queryId);
-                break;
+        //如果maskId大于9000默认为处理
+        var isMask = pageId > 9000;
+        if (isMask) {
+            //指定页码编号
+            pageIndex = Xut.Presentation.GetPageIndex();
         }
-        return data;
-    }
 
-    /**
-     * 获取父容器
-     * @return {[type]} [description]
-     */
-    function getParentDom(subtitles, pageId, queryId) {
-        //字幕数据
-        var parentDoms = hash();
-        var ancestorDoms = hash();
-        var contentsFragment;
-        var dom;
-        var pageIndex = (pageId - 1);
-        if (subtitles) {
-            //获取文档节点
-            contentsFragment = Xut.Contents.contentsFragment[pageId];
-
-            //如果maskId大于9000默认为处理
-            var isMask = pageId > 9000;
-            if (isMask) {
-                //指定页码编号
-                pageIndex = Xut.Presentation.GetPageIndex();
-            }
-
-            //找到对应的节点
-            _.each(subtitles, function(data) {
-                //'Content_0_1' 规则 类型_页码（0开始）_id
-                if (!parentDoms[data.id]) {
-                    dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
-                    ancestorDoms[data.id] = dom;
-                    var $dom = $(dom);
-                    if ($dom.length) {
-                        var _div = $dom.find('div').last();
-                        if (_div.length) {
-                            parentDoms[data.id] = _div[0]
-                        }
+        //找到对应的节点
+        _.each(subtitles, function(data) {
+            //'Content_0_1' 规则 类型_页码（0开始）_id
+            if (!parentDoms[data.id]) {
+                dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
+                ancestorDoms[data.id] = dom;
+                var $dom = $(dom);
+                if ($dom.length) {
+                    var _div = $dom.find('div').last();
+                    if (_div.length) {
+                        parentDoms[data.id] = _div[0]
                     }
                 }
+            }
+        })
+    }
+
+    return {
+        parents: parentDoms,
+        ancestors: ancestorDoms
+    };
+}
+
+/**
+ * 检测数据是否存在
+ * @return {[type]}         [description]
+ */
+let checkRepeat = (pageId, queryId, type) => {
+    var pBox = pageBox[type];
+    if (pBox && pBox[pageId] && pBox[pageId][queryId]) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * 组合热点音频数据结构
+ * data, pageId, queryId, type
+ * 数据，页码编号，videoId, 查询的类型
+ * @return {[type]}         [description]
+ */
+let combination = (data, pageId, queryId, type, eleName) => {
+    var tempDoms;
+    if (!pageBox[type]) {
+        pageBox[type] = hash();
+    }
+    if (!pageBox[type][pageId]) {
+        pageBox[type][pageId] = hash();
+    }
+    //有字幕处理
+    if (data.theTitle) {
+        var subtitles = parseJSON(data.theTitle);
+    }
+    //配置音频结构
+    return pageBox[type][pageId][queryId] = {
+        'trackId': data.track, //音轨
+        'url': data.md5, //音频名字
+        'subtitles': subtitles,
+        'audioId': queryId,
+        'data': data
+    }
+}
+
+
+/**
+ * 装配音频数据
+ * @param  {int} pageId    页面id或节的分组id
+ * @param  {int} queryId   查询id,支持activityId,audioId
+ * @param  {string} type   音频来源类型[动画音频,节音频,热点音频]
+ */
+let deployAudio = (pageId, queryId, type, actionData) => {
+    //避免复重查询
+    if (checkRepeat(pageId, queryId, type)) {
+        return false;
+    }
+    //解析合集数据
+    var data = parseData(type, queryId);
+    //存在音频文件
+    if (data && data.md5) {
+        //新的查询
+        var ret = combination(data, pageId, queryId, type, actionData);
+        //混入新的动作数据
+        //2015.9.24
+        //音频替换图片
+        //触发动画
+        if (actionData) {
+            _.extend(ret, actionData, {
+                action: true //快速判断存在动作数据
             })
         }
+    }
+}
 
-        return {
-            parents: parentDoms,
-            ancestors: ancestorDoms
-        };
+
+
+/**
+ * 检查要打断的音频
+ * @param  {[type]} type    音频类型
+ * @param  {[type]} pageId  [description]
+ * @param  {[type]} queryId [description]
+ * @param  {[type]} pageBox [description]
+ * @return {boolen}         不打断返回true,否则返回false
+ */
+let checkBreakAudio = (type, pageId, queryId, pageBox) => {
+    var playObj = playBox[type][pageId][queryId],
+        trackId = pageBox.trackId,
+        _trackId = playObj.trackId;
+
+    //如果是节音频，且地址相同，则不打断
+    if (type == SEASON && playObj.url == pageBox.url) {
+        return true;
     }
 
-    /**
-     * 检测数据是否存在
-     * @return {[type]}         [description]
-     */
-    function checkRepeat(pageId, queryId, type) {
-        var pBox = pageBox[type];
-        if (pBox && pBox[pageId] && pBox[pageId][queryId]) {
-            return true;
-        }
-        return false;
+    //如果要用零音轨||零音轨有音乐在播||两音轨相同
+    //则打断
+    if (trackId == 0 || _trackId == 0 || trackId == _trackId) {
+        playObj.end();
+        delete playBox[type][pageId][queryId];
     }
-
-    /**
-     * 组合热点音频数据结构
-     * data, pageId, queryId, type
-     * 数据，页码编号，videoId, 查询的类型
-     * @return {[type]}         [description]
-     */
-    function combination(data, pageId, queryId, type, eleName) {
-        var tempDoms;
-        if (!pageBox[type]) {
-            pageBox[type] = hash();
-        }
-        if (!pageBox[type][pageId]) {
-            pageBox[type][pageId] = hash();
-        }
-        //有字幕处理
-        if (data.theTitle) {
-            var subtitles = parseJSON(data.theTitle);
-        }
-        //配置音频结构
-        return pageBox[type][pageId][queryId] = {
-            'trackId': data.track, //音轨
-            'url': data.md5, //音频名字
-            'subtitles': subtitles,
-            'audioId': queryId,
-            'data': data
-        }
-    }
+    return false;
+}
 
 
-    /**
-     * 装配音频数据
-     * @param  {int} pageId    页面id或节的分组id
-     * @param  {int} queryId   查询id,支持activityId,audioId
-     * @param  {string} type   音频来源类型[动画音频,节音频,热点音频]
-     */
-    function deployAudio(pageId, queryId, type, actionData) {
-        //避免复重查询
-        if (checkRepeat(pageId, queryId, type)) {
-            return false;
-        }
-        //解析合集数据
-        var data = parseData(type, queryId);
-        //存在音频文件
-        if (data && data.md5) {
-            //新的查询
-            var ret = combination(data, pageId, queryId, type, actionData);
-            //混入新的动作数据
-            //2015.9.24
-            //音频替换图片
-            //触发动画
-            if (actionData) {
-                _.extend(ret, actionData, {
-                    action: true //快速判断存在动作数据
-                })
-            }
-        }
-    }
-
-
-    //===============================================
-    //
-    //              初始化加载音频
-    //
-    //===============================================
-
-
-    /**
-     * 检查要打断的音频
-     * @param  {[type]} type    音频类型
-     * @param  {[type]} pageId  [description]
-     * @param  {[type]} queryId [description]
-     * @param  {[type]} pageBox [description]
-     * @return {boolen}         不打断返回true,否则返回false
-     */
-    function checkBreakAudio(type, pageId, queryId, pageBox) {
-        var playObj = playBox[type][pageId][queryId],
-            trackId = pageBox.trackId,
-            _trackId = playObj.trackId;
-
-        //如果是节音频，且地址相同，则不打断
-        if (type == SEASON && playObj.url == pageBox.url) {
-            return true;
-        }
-
-        //如果要用零音轨||零音轨有音乐在播||两音轨相同
-        //则打断
-        if (trackId == 0 || _trackId == 0 || trackId == _trackId) {
-            playObj.end();
-            delete playBox[type][pageId][queryId];
-        }
-        return false;
-    }
-
-
-    /**
-     * 播放音频之前检查
-     * @param  {int} pageId    [description]
-     * @param  {int} queryId    查询id
-     * @param  {string} type    决定video表按哪个字段查询
-     * @return {object}         音频对象/不存在为null
-     */
-    function preCheck(pageId, queryId, type) {
-        var t, p, q,
-            playObj = pageBox[type][pageId][queryId],
-            seasonAudio = null;
-        for (t in playBox) {
-            for (p in playBox[t]) {
-                for (q in playBox[t][p]) {
-                    if (checkBreakAudio(t, p, q, playObj)) {
-                        seasonAudio = playBox[t][p][q];
-                    }
+/**
+ * 播放音频之前检查
+ * @param  {int} pageId    [description]
+ * @param  {int} queryId    查询id
+ * @param  {string} type    决定video表按哪个字段查询
+ * @return {object}         音频对象/不存在为null
+ */
+let preCheck = (pageId, queryId, type) => {
+    var t, p, q,
+        playObj = pageBox[type][pageId][queryId],
+        seasonAudio = null;
+    for (t in playBox) {
+        for (p in playBox[t]) {
+            for (q in playBox[t][p]) {
+                if (checkBreakAudio(t, p, q, playObj)) {
+                    seasonAudio = playBox[t][p][q];
                 }
             }
         }
-        return seasonAudio;
+    }
+    return seasonAudio;
+}
+
+
+/**
+ * 加载音频对象
+ * @return {[type]}         [description]
+ */
+let loadAudio = (pageId, queryId, type) => {
+
+    //找到页面对应的音频
+    //类型=》页面=》指定音频Id
+    var pageObj = pageBox[type][pageId][queryId];
+    //检测
+    var seAudio = preCheck(pageId, queryId, type);
+
+    //播放音频时关掉视频
+    Xut.VideoManager.clearVideo();
+
+    //构建播放列表
+    if (!playBox[type]) {
+        playBox[type] = hash();
+    }
+    if (!playBox[type][pageId]) {
+        playBox[type][pageId] = hash();
+    }
+    //假如有字幕信息
+    //找到对应的文档对象
+    if (pageObj.subtitles) {
+        var tempDoms = getParentDom(pageObj.subtitles, pageId, queryId);
     }
 
-
-    /**
-     * 加载音频对象
-     * @return {[type]}         [description]
-     */
-    function loadAudio(pageId, queryId, type) {
-
-        //找到页面对应的音频
-        //类型=》页面=》指定音频Id
-        var pageObj = pageBox[type][pageId][queryId];
-        //检测
-        var seAudio = preCheck(pageId, queryId, type);
-
-        //播放音频时关掉视频
-        Xut.VideoManager.clearVideo();
-
-        //构建播放列表
-        if (!playBox[type]) {
-            playBox[type] = hash();
+    //播放完成处理
+    pageObj.innerCallback = function(audio) {
+        if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
+            audio.end();
+            delete playBox[type][pageId][queryId];
         }
-        if (!playBox[type][pageId]) {
-            playBox[type][pageId] = hash();
-        }
-        //假如有字幕信息
-        //找到对应的文档对象
-        if (pageObj.subtitles) {
-            var tempDoms = getParentDom(pageObj.subtitles, pageId, queryId);
-        }
+    }
 
-        //播放完成处理
-        pageObj.innerCallback = function(audio) {
-            if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
-                audio.end();
-                delete playBox[type][pageId][queryId];
+    //new播放对象
+    var newObj = seAudio || new audioPlayer(pageObj, tempDoms);
+    newObj.play();
+
+    //存入播放对象池
+    playBox[type][pageId][queryId] = newObj;
+}
+
+
+/**
+ * 交互点击
+ * @param  {int} pageId     [description]
+ * @param  {int} queryId    [description]
+ * @param  {string} type    ACTIVIT
+ * @return {[type]}         [description]
+ */
+let loadTiggerAudio = (pageId, queryId, type) => {
+    var playObj, status;
+    if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
+        playObj = playBox[type][pageId][queryId];
+        status = playObj.audio ? playObj.status : null;
+    }
+    switch (status) {
+        case 'playing':
+            playObj.pause();
+            break;
+        case 'paused':
+            playObj.play();
+            break;
+        default:
+            loadAudio(pageId, queryId, type);
+            break;
+    }
+}
+
+
+/**
+ * 清理全部音频
+ * @return {[type]} [description]
+ */
+let removeAudio = () => {
+    var flag = false,
+        t, p, a;
+    for (t in playBox) {
+        for (p in playBox[t]) {
+            for (a in playBox[t][p]) {
+                playBox[t][p][a].end();
+                flag = true;
             }
         }
+    }
+    initBox();
+    return flag;
+}
 
-        //new播放对象
-        var newObj = seAudio || new audioPlayer(pageObj, tempDoms);
-        newObj.play();
 
-        //存入播放对象池
-        playBox[type][pageId][queryId] = newObj;
+export class AudioManager {
+
+    ///////////////////
+    //1 独立音频处理, 音轨/跨页面 //
+    //2 动画音频,跟动画一起播放与销毁
+    ///////////////////
+
+    //自动播放触发接口
+    autoPlay(pageId, activityId, actionData) {
+        deployAudio(pageId, activityId, ACTIVIT, actionData);
+        loadAudio(pageId, activityId, ACTIVIT);
+    }
+
+    //手动触发
+    trigger(pageId, activityId, actionData) {
+        deployAudio(pageId, activityId, ACTIVIT, actionData);
+        loadTiggerAudio(pageId, activityId, ACTIVIT);
     }
 
 
-    /**
-     * 交互点击
-     * @param  {int} pageId     [description]
-     * @param  {int} queryId    [description]
-     * @param  {string} type    ACTIVIT
-     * @return {[type]}         [description]
-     */
-    function loadTiggerAudio(pageId, queryId, type) {
-        var playObj, status;
-        if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
-            playObj = playBox[type][pageId][queryId];
-            status = playObj.audio ? playObj.status : null;
-        }
-        switch (status) {
-            case 'playing':
-                playObj.pause();
-                break;
-            case 'paused':
-                playObj.play();
-                break;
-            default:
-                loadAudio(pageId, queryId, type);
-                break;
-        }
+    //动画音频触发接口
+    contentAudio(pageId, audioId) {
+        deployAudio(pageId, audioId, ANIMATE);
+        loadAudio(pageId, audioId, ANIMATE);
     }
 
+    //节音频触发接口
+    seasonAudio(seasonAudioId, audioId) {
+        deployAudio(seasonAudioId, audioId, SEASON);
+        loadAudio(seasonAudioId, audioId, SEASON);
+    }
 
-    /**
-     * 清理全部音频
-     * @return {[type]} [description]
-     */
-    function removeAudio() {
-        var flag = false,
-            t, p, a;
+    //挂起音频
+    hangUpAudio() {
+        var t, p, a;
         for (t in playBox) {
             for (p in playBox[t]) {
                 for (a in playBox[t][p]) {
-                    playBox[t][p][a].end();
-                    flag = true;
+                    playBox[t][p][a].pause();
                 }
             }
         }
-        initBox();
-        return flag;
     }
 
-    var out = {
-
-        ///////////////////
-        //1 独立音频处理, 音轨/跨页面 //
-        //2 动画音频,跟动画一起播放与销毁
-        ///////////////////
-
-        //自动播放触发接口
-        autoPlay: function(pageId, activityId, actionData) {
-            deployAudio(pageId, activityId, ACTIVIT, actionData);
-            loadAudio(pageId, activityId, ACTIVIT);
-        },
-
-        //手动触发
-        trigger: function(pageId, activityId, actionData) {
-            deployAudio(pageId, activityId, ACTIVIT, actionData);
-            loadTiggerAudio(pageId, activityId, ACTIVIT);
-        },
-
-
-        //动画音频触发接口
-        contentAudio: function(pageId, audioId) {
-            deployAudio(pageId, audioId, ANIMATE);
-            loadAudio(pageId, audioId, ANIMATE);
-        },
-
-        //节音频触发接口
-        seasonAudio: function(seasonAudioId, audioId) {
-            deployAudio(seasonAudioId, audioId, SEASON);
-            loadAudio(seasonAudioId, audioId, SEASON);
-        },
-
-        //挂起音频
-        hangUpAudio: function() {
-            var t, p, a;
-            for (t in playBox) {
-                for (p in playBox[t]) {
-                    for (a in playBox[t][p]) {
-                        playBox[t][p][a].pause();
-                    }
-                }
-            }
-        },
-
-        //销毁动画音频
-        clearContentAudio: function(pageId) {
-            if (!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
-                return false;
-            }
-            var playObj = playBox[ANIMATE][pageId];
-            if (playObj) {
-                for (var i in playObj) {
-                    playObj[i].end();
-                    delete playBox[ANIMATE][pageId][i];
-                }
-            }
-        },
-
-        //清理音频
-        clearAudio: function(pageId) {
-            if (pageId) { //如果只跳槽关闭动画音频
-                out.clearContentAudio(pageId);
-            } else {
-                removeAudio(); //多场景模式,不处理跨页面
+    //销毁动画音频
+    clearContentAudio(pageId) {
+        if (!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
+            return false;
+        }
+        var playObj = playBox[ANIMATE][pageId];
+        if (playObj) {
+            for (var i in playObj) {
+                playObj[i].end();
+                delete playBox[ANIMATE][pageId][i];
             }
         }
-
-
     }
 
-    return out;
-};
+    //清理音频
+    clearAudio(pageId) {
+        if (pageId) { //如果只跳槽关闭动画音频
+            this.clearContentAudio(pageId)
+        } else {
+            removeAudio(); //多场景模式,不处理跨页面
+        }
+    }
 
-
-Xut.AudioManager = AudioManager();
-
-export {
-    AudioManager
 }

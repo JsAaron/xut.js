@@ -1,12 +1,11 @@
-
 //解析工具
-import { execJson, parseJSON, enterReplace} from '../../../../util/dom'
+import { execJson, parseJSON, enterReplace } from '../../../../util/dom'
 //支持
-import {isMacOS, isDesktop} from './support'
+import { isMacOS, isDesktop } from './support'
 //动画扩展
-import {extension} from './extension'
+import { extension } from './extension'
 
- 
+
 /**
  * Pptanimation.js - PPT Animation for Zepto/jQuery.
  *requestAnimationFrame
@@ -32,7 +31,7 @@ function PptAnimation(pageIndex, pageType, chapterId, element, itemArray, contai
 
     this.pageIndex = pageIndex;
 
-    if (typeof (element) == "object") {
+    if (_.isObject(element)) {
         this.pageType = pageType;
         this.chapterId = chapterId;
         this.element = element;
@@ -63,7 +62,7 @@ function PptAnimation(pageIndex, pageType, chapterId, element, itemArray, contai
         this._initElement();
     }
 }
- 
+
 
 
 PptAnimation.prototype = {
@@ -74,7 +73,7 @@ PptAnimation.prototype = {
      * 对象初始化(visibility)
      * @return {[type]} [description]
      */
-    _initElement: function () {
+    _initElement: function() {
 
         //如果没有数据
         if (!this.options.length) {
@@ -170,14 +169,14 @@ PptAnimation.prototype = {
      * @param  {[type]} completeEvent [description]
      * @return {[type]}               [description]
      */
-    _initAnimation: function (startEvent, completeEvent) {
+    _initAnimation: function(startEvent, completeEvent) {
         var self = this;
 
-        var startHandler = function (preCode) {
+        var startHandler = function(preCode) {
             //整个动画开始事件(外部事件)
-            if (typeof (startEvent) == "function") startEvent();
+            if (typeof(startEvent) == "function") startEvent();
             //条件判断动画是否执行
-            if (typeof (preCode) == "function") {
+            if (typeof(preCode) == "function") {
                 self.animation.pause();
                 var result = false;
                 try {
@@ -190,16 +189,16 @@ PptAnimation.prototype = {
                 else {
                     self.animation.stop();
                     //整个动画完成事件(动画不需继续执行视为执行完成)
-                    if (typeof (completeEvent) == "function") completeEvent();
+                    if (typeof(completeEvent) == "function") completeEvent();
                 }
             }
         }
 
-        var completeHandler = function (postCode, codeDelay) {
+        var completeHandler = function(postCode, codeDelay) {
             self.isCompleted = true;
             //延迟执行postCode代码
             try {
-                if (typeof (postCode) == "function") {
+                if (typeof(postCode) == "function") {
                     if (codeDelay > 0)
                         setTimeout(postCode, codeDelay);
                     else
@@ -209,7 +208,7 @@ PptAnimation.prototype = {
                 console.log("Run postCode is error in completeHandler:" + error);
             }
             //整个动画完成事件(外部事件)
-            if (typeof (completeEvent) == "function") completeEvent();
+            if (typeof(completeEvent) == "function") completeEvent();
         }
 
         var start = new TimelineLite({
@@ -241,7 +240,7 @@ PptAnimation.prototype = {
      * @param  {[type]} index [description]
      * @return {[type]}       [description]
      */
-    _getTimeline: function (data, index) {
+    _getTimeline: function(data, index) {
         var object = this.element;
         var parameter = this.parameter0;
         var isExit = this.isExit0;
@@ -277,51 +276,51 @@ PptAnimation.prototype = {
         switch (data.animationName) {
             //进入退出动画
             default:
-            case "EffectAppear": //出现/消失
+                case "EffectAppear": //出现/消失
                 return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
             case "EffectFade": //淡出
-                return this.getEffectFade(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectFade(parameter, object, isExit, duration, delay, repeat);
             case "EffectFly": //飞入/飞出
-                return this.getEffectFly(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectFly(parameter, object, isExit, duration, delay, repeat);
             case "EffectAscend": //浮入/浮出(上升)
-                return this.getEffectAscend(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectAscend(parameter, object, isExit, duration, delay, repeat);
             case "EffectDescend": //浮入/浮出(下降)
-                return this.getEffectDescend(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectDescend(parameter, object, isExit, duration, delay, repeat);
             case "EffectSplit": //劈裂(分割)
-                return this.getEffectSplit(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectSplit(parameter, object, isExit, duration, delay, repeat);
             case "EffectWipe": //擦除
-                return this.getEffectWipe(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectWipe(parameter, object, isExit, duration, delay, repeat);
             case "EffectCircle": //形状一(圆)
-                return this.getEffectCircle(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectCircle(parameter, object, isExit, duration, delay, repeat);
             case "EffectBox": //形状二(方框)
-                return this.getEffectBox(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectBox(parameter, object, isExit, duration, delay, repeat);
             case "EffectDiamond": //形状三(菱形)
-                return this.getEffectDiamond(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectDiamond(parameter, object, isExit, duration, delay, repeat);
             case "EffectPlus": //形状四(加号)
-                return this.getEffectPlus(parameter, object, isExit, duration, delay, repeat);
-            /*
+                    return this.getEffectPlus(parameter, object, isExit, duration, delay, repeat);
+                /*
         case "EffectWheel": //轮子
             return;
         case "EffectRandomBars": //随机线条
             return;
         */
             case "EffectGrowAndTurn": //翻转式由远及近
-                return this.getEffectGrowAndTurn(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectGrowAndTurn(parameter, object, isExit, duration, delay, repeat);
             case "EffectZoom": //基本缩放
-                return this.getEffectZoom(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectZoom(parameter, object, isExit, duration, delay, repeat);
             case "EffectFadedZoom": //淡出式缩放
-                return this.getEffectFadedZoom(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectFadedZoom(parameter, object, isExit, duration, delay, repeat);
             case "EffectSwivel": //基本旋转
-                return this.getEffectSwivel(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectSwivel(parameter, object, isExit, duration, delay, repeat);
             case "EffectFadedSwivel": //旋转(淡出式回旋)
-                return this.getEffectFadedSwivel(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectFadedSwivel(parameter, object, isExit, duration, delay, repeat);
             case "EffectBounce": //弹跳
-                return this.getEffectBounce(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectBounce(parameter, object, isExit, duration, delay, repeat);
             case "EffectBlinds": //百叶窗
-                return this.getEffectBlinds(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectBlinds(parameter, object, isExit, duration, delay, repeat);
             case "EffectPeek": //切入/出
-                return this.getEffectPeek(parameter, object, isExit, duration, delay, repeat);
-            /*
+                    return this.getEffectPeek(parameter, object, isExit, duration, delay, repeat);
+                /*
         case "EffectWedge": //楔入
             return;
         case "EffectStrips": //阶梯状
@@ -332,56 +331,56 @@ PptAnimation.prototype = {
             return;
         */
             case "EffectExpand": //展开/收缩
-                return this.getEffectExpand(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectExpand(parameter, object, isExit, duration, delay, repeat);
             case "EffectRiseUp": //升起/下沉
-                return this.getEffectRiseUp(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectRiseUp(parameter, object, isExit, duration, delay, repeat);
             case "EffectCenterRevolve": //中心旋转
-                return this.getEffectCenterRevolve(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectCenterRevolve(parameter, object, isExit, duration, delay, repeat);
             case "EffectSpinner": //回旋
-                return this.getEffectSpinner(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectSpinner(parameter, object, isExit, duration, delay, repeat);
             case "EffectFloat": //浮动
-                return this.getEffectFloat(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectFloat(parameter, object, isExit, duration, delay, repeat);
             case "EffectSpiral": //螺旋飞入/出
-                return this.getEffectSpiral(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectSpiral(parameter, object, isExit, duration, delay, repeat);
             case "EffectPinwheel": //玩具风车
-                return this.getEffectPinwheel(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectPinwheel(parameter, object, isExit, duration, delay, repeat);
             case "EffectCredits": //字幕式
-                return this.getEffectCredits(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectCredits(parameter, object, isExit, duration, delay, repeat);
             case "EffectBoomerang": //飞旋
-                return this.getEffectBoomerang(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectBoomerang(parameter, object, isExit, duration, delay, repeat);
             case "EffectArcUp": //曲线向上/下
-                return this.getEffectArcUp(parameter, object, isExit, duration, delay, repeat);
+                    return this.getEffectArcUp(parameter, object, isExit, duration, delay, repeat);
 
-            //强调动画
+                //强调动画
             case "EffectFlashBulb": //脉冲
-                return this.getEffectFlashBulb(parameter, object, duration, delay, repeat);
+                    return this.getEffectFlashBulb(parameter, object, duration, delay, repeat);
             case "EffectFlicker": //彩色脉冲
-                return this.getEffectFlicker(parameter, object, duration, delay, repeat);
+                    return this.getEffectFlicker(parameter, object, duration, delay, repeat);
             case "EffectTeeter": //跷跷板
-                return this.getEffectTeeter(parameter, object, duration, delay, repeat);
+                    return this.getEffectTeeter(parameter, object, duration, delay, repeat);
             case "EffectSpin": //陀螺旋转
-                return this.getEffectSpin(parameter, object, duration, delay, repeat);
+                    return this.getEffectSpin(parameter, object, duration, delay, repeat);
             case "EffectGrowShrink": //放大/缩小
-                return this.getEffectGrowShrink(parameter, object, duration, delay, repeat);
+                    return this.getEffectGrowShrink(parameter, object, duration, delay, repeat);
             case "EffectDesaturate": //不饱和
-                return this.getEffectDesaturate(parameter, object, duration, delay, repeat);
+                    return this.getEffectDesaturate(parameter, object, duration, delay, repeat);
             case "EffectDarken": //加深
-                return this.getEffectDarken(parameter, object, duration, delay, repeat);
+                    return this.getEffectDarken(parameter, object, duration, delay, repeat);
             case "EffectLighten": //变淡
-                return this.getEffectLighten(parameter, object, duration, delay, repeat);
+                    return this.getEffectLighten(parameter, object, duration, delay, repeat);
             case "EffectTransparency": //透明
-                return this.getEffectTransparency(parameter, object, duration, delay, repeat);
+                    return this.getEffectTransparency(parameter, object, duration, delay, repeat);
             case "EffectColorBlend": //对象颜色
-                return new TimelineMax();
+                    return new TimelineMax();
             case "EffectComplementaryColor": //补色
-                return this.getEffectComplementaryColor(parameter, object, duration, delay, repeat);
+                    return this.getEffectComplementaryColor(parameter, object, duration, delay, repeat);
             case "EffectChangeLineColor": //线条颜色
-                return new TimelineMax();
+                    return new TimelineMax();
             case "EffectChangeFillColor": //填允颜色
-                return new TimelineMax();
+                    return new TimelineMax();
             case "EffectFlashOnce": //闪烁(一次)
-                return this.getEffectFlashOnce(parameter, object, duration, delay, repeat);
-            /*
+                    return this.getEffectFlashOnce(parameter, object, duration, delay, repeat);
+                /*
         //路径动画
         case "EffectPathDown": //直线（下） M 0 0 L 0 0.25 E
         case "EffectPathLeft": //直线（靠左）
@@ -422,11 +421,11 @@ PptAnimation.prototype = {
      * 解锁处理
      * @return {[type]} [description]
      */
-    _unlockHandler: function () {
+    _unlockHandler: function() {
         //购买解锁
         var unlock = Xut.Application.Unlock ? Xut.Application.Unlock() : "undefind";
         //脚本解锁
-        if (typeof (this.preCode) == "function") {
+        if (typeof(this.preCode) == "function") {
             try {
                 unlock = this.preCode();
             } catch (error) {
@@ -452,7 +451,7 @@ PptAnimation.prototype = {
      * @param  {[type]} params    [description]
      * @return {[type]}           [description]
      */
-    startHandler: function (parameter, object, params) {
+    startHandler: function(parameter, object, params) {
 
         for (var item in params) {
             switch (item) {
@@ -491,13 +490,13 @@ PptAnimation.prototype = {
                     break;
             }
         }
-        
+
 
         //ppt动画音频
         if (parameter.videoId > 0) {
             Xut.AudioManager.contentAudio(parameter.chapterId, parameter.videoId)
         }
-        
+
         /*eslint-disable */
 
         //ppt动画扩展处理
@@ -514,7 +513,7 @@ PptAnimation.prototype = {
                     break;
             }
         }
-        
+
         /*eslint-enable */
     },
 
@@ -526,7 +525,7 @@ PptAnimation.prototype = {
      * @param  {[type]} params    [description]
      * @return {[type]}           [description]
      */
-    completeHandler: function (parameter, object, params) {
+    completeHandler: function(parameter, object, params) {
         //if(parameter.pptAudio) parameter.pptAudio.end(); //声音存在延时问题，马上结束可导制无法听到声音
         for (var item in params) {
             switch (item) {
@@ -566,14 +565,14 @@ PptAnimation.prototype = {
             }
         }
     },
-    
-    
+
+
     /**
      * 执行动画
      * @param  {[type]} scopeComplete [description]
      * @return {[type]}               [description]
      */
-    runAnimation: function (scopeComplete) {
+    runAnimation: function(scopeComplete) {
         if (this.hasRunning == false) return;
         if (this.isCompleted) this.resetAnimation();
         this.animation = this._initAnimation(this.startEvent, scopeComplete || this.completeEvent);
@@ -585,7 +584,7 @@ PptAnimation.prototype = {
      * 停止动画
      * @return {[type]} [description]
      */
-    stopAnimation: function () {
+    stopAnimation: function() {
         if (this.animation instanceof TimelineLite) {
             this.animation.stop();
             this.animation.kill();
@@ -599,7 +598,7 @@ PptAnimation.prototype = {
      * 复位动画
      * @return {[type]} [description]
      */
-    resetAnimation: function () {
+    resetAnimation: function() {
         this.stopAnimation();
         if (this.elementStyle && this.elementStyle.length > 0) {
             var origin = this.element.css("-webkit-transform-origin");
@@ -619,14 +618,14 @@ PptAnimation.prototype = {
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroyAnimation: function () {
+    destroyAnimation: function() {
         this.stopAnimation();
         this.container = null;
         this.options = null;
         this.element = null;
     }
 
-  
+
 }
 
 
@@ -635,5 +634,5 @@ extension(PptAnimation.prototype)
 
 
 export {
-PptAnimation
+    PptAnimation
 }

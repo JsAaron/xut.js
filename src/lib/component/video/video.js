@@ -93,7 +93,10 @@ VideoClass.prototype = {
 }
 
 
-// 网页
+/**
+ * 网页
+ * @param {[type]} options [description]
+ */
 function WebPage(options) {
 
     var pageUrl = options.pageUrl;
@@ -159,6 +162,11 @@ function WebPage(options) {
 }
 
 
+/**
+ * webView弹出框
+ * @param  {[type]} options [description]
+ * @return {[type]}         [description]
+ */
 function webView(options) {
     var width = options.width,
         height = options.height,
@@ -187,9 +195,6 @@ function webView(options) {
         close: close
     }
 }
-
-
-
 
 
 /**
@@ -243,7 +248,6 @@ function _Media(options) {
  *  var video = new Video({url:'1.mp4',width:'320',...});
  *  video.play();
  */
-
 function Video5(options) {
 
     var container = options.container || $('body'),
@@ -348,12 +352,12 @@ function Video5(options) {
     }
 };
 
+
 /**
  * https://github.com/videojs/video.js/blob/master/docs/guides/setup.md
  * 基于video.js的web播放器,在pc端flash优先
  * @param {[type]} options [description]
  */
-
 function VideoJS(options) {
     var container = options.container || $('body'),
         videoId = options.videoId,

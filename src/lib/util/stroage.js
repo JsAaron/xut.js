@@ -6,22 +6,22 @@ const TAG = 'aaron'
 
 
 //如果数据库为写入appid ,则创建
-var createAppid = function () {
+var createAppid = function() {
     //添加UUID
     var appId = 'aaron-' + new Date().getDate();
     //写入数据库
-    Xut.config.db && Xut.config.db.transaction(function (tx) {
-        tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function () { }, function () { });
-    }, function () {
+    Xut.config.db && Xut.config.db.transaction(function(tx) {
+        tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function() {}, function() {});
+    }, function() {
         //  callback && callback();
-    }, function () {
+    }, function() {
         //  callback && callback();
     });
     return appId;
 }
 
 //过滤
-var filter = function (key) {
+var filter = function(key) {
     //添加头部标示
     if (onlyId) {
         return key + onlyId;
@@ -61,7 +61,7 @@ var set = function name(key, val) {
         }
     }
 
-    if (typeof key === 'object') {
+    if (_.isObject(key)) {
         for (var i in key) {
             if (key.hasOwnProperty(i)) {
                 setkey = filter(i);
@@ -74,7 +74,7 @@ var set = function name(key, val) {
     }
 }
 
-var get = function (key) {
+var get = function(key) {
     key = filter(key);
     return storage.getItem(key);
 }
@@ -84,14 +84,14 @@ var get = function (key) {
  * @param {[type]} key [description]
  * @param {[type]} val [description]
  */
-export {set as _set}
+export {set as _set }
 
 /**
  * 获取localstorage中的值
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export {get as  _get }
+export {get as _get }
 
 /**
  * 删除localStorage中指定项

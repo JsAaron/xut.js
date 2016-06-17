@@ -10,10 +10,10 @@ import { parseJSON } from '../../../util/index'
 import { spiritAni } from './spirit'
 
 
-let getSpiritAni = (inputPara, data, canvasEl) => {
-    let path = data.resourcePath;
-    let loop = data.loop;
-    if (typeof inputPara == "object") {
+function getSpiritAni(inputPara, data, canvasEl) {
+    var path = data.resourcePath;
+    var loop = data.loop;
+    if (_.isObject(inputPara)) {
         return new spiritAni(inputPara, canvasEl, data);
     } else {
         console.log("inputPara undefine Spirit")
@@ -22,10 +22,10 @@ let getSpiritAni = (inputPara, data, canvasEl) => {
 }
 
 
-let getResources = (data) => {
-    let option;
-    let ResourcePath = "content/gallery/" + data.md5 + "/";
-    let xhr = new XMLHttpRequest();
+function getResources(data) {
+    var option;
+    var ResourcePath = "content/gallery/" + data.md5 + "/";
+    var xhr = new XMLHttpRequest();
     data.resourcePath = ResourcePath;
     xhr.open('GET', ResourcePath + 'app.json', false);
     xhr.send(null);
@@ -35,7 +35,7 @@ let getResources = (data) => {
 
 
 
-export class specialSprite extends Rule {
+class specialSprite extends Rule {
 
     constructor(options) {
         super()
@@ -48,13 +48,13 @@ export class specialSprite extends Rule {
         //可以用来过滤失败的pixi对象
         this.contentId = this.data._id;
         this.option = getResources(this.data);
-        let spiritList = this.option.spiritList;
+        var spiritList = this.option.spiritList;
         this.sprObjs = [];
 
-        for (let i = 0; i < spiritList.length; i++) {
-            let paramObj = spiritList[i].params;
-            let actLists = paramObj.actList.split(',');
-            for (let k = 0; k < actLists.length; k++) {
+        for (var i = 0; i < spiritList.length; i++) {
+            var paramObj = spiritList[i].params;
+            var actLists = paramObj.actList.split(',');
+            for (var k = 0; k < actLists.length; k++) {
                 this.sprObjs.push(getSpiritAni(paramObj[actLists[k]], this.data, this.renderer.view));
             }
         }
@@ -74,16 +74,18 @@ export class specialSprite extends Rule {
      * 1000 / (obj.FPS || 10)
      */
     play(addQueue) {
-        this.uuid = addQueue(this.pageIndex, () => {
-            _.each(this.sprObjs, (obj) => {
+        var self = this
+        var renderer = self.renderer
+        this.uuid = addQueue(this.pageIndex, function() {
+            _.each(self.sprObjs, function(obj) {
                 //防止内存溢出
                 //停止后不能再运行了
                 if (!obj.timer) {
-                    obj.timer = setTimeout(() => {
+                    obj.timer = setTimeout(function() {
                         //在定时器事件内正好删除了引用
                         //必须判断状态
-                        if (this.action == 'play') {
-                            this.renderer.render(obj.stage)
+                        if (self.action == 'play') {
+                            renderer.render(obj.stage)
                             obj.runAnimate()
                         }
                         clearTimeout(obj.timer)
@@ -101,9 +103,8 @@ export class specialSprite extends Rule {
      */
     stop(stopQueue) {
         stopQueue(this.pageIndex, this.uuid)
-        _.each(this.sprObjs, (obj) => {
+        _.each(self.sprObjs, function(obj) {
             obj.timer && clearTimeout(obj.timer)
-            obj.timer = null
         })
     }
 
@@ -114,9 +115,18 @@ export class specialSprite extends Rule {
      */
     destroy(destroyQueue) {
         destroyQueue(this.pageIndex, this.uuid)
-        _.each(this.sprObjs, (obj) => {
+        _.each(this.sprObjs, function(obj) {
             obj.destroy();
         })
     }
 
+
+}
+
+
+
+
+
+export {
+    specialSprite
 }

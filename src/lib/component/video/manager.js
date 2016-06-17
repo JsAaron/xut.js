@@ -4,26 +4,44 @@
 import { VideoClass } from './video'
 
 
-class VideoManager {
+//综合管理video, webpage
+export class VideoManager {
 
     constructor() {
         this.pageBox = {}; //当前页面包含的视频数据
         this.playBox = {}; //播放过的视频数据 （播放集合）
     }
 
-    //自动播放
+    /**
+     * 自动播放
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @param  {[type]} container  [description]
+     * @return {[type]}            [description]
+     */
     autoPlay(pageId, activityId, container) {
         this.initVideo.apply(this, arguments);
     }
 
-    //手动播放
+    /**
+     * 手动播放
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @param  {[type]} container  [description]
+     * @return {[type]}            [description]
+     */
     trigger(pageId, activityId, container) {
         this.initVideo.apply(this, arguments);
     }
 
-    //=================视频调用===========================
 
-    //触发视频
+    /**
+     * 触发视频
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @param  {[type]} container  [description]
+     * @return {[type]}            [description]
+     */
     initVideo(pageId, activityId, container) {
         //解析数据
         this.parseVideo(pageId, activityId);
@@ -31,7 +49,7 @@ class VideoManager {
         this.loadVideo(pageId, activityId, container);
     }
 
-    //=================视频数据处理===========================
+
 
     //处理重复数据
     // 1:pageBox能找到对应的 videoId
@@ -46,7 +64,13 @@ class VideoManager {
         this.deployVideo(data, pageId, activityId);
     }
 
-    //检测数据是否存在
+
+    /**
+     * 检测数据是否存在
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @return {[type]}            [description]
+     */
     checkRepeat(pageId, activityId) {
         var chapterData = this.pageBox[pageId];
         //如果能在pageBox找到对应的数据
@@ -56,7 +80,14 @@ class VideoManager {
         return false;
     }
 
-    //配置视频结构
+
+    /**
+     * 配置视频结构
+     * @param  {[type]} data       [description]
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @return {[type]}            [description]
+     */
     deployVideo(data, pageId, activityId) {
         var config = Xut.config
         var proportion = config.proportion
@@ -105,16 +136,22 @@ class VideoManager {
             'hyperlink': data.hyperlink
         };
 
-        if (typeof this.pageBox[pageId] != 'object') {
+        if (!_.isObject(this.pageBox[pageId])) {
             this.pageBox[pageId] = {};
         }
 
         this.pageBox[pageId][activityId] = videoInfo;
     }
 
-    //=================视频动作处理============================
 
-    //加载视频
+
+    /**
+     * 加载视频
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @param  {[type]} container  [description]
+     * @return {[type]}            [description]
+     */
     loadVideo(pageId, activityId, container) {
         var playBox = this.playBox,
             data = this.pageBox[pageId][activityId];
@@ -130,7 +167,7 @@ class VideoManager {
             playBox[pageId][activityId].play();
         } else {
             //console.log('=========new=============');
-            if (typeof playBox[pageId] !== 'object') {
+            if (!_.isObject(playBox[pageId])) {
                 playBox[pageId] = {};
             }
             //cache video object
@@ -140,12 +177,23 @@ class VideoManager {
 
     }
 
-    //播放视频之前检查要停的视频
+
+    /**
+     * 播放视频之前检查要停的视频
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @return {[type]}            [description]
+     */
     beforePlayVideo(pageId, activityId) {
 
     }
 
-    //清理移除页的视频
+
+    /**
+     * 清理移除页的视频
+     * @param  {[type]} pageId [description]
+     * @return {[type]}        [description]
+     */
     removeVideo(pageId) {
         var playBox = this.playBox,
             pageBox = this.pageBox;
@@ -163,7 +211,11 @@ class VideoManager {
         }
     }
 
-    //清理全部视频
+
+    /**
+     * 清理全部视频
+     * @return {[type]} [description]
+     */
     clearVideo() {
         var playBox = this.playBox,
             flag = false; //记录是否处理过销毁状态
@@ -181,7 +233,11 @@ class VideoManager {
     }
 
 
-    //离开页面
+    /**
+     * 离开页面
+     * @param  {[type]} pageId [description]
+     * @return {[type]}        [description]
+     */
     leavePage(pageId) {
         var playBox = this.playBox;
         if (playBox && playBox[pageId]) {
@@ -191,12 +247,4 @@ class VideoManager {
         }
     }
 
-}
-
-
-Xut.VideoManager = new VideoManager;
-
-
-export {
-    VideoManager
 }

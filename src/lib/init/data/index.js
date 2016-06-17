@@ -6,7 +6,6 @@ import {
 from '../../util/index'
 
 import { cursor } from '../cursor'
-import { external } from '../../external'
 import { createStore } from './storemgr'
 import { contentFilter } from '../../component/content/filter'
 import { loadScene } from '../scene'

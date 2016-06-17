@@ -82,8 +82,7 @@ module.exports = (conf) => {
                     console.log(conf.tarDir + '目录创建成功');
                 }
                 var code = bundle.generate({
-                    format: 'umd',
-                    moduleName: 'Aaron'
+                    format: 'cjs'
                 }).code
                 return write(conf.rollup, code)
             }).then(() => {
@@ -94,6 +93,7 @@ module.exports = (conf) => {
             })
             .catch(() => {
                 console.log('错误')
+                reject()
             })
     })
 }

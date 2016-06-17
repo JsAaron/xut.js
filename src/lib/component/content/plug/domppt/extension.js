@@ -7,10 +7,9 @@ import {
     colorHexToRGB
 } from './util'
 
- 
+
 export function extension(animproto) {
- 
-  
+
     //文字动画
     animproto.getTextAnimation = function (parameter, object, duration, delay, repeat) {
         if (delay == 0) delay = 0.1; //子对象间延时不能为0

@@ -97,7 +97,7 @@ export class Sprite {
         var maskTextures = [];
         //create textures array from res's textures object
         var resObject, maskObject;
-        if ("object" == typeof res) {
+        if (_.isObject(res)) {
             //首次加载
             resObject = res[Object.keys(res)[0]];
         } else {
