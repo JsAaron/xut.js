@@ -11,19 +11,7 @@ const child_process = require('child_process');
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
-
-//数据库
-if (!fs.existsSync("./src/content/xxtebook.db")) {
-    console.log('data not available!')
-    return
-}
-
 const spinner = ora('Begin to pack , Please wait for\n')
-spinner.start()
-
-if (!fs.existsSync("./src/content/SQLResult.js")) {
-    require('../sqlite/index').resolve()
-}
 
 let app = express()
 let config = require('../../config')
@@ -32,6 +20,17 @@ let conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
 });
 
+//数据库
+if (!fs.existsSync("./src/content/xxtebook.db")) {
+    console.log('data not available!')
+    return
+}
+
+spinner.start()
+
+if (!fs.existsSync("./src/content/SQLResult.js")) {
+    require('../sqlite/index').resolve()
+}
 
 fsextra.removeSync(conf.assetsRoot)
 fsextra.mkdirSync(conf.assetsRoot);
