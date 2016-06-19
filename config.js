@@ -31,29 +31,40 @@ module.exports = {
      * 开发配置
      */
     dev: {
-        //localhost:88888
+        /**
+         * http端口
+         * @type {Number}
+         */
         port: 8888,
-        proxyTable: {},
-        //真机调试环境
-        //每次修改都会打包一个完整的文件''
-        //这里填入目标地址er
-        //e.g:d:/xxxx
-        debug: {
-            launch: false,
+
+        /**
+         * 真机调试环境
+         * 每次修改都会打包一个完整的文件''
+         * 这里填入目标地址er
+         * e.g:d:/xxxx
+         * @type {Object}
+         */
+        test: {
+            launch: true,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
-            dir: process.platform === 'win32'
-                ? 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build'
-                : '/Users/mac/project/xcode/www/build'
+            dir: process.platform === 'win32' ? 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' : '/Users/mac/project/xcode/www/build'
         },
-        //eslint测试目录
-        //测试文件地址
+
+        /**
+         * eslint配置
+         * @type {Object}
+         */
         eslint: {
             launch: true,
             //必须绝对路径
             dir: path.resolve(__dirname, 'src/lib'),
         },
-        //路径配置
+
+        /**
+         * 路径配置
+         * @type {[type]}
+         */
         conf: _.extend(common, {
             index: path.resolve(__dirname, 'temp/index.html'),
             assetsRoot: path.resolve(__dirname, 'temp'),
@@ -72,7 +83,10 @@ module.exports = {
      * 发布配置
      */
     build: {
-        //启动web服务测试
+        /**
+         * 启动web服务测试
+         * @type {Boolean}
+         */
         server: true,
         conf: _.extend(common)
     }

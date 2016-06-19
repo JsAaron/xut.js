@@ -3,7 +3,7 @@
  import { AudioManager } from './component/audio/manager'
  import { VideoManager } from './component/video/manager'
  //init
- import { init } from './init/index'
+ // import { init } from './init/index'
 
 //初始化音频视频
  Xut.VideoManager = new VideoManager()
@@ -27,4 +27,4 @@
 
  Xut.Version = 805
 
- init()
+ // init()

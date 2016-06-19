@@ -38,8 +38,12 @@ fsextra.mkdirSync(conf.assetsRoot);
 let webpackConfig = require('./webpack.dev.conf')
 
 
-//启动代码测试
-//eslint
+/**
+ * 启动代码测试
+ * eslint
+ * @param  {[type]} config.dev.eslint.launch [description]
+ * @return {[type]}                          [description]
+ */
 if (config.dev.eslint.launch) {
     webpackConfig.module.preLoaders = [{
         test: /\.js$/,
@@ -88,7 +92,6 @@ compiler.plugin('compilation', (compilation) => {
     })
 })
 
-
 // serve webpack bundle output
 app.use(devMiddleware)
 
@@ -109,21 +112,15 @@ watch(conf.assetsRoot + '/app.js', () => {
         open("http://localhost:" + port)
         first = false
     }
-    if (config.dev.debug.launch) {
+    if (config.dev.test.launch) {
         console.log(
             '\n' +
             'watch file change.....await....:\n'
         )
-        let child = child_process.spawn('node', ['build/dev/debug.js', ['debug=' + config.dev.debug.dir]]);
-        child.stdout.on('data', (data) => {
-            console.log('\n' + data);
-        });
-        child.stderr.on('data', (data) => {
-            console.log('fail out：\n' + data);
-        });
-        child.on('close', (code) => {
-            console.log('complete：' + code);
-        });
+        let child = child_process.spawn('node', ['build/dev/test.js', ['test=' + config.dev.test.dir]]);
+        child.stdout.on('data', (data) => console.log('\n' + data))
+        child.stderr.on('data', (data) => console.log('fail out：\n' + data));
+        child.on('close', (code) => console.log('complete：' + code));
     }
 })
 
