@@ -5,28 +5,25 @@
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-let config
-let round
-let ratio
-let isIOS
+import { config } from '../config/index'
+
+let round = Math.round
+let ratio = 6
+let isIOS = Xut.plat.isIOS
+let TOP = isIOS ? 20 : 0
+
 let iconHeight
 let proportion
 let calculate
-let TOP
 let sWidth
 let sHeight
 let navHeight //菜单的高度
 let navWidth //菜单的宽度
 
-function setOption() {
-    config = Xut.config
-    round = Math.round
-    ratio = 6
-    isIOS = Xut.plat.isIOS
+let setOption = () => {
     iconHeight = config.iconHeight
     proportion = config.proportion
     calculate = proportion.calculateContainer()
-    TOP = isIOS ? 20 : 0
     sWidth = calculate.width
     sHeight = calculate.height
     proportion = config.layoutMode == "horizontal" ? proportion.width : proportion.height
@@ -117,8 +114,8 @@ export function nav(seasonSqlRet) {
         seasonId,
         chapterId,
         data,
-        overwidth,//溢出宽度
-        overHeigth,//溢出高度
+        overwidth, //溢出宽度
+        overHeigth, //溢出高度
         xxtlink;
 
 
@@ -153,7 +150,7 @@ export function nav(seasonSqlRet) {
 
 
     retStr = '<div id="SectionWrapper" style="' + wrapper + '">';
-    retStr += '  <div id="Sectionscroller" style="width:'+ overwidth +'px;height:'+ overHeigth +'px;+ ' + scroller + '">';
+    retStr += '  <div id="Sectionscroller" style="width:' + overwidth + 'px;height:' + overHeigth + 'px;+ ' + scroller + '">';
     retStr += '     <ul id="SectionThelist">';
 
     for (var i = 0; i < seasonlist; i++) {

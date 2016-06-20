@@ -172,49 +172,56 @@ let _Media = (options) => {
  */
 let _Video5 = (options) => {
 
-    var container = options.container || $('body'),
-        url = Xut.config.videoPath() + options.url,
-        width = options.width,
-        height = options.height,
-        top = options.top,
-        left = options.left,
-        zIndex = options.zIndex,
-        /*创建播放器*/
-        $videoWrap = $('<div></div>');
+    let container = options.container || $('body')
+    let url = Xut.config.videoPath() + options.url
+    let width = options.width
+    let height = options.height
+    let top = options.top
+    let left = options.left
+    let zIndex = options.zIndex
 
-    var $video = $(document.createElement('video'));
-
-    //音频对象
-    var video = $video[0];
+    let $videoWrap = $('<div></div>')
+    let $video = $(document.createElement('video'));
+    let video = $video[0];
 
     video.play();
 
+    //video节点
     $video.css({
-        width: width,
-        height: height
+        width  : width,
+        height : height
     }).attr({
-        'src': url,
-        'controls': 'controls',
-        'autoplay': 'autoplay'
+        'src'      : url,
+        'controls' : 'controls',
+        'autoplay' : 'autoplay'
     });
 
+    //父容器
     $videoWrap.append($video).css({
-        position: 'absolute',
-        'z-index': -1,
-        top: top,
-        left: left,
-        width: 0,
-        height: 0
+        position  : 'absolute',
+        'z-index' : -1,
+        top       : top,
+        left      : left,
+        width     : 0,
+        height    : 0
     });
 
-    //播放
-    function play() {
+
+    /**
+     * 播放
+     * @return {[type]} [description]
+     */
+    let play = () => {
         $videoWrap.show();
         video.play();
     }
 
-    //停止
-    function stop() {
+
+    /**
+     * 停止
+     * @return {[type]} [description]
+     */
+    let stop = () => {
         video.pause();
         //复位视频
         if (video.duration) {
@@ -231,7 +238,11 @@ let _Video5 = (options) => {
         }
     }
 
-    function error() {
+    /**
+     * 错误
+     * @return {[type]} [description]
+     */
+    let error = () => {
         //用于启动视频
         if (options.startBoot) {
             options.startBoot();
@@ -243,7 +254,7 @@ let _Video5 = (options) => {
      * 防止播放错误时播放界面闪现
      * @return {[type]} [description]
      */
-    function start() {
+    let start = () => {
         $videoWrap.css({
             width: width + 'px',
             height: height + 'px',
@@ -251,15 +262,18 @@ let _Video5 = (options) => {
         });
     }
 
-    //销毁
-    function destroy() {
+    /**
+     * 销毁
+     * @return {[type]} [description]
+     */
+    let destroy = () => {
         video.removeEventListener('ended', stop, false);
         video.removeEventListener('error', error, false);
         video.removeEventListener('loadeddata', start, false);
         video.removeEventListener('webkitendfullscreen', stop, false);
         $videoWrap.hide().remove();
     }
-
+ 
     container.append($videoWrap);
 
     video.addEventListener('ended', stop, false);
@@ -268,9 +282,9 @@ let _Video5 = (options) => {
     video.addEventListener('webkitendfullscreen', stop, false);
 
     return {
-        play: play,
-        stop: stop,
-        close: destroy
+        play  : play,
+        stop  : stop,
+        close : destroy
     }
 };
 

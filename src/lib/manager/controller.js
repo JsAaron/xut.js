@@ -159,8 +159,8 @@ class Controller extends Observer {
          * 触屏滑动,通知pageMgr处理页面移动
          * @return {[type]} [description]
          */
-        $globalEvent.$watch('onSwipeMove', () => {
-            $scheduler.move.apply($scheduler, arguments);
+        $globalEvent.$watch('onSwipeMove', (data) => {
+            $scheduler.move(data)
         });
 
 
@@ -197,7 +197,7 @@ class Controller extends Observer {
          * @return {[type]}              [description]
          */
         $globalEvent.$watch('onAnimComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
-            $scheduler.complete.apply($scheduler, arguments);
+            $scheduler.complete(direction, pagePointer, unfliplock, isQuickTurn)
         });
 
 

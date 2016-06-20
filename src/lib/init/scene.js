@@ -5,9 +5,7 @@ import {
     toEmpty
 }
 from '../util/index'
-
-let config
-
+import { config } from '../config/index'
 
 /**
  * 设置缓存
@@ -56,8 +54,6 @@ let checkInjectScript = () => {
 }
 
 export function loadScene(options) {
-
-    config = Xut.config
 
     //获取默认参数
     var parameter = initDefaultValues(options || {});

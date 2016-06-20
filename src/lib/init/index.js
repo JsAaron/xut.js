@@ -1,4 +1,4 @@
-
+import { config } from '../config/index'
 import initdata from './data/index'
 import { bindKeyEvent } from './keyevent'
 import { loader, setRootfont } from '../util/index'
@@ -13,10 +13,9 @@ let loadcss = (callback) => {
     //nodeBuildMode 是node build下的test.html文件
     //加载build/*.css压缩文件
     //否则就是默认的css/*.css
-    let baseCss = window.nodeBuildMode ? window.nodeBuildMode.csspath : './css/' + (Xut.config.layoutMode) + '.css';
-    let svgsheet = 'content/gallery/svgsheet.css';
-
-    let cssArr = [baseCss, svgsheet];
+    let baseCss = window.nodeBuildMode ? window.nodeBuildMode.csspath : './css/' + (config.layoutMode) + '.css'
+    let svgsheet = 'content/gallery/svgsheet.css'
+    let cssArr = [baseCss, svgsheet]
     //是否需要加载svg
     //如果是ibooks模式
     //并且没有svg
@@ -35,10 +34,10 @@ let loadcss = (callback) => {
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-let loadApp = (config) => {
+let loadApp = () => {
     //修正API接口
     //iframe要要Xut.config
-    Xut.config.revised();
+    config.revised();
     //加载css
     loadcss(() => {
         //修正字体大小
@@ -54,7 +53,7 @@ let loadApp = (config) => {
  * 创建数据库
  * @return {[type]} [description]
  */
-let creatDatabase = (config) => {
+let creatDatabase = () => {
     //安卓上
     if (Xut.plat.isAndroid) {
         //预加载处理视频
@@ -86,8 +85,6 @@ let creatDatabase = (config) => {
 
 
 export function init() {
-
-    let config = Xut.config;
 
     //绑定键盘事件
     bindKeyEvent(config)

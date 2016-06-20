@@ -10,7 +10,7 @@ import { parseJSON } from '../../../util/index'
 import { spiritAni } from './spirit'
 
 
-function getSpiritAni(inputPara, data, canvasEl) {
+let getSpiritAni = (inputPara, data, canvasEl) => {
     var path = data.resourcePath;
     var loop = data.loop;
     if (_.isObject(inputPara)) {
@@ -22,7 +22,7 @@ function getSpiritAni(inputPara, data, canvasEl) {
 }
 
 
-function getResources(data) {
+let getResources = (data) => {
     var option;
     var ResourcePath = "content/gallery/" + data.md5 + "/";
     var xhr = new XMLHttpRequest();
@@ -74,17 +74,16 @@ class specialSprite extends Rule {
      * 1000 / (obj.FPS || 10)
      */
     play(addQueue) {
-        var self = this
-        var renderer = self.renderer
-        this.uuid = addQueue(this.pageIndex, function() {
-            _.each(self.sprObjs, function(obj) {
+        let renderer = this.renderer
+        this.uuid = addQueue(this.pageIndex, () => {
+            _.each(this.sprObjs, (obj) => {
                 //防止内存溢出
                 //停止后不能再运行了
                 if (!obj.timer) {
-                    obj.timer = setTimeout(function() {
+                    obj.timer = setTimeout(() => {
                         //在定时器事件内正好删除了引用
                         //必须判断状态
-                        if (self.action == 'play') {
+                        if (this.action == 'play') {
                             renderer.render(obj.stage)
                             obj.runAnimate()
                         }
@@ -103,7 +102,7 @@ class specialSprite extends Rule {
      */
     stop(stopQueue) {
         stopQueue(this.pageIndex, this.uuid)
-        _.each(self.sprObjs, function(obj) {
+        _.each(self.sprObjs, (obj) => {
             obj.timer && clearTimeout(obj.timer)
         })
     }
@@ -115,16 +114,12 @@ class specialSprite extends Rule {
      */
     destroy(destroyQueue) {
         destroyQueue(this.pageIndex, this.uuid)
-        _.each(this.sprObjs, function(obj) {
+        _.each(this.sprObjs, (obj) => {
             obj.destroy();
         })
     }
 
-
 }
-
-
-
 
 
 export {

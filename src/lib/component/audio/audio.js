@@ -4,6 +4,7 @@
  * @return {[type]}        [description]
  */
 import { hash } from '../../util/dom'
+import { config } from '../../config/index'
 import { BaseClass } from './baseclass'
 
 let Player = null
@@ -61,7 +62,7 @@ class _Media extends BaseClass {
     constructor(options, controlDoms) {
         super()
 
-        var url = Xut.config.audioPath() + options.url,
+        var url = config.audioPath() + options.url,
             trackId = options.trackId,
             self = this,
             audio;
@@ -106,7 +107,7 @@ class _Flash extends BaseClass {
     constructor(options, controlDoms) {
         super()
         var trackId = options.trackId,
-            url = Xut.config.audioPath() + options.url,
+            url = config.audioPath() + options.url,
             self = this,
             audio;
 
@@ -159,7 +160,7 @@ class _Audio extends BaseClass {
         super()
 
         let trackId = options.trackId
-        let url = Xut.config.audioPath() + options.url
+        let url = config.audioPath() + options.url
         let self = this
         let audio
 
@@ -225,7 +226,7 @@ class _cordovaMedia extends BaseClass {
 
     constructor(options, controlDoms) {
         super()
-        var url = Xut.config.audioPath() + options.url,
+        var url = config.audioPath() + options.url,
             trackId = options.trackId,
             self = this,
             audio;

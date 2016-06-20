@@ -15,14 +15,14 @@ const _ = require("underscore");
 const browserSync = require("browser-sync");
 const base = require('../rollup.base.conf.js')
 
-var config = require('../../config')
+let config = require('../../config')
 
-var app = express();
-var conf = _.extend(config.build.conf, {
+let app = express();
+let conf = _.extend(config.build.conf, {
     rollup: config.build.conf.tarDir + 'rollup.js'
 });
 
-var spinner = ora('Begin to pack , Please wait for\n')
+let spinner = ora('Begin to pack , Please wait for\n')
 spinner.start()
 
 console.log(
@@ -66,8 +66,9 @@ base(conf).then((scriptUrl) => {
             .pipe(gulp.dest(conf.testDir))
             .on('end', resolve)
     })
-}).then(function() {
-    var complete = () => {
+}).then(() => {
+
+    let complete = () => {
         spinner.stop()
         browserSync({
             port: 3000,
@@ -100,5 +101,6 @@ base(conf).then((scriptUrl) => {
             return;
         }
         complete()
-    });
+    })
+
 })

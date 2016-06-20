@@ -1,11 +1,12 @@
 ﻿ //预初始化
+ import { config } from './config/index'
  import { interport } from './interport'
  import { AudioManager } from './component/audio/manager'
  import { VideoManager } from './component/video/manager'
  //init
- // import { init } from './init/index'
+ import { init } from './init/index'
 
-//初始化音频视频
+ //初始化音频视频
  Xut.VideoManager = new VideoManager()
  Xut.AudioManager = new AudioManager()
 
@@ -27,4 +28,4 @@
 
  Xut.Version = 805
 
- // init()
+ init()

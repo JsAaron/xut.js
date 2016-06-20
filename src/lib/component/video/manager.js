@@ -2,7 +2,10 @@
     视频和远程网页管理模块
 */
 import { VideoClass } from './video'
+import { config } from '../../config/index'
 
+const pixelRatio = window.devicePixelRatio
+const resolution = window.screen
 
 //综合管理video, webpage
 export class VideoManager {
@@ -89,7 +92,7 @@ export class VideoManager {
      * @return {[type]}            [description]
      */
     deployVideo(data, pageId, activityId) {
-        var config = Xut.config
+
         var proportion = config.proportion
         var screenSize = config.screenSize
 
@@ -104,15 +107,13 @@ export class VideoManager {
             //读库强制全屏
             if (window.DUKUCONFIG) {
                 //获取分辨率
-                var screen = window.screen
-                width = screen.width
-                height = screen.height
+                width = resolution.width
+                height = resolution.height
                 top = 0
                 left = 0
             } else {
                 //正常的是按照屏幕尺寸的
                 //这是安卓插件问题,按照分辨率计算
-                var pixelRatio = window.devicePixelRatio
                 width = width * pixelRatio
                 height = height * pixelRatio
                 left = left * pixelRatio

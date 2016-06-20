@@ -36,9 +36,9 @@ let setConfig = () => {
 }
 
 //切换坐标
-let toTranslate3d = (distance, speed, element) => {
+let toTranslate3d = (context, distance, speed, element) => {
     distance = Xut.config.virtualMode ? distance / 2 : distance;
-    if (element = element || this.element || this.$contentProcess) {
+    if (element = element || context.element || context.$contentProcess) {
         element.css(prefix('transform'), 'translate3d(' + distance + 'px,0px,0px)');
         if (Xut.config.pageFlip) {
             //修正pageFlip切换页面的处理
@@ -101,7 +101,7 @@ export function reset() {
  * @return {[type]} [description]
  */
 export function flipMove(distance, speed, element) {
-    toTranslate3d.apply(this, arguments)
+    toTranslate3d(this, distance, speed, element)
 }
 
 /**
@@ -109,7 +109,7 @@ export function flipMove(distance, speed, element) {
  * @return {[type]} [description]
  */
 export function flipRebound(distance, speed) {
-    toTranslate3d.apply(this, arguments)
+    toTranslate3d(this, distance, speed)
 }
 
 /**
@@ -125,7 +125,7 @@ export function flipOver(distance, speed) {
             this.element.attr('data-view', true)
         }
     }
-    toTranslate3d.apply(this, arguments)
+    toTranslate3d(this, distance, speed)
 }
 
 

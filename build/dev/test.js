@@ -89,7 +89,7 @@ let mergeuglify = (scriptUrl, cb) => {
             console.log('Less Error!', err.message);
             this.end();
         })
-        // .pipe(uglify())
+        .pipe(uglify())
         .pipe(gulp.dest(conf.tarDir))
         .on('end', cb)
 }

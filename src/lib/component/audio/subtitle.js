@@ -132,12 +132,14 @@ Subtitle.prototype = {
 
     createDom: function(data) {
 
+        var config = Xut.config
+
         //屏幕分辨率
-        var proportion = Xut.config.proportion;
+        var proportion = config.proportion;
         var proportionWidth = proportion.width;
         var proportionHeight = proportion.height;
-        var screenWidth = Xut.config.screenSize.width;
-        var screenHeight = Xut.config.screenSize.height;
+        var screenWidth = config.screenSize.width;
+        var screenHeight = config.screenSize.height;
 
         var cid = data.id;
         var parentNode = this.parents[cid];

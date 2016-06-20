@@ -46,7 +46,7 @@ function fiexdProportion(width, height, left, top) {
 
 
 export function setProportion(width, height, left, top) {
-    return fiexdProportion.apply(this, arguments)
+    return fiexdProportion(width, height, left, top)
 }
 
 

@@ -28,7 +28,7 @@ const write = (path, code) => {
  * @param  {[type]} url    [description]
  * @return {[type]}        [description]
  */
-var readsrcipt = (srcDir, url) => {
+let readsrcipt = (srcDir, url) => {
     url = url || './src/index.html'
     return new Promise((resolve, reject) => {
         fs.readFile(url, "utf8", (error, data) => {
@@ -68,21 +68,36 @@ module.exports = (conf) => {
     console.log('Delete the directory, the path is:\n ' + conf.tarDir + ' \n ' + conf.testDir + '\n')
 
     return new Promise((resolve, reject) => {
-        rollup.rollup({
-                entry: conf.entry,
-                plugins: [
-                    babel({
-                        exclude: 'node_modules/**'
-                    })
-                ]
-            }).then((bundle) => {
+        let plugins
+        let config = {
+            entry: conf.entry
+        }
+        if (process.platform === 'win32') {
+            plugins = [
+                babel({
+                    exclude: 'node_modules/**',
+                    "presets": ["es2015-rollup"]
+                })
+            ]
+
+        } else {
+            plugins = [
+                babel({
+                    exclude: 'node_modules/**'
+                })
+            ]
+        }
+
+        config.plugins = plugins
+
+        rollup.rollup(config).then((bundle) => {
                 //创建目录,如果不存在
                 if (!fs.existsSync(conf.tarDir)) {
                     fs.mkdirSync(conf.tarDir);
                     console.log(conf.tarDir + '目录创建成功');
                 }
                 var code = bundle.generate({
-                    format: 'cjs'
+                    format: 'umd'
                 }).code
                 return write(conf.rollup, code)
             }).then(() => {
@@ -93,7 +108,7 @@ module.exports = (conf) => {
             })
             .catch(() => {
                 console.log('错误')
-                reject()
+                    // reject()
             })
     })
 }

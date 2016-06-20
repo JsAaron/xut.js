@@ -200,9 +200,11 @@ export class Animation {
      */
     run(scopeComplete) {
 
-        //div and canvas of nodes
-        var element = this.$contentProcess.view ? this.$contentProcess.view : this.$contentProcess;
-
+        var element = this.$contentProcess
+        //canvas
+        if (element && element.view) {
+            element = this.$contentProcess.view
+        }
 
         //ppt动画
         //dom与canvas
