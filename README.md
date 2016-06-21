@@ -1,4 +1,16 @@
+
+##前端能干嘛？
+前端不仅仅写网页，还可以做app，甚至桌面端应用软件
+#####我的作品
+
+* 移动端软件: [大量app](http://www.appone.cn/)
+* 桌面端工具: [apk转化epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
+
+
+
+
 ##magazine 是什么?
+#####这是一套模板方案，用来批量制作app，使用前端的技术实现模拟原生的app效果
 * 这是一套可以批量制作app的代码实现，可以制作apk/ipa/epub/pc等跨平台应用软件
 * 采用混合技术 cordova+h5+css3+webgl ，基于SPA架构
 * 代码超过10万行，实现了几十种动画与14种事件，同时也实现了部分webgl适配
