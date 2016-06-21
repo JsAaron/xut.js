@@ -14,7 +14,7 @@
 #####通过组合各种模块，整合成一个定制化的app应用
 * 可以批量制作apk/ipa/epub/pc等跨平台应用软件
 * 采用混合技术 cordova+h5+css3+webgl ，基于SPA架构
-* 代码超过10万行，模拟多种原生应用行为，实现了几十种动画与14种事件，同时也实现了部分webgl适配
+* 代码超过10万行，模拟多种原生应用行为，实现了上百种动画特效与14种事件，同时也实现了部分webgl适配
 * 具体介绍可以参考博客链接介绍  [Hybrid App应用制作与跨平台解决方案 ](http://www.cnblogs.com/aaronjs/p/4255232.html)
 
 
@@ -27,11 +27,10 @@
 
 ##博客链接
 
-* http://www.cnblogs.com/aaronjs/p/4255232.html
+* http://www.cnblogs.com/aaronjs
 
 
 ##特别注意
-
 ```javascript
   var 注明 = {
      内容 : "公司内部源码，但是属于我个人开发，不能抄袭后作为商业使用，仅提供前端爱好者参考学习交流",
