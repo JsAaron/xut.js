@@ -3,7 +3,7 @@
  * @param  {[type]} global [description]
  * @return {[type]}        [description]
  */
-import { hash } from '../../util/dom'
+import { hash } from '../../util/lang'
 import { config } from '../../config/index'
 import { BaseClass } from './baseclass'
 

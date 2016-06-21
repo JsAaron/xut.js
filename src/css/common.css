@@ -337,15 +337,6 @@ video {
 }
 
 
-/**
- * 等待加载
- */
-
-.xut-waitLoad {
-    background-size: 100% 100%;
-    background-image: url(../images/icons/waitLoad.png);
-}
-
 
 /**
  * 翻页控制

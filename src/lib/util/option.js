@@ -153,8 +153,8 @@ export function readFile(path, callback, type) {
                 console.log('SVG' + path + '解析出错!');
             }
         })
- 
-    } else { 
+
+    } else {
         //手机模式
         Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.svgPath() + path, function(svgContent) {
             callback(svgContent);

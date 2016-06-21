@@ -80,12 +80,12 @@ export function scene(id) {
 
     var wapper = '';
     if (config.scrollPaintingMode) {
-        wapper = '<div id="{0}" class="xut-waitLoad" style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">' +
+        wapper = '<div id="{0}" style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">' +
             '<ul id="{6}" class="xut-flip" style="z-index:{7}"></ul>' +
             '<ul id="{8}" class="xut-flip" style="z-index:{9}"></ul>' +
             '</div>';
     } else {
-        wapper = '<div id="{0}" class="xut-waitLoad" style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;overflow:hidden;z-index:{5};">' +
+        wapper = '<div id="{0}" style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;overflow:hidden;z-index:{5};">' +
             '<ul id="{6}" class="xut-flip" style="z-index:{7}"></ul>' +
             '<ul id="{8}" class="xut-flip" style="z-index:{9}"></ul>' +
             '</div>';

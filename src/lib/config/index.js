@@ -7,24 +7,23 @@
  */
 
 //配置对象
-var config = {},
-    layoutMode,
-    screenSize,
-    proportion,
-    isIOS = Xut.plat.isIOS,
-    isIphone = Xut.plat.isIphone,
-    isAndroid = Xut.plat.isAndroid,
-    isBrowser = Xut.plat.isBrowser,
-    sourceUrl = "content/gallery/";
-
-var FLOOR = Math.floor;
-var CEIL = Math.ceil;
+let config = {}
+let layoutMode
+let screenSize
+let proportion
+let isIOS = Xut.plat.isIOS
+let isIphone = Xut.plat.isIphone
+let isAndroid = Xut.plat.isAndroid
+let isBrowser = Xut.plat.isBrowser
+let sourceUrl = "content/gallery/"
+let FLOOR = Math.floor
+let CEIL = Math.ceil
 
 /**
  * 屏幕尺寸
  * @return {[type]} [description]
  */
-var judgeScreen = function() {
+let judgeScreen = () => {
     //如果是IBooks模式处理
     if (Xut.IBooks.Enabled) {
         var screenSize = Xut.IBooks.CONFIG.screenSize;
@@ -35,7 +34,6 @@ var judgeScreen = function() {
             }
         }
     }
-
     return {
         "width": $(window).width(),
         // 1024 768
@@ -43,14 +41,23 @@ var judgeScreen = function() {
     }
 }
 
-//排版判断
-var judgeLayer = function() {
+
+/**
+ * 排版判断
+ * @return {[type]} [description]
+ */
+let judgeLayer = () => {
     return screenSize.width > screenSize.height ? "horizontal" : "vertical";
 }
 
 
-//缩放比例
-var judgeScale = function(pptWidth, pptHeight) {
+/**
+ * 缩放比例
+ * @param  {[type]} pptWidth  [description]
+ * @param  {[type]} pptHeight [description]
+ * @return {[type]}           [description]
+ */
+let judgeScale = (pptWidth, pptHeight) => {
     var dbmode, scaleWidth, scaleHeight,
         width = screenSize.width,
         height = screenSize.height,
@@ -117,7 +124,7 @@ var judgeScale = function(pptWidth, pptHeight) {
         wProp = hProp = _prop;
     }
 
-    var opts = {
+    return {
         width: wProp,
         height: hProp,
         left: wProp,
@@ -127,15 +134,14 @@ var judgeScale = function(pptWidth, pptHeight) {
         pptWidth: pptWidth,
         pptHeight: pptHeight
     }
-
-    return opts;
 }
+
 
 /**
  * 修正API接口
  * @return {[type]} [description]
  */
-var fiexdAPI = function() {
+let fiexdAPI = () => {
     screenSize = config.screenSize = judgeScreen();
     layoutMode = config.layoutMode = judgeLayer();
     proportion = config.proportion = judgeScale();
@@ -145,25 +151,30 @@ var fiexdAPI = function() {
  * 修复缩放比
  * 如果PPT有编辑指定的宽度与高度
  */
-var setProportion = function(pptWidth, pptHeight) {
+let setProportion = (pptWidth, pptHeight) => {
 
-    //计算新的缩放比
+    /**
+     * 计算新的缩放比
+     * @type {[type]}
+     */
     proportion = config.proportion = judgeScale(pptWidth, pptHeight);
 
-    //计算容器的宽高比
-    proportion.calculateContainer = (function() {
+    /**
+     * 计算容器的宽高比
+     * @param  {[type]} () [description]
+     * @return {[type]}    [description]
+     */
+    proportion.calculateContainer = (() => {
+        var pptWidth = proportion.pptWidth
+        var pptHeight = proportion.pptHeight
+        var scaleWidth = proportion.width
+        var scaleHeight = proportion.height
+        return (width, height, left, top) => {
 
-        var pptWidth = proportion.pptWidth,
-            pptHeight = proportion.pptHeight,
-            scaleWidth = proportion.width,
-            scaleHeight = proportion.height;
-
-        return function(width, height, left, top) {
-
-            width = arguments[0] ? arguments[0] : screenSize.width;
-            height = arguments[1] ? arguments[1] : screenSize.height;
-            left = arguments[2] ? arguments[2] : 0;
-            top = arguments[3] ? arguments[3] : 0;
+            width = width || screenSize.width
+            height = height || screenSize.height
+            left = left || 0
+            top = top || 0
 
             if (pptWidth && pptHeight && isBrowser) {
                 //维持竖版的缩放比
@@ -197,8 +208,12 @@ var setProportion = function(pptWidth, pptHeight) {
         }
     })();
 
-    //计算元素的缩放比
-    proportion.calculateElement = function(data) {
+    /**
+     * 计算元素的缩放比
+     * @param  {[type]} data [description]
+     * @return {[type]}      [description]
+     */
+    proportion.calculateElement = (data) => {
         var data = _.extend({}, data)
         data.width = CEIL(data.width * proportion.width);
         data.height = CEIL(data.height * proportion.height);
@@ -209,12 +224,14 @@ var setProportion = function(pptWidth, pptHeight) {
 }
 
 
-//层级关系
-_.extend(Xut, {
-    zIndexlevel: function() {
-        return ++config.zIndexlevel;
-    }
-})
+/**
+ * 层级关系
+ * @return {[type]} [description]
+ */
+Xut.zIndexlevel = () => {
+    return ++config.zIndexlevel
+}
+
 
 //通过新学堂加载
 //用于处理iframe窗口去全屏
@@ -223,50 +240,55 @@ if (/xinxuetang/.test(window.location.href)) {
 }
 
 
-/********************************************************************
- *
- *              通过iframe加载判断当前的加载方式
- *              1 本地iframe打开子文档
- *              2 读酷加载电子杂志
- *              3 读酷加载电子杂志打开子文档
- *
- * *******************************************************************/
-var iframeMode = (function() {
-    var mode;
-    if (SUbCONFIGT && DUKUCONFIG) {
+/**
+ *  通过iframe加载判断当前的加载方式
+ *  1 本地iframe打开子文档
+ *  2 读酷加载电子杂志
+ *  3 读酷加载电子杂志打开子文档
+ */
+let iframeMode = (() => {
+    let mode;
+    if (window.SUbCONFIGT && window.DUKUCONFIG) {
         //通过读酷客户端开打子文档方式
         mode = 'iframeDuKuSubDoc'
     } else {
         //子文档加载
-        if (SUbCONFIGT) {
+        if (window.SUbCONFIGT) {
             mode = 'iframeSubDoc'
         }
-
         //读酷客户端加载
-        if (DUKUCONFIG) {
+        if (window.DUKUCONFIG) {
             mode = 'iframeDuKu'
         }
-
         //客户端模式
         //通过零件加载
-        if (CLIENTCONFIGT) {
+        if (window.CLIENTCONFIGT) {
             mode = 'iframeClient'
         }
-
         //秒秒学客户端加载
-        if (MMXCONFIG) {
+        if (window.MMXCONFIG) {
             mode = 'iframeMiaomiaoxue'
         }
-
     }
     return mode;
-}());
+})()
 
 
-//读酷模式下的路径
-DUKUCONFIG && (DUKUCONFIG.path = DUKUCONFIG.path.replace('//', '/'));
+/**
+ * 读酷模式下的路径
+ * @param  {[type]} window.DUKUCONFIG [description]
+ * @return {[type]}                   [description]
+ */
+if (window.DUKUCONFIG) {
+    window.DUKUCONFIG.path = window.DUKUCONFIG.path.replace('//', '/')
+}
 
-//除右端的"/"
+
+/**
+ * 除右端的"/"
+ * @param  {[type]} str [description]
+ * @return {[type]}     [description]
+ */
 var rtrim = function(str) {
     if (typeof str != 'string') return str;
     var lastIndex = str.length - 1;
@@ -277,13 +299,14 @@ var rtrim = function(str) {
     }
 }
 
+
 // var MMXCONFIGPath = '.'
 // if (MMXCONFIG && MMXCONFIG.path) {
 //     MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
 // }
 var MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
-if (MMXCONFIG && MMXCONFIG.path) {
-    MMXCONFIGPath = rtrim(MMXCONFIG.path)
+if (window.MMXCONFIG && window.MMXCONFIG.path) {
+    MMXCONFIGPath = rtrim(window.MMXCONFIG.path)
 }
 
 
@@ -292,18 +315,22 @@ if (MMXCONFIG && MMXCONFIG.path) {
 //2 子文档
 //3 秒秒学
 var iframeConfig = {
-    //资源图片
-    resources: function() {
+
+    /**
+     * 资源图片
+     * @return {[type]} [description]
+     */
+    resources() {
         if (isIOS) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return DUKUCONFIG.path;
+                    return window.DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     return sourceUrl;
                 case 'iframeDuKuSubDoc':
                     return sourceUrl;
                 case 'iframeClient':
-                    return CLIENTCONFIGT.path;
+                    return window.CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -312,31 +339,34 @@ var iframeConfig = {
         if (isAndroid) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return DUKUCONFIG.path;
+                    return window.DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+                    return '/android_asset/www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return CLIENTCONFIGT.path;
+                    return window.CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
         }
     },
 
-    //视频路径
-    video: function() {
+    /**
+     * 视频路径
+     * @return {[type]} [description]
+     */
+    video() {
         if (isIOS) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return DUKUCONFIG.path;
+                    return window.DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     return sourceUrl
                 case 'iframeDuKuSubDoc':
                     return sourceUrl;
                 case 'iframeClient':
-                    return CLIENTCONFIGT.path;
+                    return window.CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -345,31 +375,34 @@ var iframeConfig = {
         if (isAndroid) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return DUKUCONFIG.path;
+                    return window.DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     return 'android.resource://#packagename#/raw/';
                 case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return CLIENTCONFIGT.path;
+                    return window.CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
         }
     },
 
-    //音频路径
-    audio: function() {
+    /**
+     * 音频路径
+     * @return {[type]} [description]
+     */
+    audio() {
         if (isIOS) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return DUKUCONFIG.path;
+                    return window.DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     return sourceUrl;
                 case 'iframeDuKuSubDoc':
                     return sourceUrl;
                 case 'iframeClient':
-                    return CLIENTCONFIGT.path;
+                    return window.CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -377,32 +410,35 @@ var iframeConfig = {
         if (isAndroid) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return DUKUCONFIG.path;
+                    return window.DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+                    return '/android_asset/www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return CLIENTCONFIGT.path;
+                    return window.CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
         }
     },
 
-    //调用插件处理
-    svg: function() {
+    /**
+     * 调用插件处理
+     * @return {[type]} [description]
+     */
+    svg() {
         if (isIOS) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return DUKUCONFIG.path;
+                    return window.DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     //www/content/subdoc/00c83e668a6b6bad7eda8eedbd2110ad/content/gallery/
-                    return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+                    return 'www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return CLIENTCONFIGT.path;
+                    return window.CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -411,13 +447,13 @@ var iframeConfig = {
         if (isAndroid) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return DUKUCONFIG.path;
+                    return window.DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+                    return 'www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return CLIENTCONFIGT.path;
+                    return window.CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -429,8 +465,12 @@ var iframeConfig = {
 
 //杂志直接打开
 var nativeConfig = {
-    //资源图片
-    resources: function() {
+
+    /**
+     * 资源图片
+     * @return {[type]} [description]
+     */
+    resources() {
         if (isIOS) {
             return sourceUrl;
         }
@@ -446,10 +486,12 @@ var nativeConfig = {
         }
     },
 
-    //视频路径
-    // ios平台在缓存
-    // 安卓在编译raw中
-    video: function() {
+    /**
+     * 视频路径
+     * ios平台在缓存
+     * 安卓在编译raw中
+     */
+    video() {
         if (isIOS) {
             return sourceUrl;
         }
@@ -458,10 +500,13 @@ var nativeConfig = {
         }
     },
 
-    //音频路径
-    // ios平台在缓存
-    // 安卓在缓存中
-    audio: function() {
+    /**
+     * 音频路径
+     * ios平台在缓存
+     * 安卓在缓存中
+     * @return {[type]} [description]
+     */
+    audio() {
         if (isIOS) {
             return sourceUrl;
         }
@@ -470,18 +515,23 @@ var nativeConfig = {
         }
     },
 
-    //读取svg路径前缀
-    svg: function() {
+    /**
+     * 读取svg路径前缀
+     * @return {[type]} [description]
+     */
+    svg() {
         return 'www/' + sourceUrl;
     }
 }
 
 
-
 /**
  * 缓存
  */
-var cacheResourcesPath, cacheVideoPath, cacheAudioPath, cacheSvgPath;
+let cacheResourcesPath
+let cacheVideoPath
+let cacheAudioPath
+let cacheSvgPath
 
 
 /**
@@ -489,11 +539,11 @@ var cacheResourcesPath, cacheVideoPath, cacheAudioPath, cacheSvgPath;
  * 而且是客户端模式
  * @return {[type]} [description]
  */
-var pcMode = function() {
+let pcMode = () => {
     //如果是iframe加载
     //而且是客户端模式
-    if (GLOBALIFRAME && CLIENTCONFIGT) {
-        return CLIENTCONFIGT.path;
+    if (window.GLOBALIFRAME && window.CLIENTCONFIGT) {
+        return window.CLIENTCONFIGT.path;
     }
 
     if (typeof initGalleryUrl != 'undefined') {
@@ -509,7 +559,8 @@ var pcMode = function() {
             return sourceUrl;
         }
     }
-};
+}
+
 
 /**
  * 平台加载用于
@@ -519,26 +570,27 @@ var pcMode = function() {
  * 3 安卓打包后通过网页访问=>妙妙学
  * @return {[type]} [description]
  */
-var runLoad = function() {
-    if (MMXCONFIG) {
+let runLoad = () => {
+    if (window.MMXCONFIG) {
         return false
     }
     return isBrowser;
 }
+
 
 /**
  * 图片资源配置路径
  * [resourcesPath description]
  * @return {[type]} [description]
  */
-var resourcesPath = function() {
+let resourcesPath = () => {
     if (cacheResourcesPath) {
         return cacheResourcesPath;
     }
     //移动端模式
-    var mobileMode = function() {
-        return GLOBALIFRAME ? iframeConfig.resources() : nativeConfig.resources();
-    };
+    let mobileMode = () => {
+        return window.GLOBALIFRAME ? iframeConfig.resources() : nativeConfig.resources();
+    }
     return cacheResourcesPath = isBrowser ? pcMode() : mobileMode();
 }
 
@@ -549,13 +601,14 @@ var resourcesPath = function() {
  * 2 或者asset上的资源
  * @return {[type]} [description]
  */
-var videoPath = function() {
+let videoPath = () => {
     if (cacheVideoPath) {
         return cacheVideoPath;
     }
-    var mobilePath = function() {
-        return GLOBALIFRAME ? iframeConfig.video() : nativeConfig.video();
-    };
+    //移动
+    let mobilePath = () => {
+        return window.GLOBALIFRAME ? iframeConfig.video() : nativeConfig.video();
+    }
     return cacheVideoPath = runLoad() ? pcMode() : mobilePath();
 }
 
@@ -564,14 +617,14 @@ var videoPath = function() {
  * 音频路径
  * @return {[type]} [description]
  */
-var audioPath = function() {
+let audioPath = () => {
     if (cacheAudioPath) {
         return cacheAudioPath;
     }
     //移动端
-    var mobileMode = function() {
-        return GLOBALIFRAME ? iframeConfig.audio() : nativeConfig.audio();
-    };
+    let mobileMode = () => {
+        return window.GLOBALIFRAME ? iframeConfig.audio() : nativeConfig.audio();
+    }
     return cacheAudioPath = runLoad() ? pcMode() : mobileMode();
 };
 
@@ -580,13 +633,13 @@ var audioPath = function() {
  * SVG文件路径
  * @return {[type]} [description]
  */
-var svgPath = function() {
+let svgPath = () => {
     if (cacheSvgPath) {
         return cacheSvgPath;
     }
-    var mobileMode = function() {
-        return GLOBALIFRAME ? iframeConfig.svg() : nativeConfig.svg();
-    };
+    let mobileMode = () => {
+        return window.GLOBALIFRAME ? iframeConfig.svg() : nativeConfig.svg();
+    }
     return cacheSvgPath = isBrowser ? pcMode() : mobileMode();
 }
 
@@ -597,7 +650,7 @@ var svgPath = function() {
  * @param  {[type]} name [description]
  * @return {[type]}      [description]
  */
-Xut.log = function(info, name) {
+Xut.log = function(info, name){
     if (!config.debugMode) return;
     switch (info) {
         case 'error':
@@ -611,7 +664,6 @@ Xut.log = function(info, name) {
             break;
     }
 }
-
 
 
 _.extend(config, {
@@ -710,7 +762,7 @@ _.extend(config, {
      * 配置图片路径地址
      * @return {[type]} [description]
      */
-    initResourcesPath: function() {
+    initResourcesPath() {
         this.pathAddress = resourcesPath();
     },
 
@@ -718,7 +770,7 @@ _.extend(config, {
      * 视频文件路径
      * @return {[type]} [description]
      */
-    videoPath: function() {
+    videoPath() {
         return videoPath();
     },
 
@@ -726,7 +778,7 @@ _.extend(config, {
      * 音频文件路径
      * @return {[type]} [description]
      */
-    audioPath: function() {
+    audioPath() {
         return audioPath();
     },
 
@@ -734,7 +786,7 @@ _.extend(config, {
      * 配置SVG文件路径
      * @return {[type]} [description]
      */
-    svgPath: function() {
+    svgPath() {
         return svgPath();
     },
 
@@ -796,4 +848,5 @@ _.extend(config, {
 
 Xut.config = config
 
-export {config}
+export { config }
+

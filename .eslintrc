@@ -34,14 +34,15 @@
     "Snap":true,
     "videojs":true,
     "Audio5js":true,
-    "Draggable":true
+    "Draggable":true,
+    "Promise":true
   },
   "parser": "babel-eslint",
   "extends": "eslint:recommended",
-  
+
   "rules": {
     "no-console": 0,
-    
+
     //警告
     // "quotes": [1, "single"],                  //建议使用单引号
     // "no-inner-declarations": [1, "both"],     //不建议在{}代码块内部声明变量或函数
@@ -86,7 +87,7 @@
       0,
       {
         "beforeColon": false,
-        "afterColon": true 
+        "afterColon": true
       }
     ], //object直接量建议写法 : 后一个空格签名不留空格
     "block-scoped-var": 0, //变量定义后未使用

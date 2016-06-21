@@ -6,25 +6,24 @@
  *      3 加载子文档
  *
  */
+
+import { suspendHandles, promptMessage } from '../../stop'
+
+
 export class ActionClass {
 
     constructor(data) {
         _.extend(this, data);
         this.id = parseInt(this.id);
         this.actType = this.type;
-        var results = Xut.data.query('Action', this.id, 'activityId')
-        this.init(results)
+        this.init(Xut.data.query('Action', this.id, 'activityId'))
     }
 
-
     init(results) {
-        var para1, dbId
-        para1 = results.para1 //跳转参数
-            // para2 = results.para2 //ppt
-        dbId = results._id
 
-
-        var actionType = parseInt(results.actionType);
+        let para1 = results.para1 //跳转参数
+        let dbId = results._id
+        let actionType = parseInt(results.actionType);
 
         //跳转或打开本地程序
         switch (actionType) {
@@ -120,20 +119,21 @@ export class ActionClass {
             self.rootNode = null;
             Xut.isRunSubDoc = false;
         }
+
         try {
-            contentWindow.require("Dispatcher", function(c) {
-                if (iframe) {
-                    //子文档操作
-                    if (c.stopHandles()) {
-                        c.promptMessage('再按一次将退出子目录！')
-                    } else {
-                        clear();
-                    }
+
+            if (iframe) {
+                //子文档操作
+                if (suspendHandles()) {
+                    promptMessage('再按一次将退出子目录！')
                 } else {
-                    //父级操作
-                    c.stopHandles()
+                    clear();
                 }
-            })
+            } else {
+                //父级操作
+                suspendHandles()
+            }
+
         } catch (err) {
             clear();
         }

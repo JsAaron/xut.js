@@ -44,12 +44,20 @@ export function toEmpty(val) {
 }
 
 /**
+ * 创建一个纯存的hash对象
+ */
+export function hash() {
+    return Object.create(null)
+}
+
+
+/**
  * 简单继承
  * @return {[type]} [description]
  */
 export function extend(subClass, superClass) {
     var F = function() {}
-    F.prototype = superClass.prototype 
+    F.prototype = superClass.prototype
     var fProto = new F();
     for (var k in fProto) {
         if (subClass.prototype[k]) {
@@ -181,4 +189,3 @@ export function arrayUnique(arr) { //去重
         return arr
     }
 }
-

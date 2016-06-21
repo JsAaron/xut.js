@@ -1,6 +1,6 @@
 ﻿ //预初始化
  import { config } from './config/index'
- import { interport } from './interport'
+ import { api } from './api.js'
  import { AudioManager } from './component/audio/manager'
  import { VideoManager } from './component/video/manager'
  //init
@@ -14,18 +14,32 @@
  //在加载时创建新的audio.video 用的时候更换
  Xut.fix = Xut.fix || {}
 
- //移动端浏览器平台
- if (Xut.plat.isBrowser && (Xut.plat.isIOS || Xut.plat.isAndroid)) {
-     var fixaudio = function() {
-         if (!Xut.fix.audio) {
-             Xut.fix.audio = new Audio();
-             Xut.fix.video = document.createElement("Video");
-             document.removeEventListener('touchstart', fixaudio, false);
+ if (Xut.plat.isBrowser) {
+     //移动端浏览器平台媒体自动播放处理
+     if (Xut.plat.isIOS || Xut.plat.isAndroid) {
+         var fixaudio = function() {
+             if (!Xut.fix.audio) {
+                 Xut.fix.audio = new Audio();
+                 Xut.fix.video = document.createElement("Video");
+                 document.removeEventListener('touchstart', fixaudio, false);
+             }
          }
-     };
-     document.addEventListener('touchstart', fixaudio, false);
+         document.addEventListener('touchstart', fixaudio, false);
+     } else {
+         //桌面绑定鼠标控制
+         $(document).keyup(function(event) {
+             switch (event.keyCode) {
+                 case 37:
+                     Xut.View.GotoPrevSlide()
+                     break;
+                 case 39:
+                     Xut.View.GotoNextSlide()
+                     break;
+             }
+         })
+     }
  }
 
- Xut.Version = 805
+ Xut.Version = 806
 
  init()

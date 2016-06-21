@@ -84,7 +84,7 @@ let hotMiddleware = webpacHotMiddleware(compiler)
 // force page reload when html-webpack-plugin template changes
 compiler.plugin('compilation', (compilation) => {
     //https://github.com/ampedandwired/html-webpack-plugin
-    compilation.plugin('html-webpack-plugin-after-emit', function(data, cb) {
+    compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
         hotMiddleware.publish({
             action: 'reload'
         })

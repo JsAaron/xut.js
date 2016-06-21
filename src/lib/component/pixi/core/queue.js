@@ -1,7 +1,7 @@
 import {
     hash
 }
-from '../../../util/index'
+from '../../../util/lang'
 
 
 /**
