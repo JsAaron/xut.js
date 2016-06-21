@@ -1,9 +1,5 @@
 
-```javascript
-  var 注明 = {
-     内容 : "公司内部源码，但是属于我个人开发，不能抄袭后作为商业使用，仅提供前端爱好者参考学习交流",
-  }
-```
+
 
 ##前端能干嘛？
 前端不仅仅写网页，还可以做app，甚至桌面端应用软件
@@ -33,12 +29,10 @@
 * http://www.cnblogs.com/aaronjs/p/4255232.html
 
 
-
-##关于作者
+##特别注意
 
 ```javascript
-  var ihubo = {
-    nickName  : "Aaron",
-    site : "https://github.com/jsAaron"
+  var 注明 = {
+     内容 : "公司内部源码，但是属于我个人开发，不能抄袭后作为商业使用，仅提供前端爱好者参考学习交流",
   }
 ```
