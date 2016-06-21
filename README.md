@@ -4,7 +4,7 @@
 ##前端能干嘛？
 前端不仅仅写网页，还可以做app，甚至桌面端应用软件
 #####我的作品
-
+* 网页加壳: [秒秒学](http://www.miaomiaoxue.com/)
 * 移动端软件: [大量app](http://www.appone.cn/)
 * 桌面端工具: [apk转化epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
 
