@@ -228,8 +228,8 @@ export function init(baseProto) {
                 //用于是最顶层的，比母版浮动对象还要高
                 //所以这个浮动对象需要跟随页面动
                 floatPages: function(data) {
+                    //浮动页面对象容器
                     var contentObj
-                        //浮动页面对象容器
                     floatContents.PageContainer = data.container;
                     _.each(data.ids, function(id) {
                         if (contentObj = self.baseGetContentObject(id)) {

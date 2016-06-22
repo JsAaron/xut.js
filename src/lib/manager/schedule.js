@@ -374,8 +374,8 @@ export class Scheduler {
             //chapterId => createPid
             createPid = createPids[index];
 
-            //createPid 
-            //pageIndex 
+            //createPid
+            //pageIndex
             conversion = conversionPageOpts.call(self, createPid, visiblePage);
             visiblePid = conversion.visiblePid;
             pageIndex = conversion.pageIndex;

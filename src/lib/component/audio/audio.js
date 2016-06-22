@@ -67,11 +67,11 @@ class _Media extends BaseClass {
         this.preRelated(trackId, options);
 
         //音频成功与失败调用
-        audio = new window.GLOBALCONTEXT.Media(url, function() {
+        audio = new window.GLOBALCONTEXT.Media(url, () => {
             self.callbackProcess(true);
-        }, function() {
+        }, () => {
             self.callbackProcess(true);
-        });
+        })
 
         //autoplay
         this.audio = audio;
@@ -79,7 +79,9 @@ class _Media extends BaseClass {
         this.options = options;
 
         //相关数据
-        this.afterRelated(audio, options, controlDoms);
+        this.afterRelated(audio, options, controlDoms)
+
+        this.play()
     }
 
     //取反
@@ -157,7 +159,6 @@ class _Audio extends BaseClass {
 
         let trackId = options.trackId
         let url = config.audioPath() + options.url
-        let self = this
         let audio
 
         //构建之前处理
@@ -175,21 +176,24 @@ class _Audio extends BaseClass {
             } else {
                 audio = new Audio(url);
             }
-
             //更新音轨
             //妙妙学方式不要音轨处理
             if (!Xut.fix.audio) {
                 instance[trackId] = audio;
             }
-
-            audio.addEventListener('ended', function() {
-                self.callbackProcess()
-            }, false);
-
-            audio.addEventListener('error', function() {
-                self.callbackProcess()
-            }, false);
         }
+
+        audio.addEventListener('loadeddata', () => {
+            this.play()
+        }, false)
+
+        audio.addEventListener('error', () => {
+            this.callbackProcess()
+        }, false)
+
+        audio.addEventListener('error', () => {
+            this.callbackProcess()
+        }, false)
 
         this.audio = audio;
         this.trackId = trackId;
@@ -197,7 +201,7 @@ class _Audio extends BaseClass {
         this.options = options;
 
         //相关数据
-        this.afterRelated(audio, options, controlDoms);
+        this.afterRelated(audio, options, controlDoms)
     }
 
     end() {
@@ -257,7 +261,9 @@ class _cordovaMedia extends BaseClass {
         this.options = options;
 
         //相关数据
-        this.afterRelated(audio, options, controlDoms);
+        this.afterRelated(audio, options, controlDoms)
+
+        this.play()
     }
 
     //播放

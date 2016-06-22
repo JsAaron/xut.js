@@ -178,10 +178,10 @@ export class PageMgr extends Abstract {
                 //移动浮动页面容器
                 var flaotElement;
                 if (flaotElement = pageObj.floatContents.PageContainer) {
-                    translation[action].call(pageObj, moveDistance[index], speed, flaotElement)
+                    translation[action](pageObj, moveDistance[index], speed, flaotElement)
                 }
                 //正常页面
-                translation[action].call(pageObj, moveDistance[index], speed)
+                translation[action](pageObj, moveDistance[index], speed)
             }
         })
     }

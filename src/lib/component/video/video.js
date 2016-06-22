@@ -13,7 +13,6 @@ import {
 } from './support'
 
 let VideoPlayer = null
-let noop = () => {}
 
 
 /**
@@ -77,8 +76,9 @@ let _WebPage = (options) => {
         }
     }
 
+    play()
+
     return {
-        play: play,
         stop: stop,
         close: close
     }
@@ -112,8 +112,9 @@ let webView = (options) => {
         Xut.VideoManager.openWebView = false;
     }
 
+    play()
+
     return {
-        play: play,
         stop: close,
         close: close
     }
@@ -147,7 +148,6 @@ let _Media = (options) => {
     play()
 
     return {
-        play: play,
         stop: close,
         close: close
     }
@@ -173,11 +173,11 @@ let _Video5 = (options) => {
     let left = options.left
     let zIndex = options.zIndex
 
+
     let $videoWrap = $('<div></div>')
     let $video = $(document.createElement('video'))
     let video = $video[0]
 
-    video.play()
 
     //video节点
     $video.css({
@@ -199,16 +199,14 @@ let _Video5 = (options) => {
         height: 0
     })
 
-
     /**
-     * 播放
+     * 播放视频
      * @return {[type]} [description]
      */
-    let play = () => {
+    let _paly = () => {
         $videoWrap.show();
         video.play();
     }
-
 
     /**
      * 停止
@@ -249,10 +247,12 @@ let _Video5 = (options) => {
      */
     let start = () => {
         $videoWrap.css({
-            width: width + 'px',
-            height: height + 'px',
-            zIndex: zIndex
-        })
+                width: width + 'px',
+                height: height + 'px',
+                zIndex: zIndex
+            })
+            //加完后播放视频
+        _paly()
     }
 
     /**
@@ -275,7 +275,6 @@ let _Video5 = (options) => {
     video.addEventListener('webkitendfullscreen', stop, false)
 
     return {
-        play: play,
         stop: stop,
         close: destroy
     }
@@ -309,12 +308,10 @@ let _VideoJS = (options) => {
     //指定本地的swf地址取代网络地址
     videojs.options.flash.swf = "lib/data/video-js.swf";
 
-
     var clear = function() {
         //结束后清理自己
         Xut.VideoManager.removeVideo(options.pageId);
     }
-
 
     //videojs是videojs定义的全局函数
     player = videojs(video, {
@@ -390,7 +387,6 @@ let _VideoJS = (options) => {
     wrap.style.zIndex = -1;
 
     api = {
-        play: noop,
 
         stop: function() {
             player.stop();
@@ -418,11 +414,16 @@ if (Xut.plat.isBrowser) {
             VideoPlayer = _VideoJS
         } else {
             //如果是ios或读酷pc版则使用html5播放
-            VideoPlayer = _Video5;
+            VideoPlayer = _Video5
         }
     } else if (Xut.plat.isAndroid) {
-        //android平台
-        VideoPlayer = _Media;
+        if (window.MMXCONFIG) {
+            // 安卓妙妙学强制走h5
+            VideoPlayer = _Video5
+        } else {
+            //android平台
+            VideoPlayer = _Media
+        }
     }
 }
 
@@ -431,6 +432,7 @@ if (Xut.plat.isBrowser) {
 class VideoClass {
 
     constructor(options, container) {
+
         options.container = container;
         if ('video' == options.category) {
             this.video = VideoPlayer(options)
@@ -439,24 +441,19 @@ class VideoClass {
         } else {
             console.log('options.category must be video or webPage ')
         }
+        Xut.View.Toolbar("hide")
     }
 
-    play() {
-        //隐藏工具栏
-        Xut.View.Toolbar("hide");
-        this.video.play();
-    }
     stop() {
         //显示工具栏
-        Xut.View.Toolbar("show");
-        this.video.stop();
+        Xut.View.Toolbar("show")
+        this.video.stop()
     }
     close() {
-        this.video.close();
+        this.video.close()
     }
 
 }
-
 
 
 export {

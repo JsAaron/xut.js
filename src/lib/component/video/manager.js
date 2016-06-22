@@ -172,7 +172,7 @@ export class VideoManager {
                 playBox[pageId] = {};
             }
             //cache video object
-            playBox[pageId][activityId] = new VideoClass(data, container);
+            playBox[pageId][activityId] = new VideoClass(data, container)
 
         }
 

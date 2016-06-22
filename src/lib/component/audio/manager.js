@@ -283,12 +283,8 @@ let loadAudio = (pageId, queryId, type) => {
         }
     }
 
-    //new播放对象
-    var newObj = seAudio || new audioPlayer(pageObj, tempDoms);
-    newObj.play();
-
     //存入播放对象池
-    playBox[type][pageId][queryId] = newObj;
+    playBox[type][pageId][queryId] = seAudio || new audioPlayer(pageObj, tempDoms)
 }
 
 

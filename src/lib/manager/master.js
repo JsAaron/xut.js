@@ -176,15 +176,19 @@ export class MasterMgr extends Abstract {
         //找到需要滑动的母版
         _.each(this.findMaster(leftIndex, currIndex, rightIndex, direction, action), function(pageObj, index) {
             if (pageObj) {
-                isBoundary = true;
+
+                isBoundary = true
+
                 //母版交接判断
                 //用户事件的触发
-                pageObj.onceMaster = false;
+                pageObj.onceMaster = false
+
                 //移动母版
-                translation[action].call(pageObj, moveDistance[index], speed)
-                    //移动浮动容器
+                translation[action](pageObj, moveDistance[index], speed)
+
+                //移动浮动容器
                 if (pageObj.floatContents.MasterContainer) {
-                    translation[action].call(pageObj, moveDistance[index], speed, pageObj.floatContents.MasterContainer)
+                    translation[action](pageObj, moveDistance[index], speed, pageObj.floatContents.MasterContainer)
                 }
             }
         })

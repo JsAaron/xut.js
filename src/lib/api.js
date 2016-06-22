@@ -43,7 +43,7 @@ import { controll } from './scenario/controller'
 import { autoRun, original, suspend } from './scheduler/index'
 import { suspendHandles, promptMessage } from './stop'
 import { loadScene } from './init/scene'
-//主场景工厂方法
+// //主场景工厂方法
 import { SceneFactory } from './scenario/factory'
 
 let plat = plat

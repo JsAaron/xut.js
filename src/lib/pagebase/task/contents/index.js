@@ -346,17 +346,18 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
     //floatPages设置的content溢出后处理
     //在非视区增加overflow:hidden
     //可视区域overflow:''
-    var overflow = 'overflow:hidden;';
+    var overflow = 'overflow:hidden;'
     //如果是母板,排除
     if (floatName === 'floatMaters') {
-        overflow = '';
+        overflow = ''
     }
+
     var floatStr = String.format(
         '<div id="' + floatName + '-li-{0}" class="xut-float" style="' + Xut.plat.prefixStyle('transform') + ':{1};z-index:' + zIndex + ';{2}"></div>',
         data.pid, base.initTransformParameter[0], overflow
-    );
+    )
 
-    var container = $(floatStr);
+    var container = $(floatStr)
 
     //增加浮动容器
     $(data.rootNode).after(container)

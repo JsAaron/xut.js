@@ -3,20 +3,9 @@
  * 平移
  * @return {[type]} [description]
  */
-let prefix = Xut.plat.prefixStyle
 
-let xxtTrans = (offset) => {
-    offset = Xut.config.virtualMode ? offset / 2 : offset;
-    return "translate3d(" + offset + "px, 0, 0)";
-}
+import { config } from '../config/index'
 
-let dydTransform = (distance) => {
-    distance = Xut.config.virtualMode ? distance / 2 : distance;
-    return prefix('transform') + ':' + 'translate3d(' + distance + 'px,0px,0px)'
-}
-
-
-//保持缩放比,计算缩放比情况下的转化
 let calculateContainer
 let offsetLeft
 let offsetRight
@@ -24,9 +13,23 @@ let offsetCut
 let prevEffect
 let currEffect
 let nextEffect
+let prefix = Xut.plat.prefixStyle
+let xxtTrans = (offset) => {
+    offset = config.virtualMode ? offset / 2 : offset;
+    return "translate3d(" + offset + "px, 0, 0)";
+}
+let dydTransform = (distance) => {
+    distance = config.virtualMode ? distance / 2 : distance;
+    return prefix('transform') + ':' + 'translate3d(' + distance + 'px,0px,0px)'
+}
 
-let setConfig = () => {
-    calculateContainer = Xut.config.proportion.calculateContainer()
+
+/**
+ * 设置基本参数
+ * @return {[type]} [description]
+ */
+let initOptions = () => {
+    calculateContainer = config.proportion.calculateContainer()
     offsetLeft = (-1 * calculateContainer.width)
     offsetRight = calculateContainer.width
     offsetCut = 0
@@ -35,12 +38,20 @@ let setConfig = () => {
     nextEffect = xxtTrans(offsetRight)
 }
 
-//切换坐标
+
+/**
+ * 切换坐标
+ * @param  {[type]} context  [description]
+ * @param  {[type]} distance [description]
+ * @param  {[type]} speed    [description]
+ * @param  {[type]} element  [description]
+ * @return {[type]}          [description]
+ */
 let toTranslate3d = (context, distance, speed, element) => {
-    distance = Xut.config.virtualMode ? distance / 2 : distance;
+    distance = config.virtualMode ? distance / 2 : distance;
     if (element = element || context.element || context.$contentProcess) {
         element.css(prefix('transform'), 'translate3d(' + distance + 'px,0px,0px)');
-        if (Xut.config.pageFlip) {
+        if (config.pageFlip) {
             //修正pageFlip切换页面的处理
             //没有翻页效果
             if (distance === 0) {
@@ -53,12 +64,82 @@ let toTranslate3d = (context, distance, speed, element) => {
     }
 }
 
+
+/**
+ * 复位
+ * @return {[type]} [description]
+ */
+let reset = (context) => {
+    var element
+    if (element = context.element || context.$contentProcess) {
+        element.css(prefix('transition-duration'), '');
+        element.css(prefix('transform'), 'translate3d(0px,0px,0px)');
+    }
+}
+
+
+/**
+ * 移动
+ * @return {[type]} [description]
+ */
+let flipMove = (context, distance, speed, element) => {
+    toTranslate3d(context, distance, speed, element)
+}
+
+
+/**
+ * 移动反弹
+ * @return {[type]} [description]
+ */
+let flipRebound = (context, distance, speed, element) => {
+    toTranslate3d(context, distance, speed, element)
+}
+
+
+/**
+ * 移动结束
+ * @return {[type]} [description]
+ */
+let flipOver = (context, distance, speed, element) => {
+    //过滤多个动画回调，保证指向始终是当前页面
+    if (context.pageType === 'page') {
+        if (distance === 0) { //目标页面传递属性
+            context.element.attr('data-view', true)
+        }
+    }
+    toTranslate3d(context, distance, speed, element)
+}
+
+
+/**
+ * translation滑动接口
+ * @type {Object}
+ */
+export var translation = {
+    reset: reset,
+    flipMove: flipMove,
+    flipRebound: flipRebound,
+    flipOver: flipOver
+}
+
+
+/**
+ * 修正坐标
+ * @return {[type]} [description]
+ */
+export function fix(element, translate3d) {
+    var transform = prefix('transform')
+    var translate3d = translate3d === 'prevEffect' ? prevEffect : nextEffect
+    element.css(transform, translate3d)
+}
+
+
 /**
  * 创建起始坐标
  * @return {[type]}
  */
 export function createTransform(currPageIndex, createPageIndex) {
-    setConfig();
+    initOptions();
     var translate3d, direction, offset;
     if (createPageIndex < currPageIndex) {
         translate3d = prevEffect;
@@ -74,67 +155,4 @@ export function createTransform(currPageIndex, createPageIndex) {
         direction = 'original';
     }
     return [translate3d, direction, offset, dydTransform];
-
 }
-
-
-/**
- * 修正坐标
- * @return {[type]} [description]
- */
-export function fix(translate3d) {
-    var transform = prefix('transform')
-    var translate3d = translate3d === 'prevEffect' ? prevEffect : nextEffect
-    this.element.css(transform, translate3d)
-}
-
-export function reset() {
-    var element;
-    if (element = this.element || this.$contentProcess) {
-        element.css(prefix('transition-duration'), '');
-        element.css(prefix('transform'), 'translate3d(0px,0px,0px)');
-    }
-}
-
-/**
- * 移动
- * @return {[type]} [description]
- */
-export function flipMove(distance, speed, element) {
-    toTranslate3d(this, distance, speed, element)
-}
-
-/**
- * 移动反弹
- * @return {[type]} [description]
- */
-export function flipRebound(distance, speed) {
-    toTranslate3d(this, distance, speed)
-}
-
-/**
- * 移动结束
- * @return {[type]} [description]
- */
-export function flipOver(distance, speed) {
-    /**
-     * 过滤多个动画回调，保证指向始终是当前页面
-     */
-    if (this.pageType === 'page') {
-        if (distance === 0) { //目标页面传递属性
-            this.element.attr('data-view', true)
-        }
-    }
-    toTranslate3d(this, distance, speed)
-}
-
-
-var translation = {
-    fix: fix,
-    reset: reset,
-    flipMove: flipMove,
-    flipRebound: flipRebound,
-    flipOver: flipOver
-}
-
-export { translation }

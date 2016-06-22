@@ -1,9 +1,9 @@
 ﻿ //预初始化
  import { config } from './config/index'
- import { api } from './api.js'
+ import { api } from './api'
  import { AudioManager } from './component/audio/manager'
  import { VideoManager } from './component/video/manager'
- //init
+ // //init
  import { init } from './init/index'
 
  //初始化音频视频
@@ -40,6 +40,6 @@
      }
  }
 
- Xut.Version = 807
+ Xut.Version = 809
 
  init()
