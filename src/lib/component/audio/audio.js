@@ -13,19 +13,11 @@ let instance = hash() //存放不同音轨的一个实例
 let audioPlayer
 
 
-let createUUID = () => {
-    return UUIDcreatePart(4) + '-' +
-        UUIDcreatePart(2) + '-' +
-        UUIDcreatePart(2) + '-' +
-        UUIDcreatePart(2) + '-' +
-        UUIDcreatePart(6);
-};
-
-
 let UUIDcreatePart = (length) => {
-    var uuidpart = "";
-    for (var i = 0; i < length; i++) {
-        var uuidchar = parseInt((Math.random() * 256), 10).toString(16);
+    let uuidpart = ""
+    let uuidchar
+    for (let i = 0; i < length; i++) {
+        uuidchar = parseInt((Math.random() * 256), 10).toString(16);
         if (uuidchar.length == 1) {
             uuidchar = "0" + uuidchar;
         }
@@ -33,6 +25,10 @@ let UUIDcreatePart = (length) => {
     }
     return uuidpart;
 }
+
+
+let createUUID = () => [4, 2, 2, 2, 6].map(UUIDcreatePart).join('-')
+
 
 /**
  * 检测是否支持HTML5的audio播放

@@ -20,7 +20,7 @@ let noop = () => {}
  * 网页
  * @param {[type]} options [description]
  */
-let WebPage = (options) => {
+let _WebPage = (options) => {
 
     var pageUrl = options.pageUrl;
 
@@ -126,32 +126,25 @@ let webView = (options) => {
  * @return {[type]}         [description]
  */
 let _Media = (options) => {
+
     //如果是读库或者妙妙学
-    var url = (window.MMXCONFIG || window.DUKUCONFIG) ? options.url
+    let url = (window.MMXCONFIG || window.DUKUCONFIG) ? options.url
         //如果是纯apk模式
         : options.url.substring(0, options.url.lastIndexOf('.'))
 
-    var width = options.width
-    var height = options.height
-    var top = options.top || 0
-    var left = options.left || 0
-
-    var play = function() {
-        //var calculate = Xut.config.proportion.calculateContainer();
-        //top += Math.ceil(calculate.top);
-        //left += Math.ceil(calculate.left);
-        Xut.Plugin.VideoPlayer.play(function() {
+    let play = () => {
+        Xut.Plugin.VideoPlayer.play(() => {
             //成功回调
-        }, function() {
+        }, () => {
             //失败回调
-        }, Xut.config.videoPath() + url, 1, left, top, height, width);
+        }, Xut.config.videoPath() + url, 1, options.left || 0, options.top || 0, options.height, options.width);
     }
 
-    var close = function() {
+    let close = () => {
         Xut.Plugin.VideoPlayer.close();
     }
 
-    play();
+    play()
 
     return {
         play: play,
@@ -181,30 +174,30 @@ let _Video5 = (options) => {
     let zIndex = options.zIndex
 
     let $videoWrap = $('<div></div>')
-    let $video = $(document.createElement('video'));
-    let video = $video[0];
+    let $video = $(document.createElement('video'))
+    let video = $video[0]
 
-    video.play();
+    video.play()
 
     //video节点
     $video.css({
-        width  : width,
-        height : height
+        width: width,
+        height: height
     }).attr({
-        'src'      : url,
-        'controls' : 'controls',
-        'autoplay' : 'autoplay'
-    });
+        'src': url,
+        'controls': 'controls',
+        'autoplay': 'autoplay'
+    })
 
     //父容器
     $videoWrap.append($video).css({
-        position  : 'absolute',
-        'z-index' : -1,
-        top       : top,
-        left      : left,
-        width     : 0,
-        height    : 0
-    });
+        position: 'absolute',
+        'z-index': -1,
+        top: top,
+        left: left,
+        width: 0,
+        height: 0
+    })
 
 
     /**
@@ -259,7 +252,7 @@ let _Video5 = (options) => {
             width: width + 'px',
             height: height + 'px',
             zIndex: zIndex
-        });
+        })
     }
 
     /**
@@ -267,24 +260,24 @@ let _Video5 = (options) => {
      * @return {[type]} [description]
      */
     let destroy = () => {
-        video.removeEventListener('ended', stop, false);
-        video.removeEventListener('error', error, false);
-        video.removeEventListener('loadeddata', start, false);
-        video.removeEventListener('webkitendfullscreen', stop, false);
-        $videoWrap.hide().remove();
+        video.removeEventListener('ended', stop, false)
+        video.removeEventListener('error', error, false)
+        video.removeEventListener('loadeddata', start, false)
+        video.removeEventListener('webkitendfullscreen', stop, false)
+        $videoWrap.hide().remove()
     }
- 
+
     container.append($videoWrap);
 
-    video.addEventListener('ended', stop, false);
-    video.addEventListener('error', error, false);
-    video.addEventListener('loadeddata', start, false);
-    video.addEventListener('webkitendfullscreen', stop, false);
+    video.addEventListener('ended', stop, false)
+    video.addEventListener('error', error, false)
+    video.addEventListener('loadeddata', start, false)
+    video.addEventListener('webkitendfullscreen', stop, false)
 
     return {
-        play  : play,
-        stop  : stop,
-        close : destroy
+        play: play,
+        stop: stop,
+        close: destroy
     }
 };
 
@@ -442,7 +435,7 @@ class VideoClass {
         if ('video' == options.category) {
             this.video = VideoPlayer(options)
         } else if ('webpage' == options.category) {
-            this.video = WebPage(options);
+            this.video = _WebPage(options);
         } else {
             console.log('options.category must be video or webPage ')
         }

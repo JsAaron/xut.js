@@ -63,7 +63,13 @@ let Application = Xut.Application = hash()
  * 忙碌光标
  * */
 portExtend(View, {
+
+    /**
+     * 光标对象
+     * @type {[type]}
+     */
     busyIcon: null,
+
     /**
      * 光标状态
      * @type {Boolean}
@@ -552,9 +558,9 @@ let pass = () => {
     var db = config.db,
         sql = 'UPDATE Setting SET value=? WHERE name=?';
 
-    db.transaction(function(tx) {
+    db.transaction((tx) => {
         tx.executeSql(sql, [null, 'Inapp']);
-    }, function(e) {
+    }, (e) => {
         // _set(inAppId, UNLOCK);
     })
 
@@ -853,10 +859,17 @@ portExtend(Application, {
      */
     appState: false,
 
+    /**
+     * 设置应用状态
+     */
     setAppState() {
         Application.appState = true;
     },
 
+    /**
+     * 删除应用状态
+     * @return {[type]} [description]
+     */
     delAppState() {
         Application.appState = false;
     },

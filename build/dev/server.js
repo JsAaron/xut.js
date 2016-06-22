@@ -106,6 +106,7 @@ app.use('/content', express.static('src/content'));
 
 
 let first = true
+let preChildRun = null
 watch(conf.assetsRoot + '/app.js', () => {
     if (first) {
         spinner.stop()
@@ -117,10 +118,15 @@ watch(conf.assetsRoot + '/app.js', () => {
             '\n' +
             'watch file change.....await....:\n'
         )
+        if (preChildRun) {
+            preChildRun.kill()
+            preChildRun = null
+        }
         let child = child_process.spawn('node', ['build/dev/test.js', ['test=' + config.dev.test.dir]]);
         child.stdout.on('data', (data) => console.log('\n' + data))
         child.stderr.on('data', (data) => console.log('fail out：\n' + data));
         child.on('close', (code) => console.log('complete：' + code));
+        preChildRun = child
     }
 })
 

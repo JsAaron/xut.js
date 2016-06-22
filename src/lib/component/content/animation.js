@@ -10,21 +10,13 @@
  ********************************************************************/
 
 //dom精灵动画
-import {
-    Sprite as domSprite
-} from './plug/domsprite'
+import { Sprite as domSprite } from './plug/domsprite'
 //dom ppt动画
-import {
-    PptAnimation
-} from './plug/domppt/index'
+import { PptAnimation } from './plug/domppt/index'
 //pixi普通精灵动画
-import {
-    Sprite as pixiSpirit
-} from '../pixi/sprite/index'
+import { Sprite as pixiSpirit } from '../pixi/sprite/index'
 //pixi特殊高级动画
-import {
-    specialSprite as pixiSpecial
-} from '../pixi/special/index'
+import { specialSprite as pixiSpecial } from '../pixi/special/index'
 
 /**
  * 销毁动画音频
@@ -32,10 +24,10 @@ import {
  * @param  {[type]} chapterId [description]
  * @return {[type]}           [description]
  */
-function destroyContentAudio(videoIds, chapterId) {
-    var isExist = false;
+let destroyContentAudio = (videoIds, chapterId) => {
+    let isExist = false;
     //如果有音频存在
-    videoIds && _.each(videoIds, function(data) {
+    videoIds && _.each(videoIds, (data) => {
         //如果存在对象音频
         if (data.videoId) {
             isExist = true;
@@ -51,7 +43,7 @@ function destroyContentAudio(videoIds, chapterId) {
  * 判断是否存在
  * @return {Boolean} [description]
  */
-function bind(instance, success, fail) {
+let bind = (instance, success, fail) => {
     if (instance) {
         success.call(instance, instance)
     } else {
@@ -87,14 +79,14 @@ export class Animation {
      */
     init(id, context, rootNode, chapterId, parameter, pageType) {
 
-        var pageIndex = this.pageIndex
-        var self = this
-        var actionTypes
-        var makeOpts
-        var initstate
+        let pageIndex = this.pageIndex
+        let self = this
+        let actionTypes
+        let makeOpts
+        let initstate
 
-        var create = function(constructor, newContext) {
-            var element = newContext || context
+        let create = (constructor, newContext) => {
+            let element = newContext || context
             if (element.length) {
                 return new constructor(pageIndex, pageType, chapterId, element, parameter, rootNode);
             } else {
@@ -131,7 +123,7 @@ export class Animation {
 
 
             //创建pixi上下文的ppt对象
-            var createPixiPPT = function() {
+            let createPixiPPT = () => {
                 //parameter存在就是ppt动画
                 if ((parameter || actionTypes.pptId) && self.$contentProcess.view) {
                     self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
@@ -139,12 +131,12 @@ export class Animation {
                 }
             }
 
-            var $veiw = this.$contentProcess.view
+            let $veiw = this.$contentProcess.view
             if ($veiw) {
                 initstate = $veiw.getAttribute('data-init')
             }
 
-            var setState = function() {
+            let setState = () => {
                 $veiw.setAttribute('data-init', true)
             }
 
@@ -161,7 +153,7 @@ export class Animation {
                     //防止多条一样的数据绑多个动画
                     //构建精灵动画完毕后
                     //构建ppt对象
-                    this.pixiObj.$once('load', function() {
+                    this.pixiObj.$once('load', () => {
                         //ppt动画
                         createPixiPPT()
                             //任务完成
@@ -201,14 +193,14 @@ export class Animation {
     run(scopeComplete) {
 
         var element = this.$contentProcess
-        //canvas
+            //canvas
         if (element && element.view) {
             element = this.$contentProcess.view
         }
 
         //ppt动画
         //dom与canvas
-        bind(this.pptObj, function(ppt) {
+        bind(this.pptObj, (ppt) => {
             //优化处理,只针对互斥的情况下
             //处理层级关系
             if (element.prop && element.prop("mutex")) {
@@ -222,7 +214,7 @@ export class Animation {
         })
 
         //pixi动画
-        bind(this.pixiObj, function(pixi) {
+        bind(this.pixiObj, (pixi) => {
             pixi.playAnim(scopeComplete);
         })
 
@@ -250,7 +242,7 @@ export class Animation {
     stop(chapterId) {
 
         //ppt动画
-        bind(this.pptObj, function(ppt) {
+        bind(this.pptObj, (ppt) => {
             //销毁ppt音频
             destroyContentAudio(ppt.options, chapterId);
             //停止PPT动画
@@ -258,12 +250,12 @@ export class Animation {
         })
 
         //pixi动画
-        bind(this.pixiObj, function(pixi) {
+        bind(this.pixiObj, (pixi) => {
             pixi.stopAnim()
         })
 
         //dom精灵
-        bind(this.spriteObj, function(sprObj) {
+        bind(this.spriteObj, (sprObj) => {
             sprObj.pauseSprites();
         });
     }
@@ -274,10 +266,10 @@ export class Animation {
      * @return {[type]} [description]
      */
     reset() {
-        bind(this.pptObj, function(ppt) {
+        bind(this.pptObj, (ppt) => {
             ppt.resetAnimation();
         })
-        bind(this.pixiObj, function(ppt) {
+        bind(this.pixiObj, (ppt) => {
             ppt.resetAnim();
         })
     }
@@ -290,17 +282,17 @@ export class Animation {
     destroy() {
 
         //ppt
-        bind(this.pptObj, function(ppt) {
+        bind(this.pptObj, (ppt) => {
             ppt.destroyAnimation();
         })
 
         //canvas
-        bind(this.pixiObj, function(pixi) {
+        bind(this.pixiObj, (pixi) => {
             pixi.destroyAnim();
         })
 
         //dom 精灵
-        bind(this.spriteObj, function(sprObj) {
+        bind(this.spriteObj, (sprObj) => {
             sprObj.stopSprites();
         });
 

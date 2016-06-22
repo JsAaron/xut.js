@@ -241,16 +241,16 @@ class Controller extends Observer {
     addTools(vm) {
         _.extend(delegateHooks, {
             //li节点,多线程创建的时候处理滑动
-            'data-container': () => {
+            'data-container': function() {
                 vm.$emit('change:toggleToolbar')
             },
             //是背景层
-            'data-multilayer': () => {
+            'data-multilayer': function() {
                 //改变工具条状态
                 vm.$emit('change:toggleToolbar')
             },
             //默认content元素可以翻页
-            'data-behavior': (target, attribute, rootNode, pageIndex) => {
+            'data-behavior': function(target, attribute, rootNode, pageIndex) {
                 //没有事件的元素,即可翻页又可点击切换工具栏
                 if (attribute == 'click-swipe') {
                     vm.$emit('change:toggleToolbar')
@@ -405,5 +405,5 @@ def(VMProto, '$overrideApi', function() {
 
 
 export {
-    Controller 
+    Controller
 }
