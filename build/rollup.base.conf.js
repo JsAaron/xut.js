@@ -106,8 +106,8 @@ module.exports = (conf) => {
             .then((scriptUrl) => {
                 resolve && resolve(scriptUrl)
             })
-            .catch(() => {
-                console.log('错误')
+            .catch((err) => {
+                console.log('错误',err)
                     // reject()
             })
     })
