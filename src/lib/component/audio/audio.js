@@ -3,9 +3,15 @@
  * @param  {[type]} global [description]
  * @return {[type]}        [description]
  */
-import { hash } from '../../util/lang'
-import { config } from '../../config/index'
-import { BaseClass } from './baseclass'
+import {
+    hash
+} from '../../util/lang'
+import {
+    config
+} from '../../config/index'
+import {
+    BaseClass
+} from './baseclass'
 
 let Player = null
 let noop = function() {}
@@ -147,6 +153,51 @@ class _Flash extends BaseClass {
 
 
 /**
+ * 采用_Audio5js播放
+ * @type {[type]}
+ */
+class _Audio5js extends BaseClass {
+
+    constructor(options, controlDoms) {
+        super()
+        var trackId = options.trackId,
+            url = config.audioPath() + options.url,
+            self = this,
+            audio;
+
+        //构建之前处理
+        this.preRelated(trackId, options);
+
+        audio = new Audio5js({
+            ready: function(player) {
+                this.load(url);
+                //如果调用了播放
+                this.play()
+                self.status = "playing"
+            }
+        });
+
+        this.audio = audio;
+        this.trackId = trackId;
+        this.status = 'playing';
+        this.options = options;
+
+        //相关数据
+        this.afterRelated(audio, options, controlDoms);
+    }
+
+    end() {
+        if (this.audio) {
+            this.audio.destroy();
+            this.audio = null;
+        }
+        this.status = 'ended';
+        this.destroyRelated();
+    }
+}
+
+
+/**
  * 使用html5的audio播放
  * @param  {string} url    音频路径
  * @param  {object} options 可选参数
@@ -183,7 +234,7 @@ class _Audio extends BaseClass {
             }
         }
 
-        audio.addEventListener('loadeddata', () => {
+        audio.addEventListener('canplaythrough', () => {
             this.play()
         }, false)
 
@@ -305,7 +356,7 @@ if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     } else {
         //特殊情况
         //有客户端的内嵌浏览器模式
-        audioPlayer = _Audio;
+        audioPlayer = _Audio5js
     }
     //2015.12.23
     //如果不支持audio改用flash

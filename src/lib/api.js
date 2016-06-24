@@ -46,7 +46,7 @@ import { loadScene } from './init/scene'
 // //主场景工厂方法
 import { SceneFactory } from './scenario/factory'
 
-let plat = plat
+let plat = Xut.plat
 let LOCK = 1 //锁定
 let UNLOCK = 2 //解除锁定
 let IsPay = false

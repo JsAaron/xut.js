@@ -72,22 +72,12 @@ module.exports = (conf) => {
         let config = {
             entry: conf.entry
         }
-        if (process.platform === 'win32') {
-            plugins = [
-                babel({
-                    exclude: 'node_modules/**',
-                    "presets": ["es2015-rollup"]
-                })
-            ]
-
-        } else {
-            plugins = [
-                babel({
-                    exclude: 'node_modules/**'
-                })
-            ]
-        }
-
+        plugins = [
+            babel({
+                exclude: 'node_modules/**',
+                "presets": ["es2015-rollup"]
+            })
+        ]
         config.plugins = plugins
 
         rollup.rollup(config).then((bundle) => {
@@ -107,7 +97,7 @@ module.exports = (conf) => {
                 resolve && resolve(scriptUrl)
             })
             .catch((err) => {
-                console.log('错误',err)
+                console.log('错误', err)
                     // reject()
             })
     })

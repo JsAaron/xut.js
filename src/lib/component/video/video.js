@@ -12,6 +12,9 @@ import {
     supportFlash
 } from './support'
 
+const pixelRatio = window.devicePixelRatio
+const resolution = window.screen
+
 let VideoPlayer = null
 
 
@@ -128,17 +131,41 @@ let webView = (options) => {
  */
 let _Media = (options) => {
 
+    let width
+    let height
+    let left
+    let top
+    let url
+
     //如果是读库或者妙妙学
-    let url = (window.MMXCONFIG || window.DUKUCONFIG) ? options.url
+    url = (window.MMXCONFIG || window.DUKUCONFIG) ? options.url
         //如果是纯apk模式
         : options.url.substring(0, options.url.lastIndexOf('.'))
+
+    //如果是安卓平台，视频插件去的分辨率
+    //所以这里要把 可以区尺寸，转成分辨率
+    //读库强制全屏
+    if (window.DUKUCONFIG) {
+        width = resolution.width
+        height = resolution.height
+        top = 0
+        left = 0
+    } else {
+        //正常的是按照屏幕尺寸的
+        //这是安卓插件问题,按照分辨率计算
+        width = options.width * pixelRatio
+        height = options.height * pixelRatio
+        left = options.left * pixelRatio || 0
+        top = options.top * pixelRatio || 0
+    }
+
 
     let play = () => {
         Xut.Plugin.VideoPlayer.play(() => {
             //成功回调
         }, () => {
             //失败回调
-        }, Xut.config.videoPath() + url, 1, options.left || 0, options.top || 0, options.height, options.width);
+        }, Xut.config.videoPath() + url, 1, left, top, height, width);
     }
 
     let close = () => {
@@ -204,8 +231,16 @@ let _Video5 = (options) => {
      * @return {[type]} [description]
      */
     let _paly = () => {
-        $videoWrap.show();
-        video.play();
+        $videoWrap.show()
+        video.play()
+    }
+
+    //////////////////////////
+    ///2016.6.23
+    //安卓ios需要直接调用play开始
+    ////////////////////////
+    if (Xut.plat.isIOS || Xut.plat.isAndroid) {
+        _paly()
     }
 
     /**
@@ -237,7 +272,7 @@ let _Video5 = (options) => {
         //用于启动视频
         if (options.startBoot) {
             options.startBoot();
-            destroy();
+            destroy()
         }
     }
 
@@ -247,11 +282,12 @@ let _Video5 = (options) => {
      */
     let start = () => {
         $videoWrap.css({
-                width: width + 'px',
-                height: height + 'px',
-                zIndex: zIndex
-            })
-            //加完后播放视频
+            width: width + 'px',
+            height: height + 'px',
+            zIndex: zIndex
+        })
+
+        //加完后播放视频
         _paly()
     }
 
@@ -333,16 +369,18 @@ let _VideoJS = (options) => {
             //是否显示视频快照
             posterImage: false,
             //是否显示字幕
-            textTrackDisplay: false
-        },
+            textTrackDisplay: false,
+            volumeMenuButton:false
+        }, 
         //控制条相关设置
         controlBar: {
             //是否显示字幕按钮
             captionsButton: false,
             chaptersButton: false,
-            liveDisplay: false,
+
+            liveDisplay: false, 
             //是否显示剩余时间
-            remainingTimeDisplay: false,
+            remainingTimeDisplay: true,
             //是否显示子标题按钮
             subtitlesButton: false,
             //是否显示回放菜单按钮
@@ -377,14 +415,14 @@ let _VideoJS = (options) => {
                 clear()
             }
         })
-    });
+    })
 
     //修正视频样式
-    var wrap = player.el(),
-        videoElement = wrap.children[0];
-    wrap.style.left = left + 'px';
-    wrap.style.top = top + 'px';
-    wrap.style.zIndex = -1;
+    var wrap = player.el()
+    var videoElement = wrap.children[0]
+    wrap.style.left = left + 'px'
+    wrap.style.top = top + 'px'
+    wrap.style.zIndex = -1
 
     api = {
 
@@ -403,7 +441,7 @@ let _VideoJS = (options) => {
 
 
 
-//移动端浏览器平台
+//浏览器平台
 if (Xut.plat.isBrowser) {
     VideoPlayer = _Video5
 } else {

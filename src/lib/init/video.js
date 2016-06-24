@@ -1,5 +1,4 @@
-
-import {Video5} from '../component/video/video'
+import { Video5 } from '../component/video/video'
 
 
 var preloadVideo = {
@@ -11,7 +10,7 @@ var preloadVideo = {
     path: window.DUKUCONFIG ? window.DUKUCONFIG.path + "duku.mp4" : 'android.resource://#packagename#/raw/duku',
 
     //加载视频
-    load: function () {
+    load: function() {
         // if (window.localStorage.getItem("videoPlayer") == 'error') {
         //       alert("error")
         //     return preloadVideo.launchApp();
@@ -21,12 +20,12 @@ var preloadVideo = {
     },
 
     //播放视频
-    play: function () {
+    play: function() {
         //延时应用加载
         Xut.Application.delayAppRun();
-        Xut.Plugin.VideoPlayer.play(function () {
+        Xut.Plugin.VideoPlayer.play(function() {
             preloadVideo.launchApp();
-        }, function () {
+        }, function() {
             //捕获出错,下次不进入了,,暂无ID号
             // window.localStorage.setItem("videoPlayer", "error")
             preloadVideo.launchApp();
@@ -34,14 +33,14 @@ var preloadVideo = {
     },
 
     //清理视频
-    closeVideo: function () {
-        Xut.Plugin.VideoPlayer.close(function () {
+    closeVideo: function() {
+        Xut.Plugin.VideoPlayer.close(function() {
             preloadVideo.launchApp();
         });
     },
 
     //加载应用
-    launchApp: function () {
+    launchApp: function() {
         this.state = false;
         Xut.Application.LaunchApp()
     }
@@ -78,11 +77,10 @@ export function closePlugVideo() {
 export function playHtml5Video() {
     //延时应用开始
     Xut.Application.delayAppRun();
-    var videoPlay = Video5({
+    Video5({
         url: 'duku.mp4',
-        startBoot: function () {
+        startBoot: function() {
             Xut.Application.LaunchApp();
         }
-    });
-    videoPlay.play();
+    })
 }

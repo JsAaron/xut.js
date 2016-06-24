@@ -4,9 +4,6 @@
 import { VideoClass } from './video'
 import { config } from '../../config/index'
 
-const pixelRatio = window.devicePixelRatio
-const resolution = window.screen
-
 //综合管理video, webpage
 export class VideoManager {
 
@@ -96,40 +93,15 @@ export class VideoManager {
         var proportion = config.proportion
         var screenSize = config.screenSize
 
-        var width = data.width * proportion.width || screenSize.width
-        var height = data.height * proportion.height || screenSize.height
-        var left = data.left * proportion.left || 0
-        var top = data.top * proportion.top || 0
-
-        //如果是安卓平台，视频插件去的分辨率
-        //所以这里要把 可以区尺寸，转成分辨率
-        if (Xut.plat.isAndroid) {
-            //读库强制全屏
-            if (window.DUKUCONFIG) {
-                //获取分辨率
-                width = resolution.width
-                height = resolution.height
-                top = 0
-                left = 0
-            } else {
-                //正常的是按照屏幕尺寸的
-                //这是安卓插件问题,按照分辨率计算
-                width = width * pixelRatio
-                height = height * pixelRatio
-                left = left * pixelRatio
-                top = top * pixelRatio
-            }
-        }
-
         var videoInfo = {
             'pageId': pageId,
             'videoId': activityId,
             'url': data.md5,
             'pageUrl': data.url,
-            'left': left,
-            'top': top,
-            'width': width,
-            'height': height,
+            'left': data.left * proportion.left || 0,
+            'top': data.top * proportion.top || 0,
+            'width': data.width * proportion.width || screenSize.width,
+            'height': data.height * proportion.height || screenSize.height,
             'padding': data.padding * proportion.left || 0,
             'zIndex': data.zIndex || 2147483647,
             'background': data.background,

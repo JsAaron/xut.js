@@ -38,7 +38,7 @@ base(conf).then((scriptUrl) => {
         gulp.src(scriptUrl)
             .pipe(concat(conf.devName))
             .on('error', (err) => {
-                console.log('Less Error!', err.message);
+                console.log('concat Error!', err.message);
                 this.end();
             })
             //dev
@@ -46,11 +46,15 @@ base(conf).then((scriptUrl) => {
             .pipe(gulp.dest(conf.testDir))
             //min
             .pipe(uglify())
+            .on('error', (err) => {
+                console.log('error Error!', err);
+                spinner.stop()
+            })
             .pipe(rename(conf.distName))
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.testDir))
-            .on('end', () => {
+            .on('end', (err) => {
                 fs.unlinkSync(conf.rollup)
                 resolve && resolve()
             })
