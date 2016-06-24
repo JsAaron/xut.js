@@ -1,31 +1,31 @@
 
-##特别注意
-这并非是开源项目，不能抄袭后作为商业使用，仅提供前端爱好者参考学习交流
+##Attention
+It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
 
-##前端能干嘛？
-前端不仅仅写网页，还可以做app，甚至桌面端应用软件
-#####我的作品
-* 网页加壳: [秒秒学](http://www.miaomiaoxue.com/)
-* 移动端软件: [大量app](http://www.appone.cn/)
-* 桌面端工具: [apk转化epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
-
-
-##magazine 是什么?
-#####这是一套模板方案，用来批量制作app，使用前端的技术实现模拟原生的app效果。通过组合各种模块，整合成一个定制化的app应用
-* 可以批量制作apk/ipa/epub/pc等跨平台应用软件
-* 采用混合技术 cordova+h5+css3+webgl ，基于SPA架构
-* 代码超过10万行，模拟多种原生应用行为，实现了上百种动画特效与14种事件，同时也实现了部分webgl适配
-* 具体介绍可以参考博客链接介绍  [Hybrid App应用制作与跨平台解决方案 ](http://www.cnblogs.com/aaronjs/p/4255232.html)
+##The front-end developer can go？
+Front end not just write page, also can do the app, and even desktop client application
+#####My work
+* Web pages with shell: [miaomiaoxue](http://www.miaomiaoxue.com/)
+* Mobile software: [appone](http://www.appone.cn/)
+* Desktop tools: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
 
 
-##环境
-#####集成了目前最新的技术点 node/es6/gulp/webpack/rollup/eslint/karma等等
-* 开发:基于es6
-* 测试:基于webpack+express+rollup+gulp搭建，有热替换功能
-* 发布:基于gulp+rollup 单文件打包
-* 测试:基于karma+mocha+chai
+##Magazine what is it?
+This is a template program, used to batch production of app, using the front end of the technology to achieve the simulation of the original app effect. Through the combination of various modules, integrated into a customized app applications
+* can be mass production of apk/ipa/epub/pc and other cross platform application software
+* using hybrid technology SPA, based on the cordova+h5+css3+webgl architecture
+* code more than 100 thousand lines, simulation of a variety of native applications, to achieve a hundred kinds of animation effects and 14 events, but also to achieve some of the webgl adaptation
+* specific introduction can refer to the blog link introduced App [Hybrid application production and cross platform solutions (http://www.cnblogs.com/aaronjs/p/4255232.html)
 
-##博客链接
+
+##Environmental
+#####Integration of the latest technology point node/es6/gulp/webpack/rollup/eslint/karma and so on
+* development: Based on ES6
+* test: Based on the webpack+express+rollup+gulp build, there is a hot replacement function
+* release: Based on gulp+rollup single file package
+* test: Based on karma+mocha+chai
+
+## blog links
 * http://www.cnblogs.com/aaronjs
 
 
