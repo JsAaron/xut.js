@@ -2,7 +2,7 @@
  * 编译content的容器
  * 2013.10.12
  * 1 为处理重复content数据引用问题,增加
- * 			  makeWarpObj方法,用于隔绝content数据的引用关系，导致重复数据被修正的问题
+ *            makeWarpObj方法,用于隔绝content数据的引用关系，导致重复数据被修正的问题
  * 2 多个页面引用同一个content的处理，Conetnt_0_1 ,类型+页码+ID的标示
  * @return {[type]} [description]
  */
@@ -30,7 +30,7 @@ import { parseContentDas } from './parsecontent'
  * 导致重复数据被修正的问题
  * @return {[type]}             [description]
  */
-function makeWarpObj(contentId, content, pageType, pid, virtualOffset) {
+let makeWarpObj = (contentId, content, pageType, pid, virtualOffset) => {
     //唯一标示符
     var prefix = "_" + pid + "_" + contentId;
     return {
@@ -42,7 +42,7 @@ function makeWarpObj(contentId, content, pageType, pid, virtualOffset) {
         pid: pid,
         virtualOffset: virtualOffset, //布局位置
         containerName: 'Content' + prefix,
-        makeId: function (name) {
+        makeId(name) {
             return name + prefix;
         }
     }
@@ -53,7 +53,7 @@ function makeWarpObj(contentId, content, pageType, pid, virtualOffset) {
  * 创建图片地址
  * @return {[type]}         [description]
  */
-function analysisPath(wrapObj, conData) {
+let analysisPath = (wrapObj, conData) => {
     var pathImg,
         imgContent = conData.md5,
         //是gif格式
@@ -75,28 +75,28 @@ function analysisPath(wrapObj, conData) {
 
 /**
  * content
- * 	svg数据
- * 	html数据
+ *  svg数据
+ *  html数据
  * 解析外部文件
  * @param  {[type]} wrapObj     [description]
  * @param  {[type]} svgCallback [description]
  * @return {[type]}             [description]
  */
-function externalFile(wrapObj, svgCallback) {
+let externalFile = (wrapObj, svgCallback) => {
     //svg零件不创建解析具体内容
     if (wrapObj.isSvg) {
-        readFile(wrapObj.data.md5, function (svgdata) {
+        readFile(wrapObj.data.md5, (svgdata) => {
             wrapObj['svgstr'] = svgdata;
-            svgCallback(wrapObj);
+            svgCallback(wrapObj)
         });
     } else if (wrapObj.isJs) {
         //如果是.js的svg文件
-        readFile(wrapObj.data.md5, function (htmldata) {
+        readFile(wrapObj.data.md5, (htmldata) => {
             wrapObj['htmlstr'] = htmldata;
-            svgCallback(wrapObj);
-        }, "js");
+            svgCallback(wrapObj)
+        }, "js")
     } else {
-        svgCallback(wrapObj);
+        svgCallback(wrapObj)
     }
 }
 
@@ -104,12 +104,12 @@ function externalFile(wrapObj, svgCallback) {
 
 //=====================================================
 //
-//	构建content的序列tokens
-//	createImageIds,
-//	createContentIds
-//	pid,
-//	pageType,
-//	dydCreate //重要判断,动态创建
+//  构建content的序列tokens
+//  createImageIds,
+//  createContentIds
+//  pid,
+//  pageType,
+//  dydCreate //重要判断,动态创建
 //
 //=======================================================
 export function structure(callback, data, context) {
@@ -155,7 +155,7 @@ export function structure(callback, data, context) {
 
 
     /**
-     * 容器结构创建 
+     * 容器结构创建
      */
     if (containerRelated && containerRelated.length) {
         containerObj = createContainer(containerRelated, pid);
@@ -168,9 +168,9 @@ export function structure(callback, data, context) {
      * 页面是最顶级的
      * @return {[type]}           [description]
      */
-    var eachPara = function (parameter, contentId, conData) {
+    let eachPara = (parameter, contentId, conData) => {
         var zIndex;
-        _.each(parameter, function (para) {
+        _.each(parameter, (para) => {
             //针对母版content的topmost数据处理，找出浮动的对象Id
             //排除数据topmost为0的处理
             zIndex = para['topmost']
@@ -194,7 +194,7 @@ export function structure(callback, data, context) {
      * 开始过滤参数
      * @return {[type]}           [description]
      */
-    var prefilter = function (conData, contentId) {
+    let prefilter = (conData, contentId) => {
         var eventId, parameter;
         var category = conData.category;
 
@@ -279,7 +279,13 @@ export function structure(callback, data, context) {
     }
 
 
-    //开始创建节点
+    /**
+     * analysisPath
+     * @param  {[type]} wrapObj   [description]
+     * @param  {[type]} content   [description]
+     * @param  {[type]} contentId [description]
+     * @return {[type]}           [description]
+     */
     function startCreate(wrapObj, content, contentId) {
         //缓存数据
         contentDas[contentId] = content;
@@ -334,7 +340,7 @@ export function structure(callback, data, context) {
      */
     function createRelated(contentId, wrapObj) {
         //解析外部文件
-        externalFile(wrapObj, function (wrapObj) {
+        externalFile(wrapObj, function(wrapObj) {
             var uuid,
                 startStr,
                 contentStr,
@@ -372,19 +378,19 @@ export function structure(callback, data, context) {
     function checkComplete() {
         if (cloneContentCount === 1) {
             var data = {
-                contentDas: contentDas,
-                idFix: idFix,
-                contentHtmlBoxIds: contentHtmlBoxIds,
-                containerPrefix: ''
-            } 
-            //针对容器处理
+                    contentDas: contentDas,
+                    idFix: idFix,
+                    contentHtmlBoxIds: contentHtmlBoxIds,
+                    containerPrefix: ''
+                }
+                //针对容器处理
             if (containerObj) {
                 var start,
                     end,
                     containerPrefix,
                     containerStr = [];
                 //合并容器
-                containerObj.createUUID.forEach(function (uuid) {
+                containerObj.createUUID.forEach(function(uuid) {
                     start = containerObj[uuid].start.join('');
                     end = containerObj[uuid].end;
                     containerStr.push(start.concat(end));
@@ -410,7 +416,7 @@ export function structure(callback, data, context) {
  * 针对分段处理
  * 只构件必要的节点节点对象
  * content字段中visible === 0 是构建显示的对象
- * 					 	=== 1 是构建隐藏的对象
+ *                      === 1 是构建隐藏的对象
  *
  * 并且不是动态创建
  */

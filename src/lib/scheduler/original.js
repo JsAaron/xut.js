@@ -3,6 +3,8 @@
  * @return {[type]} [description]
  */
 
+import { access } from './access'
+
 /////////
 //优化检测 //
 /////////
@@ -23,7 +25,7 @@ function checkOptimize(fn) {
 //==============================================================
 export function original(pageObj) {
 
-    Xut.accessControl(pageObj, function(pageObj, ContentObjs, ComponentObjs) {
+    access(pageObj, function(pageObj, ContentObjs, ComponentObjs) {
 
         //母版对象不还原
         if (pageObj.pageType === 'master') return;

@@ -2,40 +2,41 @@
  * 自动触发控制
  * @return {[type]} [description]
  */
-
-
-import {
-    Bind
-} from '../pagebase/task/dispenser/bind'
-
+import { Bind } from '../pagebase/task/dispenser/bind'
+import { access } from './access'
 
 //content任务超时Id
-var contentTaskOutId, markComplete;
+let contentTaskOutId
+let markComplete
 
 /**
  * 运行自动的content对象
  * 延时500毫秒执行
  * @return {[type]} [description]
  */
-function runContent(contentObjs, taskAnimCallback) {
+let runContent = (contentObjs, taskAnimCallback) => {
 
-    var contentTaskOutId = setTimeout(function() {
+    let contentTaskOutId = setTimeout(() => {
 
         clearTimeout(contentTaskOutId);
 
-        //完成通知
-        var markComplete = function() {
-            var completeStatistics = contentObjs.length; //动画完成统计
-            return function() {
+        /**
+         * 完成通知
+         * @param  {[type]} () [description]
+         * @return {[type]}    [description]
+         */
+        let markComplete = (() => {
+            let completeStatistics = contentObjs.length; //动画完成统计
+            return () => {
                 if (completeStatistics === 1) {
                     taskAnimCallback && taskAnimCallback();
                     markComplete = null;
                 }
                 completeStatistics--;
             }
-        }();
+        })()
 
-        _.each(contentObjs, function(obj, index) {
+        _.each(contentObjs, (obj, index) => {
             if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
                 obj.autoPlay(markComplete)
             } else {
@@ -49,15 +50,16 @@ function runContent(contentObjs, taskAnimCallback) {
  * 运行自动的静态类型
  * @return {[type]} [description]
  */
-function runComponent(pageObj, pageIndex, autoRunComponents, pageType) {
+let runComponent = (pageObj, pageIndex, autoRunComponents, pageType) => {
 
-    var chapterId = pageObj.baseGetPageId(pageIndex);
+    let chapterId = pageObj.baseGetPageId(pageIndex)
 
     if (pageIndex === undefined) {
-        pageIndex = Xut.Presentation.GetPageIndex();
+        pageIndex = Xut.Presentation.GetPageIndex()
     }
-    _.each(autoRunComponents, function(data, index) {
-        var dir = Bind[data.type];
+
+    _.each(autoRunComponents, (data, index) => {
+        let dir = Bind[data.type];
         if (dir && dir.autoPlay) {
             dir.autoPlay({
                 'id': data.id,
@@ -87,7 +89,7 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
     //pageType
     //用于区别触发类型
     //页面还是母版
-    Xut.accessControl(pageObj, function(pageObj, ContentObjs, ComponentObjs, pageType) {
+    access(pageObj, (pageObj, ContentObjs, ComponentObjs, pageType) => {
 
         //如果是母版对象，一次生命周期种只激活一次
         if (pageObj.pageType === 'master') {
@@ -100,8 +102,8 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
         taskAnimCallback = taskAnimCallback || function() {};
 
         //自动运行的组件
-        var autoRunComponents;
-        if (autoRunComponents = pageObj.baseAutoRun()) {
+        let autoRunComponents = pageObj.baseAutoRun()
+        if (autoRunComponents) {
             runComponent(pageObj, pageIndex, autoRunComponents, pageType)
         }
 

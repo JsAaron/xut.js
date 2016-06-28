@@ -9,7 +9,7 @@ var createCanvasData = function (type, opts) {
 
 	//content收集id标记
 	//cid =>content=> 普通动画 ppt
-	//wid =>widget=>高级动画 
+	//wid =>widget=>高级动画
 	if (data.canvasRelated[type].indexOf(contentId) == -1) {
 		data.canvasRelated[type].push(contentId);
 		conData.actionTypes[type] = true;
@@ -120,7 +120,7 @@ function callResolveArgs(category, opts) {
 
 /**
  * 解析canvas数据
- * 
+ *
  */
 export function parseCanvas(contentId, category, conData, data) {
 

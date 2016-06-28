@@ -1,7 +1,5 @@
 
 import {reviseSize } from '../../../../util/index'
-
-
 import { parseContentDas } from './parsecontent'
 
 /**
@@ -11,10 +9,14 @@ import { parseContentDas } from './parsecontent'
  * @param  {[type]} pid     [description]
  * @return {[type]}               [description]
  */
-function createContainerWrap(containerName, contentId, pid) {
-    var contentDas = parseContentDas([contentId]),
+let createContainerWrap = (containerName, contentId, pid) => {
+
+    let contentDas = parseContentDas([contentId]),
         data = reviseSize(contentDas[0]),
-        wapper = '<div' + ' id="{0}"' + ' data-behavior="click-swipe"' + ' style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">';
+        wapper = '<div'
+                + ' id="{0}"'
+                + ' data-behavior="click-swipe"'
+                + ' style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">'
 
     return String.format(wapper,
         containerName, data.scaleWidth, data.scaleHeight, data.scaleTop, data.scaleLeft, data.zIndex)
@@ -31,7 +33,7 @@ export function createContainer(containerRelated, pid) {
             containerName: []
         };
 
-    containerRelated.forEach(function (data, index) {
+    containerRelated.forEach((data, index) => {
         contentId = data.imageIds;
         containerName = "Container_" + pid + "_" + contentId
         uuid = "aaron" + Math.random()
@@ -41,7 +43,7 @@ export function createContainer(containerRelated, pid) {
         };
         containerObj.createUUID.push(uuid);
         containerObj.containerName.push(containerName);
-        data.itemIds.forEach(function (id) {
+        data.itemIds.forEach(function(id) {
             containerObj[id] = uuid;
         })
     })

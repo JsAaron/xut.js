@@ -133,11 +133,10 @@ export class VideoManager {
         //视频的同时肯能存在音频
         // Xut.AudioManager.clearAudio();
 
-        //this.beforePlayVideo(pageId,videoId)
         //search video cache
         if (playBox[pageId] && playBox[pageId][activityId]) {
             //console.log('*********cache*********');
-            playBox[pageId][activityId].play();
+            playBox[pageId][activityId].play()
         } else {
             //console.log('=========new=============');
             if (!_.isObject(playBox[pageId])) {
@@ -147,17 +146,6 @@ export class VideoManager {
             playBox[pageId][activityId] = new VideoClass(data, container)
 
         }
-
-    }
-
-
-    /**
-     * 播放视频之前检查要停的视频
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @return {[type]}            [description]
-     */
-    beforePlayVideo(pageId, activityId) {
 
     }
 

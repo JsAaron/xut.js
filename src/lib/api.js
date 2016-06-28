@@ -714,7 +714,8 @@ portExtend(Application, {
      * 用于进来的时候激活Activate
      */
     Original() {
-        suspend();
+        //传递一个完全关闭的参数
+        suspend('', '', true);
         original();
     },
 
@@ -843,12 +844,12 @@ portExtend(Application, {
      * @return {[type]}         [description]
      */
     injectionComponent(regData) {
-        var sceneObj = controll.containerObj('current');
-        sceneObj.vm.$injectionComponent = regData;
+        var sceneObj = controll.containerObj('current')
+        sceneObj.vm.$injectionComponent = regData
     }
 })
 
-
+ 
 portExtend(Application, {
 
     /**

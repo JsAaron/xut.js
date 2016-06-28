@@ -7,14 +7,7 @@ import { Bind } from '../pagebase/task/dispenser/bind'
 
 export function trigger(target, attribute, rootNode, pageIndex) {
 
-    var key,
-        tag,
-        type,
-        id,
-        dir,
-        data,
-        pageType,
-        instance;
+    var key, tag, type, id, dir, data, pageType, instance;
 
     if (key = target.id) {
 

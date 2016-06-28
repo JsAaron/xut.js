@@ -320,18 +320,15 @@ let loadTiggerAudio = (pageId, queryId, type) => {
  * @return {[type]} [description]
  */
 let removeAudio = () => {
-    var flag = false,
-        t, p, a;
+    var t, p, a;
     for (t in playBox) {
         for (p in playBox[t]) {
             for (a in playBox[t][p]) {
                 playBox[t][p][a].end();
-                flag = true;
             }
         }
     }
-    initBox();
-    return flag;
+    initBox()
 }
 
 
@@ -342,32 +339,57 @@ export class AudioManager {
     //2 动画音频,跟动画一起播放与销毁
     ///////////////////
 
-    //自动播放触发接口
+    /**
+     * 自动播放触发接口
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @param  {[type]} actionData [description]
+     * @return {[type]}            [description]
+     */
     autoPlay(pageId, activityId, actionData) {
         deployAudio(pageId, activityId, ACTIVIT, actionData);
         loadAudio(pageId, activityId, ACTIVIT);
     }
 
-    //手动触发
+    /**
+     * 手动触发
+     * @param  {[type]} pageId     [description]
+     * @param  {[type]} activityId [description]
+     * @param  {[type]} actionData [description]
+     * @return {[type]}            [description]
+     */
     trigger(pageId, activityId, actionData) {
         deployAudio(pageId, activityId, ACTIVIT, actionData);
         loadTiggerAudio(pageId, activityId, ACTIVIT);
     }
 
 
-    //动画音频触发接口
+    /**
+     * 动画音频触发接口
+     * @param  {[type]} pageId  [description]
+     * @param  {[type]} audioId [description]
+     * @return {[type]}         [description]
+     */
     contentAudio(pageId, audioId) {
         deployAudio(pageId, audioId, ANIMATE);
         loadAudio(pageId, audioId, ANIMATE);
     }
 
-    //节音频触发接口
+    /**
+     * 节音频触发接口
+     * @param  {[type]} seasonAudioId [description]
+     * @param  {[type]} audioId       [description]
+     * @return {[type]}               [description]
+     */
     seasonAudio(seasonAudioId, audioId) {
         deployAudio(seasonAudioId, audioId, SEASON);
         loadAudio(seasonAudioId, audioId, SEASON);
     }
 
-    //挂起音频
+    /**
+     * 挂起音频
+     * @return {[type]} [description]
+     */
     hangUpAudio() {
         var t, p, a;
         for (t in playBox) {
@@ -379,7 +401,11 @@ export class AudioManager {
         }
     }
 
-    //销毁动画音频
+    /**
+     * 销毁动画音频
+     * @param  {[type]} pageId [description]
+     * @return {[type]}        [description]
+     */
     clearContentAudio(pageId) {
         if (!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
             return false;
@@ -393,7 +419,11 @@ export class AudioManager {
         }
     }
 
-    //清理音频
+    /**
+     * 清理音频
+     * @param  {[type]} pageId [description]
+     * @return {[type]}        [description]
+     */
     clearAudio(pageId) {
         if (pageId) { //如果只跳槽关闭动画音频
             this.clearContentAudio(pageId)

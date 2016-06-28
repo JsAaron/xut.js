@@ -239,24 +239,35 @@ class Controller extends Observer {
      * 系统工具栏
      */
     addTools(vm) {
+
         _.extend(delegateHooks, {
-            //li节点,多线程创建的时候处理滑动
-            'data-container': function() {
+            
+            /**
+             * li节点,多线程创建的时候处理滑动
+             */
+            'data-container' () {
                 vm.$emit('change:toggleToolbar')
             },
-            //是背景层
-            'data-multilayer': function() {
+
+            /**
+             * 是背景层
+             */
+            'data-multilayer' () {
                 //改变工具条状态
                 vm.$emit('change:toggleToolbar')
             },
-            //默认content元素可以翻页
-            'data-behavior': function(target, attribute, rootNode, pageIndex) {
+
+            /**
+             * 默认content元素可以翻页
+             */
+            'data-behavior' (target, attribute, rootNode, pageIndex) {
                 //没有事件的元素,即可翻页又可点击切换工具栏
                 if (attribute == 'click-swipe') {
                     vm.$emit('change:toggleToolbar')
                 }
             }
         })
+
     }
 
 }

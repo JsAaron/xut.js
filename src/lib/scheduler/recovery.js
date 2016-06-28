@@ -3,6 +3,7 @@
  * @return {[type]} [description]
  */
 
+import { access } from './access'
 
 //========================================================
 //          复位状态
@@ -11,7 +12,7 @@
 //  第一次只能关闭热点不能退出页面
 //=========================================================
 export function recovery(pageObj) {
-    return Xut.accessControl(pageObj, function(pageObj, ContentObjs, ComponentObjs) {
+    return access(pageObj, function(pageObj, ContentObjs, ComponentObjs) {
         var falg = false;
         _.each([ContentObjs, ComponentObjs], function(collectionObj) {
             collectionObj && _.each(collectionObj, function(obj) {

@@ -534,8 +534,20 @@ export class GlobalEvent extends Observer {
 
     onTouchStart(e) {
 
-        var interrupt,
-            point = compatibilityEvent(e);
+        //判断双击速度
+        //必须要大于350
+        let currtTime = (+new Date())
+        if(this.isClickTime){
+            if(currtTime - this.isClickTime < 350){
+                return
+            }
+        }
+        this.isClickTime = currtTime
+    
+        
+
+        let interrupt
+        let point = compatibilityEvent(e)
 
         if (!point) {
             return interrupt = this.preventSwipe = true;
@@ -562,6 +574,7 @@ export class GlobalEvent extends Observer {
         this.isScrollX = false; //是否为X轴滑动
         this.isScrollY = false; //是否为Y轴滑动
         this.isTouching = true; //点击了屏幕
+
 
         this.start = {
             pageX: point.pageX,
