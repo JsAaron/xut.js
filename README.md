@@ -2,7 +2,7 @@
 ##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
 
-##The front-end developer can go？
+##The front-end developer can do？
 Front end not just write page, also can do the app, and even desktop client application
 #####My work
 * Web pages with shell: [miaomiaoxue](http://www.miaomiaoxue.com/)
@@ -18,14 +18,14 @@ This is a template program, used to batch production of app, using the front end
 * specific introduction can refer to the blog link introduced App [Hybrid application production and cross platform solutions (http://www.cnblogs.com/aaronjs/p/4255232.html)
 
 
-##Environmental
+##Technology
 #####Integration of the latest technology point node/es6/gulp/webpack/rollup/eslint/karma and so on
 * development: Based on ES6
 * test: Based on the webpack+express+rollup+gulp build, there is a hot replacement function
 * release: Based on gulp+rollup single file package
 * test: Based on karma+mocha+chai
 
-## blog links
+##Blog links
 * http://www.cnblogs.com/aaronjs
 
 
