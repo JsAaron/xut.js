@@ -1,5 +1,5 @@
 
-##Attention
+##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
 
 ##The front-end developer can go？
