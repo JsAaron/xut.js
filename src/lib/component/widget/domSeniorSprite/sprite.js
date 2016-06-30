@@ -129,11 +129,13 @@ export class seniorSpiritAni {
         var x = curFPS.X - this.startPoint.x;
         var y = curFPS.Y - this.startPoint.y;
 
-  
-         this.obj[0].style.cssText += String.format(
-            "top:0;left:0;"
-            + " {0}:translate3d({1}px,{2}px,0)",
-            prefix('transform'),this.startLeft + x * this.xRote,this.startTop + y * this.yRote);
+        this.obj.css("left", this.startLeft + x * this.xRote);
+        this.obj.css("top", this.startTop + y * this.yRote);
+
+         // this.obj[0].style.cssText += String.format(
+         //    "top:0;left:0;"
+         //    + " {0}:translate3d({1}px,{2}px,0)",
+         //    prefix('transform'),this.startLeft + x * this.xRote,this.startTop + y * this.yRote);
 
         this.imgArray.pop();
         if (this.resType != 1) this.imgArray.pop();

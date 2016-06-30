@@ -2,6 +2,7 @@
 /*************************
 * 电子杂志更新日志记录
 **************************
+* v818  SeniorSpriteAnimation of dom version
 * v817  Optimization platform judgment for subtitle 
 * v816  Fixed subtitles
 * v815  2016.5.29 When invoke the home button in the Android for miaomiaoxue platform，

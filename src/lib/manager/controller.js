@@ -7,7 +7,7 @@
 
 import { Observer } from '../observer/index'
 import { GlobalEvent } from './global-event.js'
-import { overrideApi } from './dynamic-api'
+import { overrideApi } from '../dynamic-api'
 import { Scheduler } from './schedule'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'

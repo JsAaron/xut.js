@@ -18,10 +18,9 @@
  * @return {[type]} [description]
  */
 
-import { reviseSize } from '../util/option'
+import { reviseSize } from './util/option'
 
-
-var typeFilter = ['page', 'master'];
+let typeFilter = ['page', 'master'];
 
 /**
  * 合并参数设置
@@ -31,8 +30,8 @@ var typeFilter = ['page', 'master'];
  * 4 args参数
  * 5 回调每一个上下文
  */
-function createaAccess(mgr) {
-    return function(callback, pageType, args, eachContext) {
+let createaAccess = (mgr) => {
+    return (callback, pageType, args, eachContext) => {
         //如果第一个参数不是pageType模式
         //参数移位
         if (pageType !== undefined && -1 === typeFilter.indexOf(pageType)) {
@@ -63,8 +62,8 @@ function createaAccess(mgr) {
  * 判断是否存在页码索引
  * 如果不存在默认取当前页面
  */
-function createExistIndex($globalEvent) {
-    return function(pageIndex) {
+let createExistIndex = ($globalEvent) => {
+    return (pageIndex) => {
         //如果不存在
         if (pageIndex == undefined) {
             pageIndex = $globalEvent.hindex //当前页面
@@ -76,17 +75,17 @@ function createExistIndex($globalEvent) {
 
 export function overrideApi(vm) {
 
-    var $globalEvent = vm.$globalEvent;
-    var options = vm.options;
-    var $scheduler = vm.$scheduler
+    let $globalEvent = vm.$globalEvent
+    let options = vm.options
+    let $scheduler = vm.$scheduler
 
     //页面与母版的管理器
-    var access = createaAccess({
+    let access = createaAccess({
         page: $scheduler.pageMgr,
         master: $scheduler.masterMgr
-    });
+    })
 
-    var isExistIndex = createExistIndex($globalEvent);
+    let isExistIndex = createExistIndex($globalEvent);
 
     //***************************************************************
     //
@@ -94,25 +93,24 @@ export function overrideApi(vm) {
     //
     //***************************************************************
 
-    var Presentation = Xut.Presentation;
+    let Presentation = Xut.Presentation;
 
     /**
      * 获取当前页码
      */
-    Presentation.GetPageIndex = function() {
-        return $globalEvent.hindex;
-    };
+    Presentation.GetPageIndex = () => $globalEvent.hindex
 
-    ///////////////
-    //获取页面的总数据 //
-    //1 chapter数据
-    //2 section数据
-    ///////////////
+    /**
+     * [获取页面的总数据]
+     * 1 chapter数据
+     * 2 section数据
+     * @return {[type]}
+     */
     _.each([
         "Section",
         "Page"
-    ], function(apiName) {
-        Presentation['GetApp' + apiName + 'Data'] = function(callback) {
+    ], (apiName) => {
+        Presentation['GetApp' + apiName + 'Data'] = (callback) => {
             var i = 0,
                 temp = [],
                 cps = Xut.data.query('app' + apiName),
@@ -125,44 +123,49 @@ export function overrideApi(vm) {
     })
 
 
-    //////////////////
-    //获取首页的pageId //
-    //////////////////
-    Presentation.GetFirstPageId = function(seasonId) {
+    /**
+     * 获取首页的pageId
+     * @param {[type]} seasonId [description]
+     */
+    Presentation.GetFirstPageId = (seasonId) => {
         var sectionRang = Xut.data.query('sectionRelated', seasonId);
         var pageData = Xut.data.query('appPage');
         return pageData.item(sectionRang.start);
     }
 
-    //==========================================
-    //  四大数据接口
-    //  快速获取一个页面的nodes值
-    //  获取当前页面的页码编号 - chapterId
-    //  快速获取指定页面的chapter数据
-    //  pagebase页面管理对象
-    //==========================================
+
+    /**
+     *  四大数据接口
+     *  快速获取一个页面的nodes值
+     *  获取当前页面的页码编号 - chapterId
+     *  快速获取指定页面的chapter数据
+     *  pagebase页面管理对象
+     * @return {[type]}            [description]
+     */
     _.each([
         "GetPageId",
         "GetPageNode",
         "GetPageData",
         "GetPageObj"
-    ], function(apiName) {
-        Presentation[apiName] = function(pageType, pageIndex) {
-            return access(function(manager, pageType, pageIndex) {
-                pageIndex = isExistIndex(pageIndex);
-                return manager["abstract" + apiName](pageIndex, pageType);
+    ], (apiName) => {
+        Presentation[apiName] = (pageType, pageIndex) => {
+            return access((manager, pageType, pageIndex) => {
+                pageIndex = isExistIndex(pageIndex)
+                return manager["abstract" + apiName](pageIndex, pageType)
             }, pageType, pageIndex)
         }
     })
+
 
     /**
      * 得到页面根节点
      * li节点
      */
-    Presentation.GetPageElement = function() {
-        var obj = Presentation.GetPageObj();
-        return obj.element;
+    Presentation.GetPageElement = () => {
+        var obj = Presentation.GetPageObj()
+        return obj.element
     };
+
 
     /**
      * 获取页码标记
@@ -172,8 +175,8 @@ export function overrideApi(vm) {
      * 但是每一个章节页面的索引是从0开始的
      * 区分pageIndex
      */
-    Presentation.GetPagePrefix = function(pageType, pageIndex) {
-        var pageObj = Presentation.GetPageObj(pageType, pageIndex);
+    Presentation.GetPagePrefix = (pageType, pageIndex) => {
+        let pageObj = Presentation.GetPageObj(pageType, pageIndex);
         return pageObj.pid;
     };
 
