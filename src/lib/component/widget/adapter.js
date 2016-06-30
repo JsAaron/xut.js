@@ -2,66 +2,51 @@
  *
  *                   零件适配器
  *
- * 				1 数据过滤
- * 				构件5种类型
+ *              1 数据过滤
+ *              构件5种类型
  *
  * *******************************************************************/
 
 
-import { iframeWidget } from './iframe'
-import { pageWidget } from './page/core'
-
+import { IframeWidget } from './iframe'
+import { PageWidget } from './page/core'
+import { parseJSON } from '../../util/dom'
+import { config } from '../../config/index'
 
 let proportion
 let screenSize
 let appId
 
 
-function loadWidget(type, data, widgetClass) {
-
-
+let loadWidget = (type, data, widgetClass) => {
     Xut.Application.injectionComponent({
         'pageType': data.pageType, //标记类型区分
         'pageIndex': data.pageIndex,
         'widget': new widgetClass(data)
     });
- 
-
-    // var widgetObj = new widgetClass(data);
-
-    // //特殊的零件，也是只加载脚本
-    // if (data.widgetName != "bones") {
-    //     //保存引用
-    //     //特殊的2个个零件不保存
-    //     Xut.Application.injectionComponent({
-    //         'pageType'  : data.pageType, //标记类型区分
-    //         'pageIndex' : data.pageIndex,
-    //         'widget'    : widgetObj
-    //     });
-    // }
 }
 
 /**
  * 构建5中零件类型
- * 	1、iframe零件
- *	2、页面零件
- *	3、SVG零件
- *	4、canvas零件
- *	5、webGL零件
+ *  1、iframe零件
+ *  2、页面零件
+ *  3、SVG零件
+ *  4、canvas零件
+ *  5、webGL零件
  * @type {Object}
  */
-var adapterType = {
+let adapterType = {
 
     /**
      * iframe零件类型
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    'iframe': function (data) {
-        loadWidget('widget', data, iframeWidget);
+    'iframe' (data) {
+        loadWidget('widget', data, IframeWidget);
     },
-    'widget': function (data) {
-        loadWidget('widget', data, iframeWidget);
+    'widget' (data) {
+        loadWidget('widget', data, IframeWidget);
     },
 
     /**
@@ -69,21 +54,37 @@ var adapterType = {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    'js': function (data) {
-        loadWidget('js', data, pageWidget);
+    'js' (data) {
+        loadWidget('js', data, PageWidget);
     },
-    'page': function (data) {
-        loadWidget('page', data, pageWidget);
+    'page' (data) {
+        loadWidget('page', data, PageWidget);
     },
-    'svg': function (data) {
-        loadWidget('svg', data, pageWidget);
+    'svg' (data) {
+        loadWidget('svg', data, PageWidget);
     },
-    'canvas': function (data) {
-        loadWidget('canvas', data, pageWidget);
+    'canvas' (data) {
+        loadWidget('canvas', data, PageWidget);
     },
-    'webgL': function (data) {
-        loadWidget('webgL', data, pageWidget);
+    'webgL' (data) {
+        loadWidget('webgL', data, PageWidget);
     }
+}
+
+
+/**
+ * 过滤出数据
+ * @return {[type]} [description]
+ */
+let filterData = (data) => {
+    //直接通过id查询数据
+    if (data.widgetId) {
+        _.extend(data, Xut.data.query('Widget', data.widgetId))
+    } else {
+        //直接通过activityId查询数据
+        _.extend(data, Xut.data.query('Widget', data.activityId, 'activityId'));
+    }
+    return data;
 }
 
 
@@ -91,66 +92,38 @@ var adapterType = {
  * 获取widget数据
  * @return {[type]} [description]
  */
-function filtrateDas(data) {
+let filtrateDas = (data) => {
     data = filterData(data);
     return proportion.calculateElement(data)
 }
 
-/**
- * 过滤出数据
- * @return {[type]} [description]
- */
-function filterData(data) {
-    //直接通过id查询数据	
-    if (data.widgetId) {
-        _.extend(data, Xut.data.query('Widget', data.widgetId))
-    } else {
-        //直接通过activityId查询数据	
-        _.extend(data, Xut.data.query('Widget', data.activityId, 'activityId'));
-    }
-    return data;
-}
-
-/**
- * 解析json数据
- * @param  {[type]} itemArray [description]
- * @return {[type]}           [description]
- */
-function ParseJSON(itemArray) {
-    var anminJson;
-    try {
-        anminJson = JSON.parse(itemArray);
-    } catch (error) {
-        anminJson = (new Function("return " + itemArray))();
-    }
-    return anminJson;
-}
 
 
 /**
  * ifarme内部，请求返回数据
  * @return {[type]} [description]
  */
-function parsePara(data) {
+let parsePara = (data) => {
     var inputPara, //输入数据
         outputPara; //输出数据
     if (inputPara = data.inputPara) {
-        outputPara = ParseJSON(inputPara)
+        outputPara = parseJSON(inputPara)
     }
     return outputPara;
 }
 
 
+
 export function Adapter(para) {
 
-    var config = Xut.config;
+    let data
 
     proportion = config.proportion;
     screenSize = config.screenSize;
     appId = config.appId;
 
     //获取数据
-    var data = filtrateDas(para);
+    data = filtrateDas(para);
 
     para = null;
 

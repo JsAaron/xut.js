@@ -21,7 +21,7 @@ export class BaseClass {
     }
 
     //构建之后关数据
-    afterRelated(audio, options, controlDoms) {
+    afterRelated(options, controlDoms) {
         //音频重复播放次数
         if (options.data && options.data.repeat) {
             this.repeat = Number(options.data.repeat); //需要重复
@@ -33,7 +33,7 @@ export class BaseClass {
         //字幕对象
         if (options.subtitles && options.subtitles.length > 0) {
             //创建字幕对象
-            this.subtitleObject = new Subtitle(audio, options, controlDoms);
+            this.subtitleObject = new Subtitle(options, controlDoms, (cb) => this.getAudioTime(cb))
         }
 
         //如果有外部回调处理

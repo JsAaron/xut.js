@@ -2,6 +2,11 @@
 /*************************
 * 电子杂志更新日志记录
 **************************
+* v817  Optimization platform judgment for subtitle 
+* v816  Fixed subtitles
+* v815  2016.5.29 When invoke the home button in the Android for miaomiaoxue platform，
+* 				  stop autoplay of application
+* v814  视频的play方法处理.妙妙处理
 * v813  Original的suspend接口增加音频视频的销毁方法，globalevent函数增加单击过快判断
 * v812  音频使用插件
 * v811  2015.6.24 修正应用无法加载. xut.plat / h5 播放

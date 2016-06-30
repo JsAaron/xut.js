@@ -79,12 +79,40 @@ class _Media extends BaseClass {
         this.options = options;
 
         //相关数据
-        this.afterRelated(audio, options, controlDoms)
+        this.afterRelated(options, controlDoms)
 
         this.play()
     }
 
-    //取反
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        this.audio.getCurrentPosition((position) => {
+            let audioTime
+            position = position * 1000;
+            if (!this.changeValue) {
+                this.changeValue = position
+            }
+            position -= this.changeValue;
+            if (position > -1) {
+                audioTime = Math.round(position);
+            }
+            callback(audioTime)
+        }, (e) => {
+            console.log("error:" + e);
+            //出错继续检测
+            callback()
+        })
+    }
+
+    /**
+     * 取反
+     * @return {[type]} [description]
+     */
     end() {
         if (this.audio) {
             this.audio.release();
@@ -132,7 +160,17 @@ class _Flash extends BaseClass {
         this.isFlash = true;
 
         //相关数据
-        this.afterRelated(audio, options, controlDoms);
+        this.afterRelated(options, controlDoms);
+    }
+
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        callback(Math.round(this.audio.audio.audio.currentTime * 1000))
     }
 
     end() {
@@ -177,7 +215,17 @@ class _Audio5js extends BaseClass {
         this.options = options;
 
         //相关数据
-        this.afterRelated(audio, options, controlDoms);
+        this.afterRelated(options, controlDoms);
+    }
+
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        callback(Math.round(this.audio.audio.audio.currentTime * 1000))
     }
 
     end() {
@@ -246,7 +294,17 @@ class _Audio extends BaseClass {
         this.options = options;
 
         //相关数据
-        this.afterRelated(audio, options, controlDoms)
+        this.afterRelated(options, controlDoms)
+    }
+
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        callback(Math.round(this.audio.currentTime * 1000))
     }
 
     end() {
@@ -306,9 +364,20 @@ class _cordovaMedia extends BaseClass {
         this.options = options;
 
         //相关数据
-        this.afterRelated(audio, options, controlDoms)
+        this.afterRelated(options, controlDoms)
 
         this.play()
+    }
+
+
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        callback(Math.round(this.audio.expansionCurrentPosition() * 1000))
     }
 
     //播放
@@ -342,11 +411,11 @@ class _cordovaMedia extends BaseClass {
 
 //安卓客户端apk的情况下
 if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
-    audioPlayer = _Media;
+    audioPlayer = _Media
 } else {
     //妙妙学的 客户端浏览器模式
     if (window.MMXCONFIG && window.audioHandler) {
-        audioPlayer = _cordovaMedia;
+        audioPlayer = _cordovaMedia
     } else {
         //特殊情况
         //有客户端的内嵌浏览器模式

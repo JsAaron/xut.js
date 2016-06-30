@@ -82,6 +82,7 @@ let _WebPage = (options) => {
     play()
 
     return {
+        play: play,
         stop: stop,
         close: close
     }
@@ -118,6 +119,7 @@ let webView = (options) => {
     play()
 
     return {
+        play: play,
         stop: close,
         close: close
     }
@@ -175,6 +177,7 @@ let _Media = (options) => {
     play()
 
     return {
+        play: play,
         stop: close,
         close: close
     }
@@ -248,20 +251,25 @@ let _Video5 = (options) => {
      * @return {[type]} [description]
      */
     let stop = () => {
-        video.pause();
-        //复位视频
-        if (video.duration) {
-            video.currentTime = 0.01;
-        }
-        //在全屏时无法隐藏元素,须先退出
-        //this.video.webkitExitFullScreen();
-        $videoWrap.hide();
 
-        //用于启动视频
-        if (options.startBoot) {
-            options.startBoot();
-            destroy();
+        video.pause();
+
+        //妙妙学只需要停止
+        if (!window.MMXCONFIG) {
+            //复位视频
+            if (video.duration) {
+                video.currentTime = 0.01;
+            }
+
+            $videoWrap.hide();
+
+            //用于启动视频
+            if (options.startBoot) {
+                options.startBoot();
+                destroy();
+            }
         }
+
     }
 
     /**
@@ -311,6 +319,7 @@ let _Video5 = (options) => {
     video.addEventListener('webkitendfullscreen', stop, false)
 
     return {
+        play: _paly,
         stop: stop,
         close: destroy
     }
@@ -331,7 +340,7 @@ let _VideoJS = (options) => {
         zIndex = options.zIndex,
         top = options.top,
         left = options.left,
-        video, source, player, api;
+        video, source, player;
 
     video = document.createElement('video');
     source = document.createElement('source');
@@ -370,15 +379,15 @@ let _VideoJS = (options) => {
             posterImage: false,
             //是否显示字幕
             textTrackDisplay: false,
-            volumeMenuButton:false
-        }, 
+            volumeMenuButton: false
+        },
         //控制条相关设置
         controlBar: {
             //是否显示字幕按钮
             captionsButton: false,
             chaptersButton: false,
 
-            liveDisplay: false, 
+            liveDisplay: false,
             //是否显示剩余时间
             remainingTimeDisplay: true,
             //是否显示子标题按钮
@@ -424,19 +433,23 @@ let _VideoJS = (options) => {
     wrap.style.top = top + 'px'
     wrap.style.zIndex = -1
 
-    api = {
+    return {
+
+        play: function() {
+            console.log(111);
+        },
 
         stop: function() {
-            player.stop();
+            player.pause();
         },
 
         close: function() {
-            player && player.dispose();
+            player.dispose();
             player = null;
         }
     }
 
-    return api;
+
 }
 
 
@@ -482,11 +495,18 @@ class VideoClass {
         Xut.View.Toolbar("hide")
     }
 
+    play() {
+        //隐藏工具栏
+        Xut.View.Toolbar("hide")
+        this.video.play()
+    }
+
     stop() {
         //显示工具栏
         Xut.View.Toolbar("show")
         this.video.stop()
     }
+
     close() {
         this.video.close()
     }

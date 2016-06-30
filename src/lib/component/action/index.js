@@ -7,7 +7,7 @@
  *
  */
 
-import { suspendHandles, promptMessage } from '../../stop'
+import { suspendHandles, promptMessage } from '../../global-stop'
 
 
 export class ActionClass {

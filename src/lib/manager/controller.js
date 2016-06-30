@@ -5,23 +5,18 @@
  *
  **********************************************************************/
 
+import { Observer } from '../observer/index'
+import { GlobalEvent } from './global-event.js'
+import { overrideApi } from './dynamic-api'
+import { Scheduler } from './schedule'
+import { delegateHooks } from './hooks'
+import { filterProcessor } from './filter'
+
 // 定义访问器
 import {
     defProtected as def,
     defAccess
 } from '../util/index'
-// 观察
-import { Observer } from '../observer/index'
-//全部交互通知
-import { GlobalEvent } from './globalevent.js'
-//动态api
-import { overrideApi } from './overrideapi'
-//调度任务
-import { Scheduler } from './schedule'
-//事件钩子
-import { delegateHooks } from './hooks'
-//委托处理器
-import { filterProcessor } from './filter'
 
 
 /**

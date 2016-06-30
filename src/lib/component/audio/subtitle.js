@@ -4,113 +4,105 @@
  * @return {[type]}        [description]
  */
 //字幕检测时间
-var Interval = 50;
+let Interval = 50;
 
-var getStyles = function(elem, name) {
+let getStyles = (elem, name) => {
     var styles = elem.ownerDocument.defaultView.getComputedStyle(elem, null);
     return styles.getPropertyValue(name);
 };
 
 /**
  * 字幕类
- * audio  音频实例
+ *   音频实例
  * options 参数
  */
-function Subtitle(audio, options, controlDoms) {
+export class Subtitle {
 
-    var visibility;
-    this.audio = audio;
-    this.options = options;
-    this.parents = controlDoms.parents;
-    this.ancestors = controlDoms.ancestors;
+    constructor(options, controlDoms, getAudioTime) {
 
-    this.timer = 0;
-    //缓存创建的div节点
-    this.cacheCreateDivs = {};
+        let visibility
+        let orgAncestorVisibility
 
-    //保存原始的属性
-    var orgAncestorVisibility = this.orgAncestorVisibility = {};
-    _.each(this.ancestors, function(node, cid) {
-        visibility = getStyles(node, 'visibility');
-        if (visibility) {
-            orgAncestorVisibility[cid] = visibility;
-        }
-    })
+        //快速处理匹配数据
+        let checkData = {}
 
-    //去重记录
-    this.recordRepart = {};
-    //phonegap getCurrentPosition得到的音频播放位置不从0开始 记录起始位置
-    this.changeValue = 0;
+        this.getAudioTime = getAudioTime
+        this.options = options
+        this.parents = controlDoms.parents
+        this.ancestors = controlDoms.ancestors
 
-    //快速处理匹配数据
-    var checkData = {};
-    _.each(options.subtitles, function(data) {
-        checkData[data.start + '-start'] = data;
-        checkData[data.end + '-end'] = data;
-    })
-    this.createSubtitle(checkData);
-}
+        this.timer = 0
 
-Subtitle.prototype = {
+        //缓存创建的div节点
+        this.cacheCreateDivs = {}
+
+        //保存原始的属性
+        orgAncestorVisibility = this.orgAncestorVisibility = {}
+        _.each(this.ancestors, (node, cid) => {
+            visibility = getStyles(node, 'visibility');
+            if (visibility) {
+                orgAncestorVisibility[cid] = visibility;
+            }
+        })
+
+        //去重记录
+        this.recordRepart = {}
+
+        //phonegap getCurrentPosition得到的音频播放位置不从0开始 记录起始位置
+        this.changeValue = 0;
+
+        _.each(options.subtitles, (data) => {
+            checkData[data.start + '-start'] = data;
+            checkData[data.end + '-end'] = data;
+        })
+
+        this.createSubtitle(checkData)
+    }
+
+
     /**
      * 运行字幕
      * @return {[type]}
      */
-    createSubtitle: function(checkData) {
-        var self = this,
-            audio = this.audio,
-            options = this.options;
+    createSubtitle(checkData) {
 
-        //准备创建字幕
-        function createAction(audioTime) {
-            _.each(checkData, function(data, key) {
-                var match = key.split('-');
+        let getAudioTime = this.getAudioTime
+        let options = this.options
+
+        /**
+         * 准备创建字幕
+         * @param  {[type]} audioTime [description]
+         * @return {[type]}           [description]
+         */
+        let createAction = (audioTime) => {
+            let match
+            _.each(checkData, (data, key) => {
+                match = key.split('-');
                 //创建动作
-                self.action(match[0], audioTime, match[1], data);
+                this.action(match[0], audioTime, match[1], data);
             })
-            self.createSubtitle(checkData);
+            this.createSubtitle(checkData);
         }
 
-        function JudgePlat() {
-            var audioTime;
-            //phonegap
-            if (audio.getCurrentPosition) {
-                audio.getCurrentPosition(function(position) {
-                        position = position * 1000;
-                        if (!self.changeValue) {
-                            self.changeValue = position
-                        }
-                        position -= self.changeValue;
-                        if (position > -1) {
-                            audioTime = Math.round(position);
-                        }
-                        createAction(audioTime)
-                    },
-                    function(e) {
-                        console.log("error:" + e);
-                        //出错继续检测
-                        self.createSubtitle(checkData);
-                    });
-            } else if (audio.expansionCurrentPosition) {
-                //扩充的对象
-                audioTime = Math.round(audio.expansionCurrentPosition() * 1000);
-                createAction(audioTime);
-            } else {
-                //html5
-                audioTime = Math.round(audio.currentTime * 1000);
-                createAction(audioTime);
-            }
+        /**
+         * 判断不同的播放平台
+         * @return {[type]} [description]
+         */
+        let JudgePlat = () => {
+            getAudioTime((audioTime) => {
+                createAction(audioTime)
+            })
         }
 
-        self.timer = setTimeout(function() {
+        this.timer = setTimeout(() => {
             JudgePlat();
         }, Interval);
-    },
+    }
 
     //执行动作
     //创建文本框
     //显示/隐藏
-    action: function(currentTime, audioTime, action, data) {
+    action(currentTime, audioTime, action, data) {
         if (audioTime > currentTime - Interval && audioTime < currentTime + Interval) {
             //创建
             if (!this.recordRepart[data.start] && action === 'start') {
@@ -128,9 +120,9 @@ Subtitle.prototype = {
                 }
             }
         }
-    },
+    }
 
-    createDom: function(data) {
+    createDom(data) {
 
         var config = Xut.config
 
@@ -232,13 +224,13 @@ Subtitle.prototype = {
                 ancestorNode.style.visibility = 'visible';
             }
         }
-    },
+    }
 
     /**
      * 清理音频
      * @return {[type]}
      */
-    destroy: function() {
+    destroy() {
         var self = this;
         _.each(this.cacheCreateDivs, function(node) {
                 node.parentNode.removeChild(node)
@@ -251,6 +243,7 @@ Subtitle.prototype = {
                 node.style.visibility = orgValue;
             }
         })
+
         this.ancestors = null;
         this.cacheCreateDivs = null;
         this.changeValue = 0;
@@ -261,9 +254,4 @@ Subtitle.prototype = {
         }
     }
 
-}
-
-
-export {
-    Subtitle
 }

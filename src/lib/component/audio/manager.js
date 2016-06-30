@@ -276,7 +276,7 @@ let loadAudio = (pageId, queryId, type) => {
     }
 
     //播放完成处理
-    pageObj.innerCallback = function(audio) {
+    pageObj.innerCallback = (audio) => {
         if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
             audio.end();
             delete playBox[type][pageId][queryId];

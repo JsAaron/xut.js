@@ -5,6 +5,9 @@ import { isMacOS, isDesktop } from './support'
 //动画扩展
 import { extension } from './extension'
 
+//高级精灵动画
+import { updateAction } from '../../../widget/domSeniorSprite/index'
+
 
 /**
  * Pptanimation.js - PPT Animation for Zepto/jQuery.
@@ -23,7 +26,6 @@ import { extension } from './extension'
  * }
  **/
 function PptAnimation(pageIndex, pageType, chapterId, element, itemArray, container, hasLoop, startEvent, completeEvent) {
-
     this.screenWidth = document.documentElement.clientWidth;
     this.screenHeight = document.documentElement.clientHeight;
     this.container = container ? $(container) : $(document.body); //父容器(主要用于手势控制路径动画)
@@ -501,15 +503,16 @@ PptAnimation.prototype = {
 
         //ppt动画扩展处理
         if (parameter.pptanimation && parameter.pptanimation.pptapi) {
+
             var params = parameter.pptanimation.parameters ? parameter.pptanimation.parameters : {};
             switch (parameter.pptanimation.pptapi) {
                 case "bonesWidget": //骨骼动画
                     bonesWidget.updateAction(object.attr("id"), params.actList);
                     break;
                 case "spiritWidget":
-                    if (window.spiritWidget) {
-                        spiritWidget.updateAction(object.attr("id"), params);
-                    }
+                    // if (window.spiritWidget) {
+                    updateAction(object.attr("id"), params);
+                    // }
                     break;
             }
         }

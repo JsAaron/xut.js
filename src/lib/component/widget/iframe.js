@@ -2,34 +2,34 @@
  * 创建iframe零件包装器
  */
 
-function iframeWidget(data) {
+export class IframeWidget {
 
-    var self = this;
 
-    //获取数据
-    _.extend(this, data)
+    constructor(data) {
 
-    //创建页面零件包装器
-    this.$wapper = this.createWapper();
+        //获取数据
+        _.extend(this, data)
 
-    Xut.nextTick({
-        'container': self.rootNode,
-        'content': this.$wapper
-    }, function() {
-        self.rootNode = null;
-        self.bindPMS();
-    });
+        //创建页面零件包装器
+        this.$wapper = this.createWapper();
 
-    return this;
-}
+        Xut.nextTick({
+            'container': this.rootNode,
+            'content': this.$wapper
+        }, () => {
+            this.rootNode = null;
+            this.bindPMS();
+        });
 
-iframeWidget.prototype = {
+        return this;
+    }
+
 
     /**
      * 创建包含容器
      * @return {[type]} [description]
      */
-    createWapper: function() {
+    createWapper() {
         var zIndex, str, dom, ifr;
 
         //层级设定
@@ -52,14 +52,14 @@ iframeWidget.prototype = {
         this._iframe = ifr;
 
         return $(dom).append(ifr)
-    },
+    }
 
 
     /**
      * 加载iframe
      * @return {[type]} [description]
      */
-    createIframe: function() {
+    createIframe() {
         var me = this,
             path = 'content/widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key,
             ifr = document.createElement('iframe');
@@ -80,14 +80,14 @@ iframeWidget.prototype = {
             };
         }
         return ifr;
-    },
+    }
 
 
     /**
      * iframe加载完毕回调
      * @return {[type]} [description]
      */
-    iframeComplete: function() {
+    iframeComplete() {
         var me = this;
         var dataSource = this.loadData();
         var width = me._iframe.offsetWidth;
@@ -120,13 +120,13 @@ iframeWidget.prototype = {
 
         //iframe加载的状态
         me.state = true;
-    },
+    }
 
     /**
      * ifarme内部，请求返回数据
      * @return {[type]} [description]
      */
-    loadData: function() {
+    loadData() {
         var item,
             field,
             source_export = [],
@@ -149,7 +149,7 @@ iframeWidget.prototype = {
         outputPara.source = source_export;
 
         return outputPara;
-    },
+    }
 
 
     /********************************************************************
@@ -162,7 +162,7 @@ iframeWidget.prototype = {
      * 与iframe通讯接口
      * @return {[type]} [description]
      */
-    bindPMS: function() {
+    bindPMS() {
         var me = this,
             markId = this.id;
 
@@ -269,9 +269,9 @@ iframeWidget.prototype = {
         PMS.bind('scrollToPage' + markId, function(data) {
             Xut.View.GotoSlide(data['ppts'], data['pageIndex'])
         }, '*');
-    },
+    }
 
- 
+
     //=============外部调用接口===================
 
     /**
@@ -279,19 +279,19 @@ iframeWidget.prototype = {
      * 显示隐藏
      * @return {[type]} [description]
      */
-    dispatchProcess: function() {
+    dispatchProcess() {
         if (this.state) {
             this.stop();
         } else {
             this.start();
         }
-    },
+    }
 
     /**
      * 开始
      * @return {[type]} [description]
      */
-    start: function() {
+    start() {
         var me = this;
         me.domWapper();
         this.PMS.send({
@@ -305,14 +305,14 @@ iframeWidget.prototype = {
         });
         setTimeout(function() {
             me.state = true;
-        }, 0) 
-    },
+        }, 0)
+    }
 
     /**
      * 暂停
      * @return {[type]} [description]
      */
-    stop: function() {
+    stop() {
         var me = this;
         me.domWapper();
         this.PMS.send({
@@ -325,24 +325,24 @@ iframeWidget.prototype = {
         setTimeout(function() {
             me.state = false;
         }, 0)
-    },
+    }
 
 
     /**
      * 处理包装容器的状态
      * @return {[type]} [description]
      */
-    domWapper: function() {
+    domWapper() {
         if (this.state) {
             this.$wapper.hide();
         } else {
             this.$wapper.show();
         }
-    },
+    }
 
 
     //复位
-    recovery: function() {
+    recovery() {
         var me = this;
         if (me.state) {
             me.PMS.send({
@@ -357,10 +357,10 @@ iframeWidget.prototype = {
             return true;
         }
         return false;
-    },
+    }
 
     //销毁接口
-    destroy: function() {
+    destroy() {
 
         var me = this,
             iframe = this._iframe,
@@ -386,7 +386,5 @@ iframeWidget.prototype = {
         }, 0)
     }
 
+
 }
-
-
-export { iframeWidget }

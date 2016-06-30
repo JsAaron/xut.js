@@ -24,7 +24,12 @@
  * @return {[type]} [description]
  */
 
-//ProcessControl
+import { config } from './config/index'
+import { controll } from './scenario/controller'
+import { autoRun, original, suspend } from './scheduler/index'
+import { suspendHandles, promptMessage } from './global-stop'
+import { loadScene } from './init/scene'
+import { SceneFactory } from './scenario/factory'
 
 import {
     _set,
@@ -36,15 +41,6 @@ import {
     messageBox
 }
 from './util/index'
-import { config } from './config/index'
-//场景管理器
-import { controll } from './scenario/controller'
-//调度器
-import { autoRun, original, suspend } from './scheduler/index'
-import { suspendHandles, promptMessage } from './stop'
-import { loadScene } from './init/scene'
-// //主场景工厂方法
-import { SceneFactory } from './scenario/factory'
 
 let plat = Xut.plat
 let LOCK = 1 //锁定
@@ -849,7 +845,13 @@ portExtend(Application, {
     }
 })
 
- 
+// $('body').on('dblclick',function(){
+//     Application.Original()
+//     setTimeout(function(){
+//         Application.Activate()
+//     },2000)
+// })
+
 portExtend(Application, {
 
     /**

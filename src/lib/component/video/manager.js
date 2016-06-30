@@ -195,13 +195,13 @@ export class VideoManager {
 
 
     /**
-     * 离开页面
+     * 挂起视频
      * @param  {[type]} pageId [description]
      * @return {[type]}        [description]
      */
-    leavePage(pageId) {
-        var playBox = this.playBox;
-        if (playBox && playBox[pageId]) {
+    hangUpVideo(pageId) {
+        var playBox = this.playBox
+        for (var pageId in playBox) {
             for (var activityId in playBox[pageId]) {
                 playBox[pageId][activityId].stop();
             }

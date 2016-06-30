@@ -4,6 +4,7 @@
  */
 import { Bind } from '../pagebase/task/dispenser/bind'
 import { access } from './access'
+import allowNext from '../backstage'
 
 //content任务超时Id
 let contentTaskOutId
@@ -85,6 +86,19 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
     if (Xut.IBooks.compileMode()) {
         return;
     }
+
+    //When the home button by invoking
+    //Does not perform automatic animation
+    //fix 2016.6.29
+    // originalApp
+    // window.miaomiaoxue.back = 1;
+    // activateApp
+    // window.miaomiaoxue.back = 0;
+    if(!allowNext()){
+        taskAnimCallback()
+        return
+    }
+
 
     //pageType
     //用于区别触发类型
