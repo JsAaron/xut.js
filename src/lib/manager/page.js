@@ -3,22 +3,22 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import {
-    injectScript,
-    extend
-} from '../util/index'
 import { Abstract } from './abstract'
 import { Pagebase } from '../pagebase/pagebase'
 import { translation } from '../pagebase/translation'
-//epub使用
 import { addEdges } from '../util/edge'
-//动作热热点派发
+import { removeVideo } from '../component/video/manager'
+
 import {
     suspend as _suspend,
     original as _original,
     autoRun as _autoRun
 } from '../scheduler/index'
 
+import {
+    injectScript,
+    extend
+} from '../util/index'
 
 /**
  * 检测脚本注入
@@ -31,15 +31,6 @@ let checkInjectScript = (pageObject, type) => {
     }
 }
 
-/**
- * 清理视频
- * @return {[type]} [description]
- */
-let removeVideo = (clearPageIndex) => {
-    //处理视频
-    var pageId = Xut.Presentation.GetPageId(clearPageIndex);
-    Xut.VideoManager.removeVideo(pageId);
-}
 
 export class PageMgr extends Abstract {
 
@@ -80,12 +71,13 @@ export class PageMgr extends Abstract {
     }
 
 
-
-    //清理其中的一个页面
+    /**
+     * 销毁整个页面管理对象
+     * @param  {[type]} clearPageIndex [description]
+     * @return {[type]}                [description]
+     */
     clearPage(clearPageIndex) {
         var pageObj;
-        //清理视频
-        // removeVideo(clearPageIndex);
         //销毁页面对象事件
         if (pageObj = this.abstractGetPageObj(clearPageIndex)) {
             //移除事件
@@ -95,10 +87,16 @@ export class PageMgr extends Abstract {
         }
     }
 
-    //销毁整个页面管理对象
+
+    /**
+     * 销毁整个页面管理对象
+     * @return {[type]} [description]
+     */
     destroy() {
         //清理视频
-        removeVideo(Xut.Presentation.GetPageIndex());
+        var pageId = Xut.Presentation.GetPageId(Xut.Presentation.GetPageIndex())
+        removeVideo(pageId)
+
         //清理对象
         this.abstractDestroyCollection();
         //清理节点

@@ -1,7 +1,9 @@
+import { clearVideo } from '../../component/video/manager'
+
+
 /**
  * 创建iframe零件包装器
  */
-
 export class IframeWidget {
 
 
@@ -182,7 +184,7 @@ export class IframeWidget {
 
             if (!$iframe.length) return;
             //关闭视频
-            Xut.VideoManager.clearVideo();
+            clearVideo();
 
             $wapper.css({
                 width: '100%',

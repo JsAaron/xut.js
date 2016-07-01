@@ -418,8 +418,6 @@ export class SceneFactory {
                 console.log('主场景容器', vm.$scheduler.pageMgr.Collections)
                 console.log('主场景视觉差容器', vm.$scheduler.parallaxMgr && vm.$scheduler.parallaxMgr.Collections)
                 console.log('多场景', sceneControll.expose())
-                console.log('音频', Xut.AudioManager);
-                console.log('视频', Xut.VideoManager);
                 console.log('数据库', Xut.data);
             })
         }

@@ -6,7 +6,7 @@
  *    3: 基于videoJS用flash实现的播放 for pc
  *    4: 用于插入一个网页的webview
  */
-
+import { removeVideo } from './manager'
 import {
     supportVideo,
     supportFlash
@@ -104,16 +104,16 @@ let webView = (options) => {
     function play() {
         //打开一个网页的时候，需要关闭其他已经打开过的网页
         Xut.Plugin.WebView.close();
-        Xut.VideoManager.openWebView = false;
+        Xut.openWebView = false;
         setTimeout(function() {
             Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
-            Xut.VideoManager.openWebView = true;
+            Xut.openWebView = true;
         }, 500);
     }
 
     function close() {
         Xut.Plugin.WebView.close();
-        Xut.VideoManager.openWebView = false;
+        Xut.openWebView = false;
     }
 
     play()
@@ -355,7 +355,7 @@ let _VideoJS = (options) => {
 
     var clear = function() {
         //结束后清理自己
-        Xut.VideoManager.removeVideo(options.pageId);
+        removeVideo(options.pageId);
     }
 
     //videojs是videojs定义的全局函数

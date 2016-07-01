@@ -9,7 +9,8 @@
 import { recovery } from './scheduler/index'
 import { show } from './util/notice'
 import { close } from './toolbar/navbar/index'
-
+import { clearAudio } from './component/audio/manager'
+import { clearVideo } from './component/video/manager'
 
 /**
  * [checkWidgets description]
@@ -33,11 +34,11 @@ let checkMedia = (pageId) => {
     //音频 视频 是否有处理
     let flag = false
 
-    if (Xut.AudioManager.clearAudio(pageId)) {
+    if (clearAudio(pageId)) {
         flag = true;
     }
 
-    if (Xut.VideoManager.clearVideo()) {
+    if (clearVideo()) {
         flag = true;
     }
 

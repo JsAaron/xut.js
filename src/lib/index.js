@@ -5,10 +5,6 @@ import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { init } from './init/index'
 
-//Initializes the audio video
-Xut.VideoManager = new VideoManager()
-Xut.AudioManager = new AudioManager()
-
 //repair ios android browser doesn't automatically play audio problems
 //when loaded. Create a new audio video and use it every time you change
 Xut.fix = Xut.fix || {}
@@ -40,6 +36,6 @@ if (Xut.plat.isBrowser) {
 }
 
 
-Xut.Version = 818
+Xut.Version = 819
 
 init()

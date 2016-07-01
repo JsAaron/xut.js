@@ -1,4 +1,6 @@
 import { parseJSON } from '../../../util/index'
+import { triggerAudio, autoAudio } from '../../../component/audio/manager'
+import { triggerVideo, autoVideo } from '../../../component/video/manager'
 
 //临时音频动作数据
 let tempData = {};
@@ -6,7 +8,7 @@ let tempData = {};
 let Media = {
 
     createDom: function(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-            var width = activityData.scaleWidth,
+        var width = activityData.scaleWidth,
             height = activityData.scaleHeight,
             top = activityData.scaleTop,
             left = activityData.scaleLeft,
@@ -131,9 +133,9 @@ let Media = {
              * 根节点
              */
             if (category == 'audio') {
-                Xut.AudioManager.trigger(chapterId, data.activityId, this.onlyCreateOnce(data.id));
+                triggerAudio(chapterId, data.activityId, this.onlyCreateOnce(data.id))
             } else {
-                Xut.VideoManager.trigger(chapterId, data.activityId, $(data.rootNode));
+                triggerVideo(chapterId, data.activityId, $(data.rootNode))
             }
         }
     },
@@ -157,14 +159,14 @@ let Media = {
 
         //自动音频
         if (category == 'audio') {
-            Xut.AudioManager.autoPlay(chapterId, activityId, this.onlyCreateOnce(data.id));
+            autoAudio(chapterId, activityId, this.onlyCreateOnce(data.id));
         } else {
             //自动视频
-            Xut.VideoManager.autoPlay(chapterId, activityId, rootNode);
+            autoVideo(chapterId, activityId, rootNode);
         }
     }
 
 }
 
 
-export {Media}
+export { Media }

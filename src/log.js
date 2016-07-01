@@ -2,6 +2,7 @@
 /*************************
 * 电子杂志更新日志记录
 **************************
+* v819  Get rid of Xut.AudioManager and Xut.VideoManager into the import and export
 * v818  SeniorSpriteAnimation of dom version
 * v817  Optimization platform judgment for subtitle 
 * v816  Fixed subtitles

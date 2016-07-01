@@ -1,13 +1,8 @@
-//解析工具
 import { execJson, parseJSON, enterReplace } from '../../../../util/dom'
-//支持
 import { isMacOS, isDesktop } from './support'
-//动画扩展
 import { extension } from './extension'
-
-//高级精灵动画
 import { updateAction } from '../../../widget/domSeniorSprite/index'
-
+import { createContentAudio } from '../../../audio/manager'
 
 /**
  * Pptanimation.js - PPT Animation for Zepto/jQuery.
@@ -496,7 +491,7 @@ PptAnimation.prototype = {
 
         //ppt动画音频
         if (parameter.videoId > 0) {
-            Xut.AudioManager.contentAudio(parameter.chapterId, parameter.videoId)
+            createContentAudio(parameter.chapterId, parameter.videoId)
         }
 
         /*eslint-disable */

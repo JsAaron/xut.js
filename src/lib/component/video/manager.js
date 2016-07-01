@@ -3,209 +3,199 @@
 */
 import { VideoClass } from './video'
 import { config } from '../../config/index'
+import { hash } from '../../util/index'
 
-//综合管理video, webpage
-export class VideoManager {
+let pageBox
+let playBox
 
-    constructor() {
-        this.pageBox = {}; //当前页面包含的视频数据
-        this.playBox = {}; //播放过的视频数据 （播放集合）
+let initBox = () => {
+    pageBox = hash() //当前页面包含的视频数据
+    playBox = hash() //播放过的视频数据 （播放集合)
+}
+
+initBox()
+
+
+/**
+ * 配置视频结构
+ * @param  {[type]} data       [description]
+ * @param  {[type]} pageId     [description]
+ * @param  {[type]} activityId [description]
+ * @return {[type]}            [description]
+ */
+let deployVideo = (data, pageId, activityId) => {
+
+    let proportion = config.proportion
+    let screenSize = config.screenSize
+
+    let videoInfo = {
+        'pageId': pageId,
+        'videoId': activityId,
+        'url': data.md5,
+        'pageUrl': data.url,
+        'left': data.left * proportion.left || 0,
+        'top': data.top * proportion.top || 0,
+        'width': data.width * proportion.width || screenSize.width,
+        'height': data.height * proportion.height || screenSize.height,
+        'padding': data.padding * proportion.left || 0,
+        'zIndex': data.zIndex || 2147483647,
+        'background': data.background,
+        'category': data.category,
+        'hyperlink': data.hyperlink
+    };
+
+    if (!_.isObject(pageBox[pageId])) {
+        pageBox[pageId] = {};
     }
 
-    /**
-     * 自动播放
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @param  {[type]} container  [description]
-     * @return {[type]}            [description]
-     */
-    autoPlay(pageId, activityId, container) {
-        this.initVideo.apply(this, arguments);
+    pageBox[pageId][activityId] = videoInfo;
+}
+
+
+
+
+/**
+ * 检测数据是否存在
+ * @param  {[type]} pageId     [description]
+ * @param  {[type]} activityId [description]
+ * @return {[type]}            [description]
+ */
+let checkRepeat = (pageId, activityId) => {
+    var chapterData = pageBox[pageId];
+    //如果能在pageBox找到对应的数据
+    if (chapterData && chapterData[activityId]) {
+        return true;
     }
+    return false;
+}
 
-    /**
-     * 手动播放
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @param  {[type]} container  [description]
-     * @return {[type]}            [description]
-     */
-    trigger(pageId, activityId, container) {
-        this.initVideo.apply(this, arguments);
+
+
+//处理重复数据
+// 1:pageBox能找到对应的 videoId
+// 2:重新查询数据
+let parseVideo = (pageId, activityId) => {
+    //复重
+    if (checkRepeat(pageId, activityId)) {
+        return
     }
-
-
-    /**
-     * 触发视频
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @param  {[type]} container  [description]
-     * @return {[type]}            [description]
-     */
-    initVideo(pageId, activityId, container) {
-        //解析数据
-        this.parseVideo(pageId, activityId);
-        //调用播放
-        this.loadVideo(pageId, activityId, container);
-    }
+    //新的查询
+    let data = Xut.data.query('Video', activityId)
+    deployVideo(data, pageId, activityId)
+}
 
 
 
-    //处理重复数据
-    // 1:pageBox能找到对应的 videoId
-    // 2:重新查询数据
-    parseVideo(pageId, activityId) {
-        //复重
-        if (this.checkRepeat(pageId, activityId)) {
-            return;
+/**
+ * 加载视频
+ * @param  {[type]} pageId     [description]
+ * @param  {[type]} activityId [description]
+ * @param  {[type]} container  [description]
+ * @return {[type]}            [description]
+ */
+let loadVideo = (pageId, activityId, container) => {
+    let data = pageBox[pageId][activityId]
+
+    //search video cache
+    if (playBox[pageId] && playBox[pageId][activityId]) {
+        //console.log('*********cache*********');
+        playBox[pageId][activityId].play()
+    } else {
+        //console.log('=========new=============');
+        if (!_.isObject(playBox[pageId])) {
+            playBox[pageId] = {};
         }
-        var data = Xut.data.query('Video', activityId);
-        //新的查询
-        this.deployVideo(data, pageId, activityId);
+        //cache video object
+        playBox[pageId][activityId] = new VideoClass(data, container)
     }
+}
 
 
-    /**
-     * 检测数据是否存在
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @return {[type]}            [description]
-     */
-    checkRepeat(pageId, activityId) {
-        var chapterData = this.pageBox[pageId];
-        //如果能在pageBox找到对应的数据
-        if (chapterData && chapterData[activityId]) {
-            return true;
+/**
+ * 触发视频
+ * @param  {[type]} pageId     [description]
+ * @param  {[type]} activityId [description]
+ * @param  {[type]} container  [description]
+ * @return {[type]}            [description]
+ */
+let initVideo = (pageId, activityId, container) => {
+    //解析数据
+    parseVideo(pageId, activityId);
+    //调用播放
+    loadVideo(pageId, activityId, container);
+}
+
+
+/**
+ * 自动播放
+ * @param  {[type]} pageId     [description]
+ * @param  {[type]} activityId [description]
+ * @param  {[type]} container  [description]
+ * @return {[type]}            [description]
+ */
+export function autoVideo(pageId, activityId, container) {
+    initVideo(pageId, activityId, container)
+}
+
+
+/**
+ * 手动播放
+ * @param  {[type]} pageId     [description]
+ * @param  {[type]} activityId [description]
+ * @param  {[type]} container  [description]
+ * @return {[type]}            [description]
+ */
+export function triggerVideo(pageId, activityId, container) {
+    initVideo(pageId, activityId, container)
+}
+
+
+/**
+ * 清理移除页的视频
+ * @param  {[type]} pageId [description]
+ * @return {[type]}        [description]
+ */
+export function removeVideo(pageId) {
+    //清理视频
+    if (playBox && playBox[pageId]) {
+        for (let activityId in playBox[pageId]) {
+            playBox[pageId][activityId].close();
         }
-        return false;
+        delete playBox[pageId]
     }
-
-
-    /**
-     * 配置视频结构
-     * @param  {[type]} data       [description]
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @return {[type]}            [description]
-     */
-    deployVideo(data, pageId, activityId) {
-
-        var proportion = config.proportion
-        var screenSize = config.screenSize
-
-        var videoInfo = {
-            'pageId': pageId,
-            'videoId': activityId,
-            'url': data.md5,
-            'pageUrl': data.url,
-            'left': data.left * proportion.left || 0,
-            'top': data.top * proportion.top || 0,
-            'width': data.width * proportion.width || screenSize.width,
-            'height': data.height * proportion.height || screenSize.height,
-            'padding': data.padding * proportion.left || 0,
-            'zIndex': data.zIndex || 2147483647,
-            'background': data.background,
-            'category': data.category,
-            'hyperlink': data.hyperlink
-        };
-
-        if (!_.isObject(this.pageBox[pageId])) {
-            this.pageBox[pageId] = {};
-        }
-
-        this.pageBox[pageId][activityId] = videoInfo;
+    //清理数据
+    if (pageBox && pageBox[pageId]) {
+        delete pageBox[pageId]
     }
+}
 
 
-
-    /**
-     * 加载视频
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @param  {[type]} container  [description]
-     * @return {[type]}            [description]
-     */
-    loadVideo(pageId, activityId, container) {
-        var playBox = this.playBox,
-            data = this.pageBox[pageId][activityId];
-
-        //播放视频时停止所有的音频
-        //视频的同时肯能存在音频
-        // Xut.AudioManager.clearAudio();
-
-        //search video cache
-        if (playBox[pageId] && playBox[pageId][activityId]) {
-            //console.log('*********cache*********');
-            playBox[pageId][activityId].play()
-        } else {
-            //console.log('=========new=============');
-            if (!_.isObject(playBox[pageId])) {
-                playBox[pageId] = {};
-            }
-            //cache video object
-            playBox[pageId][activityId] = new VideoClass(data, container)
-
-        }
-
-    }
-
-
-    /**
-     * 清理移除页的视频
-     * @param  {[type]} pageId [description]
-     * @return {[type]}        [description]
-     */
-    removeVideo(pageId) {
-        var playBox = this.playBox,
-            pageBox = this.pageBox;
-
-        //清理视频
-        if (playBox && playBox[pageId]) {
-            for (var activityId in playBox[pageId]) {
-                playBox[pageId][activityId].close();
-            }
-            delete this.playBox[pageId];
-        }
-        //清理数据
-        if (pageBox && pageBox[pageId]) {
-            delete this.pageBox[pageId];
-        }
-    }
-
-
-    /**
-     * 清理全部视频
-     * @return {[type]} [description]
-     */
-    clearVideo() {
-        var playBox = this.playBox,
-            flag = false; //记录是否处理过销毁状态
-
-        for (var pageId in playBox) {
-            for (var activityId in playBox[pageId]) {
-                playBox[pageId][activityId].close();
-                flag = true;
-            }
-        }
-
-        this.playBox = {};
-        this.pageBox = {};
-        return flag;
-    }
-
-
-    /**
-     * 挂起视频
-     * @param  {[type]} pageId [description]
-     * @return {[type]}        [description]
-     */
-    hangUpVideo(pageId) {
-        var playBox = this.playBox
-        for (var pageId in playBox) {
-            for (var activityId in playBox[pageId]) {
-                playBox[pageId][activityId].stop();
-            }
+/**
+ * 清理全部视频
+ * @return {[type]} [description]
+ */
+export function clearVideo() {
+    let flag = false //记录是否处理过销毁状态
+    for (let pageId in playBox) {
+        for (let activityId in playBox[pageId]) {
+            playBox[pageId][activityId].close();
+            flag = true;
         }
     }
+    initBox()
+    return flag;
+}
 
+
+/**
+ * 挂起视频
+ * @param  {[type]} pageId [description]
+ * @return {[type]}        [description]
+ */
+export function hangUpVideo(pageId) {
+    for (let pageId in playBox) {
+        for (let activityId in playBox[pageId]) {
+            playBox[pageId][activityId].stop();
+        }
+    }
 }

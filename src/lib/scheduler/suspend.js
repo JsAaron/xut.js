@@ -4,7 +4,8 @@
  */
 
 import { access } from './access'
-
+import { hangUpAudio } from '../component/audio/manager'
+import { removeVideo, hangUpVideo } from '../component/video/manager'
 
 /**
  * 翻页停止content动作
@@ -25,10 +26,10 @@ export function suspend(pageObj, pageId, allHandle) {
         //多媒体处理
         if (pageId !== undefined) {
             //离开页面销毁视频
-            Xut.VideoManager.removeVideo(pageId);
+            removeVideo(pageId);
             //翻页停止母板音频
             if (pageObj.pageType === 'master') {
-                Xut.AudioManager.hangUpAudio()
+                hangUpAudio()
             }
         }
 
@@ -43,8 +44,8 @@ export function suspend(pageObj, pageId, allHandle) {
         //销毁视频
         //销毁所有的音频
         if (allHandle) {
-            Xut.VideoManager.hangUpVideo()
-            Xut.AudioManager.hangUpAudio()
+            hangUpVideo()
+            hangUpAudio()
         }
 
     })

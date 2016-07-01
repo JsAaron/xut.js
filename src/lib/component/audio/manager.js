@@ -32,12 +32,12 @@
 
 import { parseJSON, hash } from '../../util/index'
 import { audioPlayer } from './audio'
-
+import { clearVideo } from '../video/manager'
 
 //动作标示
-var ACTIVIT = 'hot'; //热点音频
-var ANIMATE = 'content'; //动画音频
-var SEASON = 'season'; //节音频
+let ACTIVIT = 'hot' //热点音频
+let ANIMATE = 'content' //动画音频
+let SEASON = 'season' //节音频
 
 /**
  * 容器合集
@@ -45,15 +45,16 @@ var SEASON = 'season'; //节音频
  * 2 playBox 播放中的热点音频集合
  */
 //[type][pageId][queryId]
-var pageBox, playBox;
+var pageBox, playBox
 
-function initBox() {
-    pageBox = hash();
+let initBox = () => {
+    pageBox = hash()
+
     //[type][pageId][queryId]
-    playBox = hash();
+    playBox = hash()
 }
 
-initBox();
+initBox()
 
 
 /**
@@ -260,7 +261,7 @@ let loadAudio = (pageId, queryId, type) => {
     var seAudio = preCheck(pageId, queryId, type);
 
     //播放音频时关掉视频
-    Xut.VideoManager.clearVideo();
+    clearVideo()
 
     //构建播放列表
     if (!playBox[type]) {
@@ -332,104 +333,107 @@ let removeAudio = () => {
 }
 
 
-export class AudioManager {
 
-    ///////////////////
-    //1 独立音频处理, 音轨/跨页面 //
-    //2 动画音频,跟动画一起播放与销毁
-    ///////////////////
+///////////////////
+//1 独立音频处理, 音轨/跨页面 //
+//2 动画音频,跟动画一起播放与销毁
+///////////////////
 
-    /**
-     * 自动播放触发接口
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @param  {[type]} actionData [description]
-     * @return {[type]}            [description]
-     */
-    autoPlay(pageId, activityId, actionData) {
-        deployAudio(pageId, activityId, ACTIVIT, actionData);
-        loadAudio(pageId, activityId, ACTIVIT);
-    }
-
-    /**
-     * 手动触发
-     * @param  {[type]} pageId     [description]
-     * @param  {[type]} activityId [description]
-     * @param  {[type]} actionData [description]
-     * @return {[type]}            [description]
-     */
-    trigger(pageId, activityId, actionData) {
-        deployAudio(pageId, activityId, ACTIVIT, actionData);
-        loadTiggerAudio(pageId, activityId, ACTIVIT);
-    }
-
-
-    /**
-     * 动画音频触发接口
-     * @param  {[type]} pageId  [description]
-     * @param  {[type]} audioId [description]
-     * @return {[type]}         [description]
-     */
-    contentAudio(pageId, audioId) {
-        deployAudio(pageId, audioId, ANIMATE);
-        loadAudio(pageId, audioId, ANIMATE);
-    }
-
-    /**
-     * 节音频触发接口
-     * @param  {[type]} seasonAudioId [description]
-     * @param  {[type]} audioId       [description]
-     * @return {[type]}               [description]
-     */
-    seasonAudio(seasonAudioId, audioId) {
-        deployAudio(seasonAudioId, audioId, SEASON);
-        loadAudio(seasonAudioId, audioId, SEASON);
-    }
-
-    /**
-     * 挂起音频
-     * @return {[type]} [description]
-     */
-    hangUpAudio() {
-        var t, p, a;
-        for (t in playBox) {
-            for (p in playBox[t]) {
-                for (a in playBox[t][p]) {
-                    playBox[t][p][a].pause();
-                }
-            }
-        }
-    }
-
-    /**
-     * 销毁动画音频
-     * @param  {[type]} pageId [description]
-     * @return {[type]}        [description]
-     */
-    clearContentAudio(pageId) {
-        if (!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
-            return false;
-        }
-        var playObj = playBox[ANIMATE][pageId];
-        if (playObj) {
-            for (var i in playObj) {
-                playObj[i].end();
-                delete playBox[ANIMATE][pageId][i];
-            }
-        }
-    }
-
-    /**
-     * 清理音频
-     * @param  {[type]} pageId [description]
-     * @return {[type]}        [description]
-     */
-    clearAudio(pageId) {
-        if (pageId) { //如果只跳槽关闭动画音频
-            this.clearContentAudio(pageId)
-        } else {
-            removeAudio(); //多场景模式,不处理跨页面
-        }
-    }
-
+/**
+ * 自动播放触发接口
+ * @param  {[type]} pageId     [description]
+ * @param  {[type]} activityId [description]
+ * @param  {[type]} actionData [description]
+ * @return {[type]}            [description]
+ */
+export function autoAudio(pageId, activityId, actionData) {
+    deployAudio(pageId, activityId, ACTIVIT, actionData);
+    loadAudio(pageId, activityId, ACTIVIT);
 }
+
+
+/**
+ * 手动触发
+ * @param  {[type]} pageId     [description]
+ * @param  {[type]} activityId [description]
+ * @param  {[type]} actionData [description]
+ * @return {[type]}            [description]
+ */
+export function triggerAudio(pageId, activityId, actionData) {
+    deployAudio(pageId, activityId, ACTIVIT, actionData);
+    loadTiggerAudio(pageId, activityId, ACTIVIT);
+}
+
+
+
+/**
+ * 节音频触发接口
+ * @param  {[type]} seasonAudioId [description]
+ * @param  {[type]} audioId       [description]
+ * @return {[type]}               [description]
+ */
+export function seasonAudio(seasonAudioId, audioId) {
+    deployAudio(seasonAudioId, audioId, SEASON);
+    loadAudio(seasonAudioId, audioId, SEASON);
+}
+
+
+/**
+ * 挂起音频
+ * @return {[type]} [description]
+ */
+export function hangUpAudio() {
+    var t, p, a;
+    for (t in playBox) {
+        for (p in playBox[t]) {
+            for (a in playBox[t][p]) {
+                playBox[t][p][a].pause();
+            }
+        }
+    }
+}
+
+
+/**
+ * 动画音频触发接口
+ * @param  {[type]} pageId  [description]
+ * @param  {[type]} audioId [description]
+ * @return {[type]}         [description]
+ */
+export function createContentAudio(pageId, audioId) {
+    deployAudio(pageId, audioId, ANIMATE);
+    loadAudio(pageId, audioId, ANIMATE);
+}
+
+
+/**
+ * 销毁动画音频
+ * @param  {[type]} pageId [description]
+ * @return {[type]}        [description]
+ */
+export function clearContentAudio(pageId) {
+    if (!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
+        return false;
+    }
+    var playObj = playBox[ANIMATE][pageId];
+    if (playObj) {
+        for (var i in playObj) {
+            playObj[i].end();
+            delete playBox[ANIMATE][pageId][i];
+        }
+    }
+}
+
+/**
+ * 清理音频
+ * @param  {[type]} pageId [description]
+ * @return {[type]}        [description]
+ */
+export function clearAudio(pageId) {
+    if (pageId) { //如果只跳槽关闭动画音频
+        clearContentAudio(pageId)
+    } else {
+        removeAudio() //多场景模式,不处理跨页面
+    }
+}
+

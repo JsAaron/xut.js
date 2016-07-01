@@ -9,14 +9,12 @@
  *
  ********************************************************************/
 
-//dom精灵动画
 import { Sprite as domSprite } from './plug/domsprite'
-//dom ppt动画
 import { PptAnimation } from './plug/domppt/index'
-//pixi普通精灵动画
 import { Sprite as pixiSpirit } from '../pixi/sprite/index'
-//pixi特殊高级动画
 import { specialSprite as pixiSpecial } from '../pixi/special/index'
+import { clearContentAudio } from '../audio/manager'
+
 
 /**
  * 销毁动画音频
@@ -31,11 +29,11 @@ let destroyContentAudio = (videoIds, chapterId) => {
         //如果存在对象音频
         if (data.videoId) {
             isExist = true;
-            return 'breaker';
+            return 'breaker'
         }
     })
     if (isExist) {
-        Xut.AudioManager.clearContentAudio(chapterId)
+        clearContentAudio(chapterId)
     }
 }
 
