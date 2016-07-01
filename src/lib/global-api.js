@@ -703,6 +703,11 @@ portExtend(Application, {
         }
     },
 
+    /**
+     * 后台运行
+     * @type {Number}
+     */
+    backstage: 0,
 
     /**
      * home隐藏
@@ -710,6 +715,8 @@ portExtend(Application, {
      * 用于进来的时候激活Activate
      */
     Original() {
+        Application.backstage = 1
+
         //传递一个完全关闭的参数
         suspend('', '', true);
         original();
@@ -722,6 +729,7 @@ portExtend(Application, {
      * 激活应用行为
      */
     Activate() {
+        Application.backstage = 0
         autoRun()
     },
 

@@ -7,7 +7,7 @@
 let allowNext = () => {
     if (window.MMXCONFIG) {
         return () => {
-            return !window.MMXCONFIG.back
+            return !(window.MMXCONFIG.back || Xut.Application.backstage)
         }
     } else {
         return () => {
