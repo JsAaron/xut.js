@@ -13,15 +13,13 @@ const WriteFilePlugin = require('write-file-webpack-plugin');
 baseWebpackConfig.entry = ['./build/dev/client'].concat(baseWebpackConfig.entry)
 
 module.exports = merge(baseWebpackConfig, {
-    devtool: '#eval-source-map',
+    devtool: '#cheap-source-map',
     plugins: [
         // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
-        // 热替换、错误不退出
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
-
-        // 生成html文件
+        
         new HtmlWebpackPlugin({
             filename: './index.html',
             template: './src/index.html',

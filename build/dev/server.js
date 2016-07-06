@@ -1,4 +1,5 @@
 const fs = require('fs')
+const http = require('http');
 const express = require('express')
 const webpack = require('webpack')
 const ora = require('ora')
@@ -7,10 +8,11 @@ const watch = require('gulp-watch');
 const path = require('path')
 const _ = require("underscore");
 const fsextra = require('fs-extra')
-const child_process = require('child_process');
+const cp = require('child_process');
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
+const portoccupied = require('../portoccupied')
 const spinner = ora('Begin to pack , Please wait for\n')
 
 let app = express()
@@ -20,14 +22,12 @@ let conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
 });
 
-//数据库
 if (!fs.existsSync("./src/content/xxtebook.db")) {
     console.log('data not available!')
     return
 }
 
 spinner.start()
-
 if (!fs.existsSync("./src/content/SQLResult.js")) {
     require('../sqlite/index').resolve()
 }
@@ -37,9 +37,7 @@ fsextra.mkdirSync(conf.assetsRoot);
 
 let webpackConfig = require('./webpack.dev.conf')
 
-
 /**
- * 启动代码测试
  * eslint
  * @param  {[type]} config.dev.eslint.launch [description]
  * @return {[type]}                          [description]
@@ -122,7 +120,7 @@ watch(conf.assetsRoot + '/app.js', () => {
             preChildRun.kill()
             preChildRun = null
         }
-        let child = child_process.spawn('node', ['build/dev/test.js', ['test=' + config.dev.test.dir]]);
+        let child = cp.spawn('node', ['build/dev/test.js', ['test=' + config.dev.test.dir]]);
         child.stdout.on('data', (data) => console.log('\n' + data))
         child.stderr.on('data', (data) => console.log('fail out：\n' + data));
         child.on('close', (code) => console.log('complete：' + code));
@@ -131,10 +129,12 @@ watch(conf.assetsRoot + '/app.js', () => {
 })
 
 
-module.exports = app.listen(port, (err) => {
-    if (err) {
-        console.log(err)
-        return
-    }
-    console.log('Listening at http://localhost:' + port + '\n')
+portoccupied(port, function() {
+    app.listen(port, (err) => {
+        if (err) {
+            console.log(err)
+            return
+        }
+        console.log('Listening at http://localhost:' + port + '\n')
+    })
 })

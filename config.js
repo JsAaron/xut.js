@@ -10,8 +10,8 @@ const root = resolve(__dirname)
 const common = {
     //index入口
     index: './src/index.html',
-    //app.js 执行入口
-    entry: './src/lib/app.js',
+    //执行入口
+    entry: './src/lib/index.js',
     //生成名称
     devName: 'xxtppt.dev.js',
     distName: 'xxtppt.js',
@@ -45,7 +45,7 @@ module.exports = {
          * @type {Object}
          */
         test: {
-            launch: true,
+            launch: false,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: process.platform === 'win32' ? 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' : '/Users/mac/project/xcode/www/build'

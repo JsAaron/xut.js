@@ -127,7 +127,7 @@ let cfgHistory = (data) => {
 let fixedSize = (novelData) => {
     if (novelData) {
         if (novelData.pptWidth || novelData.pptHeight) {
-            config.setProportion(novelData.pptWidth, novelData.pptHeight);
+            config.fixProportion(novelData.pptWidth, novelData.pptHeight);
         }
     }
 }

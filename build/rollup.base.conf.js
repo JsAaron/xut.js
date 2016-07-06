@@ -23,7 +23,6 @@ const write = (path, code) => {
 
 
 /**
- * 读出所有的index中的script路径
  * @param  {[type]} srcDir [description]
  * @param  {[type]} url    [description]
  * @return {[type]}        [description]
@@ -41,8 +40,6 @@ let readsrcipt = (srcDir, url) => {
                 val = val.match(/src="(.*?.js)/);
                 if (val && val.length) {
                     path = val[1]
-
-                    //有效src
                     if (/^lib/.test(path)) {
                         paths.push(srcDir + path)
                     }
@@ -56,12 +53,8 @@ let readsrcipt = (srcDir, url) => {
 
 
 
-/**
- * rollup合并
- */
 module.exports = (conf) => {
 
-    //清空目录
     fsextra.emptyDirSync(conf.tarDir)
     fsextra.emptyDirSync(conf.testDir)
 

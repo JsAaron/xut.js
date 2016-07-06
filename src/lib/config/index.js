@@ -5,223 +5,26 @@
  * @param  {[type]} module  [description]
  * @return {[type]}         [description]
  */
+import nativeConf from './native'
+import iframeConf from './iframe'
+import common from './common'
 
-//配置对象
+import {
+    _screen,
+    _layer,
+    _scale,
+    _fixProportion
+}
+from './judge'
+
+
 let config = {}
 let layoutMode
 let screenSize
 let proportion
-let isIOS = Xut.plat.isIOS
 let isIphone = Xut.plat.isIphone
-let isAndroid = Xut.plat.isAndroid
 let isBrowser = Xut.plat.isBrowser
-let sourceUrl = "content/gallery/"
-let FLOOR = Math.floor
-let CEIL = Math.ceil
-
-/**
- * 屏幕尺寸
- * @return {[type]} [description]
- */
-let judgeScreen = () => {
-    //如果是IBooks模式处理
-    if (Xut.IBooks.Enabled) {
-        var screenSize = Xut.IBooks.CONFIG.screenSize;
-        if (screenSize) {
-            return {
-                "width": screenSize.width,
-                "height": screenSize.height
-            }
-        }
-    }
-    return {
-        "width": $(window).width(),
-        // 1024 768
-        "height": $(window).height()
-    }
-}
-
-
-/**
- * 排版判断
- * @return {[type]} [description]
- */
-let judgeLayer = () => {
-    return screenSize.width > screenSize.height ? "horizontal" : "vertical";
-}
-
-
-/**
- * 缩放比例
- * @param  {[type]} pptWidth  [description]
- * @param  {[type]} pptHeight [description]
- * @return {[type]}           [description]
- */
-let judgeScale = (pptWidth, pptHeight) => {
-    var dbmode, scaleWidth, scaleHeight,
-        width = screenSize.width,
-        height = screenSize.height,
-        // 根据设备判断设备的横竖屏 1 横板 0 竖版
-        horizontalMode = width > height ? 1 : 0,
-
-        //默认ppt尺寸
-        defaultWidth = pptWidth ? pptWidth : horizontalMode ? 1024 : 768,
-        defaultHeight = pptHeight ? pptHeight : horizontalMode ? 720 : 976,
-
-        //当前屏幕的尺寸与数据库设计的尺寸，比例
-        wProp = width / defaultWidth,
-        hProp = height / defaultHeight,
-
-        //布局的偏移量，可能是采用了画轴模式，一个可视区可以容纳3个页面
-        offsetTop = 0,
-        offsetLeft = 0;
-
-    if (pptWidth && pptHeight && isBrowser) {
-        dbmode = pptWidth > pptHeight ? 1 : 0; // 根据数据库判断横杂志的竖屏 1 横板 0 竖版
-        if (dbmode != horizontalMode) {
-            if (dbmode === 1) {
-                hProp = wProp;
-            } else {
-                wProp = hProp;
-            }
-        }
-    }
-
-    //画轴模式
-    if (config.scrollPaintingMode) {
-        //    Dw       width - 2 * left 
-        //   ----  =  -------------------
-        //    Dh       height - 2 * top
-
-        if (horizontalMode) {
-            scaleWidth = defaultWidth * hProp;
-            offsetLeft = (width - scaleWidth) / 2;
-            wProp = hProp;
-        } else {
-            scaleHeight = defaultHeight * hProp;
-            offsetTop = (height - scaleHeight) / 2;
-            hProp = wProp;
-        }
-    }
-
-    //word模式下的竖版
-    if (config.virtualMode && !horizontalMode) {
-        //假设高度不会溢出,按两倍屏宽计算
-        var _prop = 2 * width / defaultWidth;
-        offsetLeft = 0;
-        scaleHeight = defaultHeight * _prop;
-        offsetTop = (height - scaleHeight) / 2;
-
-        //如果高度溢出,按屏高计算
-        if (scaleHeight > height) {
-            _prop = height / defaultHeight;
-            scaleWidth = defaultWidth * _prop;
-
-            offsetTop = 0;
-            offsetLeft = (2 * width - scaleWidth) / 2;
-        }
-
-        wProp = hProp = _prop;
-    }
-
-    return {
-        width: wProp,
-        height: hProp,
-        left: wProp,
-        top: hProp,
-        offsetTop: offsetTop,
-        offsetLeft: offsetLeft,
-        pptWidth: pptWidth,
-        pptHeight: pptHeight
-    }
-}
-
-
-/**
- * 修正API接口
- * @return {[type]} [description]
- */
-let fiexdAPI = () => {
-    screenSize = config.screenSize = judgeScreen();
-    layoutMode = config.layoutMode = judgeLayer();
-    proportion = config.proportion = judgeScale();
-}
-
-/**
- * 修复缩放比
- * 如果PPT有编辑指定的宽度与高度
- */
-let setProportion = (pptWidth, pptHeight) => {
-
-    /**
-     * 计算新的缩放比
-     * @type {[type]}
-     */
-    proportion = config.proportion = judgeScale(pptWidth, pptHeight);
-
-    /**
-     * 计算容器的宽高比
-     * @param  {[type]} () [description]
-     * @return {[type]}    [description]
-     */
-    proportion.calculateContainer = (() => {
-        var pptWidth = proportion.pptWidth
-        var pptHeight = proportion.pptHeight
-        var scaleWidth = proportion.width
-        var scaleHeight = proportion.height
-        return (width, height, left, top) => {
-
-            width = width || screenSize.width
-            height = height || screenSize.height
-            left = left || 0
-            top = top || 0
-
-            if (pptWidth && pptHeight && isBrowser) {
-                //维持竖版的缩放比
-                var _width = scaleWidth * pptWidth;
-                var _height = scaleHeight * pptHeight;
-
-                //虚拟模式并且是竖版
-                if (config.virtualMode && height > width) {
-                    return {
-                        width: FLOOR(_width),
-                        height: FLOOR(_height),
-                        left: FLOOR((width - _width / 2) / 2),
-                        top: FLOOR((height - _height) / 2)
-                    }
-                }
-                //横版模式
-                return {
-                    width: FLOOR(_width),
-                    height: FLOOR(_height),
-                    left: FLOOR((width - _width) / 2),
-                    top: FLOOR((height - _height) / 2)
-                };
-            } else {
-                return {
-                    width: FLOOR(width),
-                    height: FLOOR(height),
-                    left: FLOOR(left),
-                    top: FLOOR(top)
-                }
-            }
-        }
-    })();
-
-    /**
-     * 计算元素的缩放比
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
-     */
-    proportion.calculateElement = (data) => {
-        var data = _.extend({}, data)
-        data.width = CEIL(data.width * proportion.width);
-        data.height = CEIL(data.height * proportion.height);
-        data.top = FLOOR(data.top * proportion.top);
-        data.left = FLOOR(data.left * proportion.left);
-        return data;
-    }
-}
+let sourceUrl = common.sourceUrl
 
 
 /**
@@ -230,6 +33,16 @@ let setProportion = (pptWidth, pptHeight) => {
  */
 Xut.zIndexlevel = () => {
     return ++config.zIndexlevel
+}
+
+/**
+ * 修正API接口
+ * @return {[type]} [description]
+ */
+let fiexdAPI = () => {
+    screenSize = config.screenSize = _screen()
+    layoutMode = config.layoutMode = _layer(screenSize)
+    proportion = config.proportion = _scale(config)
 }
 
 
@@ -241,294 +54,8 @@ if (/xinxuetang/.test(window.location.href)) {
 
 
 /**
- *  通过iframe加载判断当前的加载方式
- *  1 本地iframe打开子文档
- *  2 读酷加载电子杂志
- *  3 读酷加载电子杂志打开子文档
- */
-let iframeMode = (() => {
-    let mode;
-    if (window.SUbCONFIGT && window.DUKUCONFIG) {
-        //通过读酷客户端开打子文档方式
-        mode = 'iframeDuKuSubDoc'
-    } else {
-        //子文档加载
-        if (window.SUbCONFIGT) {
-            mode = 'iframeSubDoc'
-        }
-        //读酷客户端加载
-        if (window.DUKUCONFIG) {
-            mode = 'iframeDuKu'
-        }
-        //客户端模式
-        //通过零件加载
-        if (window.CLIENTCONFIGT) {
-            mode = 'iframeClient'
-        }
-        //秒秒学客户端加载
-        if (window.MMXCONFIG) {
-            mode = 'iframeMiaomiaoxue'
-        }
-    }
-    return mode;
-})()
-
-
-/**
- * 读酷模式下的路径
- * @param  {[type]} window.DUKUCONFIG [description]
- * @return {[type]}                   [description]
- */
-if (window.DUKUCONFIG) {
-    window.DUKUCONFIG.path = window.DUKUCONFIG.path.replace('//', '/')
-}
-
-
-/**
- * 除右端的"/"
- * @param  {[type]} str [description]
- * @return {[type]}     [description]
- */
-var rtrim = function(str) {
-    if (typeof str != 'string') return str;
-    var lastIndex = str.length - 1;
-    if (str.charAt(lastIndex) === '/') {
-        return str.substr(0, lastIndex)
-    } else {
-        return str;
-    }
-}
-
-
-// var MMXCONFIGPath = '.'
-// if (MMXCONFIG && MMXCONFIG.path) {
-//     MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
-// }
-var MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
-if (window.MMXCONFIG && window.MMXCONFIG.path) {
-    MMXCONFIGPath = rtrim(window.MMXCONFIG.path)
-}
-
-
-//iframe嵌套配置
-//1 新阅读
-//2 子文档
-//3 秒秒学
-var iframeConfig = {
-
-    /**
-     * 资源图片
-     * @return {[type]} [description]
-     */
-    resources() {
-        if (isIOS) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return sourceUrl;
-                case 'iframeDuKuSubDoc':
-                    return sourceUrl;
-                case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
-            }
-        }
-
-        if (isAndroid) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return '/android_asset/www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
-            }
-        }
-    },
-
-    /**
-     * 视频路径
-     * @return {[type]} [description]
-     */
-    video() {
-        if (isIOS) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return sourceUrl
-                case 'iframeDuKuSubDoc':
-                    return sourceUrl;
-                case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
-            }
-        }
-
-        if (isAndroid) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return 'android.resource://#packagename#/raw/';
-                case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
-            }
-        }
-    },
-
-    /**
-     * 音频路径
-     * @return {[type]} [description]
-     */
-    audio() {
-        if (isIOS) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return sourceUrl;
-                case 'iframeDuKuSubDoc':
-                    return sourceUrl;
-                case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
-            }
-        }
-        if (isAndroid) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return '/android_asset/www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
-            }
-        }
-    },
-
-    /**
-     * 调用插件处理
-     * @return {[type]} [description]
-     */
-    svg() {
-        if (isIOS) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    //www/content/subdoc/00c83e668a6b6bad7eda8eedbd2110ad/content/gallery/
-                    return 'www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
-            }
-        }
-
-        if (isAndroid) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return 'www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
-            }
-        }
-    }
-
-}
-
-
-//杂志直接打开
-var nativeConfig = {
-
-    /**
-     * 资源图片
-     * @return {[type]} [description]
-     */
-    resources() {
-        if (isIOS) {
-            return sourceUrl;
-        }
-
-        if (isAndroid) {
-            if (parseInt(config.storageMode)) {
-                //sd卡加载资源数据
-                return "/sdcard/appcarrier/magazine/" + config.appId + "/" + sourceUrl;
-            } else {
-                //android_asset缓存加载资源
-                return "/android_asset/www/" + sourceUrl;
-            }
-        }
-    },
-
-    /**
-     * 视频路径
-     * ios平台在缓存
-     * 安卓在编译raw中
-     */
-    video() {
-        if (isIOS) {
-            return sourceUrl;
-        }
-        if (isAndroid) {
-            return 'android.resource://#packagename#/raw/';
-        }
-    },
-
-    /**
-     * 音频路径
-     * ios平台在缓存
-     * 安卓在缓存中
-     * @return {[type]} [description]
-     */
-    audio() {
-        if (isIOS) {
-            return sourceUrl;
-        }
-        if (isAndroid) {
-            return "/android_asset/www/" + sourceUrl;
-        }
-    },
-
-    /**
-     * 读取svg路径前缀
-     * @return {[type]} [description]
-     */
-    svg() {
-        return 'www/' + sourceUrl;
-    }
-}
-
-
-/**
  * 缓存
  */
-let cacheResourcesPath
 let cacheVideoPath
 let cacheAudioPath
 let cacheSvgPath
@@ -583,15 +110,12 @@ let runLoad = () => {
  * [resourcesPath description]
  * @return {[type]} [description]
  */
-let resourcesPath = () => {
-    if (cacheResourcesPath) {
-        return cacheResourcesPath;
-    }
+let confResources = () => {
     //移动端模式
     let mobileMode = () => {
-        return window.GLOBALIFRAME ? iframeConfig.resources() : nativeConfig.resources();
+        return window.GLOBALIFRAME ? iframeConf.resources() : nativeConf.resources()
     }
-    return cacheResourcesPath = isBrowser ? pcMode() : mobileMode();
+    return isBrowser ? pcMode() : mobileMode()
 }
 
 
@@ -601,13 +125,13 @@ let resourcesPath = () => {
  * 2 或者asset上的资源
  * @return {[type]} [description]
  */
-let videoPath = () => {
+let _videoPath = () => {
     if (cacheVideoPath) {
         return cacheVideoPath;
     }
     //移动
     let mobilePath = () => {
-        return window.GLOBALIFRAME ? iframeConfig.video() : nativeConfig.video();
+        return window.GLOBALIFRAME ? iframeConf.video() : nativeConf.video();
     }
     return cacheVideoPath = runLoad() ? pcMode() : mobilePath();
 }
@@ -617,13 +141,13 @@ let videoPath = () => {
  * 音频路径
  * @return {[type]} [description]
  */
-let audioPath = () => {
+let _audioPath = () => {
     if (cacheAudioPath) {
         return cacheAudioPath;
     }
     //移动端
     let mobileMode = () => {
-        return window.GLOBALIFRAME ? iframeConfig.audio() : nativeConfig.audio();
+        return window.GLOBALIFRAME ? iframeConf.audio() : nativeConf.audio();
     }
     return cacheAudioPath = runLoad() ? pcMode() : mobileMode();
 };
@@ -633,12 +157,12 @@ let audioPath = () => {
  * SVG文件路径
  * @return {[type]} [description]
  */
-let svgPath = () => {
+let _svgPath = () => {
     if (cacheSvgPath) {
         return cacheSvgPath;
     }
     let mobileMode = () => {
-        return window.GLOBALIFRAME ? iframeConfig.svg() : nativeConfig.svg();
+        return window.GLOBALIFRAME ? iframeConf.svg() : nativeConf.svg();
     }
     return cacheSvgPath = isBrowser ? pcMode() : mobileMode();
 }
@@ -650,7 +174,7 @@ let svgPath = () => {
  * @param  {[type]} name [description]
  * @return {[type]}      [description]
  */
-Xut.log = function(info, name){
+Xut.log = function(info, name) {
     if (!config.debugMode) return;
     switch (info) {
         case 'error':
@@ -666,6 +190,12 @@ Xut.log = function(info, name){
 }
 
 
+
+/**
+ * 全局配置文件
+ * [debugMode description]
+ * @type {Boolean}
+ */
 _.extend(config, {
 
     /**
@@ -757,13 +287,21 @@ _.extend(config, {
      */
     appId: null,
 
+
+    /**
+     * 资源路径
+     * @type {[type]}
+     */
+    pathAddress: null,
+
+
     /**
      * 初始化资源路径
      * 配置图片路径地址
      * @return {[type]} [description]
      */
     initResourcesPath() {
-        this.pathAddress = resourcesPath();
+        config.pathAddress = confResources()
     },
 
     /**
@@ -771,7 +309,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     videoPath() {
-        return videoPath();
+        return _videoPath()
     },
 
     /**
@@ -779,7 +317,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     audioPath() {
-        return audioPath();
+        return _audioPath()
     },
 
     /**
@@ -787,7 +325,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     svgPath() {
-        return svgPath();
+        return _svgPath()
     },
 
     /**
@@ -834,9 +372,12 @@ _.extend(config, {
 
     /**
      * 修正缩放比
+     * 通过数据库中的设置的模板尺寸与实际尺寸修复
      * @type {[type]}
      */
-    setProportion: setProportion,
+    fixProportion(pptWidth, pptHeight) {
+        _fixProportion(config, pptWidth, pptHeight)
+    },
 
     /**
      * 数据库尺寸
@@ -849,4 +390,3 @@ _.extend(config, {
 Xut.config = config
 
 export { config }
-
