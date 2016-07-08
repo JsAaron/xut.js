@@ -1,5 +1,5 @@
  //调度器
- import { trigger } from '../scheduler/index'
+ import { trigger } from '../dispatcher/index'
 
 
  //委托事件处理钩子

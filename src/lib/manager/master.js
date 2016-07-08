@@ -11,7 +11,7 @@ import {
     suspend as _suspend,
     original as _original,
     autoRun as _autoRun
-} from '../scheduler/index'
+} from '../dispatcher/index'
 
 //扁平化对象到数组
 let toArray = (filter) => {

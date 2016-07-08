@@ -26,7 +26,7 @@
 
 import { config } from './config/index'
 import { controll } from './scenario/controller'
-import { autoRun, original, suspend } from './scheduler/index'
+import { autoRun, original, suspend } from './dispatcher/index'
 import { suspendHandles, promptMessage } from './global-stop'
 import { loadScene } from './init/scene'
 import { SceneFactory } from './scenario/factory'

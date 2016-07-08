@@ -2,9 +2,10 @@
  * 自动触发控制
  * @return {[type]} [description]
  */
-import { Bind } from '../pagebase/task/dispenser/bind'
+
 import { access } from './access'
 import allowNext from '../backstage'
+import directives from '../directives/index'
 
 //content任务超时Id
 let contentTaskOutId
@@ -60,7 +61,7 @@ let runComponent = (pageObj, pageIndex, autoRunComponents, pageType) => {
     }
 
     _.each(autoRunComponents, (data, index) => {
-        let dir = Bind[data.type];
+        let dir = directives[data.type];
         if (dir && dir.autoPlay) {
             dir.autoPlay({
                 'id': data.id,
@@ -94,7 +95,7 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
     // window.miaomiaoxue.back = 1;
     // activateApp
     // window.miaomiaoxue.back = 0;
-    if(!allowNext()){
+    if (!allowNext()) {
         taskAnimCallback()
         return
     }

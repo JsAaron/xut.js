@@ -23,7 +23,7 @@ let lockAnimation //动画加锁
 let $navbal
 
 /**
- * 下拉章节列表        
+ * 下拉章节列表
  */
 function SectionList(pageArray) {
     this.pageArray = pageArray

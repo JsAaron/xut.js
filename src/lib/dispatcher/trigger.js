@@ -3,7 +3,7 @@
  * @return {[type]} [description]
  */
 
-import { Bind } from '../pagebase/task/dispenser/bind'
+import directives from '../directives/index'
 
 export function trigger(target, attribute, rootNode, pageIndex) {
 
@@ -14,7 +14,7 @@ export function trigger(target, attribute, rootNode, pageIndex) {
         tag = key.split('_');
         type = tag[0];
         id = tag[1];
-        dir = Bind[type];
+        dir = directives[type];
 
         if (dir && dir.eventDelegate) {
 

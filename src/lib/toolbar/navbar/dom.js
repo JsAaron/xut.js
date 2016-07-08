@@ -11,7 +11,7 @@ export function createdom(artControl, callback) {
     Xut.data.query('Chapter', Xut.data.novelId, 'seasonId', function (item) {
         pageArray.push(item);
     })
-    
+
     // //显示下拉菜单
     Xut.nextTick({
         'container': artControl,

@@ -5,7 +5,7 @@
  *      依赖数据解析算法类 Algorithm
  *      结构合并创建类    Structure
  *      行为动画绑定类     Content
- * 
+ *
  * ***************************************************/
 import {parseJSON, arrayUnique}from '../../../util/index'
 import {parserRelated as conParser}from './data'

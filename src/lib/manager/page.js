@@ -13,7 +13,7 @@ import {
     suspend as _suspend,
     original as _original,
     autoRun as _autoRun
-} from '../scheduler/index'
+} from '../dispatcher/index'
 
 import {
     injectScript,

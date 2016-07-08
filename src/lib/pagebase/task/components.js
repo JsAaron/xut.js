@@ -6,10 +6,9 @@
  *      2 创建完毕
  *      3 创建失败
  */
-
-//组件任务
-import {Bind} from './dispenser/bind'
+import directives from '../../directives/index'
 import {reviseSize} from '../../util/option'
+
 
 function TaskComponents(data, suspendCallback, successCallback) {
 
@@ -32,6 +31,7 @@ function TaskComponents(data, suspendCallback, successCallback) {
         successCallback();
     }
 }
+
 
 TaskComponents.prototype = {
 
@@ -70,7 +70,7 @@ TaskComponents.prototype = {
         function startCreate(actType, activityData) {
             //创建DOM元素结构
             //返回是拼接字符串
-            widgetRetStr.push(Bind[actType]['createDom'](
+            widgetRetStr.push(directives[actType]['createDom'](
                 activityData, chpaterData, chapterId, pid, Xut.zIndexlevel(), pageType
             ));
         }

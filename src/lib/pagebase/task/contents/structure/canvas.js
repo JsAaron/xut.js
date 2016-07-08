@@ -27,9 +27,9 @@ export function createCanvas(data, wrapObj) {
         temp,
         wrapObj.makeId('canvas'),
         mark.toLocaleLowerCase(),
-        data.scaleWidth, 
+        data.scaleWidth,
         data.scaleHeight
-    ) 
+    )
 
     return str;
 }

@@ -6,7 +6,7 @@
  */
 
 //调度器
-import { recovery } from './scheduler/index'
+import { recovery } from './dispatcher/index'
 import { show } from './util/notice'
 import { close } from './toolbar/navbar/index'
 import { clearAudio } from './component/audio/manager'
