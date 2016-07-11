@@ -9,8 +9,9 @@
  *
  ********************************************************************/
 
-import { Sprite as domSprite } from './plug/domsprite'
-import { PptAnimation } from './plug/domppt/index'
+import { PPT } from './extension/ppt/index'
+import { ComSpirit } from './extension/comspirit'
+import { AdvSpirit } from './extension/advSpirit'
 import { Sprite as pixiSpirit } from '../pixi/sprite/index'
 import { specialSprite as pixiSpecial } from '../pixi/special/index'
 import { clearContentAudio } from '../audio/manager'
@@ -77,28 +78,41 @@ export class Animation {
      */
     init(id, context, rootNode, chapterId, parameter, pageType) {
 
-        let pageIndex = this.pageIndex
-        let self = this
-        let actionTypes
-        let makeOpts
-        let initstate
+        let pageIndex, self, actionTypes, makeOpts, initstate, create, createPixiPPT, $veiw, setState, category
 
-        let create = (constructor, newContext) => {
+        self = this
+        category = this.contentDas.category
+        pageIndex = this.pageIndex
+
+        create = (constructor, newContext) => {
             let element = newContext || context
             if (element.length) {
                 return new constructor(pageIndex, pageType, chapterId, element, parameter, rootNode);
             } else {
-                console.log(id, self)
+                console.log(id, this)
             }
-
         }
 
         //dom模式
         if (this.domMode) {
             //ppt动画
-            this.pptObj = create(PptAnimation);
-            //普通精灵动画
-            this.domSprites = this.contentDas.category === 'Sprite' ? true : false;
+            this.pptObj = create(PPT);
+
+            //type choose
+            switch (category) {
+                //普通精灵动画
+                case "Sprite":
+                    this.domSprites = true
+                    break
+                case "AdvSprite":
+                    this.advSpiritObj = new AdvSpirit({
+                        element: this.$contentProcess.find('.sprite').show(),
+                        data: this.contentDas,
+                        id: this.id
+                    })
+                    this.advSpiritObj.play()
+                    break
+            }
             return
         }
 
@@ -119,22 +133,21 @@ export class Animation {
                 pageIndex: this.pageIndex
             }
 
-
             //创建pixi上下文的ppt对象
-            let createPixiPPT = () => {
+            createPixiPPT = () => {
                 //parameter存在就是ppt动画
-                if ((parameter || actionTypes.pptId) && self.$contentProcess.view) {
-                    self.pptObj = create(PptAnimation, $(self.$contentProcess.view));
-                    self.pptObj.contentId = id
+                if ((parameter || actionTypes.pptId) && this.$contentProcess.view) {
+                    this.pptObj = create(PPT, $(this.$contentProcess.view));
+                    this.pptObj.contentId = id
                 }
             }
 
-            let $veiw = this.$contentProcess.view
+            $veiw = this.$contentProcess.view
             if ($veiw) {
                 initstate = $veiw.getAttribute('data-init')
             }
 
-            let setState = () => {
+            setState = () => {
                 $veiw.setAttribute('data-init', true)
             }
 
@@ -154,7 +167,8 @@ export class Animation {
                     this.pixiObj.$once('load', () => {
                         //ppt动画
                         createPixiPPT()
-                            //任务完成
+
+                        //任务完成
                         self.nextTask.context.remove(id)
                     })
                     setState()
@@ -164,7 +178,6 @@ export class Animation {
             //特殊高级动画
             //必须是ppt与pixi绑定的
             if (actionTypes.compSpriteId) {
-
                 // console.log(this,this.id,this.contentDas.initpixi)
                 //这个dom已经创建了pixi了
                 if (initstate) {
@@ -172,13 +185,13 @@ export class Animation {
                 } else {
                     this.pixiObj = new pixiSpecial(makeOpts);
                     setState()
-                        //ppt动画
+
+                    //ppt动画
                     createPixiPPT()
                 }
 
             }
         }
-
     }
 
 
@@ -206,7 +219,6 @@ export class Animation {
                     'display': 'block'
                 })
             }
-
             //指定动画
             ppt.runAnimation(scopeComplete);
         })
@@ -223,13 +235,15 @@ export class Animation {
                 this.spriteObj.playSprites();
                 return;
             }
-            this.spriteObj = domSprite({
+            this.spriteObj = ComSpirit({
                 element: this.$contentProcess.find('.sprite').show(),
                 data: this.contentDas,
                 id: this.id,
                 mode: 'css'
             });
         }
+
+
     }
 
     /**

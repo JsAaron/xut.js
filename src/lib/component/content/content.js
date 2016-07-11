@@ -6,7 +6,6 @@
  */
 import { Animation } from './animation'
 import { Parallax } from './parallax'
-
 import { Context } from '../pixi/context'
 
 

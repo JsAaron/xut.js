@@ -1,12 +1,12 @@
 import { execJson, parseJSON, enterReplace } from '../../../../util/dom'
+import { config } from '../../../../config/index'
 import { isMacOS, isDesktop } from './support'
-import { extension } from './extension'
-import { updateAction } from '../../../widget/domSeniorSprite/index'
+import { internal } from './internal'
+import { updateAction } from '../../../widget/seniorsprite/index'
 import { createContentAudio } from '../../../audio/manager'
 
+
 /**
- * Pptanimation.js - PPT Animation for Zepto/jQuery.
- *requestAnimationFrame
  * 参数说明
  * pageType: 页面类型
  * chapterId: 当前页ID
@@ -16,53 +16,49 @@ import { createContentAudio } from '../../../audio/manager'
  * hasLoop: 是否循环动画
  * startEvent: 整个动画开始事件
  * completeEvent: 整个动画结束事件
- * options {
- *     pageIndex, pageType, chapterId, element, itemArray, container, hasLoop, startEvent, completeEvent
- * }
  **/
-function PptAnimation(pageIndex, pageType, chapterId, element, itemArray, container, hasLoop, startEvent, completeEvent) {
-    this.screenWidth = document.documentElement.clientWidth;
-    this.screenHeight = document.documentElement.clientHeight;
-    this.container = container ? $(container) : $(document.body); //父容器(主要用于手势控制路径动画)
-    this.isDebug = false; //是否显示调试信息
+export class PPT {
 
-    this.pageIndex = pageIndex;
 
-    if (_.isObject(element)) {
-        this.pageType = pageType;
-        this.chapterId = chapterId;
-        this.element = element;
-        this.elementStyle = ''; //动画对象默认样式
-        this.elementVisibility = 'visible'; //初始化后对象状态
+    constructor(pageIndex, pageType, chapterId, element, itemArray, container, hasLoop, startEvent, completeEvent) {
+        this.screenWidth = config.screenSize.width
+        this.screenHeight = config.screenSize.height
+        this.container = container ? $(container) : $(document.body); //父容器(主要用于手势控制路径动画)
+        this.isDebug = false; //是否显示调试信息
 
-        this.options = [];
+        this.pageIndex = pageIndex;
 
-        if (Array.isArray(itemArray)) {
-            this.options = itemArray;
-        } else {
-            console.log("Animation options error is not Array.");
+        if (_.isObject(element)) {
+            this.pageType = pageType;
+            this.chapterId = chapterId;
+            this.element = element;
+            this.elementStyle = ''; //动画对象默认样式
+            this.elementVisibility = 'visible'; //初始化后对象状态
+
+            this.options = [];
+
+            if (Array.isArray(itemArray)) {
+                this.options = itemArray;
+            } else {
+                console.log("Animation options error is not Array.");
+            }
+
+            this.useMask = (isDesktop || isMacOS) ? true : false; //是否使用CSS渐变效果
+            this.hasLoop = (hasLoop == true) ? true : false;
+            this.startEvent = startEvent;
+            this.completeEvent = completeEvent;
+            this.parameter0 = null; //第一个动画参数（默认支持多个动画作用于一个对象）
+            this.isExit0 = false; //第一个动画类型（进入/退出）
+            this.preCode = ''; //动画前脚本
+            this.postCode = ''; //动画后脚本
+            this.codeDelay = 0; //延时
+            this.hasRunning = true; //是否继续运行
+            this.isCompleted = false; //是否完全执行过(用于解决重复执行问题)
+
+            //初始对象状态:opacity(visibility)
+            this._initElement();
         }
-
-        this.useMask = (isDesktop || isMacOS) ? true : false; //是否使用CSS渐变效果
-        this.hasLoop = (hasLoop == true) ? true : false;
-        this.startEvent = startEvent;
-        this.completeEvent = completeEvent;
-        this.parameter0 = null; //第一个动画参数（默认支持多个动画作用于一个对象）
-        this.isExit0 = false; //第一个动画类型（进入/退出）
-        this.preCode = ''; //动画前脚本
-        this.postCode = ''; //动画后脚本
-        this.codeDelay = 0; //延时
-        this.hasRunning = true; //是否继续运行
-        this.isCompleted = false; //是否完全执行过(用于解决重复执行问题)
-
-        //初始对象状态:opacity(visibility)
-        this._initElement();
     }
-}
-
-
-
-PptAnimation.prototype = {
 
 
     /**
@@ -70,7 +66,7 @@ PptAnimation.prototype = {
      * 对象初始化(visibility)
      * @return {[type]} [description]
      */
-    _initElement: function() {
+    _initElement() {
 
         //如果没有数据
         if (!this.options.length) {
@@ -157,7 +153,7 @@ PptAnimation.prototype = {
             this.elementVisibility = this.element.css("visibility");
         }
 
-    },
+    }
 
 
     /**
@@ -166,7 +162,7 @@ PptAnimation.prototype = {
      * @param  {[type]} completeEvent [description]
      * @return {[type]}               [description]
      */
-    _initAnimation: function(startEvent, completeEvent) {
+    _initAnimation(startEvent, completeEvent) {
         var self = this;
 
         var startHandler = function(preCode) {
@@ -228,7 +224,7 @@ PptAnimation.prototype = {
             }
         }
         return start;
-    },
+    }
 
 
     /**
@@ -237,7 +233,7 @@ PptAnimation.prototype = {
      * @param  {[type]} index [description]
      * @return {[type]}       [description]
      */
-    _getTimeline: function(data, index) {
+    _getTimeline(data, index) {
         var object = this.element;
         var parameter = this.parameter0;
         var isExit = this.isExit0;
@@ -411,14 +407,14 @@ PptAnimation.prototype = {
             return this.getPathAnimation(parameter,object,duration,delay,repeat);
         */
         }
-    },
+    }
 
 
     /**
      * 解锁处理
      * @return {[type]} [description]
      */
-    _unlockHandler: function() {
+    _unlockHandler() {
         //购买解锁
         var unlock = Xut.Application.Unlock ? Xut.Application.Unlock() : "undefind";
         //脚本解锁
@@ -438,7 +434,7 @@ PptAnimation.prototype = {
             this.element.css("visibility", "visible");
         else
             this.element.css("visibility", "hidden"); //默认隐藏
-    },
+    }
 
 
     /**
@@ -448,7 +444,7 @@ PptAnimation.prototype = {
      * @param  {[type]} params    [description]
      * @return {[type]}           [description]
      */
-    startHandler: function(parameter, object, params) {
+    startHandler(parameter, object, params) {
 
         for (var item in params) {
             switch (item) {
@@ -513,7 +509,7 @@ PptAnimation.prototype = {
         }
 
         /*eslint-enable */
-    },
+    }
 
 
     /**
@@ -523,7 +519,7 @@ PptAnimation.prototype = {
      * @param  {[type]} params    [description]
      * @return {[type]}           [description]
      */
-    completeHandler: function(parameter, object, params) {
+    completeHandler(parameter, object, params) {
         //if(parameter.pptAudio) parameter.pptAudio.end(); //声音存在延时问题，马上结束可导制无法听到声音
         for (var item in params) {
             switch (item) {
@@ -562,7 +558,7 @@ PptAnimation.prototype = {
                     break;
             }
         }
-    },
+    }
 
 
     /**
@@ -570,33 +566,33 @@ PptAnimation.prototype = {
      * @param  {[type]} scopeComplete [description]
      * @return {[type]}               [description]
      */
-    runAnimation: function(scopeComplete) {
+    runAnimation(scopeComplete) {
         if (this.hasRunning == false) return;
         if (this.isCompleted) this.resetAnimation();
         this.animation = this._initAnimation(this.startEvent, scopeComplete || this.completeEvent);
         this.animation.play();
-    },
+    }
 
 
     /**
      * 停止动画
      * @return {[type]} [description]
      */
-    stopAnimation: function() {
+    stopAnimation() {
         if (this.animation instanceof TimelineLite) {
             this.animation.stop();
             this.animation.kill();
             this.animation.clear();
         }
         this.animation = null;
-    },
+    }
 
 
     /**
      * 复位动画
      * @return {[type]} [description]
      */
-    resetAnimation: function() {
+    resetAnimation() {
         this.stopAnimation();
         if (this.elementStyle && this.elementStyle.length > 0) {
             var origin = this.element.css("-webkit-transform-origin");
@@ -609,28 +605,22 @@ PptAnimation.prototype = {
         }
         if (this.hasRunning == false) this._unlockHandler();
         this.isCompleted = false;
-    },
+    }
 
 
     /**
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroyAnimation: function() {
+    destroyAnimation() {
         this.stopAnimation();
         this.container = null;
         this.options = null;
         this.element = null;
     }
 
-
 }
 
 
 //动画扩展
-extension(PptAnimation.prototype)
-
-
-export {
-    PptAnimation
-}
+internal(PPT.prototype)

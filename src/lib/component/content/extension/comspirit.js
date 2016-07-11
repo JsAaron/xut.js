@@ -127,7 +127,6 @@ function css3Animate(options) {
                 var period = currCol * col; //每段数量  
                 x = 100 * (i - period)
                 var y = 100 * currCol;
- 
                 x = x == 0 ? x : "-" + x;
                 y = y == 0 ? y : "-" + y;
                 frames.push(((i + 1) * base) + '% { background-position: ' + x + '% ' + y + '%}')
@@ -287,7 +286,7 @@ function keyframes(options) {
  * 3 canvas动画
  * @param {[type]} options [description]
  */
-export function Sprite(options) {
+export function ComSpirit(options) {
     var mode = options.mode || 'css';
     switch (mode) {
         case 'css':

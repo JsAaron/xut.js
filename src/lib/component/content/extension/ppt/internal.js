@@ -8,7 +8,7 @@ import {
 } from './util'
 
 
-export function extension(animproto) {
+export function internal(animproto) {
 
     //文字动画
     animproto.getTextAnimation = function (parameter, object, duration, delay, repeat) {
@@ -65,7 +65,7 @@ export function extension(animproto) {
         }
         return t1;
     }
- 
+
     //出现/消失
     animproto.getEffectAppear = function (parameter, object, isExit, duration, delay, repeat) {
         var t1 = new TimelineMax({

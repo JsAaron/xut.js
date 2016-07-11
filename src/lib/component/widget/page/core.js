@@ -11,7 +11,7 @@
 
 import { loader } from './loader'
 import { createData } from './data'
-import { SpiritAni } from '../domSeniorSprite/index'
+import { SpiritAni } from '../seniorsprite/index'
 
 /**
  * 解析数据,获取content对象

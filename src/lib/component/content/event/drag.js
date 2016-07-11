@@ -3,7 +3,6 @@
  * 拖拽
  */
 function DragDropClass(dragElement, dropElement, autoReturn, dragCallback, dropCallback, container, throwProps) {
-  
     this.dragElement = dragElement;
     this.defaultPoint = null;
     this.dropElement = dropElement;
@@ -23,7 +22,7 @@ function DragDropClass(dragElement, dropElement, autoReturn, dragCallback, dropC
         console.log("This element has binding DragDropClass.");
     }
 }
-  
+
 DragDropClass.prototype = {
     //复位动画与状态
     reset: function () {

@@ -7,10 +7,10 @@
  *      行为动画绑定类     Content
  *
  * ***************************************************/
-import {parseJSON, arrayUnique}from '../../../util/index'
-import {parserRelated as conParser}from './data'
-import {structure as conStructure}from './structure/index'
-import {activityClass}from '../../../component/content/activity'
+import { parseJSON, arrayUnique } from '../../../util/index'
+import { parserRelated as conParser } from './data'
+import { structure as conStructure } from './structure/index'
+import { Activity as ActivityClass } from '../../../component/content/activity'
 
 
 /**
@@ -23,7 +23,7 @@ function onlyParseContents(data) {
         preCompileContent = [];
 
     //需要创建的数据结构
-    _.each(data.activitys, function (activityData) {
+    _.each(data.activitys, function(activityData) {
         actType = activityData.actType || activityData.animation;
         //特殊类型 showNote
         if (!actType && activityData.note) {
@@ -44,7 +44,7 @@ function onlyParseContents(data) {
         // 2 通过Parallax 表产生
         function compileContent() {
             preCompileContent.push({
-                postprocessor: function (rootEle, pid) {
+                postprocessor: function(rootEle, pid) {
                     activityData['nodes'] = data['nodes'];
                     activityData['pageOffset'] = data['pageOffset'];
                     return activityData;
@@ -61,16 +61,14 @@ function TaskContents(activityData) {
     activityData = _.extend(this, activityData);
     //只解析content有关的activityData
     var compileActivitys = onlyParseContents(activityData)
-    //如果有预执行动作
-    //Activity表数据存在
+        //如果有预执行动作
+        //Activity表数据存在
     if (compileActivitys) {
         //解析动画表数据结构
         activityData = conParser(compileActivitys, activityData);
         //如果有需要构建的content
         //开始多线程处理
-        activityData.createContentIds.length
-            ? this.dataAfterCheck(activityData)
-            : this.loadComplete();
+        activityData.createContentIds.length ? this.dataAfterCheck(activityData) : this.loadComplete();
     } else {
         this.loadComplete();
     }
@@ -82,20 +80,20 @@ var taskProto = TaskContents.prototype;
 /**
  * 任务断言
  */
-taskProto.assert = function (taskName, tasks) {
+taskProto.assert = function(taskName, tasks) {
 
     var self = this;
 
     //中断方法
-    var suspendTasks = function () {
+    var suspendTasks = function() {
         self.suspendQueues = [];
-        self.suspendQueues.push(function () {
+        self.suspendQueues.push(function() {
             tasks.call(self);
         })
     }
 
     //完成方法
-    var nextTasks = function () {
+    var nextTasks = function() {
         tasks.call(self);
     }
 
@@ -107,7 +105,7 @@ taskProto.assert = function (taskName, tasks) {
  * 运行被阻断的线程任务
  * @return {[type]} [description]
  */
-taskProto.runSuspendTasks = function () {
+taskProto.runSuspendTasks = function() {
     if (this.suspendQueues) {
         var fn;
         if (fn = this.suspendQueues.pop()) {
@@ -121,7 +119,7 @@ taskProto.runSuspendTasks = function () {
  * 构建完毕
  * @return {[type]} [description]
  */
-taskProto.loadComplete = function () {
+taskProto.loadComplete = function() {
     this.pageBaseHooks.success();
 }
 
@@ -142,7 +140,7 @@ function createFn(obj, id, callback) {
  */
 function toArray(o) {
     var contentsFragment = [];
-    _.each(o, function (contentElements) {
+    _.each(o, function(contentElements) {
         contentsFragment.push(contentElements)
     })
     return contentsFragment;
@@ -155,7 +153,7 @@ function toArray(o) {
  */
 function toObject(cachedContentStr) {
     var tempFragmentHash = {};
-    _.each($(cachedContentStr), function (ele, index) {
+    _.each($(cachedContentStr), function(ele, index) {
         tempFragmentHash[ele.id] = ele;
     })
     return tempFragmentHash;
@@ -172,13 +170,13 @@ function toObject(cachedContentStr) {
 function addBehavior(data) {
     var parameter, soundSrc, contentId, isButton,
         feedbackBehavior = data.feedbackBehavior = {};
-    _.each(data.activitys, function (activitys) {
+    _.each(data.activitys, function(activitys) {
         if (activitys.parameter && (parameter = parseJSON(activitys.parameter))) {
             contentId = activitys.imageId;
             //视觉反馈
             if (isButton = parameter['isButton']) {
                 if (isButton != 0) { //过滤数据的字符串类型
-                    createFn(feedbackBehavior, contentId, function () {
+                    createFn(feedbackBehavior, contentId, function() {
                         this['isButton'] = true;
                     })
                 }
@@ -186,7 +184,7 @@ function addBehavior(data) {
             //音频行为
             if (soundSrc = parameter['behaviorSound']) {
                 if (soundSrc != 0) {
-                    createFn(feedbackBehavior, contentId, function () {
+                    createFn(feedbackBehavior, contentId, function() {
                         this['behaviorSound'] = soundSrc;
                     })
                 }
@@ -201,9 +199,9 @@ function addBehavior(data) {
  * @param  {[type]} data [description]
  * @return {[type]}      [description]
  */
-taskProto.dataAfterCheck = function (data) {
+taskProto.dataAfterCheck = function(data) {
 
-    this.assert('dataAfter', function () {
+    this.assert('dataAfter', function() {
 
         //浮动模板
         //用于实现模板上的事件
@@ -227,7 +225,7 @@ taskProto.dataAfterCheck = function (data) {
 
         //构建页面content类型结构
         //contentDas, contentStr, containerPrefix, idFix, contentHtmlBoxIds
-        var createStr = function (userData) {
+        var createStr = function(userData) {
 
             data.contentHtmlBoxIds = userData.contentHtmlBoxIds;
             data.contentsFragment = {};
@@ -236,7 +234,7 @@ taskProto.dataAfterCheck = function (data) {
             //在执行的时候节点已经存在
             //不需要在创建
             if (Xut.IBooks.runMode()) {
-                _.each(userData.idFix, function (id) {
+                _.each(userData.idFix, function(id) {
                     data.contentsFragment[id] = data.element.find("#" + id)[0]
                 })
             } else {
@@ -251,12 +249,12 @@ taskProto.dataAfterCheck = function (data) {
 
             /* eslint-disable */
             //2015.5.6暴露到全局
-            //提供给音频字幕上下文                
+            //提供给音频字幕上下文
             if (!Xut.Contents.contentsFragment[data.chapterId]) {
                 Xut.Contents.contentsFragment[data.chapterId];
             }
             Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment
-            /* elist-enable */
+                /* elist-enable */
 
             //开始下一个任务
             this.dataStrCheck(data, userData.contentDas);
@@ -275,8 +273,8 @@ taskProto.dataAfterCheck = function (data) {
  * @param  {[type]} contentDas [description]
  * @return {[type]}            [description]
  */
-taskProto.dataStrCheck = function (data, contentDas) {
-    this.assert('strAfter', function () {
+taskProto.dataStrCheck = function(data, contentDas) {
+    this.assert('strAfter', function() {
 
         var self = this
 
@@ -291,7 +289,7 @@ taskProto.dataStrCheck = function (data, contentDas) {
         //3 视觉差
         //4 动画音频
         //5 canvas动画
-        var cb = function (delayHooks) {
+        var cb = function(delayHooks) {
             //渲染页面
             self.eventAfterCheck(data, delayHooks);
         }
@@ -320,7 +318,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
     data.count++;
 
     //分离出浮动节点
-    _.each(dasFloat.ids, function (id) {
+    _.each(dasFloat.ids, function(id) {
         makePrefix = prefix + id;
         if (fragment = data.contentsFragment[makePrefix]) {
             zIndex = zIndexs[id];
@@ -347,7 +345,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
     //在非视区增加overflow:hidden
     //可视区域overflow:''
     var overflow = 'overflow:hidden;'
-    //如果是母板,排除
+        //如果是母板,排除
     if (floatName === 'floatMaters') {
         overflow = ''
     }
@@ -372,14 +370,14 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
  */
 function createFloatMater(base, data, complete) {
     //创建浮动对象
-    crateFloat(function (elements, container) {
+    crateFloat(function(elements, container) {
         //浮动容器
         data.floatMaters.container = container;
 
         Xut.nextTick({
             'container': container,
             'content': elements
-        }, function () {
+        }, function() {
             //收集浮动母版对象标识
             base.pageBaseHooks.collector.floatMaters(data.floatMaters);
             complete(data);
@@ -393,13 +391,13 @@ function createFloatMater(base, data, complete) {
  */
 function createFloatPage(base, data, complete) {
     //创建浮动对象
-    crateFloat(function (elements, container) {
+    crateFloat(function(elements, container) {
         //浮动容器
         data.floatPages.container = container;
         Xut.nextTick({
             'container': container,
             'content': elements
-        }, function () {
+        }, function() {
             //收集浮动母版对象标识
             base.pageBaseHooks.collector.floatPages(data.floatPages);
             complete(data);
@@ -413,11 +411,11 @@ function createFloatPage(base, data, complete) {
  * @param  {[type]} iScrollHooks [description]
  * @return {[type]}              [description]
  */
-taskProto.eventAfterCheck = function (data, delayHooks) {
+taskProto.eventAfterCheck = function(data, delayHooks) {
 
     var self = this;
 
-    this.assert('eventAfter', function () {
+    this.assert('eventAfter', function() {
 
         data.count = 1; //计算回调的成功的次数
 
@@ -427,16 +425,16 @@ taskProto.eventAfterCheck = function (data, delayHooks) {
          * 2 canvas事件绑定
          * @return {[type]} [description]
          */
-        var completeHooks = function () {
+        var completeHooks = function() {
             var hooks;
-            _.each(delayHooks, function (fns) {
+            _.each(delayHooks, function(fns) {
                 while (hooks = fns.shift()) {
                     hooks();
                 }
             })
         }
 
-        var nextTask = function () {
+        var nextTask = function() {
             completeHooks();
             self.applyAfterCheck();
         }
@@ -446,15 +444,15 @@ taskProto.eventAfterCheck = function (data, delayHooks) {
          * 2 母版浮动
          * 3 正常对象
          */
-        var complete = function (data) {
-            return function () {
+        var complete = function(data) {
+            return function() {
                 if (data.count === 1) {
                     nextTask()
                     return
                 }
                 data.count--;
             }
-        } (data);
+        }(data);
 
 
         //浮动页面对
@@ -491,8 +489,8 @@ taskProto.eventAfterCheck = function (data, delayHooks) {
  * 中断四：渲染content
  * @return {[type]} [description]
  */
-taskProto.applyAfterCheck = function () {
-    this.assert('applyAfter', function () {
+taskProto.applyAfterCheck = function() {
+    this.assert('applyAfter', function() {
         //构建页面节点
         // Xut.log('debug', '第' + (self.pid + 1) + '页面content相关的节点与事件全部构建完毕................')
         this.loadComplete(true);
@@ -504,7 +502,7 @@ taskProto.applyAfterCheck = function () {
  * 清理引用
  * @return {[type]} [description]
  */
-taskProto.clearReference = function () {
+taskProto.clearReference = function() {
     //删除字幕用的碎片文档
     if (Xut.Contents.contentsFragment[this.chapterId]) {
         delete Xut.Contents.contentsFragment[this.chapterId]
@@ -544,8 +542,8 @@ function bindActivitys(callback, data, contentDas) {
     //那么在布局的时候想对点不一样
     //如果在浮动区域就取浮动初始值
     //否则就是默认的想对点0
-    var transformOffset = function (ids, initTransformOffset) {
-        return function (id) {
+    var transformOffset = function(ids, initTransformOffset) {
+        return function(id) {
             //匹配是不是属于浮动对象
             if (ids.length && ids[id]) {
                 //初始化容器布局的坐标
@@ -553,7 +551,7 @@ function bindActivitys(callback, data, contentDas) {
             }
             return 0
         }
-    } (data.floatMaters.ids, data.initTransformParameter[2]);
+    }(data.floatMaters.ids, data.initTransformParameter[2]);
 
 
     //相关回调
@@ -586,7 +584,7 @@ function bindActivitys(callback, data, contentDas) {
      * 继续下一个任务
      * @return {[type]} [description]
      */
-    var nextTask = function () {
+    var nextTask = function() {
         //多事件合集处理pagebase
         if (eventRelated) {
             pageBaseHooks.eventBinding && pageBaseHooks.eventBinding(eventRelated)
@@ -601,8 +599,8 @@ function bindActivitys(callback, data, contentDas) {
      * 生成activty控制对象
      * @type {[type]}
      */
-    var makeActivitys = function (compiler) {
-        return function (callback) {
+    var makeActivitys = function(compiler) {
+        return function(callback) {
             var filters;
             var imageId = compiler['imageIds']; //父id
             var activity = compiler['activity'];
@@ -618,7 +616,7 @@ function bindActivitys(callback, data, contentDas) {
              * @type {[type]}
              */
             if (filters = eventRelated['eventContentId->' + imageId]) {
-                _.each(filters, function (edata) {
+                _.each(filters, function(edata) {
                     //id不需要
                     //eventContentId = void 0;
                     if (edata.eventType == activity.eventType) {
@@ -655,7 +653,7 @@ function bindActivitys(callback, data, contentDas) {
 
             //注册引用
             pageBaseHooks.registerAbstractActivity(
-                new activityClass(actdata)
+                new ActivityClass(actdata)
             );
         }
     }
@@ -667,13 +665,13 @@ function bindActivitys(callback, data, contentDas) {
     }
 
     // 递归解析 activitys
-    var recursiveParse = function () {
+    var recursiveParse = function() {
         if (!fnsActivity.length) {
             nextTask()
             return
         }
         var first = fnsActivity.shift()
-        first(function () {
+        first(function() {
             recursiveParse()
         })
     }
@@ -685,5 +683,5 @@ function bindActivitys(callback, data, contentDas) {
 
 
 export {
-TaskContents
+    TaskContents
 }

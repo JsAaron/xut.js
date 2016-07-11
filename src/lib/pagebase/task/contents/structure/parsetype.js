@@ -127,7 +127,6 @@ export function parseCanvas(contentId, category, conData, data) {
 	//类型转化
 	//双数据类型转行单个类型
 	if (Xut.config.onlyDomMode) {
-
 		if (category) {
 			var cat
 			var cats = category.split(",")
@@ -154,6 +153,7 @@ export function parseCanvas(contentId, category, conData, data) {
 		conData: conData,
 		data: data
 	}
+
 
 	//转成canvas标记
 	//如果有pixi的处理类型

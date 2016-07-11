@@ -299,7 +299,7 @@ function bindEvent(eventDrop, data) {
             }
             break;
     }
-    
+
     return [dragObj, eventReference, eventHandler]
 }
 
