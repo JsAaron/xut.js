@@ -3,16 +3,18 @@ import { config } from '../config/index'
 
 export default {
 
-    //==========创建热点元素结构（用于布局可触发点）===============
-    //
-    // 根据数据创建自己的热点元素结构（用于拼接结构字符串）
-    //
-    // 要retrun返回这个结构，主要是多人操作时,保证只有最终的dom渲染只有一次
-    //actType + "_" + _id
+    /**
+     * 创建热点元素结构（用于布局可触发点）
+     * 根据数据创建自己的热点元素结构（用于拼接结构字符串）
+     * 要retrun返回这个结构，主要是多人操作时,保证只有最终的dom渲染只有一次
+     * actType + "_" + _id
+     * @return {[type]}              [description]
+     */
     createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
-            var newWidth, id, width, height, retStr = ""
+            var newWidth, id, width, height, retStr
 
+            retStr = ""
             id = activityData['_id']
             width = activityData.scaleWidth
             height = activityData.scaleHeight

@@ -1,9 +1,20 @@
-import {
-    messageBox as box
-}
-from './notice'
-
 import { request } from './loader'
+import { parseJSON } from './dom'
+import { messageBox as box } from './notice'
+
+/**
+ * 获取资源
+ * @param  {[type]} url [description]
+ * @return {[type]}     [description]
+ */
+export function getResources(url) {
+    var option;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, false);
+    xhr.send(null);
+    option = parseJSON(xhr.responseText);
+    return option;
+}
 
 
 /**

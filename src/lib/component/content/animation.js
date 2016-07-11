@@ -104,9 +104,9 @@ export class Animation {
                 case "Sprite":
                     this.domSprites = true
                     break
-                case "AdvSprite":
+                case "AutoCompSprite":
                     this.advSpiritObj = new AdvSpirit({
-                        element: this.$contentProcess.find('.sprite').show(),
+                        element: this.$contentProcess,
                         data: this.contentDas,
                         id: this.id
                     })

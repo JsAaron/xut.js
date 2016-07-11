@@ -26,6 +26,12 @@ var isIE10 = document.documentMode === 10;
 /**
  * 事件类型
  * @type {Array}
+ * 0 null
+ * 1 auto
+ * 2 tap
+ * 3 drag
+ * 4 dragTag
+ * .........
  */
 var eventName = ['null', 'auto', 'tap', 'drag', 'dragTag',
     'swipeleft', 'swiperight', 'swipeup', 'swipedown', 'doubletap',

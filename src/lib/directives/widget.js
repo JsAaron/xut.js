@@ -6,12 +6,6 @@ export default {
      * 创建热点元素结构（用于布局可触发点
      * 要retrun返回这个结构，主要是多人操作时,保证只有最终的dom渲染只有一次
      * 根据数据创建自己的热点元素结构（用于拼接结构字符串）
-     * @param  {[type]} activityData [description]
-     * @param  {[type]} chpaterData  [description]
-     * @param  {[type]} chapterId    [description]
-     * @param  {[type]} pageIndex    [description]
-     * @param  {[type]} zIndex       [description]
-     * @param  {[type]} pageType     [description]
      * @return {[type]}              [description]
      */
     createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {

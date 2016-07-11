@@ -1,7 +1,6 @@
-
 import { parseJSON } from '../../../../util/index'
 
-let prefix = Xut.plat.prefixStyle;
+const prefix = Xut.plat.prefixStyle;
 
 /**
  * 蒙版动画
@@ -14,9 +13,7 @@ let maskContent = (data, wrapObj) => {
     let restr = ""
 
     //如果有蒙版图
-    let isMaskImg = data.mask
-        ? prefix('mask-box-image') + ":url(" + Xut.config.pathAddress + data.mask + ");"
-        : ""
+    let isMaskImg = data.mask ? prefix('mask-box-image') + ":url(" + Xut.config.pathAddress + data.mask + ");" : ""
 
     //蒙板图
     if (data.mask || wrapObj['isGif']) {
@@ -24,22 +21,24 @@ let maskContent = (data, wrapObj) => {
         //蒙版图
         if (prefix('mask-box-image') != undefined) {
             restr += String.format(
-                '<img'
-                    + ' id="img_{1}"'
-                    + ' class="contentScrollerImg"'
-                    + ' src="{0}"'
-                    + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%;{4}"/>',
+                '<img' +
+                ' id="img_{1}"' +
+                ' class="contentScrollerImg"' +
+                ' src="{0}"' +
+                ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%;{4}"/>',
                 wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg
             );
         } else {
             //canvas
             restr += String.format(
-                ' <canvas src="{0}"'
-                    + ' class="contentScrollerImg edges"'
-                    + ' mask="{5}"' + ' id = "img_{1}"'
-                    + ' width="{2}"' + ' height="{3}"'
-                    + ' style="width:{2}px; height:{3}px;opacity:0; background-size:100% 100%; {4}"'
-                + ' />',
+                ' <canvas src="{0}"' +
+                ' class="contentScrollerImg edges"' +
+                ' mask="{5}"' +
+                ' id = "img_{1}"' +
+                ' width="{2}"' +
+                ' height="{3}"' +
+                ' style="width:{2}px; height:{3}px;opacity:0; background-size:100% 100%; {4}"' +
+                ' />',
                 wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg, Xut.config.pathAddress.replace(/\//g, "\/") + data.mask);
         }
 
@@ -60,21 +59,21 @@ let maskContent = (data, wrapObj) => {
             }
         }
         restr += String.format(
-            '<div'
-                + ' class="sprite"'
-                + ' style="height:{0}px;background-image:url({1});background-size:{2}% {3}%;">'
-            + '</div>',
+            '<div' +
+            ' class="sprite"' +
+            ' style="height:{0}px;background-image:url({1});background-size:{2}% {3}%;">' +
+            '</div>',
             data.scaleHeight, wrapObj['pathImg'], matrixX, matrixY
         );
 
     } else {
         //普通图片
         restr += String.format(
-            '<img'
-                + ' src="{0}"'
-                + ' class="contentScrollerImg"'
-                + ' id="img_{1}"'
-                + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%; {4}"/>',
+            '<img' +
+            ' src="{0}"' +
+            ' class="contentScrollerImg"' +
+            ' id="img_{1}"' +
+            ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%; {4}"/>',
             wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg
         );
     }
@@ -90,9 +89,9 @@ let maskContent = (data, wrapObj) => {
  */
 let textContent = (data) => {
     return String.format(
-        '<div'
-        + ' id = "{0}"'
-        + ' style="background-size:100% 100%;height:auto">{1}</div>',
+        '<div' +
+        ' id = "{0}"' +
+        ' style="background-size:100% 100%;height:auto">{1}</div>',
         data['_id'], data.content
     )
 }
@@ -198,11 +197,10 @@ let createWapper = (data, wrapObj) => {
     //如果是html内容
     if (wrapObj.isJs) {
         //正常content类型
-        wapper = '<div id="{0}"'
-                    + ' data-behavior="click-swipe"'
-                    + ' style="overflow:hidden;width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};visibility:{6};background-size:100% 100%;{10}">'
-                    + ' <div id="{7}" style="width:{8}px;position:absolute;">';
-
+        wapper = '<div id="{0}"' +
+            ' data-behavior="click-swipe"' +
+            ' style="overflow:hidden;width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};visibility:{6};background-size:100% 100%;{10}">' +
+            ' <div id="{7}" style="width:{8}px;position:absolute;">';
         return String.format(wapper,
             containerName, backwidth, backheight, backtop, backleft, zIndex, visibility,
             makeId('contentWrapper'), backwidth, backheight, background
@@ -210,11 +208,10 @@ let createWapper = (data, wrapObj) => {
     }
 
     //正常content类型
-    wapper = '<div id="{0}"'
-                + ' data-behavior="click-swipe"'
-                + ' style="overflow:hidden;width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};visibility:{6};">'
-                + ' <div id="{7}" style="width:{8}px;height:{9}px;{10}position:absolute;background-size:100% 100%;">';
-
+    wapper = '<div id="{0}"' +
+        ' data-behavior="click-swipe"' +
+        ' style="overflow:hidden;width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};visibility:{6};">' +
+        ' <div id="{7}" style="width:{8}px;height:{9}px;{10}position:absolute;background-size:100% 100%;">';
 
     return String.format(wapper,
         containerName, backwidth, backheight, backtop, backleft, zIndex, visibility,

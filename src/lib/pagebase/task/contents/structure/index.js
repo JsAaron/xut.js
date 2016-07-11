@@ -7,8 +7,7 @@
  * @return {[type]} [description]
  */
 
-import { parseJSON, reviseSize, readFile } from '../../../../util/index'
-
+import { parseJSON, reviseSize, readFile, getResources } from '../../../../util/index'
 import { parseCanvas } from './parsetype'
 import { createContainer } from './container'
 import { createDom } from './dom'
@@ -54,19 +53,31 @@ let makeWarpObj = (contentId, content, pageType, pid, virtualOffset) => {
  * @return {[type]}         [description]
  */
 let analysisPath = (wrapObj, conData) => {
-    var pathImg,
-        imgContent = conData.md5,
-        //是gif格式
-        isGif = /.gif$/i.test(imgContent),
-        //原始地址
-        originalPathImg = Xut.config.pathAddress + imgContent;
+    var pathImg, imgContent, isGif, originalPathImg, resourcePath, results, name
+
+    imgContent = conData.md5
+    isGif = /.gif$/i.test(imgContent) //是gif格式
+    originalPathImg = Xut.config.pathAddress + imgContent //原始地址
 
     if (isGif) {
-        //处理gif图片缓存+随机数
-        pathImg = Xut.createRandomImg(originalPathImg)
+        pathImg = Xut.createRandomImg(originalPathImg) //处理gif图片缓存+随机数
     } else {
-        pathImg = originalPathImg;
+        pathImg = originalPathImg
     }
+
+    if (conData.category === "AutoCompSprite") {
+        try {
+            resourcePath = "content/gallery/" + imgContent + "/app.json";
+            results = getResources(resourcePath)
+            name = results.spiritList[0].params.a1.ImageList[0].name
+            pathImg += '/' + name
+            conData.resource = results
+            conData.containerName = wrapObj.containerName
+        } catch (err) {
+            console.log('AutoCompSprite获取数据失败')
+        }
+    }
+
     wrapObj['imgContent'] = imgContent;
     wrapObj['isGif'] = isGif;
     wrapObj['pathImg'] = pathImg;
@@ -339,12 +350,9 @@ export function structure(callback, data, context) {
      * @return {[type]}         [description]
      */
     function createRelated(contentId, wrapObj) {
-        //解析外部文件
         externalFile(wrapObj, function(wrapObj) {
-            var uuid,
-                startStr,
-                contentStr,
-                conData = wrapObj.data;
+            var uuid, startStr, contentStr, conData
+            conData = wrapObj.data
 
             //拼接地址
             analysisPath(wrapObj, conData)
@@ -385,10 +393,9 @@ export function structure(callback, data, context) {
                 }
                 //针对容器处理
             if (containerObj) {
-                var start,
-                    end,
-                    containerPrefix,
-                    containerStr = [];
+                var start, end, containerPrefix, containerStr
+                containerStr = []
+
                 //合并容器
                 containerObj.createUUID.forEach(function(uuid) {
                     start = containerObj[uuid].start.join('');
@@ -404,6 +411,7 @@ export function structure(callback, data, context) {
             } else {
                 data.contentStr = cachedContentStr.join('')
             }
+
             callback.call(context, data)
         }
         cloneContentCount--;
