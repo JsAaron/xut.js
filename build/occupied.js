@@ -2,14 +2,16 @@ const net = require('net')
 const cp = require('child_process');
 
 module.exports = (port, callback) => {
-    var server = net.createServer().listen(port)
+    var server, killPort
+
+    server = net.createServer().listen(port)
     server.on('listening', () => {
         server.close()
         console.log('The port【' + port + '】 is available.')
         callback()
     })
 
-    var killPort = (pid) => {
+    killPort = (pid) => {
         cp.exec('kill -9 ' + pid, (e, stdout, stderr) => {
             if (e) {
                 console.log('Command kill -9 ' + pid + ' fails')

@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node build/dev/server.js",
-    "build": "node build/build/build.js run",
+    "build": "node build/build/index.js run",
     "remote": "node build/remote/debug.js",
     "lint": "eslint dist/xxtppt.dev.js",
     "unit": "karma start test/unit/karma.conf.js",

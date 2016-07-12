@@ -12,7 +12,7 @@ const cp = require('child_process');
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
-const portoccupied = require('../portoccupied')
+const portoccupied = require('../occupied')
 const spinner = ora('Begin to pack , Please wait for\n')
 
 let app = express()

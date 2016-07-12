@@ -73,21 +73,33 @@ module.exports = {
         })
     },
 
-    /**
-     * 远程调试
-     * remoteRemote
-     */
-    remote: {},
 
     /**
      * 发布配置
      */
     build: {
+
+        conf: _.extend(common),
+
         /**
          * 启动web服务测试
          * @type {Boolean}
          */
         server: true,
-        conf: _.extend(common)
-    }
+
+        /**
+         * index中排除的文件
+         * @type {Array}
+         * Parameter is an array format
+         */
+        exclude: ['SQLResult.js']
+
+    },
+
+
+    /**
+     * 远程调试
+     * remoteRemote
+     */
+    remote: {},
 }
