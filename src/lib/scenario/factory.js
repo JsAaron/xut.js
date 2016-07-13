@@ -1,9 +1,7 @@
-//布局
+import nextTick from '../core/tick'
 import { home, scene } from './layout'
 import { parseJSON } from '../util/index'
-//场景控制器
 import { controll as sceneControll } from './controller'
-//工具栏
 import { sToolbar as MainBar } from '../toolbar/sysbar'
 import { fToolbar as DeputyBar } from '../toolbar/fnbar'
 import { Bar as BookToolBar } from '../toolbar/bookbar'
@@ -177,7 +175,7 @@ export class SceneFactory {
 
         //创建场景容器
         elements = this.elements = $(str);
-        Xut.nextTick({
+        nextTick({
             'container': self.container,
             'content': elements
         }, function() {

@@ -7,7 +7,8 @@
  *      3 创建失败
  */
 import directives from '../../directives/index'
-import {reviseSize} from '../../util/option'
+import { reviseSize } from '../../util/option'
+import nextTick from '../../core/tick'
 
 
 function TaskComponents(data, suspendCallback, successCallback) {
@@ -41,13 +42,13 @@ TaskComponents.prototype = {
 
     create: function(data) {
         var actType,
-            pageType      = data.pageType,
+            pageType = data.pageType,
             createWidgets = data.activitys,
-            chpaterData   = data.chpaterData,
-            chapterId     = data.chapterId,
-            pid           = data.pid,
+            chpaterData = data.chpaterData,
+            chapterId = data.chapterId,
+            pid = data.pid,
             virtualOffset = data.virtualOffset,
-            widgetRetStr  = [];
+            widgetRetStr = [];
 
 
         function virtualCreate(actType, activityData) {
@@ -121,7 +122,7 @@ TaskComponents.prototype = {
 
         //继续执行
         nextTasks = function() {
-            Xut.nextTick({
+            nextTick({
                 container: self.rootNode,
                 content: $(str)
             }, function() {

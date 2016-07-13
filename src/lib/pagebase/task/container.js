@@ -6,8 +6,9 @@
  *     	2 创建完毕
  *      3 创建失败
  */
+import nextTick from '../../core/tick'
 
-var prefixStyle = Xut.plat.prefixStyle;
+const prefixStyle = Xut.plat.prefixStyle;
 
 /**
  * 创建父容器li结构
@@ -101,7 +102,7 @@ export function TaskContainer(data, successCallback) {
         pseudoElement = $element.find('div');
     }
 
-    Xut.nextTick({
+    nextTick({
         container: data.rootNode,
         content: $element,
         position: direction

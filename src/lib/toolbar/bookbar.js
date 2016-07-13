@@ -1,6 +1,7 @@
 import { BookMark } from './bookmark'
 import { ToolBar } from './base/toolBar'
 import { parseJSON } from '../util/index'
+import { on } from '../core/event'
 
 /**
  * 阅读模式工具栏
@@ -55,7 +56,7 @@ Bar.prototype.initTool = function () {
     //监听事件
     var ele = this.container[0];
 
-    Xut.plat.execEvent('on', {
+    on('on', {
         context: ele,
         callback: {
             end: this

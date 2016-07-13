@@ -8,7 +8,7 @@
  */
 
 import { suspendHandles, promptMessage } from '../../global-stop'
-
+import nextTick from '../../core/tick'
 
 export class ActionClass {
 
@@ -78,7 +78,7 @@ export class ActionClass {
         //构建子文档的容器
         wapper = this.$wapper = this.createWapper();
 
-        Xut.nextTick({
+        nextTick({
             'container': $(this.rootNode),
             'content': wapper
         }, function() {

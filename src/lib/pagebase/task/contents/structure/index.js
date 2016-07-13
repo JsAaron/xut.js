@@ -69,7 +69,10 @@ let analysisPath = (wrapObj, conData) => {
         try {
             resourcePath = "content/gallery/" + imgContent + "/app.json";
             results = getResources(resourcePath)
-            name = results.spiritList[0].params.a1.ImageList[0].name
+            var spiritList = results.spiritList[0]
+            var actListName = spiritList.params.actList
+            name = spiritList.params[actListName].ImageList[0].name
+
             pathImg += '/' + name
             conData.resource = results
             conData.containerName = wrapObj.containerName

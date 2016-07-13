@@ -1,13 +1,7 @@
-import {
-    svgIcon
-}
-from './svgicon'
-import {
-    iconConfig
-}from './iconconfig'
+import { svgIcon } from './svgicon'
+import { iconConfig } from './iconconfig'
 
-
-let isIOS = Xut.plat.isIOS
+const isIOS = Xut.plat.isIOS
 
 //获取翻页按钮位置
 var arrowStyle = function() {

@@ -1,6 +1,3 @@
-
-import {DragDropClass} from './drag'
-
 /**
  * ppt事件接口
  *
@@ -15,12 +12,9 @@ import {DragDropClass} from './drag'
  * 此接口函数有作用域隔离
  */
 
-
-/**
- * ie10下面mouse事件怪异
- * @return {Boolean} [description]
- */
-var isIE10 = document.documentMode === 10;
+import { DragDropClass } from './drag'
+import { simpleEvent } from './simple'
+import { complexEvent } from './complex'
 
 
 /**
@@ -38,18 +32,17 @@ var eventName = ['null', 'auto', 'tap', 'drag', 'dragTag',
     'press', 'pinchout', 'pinchin', 'rotate', 'assist'
 ]
 
-/*********************************************************************
- *                重写默认事件
- *
- *                Content对象默认具有左右翻页的特性
- *                根据过滤来选择是否覆盖重写这个特性
- *                比如 用户如果遇到 swipeLeft，swipeRight 这种本身与翻页行为冲突的
- *                将要覆盖这个行为
- *                                                         *
- **********************************************************************/
 
-//过滤事件
-//如果用户指定了如下操作行为,将覆盖默认的翻页行为
+/**
+ * 重写默认事件
+ *
+ * Content对象默认具有左右翻页的特性
+ * 根据过滤来选择是否覆盖重写这个特性
+ * 比如 用户如果遇到 swipeLeft，swipeRight 这种本身与翻页行为冲突的
+ * 将要覆盖这个行为
+ * 过滤事件
+ * 如果用户指定了如下操作行为,将覆盖默认的翻页行为
+ **/
 var filterEvent = ['drag', 'dragTag', 'swipeleft', 'swiperight', 'swipeup', 'swipedown'];
 
 
@@ -71,7 +64,7 @@ function isfilter(eventName) {
  * @param  {[type]} evtName [事件名]
  * @return {[type]}         [description]
  */
-function checkDefaultBehavior(supportSwipe, element) {
+function setDefaultBehavior(supportSwipe, element) {
     if (supportSwipe) {
         //静态事件，默认可以翻页，还可以切换工具栏
         element.attr('data-behavior', 'swipe');
@@ -100,188 +93,17 @@ function addCursor(eventName, $element) {
 
 
 /**
- * 针对canvas模式
- * 特殊的hack
+ *  绑定事件
+ * @param  {[type]} eventDrop [description]
+ * @param  {[type]} data      [description]
+ * @return {[type]}           [description]
  */
-function setCanvasStart(supportSwipe) {
-    Xut.Contents.Canvas.Reset()
-    //当前点击的元素是滑动元素
-    //处理元素的全局事件
-    Xut.Contents.Canvas.SupportSwipe = supportSwipe;
-    Xut.Contents.Canvas.isTap = true;
-}
-
-function setCanvasMove() {
-    Xut.Contents.Canvas.isSwipe = true;
-}
-
-
-/**
- * 兼容事件对象
- * @return {[type]}   [description]
- */
-function compatibilityEvent(e) {
-    var point;
-    if (e.touches && e.touches[0]) {
-        point = e.touches[0];
-    } else {
-        point = e;
-    }
-    return point
-}
-
-
-/**
- * 如果是简单的点击事件
- */
-function tapEvent(eventContext, eventHandle, supportSwipe) {
-
-    eventContext.isTap = false;
-
-    //这里单独绑定事件有个问题,单击move被触发
-    //如果停止e.stopPropagation，那么默认行为就不会被触发
-    //你绑定单击的情况下可以翻页
-    //这里通过坐标的位置来判断
-    var start = function (e) {
-        var point = compatibilityEvent(e);
-        //记录开始坐标
-        eventContext.pageX = point.pageX;
-        //是否是tap事件
-        eventContext.isTap = true;
-        setCanvasStart(supportSwipe);
-    }
-
-    var move = function (e) {
-        if (!eventContext.isTap) {
-            return
-        }
-        var point = compatibilityEvent(e),
-            deltaX = point.pageX - eventContext.pageX;
-        //如果有move事件，则取消tap事件
-        if (Math.abs(deltaX)) {
-            eventContext.isTap = false;
-            setCanvasMove(supportSwipe);
-        }
-    }
-
-    var end = function () {
-        //触发tap事件
-        eventContext.isTap && eventHandle();
-    }
-
-
-    eventContext = eventContext[0];
-    //IE10是不支持touch事件，直接绑定click事件
-    if (isIE10) {
-        eventContext.isTap = true;
-        eventContext.addEventListener('click', end, false);
-    } else {
-        Xut.plat.execEvent('on', {
-            context: eventContext,
-            callback: {
-                start: start,
-                move: move,
-                end: end
-            }
-        })
-    }
-
-
-    //销毁接口
-    return {
-        off: function () {
-            if (eventContext) {
-                if (isIE10) {
-                    eventContext.removeEventListener('click', end, false);
-                } else {
-                    Xut.plat.execEvent('off', {
-                        context: eventContext,
-                        callback: {
-                            start: start,
-                            move: move,
-                            end: end
-                        }
-                    })
-                }
-                eventContext = null;
-            }
-        }
-    }
-}
-
-
-/**
- * 优化hammer创建,生成必要配置文件
- * @return {[type]} [description]
- */
-function createRecognizers(eventName) {
-    var recognizers = [];
-    switch (eventName) {
-        //如果是swipe处理
-        case 'swipeleft':
-        case 'swiperight':
-        case 'swipeup':
-        case 'swipedown':
-            var direction = Hammer.DIRECTION_HORIZONTAL;
-            if (eventName === 'swipeup' || eventName === "swipedown") {
-                direction = Hammer.DIRECTION_VERTICAL;
-            }
-            recognizers.push([Hammer.Swipe, { 'direction': direction, 'velocity': 0.01 }])
-            break;
-        case 'doubletap': //双击
-            recognizers.push([Hammer.Tap])
-            recognizers.push([Hammer.Tap, { event: 'doubletap', taps: 2 },
-                ['tap']
-            ])
-            break
-        case 'press': //长按
-            recognizers.push([Hammer.Press])
-            return
-    }
-    return recognizers;
-}
-
-
-/**
- * 创建hammer引用
- * @return {[type]}         [description]
- */
-function createHammer(eventContext, eventName, supportSwipe) {
-    var eventReference;
-    var context = eventContext[0];
-    var recognizer = createRecognizers(eventName)
-    if (recognizer && recognizer.length) {
-        eventReference = Hammer(context, {
-            'recognizers': recognizer
-        });
-    } else {
-        eventReference = Hammer(context)
-    }
-    return eventReference;
-}
-
-
-/**
- * 复杂的事件
- * @return {[type]} [description]
- */
-function complexEvent(eventContext, eventName, eventHandler, supportSwipe) {
-    var eventReference = createHammer(eventContext, eventName, supportSwipe);
-    eventReference.on(eventName, function () {
-        eventHandler();
-    });
-    return eventReference;
-}
-
-
-/**
- * 绑定事件
- */
-function bindEvent(eventDrop, data) {
+function _bind(eventDrop, data) {
     var dragObj, eventHandler, eventReference, eventContext, eventName, supportSwipe
 
-    eventContext = data.eventContext;
-    eventName = data.eventName;
+    eventContext = data.eventContext
+    eventName = data.eventName
+    supportSwipe = data.supportSwipe
 
     switch (eventName) {
         case 'drag': //拖动
@@ -291,14 +113,15 @@ function bindEvent(eventDrop, data) {
             dragObj = new DragDropClass(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
             break;
         default:
-            supportSwipe = data.supportSwipe
+
             //事件句柄
-            eventHandler = function () {
+            eventHandler = function() {
                 data.eventRun.call(eventContext);
             }
+
             //简单单机
             if (eventName === 'tap') {
-                eventReference = tapEvent(eventContext, eventHandler, supportSwipe)
+                eventReference = simpleEvent(eventContext, eventHandler, supportSwipe)
             } else {
                 //复杂用hammer
                 eventReference = complexEvent(eventContext, eventName, eventHandler, supportSwipe)
@@ -311,23 +134,24 @@ function bindEvent(eventDrop, data) {
 
 
 
-//绑定事件
-// parameter 参数
-// 1：对于自由拖动drag，para参数为0，表示松手后，停留在松手的地方
-//                      para参数为1，表示松手后，返回原来的位置
-//
-// 2: 对于拖拽dragTag， para表示目标对象的target
-function applyEvent(data) {
-
+/**
+ * /匹配事件
+ * parameter 参数
+ * 1：对于自由拖动drag，para参数为0，表示松手后，停留在松手的地方
+ *                      para参数为1，表示松手后，返回原来的位置
+ * 2: 对于拖拽dragTag， para表示目标对象的target
+ */
+function matchEvent(data) {
     //针对软件培训的操作行为下光标状态需求
-    Xut.plat.isBrowser
-        && data.domMode
-        && addCursor(data.eventName, data.eventContext)
+    Xut.plat.isBrowser &&
+        data.domMode &&
+        addCursor(data.eventName, data.eventContext)
 
     //绑定事件
     var eventDrop = data.eventDrop
+
     //拖动,引用,回调
-    var eventObj = bindEvent(eventDrop, data)
+    var eventObj = _bind(eventDrop, data)
 
     //拖动,拖拽对象处理
     //动作初始化
@@ -339,10 +163,6 @@ function applyEvent(data) {
     }
 }
 
-
-
-
-//================事件接口====================
 
 /**
  * 注册自定义事件
@@ -360,10 +180,10 @@ export function bindEvents(data) {
     var supportSwipe = data.supportSwipe = isfilter(data.eventName);
     //检测是否移除元素的默认行为,因为元素都具有翻页的特性
     if (data.domMode) {
-        checkDefaultBehavior(supportSwipe, data.eventContext);
+        setDefaultBehavior(supportSwipe, data.eventContext);
     }
     //执行事件绑定
-    applyEvent(data);
+    matchEvent(data);
 }
 
 

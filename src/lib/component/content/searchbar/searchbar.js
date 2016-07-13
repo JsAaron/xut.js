@@ -4,6 +4,7 @@
  *
  */
 
+import { on } from '../../../core/event'
 
 //图标
 var icons = {
@@ -12,7 +13,7 @@ var icons = {
     exit: 'images/icons/exit.svg'
 };
 
-function SearchBar(options) {
+export function SearchBar(options) {
     //父容器
     this.parent = options.parent;
     //提示信息
@@ -35,7 +36,7 @@ SearchBar.prototype.init = function() {
     this.searchBtn = $box.find('.xut-search-btn');
 
     //用户操作事件邦定
-    Xut.plat.execEvent('on', {
+    on('on', {
         context: dom,
         callback: {
             end: this
@@ -204,8 +205,4 @@ SearchBar.prototype.destroy = function() {
     this.searchBtn = null;
     this.input = null;
     this.parent = null;
-}
-
-export {
-    SearchBar
 }

@@ -16,18 +16,20 @@ import { Context } from '../pixi/context'
  * @return {[type]}         [description]
  */
 function preRunAction(data, eventName) {
-    var para,
-        parameter = data.getParameter();
+    var para, state, category, parameter
+    parameter = data.getParameter()
 
     //过滤预生成动画
     if (parameter.length === 1) {
+        category  = data.contentDas.category
         para = parameter[0];
         if (para.animationName === 'EffectAppear'
             && data.domMode  //并且只有dom模式才可以，canvas排除
             && eventName === 'auto'
             && !para.videoId
             && !para.delay
-            && data.contentDas.category !== 'Sprite'
+            && category !== 'Sprite'
+            && category !== 'AutoCompSprite'
             && !para.preCode //动画前脚本
             && !para.postCode //动画后脚本
             && !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
@@ -36,8 +38,7 @@ function preRunAction(data, eventName) {
              *      针对预处理动作,并且没有卷滚的不注册
              *      满足是静态动画
              * **********************************************/
-            //true是显示,false隐藏
-
+            //true是显示,false隐藏å
             var state = data.isRreRun = /"exit":"False"/i.test(para.parameter) === true
                 ? 'visible'
                 : 'hidden';

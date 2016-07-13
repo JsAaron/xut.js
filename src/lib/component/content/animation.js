@@ -11,7 +11,7 @@
 
 import { PPT } from './extension/ppt/index'
 import { ComSpirit } from './extension/comspirit'
-import { AdvSpirit } from './extension/advSpirit'
+import { AdvSpirit } from './extension/advSpirit/index'
 import { Sprite as pixiSpirit } from '../pixi/sprite/index'
 import { specialSprite as pixiSpecial } from '../pixi/special/index'
 import { clearContentAudio } from '../audio/manager'
@@ -110,7 +110,6 @@ export class Animation {
                         data: this.contentDas,
                         id: this.id
                     })
-                    this.advSpiritObj.play()
                     break
             }
             return
@@ -204,7 +203,8 @@ export class Animation {
     run(scopeComplete) {
 
         var element = this.$contentProcess
-            //canvas
+
+        //canvas
         if (element && element.view) {
             element = this.$contentProcess.view
         }
@@ -229,6 +229,7 @@ export class Animation {
         })
 
         //dom精灵动画
+        //Sprite
         if (this.domSprites && element) {
             //存在动画
             if (this.spriteObj) {
@@ -243,7 +244,11 @@ export class Animation {
             });
         }
 
-
+        //普通转高级
+        //AutoCompSprite
+        bind(this.advSpiritObj, (adv) => {
+            console.log(adv)
+        })
     }
 
     /**

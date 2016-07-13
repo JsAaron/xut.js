@@ -4,11 +4,8 @@
  * @return {[type]}       [description]
  */
 
-import {
-    bindEvents
-}
-from '../event/event'
-
+import { bindEvents } from '../event/event'
+import { on, off } from '../../../core/event'
 
 import {
     _set,
@@ -148,7 +145,7 @@ HtmlBox.prototype = {
         });
 
     },
- 
+
     /**
      * 卷滚
      * @param  {[type]} iscrollName [description]
@@ -226,7 +223,7 @@ HtmlBox.prototype = {
             var className = e.target.className;
             process[className] && process[className]();
         }
-        Xut.plat.execEvent('on', {
+        on('on', {
             context: this.eventContext,
             callback: {
                 start: this.start
@@ -236,7 +233,7 @@ HtmlBox.prototype = {
 
     //移除盒子
     removeBox: function() {
-        Xut.plat.execEvent('off', {
+        off('off', {
             context: this.eventContext,
             callback: {
                 start: this.start

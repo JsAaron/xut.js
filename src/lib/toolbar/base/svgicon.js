@@ -9,6 +9,8 @@
  * http://www.codrops.com
  */
 
+import { on } from '../../core/event'
+
 /*** helper functions ***/
 
 // from https://github.com/desandro/classie/blob/master/classie.js
@@ -49,7 +51,7 @@ function isMouseLeaveOrEnter(e, handler) {
 
 /*** svgIcon ***/
 
-function svgIcon(el, config, options) {
+export function svgIcon(el, config, options) {
     this.el = el;
     this.options = extend({}, this.options);
     extend(this.options, options);
@@ -108,7 +110,7 @@ svgIcon.prototype._initEvents = function() {
         this.el.addEventListener('mouseover', toggleFn);
         this.el.addEventListener('mouseout', toggleFn);
     } else {
-        Xut.plat.execEvent('on', {
+        on('on', {
             context: this.el,
             callback: {
                 start: function(e) {
@@ -153,8 +155,3 @@ svgIcon.prototype.toggle = function(motion) {
     }
     this.toggled = !this.toggled;
 };
-
-// add to global namespace
-export {
-    svgIcon
-}

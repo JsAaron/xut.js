@@ -1,5 +1,5 @@
-
-import {nav as navlayout} from '../../scenario/layout'
+import { nav as navlayout } from '../../scenario/layout'
+import nextTick from '../../core/tick'
 
 /**
  * 创建dom
@@ -8,15 +8,15 @@ export function createdom(artControl, callback) {
 
     var pageArray = [];
 
-    Xut.data.query('Chapter', Xut.data.novelId, 'seasonId', function (item) {
+    Xut.data.query('Chapter', Xut.data.novelId, 'seasonId', function(item) {
         pageArray.push(item);
     })
 
-    // //显示下拉菜单
-    Xut.nextTick({
+    //显示下拉菜单
+    nextTick({
         'container': artControl,
         'content': navlayout(pageArray)
-    }, function () {
+    }, function() {
         callback(pageArray)
     });
 

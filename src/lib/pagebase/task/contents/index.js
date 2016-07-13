@@ -7,6 +7,7 @@
  *      行为动画绑定类     Content
  *
  * ***************************************************/
+import nextTick from '../../../core/tick'
 import { parseJSON, arrayUnique } from '../../../util/index'
 import { parserRelated as conParser } from './data'
 import { structure as conStructure } from './structure/index'
@@ -374,7 +375,7 @@ function createFloatMater(base, data, complete) {
         //浮动容器
         data.floatMaters.container = container;
 
-        Xut.nextTick({
+        nextTick({
             'container': container,
             'content': elements
         }, function() {
@@ -394,7 +395,7 @@ function createFloatPage(base, data, complete) {
     crateFloat(function(elements, container) {
         //浮动容器
         data.floatPages.container = container;
-        Xut.nextTick({
+        nextTick({
             'container': container,
             'content': elements
         }, function() {
@@ -476,7 +477,7 @@ taskProto.eventAfterCheck = function(data, delayHooks) {
             complete();
         } else {
             //正常对象
-            Xut.nextTick({
+            nextTick({
                 'container': data.element,
                 'content': toArray(data.contentsFragment)
             }, complete);

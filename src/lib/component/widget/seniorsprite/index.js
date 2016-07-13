@@ -57,6 +57,7 @@ let getId = (inputPara, contentPrefix) => {
 
 
 export function updateAction(id, params) {
+
     let loop = 1
     let obj
     if (params.playerType == "loop") {

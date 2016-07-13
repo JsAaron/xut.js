@@ -106,6 +106,7 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
     //页面还是母版
     access(pageObj, (pageObj, ContentObjs, ComponentObjs, pageType) => {
 
+
         //如果是母版对象，一次生命周期种只激活一次
         if (pageObj.pageType === 'master') {
             if (pageObj.onceMaster) {

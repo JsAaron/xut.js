@@ -1,5 +1,11 @@
-// 观察
-import { Observer } from '../observer/index'
+import {
+    Observer
+} from '../observer/index'
+import {
+    on,
+    off,
+    handle
+} from '../core/event'
 
 /**
  * 初始化首次范围
@@ -537,14 +543,14 @@ export class GlobalEvent extends Observer {
         //判断双击速度
         //必须要大于350
         let currtTime = (+new Date())
-        if(this.isClickTime){
-            if(currtTime - this.isClickTime < 350){
+        if (this.isClickTime) {
+            if (currtTime - this.isClickTime < 350) {
                 return
             }
         }
         this.isClickTime = currtTime
-    
-        
+
+
 
         let interrupt
         let point = compatibilityEvent(e)
@@ -777,7 +783,6 @@ export class GlobalEvent extends Observer {
 
 
 
-
     scrollToPage(targetIndex, preMode, complete) { //目标页面
 
         //如果还在翻页中
@@ -824,7 +829,7 @@ export class GlobalEvent extends Observer {
      * @return {[type]}   [description]
      */
     handleEvent(e) {
-        Xut.plat.handleEvent({
+        handle({
             start: function(e) {
                 this.onTouchStart(e);
             },
@@ -845,36 +850,25 @@ export class GlobalEvent extends Observer {
      * @return {[type]} [description]
      */
     _bindEvt() {
-        var self = this;
+
+        var callback = {
+            start: this,
+            end: this
+        }
+
         //pageFlip启动，没有滑动处理
         if (this.pageFlip) {
-            Xut.plat.execEvent('on', {
-                context: this.element,
-                callback: {
-                    start: this,
-                    end: this,
-                    transitionend: this
-                }
-            })
+            callback.transitionend = this
         } else if (this.multiplePages) {
-            Xut.plat.execEvent('on', {
-                context: this.element,
-                callback: {
-                    start: this,
-                    move: this,
-                    end: this,
-                    transitionend: this
-                }
-            })
-        } else {
-            Xut.plat.execEvent('on', {
-                context: this.element,
-                callback: {
-                    start: this,
-                    end: this
-                }
-            })
+            callback.move = this
+            callback.transitionend = this
         }
+
+        on('on', {
+            context: this.element,
+            callback: callback
+        })
+
     }
 
     /**
@@ -882,8 +876,7 @@ export class GlobalEvent extends Observer {
      * @return {[type]} [description]
      */
     evtDestroy() {
-        var self = this;
-        Xut.plat.execEvent('off', {
+        off('off', {
             context: this.element,
             callback: {
                 start: this,

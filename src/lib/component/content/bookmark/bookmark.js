@@ -5,6 +5,8 @@
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
 
+import { on } from '../../../core/event'
+
 import {
     _set,
     _get,
@@ -46,7 +48,7 @@ BookMark.prototype.init = function() {
     BOOKCACHE = this.getHistory();
 
     //邦定用户事件
-    Xut.plat.execEvent('on', {
+    on('on', {
         context: dom,
         callback: {
             end: this
@@ -208,7 +210,7 @@ BookMark.prototype.iconManager = function(target) {
     $icon.css({
         'transform': 'scale(1.2)',
         'transition-duration': '500ms'
-    })[0].addEventListener(Xut.plat.TRANSITION_EV, restore.bind(this), false);
+    })[0].addEventListener(Xut.plat.TRANSITION_END, restore.bind(this), false);
 
 }
 
@@ -296,7 +298,7 @@ BookMark.prototype.handleEvent = function(evt) {
     }
 
 }
- 
+
 /**
  * 关闭书签菜单
  * @return {[type]} [description]
@@ -343,7 +345,7 @@ BookMark.prototype.destroy = function() {
 
     //按钮效果
     if (this.bookMarkIcon) {
-        this.bookMarkIcon[0].removeEventListener(events.TRANSITION_EV, this.iconRestore, false);
+        this.bookMarkIcon[0].removeEventListener(events.TRANSITION_END, this.iconRestore, false);
         this.bookMarkIcon = null;
     }
 

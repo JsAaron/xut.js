@@ -1,12 +1,8 @@
+import { readFile } from '../../util/option'
+import nextTick from '../../core/tick'
 
-import {readFile} from '../../util/option'
 
-
-/**
- *	创建背景
- */
-
-var prefix = Xut.plat.prefixStyle;
+const prefix = Xut.plat.prefixStyle;
 
 /**
  * 构建背景类
@@ -40,7 +36,7 @@ function TaskBackground(rootNode, data, suspendCallback, successCallback) {
     }
 
     //背景是否需要SVG解析
-    this.parseMaster(isSVGContent, content, function (svgContents) {
+    this.parseMaster(isSVGContent, content, function(svgContents) {
 
         //构建背景
         var backgroundStr = createMaster(svgContents, data);
@@ -67,7 +63,7 @@ TaskBackground.prototype = {
 
         //继续执行
         nextTasks = function() {
-            Xut.nextTick({
+            nextTick({
                 'container': rootNode,
                 'content': $background
             }, function() {
@@ -119,8 +115,8 @@ TaskBackground.prototype = {
 
 function fixSize(data) {
     //缩放比
-	var proportion   = Xut.config.proportion;
-	data.path        = Xut.config.pathAddress;
+    var proportion = Xut.config.proportion;
+    data.path = Xut.config.pathAddress;
 
     if (data.imageWidth) {
         data.imageWidth = data.imageWidth * proportion.width;
@@ -146,21 +142,21 @@ function fixSize(data) {
  **********************************************************************/
 
 function createMaster(svgContent, data) {
-    var imageLayer, 
-        maskLayer, 
+    var imageLayer,
+        maskLayer,
         restr = '',
         imageLayerData = data["imageLayer"], //图片层
-        imageMaskData  = data["imageMask"], //蒙版层
-        backImageData  = data["backImage"], //真实图片层
-        backMaskData   = data["backMask"], //真实蒙版层
-        masterData     = data["master"], //母板
-        backText       = data['md5'], //背景文字
-        pptMaster      = data['pptMaster']; //母板PPTID
+        imageMaskData = data["imageMask"], //蒙版层
+        backImageData = data["backImage"], //真实图片层
+        backMaskData = data["backMask"], //真实蒙版层
+        masterData = data["master"], //母板
+        backText = data['md5'], //背景文字
+        pptMaster = data['pptMaster']; //母板PPTID
 
 
     //=======================未分层结构===========================
     //
-    //		 只有SVG数据，没有层次数据 ,不是视觉差
+    //       只有SVG数据，没有层次数据 ,不是视觉差
     //
     // ============================================================
     if (backText && !masterData && !pptMaster && !imageLayerData) {
@@ -244,4 +240,4 @@ function createMaster(svgContent, data) {
 
 
 
-export {TaskBackground}
+export { TaskBackground }

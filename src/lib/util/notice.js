@@ -6,6 +6,7 @@
  * @return {[type]}         [description]
  */
 
+import nextTick from '../core/tick'
 
 let msgBox
 let toolTip
@@ -23,14 +24,14 @@ function show(opts) {
         content = opts.content,
         time = opts.time || 3000,
         css = {
-			'font-size'        : fontsize,
-			'background-image' : 'url(images/icons/nodeBig.png)',
-			'z-index'          : 99999,
-			'bottom'           : '1%',
-			'left'             : '5%',
-			'padding'          : '0.2em 0.5em',
-			'color'            : 'white',
-			'position'         : 'absolute'
+            'font-size': fontsize,
+            'background-image': 'url(images/icons/nodeBig.png)',
+            'z-index': 99999,
+            'bottom': '1%',
+            'left': '5%',
+            'padding': '0.2em 0.5em',
+            'color': 'white',
+            'position': 'absolute'
         };
 
     if (!toolTip) {
@@ -41,7 +42,7 @@ function show(opts) {
         toolTip.empty().show();
     }
 
-    Xut.nextTick({
+    nextTick({
         'container': toolTip,
         'content': content
     }, hide);
