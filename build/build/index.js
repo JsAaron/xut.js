@@ -25,7 +25,6 @@ let conf = _.extend(config.build.conf, {
     server: config.build.server
 });
 
-console.log(conf)
 const spinner = ora('Begin to pack , Please wait for\n')
 spinner.start()
 const stop = () => {

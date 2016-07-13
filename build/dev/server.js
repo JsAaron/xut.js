@@ -13,24 +13,18 @@ const cp = require('child_process');
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
 const portoccupied = require('../occupied')
-const spinner = ora('Begin to pack , Please wait for\n')
+const initData = require('./data')
+const spinner = ora('【Begin to pack , Please wait for】\n')
+spinner.start()
 
 let app = express()
 let config = require('../../config')
 let port = process.env.PORT || config.dev.port
 let conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
-});
+})
 
-if (!fs.existsSync("./src/content/xxtebook.db")) {
-    console.log('data not available!')
-    return
-}
-
-spinner.start()
-if (!fs.existsSync("./src/content/SQLResult.js")) {
-    require('../sqlite/index').resolve()
-}
+initData(conf, spinner)
 
 fsextra.removeSync(conf.assetsRoot)
 fsextra.mkdirSync(conf.assetsRoot);
