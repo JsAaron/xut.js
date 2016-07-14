@@ -6,6 +6,7 @@ const concat = require('gulp-concat')
 const ora = require('ora')
 const base = require('../rollup.base.conf.js')
 const config = require('../../config')
+const readsrcipt = require('../script')
 
 let debugDir, args, scriptUrl, conf
 
@@ -18,6 +19,7 @@ if (args[0] == 'test') {
 scriptUrl = []
 conf = _.extend(config.common, {
     rollup: config.common.tarDir + 'rollup.js',
+    exclude: config.build.exclude,
     debugDir: debugDir
 });
 
@@ -63,9 +65,7 @@ gulp.task('mergeall', (cb) => {
  */
 let copy = () => {
     try {
-        //删除多余的rollup.js
         fsextra.removeSync(conf.rollup)
-            //复制目录文件
         fsextra.copySync(conf.tarDir, conf.debugDir)
         console.log("copy file dir to " + conf.debugDir + " success!")
     } catch (err) {
@@ -81,7 +81,6 @@ let copy = () => {
  * @return {[type]}             [description]
  */
 let mergeuglify = (scriptUrl, cb) => {
-    //合成xxtppt.js
     scriptUrl.push(conf.rollup)
     gulp.src(scriptUrl)
         .pipe(concat(conf.distName))
@@ -95,6 +94,10 @@ let mergeuglify = (scriptUrl, cb) => {
 }
 
 
-base(conf).then((paths) => {
-    mergeuglify(paths, copy)
-})
+base(conf)
+    .then(() => {
+        return readsrcipt(conf)
+    })
+    .then((scriptUrl) => {
+        mergeuglify(scriptUrl, copy)
+    })

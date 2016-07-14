@@ -11,15 +11,14 @@ const ora = require('ora')
 const _ = require("underscore");
 
 const base = require('../rollup.base.conf')
-const readsrcipt = require('./script')
+const readsrcipt = require('../script')
 const compilercss = require('./css')
 const startserver = require('./server')
+const config = require('../../config')
 
-
-let config = require('../../config')
 
 const app = express();
-let conf = _.extend(config.build.conf, {
+const conf = _.extend(config.build.conf, {
     rollup: config.build.conf.tarDir + 'rollup.js',
     exclude: config.build.exclude,
     server: config.build.server

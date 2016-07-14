@@ -17,10 +17,11 @@ const initData = require('./data')
 const spinner = ora('【Begin to pack , Please wait for】\n')
 spinner.start()
 
-let app = express()
-let config = require('../../config')
-let port = process.env.PORT || config.dev.port
-let conf = _.extend(config.dev.conf, {
+const app = express()
+const config = require('../../config')
+const port = process.env.PORT || config.dev.port
+
+const conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
 })
 
@@ -29,7 +30,7 @@ initData(conf, spinner)
 fsextra.removeSync(conf.assetsRoot)
 fsextra.mkdirSync(conf.assetsRoot);
 
-let webpackConfig = require('./webpack.dev.conf')
+const webpackConfig = require('./webpack.dev.conf')
 
 /**
  * eslint
@@ -50,9 +51,9 @@ if (config.dev.eslint.launch) {
     }
 }
 
-let compiler = webpack(webpackConfig)
+const compiler = webpack(webpackConfig)
 
-let devMiddleware = webpackDevMiddleware(compiler, {
+const devMiddleware = webpackDevMiddleware(compiler, {
     //The path where to bind the middleware to the server.
     //In most cases this equals the webpack configuration option output.publicPath
     publicPath: webpackConfig.output.publicPath,
@@ -71,7 +72,7 @@ let devMiddleware = webpackDevMiddleware(compiler, {
 //Webpack热重载连接服务器
 //https://github.com/glenjamin/webpack-hot-middleware
 //Add webpack-hot-middleware attached to the same compiler instance
-let hotMiddleware = webpacHotMiddleware(compiler)
+const hotMiddleware = webpacHotMiddleware(compiler)
 
 // force page reload when html-webpack-plugin template changes
 compiler.plugin('compilation', (compilation) => {
@@ -123,7 +124,7 @@ watch(conf.assetsRoot + '/app.js', () => {
 })
 
 
-portoccupied(port, function() {
+portoccupied(port, () => {
     app.listen(port, (err) => {
         if (err) {
             console.log(err)
