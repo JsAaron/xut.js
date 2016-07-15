@@ -2,9 +2,13 @@
 /*************************
 * 电子杂志更新日志记录
 **************************
+* v821  2015.7.15  Compel common spriteAnimation to advancedSpriteAnimation
+* v820  2015.7.15  A lot of separation of the code structure,
+* 				   And add a feature like the common spirit of the transformation of the spirit of the wizard animation
+*     			   Remove the pix framework
 * v819  Get rid of Xut.AudioManager and Xut.VideoManager into the import and export
 * v818  SeniorSpriteAnimation of dom version
-* v817  Optimization platform judgment for subtitle 
+* v817  Optimization platform judgment for subtitle
 * v816  Fixed subtitles
 * v815  2016.5.29 When invoke the home button in the Android for miaomiaoxue platform，
 * 				  stop autoplay of application
