@@ -92,7 +92,7 @@ module.exports = {
          * @type {Array}
          * Parameter is an array format
          */
-        exclude: ['SQLResult.js','pixi.js']
+        exclude: ['SQLResult.js']
 
     },
 
