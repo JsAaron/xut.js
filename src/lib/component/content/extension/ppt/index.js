@@ -566,9 +566,9 @@ export class PPT {
      * @param  {[type]} scopeComplete [description]
      * @return {[type]}               [description]
      */
-    runAnimation(scopeComplete) {
+    play(scopeComplete) {
         if (this.hasRunning == false) return;
-        if (this.isCompleted) this.resetAnimation();
+        if (this.isCompleted) this.reset();
         this.animation = this._initAnimation(this.startEvent, scopeComplete || this.completeEvent);
         this.animation.play();
     }
@@ -578,7 +578,7 @@ export class PPT {
      * 停止动画
      * @return {[type]} [description]
      */
-    stopAnimation() {
+    stop() {
         if (this.animation instanceof TimelineLite) {
             this.animation.stop();
             this.animation.kill();
@@ -592,8 +592,8 @@ export class PPT {
      * 复位动画
      * @return {[type]} [description]
      */
-    resetAnimation() {
-        this.stopAnimation();
+    reset() {
+        this.stop();
         if (this.elementStyle && this.elementStyle.length > 0) {
             var origin = this.element.css("-webkit-transform-origin");
             var isscroll = this.element.attr("isscroll");
@@ -612,8 +612,8 @@ export class PPT {
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroyAnimation() {
-        this.stopAnimation();
+    destroy() {
+        this.stop();
         this.container = null;
         this.options = null;
         this.element = null;

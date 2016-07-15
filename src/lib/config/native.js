@@ -1,6 +1,5 @@
-import common from './common'
+import sourceUrl from './common'
 
-let sourceUrl = common.sourceUrl
 let isIOS = Xut.plat.isIOS
 let isAndroid = Xut.plat.isAndroid
 
@@ -12,14 +11,14 @@ const nativeConf = {
      * 资源图片
      * @return {[type]} [description]
      */
-    resources() {
+    resources(config) {
         if (isIOS) {
             return sourceUrl
         }
         if (isAndroid) {
-            if (parseInt(Xut.config.storageMode)) {
+            if (parseInt(config.storageMode)) {
                 //sd卡加载资源数据
-                return "/sdcard/appcarrier/magazine/" + Xut.config.appId + "/" + sourceUrl;
+                return "/sdcard/appcarrier/magazine/" + config.appId + "/" + sourceUrl;
             } else {
                 //android_asset缓存加载资源
                 return "/android_asset/www/" + sourceUrl;

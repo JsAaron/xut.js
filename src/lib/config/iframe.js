@@ -1,18 +1,19 @@
+import sourceUrl from './common'
 
-import common from './common'
-
-let sourceUrl = common.sourceUrl
-let isIOS = Xut.plat.isIOS
-let isAndroid = Xut.plat.isAndroid
-
+const isIOS = Xut.plat.isIOS
+const isAndroid = Xut.plat.isAndroid
+const DUKUCONFIG = window.DUKUCONFIG
+const MMXCONFIG = window.MMXCONFIG
+const CLIENTCONFIGT = window.CLIENTCONFIGT
+const SUbCONFIGT = window.SUbCONFIGT
 
 /**
  * 读酷模式下的路径
- * @param  {[type]} window.DUKUCONFIG [description]
+ * @param  {[type]} DUKUCONFIG [description]
  * @return {[type]}                   [description]
  */
-if (window.DUKUCONFIG) {
-    window.DUKUCONFIG.path = window.DUKUCONFIG.path.replace('//', '/')
+if (DUKUCONFIG) {
+    DUKUCONFIG.path = DUKUCONFIG.path.replace('//', '/')
 }
 
 /**
@@ -36,8 +37,8 @@ var rtrim = function(str) {
 //     MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
 // }
 var MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
-if (window.MMXCONFIG && window.MMXCONFIG.path) {
-    MMXCONFIGPath = rtrim(window.MMXCONFIG.path)
+if (MMXCONFIG && MMXCONFIG.path) {
+    MMXCONFIGPath = rtrim(MMXCONFIG.path)
 }
 
 
@@ -49,25 +50,25 @@ if (window.MMXCONFIG && window.MMXCONFIG.path) {
  */
 let iframeMode = (() => {
     let mode;
-    if (window.SUbCONFIGT && window.DUKUCONFIG) {
+    if (SUbCONFIGT && DUKUCONFIG) {
         //通过读酷客户端开打子文档方式
         mode = 'iframeDuKuSubDoc'
     } else {
         //子文档加载
-        if (window.SUbCONFIGT) {
+        if (SUbCONFIGT) {
             mode = 'iframeSubDoc'
         }
         //读酷客户端加载
-        if (window.DUKUCONFIG) {
+        if (DUKUCONFIG) {
             mode = 'iframeDuKu'
         }
         //客户端模式
         //通过零件加载
-        if (window.CLIENTCONFIGT) {
+        if (CLIENTCONFIGT) {
             mode = 'iframeClient'
         }
         //秒秒学客户端加载
-        if (window.MMXCONFIG) {
+        if (MMXCONFIG) {
             mode = 'iframeMiaomiaoxue'
         }
     }
@@ -89,13 +90,13 @@ const iframeConf = {
         if (isIOS) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
+                    return DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     return sourceUrl;
                 case 'iframeDuKuSubDoc':
                     return sourceUrl;
                 case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
+                    return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -104,13 +105,13 @@ const iframeConf = {
         if (isAndroid) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
+                    return DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return '/android_asset/www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
+                    return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
+                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
+                    return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -125,13 +126,13 @@ const iframeConf = {
         if (isIOS) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
+                    return DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     return sourceUrl
                 case 'iframeDuKuSubDoc':
                     return sourceUrl;
                 case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
+                    return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -140,13 +141,13 @@ const iframeConf = {
         if (isAndroid) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
+                    return DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     return 'android.resource://#packagename#/raw/';
                 case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
+                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
+                    return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -161,13 +162,13 @@ const iframeConf = {
         if (isIOS) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
+                    return DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     return sourceUrl;
                 case 'iframeDuKuSubDoc':
                     return sourceUrl;
                 case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
+                    return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -175,13 +176,13 @@ const iframeConf = {
         if (isAndroid) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
+                    return DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return '/android_asset/www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
+                    return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
+                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
+                    return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -196,14 +197,14 @@ const iframeConf = {
         if (isIOS) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
+                    return DUKUCONFIG.path;
                 case 'iframeSubDoc':
                     //www/content/subdoc/00c83e668a6b6bad7eda8eedbd2110ad/content/gallery/
-                    return 'www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
+                    return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
+                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
+                    return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }
@@ -212,13 +213,13 @@ const iframeConf = {
         if (isAndroid) {
             switch (iframeMode) {
                 case 'iframeDuKu':
-                    return window.DUKUCONFIG.path;
+                    return DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return 'www/content/subdoc/' + window.SUbCONFIGT.path + '/content/gallery/';
+                    return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeDuKuSubDoc':
-                    return window.DUKUCONFIG.path.replace('gallery', 'subdoc') + window.SUbCONFIGT.path + '/content/gallery/';
+                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
                 case 'iframeClient':
-                    return window.CLIENTCONFIGT.path;
+                    return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
                     return MMXCONFIGPath + '/content/gallery/';
             }

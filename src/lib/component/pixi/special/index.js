@@ -5,7 +5,7 @@
  * @return {[type]}         [description]
  */
 
-import { Rule } from '../core/rule'
+import { Rule } from '../index'
 import { parseJSON } from '../../../util/index'
 import { spiritAni } from './spirit'
 
@@ -73,7 +73,7 @@ class specialSprite extends Rule {
      * @return {[type]} [description]
      * 1000 / (obj.FPS || 10)
      */
-    play(addQueue) {
+    _play(addQueue) {
         let renderer = this.renderer
         this.uuid = addQueue(this.pageIndex, () => {
             _.each(this.sprObjs, (obj) => {
@@ -100,7 +100,7 @@ class specialSprite extends Rule {
      * stopQueue 销毁队列
      * @return {[type]} [description]
      */
-    stop(stopQueue) {
+    _stop(stopQueue) {
         stopQueue(this.pageIndex, this.uuid)
         _.each(self.sprObjs, (obj) => {
             obj.timer && clearTimeout(obj.timer)
@@ -112,7 +112,7 @@ class specialSprite extends Rule {
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroy(destroyQueue) {
+    _destroy(destroyQueue) {
         destroyQueue(this.pageIndex, this.uuid)
         _.each(this.sprObjs, (obj) => {
             obj.destroy();

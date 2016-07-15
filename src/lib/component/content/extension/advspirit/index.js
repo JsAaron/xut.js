@@ -18,46 +18,44 @@ let moveContent = (contentPrefix, id, parentId) => {
 export class AdvSpirit {
 
     constructor(options) {
-
-        let ids, data, ele, resource, path
-
-        data = options.data;
-        ele = options.element;
-        resource = data.resource;
-        path = data.md5;
-
-        this.spiritObjs = {}
+        this.options = options;
         this.ids = []
-
-        for (let i = 0; i < resource.spiritList.length; i++) {
-            let spiritList = resource.spiritList[i];
-            let id = data.containerName
-            let framId = spiritList.framId
-            let parentId = spiritList.parentId
-            this.spiritObjs[id] = new AdvSpiritAni(spiritList, id, path)
-            this.ids.push(id)
-            if (parentId != "0") {
-                let tempArray = data.containerName.split('_');
-                let contentPrefix = tempArray[0] + '_' + tempArray[1];
-                moveContent(contentPrefix, framId, parentId)
-            }
-            this.spiritObjs[id] = new AdvSpiritAni(spiritList, ele, path)
-            let params = spiritList.params
-
-            let action = params["actList"].split(",")[0]
-            this.spiritObjs[id].changeSwitchAni(action, 1)
-            this.ids.push(id)
-        }
     }
 
 
     play() {
-        console.log('play');
-        // var self = this;
-        // console.log(this.stop);
-        // setTimeout(function() {
-        //     self.stop();
-        // }, 3000)
+
+        let id, action, ids, data, ele, resource, path,
+            contentId, spiritList, framId, parentId, params, options
+
+        options = this.options;
+        data = options.data;
+        ele = options.element;
+        contentId = options.id;
+        resource = data.resource;
+        path = data.md5;
+
+        this.spiritObjs = {}
+        for (let i = 0; i < resource.spiritList.length; i++) {
+            spiritList = resource.spiritList[i];
+            id = data.containerName
+            framId = spiritList.framId
+            parentId = spiritList.parentId
+            this.ids.push(id)
+            if (parentId != "0") {
+                let tempArray = id.split('_');
+                let contentPrefix = tempArray[0] + '_' + tempArray[1];
+                moveContent(contentPrefix, framId, parentId)
+            }
+            this.spiritObjs[id] = new AdvSpiritAni(contentId, spiritList, ele, path)
+            params = spiritList.params
+
+            action = params["actList"].split(",")[0]
+            //0 循环播放 1播放一次
+            this.spiritObjs[id].startAnimation(action, 0)
+        }
+
+
     }
 
     stop() {
@@ -67,7 +65,7 @@ export class AdvSpirit {
     }
 
     reset() {
-
+        this.stop();
     }
 
     destroy() {
@@ -79,7 +77,11 @@ export class AdvSpirit {
             }
 
         })
-    }
+        this.options.data = null;
+        this.options.element = null;
+        this.options = null;
+        this.ids = null;
 
+    }
 
 }

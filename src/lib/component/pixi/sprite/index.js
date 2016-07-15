@@ -5,7 +5,7 @@
  * @return {[type]}         [description]
  */
 
-import { Rule } from '../core/rule'
+import { Rule } from '../index'
 //普通精灵动画
 import { Sprite as OrdinarySprite } from './sprite'
 
@@ -26,7 +26,7 @@ class Sprite extends Rule {
      * 运行动画
      * @return {[type]} [description]
      */
-    play (addQueue) {
+    _play (addQueue) {
         var sprite = this.sprite
         //绘制页面
         this.uuid = addQueue(this.pageIndex, function () {
@@ -39,7 +39,7 @@ class Sprite extends Rule {
      * stopQueue 停止队列
      * @return {[type]} [description]
      */
-    stop (stopQueue) {
+    _stop (stopQueue) {
         stopQueue(this.pageIndex, this.uuid)
     }
 
@@ -47,7 +47,7 @@ class Sprite extends Rule {
      * 销毁动画
      * @return {[type]} [description]
      */
-    destroy (destroyQueue) {
+    _destroy (destroyQueue) {
         this.sprite.destroy()
         destroyQueue(this.pageIndex, this.uuid)
     }

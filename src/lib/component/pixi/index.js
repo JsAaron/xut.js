@@ -3,19 +3,15 @@
  * @param  {[type]} Utils   [description]
  */
 
-import {
-    Observer
-} from '../../../observer/index'
+import { Observer } from '../../observer/index'
 import {
     addRenderer,
     stopRenderer,
     destroyRenderer
 }
-from '../core/index'
+from './core/index'
 
-let arr = [];
-let slice = arr.slice;
-
+const slice = Array.slice;
 
 class Rule extends Observer {
 
@@ -55,25 +51,25 @@ class Rule extends Observer {
 
     //所有self动画共享一个刷新器
     //所以在每一个子动画中传递一个刷新器接口
-    playAnim() {
+    play() {
         this.action = 'play'
-        this.play && this.play(addRenderer)
+        this._play && this._play(addRenderer)
     }
 
-    stopAnim() {
+    stop() {
         this.action = 'stop'
-        this.stop && this.stop(stopRenderer)
+        this._stop && this._stop(stopRenderer)
     }
 
     //复位
-    resetAnim() {
+    reset() {
         this.action = 'reset'
-        this.reset && this.reset()
+        this._reset && this._reset()
     }
 
-    destroyAnim() {
+    destroy() {
         this.action = 'destroy'
-        this.destroy && this.destroy(destroyRenderer)
+        this._destroy && this._destroy(destroyRenderer)
     }
 }
 

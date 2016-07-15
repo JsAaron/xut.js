@@ -54,7 +54,7 @@
      *
  */
 
-(function(glob) {
+;(function(glob) {
     var PMS = function(options) {
         pm.send(options);
     };

@@ -117,7 +117,7 @@
         MOVE_EV: SUPPORT_ONLY_TOUCH ? 'touchmove' : 'mousemove',
         END_EV: SUPPORT_ONLY_TOUCH ? 'touchend' : 'mouseup',
         CANCEL_EV: SUPPORT_ONLY_TOUCH ? 'touchcancel' : 'mouseup',
-        ANIMATION_EV: ANIMATION_END,
+        ANIMATION_END: ANIMATION_END,
         TRANSITION_END: TRANSITION_END,
         evtTarget: evtTarget,
         prefixStyle: prefixStyle,

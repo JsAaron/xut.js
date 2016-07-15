@@ -7,7 +7,7 @@
  */
 import nativeConf from './native'
 import iframeConf from './iframe'
-import common from './common'
+import sourceUrl from './common'
 
 import {
     _screen,
@@ -17,15 +17,17 @@ import {
 }
 from './judge'
 
+const plat = Xut.plat
+const isIphone = Xut.plat.isIphone
+const isBrowser = Xut.plat.isBrowser
+const GLOBALIFRAME = window.GLOBALIFRAME
+const CLIENTCONFIGT = window.CLIENTCONFIGT
+const MMXCONFIG = window.MMXCONFIG
 
 let config = {}
 let layoutMode
 let screenSize
 let proportion
-let isIphone = Xut.plat.isIphone
-let isBrowser = Xut.plat.isBrowser
-let sourceUrl = common.sourceUrl
-
 
 /**
  * 层级关系
@@ -66,11 +68,11 @@ let cacheSvgPath
  * 而且是客户端模式
  * @return {[type]} [description]
  */
-let pcMode = () => {
+let browserPlat = () => {
     //如果是iframe加载
     //而且是客户端模式
-    if (window.GLOBALIFRAME && window.CLIENTCONFIGT) {
-        return window.CLIENTCONFIGT.path;
+    if (GLOBALIFRAME && CLIENTCONFIGT) {
+        return CLIENTCONFIGT.path
     }
 
     if (typeof initGalleryUrl != 'undefined') {
@@ -97,26 +99,12 @@ let pcMode = () => {
  * 3 安卓打包后通过网页访问=>妙妙学
  * @return {[type]} [description]
  */
-let runLoad = () => {
-    if (window.MMXCONFIG) {
+let runMode = (() => {
+    if (MMXCONFIG) {
         return false
     }
-    return isBrowser;
-}
-
-
-/**
- * 图片资源配置路径
- * [resourcesPath description]
- * @return {[type]} [description]
- */
-let confResources = () => {
-    //移动端模式
-    let mobileMode = () => {
-        return window.GLOBALIFRAME ? iframeConf.resources() : nativeConf.resources()
-    }
-    return isBrowser ? pcMode() : mobileMode()
-}
+    return isBrowser
+})()
 
 
 /**
@@ -126,14 +114,11 @@ let confResources = () => {
  * @return {[type]} [description]
  */
 let _videoPath = () => {
-    if (cacheVideoPath) {
-        return cacheVideoPath;
-    }
-    //移动
-    let mobilePath = () => {
-        return window.GLOBALIFRAME ? iframeConf.video() : nativeConf.video();
-    }
-    return cacheVideoPath = runLoad() ? pcMode() : mobilePath();
+    return runMode ?
+        browserPlat() :
+        GLOBALIFRAME ?
+        iframeConf.video() :
+        nativeConf.video();
 }
 
 
@@ -142,15 +127,26 @@ let _videoPath = () => {
  * @return {[type]} [description]
  */
 let _audioPath = () => {
-    if (cacheAudioPath) {
-        return cacheAudioPath;
-    }
-    //移动端
-    let mobileMode = () => {
-        return window.GLOBALIFRAME ? iframeConf.audio() : nativeConf.audio();
-    }
-    return cacheAudioPath = runLoad() ? pcMode() : mobileMode();
+    return runMode ?
+        browserPlat() :
+        GLOBALIFRAME ?
+        iframeConf.audio() :
+        nativeConf.audio()
 };
+
+
+/**
+ * 图片资源配置路径
+ * [resourcesPath description]
+ * @return {[type]} [description]
+ */
+let _rsourcesPath = () => {
+    return isBrowser ?
+        browserPlat() :
+        GLOBALIFRAME ?
+        iframeConf.resources(config) :
+        nativeConf.resources(config)
+}
 
 
 /**
@@ -158,13 +154,11 @@ let _audioPath = () => {
  * @return {[type]} [description]
  */
 let _svgPath = () => {
-    if (cacheSvgPath) {
-        return cacheSvgPath;
-    }
-    let mobileMode = () => {
-        return window.GLOBALIFRAME ? iframeConf.svg() : nativeConf.svg();
-    }
-    return cacheSvgPath = isBrowser ? pcMode() : mobileMode();
+    return isBrowser ?
+        browserPlat() :
+        GLOBALIFRAME ?
+        iframeConf.svg() :
+        nativeConf.svg()
 }
 
 
@@ -301,7 +295,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     initResourcesPath() {
-        config.pathAddress = confResources()
+        config.pathAddress = _rsourcesPath()
     },
 
     /**
@@ -309,7 +303,10 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     videoPath() {
-        return _videoPath()
+        if (cacheVideoPath) {
+            return cacheVideoPath
+        }
+        return cacheVideoPath = _videoPath()
     },
 
     /**
@@ -317,7 +314,10 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     audioPath() {
-        return _audioPath()
+        if (cacheAudioPath) {
+            return cacheAudioPath
+        }
+        return cacheAudioPath = _audioPath()
     },
 
     /**
@@ -325,7 +325,11 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     svgPath() {
-        return _svgPath()
+        if (cacheSvgPath) {
+            return cacheSvgPath
+
+        }
+        return cacheSvgPath = _svgPath()
     },
 
     /**

@@ -14,7 +14,7 @@
  ******************************************/
 
 import { Content } from './content'
-import { createNextTask } from './nexttask'
+import { createNextTask } from './task'
 import { extendPrivate } from './util'
 import { extendTextBox } from './textbox/index'
 import { extendBookMark } from './bookmark/index'
@@ -314,7 +314,7 @@ export class Activity {
 
                 //ppt动画
                 //ppt音频
-                scope.run(function() {
+                scope.play(function() {
                     captureAnimComplete(scope);
                 });
             }

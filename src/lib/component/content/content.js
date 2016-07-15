@@ -4,9 +4,12 @@
  * 2 视觉差作用域
  * @type {Array}
  */
-import { Animation } from './animation'
+import { Effects } from './effects'
 import { Parallax } from './parallax'
-import { Context } from '../pixi/context'
+
+//2016.7.15废弃
+//pixi暂时不使用
+// import { Context } from '../pixi/context'
 
 
 /**
@@ -15,7 +18,7 @@ import { Context } from '../pixi/context'
  *  && 不是精灵动画 && 没有脚本代码 && 并且不能是收费
  * @return {[type]}         [description]
  */
-function preRunAction(data, eventName) {
+const preRunAction = function(data, eventName) {
     var para, state, category, parameter
     parameter = data.getParameter()
 
@@ -34,11 +37,11 @@ function preRunAction(data, eventName) {
             && !para.postCode //动画后脚本
             && !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
 
-            /***********************************************
-             *      针对预处理动作,并且没有卷滚的不注册
-             *      满足是静态动画
-             * **********************************************/
-            //true是显示,false隐藏å
+             /**
+              *针对预处理动作,并且没有卷滚的不注册
+              *满足是静态动画
+              *true是显示,false隐藏å
+              */
             var state = data.isRreRun = /"exit":"False"/i.test(para.parameter) === true
                 ? 'visible'
                 : 'hidden';
@@ -53,7 +56,7 @@ function preRunAction(data, eventName) {
  * 构建动画
  * @return {[type]} [description]
  */
-function createScope(base, contentId, pid, actName, parameter, hasParallax) {
+const createScope = function(base, contentId, pid, actName, parameter, hasParallax) {
 
     //默认启动dom模式
     var data = {
@@ -79,9 +82,9 @@ function createScope(base, contentId, pid, actName, parameter, hasParallax) {
             if (contentDas.$contentProcess) {
                 $contentProcess = contentDas.$contentProcess
             } else {
-                $contentProcess = Context(contentDas, canvasDom, base.pageIndex)
+                // $contentProcess = Context(contentDas, canvasDom, base.pageIndex)
                 //保存canvas pixi的上下文引用
-                base.relatedData.contentDas[contentId].$contentProcess = $contentProcess
+                // base.relatedData.contentDas[contentId].$contentProcess = $contentProcess
             }
             data.type = 'canvas';
             data.canvasMode = true;
@@ -168,7 +171,7 @@ function createScope(base, contentId, pid, actName, parameter, hasParallax) {
     /**
      * 生成子作用域对象，用于抽象处理动画,行为
      */
-    return new Animation(data);
+    return new Effects(data);
 }
 
 
@@ -179,7 +182,7 @@ function createScope(base, contentId, pid, actName, parameter, hasParallax) {
  * @param  {[type]} parameter [description]
  * @return {[type]}           [description]
  */
-function createHandlers(base, parameter) {
+const createHandlers = function(base, parameter) {
 
     //dom对象
     var para = parameter[0],
@@ -198,7 +201,7 @@ function createHandlers(base, parameter) {
  * 构建作用域
  * @return {[type]} [description]
  */
-function fnCreate(base) {
+const fnCreate = function(base) {
     return function (data, callback) {
         var para, handlers;
         if (data && data.length) {
@@ -216,7 +219,7 @@ function fnCreate(base) {
 /**
  * 源对象复制到目标对象
  */
-function innerExtend(target, source) {
+const innerExtend = function(target, source) {
     var property
     for (property in source) {
         if (target[property] === undefined) {

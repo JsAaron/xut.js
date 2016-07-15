@@ -46,7 +46,7 @@ export function contentFilter(filterName) {
     }
 
     return {
-        add: function(pageId, contentId) {
+        add(pageId, contentId) {
             access(function(pageId, contentId) {
                 if (!listFilters[pageId]) {
                     listFilters[pageId] = [];
@@ -59,7 +59,7 @@ export function contentFilter(filterName) {
             }, pageId, contentId)
         },
 
-        remove: function(pageId, contentId) {
+        remove(pageId, contentId) {
             access(function(pageId, contentId) {
                 var target = listFilters[pageId] || [],
                     index = target.indexOf(contentId);
@@ -70,7 +70,7 @@ export function contentFilter(filterName) {
             }, pageId, contentId)
         },
 
-        has: function(pageId, contentId) {
+        has(pageId, contentId) {
             return access(function(pageId, contentId) {
                 var target = listFilters[pageId];
                 return target ? -1 !== target.indexOf(contentId) ? true : false : false;
@@ -82,7 +82,7 @@ export function contentFilter(filterName) {
          * @param  {[type]} pageId [description]
          * @return {[type]}        [description]
          */
-        each: function(pageId) {
+        each(pageId) {
             return access(function(pageId, contentId) {
                 var target, indexOf;
                 if (target = listFilters[pageId]) {
@@ -99,11 +99,11 @@ export function contentFilter(filterName) {
         },
 
         //过滤器数量
-        size: function() {
+        size() {
             return _.keys(listFilters).length;
         },
 
-        empty: function() {
+        empty() {
             _remove(filterName);
             listFilters = {};
         }

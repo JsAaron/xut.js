@@ -1,6 +1,7 @@
 import { request } from './loader'
 import { parseJSON } from './dom'
 import { messageBox as box } from './notice'
+import { config } from '../config/index'
 
 /**
  * 获取资源
@@ -46,7 +47,7 @@ export function messageBox(message) {
 
 //缩放比
 function fiexdProportion(width, height, left, top) {
-    var proportion = Xut.config.proportion;
+    var proportion = config.proportion;
     return {
         width: width * proportion.width,
         height: height * proportion.height,
@@ -95,7 +96,6 @@ export function reviseSize(results) {
 export function readFile(path, callback, type) {
 
     var paths, name, data;
-    var config = Xut.config;
 
     /**
      * ibooks模式 单独处理svg转化策划给你js,加载js文件
