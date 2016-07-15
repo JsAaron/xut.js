@@ -25,7 +25,7 @@ export class AdvSpirit {
 
     play() {
 
-        let id, action, ids, data, ele, resource, path,
+        let id, action, ids, data, ele, resource, path, loop,
             contentId, spiritList, framId, parentId, params, options
 
         options = this.options;
@@ -34,7 +34,7 @@ export class AdvSpirit {
         contentId = options.id;
         resource = data.resource;
         path = data.md5;
-
+        loop = data.loop;
         this.spiritObjs = {}
         for (let i = 0; i < resource.spiritList.length; i++) {
             spiritList = resource.spiritList[i];
@@ -51,8 +51,8 @@ export class AdvSpirit {
             params = spiritList.params
 
             action = params["actList"].split(",")[0]
-            //0 循环播放 1播放一次
-            this.spiritObjs[id].startAnimation(action, 0)
+                //0 循环播放 1播放一次
+            this.spiritObjs[id].startAnimation(action, loop)
         }
 
 
