@@ -13,14 +13,16 @@
  *                                      *
  ******************************************/
 
-import { Content } from './content'
-import { createNextTask } from './task'
-import { extendPrivate } from './util'
-import { extendTextBox } from './textbox/index'
-import { extendBookMark } from './bookmark/index'
-import { extendSearchBar } from './searchbar/index'
-import { extendEvent } from './event/related'
+import Contents from './content'
+import Tasks from './task'
 import { destroyEvents } from './event/event'
+
+import extraMixin from './extra'
+import textBoxMixin from './textbox/index'
+import bookMarkMixin from './bookmark/index'
+import searchBarMixin from './searchbar/index'
+import eventMixin from './event/index'
+
 
 /**
  * 处理拖动对象
@@ -52,7 +54,7 @@ export class Activity {
          * 任务必须等待context上下创建
          * context就是pixi的直接对象，精灵..都是异步的
          */
-        this.nextTask = createNextTask(this.noticeComplete)
+        this.nextTask = Tasks(this.noticeComplete)
 
         /**
          * 填充事件数据
@@ -63,7 +65,7 @@ export class Activity {
          * 保存子对象content
          * @type {Array}
          */
-        this.abstractContents = Content(this);
+        this.abstractContents = Contents(this);
 
         /**
          * 处理html文本框
@@ -79,7 +81,7 @@ export class Activity {
         /**
          * 初始化content行为
          */
-        this.initContents();
+        this._initContents();
 
         /**
          * 2016.2.26
@@ -110,21 +112,10 @@ export class Activity {
 
 
     /**
-     * 保证正确遍历
-     * @return {[type]} [description]
-     */
-    eachAssistContents(callback) {
-        _.each(this.abstractContents, function(scope) {
-            callback.call(this, scope)
-        }, this)
-    }
-
-
-    /**
      * 初始化content行为
      * @return {[type]} [description]
      */
-    initContents() {
+    _initContents() {
 
         var pageId, rootNode, collectorHooks, pageType
 
@@ -162,7 +153,7 @@ export class Activity {
             }
 
             //绑定DOM一些属性
-            this.toRepeatBind(id, context, isRreRun, scope, collectorHooks);
+            this._toRepeatBind(id, context, isRreRun, scope, collectorHooks);
         });
 
     }
@@ -176,7 +167,7 @@ export class Activity {
      * 3 预显示
      * @return {[type]} [description]
      */
-    toRepeatBind(id, context, isRreRun, scope, collectorHooks) {
+    _toRepeatBind(id, context, isRreRun, scope, collectorHooks) {
         var indexOf, relatedData
 
         relatedData = this.relatedData
@@ -198,6 +189,90 @@ export class Activity {
                 })
             }
         }
+    }
+
+
+    /**
+     * 复位独立动画
+     * 提供快速翻页复用
+     * @return {[type]} [description]
+     */
+    _resetAloneAnim() {
+        //复位拖动对象
+        accessDrop(this.eventData, function(drop) {
+            drop.reset();
+        })
+    }
+
+
+    /**
+     * 动画运行之后
+     * 1 创建一个新场景
+     * 2 执行跳转到收费提示页面
+     * 3 触发搜索工具栏
+     * @return {[type]} [description]
+     */
+    _relevantOperation() {
+
+        var scenarioInfo, eventContentId
+
+        //触发事件的content id
+        if (this.eventData) {
+            eventContentId = this.eventData.eventContentId;
+        }
+
+        if (eventContentId) {
+
+            //查找出当前节的所有信息
+            if (scenarioInfo = this.relatedData.seasonRelated[eventContentId]) {
+
+                //如果存在搜索栏触发
+                if (scenarioInfo.SearchBar) {
+                    this.createSearchBar();
+                    return;
+                }
+
+                //如果存在书签
+                if (scenarioInfo.BookMarks) {
+                    this.createBookMark();
+                    return;
+                }
+
+                //收费处理
+                if (scenarioInfo.Inapp !== undefined) {
+                    if (scenarioInfo.Inapp == 1) {
+                        Xut.Application.HasBuyGood(); //已收费
+                    } else {
+                        Xut.Application.BuyGood(); //付费接口
+                    }
+                    return
+                }
+
+                //处理新的场景
+                if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
+                    setTimeout(function() {
+                        Xut.View.LoadScenario({
+                            'scenarioId': scenarioInfo.seasonId,
+                            'chapterId': scenarioInfo.chapterId
+                        })
+                    }, Xut.fix.audio ? 1000 : 0)
+                    return
+                }
+
+                // console.log('content跳转信息出错',scenarioInfo)
+            }
+        }
+    }
+
+
+    /**
+     * 保证正确遍历
+     * @return {[type]} [description]
+     */
+    eachAssistContents(callback) {
+        _.each(this.abstractContents, function(scope) {
+            callback.call(this, scope)
+        }, this)
     }
 
 
@@ -228,7 +303,7 @@ export class Activity {
         //如果没有运行动画
         if (!self.seed.animation) {
             self.preventRepeat = false;
-            self.relevantOperation();
+            self._relevantOperation();
             return;
         }
 
@@ -241,12 +316,14 @@ export class Activity {
         captureAnimComplete = self.captureAnimComplete = function(counts) {
             return function(scope) {
                 //动画结束,删除这个hack
-                scope
-                    && scope.$contentProcess && scope.$contentProcess.removeProp && scope.$contentProcess.removeProp('animOffset')
+                scope &&
+                    scope.$contentProcess &&
+                    scope.$contentProcess.removeProp &&
+                    scope.$contentProcess.removeProp('animOffset')
 
                 //如果快速翻页
                 //运行动画的时候，发现不是可视页面
-                //需要关闭这些动画  
+                //需要关闭这些动画
                 closeAnim = (pageId != Xut.Presentation.GetPageId());
 
                 if (closeAnim && scope) {
@@ -258,10 +335,10 @@ export class Activity {
                 if (counts === 1) {
                     if (closeAnim) {
                         //复位动画
-                        self.resetAloneAnim();
+                        self._resetAloneAnim();
                     }
                     self.preventRepeat = false;
-                    self.relevantOperation();
+                    self._relevantOperation();
                     outComplete && outComplete();
                     self.captureAnimComplete = null;
                 } else {
@@ -339,28 +416,15 @@ export class Activity {
 
 
     /**
-     * 复位独立动画
-     * 提供快速翻页复用
-     * @return {[type]} [description]
-     */
-    resetAloneAnim() {
-        //复位拖动对象
-        accessDrop(this.eventData, function(drop) {
-            drop.reset();
-        })
-    }
-
-
-    /**
      * 复位状态
      * @return {[type]} [description]
      */
-    resetAnimation() {
+    resetEffects() {
         this.eachAssistContents(function(scope) {
             !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
         })
 
-        this.resetAloneAnim();
+        this._resetAloneAnim();
     }
 
 
@@ -380,66 +444,6 @@ export class Activity {
             }
             elementCallback && elementCallback(scope)
         })
-    }
-
-
-    /**
-     * 动画运行之后
-     * 1 创建一个新场景
-     * 2 执行跳转到收费提示页面
-     * 3 触发搜索工具栏
-     * @return {[type]} [description]
-     */
-    relevantOperation() {
-
-        var scenarioInfo, eventContentId
-
-        //触发事件的content id
-        if (this.eventData) {
-            eventContentId = this.eventData.eventContentId;
-        }
-
-        if (eventContentId) {
-
-            //查找出当前节的所有信息
-            if (scenarioInfo = this.relatedData.seasonRelated[eventContentId]) {
-
-                //如果存在搜索栏触发
-                if (scenarioInfo.SearchBar) {
-                    this.createSearchBar();
-                    return;
-                }
-
-                //如果存在书签
-                if (scenarioInfo.BookMarks) {
-                    this.createBookMark();
-                    return;
-                }
-
-                //收费处理
-                if (scenarioInfo.Inapp !== undefined) {
-                    if (scenarioInfo.Inapp == 1) {
-                        Xut.Application.HasBuyGood(); //已收费
-                    } else {
-                        Xut.Application.BuyGood(); //付费接口
-                    }
-                    return
-                }
-
-                //处理新的场景
-                if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
-                    setTimeout(function() {
-                        Xut.View.LoadScenario({
-                            'scenarioId': scenarioInfo.seasonId,
-                            'chapterId': scenarioInfo.chapterId
-                        })
-                    }, Xut.fix.audio ? 1000 : 0)
-                    return
-                }
-
-                // console.log('content跳转信息出错',scenarioInfo)
-            }
-        }
     }
 
 
@@ -492,7 +496,7 @@ export class Activity {
      * @return {[type]} [description]
      */
     flipComplete() {
-        this.resetAnimation();
+        this.resetEffects();
     }
 
 
@@ -561,8 +565,8 @@ export class Activity {
 
 var activitProto = Activity.prototype;
 
-extendEvent(activitProto)
-extendPrivate(activitProto)
-extendTextBox(activitProto)
-extendBookMark(activitProto)
-extendSearchBar(activitProto)
+extraMixin(activitProto)
+textBoxMixin(activitProto)
+bookMarkMixin(activitProto)
+searchBarMixin(activitProto)
+eventMixin(activitProto)

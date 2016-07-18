@@ -7,7 +7,7 @@
 import {
     conversionEventType, bindEvents, destroyEvents
 }
-from '../../component/content/event/event'
+from '../../component/activity/event/event'
 
 //获取对应的activity对象
 var getActivity = function(activityId, callback) {

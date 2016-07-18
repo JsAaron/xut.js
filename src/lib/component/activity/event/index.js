@@ -9,7 +9,7 @@ from './event'
 import {audioPlayer} from '../../audio/audio'
 
 
-export function extendEvent(activitProto) {
+export default function (activitProto) {
 
 
     /**

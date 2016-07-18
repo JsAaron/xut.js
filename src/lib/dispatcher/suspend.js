@@ -2,10 +2,10 @@
  * 暂停控制
  * @return {[type]} [description]
  */
-
 import { access } from './access'
 import { hangUpAudio } from '../component/audio/manager'
 import { removeVideo, hangUpVideo } from '../component/video/manager'
+
 
 /**
  * 翻页停止content动作

@@ -7,7 +7,7 @@ import { SearchBar } from './searchbar'
  * @return {[type]} [description]
  */
 
-export function extendSearchBar(activitProto) {
+export default function (activitProto) {
 
     activitProto.createSearchBar = function () {
         var options = {

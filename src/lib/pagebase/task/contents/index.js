@@ -11,7 +11,7 @@ import nextTick from '../../../core/tick'
 import { parseJSON, arrayUnique } from '../../../util/index'
 import { parserRelated as conParser } from './data'
 import { structure as conStructure } from './structure/index'
-import { Activity as ActivityClass } from '../../../component/content/activity'
+import { Activity as ActivityClass } from '../../../component/activity/index'
 
 
 /**

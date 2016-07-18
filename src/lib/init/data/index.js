@@ -7,7 +7,7 @@ from '../../util/index'
 
 import { cursor } from '../cursor'
 import { createStore } from './storemgr'
-import { contentFilter } from '../../component/content/filter'
+import { contentFilter } from '../../component/activity/filter'
 import { loadScene } from '../scene'
 
 

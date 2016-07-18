@@ -2,8 +2,8 @@
  * 手动触发控制
  * @return {[type]} [description]
  */
-
 import directives from '../directives/index'
+
 
 export function trigger(target, attribute, rootNode, pageIndex) {
 

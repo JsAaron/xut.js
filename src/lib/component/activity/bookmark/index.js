@@ -5,7 +5,7 @@ import { BookMark } from './bookmark'
 * 创建书签
 * @return {[type]} [description]
 */
-export function extendBookMark(activitProto) {
+export default function (activitProto) {
 
     activitProto.createBookMark = function () {
         var element, seasonId, pageId, pageData;

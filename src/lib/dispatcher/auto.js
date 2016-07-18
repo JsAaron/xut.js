@@ -44,8 +44,9 @@ let runContent = (contentObjs, taskAnimCallback) => {
             } else {
                 markComplete();
             }
-        });
-    }, 500);
+        })
+
+    }, 500)
 }
 
 /**
@@ -55,13 +56,14 @@ let runContent = (contentObjs, taskAnimCallback) => {
 let runComponent = (pageObj, pageIndex, autoRunComponents, pageType) => {
 
     let chapterId = pageObj.baseGetPageId(pageIndex)
+    let dir
 
     if (pageIndex === undefined) {
         pageIndex = Xut.Presentation.GetPageIndex()
     }
 
     _.each(autoRunComponents, (data, index) => {
-        let dir = directives[data.type];
+        dir = directives[data.type];
         if (dir && dir.autoPlay) {
             dir.autoPlay({
                 'id': data.id,
@@ -105,7 +107,6 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
     //用于区别触发类型
     //页面还是母版
     access(pageObj, (pageObj, ContentObjs, ComponentObjs, pageType) => {
-
 
         //如果是母版对象，一次生命周期种只激活一次
         if (pageObj.pageType === 'master') {

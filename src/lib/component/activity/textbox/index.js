@@ -1,13 +1,11 @@
-
-//文本框
-import { HtmlBox } from './htmlbox'
- 
 /**
  * 文本框
  */
-export function extendTextBox(activitProto) {
+import { HtmlBox } from './htmlbox'
 
-    /** 
+export default function (activitProto) {
+
+    /**
      * 检测是HTML文本框处理
      * @return {[type]} [description]
     */

@@ -1,16 +1,8 @@
-
-
-
 //卷滚
 import { Iscroll } from './iscroll'
 
-/*********************************************************************
-*
-*                 私有方法
-*
-**********************************************************************/
 
-export function extendPrivate(activitProto) {
+export default function(activitProto) {
 
 
     /**
@@ -18,7 +10,7 @@ export function extendPrivate(activitProto) {
      * 可能有多个引用关系
      * @return {[type]}         [description]
      */
-    activitProto.addIScroll = function (scope, element) {
+    activitProto.addIScroll = function(scope, element) {
         var self = this,
             // elementName,
             contentDas = scope.contentDas;
@@ -34,7 +26,7 @@ export function extendPrivate(activitProto) {
 
             //ios or pc
             if (!Xut.plat.isAndroid) {
-                return function () {
+                return function() {
                     self.iscroll = Iscroll(element);
                 }
             }
@@ -43,7 +35,7 @@ export function extendPrivate(activitProto) {
             //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
             //如果是显示的,则不需要处理,
             var visible = preEle.css('visibility'),
-                restore = function () { };
+                restore = function() {};
 
             if (visible == 'hidden') {
                 var opacity = preEle.css('opacity');
@@ -53,7 +45,7 @@ export function extendPrivate(activitProto) {
                     preEle.css({
                         'visibility': 'visible'
                     })
-                    restore = function () {
+                    restore = function() {
                         preEle.css({
                             'visibility': visible
                         })
@@ -64,7 +56,7 @@ export function extendPrivate(activitProto) {
                     }).css({
                         'visibility': 'visible'
                     })
-                    restore = function () {
+                    restore = function() {
                         preEle.css({
                             'opacity': opacity
                         }).css({
@@ -74,8 +66,8 @@ export function extendPrivate(activitProto) {
                 }
             }
 
-            return function () {
-                
+            return function() {
+
                 restore();
                 preEle = null;
                 restore = null;
@@ -102,7 +94,7 @@ export function extendPrivate(activitProto) {
      * 制作一个查找标示
      * @return {[type]}
      */
-    activitProto.makePrefix = function (name, pid, id) {
+    activitProto.makePrefix = function(name, pid, id) {
         return name + "_" + pid + "_" + id;
     }
 
@@ -115,7 +107,7 @@ export function extendPrivate(activitProto) {
      * @param  {[type]} prefix [description]
      * @return {[type]}        [description]
      */
-    activitProto.getContextNode = function (prefix, type) {
+    activitProto.getContextNode = function(prefix, type) {
 
         var element, containerPrefix, contentsFragment
 
@@ -133,7 +125,7 @@ export function extendPrivate(activitProto) {
         } else {
             //容器处理
             if (containerPrefix = this.relatedData.containerPrefix) {
-                _.each(containerPrefix, function (containerName) {
+                _.each(containerPrefix, function(containerName) {
                     element = contentsFragment[containerName];
                     element = $(element).find('#' + prefix);
                     if (element.length) {

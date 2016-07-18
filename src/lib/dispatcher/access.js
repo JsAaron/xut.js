@@ -4,10 +4,7 @@
  * @return {[type]} [description]
  */
 export function access(pageObj, callback) {
-    let flag
-    let contents
-    let components
-    let pageType
+    let flag, contents, components, pageType
     pageObj = pageObj || Xut.Presentation.GetPageObj()
     if (pageObj) {
         contents = pageObj.baseGetContent();

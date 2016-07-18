@@ -24,27 +24,19 @@ const preRunAction = function(data, eventName) {
 
     //过滤预生成动画
     if (parameter.length === 1) {
-        category  = data.contentDas.category
+        category = data.contentDas.category
         para = parameter[0];
-        if (para.animationName === 'EffectAppear'
-            && data.domMode  //并且只有dom模式才可以，canvas排除
-            && eventName === 'auto'
-            && !para.videoId
-            && !para.delay
-            && category !== 'Sprite'
-            && category !== 'AutoCompSprite'
-            && !para.preCode //动画前脚本
+        if (para.animationName === 'EffectAppear' && data.domMode //并且只有dom模式才可以，canvas排除
+            && eventName === 'auto' && !para.videoId && !para.delay && category !== 'Sprite' && category !== 'AutoCompSprite' && !para.preCode //动画前脚本
             && !para.postCode //动画后脚本
             && !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
 
-             /**
-              *针对预处理动作,并且没有卷滚的不注册
-              *满足是静态动画
-              *true是显示,false隐藏å
-              */
-            var state = data.isRreRun = /"exit":"False"/i.test(para.parameter) === true
-                ? 'visible'
-                : 'hidden';
+            /**
+             *针对预处理动作,并且没有卷滚的不注册
+             *满足是静态动画
+             *true是显示,false隐藏å
+             */
+            var state = data.isRreRun = /"exit":"False"/i.test(para.parameter) === true ? 'visible' : 'hidden';
 
             return state
         }
@@ -138,17 +130,17 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
 
 
     //生成查询方法
-    data.getParameter = function () {
+    data.getParameter = function() {
         //分区母版与页面的数据结构
         //parameter-master-parallax
         //parameter-master-animation
         //parameter-page-animation
         var fix = 'parameter-' + pageType + '-' + data.processType;
         data[fix] = parameter;
-        return function () {
+        return function() {
             return data[fix];
         }
-    } ();
+    }();
 
 
     /**
@@ -202,7 +194,7 @@ const createHandlers = function(base, parameter) {
  * @return {[type]} [description]
  */
 const fnCreate = function(base) {
-    return function (data, callback) {
+    return function(data, callback) {
         var para, handlers;
         if (data && data.length) {
             //生成动画作用域对象
@@ -232,7 +224,7 @@ const innerExtend = function(target, source) {
 //处理itemArray绑定的动画对象
 //注入动画
 //绑定用户事件
-export function Content(base) {
+export default function(base) {
     var animation = base.seed.animation,
         parallax = base.seed.parallax,
         //抽出content对象
@@ -243,7 +235,7 @@ export function Content(base) {
 
     switch (base.pageType) {
         case 'page':
-            batcheCreate(animation, function (handlers) {
+            batcheCreate(animation, function(handlers) {
                 abstractContents.push(handlers)
             });
             break;
@@ -253,11 +245,11 @@ export function Content(base) {
                 tempAnimationScope = {},
                 tempAssistContents = [];
             //视觉差处理
-            batcheCreate(parallax, function (handlers) {
+            batcheCreate(parallax, function(handlers) {
                 tempParallaxScope[handlers.id] = handlers;
             });
 
-            batcheCreate(animation, function (handlers) {
+            batcheCreate(animation, function(handlers) {
                 tempAnimationScope[handlers.id] = handlers;
             });
 
@@ -267,23 +259,23 @@ export function Content(base) {
             //动画为主
             //合并，同一个对象可能具有动画+视觉差行为
             if (hasParallax && hasAnimation) {
-                _.each(tempAnimationScope, function (target) {
-                    var id = target.id
-                    var source = tempParallaxScope[id]
-                    if (source) { //如果能找到就需要合并
-                        innerExtend(target, source); //复制方法
-                        target.processType = 'both'; //标记新组合
-                        delete tempParallaxScope[id]; //删除引用
-                    }
-                })
-                //剩余的处理
+                _.each(tempAnimationScope, function(target) {
+                        var id = target.id
+                        var source = tempParallaxScope[id]
+                        if (source) { //如果能找到就需要合并
+                            innerExtend(target, source); //复制方法
+                            target.processType = 'both'; //标记新组合
+                            delete tempParallaxScope[id]; //删除引用
+                        }
+                    })
+                    //剩余的处理
                 if (_.keys(tempParallaxScope).length) {
                     _.extend(tempAnimationScope, tempParallaxScope);
                 }
                 tempParallaxScope = null;
             }
             //转化成数组
-            _.each(hasAnimation ? tempAnimationScope : tempParallaxScope, function (target) {
+            _.each(hasAnimation ? tempAnimationScope : tempParallaxScope, function(target) {
                 tempAssistContents.push(target);
             })
             abstractContents = tempAssistContents;
