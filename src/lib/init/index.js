@@ -16,10 +16,10 @@ let loadcss = (callback) => {
     let baseCss = window.nodeBuildMode ? window.nodeBuildMode.csspath : './css/' + (config.layoutMode) + '.css'
     let svgsheet = 'content/gallery/svgsheet.css'
     let cssArr = [baseCss, svgsheet]
-    //是否需要加载svg
-    //如果是ibooks模式
-    //并且没有svg
-    //兼容安卓2.x
+        //是否需要加载svg
+        //如果是ibooks模式
+        //并且没有svg
+        //兼容安卓2.x
     if (Xut.IBooks.Enabled && !Xut.IBooks.existSvg) {
         cssArr = [baseCss]
     }
@@ -105,13 +105,11 @@ export function init() {
     if (window.GLOBALIFRAME) {
         creatDatabase(config)
     } else {
-        //PC还是移动
+        //brower or mobile(apk or ipa)
         if (config.isBrowser) {
             loadApp(config)
         } else {
-            //如果不是iframe加载,则创建空数据库
             window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
-            //等待硬件加载完毕
             document.addEventListener("deviceready", () => {
                 creatDatabase(config)
             }, false)

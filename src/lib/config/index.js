@@ -200,18 +200,19 @@ _.extend(config, {
      */
     debugMode: false,
 
-    //直接通过数据库的历史记录定位到指定的页面
-    // Xut.View.LoadScenario({
-    //     'scenarioId' : scenarioInfo[0],
-    //     'chapterId'  : scenarioInfo[1],
-    //     'pageIndex'  : scenarioInfo[2]
-    // })
-    // {
-    //     'scenarioId' : 7,
-    //     'chapterId'  : 9
-    // }
-    //
-    //
+    /**
+     * 直接通过数据库的历史记录定位到指定的页面
+     * Xut.View.LoadScenario({
+     *     'scenarioId' : scenarioInfo[0],
+     *     'chapterId'  : scenarioInfo[1],
+     *     'pageIndex'  : scenarioInfo[2]
+     *  })
+     *  {
+     *     'scenarioId' : 7,
+     *     'chapterId'  : 9
+     *  }
+     * @type {Boolean}
+     */
     deBugHistory: false,
 
     /**

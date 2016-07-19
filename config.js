@@ -31,6 +31,7 @@ module.exports = {
      * 开发配置
      */
     dev: {
+
         /**
          * http端口
          * @type {Number}
@@ -45,7 +46,7 @@ module.exports = {
          * @type {Object}
          */
         test: {
-            launch: true,
+            launch: false,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: process.platform === 'win32' ? 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' : '/Users/mac/project/xcode/www/build'
@@ -92,7 +93,7 @@ module.exports = {
          * @type {Array}
          * Parameter is an array format
          */
-        exclude: ['SQLResult.js']
+        exclude: ['SQLResult.js','pixi.js']
 
     },
 

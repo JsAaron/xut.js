@@ -1,13 +1,18 @@
 import { getPlugVideoState, closePlugVideo } from './video'
 
-/**
- *  物理按键处理
- */
 
-//退出加锁,防止过快点击
+/**
+ * 退出加锁,防止过快点击
+ * @type {Boolean}
+ */
 let outLock = false;
 
-//回退按钮状态控制器
+
+/**
+ * 回退按钮状态控制器
+ * @param  {[type]} state [description]
+ * @return {[type]}       [description]
+ */
 let controller = (state) => {
     //如果是子文档处理
     if (Xut.isRunSubDoc) {
@@ -15,14 +20,25 @@ let controller = (state) => {
         Xut.publish('subdoc:dropApp');
         return;
     }
+
     //正常逻辑
     outLock = true;
 
     Xut.Application.Suspend({
-        dispose: function() { //停止热点动作
+
+        /**
+         * 停止热点动作
+         * @return {[type]} [description]
+         */
+        dispose: function() {
             setTimeout(() => { outLock = false }, 100)
         },
-        processed: function() { //退出应用
+
+        /**
+         * 退出应用
+         * @return {[type]} [description]
+         */
+        processed: function() {
             state === 'back' && Xut.Application.DropApp();
         }
     });
@@ -34,9 +50,16 @@ let controller = (state) => {
  * @return {[type]}        [description]
  */
 export function bindKeyEvent(config) {
-    //存放绑定事件
+    /**
+     * 存放绑定事件
+     * @type {Object}
+     */
     config._event = {
-        //回退键
+
+        /**
+         * 回退键
+         * @return {[type]} [description]
+         */
         back: function() {
             //如果是预加载视频
             if (getPlugVideoState()) {
@@ -45,7 +68,11 @@ export function bindKeyEvent(config) {
                 controller('back');
             }
         },
-        //暂停键
+
+        /**
+         * 暂停键
+         * @return {[type]} [description]
+         */
         pause: function() {
             controller('pause');
         }
