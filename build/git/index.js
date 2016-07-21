@@ -1,48 +1,43 @@
 const fs = require("fs")
+const path = require('path');
 const fsextra = require('fs-extra')
 const _ = require("underscore");
-const excludeRE = require('./exclude')
+const createRE = require('./filter')
+const getAllFiles = require('./getfiles')
 
 const hash = () => {
     return Object.create(null)
 }
-const src = './'
-const dist = '/Users/mac/project/git/es6-magazine/'
+const src = '.'
+const dist = process.platform === 'win32' ?
+    'd:\\git\\magazine-develop\\' :
+    '/Users/mac/project/git/es6-magazine/'
 
-const matchRE = excludeRE()
-    // const recursion = matchRE.index
+const filterRE = createRE()
 
+//./build/.config.js
+//./build/dev/test.js
+//build/dev/webpack.dev.conf.js
+const segmentation = new RegExp("[.]?\\w+([.]?\\w*)*", "ig")
 
-// var count = 0
-// var fileCollect = hash()
+console.log(filterRE)
+console.log('\n')
 
-// function parse(path) {
-//     var express = matchRE.express[count++]
-//     var matchkey = Object.keys(express)[0]
-//     var matchVal = express[matchkey]
-//     var files = fs.readdirSync(path)
-//     while (files.length) {
-//         var filename = files.pop()
-//         if (!matchVal.test(filename)) {
-//             parse(path + '/' + filename)
-//         }
-//     }
-// }
-
-
-// parse(src, fileCollect)
-
-
-console.log('【fsextra is starting】')
-var files = fs.readdirSync(src)
-while (files.length) {
-    var filename = files.pop()
-    var express = matchRE.express[0]
-    var matchkey = Object.keys(express)[0]
-    var matchVal = express[matchkey]
-    if (!matchVal.test(filename)) {
-        fsextra.copySync(src + filename, dist + filename)
+function ls(ff) {
+    var files = fs.readdirSync(ff);
+    for (fn in files) {
+        var rootPath = ff + path.sep
+        var filename = rootPath + files[fn]
+        var stat = fs.lstatSync(filename);
+        if (stat.isDirectory() == true) {
+            ls(filename);
+        } else {
+            if (!filterRE.test(filename)) {
+                fsextra.copySync(filename, dist + filename)
+            }
+        }
     }
 }
+ls('.');
 
 console.log('【fsextra is complete】')
