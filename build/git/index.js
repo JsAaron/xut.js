@@ -1,12 +1,10 @@
 const fs = require("fs")
 const path = require('path');
 const fsextra = require('fs-extra')
+const cp = require('child_process');
 const _ = require("underscore");
 const createRE = require('./filter')
 
-const hash = () => {
-    return Object.create(null)
-}
 const src = '.'
 const dist = '/Users/mac/project/git/es6-magazine/'
 
@@ -16,6 +14,7 @@ const filterRE = createRE()
 //./build/dev/test.js
 //build/dev/webpack.dev.conf.js
 const segmentation = new RegExp("[.]?\\w+([.]?\\w*)*", "ig")
+const excludeRE = new RegExp(".git|node_modules", "ig")
 
 console.log(
     '【Regular filter】\n' +
@@ -25,6 +24,14 @@ console.log(
 
 let count = 0
 
+
+var files = fs.readdirSync(dist);
+for (file of files) {
+    if (!excludeRE.test(file)) {
+        fsextra.removeSync(dist + file)
+    }
+}
+
 const ls = (ff) => {
     var files = fs.readdirSync(ff);
     for (fn in files) {
@@ -32,7 +39,7 @@ const ls = (ff) => {
         var filename = rootPath + files[fn]
         var stat = fs.lstatSync(filename);
         if (stat.isDirectory() == true) {
-            ls(filename);
+            ls(filename)
         } else {
             if (!filterRE.test(rootPath)) {
                 ++count
@@ -41,10 +48,4 @@ const ls = (ff) => {
         }
     }
 }
-ls('.');
-
-console.log('\n【fsextra is complete, Copy \x1b[1m\x1b[34m' + count + '\x1b[39m\x1b[22m files】\n')
-
-
-
-
+ls(src)

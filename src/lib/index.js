@@ -1,19 +1,9 @@
 ﻿//Pre initialized
-import {
-    config
-} from './config/index'
-import {
-    api
-} from './global-api'
-import {
-    AudioManager
-} from './component/audio/manager'
-import {
-    VideoManager
-} from './component/video/manager'
-import {
-    init
-} from './init/index'
+import { config } from './config/index'
+import { api } from './global-api'
+import { AudioManager } from './component/audio/manager'
+import { VideoManager } from './component/video/manager'
+import { init } from './init/index'
 
 //repair ios android browser doesn't automatically play audio problems
 //when loaded. Create a new audio video and use it every time you change
@@ -46,6 +36,6 @@ if (Xut.plat.isBrowser) {
 }
 
 
-Xut.Version = 821
+Xut.Version = 823
 
 init()

@@ -1,23 +1,13 @@
 const fs = require("fs")
 const fsextra = require('fs-extra')
 const path = require('path');
+
 const SLASHES = new RegExp("/", "ig")
 const DIRNAME = new RegExp("(?!=\/)([*,.,**]\*[a-z]+)$", "i")
-
 const perfix = '.'
-
 const specialKey = {
     '*.number': '[0-9]+'
 }
-
-const hash = () => {
-    return Object.create(null)
-}
-
-// const excludeKeywords = [
-//     'build/dev',
-//     'build/sqlite/aaa'
-// ]
 
 const excludeKeywords = [
     '.svn',
@@ -72,7 +62,6 @@ module.exports = () => {
         }
 
     }
-
 
 
     /**

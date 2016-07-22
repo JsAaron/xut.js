@@ -2,6 +2,7 @@
 #http://www.jb51.net/article/56563.htm
 
 dir=$(pwd)
+# dir="/Users/mac/project/git/es6-magazine/"
 index="$dir/src/lib/index.js"
 log="$dir/src/log.js"
 
@@ -14,11 +15,11 @@ do
     then
         version=${LINE##*=}
         version=`echo v"$version" | sed s/[[:space:]]//g`
-    fi 
+    fi
 done < $index
 
 while read LINE
-do  
+do
     # `echo $LINE | grep -w "${version}"`
     flag=`echo $LINE | grep -w -i "${version}"`
     if [ -z "$flag" ]; then
@@ -28,7 +29,7 @@ do
 done < $log
 
 git add .
-git commit -m "${content}"
+git commit -m "$content"
 git remote add origin https://github.com/JsAaron/es6-magazine.git
 git push origin master
 
