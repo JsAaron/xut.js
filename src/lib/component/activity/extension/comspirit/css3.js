@@ -145,10 +145,10 @@ export default function css3(options) {
     function setStep(aniName, time, count, loop) {
         var rule
         if (matrix) {
-            rule = '{0} {1}s step-start {2}';
+            rule = '{0} {1}s step-start {2} paused';
             return String.format(rule, aniName, time, loop);
         } else {
-            rule = '{0} {1}s steps({2}, end) {3}';
+            rule = '{0} {1}s steps({2}, end) {3} paused';
             return String.format(rule, aniName, time, count, loop);
         }
     }
@@ -159,7 +159,7 @@ export default function css3(options) {
      * @param {[type]} rule     [description]
      */
     function initStyle($element, rule) {
-        prefixAnims && $element.css(prefixAnims, rule).css(playState, 'paused');
+        prefixAnims && $element.css(prefixAnims, rule)
     }
 
 
@@ -186,7 +186,7 @@ export default function css3(options) {
     return {
 
         play: function() {
-            $element.css(playState, 'running');
+            $element.css(playState, '');
         },
 
         stop: function() {

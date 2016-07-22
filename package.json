@@ -1,6 +1,6 @@
 {
   "name": "es6-magazine",
-  "version": "1.0.0",
+  "version": "1.0.0-csp",
   "description": "A es6-magazine project",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,7 +10,8 @@
     "remote": "node build/remote/debug.js",
     "lint": "eslint dist/xxtppt.dev.js",
     "unit": "karma start test/unit/karma.conf.js",
-    "karma": "karma start karma.conf.js --log-level debug --single-run"
+    "karma": "karma start karma.conf.js --log-level debug --single-run",
+    "release": "bash build/git/release.sh"
   },
   "repository": {
     "type": "git",

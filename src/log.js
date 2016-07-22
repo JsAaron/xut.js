@@ -1,10 +1,9 @@
-﻿/*************************
+﻿
+/*************************
 * 电子杂志更新日志记录
 **************************
-* v823  2016.7.20  writing original animation method to handle the situation when css3 animation is not compatible
-* v822  2016.7.19  writing css3 animation-play-state  separately to fix common sprite's problem of not moving
-* v821  2016.7.15  Compel common spriteAnimation to advancedSpriteAnimation
-* v820  2016.7.15  A lot of separation of the code structure,
+* v821  2015.7.15  Compel common spriteAnimation to advancedSpriteAnimation
+* v820  2015.7.15  A lot of separation of the code structure,
 * 				   And add a feature like the common spirit of the transformation of the spirit of the wizard animation
 *     			   Remove the pix framework
 * v819  Get rid of Xut.AudioManager and Xut.VideoManager into the import and export
