@@ -6,12 +6,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node build/dev/index.js",
     "build": "node build/build/index.js run",
-     "git": "node build/git/index.js",
+     "copy": "node build/copy/index.js",
     "remote": "node build/remote/debug.js",
     "lint": "eslint dist/xxtppt.dev.js",
     "unit": "karma start test/unit/karma.conf.js",
     "karma": "karma start karma.conf.js --log-level debug --single-run",
-    "release": "bash build/git/release.sh"
+    "git": "bash git.sh"
   },
   "repository": {
     "type": "git",
