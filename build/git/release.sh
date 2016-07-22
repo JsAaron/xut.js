@@ -28,7 +28,7 @@ do
 done < $log
 
 git add .
-git commit -m "{$content}"
+git commit -m "${content}"
 git remote add origin https://github.com/JsAaron/es6-magazine.git
 git push origin master
 
