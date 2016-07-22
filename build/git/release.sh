@@ -25,7 +25,6 @@ do
         continue
     fi
     content=${flag##*"${version}"}
-    echo $content
 done < $log
 
 git add .
