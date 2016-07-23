@@ -1,18 +1,13 @@
 const fs = require('fs')
-const query = require('./query')
+const query = require('./resolve')
 const fsextra = require('fs-extra')
 const path = "./src/content/"
 
-/**
- * 生成数据文件
- * @param  {Function} callback [description]
- * @return {[type]}            [description]
- */
 exports.resolve = (callback) => {
-    query.resolve(path + 'xxtebook.db', (successResults) => {
-        var results = JSON.stringify(successResults);
-        var stringify = 'window.SQLResult = ' + results;
+    query(path + 'xxtebook.db', (results) => {
+        results = JSON.stringify(results)
+        var stringify = 'window.SQLResult = ' + results
         fs.writeFileSync(path + 'SQLResult.js', stringify);
-        callback && callback();
+        callback();
     })
 }
