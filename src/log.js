@@ -1,6 +1,7 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v824  2016.7.25  combine the sprite of advancedSpriteAnimation width the sprite of SeniorSpriteAnimation into one javascript file
 * v823  2016.7.20  writing original animation method to handle the situation when css3 animation is not compatible
 * v822  2016.7.19  writing css3 animation-play-state  separately to fix common sprite's problem of not moving
 * v821  2016.7.15  Compel common spriteAnimation to advancedSpriteAnimation

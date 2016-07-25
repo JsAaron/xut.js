@@ -1,6 +1,11 @@
 import css3 from './css3'
 import keyframe from './keyframe'
 
+const prefix = Xut.plat.prefixStyle
+
+//判断是否支持css3属性
+const supportCss3Property = prefix('animation-play-state')
+
 /**
  * css3动画
  * 1 帧动画
@@ -10,5 +15,5 @@ import keyframe from './keyframe'
 export function ComSpirit(options) {
     //timer,css
     var mode = options.mode || 'css';
-    return mode === 'css' ? css3(options) : keyframe(options)
+    return mode === 'css' && supportCss3Property ? css3(options) : keyframe(options)
 }

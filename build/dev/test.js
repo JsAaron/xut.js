@@ -24,10 +24,6 @@ conf = _.extend(config.common, {
 });
 
 
-/**
- * 合并index引入的js
- * @return {[type]}   [description]
- */
 gulp.task('mergescript', (cb) => {
     gulp.src(scriptUrl)
         .pipe(concat(conf.devName))
@@ -40,10 +36,6 @@ gulp.task('mergescript', (cb) => {
 });
 
 
-/**
- * 合成最终发布的xxtppt
- * @return {[type]}   [description]
- */
 gulp.task('mergeall', (cb) => {
     //合成xxtppt.js
     scriptUrl.push(conf.rollup)
@@ -59,10 +51,6 @@ gulp.task('mergeall', (cb) => {
 });
 
 
-/**
- * 复制dist到lib/build
- * @return {[type]} [description]
- */
 let copy = () => {
     try {
         fsextra.removeSync(conf.rollup)
@@ -74,12 +62,6 @@ let copy = () => {
 }
 
 
-/**
- * 合并压缩xxtppt.js
- * @param  {[type]}   scriptUrl [description]
- * @param  {Function} cb        [description]
- * @return {[type]}             [description]
- */
 let mergeuglify = (scriptUrl, cb) => {
     scriptUrl.push(conf.rollup)
     gulp.src(scriptUrl)

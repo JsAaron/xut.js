@@ -1,5 +1,5 @@
 import {
-    seniorSpiritAni
+    SpiritAnimation
 }
 from './sprite'
 
@@ -66,7 +66,7 @@ export function updateAction(id, params) {
 
     if (obj = spiritObjs[id]) {
         obj.init();
-        obj.changeSwitchAni(params.actList, loop);
+        obj.startAnimation(params.actList, loop);
     } else {
         console.log('error')
     }
@@ -74,11 +74,14 @@ export function updateAction(id, params) {
 
 
 export function SpiritAni(inputPara, contents) {
-
     let option = getData(inputPara, contents)
     let ResourcePath = "content/widget/gallery/" + inputPara.id + "/";
     let contentPrefix = inputPara.contentPrefix
     let ids = []
+    let options = {};
+    options.contentPrefix = contentPrefix;
+    options.resourcePath = ResourcePath;
+    options.type = 'seniorSprite';
 
     for (let i = 0; i < option.spiritList.length; i++) {
         let spiritList = option.spiritList[i];
@@ -89,7 +92,7 @@ export function SpiritAni(inputPara, contents) {
             if (parentId != "0") {
                 moveContent(contentPrefix, framId, parentId)
             }
-            spiritObjs[id] = new seniorSpiritAni(spiritList, contentPrefix, ResourcePath)
+            spiritObjs[id] = new SpiritAnimation(spiritList, options)
             ids.push(id)
         } else {
             console.log("inputPara undefine Spirit")

@@ -2,22 +2,22 @@ const sqlite = require('./sqlite3')
 
 var statement = []
 
-'Setting,
-Parallax,
-Master,
-Activity,
-Content,
-Video,
-Image,
-Action,
-Animation,
-Widget,
-Novel,
-Season,
-Chapter '
-    .replace(/[^, ]+/g, (name) => {
-        statement.push(name, 'select * FROM ' + (name) + ' order by _id ASC')
-    })
+'Setting,' +
+'Parallax,' +
+'Master,' +
+'Activity,' +
+'Content,' +
+'Video,' +
+'Image,' +
+'Action,' +
+'Animation,' +
+'Widget,' +
+'Novel,' +
+'Season,' +
+'Chapter '
+.replace(/[^, ]+/g, (name) => {
+    statement.push(name, 'select * FROM ' + (name) + ' order by _id ASC')
+})
 
 
 const resolve = (databasePath, callback) => {

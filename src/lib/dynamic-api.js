@@ -20,7 +20,8 @@
 
 import { reviseSize } from './util/option'
 
-let typeFilter = ['page', 'master'];
+const typeFilter = ['page', 'master'];
+
 
 /**
  * 合并参数设置

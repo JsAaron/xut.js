@@ -3,7 +3,7 @@
  * if comsprites is too large，
  * The client will comsprite become the advsprite  by default
  */
-import { AdvSpiritAni } from './sprite'
+import { SpiritAnimation } from '../../../widget/seniorsprite/sprite'
 
 let moveContent = (contentPrefix, id, parentId) => {
     let obj = $("#" + contentPrefix + id);
@@ -25,17 +25,20 @@ export class AdvSpirit {
 
     play() {
 
-        let id, action, ids, data, ele, resource, path, loop,
-            contentId, spiritList, framId, parentId, params, options
+        let id, action, ids, data,  resource, loop,
+            spiritList, framId, parentId, params, options
+
 
         options = this.options;
         data = options.data;
-        ele = options.element;
-        contentId = options.id;
         resource = data.resource;
-        path = data.md5;
         loop = data.loop;
         this.spiritObjs = {}
+        let option = {};
+        option.contentId = options.id;
+        option.ele = options.element;
+        option.resourcePath = data.md5;
+        option.type = "advSprite";
         for (let i = 0; i < resource.spiritList.length; i++) {
             spiritList = resource.spiritList[i];
             id = data.containerName
@@ -47,11 +50,11 @@ export class AdvSpirit {
                 let contentPrefix = tempArray[0] + '_' + tempArray[1];
                 moveContent(contentPrefix, framId, parentId)
             }
-            this.spiritObjs[id] = new AdvSpiritAni(contentId, spiritList, ele, path)
+            this.spiritObjs[id] = new SpiritAnimation(spiritList, option)
             params = spiritList.params
 
             action = params["actList"].split(",")[0]
-                //0 循环播放 1播放一次
+            //0 循环播放 1播放一次
             this.spiritObjs[id].startAnimation(action, loop)
         }
 
