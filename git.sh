@@ -8,7 +8,6 @@ log="$dir/src/log.js"
 
 version=''
 
-
 while read LINE
 do
     flag=`echo $LINE | grep -w Xut.Version`

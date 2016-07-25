@@ -1,7 +1,7 @@
 const fs = require("fs")
 const path = require('path');
 const fsextra = require('fs-extra')
-const cp = require('child_process');
+const cp = require('child_process')
 const _ = require("underscore");
 const createRE = require('./filter')
 
