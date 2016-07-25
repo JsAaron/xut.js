@@ -27,10 +27,10 @@ do
     if [ "$flag" != "" ]
     then
         content=${flag##*"${version}"}
+        content=${${flag##*"${version}"}string#* }
         continue
     fi
 done < $log
-
 
 git add .
 git commit -m "$content"
