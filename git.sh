@@ -25,8 +25,8 @@ do
     flag=`echo $LINE | grep -w -i "${version}"`
     if [ "$flag" != "" ]
     then
-        content=${flag##*"${version}"}
-        content=${${flag##*"${version}"}string#* }
+        string=${flag##*"${version}"}
+        content=${string/[0-9]*.?[0-9]?/}
         continue
     fi
 done < $log
