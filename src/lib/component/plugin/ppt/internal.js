@@ -3050,9 +3050,9 @@ export function internal(animproto) {
             x: x,
             y: y
         };
-    }  
-    
-    /** 
+    }
+
+    /**
      * 获取对象相关信息
      * @param  {[type]} object [description]
      * @return {[type]}        [description]

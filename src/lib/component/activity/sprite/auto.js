@@ -3,7 +3,8 @@
  * if comsprites is too large，
  * The client will comsprite become the advsprite  by default
  */
-import { SpiritAnimation } from '../../../widget/seniorsprite/sprite'
+import AutoSprite from '../../plugin/sprite'
+
 
 let moveContent = (contentPrefix, id, parentId) => {
     let obj = $("#" + contentPrefix + id);
@@ -15,7 +16,8 @@ let moveContent = (contentPrefix, id, parentId) => {
     $parent.append(obj);
 }
 
-export class AdvSpirit {
+
+export default class  {
 
     constructor(options) {
         this.options = options;
@@ -25,7 +27,7 @@ export class AdvSpirit {
 
     play() {
 
-        let id, action, ids, data,  resource, loop,
+        let id, action, ids, data, resource, loop,
             spiritList, framId, parentId, params, options
 
 
@@ -50,11 +52,11 @@ export class AdvSpirit {
                 let contentPrefix = tempArray[0] + '_' + tempArray[1];
                 moveContent(contentPrefix, framId, parentId)
             }
-            this.spiritObjs[id] = new SpiritAnimation(spiritList, option)
+            this.spiritObjs[id] = new AutoSprite(spiritList, option)
             params = spiritList.params
 
             action = params["actList"].split(",")[0]
-            //0 循环播放 1播放一次
+                //0 循环播放 1播放一次
             this.spiritObjs[id].startAnimation(action, loop)
         }
 

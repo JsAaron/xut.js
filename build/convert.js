@@ -3,14 +3,14 @@ const _ = require("underscore")
 const stats = []
 const relative = 'content/gallery'
 
-const readFile = function(path) {
+const readFile = (path) => {
     return fs.readFileSync(path, {
         flag: 'r+',
         encoding: 'utf8'
     })
 }
 
-const writeFile = function(filename, content) {
+const writeFile = (filename, content) => {
     fs.writeFileSync(filename, content, {
         encoding: 'utf8',
         flag: 'w+'
@@ -18,11 +18,13 @@ const writeFile = function(filename, content) {
 }
 
 module.exports = function(src) {
-    var filename, readPath, str, data, handle, svgfiles, total, count
-    var galleryPath = src + relative
-    var convertedPath = galleryPath + '/converted.txt'
 
-    var exists = fs.existsSync(convertedPath)
+    var filename, readPath, str, data, handle, svgfiles, total, count, galleryPath, convertedPath, exists
+
+    galleryPath = src + relative
+    convertedPath = galleryPath + '/converted.txt'
+
+    exists = fs.existsSync(convertedPath)
     if (exists) {
         data = readFile(convertedPath)
         if (data) {

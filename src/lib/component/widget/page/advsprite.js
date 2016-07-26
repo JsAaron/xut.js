@@ -1,8 +1,4 @@
-import {
-    SpiritAnimation
-}
-from './sprite'
-
+import AdvSpirit from '../../plugin/sprite'
 import { parseJSON } from '../../../util/dom'
 
 
@@ -73,7 +69,7 @@ export function updateAction(id, params) {
 }
 
 
-export function SpiritAni(inputPara, contents) {
+export default function(inputPara, contents) {
     let option = getData(inputPara, contents)
     let ResourcePath = "content/widget/gallery/" + inputPara.id + "/";
     let contentPrefix = inputPara.contentPrefix
@@ -92,7 +88,7 @@ export function SpiritAni(inputPara, contents) {
             if (parentId != "0") {
                 moveContent(contentPrefix, framId, parentId)
             }
-            spiritObjs[id] = new SpiritAnimation(spiritList, options)
+            spiritObjs[id] = new AdvSpirit(spiritList, options)
             ids.push(id)
         } else {
             console.log("inputPara undefine Spirit")

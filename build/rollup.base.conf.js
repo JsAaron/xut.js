@@ -2,22 +2,7 @@ const fs = require('fs')
 const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
 const fsextra = require('fs-extra')
-
-const getSize = (code) => {
-    return (code.length / 1024).toFixed(2) + 'kb'
-}
-const blue = (str) => {
-    return '\x1b[1m\x1b[34m' + escape(process.cwd()) + str + '\x1b[39m\x1b[22m'
-}
-const write = (path, code) => {
-    return new Promise((resolve, reject) => {
-        fs.writeFile(path, code, (err) => {
-            if (err) return reject(err)
-            console.log('write: ' + blue(path) + ' ' + getSize(code))
-            resolve(code)
-        })
-    })
-}
+const utils = require('./utils')
 
 module.exports = (conf, fail) => {
 
@@ -45,7 +30,7 @@ module.exports = (conf, fail) => {
                 code = bundle.generate({
                     format: 'umd'
                 }).code
-                return write(conf.rollup, code)
+                return utils.write(conf.rollup, code)
             }).then(() => {
                 resolve()
             })

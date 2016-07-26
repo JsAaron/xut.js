@@ -1,9 +1,9 @@
-import { execJson, parseJSON, enterReplace } from '../../../../util/dom'
-import { config } from '../../../../config/index'
+import { execJson, parseJSON, enterReplace } from '../../../util/dom'
+import { config } from '../../../config/index'
 import { isMacOS, isDesktop } from './support'
 import { internal } from './internal'
-import { updateAction } from '../../../widget/seniorsprite/index'
-import { createContentAudio } from '../../../audio/manager'
+import { updateAction } from '../../widget/page/advsprite'
+import { createContentAudio } from '../../audio/manager'
 
 
 /**
@@ -18,7 +18,6 @@ import { createContentAudio } from '../../../audio/manager'
  * completeEvent: 整个动画结束事件
  **/
 export class PPT {
-
 
     constructor(pageIndex, pageType, chapterId, element, itemArray, container, hasLoop, startEvent, completeEvent) {
         this.screenWidth = config.screenSize.width

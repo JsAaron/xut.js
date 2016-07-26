@@ -3,7 +3,7 @@
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-import { parseJSON } from '../../../../util/index'
+import { parseJSON } from '../../util/index'
 
 export default function keyframe(options) {
     var $element, data, callback, count, fps, loop, matrix, parameter, width, height, timer,

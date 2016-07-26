@@ -6,8 +6,7 @@ const path = "./src/content/"
 exports.resolve = (callback) => {
     query(path + 'xxtebook.db', (results) => {
         results = JSON.stringify(results)
-        var stringify = 'window.SQLResult = ' + results
-        fs.writeFileSync(path + 'SQLResult.js', stringify);
+        fs.writeFileSync(path + 'SQLResult.js', 'window.SQLResult = ' + results)
         callback();
     })
 }

@@ -11,7 +11,7 @@
 
 import { loader } from './loader'
 import { createData } from './data'
-import { SpiritAni } from '../seniorsprite/index'
+import AdvSprite from './advsprite'
 
 /**
  * 解析数据,获取content对象
@@ -59,7 +59,7 @@ export class PageWidget {
         //Combined advanced Sprite
         if (this.widgetId == "72" && this.widgetName == "spirit") {
             var arg = this._getArg()
-            this.pageObj = SpiritAni(arg[0], arg[1])
+            this.pageObj = AdvSprite(arg[0], arg[1])
         } else {
             //If there is no
             if (typeof window[this.widgetName + "Widget"] != "function") {

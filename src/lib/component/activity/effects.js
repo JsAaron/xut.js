@@ -8,15 +8,16 @@
  * @return {[type]} [description]
  *
  ********************************************************************/
-import { PPT } from './extension/ppt/index'
-import { ComSpirit } from './extension/comspirit/index'
-import { AdvSpirit } from './extension/advSpirit/index'
+import { PPT } from '../plugin/ppt/index'
+import ComSprite from './sprite/com'
+import AutoSprite from './sprite/auto'
 import { clearContentAudio } from '../audio/manager'
 
 //2016.7.15废弃
 //pixi暂时不使用
-const pixiSpirit = {}
-const pixiSpecial = {}
+let pixiSpirit = {}
+let pixiSpecial = {}
+
 // import { Sprite as pixiSpirit } from '../pixi/sprite/index'
 // import { specialSprite as pixiSpecial } from '../pixi/special/index'
 
@@ -50,8 +51,8 @@ const destroyAudio = (videoIds, chapterId) => {
 const OBJNAME = [
     'pptObj',
     'pixiObj',
-    'domSpriteObj',
-    'advSpiritObj'
+    'comSpriteObj',
+    'autoSpriteObj'
 ]
 
 
@@ -177,11 +178,11 @@ export class Effects {
             switch (category) {
                 //普通精灵动画
                 case "Sprite":
-                    this.domSpriteObj = ComSpirit(data)
+                    this.comSpriteObj = ComSprite(data)
                     break
                     //普通转复杂精灵动画
                 case "AutoCompSprite":
-                    this.advSpiritObj = new AdvSpirit(data)
+                    this.autoSpriteObj = new AutoSprite(data)
                     break
             }
         }
