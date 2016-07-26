@@ -11,8 +11,7 @@
  *
  * 此接口函数有作用域隔离
  */
-
-import { DragDropClass } from './drag'
+import DragDrop from './drag'
 import { simpleEvent } from './simple'
 import { complexEvent } from './complex'
 
@@ -107,10 +106,10 @@ function _bind(eventDrop, data) {
 
     switch (eventName) {
         case 'drag': //拖动
-            dragObj = new DragDropClass(eventContext, null, data.parameter, eventDrop.startRun, eventDrop.stopRun);
+            dragObj = new DragDrop(eventContext, null, data.parameter, eventDrop.startRun, eventDrop.stopRun);
             break;
         case 'dragTag': //拖拽
-            dragObj = new DragDropClass(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
+            dragObj = new DragDrop(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
             break;
         default:
 

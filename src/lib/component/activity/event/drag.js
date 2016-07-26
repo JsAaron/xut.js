@@ -1,63 +1,34 @@
-
 /**
- * 拖拽
+ * 拖拽类
  */
-function DragDropClass(dragElement, dropElement, autoReturn, dragCallback, dropCallback, container, throwProps) {
-    this.dragElement = dragElement;
-    this.defaultPoint = null;
-    this.dropElement = dropElement;
-    this.autoReturn = (autoReturn >= 1) ? true : false; //1:自动返回(true) 0:留在原地(false)
-    this.dragCallback = (typeof (dragCallback) == "function") ? dragCallback : null;
-    this.dropCallback = (typeof (dropCallback) == "function") ? dropCallback : null;
-    this.throwProps = (throwProps == false || this.autoReturn) ? false : true;
-    this.container = container;
-    this.dragElement.attr("data-defaultindex", this.dragElement.css("z-index"))
-    //this.dragObject = null; //创建的拖拽对象实例
+export default class {
 
-    var isInit = this.dragElement.attr("data-DragDrop");
-    if (isInit == null) {
-        this.init();
-        this.dragElement.attr("data-DragDrop", true);
-    } else {
-        console.log("This element has binding DragDropClass.");
+    constructor(dragElement, dropElement, autoReturn, dragCallback, dropCallback, container, throwProps) {
+
+        this.dragElement = dragElement;
+        this.defaultPoint = null;
+        this.dropElement = dropElement;
+        this.autoReturn = (autoReturn >= 1) ? true : false; //1:自动返回(true) 0:留在原地(false)
+        this.dragCallback = (typeof(dragCallback) == "function") ? dragCallback : null;
+        this.dropCallback = (typeof(dropCallback) == "function") ? dropCallback : null;
+        this.throwProps = (throwProps == false || this.autoReturn) ? false : true;
+        this.container = container;
+        this.dragElement.attr("data-defaultindex", this.dragElement.css("z-index"))
+            //this.dragObject = null; //创建的拖拽对象实例
+        var isInit = this.dragElement.attr("data-DragDrop");
+        if (isInit == null) {
+            this.init();
+            this.dragElement.attr("data-DragDrop", true);
+        } else {
+            console.log("This element has binding DragDropClass.");
+        }
     }
-}
 
-DragDropClass.prototype = {
-    //复位动画与状态
-    reset: function () {
-        var self = this;
-        var dragObject;
-        if (dragObject = this.dragObject) {
-            dragObject.enable();
-            if (self.defaultPoint) {
-                self.dragElement.css("left", self.defaultPoint.left);
-                self.dragElement.css("top", self.defaultPoint.top);
-            }
-            /*TweenLite.to(self.dragElement, 0, {
-                css: {
-                    x: 0,
-                    y: 0
-                }
-            });*/
-        }
-    },
-
-    disable: function () {
-        var dragObject;
-        if (dragObject = this.dragObject) {
-            dragObject.disable();
-        }
-    },
-
-    destroy: function () {
-        this.dragObject && this.dragObject.disable();
-        this.dropElement = null;
-        this.dragElement = null;
-        this.dragObject = null;
-    },
-
-    init: function () {
+    /**
+     * 初始化拖拽
+     * @return {[type]} [description]
+     */
+    init() {
         if (this.dragObject != null) return;
 
         var dragObject, self = this,
@@ -71,14 +42,14 @@ DragDropClass.prototype = {
             force3D: false, //是否启用硬件加速(left+top模式无需启用，启用后存在闪现问题)
             throwProps: this.throwProps,
             snap: {
-                left: function (endValue) {
+                left: function(endValue) {
                     return endValue;
                 },
-                top: function (endValue) {
+                top: function(endValue) {
                     return endValue;
                 }
             },
-            onDragStart: function (e) {
+            onDragStart: function(e) {
                 //获取拖拽对象原始参数
                 var defaultOffset = self.dragElement.offset();
                 self.defaultPoint = {
@@ -89,7 +60,7 @@ DragDropClass.prototype = {
                 };
                 if (self.dragCallback) self.dragCallback();
             },
-            onDragEnd: function (e) {
+            onDragEnd: function(e) {
                 var dropElement = self.dropElement,
                     isEnter = false; //是否进入目标
 
@@ -97,12 +68,12 @@ DragDropClass.prototype = {
                     //获取拖拽对象当前参数
                     var fromOffset = self.dragElement.offset();
                     var fromPoint = {
-                        x: fromOffset.left,
-                        y: fromOffset.top,
-                        w: self.dragElement.width(),
-                        h: self.dragElement.height()
-                    }
-                    //获取目标对象参数
+                            x: fromOffset.left,
+                            y: fromOffset.top,
+                            w: self.dragElement.width(),
+                            h: self.dragElement.height()
+                        }
+                        //获取目标对象参数
                     var toOffset = dropElement.offset();
                     var toPoint = {
                         x: toOffset.left,
@@ -160,8 +131,43 @@ DragDropClass.prototype = {
             }
         })[0];
     }
-};
+
+    /**
+     * 复位动画与状态
+     * @return {[type]} [description]
+     */
+    reset() {
+        var self = this;
+        var dragObject;
+        if (dragObject = this.dragObject) {
+            dragObject.enable();
+            if (self.defaultPoint) {
+                self.dragElement.css("left", self.defaultPoint.left);
+                self.dragElement.css("top", self.defaultPoint.top);
+            }
+            /*TweenLite.to(self.dragElement, 0, {
+                css: {
+                    x: 0,
+                    y: 0
+                }
+            });*/
+        }
+    }
 
 
+    disable() {
+        var dragObject;
+        if (dragObject = this.dragObject) {
+            dragObject.disable();
+        }
+    }
 
-export {DragDropClass}
+
+    destroy() {
+        this.dragObject && this.dragObject.disable();
+        this.dropElement = null;
+        this.dragElement = null;
+        this.dragObject = null;
+    }
+
+}
