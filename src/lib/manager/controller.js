@@ -90,10 +90,17 @@ let isBelong = (target) => {
  *
  * 2016.3.18
  * 妙妙学 滚动插件默认行为被阻止
+ *
+ * 2016.7.26
+ * 读库强制PC模式了
  */
 let preventDefault = (evtObj, target) => {
     //var tagName = target.nodeName.toLowerCase();
-    if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG) {
+    if (Xut.plat.isBrowser
+        && !Xut.IBooks.Enabled
+        && !window.MMXCONFIG
+        && !window.DUKUCONFIG
+        ) {
         evtObj.preventDefault && evtObj.preventDefault();
     }
 }

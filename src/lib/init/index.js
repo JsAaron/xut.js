@@ -79,8 +79,7 @@ let creatDatabase = () => {
         }, "*")
     }
 
-    //拷贝数据库
-    Xut.Plugin.XXTEbookInit.startup(config.dbName, loadApp, () => {});
+    loadApp()
 }
 
 
@@ -103,15 +102,15 @@ export function init() {
     //3 pc
     //4 ios/android
     if (window.GLOBALIFRAME) {
-        creatDatabase(config)
+        creatDatabase()
     } else {
         //brower or mobile(apk or ipa)
         if (config.isBrowser) {
-            loadApp(config)
+            loadApp()
         } else {
             window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
             document.addEventListener("deviceready", () => {
-                creatDatabase(config)
+                Xut.Plugin.XXTEbookInit.startup(config.dbName, creatDatabase, () => {});
             }, false)
         }
     }

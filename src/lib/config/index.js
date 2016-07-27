@@ -192,6 +192,10 @@ Xut.log = function(info, name) {
  */
 _.extend(config, {
 
+    //2016.7.26
+    //读酷增加强制插件模式
+    isPlugin: window.DUKUCONFIG && plat.isIOS,
+
     /**
      * 调试模式
      * 如果启动桌面调试模式,自动打开缓存加载,就是每次都打开都回到最后看到的一页

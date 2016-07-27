@@ -24,7 +24,7 @@ base(conf, stop)
         return readsrcipt(conf)
     }, stop)
     .then((scriptUrl) => {
-        return compilerjs(conf, scriptUrl)
+        return compilerjs(conf, scriptUrl,stop)
     }, stop)
     .then(() => {
         return compilercss(conf)

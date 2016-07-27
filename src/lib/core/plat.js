@@ -5,7 +5,8 @@
 ;
 (function() {
 
-    var ua, uv, _style, _cache, TRANSITION_END, ANIMATION_END, KEYFRAMES, isAndroid, isIphone, isIpad, isIOS, isIOS7, has3d, MOBILE_REGEX, SUPPORT_TOUCH, SUPPORT_MOUSE, SUPPORT_ONLY_TOUCH, org_href, boolBrowser
+    var ua, uv, _style, _cache, TRANSITION_END, ANIMATION_END, KEYFRAMES, isAndroid, isIphone, isIpad, isIOS, isIOS7, has3d, MOBILE_REGEX, SUPPORT_TOUCH, SUPPORT_MOUSE, SUPPORT_ONLY_TOUCH, location, boolBrowser, PREFIX, prefixStyle
+
 
     //在读酷pc端 navigator的值被改写过了!!
     //navigator.appVersion: "xxt 1.0.5260.29725"
@@ -23,6 +24,7 @@
     TRANSITION_END = 'transitionend'
     ANIMATION_END = 'animationend'
     KEYFRAMES = '@keyframes '
+    PREFIX = ['webkit', 'Moz', 'ms', 'o']
 
     //针对win8的处理
     MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
@@ -37,14 +39,14 @@
     SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH && MOBILE_REGEX.test(navigator.userAgent);
 
     //判断是否为浏览器
-    org_href = document.location.href;
-    boolBrowser = org_href.indexOf('http') > -1 || org_href.indexOf('https') > -1;
+    //http://localhost:12344/index.html
+    location = document.location.href
+    boolBrowser = location.indexOf('http') > -1 || location.indexOf('https') > -1;
 
 
-    var prefixStyle = function(attr) {
-        var vendors = ['webkit', 'Moz', 'ms', 'o'];
-        var name;
-        //缓存中存在
+    prefixStyle = function(attr) {
+        var name
+            //缓存中存在
         if (_cache[attr]) {
             return _cache[attr];
         }
@@ -53,7 +55,7 @@
             return _cache[attr] = attr;
         }
         //需要加前缀
-        _.each(vendors, function(v) {
+        _.each(PREFIX, function(v) {
             if (jQuery.camelCase(v + '-' + attr) in _style) {
                 name = '-' + v + '-' + attr;
                 return _cache[attr] = name;

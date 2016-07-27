@@ -150,8 +150,8 @@ export function readFile(path, callback, type) {
     }
 
     //svg文件
-    //游览器模式
-    if (Xut.plat.isBrowser) {
+    //游览器模式 && 非强制插件模式
+    if (Xut.plat.isBrowser && !config.isPlugin) {
         $.ajax({
             type: 'get',
             dataType: 'html',
@@ -164,9 +164,7 @@ export function readFile(path, callback, type) {
                 console.log('SVG' + path + '解析出错!');
             }
         })
-
     } else {
-        //手机模式
         Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.svgPath() + path, function(svgContent) {
             callback(svgContent);
         }, function(err) {

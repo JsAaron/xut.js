@@ -4,7 +4,7 @@ const rename = require("gulp-rename");
 const concat = require('gulp-concat')
 const fs = require('fs')
 
-module.exports = (conf, scriptUrl) => {
+module.exports = (conf, scriptUrl, stop) => {
     return new Promise((resolve, reject) => {
         //合成xxtppt.js
         scriptUrl.push(conf.rollup)
