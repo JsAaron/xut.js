@@ -818,7 +818,7 @@ portExtend(Application, {
                         window.GLOBALCONTEXT.navigator.app.exitApp();
                     }
                 },
-                '退出', ['确定', '取消']
+                '退出', '确定,取消'
             );
         }
     },

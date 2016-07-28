@@ -4,14 +4,13 @@
  *   提供给widget使用
  *
  * 2.复杂精灵动画
- * 	 提供给普通转化高级使用
+ *   提供给普通转化高级使用
  */
 let prefix = Xut.plat.prefixStyle
 
 export default class {
 
     constructor(data, options) {
-
         this.data = data;
         //精灵动画类型 默认为高级精灵动画true 简单转复杂为false
         this.animationType = true;
@@ -34,7 +33,7 @@ export default class {
         this.curFPS = 0;
         this.timer = null;
         this.loop = 1;
-        this.curLoop = 1;
+        this.curLoop = 0;
         let params = this.data.params
         let action = this.action = params["actList"].split(",")[0]
         let pa = params[action];
@@ -42,13 +41,23 @@ export default class {
         this.playerType = (pa.playerType);
         //isSports:0非运动状态 isSports:1运动状态
         this.isSports = parseInt(pa.isSports);
-        this.imageList = pa.ImageList;
-        this.FPSCount = this.imageList.length;
+        let originalImageList = this.originalImageList = pa.ImageList;
+
+
+
+        this.FPSCount = originalImageList.length;
         this.imgArray = new Array();
 
         if (this.playerType == "loop") {
             this.loop = 0;
+
         }
+        let reverseArray = new Array();
+        for (var i = originalImageList.length - 1; i >= 0; i--) {
+            var temp = originalImageList[i];
+            reverseArray.push(temp);
+        }
+        this.reverseImageList = reverseArray;
 
         this.init();
     }
@@ -107,8 +116,8 @@ export default class {
             let params = this.data.params;
             let action = this.action;
             this.startPoint = {
-                x: this.imageList[0].X,
-                y: this.imageList[0].Y,
+                x: this.originalImageList[0].X,
+                y: this.originalImageList[0].Y,
                 w: parseInt(params[action].width),
                 h: parseInt(params[action].height)
             }
@@ -142,10 +151,10 @@ export default class {
                 "<img" +
                 " id='spImg_{0}'" +
                 " src='{1}'" +
-                " style='width:100%;height:100%;position:absolute;' />", framId, ResourcePath + this.imageList[0].name)
+                " style='width:100%;height:100%;position:absolute;' />", framId, ResourcePath + this.originalImageList[0].name)
             obj.html(ret);
         } else {
-            let filename = this.getFilename(this.imageList[0].name);
+            let filename = this.getFilename(this.originalImageList[0].name);
             let ret = ""
             ret += String.Foramt(
                 "<div" +
@@ -174,7 +183,7 @@ export default class {
         clearTimeout(this.timer);
 
         if (this.animationType) {
-            let imageList = this.imageList;
+            let imageList = this.originalImageList;
             //预加载图片
             this.imgArray = [];
             for (let i = 1; i < 6; i++) {
@@ -192,26 +201,32 @@ export default class {
     setAnimation() {
         //第一次循环结束
         if (this.curFPS >= this.FPSCount) {
-            if (this.loop > 0) {
-                if (this.animationType) {
-                    //只播放loop次
-                    if (this.curLoop >= this.loop) {
-                        return;
+            this.curLoop++;
+            //若元素不可见 停止播放动画
+            if (this.obj[0].style.visibility == "hidden") {
+                return
+            } else {
+                if (this.loop > 0) {
+                    if (this.animationType) {
+                        //只播放loop次
+                        if (this.curLoop >= this.loop) {
+                            return;
+                        } else {
+                            this.curFPS = 0;
+                            this.time();
+                        }
                     } else {
-                        this.curLoop++;
-                        this.curFPS = 0;
-                        this.time();
+                        return;
                     }
-                } else {
-                    return;
-                }
 
+                }
+                //循环播放 
+                else {
+                    this.curFPS = 0;
+                    this.time();
+                }
             }
-            //循环播放 
-            else {
-                this.curFPS = 0;
-                this.time();
-            }
+
         }
         //开始第一次循环 
         else {
@@ -232,50 +247,73 @@ export default class {
      * @return {[type]} [description]
      */
     changeImageUrl() {
-        let imageList = this.imageList;
-        let curFPS = imageList[this.curFPS];
-        let ResourcePath = this.ResourcePath;
-        let ele;
-        if (this.animationType) {
-            ele = $("#spImg_" + this.data.framId);
-        } else {
-            ele = $("#spImg_" + this.contentId + '_' + this.data.framId);
-        }
-
-        if (this.resType == 1) {
-            let str = ResourcePath + curFPS.name
-            ele.attr("src", str);
-        } else {
-            let filename = this.getFilename(curFPS.name);
-            ele.css("background-image", "url(" + ResourcePath + filename + ".jpg)");
-            ele.css("-webkit-mask-image", "url(" + ResourcePath + filename + ".png)");
-        }
-
-        if (this.animationType) {
-            //预加载下下下帧资源
-            this.imgArray.pop();
-            if (this.resType != 1) this.imgArray.pop();
-            let nextImgId = this.curFPS + 3;
-            if (nextImgId < imageList.length) {
-                this.preloadImage(nextImgId);
+            let imageList;
+            if (this.curLoop % 2 == 0) {
+                imageList = this.originalImageList;
+            } else {
+                imageList = this.reverseImageList;
             }
+
+            let curFPS = imageList[this.curFPS];
+            let ResourcePath = this.ResourcePath;
+            let ele;
+            if (this.animationType) {
+                ele = $("#spImg_" + this.data.framId);
+            } else {
+                ele = $("#spImg_" + this.contentId + '_' + this.data.framId);
+            }
+
+            if (this.resType == 1) {
+                let str = ResourcePath + curFPS.name
+                ele.attr("src", str);
+            } else {
+                let filename = this.getFilename(curFPS.name);
+                ele.css("background-image", "url(" + ResourcePath + filename + ".jpg)");
+                ele.css("-webkit-mask-image", "url(" + ResourcePath + filename + ".png)");
+            }
+
+            if (this.animationType) {
+                //预加载下下下帧资源
+                this.imgArray.pop();
+                if (this.resType != 1) this.imgArray.pop();
+                let nextImgId = this.curFPS + 3;
+                if (nextImgId < imageList.length) {
+                    this.preloadImage(nextImgId);
+                }
+            }
+
+
+        }
+        /**
+         * 根据循环次数切换图片数组 正序逆序交替切换 解决动画抖动问题
+         * @return {[type]} [description]
+         */
+        getTargetImageList() {
+            let imageList;
+            if (this.curLoop % 2 == 0) {
+                imageList = this.originalImageList;
+            } else {
+                imageList = this.reverseImageList;
+
+            }
+            return imageList;
         }
 
-
-    }
 
     /**
      * 改变图片位置
      * @return {[type]} [description]
      */
     changePosition() {
-        let imageList = this.imageList;
-        let curFPS = imageList[this.curFPS];
-        let x = curFPS.X - this.startPoint.x;
-        let y = curFPS.Y - this.startPoint.y;
+        let imageList, curFPS, x, y;
 
+        imageList = this.getTargetImageList();
+        curFPS = imageList[this.curFPS];
+        x = curFPS.X - this.startPoint.x;
+        y = curFPS.Y - this.startPoint.y;
         this.obj.css("left", this.startLeft + x * this.xRote);
         this.obj.css("top", this.startTop + y * this.yRote);
+
     }
 
     /**
@@ -284,7 +322,8 @@ export default class {
      * @return {[type]}       [description]
      */
     preloadImage(index) {
-        let imageList = this.imageList;
+        let imageList = this.getTargetImageList();
+
         let resourcePath = this.ResourcePath;
         if (this.resType == 1) {
             let img = this.loadResource(resourcePath + imageList[index].name, null);
