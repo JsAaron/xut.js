@@ -35,6 +35,6 @@ if (Xut.plat.isBrowser) {
     }
 }
 
-Xut.Version = 826;
+Xut.Version = 827
 
 init()

@@ -1,5 +1,5 @@
 
-let ceil = Math.Math
+let ceil = Math.ceil
 let pow = Math.pow
 let regexpRGB = /^(rgb|RGB)\([0-9]{1,3},\s?[0-9]{1,3},\s?[0-9]{1,3}\)$/; //RGB
 let regexpHex = /^#[0-9a-fA-F]{3,6}$/; //Hex

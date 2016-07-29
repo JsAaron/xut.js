@@ -8,25 +8,23 @@
  *                                                                    *
  **********************************************************************/
 import { _set } from '../util/stroage'
-//页面管理
 import { PageMgr } from './page'
-//母版管理
 import { MasterMgr } from './master'
-//错误的数据库表
 import { errorTable } from '../init/data/storemgr'
-//数据解析
 import { query } from './parser'
-//页面切换
 import { SwitchPage } from './switch'
-//Navbar
 import { close as _close } from '../toolbar/navbar/index'
 
 
-
-//判断是否能整除2
+/**
+ * 判断是否能整除2
+ * @param  {[type]} num [description]
+ * @return {[type]}     [description]
+ */
 function offsetPage(num) {
     return ((num % 2 == 0) ? 'left' : 'right');
 }
+
 
 //如果是场景加载，转化页码数
 //转化按0开始
@@ -224,9 +222,6 @@ function checkMasterCreate() {
 }
 
 
-/**
- * 调度器
- */
 export class Scheduler {
 
     constructor(vm) {

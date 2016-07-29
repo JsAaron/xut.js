@@ -6,7 +6,7 @@
  * 2.复杂精灵动画
  *   提供给普通转化高级使用
  */
-let prefix = Xut.plat.prefixStyle
+const prefix = Xut.plat.prefixStyle
 
 export default class {
 
@@ -201,7 +201,7 @@ export default class {
     setAnimation() {
         //第一次循环结束
         if (this.curFPS >= this.FPSCount) {
-            this.curLoop++;
+            //this.curLoop++;
             //若元素不可见 停止播放动画
             if (this.obj[0].style.visibility == "hidden") {
                 return
@@ -313,6 +313,7 @@ export default class {
         y = curFPS.Y - this.startPoint.y;
         this.obj.css("left", this.startLeft + x * this.xRote);
         this.obj.css("top", this.startTop + y * this.yRote);
+
 
     }
 

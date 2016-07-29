@@ -1,12 +1,17 @@
-/***************************************************************
- *
- *          视觉差对象初始化操作
- *
- ****************************************************************/
+/**
+ * 视觉差对象初始化操作
+ */
 
-let screenSize
+import { config } from '../../config/index'
 
-//变化节点的css3transform属性
+
+/**
+ * 变化节点的css3transform属性
+ * @param  {[type]} rootNode   [description]
+ * @param  {[type]} property   [description]
+ * @param  {[type]} pageOffset [description]
+ * @return {[type]}            [description]
+ */
 function transformNodes(rootNode, property, pageOffset) {
     var style = {},
         effect = '',
@@ -57,7 +62,12 @@ function transformNodes(rootNode, property, pageOffset) {
     return parallaxOffset;
 }
 
-//转换成比例值
+
+/**
+ * 转换成比例值
+ * @param  {[type]} parameters [description]
+ * @return {[type]}            [description]
+ */
 function conversionRatio(parameters) {
     if (parameters.opacityStart > -1) {
         parameters.opacity = (parameters.opacityEnd || 1) - parameters.opacityStart;
@@ -66,11 +76,17 @@ function conversionRatio(parameters) {
     return parameters;
 }
 
-//转化成实际值
-function conversionValue(parameters, nodeProportion, screenSize) {
+
+/**
+ * 转化成实际值
+ * @param  {[type]} parameters     [description]
+ * @param  {[type]} nodeProportion [description]
+ * @return {[type]}                [description]
+ */
+function conversionValue(parameters, nodeProportion) {
     var results = {},
-        width = -screenSize.width,
-        height = -screenSize.height;
+        width = -config.screenSize.width,
+        height = -config.screenSize.height;
 
     for (var i in parameters) {
         switch (i) {
@@ -92,9 +108,8 @@ function conversionValue(parameters, nodeProportion, screenSize) {
     return results;
 }
 
-export function Parallax(data) {
 
-    screenSize = Xut.config.screenSize
+export function Parallax(data) {
 
     try {
         //转化所有css特效的参数的比例
@@ -113,7 +128,7 @@ export function Parallax(data) {
         //页面偏移比例
         nodeOffsetProportion = (currPageOffset - 1) / (pageRange - 1),
         //计算出偏移值
-        offsetTranslate = conversionValue(translate, nodeOffsetProportion, screenSize),
+        offsetTranslate = conversionValue(translate, nodeOffsetProportion),
         //页面分割比
         nodeProportion = 1 / (pageRange - 1);
 
@@ -128,7 +143,7 @@ export function Parallax(data) {
      */
     data.parallax = {
         //计算页码结束边界值,用于跳转过滤
-        calculateRangePage: function () {
+        calculateRangePage: function() {
             return {
                 'start': pid - currPageOffset + 1,
                 'end': pageRange - currPageOffset + pid

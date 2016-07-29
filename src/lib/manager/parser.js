@@ -1,20 +1,3 @@
-//查询接口
-export function query(tableName, options, callback) {
-    switch (tableName) {
-        case 'page':
-            //得到页面关联的数据
-            return getPageData(options, callback);
-        case 'master':
-            //得到母版关联的数据
-            return getMasterData(options, callback);
-        case 'chapter':
-            //得到chapter表数据
-            return parseChapter(options)
-        case 'scenarioChapter':
-            return scenarioChapter(options);
-    }
-}
-
 /**
  * 根据指定的chpaterId解析
  * @return {[type]} [description]
@@ -26,13 +9,14 @@ function scenarioChapter(chapterId) {
 }
 
 
-/*********************************************************************
- *
- *               1 解析chapter页面数据
- *               2 解析对应的Activity数据
- *               3 解析出自动widget数据结构
- *                                                         *
- **********************************************************************/
+/**
+ * 1 解析chapter页面数据
+ * 2 解析对应的Activity数据
+ * 3 解析出自动widget数据结构
+ * @param  {[type]}   data     [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
 function getPageData(data, callback) {
     var parsePointer = data['pageIndex'],
         pageData = data['pageData'];
@@ -47,12 +31,19 @@ function getPageData(data, callback) {
     }
 };
 
-//解析关联的Activity表数据
+
+/**
+ * 解析关联的Activity表数据
+ * @param  {[type]}   pageData [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
 function getActivity(pageData, callback) {
     parseActivity(pageData, function(activitys, autoData) {
         callback(pageData, activitys, autoData);
     });
 }
+
 
 /**
  * 递归分解
@@ -77,11 +68,12 @@ function parseChapter(waitCreatePointer) {
 };
 
 
-/*********************************************************************
- *
- *                解析视觉差的数据
- *                                                         *
- **********************************************************************/
+/**
+ * 解析视觉差的数据
+ * @param  {[type]}   data     [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
 function getMasterData(data, callback) {
     var pptMaster = data['pptMaster'];
     var masterDas = Xut.data.query('Master', pptMaster)
@@ -91,11 +83,8 @@ function getMasterData(data, callback) {
 }
 
 
-/*********************************************************************
- *                解析activity表的数据
- *                                                         *
- **********************************************************************/
 /**
+ *  解析activity表的数据
  * chpaters = {
  *     pageIndex-12: Object
  *     pageIndex-13: Object
@@ -135,7 +124,11 @@ function mixShowNote(onechapter, activitydata) {
 };
 
 
-//解析出页面自动运行的数据
+/**
+ * 解析出页面自动运行的数据
+ * @param  {[type]} activitys [description]
+ * @return {[type]}           [description]
+ */
 function filterAutoRun(activitys) {
 
     var collectAutoBuffers, key, id, key, sub;
@@ -165,5 +158,29 @@ function filterAutoRun(activitys) {
 
     if (collectAutoBuffers.length) {
         return collectAutoBuffers;
+    }
+}
+
+
+/**
+ * 查询接口
+ * @param  {[type]}   tableName [description]
+ * @param  {[type]}   options   [description]
+ * @param  {Function} callback  [description]
+ * @return {[type]}             [description]
+ */
+export function query(tableName, options, callback) {
+    switch (tableName) {
+        case 'page':
+            //得到页面关联的数据
+            return getPageData(options, callback);
+        case 'master':
+            //得到母版关联的数据
+            return getMasterData(options, callback);
+        case 'chapter':
+            //得到chapter表数据
+            return parseChapter(options)
+        case 'scenarioChapter':
+            return scenarioChapter(options);
     }
 }

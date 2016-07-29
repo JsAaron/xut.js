@@ -22,7 +22,7 @@ import {
 /**
  * 部分配置文件
  */
-let optConf = {
+const optConf = {
     //数据库定义的翻页模式
     //用来兼容客户端的制作模式
     //妙妙学模式处理，多页面下翻页切换
@@ -96,11 +96,7 @@ let isBelong = (target) => {
  */
 let preventDefault = (evtObj, target) => {
     //var tagName = target.nodeName.toLowerCase();
-    if (Xut.plat.isBrowser
-        && !Xut.IBooks.Enabled
-        && !window.MMXCONFIG
-        && !window.DUKUCONFIG
-        ) {
+    if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
         evtObj.preventDefault && evtObj.preventDefault();
     }
 }
@@ -243,7 +239,7 @@ class Controller extends Observer {
     addTools(vm) {
 
         _.extend(delegateHooks, {
-            
+
             /**
              * li节点,多线程创建的时候处理滑动
              */

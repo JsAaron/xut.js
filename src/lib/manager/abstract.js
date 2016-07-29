@@ -115,12 +115,14 @@ export class Abstract {
         return this.abstractGetPageData(pageIndex, 'nodes', pageType);
     }
 
-
-    //***************************************************************
-    //
-    //  执行辅助对象事件
-    //
-    //***************************************************************
+    /**
+     * 执行辅助对象事件
+     * @param  {[type]} activityId  [description]
+     * @param  {[type]} currIndex   [description]
+     * @param  {[type]} outCallBack [description]
+     * @param  {[type]} actionName  [description]
+     * @return {[type]}             [description]
+     */
     abstractAssistAppoint(activityId, currIndex, outCallBack, actionName) {
         var pageObj;
         if (pageObj = this.abstractGetPageObj(currIndex)) {

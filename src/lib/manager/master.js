@@ -6,14 +6,19 @@
 import { Abstract } from './abstract'
 import { translation } from '../pagebase/translation'
 import { Pagebase } from '../pagebase/pagebase'
-//动作热热点派发
+
 import {
     suspend as _suspend,
     original as _original,
     autoRun as _autoRun
 } from '../dispatcher/index'
 
-//扁平化对象到数组
+
+/**
+ * 扁平化对象到数组
+ * @param  {[type]} filter [description]
+ * @return {[type]}        [description]
+ */
 let toArray = (filter) => {
     var arr = [];
     if (!filter.length) {
@@ -25,8 +30,8 @@ let toArray = (filter) => {
     return filter;
 }
 
-let prefix = Xut.plat.prefixStyle
-let rword = "-"
+const prefix = Xut.plat.prefixStyle
+const rword = "-"
 
 
 /**
@@ -71,14 +76,14 @@ export class MasterMgr extends Abstract {
         this.abstractCreateCollection();
     }
 
-    /****************************************************************
-     *
-     *                 对外接口
-     *
-     ***************************************************************/
 
-    //====================页面结构处理===========================
-
+    /**
+     * 创建
+     * @param  {[type]} dataOpts       [description]
+     * @param  {[type]} pageIndex      [description]
+     * @param  {[type]} createCallBack [description]
+     * @return {[type]}                [description]
+     */
     create(dataOpts, pageIndex, createCallBack) {
         var masterObj, reuseMasterId, reuseMasterKey
         var pptMaster = dataOpts.chapterDas.pptMaster
@@ -117,7 +122,10 @@ export class MasterMgr extends Abstract {
     }
 
 
-    //销毁整个页面对象
+    /**
+     * 销毁整个页面对象
+     * @return {[type]} [description]
+     */
     destroy() {
         this.rootNode = null;
         //销毁对象
@@ -232,6 +240,7 @@ export class MasterMgr extends Abstract {
         }
     }
 
+
     /**
      * 复位初始状态
      * @return {[type]} [description]
@@ -242,6 +251,7 @@ export class MasterMgr extends Abstract {
             _original(originalPageObj);
         }
     }
+
 
     /**
      *  母版自动运行
@@ -254,7 +264,6 @@ export class MasterMgr extends Abstract {
             _autoRun(masterObj, data.currIndex);
         }
     }
-
 
     /**
      * 移动内部的视察对象
@@ -388,7 +397,14 @@ export class MasterMgr extends Abstract {
     }
 
 
-    //变化节点的css3transform属性
+    /**
+     * 变化节点的css3transform属性
+     * @param  {[type]} rootNode     [description]
+     * @param  {[type]} speed        [description]
+     * @param  {[type]} property     [description]
+     * @param  {[type]} opacityStart [description]
+     * @return {[type]}              [description]
+     */
     _transformNodes(rootNode, speed, property, opacityStart) {
         var style = {},
             effect = '',
@@ -436,8 +452,12 @@ export class MasterMgr extends Abstract {
     }
 
 
-    //针对跳转页面
-    //制作处理器
+    /**
+     * 制作处理器
+     * 针对跳转页面
+     * @param  {[type]} data [description]
+     * @return {[type]}      [description]
+     */
     makeJumpPocesss(data) {
         var filter;
         var master = this;
@@ -498,7 +518,11 @@ export class MasterMgr extends Abstract {
     }
 
 
-    //修正位置
+    /**
+     * 修正位置
+     * @param  {[type]} filter [description]
+     * @return {[type]}        [description]
+     */
     _fixPosition(filter) {
 
         var self = this
@@ -549,9 +573,12 @@ export class MasterMgr extends Abstract {
     }
 
 
-    //=======================去重检测==============================
-
-    //当前同一视觉页面作用的范围
+    /**
+     * 当前同一视觉页面作用的范围
+     * @param  {[type]} reuseMasterKey [description]
+     * @param  {[type]} pageIndex      [description]
+     * @return {[type]}                [description]
+     */
     _toRepeat(reuseMasterKey, pageIndex) {
         var temp;
         if (temp = this.recordMasterscope[reuseMasterKey]) {
@@ -577,7 +604,12 @@ export class MasterMgr extends Abstract {
         }
     }
 
-    //记录页面与模板标示的映射
+    /**
+     * 记录页面与模板标示的映射
+     * @param  {[type]} reuseMasterKey [description]
+     * @param  {[type]} pageIndex      [description]
+     * @return {[type]}                [description]
+     */
     _updatadParallaxMaster(reuseMasterKey, pageIndex) {
         //记录页面与模板标示的映射
         this.recordMasterId[pageIndex] = reuseMasterKey;
@@ -585,7 +617,14 @@ export class MasterMgr extends Abstract {
         this.currMasterId = this.conversionMasterId(Xut.Presentation.GetPageIndex())
     }
 
-    //检测是否需要创建视觉差
+
+    /**
+     * 检测是否需要创建视觉差
+     * @param  {[type]} reuseMasterKey [description]
+     * @param  {[type]} pageOffset     [description]
+     * @param  {[type]} pageIndex      [description]
+     * @return {[type]}                [description]
+     */
     _checkRepeat(reuseMasterKey, pageOffset, pageIndex) {
         var tag = this._toRepeat(reuseMasterKey, pageIndex); //false就是没找到视察对象
         this._updataMasterscope(reuseMasterKey, pageIndex);
@@ -593,7 +632,14 @@ export class MasterMgr extends Abstract {
         return tag;
     }
 
-    //transform转化成相对应的偏移量
+
+    /**
+     * transform转化成相对应的偏移量
+     * @param  {[type]} property     [description]
+     * @param  {[type]} moveDistance [description]
+     * @param  {[type]} nodes        [description]
+     * @return {[type]}              [description]
+     */
     _transformConversion(property, moveDistance, nodes) {
         var temp = {},
             i;
@@ -618,7 +664,13 @@ export class MasterMgr extends Abstract {
         return temp;
     }
 
-    //移动叠加值
+
+    /**
+     * 移动叠加值
+     * @param  {[type]} property       [description]
+     * @param  {[type]} repairProperty [description]
+     * @return {[type]}                [description]
+     */
     _flipMove(property, repairProperty) {
         var temp = {};
         var start = property.opacityStart;
@@ -629,7 +681,13 @@ export class MasterMgr extends Abstract {
         return temp;
     }
 
-    //反弹
+
+    /**
+     * 反弹
+     * @param  {[type]} property       [description]
+     * @param  {[type]} repairProperty [description]
+     * @return {[type]}                [description]
+     */
     _flipRebound(property, repairProperty) {
         var temp = {};
         for (var i in property) {
@@ -638,12 +696,23 @@ export class MasterMgr extends Abstract {
         return temp;
     }
 
-    //翻页结束
+    /**
+     * 翻页结束
+     * @param  {[type]} property       [description]
+     * @param  {[type]} repairProperty [description]
+     * @return {[type]}                [description]
+     */
     _flipOver(property, repairProperty) {
         return this._flipMove(property, repairProperty);
     }
 
-    //结束后缓存上一个记录
+
+    /**
+     * 结束后缓存上一个记录
+     * @param  {[type]} property       [description]
+     * @param  {[type]} repairProperty [description]
+     * @return {[type]}                [description]
+     */
     _overMemory(property, repairProperty) {
         for (var i in property) {
             repairProperty[i] = property[i];
@@ -651,7 +720,13 @@ export class MasterMgr extends Abstract {
     }
 
 
-    //修正跳转后视觉对象坐标
+    /**
+     * 修正跳转后视觉对象坐标
+     * @param  {[type]} parallaxObj   [description]
+     * @param  {[type]} currPageIndex [description]
+     * @param  {[type]} targetIndex   [description]
+     * @return {[type]}               [description]
+     */
     _fixParallaxPox(parallaxObj, currPageIndex, targetIndex) {
         var self = this,
             contentObjs, prevNodes, nodes;
@@ -738,7 +813,13 @@ export class MasterMgr extends Abstract {
     }
 
 
-    //注册状态管理
+    /**
+     * 注册状态管理
+     * @param  {[type]} pageIndex  [description]
+     * @param  {[type]} type       [description]
+     * @param  {[type]} hotspotObj [description]
+     * @return {[type]}            [description]
+     */
     register(pageIndex, type, hotspotObj) {
         var parallaxObj = this.abstractGetPageObj(this.conversionMasterId(pageIndex))
         if (parallaxObj) {
@@ -746,12 +827,16 @@ export class MasterMgr extends Abstract {
         }
     }
 
-    //=======================工具方法==============================
 
-    //page转化成母版ID
+    /**
+     * page转化成母版ID
+     * @param  {[type]} pageIndex [description]
+     * @return {[type]}           [description]
+     */
     conversionMasterId(pageIndex) {
         return this.recordMasterId ? this.recordMasterId[pageIndex] : undefined;
     }
+
 
     removeRecordMasterscope(removekey) {
         var me = this;

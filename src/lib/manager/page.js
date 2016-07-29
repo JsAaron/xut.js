@@ -8,6 +8,7 @@ import { Pagebase } from '../pagebase/pagebase'
 import { translation } from '../pagebase/translation'
 import { addEdges } from '../util/edge'
 import { removeVideo } from '../component/video/manager'
+import { injectScript, extend } from '../util/index'
 
 import {
     suspend as _suspend,
@@ -15,10 +16,7 @@ import {
     autoRun as _autoRun
 } from '../dispatcher/index'
 
-import {
-    injectScript,
-    extend
-} from '../util/index'
+
 
 /**
  * 检测脚本注入

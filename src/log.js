@@ -1,6 +1,7 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v827  2016.7.27  Correct gesture
 * v826  2016.7.27  Increased the DUKU mode of judgment
 * v825  2016.7.26  Organize structure, combine the Sprite
 * v824  2016.7.25  combine the sprite of advancedSpriteAnimation width the sprite of SeniorSpriteAnimation into one javascript file
