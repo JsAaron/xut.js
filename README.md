@@ -25,7 +25,7 @@ This is a template program, used to batch production of app, using the front end
 * release: Based on gulp+rollup single file package
 * test: Based on karma+mocha+chai
 
-##Blog links
+##Blog
 * http://www.cnblogs.com/aaronjs
 
 
