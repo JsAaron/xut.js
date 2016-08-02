@@ -7,11 +7,11 @@ Cross-platform, support PC/ios/android/wp
 
 ![](https://github.com/JsAaron/res/blob/master/horizontal.gif)  
 
+*************
 
 ###Vertical
 
-![](hhttps://github.com/JsAaron/res/blob/master/vertical.gif)  
-
+![](https://github.com/JsAaron/res/blob/master/vertical.gif)  
 
 *************
 
