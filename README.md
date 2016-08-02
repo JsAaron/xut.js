@@ -2,7 +2,18 @@
 ##Preview
 Cross-platform, support PC/ios/android/wp
 *************
-![](https://github.com/JsAaron/es6-magazine/blob/master/README.gif)  
+
+###Horizontal
+```
+![](https://github.com/JsAaron/res/blob/master/horizontal.gif)  
+```
+
+###Vertical
+```
+![](hhttps://github.com/JsAaron/res/blob/master/vertical.gif)  
+```
+
+*************
 
 ##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
@@ -32,5 +43,3 @@ This is a template program, used to batch production of app, using the front end
 
 ##Blog
 * http://www.cnblogs.com/aaronjs
-
-
