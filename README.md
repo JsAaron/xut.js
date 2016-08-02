@@ -3,17 +3,10 @@
 Cross-platform, support PC/ios/android/wp
 *************
 
-###Horizontal
-
 ![](https://github.com/JsAaron/res/blob/master/horizontal.gif)  
 
 *************
 
-###Vertical
-
-![](https://github.com/JsAaron/res/blob/master/vertical.gif)  
-
-*************
 
 ##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
