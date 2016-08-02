@@ -5,10 +5,12 @@ const readsrcipt = require('../script')
 const compilercss = require('./css')
 const compilerjs = require('./js')
 const startserver = require('./server')
+const vs = require('./vs')
 const config = require('../../config')
 
 const conf = _.extend(config.build.conf, {
-    rollup: config.build.conf.tarDir + 'rollup.js',
+    rollup: conf
+    ig.build.conf.tarDir + 'rollup.js',
     exclude: config.build.exclude,
     server: config.build.server
 });
@@ -24,7 +26,10 @@ base(conf, stop)
         return readsrcipt(conf)
     }, stop)
     .then((scriptUrl) => {
-        return compilerjs(conf, scriptUrl,stop)
+        return compilerjs(conf, scriptUrl, stop)
+    }, stop)
+    .then(() => {
+        return vs(conf)
     }, stop)
     .then(() => {
         return compilercss(conf)

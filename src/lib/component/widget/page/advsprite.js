@@ -61,8 +61,7 @@ export function updateAction(id, params) {
     }
 
     if (obj = spiritObjs[id]) {
-        obj.init();
-        obj.startAnimation(params.actList, loop);
+        obj.play(params.actList, loop);
     } else {
         console.log('error')
     }

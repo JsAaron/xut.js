@@ -57,7 +57,7 @@ export default class  {
 
             action = params["actList"].split(",")[0]
                 //0 循环播放 1播放一次
-            this.spiritObjs[id].startAnimation(action, loop)
+            this.spiritObjs[id].play(action, loop)
         }
 
 

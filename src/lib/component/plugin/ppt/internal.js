@@ -7,7 +7,7 @@ import {
     colorHexToRGB
 } from './util'
 
-
+let prefix = Xut.plat.prefixStyle
 export function internal(animproto) {
 
     //文字动画
@@ -2145,7 +2145,8 @@ export function internal(animproto) {
 
     //彩色脉冲
     animproto.getEffectFlicker = function (parameter, object, duration, delay, repeat) {
-        if (!("-webkit-filter" in object[0].style)) return new TimelineMax();
+         var filter = prefix('filter')
+        if (!(filter in object[0].style)) return new TimelineMax();
         //if (repeat < 2) repeat = 2; //默认三次
         var color2 = parameter.color2 ? parameter.color2 : "#fff"; //颜色
         var maxGlowSize = (parameter.maxGlowSize) ? parameter.maxGlowSize : 0.1; //光晕最大尺寸(百分比)
@@ -2164,7 +2165,7 @@ export function internal(animproto) {
             onComplete: this.completeHandler,
             onCompleteParams: [parameter, object, {
                 //"box-shadow": "none"
-                "-webkit-filter": "none"
+                filter: "none"
             }]
         });
         t1.to(object, duration, {
@@ -2177,7 +2178,7 @@ export function internal(animproto) {
             var percent = parseInt(progress * (maxSize - minSize));
             if (progress > 0.5) percent = parseInt((1 - progress) * (maxSize - minSize));
             //object.css("box-shadow", distance + "px " + distance + "px " + minSize + "px " + (minSize + percent) + "px " + color);
-            object.css("-webkit-filter", "drop-shadow(" + color + " " + distance + "px " + distance + "px " + (minSize + percent) + "px)");
+            object.css(filter, "drop-shadow(" + color + " " + distance + "px " + distance + "px " + (minSize + percent) + "px)");
         }
     }
 
@@ -2414,7 +2415,8 @@ export function internal(animproto) {
 
     //不饱和
     animproto.getEffectDesaturate = function (parameter, object, duration, delay, repeat) {
-        if (!("-webkit-filter" in object[0].style)) return new TimelineMax();
+        var filter = prefix('filter');
+        if (!(filter in object[0].style)) return new TimelineMax();
         var saturation = parameter.saturation ? parameter.saturation : 0.5; //饱和度
         var t1 = new TimelineMax({
             delay: delay,
@@ -2423,7 +2425,7 @@ export function internal(animproto) {
             onStartParams: [parameter, object],
             onComplete: this.completeHandler,
             onCompleteParams: [parameter, object, {
-                "-webkit-filter": "none"
+                filter: "none"
             }]
         });
         t1.to(object, duration, {
@@ -2435,13 +2437,14 @@ export function internal(animproto) {
             var progress = t1.progress();
             var percent = (progress <= 0.5) ? progress * 2 : 1;
             var val = 1 + (saturation - 1) * percent;
-            object.css("-webkit-filter", "saturate(" + val + ")");
+            object.css(filter, "saturate(" + val + ")");
         }
     }
 
     //加深
     animproto.getEffectDarken = function (parameter, object, duration, delay, repeat) {
-        if (!("-webkit-filter" in object[0].style)) return new TimelineMax();
+        var filter = prefix('filter')
+        if (!(filter in object[0].style)) return new TimelineMax();
         var brightness = (parameter.brightness && parameter.brightness < 1) ? brightness.saturation : 0.5; //亮度
         var t1 = new TimelineMax({
             delay: delay,
@@ -2450,7 +2453,7 @@ export function internal(animproto) {
             onStartParams: [parameter, object],
             onComplete: this.completeHandler,
             onCompleteParams: [parameter, object, {
-                "-webkit-filter": "none"
+                filter: "none"
             }]
         });
         t1.to(object, duration, {
@@ -2462,13 +2465,14 @@ export function internal(animproto) {
             var progress = t1.progress();
             var percent = (progress <= 0.5) ? progress * 2 : 1;
             var val = 1 + (brightness - 1) * percent;
-            object.css("-webkit-filter", "brightness(" + val + ")");
+            object.css(filter, "brightness(" + val + ")");
         }
     }
 
     //变淡
     animproto.getEffectLighten = function (parameter, object, duration, delay, repeat) {
-        if (!("-webkit-filter" in object[0].style)) return new TimelineMax();
+        var filter = prefix('filter')
+        if (!(filter in object[0].style)) return new TimelineMax();
         var brightness = (parameter.brightness && parameter.brightness > 1) ? parameter.brightness : 1.5; //亮度
         var t1 = new TimelineMax({
             delay: delay,
@@ -2477,7 +2481,7 @@ export function internal(animproto) {
             onStartParams: [parameter, object],
             onComplete: this.completeHandler,
             onCompleteParams: [parameter, object, {
-                "-webkit-filter": "none"
+                filter: "none"
             }]
         });
         t1.to(object, duration, {
@@ -2489,7 +2493,7 @@ export function internal(animproto) {
             var progress = t1.progress();
             var percent = (progress <= 0.5) ? progress * 2 : 1;
             var val = 1 + (brightness - 1) * percent;
-            object.css("-webkit-filter", "brightness(" + val + ")");
+            object.css(filter, "brightness(" + val + ")");
         }
     }
 

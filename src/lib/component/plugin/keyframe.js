@@ -7,7 +7,8 @@ import { parseJSON } from '../../util/index'
 
 export default function keyframe(options) {
     var $element, data, callback, count, fps, loop, matrix, parameter, width, height, timer,
-        arrays, x, y, t;
+        arrays, x, y, t
+
     arrays = [];
     t = 0;
     $element = options.element.find('.sprite')

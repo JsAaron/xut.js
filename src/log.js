@@ -1,6 +1,8 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v829  2016.8.1   Modify the compatibility of filter property
+* v828  2016.7.29  Cancel the senior Sprite retrograde cycle
 * v827  2016.7.27  Correct gesture
 * v826  2016.7.27  Increased the DUKU mode of judgment
 * v825  2016.7.26  Organize structure, combine the Sprite
