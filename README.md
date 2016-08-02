@@ -2,10 +2,7 @@
 ##Preview
 Cross-platform, support PC/ios/android/wp
 *************
-*************
 ![](http://files.cnblogs.com/files/aaronjs/1111.gif)  
-*************
-*************
 
 ##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
