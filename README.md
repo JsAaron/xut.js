@@ -2,7 +2,7 @@
 ##Preview
 Cross-platform, support PC/ios/android/wp
 *************
-![](http://files.cnblogs.com/files/aaronjs/1111.gif)  
+![](https://github.com/JsAaron/es6-magazine/blob/master/README.gif)  
 
 ##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
