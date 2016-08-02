@@ -11,7 +11,7 @@ import {
     suspend as _suspend,
     original as _original,
     autoRun as _autoRun
-} from '../dispatcher/index'
+} from '../commands/index'
 
 
 /**

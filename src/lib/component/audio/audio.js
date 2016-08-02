@@ -253,6 +253,7 @@ class _Audio extends BaseClass {
         let trackId = options.trackId
         let url = config.audioPath() + options.url
         let audio
+        let self = this
 
         //构建之前处理
         this.preRelated(trackId, options);
@@ -276,17 +277,17 @@ class _Audio extends BaseClass {
             }
         }
 
-        audio.addEventListener('canplaythrough', () => {
-            this.play()
-        }, false)
+        this._callback = () => {
+            self.callbackProcess()
+        }
 
-        audio.addEventListener('error', () => {
-            this.callbackProcess()
-        }, false)
+        this._throughCallback = () => {
+            self.play()
+        }
 
-        audio.addEventListener('error', () => {
-            this.callbackProcess()
-        }, false)
+        audio.addEventListener('canplaythrough', this._throughCallback, false)
+        audio.addEventListener('ended', this._callback, false)
+        audio.addEventListener('error', this._callback, false)
 
         this.audio = audio;
         this.trackId = trackId;
@@ -310,8 +311,9 @@ class _Audio extends BaseClass {
     end() {
         if (this.audio) {
             this.audio.pause();
-            this.audio.removeEventListener('ended', this.callbackProcess, false)
-            this.audio.removeEventListener('error', this.callbackProcess, false)
+            this.audio.removeEventListener('canplaythrough', this._throughCallback, false)
+            this.audio.removeEventListener('ended', this._callback, false)
+            this.audio.removeEventListener('error', this._callback, false)
             this.audio = null;
         }
         this.status = 'ended';
