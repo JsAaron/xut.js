@@ -1,7 +1,5 @@
 ##Magazine what is it?
-```
 This is a template program, used to batch production of app, using the front end of the technology to achieve the simulation of the original app effect. Through the combination of various modules, integrated into a customized app applications
-```
 
 ##Preview
 ```
@@ -12,9 +10,7 @@ This is a template program, used to batch production of app, using the front end
 
 
 ##Notice
-```
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
-```
 
 ##The front-end developer can do？
 Front end not just write page, also can do the app, and even desktop client application
