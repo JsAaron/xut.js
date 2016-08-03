@@ -5,7 +5,6 @@ This is a template program, used to batch production of app, using the front end
 ```
 1.Cross-platform. There is the platform based on webkit, including PC/ios/android/wp
 2.Through templates, easily implement the application
-
 ```
 ![](https://github.com/JsAaron/res/blob/master/horizontal.gif)  
 
