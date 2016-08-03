@@ -26,7 +26,7 @@ do
     if [ "$flag" != "" ]
     then
         string=${flag##*"${version}"}
-        content=${string/[0-9]*.?[0-9]?/}
+        content=${string/[0-9]*.?/}
         continue
     fi
 done < $log
