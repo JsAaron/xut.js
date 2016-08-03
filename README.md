@@ -1,6 +1,6 @@
 
 ##Preview
-Cross-platform, support PC/ios/android/wp
+Cross-platform, There is the platform based on webkit，including PC/ios/android/wp
 *************
 
 ![](https://github.com/JsAaron/res/blob/master/horizontal.gif)  
