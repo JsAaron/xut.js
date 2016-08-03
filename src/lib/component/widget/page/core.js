@@ -13,6 +13,7 @@ import { loader } from './loader'
 import { createData } from './data'
 import AdvSprite from './advsprite'
 
+
 /**
  * 解析数据,获取content对象
  * @return {[type]} [description]
@@ -94,6 +95,7 @@ export class PageWidget {
         return this.pageObj.getIdName();
     }
 
+
     /**
      * 外部调用接口
      * @return {[type]} [description]
@@ -101,6 +103,7 @@ export class PageWidget {
     dispatchProcess() {
         this.pageObj.toggle();
     }
+
 
     /**
      * 处理包装容器的状态
@@ -115,11 +118,13 @@ export class PageWidget {
         }
     }
 
+
     /**
      * 销毁页面零件
      * @return {[type]} [description]
      */
     destroy() {
+        console.log(1233)
         if (this.pageObj && this.pageObj.destroy) {
             this.pageObj.destroy();
         }

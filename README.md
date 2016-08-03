@@ -7,6 +7,15 @@ Cross-platform, support PC/ios/android/wp
 
 *************
 
+<<<<<<< HEAD
+###others
+###Vertical
+
+![](https://github.com/JsAaron/res/blob/master/vertical.gif)  
+
+*************
+=======
+>>>>>>> 35ad921cf675b61b781c41cb162658e0ad25fe4a
 
 ##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange

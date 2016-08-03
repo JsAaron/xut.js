@@ -14,7 +14,7 @@ const filterRE = createRE()
 //./build/dev/test.js
 //build/dev/webpack.dev.conf.js
 const segmentation = new RegExp("[.]?\\w+([.]?\\w*)*", "ig")
-const excludeRE = new RegExp(".git|node_modules|README.md", "ig")
+const excludeRE = new RegExp(".git|node_modules|README.md|README.gif", "ig")
 
 console.log(
     '【Regular filter】\n' +

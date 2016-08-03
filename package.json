@@ -11,7 +11,7 @@
     "lint": "eslint dist/xxtppt.dev.js",
     "unit": "karma start test/unit/karma.conf.js",
     "karma": "karma start karma.conf.js --log-level debug --single-run",
-    "git": "bash git.sh"
+    "git": "bash build/git.sh"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,5 @@
 import { loadfile } from '../../../util/loader'
 
-
-
 /**
  * 路径地址
  * @param  {[type]} name [description]

@@ -9,8 +9,7 @@ const vs = require('./vs')
 const config = require('../../config')
 
 const conf = _.extend(config.build.conf, {
-    rollup: conf
-    ig.build.conf.tarDir + 'rollup.js',
+    rollup: config.build.conf.tarDir + 'rollup.js',
     exclude: config.build.exclude,
     server: config.build.server
 });

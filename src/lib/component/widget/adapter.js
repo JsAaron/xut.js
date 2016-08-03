@@ -6,8 +6,6 @@
  *              构件5种类型
  *
  * *******************************************************************/
-
-
 import { IframeWidget } from './iframe'
 import { PageWidget } from './page/core'
 import { parseJSON } from '../../util/dom'
@@ -16,7 +14,6 @@ import { config } from '../../config/index'
 let proportion
 let screenSize
 let appId
-
 
 let loadWidget = (type, data, widgetClass) => {
     Xut.Application.injectionComponent({

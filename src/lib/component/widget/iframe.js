@@ -6,24 +6,17 @@ import nextTick from '../../core/tick'
  */
 export class IframeWidget {
 
-
     constructor(data) {
-
-        //获取数据
         _.extend(this, data)
-
-        //创建页面零件包装器
-        this.$wapper = this.createWapper();
-
+        this.$wapper = this._createWapper()
         nextTick({
             'container': this.rootNode,
             'content': this.$wapper
         }, () => {
             this.rootNode = null;
-            this.bindPMS();
+            this._bindPMS();
         });
-
-        return this;
+        return this
     }
 
 
@@ -31,10 +24,9 @@ export class IframeWidget {
      * 创建包含容器
      * @return {[type]} [description]
      */
-    createWapper() {
+    _createWapper() {
         var zIndex, str, dom, ifr;
 
-        //层级设定
         if (this.zIndex === 0) {
             zIndex = this.zIndex;
         } else {
@@ -43,15 +35,26 @@ export class IframeWidget {
 
         this.zIndex = zIndex;
 
-        str = '<div id="iframeWidget_{0}" style="z-index:{1};width:{2}px;height:{3}px;top:{4}px;left:{5}px;position:absolute;" ></div>';
-
-        dom = String.format(str,
-            this.id, zIndex, this.width, this.height, this.top, this.left
+        dom = String.format(
+            '<div' +
+            ' id="iframeWidget_{0}"' +
+            ' style="z-index:{1};' +
+            ' width:{2}px;' +
+            ' height:{3}px;' +
+            ' top:{4}px;' +
+            ' left:{5}px;' +
+            ' position:absolute;">' +
+            ' </div>',
+            this.id,
+            zIndex,
+            this.width,
+            this.height,
+            this.top,
+            this.left
         );
 
-        ifr = this.createIframe();
-
-        this._iframe = ifr;
+        ifr = this._createIframe();
+        this._iframe = ifr
 
         return $(dom).append(ifr)
     }
@@ -61,24 +64,28 @@ export class IframeWidget {
      * 加载iframe
      * @return {[type]} [description]
      */
-    createIframe() {
-        var me = this,
-            path = 'content/widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key,
-            ifr = document.createElement('iframe');
+    _createIframe() {
+
+        let ifr = document.createElement('iframe')
+        let path = 'widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key
+        let rootPath = Xut.config.pathAddress.replace('gallery/', '')
+
+        path = rootPath + path
 
         ifr.id = 'iframe_' + this.id;
         ifr.src = path;
         ifr.style.width = '100%';
         ifr.style.height = '100%';
-        ifr.sandbox = "allow-scripts allow-same-origin";
-        ifr.frameborder = 0;
+        ifr.sandbox = "allow-scripts allow-same-origin"
+        ifr.frameborder = 0
+
         if (ifr.attachEvent) {
-            ifr.attachEvent('onload', function() {
-                me.iframeComplete();
+            ifr.attachEvent('onload', () => {
+                this._iframeComplete();
             });
         } else {
-            ifr.onload = function() {
-                me.iframeComplete();
+            ifr.onload = () => {
+                this._iframeComplete();
             };
         }
         return ifr;
@@ -89,9 +96,9 @@ export class IframeWidget {
      * iframe加载完毕回调
      * @return {[type]} [description]
      */
-    iframeComplete() {
+    _iframeComplete() {
         var me = this;
-        var dataSource = this.loadData();
+        var dataSource = this._loadData();
         var width = me._iframe.offsetWidth;
         var height = me._iframe.offsetHeight;
 
@@ -128,7 +135,7 @@ export class IframeWidget {
      * ifarme内部，请求返回数据
      * @return {[type]} [description]
      */
-    loadData() {
+    _loadData() {
         var item,
             field,
             source_export = [],
@@ -154,17 +161,11 @@ export class IframeWidget {
     }
 
 
-    /********************************************************************
-     *
-     *                   与iframe通讯接口
-     *
-     * ********************************************************************/
-
     /**
      * 与iframe通讯接口
      * @return {[type]} [description]
      */
-    bindPMS() {
+    _bindPMS() {
         var me = this,
             markId = this.id;
 
@@ -274,7 +275,6 @@ export class IframeWidget {
     }
 
 
-    //=============外部调用接口===================
 
     /**
      * 外部调用接口
@@ -289,43 +289,43 @@ export class IframeWidget {
         }
     }
 
+
     /**
      * 开始
      * @return {[type]} [description]
      */
     start() {
-        var me = this;
-        me.domWapper();
+        this.domWapper();
         this.PMS.send({
-            target: me._iframe.contentWindow,
-            url: me._iframe.src,
+            target: this._iframe.contentWindow,
+            url: this._iframe.src,
             origin: '*',
             type: 'onShow',
             success: function() {
                 // alert(123)
             }
         });
-        setTimeout(function() {
-            me.state = true;
+        setTimeout(() => {
+            this.state = true;
         }, 0)
     }
+
 
     /**
      * 暂停
      * @return {[type]} [description]
      */
     stop() {
-        var me = this;
-        me.domWapper();
+        this.domWapper()
         this.PMS.send({
-            target: me._iframe.contentWindow,
-            url: me._iframe.src,
+            target: this._iframe.contentWindow,
+            url: this._iframe.src,
             origin: '*',
             type: 'onHide',
             success: function() {}
         });
-        setTimeout(function() {
-            me.state = false;
+        setTimeout(() => {
+            this.state = false;
         }, 0)
     }
 
@@ -343,7 +343,10 @@ export class IframeWidget {
     }
 
 
-    //复位
+    /**
+     * 复位
+     * @return {[type]} [description]
+     */
     recovery() {
         var me = this;
         if (me.state) {
@@ -361,30 +364,30 @@ export class IframeWidget {
         return false;
     }
 
-    //销毁接口
+
+    /**
+     * 销毁接口
+     * @return {[type]} [description]
+     */
     destroy() {
 
-        var me = this,
-            iframe = this._iframe,
-            PMS = this.PMS;
-
         //销毁内部事件
-        PMS.send({
-            target: iframe.contentWindow,
-            url: iframe.src,
+        this.PMS.send({
+            target: this._iframe.contentWindow,
+            url: this._iframe.src,
             origin: '*',
             type: 'onDestory',
             success: function() {}
-        });
+        })
 
         //销毁事件绑定
-        PMS.unbind();
+        this.PMS.unbind()
 
         //销魂节点
-        setTimeout(function() {
-            me._iframe = null;
-            me.$wapper.remove();
-            me.$wapper = null;
+        setTimeout(() => {
+            this._iframe = null;
+            this.$wapper.remove();
+            this.$wapper = null;
         }, 0)
     }
 
