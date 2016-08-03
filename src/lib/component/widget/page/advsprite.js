@@ -1,4 +1,4 @@
-import AdvSpirit from '../../plugin/sprite'
+import Sprite from '../../plugin/sprite'
 import { parseJSON } from '../../../util/dom'
 
 
@@ -16,9 +16,9 @@ let spiritObjs = {}
  */
 let getData = (inputPara, contents) => {
     let option;
-    let ResourcePath = "content/widget/gallery/" + inputPara.id + "/";
+    let resourcePath = "content/widget/gallery/" + inputPara.id + "/";
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', ResourcePath + 'app.json', false);
+    xhr.open('GET', resourcePath + 'app.json', false);
     xhr.send(null);
     try {
         option = parseJSON(xhr.responseText);
@@ -87,7 +87,7 @@ export default function(inputPara, contents) {
             if (parentId != "0") {
                 moveContent(contentPrefix, framId, parentId)
             }
-            spiritObjs[id] = new AdvSpirit(spiritList, options)
+            spiritObjs[id] = new Sprite(spiritList, options)
             ids.push(id)
         } else {
             console.log("inputPara undefine Spirit")

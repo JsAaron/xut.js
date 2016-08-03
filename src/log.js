@@ -1,6 +1,7 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v830  2016.8.3   add jsWidgetPath config for miaomiaoxue, fix sprite animation
 * v829  2016.8.1   Modify the compatibility of filter property
 * v828  2016.7.29  Cancel the senior Sprite retrograde cycle
 * v827  2016.7.27  Correct gesture

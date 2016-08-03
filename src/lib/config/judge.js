@@ -1,6 +1,6 @@
-let isBrowser = Xut.plat.isBrowser
-let FLOOR = Math.floor
-let CEIL = Math.ceil
+const isBrowser = Xut.plat.isBrowser
+const FLOOR = Math.floor
+const CEIL = Math.ceil
 
 /**
  * 屏幕尺寸

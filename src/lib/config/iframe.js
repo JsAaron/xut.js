@@ -1,4 +1,4 @@
-import sourceUrl from './common'
+import { sourcePath, widgetPath } from './default'
 
 const isIOS = Xut.plat.isIOS
 const isAndroid = Xut.plat.isAndroid
@@ -82,6 +82,7 @@ let iframeMode = (() => {
 //3 秒秒学
 const iframeConf = {
 
+
     /**
      * 资源图片
      * @return {[type]} [description]
@@ -92,9 +93,9 @@ const iframeConf = {
                 case 'iframeDuKu':
                     return DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return sourceUrl;
+                    return sourcePath;
                 case 'iframeDuKuSubDoc':
-                    return sourceUrl;
+                    return sourcePath;
                 case 'iframeClient':
                     return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
@@ -118,6 +119,7 @@ const iframeConf = {
         }
     },
 
+
     /**
      * 视频路径
      * @return {[type]} [description]
@@ -128,9 +130,9 @@ const iframeConf = {
                 case 'iframeDuKu':
                     return DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return sourceUrl
+                    return sourcePath
                 case 'iframeDuKuSubDoc':
-                    return sourceUrl;
+                    return sourcePath;
                 case 'iframeClient':
                     return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
@@ -154,6 +156,7 @@ const iframeConf = {
         }
     },
 
+
     /**
      * 音频路径
      * @return {[type]} [description]
@@ -164,9 +167,9 @@ const iframeConf = {
                 case 'iframeDuKu':
                     return DUKUCONFIG.path;
                 case 'iframeSubDoc':
-                    return sourceUrl;
+                    return sourcePath;
                 case 'iframeDuKuSubDoc':
-                    return sourceUrl;
+                    return sourcePath;
                 case 'iframeClient':
                     return CLIENTCONFIGT.path;
                 case 'iframeMiaomiaoxue':
@@ -188,6 +191,7 @@ const iframeConf = {
             }
         }
     },
+
 
     /**
      * 调用插件处理
@@ -224,6 +228,16 @@ const iframeConf = {
                     return MMXCONFIGPath + '/content/gallery/';
             }
         }
+    },
+
+
+    /**
+     * js零件
+     * 2016.8.3 喵喵学
+     * @return {[type]} [description]
+     */
+    jsWidget() {
+        return MMXCONFIGPath + '/content/widget/'
     }
 
 }

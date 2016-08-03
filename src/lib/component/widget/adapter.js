@@ -7,7 +7,7 @@
  *
  * *******************************************************************/
 import { IframeWidget } from './iframe'
-import { PageWidget } from './page/core'
+import { PageWidget } from './page/index'
 import { parseJSON } from '../../util/dom'
 import { config } from '../../config/index'
 
@@ -147,7 +147,6 @@ export function Adapter(para) {
     //画轴模式
     data.scrollPaintingMode = config.scrollPaintingMode;
     data.calculate = config.proportion.calculateContainer();
-
 
     //执行类构建
     adapterType[(data.widgetType || 'widget').toLowerCase()](data);

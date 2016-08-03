@@ -1,7 +1,7 @@
-import sourceUrl from './common'
+import { sourcePath, widgetPath } from './default'
 
-let isIOS = Xut.plat.isIOS
-let isAndroid = Xut.plat.isAndroid
+const isIOS = Xut.plat.isIOS
+const isAndroid = Xut.plat.isAndroid
 
 
 //杂志直接打开
@@ -13,15 +13,15 @@ const nativeConf = {
      */
     resources(config) {
         if (isIOS) {
-            return sourceUrl
+            return sourcePath
         }
         if (isAndroid) {
             if (parseInt(config.storageMode)) {
                 //sd卡加载资源数据
-                return "/sdcard/appcarrier/magazine/" + config.appId + "/" + sourceUrl;
+                return "/sdcard/appcarrier/magazine/" + config.appId + "/" + sourcePath;
             } else {
                 //android_asset缓存加载资源
-                return "/android_asset/www/" + sourceUrl;
+                return "/android_asset/www/" + sourcePath;
             }
         }
     },
@@ -33,7 +33,7 @@ const nativeConf = {
      */
     video() {
         if (isIOS) {
-            return sourceUrl;
+            return sourcePath;
         }
         if (isAndroid) {
             return 'android.resource://#packagename#/raw/';
@@ -48,10 +48,10 @@ const nativeConf = {
      */
     audio() {
         if (isIOS) {
-            return sourceUrl;
+            return sourcePath;
         }
         if (isAndroid) {
-            return "/android_asset/www/" + sourceUrl;
+            return "/android_asset/www/" + sourcePath;
         }
     },
 
@@ -60,7 +60,21 @@ const nativeConf = {
      * @return {[type]} [description]
      */
     svg() {
-        return 'www/' + sourceUrl;
+        return 'www/' + sourcePath;
+    },
+
+    /**
+     * js零件
+     * 2016.8.3 喵喵学
+     * @return {[type]} [description]
+     */
+    jsWidget() {
+        if (isIOS) {
+            return widgetPath
+        }
+        if (isAndroid) {
+            return "/android_asset/www/" + widgetPath;
+        }
     }
 }
 

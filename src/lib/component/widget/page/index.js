@@ -33,21 +33,24 @@ let parseContentObjs = (pageType, inputPara) => {
  */
 export class PageWidget {
 
+
     constructor(data) {
         _.extend(this, data)
         this.pageObj = null
         this._init()
     }
 
+
     /**
      * 获取参数
      * 得到content对象与数据
      * @return {[type]} [description]
      */
-    _getArg() {
-        let data = createData(this.inputPara, this.scrollPaintingMode, this.calculate);
-        let contentObjs = parseContentObjs(this.pageType, this.inputPara);
-        return [data, contentObjs]
+    _getOptions() {
+        return [
+            createData(this.inputPara, this.scrollPaintingMode, this.calculate),
+            parseContentObjs(this.pageType, this.inputPara)
+        ]
     }
 
 
@@ -59,7 +62,7 @@ export class PageWidget {
         //Load the localized code first
         //Combined advanced Sprite
         if (this.widgetId == "72" && this.widgetName == "spirit") {
-            var arg = this._getArg()
+            var arg = this._getOptions()
             this.pageObj = AdvSprite(arg[0], arg[1])
         } else {
             //If there is no
@@ -71,14 +74,14 @@ export class PageWidget {
         }
     }
 
+
     /**
      * 执行函数
      * @return {[type]} [description]
      */
     _executive() {
-        //普通dom模式
         if (typeof(window[this.widgetName + "Widget"]) == "function") {
-            var arg = this._getArg()
+            var arg = this._getOptions()
             this.pageObj = new window[this.widgetName + "Widget"](arg[0], arg[1]);
         } else {
             console.error("Function [" + this.widgetName + "Widget] does not exist.");
@@ -87,9 +90,9 @@ export class PageWidget {
 
 
     play() {
-        // console.log('widget')
         return this.pageObj.play();
     }
+
 
     getIdName() {
         return this.pageObj.getIdName();
@@ -124,7 +127,6 @@ export class PageWidget {
      * @return {[type]} [description]
      */
     destroy() {
-        console.log(1233)
         if (this.pageObj && this.pageObj.destroy) {
             this.pageObj.destroy();
         }

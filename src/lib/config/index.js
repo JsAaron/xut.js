@@ -7,7 +7,7 @@
  */
 import nativeConf from './native'
 import iframeConf from './iframe'
-import sourceUrl from './common'
+import { sourcePath, widgetPath } from './default'
 
 import {
     _screen,
@@ -61,6 +61,7 @@ if (/xinxuetang/.test(window.location.href)) {
 let cacheVideoPath
 let cacheAudioPath
 let cacheSvgPath
+let cacheJsWidgetPath
 
 
 /**
@@ -76,16 +77,16 @@ let browserPlat = () => {
     }
 
     if (typeof initGalleryUrl != 'undefined') {
-        return sourceUrl;
+        return sourcePath
     } else {
         //资源存放位置
         // * storageMode 存放的位置
         // * 0 APK应用本身
         // 1 外置SD卡
         if (Number(config.storageMode)) {
-            return "sdcard/" + config.appId + "/" + sourceUrl;
+            return "sdcard/" + config.appId + "/" + sourcePath
         } else {
-            return sourceUrl;
+            return sourcePath
         }
     }
 }
@@ -118,7 +119,7 @@ let _videoPath = () => {
         browserPlat() :
         GLOBALIFRAME ?
         iframeConf.video() :
-        nativeConf.video();
+        nativeConf.video()
 }
 
 
@@ -161,6 +162,17 @@ let _svgPath = () => {
         nativeConf.svg()
 }
 
+
+/**
+ * js零件
+ * 2016.8.3 妙妙学新增
+ * 只提供相对路径
+ * @return {[type]} [description]
+ */
+let _jsWidgetPath = () => {
+    return isBrowser ? widgetPath :
+        GLOBALIFRAME ? iframeConf.jsWidget() : nativeConf.jsWidget()
+}
 
 /**
  * 打印信息
@@ -325,6 +337,7 @@ _.extend(config, {
         return cacheAudioPath = _audioPath()
     },
 
+
     /**
      * 配置SVG文件路径
      * @return {[type]} [description]
@@ -335,6 +348,19 @@ _.extend(config, {
 
         }
         return cacheSvgPath = _svgPath()
+    },
+
+    /**
+     * 配置js零件文件路径
+     * 2016.8.3增加
+     * @return {[type]} [description]
+     */
+    jsWidgetPath() {
+        if (cacheJsWidgetPath) {
+            return cacheJsWidgetPath
+
+        }
+        return cacheJsWidgetPath = _jsWidgetPath()
     },
 
     /**
