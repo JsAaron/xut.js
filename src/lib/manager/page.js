@@ -14,7 +14,7 @@ import {
     suspend as _suspend,
     original as _original,
     autoRun as _autoRun
-} from '../commands/index'
+} from '../command/index'
 
 
 

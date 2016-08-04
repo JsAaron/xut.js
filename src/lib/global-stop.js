@@ -6,7 +6,7 @@
  */
 
 //调度器
-import { recovery } from './commands/index'
+import { recovery } from './command/index'
 import { show } from './util/notice'
 import { close } from './toolbar/navbar/index'
 import { clearAudio } from './component/audio/manager'

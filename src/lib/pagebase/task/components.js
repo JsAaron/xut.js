@@ -6,7 +6,7 @@
  *      2 创建完毕
  *      3 创建失败
  */
-import directives from '../../directives/index'
+import directives from '../../directive/index'
 import { reviseSize } from '../../util/option'
 import nextTick from '../../core/tick'
 

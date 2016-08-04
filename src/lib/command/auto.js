@@ -5,7 +5,7 @@
 
 import { access } from './access'
 import allowNext from '../backstage'
-import directives from '../directives/index'
+import directives from '../directive/index'
 
 //content任务超时Id
 let contentTaskOutId
