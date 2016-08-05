@@ -9,11 +9,10 @@ import { cursor } from '../cursor'
 import { createStore } from './storemgr'
 import { contentFilter } from '../../component/activity/filter'
 import { loadScene } from '../scene'
+import { config } from '../../config/index'
 
 
-let config;
-
-let getCache = (name) => parseInt(_get(name))
+const getCache = (name) => parseInt(_get(name))
 
 
 /**
@@ -207,7 +206,7 @@ let initMain = (novelData) => {
  * 根据set表初始化数据
  * @return {[type]} [description]
  */
-let initValue = () => {
+let initdata = () => {
     createStore((dataRet) => {
         let novelData = dataRet.Novel.item(0)
         initDefaults(dataRet.Setting)
@@ -224,17 +223,18 @@ let initValue = () => {
 let checkTestDB = () => {
     var database = config.db,
         sql = 'SELECT * FROM Novel'
+
     if (database) {
         database.transaction(function(tx) {
             tx.executeSql(sql, [], function(tx, rs) {
-                initValue();
+                initdata();
             }, function() {
                 Xut.config.db = null;
-                initValue();
+                initdata();
             })
         })
     } else {
-        initValue();
+        initdata();
     }
 }
 
@@ -244,11 +244,12 @@ let checkTestDB = () => {
  * 数据结构
  */
 export default function() {
-    config = Xut.config
-        //加载忙碌光标
+
+    //加载忙碌光标
     if (!Xut.IBooks.Enabled) {
         cursor()
     }
+
     if (window.openDatabase) {
         try {
             //数据库链接对象
@@ -257,6 +258,6 @@ export default function() {
             console.log('window.openDatabase出错')
         }
     }
-    //检查数据库
+
     checkTestDB();
 }
