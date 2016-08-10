@@ -17,7 +17,6 @@ const writeFile = (filename, content) => {
     })
 }
 
-
 module.exports = function(src) {
 
     var filename, readPath, str, data, handle, svgfiles, total, count, galleryPath, convertedPath, exists
