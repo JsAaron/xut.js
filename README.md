@@ -2,10 +2,10 @@
 This is a template program, used to batch production of app, using the front end of the technology to achieve the simulation of the original app effect. Through the combination of various modules, integrated into a customized app applications
 
 ##Preview
-```
+
 1.Cross-platform. There is the platform based on webkit, including PC/ios/android/wp
 2.Through templates, easily implement the application
-```
+
 ![](https://github.com/JsAaron/res/blob/master/horizontal.gif)  
 
 
