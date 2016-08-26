@@ -4,24 +4,13 @@ import { api } from './global-api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { init } from './init/index'
+//fix audio
+import { fixAudio } from './component/audio/fix'
 
-const plat = Xut.plat
-
-//repair ios android browser doesn't automatically play audio problems
-//when loaded. Create a new audio video and use it every time you change
-Xut.fix = Xut.fix || {}
-
-if (plat.isBrowser) {
-
+if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
-    if (plat.noAutoPlayMedia) {
-        let fixaudio = () => {
-            if (!Xut.fix.audio) {
-                Xut.fix.audio = new Audio();
-                document.removeEventListener('touchstart', fixaudio, false);
-            }
-        }
-        document.addEventListener('touchstart', fixaudio, false);
+    if (Xut.plat.noAutoPlayMedia) {
+        fixAudio()
     } else {
         //Desktop binding mouse control
         $(document).keyup((event) => {
@@ -37,6 +26,6 @@ if (plat.isBrowser) {
     }
 }
 
-Xut.Version = 832;
+Xut.Version = 833
 
 init()

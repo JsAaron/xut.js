@@ -6,6 +6,8 @@
 import { hash } from '../../util/lang'
 import { config } from '../../config/index'
 import { BaseClass } from './baseclass'
+import { hasAudioes, getAudio } from './fix'
+
 
 let Player = null
 const noop = function() {}
@@ -256,26 +258,31 @@ class _Audio extends BaseClass {
         let audio
         let self = this
 
+        let replaceAudio = hasAudioes()
+
         //构建之前处理
         this.preRelated(trackId, options);
 
         if (instance[trackId]) {
-            audio = Xut.fix.audio ? Xut.fix.audio : instance[trackId];
+            audio = replaceAudio ? getAudio() : instance[trackId];
             audio.src = url;
         } else {
+
             //create a new Audio instance
-            //如果为ios browser 用Xut.fix.audio 指定src 初始化见app.js
-            if (Xut.fix.audio) {
-                audio = Xut.fix.audio;
+            //如果为ios browser 用Xut.fix.audioes 指定src 初始化见app.js
+            if (replaceAudio) {
+                audio = getAudio();
                 audio.src = url;
             } else {
                 audio = new Audio(url);
-            }
+            } 
+ 
             //更新音轨
             //妙妙学方式不要音轨处理
-            if (!Xut.fix.audio) {
+            if (!replaceAudio) {
                 instance[trackId] = audio;
             }
+
         }
 
         this._callback = () => {

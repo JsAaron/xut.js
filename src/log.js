@@ -1,6 +1,7 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v833  2016.8.26  fix audio
 * v832  2016.8.26  Strengthen the judge of no the AutoPlay Media
 * v831  2016.8.26  fix audio autoplay of h5
 * v830  2016.8.3   add jsWidgetPath config for miaomiaoxue, fix sprite animation

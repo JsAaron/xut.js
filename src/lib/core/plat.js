@@ -132,7 +132,7 @@
          * 是webkit
          * 是手机端浏览器
          */
-        noAutoPlayMedia: !isWeiXin && isBrowser && isWebKit && (isIphone || isAndroid),
+        noAutoPlayMedia: !isWeiXin && isBrowser && isWebKit && (isIOS || isAndroid),
 
         isIOS7: isIOS7,
         isOverflow: ("WebkitOverflowScrolling" in _style),

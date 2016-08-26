@@ -23,6 +23,7 @@ import bookMarkMixin from './bookmark/index'
 import searchBarMixin from './searchbar/index'
 import eventMixin from './event/index'
 
+import { hasAudioes } from '../audio/fix'
 
 /**
  * 处理拖动对象
@@ -255,7 +256,7 @@ export class Activity {
                             'scenarioId': scenarioInfo.seasonId,
                             'chapterId': scenarioInfo.chapterId
                         })
-                    }, Xut.fix.audio ? 1000 : 0)
+                    }, hasAudioes() ? 1000 : 0)
                     return
                 }
 
