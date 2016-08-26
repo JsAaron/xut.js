@@ -1,6 +1,8 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v832  2016.8.26  Strengthen the judge of no the AutoPlay Media
+* v831  2016.8.26  fix audio autoplay of h5
 * v830  2016.8.3   add jsWidgetPath config for miaomiaoxue, fix sprite animation
 * v829  2016.8.1   Modify the compatibility of filter property
 * v828  2016.7.29  Cancel the senior Sprite retrograde cycle

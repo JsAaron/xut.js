@@ -1,11 +1,7 @@
 .DS_Store
 node_modules/
+dev/
 npm-debug.log
 selenium-debug.log
 test/unit/coverage
 test/e2e/reports
-/build/dev/client.js
-/build/dev/data.js
-/build/dev/index.js
-/build/dev/test.js
-/build/dev/webpack.dev.conf.js

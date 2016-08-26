@@ -8,9 +8,10 @@ import { config } from '../../config/index'
 import { BaseClass } from './baseclass'
 
 let Player = null
-let noop = function() {}
+const noop = function() {}
 let instance = hash() //存放不同音轨的一个实例
 let audioPlayer
+const plat = Xut.plat
 
 
 let UUIDcreatePart = (length) => {
@@ -285,6 +286,14 @@ class _Audio extends BaseClass {
             self.play()
         }
 
+        /**
+         * safari 自动播放
+         * 手机浏览器需要加
+         * 2016.8.26
+         * @type {Boolean}
+         */
+        audio.autoplay = true
+
         audio.addEventListener('canplaythrough', this._throughCallback, false)
         audio.addEventListener('ended', this._callback, false)
         audio.addEventListener('error', this._callback, false)
@@ -412,16 +421,24 @@ class _cordovaMedia extends BaseClass {
 
 
 //安卓客户端apk的情况下
-if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
+if (plat.isAndroid && !plat.isBrowser) {
     audioPlayer = _Media
 } else {
     //妙妙学的 客户端浏览器模式
     if (window.MMXCONFIG && window.audioHandler) {
         audioPlayer = _cordovaMedia
     } else {
-        //特殊情况
-        //有客户端的内嵌浏览器模式
-        audioPlayer = _Audio5js
+
+        //安卓 && ios手机端
+        //用纯video 因为 safari要加autoplay
+        if (plat.noAutoPlayMedia) {
+            audioPlayer = _Audio
+        } else {
+            //特殊情况
+            //有客户端的内嵌浏览器模式
+            audioPlayer = _Audio5js
+        }
+
     }
     //2015.12.23
     //如果不支持audio改用flash

@@ -5,7 +5,7 @@
 ;
 (function() {
 
-    var ua, uv, _style, _cache, TRANSITION_END, ANIMATION_END, KEYFRAMES, isAndroid, isIphone, isIpad, isIOS, isIOS7, has3d, MOBILE_REGEX, SUPPORT_TOUCH, SUPPORT_MOUSE, SUPPORT_ONLY_TOUCH, location, boolBrowser, PREFIX, prefixStyle
+    var ua, uv, _style, _cache, TRANSITION_END, ANIMATION_END, KEYFRAMES, isAndroid, isIphone, isIpad, isIOS, isIOS7, has3d, MOBILE_REGEX, SUPPORT_TOUCH, SUPPORT_MOUSE, SUPPORT_ONLY_TOUCH, location, boolBrowser, PREFIX, prefixStyle, isWebKit, isWeiXin, isBrowser
 
 
     //在读酷pc端 navigator的值被改写过了!!
@@ -17,8 +17,20 @@
     isIpad = (/ipad/gi).test(ua)
     isIOS = isIphone || isIpad
     isIOS7 = isIOS && (/OS\s7/gi).test(ua)
-    has3d = 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()
 
+    /**
+     * webkit内核
+     * @type {RegExp}
+     */
+    isWebKit = /AppleWebKit/ig.test(uv)
+
+    /**
+     * 微信
+     * @type {Boolean}
+     */
+    isWeiXin = /MicroMessenger/ig.test(uv)
+
+    has3d = 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()
     _style = document.documentElement.style
     _cache = Object.create(null)
     TRANSITION_END = 'transitionend'
@@ -100,17 +112,33 @@
     }
 
 
+    isBrowser = boolBrowser ? boolBrowser : !SUPPORT_ONLY_TOUCH
+
     Xut.plat = {
         has3d: has3d,
         isAndroid: isAndroid,
         isIphone: isIphone,
         isIpad: isIpad,
         isIOS: isIOS,
+        isWebKit: isWebKit,
+
+        /**
+         * 不能自动播放媒体
+         * audio
+         * video
+         * @type {[type]}
+         * 浏览器端
+         * 不是微信
+         * 是webkit
+         * 是手机端浏览器
+         */
+        noAutoPlayMedia: !isWeiXin && isBrowser && isWebKit && (isIphone || isAndroid),
+
         isIOS7: isIOS7,
         isOverflow: ("WebkitOverflowScrolling" in _style),
         hasTouch: SUPPORT_ONLY_TOUCH,
         //游览器平台 解决ios Android浏览器判断问题
-        isBrowser: boolBrowser ? boolBrowser : !SUPPORT_ONLY_TOUCH,
+        isBrowser: isBrowser,
         //2015.3.23
         //可以点击与触摸
         isSurface: SUPPORT_TOUCH && SUPPORT_MOUSE && !SUPPORT_ONLY_TOUCH,

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body>
+small
+<iframe id="iframe" src="http://localhost:8888/index.html" scrolling="no">
+    <p>Your browser does not support iframes.</p>
+</iframe>
+</body>
+<!--  1024 720  1280 752   1024 600 -->
+
+
+<script type="text/javascript">
+    var iframe = document.getElementById("iframe");
+
+    var resolution = 1;
+    var mode = 1;
+
+    var config = function () {
+
+        if (resolution == 1) {
+            return {
+                width  :mode ? 768 : 1024,
+                height :mode ? 976 : 720
+            }
+        } else if (resolution == 2) {
+            return {
+                width  :mode ? 800 : 1280,
+                height :mode ? 1280 - 48 : 752
+            }
+        } else if (resolution == 3) {
+            return {
+                width  :mode ? 600 : 1024,
+                height :mode ? 1024 - 48 : 600 - 48
+            }// iphone 3
+        }else if (resolution == 4) {
+            return {
+                width  :mode ? 320 : 480,
+                height :mode ? 480 : 320
+            }// iphone 4 4s
+        }else if (resolution == 5) {
+            return {
+                width  :mode ? 640 : 960,
+                height :mode ? 960 : 640
+            }// iphone 5
+        }else if (resolution == 6) {
+            return {
+                width  :mode ? 640 : 1136,
+                height :mode ? 1136 : 640
+            }
+        }else if (resolution == 7) {
+            return {
+                width  :mode ? 480 : 800,
+                height :mode ? 800 : 480
+            }
+        }
+    }();
+
+    iframe.style.width = config.width + "px";
+    iframe.style.height = config.height + "px";
+</script>
+
+</html>

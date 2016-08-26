@@ -5,17 +5,19 @@ import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { init } from './init/index'
 
+const plat = Xut.plat
+
 //repair ios android browser doesn't automatically play audio problems
 //when loaded. Create a new audio video and use it every time you change
 Xut.fix = Xut.fix || {}
 
-if (Xut.plat.isBrowser) {
+if (plat.isBrowser) {
+
     //Mobile browser automatically broadcast platform media processing
-    if (Xut.plat.isIOS || Xut.plat.isAndroid) {
+    if (plat.noAutoPlayMedia) {
         let fixaudio = () => {
             if (!Xut.fix.audio) {
                 Xut.fix.audio = new Audio();
-                Xut.fix.video = document.createElement("Video");
                 document.removeEventListener('touchstart', fixaudio, false);
             }
         }
@@ -35,6 +37,6 @@ if (Xut.plat.isBrowser) {
     }
 }
 
-Xut.Version = 830
+Xut.Version = 832;
 
 init()
