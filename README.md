@@ -5,8 +5,11 @@ This is a template program, used to batch production of app, using the front end
 * Integrated Right into Your PowerPoint
 
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt1.jpg)
+* * *
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt2.jpg)
+* * *
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt3.jpg)
+* * *
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt4.jpg)
 
 * Cross-platform. There is the platform based on webkit, including PC/ios/android/wp
