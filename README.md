@@ -6,15 +6,12 @@ This is a template program, used to batch production of app, using the front end
 * Through templates, easily implement the application
 
 ![](https://github.com/JsAaron/res/blob/master/horizontal.gif)  
-* * *
 
-* Integrated Right into Your PowerPoint
+##Integrated Right into Your PowerPoint
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt1.jpg)
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt2.jpg)
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt4.jpg)
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt3.jpg)
-
-
 
 
 ##Notice
