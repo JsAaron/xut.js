@@ -3,8 +3,9 @@ This is a template program, used to batch production of app, using the front end
 
 ##Preview
 * Integrated Right into Your PowerPoint
-![mahua](https://github.com/JsAaron/res/blob/master/ppt1.png)
-![mahua](https://github.com/JsAaron/res/blob/master/ppt2.png)
+
+![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt1.png)
+![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt2.png)
 
 
 * Cross-platform. There is the platform based on webkit, including PC/ios/android/wp
