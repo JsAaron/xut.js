@@ -1,4 +1,4 @@
-import { on, off } from '../../core/event'
+import { bindTap, offTap } from '../../core/event'
 
 /**
  * audio对象下标
@@ -23,20 +23,13 @@ export function fixAudio(obj, key, access) {
             audio.play()
             audioes.push(audio)
         }
-        off('off', {
-            context: document,
-            callback: {
-                start: start
-            }
+        offTap(document, {
+            start: start
         })
     }
-    on('on', {
-        context: document,
-        callback: {
-            start: start
-        }
+    bindTap(document, {
+        start: start
     })
-
 }
 
 

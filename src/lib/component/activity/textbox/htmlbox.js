@@ -5,7 +5,7 @@
  */
 
 import { bindEvents } from '../event/event'
-import { on, off } from '../../../core/event'
+import { bindTap, offTap } from '../../../core/event'
 
 import {
     _set,
@@ -223,21 +223,16 @@ HtmlBox.prototype = {
             var className = e.target.className;
             process[className] && process[className]();
         }
-        on('on', {
-            context: this.eventContext,
-            callback: {
-                start: this.start
-            }
+
+        bindTap(this.eventContext, {
+            start: this.start
         })
     },
 
     //移除盒子
     removeBox: function() {
-        off('off', {
-            context: this.eventContext,
-            callback: {
-                start: this.start
-            }
+        offTap(this.eventContext, {
+            start: this.start
         })
         this.$str && this.$str.remove();
         this.iscroll && this.iscroll.destroy();

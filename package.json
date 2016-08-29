@@ -3,11 +3,10 @@
   "version": "1.0.0-csp",
   "description": "A es6-magazine project",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node build/dev/index.js",
     "build": "node build/build/index.js run",
-     "copy": "node build/copy/index.js",
-    "remote": "node build/remote/debug.js",
+    "copy": "node build/copy/index.js",
+    "test-iframe": "node build/remote/index.js",
     "lint": "eslint dist/xxtppt.dev.js",
     "unit": "karma start test/unit/karma.conf.js",
     "karma": "karma start karma.conf.js --log-level debug --single-run",
@@ -64,6 +63,7 @@
     "watch": "^0.18.0",
     "webpack": "^1.13.0",
     "webpack-dev-middleware": "^1.6.1",
+    "webpack-dev-server": "^1.15.0",
     "webpack-hot-middleware": "^2.10.0",
     "webpack-merge": "^0.12.0",
     "write-file-webpack-plugin": "^3.1.8"

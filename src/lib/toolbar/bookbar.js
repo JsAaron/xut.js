@@ -1,7 +1,7 @@
 import { BookMark } from './bookmark'
 import { ToolBar } from './base/toolBar'
 import { parseJSON } from '../util/index'
-import { on } from '../core/event'
+import { bindTap } from '../core/event'
 
 /**
  * 阅读模式工具栏
@@ -54,15 +54,9 @@ Bar.prototype.initTool = function () {
     }
 
     //监听事件
-    var ele = this.container[0];
-
-    on('on', {
-        context: ele,
-        callback: {
-            end: this
-        }
+    bindTap(this.container[0],{
+         end: this
     })
-
 }
 
 /**

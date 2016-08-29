@@ -4,7 +4,8 @@
  * @param options object
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
-import { on } from '../core/event'
+import { bindTap } from '../core/event'
+
 import {
     _set,
     _get,
@@ -53,11 +54,8 @@ BookMark.prototype.init = function() {
     BOOKCACHE = this.getHistory();
 
     //邦定用户事件
-    on('on', {
-        context: dom,
-        callback: {
-            end: this
-        }
+    bindTap(dom, {
+        end: this
     })
 
 }

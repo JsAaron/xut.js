@@ -9,7 +9,7 @@
  * http://www.codrops.com
  */
 
-import { on } from '../../core/event'
+import { bindTap } from '../../core/event'
 
 /*** helper functions ***/
 
@@ -110,12 +110,10 @@ svgIcon.prototype._initEvents = function() {
         this.el.addEventListener('mouseover', toggleFn);
         this.el.addEventListener('mouseout', toggleFn);
     } else {
-        on('on', {
-            context: this.el,
-            callback: {
-                start: function(e) {
-                    toggleFn(e)
-                }
+
+        bindTap(this.el, {
+            start: function(e) {
+                toggleFn(e)
             }
         })
     }

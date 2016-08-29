@@ -2,8 +2,8 @@ import {
     Observer
 } from '../observer/index'
 import {
-    on,
-    off,
+    bindTap,
+    offTap,
     handle
 } from '../core/event'
 
@@ -864,11 +864,7 @@ export class GlobalEvent extends Observer {
             callback.transitionend = this
         }
 
-        on('on', {
-            context: this.element,
-            callback: callback
-        })
-
+        bindTap(this.element, callback)
     }
 
     /**
@@ -876,15 +872,14 @@ export class GlobalEvent extends Observer {
      * @return {[type]} [description]
      */
     evtDestroy() {
-        off('off', {
-            context: this.element,
-            callback: {
-                start: this,
-                move: this,
-                end: this,
-                transitionend: this
-            }
+
+        offTap(this.element, {
+            start: this,
+            move: this,
+            end: this,
+            transitionend: this
         })
+
     }
 
 
