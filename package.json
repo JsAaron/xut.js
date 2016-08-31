@@ -6,7 +6,7 @@
     "dev": "node build/dev/index.js",
     "build": "node build/build/index.js run",
     "copy": "node build/copy/index.js",
-    "test-iframe": "node build/remote/index.js",
+    "remote": "node build/remote/index.js",
     "lint": "eslint dist/xxtppt.dev.js",
     "unit": "karma start test/unit/karma.conf.js",
     "karma": "karma start karma.conf.js --log-level debug --single-run",

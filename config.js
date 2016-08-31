@@ -4,12 +4,18 @@ const _ = require("underscore");
 const root = resolve(__dirname)
 const win = process.platform === 'win32'
 
-
+/**
+ * 公共配置
+ */
 const common = {
+    //index入口
     index: './src/index.html',
+    //执行入口
     entry: './src/lib/index.js',
+    //生成名称
     devName: 'xxtppt.dev.js',
     distName: 'xxtppt.js',
+    //目录
     srcDir: './src/',
     tarDir: './dist/',
     testDir: './src/test/'
@@ -97,5 +103,7 @@ module.exports = {
      * 远程调试
      * remoteRemote
      */
-    remote: {},
+    remote: {
+        port: 8001
+    },
 }
