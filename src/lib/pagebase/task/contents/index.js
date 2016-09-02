@@ -480,7 +480,7 @@ taskProto.eventAfterCheck = function(data, delayHooks) {
             nextTick({
                 'container': data.element,
                 'content': toArray(data.contentsFragment)
-            }, complete);
+            },  complete);
         }
     })
 }

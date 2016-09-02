@@ -1,6 +1,7 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v835  2016.9.2   cursor
 * v834  2016.8.29  Remove core method on the way of binding events, modify the interface for bindTap/offTap
 * v833  2016.8.26  fix audio
 * v832  2016.8.26  Strengthen the judge of no the AutoPlay Media

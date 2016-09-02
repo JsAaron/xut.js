@@ -30,6 +30,7 @@ import { autoRun, original, suspend } from './command/index'
 import { suspendHandles, promptMessage } from './global-stop'
 import { loadScene } from './init/scene'
 import { SceneFactory } from './scenario/factory'
+import { ShowBusy,HideBusy,ShowTextBusy} from './util/cursor'
 
 import {
     _set,
@@ -42,66 +43,28 @@ import {
 }
 from './util/index'
 
-let plat = Xut.plat
+const plat = Xut.plat
+
+let api = hash()
 let LOCK = 1 //锁定
 let UNLOCK = 2 //解除锁定
 let IsPay = false
-let api = hash()
+
 
 Xut.Assist = hash()
-let Presentation = Xut.Presentation = hash()
-let View = Xut.View = hash()
-let Contents = Xut.Contents = hash()
-let Application = Xut.Application = hash()
+const Presentation = Xut.Presentation = hash()
+const View = Xut.View = hash()
+const Contents = Xut.Contents = hash()
+const Application = Xut.Application = hash()
 
 
 /**
  * 忙碌光标
  * */
 portExtend(View, {
-
-    /**
-     * 光标对象
-     * @type {[type]}
-     */
-    busyIcon: null,
-
-    /**
-     * 光标状态
-     * @type {Boolean}
-     */
-    busyBarState: false,
-
-    /**
-     * 显示光标
-     */
-    ShowBusy() {
-        if (Xut.IBooks.Enabled) return;
-        View.busyBarState = true;
-        View.busyIcon.show();
-    },
-
-    /**
-     * 隐藏光标
-     */
-    HideBusy() {
-        if (Xut.IBooks.Enabled) return;
-        var busyIcon = View.busyIcon;
-        if (View.ShowBusy.lock) return; //显示忙碌加锁，用于不处理hideBusy
-        View.busyBarState = false;
-        busyIcon.hide();
-        IsPay && busyIcon.css('pointer-events', '').find('.xut-busy-text').html('')
-    },
-
-    /**
-     * 显示光标
-     * @param {[type]} txt [description]
-     */
-    ShowTextBusy(txt) {
-        if (Xut.IBooks.Enabled) return;
-        View.busyIcon.css('pointer-events', 'none').find('.xut-busy-text').html(txt);
-        View.ShowBusy();
-    }
+    ShowBusy,
+    HideBusy,
+    ShowTextBusy
 })
 
 
@@ -259,9 +222,9 @@ portExtend(View, {
 
         //读酷启动时不需要忙碌光标
         if (window.DUKUCONFIG && options.main) {
-            Xut.View.HideBusy();
+            View.HideBusy();
         } else {
-            Xut.View.ShowBusy();
+            View.ShowBusy();
         }
 
 
@@ -562,7 +525,7 @@ let pass = () => {
 
     setUnlock();
     View.CloseScenario();
-    View.HideBusy();
+    View.HideBusy(IsPay);
 }
 
 
@@ -573,7 +536,7 @@ let pass = () => {
 let failed = () => {
     if (!View.busyBarState) return;
     messageBox('购买失败');
-    View.HideBusy();
+    View.HideBusy(IsPay);
 }
 
 

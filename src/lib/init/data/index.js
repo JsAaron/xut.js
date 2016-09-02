@@ -5,7 +5,7 @@ import {
 }
 from '../../util/index'
 
-import { cursor } from '../cursor'
+import { createCursor } from '../../util/cursor'
 import { createStore } from './storemgr'
 import { contentFilter } from '../../component/activity/filter'
 import { loadScene } from '../scene'
@@ -247,7 +247,7 @@ export default function() {
 
     //加载忙碌光标
     if (!Xut.IBooks.Enabled) {
-        cursor()
+        createCursor()
     }
 
     if (window.openDatabase) {
