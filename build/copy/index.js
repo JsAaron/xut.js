@@ -6,7 +6,10 @@ const _ = require("underscore");
 const createRE = require('./filter')
 
 const src = '.'
-const dist = '/Users/mac/project/git/es6-magazine/'
+const dists = [
+    '/Users/mac/project/git/es6-magazine/',
+    '/Users/mac/project/svn/server/magazine-develop/assets/www/'
+]
 
 const filterRE = createRE()
 
@@ -14,7 +17,7 @@ const filterRE = createRE()
 //./build/dev/test.js
 //build/dev/webpack.dev.conf.js
 const segmentation = new RegExp("[.]?\\w+([.]?\\w*)*", "ig")
-const excludeRE = new RegExp(".git|node_modules|README.md|README.gif", "ig")
+const excludeRE = new RegExp(".git|.svn|node_modules|README.md|README.gif", "ig")
 
 console.log(
     '【Regular filter】\n' +
@@ -22,30 +25,38 @@ console.log(
     '\n'
 )
 
-let count = 0
 
-
-var files = fs.readdirSync(dist);
-for (file of files) {
-    if (!excludeRE.test(file)) {
-        fsextra.removeSync(dist + file)
+const del = (dist) => {
+    var files = fs.readdirSync(dist);
+    for (file of files) {
+        if (!excludeRE.test(file)) {
+            fsextra.removeSync(dist + file)
+        }
     }
+    console.log('del: ' + dist)
 }
 
-const ls = (ff) => {
-    var files = fs.readdirSync(ff);
+const ls = (src, dist) => {
+    var files = fs.readdirSync(src);
     for (fn in files) {
-        var rootPath = ff + path.sep
+        var rootPath = src + path.sep
         var filename = rootPath + files[fn]
         var stat = fs.lstatSync(filename);
         if (stat.isDirectory() == true) {
-            ls(filename)
+            ls(filename,dist)
         } else {
             if (!filterRE.test(rootPath)) {
-                ++count
-                fsextra.copySync(filename, dist + filename)
+                 fsextra.copySync(filename, dist + filename)
             }
         }
     }
 }
-ls(src)
+
+
+dists.forEach((dist) => {
+    del(dist)
+    ls(src, dist)
+    console.log('copy: ' + dist)
+})
+
+

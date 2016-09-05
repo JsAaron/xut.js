@@ -31,7 +31,7 @@ const typeFilter = ['page', 'master'];
  * 4 args参数
  * 5 回调每一个上下文
  */
-let createaAccess = (mgr) => {
+const createaAccess = (mgr) => {
     return (callback, pageType, args, eachContext) => {
         //如果第一个参数不是pageType模式
         //参数移位

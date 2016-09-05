@@ -50,7 +50,8 @@ module.exports = {
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: win ?
-                'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' : '/Users/mac/project/xcode/www/build'
+                'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' :
+                '/Users/mac/project/xcode/www/build'
         },
 
         /**
@@ -104,6 +105,13 @@ module.exports = {
      * remoteRemote
      */
     remote: {
-        port: 8001
-    },
+
+        port: 8001,
+
+        /**
+         * 监控文件打包
+         * @type {[type]}
+         */
+        wacthFilesPath:'src/lib/**/*.js'
+    }
 }
