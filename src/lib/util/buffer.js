@@ -1,12 +1,9 @@
-/****************************************************
- *
- *         	缓存池
- *
- * ***************************************************/
-//创建缓存
+/**
+ * 缓存池
+ * @return {[type]} [description]
+ */
 function createCache() {
-    var keys = [];
-
+    let keys = [];
     function cache(key, value) {
         if (keys.push(key) > 20) {
             delete cache[keys.shift()];
@@ -15,6 +12,5 @@ function createCache() {
     }
     return cache;
 }
-var contentCache = createCache()
 
-export {contentCache}
+export let contentCache = createCache() 

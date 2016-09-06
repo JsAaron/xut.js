@@ -3,44 +3,45 @@ import {
     _get,
     parseJSON
 }
-from '../../util/index'
+from '../util/index'
 
-import { createCursor } from '../../util/cursor'
-import { createStore } from './storemgr'
-import { contentFilter } from '../../component/activity/filter'
-import { loadScene } from '../scene'
-import { config } from '../../config/index'
-
+import { createCursor } from '../util/cursor'
+import { createStore } from '../store/index'
+import { contentFilter } from '../component/activity/filter'
+import { config } from '../config/index'
+import loadScene from './scene'
 
 const getCache = (name) => parseInt(_get(name))
 
+/**
+ * 默认工具栏配置
+ * @type {Object}
+ */
+const defaults = {
+    ToolbarPos: 0, //工具栏[0顶部,1底部]
+    NavbarPos: 1, //左右翻页按钮[0顶部, 1中间, 2底部]
+    HomeBut: 1, //主页按钮[0不显示,1显示]
+    ContentBut: 1, //目录按钮[0不显示,1显示]
+    PageBut: 1, //页码按钮[0不显示,1显示]
+    NavLeft: 1, //左翻页按钮[0不显示,1显示]
+    NavRight: 1, //右翻页按钮[0不显示,1显示]
+    customButton: 0, //自定义翻页按钮
+    CloseBut: window.SUbDOCCONTEXT ? 1 : 0 //关闭按钮[0不显示,1显示]
+}
 
 /**
  * 配置默认数据
  * @return {[type]} [description]
  */
-let initDefaults = (setData) => {
+const initDefaults = (setData) => {
     let rs
-    let data = {}
-    let setConfig = {}
+    const data = {}
+    const setConfig = {}
 
-    //工具栏默认参数
-    let defaults = {
-        ToolbarPos: 0, //工具栏[0顶部,1底部]
-        NavbarPos: 1, //左右翻页按钮[0顶部, 1中间, 2底部]
-        HomeBut: 1, //主页按钮[0不显示,1显示]
-        ContentBut: 1, //目录按钮[0不显示,1显示]
-        PageBut: 1, //页码按钮[0不显示,1显示]
-        NavLeft: 1, //左翻页按钮[0不显示,1显示]
-        NavRight: 1, //右翻页按钮[0不显示,1显示]
-        customButton: 0, //自定义翻页按钮
-        CloseBut: window.SUbDOCCONTEXT ? 1 : 0 //关闭按钮[0不显示,1显示]
-    }
-
-    for (let i = 0, len = setData.length; i < len; i++) {
-        rs = setData.item(i);
+    _.each(setData, (key, index) => {
+        rs = setData.item(index);
         data[rs.name] = rs.value;
-    }
+    })
 
     _.defaults(data, defaults);
 
@@ -101,7 +102,7 @@ let initDefaults = (setData) => {
 //set表中写一个recordHistory
 //是   1
 //否   0
-let cfgHistory = (data) => {
+const cfgHistory = (data) => {
 
     let recordHistory = 1; //默认启动
     if (data.recordHistory !== undefined) {
@@ -123,7 +124,7 @@ let cfgHistory = (data) => {
  * 修正实际分辨率
  * @return {[type]} [description]
  */
-let fixedSize = (novelData) => {
+const fixedSize = (novelData) => {
     if (novelData) {
         if (novelData.pptWidth || novelData.pptHeight) {
             config.fixProportion(novelData.pptWidth, novelData.pptHeight);
@@ -136,7 +137,7 @@ let fixedSize = (novelData) => {
  * 进入主页面
  * @return {[type]} [description]
  */
-let initMain = (novelData) => {
+const initMain = (novelData) => {
 
     let novelId
     let parameter
@@ -206,7 +207,7 @@ let initMain = (novelData) => {
  * 根据set表初始化数据
  * @return {[type]} [description]
  */
-let initdata = () => {
+const initdata = () => {
     createStore((dataRet) => {
         let novelData = dataRet.Novel.item(0)
         initDefaults(dataRet.Setting)
@@ -220,7 +221,7 @@ let initdata = () => {
  * 数据库检测
  * @return {[type]} [description]
  */
-let checkTestDB = () => {
+const checkTestDB = () => {
     var database = config.db,
         sql = 'SELECT * FROM Novel'
 

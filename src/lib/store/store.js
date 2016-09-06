@@ -1,9 +1,7 @@
-import { execute } from '../../util/execute'
+import { execute } from '../util/execute'
 
-
-//热点合集
-let dataRet = {}
-let statement = {}
+const dataRet = {}
+const statement = {}
 
 
 'Setting,Parallax,Master,Activity,Content,Video,Image,Action,Animation,Widget,Novel,Season,Chapter'.replace(/[^, ]+/g, function(name) {

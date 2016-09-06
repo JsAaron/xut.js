@@ -29,6 +29,16 @@ let layoutMode
 let screenSize
 let proportion
 
+
+/**
+ * 设置模板分解符
+ * @type {Object}
+ */
+_.templateSettings = {
+    interpolate: /\{\{(.+?)\}\}/g
+}
+
+
 /**
  * 层级关系
  * @return {[type]} [description]

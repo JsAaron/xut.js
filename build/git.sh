@@ -3,7 +3,7 @@
 
 dir=$(pwd)
 # dir="/Users/mac/project/git/es6-magazine/'"
-index="$dir/src/lib/index.js"
+main="$dir/src/lib/main.js"
 log="$dir/src/log.js"
 
 version=''
@@ -17,7 +17,7 @@ do
         version=`echo v"$version" | sed s/[[:space:]]//g`
         continue
     fi
-done < $index
+done < $main
 
 while read LINE
 do

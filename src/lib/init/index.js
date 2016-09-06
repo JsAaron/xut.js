@@ -1,20 +1,21 @@
 import { config } from '../config/index'
-import initdata from './data/index'
-import { bindKeyEvent } from './keyevent'
+import initdata from './database'
 import { loader, setRootfont } from '../util/index'
 import { playPlugVideo, playHtml5Video } from './video'
+import bindKeyEvent from './keyevent'
+
+const svgsheet = 'content/gallery/svgsheet.css'
 
 /**
  * 加载css
  * @return {[type]} [description]
  */
-let loadcss = (callback) => {
+const loadcss = (callback) => {
     //加载横版或者竖版css
     //nodeBuildMode 是node build下的test.html文件
     //加载build/*.css压缩文件
     //否则就是默认的css/*.css
     let baseCss = window.nodeBuildMode ? window.nodeBuildMode.csspath : './css/' + (config.layoutMode) + '.css'
-    let svgsheet = 'content/gallery/svgsheet.css'
     let cssArr = [baseCss, svgsheet]
 
     //是否需要加载svg
@@ -25,23 +26,19 @@ let loadcss = (callback) => {
         cssArr = [baseCss]
     }
 
-    //动态加载脚本
     loader.load(cssArr, callback, null, true);
 }
-
 
 /**
  * 加载app应用
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-let loadApp = () => {
+const loadApp = () => {
     //修正API接口
     //iframe要要Xut.config
     config.revised();
-    //加载css
     loadcss(() => {
-        //修正字体大小
         setRootfont()
         initdata()
     });
@@ -54,7 +51,7 @@ let loadApp = () => {
  * 创建数据库
  * @return {[type]} [description]
  */
-let creatDatabase = () => {
+const creatDatabase = () => {
     //安卓上
     if (Xut.plat.isAndroid) {
         //预加载处理视频
@@ -84,7 +81,7 @@ let creatDatabase = () => {
 }
 
 
-export function init() {
+export default function() {
 
     //绑定键盘事件
     bindKeyEvent(config)
@@ -99,7 +96,6 @@ export function init() {
     //Ifarme嵌套处理
     //1 新阅读
     //2 子文档
-    //=======
     //3 pc
     //4 ios/android
     if (window.GLOBALIFRAME) {

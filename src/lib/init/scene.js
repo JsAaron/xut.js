@@ -11,7 +11,7 @@ import { config } from '../config/index'
  * 设置缓存
  * @param {[type]} parameter [description]
  */
-let setDataToStorage = (parameter) => {
+const setDataToStorage = (parameter) => {
     config.pageIndex = parameter.pageIndex;
     config.novelId = parameter.novelId;
     _set({
@@ -25,7 +25,7 @@ let setDataToStorage = (parameter) => {
  * 初始化值
  * @param {[type]} options [description]
  */
-let initDefaultValues = (options) => {
+const initDefaultValues = (options) => {
     var pageFlip = options.pageFlip;
     //配置全局翻页模式
     //pageflip可以为0
@@ -45,15 +45,15 @@ let initDefaultValues = (options) => {
  * 检测脚本注入
  * @return {[type]} [description]
  */
-let checkInjectScript = () => {
-    var preCode,
-        novels = Xut.data.query('Novel');
+const checkInjectScript = () => {
+    var preCode, novels = Xut.data.query('Novel');
     if (preCode = novels.preCode) {
         injectScript(preCode, 'novelpre脚本')
     }
 }
 
-export function loadScene(options) {
+
+export default function(options) {
 
     //获取默认参数
     var parameter = initDefaultValues(options || {});

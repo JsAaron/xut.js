@@ -1,7 +1,7 @@
 import { Video5 } from '../component/video/video'
 
 
-var preloadVideo = {
+const preloadVideo = {
 
     //播放状态
     state: false,
@@ -10,7 +10,7 @@ var preloadVideo = {
     path: window.DUKUCONFIG ? window.DUKUCONFIG.path + "duku.mp4" : 'android.resource://#packagename#/raw/duku',
 
     //加载视频
-    load: function() {
+    load() {
         // if (window.localStorage.getItem("videoPlayer") == 'error') {
         //       alert("error")
         //     return preloadVideo.launchApp();
@@ -20,7 +20,7 @@ var preloadVideo = {
     },
 
     //播放视频
-    play: function() {
+    play() {
         //延时应用加载
         Xut.Application.delayAppRun();
         Xut.Plugin.VideoPlayer.play(function() {
@@ -33,14 +33,14 @@ var preloadVideo = {
     },
 
     //清理视频
-    closeVideo: function() {
+    closeVideo() {
         Xut.Plugin.VideoPlayer.close(function() {
             preloadVideo.launchApp();
         });
     },
 
     //加载应用
-    launchApp: function() {
+    launchApp() {
         this.state = false;
         Xut.Application.LaunchApp()
     }

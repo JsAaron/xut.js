@@ -78,12 +78,12 @@ export function overrideApi(vm) {
 
     let $globalEvent = vm.$globalEvent
     let options = vm.options
-    let $scheduler = vm.$scheduler
+    let $dispatch = vm.$dispatch
 
     //页面与母版的管理器
     let access = createaAccess({
-        page: $scheduler.pageMgr,
-        master: $scheduler.masterMgr
+        page: $dispatch.pageMgr,
+        master: $dispatch.masterMgr
     })
 
     let isExistIndex = createExistIndex($globalEvent);
@@ -362,7 +362,7 @@ export function overrideApi(vm) {
                 'pageIndex': pagePointer.currIndex,
                 'rightIndex': pagePointer.rightIndex
             };
-        $scheduler.move(data);
+        $dispatch.move(data);
         pagePointer = null;
     };
 

@@ -1,19 +1,17 @@
 import { getPlugVideoState, closePlugVideo } from './video'
 
-
 /**
  * 退出加锁,防止过快点击
  * @type {Boolean}
  */
 let outLock = false;
 
-
 /**
  * 回退按钮状态控制器
  * @param  {[type]} state [description]
  * @return {[type]}       [description]
  */
-let controller = (state) => {
+const controller = (state) => {
     //如果是子文档处理
     if (Xut.isRunSubDoc) {
         //通过Action动作激活的,需要到Action类中处理
@@ -30,7 +28,7 @@ let controller = (state) => {
          * 停止热点动作
          * @return {[type]} [description]
          */
-        dispose: function() {
+        dispose() {
             setTimeout(() => { outLock = false }, 100)
         },
 
@@ -38,7 +36,7 @@ let controller = (state) => {
          * 退出应用
          * @return {[type]} [description]
          */
-        processed: function() {
+        processed() {
             state === 'back' && Xut.Application.DropApp();
         }
     });
@@ -49,7 +47,7 @@ let controller = (state) => {
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-export function bindKeyEvent(config) {
+export default function(config) {
     /**
      * 存放绑定事件
      * @type {Object}
@@ -60,7 +58,7 @@ export function bindKeyEvent(config) {
          * 回退键
          * @return {[type]} [description]
          */
-        back: function() {
+        back() {
             //如果是预加载视频
             if (getPlugVideoState()) {
                 closePlugVideo()
@@ -73,7 +71,7 @@ export function bindKeyEvent(config) {
          * 暂停键
          * @return {[type]} [description]
          */
-        pause: function() {
+        pause() {
             controller('pause');
         }
     }

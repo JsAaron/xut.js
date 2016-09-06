@@ -8,7 +8,7 @@ const createRE = require('./filter')
 const src = '.'
 const dists = [
     '/Users/mac/project/git/es6-magazine/',
-    '/Users/mac/project/svn/server/magazine-develop/assets/www/'
+    '/Users/mac/project/svn/server/magazine-develop/www/'
 ]
 
 const filterRE = createRE()
@@ -17,7 +17,7 @@ const filterRE = createRE()
 //./build/dev/test.js
 //build/dev/webpack.dev.conf.js
 const segmentation = new RegExp("[.]?\\w+([.]?\\w*)*", "ig")
-const excludeRE = new RegExp(".git|.svn|node_modules|README.md|README.gif", "ig")
+const excludeRE = new RegExp(".git|epub|.svn|node_modules|README.md|README.gif|安装说明.docx", "ig")
 
 console.log(
     '【Regular filter】\n' +

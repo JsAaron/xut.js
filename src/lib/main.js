@@ -3,7 +3,7 @@ import { config } from './config/index'
 import { api } from './global-api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
-import { init } from './init/index'
+import init from './init/index'
 //fix audio
 import { fixAudio } from './component/audio/fix'
 

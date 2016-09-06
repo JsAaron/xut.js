@@ -12,12 +12,13 @@ let videoActivityIdCache
 let novelId
 let errortables
 
+
 /**
  * 混入数据到data中
  * @param  {[type]} collections [description]
  * @return {[type]}             [description]
  */
-let mixToData = (collections) => {
+const mixToData = (collections) => {
     Xut.data = dataCache = collections;
 }
 
@@ -27,7 +28,7 @@ let mixToData = (collections) => {
  * @param  {[type]} tableName [description]
  * @return {[type]}           [description]
  */
-let dataOffset = (tableName) => {
+const dataOffset = (tableName) => {
     var start,
         data = dataCache[tableName];
     if (data.length) {
@@ -42,7 +43,7 @@ let dataOffset = (tableName) => {
 
 //转化video的activtiy信息
 //因为Video不是靠id关联的 是靠activtiy关联
-let videoActivity = () => {
+const videoActivity = () => {
     var d, activityIds = {},
         data = dataCache.Video;
     _.each(data, function(_, index) {
@@ -58,7 +59,7 @@ let videoActivity = () => {
 //chpater分段
 //转化section信息
 //带有场景处理
-let conversionSectionRelated = () => {
+const conversionSectionRelated = () => {
     var seasonId, start, length, sid, i, id, seasonInfo, toolbar, Chapters,
         container = {},
         Chapter = dataCache.Chapter,
@@ -108,7 +109,7 @@ let conversionSectionRelated = () => {
 
 
 //转化数据结构
-let conversion = () => {
+const conversion = () => {
 
     //数据段标记
     for (var k in dataCache) {

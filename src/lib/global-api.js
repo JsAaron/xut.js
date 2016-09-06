@@ -25,12 +25,12 @@
  */
 
 import { config } from './config/index'
-import { controll } from './scenario/controller'
+import { sceneController } from './scenario/controller'
 import { autoRun, original, suspend } from './command/index'
 import { suspendHandles, promptMessage } from './global-stop'
 import { loadScene } from './init/scene'
 import { SceneFactory } from './scenario/factory'
-import { ShowBusy,HideBusy,ShowTextBusy} from './util/cursor'
+import { ShowBusy, HideBusy, ShowTextBusy } from './util/cursor'
 
 import {
     _set,
@@ -130,7 +130,7 @@ portExtend(View, {
     CloseScenario() {
         if (repeatClick) return;
         repeatClick = true;
-        var serial = controll.takeOutPrevChainId();
+        var serial = sceneController.takeOutPrevChainId();
         View.LoadScenario({
             'scenarioId': serial.scenarioId,
             'chapterId': serial.chapterId,
@@ -172,10 +172,8 @@ portExtend(View, {
             return false;
         }
 
-        //处理场景跳转
-        var sceneController = controll,
-            //用户指定的跳转入口，而不是通过内部关闭按钮处理的
-            userAssign = createMode === 'sysClose' ? false : true,
+        //用户指定的跳转入口，而不是通过内部关闭按钮处理的
+        var userAssign = createMode === 'sysClose' ? false : true,
             //当前活动场景容器对象
             current = sceneController.containerObj('current');
 
@@ -644,7 +642,7 @@ portExtend(Application, {
      */
     Resize() {
         //清理对象
-        controll.destroyAllScene()
+        sceneController.destroyAllScene()
 
         //清理节点
         $("#sceneContainer").empty()
@@ -706,7 +704,7 @@ portExtend(Application, {
             $(document).off()
         }
         //销毁所有场景
-        controll.destroyAllScene();
+        sceneController.destroyAllScene();
     },
 
 
@@ -811,7 +809,7 @@ portExtend(Application, {
      * @return {[type]}         [description]
      */
     injectionComponent(regData) {
-        var sceneObj = controll.containerObj('current')
+        var sceneObj = sceneController.containerObj('current')
         sceneObj.vm.$injectionComponent = regData
     }
 })

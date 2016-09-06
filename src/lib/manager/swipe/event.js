@@ -1,11 +1,11 @@
 import {
     Observer
-} from '../observer/index'
+} from '../../observer/index'
 import {
     bindTap,
     offTap,
     handle
-} from '../core/event'
+} from '../../core/event'
 
 /**
  * 初始化首次范围

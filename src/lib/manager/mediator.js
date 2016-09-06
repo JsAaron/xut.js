@@ -6,9 +6,9 @@
  **********************************************************************/
 
 import { Observer } from '../observer/index'
-import { GlobalEvent } from './swipe/global-event.js'
+import { GlobalEvent } from './swipe/event.js'
 import { overrideApi } from '../dynamic-api'
-import { Scheduler } from './schedule'
+import { Dispatch } from './dispatch/dispatch'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'
 
@@ -22,7 +22,7 @@ import {
 /**
  * 部分配置文件
  */
-const optConf = {
+const pageConf = {
     //数据库定义的翻页模式
     //用来兼容客户端的制作模式
     //妙妙学模式处理，多页面下翻页切换
@@ -50,7 +50,7 @@ const optConf = {
  * 配置多页面参数
  * @return {[type]} [description]
  */
-let configMultiple = (options) => {
+const configMultiple = (options) => {
     //如果是epub,强制转换为单页面
     if (Xut.IBooks.Enabled) {
         options.multiplePages = false
@@ -59,7 +59,9 @@ let configMultiple = (options) => {
         //1 数据库定义
         //2 系统优化
         options.multiplePages =
-            options.pageFlip ? options.pageFlip : options.pageMode ? true : false
+            options.pageFlip ?
+            options.pageFlip :
+            options.pageMode ? true : false
     }
 }
 
@@ -73,7 +75,7 @@ let configMultiple = (options) => {
  * 因为冒泡的元素，可能是页面层，也可能是母板上的
  * @return {Boolean} [description]
  */
-let isBelong = (target) => {
+const isBelong = (target) => {
     var pageType = 'page';
     if (target.dataset && target.dataset.belong) {
         pageType = target.dataset.belong;
@@ -94,7 +96,7 @@ let isBelong = (target) => {
  * 2016.7.26
  * 读库强制PC模式了
  */
-let preventDefault = (evtObj, target) => {
+const preventDefault = (evtObj, target) => {
     //var tagName = target.nodeName.toLowerCase();
     if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
         evtObj.preventDefault && evtObj.preventDefault();
@@ -102,26 +104,25 @@ let preventDefault = (evtObj, target) => {
 }
 
 
-class Controller extends Observer {
+class Mediator extends Observer {
 
     constructor(parameter) {
+
         super()
 
-        let config = Xut.config
-        let vm = this;
+        const config = Xut.config
+        const vm = this;
 
         //配置文件
-        let options = vm.options = _.extend(optConf, parameter, {
+        const options = vm.options = _.extend(pageConf, parameter, {
             pageFlip: config.pageFlip
         })
 
         //配置多页面参数
         configMultiple(options)
 
-        //创建翻页滑动
-        let $globalEvent = vm.$globalEvent = new GlobalEvent(options, config);
-        //创建page页面管理
-        let $scheduler = vm.$scheduler = new Scheduler(vm);
+        const $globalEvent = vm.$globalEvent = new GlobalEvent(options, config);
+        const $dispatch = vm.$dispatch = new Dispatch(vm);
 
         //如果是主场景,才能切换系统工具栏
         if (options.multiplePages) {
@@ -158,7 +159,7 @@ class Controller extends Observer {
          * @return {[type]} [description]
          */
         $globalEvent.$watch('onSwipeMove', (data) => {
-            $scheduler.move(data)
+            $dispatch.move(data)
         });
 
 
@@ -186,7 +187,7 @@ class Controller extends Observer {
          * @return {[type]}          [description]
          */
         $globalEvent.$watch('onSwipeUpSlider', (pointers) => {
-            $scheduler.suspend(pointers)
+            $dispatch.suspend(pointers)
         });
 
 
@@ -195,7 +196,7 @@ class Controller extends Observer {
          * @return {[type]}              [description]
          */
         $globalEvent.$watch('onAnimComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
-            $scheduler.complete(direction, pagePointer, unfliplock, isQuickTurn)
+            $dispatch.complete(direction, pagePointer, unfliplock, isQuickTurn)
         });
 
 
@@ -204,7 +205,7 @@ class Controller extends Observer {
          * @return {[type]}      [description]
          */
         $globalEvent.$watch('onJumpPage', (data) => {
-            $scheduler.jumpPage(data);
+            $dispatch.jumpPage(data);
         });
 
 
@@ -225,7 +226,7 @@ class Controller extends Observer {
          */
         $globalEvent.$watch('onMasterMove', (hindex, target) => {
             if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
-                $scheduler.masterMgr && $scheduler.masterMgr.reactivation(target);
+                $dispatch.masterMgr && $dispatch.masterMgr.reactivation(target);
             }
         });
 
@@ -271,13 +272,13 @@ class Controller extends Observer {
 }
 
 
-var VMProto = Controller.prototype
+var medProto = Mediator.prototype
 
 
 /**
  * 是否多场景模式
  */
-defAccess(VMProto, '$multiScenario', {
+defAccess(medProto, '$multiScenario', {
     get: function() {
         return this.options.multiScenario
     }
@@ -292,10 +293,10 @@ defAccess(VMProto, '$multiScenario', {
  *  widget 包括 视频 音频 Action 子文档 弹出口 类型
  *  这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
  */
-defAccess(VMProto, '$injectionComponent', {
+defAccess(medProto, '$injectionComponent', {
     set: function(regData) {
         var injection;
-        if (injection = this.$scheduler[regData.pageType + 'Mgr']) {
+        if (injection = this.$dispatch[regData.pageType + 'Mgr']) {
             injection.abstractAssistPocess(regData.pageIndex, function(pageObj) {
                 pageObj.baseRegisterComponent.call(pageObj, regData.widget);
             })
@@ -309,9 +310,9 @@ defAccess(VMProto, '$injectionComponent', {
  * 得到当前的视图页面
  * @return {[type]}   [description]
  */
-defAccess(VMProto, '$curVmPage', {
+defAccess(medProto, '$curVmPage', {
     get: function() {
-        return this.$scheduler.pageMgr.abstractGetPageObj(this.$globalEvent.hindex);
+        return this.$dispatch.pageMgr.abstractGetPageObj(this.$globalEvent.hindex);
     }
 });
 
@@ -342,7 +343,7 @@ defAccess(VMProto, '$curVmPage', {
  *          'suspendAutoCallback': null
  *
  */
-def(VMProto, '$bind', function(key, callback) {
+def(medProto, '$bind', function(key, callback) {
     var vm = this
     vm.$watch('change:' + key, function() {
         callback.apply(vm, arguments)
@@ -354,8 +355,8 @@ def(VMProto, '$bind', function(key, callback) {
  * 创建页面
  * @return {[type]} [description]
  */
-def(VMProto, '$init', function() {
-    this.$scheduler.initCreate();
+def(medProto, '$init', function() {
+    this.$dispatch.initCreate();
 });
 
 
@@ -363,9 +364,9 @@ def(VMProto, '$init', function() {
  * 运动动画
  * @return {[type]} [description]
  */
-def(VMProto, '$run', function() {
+def(medProto, '$run', function() {
     var vm = this;
-    vm.$scheduler.pageMgr.activateAutoRuns(
+    vm.$dispatch.pageMgr.activateAutoRuns(
         vm.$globalEvent.hindex, Xut.Presentation.GetPageObj()
     )
 });
@@ -375,8 +376,8 @@ def(VMProto, '$run', function() {
  * 复位对象
  * @return {[type]} [description]
  */
-def(VMProto, '$reset', function() {
-    return this.$scheduler.pageMgr.resetOriginal(this.$globalEvent.hindex);
+def(medProto, '$reset', function() {
+    return this.$dispatch.pageMgr.resetOriginal(this.$globalEvent.hindex);
 });
 
 
@@ -384,7 +385,7 @@ def(VMProto, '$reset', function() {
  * 停止所有任务
  * @return {[type]} [description]
  */
-def(VMProto, '$suspend', function() {
+def(medProto, '$suspend', function() {
     Xut.Application.Suspend({
         skipMedia: true //跨页面不处理
     })
@@ -395,11 +396,11 @@ def(VMProto, '$suspend', function() {
  * 销毁场景内部对象
  * @return {[type]} [description]
  */
-def(VMProto, '$destroy', function() {
+def(medProto, '$destroy', function() {
     this.$off();
     this.$globalEvent.destroy();
-    this.$scheduler.destroy();
-    this.$scheduler = null;
+    this.$dispatch.destroy();
+    this.$dispatch = null;
     this.$globalEvent = null;
 });
 
@@ -408,11 +409,11 @@ def(VMProto, '$destroy', function() {
  * 设置所有API接口
  * @return {[type]} [description]
  */
-def(VMProto, '$overrideApi', function() {
+def(medProto, '$overrideApi', function() {
     overrideApi(this)
 })
 
 
 export {
-    Controller
+    Mediator
 }

@@ -1,4 +1,4 @@
-
+ 
 /**
  * /解析json字符串
  * @param  {[type]} itemArray [description]
@@ -9,8 +9,7 @@ export function parseJSON(itemArray) {
     try {
         anminJson = JSON.parse(itemArray);
     } catch (error) {
-        console.log('parseJSON失败')
-        // anminJson = (new Function("return " + itemArray))();
+        console.log('parseJSON失败:'+ itemArray)
     }
     return anminJson;
 }

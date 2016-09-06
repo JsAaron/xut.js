@@ -11,7 +11,7 @@ const common = {
     //index入口
     index: './src/index.html',
     //执行入口
-    entry: './src/lib/index.js',
+    entry: './src/lib/main.js',
     //生成名称
     devName: 'xxtppt.dev.js',
     distName: 'xxtppt.js',

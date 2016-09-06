@@ -1,13 +1,11 @@
 import nextTick from '../core/tick'
 import { home, scene } from './layout'
 import { parseJSON } from '../util/index'
-import { controll as sceneControll } from './controller'
+import { sceneController } from './controller'
 import { sToolbar as MainBar } from '../toolbar/sysbar'
 import { fToolbar as DeputyBar } from '../toolbar/fnbar'
 import { Bar as BookToolBar } from '../toolbar/bookbar'
-
-//vm
-import { Controller as Manager } from '../manager/controller'
+import { Mediator } from '../manager/mediator'
 
 let config
 
@@ -96,7 +94,7 @@ let checkHistory = (history) => {
 
     //如果有历史记录
     if (history) {
-        var scenarioInfo = sceneControll.seqReverse(history)
+        var scenarioInfo = sceneController.seqReverse(history)
         if (scenarioInfo) {
             scenarioInfo = scenarioInfo.split('-');
             Xut.View.LoadScenario({
@@ -146,7 +144,7 @@ export class SceneFactory {
             //构件vm对象
             this.createViewModel();
             //注入场景管理
-            sceneControll.add(seasonId, chapterId, this);
+            sceneController.add(seasonId, chapterId, this);
         })
     }
 
@@ -276,7 +274,7 @@ export class SceneFactory {
         var scenarioMaster = tempfind('masterContainer', 'scenarioMaster-');
 
         //场景容器对象
-        var vm = this.vm = new Manager({
+        var vm = this.vm = new Mediator({
             'container': this.elements[0],
             'pageMode': pageMode,
             'multiScenario': !isMain,
@@ -415,7 +413,7 @@ export class SceneFactory {
                 console.log('主场景', vm)
                 console.log('主场景容器', vm.$scheduler.pageMgr.Collections)
                 console.log('主场景视觉差容器', vm.$scheduler.parallaxMgr && vm.$scheduler.parallaxMgr.Collections)
-                console.log('多场景', sceneControll.expose())
+                console.log('多场景', sceneController.expose())
                 console.log('数据库', Xut.data);
             })
         }
@@ -456,6 +454,6 @@ export class SceneFactory {
         this.elements = null;
 
         //销毁引用
-        sceneControll.remove(this.scenarioId)
+        sceneController.remove(this.scenarioId)
     }
 }

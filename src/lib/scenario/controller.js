@@ -4,7 +4,6 @@
  * @return {[type]} [description]
  */
 
-
 //场景层级控制
 let zIndex = 999999
 
@@ -14,24 +13,32 @@ let toRepeat = 0
 //场景合集
 //主场景
 //副场景
-let sceneCollection = {
+const sceneCollection = {
     //场景顺序
     scenarioStack: [],
     //场景链表
     scenarioChain: []
 }
 
-var controll = {
 
+const sceneController = {
 
-    //场景层级控制
-    createIndex: function() {
+    /**
+     * 场景层级控制
+     * @return {[type]} [description]
+     */
+    createIndex() {
         return --zIndex;
     },
 
 
-    //设置一个新场景
-    add: function(scenarioId, relevant, sceneObj) {
+    /**
+     * 设置一个新场景
+     * @param {[type]} scenarioId [description]
+     * @param {[type]} relevant   [description]
+     * @param {[type]} sceneObj   [description]
+     */
+    add(scenarioId, relevant, sceneObj) {
         sceneCollection.scenarioStack.push(scenarioId);
         sceneCollection['scenarioId->' + scenarioId] = sceneObj;
         //场景链表,拥挤记录场景的加载上一页
@@ -43,10 +50,11 @@ var controll = {
     },
 
 
-    //=============== 场景链相关方法 ==========================
-
-    //取出上一个场景链
-    takeOutPrevChainId: function() {
+    /**
+     * 取出上一个场景链
+     * @return {[type]} [description]
+     */
+    takeOutPrevChainId() {
         var pre = sceneCollection.scenarioChain.pop();
         if (sceneCollection.scenarioChain.length > 1) {
             return sceneCollection.scenarioChain.pop()
@@ -55,8 +63,13 @@ var controll = {
         }
     },
 
-    //检测重复
-    checkToRepeat: function(seasonId) {
+
+    /**
+     * 检测重复
+     * @param  {[type]} seasonId [description]
+     * @return {[type]}          [description]
+     */
+    checkToRepeat(seasonId) {
         var last,
             len = sceneCollection.scenarioChain.length;
         if (len > 1) {
@@ -78,11 +91,12 @@ var controll = {
         }
     },
 
+
     /**
      * 返回活动对象
      * @return {[type]} [description]
      */
-    containerObj: function(scenarioId) {
+    containerObj(scenarioId) {
         if (scenarioId === 'current') {
             var scenarioStack = sceneCollection.scenarioStack;
             scenarioId = scenarioStack[scenarioStack.length - 1];
@@ -96,12 +110,17 @@ var controll = {
      * @param  {[type]} scenarioId [description]
      * @return {[type]}            [description]
      */
-    findIndexOfId: function(scenarioId) {
+    findIndexOfId(scenarioId) {
         return sceneCollection.scenarioStack.lastIndexOf(scenarioId);
     },
 
-    //删除指定场景引用
-    remove: function(scenarioId) {
+
+    /**
+     * 删除指定场景引用
+     * @param  {[type]} scenarioId [description]
+     * @return {[type]}            [description]
+     */
+    remove(scenarioId) {
         var indexOf = this.findIndexOfId(scenarioId)
             //删除索引
         sceneCollection.scenarioStack.splice(indexOf, 1)
@@ -109,8 +128,12 @@ var controll = {
         delete sceneCollection['scenarioId->' + scenarioId];
     },
 
-    //销毁所有场景
-    destroyAllScene: function() {
+
+    /**
+     * 销毁所有场景
+     * @return {[type]} [description]
+     */
+    destroyAllScene() {
         var cache = _.clone(sceneCollection.scenarioStack);
         _.each(cache, function(scenarioId) {
             sceneCollection['scenarioId->' + scenarioId].destroy();
@@ -118,12 +141,13 @@ var controll = {
         sceneCollection.scenarioChain = [];
     },
 
+
     /**
      * 重写场景的顺序编号
      * 用于记录最后一次跳转的问题
      * @return {[type]} [description]
      */
-    rewrite: function(scenarioId, chapterId) {
+    rewrite(scenarioId, chapterId) {
         _.each(sceneCollection.scenarioChain, function(scenarioChain) {
             if (scenarioChain.scenarioId == scenarioId) {
                 scenarioChain.chapterId = chapterId;
@@ -132,20 +156,22 @@ var controll = {
     },
 
 
-    //暴露接口
-    expose: function() {
+    /**
+     * 暴露接口
+     * @return {[type]} [description]
+     */
+    expose() {
         return sceneCollection;
     },
 
 
-    //===============================================
-    //
-    //			记录历史缓存
-    //
-    //===============================================
-
-    //解析序列
-    sequence: function(scenarioId, currPageIndex) {
+    /**
+     * 解析序列
+     * @param  {[type]} scenarioId    [description]
+     * @param  {[type]} currPageIndex [description]
+     * @return {[type]}               [description]
+     */
+    sequence(scenarioId, currPageIndex) {
         var chains = sceneCollection.scenarioChain;
         //有多个场景关系,需要记录
         if (chains.length > 1) {
@@ -162,8 +188,13 @@ var controll = {
         }
     },
 
-    //反解析
-    seqReverse: function(chains) {
+
+    /**
+     * 反解析
+     * @param  {[type]} chains [description]
+     * @return {[type]}        [description]
+     */
+    seqReverse(chains) {
         var chains = chains.split(",")
         var chainsNum = chains.length;
 
@@ -193,10 +224,10 @@ var controll = {
     }
 }
 
-Xut.sceneController = controll;
+Xut.sceneController = sceneController
 
 
-export {controll}
+export { sceneController }
 
 
 // Xut.test = function() {

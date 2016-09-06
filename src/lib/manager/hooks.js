@@ -3,7 +3,7 @@
 
 
  //委托事件处理钩子
- let delegateHooks = {
+ export const delegateHooks = {
 
      /**
       * 超连接,跳转
@@ -37,7 +37,3 @@
      }
  }
 
-
- export {
-     delegateHooks
- }

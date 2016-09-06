@@ -7,27 +7,31 @@
  */
 import { config } from '../config/index'
 
-let round = Math.round
-let ratio = 6
-let isIOS = Xut.plat.isIOS
-let TOP = isIOS ? 20 : 0
+const round = Math.round
+const ratio = 6
+const isIOS = Xut.plat.isIOS
+const TOP = isIOS ? 20 : 0
 
-let iconHeight
-let proportion
-let calculate
-let sWidth
-let sHeight
-let navHeight //菜单的高度
-let navWidth //菜单的宽度
+const getOptions = () => {
+    let iconHeight = config.iconHeight
+    let proportion = config.proportion
+    let calculate = proportion.calculateContainer()
+        //横版模式
+    let isHorizontal = config.layoutMode == 'horizontal'
 
-let setOption = () => {
-    iconHeight = config.iconHeight
-    proportion = config.proportion
-    calculate = proportion.calculateContainer()
-    sWidth = calculate.width
-    sHeight = calculate.height
-    proportion = config.layoutMode == "horizontal" ? proportion.width : proportion.height
+    proportion = isHorizontal ? proportion.width : proportion.height
     iconHeight = isIOS ? iconHeight : round(proportion * iconHeight)
+
+    return {
+        isHorizontal: isHorizontal,
+        iconHeight: iconHeight,
+        sWidth: calculate.width,
+        sHeight: calculate.height,
+        sTop: calculate.top,
+        sLeft: calculate.left,
+        calculate: calculate,
+        proportion: proportion
+    }
 }
 
 /**
@@ -36,36 +40,71 @@ let setOption = () => {
  */
 export function home() {
 
-    setOption()
+    let options = getOptions()
+    let sWidth = options.sWidth
+    let sHeight = options.sHeight
+    let iconHeight = options.iconHeight
+    let calculate = options.calculate
+    let isHorizontal = options.isHorizontal
 
-    let retStr = ''
-    let style
+    let html = ''
+    let template
+    let navBar
+    let container
 
-    if (config.scrollPaintingMode) {
-        retStr = '<div id="sceneHome" style ="width:' + (config.virtualMode ? sWidth / 2 : sWidth) + 'px;height:' + sHeight + 'px;top:' + calculate.top + 'px;left:' + calculate.left + 'px;z-index:' + Xut.sceneController.createIndex() + '" class="xut-chapter">';
-    } else {
-        //overflow:hidden;
-        retStr = '<div id="sceneHome" style ="width:' + (config.virtualMode ? sWidth / 2 : sWidth) + 'px;height:' + sHeight + 'px;top:' + calculate.top + 'px;left:' + calculate.left + 'px;overflow:hidden;z-index:' + Xut.sceneController.createIndex() + '" class="xut-chapter">';
-    }
-    retStr += '<div id="controlBar" class="xut-controlBar hide"></div>';
-    retStr += '<ul id="pageContainer" class="xut-flip"></ul>'; //页面节点
-    retStr += '<ul id="masterContainer" class="xut-master xut-flip"></ul>'; //视觉差包装容器
+    //导航
+    html =
+        '<div id="navBar" class="xut-navBar" style="' +
+        'width:{{width}};' +
+        'height:{{height}}px;' +
+        'top:{{top}};' +
+        'left:{{left}};' +
+        'bottom:{{bottom}};' +
+        'background-color:white;' +
+        'border-top:1px solid rgba(0,0,0,0.1);' +
+        'overflow:{{overflow}};' +
+        '"></div>'
 
-    //滑动菜单
-    if (config.layoutMode == 'horizontal') {
-        navHeight = round(sHeight / ratio); //菜单的高度
-        style = 'overflow:hidden;width:100%;height:' + navHeight + 'px;background-color:white;bottom:4px;border-top:1px solid rgba(0,0,0,0.1)';
-    } else {
-        navWidth = Math.min(sWidth, sHeight) / (isIOS ? 8 : 3); //菜单宽度
-        navHeight = round((sHeight - iconHeight - TOP) * 0.96);
-        style = 'width:' + navWidth + 'px;height:' + navHeight + 'px;background-color:white;top:' + (iconHeight + TOP + 2) + 'px;left:' + iconHeight + 'px;border-top:1px solid rgba(0,0,0,0.1)';
-    }
+    navBar = _.template(html, {
+        width: isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px',
+        height: isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96),
+        top: isHorizontal ? '' : (iconHeight + TOP + 2) + 'px',
+        left: isHorizontal ? '' : iconHeight + 'px',
+        overflow: isHorizontal ? 'hidden' : 'visible',
+        bottom: isHorizontal ? '4px' : ''
+    })
 
-    retStr += '<div id="navBar" class="xut-navBar" style="' + style + '"></div>';
-    //消息提示框
-    retStr += '<div id="toolTip"></div>';
-    retStr += '</div>';
-    return retStr;
+    //主体
+    html =
+        '<div id="sceneHome" class="xut-chapter" style="' +
+        'width:{{width}}px;' +
+        'height:{{height}}px;' +
+        'top:{{top}}px;' +
+        'left:{{left}}px;' +
+        'overflow:hidden;' +
+        'z-index:{{index}};' +
+        'overflow:{{overflow}};" >' +
+
+        ' <div id="controlBar" class="xut-controlBar hide"></div>' +
+        //页面节点
+        ' <ul id="pageContainer" class="xut-flip"></ul>' +
+        //视觉差包装容器
+        ' <ul id="masterContainer" class="xut-master xut-flip"></ul>' +
+        //滑动菜单
+        ' {{navBar}}' +
+        //消息提示框
+        ' <div id="toolTip"></div>' +
+        '</div>'
+
+    return _.template(html, {
+        width: config.virtualMode ? sWidth / 2 : sWidth,
+        height: sHeight,
+        top: calculate.top,
+        left: calculate.left,
+        index: Xut.sceneController.createIndex(),
+        overflow: config.scrollPaintingMode ? 'visible' : 'hidden',
+        navBar: navBar
+    })
 }
 
 
@@ -76,26 +115,115 @@ export function home() {
  */
 export function scene(id) {
 
-    setOption()
+    let options = getOptions()
 
-    var wapper = '';
-    if (config.scrollPaintingMode) {
-        wapper = '<div id="{0}" style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">' +
-            '<ul id="{6}" class="xut-flip" style="z-index:{7}"></ul>' +
-            '<ul id="{8}" class="xut-flip" style="z-index:{9}"></ul>' +
-            '</div>';
-    } else {
-        wapper = '<div id="{0}" style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;overflow:hidden;z-index:{5};">' +
-            '<ul id="{6}" class="xut-flip" style="z-index:{7}"></ul>' +
-            '<ul id="{8}" class="xut-flip" style="z-index:{9}"></ul>' +
-            '</div>';
-    }
-    return String.format(wapper, 'scenario-' + id, config.virtualMode ? sWidth / 2 : sWidth, sHeight, calculate.top, calculate.left, Xut.sceneController.createIndex(),
-        'scenarioPage-' + id, 2,
-        'scenarioMaster-' + id, 1
-    );
+    let sWidth = options.sWidth
+    let sHeight = options.sHeight
+    let calculate = options.calculate
+
+    let html =
+        '<div id="{{id}}" style="' +
+        'width:{{width}}px;' +
+        'height:{{height}}px;' +
+        'top:{{top}}px;' +
+        'left:{{left}}px;' +
+        'position:absolute;' +
+        'z-index:{{zIndex}};' +
+        'overflow:{{overflow}};' +
+        '">' +
+
+        ' <ul id="{{pageId}}" class="xut-flip" style="z-index:{{zIndexPage}}"></ul>' +
+        ' <ul id="{{masterId}}" class="xut-flip" style="z-index:{{zIndexMaster}}"></ul>' +
+        '</div>';
+
+    return _.template(html, {
+        id: 'scenario-' + id,
+        width: config.virtualMode ? sWidth / 2 : sWidth,
+        height: sHeight,
+        top: calculate.top,
+        left: calculate.left,
+        zIndex: Xut.sceneController.createIndex(),
+        overflow: config.scrollPaintingMode ? 'visible' : 'hidden',
+        pageId: 'scenarioPage-' + id,
+        zIndexPage: 2,
+        masterId: 'scenarioMaster-' + id,
+        zIndexMaster: 1
+    })
+
 }
 
+
+const getNavOptions = () => {
+
+    //导航菜单宽高
+    let navHeight, navWidth
+    let options = getOptions()
+    let sWidth = options.sWidth
+    let sHeight = options.sHeight
+    let proportion = options.proportion
+    let isHorizontal = options.isHorizontal
+
+    //横版模版
+    if (isHorizontal) {
+        navHeight = round(sHeight / ratio)
+    } else {
+        navWidth = Math.min(sWidth, sHeight) / (isIOS ? 8 : 3)
+        navHeight = round((sHeight - options.iconHeight - TOP) * 0.96)
+    }
+
+    return {
+        sWidth: sWidth,
+        sHeight: sHeight,
+        navHeight: navHeight,
+        navWidth: navWidth,
+        proportion: proportion
+    }
+
+}
+
+
+//获得css配置数据
+const getWrapper = (seasonlist) => {
+
+    let width, height, blank, scroller, contentstyle, containerstyle, overwidth, overHeigth
+
+    //获得css配置数据
+    let options = getNavOptions()
+    let font = round(options.proportion * 2)
+
+    let navWidth = options.navWidth
+    let navHeight = options.navHeight
+    let sWidth = options.sWidth
+    let sHeight = options.sHeight
+
+    if (config.layoutMode == 'horizontal') {
+        height = round(navHeight * 0.9);
+        width = round(height * sWidth / sHeight); //保持缩略图的宽高比
+        blank = round(navHeight * 0.05); //缩略图之间的间距
+        scroller = 'width:' + seasonlist * (width + blank) + 'px>';
+        contentstyle = 'float:left;width:' + width + 'px;height:' + height + 'px;margin-left:' + blank + 'px';
+        containerstyle = 'width:96%;height:' + height + 'px;margin:' + blank + 'px auto;font-size:' + font + 'em';
+        //横版左右滑动
+        //溢出长度+上偏移量
+        overwidth = (width * seasonlist) + (seasonlist * blank)
+    } else {
+        width = round(navWidth * 0.9);
+        height = round(navWidth * 1.1);
+        blank = round(navWidth * 0.05);
+        contentstyle = 'width:' + width + 'px;height:' + height + 'px;margin:' + blank + 'px auto;border-bottom:1px solid rgba(0,0,0,0.3)';
+        containerstyle = 'height:' + (navHeight - 4) + 'px;overflow:hidden;margin:2px auto;font-size:' + font + 'em';
+        //竖版上下滑动
+        overHeigth = (height * seasonlist) + (seasonlist * blank)
+    }
+
+    return {
+        contentstyle: contentstyle,
+        containerstyle: containerstyle,
+        overwidth: overwidth,
+        overHeigth: overHeigth,
+        scroller: scroller
+    }
+}
 
 /**
  * [nav 导航菜单]
@@ -104,66 +232,38 @@ export function scene(id) {
  */
 export function nav(seasonSqlRet) {
 
-    setOption()
+    let seasonId, chapterId, data, xxtlink
+    let seasonlist = seasonSqlRet.length
+    let options = getWrapper(seasonlist)
 
-    var seasonlist = seasonSqlRet.length,
-        retStr,
-        liCss,
-        scroller = '',
-        wrapper,
-        seasonId,
-        chapterId,
-        data,
-        overwidth, //溢出宽度
-        overHeigth, //溢出高度
-        xxtlink;
+    let list = ''
+    let i = 0
 
-
-    //获得css配置数据
-    (function SectionWrapper() {
-        var width,
-            height,
-            blank,
-            font = round(proportion * 2);
-
-        if (config.layoutMode == 'horizontal') {
-            height = round(navHeight * 0.9);
-            width = round(height * sWidth / sHeight); //保持缩略图的宽高比
-            blank = round(navHeight * 0.05); //缩略图之间的间距
-            scroller = 'width:' + seasonlist * (width + blank) + 'px>';
-            liCss = 'float:left;width:' + width + 'px;height:' + height + 'px;margin-left:' + blank + 'px';
-            wrapper = 'width:96%;height:' + height + 'px;margin:' + blank + 'px auto;font-size:' + font + 'em';
-            //横版左右滑动
-            //溢出长度+上偏移量
-            overwidth = (width * seasonlist) + (seasonlist * blank)
-        } else {
-            width = round(navWidth * 0.9);
-            height = round(navWidth * 1.1);
-            blank = round(navWidth * 0.05);
-            liCss = 'width:' + width + 'px;height:' + height + 'px;margin:' + blank + 'px auto;border-bottom:1px solid rgba(0,0,0,0.3)';
-            wrapper = 'height:' + (navHeight - 4) + 'px;overflow:hidden;margin:2px auto;font-size:' + font + 'em';
-            //竖版上下滑动
-            overHeigth = (height * seasonlist) + (seasonlist * blank)
-        }
-
-    })();
-
-
-    retStr = '<div id="SectionWrapper" style="' + wrapper + '">';
-    retStr += '  <div id="Sectionscroller" style="width:' + overwidth + 'px;height:' + overHeigth + 'px;+ ' + scroller + '">';
-    retStr += '     <ul id="SectionThelist">';
-
-    for (var i = 0; i < seasonlist; i++) {
+    for (i; i < seasonlist; i++) {
         data = seasonSqlRet[i];
         seasonId = data.seasonId;
         chapterId = data._id;
         xxtlink = seasonId + '-' + chapterId;
-        retStr += '<li style="' + liCss + '">';
-        retStr += '    <div class="xut-navBar-box" data-xxtlink = "' + xxtlink + '">' + (i + 1) + '</div>';
-        retStr += '</li>';
+        list += '<li style="' + options.contentstyle + '">';
+        list += '  <div class="xut-navBar-box" data-xxtlink = "' + xxtlink + '">' + (i + 1) + '</div>';
+        list += '</li>';
     }
 
-    retStr += '</ul></div>';
+    //导航
+    let html =
+        '<div id="SectionWrapper" style="{{style}}">' +
+        '  <div id="Sectionscroller" style="width:{{width}}px;height:{{height}}px;{{scroller}}">' +
+        '    <ul id="SectionThelist">' +
+        '       {{list}}' +
+        '    </ul>' +
+        '  </div>' +
+        '</div>'
 
-    return retStr;
+    return _.template(html, {
+        style: options.containerstyle,
+        width: options.overwidth,
+        height: options.overHeigth,
+        scroller: options.scroller,
+        list: list
+    })
 }

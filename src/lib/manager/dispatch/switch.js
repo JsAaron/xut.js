@@ -1,4 +1,4 @@
-import { fix as _fix } from '../pagebase/translation'
+import { fix as _fix } from '../../pagebase/translation'
 
 /**
  * 页面切换逻辑
