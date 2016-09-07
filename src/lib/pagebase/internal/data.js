@@ -5,7 +5,6 @@
  */
 export default function(baseProto) {
 
-
 	/**
 	 * 对象实例内部构建
 	 * @return {[type]} [description]
@@ -19,23 +18,39 @@ export default function(baseProto) {
 	}
 
 
-	//获取页面数据
+	/**
+	 * 获取页面数据
+	 * @return {[type]} [description]
+	 */
 	baseProto.baseData = function () {
 		return this.dataCache[this.pageType];
 	}
 
-	//获取热点数据信息
+
+	/**
+	 * 获取热点数据信息
+	 * @return {[type]} [description]
+	 */
 	baseProto.baseActivits = function () {
 		return this.dataCache['activitys'];
 	}
 
-	//获取自动运行数据
+
+	/**
+	 * 获取自动运行数据
+	 * @return {[type]} [description]
+	 */
 	baseProto.baseAutoRun = function () {
 		var autoRunDas = this.dataCache['autoRunDas'];
 		return autoRunDas && autoRunDas;
 	}
 
-	//获取chapterid
+
+	/**
+	 * 获取chapterid
+	 * @param  {[type]} pid [description]
+	 * @return {[type]}     [description]
+	 */
 	baseProto.baseGetPageId = function (pid) {
 		return this.baseData(pid)['_id'];
 	}
@@ -49,7 +64,7 @@ export default function(baseProto) {
 	 */
 	baseProto.baseGetContentObject = function (contentId) {
 		var contentsObj;
-		if (contentsObj = this.contentsCollector[contentId]) {
+		if (contentsObj = this._contentsCollector[contentId]) {
 			return contentsObj;
 		} else {
 			//查找浮动母版
@@ -114,9 +129,9 @@ export default function(baseProto) {
 		baseProto['base' + type + 'Content'] = function (data) {
 			switch (type) {
 				case 'Get':
-					return this.abActivitys.get();
+					return this._abActivitys.get();
 				case 'Specified':
-					return this.abActivitys.specified(data);
+					return this._abActivitys.specified(data);
 			}
 		}
 	})
@@ -135,25 +150,28 @@ export default function(baseProto) {
 		baseProto['base' + type + 'Component'] = function (data) {
 			switch (type) {
 				case 'Register':
-					return this.components.register(data);
+					return this._components.register(data);
 				case 'Get':
-					return this.components.get();
+					return this._components.get();
 				case 'Specified':
-					return this.components.specified(data);
+					return this._components.specified(data);
 				case 'Remove':
-					return this.components.remove();
+					return this._components.remove();
 			}
 		}
 	})
 
-	//***************************************************************
-	//
-	//               运行辅助对象事件
-	//
-	//***************************************************************
+
+	/**
+	 *  运行辅助对象事件
+	 * @param  {[type]} activityId  [description]
+	 * @param  {[type]} outCallBack [description]
+	 * @param  {[type]} actionName  [description]
+	 * @return {[type]}             [description]
+	 */
 	baseProto.baseAssistRun = function (activityId, outCallBack, actionName) {
 		var activity;
-		if (activity = this.abActivitys) {
+		if (activity = this._abActivitys) {
 			_.each(activity.get(), function (contentObj, index) {
 				if (activityId == contentObj.activityId) {
 					if (actionName == 'Run') {

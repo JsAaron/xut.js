@@ -66,12 +66,13 @@ export default {
         })
     },
 
+
     /**
      * 流式排版
      */
     'Flow' (taskCallback, base) {
-
-        base.createRelated.cacheTasks['flow'] = new TaskFlow(base, taskCallback);
+        taskCallback()
+     //   TaskFlow(base, taskCallback)
     },
 
 
@@ -106,6 +107,7 @@ export default {
 
         base.createRelated.cacheTasks['background'] = new TaskBackground(base.getElement(), data, suspendCallback, successCallback)
     },
+
 
     /**
      * 分配Components构建任务
@@ -144,6 +146,7 @@ export default {
             'virtualOffset': base.virtualOffset
         }, suspendCallback, successCallback);
     },
+
 
     /**
      * 分配contetns构建任务

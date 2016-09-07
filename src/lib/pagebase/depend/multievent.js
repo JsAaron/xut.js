@@ -1,18 +1,23 @@
-//***********************************************************
-//
-//             多事件模块
-//
-//**********************************************************
-
+/**
+ * 多事件模块
+ */
 import {
-    conversionEventType, bindEvents, destroyEvents
+    conversionEventType,
+    bindEvents,
+    destroyEvents
 }
 from '../../component/activity/event/event'
 
-//获取对应的activity对象
-var getActivity = function(activityId, callback) {
+
+/**
+ * 获取对应的activity对象
+ * @param  {[type]}   activityId [description]
+ * @param  {Function} callback   [description]
+ * @return {[type]}              [description]
+ */
+const getActivity = function(activityId, callback) {
     var activity;
-    if (activity = this.abActivitys) {
+    if (activity = this._abActivitys) {
         _.each(activity.get(), function(contentObj, index) {
             if (activityId == contentObj.activityId) {
                 callback(contentObj)
@@ -22,8 +27,13 @@ var getActivity = function(activityId, callback) {
     }
 }
 
-//制作一个处理绑定函数
-var makeRunBinding = function(pagebase) {
+
+/**
+ * 制作一个处理绑定函数
+ * @param  {[type]} pagebase [description]
+ * @return {[type]}          [description]
+ */
+const makeRunBinding = function(pagebase) {
     var registers = this.registers;
     var shift;
     return function() {
@@ -35,14 +45,15 @@ var makeRunBinding = function(pagebase) {
             })
         })
     }
-};
+}
+
 
 /**
  * 多事件处理
  * 每次通过同一个热点,触发不同的对象操作
  * @return {[type]} [description]
  */
-function combineEvents(pagebase, eventRelated) {
+const combineEvents = function(pagebase, eventRelated) {
 
     var contentObj, element, eventName;
 

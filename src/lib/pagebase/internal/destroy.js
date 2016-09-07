@@ -33,7 +33,7 @@ export default function(baseProto) {
 
         //清理content类型对象
         var contents;
-        if (contents = this.abActivitys.get()) {
+        if (contents = this._abActivitys.get()) {
             contents.forEach(function(contentObj) {
                 contentObj.destroy(function(destroyObj) {
                     //如果不是浮动对象,清理元素引用
@@ -55,9 +55,9 @@ export default function(baseProto) {
         }
 
         //清理零件类型对象
-        var components;
-        if ((components = this.baseGetComponent())) {
-            components.length && components.forEach(function(componentObj) {
+        var _components;
+        if ((_components = this.baseGetComponent())) {
+            _components.length && _components.forEach(function(componentObj) {
                 componentObj.destroy && componentObj.destroy();
             })
         }

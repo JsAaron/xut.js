@@ -55,23 +55,36 @@ export default function(baseProto) {
          * 构建所有对象完毕后处理
          */
 
-        //抽象activtiys合集,用于关联各自的content
-        //划分各自的子作用域
-        //1对多的关系
-        this.abActivitys = new Collection();
+        /**
+         * 抽象activtiys合集,用于关联各自的content
+         * 划分各自的子作用域
+         * 1对多的关系
+         * @type {Collection}
+         */
+        this._abActivitys = new Collection();
 
-        //widget热点处理类
-        //1 iframe零件
-        //2 页面零件
-        //只存在当前页面
-        this.components = new Collection();
+        /**
+         * widget热点处理类
+         * 只存在当前页面
+         * 1 iframe零件
+         * 2 页面零件
+         * @type {Collection}
+         */
+        this._components = new Collection();
 
         /**
          * 缓存所有的content对象引用
          * 1对1的关系
          * @type {Object}
          */
-        this.contentsCollector = {};
+        this._contentsCollector = {};
+
+        /**
+         * 2016.9.7
+         * flow热点
+         * @type {Collection}
+         */
+        this._flows = new Collection()
 
 
         /**
@@ -124,7 +137,7 @@ export default function(baseProto) {
              * @return {[type]}              [description]
              */
             registerAbstractActivity(contentsObjs) {
-                instance.abActivitys.register(contentsObjs);
+                instance._abActivitys.register(contentsObjs);
             },
 
             /**
@@ -136,12 +149,12 @@ export default function(baseProto) {
                 //因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
                 contents(pid, id, contentScope) {
                     const scope = instance.baseGetContentObject[id]
-                    //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
+                        //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
                     if (scope && scope.isBindEventHooks) {
-                        instance.contentsCollector[id] = contentScope;
+                        instance._contentsCollector[id] = contentScope;
                     }
                     if (!scope) {
-                        instance.contentsCollector[id] = contentScope;
+                        instance._contentsCollector[id] = contentScope;
                     }
                 },
 
