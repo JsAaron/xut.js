@@ -58,7 +58,7 @@ function onlyParseContents(data) {
 
 
 
-function TaskContents(activityData) {
+export default function TaskContents(activityData) {
     activityData = _.extend(this, activityData);
     //只解析content有关的activityData
     var compileActivitys = onlyParseContents(activityData)
@@ -649,7 +649,7 @@ function bindActivitys(callback, data, contentDas) {
                 "pid": pid, //页码
                 'eventData': eventData, //事件数据
                 'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
-                'relatedCallback': relatedCallback //相关回调 
+                'relatedCallback': relatedCallback //相关回调
             }
 
             //注册引用
@@ -681,8 +681,3 @@ function bindActivitys(callback, data, contentDas) {
 }
 
 
-
-
-export {
-    TaskContents
-}

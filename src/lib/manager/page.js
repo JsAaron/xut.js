@@ -155,20 +155,22 @@ export class PageMgr extends Abstract {
 
     move(leftIndex, currIndex, rightIndex, direction, speed, action, moveDistance) {
 
-        //////////////
-        //找到需要滑动的页面 //
-        //////////////
-        function findPage() {
+        /**
+         * 找到需要滑动的页面
+         * @return {[type]} [description]
+         */
+        const findPage = () => {
             return [
                 this.abstractGetPageObj(leftIndex),
                 this.abstractGetPageObj(currIndex),
                 this.abstractGetPageObj(rightIndex)
-            ];
+            ]
         }
 
-        ///////////
-        //开始移动页面 //
-        ///////////
+        /**
+         * /开始移动页面
+         * @return {[type]}         [description]
+         */
         _.each(findPage.call(this), function(pageObj, index) {
             if (pageObj) {
                 //移动浮动页面容器

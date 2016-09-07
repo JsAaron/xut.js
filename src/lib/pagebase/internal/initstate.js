@@ -1,10 +1,7 @@
 import { create as _create } from '../depend/multievent'
-import { createTransform } from '../translation'
 import Collection from '../depend/collection'
+import initTasks from '../threadtask/inittasks'
 import Factory from '../depend/factory'
-import assignedTasks from '../threadtask/threadtask'
-
-const noop = function() {}
 
 
 export default function(baseProto) {
@@ -13,7 +10,7 @@ export default function(baseProto) {
      * 初始化多线程任务
      * @return {[type]} [description]
      */
-    baseProto.initTasks = function(options) {
+    baseProto.initState = function(options) {
 
         var instance = this
 
@@ -45,83 +42,9 @@ export default function(baseProto) {
         this.canvasRelated = new Factory();
 
         /**
-         * 创建相关的信息
-         * @type {Object}
+         * 初始化任务
          */
-        const createRelated = this.createRelated = {
-
-            /**
-             * 主线任务等待
-             */
-            tasksHang: null,
-
-            /**
-             * 创建相关的信息
-             * @type {Object}
-             */
-            tasksTimer: 0,
-
-            /**
-             * 当前任务是否中断
-             * return
-             *     true  中断
-             *     false 没有中断
-             */
-            isTaskSuspend: false,
-
-            /**
-             * 是否预创建背景中
-             */
-            preCreateTasks: false,
-
-
-            /**
-             * 下一个将要运行的任务标示
-             * 1 主容器任务
-             * 2 背景任务
-             * 3 widget热点任务
-             * 4 content对象任务
-             */
-            nextRunTask: 'container',
-
-            /**
-             * 缓存构建中断回调
-             * 构建分2步骤
-             * 1 构建数据与结构（执行中断处理）
-             * 2 构建绘制页面
-             * @type {Object}
-             */
-            cacheTasks: function() {
-                const cacheTasks = {};
-                _.each(["background", "components", "contents"], function(taskName) {
-                    cacheTasks[taskName] = false;
-                })
-                return cacheTasks;
-            }(),
-
-            /**
-             * 与创建相关的信息
-             * 创建坐标
-             * 1 创建li位置
-             * 2 创建浮动对象
-             * "translate3d(0px, 0, 0)", "original"
-             */
-            initTransformParameter: createTransform(this.visiblePid, this.pid),
-
-            /**
-             * 预创建
-             * 构建页面主容器完毕后,此时可以翻页
-             * @return {[type]} [description]
-             */
-            preforkComplete: noop,
-
-            /**
-             * 整个页面都构建完毕通知
-             * @return {[type]} [description]
-             */
-            createTasksComplete: noop
-        }
-
+        initTasks(instance)
 
         /**
          * 内部钩子相关
@@ -211,8 +134,8 @@ export default function(baseProto) {
             collector: {
                 //搜集所有的content(每一个content对象)
                 //因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
-                contents: function(pid, id, contentScope) {
-                    var scope = instance.baseGetContentObject[id];
+                contents(pid, id, contentScope) {
+                    const scope = instance.baseGetContentObject[id]
                     //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
                     if (scope && scope.isBindEventHooks) {
                         instance.contentsCollector[id] = contentScope;
@@ -226,9 +149,9 @@ export default function(baseProto) {
                 //新概念，浮动页面对象
                 //用于是最顶层的，比母版浮动对象还要高
                 //所以这个浮动对象需要跟随页面动
-                floatPages: function(data) {
+                floatPages(data) {
                     //浮动页面对象容器
-                    var contentObj
+                    let contentObj
                     floatContents.PageContainer = data.container;
                     _.each(data.ids, function(id) {
                         if (contentObj = instance.baseGetContentObject(id)) {
@@ -247,8 +170,8 @@ export default function(baseProto) {
                 //1 浮动的对象是有动画数据或者视觉差数据
                 //2 浮动的对象是用于零件类型,这边只提供创建
                 //  所以需要制造一个空的容器，用于母版交界动
-                floatMaters: function(data) {
-                    var prefix,
+                floatMaters(data) {
+                    let prefix,
                         contentObj,
                         contentProcess,
                         contentsFragment;
@@ -297,94 +220,8 @@ export default function(baseProto) {
             eventBinding(eventRelated) {
                 _create(instance, eventRelated);
             }
-        };
-
-
-        /**
-         * 设置下一个标记
-         */
-        function setNextRunTask(taskName) {
-            createRelated.nextRunTask = taskName;
         }
 
-        function callContext(taskName, fn) {
-            return assignedTasks[taskName](fn, instance)
-        }
-
-        /**
-         * 任务钩子
-         * @type {Object}
-         */
-        instance.tasks = {
-            container() {
-                callContext('Container', function(element, pseudoElement) {
-                    //////////////
-                    //li,li-div //
-                    //////////////
-                    instance.element = element;
-                    instance.pseudoElement = pseudoElement;
-
-                    //获取根节点
-                    instance.getElement = function() {
-                        return pseudoElement ? pseudoElement : element
-                    }
-
-                    setNextRunTask('background')
-
-                    //构建主容器li完毕,可以提前执行翻页动作
-                    createRelated.preforkComplete();
-                    //视觉差不管
-                    if (instance.isMaster) {
-                        instance.nextTasks({
-                            'taskName': '外部background',
-                            'outNextTasks': function() {
-                                instance.dispatchTasks();
-                            }
-                        });
-                    }
-                })
-            },
-            background() {
-                var nextRun = function() {
-                    createRelated.preCreateTasks = false;
-                    setNextRunTask('components')
-                        //针对当前页面的检测
-                    if (!createRelated.tasksHang || instance.isMaster) {
-                        instance.nextTasks({
-                            'taskName': '外部widgets',
-                            outNextTasks: function() {
-                                instance.dispatchTasks();
-                            }
-                        });
-                    }
-
-                    //如果有挂起任务，则继续执行
-                    if (createRelated.tasksHang) {
-                        createRelated.tasksHang();
-                    }
-                }
-                callContext('Background', nextRun)
-            },
-            components() {
-                //构件零件类型任务
-                callContext('Components', function() {
-                    setNextRunTask('contents')
-                    instance.nextTasks({
-                        'taskName': '外部contents',
-                        outNextTasks: function() {
-                            instance.dispatchTasks();
-                        }
-                    });
-                })
-            },
-            contents() {
-                callContext('Contetns', function() {
-                    setNextRunTask('complete')
-                    createRelated.createTasksComplete();
-                })
-            }
-        }
     }
-
 
 }

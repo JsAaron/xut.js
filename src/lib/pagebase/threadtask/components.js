@@ -11,7 +11,7 @@ import { reviseSize } from '../../util/option'
 import nextTick from '../../core/tick'
 
 
-function TaskComponents(data, suspendCallback, successCallback) {
+export default function TaskComponents(data, suspendCallback, successCallback) {
 
     //预编译模式跳过创建
     if (Xut.IBooks.runMode()) {
@@ -153,5 +153,3 @@ TaskComponents.prototype = {
         }
     }
 }
-
-export { TaskComponents }

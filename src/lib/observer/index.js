@@ -6,10 +6,10 @@
  *
  */
 
-let ArrayProto = Array.prototype
-let nativeIndexOf = ArrayProto.indexOf
-let slice = ArrayProto.slice
-let _indexOf = (array, needle) => {
+const ArrayProto = Array.prototype
+const nativeIndexOf = ArrayProto.indexOf
+const slice = ArrayProto.slice
+const _indexOf = (array, needle) => {
     var i, l;
     if (nativeIndexOf && array.indexOf === nativeIndexOf) {
         return array.indexOf(needle);

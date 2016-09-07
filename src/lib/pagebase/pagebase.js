@@ -21,13 +21,13 @@
  **********************************************************************/
 
 import initstate from './internal/initstate'
-import threadExternal from './internal/thread'
+import threadExternal from './internal/thread-api'
 import dataExternal from './internal/data'
 import destroy from './internal/destroy'
 
 export class Pagebase {
     constructor(options) {
-        this.initTasks(options)
+        this.initState(options)
     }
 }
 

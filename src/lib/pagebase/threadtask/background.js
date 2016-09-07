@@ -1,7 +1,6 @@
 import { readFile } from '../../util/option'
 import nextTick from '../../core/tick'
 
-
 const prefix = Xut.plat.prefixStyle;
 
 /**
@@ -11,7 +10,7 @@ const prefix = Xut.plat.prefixStyle;
  * @param {[type]} suspendCallback      [中断回调]
  * @param {[type]} successCallback      [description]
  */
-function TaskBackground(rootNode, data, suspendCallback, successCallback) {
+export default function TaskBackground(rootNode, data, suspendCallback, successCallback) {
     var layer,
         suspendTasks,
         nextTasks,
@@ -240,4 +239,3 @@ function createMaster(svgContent, data) {
 
 
 
-export { TaskBackground }

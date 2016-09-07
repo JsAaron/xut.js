@@ -1,8 +1,9 @@
 import updataCache from './cache'
 import TaskContainer from './container'
-import { TaskBackground } from './background'
-import { TaskContents } from './contents/index'
-import { TaskComponents } from './components'
+import TaskBackground from './background'
+import TaskContents from './contents/index'
+import TaskComponents from './components'
+import TaskFlow from './flow'
 
 /**
  * 解析canvas配置
@@ -65,6 +66,14 @@ export default {
         })
     },
 
+    /**
+     * 流式排版
+     */
+    'Flow' (taskCallback, base) {
+
+        base.createRelated.cacheTasks['flow'] = new TaskFlow(base, taskCallback);
+    },
+
 
     /**
      *  分配背景构建任务
@@ -119,7 +128,7 @@ export default {
                 });
             },
             //获取数据成功回调
-            successCallback = function() {
+            successCallback = () => {
                 taskCallback();
             };
 
@@ -140,7 +149,7 @@ export default {
      * 分配contetns构建任务
      * @return {[type]} [description]
      */
-    'Contetns' (taskCallback, base) {
+    'Contents' (taskCallback, base) {
 
         //通过content数据库为空处理
         if (Xut.data.preventContent) {
