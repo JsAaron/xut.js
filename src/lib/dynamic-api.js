@@ -63,7 +63,7 @@ const createaAccess = (mgr) => {
  * 判断是否存在页码索引
  * 如果不存在默认取当前页面
  */
-let createExistIndex = ($globalEvent) => {
+const createExistIndex = ($globalEvent) => {
     return (pageIndex) => {
         //如果不存在
         if (pageIndex == undefined) {
@@ -74,19 +74,19 @@ let createExistIndex = ($globalEvent) => {
 }
 
 
-export function overrideApi(vm) {
+export default function overrideApi(vm) {
 
-    let $globalEvent = vm.$globalEvent
-    let options = vm.options
-    let $dispatch = vm.$dispatch
+    const $globalEvent = vm.$globalEvent
+    const options = vm.options
+    const $dispatch = vm.$dispatch
 
     //页面与母版的管理器
-    let access = createaAccess({
+    const access = createaAccess({
         page: $dispatch.pageMgr,
         master: $dispatch.masterMgr
     })
 
-    let isExistIndex = createExistIndex($globalEvent);
+    const isExistIndex = createExistIndex($globalEvent);
 
     //***************************************************************
     //
@@ -94,7 +94,7 @@ export function overrideApi(vm) {
     //
     //***************************************************************
 
-    let Presentation = Xut.Presentation;
+    const Presentation = Xut.Presentation;
 
     /**
      * 获取当前页码
@@ -183,7 +183,7 @@ export function overrideApi(vm) {
 
 
     //命名前缀
-    var prefix = 'Content_';
+    const prefix = 'Content_';
 
     /**
      * 创建一个content的命名规则
@@ -210,7 +210,7 @@ export function overrideApi(vm) {
     //
     //***************************************************************
 
-    var View = Xut.View;
+    const View = Xut.View;
 
     /**
      * 显示工具栏
@@ -382,7 +382,7 @@ export function overrideApi(vm) {
      * 1 零件
      * 2 音频动画
      */
-    var Assist = Xut.Assist;
+    const Assist = Xut.Assist;
 
     _.each([
         "Run",
@@ -420,7 +420,7 @@ export function overrideApi(vm) {
     //
     //***************************************************************
 
-    var Contents = Xut.Contents;
+    const Contents = Xut.Contents;
 
     /**
      * 获取指定的对象
@@ -612,7 +612,7 @@ export function overrideApi(vm) {
     //
     //*******************************************
 
-    var Application = Xut.Application;
+    const Application = Xut.Application;
 
     /**
      * 获取一个存在的实例对象

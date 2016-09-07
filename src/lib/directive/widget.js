@@ -8,59 +8,57 @@ export default {
      * 根据数据创建自己的热点元素结构（用于拼接结构字符串）
      * @return {[type]}              [description]
      */
-    createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-            var width, height, top, left, actType, md5, layerId, cssStyle, autoPlay, retStr = '',
-                backgroundImage = ''
+    createDom({
+            _id,
+            md5,
+            autoPlay,
+            actType,
+            scaleWidth,
+            scaleHeight,
+            scaleTop,
+            scaleLeft
+        } = {}, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
-            autoPlay = activityData.autoPlay
+            let backgroundImage = ''
 
             //如果是自动播放,则不创建结构
             if (autoPlay) {
-                return retStr
+                return ''
             }
-
-            width = activityData.scaleWidth
-            height = activityData.scaleHeight
-            top = activityData.scaleTop
-            left = activityData.scaleLeft
-            actType = activityData.actType
-            md5 = activityData.md5
 
             //热点背景图
             if (md5) {
-                backgroundImage = "background-image: url(" + Xut.config.pathAddress + md5 + ");";
+                backgroundImage = "background-image: url(" + Xut.config.pathAddress + md5 + ");"
             }
 
-            //创建触发点结构
-            layerId = actType + "_" + activityData._id;
+            let html =
+                '<div id="{{id}}" ' +
+                'data-belong="{{pageType}}" ' +
+                'data-delegate="{{actType}}" ' +
+                'style=' +
+                '"' +
+                'cursor: pointer;' +
+                'background-size:100% 100%;' +
+                'position:absolute;' +
+                'width:{{width}}px;height:{{height}}px;left:{{left}}px;top:{{top}}px;' +
+                'z-index:{{zIndex}};' +
+                '{{backgroundImage}}' +
+                '"' +
+                '></div>'
 
-            cssStyle = String.format(
-                'cursor: pointer; ' +
-                'width:{0}px;height:{1}px;left:{2}px;top:{3}px; ' +
-                'background-size:100% 100%; ' +
-                'position:absolute; ' +
-                'z-index:{4}; ' +
-                '{5}',
-                width,
-                height,
-                left,
-                top,
-                zIndex,
-                backgroundImage
-            )
+            return _.template(html, {
+                id: actType + "_" + _id,
+                pageType: pageType,
+                actType: actType,
+                autoPlay: autoPlay,
+                width: scaleWidth,
+                height: scaleHeight,
+                left: scaleLeft,
+                top: scaleTop,
+                zIndex: zIndex,
+                backgroundImage: backgroundImage
+            })
 
-            return String.format(
-                '<div id="{0}"' +
-                ' data-belong ="{1}"' +
-                ' data-delegate="{2}"' +
-                ' style="{4}"> ' +
-                '</div>',
-                layerId,
-                pageType,
-                actType,
-                autoPlay,
-                cssStyle
-            )
         },
 
 

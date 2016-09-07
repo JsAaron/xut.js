@@ -1,18 +1,13 @@
-import { Collection } from '../depend/collection'
 import { create as _create } from '../depend/multievent'
-//canvas相关
-import { Factory as CanvasRelated } from '../depend/canvas'
 import { createTransform } from '../translation'
-//分配任务
-import { assignedTasks } from '../threadtask'
+import Collection from '../depend/collection'
+import Factory from '../depend/factory'
+import assignedTasks from '../threadtask/threadtask'
+
+const noop = function() {}
 
 
-/**
- * 初始化构建
- * @param  {[type]} baseProto [description]
- * @return {[type]}           [description]
- */
-export function init(baseProto) {
+export default function(baseProto) {
 
     /**
      * 初始化多线程任务
@@ -20,16 +15,16 @@ export function init(baseProto) {
      */
     baseProto.initTasks = function(options) {
 
-        var self = this;
+        var instance = this
 
-        _.extend(self, options);
+        _.extend(instance, options)
 
         /**
          * 数据缓存容器
          * @type {Object}
          */
-        this.dataCache = {};
-        this.scenarioId = this.chapterDas.seasonId;
+        this.dataCache = {}
+        this.scenarioId = this.chapterDas.seasonId
         this.chapterId = this.chapterDas._id
 
         /**
@@ -42,21 +37,18 @@ export function init(baseProto) {
         this.isMultithread = this.multiplePages ? true : false;
 
         //母版处理
-        if (self.pageType === 'master') {
+        if (instance.pageType === 'master') {
             this.isMaster = true;
         }
 
-        /**
-         * canvas模式
-         * @type {Boolean}
-         */
-        this.canvasRelated = new CanvasRelated();
+        //canvas模式
+        this.canvasRelated = new Factory();
 
         /**
          * 创建相关的信息
          * @type {Object}
          */
-        var createRelated = this.createRelated = {
+        const createRelated = this.createRelated = {
 
             /**
              * 主线任务等待
@@ -100,7 +92,7 @@ export function init(baseProto) {
              * @type {Object}
              */
             cacheTasks: function() {
-                var cacheTasks = {};
+                const cacheTasks = {};
                 _.each(["background", "components", "contents"], function(taskName) {
                     cacheTasks[taskName] = false;
                 })
@@ -121,24 +113,24 @@ export function init(baseProto) {
              * 构建页面主容器完毕后,此时可以翻页
              * @return {[type]} [description]
              */
-            preforkComplete: function() {},
+            preforkComplete: noop,
 
             /**
              * 整个页面都构建完毕通知
              * @return {[type]} [description]
              */
-            createTasksComplete: function() {}
+            createTasksComplete: noop
         }
 
 
-        //==================内部钩子相关===========================
-        //
-        // * 监听状态的钩子
-        // * 注册所有content对象管理
-        // * 收集所有content对象
-        // * 构建li主结构后,即可翻页
-        // * 构建所有对象完毕后处理
-        //
+        /**
+         * 内部钩子相关
+         * 监听状态的钩子
+         * 注册所有content对象管理
+         * 收集所有content对象
+         * 构建li主结构后,即可翻页
+         * 构建所有对象完毕后处理
+         */
 
         //抽象activtiys合集,用于关联各自的content
         //划分各自的子作用域
@@ -167,7 +159,7 @@ export function init(baseProto) {
          * [floatContents description]
          * @type {Object}
          */
-        var floatContents = this.floatContents = {
+        const floatContents = this.floatContents = {
 
             /**
              * 页面浮动对象容器
@@ -203,23 +195,30 @@ export function init(baseProto) {
          */
         this.listenerHooks = {
 
-            //注册抽象Activity类content(大类,总content对象)
-            registerAbstractActivity: function(contentsObjs) {
-                self.abActivitys.register(contentsObjs);
+            /**
+             * 注册抽象Activity类content(大类,总content对象)
+             * @param  {[type]} contentsObjs [description]
+             * @return {[type]}              [description]
+             */
+            registerAbstractActivity(contentsObjs) {
+                instance.abActivitys.register(contentsObjs);
             },
 
-            //收集器
+            /**
+             * 收集器
+             * @type {Object}
+             */
             collector: {
                 //搜集所有的content(每一个content对象)
                 //因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
                 contents: function(pid, id, contentScope) {
-                    var scope = self.baseGetContentObject[id];
+                    var scope = instance.baseGetContentObject[id];
                     //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
                     if (scope && scope.isBindEventHooks) {
-                        self.contentsCollector[id] = contentScope;
+                        instance.contentsCollector[id] = contentScope;
                     }
                     if (!scope) {
-                        self.contentsCollector[id] = contentScope;
+                        instance.contentsCollector[id] = contentScope;
                     }
                 },
 
@@ -232,7 +231,7 @@ export function init(baseProto) {
                     var contentObj
                     floatContents.PageContainer = data.container;
                     _.each(data.ids, function(id) {
-                        if (contentObj = self.baseGetContentObject(id)) {
+                        if (contentObj = instance.baseGetContentObject(id)) {
                             //初始视察坐标
                             if (contentObj.parallax) {
                                 contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
@@ -258,7 +257,7 @@ export function init(baseProto) {
                     //浮动对象
                     _.each(data.ids, function(id) {
                         //转化成实际操作的浮动对象,保存
-                        if (contentObj = self.baseGetContentObject(id)) {
+                        if (contentObj = instance.baseGetContentObject(id)) {
                             //初始视察坐标
                             if (contentObj.parallax) {
                                 contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
@@ -267,8 +266,8 @@ export function init(baseProto) {
                         } else {
                             Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
                                 //获取DOM节点
-                            if (contentsFragment = self.createRelated.cacheTasks.contents.contentsFragment) {
-                                prefix = 'Content_' + self.pid + "_";
+                            if (contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
+                                prefix = 'Content_' + instance.pid + "_";
                                 _.each(contentsFragment, function(dom) {
                                     var makePrefix = prefix + id;
                                     if (dom.id == makePrefix) {
@@ -280,7 +279,7 @@ export function init(baseProto) {
                             //作为零件类型的空content处理
                             floatContents.Master[id] = {
                                 id: id,
-                                pid: self.pid,
+                                pid: instance.pid,
                                 $contentProcess: $(contentProcess),
                                 'empty': true //空类型
                             }
@@ -289,10 +288,14 @@ export function init(baseProto) {
                 }
             },
 
-            //多事件钩子
-            //执行多事件绑定
-            eventBinding: function(eventRelated) {
-                _create(self, eventRelated);
+            /**
+             * 多事件钩子
+             * 执行多事件绑定
+             * @param  {[type]} eventRelated [description]
+             * @return {[type]}              [description]
+             */
+            eventBinding(eventRelated) {
+                _create(instance, eventRelated);
             }
         };
 
@@ -305,24 +308,24 @@ export function init(baseProto) {
         }
 
         function callContext(taskName, fn) {
-            return assignedTasks[taskName](fn, self)
+            return assignedTasks[taskName](fn, instance)
         }
 
         /**
          * 任务钩子
          * @type {Object}
          */
-        self.tasks = {
-            container: function() {
+        instance.tasks = {
+            container() {
                 callContext('Container', function(element, pseudoElement) {
                     //////////////
                     //li,li-div //
                     //////////////
-                    self.element = element;
-                    self.pseudoElement = pseudoElement;
+                    instance.element = element;
+                    instance.pseudoElement = pseudoElement;
 
                     //获取根节点
-                    self.getElement = function() {
+                    instance.getElement = function() {
                         return pseudoElement ? pseudoElement : element
                     }
 
@@ -331,26 +334,26 @@ export function init(baseProto) {
                     //构建主容器li完毕,可以提前执行翻页动作
                     createRelated.preforkComplete();
                     //视觉差不管
-                    if (self.isMaster) {
-                        self.nextTasks({
+                    if (instance.isMaster) {
+                        instance.nextTasks({
                             'taskName': '外部background',
                             'outNextTasks': function() {
-                                self.dispatchTasks();
+                                instance.dispatchTasks();
                             }
                         });
                     }
                 })
             },
-            background: function() {
+            background() {
                 var nextRun = function() {
                     createRelated.preCreateTasks = false;
                     setNextRunTask('components')
                         //针对当前页面的检测
-                    if (!createRelated.tasksHang || self.isMaster) {
-                        self.nextTasks({
+                    if (!createRelated.tasksHang || instance.isMaster) {
+                        instance.nextTasks({
                             'taskName': '外部widgets',
                             outNextTasks: function() {
-                                self.dispatchTasks();
+                                instance.dispatchTasks();
                             }
                         });
                     }
@@ -362,19 +365,19 @@ export function init(baseProto) {
                 }
                 callContext('Background', nextRun)
             },
-            components: function() {
+            components() {
                 //构件零件类型任务
                 callContext('Components', function() {
                     setNextRunTask('contents')
-                    self.nextTasks({
+                    instance.nextTasks({
                         'taskName': '外部contents',
                         outNextTasks: function() {
-                            self.dispatchTasks();
+                            instance.dispatchTasks();
                         }
                     });
                 })
             },
-            contents: function() {
+            contents() {
                 callContext('Contetns', function() {
                     setNextRunTask('complete')
                     createRelated.createTasksComplete();

@@ -21,7 +21,7 @@ if (DUKUCONFIG) {
  * @param  {[type]} str [description]
  * @return {[type]}     [description]
  */
-var rtrim = function(str) {
+const rtrim = function(str) {
     if (typeof str != 'string') return str;
     var lastIndex = str.length - 1;
     if (str.charAt(lastIndex) === '/') {
@@ -36,7 +36,7 @@ var rtrim = function(str) {
 // if (MMXCONFIG && MMXCONFIG.path) {
 //     MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
 // }
-var MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
+let MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
 if (MMXCONFIG && MMXCONFIG.path) {
     MMXCONFIGPath = rtrim(MMXCONFIG.path)
 }
@@ -48,7 +48,7 @@ if (MMXCONFIG && MMXCONFIG.path) {
  *  2 读酷加载电子杂志
  *  3 读酷加载电子杂志打开子文档
  */
-let iframeMode = (() => {
+const iframeMode = (() => {
     let mode;
     if (SUbCONFIGT && DUKUCONFIG) {
         //通过读酷客户端开打子文档方式
@@ -80,7 +80,7 @@ let iframeMode = (() => {
 //1 新阅读
 //2 子文档
 //3 秒秒学
-const iframeConf = {
+export default {
 
 
     /**
@@ -243,5 +243,3 @@ const iframeConf = {
 }
 
 
-
-export default iframeConf

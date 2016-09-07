@@ -79,7 +79,7 @@ let cacheJsWidgetPath
  * 而且是客户端模式
  * @return {[type]} [description]
  */
-let browserPlat = () => {
+const browserPlat = () => {
     //如果是iframe加载
     //而且是客户端模式
     if (GLOBALIFRAME && CLIENTCONFIGT) {
@@ -110,7 +110,7 @@ let browserPlat = () => {
  * 3 安卓打包后通过网页访问=>妙妙学
  * @return {[type]} [description]
  */
-let runMode = (() => {
+const runMode = (() => {
     if (MMXCONFIG) {
         return false
     }
@@ -124,7 +124,7 @@ let runMode = (() => {
  * 2 或者asset上的资源
  * @return {[type]} [description]
  */
-let _videoPath = () => {
+const _videoPath = () => {
     return runMode ?
         browserPlat() :
         GLOBALIFRAME ?
@@ -137,7 +137,7 @@ let _videoPath = () => {
  * 音频路径
  * @return {[type]} [description]
  */
-let _audioPath = () => {
+const _audioPath = () => {
     return runMode ?
         browserPlat() :
         GLOBALIFRAME ?
@@ -151,7 +151,7 @@ let _audioPath = () => {
  * [resourcesPath description]
  * @return {[type]} [description]
  */
-let _rsourcesPath = () => {
+const _rsourcesPath = () => {
     return isBrowser ?
         browserPlat() :
         GLOBALIFRAME ?
@@ -164,7 +164,7 @@ let _rsourcesPath = () => {
  * SVG文件路径
  * @return {[type]} [description]
  */
-let _svgPath = () => {
+const _svgPath = () => {
     return isBrowser ?
         browserPlat() :
         GLOBALIFRAME ?
@@ -179,7 +179,7 @@ let _svgPath = () => {
  * 只提供相对路径
  * @return {[type]} [description]
  */
-let _jsWidgetPath = () => {
+const _jsWidgetPath = () => {
     return isBrowser ? widgetPath :
         GLOBALIFRAME ? iframeConf.jsWidget() : nativeConf.jsWidget()
 }

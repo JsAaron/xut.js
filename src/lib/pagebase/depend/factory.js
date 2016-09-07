@@ -9,7 +9,7 @@ import { Observer } from '../../observer/index'
  * 因为canvas只能绘制一次
  * cnavas模式下 category === "Sprite" 转化cid
  */
-export class Factory extends Observer {
+export default class Factory extends Observer {
 
     constructor() {
         super()

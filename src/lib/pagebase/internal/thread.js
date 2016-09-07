@@ -9,7 +9,7 @@
  *
  * **************************************************************/
 
-export function threadExternal(baseProto) {
+export default function(baseProto) {
 
 	/**
 	 * 开始调用任务

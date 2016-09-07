@@ -13,12 +13,15 @@ let offsetCut
 let prevEffect
 let currEffect
 let nextEffect
-let prefix = Xut.plat.prefixStyle
-let xxtTrans = (offset) => {
+
+const prefix = Xut.plat.prefixStyle
+
+const xxtTrans = (offset) => {
     offset = config.virtualMode ? offset / 2 : offset;
     return "translate3d(" + offset + "px, 0, 0)";
 }
-let dydTransform = (distance) => {
+
+const dydTransform = (distance) => {
     distance = config.virtualMode ? distance / 2 : distance;
     return prefix('transform') + ':' + 'translate3d(' + distance + 'px,0px,0px)'
 }
@@ -28,7 +31,7 @@ let dydTransform = (distance) => {
  * 设置基本参数
  * @return {[type]} [description]
  */
-let initOptions = () => {
+const initOptions = () => {
     calculateContainer = config.proportion.calculateContainer()
     offsetLeft = (-1 * calculateContainer.width)
     offsetRight = calculateContainer.width
@@ -47,7 +50,7 @@ let initOptions = () => {
  * @param  {[type]} element  [description]
  * @return {[type]}          [description]
  */
-let toTranslate3d = (context, distance, speed, element) => {
+const toTranslate3d = (context, distance, speed, element) => {
     distance = config.virtualMode ? distance / 2 : distance;
     if (element = element || context.element || context.$contentProcess) {
         element.css(prefix('transform'), 'translate3d(' + distance + 'px,0px,0px)');
@@ -69,7 +72,7 @@ let toTranslate3d = (context, distance, speed, element) => {
  * 复位
  * @return {[type]} [description]
  */
-let reset = (context) => {
+const reset = (context) => {
     var element
     if (element = context.element || context.$contentProcess) {
         element.css(prefix('transition-duration'), '');
@@ -82,7 +85,7 @@ let reset = (context) => {
  * 移动
  * @return {[type]} [description]
  */
-let flipMove = (context, distance, speed, element) => {
+const flipMove = (context, distance, speed, element) => {
     toTranslate3d(context, distance, speed, element)
 }
 
@@ -91,7 +94,7 @@ let flipMove = (context, distance, speed, element) => {
  * 移动反弹
  * @return {[type]} [description]
  */
-let flipRebound = (context, distance, speed, element) => {
+const flipRebound = (context, distance, speed, element) => {
     toTranslate3d(context, distance, speed, element)
 }
 
@@ -100,7 +103,7 @@ let flipRebound = (context, distance, speed, element) => {
  * 移动结束
  * @return {[type]} [description]
  */
-let flipOver = (context, distance, speed, element) => {
+const flipOver = (context, distance, speed, element) => {
     //过滤多个动画回调，保证指向始终是当前页面
     if (context.pageType === 'page') {
         if (distance === 0) { //目标页面传递属性
@@ -115,7 +118,7 @@ let flipOver = (context, distance, speed, element) => {
  * translation滑动接口
  * @type {Object}
  */
-export var translation = {
+export const translation = {
     reset: reset,
     flipMove: flipMove,
     flipRebound: flipRebound,

@@ -156,7 +156,7 @@ export function setRootfont() {
 
 
 
-export function portExtend(object, config) {
+export function _extend(object, config) {
     for (var i in config) {
         if (i) {
             if (object[i]) {

@@ -7,11 +7,10 @@
 
 import { Observer } from '../observer/index'
 import { GlobalEvent } from './swipe/event.js'
-import { overrideApi } from '../dynamic-api'
 import { Dispatch } from './dispatch/dispatch'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'
-
+import overrideApi from '../dynamic-api'
 // 定义访问器
 import {
     defProtected as def,

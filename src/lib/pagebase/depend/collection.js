@@ -3,31 +3,38 @@
  * @return {[type]} [description]
  */
 
-export function Collection() {
-    this.reset();
+/**
+ * 处理合集
+ */
+export default function Collection() {
+    this.remove()
 }
 
 Collection.prototype = {
 
-    register: function(contentObj) {
-        if (!this._list) {
-            this._list = [contentObj];
+    register(contentObj) {
+        if (!this.list) {
+            this.list = [contentObj]
         } else {
-            this._list.push(contentObj);
+            this.list.push(contentObj)
         }
     },
 
-    get: function() {
-        return this._list;
+    get() {
+        return this.list;
     },
 
-    //得到一个指定的实例
-    specified: function(data) {
+    /**
+     * 得到一个指定的实例
+     * @param  {[type]} data [description]
+     * @return {[type]}      [description]
+     */
+    specified(data) {
         var instance;
-        var listLength = this._list.length;
+        var listLength = this.list.length;
         while (listLength) {
             listLength--;
-            if (instance = this._list[listLength]) {
+            if (instance = this.list[listLength]) {
                 if (instance.type === data.type && instance.id === data.id) {
                     return instance;
                 }
@@ -35,12 +42,12 @@ Collection.prototype = {
         }
     },
 
-    remove: function() {
-        this._list = [];
+    remove() {
+        this.list = []
     },
 
-    reset: function() {
-        this._list = [];
+    reset() {
+        this.remove()
     }
 
 };

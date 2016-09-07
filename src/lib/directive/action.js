@@ -60,41 +60,46 @@ export default {
      * @param  {[type]} pageType     [description]
      * @return {[type]}              [description]
      */
-    createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-        var md5, str, width, height, top, left, backgroundImage = ''
-
-        //等比缩放
-        width = activityData.scaleWidth
-        height = activityData.scaleHeight
-        top = activityData.scaleTop
-        left = activityData.scaleLeft
+    createDom({
+        _id,
+        md5,
+        actType,
+        scaleWidth,
+        scaleHeight,
+        scaleTop,
+        scaleLeft
+    } = {}, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
         //热点背景图
-        if (md5 = activityData.md5) {
+        let backgroundImage = ''
+        if (md5) {
             backgroundImage = "background-image: url(" + Xut.config.pathAddress + md5 + ");";
         }
 
-        str = '<div id="{0}" ' +
-            '    data-belong = "{1}" ' +
-            '    data-delegate="Action" ' +
-            '    style="cursor: pointer; ' +
-            '       width:{3}px;height:{4}px;left:{5}px;top:{6}px; ' +
-            '       background-size:100% 100%; ' +
-            '       position:absolute; ' +
-            '       z-index:{7};{8}"> ' +
-            '</div>'
+        let html =
+            '<div id="{{id}}" ' +
+            'data-belong="{{pageType}}" ' +
+            'data-delegate="Action" ' +
+            'style=' +
+            '"' +
+            'cursor:pointer;' +
+            'width:{{width}}px;height:{{height}}px;left:{{left}}px;top:{{top}}px;' +
+            'background-size:100% 100%;' +
+            'position:absolute;' +
+            'z-index:{{zIndex}};{{backgroundImage}}' +
+            '"' +
+            '></div>'
 
-        return String.format(str,
-            activityData.actType + "_" + activityData._id,
-            pageType,
-            activityData.autoPlay,
-            width,
-            height,
-            left,
-            top,
-            zIndex,
-            backgroundImage
-        )
+        return _.template(html, {
+            id: actType + "_" + _id,
+            pageType: pageType,
+            width: scaleWidth,
+            height: scaleHeight,
+            left: scaleLeft,
+            top: scaleTop,
+            zIndex: zIndex,
+            backgroundImage: backgroundImage
+        })
     }
 
 }

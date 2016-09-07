@@ -4,110 +4,124 @@ import { triggerAudio, autoAudio } from '../component/audio/manager'
 import { triggerVideo, autoVideo } from '../component/video/manager'
 
 //临时音频动作数据
-let tempData = {}
+const tempData = {}
 
 export default {
 
-    createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
+    createDom({
+            _id,
+            md5,
+            actType,
+            category,
+            itemArray,
+            scaleWidth,
+            scaleHeight,
+            scaleTop,
+            scaleLeft
+        } = {}, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
-            var width, height, top, left, actType, id, category, mediaIcon, mediaIconSize, posX, posY, start, stop, itemArray, screenSize, mediaType, tpl, startImage = ""
-
-            width = activityData.scaleWidth
-            height = activityData.scaleHeight
-            top = activityData.scaleTop
-            left = activityData.scaleLeft
-            actType = activityData.actType
-            id = activityData._id
+            let html, mediaIcon, startImage
 
             //如果没有宽高则不创建绑定节点
-            if (!width || !height) return ''
+            if (!scaleWidth || !scaleHeight) return ''
 
-            category = activityData.category
-            screenSize = config.screenSize
-
-            //只针对网页插件增加单独的点击界面
-            if (category == 'webpage' && (width > 200) && (height > 100) && (width <= screenSize.width) && (height <= screenSize.height)) {
-                mediaIcon = 'background-image:url(images/icons/web_hotspot.png)';
-            }
+            let screenSize = config.screenSize
 
             //解析音乐动作
             //冒泡动作靠节点传递数据
-            if (itemArray = activityData.itemArray) {
+            if (itemArray) {
                 itemArray = parseJSON(itemArray);
-                start = itemArray[0];
-                stop = itemArray[1];
-                tempData[id] = {};
+                let start = itemArray[0];
+                let stop = itemArray[1];
+                tempData[_id] = {};
                 if (start) {
                     if (start.startImg) {
                         startImage = start.startImg;
-                        tempData[id]['startImg'] = startImage;
+                        tempData[_id]['startImg'] = startImage;
                         startImage = 'background-image:url(' + startImage + ');';
                     }
                     if (start.script) {
-                        tempData[id]['startScript'] = start.script;
+                        tempData[_id]['startScript'] = start.script;
                     }
                 }
                 if (stop) {
                     if (stop.stopImg) {
-                        tempData[id]['stopImg'] = stop.stopImg;
+                        tempData[_id]['stopImg'] = stop.stopImg;
                     }
                     if (stop.script) {
-                        tempData[id]['stopScript'] = stop.script
+                        tempData[_id]['stopScript'] = stop.script
                     }
                 }
             }
 
             //首字母大写
-            mediaType = category.replace(/(\w)/, function(v) {
+            const mediaType = category.replace(/(\w)/, function(v) {
                 return v.toUpperCase()
             })
+
+            //只针对网页插件增加单独的点击界面
+            //如果有视频图标
+            if (category == 'webpage' &&
+                (scaleWidth > 200) &&
+                (scaleHeight > 100) &&
+                (scaleWidth <= screenSize.width) &&
+                (scaleHeight <= screenSize.height)) {
+
+                const mediaIconSize = 74;
+                const posX = (scaleWidth - mediaIconSize) / 2;
+                const posY = (scaleHeight - mediaIconSize) / 2;
+
+                html =
+                    '<div id="icon_{{id}}" type="icon" ' +
+                    'style=' +
+                    '"' +
+                    'width:{{width}}px;height:{{height}}px;top:{{top}}px;left:{{left}}px;' +
+                    'position:absolute;' +
+                    '{{icon}};' +
+                    '"' +
+                    '></div>'
+
+                mediaIcon = _.template(html, {
+                    id: _id,
+                    width: mediaIconSize,
+                    height: mediaIconSize,
+                    left: posX,
+                    top: posY,
+                    icon: 'background-image:url(images/icons/web_hotspot.png)'
+                })
+            }
+
 
             //创建音频对象
             //Webpage_1
             //Audio_1
             //Video_1
-            tpl = String.format(
-                '<div id="{0}" ' +
-                ' data-belong="{1}" ' +
-                ' data-delegate="{2}" ' +
-                '   style="width:{3}px;height:{4}px;left:{5}px;top:{6}px; ' +
-                '     z-index:{7};{8} ' +
-                '     background-size:100% 100%; ' +
-                '     position:absolute;" ' +
-                '>',
-                mediaType + "_" + id,
-                pageType,
-                category,
-                width,
-                height,
-                left,
-                top,
-                zIndex,
-                startImage
-            )
+            html =
+                '<div id="{{id}}" ' +
+                'data-belong="{{pageType}}" ' +
+                'data-delegate="{{category}}" ' +
+                'style=' +
+                '"' +
+                'width:{{width}}px;height:{{height}}px;left:{{left}}px;top:{{top}}px;' +
+                'z-index:{{zIndex}};{{startImage}}' +
+                'background-size:100% 100%;' +
+                'position:absolute;' +
+                '">' +
+                '{{mediaIcon}}' +
+                '</div>'
 
-            //如果有视频图标
-            if (mediaIcon) {
-                mediaIconSize = 74;
-                posX = (width - mediaIconSize) / 2;
-                posY = (height - mediaIconSize) / 2;
-
-                tpl += String.format(
-                    '<div id="icon_{0}" type="icon" ' +
-                    '  style="position:absolute;top:{1}px;left:{2}px;width:{3}px;height:{4}px;{5};" ' +
-                    '></div>',
-                    id,
-                    posY,
-                    posX,
-                    mediaIconSize,
-                    mediaIconSize,
-                    mediaIcon
-                )
-            }
-
-            tpl += '</div>'
-
-            return tpl;
+            return _.template(html, {
+                id: mediaType + "_" + _id,
+                pageType: pageType,
+                category: category,
+                width: scaleWidth,
+                height: scaleHeight,
+                left: scaleLeft,
+                top: scaleTop,
+                zIndex: zIndex,
+                startImage: startImage,
+                mediaIcon: mediaIcon
+            })
         },
 
 
@@ -130,10 +144,16 @@ export default {
          * touchEnd 全局派发的点击事件
          * 如果stopGlobalEvent == ture 事件由全局派发
          */
-        eventDelegate(data) {
-            var category, chapterId;
-            if (category = data.target.getAttribute('data-delegate')) { //触发类型
-                chapterId = Xut.Presentation.GetPageId(data.pageIndex);
+        eventDelegate({
+            id,
+            target,
+            rootNode,
+            pageIndex,
+            activityId
+        } = {}) {
+            let category = target.getAttribute('data-delegate')
+            if (category) {
+                let chapterId = Xut.Presentation.GetPageId(pageIndex);
                 /**
                  * 传入chapterId 页面ID
                  * activityId    视频ID
@@ -141,9 +161,9 @@ export default {
                  * 根节点
                  */
                 if (category == 'audio') {
-                    triggerAudio(chapterId, data.activityId, this.onlyCreateOnce(data.id))
+                    triggerAudio(chapterId, activityId, this.onlyCreateOnce(id))
                 } else {
-                    triggerVideo(chapterId, data.activityId, $(data.rootNode))
+                    triggerVideo(chapterId, activityId, $(rootNode))
                 }
             }
         },
@@ -154,30 +174,19 @@ export default {
          * @param  {[type]} data [description]
          * @return {[type]}      [description]
          */
-        autoPlay(data) {
-
-            var category, rootNode, pageIndex, chapterId, activityId, triggerType, mediaType
-
-            category = data.category
+        autoPlay({
+            id,
+            autoPlay,
+            category,
+            rootNode,
+            pageIndex,
+            chapterId
+        } = {}) {
             if (!category) return
-            rootNode = data.rootNode
-            pageIndex = data.pageIndex
-            chapterId = data.chapterId
-            activityId = data.id
-            triggerType = category == 'audio' ? 'audioManager' : 'videoManager'
-
-            //数据库视频音频不规则问题导致
-            //首字母大写
-            mediaType = category.replace(/(\w)/, function(v) {
-                return v.toUpperCase()
-            })
-
-            //自动音频
             if (category == 'audio') {
-                autoAudio(chapterId, activityId, this.onlyCreateOnce(data.id));
+                autoAudio(chapterId, id, this.onlyCreateOnce(id));
             } else {
-                //自动视频
-                autoVideo(chapterId, activityId, rootNode);
+                autoVideo(chapterId, id, rootNode);
             }
         }
 

@@ -22,7 +22,7 @@ import {
  * 检测脚本注入
  * @return {[type]} [description]
  */
-let checkInjectScript = (pageObject, type) => {
+const checkInjectScript = (pageObject, type) => {
     var code;
     if (code = pageObject.chapterDas[type]) {
         injectScript(code, type)

@@ -5,7 +5,7 @@ const isAndroid = Xut.plat.isAndroid
 
 
 //杂志直接打开
-const nativeConf = {
+export default {
 
     /**
      * 资源图片
@@ -79,5 +79,3 @@ const nativeConf = {
 }
 
 
-
-export default nativeConf

@@ -20,13 +20,10 @@
  *                                                         *
  **********************************************************************/
 
-
-//原型接口
-import { init } from './proto/init'
-import { threadExternal } from './proto/thread'
-import { dataExternal } from './proto/data'
-import { destroy } from './proto/destroy'
-
+import initstate from './internal/initstate'
+import threadExternal from './internal/thread'
+import dataExternal from './internal/data'
+import destroy from './internal/destroy'
 
 export class Pagebase {
     constructor(options) {
@@ -34,16 +31,9 @@ export class Pagebase {
     }
 }
 
-var baseProto = Pagebase.prototype
+const baseProto = Pagebase.prototype
 
-//初始化
-init(baseProto)
-
-//多线程接口
+initstate(baseProto)
 threadExternal(baseProto)
-
-//数据接口
 dataExternal(baseProto)
-
-//销毁
 destroy(baseProto)

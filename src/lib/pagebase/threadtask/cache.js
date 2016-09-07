@@ -1,0 +1,41 @@
+
+import { query } from '../../manager/parser'
+
+/**
+ * 更新数据缓存
+ * @param  {[type]}   pid      [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+export default function(pid, callback) {
+    let fn, base = this,
+        pageType = base.pageType;
+
+    //缓存数据
+    const addCacheDas = (namespace, data) => {
+        let key;
+        if (!base.dataCache[namespace]) {
+            base.dataCache[namespace] = data;
+        } else {
+            for (key in data) {
+                base.dataCache[namespace][key] = data[key];
+            }
+        }
+    }
+
+    //增加数据缓存
+    const addCache = (data, activitys, autoRunDas) => {
+        addCacheDas(base.pageType, data); //挂载页面容器数据
+        addCacheDas('activitys', activitys); //挂载activitys数据
+        addCacheDas('autoRunDas', autoRunDas); //挂载自动运行数据
+    }
+
+    query(pageType, {
+        'pageIndex': pid,
+        'pageData': base.chapterDas,
+        'pptMaster': base.pptMaster
+    }, function(data, activitys, autoRunDas) {
+        addCache.apply(addCache, arguments)
+        callback(data);
+    })
+}

@@ -21,8 +21,7 @@
  *   }
  *
  */
-;
-(function(CONFIG) {
+;(function(CONFIG) {
 
     //上文环境
     //1 新阅读
@@ -156,14 +155,12 @@
         } catch (er) {}
     }
 
-
     //搜索2层作用域
     //1 top
     //2 parent
-    if (parent == top) {
-        scopeMatch(parent)
-    } else {
-        scopeMatch(parent)
+    scopeMatch(parent)
+    //嵌套iframe
+    if (parent != top) {
         scopeMatch(top)
     }
 

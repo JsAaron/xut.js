@@ -28,9 +28,9 @@ import { config } from './config/index'
 import { sceneController } from './scenario/controller'
 import { autoRun, original, suspend } from './command/index'
 import { suspendHandles, promptMessage } from './global-stop'
-import { loadScene } from './init/scene'
 import { SceneFactory } from './scenario/factory'
 import { ShowBusy, HideBusy, ShowTextBusy } from './util/cursor'
+import loadScene from './initialize/scene'
 
 import {
     _set,
@@ -38,30 +38,28 @@ import {
     _remove,
     hash,
     toNumber,
-    portExtend,
+    _extend,
     messageBox
 }
 from './util/index'
 
 const plat = Xut.plat
-
-let api = hash()
-let LOCK = 1 //锁定
-let UNLOCK = 2 //解除锁定
-let IsPay = false
-
-
-Xut.Assist = hash()
 const Presentation = Xut.Presentation = hash()
 const View = Xut.View = hash()
 const Contents = Xut.Contents = hash()
 const Application = Xut.Application = hash()
 
+Xut.Assist = hash()
+
+let LOCK = 1 //锁定
+let UNLOCK = 2 //解除锁定
+let IsPay = false
+
 
 /**
  * 忙碌光标
  * */
-portExtend(View, {
+_extend(View, {
     ShowBusy,
     HideBusy,
     ShowTextBusy
@@ -71,7 +69,7 @@ portExtend(View, {
 /**
  * [检查是否购买]
  **/
-let CheckBuyGood = (seasonId, chapterId, createMode, pageIndex) => {
+const CheckBuyGood = (seasonId, chapterId, createMode, pageIndex) => {
     //已付费
     if (IsPay) {
         return false;
@@ -116,13 +114,13 @@ let CheckBuyGood = (seasonId, chapterId, createMode, pageIndex) => {
 
 
 //重复点击
-var repeatClick = false;
+let repeatClick = false;
 
 
 /**
  * 场景
  * */
-portExtend(View, {
+_extend(View, {
 
     /**
      * 关闭场景
@@ -337,7 +335,7 @@ portExtend(View, {
 /**
  * 行为
  * */
-portExtend(View, {
+_extend(View, {
     /**
      * 通过插件打开一个新view窗口
      */
@@ -355,7 +353,7 @@ portExtend(View, {
 /**
  * content
  * */
-portExtend(Contents, {
+_extend(Contents, {
 
     //存在文档碎片
     //针对音频字幕增加的快捷查找
@@ -494,21 +492,21 @@ portExtend(Contents, {
  * @param  {[type]} name [description]
  * @return {[type]}      [description]
  */
-let getStorage = (name) => parseInt(_get(name))
+const getStorage = (name) => parseInt(_get(name))
 
 
 /**
  * [ 执行解锁]
  * @return {[type]} [description]
  */
-let setUnlock = () => IsPay = true;
+const setUnlock = () => IsPay = true;
 
 
 /**
  * 购买成功
  * @return {[type]} [description]
  */
-let pass = () => {
+const pass = () => {
     //如果提前关闭了忙碌光标说明被用户中止
     if (!View.busyBarState) return;
     //将购买记录存入数据库
@@ -531,14 +529,14 @@ let pass = () => {
  * 购买失败
  * @return {[type]} [description]
  */
-let failed = () => {
+const failed = () => {
     if (!View.busyBarState) return;
     messageBox('购买失败');
     View.HideBusy(IsPay);
 }
 
 
-portExtend(Application, {
+_extend(Application, {
 
     /**
      * 应用平台
@@ -814,14 +812,9 @@ portExtend(Application, {
     }
 })
 
-// $('body').on('dblclick',function(){
-//     Application.Original()
-//     setTimeout(function(){
-//         Application.Activate()
-//     },2000)
-// })
 
-portExtend(Application, {
+
+_extend(Application, {
 
     /**
      * 应用加载状态
@@ -881,13 +874,29 @@ portExtend(Application, {
 })
 
 
+/**
+ * u3d接口
+ */
+Xut.U3d = {
+    /**
+     * 跳转接口
+     * @param {[type]} seasonId  [description]
+     * @param {[type]} chapterId [description]
+     */
+    View(seasonId, chapterId) {
+        View.LoadScenario({
+            'scenarioId': seasonId,
+            'chapterId': chapterId
+        })
+    }
+}
 
 
 /**
  * 脚本注入接口
  * @type {Object}
  */
-api = {
+window.XXTAPI = {
 
     /**
      *读取系统中保存的变量的值。
@@ -920,33 +929,4 @@ api = {
         _set(variable, value)
     }
 
-}
-
-
-/**
- * u3d接口
- */
-Xut.U3d = {
-    /**
-     * 跳转接口
-     * @param {[type]} seasonId  [description]
-     * @param {[type]} chapterId [description]
-     */
-    View: function(seasonId, chapterId) {
-        View.LoadScenario({
-            'scenarioId': seasonId,
-            'chapterId': chapterId
-        })
-    }
-}
-
-
-/**
- * 导出注入接口
- * @type {[type]}
- */
-window.XXTAPI = api;
-
-export {
-    api
 }

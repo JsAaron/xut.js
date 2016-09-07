@@ -4,5 +4,5 @@
  * widget 是零件资源文件
  * @type {String}
  */
-export let sourcePath = "content/gallery/"
-export let widgetPath = "content/widget/"
+export const sourcePath = "content/gallery/"
+export const widgetPath = "content/widget/"

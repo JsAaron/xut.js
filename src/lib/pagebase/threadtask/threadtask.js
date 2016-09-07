@@ -1,50 +1,38 @@
-//***********************************************************
-//
-//             多线程任务构建
-//
-//**********************************************************
+import updataCache from './cache'
+import TaskContainer from './container'
+import { TaskBackground } from './background'
+import { TaskContents } from './contents/index'
+import { TaskComponents } from './components'
 
-//数据解析
-import { query } from '../manager/parser'
-//子任务
-import { TaskContainer, TaskBackground, TaskContents, TaskComponents } from './task/index'
-
-
-//更新数据缓存
-let updataCache = function(pid, callback) {
-    let fn,
-        base = this,
-        pageType = base.pageType;
-
-    //缓存数据
-    let addCacheDas = (namespace, data) => {
-        let key;
-        if (!base.dataCache[namespace]) {
-            base.dataCache[namespace] = data;
-        } else {
-            for (key in data) {
-                base.dataCache[namespace][key] = data[key];
+/**
+ * 解析canvas配置
+ * contentMode 分为  0 或者 1
+ * 1 是dom模式
+ * 0 是canvas模式
+ * 以后如果其余的在增加
+ * 针对页面chapter中的parameter写入 contentMode   值为 1
+ * 针对每一个content中的parameter写入 contentMode 值为 1
+ * 如果是canvas模式的时候，同时也是能够存在dom模式是
+ * @return {[type]} [description]
+ */
+const parseMode = ({
+    parameter
+} = {}, base) => {
+    if (parameter) {
+        try {
+            let parameter = JSON.parse(parameter);
+            if (parameter && parameter.contentMode && parameter.contentMode == 1) {
+                //非强制dom模式
+                if (!Xut.config.onlyDomMode) {
+                    //启动dom模式
+                    base.canvasRelated.enable = true;
+                }
             }
+        } catch (e) {
+            console.log('JSON错误,chpterId为', base.chapterId, parameter)
         }
     }
-
-    //增加数据缓存
-    let addCache = (data, activitys, autoRunDas) => {
-        addCacheDas(base.pageType, data); //挂载页面容器数据
-        addCacheDas('activitys', activitys); //挂载activitys数据
-        addCacheDas('autoRunDas', autoRunDas); //挂载自动运行数据
-    }
-
-    query(pageType, {
-        'pageIndex': pid,
-        'pageData': base.chapterDas,
-        'pptMaster': base.pptMaster
-    }, function(data, activitys, autoRunDas) {
-        addCache.apply(addCache, arguments)
-        callback(data);
-    })
 }
-
 
 /**
  * 分配Container构建任务
@@ -54,36 +42,16 @@ let updataCache = function(pid, callback) {
  * 4 等待之后自动创建或者后台空闲创建之后的任务
  * @return {[type]} [description]
  */
-let assignedTasks = {
+export default {
 
-    'Container': function(taskCallback, base) {
+    /**
+     * 主容器
+     */
+    'Container' (taskCallback, base) {
         //同步数据
         updataCache.call(base, [base.pid], () => {
             let pageData = base.baseData();
-            if (pageData.parameter) {
-                // contentMode 分为  0 或者 1
-                // 1 是dom模式
-                // 0 是canvas模式
-                // 以后如果其余的在增加
-                // 针对页面chapter中的parameter写入 contentMode   值为 1
-                // 针对每一个content中的parameter写入 contentMode 值为 1
-                // 如果是canvas模式的时候，同时也是能够存在dom模式是
-                try {
-                    let parameter = JSON.parse(pageData.parameter);
-                    if (parameter && parameter.contentMode && parameter.contentMode == 1) {
-                        //非强制dom模式
-                        if (!Xut.config.onlyDomMode) {
-                            //启动dom模式
-                            base.canvasRelated.enable = true;
-                        }
-
-                    }
-                } catch (e) {
-                    console.log('JSON错误,chpterId为', base.chapterId, pageData.parameter)
-                }
-            }
-
-            //创建主容器
+            parseMode(pageData, base)
             TaskContainer({
                 'rootNode': base.root,
                 'prefix': base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId,
@@ -107,7 +75,7 @@ let assignedTasks = {
      *    1 构建数据结构 suspendCallback
      *    2 执行innerhtml构建完毕 successCallback
      */
-    'Background': function(taskCallback, base) {
+    'Background' (taskCallback, base) {
 
         if (base.checkInstanceTasks('background')) {
             return;
@@ -134,7 +102,7 @@ let assignedTasks = {
      * 分配Components构建任务
      * @return {[type]} [description]
      */
-    'Components': function(taskCallback, base) {
+    'Components' (taskCallback, base) {
 
         if (base.checkInstanceTasks('components')) {
             return;
@@ -172,7 +140,7 @@ let assignedTasks = {
      * 分配contetns构建任务
      * @return {[type]} [description]
      */
-    'Contetns': function(taskCallback, base) {
+    'Contetns' (taskCallback, base) {
 
         //通过content数据库为空处理
         if (Xut.data.preventContent) {
@@ -235,5 +203,3 @@ let assignedTasks = {
         });
     }
 }
-
-export { assignedTasks }

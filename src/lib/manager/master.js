@@ -19,7 +19,7 @@ import {
  * @param  {[type]} filter [description]
  * @return {[type]}        [description]
  */
-let toArray = (filter) => {
+const toArray = (filter) => {
     var arr = [];
     if (!filter.length) {
         for (var key in filter) {
