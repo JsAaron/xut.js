@@ -6,8 +6,8 @@
  **********************************************************************/
 
 import { Observer } from '../observer/index'
-import { GlobalEvent } from './swipe/event.js'
-import { Dispatch } from './dispatch/dispatch'
+import GlobalEvent from '../swipe/index.js'
+import { Dispatch } from './dispatch/index'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'
 import overrideApi from '../dynamic-api'
@@ -109,18 +109,17 @@ class Mediator extends Observer {
 
         super()
 
-        const config = Xut.config
         const vm = this;
 
         //配置文件
         const options = vm.options = _.extend(pageConf, parameter, {
-            pageFlip: config.pageFlip
+            pageFlip: Xut.config.pageFlip
         })
 
         //配置多页面参数
         configMultiple(options)
 
-        const $globalEvent = vm.$globalEvent = new GlobalEvent(options, config);
+        const $globalEvent = vm.$globalEvent = new GlobalEvent(options);
         const $dispatch = vm.$dispatch = new Dispatch(vm);
 
         //如果是主场景,才能切换系统工具栏

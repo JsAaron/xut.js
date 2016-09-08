@@ -96,9 +96,19 @@ export function home() {
         ' <div id="toolTip"></div>' +
         '</div>'
 
-    return _.template(html, {
+
+    /**
+     * 可视区域尺寸
+     * @type {Object}
+     */
+    const viewSize = config.viewSize = {
         width: config.virtualMode ? sWidth / 2 : sWidth,
-        height: sHeight,
+        height: sHeight
+    }
+
+    return _.template(html, {
+        width: viewSize.width,
+        height: viewSize.height,
         top: calculate.top,
         left: calculate.left,
         index: Xut.sceneController.createIndex(),
@@ -136,10 +146,11 @@ export function scene(id) {
         ' <ul id="{{masterId}}" class="xut-flip" style="z-index:{{zIndexMaster}}"></ul>' +
         '</div>';
 
+
     return _.template(html, {
         id: 'scenario-' + id,
-        width: config.virtualMode ? sWidth / 2 : sWidth,
-        height: sHeight,
+        width: config.viewSize.width,
+        height: config.viewSize.height,
         top: calculate.top,
         left: calculate.left,
         zIndex: Xut.sceneController.createIndex(),

@@ -8,9 +8,9 @@
  *                                                                    *
  **********************************************************************/
 import { _set } from '../../util/stroage'
-import { PageMgr } from '../page'
-import { MasterMgr } from '../master'
-import { SwitchPage } from './switch'
+import PageMgr from '../page'
+import MasterMgr from '../master'
+import SwitchPage from './switch'
 import { sceneController } from '../../scenario/controller'
 import { close as _close } from '../../toolbar/navbar/index'
 
@@ -53,7 +53,7 @@ export class Dispatch {
      * @return {[type]} [description]
      */
     initCreate() {
-        var options = this.options;
+        const options = this.options;
         /**
          * 初始化构建页面
          */
@@ -80,16 +80,7 @@ export class Dispatch {
             return;
         }
 
-
-        // console.debug('当前页面:' + this.pagePointer.currIndex + ',创建新页面:"'+ createPointer + '",动作:' +action)
-        var createPid,
-            pageBase,
-            visiblePid,
-            pageIndex,
-            conversion,
-            newCreate,
-            callbackAction,
-            virtualMode = Xut.config.virtualMode,
+        let virtualMode = Xut.config.virtualMode,
             self = this,
             multiplePages = this.options.multiplePages, //是否线性
             total = createPage.length,
@@ -111,28 +102,28 @@ export class Dispatch {
             createMaster = false,
 
             //收集完成回调
-            collectCallback = function() {
+            collectCallback = (() => {
                 //收集创建页码的数量
-                var createContent = 0;
-                return function(callback) {
+                let createContent = 0;
+                return callback => {
                     ++createContent
                     if (createContent === total) {
                         callback();
                     }
                 }
-            }(),
+            })(),
 
             //构建执行代码
             callbackAction = {
                 //初始化
-                init: function() {
-                    collectCallback(function() {
-                        self.loadPage('init');
+                init() {
+                    collectCallback(() => {
+                        self._loadPage('init');
                     })
                 },
                 //翻页
-                flipOver: function() {
-                    collectCallback(function() {
+                flipOver() {
+                    collectCallback(() => {
                         self.autoRun({ //翻页
                             'createPointer': createPids,
                             'createMaster': createMaster
@@ -140,25 +131,21 @@ export class Dispatch {
                     })
                 },
                 //跳转
-                toPage: function() {
-                    collectCallback(function() {
+                toPage() {
+                    collectCallback(() => {
                         toPageCallback(collectCreatePageBase);
                     })
                 }
-            };
+            }
 
 
-        ////////////////////
-        //pid=>chpterData //
-        ////////////////////
-        var results = conversionPids(createPids);
+        //pid=>chpterData
+        let results = conversionPids(createPids);
 
-        ////////////
-        //如果是最后一页 //
+        //如果是最后一页
         //没有对应的虚拟数据，取前一页的
-        ////////////
         if (virtualMode && !results.length) {
-            var virtualPid = _.extend([], createPids);
+            let virtualPid = _.extend([], createPids);
             createPids.forEach(function(pid, index) {
                 virtualPid.splice(index, 1, --pid)
             })
@@ -166,30 +153,30 @@ export class Dispatch {
         }
 
         //页码转成数据
-        _.each(results, function(chapterData, index) {
+        _.each(results, (chapterData, index) => {
 
             //转化值
             //chapterId => createPid
-            createPid = createPids[index];
+            let createPid = createPids[index];
 
             //createPid
             //pageIndex
-            conversion = conversionPageOpts.call(self, createPid, visiblePage);
-            visiblePid = conversion.visiblePid;
-            pageIndex = conversion.pageIndex;
+            let conversion = conversionPageOpts.call(self, createPid, visiblePage);
+            let visiblePid = conversion.visiblePid;
+            let pageIndex = conversion.pageIndex;
 
             ////////////////
             // 如果启动了虚拟页面模式 //
             ////////////////
-            var virtualPid = false; //虚拟页面的pid编号
-            var virtualOffset = false; //页面坐标left,right
+            let virtualPid = false; //虚拟页面的pid编号
+            let virtualOffset = false; //页面坐标left,right
             if (virtualMode) {
                 //页面位置
                 virtualOffset = offsetPage(pageIndex);
 
                 //获取新的chpater数据
-                var fixCids = function(originalIndex) {
-                    var originalPid = conversionCid.call(self, [originalIndex]);
+                const fixCids = function(originalIndex) {
+                    let originalPid = conversionCid.call(self, [originalIndex]);
                     return conversionPids([originalPid])[0];
                 }
 
@@ -210,9 +197,13 @@ export class Dispatch {
                 self.options.chapterId = chapterData._id
             }
 
-            //构件新的页面
-            //masterFilter 母板过滤器回调函数
-            newCreate = function(masterFilter) {
+            /**
+             * 构件新的页面
+             * masterFilter 母板过滤器回调函数
+             * @param  {[type]} masterFilter [description]
+             * @return {[type]}              [description]
+             */
+            const createMgr = function(masterFilter) {
 
                 //跳转的时候，创建新页面可以自动样式信息
                 //优化设置，只是改变当前页面即可
@@ -220,7 +211,7 @@ export class Dispatch {
                     userStyle = undefined;
                 }
 
-                var dataOpts = {
+                const dataOpts = {
                     'pageIndex': pageIndex,
                     'multiplePages': multiplePages,
                     'pid': createPid, //页码chapterId
@@ -234,17 +225,15 @@ export class Dispatch {
                 //初始化构建页面对象
                 //page
                 //master
-                pageBase = this.create(dataOpts, pageIndex, masterFilter);
+                const pageBase = this.create(dataOpts, pageIndex, masterFilter);
 
                 //构建页面对象后
                 //开始执行
                 if (pageBase) {
                     //开始线程任务
                     //当为滑动模式,支持快速创建
-                    pageBase.startThreadTask(filpOverAction, function() {
-                        // console.log('创建完毕************** ' + (createPid+1) +' '+ action)
-                        callbackAction[action]();
-                    });
+                    pageBase.startThreadTask(filpOverAction, () => callbackAction[action]())
+
                     //收集自定义样式的页面对象
                     if (userStyle) {
                         collectCreatePageBase.push(pageBase);
@@ -255,7 +244,7 @@ export class Dispatch {
 
             //母版层
             if (chapterData.pptMaster && self.masterMgr) {
-                newCreate.call(self.masterMgr, function() {
+                createMgr.call(self.masterMgr, () => {
                     //母版是否创建等待通知
                     //母版是共享的所以不一定每次翻页都会创建
                     //如果需要创建,则叠加总数
@@ -265,169 +254,8 @@ export class Dispatch {
             }
 
             //页面层
-            newCreate.call(self.pageMgr);
+            createMgr.call(self.pageMgr);
         })
-    }
-
-
-    /**
-     * 滑动处理
-     *  1 滑动
-     *  2 反弹
-     *  3 翻页
-     */
-    move(data) {
-
-        //动作
-        var action = data.action;
-
-        //用户强制直接切换模式
-        //禁止页面跟随滑动
-        if (this.options.pageFlip && action == 'flipMove') {
-            return
-        }
-
-        var speed = data.speed;
-        var distance = data.distance;
-        var leftIndex = data.leftIndex;
-        var currIndex = data.pageIndex;
-        var rightIndex = data.rightIndex;
-        var direction = data.direction;
-        //移动的距离
-        var moveDistance = calculateDistance(action, distance, direction);
-        //视觉差页面滑动
-        var nodes = this.pageMgr.abstractGetPageObj(currIndex)['chapterDas']['nodes'];
-
-        ///////
-        //页面改变 //
-        ///////
-        //通知page模块
-        this.pageMgr.move(leftIndex, currIndex, rightIndex, direction, speed, action, moveDistance);
-
-        //通知视觉差模块
-        this.callMasterMgr(function() {
-            this.move(leftIndex, currIndex, rightIndex, direction, moveDistance, action, speed, nodes);
-        })
-
-        //更新页码标示
-        'flipOver' === action && setTimeout(function() {
-            this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
-        }.bind(this), 0);
-    }
-
-
-    /**
-     * 翻页松手后
-     * 暂停页面的各种活动动作
-     * @param  {[type]} pointers [description]
-     * @return {[type]}          [description]
-     */
-    suspend(pointers) {
-        //关闭层事件
-        this.pageMgr.suspend(pointers);
-        this.callMasterMgr(function() {
-            this.suspend(pointers)
-        })
-
-        //目录栏
-        _close();
-        //复位工具栏
-        this.vm.$emit('change:resetToolbar')
-    }
-
-
-    /**
-     * 翻页动画完毕后
-     * @return {[type]}              [description]
-     */
-    complete(direction, pagePointer, unfliplock, isQuickTurn) {
-        //方向
-        this.direction = direction;
-        //是否快速翻页
-        this.isQuickTurn = isQuickTurn || false;
-        //解锁
-        this.unfliplock = unfliplock;
-        //清理上一个页面
-        this._clearPage(pagePointer.destroyPointer)
-        this._updatePointer(pagePointer);
-        //预创建下一页
-        this._advanceCreate(direction, pagePointer);
-    }
-
-
-    //清理页面结构
-    _clearPage(clearPageIndex) {
-        this.pageMgr.clearPage(clearPageIndex);
-    }
-
-
-    //更新页码索引标示
-    _updatePointer(pagePointer) {
-        this.pagePointer = pagePointer;
-    }
-
-
-    //预创建新页面
-    _advanceCreate(direction, pagePointer) {
-        var pagetotal = this.options.pagetotal,
-            vm = this.vm,
-            createPointer = pagePointer.createPointer,
-            destroyPointer = pagePointer.destroyPointer,
-            //清理页码
-            clear = function() {
-                delete pagePointer.createPointer;
-                delete pagePointer.destroyPointer;
-            },
-            //创建新的页面对象
-            createNextContainer = function(createPointer, currIndex) {
-                this.create([createPointer], currIndex, 'flipOver');
-            };
-
-
-        //如果是右边翻页
-        if (direction === 'next') {
-            //首尾无须创建页面
-            if (pagePointer.currIndex === pagetotal - 1) {
-                this.autoRun();
-                //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-                if (pagetotal == 2) {
-                    vm.$emit('change:showPrev');
-                }
-                //多页处理
-                vm.$emit('change:hideNext');
-                return
-            }
-            if (createPointer < pagetotal) { //创建的页面
-                createNextContainer.call(this, createPointer, pagePointer.currIndex);
-                clear();
-                vm.$emit('change:showPrev');
-                return;
-            }
-        }
-
-        //如果是左边翻页
-        if (direction === 'prev') {
-            //首尾无须创建页面
-            if (pagePointer.currIndex === 0) {
-                this.autoRun();
-                //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-                if (pagetotal == 2) {
-                    vm.$emit('change:showNext');
-                }
-                vm.$emit('change:hidePrev');
-                return
-            }
-            if (pagePointer.currIndex > -1) { //创建的页面
-                createNextContainer.call(this, createPointer, pagePointer.currIndex);
-                clear();
-                vm.$emit('change:showNext');
-                return;
-            }
-        }
-
-        clear();
-
-        return;
     }
 
 
@@ -468,7 +296,7 @@ export class Dispatch {
             //中断通知
             'suspendCallback': options.suspendAutoCallback,
             //构建完毕通知
-            'buildComplete': function(scenarioId) {
+            'buildComplete' (scenarioId) {
                 //==========================================
                 //
                 //      构建完成通知,用于处理历史缓存记录
@@ -487,14 +315,14 @@ export class Dispatch {
 
             //流程结束通知
             //包括动画都已经结束了
-            'processComplete': function() {}
+            'processComplete' () {}
         };
 
         //页面自动运行
         this.pageMgr.autoRun(data);
 
         //模板自动运行
-        this.callMasterMgr(function() {
+        this.masterContext(function() {
             //如果动作是初始化，或者触发了母版自动运行
             //如果是越界处理
             //console.log(action,this.isBoundary,para.createMaster)
@@ -571,6 +399,90 @@ export class Dispatch {
 
 
     /**
+     * 滑动处理
+     *  1 滑动
+     *  2 反弹
+     *  3 翻页
+     */
+    move({
+        action,
+        speed,
+        distance,
+        leftIndex,
+        pageIndex,
+        rightIndex,
+        direction
+    } = {}) {
+
+        const currIndex = pageIndex
+
+        //用户强制直接切换模式
+        //禁止页面跟随滑动
+        if (this.options.pageFlip && action == 'flipMove') {
+            return
+        }
+
+        //移动的距离
+        const moveDistance = calculateDistance(action, distance, direction)
+
+        //视觉差页面滑动
+        const nodes = this.pageMgr.abstractGetPageObj(currIndex)['chapterDas']['nodes']
+
+        //通知page模块
+        this.pageMgr.move(leftIndex, currIndex, rightIndex, direction, speed, action, moveDistance);
+
+        //通知视觉差模块
+        this.masterContext(() => {
+            this.move(leftIndex, currIndex, rightIndex, direction, moveDistance, action, speed, nodes);
+        })
+
+        //更新页码标示
+        'flipOver' === action && setTimeout(function() {
+            this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
+        }.bind(this), 0);
+    }
+
+
+    /**
+     * 翻页松手后
+     * 暂停页面的各种活动动作
+     * @param  {[type]} pointers [description]
+     * @return {[type]}          [description]
+     */
+    suspend(pointers) {
+        //关闭层事件
+        this.pageMgr.suspend(pointers);
+        this.masterContext(function() {
+            this.suspend(pointers)
+        })
+
+        //目录栏
+        _close();
+        //复位工具栏
+        this.vm.$emit('change:resetToolbar')
+    }
+
+
+    /**
+     * 翻页动画完毕后
+     * @return {[type]}              [description]
+     */
+    complete(direction, pagePointer, unfliplock, isQuickTurn) {
+        //方向
+        this.direction = direction;
+        //是否快速翻页
+        this.isQuickTurn = isQuickTurn || false;
+        //解锁
+        this.unfliplock = unfliplock;
+        //清理上一个页面
+        this._clearPage(pagePointer.destroyPointer)
+        this._updatePointer(pagePointer);
+        //预创建下一页
+        this._advanceCreate(direction, pagePointer);
+    }
+
+
+    /**
      * 页面跳转切换处
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
@@ -602,11 +514,124 @@ export class Dispatch {
 
 
     /**
+     * 调用母版管理器
+     * @return {[type]} [description]
+     */
+    masterContext(callback) {
+        if (this.masterMgr) {
+            callback.call(this.masterMgr)
+        }
+    }
+
+
+    /**
+     * 销毁接口
+     * 对应多场景操作
+     * @return {[type]} [description]
+     */
+    destroy() {
+        this.pageMgr.destroy();
+        this.masterContext(function() {
+            this.destroy();
+        })
+    }
+
+
+    /**
+     * 清理页面结构
+     * @param  {[type]} clearPageIndex [description]
+     * @return {[type]}                [description]
+     */
+    _clearPage(clearPageIndex) {
+        this.pageMgr.clearPage(clearPageIndex);
+    }
+
+
+    /**
+     * 更新页码索引标示
+     * @param  {[type]} pagePointer [description]
+     * @return {[type]}             [description]
+     */
+    _updatePointer(pagePointer) {
+        this.pagePointer = pagePointer;
+    }
+
+
+    /**
+     * 预创建新页面
+     * @param  {[type]} direction   [description]
+     * @param  {[type]} pagePointer [description]
+     * @return {[type]}             [description]
+     */
+    _advanceCreate(direction, pagePointer) {
+        var pagetotal = this.options.pagetotal,
+            vm = this.vm,
+            createPointer = pagePointer.createPointer,
+            destroyPointer = pagePointer.destroyPointer,
+            //清理页码
+            clear = function() {
+                delete pagePointer.createPointer;
+                delete pagePointer.destroyPointer;
+            },
+            //创建新的页面对象
+            createNextContainer = function(createPointer, currIndex) {
+                this.create([createPointer], currIndex, 'flipOver');
+            };
+
+
+        //如果是右边翻页
+        if (direction === 'next') {
+            //首尾无须创建页面
+            if (pagePointer.currIndex === pagetotal - 1) {
+                this.autoRun();
+                //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+                if (pagetotal == 2) {
+                    vm.$emit('change:showPrev');
+                }
+                //多页处理
+                vm.$emit('change:hideNext');
+                return
+            }
+            if (createPointer < pagetotal) { //创建的页面
+                createNextContainer.call(this, createPointer, pagePointer.currIndex);
+                clear();
+                vm.$emit('change:showPrev');
+                return;
+            }
+        }
+
+        //如果是左边翻页
+        if (direction === 'prev') {
+            //首尾无须创建页面
+            if (pagePointer.currIndex === 0) {
+                this.autoRun();
+                //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+                if (pagetotal == 2) {
+                    vm.$emit('change:showNext');
+                }
+                vm.$emit('change:hidePrev');
+                return
+            }
+            if (pagePointer.currIndex > -1) { //创建的页面
+                createNextContainer.call(this, createPointer, pagePointer.currIndex);
+                clear();
+                vm.$emit('change:showNext');
+                return;
+            }
+        }
+
+        clear();
+
+        return;
+    }
+
+
+    /**
      * 加载页面事件与动作
      * @param  {[type]} action [description]
      * @return {[type]}        [description]
      */
-    loadPage(action) {
+    _loadPage(action) {
         var self = this;
 
         //触发自动任务
@@ -652,28 +677,5 @@ export class Dispatch {
         })
     }
 
-
-    /**
-     * 调用母版管理器
-     * @return {[type]} [description]
-     */
-    callMasterMgr(callback) {
-        if (this.masterMgr) {
-            callback.call(this.masterMgr)
-        }
-    }
-
-
-    /**
-     * 销毁接口
-     * 对应多场景操作
-     * @return {[type]} [description]
-     */
-    destroy() {
-        this.pageMgr.destroy();
-        this.callMasterMgr(function() {
-            this.destroy();
-        })
-    }
 
 }

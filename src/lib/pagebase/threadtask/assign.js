@@ -1,9 +1,9 @@
 import updataCache from './cache'
-import TaskContainer from './container'
-import TaskBackground from './background'
+import TaskContainer from './container/index'
+import TaskBackground from './background/index'
 import TaskContents from './contents/index'
-import TaskComponents from './components'
-import TaskFlow from './flow'
+import TaskComponents from './component/index'
+import TaskFlow from './flow/index'
 
 /**
  * 解析canvas配置
@@ -71,8 +71,7 @@ export default {
      * 流式排版
      */
     'Flow' (taskCallback, base) {
-        taskCallback()
-     //   TaskFlow(base, taskCallback)
+        TaskFlow(base, taskCallback)
     },
 
 

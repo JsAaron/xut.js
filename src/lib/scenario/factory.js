@@ -5,7 +5,7 @@ import { sceneController } from './controller'
 import { sToolbar as MainBar } from '../toolbar/sysbar'
 import { fToolbar as DeputyBar } from '../toolbar/fnbar'
 import { Bar as BookToolBar } from '../toolbar/bookbar'
-import { Mediator } from '../manager/mediator'
+import { Mediator } from '../manager/index'
 
 let config
 

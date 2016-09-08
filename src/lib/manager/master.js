@@ -51,7 +51,7 @@ const rword = "-"
  *  currMasterId: 9001 //实际的可使区
  */
 
-export class MasterMgr extends Abstract {
+export default class MasterMgr extends Abstract {
 
     constructor(vm) {
         super()

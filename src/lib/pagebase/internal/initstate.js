@@ -1,6 +1,6 @@
 import { create as _create } from '../depend/multievent'
 import Collection from '../depend/collection'
-import initTasks from '../threadtask/inittasks'
+import initTasks from '../threadtask/tasks'
 import Factory from '../depend/factory'
 
 
@@ -12,7 +12,7 @@ export default function(baseProto) {
      */
     baseProto.initState = function(options) {
 
-        var instance = this
+        const instance = this
 
         _.extend(instance, options)
 
@@ -20,7 +20,7 @@ export default function(baseProto) {
          * 数据缓存容器
          * @type {Object}
          */
-        this.dataCache = {}
+        this._dataCache = {}
         this.scenarioId = this.chapterDas.seasonId
         this.chapterId = this.chapterDas._id
 
@@ -81,11 +81,10 @@ export default function(baseProto) {
 
         /**
          * 2016.9.7
-         * flow热点
+         * flow热点对象
          * @type {Collection}
          */
         this._flows = new Collection()
-
 
         /**
          * 浮动对象

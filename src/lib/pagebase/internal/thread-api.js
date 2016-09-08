@@ -10,6 +10,7 @@ export default function(baseProto) {
 
     /**
      * 开始调用任务
+     * dispatch=>index=>create=>startThreadTask
      * @return {[type]} [description]
      */
     baseProto.startThreadTask = function(flipOver, callback) {

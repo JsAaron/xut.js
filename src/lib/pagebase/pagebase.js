@@ -22,7 +22,7 @@
 
 import initstate from './internal/initstate'
 import threadExternal from './internal/thread-api'
-import dataExternal from './internal/data'
+import dataExternal from './internal/data-api'
 import destroy from './internal/destroy'
 
 export class Pagebase {

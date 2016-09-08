@@ -17,36 +17,29 @@ import {
 } from '../command/index'
 
 
-
 /**
  * 检测脚本注入
  * @return {[type]} [description]
  */
 const checkInjectScript = (pageObject, type) => {
-    var code;
-    if (code = pageObject.chapterDas[type]) {
+    const code = pageObject.chapterDas[type]
+    if (code) {
         injectScript(code, type)
     }
 }
 
 
-export class PageMgr extends Abstract {
+export default class PageMgr extends Abstract {
 
     constructor(vm) {
         super()
 
         this.pageType = 'page';
 
-        /**
-         * 页面根节点
-         * @type {[type]}
-         */
+        //页面根节点
         this.rootNode = vm.options.rootPage;
 
-        /**
-         * 抽象方法
-         * 创建合集容器
-         */
+        //创建合集容器
         this.abstractCreateCollection();
     }
 
@@ -55,7 +48,7 @@ export class PageMgr extends Abstract {
     create(dataOpts, pageIndex) {
 
         //生成指定页面对象
-        var pageObjs = new Pagebase(
+        const pageObjs = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
                 'root': this.rootNode //根元素
@@ -75,9 +68,9 @@ export class PageMgr extends Abstract {
      * @return {[type]}                [description]
      */
     clearPage(clearPageIndex) {
-        var pageObj;
+        const pageObj = this.abstractGetPageObj(clearPageIndex)
         //销毁页面对象事件
-        if (pageObj = this.abstractGetPageObj(clearPageIndex)) {
+        if (pageObj) {
             //移除事件
             pageObj.baseDestroy();
             //移除列表

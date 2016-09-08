@@ -14,11 +14,11 @@ export default function(pid, callback) {
     //缓存数据
     const addCacheDas = (namespace, data) => {
         let key;
-        if (!base.dataCache[namespace]) {
-            base.dataCache[namespace] = data;
+        if (!base._dataCache[namespace]) {
+            base._dataCache[namespace] = data;
         } else {
             for (key in data) {
-                base.dataCache[namespace][key] = data[key];
+                base._dataCache[namespace][key] = data[key];
             }
         }
     }
