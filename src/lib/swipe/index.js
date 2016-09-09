@@ -53,8 +53,9 @@ export default class Swipe extends Observer {
         initIndex, //初页
         container,
         pageFlip, //翻页模式
-        pagetotal,  //总数
+        pagetotal, //总数
         multiplePages, //多页面
+        stopPropagation = false,
         preventDefault,
         linear = false, //线性模式
         borderBounce = false, //边界反弹
@@ -82,6 +83,8 @@ export default class Swipe extends Observer {
 
 
         this.options = {
+
+            stopPropagation: stopPropagation,
 
             preventDefault: preventDefault !== undefined ? preventDefault : true,
 
@@ -660,19 +663,19 @@ export default class Swipe extends Observer {
     handleEvent(e) {
         handle({
             start(e) {
-                e.stopPropagation()
+                this.options.stopPropagation && e.stopPropagation()
                 this._onStart(e)
             },
             move(e) {
-                e.stopPropagation()
+                this.options.stopPropagation && e.stopPropagation()
                 this._onMove(e)
             },
             end(e) {
-                e.stopPropagation()
+                this.options.stopPropagation && e.stopPropagation()
                 this._onEnd(e)
             },
             transitionend(e) {
-                e.stopPropagation()
+                this.options.stopPropagation && e.stopPropagation()
                 this._onAnimComplete(e)
             }
         }, this, e)

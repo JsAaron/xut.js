@@ -52,6 +52,7 @@ export default class Flow {
             container: $content[0],
             pageFlip: 0,
             multiplePages: 1,
+            stopPropagation:true,
             pagetotal: pagesCount
         })
 
