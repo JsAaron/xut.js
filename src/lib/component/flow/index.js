@@ -42,13 +42,12 @@ export default class Flow {
         const MIN = 0
         const MAX = pagesCount - 1
         const viewWidth = config.viewSize.width
-
         const gapWidth = 20
 
         const swipe = new Swipe({
             borderBounce: true,
             linear: true,
-            initIndex: MAX,
+            initIndex: Xut.Presentation.GetPageIndex() > this.base.pageIndex ? MAX : MIN,
             extraGap: gapWidth,
             container: $content[0],
             pageFlip: 0,
@@ -92,12 +91,14 @@ export default class Flow {
             if (this._hindex === MIN && this.direction === 'prev') {
                 if (action === 'flipOver') {
                     Xut.View.GotoPrevSlide()
+                    this._unlock()
                 } else {
                     Xut.View.MovePage(moveDistance, speed, this.direction, action)
                 }
             } else if (this._hindex === MAX && this.direction === 'next') {
                 if (action === 'flipOver') {
                     Xut.View.GotoNextSlide()
+                    this._unlock()
                 } else {
                     Xut.View.MovePage(currentDist, speed, this.direction, action)
                 }
@@ -110,6 +111,7 @@ export default class Flow {
 
         swipe.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
             lastDistance = moveDistance
+            console.log(123)
             unfliplock()
         })
 
