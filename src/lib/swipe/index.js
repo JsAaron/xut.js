@@ -96,12 +96,10 @@ export default class Swipe extends Observer {
             borderBounce: borderBounce
         }
 
-
         //增加回到标记
         if (linear) {
             container.setAttribute(LINEARTAG, true)
         }
-
 
         //绑定行为
         this._initEvents()
@@ -339,11 +337,8 @@ export default class Swipe extends Observer {
 
             //跟随移动
             if (!this._fliplock && isValidSlide && !isPastBounds) {
-                if (this._deltaX < 0) { //true:right, false:left
-                    this._slideTo('next')
-                } else {
-                    this._slideTo('prev')
-                }
+                //true:right, false:left
+                this._slideTo(this._deltaX < 0 ? 'next' : 'prev')
             } else {
                 //反弹
                 this._distributeMove({
@@ -585,7 +580,6 @@ export default class Swipe extends Observer {
      * @return {[type]}   [description]
      */
     _onAnimComplete(e) {
-
         const element = e.target
         const pageType = element.getAttribute('data-pageType')
         const view = element.getAttribute('data-view') //操作的可视窗口

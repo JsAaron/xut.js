@@ -40,15 +40,15 @@ export default class Flow {
         const pagesCount = this._resolveHeight($content)
 
         const MIN = 0
-        const MAX = pagesCount + 1
+        const MAX = pagesCount - 1
         const viewWidth = config.viewSize.width
 
         const gapWidth = 20
 
-        const swipe = new Swipe({
+        const swipe = new Swipe({ 
             borderBounce: true,
             linear: true,
-            initIndex: 0,
+            initIndex: 5,
             container: $content[0],
             pageFlip: 0,
             multiplePages: 1,
@@ -68,9 +68,7 @@ export default class Flow {
             direction
         } = {}) {
 
-            const dist = calculateDistance(action, distance, direction)[1]
-            moveDistance = dist
-
+            moveDistance = calculateDistance(action, distance, direction)[1]
 
             switch (direction) {
                 case 'next':
@@ -88,11 +86,20 @@ export default class Flow {
                     -(viewWidth * this._hindex + this._hindex * gapWidth)
             }
 
-
+            //首尾连接主页
             if (this._hindex === MIN && this.direction === 'prev') {
-                Xut.View.MovePage(dist, speed, this.direction, action)
-            } else if (this._hindex === MAX - 1 && this.direction === 'next') {
-                return
+                if (action === 'flipOver') {
+                    Xut.View.GotoPrevSlide()
+                } else {
+                    Xut.View.MovePage(moveDistance, speed, this.direction, action)
+                }
+            } else if (this._hindex === MAX && this.direction === 'next') {
+                console.log(moveDistance)
+               // if (action === 'flipOver') {
+               //      Xut.View.GotoNextSlide()
+               //  } else {
+               //      Xut.View.MovePage(moveDistance, speed, this.direction, action)
+               //  }
             } else {
                 translation[action]({}, moveDistance, speed, $content)
             }

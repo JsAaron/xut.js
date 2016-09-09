@@ -84,7 +84,7 @@ export default function api(Swipe) {
      * @param  {[type]} complete    [description]
      * @return {[type]}             [description]
      */
-    Swipe.prototype.scrollToPage = function(targetIndex, preMode, complete) { //目标页面
+    Swipe.prototype.scrollToPage = function(targetIndex) { //目标页面
 
         //如果还在翻页中
         if (this._fliplock) return
