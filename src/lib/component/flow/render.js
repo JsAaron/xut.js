@@ -26,9 +26,9 @@ export default function render({
     const transform = 'translate3d(0, 0, 0)'
 
     const $container = $(`
-            <section  id="flow-${chapterId}" style="width:100%;height:100%;overflow:hidden;">
+            <section id="flow-${chapterId}" style="overflow:hidden;">
                 <div id="scroller" style="position:absolute;">
-                    <div style="${columnWidth};${columnHeight};">${dataNode.html()}</div>
+                    <div style="${columnWidth};${columnHeight};${columnGap}">${dataNode.html()}</div>
                 </div>
             </section>`)
 

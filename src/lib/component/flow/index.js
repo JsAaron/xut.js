@@ -34,8 +34,82 @@ export default class Flow {
         })
     }
 
-
     _init($container, $content) {
+
+        //分段数
+        const pagesCount = this._resolveHeight($content)
+
+        const MIN = 0
+        const MAX = pagesCount + 1
+        const viewWidth = config.viewSize.width
+
+        const gapWidth = 20
+
+        const swipe = new Swipe({
+            borderBounce: true,
+            linear: true,
+            initIndex: 0,
+            container: $content[0],
+            pageFlip: 0,
+            multiplePages: 1,
+            pagetotal: pagesCount
+        })
+
+        let moveDistance = 0
+        let lastDistance = 0
+
+        swipe.$watch('onMove', function({
+            action,
+            speed,
+            distance,
+            leftIndex,
+            pageIndex,
+            rightIndex,
+            direction
+        } = {}) {
+
+            const dist = calculateDistance(action, distance, direction)[1]
+            moveDistance = dist
+
+
+            switch (direction) {
+                case 'next':
+                    moveDistance = moveDistance - gapWidth + lastDistance
+                    break
+                case 'prev':
+                    moveDistance = moveDistance + gapWidth + lastDistance
+                    break
+            }
+
+            //反弹
+            if (action === 'flipRebound') {
+                moveDistance = direction === 'next' ?
+                    (-viewWidth * this._hindex - this._hindex * gapWidth) :
+                    -(viewWidth * this._hindex + this._hindex * gapWidth)
+            }
+
+
+            if (this._hindex === MIN && this.direction === 'prev') {
+                Xut.View.MovePage(dist, speed, this.direction, action)
+            } else if (this._hindex === MAX - 1 && this.direction === 'next') {
+                return
+            } else {
+                translation[action]({}, moveDistance, speed, $content)
+            }
+
+        })
+
+
+        swipe.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
+            lastDistance = moveDistance
+            unfliplock()
+        })
+
+        this.callback()
+    }
+
+
+    _init1($container, $content) {
 
         //分段数
         const pagesCount = this._resolveHeight($content)

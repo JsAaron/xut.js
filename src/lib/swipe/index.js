@@ -33,6 +33,8 @@ const getDate = () => {
     return +new Date
 }
 
+const LINEARTAG = 'data-viewlinear'
+
 /**
  * 自定义事件类型
  * onSwipeDown 触屏点击
@@ -52,7 +54,9 @@ export default class Swipe extends Observer {
         pageFlip,
         pagetotal,
         multiplePages,
-        preventDefault
+        preventDefault,
+        linear = false, //线性模式
+        borderBounce = false //边界反弹
     } = {}) {
 
         super()
@@ -74,18 +78,33 @@ export default class Swipe extends Observer {
         this._pagePointer = initPointer(initIndex, pagetotal)
 
 
-        /**
-         * 默认配置
-         * @type {Object}
-         */
-        this._options = {
-            //默认true
-            preventDefault: preventDefault !== undefined ? preventDefault : true
+        this.options = {
+
+            preventDefault: preventDefault !== undefined ? preventDefault : true,
+
+            /**
+             * 是否分段处理
+             * 默认是
+             * @type {[type]}
+             */
+            linear: linear,
+
+            /**
+             * 启动边界反弹
+             * @type {[type]}
+             */
+            borderBounce: borderBounce
+        }
+
+
+        //增加回到标记
+        if (linear) {
+            container.setAttribute(LINEARTAG, true)
         }
 
 
         //绑定行为
-        this._initOperation()
+        this._initEvents()
 
         //用于查找跟元素
         const ul = this.element.querySelectorAll('ul');
@@ -104,11 +123,12 @@ export default class Swipe extends Observer {
      * viewTag   可使区标记
      * follow    是否为跟随滑动
      * @return {[type]} [description]
+     * pageIndex: 0, distance: -2, speed: 0, direction: "next", action: "flipMove"
      */
-    _processorMove(data) {
-        const _pagePointer = this._pagePointer;
-        data.leftIndex = _pagePointer.leftIndex;
-        data.rightIndex = _pagePointer.rightIndex;
+    _distributeMove(data) {
+        const pointer = this._pagePointer
+        data.leftIndex = pointer.leftIndex
+        data.rightIndex = pointer.rightIndex
         this.$emit('onMove', data)
     }
 
@@ -117,9 +137,9 @@ export default class Swipe extends Observer {
      * 绑定事件
      * @return {[type]} [description]
      */
-    _initOperation() {
+    _initEvents() {
 
-        var callback = {
+        const callback = {
             start: this,
             end: this
         }
@@ -239,9 +259,11 @@ export default class Swipe extends Observer {
         //=========X轴滑动=========
 
         //前尾是否允许反弹
-        if (this._isBounce = this._borderBounce(deltaX)) return;
+        if (!this.options.borderBounce) {
+            if (this._isBounce = this._borderBounce(deltaX)) return;
+        }
 
-        if (this._options.preventDefault) {
+        if (this.options.preventDefault) {
             e.preventDefault()
         }
 
@@ -253,28 +275,29 @@ export default class Swipe extends Observer {
             && deltaX < 0 // 中间
         ) ? (absDeltaX / this._viewWidth + 1) : 1)
 
+
         if (!this._isRollX && this._deltaX) {
             this._isRollX = true
         }
 
+        this.direction = this._deltaX > 0 ? 'prev' : 'next'
+
         //减少抖动
         //算一次有效的滑动
-        //移动距离必须25px才开始移动
-        if (absDeltaX <= 25) return;
+        //移动距离必须20px才开始移动
+        let xWait = 20
+        if (absDeltaX <= xWait) return;
 
-        let delayX = 0;
         //需要叠加排除值
-        if (this._deltaX < 0) {
-            delayX = 20;
-        } else {
-            delayX = (-20);
+        if (this._deltaX > 0) {
+            xWait = (-xWait)
         }
 
-        !this._fliplock && this._processorMove({
+        !this._fliplock && this._distributeMove({
             'pageIndex': this._hindex,
-            'distance': this._deltaX + delayX,
+            'distance': this._deltaX + xWait,
             'speed': 0,
-            'direction': this._deltaX > 0 ? 'prev' : 'next',
+            'direction': this.direction,
             'action': 'flipMove'
         })
     }
@@ -305,7 +328,9 @@ export default class Swipe extends Observer {
             let deltaX = Math.abs(this._deltaX)
 
             //如果是首尾
-            let isPastBounds = !this._hindex && this._deltaX > 0 || this._hindex == this.pagetotal - 1 && this._deltaX < 0
+            //如果是liner模式排除
+            let isPastBounds = this.options.linear ? false :
+                !this._hindex && this._deltaX > 0 || this._hindex == this.pagetotal - 1 && this._deltaX < 0
 
             //_slideTo的最低值要求
             //1 fast: time < 200 && x >30
@@ -321,7 +346,7 @@ export default class Swipe extends Observer {
                 }
             } else {
                 //反弹
-                this._processorMove({
+                this._distributeMove({
                     'pageIndex': this._hindex,
                     'direction': this._deltaX > 0 ? 'prev' : 'next',
                     'distance': 0,
@@ -518,7 +543,9 @@ export default class Swipe extends Observer {
         }
 
         //前后边界
-        if (this._isBorder(direction)) return;
+        if (!this.options.linear) {
+            if (this._isBorder(direction)) return;
+        }
 
         this._lock()
         this.direction = direction
@@ -534,7 +561,7 @@ export default class Swipe extends Observer {
         }
 
 
-        this._processorMove({
+        this._distributeMove({
             'pageIndex': this._hindex,
             'speed': calculatespeed(),
             'distance': 0,
@@ -558,14 +585,14 @@ export default class Swipe extends Observer {
      * @return {[type]}   [description]
      */
     _onAnimComplete(e) {
-        e.stopPropagation()
+
         const element = e.target
         const pageType = element.getAttribute('data-pageType')
         const view = element.getAttribute('data-view') //操作的可视窗口
-        const flow = element.getAttribute('data-flow') //流式布局
+        const linearView = element.getAttribute(LINEARTAG) //流式布局
 
         //流式布局处理
-        if (flow && !view) {
+        if (linearView && !view) {
             this._distributed(element, view)
             return
         }
@@ -626,15 +653,19 @@ export default class Swipe extends Observer {
     handleEvent(e) {
         handle({
             start(e) {
+                e.stopPropagation()
                 this._onStart(e)
             },
             move(e) {
+                e.stopPropagation()
                 this._onMove(e)
             },
             end(e) {
+                e.stopPropagation()
                 this._onEnd(e)
             },
             transitionend(e) {
+                e.stopPropagation()
                 this._onAnimComplete(e)
             }
         }, this, e)
