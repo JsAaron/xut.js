@@ -76,30 +76,13 @@ export default {
             backgroundImage = "background-image: url(" + Xut.config.pathAddress + md5 + ");";
         }
 
-        let html =
-            '<div id="{{id}}" ' +
-            'data-belong="{{pageType}}" ' +
-            'data-delegate="Action" ' +
-            'style=' +
-            '"' +
-            'cursor:pointer;' +
-            'width:{{width}}px;height:{{height}}px;left:{{left}}px;top:{{top}}px;' +
-            'background-size:100% 100%;' +
-            'position:absolute;' +
-            'z-index:{{zIndex}};{{backgroundImage}}' +
-            '"' +
-            '></div>'
+        const id = actType + "_" + _id
 
-        return _.template(html, {
-            id: actType + "_" + _id,
-            pageType: pageType,
-            width: scaleWidth,
-            height: scaleHeight,
-            left: scaleLeft,
-            top: scaleTop,
-            zIndex: zIndex,
-            backgroundImage: backgroundImage
-        })
+        return `<div id="${id}"
+                  data-belong="${pageType}" 
+                  data-delegate="Action" 
+                  style="cursor:pointer;width:${scaleWidth}px;height:${scaleHeight}px;left:${scaleLeft}px;top:${scaleTop}px;background-size:100% 100%;position:absolute;'z-index:${zIndex};${backgroundImage}"></div>`
+
     }
 
 }
