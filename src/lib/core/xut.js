@@ -8,6 +8,7 @@ Xut.Plugin = Object.create(null)
 Xut.plugins = Object.create(null)
 
 
+
 //生成32位UUID的方法
 Xut.createUUID = (function(uuidRegEx, uuidReplacer) {
     return function() {
@@ -54,6 +55,10 @@ String.format = function(format) {
     });
 }
 
+
+String.styleFormat = function(format){
+    return format.replace(/\s+/g, " ")
+}
 
 
 //模拟继承

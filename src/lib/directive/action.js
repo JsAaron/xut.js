@@ -78,11 +78,22 @@ export default {
 
         const id = actType + "_" + _id
 
-        return `<div id="${id}"
-                  data-belong="${pageType}" 
-                  data-delegate="Action" 
-                  style="cursor:pointer;width:${scaleWidth}px;height:${scaleHeight}px;left:${scaleLeft}px;top:${scaleTop}px;background-size:100% 100%;position:absolute;'z-index:${zIndex};${backgroundImage}"></div>`
+        const html = `<div id="${id}"
+                        data-belong="${pageType}" 
+                        data-delegate="Action" 
+                        style="
+                            cursor:pointer;
+                            width:${scaleWidth}px;
+                            height:${scaleHeight}px;
+                            left:${scaleLeft}px;
+                            top:${scaleTop}px;
+                            background-size:100% 100%;
+                            position:absolute;
+                            z-index:${zIndex};
+                            ${backgroundImage}">
+                      </div>`
 
+        return String.styleFormat(html)
     }
 
 }

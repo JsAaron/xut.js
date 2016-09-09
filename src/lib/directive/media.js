@@ -73,9 +73,16 @@ export default {
                 const posY = (scaleHeight - mediaIconSize) / 2;
                 const icon = 'background-image:url(images/icons/web_hotspot.png)'
                 mediaIcon = `<div 
-                              id="icon_${_id}" 
-                              type="icon" 
-                              style="width:${mediaIconSize}px;height:${mediaIconSize}px;top:${posY}px;left:${posX}px;position:absolute;${icon}"></div>`
+                               id="icon_${_id}" 
+                               type="icon" 
+                               style="
+                                 width:${mediaIconSize}px;
+                                 height:${mediaIconSize}px;
+                                 top:${posY}px;
+                                 left:${posX}px;
+                                 position:absolute;
+                                 ${icon}">
+                            </div>`
             }
 
 
@@ -83,11 +90,23 @@ export default {
             //Webpage_1
             //Audio_1
             //Video_1
-            return `<div 
+            return String.styleFormat(
+                `<div 
                       id="${mediaType + "_" + _id}" 
                       data-belong="${pageType}" 
                       data-delegate="${category}" 
-                      style="width:${scaleWidth}px;height:${scaleHeight}px;left:${scaleLeft}px;top:${scaleTop}px;z-index:${zIndex};${startImage}background-size:100% 100%;position:absolute;">${mediaIcon}</div>`
+                      style="
+                        width:${scaleWidth}px;
+                        height:${scaleHeight}px;
+                        left:${scaleLeft}px;
+                        top:${scaleTop}px;
+                        z-index:${zIndex};
+                        ${startImage}
+                        background-size:100% 100%;
+                        position:absolute;">
+                            ${mediaIcon}
+                    </div>`
+            )
         },
 
 
