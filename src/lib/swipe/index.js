@@ -33,6 +33,7 @@ const getDate = () => {
     return +new Date
 }
 
+const PREFIXSTYLE = Xut.plat.prefixStyle
 const LINEARTAG = 'data-viewlinear'
 
 /**
@@ -49,19 +50,21 @@ const LINEARTAG = 'data-viewlinear'
 export default class Swipe extends Observer {
 
     constructor({
-        initIndex,
+        initIndex, //初页
         container,
-        pageFlip,
-        pagetotal,
-        multiplePages,
+        pageFlip, //翻页模式
+        pagetotal,  //总数
+        multiplePages, //多页面
         preventDefault,
         linear = false, //线性模式
-        borderBounce = false //边界反弹
+        borderBounce = false, //边界反弹
+        extraGap = 0 //间隔
     } = {}) {
 
         super()
 
         this._hindex = initIndex
+        this._extraGap = extraGap
         this.pagetotal = pagetotal
         this.multiplePages = multiplePages
         this.element = container
@@ -101,6 +104,8 @@ export default class Swipe extends Observer {
             container.setAttribute(LINEARTAG, true)
         }
 
+        this._initTransform()
+
         //绑定行为
         this._initEvents()
 
@@ -112,6 +117,14 @@ export default class Swipe extends Observer {
         }
     }
 
+
+    _initTransform(distance) {
+        if (this.options.linear) {
+            this._initDistance = -this._hindex * (this._viewWidth + this._extraGap)
+            this.element.style[PREFIXSTYLE('transform')] = `translate3d(${this._initDistance}px,0px,0px)`
+        }
+
+    }
 
     /**
      * 处理松手后滑动

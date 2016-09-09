@@ -45,10 +45,11 @@ export default class Flow {
 
         const gapWidth = 20
 
-        const swipe = new Swipe({ 
+        const swipe = new Swipe({
             borderBounce: true,
             linear: true,
-            initIndex: 5,
+            initIndex: MAX,
+            extraGap: gapWidth,
             container: $content[0],
             pageFlip: 0,
             multiplePages: 1,
@@ -56,7 +57,7 @@ export default class Flow {
         })
 
         let moveDistance = 0
-        let lastDistance = 0
+        let lastDistance = swipe._initDistance
 
         swipe.$watch('onMove', function({
             action,
@@ -68,7 +69,8 @@ export default class Flow {
             direction
         } = {}) {
 
-            moveDistance = calculateDistance(action, distance, direction)[1]
+            let currentDist = calculateDistance(action, distance, direction)[1]
+            moveDistance = currentDist
 
             switch (direction) {
                 case 'next':
@@ -94,12 +96,11 @@ export default class Flow {
                     Xut.View.MovePage(moveDistance, speed, this.direction, action)
                 }
             } else if (this._hindex === MAX && this.direction === 'next') {
-                console.log(moveDistance)
-               // if (action === 'flipOver') {
-               //      Xut.View.GotoNextSlide()
-               //  } else {
-               //      Xut.View.MovePage(moveDistance, speed, this.direction, action)
-               //  }
+                if (action === 'flipOver') {
+                    Xut.View.GotoNextSlide()
+                } else {
+                    Xut.View.MovePage(currentDist, speed, this.direction, action)
+                }
             } else {
                 translation[action]({}, moveDistance, speed, $content)
             }
