@@ -20,7 +20,8 @@ export default {
             scaleLeft
         } = {}, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
-            let html, mediaIcon, startImage
+            let html, mediaIcon = '',
+                startImage = ''
 
             //如果没有宽高则不创建绑定节点
             if (!scaleWidth || !scaleHeight) return ''
@@ -70,25 +71,11 @@ export default {
                 const mediaIconSize = 74;
                 const posX = (scaleWidth - mediaIconSize) / 2;
                 const posY = (scaleHeight - mediaIconSize) / 2;
-
-                html =
-                    '<div id="icon_{{id}}" type="icon" ' +
-                    'style=' +
-                    '"' +
-                    'width:{{width}}px;height:{{height}}px;top:{{top}}px;left:{{left}}px;' +
-                    'position:absolute;' +
-                    '{{icon}};' +
-                    '"' +
-                    '></div>'
-
-                mediaIcon = _.template(html, {
-                    id: _id,
-                    width: mediaIconSize,
-                    height: mediaIconSize,
-                    left: posX,
-                    top: posY,
-                    icon: 'background-image:url(images/icons/web_hotspot.png)'
-                })
+                const icon = 'background-image:url(images/icons/web_hotspot.png)'
+                mediaIcon = `<div 
+                              id="icon_${_id}" 
+                              type="icon" 
+                              style="width:${mediaIconSize}px;height:${mediaIconSize}px;top:${posY}px;left:${posX}px;position:absolute;${icon}"></div>`
             }
 
 
@@ -96,32 +83,11 @@ export default {
             //Webpage_1
             //Audio_1
             //Video_1
-            html =
-                '<div id="{{id}}" ' +
-                'data-belong="{{pageType}}" ' +
-                'data-delegate="{{category}}" ' +
-                'style=' +
-                '"' +
-                'width:{{width}}px;height:{{height}}px;left:{{left}}px;top:{{top}}px;' +
-                'z-index:{{zIndex}};{{startImage}}' +
-                'background-size:100% 100%;' +
-                'position:absolute;' +
-                '">' +
-                '{{mediaIcon}}' +
-                '</div>'
-
-            return _.template(html, {
-                id: mediaType + "_" + _id,
-                pageType: pageType,
-                category: category,
-                width: scaleWidth,
-                height: scaleHeight,
-                left: scaleLeft,
-                top: scaleTop,
-                zIndex: zIndex,
-                startImage: startImage,
-                mediaIcon: mediaIcon
-            })
+            return `<div 
+                      id="${mediaType + "_" + _id}" 
+                      data-belong="${pageType}" 
+                      data-delegate="${category}" 
+                      style="width:${scaleWidth}px;height:${scaleHeight}px;left:${scaleLeft}px;top:${scaleTop}px;z-index:${zIndex};${startImage}background-size:100% 100%;position:absolute;">${mediaIcon}</div>`
         },
 
 
