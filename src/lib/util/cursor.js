@@ -102,6 +102,13 @@ export const ShowBusy = () => {
     }, delay)
 }
 
+/**
+ * 光标状态
+ * @return {[type]} [description]
+ */
+export const busyBarState = () => {
+    console.log(123)
+}
 
 /**
  * 隐藏光标

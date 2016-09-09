@@ -20,11 +20,11 @@ export default function api(Swipe) {
      */
     Swipe.prototype.isBorder = function(distance) {
         //起点左偏移
-        if (this.hindex === 0 && distance > 0) {
+        if (this._hindex === 0 && distance > 0) {
             return true;
         }
         //终点右偏移
-        if (this.hindex === (this.pagetotal - 1) && distance < 0) {
+        if (this._hindex === (this.pagetotal - 1) && distance < 0) {
             return true
         }
     }
@@ -35,7 +35,7 @@ export default function api(Swipe) {
      * @return {Boolean} [description]
      */
     Swipe.prototype.isMove = function() {
-        return this.fliplock;
+        return this._fliplock;
     }
 
 
@@ -44,7 +44,7 @@ export default function api(Swipe) {
      * @return {[type]} [description]
      */
     Swipe.prototype.prev = function() {
-        if (!this._overstep(1)) {
+        if (!this._borderBounce(1)) {
             this._slideTo('prev');
         }
     }
@@ -54,9 +54,26 @@ export default function api(Swipe) {
      * @return {Function} [description]
      */
     Swipe.prototype.next = function() {
-        if (!this._overstep(-1)) {
+        if (!this._borderBounce(-1)) {
             this._slideTo('next');
         }
+    }
+
+
+    /**
+     * 获取当前页码
+     * @return {[type]} [description]
+     */
+    Swipe.prototype.getHindex = function() {
+        return this._hindex
+    }
+
+    /**
+     * 获取页面Pointer
+     * @return {[type]} [description]
+     */
+    Swipe.prototype.getPointer = function() {
+        return this._pagePointer
     }
 
 
@@ -70,10 +87,10 @@ export default function api(Swipe) {
     Swipe.prototype.scrollToPage = function(targetIndex, preMode, complete) { //目标页面
 
         //如果还在翻页中
-        if (this.fliplock) return
+        if (this._fliplock) return
 
         var data;
-        var currIndex = this.hindex; //当前页面
+        var currIndex = this._hindex; //当前页面
 
         switch (targetIndex) {
             //前一页
@@ -102,7 +119,7 @@ export default function api(Swipe) {
         //更新页码索引
         this._updataPointer(data);
 
-        data.pagePointer = this.pagePointer;
+        data.pagePointer = this._pagePointer;
 
         this.$emit('onJumpPage', data);
     }
@@ -138,7 +155,7 @@ export default function api(Swipe) {
      */
     Swipe.prototype.findRootElement = function(point, pageType) {
         var liNode, map,
-            hindex = this.hindex,
+            _hindex = this._hindex,
             sectionRang = this.sectionRang,
             //找到对应的li
             childNodes = this.bubbleNode[pageType].childNodes,
@@ -148,12 +165,12 @@ export default function api(Swipe) {
             liNode = childNodes[numNodes];
             map = liNode.getAttribute('data-map');
             if (sectionRang) {
-                hindex += sectionRang.start;
+                _hindex += sectionRang.start;
             }
-            if (map == hindex) {
+            if (map == _hindex) {
                 return liNode
             }
-            hindex = this.hindex;
+            _hindex = this._hindex;
         }
     }
 

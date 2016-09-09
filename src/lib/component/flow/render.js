@@ -22,12 +22,14 @@ export default function render({
 
     const columnWidth = `${COLUMNWIDTH}:${vWidth}px`
     const columnHeight = `height:${vHeight}px`
-    const columnGap = `${COLUMNTAP}:50px`
-    const transform = 'translate3d(0, 0, 0);'
+    const columnGap = `${COLUMNTAP}:20px`
+    const transform = 'translate3d(0, 0, 0)'
 
     const $container = $(`
-            <section id="flow-${chapterId}" style="width:100%;height:100%;overflow:hidden;">
-                <div style="${columnWidth};${columnHeight};${columnGap};${TRANSFORM}:${transform};">${dataNode.html()}</div>
+            <section  id="flow-${chapterId}" style="width:100%;height:100%;overflow:hidden;">
+                <div id="scroller" style="position:absolute;">
+                    <div style="${columnWidth};${columnHeight};">${dataNode.html()}</div>
+                </div>
             </section>`)
 
     nextTick({

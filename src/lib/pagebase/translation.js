@@ -6,10 +6,9 @@
 
 import { config } from '../config/index'
 
-let calculateContainer
+let offsetCut
 let offsetLeft
 let offsetRight
-let offsetCut
 let prevEffect
 let currEffect
 let nextEffect
@@ -32,13 +31,15 @@ const dydTransform = (distance) => {
  * @return {[type]} [description]
  */
 const initOptions = () => {
-    calculateContainer = config.proportion.calculateContainer()
+    if (initOptions.set) return
+    let calculateContainer = config.proportion.calculateContainer()
     offsetLeft = (-1 * calculateContainer.width)
     offsetRight = calculateContainer.width
     offsetCut = 0
     prevEffect = xxtTrans(offsetLeft)
     currEffect = xxtTrans(offsetCut)
     nextEffect = xxtTrans(offsetRight)
+    initOptions.set = true
 }
 
 

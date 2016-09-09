@@ -29,8 +29,14 @@ import { sceneController } from './scenario/controller'
 import { autoRun, original, suspend } from './command/index'
 import { suspendHandles, promptMessage } from './global-stop'
 import { SceneFactory } from './scenario/factory'
-import { ShowBusy, HideBusy, ShowTextBusy } from './util/cursor'
 import loadScene from './initialize/scene'
+
+import {
+    ShowBusy,
+    HideBusy,
+    ShowTextBusy,
+    busyBarState
+} from './util/cursor'
 
 import {
     _set,
@@ -62,7 +68,8 @@ let IsPay = false
 _extend(View, {
     ShowBusy,
     HideBusy,
-    ShowTextBusy
+    ShowTextBusy,
+    busyBarState
 })
 
 

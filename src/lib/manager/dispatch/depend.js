@@ -1,4 +1,3 @@
-
 import { errorTable } from '../../store/index'
 import { query } from '../parser'
 
@@ -43,18 +42,18 @@ export function conversionPageOpts(pageIndex, visiblePid) {
     }
 }
 
+
 /**
  * 计算翻页距离
  */
 export function calculateDistance(action, distance, direction) {
-    var leftOffset,
-        currOffset,
-        rightOffset;
+    let leftOffset
+    let currOffset
+    let rightOffset
 
     //保持缩放比,计算缩放比情况下的转化
-    var calculateContainer = Xut.config.proportion.calculateContainer();
-    var containerWidth = calculateContainer.width;
-
+    const calculateContainer = Xut.config.proportion.calculateContainer();
+    const containerWidth = calculateContainer.width;
 
     switch (direction) {
         //前翻
@@ -105,23 +104,23 @@ export function calculateDistance(action, distance, direction) {
 /**
  * 计算初始化页码
  */
-export function calculatePointer(targetIndex, pageTotal, multiplePages) {
+export function initPointer(targetIndex, pageTotal, multiplePages) {
 
     var leftscope = 0,
-        pagePointer = {},
+        initPointer = {},
         createPointer = [];
 
     function setValue(index) {
         if (index.leftIndex !== undefined) {
-            pagePointer.leftIndex = index.leftIndex;
+            initPointer.leftIndex = index.leftIndex;
             createPointer.push(index.leftIndex)
         }
         if (index.currIndex !== undefined) {
-            pagePointer.currIndex = index.currIndex;
+            initPointer.currIndex = index.currIndex;
             createPointer.push(index.currIndex)
         }
         if (index.rightIndex !== undefined) {
-            pagePointer.rightIndex = index.rightIndex;
+            initPointer.rightIndex = index.rightIndex;
             createPointer.push(index.rightIndex)
         }
     }
@@ -152,9 +151,11 @@ export function calculatePointer(targetIndex, pageTotal, multiplePages) {
         }
     }
 
-    this.pagePointer = pagePointer;
 
-    return createPointer;
+    return {
+        createPointer,
+        initPointer
+    }
 }
 
 //保证可视页面第一个分解

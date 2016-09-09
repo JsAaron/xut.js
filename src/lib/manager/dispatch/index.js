@@ -18,7 +18,7 @@ import {
     offsetPage,
     conversionPageOpts,
     calculateDistance,
-    calculatePointer,
+    initPointer,
     conversionCid,
     conversionPids,
     checkMasterCreate
@@ -29,6 +29,7 @@ export class Dispatch {
 
     constructor(vm) {
         this.vm = vm;
+
         this.options = vm.options;
 
         /**
@@ -54,12 +55,15 @@ export class Dispatch {
      */
     initCreate() {
         const options = this.options;
-        /**
-         * 初始化构建页面
-         */
-        this.create(
-            calculatePointer.call(this, options.initIndex, options.pagetotal, options.multiplePages), options.initIndex, 'init'
-        );
+
+        //createPointer,
+        //initPointer
+        const pointer = initPointer(options.initIndex, options.pagetotal, options.multiplePages)
+
+        this.pagePointer = pointer.initPointer
+
+        //始化构建页面
+        this.create(pointer.createPointer, options.initIndex, 'init')
     }
 
 

@@ -167,9 +167,9 @@ export default class PageMgr extends Abstract {
         _.each(findPage.call(this), function(pageObj, index) {
             if (pageObj) {
                 //移动浮动页面容器
-                var flaotElement;
-                if (flaotElement = pageObj.floatContents.PageContainer) {
-                    translation[action](pageObj, moveDistance[index], speed, flaotElement)
+                var floatElement;
+                if (floatElement = pageObj.floatContents.PageContainer) {
+                    translation[action](pageObj, moveDistance[index], speed, floatElement)
                 }
                 //正常页面
                 translation[action](pageObj, moveDistance[index], speed)

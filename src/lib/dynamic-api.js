@@ -67,7 +67,7 @@ const createExistIndex = ($globalEvent) => {
     return (pageIndex) => {
         //如果不存在
         if (pageIndex == undefined) {
-            pageIndex = $globalEvent.hindex //当前页面
+            pageIndex = $globalEvent.getHindex() //当前页面
         }
         return pageIndex
     }
@@ -99,7 +99,7 @@ export default function overrideApi(vm) {
     /**
      * 获取当前页码
      */
-    Presentation.GetPageIndex = () => $globalEvent.hindex
+    Presentation.GetPageIndex = () => $globalEvent.getHindex()
 
     /**
      * [获取页面的总数据]
@@ -266,7 +266,7 @@ export default function overrideApi(vm) {
             return
         }
 
-        options.multiplePages && $globalEvent.prev();
+        options.multiplePages && $globalEvent.prev()
     };
 
     /**
@@ -346,24 +346,32 @@ export default function overrideApi(vm) {
         });
     }
 
-    //页面滑动
+
+    /**
+     * 页面滑动
+     * @param {[type]} distance  [description]
+     * @param {[type]} speed     [description]
+     * @param {[type]} direction [description]
+     * @param {[type]} action    [description]
+     */
     View.MovePage = function(distance, speed, direction, action) {
         //如果禁止翻页模式 || 如果是滑动,不是边界
-        if (!options.multiplePages || $globalEvent.isMove() || action === 'flipMove' && $globalEvent.isBorder(distance)) {
-            return;
+        if (!options.multiplePages ||
+            $globalEvent.isMove() ||
+            action === 'flipMove' && $globalEvent.isBorder(distance)) {
+            return
         }
-        var pagePointer = $globalEvent.pagePointer,
-            data = {
-                'distance': distance,
-                'speed': speed,
-                'direction': direction,
-                'action': action,
-                'leftIndex': pagePointer.leftIndex,
-                'pageIndex': pagePointer.currIndex,
-                'rightIndex': pagePointer.rightIndex
-            };
-        $dispatch.move(data);
-        pagePointer = null;
+        const pagePointer = $globalEvent.getPointer()
+        const data = {
+            'distance'   : distance,
+            'speed'      : speed,
+            'direction'  : direction,
+            'action'     : action,
+            'leftIndex'  : pagePointer.leftIndex,
+            'pageIndex'  : pagePointer.currIndex,
+            'rightIndex' : pagePointer.rightIndex
+        }
+        $dispatch.move(data)
     };
 
 
@@ -404,10 +412,10 @@ export default function overrideApi(vm) {
                         }
                     }();
                     _.each(activityId, function(id) {
-                        manager.abstractAssistAppoint(id, $globalEvent.hindex, markComplete, apiName);
+                        manager.abstractAssistAppoint(id, $globalEvent.getHindex(), markComplete, apiName);
                     })
                 } else {
-                    manager.abstractAssistAppoint(activityId, $globalEvent.hindex, outCallBack, apiName);
+                    manager.abstractAssistAppoint(activityId, $globalEvent.getHindex(), outCallBack, apiName);
                 }
             }, pageType, activityId, outCallBack)
         }
@@ -593,7 +601,7 @@ export default function overrideApi(vm) {
             access(function(manager, pageType, nameList) {
                 if (typeCheck(nameList)) return;
                 var pageBaseObj;
-                if (!(pageBaseObj = manager.abstractAssistPocess($globalEvent.hindex))) {
+                if (!(pageBaseObj = manager.abstractAssistPocess($globalEvent.getHindex()))) {
                     console.log('注入互斥接口数据错误！')
                     return;
                 }

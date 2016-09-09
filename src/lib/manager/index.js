@@ -134,15 +134,14 @@ class Mediator extends Observer {
          * 过滤器.全局控制函数
          * return true 阻止页面滑动
          */
-        $globalEvent.$watch('filter', (hookCallback, point, evtObj) => {
-            let target, pageType, parentNode;
-            target = point.target;
+        $globalEvent.$watch('onFilter', (hookCallback, point, evtObj) => {
+            let target = point.target;
             //阻止默认行为
             preventDefault(evtObj, target);
             //页面类型
-            pageType = isBelong(target);
+            let pageType = isBelong(target);
             //根节点
-            parentNode = $globalEvent.findRootElement(point, pageType);
+            let parentNode = $globalEvent.findRootElement(point, pageType);
             //执行过滤处理
             handlerObj = filterProcessor.call(parentNode, point, pageType);
             if (!handlerObj || handlerObj.attribute === 'disable') {
@@ -156,7 +155,7 @@ class Mediator extends Observer {
          * 触屏滑动,通知pageMgr处理页面移动
          * @return {[type]} [description]
          */
-        $globalEvent.$watch('onSwipeMove', (data) => {
+        $globalEvent.$watch('onMove', (data) => {
             $dispatch.move(data)
         });
 
@@ -165,7 +164,7 @@ class Mediator extends Observer {
          * 触屏松手点击
          * 无滑动
          */
-        $globalEvent.$watch('onSwipeUp', (pageIndex, hookCallback) => {
+        $globalEvent.$watch('onTap', (pageIndex, hookCallback) => {
             if (handlerObj) {
                 if (handlerObj.handlers) {
                     handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex);
@@ -184,7 +183,7 @@ class Mediator extends Observer {
          * 触屏滑动,通知ProcessMgr关闭所有激活的热点
          * @return {[type]}          [description]
          */
-        $globalEvent.$watch('onSwipeUpSlider', (pointers) => {
+        $globalEvent.$watch('onUpSlider', (pointers) => {
             $dispatch.suspend(pointers)
         });
 
@@ -193,7 +192,7 @@ class Mediator extends Observer {
          * 翻页动画完成回调
          * @return {[type]}              [description]
          */
-        $globalEvent.$watch('onAnimComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
+        $globalEvent.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
             $dispatch.complete(direction, pagePointer, unfliplock, isQuickTurn)
         });
 
@@ -310,7 +309,7 @@ defAccess(medProto, '$injectionComponent', {
  */
 defAccess(medProto, '$curVmPage', {
     get: function() {
-        return this.$dispatch.pageMgr.abstractGetPageObj(this.$globalEvent.hindex);
+        return this.$dispatch.pageMgr.abstractGetPageObj(this.$globalEvent.getHindex());
     }
 });
 
@@ -365,7 +364,7 @@ def(medProto, '$init', function() {
 def(medProto, '$run', function() {
     var vm = this;
     vm.$dispatch.pageMgr.activateAutoRuns(
-        vm.$globalEvent.hindex, Xut.Presentation.GetPageObj()
+        vm.$globalEvent.getHindex(), Xut.Presentation.GetPageObj()
     )
 });
 
@@ -375,7 +374,7 @@ def(medProto, '$run', function() {
  * @return {[type]} [description]
  */
 def(medProto, '$reset', function() {
-    return this.$dispatch.pageMgr.resetOriginal(this.$globalEvent.hindex);
+    return this.$dispatch.pageMgr.resetOriginal(this.$globalEvent.getHindex());
 });
 
 

@@ -15,6 +15,7 @@
     "_": true,
     "PMS": true,
     "iScroll": true,
+    "IScroll":true,
     "console":true,
     "requestAnimFrame": true,
     "TweenLite": true,

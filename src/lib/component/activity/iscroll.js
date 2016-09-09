@@ -34,6 +34,8 @@
      // this.iscroll.on('scrollStart', function() {
      //     iscroll.initDirection = false; //初始化一次滑动方向
      // });
+     // 
+     // 
      // this.iscroll.on('scrollEnd', function(e) {
      //     //如果是Y轴滑动者不作处理跳过
      //     if (iscroll.initDirection) {
