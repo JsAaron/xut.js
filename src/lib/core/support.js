@@ -171,6 +171,7 @@
      */
     var hasPerspective = _prefixStyle('perspective') in _elementStyle
     var translateZ = hasPerspective ? ' translateZ(0)' : ''
+    var maskBoxImage = _prefixStyle('maskBoxImage')
 
     /**
      * 样式style支持
@@ -182,7 +183,7 @@
          * 不支持蒙版
          * @type {[type]}
          */
-        noMaskBoxImage: _prefixStyle('mask-box-image') == undefined,
+        noMaskBoxImage: maskBoxImage == undefined,
 
         /**
          * 前缀
@@ -207,26 +208,24 @@
          * @type {[type]}
          */
         animation: animation,
+        animationDelay: _prefixStyle('animationDelay'),
+        animationPlayState: _prefixStyle('animationPlayState'),
         animationEnd: animationEnd,
         keyframes: keyframes,
 
+        /**
+         * 支持3d Z
+         * @type {[type]}
+         */
         translateZ: translateZ,
 
         /**
-         * css3 playState
+         * 额外样式
          * @type {[type]}
          */
-        animationPlayState: _prefixStyle('animationPlayState'),
-
-
-        animationDelay: _prefixStyle('animationDelay'),
         filter: _prefixStyle('filter'),
-
-        /**
-         * mask-box-image
-         * @type {[type]}
-         */
         maskBoxImage: _prefixStyle('maskBoxImage'),
+        borderRadius: _prefixStyle('borderRadius'),
 
         /**
          * css3分栏

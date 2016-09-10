@@ -19,7 +19,6 @@ let config
 function show(opts) {
 
     var prop = config.proportion,
-        prefix = Xut.plat.prefixStyle,
         fontsize = (prop.width + prop.height) * 0.5 + 'em',
         content = opts.content,
         time = opts.time || 3000,
@@ -37,7 +36,7 @@ function show(opts) {
     if (!toolTip) {
         toolTip = $('#toolTip');
         toolTip.css(css);
-        toolTip.css(prefix('border-radius'), '5px');
+        toolTip.css(Xut.style.borderRadius, '5px');
     } else {
         toolTip.empty().show();
     }
