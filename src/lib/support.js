@@ -57,7 +57,7 @@
     var _cache = Object.create(null)
     var _prefixStyle = function(attr) {
         var name
-        //缓存中存在
+            //缓存中存在
         if (_cache[attr]) {
             return _cache[attr];
         }
@@ -114,7 +114,7 @@
      * 平台支持
      * @type {Object}
      */
-    Xut.plat = {
+    Xut.extend(Xut.plat, {
         has3d: has3d,
         isAndroid: isAndroid,
         isIphone: isIphone,
@@ -170,7 +170,7 @@
             }
             return original ? event : event.target;
         }
-    }
+    })
 
 
     /**
@@ -185,7 +185,7 @@
      * 样式style支持
      * @type {Object}
      */
-    Xut.style = {
+    Xut.extend(Xut.style, {
 
         /**
          * 不支持蒙版
@@ -241,6 +241,7 @@
          */
         columnWidth: _prefixStyle('column-width'),
         columnGap: _prefixStyle('column-gap')
-    }
+
+    })
 
 })()
