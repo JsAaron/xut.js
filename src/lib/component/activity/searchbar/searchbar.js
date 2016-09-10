@@ -4,7 +4,7 @@
  *
  */
 
-import { bindTap } from '../../../core/event'
+import { bindTap } from '../../../core/tap'
 
 //图标
 var icons = {

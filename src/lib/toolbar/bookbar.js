@@ -1,7 +1,7 @@
 import { BookMark } from './bookmark'
 import { ToolBar } from './base/toolBar'
 import { parseJSON } from '../util/index'
-import { bindTap } from '../core/event'
+import { bindTap } from '../core/tap'
 
 /**
  * 阅读模式工具栏

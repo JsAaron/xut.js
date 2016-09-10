@@ -5,7 +5,7 @@
  */
 
 import { bindEvents } from '../event/event'
-import { bindTap, offTap } from '../../../core/event'
+import { bindTap, offTap } from '../../../core/tap'
 
 import {
     _set,

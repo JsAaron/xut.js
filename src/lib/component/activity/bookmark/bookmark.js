@@ -5,7 +5,7 @@
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
 
-import { bindTap } from '../../../core/event'
+import { bindTap } from '../../../core/tap'
 
 import {
     _set,
