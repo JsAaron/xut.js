@@ -13,6 +13,7 @@ import { parserRelated as conParser } from './data'
 import { structure as conStructure } from './structure/index'
 import { Activity as ActivityClass } from '../../../component/activity/index'
 
+const TRANSFORM = Xut.style.transform
 
 /**
  * 解析出需要构建的content对象
@@ -352,7 +353,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
     }
 
     var floatStr = String.format(
-        '<div id="' + floatName + '-li-{0}" class="xut-float" style="' + Xut.plat.prefixStyle('transform') + ':{1};z-index:' + zIndex + ';{2}"></div>',
+        '<div id="' + floatName + '-li-{0}" class="xut-float" style="' + TRANSFORM + ':{1};z-index:' + zIndex + ';{2}"></div>',
         data.pid, base.initTransformParameter[0], overflow
     )
 

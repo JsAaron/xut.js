@@ -11,7 +11,6 @@
 import {createdom} from './dom'
 
 let config
-let _prefix
 let _layoutMode
 let pageIndex = 0
 
@@ -288,7 +287,7 @@ function toAnimation(navControlBar, navhandle, action) {
 
     var complete = function () {
         //恢复css
-        navControlBar.css(_prefix('transition'), '');
+        navControlBar.css(Xut.style.transition, '');
         Xut.View.HideBusy();
         lockAnimation = false;
     };
@@ -344,7 +343,6 @@ function load() {
  */
 function initconf(index) {
     config = Xut.config
-    _prefix = Xut.plat.prefixStyle
     _layoutMode = config.layoutMode
     pageIndex = index;
 }

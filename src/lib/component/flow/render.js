@@ -1,10 +1,8 @@
 import { config } from '../../config/index'
 import nextTick from '../../core/tick'
 
-const prefix = Xut.plat.prefixStyle
-const COLUMNWIDTH = prefix('column-width')
-const COLUMNTAP = prefix('column-gap')
-const TRANSFORM = prefix('transform')
+const COLUMNWIDTH = Xut.style.columnWidth
+const COLUMNTAP = Xut.style.columnGap
 
 /**
  * dom...

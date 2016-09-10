@@ -4,17 +4,15 @@
  * 2 isMobile
  * 3 isSurface
  */
-
-const plat = Xut.plat
-const TRANSITION_END = plat.TRANSITION_END
+const transitionEnd = Xut.style.transitionEnd
 
 //2015.3.23
 //可以点击与触摸
-const isSurface = plat.isSurface;
+const isSurface = Xut.plat.isSurface;
 
 //触发事件名
-const touchName = ['touchstart', 'touchmove', 'touchend', TRANSITION_END];
-const mouseName = ['mousedown', 'mousemove', 'mouseup', TRANSITION_END];
+const touchName = ['touchstart', 'touchmove', 'touchend', transitionEnd];
+const mouseName = ['mousedown', 'mousemove', 'mouseup', transitionEnd];
 
 //绑定事件名排序
 const orderName = {
@@ -31,12 +29,18 @@ const EVENT_NAME = function() {
             mouse: mouseName
         }
     }
-    return [plat.START_EV, plat.MOVE_EV, plat.END_EV, TRANSITION_END];
+    const hasTouch = Xut.plat.hasTouch
+    return [
+        hasTouch ? 'touchstart' : 'mousedown',
+        hasTouch ? 'touchmove' : 'mousemove',
+        hasTouch ? 'touchend' : 'mouseup',
+        transitionEnd
+    ]
 }()
 
 
-function _apply(events, callbacks, processor) {
-    _.each(callbacks, function(hooks, key) {
+const _apply = (events, callbacks, processor) => {
+    _.each(callbacks, (hooks, key) => {
         //必须存在回调处理器
         hooks && processor(events[orderName[key]], hooks)
     })
@@ -49,7 +53,7 @@ function _apply(events, callbacks, processor) {
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
-function _bind(context, events, callbacks) {
+const _bind = (context, events, callbacks) => {
     _apply(events, callbacks, (eventName, hook) => {
         context.addEventListener(eventName, hook, false)
     })
@@ -61,7 +65,7 @@ function _bind(context, events, callbacks) {
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
-function _off(context, events, callbacks) {
+const _off = (context, events, callbacks) => {
     _apply(events, callbacks, (eventName, hook) => {
         context.removeEventListener(eventName, hook, false)
     })
@@ -75,7 +79,7 @@ function _off(context, events, callbacks) {
  * @param  {Function} callback     [回调函数]
  * @return {[type]}                [description]
  */
-function exec(processor, eventContext, callback) {
+const exec = (processor, eventContext, callback) => {
     //如果两者都支持
     //鼠标与触摸
     if (isSurface) {
@@ -123,7 +127,7 @@ export function handle(callbacks, context, event) {
         case 'mouseup':
             callbacks.end && callbacks.end.call(context, event)
             break;
-        case TRANSITION_END:
+        case transitionEnd:
             callbacks.transitionend && callbacks.transitionend.call(context, event)
             break;
     }

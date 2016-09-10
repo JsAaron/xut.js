@@ -13,16 +13,18 @@ let prevEffect
 let currEffect
 let nextEffect
 
-const prefix = Xut.plat.prefixStyle
+const transitionDuration = Xut.style.transitionDuration
+const transform = Xut.style.transform
+const translateZ = Xut.style.translateZ
 
 const xxtTrans = (offset) => {
     offset = config.virtualMode ? offset / 2 : offset;
-    return "translate3d(" + offset + "px, 0, 0)";
+    return 'translate(' + offset + 'px,0px)' + translateZ
 }
 
 const dydTransform = (distance) => {
     distance = config.virtualMode ? distance / 2 : distance;
-    return prefix('transform') + ':' + 'translate3d(' + distance + 'px,0px,0px)'
+    return transform + ':' + 'translate(' + distance + 'px,0px)' + translateZ
 }
 
 
@@ -54,7 +56,7 @@ const initOptions = () => {
 const toTranslate3d = (context, distance, speed, element) => {
     distance = config.virtualMode ? distance / 2 : distance;
     if (element = element || context.element || context.$contentProcess) {
-        element.css(prefix('transform'), 'translate3d(' + distance + 'px,0px,0px)');
+        element.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
         if (config.pageFlip) {
             //修正pageFlip切换页面的处理
             //没有翻页效果
@@ -63,7 +65,7 @@ const toTranslate3d = (context, distance, speed, element) => {
                 cur.vm.$globalEvent.setAnimComplete(element);
             }
         } else {
-            element.css(prefix('transition-duration'), speed + "ms")
+            element.css(transitionDuration, speed + "ms")
         }
     }
 }
@@ -76,8 +78,8 @@ const toTranslate3d = (context, distance, speed, element) => {
 const reset = (context) => {
     var element
     if (element = context.element || context.$contentProcess) {
-        element.css(prefix('transition-duration'), '');
-        element.css(prefix('transform'), 'translate3d(0px,0px,0px)');
+        element.css(transitionDuration, '');
+        element.css(transform, 'translate(0px,0px)' + translateZ);
     }
 }
 
@@ -132,8 +134,7 @@ export const translation = {
  * @return {[type]} [description]
  */
 export function fix(element, translate3d) {
-    var transform = prefix('transform')
-    var translate3d = translate3d === 'prevEffect' ? prevEffect : nextEffect
+    translate3d = translate3d === 'prevEffect' ? prevEffect : nextEffect
     element.css(transform, translate3d)
 }
 

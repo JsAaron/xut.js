@@ -210,7 +210,7 @@ BookMark.prototype.iconManager = function(target) {
     $icon.css({
         'transform': 'scale(1.2)',
         'transition-duration': '500ms'
-    })[0].addEventListener(Xut.plat.TRANSITION_END, restore.bind(this), false);
+    })[0].addEventListener(Xut.style.transitionEnd, restore.bind(this), false);
 
 }
 
@@ -325,9 +325,8 @@ BookMark.prototype.restore = function() {
  * @return {[type]} [description]
  */
 BookMark.prototype.destroy = function() {
-    var dom = this.parent[0],
-        events = Xut.plat;
-
+    var dom = this.parent[0]
+    
     dom.removeEventListener('touchend', this, false);
     dom.removeEventListener('mouseup', this, false);
 
@@ -345,7 +344,7 @@ BookMark.prototype.destroy = function() {
 
     //按钮效果
     if (this.bookMarkIcon) {
-        this.bookMarkIcon[0].removeEventListener(events.TRANSITION_END, this.iconRestore, false);
+        this.bookMarkIcon[0].removeEventListener(Xut.style.transitionEnd, this.iconRestore, false);
         this.bookMarkIcon = null;
     }
 

@@ -1,6 +1,6 @@
 import { parseJSON } from '../../../../util/index'
 
-const prefix = Xut.plat.prefixStyle;
+const maskBoxImage = Xut.style.maskBoxImage
 
 /**
  * 蒙版动画
@@ -13,13 +13,13 @@ let maskContent = (data, wrapObj) => {
     let restr = ""
 
     //如果有蒙版图
-    let isMaskImg = data.mask ? prefix('mask-box-image') + ":url(" + Xut.config.pathAddress + data.mask + ");" : ""
+    let isMaskImg = data.mask ? maskBoxImage + ":url(" + Xut.config.pathAddress + data.mask + ");" : ""
 
     //蒙板图
     if (data.mask || wrapObj['isGif']) {
 
         //蒙版图
-        if (prefix('mask-box-image') != undefined) {
+        if (maskBoxImage != undefined) {
             restr += String.format(
                 '<img' +
                 ' id="img_{1}"' +

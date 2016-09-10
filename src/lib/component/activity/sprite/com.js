@@ -1,10 +1,8 @@
 import css3 from '../../plugin/css3'
 import keyframe from '../../plugin/keyframe'
 
-const prefix = Xut.plat.prefixStyle
-
 //判断是否支持css3属性
-const supportCss3Property = prefix('animation-play-state')
+const animationPlayState = Xut.style.animationPlayState
 
 /**
  * css3动画
@@ -15,5 +13,5 @@ const supportCss3Property = prefix('animation-play-state')
 export default function(options) {
     //timer,css
     var mode = options.mode || 'css';
-    return mode === 'css' && supportCss3Property ? css3(options) : keyframe(options)
+    return mode === 'css' && animationPlayState ? css3(options) : keyframe(options)
 }

@@ -4,7 +4,8 @@ import { config } from '../config/index'
  * 用css3实现的忙碌光标
  * @return {[type]} [description]
  */
-const prefix = Xut.plat.prefixStyle
+const transform = Xut.style.transform
+const animationDelay = Xut.style.animationDelay
 
 /**
  * 延时加载
@@ -56,9 +57,9 @@ export function createCursor() {
             '{{animation}}:-{{delay}}s">' +
             '</div>'
         container += _.template(html, {
-            transform: prefix('transform'),
+            transform: transform,
             rotate: deg[count],
-            animation: prefix('animation-delay'),
+            animation: animationDelay,
             delay: delay[count]
         })
     }

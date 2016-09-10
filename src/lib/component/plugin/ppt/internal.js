@@ -7,7 +7,8 @@ import {
     colorHexToRGB
 } from './util'
 
-let prefix = Xut.plat.prefixStyle
+const filter = Xut.style.filter
+
 export function internal(animproto) {
 
     //文字动画
@@ -2145,7 +2146,6 @@ export function internal(animproto) {
 
     //彩色脉冲
     animproto.getEffectFlicker = function (parameter, object, duration, delay, repeat) {
-         var filter = prefix('filter')
         if (!(filter in object[0].style)) return new TimelineMax();
         //if (repeat < 2) repeat = 2; //默认三次
         var color2 = parameter.color2 ? parameter.color2 : "#fff"; //颜色
@@ -2415,7 +2415,6 @@ export function internal(animproto) {
 
     //不饱和
     animproto.getEffectDesaturate = function (parameter, object, duration, delay, repeat) {
-        var filter = prefix('filter');
         if (!(filter in object[0].style)) return new TimelineMax();
         var saturation = parameter.saturation ? parameter.saturation : 0.5; //饱和度
         var t1 = new TimelineMax({
@@ -2443,7 +2442,6 @@ export function internal(animproto) {
 
     //加深
     animproto.getEffectDarken = function (parameter, object, duration, delay, repeat) {
-        var filter = prefix('filter')
         if (!(filter in object[0].style)) return new TimelineMax();
         var brightness = (parameter.brightness && parameter.brightness < 1) ? brightness.saturation : 0.5; //亮度
         var t1 = new TimelineMax({
@@ -2471,7 +2469,6 @@ export function internal(animproto) {
 
     //变淡
     animproto.getEffectLighten = function (parameter, object, duration, delay, repeat) {
-        var filter = prefix('filter')
         if (!(filter in object[0].style)) return new TimelineMax();
         var brightness = (parameter.brightness && parameter.brightness > 1) ? parameter.brightness : 1.5; //亮度
         var t1 = new TimelineMax({

@@ -1,9 +1,9 @@
-import { createTransform } from '../translation'
+import { createTransform } from '../../swipe/translation'
 
 const noop = function() {}
 
 export default function initstate(instance) {
-
+ 
     return {
         /**
          * 主线任务等待

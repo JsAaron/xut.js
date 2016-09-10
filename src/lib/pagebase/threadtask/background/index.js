@@ -1,7 +1,7 @@
 import { readFile } from '../../../util/option'
 import nextTick from '../../../core/tick'
 
-const prefix = Xut.plat.prefixStyle;
+const maskBoxImage = Xut.style.maskBoxImage
 
 /**
  * 构建背景类
@@ -185,7 +185,7 @@ function createMaster(svgContent, data) {
     //存在背景图
     if (imageLayerData) {
         //蒙版图（与背景图是组合关系）
-        maskLayer = data["imageMask"] ? prefix("mask-box-image") + ":url(" + data.path + data["imageMask"] + ");" : "";
+        maskLayer = data["imageMask"] ? maskBoxImage + ":url(" + data.path + data["imageMask"] + ");" : "";
         //图片层
         restr += '<div class="imageLayer" style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:2;background-size:100% 100%;background-image:url({5});{6};"></div>';
     }
@@ -211,8 +211,8 @@ function createMaster(svgContent, data) {
 
         if (backMaskData) {
             //带蒙版
-            if (prefix('mask-box-image') != undefined) {
-                restr += '<div class="backImage" style="width:{7};height:100%;position:absolute;z-index:1;background-size:100% 100%;background-image:url(' + data.path + backImageData + ');' + prefix('mask-box-image') + ':url(' + data.path + backMaskData + ');{8}"></div>';
+            if (maskBoxImage != undefined) {
+                restr += '<div class="backImage" style="width:{7};height:100%;position:absolute;z-index:1;background-size:100% 100%;background-image:url(' + data.path + backImageData + ');' + maskBoxImage + ':url(' + data.path + backMaskData + ');{8}"></div>';
             } else {
                 restr += '<canvas class="backImage edges" height=' + document.body.clientHeight + ' width=' + document.body.clientWidth + '  style="width:{7};opacity:0;height:100%;background-size:100% 100%;position:absolute;z-index:1;-webkit-mask-box-image:url(' + data.path + backMaskData + ');{8}" src=' + data.path + backImageData + ' mask=' + data.path + backMaskData + '></canvas>';
             }

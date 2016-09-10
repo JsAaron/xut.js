@@ -9,7 +9,7 @@
 import { config } from '../../../config/index'
 import nextTick from '../../../core/tick'
 
-const prefixStyle = Xut.plat.prefixStyle;
+const TANSFROM = Xut.style.transform
 
 const createli = function({
     data,
@@ -39,7 +39,7 @@ const createli = function({
               data-pageType="${pageType}"
               data-container="true" 
               style="overflow:hidden;
-                ${prefixStyle('transform')}:${transform};
+                ${TANSFROM}:${transform};
                 ${containerBackground}${customStyle}">
               ${virtualNode}
             </li>`

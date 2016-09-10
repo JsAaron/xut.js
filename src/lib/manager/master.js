@@ -30,9 +30,10 @@ const toArray = (filter) => {
     return filter;
 }
 
-const prefix = Xut.plat.prefixStyle
 const rword = "-"
-
+const transitionDuration = Xut.style.transitionDuration
+const transform = Xut.style.transform
+const translateZ = Xut.style.translateZ
 
 /**
  * parallaObjsCollection: Object
@@ -445,8 +446,8 @@ export default class MasterMgr extends Abstract {
         //最终改变视觉对象的坐标 //
         ////////////////
         if (effect) {
-            style[prefix('transition-duration')] = speed + 'ms';
-            style[prefix('transform')] = effect;
+            style[transitionDuration] = speed + 'ms';
+            style[transform] = effect;
             rootNode.css(style);
         }
     }
@@ -532,8 +533,10 @@ export default class MasterMgr extends Abstract {
             function toMove(distance, speed) {
                 var element = parallaxObj.element;
                 if (element) {
-                    element.css(prefix('transition-duration'), speed + 'ms');
-                    element.css(prefix('transform'), 'translate3d(' + distance + 'px,0px,0px)');
+                    element.css(transitionDuration, speed + 'ms');
+                    //scrollerStyle[transform] = 'translate(' + x + 'px,' + y + 'px)' + this.translateZ;
+                    //element.css(transform, 'translate3d(' + distance + 'px,0px,0px)');
+                    element.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
                 }
             }
 

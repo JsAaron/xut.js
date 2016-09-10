@@ -5,11 +5,11 @@
  */
 import { parseJSON } from '../../util/index'
 
-const prefix = Xut.plat.prefixStyle
-const KEYFRAMES = Xut.plat.KEYFRAMES
-const ANIMATION_END = Xut.plat.ANIMATION_END
-const playState = prefix('animation-play-state')
-const prefixAnims = prefix('animation')
+const style = Xut.style
+const keyframes = style.keyframes
+const animationEnd = style.animationEnd
+const playState = style.animationPlayState
+const prefixAnims = style.animation
 
 let styleElement = null
 
@@ -168,8 +168,8 @@ export default function css3(options) {
      * @param {[type]} rule [description]
      */
     function setKeyframes(rule) {
-        if (KEYFRAMES) {
-            insertCSSRule(KEYFRAMES + rule);
+        if (keyframes) {
+            insertCSSRule(keyframes + rule);
         }
     }
 
@@ -181,7 +181,7 @@ export default function css3(options) {
 
     initStyle($element, rule1);
     setKeyframes(rule2);
-    $element.on(ANIMATION_END, callback);
+    $element.on(animationEnd, callback);
 
     return {
 
@@ -196,7 +196,7 @@ export default function css3(options) {
         destroy: function() {
             //停止精灵动画
             deleteCSSRule(aniName);
-            $element.off(ANIMATION_END, callback);
+            $element.off(animationEnd, callback);
             $element = null;
         }
 

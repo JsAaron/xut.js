@@ -4,6 +4,7 @@
 
 import { config } from '../../config/index'
 
+const transform = Xut.style.transform
 
 /**
  * 变化节点的css3transform属性
@@ -19,8 +20,7 @@ function transformNodes(rootNode, property, pageOffset) {
         x = 0,
         y = 0,
         z = 0,
-        round = Math.round,
-        prefix = Xut.plat.prefixStyle;
+        round = Math.round;
 
     //浮动对象初始化偏移量
     parallaxOffset = pageOffset;
@@ -55,7 +55,7 @@ function transformNodes(rootNode, property, pageOffset) {
     }
 
     if (effect) {
-        style[prefix('transform')] = effect;
+        style[transform] = effect;
         rootNode.css(style);
     }
 

@@ -33,7 +33,6 @@ const getDate = () => {
     return +new Date
 }
 
-const PREFIXSTYLE = Xut.plat.prefixStyle
 const LINEARTAG = 'data-viewlinear'
 
 /**
@@ -124,7 +123,7 @@ export default class Swipe extends Observer {
     _initTransform(distance) {
         if (this.options.linear) {
             this._initDistance = -this._hindex * (this._viewWidth + this._extraGap)
-            this.element.style[PREFIXSTYLE('transform')] = `translate3d(${this._initDistance}px,0px,0px)`
+            this.element.style[Xut.style.transform] = `translate(${this._initDistance}px,0px) + Xut.style.translateZ`
         }
 
     }

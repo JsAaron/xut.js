@@ -249,7 +249,7 @@ export default class PageMgr extends Abstract {
             }
 
             //IE上不支持蒙版效果的处理
-            if (Xut.plat.noMaskBoxImage) {
+            if (Xut.style.noMaskBoxImage) {
                 addEdges();
             }
 
