@@ -2,7 +2,10 @@ import { destroy as _destroy } from '../depend/multievent'
 
 export default function(baseProto) {
 
-    //销毁页面对象
+    /**
+     * 销毁页面对象
+     * @return {[type]} [description]
+     */
     baseProto.baseDestroy = function() {
 
         //清理图片缓存
@@ -18,16 +21,18 @@ export default function(baseProto) {
 
         //流式布局对象
         //2016.9.10
-        let _flows = this._flows.get()
+        const _flows = this._flows.get()
         if (_flows.length) {
             _flows.forEach(flowObj => {
                 flowObj.destroy()
+                flowObj = null
             })
+            this._flows = null
         }
 
 
         //清理线程任务块
-        var cacheTasks, key, tasks;
+        let cacheTasks, key, tasks;
         if (cacheTasks = this.createRelated.cacheTasks) {
             for (key in cacheTasks) {
                 if (tasks = cacheTasks[key]) {
@@ -37,16 +42,16 @@ export default function(baseProto) {
         }
 
         //浮动对象
-        var floatMaterContents = this.floatContents.Master
+        const floatMaterContents = this.floatContents.Master
 
         //是否有浮动对象
-        var hasFloatMater = !_.isEmpty(floatMaterContents);
+        const hasFloatMater = !_.isEmpty(floatMaterContents);
 
         //清理content类型对象
-        var contents;
+        let contents
         if (contents = this._abActivitys.get()) {
-            contents.forEach(function(contentObj) {
-                contentObj.destroy(function(destroyObj) {
+            contents.forEach(contentObj => {
+                contentObj.destroy(destroyObj => {
                     //如果不是浮动对象,清理元素引用
                     if (!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
                         destroyObj.$contentProcess = null;
@@ -66,9 +71,9 @@ export default function(baseProto) {
         }
 
         //清理零件类型对象
-        var _components;
+        let _components;
         if ((_components = this.baseGetComponent())) {
-            _components.length && _components.forEach(function(componentObj) {
+            _components.length && _components.forEach(componentObj => {
                 componentObj.destroy && componentObj.destroy();
             })
         }
