@@ -18,56 +18,34 @@ const createli = function({
     containerBackground
 } = {}) {
 
-    let html
     let offsetLeft = 0
     let proportion = config.proportion
     let calculate = proportion.calculateContainer()
     let sWidth = calculate.width
     let pageType = data.pageType
-    let virtualMode = config.virtualMode
     let virtualNode = ''
 
-    if (virtualMode) {
+    if (config.virtualMode) {
         if (data.virtualOffset === 'right') {
             offsetLeft = -(config.screenSize.width - proportion.offsetLeft);
         }
-        virtualNode =
-            '<div style=' +
-            '"' +
-            'width:{{sWidth}}px;' +
-            'left:{{offsetLeft}}px;' +
-            'height:100%;' +
-            'position:relative' +
-            '">' +
-            '</div>'
-
-        virtualNode = _.template(virtualNode, {
-            sWidth: sWidth,
-            offsetLeft: offsetLeft
-        })
+        virtualNode = `<div style="width:${sWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
     }
 
-    html =
-        '<li ' +
-        'id="{{id}}" ' +
-        'class="xut-flip" ' +
-        'data-map="{{pid}}" ' +
-        'data-pageType="{{pageType}}" ' +
-        'data-container="true" ' +
-        'style="overflow:hidden;{{prefixStyle}}:{{transform}};{{containerBackground}}{{customStyle}}">' +
-        '{{virtualNode}}' +
-        '</li>'
+    return String.styleFormat(
+        `<li id="${data.prefix}" 
+              class="xut-flip" 
+              data-map="${data.pid}" 
+              data-pageType="${pageType}"
+              data-container="true" 
+              style="overflow:hidden;
+                ${prefixStyle('transform')}:${transform};
+                ${containerBackground}${customStyle}">
+              ${virtualNode}
+            </li>`
+    )
 
-    return _.template(html, {
-        id: data.prefix,
-        pid: data.pid,
-        pageType: pageType,
-        prefixStyle: prefixStyle('transform'),
-        transform: transform,
-        containerBackground: containerBackground,
-        customStyle: customStyle,
-        virtualNode: virtualNode
-    })
+
 }
 
 

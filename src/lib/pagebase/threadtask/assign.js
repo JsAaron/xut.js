@@ -54,14 +54,14 @@ export default {
             let pageData = base.baseData();
             parseMode(pageData, base)
             TaskContainer({
-                'rootNode': base.root,
-                'prefix': base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId,
-                'pageType': base.pageType,
-                'pid': base.pid,
-                'baseData': pageData,
-                'virtualOffset': base.virtualOffset,
-                'initTransformParameter': base.createRelated.initTransformParameter,
-                'userStyle': base.userStyle //创建自定义style
+                'rootNode'               : base.root,
+                'prefix'                 : base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId,
+                'pageType'               : base.pageType,
+                'pid'                    : base.pid,
+                'baseData'               : pageData,
+                'virtualOffset'          : base.virtualOffset,
+                'initTransformParameter' : base.createRelated.initTransformParameter,
+                'userStyle'              : base.userStyle //创建自定义style
             }, taskCallback)
         })
     },
@@ -94,9 +94,9 @@ export default {
             //构建中断回调
             suspendCallback = (innerNextTasks, innerSuspendTasks) => {
                 base.nextTasks({
-                    'taskName': '内部background',
-                    'outSuspendTasks': innerSuspendTasks,
-                    'outNextTasks': innerNextTasks
+                    'taskName'        : '内部background',
+                    'outSuspendTasks' : innerSuspendTasks,
+                    'outNextTasks'    : innerNextTasks
                 });
             },
             //获取数据成功回调
@@ -123,9 +123,9 @@ export default {
             //构建中断回调
             suspendCallback = (innerNextTasks, innerSuspendTasks) => {
                 base.nextTasks({
-                    'taskName': '内部widgets',
-                    'outSuspendTasks': innerSuspendTasks,
-                    'outNextTasks': innerNextTasks
+                    'taskName'        : '内部widgets',
+                    'outSuspendTasks' : innerSuspendTasks,
+                    'outNextTasks'    : innerNextTasks
                 });
             },
             //获取数据成功回调
@@ -134,15 +134,15 @@ export default {
             };
 
         base.createRelated.cacheTasks['components'] = new TaskComponents({
-            'rootNode': base.getElement(),
-            'nodes': chapterDas['nodes'],
-            'pageOffset': chapterDas['pageOffset'],
-            'activitys': base.baseActivits(),
-            'chpaterData': baseData,
-            'chapterId': baseData['_id'],
-            'pid': base.pid,
-            'pageType': base.pageType,
-            'virtualOffset': base.virtualOffset
+            'rootNode'      : base.getElement(),
+            'nodes'         : chapterDas['nodes'],
+            'pageOffset'    : chapterDas['pageOffset'],
+            'activitys'     : base.baseActivits(),
+            'chpaterData'   : baseData,
+            'chapterId'     : baseData['_id'],
+            'pid'           : base.pid,
+            'pageType'      : base.pageType,
+            'virtualOffset' : base.virtualOffset
         }, suspendCallback, successCallback);
     },
 
@@ -163,7 +163,7 @@ export default {
         }
 
         var chapterDas = base.chapterDas,
-            baseData = base.baseData(),
+            baseData  = base.baseData(),
             chapterId = baseData['_id'],
             activitys = base.baseActivits(),
 
@@ -183,10 +183,10 @@ export default {
                         interrupt = true;
                     }
                     base.nextTasks({
-                        'interrupt': interrupt,
-                        'taskName': '内部contents',
-                        'outSuspendTasks': innerSuspendTasks,
-                        'outNextTasks': innerNextTasks
+                        'interrupt'       : interrupt,
+                        'taskName'        : '内部contents',
+                        'outSuspendTasks' : innerSuspendTasks,
+                        'outNextTasks'    : innerNextTasks
                     });
                 },
                 //获取数据成功回调
@@ -197,20 +197,20 @@ export default {
 
 
         base.createRelated.cacheTasks['contents'] = new TaskContents({
-            'canvasRelated': base.canvasRelated,
-            'rootNode': base.root,
-            'element': base.getElement(),
-            'pageType': base.pageType,
-            'nodes': chapterDas['nodes'],
-            'pageOffset': chapterDas['pageOffset'],
-            'activitys': activitys,
-            'chpaterData': baseData,
-            'chapterId': chapterId,
-            'pageIndex': base.pageIndex,
-            'pid': base.pid,
-            'pageBaseHooks': pageBaseHooks,
-            'virtualOffset': base.virtualOffset,
-            'initTransformParameter': base.createRelated.initTransformParameter
+            'canvasRelated'          : base.canvasRelated,
+            'rootNode'               : base.root,
+            'element'                : base.getElement(),
+            'pageType'               : base.pageType,
+            'nodes'                  : chapterDas['nodes'],
+            'pageOffset'             : chapterDas['pageOffset'],
+            'activitys'              : activitys,
+            'chpaterData'            : baseData,
+            'chapterId'              : chapterId,
+            'pageIndex'              : base.pageIndex,
+            'pid'                    : base.pid,
+            'pageBaseHooks'          : pageBaseHooks,
+            'virtualOffset'          : base.virtualOffset,
+            'initTransformParameter' : base.createRelated.initTransformParameter
         });
     }
 }

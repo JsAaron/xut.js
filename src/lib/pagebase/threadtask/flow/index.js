@@ -5,8 +5,5 @@ import Flow from '../../../component/flow/index'
  * 流式排版
  */
 export default function(base, successCallback) {
-
-	
-
-    base._flows.register(new Flow(base,successCallback))
+    base._flows.register(new Flow(base, successCallback))
 }
