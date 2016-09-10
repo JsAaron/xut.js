@@ -4,8 +4,6 @@ import nextTick from '../../nexttick'
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
 
-console.log(COLUMNWIDTH)
-
 /**
  * dom...
  */

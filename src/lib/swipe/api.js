@@ -132,8 +132,8 @@ export default function api(Swipe) {
     Swipe.prototype.destroy = function() {
         this._evtDestroy();
         this.$off();
-        this.bubbleNode.page = null;
-        this.bubbleNode.master = null;
+        this._bubbleNode.page = null;
+        this._bubbleNode.master = null;
         this.element = null;
     }
 
@@ -158,7 +158,7 @@ export default function api(Swipe) {
             _hindex = this._hindex,
             sectionRang = this.sectionRang,
             //找到对应的li
-            childNodes = this.bubbleNode[pageType].childNodes,
+            childNodes = this._bubbleNode[pageType].childNodes,
             numNodes = childNodes.length;
 
         while (numNodes--) {

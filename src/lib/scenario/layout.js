@@ -87,9 +87,9 @@ export function home() {
 
         ' <div id="controlBar" class="xut-controlBar hide"></div>' +
         //页面节点
-        ' <ul id="pageContainer" class="xut-flip"></ul>' +
+        ' <ol id="pageContainer" class="xut-flip"></ol>' +
         //视觉差包装容器
-        ' <ul id="masterContainer" class="xut-master xut-flip"></ul>' +
+        ' <ol id="masterContainer" class="xut-master xut-flip"></ol>' +
         //滑动菜单
         ' {{navBar}}' +
         //消息提示框
