@@ -1,5 +1,5 @@
 import { config } from '../../config/index'
-import { translation } from '../../pagebase/translation'
+import { translation } from '../../swipe/translation'
 import Swipe from '../../swipe/index'
 import render from './render'
 
@@ -16,8 +16,9 @@ export default class Flow {
     constructor(base, callback) {
 
         const self = this
+
         this.callback = callback
-        this.base = base
+        this.initIndex = base.pageIndex
 
         const rootNode = base.element
         const chapterId = base.chapterId
@@ -30,10 +31,18 @@ export default class Flow {
             chapterId,
             callback($container, $content) {
                 self._init($container, $content)
+                callback()
             }
         })
     }
 
+
+    /**
+     * 初始化
+     * @param  {[type]} $container [description]
+     * @param  {[type]} $content   [description]
+     * @return {[type]}            [description]
+     */
     _init($container, $content) {
 
         //分段数
@@ -43,21 +52,34 @@ export default class Flow {
         const MAX = pagesCount - 1
         const viewWidth = config.viewSize.width
         const gapWidth = 20
+        const View = Xut.View
 
-        const swipe = new Swipe({
+        const swipe = this.swipe = new Swipe({
             borderBounce: true,
             linear: true,
-            initIndex: Xut.Presentation.GetPageIndex() > this.base.pageIndex ? MAX : MIN,
+            initIndex: Xut.Presentation.GetPageIndex() > this.initIndex ? MAX : MIN,
             extraGap: gapWidth,
             container: $content[0],
             pageFlip: 0,
             multiplePages: 1,
-            stopPropagation:true,
+            stopPropagation: true,
             pagetotal: pagesCount
         })
 
         let moveDistance = 0
         let lastDistance = swipe._initDistance
+
+
+        /**
+         * 触屏松手点击
+         * 无滑动
+         */
+        swipe.$watch('onTap', (pageIndex, hookCallback) => {
+            if (!Xut.Contents.Canvas.getIsTap()) {
+                View.Toolbar()
+            }
+        });
+
 
         swipe.$watch('onMove', function({
             action,
@@ -91,17 +113,17 @@ export default class Flow {
             //首尾连接主页
             if (this._hindex === MIN && this.direction === 'prev') {
                 if (action === 'flipOver') {
-                    Xut.View.GotoPrevSlide()
+                    View.GotoPrevSlide()
                     this._unlock()
                 } else {
-                    Xut.View.MovePage(moveDistance, speed, this.direction, action)
+                    View.MovePage(moveDistance, speed, this.direction, action)
                 }
             } else if (this._hindex === MAX && this.direction === 'next') {
                 if (action === 'flipOver') {
-                    Xut.View.GotoNextSlide()
+                    View.GotoNextSlide()
                     this._unlock()
                 } else {
-                    Xut.View.MovePage(currentDist, speed, this.direction, action)
+                    View.MovePage(currentDist, speed, this.direction, action)
                 }
             } else {
                 translation[action]({}, moveDistance, speed, $content)
@@ -112,152 +134,18 @@ export default class Flow {
 
         swipe.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
             lastDistance = moveDistance
-            console.log(123)
             unfliplock()
         })
 
-        this.callback()
     }
 
 
-    _init1($container, $content) {
-
-        //分段数
-        const pagesCount = this._resolveHeight($content)
-
-        const MIN = 0
-        const MIX = pagesCount + 1
-        const viewWidth = config.viewSize.width / 6
-
-        $content.width(config.viewSize.width * MIX)
-
-        const iscroll = this.iscroll = new iScroll($container[0], {
-            scrollX: true,
-            scrollY: false,
-            momentum: false,
-            bounce: false,
-            snap: true,
-            snapSpeed: 500,
-            keyBindings: true,
-            fadeScrollbars: false,
-            probeType: 3
-        })
-
-        if (Xut.Presentation.GetPageIndex() > this.base.pageIndex) {
-            iscroll.goToPage(config.viewSize.width * MIX, 0, 0, 0)
-        }
-
-        //回调N次
-        //只触发一次有效的
-        let oneHandle = false
-
-        iscroll.on('beforeScrollStart', function(e) {
-            oneHandle = true
-        })
-
-        const move = function(distX, action) {
-            //减少抖动
-            //算一次有效的滑动
-            //移动距离必须25px才开始移动
-            if (Math.abs(distX) <= 25) return;
-            let delayX = 0;
-            //需要叠加排除值
-            if (distX < 0) {
-                delayX = 20;
-            } else {
-                delayX = (-20);
-            }
-            Xut.View.MovePage(distX + delayX, 0, action, 'flipMove')
-        }
-
-        iscroll.on('scroll', function(e) {
-            if (!this.distX || !oneHandle) return
-            if (this.directionLocked === 'h') {
-                if (this.currentPage.pageX == MIN) {
-                    if (this.directionX < 0 && this.absStartX == 0) {
-                        move(this.distX, 'prev')
-                    }
-                }
-                if (this.currentPage.pageX == MIX - 1) {
-                    if (this.directionX > 0) {
-                        move(this.distX, 'next')
-                    }
-                }
-            }
-        })
-
-
-        const end = (distX, action, exec) => {
-            const duration = new Date().getTime() - this.startTime
-            const deltaX = Math.abs(distX)
-            const isValidSlide = Number(duration) < 200 && deltaX > 30 || deltaX > viewWidth
-            if (isValidSlide) {
-                exec()
-            } else {
-                Xut.View.MovePage(0, 300, action, 'flipRebound')
-            }
-        }
-
-
-        iscroll.on('scrollEnd', function(e) {
-            if (!oneHandle) {
-                return
-            }
-            oneHandle = false
-            if (this.directionLocked === 'h') {
-                if (this.currentPage.pageX == MIN) {
-                    end(this.distX, 'prev', Xut.View.GotoPrevSlide)
-                }
-                if (this.currentPage.pageX == MIX - 1) {
-                    end(this.distX, 'next', Xut.View.GotoNextSlide)
-                }
-            }
-        })
-
-
-
-        // const swipe = new Swipe({
-        //     initIndex: 0,
-        //     container: $content[0],
-        //     pageFlip: 0,
-        //     multiplePages: 1,
-        //     pagetotal: pagesCount
-        // })
-
-        // let moveDistance = 0
-        // let lastDistance = 0
-
-        // swipe.$watch('onMove', function({
-        //     action,
-        //     speed,
-        //     distance,
-        //     leftIndex,
-        //     pageIndex,
-        //     rightIndex,
-        //     direction
-        // } = {}) {
-
-        //     moveDistance = calculateDistance(action, distance, direction)[1]
-
-        //     switch (direction) {
-        //         case 'next':
-        //             moveDistance = moveDistance - gapWidth + lastDistance
-        //             break
-        //         case 'prev':
-        //             moveDistance = moveDistance + gapWidth + lastDistance
-        //             break
-        //     }
-
-        //     translation[action]({}, moveDistance, speed, $content)
-        // })
-
-
-        // swipe.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
-        //     lastDistance = moveDistance
-        //     unfliplock()
-        // })
-
-        this.callback()
+    /**
+     * 销毁
+     * @return {[type]} [description]
+     */
+    destroy() {
+        this.swipe && this.swipe.destroy()
     }
 
 
@@ -273,6 +161,4 @@ export default class Flow {
         }
         return Math.floor(paraHeight / config.viewSize.height)
     }
-
-
 }

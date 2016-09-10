@@ -1,4 +1,4 @@
-import { fix as _fix } from '../../pagebase/translation'
+import { fix as _fix } from '../../swipe/translation'
 
 /**
  * 跳转之前提高层级问题

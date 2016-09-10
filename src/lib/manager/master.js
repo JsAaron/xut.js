@@ -4,7 +4,7 @@
  * @return {[type]}
  */
 import { Abstract } from './abstract'
-import { translation } from '../pagebase/translation'
+import { translation } from '../swipe/translation'
 import { Pagebase } from '../pagebase/pagebase'
 
 import {

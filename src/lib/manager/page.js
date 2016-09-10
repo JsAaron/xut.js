@@ -5,7 +5,7 @@
  */
 import { Abstract } from './abstract'
 import { Pagebase } from '../pagebase/pagebase'
-import { translation } from '../pagebase/translation'
+import { translation } from '../swipe/translation'
 import { addEdges } from '../util/edge'
 import { removeVideo } from '../component/video/manager'
 import { injectScript, extend } from '../util/index'

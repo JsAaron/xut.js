@@ -15,6 +15,17 @@ export default function(baseProto) {
             console.log('销毁图片出错')
         }
 
+
+        //流式布局对象
+        //2016.9.10
+        let _flows = this._flows.get()
+        if (_flows.length) {
+            _flows.forEach(flowObj => {
+                flowObj.destroy()
+            })
+        }
+
+
         //清理线程任务块
         var cacheTasks, key, tasks;
         if (cacheTasks = this.createRelated.cacheTasks) {
