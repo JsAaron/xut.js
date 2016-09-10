@@ -8,11 +8,11 @@ const transitionEnd = Xut.style.transitionEnd
 
 //2015.3.23
 //可以点击与触摸
-const isSurface = Xut.plat.isSurface;
+const isSurface = Xut.plat.isSurface
 
 //触发事件名
-const touchName = ['touchstart', 'touchmove', 'touchend', transitionEnd];
-const mouseName = ['mousedown', 'mousemove', 'mouseup', transitionEnd];
+const touchName = ['touchstart', 'touchmove', 'touchend', transitionEnd]
+const mouseName = ['mousedown', 'mousemove', 'mouseup', transitionEnd]
 
 //绑定事件名排序
 const orderName = {
@@ -22,7 +22,7 @@ const orderName = {
     transitionend: 3
 }
 
-const EVENT_NAME = function() {
+const EVENT_NAME = (() => {
     if (isSurface) {
         return {
             touch: touchName,
@@ -36,14 +36,11 @@ const EVENT_NAME = function() {
         hasTouch ? 'touchend' : 'mouseup',
         transitionEnd
     ]
-}()
+})()
 
 
 const _apply = (events, callbacks, processor) => {
-    _.each(callbacks, (hooks, key) => {
-        //必须存在回调处理器
-        hooks && processor(events[orderName[key]], hooks)
-    })
+    _.each(callbacks, (hooks, key) => hooks && processor(events[orderName[key]], hooks))
 }
 
 
@@ -54,9 +51,7 @@ const _apply = (events, callbacks, processor) => {
  * @return {[type]} [description]
  */
 const _bind = (context, events, callbacks) => {
-    _apply(events, callbacks, (eventName, hook) => {
-        context.addEventListener(eventName, hook, false)
-    })
+    _apply(events, callbacks, (eventName, hook) => context.addEventListener(eventName, hook, false))
 }
 
 /**
@@ -66,9 +61,7 @@ const _bind = (context, events, callbacks) => {
  * @return {[type]} [description]
  */
 const _off = (context, events, callbacks) => {
-    _apply(events, callbacks, (eventName, hook) => {
-        context.removeEventListener(eventName, hook, false)
-    })
+    _apply(events, callbacks, (eventName, hook) => context.removeEventListener(eventName, hook, false))
 }
 
 
@@ -83,9 +76,7 @@ const exec = (processor, eventContext, callback) => {
     //如果两者都支持
     //鼠标与触摸
     if (isSurface) {
-        // touch :['touchstart','touchmove','touchend'],
-        // mouse :['mousedown','mousemove','mouseup']
-        _.each(EVENT_NAME, function(events) {
+        _.each(EVENT_NAME, events => {
             processor(eventContext, events, callback);
         })
     } else {
