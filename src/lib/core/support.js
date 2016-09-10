@@ -39,34 +39,42 @@
     var location = document.location.href
     var boolBrowser = location.indexOf('http') > -1 || location.indexOf('https') > -1;
 
+
     /**
      * 私有前缀
      * @type {[type]}
      */
-    var _elementStyle = document.createElement('div').style;
-    var _vendor = (function() {
-        var vendors = ['t', 'webkitT', 'MozT', 'msT', 'OT'],
-            transform,
-            i = 0,
-            l = vendors.length;
-
-        for (; i < l; i++) {
-            transform = vendors[i] + 'ransform';
-            if (transform in _elementStyle) return vendors[i].substr(0, vendors[i].length - 1);
-        }
-
-        return false;
-    })();
-
-    function _prefixStyle(style) {
-        if (_vendor === false) {
-            return false
-        }
-        if (_vendor === '') {
-            return style
-        }
-        return _vendor + style.charAt(0).toUpperCase() + style.substr(1);
+    var rdashAlpha = /-([a-z]|[0-9])/ig
+    var rmsPrefix = /^-ms-/
+    var fcamelCase = function(all, letter) {
+        return (letter + '').toUpperCase();
     }
+    var camelCase = function(string) {
+        return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
+    }
+    var PREFIX = ['webkit', 'Moz', 'ms', 'o']
+    var _elementStyle = document.createElement('div').style
+    var _cache = Object.create(null)
+    var _prefixStyle = function(attr) {
+        var name
+        //缓存中存在
+        if (_cache[attr]) {
+            return _cache[attr];
+        }
+        //不需要加前缀
+        if (attr in _elementStyle) {
+            return _cache[attr] = attr;
+        }
+        //需要加前缀
+        PREFIX.forEach(function(v) {
+            if (camelCase(v + '-' + attr) in _elementStyle) {
+                name = '-' + v + '-' + attr;
+                return _cache[attr] = name;
+            }
+        })
+        return name;
+    }
+
 
 
     /**
@@ -171,7 +179,7 @@
      */
     var hasPerspective = _prefixStyle('perspective') in _elementStyle
     var translateZ = hasPerspective ? ' translateZ(0)' : ''
-    var maskBoxImage = _prefixStyle('maskBoxImage')
+    var maskBoxImage = _prefixStyle('mask-box-image')
 
     /**
      * 样式style支持
@@ -197,10 +205,10 @@
          */
         transform: _prefixStyle('transform'),
         transition: _prefixStyle('transition'),
-        transitionDuration: _prefixStyle('transitionDuration'),
-        transitionDelay: _prefixStyle('transitionDelay'),
-        transformOrigin: _prefixStyle('transformOrigin'),
-        transitionTimingFunction: _prefixStyle('transitionTimingFunction'),
+        transitionDuration: _prefixStyle('transition-duration'),
+        transitionDelay: _prefixStyle('transition-delay'),
+        transformOrigin: _prefixStyle('transform-origin'),
+        transitionTimingFunction: _prefixStyle('transition-timing-function'),
         transitionEnd: transitionEnd,
 
         /**
@@ -208,8 +216,8 @@
          * @type {[type]}
          */
         animation: animation,
-        animationDelay: _prefixStyle('animationDelay'),
-        animationPlayState: _prefixStyle('animationPlayState'),
+        animationDelay: _prefixStyle('animation-delay'),
+        animationPlayState: _prefixStyle('animation-play-state'),
         animationEnd: animationEnd,
         keyframes: keyframes,
 
@@ -224,15 +232,15 @@
          * @type {[type]}
          */
         filter: _prefixStyle('filter'),
-        maskBoxImage: _prefixStyle('maskBoxImage'),
-        borderRadius: _prefixStyle('borderRadius'),
+        maskBoxImage: maskBoxImage,
+        borderRadius: _prefixStyle('border-radius'),
 
         /**
          * css3分栏
          * @type {[type]}
          */
-        columnWidth: _prefixStyle('columnWidth'),
-        columnGap: _prefixStyle('columnGap')
+        columnWidth: _prefixStyle('column-width'),
+        columnGap: _prefixStyle('column-gap')
     }
 
 })()
