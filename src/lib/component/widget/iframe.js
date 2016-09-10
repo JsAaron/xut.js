@@ -1,5 +1,5 @@
 import { clearVideo } from '../../component/video/manager'
-import nextTick from '../../core/tick'
+import nextTick from '../../nexttick'
 
 /**
  * 创建iframe零件包装器

@@ -8,7 +8,7 @@
  */
 
 import { suspendHandles, promptMessage } from '../../global-stop'
-import nextTick from '../../core/tick'
+import nextTick from '../../nexttick'
 
 export class ActionClass {
 

@@ -7,7 +7,7 @@
  *      3 创建失败
  */
 import { config } from '../../../config/index'
-import nextTick from '../../../core/tick'
+import nextTick from '../../../nexttick'
 
 const TANSFROM = Xut.style.transform
 

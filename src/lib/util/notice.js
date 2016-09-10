@@ -6,7 +6,7 @@
  * @return {[type]}         [description]
  */
 
-import nextTick from '../core/tick'
+import nextTick from '../nexttick'
 
 let msgBox
 let toolTip

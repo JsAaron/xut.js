@@ -1,4 +1,4 @@
-import { bindTap, offTap } from '../../core/tap'
+import { bindTap, offTap } from '../../tap'
 
 /**
  * audio对象下标

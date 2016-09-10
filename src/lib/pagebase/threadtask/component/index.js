@@ -8,7 +8,7 @@
  */
 import directives from '../../../directive/index'
 import { reviseSize } from '../../../util/option'
-import nextTick from '../../../core/tick'
+import nextTick from '../../../nexttick'
 
 
 export default function TaskComponents(data, suspendCallback, successCallback) {

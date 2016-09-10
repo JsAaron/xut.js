@@ -1,5 +1,5 @@
 import { nav as navlayout } from '../../scenario/layout'
-import nextTick from '../../core/tick'
+import nextTick from '../../nexttick'
 
 /**
  * 创建dom

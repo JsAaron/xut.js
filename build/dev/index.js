@@ -16,7 +16,7 @@ const portoccupied = require('../occupied')
 const convert = require('../convert')
 const dataInit = require('./data')
 const spinner = ora('【Begin to pack , Please wait for】\n')
-spinner.start()
+// spinner.start()
 
 const app = express()
 const config = require('../../config')

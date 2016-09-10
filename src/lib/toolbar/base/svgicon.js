@@ -9,7 +9,7 @@
  * http://www.codrops.com
  */
 
-import { bindTap } from '../../core/tap'
+import { bindTap } from '../../tap'
 
 /*** helper functions ***/
 

@@ -7,7 +7,7 @@
  *      行为动画绑定类     Content
  *
  * ***************************************************/
-import nextTick from '../../../core/tick'
+import nextTick from '../../../nexttick'
 import { parseJSON, arrayUnique } from '../../../util/index'
 import { parserRelated as conParser } from './data'
 import { structure as conStructure } from './structure/index'

@@ -1,4 +1,4 @@
-import nextTick from '../core/tick'
+import nextTick from '../nexttick'
 import { home, scene } from './layout'
 import { parseJSON } from '../util/index'
 import { sceneController } from './controller'

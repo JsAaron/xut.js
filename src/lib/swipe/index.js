@@ -6,7 +6,7 @@ import {
     bindTap,
     offTap,
     handle
-} from '../core/tap'
+} from '../tap'
 
 import {
     initPointer,

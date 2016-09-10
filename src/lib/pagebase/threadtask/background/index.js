@@ -1,5 +1,5 @@
 import { readFile } from '../../../util/option'
-import nextTick from '../../../core/tick'
+import nextTick from '../../../nexttick'
 
 const maskBoxImage = Xut.style.maskBoxImage
 

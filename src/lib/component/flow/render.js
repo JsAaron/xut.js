@@ -1,5 +1,5 @@
 import { config } from '../../config/index'
-import nextTick from '../../core/tick'
+import nextTick from '../../nexttick'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap

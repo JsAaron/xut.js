@@ -1,4 +1,4 @@
-import { bindTap, offTap } from '../../../core/tap'
+import { bindTap, offTap } from '../../../tap'
 
 /**
  * ie10下面mouse事件怪异
