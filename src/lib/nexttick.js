@@ -19,17 +19,16 @@ const MutationObserver = window.MutationObserver ||
 const implementation = DOC.implementation.hasFeature("MutationEvents", "2.0")
 
 
-export default function nextTick(opts, callback, context) {
+export default function nextTick({
+    container,
+    content,
+    position,
+    delay = 0
+} = {}, callback, context) {
 
-    var container, content, delay, position, animatId, tick, observer
-
-    container = opts.container
-    content = opts.content
-    delay = opts.delay || 0
-    position = opts.position
-    animatId = 'T' + (Math.random() * 10000 << 1)
-    tick = DOC.createElement('input')
-    observer = null
+    const animatId = 'T' + (Math.random() * 10000 << 1)
+    let tick = DOC.createElement('input')
+    let observer = null
 
     if (!container || !content) {
         return;
@@ -50,7 +49,7 @@ export default function nextTick(opts, callback, context) {
 
     //检查内容
     if (typeof content === 'string') {
-        var temp = $(content);
+        let temp = $(content);
         if (!temp[0]) {
             //纯文本内容
             temp = DOC.createTextNode(content);
@@ -59,8 +58,11 @@ export default function nextTick(opts, callback, context) {
         content = temp;
     }
 
-    //组装内容到临时片段
-    function _createFragment() {
+    /**
+     * 组装内容到临时片段
+     * @return {[type]} [description]
+     */
+    const _createFragment = () => {
         var frag = DOC.createDocumentFragment(),
             len = content.length;
         for (var i = 0; i < len; i++) {
@@ -69,8 +71,11 @@ export default function nextTick(opts, callback, context) {
         return frag;
     }
 
-    //将内容加入父容器
-    function _appendChild() {
+    /**
+     * 将内容加入父容器
+     * @return {[type]} [description]
+     */
+    const _appendChild = () => {
         //拼接内容
         content = _createFragment();
         content.appendChild(tick);
@@ -84,8 +89,12 @@ export default function nextTick(opts, callback, context) {
         tick.setAttribute('value', animatId);
     }
 
-    //完成任务后处理&Event
-    function _finishTask(event) {
+    /**
+     * 完成任务后处理&Event
+     * @param  {[type]} event [description]
+     * @return {[type]}       [description]
+     */
+    const _finishTask = (event) => {
         if (event.target.value === animatId) {
             //container.removeEventListener('DOMNodeRemoved',_finishTask,false);
             container.removeEventListener('DOMNodeInserted', _finishTask, false);
@@ -93,15 +102,18 @@ export default function nextTick(opts, callback, context) {
         }
     }
 
-    //完成任务后处理&Observer
-    function _completeTask() {
+    /**
+     * 完成任务后处理&Observer
+     * @return {[type]} [description]
+     */
+    const _completeTask = () => {
         container.removeChild(tick);
         callback.call(context);
     }
 
     if (MutationObserver) {
-        observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(record) {
+        observer = new MutationObserver(mutations => {
+            mutations.forEach(record => {
                 if (record.oldValue === animatId) {
                     _completeTask();
                     observer = null;
