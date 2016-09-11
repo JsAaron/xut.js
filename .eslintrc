@@ -8,6 +8,7 @@
     "node": true
   },
   "globals": {
+    "Redux":true,
     "navigator": true,
     "Xut": true,
     "$": true,
