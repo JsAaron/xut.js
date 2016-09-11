@@ -1,5 +1,5 @@
 import { config } from '../config/index'
-import initdata from './database'
+import initdata from './data'
 import { loader, setRootfont } from '../util/index'
 import { playPlugVideo, playHtml5Video } from './video'
 import bindKeyEvent from './keyevent'
