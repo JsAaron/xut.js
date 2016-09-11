@@ -1,10 +1,10 @@
-import todoApp from './modules/todoApp'
-
-const createStore = window.Redux.createStore
-
-const store = createStore(todoApp)
+import todo from './modules/todo'
+import app from './modules/app'
 
 
-export {
-    store
-}
+const reducer = Redux.combineReducers({
+    todo,
+    app
+})
+
+export default Redux.createStore(reducer)

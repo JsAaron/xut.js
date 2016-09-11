@@ -6,6 +6,8 @@ import { VideoManager } from './component/video/manager'
 import init from './initialize/index'
 //fix audio
 import { fixAudio } from './component/audio/fix'
+//A predictable state container for apps.
+import store from './redex/store'
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -30,3 +32,24 @@ Xut.Version = 836;
 
 
 init()
+
+
+// import { addTodo, destoryTodo } from './redex/actions'
+
+
+// store.subscribe(() =>
+//     console.log(store.getState())
+// )
+
+// var id = 11
+// $('body').click(function() {
+//     store.dispatch(addTodo((id++) + 'Learn about actions'))
+//     store.dispatch(addTodo((id++) + 'Learn about actions'))
+//     store.dispatch(addTodo((id++) + 'Learn about actions'))
+
+
+//     setTimeout(function() {
+//         store.dispatch(destoryTodo())
+//     }, 2000)
+
+// })

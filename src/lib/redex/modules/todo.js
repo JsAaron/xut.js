@@ -1,20 +1,18 @@
-import {
-    VisibilityFilters,
-    SET_VISIBILITY_FILTER
-} from '../mutation-types'
+import * as types from '../mutation-types'
+
 
 const initialState = {
-    visibilityFilter: VisibilityFilters.SHOW_ALL,
+    visibilityFilter: types.VisibilityFilters.SHOW_ALL,
     todos: []
 }
 
-export function todoApp(state = initialState, action) {
+export default function todoApp(state = initialState, action) {
     switch (action.type) {
-        case SET_VISIBILITY_FILTER:
+        case types['SET_VISIBILITY_FILTER']:
             return Object.assign({}, state, {
                 visibilityFilter: action.filter
             })
-        case ADD_TODO:
+        case types['ADD_TODO']:
             return Object.assign({}, state, {
                 todos: [
                     ...state.todos, {
@@ -23,7 +21,7 @@ export function todoApp(state = initialState, action) {
                     }
                 ]
             })
-        case TOGGLE_TODO:
+        case types['TOGGLE_TODO']:
             return Object.assign({}, state, {
                 todos: state.todos.map((todo, index) => {
                     if (index === action.index) {
@@ -34,6 +32,9 @@ export function todoApp(state = initialState, action) {
                     return todo
                 })
             })
+        case types['DEST_TODO']:
+        state = initialState 
+        return initialState
         default:
             return state
     }
