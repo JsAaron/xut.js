@@ -29,13 +29,7 @@ const EVENT_NAME = (() => {
             mouse: mouseName
         }
     }
-    const hasTouch = Xut.plat.hasTouch
-    return [
-        hasTouch ? 'touchstart' : 'mousedown',
-        hasTouch ? 'touchmove' : 'mousemove',
-        hasTouch ? 'touchend' : 'mouseup',
-        transitionEnd
-    ]
+    return Xut.plat.hasTouch ? touchName : mouseName
 })()
 
 
