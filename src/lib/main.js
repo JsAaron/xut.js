@@ -6,6 +6,7 @@ import { VideoManager } from './component/video/manager'
 import init from './initialize/index'
 //fix audio
 import { fixAudio } from './component/audio/fix'
+import nextTick from './nexttick'
 //A predictable state container for apps.
 // import store from './redex/store'
 
@@ -31,6 +32,23 @@ if (Xut.plat.isBrowser) {
 Xut.Version = 836
 
 
-init()
+/**
+ * 启动应用
+ */
+Xut.Application.Launch = function(node) {
 
+    const html = `
+    <div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>
+    <div class="xut-busy-wrap xut-fullScreen xut-hide"></div>
+    <div class="xut-removelayer"></div>
+    <div class="xut-startupPage xut-fullScreen"></div>
+    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>`
 
+    nextTick({
+        container: $(node),
+        content: $(html)
+    }, function() {
+        init()
+    })
+
+}

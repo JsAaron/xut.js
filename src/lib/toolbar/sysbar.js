@@ -254,7 +254,7 @@ sToolbar.prototype.showTopBar = function () {
     });
 
     setTimeout(function () {
-        that.controlBar.animate({
+        that.controlBar && that.controlBar.animate({
             'opacity': 1
         }, that.delay, 'linear', function () {
             closeNavbar();

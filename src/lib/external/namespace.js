@@ -24,6 +24,7 @@ Xut.plat = Object.create(null)
 Xut.style = Object.create(null)
 
 
+
 /**
  * 浅拷贝
  * @param  {[type]} target [description]

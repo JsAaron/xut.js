@@ -696,7 +696,6 @@ _extend(Application, {
         original();
     },
 
-
     /**
      * home显示
      * 后台弹回来
@@ -706,7 +705,6 @@ _extend(Application, {
         Application.backstage = 0
         autoRun()
     },
-
 
     /**
      * 销毁应用
@@ -830,6 +828,11 @@ _extend(Application, {
 
 
 _extend(Application, {
+
+    /**
+     * 启动应用
+     */
+    Launch() {},
 
     /**
      * 应用加载状态

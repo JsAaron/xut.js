@@ -52,13 +52,7 @@
 </head>
 
 <body>
-
-    <div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>
-    <div class="xut-busy-wrap xut-fullScreen xut-hide"></div>
-    <div class="xut-removelayer"></div>
-    <div class="xut-startupPage xut-fullScreen"></div>
-    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>
- 
+    <div id="xxtppt-app-container" class="xut-chapter xut-fullScreen xut-overflow"></div>
     <div id="xut-stream-flow" style="display:none;z-index:-1">
         <div id="season-flow-1">
             <div id="chapter-flow-3">
@@ -279,6 +273,17 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+    window.onload = function() {
+        Xut.Application.Launch('#xxtppt-app-container')
+    }
+
+
+    // $('body').dblclick(function(){
+    //     Xut.Application.Destroy()
+    // })
+
+    </script>
 </body>
 
 </html>
