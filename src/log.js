@@ -1,6 +1,7 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v836  2016.9.10  Optimization of Xut. Platt is decomposed into Xut. Style and Xut. Platt
 * v835  2016.9.2   cursor
 * v834  2016.8.29  Remove core method on the way of binding events, modify the interface for bindTap/offTap
 * v833  2016.8.26  fix audio

@@ -1,5 +1,6 @@
 import { config } from '../../config/index'
 import { translation } from '../../swipe/translation'
+import { getCounts } from './layout'
 import Swipe from '../../swipe/index'
 import render from './render'
 
@@ -21,16 +22,16 @@ export default class Flow {
         this.initIndex = base.pageIndex
 
         const rootNode = base.element
+        const seasonId = base.chapterDas.seasonId
         const chapterId = base.chapterId
-        const domId = 'chapter-' + chapterId
-        const dataNode = $("#" + domId)
+        const dataNode = $('#chapter-flow-' + chapterId)
 
         render({
             rootNode,
             dataNode,
             chapterId,
             callback($container, $content) {
-                self._init($container, $content)
+                self._init($container, $content, getCounts(seasonId, chapterId))
                 callback()
             }
         })
@@ -43,21 +44,19 @@ export default class Flow {
      * @param  {[type]} $content   [description]
      * @return {[type]}            [description]
      */
-    _init($container, $content) {
-
-        //分段数
-        const pagesCount = this._resolveHeight($content)
+    _init($container, $content, pagesCount) {
 
         const MIN = 0
         const MAX = pagesCount - 1
         const viewWidth = config.viewSize.width
         const gapWidth = 20
         const View = Xut.View
+        const initIndex = this.initIndex
 
         const swipe = this.swipe = new Swipe({
             borderBounce: true,
             linear: true,
-            initIndex: Xut.Presentation.GetPageIndex() > this.initIndex ? MAX : MIN,
+            initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
             extraGap: gapWidth,
             container: $content[0],
             pageFlip: 0,
@@ -129,6 +128,15 @@ export default class Flow {
                 translation[action]({}, moveDistance, speed, $content)
             }
 
+
+            //更新页码标示
+            'flipOver' === action && setTimeout(() => {
+                let extra = direction === 'next' ? 1 : (-1)
+                let index = initIndex + pageIndex + extra
+                Xut.View.pageUpdate(index)
+                // Xut.View.setPointer(index)
+            })
+
         })
 
 
@@ -149,16 +157,4 @@ export default class Flow {
     }
 
 
-    /**
-     * parse height
-     * @return {[type]} [description]
-     */
-    _resolveHeight($content) {
-        const theChildren = $content.children().children()
-        let paraHeight = 0
-        for (let i = 0; i < theChildren.length; i++) {
-            paraHeight += $(theChildren[i]).height()
-        }
-        return Math.floor(paraHeight / config.viewSize.height)
-    }
 }

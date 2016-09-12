@@ -29,6 +29,14 @@
          trigger.apply(null, arguments);
      },
 
+
+     /**
+      * 有效,可滑动
+      */
+     'data-flow'(){
+
+     },
+
      /**
       * 如果是canvas节点
       */

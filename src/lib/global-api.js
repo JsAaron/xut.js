@@ -29,6 +29,7 @@ import { sceneController } from './scenario/controller'
 import { autoRun, original, suspend } from './command/index'
 import { suspendHandles, promptMessage } from './global-stop'
 import { SceneFactory } from './scenario/factory'
+import { getCounts } from './component/flow/layout'
 import loadScene from './initialize/scene'
 
 import {
@@ -260,26 +261,33 @@ _extend(View, {
          * 场景信息
          * @type {[type]}
          */
-        var sectionRang = Xut.data.query('sectionRelated', seasonId);
-        var barInfo = sectionRang.toolbar, //场景工具栏配置信息
-            pageTotal = sectionRang.length,
-            //通过chapterId转化为实际页码指标
-            //season 2
-            //       {
-            //          chapterId : 1  => 0
-            //          chpaterId : 2  => 1
-            //       }
-            //
-            parseInitIndex = () => {
-                return chapterId ? (() => {
-                    //如果节点内部跳转方式加载,无需转化页码
-                    if (createMode === 'GotoSlide') {
-                        return chapterId;
-                    }
-                    //初始页从0开始，减去下标1
-                    return chapterId - sectionRang.start - 1;
-                })() : 0;
-            };
+        var sectionRang = Xut.data.query('sectionRelated', seasonId)
+        var barInfo = sectionRang.toolbar //场景工具栏配置信息
+
+        /**
+         * 2016.9.12
+         * chapter的长度 = 本身chpater页面 + 子分栏数
+         * @type {[type]}
+         */
+        var pageTotal = sectionRang.length + getCounts(seasonId)
+
+        //通过chapterId转化为实际页码指标
+        //season 2
+        //       {
+        //          chapterId : 1  => 0
+        //          chpaterId : 2  => 1
+        //       }
+        //
+        var parseInitIndex = () => {
+            return chapterId ? (() => {
+                //如果节点内部跳转方式加载,无需转化页码
+                if (createMode === 'GotoSlide') {
+                    return chapterId;
+                }
+                //初始页从0开始，减去下标1
+                return chapterId - sectionRang.start - 1;
+            })() : 0;
+        }
 
 
         //如果启动了虚拟模式

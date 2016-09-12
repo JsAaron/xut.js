@@ -107,5 +107,5 @@ Xut.IBooks = {
         }
         return false;
     }
-}
+};
 

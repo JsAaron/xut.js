@@ -3,9 +3,9 @@ const startserver = require('./server')
 const ora = require('ora')
 
 const spinner = ora('Begin to pack , Please wait for\n')
-spinner.start()
+// spinner.start()
 const stop = () => {
-    spinner.stop()
+    // spinner.stop()
 }
 
 build(stop).then((conf) => {

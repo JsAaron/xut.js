@@ -194,4 +194,6 @@ export function _fixProportion(config, pptWidth, pptHeight) {
         data.left = FLOOR(data.left * proportion.left);
         return data;
     }
+
+    return proportion
 }

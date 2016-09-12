@@ -24,9 +24,8 @@ const GLOBALIFRAME = window.GLOBALIFRAME
 const CLIENTCONFIGT = window.CLIENTCONFIGT
 const MMXCONFIG = window.MMXCONFIG
 
-let config = {}
+let config = Object.create(null)
 let layoutMode
-let screenSize
 let proportion
 
 
@@ -52,8 +51,11 @@ Xut.zIndexlevel = () => {
  * @return {[type]} [description]
  */
 let fiexdAPI = () => {
-    screenSize = config.screenSize = _screen()
-    layoutMode = config.layoutMode = _layer(screenSize)
+    //设备尺寸
+    config.screenSize = _screen()
+    //可视尺寸
+    config.viewSize = _screen()
+    layoutMode = config.layoutMode = _layer(config.screenSize)
     proportion = config.proportion = _scale(config)
 }
 
@@ -374,12 +376,6 @@ _.extend(config, {
     },
 
     /**
-     * 设备尺寸
-     * @type {[type]}
-     */
-    screenSize: screenSize,
-
-    /**
      * 排版模式
      * @type {[type]}
      */
@@ -421,7 +417,18 @@ _.extend(config, {
      * @type {[type]}
      */
     fixProportion(pptWidth, pptHeight) {
-        _fixProportion(config, pptWidth, pptHeight)
+
+        const proportion = _fixProportion(config, pptWidth, pptHeight)
+        const calculate = proportion.calculateContainer()
+
+        /**
+         * 可视区域尺寸
+         * @type {Object}
+         */
+        config.viewSize = {
+            width: config.virtualMode ? calculate.width / 2 : calculate.width,
+            height: calculate.height
+        }
     },
 
     /**

@@ -50,8 +50,7 @@ module.exports = {
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: win ?
-                'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' :
-                '/Users/mac/project/xcode/www/build'
+                'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' : '/Users/mac/project/xcode/www/build'
         },
 
         /**
@@ -59,7 +58,7 @@ module.exports = {
          * @type {Object}
          */
         eslint: {
-            launch: true,
+            launch: false,
             //必须绝对路径
             dir: path.resolve(__dirname, 'src/lib'),
         },
@@ -95,7 +94,7 @@ module.exports = {
          * @type {Array}
          * Parameter is an array format
          */
-        exclude: ['SQLResult.js', 'pixi.js']
+        exclude: ['SQLResult.js', 'pixi.js', 'redux.js']
 
     },
 
@@ -112,6 +111,6 @@ module.exports = {
          * 监控文件打包
          * @type {[type]}
          */
-        wacthFilesPath:'src/lib/**/*.js'
+        wacthFilesPath: 'src/lib/**/*.js'
     }
 }

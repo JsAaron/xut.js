@@ -208,7 +208,7 @@ export class SceneFactory {
         var bar;
         var findControlBar = () => {
             return elements.find('#controlBar')
-        };
+        }
 
         /**
          * 主场景工具栏设置

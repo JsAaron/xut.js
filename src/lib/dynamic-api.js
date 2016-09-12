@@ -213,13 +213,29 @@ export default function overrideApi(vm) {
     const View = Xut.View;
 
     /**
+     * 设置页面的potion编码
+     * 为分栏修改
+     */
+    View.setPointer = function(pageIndex) {
+        $globalEvent.setPointer(pageIndex)
+    }
+
+    /**
+     * 更新页码
+     * @param {[type]} point [description]
+     */
+    View.pageUpdate = function(pageIndex) {
+        vm.$emit('change:pageUpdate', pageIndex)
+    }
+
+    /**
      * 显示工具栏
      * 没有参数显示 工具栏与控制翻页按钮
      * 有参数单独显示指定的
      */
     View.ShowToolbar = function(point) {
         vm.$emit('change:toggleToolbar', 'show', point)
-    };
+    }
 
     /**
      * 隐藏工具栏
@@ -228,7 +244,7 @@ export default function overrideApi(vm) {
      */
     View.HideToolbar = function(point) {
         vm.$emit('change:toggleToolbar', 'hide', point)
-    };
+    }
 
     /**
      * 指定特定的显示与隐藏
@@ -363,13 +379,13 @@ export default function overrideApi(vm) {
         }
         const pagePointer = $globalEvent.getPointer()
         const data = {
-            'distance'   : distance,
-            'speed'      : speed,
-            'direction'  : direction,
-            'action'     : action,
-            'leftIndex'  : pagePointer.leftIndex,
-            'pageIndex'  : pagePointer.currIndex,
-            'rightIndex' : pagePointer.rightIndex
+            'distance': distance,
+            'speed': speed,
+            'direction': direction,
+            'action': action,
+            'leftIndex': pagePointer.leftIndex,
+            'pageIndex': pagePointer.currIndex,
+            'rightIndex': pagePointer.rightIndex
         }
         $dispatch.move(data)
     };
@@ -621,6 +637,7 @@ export default function overrideApi(vm) {
     //*******************************************
 
     const Application = Xut.Application;
+
 
     /**
      * 获取一个存在的实例对象

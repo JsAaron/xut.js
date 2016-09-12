@@ -12,15 +12,16 @@ module.exports = (conf, fail) => {
     console.log('【Delete the directory, the path is:' + conf.tarDir + ' and ' + conf.testDir + '】')
 
     return new Promise((resolve, reject) => {
-        rollup.rollup({
-                entry: conf.entry
-                // plugins: [
-                //     babel({
-                //         exclude: 'node_modules/**',
-                //         "presets": ["es2015"]
-                //     })
-                // ]
-            }).then((bundle) => {
+        let config = {
+            entry: conf.entry,
+            plugins: [
+                babel({
+                    exclude: 'node_modules/**',
+                    "presets": ["es2015-rollup"]
+                })
+            ]
+        }
+        rollup.rollup(config).then((bundle) => {
                 var code
                 if (!fs.existsSync(conf.tarDir)) {
                     fs.mkdirSync(conf.tarDir);

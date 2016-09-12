@@ -15,9 +15,10 @@ const TOP = isIOS ? 20 : 0
 const getOptions = () => {
     let iconHeight = config.iconHeight
     let proportion = config.proportion
-    let calculate = proportion.calculateContainer()
-        //横版模式
-    let isHorizontal = config.layoutMode == 'horizontal'
+    const calculate = proportion.calculateContainer()
+
+    //横版模式
+    const isHorizontal = config.layoutMode == 'horizontal'
 
     proportion = isHorizontal ? proportion.width : proportion.height
     iconHeight = isIOS ? iconHeight : round(proportion * iconHeight)
@@ -97,18 +98,9 @@ export function home() {
         '</div>'
 
 
-    /**
-     * 可视区域尺寸
-     * @type {Object}
-     */
-    const viewSize = config.viewSize = {
-        width: config.virtualMode ? sWidth / 2 : sWidth,
-        height: sHeight
-    }
-
     return _.template(html, {
-        width: viewSize.width,
-        height: viewSize.height,
+        width: config.viewSize.width,
+        height: config.viewSize.height,
         top: calculate.top,
         left: calculate.left,
         index: Xut.sceneController.createIndex(),

@@ -1,4 +1,8 @@
-import { calculationIndex } from './depend'
+import {
+    calculationIndex,
+    initPointer
+} from './depend'
+
 
 
 export default function api(Swipe) {
@@ -67,6 +71,17 @@ export default function api(Swipe) {
     Swipe.prototype.getHindex = function() {
         return this._hindex
     }
+
+
+    /**
+     * 主动设置页码编号
+     * 因为分栏的关系，内部修改外部
+     * 页面需要拼接
+     */
+    Swipe.prototype.setPointer = function(target, pagetotal) {
+        this._pagePointer = initPointer(target, pagetotal || this.pagetotal)
+    }
+
 
     /**
      * 获取页面Pointer

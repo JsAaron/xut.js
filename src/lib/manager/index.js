@@ -144,8 +144,8 @@ class Mediator extends Observer {
             let parentNode = $globalEvent.findRootElement(point, pageType);
             //执行过滤处理
             handlerObj = filterProcessor.call(parentNode, point, pageType);
+            //停止翻页,针对content对象可以拖动,滑动的情况处理
             if (!handlerObj || handlerObj.attribute === 'disable') {
-                //停止翻页,针对content对象可以拖动,滑动的情况处理
                 hookCallback();
             }
         });
