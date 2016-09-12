@@ -37,10 +37,11 @@ if (Xut.plat.isBrowser) {
     }
 }
 
-/**
- * 启动应用
- */
-Xut.Application.Launch = function(node) {
+
+export default Xut
+
+
+const main = function(node) {
     const html = `
     <div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>
     <div class="xut-busy-wrap xut-fullScreen xut-hide"></div>
@@ -55,3 +56,12 @@ Xut.Application.Launch = function(node) {
         init()
     })
 }
+
+
+Xut.Application.Launch = main
+
+setTimeout(() => {
+    if (Xut.Application.setLaunch) {
+         main()
+    }
+}, 0)
