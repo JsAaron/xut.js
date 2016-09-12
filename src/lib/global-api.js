@@ -658,7 +658,7 @@ _extend(Application, {
         sceneController.destroyAllScene()
 
         //清理节点
-        $("#sceneContainer").empty()
+        $("#xut-scene-container").empty()
 
         //加载新的页面
         var novelId, pageIndex = getStorage('pageIndex')

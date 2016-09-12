@@ -348,8 +348,8 @@ export class Dispatch {
                 vm.$emit('change:pageUpdate', currIndex)
                 resetToolbar.call(this)
                 setTimeout(function() {
-                    $("#startupPage").hide().remove();
-                    $("#removelayer").hide().remove();
+                    $(".xut-startupPage").hide().remove();
+                    $(".xut-removelayer").hide().remove();
                 }, 0)
                 break;
             case 'toPage':

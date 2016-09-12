@@ -59,7 +59,7 @@ function messageBox(message) {
 
     var size = config.screenSize,
         width = size.width * 0.25,
-        Box = msgBox || $('#message'),
+        Box = msgBox || $('#xut-message'),
         html = '<div class="messageBox" style="width:' + width + 'px;">' +
         '<div class="messageTex" style="line-height:2">' + message + '</div>' +
         '<div class="messageBtn" style="line-height:1.5">OK</div>' +
