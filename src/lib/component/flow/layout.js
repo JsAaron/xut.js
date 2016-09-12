@@ -83,7 +83,7 @@ export function getCounts(seasonId, chpaterId) {
  */
 export function initFlows() {
 
-    const $container = $("#stream-flow")
+    const $container = $("#xut-stream-flow")
     const $seasons = $container.children()
     const vWidth = config.viewSize.width
     const vHeight = config.viewSize.height
