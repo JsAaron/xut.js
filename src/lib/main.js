@@ -10,6 +10,14 @@ import nextTick from './nexttick'
 //A predictable state container for apps.
 // import store from './redex/store'
 
+
+/**
+ * 版本号
+ * @type {Number}
+ */
+Xut.Version = 836
+
+
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
     if (Xut.plat.noAutoPlayMedia) {
@@ -29,14 +37,10 @@ if (Xut.plat.isBrowser) {
     }
 }
 
-Xut.Version = 836
-
-
 /**
  * 启动应用
  */
 Xut.Application.Launch = function(node) {
-
     const html = `
     <div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>
     <div class="xut-busy-wrap xut-fullScreen xut-hide"></div>
@@ -50,5 +54,4 @@ Xut.Application.Launch = function(node) {
     }, function() {
         init()
     })
-
 }
