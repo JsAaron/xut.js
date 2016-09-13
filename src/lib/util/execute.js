@@ -1,4 +1,4 @@
-import { getCache } from '../database/cache'
+import { getResults } from '../database/results'
 
 /**
  * 创建执行方法
@@ -20,7 +20,7 @@ function createfactory(sql, fn) {
  * @return {[type]}            [description]
  */
 function executeDB(sql, callback, errorCB, tName) {
-    let SQLResult = getCache()
+    let SQLResult = getResults()
     if (SQLResult) {
         if (SQLResult[tName]) {
             let data = SQLResult[tName]
@@ -75,7 +75,7 @@ export function execute(selectSql, callback) {
             } else {
                 return Object.keys(selectSql).length;
             }
-        }();
+        }()
 
 
     createfactory(selectSql, function(key, value) {

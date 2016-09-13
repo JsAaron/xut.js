@@ -47,7 +47,7 @@ const controller = (state) => {
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-export default function(config) {
+export default function button(config) {
     /**
      * 存放绑定事件
      * @type {Object}

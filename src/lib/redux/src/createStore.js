@@ -1,18 +1,5 @@
-'use strict';
-
-exports.__esModule = true;
-exports.ActionTypes = undefined;
-exports['default'] = createStore;
-
-var _isPlainObject = require('lodash/isPlainObject');
-
-var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
-
-var _symbolObservable = require('symbol-observable');
-
-var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+import isPlainObject from 'lodash/isPlainObject'
+import $$observable from 'symbol-observable'
 
 /**
  * These are private action types reserved by Redux.
@@ -20,9 +7,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * If the current state is undefined, you must return the initial state.
  * Do not reference these action types directly in your code.
  */
-var ActionTypes = exports.ActionTypes = {
+export var ActionTypes = {
   INIT: '@@redux/INIT'
-};
+}
 
 /**
  * Creates a Redux store that holds the state tree.
@@ -49,35 +36,33 @@ var ActionTypes = exports.ActionTypes = {
  * @returns {Store} A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
  */
-function createStore(reducer, preloadedState, enhancer) {
-  var _ref2;
-
+export default function createStore(reducer, preloadedState, enhancer) {
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
-    enhancer = preloadedState;
-    preloadedState = undefined;
+    enhancer = preloadedState
+    preloadedState = undefined
   }
 
   if (typeof enhancer !== 'undefined') {
     if (typeof enhancer !== 'function') {
-      throw new Error('Expected the enhancer to be a function.');
+      throw new Error('Expected the enhancer to be a function.')
     }
 
-    return enhancer(createStore)(reducer, preloadedState);
+    return enhancer(createStore)(reducer, preloadedState)
   }
 
   if (typeof reducer !== 'function') {
-    throw new Error('Expected the reducer to be a function.');
+    throw new Error('Expected the reducer to be a function.')
   }
 
-  var currentReducer = reducer;
-  var currentState = preloadedState;
-  var currentListeners = [];
-  var nextListeners = currentListeners;
-  var isDispatching = false;
+  var currentReducer = reducer
+  var currentState = preloadedState
+  var currentListeners = []
+  var nextListeners = currentListeners
+  var isDispatching = false
 
   function ensureCanMutateNextListeners() {
     if (nextListeners === currentListeners) {
-      nextListeners = currentListeners.slice();
+      nextListeners = currentListeners.slice()
     }
   }
 
@@ -87,7 +72,7 @@ function createStore(reducer, preloadedState, enhancer) {
    * @returns {any} The current state tree of your application.
    */
   function getState() {
-    return currentState;
+    return currentState
   }
 
   /**
@@ -115,25 +100,25 @@ function createStore(reducer, preloadedState, enhancer) {
    */
   function subscribe(listener) {
     if (typeof listener !== 'function') {
-      throw new Error('Expected listener to be a function.');
+      throw new Error('Expected listener to be a function.')
     }
 
-    var isSubscribed = true;
+    var isSubscribed = true
 
-    ensureCanMutateNextListeners();
-    nextListeners.push(listener);
+    ensureCanMutateNextListeners()
+    nextListeners.push(listener)
 
     return function unsubscribe() {
       if (!isSubscribed) {
-        return;
+        return
       }
 
-      isSubscribed = false;
+      isSubscribed = false
 
-      ensureCanMutateNextListeners();
-      var index = nextListeners.indexOf(listener);
-      nextListeners.splice(index, 1);
-    };
+      ensureCanMutateNextListeners()
+      var index = nextListeners.indexOf(listener)
+      nextListeners.splice(index, 1)
+    }
   }
 
   /**
@@ -162,31 +147,37 @@ function createStore(reducer, preloadedState, enhancer) {
    * return something else (for example, a Promise you can await).
    */
   function dispatch(action) {
-    if (!(0, _isPlainObject2['default'])(action)) {
-      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
+    if (!isPlainObject(action)) {
+      throw new Error(
+        'Actions must be plain objects. ' +
+        'Use custom middleware for async actions.'
+      )
     }
 
     if (typeof action.type === 'undefined') {
-      throw new Error('Actions may not have an undefined "type" property. ' + 'Have you misspelled a constant?');
+      throw new Error(
+        'Actions may not have an undefined "type" property. ' +
+        'Have you misspelled a constant?'
+      )
     }
 
     if (isDispatching) {
-      throw new Error('Reducers may not dispatch actions.');
+      throw new Error('Reducers may not dispatch actions.')
     }
 
     try {
-      isDispatching = true;
-      currentState = currentReducer(currentState, action);
+      isDispatching = true
+      currentState = currentReducer(currentState, action)
     } finally {
-      isDispatching = false;
+      isDispatching = false
     }
 
-    var listeners = currentListeners = nextListeners;
+    var listeners = currentListeners = nextListeners
     for (var i = 0; i < listeners.length; i++) {
-      listeners[i]();
+      listeners[i]()
     }
 
-    return action;
+    return action
   }
 
   /**
@@ -201,11 +192,11 @@ function createStore(reducer, preloadedState, enhancer) {
    */
   function replaceReducer(nextReducer) {
     if (typeof nextReducer !== 'function') {
-      throw new Error('Expected the nextReducer to be a function.');
+      throw new Error('Expected the nextReducer to be a function.')
     }
 
-    currentReducer = nextReducer;
-    dispatch({ type: ActionTypes.INIT });
+    currentReducer = nextReducer
+    dispatch({ type: ActionTypes.INIT })
   }
 
   /**
@@ -215,10 +206,8 @@ function createStore(reducer, preloadedState, enhancer) {
    * https://github.com/zenparsing/es-observable
    */
   function observable() {
-    var _ref;
-
-    var outerSubscribe = subscribe;
-    return _ref = {
+    var outerSubscribe = subscribe
+    return {
       /**
        * The minimal observable subscription method.
        * @param {Object} observer Any object that can be used as an observer.
@@ -227,35 +216,38 @@ function createStore(reducer, preloadedState, enhancer) {
        * be used to unsubscribe the observable from the store, and prevent further
        * emission of values from the observable.
        */
-      subscribe: function subscribe(observer) {
+      subscribe(observer) {
         if (typeof observer !== 'object') {
-          throw new TypeError('Expected the observer to be an object.');
+          throw new TypeError('Expected the observer to be an object.')
         }
 
         function observeState() {
           if (observer.next) {
-            observer.next(getState());
+            observer.next(getState())
           }
         }
 
-        observeState();
-        var unsubscribe = outerSubscribe(observeState);
-        return { unsubscribe: unsubscribe };
+        observeState()
+        var unsubscribe = outerSubscribe(observeState)
+        return { unsubscribe }
+      },
+
+      [$$observable]() {
+        return this
       }
-    }, _ref[_symbolObservable2['default']] = function () {
-      return this;
-    }, _ref;
+    }
   }
 
   // When a store is created, an "INIT" action is dispatched so that every
   // reducer returns their initial state. This effectively populates
   // the initial state tree.
-  dispatch({ type: ActionTypes.INIT });
+  dispatch({ type: ActionTypes.INIT })
 
-  return _ref2 = {
-    dispatch: dispatch,
-    subscribe: subscribe,
-    getState: getState,
-    replaceReducer: replaceReducer
-  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
+  return {
+    dispatch,
+    subscribe,
+    getState,
+    replaceReducer,
+    [$$observable]: observable
+  }
 }

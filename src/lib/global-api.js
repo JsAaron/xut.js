@@ -30,6 +30,8 @@ import { autoRun, original, suspend } from './command/index'
 import { suspendHandles, promptMessage } from './global-stop'
 import { SceneFactory } from './scenario/factory'
 import { getCounts } from './component/flow/layout'
+
+import { removeResults } from './database/results'
 import { removeCache } from './database/cache'
 
 import loadScene from './init/scene'
@@ -539,11 +541,17 @@ _extend(Application, {
             $(document).off()
         }
         //销毁所有场景
-        sceneController.destroyAllScene();
+        sceneController.destroyAllScene()
+
+        //DYNAMICCONFIGT模式销毁节点
         window.DYNAMICCONFIGT.removeNode()
+
+        //移除数据库缓存
+        removeResults()
+        //移除应用数据缓存
         removeCache()
     },
-
+ 
 
     /**
      * 退出app

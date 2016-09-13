@@ -3,12 +3,19 @@ import { contentFilter } from '../component/activity/filter'
 import { config } from '../config/index'
 import { _set } from '../util/index'
 
-//新增模式,用于记录浏览器退出记录
-//默认启动
-//是否回到退出的页面
-//set表中写一个recordHistory
-//是   1
-//否   0
+
+/**
+ * 新增模式,用于记录浏览器退出记录
+ * 默认启动
+ * 是否回到退出的页面
+ * set表中写一个recordHistory
+ * 是   1
+ * 否   0
+ * 
+ * [description]
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
 const cfgHistory = (data) => {
 
     let recordHistory = 1; //默认启动
@@ -151,7 +158,5 @@ const supportTransaction = (callback) => {
  * 数据结构
  */
 export default function(callback) {
-    supportTransaction(function() {
-        setStore(callback)
-    })
+    supportTransaction(() => setStore(callback))
 }

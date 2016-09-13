@@ -1,6 +1,6 @@
 import { createCursor } from '../util/cursor'
 import { initFlows } from '../component/flow/layout'
-import { importCache } from '../database/cache'
+import { importResults } from '../database/results'
 
 import {
     loader,
@@ -14,7 +14,7 @@ import {
     fixResourcesPath
 } from '../config/index'
 
-import initdata from './data'
+import initData from './data'
 
 /**
  * 加载css
@@ -64,9 +64,9 @@ const fixedSize = (novelData) => {
  */
 export default function dynamic(callback) {
     //导入数据缓存
-    importCache(window.DYNAMICCONFIGT.database, () => {
-        //构建数据库存取
-        initdata(novelData => {
+    importResults(window.DYNAMICCONFIGT.database, () => {
+        //初始化数据库设置
+        initData(novelData => {
 
             //重置数据API接口
             resetDataAPI()

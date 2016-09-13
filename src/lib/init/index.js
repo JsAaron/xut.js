@@ -1,8 +1,7 @@
 import { config } from '../config/index'
 import { plugVideo, html5Video } from './video'
-import { initCache } from '../database/cache'
 import dynamic from './dynamic'
-import keyEvent from './keyevent'
+import button from './button'
 import loadScene from './scene'
 
 import {
@@ -25,7 +24,7 @@ const initMain = (novelData) => {
     let novelId
     let parameter
     let pageIndex = getCache('pageIndex')
-    let pageFlip = getCache('pageFlip') || 0
+    let pageFlip  = getCache('pageFlip') || 0
 
     /**
      * IBOOS模式
@@ -55,23 +54,24 @@ const initMain = (novelData) => {
         //直接切换模式
         pageFlip = parameter.pageflip
         if (pageFlip !== undefined) {
-            //设置缓存
-            _set({
-                'pageFlip': pageFlip
-            });
+            _set({'pageFlip': pageFlip})
         }
     }
 
-    //缓存加载
-    //如果启动recordHistory记录
+
+    /**
+     * 缓存加载
+     * 如果启动recordHistory记录
+     * [if description]
+     */
     if (config.recordHistory && pageIndex !== undefined) {
         //加强判断
         if (novelId = getCache("novelId")) {
             return loadScene({
-                'pageFlip': pageFlip,
-                "novelId": novelId,
-                "pageIndex": pageIndex,
-                'history': _get('history')
+                'pageFlip'  : pageFlip,
+                "novelId"   : novelId,
+                "pageIndex" : pageIndex,
+                'history'   : _get('history')
             });
         }
     }
@@ -79,9 +79,9 @@ const initMain = (novelData) => {
     //第一次加载
     //没有缓存
     loadScene({
-        "novelId": novelData._id,
-        "pageIndex": 0,
-        'pageFlip': pageFlip
+        "novelId"   : novelData._id,
+        "pageIndex" : 0,
+        'pageFlip'  : pageFlip
     });
 }
 
@@ -91,11 +91,7 @@ const initMain = (novelData) => {
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-const initApp = () => {
-    dynamic((novelData) => {
-        initMain(novelData)
-    })
-}
+const initApp = () => dynamic(initMain)
 
 
 /**
@@ -133,10 +129,10 @@ const operation = () => {
 }
 
 
-export default function() {
+export default function init() {
 
-    //绑定键盘事件
-    keyEvent(config)
+    //安卓按键
+    button(config)
 
     //如果不是读库模式
     //播放HTML5视频

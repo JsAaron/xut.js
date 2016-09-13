@@ -34,7 +34,7 @@ if (Xut.plat.isBrowser) {
                     break;
             }
         })
-    }
+    } 
 }
 
 
@@ -60,16 +60,20 @@ Xut.Application.Launch = function({
         disable(true)
         busyIcon = ''
     }
-    const $html = $(`
+
+    let $html = $(`
     ${busyIcon}
     <div class="xut-removelayer"></div>
     <div class="xut-startupPage xut-fullScreen"></div>
     <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>`)
-    const $el = $(el)
+
+    let $el = $(el)
     $el.css('z-index', 99999)
 
     window.DYNAMICCONFIGT.removeNode = function() {
         $html.remove()
+        $html = null
+        $el = null
     }
 
     nextTick({
