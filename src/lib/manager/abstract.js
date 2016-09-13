@@ -43,7 +43,7 @@ export class Abstract {
     abstractDestroyCollection() {
         var k, Collections = this.Collections;
         for (k in Collections) {
-            Collections[k].baseDestroy();
+            Collections[k].baseDestroy()
         }
         this.Collections = null;
     }

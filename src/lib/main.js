@@ -35,7 +35,7 @@ if (Xut.plat.isBrowser) {
             }
         })
     } 
-}
+} 
 
 
 Xut.Application.Launch = function({
