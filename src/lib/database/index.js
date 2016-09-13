@@ -1,4 +1,8 @@
-import { dataQuery, dataRemove, oneQuery } from './store'
+import {
+    dataQuery,
+    dataRemove,
+    oneQuery
+} from './query'
 
 //数据缓存
 let dataCache
@@ -306,7 +310,7 @@ export function errorTable() {
  */
 export function createStore(callback) {
 
-    dataQuery(function(successRet, collectError) {
+    dataQuery((successRet, collectError) => {
 
         errortables = collectError || []
         novelId = successRet.Novel.item(0)['_id']

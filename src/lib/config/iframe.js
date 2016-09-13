@@ -1,4 +1,4 @@
-import { sourcePath, widgetPath } from './default'
+import { getSourcePath } from './default'
 
 const isIOS = Xut.plat.isIOS
 const isAndroid = Xut.plat.isAndroid
@@ -88,158 +88,156 @@ export default {
      * @return {[type]} [description]
      */
     resources() {
-        if (isIOS) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return sourcePath;
-                case 'iframeDuKuSubDoc':
-                    return sourcePath;
-                case 'iframeClient':
-                    return CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
+            if (isIOS) {
+                switch (iframeMode) {
+                    case 'iframeDuKu':
+                        return DUKUCONFIG.path;
+                    case 'iframeSubDoc':
+                        return getSourcePath();
+                    case 'iframeDuKuSubDoc':
+                        return getSourcePath();
+                    case 'iframeClient':
+                        return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
+                }
             }
-        }
 
-        if (isAndroid) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
+            if (isAndroid) {
+                switch (iframeMode) {
+                    case 'iframeDuKu':
+                        return DUKUCONFIG.path;
+                    case 'iframeSubDoc':
+                        return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeDuKuSubDoc':
+                        return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeClient':
+                        return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
+                }
             }
-        }
-    },
+        },
 
 
-    /**
-     * 视频路径
-     * @return {[type]} [description]
-     */
-    video() {
-        if (isIOS) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return sourcePath
-                case 'iframeDuKuSubDoc':
-                    return sourcePath;
-                case 'iframeClient':
-                    return CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
+        /**
+         * 视频路径
+         * @return {[type]} [description]
+         */
+        video() {
+            if (isIOS) {
+                switch (iframeMode) {
+                    case 'iframeDuKu':
+                        return DUKUCONFIG.path;
+                    case 'iframeSubDoc':
+                        return getSourcePath()
+                    case 'iframeDuKuSubDoc':
+                        return getSourcePath();
+                    case 'iframeClient':
+                        return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
+                }
             }
-        }
 
-        if (isAndroid) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return 'android.resource://#packagename#/raw/';
-                case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
+            if (isAndroid) {
+                switch (iframeMode) {
+                    case 'iframeDuKu':
+                        return DUKUCONFIG.path;
+                    case 'iframeSubDoc':
+                        return 'android.resource://#packagename#/raw/';
+                    case 'iframeDuKuSubDoc':
+                        return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeClient':
+                        return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
+                }
             }
-        }
-    },
+        },
 
 
-    /**
-     * 音频路径
-     * @return {[type]} [description]
-     */
-    audio() {
-        if (isIOS) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return sourcePath;
-                case 'iframeDuKuSubDoc':
-                    return sourcePath;
-                case 'iframeClient':
-                    return CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
+        /**
+         * 音频路径
+         * @return {[type]} [description]
+         */
+        audio() {
+            if (isIOS) {
+                switch (iframeMode) {
+                    case 'iframeDuKu':
+                        return DUKUCONFIG.path;
+                    case 'iframeSubDoc':
+                        return getSourcePath();
+                    case 'iframeDuKuSubDoc':
+                        return getSourcePath();
+                    case 'iframeClient':
+                        return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
+                }
             }
-        }
-        if (isAndroid) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
+            if (isAndroid) {
+                switch (iframeMode) {
+                    case 'iframeDuKu':
+                        return DUKUCONFIG.path;
+                    case 'iframeSubDoc':
+                        return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeDuKuSubDoc':
+                        return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeClient':
+                        return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
+                }
             }
-        }
-    },
+        },
 
 
-    /**
-     * 调用插件处理
-     * @return {[type]} [description]
-     */
-    svg() {
-        if (isIOS) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    //www/content/subdoc/00c83e668a6b6bad7eda8eedbd2110ad/content/gallery/
-                    return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
+        /**
+         * 调用插件处理
+         * @return {[type]} [description]
+         */
+        svg() {
+            if (isIOS) {
+                switch (iframeMode) {
+                    case 'iframeDuKu':
+                        return DUKUCONFIG.path;
+                    case 'iframeSubDoc':
+                        //www/content/subdoc/00c83e668a6b6bad7eda8eedbd2110ad/content/gallery/
+                        return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeDuKuSubDoc':
+                        return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeClient':
+                        return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
+                }
             }
-        }
 
-        if (isAndroid) {
-            switch (iframeMode) {
-                case 'iframeDuKu':
-                    return DUKUCONFIG.path;
-                case 'iframeSubDoc':
-                    return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeDuKuSubDoc':
-                    return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-                case 'iframeClient':
-                    return CLIENTCONFIGT.path;
-                case 'iframeMiaomiaoxue':
-                    return MMXCONFIGPath + '/content/gallery/';
+            if (isAndroid) {
+                switch (iframeMode) {
+                    case 'iframeDuKu':
+                        return DUKUCONFIG.path;
+                    case 'iframeSubDoc':
+                        return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeDuKuSubDoc':
+                        return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+                    case 'iframeClient':
+                        return CLIENTCONFIGT.path;
+                    case 'iframeMiaomiaoxue':
+                        return MMXCONFIGPath + '/content/gallery/';
+                }
             }
+        },
+
+
+        /**
+         * js零件
+         * 2016.8.3 喵喵学
+         * @return {[type]} [description]
+         */
+        jsWidget() {
+            return MMXCONFIGPath + '/content/widget/'
         }
-    },
-
-
-    /**
-     * js零件
-     * 2016.8.3 喵喵学
-     * @return {[type]} [description]
-     */
-    jsWidget() {
-        return MMXCONFIGPath + '/content/widget/'
-    }
 
 }
-
-

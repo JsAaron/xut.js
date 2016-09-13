@@ -1,4 +1,4 @@
-import { errorTable } from '../../store/index'
+import { errorTable } from '../../database/index'
 import { query } from '../parser'
 
 /**

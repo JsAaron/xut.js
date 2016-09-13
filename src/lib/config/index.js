@@ -7,7 +7,7 @@
  */
 import nativeConf from './native'
 import iframeConf from './iframe'
-import { sourcePath, widgetPath } from './default'
+import { getWidgetPath, getSourcePath } from './default'
 
 import {
     _screen,
@@ -16,6 +16,7 @@ import {
     _fixProportion
 }
 from './judge'
+
 
 const plat = Xut.plat
 const isIphone = Xut.plat.isIphone
@@ -46,18 +47,6 @@ Xut.zIndexlevel = () => {
     return ++config.zIndexlevel
 }
 
-/**
- * 修正API接口
- * @return {[type]} [description]
- */
-let fiexdAPI = () => {
-    //设备尺寸
-    config.screenSize = _screen()
-    //可视尺寸
-    config.viewSize = _screen()
-    layoutMode = config.layoutMode = _layer(config.screenSize)
-    proportion = config.proportion = _scale(config)
-}
 
 
 //通过新学堂加载
@@ -67,9 +56,19 @@ if (/xinxuetang/.test(window.location.href)) {
 }
 
 
+
 /**
- * 缓存
+ * 是否启动缓存机制
+ * 第一次默认是关闭
+ * 必须读取一次后，缓存启动
+ * 为了支持window.DYNAMICCONFIGT模式
+ * @type {Boolean}
  */
+let isCacheVideoPath = false
+let isCacheAudioPath = false
+let isCacheSvgPath = false
+let isCacheJsWidgetPath = false
+
 let cacheVideoPath
 let cacheAudioPath
 let cacheSvgPath
@@ -81,7 +80,14 @@ let cacheJsWidgetPath
  * 而且是客户端模式
  * @return {[type]} [description]
  */
-const browserPlat = () => {
+const desktopPlat = () => {
+
+    //2016.9.13
+    //新增动态模式
+    if (window.DYNAMICCONFIGT) {
+        return getSourcePath()
+    }
+
     //如果是iframe加载
     //而且是客户端模式
     if (GLOBALIFRAME && CLIENTCONFIGT) {
@@ -89,16 +95,16 @@ const browserPlat = () => {
     }
 
     if (typeof initGalleryUrl != 'undefined') {
-        return sourcePath
+        return getSourcePath()
     } else {
         //资源存放位置
         // * storageMode 存放的位置
         // * 0 APK应用本身
         // 1 外置SD卡
         if (Number(config.storageMode)) {
-            return "sdcard/" + config.appId + "/" + sourcePath
+            return "sdcard/" + config.appId + "/" + getSourcePath()
         } else {
-            return sourcePath
+            return getSourcePath()
         }
     }
 }
@@ -121,6 +127,21 @@ const runMode = (() => {
 
 
 /**
+ * 图片资源配置路径
+ * [resourcesPath description]
+ * @return {[type]} [description]
+ */
+const _rsourcesPath = () => {
+    return isBrowser ?
+        desktopPlat() :
+        GLOBALIFRAME ?
+        iframeConf.resources(config) :
+        nativeConf.resources(config)
+}
+
+
+
+/**
  * mp3 mp4 音频文件路径
  * 1 音频加载就会自动拷贝到SD卡上
  * 2 或者asset上的资源
@@ -128,7 +149,7 @@ const runMode = (() => {
  */
 const _videoPath = () => {
     return runMode ?
-        browserPlat() :
+        desktopPlat() :
         GLOBALIFRAME ?
         iframeConf.video() :
         nativeConf.video()
@@ -141,24 +162,10 @@ const _videoPath = () => {
  */
 const _audioPath = () => {
     return runMode ?
-        browserPlat() :
+        desktopPlat() :
         GLOBALIFRAME ?
         iframeConf.audio() :
         nativeConf.audio()
-};
-
-
-/**
- * 图片资源配置路径
- * [resourcesPath description]
- * @return {[type]} [description]
- */
-const _rsourcesPath = () => {
-    return isBrowser ?
-        browserPlat() :
-        GLOBALIFRAME ?
-        iframeConf.resources(config) :
-        nativeConf.resources(config)
 }
 
 
@@ -168,7 +175,7 @@ const _rsourcesPath = () => {
  */
 const _svgPath = () => {
     return isBrowser ?
-        browserPlat() :
+        desktopPlat() :
         GLOBALIFRAME ?
         iframeConf.svg() :
         nativeConf.svg()
@@ -182,7 +189,7 @@ const _svgPath = () => {
  * @return {[type]} [description]
  */
 const _jsWidgetPath = () => {
-    return isBrowser ? widgetPath :
+    return isBrowser ? getWidgetPath() :
         GLOBALIFRAME ? iframeConf.jsWidget() : nativeConf.jsWidget()
 }
 
@@ -206,7 +213,6 @@ Xut.log = function(info, name) {
             break;
     }
 }
-
 
 
 /**
@@ -319,22 +325,14 @@ _.extend(config, {
 
 
     /**
-     * 初始化资源路径
-     * 配置图片路径地址
-     * @return {[type]} [description]
-     */
-    initResourcesPath() {
-        config.pathAddress = _rsourcesPath()
-    },
-
-    /**
      * 视频文件路径
      * @return {[type]} [description]
      */
     videoPath() {
-        if (cacheVideoPath) {
+        if (isCacheVideoPath && cacheVideoPath) {
             return cacheVideoPath
         }
+        isCacheVideoPath = true
         return cacheVideoPath = _videoPath()
     },
 
@@ -343,9 +341,10 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     audioPath() {
-        if (cacheAudioPath) {
+        if (isCacheAudioPath && cacheAudioPath) {
             return cacheAudioPath
         }
+        isCacheAudioPath = true
         return cacheAudioPath = _audioPath()
     },
 
@@ -355,10 +354,11 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     svgPath() {
-        if (cacheSvgPath) {
+        if (isCacheSvgPath && cacheSvgPath) {
             return cacheSvgPath
 
         }
+        isCacheSvgPath = true
         return cacheSvgPath = _svgPath()
     },
 
@@ -368,10 +368,10 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     jsWidgetPath() {
-        if (cacheJsWidgetPath) {
+        if (isCacheJsWidgetPath && cacheJsWidgetPath) {
             return cacheJsWidgetPath
-
         }
+        isCacheJsWidgetPath = true
         return cacheJsWidgetPath = _jsWidgetPath()
     },
 
@@ -406,32 +406,6 @@ _.extend(config, {
     iconHeight: isIphone ? 32 : 44,
 
     /**
-     * 修正
-     * @type {[type]}
-     */
-    revised: fiexdAPI,
-
-    /**
-     * 修正缩放比
-     * 通过数据库中的设置的模板尺寸与实际尺寸修复
-     * @type {[type]}
-     */
-    fixProportion(pptWidth, pptHeight) {
-
-        const proportion = _fixProportion(config, pptWidth, pptHeight)
-        const calculate = proportion.calculateContainer()
-
-        /**
-         * 可视区域尺寸
-         * @type {Object}
-         */
-        config.viewSize = {
-            width: config.virtualMode ? calculate.width / 2 : calculate.width,
-            height: calculate.height
-        }
-    },
-
-    /**
      * 数据库尺寸
      * @type {Number}
      */
@@ -442,3 +416,48 @@ _.extend(config, {
 Xut.config = config
 
 export { config }
+
+
+export function resetDataAPI() {
+    //设备尺寸
+    config.screenSize = _screen();
+    //可视尺寸
+    config.viewSize = _screen()
+    layoutMode = config.layoutMode = _layer(config.screenSize)
+    proportion = config.proportion = _scale(config)
+}
+
+/**
+ * 初始化资源路径
+ * 配置图片路径地址
+ * @return {[type]} [description]
+ */
+export function fixResourcesPath() {
+    //资源缓存关闭
+    isCacheVideoPath = false
+    isCacheAudioPath = false
+    isCacheSvgPath = false
+    isCacheJsWidgetPath = false
+    config.pathAddress = _rsourcesPath()
+}
+
+
+/**
+ * 修正缩放比
+ * 通过数据库中的设置的模板尺寸与实际尺寸修复
+ * @type {[type]}
+ */
+export function fixProportion(pptWidth, pptHeight) {
+
+    const proportion = _fixProportion(config, pptWidth, pptHeight)
+    const calculate = proportion.calculateContainer()
+
+    /**
+     * 可视区域尺寸
+     * @type {Object}
+     */
+    config.viewSize = {
+        width: config.virtualMode ? calculate.width / 2 : calculate.width,
+        height: calculate.height
+    }
+}

@@ -1,3 +1,5 @@
+import { getCache } from '../database/cache'
+
 /**
  * 创建执行方法
  * @return {[type]} [description]
@@ -13,19 +15,22 @@ function createfactory(sql, fn) {
     }
 }
 
-//模拟database获取数据
+/**
+ * 模拟database获取数据
+ * @return {[type]}            [description]
+ */
 function executeDB(sql, callback, errorCB, tName) {
-    //如果存在生成好的数据文件则直接取
-    if (window.SQLResult) {
-        if (window.SQLResult[tName]) {
-            var data = window.SQLResult[tName],
-                SQLResultSetRowList = {};
+    let SQLResult = getCache()
+    if (SQLResult) {
+        if (SQLResult[tName]) {
+            let data = SQLResult[tName]
+            let SQLResultSetRowList = {}
             SQLResultSetRowList = {
                 length: Object.keys(data).length,
                 item: function(num) {
                     return data[num];
                 }
-            };
+            }
             callback(SQLResultSetRowList);
         } else {
             errorCB({

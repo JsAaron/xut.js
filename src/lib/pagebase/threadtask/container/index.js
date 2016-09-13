@@ -33,16 +33,16 @@ const createli = function({
     }
 
     return String.styleFormat(
-        `<li id="${data.prefix}" 
-              class="xut-flip" 
-              data-map="${data.pid}" 
-              data-pageType="${pageType}"
-              data-container="true" 
-              style="overflow:hidden;
+        `<ol id="${data.prefix}"
+            class="xut-flip"
+            data-map="${data.pid}"
+            data-pageType="${pageType}"
+            data-container="true"
+            style="overflow:hidden;
                 ${TANSFROM}:${transform};
                 ${containerBackground}${customStyle}">
-              ${virtualNode}
-            </li>`
+            ${virtualNode}
+        </ol>`
     )
 
 

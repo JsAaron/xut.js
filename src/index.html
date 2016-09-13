@@ -14,7 +14,6 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-    <script src="content/SQLResult.js"></script>
     <script src="lib/external/environ.js"></script>
     <script src="lib/external/namespace.js"></script>
     <script src="lib/external/support.js"></script>
@@ -52,8 +51,9 @@
 </head>
 
 <body>
+    <!-- 新版加载方式，一个app节点 -->
     <div id="xxtppt-app-container" class="xut-chapter xut-fullScreen xut-overflow"></div>
-
+    <!-- flows -->
     <div id="xut-stream-flow" style="display:none;z-index:-1">
         <div id="season-flow-1">
             <div id="chapter-flow-3">
@@ -274,16 +274,44 @@
             </div>
         </div>
     </div>
-
+    <button id="testSwitch" style="position:absolute;left:0;top:0;z-index:9999999">点击切换应用</button>
+    <button id="testDestroy" style="position:absolute;left:100px;top:0;z-index:9999999">点击销毁应用</button>
     <script type="text/javascript">
+    var appid = 1
+    var switchApp = function() {
+        appid++
+        if (appid == 4) {
+            appid = 1
+        }
+    }
+    var isCreate = false
 
     window.onload = function() {
-        Xut.Application.Launch('#xxtppt-app-container')
+        Xut.Application.supportLaunch = true
     }
 
-    // $('body').dblclick(function(){
-    //     Xut.Application.Destroy()
-    // })
+    $("#testSwitch").click(function() {
+        if(isCreate){
+            alert('先销毁,否则应用叠加，内存溢出')
+            return
+        }
+        isCreate = true
+        Xut.Application.Launch({
+            el: '#xxtppt-app-container',
+            paths: {
+                resource: 'content/app' + appid,
+                database: 'content/app' + appid + '/SQLResult.js'
+            },
+            cursor: false
+        })
+        switchApp()
+
+    })
+
+    $("#testDestroy").click(function() {
+        isCreate = false
+        Xut.Application.DropApp()
+    })
     </script>
 </body>
 

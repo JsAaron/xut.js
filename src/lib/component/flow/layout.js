@@ -72,7 +72,7 @@ export function getCounts(seasonId, chpaterId) {
             return count
         }
     } else {
-        console.log('getCounts失败')
+        // console.log('getCounts失败')
     }
 }
 

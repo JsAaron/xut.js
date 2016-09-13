@@ -239,16 +239,6 @@ export class Activity {
                     return;
                 }
 
-                //收费处理
-                if (scenarioInfo.Inapp !== undefined) {
-                    if (scenarioInfo.Inapp == 1) {
-                        Xut.Application.HasBuyGood(); //已收费
-                    } else {
-                        Xut.Application.BuyGood(); //付费接口
-                    }
-                    return
-                }
-
                 //处理新的场景
                 if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
                     setTimeout(function() {

@@ -3,16 +3,16 @@ import { config } from './config/index'
 import { api } from './global-api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
-import init from './initialize/index'
-//fix audio
 import { fixAudio } from './component/audio/fix'
+import { disable } from './util/cursor'
+//nextTick
 import nextTick from './nexttick'
 //A predictable state container for apps.
 // import store from './redex/store'
-
+import init from './init/index'
 
 /**
- * 版本号
+ * Version
  * @type {Number}
  */
 Xut.Version = 836
@@ -41,27 +41,51 @@ if (Xut.plat.isBrowser) {
 export default Xut
 
 
-const main = function(node) {
-    const html = `
-    <div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>
-    <div class="xut-busy-wrap xut-fullScreen xut-hide"></div>
+Xut.Application.Launch = function({
+    el,
+    paths,
+    cursor
+} = {}) {
+
+    /**
+     * add dynamic config
+     * @type {Object}
+     */
+    window.DYNAMICCONFIGT = {
+        resource: paths.resource,
+        database: paths.database
+    }
+
+    let busyIcon = '<div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>'
+
+    //disable cursor
+    if (!cursor) {
+        disable(true)
+        busyIcon = ''
+    }
+    const $html = $(`
+    ${busyIcon}
     <div class="xut-removelayer"></div>
     <div class="xut-startupPage xut-fullScreen"></div>
-    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>`
+    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>`)
+    const $el = $(el)
+    $el.css('z-index', 99999)
+
+    window.DYNAMICCONFIGT.removeNode = function() {
+        $html.remove()
+    }
 
     nextTick({
-        container: $(node),
-        content: $(html)
-    }, function() {
-        init()
-    })
+        container: $el,
+        content: $html
+    }, init)
 }
 
 
-Xut.Application.Launch = main
-
 setTimeout(() => {
-    if (Xut.Application.setLaunch) {
-         main()
+    //External interface call
+    if (!Xut.Application.supportLaunch) {
+        $("#xxtppt-app-container").hide()
+        init()
     }
 }, 0)

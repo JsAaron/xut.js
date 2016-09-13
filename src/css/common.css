@@ -87,10 +87,10 @@ video {
 }
 
 
-
 /**
  * index xut-fullScreen
  */
+
 .xut-fullScreen {
     height: 100%;
     width: 100%;
@@ -101,11 +101,9 @@ video {
     overflow: hidden;
 }
 
-
 .xut-hide {
     display: none;
 }
-
 
 .xut-startupPage {
     background-repeat: no-repeat;
@@ -118,7 +116,7 @@ video {
 
 .xut-busy-wrap {
     position: absolute;
-    z-index: 1000001;
+    z-index: 1000;
 }
 
 .xut-busy-middle {
@@ -147,7 +145,6 @@ video {
     -webkit-animation: kfnavControlBar 1s linear infinite;
     border-radius: 40%;
 }
-
 
 
 /*==========================工具栏================*/
@@ -184,6 +181,14 @@ video {
 .xut-Bar-middle {
     width: 60%;
     margin: 0 auto;
+}
+
+.xut-flip-control-left {
+    left: : 0;
+}
+
+.xut-flip-control-right {
+    right: 0
 }
 
 .xut-Bar-left li,
@@ -304,7 +309,6 @@ video {
 }
 
 
-
 /**
  * 翻页控制
  */
@@ -345,7 +349,6 @@ video {
     z-index: 1
 }
 
-
 .xut-floatMaters {
     z-index: 1000;
 }
@@ -374,8 +377,6 @@ video {
 }
 
 
-
-
 /**
  *  导航条CSS3切换
  *
@@ -388,7 +389,7 @@ video {
     animation-duration: 1s;
     animation-iteration-count: 1;
     animation-timing-function: ease-out;
-    animation-fill-mode: forwards; 
+    animation-fill-mode: forwards;
     -webkit-transform-style: preserve-3d;
     -webkit-backface-visibility: hidden;
     -webkit-animation-name: kfnavControlBar;
@@ -889,7 +890,6 @@ video {
     height: 8%;
 }
 
-
 .htmlbox_close_container {
     width: 8%;
     height: 100%;
@@ -933,18 +933,18 @@ video {
     position: relative;
 }
 
-.htmlbox_fontsizeUl li{
+.htmlbox_fontsizeUl li {
     width: 33%;
     height: 100%;
     float: left;
 }
 
-.htmlbox_fontsizeUl li a{
+.htmlbox_fontsizeUl li a {
     display: block;
-/*    width: 50%;
+    /*    width: 50%;
     height: 50%;*/
     border-radius: 50%;
-    background:#51aed9;
+    background: #51aed9;
     position: absolute;
-    top:50%;
+    top: 50%;
 }

@@ -20,6 +20,12 @@ const delay = 1000
 let node = null
 
 /**
+ * 是否禁用忙了光标
+ * @type {Boolean}
+ */
+let isDisable = false
+
+/**
  * 光标状态
  * 调用隐藏
  * @type {Boolean}
@@ -38,7 +44,7 @@ let timer = null
  * @return {[type]} [description]
  */
 export function createCursor() {
-
+    if (isDisable) return
     const sWidth = config.screenSize.width
     const sHeight = config.screenSize.height
     const width = Math.min(sWidth, sHeight) / 4
@@ -91,8 +97,7 @@ const clear = () => {
  * 显示光标
  */
 export const ShowBusy = () => {
-    if (Xut.IBooks.Enabled) return;
-    if (timer) return
+    if (isDisable || Xut.IBooks.Enabled || timer) return
     timer = setTimeout(() => {
         node.show()
         clear()
@@ -103,20 +108,13 @@ export const ShowBusy = () => {
     }, delay)
 }
 
-/**
- * 光标状态
- * @return {[type]} [description]
- */
-export const busyBarState = () => {
-    console.log(123)
-}
 
 /**
  * 隐藏光标
  */
 export const HideBusy = (IsPay) => {
-    if (Xut.IBooks.Enabled) return;
-    if (ShowBusy.lock) return; //显示忙碌加锁，用于不处理hideBusy
+    //显示忙碌加锁，用于不处理hideBusy
+    if (isDisable || Xut.IBooks.Enabled || ShowBusy.lock) return;
     if (!timer) {
         node.hide();
     } else {
@@ -131,7 +129,17 @@ export const HideBusy = (IsPay) => {
  * @param {[type]} txt [description]
  */
 export const ShowTextBusy = (txt) => {
-    if (Xut.IBooks.Enabled) return;
+    if (isDisable || Xut.IBooks.Enabled) return;
     node.css('pointer-events', 'none').find('.xut-busy-text').html(txt);
     ShowBusy();
+}
+
+
+/**
+ * 禁用光标
+ * isDisable 是否禁用
+ * @return {[type]} [description]
+ */
+export const disable = (state) => {
+    isDisable = state
 }

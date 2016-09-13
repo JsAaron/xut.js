@@ -1,12 +1,13 @@
 import { execute } from '../util/execute'
 
-const dataRet = {}
+// const dataRet = {}
 const statement = {}
 
 
 'Setting,Parallax,Master,Activity,Content,Video,Image,Action,Animation,Widget,Novel,Season,Chapter'.replace(/[^, ]+/g, function(name) {
     statement[name] = 'select * FROM ' + (name) + ' order by _id ASC';
 })
+
 
 /**
  * 查询单一的数据
@@ -18,25 +19,27 @@ export function oneQuery(tableName, callback) {
     })
 }
 
+
 /**
  * 查询总数据
  */
 export function dataQuery(callback) {
 
     //数据库表重复数据只查询一次
-    if (Object.keys(dataRet).length) {
-        callback(dataRet);
-        return;
-    }
+    // if (Object.keys(dataRet).length) {
+    //     callback(dataRet);
+    //     return;
+    // }
+
     //ibook模式，数据库外部注入的
     if (Xut.IBooks.CONFIG) {
         callback(Xut.IBooks.CONFIG.data);
     } else {
         //查询所有数据
         execute(statement, function(successRet, collectError) {
-            for (let i in successRet) {
-                dataRet[i] = successRet[i];
-            }
+            // for (let i in successRet) {
+            //     dataRet[i] = successRet[i];
+            // }
             callback(successRet, collectError);
         })
     }

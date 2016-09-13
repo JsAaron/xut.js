@@ -81,7 +81,7 @@ ToolBar.prototype.createLeftArrow = function() {
     var style = arrowStyle(),
         state = this.barStatus ? '' : 'hide',
         $dom;
-    $dom = $('<div class="si-icon xut-flip-control left ' + state + '" data-icon-name="prevArrow" style="' + style + '"></div>');
+    $dom = $('<div class="si-icon xut-flip-control xut-flip-control-left ' + state + '" data-icon-name="prevArrow" style="' + style + '"></div>');
 
     this.createSVGIcon($dom[0],
         function() {
@@ -101,7 +101,7 @@ ToolBar.prototype.createRightArrow = function() {
     var style = arrowStyle(),
         state = this.barStatus ? '' : 'hide',
         $dom;
-    $dom = $('<div class="si-icon xut-flip-control right ' + state + '" data-icon-name="nextArrow" style="' + style + '"></div>');
+    $dom = $('<div class="si-icon xut-flip-control xut-flip-control-right ' + state + '" data-icon-name="nextArrow" style="' + style + '"></div>');
 
     this.createSVGIcon($dom[0],
         function() {
@@ -123,7 +123,7 @@ ToolBar.prototype.createLeftIcon = function() {
         state = this.barStatus ? '' : 'hide',
         $dom;
     style += ';background-image:url(images/icons/pageforward_' + appId + '.svg);background-size:cover';
-    $dom = $('<div name="prevArrow" class="xut-flip-control left ' + state + '" style="' + style + '"></div>');
+    $dom = $('<div name="prevArrow" class="xut-flip-control xut-flip-control-left ' + state + '" style="' + style + '"></div>');
 
     $dom.on("touchend mouseup", function() {
         Xut.View.GotoPrevSlide();
@@ -143,7 +143,7 @@ ToolBar.prototype.createRightIcon = function() {
         state = this.barStatus ? '' : 'hide',
         $dom;
     style += ';background-image:url(images/icons/pageback_' + appId + '.svg);background-size:cover';
-    $dom = $('<div name="nextArrow" class="xut-flip-control right ' + state + '" style="' + style + '"></div>');
+    $dom = $('<div name="nextArrow" class="xut-flip-control xut-flip-control-right ' + state + '" style="' + style + '"></div>');
 
     $dom.on("touchend mouseup", function() {
         Xut.View.GotoNextSlide();

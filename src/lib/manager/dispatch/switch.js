@@ -13,7 +13,7 @@ const improveIndex = (complier, { currIndex } = {}) => {
     })
 
     //提高mater层级
-    complier.masterContext(() => {
+    complier.masterContext(function() {
         this.abstractAssistPocess(currIndex, pageObj => {
             pageObj.element.css({
                 'z-index': 1

@@ -47,12 +47,6 @@ const preloadVideo = {
 }
 
 
-/**
- * 播放视频插件
- */
-export function playPlugVideo() {
-    preloadVideo.load();
-}
 
 /**
  * 获取插件视频状态
@@ -69,12 +63,19 @@ export function closePlugVideo() {
 }
 
 
+/**
+ * 播放视频插件
+ */
+export function plugVideo() {
+    preloadVideo.load();
+}
+
 
 /**
  *  创建播放器
  *  IOS，PC端执行
  */
-export function playHtml5Video() {
+export function html5Video() {
     //延时应用开始
     Xut.Application.delayAppRun();
     Video5({

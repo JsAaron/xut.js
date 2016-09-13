@@ -1,4 +1,5 @@
-import { sourcePath, widgetPath } from './default'
+
+import { getWidgetPath, getSourcePath } from './default'
 
 const isIOS = Xut.plat.isIOS
 const isAndroid = Xut.plat.isAndroid
@@ -13,15 +14,15 @@ export default {
      */
     resources(config) {
         if (isIOS) {
-            return sourcePath
+            return getSourcePath()
         }
         if (isAndroid) {
             if (parseInt(config.storageMode)) {
                 //sd卡加载资源数据
-                return "/sdcard/appcarrier/magazine/" + config.appId + "/" + sourcePath;
+                return "/sdcard/appcarrier/magazine/" + config.appId + "/" + getSourcePath();
             } else {
                 //android_asset缓存加载资源
-                return "/android_asset/www/" + sourcePath;
+                return "/android_asset/www/" + getSourcePath();
             }
         }
     },
@@ -33,7 +34,7 @@ export default {
      */
     video() {
         if (isIOS) {
-            return sourcePath;
+            return getSourcePath();
         }
         if (isAndroid) {
             return 'android.resource://#packagename#/raw/';
@@ -48,10 +49,10 @@ export default {
      */
     audio() {
         if (isIOS) {
-            return sourcePath;
+            return getSourcePath();
         }
         if (isAndroid) {
-            return "/android_asset/www/" + sourcePath;
+            return "/android_asset/www/" + getSourcePath();
         }
     },
 
@@ -60,7 +61,7 @@ export default {
      * @return {[type]} [description]
      */
     svg() {
-        return 'www/' + sourcePath;
+        return 'www/' + getSourcePath();
     },
 
     /**
@@ -70,10 +71,10 @@ export default {
      */
     jsWidget() {
         if (isIOS) {
-            return widgetPath
+            return getWidgetPath()
         }
         if (isAndroid) {
-            return "/android_asset/www/" + widgetPath;
+            return "/android_asset/www/" + getWidgetPath();
         }
     }
 }

@@ -169,12 +169,13 @@ export default function api(Swipe) {
      * @return {[type]}            [description]
      */
     Swipe.prototype.findRootElement = function(point, pageType) {
-        var liNode, map,
-            _hindex = this._hindex,
-            sectionRang = this.sectionRang,
-            //找到对应的li
-            childNodes = this._bubbleNode[pageType].childNodes,
-            numNodes = childNodes.length;
+        let liNode, map
+        let _hindex = this._hindex
+        let sectionRang = this.sectionRang
+
+        //找到对应的li
+        let childNodes = this._bubbleNode[pageType].childNodes
+        let numNodes = childNodes.length
 
         while (numNodes--) {
             liNode = childNodes[numNodes];

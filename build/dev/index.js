@@ -27,8 +27,8 @@ const conf = _.extend(config.dev.conf, {
 })
 
 
-convert(conf.srcDir)
-dataInit(conf, spinner)
+// convert(conf.srcDir)
+// dataInit(conf, spinner)
 
 fsextra.removeSync(conf.assetsRoot)
 fsextra.mkdirSync(conf.assetsRoot);

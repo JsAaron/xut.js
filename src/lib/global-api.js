@@ -30,13 +30,14 @@ import { autoRun, original, suspend } from './command/index'
 import { suspendHandles, promptMessage } from './global-stop'
 import { SceneFactory } from './scenario/factory'
 import { getCounts } from './component/flow/layout'
-import loadScene from './initialize/scene'
+import { removeCache } from './database/cache'
+
+import loadScene from './init/scene'
 
 import {
     ShowBusy,
     HideBusy,
-    ShowTextBusy,
-    busyBarState
+    ShowTextBusy
 } from './util/cursor'
 
 import {
@@ -58,9 +59,12 @@ const Application = Xut.Application = hash()
 
 Xut.Assist = hash()
 
-let LOCK = 1 //锁定
-let UNLOCK = 2 //解除锁定
-let IsPay = false
+/**
+ * 获取缓存
+ * @param  {[type]} name [description]
+ * @return {[type]}      [description]
+ */
+const getStorage = (name) => parseInt(_get(name))
 
 
 /**
@@ -69,61 +73,11 @@ let IsPay = false
 _extend(View, {
     ShowBusy,
     HideBusy,
-    ShowTextBusy,
-    busyBarState
+    ShowTextBusy
 })
-
-
-/**
- * [检查是否购买]
- **/
-const CheckBuyGood = (seasonId, chapterId, createMode, pageIndex) => {
-    //已付费
-    if (IsPay) {
-        return false;
-    }
-
-    try {
-        var data = Xut.data.query('sectionRelated', seasonId).toolbar,
-            item = [];
-        data = JSON.parse(data);
-        //判断是否免费章节
-        if (!data.Inapp) {
-            return false;
-        }
-        //判断是否交费
-        // if (UNLOCK == data.Inapp || UNLOCK == _get(inAppId)) {
-        //     setUnlock();
-        //     return false;
-        // }
-        //判断是否收费章节
-        if (LOCK == data.Inapp && data.inappInfo) {
-            item = _.map(data.inappInfo.split('-'), function(num) {
-                return Number(num);
-            });
-            //收费提示页
-            if (item[0] == chapterId && item[1] == seasonId) {
-                return false;
-            } else {
-                View.LoadScenario({
-                    'scenarioId': item[1],
-                    'chapterId': item[0],
-                    'createMode': createMode,
-                    'pageIndex': pageIndex,
-                    'isInApp': 'isInApp'
-                })
-            }
-        }
-    } catch (e) {
-        console.log('Data error:', e);
-    }
-    return true;
-}
-
 
 //重复点击
 let repeatClick = false;
-
 
 /**
  * 场景
@@ -169,13 +123,6 @@ _extend(View, {
         if (!options.main && Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
             location.href = chapterId + ".xhtml";
             return
-        }
-
-
-        //检查应用内是否收费
-        if (current && CheckBuyGood(seasonId, chapterId, createMode, pageIndex)) {
-            //未交费
-            return false;
         }
 
         //用户指定的跳转入口，而不是通过内部关闭按钮处理的
@@ -502,54 +449,6 @@ _extend(Contents, {
 })
 
 
-/**
- * 获取缓存
- * @param  {[type]} name [description]
- * @return {[type]}      [description]
- */
-const getStorage = (name) => parseInt(_get(name))
-
-
-/**
- * [ 执行解锁]
- * @return {[type]} [description]
- */
-const setUnlock = () => IsPay = true;
-
-
-/**
- * 购买成功
- * @return {[type]} [description]
- */
-const pass = () => {
-    //如果提前关闭了忙碌光标说明被用户中止
-    if (!View.busyBarState) return;
-    //将购买记录存入数据库
-    var db = config.db,
-        sql = 'UPDATE Setting SET value=? WHERE name=?';
-
-    db.transaction((tx) => {
-        tx.executeSql(sql, [null, 'Inapp']);
-    }, (e) => {
-        // _set(inAppId, UNLOCK);
-    })
-
-    setUnlock();
-    View.CloseScenario();
-    View.HideBusy(IsPay);
-}
-
-
-/**
- * 购买失败
- * @return {[type]} [description]
- */
-const failed = () => {
-    if (!View.busyBarState) return;
-    messageBox('购买失败');
-    View.HideBusy(IsPay);
-}
-
 
 _extend(Application, {
 
@@ -573,81 +472,6 @@ _extend(Application, {
             }
         }
     })(),
-
-
-    /**
-     * [ 锁状态]
-     * @return {[type]} [description]
-     */
-    Unlock() {
-        return IsPay;
-    },
-
-    /**
-     * [ 检查是否解锁]
-     * @return {[type]}       [description]
-     */
-    CheckOut() {
-        var Inapp = config.Inapp;
-        if (!Inapp || _get(Inapp) === UNLOCK || Xut.plat.isAndroid) {
-            setUnlock();
-        }
-    },
-
-    /**
-     * [ 付费接口]
-     * @param  {[type]} seasonId   [description]
-     * @param  {[type]} chapterId  [description]
-     * @param  {[type]} createMode [description]
-     * @param  {[type]} pageIndex  [description]
-     * @return {[type]}            [description]
-     */
-    BuyGood() {
-        var inAppId = config.Inapp;
-        if (View.busyBarState) return;
-        View.ShowTextBusy('请稍候...');
-        //调式模式
-        if (plat.isBrowser) {
-            setTimeout(() => {
-                pass();
-            }, 3000)
-            return;
-        }
-        //从AppStore查询是否交费
-        Xut.Plugin.iapPlugin.selectInfo(() => {
-            pass(); //查询成功则表明已购买
-        }, () => {
-            //否则提示购买
-            Xut.Plugin.iapPlugin.buyGood(() => {
-                pass();
-            }, (e) => {
-                failed();
-            }, inAppId);
-        }, inAppId);
-    },
-
-
-    /**
-     * 已付费接口
-     * @return {[type]} [description]
-     */
-    HasBuyGood() {
-        var inAppId = config.Inapp;
-        if (View.busyBarState) return;
-        View.ShowTextBusy('请稍候...');
-        //调式模式
-        if (plat.isBrowser) {
-            setTimeout(() => {
-                pass();
-            }, 3000)
-            return;
-        }
-        Xut.Plugin.iapPlugin.restore(() => {
-            pass(); //查询成功则表明已购买
-        }, () => {
-            failed();
-        }, inAppId);
-    },
 
 
     /**
@@ -716,6 +540,8 @@ _extend(Application, {
         }
         //销毁所有场景
         sceneController.destroyAllScene();
+        window.DYNAMICCONFIGT.removeNode()
+        removeCache()
     },
 
 
@@ -744,6 +570,17 @@ _extend(Application, {
             //销毁内存对象
             Application.Destroy();
             window.GLOBALCONTEXT = null;
+        }
+
+        /**
+         * 动态配置
+         * @param  {[type]} window.DYNAMICCONFIGT [description]
+         * @return {[type]}                       [description]
+         */
+        if (window.DYNAMICCONFIGT) {
+            unEvent()
+            destroy()
+            return
         }
 
         //如果读酷
