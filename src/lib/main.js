@@ -38,9 +38,6 @@ if (Xut.plat.isBrowser) {
 }
 
 
-export default Xut
-
-
 Xut.Application.Launch = function({
     el,
     paths,
