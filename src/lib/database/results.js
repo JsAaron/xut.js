@@ -10,7 +10,8 @@ let result
  * 1 去掉全局挂着
  * 2 缓存
  */
-export function importResults(path, callback) {
+export function importResults(callback) {
+    const path = window.DYNAMICCONFIGT.database
     if (path) {
         //add window.SQLResult database
         request(path, () => {
@@ -42,5 +43,3 @@ export function getResults() {
 export function removeResults() {
     result = null
 }
-
-

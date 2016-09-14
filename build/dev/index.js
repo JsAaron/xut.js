@@ -13,10 +13,10 @@ const cp = require('child_process');
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
 const portoccupied = require('../occupied')
-const convert = require('../convert')
+const convertJs = require('../convertjs')
 const dataInit = require('./data')
 const spinner = ora('【Begin to pack , Please wait for】\n')
-spinner.start()
+// spinner.start()
 
 const app = express()
 const config = require('../../config')
@@ -27,112 +27,114 @@ const conf = _.extend(config.dev.conf, {
 })
 
 
-convert(conf.srcDir)
-dataInit(conf, spinner)
-
-fsextra.removeSync(conf.assetsRoot)
-fsextra.mkdirSync(conf.assetsRoot);
-
-const webpackConfig = require('./webpack.dev.conf')
-
-/**
- * eslint
- * @param  {[type]} config.dev.eslint.launch [description]
- * @return {[type]}                          [description]
- */
-if (config.dev.eslint.launch) {
-    webpackConfig.module.preLoaders = [{
-        test: /\.js$/,
-        loader: 'eslint',
-        include: config.dev.eslint.dir,
-        exclude: /node_modules/
-    }]
-
-    // community formatter
-    webpackConfig.eslint = {
-        formatter: require("eslint-friendly-formatter")
-    }
-}
-
-const compiler = webpack(webpackConfig)
-
-const devMiddleware = webpackDevMiddleware(compiler, {
-    //The path where to bind the middleware to the server.
-    //In most cases this equals the webpack configuration option output.publicPath
-    publicPath: webpackConfig.output.publicPath,
-
-    //Output options for the stats. See node.js API.
-    //http://webpack.github.io/docs/node.js-api.html
-    stats: {
-        //With console colors
-        colors: true,
-        //add chunk information
-        chunks: false
-    }
-})
+convertJs(conf.srcDir)
 
 
-//Webpack热重载连接服务器
-//https://github.com/glenjamin/webpack-hot-middleware
-//Add webpack-hot-middleware attached to the same compiler instance
-const hotMiddleware = webpacHotMiddleware(compiler)
+// dataInit(conf, spinner)
 
-// force page reload when html-webpack-plugin template changes
-compiler.plugin('compilation', (compilation) => {
-    //https://github.com/ampedandwired/html-webpack-plugin
-    compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
-        hotMiddleware.publish({
-            action: 'reload'
-        })
-        cb()
-    })
-})
+// fsextra.removeSync(conf.assetsRoot)
+// fsextra.mkdirSync(conf.assetsRoot);
 
-// serve webpack bundle output
-app.use(devMiddleware)
+// const webpackConfig = require('./webpack.dev.conf')
 
-// enable hot-reload and state-preserving
-// compilation error display
-app.use(hotMiddleware)
+// /**
+//  * eslint
+//  * @param  {[type]} config.dev.eslint.launch [description]
+//  * @return {[type]}                          [description]
+//  */
+// if (config.dev.eslint.launch) {
+//     webpackConfig.module.preLoaders = [{
+//         test: /\.js$/,
+//         loader: 'eslint',
+//         include: config.dev.eslint.dir,
+//         exclude: /node_modules/
+//     }]
 
-app.use('/lib', express.static('src/lib'));
-app.use('/css', express.static('src/css'));
-app.use('/images', express.static('src/images'));
-app.use('/content', express.static('src/content'));
+//     // community formatter
+//     webpackConfig.eslint = {
+//         formatter: require("eslint-friendly-formatter")
+//     }
+// }
 
+// const compiler = webpack(webpackConfig)
 
-let first = true
-let preChildRun = null
-watch(conf.assetsRoot + '/app.js', () => {
-    if (first) {
-        spinner.stop()
-        open("http://localhost:" + port)
-        first = false
-    }
-    if (config.dev.test.launch) {
-        console.log(
-            '\n' +
-            'watch file change.....await....:\n'
-        )
-        if (preChildRun) {
-            preChildRun.kill()
-            preChildRun = null
-        }
-        let child = cp.spawn('node', ['build/dev/test.js', ['test=' + config.dev.test.dir]]);
-        child.stdout.on('data', (data) => console.log('\n' + data))
-        child.stderr.on('data', (data) => console.log('fail out：\n' + data));
-        child.on('close', (code) => console.log('complete：' + code));
-        preChildRun = child
-    }
-})
+// const devMiddleware = webpackDevMiddleware(compiler, {
+//     //The path where to bind the middleware to the server.
+//     //In most cases this equals the webpack configuration option output.publicPath
+//     publicPath: webpackConfig.output.publicPath,
+
+//     //Output options for the stats. See node.js API.
+//     //http://webpack.github.io/docs/node.js-api.html
+//     stats: {
+//         //With console colors
+//         colors: true,
+//         //add chunk information
+//         chunks: false
+//     }
+// })
 
 
-portoccupied(port, () => {
-    app.listen(port, (err) => {
-        if (err) {
-            console.log(err)
-            return
-        }
-        console.log('Listening at http://localhost:' + port + '\n')
-    })
-})
+// //Webpack热重载连接服务器
+// //https://github.com/glenjamin/webpack-hot-middleware
+// //Add webpack-hot-middleware attached to the same compiler instance
+// const hotMiddleware = webpacHotMiddleware(compiler)
+
+// // force page reload when html-webpack-plugin template changes
+// compiler.plugin('compilation', (compilation) => {
+//     //https://github.com/ampedandwired/html-webpack-plugin
+//     compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
+//         hotMiddleware.publish({
+//             action: 'reload'
+//         })
+//         cb()
+//     })
+// })
+
+// // serve webpack bundle output
+// app.use(devMiddleware)
+
+// // enable hot-reload and state-preserving
+// // compilation error display
+// app.use(hotMiddleware)
+
+// app.use('/lib', express.static('src/lib'));
+// app.use('/css', express.static('src/css'));
+// app.use('/images', express.static('src/images'));
+// app.use('/content', express.static('src/content'));
+
+
+// let first = true
+// let preChildRun = null
+// watch(conf.assetsRoot + '/app.js', () => {
+//     if (first) {
+//         spinner.stop()
+//         open("http://localhost:" + port)
+//         first = false
+//     }
+//     if (config.dev.test.launch) {
+//         console.log(
+//             '\n' +
+//             'watch file change.....await....:\n'
+//         )
+//         if (preChildRun) {
+//             preChildRun.kill()
+//             preChildRun = null
+//         }
+//         let child = cp.spawn('node', ['build/dev/test.js', ['test=' + config.dev.test.dir]]);
+//         child.stdout.on('data', (data) => console.log('\n' + data))
+//         child.stderr.on('data', (data) => console.log('fail out：\n' + data));
+//         child.on('close', (code) => console.log('complete：' + code));
+//         preChildRun = child
+//     }
+// })
+
+
+// portoccupied(port, () => {
+//     app.listen(port, (err) => {
+//         if (err) {
+//             console.log(err)
+//             return
+//         }
+//         console.log('Listening at http://localhost:' + port + '\n')
+//     })
+// })

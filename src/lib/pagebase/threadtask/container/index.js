@@ -33,7 +33,7 @@ const createli = function({
     }
 
     return String.styleFormat(
-        `<ol id="${data.prefix}"
+        `<li id="${data.prefix}"
             class="xut-flip"
             data-map="${data.pid}"
             data-pageType="${pageType}"
@@ -42,7 +42,7 @@ const createli = function({
                 ${TANSFROM}:${transform};
                 ${containerBackground}${customStyle}">
             ${virtualNode}
-        </ol>`
+        </li>`
     )
 
 

@@ -112,10 +112,10 @@ export default class Swipe extends Observer {
         this._initEvents()
 
         //用于查找跟元素
-        const ol = this.element.children
+        const li = this.element.children
         this._bubbleNode = {
-            page: ol[0],
-            master: ol[1]
+            page: li[0],
+            master: li[1]
         }
     }
 

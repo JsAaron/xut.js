@@ -11,7 +11,6 @@ import { _set } from '../util/index'
  * set表中写一个recordHistory
  * 是   1
  * 否   0
- * 
  * [description]
  * @param  {[type]} data [description]
  * @return {[type]}      [description]

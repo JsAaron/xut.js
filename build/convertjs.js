@@ -21,9 +21,6 @@ const convert = function(src) {
 
     var filename, readPath, str, data, handle, svgfiles, total, count, galleryPath, convertedPath, exists
 
-    galleryPath = src + '/gallery/'
-    convertedPath = galleryPath + '/converted.txt'
-
     var stat = fs.lstatSync(src);
 
     if (stat.isDirectory()) {

@@ -16,7 +16,7 @@ export function oneQuery(tableName, callback) {
         callback(successRet, collectError);
     })
 }
- 
+
 
 /**
  * 查询总数据

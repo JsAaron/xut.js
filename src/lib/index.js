@@ -9,7 +9,7 @@ import { disable } from './util/cursor'
 import nextTick from './nexttick'
 //A predictable state container for apps.
 // import store from './redex/store'
-import init from './init/index'
+import init from './main/index'
 
 /**
  * Version
@@ -34,8 +34,8 @@ if (Xut.plat.isBrowser) {
                     break;
             }
         })
-    } 
-} 
+    }
+}
 
 
 Xut.Application.Launch = function({
@@ -83,10 +83,36 @@ Xut.Application.Launch = function({
 }
 
 
+const createMain = function() {
+    let rootNode = $("#xxtppt-app-container")
+    let nodeHhtml = '<div id="xxtppt-app-container" class="xut-chapter xut-fullScreen xut-overflow"></div>'
+    let tempHtml = `<div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>
+                    <div class="xut-removelayer"></div>
+                    <div class="xut-startupPage xut-fullScreen"></div>
+                    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>`
+
+    let $html
+    if (rootNode.length) {
+        $html = $(tempHtml)
+    } else {
+        rootNode = $('body')
+        $html = $(
+            `<div id="xxtppt-app-container" class="xut-chapter xut-fullScreen xut-overflow">${tempHtml}</div>`
+        )
+    }
+    nextTick({
+        container: rootNode,
+        content: $html
+    }, function() {
+        init()
+    })
+}
+
 setTimeout(() => {
     //External interface call
     if (!Xut.Application.supportLaunch) {
-        $("#xxtppt-app-container").hide()
+        Xut.Application.Launch = function() {}
+        $("#xxtppt-app-container").remove()
         init()
     }
 }, 0)

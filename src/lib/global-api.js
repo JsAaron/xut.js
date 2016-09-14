@@ -27,18 +27,11 @@
 import { config } from './config/index'
 import { sceneController } from './scenario/controller'
 import { autoRun, original, suspend } from './command/index'
-import { suspendHandles, promptMessage } from './global-stop'
 import { SceneFactory } from './scenario/factory'
 import { getCounts } from './component/flow/layout'
-
-
-import { close } from './toolbar/navbar/index'
-import { clearAudio } from './component/audio/manager'
-import { clearVideo } from './component/video/manager'
-import { removeResults } from './database/results'
-import { removeCache } from './database/cache'
-
-import loadScene from './init/scene'
+import { suspendHandles as globalStop, promptMessage } from './global-stop'
+import globalDestroy from './global-destroy'
+import loadScene from './main/scene'
 
 import {
     ShowBusy,
@@ -105,7 +98,7 @@ _extend(View, {
             repeatClick = false;
         })
     },
- 
+
     /**
      * 加载一个新的场景
      * 1 节与节跳
@@ -540,30 +533,7 @@ _extend(Application, {
      * 销毁应用
      */
     Destroy() {
-        if (plat.isBrowser) {
-            //销毁桌面控制
-            $(document).off()
-        }
-
-        if (window.DYNAMICCONFIGT) {
-            //DYNAMICCONFIGT模式销毁节点
-            window.DYNAMICCONFIGT.removeNode()
-        }
-
-        //移除数据库缓存
-        removeResults()
-        //移除应用数据缓存
-        removeCache()
-
-        close()
-        clearAudio()
-        clearVideo()
-
-
-        //销毁所有场景
-        sceneController.destroyAllScene()
-
-
+        globalDestroy()
     },
 
 
@@ -662,7 +632,7 @@ _extend(Application, {
      * processed 处理完毕回调
      */
     Suspend(opts) {
-        if (suspendHandles(opts.skipMedia)) { //停止热点动作
+        if (globalStop(opts.skipMedia)) { //停止热点动作
             if (opts.dispose) {
                 opts.dispose(promptMessage);
             }

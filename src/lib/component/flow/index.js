@@ -30,8 +30,9 @@ export default class Flow {
             rootNode,
             dataNode,
             chapterId,
-            callback($container, $content) {
-                self._init($container, $content, getCounts(seasonId, chapterId))
+            callback($container) {
+
+                self._init($container, getCounts(seasonId, chapterId))
                 callback()
             }
         })
@@ -44,12 +45,12 @@ export default class Flow {
      * @param  {[type]} $content   [description]
      * @return {[type]}            [description]
      */
-    _init($container, $content, pagesCount) {
+    _init($container, pagesCount) {
 
         const MIN = 0
         const MAX = pagesCount - 1
         const viewWidth = config.viewSize.width
-        const gapWidth = 20
+        const gapWidth = 0
         const View = Xut.View
         const initIndex = this.initIndex
 
@@ -58,7 +59,7 @@ export default class Flow {
             linear: true,
             initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
             extraGap: gapWidth,
-            container: $content[0],
+            container: $container[0],
             pageFlip: 0,
             multiplePages: 1,
             stopPropagation: true,
@@ -95,7 +96,7 @@ export default class Flow {
 
             switch (direction) {
                 case 'next':
-                    moveDistance = moveDistance - gapWidth + lastDistance
+                    moveDistance = moveDistance - gapWidth + lastDistance 
                     break
                 case 'prev':
                     moveDistance = moveDistance + gapWidth + lastDistance
@@ -125,7 +126,7 @@ export default class Flow {
                     View.MovePage(currentDist, speed, this.direction, action)
                 }
             } else {
-                translation[action]({}, moveDistance, speed, $content)
+                translation[action]({}, moveDistance, speed, $container)
             }
 
 

@@ -22,9 +22,9 @@ const get = function(path, files) {
         console.log('数据解析完毕')
         return
     }
-    var file = files.shift()
-    var url = path + file
-    var stat = fs.lstatSync(url)
+    let file = files.shift()
+    let url = path + file
+    let stat = fs.lstatSync(url)
     if (stat.isDirectory()) {
         if (!fs.existsSync(url + '/SQLResult.js')) {
             console.log('【SQLResult.js not available!】')
@@ -42,7 +42,7 @@ const get = function(path, files) {
 
 
 module.exports = (conf, spinner) => {
-    var path = conf.srcDir + 'content/'
-    var files = fs.readdirSync(path)
+    let path = conf.srcDir + 'content/'
+    let files = fs.readdirSync(path)
     get(path, files)
 }

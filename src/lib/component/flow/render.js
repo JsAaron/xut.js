@@ -35,5 +35,5 @@ export default function render({
     nextTick({
         container: rootNode,
         content: $container
-    }, () => callback($container, $container.children('div')))
+    }, () => callback($container))
 }

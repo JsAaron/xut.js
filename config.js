@@ -11,7 +11,7 @@ const common = {
     //index入口
     index: './src/index.html',
     //执行入口
-    entry: './src/lib/main.js',
+    entry: './src/lib/index.js',
     //生成名称
     devName: 'xxtppt.dev.js',
     distName: 'xxtppt.js',
@@ -94,7 +94,7 @@ module.exports = {
          * @type {Array}
          * Parameter is an array format
          */
-        exclude: ['SQLResult.js', 'pixi.js', 'redux.js']
+        exclude: ['SQLResult.js', 'sqlResult.js', 'pixi.js', 'redux.js']
 
     },
 

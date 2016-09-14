@@ -15,22 +15,41 @@ let flowCounts = Object.create(null)
 /**
  * dom...
  */
-const createStr = (chapterId, data, vWidth, vHeight) => {
+const createStr = (chapterId, data, vWidth, vHeight, margin) => {
     const columnWidth = `${COLUMNWIDTH}:${vWidth}px`
     const columnHeight = `height:${vHeight}px`
-    const columnGap = `${COLUMNTAP}:20px`
-    const transform = 'translate3d(0, 0, 0)'
-    const $container = `
-            <section data-flow="true" style="overflow:hidden;">
-                <div id="section-column" style="${columnWidth};${columnHeight};${columnGap}">${data}</div>
+
+    let percentageTop = parseInt(margin[0])
+    let percentageLeft = parseInt(margin[1])
+    let percentageBottom = parseInt(margin[2])
+    let percentageRight = parseInt(margin[3])
+
+    let marginTop = vHeight / 100 * percentageTop
+    let marginLeft = vWidth / 100 * percentageLeft
+    let marginBottom = vHeight / 100 * percentageBottom
+    let marginRight = vWidth / 100 * percentageRight
+
+    const containerWidth = vWidth - marginLeft
+    const containerHeight = vHeight - marginTop - marginBottom
+    const containerLeft = marginLeft / 2
+    const containerTop = marginTop
+    const columnGap = `${COLUMNTAP}:${marginLeft}px`
+
+    const container = `
+            <section data-flow="true">
+                <div data-role="margin" style="width:${containerWidth}px;height:${containerHeight}px;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
+                    <div data-role="column" id="columns-content" style="columns:${containerWidth}px;height:100%;${columnGap}">
+                        ${data}
+                    </div>
+                </div>
             </section>`
 
-    return $container
+    return container
 }
 
 
 const resolveCount = ($content) => {
-    const theChildren = $content.find('#section-column').children()
+    const theChildren = $content.find('#columns-content').children()
     let paraHeight = 0
     for (let i = 0; i < theChildren.length; i++) {
         paraHeight += $(theChildren[i]).height()
@@ -45,7 +64,16 @@ const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, flowCounts) => {
         if (chapterNode.nodeType == 1) {
             const tag = chapterNode.id
             const id = tag.match(/\d/)[0]
-            chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, vWidth, vHeight)
+
+            //传递的数据
+            let margin = chapterNode.getAttribute('data-margin')
+            if (margin) {
+                margin = margin.split(",")
+            }else{
+                margin = [0,0,0,0]
+            }
+
+            chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, vWidth, vHeight, margin)
             flowCounts[seasonsId][id] = 0
         }
     }
@@ -66,7 +94,7 @@ export function getCounts(seasonId, chpaterId) {
             return seasonIds[chpaterId]
         } else {
             let count = 0
-            for(let key in seasonIds){
+            for (let key in seasonIds) {
                 count += seasonIds[key]
             }
             return count
