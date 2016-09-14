@@ -430,7 +430,13 @@ export class Dispatch {
         const moveDistance = calculateDistance(action, distance, direction)
 
         //视觉差页面滑动
-        const nodes = this.pageMgr.abstractGetPageObj(currIndex)['chapterDas']['nodes']
+        let currObj = this.pageMgr.abstractGetPageObj(currIndex)
+        if(!currObj) return
+        let chapterData = currObj.chapterDas
+        let nodes
+        if(chapterData && chapterData.nodes){
+            nodes = chapterData.nodes
+        }
 
         //通知page模块
         this.pageMgr.move(leftIndex, currIndex, rightIndex, direction, speed, action, moveDistance);

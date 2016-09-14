@@ -570,7 +570,6 @@ export default class Swipe extends Observer {
             return (this._viewWidth - (Math.abs(this._deltaX))) * this._speedRate || this._pageTime;
         }
 
-
         this._distributeMove({
             'pageIndex': this._hindex,
             'speed': calculatespeed(),
