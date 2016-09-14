@@ -11,10 +11,7 @@ import nextTick from './nexttick'
 // import store from './redex/store'
 import init from './main/index'
 
-/**
- * Version
- * @type {Number}
- */
+
 Xut.Version = 836
 
 
@@ -35,7 +32,7 @@ if (Xut.plat.isBrowser) {
             }
         })
     }
-}
+} 
 
 
 Xut.Application.Launch = function({

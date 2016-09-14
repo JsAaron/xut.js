@@ -139,7 +139,7 @@ export default class Swipe extends Observer {
      * pageIndex: 0, distance: -2, speed: 0, direction: "next", action: "flipMove"
      */
     _distributeMove(data) {
-        const pointer = this._pagePointer
+        let pointer = this._pagePointer
         data.leftIndex = pointer.leftIndex
         data.rightIndex = pointer.rightIndex
         this.$emit('onMove', data)

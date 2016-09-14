@@ -162,7 +162,7 @@ export default class PageMgr extends Abstract {
         }
 
         /**
-         * /开始移动页面
+         * 开始移动页面
          * @return {[type]}         [description]
          */
         _.each(findPage.call(this), function(pageObj, index) {

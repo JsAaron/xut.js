@@ -418,8 +418,8 @@ export class Dispatch {
         direction
     } = {}) {
 
-        const currIndex = pageIndex
-
+        let currIndex = pageIndex
+ 
         //用户强制直接切换模式
         //禁止页面跟随滑动
         if (this.options.pageFlip && action == 'flipMove') {
@@ -431,7 +431,8 @@ export class Dispatch {
 
         //视觉差页面滑动
         let currObj = this.pageMgr.abstractGetPageObj(currIndex)
-        if(!currObj) return
+
+        // if(!currObj) return
         let chapterData = currObj.chapterDas
         let nodes
         if(chapterData && chapterData.nodes){
@@ -442,7 +443,7 @@ export class Dispatch {
         this.pageMgr.move(leftIndex, currIndex, rightIndex, direction, speed, action, moveDistance);
 
         //通知视觉差模块
-        this.masterContext(() => {
+        this.masterContext(function(){
             this.move(leftIndex, currIndex, rightIndex, direction, moveDistance, action, speed, nodes);
         })
 

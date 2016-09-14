@@ -156,7 +156,7 @@ class Mediator extends Observer {
          * @return {[type]} [description]
          */
         $globalEvent.$watch('onMove', (data) => {
-            $dispatch.move(data)
+             $dispatch.move(data)
         });
 
 
