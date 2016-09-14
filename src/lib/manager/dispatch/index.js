@@ -386,7 +386,6 @@ export class Dispatch {
             _set("pageIndex", currIndex);
         }
 
-
         /**
          * 解锁翻页
          * 允许继续执行下一个翻页作用
@@ -588,7 +587,6 @@ export class Dispatch {
             createNextContainer = function(createPointer, currIndex) {
                 this.create([createPointer], currIndex, 'flipOver');
             };
-
 
         //如果是右边翻页
         if (direction === 'next') {

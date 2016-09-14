@@ -28,7 +28,6 @@ import { config } from './config/index'
 import { sceneController } from './scenario/controller'
 import { autoRun, original, suspend } from './command/index'
 import { SceneFactory } from './scenario/factory'
-import { getCounts } from './component/flow/layout'
 import { suspendHandles as globalStop, promptMessage } from './global-stop'
 import globalDestroy from './global-destroy'
 import loadScene from './main/scene'
@@ -210,12 +209,8 @@ _extend(View, {
         var sectionRang = Xut.data.query('sectionRelated', seasonId)
         var barInfo = sectionRang.toolbar //场景工具栏配置信息
 
-        /**
-         * 2016.9.12
-         * chapter的长度 = 本身chpater页面 + 子分栏数
-         * @type {[type]}
-         */
-        var pageTotal = sectionRang.length + getCounts(seasonId)
+
+        var pageTotal = sectionRang.length 
 
         //通过chapterId转化为实际页码指标
         //season 2

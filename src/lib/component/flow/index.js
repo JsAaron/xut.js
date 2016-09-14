@@ -133,7 +133,7 @@ export default class Flow {
             'flipOver' === action && setTimeout(() => {
                 let extra = direction === 'next' ? 1 : (-1)
                 let index = initIndex + pageIndex + extra
-                Xut.View.pageUpdate(index)
+                // Xut.View.pageUpdate(index)
                 // Xut.View.setPointer(index)
             })
 
