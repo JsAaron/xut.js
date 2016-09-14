@@ -13,21 +13,21 @@ let flowCounts = Object.create(null)
 
 
 /**
- * dom...
+ * create dom...
  */
 const createStr = (chapterId, data, vWidth, vHeight, margin) => {
     const columnWidth = `${COLUMNWIDTH}:${vWidth}px`
     const columnHeight = `height:${vHeight}px`
 
-    let percentageTop = parseInt(margin[0])
-    let percentageLeft = parseInt(margin[1])
-    let percentageBottom = parseInt(margin[2])
-    let percentageRight = parseInt(margin[3])
-
-    let marginTop = vHeight / 100 * percentageTop
-    let marginLeft = vWidth / 100 * percentageLeft
-    let marginBottom = vHeight / 100 * percentageBottom
-    let marginRight = vWidth / 100 * percentageRight
+    const percentageTop = parseInt(margin[0])
+    const percentageLeft = parseInt(margin[1])
+    const percentageBottom = parseInt(margin[2])
+    const percentageRight = parseInt(margin[3])
+ 
+    const marginTop = vHeight / 100 * percentageTop
+    const marginLeft = vWidth / 100 * percentageLeft
+    const marginBottom = vHeight / 100 * percentageBottom
+    const marginRight = vWidth / 100 * percentageRight
 
     const containerWidth = vWidth - marginLeft
     const containerHeight = vHeight - marginTop - marginBottom
@@ -100,7 +100,7 @@ export function getCounts(seasonId, chpaterId) {
             return count
         }
     } else {
-        // console.log('getCounts失败')
+        console.log('getCounts失败')
     }
 }
 

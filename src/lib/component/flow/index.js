@@ -31,7 +31,6 @@ export default class Flow {
             dataNode,
             chapterId,
             callback($container) {
-
                 self._init($container, getCounts(seasonId, chapterId))
                 callback()
             }

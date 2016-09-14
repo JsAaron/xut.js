@@ -371,12 +371,14 @@ export default function overrideApi(vm) {
      * @param {[type]} action    [description]
      */
     View.MovePage = function(distance, speed, direction, action) {
+
         //如果禁止翻页模式 || 如果是滑动,不是边界
         if (!options.multiplePages ||
-            $globalEvent.isMove() ||
+            $globalEvent.isMoveimg() ||
             action === 'flipMove' && $globalEvent.isBorder(distance)) {
             return
         }
+
         const pagePointer = $globalEvent.getPointer()
         const data = {
             'distance': distance,

@@ -38,7 +38,7 @@ export default function api(Swipe) {
      * 检车是否还在移动中
      * @return {Boolean} [description]
      */
-    Swipe.prototype.isMove = function() {
+    Swipe.prototype.isMoveimg = function() {
         return this._fliplock;
     }
 
