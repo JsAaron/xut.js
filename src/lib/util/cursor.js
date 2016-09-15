@@ -84,7 +84,7 @@ export function createCursor() {
         container: container
     })
 
-    node = $('#xut-busyIcon').html(container);
+    node = $('#xut-busy-icon').html(container);
 }
 
 

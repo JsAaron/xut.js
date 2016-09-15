@@ -6,7 +6,7 @@
  */
 import { recovery } from './command/index'
 import { show } from './util/notice'
-import { close } from './toolbar/navbar/index'
+import { closeNavbar } from './toolbar/navbar/index'
 import { clearAudio } from './component/audio/manager'
 import { clearVideo } from './component/video/manager'
 
@@ -82,7 +82,7 @@ export function suspendHandles(context, pageIndex, skipMedia) {
     }
 
     //处理导航
-    close(() => {
+    closeNavbar(() => {
         stateRun = true;
     });
 

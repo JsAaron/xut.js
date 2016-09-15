@@ -88,10 +88,10 @@ video {
 
 
 /**
- * index xut-fullScreen
+ * index.html
  */
 
-.xut-fullScreen {
+.xut-fullscreen {
     height: 100%;
     width: 100%;
     background-size: 100% 100%;
@@ -105,7 +105,7 @@ video {
     display: none;
 }
 
-.xut-startupPage {
+.xut-start-page {
     background-repeat: no-repeat;
     background-position: center top;
     background-size: 100% 100%;
@@ -147,9 +147,9 @@ video {
 }
 
 
-/*==========================工具栏================*/
+/*工具栏*/
 
-.xut-controlBar {
+.xut-control-bar {
     position: absolute;
     z-index: 9999;
     overflow: hidden;
@@ -157,6 +157,36 @@ video {
     background-color: white;
     font-size: 1rem;
 }
+
+/*工具栏返回主页*/
+.xut-control-backdir {
+    background-image: url(../images/icons/directory.png);
+}
+
+/*工具栏,标题*/
+.xut-control-title {
+    text-align: center;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+
+/*工具栏：页码场景顶部小圆样式结束*/
+.xut-control-pageindex {
+    font-family: sans-serif;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+
+/*收起工具栏,nav导航*/
+.xut-control-nav-hide {
+    background-image: url(../images/icons/hideToolbar.png);
+}
+
+
+
 
 
 /*函数工具栏*/
@@ -198,23 +228,10 @@ video {
     cursor: pointer;
 }
 
-.xut-controlBar-title {
-    text-align: center;
-    font-weight: bold;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.xut-controlBar-backDir {
-    background-image: url(../images/icons/directory.png);
-}
 
 
-/*收起工具栏*/
 
-.xut-controlBar-hide {
-    background-image: url(../images/icons/hideToolbar.png);
-}
+
 
 
 /*场景页关闭按钮*/
@@ -252,32 +269,25 @@ video {
 }
 
 
-/*场景顶部小圆样式结束*/
-
-.xut-controlBar-pageNum {
-    font-family: sans-serif;
-    color: #fff;
-    background-color: rgba(0, 0, 0, 0.6);
-}
 
 
 /*======================下拉菜单====================*/
 
-.xut-navBar {
+.xut-nav-bar {
     background-size: 100% 100%;
     position: absolute;
     display: none;
     left: 0;
 }
 
-.xut-navBar li {
+.xut-nav-bar li {
     display: table;
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
 
-.xut-navBar-box {
+.xut-navbar-box {
     opacity: 0.5;
     color: #007aff;
     z-index: 9999;
@@ -297,9 +307,7 @@ video {
 }
 
 
-/**
- * ========================chpter页面============================
- */
+/*chpter页面*/
 
 .xut-chapter {
     position: absolute;
@@ -312,7 +320,6 @@ video {
 /**
  * 翻页控制
  */
-
 .xut-flip {
     width: 100%;
     height: 100%;
@@ -372,7 +379,7 @@ video {
     -webkit-perspective: 1000;
 }
 
-.xut-contentScrollerImg {
+.xut-content-scroller-img {
     width: 99%;
 }
 

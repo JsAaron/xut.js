@@ -1,5 +1,5 @@
 import { sceneController } from './scenario/controller'
-import { close } from './toolbar/navbar/index'
+import { closeNavbar } from './toolbar/navbar/index'
 import { clearAudio } from './component/audio/manager'
 import { clearVideo } from './component/video/manager'
 import databaseDestroy from './database/destroy'
@@ -25,7 +25,7 @@ export default function Destroy() {
     databaseDestroy()
 
     //导航
-    close()
+    closeNavbar()
 
     //音视频
     clearAudio()

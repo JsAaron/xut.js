@@ -65,7 +65,7 @@
 /******/ 	}
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "fd40b5cb95ac844e89dc"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "55717fb50c59d5bf5076"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 /******/ 	
@@ -609,7 +609,7 @@
 
 	var _iframe2 = _interopRequireDefault(_iframe);
 
-	var _default = __webpack_require__(18);
+	var _default = __webpack_require__(19);
 
 	var _judge = __webpack_require__(97);
 
@@ -1040,7 +1040,7 @@
 	  value: true
 	});
 
-	var _lang = __webpack_require__(47);
+	var _lang = __webpack_require__(15);
 
 	Object.keys(_lang).forEach(function (key) {
 	  if (key === "default") return;
@@ -1076,7 +1076,7 @@
 	  });
 	});
 
-	var _stroage = __webpack_require__(16);
+	var _stroage = __webpack_require__(17);
 
 	Object.keys(_stroage).forEach(function (key) {
 	  if (key === "default") return;
@@ -1088,7 +1088,7 @@
 	  });
 	});
 
-	var _option = __webpack_require__(15);
+	var _option = __webpack_require__(16);
 
 	Object.keys(_option).forEach(function (key) {
 	  if (key === "default") return;
@@ -1112,7 +1112,7 @@
 	  });
 	});
 
-	var _execute = __webpack_require__(46);
+	var _execute = __webpack_require__(47);
 
 	Object.keys(_execute).forEach(function (key) {
 	  if (key === "default") return;
@@ -1304,7 +1304,7 @@
 	exports.clearVideo = clearVideo;
 	exports.hangUpVideo = hangUpVideo;
 
-	var _video = __webpack_require__(30);
+	var _video = __webpack_require__(31);
 
 	var _index = __webpack_require__(1);
 
@@ -1671,7 +1671,7 @@
 
 	var _index = __webpack_require__(2);
 
-	var _audio = __webpack_require__(26);
+	var _audio = __webpack_require__(27);
 
 	var _manager = __webpack_require__(4);
 
@@ -3173,294 +3173,53 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.destroy = exports.close = exports.oepn = exports.load = undefined;
+	exports.createNavbar = createNavbar;
+	exports.closeNavbar = closeNavbar;
+	exports.destroyNavbar = destroyNavbar;
 
-	var _dom = __webpack_require__(150);
+	var _html = __webpack_require__(167);
 
-	var config = void 0; /**
-	                      * 目录列表
-	                      * @param  {[type]} hindex    [description]
-	                      * @param  {[type]} pageArray [description]
-	                      * @param  {[type]} modules   [description]
-	                      * @return {[type]}           [description]
-	                      *
-	                      */
+	var _html2 = _interopRequireDefault(_html);
 
-	var _layoutMode = void 0;
-	var pageIndex = 0;
+	var _section = __webpack_require__(168);
 
+	var _section2 = _interopRequireDefault(_section);
+
+	var _index = __webpack_require__(1);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * 动画加锁
+	 */
+	var lockAnimation = void 0;
+
+	/**
+	 * 导航对象
+	 * @type {[type]}
+	 */
+	/**
+	 * 目录列表
+	 * @param  {[type]} hindex    [description]
+	 * @param  {[type]} pageArray [description]
+	 * @param  {[type]} modules   [description]
+	 * @return {[type]}           [description]
+	 *
+	 */
 	var sectionInstance = null;
-	var directory = 'images/icons/directory.png';
-	var directory_act = 'images/icons/directory_act.png';
-	var lockAnimation = void 0; //动画加锁
-
-	var $navbal = void 0;
-
-	/**
-	 * 下拉章节列表
-	 */
-	function SectionList(pageArray) {
-	    this.pageArray = pageArray;
-	    this.$sectionlist = $('#SectionThelist');
-	    this.list = this.$sectionlist.find("li");
-	};
-
-	SectionList.prototype = {
-
-	    /**
-	     * 卷滚条
-	     */
-	    userIscroll: function userIscroll() {
-	        var self = this,
-	            hBox = self.hBox,
-	            H = !!(_layoutMode === 'horizontal');
-
-	        if (hBox) {
-	            if (H) {
-	                //hBox.goToPage(pageIndex, 0, 0)
-	            } else {
-	                hBox.goToPage(0, pageIndex, 0);
-	            }
-	        } else {
-	            hBox = new iScroll('#SectionWrapper', {
-	                snap: 'li',
-	                tap: true,
-	                scrollX: H,
-	                scrollY: !H,
-	                scrollbars: true,
-	                fadeScrollbars: true,
-	                stopPropagation: true
-	            });
-
-	            //滑动结束,动态处理缩略图
-	            hBox.on('scrollEnd', function (e) {
-	                self.createThumb();
-	                self.removeThumb();
-	            });
-
-	            this.$sectionlist.on('tap', self.tojump);
-
-	            self.hBox = hBox;
-	        }
-	    },
-
-	    /**
-	     * [ 创建缩略图]
-	     * @return {[type]} [description]
-	     */
-	    createThumb: function createThumb() {
-	        var index = this.getPageIndex(),
-	            //最左边的索引
-	        count = this.getViewLen(),
-	            //允许显示的页数
-	        createBak = this.createBak || [],
-	            //已创建的页码索引
-	        createNew = [],
-	            //新建的页码索引
-	        pageArray = this.pageArray,
-	            list = this.list,
-	            maxLen = pageArray.length,
-	            path = config.pathAddress;
-
-	        //确保不会溢出
-	        count = count > maxLen ? maxLen : count;
-	        //尽可能地填满
-	        index = index + count > maxLen ? maxLen - count : index;
-
-	        for (var i = 0; i < count; i++) {
-	            var j = index + i,
-	                page = pageArray[j];
-
-	            createNew.push(j);
-
-	            if (_.contains(createBak, j)) continue;
-
-	            createBak.push(j);
-
-	            //如果是分层母板了,此时用icon代替
-	            if (page.iconImage) {
-	                list.eq(j).css({
-	                    'background-image': 'url(' + path + page.iconImage + ')'
-	                });
-	            } else {
-	                list.eq(j).css({
-	                    'background-image': 'url(' + path + page.md5 + ')',
-	                    'background-color': 'white'
-	                });
-	            }
-	        }
-
-	        this.createNew = createNew;
-	        this.createBak = createBak;
-	    },
-
-	    /**
-	     * [ 清理隐藏的缩略图]
-	     * @return {[type]} [description]
-	     */
-	    removeThumb: function removeThumb() {
-	        var list = this.list,
-	            createNew = this.createNew,
-	            createBak = this.createBak;
-
-	        _.each(createBak, function (val, i) {
-	            if (!_.contains(createNew, val)) {
-	                //标记要清理的索引
-	                createBak[i] = -1;
-	                list.eq(val).css({
-	                    'background': ''
-	                });
-	            }
-	        });
-
-	        //执行清理
-	        this.createBak = _.without(createBak, -1);
-	    },
-
-	    /**
-	     * [ 得到滑动列表中最左侧的索引]
-	     * @return {[type]} [description]
-	     */
-	    getPageIndex: function getPageIndex() {
-	        if (this.hBox.options.scrollX) {
-	            return this.hBox.currentPage.pageX;
-	        } else {
-	            return this.hBox.currentPage.pageY;
-	        }
-	    },
-
-	    /**
-	     * [ 获取待创建的缩略图的个数]
-	     * @return {[type]} [description]
-	     */
-	    getViewLen: function getViewLen() {
-	        var hBox = this.hBox,
-	            eleSize = 1,
-	            //单个li的高度,
-	        count = 1,
-	            len = this.pageArray.length; //li的总数
-
-	        if (_layoutMode === 'horizontal') {
-	            eleSize = hBox.scrollerWidth / len;
-	            count = hBox.wrapperWidth / eleSize;
-	        } else {
-	            eleSize = hBox.scrollerHeight / len;
-	            count = hBox.wrapperHeight / eleSize;
-	        }
-	        //多创建一个
-	        return Math.ceil(count) + 1;
-	    },
-
-	    /**
-	     * 点击元素跳转
-	     */
-	    tojump: function tojump(env) {
-	        var target;
-	        var xxtlink;
-	        if (target = env.target) {
-	            initialize();
-	            if (xxtlink = target.getAttribute('data-xxtlink')) {
-	                xxtlink = xxtlink.split('-');
-	                Xut.View.GotoSlide(xxtlink[0], xxtlink[1]);
-	            }
-	        }
-	    },
-
-	    /**
-	     * 滚动指定位置
-	     */
-	    scrollTo: function scrollTo() {
-	        this.userIscroll();
-	    },
-
-	    /**
-	     * 刷新
-	     */
-	    refresh: function refresh() {
-	        this.hBox && this.hBox.refresh();
-	    },
-
-	    /**
-	     * 销毁
-	     */
-	    destroy: function destroy() {
-	        if (this.hBox) {
-	            this.$sectionlist.off();
-	            this.hBox.destroy();
-	            this.hBox = null;
-	        }
-	        this.pageArray = null;
-	    }
-
-	};
-
-	/**
-	 * 初始化
-	 */
-	function initialize() {
-	    //动画状态
-	    if (lockAnimation) {
-	        return false;
-	    }
-	    lockAnimation = true;
-	    Xut.View.ShowBusy();
-	    startpocess();
-	};
-
-	/**
-	 * 控制处理
-	 */
-	function startpocess() {
-	    //控制按钮
-	    var navhandle = $("#backDir");
-	    var navControlBar = $("#navBar");
-	    //判断点击的动作
-	    var action = navhandle.attr('fly') || 'in';
-
-	    /**
-	     * 初始化目录栏的样式
-	     * 能够显示出来
-	     */
-	    var initStyle = function initStyle(callback) {
-	        sectionInstance.state = false;
-	        if (action == 'in') {
-	            sectionInstance.state = true;
-	            navControlBar.css({
-	                'z-index': 0,
-	                'opacity': 0,
-	                'display': 'block'
-	            });
-	        }
-	        callback();
-	    };
-
-	    //初始化样式
-	    initStyle(function () {
-	        //触发控制条
-	        navControl(action, navhandle);
-	        //执行动画
-	        toAnimation(navControlBar, navhandle, action);
-	    });
-	};
-
-	/**
-	 * 控制按钮改变
-	 */
-	function navControl(action, navhandle) {
-	    navhandle.css('opacity', action === "in" ? 0.5 : 1);
-	}
 
 	/**
 	 * 执行动画
 	 */
-	function toAnimation(navControlBar, navhandle, action) {
+	var toAnimation = function toAnimation(navControl, navhandle, action) {
 
 	    var complete = function complete() {
 	        //恢复css
-	        navControlBar.css(Xut.style.transition, '');
+	        navControl.css(Xut.style.transition, '');
 	        Xut.View.HideBusy();
 	        lockAnimation = false;
 	    };
+
 	    //出现
 	    if (action == 'in') {
 	        //导航需要重置
@@ -3468,7 +3227,7 @@
 	        sectionInstance.refresh();
 	        sectionInstance.scrollTo();
 	        //动画出现
-	        navControlBar.animate({
+	        navControl.animate({
 	            'z-index': Xut.zIndexlevel(),
 	            'opacity': 1
 	        }, 'fast', 'linear', function () {
@@ -3478,59 +3237,87 @@
 	    } else {
 	        //隐藏
 	        navhandle.attr('fly', 'in');
-	        navControlBar.hide();
+	        navControl.hide();
 	        complete();
 	    }
-	}
+	};
+
+	var _controlNav = function _controlNav() {
+
+	    //控制按钮
+	    var navhandle = $(".xut-control-backdir");
+	    var navControl = $(".xut-nav-bar");
+
+	    //判断点击的动作
+	    var action = navhandle.attr('fly') || 'in';
+
+	    //初始化目录栏的样式
+	    //能够显示出来
+	    sectionInstance.state = false;
+	    if (action == 'in') {
+	        sectionInstance.state = true;
+	        navControl.css({
+	            'z-index': 0,
+	            'opacity': 0,
+	            'display': 'block'
+	        });
+	    }
+
+	    //触发控制条
+	    navhandle.css('opacity', action === "in" ? 0.5 : 1);
+
+	    //执行动画
+	    toAnimation(navControl, navhandle, action);
+	};
+
+	/**
+	 * 初始化
+	 */
+	var _initialize = function _initialize() {
+	    if (lockAnimation) {
+	        return false;
+	    }
+	    lockAnimation = true;
+	    Xut.View.ShowBusy();
+	    _controlNav();
+	};
 
 	/**
 	 * 预先缓存加载
 	 * @return {[type]} [description]
 	 */
-	function load() {
-	    $navbal = $("#navBar");
-	    //创建dom
-	    //返回页面数据
-	    (0, _dom.createdom)($navbal, function (pageArray) {
+	var _create = function _create(pageIndex) {
+	    (0, _html2.default)($(".xut-nav-bar"), function (data) {
 	        //目录对象
-	        sectionInstance = new SectionList(pageArray);
+	        sectionInstance = new _section2.default(data);
 	        //初始化滑动
-	        sectionInstance.userIscroll();
+	        sectionInstance.userIscroll(pageIndex);
 	        //初始缩略图
 	        sectionInstance.createThumb();
 	        //初始化样式
-	        initialize();
+	        _initialize();
 	    });
 	};
 
 	/**
-	 * 配置
+	 * 目录
 	 */
-	function initconf(index) {
-	    config = Xut.config;
-	    _layoutMode = config.layoutMode;
-	    pageIndex = index;
-	}
-
-	/**
-	 * 打开目录
-	 */
-	function oepn(index) {
-	    initconf(index);
+	function createNavbar(pageIndex) {
+	    lockAnimation = false;
 	    if (sectionInstance) {
-	        initialize();
+	        _initialize();
 	    } else {
-	        load();
+	        _create(pageIndex);
 	    }
 	}
 
 	/**
 	 * 关闭
 	 */
-	function close(callback) {
+	function closeNavbar(callback) {
 	    if (sectionInstance && sectionInstance.state) {
 	        callback && callback();
-	        initialize();
+	        _initialize();
 	    }
 	}
 
@@ -3538,20 +3325,371 @@
 	 * 销毁对象
 	 * @return {[type]} [description]
 	 */
-	function destroy() {
+	function destroyNavbar() {
 	    if (sectionInstance) {
 	        sectionInstance.destroy();
 	        sectionInstance = null;
 	    }
 	}
 
-	exports.load = load;
-	exports.oepn = oepn;
-	exports.close = close;
-	exports.destroy = destroy;
-
 /***/ },
 /* 15 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.defProtected = defProtected;
+	exports.defAccess = defAccess;
+	exports.toNumber = toNumber;
+	exports.toEmpty = toEmpty;
+	exports.hash = hash;
+	exports.extend = extend;
+	exports.revisesize = revisesize;
+	exports.setRootfont = setRootfont;
+	exports._extend = _extend;
+	exports.arrayUnique = arrayUnique;
+	exports.joinPaths = joinPaths;
+	//定义属性
+	var def = Object.defineProperty;
+
+	/**
+	 * 定义一个新的对象
+	 * 重写属性
+	 */
+	function defProtected(obj, key, val, enumerable, writable) {
+	    def(obj, key, {
+	        value: val,
+	        enumerable: enumerable,
+	        writable: writable,
+	        configurable: true
+	    });
+	}
+
+	/**
+	 * 定义访问控制器
+	 * @return {[type]} [description]
+	 */
+	function defAccess(obj, key, access) {
+	    def(obj, key, {
+	        get: access.get,
+	        set: access.set
+	    });
+	}
+
+	/**
+	 * 转化数组
+	 * @param  {[type]} o [description]
+	 * @return {[type]}   [description]
+	 */
+	function toNumber(o) {
+	    return Number(o) || null;
+	};
+
+	/**
+	 * 保证有效值
+	 * @return {[type]} [description]
+	 */
+	function toEmpty(val) {
+	    return Number(val);
+	}
+
+	/**
+	 * 创建一个纯存的hash对象
+	 */
+	function hash() {
+	    return Object.create(null);
+	}
+
+	/**
+	 * 简单继承
+	 * @return {[type]} [description]
+	 */
+	function extend(subClass, superClass) {
+	    var F = function F() {};
+	    F.prototype = superClass.prototype;
+	    var fProto = new F();
+	    for (var k in fProto) {
+	        if (subClass.prototype[k]) {
+	            console.log('子类与超类的方法名重叠了！');
+	        } else {
+	            subClass.prototype[k] = fProto[k];
+	        }
+	    }
+	    subClass.prototype.constructor = subClass;
+	    superClass = null;
+	}
+
+	/**
+	 * 缩放比
+	 * @param  {[type]} width  [description]
+	 * @param  {[type]} height [description]
+	 * @param  {[type]} left   [description]
+	 * @param  {[type]} top    [description]
+	 * @return {[type]}        [description]
+	 */
+	function fiexdProportion(width, height, left, top) {
+	    var proportion = Xut.config.proportion;
+	    return {
+	        width: width * proportion.width,
+	        height: height * proportion.height,
+	        left: left * proportion.left,
+	        top: top * proportion.top
+	    };
+	}
+
+	/**
+	 * 修正元素尺寸
+	 * @param  {[type]} results [description]
+	 * @return {[type]}         [description]
+	 */
+	function revisesize(results) {
+	    //不同设备下缩放比计算
+	    var layerSize = fiexdProportion(results.width, results.height, results.left, results.top);
+	    //新的背景图尺寸
+	    var backSize = fiexdProportion(results.backwidth, results.backheight, results.backleft, results.backtop);
+
+	    //赋值新的坐标
+	    results.scaleWidth = Math.ceil(layerSize.width);
+	    results.scaleHeight = Math.ceil(layerSize.height);
+	    results.scaleLeft = Math.floor(layerSize.left);
+	    results.scaleTop = Math.floor(layerSize.top);
+
+	    //背景坐标
+	    results.scaleBackWidth = Math.ceil(backSize.width);
+	    results.scaleBackHeight = Math.ceil(backSize.height);
+	    results.scaleBackLeft = Math.floor(backSize.left);
+	    results.scaleBackTop = Math.floor(backSize.top);
+
+	    return results;
+	}
+
+	/**
+	 * 全局字体修复
+	 * @return {[type]} [description]
+	 */
+	function setRootfont() {
+	    var rootSize = 16;
+	    switch (window.innerWidth + window.innerHeight) {
+	        case 3000:
+	            //1920+1080
+	            //samsumg galaxy s4
+	            rootSize = 32;
+	            break;
+	        case 2000:
+	            //1280+720
+	            //HD Android phone
+	            rootSize = 26;
+	            break;
+	        case 2048:
+	            //1280+768
+	            rootSize = Xut.plat.isIpad ? 16 : 26;
+	            break;
+	        case 1624:
+	            //1024+600
+	            rootSize = 18;
+	            break;
+	        case 888:
+	            //568+320
+	            rootSize = 12;
+	            break;
+	        case 800:
+	            //480+320
+	            rootSize = 14;
+	            break;
+	        case 560:
+	            //320+240
+	            rootSize = 12;
+	            break;
+	        default:
+	            //其他分辨率 取默认值
+	            break;
+	    }
+	    16 != rootSize && $("html").css("font-size", rootSize + "px");
+	}
+
+	function _extend(object, config) {
+	    for (var i in config) {
+	        if (i) {
+	            if (object[i]) {
+	                console.log('接口方法重复', 'Key->' + i, 'Value->' + object[i]);
+	            } else {
+	                object[i] = config[i];
+	            }
+	        }
+	    }
+	};
+
+	/**
+	 * 修正判断是否存在处理
+	 * @param  {[type]} arr [description]
+	 * @return {[type]}     [description]
+	 */
+	function arrayUnique(arr) {
+	    //去重
+	    if (arr && arr.length) {
+	        var length = arr.length;
+	        while (--length) {
+	            //如果在前面已经出现，则将该位置的元素删除
+	            if (arr.lastIndexOf(arr[length], length - 1) > -1) {
+	                arr.splice(length, 1);
+	            }
+	        }
+	        return arr;
+	    } else {
+	        return arr;
+	    }
+	}
+
+	/**
+	 * 标准化文件路径，主要解决 '.'和'..'相对路径问题。
+	 * @param  {[type]} path [description]
+	 * @return {[type]}      [description]
+	 */
+	function normalize(path) {
+	    // 利用帮助函数获取文件路径的信息
+	    var result = statPath(path),
+
+	    // 盘符
+	    device = result.device,
+
+	    // 是否为windows的UNC路径
+	    isUnc = result.isUnc,
+
+	    // 是否为绝对路径
+	    isAbsolute = result.isAbsolute,
+
+	    // 文件路径结尾
+	    tail = result.tail,
+
+	    // 尾部是否为'\' 或者 '/' 结尾。
+	    trailingSlash = /[\\\/]$/.test(tail);
+
+	    // Normalize the tail path
+	    //标准化tail路径，处理掉'.' '..' 以 '\' 连接 
+	    tail = normalizeArray(tail.split(/[\\\/]+/), !isAbsolute).join('\\');
+	    // 处理tail为空的情况
+	    if (!tail && !isAbsolute) {
+	        tail = '.';
+	    }
+	    // 当原始路径中有slash时候，需要加上
+	    if (tail && trailingSlash) {
+	        tail += '\\';
+	    }
+
+	    // Convert slashes to backslashes when `device` points to an UNC root.
+	    // Also squash multiple slashes into a single one where appropriate.
+	    // 处理windows UNC的情况。
+	    if (isUnc) {
+	        // 获取具体的路径，如果是UNC的情况
+	        device = normalizeUNCRoot(device);
+	    }
+	    // 返回具体的路径
+	    return device + (isAbsolute ? '\\' : '') + tail;
+	}
+
+	/**
+	 * 获取文件路径详细信息
+	 * @param  {[type]} path [description]
+	 * @return {[type]}      [description]
+	 */
+	function statPath(path) {
+	    var splitDeviceRe = /^([a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?([\\\/])?([\s\S]*?)$/;
+	    // 和上述的函数一样，解析路径中的信息。
+	    var result = splitDeviceRe.exec(path),
+	        device = result[1] || '',
+
+	    // 判断是否 为UNC path
+	    isUnc = !!device && device[1] !== ':';
+	    // 返回具体的对象，盘符，是否为统一路径，绝对路径， 以及结尾
+	    return {
+	        device: device,
+	        isUnc: isUnc,
+	        isAbsolute: isUnc || !!result[2], // UNC paths are always absolute
+	        tail: result[3]
+	    };
+	}
+
+	/**
+	 * 解决文件目录中的相对路径
+	 * @param  {[type]} parts          文件目录数组，从0- 高位分别代表一级目录
+	 * @param  {[type]} allowAboveRoot 布尔值，代表是否可以超过根目录
+	 * @return {[type]}                解决掉相对路径后的数组，比如说数组 
+	                                   ['/test'， '/re'， '..']将会返回 ['/test']
+	 */
+	function normalizeArray(parts, allowAboveRoot) {
+	    // 返回值
+	    var res = [];
+	    // 遍历数组，处理数组中的相对路径字符 '.' 或者'..'
+	    for (var i = 0; i < parts.length; i++) {
+	        // 取得当前的数组的字符
+	        var p = parts[i];
+
+	        // ignore empty parts
+	        // 对空或者'.'不处理
+	        if (!p || p === '.') continue;
+	        // 处理相对路径中的'..'
+	        if (p === '..') {
+	            if (res.length && res[res.length - 1] !== '..') {
+	                // 直接弹出返回队列，当没有到达根目录时
+	                res.pop();
+	            } else if (allowAboveRoot) {
+	                //allowAboveRoot 为真时，插入'..'
+	                res.push('..');
+	            }
+	        } else {
+	            // 非 '.' 和'..'直接插入返回队列。 
+	            res.push(p);
+	        }
+	    }
+	    // 返回路径数组
+	    return res;
+	}
+
+	/**
+	 *帮助函数，将路径UNC路径标准化成\\pathname\\
+	 * @param  {[type]} device [description]
+	 * @return {[type]}        [description]
+	 */
+	function normalizeUNCRoot(device) {
+	    return '\\\\' + device.replace(/^[\\\/]+/, '').replace(/[\\\/]+/g, '\\');
+	}
+
+	/**
+	 *  文件路径拼接
+	 * @return {[type]} [description]
+	 */
+	function joinPaths() {
+	    var paths = [];
+	    for (var i = 0; i < arguments.length; i++) {
+	        var arg = arguments[i];
+	        // 确保函数参数为字符串
+	        try {
+	            if (Object.prototype.toString.call(arg) != "[object String]") {
+	                throw new Error('Arguments to path.join must be strings');
+	            }
+	            if (arg) {
+	                // 放入参数数组
+	                paths.push(arg);
+	            }
+	        } catch (e) {
+	            console.log(e);
+	        }
+	    }
+
+	    var joined = paths.join("/");
+
+	    if (!/^[\\\/]{2}[^\\\/]/.test(paths[0])) {
+	        joined = joined.replace(/^[\\\/]{2,}/, '\\');
+	    }
+	    // 利用标准化接口 获取具体的文件路径
+	    return normalize(joined);
+	}
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3738,7 +3876,7 @@
 	}
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3869,7 +4007,7 @@
 	}
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3929,7 +4067,7 @@
 	}
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3973,7 +4111,7 @@
 	};
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3989,7 +4127,7 @@
 
 	var _transform = __webpack_require__(101);
 
-	var _query = __webpack_require__(32);
+	var _query = __webpack_require__(33);
 
 	/**
 	 * 数据缓存
@@ -4211,7 +4349,7 @@
 	}
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4268,7 +4406,7 @@
 	}
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4310,7 +4448,7 @@
 	};
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4452,8 +4590,439 @@
 	}();
 
 /***/ },
-/* 23 */,
 /* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _iconconf = __webpack_require__(145);
+
+	var _iconconf2 = _interopRequireDefault(_iconconf);
+
+	var _svgicon = __webpack_require__(146);
+
+	var _index = __webpack_require__(1);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var isIOS = Xut.plat.isIOS;
+
+	/**
+	 * 获取翻页按钮位置
+	 * @return {[type]} [description]
+	 */
+	var arrowStyle = function arrowStyle() {
+	    var height = _index.config.iconHeight;
+	    var settings = _index.config.settings;
+	    var styleText = 'height:' + height + 'px;width:' + height + 'px';
+	    switch (settings.NavbarPos) {
+	        case 0:
+	            styleText += ';top:0';
+	            break; //顶部
+	        case 1:
+	            styleText += ';margin-top:' + -height / 2 + 'px';
+	            break; //中间
+	        case 2:
+	            styleText += ';top:auto;bottom:0';
+	            break; //底部
+	        default:
+	            break;
+	    }
+	    return styleText;
+	};
+
+	var Bar = function () {
+	    function Bar() {
+	        _classCallCheck(this, Bar);
+
+	        /**
+	         * 系统状态栏高度
+	         * @type {[type]}
+	         */
+	        this.barHeight = isIOS ? 20 : 0;
+
+	        /**
+	         * 默认创建左翻页按钮
+	         * @type {Boolean}
+	         */
+	        this.enableLeft = true;
+
+	        /**
+	         * 默认创建右翻页按钮 
+	         * @type {Boolean}
+	         */
+	        this.enableRight = true;
+	    }
+
+	    _createClass(Bar, [{
+	        key: 'initConfig',
+	        value: function initConfig() {
+	            var propHeight;
+	            //获取高度缩放比
+	            //自动选择缩放比例
+	            this.propHeight = propHeight = function () {
+	                var layout = _index.config.layoutMode,
+	                    prop = _index.config.proportion;
+	                return layout == "horizontal" ? prop.width : prop.height;
+	            }();
+
+	            //获取图标高度
+	            //工具栏图标高度
+	            this.iconHeight = function () {
+	                var height = _index.config.iconHeight;
+	                return isIOS ? height : Math.round(propHeight * height);
+	            }();
+
+	            this.appName = _index.config.shortName; //应用标题
+	            this.settings = _index.config.settings; //应用默认配置
+	        }
+
+	        /**
+	         * 创建翻页按钮
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'createArrows',
+	        value: function createArrows() {
+	            //是否使用自定义的翻页按钮: true /false
+	            //图标名称是客户端指定的：pageforward_'+appId+'.svg
+	            var isCustom = this.settings.customButton;
+
+	            if (this.enableLeft) {
+	                isCustom ? this.createLeftIcon() : this.createLeftArrow();
+	            }
+
+	            if (this.enableRight) {
+	                isCustom ? this.createRightIcon() : this.createRightArrow();
+	            }
+	        }
+
+	        /**
+	         * 左箭头翻页按钮
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'createLeftArrow',
+	        value: function createLeftArrow() {
+	            var style = arrowStyle(),
+	                state = this.barStatus ? '' : 'hide',
+	                $dom;
+	            $dom = $('<div class="si-icon xut-flip-control xut-flip-control-left ' + state + '" data-icon-name="prevArrow" style="' + style + '"></div>');
+
+	            this.createSVGIcon($dom[0], function () {
+	                Xut.View.GotoPrevSlide();
+	            });
+
+	            this.container.append($dom);
+	            this.arrows.prev = {
+	                el: $dom,
+	                able: true
+	            };
+	        }
+
+	        /**
+	         * 右箭头翻页按钮
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'createRightArrow',
+	        value: function createRightArrow() {
+	            var style = arrowStyle(),
+	                state = this.barStatus ? '' : 'hide',
+	                $dom;
+	            $dom = $('<div class="si-icon xut-flip-control xut-flip-control-right ' + state + '" data-icon-name="nextArrow" style="' + style + '"></div>');
+
+	            this.createSVGIcon($dom[0], function () {
+	                Xut.View.GotoNextSlide();
+	            });
+
+	            this.container.append($dom);
+	            this.arrows.next = {
+	                el: $dom,
+	                able: true
+	            };
+	        }
+
+	        /**
+	         * 自定义左翻页按钮
+	         * [createLeftIcon description]
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'createLeftIcon',
+	        value: function createLeftIcon() {
+	            var style = arrowStyle(),
+	                appId = this.config.appId,
+	                state = this.barStatus ? '' : 'hide',
+	                $dom;
+	            style += ';background-image:url(images/icons/pageforward_' + appId + '.svg);background-size:cover';
+	            $dom = $('<div name="prevArrow" class="xut-flip-control xut-flip-control-left ' + state + '" style="' + style + '"></div>');
+
+	            $dom.on("touchend mouseup", function () {
+	                Xut.View.GotoPrevSlide();
+	            });
+
+	            this.container.append($dom);
+	            this.arrows.prev = {
+	                el: $dom,
+	                able: true
+	            };
+	        }
+
+	        //自定义右翻页按钮
+
+	    }, {
+	        key: 'createRightIcon',
+	        value: function createRightIcon() {
+	            var style = arrowStyle(),
+	                appId = this.config.appId,
+	                state = this.barStatus ? '' : 'hide',
+	                $dom;
+	            style += ';background-image:url(images/icons/pageback_' + appId + '.svg);background-size:cover';
+	            $dom = $('<div name="nextArrow" class="xut-flip-control xut-flip-control-right ' + state + '" style="' + style + '"></div>');
+
+	            $dom.on("touchend mouseup", function () {
+	                Xut.View.GotoNextSlide();
+	            });
+
+	            this.container.append($dom);
+	            this.arrows.next = {
+	                el: $dom,
+	                able: true
+	            };
+	        }
+
+	        /**
+	         * [ description]
+	         * @param  {[type]} dir [next,prev]
+	         * @param  {[type]} status  [true/false]
+	         * @return {[type]}       [description]
+	         */
+
+	    }, {
+	        key: 'toggleArrow',
+	        value: function toggleArrow(dir, status) {
+	            var arrow = this.arrows[dir];
+	            //如果没有创建翻页按钮,则不处理
+	            if (!arrow) return;
+	            arrow.able = status;
+	            //如果人为隐藏了工具栏,则不显示翻页按钮
+	            if (this.hasTopBar && !this.barStatus && status) {
+	                return;
+	            }
+	            arrow.el[status ? 'show' : 'hide']();
+	        }
+
+	        //隐藏下一页按钮
+
+	    }, {
+	        key: 'hideNext',
+	        value: function hideNext() {
+	            this.toggleArrow('next', false);
+	        }
+
+	        //显示下一页按钮
+
+	    }, {
+	        key: 'showNext',
+	        value: function showNext() {
+	            this.toggleArrow('next', true);
+	        }
+
+	        //隐藏上一页按钮
+
+	    }, {
+	        key: 'hidePrev',
+	        value: function hidePrev() {
+	            this.toggleArrow('prev', false);
+	        }
+
+	        //显示上一页按钮
+
+	    }, {
+	        key: 'showPrev',
+	        value: function showPrev() {
+	            this.toggleArrow('prev', true);
+	        }
+
+	        /**
+	         * [ 显示翻页按钮]
+	         * @return {[type]}        [description]
+	         */
+
+	    }, {
+	        key: 'showPageBar',
+	        value: function showPageBar() {
+	            var arrows = this.arrows;
+
+	            for (var dir in arrows) {
+	                var arrow = arrows[dir];
+	                arrow.able && arrow.el.show();
+	            }
+	        }
+
+	        /**
+	         * [ 隐藏翻页按钮]
+	         * @param  {[type]} unlock [description]
+	         * @return {[type]}        [description]
+	         */
+
+	    }, {
+	        key: 'hidePageBar',
+	        value: function hidePageBar() {
+	            var arrows = this.arrows;
+	            for (var dir in arrows) {
+	                arrows[dir].el.hide();
+	            }
+	        }
+
+	        /**
+	         * [description]
+	         * @param  {[type]} state   [description]
+	         * @param  {[type]} pointer [description]
+	         * @return {[type]}         [description]
+	         */
+
+	    }, {
+	        key: 'toggle',
+	        value: function toggle(state, pointer) {
+	            if (this.Lock) return;
+	            this.Lock = true;
+
+	            switch (state) {
+	                case 'show':
+	                    this.showToolbar(pointer);
+	                    break;
+	                case 'hide':
+	                    this.hideToolbar(pointer);
+	                    break;
+	                default:
+	                    this.barStatus ? this.hideToolbar(pointer) : this.showToolbar(pointer);
+	                    break;
+	            }
+	        }
+
+	        /**
+	         * [ 显示工具栏]
+	         * @param  {[type]} pointer [description]
+	         * @return {[type]}         [description]
+	         */
+
+	    }, {
+	        key: 'showToolbar',
+	        value: function showToolbar(pointer) {
+	            switch (pointer) {
+	                case 'controlBar':
+	                    this.showTopBar();
+	                    break;
+	                case 'button':
+	                    this.showPageBar();
+	                    this.Lock = false;
+	                    break;
+	                default:
+	                    this.showTopBar();
+	                    this.showPageBar();
+	            }
+	        }
+
+	        /**
+	         * [ 隐藏工具栏]
+	         * @param  {[type]} pointer [description]
+	         * @return {[type]}         [description]
+	         */
+
+	    }, {
+	        key: 'hideToolbar',
+	        value: function hideToolbar(pointer) {
+	            switch (pointer) {
+	                case 'controlBar':
+	                    this.hideTopBar();
+	                    break;
+	                case 'button':
+	                    this.hidePageBar();
+	                    this.Lock = false;
+	                    break;
+	                default:
+	                    this.hideTopBar();
+	                    this.hidePageBar();
+	            }
+	        }
+
+	        /**
+	         * 显示IOS系统工具栏
+	         *  iOS状态栏0=show,1=hide
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'showSystemBar',
+	        value: function showSystemBar() {
+	            isIOS && Xut.Plugin.statusbarPlugin.setStatus(null, null, 0);
+	        }
+
+	        /**
+	         * 隐藏IOS系统工具栏
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'hideSystemBar',
+	        value: function hideSystemBar() {
+	            isIOS && Xut.Plugin.statusbarPlugin.setStatus(null, null, 1);
+	        }
+
+	        /**
+	         * 创建SVG按钮
+	         * @param  {[type]}   el       [description]
+	         * @param  {Function} callback [description]
+	         * @return {[type]}            [description]
+	         */
+
+	    }, {
+	        key: 'createSVGIcon',
+	        value: function createSVGIcon(el, callback) {
+	            var options = {
+	                speed: 6000,
+	                size: {
+	                    w: this.iconHeight,
+	                    h: this.iconHeight
+	                },
+	                onToggle: callback
+	            };
+	            return new _svgicon.svgIcon(el, _iconconf2.default, options);
+	        }
+
+	        /**
+	         * 重置翻页按钮,状态以工具栏为标准
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'reset',
+	        value: function reset() {
+	            this.barStatus ? this.showPageBar() : this.hidePageBar();
+	        }
+	    }]);
+
+	    return Bar;
+	}();
+
+	exports.default = Bar;
+
+/***/ },
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4540,7 +5109,7 @@
 	        container: container
 	    });
 
-	    node = $('#xut-busyIcon').html(container);
+	    node = $('#xut-busy-icon').html(container);
 	}
 
 	var clear = function clear() {
@@ -4597,7 +5166,7 @@
 	};
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4700,7 +5269,7 @@
 	}
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4712,13 +5281,13 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _lang = __webpack_require__(47);
+	var _lang = __webpack_require__(15);
 
 	var _index = __webpack_require__(1);
 
 	var _baseclass = __webpack_require__(80);
 
-	var _fix = __webpack_require__(17);
+	var _fix = __webpack_require__(18);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -5254,7 +5823,7 @@
 	exports.audioPlayer = audioPlayer;
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5401,7 +5970,7 @@
 	}
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5496,7 +6065,7 @@
 	exports.onTouchMove = onTouchMove;
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5901,7 +6470,7 @@
 	exports.default = _class;
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6421,7 +6990,7 @@
 	exports.VideoClass = VideoClass;
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6473,7 +7042,7 @@
 	    };
 	};
 
-	var _sprite = __webpack_require__(29);
+	var _sprite = __webpack_require__(30);
 
 	var _sprite2 = _interopRequireDefault(_sprite);
 
@@ -6543,7 +7112,7 @@
 	}
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6555,7 +7124,7 @@
 	exports.dataQuery = dataQuery;
 	exports.dataRemove = dataRemove;
 
-	var _execute = __webpack_require__(46);
+	var _execute = __webpack_require__(47);
 
 	var statement = {};
 
@@ -6607,7 +7176,7 @@
 	}
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6703,7 +7272,7 @@
 	    }
 
 	    //处理导航
-	    (0, _index2.close)(function () {
+	    (0, _index2.closeNavbar)(function () {
 	        stateRun = true;
 	    });
 
@@ -6711,7 +7280,7 @@
 	}
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6752,18 +7321,18 @@
 	    });
 	};
 
-	var _index = __webpack_require__(2);
+	var _index = __webpack_require__(1);
 
-	var _index2 = __webpack_require__(1);
+	var _index2 = __webpack_require__(2);
 
 	/**
 	 * 设置缓存
 	 * @param {[type]} parameter [description]
 	 */
 	var setDataToStorage = function setDataToStorage(parameter) {
-	    _index2.config.pageIndex = parameter.pageIndex;
-	    _index2.config.novelId = parameter.novelId;
-	    (0, _index._set)({
+	    _index.config.pageIndex = parameter.pageIndex;
+	    _index.config.novelId = parameter.novelId;
+	    (0, _index2._set)({
 	        "pageIndex": parameter.pageIndex,
 	        "novelId": parameter.novelId
 	    });
@@ -6779,11 +7348,11 @@
 	    //pageflip可以为0
 	    //兼容pageFlip错误,强制转化成数字类型
 	    if (pageFlip !== undefined) {
-	        _index2.config.pageFlip = (0, _index.toEmpty)(pageFlip);
+	        _index.config.pageFlip = (0, _index2.toEmpty)(pageFlip);
 	    }
 	    return {
-	        'novelId': (0, _index.toEmpty)(options.novelId),
-	        'pageIndex': (0, _index.toEmpty)(options.pageIndex),
+	        'novelId': (0, _index2.toEmpty)(options.novelId),
+	        'pageIndex': (0, _index2.toEmpty)(options.pageIndex),
 	        'history': options.history
 	    };
 	};
@@ -6796,12 +7365,12 @@
 	    var preCode,
 	        novels = Xut.data.query('Novel');
 	    if (preCode = novels.preCode) {
-	        (0, _index.injectScript)(preCode, 'novelpre脚本');
+	        (0, _index2.injectScript)(preCode, 'novelpre脚本');
 	    }
 	};
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6814,7 +7383,7 @@
 	exports.plugVideo = plugVideo;
 	exports.html5Video = html5Video;
 
-	var _video = __webpack_require__(30);
+	var _video = __webpack_require__(31);
 
 	var preloadVideo = {
 
@@ -6901,7 +7470,7 @@
 	}
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7090,7 +7659,7 @@
 	}();
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7106,9 +7675,9 @@
 	exports.conversionPids = conversionPids;
 	exports.checkMasterCreate = checkMasterCreate;
 
-	var _cache = __webpack_require__(19);
+	var _cache = __webpack_require__(20);
 
-	var _parser = __webpack_require__(39);
+	var _parser = __webpack_require__(40);
 
 	/**
 	 * 判断是否能整除2
@@ -7323,7 +7892,7 @@
 	}
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7380,7 +7949,7 @@
 	}; //调度器
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7570,7 +8139,7 @@
 	}
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7696,7 +8265,7 @@
 	}
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7760,7 +8329,7 @@
 	(0, _destroy2.default)(baseProto);
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7787,7 +8356,7 @@
 	}
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7797,7 +8366,7 @@
 	});
 	exports.home = home;
 	exports.scene = scene;
-	exports.nav = nav;
+	exports.navMenu = navMenu;
 
 	var _index = __webpack_require__(1);
 
@@ -7849,43 +8418,27 @@
 	    var calculate = options.calculate;
 	    var isHorizontal = options.isHorizontal;
 
-	    var html = '';
-	    var template = void 0;
-	    var navBar = void 0;
-	    var container = void 0;
+	    var navBarWidth = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px';
+	    var navBarHeight = isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96);
+	    var navBarTop = isHorizontal ? '' : iconHeight + TOP + 2 + 'px';
+	    var navBarLeft = isHorizontal ? '' : iconHeight + 'px';
+	    var navBarBottom = isHorizontal ? '4px' : '';
+	    var navBaroOverflow = isHorizontal ? 'hidden' : 'visible';
 
 	    //导航
-	    html = '<div id="navBar" class="xut-navBar" style="' + 'width:{{width}};' + 'height:{{height}}px;' + 'top:{{top}};' + 'left:{{left}};' + 'bottom:{{bottom}};' + 'background-color:white;' + 'border-top:1px solid rgba(0,0,0,0.1);' + 'overflow:{{overflow}};' + '"></div>';
+	    var navBarHTML = '<div class="xut-nav-bar" \n              style="width:' + navBarWidth + ';\n                     height:' + navBarHeight + 'px;\n                     top:' + navBarTop + ';\n                     left:' + navBarLeft + ';\n                     bottom:' + navBarBottom + ';\n                     background-color:white;\n                     border-top:1px solid rgba(0,0,0,0.1);\n                     overflow:' + navBaroOverflow + ';">\n        </div>';
 
-	    navBar = _.template(html, {
-	        width: isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px',
-	        height: isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96),
-	        top: isHorizontal ? '' : iconHeight + TOP + 2 + 'px',
-	        left: isHorizontal ? '' : iconHeight + 'px',
-	        overflow: isHorizontal ? 'hidden' : 'visible',
-	        bottom: isHorizontal ? '4px' : ''
-	    });
+	    var homeWidth = _index.config.viewSize.width;
+	    var homeHeight = _index.config.viewSize.height;
+	    var homeTop = calculate.top;
+	    var homeLeft = calculate.left;
+	    var homeIndex = Xut.sceneController.createIndex();
+	    var homeOverflow = _index.config.scrollPaintingMode ? 'visible' : 'hidden';
 
 	    //主体
-	    html = '<div id="sceneHome" class="xut-chapter" style="' + 'width:{{width}}px;' + 'height:{{height}}px;' + 'top:{{top}}px;' + 'left:{{left}}px;' + 'overflow:hidden;' + 'z-index:{{index}};' + 'overflow:{{overflow}};" >' + ' <div id="controlBar" class="xut-controlBar hide"></div>' +
-	    //页面节点
-	    ' <ul id="pageContainer" class="xut-flip"></ul>' +
-	    //视觉差包装容器
-	    ' <ul id="masterContainer" class="xut-master xut-flip"></ul>' +
-	    //滑动菜单
-	    ' {{navBar}}' +
-	    //消息提示框
-	    ' <div id="toolTip"></div>' + '</div>';
+	    var homeHTML = '<div id="xut-main-scene" \n              class="xut-chapter" \n              style="width:' + homeWidth + 'px;\n                     height:' + homeHeight + 'px;\n                     top:' + homeTop + 'px;\n                     left:' + homeLeft + 'px;\n                     overflow:hidden;\n                     z-index:' + homeIndex + ';\n                     overflow:' + homeOverflow + ';">\n\n            <div id="xut-control-bar" class="xut-control-bar hide"></div>\n            <ul id="xut-page-container" class="xut-flip"></ul>\n            <ul id="xut-master-container" class="xut-master xut-flip"></ul>\n            ' + navBarHTML + '\n            <div id="toolTip"></div>\n        </div>';
 
-	    return _.template(html, {
-	        width: _index.config.viewSize.width,
-	        height: _index.config.viewSize.height,
-	        top: calculate.top,
-	        left: calculate.left,
-	        index: Xut.sceneController.createIndex(),
-	        overflow: _index.config.scrollPaintingMode ? 'visible' : 'hidden',
-	        navBar: navBar
-	    });
+	    return String.styleFormat(homeHTML);
 	}
 
 	/**
@@ -7946,7 +8499,11 @@
 	    };
 	};
 
-	//获得css配置数据
+	/**
+	 * 获得css配置数据
+	 * @param  {[type]} seasonlist [description]
+	 * @return {[type]}            [description]
+	 */
 	var getWrapper = function getWrapper(seasonlist) {
 
 	    var width = void 0,
@@ -7997,46 +8554,37 @@
 	};
 
 	/**
-	 * [nav 导航菜单]
+	 * 导航菜单
 	 * @param  {[type]} seasonSqlRet [description]
 	 * @return {[type]}              [description]
 	 */
-	function nav(seasonSqlRet) {
+	function navMenu(results) {
 
-	    var seasonId = void 0,
-	        chapterId = void 0,
-	        data = void 0,
-	        xxtlink = void 0;
-	    var seasonlist = seasonSqlRet.length;
+	    var seasonlist = results.length;
 	    var options = getWrapper(seasonlist);
 
 	    var list = '';
-	    var i = 0;
+	    var seasonId = void 0;
+	    var chapterId = void 0;
+	    var data = void 0;
+	    var xxtlink = void 0;
 
-	    for (i; i < seasonlist; i++) {
-	        data = seasonSqlRet[i];
+	    for (var i = 0; i < seasonlist; i++) {
+	        data = results[i];
 	        seasonId = data.seasonId;
 	        chapterId = data._id;
 	        xxtlink = seasonId + '-' + chapterId;
-	        list += '<li style="' + options.contentstyle + '">';
-	        list += '  <div class="xut-navBar-box" data-xxtlink = "' + xxtlink + '">' + (i + 1) + '</div>';
-	        list += '</li>';
+	        list += '<li style="' + options.contentstyle + '">;\n                <div class="xut-navBar-box" data-xxtlink="' + xxtlink + '">\n                    ' + (i + 1) + '\n                </div>\n           </li>';
 	    }
 
 	    //导航
-	    var html = '<div id="SectionWrapper" style="{{style}}">' + '  <div id="Sectionscroller" style="width:{{width}}px;height:{{height}}px;{{scroller}}">' + '    <ul id="SectionThelist">' + '       {{list}}' + '    </ul>' + '  </div>' + '</div>';
+	    var navHTML = '<div id="xut-nav-wrapper" style="' + options.containerstyle + '">\n            <div style="width:' + options.overwidth + 'px;\n                                           height:' + options.overHeigth + 'px;\n                                           ' + options.scroller + '">\n                <ul id="xut-nav-section-list">\n                    ' + list + '\n                </ul>\n            </div>\n        </div>';
 
-	    return _.template(html, {
-	        style: options.containerstyle,
-	        width: options.overwidth,
-	        height: options.overHeigth,
-	        scroller: options.scroller,
-	        list: list
-	    });
+	    return String.styleFormat(navHTML);
 	}
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -8148,7 +8696,7 @@
 	};
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8159,7 +8707,7 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _index = __webpack_require__(22);
+	var _index = __webpack_require__(23);
 
 	var _index2 = __webpack_require__(1);
 
@@ -8169,7 +8717,7 @@
 
 	var _tap = __webpack_require__(5);
 
-	var _depend = __webpack_require__(44);
+	var _depend = __webpack_require__(45);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8911,7 +9459,7 @@
 	(0, _api2.default)(Swipe);
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8921,7 +9469,7 @@
 	});
 	exports.execute = execute;
 
-	var _results = __webpack_require__(20);
+	var _results = __webpack_require__(21);
 
 	/**
 	 * 创建执行方法
@@ -9073,362 +9621,6 @@
 	        };
 	    }
 	};
-
-/***/ },
-/* 47 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.defProtected = defProtected;
-	exports.defAccess = defAccess;
-	exports.toNumber = toNumber;
-	exports.toEmpty = toEmpty;
-	exports.hash = hash;
-	exports.extend = extend;
-	exports.revisesize = revisesize;
-	exports.setRootfont = setRootfont;
-	exports._extend = _extend;
-	exports.arrayUnique = arrayUnique;
-	exports.joinPaths = joinPaths;
-	//定义属性
-	var def = Object.defineProperty;
-
-	/**
-	 * 定义一个新的对象
-	 * 重写属性
-	 */
-	function defProtected(obj, key, val, enumerable, writable) {
-	    def(obj, key, {
-	        value: val,
-	        enumerable: enumerable,
-	        writable: writable,
-	        configurable: true
-	    });
-	}
-
-	/**
-	 * 定义访问控制器
-	 * @return {[type]} [description]
-	 */
-	function defAccess(obj, key, access) {
-	    def(obj, key, {
-	        get: access.get,
-	        set: access.set
-	    });
-	}
-
-	/**
-	 * 转化数组
-	 * @param  {[type]} o [description]
-	 * @return {[type]}   [description]
-	 */
-	function toNumber(o) {
-	    return Number(o) || null;
-	};
-
-	/**
-	 * 保证有效值
-	 * @return {[type]} [description]
-	 */
-	function toEmpty(val) {
-	    return Number(val);
-	}
-
-	/**
-	 * 创建一个纯存的hash对象
-	 */
-	function hash() {
-	    return Object.create(null);
-	}
-
-	/**
-	 * 简单继承
-	 * @return {[type]} [description]
-	 */
-	function extend(subClass, superClass) {
-	    var F = function F() {};
-	    F.prototype = superClass.prototype;
-	    var fProto = new F();
-	    for (var k in fProto) {
-	        if (subClass.prototype[k]) {
-	            console.log('子类与超类的方法名重叠了！');
-	        } else {
-	            subClass.prototype[k] = fProto[k];
-	        }
-	    }
-	    subClass.prototype.constructor = subClass;
-	    superClass = null;
-	}
-
-	/**
-	 * 缩放比
-	 * @param  {[type]} width  [description]
-	 * @param  {[type]} height [description]
-	 * @param  {[type]} left   [description]
-	 * @param  {[type]} top    [description]
-	 * @return {[type]}        [description]
-	 */
-	function fiexdProportion(width, height, left, top) {
-	    var proportion = Xut.config.proportion;
-	    return {
-	        width: width * proportion.width,
-	        height: height * proportion.height,
-	        left: left * proportion.left,
-	        top: top * proportion.top
-	    };
-	}
-
-	/**
-	 * 修正元素尺寸
-	 * @param  {[type]} results [description]
-	 * @return {[type]}         [description]
-	 */
-	function revisesize(results) {
-	    //不同设备下缩放比计算
-	    var layerSize = fiexdProportion(results.width, results.height, results.left, results.top);
-	    //新的背景图尺寸
-	    var backSize = fiexdProportion(results.backwidth, results.backheight, results.backleft, results.backtop);
-
-	    //赋值新的坐标
-	    results.scaleWidth = Math.ceil(layerSize.width);
-	    results.scaleHeight = Math.ceil(layerSize.height);
-	    results.scaleLeft = Math.floor(layerSize.left);
-	    results.scaleTop = Math.floor(layerSize.top);
-
-	    //背景坐标
-	    results.scaleBackWidth = Math.ceil(backSize.width);
-	    results.scaleBackHeight = Math.ceil(backSize.height);
-	    results.scaleBackLeft = Math.floor(backSize.left);
-	    results.scaleBackTop = Math.floor(backSize.top);
-
-	    return results;
-	}
-
-	/**
-	 * 全局字体修复
-	 * @return {[type]} [description]
-	 */
-	function setRootfont() {
-	    var rootSize = 16;
-	    switch (window.innerWidth + window.innerHeight) {
-	        case 3000:
-	            //1920+1080
-	            //samsumg galaxy s4
-	            rootSize = 32;
-	            break;
-	        case 2000:
-	            //1280+720
-	            //HD Android phone
-	            rootSize = 26;
-	            break;
-	        case 2048:
-	            //1280+768
-	            rootSize = Xut.plat.isIpad ? 16 : 26;
-	            break;
-	        case 1624:
-	            //1024+600
-	            rootSize = 18;
-	            break;
-	        case 888:
-	            //568+320
-	            rootSize = 12;
-	            break;
-	        case 800:
-	            //480+320
-	            rootSize = 14;
-	            break;
-	        case 560:
-	            //320+240
-	            rootSize = 12;
-	            break;
-	        default:
-	            //其他分辨率 取默认值
-	            break;
-	    }
-	    16 != rootSize && $("html").css("font-size", rootSize + "px");
-	}
-
-	function _extend(object, config) {
-	    for (var i in config) {
-	        if (i) {
-	            if (object[i]) {
-	                console.log('接口方法重复', 'Key->' + i, 'Value->' + object[i]);
-	            } else {
-	                object[i] = config[i];
-	            }
-	        }
-	    }
-	};
-
-	/**
-	 * 修正判断是否存在处理
-	 * @param  {[type]} arr [description]
-	 * @return {[type]}     [description]
-	 */
-	function arrayUnique(arr) {
-	    //去重
-	    if (arr && arr.length) {
-	        var length = arr.length;
-	        while (--length) {
-	            //如果在前面已经出现，则将该位置的元素删除
-	            if (arr.lastIndexOf(arr[length], length - 1) > -1) {
-	                arr.splice(length, 1);
-	            }
-	        }
-	        return arr;
-	    } else {
-	        return arr;
-	    }
-	}
-
-	/**
-	 * 标准化文件路径，主要解决 '.'和'..'相对路径问题。
-	 * @param  {[type]} path [description]
-	 * @return {[type]}      [description]
-	 */
-	function normalize(path) {
-	    // 利用帮助函数获取文件路径的信息
-	    var result = statPath(path),
-
-	    // 盘符
-	    device = result.device,
-
-	    // 是否为windows的UNC路径
-	    isUnc = result.isUnc,
-
-	    // 是否为绝对路径
-	    isAbsolute = result.isAbsolute,
-
-	    // 文件路径结尾
-	    tail = result.tail,
-
-	    // 尾部是否为'\' 或者 '/' 结尾。
-	    trailingSlash = /[\\\/]$/.test(tail);
-
-	    // Normalize the tail path
-	    //标准化tail路径，处理掉'.' '..' 以 '\' 连接 
-	    tail = normalizeArray(tail.split(/[\\\/]+/), !isAbsolute).join('\\');
-	    // 处理tail为空的情况
-	    if (!tail && !isAbsolute) {
-	        tail = '.';
-	    }
-	    // 当原始路径中有slash时候，需要加上
-	    if (tail && trailingSlash) {
-	        tail += '\\';
-	    }
-
-	    // Convert slashes to backslashes when `device` points to an UNC root.
-	    // Also squash multiple slashes into a single one where appropriate.
-	    // 处理windows UNC的情况。
-	    if (isUnc) {
-	        // 获取具体的路径，如果是UNC的情况
-	        device = normalizeUNCRoot(device);
-	    }
-	    // 返回具体的路径
-	    return device + (isAbsolute ? '\\' : '') + tail;
-	}
-
-	/**
-	 * 获取文件路径详细信息
-	 * @param  {[type]} path [description]
-	 * @return {[type]}      [description]
-	 */
-	function statPath(path) {
-	    var splitDeviceRe = /^([a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?([\\\/])?([\s\S]*?)$/;
-	    // 和上述的函数一样，解析路径中的信息。
-	    var result = splitDeviceRe.exec(path),
-	        device = result[1] || '',
-
-	    // 判断是否 为UNC path
-	    isUnc = !!device && device[1] !== ':';
-	    // 返回具体的对象，盘符，是否为统一路径，绝对路径， 以及结尾
-	    return {
-	        device: device,
-	        isUnc: isUnc,
-	        isAbsolute: isUnc || !!result[2], // UNC paths are always absolute
-	        tail: result[3]
-	    };
-	}
-
-	/**
-	 * 解决文件目录中的相对路径
-	 * @param  {[type]} parts          文件目录数组，从0- 高位分别代表一级目录
-	 * @param  {[type]} allowAboveRoot 布尔值，代表是否可以超过根目录
-	 * @return {[type]}                解决掉相对路径后的数组，比如说数组 
-	                                   ['/test'， '/re'， '..']将会返回 ['/test']
-	 */
-	function normalizeArray(parts, allowAboveRoot) {
-	    // 返回值
-	    var res = [];
-	    // 遍历数组，处理数组中的相对路径字符 '.' 或者'..'
-	    for (var i = 0; i < parts.length; i++) {
-	        // 取得当前的数组的字符
-	        var p = parts[i];
-
-	        // ignore empty parts
-	        // 对空或者'.'不处理
-	        if (!p || p === '.') continue;
-	        // 处理相对路径中的'..'
-	        if (p === '..') {
-	            if (res.length && res[res.length - 1] !== '..') {
-	                // 直接弹出返回队列，当没有到达根目录时
-	                res.pop();
-	            } else if (allowAboveRoot) {
-	                //allowAboveRoot 为真时，插入'..'
-	                res.push('..');
-	            }
-	        } else {
-	            // 非 '.' 和'..'直接插入返回队列。 
-	            res.push(p);
-	        }
-	    }
-	    // 返回路径数组
-	    return res;
-	}
-
-	/**
-	 *帮助函数，将路径UNC路径标准化成\\pathname\\
-	 * @param  {[type]} device [description]
-	 * @return {[type]}        [description]
-	 */
-	function normalizeUNCRoot(device) {
-	    return '\\\\' + device.replace(/^[\\\/]+/, '').replace(/[\\\/]+/g, '\\');
-	}
-
-	/**
-	 *  文件路径拼接
-	 * @return {[type]} [description]
-	 */
-	function joinPaths() {
-	    var paths = [];
-	    for (var i = 0; i < arguments.length; i++) {
-	        var arg = arguments[i];
-	        // 确保函数参数为字符串
-	        try {
-	            if (Object.prototype.toString.call(arg) != "[object String]") {
-	                throw new Error('Arguments to path.join must be strings');
-	            }
-	            if (arg) {
-	                // 放入参数数组
-	                paths.push(arg);
-	            }
-	        } catch (e) {
-	            console.log(e);
-	        }
-	    }
-
-	    var joined = paths.join("/");
-
-	    if (!/^[\\\/]{2}[^\\\/]/.test(paths[0])) {
-	        joined = joined.replace(/^[\\\/]{2,}/, '\\');
-	    }
-	    // 利用标准化接口 获取具体的文件路径
-	    return normalize(joined);
-	}
 
 /***/ },
 /* 48 */
@@ -9970,7 +10162,7 @@
 
 	var _backstage2 = _interopRequireDefault(_backstage);
 
-	var _index = __webpack_require__(21);
+	var _index = __webpack_require__(22);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -10297,7 +10489,7 @@
 	});
 	exports.trigger = trigger;
 
-	var _index = __webpack_require__(21);
+	var _index = __webpack_require__(22);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -10374,7 +10566,7 @@
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
-	var _globalStop = __webpack_require__(33);
+	var _globalStop = __webpack_require__(34);
 
 	var _nexttick = __webpack_require__(3);
 
@@ -10589,7 +10781,7 @@
 
 	var _tap = __webpack_require__(5);
 
-	var _stroage = __webpack_require__(16);
+	var _stroage = __webpack_require__(17);
 
 	/**
 	 * 书签栏
@@ -12137,7 +12329,7 @@
 
 	var _event = __webpack_require__(12);
 
-	var _audio = __webpack_require__(26);
+	var _audio = __webpack_require__(27);
 
 /***/ },
 /* 67 */
@@ -12403,7 +12595,7 @@
 	    };
 	};
 
-	var _iscroll = __webpack_require__(25);
+	var _iscroll = __webpack_require__(26);
 
 /***/ },
 /* 69 */
@@ -12575,7 +12767,7 @@
 
 	var _index8 = _interopRequireDefault(_index7);
 
-	var _fix = __webpack_require__(17);
+	var _fix = __webpack_require__(18);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -13557,7 +13749,7 @@
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
 
-	var _sprite = __webpack_require__(29);
+	var _sprite = __webpack_require__(30);
 
 	var _sprite2 = _interopRequireDefault(_sprite);
 
@@ -13809,7 +14001,7 @@
 
 	var _tap = __webpack_require__(5);
 
-	var _stroage = __webpack_require__(16);
+	var _stroage = __webpack_require__(17);
 
 	var defaultFontSize = void 0; /**
 	                               * html文本框
@@ -14584,9 +14776,9 @@
 
 	var _translation = __webpack_require__(8);
 
-	var _layout = __webpack_require__(27);
+	var _layout = __webpack_require__(28);
 
-	var _index2 = __webpack_require__(45);
+	var _index2 = __webpack_require__(46);
 
 	var _index3 = _interopRequireDefault(_index2);
 
@@ -14594,7 +14786,7 @@
 
 	var _render2 = _interopRequireDefault(_render);
 
-	var _depend = __webpack_require__(37);
+	var _depend = __webpack_require__(38);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -14803,7 +14995,7 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _iscroll = __webpack_require__(25);
+	var _iscroll = __webpack_require__(26);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -15246,11 +15438,11 @@
 
 	var _index = __webpack_require__(1);
 
-	var _support = __webpack_require__(28);
+	var _support = __webpack_require__(29);
 
 	var _internal = __webpack_require__(88);
 
-	var _advsprite = __webpack_require__(31);
+	var _advsprite = __webpack_require__(32);
 
 	var _manager = __webpack_require__(6);
 
@@ -15933,7 +16125,7 @@
 /* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';Object.defineProperty(exports,"__esModule",{value:true});exports.internal=internal;var _support=__webpack_require__(28);var _util=__webpack_require__(89);var filter=Xut.style.filter;function internal(animproto){//文字动画
+	'use strict';Object.defineProperty(exports,"__esModule",{value:true});exports.internal=internal;var _support=__webpack_require__(29);var _util=__webpack_require__(89);var filter=Xut.style.filter;function internal(animproto){//文字动画
 	animproto.getTextAnimation=function(parameter,object,duration,delay,repeat){if(delay==0)delay=0.1;//子对象间延时不能为0
 	var type=parameter.effectType?parameter.effectType:"text1";var color=parameter.startColor?parameter.startColor:"";var svgElement=object.find("svg").children();var t1=new TimelineMax({repeat:repeat,onStart:this.startHandler,onStartParams:[parameter,object,{visibility:"visible"}],onComplete:this.completeHandler,onCompleteParams:[parameter,object]});switch(type){default:case"text5"://文字逐行蹦出(以行为单位)
 	case"text1"://文字逐个蹦出(以字为单位)
@@ -17004,7 +17196,7 @@
 
 	var _data = __webpack_require__(93);
 
-	var _advsprite = __webpack_require__(31);
+	var _advsprite = __webpack_require__(32);
 
 	var _advsprite2 = _interopRequireDefault(_advsprite);
 
@@ -17220,7 +17412,7 @@
 	    value: true
 	});
 
-	var _default = __webpack_require__(18);
+	var _default = __webpack_require__(19);
 
 	var isIOS = Xut.plat.isIOS;
 	var isAndroid = Xut.plat.isAndroid;
@@ -17684,7 +17876,7 @@
 	    value: true
 	});
 
-	var _default = __webpack_require__(18);
+	var _default = __webpack_require__(19);
 
 	var isIOS = Xut.plat.isIOS;
 	var isAndroid = Xut.plat.isAndroid;
@@ -17778,9 +17970,9 @@
 	});
 	exports.default = Destroy;
 
-	var _results = __webpack_require__(20);
+	var _results = __webpack_require__(21);
 
-	var _cache = __webpack_require__(19);
+	var _cache = __webpack_require__(20);
 
 	/**
 	 * 数据销毁
@@ -17801,9 +17993,9 @@
 	});
 	exports.createStore = createStore;
 
-	var _query = __webpack_require__(32);
+	var _query = __webpack_require__(33);
 
-	var _cache = __webpack_require__(19);
+	var _cache = __webpack_require__(20);
 
 	/**
 	 * 初始化数据类
@@ -18563,7 +18755,7 @@
 	});
 	exports.default = overrideApi;
 
-	var _option = __webpack_require__(15);
+	var _option = __webpack_require__(16);
 
 	var typeFilter = ['page', 'master'];
 
@@ -19219,19 +19411,19 @@
 
 	var _index2 = __webpack_require__(7);
 
-	var _factory = __webpack_require__(143);
+	var _scenario = __webpack_require__(143);
 
-	var _globalStop = __webpack_require__(33);
+	var _globalStop = __webpack_require__(34);
 
 	var _globalDestroy = __webpack_require__(109);
 
 	var _globalDestroy2 = _interopRequireDefault(_globalDestroy);
 
-	var _scene = __webpack_require__(34);
+	var _scene = __webpack_require__(35);
 
 	var _scene2 = _interopRequireDefault(_scene);
 
-	var _cursor = __webpack_require__(24);
+	var _cursor = __webpack_require__(25);
 
 	var _index3 = __webpack_require__(2);
 
@@ -19490,7 +19682,7 @@
 	            //是否主场景
 	            data.isMain = true;
 	        }
-	        new _factory.SceneFactory(data);
+	        new _scenario.SceneFactory(data);
 	    }
 	});
 
@@ -20032,7 +20224,7 @@
 	    (0, _destroy2.default)();
 
 	    //导航
-	    (0, _index.close)();
+	    (0, _index.closeNavbar)();
 
 	    //音视频
 	    (0, _manager.clearAudio)();
@@ -20053,9 +20245,9 @@
 
 	var _manager2 = __webpack_require__(4);
 
-	var _fix = __webpack_require__(17);
+	var _fix = __webpack_require__(18);
 
-	var _cursor = __webpack_require__(24);
+	var _cursor = __webpack_require__(25);
 
 	var _nexttick = __webpack_require__(3);
 
@@ -20079,7 +20271,6 @@
 	    if (Xut.plat.noAutoPlayMedia) {
 	        (0, _fix.fixAudio)();
 	    }
-
 	    //Desktop binding mouse control
 	    $(document).keyup(function (event) {
 	        switch (event.keyCode) {
@@ -20101,6 +20292,14 @@
 	    var cursor = _ref.cursor;
 
 
+	    var $el = $(el);
+	    if (!$el.length) {
+	        console.log('Must pass a root node');
+	        return;
+	    }
+
+	    Xut.Application.supportLaunch = true;
+
 	    /**
 	     * add dynamic config
 	     * @type {Object}
@@ -20110,7 +20309,7 @@
 	        database: paths.database
 	    };
 
-	    var busyIcon = '<div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>';
+	    var busyIcon = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>';
 
 	    //disable cursor
 	    if (!cursor) {
@@ -20118,9 +20317,8 @@
 	        busyIcon = '';
 	    }
 
-	    var $html = $('\n    ' + busyIcon + '\n    <div class="xut-removelayer"></div>\n    <div class="xut-startupPage xut-fullScreen"></div>\n    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>');
+	    var $html = $('\n    ' + busyIcon + '\n    <div class="xut-removelayer"></div>\n    <div class="xut-start-page xut-fullscreen"></div>\n    <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>');
 
-	    var $el = $(el);
 	    $el.css('z-index', 99999);
 
 	    window.DYNAMICCONFIGT.removeNode = function () {
@@ -20137,15 +20335,15 @@
 
 	var createMain = function createMain() {
 	    var rootNode = $("#xxtppt-app-container");
-	    var nodeHhtml = '<div id="xxtppt-app-container" class="xut-chapter xut-fullScreen xut-overflow"></div>';
-	    var tempHtml = '<div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>\n                    <div class="xut-removelayer"></div>\n                    <div class="xut-startupPage xut-fullScreen"></div>\n                    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>';
+	    var nodeHhtml = '<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow"></div>';
+	    var tempHtml = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>\n                    <div class="xut-removelayer"></div>\n                    <div class="xut-start-page xut-fullscreen"></div>\n                    <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>';
 
 	    var $html = void 0;
 	    if (rootNode.length) {
 	        $html = $(tempHtml);
 	    } else {
 	        rootNode = $('body');
-	        $html = $('<div id="xxtppt-app-container" class="xut-chapter xut-fullScreen xut-overflow">' + tempHtml + '</div>');
+	        $html = $('<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow">' + tempHtml + '</div>');
 	    }
 	    (0, _nexttick2.default)({
 	        container: rootNode,
@@ -20158,7 +20356,7 @@
 	setTimeout(function () {
 	    //External interface call
 	    if (!Xut.Application.supportLaunch) {
-	        Xut.Application.Launch = function () {};
+	        Xut.Application.Launch = null;
 	        $("#xxtppt-app-container").remove();
 	        (0, _index3.default)();
 	    }
@@ -20175,7 +20373,7 @@
 	});
 	exports.default = button;
 
-	var _video = __webpack_require__(35);
+	var _video = __webpack_require__(36);
 
 	/**
 	 * 退出加锁,防止过快点击
@@ -20441,11 +20639,11 @@
 	});
 	exports.default = dynamic;
 
-	var _cursor = __webpack_require__(24);
+	var _cursor = __webpack_require__(25);
 
-	var _layout = __webpack_require__(27);
+	var _layout = __webpack_require__(28);
 
-	var _results = __webpack_require__(20);
+	var _results = __webpack_require__(21);
 
 	var _index = __webpack_require__(2);
 
@@ -20546,7 +20744,7 @@
 
 	var _index = __webpack_require__(1);
 
-	var _video = __webpack_require__(35);
+	var _video = __webpack_require__(36);
 
 	var _dynamic = __webpack_require__(113);
 
@@ -20556,7 +20754,7 @@
 
 	var _button2 = _interopRequireDefault(_button);
 
-	var _scene = __webpack_require__(34);
+	var _scene = __webpack_require__(35);
 
 	var _scene2 = _interopRequireDefault(_scene);
 
@@ -20734,7 +20932,7 @@
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      **********************************************************************/
 
 
-	var _stroage = __webpack_require__(16);
+	var _stroage = __webpack_require__(17);
 
 	var _page = __webpack_require__(120);
 
@@ -20752,7 +20950,7 @@
 
 	var _index = __webpack_require__(14);
 
-	var _depend = __webpack_require__(37);
+	var _depend = __webpack_require__(38);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21102,7 +21300,7 @@
 	                    vm.$emit('change:pageUpdate', currIndex);
 	                    resetToolbar.call(this);
 	                    setTimeout(function () {
-	                        $(".xut-startupPage").hide().remove();
+	                        $(".xut-start-page").hide().remove();
 	                        $(".xut-removelayer").hide().remove();
 	                    }, 0);
 	                    break;
@@ -21224,7 +21422,7 @@
 	            });
 
 	            //目录栏
-	            (0, _index.close)();
+	            (0, _index.closeNavbar)();
 	            //复位工具栏
 	            this.vm.$emit('change:resetToolbar');
 	        }
@@ -21430,7 +21628,7 @@
 	            //加载主场景页面
 	            function firstLoading() {
 
-	                $("#sceneHome").css({
+	                $("#xut-main-scene").css({
 	                    'visibility': 'visible'
 	                });
 
@@ -21658,7 +21856,7 @@
 	});
 	exports.filterProcessor = filterProcessor;
 
-	var _hooks = __webpack_require__(38);
+	var _hooks = __webpack_require__(39);
 
 	/**
 	 * 简化委托处理，默认一层元素只能绑定一个委托事件
@@ -21726,15 +21924,15 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _index = __webpack_require__(22);
+	var _index = __webpack_require__(23);
 
-	var _index2 = __webpack_require__(45);
+	var _index2 = __webpack_require__(46);
 
 	var _index3 = _interopRequireDefault(_index2);
 
 	var _index4 = __webpack_require__(115);
 
-	var _hooks = __webpack_require__(38);
+	var _hooks = __webpack_require__(39);
 
 	var _filter = __webpack_require__(117);
 
@@ -22150,11 +22348,11 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _abstract = __webpack_require__(36);
+	var _abstract = __webpack_require__(37);
 
 	var _translation = __webpack_require__(8);
 
-	var _pagebase = __webpack_require__(41);
+	var _pagebase = __webpack_require__(42);
 
 	var _index = __webpack_require__(7);
 
@@ -23094,9 +23292,9 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _abstract = __webpack_require__(36);
+	var _abstract = __webpack_require__(37);
 
-	var _pagebase = __webpack_require__(41);
+	var _pagebase = __webpack_require__(42);
 
 	var _translation = __webpack_require__(8);
 
@@ -23514,7 +23712,7 @@
 	        value: true
 	});
 
-	var _index = __webpack_require__(22);
+	var _index = __webpack_require__(23);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -23876,7 +24074,7 @@
 	    };
 	};
 
-	var _multievent = __webpack_require__(40);
+	var _multievent = __webpack_require__(41);
 
 /***/ },
 /* 125 */
@@ -24122,7 +24320,7 @@
 	    };
 	};
 
-	var _multievent = __webpack_require__(40);
+	var _multievent = __webpack_require__(41);
 
 	var _collection = __webpack_require__(121);
 
@@ -24620,7 +24818,7 @@
 	});
 	exports.default = TaskBackground;
 
-	var _option = __webpack_require__(15);
+	var _option = __webpack_require__(16);
 
 	var _nexttick = __webpack_require__(3);
 
@@ -24906,7 +25104,7 @@
 	    });
 	};
 
-	var _parser = __webpack_require__(39);
+	var _parser = __webpack_require__(40);
 
 /***/ },
 /* 130 */
@@ -24919,11 +25117,11 @@
 	});
 	exports.default = TaskComponents;
 
-	var _index = __webpack_require__(21);
+	var _index = __webpack_require__(22);
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _option = __webpack_require__(15);
+	var _option = __webpack_require__(16);
 
 	var _nexttick = __webpack_require__(3);
 
@@ -26533,7 +26731,7 @@
 
 	var _index = __webpack_require__(2);
 
-	var _parsecontent = __webpack_require__(42);
+	var _parsecontent = __webpack_require__(43);
 
 	/**
 	 * 针对容器类型的处理
@@ -26611,10 +26809,10 @@
 
 	        //蒙版图
 	        if (maskBoxImage != undefined) {
-	            restr += String.format('<img' + ' id="img_{1}"' + ' class="xut-contentScrollerImg"' + ' src="{0}"' + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%;{4}"/>', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg);
+	            restr += String.format('<img' + ' id="img_{1}"' + ' class="xut-content-scroller-img"' + ' src="{0}"' + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%;{4}"/>', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg);
 	        } else {
 	            //canvas
-	            restr += String.format(' <canvas src="{0}"' + ' class="xut-contentScrollerImg edges"' + ' mask="{5}"' + ' id = "img_{1}"' + ' width="{2}"' + ' height="{3}"' + ' style="width:{2}px; height:{3}px;opacity:0; background-size:100% 100%; {4}"' + ' />', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg, Xut.config.pathAddress.replace(/\//g, "\/") + data.mask);
+	            restr += String.format(' <canvas src="{0}"' + ' class="xut-content-scroller-img edges"' + ' mask="{5}"' + ' id = "img_{1}"' + ' width="{2}"' + ' height="{3}"' + ' style="width:{2}px; height:{3}px;opacity:0; background-size:100% 100%; {4}"' + ' />', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg, Xut.config.pathAddress.replace(/\//g, "\/") + data.mask);
 	        }
 
 	        //精灵图
@@ -26636,7 +26834,7 @@
 	        restr += String.format('<div' + ' class="sprite"' + ' style="height:{0}px;background-image:url({1});background-size:{2}% {3}%;">' + '</div>', data.scaleHeight, wrapObj['pathImg'], matrixX, matrixY);
 	    } else {
 	        //普通图片
-	        restr += String.format('<img' + ' src="{0}"' + ' class="xut-contentScrollerImg"' + ' id="img_{1}"' + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%; {4}"/>', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg);
+	        restr += String.format('<img' + ' src="{0}"' + ' class="xut-content-scroller-img"' + ' id="img_{1}"' + ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%; {4}"/>', wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg);
 	    }
 
 	    return restr;
@@ -26831,7 +27029,7 @@
 
 	var _canvas = __webpack_require__(134);
 
-	var _parsecontent = __webpack_require__(42);
+	var _parsecontent = __webpack_require__(43);
 
 	/**
 	 * 解析序列中需要的数据
@@ -27789,11 +27987,11 @@
 
 	var _fnbar2 = _interopRequireDefault(_fnbar);
 
-	var _index2 = __webpack_require__(171);
+	var _index2 = __webpack_require__(148);
 
 	var _index3 = _interopRequireDefault(_index2);
 
-	var _layout = __webpack_require__(43);
+	var _layout = __webpack_require__(44);
 
 	var _controller = __webpack_require__(13);
 
@@ -27908,7 +28106,7 @@
 	            //支持Xut.IBooks模式
 	            //都不需要创建节点
 	            if (Xut.IBooks.runMode()) {
-	                this.elements = $('#sceneHome');
+	                this.elements = $('#xut-main-scene');
 	                callback();
 	                return;
 	            }
@@ -27957,7 +28155,7 @@
 	            var pageIndex = this.pageIndex;
 	            var elements = this.elements;
 	            var findControlBar = function findControlBar() {
-	                return elements.find('#controlBar');
+	                return elements.find('.xut-control-bar');
 	            };
 
 	            //工具栏配置信息
@@ -28021,9 +28219,9 @@
 	            var isMain = this.isMain;
 	            var tempfind = findContainer(elements, scenarioId, isMain);
 	            //页面容器
-	            var scenarioPage = tempfind('pageContainer', 'scenarioPage-');
+	            var scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
 	            //视差容器
-	            var scenarioMaster = tempfind('masterContainer', 'scenarioMaster-');
+	            var scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
 
 	            //场景容器对象
 	            var vm = this.vm = new _index4.Mediator({
@@ -28157,7 +28355,7 @@
 	            // for test
 	            if (Xut.plat.isBrowser) {
 	                var vm = this.vm;
-	                this.testWatch = $(".xut-controlBar-pageNum").click(function () {
+	                this.testWatch = $(".xut-control-pageindex").click(function () {
 	                    console.log('主场景', vm);
 	                    console.log('主场景容器', vm.$scheduler.pageMgr.Collections);
 	                    console.log('主场景视觉差容器', vm.$scheduler.parallaxMgr && vm.$scheduler.parallaxMgr.Collections);
@@ -28222,7 +28420,7 @@
 	});
 	exports.default = api;
 
-	var _depend = __webpack_require__(44);
+	var _depend = __webpack_require__(45);
 
 	function api(Swipe) {
 
@@ -28415,7 +28613,7 @@
 	 * http://tympanus.net/Development/AnimatedSVGIcons/
 	 * @type {Object}
 	 */
-	var iconConfig = {
+	exports.default = {
 	    nextArrow: {
 	        url: 'images/icons/pageback.svg',
 	        animation: [{
@@ -28481,8 +28679,6 @@
 	        }]
 	    }
 	};
-
-	exports.iconConfig = iconConfig;
 
 /***/ },
 /* 146 */
@@ -28649,8 +28845,967 @@
 	};
 
 /***/ },
-/* 147 */,
-/* 148 */,
+/* 147 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 书签栏
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 加入这个书签功能后，可以让用户自由选择哪页是需要保存记录的
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @param options object
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+	var _tap = __webpack_require__(5);
+
+	var _index = __webpack_require__(2);
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var icons = {
+	    hide: 'images/icons/arrowDown.svg'
+	};
+
+	/**
+	 * 行高
+	 * @type {[type]}
+	 */
+	var sLineHeiht = parseInt($('body').css('font-size')) || 16; //行高
+
+	/**
+	 * 书签缓存
+	 */
+	var BOOKCACHE = void 0;
+
+	var Mark = function () {
+	    function Mark() {
+	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	        var parent = _ref.parent;
+	        var pageId = _ref.pageId;
+	        var seasonId = _ref.seasonId;
+
+	        _classCallCheck(this, Mark);
+
+	        this.parent = parent;
+	        this.pageId = pageId;
+	        this.seasonId = seasonId;
+
+	        this.screenSize = Xut.config.screenSize;
+	        this.sHeight = this.screenSize.height;
+	        this.sWidth = this.screenSize.width;
+
+	        //是否已存储
+	        this.isStored = false;
+	        this.init();
+	    }
+
+	    /**
+	     * 初始化
+	     * @return {[type]} [description]
+	     */
+
+
+	    _createClass(Mark, [{
+	        key: 'init',
+	        value: function init() {
+	            var $bookMark = this.createBookMark(),
+	                dom = this.parent[0],
+	                that = this;
+
+	            this.parent.append($bookMark);
+	            this.bookMarkMenu = $bookMark.eq(0);
+	            //显示书签
+	            setTimeout(function () {
+	                that.restore();
+	            }, 20);
+	            //获取历史记录
+	            BOOKCACHE = this.getHistory();
+
+	            //邦定用户事件
+	            (0, _tap.bindTap)(dom, {
+	                end: this
+	            });
+	        }
+
+	        /**
+	         * 创建书签
+	         * @return {[object]} [jquery生成的dom对象]
+	         */
+
+	    }, {
+	        key: 'createBookMark',
+	        value: function createBookMark() {
+	            var height = sLineHeiht * 3,
+	                // menu的高为3em
+	            box = '<div class="xut-bookmark-menu" style="width:100%;height:{0}px;left:0;top:{1}px;">' + '<div class="xut-bookmark-wrap">' + '<div class="xut-bookmark-add">加入书签</div>' + '<div class="xut-bookmark-off" style="background-image:url({2})"></div>' + '<div class="xut-bookmark-view">书签记录</div>' + '</div>' + '</div>' + '<div class="xut-bookmark-list" style="display:none;width:100%;height:{3}px;">' + '<ul class="xut-bookmark-head">' + '<li class="xut-bookmark-back">返回</li>' + '<li>书签</li>' + '</ul>' + '<ul class="xut-bookmark-body"></ul>' + '</div>';
+	            box = String.format(box, height, this.sHeight, icons.hide, this.sHeight);
+	            this.markHeight = height;
+	            return $(box);
+	        }
+
+	        /**
+	         * 生成书签列表
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'createMarkList',
+	        value: function createMarkList() {
+	            var tmp,
+	                seasonId,
+	                pageId,
+	                list = '',
+	                box = '',
+	                self = this;
+
+	            //取历史记录
+	            _.each(BOOKCACHE, function (mark) {
+	                tmp = mark.split('-');
+	                seasonId = tmp[0];
+	                pageId = tmp[1];
+	                mark = self.getMarkId(seasonId, pageId);
+	                list += '<li><a data-mark="' + mark + '" class="xut-bookmark-id" href="javascript:0">第' + pageId + '页</a><a class="xut-bookmark-del" data-mark="' + mark + '" href="javascript:0">X</a></li>';
+	            });
+
+	            return list;
+	        }
+
+	        /**
+	         * 创建存储标签
+	         * 存储格式 seasonId-pageId
+	         * @return {string} [description]
+	         */
+
+	    }, {
+	        key: 'getMarkId',
+	        value: function getMarkId(seasonId, pageId) {
+	            return seasonId + '-' + pageId;
+	        }
+
+	        /**
+	         * 获取历史记录
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'getHistory',
+	        value: function getHistory() {
+	            var mark = (0, _index._get)('bookMark');
+	            if (mark) {
+	                return mark.split(',');
+	            }
+	            return [];
+	        }
+
+	        /**
+	         * 添加书签
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'addBookMark',
+	        value: function addBookMark() {
+	            var key;
+
+	            this.updatePageInfo();
+	            key = this.getMarkId(this.seasonId, this.pageId);
+
+	            //避免重复缓存
+	            if (BOOKCACHE.indexOf(key) > -1) {
+	                return;
+	            }
+	            BOOKCACHE.push(key);
+	            (0, _index._set)('bookMark', BOOKCACHE);
+	        }
+
+	        /**
+	         * 更新页信息
+	         *  针对母板层上的书签
+	         */
+
+	    }, {
+	        key: 'updatePageInfo',
+	        value: function updatePageInfo() {
+	            var pageData = Xut.Presentation.GetPageData();
+	            this.pageId = pageData._id;
+	            this.seasonId = pageData.seasonId;
+	        }
+
+	        /**
+	         * 删除书签
+	         * @param {object} [key] [事件目标对象]
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'delBookMark',
+	        value: function delBookMark(target) {
+	            if (!target || !target.dataset) return;
+
+	            var key = target.dataset.mark,
+	                index = BOOKCACHE.indexOf(key);
+
+	            BOOKCACHE.splice(index, 1);
+	            (0, _index._set)('bookMark', BOOKCACHE);
+
+	            if (BOOKCACHE.length == 0) {
+	                (0, _index._remove)('bookMark');
+	            }
+
+	            //移除该行
+	            $(target).parent().remove();
+	        }
+
+	        /**
+	         * 显示书签
+	         * @param {object} [target] [事件目标对象]
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'viewBookMark',
+	        value: function viewBookMark(target) {
+	            var $bookMarkList,
+	                list = this.createMarkList();
+
+	            if (this.bookMarkList) {
+	                $bookMarkList = this.bookMarkList;
+	            } else {
+	                $bookMarkList = $(target).parent().parent().next();
+	            }
+	            //更新书签内容
+	            $bookMarkList.find('.xut-bookmark-body').html(list);
+	            this.bookMarkList = $bookMarkList;
+	            $bookMarkList.fadeIn();
+	        }
+
+	        /**
+	         * 点击放大效果
+	         * @param  {[object]} target [事件目标对象]
+	         * @return {[type]}      [description]
+	         */
+
+	    }, {
+	        key: 'iconManager',
+	        value: function iconManager(target) {
+	            var $icon = this.bookMarkIcon = $(target),
+	                restore = this.iconRestore;
+
+	            $icon.css({
+	                'transform': 'scale(1.2)',
+	                'transition-duration': '500ms'
+	            })[0].addEventListener(Xut.style.transitionEnd, restore.bind(this), false);
+	        }
+
+	        /**
+	         * 复原按钮
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'iconRestore',
+	        value: function iconRestore() {
+	            this.bookMarkIcon.css('transform', '');
+	        }
+
+	        /**
+	         * 跳转到书签页
+	         * @param  {[type]} target [description]
+	         * @return {[type]}        [description]
+	         */
+
+	    }, {
+	        key: 'goBookMark',
+	        value: function goBookMark(target) {
+	            if (!target || !target.dataset) return;
+
+	            var key = target.dataset.mark.split('-');
+	            var seasonId = Number(key[0]);
+	            var pageId = Number(key[1]);
+
+	            this.updatePageInfo();
+	            //关闭书签列表
+	            this.backBookMark();
+
+	            //忽略当前页的跳转
+	            if (this.pageId == pageId && this.seasonId == seasonId) {
+	                return;
+	            }
+
+	            Xut.View.LoadScenario({
+	                'scenarioId': seasonId,
+	                'chapterId': pageId
+	            });
+	        }
+
+	        /**
+	         * 书签回退键
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'backBookMark',
+	        value: function backBookMark() {
+	            this.bookMarkList.fadeOut();
+	        }
+
+	        /**
+	         * 邦定事件
+	         * @param  {[type]} evt [事件]
+	         * @return {[type]}     [description]
+	         */
+
+	    }, {
+	        key: 'handleEvent',
+	        value: function handleEvent(evt) {
+	            var target = evt.target;
+	            switch (target.className) {
+	                //加入书签
+	                case 'xut-bookmark-add':
+	                    this.addBookMark();
+	                    this.iconManager(target);
+	                    break;
+	                //显示书签记录
+	                case 'xut-bookmark-view':
+	                    this.viewBookMark(target);
+	                    this.iconManager(target);
+	                    break;
+	                //关闭书签
+	                case 'xut-bookmark-off':
+	                    this.closeBookMark(target);
+	                    break;
+	                //返回书签主菜单
+	                case 'xut-bookmark-back':
+	                    this.backBookMark();
+	                    break;
+	                //删除书签记录
+	                case 'xut-bookmark-del':
+	                    this.delBookMark(target);
+	                    break;
+	                //跳转到书签页
+	                case 'xut-bookmark-id':
+	                    this.goBookMark(target);
+	                    break;
+	                default:
+	                    //console.log(target.className)
+	                    break;
+	            }
+	        }
+
+	        /**
+	         * 关闭书签菜单
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'closeBookMark',
+	        value: function closeBookMark(target) {
+	            this.bookMarkMenu.css({
+	                transform: 'translate3d(0,0,0)',
+	                'transition-duration': '1s'
+	            });
+	        }
+
+	        /**
+	         * 恢复书签菜单
+	         */
+
+	    }, {
+	        key: 'restore',
+	        value: function restore() {
+	            this.bookMarkMenu.css({
+	                transform: 'translate3d(0,-' + this.markHeight + 'px,0)',
+	                'transition-duration': '1s'
+	            });
+	        }
+
+	        /**
+	         * 销毁书签
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            var dom = this.parent[0];
+
+	            dom.removeEventListener('touchend', this, false);
+	            dom.removeEventListener('mouseup', this, false);
+
+	            //菜单部分
+	            if (this.bookMarkMenu) {
+	                this.bookMarkMenu.remove();
+	                this.bookMarkMenu = null;
+	            }
+
+	            //列表部分
+	            if (this.bookMarkList) {
+	                this.bookMarkList.remove();
+	                this.bookMarkList = null;
+	            }
+
+	            //按钮效果
+	            if (this.bookMarkIcon) {
+	                this.bookMarkIcon[0].removeEventListener(Xut.style.transitionEnd, this.iconRestore, false);
+	                this.bookMarkIcon = null;
+	            }
+
+	            this.parent = null;
+	        }
+	    }]);
+
+	    return Mark;
+	}();
+
+	exports.default = Mark;
+
+/***/ },
+/* 148 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _Mark = __webpack_require__(147);
+
+	var _index = __webpack_require__(2);
+
+	var _tap = __webpack_require__(5);
+
+	var _bar = __webpack_require__(24);
+
+	var _bar2 = _interopRequireDefault(_bar);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * 阅读模式工具栏
+	 * @param options object
+	 * @demo {container:页面容器,controlBar:工具栏容器,...}
+	 * @desc 继承自Toolbar.js
+	 */
+	var BookBar = function (_Bar) {
+	    _inherits(BookBar, _Bar);
+
+	    function BookBar() {
+	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	        var pageMode = _ref.pageMode;
+	        var container = _ref.container;
+	        var controlBar = _ref.controlBar;
+
+	        _classCallCheck(this, BookBar);
+
+	        //左右箭头
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BookBar).call(this));
+
+	        _this.arrows = {};
+
+	        //工具栏父容器
+	        _this.container = container;
+
+	        //工具栏容器
+	        _this.controlBar = controlBar;
+
+	        _this.pageMode = pageMode;
+
+	        //是否有顶部工具栏
+	        _this.hasTopBar = true;
+	        _this.Lock = false;
+	        _this.delay = 50;
+
+	        //图书工具栏高度
+	        _this.topBarHeight = _this.iconHeight * 1.25;
+
+	        //配置属性
+	        _this.initConfig();
+
+	        _this.initTool();
+	        return _this;
+	    }
+
+	    /**
+	     * 初始化
+	     */
+
+
+	    _createClass(BookBar, [{
+	        key: 'initTool',
+	        value: function initTool() {
+	            //工具栏的显示状态
+	            var display = this.controlBar.css('display');
+	            this.barStatus = display == 'none' ? false : true;
+	            this.setToolbarStyle();
+	            this.createBackIcon();
+	            this.createDirIcon();
+	            this.createMarkIcon();
+	            // this.createStarIcon();
+
+	            //翻页按钮
+	            if (this.pageMode == 2) {
+	                this.createArrows();
+	            }
+
+	            //监听事件
+	            (0, _tap.bindTap)(this.container[0], {
+	                end: this
+	            });
+	        }
+
+	        /**
+	         * 工具条的样式
+	         */
+
+	    }, {
+	        key: 'setToolbarStyle',
+	        value: function setToolbarStyle() {
+	            var height = this.topBarHeight,
+	                TOP = this.barHeight; //系统工具栏占用的高度
+
+	            //在顶部
+	            this.controlBar.css({
+	                top: 0,
+	                height: height + 'px',
+	                paddingTop: TOP + 'px',
+	                backgroundColor: 'rgba(0, 0, 0, 0.2)', //transparent
+	                fontSize: '0.625em',
+	                color: 'white'
+	            });
+	        }
+
+	        /**
+	         * 更新页码
+	         */
+
+	    }, {
+	        key: 'updatePointer',
+	        value: function updatePointer() {}
+	        //预留
+
+
+	        /**
+	         * 创建目录图标
+	         */
+
+	    }, {
+	        key: 'createDirIcon',
+	        value: function createDirIcon(bar) {
+	            var icon = document.createElement('div');
+	            icon.innerHTML = '目录';
+	            icon.style.width = this.iconHeight + 'px';
+	            icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
+	            icon.className = 'xut-book-bar-dir';
+	            this.controlBar.append(icon);
+	        }
+
+	        /**
+	         * 创建书签图标
+	         * @param  {[type]} bar [description]
+	         * @return {[type]}     [description]
+	         */
+
+	    }, {
+	        key: 'createMarkIcon',
+	        value: function createMarkIcon(bar) {
+	            var icon = document.createElement('div');
+	            icon.innerHTML = '书签';
+	            icon.style.width = this.iconHeight + 'px';
+	            icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
+	            icon.className = 'xut-book-bar-mark';
+	            this.controlBar.append(icon);
+	        }
+
+	        /**
+	         * 创建评分图标
+	         */
+
+	    }, {
+	        key: 'createStarIcon',
+	        value: function createStarIcon(bar) {
+	            var icon = document.createElement('div');
+	            icon.innerHTML = '评分';
+	            icon.style.width = this.iconHeight + 'px';
+	            icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
+	            icon.className = 'xut-book-bar-star';
+	            this.controlBar.append(icon);
+	        }
+
+	        /**
+	         * 后退按钮
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'createBackIcon',
+	        value: function createBackIcon() {
+	            var icon = document.createElement('div');
+	            icon.style.width = this.topBarHeight + 'px';
+	            icon.className = 'xut-book-bar-back';
+	            this.controlBar.append(icon);
+	        }
+
+	        /**
+	         * 显示顶部工具栏
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'showTopBar',
+	        value: function showTopBar() {
+	            var that = this;
+
+	            if (this.barStatus) {
+	                this.Lock = false;
+	                return;
+	            }
+
+	            this.controlBar.css({
+	                'display': 'block',
+	                'opacity': 0
+	            });
+
+	            setTimeout(function () {
+	                that.controlBar.animate({
+	                    'opacity': 1
+	                }, that.delay, 'linear', function () {
+	                    that.showSystemBar();
+	                    that.barStatus = true;
+	                    that.Lock = false;
+	                });
+	            }, 50);
+	        }
+
+	        /**
+	         * 隐藏顶部工具栏
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'hideTopBar',
+	        value: function hideTopBar() {
+	            var that = this;
+
+	            if (!this.barStatus) {
+	                this.Lock = false;
+	                return;
+	            }
+
+	            this.controlBar.animate({
+	                'opacity': 0
+	            }, that.delay, 'linear', function () {
+	                that.controlBar.hide();
+	                that.hideSystemBar();
+	                that.barStatus = false;
+	                that.Lock = false;
+	            });
+	        }
+
+	        /**
+	         * 创建目录菜单
+	         */
+
+	    }, {
+	        key: 'createDirMenu',
+	        value: function createDirMenu() {
+	            var self = this;
+	            var wrap = document.createElement('div');
+	            var mask = document.createElement('div');
+	            //添加遮层
+	            mask.className = 'xut-book-menu-mask';
+	            //获取内容
+	            this.getDirContent();
+	            wrap.className = 'xut-book-menu';
+	            wrap.innerHTML = '<ul>' + this.contentText + '</ul>';
+	            this.container.append(wrap);
+	            //是否滚动
+	            this.isScrolled = false;
+
+	            //添加滚动条
+	            //url : http://iscrolljs.com/
+	            this.iscroll = new iScroll(wrap, {
+	                scrollbars: true,
+	                fadeScrollbars: true,
+	                scrollX: false
+	            });
+
+	            this.menu = wrap;
+
+	            this.setColor();
+
+	            this.iscroll.on('scrollStart', function (e) {
+	                self.isScrolled = true;
+	            });
+
+	            this.iscroll.on('scrollEnd', function (e) {
+	                self.isScrolled = false;
+	            });
+
+	            wrap.appendChild(mask);
+	        }
+
+	        /**
+	         *  显示目录菜单
+	         */
+
+	    }, {
+	        key: 'showDirMenu',
+	        value: function showDirMenu() {
+	            //获取当前页面
+	            var page = Xut.Presentation.GetPageElement();
+
+	            if (this.menu) {
+	                this.menu.style.display = 'block';
+	            } else {
+	                this.createDirMenu();
+	            }
+
+	            //添加模糊效果
+	            page.addClass('filter');
+	            this.page = page;
+
+	            //隐藏顶部工具栏
+	            this.controlBar.hide();
+	            var iscroll = this.iscroll;
+	            //自动定位到上一位置
+	            if (iscroll.y > iscroll.wrapperHeight) {
+	                iscroll.scrollToElement(this.selectedChild);
+	            }
+	        }
+
+	        /**
+	         *  隐藏目录菜单
+	         */
+
+	    }, {
+	        key: 'hideDirMenu',
+	        value: function hideDirMenu() {
+	            this.menu.style.display = 'none';
+	            //恢复顶部工具栏
+	            this.controlBar.show();
+	            //移除模糊效果
+	            this.page.removeClass('filter');
+	        }
+
+	        /**
+	         *  创建目录内容
+	         */
+
+	    }, {
+	        key: 'getDirContent',
+	        value: function getDirContent() {
+
+	            var Api = Xut.Presentation;
+	            var data = Api.GetAppSectionData();
+	            var sns = data[0];
+	            var seaonId = sns._id;
+	            var cids = Xut.data.Chapter;
+
+	            ////////////////////////////
+	            //针对book模式，合并了Season的参数 //
+	            //1 SeasonTitle
+	            //2 ChapterList列表的范围区间
+	            ////////////////////////////
+	            data = (0, _index.parseJSON)(sns.parameter);
+
+	            if (!data) {
+	                console.log('book模式parameter数据出错');
+	                return;
+	            }
+
+	            //二级目录
+	            function secondaryDirectory(startCid, endCid) {
+	                var cid,
+	                    str = '';
+	                for (startCid; startCid <= endCid; startCid++) {
+	                    cid = cids.item(startCid - 1);
+	                    if (cid && cid.chapterTitle) {
+	                        str += '<section><a class="xut-book-menu-item" data-mark=' + seaonId + '-' + startCid + ' href="javascript:0">' + cid.chapterTitle + '</a></section>';
+	                    }
+	                }
+	                return str;
+	            }
+
+	            var i = 0;
+	            var len = data.length;
+	            var li = '<li class="title"><center class="select">目录</center></li>';
+	            var seasonInfo, mark, seasonTitle, seaonId, startCid, endCid;
+
+	            for (i; i < len; i++) {
+	                seasonInfo = data[i];
+	                startCid = seasonInfo.ChapterList[0];
+	                endCid = seasonInfo.ChapterList[1];
+	                mark = seaonId + '-' + startCid;
+	                if (seasonInfo.SeasonTitle.length <= 0) continue;
+	                seasonTitle = seasonInfo.SeasonTitle || '第' + (i + 1) + '章';
+	                //第一级目录
+	                li += '<li>' + '<a class="xut-book-menu-item" data-mark="' + mark + '" href="javascript:0">' + seasonTitle + '</a>' +
+	                //第二级目录
+	                secondaryDirectory(startCid, endCid) + '</li>';
+	            }
+
+	            this.contentText = li;
+	        }
+
+	        /**
+	         * 突出显示点击颜色
+	         */
+
+	    }, {
+	        key: 'setColor',
+	        value: function setColor(element) {
+	            if (this.selectedChild) {
+	                this.selectedChild.className = 'xut-book-menu-item';
+	            }
+
+	            element = element || this.menu.querySelectorAll('li')[1].children[0];
+	            element.className = 'select';
+	            this.selectedChild = element;
+	        }
+
+	        /**
+	         * 跳转到指定书页
+	         */
+
+	    }, {
+	        key: 'turnToPage',
+	        value: function turnToPage(target) {
+	            //忽略滚动点击
+	            if (this.isScrolled) return;
+	            this.setColor(target);
+	            this.hideDirMenu();
+	            var data = target.dataset.mark || '';
+	            if (data) {
+	                data = data.split('-');
+	                Xut.View.LoadScenario({
+	                    'scenarioId': data[0],
+	                    'chapterId': data[1]
+	                });
+	            }
+	        }
+
+	        /**
+	         * 显示书签
+	         */
+
+	    }, {
+	        key: 'showBookMark',
+	        value: function showBookMark() {
+	            if (this.bookMark) {
+	                this.bookMark.restore();
+	            } else {
+	                var pageData = Xut.Presentation.GetPageData();
+	                this.bookMark = new _Mark.BookMark({
+	                    parent: this.container,
+	                    seasonId: pageData.seasonId,
+	                    pageId: pageData._id
+	                });
+	            }
+	        }
+
+	        /**
+	         * 返回首页
+	         */
+
+	    }, {
+	        key: 'goBack',
+	        value: function goBack() {
+	            var self = this;
+	            Xut.Application.Suspend({
+	                dispose: function dispose(promptMessage) {
+	                    //停止热点动作
+	                    //promptMessage('再按一次将跳至首页！')
+	                },
+	                processed: function processed() {
+	                    Xut.View.GotoSlide(1); //调整到首页
+	                    self.setColor();
+	                }
+	            });
+	        }
+
+	        /**
+	         * 事件处理
+	         */
+
+	    }, {
+	        key: 'handleEvent',
+	        value: function handleEvent(e) {
+
+	            var target = e.target || e.srcElement;
+
+	            var name = target.className;
+
+	            switch (name) {
+	                case 'xut-book-bar-back':
+	                    this.goBack();
+	                    //返回
+	                    break;
+	                case 'xut-book-bar-dir':
+	                    //目录
+	                    this.showDirMenu();
+	                    break;
+	                case 'xut-book-bar-mark':
+	                    //书签
+	                    this.showBookMark();
+	                    break;
+	                case 'xut-book-bar-star':
+	                    //评分
+	                    break;
+	                case 'xut-book-menu-item':
+	                    //跳转
+	                    this.turnToPage(target);
+	                    break;
+	                case 'xut-book-menu-mask':
+	                case 'select':
+	                    this.hideDirMenu();
+	                    break;
+	                default:
+	                    // console.log(name+':undefined')
+	                    break;
+	            }
+	        }
+
+	        /**
+	         * 销毁
+	         */
+
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            this.iscroll && this.iscroll.destroy();
+	            this.bookMark && this.bookMark.destroy();
+	            var ele = this.container[0];
+	            ele.removeEventListener('touchend', this, false);
+	            ele.removeEventListener('mouseup', this, false);
+	            this.iscroll = null;
+	            this.menu = null;
+	            this.page = null;
+	        }
+	    }]);
+
+	    return BookBar;
+	}(_bar2.default);
+
+	exports.default = BookBar;
+
+/***/ },
 /* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -28662,13 +29817,13 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _bar = __webpack_require__(169);
+	var _bar = __webpack_require__(24);
 
 	var _bar2 = _interopRequireDefault(_bar);
 
 	var _index = __webpack_require__(1);
 
-	var _lang = __webpack_require__(47);
+	var _lang = __webpack_require__(15);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28788,7 +29943,7 @@
 	                TOP = this.barHeight,
 	                html = '',
 	                style = 'top:0;height:' + this.iconHeight + 'px;padding-top:' + TOP + 'px';
-	            html = '<div id="controlBar' + id + '" class="xut-controlBar" style="' + style + '"></div>';
+	            html = '<div id="xut-control-bar' + id + '" class="xut-control-bar" style="' + style + '"></div>';
 	            html = $(html);
 	            this.top = TOP;
 	            this.showSystemBar();
@@ -28923,7 +30078,7 @@
 	                style,
 	                html;
 	            style = 'position:absolute;right:4px;top:' + (height * 0.25 + TOP) + 'px;padding:0 0.25em;height:' + height * 0.5 + 'px;line-height:' + height * 0.5 + 'px;border-radius:0.5em';
-	            html = '<div class="xut-controlBar-pageNum" style="' + style + '">';
+	            html = '<div class="xut-control-pageindex" style="' + style + '">';
 	            html += '<span class="currentPage">' + currentPage + '</span>/<span>' + pageTotal + '</span>';
 	            html += '</div>';
 	            html = $(html);
@@ -28943,7 +30098,7 @@
 	                height = this.iconHeight,
 	                right = this.iconHeight * 2.5;
 	            style = 'position:absolute;right:' + right + 'px;top:' + TOP + 'px;width:' + height + 'px;height:' + height + 'px;background-size:cover';
-	            html = '<div class="xut-controlBar-hide" style="' + style + '"></div>';
+	            html = '<div class="xut-control-nav-hide" style="' + style + '"></div>';
 	            container.append(html);
 	        }
 
@@ -28956,7 +30111,7 @@
 	                html,
 	                appName = this.appName;
 	            style = 'line-height:' + this.iconHeight + 'px';
-	            html = '<div class="xut-controlBar-title" style="' + style + '">' + appName + '</div>';
+	            html = '<div class="xut-control-title" style="' + style + '">' + appName + '</div>';
 	            container.append(html);
 	        }
 
@@ -28977,7 +30132,7 @@
 	                var target = Xut.plat.evtTarget(e),
 	                    type = target.className;
 	                switch (type) {
-	                    case 'xut-controlBar-hide':
+	                    case 'xut-control-nav-hide':
 	                        that.hideTopBar();
 	                        break;
 	                    case 'xut-scenario-dark':
@@ -29082,45 +30237,7 @@
 	exports.default = fnBar;
 
 /***/ },
-/* 150 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.createdom = createdom;
-
-	var _layout = __webpack_require__(43);
-
-	var _nexttick = __webpack_require__(3);
-
-	var _nexttick2 = _interopRequireDefault(_nexttick);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	/**
-	 * 创建dom
-	 */
-	function createdom(artControl, callback) {
-
-	    var pageArray = [];
-
-	    Xut.data.query('Chapter', Xut.data.novelId, 'seasonId', function (item) {
-	        pageArray.push(item);
-	    });
-
-	    //显示下拉菜单
-	    (0, _nexttick2.default)({
-	        'container': artControl,
-	        'content': (0, _layout.nav)(pageArray)
-	    }, function () {
-	        callback(pageArray);
-	    });
-	}
-
-/***/ },
+/* 150 */,
 /* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -29132,11 +30249,11 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _bar = __webpack_require__(169);
+	var _bar = __webpack_require__(24);
 
 	var _bar2 = _interopRequireDefault(_bar);
 
-	var _lang = __webpack_require__(47);
+	var _lang = __webpack_require__(15);
 
 	var _index = __webpack_require__(14);
 
@@ -29196,8 +30313,8 @@
 	        key: '_initTool',
 	        value: function _initTool() {
 
-	            var bar = this.controlBar,
-	                setting = this.settings;
+	            var bar = this.controlBar;
+	            var setting = this.settings;
 
 	            //工具栏的显示状态
 	            this.barStatus = bar.css('display') === 'none' ? false : true;
@@ -29269,7 +30386,7 @@
 	    }, {
 	        key: 'createHomeIcon',
 	        value: function createHomeIcon(bar) {
-	            var str = '<div id="backHome" style="float:left;text-indent:0.25em;height:{0}px;line-height:{1}px;color:#007aff">主页</div>',
+	            var str = '<div id="xut-control-backhome" style="float:left;text-indent:0.25em;height:{0}px;line-height:{1}px;color:#007aff">主页</div>',
 	                height = this.iconHeight,
 	                html = $(String.format(str, height, height));
 	            bar.append(html);
@@ -29284,7 +30401,7 @@
 	    }, {
 	        key: 'createDirIcon',
 	        value: function createDirIcon(bar) {
-	            var str = '<div id="backDir" class="xut-controlBar-backDir" style="float:left;margin-left:4px;width:{0}px;height:{1}px;background-size:cover"></div>',
+	            var str = '<div class="xut-control-backdir" style="float:left;margin-left:4px;width:{0}px;height:{1}px;background-size:cover"></div>',
 	                height = this.iconHeight,
 	                html = $(String.format(str, height, height));
 	            bar.append(html);
@@ -29304,7 +30421,7 @@
 	                iconH = height * 0.5,
 	                str,
 	                html;
-	            str = '<div class="xut-controlBar-pageNum" style="float:right;margin:{0}px 4px;padding:0 0.25em;height:{1}px;line-height:{2}px;border-radius:0.5em"><span>{3}</span>/<span>{4}</span></div>';
+	            str = '<div class="xut-control-pageindex" style="float:right;margin:{0}px 4px;padding:0 0.25em;height:{1}px;line-height:{2}px;border-radius:0.5em"><span>{3}</span>/<span>{4}</span></div>';
 	            html = $(String.format(str, marginTop, iconH, iconH, this.currentPage, this.pageTotal));
 	            this.curTips = html.children().first();
 	            bar.append(html);
@@ -29323,7 +30440,7 @@
 	                style,
 	                height = this.iconHeight;
 	            style = 'float:right;width:' + height + 'px;height:' + height + 'px;background-size:cover';
-	            html = '<div id="hideToolbar" class="xut-controlBar-hide" style="' + style + '"></div>';
+	            html = '<div id="xut-nav-hidebar" class="xut-control-nav-hide" style="' + style + '"></div>';
 	            bar.append(html);
 	        }
 
@@ -29358,7 +30475,7 @@
 	                appName = this.appName,
 	                height = this.iconHeight;
 	            style = 'width:100%;position:absolute;line-height:' + height + 'px;pointer-events:none';
-	            html = '<div class="xut-controlBar-title" style="z-index:-99;' + style + '">' + appName + '</div>';
+	            html = '<div class="xut-control-title" style="z-index:-99;' + style + '">' + appName + '</div>';
 	            bar.append(html);
 	        }
 
@@ -29407,13 +30524,13 @@
 	            bar.on("touchend mouseup", function (e) {
 	                var type = Xut.plat.evtTarget(e).id;
 	                switch (type) {
-	                    case "backHome":
+	                    case "xut-control-backhome":
 	                        that.homeControl();
 	                        break;
-	                    case "backDir":
+	                    case "xut-control-backdir":
 	                        that.navigationBar();
 	                        break;
-	                    case 'hideToolbar':
+	                    case 'xut-nav-hidebar':
 	                        that.hideTopBar();
 	                        break;
 	                }
@@ -29459,7 +30576,7 @@
 	    }, {
 	        key: 'navigationBar',
 	        value: function navigationBar() {
-	            (0, _index.oepn)(Xut.Presentation.GetPageIndex());
+	            (0, _index.createNavbar)(Xut.Presentation.GetPageIndex());
 	        }
 
 	        /**
@@ -29485,7 +30602,7 @@
 	                that.controlBar && that.controlBar.animate({
 	                    'opacity': 1
 	                }, that.delay, 'linear', function () {
-	                    (0, _index.close)();
+	                    (0, _index.closeNavbar)();
 	                    that.showSystemBar();
 	                    that.barStatus = true;
 	                    that.Lock = false;
@@ -29511,7 +30628,7 @@
 	            this.controlBar.animate({
 	                'opacity': 0
 	            }, that.delay, 'linear', function () {
-	                (0, _index.close)();
+	                (0, _index.closeNavbar)();
 	                that.controlBar.hide();
 	                that.hideSystemBar();
 	                that.barStatus = false;
@@ -31209,9 +32326,45 @@
 
 
 /***/ },
-/* 167 */,
-/* 168 */,
-/* 169 */
+/* 167 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = createHTML;
+
+	var _layout = __webpack_require__(44);
+
+	var _nexttick = __webpack_require__(3);
+
+	var _nexttick2 = _interopRequireDefault(_nexttick);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * 创建dom
+	 */
+	function createHTML(container, callback) {
+
+	    var data = [];
+
+	    Xut.data.query('Chapter', Xut.data.novelId, 'seasonId', function (item) {
+	        data.push(item);
+	    });
+
+	    (0, _nexttick2.default)({
+	        'container': container,
+	        'content': (0, _layout.navMenu)(data)
+	    }, function () {
+	        callback(data);
+	    });
+	}
+
+/***/ },
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31221,939 +32374,220 @@
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _svgicon = __webpack_require__(146);
-
-	var _iconconfig = __webpack_require__(145);
 
 	var _index = __webpack_require__(1);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var isIOS = Xut.plat.isIOS;
-
 	/**
-	 * 获取翻页按钮位置
-	 * @return {[type]} [description]
+	 * 下拉章节列表
 	 */
-	var arrowStyle = function arrowStyle() {
-	    var height = _index.config.iconHeight;
-	    var settings = _index.config.settings;
-	    var styleText = 'height:' + height + 'px;width:' + height + 'px';
-	    switch (settings.NavbarPos) {
-	        case 0:
-	            styleText += ';top:0';
-	            break; //顶部
-	        case 1:
-	            styleText += ';margin-top:' + -height / 2 + 'px';
-	            break; //中间
-	        case 2:
-	            styleText += ';top:auto;bottom:0';
-	            break; //底部
-	        default:
-	            break;
-	    }
-
-	    return styleText;
-	};
-
-	var Bar = function () {
-	    function Bar() {
-	        _classCallCheck(this, Bar);
-
-	        /**
-	         * 系统状态栏高度
-	         * @type {[type]}
-	         */
-	        this.barHeight = isIOS ? 20 : 0;
-
-	        /**
-	         * 默认创建左翻页按钮
-	         * @type {Boolean}
-	         */
-	        this.enableLeft = true;
-
-	        /**
-	         * 默认创建右翻页按钮 
-	         * @type {Boolean}
-	         */
-	        this.enableRight = true;
-	    }
-
-	    _createClass(Bar, [{
-	        key: 'initConfig',
-	        value: function initConfig() {
-	            var propHeight;
-	            //获取高度缩放比
-	            //自动选择缩放比例
-	            this.propHeight = propHeight = function () {
-	                var layout = _index.config.layoutMode,
-	                    prop = _index.config.proportion;
-	                return layout == "horizontal" ? prop.width : prop.height;
-	            }();
-
-	            //获取图标高度
-	            //工具栏图标高度
-	            this.iconHeight = function () {
-	                var height = _index.config.iconHeight;
-	                return isIOS ? height : Math.round(propHeight * height);
-	            }();
-
-	            this.appName = _index.config.shortName; //应用标题
-	            this.settings = _index.config.settings; //应用默认配置
-	        }
-
-	        /**
-	         * 创建翻页按钮
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'createArrows',
-	        value: function createArrows() {
-	            //是否使用自定义的翻页按钮: true /false
-	            //图标名称是客户端指定的：pageforward_'+appId+'.svg
-	            var isCustom = this.settings.customButton;
-
-	            if (this.enableLeft) {
-	                isCustom ? this.createLeftIcon() : this.createLeftArrow();
-	            }
-
-	            if (this.enableRight) {
-	                isCustom ? this.createRightIcon() : this.createRightArrow();
-	            }
-	        }
-
-	        /**
-	         * 左箭头翻页按钮
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'createLeftArrow',
-	        value: function createLeftArrow() {
-	            var style = arrowStyle(),
-	                state = this.barStatus ? '' : 'hide',
-	                $dom;
-	            $dom = $('<div class="si-icon xut-flip-control xut-flip-control-left ' + state + '" data-icon-name="prevArrow" style="' + style + '"></div>');
-
-	            this.createSVGIcon($dom[0], function () {
-	                Xut.View.GotoPrevSlide();
-	            });
-
-	            this.container.append($dom);
-	            this.arrows.prev = {
-	                el: $dom,
-	                able: true
-	            };
-	        }
-
-	        /**
-	         * 右箭头翻页按钮
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'createRightArrow',
-	        value: function createRightArrow() {
-	            var style = arrowStyle(),
-	                state = this.barStatus ? '' : 'hide',
-	                $dom;
-	            $dom = $('<div class="si-icon xut-flip-control xut-flip-control-right ' + state + '" data-icon-name="nextArrow" style="' + style + '"></div>');
-
-	            this.createSVGIcon($dom[0], function () {
-	                Xut.View.GotoNextSlide();
-	            });
-
-	            this.container.append($dom);
-	            this.arrows.next = {
-	                el: $dom,
-	                able: true
-	            };
-	        }
-
-	        /**
-	         * 自定义左翻页按钮
-	         * [createLeftIcon description]
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'createLeftIcon',
-	        value: function createLeftIcon() {
-	            var style = arrowStyle(),
-	                appId = this.config.appId,
-	                state = this.barStatus ? '' : 'hide',
-	                $dom;
-	            style += ';background-image:url(images/icons/pageforward_' + appId + '.svg);background-size:cover';
-	            $dom = $('<div name="prevArrow" class="xut-flip-control xut-flip-control-left ' + state + '" style="' + style + '"></div>');
-
-	            $dom.on("touchend mouseup", function () {
-	                Xut.View.GotoPrevSlide();
-	            });
-
-	            this.container.append($dom);
-	            this.arrows.prev = {
-	                el: $dom,
-	                able: true
-	            };
-	        }
-
-	        //自定义右翻页按钮
-
-	    }, {
-	        key: 'createRightIcon',
-	        value: function createRightIcon() {
-	            var style = arrowStyle(),
-	                appId = this.config.appId,
-	                state = this.barStatus ? '' : 'hide',
-	                $dom;
-	            style += ';background-image:url(images/icons/pageback_' + appId + '.svg);background-size:cover';
-	            $dom = $('<div name="nextArrow" class="xut-flip-control xut-flip-control-right ' + state + '" style="' + style + '"></div>');
-
-	            $dom.on("touchend mouseup", function () {
-	                Xut.View.GotoNextSlide();
-	            });
-
-	            this.container.append($dom);
-	            this.arrows.next = {
-	                el: $dom,
-	                able: true
-	            };
-	        }
-
-	        /**
-	         * [ description]
-	         * @param  {[type]} dir [next,prev]
-	         * @param  {[type]} status  [true/false]
-	         * @return {[type]}       [description]
-	         */
-
-	    }, {
-	        key: 'toggleArrow',
-	        value: function toggleArrow(dir, status) {
-	            var arrow = this.arrows[dir];
-	            //如果没有创建翻页按钮,则不处理
-	            if (!arrow) return;
-	            arrow.able = status;
-	            //如果人为隐藏了工具栏,则不显示翻页按钮
-	            if (this.hasTopBar && !this.barStatus && status) {
-	                return;
-	            }
-	            arrow.el[status ? 'show' : 'hide']();
-	        }
-
-	        //隐藏下一页按钮
-
-	    }, {
-	        key: 'hideNext',
-	        value: function hideNext() {
-	            this.toggleArrow('next', false);
-	        }
-
-	        //显示下一页按钮
-
-	    }, {
-	        key: 'showNext',
-	        value: function showNext() {
-	            this.toggleArrow('next', true);
-	        }
-
-	        //隐藏上一页按钮
-
-	    }, {
-	        key: 'hidePrev',
-	        value: function hidePrev() {
-	            this.toggleArrow('prev', false);
-	        }
-
-	        //显示上一页按钮
-
-	    }, {
-	        key: 'showPrev',
-	        value: function showPrev() {
-	            this.toggleArrow('prev', true);
-	        }
-
-	        /**
-	         * [ 显示翻页按钮]
-	         * @return {[type]}        [description]
-	         */
-
-	    }, {
-	        key: 'showPageBar',
-	        value: function showPageBar() {
-	            var arrows = this.arrows;
-
-	            for (var dir in arrows) {
-	                var arrow = arrows[dir];
-	                arrow.able && arrow.el.show();
-	            }
-	        }
-
-	        /**
-	         * [ 隐藏翻页按钮]
-	         * @param  {[type]} unlock [description]
-	         * @return {[type]}        [description]
-	         */
-
-	    }, {
-	        key: 'hidePageBar',
-	        value: function hidePageBar() {
-	            var arrows = this.arrows;
-	            for (var dir in arrows) {
-	                arrows[dir].el.hide();
-	            }
-	        }
-
-	        /**
-	         * [description]
-	         * @param  {[type]} state   [description]
-	         * @param  {[type]} pointer [description]
-	         * @return {[type]}         [description]
-	         */
-
-	    }, {
-	        key: 'toggle',
-	        value: function toggle(state, pointer) {
-	            if (this.Lock) return;
-	            this.Lock = true;
-
-	            switch (state) {
-	                case 'show':
-	                    this.showToolbar(pointer);
-	                    break;
-	                case 'hide':
-	                    this.hideToolbar(pointer);
-	                    break;
-	                default:
-	                    this.barStatus ? this.hideToolbar(pointer) : this.showToolbar(pointer);
-	                    break;
-	            }
-	        }
-
-	        /**
-	         * [ 显示工具栏]
-	         * @param  {[type]} pointer [description]
-	         * @return {[type]}         [description]
-	         */
-
-	    }, {
-	        key: 'showToolbar',
-	        value: function showToolbar(pointer) {
-	            switch (pointer) {
-	                case 'controlBar':
-	                    this.showTopBar();
-	                    break;
-	                case 'button':
-	                    this.showPageBar();
-	                    this.Lock = false;
-	                    break;
-	                default:
-	                    this.showTopBar();
-	                    this.showPageBar();
-	            }
-	        }
-
-	        /**
-	         * [ 隐藏工具栏]
-	         * @param  {[type]} pointer [description]
-	         * @return {[type]}         [description]
-	         */
-
-	    }, {
-	        key: 'hideToolbar',
-	        value: function hideToolbar(pointer) {
-	            switch (pointer) {
-	                case 'controlBar':
-	                    this.hideTopBar();
-	                    break;
-	                case 'button':
-	                    this.hidePageBar();
-	                    this.Lock = false;
-	                    break;
-	                default:
-	                    this.hideTopBar();
-	                    this.hidePageBar();
-	            }
-	        }
-
-	        /**
-	         * 显示IOS系统工具栏
-	         *  iOS状态栏0=show,1=hide
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'showSystemBar',
-	        value: function showSystemBar() {
-	            isIOS && Xut.Plugin.statusbarPlugin.setStatus(null, null, 0);
-	        }
-
-	        /**
-	         * 隐藏IOS系统工具栏
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'hideSystemBar',
-	        value: function hideSystemBar() {
-	            isIOS && Xut.Plugin.statusbarPlugin.setStatus(null, null, 1);
-	        }
-
-	        /**
-	         * 创建SVG按钮
-	         * @param  {[type]}   el       [description]
-	         * @param  {Function} callback [description]
-	         * @return {[type]}            [description]
-	         */
-
-	    }, {
-	        key: 'createSVGIcon',
-	        value: function createSVGIcon(el, callback) {
-	            var options = {
-	                speed: 6000,
-	                size: {
-	                    w: this.iconHeight,
-	                    h: this.iconHeight
-	                },
-	                onToggle: callback
-	            };
-	            return new _svgicon.svgIcon(el, _iconconfig.iconConfig, options);
-	        }
-
-	        /**
-	         * 重置翻页按钮,状态以工具栏为标准
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'reset',
-	        value: function reset() {
-	            this.barStatus ? this.showPageBar() : this.hidePageBar();
-	        }
-	    }]);
-
-	    return Bar;
-	}();
-
-	exports.default = Bar;
-
-/***/ },
-/* 170 */,
-/* 171 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _Mark = __webpack_require__(172);
-
-	var _index = __webpack_require__(2);
-
-	var _tap = __webpack_require__(5);
-
-	var _bar = __webpack_require__(169);
-
-	var _bar2 = _interopRequireDefault(_bar);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * 阅读模式工具栏
-	 * @param options object
-	 * @demo {container:页面容器,controlBar:工具栏容器,...}
-	 * @desc 继承自Toolbar.js
-	 */
-	var BookBar = function (_Bar) {
-	    _inherits(BookBar, _Bar);
-
-	    function BookBar() {
-	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	        var pageMode = _ref.pageMode;
-	        var container = _ref.container;
-	        var controlBar = _ref.controlBar;
-
-	        _classCallCheck(this, BookBar);
-
-	        //左右箭头
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BookBar).call(this));
-
-	        _this.arrows = {};
-
-	        //工具栏父容器
-	        _this.container = container;
-
-	        //工具栏容器
-	        _this.controlBar = controlBar;
-
-	        _this.pageMode = pageMode;
-
-	        //是否有顶部工具栏
-	        _this.hasTopBar = true;
-	        _this.Lock = false;
-	        _this.delay = 50;
-
-	        //图书工具栏高度
-	        _this.topBarHeight = _this.iconHeight * 1.25;
-
-	        //配置属性
-	        _this.initConfig();
-
-	        _this.initTool();
-	        return _this;
+	var Section = function () {
+	    function Section(data) {
+	        _classCallCheck(this, Section);
+
+	        this._isHorizontal = _index.config.layoutMode === 'horizontal';
+	        this._pagedata = data;
+	        this._$navlist = $('#xut-nav-section-list');
+	        this._list = this._$navlist.find("li");
 	    }
 
 	    /**
-	     * 初始化
+	     * 卷滚条
+	     * @param  {[type]} pageIndex [description]
+	     * @return {[type]}           [description]
 	     */
 
 
-	    _createClass(BookBar, [{
-	        key: 'initTool',
-	        value: function initTool() {
-	            //工具栏的显示状态
-	            var display = this.controlBar.css('display');
-	            this.barStatus = display == 'none' ? false : true;
-	            this.setToolbarStyle();
-	            this.createBackIcon();
-	            this.createDirIcon();
-	            this.createMarkIcon();
-	            // this.createStarIcon();
+	    _createClass(Section, [{
+	        key: 'userIscroll',
+	        value: function userIscroll(pageIndex) {
+	            var _this = this;
 
-	            //翻页按钮
-	            if (this.pageMode == 2) {
-	                this.createArrows();
-	            }
+	            var H = !!this._isHorizontal;
 
-	            //监听事件
-	            (0, _tap.bindTap)(this.container[0], {
-	                end: this
-	            });
-	        }
-
-	        /**
-	         * 工具条的样式
-	         */
-
-	    }, {
-	        key: 'setToolbarStyle',
-	        value: function setToolbarStyle() {
-	            var height = this.topBarHeight,
-	                TOP = this.barHeight; //系统工具栏占用的高度
-
-	            //在顶部
-	            this.controlBar.css({
-	                top: 0,
-	                height: height + 'px',
-	                paddingTop: TOP + 'px',
-	                backgroundColor: 'rgba(0, 0, 0, 0.2)', //transparent
-	                fontSize: '0.625em',
-	                color: 'white'
-	            });
-	        }
-
-	        /**
-	         * 更新页码
-	         */
-
-	    }, {
-	        key: 'updatePointer',
-	        value: function updatePointer() {}
-	        //预留
-
-
-	        /**
-	         * 创建目录图标
-	         */
-
-	    }, {
-	        key: 'createDirIcon',
-	        value: function createDirIcon(bar) {
-	            var icon = document.createElement('div');
-	            icon.innerHTML = '目录';
-	            icon.style.width = this.iconHeight + 'px';
-	            icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
-	            icon.className = 'xut-book-bar-dir';
-	            this.controlBar.append(icon);
-	        }
-
-	        /**
-	         * 创建书签图标
-	         * @param  {[type]} bar [description]
-	         * @return {[type]}     [description]
-	         */
-
-	    }, {
-	        key: 'createMarkIcon',
-	        value: function createMarkIcon(bar) {
-	            var icon = document.createElement('div');
-	            icon.innerHTML = '书签';
-	            icon.style.width = this.iconHeight + 'px';
-	            icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
-	            icon.className = 'xut-book-bar-mark';
-	            this.controlBar.append(icon);
-	        }
-
-	        /**
-	         * 创建评分图标
-	         */
-
-	    }, {
-	        key: 'createStarIcon',
-	        value: function createStarIcon(bar) {
-	            var icon = document.createElement('div');
-	            icon.innerHTML = '评分';
-	            icon.style.width = this.iconHeight + 'px';
-	            icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
-	            icon.className = 'xut-book-bar-star';
-	            this.controlBar.append(icon);
-	        }
-
-	        /**
-	         * 后退按钮
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'createBackIcon',
-	        value: function createBackIcon() {
-	            var icon = document.createElement('div');
-	            icon.style.width = this.topBarHeight + 'px';
-	            icon.className = 'xut-book-bar-back';
-	            this.controlBar.append(icon);
-	        }
-
-	        /**
-	         * 显示顶部工具栏
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'showTopBar',
-	        value: function showTopBar() {
-	            var that = this;
-
-	            if (this.barStatus) {
-	                this.Lock = false;
-	                return;
-	            }
-
-	            this.controlBar.css({
-	                'display': 'block',
-	                'opacity': 0
-	            });
-
-	            setTimeout(function () {
-	                that.controlBar.animate({
-	                    'opacity': 1
-	                }, that.delay, 'linear', function () {
-	                    that.showSystemBar();
-	                    that.barStatus = true;
-	                    that.Lock = false;
-	                });
-	            }, 50);
-	        }
-
-	        /**
-	         * 隐藏顶部工具栏
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'hideTopBar',
-	        value: function hideTopBar() {
-	            var that = this;
-
-	            if (!this.barStatus) {
-	                this.Lock = false;
-	                return;
-	            }
-
-	            this.controlBar.animate({
-	                'opacity': 0
-	            }, that.delay, 'linear', function () {
-	                that.controlBar.hide();
-	                that.hideSystemBar();
-	                that.barStatus = false;
-	                that.Lock = false;
-	            });
-	        }
-
-	        /**
-	         * 创建目录菜单
-	         */
-
-	    }, {
-	        key: 'createDirMenu',
-	        value: function createDirMenu() {
-	            var self = this;
-	            var wrap = document.createElement('div');
-	            var mask = document.createElement('div');
-	            //添加遮层
-	            mask.className = 'xut-book-menu-mask';
-	            //获取内容
-	            this.getDirContent();
-	            wrap.className = 'xut-book-menu';
-	            wrap.innerHTML = '<ul>' + this.contentText + '</ul>';
-	            this.container.append(wrap);
-	            //是否滚动
-	            this.isScrolled = false;
-
-	            //添加滚动条
-	            //url : http://iscrolljs.com/
-	            this.iscroll = new iScroll(wrap, {
-	                scrollbars: true,
-	                fadeScrollbars: true,
-	                scrollX: false
-	            });
-
-	            this.menu = wrap;
-
-	            this.setColor();
-
-	            this.iscroll.on('scrollStart', function (e) {
-	                self.isScrolled = true;
-	            });
-
-	            this.iscroll.on('scrollEnd', function (e) {
-	                self.isScrolled = false;
-	            });
-
-	            wrap.appendChild(mask);
-	        }
-
-	        /**
-	         *  显示目录菜单
-	         */
-
-	    }, {
-	        key: 'showDirMenu',
-	        value: function showDirMenu() {
-	            //获取当前页面
-	            var page = Xut.Presentation.GetPageElement();
-
-	            if (this.menu) {
-	                this.menu.style.display = 'block';
-	            } else {
-	                this.createDirMenu();
-	            }
-
-	            //添加模糊效果
-	            page.addClass('filter');
-	            this.page = page;
-
-	            //隐藏顶部工具栏
-	            this.controlBar.hide();
-	            var iscroll = this.iscroll;
-	            //自动定位到上一位置
-	            if (iscroll.y > iscroll.wrapperHeight) {
-	                iscroll.scrollToElement(this.selectedChild);
-	            }
-	        }
-
-	        /**
-	         *  隐藏目录菜单
-	         */
-
-	    }, {
-	        key: 'hideDirMenu',
-	        value: function hideDirMenu() {
-	            this.menu.style.display = 'none';
-	            //恢复顶部工具栏
-	            this.controlBar.show();
-	            //移除模糊效果
-	            this.page.removeClass('filter');
-	        }
-
-	        /**
-	         *  创建目录内容
-	         */
-
-	    }, {
-	        key: 'getDirContent',
-	        value: function getDirContent() {
-
-	            var Api = Xut.Presentation;
-	            var data = Api.GetAppSectionData();
-	            var sns = data[0];
-	            var seaonId = sns._id;
-	            var cids = Xut.data.Chapter;
-
-	            ////////////////////////////
-	            //针对book模式，合并了Season的参数 //
-	            //1 SeasonTitle
-	            //2 ChapterList列表的范围区间
-	            ////////////////////////////
-	            data = (0, _index.parseJSON)(sns.parameter);
-
-	            if (!data) {
-	                console.log('book模式parameter数据出错');
-	                return;
-	            }
-
-	            //二级目录
-	            function secondaryDirectory(startCid, endCid) {
-	                var cid,
-	                    str = '';
-	                for (startCid; startCid <= endCid; startCid++) {
-	                    cid = cids.item(startCid - 1);
-	                    if (cid && cid.chapterTitle) {
-	                        str += '<section><a class="xut-book-menu-item" data-mark=' + seaonId + '-' + startCid + ' href="javascript:0">' + cid.chapterTitle + '</a></section>';
-	                    }
+	            if (this.hBox) {
+	                if (H) {
+	                    //hBox.goToPage(pageIndex, 0, 0)
+	                } else {
+	                    this.hBox.goToPage(0, pageIndex, 0);
 	                }
-	                return str;
+	            } else {
+	                this.hBox = new iScroll('#xut-nav-wrapper', {
+	                    snap: 'li',
+	                    tap: true,
+	                    scrollX: H,
+	                    scrollY: !H,
+	                    scrollbars: true,
+	                    fadeScrollbars: true,
+	                    stopPropagation: true
+	                });
+
+	                //滑动结束,动态处理缩略图
+	                this.hBox.on('scrollEnd', function (e) {
+	                    _this.createThumb();
+	                    _this.removeThumb();
+	                });
+
+	                this._$navlist.on('tap', self.tojump);
 	            }
+	        }
+
+	        /**
+	         * [ 创建缩略图]
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'createThumb',
+	        value: function createThumb() {
+	            var index = this.getPageIndex(),
+	                //最左边的索引
+	            count = this.getViewLen(),
+	                //允许显示的页数
+	            createBak = this.createBak || [],
+	                //已创建的页码索引
+	            createNew = [],
+	                //新建的页码索引
+	            pageData = this._pagedata,
+	                maxLen = pageData.length,
+	                path = _index.config.pathAddress;
+
+	            //确保不会溢出
+	            count = count > maxLen ? maxLen : count;
+	            //尽可能地填满
+	            index = index + count > maxLen ? maxLen - count : index;
 
 	            var i = 0;
-	            var len = data.length;
-	            var li = '<li class="title"><center class="select">目录</center></li>';
-	            var seasonInfo, mark, seasonTitle, seaonId, startCid, endCid;
+	            var j = void 0;
+	            var page = void 0;
 
-	            for (i; i < len; i++) {
-	                seasonInfo = data[i];
-	                startCid = seasonInfo.ChapterList[0];
-	                endCid = seasonInfo.ChapterList[1];
-	                mark = seaonId + '-' + startCid;
-	                if (seasonInfo.SeasonTitle.length <= 0) continue;
-	                seasonTitle = seasonInfo.SeasonTitle || '第' + (i + 1) + '章';
-	                //第一级目录
-	                li += '<li>' + '<a class="xut-book-menu-item" data-mark="' + mark + '" href="javascript:0">' + seasonTitle + '</a>' +
-	                //第二级目录
-	                secondaryDirectory(startCid, endCid) + '</li>';
+	            for (i = 0; i < count; i++) {
+	                j = index + i;
+	                page = pageData[j];
+	                createNew.push(j);
+	                if (_.contains(createBak, j)) continue;
+	                createBak.push(j);
+
+	                //如果是分层母板了,此时用icon代替
+	                if (page.iconImage) {
+	                    this._list.eq(j).css({
+	                        'background-image': 'url(' + path + page.iconImage + ')'
+	                    });
+	                } else {
+	                    this._list.eq(j).css({
+	                        'background-image': 'url(' + path + page.md5 + ')',
+	                        'background-color': 'white'
+	                    });
+	                }
 	            }
 
-	            this.contentText = li;
+	            this.createNew = createNew;
+	            this.createBak = createBak;
 	        }
 
 	        /**
-	         * 突出显示点击颜色
+	         * [ 清理隐藏的缩略图]
+	         * @return {[type]} [description]
 	         */
 
 	    }, {
-	        key: 'setColor',
-	        value: function setColor(element) {
-	            if (this.selectedChild) {
-	                this.selectedChild.className = 'xut-book-menu-item';
-	            }
+	        key: 'removeThumb',
+	        value: function removeThumb() {
+	            var list = this._list;
+	            var createNew = this.createNew;
+	            var createBak = this.createBak;
 
-	            element = element || this.menu.querySelectorAll('li')[1].children[0];
-	            element.className = 'select';
-	            this.selectedChild = element;
-	        }
-
-	        /**
-	         * 跳转到指定书页
-	         */
-
-	    }, {
-	        key: 'turnToPage',
-	        value: function turnToPage(target) {
-	            //忽略滚动点击
-	            if (this.isScrolled) return;
-	            this.setColor(target);
-	            this.hideDirMenu();
-	            var data = target.dataset.mark || '';
-	            if (data) {
-	                data = data.split('-');
-	                Xut.View.LoadScenario({
-	                    'scenarioId': data[0],
-	                    'chapterId': data[1]
-	                });
-	            }
-	        }
-
-	        /**
-	         * 显示书签
-	         */
-
-	    }, {
-	        key: 'showBookMark',
-	        value: function showBookMark() {
-	            if (this.bookMark) {
-	                this.bookMark.restore();
-	            } else {
-	                var pageData = Xut.Presentation.GetPageData();
-	                this.bookMark = new _Mark.BookMark({
-	                    parent: this.container,
-	                    seasonId: pageData.seasonId,
-	                    pageId: pageData._id
-	                });
-	            }
-	        }
-
-	        /**
-	         * 返回首页
-	         */
-
-	    }, {
-	        key: 'goBack',
-	        value: function goBack() {
-	            var self = this;
-	            Xut.Application.Suspend({
-	                dispose: function dispose(promptMessage) {
-	                    //停止热点动作
-	                    //promptMessage('再按一次将跳至首页！')
-	                },
-	                processed: function processed() {
-	                    Xut.View.GotoSlide(1); //调整到首页
-	                    self.setColor();
+	            _.each(createBak, function (val, i) {
+	                if (!_.contains(createNew, val)) {
+	                    //标记要清理的索引
+	                    createBak[i] = -1;
+	                    list.eq(val).css({
+	                        'background': ''
+	                    });
 	                }
 	            });
+
+	            //执行清理
+	            this.createBak = _.without(createBak, -1);
 	        }
 
 	        /**
-	         * 事件处理
+	         * [ 得到滑动列表中最左侧的索引]
+	         * @return {[type]} [description]
 	         */
 
 	    }, {
-	        key: 'handleEvent',
-	        value: function handleEvent(e) {
-
-	            var target = e.target || e.srcElement;
-
-	            var name = target.className;
-
-	            switch (name) {
-	                case 'xut-book-bar-back':
-	                    this.goBack();
-	                    //返回
-	                    break;
-	                case 'xut-book-bar-dir':
-	                    //目录
-	                    this.showDirMenu();
-	                    break;
-	                case 'xut-book-bar-mark':
-	                    //书签
-	                    this.showBookMark();
-	                    break;
-	                case 'xut-book-bar-star':
-	                    //评分
-	                    break;
-	                case 'xut-book-menu-item':
-	                    //跳转
-	                    this.turnToPage(target);
-	                    break;
-	                case 'xut-book-menu-mask':
-	                case 'select':
-	                    this.hideDirMenu();
-	                    break;
-	                default:
-	                    // console.log(name+':undefined')
-	                    break;
+	        key: 'getPageIndex',
+	        value: function getPageIndex() {
+	            if (this.hBox.options.scrollX) {
+	                return this.hBox.currentPage.pageX;
+	            } else {
+	                return this.hBox.currentPage.pageY;
 	            }
+	        }
+
+	        /**
+	         * [ 获取待创建的缩略图的个数]
+	         * @return {[type]} [description]
+	         */
+
+	    }, {
+	        key: 'getViewLen',
+	        value: function getViewLen() {
+	            var hBox = this.hBox,
+	                eleSize = 1,
+	                //单个li的高度,
+	            count = 1,
+	                len = this._pagedata.length; //li的总数
+
+	            if (this._isHorizontal) {
+	                eleSize = hBox.scrollerWidth / len;
+	                count = hBox.wrapperWidth / eleSize;
+	            } else {
+	                eleSize = hBox.scrollerHeight / len;
+	                count = hBox.wrapperHeight / eleSize;
+	            }
+	            //多创建一个
+	            return Math.ceil(count) + 1;
+	        }
+
+	        /**
+	         * 点击元素跳转
+	         */
+
+	    }, {
+	        key: 'tojump',
+	        value: function tojump(env) {
+	            var target;
+	            var xxtlink;
+	            if (target = env.target) {
+	                // initialize();
+	                if (xxtlink = target.getAttribute('data-xxtlink')) {
+	                    xxtlink = xxtlink.split('-');
+	                    Xut.View.GotoSlide(xxtlink[0], xxtlink[1]);
+	                }
+	            }
+	        }
+
+	        /**
+	         * 滚动指定位置
+	         */
+
+	    }, {
+	        key: 'scrollTo',
+	        value: function scrollTo() {
+	            this.userIscroll();
+	        }
+
+	        /**
+	         * 刷新
+	         */
+
+	    }, {
+	        key: 'refresh',
+	        value: function refresh() {
+	            this.hBox && this.hBox.refresh();
 	        }
 
 	        /**
@@ -32163,443 +32597,19 @@
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            this.iscroll && this.iscroll.destroy();
-	            this.bookMark && this.bookMark.destroy();
-	            var ele = this.container[0];
-	            ele.removeEventListener('touchend', this, false);
-	            ele.removeEventListener('mouseup', this, false);
-	            this.iscroll = null;
-	            this.menu = null;
-	            this.page = null;
+	            if (this.hBox) {
+	                this._$navlist.off();
+	                this.hBox.destroy();
+	                this.hBox = null;
+	            }
+	            this._pagedata = null;
 	        }
 	    }]);
 
-	    return BookBar;
-	}(_bar2.default);
-
-	exports.default = BookBar;
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 书签栏
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 加入这个书签功能后，可以让用户自由选择哪页是需要保存记录的
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @param options object
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
-
-
-	var _tap = __webpack_require__(5);
-
-	var _index = __webpack_require__(2);
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var icons = {
-	    hide: 'images/icons/arrowDown.svg'
-	};
-
-	/**
-	 * 行高
-	 * @type {[type]}
-	 */
-	var sLineHeiht = parseInt($('body').css('font-size')) || 16; //行高
-
-	/**
-	 * 书签缓存
-	 */
-	var BOOKCACHE = void 0;
-
-	var Mark = function () {
-	    function Mark() {
-	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	        var parent = _ref.parent;
-	        var pageId = _ref.pageId;
-	        var seasonId = _ref.seasonId;
-
-	        _classCallCheck(this, Mark);
-
-	        this.parent = parent;
-	        this.pageId = pageId;
-	        this.seasonId = seasonId;
-
-	        this.screenSize = Xut.config.screenSize;
-	        this.sHeight = this.screenSize.height;
-	        this.sWidth = this.screenSize.width;
-
-	        //是否已存储
-	        this.isStored = false;
-	        this.init();
-	    }
-
-	    /**
-	     * 初始化
-	     * @return {[type]} [description]
-	     */
-
-
-	    _createClass(Mark, [{
-	        key: 'init',
-	        value: function init() {
-	            var $bookMark = this.createBookMark(),
-	                dom = this.parent[0],
-	                that = this;
-
-	            this.parent.append($bookMark);
-	            this.bookMarkMenu = $bookMark.eq(0);
-	            //显示书签
-	            setTimeout(function () {
-	                that.restore();
-	            }, 20);
-	            //获取历史记录
-	            BOOKCACHE = this.getHistory();
-
-	            //邦定用户事件
-	            (0, _tap.bindTap)(dom, {
-	                end: this
-	            });
-	        }
-
-	        /**
-	         * 创建书签
-	         * @return {[object]} [jquery生成的dom对象]
-	         */
-
-	    }, {
-	        key: 'createBookMark',
-	        value: function createBookMark() {
-	            var height = sLineHeiht * 3,
-	                // menu的高为3em
-	            box = '<div class="xut-bookmark-menu" style="width:100%;height:{0}px;left:0;top:{1}px;">' + '<div class="xut-bookmark-wrap">' + '<div class="xut-bookmark-add">加入书签</div>' + '<div class="xut-bookmark-off" style="background-image:url({2})"></div>' + '<div class="xut-bookmark-view">书签记录</div>' + '</div>' + '</div>' + '<div class="xut-bookmark-list" style="display:none;width:100%;height:{3}px;">' + '<ul class="xut-bookmark-head">' + '<li class="xut-bookmark-back">返回</li>' + '<li>书签</li>' + '</ul>' + '<ul class="xut-bookmark-body"></ul>' + '</div>';
-	            box = String.format(box, height, this.sHeight, icons.hide, this.sHeight);
-	            this.markHeight = height;
-	            return $(box);
-	        }
-
-	        /**
-	         * 生成书签列表
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'createMarkList',
-	        value: function createMarkList() {
-	            var tmp,
-	                seasonId,
-	                pageId,
-	                list = '',
-	                box = '',
-	                self = this;
-
-	            //取历史记录
-	            _.each(BOOKCACHE, function (mark) {
-	                tmp = mark.split('-');
-	                seasonId = tmp[0];
-	                pageId = tmp[1];
-	                mark = self.getMarkId(seasonId, pageId);
-	                list += '<li><a data-mark="' + mark + '" class="xut-bookmark-id" href="javascript:0">第' + pageId + '页</a><a class="xut-bookmark-del" data-mark="' + mark + '" href="javascript:0">X</a></li>';
-	            });
-
-	            return list;
-	        }
-
-	        /**
-	         * 创建存储标签
-	         * 存储格式 seasonId-pageId
-	         * @return {string} [description]
-	         */
-
-	    }, {
-	        key: 'getMarkId',
-	        value: function getMarkId(seasonId, pageId) {
-	            return seasonId + '-' + pageId;
-	        }
-
-	        /**
-	         * 获取历史记录
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'getHistory',
-	        value: function getHistory() {
-	            var mark = (0, _index._get)('bookMark');
-	            if (mark) {
-	                return mark.split(',');
-	            }
-	            return [];
-	        }
-
-	        /**
-	         * 添加书签
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'addBookMark',
-	        value: function addBookMark() {
-	            var key;
-
-	            this.updatePageInfo();
-	            key = this.getMarkId(this.seasonId, this.pageId);
-
-	            //避免重复缓存
-	            if (BOOKCACHE.indexOf(key) > -1) {
-	                return;
-	            }
-	            BOOKCACHE.push(key);
-	            (0, _index._set)('bookMark', BOOKCACHE);
-	        }
-
-	        /**
-	         * 更新页信息
-	         *  针对母板层上的书签
-	         */
-
-	    }, {
-	        key: 'updatePageInfo',
-	        value: function updatePageInfo() {
-	            var pageData = Xut.Presentation.GetPageData();
-	            this.pageId = pageData._id;
-	            this.seasonId = pageData.seasonId;
-	        }
-
-	        /**
-	         * 删除书签
-	         * @param {object} [key] [事件目标对象]
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'delBookMark',
-	        value: function delBookMark(target) {
-	            if (!target || !target.dataset) return;
-
-	            var key = target.dataset.mark,
-	                index = BOOKCACHE.indexOf(key);
-
-	            BOOKCACHE.splice(index, 1);
-	            (0, _index._set)('bookMark', BOOKCACHE);
-
-	            if (BOOKCACHE.length == 0) {
-	                (0, _index._remove)('bookMark');
-	            }
-
-	            //移除该行
-	            $(target).parent().remove();
-	        }
-
-	        /**
-	         * 显示书签
-	         * @param {object} [target] [事件目标对象]
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'viewBookMark',
-	        value: function viewBookMark(target) {
-	            var $bookMarkList,
-	                list = this.createMarkList();
-
-	            if (this.bookMarkList) {
-	                $bookMarkList = this.bookMarkList;
-	            } else {
-	                $bookMarkList = $(target).parent().parent().next();
-	            }
-	            //更新书签内容
-	            $bookMarkList.find('.xut-bookmark-body').html(list);
-	            this.bookMarkList = $bookMarkList;
-	            $bookMarkList.fadeIn();
-	        }
-
-	        /**
-	         * 点击放大效果
-	         * @param  {[object]} target [事件目标对象]
-	         * @return {[type]}      [description]
-	         */
-
-	    }, {
-	        key: 'iconManager',
-	        value: function iconManager(target) {
-	            var $icon = this.bookMarkIcon = $(target),
-	                restore = this.iconRestore;
-
-	            $icon.css({
-	                'transform': 'scale(1.2)',
-	                'transition-duration': '500ms'
-	            })[0].addEventListener(Xut.style.transitionEnd, restore.bind(this), false);
-	        }
-
-	        /**
-	         * 复原按钮
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'iconRestore',
-	        value: function iconRestore() {
-	            this.bookMarkIcon.css('transform', '');
-	        }
-
-	        /**
-	         * 跳转到书签页
-	         * @param  {[type]} target [description]
-	         * @return {[type]}        [description]
-	         */
-
-	    }, {
-	        key: 'goBookMark',
-	        value: function goBookMark(target) {
-	            if (!target || !target.dataset) return;
-
-	            var key = target.dataset.mark.split('-');
-	            var seasonId = Number(key[0]);
-	            var pageId = Number(key[1]);
-
-	            this.updatePageInfo();
-	            //关闭书签列表
-	            this.backBookMark();
-
-	            //忽略当前页的跳转
-	            if (this.pageId == pageId && this.seasonId == seasonId) {
-	                return;
-	            }
-
-	            Xut.View.LoadScenario({
-	                'scenarioId': seasonId,
-	                'chapterId': pageId
-	            });
-	        }
-
-	        /**
-	         * 书签回退键
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'backBookMark',
-	        value: function backBookMark() {
-	            this.bookMarkList.fadeOut();
-	        }
-
-	        /**
-	         * 邦定事件
-	         * @param  {[type]} evt [事件]
-	         * @return {[type]}     [description]
-	         */
-
-	    }, {
-	        key: 'handleEvent',
-	        value: function handleEvent(evt) {
-	            var target = evt.target;
-	            switch (target.className) {
-	                //加入书签
-	                case 'xut-bookmark-add':
-	                    this.addBookMark();
-	                    this.iconManager(target);
-	                    break;
-	                //显示书签记录
-	                case 'xut-bookmark-view':
-	                    this.viewBookMark(target);
-	                    this.iconManager(target);
-	                    break;
-	                //关闭书签
-	                case 'xut-bookmark-off':
-	                    this.closeBookMark(target);
-	                    break;
-	                //返回书签主菜单
-	                case 'xut-bookmark-back':
-	                    this.backBookMark();
-	                    break;
-	                //删除书签记录
-	                case 'xut-bookmark-del':
-	                    this.delBookMark(target);
-	                    break;
-	                //跳转到书签页
-	                case 'xut-bookmark-id':
-	                    this.goBookMark(target);
-	                    break;
-	                default:
-	                    //console.log(target.className)
-	                    break;
-	            }
-	        }
-
-	        /**
-	         * 关闭书签菜单
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'closeBookMark',
-	        value: function closeBookMark(target) {
-	            this.bookMarkMenu.css({
-	                transform: 'translate3d(0,0,0)',
-	                'transition-duration': '1s'
-	            });
-	        }
-
-	        /**
-	         * 恢复书签菜单
-	         */
-
-	    }, {
-	        key: 'restore',
-	        value: function restore() {
-	            this.bookMarkMenu.css({
-	                transform: 'translate3d(0,-' + this.markHeight + 'px,0)',
-	                'transition-duration': '1s'
-	            });
-	        }
-
-	        /**
-	         * 销毁书签
-	         * @return {[type]} [description]
-	         */
-
-	    }, {
-	        key: 'destroy',
-	        value: function destroy() {
-	            var dom = this.parent[0];
-
-	            dom.removeEventListener('touchend', this, false);
-	            dom.removeEventListener('mouseup', this, false);
-
-	            //菜单部分
-	            if (this.bookMarkMenu) {
-	                this.bookMarkMenu.remove();
-	                this.bookMarkMenu = null;
-	            }
-
-	            //列表部分
-	            if (this.bookMarkList) {
-	                this.bookMarkList.remove();
-	                this.bookMarkList = null;
-	            }
-
-	            //按钮效果
-	            if (this.bookMarkIcon) {
-	                this.bookMarkIcon[0].removeEventListener(Xut.style.transitionEnd, this.iconRestore, false);
-	                this.bookMarkIcon = null;
-	            }
-
-	            this.parent = null;
-	        }
-	    }]);
-
-	    return Mark;
+	    return Section;
 	}();
 
-	exports.default = Mark;
+	exports.default = Section;
 
 /***/ }
 /******/ ]);

@@ -27,7 +27,7 @@
 import { config } from './config/index'
 import { sceneController } from './scenario/controller'
 import { autoRun, original, suspend } from './command/index'
-import { SceneFactory } from './scenario/factory'
+import { SceneFactory } from './scenario/scenario'
 import { suspendHandles as globalStop, promptMessage } from './global-stop'
 import globalDestroy from './global-destroy'
 import loadScene from './main/scene'

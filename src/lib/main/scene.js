@@ -1,3 +1,5 @@
+import { config } from '../config/index'
+
 import {
     _set,
     _get,
@@ -5,7 +7,7 @@ import {
     toEmpty
 }
 from '../util/index'
-import { config } from '../config/index'
+
 
 /**
  * 设置缓存

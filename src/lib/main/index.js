@@ -11,9 +11,7 @@ import {
 }
 from '../util/index'
 
-
 const getCache = (name) => parseInt(_get(name))
-
 
 /**
  * 进入主页面

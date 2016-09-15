@@ -57,7 +57,7 @@ Xut.Application.Launch = function({
         database: paths.database
     }
 
-    let busyIcon = '<div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>'
+    let busyIcon = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
 
     //disable cursor
     if (!cursor) {
@@ -68,8 +68,8 @@ Xut.Application.Launch = function({
     let $html = $(`
     ${busyIcon}
     <div class="xut-removelayer"></div>
-    <div class="xut-startupPage xut-fullScreen"></div>
-    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>`)
+    <div class="xut-start-page xut-fullscreen"></div>
+    <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>`)
 
     $el.css('z-index', 99999)
 
@@ -88,11 +88,11 @@ Xut.Application.Launch = function({
 
 const createMain = function() {
     let rootNode = $("#xxtppt-app-container")
-    let nodeHhtml = '<div id="xxtppt-app-container" class="xut-chapter xut-fullScreen xut-overflow"></div>'
-    let tempHtml = `<div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>
+    let nodeHhtml = '<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow"></div>'
+    let tempHtml = `<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>
                     <div class="xut-removelayer"></div>
-                    <div class="xut-startupPage xut-fullScreen"></div>
-                    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>`
+                    <div class="xut-start-page xut-fullscreen"></div>
+                    <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>`
 
     let $html
     if (rootNode.length) {
@@ -100,7 +100,7 @@ const createMain = function() {
     } else {
         rootNode = $('body')
         $html = $(
-            `<div id="xxtppt-app-container" class="xut-chapter xut-fullScreen xut-overflow">${tempHtml}</div>`
+            `<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow">${tempHtml}</div>`
         )
     }
     nextTick({

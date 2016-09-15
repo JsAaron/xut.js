@@ -102,7 +102,7 @@ export default class fnBar extends Bar {
             TOP = this.barHeight,
             html = '',
             style = 'top:0;height:' + this.iconHeight + 'px;padding-top:' + TOP + 'px';
-        html = '<div id="controlBar' + id + '" class="xut-controlBar" style="' + style + '"></div>';
+        html = '<div id="xut-control-bar' + id + '" class="xut-control-bar" style="' + style + '"></div>';
         html = $(html);
         this.top = TOP;
         this.showSystemBar();
@@ -220,7 +220,7 @@ export default class fnBar extends Bar {
             currentPage = this.currentPage,
             style, html;
         style = 'position:absolute;right:4px;top:' + (height * 0.25 + TOP) + 'px;padding:0 0.25em;height:' + height * 0.5 + 'px;line-height:' + height * 0.5 + 'px;border-radius:0.5em';
-        html = '<div class="xut-controlBar-pageNum" style="' + style + '">';
+        html = '<div class="xut-control-pageindex" style="' + style + '">';
         html += '<span class="currentPage">' + currentPage + '</span>/<span>' + pageTotal + '</span>';
         html += '</div>';
         html = $(html);
@@ -236,7 +236,7 @@ export default class fnBar extends Bar {
             height = this.iconHeight,
             right = this.iconHeight * 2.5;
         style = 'position:absolute;right:' + right + 'px;top:' + TOP + 'px;width:' + height + 'px;height:' + height + 'px;background-size:cover';
-        html = '<div class="xut-controlBar-hide" style="' + style + '"></div>';
+        html = '<div class="xut-control-nav-hide" style="' + style + '"></div>';
         container.append(html);
     }
 
@@ -245,7 +245,7 @@ export default class fnBar extends Bar {
         var style, html,
             appName = this.appName;
         style = 'line-height:' + this.iconHeight + 'px';
-        html = '<div class="xut-controlBar-title" style="' + style + '">' + appName + '</div>';
+        html = '<div class="xut-control-title" style="' + style + '">' + appName + '</div>';
         container.append(html)
     }
 
@@ -264,7 +264,7 @@ export default class fnBar extends Bar {
             var target = Xut.plat.evtTarget(e),
                 type = target.className;
             switch (type) {
-                case 'xut-controlBar-hide':
+                case 'xut-control-nav-hide':
                     that.hideTopBar();
                     break;
                 case 'xut-scenario-dark':

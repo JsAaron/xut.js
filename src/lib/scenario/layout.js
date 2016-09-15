@@ -41,72 +41,61 @@ const getOptions = () => {
  */
 export function home() {
 
-    let options = getOptions()
-    let sWidth = options.sWidth
-    let sHeight = options.sHeight
-    let iconHeight = options.iconHeight
-    let calculate = options.calculate
-    let isHorizontal = options.isHorizontal
+    const options      = getOptions()
+    const sWidth       = options.sWidth
+    const sHeight      = options.sHeight
+    const iconHeight   = options.iconHeight
+    const calculate    = options.calculate
+    const isHorizontal = options.isHorizontal
 
-    let html = ''
-    let template
-    let navBar
-    let container
+    const navBarWidth     = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px'
+    const navBarHeight    = isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96)
+    const navBarTop       = isHorizontal ? '' : (iconHeight + TOP + 2) + 'px'
+    const navBarLeft      = isHorizontal ? '' : iconHeight + 'px'
+    const navBarBottom    = isHorizontal ? '4px' : ''
+    const navBaroOverflow = isHorizontal ? 'hidden' : 'visible'
 
     //导航
-    html =
-        '<div id="navBar" class="xut-navBar" style="' +
-        'width:{{width}};' +
-        'height:{{height}}px;' +
-        'top:{{top}};' +
-        'left:{{left}};' +
-        'bottom:{{bottom}};' +
-        'background-color:white;' +
-        'border-top:1px solid rgba(0,0,0,0.1);' +
-        'overflow:{{overflow}};' +
-        '"></div>'
+    const navBarHTML =
+        `<div class="xut-nav-bar" 
+              style="width:${navBarWidth};
+                     height:${navBarHeight}px;
+                     top:${navBarTop};
+                     left:${navBarLeft};
+                     bottom:${navBarBottom};
+                     background-color:white;
+                     border-top:1px solid rgba(0,0,0,0.1);
+                     overflow:${navBaroOverflow};">
+        </div>`
 
-    navBar = _.template(html, {
-        width: isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px',
-        height: isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96),
-        top: isHorizontal ? '' : (iconHeight + TOP + 2) + 'px',
-        left: isHorizontal ? '' : iconHeight + 'px',
-        overflow: isHorizontal ? 'hidden' : 'visible',
-        bottom: isHorizontal ? '4px' : ''
-    })
+
+    const homeWidth = config.viewSize.width
+    const homeHeight = config.viewSize.height
+    const homeTop = calculate.top
+    const homeLeft = calculate.left
+    const homeIndex = Xut.sceneController.createIndex()
+    const homeOverflow = config.scrollPaintingMode ? 'visible' : 'hidden'
 
     //主体
-    html =
-        '<div id="sceneHome" class="xut-chapter" style="' +
-        'width:{{width}}px;' +
-        'height:{{height}}px;' +
-        'top:{{top}}px;' +
-        'left:{{left}}px;' +
-        'overflow:hidden;' +
-        'z-index:{{index}};' +
-        'overflow:{{overflow}};" >' +
+    const homeHTML =
+        `<div id="xut-main-scene" 
+              class="xut-chapter" 
+              style="width:${homeWidth}px;
+                     height:${homeHeight}px;
+                     top:${homeTop}px;
+                     left:${homeLeft}px;
+                     overflow:hidden;
+                     z-index:${homeIndex};
+                     overflow:${homeOverflow};">
 
-        ' <div id="controlBar" class="xut-controlBar hide"></div>' +
-        //页面节点
-        ' <ul id="pageContainer" class="xut-flip"></ul>' +
-        //视觉差包装容器
-        ' <ul id="masterContainer" class="xut-master xut-flip"></ul>' +
-        //滑动菜单
-        ' {{navBar}}' +
-        //消息提示框
-        ' <div id="toolTip"></div>' +
-        '</div>'
+            <div id="xut-control-bar" class="xut-control-bar hide"></div>
+            <ul id="xut-page-container" class="xut-flip"></ul>
+            <ul id="xut-master-container" class="xut-master xut-flip"></ul>
+            ${navBarHTML}
+            <div id="toolTip"></div>
+        </div>`
 
-
-    return _.template(html, {
-        width: config.viewSize.width,
-        height: config.viewSize.height,
-        top: calculate.top,
-        left: calculate.left,
-        index: Xut.sceneController.createIndex(),
-        overflow: config.scrollPaintingMode ? 'visible' : 'hidden',
-        navBar: navBar
-    })
+    return  String.styleFormat(homeHTML)
 }
 
 
@@ -185,7 +174,11 @@ const getNavOptions = () => {
 }
 
 
-//获得css配置数据
+/**
+ * 获得css配置数据
+ * @param  {[type]} seasonlist [description]
+ * @return {[type]}            [description]
+ */
 const getWrapper = (seasonlist) => {
 
     let width, height, blank, scroller, contentstyle, containerstyle, overwidth, overHeigth
@@ -228,45 +221,47 @@ const getWrapper = (seasonlist) => {
     }
 }
 
+
 /**
- * [nav 导航菜单]
+ * 导航菜单
  * @param  {[type]} seasonSqlRet [description]
  * @return {[type]}              [description]
  */
-export function nav(seasonSqlRet) {
+export function navMenu(results) {
 
-    let seasonId, chapterId, data, xxtlink
-    let seasonlist = seasonSqlRet.length
-    let options = getWrapper(seasonlist)
+    let seasonlist = results.length
+    let options    = getWrapper(seasonlist)
 
     let list = ''
-    let i = 0
+    let seasonId
+    let chapterId
+    let data
+    let xxtlink
 
-    for (i; i < seasonlist; i++) {
-        data = seasonSqlRet[i];
-        seasonId = data.seasonId;
-        chapterId = data._id;
-        xxtlink = seasonId + '-' + chapterId;
-        list += '<li style="' + options.contentstyle + '">';
-        list += '  <div class="xut-navBar-box" data-xxtlink = "' + xxtlink + '">' + (i + 1) + '</div>';
-        list += '</li>';
+    for (let i = 0; i < seasonlist; i++) {
+        data      = results[i]
+        seasonId  = data.seasonId
+        chapterId = data._id
+        xxtlink   = seasonId + '-' + chapterId
+        list +=
+           `<li style="${options.contentstyle}">;
+                <div class="xut-navBar-box" data-xxtlink="${xxtlink}">
+                    ${i + 1}
+                </div>
+           </li>`
     }
 
     //导航
-    let html =
-        '<div id="SectionWrapper" style="{{style}}">' +
-        '  <div id="Sectionscroller" style="width:{{width}}px;height:{{height}}px;{{scroller}}">' +
-        '    <ul id="SectionThelist">' +
-        '       {{list}}' +
-        '    </ul>' +
-        '  </div>' +
-        '</div>'
+    let navHTML =
+        `<div id="xut-nav-wrapper" style="${options.containerstyle}">
+            <div style="width:${options.overwidth}px;
+                                           height:${options.overHeigth}px;
+                                           ${options.scroller}">
+                <ul id="xut-nav-section-list">
+                    ${list}
+                </ul>
+            </div>
+        </div>`
 
-    return _.template(html, {
-        style: options.containerstyle,
-        width: options.overwidth,
-        height: options.overHeigth,
-        scroller: options.scroller,
-        list: list
-    })
+    return String.styleFormat(navHTML)
 }

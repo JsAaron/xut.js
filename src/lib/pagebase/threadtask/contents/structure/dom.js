@@ -23,7 +23,7 @@ let maskContent = (data, wrapObj) => {
             restr += String.format(
                 '<img' +
                 ' id="img_{1}"' +
-                ' class="xut-contentScrollerImg"' +
+                ' class="xut-content-scroller-img"' +
                 ' src="{0}"' +
                 ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%;{4}"/>',
                 wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg
@@ -32,7 +32,7 @@ let maskContent = (data, wrapObj) => {
             //canvas
             restr += String.format(
                 ' <canvas src="{0}"' +
-                ' class="xut-contentScrollerImg edges"' +
+                ' class="xut-content-scroller-img edges"' +
                 ' mask="{5}"' +
                 ' id = "img_{1}"' +
                 ' width="{2}"' +
@@ -71,7 +71,7 @@ let maskContent = (data, wrapObj) => {
         restr += String.format(
             '<img' +
             ' src="{0}"' +
-            ' class="xut-contentScrollerImg"' +
+            ' class="xut-content-scroller-img"' +
             ' id="img_{1}"' +
             ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%; {4}"/>',
             wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg

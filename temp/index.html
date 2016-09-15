@@ -53,10 +53,10 @@
 
 <body>
     <!-- 旧版方式 -->
-    <div id="xut-busyIcon" class="xut-busy-wrap xut-fullScreen"></div>
+    <div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>
     <div class="xut-removelayer"></div>
-    <div class="xut-startupPage xut-fullScreen"></div>
-    <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>
+    <div class="xut-start-page xut-fullscreen"></div>
+    <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>
 
 
     <div id="xut-stream-flow" style="display:none;z-index:-1">
@@ -175,14 +175,14 @@ class="st_3acd961a467ae943">2011</span>年<span class="st_3acd961a467ae943">8</s
 
     window.onload = function() {
         // Xut.Application.supportLaunch = true
-        // Xut.Application.Launch({
-        //     el: '#xxtppt-app-container',
-        //     paths: {
-        //         resource: 'content/app' + appid,
-        //         database: 'content/app' + appid + '/SQLResult.js'
-        //     },
-        //     cursor: false
-        // });
+        Xut.Application.Launch({
+            el: '#xxtppt-app-container',
+            paths: {
+                resource: 'content/app' + appid,
+                database: 'content/app' + appid + '/SQLResult.js'
+            },
+            cursor: false
+        })
     }
 
     $("#testSwitch").click(function() {

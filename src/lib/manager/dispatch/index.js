@@ -12,7 +12,7 @@ import PageMgr from '../page'
 import MasterMgr from '../master'
 import SwitchPage from './switch'
 import { sceneController } from '../../scenario/controller'
-import { close as _close } from '../../toolbar/navbar/index'
+import { closeNavbar } from '../../toolbar/navbar/index'
 
 import {
     offsetPage,
@@ -348,7 +348,7 @@ export class Dispatch {
                 vm.$emit('change:pageUpdate', currIndex)
                 resetToolbar.call(this)
                 setTimeout(function() {
-                    $(".xut-startupPage").hide().remove();
+                    $(".xut-start-page").hide().remove();
                     $(".xut-removelayer").hide().remove();
                 }, 0)
                 break;
@@ -467,7 +467,7 @@ export class Dispatch {
         })
 
         //目录栏
-        _close();
+        closeNavbar();
         //复位工具栏
         this.vm.$emit('change:resetToolbar')
     }
@@ -653,7 +653,7 @@ export class Dispatch {
         //加载主场景页面
         function firstLoading() {
 
-            $("#sceneHome").css({
+            $("#xut-main-scene").css({
                 'visibility': 'visible'
             });
 

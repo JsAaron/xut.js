@@ -6,8 +6,8 @@ import Bar from './base/bar'
 import { hash } from '../util/lang'
 
 import {
-    close as closeNavbar,
-    oepn as oepnNavbar
+    closeNavbar,
+    createNavbar
 } from './navbar/index'
 
 
@@ -34,9 +34,9 @@ export default class sysBar extends Bar {
         this.currentPage = currentPage
 
         //配置属性
-        this.initConfig();
+        this.initConfig()
 
-        this._initTool();
+        this._initTool()
     }
 
 
@@ -46,8 +46,8 @@ export default class sysBar extends Bar {
      */
     _initTool() {
 
-        var bar = this.controlBar,
-            setting = this.settings;
+        let bar = this.controlBar
+        let setting = this.settings
 
         //工具栏的显示状态
         this.barStatus = (bar.css('display') === 'none') ? false : true;
@@ -113,7 +113,7 @@ export default class sysBar extends Bar {
      * @return {[type]}     [description]
      */
     createHomeIcon(bar) {
-        var str = '<div id="backHome" style="float:left;text-indent:0.25em;height:{0}px;line-height:{1}px;color:#007aff">主页</div>',
+        var str = '<div id="xut-control-backhome" style="float:left;text-indent:0.25em;height:{0}px;line-height:{1}px;color:#007aff">主页</div>',
             height = this.iconHeight,
             html = $(String.format(str, height, height));
         bar.append(html);
@@ -125,7 +125,7 @@ export default class sysBar extends Bar {
      * @return {[type]}     [description]
      */
     createDirIcon(bar) {
-        var str = '<div id="backDir" class="xut-controlBar-backDir" style="float:left;margin-left:4px;width:{0}px;height:{1}px;background-size:cover"></div>',
+        var str = '<div class="xut-control-backdir" style="float:left;margin-left:4px;width:{0}px;height:{1}px;background-size:cover"></div>',
             height = this.iconHeight,
             html = $(String.format(str, height, height));
         bar.append(html);
@@ -141,7 +141,7 @@ export default class sysBar extends Bar {
             marginTop = height * 0.25,
             iconH = height * 0.5,
             str, html;
-        str = '<div class="xut-controlBar-pageNum" style="float:right;margin:{0}px 4px;padding:0 0.25em;height:{1}px;line-height:{2}px;border-radius:0.5em"><span>{3}</span>/<span>{4}</span></div>';
+        str = '<div class="xut-control-pageindex" style="float:right;margin:{0}px 4px;padding:0 0.25em;height:{1}px;line-height:{2}px;border-radius:0.5em"><span>{3}</span>/<span>{4}</span></div>';
         html = $(String.format(str, marginTop, iconH, iconH, this.currentPage, this.pageTotal));
         this.curTips = html.children().first();
         bar.append(html);
@@ -156,7 +156,7 @@ export default class sysBar extends Bar {
         var html, style,
             height = this.iconHeight;
         style = 'float:right;width:' + height + 'px;height:' + height + 'px;background-size:cover';
-        html = '<div id="hideToolbar" class="xut-controlBar-hide" style="' + style + '"></div>';
+        html = '<div id="xut-nav-hidebar" class="xut-control-nav-hide" style="' + style + '"></div>';
         bar.append(html);
     }
 
@@ -184,7 +184,7 @@ export default class sysBar extends Bar {
             appName = this.appName,
             height = this.iconHeight;
         style = 'width:100%;position:absolute;line-height:' + height + 'px;pointer-events:none';
-        html = '<div class="xut-controlBar-title" style="z-index:-99;' + style + '">' + appName + '</div>';
+        html = '<div class="xut-control-title" style="z-index:-99;' + style + '">' + appName + '</div>';
         bar.append(html);
     }
 
@@ -226,13 +226,13 @@ export default class sysBar extends Bar {
         bar.on("touchend mouseup", function(e) {
             var type = Xut.plat.evtTarget(e).id;
             switch (type) {
-                case "backHome":
+                case "xut-control-backhome":
                     that.homeControl();
                     break;
-                case "backDir":
+                case "xut-control-backdir":
                     that.navigationBar();
                     break;
-                case 'hideToolbar':
+                case 'xut-nav-hidebar':
                     that.hideTopBar();
                     break;
             }
@@ -272,7 +272,7 @@ export default class sysBar extends Bar {
      * @return {[type]} [description]
      */
     navigationBar() {
-        oepnNavbar(Xut.Presentation.GetPageIndex());
+        createNavbar(Xut.Presentation.GetPageIndex());
     }
 
 
