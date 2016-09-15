@@ -1,9 +1,11 @@
 import { config } from '../config/index'
+
+import MainBar from '../toolbar/sysbar'
+import DeputyBar from '../toolbar/fnbar'
+import BookBar from '../toolbar/bookbar/index'
+
 import { home, scene } from './layout'
 import { sceneController } from './controller'
-import { sToolbar as MainBar } from '../toolbar/sysbar'
-import { fToolbar as DeputyBar } from '../toolbar/fnbar'
-import { Bar as BookToolBar } from '../toolbar/bookbar'
 import { Mediator } from '../manager/index'
 
 import {
@@ -18,7 +20,7 @@ import nextTick from '../nexttick'
  * 找到对应容器
  * @return {[type]}            [description]
  */
-let findContainer = (elements, scenarioId, isMain) => {
+const findContainer = (elements, scenarioId, isMain) => {
     return function(pane, parallax) {
         var node;
         if (isMain) {
@@ -36,7 +38,7 @@ let findContainer = (elements, scenarioId, isMain) => {
  * 加载新的场景
  * @return {[type]} [description]
  */
-let checkHistory = (history) => {
+const checkHistory = (history) => {
 
     //直接启用快捷调试模式
     if (config.deBugHistory) {
@@ -122,12 +124,11 @@ export class SceneFactory {
         }
 
         this.elements = $(str)
+
         nextTick({
-            'container' : this.container,
-            'content'   : this.elements
-        }, function() {
-            callback();
-        });
+            'container': this.container,
+            'content': this.elements
+        }, callback)
     }
 
     /**
@@ -151,9 +152,9 @@ export class SceneFactory {
      */
     _initToolBar() {
         const scenarioId = this.scenarioId
-        const pageTotal  = this.pageTotal
-        const pageIndex  = this.pageIndex
-        const elements   = this.elements
+        const pageTotal = this.pageTotal
+        const pageIndex = this.pageIndex
+        const elements = this.elements
         const findControlBar = function() {
             return elements.find('#controlBar')
         }
@@ -164,35 +165,36 @@ export class SceneFactory {
         //主场景工具栏设置
         if (this.isMain) {
             conf = pMainBar(scenarioId, pageTotal)
+
             if (config.scrollPaintingMode) {
                 //word模式,自动启动工具条
-                this.sToolbar = new BookToolBar({
-                    container  : elements,
-                    controlBar : findControlBar(),
-                    pageMode   : conf.pageMode
+                this.sToolbar = new BookBar({
+                    container: elements,
+                    controlBar: findControlBar(),
+                    pageMode: conf.pageMode
                 })
             } else if (_.some(conf.tbType)) {
                 //普通模式
                 this.sToolbar = new MainBar({
-                    container   : elements,
-                    controlBar  : findControlBar(),
-                    pageTotal   : pageTotal,
-                    currentPage : pageIndex + 1,
-                    pageMode    : conf.pageMode
-                }) 
+                    container: elements,
+                    controlBar: findControlBar(),
+                    pageTotal: pageTotal,
+                    currentPage: pageIndex + 1,
+                    pageMode: conf.pageMode
+                })
             }
         } else {
             //副场景
             conf = pDeputyBar(this.barInfo, pageTotal)
-            //创建工具栏
+                //创建工具栏
             if (conf) {
                 this.cToolbar = new DeputyBar({
-                    id          : scenarioId,
-                    container   : elements,
-                    tbType      : conf.tbType,
-                    pageTotal   : pageTotal,
-                    currentPage : pageIndex,
-                    pageMode    : conf.pageMode
+                    id: scenarioId,
+                    container: elements,
+                    tbType: conf.tbType,
+                    pageTotal: pageTotal,
+                    currentPage: pageIndex,
+                    pageMode: conf.pageMode
                 })
             }
         }

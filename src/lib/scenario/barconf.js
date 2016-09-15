@@ -5,7 +5,7 @@ import { parseJSON } from '../util/index'
  * 分解工具栏配置文件
  * @return {[type]}          [description]
  */
-let parseTooBar = (toolbar, tbType, pageMode) => {
+const parseTooBar = (toolbar, tbType, pageMode) => {
     if (toolbar = parseJSON(toolbar)) {
         //兼容数据库中未指定的情况
         var n = Number(toolbar.pageMode);

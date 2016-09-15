@@ -2,8 +2,7 @@
  * 设备平台判断
  * @return {[type]} [description]
  */
-;
-(function() {
+;(function() {
 
     //在读酷pc端 navigator的值被改写过了!!
     //navigator.appVersion: "xxt 1.0.5260.29725"

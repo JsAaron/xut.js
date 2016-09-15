@@ -11,12 +11,12 @@ import { Dispatch } from './dispatch/index'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'
 import overrideApi from '../dynamic-api'
-// 定义访问器
+
+//定义访问器
 import {
     defProtected as def,
     defAccess
 } from '../util/index'
-
 
 /**
  * 部分配置文件
