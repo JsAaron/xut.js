@@ -31,10 +31,10 @@ const initMain = (novelData) => {
      */
     if (Xut.IBooks.Enabled) {
         //删除背景图
-        $(".xut-removelayer").remove();
+        $(".xut-removelayer").remove()
         loadScene({
             "pageIndex": Xut.IBooks.CONFIG.pageIndex
-        });
+        })
         return
     }
 

@@ -1,18 +1,17 @@
+import iconsConfig from './iconconf.js'
 import { svgIcon } from './svgicon'
-import { iconConfig } from './iconconfig'
 import { config } from '../../config/index'
 
 const isIOS = Xut.plat.isIOS
-
 
 /**
  * 获取翻页按钮位置
  * @return {[type]} [description]
  */
 const arrowStyle = function() {
-    var height = config.iconHeight
-    var settings = config.settings
-    var styleText = 'height:' + height + 'px;width:' + height + 'px';
+    let height = config.iconHeight
+    let settings = config.settings
+    let styleText = 'height:' + height + 'px;width:' + height + 'px';
     switch (settings.NavbarPos) {
         case 0:
             styleText += ';top:0';
@@ -26,7 +25,6 @@ const arrowStyle = function() {
         default:
             break;
     }
-
     return styleText;
 }
 
@@ -347,7 +345,7 @@ export default class Bar {
             },
             onToggle: callback
         };
-        return new svgIcon(el, iconConfig, options);
+        return new svgIcon(el, iconsConfig, options);
     }
 
 

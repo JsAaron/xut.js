@@ -111,6 +111,7 @@ export default function nextTick({
         callback.call(context);
     }
 
+
     if (MutationObserver) {
         observer = new MutationObserver(mutations => {
             mutations.forEach(record => {

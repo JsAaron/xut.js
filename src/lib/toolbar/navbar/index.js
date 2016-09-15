@@ -6,9 +6,7 @@
  * @return {[type]}           [description]
  *
  */
-
-
-import {createdom} from './dom'
+import { createdom } from './dom'
 
 let config
 let _layoutMode
@@ -31,13 +29,12 @@ function SectionList(pageArray) {
 };
 
 
-SectionList
-.prototype = {
+SectionList.prototype = {
 
     /**
      * 卷滚条
      */
-    userIscroll: function () {
+    userIscroll: function() {
         var self = this,
             hBox = self.hBox,
             H = !!(_layoutMode === 'horizontal')
@@ -60,7 +57,7 @@ SectionList
             });
 
             //滑动结束,动态处理缩略图
-            hBox.on('scrollEnd', function (e) {
+            hBox.on('scrollEnd', function(e) {
                 self.createThumb();
                 self.removeThumb();
             });
@@ -76,7 +73,7 @@ SectionList
      * [ 创建缩略图]
      * @return {[type]} [description]
      */
-    createThumb: function () {
+    createThumb: function() {
         var index = this.getPageIndex(), //最左边的索引
             count = this.getViewLen(), //允许显示的页数
             createBak = this.createBak || [], //已创建的页码索引
@@ -123,12 +120,12 @@ SectionList
      * [ 清理隐藏的缩略图]
      * @return {[type]} [description]
      */
-    removeThumb: function () {
+    removeThumb: function() {
         var list = this.list,
             createNew = this.createNew,
             createBak = this.createBak;
 
-        _.each(createBak, function (val, i) {
+        _.each(createBak, function(val, i) {
             if (!_.contains(createNew, val)) {
                 //标记要清理的索引
                 createBak[i] = -1;
@@ -146,7 +143,7 @@ SectionList
      * [ 得到滑动列表中最左侧的索引]
      * @return {[type]} [description]
      */
-    getPageIndex: function () {
+    getPageIndex: function() {
         if (this.hBox.options.scrollX) {
             return this.hBox.currentPage.pageX;
         } else {
@@ -159,7 +156,7 @@ SectionList
      * [ 获取待创建的缩略图的个数]
      * @return {[type]} [description]
      */
-    getViewLen: function () {
+    getViewLen: function() {
         var hBox = this.hBox,
             eleSize = 1, //单个li的高度,
             count = 1,
@@ -180,7 +177,7 @@ SectionList
     /**
      * 点击元素跳转
      */
-    tojump: function (env) {
+    tojump: function(env) {
         var target
         var xxtlink
         if (target = env.target) {
@@ -196,21 +193,21 @@ SectionList
     /**
      * 滚动指定位置
      */
-    scrollTo: function () {
+    scrollTo: function() {
         this.userIscroll();
     },
 
     /**
      * 刷新
      */
-    refresh: function () {
+    refresh: function() {
         this.hBox && this.hBox.refresh();
     },
 
     /**
      * 销毁
      */
-    destroy: function () {
+    destroy: function() {
         if (this.hBox) {
             this.$sectionlist.off();
             this.hBox.destroy();
@@ -243,14 +240,14 @@ function startpocess() {
     //控制按钮
     var navhandle = $("#backDir")
     var navControlBar = $("#navBar")
-    //判断点击的动作
+        //判断点击的动作
     var action = navhandle.attr('fly') || 'in'
 
     /**
      * 初始化目录栏的样式
      * 能够显示出来
      */
-    var initStyle = function (callback) {
+    var initStyle = function(callback) {
         sectionInstance.state = false;
         if (action == 'in') {
             sectionInstance.state = true;
@@ -264,7 +261,7 @@ function startpocess() {
     }
 
     //初始化样式
-    initStyle(function () {
+    initStyle(function() {
         //触发控制条
         navControl(action, navhandle);
         //执行动画
@@ -272,7 +269,7 @@ function startpocess() {
     })
 };
 
- 
+
 /**
  * 控制按钮改变
  */
@@ -286,7 +283,7 @@ function navControl(action, navhandle) {
  */
 function toAnimation(navControlBar, navhandle, action) {
 
-    var complete = function () {
+    var complete = function() {
         //恢复css
         navControlBar.css(Xut.style.transition, '');
         Xut.View.HideBusy();
@@ -302,7 +299,7 @@ function toAnimation(navControlBar, navhandle, action) {
         navControlBar.animate({
             'z-index': Xut.zIndexlevel(),
             'opacity': 1
-        }, 'fast', 'linear', function () {
+        }, 'fast', 'linear', function() {
             navhandle.attr('fly', 'out');
             complete();
         });
@@ -323,16 +320,16 @@ function toAnimation(navControlBar, navhandle, action) {
  */
 function load() {
     $navbal = $("#navBar")
-    //创建dom
-    //返回页面数据
-    createdom($navbal, function (pageArray) {
+        //创建dom
+        //返回页面数据
+    createdom($navbal, function(pageArray) {
         //目录对象
         sectionInstance = new SectionList(pageArray)
-        //初始化滑动
+            //初始化滑动
         sectionInstance.userIscroll();
         //初始缩略图
         sectionInstance.createThumb()
-        //初始化样式
+            //初始化样式
         initialize()
     })
 
@@ -387,8 +384,8 @@ function destroy() {
 
 
 export {
-load,
-oepn,
-close,
-destroy
+    load,
+    oepn,
+    close,
+    destroy
 }

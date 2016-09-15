@@ -20,7 +20,6 @@ if (Xut.plat.isBrowser) {
     if (Xut.plat.noAutoPlayMedia) {
         fixAudio()
     }
-
     //Desktop binding mouse control
     $(document).keyup((event) => {
         switch (event.keyCode) {
@@ -40,6 +39,14 @@ Xut.Application.Launch = function({
     paths,
     cursor
 } = {}) {
+
+    let $el = $(el)
+    if(!$el.length){
+        console.log('Must pass a root node')
+        return
+    }
+    
+    Xut.Application.supportLaunch = true
 
     /**
      * add dynamic config
@@ -64,7 +71,6 @@ Xut.Application.Launch = function({
     <div class="xut-startupPage xut-fullScreen"></div>
     <div id="xut-scene-container" class="xut-chapter xut-fullScreen xut-overflow"></div>`)
 
-    let $el = $(el)
     $el.css('z-index', 99999)
 
     window.DYNAMICCONFIGT.removeNode = function() {
@@ -108,7 +114,7 @@ const createMain = function() {
 setTimeout(() => {
     //External interface call
     if (!Xut.Application.supportLaunch) {
-        Xut.Application.Launch = function() {}
+        Xut.Application.Launch = null
         $("#xxtppt-app-container").remove()
         init()
     }
