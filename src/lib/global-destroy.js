@@ -1,8 +1,8 @@
 import { sceneController } from './scenario/controller'
-import databaseDestroy from './database/destroy'
 import { close } from './toolbar/navbar/index'
 import { clearAudio } from './component/audio/manager'
 import { clearVideo } from './component/video/manager'
+import databaseDestroy from './database/destroy'
 
 /**
  * 销毁接口
@@ -22,7 +22,7 @@ export default function Destroy() {
     sceneController.destroyAllScene()
 
     //删除数据库
-    databaseDestroy
+    databaseDestroy()
 
     //导航
     close()
