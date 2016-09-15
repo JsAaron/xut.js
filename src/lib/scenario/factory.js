@@ -1,65 +1,17 @@
-import nextTick from '../nexttick'
+import { config } from '../config/index'
 import { home, scene } from './layout'
-import { parseJSON } from '../util/index'
 import { sceneController } from './controller'
 import { sToolbar as MainBar } from '../toolbar/sysbar'
 import { fToolbar as DeputyBar } from '../toolbar/fnbar'
 import { Bar as BookToolBar } from '../toolbar/bookbar'
 import { Mediator } from '../manager/index'
 
-let config
+import {
+    pMainBar,
+    pDeputyBar
+} from './barconf'
 
-//========================场景容器,工具栏创建相关================================
-
-/**
- * 分解工具栏配置文件
- * @return {[type]}          [description]
- */
-let parseTooBar = (toolbar, tbType, pageMode) => {
-    if (toolbar = parseJSON(toolbar)) {
-        //兼容数据库中未指定的情况
-        var n = Number(toolbar.pageMode);
-        pageMode = _.isFinite(n) ? n : pageMode;
-        if (_.isString(toolbar.tbType)) {
-            tbType = _.map(toolbar.tbType.split(','), (num) => {
-                return Number(num);
-            });
-        }
-
-    }
-    return {
-        'tbType': tbType,
-        'pageMode': pageMode
-    }
-}
-
-
-/**
- * 主场景工具栏配置
- * pageMode:默认2 允许滑动,带翻页按钮
- * @param  {[type]} scenarioId [description]
- * @return {[type]}            [description]
- */
-let pMainBar = (scenarioId) => {
-    var sectionRang = Xut.data.query('sectionRelated', scenarioId),
-        toolbar = sectionRang.toolbar, //场景工具栏配置信息
-        pagetotal = sectionRang.length,
-        tbType = [1], //默认显示系统工具栏
-        pageMode = pagetotal > 1 ? 2 : 0; //默认2 允许滑动,带翻页按钮
-    return parseTooBar(toolbar, tbType, pageMode)
-}
-
-
-/**
- * 副场景工具栏配置
- * pageMode 是否支持滑动翻页  0禁止滑动 1允许滑动
- * tbType   工具栏显示的类型 [0-5]
- */
-let pDeputyBar = (toolbar, pagetotal) => {
-    var tbType = [0],
-        pageMode = pagetotal > 1 ? 1 : 0;
-    return parseTooBar(toolbar, tbType, pageMode)
-}
+import nextTick from '../nexttick'
 
 
 /**
@@ -123,26 +75,24 @@ export class SceneFactory {
 
     constructor(data) {
 
-        config = Xut.config
-
         //基本配置信息
-        var seasonId = data.seasonId;
-        var chapterId = data.chapterId;
+        const seasonId = data.seasonId;
+        const chapterId = data.chapterId;
 
-        var options = _.extend(this, data, {
+        const options = _.extend(this, data, {
             'scenarioId': seasonId,
             'chapterId': chapterId,
             'container': $('#xut-scene-container')
         })
 
-        //创建主场景容器
-        this.createScenario(options, () => {
+        //创建主场景
+        this._createHTML(options, () => {
             //配置工具栏行为
             if (!Xut.IBooks.Enabled) {
-                _.extend(this, this.initToolBar());
+                _.extend(this, this._initToolBar())
             }
-            //构件vm对象
-            this.createViewModel();
+            //构建Mediator对象
+            this._createMediator();
             //注入场景管理
             sceneController.add(seasonId, chapterId, this);
         })
@@ -152,32 +102,31 @@ export class SceneFactory {
      * 创建场景
      * @return {[type]} [description]
      */
-    createScenario(options, callback) {
+    _createHTML(options, callback) {
 
         //如果是静态文件执行期
         //支持Xut.IBooks模式
         //都不需要创建节点
         if (Xut.IBooks.runMode()) {
-            this.elements = $('#sceneHome');
-            callback.call(this);
+            this.elements = $('#sceneHome')
+            callback()
             return;
         }
 
-        var elements, str, self = this;
+        let str
 
         if (options.isMain) {
-            str = home();
+            str = home()
         } else {
-            str = scene(this.scenarioId);
+            str = scene(this.scenarioId)
         }
 
-        //创建场景容器
-        elements = this.elements = $(str);
+        this.elements = $(str)
         nextTick({
-            'container': self.container,
-            'content': elements
+            'container' : this.container,
+            'content'   : this.elements
         }, function() {
-            callback.call(self);
+            callback();
         });
     }
 
@@ -200,65 +149,62 @@ export class SceneFactory {
      *
      * @return {[type]} [description]
      */
-    initToolBar() {
-        var scenarioId = this.scenarioId;
-        var pageTotal = this.pageTotal;
-        var pageIndex = this.pageIndex;
-        var elements = this.elements;
-        var bar;
-        var findControlBar = () => {
+    _initToolBar() {
+        const scenarioId = this.scenarioId
+        const pageTotal  = this.pageTotal
+        const pageIndex  = this.pageIndex
+        const elements   = this.elements
+        const findControlBar = function() {
             return elements.find('#controlBar')
         }
 
-        /**
-         * 主场景工具栏设置
-         */
+        //工具栏配置信息
+        let conf
+
+        //主场景工具栏设置
         if (this.isMain) {
-            bar = pMainBar(scenarioId, pageTotal);
+            conf = pMainBar(scenarioId, pageTotal)
             if (config.scrollPaintingMode) {
                 //word模式,自动启动工具条
                 this.sToolbar = new BookToolBar({
-                    container: elements,
-                    controlBar: findControlBar(),
-                    pageMode: bar.pageMode
-                });
-            } else if (_.some(bar.tbType)) {
+                    container  : elements,
+                    controlBar : findControlBar(),
+                    pageMode   : conf.pageMode
+                })
+            } else if (_.some(conf.tbType)) {
                 //普通模式
                 this.sToolbar = new MainBar({
-                    container: elements,
-                    controlBar: findControlBar(),
-                    pageTotal: pageTotal,
-                    currentPage: pageIndex + 1,
-                    pageMode: bar.pageMode
-                });
+                    container   : elements,
+                    controlBar  : findControlBar(),
+                    pageTotal   : pageTotal,
+                    currentPage : pageIndex + 1,
+                    pageMode    : conf.pageMode
+                }) 
             }
         } else {
-            /**
-             * 副场景
-             * @type {[type]}
-             */
-            bar = pDeputyBar(this.barInfo, pageTotal);
+            //副场景
+            conf = pDeputyBar(this.barInfo, pageTotal)
             //创建工具栏
-            if (bar) {
+            if (conf) {
                 this.cToolbar = new DeputyBar({
-                    id: scenarioId,
-                    container: elements,
-                    tbType: bar.tbType,
-                    pageTotal: pageTotal,
-                    currentPage: pageIndex,
-                    pageMode: bar.pageMode
-                });
+                    id          : scenarioId,
+                    container   : elements,
+                    tbType      : conf.tbType,
+                    pageTotal   : pageTotal,
+                    currentPage : pageIndex,
+                    pageMode    : conf.pageMode
+                })
             }
         }
 
-        return bar;
+        return conf
     }
 
     /**
      * 构建创建对象
      * @return {[type]} [description]
      */
-    createViewModel() {
+    _createMediator() {
 
         var self = this;
         var scenarioId = this.scenarioId;
@@ -397,7 +343,7 @@ export class SceneFactory {
         /**
          * 绑定桌面调试
          */
-        config.debugMode && Xut.plat.isBrowser && this.bindWatch();
+        config.debugMode && Xut.plat.isBrowser && this._bindWatch();
     }
 
     /**
@@ -405,7 +351,7 @@ export class SceneFactory {
      * 绑定调试
      * @return {[type]} [description]
      */
-    bindWatch() {
+    _bindWatch() {
         // for test
         if (Xut.plat.isBrowser) {
             var vm = this.vm;

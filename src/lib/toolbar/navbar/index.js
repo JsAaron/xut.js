@@ -31,7 +31,8 @@ function SectionList(pageArray) {
 };
 
 
-SectionList.prototype = {
+SectionList
+.prototype = {
 
     /**
      * 卷滚条
@@ -381,7 +382,7 @@ function destroy() {
         sectionInstance.destroy();
         sectionInstance = null;
     }
-};
+}
 
 
 

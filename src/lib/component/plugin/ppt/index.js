@@ -1,10 +1,14 @@
-import { execJson, parseJSON, enterReplace } from '../../../util/dom'
 import { config } from '../../../config/index'
 import { isMacOS, isDesktop } from './support'
 import { internal } from './internal'
 import { updateAction } from '../../widget/page/advsprite'
 import { createContentAudio } from '../../audio/manager'
 
+import {
+    execJson,
+    parseJSON,
+    enterReplace
+} from '../../../util/dom'
 
 /**
  * 参数说明
