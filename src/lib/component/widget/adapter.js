@@ -6,21 +6,18 @@
  *              构件5种类型
  *
  * *******************************************************************/
-import { IframeWidget } from './iframe'
 import { PageWidget } from './page/index'
 import { parseJSON } from '../../util/dom'
 import { config } from '../../config/index'
+import iframeWidget from './iframe'
 
-let proportion
-let screenSize
-let appId
 
-let loadWidget = (type, data, widgetClass) => {
+const load = (type, data, constructor) => {
     Xut.Application.injectionComponent({
-        'pageType': data.pageType, //标记类型区分
-        'pageIndex': data.pageIndex,
-        'widget': new widgetClass(data)
-    });
+        'pageType'  : data.pageType, //标记类型区分
+        'pageIndex' : data.pageIndex,
+        'widget'    : new constructor(data)
+    })
 }
 
 /**
@@ -32,7 +29,7 @@ let loadWidget = (type, data, widgetClass) => {
  *  5、webGL零件
  * @type {Object}
  */
-let adapterType = {
+const adapterType = {
 
     /**
      * iframe零件类型
@@ -40,10 +37,11 @@ let adapterType = {
      * @return {[type]}      [description]
      */
     'iframe' (data) {
-        loadWidget('widget', data, IframeWidget);
+        load('widget', data, iframeWidget);
     },
+
     'widget' (data) {
-        loadWidget('widget', data, IframeWidget);
+        load('widget', data, iframeWidget);
     },
 
     /**
@@ -52,19 +50,19 @@ let adapterType = {
      * @return {[type]}      [description]
      */
     'js' (data) {
-        loadWidget('js', data, PageWidget);
+        load('js', data, PageWidget);
     },
     'page' (data) {
-        loadWidget('page', data, PageWidget);
+        load('page', data, PageWidget);
     },
     'svg' (data) {
-        loadWidget('svg', data, PageWidget);
+        load('svg', data, PageWidget);
     },
     'canvas' (data) {
-        loadWidget('canvas', data, PageWidget);
+        load('canvas', data, PageWidget);
     },
     'webgL' (data) {
-        loadWidget('webgL', data, PageWidget);
+        load('webgL', data, PageWidget);
     }
 }
 
@@ -73,7 +71,7 @@ let adapterType = {
  * 过滤出数据
  * @return {[type]} [description]
  */
-let filterData = (data) => {
+const filterData = (data) => {
     //直接通过id查询数据
     if (data.widgetId) {
         _.extend(data, Xut.data.query('Widget', data.widgetId))
@@ -89,9 +87,9 @@ let filterData = (data) => {
  * 获取widget数据
  * @return {[type]} [description]
  */
-let filtrateDas = (data) => {
+const filtrateDas = (data) => {
     data = filterData(data);
-    return proportion.calculateElement(data)
+    return config.proportion.calculateElement(data)
 }
 
 
@@ -100,7 +98,7 @@ let filtrateDas = (data) => {
  * ifarme内部，请求返回数据
  * @return {[type]} [description]
  */
-let parsePara = (data) => {
+const parsePara = (data) => {
     var inputPara, //输入数据
         outputPara; //输出数据
     if (inputPara = data.inputPara) {
@@ -113,34 +111,26 @@ let parsePara = (data) => {
 
 export function Adapter(para) {
 
-    let data
-
-    proportion = config.proportion;
-    screenSize = config.screenSize;
-    appId = config.appId;
-
     //获取数据
-    data = filtrateDas(para);
+    const data = filtrateDas(para)
 
-    para = null;
-
-    data.id = data.activityId;
+    data.id = data.activityId
 
     //解析数据
-    data.inputPara = parsePara(data);
-
+    data.inputPara = parsePara(data)
+ 
     if (!data.inputPara) {
-        data.inputPara = {};
+        data.inputPara = {}
     }
 
     //增加属性参数
     if (data.widgetType === 'page') {
-        data.inputPara.container = data.rootNode;
+        data.inputPara.container = data.rootNode
     }
 
-    data.inputPara.uuid = appId + '-' + data.activityId; //唯一ID标示
+    data.inputPara.uuid = config.appId + '-' + data.activityId; //唯一ID标示
     data.inputPara.id = data.activityId;
-    data.inputPara.screenSize = screenSize;
+    data.inputPara.screenSize = config.screenSize;
     //content的命名前缀
     data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType)
 

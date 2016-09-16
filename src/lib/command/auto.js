@@ -73,7 +73,7 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
     }
 
     _.each(autoData, (data, index) => {
-        dir = directives[data.type]
+        dir = directives[data.actType]
         if (dir && dir.autoPlay) {
             dir.autoPlay({
                 'id'        : data.id,
@@ -83,7 +83,7 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
                 'category'  : data.category,
                 'autoPlay'  : data.autoPlay,
                 'pageIndex' : pageIndex
-            });
+            })
         }
     });
 }

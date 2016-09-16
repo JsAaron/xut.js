@@ -4,7 +4,7 @@ import nextTick from '../../nexttick'
 /**
  * 创建iframe零件包装器
  */
-export class IframeWidget {
+export default class iframeWidget {
 
     constructor(data) {
         _.extend(this, data)

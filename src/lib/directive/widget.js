@@ -59,12 +59,10 @@ export default {
     autoPlay({
         id,
         rootNode,
-        type,
         pageType,
         pageIndex
     } = {}) {
         Adapter({
-            type,
             rootNode,
             pageType,
             pageIndex,

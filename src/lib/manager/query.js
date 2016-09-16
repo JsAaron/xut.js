@@ -10,10 +10,6 @@ const scenarioChapter = function(chapterId) {
 
 
 
-
-
-
-
 /**
  * 递归分解
  * chpater直接对应页面的ID编码，直接去下标即可
@@ -63,7 +59,7 @@ const makeAuto = function(activityData) {
 
     if (!activityData || !activityData.length) return
 
-    let key, id, sub;
+    let sub;
     //自动热点
     const collectAutoBuffers = []
 
@@ -72,15 +68,13 @@ const makeAuto = function(activityData) {
         //并且不是content类型
         if (target.autoPlay && target.actType !== 'Content') {
             //增加note提示信息数据
-            id = target._id
-            key = target.actType ? target.actType + "_" + id : 'showNote_' + id
+            // id = target._id
+            // key = target.actType ? target.actType + "_" + id : 'showNote_' + id
             sub = {
-                'id'        : id,
-                'type'      : target.actType,
-                'animation' : target.animation,
-                'key'       : key,
-                'category'  : target.category,
-                'autoPlay'  : target.autoPlay
+                'id'       : target._id,
+                'actType'  : target.actType,
+                'category' : target.category,
+                'autoPlay' : target.autoPlay
             }
             collectAutoBuffers.push(sub);
         }
