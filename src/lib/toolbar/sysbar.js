@@ -113,7 +113,7 @@ export default class sysBar extends Bar {
      * @return {[type]}     [description]
      */
     createHomeIcon(bar) {
-        var str = '<div id="xut-control-backhome" style="float:left;text-indent:0.25em;height:{0}px;line-height:{1}px;color:#007aff">主页</div>',
+        var str = '<div class="xut-control-backhome" style="float:left;text-indent:0.25em;height:{0}px;line-height:{1}px;color:#007aff">主页</div>',
             height = this.iconHeight,
             html = $(String.format(str, height, height));
         bar.append(html);
@@ -125,7 +125,7 @@ export default class sysBar extends Bar {
      * @return {[type]}     [description]
      */
     createDirIcon(bar) {
-        var str = '<div class="xut-control-backdir" style="float:left;margin-left:4px;width:{0}px;height:{1}px;background-size:cover"></div>',
+        var str = '<div class="xut-control-navbar" style="float:left;margin-left:4px;width:{0}px;height:{1}px;background-size:cover"></div>',
             height = this.iconHeight,
             html = $(String.format(str, height, height));
         bar.append(html);
@@ -224,12 +224,12 @@ export default class sysBar extends Bar {
     bindButtonsEvent(bar) {
         var that = this;
         bar.on("touchend mouseup", function(e) {
-            var type = Xut.plat.evtTarget(e).id;
-            switch (type) {
+            var className = Xut.plat.evtTarget(e).className;
+            switch (className) {
                 case "xut-control-backhome":
                     that.homeControl();
                     break;
-                case "xut-control-backdir":
+                case "xut-control-navbar":
                     that.navigationBar();
                     break;
                 case 'xut-nav-hidebar':

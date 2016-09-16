@@ -148,7 +148,6 @@ video {
 
 
 /*工具栏*/
-
 .xut-control-bar {
     position: absolute;
     z-index: 9999;
@@ -158,8 +157,8 @@ video {
     font-size: 1rem;
 }
 
-/*工具栏返回主页*/
-.xut-control-backdir {
+/*工具栏:导航*/
+.xut-control-navbar {
     background-image: url(../images/icons/directory.png);
 }
 
@@ -180,9 +179,34 @@ video {
 }
 
 
-/*收起工具栏,nav导航*/
+/*工具栏：nav导航按钮，收起工具栏*/
 .xut-control-nav-hide {
     background-image: url(../images/icons/hideToolbar.png);
+}
+
+
+/*工具栏：下拉导航菜单*/
+.xut-nav-bar {
+    background-size: 100% 100%;
+    position: absolute;
+    display: none;
+    left: 0;
+}
+
+.xut-nav-bar li {
+    display: table;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.xut-nav-bar li > div {
+    opacity: 0.5;
+    color: #007aff;
+    z-index: 9999;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
 }
 
 
@@ -268,33 +292,6 @@ video {
     background-color: red;
 }
 
-
-
-
-/*======================下拉菜单====================*/
-
-.xut-nav-bar {
-    background-size: 100% 100%;
-    position: absolute;
-    display: none;
-    left: 0;
-}
-
-.xut-nav-bar li {
-    display: table;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-}
-
-.xut-navbar-box {
-    opacity: 0.5;
-    color: #007aff;
-    z-index: 9999;
-    text-align: center;
-    display: table-cell;
-    vertical-align: middle;
-}
 
 
 /*======================左右翻页按钮=================*/

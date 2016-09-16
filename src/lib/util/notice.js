@@ -34,7 +34,7 @@ function show(opts) {
         };
 
     if (!toolTip) {
-        toolTip = $('#toolTip');
+        toolTip = $('#xut-tool-tip');
         toolTip.css(css);
         toolTip.css(Xut.style.borderRadius, '5px');
     } else {

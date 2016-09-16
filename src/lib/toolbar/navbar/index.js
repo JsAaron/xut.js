@@ -62,18 +62,18 @@ const toAnimation = (navControl, navhandle, action) => {
 const _controlNav = () => {
 
     //控制按钮
-    let navhandle = $(".xut-control-backdir")
-    let navControl = $(".xut-nav-bar")
+    let $button = $(".xut-control-navbar")
+    let $navBar = $(".xut-nav-bar")
 
     //判断点击的动作
-    let action = navhandle.attr('fly') || 'in'
+    let action = $button.attr('fly') || 'in'
 
     //初始化目录栏的样式
     //能够显示出来
     sectionInstance.state = false
     if (action == 'in') {
         sectionInstance.state = true
-        navControl.css({
+        $navBar.css({
             'z-index': 0,
             'opacity': 0,
             'display': 'block'
@@ -81,10 +81,10 @@ const _controlNav = () => {
     }
 
     //触发控制条
-    navhandle.css('opacity', action === "in" ? 0.5 : 1);
+    $button.css('opacity', action === "in" ? 0.5 : 1);
 
     //执行动画
-    toAnimation(navControl, navhandle, action);
+    toAnimation($navBar, $button, action);
 }
 
 

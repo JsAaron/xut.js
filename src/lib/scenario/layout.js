@@ -35,6 +35,8 @@ const getOptions = () => {
     }
 }
 
+
+
 /**
  * 首页布局
  * @return {[type]} [description]
@@ -50,9 +52,9 @@ export function home() {
 
     const navBarWidth     = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px'
     const navBarHeight    = isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96)
-    const navBarTop       = isHorizontal ? '' : (iconHeight + TOP + 2) + 'px'
-    const navBarLeft      = isHorizontal ? '' : iconHeight + 'px'
-    const navBarBottom    = isHorizontal ? '4px' : ''
+    const navBarTop       = isHorizontal ? '' : 'top:' + (iconHeight + TOP + 2) + 'px;'
+    const navBarLeft      = isHorizontal ? '' :'left:' + iconHeight + 'px;'
+    const navBarBottom    = isHorizontal ? 'bottom:4px;' : ''
     const navBaroOverflow = isHorizontal ? 'hidden' : 'visible'
 
     //导航
@@ -60,9 +62,9 @@ export function home() {
         `<div class="xut-nav-bar" 
               style="width:${navBarWidth};
                      height:${navBarHeight}px;
-                     top:${navBarTop};
-                     left:${navBarLeft};
-                     bottom:${navBarBottom};
+                     ${navBarTop}
+                     ${navBarLeft}
+                     ${navBarBottom}
                      background-color:white;
                      border-top:1px solid rgba(0,0,0,0.1);
                      overflow:${navBaroOverflow};">
@@ -88,11 +90,11 @@ export function home() {
                      z-index:${homeIndex};
                      overflow:${homeOverflow};">
 
-            <div id="xut-control-bar" class="xut-control-bar hide"></div>
+            <div id="xut-control-bar" class="xut-control-bar"></div>
             <ul id="xut-page-container" class="xut-flip"></ul>
             <ul id="xut-master-container" class="xut-master xut-flip"></ul>
             ${navBarHTML}
-            <div id="toolTip"></div>
+            <div id="xut-tool-tip"></div>
         </div>`
 
     return  String.styleFormat(homeHTML)
@@ -244,8 +246,8 @@ export function navMenu(results) {
         chapterId = data._id
         xxtlink   = seasonId + '-' + chapterId
         list +=
-           `<li style="${options.contentstyle}">;
-                <div class="xut-navBar-box" data-xxtlink="${xxtlink}">
+           `<li style="${options.contentstyle}">
+                <div data-xxtlink="${xxtlink}">
                     ${i + 1}
                 </div>
            </li>`

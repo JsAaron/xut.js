@@ -216,10 +216,12 @@ export class SceneFactory {
         var pageMode = this.pageMode;
         var isMain = this.isMain;
         var tempfind = findContainer(elements, scenarioId, isMain)
-            //页面容器
+
+        //页面容器
         var scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
         //视差容器
         var scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
+
 
         //场景容器对象
         var vm = this.vm = new Mediator({
