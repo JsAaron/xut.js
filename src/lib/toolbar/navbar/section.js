@@ -190,11 +190,13 @@ export default class Section {
      */
     destroy() {
         if (this.hBox) {
-            this._$section.off();
-            this.hBox.destroy();
-            this.hBox = null;
+            this._$section.off()
+            this._$section = null
+            this._$list = null
+            this.hBox.destroy()
+            this.hBox = null
         }
-        this._pagedata = null;
+        this._pagedata = null
     }
 
 }
