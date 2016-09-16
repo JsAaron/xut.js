@@ -20,11 +20,11 @@ export default class Section {
      * @return {[type]}           [description]
      */
     userIscroll(pageIndex) {
-        let H = !!(this._isHorizontal)
+        let isHorizontal = this._isHorizontal
 
         if (this.hBox) {
-            if (H) {
-                //hBox.goToPage(pageIndex, 0, 0)
+            if (isHorizontal) {
+                this.hBox.goToPage(pageIndex, 0, 0)
             } else {
                 this.hBox.goToPage(0, pageIndex, 0);
             }
@@ -32,8 +32,8 @@ export default class Section {
             this.hBox = new iScroll('#xut-nav-wrapper', {
                 snap: 'li',
                 tap: true,
-                scrollX: H,
-                scrollY: !H,
+                scrollX: isHorizontal,
+                scrollY: !isHorizontal,
                 scrollbars: true,
                 fadeScrollbars: true,
                 stopPropagation: true
@@ -42,7 +42,7 @@ export default class Section {
             //滑动结束,动态处理缩略图
             this.hBox.on('scrollEnd', e => {
                 this.createThumb();
-                this.removeThumb();
+                this._removeThumb();
             });
 
             this._$section.on('tap', this._toJump);
@@ -71,8 +71,8 @@ export default class Section {
      * @return {[type]} [description]
      */
     createThumb() {
-        let index = this.getPageIndex(), //最左边的索引
-            count = this.getViewLen(), //允许显示的页数
+        let index = this._getPageIndex(), //最左边的索引
+            count = this._getViewLen(), //允许显示的页数
             createBak = this.createBak || [], //已创建的页码索引
             createNew = [], //新建的页码索引
             pageData = this._pagedata,
@@ -117,7 +117,7 @@ export default class Section {
      * [ 清理隐藏的缩略图]
      * @return {[type]} [description]
      */
-    removeThumb() {
+    _removeThumb() {
         let list = this._$list
         let createNew = this.createNew
         let createBak = this.createBak
@@ -140,7 +140,7 @@ export default class Section {
      * [ 得到滑动列表中最左侧的索引]
      * @return {[type]} [description]
      */
-    getPageIndex() {
+    _getPageIndex() {
         if (this.hBox.options.scrollX) {
             return this.hBox.currentPage.pageX;
         } else {
@@ -153,7 +153,7 @@ export default class Section {
      * [ 获取待创建的缩略图的个数]
      * @return {[type]} [description]
      */
-    getViewLen() {
+    _getViewLen() {
         var hBox = this.hBox,
             eleSize = 1, //单个li的高度,
             count = 1,
