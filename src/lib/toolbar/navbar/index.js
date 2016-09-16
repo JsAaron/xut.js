@@ -4,11 +4,11 @@
  * @param  {[type]} pageArray [description]
  * @param  {[type]} modules   [description]
  * @return {[type]}           [description]
- *
  */
+import { config } from '../../config/index'
 import createHTML from './html'
 import Section from './section'
-import { config } from '../../config/index'
+
 
 /**
  * 动画加锁
@@ -21,16 +21,17 @@ let lockAnimation
  */
 let sectionInstance = null
 
-
+/**
+ * 初始化页码
+ */
+let pageIndex
 
 /**
  * 执行动画
  */
-const toAnimation = (navControl, navhandle, action) => {
+const _toAction = (navBar, button, action) => {
 
     var complete = function() {
-        //恢复css
-        navControl.css(Xut.style.transition, '');
         Xut.View.HideBusy();
         lockAnimation = false;
     }
@@ -40,28 +41,29 @@ const toAnimation = (navControl, navhandle, action) => {
         //导航需要重置
         //不同的页面定位不一定
         sectionInstance.refresh();
-        sectionInstance.scrollTo();
+        sectionInstance.scrollTo(pageIndex);
         //动画出现
-        navControl.animate({
+        navBar.css({
             'z-index': Xut.zIndexlevel(),
             'opacity': 1
-        }, 'fast', 'linear', function() {
-            navhandle.attr('fly', 'out');
-            complete();
-        });
+        })
+        button.attr('fly', 'out')
+        complete()
     } else {
         //隐藏
-        navhandle.attr('fly', 'in');
-        navControl.hide()
+        button.attr('fly', 'in')
+        navBar.hide()
         complete()
     }
 }
 
 
+/**
+ * 控制导航条
+ * @return {[type]} [description]
+ */
+const _navControl = () => {
 
-const _controlNav = () => {
-
-    //控制按钮
     let $button = $(".xut-control-navbar")
     let $navBar = $(".xut-nav-bar")
 
@@ -84,9 +86,8 @@ const _controlNav = () => {
     $button.css('opacity', action === "in" ? 0.5 : 1);
 
     //执行动画
-    toAnimation($navBar, $button, action);
+    _toAction($navBar, $button, action);
 }
-
 
 
 /**
@@ -98,14 +99,15 @@ const _initialize = () => {
     }
     lockAnimation = true;
     Xut.View.ShowBusy()
-    _controlNav()
+    _navControl()
 }
 
+
 /**
- * 预先缓存加载
+ * 创建Nav导航列表
  * @return {[type]} [description]
  */
-const _create = (pageIndex) => {
+const _createNav = () => {
     createHTML($(".xut-nav-bar"), data => {
         //目录对象
         sectionInstance = new Section(data);
@@ -118,15 +120,17 @@ const _create = (pageIndex) => {
     })
 }
 
+
 /**
  * 目录
  */
-export function createNavbar(pageIndex) {
+export function createNavbar(index) {
     lockAnimation = false
+    pageIndex = index
     if (sectionInstance) {
         _initialize()
     } else {
-        _create(pageIndex)
+        _createNav()
     }
 }
 

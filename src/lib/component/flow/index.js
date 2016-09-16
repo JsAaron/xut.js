@@ -4,9 +4,7 @@ import { getCounts } from './layout'
 import Swipe from '../../swipe/index'
 import render from './render'
 
-import {
-    calculateDistance
-} from '../../manager/dispatch/depend'
+import { calculateDistance } from '../../manager/dispatch/depend'
 
 /**
  * 2017.9.7
@@ -31,11 +29,11 @@ export default class Flow {
             dataNode,
             chapterId,
             callback($container) {
-                self._init($container, getCounts(seasonId, chapterId))
+                self._init($container, getCounts(seasonId,chapterId))
                 callback()
             }
         })
-    }
+    } 
 
 
     /**

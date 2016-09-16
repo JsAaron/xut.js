@@ -23,7 +23,7 @@ const createStr = (chapterId, data, vWidth, vHeight, margin) => {
     const percentageLeft = parseInt(margin[1])
     const percentageBottom = parseInt(margin[2])
     const percentageRight = parseInt(margin[3])
- 
+
     const marginTop = vHeight / 100 * percentageTop
     const marginLeft = vWidth / 100 * percentageLeft
     const marginBottom = vHeight / 100 * percentageBottom
@@ -69,8 +69,8 @@ const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, flowCounts) => {
             let margin = chapterNode.getAttribute('data-margin')
             if (margin) {
                 margin = margin.split(",")
-            }else{
-                margin = [0,0,0,0]
+            } else {
+                margin = [0, 0, 0, 0]
             }
 
             chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, vWidth, vHeight, margin)
@@ -87,15 +87,15 @@ const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, flowCounts) => {
  * @param  {[type]} chpaterId [description]
  * @return {[type]}           [description]
  */
-export function getCounts(seasonId, chpaterId) {
-    let seasonIds = flowCounts[seasonId]
-    if (seasonIds) {
-        if (seasonIds[chpaterId]) {
-            return seasonIds[chpaterId]
+export function getCounts(seasonId, chapterId) {
+    if (seasonId) {
+        if (chapterId) {
+            return flowCounts[seasonId] && flowCounts[seasonId][chapterId]
         } else {
+            let seasonIds = flowCounts[seasonId]
             let count = 0
             for (let key in seasonIds) {
-                count += seasonIds[key]
+                count += seasonId[key]
             }
             return count
         }

@@ -1,5 +1,5 @@
 import { config } from '../../config/index'
-
+import { bindTap } from '../../tap'
 
 /**
  * 下拉章节列表
@@ -9,8 +9,8 @@ export default class Section {
     constructor(data) {
         this._isHorizontal = config.layoutMode === 'horizontal'
         this._pagedata = data
-        this._$navlist = $('#xut-nav-section-list')
-        this._list = this._$navlist.find("li")
+        this._$section = $('#xut-nav-section-list')
+        this._$list = this._$section.find("li")
     }
 
 
@@ -45,7 +45,23 @@ export default class Section {
                 this.removeThumb();
             });
 
-            this._$navlist.on('tap', self.tojump);
+            this._$section.on('tap', this._toJump);
+        }
+    }
+
+
+    /**
+     * 点击元素跳转
+     */
+    _toJump(e) {
+        let target
+        let xxtlink
+        if (target = e.target) {
+            // initialize();
+            if (xxtlink = target.getAttribute('data-xxtlink')) {
+                xxtlink = xxtlink.split('-');
+                Xut.View.GotoSlide(xxtlink[0], xxtlink[1]);
+            }
         }
     }
 
@@ -81,11 +97,11 @@ export default class Section {
 
             //如果是分层母板了,此时用icon代替
             if (page.iconImage) {
-                this._list.eq(j).css({
+                this._$list.eq(j).css({
                     'background-image': 'url(' + path + page.iconImage + ')'
                 });
             } else {
-                this._list.eq(j).css({
+                this._$list.eq(j).css({
                     'background-image': 'url(' + path + page.md5 + ')',
                     'background-color': 'white'
                 });
@@ -102,7 +118,7 @@ export default class Section {
      * @return {[type]} [description]
      */
     removeThumb() {
-        let list = this._list
+        let list = this._$list
         let createNew = this.createNew
         let createBak = this.createBak
 
@@ -156,26 +172,10 @@ export default class Section {
 
 
     /**
-     * 点击元素跳转
-     */
-    tojump(env) {
-        var target
-        var xxtlink
-        if (target = env.target) {
-            // initialize();
-            if (xxtlink = target.getAttribute('data-xxtlink')) {
-                xxtlink = xxtlink.split('-');
-                Xut.View.GotoSlide(xxtlink[0], xxtlink[1]);
-            }
-        }
-    }
-
-
-    /**
      * 滚动指定位置
      */
-    scrollTo() {
-        this.userIscroll()
+    scrollTo(pageIndex) {
+        this.userIscroll(pageIndex)
     }
 
     /**
@@ -190,7 +190,7 @@ export default class Section {
      */
     destroy() {
         if (this.hBox) {
-            this._$navlist.off();
+            this._$section.off();
             this.hBox.destroy();
             this.hBox = null;
         }

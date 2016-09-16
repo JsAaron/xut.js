@@ -272,7 +272,7 @@ export default class sysBar extends Bar {
      * @return {[type]} [description]
      */
     navigationBar() {
-        createNavbar(Xut.Presentation.GetPageIndex());
+        createNavbar(Xut.Presentation.GetPageIndex())
     }
 
 

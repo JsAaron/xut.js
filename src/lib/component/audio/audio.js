@@ -443,7 +443,7 @@ if (plat.isAndroid && !plat.isBrowser) {
         } else {
             //特殊情况
             //有客户端的内嵌浏览器模式
-            audioPlayer = _Audio5js
+            audioPlayer = _Audio
         }
 
     }

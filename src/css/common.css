@@ -209,6 +209,22 @@ video {
     vertical-align: middle;
 }
 
+/*主页：左右翻页按钮*/
+.xut-flip-control {
+    position: absolute;
+    top: 50%;
+    z-index: 9998;
+    background-size: 100% 100%;
+}
+
+.xut-flip-control-left {
+    left: : 0;
+}
+
+.xut-flip-control-right {
+    right: 0
+}
+
 
 
 
@@ -237,13 +253,7 @@ video {
     margin: 0 auto;
 }
 
-.xut-flip-control-left {
-    left: : 0;
-}
 
-.xut-flip-control-right {
-    right: 0
-}
 
 .xut-Bar-left li,
 .xut-Bar-right li {
@@ -294,14 +304,6 @@ video {
 
 
 
-/*======================左右翻页按钮=================*/
-
-.xut-flip-control {
-    position: absolute;
-    top: 50%;
-    z-index: 9998;
-    background-size: 100% 100%;
-}
 
 
 /*chpter页面*/
