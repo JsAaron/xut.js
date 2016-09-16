@@ -81,7 +81,7 @@ export default {
                                          left:${posX}px;
                                          position:absolute;
                                          ${icon}">
-                            </div>`
+                          </div>`
         }
 
 
@@ -101,8 +101,8 @@ export default {
                              ${startImage}
                              background-size:100% 100%;
                              position:absolute;">
-                    ${mediaIcon}
-                </div>`
+                ${mediaIcon}
+            </div>`
         )
     },
 
@@ -118,35 +118,6 @@ export default {
         if (data = tempData[id]) {
             delete tempData[id]
             return data;
-        }
-    },
-
-
-    /**
-     * touchEnd 全局派发的点击事件
-     * 如果stopGlobalEvent == ture 事件由全局派发
-     */
-    eventDelegate({
-        id,
-        target,
-        rootNode,
-        pageIndex,
-        activityId
-    } = {}) {
-        let category = target.getAttribute('data-delegate')
-        if (category) {
-            let chapterId = Xut.Presentation.GetPageId(pageIndex);
-            /**
-             * 传入chapterId 页面ID
-             * activityId    视频ID
-             * eleName       节点名  //切换控制
-             * 根节点
-             */
-            if (category == 'audio') {
-                triggerAudio(chapterId, activityId, this.onlyCreateOnce(id))
-            } else {
-                triggerVideo(chapterId, activityId, $(rootNode))
-            }
         }
     },
 
@@ -168,6 +139,35 @@ export default {
             autoAudio(chapterId, id, this.onlyCreateOnce(id));
         } else {
             autoVideo(chapterId, id, rootNode);
+        }
+    },
+
+
+    /**
+     * touchEnd 全局派发的点击事件
+     * 如果stopGlobalEvent == ture 事件由全局派发
+     */
+    trigger({
+        id,
+        target,
+        rootNode,
+        pageIndex,
+        activityId
+    } = {}) {
+        const category = target.getAttribute('data-delegate')
+        if (category) {
+            const chapterId = Xut.Presentation.GetPageId(pageIndex);
+            /**
+             * 传入chapterId 页面ID
+             * activityId    视频ID
+             * eleName       节点名  //切换控制
+             * 根节点
+             */
+            if (category == 'audio') {
+                triggerAudio(chapterId, activityId, this.onlyCreateOnce(id))
+            } else {
+                triggerVideo(chapterId, activityId, $(rootNode))
+            }
         }
     }
 }

@@ -80,7 +80,7 @@ export default {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    eventDelegate(data) {
+    trigger(data) {
         return Adapter(data)
     },
 

@@ -32,7 +32,7 @@ export default {
      * touchEnd 全局派发的点击事件
      * 如果stopGlobalEvent == ture 事件由全局派发
      */
-    eventDelegate(data) {
+    trigger(data) {
         data.data = Xut.Presentation.GetPageData(data.pageIndex);
         new ShowNoteClass(data)
     },

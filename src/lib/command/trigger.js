@@ -16,7 +16,7 @@ export function trigger(target, attribute, rootNode, pageIndex) {
         id = tag[1];
         dir = directives[type];
 
-        if (dir && dir.eventDelegate) {
+        if (dir && dir.trigger) {
 
             //获取页面类型
             pageType = function() {
@@ -47,7 +47,7 @@ export function trigger(target, attribute, rootNode, pageIndex) {
             }
 
             //委派新的任务
-            dir.eventDelegate(data)
+            dir.trigger(data)
         }
     }
 }

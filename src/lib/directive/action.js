@@ -47,28 +47,15 @@ export default {
         return String.styleFormat(html)
     },
 
-    /**
-     * 是否阻止全局事件派发
-     * @type {Boolean}
-     *   false 事件由全局接管派发
-     *   false 事件由hotspot处理触发
-     *   全局提供的事件接口
-     *   {
-     *       globalTouchStart
-     *       globalTouchMove
-     *       globalTouchEnd
-     *   }
-     */
-    stopDelegate: false,
 
-
-    /**
+    /*
      * touchEnd 全局派发的点击事件
      * 如果stopGlobalEvent == ture 事件由全局派发
      */
-    eventDelegate(data) {
+    trigger(data) {
         Action(data)
     },
+
 
     /**
      * 复位对象
