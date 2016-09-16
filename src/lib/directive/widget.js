@@ -80,12 +80,12 @@ export default {
          */
         autoPlay(data) {
             Adapter({
-                'rootNode': data.rootNode,
-                "type": data.type,
-                "pageType": data.pageType,
-                "activityId": data.id,
-                "pageIndex": data.pageIndex,
-                "isAutoPlay": true
+                'rootNode'   : data.rootNode,
+                "type"       : data.type,
+                "pageType"   : data.pageType,
+                "activityId" : data.id,
+                "pageIndex"  : data.pageIndex,
+                "isAutoPlay" : true
             })
         },
 

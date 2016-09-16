@@ -23,7 +23,7 @@ export default function(baseProto) {
      * @return {[type]} [description]
      */
     baseProto.baseData = function() {
-        return this._dataCache[this.pageType];
+        return this._dataCache[this.pageType]
     }
 
 
@@ -32,7 +32,7 @@ export default function(baseProto) {
      * @return {[type]} [description]
      */
     baseProto.baseActivits = function() {
-        return this._dataCache['activitys'];
+        return this._dataCache['activitys']
     }
 
 
@@ -41,8 +41,8 @@ export default function(baseProto) {
      * @return {[type]} [description]
      */
     baseProto.baseAutoRun = function() {
-        var autoRunDas = this._dataCache['autoRunDas'];
-        return autoRunDas && autoRunDas;
+        const data = this._dataCache['auto']
+        return data && data;
     }
 
 

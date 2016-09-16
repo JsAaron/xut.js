@@ -1,5 +1,5 @@
 
-import { query } from '../../manager/parser'
+import { query } from '../../manager/query'
 
 /**
  * 更新数据缓存
@@ -24,17 +24,17 @@ export default function(pid, callback) {
     }
 
     //增加数据缓存
-    const addCache = (data, activitys, autoRunDas) => {
+    const addCache = (data, activitys, autoData) => {
         addCacheDas(base.pageType, data); //挂载页面容器数据
         addCacheDas('activitys', activitys); //挂载activitys数据
-        addCacheDas('autoRunDas', autoRunDas); //挂载自动运行数据
+        addCacheDas('auto', autoData); //挂载自动运行数据
     }
 
     query(pageType, {
         'pageIndex': pid,
         'pageData': base.chapterDas,
         'pptMaster': base.pptMaster
-    }, function(data, activitys, autoRunDas) {
+    }, function(data, activitys, autoData) {
         addCache.apply(addCache, arguments)
         callback(data);
     })

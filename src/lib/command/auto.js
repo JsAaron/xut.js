@@ -24,7 +24,7 @@ const cleanTimer = function() {
  * 延时500毫秒执行
  * @return {[type]} [description]
  */
-let autoContents = (contentObjs, taskAnimCallback) => {
+const autoContents = (contentObjs, taskAnimCallback) => {
     cleanTimer()
 
     contentTaskTimer = setTimeout(() => {
@@ -58,11 +58,12 @@ let autoContents = (contentObjs, taskAnimCallback) => {
     }, 500)
 }
 
+
 /**
  * 运行自动的静态类型
  * @return {[type]} [description]
  */
-let AutoComponents = (pageObj, pageIndex, autoRunComponents, pageType) => {
+const autoComponents = (pageObj, pageIndex, autoRunComponents, pageType) => {
 
     let chapterId = pageObj.baseGetPageId(pageIndex)
     let dir
@@ -130,19 +131,19 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
             if (pageObj.onceMaster) {
                 return
             }
-            pageObj.onceMaster = true;
+            pageObj.onceMaster = true
         }
 
         taskAnimCallback = taskAnimCallback || noop
 
 
-        let autoRunComponents = pageObj.baseAutoRun()
-        if (autoRunComponents) {
-            AutoComponents(pageObj, pageIndex, autoRunComponents, pageType)
+        let autoData = pageObj.baseAutoRun()
+        if (autoData) {
+            autoComponents(pageObj, pageIndex, autoData, pageType)
         }
 
         if (contentObjs) {
-            autoContents(contentObjs, taskAnimCallback);
+            autoContents(contentObjs, taskAnimCallback)
         } else {
             taskAnimCallback(); //无动画
         }
