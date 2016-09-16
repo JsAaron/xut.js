@@ -7,20 +7,29 @@ import { access } from './access'
 import allowNext from '../backstage'
 import directives from '../directive/index'
 
+const noop = function() {}
+
 //content任务超时Id
-let contentTaskOutId
-let markComplete
+let contentTaskTimer
+
+const cleanTimer = function() {
+    if (contentTaskTimer) {
+        clearTimeout(contentTaskTimer)
+        contentTaskTimer = null
+    }
+}
 
 /**
  * 运行自动的content对象
  * 延时500毫秒执行
  * @return {[type]} [description]
  */
-let runContent = (contentObjs, taskAnimCallback) => {
+let autoContents = (contentObjs, taskAnimCallback) => {
+    cleanTimer()
 
-    let contentTaskOutId = setTimeout(() => {
+    contentTaskTimer = setTimeout(() => {
 
-        clearTimeout(contentTaskOutId);
+        cleanTimer()
 
         /**
          * 完成通知
@@ -53,7 +62,7 @@ let runContent = (contentObjs, taskAnimCallback) => {
  * 运行自动的静态类型
  * @return {[type]} [description]
  */
-let runComponent = (pageObj, pageIndex, autoRunComponents, pageType) => {
+let AutoComponents = (pageObj, pageIndex, autoRunComponents, pageType) => {
 
     let chapterId = pageObj.baseGetPageId(pageIndex)
     let dir
@@ -63,23 +72,31 @@ let runComponent = (pageObj, pageIndex, autoRunComponents, pageType) => {
     }
 
     _.each(autoRunComponents, (data, index) => {
-        dir = directives[data.type];
+        dir = directives[data.type]
         if (dir && dir.autoPlay) {
             dir.autoPlay({
-                'id': data.id,
-                'key': data.key,
-                'type': data.type,
-                'pageType': pageType,
-                'rootNode': pageObj.element,
-                'chapterId': chapterId,
-                'category': data.category,
-                'autoPlay': data.autoPlay,
-                'pageIndex': pageIndex
+                'id'        : data.id,
+                'key'       : data.key,
+                'type'      : data.type,
+                'pageType'  : pageType,
+                'rootNode'  : pageObj.element,
+                'chapterId' : chapterId,
+                'category'  : data.category,
+                'autoPlay'  : data.autoPlay,
+                'pageIndex' : pageIndex
             });
         }
     });
 }
 
+
+/**
+ * 自动动作
+ * @param  {[type]} pageObj          [description]
+ * @param  {[type]} pageIndex        [description]
+ * @param  {[type]} taskAnimCallback [description]
+ * @return {[type]}                  [description]
+ */
 export function autoRun(pageObj, pageIndex, taskAnimCallback) {
 
     /**
@@ -106,7 +123,7 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
     //pageType
     //用于区别触发类型
     //页面还是母版
-    access(pageObj, (pageObj, ContentObjs, ComponentObjs, pageType) => {
+    access(pageObj, (pageObj, contentObjs, componentObjs, pageType) => {
 
         //如果是母版对象，一次生命周期种只激活一次
         if (pageObj.pageType === 'master') {
@@ -116,19 +133,16 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
             pageObj.onceMaster = true;
         }
 
-        taskAnimCallback = taskAnimCallback || function() {};
+        taskAnimCallback = taskAnimCallback || noop
 
-        //自动运行的组件
+
         let autoRunComponents = pageObj.baseAutoRun()
         if (autoRunComponents) {
-            runComponent(pageObj, pageIndex, autoRunComponents, pageType)
+            AutoComponents(pageObj, pageIndex, autoRunComponents, pageType)
         }
 
-        //自动运行content
-        clearTimeout(contentTaskOutId);
-
-        if (ContentObjs) {
-            runContent(ContentObjs, taskAnimCallback);
+        if (contentObjs) {
+            autoContents(contentObjs, taskAnimCallback);
         } else {
             taskAnimCallback(); //无动画
         }
