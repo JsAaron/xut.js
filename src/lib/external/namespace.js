@@ -100,37 +100,3 @@ String.styleFormat = function(format) {
 }
 
 
-//模拟继承
-Xut.CoreObject = function() {};
-
-Xut.CoreObject.extend = function(props) {
-    var init, subObj;
-
-    props = props || {};
-    // Set up the constructor using the supplied init method
-    // or using the init of the parent object
-
-    init = props.init || this.prototype.init || function() {};
-
-    subObj = function() {
-        init.apply(this, arguments);
-    };
-
-    // Inherit from this object's prototype
-    subObj.prototype = Object.create(this.prototype);
-    // Reset the constructor property for subObj otherwise
-    // instances of subObj would have the constructor of the parent Object
-    subObj.prototype.constructor = subObj;
-
-    // Make the class extendable
-    subObj.extend = Xut.CoreObject.extend;
-
-    // Extend subObj's prototype with functions and other properties from props
-    for (var name in props) {
-        if (props.hasOwnProperty(name)) {
-            subObj.prototype[name] = props[name];
-        }
-    }
-
-    return subObj;
-};

@@ -20,13 +20,12 @@ export default {
             scaleLeft
         } = {}, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
-            let html, mediaIcon = '',
-                startImage = ''
+            let html
+            let mediaIcon = ''
+            let startImage = ''
 
             //如果没有宽高则不创建绑定节点
             if (!scaleWidth || !scaleHeight) return ''
-
-            let screenSize = config.screenSize
 
             //解析音乐动作
             //冒泡动作靠节点传递数据
@@ -60,6 +59,8 @@ export default {
                 return v.toUpperCase()
             })
 
+            const screenSize = config.screenSize
+
             //只针对网页插件增加单独的点击界面
             //如果有视频图标
             if (category == 'webpage' &&
@@ -72,16 +73,14 @@ export default {
                 const posX = (scaleWidth - mediaIconSize) / 2;
                 const posY = (scaleHeight - mediaIconSize) / 2;
                 const icon = 'background-image:url(images/icons/web_hotspot.png)'
-                mediaIcon = `<div 
-                               id="icon_${_id}" 
-                               type="icon" 
-                               style="
-                                 width:${mediaIconSize}px;
-                                 height:${mediaIconSize}px;
-                                 top:${posY}px;
-                                 left:${posX}px;
-                                 position:absolute;
-                                 ${icon}">
+                mediaIcon = `<div id="icon_${_id}" 
+                                  type="icon" 
+                                  style="width:${mediaIconSize}px;
+                                         height:${mediaIconSize}px;
+                                         top:${posY}px;
+                                         left:${posX}px;
+                                         position:absolute;
+                                         ${icon}">
                             </div>`
             }
 
@@ -91,21 +90,19 @@ export default {
             //Audio_1
             //Video_1
             return String.styleFormat(
-                `<div 
-                      id="${mediaType + "_" + _id}" 
+                `<div id="${mediaType + "_" + _id}" 
                       data-belong="${pageType}" 
                       data-delegate="${category}" 
-                      style="
-                        width:${scaleWidth}px;
-                        height:${scaleHeight}px;
-                        left:${scaleLeft}px;
-                        top:${scaleTop}px;
-                        z-index:${zIndex};
-                        ${startImage}
-                        background-size:100% 100%;
-                        position:absolute;">
-                            ${mediaIcon}
-                    </div>`
+                      style="width:${scaleWidth}px;
+                             height:${scaleHeight}px;
+                             left:${scaleLeft}px;
+                             top:${scaleTop}px;
+                             z-index:${zIndex};
+                             ${startImage}
+                             background-size:100% 100%;
+                             position:absolute;">
+                    ${mediaIcon}
+                </div>`
             )
         },
 

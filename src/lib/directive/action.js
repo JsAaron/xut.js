@@ -3,8 +3,7 @@
  * 1. 跳转页面
  * 2. 打开系统应用程序
  */
-
-import { ActionClass } from '../component/action/index'
+import Action from '../component/action/index'
 
 
 export default {
@@ -29,7 +28,7 @@ export default {
      * 如果stopGlobalEvent == ture 事件由全局派发
      */
     eventDelegate(data) {
-        new ActionClass(data)
+        Action(data)
     },
 
     /**
@@ -79,18 +78,17 @@ export default {
         const id = actType + "_" + _id
 
         const html = `<div id="${id}"
-                        data-belong="${pageType}" 
-                        data-delegate="Action" 
-                        style="
-                            cursor:pointer;
-                            width:${scaleWidth}px;
-                            height:${scaleHeight}px;
-                            left:${scaleLeft}px;
-                            top:${scaleTop}px;
-                            background-size:100% 100%;
-                            position:absolute;
-                            z-index:${zIndex};
-                            ${backgroundImage}">
+                           data-belong="${pageType}" 
+                           data-delegate="action" 
+                           style="cursor:pointer;
+                                  width:${scaleWidth}px;
+                                  height:${scaleHeight}px;
+                                  left:${scaleLeft}px;
+                                  top:${scaleTop}px;
+                                  background-size:100% 100%;
+                                  position:absolute;
+                                  z-index:${zIndex};
+                                  ${backgroundImage}">
                       </div>`
 
         return String.styleFormat(html)
