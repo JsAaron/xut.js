@@ -55,6 +55,7 @@ const getMasterData = function(data, callback) {
 
 /**
  * 解析出页面自动运行的数据
+ * autoplay && !Content
  * @param  {[type]} activitys [description]
  * @return {[type]}           [description]
  */

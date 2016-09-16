@@ -63,7 +63,7 @@ const autoContents = (contentObjs, taskAnimCallback) => {
  * 运行自动的静态类型
  * @return {[type]} [description]
  */
-const autoComponents = (pageObj, pageIndex, autoRunComponents, pageType) => {
+const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
 
     let chapterId = pageObj.baseGetPageId(pageIndex)
     let dir
@@ -72,13 +72,11 @@ const autoComponents = (pageObj, pageIndex, autoRunComponents, pageType) => {
         pageIndex = Xut.Presentation.GetPageIndex()
     }
 
-    _.each(autoRunComponents, (data, index) => {
+    _.each(autoData, (data, index) => {
         dir = directives[data.type]
         if (dir && dir.autoPlay) {
             dir.autoPlay({
                 'id'        : data.id,
-                'key'       : data.key,
-                'type'      : data.type,
                 'pageType'  : pageType,
                 'rootNode'  : pageObj.element,
                 'chapterId' : chapterId,

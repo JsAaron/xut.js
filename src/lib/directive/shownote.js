@@ -12,83 +12,75 @@ export default {
      */
     createDom(activityData, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
-            var newWidth, id, width, height, retStr
+        const id = activityData['_id']
+        const width = activityData.scaleWidth
+        const height = activityData.scaleHeight
+        const newWidth = (width + height) / 2 * config.iconHeight
 
-            retStr = ""
-            id = activityData['_id']
-            width = activityData.scaleWidth
-            height = activityData.scaleHeight
-            newWidth = (width + height) / 2 * config.iconHeight
+        const html = `<div id="ShowNote_${id}" 
+                         class="xut-showNote" 
+                         data-belong ="${pageType}"  
+                         data-delegate="shownote" 
+                         style="width:${newWidth}px;height:${newWidth}px">
+                    </div>`
 
-            retStr +=
-                '<div id="ShowNote_{0}" ' +
-                ' class="xut-showNote" ' +
-                ' data-belong ="{1}"  ' +
-                ' data-delegate="ShowNote" ' +
-                ' style="width:{2}px;height:{3}px">" ' +
-                '</div>'
-
-            return String.format(retStr,
-                id,
-                pageType,
-                newWidth,
-                newWidth)
-        },
+        return String.styleFormat(html)
+    },
 
 
-        /**
-         * touchEnd 全局派发的点击事件
-         * 如果stopGlobalEvent == ture 事件由全局派发
-         */
-        eventDelegate(data) {
-            data.data = Xut.Presentation.GetPageData(data.pageIndex);
-            new ShowNoteClass(data)
-        },
+    /**
+     * touchEnd 全局派发的点击事件
+     * 如果stopGlobalEvent == ture 事件由全局派发
+     */
+    eventDelegate(data) {
+        data.data = Xut.Presentation.GetPageData(data.pageIndex);
+        new ShowNoteClass(data)
+    },
 
 
-        /**
-         * 自动运行生成Action或者widget触发点对象
-         * @param  {[type]} opts [description]
-         * @return {[type]}      [description]
-         */
-        autoPlay(opts) {},
+    /**
+     * 自动运行生成Action或者widget触发点对象
+     * @param  {[type]} opts [description]
+     * @return {[type]}      [description]
+     */
+    autoPlay() {},
 
-        /**
-         * 翻页后处理页面中活动热点的状态
-         * @param  {[type]} activeObejct [需要处理的活动对象]
-         *
-         * 比如音频,视频 翻页需要暂停，也可以销毁
-         */
-        flipOver(opts) {
-            //console.log('翻页处理活动对象', activeObejct ,pageIndex);
-        },
-
-
-        /**
-         * 销毁页面hotspot事件与Action或widget事件
-         * @param  {[type]} activeObejct [需要处理的活动对象]
-         * @param  {[type]} pageIndex    [页码标示]
-         * @param  {[type]} rootEle      [根元素]
-         * @return {[type]}              [description]
-         */
-        destroy(opts) {
-            this && this.destroy();
-        },
+    /**
+     * 翻页后处理页面中活动热点的状态
+     * @param  {[type]} activeObejct [需要处理的活动对象]
+     *
+     * 比如音频,视频 翻页需要暂停，也可以销毁
+     */
+    flipOver(opts) {
+        //console.log('翻页处理活动对象', activeObejct ,pageIndex);
+    },
 
 
-        /**
-         * 复位对象
-         * 通过按物理键，关闭当前热点
-         *  @return 如果当前没有需要处理的Action
-         *  需要返回一个状态标示告诉当前是否应该退出应用
-         * @param  {[type]} opts [description]
-         * @return {[type]}      [description]
-         */
-        recovery(opts) {
-            if (this.state) {
-                this.dispatchProcess();
-                return true;
-            }
-            return false
+    /**
+     * 销毁页面hotspot事件与Action或widget事件
+     * @param  {[type]} activeObejct [需要处理的活动对象]
+     * @param  {[type]} pageIndex    [页码标示]
+     * @param  {[type]} rootEle      [根元素]
+     * @return {[type]}              [description]
+     */
+    destroy(opts) {
+        this && this.destroy();
+    },
+
+
+    /**
+     * 复位对象
+     * 通过按物理键，关闭当前热点
+     *  @return 如果当前没有需要处理的Action
+     *  需要返回一个状态标示告诉当前是否应该退出应用
+     * @param  {[type]} opts [description]
+     * @return {[type]}      [description]
+     */
+    recovery(opts) {
+        if (this.state) {
+            this.dispatchProcess();
+            return true;
         }
+        return false
+    }
 }
