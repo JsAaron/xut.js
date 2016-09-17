@@ -31,7 +31,7 @@ let parseContentObjs = (pageType, inputPara) => {
  * 页面零件
  * @param {[type]} data [description]
  */
-export class PageWidget {
+export default class PageWidget {
 
 
     constructor(data) {

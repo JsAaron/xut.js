@@ -6,10 +6,11 @@
  *              构件5种类型
  *
  * *******************************************************************/
-import { PageWidget } from './page/index'
+
 import { parseJSON } from '../../util/dom'
 import { config } from '../../config/index'
-import iframeWidget from './iframe'
+import pageWidget from './page/index'
+import iframeWidget from './iframe/index'
 
 
 const load = (type, data, constructor) => {
@@ -50,19 +51,19 @@ const adapterType = {
      * @return {[type]}      [description]
      */
     'js' (data) {
-        load('js', data, PageWidget);
+        load('js', data, pageWidget);
     },
     'page' (data) {
-        load('page', data, PageWidget);
+        load('page', data, pageWidget);
     },
     'svg' (data) {
-        load('svg', data, PageWidget);
+        load('svg', data, pageWidget);
     },
     'canvas' (data) {
-        load('canvas', data, PageWidget);
+        load('canvas', data, pageWidget);
     },
     'webgL' (data) {
-        load('webgL', data, PageWidget);
+        load('webgL', data, pageWidget);
     }
 }
 
