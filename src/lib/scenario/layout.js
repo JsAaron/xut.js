@@ -59,7 +59,7 @@ export function home() {
 
     //导航
     const navBarHTML =
-        `<div class="xut-nav-bar" 
+        `<div class="xut-nav-bar"
               style="width:${navBarWidth};
                      height:${navBarHeight}px;
                      ${navBarTop}
@@ -80,8 +80,8 @@ export function home() {
 
     //主体
     const homeHTML =
-        `<div id="xut-main-scene" 
-              class="xut-chapter" 
+        `<div id="xut-main-scene"
+              class="xut-chapter"
               style="width:${homeWidth}px;
                      height:${homeHeight}px;
                      top:${homeTop}px;
@@ -108,42 +108,30 @@ export function home() {
  */
 export function scene(id) {
 
-    let options = getOptions()
+    const options   = getOptions()
+    const sWidth    = options.sWidth
+    const sHeight   = options.sHeight
+    const calculate = options.calculate
 
-    let sWidth = options.sWidth
-    let sHeight = options.sHeight
-    let calculate = options.calculate
+    const scenarioId = 'scenario-' + id
+    const overflow = config.scrollPaintingMode ? 'visible' : 'hidden'
+    const pageId =  'scenarioPage-' + id
+    const masterId = 'scenarioMaster-' + id
 
-    let html =
-        '<div id="{{id}}" style="' +
-        'width:{{width}}px;' +
-        'height:{{height}}px;' +
-        'top:{{top}}px;' +
-        'left:{{left}}px;' +
-        'position:absolute;' +
-        'z-index:{{zIndex}};' +
-        'overflow:{{overflow}};' +
-        '">' +
+    const html =
+        `<div id="${scenarioId}"
+              style="width:${config.viewSize.width}px;
+                     height:${config.viewSize.height}px;
+                     top:${calculate.top}px;
+                     left:${calculate.left}px;
+                     position:absolute;
+                     z-index:${Xut.sceneController.createIndex()};
+                     overflow:{{overflow}};">
+            <ul id="${pageId}" class="xut-flip" style="z-index:2"></ul>
+            <ul id="${masterId}" class="xut-flip" style="z-index:1"></ul>
+        </div>`
 
-        ' <ul id="{{pageId}}" class="xut-flip" style="z-index:{{zIndexPage}}"></ul>' +
-        ' <ul id="{{masterId}}" class="xut-flip" style="z-index:{{zIndexMaster}}"></ul>' +
-        '</div>';
-
-
-    return _.template(html, {
-        id: 'scenario-' + id,
-        width: config.viewSize.width,
-        height: config.viewSize.height,
-        top: calculate.top,
-        left: calculate.left,
-        zIndex: Xut.sceneController.createIndex(),
-        overflow: config.scrollPaintingMode ? 'visible' : 'hidden',
-        pageId: 'scenarioPage-' + id,
-        zIndexPage: 2,
-        masterId: 'scenarioMaster-' + id,
-        zIndexMaster: 1
-    })
-
+    return String.styleFormat(html)
 }
 
 

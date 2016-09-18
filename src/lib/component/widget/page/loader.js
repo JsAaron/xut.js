@@ -1,4 +1,5 @@
 import { loadfile } from '../../../util/loader'
+import { config } from '../../../config/index'
 
 /**
  * 路径地址
@@ -6,7 +7,7 @@ import { loadfile } from '../../../util/loader'
  * @return {[type]}      [description]
  */
 function path(fileName,widgetId) {
-    return 'content/widget/' + widgetId + '/' + fileName
+    return config.jsWidgetPath() + widgetId + '/' + fileName
 }
 
 

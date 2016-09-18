@@ -58,33 +58,22 @@ export function createCursor() {
 
     while (count--) {
         html =
-            '<div class="xut-busy-spinner" style="' +
-            '{{transform}}:rotate({{rotate}}deg) translate(0,-142%);' +
-            '{{animation}}:-{{delay}}s">' +
-            '</div>'
+            `<div class="xut-busy-spinner"
+                  style="${transform}:rotate(${deg[count]}deg) translate(0,-142%);${animationDelay}:-${delay[count]}s">
+            </div>`
         container += _.template(html, {
-            transform: transform,
-            rotate: deg[count],
-            animation: animationDelay,
-            delay: delay[count]
+
         })
     }
 
     html =
-        '<div style="width:{{width}}px;height:{{height}}px;margin:{{margin}}px auto;">' +
-        ' <div style="height:30%;"></div>' +
-        ' <div class="xut-busy-middle">{{container}}</div>' +
-        ' <div class="xut-busy-text"></div>' +
-        '</div>'
+        `<div style="width:${width}px;height:${width}px;margin:${space}px auto;">
+            <div style="height:30%;"></div>
+            <div class="xut-busy-middle">${container}</div>
+            <div class="xut-busy-text"></div>
+        </div>`
 
-    container = _.template(html, {
-        width: width,
-        height: width,
-        margin: space,
-        container: container
-    })
-
-    node = $('#xut-busy-icon').html(container);
+    node = $('#xut-busy-icon').html(String.styleFormat(html));
 }
 
 
@@ -112,7 +101,7 @@ export const ShowBusy = () => {
 /**
  * 隐藏光标
  */
-export const HideBusy = (IsPay) => {
+export const HideBusy = () => {
     //显示忙碌加锁，用于不处理hideBusy
     if (isDisable || Xut.IBooks.Enabled || ShowBusy.lock) return;
     if (!timer) {
@@ -120,7 +109,6 @@ export const HideBusy = (IsPay) => {
     } else {
         isCallHide = true
     }
-    IsPay && node.css('pointer-events', '').find('.xut-busy-text').html('')
 }
 
 

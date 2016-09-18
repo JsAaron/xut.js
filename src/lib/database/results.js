@@ -26,7 +26,6 @@ export function importResults(callback) {
     }
 }
 
-
 /**
  * 获取数据缓存
  * @return {[type]} [description]

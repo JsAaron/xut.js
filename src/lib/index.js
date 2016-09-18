@@ -55,10 +55,34 @@ const removeOldNode = function() {
 const commonHTML = function() {
     return `<div class="xut-removelayer"></div>
             <div class="xut-start-page xut-fullscreen"></div>
-            <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>`
+            <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
 }
 
 const iconHTML = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
+
+
+const createMain = function() {
+
+    let rootNode = $("#xxtppt-app-container")
+    let tempHTML = `${iconHTML} ${commonHTML()}`
+
+    //create root node
+    if (!rootNode.length) {
+        rootNode = $('body')
+        tempHTML =
+            `<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow-hidden">
+                ${tempHTML}
+            </div>`
+    }
+    nextTick({
+        container: rootNode,
+        content: $(tempHTML)
+    }, function() {
+        rootNode = null
+        init()
+    })
+}
+
 
 
 Xut.Application.Launch = function({
@@ -66,6 +90,14 @@ Xut.Application.Launch = function({
     paths,
     cursor
 } = {}) {
+
+    //set supportLaunch == false on load
+    if (!Xut.Application.supportLaunch) {
+        Xut.Application.isRun = true
+        removeOldNode()
+        createMain()
+        return
+    }
 
     let $el = $(el)
     if (!$el.length) {
@@ -112,31 +144,9 @@ Xut.Application.Launch = function({
 }
 
 
-const createMain = function() {
-
-    let rootNode = $("#xxtppt-app-container")
-    let tempHTML =`${iconHTML} ${commonHTML()}`
-
-    //create root node
-    if (!rootNode.length) {
-        rootNode = $('body')
-        tempHTML =
-            `<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow">
-                ${tempHTML}
-            </div>`
-    }
-    nextTick({
-        container: rootNode,
-        content: $(tempHTML)
-    }, function() {
-        rootNode = null
-        init()
-    })
-}
-
 setTimeout(() => {
     //External interface call
-    if (!Xut.Application.supportLaunch) {
+    if (!Xut.Application.supportLaunch && !Xut.Application.isRun) {
         Xut.Application.Launch = function() {}
         removeOldNode()
         createMain()

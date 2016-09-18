@@ -67,7 +67,7 @@ export default class PageWidget {
         } else {
             //If there is no
             if (typeof window[this.widgetName + "Widget"] != "function") {
-                loader(this._executive, this);
+                loader(this._executive, this)
             } else {
                 this._executive();
             }

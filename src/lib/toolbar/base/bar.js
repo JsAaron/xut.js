@@ -46,7 +46,7 @@ export default class Bar {
         this.enableLeft = true
 
         /**
-         * 默认创建右翻页按钮 
+         * 默认创建右翻页按钮
          * @type {Boolean}
          */
         this.enableRight = true

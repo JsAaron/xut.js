@@ -17,12 +17,13 @@ export default {
         const height = activityData.scaleHeight
         const newWidth = (width + height) / 2 * config.iconHeight
 
-        const html = `<div id="ShowNote_${id}" 
-                         class="xut-showNote" 
-                         data-belong ="${pageType}"  
-                         data-delegate="shownote" 
-                         style="width:${newWidth}px;height:${newWidth}px">
-                    </div>`
+        const html =
+                `<div id="ShowNote_${id}"
+                      class="xut-showNote"
+                      data-belong ="${pageType}"
+                      data-delegate="shownote"
+                      style="width:${newWidth}px;height:${newWidth}px">
+                 </div>`
 
         return String.styleFormat(html)
     },

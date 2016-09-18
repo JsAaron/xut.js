@@ -86,7 +86,7 @@ export default class PageMgr extends Abstract {
     destroy() {
         //清理视频
         var pageId = Xut.Presentation.GetPageId(Xut.Presentation.GetPageIndex())
-        
+
         removeVideo(pageId)
 
         //清理对象

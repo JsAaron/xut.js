@@ -33,9 +33,9 @@ export default {
 
         const id = actType + "_" + _id
         const html =
-            `<div id="${id}" 
-                  data-belong="${pageType}" 
-                  data-delegate="${actType}" 
+            `<div id="${id}"
+                  data-belong="${pageType}"
+                  data-delegate="${actType}"
                   style="cursor:pointer;
                          background-size:100% 100%;
                          position:absolute;

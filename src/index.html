@@ -14,9 +14,7 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-
     <script src="content/sqlResult.js"></script>
-
     <script src="lib/external/environ.js"></script>
     <script src="lib/external/namespace.js"></script>
     <script src="lib/external/support.js"></script>
@@ -55,6 +53,20 @@
 
 <body>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow"></div>
+    <script type="text/javascript">
+    window.onload = function() {
+        const appid = 1
+        Xut.Application.supportLaunch = false
+        Xut.Application.Launch({
+            el: '#xxtppt-app-container',
+            paths: {
+                resource: 'content/app' + appid,
+                database: 'content/app' + appid + '/SQLResult.js'
+            },
+            cursor: false
+        });
+    }
+    </script>
 </body>
 
 </html>
