@@ -13,11 +13,6 @@ export default function Destroy() {
         $(document).off()
     }
 
-    //DYNAMICCONFIGT模式销毁节点
-    if (window.DYNAMICCONFIGT) {
-        window.DYNAMICCONFIGT.removeNode()
-    }
-
     //销毁所有场景
     sceneController.destroyAllScene()
 
@@ -29,5 +24,12 @@ export default function Destroy() {
 
     //音视频
     clearAudio()
+
+    //音频
     clearVideo()
+
+    //DYNAMICCONFIGT模式销毁节点
+    if (window.DYNAMICCONFIGT) {
+        window.DYNAMICCONFIGT.removeNode()
+    }
 }

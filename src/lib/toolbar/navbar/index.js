@@ -27,7 +27,6 @@ let sectionInstance = null
 let pageIndex
 
 /**
- * 
  * 执行动画
  */
 const _toAction = (navBar, button, action) => {

@@ -1,4 +1,4 @@
-import { BookMark } from './Mark'
+import BookMark from './mark'
 import { parseJSON } from '../../util/index'
 import { bindTap } from '../../tap'
 import Bar from '../base/bar'

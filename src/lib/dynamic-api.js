@@ -317,18 +317,15 @@ export default function overrideApi(vm) {
      * ........
      */
     View.GotoSlide = function(seasonId, chapterId) {
-        var count,
-            sceneObj,
-            currscene,
-            sceneController,
-            //修正参数
-            fixParameter = function(pageIndex) {
-                pageIndex = Number(pageIndex) - 1;
-                if (pageIndex < 0) {
-                    pageIndex = 0;
-                }
-                return pageIndex;
-            };
+
+        //修正参数
+        const fixParameter = function(pageIndex) {
+            pageIndex = Number(pageIndex) - 1
+            if (pageIndex < 0) {
+                pageIndex = 0
+            }
+            return pageIndex
+        }
 
         //ibooks模式下的跳转
         //全部转化成超链接
@@ -350,16 +347,17 @@ export default function overrideApi(vm) {
         //场景模式内部跳转
         if (options.scenarioId == seasonId) {
             //chpaterId 转化成实际页码
-            var sectionRang = Xut.data.query('sectionRelated', seasonId);
-            var pageIndex = chapterId - sectionRang.start;
+            var sectionRang = Xut.data.query('sectionRelated', seasonId)
+            var pageIndex = chapterId - sectionRang.start
             vm.$emit('change:showNext')
             return $globalEvent.scrollToPage(fixParameter(pageIndex))
         }
+
         //场景与场景的跳转
         return View.LoadScenario({
             'scenarioId': seasonId,
             'chapterId': chapterId
-        });
+        })
     }
 
 

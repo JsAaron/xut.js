@@ -46,7 +46,7 @@ const calculateFlip = (complier, data, createCallback) => {
                 //创建新结构
                 complier.create([pageIndex], targetIndex, 'toPage', callback, {
                     'opacity': 0 //同页面切换,规定切换的样式
-                });
+                })
             }
         }(targetIndex, pageIndex));
     }
@@ -91,13 +91,13 @@ const calculateFlip = (complier, data, createCallback) => {
  */
 const createContainerView = (complier, data) => {
 
-    var prveHindex = data.currIndex;
-    var pageMgr = complier.pageMgr;
+    let prveHindex = data.currIndex
+    let pageMgr = complier.pageMgr
 
     //停止当前页面动作
     complier.suspend({
         'stopPointer': prveHindex
-    });
+    })
 
     //========处理跳转中逻辑=========
 
@@ -127,18 +127,18 @@ const createContainerView = (complier, data) => {
     })
 
 
-    let jumpPocesss;
+    let jumpPocesss
 
     //母版
     complier.masterContext(function() {
-        jumpPocesss = this.makeJumpPocesss(data);
+        jumpPocesss = this.makeJumpPocesss(data)
         jumpPocesss.pre();
     })
 
     //===========跳槽后逻辑========================
-    pageMgr.clearPage(prveHindex);
+    pageMgr.clearPage(prveHindex)
 
-    jumpPocesss && jumpPocesss.clean(data.currIndex, data.targetIndex);
+    jumpPocesss && jumpPocesss.clean(data.currIndex, data.targetIndex)
 
     /**
      * 同页面切换,规定切换的样式复位
@@ -153,8 +153,8 @@ const createContainerView = (complier, data) => {
         })
     })
 
-    data.pageBaseCollect = null;
-    jumpPocesss = null;
+    data.pageBaseCollect = null
+    jumpPocesss = null
 }
 
 

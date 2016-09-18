@@ -80,7 +80,7 @@ const initMain = (novelData) => {
         "novelId"   : novelData._id,
         "pageIndex" : 0,
         'pageFlip'  : pageFlip
-    });
+    })
 }
 
 

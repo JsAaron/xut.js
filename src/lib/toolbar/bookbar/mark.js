@@ -26,7 +26,7 @@ let sLineHeiht = parseInt($('body').css('font-size')) || 16 //行高
 /**
  * 书签缓存
  */
-let BOOKCACHE 
+let BOOKCACHE
 
 
 export default class Mark {

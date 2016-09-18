@@ -74,6 +74,7 @@ export default function(instance) {
          */
         flow() {
             //chapter=>note == 'flow'
+            //因为设计chapter只有一个flow效果，所以直接跳过别的创建
             if (instance.chapterDas.note == 'flow') {
                 callContextTasks('Flow', function() {
                     setNextRunTask('complete')
@@ -102,7 +103,7 @@ export default function(instance) {
                         outNextTasks: function() {
                             instance.dispatchTasks();
                         }
-                    });
+                    })
                 }
 
                 //如果有挂起任务，则继续执行

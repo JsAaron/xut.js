@@ -18,16 +18,18 @@ export default function(baseProto) {
         //制作回调
         //如果是快速翻页,立刻调用
         //构建container调用preforkComplete
-        this.createRelated.preforkComplete = (context => {
+        this.createRelated.preforkComplete = (() => {
             return () => {
                 //1 滑动允许打断创建
+                //
+                //swich
                 //2 所有继续分解任务
-                flipOver ? callback() : context._checkTasksCreate(callback)
+                flipOver ? callback() : this._checkTasksCreate(callback, this)
             }
-        })(this)
+        })()
 
         //继续构建任务
-        this.dispatchTasks();
+        this.dispatchTasks()
     }
 
 
@@ -132,7 +134,7 @@ export default function(baseProto) {
 
         //如果任务全部完成
         if (this.createRelated.nextRunTask === 'complete') {
-            return callback.call(context);
+            return callback.call(context)
         }
 
         var self = this;

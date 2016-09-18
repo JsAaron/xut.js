@@ -16,8 +16,6 @@ let flowCounts = Object.create(null)
  * create dom...
  */
 const createStr = (chapterId, data, vWidth, vHeight, margin) => {
-    const columnWidth = `${COLUMNWIDTH}:${vWidth}px`
-    const columnHeight = `height:${vHeight}px`
 
     const percentageTop = parseInt(margin[0])
     const percentageLeft = parseInt(margin[1])
@@ -34,11 +32,12 @@ const createStr = (chapterId, data, vWidth, vHeight, margin) => {
     const containerLeft = marginLeft / 2
     const containerTop = marginTop
     const columnGap = `${COLUMNTAP}:${marginLeft}px`
+    const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
 
     const container = `
             <section data-flow="true">
                 <div data-role="margin" style="width:${containerWidth}px;height:${containerHeight}px;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
-                    <div data-role="column" id="columns-content" style="columns:${containerWidth}px;height:100%;${columnGap}">
+                    <div data-role="column" id="columns-content" style="${columnWidth};height:100%;${columnGap}">
                         ${data}
                     </div>
                 </div>

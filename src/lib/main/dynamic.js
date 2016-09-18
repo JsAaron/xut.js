@@ -65,6 +65,7 @@ const fixedSize = (novelData) => {
 export default function dynamic(callback) {
     //导入数据缓存
     importResults(() => {
+
         //初始化数据库设置
         initData(novelData => {
 

@@ -31,7 +31,7 @@ export default class iframeWidget {
         }
 
         const html = String.styleFormat(
-            `<div id="widget-iframe-${this.id}" 
+            `<div id="widget_iframe_${this.id}"
                   style="z-index:${this.zIndex};
                          width:${this.width}px;
                          height:${this.height}px;
@@ -154,7 +154,7 @@ export default class iframeWidget {
         const $wapper = this._$wapper
         const $iframe = $(this._$iframe)
 
-        //隐藏widget 
+        //隐藏widget
         PMS.bind("onHideWapper" + markId, () => {
             $wapper.hide()
             this.state = false

@@ -104,16 +104,17 @@ export default function api(Swipe) {
         //如果还在翻页中
         if (this._fliplock) return
 
-        var data;
-        var currIndex = this._hindex; //当前页面
+        let data
+        let currIndex = this._hindex //当前页面
 
+        //相邻页
         switch (targetIndex) {
             //前一页
             case (currIndex - 1):
                 if (this.multiplePages) {
                     return this.prev();
                 }
-                break;
+                break
                 //首页
             case currIndex:
                 if (currIndex == 0) {
@@ -125,18 +126,18 @@ export default function api(Swipe) {
                 if (this.multiplePages) {
                     return this.next();
                 }
-                break;
+                break
         }
 
         //算出是相关数据
         data = calculationIndex(currIndex, targetIndex, this.pagetotal)
 
         //更新页码索引
-        this._updataPointer(data);
+        this._updataPointer(data)
 
-        data.pagePointer = this._pagePointer;
+        data.pagePointer = this._pagePointer
 
-        this.$emit('onJumpPage', data);
+        this.$emit('onJumpPage', data)
     }
 
 

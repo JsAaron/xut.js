@@ -6,6 +6,7 @@ import { bindTap } from '../../tap'
  */
 export default class Section {
 
+
     constructor(data) {
         this._isHorizontal = config.layoutMode === 'horizontal'
         this._pagedata = data
@@ -54,11 +55,11 @@ export default class Section {
      * 点击元素跳转
      */
     _toJump(e) {
-        let target
+        const target = e.target
         let xxtlink
-        if (target = e.target) {
-            // initialize();
-            if (xxtlink = target.getAttribute('data-xxtlink')) {
+        if (target) {
+            let xxtlink = target.getAttribute('data-xxtlink')
+            if (xxtlink){
                 xxtlink = xxtlink.split('-');
                 Xut.View.GotoSlide(xxtlink[0], xxtlink[1]);
             }

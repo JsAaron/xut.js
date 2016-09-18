@@ -34,6 +34,33 @@ if (Xut.plat.isBrowser) {
 }
 
 
+/**
+ * remove old html
+ * @return {[type]} [description]
+ */
+const removeOldNode = function() {
+    if (document.getElementById('sceneContainer')) {
+        $("#busyIcon").hide().remove()
+        $("#message").hide().remove()
+        $("#removelayer").hide().remove()
+        $("#startupPage").hide().remove()
+        $("#sceneContainer").hide().remove()
+    }
+}
+
+/**
+ * common html
+ * @return {[type]} [description]
+ */
+const commonHTML = function() {
+    return `<div class="xut-removelayer"></div>
+            <div class="xut-start-page xut-fullscreen"></div>
+            <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>`
+}
+
+const iconHTML = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
+
+
 Xut.Application.Launch = function({
     el,
     paths,
@@ -41,11 +68,14 @@ Xut.Application.Launch = function({
 } = {}) {
 
     let $el = $(el)
-    if(!$el.length){
-        console.log('Must pass a root node')
+    if (!$el.length) {
+        console.log('Is Xut.Application.Launch call,Must pass a root node')
         return
     }
-    
+
+    //清理旧节点
+    removeOldNode()
+
     Xut.Application.supportLaunch = true
 
     /**
@@ -57,7 +87,7 @@ Xut.Application.Launch = function({
         database: paths.database
     }
 
-    let busyIcon = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
+    let busyIcon = iconHTML
 
     //disable cursor
     if (!cursor) {
@@ -65,13 +95,9 @@ Xut.Application.Launch = function({
         busyIcon = ''
     }
 
-    let $html = $(`
-    ${busyIcon}
-    <div class="xut-removelayer"></div>
-    <div class="xut-start-page xut-fullscreen"></div>
-    <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>`)
+    let $html = $(`${busyIcon}${commonHTML()}`)
 
-    $el.css('z-index', 99999)
+    $el.css('z-index', 9999999)
 
     window.DYNAMICCONFIGT.removeNode = function() {
         $html.remove()
@@ -87,26 +113,23 @@ Xut.Application.Launch = function({
 
 
 const createMain = function() {
-    let rootNode = $("#xxtppt-app-container")
-    let nodeHhtml = '<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow"></div>'
-    let tempHtml = `<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>
-                    <div class="xut-removelayer"></div>
-                    <div class="xut-start-page xut-fullscreen"></div>
-                    <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow"></div>`
 
-    let $html
-    if (rootNode.length) {
-        $html = $(tempHtml)
-    } else {
+    let rootNode = $("#xxtppt-app-container")
+    let tempHTML =`${iconHTML} ${commonHTML()}`
+
+    //create root node
+    if (!rootNode.length) {
         rootNode = $('body')
-        $html = $(
-            `<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow">${tempHtml}</div>`
-        )
+        tempHTML =
+            `<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow">
+                ${tempHTML}
+            </div>`
     }
     nextTick({
         container: rootNode,
-        content: $html
+        content: $(tempHTML)
     }, function() {
+        rootNode = null
         init()
     })
 }
@@ -114,8 +137,8 @@ const createMain = function() {
 setTimeout(() => {
     //External interface call
     if (!Xut.Application.supportLaunch) {
-        Xut.Application.Launch = null
-        $("#xxtppt-app-container").remove()
-        init()
+        Xut.Application.Launch = function() {}
+        removeOldNode()
+        createMain()
     }
 }, 0)

@@ -207,7 +207,7 @@ export class Dispatch {
              * @param  {[type]} masterFilter [description]
              * @return {[type]}              [description]
              */
-            const createMgr = function(masterFilter) {
+            const createPageBase = function(masterFilter) {
 
                 //跳转的时候，创建新页面可以自动样式信息
                 //优化设置，只是改变当前页面即可
@@ -236,7 +236,9 @@ export class Dispatch {
                 if (pageBase) {
                     //开始线程任务
                     //当为滑动模式,支持快速创建
-                    pageBase.startThreadTask(filpOverAction, () => callbackAction[action]())
+                    pageBase.startThreadTask(filpOverAction, function(){
+                        callbackAction[action]()
+                    })
 
                     //收集自定义样式的页面对象
                     if (userStyle) {
@@ -248,7 +250,7 @@ export class Dispatch {
 
             //母版层
             if (chapterData.pptMaster && self.masterMgr) {
-                createMgr.call(self.masterMgr, () => {
+                createPageBase.call(self.masterMgr, () => {
                     //母版是否创建等待通知
                     //母版是共享的所以不一定每次翻页都会创建
                     //如果需要创建,则叠加总数
@@ -258,7 +260,7 @@ export class Dispatch {
             }
 
             //页面层
-            createMgr.call(self.pageMgr);
+            createPageBase.call(self.pageMgr);
         })
     }
 
@@ -499,7 +501,7 @@ export class Dispatch {
      */
     jumpPage(data) {
 
-        Xut.View.ShowBusy();
+        Xut.View.ShowBusy()
 
         //如果是非线性,创建页面修改
         if (!this.options.multiplePages) {

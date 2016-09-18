@@ -46,11 +46,11 @@ module.exports = {
          * @type {Object}
          */
         test: {
-            launch: false,
+            launch: true,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: win ?
-                'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' : '/Users/mac/project/xcode/www/build'
+                'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' : '/Users/mac/project/xcode/www/lib'
         },
 
         /**

@@ -11,7 +11,7 @@ import { Mediator } from '../manager/index'
 import {
     pMainBar,
     pDeputyBar
-} from './barconf'
+} from './conf'
 
 import nextTick from '../nexttick'
 
@@ -186,7 +186,8 @@ export class SceneFactory {
         } else {
             //副场景
             conf = pDeputyBar(this.barInfo, pageTotal)
-                //创建工具栏
+
+            //创建工具栏
             if (conf) {
                 this.cToolbar = new DeputyBar({
                     id: scenarioId,
