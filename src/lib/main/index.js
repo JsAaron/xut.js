@@ -7,6 +7,7 @@ import loadScene from './scene'
 import {
     _set,
     _get,
+    toEmpty,
     parseJSON
 }
 from '../util/index'
@@ -44,15 +45,14 @@ const initMain = (novelData) => {
      * 所以pageFlip只有在左面的情况下
      */
     if (parameter = novelData.parameter) {
-        parameter = parseJSON(parameter);
-        flipMode = parameter.pageflip
-        if (flipMode !== undefined) {
-            _set({ 'flipMode': flipMode })
+        parameter = parseJSON(parameter)
+        //配置全局翻页模式
+        //flipMode可以为0
+        //兼容flipMode错误,强制转化成数字类型
+        if(parameter.pageflip !== undefined){
+            config.flipMode = toEmpty(parameter.pageflip)
+            _set({ 'flipMode': config.flipMode })
         }
-    } else {
-        //如果没有任何设置，取config配置
-        flipMode = config.flipMode
-        _set({ 'flipMode': flipMode })
     }
 
 
@@ -65,7 +65,6 @@ const initMain = (novelData) => {
         //加强判断
         if (novelId = getCache("novelId")) {
             return loadScene({
-                'flipMode': flipMode,
                 "novelId": novelId,
                 "pageIndex": pageIndex,
                 'history': _get('history')
@@ -77,8 +76,7 @@ const initMain = (novelData) => {
     //没有缓存
     loadScene({
         "novelId": novelData._id,
-        "pageIndex": 0,
-        'flipMode': flipMode
+        "pageIndex": 0
     })
 }
 

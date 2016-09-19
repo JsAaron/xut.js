@@ -14,7 +14,7 @@ import { parseJSON } from '../util/index'
  *
  *  2.  翻页模式
  *  pageMode：(如果用户没有选择任何处理，pageMode字段就为空)
- *   0禁止滑动
+ *   0 禁止滑动
  *   1 允许滑动无翻页按钮
  *   2 允许滑动带翻页按钮
  *

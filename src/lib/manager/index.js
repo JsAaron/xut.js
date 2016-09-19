@@ -32,7 +32,10 @@ const configMultiple = (options) => {
         //判断多页面情况
         //1 数据库定义
         //2 系统优化
-        options.multiplePages = !!(options.flipMode === 0 || options.pageMode)
+        options.multiplePages = 
+            options.flipMode 
+            ? options.flipMode 
+            : options.pageMode ? true : false
     }
 }
 

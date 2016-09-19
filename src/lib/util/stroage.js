@@ -1,12 +1,10 @@
-var dbId,
-    onlyId,
-    storage = window.localStorage;
-
+let dbId,onlyId
+   
 const TAG = 'aaron'
-
+const storage = window.localStorage
 
 //如果数据库为写入appid ,则创建
-var createAppid = function() {
+const createAppid = function() {
     //添加UUID
     var appId = 'aaron-' + new Date().getDate();
     //写入数据库
@@ -21,7 +19,7 @@ var createAppid = function() {
 }
 
 //过滤
-var filter = function(key) {
+const filter = function(key) {
     //添加头部标示
     if (onlyId) {
         return key + onlyId;
@@ -76,7 +74,7 @@ var set = function name(key, val) {
 
 var get = function(key) {
     key = filter(key);
-    return storage.getItem(key);
+    return storage.getItem(key) || undefined
 }
 
 /**

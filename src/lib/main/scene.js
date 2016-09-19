@@ -15,10 +15,10 @@ from '../util/index'
  */
 const setDataToStorage = (parameter) => {
     config.pageIndex = parameter.pageIndex;
-    config.novelId = parameter.novelId;
+    config.novelId   = parameter.novelId;
     _set({
-        "pageIndex": parameter.pageIndex,
-        "novelId": parameter.novelId
+        "pageIndex" : parameter.pageIndex,
+        "novelId"   : parameter.novelId
     });
 };
 
@@ -28,15 +28,6 @@ const setDataToStorage = (parameter) => {
  * @param {[type]} options [description]
  */
 const initDefaultValues = (options) => {
-    const flipMode = options.flipMode;
-
-    //配置全局翻页模式
-    //flipMode可以为0
-    //兼容flipMode错误,强制转化成数字类型
-    if (flipMode !== undefined) {
-        config.flipMode = toEmpty(flipMode);
-    }
-
     return {
         'novelId'   : toEmpty(options.novelId),
         'pageIndex' : toEmpty(options.pageIndex),
@@ -59,11 +50,10 @@ const checkInjectScript = () => {
 
 export default function(options) {
 
-    //获取默认参数
-    var parameter = initDefaultValues(options || {});
+    options = initDefaultValues(options || {});
 
     //设置缓存
-    setDataToStorage(parameter);
+    setDataToStorage(options)
 
     //应用脚本注入
     checkInjectScript();
@@ -82,10 +72,10 @@ export default function(options) {
 
     //加载新的场景
     Xut.View.LoadScenario({
-        'main': true, //主场景入口
-        'scenarioId': scenarioId,
-        'pageIndex': parameter.pageIndex,
-        'history': parameter.history
+        'main'       : true, //主场景入口
+        'scenarioId' : scenarioId,
+        'pageIndex'  : options.pageIndex,
+        'history'    : options.history
     });
 
 }
