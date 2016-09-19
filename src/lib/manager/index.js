@@ -18,32 +18,6 @@ import {
     defAccess
 } from '../util/index'
 
-/**
- * 部分配置文件
- */
-const pageConf = {
-    //数据库定义的翻页模式
-    //用来兼容客户端的制作模式
-    //妙妙学模式处理，多页面下翻页切换
-    //0 翻页滑动
-    //1 没有滑动过程,直接切换页面
-    'pageFlip': 0,
-
-    //翻页模式
-    //根据页码数决定,主要是优化一些代码
-    //true  是多页面模式,支持翻页滑动
-    //false 单页面模式,不能翻页，只能跳转
-    'pageMode': false,
-
-    //是否多场景加载
-    //单页场景 false
-    //多场景   true
-    'multiScenario': false,
-
-    //是否为连续页面
-    //通过pageMode的参数定义
-    'multiplePages': false
-}
 
 /**
  * 配置多页面参数
@@ -54,13 +28,11 @@ const configMultiple = (options) => {
     if (Xut.IBooks.Enabled) {
         options.multiplePages = false
     } else {
+
         //判断多页面情况
         //1 数据库定义
         //2 系统优化
-        options.multiplePages =
-            options.pageFlip ?
-            options.pageFlip :
-            options.pageMode ? true : false
+        options.multiplePages = !!(options.flipMode === 0 || options.pageMode)
     }
 }
 
@@ -109,11 +81,26 @@ class Mediator extends Observer {
 
         super()
 
-        const vm = this;
+        const vm = this
 
         //配置文件
-        const options = vm.options = _.extend(pageConf, parameter, {
-            pageFlip: Xut.config.pageFlip
+        const options = vm.options = _.extend({
+            //翻页模式
+            //根据页码数决定,主要是优化一些代码
+            //true  是多页面模式,支持翻页滑动
+            //false 单页面模式,不能翻页，只能跳转
+            'pageMode': false,
+
+            //是否多场景加载
+            //单页场景 false
+            //多场景   true
+            'multiScenario': false,
+
+            //是否为连续页面
+            //通过pageMode的参数定义
+            'multiplePages': false
+        }, parameter, {
+            flipMode: Xut.config.flipMode
         })
 
         //配置多页面参数
@@ -156,7 +143,7 @@ class Mediator extends Observer {
          * @return {[type]} [description]
          */
         $globalEvent.$watch('onMove', (data) => {
-             $dispatch.move(data)
+            $dispatch.move(data)
         });
 
 

@@ -423,7 +423,7 @@ export class Dispatch {
  
         //用户强制直接切换模式
         //禁止页面跟随滑动
-        if (this.options.pageFlip && action == 'flipMove') {
+        if (this.options.flipMode && action == 'flipMove') {
             return
         }
 

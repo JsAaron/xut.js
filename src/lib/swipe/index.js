@@ -51,7 +51,7 @@ export default class Swipe extends Observer {
     constructor({
         initIndex, //初页
         container,
-        pageFlip, //翻页模式
+        flipMode, //翻页模式
         pagetotal, //总数
         multiplePages, //多页面
         stopPropagation = false,
@@ -68,11 +68,12 @@ export default class Swipe extends Observer {
         this.pagetotal = pagetotal
         this.multiplePages = multiplePages
         this.element = container
+        this.flipMode = flipMode
 
         this._viewWidth = config.viewSize.width
 
         //翻页时间
-        this._pageTime = pageFlip ? DEFAULTTIME.min : DEFAULTTIME.mix
+        this._pageTime = flipMode ? DEFAULTTIME.min : DEFAULTTIME.mix
 
         //翻页速率
         this._speedRate = this._originalRate = this._pageTime / this._viewWidth
@@ -157,8 +158,8 @@ export default class Swipe extends Observer {
             end: this
         }
 
-        //pageFlip启动，没有滑动处理
-        if (this.pageFlip) {
+        //flipMode启动，没有滑动处理
+        if (this.flipMode) {
             callback.transitionend = this
         } else if (this.multiplePages) {
             callback.move = this

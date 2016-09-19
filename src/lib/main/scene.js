@@ -28,17 +28,19 @@ const setDataToStorage = (parameter) => {
  * @param {[type]} options [description]
  */
 const initDefaultValues = (options) => {
-    var pageFlip = options.pageFlip;
+    const flipMode = options.flipMode;
+
     //配置全局翻页模式
-    //pageflip可以为0
-    //兼容pageFlip错误,强制转化成数字类型
-    if (pageFlip !== undefined) {
-        config.pageFlip = toEmpty(pageFlip);
+    //flipMode可以为0
+    //兼容flipMode错误,强制转化成数字类型
+    if (flipMode !== undefined) {
+        config.flipMode = toEmpty(flipMode);
     }
+
     return {
-        'novelId': toEmpty(options.novelId),
-        'pageIndex': toEmpty(options.pageIndex),
-        'history': options.history
+        'novelId'   : toEmpty(options.novelId),
+        'pageIndex' : toEmpty(options.pageIndex),
+        'history'   : options.history
     }
 };
 

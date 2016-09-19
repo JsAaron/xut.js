@@ -57,7 +57,7 @@ export default class Flow {
             initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
             extraGap: gapWidth,
             container: $container[0],
-            pageFlip: 0,
+            flipMode: 0,
             multiplePages: 1,
             stopPropagation: true,
             pagetotal: pagesCount

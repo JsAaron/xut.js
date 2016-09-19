@@ -57,8 +57,8 @@ const toTranslate3d = (context, distance, speed, element) => {
     distance = config.virtualMode ? distance / 2 : distance;
     if (element = element || context.element || context.$contentProcess) {
         element.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
-        if (config.pageFlip) {
-            //修正pageFlip切换页面的处理
+        if (config.flipMode) {
+            //修正flipMode切换页面的处理
             //没有翻页效果
             if (distance === 0) {
                 var cur = Xut.sceneController.containerObj('current')

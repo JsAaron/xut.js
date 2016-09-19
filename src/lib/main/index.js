@@ -22,7 +22,7 @@ const initMain = (novelData) => {
     let novelId
     let parameter
     let pageIndex = getCache('pageIndex')
-    let pageFlip  = getCache('pageFlip') || 0
+    let flipMode = getCache('flipMode')
 
     /**
      * IBOOS模式
@@ -44,16 +44,15 @@ const initMain = (novelData) => {
      * 所以pageFlip只有在左面的情况下
      */
     if (parameter = novelData.parameter) {
-        //拿出pageflip的值
         parameter = parseJSON(parameter);
-        //获取pageflip的值得
-        //pageflip用来标
-        //不能翻页
-        //直接切换模式
-        pageFlip = parameter.pageflip
-        if (pageFlip !== undefined) {
-            _set({'pageFlip': pageFlip})
+        flipMode = parameter.pageflip
+        if (flipMode !== undefined) {
+            _set({ 'flipMode': flipMode })
         }
+    } else {
+        //如果没有任何设置，取config配置
+        flipMode = config.flipMode
+        _set({ 'flipMode': flipMode })
     }
 
 
@@ -66,10 +65,10 @@ const initMain = (novelData) => {
         //加强判断
         if (novelId = getCache("novelId")) {
             return loadScene({
-                'pageFlip'  : pageFlip,
-                "novelId"   : novelId,
-                "pageIndex" : pageIndex,
-                'history'   : _get('history')
+                'flipMode': flipMode,
+                "novelId": novelId,
+                "pageIndex": pageIndex,
+                'history': _get('history')
             });
         }
     }
@@ -77,9 +76,9 @@ const initMain = (novelData) => {
     //第一次加载
     //没有缓存
     loadScene({
-        "novelId"   : novelData._id,
-        "pageIndex" : 0,
-        'pageFlip'  : pageFlip
+        "novelId": novelData._id,
+        "pageIndex": 0,
+        'flipMode': flipMode
     })
 }
 

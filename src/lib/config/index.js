@@ -225,12 +225,32 @@ _.extend(config, {
     visualMode: 1,
 
     /**
-     * 2016.7.26
-     * 读酷增加强制插件模式
-     * [isPlugin description]
+     * 画轴模式
+     * 在不同分辨率下，按照正比缩放拼接
+     * 在一个可视区中，可以看到3个li拼接后的效果
+     * [scrollPaintingMode description]
      * @type {Boolean}
      */
-    isPlugin: window.DUKUCONFIG && plat.isIOS,
+    scrollPaintingMode: false,
+
+    /**
+     * 虚拟模式
+     * 采用word排版，如果是横屏的布局放到竖版的手机上
+     * 就需要分割排版布局
+     * @type {Boolean}
+     */
+    virtualMode: false,
+
+    /**
+     * 全局翻页模式
+     * 数据库定义的翻页模式
+     * 用来兼容客户端的制作模式
+     * 妙妙学模式处理，多页面下翻页切换
+     * 0 通过滑动翻页
+     * 1 (锁掉滑动),直接快速切换页面(通过左右按键快速切换页面)
+     * @type {Number}
+     */
+    flipMode: 0,
 
     /**
      * 调试模式
@@ -239,6 +259,21 @@ _.extend(config, {
      * @type {Boolean}
      */
     debugMode: false,
+
+    /**
+     * 独立canvas模式处理
+     * 为了测试方便
+     * 可以直接切换到dom模式
+     * @type {Boolean}
+     */
+    onlyDomMode: false,
+
+    /**
+     *canvas的处理模式
+     *合并模式：merge
+     *单个模式：single
+     */
+    canvasProcessMode: 'merge',
 
     /**
      * 直接通过数据库的历史记录定位到指定的页面
@@ -263,19 +298,19 @@ _.extend(config, {
     onlineModeUrl: 'lib/data/database.php',
 
     /**
+     * 2016.7.26
+     * 读酷增加强制插件模式
+     * [isPlugin description]
+     * @type {Boolean}
+     */
+    isPlugin: window.DUKUCONFIG && plat.isIOS,
+
+
+    /**
      * 数据库名
      * @type {[type]}
      */
     dbName: window.xxtmagzinedbname || 'magazine',
-
-    /**
-     * 全局翻页模式
-     * 0 滑动翻页
-     * 1 直接换
-     * [pageFlip description]
-     * @type {Number}
-     */
-    pageFlip: 0,
 
     /**
      * 存储模式
@@ -285,50 +320,16 @@ _.extend(config, {
     storageMode: 0,
 
     /**
-     * 虚拟模式
-     * 采用word排版，如果是横屏的布局放到竖版的手机上
-     * 就需要分割排版布局
-     * @type {Boolean}
-     */
-    virtualMode: false,
-
-    /**
-     * 画轴模式
-     * 在不同分辨率下，按照正比缩放拼接
-     * 在一个可视区中，可以看到3个li拼接后的效果
-     * [scrollPaintingMode description]
-     * @type {Boolean}
-     */
-    scrollPaintingMode: false,
-
-    /**
-     * 独立canvas模式处理
-     * 为了测试方便
-     * 可以直接切换到dom模式
-     * @type {Boolean}
-     */
-    onlyDomMode: false,
-
-    /**
-     *canvas的处理模式
-     *合并模式：merge
-     *单个模式：single
-     */
-    canvasProcessMode: 'merge',
-
-    /**
      * 应用路径唯一标示
      * @type {[type]}
      */
     appId: null,
-
 
     /**
      * 资源路径
      * @type {[type]}
      */
     pathAddress: null,
-
 
     /**
      * 视频文件路径

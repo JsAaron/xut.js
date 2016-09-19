@@ -159,7 +159,7 @@ export default function api(Swipe) {
      * @param {[type]} element [description]
      */
     Swipe.prototype.setAnimComplete = function(element) {
-        this.distributed(element[0])
+        this._distributed(element[0])
     }
 
 
