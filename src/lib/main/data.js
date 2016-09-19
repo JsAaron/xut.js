@@ -93,7 +93,7 @@ const initDefaults = (SettData) => {
     //2015.2.26
     //启动画轴模式
     //防止是布尔0成立
-    if (data.scrollPaintingMode && data.scrollPaintingMode == 1) {
+    if (config.visualMode === 1 || data.scrollPaintingMode && data.scrollPaintingMode == 1) {
         config.scrollPaintingMode = true;
     }
 

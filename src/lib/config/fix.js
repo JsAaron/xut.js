@@ -62,6 +62,10 @@ const getProportion = function(config, pptWidth, pptHeight) {
     let offsetTop = 0
     let offsetLeft = 0
 
+    //数据ppt排版设计
+    //是否为ppt制作横版
+    let pptHorizontal = pptWidth > pptHeight ? 1 : 0;
+
     /**
      * config.visualMode处理
      * ppt的设计排版
@@ -69,28 +73,36 @@ const getProportion = function(config, pptWidth, pptHeight) {
      * 根据数据库判断横杂志的竖屏 1 横板 0 竖版
      */
     if (pptWidth && pptHeight) {
-        //全屏
+
+        //宽高正比缩放
         if (config.visualMode === 1) {
-
-        } else if (config.visualMode === 2) {
-            //宽度100% ，缩放height，上下居中
-
-        } else {
-            //数据ppt排版设计
-            const dbHorizontal = pptWidth > pptHeight ? 1 : 0;
             //如果ppt设计的排版与当前的播放不符
-            if (dbHorizontal != screenHorizontal) {
-                if (dbHorizontal === 1) {
+            if (pptHorizontal != screenHorizontal) {
+                if (pptHorizontal === 1) {
                     heightProp = widthProp
                 } else {
                     widthProp = heightProp
                 }
             }
         }
+
+        //宽度100% ，缩放height，上下居中
+        if (config.visualMode === 2) {
+            //缩放高度
+            heightProp = widthProp
+        }
+
+        //高度100&，缩放宽度，左右居中
+        if (config.visualMode === 3) {
+
+        }
+
     }
+
 
     /**
      * 画轴模式
+     * 正比缩放,可以看到左右拼接
      */
     if (config.scrollPaintingMode) {
         //    Dw       screenWidth - 2 * left
@@ -130,15 +142,16 @@ const getProportion = function(config, pptWidth, pptHeight) {
         widthProp = heightProp = _prop;
     }
 
+
     return {
-        width      : widthProp,
-        height     : heightProp,
-        left       : widthProp,
-        top        : heightProp,
-        offsetTop  : offsetTop,
-        offsetLeft : offsetLeft,
-        pptWidth   : pptWidth,
-        pptHeight  : pptHeight
+        width: widthProp,
+        height: heightProp,
+        left: widthProp,
+        top: heightProp,
+        offsetTop: offsetTop,
+        offsetLeft: offsetLeft,
+        pptWidth: pptWidth,
+        pptHeight: pptHeight
     }
 }
 
@@ -168,10 +181,10 @@ export function fixProportion(config, pptWidth, pptHeight) {
         return (width, height, left, top) => {
             const screenSize = config.screenSize
 
-            width  = width || screenSize.width
+            width = width || screenSize.width
             height = height || screenSize.height
-            left   = left || 0
-            top    = top || 0
+            left = left || 0
+            top = top || 0
 
             //如果数据库有ppt尺寸设置
             //按照ppt尺寸处理设置缩放比
