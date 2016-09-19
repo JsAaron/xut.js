@@ -1,21 +1,21 @@
 /**
  * 配置文件
- * @param  {[type]} require [description]
- * @param  {[type]} exports [description]
- * @param  {[type]} module  [description]
  * @return {[type]}         [description]
  */
 import nativeConf from './native'
 import iframeConf from './iframe'
-import { getWidgetPath, getSourcePath } from './default'
 
 import {
-    _screen,
-    _layer,
-    _scale,
-    _fixProportion
+    getWidgetPath,
+    getSourcePath
+} from './default'
+
+import {
+    getSize,
+    getLayerMode,
+    fixProportion
 }
-from './judge'
+from './fix'
 
 
 const plat = Xut.plat
@@ -31,22 +31,12 @@ let proportion
 
 
 /**
- * 设置模板分解符
- * @type {Object}
- */
-_.templateSettings = {
-    interpolate: /\{\{(.+?)\}\}/g
-}
-
-
-/**
  * 层级关系
  * @return {[type]} [description]
  */
 Xut.zIndexlevel = () => {
     return ++config.zIndexlevel
 }
-
 
 
 //通过新学堂加载
@@ -222,8 +212,24 @@ Xut.log = function(info, name) {
  */
 _.extend(config, {
 
-    //2016.7.26
-    //读酷增加强制插件模式
+    /**
+     * 页面可视模式
+     * 2016.9.19
+     * 3种分辨率显示模式:
+     * 默认全屏1
+     * 1 永远100%屏幕尺寸自适应
+     * 2 宽度100% 自适应高度，居中
+     * 3 高度100% 自适应宽度，居中,溢出隐藏
+     * @type {Number}
+     */
+    visualMode: 1,
+
+    /**
+     * 2016.7.26
+     * 读酷增加强制插件模式
+     * [isPlugin description]
+     * @type {Boolean}
+     */
     isPlugin: window.DUKUCONFIG && plat.isIOS,
 
     /**
@@ -418,22 +424,13 @@ Xut.config = config
 export { config }
 
 
-export function resetDataAPI() {
-    //设备尺寸
-    config.screenSize = _screen();
-    //可视尺寸
-    config.viewSize = _screen()
-    layoutMode = config.layoutMode = _layer(config.screenSize)
-    proportion = config.proportion = _scale(config)
-}
-
 /**
  * 初始化资源路径
  * 配置图片路径地址
  * @return {[type]} [description]
  */
-export function fixResourcesPath() {
-    //资源缓存关闭
+export function initPathAddress() {
+    //设置资源缓存关闭
     isCacheVideoPath = false
     isCacheAudioPath = false
     isCacheSvgPath = false
@@ -443,21 +440,47 @@ export function fixResourcesPath() {
 
 
 /**
- * 修正缩放比
+ * 重写默认设置
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
  * @type {[type]}
  */
-export function fixProportion(pptWidth, pptHeight) {
-
-    const proportion = _fixProportion(config, pptWidth, pptHeight)
-    const calculate = proportion.calculateContainer()
+export function setProportion(pptWidth, pptHeight) {
+    /**
+     * 缩放比
+     * @type {[type]}
+     */
+    proportion = config.proportion = fixProportion(config, pptWidth, pptHeight)
 
     /**
      * 可视区域尺寸
      * @type {Object}
      */
+    const calculate = proportion.calculateContainer()
     config.viewSize = {
         width: config.virtualMode ? calculate.width / 2 : calculate.width,
         height: calculate.height
     }
 }
+
+
+/**
+ * 默认设置
+ * viewSize,screenSize,layoutMode,proportion
+ * @return {[type]} [description]
+ */
+export function initConfig() {
+    /**
+     * 获取分辨率
+     * @type {[type]}
+     */
+    config.screenSize = getSize()
+    layoutMode = config.layoutMode = getLayerMode(config.screenSize)
+
+    /**
+     * 设置缩放比
+     */
+    setProportion()
+}
+
+
+

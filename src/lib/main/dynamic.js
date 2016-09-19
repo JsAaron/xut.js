@@ -9,9 +9,9 @@ import {
 
 import {
     config,
-    resetDataAPI,
-    fixProportion,
-    fixResourcesPath
+    initConfig,
+    setProportion,
+    initPathAddress
 } from '../config/index'
 
 import initData from './data'
@@ -46,50 +46,55 @@ const loadStyle = (callback) => {
 
 
 /**
- * 修正尺寸
- * 修正实际分辨率
- * @return {[type]} [description]
- */
-const fixedSize = (novelData) => {
-    if (novelData) {
-        if (novelData.pptWidth || novelData.pptHeight) {
-            fixProportion(novelData.pptWidth, novelData.pptHeight);
-        }
-    }
-}
-
-
-/**
  * 动态代码变动区域
  */
 export default function dynamic(callback) {
     //导入数据缓存
     importResults(() => {
 
-        //初始化数据库设置
+        /**
+         * 初始配置
+         */
+        initConfig()
+
+        /**
+         * root字体大小
+         */
+        setRootfont()
+
+        /**
+         * 初始化数据库设置
+         */
         initData(novelData => {
 
-            //重置数据API接口
-            resetDataAPI()
-
-            //跟字体大小
-            setRootfont()
-
-            //创建忙碌光标
+            /**
+             * 创建忙碌光标
+             */
             if (!Xut.IBooks.Enabled) {
                 createCursor()
             }
 
-            //修复地址配置
-            fixResourcesPath()
+            /**
+             * 初始资源地址
+             */
+            initPathAddress()
 
-            // ppt尺寸修正
-            fixedSize(novelData)
+            /**
+             * ppt尺寸修正
+             */
+            if (novelData && novelData.pptWidth && novelData.pptHeight) {
+                setProportion(novelData.pptWidth, novelData.pptHeight)
+            }
 
-            //flows排版
-            //嵌入index
-            initFlows();
-            //iframe要要Xut.config
+            /**
+             * 初始flows排版
+             * 嵌入index
+             */
+            initFlows()
+
+            /**
+             * iframe要要Xut.config
+             */
             loadStyle(() => callback(novelData))
         })
     })

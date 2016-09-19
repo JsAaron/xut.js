@@ -89,7 +89,7 @@ const initDefaults = (SettData) => {
     //广告Id
     //2014.9.2
     Xut.Presentation.AdsId = data.adsId;
-
+// data.scrollPaintingMode = 1
     //2015.2.26
     //启动画轴模式
     //防止是布尔0成立

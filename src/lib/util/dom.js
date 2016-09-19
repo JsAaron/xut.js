@@ -4,6 +4,7 @@
  * @return {[type]}           [description]
  */
 export function parseJSON(itemArray) {
+    if(!itemArray) return
     var anminJson;
     try {
         anminJson = JSON.parse(itemArray);

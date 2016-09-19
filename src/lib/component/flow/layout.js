@@ -53,7 +53,7 @@ const resolveCount = ($content) => {
     for (let i = 0; i < theChildren.length; i++) {
         paraHeight += $(theChildren[i]).height()
     }
-    return Math.floor(paraHeight / config.viewSize.height)
+    return Math.ceil(paraHeight / config.viewSize.height)
 }
 
 
@@ -111,6 +111,9 @@ export function getCounts(seasonId, chapterId) {
 export function initFlows() {
 
     const $container = $("#xut-stream-flow")
+
+    if(!$container.length) return
+
     const $seasons = $container.children()
     const vWidth = config.viewSize.width
     const vHeight = config.viewSize.height

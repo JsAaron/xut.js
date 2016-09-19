@@ -119,7 +119,7 @@ export function Adapter(para) {
 
     //解析数据
     data.inputPara = parsePara(data)
- 
+
     if (!data.inputPara) {
         data.inputPara = {}
     }

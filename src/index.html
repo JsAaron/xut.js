@@ -53,10 +53,11 @@
 
 <body>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow"></div>
+
     <script type="text/javascript">
     window.onload = function() {
-        const appid = 1
-        Xut.Application.supportLaunch = false
+        Xut.Application.supportLaunch = true
+        const appid = 5
         Xut.Application.Launch({
             el: '#xxtppt-app-container',
             paths: {

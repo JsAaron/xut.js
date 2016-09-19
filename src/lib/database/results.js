@@ -23,6 +23,8 @@ export function importResults(callback) {
         result = window.SQLResult
         window.SQLResult = null
         callback()
+    } else {
+        callback()
     }
 }
 

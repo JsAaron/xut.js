@@ -151,4 +151,4 @@ setTimeout(() => {
         removeOldNode()
         createMain()
     }
-}, 0)
+}, 100)
