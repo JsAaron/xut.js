@@ -49,6 +49,11 @@ export default function dynamic(callback) {
     //导入数据缓存
     importResults(() => {
 
+        //提供全局配置文件
+        if (Xut.Application.setConfig !== undefined) {
+            Xut.extend(config, Xut.Application.setConfig)
+        }
+
         /**
          * 初始配置
          */

@@ -7,7 +7,6 @@ const readFile = (path) => {
         // flag: 'r+',
         encoding: 'utf8'
     })
-console.log(111111,data)
     return data
 }
 

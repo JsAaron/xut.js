@@ -103,8 +103,8 @@ const getProportion = function(config, pptWidth, pptHeight) {
                     //横板PPT竖版显示(宽度100%。上下空白，显示居中，整体缩短)
                     heightProp = widthProp
                 } else {
-                    //竖版ppt在横版显示(宽度100%，高度溢出，只显示中间布局，整体拉高)
-                    heightProp = widthProp
+                    //竖版ppt在横版显示(高度100%，缩放宽度，左右留边)
+                    widthProp = heightProp
                 }
             }
         }
@@ -127,7 +127,7 @@ const getProportion = function(config, pptWidth, pptHeight) {
                     //横板PPT竖版显示(高度100%。宽度溢出，只显示中间部分，整体拉长)
                     widthProp = heightProp
                 } else {
-                    //横版ppt在横版显示(高度100%，显示居中，左右空白，整体缩短)
+                    //竖版ppt在横版显示(高度100%，显示居中，左右空白，整体缩短)
                     widthProp = heightProp
                 }
             }
