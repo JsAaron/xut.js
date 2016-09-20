@@ -11,6 +11,12 @@ const COLUMNTAP = Xut.style.columnGap
  */
 let flowCounts = Object.create(null)
 
+/**
+ * 高度marginTop - marginBottom处理了
+ * 不一定等于设备高度
+ * @type {Number}
+ */
+let newViewHight = 0
 
 /**
  * create dom...
@@ -33,7 +39,6 @@ const createStr = (chapterId, data, vWidth, vHeight, margin) => {
     const containerTop = marginTop
     const columnGap = `${COLUMNTAP}:${marginLeft}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
-
     const container = `
             <section data-flow="true">
                 <div data-role="margin" style="width:${containerWidth}px;height:${containerHeight}px;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
@@ -42,6 +47,8 @@ const createStr = (chapterId, data, vWidth, vHeight, margin) => {
                     </div>
                 </div>
             </section>`
+
+    newViewHight = containerHeight
 
     return container
 }
@@ -53,7 +60,7 @@ const resolveCount = ($content) => {
     for (let i = 0; i < theChildren.length; i++) {
         paraHeight += $(theChildren[i]).height()
     }
-    return Math.ceil(paraHeight / config.viewSize.height)
+    return Math.ceil(paraHeight / newViewHight)
 }
 
 
@@ -111,12 +118,13 @@ export function getCounts(seasonId, chapterId) {
 export function initFlows() {
 
     const $container = $("#xut-stream-flow")
-
-    if(!$container.length) return
-
+    if (!$container.length) return
     const $seasons = $container.children()
+    if (!$seasons.length) return
+
     const vWidth = config.viewSize.width
-    const vHeight = config.viewSize.height
+    const vHeight = newViewHight = config.viewSize.height
+
 
     $seasons.each((index, node) => {
         const tag = node.id
@@ -136,6 +144,7 @@ export function initFlows() {
         const tag = node.id
         const seasonsId = tag.match(/\d/)[0]
         const $chapters = $seasons.children()
+
         $chapters.each(function(index, node) {
             const tag = node.id
             const chpaterId = tag.match(/\d/)[0]

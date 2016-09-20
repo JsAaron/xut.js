@@ -1,6 +1,6 @@
 import Sprite from '../../plugin/sprite'
 import { parseJSON } from '../../../util/dom'
-
+import { config } from '../../../config/index'
 
 let spiritObjs = {}
 
@@ -14,9 +14,9 @@ let spiritObjs = {}
  * @param  {[type]} contents  [description]
  * @return {[type]}           [description]
  */
-let getData = (inputPara, contents) => {
+const getData = (inputPara, contents) => {
     let option;
-    let resourcePath = "content/widget/gallery/" + inputPara.id + "/";
+    let resourcePath = config.jsWidgetPath() + "gallery/" + inputPara.id + "/";
     let xhr = new XMLHttpRequest();
     xhr.open('GET', resourcePath + 'app.json', false);
     xhr.send(null);
@@ -29,7 +29,7 @@ let getData = (inputPara, contents) => {
 }
 
 
-let moveContent = (contentPrefix, id, parentId) => {
+const moveContent = (contentPrefix, id, parentId) => {
     let obj = $("#" + contentPrefix + id);
     let parentObj = $("#" + contentPrefix + parentId)
     let $parent = $("#spirit_parent_" + parentId)
@@ -40,7 +40,7 @@ let moveContent = (contentPrefix, id, parentId) => {
 }
 
 
-let getId = (inputPara, contentPrefix) => {
+const getId = (inputPara, contentPrefix) => {
     let id = '';
     if (_.isObject(inputPara)) {
         id = contentPrefix + inputPara.framId;
@@ -70,7 +70,7 @@ export function updateAction(id, params) {
 
 export default function(inputPara, contents) {
     let option = getData(inputPara, contents)
-    let ResourcePath = "content/widget/gallery/" + inputPara.id + "/";
+    let ResourcePath = config.jsWidgetPath() + "gallery/" + inputPara.id + "/";
     let contentPrefix = inputPara.contentPrefix
     let ids = []
     let options = {};

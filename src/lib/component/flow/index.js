@@ -51,6 +51,11 @@ export default class Flow {
         const View = Xut.View
         const initIndex = this.initIndex
 
+
+        /**
+         * 分栏整体控制
+         * @type {[type]}
+         */
         const swipe = this.swipe = new Swipe({
             borderBounce: true,
             linear: true,
@@ -93,7 +98,7 @@ export default class Flow {
 
             switch (direction) {
                 case 'next':
-                    moveDistance = moveDistance - gapWidth + lastDistance 
+                    moveDistance = moveDistance - gapWidth + lastDistance
                     break
                 case 'prev':
                     moveDistance = moveDistance + gapWidth + lastDistance

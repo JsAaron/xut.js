@@ -125,6 +125,7 @@ export default class Swipe extends Observer {
         if (this.options.linear) {
             this._initDistance = -this._hindex * (this._viewWidth + this._extraGap)
             this.element.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
+            this.element.style.width = this._viewWidth  * this.pagetotal + 'px'
         }
 
     }

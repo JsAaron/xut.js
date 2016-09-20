@@ -8,7 +8,7 @@
  */
 
 import { imgReady } from '../../util/loader'
-
+import { config } from '../../config/index'
 
 export default class {
 
@@ -30,7 +30,7 @@ export default class {
             this.animationType = false;
             this.contentId = options.contentId;
             this.obj = $(options.ele);
-            this.resourcePath = "content/gallery/" + options.resourcePath + "/";
+            this.resourcePath = config.pathAddress + options.resourcePath + "/";
         }
 
         //是否有蒙版图
@@ -152,7 +152,7 @@ export default class {
         let obj = this.obj;
         let framId;
         let resourcePath = this.resourcePath
-        let ret = ""
+        let html = ''
 
         if (this.animationType) {
             framId = this.data.framId
@@ -162,23 +162,27 @@ export default class {
         }
 
         if (this.isMask) {
-            let filename = this._getFilename(this.originalImageList[0].name);
-            ret += String.Foramt(
-                "<div" +
-                " id='spImg_{0}'" +
-                " style='width:100%;height:100%;position:absolute;background: url({1}.jpg) no-repeat;background-size: 100% 100%;-webkit-mask: url({2}.png) no-repeat;-webkit-mask-size: 100% 100%;'></div>",
-                framId, resourcePath + filename, resourcePath + filename)
-            this.sprObj = $(ret)
+            const filename = this._getFilename(this.originalImageList[0].name)
+            const maskUrl = resourcePath + filename
+            html =
+                `<div id="spImg_${framId}"
+                      style="width:100%;height:100%;position:absolute;
+                             background: url(${maskUrl}.jpg) no-repeat;
+                             background-size: 100% 100%;
+                             -webkit-mask: url(${maskUrl}.png) no-repeat;
+                             -webkit-mask-size: 100% 100%;'>
+                </div>`
+            this.sprObj = $(String.styleFormat(html))
             obj.append(this.sprObj);
         } else {
-            ret += String.format(
-                "<img" +
-                " id='spImg_{0}'" +
-                " src='{1}'" +
-                " style='width:100%;height:100%;position:absolute;' />",
-                framId, resourcePath + this.originalImageList[0].name)
-            this.sprObj = $(ret)
-            obj.html(this.sprObj);
+            const src = resourcePath + this.originalImageList[0].name
+            html =
+                `<img id="spImg_${framId}"
+                      src="${src}"
+                      style="width:100%;height:100%;position:absolute;"/>`
+
+            this.sprObj = $(String.styleFormat(html))
+            obj.html(this.sprObj)
         }
     }
 
@@ -251,11 +255,10 @@ export default class {
      * @return {[type]} [description]
      */
     _changePosition() {
-        let imageList, curFPS, x, y
-        imageList = this.originalImageList
-        curFPS = imageList[this.curFPS];
-        x = curFPS.X - this.startPoint.x;
-        y = curFPS.Y - this.startPoint.y;
+        let imageList = this.originalImageList
+        let curFPS = imageList[this.curFPS];
+        let x = curFPS.X - this.startPoint.x;
+        let y = curFPS.Y - this.startPoint.y;
         this.obj.css({
             left: this.startLeft + x * this.xRote,
             top: this.startTop + y * this.yRote
@@ -283,7 +286,7 @@ export default class {
         }, 1000 / this.FPS);
     }
 
- 
+
     /**
      * 设置动画运行状态
      * look 0  循环

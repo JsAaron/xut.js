@@ -50,33 +50,32 @@ const getProportion = function(config, pptWidth, pptHeight) {
     // 根据设备判断设备的横竖屏 1 横板 0 竖版
     let screenHorizontal = screenWidth > screenHeight ? 1 : 0
 
+    //数据ppt排版设计
+    //是否为ppt制作横版
+    let pptHorizontal = pptWidth > pptHeight ? 1 : 0
+
     //默认ppt尺寸
     let designWidth = pptWidth ? pptWidth : screenHorizontal ? 1024 : 768
     let designHeight = pptHeight ? pptHeight : screenHorizontal ? 768 : 1024
-
-    //当前屏幕的尺寸与数据库设计的尺寸，比例
-    let widthProp = screenWidth / designWidth
-    let heightProp = screenHeight / designHeight
 
     //布局的偏移量，可能是采用了画轴模式，一个可视区可以容纳3个页面
     let offsetTop = 0
     let offsetLeft = 0
 
-    //数据ppt排版设计
-    //是否为ppt制作横版
-    let pptHorizontal = pptWidth > pptHeight ? 1 : 0;
+    //当前屏幕的尺寸与数据库设计的尺寸，比例
+    //默认config.visualMode === 0
+    let widthProp = screenWidth / designWidth
+    let heightProp = screenHeight / designHeight
+
 
     /**
      * config.visualMode处理
-     * ppt的设计排版
-     * config.visualMode，全屏设置跳过
-     * 根据数据库判断横杂志的竖屏 1 横板 0 竖版
      */
-    if (pptWidth && pptHeight) {
+    if (pptWidth && pptHeight && config.visualMode) {
 
         //宽高正比缩放
-        if (config.visualMode === 1) {
-            //如果ppt设计的排版与当前的播放不符
+        if(config.visualMode === 1){
+           //如果ppt设计的排版与当前的播放不符
             if (pptHorizontal != screenHorizontal) {
                 if (pptHorizontal === 1) {
                     heightProp = widthProp
@@ -86,17 +85,53 @@ const getProportion = function(config, pptWidth, pptHeight) {
             }
         }
 
-        //宽度100% ，缩放height，上下居中
+        //宽度100% ，自适应缩放高度
         if (config.visualMode === 2) {
-            //缩放高度
-            heightProp = widthProp
+            //ppt与屏幕设计显示一致
+            if (pptHorizontal === screenHorizontal) {
+                if (pptHorizontal) {
+                    //横板PPT横板显示(宽度100%，高度溢出，只显示中间布局，整体拉高)
+                    heightProp = widthProp
+                } else {
+                    //竖版ppt竖版显示(宽度100%。上下空白，显示居中，整体缩短)
+                    heightProp = widthProp
+                }
+            }
+            //ppt制作方向与显示方向相反
+            else {
+                if (pptHorizontal) {
+                    //横板PPT竖版显示(宽度100%。上下空白，显示居中，整体缩短)
+                    heightProp = widthProp
+                } else {
+                    //竖版ppt在横版显示(宽度100%，高度溢出，只显示中间布局，整体拉高)
+                    heightProp = widthProp
+                }
+            }
         }
 
-        //高度100&，缩放宽度，左右居中
+        //高度100% ，自适应宽度缩放
         if (config.visualMode === 3) {
-
+            //ppt与屏幕设计显示一致
+            if (pptHorizontal === screenHorizontal) {
+                if (pptHorizontal) {
+                    //横板PPT横板显示(高度100%，显示居中，左右空白，整体缩短)
+                    widthProp = heightProp
+                } else {
+                    //竖版ppt竖版显示(高度100%。宽度溢出，只显示中间部分，整体拉长)
+                    widthProp = heightProp
+                }
+            }
+            //ppt制作方向与显示方向相反
+            else {
+                if (pptHorizontal) {
+                    //横板PPT竖版显示(高度100%。宽度溢出，只显示中间部分，整体拉长)
+                    widthProp = heightProp
+                } else {
+                    //横版ppt在横版显示(高度100%，显示居中，左右空白，整体缩短)
+                    widthProp = heightProp
+                }
+            }
         }
-
     }
 
 

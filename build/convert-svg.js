@@ -3,10 +3,12 @@ const _ = require("underscore")
 const stats = []
 
 const readFile = (path) => {
-    return fs.readFileSync(path, {
-        flag: 'r+',
+    let data =  fs.readFileSync(path, {
+        // flag: 'r+',
         encoding: 'utf8'
     })
+console.log(111111,data)
+    return data
 }
 
 const writeFile = (filename, content) => {

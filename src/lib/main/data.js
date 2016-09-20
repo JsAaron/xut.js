@@ -94,7 +94,8 @@ const initDefaults = (SettData) => {
     //启动画轴模式
     //防止是布尔0成立
     if (config.visualMode === 1 || data.scrollPaintingMode && data.scrollPaintingMode == 1) {
-        config.scrollPaintingMode = true;
+        config.scrollPaintingMode = true
+        config.visualMode === 1
     }
 
     //假如启用了画轴模式，看看是不是竖版的情况，需要切半模版virtualMode

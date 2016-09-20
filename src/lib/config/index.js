@@ -17,8 +17,8 @@ import {
 }
 from './set'
 
-import improtMode from './mode'
-import improtData from './data'
+import improtMode from './mode-type'
+import improtData from './data-type'
 
 const plat = Xut.plat
 const isIphone = Xut.plat.isIphone

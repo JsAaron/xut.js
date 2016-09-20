@@ -1,5 +1,5 @@
 const build = require('./build')
-const startserver = require('./server')
+const startserver = require('./test-server')
 const ora = require('ora')
 
 const spinner = ora('Begin to pack , Please wait for\n')

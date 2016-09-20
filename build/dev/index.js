@@ -12,9 +12,9 @@ const cp = require('child_process');
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
-const portoccupied = require('../occupied')
-const convertJs = require('../convertjs')
-const serialdata = require('./serialdata')
+const killOccupied = require('../kill-occupied')
+const convertSVG = require('../convert-svg')
+const serialData = require('./serial-data')
 const spinner = ora('【Begin to pack , Please wait for】\n')
 // spinner.start()
 
@@ -26,11 +26,8 @@ const conf = _.extend(config.dev.conf, {
     rollup: config.dev.conf.tarDir + 'rollup.js'
 })
 
-
-convertJs(conf.srcDir)
-
-serialdata(conf, spinner)
-
+convertSVG(conf.srcDir)
+serialData(conf, spinner)
 
 fsextra.removeSync(conf.assetsRoot)
 fsextra.mkdirSync(conf.assetsRoot);
@@ -120,7 +117,7 @@ watch(conf.assetsRoot + '/app.js', () => {
             preChildRun.kill()
             preChildRun = null
         }
-        let child = cp.spawn('node', ['build/dev/test.js', ['test=' + config.dev.test.dir]]);
+        let child = cp.spawn('node', ['build/dev/test-pack.js', ['test=' + config.dev.test.dir]]);
         child.stdout.on('data', (data) => console.log('\n' + data))
         child.stderr.on('data', (data) => console.log('fail out：\n' + data));
         child.on('close', (code) => console.log('complete：' + code));
@@ -129,7 +126,7 @@ watch(conf.assetsRoot + '/app.js', () => {
 })
 
 
-portoccupied(port, () => {
+killOccupied(port, () => {
     app.listen(port, (err) => {
         if (err) {
             console.log(err)

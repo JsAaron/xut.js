@@ -24,7 +24,7 @@ const loadStyle = (callback) => {
 
     const svgsheet = window.DYNAMICCONFIGT ?
         window.DYNAMICCONFIGT.resource + '/gallery/svgsheet.css' :
-        'content/gallery/svgsheet.css'
+        config.pathAddress + 'svgsheet.css'
 
     //加载横版或者竖版css
     //nodeBuildMode 是node build下的test.html文件

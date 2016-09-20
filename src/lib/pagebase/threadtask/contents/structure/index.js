@@ -7,13 +7,19 @@
  * @return {[type]} [description]
  */
 
-import { parseJSON, reviseSize, readFile, getResources } from '../../../../util/index'
+import { config } from '../../../../config/index'
 import { parseCanvas } from './parsetype'
 import { createContainer } from './container'
 import { createDom } from './dom'
 import { createCanvas } from './canvas'
 import { parseContentDas } from './parsecontent'
 
+import {
+    parseJSON,
+    reviseSize,
+    readFile,
+    getResources
+} from '../../../../util/index'
 
 /**
  * 解析序列中需要的数据
@@ -57,7 +63,7 @@ let analysisPath = (wrapObj, conData) => {
 
     imgContent = conData.md5
     isGif = /.gif$/i.test(imgContent) //是gif格式
-    originalPathImg = Xut.config.pathAddress + imgContent //原始地址
+    originalPathImg = config.pathAddress + imgContent //原始地址
 
     if (isGif) {
         pathImg = Xut.createRandomImg(originalPathImg) //处理gif图片缓存+随机数
@@ -67,7 +73,7 @@ let analysisPath = (wrapObj, conData) => {
 
     if (conData.category === "AutoCompSprite") {
         try {
-            resourcePath = "content/gallery/" + imgContent + "/app.json";
+            resourcePath = config.pathAddress+ imgContent + "/app.json";
             results = getResources(resourcePath)
             var spiritList = results.spiritList[0]
             var actListName = spiritList.params.actList
@@ -280,7 +286,7 @@ export function structure(callback, data, context) {
 
             //如果启用了virtualMode模式
             //对象需要分离创建
-            if (Xut.config.virtualMode) {
+            if (config.virtualMode) {
                 virtualCreate(sizeResults, wrapObj, content, contentId);
             } else {
                 //正常模式下创建
@@ -330,7 +336,7 @@ export function structure(callback, data, context) {
     function virtualCreate(sizeResults, wrapObj, content, contentId) {
         // 创建分布左边的对象
         if (wrapObj.virtualOffset === 'left') {
-            if (sizeResults.scaleLeft < Xut.config.screenSize.width) {
+            if (sizeResults.scaleLeft < config.screenSize.width) {
                 startCreate(wrapObj, content, contentId)
             } else {
                 clearContent(contentId)
@@ -338,7 +344,7 @@ export function structure(callback, data, context) {
         }
         // 创建分布右边的对象
         if (wrapObj.virtualOffset === 'right') {
-            if (sizeResults.scaleLeft > Xut.config.screenSize.width) {
+            if (sizeResults.scaleLeft > config.screenSize.width) {
                 startCreate(wrapObj, content, contentId)
             } else {
                 clearContent(contentId)

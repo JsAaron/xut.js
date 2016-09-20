@@ -4,7 +4,7 @@
   "description": "A es6-magazine project",
   "scripts": {
     "dev": "node build/dev/index.js",
-    "build": "node build/build/index.js run",
+    "build": "node build/build/index.js",
     "copy": "node build/copy/index.js",
     "remote": "node build/remote/index.js",
     "lint": "eslint dist/xxtppt.dev.js",

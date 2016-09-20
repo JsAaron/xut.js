@@ -328,10 +328,10 @@ video {
     z-index: 2;
     transform-style: preserve-3d;
     backface-visibility: hidden;
-    perspective: 1000;
+    /*perspective: 1000;冲突字体样子变形*/
     -webkit-transform-style: preserve-3d;
     -webkit-backface-visibility: hidden;
-    -webkit-perspective: 1000;
+    /*-webkit-perspective: 1000;*/
     background-size: 100% 100%;
 }
 
