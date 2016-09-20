@@ -2,10 +2,7 @@ import { createCursor } from '../util/cursor'
 import { initFlows } from '../component/flow/layout'
 import { importResults } from '../database/results'
 
-import {
-    loader,
-    setRootfont
-} from '../util/index'
+import { loader } from '../util/index'
 
 import {
     config,
@@ -56,11 +53,6 @@ export default function dynamic(callback) {
          * 初始配置
          */
         initConfig()
-
-        /**
-         * root字体大小
-         */
-        setRootfont()
 
         /**
          * 初始化数据库设置

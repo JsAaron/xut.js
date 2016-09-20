@@ -117,45 +117,6 @@ export function revisesize(results) {
 }
 
 
-/**
- * 全局字体修复
- * @return {[type]} [description]
- */
-export function setRootfont() {
-    var rootSize = 16;
-    switch (window.innerWidth + window.innerHeight) {
-        case 3000: //1920+1080
-            //samsumg galaxy s4
-            rootSize = 32;
-            break;
-        case 2000: //1280+720
-            //HD Android phone
-            rootSize = 26;
-            break;
-        case 2048: //1280+768
-            rootSize = Xut.plat.isIpad ? 16 : 26;
-            break;
-        case 1624: //1024+600
-            rootSize = 18;
-            break;
-        case 888: //568+320
-            rootSize = 12;
-            break;
-        case 800: //480+320
-            rootSize = 14;
-            break;
-        case 560: //320+240
-            rootSize = 12;
-            break;
-        default:
-            //其他分辨率 取默认值
-            break;
-    }
-    16 != rootSize && $("html").css("font-size", rootSize + "px");
-}
-
-
-
 export function _extend(object, config) {
     for (var i in config) {
         if (i) {
