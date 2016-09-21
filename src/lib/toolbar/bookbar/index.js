@@ -1,6 +1,6 @@
 import BookMark from './mark'
 import { parseJSON } from '../../util/index'
-import { bindTap } from '../../tap'
+import { bindEvent } from '../../util/event'
 import Bar from '../base/bar'
 /**
  * 阅读模式工具栏
@@ -63,7 +63,7 @@ export default class BookBar extends Bar {
         }
 
         //监听事件
-        bindTap(this.container[0], {
+        bindEvent(this.container[0], {
             end: this
         })
     }

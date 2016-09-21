@@ -6,8 +6,9 @@ import { getCounts } from '../../../component/flow/layout'
  */
 export default function(base, successCallback) {
     const chapterDas = base.chapterDas
-    //如果chpater页存在flow数据
-    if (getCounts(chapterDas.seasonId, base.chapterId)) {
+
+    //只有页面类型支持flow && chpater页存在flow数据
+    if (base.pageType === "page" && getCounts(chapterDas.seasonId, base.chapterId)) {
         base._flows.register(new Flow(base, successCallback))
     } else {
         successCallback()

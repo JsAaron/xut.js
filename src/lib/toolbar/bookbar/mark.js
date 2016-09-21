@@ -4,7 +4,7 @@
  * @param options object
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
-import { bindTap } from '../../tap'
+import { bindEvent } from '../../util/event'
 
 import {
     _set,
@@ -69,7 +69,7 @@ export default class Mark {
         BOOKCACHE = this.getHistory();
 
         //邦定用户事件
-        bindTap(dom, {
+        bindEvent(dom, {
             end: this
         })
     }

@@ -33,7 +33,6 @@ const dydTransform = (distance) => {
  * @return {[type]} [description]
  */
 const initOptions = () => {
-    if (initOptions.set) return
     let calculateContainer = config.proportion.calculateContainer()
     offsetLeft = (-1 * calculateContainer.width)
     offsetRight = calculateContainer.width
@@ -41,7 +40,20 @@ const initOptions = () => {
     prevEffect = xxtTrans(offsetLeft)
     currEffect = xxtTrans(offsetCut)
     nextEffect = xxtTrans(offsetRight)
-    initOptions.set = true
+}
+
+
+/**
+ * 新的可视区页面
+ * @param  {[type]}  distance [description]
+ * @return {Boolean}          [description]
+ */
+const newViewPage = function(distance) {
+    //calculateDistance中修改了对应的distance
+    //这里给swipe捕获
+    if (distance === 0 || Math.abs(distance) === Math.abs(config.overflowSize.left)) { //目标页面传递属性
+        return true
+    }
 }
 
 
@@ -60,8 +72,8 @@ const toTranslate3d = (context, distance, speed, element) => {
         if (config.flipMode) {
             //修正flipMode切换页面的处理
             //没有翻页效果
-            if (distance === 0) {
-                var cur = Xut.sceneController.containerObj('current')
+            if (newViewPage(distance)) {
+                const cur = Xut.sceneController.containerObj('current')
                 cur.vm.$globalEvent.setAnimComplete(element);
             }
         } else {
@@ -109,7 +121,7 @@ const flipRebound = (context, distance, speed, element) => {
 const flipOver = (context, distance, speed, element) => {
     //过滤多个动画回调，保证指向始终是当前页面
     if (context.pageType === 'page') {
-        if (distance === 0) { //目标页面传递属性
+        if (newViewPage(distance)) { //目标页面传递属性
             context.element.attr('data-view', true)
         }
     }
@@ -141,10 +153,11 @@ export function fix(element, translate3d) {
 
 /**
  * 创建起始坐标
+ * isFlowType 如果是flow类型
  * @return {[type]}
  */
-export function createTransform(currPageIndex, createPageIndex) {
-    initOptions();
+export function createTransform(currPageIndex, createPageIndex, isFlowType) {
+    initOptions()
     var translate3d, direction, offset;
     if (createPageIndex < currPageIndex) {
         translate3d = prevEffect;
@@ -159,5 +172,5 @@ export function createTransform(currPageIndex, createPageIndex) {
         offset = offsetCut;
         direction = 'original';
     }
-    return [translate3d, direction, offset, dydTransform];
+    return [translate3d, direction, offset, dydTransform]
 }

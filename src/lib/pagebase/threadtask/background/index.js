@@ -1,6 +1,6 @@
 import { readFile } from '../../../util/option'
 import createBackground from './layout'
-import nextTick from '../../../nexttick'
+import nextTick from '../../../util/nexttick'
 
 
 /**

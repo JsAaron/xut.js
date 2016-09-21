@@ -15,7 +15,7 @@
 
 import Contents from './content'
 import Tasks from './task'
-import { destroyEvents } from './event/event'
+import { destroyContentEvent } from './event/event'
 
 import extraMixin from './extra'
 import textBoxMixin from './textbox/index'
@@ -498,7 +498,7 @@ export class Activity {
 
         //销毁绑定事件
         if (this.eventData.eventContext) {
-            destroyEvents(this.eventData);
+            destroyContentEvent(this.eventData);
             this.eventData.eventContext = null;
         }
 

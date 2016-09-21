@@ -4,8 +4,8 @@
  * @return {[type]}       [description]
  */
 
-import { bindEvents } from '../event/event'
-import { bindTap, offTap } from '../../../tap'
+import { bindContentEvent } from '../event/event'
+import { bindEvent, offEvent } from '../../../util/event'
 
 import {
     _set,
@@ -86,7 +86,7 @@ function HtmlBox(contentId, element) {
     }
 
     //绑定点击事件
-    bindEvents({
+    bindContentEvent({
         'eventRun': function() {
             Xut.View.HideToolbar();
             self.init(contentId, element)
@@ -224,14 +224,14 @@ HtmlBox.prototype = {
             process[className] && process[className]();
         }
 
-        bindTap(this.eventContext, {
+        bindEvent(this.eventContext, {
             start: this.start
         })
     },
 
     //移除盒子
     removeBox: function() {
-        offTap(this.eventContext, {
+        offEvent(this.eventContext, {
             start: this.start
         })
         this.$str && this.$str.remove();

@@ -1,7 +1,7 @@
 //dom事件
 import {
     conversionEventType,
-    bindEvents as bindContentEvents
+    bindContentEvent
 }
 from './event'
 
@@ -238,7 +238,7 @@ export default function(activitProto) {
             eventData.isBind = true;
 
 
-            bindContentEvents({
+            bindContentEvent({
                 'eventDrop': eventDrop,
                 'eventRun': eventRun,
                 'eventHandler': eventHandler,

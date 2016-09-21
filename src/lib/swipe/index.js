@@ -3,10 +3,10 @@ import { config } from '../config/index'
 import api from './api'
 
 import {
-    bindTap,
-    offTap,
+    bindEvent,
+    offEvent,
     handle
-} from '../tap'
+} from '../util/event'
 
 import {
     initPointer,
@@ -167,7 +167,7 @@ export default class Swipe extends Observer {
             callback.transitionend = this
         }
 
-        bindTap(this.element, callback)
+        bindEvent(this.element, callback)
     }
 
 
@@ -646,7 +646,7 @@ export default class Swipe extends Observer {
      * @return {[type]} [description]
      */
     _evtDestroy() {
-        offTap(this.element, {
+        offEvent(this.element, {
             start: this,
             move: this,
             end: this,

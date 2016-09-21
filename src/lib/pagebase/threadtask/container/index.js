@@ -7,7 +7,9 @@
  *      3 创建失败
  */
 import { config } from '../../../config/index'
-import nextTick from '../../../nexttick'
+import { getCounts } from '../../../component/flow/layout'
+
+import nextTick from '../../../util/nexttick'
 
 const TANSFROM = Xut.style.transform
 
@@ -18,12 +20,14 @@ const createli = function({
     containerBackground
 } = {}) {
 
-    let offsetLeft = 0
-    let proportion = config.proportion
-    let calculate = proportion.calculateContainer()
-    let sWidth = calculate.width
-    let pageType = data.pageType
-    let virtualNode = ''
+    let offsetLeft   = 0
+    let virtualNode  = ''
+    let width = '100%'
+    const proportion = config.proportion
+    const calculate  = proportion.calculateContainer()
+    const sWidth     = calculate.width
+    const pageType   = data.pageType
+    const baseData   = data.baseData
 
     if (config.virtualMode) {
         if (data.virtualOffset === 'right') {
@@ -32,15 +36,25 @@ const createli = function({
         virtualNode = `<div style="width:${sWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
     }
 
+    //流式布局页面强制全屏
+    //而不是可视区域，因为有页面模式选择
+    //存在溢出的情况，所以改为全屏
+    const isFlowsPage = getCounts(baseData.seasonId, baseData._id)
+    if(isFlowsPage){
+        width = config.screenSize.width + 'px'
+    }
+
     return String.styleFormat(
         `<li id="${data.prefix}"
-            class="xut-flip"
+            data-id="${data.baseData._id}"
             data-map="${data.pid}"
             data-pageType="${pageType}"
             data-container="true"
-            style="overflow:hidden;
-                ${TANSFROM}:${transform};
-                ${containerBackground}${customStyle}">
+            class="xut-flip"
+            style="width:${width};
+                   ${TANSFROM}:${transform};
+                   ${containerBackground}${customStyle};
+                   overflow:hidden;">
             ${virtualNode}
         </li>`
     )

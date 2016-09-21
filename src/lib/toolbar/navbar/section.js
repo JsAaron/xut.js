@@ -1,5 +1,4 @@
 import { config } from '../../config/index'
-import { bindTap } from '../../tap'
 
 /**
  * 下拉章节列表

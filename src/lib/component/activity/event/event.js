@@ -163,29 +163,6 @@ function matchEvent(data) {
 }
 
 
-/**
- * 注册自定义事件
- * this还是引用的当前实例的上下文
- *
- *   'element'   : 事件对象
- *   'target'    : 目标对象
- *   'parameter' : 拖动参数
- *   'evtName'   : 事件名,
- *
- *   callbackHook 回调函数 ,处理具体的事情
- */
-export function bindEvents(data) {
-    //是否支持翻页
-    var supportSwipe = data.supportSwipe = isfilter(data.eventName);
-    //检测是否移除元素的默认行为,因为元素都具有翻页的特性
-    if (data.domMode) {
-        setDefaultBehavior(supportSwipe, data.eventContext);
-    }
-    //执行事件绑定
-    matchEvent(data);
-}
-
-
 //数据库预定义14个事件接口
 //提供给content文件
 //用于过滤数据库字段指定的行为
@@ -205,9 +182,32 @@ export function defaultBehavior(element) {
 
 
 /**
+ * 注册自定义事件
+ * this还是引用的当前实例的上下文
+ *
+ *   'element'   : 事件对象
+ *   'target'    : 目标对象
+ *   'parameter' : 拖动参数
+ *   'evtName'   : 事件名,
+ *
+ *   callbackHook 回调函数 ,处理具体的事情
+ */
+export function bindContentEvent(data) {
+    //是否支持翻页
+    var supportSwipe = data.supportSwipe = isfilter(data.eventName);
+    //检测是否移除元素的默认行为,因为元素都具有翻页的特性
+    if (data.domMode) {
+        setDefaultBehavior(supportSwipe, data.eventContext);
+    }
+    //执行事件绑定
+    matchEvent(data);
+}
+
+
+/**
  * 销毁对象事件
  */
-export function destroyEvents(eventData, eventName) {
+export function destroyContentEvent(eventData, eventName) {
     if (eventData.eventReference) {
         eventData.eventReference.off(eventName || eventData.eventName, eventData.eventHandler)
         eventData.eventReference = null;

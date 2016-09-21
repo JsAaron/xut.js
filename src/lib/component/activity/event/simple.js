@@ -1,4 +1,7 @@
-import { bindTap, offTap } from '../../../tap'
+import {
+    bindEvent,
+    offEvent
+} from '../../../util/event'
 
 /**
  * ie10下面mouse事件怪异
@@ -85,7 +88,7 @@ export function simpleEvent(eventContext, eventHandle, supportSwipe) {
         eventContext.addEventListener('click', end, false);
     } else {
 
-        bindTap(eventContext, {
+        bindEvent(eventContext, {
             start: start,
             move: move,
             end: end
@@ -98,7 +101,7 @@ export function simpleEvent(eventContext, eventHandle, supportSwipe) {
                 if (isIE10) {
                     eventContext.removeEventListener('click', end, false);
                 } else {
-                    offTap(eventContext, {
+                    offEvent(eventContext, {
                         start: start,
                         move: move,
                         end: end

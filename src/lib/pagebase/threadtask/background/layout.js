@@ -55,16 +55,16 @@ const getOffset = function(pageSide) {
  * @return {[type]}            [description]
  */
 export default function createBackground(svgContent, data) {
+
     var imageLayer,
         maskLayer,
         imageLayerData = data.imageLayer, //图片层
-        imageMaskData = data.imageMask, //蒙版层
-        backImageData = data.backImage, //真实图片层
-        backMaskData = data.backMask, //真实蒙版层
-        masterData = data.master, //母板
-        backText = data.md5, //背景文字
-        pptMaster = data.pptMaster; //母板PPTID
-
+        imageMaskData  = data.imageMask, //蒙版层
+        backImageData  = data.backImage, //真实图片层
+        backMaskData   = data.backMask, //真实蒙版层
+        masterData     = data.master, //母板
+        backText       = data.md5, //背景文字
+        pptMaster      = data.pptMaster; //母板PPTID
 
     /**
      * 未分层结构
@@ -214,6 +214,7 @@ export default function createBackground(svgContent, data) {
     }
 
 
+
     /**
      * 组层背景图开始
      * @type {String}
@@ -225,7 +226,6 @@ export default function createBackground(svgContent, data) {
             ${backImageHTML}
             ${backTextHTML}
         </div>`
-
 
     return String.styleFormat(HTML)
 }

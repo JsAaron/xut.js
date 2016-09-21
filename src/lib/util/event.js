@@ -130,7 +130,7 @@ export function handle(callbacks, context, event) {
  * })
  * @return {[type]} [description]
  */
-export function bindTap(context, callbacks) {
+export function bindEvent(context, callbacks) {
     exec(_bind, context, callbacks)
 }
 
@@ -141,6 +141,6 @@ export function bindTap(context, callbacks) {
  * @param  {[type]} opts    [description]
  * @return {[type]}         [description]
  */
-export function offTap(context, callbacks) {
+export function offEvent(context, callbacks) {
     exec(_off, context, callbacks)
 }

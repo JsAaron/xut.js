@@ -3,17 +3,20 @@ import { config } from '../config/index'
 import MainBar from '../toolbar/sysbar'
 import DeputyBar from '../toolbar/fnbar'
 import BookBar from '../toolbar/bookbar/index'
-
-import { home, scene } from './layout'
 import { sceneController } from './controller'
 import { Mediator } from '../manager/index'
 
 import {
+    home,
+    scene
+} from './layout'
+
+import {
     pMainBar,
     pDeputyBar
-} from './conf'
+} from './bar-config'
 
-import nextTick from '../nexttick'
+import nextTick from '../util/nexttick'
 
 
 /**

@@ -4,7 +4,7 @@
  * Take the opposite judgment
  * @return {[type]} [description]
  */
-let allowNext = () => {
+const allowNext = () => {
     if (window.MMXCONFIG) {
         return () => {
             return !(window.MMXCONFIG.back || Xut.Application.backstage)

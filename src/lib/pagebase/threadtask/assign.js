@@ -22,7 +22,7 @@ const parseMode = function(pageData, base) {
         try {
             parameter = JSON.parse(parameter)
             if (parameter && parameter.contentMode && parameter.contentMode == 1) {
-                //非强制dom模式
+                //非强制dom模式
                 if (!Xut.config.onlyDomMode) {
                     //启动dom模式
                     base.canvasRelated.enable = true;

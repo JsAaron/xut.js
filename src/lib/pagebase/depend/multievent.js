@@ -3,8 +3,8 @@
  */
 import {
     conversionEventType,
-    bindEvents,
-    destroyEvents
+    bindContentEvent,
+    destroyContentEvent
 }
 from '../../component/activity/event/event'
 
@@ -77,13 +77,13 @@ const combineEvents = function(pagebase, eventRelated) {
 
             //销毁方法
             scope.destroy = function() {
-                destroyEvents(scope, eventName);
+                destroyContentEvent(scope, eventName);
                 scope.registers = null
                 scope.runEffects = null;
             }
 
             //事件绑定
-            bindEvents({
+            bindContentEvent({
                 'eventRun': function() {
                     scope.runEffects();
                 },

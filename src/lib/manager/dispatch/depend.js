@@ -1,4 +1,5 @@
 import { errorTable } from '../../database/cache'
+import { config } from '../../config/index'
 import { query } from '../query'
 
 /**
@@ -46,14 +47,20 @@ export function conversionPageOpts(pageIndex, visiblePid) {
 /**
  * 计算翻页距离
  */
-export function calculateDistance(action, distance, direction) {
+export function flipDistance(action, distance, direction, flowOffset) {
+    let flowWidth
+    let flowLeft
+    if (flowOffset) {
+        flowWidth = flowOffset.width
+        flowLeft = flowOffset.left
+    }
+
     let leftOffset
     let currOffset
     let rightOffset
 
-    //保持缩放比,计算缩放比情况下的转化
-    const calculateContainer = Xut.config.proportion.calculateContainer();
-    const containerWidth = calculateContainer.width;
+    //滑动区域宽度
+    const containerWidth = flowWidth || config.viewSize.width
 
     switch (direction) {
         //前翻
@@ -91,14 +98,14 @@ export function calculateDistance(action, distance, direction) {
                     break;
                 case 'flipOver':
                     leftOffset = -2 * containerWidth;
-                    rightOffset = distance;
+                    rightOffset = flowLeft ? flowLeft : distance;
                     currOffset = -containerWidth;
                     break;
             }
             break;
     }
 
-    return [leftOffset, currOffset, rightOffset];
+    return [leftOffset, currOffset, rightOffset]
 }
 
 /**

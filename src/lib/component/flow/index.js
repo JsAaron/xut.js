@@ -4,7 +4,7 @@ import { getCounts } from './layout'
 import Swipe from '../../swipe/index'
 import render from './render'
 
-import { calculateDistance } from '../../manager/dispatch/depend'
+import { flipDistance } from '../../manager/dispatch/depend'
 
 /**
  * 2017.9.7
@@ -29,7 +29,7 @@ export default class Flow {
             dataNode,
             chapterId,
             callback($container) {
-                self._init($container, getCounts(seasonId,chapterId))
+                self._init($container, getCounts(seasonId, chapterId))
                 callback()
             }
         })
@@ -46,11 +46,14 @@ export default class Flow {
 
         const MIN = 0
         const MAX = pagesCount - 1
-        const viewWidth = config.viewSize.width
-        const gapWidth = 0
+        const screenWidth = config.screenSize.width
         const View = Xut.View
         const initIndex = this.initIndex
 
+        const flowOffset = {
+            width : config.screenSize.width
+        }
+        const overflowLeft = config.overflowSize.left
 
         /**
          * 分栏整体控制
@@ -60,7 +63,6 @@ export default class Flow {
             borderBounce: true,
             linear: true,
             initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
-            extraGap: gapWidth,
             container: $container[0],
             flipMode: 0,
             multiplePages: 1,
@@ -93,23 +95,23 @@ export default class Flow {
             direction
         } = {}) {
 
-            let currentDist = calculateDistance(action, distance, direction)[1]
+            let currentDist = flipDistance(action, distance, direction, flowOffset)[1]
             moveDistance = currentDist
 
             switch (direction) {
                 case 'next':
-                    moveDistance = moveDistance - gapWidth + lastDistance
+                    moveDistance = moveDistance  + lastDistance
                     break
                 case 'prev':
-                    moveDistance = moveDistance + gapWidth + lastDistance
+                    moveDistance = moveDistance  + lastDistance
                     break
             }
 
             //反弹
             if (action === 'flipRebound') {
                 moveDistance = direction === 'next' ?
-                    (-viewWidth * this._hindex - this._hindex * gapWidth) :
-                    -(viewWidth * this._hindex + this._hindex * gapWidth)
+                    (-screenWidth * this._hindex - this._hindex ) :
+                    -(screenWidth * this._hindex + this._hindex )
             }
 
             //首尾连接主页
@@ -118,7 +120,8 @@ export default class Flow {
                     View.GotoPrevSlide()
                     this._unlock()
                 } else {
-                    View.MovePage(moveDistance, speed, this.direction, action)
+                    //前边界反弹，要加上溢出值
+                    View.MovePage(moveDistance + overflowLeft, speed, this.direction, action)
                 }
             } else if (this._hindex === MAX && this.direction === 'next') {
                 if (action === 'flipOver') {
@@ -136,8 +139,8 @@ export default class Flow {
             'flipOver' === action && setTimeout(() => {
                 let extra = direction === 'next' ? 1 : (-1)
                 let index = initIndex + pageIndex + extra
-                // Xut.View.pageUpdate(index)
-                // Xut.View.setPointer(index)
+                    // Xut.View.pageUpdate(index)
+                    // Xut.View.setPointer(index)
             })
 
         })

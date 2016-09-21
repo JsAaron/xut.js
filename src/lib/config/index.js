@@ -345,6 +345,19 @@ export function setProportion(pptWidth, pptHeight) {
         width: config.virtualMode ? calculate.width / 2 : calculate.width,
         height: calculate.height
     }
+
+    /**
+     * 溢出尺寸
+     * @type {Object}
+     */
+    const overflowWidth = config.viewSize.width - config.screenSize.width
+    const overflowHeight = config.viewSize.height - config.screenSize.height
+    config.overflowSize = {
+        width: config.viewSize.width - config.screenSize.width,
+        height: config.viewSize.height - config.screenSize.height,
+        left: overflowWidth / 2,
+        top: overflowHeight / 2
+    }
 }
 
 

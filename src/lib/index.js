@@ -6,10 +6,10 @@ import { VideoManager } from './component/video/manager'
 import { fixAudio } from './component/audio/fix'
 import { disable } from './util/cursor'
 //nextTick
-import nextTick from './nexttick'
+import nextTick from './util/nexttick'
 //A predictable state container for apps.
 // import store from './redex/store'
-import init from './main/index'
+import init from './init/index'
 
 
 Xut.Version = 836

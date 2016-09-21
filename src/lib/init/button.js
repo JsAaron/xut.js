@@ -1,4 +1,7 @@
-import { getPlugVideoState, closePlugVideo } from './video'
+import {
+    getPlugVideoState,
+    closePlugVideo
+} from './video'
 
 /**
  * 退出加锁,防止过快点击

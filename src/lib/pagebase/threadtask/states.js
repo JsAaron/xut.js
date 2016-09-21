@@ -1,9 +1,16 @@
 import { createTransform } from '../../swipe/translation'
+import { getCounts } from '../../component/flow/layout'
 
 const noop = function() {}
 
 export default function initstate(instance) {
- 
+
+    let isFlowType = false
+    if (instance.pageType === 'page' && getCounts(instance.scenarioId, instance.chapterId)) {
+        isFlowType = true
+    }
+
+
     return {
         /**
          * 主线任务等待
@@ -61,7 +68,7 @@ export default function initstate(instance) {
          * 2 创建浮动对象
          * "translate3d(0px, 0, 0)", "original"
          */
-        initTransformParameter: createTransform(instance.visiblePid, instance.pid),
+        initTransformParameter: createTransform(instance.visiblePid, instance.pid, isFlowType),
 
         /**
          * 预创建

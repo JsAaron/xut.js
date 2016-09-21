@@ -5,7 +5,7 @@ import {
 } from '../../global-stop'
 
 
-import nextTick from '../../nexttick'
+import nextTick from '../../util/nexttick'
 
 
 

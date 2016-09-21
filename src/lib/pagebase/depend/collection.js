@@ -21,7 +21,15 @@ Collection.prototype = {
     },
 
     get() {
-        return this.list;
+        return this.list
+    },
+
+    /**
+     * 是否存在
+     * @return {Boolean} [description]
+     */
+    isExist: function() {
+        return this.list.length
     },
 
     /**

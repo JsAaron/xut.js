@@ -8,6 +8,7 @@
  *                                                                    *
  **********************************************************************/
 import { _set } from '../../util/stroage'
+import { config } from '../../config/index'
 import PageMgr from '../page'
 import MasterMgr from '../master'
 import SwitchPage from './switch'
@@ -17,7 +18,7 @@ import { closeNavbar } from '../../toolbar/navbar/index'
 import {
     offsetPage,
     conversionPageOpts,
-    calculateDistance,
+    flipDistance,
     initPointer,
     conversionCid,
     conversionPids,
@@ -84,7 +85,7 @@ export class Dispatch {
             return;
         }
 
-        let virtualMode = Xut.config.virtualMode,
+        let virtualMode = config.virtualMode,
             self = this,
             multiplePages = this.options.multiplePages, //是否线性
             total = createPage.length,
@@ -236,7 +237,7 @@ export class Dispatch {
                 if (pageBase) {
                     //开始线程任务
                     //当为滑动模式,支持快速创建
-                    pageBase.startThreadTask(filpOverAction, function(){
+                    pageBase.startThreadTask(filpOverAction, function() {
                         callbackAction[action]()
                     })
 
@@ -311,7 +312,7 @@ export class Dispatch {
                 //      && 多场景应用
                 //
                 //==========================================
-                if (Xut.config.recordHistory && !options.isInApp && options.multiScenario) {
+                if (config.recordHistory && !options.isInApp && options.multiScenario) {
                     var history;
                     if (history = sceneController.sequence(scenarioId, currIndex)) {
                         _set("history", history);
@@ -402,6 +403,21 @@ export class Dispatch {
 
     }
 
+    /**
+     * 2016.9.21
+     * 是否为流式布局页面
+     * 如果是就需要全屏处理
+     * @return {Boolean} [description]
+     */
+    _isFlowPage(pageIndex) {
+        const pageObj = this.pageMgr.abstractGetPageObj(pageIndex)
+        if (pageObj && pageObj._flows.isExist()) {
+            return {
+                width: config.screenSize.width,
+                left: config.overflowSize.left
+            }
+        }
+    }
 
     /**
      * 滑动处理
@@ -420,38 +436,50 @@ export class Dispatch {
     } = {}) {
 
         let currIndex = pageIndex
- 
+
+        //流式布局的参数
+        let flowOffet
+
         //用户强制直接切换模式
         //禁止页面跟随滑动
         if (this.options.flipMode && action == 'flipMove') {
             return
         }
 
+        //更新页码
+        if (action === 'flipOver') {
+            setTimeout(() => {
+                this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
+            }, 0)
+
+            //否为flow页面
+            //提供给flows处理，用来改变翻页的距离，因为缩放溢出问题
+            //2016.9.22
+            flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
+        }
+
+        //反弹
+        // if(action === 'flipRebound'){
+        //     flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
+        // }
+
+
         //移动的距离
-        const moveDistance = calculateDistance(action, distance, direction)
+        const moveDistance = flipDistance(action, distance, direction, flowOffet)
 
         //视觉差页面滑动
-        let currObj = this.pageMgr.abstractGetPageObj(currIndex)
-
-        // if(!currObj) return
-        let chapterData = currObj.chapterDas
-        let nodes
-        if(chapterData && chapterData.nodes){
-            nodes = chapterData.nodes
-        }
+        const currObj = this.pageMgr.abstractGetPageObj(currIndex)
+        const chapterData = currObj.chapterDas
+        const nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined
 
         //通知page模块
         this.pageMgr.move(leftIndex, currIndex, rightIndex, direction, speed, action, moveDistance);
 
         //通知视觉差模块
-        this.masterContext(function(){
+        this.masterContext(function() {
             this.move(leftIndex, currIndex, rightIndex, direction, moveDistance, action, speed, nodes);
         })
 
-        //更新页码标示
-        'flipOver' === action && setTimeout(function() {
-            this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
-        }.bind(this), 0);
     }
 
 

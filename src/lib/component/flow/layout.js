@@ -21,23 +21,28 @@ let newViewHight = 0
 /**
  * create dom...
  */
-const createStr = (chapterId, data, vWidth, vHeight, margin) => {
+const createStr = (chapterId, data, viewWidth, viewHeight, margin) => {
 
-    const percentageTop = parseInt(margin[0])
-    const percentageLeft = parseInt(margin[1])
-    const percentageBottom = parseInt(margin[2])
-    const percentageRight = parseInt(margin[3])
+    const percentageTop = Number(margin[0])
+    const percentageLeft = Number(margin[1])
+    const percentageBottom = Number(margin[2])
+    const percentageRight = Number(margin[3])
 
-    const marginTop = vHeight / 100 * percentageTop
-    const marginLeft = vWidth / 100 * percentageLeft
-    const marginBottom = vHeight / 100 * percentageBottom
-    const marginRight = vWidth / 100 * percentageRight
+    //减去的宽度值
+    const negativeWidth = viewWidth / 100 * (percentageLeft + percentageRight)
+    //减去的高度值
+    const negativeHeight = viewHeight / 100 * (percentageTop + percentageBottom)
 
-    const containerWidth = vWidth - marginLeft
-    const containerHeight = vHeight - marginTop - marginBottom
-    const containerLeft = marginLeft / 2
-    const containerTop = marginTop
-    const columnGap = `${COLUMNTAP}:${marginLeft}px`
+    //容器宽度 = 宽度 - 左右距离比值
+    const containerWidth = viewWidth - negativeWidth
+    //容器高度值 = 宽度 - 上下距离比值
+    const containerHeight = viewHeight - negativeHeight
+    //容器左边偏移量
+    const containerLeft = negativeWidth / 2
+    //容器上偏移量
+    const containerTop = viewHeight/100 * percentageTop
+
+    const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
     const container = `
             <section data-flow="true">
@@ -122,9 +127,8 @@ export function initFlows() {
     const $seasons = $container.children()
     if (!$seasons.length) return
 
-    const vWidth = config.viewSize.width
-    const vHeight = newViewHight = config.viewSize.height
-
+    const vWidth = config.screenSize.width
+    const vHeight = newViewHight = config.screenSize.height
 
     $seasons.each((index, node) => {
         const tag = node.id

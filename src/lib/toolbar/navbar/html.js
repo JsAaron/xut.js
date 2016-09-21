@@ -1,7 +1,7 @@
 
 import { navMenu } from '../../scenario/layout'
 
-import nextTick from '../../nexttick'
+import nextTick from '../../util/nexttick'
 
 
 /**

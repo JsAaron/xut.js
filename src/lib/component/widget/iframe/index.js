@@ -1,6 +1,6 @@
 import { clearVideo } from '../../../component/video/manager'
 import { config } from '../../../config/index'
-import nextTick from '../../../nexttick'
+import nextTick from '../../../util/nexttick'
 
 /**
  * 创建iframe零件包装器
