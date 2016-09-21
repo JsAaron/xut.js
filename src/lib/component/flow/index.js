@@ -13,7 +13,6 @@ import { flipDistance } from '../../manager/dispatch/depend'
 export default class Flow {
 
     constructor(base, callback) {
-
         const self = this
 
         this.callback = callback
@@ -51,7 +50,7 @@ export default class Flow {
         const initIndex = this.initIndex
 
         const flowOffset = {
-            width : config.screenSize.width
+            flowWidth : config.screenSize.width
         }
         const overflowLeft = config.overflowSize.left
 
@@ -95,8 +94,8 @@ export default class Flow {
             direction
         } = {}) {
 
-            let currentDist = flipDistance(action, distance, direction, flowOffset)[1]
-            moveDistance = currentDist
+            const currentDistance = flipDistance(action, distance, direction,flowOffset)[1]
+            moveDistance = currentDistance
 
             switch (direction) {
                 case 'next':
@@ -128,9 +127,9 @@ export default class Flow {
                     View.GotoNextSlide()
                     this._unlock()
                 } else {
-                    View.MovePage(currentDist, speed, this.direction, action)
+                    View.MovePage(currentDistance + overflowLeft, speed, this.direction, action)
                 }
-            } else {
+            } else {      
                 translation[action]({}, moveDistance, speed, $container)
             }
 

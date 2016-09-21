@@ -6,21 +6,10 @@
 
 import { config } from '../config/index'
 
-let offsetCut
-let offsetLeft
-let offsetRight
-let prevEffect
-let currEffect
-let nextEffect
-
 const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 
-const xxtTrans = (offset) => {
-    offset = config.virtualMode ? offset / 2 : offset;
-    return 'translate(' + offset + 'px,0px)' + translateZ
-}
 
 const dydTransform = (distance) => {
     distance = config.virtualMode ? distance / 2 : distance;
@@ -29,17 +18,39 @@ const dydTransform = (distance) => {
 
 
 /**
+ * 创建translate初始值
+ * @param  {[type]} offset [description]
+ * @return {[type]}        [description]
+ */
+const createTranslate = (offset) => {
+    offset = config.virtualMode ? offset / 2 : offset
+    return 'translate(' + offset + 'px,0px)' + translateZ
+}
+
+
+let prevEffect
+let currEffect
+let nextEffect
+
+
+/**
  * 设置基本参数
  * @return {[type]} [description]
  */
-const initOptions = () => {
-    let calculateContainer = config.proportion.calculateContainer()
-    offsetLeft = (-1 * calculateContainer.width)
-    offsetRight = calculateContainer.width
-    offsetCut = 0
-    prevEffect = xxtTrans(offsetLeft)
-    currEffect = xxtTrans(offsetCut)
-    nextEffect = xxtTrans(offsetRight)
+const setOptions = (flowType) => {
+
+    const viewWidth = config.viewSize.width
+    const offsetLeft = flowType ? -config.screenSize.width: -viewWidth
+    const offsetRight = viewWidth
+    const offsetCut = flowType ? config.overflowSize.left : 0
+    prevEffect = createTranslate(offsetLeft)
+    currEffect = createTranslate(offsetCut)
+    nextEffect = createTranslate(offsetRight)
+    return {
+        offsetLeft,
+        offsetRight,
+        offsetCut
+    }
 }
 
 
@@ -152,25 +163,30 @@ export function fix(element, translate3d) {
 
 
 /**
- * 创建起始坐标
- * isFlowType 如果是flow类型
+ * 创建起始坐标信息
+ * flowType 如果是flow类型
  * @return {[type]}
  */
-export function createTransform(currPageIndex, createPageIndex, isFlowType) {
-    initOptions()
-    var translate3d, direction, offset;
-    if (createPageIndex < currPageIndex) {
-        translate3d = prevEffect;
-        offset = offsetLeft;
-        direction = 'before';
-    } else if (createPageIndex > currPageIndex) {
-        translate3d = nextEffect;
-        offset = offsetRight;
-        direction = 'after';
-    } else if (currPageIndex == createPageIndex) {
-        translate3d = currEffect;
-        offset = offsetCut;
-        direction = 'original';
+export function initTransform(currIndex, createIndex, flowType) {
+
+    const option = setOptions(flowType)
+
+    let translate3d
+    let direction
+    let offset
+
+    if (createIndex < currIndex) {
+        translate3d = prevEffect
+        offset = option.offsetLeft
+        direction = 'before'
+    } else if (createIndex > currIndex) {
+        translate3d = nextEffect
+        offset = option.offsetRight
+        direction = 'after'
+    } else if (currIndex == createIndex) {
+        translate3d = currEffect
+        offset = option.offsetCut
+        direction = 'original'
     }
     return [translate3d, direction, offset, dydTransform]
 }

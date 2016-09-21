@@ -55,7 +55,7 @@ export class Dispatch {
      * @return {[type]} [description]
      */
     initCreate() {
-        const options = this.options;
+        const options = this.options
 
         //createPointer,
         //initPointer
@@ -120,13 +120,19 @@ export class Dispatch {
 
             //构建执行代码
             callbackAction = {
-                //初始化
+                /**
+                 * 初始化
+                 * @return {[type]} [description]
+                 */
                 init() {
                     collectCallback(() => {
                         self._loadPage('init');
                     })
                 },
-                //翻页
+                /**
+                 * 翻页
+                 * @return {[type]} [description]
+                 */
                 flipOver() {
                     collectCallback(() => {
                         self.autoRun({ //翻页
@@ -135,7 +141,10 @@ export class Dispatch {
                         });
                     })
                 },
-                //跳转
+                /**
+                 * 跳转
+                 * @return {[type]} [description]
+                 */
                 toPage() {
                     collectCallback(() => {
                         toPageCallback(collectCreatePageBase);
@@ -170,9 +179,11 @@ export class Dispatch {
             let visiblePid = conversion.visiblePid;
             let pageIndex = conversion.pageIndex;
 
-            ////////////////
-            // 如果启动了虚拟页面模式 //
-            ////////////////
+
+            /**
+             * 如果启动了虚拟页面模式
+             * @type {Boolean}
+             */
             let virtualPid = false; //虚拟页面的pid编号
             let virtualOffset = false; //页面坐标left,right
             if (virtualMode) {
@@ -230,7 +241,7 @@ export class Dispatch {
                 //初始化构建页面对象
                 //page
                 //master
-                const pageBase = this.create(dataOpts, pageIndex, masterFilter);
+                const pageBase = this.create(dataOpts, pageIndex, masterFilter)
 
                 //构建页面对象后
                 //开始执行
@@ -413,8 +424,7 @@ export class Dispatch {
         const pageObj = this.pageMgr.abstractGetPageObj(pageIndex)
         if (pageObj && pageObj._flows.isExist()) {
             return {
-                width: config.screenSize.width,
-                left: config.overflowSize.left
+                flowLeft: config.overflowSize.left
             }
         }
     }
@@ -458,14 +468,8 @@ export class Dispatch {
             flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
         }
 
-        //反弹
-        // if(action === 'flipRebound'){
-        //     flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
-        // }
-
-
         //移动的距离
-        const moveDistance = flipDistance(action, distance, direction, flowOffet)
+        const moveDistance = flipDistance(action, distance, direction , flowOffet)
 
         //视觉差页面滑动
         const currObj = this.pageMgr.abstractGetPageObj(currIndex)
@@ -570,9 +574,9 @@ export class Dispatch {
      * @return {[type]} [description]
      */
     destroy() {
-        this.pageMgr.destroy();
+        this.pageMgr.destroy()
         this.masterContext(function() {
-            this.destroy();
+            this.destroy()
         })
     }
 
@@ -583,7 +587,7 @@ export class Dispatch {
      * @return {[type]}                [description]
      */
     _clearPage(clearPageIndex) {
-        this.pageMgr.clearPage(clearPageIndex);
+        this.pageMgr.clearPage(clearPageIndex)
     }
 
 
@@ -593,7 +597,7 @@ export class Dispatch {
      * @return {[type]}             [description]
      */
     _updatePointer(pagePointer) {
-        this.pagePointer = pagePointer;
+        this.pagePointer = pagePointer
     }
 
 
