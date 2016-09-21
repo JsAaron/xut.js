@@ -469,8 +469,6 @@ export class Dispatch {
             //提供给flows处理，用来改变翻页的距离，因为缩放溢出问题
             //2016.9.22
             flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
-
-            console.log(123,flowOffet)
         }
 
         //移动的距离
