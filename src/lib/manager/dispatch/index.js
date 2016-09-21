@@ -422,7 +422,9 @@ export class Dispatch {
      */
     _isFlowPage(pageIndex) {
         const pageObj = this.pageMgr.abstractGetPageObj(pageIndex)
-        if (pageObj && pageObj._flows.isExist()) {
+        if (pageObj 
+            && pageObj.pageType === 'page' 
+            && pageObj._flows.isExist()) {
             return {
                 flowLeft: config.overflowSize.left
             }
@@ -456,7 +458,8 @@ export class Dispatch {
             return
         }
 
-        //更新页码
+        //1:更新页码
+        //2:处理翻页(li的页面宽度可能不一样)
         if (action === 'flipOver') {
             setTimeout(() => {
                 this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
@@ -466,6 +469,8 @@ export class Dispatch {
             //提供给flows处理，用来改变翻页的距离，因为缩放溢出问题
             //2016.9.22
             flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
+
+            console.log(123,flowOffet)
         }
 
         //移动的距离
