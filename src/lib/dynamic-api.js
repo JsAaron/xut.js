@@ -78,12 +78,12 @@ export default function overrideApi(vm) {
 
     const $globalEvent = vm.$globalEvent
     const options = vm.options
-    const $dispatch = vm.$dispatch
+    const $dispatcher = vm.$dispatcher
 
     //页面与母版的管理器
     const access = createaAccess({
-        page: $dispatch.pageMgr,
-        master: $dispatch.masterMgr
+        page: $dispatcher.pageMgr,
+        master: $dispatcher.masterMgr
     })
 
     const isExistIndex = createExistIndex($globalEvent);
@@ -387,7 +387,7 @@ export default function overrideApi(vm) {
             'pageIndex': pagePointer.currIndex,
             'rightIndex': pagePointer.rightIndex
         }
-        $dispatch.move(data)
+        $dispatcher.move(data)
     };
 
 

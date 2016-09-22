@@ -7,82 +7,90 @@
  *      3 创建失败
  */
 import { config } from '../../../config/index'
-import { getCounts } from '../../../component/flow/layout'
-
 import nextTick from '../../../util/nexttick'
 
 const TANSFROM = Xut.style.transform
 
+/**
+ * 创建页面容器li
+ */
 const createli = function({
-    data,
+    base,
+    prefix,
     transform,
     customStyle,
-    containerBackground
+    pageData,
+    background
 } = {}) {
 
-    let offsetLeft   = 0
-    let virtualNode  = ''
-    let width = '100%'
+    let offsetLeft = 0
+    let virtualNode = ''
+
     const proportion = config.proportion
-    const calculate  = proportion.calculateContainer()
-    const sWidth     = calculate.width
-    const pageType   = data.pageType
-    const baseData   = data.baseData
+    const viewSize = config.viewSize
+
+    let viewWidth = viewSize.width
+    let viewHeight = viewSize.height
+    let viewTop = viewSize.top
+    let viewLeft = viewSize.left
 
     if (config.virtualMode) {
-        if (data.virtualOffset === 'right') {
+        if (base.virtualOffset === 'right') {
             offsetLeft = -(config.screenSize.width - proportion.offsetLeft);
         }
-        virtualNode = `<div style="width:${sWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
+        virtualNode = `<div style="width:${viewWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
     }
 
-    //流式布局页面强制全屏
-    //而不是可视区域，因为有页面模式选择
-    //存在溢出的情况，所以改为全屏
-    const isFlowsPage = getCounts(baseData.seasonId, baseData._id)
-    if(isFlowsPage){
-        width = config.screenSize.width + 'px'
+    //自动配置样式
+    const getStyle = base.getStyle
+    if (getStyle.containerWidth != undefined) {
+        viewWidth = getStyle.containerWidth
+    }
+    if (getStyle.containerHeight != undefined) {
+        viewHeight = getStyle.containerHeight
+    }
+    if (getStyle.containerTop != undefined) {
+        viewTop = getStyle.containerTop
     }
 
     return String.styleFormat(
-        `<li id="${data.prefix}"
-            data-id="${data.baseData._id}"
-            data-map="${data.pid}"
-            data-pageType="${pageType}"
+        `<li id="${prefix}"
+            data-id="${pageData._id}"
+            data-map="${base.pid}"
+            data-pageType="${base.pageType}"
             data-container="true"
             class="xut-flip"
-            style="width:${width};
+            style="width:${viewWidth}px;
+                   height:${viewHeight}px;
+                   top:${viewTop}px;
                    ${TANSFROM}:${transform};
-                   ${containerBackground}${customStyle};
+                   ${background}
+                   ${customStyle}
                    overflow:hidden;">
             ${virtualNode}
         </li>`
     )
-
-
 }
 
 
 /**
  * 创建父容器li结构
  */
-const createContainer = (transform, data) => {
+const createContainer = (base, pageData, getStyle, prefix) => {
 
-    let containerBackground = ''
-    let userStyle = data.userStyle
-    let baseData = data.baseData
-    let url = baseData.md5
+    let background = ''
 
     //chpater有背景，不是svg格式
-    if (!/.svg$/i.test(url)) {
-        containerBackground = 'background-image:url(' + config.pathAddress + url + ');'
+    if (!/.svg$/i.test(pageData.md5)) {
+        background = 'background-image:url(' + config.pathAddress + pageData.md5 + ');'
     }
 
     /**
      * 自定义配置了样式
      * 因为单页面跳槽层级的问题处理
      */
-    let customStyle = '';
+    let customStyle = ''
+    let userStyle = getStyle.userStyle
     if (userStyle !== undefined) {
         //解析自定义规则
         _.each(userStyle, (value, key) => {
@@ -91,43 +99,55 @@ const createContainer = (transform, data) => {
     }
 
     return $(createli({
-        data,
-        transform,
+        base,
+        prefix,
+        transform: getStyle.transforms[0],
         customStyle,
-        containerBackground
+        pageData,
+        background
     }))
 }
 
 
-export default function(data, successCallback) {
+/**
+ *'rootNode'      : base.root,
+ *'prefix'        : base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId,
+ *'pageType'      : base.pageType,
+ *'pid'           : base.pid,
+ *'baseData'      : pageData,
+ *'virtualOffset' : base.virtualOffset,
+ *'userStyle'     : base.userStyle, //创建自定义style
+ *'isFlows'       : base._isFlows //如果是flows页面
+ **/
+export default function(base, pageData, taskCallback) {
 
-    let $element, pseudoElement, direction, transform
+    let $element, pseudoElement
+
+    const prefix = base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId
+    const getStyle = base.getStyle
 
     //iboosk编译
     //在执行的时候节点已经存在
     //不需要在创建
     if (Xut.IBooks.runMode()) {
-        $element = $("#" + data.prefix);
-        successCallback($element, pseudoElement)
+        $element = $("#" + prefix);
+        taskCallback($element, pseudoElement)
         return
     }
 
-    transform = data.initTransformParameter[0]
-    direction = data.initTransformParameter[1]
-
     //创建的flip结构体
-    $element = createContainer(transform, data)
+    $element = createContainer(base, pageData, getStyle, prefix)
 
     //如果启动了wordMode模式,查找伪li
-    if (Xut.config.virtualMode) {
+    if (config.virtualMode) {
         pseudoElement = $element.find('div');
     }
 
     nextTick({
-        container: data.rootNode,
+        container: base.root,
         content: $element,
-        position: direction === 'before' ? 'first' : 'last'
+        position: getStyle.transforms[1] === 'before' ? 'first' : 'last'
     }, () => {
-        successCallback($element, pseudoElement)
+        taskCallback($element, pseudoElement)
     });
 }

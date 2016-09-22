@@ -37,12 +37,11 @@ let nextEffect
  * 设置基本参数
  * @return {[type]} [description]
  */
-const setOptions = (flowType) => {
-
+const setOptions = () => {
     const viewWidth = config.viewSize.width
-    const offsetLeft = flowType ? -config.screenSize.width: -viewWidth
+    const offsetLeft = -viewWidth
     const offsetRight = viewWidth
-    const offsetCut = flowType ? config.overflowSize.left : 0
+    const offsetCut =  0
     prevEffect = createTranslate(offsetLeft)
     currEffect = createTranslate(offsetCut)
     nextEffect = createTranslate(offsetRight)
@@ -163,13 +162,19 @@ export function fix(element, translate3d) {
 
 
 /**
- * 创建起始坐标信息
+ * 创建li的translate起始坐标信息
  * flowType 如果是flow类型
  * @return {[type]}
  */
-export function initTransform(currIndex, createIndex, flowType) {
+export function createPageTransform({
+    createIndex,
+    currIndex,
+    hasFlows,
+    initAction,
+    filpOverAction
+} = {}) {
 
-    const option = setOptions(flowType)
+    const option = setOptions(hasFlows)
 
     let translate3d
     let direction

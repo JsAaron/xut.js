@@ -50,18 +50,10 @@ export default {
     'Container' (taskCallback, base) {
         //同步数据
         updataCache.call(base, [base.pid], () => {
-            let pageData = base.baseData();
+            const pageData = base.baseData()
+            //页面模式
             parseMode(pageData, base)
-            TaskContainer({
-                'rootNode': base.root,
-                'prefix': base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId,
-                'pageType': base.pageType,
-                'pid': base.pid,
-                'baseData': pageData,
-                'virtualOffset': base.virtualOffset,
-                'initTransformParameter': base.createRelated.initTransformParameter,
-                'userStyle': base.userStyle //创建自定义style
-            }, taskCallback)
+            TaskContainer(base, pageData, taskCallback)
         })
     },
 
@@ -209,7 +201,7 @@ export default {
             'pid': base.pid,
             'pageBaseHooks': pageBaseHooks,
             'virtualOffset': base.virtualOffset,
-            'initTransformParameter': base.createRelated.initTransformParameter
+            'transforms': base.getStyle.transforms
         });
     }
 }

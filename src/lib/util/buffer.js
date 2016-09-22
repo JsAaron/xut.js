@@ -13,4 +13,4 @@ function createCache() {
     return cache;
 }
 
-export let contentCache = createCache() 
+export let contentCache = createCache()

@@ -47,20 +47,14 @@ export function conversionPageOpts(pageIndex, visiblePid) {
 /**
  * 计算翻页距离
  */
-export function flipDistance(action, distance, direction, {
-    //设置flow布局
-    //不同的li可以单独设置尺寸
-    //所以动画的距离计算需要额外处理
-    flowWidth = 0,
-    flowLeft = 0
-} = {}) {
+export function flipDistance(action, distance, direction) {
 
     let leftOffset
     let currOffset
     let rightOffset
 
     //滑动区域宽度
-    const containerWidth = flowWidth || config.viewSize.width
+    const containerWidth = config.viewSize.width
 
     switch (direction) {
         //前翻
@@ -98,7 +92,7 @@ export function flipDistance(action, distance, direction, {
                     break;
                 case 'flipOver':
                     leftOffset = -2 * containerWidth;
-                    rightOffset = flowLeft ? flowLeft : distance;
+                    rightOffset = distance;
                     currOffset = -containerWidth;
                     break;
             }

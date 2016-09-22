@@ -1,15 +1,8 @@
 import { config } from '../../config/index'
+import { set } from './get'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
-
-/**
- * seasonId:{
- *    chpaterID:count
- * }
- * @type {[type]}
- */
-let flowCounts = Object.create(null)
 
 /**
  * 高度marginTop - marginBottom处理了
@@ -92,42 +85,25 @@ const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, flowCounts) => {
 
 
 /**
- * reutrn seasonIds
- * return chpaterIds
- * @param  {[type]} seasonId  [description]
- * @param  {[type]} chpaterId [description]
- * @return {[type]}           [description]
- */
-export function getCounts(seasonId, chapterId) {
-    if (seasonId) {
-        if (chapterId) {
-            return flowCounts[seasonId] && flowCounts[seasonId][chapterId]
-        } else {
-            let seasonIds = flowCounts[seasonId]
-            let count = 0
-            for (let key in seasonIds) {
-                count += seasonId[key]
-            }
-            return count
-        }
-    } else {
-        console.log('getCounts失败')
-    }
-}
-
-
-/**
  * 构建flow页面代码结构
  * @return {[type]} [description]
  */
-export function initFlows() {
+export default function initFlows() {
 
     const $container = $("#xut-stream-flow")
     if (!$container.length) return
     const $seasons = $container.children()
     if (!$seasons.length) return
 
-    const vWidth = config.screenSize.width
+    /**
+     * seasonId:{
+     *    chpaterID:count
+     * }
+     * @type {[type]}
+     */
+    let flowCounts = Object.create(null)
+
+    const vWidth = config.viewSize.width
     const vHeight = newViewHight = config.screenSize.height
 
     $seasons.each((index, node) => {
@@ -159,4 +135,5 @@ export function initFlows() {
 
     $container.hide()
 
+    set(flowCounts)
 }

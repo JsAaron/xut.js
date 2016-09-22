@@ -1,10 +1,10 @@
 import { config } from '../../config/index'
 import { translation } from '../../swipe/translation'
-import { getCounts } from './layout'
+import { getFlowCount } from './get'
 import Swipe from '../../swipe/index'
 import render from './render'
 
-import { flipDistance } from '../../manager/dispatch/depend'
+import { flipDistance } from '../../manager/dispatcher/depend'
 
 /**
  * 2017.9.7
@@ -23,12 +23,13 @@ export default class Flow {
         const chapterId = base.chapterId
         const dataNode = $('#chapter-flow-' + chapterId)
 
+
         render({
             rootNode,
             dataNode,
             chapterId,
             callback($container) {
-                self._init($container, getCounts(seasonId, chapterId))
+                self._init($container, getFlowCount(seasonId, chapterId))
                 callback()
             }
         })
@@ -48,11 +49,6 @@ export default class Flow {
         const screenWidth = config.screenSize.width
         const View = Xut.View
         const initIndex = this.initIndex
-
-        const flowOffset = {
-            flowWidth : config.screenSize.width
-        }
-        const overflowLeft = config.overflowSize.left
 
         /**
          * 分栏整体控制
@@ -94,23 +90,23 @@ export default class Flow {
             direction
         } = {}) {
 
-            const currentDistance = flipDistance(action, distance, direction,flowOffset)[1]
+            const currentDistance = flipDistance(action, distance, direction)[1]
             moveDistance = currentDistance
 
             switch (direction) {
                 case 'next':
-                    moveDistance = moveDistance  + lastDistance
+                    moveDistance = moveDistance + lastDistance
                     break
                 case 'prev':
-                    moveDistance = moveDistance  + lastDistance
+                    moveDistance = moveDistance + lastDistance
                     break
             }
 
             //反弹
             if (action === 'flipRebound') {
                 moveDistance = direction === 'next' ?
-                    (-screenWidth * this._hindex - this._hindex ) :
-                    -(screenWidth * this._hindex + this._hindex )
+                    (-screenWidth * this._hindex - this._hindex) :
+                    -(screenWidth * this._hindex + this._hindex)
             }
 
             //首尾连接主页
@@ -120,16 +116,16 @@ export default class Flow {
                     this._unlock()
                 } else {
                     //前边界反弹，要加上溢出值
-                    View.MovePage(moveDistance + overflowLeft, speed, this.direction, action)
+                    View.MovePage(moveDistance , speed, this.direction, action)
                 }
             } else if (this._hindex === MAX && this.direction === 'next') {
                 if (action === 'flipOver') {
                     View.GotoNextSlide()
                     this._unlock()
                 } else {
-                    View.MovePage(currentDistance + overflowLeft, speed, this.direction, action)
+                    View.MovePage(currentDistance , speed, this.direction, action)
                 }
-            } else {      
+            } else {
                 translation[action]({}, moveDistance, speed, $container)
             }
 

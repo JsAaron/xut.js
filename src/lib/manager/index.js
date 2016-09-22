@@ -7,7 +7,7 @@
 
 import { Observer } from '../observer/index'
 import GlobalEvent from '../swipe/index.js'
-import { Dispatch } from './dispatch/index'
+import { Dispatcher } from './dispatcher/index'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'
 import overrideApi from '../dynamic-api'
@@ -32,9 +32,9 @@ const configMultiple = (options) => {
         //判断多页面情况
         //1 数据库定义
         //2 系统优化
-        options.multiplePages = 
-            options.flipMode 
-            ? options.flipMode 
+        options.multiplePages =
+            options.flipMode
+            ? options.flipMode
             : options.pageMode ? true : false
     }
 }
@@ -110,7 +110,7 @@ class Mediator extends Observer {
         configMultiple(options)
 
         const $globalEvent = vm.$globalEvent = new GlobalEvent(options);
-        const $dispatch = vm.$dispatch = new Dispatch(vm);
+        const $dispatcher = vm.$dispatcher = new Dispatcher(vm);
 
         //如果是主场景,才能切换系统工具栏
         if (options.multiplePages) {
@@ -146,7 +146,7 @@ class Mediator extends Observer {
          * @return {[type]} [description]
          */
         $globalEvent.$watch('onMove', (data) => {
-            $dispatch.move(data)
+            $dispatcher.move(data)
         });
 
 
@@ -174,7 +174,7 @@ class Mediator extends Observer {
          * @return {[type]}          [description]
          */
         $globalEvent.$watch('onUpSlider', (pointers) => {
-            $dispatch.suspend(pointers)
+            $dispatcher.suspend(pointers)
         });
 
 
@@ -183,7 +183,7 @@ class Mediator extends Observer {
          * @return {[type]}              [description]
          */
         $globalEvent.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
-            $dispatch.complete(direction, pagePointer, unfliplock, isQuickTurn)
+            $dispatcher.complete(direction, pagePointer, unfliplock, isQuickTurn)
         });
 
 
@@ -192,7 +192,7 @@ class Mediator extends Observer {
          * @return {[type]}      [description]
          */
         $globalEvent.$watch('onJumpPage', (data) => {
-            $dispatch.jumpPage(data);
+            $dispatcher.jumpPage(data);
         });
 
 
@@ -213,7 +213,7 @@ class Mediator extends Observer {
          */
         $globalEvent.$watch('onMasterMove', (hindex, target) => {
             if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
-                $dispatch.masterMgr && $dispatch.masterMgr.reactivation(target);
+                $dispatcher.masterMgr && $dispatcher.masterMgr.reactivation(target);
             }
         });
 
@@ -283,7 +283,7 @@ defAccess(medProto, '$multiScenario', {
 defAccess(medProto, '$injectionComponent', {
     set: function(regData) {
         var injection;
-        if (injection = this.$dispatch[regData.pageType + 'Mgr']) {
+        if (injection = this.$dispatcher[regData.pageType + 'Mgr']) {
             injection.abstractAssistPocess(regData.pageIndex, function(pageObj) {
                 pageObj.baseRegisterComponent.call(pageObj, regData.widget);
             })
@@ -299,7 +299,7 @@ defAccess(medProto, '$injectionComponent', {
  */
 defAccess(medProto, '$curVmPage', {
     get: function() {
-        return this.$dispatch.pageMgr.abstractGetPageObj(this.$globalEvent.getHindex());
+        return this.$dispatcher.pageMgr.abstractGetPageObj(this.$globalEvent.getHindex());
     }
 });
 
@@ -343,7 +343,7 @@ def(medProto, '$bind', function(key, callback) {
  * @return {[type]} [description]
  */
 def(medProto, '$init', function() {
-    this.$dispatch.initCreate();
+    this.$dispatcher.initCreate();
 });
 
 
@@ -353,7 +353,7 @@ def(medProto, '$init', function() {
  */
 def(medProto, '$run', function() {
     var vm = this;
-    vm.$dispatch.pageMgr.activateAutoRuns(
+    vm.$dispatcher.pageMgr.activateAutoRuns(
         vm.$globalEvent.getHindex(), Xut.Presentation.GetPageObj()
     )
 });
@@ -364,7 +364,7 @@ def(medProto, '$run', function() {
  * @return {[type]} [description]
  */
 def(medProto, '$reset', function() {
-    return this.$dispatch.pageMgr.resetOriginal(this.$globalEvent.getHindex());
+    return this.$dispatcher.pageMgr.resetOriginal(this.$globalEvent.getHindex());
 });
 
 
@@ -386,8 +386,8 @@ def(medProto, '$suspend', function() {
 def(medProto, '$destroy', function() {
     this.$off();
     this.$globalEvent.destroy();
-    this.$dispatch.destroy();
-    this.$dispatch = null;
+    this.$dispatcher.destroy();
+    this.$dispatcher = null;
     this.$globalEvent = null;
 });
 

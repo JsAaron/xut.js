@@ -33,7 +33,7 @@ const convert = function(path) {
     if (exists) {
         data = readFile(convertedPath)
         if (data) {
-            console.log('【Cache: ' + data + ' SVG  files have been converted】')
+            console.log(`【Cache:${data} SVG, path is: ${convertedPath}】`)
             return
         }
     }
@@ -67,10 +67,12 @@ const convert = function(path) {
         if (handle) {
             console.log('【Convert SVG failure】')
             return
+        }else{
+            console.log(`【converted SVG is ${readPath}`)
         }
 
         if (!count) {
-            console.log('【' + total + ' SVG  files have been converted】')
+            console.log(`【converted: ${total} SVG】`)
             writeFile(convertedPath, total)
             return
         }

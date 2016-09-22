@@ -336,7 +336,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
     //如果是当前页面
     //因为会产生三页面并联
     //所以中间去最高层级
-    if (floatName === 'floatPages' && (base.initTransformParameter[2]) === 0) {
+    if (floatName === 'floatPages' && (base.getStyle.transforms[2]) === 0) {
         zIndex = 2001
     } else {
         zIndex = 2000
@@ -354,7 +354,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
 
     var floatStr = String.format(
         '<div id="' + floatName + '-li-{0}" class="xut-float" style="' + TRANSFORM + ':{1};z-index:' + zIndex + ';{2}"></div>',
-        data.pid, base.initTransformParameter[0], overflow
+        data.pid, base.getStyle.transforms[0], overflow
     )
 
     var container = $(floatStr)
@@ -538,7 +538,6 @@ function bindActivitys(callback, data, contentDas) {
         pageBaseHooks = data.pageBaseHooks,
         pageId = data.chapterId;
 
-
     //如果有浮动对象,才需要计算偏移量
     //母版里面可能存在浮动或者不浮动的对象
     //那么在布局的时候想对点不一样
@@ -553,7 +552,7 @@ function bindActivitys(callback, data, contentDas) {
             }
             return 0
         }
-    }(data.floatMaters.ids, data.initTransformParameter[2]);
+    }(data.floatMaters.ids, data.transforms[2]);
 
 
     //相关回调

@@ -15,6 +15,8 @@ import SwitchPage from './switch'
 import { sceneController } from '../../scenario/controller'
 import { closeNavbar } from '../../toolbar/navbar/index'
 
+import Stack from '../../util/stack'
+
 import {
     offsetPage,
     conversionPageOpts,
@@ -22,11 +24,13 @@ import {
     initPointer,
     conversionCid,
     conversionPids,
-    checkMasterCreate
+    checkMasterCreate,
 } from './depend'
 
+import styleConfig from './style.config'
 
-export class Dispatch {
+
+export class Dispatcher {
 
     constructor(vm) {
         this.vm = vm;
@@ -85,195 +89,271 @@ export class Dispatch {
             return;
         }
 
-        let virtualMode = config.virtualMode,
-            self = this,
-            multiplePages = this.options.multiplePages, //是否线性
-            total = createPage.length,
-            toPageAction = action === 'toPage', //如果是跳转
-            filpOverAction = action === 'flipOver', //如果是翻页
+        let virtualMode = config.virtualMode
+        let self = this
+        let multiplePages = this.options.multiplePages //是否线性
+        let total = createPage.length
+        let toPageAction = action === 'toPage' //如果是跳转
+        let filpOverAction = action === 'flipOver' //如果是翻页
 
-            //使用第一个是分解可见页面
-            //将页码pageIndex转化成对应的chapter
-            createPids = conversionCid.call(this, createPage, visiblePage),
+        //使用第一个是分解可见页面
+        //将页码pageIndex转化成对应的chapter
+        let createPids = conversionCid.call(this, createPage, visiblePage)
 
-            //收集创建的页面对象
-            //用于处理2个页面在切换的时候闪屏问题
-            //主要是传递createStyle自定义样式的处理
-            collectCreatePageBase = [],
+        //收集创建的页面对象
+        //用于处理2个页面在切换的时候闪屏问题
+        //主要是传递createStyle自定义样式的处理
+        let collectCreatePageBase = []
 
-            //是否触发母版的自动时间
-            //因为页面每次翻页都会驱动auto事件
-            //但是母版可能是共享的
-            createMaster = false,
+        //是否触发母版的自动时间
+        //因为页面每次翻页都会驱动auto事件
+        //但是母版可能是共享的
+        let createMaster = false
 
-            //收集完成回调
-            collectCallback = (() => {
-                //收集创建页码的数量
-                let createContent = 0;
-                return callback => {
-                    ++createContent
-                    if (createContent === total) {
-                        callback();
-                    }
-                }
-            })(),
-
-            //构建执行代码
-            callbackAction = {
-                /**
-                 * 初始化
-                 * @return {[type]} [description]
-                 */
-                init() {
-                    collectCallback(() => {
-                        self._loadPage('init');
-                    })
-                },
-                /**
-                 * 翻页
-                 * @return {[type]} [description]
-                 */
-                flipOver() {
-                    collectCallback(() => {
-                        self.autoRun({ //翻页
-                            'createPointer': createPids,
-                            'createMaster': createMaster
-                        });
-                    })
-                },
-                /**
-                 * 跳转
-                 * @return {[type]} [description]
-                 */
-                toPage() {
-                    collectCallback(() => {
-                        toPageCallback(collectCreatePageBase);
-                    })
+        //收集完成回调
+        const collectCallback = (() => {
+            //收集创建页码的数量
+            let createContent = 0;
+            return callback => {
+                ++createContent
+                if (createContent === total) {
+                    callback();
                 }
             }
+        })()
+
+        /**
+         * 构建执行代码
+         * @type {Object}
+         */
+        const callbackAction = {
+            /**
+             * 初始化
+             * @return {[type]} [description]
+             */
+            init() {
+                collectCallback(() => {
+                    self._loadPage('init');
+                })
+            },
+            /**
+             * 翻页
+             * @return {[type]} [description]
+             */
+            flipOver() {
+                collectCallback(() => {
+                    self.autoRun({ //翻页
+                        'createPointer': createPids,
+                        'createMaster': createMaster
+                    });
+                })
+            },
+            /**
+             * 跳转
+             * @return {[type]} [description]
+             */
+            toPage() {
+                collectCallback(() => {
+                    toPageCallback(collectCreatePageBase);
+                })
+            }
+        }
 
 
-        //pid=>chpterData
-        let results = conversionPids(createPids);
+        /**
+         * pid页码，转化成页面数据集合
+         * pid=>chpterData
+         * @type {[type]}
+         */
+        let chpaterResults = conversionPids(createPids);
 
-        //如果是最后一页
-        //没有对应的虚拟数据，取前一页的
-        if (virtualMode && !results.length) {
+        /**
+         * 如果是最后一页
+         * 没有对应的虚拟数据，取前一页的
+         * @return {[type]}             [description]
+         */
+        if (virtualMode && !chpaterResults.length) {
             let virtualPid = _.extend([], createPids);
             createPids.forEach(function(pid, index) {
                 virtualPid.splice(index, 1, --pid)
             })
-            results = conversionPids(virtualPid);
+            chpaterResults = conversionPids(virtualPid);
         }
 
-        //页码转成数据
-        _.each(results, (chapterData, index) => {
 
-            //转化值
-            //chapterId => createPid
-            let createPid = createPids[index];
+        /**
+         * 预编译
+         * 因为要需要对多个页面进行预处理
+         * 需要同步多个页面数据判断
+         * 这样需要预编译出数据，做了中间处理后再执行后续动作
+         * @type {Array}
+         */
+        const compile = new Stack()
 
-            //createPid
-            //pageIndex
-            let conversion = conversionPageOpts.call(self, createPid, visiblePage);
-            let visiblePid = conversion.visiblePid;
-            let pageIndex = conversion.pageIndex;
+        //存在flows页面
+        let hasFlows = false
 
+        //收集有用的数据
+        let usefulData = Object.create(null)
+        _.each(chpaterResults, (chapterData, index) => {
+            compile.push((function() {
+                //转化值
+                //chapterId => createPid
+                let createPid = createPids[index]
 
-            /**
-             * 如果启动了虚拟页面模式
-             * @type {Boolean}
-             */
-            let virtualPid = false; //虚拟页面的pid编号
-            let virtualOffset = false; //页面坐标left,right
-            if (virtualMode) {
-                //页面位置
-                virtualOffset = offsetPage(pageIndex);
+                //createPid
+                //pageIndex
+                let conversion = conversionPageOpts.call(self, createPid, visiblePage)
+                let visiblePid = conversion.visiblePid
+                let pageIndex = conversion.pageIndex
 
-                //获取新的chpater数据
-                const fixCids = function(originalIndex) {
-                    let originalPid = conversionCid.call(self, [originalIndex]);
-                    return conversionPids([originalPid])[0];
+                /**
+                 * 如果启动了虚拟页面模式
+                 * @type {Boolean}
+                 */
+                let virtualPid = false; //虚拟页面的pid编号
+                let virtualOffset = false; //页面坐标left,right
+                if (virtualMode) {
+                    //页面位置
+                    virtualOffset = offsetPage(pageIndex);
+
+                    //获取新的chpater数据
+                    const fixCids = function(originalIndex) {
+                        let originalPid = conversionCid.call(self, [originalIndex]);
+                        return conversionPids([originalPid])[0];
+                    }
+
+                    ////////////
+                    //如果是翻页创建 //
+                    //由于是拼接的所以chapter移位了
+                    ////////////
+                    if (virtualOffset === 'left') {
+                        chapterData = fixCids(pageIndex / 2)
+                    }
+                    //修正右边chapter
+                    if (virtualOffset === 'right') {
+                        chapterData = fixCids((pageIndex - 1) / 2)
+                    }
                 }
 
-                ////////////
-                //如果是翻页创建 //
-                //由于是拼接的所以chapter移位了
-                ////////////
-                if (virtualOffset === 'left') {
-                    chapterData = fixCids(pageIndex / 2)
+                if (total === 1) {
+                    self.options.chapterId = chapterData._id
                 }
-                //修正右边chapter
-                if (virtualOffset === 'right') {
-                    chapterData = fixCids((pageIndex - 1) / 2)
+
+                /**
+                 * 确定存在flows类型页面
+                 * @param  {[type]} chapterData.note [description]
+                 * @return {[type]}                  [description]
+                 */
+                const isFlows = chapterData.note === 'flow'
+                    //只需要判断一次存在即可
+                if (!hasFlows && isFlows) {
+                    hasFlows = isFlows
                 }
-            }
 
-            if (total === 1) {
-                self.options.chapterId = chapterData._id
-            }
-
-            /**
-             * 构件新的页面
-             * masterFilter 母板过滤器回调函数
-             * @param  {[type]} masterFilter [description]
-             * @return {[type]}              [description]
-             */
-            const createPageBase = function(masterFilter) {
 
                 //跳转的时候，创建新页面可以自动样式信息
                 //优化设置，只是改变当前页面即可
                 if (toPageAction && visiblePid !== createPid) {
-                    userStyle = undefined;
+                    userStyle = undefined
                 }
 
-                const dataOpts = {
-                    'pageIndex': pageIndex,
-                    'multiplePages': multiplePages,
-                    'pid': createPid, //页码chapterId
-                    'chapterDas': chapterData, //当前页面的chpater数据
-                    'visiblePid': visiblePid, //实际中页面显示的索引
-                    'userStyle': userStyle,
-                    'virtualPid': virtualPid, //pid
-                    'virtualOffset': virtualOffset //虚拟页面位置
+                /**
+                 * 收集数据
+                 */
+                usefulData[createPid] = {
+                    isFlows: isFlows,
+                    pid: createPid,
+                    visiblePid: visiblePid,
+                    userStyle: userStyle
                 }
 
-                //初始化构建页面对象
-                //page
-                //master
-                const pageBase = this.create(dataOpts, pageIndex, masterFilter)
+                /**
+                 *delay....
+                 * @return {[type]} [description]
+                 */
+                return function(newstyle) {
 
-                //构建页面对象后
-                //开始执行
-                if (pageBase) {
-                    //开始线程任务
-                    //当为滑动模式,支持快速创建
-                    pageBase.startThreadTask(filpOverAction, function() {
-                        callbackAction[action]()
-                    })
+                    /**
+                     * 构件新的页面
+                     * masterFilter 母板过滤器回调函数
+                     * @param  {[type]} masterFilter [description]
+                     * @return {[type]}              [description]
+                     */
+                    const createPageBase = function(masterFilter) {
 
-                    //收集自定义样式的页面对象
-                    if (userStyle) {
-                        collectCreatePageBase.push(pageBase);
+                        /**
+                         * 初始化构建页面对象
+                         * 1:page
+                         * 2:master
+                         * [pageBase description]
+                         * @type {[type]}
+                         */
+                        const pageBase = this.create({
+                            'isFlows': isFlows,
+                            'getStyle': newstyle[createPid],
+                            'pageIndex': pageIndex,
+                            'multiplePages': multiplePages,
+                            'pid': createPid, //页码chapterId
+                            'chapterDas': chapterData, //当前页面的chpater数据
+                            'visiblePid': visiblePid, //实际中页面显示的索引
+                            'virtualPid': virtualPid, //pid
+                            'virtualOffset': virtualOffset //虚拟页面位置
+                        }, pageIndex, masterFilter)
+
+                        //构建页面对象后
+                        //开始执行
+                        if (pageBase) {
+                            //开始线程任务
+                            //当为滑动模式,支持快速创建
+                            pageBase.startThreadTask(filpOverAction, function() {
+                                callbackAction[action]()
+                            })
+
+                            //收集自定义样式的页面对象
+                            if (userStyle) {
+                                collectCreatePageBase.push(pageBase);
+                            }
+                        }
+
                     }
+
+                    //母版层
+                    if (chapterData.pptMaster && self.masterMgr) {
+                        createPageBase.call(self.masterMgr, () => {
+                            //母版是否创建等待通知
+                            //母版是共享的所以不一定每次翻页都会创建
+                            //如果需要创建,则叠加总数
+                            ++total;
+                            createMaster = true;
+                        });
+                    }
+
+                    //页面层
+                    createPageBase.call(self.pageMgr);
                 }
 
-            }
-
-            //母版层
-            if (chapterData.pptMaster && self.masterMgr) {
-                createPageBase.call(self.masterMgr, () => {
-                    //母版是否创建等待通知
-                    //母版是共享的所以不一定每次翻页都会创建
-                    //如果需要创建,则叠加总数
-                    ++total;
-                    createMaster = true;
-                });
-            }
-
-            //页面层
-            createPageBase.call(self.pageMgr);
+            })())
         })
+
+        /**
+         * 创建页面的样式与翻页的布局
+         * 存在存在flows页面处理
+         * 这里创建处理的Transfrom
+         * @param  {[type]} hasFlows [description]
+         * @return {[type]}            [description]
+         */
+        const newstyle = styleConfig({
+            usefulData,
+            hasFlows,
+            initAction: action === 'init',
+            filpOverAction: filpOverAction
+        })
+
+        /**
+         * 执行编译
+         */
+        compile.shiftAll(newstyle).destroy()
     }
 
 
@@ -422,9 +502,7 @@ export class Dispatch {
      */
     _isFlowPage(pageIndex) {
         const pageObj = this.pageMgr.abstractGetPageObj(pageIndex)
-        if (pageObj 
-            && pageObj.pageType === 'page' 
-            && pageObj._flows.isExist()) {
+        if (pageObj && pageObj.pageType === 'page' && pageObj._flows.isExist()) {
             return {
                 flowLeft: config.overflowSize.left
             }
@@ -468,11 +546,11 @@ export class Dispatch {
             //否为flow页面
             //提供给flows处理，用来改变翻页的距离，因为缩放溢出问题
             //2016.9.22
-            flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
+            // flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
         }
 
         //移动的距离
-        const moveDistance = flipDistance(action, distance, direction , flowOffet)
+        const moveDistance = flipDistance(action, distance, direction, flowOffet)
 
         //视觉差页面滑动
         const currObj = this.pageMgr.abstractGetPageObj(currIndex)

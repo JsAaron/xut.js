@@ -343,7 +343,9 @@ export function setProportion(pptWidth, pptHeight) {
     const calculate = proportion.calculateContainer()
     config.viewSize = {
         width: config.virtualMode ? calculate.width / 2 : calculate.width,
-        height: calculate.height
+        height: calculate.height,
+        left:calculate.left,
+        top:calculate.top
     }
 
     /**

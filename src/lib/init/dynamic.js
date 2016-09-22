@@ -1,5 +1,5 @@
 import { createCursor } from '../util/cursor'
-import { initFlows } from '../component/flow/layout'
+import initFlows from '../component/flow/layout'
 import { importResults } from '../database/results'
 
 import { loader } from '../util/index'

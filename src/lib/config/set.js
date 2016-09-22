@@ -67,15 +67,14 @@ const getProportion = function(config, pptWidth, pptHeight) {
     let widthProp = screenWidth / designWidth
     let heightProp = screenHeight / designHeight
 
-
     /**
      * config.visualMode处理
      */
     if (pptWidth && pptHeight && config.visualMode) {
 
         //宽高正比缩放
-        if(config.visualMode === 1){
-           //如果ppt设计的排版与当前的播放不符
+        if (config.visualMode === 1) {
+            //如果ppt设计的排版与当前的播放不符
             if (pptHorizontal != screenHorizontal) {
                 if (pptHorizontal === 1) {
                     heightProp = widthProp

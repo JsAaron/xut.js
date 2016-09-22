@@ -72,8 +72,8 @@ export function home() {
 
 
     const homeWidth = config.viewSize.width
-    const homeHeight = config.viewSize.height
-    const homeTop = calculate.top
+    // const homeHeight = config.viewSize.height
+    // const homeTop = calculate.top
     const homeLeft = calculate.left
     const homeIndex = Xut.sceneController.createIndex()
     const homeOverflow = config.scrollPaintingMode ? 'visible' : 'hidden'
@@ -83,10 +83,8 @@ export function home() {
         `<div id="xut-main-scene"
               class="xut-chapter"
               style="width:${homeWidth}px;
-                     height:${homeHeight}px;
-                     top:${homeTop}px;
+                     height:100%;
                      left:${homeLeft}px;
-                     overflow:hidden;
                      z-index:${homeIndex};
                      overflow:${homeOverflow};">
 
@@ -121,10 +119,8 @@ export function scene(id) {
     const html =
         `<div id="${scenarioId}"
               style="width:${config.viewSize.width}px;
-                     height:${config.viewSize.height}px;
-                     top:${calculate.top}px;
+                     height:100%;
                      left:${calculate.left}px;
-                     position:absolute;
                      z-index:${Xut.sceneController.createIndex()};
                      overflow:{{overflow}};">
             <ul id="${pageId}" class="xut-flip" style="z-index:2"></ul>

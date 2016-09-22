@@ -3,7 +3,6 @@ import Collection from '../depend/collection'
 import initTasks from '../threadtask/tasks'
 import Factory from '../depend/factory'
 
-
 export default function(baseProto) {
 
     /**
@@ -40,11 +39,6 @@ export default function(baseProto) {
 
         //canvas模式
         this.canvasRelated = new Factory();
-
-        /**
-         * 初始化任务
-         */
-        initTasks(instance)
 
         /**
          * 内部钩子相关
@@ -87,11 +81,22 @@ export default function(baseProto) {
         this._flows = new Collection()
 
         /**
+         * 流式布局页面
+         * 目前只有flow的处理
+         * @param  {[type]} instance.pageType [description]
+         * @return {[type]}                   [description]
+         */
+        this._isFlows = false
+        if (this.pageType === 'page' && this.isFlows) {
+            this._isFlows = true
+        }
+        delete this.isFlows
+
+        /**
          * 浮动对象
          * 1 母版中
          * 2 页面中
          * 页面中是最高的
-         * [floatContents description]
          * @type {Object}
          */
         const floatContents = this.floatContents = {
@@ -234,6 +239,12 @@ export default function(baseProto) {
             }
         }
 
+
+        /**
+         * 初始化任务
+         * 等待状态初始化，比如_isFlows
+         */
+        initTasks(instance)
     }
 
 }
