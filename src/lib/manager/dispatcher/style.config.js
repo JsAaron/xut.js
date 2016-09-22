@@ -20,7 +20,7 @@ export default function styleConfig({
         if (data.isFlows) {
 
             //宽度100%的情况下
-            //如果是flow页面处理
+            //如果是flow页面处理,全屏
             if (config.visualMode === 2) {
                 data.containerHeight = config.screenSize.height
                 data.containerTop = 0
