@@ -129,13 +129,12 @@ export default class fnBar extends Bar {
             return '';
         }
 
-        var calculate = config.proportion.calculateContainer();
         //圆点尺寸
         var size = isIOS ? 7 : Math.max(8, Math.round(this.propHeight * 8)),
             width = 2.5 * size, //圆点间距
             tipsWidth = chapters * width, //圆点总宽度
             top = (height - size) / 2, //保持圆点垂直居中
-            left = (calculate.width - tipsWidth) / 2; //保持圆点水平居中
+            left = (config.viewSize.width - tipsWidth) / 2; //保持圆点水平居中
 
         html = '<ul class="xut-scenario-tips"  style="top:' + TOP + 'px;left:' + left + 'px;width:' + tipsWidth + 'px;opacity:0.6">';
         for (var i = 1; i <= chapters; i++) {

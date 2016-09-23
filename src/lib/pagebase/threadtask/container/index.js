@@ -8,6 +8,7 @@
  */
 import { config } from '../../../config/index'
 import nextTick from '../../../util/nexttick'
+import { hasValue } from '../../../util/lang'
 
 const TANSFROM = Xut.style.transform
 
@@ -32,7 +33,7 @@ const createli = function({
     let viewWidth = viewSize.width
     let viewHeight = viewSize.height
     let viewTop = viewSize.top
-    let viewLeft = viewSize.left
+    let viewLeft = 0
 
     if (config.virtualMode) {
         if (base.virtualOffset === 'right') {
@@ -42,15 +43,19 @@ const createli = function({
     }
 
     //自动配置样式
+    //提供创建样式覆盖
     const getStyle = base.getStyle
-    if (getStyle.containerWidth != undefined) {
+    if (hasValue(getStyle.containerWidth)) {
         viewWidth = getStyle.containerWidth
     }
-    if (getStyle.containerHeight != undefined) {
+    if (hasValue(getStyle.containerHeight)) {
         viewHeight = getStyle.containerHeight
     }
-    if (getStyle.containerTop != undefined) {
+    if (hasValue(getStyle.containerTop)) {
         viewTop = getStyle.containerTop
+    }
+    if (hasValue(getStyle.containerLeft)) {
+        viewLeft = getStyle.containerLeft
     }
 
     return String.styleFormat(
@@ -63,6 +68,7 @@ const createli = function({
             style="width:${viewWidth}px;
                    height:${viewHeight}px;
                    top:${viewTop}px;
+                   left:${viewLeft}px;
                    ${TANSFROM}:${transform};
                    ${background}
                    ${customStyle}

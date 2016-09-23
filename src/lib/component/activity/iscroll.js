@@ -14,7 +14,6 @@
     //      absDistX,
     //      iscroll,
     //      that = this,
-    //      screenWidth = Xut.config.screenSize.width,
     //      useswipeleft = function() {
     //          Xut.View.GotoPrevSlide()
     //      },

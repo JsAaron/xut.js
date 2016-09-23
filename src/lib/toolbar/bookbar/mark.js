@@ -5,7 +5,7 @@
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
 import { bindEvent } from '../../util/event'
-
+import { config } from '../../config/index'
 import {
     _set,
     _get,
@@ -40,9 +40,9 @@ export default class Mark {
         this.pageId = pageId;
         this.seasonId = seasonId;
 
-        this.screenSize = Xut.config.screenSize
-        this.sHeight = this.screenSize.height
-        this.sWidth = this.screenSize.width
+        this.viewSize = config.viewSize
+        this.sHeight = this.viewSize.height
+        this.sWidth = this.viewSize.width
 
         //是否已存储
         this.isStored = false;

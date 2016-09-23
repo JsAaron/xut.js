@@ -59,15 +59,15 @@ export default {
             return v.toUpperCase()
         })
 
-        const screenSize = config.screenSize
+        const viewSize = config.viewSize
 
         //只针对网页插件增加单独的点击界面
         //如果有视频图标
         if (category == 'webpage' &&
             (scaleWidth > 200) &&
             (scaleHeight > 100) &&
-            (scaleWidth <= screenSize.width) &&
-            (scaleHeight <= screenSize.height)) {
+            (scaleWidth <= viewSize.width) &&
+            (scaleHeight <= viewSize.height)) {
 
             const mediaIconSize = 74;
             const posX = (scaleWidth - mediaIconSize) / 2;

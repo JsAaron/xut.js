@@ -130,8 +130,6 @@ export class Subtitle {
         var proportion = config.proportion;
         var proportionWidth = proportion.width;
         var proportionHeight = proportion.height;
-        var screenWidth = config.screenSize.width;
-        var screenHeight = config.screenSize.height;
 
         var cid = data.id;
         var parentNode = this.parents[cid];

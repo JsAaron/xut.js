@@ -13,6 +13,7 @@ import {
     autoRun as _autoRun
 } from '../command/index'
 
+import { config } from '../config/index'
 
 /**
  * 扁平化对象到数组
@@ -56,9 +57,9 @@ export default class MasterMgr extends Abstract {
 
     constructor(vm) {
         super()
-        var config = Xut.config
-        this.screenWidth = config.screenSize.width
-        this.screenHeight = config.screenSize.height
+
+        this.viewWidth = config.viewSize.width
+        this.viewHeight = config.viewSize.height
 
         this.pageType = 'master';
 
@@ -138,7 +139,7 @@ export default class MasterMgr extends Abstract {
      * 找到当前页面的可以需要滑动是视觉页面对象
      * @return {[type]}            [description]
      */
-    findMaster(leftIndex, currIndex, rightIndex, direction, action) {
+    _findMaster(leftIndex, currIndex, rightIndex, direction, action) {
         var prevFlag,
             nextFlag,
             prevMasterObj,
@@ -183,9 +184,8 @@ export default class MasterMgr extends Abstract {
             isBoundary = false; //是边界处理
 
         //找到需要滑动的母版
-        _.each(this.findMaster(leftIndex, currIndex, rightIndex, direction, action), function(pageObj, index) {
+        _.each(this._findMaster(leftIndex, currIndex, rightIndex, direction, action), function(pageObj, index) {
             if (pageObj) {
-
                 isBoundary = true
 
                 //母版交接判断
@@ -209,7 +209,7 @@ export default class MasterMgr extends Abstract {
         }
 
         //移动视察对象
-        function moveParallaxObject(nodes) {
+        const moveParallaxObject = function(nodes) {
             self.moveParallaxs(moveDistance, currIndex, action, direction, speed, nodes)
         }
 
@@ -534,16 +534,14 @@ export default class MasterMgr extends Abstract {
                 var element = parallaxObj.element;
                 if (element) {
                     element.css(transitionDuration, speed + 'ms');
-                    //scrollerStyle[transform] = 'translate(' + x + 'px,' + y + 'px)' + this.translateZ;
-                    //element.css(transform, 'translate3d(' + distance + 'px,0px,0px)');
                     element.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
                 }
             }
 
             if (position === 'prev') {
-                toMove(-self.screenWidth);
+                toMove(-self.viewWidth);
             } else if (position === 'next') {
-                toMove(self.screenWidth);
+                toMove(self.viewWidth);
             } else if (position === 'curr') {
                 toMove(0);
             }
@@ -654,14 +652,14 @@ export default class MasterMgr extends Abstract {
                     temp[i] = moveDistance * nodes * property[i];
                     break;
                 case 'translateY':
-                    temp[i] = moveDistance * (this.screenHeight / this.screenWidth) * nodes * property[i];
+                    temp[i] = moveDistance * (this.viewHeight / this.viewWidth) * nodes * property[i];
                     break;
                 case 'opacityStart':
                     temp[i] = property.opacityStart;
                     break;
                 default:
                     //乘以-1是为了向右翻页时取值为正,位移不需这样做
-                    temp[i] = -1 * moveDistance / this.screenWidth * property[i] * nodes;
+                    temp[i] = -1 * moveDistance / this.viewWidth * property[i] * nodes;
             }
         }
         return temp;
@@ -763,7 +761,7 @@ export default class MasterMgr extends Abstract {
                 }
             }
 
-            moveTranslate = this._transformConversion(translate, -self.screenWidth, nodes);
+            moveTranslate = this._transformConversion(translate, -self.viewWidth, nodes);
             this._transformNodes(rootNode, 300, moveTranslate, offsetTranslate.opacityStart);
             this._overMemory(moveTranslate, offsetTranslate);
         }

@@ -50,6 +50,13 @@ export function hash() {
     return Object.create(null)
 }
 
+/**
+ * 存在值
+ * 只有值不为undefined
+ */
+export function hasValue(value) {
+    return value != undefined
+}
 
 /**
  * 简单继承

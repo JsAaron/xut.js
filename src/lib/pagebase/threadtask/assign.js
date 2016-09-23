@@ -1,7 +1,7 @@
 import updataCache from './cache'
 import TaskContainer from './container/index'
 import TaskBackground from './background/index'
-import TaskContents from './contents/index'
+import TaskContents from './content/index'
 import TaskComponents from './component/index'
 import TaskFlow from './flow/index'
 

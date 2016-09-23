@@ -6,7 +6,7 @@ import {
 
 
 import nextTick from '../../util/nexttick'
-
+import { config } from '../../config/index'
 
 
 /**
@@ -121,7 +121,7 @@ export default function(Action) {
         str = '<div id="Subdoc_{0}" style="z-index:{1};width:{2}px;height:{3}px;top:{4}px;left:{5}px;position:absolute;opacity:0" >' +
             '</div>';
         dom = String.format(str,
-            this.id, zIndex, this.screenSize.width, this.screenSize.height, 0, 0
+            this.id, zIndex, config.viewSize.width, config.viewSize.height, 0, 0
         );
         ifr = this.iframe = this._createIframe()
         return $(dom).append(ifr);

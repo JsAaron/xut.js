@@ -24,8 +24,8 @@ import {
 export class PPT {
 
     constructor(pageIndex, pageType, chapterId, element, itemArray, container, hasLoop, startEvent, completeEvent) {
-        this.screenWidth = config.screenSize.width
-        this.screenHeight = config.screenSize.height
+        this.screenWidth = config.viewSize.width
+        this.screenHeight = config.viewSize.height
         this.container = container ? $(container) : $(document.body); //父容器(主要用于手势控制路径动画)
         this.isDebug = false; //是否显示调试信息
 

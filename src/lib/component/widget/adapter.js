@@ -12,12 +12,14 @@ import { config } from '../../config/index'
 import pageWidget from './page/index'
 import iframeWidget from './iframe/index'
 
+const FLOOR = Math.floor
+const CEIL = Math.ceil
 
 const load = (type, data, constructor) => {
     Xut.Application.injectionComponent({
-        'pageType'  : data.pageType, //标记类型区分
-        'pageIndex' : data.pageIndex,
-        'widget'    : new constructor(data)
+        'pageType': data.pageType, //标记类型区分
+        'pageIndex': data.pageIndex,
+        'widget': new constructor(data)
     })
 }
 
@@ -85,12 +87,27 @@ const filterData = (data) => {
 
 
 /**
+ * 计算元素的缩放比
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
+const calculateElement = (data) => {
+    var data = _.extend({}, data)
+    const proportion = config.proportion
+    data.width = CEIL(data.width * proportion.width);
+    data.height = CEIL(data.height * proportion.height);
+    data.top = FLOOR(data.top * proportion.top);
+    data.left = FLOOR(data.left * proportion.left);
+    return data;
+}
+
+/**
  * 获取widget数据
  * @return {[type]} [description]
  */
 const filtrateDas = (data) => {
     data = filterData(data);
-    return config.proportion.calculateElement(data)
+    return calculateElement(data)
 }
 
 
@@ -131,13 +148,13 @@ export function Adapter(para) {
 
     data.inputPara.uuid = config.appId + '-' + data.activityId; //唯一ID标示
     data.inputPara.id = data.activityId;
-    data.inputPara.screenSize = config.screenSize;
+    data.inputPara.screenSize = config.viewSize;
     //content的命名前缀
     data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType)
 
     //画轴模式
     data.scrollPaintingMode = config.scrollPaintingMode;
-    data.calculate = config.proportion.calculateContainer();
+    data.calculate = config.viewSize
 
     //执行类构建
     adapterType[(data.widgetType || 'widget').toLowerCase()](data);

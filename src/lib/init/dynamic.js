@@ -7,7 +7,6 @@ import { loader } from '../util/index'
 import {
     config,
     initConfig,
-    setProportion,
     initPathAddress
 } from '../config/index'
 
@@ -55,14 +54,26 @@ export default function dynamic(callback) {
         }
 
         /**
-         * 初始配置
-         */
-        initConfig()
-
-        /**
          * 初始化数据库设置
          */
         initData(novelData => {
+
+            /**
+             * 初始化配置一些信息
+             */
+            initConfig(novelData.pptWidth, novelData.pptHeight)
+
+            //2015.2.26
+            //启动画轴模式
+            //防止是布尔0成立
+            if (config.visualMode === 1 || config.scrollPaintingMode) {
+                config.scrollPaintingMode = true
+                config.visualMode === 1
+                //假如启用了画轴模式，看看是不是竖版的情况，需要切半模版virtualMode
+                if (config.screenSize.width < config.screenSize.height) {
+                    config.virtualMode = true
+                }
+            }
 
             /**
              * 创建忙碌光标
@@ -76,12 +87,6 @@ export default function dynamic(callback) {
              */
             initPathAddress()
 
-            /**
-             * ppt尺寸修正
-             */
-            if (novelData && novelData.pptWidth && novelData.pptHeight) {
-                setProportion(novelData.pptWidth, novelData.pptHeight)
-            }
 
             /**
              * 初始flows排版

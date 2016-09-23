@@ -45,8 +45,8 @@ let timer = null
  */
 export function createCursor() {
     if (isDisable) return
-    const sWidth = config.screenSize.width
-    const sHeight = config.screenSize.height
+    const sWidth = config.viewSize.width
+    const sHeight = config.viewSize.height
     const width = Math.min(sWidth, sHeight) / 4
     const space = Math.round((sHeight - width) / 2)
     const delay = [0, 0.9167, 0.833, 0.75, 0.667, 0.5833, 0.5, 0.41667, 0.333, 0.25, 0.1667, 0.0833]

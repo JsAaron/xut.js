@@ -5,6 +5,11 @@
 import { config } from '../../config/index'
 
 const transform = Xut.style.transform
+const setTranslateZ = Xut.style.setTranslateZ
+
+const hasValue = function(value) {
+    return value != undefined
+}
 
 /**
  * 变化节点的css3transform属性
@@ -13,7 +18,7 @@ const transform = Xut.style.transform
  * @param  {[type]} pageOffset [description]
  * @return {[type]}            [description]
  */
-function transformNodes(rootNode, property, pageOffset) {
+const transformNodes = function(rootNode, property, pageOffset) {
     var style = {},
         effect = '',
         parallaxOffset, //最终的偏移量X
@@ -25,15 +30,16 @@ function transformNodes(rootNode, property, pageOffset) {
     //浮动对象初始化偏移量
     parallaxOffset = pageOffset;
 
-    if (property.translateX != undefined || property.translateY != undefined || property.translateZ != undefined) {
-        x = round(property.translateX) || 0;
-        y = round(property.translateY) || 0;
-        z = round(property.translateZ) || 0;
-        parallaxOffset += x;
-        effect += String.format('translate3d({0}px,{1}px,{2}px) ', parallaxOffset, y, z);
+    if (hasValue(property.translateX) || hasValue(property.translateY) || hash(property.translateZ)) {
+        x = round(property.translateX) || 0
+        y = round(property.translateY) || 0
+        z = round(property.translateZ) || 0
+        parallaxOffset += x
+        const translateZ = setTranslateZ(z)
+        effect += `translate(${parallaxOffset}px,${y}px) ${translateZ}`
     }
 
-    if (property.rotateX != undefined || property.rotateY != undefined || property.rotateZ != undefined) {
+    if (hasValue(property.rotateX) || hasValue(property.rotateY) || hasValue(property.rotateZ)) {
         x = round(property.rotateX);
         y = round(property.rotateY);
         z = round(property.rotateZ);
@@ -42,14 +48,14 @@ function transformNodes(rootNode, property, pageOffset) {
         effect += z ? 'rotateZ(' + z + 'deg) ' : '';
     }
 
-    if (property.scaleX != undefined || property.scaleY != undefined || property.scaleZ != undefined) {
+    if (hasValue(property.scaleX) || hasValue(property.scaleY) || hasValue(property.scaleZ)) {
         x = round(property.scaleX * 100) / 100 || 1;
         y = round(property.scaleY * 100) / 100 || 1;
         z = round(property.scaleZ * 100) / 100 || 1;
         effect += String.format('scale3d({0},{1},{2}) ', x, y, z);
     }
 
-    if (property.opacity != undefined) {
+    if (hasValue(property.opacity)) {
         style.opacity = round((property.opacityStart + property.opacity) * 100) / 100;
         effect += ';'
     }
@@ -68,7 +74,7 @@ function transformNodes(rootNode, property, pageOffset) {
  * @param  {[type]} parameters [description]
  * @return {[type]}            [description]
  */
-function conversionRatio(parameters) {
+const conversionRatio = function(parameters) {
     if (parameters.opacityStart > -1) {
         parameters.opacity = (parameters.opacityEnd || 1) - parameters.opacityStart;
         delete parameters.opacityEnd;
@@ -83,10 +89,10 @@ function conversionRatio(parameters) {
  * @param  {[type]} nodeProportion [description]
  * @return {[type]}                [description]
  */
-function conversionValue(parameters, nodeProportion) {
+const conversionValue = function(parameters, nodeProportion) {
     var results = {},
-        width = -config.screenSize.width,
-        height = -config.screenSize.height;
+        width = -config.viewSize.width,
+        height = -config.viewSize.height;
 
     for (var i in parameters) {
         switch (i) {
@@ -110,13 +116,14 @@ function conversionValue(parameters, nodeProportion) {
 
 
 export function Parallax(data) {
-
+    let parameters
     try {
         //转化所有css特效的参数的比例
-        var parameters = JSON.parse(data.getParameter()[0]['parameter']);
+        parameters = JSON.parse(data.getParameter()[0]['parameter']);
     } catch (err) {
-        return false;
+        return false
     }
+
     var pid = data.pid,
         translate = conversionRatio(parameters),
         //页面偏移量
@@ -134,7 +141,7 @@ export function Parallax(data) {
 
     //改变节点的transform属性
     //返回改变后translateX值
-    var parallaxOffset = transformNodes(data.$contentProcess, _.extend({}, offsetTranslate), data.transformOffset);
+    const parallaxOffset = transformNodes(data.$contentProcess, _.extend({}, offsetTranslate), data.transformOffset);
 
     /**
      * 为了兼容动画，把视觉差当作一种行为处理

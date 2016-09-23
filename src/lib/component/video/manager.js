@@ -26,7 +26,6 @@ initBox()
 let deployVideo = (data, pageId, activityId) => {
 
     let proportion = config.proportion
-    let screenSize = config.screenSize
 
     let videoInfo = {
         'pageId': pageId,
@@ -35,8 +34,8 @@ let deployVideo = (data, pageId, activityId) => {
         'pageUrl': data.url,
         'left': data.left * proportion.left || 0,
         'top': data.top * proportion.top || 0,
-        'width': data.width * proportion.width || screenSize.width,
-        'height': data.height * proportion.height || screenSize.height,
+        'width': data.width * proportion.width || config.viewSize.width,
+        'height': data.height * proportion.height || config.viewSize.height,
         'padding': data.padding * proportion.left || 0,
         'zIndex': data.zIndex || 2147483647,
         'background': data.background,

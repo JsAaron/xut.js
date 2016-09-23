@@ -5,6 +5,7 @@ import Swipe from '../../swipe/index'
 import render from './render'
 
 import { flipDistance } from '../../manager/dispatcher/depend'
+import flowStyleConfig from '../../visuals/flows.config'
 
 /**
  * 2017.9.7
@@ -13,6 +14,7 @@ import { flipDistance } from '../../manager/dispatcher/depend'
 export default class Flow {
 
     constructor(base, callback) {
+
         const self = this
 
         this.callback = callback
@@ -44,9 +46,11 @@ export default class Flow {
      */
     _init($container, pagesCount) {
 
+        const flowstyle = flowStyleConfig()
+
         const MIN = 0
         const MAX = pagesCount - 1
-        const screenWidth = config.screenSize.width
+        const flipWidth = flowstyle.containerWidth
         const View = Xut.View
         const initIndex = this.initIndex
 
@@ -105,8 +109,8 @@ export default class Flow {
             //反弹
             if (action === 'flipRebound') {
                 moveDistance = direction === 'next' ?
-                    (-screenWidth * this._hindex - this._hindex) :
-                    -(screenWidth * this._hindex + this._hindex)
+                    (-flipWidth * this._hindex - this._hindex) :
+                    -(flipWidth * this._hindex + this._hindex)
             }
 
             //首尾连接主页
@@ -134,8 +138,6 @@ export default class Flow {
             'flipOver' === action && setTimeout(() => {
                 let extra = direction === 'next' ? 1 : (-1)
                 let index = initIndex + pageIndex + extra
-                    // Xut.View.pageUpdate(index)
-                    // Xut.View.setPointer(index)
             })
 
         })

@@ -61,7 +61,7 @@ const setOptions = () => {
 const newViewPage = function(distance) {
     //calculateDistance中修改了对应的distance
     //这里给swipe捕获
-    if (distance === 0 || Math.abs(distance) === Math.abs(config.overflowSize.left)) { //目标页面传递属性
+    if (distance === 0) { //目标页面传递属性
         return true
     }
 }

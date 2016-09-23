@@ -11,15 +11,16 @@ const transitionEnd = Xut.style.transitionEnd
 const isSurface = Xut.plat.isSurface
 
 //触发事件名
-const touchName = ['touchstart', 'touchmove', 'touchend', transitionEnd]
-const mouseName = ['mousedown', 'mousemove', 'mouseup', transitionEnd]
+const touchName = ['touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd]
+const mouseName = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd]
 
 //绑定事件名排序
 const orderName = {
     start: 0,
     move: 1,
     end: 2,
-    transitionend: 3
+    cancel: 3,
+    transitionend: 4
 }
 
 const EVENT_NAME = (() => {
@@ -110,6 +111,8 @@ export function handle(callbacks, context, event) {
             break;
         case 'touchend':
         case 'mouseup':
+        case 'mousecancel':
+        case 'touchcancel':
             callbacks.end && callbacks.end.call(context, event)
             break;
         case transitionEnd:

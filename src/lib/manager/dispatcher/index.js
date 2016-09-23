@@ -27,8 +27,7 @@ import {
     checkMasterCreate,
 } from './depend'
 
-import styleConfig from './style.config'
-
+import styleConfig from '../../visuals/contaniner.config'
 
 export class Dispatcher {
 

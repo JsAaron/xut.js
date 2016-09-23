@@ -149,7 +149,7 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
      */
     if (data.processType === 'parallax') {
         //初始化视觉差对象的坐标偏移量
-        data.transformOffset = base.relatedData.transformOffset(data.id);
+        data.transformOffset = base.relatedData.transformOffset(data.id)
         return Parallax.call(base, data);
     }
 

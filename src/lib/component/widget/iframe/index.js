@@ -87,13 +87,13 @@ export default class iframeWidget {
         var width      = this._$iframe.offsetWidth
         var height     = this._$iframe.offsetHeight
 
-        if (dataSource.screenSize.width * 0.98 <= width 
+        if (dataSource.screenSize.width * 0.98 <= width
             && dataSource.screenSize.height * 0.98 <= height) {
             Xut.View.Toolbar({
                 show: 'button',
                 hide: 'controlBar'
             })
-        } else if (dataSource.screenSize.width * 0.7 <= width 
+        } else if (dataSource.screenSize.width * 0.7 <= width
             && dataSource.screenSize.height * 0.7 <= height) {
             Xut.View.Toolbar({
                 show: 'button'

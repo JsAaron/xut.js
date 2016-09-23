@@ -53,13 +53,13 @@ const defaults = {
  * 配置默认数据
  * @return {[type]} [description]
  */
-const initDefaults = (SettData) => {
+const initDefaults = (setData) => {
     let rs
     const data = {}
     const setConfig = {}
 
-    _.each(SettData, (key, index) => {
-        rs = SettData.item(index);
+    _.each(setData, (key, index) => {
+        rs = setData.item(index);
         data[rs.name] = rs.value;
     })
 
@@ -90,20 +90,8 @@ const initDefaults = (SettData) => {
     //2014.9.2
     Xut.Presentation.AdsId = data.adsId;
 
-    //2015.2.26
-    //启动画轴模式
-    //防止是布尔0成立
-    if (config.visualMode === 1 || data.scrollPaintingMode && data.scrollPaintingMode == 1) {
-        config.scrollPaintingMode = true
-        config.visualMode === 1
-    }
-
-    //假如启用了画轴模式，看看是不是竖版的情况，需要切半模版virtualMode
-    if (config.scrollPaintingMode) {
-        if (config.screenSize.width < config.screenSize.height) {
-            config.virtualMode = true
-        }
-    }
+    //画轴模式
+    config.scrollPaintingMode = Number(data.scrollPaintingMode)
 
     //创建过滤器
     Xut.CreateFilter = contentFilter('createFilter');

@@ -15,7 +15,7 @@ const TOP = isIOS ? 20 : 0
 const getOptions = () => {
     let iconHeight = config.iconHeight
     let proportion = config.proportion
-    const calculate = proportion.calculateContainer()
+    const viewSize = config.viewSize
 
     //横版模式
     const isHorizontal = config.layoutMode == 'horizontal'
@@ -26,11 +26,10 @@ const getOptions = () => {
     return {
         isHorizontal: isHorizontal,
         iconHeight: iconHeight,
-        sWidth: calculate.width,
-        sHeight: calculate.height,
-        sTop: calculate.top,
-        sLeft: calculate.left,
-        calculate: calculate,
+        sWidth: viewSize.width,
+        sHeight: viewSize.height,
+        sTop: viewSize.top,
+        sLeft: viewSize.left,
         proportion: proportion
     }
 }
@@ -47,7 +46,6 @@ export function home() {
     const sWidth       = options.sWidth
     const sHeight      = options.sHeight
     const iconHeight   = options.iconHeight
-    const calculate    = options.calculate
     const isHorizontal = options.isHorizontal
 
     const navBarWidth     = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px'
@@ -73,8 +71,7 @@ export function home() {
 
     const homeWidth = config.viewSize.width
     // const homeHeight = config.viewSize.height
-    // const homeTop = calculate.top
-    const homeLeft = calculate.left
+    const homeLeft = config.viewSize.left
     const homeIndex = Xut.sceneController.createIndex()
     const homeOverflow = config.scrollPaintingMode ? 'visible' : 'hidden'
 
@@ -109,7 +106,6 @@ export function scene(id) {
     const options   = getOptions()
     const sWidth    = options.sWidth
     const sHeight   = options.sHeight
-    const calculate = options.calculate
 
     const scenarioId = 'scenario-' + id
     const overflow = config.scrollPaintingMode ? 'visible' : 'hidden'
@@ -120,7 +116,7 @@ export function scene(id) {
         `<div id="${scenarioId}"
               style="width:${config.viewSize.width}px;
                      height:100%;
-                     left:${calculate.left}px;
+                     left:${config.viewSize.left}px;
                      z-index:${Xut.sceneController.createIndex()};
                      overflow:{{overflow}};">
             <ul id="${pageId}" class="xut-flip" style="z-index:2"></ul>

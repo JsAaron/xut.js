@@ -6,11 +6,11 @@
  * @return {[type]}         [description]
  */
 
+import { config } from '../config/index'
 import nextTick from '../util/nexttick'
 
 let msgBox
 let toolTip
-let config
 
 
 /**
@@ -55,10 +55,7 @@ function show(opts) {
  */
 function messageBox(message) {
 
-    config = Xut.config;
-
-    var size = config.screenSize,
-        width = size.width * 0.25,
+    var width = config.viewSize.width * 0.25,
         Box = msgBox || $('#xut-message'),
         html = '<div class="messageBox" style="width:' + width + 'px;">' +
         '<div class="messageTex" style="line-height:2">' + message + '</div>' +

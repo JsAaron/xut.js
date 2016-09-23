@@ -12,10 +12,15 @@ import {
 
 import {
     getSize,
-    getLayerMode,
-    fixProportion
+    getLayerMode
 }
-from './set'
+from './get'
+
+import getViewSize from '../visuals/view.config'
+import {
+    getFullProportion,
+    getRealProportion
+} from '../visuals/proportion.config'
 
 import improtMode from './mode-type'
 import improtData from './data-type'
@@ -329,37 +334,44 @@ export function initPathAddress() {
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
  * @type {[type]}
  */
-export function setProportion(pptWidth, pptHeight) {
+const setProportion = function(pptWidth, pptHeight) {
+
+    //数据ppt排版设计
+    if (pptWidth && pptHeight) {
+        config.pptHorizontal = pptWidth > pptHeight ? true : false
+        config.pptVertical = !config.pptHorizontal
+    }
+
     /**
-     * 缩放比
+     * 获取全屏比值，用来设定view的尺寸
      * @type {[type]}
      */
-    proportion = config.proportion = fixProportion(config, pptWidth, pptHeight)
+    const fullProportion = getFullProportion(config, pptWidth, pptHeight)
 
     /**
      * 可视区域尺寸
      * @type {Object}
      */
-    const calculate = proportion.calculateContainer()
-    config.viewSize = {
-        width: config.virtualMode ? calculate.width / 2 : calculate.width,
-        height: calculate.height,
-        left:calculate.left,
-        top:calculate.top
-    }
+    const viewSize = config.viewSize = getViewSize(config, fullProportion)
 
     /**
      * 溢出尺寸
      * @type {Object}
      */
-    const overflowWidth = config.viewSize.width - config.screenSize.width
-    const overflowHeight = config.viewSize.height - config.screenSize.height
+    const overflowWidth = viewSize.width - config.screenSize.width
+    const overflowHeight = viewSize.height - config.screenSize.height
     config.overflowSize = {
-        width: config.viewSize.width - config.screenSize.width,
-        height: config.viewSize.height - config.screenSize.height,
+        width: viewSize.width - config.screenSize.width,
+        height: viewSize.height - config.screenSize.height,
         left: overflowWidth / 2,
         top: overflowHeight / 2
     }
+
+    /**
+     * 获取全局缩放比
+     * @type {[type]}
+     */
+    proportion = config.proportion = getRealProportion(config, viewSize, fullProportion)
 
 }
 
@@ -369,16 +381,25 @@ export function setProportion(pptWidth, pptHeight) {
  * viewSize,screenSize,layoutMode,proportion
  * @return {[type]} [description]
  */
-export function initConfig() {
+export function initConfig(pptWidth, pptHeight) {
     /**
      * 获取分辨率
      * @type {[type]}
      */
     config.screenSize = getSize()
+
+    /**
+     * 根据设备判断设备的横竖屏
+     * @type {[type]}
+     */
+    config.screenHorizontal = config.screenSize.width > config.screenSize.height ? true : false
+    config.screenVertical = !config.screenHorizontal
+
+
     layoutMode = config.layoutMode = getLayerMode(config.screenSize)
 
     /**
      * 设置缩放比
      */
-    setProportion()
+    setProportion(pptWidth, pptHeight)
 }

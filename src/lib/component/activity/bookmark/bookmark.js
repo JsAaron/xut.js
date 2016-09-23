@@ -59,8 +59,7 @@ BookMark.prototype.init = function() {
  */
 BookMark.prototype.createBookMark = function() {
 
-    var screenSize = Xut.config.screenSize
-    var sHeight = screenSize.height
+    var sHeight = Xut.config.viewSize.height
 
     var height = sLineHeiht * 3, // menu的高为3em
         box = '<div class="xut-bookmark-menu" style="width:100%;height:{0}px;left:0;top:{1}px;">' +
