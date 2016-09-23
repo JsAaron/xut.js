@@ -62,91 +62,6 @@ export default class PageMgr extends Abstract {
 
 
     /**
-     * 销毁整个页面管理对象
-     * @param  {[type]} clearPageIndex [description]
-     * @return {[type]}                [description]
-     */
-    clearPage(clearPageIndex) {
-        const pageObj = this.abstractGetPageObj(clearPageIndex)
-            //销毁页面对象事件
-        if (pageObj) {
-            //移除事件
-            pageObj.baseDestroy();
-            //移除列表
-            this.abstractRemoveCollection(clearPageIndex);
-        }
-    }
-
-
-    /**
-     * 销毁整个页面管理对象
-     * @return {[type]} [description]
-     */
-    destroy() {
-        //清理视频
-        var pageId = Xut.Presentation.GetPageId(Xut.Presentation.GetPageIndex())
-
-        removeVideo(pageId)
-
-        //清理对象
-        this.abstractDestroyCollection();
-        //清理节点
-        this.rootNode = null;
-    }
-
-
-    /**
-     * 设置中断正在创建的页面对象任务
-     * @param {[type]}   currIndex [description]
-     * @param {Function} callback  [description]
-     */
-    suspendInnerCreateTasks(pointers) {
-        var pageObj,
-            self = this;
-        [pointers.leftIndex, pointers.currIndex, pointers.rightIndex].forEach(function(pointer) {
-            if (pageObj = self.abstractGetPageObj(pointer)) {
-                pageObj.setTaskSuspend();
-            }
-        })
-    }
-
-    /**
-     * 检测活动窗口任务
-     * @return {[type]} [description]
-     */
-    checkTaskCompleted(currIndex, callback) {
-        var currPageObj,
-            self = this;
-        // console.log('激活活动任务',currIndex)
-        if (currPageObj = self.abstractGetPageObj(currIndex)) {
-            currPageObj.checkThreadTask(function() {
-                // console.log('11111111111当前页面创建完毕',currIndex+1)
-                callback(currPageObj)
-            })
-        }
-    }
-
-    /**
-     * 检测后台预创建任务
-     * @return {[type]} [description]
-     */
-    checkPreforkTasks(resumePointer, preCreateTask) {
-        var resumeObj, resumeCount;
-        if (!resumePointer.length) {
-            resumePointer = [resumePointer];
-        }
-        resumeCount = resumePointer.length;
-        while (resumeCount--) {
-            if (resumeObj = this.abstractGetPageObj(resumePointer[resumeCount])) {
-                resumeObj.createPreforkTasks(function() {
-                    // console.log('后台处理完毕')
-                }, preCreateTask)
-            }
-        }
-    }
-
-
-    /**
      * 移动页面
      * @return {[type]}            [description]
      */
@@ -188,11 +103,12 @@ export default class PageMgr extends Abstract {
         checkInjectScript(suspendPageObj, 'postCode');
 
         //中断节点创建任务
-        this.suspendInnerCreateTasks(pointers);
+        this._suspendInnerCreateTasks(pointers);
 
         //停止活动对象活动
         _suspend(suspendPageObj, prveChpterId);
     }
+
 
     /**
      * 复位初始状态
@@ -231,7 +147,7 @@ export default class PageMgr extends Abstract {
 
         //检测当前页面构建任务的情况
         //如果任务没有完成，则等待任务完成
-        this.checkTaskCompleted(data.currIndex, function(currPageObj) {
+        this._checkTaskCompleted(data.currIndex, function(currPageObj) {
 
             //提升当前页面浮动对象的层级
             //因为浮动对象可以是并联的
@@ -277,7 +193,7 @@ export default class PageMgr extends Abstract {
             } else {
                 resumePointer = data.createPointer || data.nextIndex || data.prevIndex
             }
-            self.checkPreforkTasks(resumePointer, preCreateTask);
+            self._checkPreforkTasks(resumePointer, preCreateTask);
         };
 
 
@@ -309,4 +225,90 @@ export default class PageMgr extends Abstract {
             }
         }
     }
+
+
+   /**
+     * 销毁整个页面管理对象
+     * @param  {[type]} clearPageIndex [description]
+     * @return {[type]}                [description]
+     */
+    clearPage(clearPageIndex) {
+        const pageObj = this.abstractGetPageObj(clearPageIndex)
+            //销毁页面对象事件
+        if (pageObj) {
+            //移除事件
+            pageObj.baseDestroy();
+            //移除列表
+            this.abstractRemoveCollection(clearPageIndex);
+        }
+    }
+
+
+    /**
+     * 销毁整个页面管理对象
+     * @return {[type]} [description]
+     */
+    destroy() {
+        //清理视频
+        var pageId = Xut.Presentation.GetPageId(Xut.Presentation.GetPageIndex())
+
+        removeVideo(pageId)
+
+        //清理对象
+        this.abstractDestroyCollection();
+        //清理节点
+        this.rootNode = null;
+    }
+
+
+    /**
+     * 设置中断正在创建的页面对象任务
+     * @param {[type]}   currIndex [description]
+     * @param {Function} callback  [description]
+     */
+    _suspendInnerCreateTasks(pointers) {
+        var pageObj,
+            self = this;
+        [pointers.leftIndex, pointers.currIndex, pointers.rightIndex].forEach(function(pointer) {
+            if (pageObj = self.abstractGetPageObj(pointer)) {
+                pageObj.setTaskSuspend();
+            }
+        })
+    }
+
+    /**
+     * 检测活动窗口任务
+     * @return {[type]} [description]
+     */
+    _checkTaskCompleted(currIndex, callback) {
+        var currPageObj,
+            self = this;
+        // console.log('激活活动任务',currIndex)
+        if (currPageObj = self.abstractGetPageObj(currIndex)) {
+            currPageObj.checkThreadTask(function() {
+                // console.log('11111111111当前页面创建完毕',currIndex+1)
+                callback(currPageObj)
+            })
+        }
+    }
+
+    /**
+     * 检测后台预创建任务
+     * @return {[type]} [description]
+     */
+    _checkPreforkTasks(resumePointer, preCreateTask) {
+        var resumeObj, resumeCount;
+        if (!resumePointer.length) {
+            resumePointer = [resumePointer];
+        }
+        resumeCount = resumePointer.length;
+        while (resumeCount--) {
+            if (resumeObj = this.abstractGetPageObj(resumePointer[resumeCount])) {
+                resumeObj.createPreforkTasks(function() {
+                    // console.log('后台处理完毕')
+                }, preCreateTask)
+            }
+        }
+    }
+
 }

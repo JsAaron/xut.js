@@ -84,6 +84,21 @@ export default class MasterMgr extends Abstract {
 
 
     /**
+     * 注册状态管理
+     * @param  {[type]} pageIndex  [description]
+     * @param  {[type]} type       [description]
+     * @param  {[type]} hotspotObj [description]
+     * @return {[type]}            [description]
+     */
+    register(pageIndex, type, hotspotObj) {
+        var parallaxObj = this.abstractGetPageObj(this._conversionMasterId(pageIndex))
+        if (parallaxObj) {
+            parallaxObj.registerCotents.apply(parallaxObj, arguments);
+        }
+    }
+
+
+    /**
      * 创建
      * @param  {[type]} dataOpts       [description]
      * @param  {[type]} pageIndex      [description]
@@ -125,55 +140,6 @@ export default class MasterMgr extends Abstract {
         this.abstractAddCollection(reuseMasterKey, masterObj);
 
         return masterObj;
-    }
-
-
-    /**
-     * 销毁整个页面对象
-     * @return {[type]} [description]
-     */
-    destroy() {
-        this.rootNode = null;
-        //销毁对象
-        this.abstractDestroyCollection();
-    }
-
-
-    /**
-     * 找到当前页面的可以需要滑动是视觉页面对象
-     * @return {[type]}            [description]
-     */
-    _findMaster(leftIndex, currIndex, rightIndex, direction, action) {
-        var prevFlag,
-            nextFlag,
-            prevMasterObj,
-            currMasterObj,
-            nextMasterObj,
-            prevMasterId = this._conversionMasterId(leftIndex),
-            currMasterId = this._conversionMasterId(currIndex),
-            nextMasterId = this._conversionMasterId(rightIndex);
-
-        switch (direction) {
-            case 'prev':
-                if (prevFlag = (currMasterId !== prevMasterId)) {
-                    currMasterObj = this.abstractGetPageObj(currMasterId);
-                }
-                if (prevMasterId && prevFlag) {
-                    action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
-                    prevMasterObj = this.abstractGetPageObj(prevMasterId)
-                }
-                break;
-            case 'next':
-                if (nextFlag = (currMasterId !== nextMasterId)) {
-                    currMasterObj = this.abstractGetPageObj(currMasterId);
-                }
-                if (nextMasterId && nextFlag) {
-                    action === 'flipOver' && this._checkClear([currMasterId, nextMasterId]); //边界清理
-                    nextMasterObj = this.abstractGetPageObj(nextMasterId)
-                }
-                break;
-        }
-        return [prevMasterObj, currMasterObj, nextMasterObj];
     }
 
 
@@ -225,21 +191,6 @@ export default class MasterMgr extends Abstract {
             case 'next':
                 nodes && moveParallaxObject(nodes)
                 break;
-        }
-    }
-
-
-    /**
-     * 移动内部的视察对象
-     * 处理当前页面内的视觉差对象效果
-     */
-    _moveParallaxs(currIndex, ...arg) {
-        const getMasterId = this._conversionMasterId(currIndex)
-        const currParallaxObj = this.abstractGetPageObj(getMasterId)
-
-        //处理当前页面内的视觉差对象效果
-        if (currParallaxObj) {
-            currParallaxObj.moveParallax(...arg)
         }
     }
 
@@ -312,7 +263,6 @@ export default class MasterMgr extends Abstract {
     }
 
 
-   
     /**
      * 制作处理器
      * 针对跳转页面
@@ -343,6 +293,71 @@ export default class MasterMgr extends Abstract {
             }
         }
     }
+
+
+    /**
+     * 销毁整个页面对象
+     * @return {[type]} [description]
+     */
+    destroy() {
+        this.rootNode = null;
+        //销毁对象
+        this.abstractDestroyCollection();
+    }
+
+
+    /**
+     * 找到当前页面的可以需要滑动是视觉页面对象
+     * @return {[type]}            [description]
+     */
+    _findMaster(leftIndex, currIndex, rightIndex, direction, action) {
+        var prevFlag,
+            nextFlag,
+            prevMasterObj,
+            currMasterObj,
+            nextMasterObj,
+            prevMasterId = this._conversionMasterId(leftIndex),
+            currMasterId = this._conversionMasterId(currIndex),
+            nextMasterId = this._conversionMasterId(rightIndex);
+
+        switch (direction) {
+            case 'prev':
+                if (prevFlag = (currMasterId !== prevMasterId)) {
+                    currMasterObj = this.abstractGetPageObj(currMasterId);
+                }
+                if (prevMasterId && prevFlag) {
+                    action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
+                    prevMasterObj = this.abstractGetPageObj(prevMasterId)
+                }
+                break;
+            case 'next':
+                if (nextFlag = (currMasterId !== nextMasterId)) {
+                    currMasterObj = this.abstractGetPageObj(currMasterId);
+                }
+                if (nextMasterId && nextFlag) {
+                    action === 'flipOver' && this._checkClear([currMasterId, nextMasterId]); //边界清理
+                    nextMasterObj = this.abstractGetPageObj(nextMasterId)
+                }
+                break;
+        }
+        return [prevMasterObj, currMasterObj, nextMasterObj];
+    }
+
+
+    /**
+     * 移动内部的视察对象
+     * 处理当前页面内的视觉差对象效果
+     */
+    _moveParallaxs(currIndex, ...arg) {
+        const getMasterId = this._conversionMasterId(currIndex)
+        const currParallaxObj = this.abstractGetPageObj(getMasterId)
+
+        //处理当前页面内的视觉差对象效果
+        if (currParallaxObj) {
+            currParallaxObj.moveParallax(...arg)
+        }
+    }
+
 
     //扫描边界
     //扫描key的左右边界
@@ -570,22 +585,7 @@ export default class MasterMgr extends Abstract {
                     }
                 }
             })
-            this.clearMemory(removeMasterId);
-        }
-    }
-
-
-    /**
-     * 注册状态管理
-     * @param  {[type]} pageIndex  [description]
-     * @param  {[type]} type       [description]
-     * @param  {[type]} hotspotObj [description]
-     * @return {[type]}            [description]
-     */
-    register(pageIndex, type, hotspotObj) {
-        var parallaxObj = this.abstractGetPageObj(this._conversionMasterId(pageIndex))
-        if (parallaxObj) {
-            parallaxObj.registerCotents.apply(parallaxObj, arguments);
+            this._clearMemory(removeMasterId);
         }
     }
 
@@ -596,7 +596,7 @@ export default class MasterMgr extends Abstract {
      * @param  {[type]} removeMasterId [description]
      * @return {[type]}                [description]
      */
-    clearMemory(removeMasterId) {
+    _clearMemory(removeMasterId) {
         var pageObj, self = this;
         _.each(removeMasterId, function(removekey) {
             //销毁页面对象事件
