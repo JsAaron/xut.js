@@ -14,6 +14,7 @@ import {
 
 import {
     _overMemory,
+    _transformNodes,
     _transformConversion
 } from '../pagebase/translation/parallax'
 
@@ -72,7 +73,10 @@ export default class MasterMgr extends Abstract {
         this.recordMasterId = {}; //记录页面与母板对应的编号
         this.currMasterId = null; //可视区母板编号
 
-        //记录视察处理的对象
+        /**
+         * 记录视察处理的对象
+         * @type {Object}
+         */
         this.parallaxProcessedContetns = {};
 
         /**
@@ -604,8 +608,8 @@ export default class MasterMgr extends Abstract {
                 //移除事件
                 pageObj.baseDestroy();
                 //移除列表
-                self.abstractRemoveCollection(removekey);
-                self._removeRecordMasterscope(removekey);;
+                self.abstractRemoveCollection(removekey)
+                self._removeRecordMasterscope(removekey)
             }
             //清理作用域缓存
             delete self.recordMasterscope[removekey];

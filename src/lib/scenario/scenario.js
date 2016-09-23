@@ -4,7 +4,7 @@ import MainBar from '../toolbar/sysbar'
 import DeputyBar from '../toolbar/fnbar'
 import BookBar from '../toolbar/bookbar/index'
 import { sceneController } from './controller'
-import { Mediator } from '../manager/index'
+import { Mediator } from '../manager/mediator'
 
 import {
     home,
