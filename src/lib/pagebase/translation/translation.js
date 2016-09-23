@@ -4,7 +4,7 @@
  * @return {[type]} [description]
  */
 
-import { config } from '../config/index'
+import { config } from '../../config/index'
 
 const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
@@ -41,7 +41,7 @@ const setOptions = () => {
     const viewWidth = config.viewSize.width
     const offsetLeft = -viewWidth
     const offsetRight = viewWidth
-    const offsetCut =  0
+    const offsetCut = 0
     prevEffect = createTranslate(offsetLeft)
     currEffect = createTranslate(offsetCut)
     nextEffect = createTranslate(offsetRight)
@@ -69,19 +69,15 @@ const newViewPage = function(distance) {
 
 /**
  * 切换坐标
- * @param  {[type]} context  [description]
- * @param  {[type]} distance [description]
- * @param  {[type]} speed    [description]
- * @param  {[type]} element  [description]
- * @return {[type]}          [description]
  */
-const toTranslate3d = (context, distance, speed, element) => {
+const toTranslate3d = (element, distance, speed) => {
     distance = config.virtualMode ? distance / 2 : distance;
-    if (element = element || context.element || context.$contentProcess) {
+    if (element) {
         element.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
+
+        //修正flipMode切换页面的处理
+        //没有翻页效果
         if (config.flipMode) {
-            //修正flipMode切换页面的处理
-            //没有翻页效果
             if (newViewPage(distance)) {
                 const cur = Xut.sceneController.containerObj('current')
                 cur.vm.$globalEvent.setAnimComplete(element);
@@ -89,6 +85,7 @@ const toTranslate3d = (context, distance, speed, element) => {
         } else {
             element.css(transitionDuration, speed + "ms")
         }
+
     }
 }
 
@@ -108,10 +105,11 @@ const reset = (context) => {
 
 /**
  * 移动
+ * element, distance, speed
  * @return {[type]} [description]
  */
-const flipMove = (context, distance, speed, element) => {
-    toTranslate3d(context, distance, speed, element)
+const flipMove = (...arg) => {
+    toTranslate3d(...arg)
 }
 
 
@@ -119,8 +117,8 @@ const flipMove = (context, distance, speed, element) => {
  * 移动反弹
  * @return {[type]} [description]
  */
-const flipRebound = (context, distance, speed, element) => {
-    toTranslate3d(context, distance, speed, element)
+const flipRebound = (...arg) => {
+    toTranslate3d(...arg)
 }
 
 
@@ -128,14 +126,8 @@ const flipRebound = (context, distance, speed, element) => {
  * 移动结束
  * @return {[type]} [description]
  */
-const flipOver = (context, distance, speed, element) => {
-    //过滤多个动画回调，保证指向始终是当前页面
-    if (context.pageType === 'page') {
-        if (newViewPage(distance)) { //目标页面传递属性
-            context.element.attr('data-view', true)
-        }
-    }
-    toTranslate3d(context, distance, speed, element)
+const flipOver = (...arg) => {
+    toTranslate3d(...arg)
 }
 
 

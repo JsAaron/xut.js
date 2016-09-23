@@ -5,7 +5,6 @@
  */
 import { Abstract } from './abstract'
 import { Pagebase } from '../pagebase/pagebase'
-import { translation } from '../swipe/translation'
 import { addEdges } from '../util/edge'
 import { removeVideo } from '../component/video/manager'
 import { injectScript, extend } from '../util/index'
@@ -69,7 +68,7 @@ export default class PageMgr extends Abstract {
      */
     clearPage(clearPageIndex) {
         const pageObj = this.abstractGetPageObj(clearPageIndex)
-        //销毁页面对象事件
+            //销毁页面对象事件
         if (pageObj) {
             //移除事件
             pageObj.baseDestroy();
@@ -147,34 +146,28 @@ export default class PageMgr extends Abstract {
     }
 
 
-    move(leftIndex, currIndex, rightIndex, direction, speed, action, moveDistance) {
-
-        /**
-         * 找到需要滑动的页面
-         * @return {[type]} [description]
-         */
-        const findPage = () => {
-            return [
-                this.abstractGetPageObj(leftIndex),
-                this.abstractGetPageObj(currIndex),
-                this.abstractGetPageObj(rightIndex)
-            ]
-        }
-
-        /**
-         * 开始移动页面
-         * @return {[type]}         [description]
-         */
-        _.each(findPage.call(this), function(pageObj, index) {
+    /**
+     * 移动页面
+     * @return {[type]}            [description]
+     */
+    move({
+        nodes,
+        speed,
+        action,
+        moveDist,
+        leftIndex,
+        currIndex,
+        rightIndex,
+        direction,
+    } = {}) {
+        _.each([
+            this.abstractGetPageObj(leftIndex),
+            this.abstractGetPageObj(currIndex),
+            this.abstractGetPageObj(rightIndex)
+        ], function(pageObj, index) {
             if (pageObj) {
-                //移动浮动页面容器
-                var floatElement;
-                if (floatElement = pageObj.floatContents.PageContainer) {
-                    translation[action](pageObj, moveDistance[index], speed, floatElement)
-                }
-
-                //正常页面
-                translation[action](pageObj, moveDistance[index], speed)
+                let dist = moveDist[index]
+                pageObj.toMove(action, dist, speed, moveDist[3])
             }
         })
     }

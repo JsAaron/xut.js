@@ -541,7 +541,7 @@ export class Dispatcher {
         }
 
         //移动的距离
-        const moveDistance = getFlipDistance({
+        let moveDist = getFlipDistance({
             action,
             distance,
             direction,
@@ -553,14 +553,21 @@ export class Dispatcher {
         const chapterData = currObj.chapterDas
         const nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined
 
-        //通知page模块
-        this.pageMgr.move(leftIndex, currIndex, rightIndex, direction, speed, action, moveDistance);
+        const data = {
+            nodes,
+            speed, 
+            action, 
+            moveDist,
+            leftIndex, 
+            currIndex, 
+            rightIndex, 
+            direction, 
+        }
 
-        //通知视觉差模块
+        this.pageMgr.move(data)
         this.masterContext(function() {
-            this.move(leftIndex, currIndex, rightIndex, direction, moveDistance, action, speed, nodes);
+            this.move(data)
         })
-
     }
 
 

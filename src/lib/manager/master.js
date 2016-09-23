@@ -4,7 +4,6 @@
  * @return {[type]}
  */
 import { Abstract } from './abstract'
-import { translation } from '../swipe/translation'
 import { Pagebase } from '../pagebase/pagebase'
 
 import {
@@ -12,6 +11,11 @@ import {
     original as _original,
     autoRun as _autoRun
 } from '../command/index'
+
+import {
+    _overMemory,
+    _transformConversion
+} from '../pagebase/translation/parallax'
 
 import { config } from '../config/index'
 
@@ -145,9 +149,9 @@ export default class MasterMgr extends Abstract {
             prevMasterObj,
             currMasterObj,
             nextMasterObj,
-            prevMasterId = this.conversionMasterId(leftIndex),
-            currMasterId = this.conversionMasterId(currIndex),
-            nextMasterId = this.conversionMasterId(rightIndex);
+            prevMasterId = this._conversionMasterId(leftIndex),
+            currMasterId = this._conversionMasterId(currIndex),
+            nextMasterId = this._conversionMasterId(rightIndex);
 
         switch (direction) {
             case 'prev':
@@ -155,7 +159,7 @@ export default class MasterMgr extends Abstract {
                     currMasterObj = this.abstractGetPageObj(currMasterId);
                 }
                 if (prevMasterId && prevFlag) {
-                    action === 'flipOver' && this.checkClear([currMasterId, prevMasterId]); //边界清理
+                    action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
                     prevMasterObj = this.abstractGetPageObj(prevMasterId)
                 }
                 break;
@@ -164,7 +168,7 @@ export default class MasterMgr extends Abstract {
                     currMasterObj = this.abstractGetPageObj(currMasterId);
                 }
                 if (nextMasterId && nextFlag) {
-                    action === 'flipOver' && this.checkClear([currMasterId, nextMasterId]); //边界清理
+                    action === 'flipOver' && this._checkClear([currMasterId, nextMasterId]); //边界清理
                     nextMasterObj = this.abstractGetPageObj(nextMasterId)
                 }
                 break;
@@ -178,27 +182,27 @@ export default class MasterMgr extends Abstract {
      * 1 母版之间的切换
      * 2 浮动对象的切换
      */
-    move(leftIndex, currIndex, rightIndex, direction, moveDistance, action, speed, nodes) {
-        var parallaxOffset,
-            self = this,
-            isBoundary = false; //是边界处理
+    move({
+        nodes,
+        speed,
+        action,
+        moveDist,
+        leftIndex,
+        currIndex,
+        rightIndex,
+        direction,
+    } = {}) {
+
+        let isBoundary = false; //是边界处理
 
         //找到需要滑动的母版
-        _.each(this._findMaster(leftIndex, currIndex, rightIndex, direction, action), function(pageObj, index) {
+        const masterObjs = this._findMaster(leftIndex, currIndex, rightIndex, direction, action)
+
+        _.each(masterObjs, function(pageObj, index) {
             if (pageObj) {
                 isBoundary = true
-
-                //母版交接判断
-                //用户事件的触发
-                pageObj.onceMaster = false
-
-                //移动母版
-                translation[action](pageObj, moveDistance[index], speed)
-
-                //移动浮动容器
-                if (pageObj.floatContents.MasterContainer) {
-                    translation[action](pageObj, moveDistance[index], speed, pageObj.floatContents.MasterContainer)
-                }
+                let dist = moveDist[index]
+                pageObj.toMove(action, dist, speed, moveDist[3])
             }
         })
 
@@ -209,8 +213,8 @@ export default class MasterMgr extends Abstract {
         }
 
         //移动视察对象
-        const moveParallaxObject = function(nodes) {
-            self.moveParallaxs(moveDistance, currIndex, action, direction, speed, nodes)
+        const moveParallaxObject = (nodes) => {
+            this._moveParallaxs(currIndex, action, direction, moveDist, speed, nodes, this.parallaxProcessedContetns)
         }
 
         //移动视察对象
@@ -221,6 +225,21 @@ export default class MasterMgr extends Abstract {
             case 'next':
                 nodes && moveParallaxObject(nodes)
                 break;
+        }
+    }
+
+
+    /**
+     * 移动内部的视察对象
+     * 处理当前页面内的视觉差对象效果
+     */
+    _moveParallaxs(currIndex, ...arg) {
+        const getMasterId = this._conversionMasterId(currIndex)
+        const currParallaxObj = this.abstractGetPageObj(getMasterId)
+
+        //处理当前页面内的视觉差对象效果
+        if (currParallaxObj) {
+            currParallaxObj.moveParallax(...arg)
         }
     }
 
@@ -266,111 +285,6 @@ export default class MasterMgr extends Abstract {
         }
     }
 
-    /**
-     * 移动内部的视察对象
-     */
-    moveParallaxs(moveDistance, currIndex, action, direction, speed, nodes) {
-        var rootNode,
-            floatObj,
-            contentObj,
-            contentObjs,
-            baseContents,
-            currParallaxObj,
-            currMoveDistance,
-            hasFloatMater,
-            floatMaterParallaxChange,
-            //需要执行动画
-            activationAnim = action === "flipRebound" || action === "flipOver",
-            self = this;
-
-        //处理当前页面内的视觉差对象效果
-        if (currParallaxObj = this.abstractGetPageObj(this.conversionMasterId(currIndex))) {
-            if (baseContents = currParallaxObj.baseGetContent()) {
-                self.baseContents = baseContents;
-                //移动距离
-                currMoveDistance = moveDistance[1];
-                //遍历所有活动对象
-                _.each(baseContents, function(content) {
-                    content.eachAssistContents(function(scope) {
-                        //如果是视察对象移动
-                        if (scope.parallax) {
-                            rootNode = scope.parallax.rootNode;
-                            contentObj = currParallaxObj.baseGetContentObject(scope.id)
-                                /////////////////////
-                                //如果有这个动画效果 //
-                                //先停止否则通过视觉差移动会出问题
-                                // //影响，摩天轮转动APK
-                                // * 重新激动视觉差对象
-                                // * 因为视察滑动对象有动画
-                                // * 2个CSS3动画冲突的
-                                // * 所以在视察滑动的情况下先停止动画
-                                // * 然后给每一个视察对象打上对应的hack=>data-parallaxProcessed
-                                // * 通过动画回调在重新加载动画
-                                /////////////////////
-                            if (action === "flipMove" && contentObj.anminInstance && !contentObj.parallaxProcessed) {
-                                //标记
-                                var actName = contentObj.actName;
-                                contentObj.stopAnimations();
-                                //视觉差处理一次,停止过动画
-                                contentObj.parallaxProcessed = true;
-                                //增加标记
-                                rootNode.attr('data-parallaxProcessed', actName);
-                                //记录
-                                self.parallaxProcessedContetns[actName] = contentObj;
-                            }
-
-                            //移动视觉差对象
-                            conversionTranslateX(rootNode, scope.parallax, direction, action, speed, nodes, currMoveDistance, floatMaterParallaxChange);
-                        }
-                    })
-                })
-            }
-        }
-
-        function conversionTranslateX(rootNode, scope, direction, action, speed, nodes, currMoveDistance, floatMaterParallaxChange) {
-            var translate = scope.translate,
-                offsetTranslate = scope.offsetTranslate,
-                nodes_1, moveTranslate;
-
-            //往前翻页
-            if (direction === 'prev') {
-                //分割的比例
-                nodes_1 = scope.nodeProportion;
-                //如果往前溢出则取0
-                nodes = (nodes == nodes_1) ? 0 : nodes_1;
-            }
-
-            //视觉对象移动的距离
-            moveTranslate = self._transformConversion(translate, currMoveDistance, nodes);
-
-            switch (action) {
-                //移动中
-                case 'flipMove':
-                    moveTranslate = self._flipMove(moveTranslate, offsetTranslate);
-                    break;
-                    //反弹
-                case 'flipRebound':
-                    moveTranslate = self._flipRebound(moveTranslate, offsetTranslate);
-                    break;
-                    //翻页结束,记录上一页的坐标
-                case 'flipOver':
-                    if (direction === 'prev') {
-                        moveTranslate = self._flipOver(moveTranslate, offsetTranslate);
-                    }
-                    self._overMemory(moveTranslate, offsetTranslate);
-                    /**
-                     * 记录浮动母版视察修改
-                     * 2014.6.30针对浮动处理
-                     */
-                    // floatMaterParallaxChange && floatMaterParallaxChange(moveTranslate.translateX)
-                    break;
-            }
-
-            //直接操作元素
-            self._transformNodes(rootNode, speed, moveTranslate, offsetTranslate.opacityStart || 0);
-        }
-    }
-
 
     /**
      * 重新激动视觉差对象
@@ -398,61 +312,7 @@ export default class MasterMgr extends Abstract {
     }
 
 
-    /**
-     * 变化节点的css3transform属性
-     * @param  {[type]} rootNode     [description]
-     * @param  {[type]} speed        [description]
-     * @param  {[type]} property     [description]
-     * @param  {[type]} opacityStart [description]
-     * @return {[type]}              [description]
-     */
-    _transformNodes(rootNode, speed, property, opacityStart) {
-        var style = {},
-            effect = '',
-            x = 0,
-            y = 0,
-            z = 0,
-            round = Math.round;
-
-        if (property.translateX != undefined || property.translateY != undefined || property.translateZ != undefined) {
-            x = round(property.translateX) || 0;
-            y = round(property.translateY) || 0;
-            z = round(property.translateZ) || 0;
-            effect += String.format('translate3d({0}px,{1}px,{2}px) ', x, y, z);
-        }
-
-        if (property.rotateX != undefined || property.rotateY != undefined || property.rotateZ != undefined) {
-            x = round(property.rotateX);
-            y = round(property.rotateY);
-            z = round(property.rotateZ);
-            effect += x ? 'rotateX(' + x + 'deg) ' : '';
-            effect += y ? 'rotateY(' + y + 'deg) ' : '';
-            effect += z ? 'rotateZ(' + z + 'deg) ' : '';
-        }
-
-        if (property.scaleX != undefined || property.scaleY != undefined || property.scaleZ != undefined) {
-            x = round(property.scaleX * 100) / 100 || 1;
-            y = round(property.scaleY * 100) / 100 || 1;
-            z = round(property.scaleZ * 100) / 100 || 1;
-            effect += String.format('scale3d({0},{1},{2}) ', x, y, z);
-        }
-
-        if (property.opacity != undefined) {
-            style.opacity = round(property.opacity * 100) / 100 + opacityStart;
-            effect += ';'
-        }
-
-        ////////////////
-        //最终改变视觉对象的坐标 //
-        ////////////////
-        if (effect) {
-            style[transitionDuration] = speed + 'ms';
-            style[transform] = effect;
-            rootNode.css(style);
-        }
-    }
-
-
+   
     /**
      * 制作处理器
      * 针对跳转页面
@@ -466,13 +326,13 @@ export default class MasterMgr extends Abstract {
             pre: function() {
                 var targetIndex = data.targetIndex;
                 //目标母板对象
-                var targetkey = master.conversionMasterId(targetIndex);
+                var targetkey = master._conversionMasterId(targetIndex);
                 //得到过滤的边界keys
                 //在filter中的页面为过滤
-                filter = master.scanBounds(targetIndex, targetkey);
+                filter = master._scanBounds(targetIndex, targetkey);
                 //清理多余母板
                 //filter 需要保留的范围
-                master.checkClear(filter, true);
+                master._checkClear(filter, true);
                 //更新可视母板编号
                 master.currMasterId = targetkey;
             },
@@ -487,15 +347,15 @@ export default class MasterMgr extends Abstract {
     //扫描边界
     //扫描key的左右边界
     //当前页面的左右边
-    scanBounds(currPage, currkey) {
-        var currKey = this.conversionMasterId(currPage),
+    _scanBounds(currPage, currkey) {
+        var currKey = this._conversionMasterId(currPage),
             filter = {},
             i = currPage,
             prevKey, nextKey;
 
         //往前
         while (i--) {
-            prevKey = this.conversionMasterId(i);
+            prevKey = this._conversionMasterId(i);
             if (prevKey && prevKey !== currkey) {
                 filter['prev'] = prevKey;
                 break;
@@ -503,7 +363,7 @@ export default class MasterMgr extends Abstract {
         }
 
         //往后
-        nextKey = this.conversionMasterId(currPage + 1);
+        nextKey = this._conversionMasterId(currPage + 1);
 
         //如果有下一条记录
         if (nextKey && nextKey !== currkey) {
@@ -528,9 +388,12 @@ export default class MasterMgr extends Abstract {
 
         var self = this
 
-        function setPosition(parallaxObj, position) {
-            //设置移动
-            function toMove(distance, speed) {
+        const setPosition = function(parallaxObj, position) {
+
+            /**
+             * 设置移动
+             */
+            const toMove = function(distance, speed) {
                 var element = parallaxObj.element;
                 if (element) {
                     element.css(transitionDuration, speed + 'ms');
@@ -615,7 +478,7 @@ export default class MasterMgr extends Abstract {
         //记录页面与模板标示的映射
         this.recordMasterId[pageIndex] = reuseMasterKey;
         //更新可视区母板的编号
-        this.currMasterId = this.conversionMasterId(Xut.Presentation.GetPageIndex())
+        this.currMasterId = this._conversionMasterId(Xut.Presentation.GetPageIndex())
     }
 
 
@@ -635,93 +498,6 @@ export default class MasterMgr extends Abstract {
 
 
     /**
-     * transform转化成相对应的偏移量
-     * @param  {[type]} property     [description]
-     * @param  {[type]} moveDistance [description]
-     * @param  {[type]} nodes        [description]
-     * @return {[type]}              [description]
-     */
-    _transformConversion(property, moveDistance, nodes) {
-        var temp = {},
-            i;
-
-        for (i in property) {
-            switch (i) {
-                case 'translateX':
-                case 'translateZ':
-                    temp[i] = moveDistance * nodes * property[i];
-                    break;
-                case 'translateY':
-                    temp[i] = moveDistance * (this.viewHeight / this.viewWidth) * nodes * property[i];
-                    break;
-                case 'opacityStart':
-                    temp[i] = property.opacityStart;
-                    break;
-                default:
-                    //乘以-1是为了向右翻页时取值为正,位移不需这样做
-                    temp[i] = -1 * moveDistance / this.viewWidth * property[i] * nodes;
-            }
-        }
-        return temp;
-    }
-
-
-    /**
-     * 移动叠加值
-     * @param  {[type]} property       [description]
-     * @param  {[type]} repairProperty [description]
-     * @return {[type]}                [description]
-     */
-    _flipMove(property, repairProperty) {
-        var temp = {};
-        var start = property.opacityStart;
-        for (var i in property) {
-            temp[i] = property[i] + repairProperty[i];
-        }
-        if (start > -1) temp.opacityStart = start;
-        return temp;
-    }
-
-
-    /**
-     * 反弹
-     * @param  {[type]} property       [description]
-     * @param  {[type]} repairProperty [description]
-     * @return {[type]}                [description]
-     */
-    _flipRebound(property, repairProperty) {
-        var temp = {};
-        for (var i in property) {
-            temp[i] = repairProperty[i] || property[i];
-        }
-        return temp;
-    }
-
-    /**
-     * 翻页结束
-     * @param  {[type]} property       [description]
-     * @param  {[type]} repairProperty [description]
-     * @return {[type]}                [description]
-     */
-    _flipOver(property, repairProperty) {
-        return this._flipMove(property, repairProperty);
-    }
-
-
-    /**
-     * 结束后缓存上一个记录
-     * @param  {[type]} property       [description]
-     * @param  {[type]} repairProperty [description]
-     * @return {[type]}                [description]
-     */
-    _overMemory(property, repairProperty) {
-        for (var i in property) {
-            repairProperty[i] = property[i];
-        }
-    }
-
-
-    /**
      * 修正跳转后视觉对象坐标
      * @param  {[type]} parallaxObj   [description]
      * @param  {[type]} currPageIndex [description]
@@ -729,19 +505,12 @@ export default class MasterMgr extends Abstract {
      * @return {[type]}               [description]
      */
     _fixParallaxPox(parallaxObj, currPageIndex, targetIndex) {
-        var self = this,
-            contentObjs, prevNodes, nodes;
-        if (contentObjs = parallaxObj.baseGetContent()) {
-            contentObjs.forEach(function(contentObj) {
-                contentObj.eachAssistContents(function(scope) {
-                    if (scope.parallax) {
-                        repairNodes.call(self, scope.parallax, currPageIndex, targetIndex);
-                    }
-                })
-            })
-        }
+        let self = this
+        let contentObjs
+        let prevNodes
+        let nodes
 
-        function repairNodes(scope, currPageIndex, targetIndex) {
+        const repairNodes = function(scope, currPageIndex, targetIndex) {
             var rangePage = scope.calculateRangePage(),
                 rootNode = scope.rootNode,
                 translate = scope.translate,
@@ -761,19 +530,29 @@ export default class MasterMgr extends Abstract {
                 }
             }
 
-            moveTranslate = this._transformConversion(translate, -self.viewWidth, nodes);
-            this._transformNodes(rootNode, 300, moveTranslate, offsetTranslate.opacityStart);
-            this._overMemory(moveTranslate, offsetTranslate);
+            moveTranslate = _transformConversion(translate, -self.viewWidth, nodes);
+            _transformNodes(rootNode, 300, moveTranslate, offsetTranslate.opacityStart);
+            _overMemory(moveTranslate, offsetTranslate);
+        }
+
+
+        if (contentObjs = parallaxObj.baseGetContent()) {
+            contentObjs.forEach(function(contentObj) {
+                contentObj.eachAssistContents(function(scope) {
+                    if (scope.parallax) {
+                        repairNodes.call(self, scope.parallax, currPageIndex, targetIndex);
+                    }
+                })
+            })
         }
 
     }
 
 
-
     //检测是否需要清理
     // 1 普通翻页清理  【数组过滤条件】
     // 2 跳转页面清理  【对象过滤条件】
-    checkClear(filter, toPage) {
+    _checkClear(filter, toPage) {
         var key, indexOf,
             removeMasterId = _.keys(this.abstractGetCollection());
 
@@ -795,24 +574,6 @@ export default class MasterMgr extends Abstract {
         }
     }
 
-    //清理内存
-    //需要清理的key合集
-    clearMemory(removeMasterId) {
-        var pageObj, self = this;
-        _.each(removeMasterId, function(removekey) {
-            //销毁页面对象事件
-            if (pageObj = self.abstractGetPageObj(removekey)) {
-                //移除事件
-                pageObj.baseDestroy();
-                //移除列表
-                self.abstractRemoveCollection(removekey);
-                self.removeRecordMasterscope(removekey);;
-            }
-            //清理作用域缓存
-            delete self.recordMasterscope[removekey];
-        })
-    }
-
 
     /**
      * 注册状态管理
@@ -822,10 +583,33 @@ export default class MasterMgr extends Abstract {
      * @return {[type]}            [description]
      */
     register(pageIndex, type, hotspotObj) {
-        var parallaxObj = this.abstractGetPageObj(this.conversionMasterId(pageIndex))
+        var parallaxObj = this.abstractGetPageObj(this._conversionMasterId(pageIndex))
         if (parallaxObj) {
             parallaxObj.registerCotents.apply(parallaxObj, arguments);
         }
+    }
+
+
+    /**
+     * 清理内存
+     * 需要清理的key合集
+     * @param  {[type]} removeMasterId [description]
+     * @return {[type]}                [description]
+     */
+    clearMemory(removeMasterId) {
+        var pageObj, self = this;
+        _.each(removeMasterId, function(removekey) {
+            //销毁页面对象事件
+            if (pageObj = self.abstractGetPageObj(removekey)) {
+                //移除事件
+                pageObj.baseDestroy();
+                //移除列表
+                self.abstractRemoveCollection(removekey);
+                self._removeRecordMasterscope(removekey);;
+            }
+            //清理作用域缓存
+            delete self.recordMasterscope[removekey];
+        })
     }
 
 
@@ -834,12 +618,12 @@ export default class MasterMgr extends Abstract {
      * @param  {[type]} pageIndex [description]
      * @return {[type]}           [description]
      */
-    conversionMasterId(pageIndex) {
+    _conversionMasterId(pageIndex) {
         return this.recordMasterId ? this.recordMasterId[pageIndex] : undefined;
     }
 
 
-    removeRecordMasterscope(removekey) {
+    _removeRecordMasterscope(removekey) {
         var me = this;
         var recordMasterscope = me.recordMasterscope[removekey];
         //清理页码指示标记
@@ -847,6 +631,5 @@ export default class MasterMgr extends Abstract {
             delete me.recordMasterId[scope];
         })
     }
-
 
 }

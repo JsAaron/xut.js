@@ -1,5 +1,5 @@
 import { config } from '../../config/index'
-import { translation } from '../../swipe/translation'
+import { translation } from '../../pagebase/translation/translation'
 import { getFlowCount } from './get'
 import Swipe from '../../swipe/index'
 import render from './render'
@@ -126,7 +126,7 @@ export default class Flow {
                     this._unlock()
                 } else {
                     //前边界反弹，要加上溢出值
-                    View.MovePage(moveDistance , speed, this.direction, action)
+                    View.MovePage(moveDistance, speed, this.direction, action)
                 }
             }
             //尾页边界
@@ -149,7 +149,7 @@ export default class Flow {
                 //     }
                 // }
 
-                translation[action]({}, moveDistance, speed, $container)
+                translation[action]($container, moveDistance, speed)
             }
 
 

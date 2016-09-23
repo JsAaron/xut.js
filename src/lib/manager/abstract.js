@@ -59,7 +59,7 @@ export class Abstract {
         //模板传递的可能不是页码
         if (pageType === 'master') {
             if (!/-/.test(pageIndex)) { //如果不是母版ID，只是页码
-                pageIndex = this.conversionMasterId(pageIndex); //转化成母版id
+                pageIndex = this._conversionMasterId(pageIndex); //转化成母版id
             }
         }
         return this.Collections[pageIndex];
