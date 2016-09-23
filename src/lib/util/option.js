@@ -21,7 +21,7 @@ export function getResources(url) {
 /**
  * 执行脚本注入
  */
-export function injectScript(code, type) {
+export function execScript(code, type) {
     //过滤回车符号
     var enterReplace = function(str) {
         return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');

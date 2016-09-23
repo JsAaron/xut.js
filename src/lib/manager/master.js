@@ -16,7 +16,7 @@ import {
     _overMemory,
     _transformNodes,
     _transformConversion
-} from '../pagebase/translation/parallax'
+} from '../pagebase/move/parallax'
 
 import { config } from '../config/index'
 

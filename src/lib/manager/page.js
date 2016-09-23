@@ -7,7 +7,7 @@ import { Abstract } from './abstract'
 import { Pagebase } from '../pagebase/pagebase'
 import { addEdges } from '../util/edge'
 import { removeVideo } from '../component/video/manager'
-import { injectScript, extend } from '../util/index'
+import { execScript, extend } from '../util/index'
 
 import {
     suspend as _suspend,
@@ -20,12 +20,12 @@ import {
  * 检测脚本注入
  * @return {[type]} [description]
  */
-const checkInjectScript = (pageObject, type) => {
+const runScript = (pageObject, type) => {
     const code = pageObject.chapterDas[type]
     if (code) {
-        injectScript(code, type)
+        execScript(code, type)
     }
-}
+} 
 
 
 export default class PageMgr extends Abstract {
@@ -100,7 +100,7 @@ export default class PageMgr extends Abstract {
             prveChpterId = suspendPageObj.baseGetPageId(stopPointer);
 
         //翻页结束脚本
-        checkInjectScript(suspendPageObj, 'postCode');
+        runScript(suspendPageObj, 'postCode');
 
         //中断节点创建任务
         this._suspendInnerCreateTasks(pointers);
@@ -168,7 +168,7 @@ export default class PageMgr extends Abstract {
             data.buildComplete(currPageObj.scenarioId);
 
             //执行自动动作之前的脚本
-            checkInjectScript(currPageObj, 'preCode');
+            runScript(currPageObj, 'preCode');
 
             //热点状态复位
             self.resetOriginal(data.suspendIndex)

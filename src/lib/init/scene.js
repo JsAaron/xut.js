@@ -3,7 +3,7 @@ import { config } from '../config/index'
 import {
     _set,
     _get,
-    injectScript,
+    execScript,
     toEmpty
 }
 from '../util/index'
@@ -40,10 +40,10 @@ const initDefaultValues = (options) => {
  * 检测脚本注入
  * @return {[type]} [description]
  */
-const checkInjectScript = () => {
+const runScript = () => {
     var preCode, novels = Xut.data.query('Novel');
     if (preCode = novels.preCode) {
-        injectScript(preCode, 'novelpre脚本')
+        execScript(preCode, 'novelpre脚本')
     }
 }
 
@@ -56,7 +56,7 @@ export default function(options) {
     setDataToStorage(options)
 
     //应用脚本注入
-    checkInjectScript();
+    runScript();
 
     //检测下scenarioId的正确性
     //scenarioId = 1 找不到chapter数据

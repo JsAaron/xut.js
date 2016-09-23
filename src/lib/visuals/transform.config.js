@@ -1,5 +1,5 @@
 import flowPageConfig from './flowpage.config'
-import { createPageTransform } from '../pagebase/translation/translation'
+import { createPageTransform } from '../pagebase/move/translation'
 
 
 /**

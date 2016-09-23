@@ -1,5 +1,5 @@
 import { config } from '../../config/index'
-import { translation } from '../../pagebase/translation/translation'
+import { translation } from '../../pagebase/move/translation'
 import { getFlowCount } from './get'
 import Swipe from '../../swipe/index'
 import render from './render'
