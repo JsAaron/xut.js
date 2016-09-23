@@ -4,8 +4,8 @@ import { getFlowCount } from './get'
 import Swipe from '../../swipe/index'
 import render from './render'
 
-import { flipDistance } from '../../manager/dispatcher/depend'
-import flowStyleConfig from '../../visuals/flows.config'
+import getFlipDistance from '../../visuals/distance.config'
+import flowPageConfig from '../../visuals/flowpage.config'
 
 /**
  * 2017.9.7
@@ -46,11 +46,12 @@ export default class Flow {
      */
     _init($container, pagesCount) {
 
-        const flowstyle = flowStyleConfig()
+        const flowstyle = flowPageConfig()
 
         const MIN = 0
         const MAX = pagesCount - 1
         const flipWidth = flowstyle.containerWidth
+        const flipLeft = flowstyle.containerLeft
         const View = Xut.View
         const initIndex = this.initIndex
 
@@ -94,7 +95,12 @@ export default class Flow {
             direction
         } = {}) {
 
-            const currentDistance = flipDistance(action, distance, direction)[1]
+            const currentDistance = getFlipDistance({
+                action,
+                distance,
+                direction
+            })[1]
+
             moveDistance = currentDistance
 
             switch (direction) {
@@ -113,7 +119,7 @@ export default class Flow {
                     -(flipWidth * this._hindex + this._hindex)
             }
 
-            //首尾连接主页
+            //首页边界
             if (this._hindex === MIN && this.direction === 'prev') {
                 if (action === 'flipOver') {
                     View.GotoPrevSlide()
@@ -122,14 +128,27 @@ export default class Flow {
                     //前边界反弹，要加上溢出值
                     View.MovePage(moveDistance , speed, this.direction, action)
                 }
-            } else if (this._hindex === MAX && this.direction === 'next') {
+            }
+            //尾页边界
+            else if (this._hindex === MAX && this.direction === 'next') {
                 if (action === 'flipOver') {
                     View.GotoNextSlide()
                     this._unlock()
                 } else {
-                    View.MovePage(currentDistance , speed, this.direction, action)
+                    View.MovePage(currentDistance, speed, this.direction, action)
                 }
-            } else {
+            }
+            //中间页面
+            else {
+
+                // if (action === 'flipOver') {
+                //     if (direction === 'next') {
+                //         moveDistance += flipLeft * 2
+                //     } else {
+                //         moveDistance -= flipLeft * 2
+                //     }
+                // }
+
                 translation[action]({}, moveDistance, speed, $container)
             }
 

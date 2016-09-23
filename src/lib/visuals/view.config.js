@@ -16,33 +16,10 @@ export default function getViewSize(config, fullProportion) {
     let newTop = 0
     let newLeft = 0
 
-    /**
-     * 默认全屏
-     * @return {[type]}
-     */
-    if (config.visualMode === 0) {
-        return {
-            width: newWidth,
-            height: newHeight,
-            left: newTop,
-            top: newLeft
-        }
-    }
-
-
-    if (config.visualMode === 1) {
-        // return {
-        //     width: screenWidth,
-        //     height: screenHeight,
-        //     left: 0,
-        //     top: 0
-        // }
-    }
-
 
     /**
      * 宽度100%
-     * 高度自适应
+     * 正比缩放高度
      * @param  {[type]} config.visualMode [description]
      * @return {[type]}                   [description]
      */
@@ -63,6 +40,34 @@ export default function getViewSize(config, fullProportion) {
         }
     }
 
+    /**
+     * 高度100%
+     * 正比缩放宽度
+     * @param  {[type]} config.visualMode [description]
+     * @return {[type]}                   [description]
+     */
+    if (config.visualMode === 3) {
+        //竖版PPT
+        if (config.pptVertical) {
+
+            //竖版显示
+            if (config.screenVertical) {
+                newWidth = fullProportion.pptWidth * fullProportion.height
+                newLeft = (screenWidth - newWidth) / 2
+            }
+            //横版显示
+            else {
+
+            }
+        }
+    }
+
+
+    /**
+     * 默认全屏
+     * config.visualMode === 0
+     * @return {[type]}
+     */
     return {
         width: newWidth,
         height: newHeight,
@@ -70,17 +75,5 @@ export default function getViewSize(config, fullProportion) {
         top: newTop
     }
 
-    /**
-     * 虚拟模式并且是竖版
-     * @return {[type]}
-     */
-    // if (config.virtualMode && screenHeight > screenWidth) {
-    //     return {
-    //         width: _newWidth,
-    //         height: _newHeight,
-    //         left: (screenWidth - _newWidth / 2) / 2,
-    //         top: (screenHeight - _newHeight) / 2
-    //     }
-    // }
 
 }

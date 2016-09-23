@@ -1,5 +1,4 @@
 import { errorTable } from '../../database/cache'
-import { config } from '../../config/index'
 import { query } from '../query'
 
 /**
@@ -44,63 +43,6 @@ export function conversionPageOpts(pageIndex, visiblePid) {
 }
 
 
-/**
- * 计算翻页距离
- */
-export function flipDistance(action, distance, direction) {
-
-    let leftOffset
-    let currOffset
-    let rightOffset
-
-    //滑动区域宽度
-    const containerWidth = config.viewSize.width
-
-    switch (direction) {
-        //前翻
-        case 'prev':
-            switch (action) {
-                case 'flipMove':
-                    leftOffset = distance - containerWidth
-                    currOffset = distance
-                    rightOffset = distance + containerWidth
-                    break;
-                case 'flipRebound':
-                    leftOffset = -containerWidth
-                    currOffset = distance;
-                    rightOffset = containerWidth
-                    break;
-                case 'flipOver':
-                    leftOffset = 0
-                    currOffset = containerWidth
-                    rightOffset = 2 * containerWidth
-                    break;
-            }
-            break;
-            //后翻
-        case 'next':
-            switch (action) {
-                case 'flipMove':
-                    leftOffset = distance - containerWidth;
-                    rightOffset = distance + containerWidth;
-                    currOffset = distance;
-                    break;
-                case 'flipRebound':
-                    leftOffset = -containerWidth;
-                    rightOffset = containerWidth;
-                    currOffset = distance;
-                    break;
-                case 'flipOver':
-                    leftOffset = -2 * containerWidth;
-                    rightOffset = distance;
-                    currOffset = -containerWidth;
-                    break;
-            }
-            break;
-    }
-
-    return [leftOffset, currOffset, rightOffset]
-}
 
 /**
  * 计算初始化页码

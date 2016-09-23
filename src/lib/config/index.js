@@ -355,19 +355,6 @@ const setProportion = function(pptWidth, pptHeight) {
     const viewSize = config.viewSize = getViewSize(config, fullProportion)
 
     /**
-     * 溢出尺寸
-     * @type {Object}
-     */
-    const overflowWidth = viewSize.width - config.screenSize.width
-    const overflowHeight = viewSize.height - config.screenSize.height
-    config.overflowSize = {
-        width: viewSize.width - config.screenSize.width,
-        height: viewSize.height - config.screenSize.height,
-        left: overflowWidth / 2,
-        top: overflowHeight / 2
-    }
-
-    /**
      * 获取全局缩放比
      * @type {[type]}
      */

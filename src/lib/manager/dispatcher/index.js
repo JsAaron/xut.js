@@ -20,14 +20,14 @@ import Stack from '../../util/stack'
 import {
     offsetPage,
     conversionPageOpts,
-    flipDistance,
     initPointer,
     conversionCid,
     conversionPids,
     checkMasterCreate,
 } from './depend'
 
-import styleConfig from '../../visuals/contaniner.config'
+import getFlipDistance from '../../visuals/distance.config'
+import customTransform from '../../visuals/transform.config'
 
 export class Dispatcher {
 
@@ -342,7 +342,7 @@ export class Dispatcher {
          * @param  {[type]} hasFlows [description]
          * @return {[type]}            [description]
          */
-        const newstyle = styleConfig({
+        const newstyle = customTransform({
             usefulData,
             hasFlows,
             initAction: action === 'init',
@@ -379,7 +379,7 @@ export class Dispatcher {
          * 转化页码标记
          */
         if (createPointer) {
-            createPointer = conversionPageOpts.call(this, createPointer);
+            createPointer = conversionPageOpts.call(this, createPointer)
         }
 
         var data = {
@@ -393,7 +393,7 @@ export class Dispatcher {
             //中断通知
             'suspendCallback': options.suspendAutoCallback,
             //构建完毕通知
-            'buildComplete' (scenarioId) {
+            'buildComplete': function(scenarioId) {
                 //==========================================
                 //
                 //      构建完成通知,用于处理历史缓存记录
@@ -405,15 +405,15 @@ export class Dispatcher {
                 if (config.recordHistory && !options.isInApp && options.multiScenario) {
                     var history;
                     if (history = sceneController.sequence(scenarioId, currIndex)) {
-                        _set("history", history);
+                        _set("history", history)
                     }
                 }
             },
 
             //流程结束通知
             //包括动画都已经结束了
-            'processComplete' () {}
-        };
+            'processComplete': function() {}
+        }
 
         //页面自动运行
         this.pageMgr.autoRun(data);
@@ -493,19 +493,15 @@ export class Dispatcher {
 
     }
 
+
     /**
-     * 2016.9.21
-     * 是否为流式布局页面
-     * 如果是就需要全屏处理
-     * @return {Boolean} [description]
+     * 下一页是否为flow页面
+     * 要根据这个判断来处理翻页的距离
+     * @return {[type]} [description]
      */
-    _isFlowPage(pageIndex) {
+    _nextIsFlowPage(pageIndex) {
         const pageObj = this.pageMgr.abstractGetPageObj(pageIndex)
-        if (pageObj && pageObj.pageType === 'page' && pageObj._flows.isExist()) {
-            return {
-                flowLeft: config.overflowSize.left
-            }
-        }
+        return pageObj && pageObj._isFlows
     }
 
     /**
@@ -525,9 +521,7 @@ export class Dispatcher {
     } = {}) {
 
         let currIndex = pageIndex
-
-        //流式布局的参数
-        let flowOffet
+        let nextIsFolw = false
 
         //用户强制直接切换模式
         //禁止页面跟随滑动
@@ -542,14 +536,17 @@ export class Dispatcher {
                 this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
             }, 0)
 
-            //否为flow页面
-            //提供给flows处理，用来改变翻页的距离，因为缩放溢出问题
-            //2016.9.22
-            // flowOffet = direction === 'next' ? this._isFlowPage(rightIndex) : this._isFlowPage(leftIndex)
+            //判断下一页是flow页面
+            nextIsFolw = this._nextIsFlowPage(direction === 'next' ? rightIndex : leftIndex)
         }
 
         //移动的距离
-        const moveDistance = flipDistance(action, distance, direction, flowOffet)
+        const moveDistance = getFlipDistance({
+            action,
+            distance,
+            direction,
+            nextIsFolw
+        })
 
         //视觉差页面滑动
         const currObj = this.pageMgr.abstractGetPageObj(currIndex)

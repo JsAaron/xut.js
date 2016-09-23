@@ -172,6 +172,7 @@ export default class PageMgr extends Abstract {
                 if (floatElement = pageObj.floatContents.PageContainer) {
                     translation[action](pageObj, moveDistance[index], speed, floatElement)
                 }
+
                 //正常页面
                 translation[action](pageObj, moveDistance[index], speed)
             }

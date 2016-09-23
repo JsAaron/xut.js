@@ -1,6 +1,6 @@
 import { config } from '../../config/index'
 import { set } from './get'
-import flowStyleConfig from '../../visuals/flows.config'
+import flowPageConfig from '../../visuals/flowpage.config'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -108,7 +108,7 @@ export default function initFlows() {
      * 容器尺寸设置
      * @type {[type]}
      */
-    const flowstyle = flowStyleConfig()
+    const flowstyle = flowPageConfig()
     const vWidth = flowstyle.containerWidth
     const vHeight = newViewHight =  flowstyle.containerHeight
 
