@@ -51,7 +51,8 @@ export default class Flow {
         const MIN = 0
         const MAX = pagesCount - 1
         const flipWidth = flowstyle.newViewWidth
-        const flipLeft = flowstyle.newViewHeight
+        const flipLeft = flowstyle.newViewLeft
+        const viewLeft = config.viewSize.left
         const View = Xut.View
         const initIndex = this.initIndex
 
@@ -102,7 +103,7 @@ export default class Flow {
                     this._unlock()
                 } else {
                     //前边界前移反弹
-                    View.MovePage(distance, speed, this.direction, action)
+                    View.MovePage(distance - viewLeft, speed, this.direction, action)
                 }
             }
             /**
