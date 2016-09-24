@@ -521,7 +521,20 @@ export class Dispatcher {
         const hooks = {
             prevFlipOver(data) {
                 if (config.visualMode === 3) {
-        
+                    const currFlows = data.$$checkFlows(currIndex)
+                    const nextFlows = data.$$checkFlows(leftIndex)
+
+                    //当前flow，下一页正常
+                    if (currFlows && !nextFlows) {
+                        console.log(2)
+                    }
+
+                    //当前正常页面，下一页flow
+                    if (!currFlows && nextFlows) {
+                         data.left = -data.$$veiwLeft
+                        // data.middle = getFlowStyle().newViewWidth
+                    }
+
                 }
             },
             nextFlipOver(data) {
@@ -532,7 +545,7 @@ export class Dispatcher {
 
                     //当前flow，下一页正常
                     if (currFlows && !nextFlows) {
-                    console.log(2)
+                        console.log(2)
                     }
 
                     //当前正常页面，下一页flow

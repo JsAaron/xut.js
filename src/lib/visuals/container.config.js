@@ -36,7 +36,10 @@ const getContainer = function({
 
     //左边
     if (createIndex < currIndex) {
-        const offsetLeft = -viewWidth
+        let offsetLeft = -viewWidth
+        if (data.isFlows && config.visualMode === 3) {
+            offsetLeft = offsetLeft - config.viewSize.left
+        }
         translate = createTranslate(offsetLeft)
         offset = offsetLeft
         direction = 'before'
@@ -50,7 +53,6 @@ const getContainer = function({
     }
     //可视区域
     else if (currIndex == createIndex) {
-
         let offsetCut = 0
         if (data.isFlows && config.visualMode === 3) {
             offsetCut = -config.viewSize.left
@@ -59,7 +61,6 @@ const getContainer = function({
         offset = offsetCut
         direction = 'original'
     }
-
 
     _.extend(data, {
         translate,
