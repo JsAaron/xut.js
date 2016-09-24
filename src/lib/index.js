@@ -32,7 +32,7 @@ if (Xut.plat.isBrowser) {
         }
     })
 }
- 
+  
 /**
  * remove old html
  * @return {[type]} [description]

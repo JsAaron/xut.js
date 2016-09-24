@@ -28,31 +28,6 @@ const createTranslate = (offset) => {
 }
 
 
-let prevEffect
-let currEffect
-let nextEffect
-
-
-/**
- * 设置基本参数
- * @return {[type]} [description]
- */
-const setOptions = () => {
-    const viewWidth = config.viewSize.width
-    const offsetLeft = -viewWidth
-    const offsetRight = viewWidth
-    const offsetCut = 0
-    prevEffect = createTranslate(offsetLeft)
-    currEffect = createTranslate(offsetCut)
-    nextEffect = createTranslate(offsetRight)
-    return {
-        offsetLeft,
-        offsetRight,
-        offsetCut
-    }
-}
-
-
 /**
  * 新的可视区页面
  * @param  {[type]}  distance [description]
@@ -142,47 +117,16 @@ export const translation = {
 }
 
 
+
 /**
  * 修正坐标
  * @return {[type]} [description]
  */
 export function fix(element, action) {
-    const translate = action === 'prevEffect' ? prevEffect : nextEffect
+    const viewWidth = config.viewSize.width
+    const translate = action === 'prevEffect' 
+        ? createTranslate(-viewWidth) 
+        : createTranslate(viewWidth)
     element.css(transform, translate)
 }
 
-
-/**
- * 创建li的translate起始坐标信息
- * flowType 如果是flow类型
- * @return {[type]}
- */
-export function createPageTransform({
-    createIndex,
-    currIndex,
-    hasFlows,
-    initAction,
-    filpOverAction
-} = {}) {
-
-    const option = setOptions(hasFlows)
-
-    let translate3d
-    let direction
-    let offset
-
-    if (createIndex < currIndex) {
-        translate3d = prevEffect
-        offset = option.offsetLeft
-        direction = 'before'
-    } else if (createIndex > currIndex) {
-        translate3d = nextEffect
-        offset = option.offsetRight
-        direction = 'after'
-    } else if (currIndex == createIndex) {
-        translate3d = currEffect
-        offset = option.offsetCut
-        direction = 'original'
-    }
-    return [translate3d, direction, offset, dydTransform]
-}

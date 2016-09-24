@@ -61,10 +61,12 @@ function onlyParseContents(data) {
 
 export default function TaskContents(activityData) {
     activityData = _.extend(this, activityData);
+
     //只解析content有关的activityData
     var compileActivitys = onlyParseContents(activityData)
-        //如果有预执行动作
-        //Activity表数据存在
+
+    //如果有预执行动作
+    //Activity表数据存在
     if (compileActivitys) {
         //解析动画表数据结构
         activityData = conParser(compileActivitys, activityData);
@@ -331,12 +333,11 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
         }
     })
 
-
     //floatPages模式下面
     //如果是当前页面
     //因为会产生三页面并联
     //所以中间去最高层级
-    if (floatName === 'floatPages' && (base.getStyle.transforms[2]) === 0) {
+    if (floatName === 'floatPages' && data.getStyle.offset === 0) {
         zIndex = 2001
     } else {
         zIndex = 2000
@@ -354,7 +355,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
 
     var floatStr = String.format(
         '<div id="' + floatName + '-li-{0}" class="xut-float" style="' + TRANSFORM + ':{1};z-index:' + zIndex + ';{2}"></div>',
-        data.pid, base.getStyle.transforms[0], overflow
+        data.pid, data.getStyle.translate, overflow
     )
 
     var container = $(floatStr)
@@ -481,7 +482,7 @@ taskProto.eventAfterCheck = function(data, delayHooks) {
             nextTick({
                 'container': data.element,
                 'content': toArray(data.contentsFragment)
-            },  complete);
+            }, complete);
         }
     })
 }
@@ -552,7 +553,7 @@ function bindActivitys(callback, data, contentDas) {
             }
             return 0
         }
-    }(data.floatMaters.ids, data.transforms[2]);
+    }(data.floatMaters.ids, data.getStyle.offset);
 
 
     //相关回调
@@ -679,5 +680,3 @@ function bindActivitys(callback, data, contentDas) {
     recursiveParse()
 
 }
-
-

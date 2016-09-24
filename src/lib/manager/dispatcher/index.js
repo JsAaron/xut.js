@@ -28,7 +28,7 @@ import {
 
 import { getFlowStyle } from '../../visuals/type.page.config'
 import getFlipDistance from '../../visuals/distance.config'
-import customTransform from '../../visuals/transform.config'
+import containerStyle from '../../visuals/container.config'
 
 export class Dispatcher {
 
@@ -343,7 +343,7 @@ export class Dispatcher {
          * @param  {[type]} hasFlows [description]
          * @return {[type]}            [description]
          */
-        const newstyle = customTransform({
+        const newstyle = containerStyle({
             usefulData,
             hasFlows,
             initAction: action === 'init',

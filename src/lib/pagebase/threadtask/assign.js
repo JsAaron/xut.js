@@ -201,7 +201,7 @@ export default {
             'pid': base.pid,
             'pageBaseHooks': pageBaseHooks,
             'virtualOffset': base.virtualOffset,
-            'transforms': base.getStyle.transforms
+            'getStyle':base.getStyle
         });
     }
 }

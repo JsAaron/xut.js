@@ -18,7 +18,7 @@ const TANSFROM = Xut.style.transform
 const createli = function({
     base,
     prefix,
-    transform,
+    translate,
     customStyle,
     pageData,
     background
@@ -69,7 +69,7 @@ const createli = function({
                    height:${viewHeight}px;
                    top:${viewTop}px;
                    left:${viewLeft}px;
-                   ${TANSFROM}:${transform};
+                   ${TANSFROM}:${translate};
                    ${background}
                    ${customStyle}
                    overflow:hidden;">
@@ -107,7 +107,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
     return $(createli({
         base,
         prefix,
-        transform: getStyle.transforms[0],
+        translate: getStyle.translate,
         customStyle,
         pageData,
         background
@@ -152,7 +152,7 @@ export default function(base, pageData, taskCallback) {
     nextTick({
         container: base.root,
         content: $element,
-        position: getStyle.transforms[1] === 'before' ? 'first' : 'last'
+        position: getStyle.direction === 'before' ? 'first' : 'last'
     }, () => {
         taskCallback($element, pseudoElement)
     });
