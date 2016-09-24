@@ -129,16 +129,15 @@ export default class Flow {
                  * 翻页钩子
                  * @type {Object}
                  */
-                const flipOverHook = {
-                    prev() {
-
-                    },
-                    next(data) {
+                const hooks = {
+                    prevFlipOver(data) {
                         if (config.visualMode === 3) {
-                            data.left = -2 * data.$$veiwWidth
-                            data.middle = -getFlowStyle().newViewWidth
-                            data.right = -data.$$veiwLeft
-                            data.view = data.right
+                            data.middle = flowstyle.newViewWidth
+                        }
+                    },
+                    nextFlipOver(data) {
+                        if (config.visualMode === 3) {
+                            data.middle = -flowstyle.newViewWidth
                         }
                     }
                 }
@@ -150,7 +149,7 @@ export default class Flow {
                     leftIndex,
                     pageIndex,
                     rightIndex,
-                    flipOverHook
+                    hooks
                 })[1]
 
                 moveDistance = viewBeHideDistance

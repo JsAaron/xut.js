@@ -525,18 +525,28 @@ export class Dispatcher {
          * 翻页钩子
          * @type {Object}
          */
-        const flipOverHook = {
-            prev() {
-
-            },
-            next(data) {
+        const hooks = {
+            prevFlipOver(data) {
                 if (config.visualMode === 3) {
-                    //如果下一页是flow
-                    if (data.$$checkFlows(rightIndex)) {
+        
+                }
+            },
+            nextFlipOver(data) {
+                if (config.visualMode === 3) {
+
+                    const currFlows = data.$$checkFlows(currIndex)
+                    const nextFlows = data.$$checkFlows(rightIndex)
+
+                    //当前flow，下一页正常
+                    if (currFlows && !nextFlows) {
+                    console.log(2)
+                    }
+
+                    //当前正常页面，下一页flow
+                    if (!currFlows && nextFlows) {
                         data.left = -2 * data.$$veiwWidth
                         data.middle = -getFlowStyle().newViewWidth
                         data.right = -data.$$veiwLeft
-                        data.view = data.right
                     }
                 }
             }
@@ -547,7 +557,7 @@ export class Dispatcher {
             action,
             distance,
             direction,
-            flipOverHook
+            hooks
         })
 
         //视觉差页面滑动

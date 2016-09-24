@@ -35,7 +35,7 @@ export default function getFlipDistance({
     action,
     distance,
     direction,
-    flipOverHook
+    hooks
 } = {}) {
 
     //区域尺寸
@@ -88,6 +88,13 @@ export default function getFlipDistance({
             offset.left = 0
             offset.middle = veiwWidth
             offset.right = 2 * veiwWidth
+            if (hooks.prevFlipOver) {
+                let gather = makeGather()
+                hooks.prevFlipOver(gather)
+                _.each(gather, function(value, key) {
+                    offset[key] = value
+                })
+            }
             offset.view = offset.left
         }
 
@@ -99,15 +106,14 @@ export default function getFlipDistance({
             offset.left = -2 * veiwWidth
             offset.middle = -veiwWidth
             offset.right = distance
-            offset.view = offset.right
-
-            if (flipOverHook.next) {
+            if (hooks.nextFlipOver) {
                 let gather = makeGather()
-                flipOverHook.next(gather)
+                hooks.nextFlipOver(gather)
                 _.each(gather, function(value, key) {
                     offset[key] = value
                 })
             }
+            offset.view = offset.right
         }
 
     }
