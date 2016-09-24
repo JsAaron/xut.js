@@ -1,17 +1,31 @@
 import { config } from '../config/index'
-import { hasValue } from '../util/lang'
-import { getFlowStyle } from './type.page.config'
+import {
+    hasValue,
+    hash
+} from '../util/lang'
+
 
 /**
  * 下一页是否为flow页面
  * 要根据这个判断来处理翻页的距离
  * @return {[type]} [description]
  */
-const checkNextFlow = function(pageIndex) {
+const checkFlows = function(pageIndex) {
     const pageObj = Xut.Presentation.GetPageObj(pageIndex)
     return pageObj && pageObj._isFlows
 }
 
+/**
+ * 制作钩子收集器
+ * @return {[type]} [description]
+ */
+const makeGather = function() {
+    let _gather = hash()
+    _gather.$$veiwWidth = config.viewSize.width
+    _gather.$$veiwLeft = config.viewSize.left
+    _gather.$$checkFlows = checkFlows
+    return _gather
+}
 
 /**
  * 动态计算翻页距离
@@ -21,21 +35,22 @@ export default function getFlipDistance({
     action,
     distance,
     direction,
-    leftIndex,
-    currIndex,
-    rightIndex,
+    flipOverHook
 } = {}) {
 
-    let leftOffset
-    let middleOffset
-    let rightOffset
-
-    //当前视图页面
-    //用来处理页面回调
-    let realViewOffset
-
-    //滑动区域宽度
+    //区域尺寸
     const veiwWidth = config.viewSize.width
+    const veiwLeft = config.viewSize.left
+
+    const offset = {
+        left: undefined,
+        middle: undefined,
+        right: undefined,
+        //当前视图页面
+        //用来处理页面回调
+        view: undefined
+    }
+
 
     /**
      * 滑动
@@ -43,9 +58,9 @@ export default function getFlipDistance({
      * @return {[type]}        [description]
      */
     if (action === 'flipMove') {
-        leftOffset = distance - veiwWidth
-        middleOffset = distance
-        rightOffset = distance + veiwWidth
+        offset.left = distance - veiwWidth
+        offset.middle = distance
+        offset.right = distance + veiwWidth
     }
 
     /**
@@ -54,9 +69,9 @@ export default function getFlipDistance({
      * @return {[type]}        [description]
      */
     if (action === 'flipRebound') {
-        leftOffset = -veiwWidth
-        middleOffset = distance;
-        rightOffset = veiwWidth
+        offset.left = -veiwWidth
+        offset.middle = distance;
+        offset.right = veiwWidth
     }
 
     /**
@@ -65,26 +80,37 @@ export default function getFlipDistance({
      * @return {[type]}        [description]
      */
     if (action === 'flipOver') {
+
         /**
          * 前翻
          */
         if (direction === 'prev') {
-            leftOffset = 0
-            middleOffset = veiwWidth
-            rightOffset = 2 * veiwWidth
-            realViewOffset = leftOffset
+            offset.left = 0
+            offset.middle = veiwWidth
+            offset.right = 2 * veiwWidth
+            offset.view = offset.left
         }
+
         /**
          * 后翻
          */
         if (direction === 'next') {
-            leftOffset = -2 * veiwWidth
-            middleOffset = -veiwWidth
-            rightOffset = distance
-            realViewOffset = rightOffset
+
+            offset.left = -2 * veiwWidth
+            offset.middle = -veiwWidth
+            offset.right = distance
+            offset.view = offset.right
+
+            if (flipOverHook.next) {
+                let gather = makeGather()
+                flipOverHook.next(gather)
+                _.each(gather, function(value, key) {
+                    offset[key] = value
+                })
+            }
         }
 
     }
 
-    return [leftOffset, middleOffset, rightOffset, realViewOffset]
+    return [offset.left, offset.middle, offset.right, offset.view]
 }

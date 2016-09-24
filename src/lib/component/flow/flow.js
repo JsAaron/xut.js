@@ -100,7 +100,7 @@ export default class Flow {
             if (this._hindex === MIN && this.direction === 'prev') {
                 if (action === 'flipOver') {
                     View.GotoPrevSlide()
-                    this._unlock()
+                    this.simulationComplete()
                 } else {
                     //前边界前移反弹
                     View.MovePage(distance - viewLeft, speed, this.direction, action)
@@ -114,7 +114,7 @@ export default class Flow {
             else if (this._hindex === MAX && this.direction === 'next') {
                 if (action === 'flipOver') {
                     View.GotoNextSlide()
-                    this._unlock()
+                    this.simulationComplete()
                 } else {
                     //后边界前移反弹
                     View.MovePage(distance, speed, this.direction, action)
@@ -125,10 +125,32 @@ export default class Flow {
              */
             else {
 
+                /**
+                 * 翻页钩子
+                 * @type {Object}
+                 */
+                const flipOverHook = {
+                    prev() {
+
+                    },
+                    next(data) {
+                        if (config.visualMode === 3) {
+                            data.left = -2 * data.$$veiwWidth
+                            data.middle = -getFlowStyle().newViewWidth
+                            data.right = -data.$$veiwLeft
+                            data.view = data.right
+                        }
+                    }
+                }
+
                 const viewBeHideDistance = getFlipDistance({
                     action,
                     distance,
-                    direction
+                    direction,
+                    leftIndex,
+                    pageIndex,
+                    rightIndex,
+                    flipOverHook
                 })[1]
 
                 moveDistance = viewBeHideDistance

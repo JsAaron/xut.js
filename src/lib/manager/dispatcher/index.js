@@ -26,6 +26,7 @@ import {
     checkMasterCreate,
 } from './depend'
 
+import { getFlowStyle } from '../../visuals/type.page.config'
 import getFlipDistance from '../../visuals/distance.config'
 import customTransform from '../../visuals/transform.config'
 
@@ -510,6 +511,7 @@ export class Dispatcher {
         direction
     } = {}) {
 
+        let self = this
         let currIndex = pageIndex
 
         //用户强制直接切换模式
@@ -518,14 +520,34 @@ export class Dispatcher {
             return
         }
 
+
+        /**
+         * 翻页钩子
+         * @type {Object}
+         */
+        const flipOverHook = {
+            prev() {
+
+            },
+            next(data) {
+                if (config.visualMode === 3) {
+                    //如果下一页是flow
+                    if (data.$$checkFlows(rightIndex)) {
+                        data.left = -2 * data.$$veiwWidth
+                        data.middle = -getFlowStyle().newViewWidth
+                        data.right = -data.$$veiwLeft
+                        data.view = data.right
+                    }
+                }
+            }
+        }
+
         //移动的距离
         let moveDist = getFlipDistance({
             action,
             distance,
             direction,
-            leftIndex,
-            currIndex,
-            rightIndex,
+            flipOverHook
         })
 
         //视觉差页面滑动

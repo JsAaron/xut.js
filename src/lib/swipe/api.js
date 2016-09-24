@@ -8,6 +8,18 @@ import {
 export default function api(Swipe) {
 
 
+    /**
+     * 模拟完成状态调用
+     * @return {[type]} [description]
+     */
+    Swipe.prototype.simulationComplete = function() {
+        setTimeout(() => {
+            this._restore()
+            this._unlock()
+        })
+    }
+
+
     Swipe.prototype.openSwipe = function() {
         this._initOperation();
     }

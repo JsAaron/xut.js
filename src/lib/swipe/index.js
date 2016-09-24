@@ -125,7 +125,7 @@ export default class Swipe extends Observer {
         if (this.options.linear) {
             this._initDistance = -this._hindex * (this._viewWidth + this._extraGap)
             this.element.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
-            this.element.style.width = this._viewWidth  * this.pagetotal + 'px'
+            this.element.style.width = this._viewWidth * this.pagetotal + 'px'
         }
 
     }
@@ -619,13 +619,23 @@ export default class Swipe extends Observer {
         this._distributed(element, view)
     }
 
-    _distributed(element, view) {
+
+    /**
+     * 还原设置
+     * @return {[type]} [description]
+     */
+    _restore(element, view) {
         //针对拖拽翻页阻止
         this._preventSwipe = true
         this._isTap = false;
         //恢复速率
         this._resetRate();
         view && element.removeAttribute('data-view', 'false');
+    }
+
+
+    _distributed(...arg) {
+        this._restore(...arg)
         setTimeout(() => {
             this.$emit('onComplete', this.direction, this._pagePointer, this._unlock.bind(this), this._isQuickTurn);
         }, 100)
