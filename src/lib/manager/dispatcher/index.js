@@ -495,16 +495,6 @@ export class Dispatcher {
 
 
     /**
-     * 下一页是否为flow页面
-     * 要根据这个判断来处理翻页的距离
-     * @return {[type]} [description]
-     */
-    _checkNextFlow(pageIndex) {
-        const pageObj = this.pageMgr.abstractGetPageObj(pageIndex)
-        return pageObj && pageObj._isFlows
-    }
-
-    /**
      * 滑动处理
      *  1 滑动
      *  2 反弹

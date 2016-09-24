@@ -25,7 +25,6 @@ export default function(config, fullProportion) {
     if (config.visualMode === 2) {
         //竖版PPT
         if (config.pptVertical) {
-
             //竖版显示
             if (config.screenVertical) {
                 newHeight = fullProportion.pptHeight * fullProportion.width
@@ -48,7 +47,6 @@ export default function(config, fullProportion) {
     if (config.visualMode === 3) {
         //竖版PPT
         if (config.pptVertical) {
-
             //竖版显示
             //高度100%，宽度溢出
             if (config.screenVertical) {

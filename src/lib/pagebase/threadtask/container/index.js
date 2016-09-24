@@ -123,7 +123,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
  *'baseData'      : pageData,
  *'virtualOffset' : base.virtualOffset,
  *'userStyle'     : base.userStyle, //创建自定义style
- *'isFlows'       : base._isFlows //如果是flows页面
+ *'isFlows'       : base.isFlows //如果是flows页面
  **/
 export default function(base, pageData, taskCallback) {
 

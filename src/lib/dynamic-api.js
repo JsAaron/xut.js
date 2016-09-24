@@ -88,12 +88,9 @@ export default function overrideApi(vm) {
 
     const isExistIndex = createExistIndex($globalEvent);
 
-    //***************************************************************
-    //
-    //  数据接口
-    //
-    //***************************************************************
-
+    /**
+     * 数据接口
+     */
     const Presentation = Xut.Presentation;
 
     /**
@@ -102,7 +99,7 @@ export default function overrideApi(vm) {
     Presentation.GetPageIndex = () => $globalEvent.getHindex()
 
     /**
-     * [获取页面的总数据]
+     * 获取页面的总数据
      * 1 chapter数据
      * 2 section数据
      * @return {[type]}
@@ -204,12 +201,11 @@ export default function overrideApi(vm) {
     }
 
 
-    //***************************************************************
-    //
-    //  视图接口
-    //
-    //***************************************************************
 
+    /**
+     *  视图接口
+     * @type {[type]}
+     */
     const View = Xut.View;
 
     /**
@@ -392,13 +388,9 @@ export default function overrideApi(vm) {
 
 
 
-    //***************************************************************
-    //
-    //  辅助对象的控制接口
-    //
-    //***************************************************************
 
     /**
+     * 辅助对象的控制接口
      * 运行辅助动画
      * 辅助对象的activityId,或者合集activityId
      * Run
@@ -438,12 +430,11 @@ export default function overrideApi(vm) {
     })
 
 
-    //***************************************************************
-    //
-    //  针对page页面的content类型操作接口
-    //
-    //***************************************************************
 
+    /**
+     * 针对page页面的content类型操作接口
+     * @type {[type]}
+     */
     const Contents = Xut.Contents;
 
     /**
@@ -590,12 +581,11 @@ export default function overrideApi(vm) {
     }
 
 
-    //******************************************
-    //
-    //      互斥接口
-    //      直接显示\隐藏\停止动画
-    //
-    //*******************************************
+
+    /**
+     * 互斥接口
+     * 直接显示\隐藏\停止动画
+     */
 
     //检测类型为字符串
     function typeCheck(objNameList) {
@@ -629,13 +619,11 @@ export default function overrideApi(vm) {
     })
 
 
-    //******************************************
-    //
-    //      Application
-    //      应用接口
-    //
-    //*******************************************
-
+    /**
+     *  Application
+     * [Application description]
+     * @type {[type]}
+     */
     const Application = Xut.Application;
 
 

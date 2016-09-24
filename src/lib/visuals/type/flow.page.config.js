@@ -38,9 +38,7 @@ export default function() {
             //高度100%,宽度会存在溢出
             //所以需要修复flow页面是全屏状态
             if (config.screenVertical) {
-                // newViewWidth = config.screenSize.width
-                    // data.containerLeft = (config.viewSize.width - config.screenSize.width) / 2
-                 // newViewLeft = 0   
+                newViewWidth = config.screenSize.width
             } else {
 
             }
@@ -54,6 +52,11 @@ export default function() {
         newViewWidth,
         newViewHeight,
         newViewTop,
-        newViewLeft
+        newViewLeft,
+        /**
+         * 翻页滑动的距离
+         * @type {[type]}
+         */
+        flipOverDistance: newViewWidth
     }
 }
