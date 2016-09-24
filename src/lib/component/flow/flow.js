@@ -5,7 +5,7 @@ import Swipe from '../../swipe/index'
 import render from './render'
 
 import getFlipDistance from '../../visuals/distance.config'
-import flowPageConfig from '../../visuals/flowpage.config'
+import getFlowStyle from '../../visuals/flow.page.config'
 
 /**
  * 2017.9.7
@@ -46,12 +46,12 @@ export default class Flow {
      */
     _init($container, pagesCount) {
 
-        const flowstyle = flowPageConfig()
+        const flowstyle = getFlowStyle()
 
         const MIN = 0
         const MAX = pagesCount - 1
-        const flipWidth = flowstyle.containerWidth
-        const flipLeft = flowstyle.containerLeft
+        const flipWidth = flowstyle.newViewWidth
+        const flipLeft = flowstyle.newViewHeight
         const View = Xut.View
         const initIndex = this.initIndex
 

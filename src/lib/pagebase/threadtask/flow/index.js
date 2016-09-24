@@ -1,4 +1,4 @@
-import Flow from '../../../component/flow/class'
+import Flow from '../../../component/flow/flow'
 import { isFlowPage } from '../../../component/flow/get'
 /**
  * 2017.9.7

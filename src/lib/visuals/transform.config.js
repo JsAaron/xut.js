@@ -1,4 +1,4 @@
-import flowPageConfig from './flowpage.config'
+import getFlowStyle from './flow.page.config'
 import { createPageTransform } from '../pagebase/move/translation'
 
 
@@ -20,7 +20,7 @@ export default function styleConfig({
         //混入指定元素的样式
         //提供可自定义配置接口
         if (data.isFlows) {
-            _.extend(data, flowPageConfig())
+            _.extend(data, getFlowStyle())
         }
 
         //设置容器li的transforms

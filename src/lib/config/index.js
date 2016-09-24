@@ -16,7 +16,7 @@ import {
 }
 from './get'
 
-import getViewSize from '../visuals/view.config'
+import getViewSize from '../visuals/view.page.config'
 import {
     getFullProportion,
     getRealProportion

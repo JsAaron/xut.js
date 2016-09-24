@@ -16,7 +16,6 @@ export default function getViewSize(config, fullProportion) {
     let newTop = 0
     let newLeft = 0
 
-
     /**
      * 宽度100%
      * 正比缩放高度
@@ -51,6 +50,7 @@ export default function getViewSize(config, fullProportion) {
         if (config.pptVertical) {
 
             //竖版显示
+            //高度100%，宽度溢出
             if (config.screenVertical) {
                 newWidth = fullProportion.pptWidth * fullProportion.height
                 newLeft = (screenWidth - newWidth) / 2
@@ -61,7 +61,6 @@ export default function getViewSize(config, fullProportion) {
             }
         }
     }
-
 
     /**
      * 默认全屏

@@ -1,5 +1,4 @@
 import { config } from '../config/index'
-import flowConfig from './flowpage.config'
 
 /**
  * 动态计算翻页距离

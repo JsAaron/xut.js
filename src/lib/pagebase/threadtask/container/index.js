@@ -45,17 +45,17 @@ const createli = function({
     //自动配置样式
     //提供创建样式覆盖
     const getStyle = base.getStyle
-    if (hasValue(getStyle.containerWidth)) {
-        viewWidth = getStyle.containerWidth
+    if (hasValue(getStyle.newViewWidth)) {
+        viewWidth = getStyle.newViewWidth
     }
-    if (hasValue(getStyle.containerHeight)) {
-        viewHeight = getStyle.containerHeight
+    if (hasValue(getStyle.newViewHeight)) {
+        viewHeight = getStyle.newViewHeight
     }
-    if (hasValue(getStyle.containerTop)) {
-        viewTop = getStyle.containerTop
+    if (hasValue(getStyle.newViewTop)) {
+        viewTop = getStyle.newViewTop
     }
-    if (hasValue(getStyle.containerLeft)) {
-        viewLeft = getStyle.containerLeft
+    if (hasValue(getStyle.newViewLeft)) {
+        viewLeft = getStyle.newViewLeft
     }
 
     return String.styleFormat(

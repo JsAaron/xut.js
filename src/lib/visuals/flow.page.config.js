@@ -1,18 +1,15 @@
 import { config } from '../config/index'
 
 /**
- * flow页面的style设置
+ * flow页面的style单独设置
  * @return {[type]} [description]
  */
-export default function flowPageConfig() {
+export default function getFlowStyle() {
 
-    //默认值全屏
-    //config.visualMode === 0
-    const data = {
-        containerWidth: config.screenSize.width,
-        containerHeight: config.screenSize.height,
-        dcontainerTop: 0
-    }
+    let newViewWidth = config.screenSize.width
+    let newViewHeight = config.screenSize.height
+    let newViewTop = 0
+
 
     //宽度100%的情况下
     //如果是flow页面处理,全屏
@@ -22,13 +19,13 @@ export default function flowPageConfig() {
             //其他页面上下压缩，左右100%
             //flows页面宽高都是100%
             if (config.screenVertical) {
-                data.containerWidth = config.screenSize.width
-                data.containerHeight = config.screenSize.height
-                data.containerTop = 0
+                newViewWidth = config.screenSize.width
+                newViewHeight = config.screenSize.height
+                newViewTop = 0
             } else {
-                data.containerWidth = config.viewSize.width
-                data.containerHeight = config.viewSize.height
-                data.containerTop = 0
+                newViewWidth = config.viewSize.width
+                newViewHeight = config.viewSize.height
+                newViewTop = 0
             }
         }
 
@@ -43,8 +40,8 @@ export default function flowPageConfig() {
             //高度100%,宽度会存在溢出
             //所以需要修复flow页面是全屏状态
             if (config.screenVertical) {
-                data.containerWidth = config.screenSize.width
-                // data.containerLeft = (config.viewSize.width - config.screenSize.width) / 2
+                newViewWidth = config.screenSize.width
+                    // data.containerLeft = (config.viewSize.width - config.screenSize.width) / 2
             } else {
 
             }
@@ -52,5 +49,13 @@ export default function flowPageConfig() {
 
     }
 
-    return data
+
+
+    //默认值全屏
+    //config.visualMode === 0
+    return {
+        newViewWidth,
+        newViewHeight,
+        newViewTop
+    }
 }
