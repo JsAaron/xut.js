@@ -91,61 +91,65 @@ export default class Flow {
             direction
         } = {}) {
 
-            const currentDistance = getFlipDistance({
-                action,
-                distance,
-                direction
-            })[1]
-
-            moveDistance = currentDistance
-
-            switch (direction) {
-                case 'next':
-                    moveDistance = moveDistance + lastDistance
-                    break
-                case 'prev':
-                    moveDistance = moveDistance + lastDistance
-                    break
-            }
-
-            //反弹
-            if (action === 'flipRebound') {
-                moveDistance = direction === 'next' ?
-                    (-flipWidth * this._hindex - this._hindex) :
-                    -(flipWidth * this._hindex + this._hindex)
-            }
-
-            //首页边界
+            /**
+             * 首页边界
+             * @param  {[type]} this._hindex [description]
+             * @return {[type]}              [description]
+             */
             if (this._hindex === MIN && this.direction === 'prev') {
                 if (action === 'flipOver') {
                     View.GotoPrevSlide()
                     this._unlock()
                 } else {
                     //前边界前移反弹
-                    View.MovePage(moveDistance, speed, this.direction, action)
+                    View.MovePage(distance, speed, this.direction, action)
                 }
             }
-            //尾页边界
+            /**
+             * 尾页边界
+             * @param  {[type]} this._hindex [description]
+             * @return {[type]}              [description]
+             */
             else if (this._hindex === MAX && this.direction === 'next') {
                 if (action === 'flipOver') {
                     View.GotoNextSlide()
                     this._unlock()
                 } else {
                     //后边界前移反弹
-                    View.MovePage(currentDistance, speed, this.direction, action)
+                    View.MovePage(distance, speed, this.direction, action)
                 }
             }
-            //中间页面
+            /**
+             * 中间页面
+             */
             else {
+
+                const viewBeHideDistance = getFlipDistance({
+                    action,
+                    distance,
+                    direction
+                })[1]
+
+                moveDistance = viewBeHideDistance
+
+                switch (direction) {
+                    case 'next':
+                        moveDistance = moveDistance + lastDistance
+                        break
+                    case 'prev':
+                        moveDistance = moveDistance + lastDistance
+                        break
+                }
+
+                //反弹
+                if (action === 'flipRebound') {
+                    moveDistance = direction === 'next' ?
+                        (-flipWidth * this._hindex - this._hindex) :
+                        -(flipWidth * this._hindex + this._hindex)
+                }
+
                 translation[action]($container, moveDistance, speed)
             }
-
-
-            //更新页码标示
-            'flipOver' === action && setTimeout(() => {
-                let extra = direction === 'next' ? 1 : (-1)
-                let index = initIndex + pageIndex + extra
-            }, 0)
 
         })
 
