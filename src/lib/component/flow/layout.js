@@ -1,6 +1,6 @@
 import { config } from '../../config/index'
-import { set } from './get'
-import getFlowStyle from '../../visuals/flow.page.config'
+import {set } from './get'
+import { getFlowStyle } from '../../visuals/type.page.config'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -24,17 +24,17 @@ const createStr = (chapterId, data, viewWidth, viewHeight, margin) => {
 
     //减去的宽度值
     const negativeWidth = viewWidth / 100 * (percentageLeft + percentageRight)
-    //减去的高度值
+        //减去的高度值
     const negativeHeight = viewHeight / 100 * (percentageTop + percentageBottom)
 
     //容器宽度 = 宽度 - 左右距离比值
     const containerWidth = viewWidth - negativeWidth
-    //容器高度值 = 宽度 - 上下距离比值
+        //容器高度值 = 宽度 - 上下距离比值
     const containerHeight = viewHeight - negativeHeight
-    //容器左边偏移量
+        //容器左边偏移量
     const containerLeft = negativeWidth / 2
-    //容器上偏移量
-    const containerTop = viewHeight/100 * percentageTop
+        //容器上偏移量
+    const containerTop = viewHeight / 100 * percentageTop
 
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
@@ -110,7 +110,7 @@ export default function initFlows() {
      */
     const flowstyle = getFlowStyle()
     const vWidth = flowstyle.newViewWidth
-    const vHeight = newViewHight =  flowstyle.newViewHeight
+    const vHeight = newViewHight = flowstyle.newViewHeight
 
     $seasons.each((index, node) => {
         const tag = node.id

@@ -1,4 +1,4 @@
-import { config } from '../config/index'
+import { config } from '../../config/index'
 
 /**
  * flow页面的style单独设置
@@ -48,7 +48,6 @@ export default function getFlowStyle() {
         }
 
     }
-
 
 
     //默认值全屏

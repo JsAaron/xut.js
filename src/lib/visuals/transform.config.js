@@ -1,4 +1,4 @@
-import getFlowStyle from './flow.page.config'
+import { getFlowStyle } from './type.page.config'
 import { createPageTransform } from '../pagebase/move/translation'
 
 

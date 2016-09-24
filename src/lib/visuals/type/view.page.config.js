@@ -73,6 +73,5 @@ export default function getViewSize(config, fullProportion) {
         left: newLeft,
         top: newTop
     }
-
-
+    
 }
