@@ -8,66 +8,62 @@ export default function getFlipDistance({
     action,
     distance,
     direction,
-    nextIsFolw
+    leftIndex,
+    currIndex,
+    rightIndex,
 } = {}) {
 
-    let leftOffset
-    let currOffset
-    let rightOffset
-
     //当前视图页面
-    //用来处理页面回调
-    let viewOffset
+    //用来处理页面翻页的主页确定
+    let realView
 
-    //滑动区域宽度
+    //隐藏变删除的页面
+    //next: left => hideBeRemove
+    //prev: right => hideBeRemove
+    let hideBeRemove
+
+    //显示变隐藏的页面
+    //next：currIndex => viewBeHide
+    //prev：currIndex => viewBeHide
+    let viewBeHide
+
+    //隐藏变展示的页面
+    let hideBeView
+
+    //默认滑动区域宽度
     const veiwWidth = config.viewSize.width
 
-    switch (direction) {
-
-        //前翻
-        case 'prev':
-            switch (action) {
-                case 'flipMove':
-                    leftOffset = distance - veiwWidth
-                    currOffset = distance
-                    rightOffset = distance + veiwWidth
-                    break;
-                case 'flipRebound':
-                    leftOffset = -veiwWidth
-                    currOffset = distance;
-                    rightOffset = veiwWidth
-                    break;
-                case 'flipOver':
-                    leftOffset = 0
-                    currOffset = veiwWidth
-                    rightOffset = 2 * veiwWidth
-                    viewOffset = leftOffset
-                    break;
-            }
-            break;
-
-            //后翻
-        case 'next':
-            switch (action) {
-                case 'flipMove':
-                    leftOffset = distance - veiwWidth;
-                    rightOffset = distance + veiwWidth;
-                    currOffset = distance;
-                    break;
-                case 'flipRebound':
-                    leftOffset = -veiwWidth;
-                    rightOffset = veiwWidth;
-                    currOffset = distance;
-                    break;
-                case 'flipOver':
-                    leftOffset = -2 * veiwWidth
-                    currOffset = -veiwWidth
-                    rightOffset = distance
-                    viewOffset = rightOffset
-                    break;
-            }
-            break;
+    //滑动
+    if (action === 'flipMove') {
+        hideBeRemove = distance - veiwWidth
+        hideBeView = distance + veiwWidth
+        viewBeHide = distance
     }
 
-    return [leftOffset, currOffset, rightOffset, viewOffset]
+    //反弹
+    if (action === 'flipRebound') {
+        hideBeRemove = -veiwWidth
+        viewBeHide = distance;
+        hideBeView = veiwWidth
+    }
+
+    //翻页
+    if (action === 'flipOver') {
+        //前翻
+        if (direction === 'prev') {
+            hideBeRemove = 0
+            viewBeHide = veiwWidth
+            hideBeView = 2 * veiwWidth
+            realView = hideBeRemove
+        }
+        //后翻
+        if (direction === 'next') {
+            hideBeRemove = -2 * veiwWidth
+            hideBeView = distance
+            viewBeHide = -veiwWidth
+            realView = hideBeView
+        }
+    }
+
+    return [hideBeRemove, viewBeHide, hideBeView, realView]
 }

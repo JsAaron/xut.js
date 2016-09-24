@@ -6,7 +6,7 @@ const CEIL = Math.ceil
  * @param  {[type]} () [description]
  * @return {[type]}    [description]
  */
-export default function getViewSize(config, fullProportion) {
+export default function(config, fullProportion) {
 
     const screenWidth = config.screenSize.width
     const screenHeight = config.screenSize.height
@@ -73,5 +73,5 @@ export default function getViewSize(config, fullProportion) {
         left: newLeft,
         top: newTop
     }
-    
+
 }

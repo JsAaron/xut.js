@@ -74,10 +74,6 @@ export default class Flow {
         let lastDistance = swipe._initDistance
 
 
-        /**
-         * 触屏松手点击
-         * 无滑动
-         */
         swipe.$watch('onTap', (pageIndex, hookCallback) => {
             if (!Xut.Contents.Canvas.getIsTap()) {
                 View.Toolbar()
@@ -125,7 +121,7 @@ export default class Flow {
                     View.GotoPrevSlide()
                     this._unlock()
                 } else {
-                    //前边界反弹，要加上溢出值
+                    //前边界前移反弹
                     View.MovePage(moveDistance, speed, this.direction, action)
                 }
             }
@@ -135,20 +131,12 @@ export default class Flow {
                     View.GotoNextSlide()
                     this._unlock()
                 } else {
+                    //后边界前移反弹
                     View.MovePage(currentDistance, speed, this.direction, action)
                 }
             }
             //中间页面
             else {
-
-                // if (action === 'flipOver') {
-                //     if (direction === 'next') {
-                //         moveDistance += flipLeft * 2
-                //     } else {
-                //         moveDistance -= flipLeft * 2
-                //     }
-                // }
-
                 translation[action]($container, moveDistance, speed)
             }
 
@@ -157,7 +145,7 @@ export default class Flow {
             'flipOver' === action && setTimeout(() => {
                 let extra = direction === 'next' ? 1 : (-1)
                 let index = initIndex + pageIndex + extra
-            })
+            }, 0)
 
         })
 

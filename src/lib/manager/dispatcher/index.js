@@ -499,7 +499,7 @@ export class Dispatcher {
      * 要根据这个判断来处理翻页的距离
      * @return {[type]} [description]
      */
-    _nextIsFlowPage(pageIndex) {
+    _checkNextFlow(pageIndex) {
         const pageObj = this.pageMgr.abstractGetPageObj(pageIndex)
         return pageObj && pageObj._isFlows
     }
@@ -521,7 +521,6 @@ export class Dispatcher {
     } = {}) {
 
         let currIndex = pageIndex
-        let nextIsFolw = false
 
         //用户强制直接切换模式
         //禁止页面跟随滑动
@@ -529,23 +528,14 @@ export class Dispatcher {
             return
         }
 
-        //1:更新页码
-        //2:处理翻页(li的页面宽度可能不一样)
-        if (action === 'flipOver') {
-            setTimeout(() => {
-                this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
-            }, 0)
-
-            //判断下一页是flow页面
-            nextIsFolw = this._nextIsFlowPage(direction === 'next' ? rightIndex : leftIndex)
-        }
-
         //移动的距离
         let moveDist = getFlipDistance({
             action,
             distance,
             direction,
-            nextIsFolw
+            leftIndex,
+            currIndex,
+            rightIndex,
         })
 
         //视觉差页面滑动
@@ -555,19 +545,26 @@ export class Dispatcher {
 
         const data = {
             nodes,
-            speed, 
-            action, 
+            speed,
+            action,
             moveDist,
-            leftIndex, 
-            currIndex, 
-            rightIndex, 
-            direction, 
+            leftIndex,
+            currIndex,
+            rightIndex,
+            direction,
         }
 
         this.pageMgr.move(data)
         this.masterContext(function() {
             this.move(data)
         })
+
+        //更新页码
+        if (action === 'flipOver') {
+            setTimeout(() => {
+                this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
+            }, 0)
+        }
     }
 
 
