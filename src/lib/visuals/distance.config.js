@@ -26,73 +26,65 @@ export default function getFlipDistance({
     rightIndex,
 } = {}) {
 
+    let leftOffset
+    let middleOffset
+    let rightOffset
+
     //当前视图页面
-    //用来处理页面翻页的主页确定
-    let realView
+    //用来处理页面回调
+    let realViewOffset
 
-    //隐藏变删除的页面
-    //next: left => hideBeRemove
-    //prev: right => hideBeRemove
-    let hideBeRemove
-
-    //显示变隐藏的页面
-    //next：currIndex => viewBeHide
-    //prev：currIndex => viewBeHide
-    let viewBeHide
-
-    //隐藏变展示的页面
-    let hideBeView
-
-    //默认滑动区域宽度
+    //滑动区域宽度
     const veiwWidth = config.viewSize.width
-    const veiwLeft = config.viewSize.left
 
-    //滑动
+    /**
+     * 滑动
+     * @param  {[type]} action [description]
+     * @return {[type]}        [description]
+     */
     if (action === 'flipMove') {
-        hideBeRemove = distance - veiwWidth
-        hideBeView = distance + veiwWidth
-        viewBeHide = distance
+        leftOffset = distance - veiwWidth
+        middleOffset = distance
+        rightOffset = distance + veiwWidth
     }
 
-    //反弹
+    /**
+     * 反弹
+     * @param  {[type]} action [description]
+     * @return {[type]}        [description]
+     */
     if (action === 'flipRebound') {
-        hideBeRemove = -veiwWidth
-        viewBeHide = distance;
-        hideBeView = veiwWidth
+        leftOffset = -veiwWidth
+        middleOffset = distance;
+        rightOffset = veiwWidth
     }
 
-    //翻页
+    /**
+     * 翻页
+     * @param  {[type]} action [description]
+     * @return {[type]}        [description]
+     */
     if (action === 'flipOver') {
-        //前翻
+        /**
+         * 前翻
+         */
         if (direction === 'prev') {
-            hideBeRemove = 0
-            viewBeHide = veiwWidth
-            hideBeView = 2 * veiwWidth
-            realView = hideBeRemove
+            leftOffset = 0
+            middleOffset = veiwWidth
+            rightOffset = 2 * veiwWidth
+            realViewOffset = leftOffset
         }
-        //后翻
+        /**
+         * 后翻
+         */
         if (direction === 'next') {
-
-            hideBeRemove = -2 * veiwWidth
-
-            //下一页如果是flow页面处理
-            //修正 1：viewBeHide = flow页面的宽度
-            //     2：hideBeView = 页面的溢出值
-            if (checkNextFlow(rightIndex)) {
-                const flowstyle = getFlowStyle()
-                if (hasValue(flowstyle.flipOverDistance)) {
-                    viewBeHide = -flowstyle.newViewWidth
-                    hideBeView = -veiwLeft
-                }
-            } else {
-                viewBeHide = -veiwWidth
-                hideBeView = distance
-            }
-
-            realView = hideBeView
-
+            leftOffset = -2 * veiwWidth
+            middleOffset = -veiwWidth
+            rightOffset = distance
+            realViewOffset = rightOffset
         }
+
     }
 
-    return [hideBeRemove, viewBeHide, hideBeView, realView]
+    return [leftOffset, middleOffset, rightOffset, realViewOffset]
 }
