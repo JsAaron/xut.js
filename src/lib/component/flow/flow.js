@@ -5,7 +5,7 @@ import Swipe from '../../swipe/index'
 import render from './render'
 
 import getFlipDistance from '../../visuals/distance.config'
-import { getFlowStyle } from '../../visuals/type.page.config'
+import { getFlowStyle } from '../../visuals/type/type.page.config'
 
 /**
  * 2017.9.7

@@ -1,6 +1,6 @@
 import { config } from '../../config/index'
 import {set } from './get'
-import { getFlowStyle } from '../../visuals/type.page.config'
+import { getFlowStyle } from '../../visuals/type/type.page.config'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap

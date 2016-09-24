@@ -26,7 +26,7 @@ import {
     checkMasterCreate,
 } from './depend'
 
-import { getFlowStyle } from '../../visuals/type.page.config'
+import { getFlowStyle } from '../../visuals/type/type.page.config'
 import getFlipDistance from '../../visuals/distance.config'
 import containerStyle from '../../visuals/container.config'
 
@@ -190,8 +190,6 @@ export class Dispatcher {
          */
         const compile = new Stack()
 
-        //存在flows页面
-        let hasFlows = false
 
         //收集有用的数据
         let usefulData = Object.create(null)
@@ -246,10 +244,6 @@ export class Dispatcher {
                  * @return {[type]}                  [description]
                  */
                 const isFlows = chapterData.note === 'flow'
-                    //只需要判断一次存在即可
-                if (!hasFlows && isFlows) {
-                    hasFlows = isFlows
-                }
 
 
                 //跳转的时候，创建新页面可以自动样式信息
@@ -345,7 +339,6 @@ export class Dispatcher {
          */
         const newstyle = containerStyle({
             usefulData,
-            hasFlows,
             initAction: action === 'init',
             filpOverAction: filpOverAction
         })
