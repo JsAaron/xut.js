@@ -1,16 +1,15 @@
 import { config } from '../../config/index'
 
 /**
- * flow页面的style单独设置
+ * flow页面的View尺寸单独设置
  * @return {[type]} [description]
  */
-export default function() {
+export function setFlowView() {
 
     let viewWidth
     let viewHeight
     let viewTop
     let viewLeft
-
 
     //宽度100%的情况下
     //如果是flow页面处理,全屏

@@ -5,7 +5,7 @@ import Swipe from '../../swipe/index'
 import render from './render'
 
 import getFlipDistance from '../../visuals/distance.config'
-import { getFlowView } from '../../visuals/overwrite/type.page.config'
+import { getFlowView } from '../../visuals/overwrite.config'
 
 /**
  * 2017.9.7

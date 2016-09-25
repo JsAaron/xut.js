@@ -1,4 +1,6 @@
-import flowType from './flow.page.config'
+import {
+    setFlowView
+} from './overwrite/flow.type.config'
 
 /**
  * 结果缓存
@@ -19,5 +21,5 @@ const FLOWTYPE = 'flow'
  * @return {[type]}                [description]
  */
 export function getFlowView() {
-    return _cache[FLOWTYPE] ? _cache[FLOWTYPE] : flowType()
+    return _cache[FLOWTYPE] ? _cache[FLOWTYPE] : setFlowView()
 }

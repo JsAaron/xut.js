@@ -1,9 +1,8 @@
-import defaultView from './overwrite/default.view.config'
-import defaultStyle from './overwrite/defalut.style.config'
-import { getFlowView } from './overwrite/type.page.config'
+import defaultView from './default.view.config'
+import defaultStyle from './defalut.style.config'
+import { getFlowView } from '../overwrite.config'
 
-import { config } from '../config/index'
-
+import { config } from '../../config/index'
 
 
 /**
