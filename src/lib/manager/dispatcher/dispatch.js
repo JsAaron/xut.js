@@ -26,7 +26,7 @@ import {
     checkMasterCreate,
 } from './util'
 
-import { getFlowView } from '../../visuals/type/type.page.config'
+import { getFlowView } from '../../visuals/overwrite/type.page.config'
 import getFlipDistance from '../../visuals/distance.config'
 import containerStyle from '../../visuals/container.config'
 
