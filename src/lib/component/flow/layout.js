@@ -109,6 +109,7 @@ export default function initFlows() {
      * @type {[type]}
      */
     const flowView = getFlowView()
+    console.log(flowView)
     const vWidth = flowView.viewWidth
     const vHeight = newViewHight = flowView.viewHeight
 

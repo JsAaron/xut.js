@@ -15,9 +15,10 @@ export default function() {
     //宽度100%的情况下
     //如果是flow页面处理,全屏
     if (config.visualMode === 2) {
-        //其他页面上下压缩，左右100%
-        //flows页面宽高都是100%
+        //1 全屏
+        //2 流式排版排版需要这个单位设置
         return {
+            viewWidth: config.screenSize.width,
             viewHeight: config.screenSize.height,
             viewTop: 0
         }
