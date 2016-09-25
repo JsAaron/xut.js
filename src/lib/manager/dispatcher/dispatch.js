@@ -28,7 +28,7 @@ import {
 
 import { getFlowView } from '../../visuals/overwrite.config'
 import getFlipDistance from '../../visuals/distance.config'
-import containerStyle from '../../visuals/container/container.config'
+import containerStyle from '../../visuals/container.config'
 
 export class Dispatcher {
 

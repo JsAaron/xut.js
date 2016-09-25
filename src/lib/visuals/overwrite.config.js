@@ -21,5 +21,5 @@ const FLOWTYPE = 'flow'
  * @return {[type]}                [description]
  */
 export function getFlowView() {
-    return _cache[FLOWTYPE] ? _cache[FLOWTYPE] : setFlowView()
+    return _cache[FLOWTYPE] ? _cache[FLOWTYPE] : _cache[FLOWTYPE] = setFlowView()
 }
