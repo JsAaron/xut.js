@@ -51,6 +51,19 @@ export default function getFlipDistance({
         view: undefined
     }
 
+    /**
+     * 混入钩子
+     * @return {[type]} [description]
+     */
+    const mixHooks = function(hook) {
+        if (hook) {
+            let _receiver = makeGather()
+            hook(_receiver)
+            _.each(_receiver, function(value, key) {
+                offset[key] = value
+            })
+        }
+    }
 
     /**
      * 滑动
@@ -81,6 +94,8 @@ export default function getFlipDistance({
      */
     if (action === 'flipOver') {
 
+        const flipOver = hooks && hooks.flipOver
+
         /**
          * 前翻
          */
@@ -88,13 +103,7 @@ export default function getFlipDistance({
             offset.left = 0
             offset.middle = veiwWidth
             offset.right = 2 * veiwWidth
-            if (hooks.prevFlipOver) {
-                let gather = makeGather()
-                hooks.prevFlipOver(gather)
-                _.each(gather, function(value, key) {
-                    offset[key] = value
-                })
-            }
+            mixHooks(flipOver.prev)
             offset.view = offset.left
         }
 
@@ -102,17 +111,10 @@ export default function getFlipDistance({
          * 后翻
          */
         if (direction === 'next') {
-
             offset.left = -2 * veiwWidth
             offset.middle = -veiwWidth
             offset.right = distance
-            if (hooks.nextFlipOver) {
-                let gather = makeGather()
-                hooks.nextFlipOver(gather)
-                _.each(gather, function(value, key) {
-                    offset[key] = value
-                })
-            }
+            mixHooks(flipOver.next)
             offset.view = offset.right
         }
 

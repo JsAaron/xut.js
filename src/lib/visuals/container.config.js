@@ -22,6 +22,7 @@ const createTranslate = (offset) => {
  */
 const getContainer = function({
     data,
+    hooks,
     createIndex,
     currIndex,
     initAction,
@@ -34,31 +35,44 @@ const getContainer = function({
 
     const viewWidth = config.viewSize.width
 
-    //左边
+    const mixHooks = function(original, hook) {
+        if (hook) {
+            let newValue = hook(original)
+            if (newValue !== undefined) {
+                return newValue
+            }
+        }
+        return original
+    }
+
+    /**
+     * 左边
+     */
     if (createIndex < currIndex) {
         let offsetLeft = -viewWidth
-        if (data.isFlows && config.visualMode === 3) {
-            offsetLeft = offsetLeft - config.viewSize.left
-        }
+        offsetLeft = mixHooks(offsetLeft, hooks.left)
         translate = createTranslate(offsetLeft)
         offset = offsetLeft
         direction = 'before'
     }
-    //右边 
+    /**
+     * 右边 
+     */
     else if (createIndex > currIndex) {
-        const offsetRight = viewWidth
+        let offsetRight = viewWidth
+        offsetRight = mixHooks(offsetRight, hooks.right)
         translate = createTranslate(offsetRight)
         offset = offsetRight
         direction = 'after'
     }
-    //可视区域
+    /**
+     * 中间区域
+     */
     else if (currIndex == createIndex) {
-        let offsetCut = 0
-        if (data.isFlows && config.visualMode === 3) {
-            offsetCut = -config.viewSize.left
-        }
-        translate = createTranslate(offsetCut)
-        offset = offsetCut
+        let offsetMiddle = 0
+        offsetMiddle = mixHooks(offsetMiddle, hooks.middle)
+        translate = createTranslate(offsetMiddle)
+        offset = offsetMiddle
         direction = 'original'
     }
 
@@ -91,9 +105,33 @@ export default function styleConfig({
             _.extend(data, getFlowStyle())
         }
 
+
+        /**
+         * 容器钩子
+         * @type {Object}
+         */
+        const hooks = {
+            left(offsetLeft) {
+                if (data.isFlows && config.visualMode === 3) {
+                    offsetLeft = offsetLeft - config.viewSize.left
+                }
+                return offsetLeft
+            },
+            middle(offsetMiddle) {
+                if (data.isFlows && config.visualMode === 3) {
+                    offsetMiddle = -config.viewSize.left
+                }
+                return offsetMiddle
+            },
+            right() {
+
+            }
+        }
+
         //设置容器的样式
         getContainer({
             data,
+            hooks,
             createIndex: data.pid,
             currIndex: data.visiblePid,
             initAction,

@@ -133,14 +133,16 @@ export default class Flow {
                  * @type {Object}
                  */
                 const hooks = {
-                    prevFlipOver(data) {
-                        if (config.visualMode === 3) {
-                            data.middle = flowstyle.newViewWidth
-                        }
-                    },
-                    nextFlipOver(data) {
-                        if (config.visualMode === 3) {
-                            data.middle = -flowstyle.newViewWidth
+                    flipOver: {
+                        prev(data) {
+                            if (config.visualMode === 3) {
+                                data.middle = flowstyle.newViewWidth
+                            }
+                        },
+                        next(data) {
+                            if (config.visualMode === 3) {
+                                data.middle = -flowstyle.newViewWidth
+                            }
                         }
                     }
                 }

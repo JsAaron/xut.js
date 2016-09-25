@@ -7,7 +7,7 @@
 
 import { Observer } from '../observer/index'
 import GlobalEvent from '../swipe/index.js'
-import { Dispatcher } from './dispatcher/index'
+import { Dispatcher } from './dispatcher/dispatch'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'
 import overrideApi from '../dynamic-api'
