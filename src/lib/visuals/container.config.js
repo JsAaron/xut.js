@@ -20,7 +20,7 @@ const createTranslate = (offset) => {
  * flowType 如果是flow类型
  * @return {[type]}
  */
-const getContainer = function({
+const getBaseStyle = function({
     data,
     hooks,
     createIndex,
@@ -112,24 +112,31 @@ export default function styleConfig({
          */
         const hooks = {
             left(offsetLeft) {
-                if (data.isFlows && config.visualMode === 3) {
-                    offsetLeft = offsetLeft - config.viewSize.left
+                if (config.visualMode === 3) {
+                    if (data.isFlows) {
+                        offsetLeft = offsetLeft - config.viewSize.left
+                        return offsetLeft
+                    }
                 }
-                return offsetLeft
             },
             middle(offsetMiddle) {
-                if (data.isFlows && config.visualMode === 3) {
-                    offsetMiddle = -config.viewSize.left
+                if (config.visualMode === 3) {
+                    if (data.isFlows) {
+                        offsetMiddle = -config.viewSize.left
+                        return offsetMiddle
+                    }
                 }
-                return offsetMiddle
             },
             right() {
-
+                if (config.visualMode === 3) {
+                    if (data.isFlows) {
+                    }
+                }
             }
         }
 
         //设置容器的样式
-        getContainer({
+        getBaseStyle({
             data,
             hooks,
             createIndex: data.pid,
