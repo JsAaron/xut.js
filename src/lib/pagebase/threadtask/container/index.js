@@ -24,38 +24,16 @@ const createli = function({
     background
 } = {}) {
 
+    const getStyle = base.getStyle
+
     let offsetLeft = 0
     let virtualNode = ''
 
-    const proportion = config.proportion
-    const viewSize = config.viewSize
-
-    let viewWidth = viewSize.width
-    let viewHeight = viewSize.height
-    let viewTop = viewSize.top
-    let viewLeft = 0
-
     if (config.virtualMode) {
         if (base.virtualOffset === 'right') {
-            offsetLeft = -(config.screenSize.width - proportion.offsetLeft);
+            offsetLeft = -(config.screenSize.width - config.proportion.offsetLeft);
         }
         virtualNode = `<div style="width:${viewWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
-    }
-
-    //自动配置样式
-    //提供创建样式覆盖
-    const getStyle = base.getStyle
-    if (hasValue(getStyle.newViewWidth)) {
-        viewWidth = getStyle.newViewWidth
-    }
-    if (hasValue(getStyle.newViewHeight)) {
-        viewHeight = getStyle.newViewHeight
-    }
-    if (hasValue(getStyle.newViewTop)) {
-        viewTop = getStyle.newViewTop
-    }
-    if (hasValue(getStyle.newViewLeft)) {
-        viewLeft = getStyle.newViewLeft
     }
 
     return String.styleFormat(
@@ -65,10 +43,10 @@ const createli = function({
             data-pageType="${base.pageType}"
             data-container="true"
             class="xut-flip"
-            style="width:${viewWidth}px;
-                   height:${viewHeight}px;
-                   top:${viewTop}px;
-                   left:${viewLeft}px;
+            style="width:${getStyle.viewWidth}px;
+                   height:${getStyle.viewHeight}px;
+                   top:${getStyle.viewTop}px;
+                   left:${getStyle.viewLeft}px;
                    ${TANSFROM}:${translate};
                    ${background}
                    ${customStyle}

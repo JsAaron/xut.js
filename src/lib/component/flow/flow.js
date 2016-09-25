@@ -5,7 +5,7 @@ import Swipe from '../../swipe/index'
 import render from './render'
 
 import getFlipDistance from '../../visuals/distance.config'
-import { getFlowStyle } from '../../visuals/type/type.page.config'
+import { getFlowView } from '../../visuals/type/type.page.config'
 
 /**
  * 2017.9.7
@@ -46,12 +46,12 @@ export default class Flow {
      */
     _init($container, pagesCount) {
 
-        const flowstyle = getFlowStyle()
+        const flowView = getFlowView()
 
         const MIN = 0
         const MAX = pagesCount - 1
-        const flipWidth = flowstyle.newViewWidth
-        const flipLeft = flowstyle.newViewLeft
+        const flipWidth = flowView.viewWidth
+        const flipLeft = flowView.viewLeft
         const viewLeft = config.viewSize.left
         const View = Xut.View
         const initIndex = this.initIndex
@@ -136,12 +136,12 @@ export default class Flow {
                     flipOver: {
                         prev(data) {
                             if (config.visualMode === 3) {
-                                data.middle = flowstyle.newViewWidth
+                                data.middle = flipWidth
                             }
                         },
                         next(data) {
                             if (config.visualMode === 3) {
-                                data.middle = -flowstyle.newViewWidth
+                                data.middle = -flipWidth
                             }
                         }
                     }

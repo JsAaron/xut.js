@@ -18,6 +18,6 @@ const FLOWTYPE = 'flow'
  * @param  {[type]} fullProportion [description]
  * @return {[type]}                [description]
  */
-export function getFlowStyle() {
+export function getFlowView() {
     return _cache[FLOWTYPE] ? _cache[FLOWTYPE] : flowType()
 }

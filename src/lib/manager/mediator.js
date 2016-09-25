@@ -6,18 +6,17 @@
  **********************************************************************/
 
 import { Observer } from '../observer/index'
-import GlobalEvent from '../swipe/index.js'
 import { Dispatcher } from './dispatcher/dispatch'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'
-import overrideApi from '../dynamic-api'
 
-//定义访问器
 import {
     defProtected as def,
     defAccess
 } from '../util/index'
 
+import GlobalEvent from '../swipe/index.js'
+import overrideApi from '../dynamic-api'
 
 /**
  * 配置多页面参数

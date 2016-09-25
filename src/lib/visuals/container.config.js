@@ -1,4 +1,4 @@
-import { getFlowStyle } from './type/type.page.config'
+import { getFlowView } from './type/type.page.config'
 import { config } from '../config/index'
 
 const transform = Xut.style.transform
@@ -20,13 +20,11 @@ const createTranslate = (offset) => {
  * flowType 如果是flow类型
  * @return {[type]}
  */
-const getBaseStyle = function({
+const defaultStyle = function({
     data,
-    hooks,
+    hooks = {},
     createIndex,
-    currIndex,
-    initAction,
-    filpOverAction
+    currIndex
 } = {}) {
 
     let translate
@@ -84,6 +82,19 @@ const getBaseStyle = function({
 }
 
 
+/**
+ * 默认容器尺寸
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
+const defaultView = function(data) {
+    const viewSize = config.viewSize
+    data.viewWidth = viewSize.width
+    data.viewHeight = viewSize.height
+    data.viewTop = viewSize.top
+    data.viewLeft = 0
+}
+
 
 /**
  * 自定义样式页面容器的样式
@@ -93,18 +104,20 @@ const getBaseStyle = function({
  * @return {[type]} [description]
  */
 export default function styleConfig({
-    usefulData,
-    initAction,
-    filpOverAction
+    action,
+    usefulData
 } = {}) {
+
     _.each(usefulData, function(data, index) {
+
+        //默认尺寸
+        defaultView(data)
 
         //混入指定元素的样式
         //提供可自定义配置接口
         if (data.isFlows) {
-            _.extend(data, getFlowStyle())
+            _.extend(data, getFlowView())
         }
-
 
         /**
          * 容器钩子
@@ -129,22 +142,19 @@ export default function styleConfig({
             },
             right() {
                 if (config.visualMode === 3) {
-                    if (data.isFlows) {
-                    }
+                    if (data.isFlows) {}
                 }
             }
         }
 
         //设置容器的样式
-        getBaseStyle({
+        defaultStyle({
             data,
-            hooks,
+            // hooks,
             createIndex: data.pid,
-            currIndex: data.visiblePid,
-            initAction,
-            filpOverAction
+            currIndex: data.visiblePid
         })
     })
-
+    console.log(usefulData)
     return usefulData
 }

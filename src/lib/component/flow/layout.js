@@ -1,6 +1,6 @@
 import { config } from '../../config/index'
 import {set } from './get'
-import { getFlowStyle } from '../../visuals/type/type.page.config'
+import { getFlowView } from '../../visuals/type/type.page.config'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -108,9 +108,9 @@ export default function initFlows() {
      * 容器尺寸设置
      * @type {[type]}
      */
-    const flowstyle = getFlowStyle()
-    const vWidth = flowstyle.newViewWidth
-    const vHeight = newViewHight = flowstyle.newViewHeight
+    const flowView = getFlowView()
+    const vWidth = flowView.viewWidth
+    const vHeight = newViewHight = flowView.viewHeight
 
     $seasons.each((index, node) => {
         const tag = node.id

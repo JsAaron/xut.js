@@ -6,27 +6,20 @@ import { config } from '../../config/index'
  */
 export default function() {
 
-    let newViewWidth = config.screenSize.width
-    let newViewHeight = config.screenSize.height
-    let newViewTop = 0
-    let newViewLeft = 0
+    let viewWidth
+    let viewHeight
+    let viewTop
+    let viewLeft
 
 
     //宽度100%的情况下
     //如果是flow页面处理,全屏
     if (config.visualMode === 2) {
-        if (config.pptVertical) {
-            //其他页面上下压缩，左右100%
-            //flows页面宽高都是100%
-            if (config.screenVertical) {
-                newViewWidth = config.screenSize.width
-                newViewHeight = config.screenSize.height
-                newViewTop = 0
-            } else {
-                newViewWidth = config.viewSize.width
-                newViewHeight = config.viewSize.height
-                newViewTop = 0
-            }
+        //其他页面上下压缩，左右100%
+        //flows页面宽高都是100%
+        return {
+            viewHeight: config.screenSize.height,
+            viewTop: 0
         }
     }
 
@@ -38,25 +31,11 @@ export default function() {
             //高度100%,宽度会存在溢出
             //所以需要修复flow页面是全屏状态
             if (config.screenVertical) {
-                newViewWidth = config.screenSize.width
+                viewWidth = config.screenSize.width
             } else {
 
             }
         }
     }
 
-
-    //默认值全屏
-    //config.visualMode === 0
-    return {
-        newViewWidth,
-        newViewHeight,
-        newViewTop,
-        newViewLeft,
-        /**
-         * 翻页滑动的距离
-         * @type {[type]}
-         */
-        flipOverDistance: newViewWidth
-    }
 }
