@@ -25,7 +25,7 @@ const runScript = (pageObject, type) => {
     if (code) {
         execScript(code, type)
     }
-} 
+}
 
 
 export default class PageMgr extends Abstract {

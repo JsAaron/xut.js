@@ -69,7 +69,7 @@ export default {
                 if (config.visualMode === 3) {
                     const middle = usefulData.getStyle('middle')
                     if (middle && middle.isFlows) {
-                        return - (middle.viewWidth + middle.offset)
+                        return -(middle.viewWidth + middle.offset)
                     }
                 }
             },
@@ -94,4 +94,49 @@ export default {
         }
     }
 
+
+    /**
+     * 滑动值
+     * @return {[type]} [description]
+     */
+    , distance() {
+        return {
+            flipMove: {
+                next(data) {
+
+                }
+            },
+            flipOver: {
+                prev(data) {
+                    // if (config.visualMode === 3) {
+                    //     const currFlows = data.$$checkFlows(currIndex)
+                    //     const nextFlows = data.$$checkFlows(leftIndex)
+                    //         //当前flow，下一页正常
+                    //     if (currFlows && !nextFlows) {}
+                    //     //当前正常页面，下一页flow
+                    //     if (!currFlows && nextFlows) {
+                    //         data.left = -data.$$veiwLeft
+                    //     }
+                    // }
+                },
+                next(data) {
+                    // if (config.visualMode === 3) {
+                    //     const currFlows = data.$$checkFlows(currIndex)
+                    //     const nextFlows = data.$$checkFlows(rightIndex)
+                    //         //当前flow，下一页正常
+                    //     if (currFlows && !nextFlows) {
+                    //         console.log(2)
+                    //     }
+                    //     //当前正常页面，下一页flow
+                    //     if (!currFlows && nextFlows) {
+                    //         data.left = -2 * data.$$veiwWidth
+                    //         data.middle = -getFlowView().viewWidth
+                    //         data.right = -data.$$veiwLeft
+                    //         console.log(data.middle)
+                    //     }
+                    // }
+                }
+            }
+        }
+    }
 }

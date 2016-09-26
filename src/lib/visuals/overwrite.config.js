@@ -26,3 +26,8 @@ export function getFlowView() {
 export function setFlowTranslate(...arg) {
     return flowConfig.translate(...arg)
 }
+
+
+export function getFlowDistance(...arg) {
+    return flowConfig.distance(...arg)
+}

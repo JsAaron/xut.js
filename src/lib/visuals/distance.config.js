@@ -34,9 +34,8 @@ const makeGather = function() {
 export default function getFlipDistance({
     action,
     distance,
-    direction,
-    hooks
-} = {}) {
+    direction
+} = {}, hooks) {
 
     //区域尺寸
     const veiwWidth = config.viewSize.width
@@ -71,9 +70,18 @@ export default function getFlipDistance({
      * @return {[type]}        [description]
      */
     if (action === 'flipMove') {
+        const flipMove = hooks && hooks.flipMove
         offset.left = distance - veiwWidth
         offset.middle = distance
         offset.right = distance + veiwWidth
+        if (flipMove) {
+            if (direction === 'prev') {
+                mixHooks(flipMove.prev)
+            }
+            if (direction === 'next') {
+                mixHooks(flipMove.next)
+            }
+        }
     }
 
     /**
@@ -103,7 +111,7 @@ export default function getFlipDistance({
             offset.left = 0
             offset.middle = veiwWidth
             offset.right = 2 * veiwWidth
-            mixHooks(flipOver.prev)
+            mixHooks(flipOver && flipOver.prev)
             offset.view = offset.left
         }
 
@@ -114,7 +122,7 @@ export default function getFlipDistance({
             offset.left = -2 * veiwWidth
             offset.middle = -veiwWidth
             offset.right = distance
-            mixHooks(flipOver.next)
+            mixHooks(flipOver && flipOver.next)
             offset.view = offset.right
         }
 

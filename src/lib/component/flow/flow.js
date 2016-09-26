@@ -150,12 +150,8 @@ export default class Flow {
                 const viewBeHideDistance = getFlipDistance({
                     action,
                     distance,
-                    direction,
-                    leftIndex,
-                    pageIndex,
-                    rightIndex,
-                    hooks
-                })[1]
+                    direction
+                }, hooks)[1]
 
                 moveDistance = viewBeHideDistance
 
