@@ -29,7 +29,7 @@ import {
 import {
     getFlowView,
     getFlowDistance
-} from '../../visuals/overwrite.config'
+} from '../../visuals/expand/api.config'
 
 import getFlipDistance from '../../visuals/distance.config'
 import containerStyle from '../../visuals/container.config'

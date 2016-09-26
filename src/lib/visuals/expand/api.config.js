@@ -1,4 +1,4 @@
-import flowConfig from './overwrite/flow.type.config'
+import flowConfig from './flow.type.config'
 
 /**
  * 结果缓存

@@ -1,10 +1,10 @@
-import containerConfig from './overwrite/container.type.config'
+import containerConfig from './expand/container.type.config'
 import Stack from '../util/stack'
 
 import {
     getFlowView,
     setFlowTranslate
-} from './overwrite.config'
+} from './expand/api.config'
 
 /**
  * 自定义样式页面容器的样式

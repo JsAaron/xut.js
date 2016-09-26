@@ -64,24 +64,20 @@ export default {
      * @return {[type]}            [description]
      */
     , translate(data, usefulData) {
-        return {
-            left(offsetLeft) {
-                if (config.visualMode === 3) {
+        if (config.visualMode === 3) {
+            return {
+                left(offsetLeft) {
                     const middle = usefulData.getStyle('middle')
                     if (middle && middle.isFlows) {
                         return -(middle.viewWidth + middle.offset)
                     }
-                }
-            },
-            middle(originalOffset) {
-                if (config.visualMode === 3) {
+                },
+                middle(originalOffset) {
                     if (data.isFlows) {
                         return -config.viewSize.left
                     }
-                }
-            },
-            right(originalOffset) {
-                if (config.visualMode === 3) {
+                },
+                right(originalOffset) {
                     //获取上一页的styles状态
                     //如果上一页是通过flow方式处理过的
                     //当前页面小姐要不去重新处理
@@ -100,41 +96,43 @@ export default {
      * @return {[type]} [description]
      */
     , distance() {
-        return {
-            flipMove: {
-                next(data) {
-
-                }
-            },
-            flipOver: {
-                prev(data) {
-                    // if (config.visualMode === 3) {
-                    //     const currFlows = data.$$checkFlows(currIndex)
-                    //     const nextFlows = data.$$checkFlows(leftIndex)
-                    //         //当前flow，下一页正常
-                    //     if (currFlows && !nextFlows) {}
-                    //     //当前正常页面，下一页flow
-                    //     if (!currFlows && nextFlows) {
-                    //         data.left = -data.$$veiwLeft
-                    //     }
-                    // }
+        if (config.visualMode === 3) {
+            return {
+                flipMove: {
+                    next(data) {
+                        console.log(123)
+                    }
                 },
-                next(data) {
-                    // if (config.visualMode === 3) {
-                    //     const currFlows = data.$$checkFlows(currIndex)
-                    //     const nextFlows = data.$$checkFlows(rightIndex)
-                    //         //当前flow，下一页正常
-                    //     if (currFlows && !nextFlows) {
-                    //         console.log(2)
-                    //     }
-                    //     //当前正常页面，下一页flow
-                    //     if (!currFlows && nextFlows) {
-                    //         data.left = -2 * data.$$veiwWidth
-                    //         data.middle = -getFlowView().viewWidth
-                    //         data.right = -data.$$veiwLeft
-                    //         console.log(data.middle)
-                    //     }
-                    // }
+                flipOver: {
+                    prev(data) {
+                        // if (config.visualMode === 3) {
+                        //     const currFlows = data.$$checkFlows(currIndex)
+                        //     const nextFlows = data.$$checkFlows(leftIndex)
+                        //         //当前flow，下一页正常
+                        //     if (currFlows && !nextFlows) {}
+                        //     //当前正常页面，下一页flow
+                        //     if (!currFlows && nextFlows) {
+                        //         data.left = -data.$$veiwLeft
+                        //     }
+                        // }
+                    },
+                    next(data) {
+                        // if (config.visualMode === 3) {
+                        //     const currFlows = data.$$checkFlows(currIndex)
+                        //     const nextFlows = data.$$checkFlows(rightIndex)
+                        //         //当前flow，下一页正常
+                        //     if (currFlows && !nextFlows) {
+                        //         console.log(2)
+                        //     }
+                        //     //当前正常页面，下一页flow
+                        //     if (!currFlows && nextFlows) {
+                        //         data.left = -2 * data.$$veiwWidth
+                        //         data.middle = -getFlowView().viewWidth
+                        //         data.right = -data.$$veiwLeft
+                        //         console.log(data.middle)
+                        //     }
+                        // }
+                    }
                 }
             }
         }

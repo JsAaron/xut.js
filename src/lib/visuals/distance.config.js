@@ -111,7 +111,7 @@ export default function getFlipDistance({
             offset.left = 0
             offset.middle = veiwWidth
             offset.right = 2 * veiwWidth
-            mixHooks(flipOver && flipOver.prev)
+            flipOver && mixHooks(flipOver.prev)
             offset.view = offset.left
         }
 
@@ -122,7 +122,7 @@ export default function getFlipDistance({
             offset.left = -2 * veiwWidth
             offset.middle = -veiwWidth
             offset.right = distance
-            mixHooks(flipOver && flipOver.next)
+            flipOver && mixHooks(flipOver.next)
             offset.view = offset.right
         }
 
