@@ -48,7 +48,7 @@ export default {
             </div>`
 
         return String.styleFormat(html)
-    },
+    }
 
 
     /**
@@ -56,7 +56,7 @@ export default {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    autoPlay({
+    , autoPlay({
         id,
         rootNode,
         pageType,
@@ -66,10 +66,10 @@ export default {
             rootNode,
             pageType,
             pageIndex,
-            activityId:id,
-            isAutoPlay:true
+            activityId: id,
+            isAutoPlay: true
         })
-    },
+    }
 
 
     /**
@@ -78,9 +78,9 @@ export default {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    trigger(data) {
+    , trigger(data) {
         return Adapter(data)
-    },
+    }
 
 
     /**
@@ -99,7 +99,7 @@ export default {
      * @param  {[type]} activeObejct [description]
      * @return {[type]}              [description]
      */
-    recovery(opts) {
+    , recovery(opts) {
         return this.recovery();
     }
 }

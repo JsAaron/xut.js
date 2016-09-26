@@ -104,7 +104,7 @@ export default {
                 ${mediaIcon}
             </div>`
         )
-    },
+    }
 
 
     /**
@@ -113,13 +113,13 @@ export default {
      * @param  {[type]} id [description]
      * @return {[type]}    [description]
      */
-    onlyCreateOnce(id) {
+    , onlyCreateOnce(id) {
         var data;
         if (data = tempData[id]) {
             delete tempData[id]
             return data;
         }
-    },
+    }
 
 
     /**
@@ -127,7 +127,7 @@ export default {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    autoPlay({
+    , autoPlay({
         id,
         category,
         rootNode,
@@ -140,14 +140,14 @@ export default {
         } else {
             autoVideo(chapterId, id, rootNode);
         }
-    },
+    }
 
 
     /**
      * touchEnd 全局派发的点击事件
      * 如果stopGlobalEvent == ture 事件由全局派发
      */
-    trigger({
+    , trigger({
         id,
         target,
         rootNode,

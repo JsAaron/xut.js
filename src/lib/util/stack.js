@@ -8,6 +8,14 @@ export default class Stack {
     }
 
     /**
+     * 加入首部
+     * @return {[type]} [description]
+     */
+    shift(fn) {
+        this._cache.unshift(fn)
+    }
+
+    /**
      * 加入尾部
      * @param  {Function} fn [description]
      * @return {[type]}      [description]
@@ -24,6 +32,20 @@ export default class Stack {
         if (this._cache.length) {
             let fn
             while (fn = this._cache.shift()) {
+                fn.apply(null, arguments)
+            }
+        }
+        return this
+    }
+
+    /**
+     * 尾部取出执行
+     * @return {[type]} [description]
+     */
+    popAll() {
+        if (this._cache.length) {
+            let fn
+            while (fn = this._cache.pop()) {
                 fn.apply(null, arguments)
             }
         }

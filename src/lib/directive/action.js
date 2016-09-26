@@ -10,7 +10,7 @@ export default {
 
     /**
      * 创建节点
-     * @return {[type]}   
+     * @return {[type]}
      */
     createDom({
         _id,
@@ -45,16 +45,16 @@ export default {
                       </div>`
 
         return String.styleFormat(html)
-    },
+    }
 
 
     /*
      * touchEnd 全局派发的点击事件
      * 如果stopGlobalEvent == ture 事件由全局派发
      */
-    trigger(data) {
+    , trigger(data) {
         Action(data)
-    },
+    }
 
 
     /**
@@ -65,7 +65,7 @@ export default {
      * @param  {[type]} opts [description]
      * @return {[type]}      [description]
      */
-    recovery(opts) {
+    , recovery(opts) {
         if (this.state) {
             this.state = false;
             return true;

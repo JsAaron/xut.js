@@ -6,7 +6,7 @@ const CEIL = Math.ceil
  * @param  {[type]} () [description]
  * @return {[type]}    [description]
  */
-export default function(config, fullProportion) {
+export default function setView(config, fullProportion) {
 
     const screenWidth = config.screenSize.width
     const screenHeight = config.screenSize.height

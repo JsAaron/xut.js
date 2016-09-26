@@ -16,14 +16,14 @@ export default {
             sqlRet['container'] = rootEle || opts.rootEle;
             return sqlRet;
         }
-    },
+    }
 
 
     /**
      * 绑定热点事件
      * 用户交互动作产生Action或者widget对象
      */
-    bindEvent() {},
+    , bindEvent() {}
 
 
     /**
@@ -37,9 +37,9 @@ export default {
      * Xut.ActionMgr.getOne(key) 接口，是获取当前是否有实例对象的引用
      *
      */
-    autoPlay(scopeComplete) {
+    , autoPlay(scopeComplete) {
         return this.autoPlay && this.autoPlay(scopeComplete);
-    },
+    }
 
 
     /**
@@ -54,18 +54,18 @@ export default {
      * @param  {[type]} this  当前活动对象
      *
      */
-    flipOver() {
+    , flipOver() {
         return this.flipOver();
-    },
+    }
 
 
     /**
      * 翻页完成
      * @return {[type]} [description]
      */
-    flipComplete() {
+    , flipComplete() {
         return this.flipComplete();
-    },
+    }
 
     /**
      *  复位状态通知
@@ -83,9 +83,9 @@ export default {
      * @param  {[type]} activeObejct [description]
      * @return {[type]}              [description]
      */
-    recovery(opts) {
+    , recovery(opts) {
         return this.recovery && this.recovery();
-    },
+    }
 
 
     /**
@@ -106,7 +106,7 @@ export default {
      * @param  {[type]} rootEle      [根元素]
      * @return {[type]}              [description]
      */
-    destroy() {
+    , destroy() {
         return this.destroy();
     }
 

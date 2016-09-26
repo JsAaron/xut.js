@@ -8,6 +8,7 @@ const PPTHEIGHT = 768
 
 /**
  * 获取默认全屏比值关系
+ * 用来设置新的view尺寸
  * @param  {[type]} config    [description]
  * @param  {[type]} pptWidth  [description]
  * @param  {[type]} pptHeight [description]
@@ -41,6 +42,7 @@ export function getFullProportion(config, pptWidth, pptHeight) {
 
 /**
  * 计算真正的缩放比
+ * 依照真正的view尺寸设置
  * @param  {[type]} pptWidth  [description]
  * @param  {[type]} pptHeight [description]
  * @return {[type]}           [description]

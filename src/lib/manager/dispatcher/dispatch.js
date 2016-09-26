@@ -193,6 +193,7 @@ export class Dispatcher {
 
         //收集有用的数据
         let usefulData = Object.create(null)
+        let hasFlow = false
         _.each(chpaterResults, (chapterData, index) => {
             compile.push((function() {
                 //转化值
@@ -244,7 +245,9 @@ export class Dispatcher {
                  * @return {[type]}                  [description]
                  */
                 const isFlows = chapterData.note === 'flow'
-
+                if (isFlows) {
+                    hasFlow = true
+                }
 
                 //跳转的时候，创建新页面可以自动样式信息
                 //优化设置，只是改变当前页面即可
@@ -252,14 +255,26 @@ export class Dispatcher {
                     userStyle = undefined
                 }
 
-                /**
-                 * 收集数据
-                 */
+
+                //页面之间关系
+                const _direction = function(createIndex, currIndex) {
+                    let direction
+                    if (createIndex < currIndex) {
+                        direction = 'before'
+                    } else if (createIndex > currIndex) {
+                        direction = 'after'
+                    } else if (currIndex == createIndex) {
+                        direction = 'middle'
+                    }
+                    return direction
+                }
+                //收集页面之间创建数据
                 usefulData[createPid] = {
                     isFlows: isFlows,
                     pid: createPid,
                     visiblePid: visiblePid,
-                    userStyle: userStyle
+                    userStyle: userStyle,
+                    direction: _direction(createPid, visiblePid)
                 }
 
                 /**
@@ -339,6 +354,7 @@ export class Dispatcher {
          */
         const newstyle = containerStyle({
             action,
+            hasFlow,
             usefulData
         })
 
@@ -533,7 +549,6 @@ export class Dispatcher {
                 },
                 next(data) {
                     if (config.visualMode === 3) {
-                        console.log(data)
                         const currFlows = data.$$checkFlows(currIndex)
                         const nextFlows = data.$$checkFlows(rightIndex)
                             //当前flow，下一页正常

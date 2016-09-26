@@ -1,11 +1,10 @@
-import defaultView from './container/default.view.config'
-import defaultStyle from './container/defalut.style.config'
+import containerConfig from './overwrite/container.type.config'
+import Stack from '../util/stack'
+
 import {
     getFlowView,
-    setFlowStyle
+    setFlowTranslate
 } from './overwrite.config'
-
-import { config } from '../config/index'
 
 /**
  * 自定义样式页面容器的样式
@@ -16,15 +15,34 @@ import { config } from '../config/index'
  */
 export default function styleConfig({
     action,
+    hasFlow,
     usefulData
 } = {}) {
 
+    /**
+     * 获取指定页面样式
+     * @return {[type]} [description]
+     */
+    usefulData.getStyle = function(pageName) {
+        return this[this['_' + pageName]]
+    }
+
+    const compile = new Stack()
+
     _.each(usefulData, function(data, index) {
+
+        //跳过getStyle
+        if (_.isFunction(data)) {
+            return
+        }
+
+        //确保中间页第一个解析
+        compile[data.direction == 'middle' ? 'shift' : 'push'](function() {
 
             /**
              * 默认尺寸
              */
-            _.extend(data, defaultView(config))
+            _.extend(data, containerConfig.view())
 
             /**
              * 提供可自定义配置接口
@@ -35,14 +53,24 @@ export default function styleConfig({
                 _.extend(data, getFlowView())
             }
 
-            //设置容器的样式
-            defaultStyle({
-                data,
-                // hooks,
+            /**
+             * 设置容器的样式
+             * @type {[type]}
+             */
+            const hooks = hasFlow ? setFlowTranslate(data, usefulData) : {}
+            const translate = containerConfig.translate({
+                hooks,
                 createIndex: data.pid,
-                currIndex: data.visiblePid
+                currIndex: data.visiblePid,
+                direction: data.direction
             })
+            usefulData['_' + data.direction] = data.pid
+            _.extend(data, translate)
         })
-        // console.log(usefulData)
+
+    })
+
+    compile.shiftAll().destroy()
+
     return usefulData
 }

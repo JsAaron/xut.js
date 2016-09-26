@@ -18,7 +18,7 @@ export default {
         const newWidth = (width + height) / 2 * config.iconHeight
 
         const html =
-                `<div id="ShowNote_${id}"
+            `<div id="ShowNote_${id}"
                       class="xut-showNote"
                       data-belong ="${pageType}"
                       data-delegate="shownote"
@@ -26,17 +26,17 @@ export default {
                  </div>`
 
         return String.styleFormat(html)
-    },
+    }
 
 
     /**
      * touchEnd 全局派发的点击事件
      * 如果stopGlobalEvent == ture 事件由全局派发
      */
-    trigger(data) {
+    , trigger(data) {
         data.data = Xut.Presentation.GetPageData(data.pageIndex);
         new ShowNoteClass(data)
-    },
+    }
 
 
     /**
@@ -44,7 +44,7 @@ export default {
      * @param  {[type]} opts [description]
      * @return {[type]}      [description]
      */
-    autoPlay() {},
+    , autoPlay() {}
 
     /**
      * 翻页后处理页面中活动热点的状态
@@ -52,9 +52,9 @@ export default {
      *
      * 比如音频,视频 翻页需要暂停，也可以销毁
      */
-    flipOver(opts) {
+    , flipOver(opts) {
         //console.log('翻页处理活动对象', activeObejct ,pageIndex);
-    },
+    }
 
 
     /**
@@ -64,9 +64,9 @@ export default {
      * @param  {[type]} rootEle      [根元素]
      * @return {[type]}              [description]
      */
-    destroy(opts) {
+    , destroy(opts) {
         this && this.destroy();
-    },
+    }
 
 
     /**
@@ -77,7 +77,7 @@ export default {
      * @param  {[type]} opts [description]
      * @return {[type]}      [description]
      */
-    recovery(opts) {
+    , recovery(opts) {
         if (this.state) {
             this.dispatchProcess();
             return true;
