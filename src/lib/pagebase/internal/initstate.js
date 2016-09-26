@@ -82,15 +82,14 @@ export default function(baseProto) {
 
         /**
          * 流式布局页面
-         * 目前只有flow的处理
+         * 排除母版
          * @param  {[type]} instance.pageType [description]
          * @return {[type]}                   [description]
          */
-        this._isFlows = false
-        if (this.pageType === 'page' && this.isFlows) {
-            this._isFlows = true
+        if (this.pageType === 'master' && this.isFlows) {
+            this.isFlows = false
         }
-        delete this.isFlows
+
 
         /**
          * 浮动对象

@@ -536,7 +536,10 @@ export class Dispatcher {
         let moveDist = getFlipDistance({
             action,
             distance,
-            direction
+            direction,
+            leftIndex,
+            pageIndex,
+            rightIndex
         }, getFlowDistance())
 
         //视觉差页面滑动

@@ -99,8 +99,18 @@ export default {
         if (config.visualMode === 3) {
             return {
                 flipMove: {
+                    prev(data) {
+                        const currFlows = data.$$checkFlows(data.$$pageIndex)
+                        const leftFlow = data.$$checkFlows(data.$$leftIndex)
+                        if (leftFlow) {
+                            data.left = data.$$left + Math.abs(config.viewSize.left) * 2
+                        }
+                    },
                     next(data) {
-                        console.log(123)
+                        const middleFlow = data.$$checkFlows(data.$$pageIndex)
+                        if (middleFlow) {
+                            data.right = data.$$right - Math.abs(config.viewSize.left) * 2
+                        }
                     }
                 },
                 flipOver: {
@@ -117,21 +127,19 @@ export default {
                         // }
                     },
                     next(data) {
-                        // if (config.visualMode === 3) {
-                        //     const currFlows = data.$$checkFlows(currIndex)
-                        //     const nextFlows = data.$$checkFlows(rightIndex)
-                        //         //当前flow，下一页正常
-                        //     if (currFlows && !nextFlows) {
-                        //         console.log(2)
-                        //     }
-                        //     //当前正常页面，下一页flow
-                        //     if (!currFlows && nextFlows) {
-                        //         data.left = -2 * data.$$veiwWidth
-                        //         data.middle = -getFlowView().viewWidth
-                        //         data.right = -data.$$veiwLeft
-                        //         console.log(data.middle)
-                        //     }
-                        // }
+                        if (config.visualMode === 3) {
+                            const currFlows = data.$$checkFlows(data.$$pageIndex)
+                            const rightFlow = data.$$checkFlows(data.$$rightIndex)
+
+                            if (currFlows) {
+                                data.middle = -config.screenSize.width
+                            }
+
+                            //当前正常页面，下一页flow
+                            if (rightFlow) {
+                                data.right = Math.abs(config.viewSize.left)
+                            }
+                        }
                     }
                 }
             }

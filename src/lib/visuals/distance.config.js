@@ -12,7 +12,7 @@ import {
  */
 const checkFlows = function(pageIndex) {
     const pageObj = Xut.Presentation.GetPageObj(pageIndex)
-    return pageObj && pageObj._isFlows
+    return pageObj && pageObj.isFlows
 }
 
 /**
@@ -21,8 +21,6 @@ const checkFlows = function(pageIndex) {
  */
 const makeGather = function() {
     let _gather = hash()
-    _gather.$$veiwWidth = config.viewSize.width
-    _gather.$$veiwLeft = config.viewSize.left
     _gather.$$checkFlows = checkFlows
     return _gather
 }
@@ -34,7 +32,10 @@ const makeGather = function() {
 export default function getFlipDistance({
     action,
     distance,
-    direction
+    direction,
+    leftIndex,
+    pageIndex,
+    rightIndex
 } = {}, hooks) {
 
     //区域尺寸
@@ -57,6 +58,11 @@ export default function getFlipDistance({
     const mixHooks = function(hook) {
         if (hook) {
             let _receiver = makeGather()
+            _receiver.$$leftIndex  = leftIndex
+            _receiver.$$pageIndex  = pageIndex
+            _receiver.$$rightIndex = rightIndex
+            _receiver.$$right = offset.right
+            _receiver.$$left = offset.left
             hook(_receiver)
             _.each(_receiver, function(value, key) {
                 offset[key] = value

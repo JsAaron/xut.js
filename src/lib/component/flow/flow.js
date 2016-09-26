@@ -119,6 +119,9 @@ export default class Flow {
                     View.GotoNextSlide()
                     this.simulationComplete()
                 } else {
+                    if (config.visualMode === 3) {
+                        distance -= viewLeft
+                    }
                     //后边界前移反弹
                     View.MovePage(distance, speed, this.direction, action)
                 }
