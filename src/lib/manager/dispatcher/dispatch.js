@@ -18,6 +18,14 @@ import { closeNavbar } from '../../toolbar/navbar/index'
 import Stack from '../../util/stack'
 
 import {
+    getFlowView,
+    getFlowDistance
+} from '../../visuals/expand/api.config'
+
+import getFlipDistance from '../../visuals/distance.config'
+import containerStyle from '../../visuals/container.config'
+
+import {
     offsetPage,
     conversionPageOpts,
     initPointer,
@@ -26,13 +34,6 @@ import {
     checkMasterCreate,
 } from './util'
 
-import {
-    getFlowView,
-    getFlowDistance
-} from '../../visuals/expand/api.config'
-
-import getFlipDistance from '../../visuals/distance.config'
-import containerStyle from '../../visuals/container.config'
 
 export class Dispatcher {
 

@@ -43,14 +43,19 @@ export default class PageMgr extends Abstract {
     }
 
 
-    //创建页新的页面
+    /**
+     * 创建页新的页面
+     * @param  {[type]} dataOpts  [description]
+     * @param  {[type]} pageIndex [description]
+     * @return {[type]}           [description]
+     */
     create(dataOpts, pageIndex) {
 
         //生成指定页面对象
         const pageObjs = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
-                'root': this.rootNode //根元素
+                'rootNode': this.rootNode //根元素
             })
         )
 

@@ -217,7 +217,7 @@ export default {
 
         base.createRelated.cacheTasks['contents'] = new TaskContents({
             'canvasRelated': base.canvasRelated,
-            'rootNode': base.root,
+            'rootNode': base.rootNode,
             'containsNode': base.getContainsNode(),
             'pageType': base.pageType,
             'nodes': chapterDas['nodes'],

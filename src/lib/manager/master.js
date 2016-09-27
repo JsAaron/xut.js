@@ -135,7 +135,7 @@ export default class MasterMgr extends Abstract {
         masterObj = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
-                'root': this.rootNode, //根元素
+                'rootNode': this.rootNode, //根元素
                 'pptMaster': pptMaster //ppt母板ID
             })
         );

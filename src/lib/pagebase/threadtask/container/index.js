@@ -95,16 +95,6 @@ const createContainer = (base, pageData, getStyle, prefix) => {
 }
 
 
-/**
- *'rootNode'      : base.root,
- *'prefix'        : base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId,
- *'pageType'      : base.pageType,
- *'pid'           : base.pid,
- *'baseData'      : pageData,
- *'virtualOffset' : base.virtualOffset,
- *'userStyle'     : base.userStyle, //创建自定义style
- *'isFlows'       : base.isFlows //如果是flows页面
- **/
 export default function(base, pageData, taskCallback) {
 
     let $pageNode
@@ -131,7 +121,7 @@ export default function(base, pageData, taskCallback) {
     }
 
     nextTick({
-        container: base.root,
+        container: base.rootNode,
         content: $pageNode,
         position: getStyle.direction === 'before' ? 'first' : 'last'
     }, () => {
