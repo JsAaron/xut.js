@@ -377,16 +377,17 @@ export class Dispatcher {
      *   2.翻页完毕
      */
     autoRun(para) {
-        var options = this.options,
-            pagePointer = this.pagePointer,
-            prevIndex = pagePointer.leftIndex,
-            currIndex = pagePointer.currIndex,
-            nextIndex = pagePointer.rightIndex,
-            action = para ? para.action : '',
-            createPointer = para ? para.createPointer : '',
-            direction = this.direction,
-            //暂停的页面索引autorun
-            suspendIndex = action === 'init' ? '' : direction === 'next' ? prevIndex : nextIndex;
+        let options       = this.options
+        let pagePointer   = this.pagePointer
+        let prevIndex     = pagePointer.leftIndex
+        let currIndex     = pagePointer.currIndex
+        let nextIndex     = pagePointer.rightIndex
+        let action        = para ? para.action : ''
+        let createPointer = para ? para.createPointer : ''
+        let direction     = this.direction
+
+        //暂停的页面索引autorun
+        let suspendIndex = action === 'init' ? '' : direction === 'next' ? prevIndex : nextIndex
 
         /**
          * 存在2中模式的情况下
@@ -396,7 +397,7 @@ export class Dispatcher {
             createPointer = conversionPageOpts.call(this, createPointer)
         }
 
-        var data = {
+        const data = {
             'prevIndex': prevIndex,
             'currIndex': currIndex,
             'nextIndex': nextIndex,
