@@ -82,8 +82,8 @@ export default function(baseProto) {
         _destroy(this);
 
         //伪li节点
-        if (this.pseudoElement) {
-            this.pseudoElement = null;
+        if (this.$pseudoElement) {
+            this.$pseudoElement = null;
         }
 
         //移除li容器节点节点

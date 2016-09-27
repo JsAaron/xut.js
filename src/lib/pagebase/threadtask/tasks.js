@@ -39,12 +39,12 @@ export default function(instance) {
          */
         container() {
 
-            callContextTasks('Container', function($pageNode, pseudoElement) {
+            callContextTasks('Container', function($pageNode, $pseudoElement) {
                 //////////////
                 //li,li-div //
                 //////////////
                 instance.$pageNode = $pageNode
-                instance.pseudoElement = pseudoElement
+                instance.$pseudoElement = $pseudoElement
 
                 /**
                  * 获取包含容器
@@ -53,7 +53,7 @@ export default function(instance) {
                 //获取根节点
                 const $containsElement = $pageNode.children()
                 instance.getContainsNode = function() {
-                    return pseudoElement ? pseudoElement : $containsElement
+                    return $pseudoElement ? $pseudoElement : $containsElement
                 }
 
                 setNextRunTask('flow')
