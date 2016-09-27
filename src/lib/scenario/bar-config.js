@@ -36,7 +36,6 @@ const parseTooBar = (toolbar, tbType, pageMode) => {
             });
         }
     }
-
     return {
         'tbType': tbType,
         'pageMode': pageMode

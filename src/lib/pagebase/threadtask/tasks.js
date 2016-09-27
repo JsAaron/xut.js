@@ -1,5 +1,6 @@
 import assignedTasks from './assign'
 import initstate from './states'
+import Pinch from './pinch'
 
 const noop = function() {}
 
@@ -53,6 +54,9 @@ export default function(instance) {
 
                 //构建主容器li完毕,可以提前执行翻页动作
                 createRelated.preforkComplete()
+
+                //绑定缩放事件
+                config.saleMode && instance.pageType === 'page' && Pinch(instance.element[0])
 
                 //视觉差不管
                 if (instance.isMaster) {

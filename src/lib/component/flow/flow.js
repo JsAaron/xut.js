@@ -61,6 +61,7 @@ export default class Flow {
          * @type {[type]}
          */
         const swipe = this.swipe = new Swipe({
+            flipWidth: flipWidth,
             borderBounce: true,
             linear: true,
             initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
@@ -103,6 +104,8 @@ export default class Flow {
                     this.simulationComplete()
                 } else {
                     if (config.visualMode === 3) {
+                        //内部页面边间翻页
+                        //要除去被溢出的值
                         distance -= viewLeft
                     }
                     //前边界前移反弹
@@ -119,6 +122,8 @@ export default class Flow {
                     View.GotoNextSlide()
                     this.simulationComplete()
                 } else {
+                    //内部页面边间翻页
+                    //要除去被溢出的值
                     if (config.visualMode === 3) {
                         distance -= viewLeft
                     }
@@ -132,18 +137,17 @@ export default class Flow {
             else {
 
                 /**
-                 * 翻页钩子
+                 * 修正内部翻页的翻页算法
                  * @type {Object}
                  */
-                const hooks = {
-                    flipOver: {
-                        prev(data) {
-                            if (config.visualMode === 3) {
+                let hooks
+                if (config.visualMode === 3) {
+                    hooks = {
+                        flipOver: {
+                            left(data) {
                                 data.middle = flipWidth
-                            }
-                        },
-                        next(data) {
-                            if (config.visualMode === 3) {
+                            },
+                            right(data) {
                                 data.middle = -flipWidth
                             }
                         }

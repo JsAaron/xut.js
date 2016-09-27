@@ -7,16 +7,16 @@ module.exports = (port, callback) => {
     server = net.createServer().listen(port)
     server.on('listening', () => {
         server.close()
-        console.log('The port【' + port + '】 is available.')
+        console.log(`The port ${port} is available.`)
         callback()
     })
 
     killPort = (pid) => {
         cp.exec('kill -9 ' + pid, (e, stdout, stderr) => {
             if (e) {
-                console.log('Command kill -9 ' + pid + ' fails')
+                console.log(`Command kill -9 ${pid} fails`)
             } else {
-                console.log('Command kill -9 ' + pid + ' success')
+                console.log(`Command kill -9 ${pid} success`)
                 callback()
             }
         })
@@ -24,11 +24,11 @@ module.exports = (port, callback) => {
 
     server.on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
-            console.log('The port【' + port + '】 is occupied, please waiting.')
+            console.log(`The port ${port} is occupied, please waiting.`)
             var command = 'lsof -i:' + port
             cp.exec(command, (e, stdout, stderr) => {　　
                 if (e) {
-                    console.log('Command ' + command + 'fails')
+                    console.log(`Command ${command} fails`)
                 }　
                 else {　　
                     var pid = /node(\s*)(\d+)/ig.exec(stdout)[2]

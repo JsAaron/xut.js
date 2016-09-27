@@ -49,6 +49,7 @@ const LINEARTAG = 'data-viewlinear'
 export default class Swipe extends Observer {
 
     constructor({
+        flipWidth, //翻页的长度
         initIndex, //初页
         container,
         flipMode, //翻页模式
@@ -70,7 +71,7 @@ export default class Swipe extends Observer {
         this.element = container
         this.flipMode = flipMode
 
-        this._viewWidth = config.viewSize.width
+        this._viewWidth = flipWidth || config.viewSize.width
 
         //翻页时间
         this._pageTime = flipMode ? DEFAULTTIME.min : DEFAULTTIME.mix

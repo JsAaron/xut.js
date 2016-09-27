@@ -23,6 +23,7 @@ export default function setView(config, fullProportion) {
      * @return {[type]}                   [description]
      */
     if (config.visualMode === 2) {
+
         //竖版PPT
         if (config.pptVertical) {
             //竖版显示
@@ -36,6 +37,16 @@ export default function setView(config, fullProportion) {
                 newLeft = (screenWidth - newWidth) / 2
             }
         }
+
+        //横版PPT
+        if (config.pptHorizontal) {
+            //竖版显示(宽度100%。上下自适应，显示居中小块)
+            if (config.screenVertical) {
+                newHeight = fullProportion.pptHeight * fullProportion.width
+                newTop = (screenHeight - newHeight) / 2
+            }
+        }
+
     }
 
     /**
@@ -45,6 +56,7 @@ export default function setView(config, fullProportion) {
      * @return {[type]}                   [description]
      */
     if (config.visualMode === 3) {
+
         //竖版PPT
         if (config.pptVertical) {
             //竖版显示
@@ -58,6 +70,16 @@ export default function setView(config, fullProportion) {
 
             }
         }
+
+        //横版PPT
+        if (config.pptHorizontal) {
+            //竖版显示(宽度100%。上下自适应，显示居中小块)
+            if (config.screenVertical) {
+                newHeight = fullProportion.pptHeight * fullProportion.width
+                newTop = (screenHeight - newHeight) / 2
+            }
+        }
+
     }
 
     /**

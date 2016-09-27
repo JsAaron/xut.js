@@ -8,24 +8,16 @@ const GALLERY = 'gallery'
 const WIDGET = 'widget'
 const DBNAME = 'xxtebook.db'
 
-const addMonitor = () => {
-    // watch(xxtebook, () => {
-    //     console.log('【xxtebook.db is change!】')
-    //     sqlite.resolve(() => {
-    //         console.log('【new xxtebook.db is complete!】')
-    //     })
-    // })
-}
-
 const get = function(paths) {
     if (!paths.length) {
-        console.log('数据解析完毕')
+        console.log(`数据解析完毕`)
         return
     }
     let path = paths.shift()
     if (!fs.existsSync(path + '/SQLResult.js')) {
         console.log('【SQLResult.js not available!】')
         sqlite.resolve(path, path + '/' + DBNAME, function() {
+            console.log(`解析数据: ${path + '/' + DBNAME}`)
             get(paths)
         })
     } else {
@@ -52,5 +44,4 @@ module.exports = (conf, spinner) => {
         }
     })
     get(parse)
-    addMonitor()
 }

@@ -127,7 +127,6 @@ export default function(baseProto) {
             Master: {}
         }
 
-
         /**
          * 对象的处理情况的内部钩子方法
          * @type {Object}
@@ -244,6 +243,7 @@ export default function(baseProto) {
          * 等待状态初始化，比如_isFlows
          */
         initTasks(instance)
+
     }
 
 }

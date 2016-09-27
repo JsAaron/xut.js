@@ -27,9 +27,7 @@ module.exports = (conf) => {
                 }
             })
             console.log(
-                `【The introduction of external js :${scripts.length}】\n
-                 【Rule out :${len}】\n
-                 【The remaining :${paths.length}个】\n`
+                `【The introduction of external js :${scripts.length}个`
             )
             resolve(paths)
         })
