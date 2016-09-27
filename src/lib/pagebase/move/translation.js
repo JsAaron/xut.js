@@ -46,7 +46,7 @@ const newViewPage = function(distance) {
  * 切换坐标
  */
 const toTranslate3d = ($node, distance, speed) => {
-    distance = config.virtualMode ? distance / 2 : distance;
+    distance = config.virtualMode ? distance / 2 : distance
     if ($node) {
         $node.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
 

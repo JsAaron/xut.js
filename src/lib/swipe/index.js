@@ -13,6 +13,14 @@ import {
     compatibilityEvent
 } from './depend'
 
+
+const reqAnimationFrame = (function() {
+    return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function(callback) {
+        window.setTimeout(callback, 1000 / 60);
+    }
+})();
+
+
 /**
  * 翻页速率
  * @type {Number}
@@ -582,7 +590,7 @@ export default class Swipe extends Observer {
         })
 
 
-        setTimeout(() => {
+        reqAnimationFrame(() => {
             let newPointer = this._tanrsfromPointer(this._pagePointer)
             newPointer = this._fixPointer(newPointer)
             this.$emit('onUpSlider', newPointer)
@@ -616,7 +624,6 @@ export default class Swipe extends Observer {
             }
             return
         }
-
         this._distributed(element, view)
     }
 
@@ -637,9 +644,9 @@ export default class Swipe extends Observer {
 
     _distributed(...arg) {
         this._restore(...arg)
-        setTimeout(() => {
+        reqAnimationFrame(() => {
             this.$emit('onComplete', this.direction, this._pagePointer, this._unlock.bind(this), this._isQuickTurn);
-        }, 100)
+        })
     }
 
 
