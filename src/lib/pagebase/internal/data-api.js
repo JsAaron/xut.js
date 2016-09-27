@@ -80,37 +80,34 @@ export default function(baseProto) {
      * @return {[type]}      [description]
      */
     baseProto.baseContentMutex = function(contentId, type) {
-        var contentObj,
-            base = this;
-        if (contentObj = base.baseGetContentObject(contentId)) {
+        let contentObj
+        if (contentObj = this.baseGetContentObject(contentId)) {
+            const $contentElement = contentObj.$contentProcess.view ?
+                contentObj.$contentProcess.view :
+                contentObj.$contentProcess
 
-            var element = contentObj.$contentProcess.view ? contentObj.$contentProcess.view : contentObj.$contentProcess
-
-            var handle = {
-                'Show': function() {
+            const handle = {
+                'Show' () {
                     if (contentObj.type === 'dom') {
-                        element.css({
+                        $contentElement.css({
                             'display': 'blcok',
                             'visibility': 'visible'
                         }).prop("mutex", false);
                     } else {
-                        element.visible = true;
-                        console.log('show')
-
+                        $contentElement.visible = true;
                     }
                 },
-                'Hide': function() {
+                'Hide' () {
                     if (contentObj.type === 'dom') {
-                        element.css({
+                        $contentElement.css({
                             'display': 'none',
                             'visibility': 'hidden'
                         }).prop("mutex", true);
                     } else {
-                        console.log('hide')
-                        element.visible = false;
+                        $contentElement.visible = false;
                     }
                 },
-                'StopAnim': function() {
+                'StopAnim' () {
                     contentObj.stopAnims && contentObj.stopAnims();
                 }
             }

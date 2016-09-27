@@ -105,7 +105,7 @@ export default {
 
         base.createRelated.cacheTasks['background'] = new TaskBackground({
             data,
-            containsNode: base.getContainsNode(),
+            $containsNode: base.getContainsNode(),
             suspendCallback,
             successCallback
         })
@@ -149,7 +149,7 @@ export default {
         }
 
         base.createRelated.cacheTasks['components'] = new TaskComponents({
-            'containsNode': base.getContainsNode(),
+            '$containsNode': base.getContainsNode(),
             'nodes': chapterDas['nodes'],
             'pageOffset': chapterDas['pageOffset'],
             'activitys': base.baseActivits(),
@@ -218,7 +218,7 @@ export default {
         base.createRelated.cacheTasks['contents'] = new TaskContents({
             'canvasRelated': base.canvasRelated,
             'rootNode': base.rootNode,
-            'containsNode': base.getContainsNode(),
+            '$containsNode': base.getContainsNode(),
             'pageType': base.pageType,
             'nodes': chapterDas['nodes'],
             'pageOffset': chapterDas['pageOffset'],

@@ -54,27 +54,18 @@ const makeRunBinding = function(pagebase) {
  * @return {[type]} [description]
  */
 const combineEvents = function(pagebase, eventRelated) {
-
-    var contentObj, element, eventName;
-
+    var contentObj, eventName;
     //多条activty数据,一个对象上多事件
     _.each(eventRelated, function(edata) {
-
         _.each(edata, function(scope) {
-
             contentObj = pagebase.baseGetContentObject(scope.eventContentId)
-
             if (!contentObj) {
                 Xut.log('error', 'pagebase.js第' + pagebase.pageIndex + '页多事件处理出错!!!!')
                 return
             }
-
-            element = contentObj.$contentProcess;
             eventName = conversionEventType(scope.eventType);
-
             //制动运行动作
             scope.runEffects = makeRunBinding.call(scope, pagebase);
-
             //销毁方法
             scope.destroy = function() {
                 destroyContentEvent(scope, eventName);
@@ -91,7 +82,7 @@ const combineEvents = function(pagebase, eventRelated) {
                     scope.eventReference = eventReference;
                     scope.eventHandler = eventHandler;
                 },
-                'eventContext': element,
+                'eventContext': contentObj.$contentProcess,
                 'eventName': eventName,
                 'parameter': scope.dragdropPara,
                 'target': null,

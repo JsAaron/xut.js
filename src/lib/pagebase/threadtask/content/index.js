@@ -144,8 +144,8 @@ function createFn(obj, id, callback) {
  */
 function toArray(o) {
     var contentsFragment = [];
-    _.each(o, function(contentcontainsNodes) {
-        contentsFragment.push(contentcontainsNodes)
+    _.each(o, function($node) {
+        contentsFragment.push($node)
     })
     return contentsFragment;
 }
@@ -239,7 +239,7 @@ taskProto.dataAfterCheck = function(data) {
             //不需要在创建
             if (Xut.IBooks.runMode()) {
                 _.each(userData.idFix, function(id) {
-                    data.contentsFragment[id] = data.containsNode.find("#" + id)[0]
+                    data.contentsFragment[id] = data.$containsNode.find("#" + id)[0]
                 })
             } else {
                 //构件快速查询节点对象
@@ -308,7 +308,7 @@ taskProto.dataStrCheck = function(data, contentDas) {
 ///////////////
 function crateFloat(callback, floatName, dasFloat, data, base) {
 
-    var containsNodes = [];
+    var $containsNodes = [];
     var prefix = 'Content_' + data.pid + "_";
 
     //去重复
@@ -328,7 +328,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
             zIndex = zIndexs[id];
             //保证层级关系
             // fragment.style.zIndex = (Number(zIndex) + Number(fragment.style.zIndex)) 
-            containsNodes.push(fragment);
+            $containsNodes.push(fragment);
             delete data.contentsFragment[makePrefix]
         }
     })
@@ -363,7 +363,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
     //增加浮动容器
     $(data.rootNode).after(container)
 
-    callback(containsNodes, container)
+    callback($containsNodes, container)
 }
 
 
@@ -373,13 +373,13 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
  */
 function createFloatMater(base, data, complete) {
     //创建浮动对象
-    crateFloat(function(containsNodes, container) {
+    crateFloat(function($containsNodes, container) {
         //浮动容器
         data.floatMaters.container = container;
 
         nextTick({
             'container': container,
-            'content': containsNodes
+            'content': $containsNodes
         }, function() {
             //收集浮动母版对象标识
             base.pageBaseHooks.collector.floatMaters(data.floatMaters);
@@ -394,12 +394,12 @@ function createFloatMater(base, data, complete) {
  */
 function createFloatPage(base, data, complete) {
     //创建浮动对象
-    crateFloat(function(containsNodes, container) {
+    crateFloat(function($containsNodes, container) {
         //浮动容器
         data.floatPages.container = container;
         nextTick({
             'container': container,
-            'content': containsNodes
+            'content': $containsNodes
         }, function() {
             //收集浮动母版对象标识
             base.pageBaseHooks.collector.floatPages(data.floatPages);
@@ -480,7 +480,7 @@ taskProto.eventAfterCheck = function(data, delayHooks) {
         } else {
             //正常对象
             nextTick({
-                'container': data.containsNode,
+                'container': data.$containsNode,
                 'content': toArray(data.contentsFragment)
             }, complete);
         }
@@ -510,7 +510,7 @@ taskProto.clearReference = function() {
     if (Xut.Contents.contentsFragment[this.chapterId]) {
         delete Xut.Contents.contentsFragment[this.chapterId]
     }
-    this.containsNode = null;
+    this.$containsNode = null;
     this.rootNode = null;
     this.contentsFragment = null;
 }
@@ -531,7 +531,7 @@ function autoUUID() {
  */
 function bindActivitys(callback, data, contentDas) {
     var compiler,
-        containsNode = data.containsNode,
+        $containsNode = data.$containsNode,
         eventRelated = data.eventRelated, //合集事件
         pid = data.pid,
         createActivitys = data.createActivitys,
@@ -644,7 +644,7 @@ function bindActivitys(callback, data, contentDas) {
                 "type": 'Content',
                 'pageId': pageId,
                 'activityId': activity._id,
-                'containsNode': containsNode,
+                '$containsNode': $containsNode,
                 'pageType': compiler['pageType'], //构建类型 page/master
                 'seed': compiler['seed'], //动画表数据 or 视觉差表数据
                 "pid": pid, //页码

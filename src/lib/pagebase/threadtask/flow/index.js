@@ -11,7 +11,7 @@ export default function(base, successCallback) {
         base._flows.register(
             new Flow({
                 pageIndex: base.pageIndex,
-                containsNode: base.getContainsNode(),
+                $containsNode: base.getContainsNode(),
                 seasonId: base.chapterDas.seasonId,
                 chapterId: base.chapterId,
                 successCallback,

@@ -5,7 +5,7 @@ import nextTick from '../../../util/nexttick'
 
 /**
  * 构建背景类
- * @param {[type]} containsNode         [根节点]
+ * @param {[type]} $containsNode         [根节点]
  * @param {[type]} data                 [数据]
  * @param {[type]} suspendCallback      [中断回调]
  * @param {[type]} successCallback      [description]
@@ -14,7 +14,7 @@ export default class TaskBackground {
 
     constructor({
         data,
-        containsNode,
+        $containsNode,
         suspendCallback,
         successCallback
     }) {
@@ -36,23 +36,22 @@ export default class TaskBackground {
         //不需要在创建
         if (Xut.IBooks.runMode()) {
             //找到背景节点
-            var $element = containsNode.find('.multilayer');
+            var $element = $containsNode.find('.multilayer');
             successCallback()
             return;
         }
 
         //背景是否需要SVG解析
         this.parseMaster(isSVGContent, content, function(svgContents) {
-
             //构建背景
             var backgroundStr = createBackground(svgContents, data);
             if (backgroundStr) {
                 svgContents = null;
-                self.compileSuspend($(backgroundStr), containsNode);
+                self.compileSuspend($(backgroundStr), $containsNode);
             } else {
                 successCallback();
             }
-        });
+        })
 
     }
 
@@ -65,7 +64,7 @@ export default class TaskBackground {
      * @param  {[type]} $background [description]
      * @return {[type]}             [description]
      */
-    compileSuspend($background, containsNode) {
+    compileSuspend($background, $containsNode) {
 
         var nextTasks, suspendTasks,
             self = this;
@@ -73,7 +72,7 @@ export default class TaskBackground {
         //继续执行
         nextTasks = function() {
             nextTick({
-                'container': containsNode,
+                'container': $containsNode,
                 'content': $background
             }, function() {
                 self.clearReference();

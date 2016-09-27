@@ -5,14 +5,14 @@ import nextTick from '../../util/nexttick'
  * dom...
  */
 export default function render({
-    containsNode,
+    $containsNode,
     dataNode,
     chapterId,
     callback
 } = {}) {
     const $container = $(dataNode.html())
     nextTick({
-        container: containsNode,
+        container: $containsNode,
         content: $container
     }, () => callback($container))
 }

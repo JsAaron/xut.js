@@ -108,15 +108,7 @@ export default function(activitProto) {
      * @return {[type]}        [description]
      */
     activitProto.getContextNode = function(prefix, type) {
-
         var element, containerPrefix, contentsFragment
-
-        // //canvas模式
-        // if (type === 'canvas') {
-        //     //直接在root查找，因为canvasdom是pxixi创建的
-        //     //不能在文档碎片中查找
-        //     return element = this.containsNode.find('#' + prefix);
-        // }
 
         //dom模式
         contentsFragment = this.relatedData.contentsFragment;

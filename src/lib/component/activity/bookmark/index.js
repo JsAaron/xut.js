@@ -8,20 +8,20 @@ import { BookMark } from './bookmark'
 export default function (activitProto) {
 
     activitProto.createBookMark = function () {
-        var element, seasonId, pageId, pageData;
+        var node, seasonId, pageId, pageData;
         if (this.pageType === 'master') {
             //模板取对应的页面上的数据
             pageData = Xut.Presentation.GetPageData();
-            element = this.relatedData.floatMaters.container;
+            node = this.relatedData.floatMaters.container;
             pageId = pageData._id;
             seasonId = pageData.seasonId;
         } else {
-            element = this.containsNode;
+            node = this.$containsNode;
             seasonId = this.relatedData.seasonId
             pageId = this.pageId
         }
         var options = {
-            parent: element,
+            parent: node,
             seasonId: seasonId,
             pageId: pageId
         }

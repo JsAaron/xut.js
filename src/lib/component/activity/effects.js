@@ -199,7 +199,7 @@ export class Effects {
      *  1 dom动画
      *  2 canvas动画
      */
-    init(id, context, containsNode, chapterId, parameter, pageType) {
+    init(id, context, $containsNode, chapterId, parameter, pageType) {
 
         let pageIndex, create, category
 
@@ -208,7 +208,7 @@ export class Effects {
         create = (constr, newContext) => {
             let element = newContext || context
             if (element.length) {
-                return new constr(pageIndex, pageType, chapterId, element, parameter, containsNode);
+                return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode);
             } else {
                 console.log(id, this)
             }

@@ -15,7 +15,7 @@ export default class Flow {
 
     constructor({
         pageIndex,
-        containsNode,
+        $containsNode,
         seasonId,
         chapterId,
         successCallback
@@ -26,7 +26,7 @@ export default class Flow {
         this.initIndex = pageIndex
 
         render({
-            containsNode,
+            $containsNode,
             dataNode,
             chapterId,
             callback($container) {

@@ -528,10 +528,10 @@ export default class MasterMgr extends Abstract {
         let contentObjs
         let prevNodes
         let nodes
-
+ 
         const repairNodes = function(scope, currPageIndex, targetIndex) {
             var rangePage = scope.calculateRangePage(),
-                containsNode = scope.containsNode,
+                $contentNode = scope.$contentNode,
                 translate = scope.translate,
                 offsetTranslate = scope.offsetTranslate,
                 moveTranslate,
@@ -550,7 +550,7 @@ export default class MasterMgr extends Abstract {
             }
 
             moveTranslate = _transformConversion(translate, -self.viewWidth, nodes);
-            _transformNodes(containsNode, 300, moveTranslate, offsetTranslate.opacityStart);
+            _transformNodes($contentNode, 300, moveTranslate, offsetTranslate.opacityStart);
             _overMemory(moveTranslate, offsetTranslate);
         }
 

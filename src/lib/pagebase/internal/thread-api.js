@@ -71,7 +71,6 @@ export default function(baseProto) {
     baseProto.nextTasks = function(callback) {
         this._asyTasks({
             suspendCallback() {
-                // console.log('@@@@@@@@@@中断创建任务 ' + callback.taskName + ' @@@@@@@@@@@', this.pid + 1, this.element)
                 callback.outSuspendTasks && callback.outSuspendTasks()
             },
             nextTaskCallback() {

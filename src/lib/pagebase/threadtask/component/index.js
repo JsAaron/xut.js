@@ -21,7 +21,7 @@ export default function TaskComponents(data, suspendCallback, successCallback) {
 
     if (data['activitys'].length) {
         var str;
-        this.containsNode = data['containsNode'];
+        this.$containsNode = data['$containsNode'];
         this.callback = {
             'suspendCallback': suspendCallback,
             'successCallback': successCallback
@@ -37,7 +37,7 @@ export default function TaskComponents(data, suspendCallback, successCallback) {
 TaskComponents.prototype = {
 
     clearReference: function() {
-        this.containsNode = null;
+        this.$containsNode = null;
     },
 
     create: function(data) {
@@ -123,7 +123,7 @@ TaskComponents.prototype = {
         //继续执行
         nextTasks = function() {
             nextTick({
-                container: self.containsNode,
+                container: self.$containsNode,
                 content: $(str)
             }, function() {
                 self.clearReference();

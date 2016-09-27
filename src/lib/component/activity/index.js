@@ -118,12 +118,10 @@ export class Activity {
      */
     _initContents() {
 
-        var pageId, containsNode, collectorHooks, pageType
-
-        pageId = this.relatedData.pageId
-        containsNode = this.containsNode
-        collectorHooks = this.relatedCallback.contentsHooks
-        pageType = this.pageType
+        const pageId = this.relatedData.pageId
+        const $containsNode = this.$containsNode
+        const collectorHooks = this.relatedCallback.contentsHooks
+        const pageType = this.pageType
 
         this.eachAssistContents(function(scope) {
 
@@ -150,7 +148,7 @@ export class Activity {
             //如果不是预生成,注册动画事件
             if (isRreRun === undefined) {
                 //初始化动画
-                scope.init(id, context, containsNode, pageId, parameter, pageType);
+                scope.init(id, context, $containsNode, pageId, parameter, pageType);
             }
 
             //绑定DOM一些属性
@@ -534,7 +532,7 @@ export class Activity {
             this.bookMark = null;
         }
 
-        this.containsNode = null;
+        this.$containsNode = null;
 
     }
 

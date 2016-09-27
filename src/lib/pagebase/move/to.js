@@ -13,7 +13,7 @@ import {
 /**
  * 移动视觉差对象
  */
-const _translate = function(containsNode, scope, direction, action, speed, nodes, distance) {
+const _translate = function($contentNode, scope, direction, action, speed, nodes, distance) {
 
     let translate = scope.translate
     let offsetTranslate = scope.offsetTranslate
@@ -49,7 +49,7 @@ const _translate = function(containsNode, scope, direction, action, speed, nodes
     }
 
     //直接操作元素
-    _transformNodes(containsNode, speed, moveTranslate, offsetTranslate.opacityStart || 0);
+    _transformNodes($contentNode, speed, moveTranslate, offsetTranslate.opacityStart || 0);
 }
 
 
@@ -117,7 +117,7 @@ export default function(baseProto) {
                 content.eachAssistContents(function(scope) {
                     //如果是视察对象移动
                     if (scope.parallax) {
-                        const containsNode = scope.parallax.containsNode;
+                        const $contentNode = scope.parallax.$contentNode;
                         const contentObj = base.baseGetContentObject(scope.id)
 
                         /////////////////////
@@ -138,13 +138,13 @@ export default function(baseProto) {
                             //视觉差处理一次,停止过动画
                             contentObj.parallaxProcessed = true;
                             //增加标记
-                            containsNode.attr('data-parallaxProcessed', actName);
+                            $contentNode.attr('data-parallaxProcessed', actName);
                             //记录
                             parallaxProcessedContetns[actName] = contentObj
                         }
 
                         //移动视觉差对象
-                        _translate(containsNode, scope.parallax, direction, action, speed, nodes, distance);
+                        _translate($contentNode, scope.parallax, direction, action, speed, nodes, distance);
                     }
                 })
             })
