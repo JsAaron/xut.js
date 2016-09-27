@@ -32,13 +32,12 @@ export function original(pageObj) {
         //母版对象不还原
         if (pageObj.pageType === 'master') return;
 
-        var element;
+        var $containsNode
 
-        if (element = pageObj.element) {
+        if ($containsNode = pageObj.getContainsNode()) {
             checkOptimize(() => {
-                element.hide();
+                $containsNode.hide()
             })
-
 
             //销毁所有widget类型的节点
             if (ComponentObjs) {
@@ -58,8 +57,8 @@ export function original(pageObj) {
 
             checkOptimize(() => {
                 setTimeout(() => {
-                    element.show();
-                    element = null;
+                    $containsNode.show();
+                    $containsNode = null;
                 }, 0);
             })
         }

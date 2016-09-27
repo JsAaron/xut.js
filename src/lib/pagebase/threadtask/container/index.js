@@ -121,7 +121,7 @@ export default function(base, pageData, taskCallback) {
     }
 
     nextTick({
-        container: base.rootNode,
+        container: base.$rootNode,
         content: $pageNode,
         position: getStyle.direction === 'before' ? 'first' : 'last'
     }, () => {

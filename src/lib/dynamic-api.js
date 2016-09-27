@@ -161,7 +161,7 @@ export default function overrideApi(vm) {
      */
     Presentation.GetPageElement = () => {
         var obj = Presentation.GetPageObj()
-        return obj.element
+        return obj.$pageNode
     };
 
 
@@ -530,7 +530,7 @@ export default function overrideApi(vm) {
                 contents.push({
                     'id': content.id,
                     'idName': content.actName,
-                    'element': content.$contentProcess,
+                    'element': content.$contentNode,
                     'theTitle': contentDas.theTitle,
                     'scaleHeight': contentDas.scaleHeight,
                     'scaleLeft': contentDas.scaleLeft,
@@ -547,8 +547,8 @@ export default function overrideApi(vm) {
                     var element;
                     //如果对象是事件钩子或者是浮动对象
                     //没有具体的数据
-                    if (content && content.$contentProcess) {
-                        element = content.$contentProcess;
+                    if (content && content.$contentNode) {
+                        element = content.$contentNode;
                     } else {
                         element = $('#' + actName);
                     }

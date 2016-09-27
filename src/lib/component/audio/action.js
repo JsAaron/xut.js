@@ -9,14 +9,14 @@
 //指定动画
 export function Action(options) {
 
-    var element = document.querySelector('#Audio_' + options.audioId)
+    var audioNode = document.querySelector('#Audio_' + options.audioId)
 
     //页面从属
-    var pageType = element.getAttribute('data-belong')
+    var pageType = audioNode.getAttribute('data-belong')
 
     //切换背景
     function toggle(linker) {
-        element.style.backgroundImage = 'url(' + Xut.config.pathAddress + linker + ')'
+        audioNode.style.backgroundImage = 'url(' + Xut.config.pathAddress + linker + ')'
     }
 
     function run(ids) {
@@ -38,7 +38,7 @@ export function Action(options) {
             options.stopScript && stop(options.startScript);
         },
         destroy: function() {
-            element = null;
+            audioNode = null;
         }
     }
 }

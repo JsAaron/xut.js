@@ -17,7 +17,7 @@ let defaultFontSize
 let baseValue1
 let baseValue2
 let baseValue3
-let docEl = document.documentElement
+let docEl = document.document$contentNode
 let whiteObject = {
     "rgb(255, 255, 255)": true,
     "#ffffff": true,
@@ -72,11 +72,11 @@ function createWapper(boxName, textLayer, iscrollName, textContent) {
 }
 
 
-function HtmlBox(contentId, element) {
+function HtmlBox(contentId, $contentNode) {
 
     setOption();
     this.contentId = contentId;
-    this.element = element;
+    this.$contentNode = $contentNode;
     var self = this;
 
     //事件对象引用
@@ -89,10 +89,10 @@ function HtmlBox(contentId, element) {
     bindContentEvent({
         'eventRun': function() {
             Xut.View.HideToolbar();
-            self.init(contentId, element)
+            self.init(contentId, $contentNode)
         },
         'eventHandler': eventHandler,
-        'eventContext': element,
+        'eventContext': $contentNode,
         'eventName': "tap",
         'domMode': true
     });
@@ -118,7 +118,7 @@ HtmlBox.prototype = {
         this.textLabelArray = ['p', 'span'];
         var self = this;
         _.each(self.textLabelArray, function(text) {
-            _.each(self.element.find(text), function(el) {
+            _.each(self.$contentNode.find(text), function(el) {
                 var formerColor = getComputedStyle(el).color;
                 //若字体颜色为白色 调整为黑色
                 if (whiteObject.hasOwnProperty(formerColor)) {
@@ -135,7 +135,7 @@ HtmlBox.prototype = {
     restoreColor: function() {
         var self = this;
         _.each(self.textLabelArray, function(text) {
-            _.each(self.element.find(text), function(el) {
+            _.each(self.$contentNode.find(text), function(el) {
                 //将字体由黑色恢复为白色
                 if (el.hasFormerColor) {
                     el.style.color = "white";
@@ -158,13 +158,13 @@ HtmlBox.prototype = {
         });
     },
 
-    init: function(contentId, element) {
+    init: function(contentId, $contentNode) {
         var self = this;
 
         self.adjustColor();
 
         //移除偏移量 存在偏移量造成文字被覆盖
-        var textContent = element.find(">").html();
+        var textContent = $contentNode.find(">").html();
         textContent = textContent.replace(/translate\(0px, -\d+px\)/g, 'translate(0px,0px)');
 
         var boxName = "htmlbox_" + contentId;
@@ -181,7 +181,7 @@ HtmlBox.prototype = {
 
         //创建容器
         this.$str = $(createWapper(boxName, textLayer(), iscrollName, textContent));
-        element.after(this.$str);
+        $contentNode.after(this.$str);
 
         //卷滚
         this.createIscroll(iscrollName);

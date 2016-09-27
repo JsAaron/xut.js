@@ -135,7 +135,7 @@ export default class MasterMgr extends Abstract {
         masterObj = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
-                'rootNode': this.rootNode, //根元素
+                '$rootNode': this.rootNode, //根元素
                 'pptMaster': pptMaster //ppt母板ID
             })
         );
@@ -232,7 +232,7 @@ export default class MasterMgr extends Abstract {
      *  母版自动运行
      */
     autoRun(data) {
-        var masterObj, element;
+        var masterObj
         if (masterObj = this.abstractGetPageObj(data.currIndex)) {
             //热点状态复位
             this.resetOriginal(data.suspendIndex)
@@ -413,10 +413,10 @@ export default class MasterMgr extends Abstract {
              * 设置移动
              */
             const toMove = function(distance, speed) {
-                var element = parallaxObj.element;
-                if (element) {
-                    element.css(transitionDuration, speed + 'ms');
-                    element.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
+                var $pageNode = parallaxObj.$pageNode;
+                if ($pageNode) {
+                    $pageNode.css(transitionDuration, speed + 'ms');
+                    $pageNode.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
                 }
             }
 

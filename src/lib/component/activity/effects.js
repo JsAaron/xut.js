@@ -98,20 +98,20 @@ export class Effects {
         actionTypes = this.contentDas.actionTypes
         makeOpts = {
             data: this.contentDas,
-            renderer: this.$contentProcess,
+            renderer: this.$contentNode,
             pageIndex: this.pageIndex
         }
 
         //创建pixi上下文的ppt对象
         createPixiPPT = () => {
             //parameter存在就是ppt动画
-            if ((parameter || actionTypes.pptId) && this.$contentProcess.view) {
-                this.pptObj = callback(PPT, $(this.$contentProcess.view));
+            if ((parameter || actionTypes.pptId) && this.$contentNode.view) {
+                this.pptObj = callback(PPT, $(this.$contentNode.view));
                 this.pptObj.contentId = id
             }
         }
 
-        $veiw = this.$contentProcess.view
+        $veiw = this.$contentNode.view
         if ($veiw) {
             initstate = $veiw.getAttribute('data-init')
         }
@@ -173,7 +173,7 @@ export class Effects {
             var data = {
                 id: this.id,
                 data: this.contentDas,
-                element: this.$contentProcess
+                $contentNode: this.$contentNode
             }
             switch (category) {
                 //普通精灵动画
@@ -195,7 +195,6 @@ export class Effects {
     /**
      * 绑定动画
      * 为了向上兼容API
-     * element
      *  1 dom动画
      *  2 canvas动画
      */
@@ -206,9 +205,9 @@ export class Effects {
         category = this.contentDas.category
         pageIndex = this.pageIndex
         create = (constr, newContext) => {
-            let element = newContext || context
-            if (element.length) {
-                return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode);
+            let node = newContext || context
+            if (node.length) {
+                return new constr(pageIndex, pageType, chapterId, node, parameter, $containsNode);
             } else {
                 console.log(id, this)
             }
@@ -231,11 +230,11 @@ export class Effects {
      */
     play(scopeComplete) {
 
-        var element = this.$contentProcess
+        var $contentNode = this.$contentNode
 
         //canvas
-        if (element && element.view) {
-            element = this.$contentProcess.view
+        if ($contentNode && $contentNode.view) {
+            $contentNode = this.$contentNode.view
         }
 
         access((key) => {
@@ -243,8 +242,8 @@ export class Effects {
                 if (key === 'pptObj') {
                     //优化处理,只针对互斥的情况下
                     //处理层级关系
-                    if (element.prop && element.prop("mutex")) {
-                        element.css({ //强制提升层级
+                    if ($contentNode.prop && $contentNode.prop("mutex")) {
+                        $contentNode.css({ //强制提升层级
                             'display': 'block'
                         })
                     }
@@ -297,12 +296,12 @@ export class Effects {
         //销毁renderer = new PIXI.WebGLRenderer
         if (this.canvasMode) {
             //rederer.destroy()
-            this.$contentProcess.view && this.$contentProcess.destroy()
+            this.$contentNode.view && this.$contentNode.destroy()
         }
 
         //销毁每一个数据上的canvas上下文引用
-        if (this.contentDas.$contentProcess) {
-            this.contentDas.$contentProcess = null;
+        if (this.contentDas.$contentNode) {
+            this.contentDas.$contentNode = null;
         }
 
         access((key) => {

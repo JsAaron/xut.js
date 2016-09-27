@@ -82,7 +82,7 @@ const combineEvents = function(pagebase, eventRelated) {
                     scope.eventReference = eventReference;
                     scope.eventHandler = eventHandler;
                 },
-                'eventContext': contentObj.$contentProcess,
+                'eventContext': contentObj.$contentNode,
                 'eventName': eventName,
                 'parameter': scope.dragdropPara,
                 'target': null,

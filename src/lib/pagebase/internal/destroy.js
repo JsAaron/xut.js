@@ -11,7 +11,7 @@ export default function(baseProto) {
         //清理图片缓存
         //读库快速退出模式下报错修正
         try {
-            this.element.hide().find('img').each(function(aaa, img) {
+            this.$pageNode.hide().find('img').each(function(aaa, img) {
                 img.src = 'images/icons/clearmem.png'
             })
         } catch (e) {
@@ -54,7 +54,7 @@ export default function(baseProto) {
                 contentObj.destroy(destroyObj => {
                     //如果不是浮动对象,清理元素引用
                     if (!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
-                        destroyObj.$contentProcess = null;
+                        destroyObj.$contentNode = null;
                     }
                 });
             })
@@ -87,9 +87,9 @@ export default function(baseProto) {
         }
 
         //移除li容器节点节点
-        this.element.remove();
-        this.rootNode = null;
-        this.element = null;
+        this.$pageNode.remove();
+        this.$rootNode = null;
+        this.$pageNode = null;
     }
 
 }

@@ -66,7 +66,7 @@ export default function(activitProto) {
                  * 绑定事件加入到content钩子
                  */
                 this.relatedCallback.contentsHooks(pid, eventId, {
-                    $contentProcess: eventContext,
+                    $contentNode: eventContext,
                     //增加外部判断
                     isBindEventHooks: true,
                     type: eventData.type

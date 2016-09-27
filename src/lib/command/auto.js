@@ -78,7 +78,7 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
             dir.autoPlay({
                 'id'        : data.id,
                 'pageType'  : pageType,
-                'rootNode'  : pageObj.element,
+                'rootNode'  : pageObj.getContainsNode(),
                 'chapterId' : chapterId,
                 'category'  : data.category,
                 'autoPlay'  : data.autoPlay,
@@ -133,7 +133,6 @@ export function autoRun(pageObj, pageIndex, taskAnimCallback) {
         }
 
         taskAnimCallback = taskAnimCallback || noop
-
 
         let autoData = pageObj.baseAutoRun()
         if (autoData) {

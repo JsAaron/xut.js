@@ -39,21 +39,21 @@ export default function(instance) {
          */
         container() {
 
-            callContextTasks('Container', function(element, pseudoElement) {
+            callContextTasks('Container', function($pageNode, pseudoElement) {
                 //////////////
                 //li,li-div //
                 //////////////
-                instance.element = element;
-                instance.pseudoElement = pseudoElement;
+                instance.$pageNode = $pageNode
+                instance.pseudoElement = pseudoElement
 
                 /**
                  * 获取包含容器
                  * @return {[type]} [description]
                  */
                 //获取根节点
-                const containsElement = element.children()
+                const $containsElement = $pageNode.children()
                 instance.getContainsNode = function() {
-                    return pseudoElement ? pseudoElement : containsElement
+                    return pseudoElement ? pseudoElement : $containsElement
                 }
 
                 setNextRunTask('flow')

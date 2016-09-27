@@ -141,7 +141,7 @@ export function Parallax(data) {
 
     //改变节点的transform属性
     //返回改变后translateX值
-    const parallaxOffset = transformNodes(data.$contentProcess, _.extend({}, offsetTranslate), data.transformOffset);
+    const parallaxOffset = transformNodes(data.$contentNode, _.extend({}, offsetTranslate), data.transformOffset);
 
     /**
      * 为了兼容动画，把视觉差当作一种行为处理
@@ -159,7 +159,7 @@ export function Parallax(data) {
         'translate'       : translate,
         'offsetTranslate' : offsetTranslate,
         'nodeProportion'  : nodeProportion,
-        '$contentNode'    : data.$contentProcess,
+        '$contentNode'    : data.$contentNode,
         'parallaxOffset'  : parallaxOffset //经过视觉差修正后的偏移量
     }
 

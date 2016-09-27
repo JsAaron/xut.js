@@ -6,14 +6,14 @@ var reqAnimationFrame = (function() {
 
 /**
  * 缩放平移
- * @param {[type]} element [description]
+ * @param {[type]} $node [description]
  */
-export default function Pinch(element) {
-console.log(element)
-    var mc = new Hammer.Manager(element);
+export default function Pinch($node) {
+console.log($node)
+    var mc = new Hammer.Manager($node);
 
-    const START_X = Math.round((window.innerWidth - element.offsetWidth) / 2);
-    const START_Y = Math.round((window.innerHeight - element.offsetHeight) / 2);
+    const START_X = Math.round((window.innerWidth - $node.offsetWidth) / 2);
+    const START_Y = Math.round((window.innerHeight - $node.offsetHeight) / 2);
 
     var ticking = false;
 
@@ -42,23 +42,23 @@ console.log(element)
     var initScale = 1;
 
 
-    function updateElementTransform() {
+    function update$nodeTransform() {
         var value = [
             // 'translate3d(' + transform.translate.x + 'px, ' + transform.translate.y + 'px, 0)',
             'scale(' + transform.scale + ', ' + transform.scale + ')'
         ];
         value = value.join(" ");
-        // element.textContent = value;
-        element.style.webkitTransform = value;
-        element.style.mozTransform = value;
-        element.style.transform = value;
+        // $node.textContent = value;
+        $node.style.webkitTransform = value;
+        $node.style.mozTransform = value;
+        $node.style.transform = value;
         ticking = false;
     }
 
 
-    function requestElementUpdate() {
+    function request$nodeUpdate() {
         if (!ticking) {
-            reqAnimationFrame(updateElementTransform);
+            reqAnimationFrame(update$nodeTransform);
             ticking = true;
         }
     }
@@ -68,12 +68,12 @@ console.log(element)
         if (ev.type == 'pinchstart') {
             initScale = transform.scale || 1;
         }
-        element.className = '';
+        $node.className = '';
         transform.scale = initScale * ev.scale
        	if(transform.scale<1){
        		transform.scale = 1
        	}
-        requestElementUpdate();
+        request$nodeUpdate();
     }
 
 }

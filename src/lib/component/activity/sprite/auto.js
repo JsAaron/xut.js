@@ -38,7 +38,7 @@ export default class  {
         this.spiritObjs = {}
         let option = {};
         option.contentId = options.id;
-        option.ele = options.element;
+        option.ele = options.$contentNode;
         option.resourcePath = data.md5;
         option.type = "advSprite";
         for (let i = 0; i < resource.spiritList.length; i++) {
@@ -83,7 +83,7 @@ export default class  {
 
         })
         this.options.data = null;
-        this.options.element = null;
+        this.options.$contentNode = null;
         this.options = null;
         this.ids = null;
 

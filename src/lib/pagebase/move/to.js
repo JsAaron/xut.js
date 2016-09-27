@@ -70,7 +70,7 @@ export default function(baseProto) {
         if (action === 'flipOver' && this.pageType === 'page') {
             //目标页面传递属性
             if (distance === viewOffset) {
-                this.element.attr('data-view', true)
+                this.$pageNode.attr('data-view', true)
             }
         }
 
@@ -97,7 +97,7 @@ export default function(baseProto) {
 
 
         //当前页面
-        translation[action](this.element, distance, speed)
+        translation[action](this.$pageNode, distance, speed)
     }
 
 

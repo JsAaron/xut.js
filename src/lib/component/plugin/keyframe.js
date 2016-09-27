@@ -6,20 +6,19 @@
 import { parseJSON } from '../../util/index'
 
 export default function keyframe(options) {
-    var $element, data, callback, count, fps, loop, matrix, parameter, width, height, timer,
-        arrays, x, y, t
+    let matrix, parameter,timer, x, y
 
-    arrays = [];
-    t = 0;
-    $element = options.element.find('.sprite')
-    data = options.data
-    callback = options.callback || function() {}
+    let arrays = [];
+    let t = 0;
+    let $spriteNode = options.$contentNode.find('.sprite')
+    let data = options.data
+    let callback = options.callback || function() {}
 
-    count = data.thecount
-    fps = data.fps
-    loop = data.loop;
-    width = data.scaleWidth;
-    height = data.scaleHeight;
+    let count = data.thecount
+    let fps = data.fps
+    let loop = data.loop;
+    let width = data.scaleWidth;
+    let height = data.scaleHeight;
 
     //如果是矩形图
     if (data.parameter) {
@@ -93,11 +92,11 @@ export default function keyframe(options) {
             if (matrix) {
                 x = arrays[2 * t];
                 y = arrays[2 * t + 1];
-                $element.css('backgroundPositionX', x);
-                $element.css('backgroundPositionY', y);
+                $spriteNode.css('backgroundPositionX', x);
+                $spriteNode.css('backgroundPositionY', y);
             } else {
                 x = arrays[t];
-                $element.css('backgroundPositionX', x);
+                $spriteNode.css('backgroundPositionX', x);
             }
             t++;
             start();
@@ -119,7 +118,7 @@ export default function keyframe(options) {
             //停止精灵动画
             this.stop();
             t = 0;
-            $element = null;
+            $spriteNode = null;
             data = null;
             arrays = null;
         }

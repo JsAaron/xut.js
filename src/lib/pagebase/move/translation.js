@@ -45,20 +45,20 @@ const newViewPage = function(distance) {
 /**
  * 切换坐标
  */
-const toTranslate3d = (element, distance, speed) => {
+const toTranslate3d = ($node, distance, speed) => {
     distance = config.virtualMode ? distance / 2 : distance;
-    if (element) {
-        element.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
+    if ($node) {
+        $node.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
 
         //修正flipMode切换页面的处理
         //没有翻页效果
         if (config.flipMode) {
             if (newViewPage(distance)) {
                 const cur = Xut.sceneController.containerObj('current')
-                cur.vm.$globalEvent.setAnimComplete(element);
+                cur.vm.$globalEvent.setAnimComplete($node);
             }
         } else {
-            element.css(transitionDuration, speed + "ms")
+            $node.css(transitionDuration, speed + "ms")
         }
 
     }
@@ -69,17 +69,16 @@ const toTranslate3d = (element, distance, speed) => {
  * 复位
  * @return {[type]} [description]
  */
-const reset = (element) => {
-    if (element) {
-        element.css(transitionDuration, '');
-        element.css(transform, 'translate(0px,0px)' + translateZ);
+const reset = ($node) => {
+    if ($node) {
+        $node.css(transitionDuration, '');
+        $node.css(transform, 'translate(0px,0px)' + translateZ);
     }
 }
 
 
 /**
  * 移动
- * element, distance, speed
  * @return {[type]} [description]
  */
 const flipMove = (...arg) => {
@@ -122,11 +121,11 @@ export const translation = {
  * 修正坐标
  * @return {[type]} [description]
  */
-export function fix(element, action) {
+export function fix($node, action) {
     const viewWidth = config.viewSize.width
     const translate = action === 'prevEffect' 
         ? createTranslate(-viewWidth) 
         : createTranslate(viewWidth)
-    element.css(transform, translate)
+    $node.css(transform, translate)
 }
 

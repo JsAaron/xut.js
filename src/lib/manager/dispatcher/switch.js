@@ -7,7 +7,7 @@ import { fix as _fix } from '../../pagebase/move/translation'
 const improveIndex = (complier, { currIndex } = {}) => {
     //提高page层级
     complier.pageMgr.abstractAssistPocess(currIndex, pageObj => {
-        pageObj.element.css({
+        pageObj.$pageNode.css({
             'z-index': 9997
         });
     })
@@ -15,7 +15,7 @@ const improveIndex = (complier, { currIndex } = {}) => {
     //提高mater层级
     complier.masterContext(function() {
         this.abstractAssistPocess(currIndex, pageObj => {
-            pageObj.element.css({
+            pageObj.$pageNode.css({
                 'z-index': 1
             });
         })
@@ -116,12 +116,12 @@ const createContainerView = (complier, data) => {
     _.each(data['ruleOut'], function(pageIndex) {
         if (pageIndex > data['targetIndex']) {
             pageMgr.abstractAssistAppoint(pageIndex, function(pageObj) {
-                _fix(pageObj.element, 'nextEffect')
+                _fix(pageObj.$pageNode, 'nextEffect')
             })
         }
         if (pageIndex < data['targetIndex']) {
             pageMgr.abstractAssistAppoint(pageIndex, function(pageObj) {
-                _fix(pageObj.element, 'prevEffect')
+                _fix(pageObj.$pageNode, 'prevEffect')
             })
         }
     })
@@ -147,7 +147,7 @@ const createContainerView = (complier, data) => {
      */
     _.each(data.pageBaseCollect, function(pageBase) {
         _.each(pageBase, function(pageObj) {
-            pageObj.element && pageObj.element.css({
+            pageObj.$pageNode && pageObj.$pageNode.css({
                 'opacity': 1
             })
         })

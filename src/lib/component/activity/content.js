@@ -56,7 +56,7 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
         canvasMode: false,
         domMode: true
     }
-    var $contentProcess
+    var $contentNode
     var pageType = base.pageType
     var contentName
     var canvasDom
@@ -71,12 +71,12 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
             canvasDom = base.getContextNode(contentName)[0]
 
             //创建上下文pixi
-            if (contentDas.$contentProcess) {
-                $contentProcess = contentDas.$contentProcess
+            if (contentDas.$contentNode) {
+                $contentNode = contentDas.$contentNode
             } else {
-                // $contentProcess = Context(contentDas, canvasDom, base.pageIndex)
+                // $contentNode = Context(contentDas, canvasDom, base.pageIndex)
                 //保存canvas pixi的上下文引用
-                // base.relatedData.contentDas[contentId].$contentProcess = $contentProcess
+                // base.relatedData.contentDas[contentId].$contentNode = $contentNode
             }
             data.type = 'canvas';
             data.canvasMode = true;
@@ -85,12 +85,12 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
     }
 
     //如果是dom模式
-    if (!$contentProcess) {
+    if (!$contentNode) {
         /**
          * 确保节点存在
          * @type {[type]}
          */
-        if (!($contentProcess = base.getContextNode(actName))) {
+        if (!($contentNode = base.getContextNode(actName))) {
             return;
         }
     }
@@ -105,7 +105,7 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
         pid: pid,
         actName: actName,
         contentDas: contentDas,
-        $contentProcess: $contentProcess,
+        $contentNode: $contentNode,
         pageType: pageType,
         pageIndex: base.pageIndex,
         canvasRelated: base.canvasRelated,

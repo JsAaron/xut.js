@@ -10,13 +10,13 @@ export default function(activitProto) {
      * 可能有多个引用关系
      * @return {[type]}         [description]
      */
-    activitProto.addIScroll = function(scope, element) {
+    activitProto.addIScroll = function(scope, $contentNode) {
+
         var self = this,
-            // elementName,
             contentDas = scope.contentDas;
 
         //给外部调用处理
-        function makeUseFunction(element) {
+        function makeUseFunction(contentNode) {
 
             var prePocess = self.makePrefix('Content', scope.pid, scope.id),
                 preEle = self.getContextNode(prePocess)
@@ -27,7 +27,7 @@ export default function(activitProto) {
             //ios or pc
             if (!Xut.plat.isAndroid) {
                 return function() {
-                    self.iscroll = Iscroll(element);
+                    self.iscroll = Iscroll(contentNode);
                 }
             }
 
@@ -67,23 +67,22 @@ export default function(activitProto) {
             }
 
             return function() {
-
-                restore();
-                preEle = null;
-                restore = null;
+                restore()
+                preEle = null
+                restore = null
             }
         }
 
         //增加卷滚条
         if (contentDas.isScroll) {
             //去掉高度，因为有滚动文本框
-            element.find(">").css("height", "")
-            this.relatedCallback.iscrollHooks.push(makeUseFunction(element[0]));
+            $contentNode.find(">").css("height", "")
+            this.relatedCallback.iscrollHooks.push(makeUseFunction($contentNode[0]));
         }
 
         //如果是图片则补尝允许范围内的高度
         if (!contentDas.mask || !contentDas.isGif) {
-            element.find && element.find('img').css({
+            $contentNode.find && $contentNode.find('img').css({
                 'height': contentDas.scaleHeight
             });
         }
@@ -108,25 +107,25 @@ export default function(activitProto) {
      * @return {[type]}        [description]
      */
     activitProto.getContextNode = function(prefix, type) {
-        var element, containerPrefix, contentsFragment
+        let node, $node, containerPrefix, contentsFragment
 
         //dom模式
         contentsFragment = this.relatedData.contentsFragment;
-        if (element = (contentsFragment[prefix])) {
-            element = $(element)
+        if (node = (contentsFragment[prefix])) {
+            $node = $(node)
         } else {
             //容器处理
             if (containerPrefix = this.relatedData.containerPrefix) {
                 _.each(containerPrefix, function(containerName) {
-                    element = contentsFragment[containerName];
-                    element = $(element).find('#' + prefix);
-                    if (element.length) {
-                        return;
+                    node = contentsFragment[containerName];
+                    $node = $(node).find('#' + prefix);
+                    if ($node.length) {
+                        return
                     }
                 })
             }
         }
-        return element;
+        return $node
     }
 
 

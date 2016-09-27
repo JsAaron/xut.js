@@ -55,7 +55,7 @@ export default class PageMgr extends Abstract {
         const pageObjs = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
-                'rootNode': this.rootNode //根元素
+                '$rootNode': this.rootNode //根元素
             })
         )
 
@@ -120,13 +120,13 @@ export default class PageMgr extends Abstract {
      * @return {[type]} [description]
      */
     resetOriginal(pageIndex) {
-        var originalPageObj, flaotElement;
+        var originalPageObj, floatNode;
         if (originalPageObj = this.abstractGetPageObj(pageIndex)) {
-            if (flaotElement = originalPageObj.floatContents.PageContainer) {
+            if (floatNode = originalPageObj.floatContents.PageContainer) {
                 //floatPages设置的content溢出后处理
                 //在非视区增加overflow:hidden
                 //可视区域overflow:''
-                flaotElement.css({
+                floatNode.css({
                     'zIndex': 2000,
                     'overflow': 'hidden'
                 })
@@ -156,9 +156,9 @@ export default class PageMgr extends Abstract {
 
             //提升当前页面浮动对象的层级
             //因为浮动对象可以是并联的
-            var flaotElement;
-            if (flaotElement = currPageObj.floatContents.PageContainer) {
-                flaotElement.css({
+            var floatNode;
+            if (floatNode = currPageObj.floatContents.PageContainer) {
+                floatNode.css({
                     'zIndex': 2001,
                     'overflow': ''
                 })
@@ -212,9 +212,9 @@ export default class PageMgr extends Abstract {
             }
 
             //如果页面容器存在,才处理自动运行
-            var currRootNode = currPageObj.element
+            var currRootNode = currPageObj.getContainsNode()
             if (!currRootNode) {
-                return complete();
+                return complete()
             }
 
             //运行动作

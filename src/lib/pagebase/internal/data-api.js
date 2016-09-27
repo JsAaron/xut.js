@@ -82,9 +82,9 @@ export default function(baseProto) {
     baseProto.baseContentMutex = function(contentId, type) {
         let contentObj
         if (contentObj = this.baseGetContentObject(contentId)) {
-            const $contentElement = contentObj.$contentProcess.view ?
-                contentObj.$contentProcess.view :
-                contentObj.$contentProcess
+            const $contentElement = contentObj.$contentNode.view ?
+                contentObj.$contentNode.view :
+                contentObj.$contentNode
 
             const handle = {
                 'Show' () {

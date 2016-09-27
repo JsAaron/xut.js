@@ -128,8 +128,8 @@ export class Activity {
             var context, id, isRreRun, parameter;
 
             //针对必须创建
-            if (!(context = scope.$contentProcess)) {
-                console.log('$contentProcess不存在')
+            if (!(context = scope.$contentNode)) {
+                console.log('$contentNode不存在')
                 return
             }
 
@@ -306,9 +306,9 @@ export class Activity {
             return function(scope) {
                 //动画结束,删除这个hack
                 scope &&
-                    scope.$contentProcess &&
-                    scope.$contentProcess.removeProp &&
-                    scope.$contentProcess.removeProp('animOffset')
+                    scope.$contentNode &&
+                    scope.$contentNode.removeProp &&
+                    scope.$contentNode.removeProp('animOffset')
 
                 //如果快速翻页
                 //运行动画的时候，发现不是可视页面
@@ -348,16 +348,16 @@ export class Activity {
                 captureAnimComplete()
             } else {
                 //必须要修改
-                if (scope.$contentProcess) {
+                if (scope.$contentNode) {
                     if (scope.canvasMode) {
                         console.log('canvsa isRreRunPocess')
                             //直接改变元素状态
-                            //scope.$contentProcess.view.style.visible = scope.isRreRun === 'visible' ? true : false;
+                            //scope.$contentNode.view.style.visible = scope.isRreRun === 'visible' ? true : false;
                     } else {
                         //因为执行的顺序问题，动画与页面零件
                         //isscroll标记控制
-                        if (!scope.$contentProcess.attr('isscroll')) {
-                            scope.$contentProcess.css({
+                        if (!scope.$contentNode.attr('isscroll')) {
+                            scope.$contentNode.css({
                                 'visibility': scope.isRreRun
                             })
                         }
@@ -374,8 +374,8 @@ export class Activity {
             } else {
 
                 //标记动画正在运行
-                scope.$contentProcess && scope.$contentProcess.prop && scope.$contentProcess.prop({
-                    'animOffset': scope.$contentProcess.offset()
+                scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
+                    'animOffset': scope.$contentNode.offset()
                 })
 
                 //ppt动画

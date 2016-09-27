@@ -411,8 +411,8 @@ _extend(Contents, {
                 ele.attr('data-behavior', 'disable');
             }
         }
-        if ((elements = Contents.Get(pageType, id)) && elements.$contentProcess) {
-            handle(elements.$contentProcess)
+        if ((elements = Contents.Get(pageType, id)) && elements.$contentNode) {
+            handle(elements.$contentNode)
         } else {
             elements = $("#" + id);
             elements.length && handle(elements)

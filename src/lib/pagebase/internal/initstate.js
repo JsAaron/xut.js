@@ -186,10 +186,11 @@ export default function(baseProto) {
                 //2 浮动的对象是用于零件类型,这边只提供创建
                 //  所以需要制造一个空的容器，用于母版交界动
                 floatMaters(data) {
-                    let prefix,
-                        contentObj,
-                        contentProcess,
-                        contentsFragment;
+                    let prefix
+                    let contentObj
+                    let contentNode
+                    let contentsFragment
+
                     //浮动容器
                     floatContents.MasterContainer = data.container;
                     //浮动对象
@@ -205,11 +206,11 @@ export default function(baseProto) {
                             Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
                                 //获取DOM节点
                             if (contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
-                                prefix = 'Content_' + instance.pid + "_";
+                                prefix = 'Content_' + instance.pid + "_"
                                 _.each(contentsFragment, function(dom) {
                                     var makePrefix = prefix + id;
                                     if (dom.id == makePrefix) {
-                                        contentProcess = dom;
+                                        contentNode = dom;
                                     }
                                 })
                             }
@@ -218,7 +219,7 @@ export default function(baseProto) {
                             floatContents.Master[id] = {
                                 id: id,
                                 pid: instance.pid,
-                                $contentProcess: $(contentProcess),
+                                $contentNode: $(contentNode),
                                 'empty': true //空类型
                             }
                         }

@@ -63,29 +63,28 @@ function isfilter(eventName) {
  * @param  {[type]} evtName [事件名]
  * @return {[type]}         [description]
  */
-function setDefaultBehavior(supportSwipe, element) {
+function setDefaultBehavior(supportSwipe, $contentNode) {
     if (supportSwipe) {
         //静态事件，默认可以翻页，还可以切换工具栏
-        element.attr('data-behavior', 'swipe');
+        $contentNode.attr('data-behavior', 'swipe');
     } else {
         //如果事件存在
-        element.attr('data-behavior', 'disable');
+        $contentNode.attr('data-behavior', 'disable');
     }
 }
 
 /**
  * 针对软件培训的操作行为下光标状态需求
- * @param {[type]} element [description]
  */
-function addCursor(eventName, $element) {
-    if ($element) {
-        if (!$element.prop('setCursor')) { //只设置一次
+function addCursor(eventName, $contentNode) {
+    if ($contentNode) {
+        if (!$contentNode.prop('setCursor')) { //只设置一次
             if (eventName === ('drag' || 'dragTag')) {
-                $element.css('cursor', 'Move')
+                $contentNode.css('cursor', 'Move')
             } else {
-                $element.css('cursor', 'Pointer')
+                $contentNode.css('cursor', 'Pointer')
             }
-            $element.prop('setCursor', 'true');
+            $contentNode.prop('setCursor', 'true');
         }
     }
 }
@@ -176,8 +175,8 @@ export function conversionEventType(eventType) {
 /**
  * 增加默认行为
  */
-export function defaultBehavior(element) {
-    element && element.attr('data-behavior', 'disable');
+export function defaultBehavior($contentNode) {
+    $contentNode && $contentNode.attr('data-behavior', 'disable');
 }
 
 
@@ -185,7 +184,7 @@ export function defaultBehavior(element) {
  * 注册自定义事件
  * this还是引用的当前实例的上下文
  *
- *   'element'   : 事件对象
+ *   '$contentNode'   : 事件对象
  *   'target'    : 目标对象
  *   'parameter' : 拖动参数
  *   'evtName'   : 事件名,

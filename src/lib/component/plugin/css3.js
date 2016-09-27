@@ -81,17 +81,17 @@ function deleteCSSRule(ruleName) {
  */
 export default function css3(options) {
 
-    var $element, data, callback, aniName, count, fps, time, width, loop, matrix, parameter, rule1, rule2
+    let matrix, parameter, rule1, rule2 
 
-    $element = options.element.find('.sprite')
-    data = options.data
-    callback = options.callback || function() {}
-    aniName = 'sprite_' + options.id
-    count = data.thecount
-    fps = data.fps
-    time = Math.round(1 / fps * count * 10) / 10
-    width = Math.ceil(data.scaleWidth * count)
-    loop = data.loop ? 'infinite' : 1
+    let $spriteNode = options.$contentNode.find('.sprite')
+    let data = options.data
+    let callback = options.callback || function() {}
+    let aniName = 'sprite_' + options.id
+    let count = data.thecount
+    let fps = data.fps
+    let time = Math.round(1 / fps * count * 10) / 10
+    let width = Math.ceil(data.scaleWidth * count)
+    let loop = data.loop ? 'infinite' : 1
 
 
     //如果是矩形图
@@ -155,11 +155,10 @@ export default function css3(options) {
 
     /**
      * 设置动画样式
-     * @param {[type]} $element [description]
      * @param {[type]} rule     [description]
      */
-    function initStyle($element, rule) {
-        prefixAnims && $element.css(prefixAnims, rule).css(playState, 'paused');
+    function initStyle(rule) {
+        prefixAnims && $spriteNode.css(prefixAnims, rule).css(playState, 'paused');
     }
 
 
@@ -175,29 +174,29 @@ export default function css3(options) {
 
 
     //动画css关键帧规则
-    var rule1 = setStep(aniName, time, count, loop);
-    var rule2 = setPostion(aniName, width);
+    rule1 = setStep(aniName, time, count, loop);
+    rule2 = setPostion(aniName, width);
 
 
-    initStyle($element, rule1);
+    initStyle(rule1)
     setKeyframes(rule2);
-    $element.on(animationEnd, callback);
+    $spriteNode.on(animationEnd, callback);
 
     return {
 
         play: function() {
-            $element.css(playState, 'running');
+            $spriteNode.css(playState, 'running');
         },
 
         stop: function() {
-            $element.css(playState, 'paused');
+            $spriteNode.css(playState, 'paused');
         },
 
         destroy: function() {
             //停止精灵动画
             deleteCSSRule(aniName);
-            $element.off(animationEnd, callback);
-            $element = null;
+            $spriteNode.off(animationEnd, callback);
+            $spriteNode = null;
         }
 
 

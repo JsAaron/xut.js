@@ -36,7 +36,7 @@ export default class TaskBackground {
         //不需要在创建
         if (Xut.IBooks.runMode()) {
             //找到背景节点
-            var $element = $containsNode.find('.multilayer');
+            // var $element = $containsNode.find('.multilayer');
             successCallback()
             return;
         }

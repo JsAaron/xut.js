@@ -361,7 +361,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
     var container = $(floatStr)
 
     //增加浮动容器
-    $(data.rootNode).after(container)
+    $(data.$rootNode).after(container)
 
     callback($containsNodes, container)
 }
@@ -511,7 +511,7 @@ taskProto.clearReference = function() {
         delete Xut.Contents.contentsFragment[this.chapterId]
     }
     this.$containsNode = null;
-    this.rootNode = null;
+    this.$rootNode = null;
     this.contentsFragment = null;
 }
 
