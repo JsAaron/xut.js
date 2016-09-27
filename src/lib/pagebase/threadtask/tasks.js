@@ -1,3 +1,4 @@
+import { config } from '../../config/index'
 import assignedTasks from './assign'
 import initstate from './states'
 import Pinch from './pinch'
@@ -45,9 +46,14 @@ export default function(instance) {
                 instance.element = element;
                 instance.pseudoElement = pseudoElement;
 
+                /**
+                 * 获取包含容器
+                 * @return {[type]} [description]
+                 */
                 //获取根节点
-                instance.getElement = function() {
-                    return pseudoElement ? pseudoElement : element
+                const containsElement = element.children()
+                instance.getContainsNode = function() {
+                    return pseudoElement ? pseudoElement : containsElement
                 }
 
                 setNextRunTask('flow')
@@ -56,7 +62,7 @@ export default function(instance) {
                 createRelated.preforkComplete()
 
                 //绑定缩放事件
-                config.saleMode && instance.pageType === 'page' && Pinch(instance.element[0])
+                config.saleMode && instance.pageType === 'page' && Pinch(containsElement[0])
 
                 //视觉差不管
                 if (instance.isMaster) {

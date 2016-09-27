@@ -13,12 +13,12 @@ const hasValue = function(value) {
 
 /**
  * 变化节点的css3transform属性
- * @param  {[type]} rootNode   [description]
+ * @param  {[type]} containsNode   [description]
  * @param  {[type]} property   [description]
  * @param  {[type]} pageOffset [description]
  * @return {[type]}            [description]
  */
-const transformNodes = function(rootNode, property, pageOffset) {
+const transformNodes = function(containsNode, property, pageOffset) {
     var style = {},
         effect = '',
         parallaxOffset, //最终的偏移量X
@@ -62,7 +62,7 @@ const transformNodes = function(rootNode, property, pageOffset) {
 
     if (effect) {
         style[transform] = effect;
-        rootNode.css(style);
+        containsNode.css(style);
     }
 
     return parallaxOffset;
@@ -159,7 +159,7 @@ export function Parallax(data) {
         'translate': translate,
         'offsetTranslate': offsetTranslate,
         'nodeProportion': nodeProportion,
-        'rootNode': data.$contentProcess,
+        'containsNode': data.$contentProcess,
         'parallaxOffset': parallaxOffset //经过视觉差修正后的偏移量
     }
 

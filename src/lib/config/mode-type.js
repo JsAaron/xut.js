@@ -69,7 +69,6 @@ export default {
      */
     flipMode: 0,
 
-
     /**
      * 是否启动页面缩放
      * @type {Number}

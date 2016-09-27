@@ -11,7 +11,7 @@ export default function (activitProto) {
 
     activitProto.createSearchBar = function () {
         var options = {
-            parent: this.rootNode
+            parent: this.containsNode
         }
         if (this.searchBar) {
             //如果上次只是隐藏则可以恢复

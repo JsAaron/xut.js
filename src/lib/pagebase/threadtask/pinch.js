@@ -9,7 +9,7 @@ var reqAnimationFrame = (function() {
  * @param {[type]} element [description]
  */
 export default function Pinch(element) {
-
+console.log(element)
     var mc = new Hammer.Manager(element);
 
     const START_X = Math.round((window.innerWidth - element.offsetWidth) / 2);

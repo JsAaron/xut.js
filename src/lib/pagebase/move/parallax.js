@@ -1,3 +1,4 @@
+import { config } from '../../config/index'
 
 const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
@@ -94,13 +95,13 @@ export function _overMemory(property, repairProperty) {
 
 /**
  * 变化节点的css3transform属性
- * @param  {[type]} rootNode     [description]
+ * @param  {[type]} containsNode     [description]
  * @param  {[type]} speed        [description]
  * @param  {[type]} property     [description]
  * @param  {[type]} opacityStart [description]
  * @return {[type]}              [description]
  */
-export function _transformNodes(rootNode, speed, property, opacityStart) {
+export function _transformNodes(containsNode, speed, property, opacityStart) {
     var style = {},
         effect = '',
         x = 0,
@@ -143,6 +144,6 @@ export function _transformNodes(rootNode, speed, property, opacityStart) {
     if (effect) {
         style[transitionDuration] = speed + 'ms';
         style[transform] = effect;
-        rootNode.css(style);
+        containsNode.css(style);
     }
 }

@@ -5,14 +5,19 @@ import nextTick from '../../../util/nexttick'
 
 /**
  * 构建背景类
- * @param {[type]} rootNode             [根节点]
+ * @param {[type]} containsNode         [根节点]
  * @param {[type]} data                 [数据]
  * @param {[type]} suspendCallback      [中断回调]
  * @param {[type]} successCallback      [description]
  */
 export default class TaskBackground {
 
-    constructor(rootNode, data, suspendCallback, successCallback) {
+    constructor({
+        data,
+        containsNode,
+        suspendCallback,
+        successCallback
+    }) {
         var layer,
             suspendTasks,
             nextTasks,
@@ -31,7 +36,7 @@ export default class TaskBackground {
         //不需要在创建
         if (Xut.IBooks.runMode()) {
             //找到背景节点
-            var $element = rootNode.find('.multilayer');
+            var $element = containsNode.find('.multilayer');
             successCallback()
             return;
         }
@@ -43,7 +48,7 @@ export default class TaskBackground {
             var backgroundStr = createBackground(svgContents, data);
             if (backgroundStr) {
                 svgContents = null;
-                self.compileSuspend($(backgroundStr), rootNode);
+                self.compileSuspend($(backgroundStr), containsNode);
             } else {
                 successCallback();
             }
@@ -58,10 +63,9 @@ export default class TaskBackground {
     /**
      * 构建中断函数
      * @param  {[type]} $background [description]
-     * @param  {[type]} rootNode    [description]
      * @return {[type]}             [description]
      */
-    compileSuspend($background, rootNode) {
+    compileSuspend($background, containsNode) {
 
         var nextTasks, suspendTasks,
             self = this;
@@ -69,7 +73,7 @@ export default class TaskBackground {
         //继续执行
         nextTasks = function() {
             nextTick({
-                'container': rootNode,
+                'container': containsNode,
                 'content': $background
             }, function() {
                 self.clearReference();
@@ -120,4 +124,3 @@ export default class TaskBackground {
         }
     }
 }
-

@@ -51,7 +51,8 @@ export default {
         //同步数据
         updataCache.call(base, [base.pid], () => {
             const pageData = base.baseData()
-            //页面模式
+
+            //contentMode模式
             parseMode(pageData, base)
             TaskContainer(base, pageData, taskCallback)
         })
@@ -81,21 +82,34 @@ export default {
             return;
         }
 
-        var data = base.baseData(base.pid),
-            //构建中断回调
-            suspendCallback = (innerNextTasks, innerSuspendTasks) => {
-                base.nextTasks({
-                    'taskName': '内部background',
-                    'outSuspendTasks': innerSuspendTasks,
-                    'outNextTasks': innerNextTasks
-                });
-            },
-            //获取数据成功回调
-            successCallback = () => {
-                taskCallback();
-            };
+        const data = base.baseData(base.pid)
 
-        base.createRelated.cacheTasks['background'] = new TaskBackground(base.getElement(), data, suspendCallback, successCallback)
+        /**
+         * 构建中断回调
+         */
+        const suspendCallback = (innerNextTasks, innerSuspendTasks) => {
+            base.nextTasks({
+                'taskName': '内部background',
+                'outSuspendTasks': innerSuspendTasks,
+                'outNextTasks': innerNextTasks
+            });
+        }
+
+        /**
+         * 获取数据成功回调
+         * @return {[type]} [description]
+         */
+        const successCallback = () => {
+            taskCallback();
+        }
+
+        base.createRelated.cacheTasks['background'] = new TaskBackground({
+            data,
+            containsNode: base.getContainsNode(),
+            suspendCallback,
+            successCallback
+        })
+
     },
 
 
@@ -109,23 +123,33 @@ export default {
             return;
         }
 
-        var chapterDas = base.chapterDas,
-            baseData = base.baseData(),
-            //构建中断回调
-            suspendCallback = (innerNextTasks, innerSuspendTasks) => {
-                base.nextTasks({
-                    'taskName': '内部widgets',
-                    'outSuspendTasks': innerSuspendTasks,
-                    'outNextTasks': innerNextTasks
-                });
-            },
-            //获取数据成功回调
-            successCallback = () => {
-                taskCallback();
-            };
+        const chapterDas = base.chapterDas
+        const baseData = base.baseData()
+
+        /**
+         * 构建中断回调
+         * @param  {[type]} innerNextTasks    [description]
+         * @param  {[type]} innerSuspendTasks [description]
+         * @return {[type]}                   [description]
+         */
+        const suspendCallback = (innerNextTasks, innerSuspendTasks) => {
+            base.nextTasks({
+                'taskName': '内部widgets',
+                'outSuspendTasks': innerSuspendTasks,
+                'outNextTasks': innerNextTasks
+            });
+        }
+
+        /**
+         * 获取数据成功回调
+         * @return {[type]} [description]
+         */
+        const successCallback = () => {
+            taskCallback();
+        }
 
         base.createRelated.cacheTasks['components'] = new TaskComponents({
-            'rootNode': base.getElement(),
+            'containsNode': base.getContainsNode(),
             'nodes': chapterDas['nodes'],
             'pageOffset': chapterDas['pageOffset'],
             'activitys': base.baseActivits(),
@@ -153,44 +177,48 @@ export default {
             return;
         }
 
-        var chapterDas = base.chapterDas,
-            baseData = base.baseData(),
-            chapterId = baseData['_id'],
-            activitys = base.baseActivits(),
+        const chapterDas = base.chapterDas
+        const baseData = base.baseData()
+        const chapterId = baseData['_id']
+        const activitys = base.baseActivits()
 
-            //生成钩子
-            // collector                : function (pageIndex, id, contentScope) {
-            // eventBinding             : function () { [native code] }
-            // floatMaters              : function (masters){
-            // registerAbstractActivity : function (pageIndex, type, contentsObjs) {
-            // successCallback          : function () {
-            // suspendCallback          : function (taskName, innerNextTasks, innerSuspendTasks) {
-            pageBaseHooks = _.extend({}, {
-                //构建中断回调
-                suspend: function(taskName, innerNextTasks, innerSuspendTasks) {
-                    //如果是当前页面构建,允许打断一次
-                    var interrupt
-                    if (base.isAutoRun && taskName === 'strAfter') {
-                        interrupt = true;
-                    }
-                    base.nextTasks({
-                        'interrupt': interrupt,
-                        'taskName': '内部contents',
-                        'outSuspendTasks': innerSuspendTasks,
-                        'outNextTasks': innerNextTasks
-                    });
-                },
-                //获取数据成功回调
-                success: function() {
-                    taskCallback();
+        /**
+         * 生成钩子
+         */
+        const pageBaseHooks = _.extend({}, {
+            /**
+             * 构建中断回调
+             * @return {[type]}                   [description]
+             */
+            suspend(taskName, innerNextTasks, innerSuspendTasks) {
+                //如果是当前页面构建,允许打断一次
+                var interrupt
+                if (base.isAutoRun && taskName === 'strAfter') {
+                    interrupt = true;
                 }
-            }, base.listenerHooks);
+                base.nextTasks({
+                    'interrupt': interrupt,
+                    'taskName': '内部contents',
+                    'outSuspendTasks': innerSuspendTasks,
+                    'outNextTasks': innerNextTasks
+                });
+            },
+
+            /**
+             * 获取数据成功回调
+             * @return {[type]} [description]
+             */
+            success() {
+                taskCallback();
+            }
+
+        }, base.listenerHooks)
 
 
         base.createRelated.cacheTasks['contents'] = new TaskContents({
             'canvasRelated': base.canvasRelated,
             'rootNode': base.root,
-            'element': base.getElement(),
+            'containsNode': base.getContainsNode(),
             'pageType': base.pageType,
             'nodes': chapterDas['nodes'],
             'pageOffset': chapterDas['pageOffset'],
@@ -201,7 +229,7 @@ export default {
             'pid': base.pid,
             'pageBaseHooks': pageBaseHooks,
             'virtualOffset': base.virtualOffset,
-            'getStyle':base.getStyle
+            'getStyle': base.getStyle
         });
     }
 }

@@ -6,10 +6,17 @@ import { isFlowPage } from '../../../component/flow/get'
  */
 export default function(base, successCallback) {
     const chapterDas = base.chapterDas
-
     //只有页面类型支持flow && chpater页存在flow数据
     if (base.pageType === "page" && isFlowPage(chapterDas.seasonId, base.chapterId)) {
-        base._flows.register(new Flow(base, successCallback))
+        base._flows.register(
+            new Flow({
+                pageIndex: base.pageIndex,
+                containsNode: base.getContainsNode(),
+                seasonId: base.chapterDas.seasonId,
+                chapterId: base.chapterId,
+                successCallback,
+            })
+        )
     } else {
         successCallback()
     }

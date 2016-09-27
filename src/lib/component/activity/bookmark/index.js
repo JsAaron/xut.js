@@ -16,7 +16,7 @@ export default function (activitProto) {
             pageId = pageData._id;
             seasonId = pageData.seasonId;
         } else {
-            element = this.rootNode;
+            element = this.containsNode;
             seasonId = this.relatedData.seasonId
             pageId = this.pageId
         }

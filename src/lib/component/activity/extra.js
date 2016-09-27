@@ -115,7 +115,7 @@ export default function(activitProto) {
         // if (type === 'canvas') {
         //     //直接在root查找，因为canvasdom是pxixi创建的
         //     //不能在文档碎片中查找
-        //     return element = this.rootNode.find('#' + prefix);
+        //     return element = this.containsNode.find('#' + prefix);
         // }
 
         //dom模式

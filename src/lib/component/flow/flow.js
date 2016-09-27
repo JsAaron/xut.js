@@ -13,26 +13,25 @@ import { getFlowView } from '../../visuals/expand/api.config'
  */
 export default class Flow {
 
-    constructor(base, callback) {
+    constructor({
+        pageIndex,
+        containsNode,
+        seasonId,
+        chapterId,
+        successCallback
+    } = {}) {
 
         const self = this
-
-        this.callback = callback
-        this.initIndex = base.pageIndex
-
-        const rootNode = base.element
-        const seasonId = base.chapterDas.seasonId
-        const chapterId = base.chapterId
         const dataNode = $('#chapter-flow-' + chapterId)
-
+        this.initIndex = pageIndex
 
         render({
-            rootNode,
+            containsNode,
             dataNode,
             chapterId,
             callback($container) {
                 self._init($container, getFlowCount(seasonId, chapterId))
-                callback()
+                successCallback()
             }
         })
     }

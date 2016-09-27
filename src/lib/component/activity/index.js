@@ -118,10 +118,10 @@ export class Activity {
      */
     _initContents() {
 
-        var pageId, rootNode, collectorHooks, pageType
+        var pageId, containsNode, collectorHooks, pageType
 
         pageId = this.relatedData.pageId
-        rootNode = this.rootNode
+        containsNode = this.containsNode
         collectorHooks = this.relatedCallback.contentsHooks
         pageType = this.pageType
 
@@ -150,7 +150,7 @@ export class Activity {
             //如果不是预生成,注册动画事件
             if (isRreRun === undefined) {
                 //初始化动画
-                scope.init(id, context, rootNode, pageId, parameter, pageType);
+                scope.init(id, context, containsNode, pageId, parameter, pageType);
             }
 
             //绑定DOM一些属性
@@ -534,7 +534,7 @@ export class Activity {
             this.bookMark = null;
         }
 
-        this.rootNode = null;
+        this.containsNode = null;
 
     }
 

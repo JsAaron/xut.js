@@ -51,7 +51,9 @@ const createli = function({
                    ${background}
                    ${customStyle}
                    overflow:hidden;">
-            ${virtualNode}
+            <div data-type="pinch" style="width:100%;height:100%">
+                ${virtualNode}
+            </div
         </li>`
     )
 }
@@ -105,7 +107,8 @@ const createContainer = (base, pageData, getStyle, prefix) => {
  **/
 export default function(base, pageData, taskCallback) {
 
-    let $element, pseudoElement
+    let $pageNode
+    let $pseudoElement
 
     const prefix = base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId
     const getStyle = base.getStyle
@@ -114,24 +117,24 @@ export default function(base, pageData, taskCallback) {
     //在执行的时候节点已经存在
     //不需要在创建
     if (Xut.IBooks.runMode()) {
-        $element = $("#" + prefix);
-        taskCallback($element, pseudoElement)
+        $pageNode = $("#" + prefix);
+        taskCallback($pageNode, $pseudoElement)
         return
     }
 
     //创建的flip结构体
-    $element = createContainer(base, pageData, getStyle, prefix)
+    $pageNode = createContainer(base, pageData, getStyle, prefix)
 
     //如果启动了wordMode模式,查找伪li
     if (config.virtualMode) {
-        pseudoElement = $element.find('div');
+        $pseudoElement = $pageNode.find('div');
     }
 
     nextTick({
         container: base.root,
-        content: $element,
+        content: $pageNode,
         position: getStyle.direction === 'before' ? 'first' : 'last'
     }, () => {
-        taskCallback($element, pseudoElement)
+        taskCallback($pageNode, $pseudoElement)
     });
 }
