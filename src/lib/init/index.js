@@ -49,12 +49,20 @@ const initMain = (novelData) => {
         //配置全局翻页模式
         //flipMode可以为0
         //兼容flipMode错误,强制转化成数字类型
-        if(parameter.pageflip !== undefined){
-            config.flipMode = toEmpty(parameter.pageflip)
-            _set({ 'flipMode': config.flipMode })
+        if (parameter.pageflip !== undefined) {
+            flipMode = toEmpty(parameter.pageflip)
+            _set({ 'flipMode': flipMode })
         }
     }
 
+    /**
+     * 设置全局翻页模式
+     * @param  {[type]} _.isUndefined(config.flipMode) [description]
+     * @return {[type]}                                [description]
+     */
+    if (_.isUndefined(config.flipMode)) {
+        config.flipMode = Number(flipMode)
+    }
 
     /**
      * 缓存加载

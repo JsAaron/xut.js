@@ -18,25 +18,29 @@ export default class sysBar extends Bar {
         container,
         pageMode,
         pageTotal,
-        currentPage
-    }={}) {
+        currentPage,
+        toolType
+    } = {}) {
         super()
 
-        this.arrows      = hash()
-        this.curTips     = null //当前页码对象
-        this.Lock        = false //操作锁
-        this.delay       = 50 //动画延时
-        this.hasTopBar   = true //有顶部工具条
-        this.controlBar  = controlBar
-        this.container   = container
-        this.pageMode    = pageMode
-        this.pageTotal   = pageTotal
+        this.arrows = hash()
+        this.curTips = null //当前页码对象
+        this.Lock = false //操作锁
+        this.delay = 50 //动画延时
+        this.hasTopBar = true //有顶部工具条
+        this.controlBar = controlBar
+        this.container = container
+        this.pageTotal = pageTotal
         this.currentPage = currentPage
 
         //配置属性
         this.initConfig()
 
-        this._initTool()
+        //顶部工具栏可配置
+        _.some(toolType) && this._initTool()
+
+        //翻页按钮
+        pageMode == 2 && this.createArrows();
     }
 
 
@@ -71,15 +75,10 @@ export default class sysBar extends Bar {
         setting.PageBut && this.createPageNum(bar);
 
         //工具栏隐藏按钮
-        this.createHideToolbar(bar);
-
-        //翻页按钮
-        if (this.pageMode == 2) {
-            this.createArrows();
-        }
+        this._createHideToolbar(bar);
 
         //邦定事件
-        this.bindButtonsEvent(bar);
+        this._bindButtonsEvent(bar);
     }
 
 
@@ -152,7 +151,7 @@ export default class sysBar extends Bar {
      * @param  {[type]} bar [description]
      * @return {[type]}     [description]
      */
-    createHideToolbar(bar) {
+    _createHideToolbar(bar) {
         var html, style,
             height = this.iconHeight;
         style = 'float:right;width:' + height + 'px;height:' + height + 'px;background-size:cover';
@@ -221,7 +220,7 @@ export default class sysBar extends Bar {
         this.curTips && this.curTips.html(pageIndex + 1);
     }
 
-    bindButtonsEvent(bar) {
+    _bindButtonsEvent(bar) {
         var that = this;
         bar.on("touchend mouseup", function(e) {
             var className = Xut.plat.evtTarget(e).className;

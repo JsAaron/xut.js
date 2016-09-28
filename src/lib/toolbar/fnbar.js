@@ -12,7 +12,7 @@ export default class fnBar extends Bar {
         pageMode,
         id,
         container,
-        tbType,
+        toolType,
         pageTotal,
         currentPage
     } = {}) {
@@ -31,7 +31,7 @@ export default class fnBar extends Bar {
         this.pageMode = pageMode;
         this.id = id;
         this.container = container;
-        this.tbType = tbType;
+        this.toolType = toolType;
         this.pageTotal = pageTotal;
         this.currentPage = currentPage;
 
@@ -43,7 +43,7 @@ export default class fnBar extends Bar {
 
     /**
      * 创建工具栏
-     * tbType:
+     * toolType:
      *      0   禁止工具栏
      *      1   系统工具栏   - 显示IOS系统工具栏
      *      2   场景工具栏   - 显示关闭按钮
@@ -62,7 +62,7 @@ export default class fnBar extends Bar {
         container.hide();
         this.controlBar = [];
 
-        while (type = this.tbType.shift()) {
+        while (type = this.toolType.shift()) {
             switch (type) {
                 case 1:
                     this.createSystemBar();

@@ -91,7 +91,7 @@ function adapterItemArrayRelated(relateds, activitys, tokens) {
 //解析相关数据 //
 //解析每一条 Activitys 对应的数据结构
 ////////////
-function parserRelated(compileActivitys, data) {
+export default function parserRelated(compileActivitys, data) {
 
     var activitys,
         hookType,
@@ -606,4 +606,3 @@ function tokenize(itemArray) {
 }
 
 
-export { parserRelated }

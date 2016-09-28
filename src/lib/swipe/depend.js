@@ -1,3 +1,29 @@
+//转换页码索引
+//direction 方向
+//pointer 当前页码标示
+//[17 18 19]  pagePointer
+//[18 19 20]  转换后
+// 17 销毁
+// 20 创建
+export const getActionPointer = function(direction, leftIndex, rightIndex) {
+    let createPointer //创建的页
+    let destroyPointer //销毁的页
+    switch (direction) {
+        case 'prev': //前处理
+            createPointer = (leftIndex - 1);
+            destroyPointer = (rightIndex);
+            break;
+        case 'next': //后处理
+            createPointer = (rightIndex + 1);
+            destroyPointer = (leftIndex);
+            break;
+    }
+    return {
+        createPointer,
+        destroyPointer
+    }
+}
+
 
 /**
  * 初始化首次范围

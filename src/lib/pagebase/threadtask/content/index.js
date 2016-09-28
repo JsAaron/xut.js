@@ -7,11 +7,16 @@
  *      行为动画绑定类     Content
  *
  * ***************************************************/
+import contentParser from './data'
+import contentStructure from './structure/index'
+import ActivityClass from '../../../component/activity/activity'
+
+import {
+    parseJSON,
+    arrayUnique
+} from '../../../util/index'
+
 import nextTick from '../../../util/nexttick'
-import { parseJSON, arrayUnique } from '../../../util/index'
-import { parserRelated as conParser } from './data'
-import { structure as conStructure } from './structure/index'
-import { Activity as ActivityClass } from '../../../component/activity/index'
 
 const TRANSFORM = Xut.style.transform
 
@@ -69,7 +74,7 @@ export default function TaskContents(activityData) {
     //Activity表数据存在
     if (compileActivitys) {
         //解析动画表数据结构
-        activityData = conParser(compileActivitys, activityData);
+        activityData = contentParser(compileActivitys, activityData);
         //如果有需要构建的content
         //开始多线程处理
         activityData.createContentIds.length ? this.dataAfterCheck(activityData) : this.loadComplete();
@@ -265,7 +270,7 @@ taskProto.dataAfterCheck = function(data) {
         }
 
         //构建页面节点
-        conStructure(createStr, data, this);
+        contentStructure(createStr, data, this);
 
     })
 }

@@ -18,7 +18,6 @@ import {
 
 import nextTick from '../util/nexttick'
 
-
 /**
  * 找到对应容器
  * @return {[type]}            [description]
@@ -134,25 +133,6 @@ export class SceneFactory {
         }, callback)
     }
 
-    /**
-     *
-     * 配置工具栏行为
-     *  1.  工具栏类型
-     *  tbType：(如果用户没有选择任何工具栏信息处理，tbType字段就为空)
-     *   0  禁止工具栏
-     *   1  系统工具栏   - 显示IOS系统工具栏
-     *   2  场景工具栏   - 显示关闭按钮
-     *   3  场景工具栏   - 显示返回按钮
-     *   4  场景工具栏   - 显示顶部小圆点式标示
-     *
-     *  2.  翻页模式
-     *  pageMode：(如果用户没有选择任何处理，pageMode字段就为空)
-     *   0禁止滑动
-     *   1 允许滑动无翻页按钮
-     *   2 允许滑动带翻页按钮
-     *
-     * @return {[type]} [description]
-     */
     _initToolBar() {
         const scenarioId = this.scenarioId
         const pageTotal = this.pageTotal
@@ -162,48 +142,58 @@ export class SceneFactory {
             return elements.find('.xut-control-bar')
         }
 
-        //工具栏配置信息
-        let conf
-
-        //主场景工具栏设置
-        if (this.isMain) {
-            conf = pMainBar(scenarioId, pageTotal)
-
-            if (config.scrollPaintingMode) {
-                //word模式,自动启动工具条
-                this.sToolbar = new BookBar({
-                    container: elements,
-                    controlBar: findControlBar(),
-                    pageMode: conf.pageMode
-                })
-            } else if (_.some(conf.tbType)) {
-                //普通模式
-                this.sToolbar = new MainBar({
-                    container: elements,
-                    controlBar: findControlBar(),
-                    pageTotal: pageTotal,
-                    currentPage: pageIndex + 1,
-                    pageMode: conf.pageMode
-                })
+        /**
+         * 填充配置
+         * @return {[type]} [description]
+         */
+        const fillConfig = function(data) {
+            if (_.isUndefined(config.pageMode)) {
+                config.pageMode = data.pageMode
             }
-        } else {
-            //副场景
-            conf = pDeputyBar(this.barInfo, pageTotal)
-
-            //创建工具栏
-            if (conf) {
-                this.cToolbar = new DeputyBar({
-                    id: scenarioId,
-                    container: elements,
-                    tbType: conf.tbType,
-                    pageTotal: pageTotal,
-                    currentPage: pageIndex,
-                    pageMode: conf.pageMode
-                })
+            if (_.isUndefined(config.toolType)) {
+                config.toolType = data.toolType
             }
         }
 
-        return conf
+        //主场景工具栏设置
+        if (this.isMain) {
+            fillConfig(pMainBar(scenarioId, pageTotal))
+            if (config.scrollPaintingMode) {
+                //word模式,自动启动工具条
+                this.sToolbar = new BookBar({
+                    container  : elements,
+                    controlBar : findControlBar(),
+                    pageMode   : config.pageMode
+                })
+            }
+            //如果工具拦提供可配置
+            //或者config.pageMode 带翻页按钮
+            else if (_.some(config.toolType) || config.pageMode ===2) {
+                //普通模式
+                this.sToolbar = new MainBar({
+                    container   : elements,
+                    controlBar  : findControlBar(),
+                    pageTotal   : pageTotal,
+                    currentPage : pageIndex + 1,
+                    pageMode    : config.pageMode,
+                    toolType    : config.toolType
+                })
+            }
+        }
+        //副场景
+        else {
+            fillConfig(pDeputyBar(this.barInfo, pageTotal))
+            if (_.some(config.toolType)) {
+                this.cToolbar = new DeputyBar({
+                    id          : scenarioId,
+                    container   : elements,
+                    toolType    : config.toolType,
+                    pageTotal   : pageTotal,
+                    currentPage : pageIndex,
+                    pageMode    : config.pageMode
+                })
+            }
+        }
     }
 
     /**
@@ -217,7 +207,6 @@ export class SceneFactory {
         var pageTotal = this.pageTotal;
         var pageIndex = this.pageIndex;
         var elements = this.elements;
-        var pageMode = this.pageMode;
         var isMain = this.isMain;
         var tempfind = findContainer(elements, scenarioId, isMain)
 
@@ -230,7 +219,6 @@ export class SceneFactory {
         //场景容器对象
         var vm = this.vm = new Mediator({
             'container': this.elements[0],
-            'pageMode': pageMode,
             'multiScenario': !isMain,
             'rootPage': scenarioPage,
             'rootMaster': scenarioMaster,

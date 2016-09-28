@@ -10,16 +10,9 @@ import {
 
 import {
     initPointer,
+    getActionPointer,
     compatibilityEvent
 } from './depend'
-
-
-const reqAnimationFrame = (function() {
-    return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function(callback) {
-        window.setTimeout(callback, 1000 / 60);
-    }
-})();
-
 
 /**
  * 翻页速率
@@ -40,7 +33,7 @@ const DEFAULTTIME = {
 const getDate = () => {
     return +new Date
 }
-
+const transitionDuration = Xut.style.transitionDuration
 const LINEARTAG = 'data-viewlinear'
 
 /**
@@ -88,7 +81,7 @@ export default class Swipe extends Observer {
         this._speedRate = this._originalRate = this._pageTime / this._viewWidth
 
         //计算初始化页码
-        this._pagePointer = initPointer(initIndex, pagetotal)
+        this.pagePointer = initPointer(initIndex, pagetotal)
 
 
         this.options = {
@@ -136,8 +129,8 @@ export default class Swipe extends Observer {
             this.element.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
             this.element.style.width = this._viewWidth * this.pagetotal + 'px'
         }
-
     }
+
 
     /**
      * 处理松手后滑动
@@ -150,7 +143,7 @@ export default class Swipe extends Observer {
      * pageIndex: 0, distance: -2, speed: 0, direction: "next", action: "flipMove"
      */
     _distributeMove(data) {
-        let pointer = this._pagePointer
+        let pointer = this.pagePointer
         data.leftIndex = pointer.leftIndex
         data.rightIndex = pointer.rightIndex
         this.$emit('onMove', data)
@@ -387,7 +380,7 @@ export default class Swipe extends Observer {
      */
     _isBorder(direction) {
         let overflow
-        let pointer = this._pagePointer
+        let pointer = this.pagePointer
         let fillength = Object.keys(pointer).length
 
         switch (direction) {
@@ -446,32 +439,6 @@ export default class Swipe extends Observer {
     }
 
 
-    //转换页码索引
-    //direction 方向
-    //pointer 当前页码标示
-    //[17 18 19]  _pagePointer
-    //[18 19 20]  转换后
-    // 17 销毁
-    // 20 创建
-    _tanrsfromPointer(pointer) {
-        let createPointer //创建的页
-        let destroyPointer //销毁的页
-        switch (this.direction) {
-            case 'prev': //前处理
-                createPointer = (pointer.leftIndex - 1);
-                destroyPointer = (pointer.rightIndex);
-                break;
-            case 'next': //后处理
-                createPointer = (pointer.rightIndex + 1);
-                destroyPointer = (pointer.leftIndex);
-                break;
-        }
-        pointer.createPointer = createPointer
-        pointer.destroyPointer = destroyPointer
-        return pointer
-    }
-
-
     /**
      * 修正页面索引
      */
@@ -480,12 +447,13 @@ export default class Swipe extends Observer {
     }
 
 
+
     /**
      * 更新页码标示
      */
     _updataPointer(leftIndex, currIndex, rightIndex) {
         if (arguments.length === 3) {
-            this._pagePointer = {
+            this.pagePointer = {
                 'leftIndex': leftIndex,
                 'currIndex': currIndex,
                 'rightIndex': rightIndex
@@ -494,59 +462,70 @@ export default class Swipe extends Observer {
         }
         if (arguments.length === 1) {
             let data = leftIndex;
-            let viewFlip = data['viewFlip'];
-            this._fixHindex(data.targetIndex);
+            let viewFlip = data.viewFlip
+            this._fixHindex(data.targetIndex)
             if (viewFlip.length === 3) {
                 this._updataPointer(viewFlip[0], viewFlip[1], viewFlip[2]);
             }
             if (viewFlip.length === 2) {
                 if (viewFlip[0] === 0) { //首页
-                    this._pagePointer['rightIndex'] = viewFlip[1];
-                    this._pagePointer['currIndex'] = viewFlip[0];
-                    delete this._pagePointer['leftIndex'];
+                    this.pagePointer.rightIndex = viewFlip[1];
+                    this.pagePointer.currIndex = viewFlip[0];
+                    delete this.pagePointer.leftIndex;
                 } else { //尾页
-                    this._pagePointer['leftIndex'] = viewFlip[0];
-                    this._pagePointer['currIndex'] = viewFlip[1];
-                    delete this._pagePointer['rightIndex'];
+                    this.pagePointer.leftIndex = viewFlip[0];
+                    this.pagePointer.currIndex = viewFlip[1];
+                    delete this.pagePointer.rightIndex
                 }
             }
             return
         }
     }
 
-
     /**
+     * 增加索引的动作
      * 修正页码指示
      */
-    _fixPointer(pointer) {
+    _updateActionPointer(pointer) {
+
+        //获取动作索引
+        // createPointer
+        // destroyPointer
+        const actionPointer = getActionPointer(this.direction, pointer.leftIndex, pointer.rightIndex)
+
+        //需要创建的页面
+        const createPointer = actionPointer.createPointer
+
         //需要停止动作的页面索引
-        const stopPointer = pointer.currIndex;
+        const stopPointer = pointer.currIndex
+
         switch (this.direction) {
             case 'prev':
-                if (-1 < pointer.createPointer) { //首页情况
-                    this._updataPointer(pointer.createPointer, pointer.leftIndex, pointer.currIndex);
+                if (-1 < createPointer) { //首页情况
+                    this._updataPointer(createPointer, pointer.leftIndex, pointer.currIndex);
                 }
-                if (-1 === pointer.createPointer) {
-                    this._pagePointer['rightIndex'] = pointer.currIndex;
-                    this._pagePointer['currIndex'] = pointer.leftIndex;
-                    delete this._pagePointer['leftIndex'];
+                if (-1 === createPointer) {
+                    this.pagePointer.rightIndex = pointer.currIndex;
+                    this.pagePointer.currIndex = pointer.leftIndex;
+                    delete this.pagePointer.leftIndex;
                 }
                 break;
             case 'next':
-                if (this.pagetotal > pointer.createPointer) {
-                    this._updataPointer(pointer.currIndex, pointer.rightIndex, pointer.createPointer);
+                if (this.pagetotal > createPointer) {
+                    this._updataPointer(pointer.currIndex, pointer.rightIndex, createPointer);
                 }
-                if (this.pagetotal === pointer.createPointer) { //如果是尾页
-                    this._pagePointer['leftIndex'] = pointer.currIndex;
-                    this._pagePointer['currIndex'] = pointer.rightIndex;
-                    delete this._pagePointer['rightIndex'];
+                if (this.pagetotal === createPointer) { //如果是尾页
+                    this.pagePointer.leftIndex = pointer.currIndex;
+                    this.pagePointer.currIndex = pointer.rightIndex;
+                    delete this.pagePointer.rightIndex;
                 }
                 break;
         }
-        this._pagePointer['createPointer'] = pointer.createPointer
-        this._pagePointer['destroyPointer'] = pointer.destroyPointer
-        this._pagePointer['stopPointer'] = stopPointer
-        return this._pagePointer
+
+        //更新页面索引标识
+        this.pagePointer.createPointer = createPointer
+        this.pagePointer.destroyPointer = actionPointer.destroyPointer
+        this.pagePointer.stopPointer = stopPointer
     }
 
 
@@ -572,7 +551,6 @@ export default class Swipe extends Observer {
         this.direction = direction
         this._quickTurn()
 
-
         /**
          * 计算滑动速度
          * @return {[type]} [description]
@@ -589,12 +567,12 @@ export default class Swipe extends Observer {
             'action': 'flipOver'
         })
 
-
-        reqAnimationFrame(() => {
-            let newPointer = this._tanrsfromPointer(this._pagePointer)
-            newPointer = this._fixPointer(newPointer)
-            this.$emit('onUpSlider', newPointer)
-            this._fixHindex(newPointer.currIndex)
+        setTimeout(() => {
+            //更新this.pagePointer索引
+            //增加处理标记
+            this._updateActionPointer(this.pagePointer)
+            this.$emit('onUpSlider', this.pagePointer)
+            this._fixHindex(this.pagePointer.currIndex)
         })
     }
 
@@ -605,14 +583,19 @@ export default class Swipe extends Observer {
      * @return {[type]}   [description]
      */
     _onAnimComplete(e) {
-        const element = e.target
-        const pageType = element.getAttribute('data-pageType')
-        const view = element.getAttribute('data-view') //操作的可视窗口
-        const linearView = element.getAttribute(LINEARTAG) //流式布局
+        const node = e.target
+        const pageType = node.getAttribute('data-pageType')
+        const view = node.getAttribute('data-view') //操作的可视窗口
+        const linearView = node.getAttribute(LINEARTAG) //流式布局
+
+        //去掉动画时间
+        if(node){
+            node.style[transitionDuration] = ''
+        }
 
         //流式布局处理
         if (linearView && !view) {
-            this._distributed(element, view)
+            this._distributed(node, view)
             return
         }
 
@@ -620,11 +603,11 @@ export default class Swipe extends Observer {
         if (!view) {
             if (!pageType) {
                 //只针对母板处理
-                this.$emit('onMasterMove', this._hindex, element);
+                this.$emit('onMasterMove', this._hindex, node);
             }
             return
         }
-        this._distributed(element, view)
+        this._distributed(node, view)
     }
 
 
@@ -632,21 +615,23 @@ export default class Swipe extends Observer {
      * 还原设置
      * @return {[type]} [description]
      */
-    _restore(element, view) {
+    _restore(node, view) {
         //针对拖拽翻页阻止
         this._preventSwipe = true
         this._isTap = false;
         //恢复速率
         this._resetRate();
-        view && element.removeAttribute('data-view', 'false');
+        view && node.removeAttribute('data-view', 'false');
     }
 
 
     _distributed(...arg) {
         this._restore(...arg)
-        reqAnimationFrame(() => {
-            this.$emit('onComplete', this.direction, this._pagePointer, this._unlock.bind(this), this._isQuickTurn);
-        })
+
+        //延长获取更pagePointer的更新值
+        setTimeout(() => {
+            this.$emit('onComplete', this.direction, this.pagePointer, this._unlock.bind(this), this._isQuickTurn);
+        }, 100)
     }
 
 
@@ -698,9 +683,6 @@ export default class Swipe extends Observer {
             }
         }, this, e)
     }
-
-
-
 }
 
 

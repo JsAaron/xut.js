@@ -264,19 +264,19 @@ class _Audio extends BaseClass {
         this.preRelated(trackId, options);
 
         if (instance[trackId]) {
-            audio = replaceAudio ? getAudio() : instance[trackId];
-            audio.src = url;
+            audio = replaceAudio ? getAudio() : instance[trackId]
+            audio.src = url
         } else {
 
             //create a new Audio instance
             //如果为ios browser 用Xut.fix.audioes 指定src 初始化见app.js
             if (replaceAudio) {
-                audio = getAudio();
-                audio.src = url;
+                audio = getAudio()
+                audio.src = url
             } else {
                 audio = new Audio(url);
-            } 
- 
+            }
+
             //更新音轨
             //妙妙学方式不要音轨处理
             if (!replaceAudio) {

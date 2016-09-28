@@ -66,11 +66,13 @@ export default function(baseProto) {
      */
     baseProto.toMove = function(action, distance, speed, viewOffset) {
 
+        const pageNode = this.$pageNode[0]
+
         //过滤多个动画回调，保证指向始终是当前页面
         if (action === 'flipOver' && this.pageType === 'page') {
             //目标页面传递属性
             if (distance === viewOffset) {
-                this.$pageNode.attr('data-view', true)
+                pageNode.setAttribute('data-view', true)
             }
         }
 
@@ -97,7 +99,7 @@ export default function(baseProto) {
 
 
         //当前页面
-        translation[action](this.$pageNode, distance, speed)
+        translation[action](pageNode, distance, speed, viewOffset)
     }
 
 

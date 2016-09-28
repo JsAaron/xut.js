@@ -54,6 +54,7 @@ export default class Flow {
         const viewLeft = config.viewSize.left
         const View = Xut.View
         const initIndex = this.initIndex
+        const container = $container[0]
 
         /**
          * 分栏整体控制
@@ -64,7 +65,7 @@ export default class Flow {
             borderBounce: true,
             linear: true,
             initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
-            container: $container[0],
+            container,
             flipMode: 0,
             multiplePages: 1,
             stopPropagation: true,
@@ -177,7 +178,7 @@ export default class Flow {
                         -(flipWidth * this._hindex + this._hindex)
                 }
 
-                translation[action]($container, moveDistance, speed)
+                translation[action](container, moveDistance, speed)
             }
 
         })

@@ -6,6 +6,7 @@
 
 import { config } from '../../config/index'
 
+const reqAnimationFrame = Xut.style.reqAnimationFrame
 const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
@@ -28,39 +29,27 @@ const createTranslate = (offset) => {
 }
 
 
-/**
- * 新的可视区页面
- * @param  {[type]}  distance [description]
- * @return {Boolean}          [description]
- */
-const newViewPage = function(distance) {
-    //calculateDistance中修改了对应的distance
-    //这里给swipe捕获
-    if (distance === 0) { //目标页面传递属性
-        return true
-    }
-}
-
 
 /**
  * 切换坐标
  */
-const toTranslate3d = ($node, distance, speed) => {
+const toTranslate3d = (node, distance, speed, viewOffset) => {
     distance = config.virtualMode ? distance / 2 : distance
-    if ($node) {
-        $node.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
-
+    if (node) {
+        reqAnimationFrame(function() {
+            node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
+        })
         //修正flipMode切换页面的处理
         //没有翻页效果
         if (config.flipMode) {
-            if (newViewPage(distance)) {
+            //可视区页面
+            if (distance === viewOffset) {
                 const cur = Xut.sceneController.containerObj('current')
-                cur.vm.$globalEvent.setAnimComplete($node);
+                cur.vm.$globalEvent.transitionendComplete(node, node.getAttribute('data-view'))
             }
         } else {
-            $node.css(transitionDuration, speed + "ms")
+            node.style[transitionDuration] = speed + 'ms'
         }
-
     }
 }
 
@@ -69,10 +58,10 @@ const toTranslate3d = ($node, distance, speed) => {
  * 复位
  * @return {[type]} [description]
  */
-const reset = ($node) => {
-    if ($node) {
-        $node.css(transitionDuration, '');
-        $node.css(transform, 'translate(0px,0px)' + translateZ);
+const reset = (node) => {
+    if (node) {
+        node.style[transform] = `translate(0px,0px) ${translateZ}`
+        node.style[transitionDuration] = ''
     }
 }
 
@@ -123,9 +112,6 @@ export const translation = {
  */
 export function fix($node, action) {
     const viewWidth = config.viewSize.width
-    const translate = action === 'prevEffect' 
-        ? createTranslate(-viewWidth) 
-        : createTranslate(viewWidth)
+    const translate = action === 'prevEffect' ? createTranslate(-viewWidth) : createTranslate(viewWidth)
     $node.css(transform, translate)
 }
-

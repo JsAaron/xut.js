@@ -62,7 +62,7 @@ export default function(instance) {
                 createRelated.preforkComplete()
 
                 //绑定缩放事件
-                config.saleMode && instance.pageType === 'page' && Pinch(containsElement[0])
+                config.saleMode && instance.pageType === 'page' && Pinch($containsElement[0])
 
                 //视觉差不管
                 if (instance.isMaster) {

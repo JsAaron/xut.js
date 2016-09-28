@@ -134,29 +134,28 @@ _extend(View, {
             var curVmPage;
             if (curVmPage = current.vm.$curVmPage) {
                 if (curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
-                    console.log('无效的重复触发')
+                    console.log('过滤多次重复点击加载页面')
                     return
                 }
             }
         }
 
-        //==================场景内部跳转===============================
-        //
-        //  节相同，章与章的跳转
-        //  用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
-        //
-        //=============================================================
+        /**
+         * 场景内部跳转
+         * 节相同，章与章的跳转
+         * 用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
+         * @return {[type]}            [description]
+         */
         if (userAssign && current && current.scenarioId === seasonId) {
             View.GotoSlide(seasonId, chapterId)
             return
         }
 
-        //==================场景外部跳转===============================
-        //
-        //  节与节的跳转,需要对场景的处理
-        //
-        //=============================================================
 
+        /**
+         * 场景外部跳转
+         * 节与节的跳转,需要对场景的处理
+         */
         //清理热点动作
         current && current.vm.$suspend();
 
@@ -167,7 +166,9 @@ _extend(View, {
         }
 
 
-        //================加载新的场景=================
+        /**
+         * 加载新的场景
+         */
 
         //读酷启动时不需要忙碌光标
         if (window.DUKUCONFIG && options.main) {
@@ -208,17 +209,17 @@ _extend(View, {
          */
         var sectionRang = Xut.data.query('sectionRelated', seasonId)
         var barInfo = sectionRang.toolbar //场景工具栏配置信息
+        var pageTotal = sectionRang.length
 
-
-        var pageTotal = sectionRang.length 
-
-        //通过chapterId转化为实际页码指标
-        //season 2
-        //       {
-        //          chapterId : 1  => 0
-        //          chpaterId : 2  => 1
-        //       }
-        //
+        /**
+         * 通过chapterId转化为实际页码指标
+         * season 2 {
+         *     chapterId : 1  => 0
+         *     chpaterId : 2  => 1
+         *  }
+         * [description]
+         * @return {[type]} [description]
+         */
         var parseInitIndex = () => {
             return chapterId ? (() => {
                 //如果节点内部跳转方式加载,无需转化页码
@@ -272,7 +273,6 @@ _extend(View, {
             }
         }
 
-
         //主场景判断（第一个节,因为工具栏的配置不同）
         if (options.main || sceneController.mianId === seasonId) {
             //清理缓存
@@ -282,6 +282,7 @@ _extend(View, {
             //是否主场景
             data.isMain = true;
         }
+
         new SceneFactory(data);
 
     }

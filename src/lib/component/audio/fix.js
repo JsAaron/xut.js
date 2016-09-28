@@ -42,6 +42,7 @@ export function getAudio() {
     var audio = audioes[index++]
     if (!audio) {
         index = 0
+        return getAudio()
     }
     return audio
 }

@@ -651,6 +651,8 @@ export default function overrideApi(vm) {
      * @return {[type]}
      */
     _.each([
+        "openFlip",
+        "closeFlip",
         "closeSwipe",
         "openSwipe"
     ], function(operate) {

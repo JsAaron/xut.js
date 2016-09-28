@@ -96,7 +96,7 @@ function addCursor(eventName, $contentNode) {
  * @param  {[type]} data      [description]
  * @return {[type]}           [description]
  */
-function _bind(eventDrop, data) {
+function bindEvnet(eventDrop, data) {
     var dragObj, eventHandler, eventReference, eventContext, eventName, supportSwipe
 
     eventContext = data.eventContext
@@ -149,7 +149,7 @@ function matchEvent(data) {
     var eventDrop = data.eventDrop
 
     //拖动,引用,回调
-    var eventObj = _bind(eventDrop, data)
+    var eventObj = bindEvnet(eventDrop, data)
 
     //拖动,拖拽对象处理
     //动作初始化

@@ -181,11 +181,21 @@
     var translateZ = hasPerspective ? ' translateZ(0)' : ''
     var maskBoxImage = _prefixStyle('mask-box-image')
 
+
+    var reqAnimationFrame = window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function(callback) { window.setTimeout(callback, 1000 / 60); };
+
     /**
      * 样式style支持
      * @type {Object}
      */
     Xut.extend(Xut.style, {
+
+        reqAnimationFrame: reqAnimationFrame,
 
         /**
          * 不支持蒙版

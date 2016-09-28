@@ -6,7 +6,7 @@
 
 import { bindContentEvent } from '../event/event'
 import { bindEvent, offEvent } from '../../../util/event'
-
+import { config } from '../../../config/index'
 import {
     _set,
     _get
@@ -17,7 +17,7 @@ let defaultFontSize
 let baseValue1
 let baseValue2
 let baseValue3
-let docEl = document.document$contentNode
+let docEl = document.documentElement
 let whiteObject = {
     "rgb(255, 255, 255)": true,
     "#ffffff": true,
@@ -28,7 +28,8 @@ let whiteObject = {
 }
 
 function setOption() {
-    var proportion = Xut.config.proportion.width;
+
+    let defaultFontSize
 
     try {
         defaultFontSize = parseInt(getComputedStyle(docEl).fontSize)
@@ -37,7 +38,7 @@ function setOption() {
     }
 
     //实际字体大小
-    defaultFontSize = defaultFontSize * proportion;
+    defaultFontSize = defaultFontSize * config.proportion.width;
 
     //设置默认rem
     docEl.style.fontSize = defaultFontSize + "px"
@@ -171,7 +172,7 @@ HtmlBox.prototype = {
         var iscrollName = "htmlbox_iscroll_" + contentId;
 
         //缓存名
-        this.storageName = boxName + Xut.config.appId;
+        this.storageName = boxName + config.appId;
 
         //获取保存的字体值
         var storageValue = _get(this.storageName)

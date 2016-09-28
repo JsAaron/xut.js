@@ -132,7 +132,7 @@ let externalFile = (wrapObj, svgCallback) => {
 //  dydCreate //重要判断,动态创建
 //
 //=======================================================
-export function structure(callback, data, context) {
+export default function structure(callback, data, context) {
     var content,
         contentId,
         wrapObj,

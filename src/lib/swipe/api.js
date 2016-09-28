@@ -8,6 +8,8 @@ import {
 export default function api(Swipe) {
 
 
+    // Swipe.prototype
+
     /**
      * 模拟完成状态调用
      * @return {[type]} [description]
@@ -17,6 +19,23 @@ export default function api(Swipe) {
             this._restore()
             this._unlock()
         })
+    }
+
+
+    /**
+     * 停止翻页
+     * @return {[type]} [description]
+     */
+    Swipe.prototype.openFlip = function() {
+        this._unlock();
+    }
+
+    /**
+     * 启动翻页
+     * @return {[type]} [description]
+     */
+    Swipe.prototype.closeFlip = function() {
+        this._lock();
     }
 
 
@@ -91,7 +110,7 @@ export default function api(Swipe) {
      * 页面需要拼接
      */
     Swipe.prototype.setPointer = function(target, pagetotal) {
-        this._pagePointer = initPointer(target, pagetotal || this.pagetotal)
+        this.pagePointer = initPointer(target, pagetotal || this.pagetotal)
     }
 
 
@@ -100,7 +119,7 @@ export default function api(Swipe) {
      * @return {[type]} [description]
      */
     Swipe.prototype.getPointer = function() {
-        return this._pagePointer
+        return this.pagePointer
     }
 
 
@@ -116,8 +135,7 @@ export default function api(Swipe) {
         //如果还在翻页中
         if (this._fliplock) return
 
-        let data
-        let currIndex = this._hindex //当前页面
+        const currIndex = this._hindex //当前页面
 
         //相邻页
         switch (targetIndex) {
@@ -142,12 +160,12 @@ export default function api(Swipe) {
         }
 
         //算出是相关数据
-        data = calculationIndex(currIndex, targetIndex, this.pagetotal)
+        const data = calculationIndex(currIndex, targetIndex, this.pagetotal)
 
         //更新页码索引
         this._updataPointer(data)
 
-        data.pagePointer = this._pagePointer
+        data.pagePointer = this.pagePointer
 
         this.$emit('onJumpPage', data)
     }
@@ -167,11 +185,11 @@ export default function api(Swipe) {
 
 
     /**
-     * 设置动画完成
+     * 调用动画完成
      * @param {[type]} element [description]
      */
-    Swipe.prototype.setAnimComplete = function(element) {
-        this._distributed(element[0])
+    Swipe.prototype.transitionendComplete = function(...arg) {
+        this._distributed(...arg)
     }
 
 

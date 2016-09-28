@@ -32,9 +32,7 @@ const configMultiple = (options) => {
         //1 数据库定义
         //2 系统优化
         options.multiplePages =
-            options.flipMode
-            ? options.flipMode
-            : options.pageMode ? true : false
+            options.flipMode ? options.flipMode : options.pageMode ? true : false
     }
 }
 
@@ -82,27 +80,21 @@ class Mediator extends Observer {
     constructor(parameter) {
 
         super()
- 
+
         const vm = this
 
         //配置文件
         const options = vm.options = _.extend({
-            //翻页模式
-            //根据页码数决定,主要是优化一些代码
-            //true  是多页面模式,支持翻页滑动
-            //false 单页面模式,不能翻页，只能跳转
-            'pageMode': false,
-
             //是否多场景加载
             //单页场景 false
             //多场景   true
             'multiScenario': false,
-
             //是否为连续页面
             //通过pageMode的参数定义
             'multiplePages': false
         }, parameter, {
-            flipMode: Xut.config.flipMode
+            flipMode: Xut.config.flipMode,
+            pageMode: Xut.config.pageMode
         })
 
         //配置多页面参数
@@ -181,8 +173,8 @@ class Mediator extends Observer {
          * 翻页动画完成回调
          * @return {[type]}              [description]
          */
-        $globalEvent.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
-            $dispatcher.complete(direction, pagePointer, unfliplock, isQuickTurn)
+        $globalEvent.$watch('onComplete', (...arg) => {
+            $dispatcher.complete(...arg)
         });
 
 

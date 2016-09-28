@@ -1,37 +1,58 @@
-var reqAnimationFrame = (function() {
+const reqAnimationFrame = (function() {
     return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function(callback) {
         window.setTimeout(callback, 1000 / 60);
     }
 })();
 
+const transform = Xut.style.transform
+const translateZ = Xut.style.translateZ
+
 /**
  * 缩放平移
- * @param {[type]} $node [description]
+ * @param {[type]} node [description]
  */
-export default function Pinch($node) {
-console.log($node)
-    var mc = new Hammer.Manager($node);
+export default function Pinch(node) {
 
-    const START_X = Math.round((window.innerWidth - $node.offsetWidth) / 2);
-    const START_Y = Math.round((window.innerHeight - $node.offsetHeight) / 2);
+
+    var mc = new Hammer.Manager(node);
+
+
+    const START_X = Math.round((window.innerWidth - node.offsetWidth) / 2);
+    const START_Y = Math.round((window.innerHeight - node.offsetHeight) / 2);
+
+    var currentX = START_X;
+    var currentY = START_Y;
 
     var ticking = false;
 
 
-    mc.add(new Hammer.Pan({
-        threshold: 0,
-        pointers: 0
-    }));
+    // mc.add(new Hammer.Pan({
+    //     threshold: 0,
+    //     pointers: 0
+    // }));
 
-    mc.add(new Hammer.Pinch({
-        threshold: 0
-    })).recognizeWith([mc.get('pan')]);
+    // mc.add(new Hammer.Pinch({
+    //     threshold: 0
+    // })).recognizeWith([mc.get('pan')]);
 
+
+    var pan = new Hammer.Pan();
+    var pinch = new Hammer.Pinch();
+    mc.add([pinch])
 
     mc.on("pinchstart pinchmove", onPinch);
+    mc.on("pinchstart", function() {
+        if (!mc.get('pan')) {
+            mc.add([pan])
+            mc.on("panstart panmove", onPan);
+            mc.on("panend", onPanEnd)
+            pan.recogizeWith(pinch)
+            // Xut.Application.closeFlip()
+        }
+    })
 
 
-    const transform = {
+    const data = {
         translate: {
             x: START_X,
             y: START_Y
@@ -42,38 +63,55 @@ console.log($node)
     var initScale = 1;
 
 
-    function update$nodeTransform() {
-        var value = [
-            // 'translate3d(' + transform.translate.x + 'px, ' + transform.translate.y + 'px, 0)',
-            'scale(' + transform.scale + ', ' + transform.scale + ')'
-        ];
-        value = value.join(" ");
-        // $node.textContent = value;
-        $node.style.webkitTransform = value;
-        $node.style.mozTransform = value;
-        $node.style.transform = value;
-        ticking = false;
+    function updatenodeTransform() {
+        node.style[transform] =
+            `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
+            scale(${data.scale},${data.scale})`
+        ticking = false
     }
 
 
-    function request$nodeUpdate() {
+    function requestnodeUpdate() {
         if (!ticking) {
-            reqAnimationFrame(update$nodeTransform);
+            reqAnimationFrame(updatenodeTransform);
             ticking = true;
         }
     }
 
 
     function onPinch(ev) {
+        ev.srcEvent.stopPropagation()
         if (ev.type == 'pinchstart') {
-            initScale = transform.scale || 1;
+            initScale = data.scale || 1;
         }
-        $node.className = '';
-        transform.scale = initScale * ev.scale
-       	if(transform.scale<1){
-       		transform.scale = 1
-       	}
-        request$nodeUpdate();
+        node.className = '';
+        data.scale = initScale * ev.scale
+        if (data.scale < 1) {
+            data.scale = 1
+        }
+        requestnodeUpdate();
+    }
+
+
+    function onPan(ev) {
+        ev.srcEvent.stopPropagation()
+        if (currentX != START_X || currentY != START_Y) {
+            data.translate = {
+                x: currentX + ev.deltaX,
+                y: currentY + ev.deltaY
+            };
+        } else {
+            data.translate = {
+                x: START_X + ev.deltaX,
+                y: START_Y + ev.deltaY
+            };
+        }
+        requestnodeUpdate();
+    }
+
+    function onPanEnd() {
+        currentX = data.translate.x
+        currentY = data.translate.y
     }
 
 }
