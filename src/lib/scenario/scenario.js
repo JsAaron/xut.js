@@ -142,22 +142,21 @@ export class SceneFactory {
             return elements.find('.xut-control-bar')
         }
 
-        /**
-         * 填充配置
-         * @return {[type]} [description]
-         */
-        const fillConfig = function(data) {
-            if (_.isUndefined(config.pageMode)) {
-                config.pageMode = data.pageMode
-            }
-            if (_.isUndefined(config.toolType)) {
-                config.toolType = data.toolType
-            }
-        }
 
         //主场景工具栏设置
         if (this.isMain) {
-            fillConfig(pMainBar(scenarioId, pageTotal))
+
+            let mainBarConfig = pMainBar(scenarioId, pageTotal)
+
+            //主场工具栏设置
+            if (_.isUndefined(config.toolType.mian)) {
+                config.toolType.mian = mainBarConfig.toolType
+            }
+            //主场景模式
+            if (_.isUndefined(config.pageMode)) {
+                config.pageMode = mainBarConfig.pageMode
+            }
+
             if (config.scrollPaintingMode) {
                 //word模式,自动启动工具条
                 this.sToolbar = new BookBar({
@@ -168,7 +167,7 @@ export class SceneFactory {
             }
             //如果工具拦提供可配置
             //或者config.pageMode 带翻页按钮
-            else if (_.some(config.toolType) || config.pageMode ===2) {
+            else if (_.some(config.toolType.mian) || config.pageMode === 2) {
                 //普通模式
                 this.sToolbar = new MainBar({
                     container   : elements,
@@ -176,24 +175,35 @@ export class SceneFactory {
                     pageTotal   : pageTotal,
                     currentPage : pageIndex + 1,
                     pageMode    : config.pageMode,
-                    toolType    : config.toolType
+                    toolType    : config.toolType.mian
                 })
             }
         }
         //副场景
         else {
-            fillConfig(pDeputyBar(this.barInfo, pageTotal))
-            if (_.some(config.toolType)) {
+
+            //副场工具栏配置
+            let deputyBarConfig = pDeputyBar(this.barInfo, pageTotal)
+
+            if (_.isUndefined(config.toolType.deputy)) {
+                config.toolType.deputy = deputyBarConfig.toolType
+            }
+            if (_.isUndefined(config.pageMode)) {
+                config.pageMode = deputyBarConfig.pageMode
+            }
+
+            if (_.some(config.toolType.deputy)) {
                 this.cToolbar = new DeputyBar({
                     id          : scenarioId,
                     container   : elements,
-                    toolType    : config.toolType,
+                    toolType    : config.toolType.deputy,
                     pageTotal   : pageTotal,
                     currentPage : pageIndex,
                     pageMode    : config.pageMode
                 })
             }
         }
+
     }
 
     /**

@@ -89,7 +89,7 @@ export default {
      * 1 禁止滑动,直接快速切换页面(通过左右按键快速切换页面)
      * @type {Number}
      */
-    flipMode: DEFAULT,//默认不设置，待数据库填充。如设置,数据库设置忽略
+    flipMode: DEFAULT, //默认不设置，待数据库填充。如设置,数据库设置忽略
 
     /**
      *  仅做测试处理，因为每个section都可以对应配置pageMode参数
@@ -118,7 +118,10 @@ export default {
      *   4  场景工具栏   - 显示顶部小圆点式标示
      *   填充数组格式，可以多项选择[1,2,3,4]
      */
-    toolType: DEFAULT, //默认不设置，待数据库填充。如设置,数据库设置忽略
+    toolType: { //默认不设置，待数据库填充。如设置,数据库设置忽略
+        mian: DEFAULT,  //主场景，系统工具栏
+        deputy: DEFAULT //副场景，函数工具栏
+    },
 
     /**
      * 调试模式
