@@ -138,12 +138,25 @@ let svgContent = (data, wrapObj) => {
             //布局位置
             let marginleft = wrapObj['backMode'] ? data.scaleLeft - data.scaleBackLeft : 0;
             let margintop = wrapObj['backMode'] ? data.scaleTop - data.scaleBackTop : 0;
-            temp = '<div style="width:{0}; height:{1};margin-left:{2}px;margin-top:{3}px;">{4}</div>';
 
             if (data.isScroll) {
-                restr = String.format(temp, svgRealWidth + 'px', svgRealHeight + 'px', marginleft, margintop, svgstr);
+                restr = String.styleFormat(
+                    `<div style="width:${svgRealWidth}px;
+                                     height:${svgRealHeight}px;
+                                     margin-left:${marginleft}px;
+                                     margin-top:${margintop}px;">
+                                     ${svgstr}
+                     </div>`
+                )
             } else {
-                restr = String.format(temp, '100%', '100%', marginleft, margintop, svgstr);
+                restr = String.styleFormat(
+                    `<div style="width:100%;
+                                     height:100%;
+                                     margin-left:${marginleft}px;
+                                     margin-top:${margintop}px;">
+                                     ${svgstr}
+                    </div>`
+                )
             }
         } else {
             restr += svgstr
@@ -160,14 +173,14 @@ let svgContent = (data, wrapObj) => {
  * @return {[type]}         [description]
  */
 let createWapper = (data, wrapObj) => {
-    let wapper, actName, offset, visibility,
-        backwidth, backheight, backleft, backtop,
-        zIndex = data['zIndex'],
-        id = data['_id'],
-        containerName = wrapObj.containerName,
-        pid = wrapObj.pid,
-        makeId = wrapObj.makeId,
-        background = data.background ? 'background-image: url(' + Xut.config.pathAddress + data.background + ');' : '';
+    let wapper
+    let backwidth, backheight, backleft, backtop
+    let zIndex = data['zIndex']
+    let id = data['_id']
+    let containerName = wrapObj.containerName
+    let pid = wrapObj.pid
+    let makeId = wrapObj.makeId
+    let background = data.background ? 'background-image: url(' + Xut.config.pathAddress + data.background + ');' : ''
 
     //背景尺寸优先
     if (data.scaleBackWidth && data.scaleBackHeight) {
@@ -187,7 +200,7 @@ let createWapper = (data, wrapObj) => {
     //content.visible = 0
     //如果为1 就隐藏改成hidden
     //05.1.14
-    visibility = 'visible'
+    let visibility = 'visible'
     if (data.visible) {
         visibility = 'hidden';
     }
@@ -196,27 +209,41 @@ let createWapper = (data, wrapObj) => {
     //2015.12.29
     //如果是html内容
     if (wrapObj.isJs) {
-        //正常content类型
-        wapper = '<div id="{0}"' +
-            ' data-behavior="click-swipe"' +
-            ' style="overflow:hidden;width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};visibility:{6};background-size:100% 100%;{10}">' +
-            ' <div id="{7}" style="width:{8}px;position:absolute;">';
-        return String.format(wapper,
-            containerName, backwidth, backheight, backtop, backleft, zIndex, visibility,
-            makeId('contentWrapper'), backwidth, backheight, background
-        );
+        wapper = `<div id="${containerName}"
+                       data-behavior="click-swipe"
+                       style="overflow:hidden;
+                              width:${backwidth}px;
+                              height:${backheight}px;
+                              top:${backtop}px;
+                              left:${backleft}px;
+                              position:absolute;
+                              z-index:${zIndex};
+                              visibility:${visibility};
+                              background-size:100% 100%;{10}">
+                 <div id="${makeId('contentWrapper')}"
+                      style="width:${backwidth}px;position:absolute;">`
+        return String.styleFormat(wapper)
     }
 
     //正常content类型
-    wapper = '<div id="{0}"' +
-        ' data-behavior="click-swipe"' +
-        ' style="overflow:hidden;width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};visibility:{6};">' +
-        ' <div id="{7}" style="width:{8}px;height:{9}px;{10}position:absolute;background-size:100% 100%;">';
+    wapper = `<div id="${containerName}"
+                   data-behavior="click-swipe"
+                   style="overflow:hidden;
+                          width:${backwidth}px;
+                          height:${backheight}px;
+                          top:${backtop}px;
+                          left:${backleft}px;
+                          position:absolute;z-index:
+                          ${zIndex};
+                          visibility:${visibility}">
+              <div id="${makeId('contentWrapper')}"
+                   style="width:${backwidth}px;
+                          height:${backheight}px;
+                          ${background}
+                          position:absolute;
+                          background-size:100% 100%;">`
 
-    return String.format(wapper,
-        containerName, backwidth, backheight, backtop, backleft, zIndex, visibility,
-        makeId('contentWrapper'), backwidth, backheight, background
-    );
+    return String.styleFormat(wapper)
 }
 
 
@@ -256,11 +283,11 @@ let createContent = (data, wrapObj) => {
  * @return {[type]}          [description]
  */
 export function createDom(data, wrapObj) {
-    let restr = '';
+    let restr = ''
     //创建包装容器
-    restr += createWapper(data, wrapObj);
+    restr += createWapper(data, wrapObj)
     //创建内容
-    restr += createContent(data, wrapObj);
-    restr += "</div></div>";
-    return restr;
+    restr += createContent(data, wrapObj)
+    restr += "</div></div>"
+    return restr
 }

@@ -75,9 +75,13 @@ export default function(activitProto) {
 
         //增加卷滚条
         if (contentDas.isScroll) {
-            //去掉高度，因为有滚动文本框
-            $contentNode.find(">").css("height", "")
-            this.relatedCallback.iscrollHooks.push(makeUseFunction($contentNode[0]));
+            //必须保证svg有数据
+            if ($contentNode.find('svg').text()) {
+                //去掉高度，因为有滚动文本框
+                $contentNode.children().css('height', '')
+                this.relatedCallback.iscrollHooks.push(makeUseFunction($contentNode[0]));
+            }
+
         }
 
         //如果是图片则补尝允许范围内的高度
