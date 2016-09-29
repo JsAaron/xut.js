@@ -22,8 +22,8 @@ import {
     getRealProportion
 } from '../visuals/proportion.config'
 
-import improtMode from './mode-type'
-import improtData from './data-type'
+import improtMode from './mode.type'
+import improtData from './data.type'
 
 const plat = Xut.plat
 const isIphone = Xut.plat.isIphone

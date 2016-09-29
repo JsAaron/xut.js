@@ -219,9 +219,11 @@ export default function overrideApi(vm) {
     /**
      * 更新页码
      * @param {[type]} point [description]
+     *   parentIndex  父索引
+     *   subIndex     子索引
      */
-    View.pageUpdate = function(pageIndex) {
-        vm.$emit('change:pageUpdate', pageIndex)
+    View.pageUpdate = function(...arg) {
+        vm.$emit('change:pageUpdate', ...arg)
     }
 
     /**

@@ -1,6 +1,6 @@
 ﻿//Pre initialized
 import { config } from './config/index'
-import { api } from './global-api'
+import { api } from './global.api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { fixAudio } from './component/audio/fix'

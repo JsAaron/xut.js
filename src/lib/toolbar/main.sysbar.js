@@ -216,8 +216,10 @@ export default class sysBar extends Bar {
      * 更新页码指示
      * @return {[type]} [description]
      */
-    updatePointer(pageIndex) {
-        this.curTips && this.curTips.html(pageIndex + 1);
+    updatePointer({
+        parentIndex
+    }) {
+        this.curTips && this.curTips.html(parentIndex + 1);
     }
 
     _bindButtonsEvent(bar) {

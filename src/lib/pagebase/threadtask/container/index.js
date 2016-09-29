@@ -7,7 +7,6 @@
  *      3 创建失败
  */
 import { config } from '../../../config/index'
-import nextTick from '../../../util/nexttick'
 import { hasValue } from '../../../util/lang'
 
 const TANSFROM = Xut.style.transform
@@ -120,7 +119,7 @@ export default function(base, pageData, taskCallback) {
         $pseudoElement = $pageNode.find('div');
     }
 
-    nextTick({
+    Xut.nextTick({
         container: base.$rootNode,
         content: $pageNode,
         position: getStyle.direction === 'before' ? 'first' : 'last'

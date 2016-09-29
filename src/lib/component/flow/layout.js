@@ -136,7 +136,7 @@ export default function initFlows() {
             const tag = node.id
             const chpaterId = tag.match(/\d/)[0]
             let count = resolveCount($(node))
-            flowCounts[seasonsId][chpaterId] = parseInt(count)
+            flowCounts[seasonsId][chpaterId] = Number(count)
         })
     })
 

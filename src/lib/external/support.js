@@ -5,22 +5,27 @@
 ;
 (function() {
 
+    // Browser environment sniffing
+    var inBrowser =
+        typeof window !== 'undefined' &&
+        Object.prototype.toString.call(window) !== '[object Object]'
+
     //在读酷pc端 navigator的值被改写过了!!
     //navigator.appVersion: "xxt 1.0.5260.29725"
-    var ua = navigator.userAgent
-    var uv = navigator.appVersion
-    var isAndroid = (/android/gi).test(uv)
-    var isIphone = (/iphone|ipod/gi).test(ua)
-    var isIpad = (/ipad/gi).test(ua)
+    var UA = inBrowser && window.navigator.userAgent.toLowerCase()
+    var UV = inBrowser && window.navigator.appVersion.toLowerCase()
+    var isAndroid = UA && UA.indexOf('android') > 0
+    var isIphone = (/iphone|ipod/gi).test(UA)
+    var isIpad = (/ipod/gi).test(UA)
     var isIOS = isIphone || isIpad
-    var isIOS7 = isIOS && (/OS\s7/gi).test(ua)
+    var isIOS7 = isIOS && (/os\s7/gi).test(UA)
     var has3d = 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()
 
     //webkit内核
-    var isWebKit = /AppleWebKit/ig.test(uv)
+    var isWebKit = /applewebKit/ig.test(UV)
 
     //微信
-    var isWeiXin = /MicroMessenger/ig.test(uv)
+    var isWeiXin = /micromessenger/ig.test(UV)
 
     //针对win8的处理
     var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
@@ -32,7 +37,7 @@
     var SUPPORT_MOUSE = ('onmousedown' in window)
 
     //移动端仅仅只支持touch
-    var SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH && MOBILE_REGEX.test(navigator.userAgent);
+    var SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH && MOBILE_REGEX.test(UA);
 
     //判断是否为浏览器
     //http://localhost:12344/index.html
@@ -110,6 +115,12 @@
 
     var isBrowser = boolBrowser ? boolBrowser : !SUPPORT_ONLY_TOUCH
 
+    //有hasMutationObserverBug
+    var iosVersionMatch = isIOS && UA.match(/os ([\d_]+)/)
+    var iosVersion = iosVersionMatch && iosVersionMatch[1].split('_')
+    // detecting iOS UIWebView by indexedDB
+    var hasMutationObserverBug = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
+
     /**
      * 平台支持
      * @type {Object}
@@ -121,6 +132,8 @@
         isIpad: isIpad,
         isIOS: isIOS,
         isIOS7: isIOS7,
+
+        hasMutationObserverBug:hasMutationObserverBug,
 
         /**
          * 不能自动播放媒体

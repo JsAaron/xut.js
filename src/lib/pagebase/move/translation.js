@@ -36,7 +36,7 @@ const createTranslate = (offset) => {
 const toTranslate3d = (node, distance, speed, viewOffset) => {
     distance = config.virtualMode ? distance / 2 : distance
     if (node) {
-        reqAnimationFrame(function() {
+        Xut.nextTick(function() {
             node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
         })
         //修正flipMode切换页面的处理

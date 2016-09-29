@@ -2,10 +2,8 @@
 import {
     suspendHandles,
     promptMessage
-} from '../../global-stop'
+} from '../../global.stop'
 
-
-import nextTick from '../../util/nexttick'
 import { config } from '../../config/index'
 
 
@@ -36,7 +34,7 @@ export default function(Action) {
         //构建子文档的容器
         wapper = this.$wapper = this._createWapper();
 
-        nextTick({
+        Xut.nextTick({
             'container': $(this.rootNode),
             'content': wapper
         }, function() {

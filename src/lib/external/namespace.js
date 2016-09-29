@@ -44,7 +44,6 @@ Xut.extend = function(target, source) {
     return target
 }
 
-
 Xut.extend({
 
     /**
@@ -98,5 +97,3 @@ String.format = function(format) {
 String.styleFormat = function(format) {
     return format.replace(/\s+/g, " ")
 }
-
-

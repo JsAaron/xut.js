@@ -377,14 +377,14 @@ export class Dispatcher {
      *   2.翻页完毕
      */
     autoRun(para) {
-        let options       = this.options
-        let pagePointer   = this.pagePointer
-        let prevIndex     = pagePointer.leftIndex
-        let currIndex     = pagePointer.currIndex
-        let nextIndex     = pagePointer.rightIndex
-        let action        = para ? para.action : ''
+        let options = this.options
+        let pagePointer = this.pagePointer
+        let prevIndex = pagePointer.leftIndex
+        let currIndex = pagePointer.currIndex
+        let nextIndex = pagePointer.rightIndex
+        let action = para ? para.action : ''
         let createPointer = para ? para.createPointer : ''
-        let direction     = this.direction
+        let direction = this.direction
 
         //暂停的页面索引autorun
         let suspendIndex = action === 'init' ? '' : direction === 'next' ? prevIndex : nextIndex
@@ -443,7 +443,6 @@ export class Dispatcher {
             }
         })
 
-
         /**
          * 触发自动通知
          * @type {[type]}
@@ -453,7 +452,11 @@ export class Dispatcher {
         switch (action) {
             case 'init':
                 //更新页码标示
-                vm.$emit('change:pageUpdate', currIndex)
+                vm.$emit('change:pageUpdate', {
+                    action,
+                    parentIndex: currIndex,
+                    direction
+                })
                 resetToolbar.call(this)
                 setTimeout(function() {
                     $(".xut-start-page").hide().remove();
@@ -462,7 +465,11 @@ export class Dispatcher {
                 break;
             case 'toPage':
                 //更新页码标示
-                vm.$emit('change:pageUpdate', currIndex)
+                vm.$emit('change:pageUpdate', {
+                    action,
+                    parentIndex: currIndex,
+                    direction
+                })
                 resetToolbar.call(this)
                 break;
         }
@@ -567,9 +574,13 @@ export class Dispatcher {
 
         //更新页码
         if (action === 'flipOver') {
-            setTimeout(() => {
-                this.vm.$emit('change:pageUpdate', direction === 'next' ? rightIndex : leftIndex)
-            }, 0)
+            Xut.nextTick(() => {
+                this.vm.$emit('change:pageUpdate', {
+                    action,
+                    parentIndex: direction === 'next' ? rightIndex : leftIndex,
+                    direction
+                })
+            })
         }
     }
 

@@ -7,7 +7,6 @@
  */
 
 import { config } from '../config/index'
-import nextTick from '../util/nexttick'
 
 let msgBox
 let toolTip
@@ -41,7 +40,7 @@ function show(opts) {
         toolTip.empty().show();
     }
 
-    nextTick({
+    Xut.nextTick({
         'container': toolTip,
         'content': content
     }, hide);

@@ -1,6 +1,6 @@
 import { clearVideo } from '../../../component/video/manager'
 import { config } from '../../../config/index'
-import nextTick from '../../../util/nexttick'
+
 
 /**
  * 创建iframe零件包装器
@@ -10,7 +10,7 @@ export default class iframeWidget {
     constructor(data) {
         _.extend(this, data)
         this._$wapper = this._createWapper()
-        nextTick({
+        Xut.nextTick({
             'container': this.rootNode,
             'content': this._$wapper
         }, () => {

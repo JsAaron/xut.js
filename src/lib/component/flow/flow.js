@@ -30,7 +30,7 @@ export default class Flow {
             dataNode,
             chapterId,
             callback($container) {
-                self._init($container, getFlowCount(seasonId, chapterId))
+                self._init($container, seasonId, chapterId)
                 successCallback()
             }
         })
@@ -43,8 +43,9 @@ export default class Flow {
      * @param  {[type]} $content   [description]
      * @return {[type]}            [description]
      */
-    _init($container, pagesCount) {
+    _init($container, seasonId, chapterId) {
 
+        const pagesCount = getFlowCount(seasonId, chapterId)
         const flowView = getFlowView()
 
         const MIN = 0
@@ -127,6 +128,7 @@ export default class Flow {
                     if (config.visualMode === 3) {
                         distance -= viewLeft
                     }
+
                     //后边界前移反弹
                     View.MovePage(distance, speed, this.direction, action)
                 }
@@ -176,6 +178,16 @@ export default class Flow {
                     moveDistance = direction === 'next' ?
                         (-flipWidth * this._hindex - this._hindex) :
                         -(flipWidth * this._hindex + this._hindex)
+                }
+
+                //更新页码
+                if (action === 'flipOver') {
+                    Xut.View.pageUpdate({
+                        parentIndex: initIndex,
+                        sonIndex: swipe.getHindex() + 1,
+                        hasSon: true,
+                        direction
+                    })
                 }
 
                 translation[action](container, moveDistance, speed)

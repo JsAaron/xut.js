@@ -19,12 +19,74 @@ const MutationObserver = window.MutationObserver ||
 const implementation = DOC.implementation.hasFeature("MutationEvents", "2.0")
 
 
-export default function nextTick({
+/**
+ * Defer a task to execute it asynchronously. Ideally this
+ * should be executed as a microtask, so we leverage
+ * MutationObserver if it's available, and fallback to
+ * setTimeout(0).
+ *
+ * @param {Function} cb
+ * @param {Object} ctx
+ */
+const _nextTick = (function() {
+    var callbacks = []
+    var pending = false
+    var timerFunc
+
+    function nextTickHandler() {
+        pending = false
+        var copies = callbacks.slice(0)
+        callbacks = []
+        for (var i = 0; i < copies.length; i++) {
+            copies[i]()
+        }
+    }
+
+    if (typeof MutationObserver !== 'undefined' && !Xut.plat.hasMutationObserverBug) {
+        var counter = 1
+        var observer = new MutationObserver(nextTickHandler)
+        var textNode = document.createTextNode(counter)
+        observer.observe(textNode, {
+            characterData: true
+        })
+        timerFunc = function() {
+            counter = (counter + 1) % 2
+            textNode.data = counter
+        }
+    } else {
+        // webpack attempts to inject a shim for setImmediate
+        // if it is used as a global, so we have to work around that to
+        // avoid bundling unnecessary code.
+        const context = inBrowser ? window : typeof global !== 'undefined' ? global : {}
+        timerFunc = context.setImmediate || setTimeout
+    }
+    return function(cb, ctx) {
+        var func = ctx ? function() { cb.call(ctx) } : cb
+        callbacks.push(func)
+        if (pending) return
+        pending = true
+        timerFunc(nextTickHandler, 0)
+    }
+})()
+
+
+const nextTick = function({
     container,
     content,
     position,
     delay = 0
 } = {}, callback, context) {
+
+    //如果只提供一个回到函数
+    if (arguments.length === 1 && typeof arguments[0] === 'function') {
+        callback = arguments[0]
+        if (typeof callback === 'function') {
+            return _nextTick(callback)
+        }
+        console.log('nextTick: 参数提供错误');
+        return
+    }
+
 
     const animatId = 'T' + (Math.random() * 10000 << 1)
     let tick = DOC.createElement('input')
@@ -40,7 +102,7 @@ export default function nextTick({
     }
 
     if (container.nodeType !== 1) {
-        console.log('container must be HTMLLIElement ');
+        console.log('nextTick: container must be HTMLLIElement ');
         return;
     }
 
@@ -149,3 +211,7 @@ export default function nextTick({
         }
     }
 }
+
+Xut.nextTick = nextTick
+
+export default nextTick

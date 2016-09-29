@@ -5,7 +5,7 @@
 html,
 body {
     height: 100%;
-    font-size:125%
+    font-size: 125%
 }
 
 
@@ -149,6 +149,7 @@ video {
 
 
 /*工具栏*/
+
 .xut-control-bar {
     position: absolute;
     z-index: 9999;
@@ -158,12 +159,16 @@ video {
     font-size: 1rem;
 }
 
+
 /*工具栏:导航*/
+
 .xut-control-navbar {
     background-image: url(../images/icons/directory.png);
 }
 
+
 /*工具栏,标题*/
+
 .xut-control-title {
     text-align: center;
     font-weight: bold;
@@ -173,6 +178,7 @@ video {
 
 
 /*工具栏：页码场景顶部小圆样式结束*/
+
 .xut-control-pageindex {
     font-family: sans-serif;
     color: #fff;
@@ -181,12 +187,14 @@ video {
 
 
 /*工具栏：nav导航按钮，收起工具栏*/
+
 .xut-control-nav-hide {
     background-image: url(../images/icons/hideToolbar.png);
 }
 
 
 /*工具栏：下拉导航菜单*/
+
 .xut-nav-bar {
     background-size: 100% 100%;
     position: absolute;
@@ -210,7 +218,9 @@ video {
     vertical-align: middle;
 }
 
+
 /*主页：左右翻页按钮*/
+
 .xut-flip-control {
     position: absolute;
     top: 50%;
@@ -225,9 +235,6 @@ video {
 .xut-flip-control-right {
     right: 0
 }
-
-
-
 
 
 /*函数工具栏*/
@@ -254,19 +261,12 @@ video {
     margin: 0 auto;
 }
 
-
-
 .xut-Bar-left li,
 .xut-Bar-right li {
     float: left;
     background-size: 100%;
     cursor: pointer;
 }
-
-
-
-
-
 
 
 /*场景页关闭按钮*/
@@ -304,9 +304,6 @@ video {
 }
 
 
-
-
-
 /*chpter页面*/
 
 .xut-chapter {
@@ -320,6 +317,7 @@ video {
 /**
  * 翻页控制
  */
+
 .xut-flip {
     width: 100%;
     height: 100%;
@@ -954,4 +952,48 @@ video {
     background: #51aed9;
     position: absolute;
     top: 50%;
+}
+
+
+/**
+ * 流失布局
+ */
+
+
+/**
+ * 页码样式
+ */
+
+.xut-page-number {
+    position: absolute;
+    right: 2%;
+    bottom: 2%;
+}
+
+.xut-page-number strong{
+    font-weight: bold;
+}
+
+
+.xut-page-number > div {
+    font-size: 0.75rem;
+    text-decoration: none;
+    display: inline-block;
+    height: 2rem;
+    line-height: 2rem;
+    border: 1px solid #ddd;
+    color: #666;
+    background-color: #fff;
+    margin-left: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0 20px;
+}
+
+.xut-page-number > div:first-child {
+    font-weight: bold;
+}
+
+.xut-page-number > div:last-child {
+    font-weight: normal;
 }

@@ -1,10 +1,16 @@
 import { config } from '../config/index'
 
-import MainBar from '../toolbar/sysbar'
-import DeputyBar from '../toolbar/fnbar'
+import MainBar from '../toolbar/main.sysbar'
+import DeputyBar from '../toolbar/deputy.fnbar'
 import BookBar from '../toolbar/bookbar/index'
+import NumberBar from '../toolbar/page.number'
 import { sceneController } from './controller'
 import { Mediator } from '../manager/mediator'
+
+import {
+    getFlowCount,
+    getFlowChpaterCount
+} from '../component/flow/get'
 
 import {
     home,
@@ -14,15 +20,14 @@ import {
 import {
     pMainBar,
     pDeputyBar
-} from './bar-config'
+} from './bar.config'
 
-import nextTick from '../util/nexttick'
 
 /**
  * 找到对应容器
  * @return {[type]}            [description]
  */
-const findContainer = (elements, scenarioId, isMain) => {
+const findContainer = ($rootNode, scenarioId, isMain) => {
     return function(pane, parallax) {
         var node;
         if (isMain) {
@@ -30,7 +35,7 @@ const findContainer = (elements, scenarioId, isMain) => {
         } else {
             node = '#' + parallax + scenarioId;
         }
-        return elements.find(node)[0];
+        return $rootNode.find(node)[0];
     }
 }
 
@@ -86,7 +91,7 @@ export class SceneFactory {
         const options = _.extend(this, data, {
             'scenarioId': seasonId,
             'chapterId': chapterId,
-            'container': $('#xut-scene-container')
+            '$container': $('#xut-scene-container')
         })
 
         //创建主场景
@@ -112,7 +117,7 @@ export class SceneFactory {
         //支持Xut.IBooks模式
         //都不需要创建节点
         if (Xut.IBooks.runMode()) {
-            this.elements = $('#xut-main-scene')
+            this.$rootNode = $('#xut-main-scene')
             callback()
             return;
         }
@@ -125,28 +130,35 @@ export class SceneFactory {
             str = scene(this.scenarioId)
         }
 
-        this.elements = $(str)
+        this.$rootNode = $(str)
 
-        nextTick({
-            'container': this.container,
-            'content': this.elements
+        Xut.nextTick({
+            'container': this.$container,
+            'content': this.$rootNode
         }, callback)
     }
 
+
+    /**
+     * 初始化工具栏
+     * 1 主场景，系统工具栏
+     * 2 副场景，函数工具栏
+     * 3 全场景，页码显示（右下角）
+     * @return {[type]} [description]
+     */
     _initToolBar() {
         const scenarioId = this.scenarioId
         const pageTotal = this.pageTotal
         const pageIndex = this.pageIndex
-        const elements = this.elements
+        const $rootNode = this.$rootNode
         const findControlBar = function() {
-            return elements.find('.xut-control-bar')
+            return $rootNode.find('.xut-control-bar')
         }
-
 
         //主场景工具栏设置
         if (this.isMain) {
 
-            let mainBarConfig = pMainBar(scenarioId, pageTotal)
+            const mainBarConfig = pMainBar(scenarioId, pageTotal)
 
             //主场工具栏设置
             if (_.isUndefined(config.toolType.mian)) {
@@ -159,23 +171,23 @@ export class SceneFactory {
 
             if (config.scrollPaintingMode) {
                 //word模式,自动启动工具条
-                this.sToolbar = new BookBar({
-                    container  : elements,
-                    controlBar : findControlBar(),
-                    pageMode   : config.pageMode
+                this.mainToolbar = new BookBar({
+                    container: $rootNode,
+                    controlBar: findControlBar(),
+                    pageMode: config.pageMode
                 })
             }
             //如果工具拦提供可配置
             //或者config.pageMode 带翻页按钮
             else if (_.some(config.toolType.mian) || config.pageMode === 2) {
                 //普通模式
-                this.sToolbar = new MainBar({
-                    container   : elements,
-                    controlBar  : findControlBar(),
-                    pageTotal   : pageTotal,
-                    currentPage : pageIndex + 1,
-                    pageMode    : config.pageMode,
-                    toolType    : config.toolType.mian
+                this.mainToolbar = new MainBar({
+                    container: $rootNode,
+                    controlBar: findControlBar(),
+                    pageTotal: pageTotal,
+                    currentPage: pageIndex + 1,
+                    pageMode: config.pageMode,
+                    toolType: config.toolType.mian
                 })
             }
         }
@@ -183,7 +195,7 @@ export class SceneFactory {
         else {
 
             //副场工具栏配置
-            let deputyBarConfig = pDeputyBar(this.barInfo, pageTotal)
+            const deputyBarConfig = pDeputyBar(this.barInfo, pageTotal)
 
             if (_.isUndefined(config.toolType.deputy)) {
                 config.toolType.deputy = deputyBarConfig.toolType
@@ -193,15 +205,30 @@ export class SceneFactory {
             }
 
             if (_.some(config.toolType.deputy)) {
-                this.cToolbar = new DeputyBar({
-                    id          : scenarioId,
-                    container   : elements,
-                    toolType    : config.toolType.deputy,
-                    pageTotal   : pageTotal,
-                    currentPage : pageIndex,
-                    pageMode    : config.pageMode
+                this.deputyToolbar = new DeputyBar({
+                    id: scenarioId,
+                    container: $rootNode,
+                    toolType: config.toolType.deputy,
+                    pageTotal: pageTotal,
+                    currentPage: pageIndex,
+                    pageMode: config.pageMode
                 })
             }
+        }
+
+
+        //2016.9.29
+        //新增页码显示
+        //如果有分栏
+        const flowCounts = getFlowCount(this.seasonId)
+        if (config.toolType.number && flowCounts) {
+            //获取分栏的chapter数，总数需要减去
+            const flowChpterCount = getFlowChpaterCount(this.seasonId)
+            this.numberToolbar = new NumberBar({
+                $rootNode: $rootNode,
+                currentPage: pageIndex,
+                pageTotal: pageTotal + flowCounts - flowChpterCount
+            })
         }
 
     }
@@ -216,9 +243,9 @@ export class SceneFactory {
         var scenarioId = this.scenarioId;
         var pageTotal = this.pageTotal;
         var pageIndex = this.pageIndex;
-        var elements = this.elements;
+        var $rootNode = this.$rootNode;
         var isMain = this.isMain;
-        var tempfind = findContainer(elements, scenarioId, isMain)
+        var tempfind = findContainer($rootNode, scenarioId, isMain)
 
         //页面容器
         var scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
@@ -228,7 +255,7 @@ export class SceneFactory {
 
         //场景容器对象
         var vm = this.vm = new Mediator({
-            'container': this.elements[0],
+            'container': this.$rootNode[0],
             'multiScenario': !isMain,
             'rootPage': scenarioPage,
             'rootMaster': scenarioMaster,
@@ -244,16 +271,21 @@ export class SceneFactory {
          * 配置选项
          * @type {[type]}
          */
-        var isToolbar = this.isToolbar = this.cToolbar ? this.cToolbar : this.sToolbar;
+        var isToolbar = this.isToolbar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
 
 
         /**
          * 监听翻页
          * 用于更新页码
+         *   parentIndex  父索引
+         *   subIndex     子索引
          * @return {[type]} [description]
          */
-        vm.$bind('pageUpdate', (pageIndex) => {
-            isToolbar && isToolbar.updatePointer(pageIndex);
+        vm.$bind('pageUpdate', (...arg) => {
+            isToolbar && isToolbar.updatePointer(...arg)
+            if (this.numberToolbar) {
+                this.numberToolbar && this.numberToolbar.updatePointer(...arg)
+            }
         })
 
 
@@ -305,7 +337,7 @@ export class SceneFactory {
          * @return {[type]} [description]
          */
         vm.$bind('resetToolbar', () => {
-            self.sToolbar && self.sToolbar.reset();
+            self.mainToolbar && self.mainToolbar.reset();
         })
 
 
@@ -398,12 +430,12 @@ export class SceneFactory {
             this.isToolbar = null;
         }
 
-        this.container = null;
+        this.$container = null;
 
         //销毁节点
-        this.elements.off();
-        this.elements.remove();
-        this.elements = null;
+        this.$rootNode.off();
+        this.$rootNode.remove();
+        this.$rootNode = null;
 
         //销毁引用
         sceneController.remove(this.scenarioId)

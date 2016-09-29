@@ -8,6 +8,49 @@ export function set(flowCounts) {
 }
 
 /**
+ * 获取当前当前到前置的总和
+ * @return {[type]} [description]
+ */
+export function getCurrentBeforeCount(seasonId, chapterId) {
+    if (!seasonId && !chapterId) return
+    let seasonIds = cacheCounts[seasonId]
+    let count = 0
+    for (let key in seasonIds) {
+        if (key <= chapterId) {
+            count += seasonIds[key]
+            --count
+        }
+    }
+    return count > 0 ? count : 0
+}
+
+/**
+ * 获取当前chapterId之前的总页数
+ * @return {[type]} [description]
+ */
+export function getBeforeCount(seasonId, chapterId) {
+    if (!seasonId && !chapterId) return
+    let seasonIds = cacheCounts[seasonId]
+    let count = 0
+    for (let key in seasonIds) {
+        if (key < chapterId) {
+            count += seasonIds[key]
+            --count
+        }
+    }
+    return count > 0 ? count : 0
+}
+
+/**
+ * 获取chpater总数
+ * @param  {[type]} seasonId [description]
+ * @return {[type]}          [description]
+ */
+export function getFlowChpaterCount(seasonId) {
+    return Object.keys(cacheCounts[seasonId]).length
+}
+
+/**
  * reutrn seasonIds
  * return chpaterIds
  * @param  {[type]} seasonId  [description]
@@ -22,7 +65,7 @@ export function getFlowCount(seasonId, chapterId) {
             let seasonIds = cacheCounts[seasonId]
             let count = 0
             for (let key in seasonIds) {
-                count += seasonId[key]
+                count += seasonIds[key]
             }
             return count
         }

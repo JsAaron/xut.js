@@ -1,7 +1,5 @@
 import { readFile } from '../../../util/option'
 import createBackground from './layout'
-import nextTick from '../../../util/nexttick'
-
 
 /**
  * 构建背景类
@@ -71,7 +69,7 @@ export default class TaskBackground {
 
         //继续执行
         nextTasks = function() {
-            nextTick({
+            Xut.nextTick({
                 'container': $containsNode,
                 'content': $background
             }, function() {

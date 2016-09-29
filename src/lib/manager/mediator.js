@@ -16,7 +16,7 @@ import {
 } from '../util/index'
 
 import GlobalEvent from '../swipe/index.js'
-import overrideApi from '../dynamic-api'
+import overrideApi from '../dynamic.api'
 
 /**
  * 配置多页面参数

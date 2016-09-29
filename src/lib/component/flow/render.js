@@ -1,6 +1,4 @@
 
-import nextTick from '../../util/nexttick'
-
 /**
  * dom...
  */
@@ -11,7 +9,7 @@ export default function render({
     callback
 } = {}) {
     const $container = $(dataNode.html())
-    nextTick({
+    Xut.nextTick({
         container: $containsNode,
         content: $container
     }, () => callback($container))

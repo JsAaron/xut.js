@@ -8,8 +8,6 @@
  */
 import directives from '../../../directive/index'
 import { reviseSize } from '../../../util/option'
-import nextTick from '../../../util/nexttick'
-
 
 export default function TaskComponents(data, suspendCallback, successCallback) {
 
@@ -122,7 +120,7 @@ TaskComponents.prototype = {
 
         //继续执行
         nextTasks = function() {
-            nextTick({
+            Xut.nextTick({
                 container: self.$containsNode,
                 content: $(str)
             }, function() {

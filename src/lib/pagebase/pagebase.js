@@ -21,8 +21,8 @@
  **********************************************************************/
 
 import initstate from './internal/initstate'
-import threadExternal from './internal/thread-api'
-import dataExternal from './internal/data-api'
+import threadExternal from './internal/thread.api'
+import dataExternal from './internal/data.api'
 import destroy from './internal/destroy'
 import translation from './move/to'
 

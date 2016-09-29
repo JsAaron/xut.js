@@ -589,7 +589,7 @@ export default class Swipe extends Observer {
         const linearView = node.getAttribute(LINEARTAG) //流式布局
 
         //去掉动画时间
-        if(node){
+        if (node) {
             node.style[transitionDuration] = ''
         }
 
@@ -616,6 +616,7 @@ export default class Swipe extends Observer {
      * @return {[type]} [description]
      */
     _restore(node, view) {
+
         //针对拖拽翻页阻止
         this._preventSwipe = true
         this._isTap = false;
@@ -627,11 +628,10 @@ export default class Swipe extends Observer {
 
     _distributed(...arg) {
         this._restore(...arg)
-
         //延长获取更pagePointer的更新值
         setTimeout(() => {
             this.$emit('onComplete', this.direction, this.pagePointer, this._unlock.bind(this), this._isQuickTurn);
-        }, 100)
+        }, 50)
     }
 
 

@@ -153,18 +153,20 @@ export default class fnBar extends Bar {
      * 更新页码指示
      * @return {[type]} [description]
      */
-    updatePointer(pageIndex) {
+    updatePointer({
+        parentIndex
+    }) {
         switch (this.tipsMode) {
             case 1:
                 if (this.prevTip) {
                     this.prevTip.className = 'xut-scenario-dark';
                 }
-                this.currTip = this.pageTips[pageIndex];
+                this.currTip = this.pageTips[parentIndex];
                 this.currTip.className = 'xut-scenario-light';
                 this.prevTip = this.currTip;
                 break;
             case 2:
-                this.currTip.html(pageIndex + 1);
+                this.currTip.html(parentIndex + 1);
                 break;
             default:
                 break;
