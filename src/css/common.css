@@ -970,20 +970,19 @@ video {
     bottom: 2%;
 }
 
-.xut-page-number strong{
+.xut-page-number strong {
     font-weight: bold;
 }
 
-
 .xut-page-number > div {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     text-decoration: none;
     display: inline-block;
     height: 2rem;
     line-height: 2rem;
     border: 1px solid #ddd;
-    color: #666;
-    background-color: #fff;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.25);
     margin-left: 4px;
     cursor: pointer;
     border-radius: 4px;
