@@ -54,60 +54,6 @@ export function getRealProportion(config, viewSize, fullProportion) {
     //布局的偏移量，可能是采用了画轴模式，一个可视区可以容纳3个页面
     let offsetTop = 0
     let offsetLeft = 0
-    let scaleWidth
-    let scaleHeight
-
-    //画轴模式，缩放比重新处理
-    if (config.visualMode === 1) {
-
-        //设备分辨率
-        const screenWidth = config.screenSize.width
-        const screenHeight = config.screenSize.height
-        const designWidth = fullProportion.pptWidth
-        const designHeight = fullProportion.pptHeight
-
-        /**
-         * 画轴模式
-         * 正比缩放,可以看到左右拼接
-         */
-        if (config.scrollPaintingMode) {
-            //    Dw       screenWidth - 2 * left
-            //   ----  =  -------------------
-            //    Dh       screenHeight - 2 * top
-            if (config.screenHorizontal) {
-                scaleWidth = designWidth * heightProp;
-                offsetLeft = (screenWidth - scaleWidth) / 2;
-                widthProp = heightProp
-            } else {
-                scaleHeight = designHeight * heightProp;
-                offsetTop = (screenHeight - scaleHeight) / 2;
-                heightProp = widthProp
-            }
-        }
-
-        /**
-         * 横版设计，在竖版手机上显示，强制分2页，虚拟一页
-         * word是两栏，竖版需要强制分开
-         */
-        if (config.virtualMode && !config.screenHorizontal) {
-            //假设高度不会溢出,按两倍屏宽计算
-            var _prop = 2 * screenWidth / designWidth;
-            offsetLeft = 0;
-            scaleHeight = designHeight * _prop;
-            offsetTop = (screenHeight - scaleHeight) / 2;
-
-            //如果高度溢出,按屏高计算
-            if (scaleHeight > screenHeight) {
-                _prop = screenHeight / designHeight;
-                scaleWidth = designWidth * _prop;
-
-                offsetTop = 0;
-                offsetLeft = (2 * screenWidth - scaleWidth) / 2;
-            }
-
-            widthProp = heightProp = _prop;
-        }
-    }
 
     return {
         width: widthProp,

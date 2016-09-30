@@ -5,34 +5,6 @@ import { _set } from '../util/index'
 
 
 /**
- * 新增模式,用于记录浏览器退出记录
- * 默认启动
- * 是否回到退出的页面
- * set表中写一个recordHistory
- * 是   1
- * 否   0
- * [description]
- * @param  {[type]} data [description]
- * @return {[type]}      [description]
- */
-const cfgHistory = (data) => {
-
-    let recordHistory = 1; //默认启动
-    if (data.recordHistory !== undefined) {
-        recordHistory = Number(data.recordHistory);
-    }
-
-    //如果启动桌面调试模式
-    //自动打开缓存加载
-    if (!recordHistory && config.isBrowser && config.debugMode) {
-        recordHistory = 1;
-    }
-
-    config.recordHistory = recordHistory;
-}
-
-
-/**
  * 默认工具栏配置
  * @type {Object}
  */
@@ -83,19 +55,15 @@ const initDefaults = (setData) => {
         'appId': data.appId
     });
 
-    //新增模式,用于记录浏览器退出记录
-    cfgHistory(data);
-
     //广告Id
     //2014.9.2
     Xut.Presentation.AdsId = data.adsId;
 
-    //画轴模式
-    config.scrollPaintingMode = Number(data.scrollPaintingMode)
-
     //创建过滤器
     Xut.CreateFilter = contentFilter('createFilter');
     Xut.TransformFilter = contentFilter('transformFilter');
+
+    return data
 }
 
 
@@ -106,8 +74,7 @@ const initDefaults = (setData) => {
 const setStore = (callback) => {
     createStore((dataRet) => {
         let novelData = dataRet.Novel.item(0)
-        initDefaults(dataRet.Setting)
-        callback(novelData)
+        callback(novelData, initDefaults(dataRet.Setting))
     })
 }
 

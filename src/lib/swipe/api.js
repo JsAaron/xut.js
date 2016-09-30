@@ -7,9 +7,6 @@ import {
 
 export default function api(Swipe) {
 
-
-    // Swipe.prototype
-
     /**
      * 模拟完成状态调用
      * @return {[type]} [description]
@@ -26,23 +23,15 @@ export default function api(Swipe) {
      * 停止翻页
      * @return {[type]} [description]
      */
-    Swipe.prototype.openFlip = function() {
-        this._unlock();
+    Swipe.prototype.openSwipe = function() {
+        this._initOperation();
     }
+
 
     /**
      * 启动翻页
      * @return {[type]} [description]
      */
-    Swipe.prototype.closeFlip = function() {
-        this._lock();
-    }
-
-
-    Swipe.prototype.openSwipe = function() {
-        this._initOperation();
-    }
-
     Swipe.prototype.closeSwipe = function() {
         this._evtDestroy();
     }
@@ -53,15 +42,8 @@ export default function api(Swipe) {
      * @param  {[type]}  distance [description]
      * @return {Boolean}          [description]
      */
-    Swipe.prototype.isBorder = function(distance) {
-        //起点左偏移
-        if (this._hindex === 0 && distance > 0) {
-            return true;
-        }
-        //终点右偏移
-        if (this._hindex === (this.pagetotal - 1) && distance < 0) {
-            return true
-        }
+    Swipe.prototype.isBorder = function(...arg) {
+        this._borderBounce(...arg)
     }
 
 
@@ -81,8 +63,12 @@ export default function api(Swipe) {
     Swipe.prototype.prev = function() {
         if (!this._borderBounce(1)) {
             this._slideTo('prev');
+        } else {
+            //边界反弹
+            this._setRebound(this._hindex, 'next')
         }
     }
+
 
     /**
      * 后翻页接口
@@ -91,6 +77,9 @@ export default function api(Swipe) {
     Swipe.prototype.next = function() {
         if (!this._borderBounce(-1)) {
             this._slideTo('next');
+        } else {
+            //边界反弹
+            this._setRebound(this._hindex, 'prev')
         }
     }
 

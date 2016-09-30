@@ -94,7 +94,7 @@ export class Dispatcher {
             return;
         }
 
-        let virtualMode = config.virtualMode
+        let doublePageMode = config.doublePageMode
         let self = this
         let multiplePages = this.options.multiplePages //是否线性
         let total = createPage.length
@@ -177,7 +177,7 @@ export class Dispatcher {
          * 没有对应的虚拟数据，取前一页的
          * @return {[type]}             [description]
          */
-        if (virtualMode && !chpaterResults.length) {
+        if (doublePageMode && !chpaterResults.length) {
             let virtualPid = _.extend([], createPids);
             createPids.forEach(function(pid, index) {
                 virtualPid.splice(index, 1, --pid)
@@ -217,7 +217,7 @@ export class Dispatcher {
                  */
                 let virtualPid = false; //虚拟页面的pid编号
                 let virtualOffset = false; //页面坐标left,right
-                if (virtualMode) {
+                if (doublePageMode) {
                     //页面位置
                     virtualOffset = offsetPage(pageIndex);
 

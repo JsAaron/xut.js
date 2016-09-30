@@ -73,7 +73,7 @@ export function home() {
     // const homeHeight = config.viewSize.height
     const homeLeft = config.viewSize.left
     const homeIndex = Xut.sceneController.createIndex()
-    const homeOverflow = config.scrollPaintingMode ? 'visible' : 'hidden'
+    const homeOverflow = config.visualMode === 1 ? 'visible' : 'hidden'
 
     //主体
     const homeHTML =
@@ -108,7 +108,7 @@ export function scene(id) {
     const sHeight   = options.sHeight
 
     const scenarioId = 'scenario-' + id
-    const overflow = config.scrollPaintingMode ? 'visible' : 'hidden'
+    const overflow = config.visualMode === 1 ? 'visible' : 'hidden'
     const pageId =  'scenarioPage-' + id
     const masterId = 'scenarioMaster-' + id
 

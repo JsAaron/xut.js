@@ -59,7 +59,7 @@ export default function getFlipDistance({
         if (hook) {
             let _receiver = makeGather()
             _receiver.$$leftIndex  = leftIndex
-            _receiver.$$pageIndex  = pageIndex
+            _receiver.$$middleIndex  = pageIndex
             _receiver.$$rightIndex = rightIndex
             _receiver.$$right = offset.right
             _receiver.$$left = offset.left
@@ -76,10 +76,10 @@ export default function getFlipDistance({
      * @return {[type]}        [description]
      */
     if (action === 'flipMove') {
-        const flipMove = hooks && hooks.flipMove
         offset.left = distance - veiwWidth
         offset.middle = distance
         offset.right = distance + veiwWidth
+        const flipMove = hooks && hooks.flipMove
         if (flipMove) {
             if (direction === 'prev') {
                 mixHooks(flipMove.left)
@@ -99,6 +99,15 @@ export default function getFlipDistance({
         offset.left = -veiwWidth
         offset.middle = distance;
         offset.right = veiwWidth
+        const flipRebound = hooks && hooks.flipRebound
+        if (flipRebound) {
+            if (direction === 'prev') {
+                mixHooks(flipRebound.left)
+            }
+            if (direction === 'next') {
+                mixHooks(flipRebound.right)
+            }
+        }
     }
 
     /**

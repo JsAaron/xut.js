@@ -9,7 +9,7 @@ import { disable } from './util/cursor'
 import nextTick from './util/nexttick'
 //A predictable state container for apps.
 // import store from './redex/store'
-import init from './init/index'
+import init from './initialize/index'
 
 
 Xut.Version = 836

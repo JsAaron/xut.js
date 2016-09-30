@@ -97,7 +97,7 @@ TaskComponents.prototype = {
                     activityData = reviseSize(activityData);
 
                     //处理虚拟模式创建
-                    if (Xut.config.virtualMode) {
+                    if (Xut.config.doublePageMode) {
                         virtualCreate(actType, activityData)
                     } else {
                         startCreate(actType, activityData)

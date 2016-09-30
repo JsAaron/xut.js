@@ -13,7 +13,7 @@ const translateZ = Xut.style.translateZ
 
 
 const dydTransform = (distance) => {
-    distance = config.virtualMode ? distance / 2 : distance;
+    distance = config.doublePageMode ? distance / 2 : distance;
     return transform + ':' + 'translate(' + distance + 'px,0px)' + translateZ
 }
 
@@ -24,7 +24,7 @@ const dydTransform = (distance) => {
  * @return {[type]}        [description]
  */
 const createTranslate = (offset) => {
-    offset = config.virtualMode ? offset / 2 : offset
+    offset = config.doublePageMode ? offset / 2 : offset
     return 'translate(' + offset + 'px,0px)' + translateZ
 }
 
@@ -34,7 +34,7 @@ const createTranslate = (offset) => {
  * 切换坐标
  */
 const toTranslate3d = (node, distance, speed, viewOffset) => {
-    distance = config.virtualMode ? distance / 2 : distance
+    distance = config.doublePageMode ? distance / 2 : distance
     if (node) {
         Xut.nextTick(function() {
             node.style[transform] = `translate(${distance}px,0px) ${translateZ}`

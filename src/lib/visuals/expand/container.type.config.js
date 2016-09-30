@@ -14,7 +14,7 @@ const translateZ = Xut.style.translateZ
  * @return {[type]}        [description]
  */
 const createTranslate = (offset) => {
-    offset = config.virtualMode ? offset / 2 : offset
+    offset = config.doublePageMode ? offset / 2 : offset
     return 'translate(' + offset + 'px,0px)' + translateZ
 }
 

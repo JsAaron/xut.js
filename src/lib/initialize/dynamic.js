@@ -42,6 +42,39 @@ const loadStyle = (callback) => {
 
 
 /**
+ * 新增模式,用于记录浏览器退出记录
+ * 默认启动
+ * 是否回到退出的页面
+ * set表中写一个recordHistory
+ * 是   1
+ * 否   0
+ * [description]
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
+const setHistory = (data) => {
+    let recordHistory = 1; //默认启动
+    if (data.recordHistory !== undefined) {
+        recordHistory = Number(data.recordHistory);
+    }
+
+    //如果启动桌面调试模式
+    //自动打开缓存加载
+    if (!recordHistory && config.isBrowser && config.debugMode) {
+        recordHistory = 1;
+    }
+
+    config.recordHistory = recordHistory
+}
+
+const setMode = function(data) {
+    //如果没有config配置，默认数据库
+    if (!config.visualMode && Number(data.scrollPaintingMode)) {
+        config.visualMode = 1
+    }
+}
+
+/**
  * 动态代码变动区域
  */
 export default function dynamic(callback) {
@@ -53,40 +86,26 @@ export default function dynamic(callback) {
             Xut.extend(config, Xut.Application.setConfig)
         }
 
-        /**
-         * 初始化数据库设置
-         */
-        initData(novelData => {
+        //初始化数据库设置
+        initData((novelData, tempSettingData) => {
 
-            /**
-             * 初始化配置一些信息
-             */
+            //初始化配置一些信息
             initConfig(novelData.pptWidth, novelData.pptHeight)
+
+            //新增模式,用于记录浏览器退出记录
+            setHistory(tempSettingData)
 
             //2015.2.26
             //启动画轴模式
-            //防止是布尔0成立
-            if (config.visualMode === 1 || config.scrollPaintingMode) {
-                config.scrollPaintingMode = true
-                config.visualMode === 1
-                //假如启用了画轴模式，看看是不是竖版的情况，需要切半模版virtualMode
-                if (config.screenSize.width < config.screenSize.height) {
-                    config.virtualMode = true
-                }
-            }
+            setMode(tempSettingData)
 
-            /**
-             * 创建忙碌光标
-             */
+            //创建忙碌光标
             if (!Xut.IBooks.Enabled) {
                 createCursor()
             }
 
-            /**
-             * 初始资源地址
-             */
+            //初始资源地址
             initPathAddress()
-
 
             /**
              * 初始flows排版
@@ -94,9 +113,7 @@ export default function dynamic(callback) {
              */
             initFlows()
 
-            /**
-             * iframe要要Xut.config
-             */
+            //iframe要要Xut.config
             loadStyle(() => callback(novelData))
         })
     })

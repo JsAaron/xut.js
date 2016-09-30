@@ -1,3 +1,5 @@
+import { config } from '../config/index'
+
 import {
     getBeforeCount,
     getCurrentBeforeCount
@@ -24,8 +26,13 @@ export default class NumberBar {
     }
 
     _createDom(pageTotal) {
+        //存在模式3的情况，所以页码要处理溢出的情况。left值
+        let right = '2%'
+        if(config.visualMode === 3){
+            right = Math.abs(config.viewSize.left) + 5  + 'px'
+        }
         return $(
-            `<div class="xut-page-number" style="z-index:3;display:none;">
+            `<div class="xut-page-number" style="right:${right};z-index:3;display:none;">
                 <div>1</div>
                 <strong>/</strong>
                 <div>${pageTotal}</div>
@@ -57,7 +64,7 @@ export default class NumberBar {
         if (direction === 'prev') {
             //前翻页：内部翻页
             if (hasSon) {
-               updateIndex = parentIndex + beforeCount + sonIndex - 2
+                updateIndex = parentIndex + beforeCount + sonIndex - 2
             }
             //前翻页：外部往内部翻页，正好前一页是内部页，所以需要获取内部页总和
             else {

@@ -369,6 +369,7 @@ const setProportion = function(pptWidth, pptHeight) {
  * @return {[type]} [description]
  */
 export function initConfig(pptWidth, pptHeight) {
+
     /**
      * 获取分辨率
      * @type {[type]}

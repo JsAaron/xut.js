@@ -133,24 +133,6 @@ export default class Swipe extends Observer {
 
 
     /**
-     * 处理松手后滑动
-     * pageIndex 页面
-     * distance  移动距离
-     * speed     时间
-     * viewTag   可使区标记
-     * follow    是否为跟随滑动
-     * @return {[type]} [description]
-     * pageIndex: 0, distance: -2, speed: 0, direction: "next", action: "flipMove"
-     */
-    _distributeMove(data) {
-        let pointer = this.pagePointer
-        data.leftIndex = pointer.leftIndex
-        data.rightIndex = pointer.rightIndex
-        this.$emit('onMove', data)
-    }
-
-
-    /**
      * 绑定事件
      * @return {[type]} [description]
      */
@@ -225,22 +207,6 @@ export default class Swipe extends Observer {
             pageX: point.pageX,
             pageY: point.pageY,
             time: getDate()
-        }
-    }
-
-
-    /**
-     * 前尾边界反弹判断
-     * @param  {[type]} deltaX [description]
-     * @return {[type]}        [description]
-     */
-    _borderBounce(deltaX) {
-        //首页,并且是左滑动
-        if (this._hindex === 0 && deltaX > 0) {
-            return true;
-            //尾页
-        } else if (this._hindex === this.pagetotal - 1 && deltaX < 0) {
-            return true;
         }
     }
 
@@ -360,16 +326,58 @@ export default class Swipe extends Observer {
                 this._slideTo(this._deltaX < 0 ? 'next' : 'prev')
             } else {
                 //反弹
-                this._distributeMove({
-                    'pageIndex': this._hindex,
-                    'direction': this._deltaX > 0 ? 'prev' : 'next',
-                    'distance': 0,
-                    'speed': 300,
-                    'action': 'flipRebound'
-                });
+                this._setRebound(this._hindex, this._deltaX > 0 ? 'prev' : 'next')
             }
         }
 
+    }
+
+
+    /**
+     * 前尾边界反弹判断
+     * @param  {[type]} deltaX [description]
+     * @return {[type]}        [description]
+     */
+    _borderBounce(deltaX) {
+        //首页,并且是左滑动
+        if (this._hindex === 0 && deltaX > 0) {
+            return true;
+            //尾页
+        } else if (this._hindex === this.pagetotal - 1 && deltaX < 0) {
+            return true;
+        }
+    }
+
+
+    /**
+     * 设置反弹
+     */
+    _setRebound(pageIndex, direction) {
+        this._distributeMove({
+            'pageIndex': pageIndex,
+            'direction': direction,
+            'distance': 0,
+            'speed': 300,
+            'action': 'flipRebound'
+        });
+    }
+
+
+    /**
+     * 处理松手后滑动
+     * pageIndex 页面
+     * distance  移动距离
+     * speed     时间
+     * viewTag   可使区标记
+     * follow    是否为跟随滑动
+     * @return {[type]} [description]
+     * pageIndex: 0, distance: -2, speed: 0, direction: "next", action: "flipMove"
+     */
+    _distributeMove(data) {
+        let pointer = this.pagePointer
+        data.leftIndex = pointer.leftIndex
+        data.rightIndex = pointer.rightIndex
+        this.$emit('onMove', data)
     }
 
 
@@ -628,7 +636,7 @@ export default class Swipe extends Observer {
 
     _distributed(...arg) {
         this._restore(...arg)
-        //延长获取更pagePointer的更新值
+            //延长获取更pagePointer的更新值
         setTimeout(() => {
             this.$emit('onComplete', this.direction, this.pagePointer, this._unlock.bind(this), this._isQuickTurn);
         }, 50)

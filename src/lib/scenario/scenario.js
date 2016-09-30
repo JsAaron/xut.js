@@ -169,7 +169,7 @@ export class SceneFactory {
                 config.pageMode = mainBarConfig.pageMode
             }
 
-            if (config.scrollPaintingMode) {
+            if (config.visualMode === 1) {
                 //word模式,自动启动工具条
                 this.mainToolbar = new BookBar({
                     container: $rootNode,

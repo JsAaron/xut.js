@@ -33,8 +33,6 @@ video {
 input,
 textarea {
     user-select: text;
-    -webkit-user-select: text;
-    -moz-user-select: text;
 }
 
 
@@ -55,6 +53,10 @@ body {
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
 }
 
 
@@ -229,11 +231,11 @@ video {
 }
 
 .xut-flip-control-left {
-    left: : 0;
+    left: 0;
 }
 
 .xut-flip-control-right {
-    right: 0
+    right: 0;
 }
 
 
@@ -325,12 +327,6 @@ video {
     top: 0;
     left: 0;
     z-index: 2;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-    /*perspective: 1000;冲突字体样子变形*/
-    -webkit-transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
-    /*-webkit-perspective: 1000;*/
     background-size: 100% 100%;
 }
 
@@ -343,6 +339,23 @@ video {
 .xut-flip .xut-page p {
     line-height: 150%;
     padding: 12px;
+}
+
+
+/**
+ * 修正闪烁
+ * 隐藏转换的元素的背面
+ * 使被转换的元素的子元素保留其 3D 转换
+ * 开启GPU硬件加速模式，使用GPU代替CPU渲染动画（在安卓系统中有时会有莫名其妙的BUG，建议慎重）
+ */
+
+.xut-fix-transform-bug {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    perspective: 1000;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    -webkit-perspective: 1000;
 }
 
 
@@ -966,8 +979,7 @@ video {
 
 .xut-page-number {
     position: absolute;
-    right: 2%;
-    bottom: 2%;
+    bottom: .2rem;
 }
 
 .xut-page-number strong {
@@ -978,15 +990,15 @@ video {
     font-size: 0.85rem;
     text-decoration: none;
     display: inline-block;
-    height: 2rem;
-    line-height: 2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
     border: 1px solid #ddd;
     color: white;
     background-color: rgba(0, 0, 0, 0.25);
     margin-left: 4px;
     cursor: pointer;
     border-radius: 4px;
-    padding: 0 20px;
+    padding: 0 .7rem;
 }
 
 .xut-page-number > div:first-child {

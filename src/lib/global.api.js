@@ -30,7 +30,7 @@ import { autoRun, original, suspend } from './command/index'
 import { SceneFactory } from './scenario/scenario'
 import { suspendHandles as globalStop, promptMessage } from './global.stop'
 import globalDestroy from './global.destroy'
-import loadScene from './init/scene'
+import loadScene from './initialize/scene'
 
 import {
     ShowBusy,
@@ -233,7 +233,7 @@ _extend(View, {
 
 
         //如果启动了虚拟模式
-        if (config.virtualMode) {
+        if (config.doublePageMode) {
             pageTotal = pageTotal * 2;
         }
 

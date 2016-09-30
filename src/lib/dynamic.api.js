@@ -360,6 +360,14 @@ export default function overrideApi(vm) {
 
 
     /**
+     * 是否为翻页的边界
+     * @return {Boolean} [description]
+     */
+    View.isFlipBorderBounce = function(distance){
+        return $globalEvent.isBorder(distance)
+    }
+
+    /**
      * 页面滑动
      * @param {[type]} distance  [description]
      * @param {[type]} speed     [description]

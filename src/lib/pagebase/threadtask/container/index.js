@@ -28,11 +28,11 @@ const createli = function({
     let offsetLeft = 0
     let virtualNode = ''
 
-    if (config.virtualMode) {
+    if (config.doublePageMode) {
         if (base.virtualOffset === 'right') {
             offsetLeft = -(config.screenSize.width - config.proportion.offsetLeft);
         }
-        virtualNode = `<div style="width:${viewWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
+        virtualNode = `<div style="width:${getStyle.viewWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
     }
 
     return String.styleFormat(
@@ -41,7 +41,7 @@ const createli = function({
             data-map="${base.pid}"
             data-pageType="${base.pageType}"
             data-container="true"
-            class="xut-flip"
+            class="xut-flip xut-fix-transform-bug"
             style="width:${getStyle.viewWidth}px;
                    height:${getStyle.viewHeight}px;
                    top:${getStyle.viewTop}px;
@@ -115,7 +115,7 @@ export default function(base, pageData, taskCallback) {
     $pageNode = createContainer(base, pageData, getStyle, prefix)
 
     //如果启动了wordMode模式,查找伪li
-    if (config.virtualMode) {
+    if (config.doublePageMode) {
         $pseudoElement = $pageNode.find('div');
     }
 

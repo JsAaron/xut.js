@@ -286,7 +286,7 @@ export default function structure(callback, data, context) {
 
             //如果启用了virtualMode模式
             //对象需要分离创建
-            if (config.virtualMode) {
+            if (config.doublePageMode) {
                 virtualCreate(sizeResults, wrapObj, content, contentId);
             } else {
                 //正常模式下创建

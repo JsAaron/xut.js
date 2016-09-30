@@ -11,7 +11,7 @@ import { access } from './access'
  * @return {[type]}      [description]
  */
 let checkOptimize = (fn) => {
-    if (!Xut.config.scrollPaintingMode) {
+    if (!Xut.config.visualMode !== 1) {
         fn && fn()
     }
 }

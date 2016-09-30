@@ -98,6 +98,7 @@ export default {
     , distance() {
         if (config.visualMode === 3) {
             return {
+
                 flipMove: {
                     left(data) {
                         const leftFlow = data.$$checkFlows(data.$$leftIndex)
@@ -106,9 +107,19 @@ export default {
                         }
                     },
                     right(data) {
-                        const middleFlow = data.$$checkFlows(data.$$pageIndex)
+                        const middleFlow = data.$$checkFlows(data.$$middleIndex)
                         if (middleFlow) {
                             data.right = data.$$right - Math.abs(config.viewSize.left) * 2
+                        }
+                    }
+                },
+                flipRebound: {
+                    left(data) {
+                        //往右边滑动反弹，所以left为左边处理
+                        //而且只修正当期那是flow
+                        const middleFlow = data.$$checkFlows(data.$$middleIndex)
+                        if (middleFlow) {
+                            data.middle = Math.abs(config.viewSize.left)
                         }
                     }
                 },
@@ -116,12 +127,12 @@ export default {
                     left(data) {
                         const leftFlow = data.$$checkFlows(data.$$leftIndex)
                         if (leftFlow) {
-                           data.left = -config.viewSize.left
+                            data.left = -config.viewSize.left
                         }
                     },
                     right(data) {
                         const rightFlow = data.$$checkFlows(data.$$rightIndex)
-                        //当前正常页面，下一页flow
+                            //当前正常页面，下一页flow
                         if (rightFlow) {
                             data.right = Math.abs(config.viewSize.left)
                         }
