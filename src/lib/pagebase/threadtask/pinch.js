@@ -1,6 +1,6 @@
 import iconsConfig from '../../toolbar/base/iconconf.js'
 import { svgIcon } from '../../toolbar/base/svgicon'
-
+import { config } from '../../config/index'
 const reqAnimationFrame = (function() {
     return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function(callback) {
         window.setTimeout(callback, 1000 / 60);
@@ -14,27 +14,24 @@ const translateZ = Xut.style.translateZ
 const createSVGIcon = function(el, callback) {
     var options = {
         speed: 6000,
-        size: {
-            w: 50,
-            h: 50
-        },
         onToggle: callback
     };
     return new svgIcon(el, iconsConfig, options);
 }
 
-/**
- * [ 关闭按钮]
- * @return {[type]} [description]
- */
+
 const createCloseIcon = function() {
-    var style, html,
-        TOP = 10,
-        height = '50'
-    style = 'top:' + TOP + 'px;width:' + height + 'px;height:' + height + 'px';
-    html = '<div class="si-icon xut-scenario-close" data-icon-name="close" style="' + style + '"></div>';
-    html = $(html);
-    return html
+    const proportion = config.proportion
+    const width = proportion.width * 55
+    const height = proportion.height * 70
+    const top = proportion.height * 10
+    const right = config.viewSize.left ? Math.abs(config.viewSize.left) + (top * 2) : top * 2
+    const html =
+        `<div class="si-icon xut-scenario-close" 
+                 data-icon-name="close" 
+                 style="width:${width}px;height:${height}px;top:${top}px;right:${right}px">
+            </div>'`
+    return $(html)
 }
 
 
@@ -42,7 +39,13 @@ const createCloseIcon = function() {
  * 缩放平移
  * @param {[type]} node [description]
  */
-export default function Pinch($pinchNode, $pagePinch) {
+export default function Pinch($pinchNode, $pagePinch, pageIndex) {
+
+    let belongMaster = Xut.Presentation.GetPageObj('master', pageIndex)
+    let masterPageNode
+    if (belongMaster) {
+        masterPageNode = belongMaster.getContainsNode()[0]
+    }
 
     var pinchNode = $pinchNode[0]
     var mc = new Hammer.Manager(pinchNode);
@@ -104,9 +107,16 @@ export default function Pinch($pinchNode, $pagePinch) {
     mc.on("pinchstart pinchmove", onPinch);
 
     function updatenodeTransform() {
-        pinchNode.style[transform] =
+
+        const style =
             `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
             scale(${data.scale},${data.scale})`
+
+        pinchNode.style[transform] = style
+        if (masterPageNode) {
+            masterPageNode.style[transform] = style
+        }
+
         ticking = false
     }
 
