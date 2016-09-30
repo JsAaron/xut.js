@@ -1,11 +1,7 @@
 import iconsConfig from '../../toolbar/base/iconconf.js'
 import { svgIcon } from '../../toolbar/base/svgicon'
 import { config } from '../../config/index'
-const reqAnimationFrame = (function() {
-    return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function(callback) {
-        window.setTimeout(callback, 1000 / 60);
-    }
-})();
+
 
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
@@ -123,7 +119,7 @@ export default function Pinch($pinchNode, $pagePinch, pageIndex) {
 
     function requestnodeUpdate() {
         if (!ticking) {
-            reqAnimationFrame(updatenodeTransform);
+            Xut.nextTick(updatenodeTransform);
             ticking = true;
         }
     }
