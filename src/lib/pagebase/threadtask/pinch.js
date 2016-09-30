@@ -1,3 +1,6 @@
+import iconsConfig from '../../toolbar/base/iconconf.js'
+import { svgIcon } from '../../toolbar/base/svgicon'
+
 const reqAnimationFrame = (function() {
     return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function(callback) {
         window.setTimeout(callback, 1000 / 60);
@@ -7,17 +10,42 @@ const reqAnimationFrame = (function() {
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 
+
+const createSVGIcon = function(el, callback) {
+    var options = {
+        speed: 6000,
+        size: {
+            w: 50,
+            h: 50
+        },
+        onToggle: callback
+    };
+    return new svgIcon(el, iconsConfig, options);
+}
+
+/**
+ * [ 关闭按钮]
+ * @return {[type]} [description]
+ */
+const createCloseIcon = function() {
+    var style, html,
+        TOP = 10,
+        height = '50'
+    style = 'top:' + TOP + 'px;width:' + height + 'px;height:' + height + 'px';
+    html = '<div class="si-icon xut-scenario-close" data-icon-name="close" style="' + style + '"></div>';
+    html = $(html);
+    return html
+}
+
+
 /**
  * 缩放平移
  * @param {[type]} node [description]
  */
-export default function Pinch(node) {
+export default function Pinch($pinchNode, $pagePinch) {
 
-var aa = false
-    var mc = new Hammer.Manager(node);
-
-    // const START_X = Math.round((window.innerWidth - node.offsetWidth) / 2);
-    // const START_Y = Math.round((window.innerHeight - node.offsetHeight) / 2);
+    var pinchNode = $pinchNode[0]
+    var mc = new Hammer.Manager(pinchNode);
 
     const START_X = 0
     const START_Y = 0
@@ -27,20 +55,6 @@ var aa = false
 
     var ticking = false;
 
-    var pan = new Hammer.Pan();
-    var pinch = new Hammer.Pinch();
-    mc.add([pinch])
-
-    mc.on("pinchstart pinchmove", onPinch);
-    mc.on("pinchstart", function() {
-        if (!mc.get('pan')) {
-            mc.add([pan])
-            mc.on("panstart panmove", onPan);
-            mc.on("panend", onPanEnd)
-            pan.recogizeWith(pinch)
-                // Xut.Application.closeFlip()
-        }
-    })
 
     const data = {
         translate: {
@@ -52,10 +66,45 @@ var aa = false
 
     var initScale = 1;
 
+    let isStart = false
+    let $pinchCloseNode
+
+    const createPinchClose = function() {
+        const $closeNode = createCloseIcon()
+        createSVGIcon($closeNode[0], function() {
+            data.scale = 1;
+            data.translate.x = START_X;
+            data.translate.y = START_Y;
+            requestnodeUpdate();
+            createPinchCloseHide()
+            isStart = false
+        })
+        $pagePinch.after($closeNode)
+        return $closeNode
+    }
+
+    const createPinchCloseShow = function() {
+        if ($pinchCloseNode) {
+            $pinchCloseNode.show()
+        } else {
+            $pinchCloseNode = createPinchClose()
+        }
+        isStart = true
+    }
+
+    const createPinchCloseHide = function() {
+        $pinchCloseNode.hide()
+        isStart = false
+    }
+
+    var pan = new Hammer.Pan();
+    var pinch = new Hammer.Pinch();
+    mc.add([pinch])
+
+    mc.on("pinchstart pinchmove", onPinch);
 
     function updatenodeTransform() {
-        if(aa) return 
-        node.style[transform] =
+        pinchNode.style[transform] =
             `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
             scale(${data.scale},${data.scale})`
         ticking = false
@@ -73,16 +122,31 @@ var aa = false
     function onPinch(ev) {
         if (data.scale > 1) {
             ev.srcEvent.stopPropagation()
+            mc.get('pan').set({ enable: true });
         }
 
         if (ev.type == 'pinchstart') {
             initScale = data.scale || 1;
+            if (!mc.get('pan')) {
+                createPinchCloseShow()
+                mc.add([pan])
+                mc.on("panstart panmove", onPan);
+                mc.on("panend", onPanEnd)
+                pan.recogizeWith(pinch)
+            } else {
+                if (!isStart) {
+                    createPinchCloseShow()
+                }
+            }
         }
-        node.className = '';
+
+        pinchNode.className = '';
         data.scale = initScale * ev.scale
 
+        //还原
         if (data.scale < 1) {
             data.scale = 1
+            createPinchCloseHide()
         }
         judgeBoundry()
         requestnodeUpdate();
@@ -91,22 +155,29 @@ var aa = false
 
 
     function onPan(ev) {
-        ev.srcEvent.stopPropagation();
+        if (data.scale > 1) {
+            //取消冒泡 pinch层滑动 li层不可滑动
+            ev.srcEvent.stopPropagation()
+            mc.get('pan').set({ enable: true });
 
-        if (currentX != START_X || currentY != START_Y) {
-            data.translate = {
-                x: currentX + ev.deltaX,
-                y: currentY + ev.deltaY
-            };
+            if (currentX != START_X || currentY != START_Y) {
+                data.translate = {
+                    x: currentX + ev.deltaX,
+                    y: currentY + ev.deltaY
+                };
+            } else {
+                data.translate = {
+                    x: START_X + ev.deltaX,
+                    y: START_Y + ev.deltaY
+                };
+            }
+
+            judgeBoundry(ev)
+            requestnodeUpdate();
         } else {
-            data.translate = {
-                x: START_X + ev.deltaX,
-                y: START_Y + ev.deltaY
-            };
+            //不取消冒泡 禁止pinch层滑动 此时li层可以滑动
+            mc.get('pan').set({ enable: false });
         }
-
-        judgeBoundry()
-        requestnodeUpdate();
     }
 
     function onPanEnd() {
@@ -117,8 +188,8 @@ var aa = false
 
 
     function judgeBoundry() {
-        var horizontalBoundry = (data.scale - 1) / 2 * node.offsetWidth;
-        var verticalBoundry = (data.scale - 1) / 2 * node.offsetHeight;
+        var horizontalBoundry = (data.scale - 1) / 2 * pinchNode.offsetWidth;
+        var verticalBoundry = (data.scale - 1) / 2 * pinchNode.offsetHeight;
         if (data.scale > 1) {
             //左边界
             if (data.translate.x >= horizontalBoundry) {
@@ -126,27 +197,7 @@ var aa = false
             }
             //右边界
             if (data.translate.x <= -horizontalBoundry) {
-                aa = true
-
-                Xut.View.MovePage(data.translate.x , 0, 'next', 'flipMove')
-
-      // Xut.View.GotoNextSlide()
-      // Xut.View.GotoPrevSlide()
-
-                // -3.450381679389313 0 "next" "flipMove"
-                // flow.js:160 -9.146110056925995 0 "next" "flipMove"
-                // flow.js:160 -14.777358490566037 0 "next" "flipMove"
-                // flow.js:160 -20.345215759849907 0 "next" "flipMove"
-                // flow.js:160 -24.022429906542058 0 "next" "flipMove"
-                // flow.js:160 -25.850746268656714 0 "next" "flipMove"
-                // Xut.View.MovePage(data.translate.x , 0, 'next', 'flipMove')
-
-
-                //0 300 "next" "flipRebound
-                //Xut.View.MovePage(data.translate.x , 0, 'next', 'flipMove')
-
-                // Xut.View.GotoNextSlide()
-                // data.translate.x = -horizontalBoundry
+                data.translate.x = -horizontalBoundry
             }
             //上边界
             if (data.translate.y >= verticalBoundry) {
@@ -160,6 +211,12 @@ var aa = false
             data.scale = 1;
             data.translate.x = START_X;
             data.translate.y = START_Y;
+        }
+    }
+
+    return {
+        destroy: function() {
+            mc.destroy()
         }
     }
 

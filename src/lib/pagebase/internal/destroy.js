@@ -19,6 +19,12 @@ export default function(baseProto) {
         }
 
 
+        //2016/9/30
+        //销毁缩放动作
+        if(this._pinchObj){
+            this._pinchObj.destroy()
+        }
+
         //流式布局对象
         //2016.9.10
         const _flows = this._flows.get()

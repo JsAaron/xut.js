@@ -189,6 +189,7 @@ export default class fnBar extends Bar {
                 Xut.View.CloseScenario()
             }
         );
+
         this.controlBar.push(html);
         this.container.append(html);
     }

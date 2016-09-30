@@ -38,19 +38,12 @@ export default function setView(config, fullProportion) {
                 newLeft = (screenWidth - newWidth) / 2
             }
             //竖版显示
-            if (config.screenVertical) {
-                //正常全屏显示，类似模式0
-            }
+            //正常全屏显示，类似模式0
+            //config.screenVertical
         }
 
         //横版ppt
         if (config.pptHorizontal) {
-
-            //横版显示，默认0全屏
-            if (config.screenHorizontal) {
-
-            }
-
             //横版设计，在竖版手机上显示，强制分2页，虚拟一页
             //假如启用了画轴模式，看看是不是竖版的情况，需要切半模版virtualMode
             //word是两栏，竖版需要强制分开
@@ -59,6 +52,8 @@ export default function setView(config, fullProportion) {
                 config.doublePageMode = true
             }
 
+            //横版显示，默认0全屏
+            //config.screenHorizontal
         }
 
 
@@ -130,10 +125,6 @@ export default function setView(config, fullProportion) {
             if (config.screenVertical) {
                 newWidth = fullProportion.pptWidth * fullProportion.height
                 newLeft = (screenWidth - newWidth) / 2
-            }
-            //横版显示
-            else {
-
             }
         }
 

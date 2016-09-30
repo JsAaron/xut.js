@@ -18,7 +18,6 @@ import { closeNavbar } from '../../toolbar/navbar/index'
 import Stack from '../../util/stack'
 
 import {
-    getFlowView,
     getFlowDistance
 } from '../../visuals/expand/api.config'
 

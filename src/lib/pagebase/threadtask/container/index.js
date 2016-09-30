@@ -50,9 +50,9 @@ const createli = function({
                    ${background}
                    ${customStyle}
                    overflow:hidden;">
-            <div data-type="pinch" style="width:100%;height:100%">
+            <div class="page-pinch" style="width:100%;height:100%">
                 ${virtualNode}
-            </div
+            </div>
         </li>`
     )
 }

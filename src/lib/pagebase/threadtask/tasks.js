@@ -51,7 +51,7 @@ export default function(instance) {
                  * @return {[type]} [description]
                  */
                 //获取根节点
-                const $containsElement = $pageNode.children()
+                const $containsElement = $pageNode.children('.page-pinch')
                 instance.getContainsNode = function() {
                     return $pseudoElement ? $pseudoElement : $containsElement
                 }
@@ -60,9 +60,6 @@ export default function(instance) {
 
                 //构建主容器li完毕,可以提前执行翻页动作
                 createRelated.preforkComplete()
-
-                //绑定缩放事件
-                config.saleMode && instance.pageType === 'page' && Pinch($containsElement[0])
 
                 //视觉差不管
                 if (instance.isMaster) {
@@ -84,14 +81,28 @@ export default function(instance) {
          * @return {[type]} [description]
          */
         flow() {
+            //创建缩放
+            const createPinch = function(flow) {
+                if (config.saleMode && instance.pageType === 'page') {
+                    const $pagePinch = instance.getContainsNode()
+                    if (flow) {
+                        // instance._pinchObj = Pinch( $pagePinch.find('.page-flow-pinch'), $pagePinch)
+                    } else {
+                        instance._pinchObj = Pinch( $pagePinch, $pagePinch)
+                    }
+                }
+            }
+
             //chapter=>note == 'flow'
             //因为设计chapter只有一个flow效果，所以直接跳过别的创建
             if (instance.chapterDas.note == 'flow') {
                 callContextTasks('Flow', function() {
+                    createPinch('flow')
                     setNextRunTask('complete')
                     createRelated.createTasksComplete()
                 })
             } else {
+                createPinch()
                 setNextRunTask('background')
                 instance.dispatchTasks()
             }
