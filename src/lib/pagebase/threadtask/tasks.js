@@ -32,7 +32,7 @@ export default function(instance) {
      * @type {Object}
      */
     instance.threadtasks = {
-
+  
         /**
          * li容器
          * @return {[type]} [description]

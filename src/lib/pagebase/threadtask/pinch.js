@@ -5,7 +5,7 @@ import { config } from '../../config/index'
 
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
-
+const transitionDuration = Xut.style.transitionDuration
 
 const createSVGIcon = function(el, callback) {
     var options = {
@@ -49,12 +49,9 @@ export default class Pinch {
     _createPinchButton() {
         const $pinchButton = createCloseIcon()
         createSVGIcon($pinchButton[0], () => {
-            this.data.scale = 1;
-            this.data.translate.x = START_X;
-            this.data.translate.y = START_Y;
+            this._initState()
             this._requestUpdate()
             this._pinchButtonHide()
-            isStart = false
         })
         this.$pinchNode.after($pinchButton)
         return $pinchButton
@@ -66,12 +63,13 @@ export default class Pinch {
      * @return {[type]} [description]
      */
     _pinchButtonShow() {
+        if (this._pinchButtonState) return
         if (this._$pinchButton) {
             this._$pinchButton.show()
         } else {
             this._$pinchButton = this._createPinchButton()
         }
-        this.isRunning = true
+        this._pinchButtonState = true
     }
 
 
@@ -81,7 +79,7 @@ export default class Pinch {
      */
     _pinchButtonHide() {
         this._$pinchButton.hide()
-        this.isRunning = false
+        this._pinchButtonState = false
     }
 
 
@@ -101,7 +99,7 @@ export default class Pinch {
      * 更新样式
      * @return {[type]} [description]
      */
-    _requestUpdate() {
+    _requestUpdate(speed = 0) {
 
         const updateTransform = () => {
             const data = this.data
@@ -109,8 +107,11 @@ export default class Pinch {
                 `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
                   scale(${data.scale},${data.scale})`
             this.pinchNode.style[transform] = styleText
+            this.pinchNode.style[transitionDuration] = speed + 'ms'
+
             if (this.masterNode) {
                 this.masterNode.style[transform] = styleText
+                this.masterNode.style[transitionDuration] = speed + 'ms'
             }
             this.ticking = false
         }
@@ -124,10 +125,9 @@ export default class Pinch {
 
     _initBind() {
         this.hammer = new Hammer.Manager(this.pinchNode)
-        const pinch = new Hammer.Pinch()
-        this.hammer.add([pinch])
+        this.hammer.add(new Hammer.Pinch())
         this.hammer.on('pinchstart', e => {
-            this._onPinchStart(e, pinch)
+            this._onPinchStart(e)
         })
         this.hammer.on('pinchmove', e => {
             this._onPinchMove(e)
@@ -138,57 +138,79 @@ export default class Pinch {
     }
 
 
-    _onPinchStart(event, pinch) {
-        this.initScale = this.data.scale
-        if (!this.hammer.get('pan')) {
-            this.hammer.add(new Hammer.Pan())
-                //取消冒泡 pinch层滑动 li层不可滑动
-                // event.srcEvent.stopPropagation()
-                // this.hammer.get('pan').set({ enable: true });
-
-            // this.hammer.on("panstart", e => {
-            //     this._onPanStart(e)
-            // })
-            // this.hammer.on("panmove", e => {
-            //     this._onPanMove(e)
-            // })
-            // this.hammer.on("panend", e => {
-            //     this._onPanEnd(e)
-            // })
-            this._pinchButtonShow()
-        } else {
-            if (!this.isRunning) {
-                this._pinchButtonHide()
-            }
-        }
+    _stopPropagation(ev) {
+        //缩放时，阻止冒泡
+        ev.srcEvent.stopPropagation()
     }
 
 
-    _onPinchMove(event) {
+    /**
+     * 缩放
+     * @param  {[type]} event [description]
+     * @return {[type]}       [description]
+     */
+    _onPinchStart(ev) {
+        // if (!this.hammer.get('pan')) {
+        //this.hammer.add(new Hammer.Pan())
+        //取消冒泡 pinch层滑动 li层不可滑动
+        // event.srcEvent.stopPropagation()
+        // this.hammer.get('pan').set({ enable: true });
 
-        if (this.data.scale > 1) {
-            //缩放时，阻止冒泡
-            event.srcEvent.stopPropagation()
-                // const pan = this.hammer.get('pan')
-                // pan && pan.set({ enable: true })
+        // this.hammer.on("panstart", e => {
+        //     this._onPanStart(e)
+        // })
+        // this.hammer.on("panmove", e => {
+        //     this._onPanMove(e)
+        // })
+        // this.hammer.on("panend", e => {
+        //     this._onPanEnd(e)
+        // })
+        // }
+    }
+ 
+
+    _onPinchMove(ev) {
+
+        //放大的情况处理
+        if (ev.scale > this.prevScale) {
+            //缩放值必须要大于起步值
+            //允许误差
+            if (ev.scale < this.allowError) {
+                return
+            }
         }
+        this.prevScale = ev.scale
+
+        this._stopPropagation(ev)
+
+        //显示关闭按钮
+        this._pinchButtonShow()
 
         //缩放比
-        this.data.scale = this.initScale * event.scale
+        this.data.scale = this.lastScale * (ev.scale - (this.allowError - 1))
 
         this._requestUpdate()
     }
 
- 
-    _onPinchEnd(event) {
-        //还原缩放比
+
+    _onPinchEnd(ev) {
+        //还原缩放比 
         if (this.data.scale <= 1) {
             this.data.scale = 1
             this._pinchButtonHide()
+            this._requestUpdate(600)
+        } else {
+            this._stopPropagation(ev)
         }
+        //保存上一个缩放值
+        this.lastScale = this.data.scale
     }
 
-
+    /**
+     * 平移
+     * @param  {[type]} event [description]
+     * @return {[type]}       [description]
+     */
     _onPanStart(event) {
 
         if (this.data.scale > 1) {
@@ -255,22 +277,26 @@ export default class Pinch {
     }
 
 
-    constructor({
-        $pagePinch,
-        pageIndex
-    }) {
+    _initState() {
 
         /**
-         * 初始缩放值
-         * @type {Number}
-         */
-        this.initScale = 1
-
-        /**
-         * 是否运行中
+         * 上一个缩放值
          * @type {Boolean}
          */
-        this.isRunning = false
+        this.prevScale = 0
+
+        /**
+         * 开始计算的缩放值
+         * 这里存在操作误差处理
+         * @type {Number}
+         */
+        this.allowError = 1.3
+
+        /**
+         * 最后一个缩放值
+         * @type {Number}
+         */
+        this.lastScale = 1
 
         /**
          * 是否更新中
@@ -292,6 +318,17 @@ export default class Pinch {
 
         this.currentX = START_X
         this.currentY = START_Y
+    }
+
+    constructor({
+        $pagePinch,
+        pageIndex
+    }) {
+
+        $('body').append('<div id="testtest" style="color:white;z-index:999999;font-size:22px;position:absolute;top:0px;left:0;"></div>')
+
+        //初始化状态
+        this._initState()
 
         this.$pinchNode = $pagePinch
 
@@ -305,7 +342,7 @@ export default class Pinch {
     }
 
     destroy() {
-        mc.destroy()
+        this.hammer.destroy()
     }
 
 }
