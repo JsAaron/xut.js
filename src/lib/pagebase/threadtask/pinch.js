@@ -168,22 +168,13 @@ export default class Pinch {
         // }
     }
 
-
     _onPinchMove(ev) {
 
-        $('#test123').text(ev.scale + ' ---' + this._prevScale)
-
-        //放大的情况处理
-        if (ev.scale > this._prevScale) {
-            // 缩放值必须要大于起步值
-            // 允许误差
-            if (ev.scale < (this.errorScale + 1)) {
-                return
-            }
+        // 缩放值必须要大于起步值
+        // 允许误差
+        if (ev.scale < (this.errorScale + 1)) {
+            return
         }
-        this._prevScale = ev.scale
-
-
 
         this._stopPropagation(ev)
 
