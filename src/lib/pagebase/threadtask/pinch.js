@@ -1,7 +1,7 @@
 import iconsConfig from '../../toolbar/base/iconconf.js'
 import { svgIcon } from '../../toolbar/base/svgicon'
 import { config } from '../../config/index'
-
+import { letterFirstUpperCase } from '../../util/lang'
 
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
@@ -126,21 +126,28 @@ export default class Pinch {
     _initBind() {
         this.hammer = new Hammer.Manager(this.pinchNode)
         this.hammer.add(new Hammer.Pinch())
-        this.hammer.on('pinchstart', e => {
-            this._onPinchStart(e)
-        })
-        this.hammer.on('pinchmove', e => {
-            this._onPinchMove(e)
-        })
-        this.hammer.on('pinchend', e => {
-            this._onPinchEnd(e)
+
+        //注册事件
+        _.each([
+            'pinchstart',
+            'pinchmove',
+            'pinchend',
+            'panmove',
+            'panend'
+        ], eventName => {
+            this.hammer.on(eventName, e => {
+                this._stopPropagation(e)
+                this['_on' + letterFirstUpperCase(eventName)](e)
+            })
         })
     }
 
 
     _stopPropagation(ev) {
         //缩放时，阻止冒泡
-        ev.srcEvent.stopPropagation()
+        if (this.data.scale > 1) {
+            ev.srcEvent.stopPropagation()
+        }
     }
 
 
@@ -149,90 +156,51 @@ export default class Pinch {
      * @param  {[type]} event [description]
      * @return {[type]}       [description]
      */
-    _onPinchStart(ev) {
-        // if (!this.hammer.get('pan')) {
-        //this.hammer.add(new Hammer.Pan())
-        //取消冒泡 pinch层滑动 li层不可滑动
-        // event.srcEvent.stopPropagation()
-        // this.hammer.get('pan').set({ enable: true });
-
-        // this.hammer.on("panstart", e => {
-        //     this._onPanStart(e)
-        // })
-        // this.hammer.on("panmove", e => {
-        //     this._onPanMove(e)
-        // })
-        // this.hammer.on("panend", e => {
-        //     this._onPanEnd(e)
-        // })
-        // }
+    _onPinchstart(ev) {
+        if (!this.hammer.get('pan')) {
+            this.hammer.add(new Hammer.Pan())
+        }
     }
 
-    _onPinchMove(ev) {
-
-        // 缩放值必须要大于起步值
-        // 允许误差
-        if (ev.scale < (this.errorScale + 1)) {
-            return
-        }
-
-        this._stopPropagation(ev)
-
+    _onPinchmove(ev) {
         //显示关闭按钮
         this._pinchButtonShow()
-
-
-        this.data.scale = this.lastScale * (ev.scale - this.errorScale)
-
+        this.data.scale = this.lastScale * ev.scale
         this._requestUpdate()
     }
 
 
-    _onPinchEnd(ev) {
+    _onPinchend(ev) {
         //还原缩放比 
         if (this.data.scale <= 1) {
             this.data.scale = 1
             this._pinchButtonHide()
             this._requestUpdate(600)
-        } else {
-            this._stopPropagation(ev)
         }
         //保存上一个缩放值
         this.lastScale = this.data.scale
     }
 
-    /**
-     * 平移
-     * @param  {[type]} event [description]
-     * @return {[type]}       [description]
-     */
-    _onPanStart(event) {
 
+    _onPanmove(ev) {
         if (this.data.scale > 1) {
             if (this.currentX != START_X || this.currentY != START_Y) {
                 this.data.translate = {
-                    x: this.currentX + event.deltaX,
-                    y: this.currentY + event.deltaY
+                    x: this.currentX + ev.deltaX,
+                    y: this.currentY + ev.deltaY
                 }
             } else {
                 this.data.translate = {
-                    x: START_X + event.deltaX,
-                    y: START_Y + event.deltaY
+                    x: START_X + ev.deltaX,
+                    y: START_Y + ev.deltaY
                 }
             }
-            this._isBoundry(event)
+            this._isBoundry(ev)
             this._requestUpdate();
-        } else {
-            //不取消冒泡 禁止pinch层滑动 此时li层可以滑动
-            // this.hammer.get('pan').set({ enable: false });
         }
     }
 
-    _onPanMove() {
-        this._isBoundry()
-    }
-
-    _onPanEnd() {
+    _onPanend(ev) {
         this.currentX = data.translate.x
         this.currentY = data.translate.y
     }
@@ -279,7 +247,7 @@ export default class Pinch {
          * 这里存在操作误差处理
          * @type {Number}
          */
-        this.errorScale = 0.2
+        this.errorScale = 0.5
 
         /**
          * 最后一个缩放值
