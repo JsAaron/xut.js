@@ -88,7 +88,10 @@ export default function(instance) {
                     if (flow) {
                         // instance._pinchObj = Pinch( $pagePinch.find('.page-flow-pinch'), $pagePinch)
                     } else {
-                        instance._pinchObj = Pinch($pagePinch, $pagePinch, instance.pageIndex)
+                        instance._pinchObj = new Pinch({
+                            $pagePinch,
+                            pageIndex: instance.pageIndex
+                        })
                     }
                 }
             }

@@ -31,199 +31,281 @@ const createCloseIcon = function() {
 }
 
 
+const START_X = 0
+const START_Y = 0
+
+
 /**
  * 缩放平移
  * @param {[type]} node [description]
  */
-export default function Pinch($pinchNode, $pagePinch, pageIndex) {
-
-    let belongMaster = Xut.Presentation.GetPageObj('master', pageIndex)
-    let masterPageNode
-    if (belongMaster) {
-        masterPageNode = belongMaster.getContainsNode()[0]
-    }
-
-    var pinchNode = $pinchNode[0]
-    var mc = new Hammer.Manager(pinchNode);
-
-    const START_X = 0
-    const START_Y = 0
-
-    var currentX = START_X;
-    var currentY = START_Y;
-
-    var ticking = false;
+export default class Pinch {
 
 
-    const data = {
-        translate: {
-            x: START_X,
-            y: START_Y
-        },
-        scale: 1
-    };
-
-    var initScale = 1;
-
-    let isStart = false
-    let $pinchCloseNode
-
-    const createPinchClose = function() {
-        const $closeNode = createCloseIcon()
-        createSVGIcon($closeNode[0], function() {
-            data.scale = 1;
-            data.translate.x = START_X;
-            data.translate.y = START_Y;
-            requestnodeUpdate();
-            createPinchCloseHide()
+    /**
+     * 创建按钮
+     * @return {[type]} [description]
+     */
+    _createPinchButton() {
+        const $pinchButton = createCloseIcon()
+        createSVGIcon($pinchButton[0], () => {
+            this.data.scale = 1;
+            this.data.translate.x = START_X;
+            this.data.translate.y = START_Y;
+            this._requestUpdate()
+            this._pinchButtonHide()
             isStart = false
         })
-        $pagePinch.after($closeNode)
-        return $closeNode
+        this.$pinchNode.after($pinchButton)
+        return $pinchButton
     }
 
-    const createPinchCloseShow = function() {
-        if ($pinchCloseNode) {
-            $pinchCloseNode.show()
+
+    /**
+     * 缩放按钮显示
+     * @return {[type]} [description]
+     */
+    _pinchButtonShow() {
+        if (this._$pinchButton) {
+            this._$pinchButton.show()
         } else {
-            $pinchCloseNode = createPinchClose()
+            this._$pinchButton = this._createPinchButton()
         }
-        isStart = true
-    }
-
-    const createPinchCloseHide = function() {
-        $pinchCloseNode.hide()
-        isStart = false
-    }
-
-    var pan = new Hammer.Pan();
-    var pinch = new Hammer.Pinch();
-    mc.add([pinch])
-
-    mc.on("pinchstart pinchmove", onPinch);
-
-    function updatenodeTransform() {
-
-        const style =
-            `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
-            scale(${data.scale},${data.scale})`
-
-        pinchNode.style[transform] = style
-        if (masterPageNode) {
-            masterPageNode.style[transform] = style
-        }
-
-        ticking = false
+        this.isRunning = true
     }
 
 
-    function requestnodeUpdate() {
-        if (!ticking) {
-            Xut.nextTick(updatenodeTransform);
-            ticking = true;
+    /**
+     * 缩放按钮隐藏
+     * @return {[type]} [description]
+     */
+    _pinchButtonHide() {
+        this._$pinchButton.hide()
+        this.isRunning = false
+    }
+
+
+    /**
+     * 相关母版
+     * @return {[type]} [description]
+     */
+    _relatedMasterNode(pageIndex) {
+        let belongMaster = Xut.Presentation.GetPageObj('master', pageIndex)
+        if (belongMaster) {
+            return belongMaster.getContainsNode()[0]
         }
     }
 
 
-    function onPinch(ev) {
-        if (data.scale > 1) {
-            ev.srcEvent.stopPropagation()
-            mc.get('pan').set({ enable: true });
+    /**
+     * 更新样式
+     * @return {[type]} [description]
+     */
+    _requestUpdate() {
+
+        const updateTransform = () => {
+            const data = this.data
+            const styleText =
+                `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
+                  scale(${data.scale},${data.scale})`
+            this.pinchNode.style[transform] = styleText
+            if (this.masterNode) {
+                this.masterNode.style[transform] = styleText
+            }
+            this.ticking = false
         }
 
-        if (ev.type == 'pinchstart') {
-            initScale = data.scale || 1;
-            if (!mc.get('pan')) {
-                createPinchCloseShow()
-                mc.add([pan])
-                mc.on("panstart panmove", onPan);
-                mc.on("panend", onPanEnd)
-                pan.recogizeWith(pinch)
+        if (!this.ticking) {
+            Xut.nextTick(updateTransform)
+            this.ticking = true
+        }
+    }
+
+
+    _initBind() {
+        this.hammer = new Hammer.Manager(this.pinchNode)
+        const pinch = new Hammer.Pinch()
+        this.hammer.add([pinch])
+        this.hammer.on('pinchstart', e => {
+            this._onPinchStart(e, pinch)
+        })
+        this.hammer.on('pinchmove', e => {
+            this._onPinchMove(e)
+        })
+        this.hammer.on('pinchend', e => {
+            this._onPinchEnd(e)
+        })
+    }
+
+
+    _onPinchStart(event, pinch) {
+        this.initScale = this.data.scale
+        if (!this.hammer.get('pan')) {
+            this.hammer.add(new Hammer.Pan())
+                //取消冒泡 pinch层滑动 li层不可滑动
+                // event.srcEvent.stopPropagation()
+                // this.hammer.get('pan').set({ enable: true });
+
+            // this.hammer.on("panstart", e => {
+            //     this._onPanStart(e)
+            // })
+            // this.hammer.on("panmove", e => {
+            //     this._onPanMove(e)
+            // })
+            // this.hammer.on("panend", e => {
+            //     this._onPanEnd(e)
+            // })
+            this._pinchButtonShow()
+        } else {
+            if (!this.isRunning) {
+                this._pinchButtonHide()
+            }
+        }
+    }
+
+
+    _onPinchMove(event) {
+
+        if (this.data.scale > 1) {
+            //缩放时，阻止冒泡
+            event.srcEvent.stopPropagation()
+                // const pan = this.hammer.get('pan')
+                // pan && pan.set({ enable: true })
+        }
+
+        //缩放比
+        this.data.scale = this.initScale * event.scale
+
+        this._requestUpdate()
+    }
+
+ 
+    _onPinchEnd(event) {
+        //还原缩放比
+        if (this.data.scale <= 1) {
+            this.data.scale = 1
+            this._pinchButtonHide()
+        }
+    }
+
+
+    _onPanStart(event) {
+
+        if (this.data.scale > 1) {
+            if (this.currentX != START_X || this.currentY != START_Y) {
+                this.data.translate = {
+                    x: this.currentX + event.deltaX,
+                    y: this.currentY + event.deltaY
+                }
             } else {
-                if (!isStart) {
-                    createPinchCloseShow()
+                this.data.translate = {
+                    x: START_X + event.deltaX,
+                    y: START_Y + event.deltaY
                 }
             }
-        }
-
-        pinchNode.className = '';
-        data.scale = initScale * ev.scale
-
-        //还原
-        if (data.scale < 1) {
-            data.scale = 1
-            createPinchCloseHide()
-        }
-        judgeBoundry()
-        requestnodeUpdate();
-
-    }
-
-
-    function onPan(ev) {
-        if (data.scale > 1) {
-            //取消冒泡 pinch层滑动 li层不可滑动
-            ev.srcEvent.stopPropagation()
-            mc.get('pan').set({ enable: true });
-
-            if (currentX != START_X || currentY != START_Y) {
-                data.translate = {
-                    x: currentX + ev.deltaX,
-                    y: currentY + ev.deltaY
-                };
-            } else {
-                data.translate = {
-                    x: START_X + ev.deltaX,
-                    y: START_Y + ev.deltaY
-                };
-            }
-
-            judgeBoundry(ev)
-            requestnodeUpdate();
+            this._isBoundry(event)
+            this._requestUpdate();
         } else {
             //不取消冒泡 禁止pinch层滑动 此时li层可以滑动
-            mc.get('pan').set({ enable: false });
+            // this.hammer.get('pan').set({ enable: false });
         }
     }
 
-    function onPanEnd() {
-        currentX = data.translate.x
-        currentY = data.translate.y
+    _onPanMove() {
+        this._isBoundry()
+    }
 
+    _onPanEnd() {
+        this.currentX = data.translate.x
+        this.currentY = data.translate.y
     }
 
 
-    function judgeBoundry() {
-        var horizontalBoundry = (data.scale - 1) / 2 * pinchNode.offsetWidth;
-        var verticalBoundry = (data.scale - 1) / 2 * pinchNode.offsetHeight;
-        if (data.scale > 1) {
+    /**
+     * 边界判断
+     * @return {Boolean} [description]
+     */
+    _isBoundry() {
+        const pinchNode = this.pinchNode
+        const scale = this.data.scale
+        const horizontalBoundry = (scale - 1) / 2 * pinchNode.offsetWidth;
+        const verticalBoundry = (scale - 1) / 2 * pinchNode.offsetHeight;
+        if (scale > 1) {
             //左边界
-            if (data.translate.x >= horizontalBoundry) {
-                data.translate.x = horizontalBoundry
+            if (this.data.translate.x >= horizontalBoundry) {
+                this.data.translate.x = horizontalBoundry
             }
             //右边界
-            if (data.translate.x <= -horizontalBoundry) {
-                data.translate.x = -horizontalBoundry
+            if (this.data.translate.x <= -horizontalBoundry) {
+                this.data.translate.x = -horizontalBoundry
             }
             //上边界
-            if (data.translate.y >= verticalBoundry) {
-                data.translate.y = verticalBoundry
+            if (this.data.translate.y >= verticalBoundry) {
+                this.data.translate.y = verticalBoundry
             }
             //下边界
-            if (data.translate.y <= -verticalBoundry) {
-                data.translate.y = -verticalBoundry
+            if (this.data.translate.y <= -verticalBoundry) {
+                this.data.translate.y = -verticalBoundry
             }
         } else {
-            data.scale = 1;
-            data.translate.x = START_X;
-            data.translate.y = START_Y;
+            this.data.scale = 1
+            this.data.translate.x = START_X
+            this.data.translate.y = START_Y
         }
     }
 
-    return {
-        destroy: function() {
-            mc.destroy()
+
+    constructor({
+        $pagePinch,
+        pageIndex
+    }) {
+
+        /**
+         * 初始缩放值
+         * @type {Number}
+         */
+        this.initScale = 1
+
+        /**
+         * 是否运行中
+         * @type {Boolean}
+         */
+        this.isRunning = false
+
+        /**
+         * 是否更新中
+         * @type {Boolean}
+         */
+        this.ticking = false
+
+        /**
+         * 需要更新的数据
+         * @type {Object}
+         */
+        this.data = {
+            translate: {
+                x: START_X,
+                y: START_Y
+            },
+            scale: 1
         }
+
+        this.currentX = START_X
+        this.currentY = START_Y
+
+        this.$pinchNode = $pagePinch
+
+        this.pinchNode = $pagePinch[0]
+
+        //母版
+        this.masterNode = this._relatedMasterNode(pageIndex)
+
+        //bind event
+        this._initBind()
+    }
+
+    destroy() {
+        mc.destroy()
     }
 
 }
