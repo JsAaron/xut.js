@@ -167,27 +167,31 @@ export default class Pinch {
         // })
         // }
     }
- 
+
 
     _onPinchMove(ev) {
 
+        $('#test123').text(ev.scale + ' ---' + this._prevScale)
+
         //放大的情况处理
-        if (ev.scale > this.prevScale) {
-            //缩放值必须要大于起步值
-            //允许误差
-            if (ev.scale < this.allowError) {
+        if (ev.scale > this._prevScale) {
+            // 缩放值必须要大于起步值
+            // 允许误差
+            if (ev.scale < (this.errorScale + 1)) {
                 return
             }
         }
-        this.prevScale = ev.scale
+        this._prevScale = ev.scale
+
+
 
         this._stopPropagation(ev)
 
         //显示关闭按钮
         this._pinchButtonShow()
 
-        //缩放比
-        this.data.scale = this.lastScale * (ev.scale - (this.allowError - 1))
+
+        this.data.scale = this.lastScale * (ev.scale - this.errorScale)
 
         this._requestUpdate()
     }
@@ -280,17 +284,11 @@ export default class Pinch {
     _initState() {
 
         /**
-         * 上一个缩放值
-         * @type {Boolean}
-         */
-        this.prevScale = 0
-
-        /**
          * 开始计算的缩放值
          * 这里存在操作误差处理
          * @type {Number}
          */
-        this.allowError = 1.3
+        this.errorScale = 0.2
 
         /**
          * 最后一个缩放值
@@ -325,7 +323,7 @@ export default class Pinch {
         pageIndex
     }) {
 
-        $('body').append('<div id="testtest" style="color:white;z-index:999999;font-size:22px;position:absolute;top:0px;left:0;"></div>')
+        $('body').append('<div id="test123" style="color:white;z-index:999999;font-size:22px;position:absolute;top:0px;left:0;"></div>')
 
         //初始化状态
         this._initState()
