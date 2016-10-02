@@ -2,6 +2,7 @@ import iconsConfig from '../../toolbar/base/iconconf.js'
 import { svgIcon } from '../../toolbar/base/svgicon'
 import { config } from '../../config/index'
 
+
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 
@@ -34,7 +35,7 @@ const createCloseIcon = function() {
  * 缩放平移
  * @param {[type]} node [description]
  */
-export default function Pinch($pagePinch, pageIndex) {
+export default function Pinch($pinchNode, $pagePinch, pageIndex) {
 
     let belongMaster = Xut.Presentation.GetPageObj('master', pageIndex)
     let masterPageNode
@@ -42,8 +43,8 @@ export default function Pinch($pagePinch, pageIndex) {
         masterPageNode = belongMaster.getContainsNode()[0]
     }
 
-    var pagePinch = $pagePinch[0]
-    var mc = new Hammer.Manager(pagePinch);
+    var pinchNode = $pinchNode[0]
+    var mc = new Hammer.Manager(pinchNode);
 
     const START_X = 0
     const START_Y = 0
@@ -107,7 +108,7 @@ export default function Pinch($pagePinch, pageIndex) {
             `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
             scale(${data.scale},${data.scale})`
 
-        pagePinch.style[transform] = style
+        pinchNode.style[transform] = style
         if (masterPageNode) {
             masterPageNode.style[transform] = style
         }
@@ -145,7 +146,7 @@ export default function Pinch($pagePinch, pageIndex) {
             }
         }
 
-        pagePinch.className = '';
+        pinchNode.className = '';
         data.scale = initScale * ev.scale
 
         //还原
@@ -193,8 +194,8 @@ export default function Pinch($pagePinch, pageIndex) {
 
 
     function judgeBoundry() {
-        var horizontalBoundry = (data.scale - 1) / 2 * pagePinch.offsetWidth;
-        var verticalBoundry = (data.scale - 1) / 2 * pagePinch.offsetHeight;
+        var horizontalBoundry = (data.scale - 1) / 2 * pinchNode.offsetWidth;
+        var verticalBoundry = (data.scale - 1) / 2 * pinchNode.offsetHeight;
         if (data.scale > 1) {
             //左边界
             if (data.translate.x >= horizontalBoundry) {

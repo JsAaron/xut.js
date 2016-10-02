@@ -8,7 +8,7 @@
  * @return {[type]} [description]
  *
  ********************************************************************/
-import { PPT } from '../plugin/ppt/index'
+import { PPT } from '../../plugin/internal/ppt/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
 import { clearContentAudio } from '../audio/manager'

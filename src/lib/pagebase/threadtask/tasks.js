@@ -32,7 +32,7 @@ export default function(instance) {
      * @type {Object}
      */
     instance.threadtasks = {
-  
+
         /**
          * li容器
          * @return {[type]} [description]
@@ -88,10 +88,10 @@ export default function(instance) {
                     if (flow) {
                         // instance._pinchObj = Pinch( $pagePinch.find('.page-flow-pinch'), $pagePinch)
                     } else {
-                        instance._pinchObj = new Pinch({
+                        instance._pinchObj = new Pinch(
                             $pagePinch,
-                            pageIndex: instance.pageIndex
-                        })
+                            instance.pageIndex
+                        )
                     }
                 }
             }
