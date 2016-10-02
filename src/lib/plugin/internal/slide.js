@@ -3,6 +3,7 @@ import { svgIcon } from '../../toolbar/base/svgicon'
 import { config } from '../../config/index'
 
 const transform = Xut.style.transform
+const transitionDuration = Xut.style.transitionDuration
 const translateZ = Xut.style.translateZ
 
 
@@ -14,7 +15,6 @@ const createSVGIcon = function(el, callback) {
     return new svgIcon(el, iconsConfig, options);
 }
 
-let idid = 0
 const createCloseIcon = function() {
     const proportion = config.proportion
     const width = proportion.width * 55
@@ -41,14 +41,16 @@ export default class Slide {
      * 更新节点样式
      * @return {[type]} [description]
      */
-    _updateNodeStyle() {
+    _updateNodeStyle(speed = 0) {
         if (!this.ticking) {
             Xut.nextTick(() => {
                 const data = this.data
                 const styleText =
                     `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
             scale(${data.scale},${data.scale})`
+
                 this.pinchNode.style[transform] = styleText
+                this.pinchNode.style[transitionDuration] = speed + 'ms'
                 this.update && this.update(styleText)
                 this.ticking = false
             })
@@ -65,7 +67,7 @@ export default class Slide {
         createSVGIcon($node[0], () => {
             //点击还原
             this._initState()
-            this._requestNodeUpdate()
+            this._updateNodeStyle()
             this._buttonHide()
         })
         this.$pinchNode.after($node)
@@ -79,9 +81,10 @@ export default class Slide {
     _buttonShow() {
         //to heavy
         if (this._buttonRunning) return
-        this.debug(++idid)
         if (this.$buttonNode) {
-            this.$buttonNode.show()
+            Xut.nextTick(() => {
+                this.$buttonNode.show()
+            })
         } else {
             this.$buttonNode = this._createPinchButton()
         }
@@ -140,14 +143,11 @@ export default class Slide {
     _initEvent() {
 
         this.hammer = new Hammer.Manager(this.pinchNode)
-        this.hammer.add(
-            new Hammer.Pinch({
-                threshold: 0
-            })
-        )
+        this.hammer.add(new Hammer.Pinch())
 
         _.each({
             'pinchstart pinchmove': '_onPinch',
+            'pinchend': '_onPinchEnd',
             'panstart panmove': '_onPan',
             'panend': '_onPanEnd'
         }, (value, key) => {
@@ -177,13 +177,13 @@ export default class Slide {
      */
     _onPinch(ev) {
 
-        if (Xut.Application.isFliping()) {
-            return
-        }
-
-        if (this._isRunning()) {
+        if (this.data.scale > 1) {
             //缩放就需要打开关闭按钮
             this._buttonShow()
+        }
+
+        if (ev.type == 'pinchstart') {
+            this.lastScale = this.data.scale || 1
 
             //加入平移
             if (!this.hammer.get('pan')) {
@@ -191,23 +191,25 @@ export default class Slide {
                     .add(new Hammer.Pan())
                     .recognizeWith(this.hammer.get('pinch'))
             }
-        }
 
-        if (ev.type == 'pinchstart') {
-            this.lastScale = this.data.scale || 1
         }
 
         //新的缩放值
         this.data.scale = this.lastScale * ev.scale
 
-        //还原
-        if (this.data.scale < 1) {
-            this.data.scale = 1
-            this._buttonHide()
-        }
-
         this._isBoundry()
         this._updateNodeStyle()
+    }
+
+    _onPinchEnd() {
+        if (this.data.scale <= 1) {
+            Xut.nextTick(() => {
+                this.lastScale = 1
+                this.data.scale = 1
+                this._updateNodeStyle(500)
+                this._buttonHide()
+            })
+        }
     }
 
 
@@ -226,9 +228,6 @@ export default class Slide {
             }
             this._isBoundry()
             this._updateNodeStyle()
-        } else {
-            //不取消冒泡 禁止pinch层滑动 此时li层可以滑动
-            this.hammer.get('pan').set({ enable: false });
         }
     }
 

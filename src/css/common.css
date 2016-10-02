@@ -994,7 +994,7 @@ video {
     margin-left: 4px;
     cursor: pointer;
     border-radius: 4px;
-    padding: 0 .7rem;
+    padding: 0.2rem .8rem;
 }
 
 .xut-page-number > div:first-child {

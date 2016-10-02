@@ -157,7 +157,7 @@ export default class Swipe extends Observer {
         bindEvent(this.element, callback)
     }
 
-
+ 
     /**
      * 触发
      * @param  {[type]} e [description]
