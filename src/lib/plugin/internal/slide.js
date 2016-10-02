@@ -14,7 +14,7 @@ const createSVGIcon = function(el, callback) {
     return new svgIcon(el, iconsConfig, options);
 }
 
-
+let idid = 0
 const createCloseIcon = function() {
     const proportion = config.proportion
     const width = proportion.width * 55
@@ -76,12 +76,15 @@ export default class Slide {
      * @return {[type]} [description]
      */
     _buttonShow() {
+        //to heavy
+        if (this._buttonRunning) return
+        this.debug(++idid)
         if (this.$buttonNode) {
             this.$buttonNode.show()
         } else {
             this.$buttonNode = this._createPinchButton()
         }
-        this.isRunning = true
+        this._buttonRunning = true
     }
 
     /**
@@ -89,11 +92,12 @@ export default class Slide {
      * @return {[type]} [description]
      */
     _buttonHide() {
+        if (!this._buttonRunning) return
         if (!this.$buttonNode) {
             this.$buttonNode = this._createPinchButton()
         }
         this.$buttonNode.hide()
-        this.isRunning = false
+        this._buttonRunning = false
     }
 
 
@@ -125,8 +129,6 @@ export default class Slide {
             },
             scale: 1
         }
-
-        this.isRunning = false
     }
 
 
@@ -135,10 +137,21 @@ export default class Slide {
      * @return {[type]} [description]
      */
     _initEvent() {
+
         this.hammer = new Hammer.Manager(this.pinchNode)
-        this.hammer.add(new Hammer.Pinch())
+        this.hammer.add(
+            new Hammer.Pinch({
+                threshold: 0
+            })
+        )
         this.hammer.on("pinchstart pinchmove", (e) => {
             this._onPinch(e)
+        })
+        this.hammer.on("panstart panmove", (e) => {
+            this._onPan(e)
+        })
+        this.hammer.on("panend", (e) => {
+            this._onPanEnd(e)
         })
     }
 
@@ -149,25 +162,26 @@ export default class Slide {
      * @return {[type]}    [description]
      */
     _onPinch(ev) {
+
         if (this.data.scale > 1) {
             ev.srcEvent.stopPropagation()
-            this.hammer.get('pan').set({ enable: true });
+
+            //缩放就需要打开关闭按钮
+            this._buttonShow()
         }
 
         if (ev.type == 'pinchstart') {
-            this.lastScale = this.data.scale || 1;
+            this.lastScale = this.data.scale || 1
+
+            //加入平移
             if (!this.hammer.get('pan')) {
-                this._buttonHide()
-                this.hammer.add(new Hammer.Pan())
-                this.hammer.on("panstart panmove", onPan);
-                this.hammer.on("panend", onPanEnd)
-            } else {
-                if (!this.isRunning) {
-                    this._buttonShow()
-                }
+                this.hammer
+                    .add(new Hammer.Pan())
+                    .recognizeWith(this.hammer.get('pinch'))
             }
         }
 
+        //新的缩放值
         this.data.scale = this.lastScale * ev.scale
 
         //还原
@@ -247,6 +261,13 @@ export default class Slide {
         pageIndex,
         update
     }) {
+
+        $('body').append('<div id="test123" style="color:white;z-index:999999;font-size:22px;position:absolute;top:0px;left:0;"></div>')
+
+        this.debug = function(h) {
+            $("#test123").text(h)
+        }
+
         //更新回调
         this.update = update
 
