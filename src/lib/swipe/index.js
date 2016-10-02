@@ -80,6 +80,9 @@ export default class Swipe extends Observer {
         //翻页速率
         this._speedRate = this._originalRate = this._pageTime / this._viewWidth
 
+        //是否移动中
+        this._isMoving = false
+
         //计算初始化页码
         this.pagePointer = initPointer(initIndex, pagetotal)
 
@@ -162,6 +165,10 @@ export default class Swipe extends Observer {
      */
     _onStart(e) {
 
+        if (e.touches && e.touches.length > 1) {
+            return
+        }
+
         //判断双击速度
         //必须要大于350
         const currtTime = getDate()
@@ -218,10 +225,16 @@ export default class Swipe extends Observer {
      */
     _onMove(e) {
 
+        // if (e.touches && e.touches.length > 1) {
+        //     return
+        // }
+
         //如果没有点击
         //或是Y轴滑动
         //或者是阻止滑动
         if (!this._isTap || this._isRollY || this._preventSwipe) return
+
+        this._isMoving = true
 
         let point = compatibilityEvent(e)
         let deltaX = point.pageX - this._start.pageX
@@ -293,7 +306,12 @@ export default class Swipe extends Observer {
      */
     _onEnd(e) {
 
+        if (e.touches && e.touches.length > 1) {
+            return
+        }
+
         this._isTap = false
+        this._isMoving = false
 
         if (this._isBounce || this._preventSwipe) return
 
@@ -625,6 +643,8 @@ export default class Swipe extends Observer {
      */
     _restore(node, view) {
 
+        this._isMoving = false
+
         //针对拖拽翻页阻止
         this._preventSwipe = true
         this._isTap = false;
@@ -636,7 +656,8 @@ export default class Swipe extends Observer {
 
     _distributed(...arg) {
         this._restore(...arg)
-            //延长获取更pagePointer的更新值
+
+        //延长获取更pagePointer的更新值
         setTimeout(() => {
             this.$emit('onComplete', this.direction, this.pagePointer, this._unlock.bind(this), this._isQuickTurn);
         }, 50)

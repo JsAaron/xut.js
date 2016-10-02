@@ -367,6 +367,7 @@ export default function overrideApi(vm) {
         return $globalEvent.isBorder(distance)
     }
 
+
     /**
      * 页面滑动
      * @param {[type]} distance  [description]
@@ -378,7 +379,7 @@ export default function overrideApi(vm) {
 
         //如果禁止翻页模式 || 如果是滑动,不是边界
         if (!options.multiplePages ||
-            $globalEvent.isMoveimg() ||
+            $globalEvent.isMoving() ||
             action === 'flipMove' && $globalEvent.isBorder(distance)) {
             return
         }
@@ -670,4 +671,13 @@ export default function overrideApi(vm) {
             $globalEvent[operate]();
         }
     })
+
+    /**
+     * 是否翻页中
+     * @return {Boolean} [description]
+     */
+    Application.isFliping = function(){
+        return $globalEvent.isMoving()
+    }
+
 }

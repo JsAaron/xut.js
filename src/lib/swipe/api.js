@@ -33,7 +33,9 @@ export default function api(Swipe) {
      * @return {[type]} [description]
      */
     Swipe.prototype.closeSwipe = function() {
-        this._evtDestroy();
+        if (!this._isMoving) {
+            this._evtDestroy()
+        }
     }
 
 
@@ -51,8 +53,8 @@ export default function api(Swipe) {
      * 检车是否还在移动中
      * @return {Boolean} [description]
      */
-    Swipe.prototype.isMoveimg = function() {
-        return this._fliplock;
+    Swipe.prototype.isMoving = function() {
+        return this._isMoving
     }
 
 

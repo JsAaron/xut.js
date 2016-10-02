@@ -63,8 +63,9 @@ export default class Slide {
     _createPinchButton() {
         const $node = createCloseIcon()
         createSVGIcon($node[0], () => {
+            //点击还原
             this._initState()
-            this._requestNodeUpdate();
+            this._requestNodeUpdate()
             this._buttonHide()
         })
         this.$pinchNode.after($node)
@@ -144,15 +145,28 @@ export default class Slide {
                 threshold: 0
             })
         )
-        this.hammer.on("pinchstart pinchmove", (e) => {
-            this._onPinch(e)
+
+        _.each({
+            'pinchstart pinchmove': '_onPinch',
+            'panstart panmove': '_onPan',
+            'panend': '_onPanEnd'
+        }, (value, key) => {
+            this.hammer.on(key, (e) => {
+                if (this._isRunning()) {
+                    e.srcEvent.stopPropagation()
+                }
+                this[value](e)
+            })
         })
-        this.hammer.on("panstart panmove", (e) => {
-            this._onPan(e)
-        })
-        this.hammer.on("panend", (e) => {
-            this._onPanEnd(e)
-        })
+    }
+
+
+    /**
+     * 判断是否运行中
+     * @return {Boolean} [description]
+     */
+    _isRunning() {
+        return this.data.scale > 1 ? true : false
     }
 
 
@@ -163,15 +177,13 @@ export default class Slide {
      */
     _onPinch(ev) {
 
-        if (this.data.scale > 1) {
-            ev.srcEvent.stopPropagation()
-
-            //缩放就需要打开关闭按钮
-            this._buttonShow()
+        if (Xut.Application.isFliping()) {
+            return
         }
 
-        if (ev.type == 'pinchstart') {
-            this.lastScale = this.data.scale || 1
+        if (this._isRunning()) {
+            //缩放就需要打开关闭按钮
+            this._buttonShow()
 
             //加入平移
             if (!this.hammer.get('pan')) {
@@ -179,6 +191,10 @@ export default class Slide {
                     .add(new Hammer.Pan())
                     .recognizeWith(this.hammer.get('pinch'))
             }
+        }
+
+        if (ev.type == 'pinchstart') {
+            this.lastScale = this.data.scale || 1
         }
 
         //新的缩放值
@@ -196,11 +212,7 @@ export default class Slide {
 
 
     _onPan(ev) {
-        if (this.data.scale > 1) {
-            //取消冒泡 pinch层滑动 li层不可滑动
-            ev.srcEvent.stopPropagation()
-            this.hammer.get('pan').set({ enable: true });
-
+        if (this._isRunning()) {
             if (this.currentX != START_X || this.currentY != START_Y) {
                 this.data.translate = {
                     x: this.currentX + ev.deltaX,
@@ -212,7 +224,6 @@ export default class Slide {
                     y: START_Y + ev.deltaY
                 };
             }
-
             this._isBoundry()
             this._updateNodeStyle()
         } else {
@@ -225,7 +236,6 @@ export default class Slide {
     _onPanEnd() {
         this.currentX = this.data.translate.x
         this.currentY = this.data.translate.y
-
     }
 
     _isBoundry() {
