@@ -106,6 +106,15 @@ export default class Slide {
 
     _initState() {
 
+        //允许溢出值
+        this.overflowValue = 0.3
+
+        /**
+         * 缩放中
+         * @type {Boolean}
+         */
+        this.scaleing = false
+
         /**
          * 最后一个缩放值
          * @type {Number}
@@ -172,13 +181,26 @@ export default class Slide {
 
 
     /**
-     * 缩放
+     * 缩放移动
      * @param  {[type]} ev [description]
      * @return {[type]}    [description]
      */
     _onPinch(ev) {
 
-        if (this.data.scale > 1) {
+        if (Xut.Application.isFliping()) {
+            return
+        }
+
+        if (!this.scaleing) {
+            if (ev.scale < this.overflowValue + 1) {
+                return
+            }
+            this.scaleing = true
+        }
+
+        let scale = ev.scale - this.overflowValue
+
+        if (scale > 1) {
             //缩放就需要打开关闭按钮
             this._buttonShow()
         }
@@ -192,26 +214,36 @@ export default class Slide {
                     .add(new Hammer.Pan())
                     .recognizeWith(this.hammer.get('pinch'))
             }
-
         }
 
         //新的缩放值
-        this.data.scale = this.lastScale * ev.scale
+        this.data.scale = this.lastScale * scale
 
         // this._isBoundry()
         this._updateNodeStyle()
     }
 
+
+    /**
+     * 缩放松手
+     * @return {[type]} [description]
+     */
     _onPinchEnd() {
         if (this.data.scale <= 1) {
             Xut.nextTick(() => {
                 this._initState()
                 this._updateNodeStyle(500)
             })
+        } else {
+            this.overflowValue = 0
         }
     }
 
-
+    /**
+     * 平移
+     * @param  {[type]} ev [description]
+     * @return {[type]}    [description]
+     */
     _onPan(ev) {
         if (this._isRunning()) {
             if (this.currentX != START_X || this.currentY != START_Y) {
