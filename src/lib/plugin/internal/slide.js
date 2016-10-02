@@ -67,8 +67,7 @@ export default class Slide {
         createSVGIcon($node[0], () => {
             //点击还原
             this._initState()
-            this._updateNodeStyle()
-            this._buttonHide()
+            this._updateNodeStyle(500)
         })
         this.$pinchNode.after($node)
         return $node
@@ -133,6 +132,8 @@ export default class Slide {
             },
             scale: 1
         }
+
+        this._buttonHide()
     }
 
 
@@ -197,17 +198,15 @@ export default class Slide {
         //新的缩放值
         this.data.scale = this.lastScale * ev.scale
 
-        this._isBoundry()
+        // this._isBoundry()
         this._updateNodeStyle()
     }
 
     _onPinchEnd() {
         if (this.data.scale <= 1) {
             Xut.nextTick(() => {
-                this.lastScale = 1
-                this.data.scale = 1
+                this._initState()
                 this._updateNodeStyle(500)
-                this._buttonHide()
             })
         }
     }
@@ -224,7 +223,7 @@ export default class Slide {
                 this.data.translate = {
                     x: START_X + ev.deltaX,
                     y: START_Y + ev.deltaY
-                };
+                }
             }
             this._isBoundry()
             this._updateNodeStyle()
