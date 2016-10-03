@@ -187,18 +187,18 @@ export default class Slide {
      */
     _onPinch(ev) {
 
-        if (Xut.Application.isFliping()) {
-            return
-        }
-
         if (!this.scaleing) {
             if (ev.scale < this.overflowValue + 1) {
                 return
             }
             this.scaleing = true
         }
+ 
+        // if (Xut.Application.isFliping()) {
+        //     return
+        // }
 
-        let scale = ev.scale - this.overflowValue
+        let scale = ev.scale - this.overflowValue 
 
         if (scale > 1) {
             //缩放就需要打开关闭按钮
