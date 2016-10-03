@@ -8,7 +8,7 @@ killOccupied(prot, () => {
         port: prot,
         server: {
             baseDir: "./src",
-            index: "testtest.html"
+            index: "test.html"
         },
         open: true
     })
