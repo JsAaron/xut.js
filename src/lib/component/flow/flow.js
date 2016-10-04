@@ -15,7 +15,7 @@ export default class Flow {
 
     constructor({
         pageIndex,
-        $containsNode,
+        $pinchNode,
         seasonId,
         chapterId,
         successCallback
@@ -24,9 +24,9 @@ export default class Flow {
         const self = this
         const dataNode = $('#chapter-flow-' + chapterId)
         this.initIndex = pageIndex
-
+        this.$pinchNode = $pinchNode
         render({
-            $containsNode,
+            $pinchNode,
             dataNode,
             chapterId,
             callback($container) {
@@ -36,6 +36,26 @@ export default class Flow {
         })
     }
 
+    /**
+     * 缩放图片
+     * @return {[type]} [description]
+     */
+    _zoomImage(src) {
+
+        src = Xut.config.pathAddress + src
+
+        let html = `<div class="page-pinch-image"
+                        style="width:100%;
+                               height:100%;
+                               position:absolute;
+                               top:0;
+                               left:0;
+                               background-image:url(${src});
+                               background-size:100% 100%">
+                   </div>`
+
+        this.$pinchNode.after(String.styleFormat(html))
+    }
 
     /**
      * 初始化
@@ -77,7 +97,14 @@ export default class Flow {
         let lastDistance = swipe._initDistance
 
 
-        swipe.$watch('onTap', (pageIndex, hookCallback) => {
+        swipe.$watch('onTap', (pageIndex, hookCallback, ev) => {
+
+            //图片缩放
+            const node = ev.target
+            if (node && 　node.nodeName.toLowerCase() === "img") {
+                this._zoomImage(node.src.match(/\w+.jpg|png/gi))
+            }
+
             if (!Xut.Contents.Canvas.getIsTap()) {
                 View.Toolbar()
             }

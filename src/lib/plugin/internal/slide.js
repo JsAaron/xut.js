@@ -162,9 +162,7 @@ export default class Slide {
             'panend': '_onPanEnd'
         }, (value, key) => {
             this.hammer.on(key, (e) => {
-                if (this._isRunning()) {
-                    e.srcEvent.stopPropagation()
-                }
+                 e.srcEvent.stopPropagation()
                 this[value](e)
             })
         })
@@ -194,9 +192,6 @@ export default class Slide {
             this.scaleing = true
         }
  
-        // if (Xut.Application.isFliping()) {
-        //     return
-        // }
 
         let scale = ev.scale - this.overflowValue 
 

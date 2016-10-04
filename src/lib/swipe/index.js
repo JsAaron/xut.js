@@ -157,7 +157,7 @@ export default class Swipe extends Observer {
         bindEvent(this.element, callback)
     }
 
- 
+
     /**
      * 触发
      * @param  {[type]} e [description]
@@ -318,7 +318,7 @@ export default class Swipe extends Observer {
         //点击
         if (!this._isRollX && !this._isRollY) {
             let isReturn = false
-            this.$emit('onTap', this._hindex, () => isReturn = true);
+            this.$emit('onTap', this._hindex, () => isReturn = true, e);
             if (isReturn) return
         }
 

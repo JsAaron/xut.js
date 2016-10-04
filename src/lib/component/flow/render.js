@@ -3,14 +3,14 @@
  * dom...
  */
 export default function render({
-    $containsNode,
+    $pinchNode,
     dataNode,
     chapterId,
     callback
 } = {}) {
     const $container = $(dataNode.html())
     Xut.nextTick({
-        container: $containsNode,
+        container: $pinchNode,
         content: $container
     }, () => callback($container))
 }

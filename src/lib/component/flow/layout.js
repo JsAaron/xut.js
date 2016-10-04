@@ -49,7 +49,7 @@ const createStr = (chapterId, data, viewWidth, viewHeight, margin) => {
 
     newViewHight = containerHeight
 
-    return container
+    return String.styleFormat(container)
 }
 
 
