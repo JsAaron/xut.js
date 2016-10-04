@@ -16,7 +16,7 @@ export default function Pinch($pagePinch, pageIndex) {
         $pagePinch,
         pageIndex,
         update() {
-
+            
         }
     })
 

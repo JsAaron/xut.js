@@ -7,6 +7,8 @@ import render from './render'
 import getFlipDistance from '../../visuals/distance.config'
 import { getFlowView } from '../../visuals/expand/api.config'
 
+import Slide from '../../plugin/internal/slide'
+
 /**
  * 2017.9.7
  * 流式排版
@@ -54,7 +56,13 @@ export default class Flow {
                                background-size:100% 100%">
                    </div>`
 
-        this.$pinchNode.after(String.styleFormat(html))
+        let $html = $(String.styleFormat(html))
+
+        new Slide({
+            $html
+        })
+
+        this.$pinchNode.after($html)
     }
 
     /**
@@ -101,6 +109,7 @@ export default class Flow {
 
             //图片缩放
             const node = ev.target
+
             if (node && 　node.nodeName.toLowerCase() === "img") {
                 this._zoomImage(node.src.match(/\w+.jpg|png/gi))
             }

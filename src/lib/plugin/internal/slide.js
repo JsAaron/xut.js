@@ -293,7 +293,6 @@ export default class Slide {
 
     constructor({
         $pagePinch,
-        pageIndex,
         update
     }) {
 
@@ -308,6 +307,7 @@ export default class Slide {
 
         //缩放根节点
         this.$pinchNode = $pagePinch
+
         this.pinchNode = $pagePinch[0]
 
         //初始化状态
