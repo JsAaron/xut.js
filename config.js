@@ -90,7 +90,7 @@ module.exports = {
         server: true,
 
         /**
-         * index中排除的文件
+         * html中排除的文件
          * @type {Array}
          * Parameter is an array format
          */
