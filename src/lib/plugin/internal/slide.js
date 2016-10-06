@@ -42,12 +42,6 @@ export default class Slide {
         update
     }) {
 
-        $('body').append('<div id="test123" style="color:white;z-index:999999;font-size:22px;position:absolute;top:0px;left:0;"></div>')
-
-        this.debug = function(h) {
-            $("#test123").append(`<div>${h}</div>`)
-        }
-
         this.update = update
 
         //缩放根节点
