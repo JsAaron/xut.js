@@ -12,7 +12,7 @@ import nextTick from './util/nexttick'
 import init from './initialize/index'
 
 
-Xut.Version = 836
+Xut.Version = 837
  
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -31,7 +31,7 @@ if (Xut.plat.isBrowser) {
         }
     })
 }
-
+ 
 /**
  * remove old html
  * @return {[type]} [description]

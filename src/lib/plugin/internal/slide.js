@@ -37,77 +37,36 @@ const START_Y = 0
  */
 export default class Slide {
 
-    /**
-     * 更新节点样式
-     * @return {[type]} [description]
-     */
-    _updateNodeStyle(speed = 0) {
-        if (!this.ticking) {
-            Xut.nextTick(() => {
-                const data = this.data
-                const styleText =
-                    `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
-            scale(${data.scale},${data.scale})`
+    constructor({
+        $pagePinch,
+        update
+    }) {
 
-                this.pinchNode.style[transform] = styleText
-                this.pinchNode.style[transitionDuration] = speed + 'ms'
-                this.update && this.update(styleText)
-                this.ticking = false
-            })
-            this.ticking = true
+        $('body').append('<div id="test123" style="color:white;z-index:999999;font-size:22px;position:absolute;top:0px;left:0;"></div>')
+
+        this.debug = function(h) {
+            $("#test123").append(`<div>${h}</div>`)
         }
-    }
 
-    /**
-     * 创建按钮
-     * @return {[type]} [description]
-     */
-    _createPinchButton() {
-        const $node = createCloseIcon()
-        createSVGIcon($node[0], () => {
-            //点击还原
-            this._initState()
-            this._updateNodeStyle(500)
-        })
-        this.$pinchNode.after($node)
-        return $node
-    }
+        this.update = update
 
-    /**
-     * 按钮显示
-     * @return {[type]} [description]
-     */
-    _buttonShow() {
-        //to heavy
-        if (this._buttonRunning) return
-        if (this.$buttonNode) {
-            Xut.nextTick(() => {
-                this.$buttonNode.show()
-            })
-        } else {
-            this.$buttonNode = this._createPinchButton()
-        }
-        this._buttonRunning = true
-    }
+        //缩放根节点
+        this.$pinchNode = $pagePinch
 
-    /**
-     * 按钮隐藏
-     * @return {[type]} [description]
-     */
-    _buttonHide() {
-        if (!this._buttonRunning) return
-        if (!this.$buttonNode) {
-            this.$buttonNode = this._createPinchButton()
-        }
-        this.$buttonNode.hide()
-        this._buttonRunning = false
+        this.pinchNode = $pagePinch[0]
+
+        //初始化状态
+        this._initState()
+
+        //初始化事件
+        this._initEvent()
     }
 
 
     _initState() {
 
         //允许溢出值
-        this.overflowValue = 0.3
+        this.overflowValue = 0.5
 
         /**
          * 缩放中
@@ -154,65 +113,49 @@ export default class Slide {
 
         this.hammer = new Hammer.Manager(this.pinchNode)
         this.hammer.add(new Hammer.Pinch())
+        this.hammer.add(new Hammer.Pan({ enable: false }))
+            .recognizeWith(this.hammer.get('pinch'))
 
         _.each({
-            'pinchstart pinchmove': '_onPinch',
+            'pinchstart': '_onPinchStart',
+            'pinchmove': '_onPinchMove',
             'pinchend': '_onPinchEnd',
             'panstart panmove': '_onPan',
             'panend': '_onPanEnd'
         }, (value, key) => {
             this.hammer.on(key, (e) => {
-                 e.srcEvent.stopPropagation()
+                e.srcEvent.stopPropagation()
                 this[value](e)
             })
         })
     }
 
 
-    /**
-     * 判断是否运行中
-     * @return {Boolean} [description]
-     */
-    _isRunning() {
-        return this.data.scale > 1 ? true : false
+    _onPinchStart(ev) {
+        this.lastScale = this.data.scale || 1
     }
-
 
     /**
      * 缩放移动
      * @param  {[type]} ev [description]
      * @return {[type]}    [description]
      */
-    _onPinch(ev) {
+    _onPinchMove(ev) {
 
+        //允许溢出值
         if (!this.scaleing) {
             if (ev.scale < this.overflowValue + 1) {
                 return
             }
             this.scaleing = true
         }
- 
 
-        let scale = ev.scale - this.overflowValue 
-
-        if (scale > 1) {
-            //缩放就需要打开关闭按钮
-            this._buttonShow()
-        }
-
-        if (ev.type == 'pinchstart') {
-            this.lastScale = this.data.scale || 1
-
-            //加入平移
-            if (!this.hammer.get('pan')) {
-                this.hammer
-                    .add(new Hammer.Pan())
-                    .recognizeWith(this.hammer.get('pinch'))
-            }
-        }
+        let scale = ev.scale - this.overflowValue
 
         //新的缩放值
         this.data.scale = this.lastScale * scale
+
+        this._buttonShow()
 
         // this._isBoundry()
         this._updateNodeStyle()
@@ -223,8 +166,8 @@ export default class Slide {
      * 缩放松手
      * @return {[type]} [description]
      */
-    _onPinchEnd() {
-        if (this.data.scale <= 1) {
+    _onPinchEnd(ev) {
+        if (this.data.scale < 1) {
             Xut.nextTick(() => {
                 this._initState()
                 this._updateNodeStyle(500)
@@ -240,7 +183,7 @@ export default class Slide {
      * @return {[type]}    [description]
      */
     _onPan(ev) {
-        if (this._isRunning()) {
+        if (this._isRunning) {
             if (this.currentX != START_X || this.currentY != START_Y) {
                 this.data.translate = {
                     x: this.currentX + ev.deltaX,
@@ -258,15 +201,24 @@ export default class Slide {
     }
 
 
+    /**
+     * 平移松手
+     * @return {[type]} [description]
+     */
     _onPanEnd() {
         this.currentX = this.data.translate.x
         this.currentY = this.data.translate.y
     }
 
+
+    /**
+     * 边界反弹
+     * @return {Boolean} [description]
+     */
     _isBoundry() {
         var horizontalBoundry = (this.data.scale - 1) / 2 * this.pinchNode.offsetWidth;
         var verticalBoundry = (this.data.scale - 1) / 2 * this.pinchNode.offsetHeight;
-        if (this.data.scale > 1) {
+        if (this._isRunning) {
             //左边界
             if (this.data.translate.x >= horizontalBoundry) {
                 this.data.translate.x = horizontalBoundry
@@ -291,31 +243,77 @@ export default class Slide {
     }
 
 
-    constructor({
-        $pagePinch,
-        update
-    }) {
+    /**
+     * 更新节点样式
+     * @return {[type]} [description]
+     */
+    _updateNodeStyle(speed = 0) {
+        if (!this.ticking) {
+            Xut.nextTick(() => {
+                const data = this.data
+                const styleText =
+                    `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
+            scale(${data.scale},${data.scale})`
 
-        $('body').append('<div id="test123" style="color:white;z-index:999999;font-size:22px;position:absolute;top:0px;left:0;"></div>')
-
-        this.debug = function(h) {
-            $("#test123").text(h)
+                this.pinchNode.style[transform] = styleText
+                this.pinchNode.style[transitionDuration] = speed + 'ms'
+                this.update && this.update(styleText, speed)
+                this.ticking = false
+            })
+            this.ticking = true
         }
-
-        //更新回调
-        this.update = update
-
-        //缩放根节点
-        this.$pinchNode = $pagePinch
-
-        this.pinchNode = $pagePinch[0]
-
-        //初始化状态
-        this._initState()
-
-        //初始化事件
-        this._initEvent()
     }
+
+    /**
+     * 创建按钮
+     * @return {[type]} [description]
+     */
+    _createPinchButton() {
+        const $node = createCloseIcon()
+        createSVGIcon($node[0], () => {
+            //点击还原
+            this._initState()
+            this._updateNodeStyle(500)
+        })
+        this.$pinchNode.after($node)
+        return $node
+    }
+
+    /**
+     * 按钮显示
+     * @return {[type]} [description]
+     */
+    _buttonShow() {
+        //to heavy
+        if (this._isRunning) return
+        if (this.data.scale > 1) {
+            if (this.$buttonNode) {
+                Xut.nextTick(() => {
+                    this.$buttonNode.show()
+                })
+            } else {
+                this.$buttonNode = this._createPinchButton()
+            }
+            this._isRunning = true
+            this.hammer.get('pan').set({ enable: true })
+        }
+    }
+
+    /**
+     * 按钮隐藏
+     * @return {[type]} [description]
+     */
+    _buttonHide() {
+        if (!this._isRunning) return
+        if (!this.$buttonNode) {
+            this.$buttonNode = this._createPinchButton()
+        }
+        this.$buttonNode.hide()
+        this._isRunning = false
+        this.hammer.get('pan').set({ enable: false })
+    }
+
+
 
     destroy() {
         this.hammer.destroy()
