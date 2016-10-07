@@ -49,6 +49,10 @@ export default class Slide {
 
         this.pinchNode = $pagePinch[0]
 
+
+        this._offsetWidth = this.pinchNode.offsetWidth
+        this._offsetHeight = this.pinchNode.offsetHeight
+
         //初始化状态
         this._initState()
 
@@ -150,8 +154,7 @@ export default class Slide {
         this.data.scale = this.lastScale * scale
 
         this._buttonShow()
-
-        // this._isBoundry()
+        this._isBoundry()
         this._updateNodeStyle()
     }
 
@@ -210,9 +213,10 @@ export default class Slide {
      * @return {Boolean} [description]
      */
     _isBoundry() {
-        var horizontalBoundry = (this.data.scale - 1) / 2 * this.pinchNode.offsetWidth;
-        var verticalBoundry = (this.data.scale - 1) / 2 * this.pinchNode.offsetHeight;
         if (this._isRunning) {
+            const scale = this.data.scale
+            var horizontalBoundry = (scale - 1) / 2 * this._offsetWidth
+            var verticalBoundry = (scale - 1) / 2 * this._offsetHeight
             //左边界
             if (this.data.translate.x >= horizontalBoundry) {
                 this.data.translate.x = horizontalBoundry
