@@ -1,6 +1,6 @@
 import { config } from '../config/index'
 import { plugVideo, html5Video } from './video'
-import dynamic from './dynamic'
+import dynamic from './set'
 import button from './button'
 import loadScene from './scene'
 
@@ -12,7 +12,9 @@ import {
 }
 from '../util/index'
 
+
 const getCache = (name) => parseInt(_get(name))
+
 
 /**
  * 进入主页面
@@ -84,7 +86,7 @@ const initMain = (novelData) => {
     //没有缓存
     loadScene({
         "novelId": novelData._id,
-        "pageIndex": 0
+        "pageIndex": 3
     })
 }
 

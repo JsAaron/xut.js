@@ -1,33 +1,10 @@
-import iconsConfig from '../../toolbar/base/iconconf.js'
-import { svgIcon } from '../../toolbar/base/svgicon'
+import closeButton from './close.icon'
 import { config } from '../../config/index'
 
 const transform = Xut.style.transform
 const transitionDuration = Xut.style.transitionDuration
 const translateZ = Xut.style.translateZ
 
-
-const createSVGIcon = function(el, callback) {
-    var options = {
-        speed: 6000,
-        onToggle: callback
-    };
-    return new svgIcon(el, iconsConfig, options);
-}
-
-const createCloseIcon = function() {
-    const proportion = config.proportion
-    const width = proportion.width * 55
-    const height = proportion.height * 70
-    const top = proportion.height * 10
-    const right = config.viewSize.left ? Math.abs(config.viewSize.left) + (top * 2) : top * 2
-    const html =
-        `<div class="si-icon xut-scenario-close" 
-                 data-icon-name="close" 
-                 style="width:${width}px;height:${height}px;top:${top}px;right:${right}px">
-            </div>'`
-    return $(html)
-}
 
 const START_X = 0
 const START_Y = 0
@@ -39,16 +16,25 @@ export default class Slide {
 
     constructor({
         $pagePinch,
+        hasButton = true,
         update
     }) {
 
+        $('body').append('<div id="test123" style="z-index:99999999;position:absolute;top:0;left:0;"></div>')
+
+        this.log = function(text) {
+            $('#test123').append('<div>' + text + '</div>')
+        }
+
         this.update = update
+
+        //是否配置关闭按钮
+        this.hasButton = hasButton
 
         //缩放根节点
         this.$pinchNode = $pagePinch
 
         this.pinchNode = $pagePinch[0]
-
 
         this._offsetWidth = this.pinchNode.offsetWidth
         this._offsetHeight = this.pinchNode.offsetHeight
@@ -214,9 +200,9 @@ export default class Slide {
      */
     _isBoundry() {
         if (this._isRunning) {
-            const scale = this.data.scale
-            var horizontalBoundry = (scale - 1) / 2 * this._offsetWidth
-            var verticalBoundry = (scale - 1) / 2 * this._offsetHeight
+            var horizontalBoundry = (this.data.scale - 1) / 2 * this._offsetWidth
+            var verticalBoundry = (this.data.scale - 1) / 2 * this._offsetHeight
+
             //左边界
             if (this.data.translate.x >= horizontalBoundry) {
                 this.data.translate.x = horizontalBoundry
@@ -233,6 +219,7 @@ export default class Slide {
             if (this.data.translate.y <= -verticalBoundry) {
                 this.data.translate.y = -verticalBoundry
             }
+
         } else {
             this.data.scale = 1;
             this.data.translate.x = START_X;
@@ -267,8 +254,7 @@ export default class Slide {
      * @return {[type]} [description]
      */
     _createPinchButton() {
-        const $node = createCloseIcon()
-        createSVGIcon($node[0], () => {
+        const $node = closeButton(() => {
             //点击还原
             this._initState()
             this._updateNodeStyle(500)
@@ -285,12 +271,15 @@ export default class Slide {
         //to heavy
         if (this._isRunning) return
         if (this.data.scale > 1) {
-            if (this.$buttonNode) {
-                Xut.nextTick(() => {
-                    this.$buttonNode.show()
-                })
-            } else {
-                this.$buttonNode = this._createPinchButton()
+            //必须启动配置
+            if (this.hasButton) {
+                if (this.$buttonNode) {
+                    Xut.nextTick(() => {
+                        this.$buttonNode.show()
+                    })
+                } else {
+                    this.$buttonNode = this._createPinchButton()
+                }
             }
             this._isRunning = true
             this.hammer.get('pan').set({ enable: true })
@@ -303,14 +292,10 @@ export default class Slide {
      */
     _buttonHide() {
         if (!this._isRunning) return
-        if (!this.$buttonNode) {
-            this.$buttonNode = this._createPinchButton()
-        }
-        this.$buttonNode.hide()
+        this.hasButton && this.$buttonNode.hide()
         this._isRunning = false
         this.hammer.get('pan').set({ enable: false })
     }
-
 
 
     destroy() {

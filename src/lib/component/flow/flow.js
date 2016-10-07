@@ -8,6 +8,7 @@ import getFlipDistance from '../../visuals/distance.config'
 import { getFlowView } from '../../visuals/expand/api.config'
 
 import Slide from '../../plugin/internal/slide'
+import closeButton from '../../plugin/internal/close.icon'
 
 /**
  * 2017.9.7
@@ -38,31 +39,40 @@ export default class Flow {
         })
     }
 
+
     /**
      * 缩放图片
      * @return {[type]} [description]
      */
-    _zoomImage(src) {
+    _zoomImage(node) {
 
-        src = Xut.config.pathAddress + src
+        //图片地址
+        const src = Xut.config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
 
-        let html = `<div class="page-pinch-image"
-                        style="width:100%;
-                               height:100%;
-                               position:absolute;
-                               top:0;
-                               left:0;
-                               background-image:url(${src});
-                               background-size:100% 100%">
-                   </div>`
+        const pageImageHTML =
+            `<div class="page-pinch-image" style="width:100%;height:100%;position:absolute;top:0;left:0;">
+                        <div style="width:100%;height:100%;background-image:url(${src});background-size:100% 100%">
+                        </div>
+                    </div>`
 
-        let $html = $(String.styleFormat(html))
+        let $pageImage = $(String.styleFormat(pageImageHTML))
 
-        new Slide({
-            $html
+        //缩放
+        const slide = new Slide({
+            hasButton:false,
+            $pagePinch: $pageImage.children()
         })
 
-        this.$pinchNode.after($html)
+        //按钮
+        const $buttonNode = closeButton(() => {
+            slide.destroy()
+            $pageImage.remove()
+            node.style.visibility = ''
+        })
+
+        $pageImage.append($buttonNode)
+        node.style.visibility = 'hidden'
+        this.$pinchNode.after($pageImage)
     }
 
     /**
@@ -110,8 +120,8 @@ export default class Flow {
             //图片缩放
             const node = ev.target
 
-            if (node && 　node.nodeName.toLowerCase() === "img") {
-                this._zoomImage(node.src.match(/\w+.jpg|png/gi))
+            if (node && node.nodeName.toLowerCase() === "img") {
+                this._zoomImage(node)
             }
 
             if (!Xut.Contents.Canvas.getIsTap()) {
