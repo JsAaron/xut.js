@@ -258,7 +258,7 @@ export default class Slide {
             //点击还原
             this._initState()
             this._updateNodeStyle(500)
-        })
+        }, Math.abs(config.viewSize.left))
         this.$pinchNode.after($node)
         return $node
     }

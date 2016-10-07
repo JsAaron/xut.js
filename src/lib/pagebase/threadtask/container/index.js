@@ -41,7 +41,7 @@ const createli = function({
             data-map="${base.pid}"
             data-pageType="${base.pageType}"
             data-container="true"
-            class="xut-flip xut-fix-transform-bug"
+            class="xut-flip fix-transform"
             style="width:${getStyle.viewWidth}px;
                    height:${getStyle.viewHeight}px;
                    top:${getStyle.viewTop}px;
@@ -50,7 +50,7 @@ const createli = function({
                    ${background}
                    ${customStyle}
                    overflow:hidden;">
-            <div class="page-pinch" style="width:100%;height:100%">
+            <div class="page-pinch">
                 ${virtualNode}
             </div>
         </li>`

@@ -39,7 +39,7 @@ const createStr = (chapterId, data, viewWidth, viewHeight, margin) => {
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
     const container = `
-            <section class="xut-fix-transform-bug" data-flow="true">
+            <section class="fix-transform" data-flow="true">
                 <div class="page-flow-pinch" data-role="margin" style="width:${containerWidth}px;height:${containerHeight}px;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
                     <div data-role="column" id="columns-content" style="${columnWidth};height:100%;${columnGap}">
                         ${data}

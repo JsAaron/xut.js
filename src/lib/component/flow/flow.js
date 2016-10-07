@@ -50,16 +50,15 @@ export default class Flow {
         const src = Xut.config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
 
         const pageImageHTML =
-            `<div class="page-pinch-image" style="width:100%;height:100%;position:absolute;top:0;left:0;">
-                        <div style="width:100%;height:100%;background-image:url(${src});background-size:100% 100%">
-                        </div>
-                    </div>`
+            `<div class="page-pinch-image">
+                    <div style="background-image:url(${src})"></div>
+             </div>`
 
         let $pageImage = $(String.styleFormat(pageImageHTML))
 
         //缩放
         const slide = new Slide({
-            hasButton:false,
+            hasButton: false,
             $pagePinch: $pageImage.children()
         })
 
