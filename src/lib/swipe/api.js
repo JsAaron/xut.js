@@ -19,6 +19,15 @@ export default function api(Swipe) {
     }
 
 
+    Swipe.prototype.openFlip = function() {
+        this._unlock()
+    }
+
+    Swipe.prototype.closeFlip = function() {
+        this._lock()
+    }
+
+
     /**
      * 停止翻页
      * @return {[type]} [description]

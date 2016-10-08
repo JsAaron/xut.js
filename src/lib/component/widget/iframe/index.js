@@ -239,12 +239,12 @@ export default class iframeWidget {
 
         //显示工作条
         PMS.bind("onShowToolbar" + markId, function() {
-            // Xut.View.ShowToolbar();
+            // Xut.View.ShowToolBar();
         }, '*')
 
         //隐藏工作条
         PMS.bind("onHideToolbar" + markId, function() {
-            Xut.View.HideToolbar();
+            Xut.View.HideToolBar();
         }, '*')
 
         //跳转页面

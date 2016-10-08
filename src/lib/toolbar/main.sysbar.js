@@ -329,7 +329,7 @@ export default class sysBar extends Bar {
     }
 
 
-    //销毁 
+    //销毁
     destroy() {
         this.controlBar.off();
         this.controlBar = null;

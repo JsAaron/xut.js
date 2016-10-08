@@ -460,12 +460,14 @@ export class Activity {
             this.stopEffects();
         }
         this.preventRepeat = false
-            //复位盒子
+
+        //复位盒子
         if (this.htmlBoxInstance.length) {
             _.each(this.htmlBoxInstance, function(instance) {
                 instance.removeBox();
             })
         }
+        
         //修复妙妙客户端
         //没有点击音频结束的回调
         //最多允许播放5秒

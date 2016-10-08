@@ -273,7 +273,6 @@ export class SceneFactory {
          */
         var isToolbar = this.isToolbar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
 
-
         /**
          * 监听翻页
          * 用于更新页码
@@ -325,10 +324,14 @@ export class SceneFactory {
 
         /**
          * 切换工具栏
+         * state, pointer
          * @return {[type]} [description]
          */
-        vm.$bind('toggleToolbar', (state, pointer) => {
-            isToolbar && isToolbar.toggle(state, pointer);
+        vm.$bind('toggleToolbar', (...arg) => {
+            isToolbar && isToolbar.toggle(...arg)
+            if (this.numberToolbar) {
+                this.numberToolbar && this.numberToolbar.toggle(...arg)
+            }
         })
 
 

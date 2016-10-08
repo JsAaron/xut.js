@@ -222,7 +222,7 @@ export default function overrideApi(vm) {
      *   parentIndex  父索引
      *   subIndex     子索引
      */
-    View.pageUpdate = function(...arg) {
+    View.PageUpdate = function(...arg) {
         vm.$emit('change:pageUpdate', ...arg)
     }
 
@@ -231,7 +231,7 @@ export default function overrideApi(vm) {
      * 没有参数显示 工具栏与控制翻页按钮
      * 有参数单独显示指定的
      */
-    View.ShowToolbar = function(point) {
+    View.ShowToolBar = function(point) {
         vm.$emit('change:toggleToolbar', 'show', point)
     }
 
@@ -240,7 +240,7 @@ export default function overrideApi(vm) {
      * 没有参数隐藏 工具栏与控制翻页按钮
      * 有参数单独隐藏指定
      */
-    View.HideToolbar = function(point) {
+    View.HideToolBar = function(point) {
         vm.$emit('change:toggleToolbar', 'hide', point)
     }
 
@@ -363,7 +363,7 @@ export default function overrideApi(vm) {
      * 是否为翻页的边界
      * @return {Boolean} [description]
      */
-    View.isFlipBorderBounce = function(distance){
+    View.isFlipBorderBounce = function(distance) {
         return $globalEvent.isBorder(distance)
     }
 
@@ -676,7 +676,7 @@ export default function overrideApi(vm) {
      * 是否翻页中
      * @return {Boolean} [description]
      */
-    Application.isFliping = function(){
+    Application.isFliping = function() {
         return $globalEvent.isMoving()
     }
 

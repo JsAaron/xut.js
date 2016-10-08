@@ -1,4 +1,5 @@
 import { config } from '../config/index'
+import Bar from './base/bar'
 
 import {
     getBeforeCount,
@@ -8,13 +9,16 @@ import {
 /**
  * 页码显示
  */
-export default class NumberBar {
+export default class NumberBar extends Bar {
 
     constructor({
         $rootNode,
         pageTotal,
         currentPage
     }) {
+        super()
+
+        this.type = 'pageNumber'
 
         this.$container = this._createDom(pageTotal)
         this.$currtNode = this.$container.find('div:first')
@@ -27,16 +31,24 @@ export default class NumberBar {
 
     _createDom(pageTotal) {
         //存在模式3的情况，所以页码要处理溢出的情况。left值
-        let right = '2%'
-        if(config.visualMode === 3){
+        let right = '.2rem'
+        if(config.viewSize.left){
             right = Math.abs(config.viewSize.left) + 5  + 'px'
         }
         return $(
-            `<div class="xut-page-number" style="right:${right};z-index:3;display:none;">
+            `<div class="xut-page-number" style="right:${right};">
                 <div>1</div>
                 <strong>/</strong>
                 <div>${pageTotal}</div>
              </div>`)
+    }
+
+    showNumberBar(){
+        this.$container.show()
+    }
+
+    hideNumberBar(){
+        this.$container.hide()
     }
 
     /**

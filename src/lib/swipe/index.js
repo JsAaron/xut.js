@@ -165,6 +165,8 @@ export default class Swipe extends Observer {
      */
     _onStart(e) {
 
+        if(this._fliplock) return
+
         if (e.touches && e.touches.length > 1) {
             return
         }
@@ -229,6 +231,8 @@ export default class Swipe extends Observer {
         //     return
         // }
 
+        if(this._fliplock) return
+
         //如果没有点击
         //或是Y轴滑动
         //或者是阻止滑动
@@ -289,7 +293,7 @@ export default class Swipe extends Observer {
             xWait = (-xWait)
         }
 
-        !this._fliplock && this._distributeMove({
+        this._distributeMove({
             'pageIndex': this._hindex,
             'distance': this._deltaX + xWait,
             'speed': 0,
@@ -305,6 +309,8 @@ export default class Swipe extends Observer {
      * @return {[type]}   [description]
      */
     _onEnd(e) {
+
+        if(this._fliplock) return
 
         if (e.touches && e.touches.length > 1) {
             return
@@ -339,7 +345,7 @@ export default class Swipe extends Observer {
             let isValidSlide = Number(duration) < 200 && Math.abs(deltaX) > 30 || Math.abs(deltaX) > this._viewWidth / 6
 
             //跟随移动
-            if (!this._fliplock && isValidSlide && !isPastBounds) {
+            if (isValidSlide && !isPastBounds) {
                 //true:right, false:left
                 this._slideTo(this._deltaX < 0 ? 'next' : 'prev')
             } else {

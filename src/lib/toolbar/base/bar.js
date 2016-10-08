@@ -191,6 +191,7 @@ export default class Bar {
      * @return {[type]}       [description]
      */
     toggleArrow(dir, status) {
+        if (!this.arrows) return
         var arrow = this.arrows[dir];
         //如果没有创建翻页按钮,则不处理
         if (!arrow) return;
@@ -228,7 +229,6 @@ export default class Bar {
      */
     showPageBar() {
         var arrows = this.arrows;
-
         for (var dir in arrows) {
             var arrow = arrows[dir];
             arrow.able && arrow.el.show();
@@ -248,7 +248,7 @@ export default class Bar {
     }
 
     /**
-     * [description]
+     * 切换状态
      * @param  {[type]} state   [description]
      * @param  {[type]} pointer [description]
      * @return {[type]}         [description]
@@ -256,7 +256,6 @@ export default class Bar {
     toggle(state, pointer) {
         if (this.Lock) return;
         this.Lock = true;
-
         switch (state) {
             case 'show':
                 this.showToolbar(pointer);
@@ -265,7 +264,11 @@ export default class Bar {
                 this.hideToolbar(pointer);
                 break;
             default:
-                this.barStatus ? this.hideToolbar(pointer) : this.showToolbar(pointer);
+                if (this.type !== 'pageNumber') {
+                    this.barStatus ? this.hideToolbar(pointer) : this.showToolbar(pointer);
+                } else {
+                    this.Lock = false
+                }
                 break;
         }
     }
@@ -277,6 +280,10 @@ export default class Bar {
      */
     showToolbar(pointer) {
         switch (pointer) {
+            case 'pageNumber':
+                this.showNumberBar()
+                this.Lock = false;
+                break;
             case 'controlBar':
                 this.showTopBar();
                 break;
@@ -285,8 +292,8 @@ export default class Bar {
                 this.Lock = false;
                 break;
             default:
-                this.showTopBar();
-                this.showPageBar();
+                this.showTopBar && this.showTopBar();
+                this.showPageBar && this.showPageBar();
         }
     }
 
@@ -297,6 +304,10 @@ export default class Bar {
      */
     hideToolbar(pointer) {
         switch (pointer) {
+            case 'pageNumber':
+                this.hideNumberBar()
+                this.Lock = false;
+                break;
             case 'controlBar':
                 this.hideTopBar();
                 break;
@@ -305,8 +316,8 @@ export default class Bar {
                 this.Lock = false;
                 break;
             default:
-                this.hideTopBar();
-                this.hidePageBar();
+                this.hideTopBar && this.hideTopBar();
+                this.hidePageBar && this.hidePageBar();
         }
     }
 

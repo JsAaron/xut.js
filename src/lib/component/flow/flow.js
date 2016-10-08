@@ -55,23 +55,32 @@ export default class Flow {
              </div>`
 
         let $pageImage = $(String.styleFormat(pageImageHTML))
+        this.$pinchNode.after($pageImage)
+
+        Xut.Application.closeFlip()
+        Xut.View.HideToolBar('pageNumber')
 
         //缩放
-        const slide = new Slide({
-            hasButton: false,
-            $pagePinch: $pageImage.children()
-        })
+        let slide
+        if (Xut.plat.hasTouch) {
+            slide = new Slide({
+                hasButton: false,
+                $pagePinch: $pageImage.children()
+            })
+        }
 
         //按钮
         const $buttonNode = closeButton(() => {
-            slide.destroy()
+            slide && slide.destroy()
             $pageImage.remove()
             node.style.visibility = ''
+            this._destroyZoomImage = null
+            Xut.Application.openFlip()
+            Xut.View.ShowToolBar('pageNumber')
         })
 
         $pageImage.append($buttonNode)
         node.style.visibility = 'hidden'
-        this.$pinchNode.after($pageImage)
     }
 
     /**
@@ -115,19 +124,15 @@ export default class Flow {
 
 
         swipe.$watch('onTap', (pageIndex, hookCallback, ev) => {
-
             //图片缩放
             const node = ev.target
-
             if (node && node.nodeName.toLowerCase() === "img") {
                 this._zoomImage(node)
             }
-
             if (!Xut.Contents.Canvas.getIsTap()) {
                 View.Toolbar()
             }
         });
-
 
         swipe.$watch('onMove', function({
             action,
@@ -173,7 +178,6 @@ export default class Flow {
                     if (config.visualMode === 3) {
                         distance -= viewLeft
                     }
-
                     //后边界前移反弹
                     View.MovePage(distance, speed, this.direction, action)
                 }
@@ -227,7 +231,7 @@ export default class Flow {
 
                 //更新页码
                 if (action === 'flipOver') {
-                    Xut.View.pageUpdate({
+                    Xut.View.PageUpdate({
                         parentIndex: initIndex,
                         sonIndex: swipe.getHindex() + 1,
                         hasSon: true,

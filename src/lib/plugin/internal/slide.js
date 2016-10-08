@@ -33,7 +33,6 @@ export default class Slide {
 
         //缩放根节点
         this.$pinchNode = $pagePinch
-
         this.pinchNode = $pagePinch[0]
 
         this._offsetWidth = this.pinchNode.offsetWidth

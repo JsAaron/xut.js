@@ -11,9 +11,8 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-
 Xut.Version = 837
- 
+
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
     if (Xut.plat.noAutoPlayMedia) {
@@ -31,7 +30,7 @@ if (Xut.plat.isBrowser) {
         }
     })
 }
- 
+
 /**
  * remove old html
  * @return {[type]} [description]
@@ -52,8 +51,8 @@ const removeOldNode = function() {
  */
 const commonHTML = function() {
     return `<div class="xut-removelayer"></div>
-            <div class="xut-start-page xut-fullscreen"></div>
-            <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
+        <div class="xut-start-page xut-fullscreen"></div>
+        <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
 }
 
 const iconHTML = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
@@ -69,8 +68,8 @@ const createMain = function() {
         rootNode = $('body')
         tempHTML =
             `<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow-hidden">
-                ${tempHTML}
-            </div>`
+            ${tempHTML}
+        </div>`
     }
     nextTick({
         container: rootNode,

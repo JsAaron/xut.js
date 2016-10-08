@@ -189,7 +189,7 @@ _extend(View, {
          * 关闭系统工具栏
          */
         if (current && !current.vm.$multiScenario) {
-            View.HideToolbar();
+            View.HideToolBar();
         }
 
 

@@ -54,7 +54,7 @@ export default function(Action) {
             self._destroyCache('iframe', self.iframe[0].contentWindow);
         });
         //隐藏全局工具栏
-        Xut.View.HideToolbar();
+        Xut.View.HideToolBar();
         Xut.isRunSubDoc = true;
         self.$wapper.css({
             'opacity': '1'
@@ -76,7 +76,7 @@ export default function(Action) {
         }
 
         function clear() {
-            Xut.View.ShowToolbar()
+            Xut.View.ShowToolBar()
             self.$wapper.remove();
             self.$wapper = null;
             self.iframe = null;

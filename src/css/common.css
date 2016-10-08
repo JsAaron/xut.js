@@ -1,11 +1,18 @@
-/**
- *================初始化================
- */
+/* 设置默认字体,禁止选取,移除按下时的背景色 */
+
+body {
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
 
 html,
 body {
     height: 100%;
-    font-size: 125%
+    font-size: 100%;
 }
 
 
@@ -40,19 +47,6 @@ textarea {
 
 input::-ms-clear {
     display: none;
-}
-
-
-/* 设置默认字体,禁止选取,移除按下时的背景色 */
-
-body {
-    font-family: Tahoma, Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
 }
 
 
@@ -883,12 +877,10 @@ video {
 }
 
 
-/**
- * HTML文本框
- * 
- */
 
-.htmlbox_container {
+/** HTML文本框 ***/
+
+.htmlbox-container {
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -976,6 +968,7 @@ video {
 
 
 /** 放大图片 **/
+
 .page-pinch-image {
     width: 100%;
     height: 100%;
@@ -992,21 +985,25 @@ video {
 
 
 /** 关闭按钮 **/
+
 .page-pinch-close {
-    width: 2rem;
-    height: 2rem;
+    width: 3rem;
+    height: 3rem;
     position: absolute;
     top: 0;
 }
 
-.page-pinch-close > div{
+.page-pinch-close > div {
     padding: 0.2rem
 }
 
 
 /**页码样式**/
+
 .xut-page-number {
     position: absolute;
+    z-index: 3;
+    display: none;
     bottom: .2rem;
 }
 
@@ -1015,18 +1012,17 @@ video {
 }
 
 .xut-page-number > div {
-    font-size: 0.85rem;
+    font-size: 1rem;
     text-decoration: none;
     display: inline-block;
-    height: 1.2rem;
-    line-height: 1.2rem;
+    height: 1rem;
+    line-height: 1rem;
     border: 1px solid #ddd;
     color: white;
     background-color: rgba(0, 0, 0, 0.25);
-    margin-left: 4px;
     cursor: pointer;
     border-radius: 4px;
-    padding: 0.2rem .8rem;
+    padding: .1rem .4rem;
 }
 
 .xut-page-number > div:first-child {

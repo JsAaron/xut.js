@@ -1,7 +1,7 @@
 /**
  * 文本框
  */
-import { HtmlBox } from './htmlbox'
+import HtmlBox from './htmlbox'
 
 export default function (activitProto) {
 
@@ -19,6 +19,7 @@ export default function (activitProto) {
         //文本框实例对象
         //允许一个activity有多个
         this.htmlBoxInstance = [];
+
         //创建文本框对象
         if (contentHtmlBoxIds.length && relatedData.contentDas) {
             _.each(relatedData.contentDas, function (cds) {

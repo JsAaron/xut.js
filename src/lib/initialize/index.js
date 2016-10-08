@@ -86,7 +86,7 @@ const initMain = (novelData) => {
     //没有缓存
     loadScene({
         "novelId": novelData._id,
-        "pageIndex": 3
+        "pageIndex": 0
     })
 }
 
