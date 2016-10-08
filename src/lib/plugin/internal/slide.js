@@ -20,12 +20,6 @@ export default class Slide {
         update
     }) {
 
-        $('body').append('<div id="test123" style="z-index:99999999;position:absolute;top:0;left:0;"></div>')
-
-        this.log = function(text) {
-            $('#test123').append('<div>' + text + '</div>')
-        }
-
         this.update = update
 
         //是否配置关闭按钮
@@ -104,7 +98,8 @@ export default class Slide {
             'pinchmove': '_onPinchMove',
             'pinchend': '_onPinchEnd',
             'panstart panmove': '_onPan',
-            'panend': '_onPanEnd'
+            'panend': '_onPanEnd',
+            'pinchcancel':'_onPinchEnd'
         }, (value, key) => {
             this.hammer.on(key, (e) => {
                 e.srcEvent.stopPropagation()
@@ -149,7 +144,7 @@ export default class Slide {
      * @return {[type]} [description]
      */
     _onPinchEnd(ev) {
-        if (this.data.scale < 1) {
+        if (this.data.scale <= 1) {
             Xut.nextTick(() => {
                 this._initState()
                 this._updateNodeStyle(500)
