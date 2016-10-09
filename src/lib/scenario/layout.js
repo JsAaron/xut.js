@@ -12,10 +12,17 @@ const ratio = 6
 const isIOS = Xut.plat.isIOS
 const TOP = isIOS ? 20 : 0
 
-const getOptions = () => {
+/**
+ * 首页布局
+ * @return {[type]} [description]
+ */
+export function home() {
+
     let iconHeight = config.iconHeight
     let proportion = config.proportion
-    const viewSize = config.viewSize
+
+    const sWidth  = config.viewSize.width
+    const sHeight = config.viewSize.height
 
     //横版模式
     const isHorizontal = config.layoutMode == 'horizontal'
@@ -23,35 +30,10 @@ const getOptions = () => {
     proportion = isHorizontal ? proportion.width : proportion.height
     iconHeight = isIOS ? iconHeight : round(proportion * iconHeight)
 
-    return {
-        isHorizontal: isHorizontal,
-        iconHeight: iconHeight,
-        sWidth: viewSize.width,
-        sHeight: viewSize.height,
-        sTop: viewSize.top,
-        sLeft: viewSize.left,
-        proportion: proportion
-    }
-}
-
-
-
-/**
- * 首页布局
- * @return {[type]} [description]
- */
-export function home() {
-
-    const options      = getOptions()
-    const sWidth       = options.sWidth
-    const sHeight      = options.sHeight
-    const iconHeight   = options.iconHeight
-    const isHorizontal = options.isHorizontal
-
     const navBarWidth     = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px'
     const navBarHeight    = isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96)
     const navBarTop       = isHorizontal ? '' : 'top:' + (iconHeight + TOP + 2) + 'px;'
-    const navBarLeft      = isHorizontal ? '' :'left:' + iconHeight + 'px;'
+    const navBarLeft      = isHorizontal ? '' : 'left:' + iconHeight + 'px;'
     const navBarBottom    = isHorizontal ? 'bottom:4px;' : ''
     const navBaroOverflow = isHorizontal ? 'hidden' : 'visible'
 
@@ -70,7 +52,7 @@ export function home() {
 
 
     const homeWidth = config.viewSize.width
-    // const homeHeight = config.viewSize.height
+        // const homeHeight = config.viewSize.height
     const homeLeft = config.viewSize.left
     const homeIndex = Xut.sceneController.createIndex()
     const homeOverflow = config.visualMode === 1 ? 'visible' : 'hidden'
@@ -92,7 +74,7 @@ export function home() {
             <div id="xut-tool-tip"></div>
         </div>`
 
-    return  String.styleFormat(homeHTML)
+    return String.styleFormat(homeHTML)
 }
 
 
@@ -103,13 +85,9 @@ export function home() {
  */
 export function scene(id) {
 
-    const options   = getOptions()
-    const sWidth    = options.sWidth
-    const sHeight   = options.sHeight
-
     const scenarioId = 'scenario-' + id
     const overflow = config.visualMode === 1 ? 'visible' : 'hidden'
-    const pageId =  'scenarioPage-' + id
+    const pageId = 'scenarioPage-' + id
     const masterId = 'scenarioMaster-' + id
 
     const html =

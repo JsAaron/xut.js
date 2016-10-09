@@ -354,6 +354,11 @@ const setProportion = function(pptWidth, pptHeight) {
      */
     const viewSize = config.viewSize = getViewSize(config, fullProportion)
 
+    //溢出值
+    if(viewSize.left){
+        config.viewSize.overflow = Math.abs(viewSize.left)
+    }
+
     /**
      * 获取全局缩放比
      * @type {[type]}

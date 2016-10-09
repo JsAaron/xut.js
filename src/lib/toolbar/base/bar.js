@@ -248,18 +248,19 @@ export default class Bar {
         switch (pointer) {
             case 'pageNumber':
                 this.showNumberBar()
-                this.Lock = false;
+                this.Lock = false
                 break;
             case 'controlBar':
-                this.showTopBar();
+                this.showTopBar()
                 break;
             case 'button':
-                this._showArrow();
-                this.Lock = false;
+                this._showArrow()
+                this.Lock = false
                 break;
             default:
-                this.showTopBar && this.showTopBar();
-                this._showArrow && this._showArrow();
+                this.showTopBar && this.showTopBar()
+                this._showArrow && this._showArrow()
+                this.showNumberBar && this.showNumberBar()
         }
     }
 
@@ -272,18 +273,19 @@ export default class Bar {
         switch (pointer) {
             case 'pageNumber':
                 this.hideNumberBar()
-                this.Lock = false;
+                this.Lock = false
                 break;
             case 'controlBar':
-                this.hideTopBar();
+                this.hideTopBar()
                 break;
             case 'button':
-                this._hideArrow();
-                this.Lock = false;
+                this._hideArrow()
+                this.Lock = false
                 break;
             default:
-                this.hideTopBar && this.hideTopBar();
-                this._hideArrow && this._hideArrow();
+                this.hideNumberBar && this.hideNumberBar()
+                this.hideTopBar && this.hideTopBar()
+                this._hideArrow && this._hideArrow()
         }
 
     }

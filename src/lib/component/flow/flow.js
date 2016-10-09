@@ -40,21 +40,14 @@ export default class Flow {
     }
 
 
-    /**
-     * 缩放图片
-     * @return {[type]} [description]
-     */
-    _zoomImage(node) {
+    _setImage(node, width, height, src) {
 
-        //图片地址
-        const src = Xut.config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
+        //图片横竖
+        const isHorizontalFigure = width > height
+        const screenWidth = config.screenSize.width
+        const screenHeight = config.screenSize.height
 
-        const imageWidth = node.width
-        const impageHeight = node.height
-        const isHorizontalFigure = imageWidth > impageHeight
-
-        let width = config.screenSize.width
-        let height = config.screenSize.height
+        let prop
         let top = 0
         let left = 0
 
@@ -64,26 +57,35 @@ export default class Flow {
         //竖图
         else {
             if (config.layoutMode === 'horizontal') {
-                width = config.screenSize.width * config.proportion.width
-                left = (config.screenSize.width - width) / 2
+                //竖图，横版显示
+                prop = screenHeight / height
+                height = screenHeight
+                width = width * prop
+                left = (screenWidth - width) / 2
             } else {
                 //竖图，竖屏显示
-                height = config.screenSize.height * config.proportion.height
-                top = (config.screenSize.height - height) / 2
+                prop = screenWidth / width
+                width = screenWidth
+                height = height * prop
+                top = (screenHeight - height) / 2
             }
         }
 
-
         const pageImageHTML =
-            `<div class="page-pinch-image" style="width:${width}px;height:${height}px;top:${top}px;left:${left}px">
-                    <div style="background-image:url(${src})"></div>
+            `<div class="page-pinch-image">
+                    <div style="width:${width}px;
+                                height:${height}px;
+                                top:${top}px;
+                                left:${left}px;
+                                background-image:url(${src});">
+                    </div>
              </div>`
 
         let $pageImage = $(String.styleFormat(pageImageHTML))
         this.$pinchNode.after($pageImage)
 
         Xut.Application.closeFlip()
-        Xut.View.HideToolBar('pageNumber')
+        Xut.View.HideToolBar()
 
         //缩放
         let slide
@@ -101,11 +103,34 @@ export default class Flow {
             node.style.visibility = ''
             this._destroyZoomImage = null
             Xut.Application.openFlip()
-            Xut.View.ShowToolBar('pageNumber')
+            Xut.View.ShowToolBar()
         })
 
         $pageImage.append($buttonNode)
         node.style.visibility = 'hidden'
+    }
+
+    /**
+     * 缩放图片
+     * @return {[type]} [description]
+     */
+    _zoomImage(node) {
+
+        //图片地址
+        const src = Xut.config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
+
+        var img = new Image()
+        img.src = src
+
+        //防止图片为加载完毕
+        img.onload = () => {
+            this._setImage(node, img.width, img.height, src)
+        }
+
+        //失败就用默认
+        img.onerror = () => {
+            this._setImage(node, node.width, node.height, src)
+        }
     }
 
     /**

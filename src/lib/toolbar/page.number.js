@@ -31,9 +31,9 @@ export default class NumberBar extends Bar {
 
     _createDom(pageTotal) {
         //存在模式3的情况，所以页码要处理溢出的情况。left值
-        let right = '.2rem'
-        if(config.viewSize.left){
-            right = Math.abs(config.viewSize.left) + 5  + 'px'
+        let right = '0'
+        if (config.viewSize.overflow) {
+            right = config.viewSize.overflow + 'px'
         }
         return $(
             `<div class="xut-page-number" style="right:${right};">
@@ -43,12 +43,14 @@ export default class NumberBar extends Bar {
              </div>`)
     }
 
-    showNumberBar(){
+    showNumberBar() {
         this.$container.show()
+        this.Lock = true
     }
 
-    hideNumberBar(){
+    hideNumberBar() {
         this.$container.hide()
+        this.Lock = false
     }
 
     /**

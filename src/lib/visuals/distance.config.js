@@ -40,7 +40,6 @@ export default function getFlipDistance({
 
     //区域尺寸
     const veiwWidth = config.viewSize.width
-    const veiwLeft = config.viewSize.left
 
     const offset = {
         left: undefined,
