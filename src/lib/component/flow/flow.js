@@ -49,8 +49,33 @@ export default class Flow {
         //图片地址
         const src = Xut.config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
 
+        const imageWidth = node.width
+        const impageHeight = node.height
+        const isHorizontalFigure = imageWidth > impageHeight
+
+        let width = config.screenSize.width
+        let height = config.screenSize.height
+        let top = 0
+        let left = 0
+
+        if (isHorizontalFigure) {
+
+        }
+        //竖图
+        else {
+            if (config.layoutMode === 'horizontal') {
+                width = config.screenSize.width * config.proportion.width
+                left = (config.screenSize.width - width) / 2
+            } else {
+                //竖图，竖屏显示
+                height = config.screenSize.height * config.proportion.height
+                top = (config.screenSize.height - height) / 2
+            }
+        }
+
+
         const pageImageHTML =
-            `<div class="page-pinch-image">
+            `<div class="page-pinch-image" style="width:${width}px;height:${height}px;top:${top}px;left:${left}px">
                     <div style="background-image:url(${src})"></div>
              </div>`
 
