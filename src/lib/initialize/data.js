@@ -26,6 +26,7 @@ const defaults = {
  * @return {[type]} [description]
  */
 const initDefaults = (setData) => {
+
     let rs
     const data = {}
     const setConfig = {}

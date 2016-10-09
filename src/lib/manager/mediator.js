@@ -31,8 +31,7 @@ const configMultiple = (options) => {
         //判断多页面情况
         //1 数据库定义
         //2 系统优化
-        options.multiplePages =
-            options.flipMode ? options.flipMode : options.pageMode ? true : false
+        options.multiplePages = options.flipMode ? options.flipMode : options.pageMode ? true : false
     }
 }
 
@@ -93,9 +92,9 @@ class Mediator extends Observer {
             //通过pageMode的参数定义
             'multiplePages': false
         }, parameter, {
-            flipMode: Xut.config.flipMode,
-            pageMode: Xut.config.pageMode
+            flipMode: Xut.config.flipMode
         })
+
 
         //配置多页面参数
         configMultiple(options)

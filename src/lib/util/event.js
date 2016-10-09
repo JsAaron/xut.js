@@ -9,6 +9,7 @@ const transitionEnd = Xut.style.transitionEnd
 //2015.3.23
 //可以点击与触摸
 const isSurface = Xut.plat.isSurface
+const hasTouch = Xut.plat.hasTouch
 
 //触发事件名
 const touchName = ['touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd]
@@ -30,7 +31,7 @@ const EVENT_NAME = (() => {
             mouse: mouseName
         }
     }
-    return Xut.plat.hasTouch ? touchName : mouseName
+    return hasTouch ? touchName : mouseName
 })()
 
 
@@ -119,6 +120,18 @@ export function handle(callbacks, context, event) {
             callbacks.transitionend && callbacks.transitionend.call(context, event)
             break;
     }
+}
+
+
+export function eventTarget(event, original) {
+    var currTouches = null;
+    if (hasTouch) {
+        currTouches = event.touches;
+        if (currTouches && currTouches.length > 0) {
+            event = currTouches[0];
+        }
+    }
+    return original ? event : event.target;
 }
 
 

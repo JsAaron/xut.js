@@ -56,7 +56,7 @@ export default function(instance) {
                     return $pseudoElement ? $pseudoElement : $containsElement
                 }
 
-                setNextRunTask('flow')
+                setNextRunTask('background')
 
                 //构建主容器li完毕,可以提前执行翻页动作
                 createRelated.preforkComplete()
@@ -75,12 +75,40 @@ export default function(instance) {
 
 
         /**
+         * 背景
+         * @return {[type]} [description]
+         */
+        background() {
+            callContextTasks('Background', function() {
+                createRelated.preCreateTasks = false;
+                setNextRunTask('flow')
+
+                //针对当前页面的检测
+                if (!createRelated.tasksHang || instance.isMaster) {
+                    instance.nextTasks({
+                        'taskName': '外部widgets',
+                        outNextTasks: function() {
+                            instance.dispatchTasks();
+                        }
+                    })
+                }
+
+                //如果有挂起任务，则继续执行
+                if (createRelated.tasksHang) {
+                    createRelated.tasksHang();
+                }
+            })
+        },
+
+
+        /**
          * 2016.9.7
          * 特殊的一个内容
          * 是否为流式排版
          * @return {[type]} [description]
          */
         flow() {
+
             //创建缩放
             const createPinch = function(flow) {
                 if (config.saleMode && instance.pageType === 'page') {
@@ -106,36 +134,9 @@ export default function(instance) {
                 })
             } else {
                 createPinch()
-                setNextRunTask('background')
+                setNextRunTask('components')
                 instance.dispatchTasks()
             }
-        },
-
-
-        /**
-         * 背景
-         * @return {[type]} [description]
-         */
-        background() {
-            callContextTasks('Background', function() {
-                createRelated.preCreateTasks = false;
-                setNextRunTask('components')
-
-                //针对当前页面的检测
-                if (!createRelated.tasksHang || instance.isMaster) {
-                    instance.nextTasks({
-                        'taskName': '外部widgets',
-                        outNextTasks: function() {
-                            instance.dispatchTasks();
-                        }
-                    })
-                }
-
-                //如果有挂起任务，则继续执行
-                if (createRelated.tasksHang) {
-                    createRelated.tasksHang();
-                }
-            })
         },
 
 

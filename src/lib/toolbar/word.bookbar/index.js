@@ -5,27 +5,24 @@ import Bar from '../base/bar'
 /**
  * 阅读模式工具栏
  * @param options object
- * @demo {container:页面容器,controlBar:工具栏容器,...}
+ * @demo {$sceneNode:页面容器,$controlNode:工具栏容器,...}
  * @desc 继承自Toolbar.js
  */
 export default class BookBar extends Bar {
 
     constructor({
         pageMode,
-        container,
-        controlBar
+        sceneNode,
+        controlNode
     } = {}) {
 
         super()
 
-        //左右箭头
-        this.arrows = {}
-
         //工具栏父容器
-        this.container = container
+        this.$sceneNode = sceneNode
 
         //工具栏容器
-        this.controlBar = controlBar
+        this.$controlNode = controlNode
 
         this.pageMode = pageMode
 
@@ -35,10 +32,7 @@ export default class BookBar extends Bar {
         this.delay = 50
 
         //图书工具栏高度
-        this.topBarHeight = this.iconHeight * 1.25
-
-        //配置属性
-        this.initConfig()
+        this.topBarHeight = this.super_iconHeight * 1.25
 
         this.initTool();
     }
@@ -49,7 +43,7 @@ export default class BookBar extends Bar {
      */
     initTool() {
         //工具栏的显示状态
-        var display = this.controlBar.css('display');
+        var display = this.$controlNode.css('display');
         this.barStatus = display == 'none' ? false : true;
         this.setToolbarStyle();
         this.createBackIcon();
@@ -59,11 +53,11 @@ export default class BookBar extends Bar {
 
         //翻页按钮
         if (this.pageMode == 2) {
-            this.createArrows();
+            this.super_createArrows();
         }
 
         //监听事件
-        bindEvent(this.container[0], {
+        bindEvent(this.$sceneNode[0], {
             end: this
         })
     }
@@ -77,7 +71,7 @@ export default class BookBar extends Bar {
             TOP = this.barHeight; //系统工具栏占用的高度
 
         //在顶部
-        this.controlBar.css({
+        this.$controlNode.css({
             top: 0,
             height: height + 'px',
             paddingTop: TOP + 'px',
@@ -103,10 +97,10 @@ export default class BookBar extends Bar {
     createDirIcon(bar) {
         var icon = document.createElement('div');
         icon.innerHTML = '目录';
-        icon.style.width = this.iconHeight + 'px';
+        icon.style.width = this.super_iconHeight + 'px';
         icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
         icon.className = 'xut-book-bar-dir';
-        this.controlBar.append(icon)
+        this.$controlNode.append(icon)
     }
 
 
@@ -118,10 +112,10 @@ export default class BookBar extends Bar {
     createMarkIcon(bar) {
         var icon = document.createElement('div');
         icon.innerHTML = '书签';
-        icon.style.width = this.iconHeight + 'px';
+        icon.style.width = this.super_iconHeight + 'px';
         icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
         icon.className = 'xut-book-bar-mark';
-        this.controlBar.append(icon)
+        this.$controlNode.append(icon)
     }
 
     /**
@@ -130,10 +124,10 @@ export default class BookBar extends Bar {
     createStarIcon(bar) {
         var icon = document.createElement('div');
         icon.innerHTML = '评分';
-        icon.style.width = this.iconHeight + 'px';
+        icon.style.width = this.super_iconHeight + 'px';
         icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
         icon.className = 'xut-book-bar-star';
-        this.controlBar.append(icon)
+        this.$controlNode.append(icon)
     }
 
     /**
@@ -144,7 +138,7 @@ export default class BookBar extends Bar {
         var icon = document.createElement('div');
         icon.style.width = this.topBarHeight + 'px';
         icon.className = 'xut-book-bar-back';
-        this.controlBar.append(icon)
+        this.$controlNode.append(icon)
     }
 
 
@@ -160,16 +154,16 @@ export default class BookBar extends Bar {
             return;
         }
 
-        this.controlBar.css({
+        this.$controlNode.css({
             'display': 'block',
             'opacity': 0
         });
 
         setTimeout(function() {
-            that.controlBar.animate({
+            that.$controlNode.animate({
                 'opacity': 1
             }, that.delay, 'linear', function() {
-                that.showSystemBar();
+                that.super_showSystemBar();
                 that.barStatus = true;
                 that.Lock = false;
             });
@@ -189,11 +183,11 @@ export default class BookBar extends Bar {
             return;
         }
 
-        this.controlBar.animate({
+        this.$controlNode.animate({
             'opacity': 0
         }, that.delay, 'linear', function() {
-            that.controlBar.hide();
-            that.hideSystemBar();
+            that.$controlNode.hide();
+            that.super_hideSystemBar();
             that.barStatus = false;
             that.Lock = false;
         });
@@ -213,7 +207,7 @@ export default class BookBar extends Bar {
         this.getDirContent();
         wrap.className = 'xut-book-menu';
         wrap.innerHTML = '<ul>' + this.contentText + '</ul>';
-        this.container.append(wrap);
+        this.$sceneNode.append(wrap);
         //是否滚动
         this.isScrolled = false;
 
@@ -260,7 +254,7 @@ export default class BookBar extends Bar {
         this.page = page;
 
         //隐藏顶部工具栏
-        this.controlBar.hide();
+        this.$controlNode.hide();
         var iscroll = this.iscroll;
         //自动定位到上一位置
         if (iscroll.y > iscroll.wrapperHeight) {
@@ -275,7 +269,7 @@ export default class BookBar extends Bar {
     hideDirMenu() {
         this.menu.style.display = 'none';
         //恢复顶部工具栏
-        this.controlBar.show();
+        this.$controlNode.show();
         //移除模糊效果
         this.page.removeClass('filter');
     }
@@ -382,7 +376,7 @@ export default class BookBar extends Bar {
         } else {
             var pageData = Xut.Presentation.GetPageData();
             this.bookMark = new BookMark({
-                parent: this.container,
+                parent: this.$sceneNode,
                 seasonId: pageData.seasonId,
                 pageId: pageData._id
             })
@@ -453,12 +447,14 @@ export default class BookBar extends Bar {
     destroy() {
         this.iscroll && this.iscroll.destroy();
         this.bookMark && this.bookMark.destroy();
-        var ele = this.container[0];
+        var ele = this.$sceneNode[0];
         ele.removeEventListener('touchend', this, false);
         ele.removeEventListener('mouseup', this, false);
         this.iscroll = null;
         this.menu = null;
         this.page = null;
+        //销毁超类
+        this.super_destory()
     }
 
 }

@@ -70,7 +70,7 @@ export class BaseClass {
     }
 
     //播放
-    play() {
+    play() { 
         //flash模式不执行
         if (this.audio && !this.isFlash) {
             this.status = 'playing';

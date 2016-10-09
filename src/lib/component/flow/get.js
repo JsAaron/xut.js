@@ -12,13 +12,14 @@ export function set(flowCounts) {
  * @return {[type]} [description]
  */
 export function getCurrentBeforeCount(seasonId, chapterId) {
+    if (!cacheCounts) return
     if (!seasonId && !chapterId) return
     let seasonIds = cacheCounts[seasonId]
     let count = 0
     for (let key in seasonIds) {
         if (key <= chapterId) {
             count += seasonIds[key]
-            --count
+                --count
         }
     }
     return count > 0 ? count : 0
@@ -29,13 +30,14 @@ export function getCurrentBeforeCount(seasonId, chapterId) {
  * @return {[type]} [description]
  */
 export function getBeforeCount(seasonId, chapterId) {
+    if (!cacheCounts) return
     if (!seasonId && !chapterId) return
     let seasonIds = cacheCounts[seasonId]
     let count = 0
     for (let key in seasonIds) {
         if (key < chapterId) {
             count += seasonIds[key]
-            --count
+                --count
         }
     }
     return count > 0 ? count : 0
@@ -47,6 +49,7 @@ export function getBeforeCount(seasonId, chapterId) {
  * @return {[type]}          [description]
  */
 export function getFlowChpaterCount(seasonId) {
+    if (!cacheCounts) return
     return Object.keys(cacheCounts[seasonId]).length
 }
 
@@ -58,6 +61,7 @@ export function getFlowChpaterCount(seasonId) {
  * @return {[type]}           [description]
  */
 export function getFlowCount(seasonId, chapterId) {
+    if (!cacheCounts) return
     if (seasonId) {
         if (chapterId) {
             return cacheCounts[seasonId] && cacheCounts[seasonId][chapterId]

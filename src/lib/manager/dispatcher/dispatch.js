@@ -13,7 +13,6 @@ import PageMgr from '../page'
 import MasterMgr from '../master'
 import SwitchPage from './switch'
 import { sceneController } from '../../scenario/controller'
-import { closeNavbar } from '../../toolbar/navbar/index'
 
 import Stack from '../../util/stack'
 
@@ -446,39 +445,13 @@ export class Dispatcher {
          * 触发自动通知
          * @type {[type]}
          */
-        var vm = this.vm;
-
-        switch (action) {
-            case 'init':
-                //更新页码标示
-                vm.$emit('change:pageUpdate', {
-                    action,
-                    parentIndex: currIndex,
-                    direction
-                })
-                resetToolbar.call(this)
-                setTimeout(function() {
-                    $(".xut-start-page").hide().remove();
-                    $(".xut-removelayer").hide().remove();
-                }, 0)
-                break;
-            case 'toPage':
-                //更新页码标示
-                vm.$emit('change:pageUpdate', {
-                    action,
-                    parentIndex: currIndex,
-                    direction
-                })
-                resetToolbar.call(this)
-                break;
-        }
-
+        var vm = this.vm
 
         /**
          * 初始化与跳转针对翻页案例的设置逻辑
          * @return {[type]} [description]
          */
-        function resetToolbar() {
+        const setToolbar = () => {
             //不显示首尾对应的按钮
             if (currIndex == 0) {
                 vm.$emit('change:hidePrev');
@@ -491,6 +464,30 @@ export class Dispatcher {
             }
         }
 
+        switch (action) {
+            case 'init':
+                //更新页码标示
+                vm.$emit('change:pageUpdate', {
+                    action,
+                    parentIndex: currIndex,
+                    direction
+                })
+                setToolbar.call(this)
+                setTimeout(function() {
+                    $(".xut-start-page").hide().remove();
+                    $(".xut-removelayer").hide().remove();
+                }, 0)
+                break;
+            case 'toPage':
+                //更新页码标示
+                vm.$emit('change:pageUpdate', {
+                    action,
+                    parentIndex: currIndex,
+                    direction
+                })
+                setToolbar.call(this)
+                break;
+        }
 
         /**
          * 线性结构
@@ -597,8 +594,6 @@ export class Dispatcher {
             this.suspend(pointers)
         })
 
-        //目录栏
-        closeNavbar();
         //复位工具栏
         this.vm.$emit('change:resetToolbar')
     }

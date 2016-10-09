@@ -2,16 +2,23 @@ import iconsConfig from './iconconf.js'
 import { svgIcon } from './svgicon'
 import { config } from '../../config/index'
 
+import {
+    hash,
+    bindEvent,
+    offEvent,
+    eventTarget
+} from '../../util/index'
+
 const isIOS = Xut.plat.isIOS
 
 /**
  * 获取翻页按钮位置
  * @return {[type]} [description]
  */
-const arrowStyle = function() {
+const getArrowStyle = function() {
     let height = config.iconHeight
     let settings = config.settings
-    let styleText = 'height:' + height + 'px;width:' + height + 'px';
+    let styleText = `height:${height}px;width:${height}px`
     switch (settings.NavbarPos) {
         case 0:
             styleText += ';top:0';
@@ -29,6 +36,9 @@ const arrowStyle = function() {
 }
 
 
+/**
+ * 工具栏超类
+ */
 export default class Bar {
 
     constructor() {
@@ -37,80 +47,69 @@ export default class Bar {
          * 系统状态栏高度
          * @type {[type]}
          */
-        this.barHeight = isIOS ? 20 : 0
+        this.super_barHeight = isIOS ? 20 : 0
 
-        /**
-         * 默认创建左翻页按钮
-         * @type {Boolean}
-         */
-        this.enableLeft = true
+        const prop = config.proportion;
+        const iconHeight = config.iconHeight;
 
-        /**
-         * 默认创建右翻页按钮
-         * @type {Boolean}
-         */
-        this.enableRight = true
-    }
-
-
-    initConfig() {
-        var propHeight;
         //获取高度缩放比
         //自动选择缩放比例
-        this.propHeight = propHeight = function() {
-            var layout = config.layoutMode,
-                prop = config.proportion;
-            return layout == "horizontal" ? prop.width : prop.height;
-        }()
+        this.super_propHeight = config.layoutMode == "horizontal" ? prop.width : prop.height;
 
         //获取图标高度
         //工具栏图标高度
-        this.iconHeight = function() {
-            var height = config.iconHeight;
-            return isIOS ? height : Math.round(propHeight * height);
-        }()
+        this.super_iconHeight = isIOS ? iconHeight : Math.round(this.super_propHeight * iconHeight)
 
-        this.appName = config.shortName //应用标题
-        this.settings = config.settings //应用默认配置
+        //应用标题
+        this.appName = config.shortName
+
+        //应用默认配置
+        this.settings = config.settings
     }
-
 
     /**
      * 创建翻页按钮
      * @return {[type]} [description]
      */
-    createArrows() {
+    super_createArrows() {
+
+        /**
+         * 存放左右翻页按钮
+         * @type {[type]}
+         */
+        this.arrows = hash()
+
         //是否使用自定义的翻页按钮: true /false
         //图标名称是客户端指定的：pageforward_'+appId+'.svg
-        var isCustom = this.settings.customButton;
-
-        if (this.enableLeft) {
-            isCustom ? this.createLeftIcon() : this.createLeftArrow();
-        }
-
-        if (this.enableRight) {
-            isCustom ? this.createRightIcon() : this.createRightArrow();
+        const isCustom = this.settings.customButton;
+        if (isCustom) {
+            //动态图标，数据库定义的翻页图标
+            this._createLeftIcon()
+            this._createRightIcon()
+        } else {
+            //默认的svg图片
+            this._createLeftArrowSVG()
+            this._createRightArrowSVG()
         }
     }
 
-
     /**
-     * 左箭头翻页按钮
+     * svg版本：左箭头翻页按钮
      * @return {[type]} [description]
      */
-    createLeftArrow() {
-        var style = arrowStyle(),
-            state = this.barStatus ? '' : 'hide',
-            $dom;
-        $dom = $('<div class="si-icon xut-flip-control xut-flip-control-left ' + state + '" data-icon-name="prevArrow" style="' + style + '"></div>');
+    _createLeftArrowSVG() {
+        const style = getArrowStyle()
+        const state = this.toolBarStatus ? '' : 'hide'
+        const $dom = $(
+            `<div class="si-icon xut-flip-control xut-flip-control-left ${state}"
+                  data-icon-name="prevArrow"
+                  style="${style}">
+             </div>`)
 
-        this.createSVGIcon($dom[0],
-            function() {
-                Xut.View.GotoPrevSlide();
-            }
-        );
+        //点击左翻页动作
+        this.super_createSVGIcon($dom[0], () => Xut.View.GotoPrevSlide())
 
-        this.container.append($dom);
+        this.$sceneNode.append($dom)
         this.arrows.prev = {
             el: $dom,
             able: true
@@ -118,22 +117,22 @@ export default class Bar {
     }
 
     /**
-     * 右箭头翻页按钮
+     * svg版本：右箭头翻页按钮
      * @return {[type]} [description]
      */
-    createRightArrow() {
-        var style = arrowStyle(),
-            state = this.barStatus ? '' : 'hide',
-            $dom;
-        $dom = $('<div class="si-icon xut-flip-control xut-flip-control-right ' + state + '" data-icon-name="nextArrow" style="' + style + '"></div>');
+    _createRightArrowSVG() {
+        const style = getArrowStyle()
+        const state = this.toolBarStatus ? '' : 'hide'
+        const $dom = $(
+            `<div class="si-icon xut-flip-control xut-flip-control-right ${state}"
+                  data-icon-name="nextArrow"
+                  style="${style}">
+             </div>`)
 
-        this.createSVGIcon($dom[0],
-            function() {
-                Xut.View.GotoNextSlide();
-            }
-        );
+        //点击右翻页动作
+        this.super_createSVGIcon($dom[0], () => Xut.View.GotoNextSlide())
 
-        this.container.append($dom);
+        this.$sceneNode.append($dom);
         this.arrows.next = {
             el: $dom,
             able: true
@@ -141,43 +140,55 @@ export default class Bar {
     }
 
     /**
-     * 自定义左翻页按钮
-     * [createLeftIcon description]
+     * 客户端指定：自定义左翻页按钮
      * @return {[type]} [description]
      */
-    createLeftIcon() {
-        var style = arrowStyle(),
-            appId = this.config.appId,
-            state = this.barStatus ? '' : 'hide',
-            $dom;
-        style += ';background-image:url(images/icons/pageforward_' + appId + '.svg);background-size:cover';
-        $dom = $('<div name="prevArrow" class="xut-flip-control xut-flip-control-left ' + state + '" style="' + style + '"></div>');
+    _createLeftIcon() {
+        let style = getArrowStyle()
+        const state = this.toolBarStatus ? '' : 'hide'
+
+        //默认图标路径
+        style += `;background-image:url(images/icons/pageforward_${config.appId}.svg);background-size:cover`
+
+        const $dom = $(
+            `<div name="prevArrow"
+                  class="xut-flip-control xut-flip-control-left ${state}"
+                  style="${style}">
+            </div>`)
 
         $dom.on("touchend mouseup", function() {
             Xut.View.GotoPrevSlide();
         });
 
-        this.container.append($dom);
+        this.$sceneNode.append($dom);
         this.arrows.prev = {
             el: $dom,
             able: true
         };
     }
 
-    //自定义右翻页按钮
-    createRightIcon() {
-        var style = arrowStyle(),
-            appId = this.config.appId,
-            state = this.barStatus ? '' : 'hide',
-            $dom;
-        style += ';background-image:url(images/icons/pageback_' + appId + '.svg);background-size:cover';
-        $dom = $('<div name="nextArrow" class="xut-flip-control xut-flip-control-right ' + state + '" style="' + style + '"></div>');
+    /**
+     * 客户端指定：自定义右翻页按钮
+     * @return {[type]} [description]
+     */
+    _createRightIcon() {
+        let style = getArrowStyle()
+        const state = this.toolBarStatus ? '' : 'hide'
+
+        //默认图标
+        style += `;background-image:url(images/icons/pageback_${config.appId}.svg);background-size:cover`
+
+        const $dom = $(
+            `<div name="nextArrow"
+                  class="xut-flip-control xut-flip-control-right ${state}"
+                  style="${style}">
+            </div>`)
 
         $dom.on("touchend mouseup", function() {
             Xut.View.GotoNextSlide();
         });
 
-        this.container.append($dom);
+        this.$sceneNode.append($dom);
         this.arrows.next = {
             el: $dom,
             able: true
@@ -185,49 +196,29 @@ export default class Bar {
     }
 
     /**
-     * [ description]
+     * 针对单个按钮的显示隐藏处理
      * @param  {[type]} dir [next,prev]
      * @param  {[type]} status  [true/false]
      * @return {[type]}       [description]
      */
-    toggleArrow(dir, status) {
+    _toggleArrow(dir, status) {
         if (!this.arrows) return
         var arrow = this.arrows[dir];
         //如果没有创建翻页按钮,则不处理
         if (!arrow) return;
         arrow.able = status;
         //如果人为隐藏了工具栏,则不显示翻页按钮
-        if (this.hasTopBar && !this.barStatus && status) {
+        if (this.hasTopBar && !this.toolBarStatus && status) {
             return;
         }
         arrow.el[status ? 'show' : 'hide']();
     }
 
-    //隐藏下一页按钮
-    hideNext() {
-        this.toggleArrow('next', false);
-    }
-
-    //显示下一页按钮
-    showNext() {
-        this.toggleArrow('next', true);
-    }
-
-    //隐藏上一页按钮
-    hidePrev() {
-        this.toggleArrow('prev', false);
-    }
-
-    //显示上一页按钮
-    showPrev() {
-        this.toggleArrow('prev', true);
-    }
-
     /**
-     * [ 显示翻页按钮]
+     * 显示翻页按钮
      * @return {[type]}        [description]
      */
-    showPageBar() {
+    _showArrow() {
         var arrows = this.arrows;
         for (var dir in arrows) {
             var arrow = arrows[dir];
@@ -236,49 +227,24 @@ export default class Bar {
     }
 
     /**
-     * [ 隐藏翻页按钮]
+     * 隐藏翻页按钮
      * @param  {[type]} unlock [description]
      * @return {[type]}        [description]
      */
-    hidePageBar() {
+    _hideArrow() {
         var arrows = this.arrows;
         for (var dir in arrows) {
             arrows[dir].el.hide();
         }
     }
 
-    /**
-     * 切换状态
-     * @param  {[type]} state   [description]
-     * @param  {[type]} pointer [description]
-     * @return {[type]}         [description]
-     */
-    toggle(state, pointer) {
-        if (this.Lock) return;
-        this.Lock = true;
-        switch (state) {
-            case 'show':
-                this.showToolbar(pointer);
-                break;
-            case 'hide':
-                this.hideToolbar(pointer);
-                break;
-            default:
-                if (this.type !== 'pageNumber') {
-                    this.barStatus ? this.hideToolbar(pointer) : this.showToolbar(pointer);
-                } else {
-                    this.Lock = false
-                }
-                break;
-        }
-    }
 
     /**
      * [ 显示工具栏]
      * @param  {[type]} pointer [description]
      * @return {[type]}         [description]
      */
-    showToolbar(pointer) {
+    _showToolBar(pointer) {
         switch (pointer) {
             case 'pageNumber':
                 this.showNumberBar()
@@ -288,12 +254,12 @@ export default class Bar {
                 this.showTopBar();
                 break;
             case 'button':
-                this.showPageBar();
+                this._showArrow();
                 this.Lock = false;
                 break;
             default:
                 this.showTopBar && this.showTopBar();
-                this.showPageBar && this.showPageBar();
+                this._showArrow && this._showArrow();
         }
     }
 
@@ -302,7 +268,7 @@ export default class Bar {
      * @param  {[type]} pointer [description]
      * @return {[type]}         [description]
      */
-    hideToolbar(pointer) {
+    _hideToolBar(pointer) {
         switch (pointer) {
             case 'pageNumber':
                 this.hideNumberBar()
@@ -312,13 +278,14 @@ export default class Bar {
                 this.hideTopBar();
                 break;
             case 'button':
-                this.hidePageBar();
+                this._hideArrow();
                 this.Lock = false;
                 break;
             default:
                 this.hideTopBar && this.hideTopBar();
-                this.hidePageBar && this.hidePageBar();
+                this._hideArrow && this._hideArrow();
         }
+
     }
 
 
@@ -327,7 +294,7 @@ export default class Bar {
      *  iOS状态栏0=show,1=hide
      * @return {[type]} [description]
      */
-    showSystemBar() {
+    super_showSystemBar() {
         isIOS && Xut.Plugin.statusbarPlugin.setStatus(null, null, 0);
     }
 
@@ -336,7 +303,7 @@ export default class Bar {
      * 隐藏IOS系统工具栏
      * @return {[type]} [description]
      */
-    hideSystemBar() {
+    super_hideSystemBar() {
         isIOS && Xut.Plugin.statusbarPlugin.setStatus(null, null, 1);
     }
 
@@ -347,12 +314,12 @@ export default class Bar {
      * @param  {Function} callback [description]
      * @return {[type]}            [description]
      */
-    createSVGIcon(el, callback) {
+    super_createSVGIcon(el, callback) {
         var options = {
             speed: 6000,
             size: {
-                w: this.iconHeight,
-                h: this.iconHeight
+                w: this.super_iconHeight,
+                h: this.super_iconHeight
             },
             onToggle: callback
         };
@@ -361,12 +328,86 @@ export default class Bar {
 
 
     /**
+     * 超类销毁
+     * @return {[type]} [description]
+     */
+    super_destory() {
+        this.arrows = null
+    }
+
+
+    /**
+     * 隐藏下一页按钮
+     * @return {[type]} [description]
+     */
+    hideNext() {
+        this._toggleArrow('next', false);
+    }
+
+    /**
+     * 显示下一页按钮
+     * @return {[type]} [description]
+     */
+    showNext() {
+        this._toggleArrow('next', true);
+    }
+
+
+    /**
+     * 隐藏上一页按钮
+     * @return {[type]} [description]
+     */
+    hidePrev() {
+        this._toggleArrow('prev', false);
+    }
+
+
+    /**
+     * 显示上一页按钮
+     * @return {[type]} [description]
+     */
+    showPrev() {
+        this._toggleArrow('prev', true);
+    }
+
+
+    /**
+     * 切换状态
+     * @param  {[type]} state   [description]
+     * @param  {[type]} pointer [description]
+     * @return {[type]}         [description]
+     */
+    toggle(state, pointer) {
+        if (this.Lock) return
+        this.Lock = true;
+        switch (state) {
+            case 'show':
+                this._showToolBar(pointer);
+                break;
+            case 'hide':
+                this._hideToolBar(pointer);
+                break;
+            default:
+                //flow页码切换不处理
+                if (this.type === 'pageNumber') {
+                    this.Lock = false
+                } else {
+                    //默认：工具栏显示隐藏互斥处理
+                    this.toolBarStatus ? this._hideToolBar(pointer) : this._showToolBar(pointer);
+                }
+                break;
+        }
+    }
+
+
+    /**
      * 重置翻页按钮,状态以工具栏为标准
      * @return {[type]} [description]
      */
-    reset() {
-        this.barStatus ? this.showPageBar() : this.hidePageBar();
+    resetArrow() {
+        this.toolBarStatus ? this._showArrow() : this._hideArrow();
     }
+
 
 
 }

@@ -188,7 +188,7 @@ video {
 
 /*工具栏：页码场景顶部小圆样式结束*/
 
-.xut-control-pageindex {
+.xut-control-pageIndex {
     font-family: sans-serif;
     color: #fff;
     background-color: rgba(0, 0, 0, 0.6);
@@ -197,7 +197,7 @@ video {
 
 /*工具栏：nav导航按钮，收起工具栏*/
 
-.xut-control-nav-hide {
+.xut-control-hidebar {
     background-image: url(../images/icons/hideToolbar.png);
 }
 

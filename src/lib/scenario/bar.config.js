@@ -27,7 +27,7 @@ import { parseJSON } from '../util/index'
 const parseTooBar = (toolbar, toolType, pageMode) => {
     if (toolbar = parseJSON(toolbar)) {
         //兼容数据库中未指定的情况
-        var n = Number(toolbar.pageMode);
+        var n = Number(toolbar.pageMode)
         pageMode = _.isFinite(n) ? n : pageMode;
         if (_.isString(toolbar.tbType)) {
             toolType = _.map(toolbar.tbType.split(','), (num) => {

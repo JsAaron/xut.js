@@ -4,20 +4,20 @@
 
 import Bar from './base/bar'
 import { config } from '../config/index'
-import { hash } from '../util/lang'
+
+const isIOS = Xut.plat.isIOS
 
 export default class fnBar extends Bar {
 
     constructor({
         pageMode,
         id,
-        container,
+        sceneNode,
         toolType,
         pageTotal,
         currentPage
     } = {}) {
         super()
-
         this.pageTips = null;
         this.currTip = null;
         this.tipsMode = 0;
@@ -26,18 +26,16 @@ export default class fnBar extends Bar {
         this.delay = 50;
         this.hasTopBar = false;
         this.barStatus = true;
-        this.arrows = hash()
+
         //options
         this.pageMode = pageMode;
         this.id = id;
-        this.container = container;
+        this.$sceneNode = sceneNode;
         this.toolType = toolType;
         this.pageTotal = pageTotal;
         this.currentPage = currentPage;
 
-        this.initConfig()
-
-        this.initTool();
+        this._initTool();
     }
 
 
@@ -55,26 +53,29 @@ export default class fnBar extends Bar {
      *      2 允许滑动带翻页按钮
      * @return {[type]} [description]
      */
-    initTool() {
-        var container = this.container,
-            type;
+    _initTool() {
+        const $sceneNode = this.$sceneNode
 
-        container.hide();
-        this.controlBar = [];
+        let type
 
+        $sceneNode.hide();
+
+        this.controlBar = []
+
+        //配置工具栏
         while (type = this.toolType.shift()) {
             switch (type) {
                 case 1:
-                    this.createSystemBar();
+                    this._createSystemBar();
                     break;
                 case 2:
-                    this.createCloseIcon();
+                    this._createCloseIcon();
                     break;
                 case 3:
-                    this.createBackIcon(container);
+                    this._createBackIcon($sceneNode);
                     break;
                 case 4:
-                    this.createPageTips();
+                    this._createPageTips();
                     break;
                 default:
                     this.barStatus = false;
@@ -85,68 +86,97 @@ export default class fnBar extends Bar {
 
         //创建翻页按钮
         if (this.pageMode === 2) {
-            this.createArrows();
+            this.super_createArrows();
         }
 
-        container.show();
-
-        //邦定事件
-        this.bindButtonsEvent();
+        $sceneNode.show();
     }
+
 
     /**
      * 系统工具栏
      */
-    createSystemBar() {
-        var id = this.id,
-            TOP = this.barHeight,
-            html = '',
-            style = 'top:0;height:' + this.iconHeight + 'px;padding-top:' + TOP + 'px';
-        html = '<div id="xut-control-bar' + id + '" class="xut-control-bar" style="' + style + '"></div>';
-        html = $(html);
-        this.top = TOP;
-        this.showSystemBar();
-        this.createBackIcon(html);
-        this.createTitle(html);
-        this.createPageNum(html);
+    _createSystemBar() {
+        const id = this.id
+        const height = this.super_barHeight
+        let html = `<div class="xut-control-bar"
+                         style="top:0;height:${this.super_iconHeight}px;padding-top:${height}px">
+                    </div>`
+        html = $(String.styleFormat(html))
+        this.top = height;
+        this.super_showSystemBar();
+        this._createBackIcon(html)
+        this._createTitle(html)
+        this._createPageNum(html)
         this.controlBar = html;
-        this.container.append(html);
+        this.$sceneNode.append(html);
         this.hasTopBar = true;
     }
 
     /**
      * 页码小圆点
      */
-    createPageTips() {
-        var chapters = this.pageTotal,
-            height = this.iconHeight,
-            TOP = this.top,
-            isIOS = Xut.plat.isIOS,
-            html = '';
+    _createPageTips() {
+        let chapters = this.pageTotal
+        let height = this.super_iconHeight
+        let html = ''
+
+        //li内容
+        let content = ''
 
         //如果只有一页则不显示小圆
         if (chapters < 2) {
-            return '';
+            return html
         }
 
         //圆点尺寸
-        var size = isIOS ? 7 : Math.max(8, Math.round(this.propHeight * 8)),
-            width = 2.5 * size, //圆点间距
-            tipsWidth = chapters * width, //圆点总宽度
-            top = (height - size) / 2, //保持圆点垂直居中
-            left = (config.viewSize.width - tipsWidth) / 2; //保持圆点水平居中
+        const size = isIOS ? 7 : Math.max(8, Math.round(this.super_propHeight * 8))
+        const width = 2.5 * size //圆点间距
+        const tipsWidth = chapters * width //圆点总宽度
+        const top = (height - size) / 2 //保持圆点垂直居中
+        const left = (config.viewSize.width - tipsWidth) / 2 //保持圆点水平居中
 
-        html = '<ul class="xut-scenario-tips"  style="top:' + TOP + 'px;left:' + left + 'px;width:' + tipsWidth + 'px;opacity:0.6">';
+
         for (var i = 1; i <= chapters; i++) {
-            html += '<li class="xut-scenario-dark" style="float:left;width:' + width + 'px;height:' + height + 'px;" data-index="' + i + '">';
-            html += '<div class="xut-scenario-radius" style="width:' + size + 'px;height:' + size + 'px;margin:' + top + 'px auto"></div></li>';
+            content +=
+                `<li class="xut-scenario-dark" 
+                      style="float:left;width:${width}px;height:${height}px;" 
+                      data-index="${i}">
+                    <div class="xut-scenario-radius" 
+                          style="width:${size}px;height:${size}px;margin:${top}px auto">
+                    </div>
+                </li>`
         }
-        html += '</ul>';
-        html = $(html);
-        this.pageTips = html.children();
+
+        html = `<ul class="xut-scenario-tips"  
+                    style="top:${this.top}px;left:${left}px;width:${tipsWidth}px;opacity:0.6">
+                    ${content}
+                </ul>`
+
+        html = $(String.styleFormat(html))
+
+        //点击跳转页面
+        this.$tipsNode = html
+        this.$tipsNode.on('click', e => {
+            const target = e.target
+            switch (target.className) {
+                case 'xut-control-nav-hide':
+                    this.hideTopBar();
+                    break;
+                case 'xut-scenario-dark':
+                    if (this.pageMode) {
+                        const index = target.getAttribute('data-index') || 1;
+                        Xut.View.GotoSlide(Number(index));
+                    }
+                    break;
+                default:
+                    break;
+            }
+        })
+        this.pageTips = html.children()
         this.tipsMode = 1;
         this.controlBar.push(html);
-        this.container.append(html);
+        this.$sceneNode.append(html);
     }
 
     /**
@@ -174,115 +204,86 @@ export default class fnBar extends Bar {
     }
 
     /**
-     * [ 关闭按钮]
+     * 关闭按钮
      * @return {[type]} [description]
      */
-    createCloseIcon() {
-        var style, html,
-            TOP = this.top,
-            height = this.iconHeight;
-        style = 'top:' + TOP + 'px;width:' + height + 'px;height:' + height + 'px';
-        html = '<div class="si-icon xut-scenario-close" data-icon-name="close" style="' + style + '"></div>';
-        html = $(html);
-        this.createSVGIcon($(html)[0],
-            function() {
-                Xut.View.CloseScenario()
-            }
-        );
-
+    _createCloseIcon() {
+        const height = this.super_iconHeight;
+        let html =
+            `<div class="si-icon xut-scenario-close" 
+                  data-icon-name="close" 
+                  style="top:${this.top}px;width:${height}px;height:${height}px">
+            </div>`
+        html = $(String.styleFormat(html))
+        this.super_createSVGIcon($(html)[0], () => Xut.View.CloseScenario())
         this.controlBar.push(html);
-        this.container.append(html);
+        this.$sceneNode.append(html);
     }
 
     /**
-     * [ 返回按钮]
+     * 返回按钮
      * @return {[type]} [description]
      */
-    createBackIcon(container) {
-        var style, html,
-            TOP = this.top,
-            height = this.iconHeight;
-        style = 'top:' + TOP + 'px;width:' + height + 'px;height:' + height + 'px';
-        html = '<div class="si-icon xut-scenario-back" data-icon-name="back" style="' + style + '"></div>';
-        html = $(html);
-        this.createSVGIcon(html[0],
-            function() {
-                Xut.View.CloseScenario()
-            }
-        );
+    _createBackIcon($sceneNode) {
+        const height = this.super_iconHeight;
+        let html =
+            `<div class="si-icon xut-scenario-back" 
+                  data-icon-name="back" 
+                  style="top:${this.top}px;width:${height}px;height:${height}px">
+            </div>`
+        html = $(String.styleFormat(html))
+        this.super_createSVGIcon(html[0], () => Xut.View.CloseScenario())
         this.controlBar.push(html);
-        container.append(html);
+        $sceneNode.append(html);
     }
 
-    //创建页码数
-    createPageNum(container) {
+    /**
+     * 创建页码数
+     * @param  {[type]} $sceneNode [description]
+     * @return {[type]}            [description]
+     */
+    _createPageNum($sceneNode) {
         var pageTotal = this.pageTotal,
             TOP = this.top,
-            height = this.iconHeight,
+            height = this.super_iconHeight,
             currentPage = this.currentPage,
             style, html;
-        style = 'position:absolute;right:4px;top:' + (height * 0.25 + TOP) + 'px;padding:0 0.25em;height:' + height * 0.5 + 'px;line-height:' + height * 0.5 + 'px;border-radius:0.5em';
-        html = '<div class="xut-control-pageindex" style="' + style + '">';
-        html += '<span class="currentPage">' + currentPage + '</span>/<span>' + pageTotal + '</span>';
-        html += '</div>';
-        html = $(html);
+
+        html =
+            `<div class="xut-control-pageindex" 
+                  style="position:absolute;
+                         right:4px;
+                         top:${height * 0.25 + TOP}px;
+                         padding:0 0.25em;
+                         height:${height * 0.5}px;
+                         line-height:${height * 0.5}px;
+                         border-radius:0.5em">
+                <span class="currentPage">${currentPage}</span>/<span>${pageTotal}</span>
+            </div>`
+        html = $(String.styleFormat(html));
         this.tipsMode = 2;
         this.currTip = html.children().first();
-        container.append(html);
-    }
-
-    //工具栏隐藏按钮
-    createHideToolbar(container) {
-        var html, style,
-            TOP = this.top,
-            height = this.iconHeight,
-            right = this.iconHeight * 2.5;
-        style = 'position:absolute;right:' + right + 'px;top:' + TOP + 'px;width:' + height + 'px;height:' + height + 'px;background-size:cover';
-        html = '<div class="xut-control-nav-hide" style="' + style + '"></div>';
-        container.append(html);
-    }
-
-    //应用标题
-    createTitle(container) {
-        var style, html,
-            appName = this.appName;
-        style = 'line-height:' + this.iconHeight + 'px';
-        html = '<div class="xut-control-title" style="' + style + '">' + appName + '</div>';
-        container.append(html)
+        $sceneNode.append(html);
     }
 
 
     /**
-     * [ 普通按钮邦定事件]
-     * @param  {[type]} bar [description]
-     * @return {[type]}     [description]
+     * 应用标题
+     * @param  {[type]} $sceneNode [description]
+     * @return {[type]}            [description]
      */
-    bindButtonsEvent() {
-        var that = this,
-            index = 1,
-            id = this.id;
-
-        this.container.on("touchend touchend", function(e) {
-            var target = Xut.plat.evtTarget(e),
-                type = target.className;
-            switch (type) {
-                case 'xut-control-nav-hide':
-                    that.hideTopBar();
-                    break;
-                case 'xut-scenario-dark':
-                    if (that.pageMode) {
-                        index = target.getAttribute('data-index') || 1;
-                        Xut.View.GotoSlide(Number(index));
-                    }
-                    break;
-                default:
-                    break;
-            }
-        })
+    _createTitle($sceneNode) {
+        const html =
+            `<div class="xut-control-title"
+                  style="line-height:${this.super_iconHeight}px">
+                ${this.appName}
+            </div>`
+        $sceneNode.append(String.styleFormat(html))
     }
 
+
     /**
-     * [ 显示顶部工具栏]
+     * 显示顶部工具栏
      * @return {[type]} [description]
      */
     showTopBar() {
@@ -302,7 +303,7 @@ export default class fnBar extends Bar {
                 controlBar.animate({
                     'opacity': 1
                 }, delay, 'linear', function() {
-                    that.showSystemBar();
+                    that.__showSystemBar();
                     that.barStatus = true;
                     that.Lock = false;
                 });
@@ -317,7 +318,7 @@ export default class fnBar extends Bar {
     }
 
     /**
-     * [ 隐藏顶部工具栏]
+     * 隐藏顶部工具栏
      * @return {[type]} [description]
      */
     hideTopBar() {
@@ -334,7 +335,7 @@ export default class fnBar extends Bar {
                 'opacity': 0
             }, delay, 'linear', function() {
                 that.controlBar.hide();
-                that.hideSystemBar();
+                that.__hideSystemBar();
                 that.barStatus = false;
                 that.Lock = false;
             });
@@ -348,13 +349,22 @@ export default class fnBar extends Bar {
         }
     }
 
+
     destroy() {
-        this.container.off();
+        this.$sceneNode = null
         this.controlBar = null;
-        this.arrows = null;
         this.pageTips = null;
         this.currTip = null;
         this.prevTip = null;
+
+        //小图标点击事件
+        if (this.$tipsNode) {
+            this.$tipsNode.off()
+            this.$tipsNode = null
+        }
+
+        //销毁超类
+        this.super_destory()
     }
 
 }

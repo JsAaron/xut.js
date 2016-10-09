@@ -1,8 +1,8 @@
 import { config } from '../config/index'
 
-import MainBar from '../toolbar/main.sysbar'
+import MainBar from '../toolbar/main.sysbar/index'
 import DeputyBar from '../toolbar/deputy.fnbar'
-import BookBar from '../toolbar/bookbar/index'
+import BookBar from '../toolbar/word.bookbar/index'
 import NumberBar from '../toolbar/page.number'
 import { sceneController } from './controller'
 import { Mediator } from '../manager/mediator'
@@ -155,63 +155,46 @@ export class SceneFactory {
             return $rootNode.find('.xut-control-bar')
         }
 
+        //配置文件
+        let barConfig = {}
+
         //主场景工具栏设置
         if (this.isMain) {
-
-            const mainBarConfig = pMainBar(scenarioId, pageTotal)
-
-            //主场工具栏设置
-            if (_.isUndefined(config.toolType.mian)) {
-                config.toolType.mian = mainBarConfig.toolType
-            }
-            //主场景模式
-            if (_.isUndefined(config.pageMode)) {
-                config.pageMode = mainBarConfig.pageMode
-            }
-
+            barConfig = pMainBar(scenarioId, pageTotal)
             if (config.visualMode === 1) {
                 //word模式,自动启动工具条
                 this.mainToolbar = new BookBar({
-                    container: $rootNode,
-                    controlBar: findControlBar(),
-                    pageMode: config.pageMode
+                    sceneNode: $rootNode,
+                    controlNode: findControlBar(),
+                    pageMode: barConfig.pageMode
                 })
-            }
+            } 
             //如果工具拦提供可配置
             //或者config.pageMode 带翻页按钮
-            else if (_.some(config.toolType.mian) || config.pageMode === 2) {
+            else if (_.some(barConfig.toolType)) {
                 //普通模式
                 this.mainToolbar = new MainBar({
-                    container: $rootNode,
-                    controlBar: findControlBar(),
+                    sceneNode: $rootNode,
+                    controlNode: findControlBar(),
                     pageTotal: pageTotal,
                     currentPage: pageIndex + 1,
-                    pageMode: config.pageMode,
-                    toolType: config.toolType.mian
+                    pageMode: barConfig.pageMode,
+                    toolType: barConfig.toolType
                 })
             }
         }
         //副场景
         else {
-
             //副场工具栏配置
-            const deputyBarConfig = pDeputyBar(this.barInfo, pageTotal)
-
-            if (_.isUndefined(config.toolType.deputy)) {
-                config.toolType.deputy = deputyBarConfig.toolType
-            }
-            if (_.isUndefined(config.pageMode)) {
-                config.pageMode = deputyBarConfig.pageMode
-            }
-
-            if (_.some(config.toolType.deputy)) {
+            barConfig = pDeputyBar(this.barInfo, pageTotal)
+            if (_.some(barConfig.toolType)) {
                 this.deputyToolbar = new DeputyBar({
                     id: scenarioId,
-                    container: $rootNode,
-                    toolType: config.toolType.deputy,
+                    sceneNode: $rootNode,
+                    toolType: barConfig.toolType,
                     pageTotal: pageTotal,
                     currentPage: pageIndex,
-                    pageMode: config.pageMode
+                    pageMode: barConfig.pageMode
                 })
             }
         }
@@ -231,6 +214,8 @@ export class SceneFactory {
             })
         }
 
+
+        return barConfig
     }
 
     /**
@@ -255,6 +240,7 @@ export class SceneFactory {
 
         //场景容器对象
         var vm = this.vm = new Mediator({
+            'pageMode': this.pageMode,
             'container': this.$rootNode[0],
             'multiScenario': !isMain,
             'rootPage': scenarioPage,
@@ -267,11 +253,13 @@ export class SceneFactory {
             'isInApp': this.isInApp //提示页面
         });
 
+
         /**
          * 配置选项
          * @type {[type]}
          */
         var isToolbar = this.isToolbar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
+
 
         /**
          * 监听翻页
@@ -305,6 +293,7 @@ export class SceneFactory {
             isToolbar && isToolbar.hideNext();
         })
 
+
         /**
          * 显示上一页按钮
          * @return {[type]} [description]
@@ -321,6 +310,7 @@ export class SceneFactory {
         vm.$bind('hidePrev', () => {
             isToolbar && isToolbar.hidePrev();
         })
+
 
         /**
          * 切换工具栏
@@ -340,7 +330,10 @@ export class SceneFactory {
          * @return {[type]} [description]
          */
         vm.$bind('resetToolbar', () => {
-            self.mainToolbar && self.mainToolbar.reset();
+            if (this.mainToolbar) {
+                this.mainToolbar.resetArrow() //左右翻页按钮
+                this.mainToolbar.hideNavbar() //导航栏
+            }
         })
 
 
@@ -381,29 +374,6 @@ export class SceneFactory {
             vm.$init();
         }
 
-        /**
-         * 绑定桌面调试
-         */
-        config.debugMode && Xut.plat.isBrowser && this._bindWatch();
-    }
-
-    /**
-     * 为桌面测试
-     * 绑定调试
-     * @return {[type]} [description]
-     */
-    _bindWatch() {
-        // for test
-        if (Xut.plat.isBrowser) {
-            var vm = this.vm;
-            this.testWatch = $(".xut-control-pageindex").click(() => {
-                console.log('主场景', vm)
-                console.log('主场景容器', vm.$scheduler.pageMgr.Collections)
-                console.log('主场景视觉差容器', vm.$scheduler.parallaxMgr && vm.$scheduler.parallaxMgr.Collections)
-                console.log('多场景', sceneController.expose())
-                console.log('数据库', Xut.data);
-            })
-        }
     }
 
 
@@ -412,13 +382,6 @@ export class SceneFactory {
      * @return {[type]} [description]
      */
     destroy() {
-        /**
-         * 桌面调试
-         */
-        if (this.testWatch) {
-            this.testWatch.off();
-            this.testWatch = null;
-        }
 
         /**
          * 销毁当前场景

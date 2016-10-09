@@ -1,10 +1,9 @@
-import { config } from '../../config/index'
+import { config } from '../../../config/index'
 
 /**
  * 下拉章节列表
  */
 export default class Section {
-
 
     constructor(data) {
         this._isHorizontal = config.layoutMode === 'horizontal'
@@ -12,7 +11,6 @@ export default class Section {
         this._$section = $('#xut-nav-section-list')
         this._$list = this._$section.find("li")
     }
-
 
     /**
      * 卷滚条
@@ -60,7 +58,7 @@ export default class Section {
             let xxtlink = target.getAttribute('data-xxtlink')
             if (xxtlink){
                 xxtlink = xxtlink.split('-');
-                Xut.View.GotoSlide(xxtlink[0], xxtlink[1]);
+                Xut.View.GotoSlide(xxtlink[0], xxtlink[1])
             }
         }
     }

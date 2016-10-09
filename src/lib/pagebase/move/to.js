@@ -80,7 +80,7 @@ export default function(baseProto) {
             //移动浮动页面容器
             const $floatElement = this.floatContents.PageContainer
             if ($floatElement) {
-                translation[action](floatElement, distance, speed)
+                translation[action]($floatElement[0], distance, speed)
             }
         }
 
@@ -93,7 +93,7 @@ export default function(baseProto) {
             //移动浮动容器
             const $masterElement = this.floatContents.MasterContainer
             if ($masterElement) {
-                translation[action]($masterContainer, distance, speed)
+                translation[action]($masterElement[0], distance, speed)
             }
         }
 

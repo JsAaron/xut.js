@@ -30,7 +30,7 @@ const transformNodes = function($contentNode, property, pageOffset) {
     //浮动对象初始化偏移量
     parallaxOffset = pageOffset;
 
-    if (hasValue(property.translateX) || hasValue(property.translateY) || hash(property.translateZ)) {
+    if (hasValue(property.translateX) || hasValue(property.translateY) || hasValue(property.translateZ)) {
         x = round(property.translateX) || 0
         y = round(property.translateY) || 0
         z = round(property.translateZ) || 0
