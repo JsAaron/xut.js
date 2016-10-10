@@ -470,33 +470,6 @@ _extend(Application, {
 
 
     /**
-     * 刷新页面
-     */
-    Resize() {
-        //清理对象
-        sceneController.destroyAllScene()
-
-        //清理节点
-        $("#xut-scene-container").empty()
-
-        //加载新的页面
-        var novelId, pageIndex = getStorage('pageIndex')
-
-        //缓存加载
-        if (pageIndex !== undefined) {
-            novelId = getStorage("novelId");
-            //加强判断
-            if (novelId) {
-                loadScene({
-                    "novelId": novelId,
-                    "pageIndex": pageIndex,
-                    'history': _get('history')
-                })
-            }
-        }
-    },
-
-    /**
      * 后台运行
      * @type {Number}
      */

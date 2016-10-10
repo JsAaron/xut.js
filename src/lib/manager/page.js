@@ -9,6 +9,8 @@ import { addEdges } from '../util/edge'
 import { removeVideo } from '../component/video/manager'
 import { execScript, extend } from '../util/index'
 
+import { translation } from '../pagebase/move/translation'
+
 import {
     suspend as _suspend,
     original as _original,
@@ -36,7 +38,11 @@ export default class PageMgr extends Abstract {
         this.pageType = 'page';
 
         //页面根节点
-        this.rootNode = vm.options.rootPage;
+        this.pagesNode = vm.options.rootPage;
+
+        if(Xut.config.swipeMode){
+            this.pagesNode.style.width = Xut.config.viewSize.width * vm.options.pagetotal + 'px'
+        }
 
         //创建合集容器
         this.abstractCreateCollection();
@@ -55,7 +61,7 @@ export default class PageMgr extends Abstract {
         const pageObjs = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
-                '$rootNode': this.rootNode //根元素
+                '$rootNode': this.pagesNode //根元素
             })
         )
 
@@ -80,16 +86,25 @@ export default class PageMgr extends Abstract {
         rightIndex,
         direction,
     } = {}) {
-        _.each([
-            this.abstractGetPageObj(leftIndex),
-            this.abstractGetPageObj(currIndex),
-            this.abstractGetPageObj(rightIndex)
-        ], function(pageObj, index) {
-            if (pageObj) {
-                let dist = moveDist[index]
-                pageObj.toMove(action, dist, speed, moveDist[3])
+
+        if (Xut.config.swipeMode) {
+            let distance = moveDist[1]
+            if (action === 'flipOver') {
+                this.pagesNode.setAttribute('data-view', true)
             }
-        })
+            translation[action](this.pagesNode, distance, speed, moveDist)
+        } else {
+            _.each([
+                this.abstractGetPageObj(leftIndex),
+                this.abstractGetPageObj(currIndex),
+                this.abstractGetPageObj(rightIndex)
+            ], function(pageObj, index) {
+                if (pageObj) {
+                    let distance = moveDist[index]
+                    pageObj.toMove(action, distance, speed, moveDist[3])
+                }
+            })
+        }
     }
 
 
@@ -212,8 +227,8 @@ export default class PageMgr extends Abstract {
             }
 
             //如果页面容器存在,才处理自动运行
-            var currRootNode = currPageObj.getContainsNode()
-            if (!currRootNode) {
+            var currpagesNode = currPageObj.getContainsNode()
+            if (!currpagesNode) {
                 return complete()
             }
 
@@ -232,7 +247,7 @@ export default class PageMgr extends Abstract {
     }
 
 
-   /**
+    /**
      * 销毁整个页面管理对象
      * @param  {[type]} clearPageIndex [description]
      * @return {[type]}                [description]
@@ -262,7 +277,7 @@ export default class PageMgr extends Abstract {
         //清理对象
         this.abstractDestroyCollection();
         //清理节点
-        this.rootNode = null;
+        this.pagesNode = null;
     }
 
 

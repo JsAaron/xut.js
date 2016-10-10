@@ -54,11 +54,12 @@ export default {
 
     /**
      * 是否启动页面缩放，mini排版处理
-     * 默认禁止：
+     * 默认自动，根据是否存在flow数据处理
+     * 如果强行介入，这里设置
      * 1 true 启动
      * 2 false 禁止
      */
-    saleMode: false,
+    saleMode: DEFAULT,
 
     /**
      * 全局翻页模式
@@ -111,6 +112,14 @@ export default {
         deputy: DEFAULT, //副场景，函数工具栏
         number: true //独立配置，默认会启动页面，针对分栏处理
     },
+
+    /**
+     * 翻页模式
+     * 0 dyd   动态模式处理每个page翻页
+     * 1 linear  只处理根节点翻页
+     * @type {[type]}
+     */
+    swipeMode: 0,
 
     /**
      * 调试模式

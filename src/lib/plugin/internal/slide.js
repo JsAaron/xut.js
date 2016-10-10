@@ -17,10 +17,12 @@ export default class Slide {
     constructor({
         $pagePinch,
         hasButton = true,
-        update
+        update,
+        doubletap
     }) {
 
         this.update = update
+        this.doubletap = doubletap
 
         //是否配置关闭按钮
         this.hasButton = hasButton
@@ -43,7 +45,7 @@ export default class Slide {
     _initState() {
 
         //允许溢出值
-        this.overflowValue = 0.5
+        this.overflowValue = 0.3
 
         /**
          * 缩放中
@@ -87,19 +89,20 @@ export default class Slide {
      * @return {[type]} [description]
      */
     _initEvent() {
-
         this.hammer = new Hammer.Manager(this.pinchNode)
-        this.hammer.add(new Hammer.Pinch())
-        this.hammer.add(new Hammer.Pan({ enable: false }))
-            .recognizeWith(this.hammer.get('pinch'))
+        this.hammer.add(new Hammer.Pan({ threshold: 0, pointers: 0, enable: false }));
+        this.hammer.add(new Hammer.Pinch({ threshold: 0 })).recognizeWith(this.hammer.get('pan'))
+        this.hammer.add(new Hammer.Tap({ event: 'doubletap', taps: 2, posThreshold: 30 }));
+        this.hammer.add(new Hammer.Tap());
 
         _.each({
+            'doubletap': '_onDoubletap',
             'pinchstart': '_onPinchStart',
             'pinchmove': '_onPinchMove',
             'pinchend': '_onPinchEnd',
             'panstart panmove': '_onPan',
             'panend': '_onPanEnd',
-            'pinchcancel':'_onPinchEnd'
+            'pinchcancel': '_onPinchEnd'
         }, (value, key) => {
             this.hammer.on(key, (e) => {
                 e.srcEvent.stopPropagation()
@@ -108,6 +111,13 @@ export default class Slide {
         })
     }
 
+    _onDoubletap() {
+        if (this.doubletap) {
+            this.doubletap()
+        } else {
+            this._reset()
+        }
+    }
 
     _onPinchStart(ev) {
         this.lastScale = this.data.scale || 1
@@ -119,7 +129,6 @@ export default class Slide {
      * @return {[type]}    [description]
      */
     _onPinchMove(ev) {
-
         //允许溢出值
         if (!this.scaleing) {
             if (ev.scale < this.overflowValue + 1) {
@@ -244,15 +253,26 @@ export default class Slide {
     }
 
     /**
+     * 还原
+     * @return {[type]} [description]
+     */
+    _reset() {
+        this._initState()
+        this._updateNodeStyle(500)
+    }
+
+
+    /**
      * 创建按钮
      * @return {[type]} [description]
      */
     _createPinchButton() {
+        const viewSize = config.viewSize
+        const left = viewSize.overflowWidth && Math.abs(viewSize.left) || 0
+        const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
         const $node = closeButton(() => {
-            //点击还原
-            this._initState()
-            this._updateNodeStyle(500)
-        }, config.viewSize.overflow)
+            this._reset()
+        }, left, top)
         this.$pinchNode.after($node)
         return $node
     }
@@ -275,6 +295,7 @@ export default class Slide {
                     this.$buttonNode = this._createPinchButton()
                 }
             }
+            Xut.Application.closeFlip() //全局滑动
             this._isRunning = true
             this.hammer.get('pan').set({ enable: true })
         }
@@ -288,6 +309,7 @@ export default class Slide {
         if (!this._isRunning) return
         this.hasButton && this.$buttonNode.hide()
         this._isRunning = false
+        Xut.Application.openFlip() //全局滑动
         this.hammer.get('pan').set({ enable: false })
     }
 

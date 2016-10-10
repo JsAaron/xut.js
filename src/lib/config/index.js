@@ -354,17 +354,42 @@ const setProportion = function(pptWidth, pptHeight) {
      */
     const viewSize = config.viewSize = getViewSize(config, fullProportion)
 
-    //溢出值
-    if(viewSize.left){
-        config.viewSize.overflow = Math.abs(viewSize.left)
+    /**
+     * 判断是否溢出与是否填充
+     * @return {[type]} [description]
+     */
+    viewSize.overflowWidth = false
+    viewSize.notFillWidth = false
+    if (viewSize.left < 0) {
+        //溢出宽度
+        viewSize.overflowWidth = true
+    } else if (viewSize.left > 0) {
+        //没有填满宽度
+        viewSize.notFillWidth = true
     }
+
+
+    /**
+     * 溢出高度
+     * @param  {[type]}
+     * @return {[type]}
+     * */
+    viewSize.overflowHeight = false
+    viewSize.notFillHeight = false
+    if (viewSize.top < 0) {
+        //溢出宽度
+        viewSize.overflowHeight = true
+    } else if (viewSize.top > 0) {
+        //没有填满宽度
+        viewSize.notFillHeight = true
+    }
+
 
     /**
      * 获取全局缩放比
      * @type {[type]}
      */
     proportion = config.proportion = getRealProportion(config, viewSize, fullProportion)
-
 }
 
 

@@ -1,5 +1,4 @@
 import { config } from '../config/index'
-import Bar from './base/bar'
 
 import {
     getBeforeCount,
@@ -9,20 +8,18 @@ import {
 /**
  * 页码显示
  */
-export default class NumberBar extends Bar {
+export default class NumberBar {
 
     constructor({
         $rootNode,
         pageTotal,
         currentPage
     }) {
-        super()
-
-        this.type = 'pageNumber'
-
         this.$container = this._createDom(pageTotal)
         this.$currtNode = this.$container.find('div:first')
         this.$allNode = this.$container.find('div:last')
+
+        this.toolBarStatus = true
 
         Xut.nextTick(() => {
             $rootNode.append(this.$container)
@@ -31,9 +28,9 @@ export default class NumberBar extends Bar {
 
     _createDom(pageTotal) {
         //存在模式3的情况，所以页码要处理溢出的情况。left值
-        let right = '0'
-        if (config.viewSize.overflow) {
-            right = config.viewSize.overflow + 'px'
+        let right = 0
+        if (config.viewSize.overflowWidth) {
+            right = Math.abs(config.viewSize.left) + 'px'
         }
         return $(
             `<div class="xut-page-number" style="right:${right};">
@@ -43,14 +40,28 @@ export default class NumberBar extends Bar {
              </div>`)
     }
 
-    showNumberBar() {
+    _showToolBar() {
         this.$container.show()
-        this.Lock = true
     }
 
-    hideNumberBar() {
+    _hideToolBar() {
         this.$container.hide()
-        this.Lock = false
+    }
+
+    toggle(state, pointer) {
+        if (pointer !== 'pageNumber') return
+        switch (state) {
+            case 'show':
+                this._showToolBar();
+                break;
+            case 'hide':
+                this._hideToolBar();
+                break;
+            default:
+                //默认：工具栏显示隐藏互斥处理
+                this.toolBarStatus ? this._hideToolBar() : this._showToolBar();
+                break;
+        }
     }
 
     /**

@@ -111,9 +111,11 @@ export default function(instance) {
 
             //创建缩放
             const createPinch = function(flow) {
-                if (config.saleMode && instance.pageType === 'page') {
+                if (instance.pageType === 'page' && config.saleMode !== false) {
                     const $pagePinch = instance.getContainsNode()
                     if (flow) {
+                        //flow页面不处理
+                        //目前只处理图片
                         // instance._pinchObj = Pinch( $pagePinch.find('.page-flow-pinch'), $pagePinch)
                     } else {
                         instance._pinchObj = new Pinch(

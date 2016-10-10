@@ -36,6 +36,12 @@ const createStr = (chapterId, data, viewWidth, viewHeight, margin) => {
         //容器上偏移量
     const containerTop = viewHeight / 100 * percentageTop
 
+    //重复加载杂志
+    //不刷新的情况处理
+    if(/fix-transform/.test(data)){
+        data = $(data).find("#columns-content").html()
+    }
+
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
     const container = `
@@ -77,7 +83,6 @@ const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, flowCounts) => {
             } else {
                 margin = [0, 0, 0, 0]
             }
-
             chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, vWidth, vHeight, margin)
             flowCounts[seasonsId][id] = 0
         }

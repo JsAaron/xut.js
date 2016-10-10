@@ -40,10 +40,10 @@ export default class Flow {
     }
 
 
-    _setImage(node, width, height, src) {
+    _setImage(node, img, width, height, src) {
 
-        //图片横竖
-        const isHorizontalFigure = width > height
+        //是竖版图片
+        const isVerticalFigure = width < height
         const screenWidth = config.screenSize.width
         const screenHeight = config.screenSize.height
 
@@ -51,24 +51,28 @@ export default class Flow {
         let top = 0
         let left = 0
 
-        if (isHorizontalFigure) {
-
+        //宽度100% 自适应高度
+        const widthFullAdaptiveHeight = () => {
+            prop = screenWidth / width
+            width = screenWidth
+            height = height * prop
+            top = (screenHeight - height) / 2
         }
-        //竖图
-        else {
-            if (config.layoutMode === 'horizontal') {
-                //竖图，横版显示
-                prop = screenHeight / height
-                height = screenHeight
-                width = width * prop
-                left = (screenWidth - width) / 2
-            } else {
-                //竖图，竖屏显示
-                prop = screenWidth / width
-                width = screenWidth
-                height = height * prop
-                top = (screenHeight - height) / 2
-            }
+
+        //宽度100% 自适应宽度
+        const heightFullAdaptiveWidth = () => {
+            prop = screenWidth / width
+            width = screenWidth
+            height = height * prop
+            top = (screenHeight - height) / 2
+        }
+
+        //竖图，竖屏显示
+        if (isVerticalFigure && config.screenVertical) {
+            heightFullAdaptiveWidth()
+        } else {
+            //剩余3种情况，全部按照全宽自适应高度处理
+            widthFullAdaptiveHeight()
         }
 
         const pageImageHTML =
@@ -81,33 +85,41 @@ export default class Flow {
                     </div>
              </div>`
 
-        let $pageImage = $(String.styleFormat(pageImageHTML))
+        const $pageImage = $(String.styleFormat(pageImageHTML))
         this.$pinchNode.after($pageImage)
 
-        Xut.Application.closeFlip()
-        Xut.View.HideToolBar()
+        this.swipe.closeFlip() //flow滑动
+        Xut.Application.closeFlip() //全局滑动
+        Xut.View.HideToolBar('pageNumber') //工具栏
 
         //缩放
         let slide
-        if (Xut.plat.hasTouch) {
-            slide = new Slide({
-                hasButton: false,
-                $pagePinch: $pageImage.children()
-            })
-        }
 
-        //按钮
-        const $buttonNode = closeButton(() => {
+        //销毁
+        const destory = () => {
+            img = null
             slide && slide.destroy()
             $pageImage.remove()
             node.style.visibility = ''
             this._destroyZoomImage = null
+            this.swipe.openFlip()
             Xut.Application.openFlip()
-            Xut.View.ShowToolBar()
-        })
+            Xut.View.ShowToolBar('pageNumber')
+        }
 
-        $pageImage.append($buttonNode)
+        if (Xut.plat.hasTouch && config.saleMode !== false) {
+            slide = new Slide({
+                hasButton: false,
+                $pagePinch: $pageImage.children(),
+                doubletap: destory
+            })
+        }
+
+        //按钮
+        const $buttonNode = closeButton(() => destory())
+
         node.style.visibility = 'hidden'
+        $pageImage.append($buttonNode)
     }
 
     /**
@@ -115,21 +127,15 @@ export default class Flow {
      * @return {[type]} [description]
      */
     _zoomImage(node) {
-
         //图片地址
         const src = Xut.config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
-
         var img = new Image()
         img.src = src
-
-        //防止图片为加载完毕
-        img.onload = () => {
-            this._setImage(node, img.width, img.height, src)
+        img.onload = () => { //防止图片为加载完毕
+            this._setImage(node, img, img.width, img.height, src)
         }
-
-        //失败就用默认
-        img.onerror = () => {
-            this._setImage(node, node.width, node.height, src)
+        img.onerror = () => { //失败
+            img = null
         }
     }
 
@@ -204,7 +210,7 @@ export default class Flow {
                     View.GotoPrevSlide()
                     this.simulationComplete()
                 } else {
-                    if (config.visualMode === 3) {
+                    if (config.viewSize.overflowWidth) {
                         //内部页面边间翻页
                         //要除去被溢出的值
                         distance -= viewLeft
@@ -225,7 +231,7 @@ export default class Flow {
                 } else {
                     //内部页面边间翻页
                     //要除去被溢出的值
-                    if (config.visualMode === 3) {
+                    if (config.viewSize.overflowWidth) {
                         distance -= viewLeft
                     }
                     //后边界前移反弹
@@ -242,7 +248,7 @@ export default class Flow {
                  * @type {Object}
                  */
                 let hooks
-                if (config.visualMode === 3) {
+                if (config.viewSize.overflowWidth) {
                     hooks = {
                         flipOver: {
                             left(data) {

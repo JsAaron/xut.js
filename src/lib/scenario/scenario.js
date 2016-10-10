@@ -168,7 +168,7 @@ export class SceneFactory {
                     controlNode: findControlBar(),
                     pageMode: barConfig.pageMode
                 })
-            } 
+            }
             //如果工具拦提供可配置
             //或者config.pageMode 带翻页按钮
             else if (_.some(barConfig.toolType)) {

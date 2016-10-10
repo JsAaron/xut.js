@@ -12,9 +12,9 @@ const createSVGIcon = function(el, callback) {
     return new svgIcon(el, iconsConfig, options);
 }
 
-const createCloseIcon = function(right) {
+const createCloseIcon = function(right, top) {
     const html =
-        `<div class="page-pinch-close" style="right:${right}px;">
+        `<div class="page-pinch-close" style="right:${right}px;top:${top}px;">
             <div class="si-icon" data-icon-name="close"></div>
         </div>`
     return $(String.styleFormat(html))
@@ -25,8 +25,8 @@ const createCloseIcon = function(right) {
  * 创建关闭按钮
  * @return {[type]} [description]
  */
-export default function createPinchButton(callback, right = 0) {
-    const $closeNode = createCloseIcon(right)
+export default function createPinchButton(callback, right = 0, top = 0) {
+    const $closeNode = createCloseIcon(right, top)
     createSVGIcon($closeNode.children()[0], callback)
     return $closeNode
 }

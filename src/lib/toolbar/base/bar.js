@@ -238,59 +238,6 @@ export default class Bar {
         }
     }
 
-
-    /**
-     * [ 显示工具栏]
-     * @param  {[type]} pointer [description]
-     * @return {[type]}         [description]
-     */
-    _showToolBar(pointer) {
-        switch (pointer) {
-            case 'pageNumber':
-                this.showNumberBar()
-                this.Lock = false
-                break;
-            case 'controlBar':
-                this.showTopBar()
-                break;
-            case 'button':
-                this._showArrow()
-                this.Lock = false
-                break;
-            default:
-                this.showTopBar && this.showTopBar()
-                this._showArrow && this._showArrow()
-                this.showNumberBar && this.showNumberBar()
-        }
-    }
-
-    /**
-     * [ 隐藏工具栏]
-     * @param  {[type]} pointer [description]
-     * @return {[type]}         [description]
-     */
-    _hideToolBar(pointer) {
-        switch (pointer) {
-            case 'pageNumber':
-                this.hideNumberBar()
-                this.Lock = false
-                break;
-            case 'controlBar':
-                this.hideTopBar()
-                break;
-            case 'button':
-                this._hideArrow()
-                this.Lock = false
-                break;
-            default:
-                this.hideNumberBar && this.hideNumberBar()
-                this.hideTopBar && this.hideTopBar()
-                this._hideArrow && this._hideArrow()
-        }
-
-    }
-
-
     /**
      * 显示IOS系统工具栏
      *  iOS状态栏0=show,1=hide
@@ -373,6 +320,50 @@ export default class Bar {
     }
 
 
+
+
+    /**
+     * [ 显示工具栏]
+     * @param  {[type]} pointer [description]
+     * @return {[type]}         [description]
+     */
+    _showToolBar(pointer) {
+        switch (pointer) {
+            case 'controlBar':
+                this.showTopBar()
+                break;
+            case 'button':
+                this._showArrow()
+                this.Lock = false
+                break;
+            default:
+                this.showTopBar()
+                this._showArrow()
+        }
+    }
+
+    /**
+     * [ 隐藏工具栏]
+     * @param  {[type]} pointer [description]
+     * @return {[type]}         [description]
+     */
+    _hideToolBar(pointer) {
+        switch (pointer) {
+            case 'controlBar':
+                this.hideTopBar()
+                break;
+            case 'button':
+                this._hideArrow()
+                this.Lock = false
+                break;
+            default:
+                this.hideTopBar()
+                this._hideArrow()
+        }
+
+    }
+
+
     /**
      * 切换状态
      * @param  {[type]} state   [description]
@@ -390,13 +381,8 @@ export default class Bar {
                 this._hideToolBar(pointer);
                 break;
             default:
-                //flow页码切换不处理
-                if (this.type === 'pageNumber') {
-                    this.Lock = false
-                } else {
-                    //默认：工具栏显示隐藏互斥处理
-                    this.toolBarStatus ? this._hideToolBar(pointer) : this._showToolBar(pointer);
-                }
+                //默认：工具栏显示隐藏互斥处理
+                this.toolBarStatus ? this._hideToolBar(pointer) : this._showToolBar(pointer);
                 break;
         }
     }

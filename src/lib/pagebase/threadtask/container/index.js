@@ -35,18 +35,28 @@ const createli = function({
         virtualNode = `<div style="width:${getStyle.viewWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
     }
 
+    let dydStyle = ''
+    let dydClass = ''
+    if (config.swipeMode) {
+        dydStyle = `float:left;position:relative;`
+    } else {
+        dydStyle = `
+        left:${getStyle.viewLeft}px;
+        top:${getStyle.viewTop}px;
+        ${TANSFROM}:${translate};`
+        dydClass = ` class="xut-flip fix-transform"`
+    }
+
     return String.styleFormat(
         `<li id="${prefix}"
             data-id="${pageData._id}"
             data-map="${base.pid}"
             data-pageType="${base.pageType}"
             data-container="true"
-            class="xut-flip fix-transform"
+            ${dydClass}
             style="width:${getStyle.viewWidth}px;
                    height:${getStyle.viewHeight}px;
-                   top:${getStyle.viewTop}px;
-                   left:${getStyle.viewLeft}px;
-                   ${TANSFROM}:${translate};
+                   ${dydStyle}
                    ${background}
                    ${customStyle}
                    overflow:hidden;">

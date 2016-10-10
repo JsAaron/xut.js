@@ -366,8 +366,7 @@ def(medProto, '$suspend', function() {
     Xut.Application.Suspend({
         skipMedia: true //跨页面不处理
     })
-});
-
+})
 
 /**
  * 销毁场景内部对象
@@ -379,8 +378,7 @@ def(medProto, '$destroy', function() {
     this.$dispatcher.destroy();
     this.$dispatcher = null;
     this.$globalEvent = null;
-});
-
+})
 
 /**
  * 设置所有API接口

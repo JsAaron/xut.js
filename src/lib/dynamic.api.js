@@ -53,7 +53,7 @@ const createaAccess = (mgr) => {
         if (mgr[pageType]) {
             return callback(mgr[pageType], pageType, args, eachContext)
         } else {
-            console.log('传递到access的pageType错误！')
+            // console.log('传递到access的pageType错误！')
         }
     }
 }
@@ -676,7 +676,7 @@ export default function overrideApi(vm) {
      * 是否翻页中
      * @return {Boolean} [description]
      */
-    Application.isFliping = function() {
+    Application.Swiping = function() {
         return $globalEvent.isMoving()
     }
 

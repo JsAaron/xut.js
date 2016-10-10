@@ -97,7 +97,7 @@ const nextTick = function({
     }
 
     //检查容器---$(container) 转为dom对象
-    if (typeof container === 'object' && container.selector !== undefined) {
+    if (_.isObject(container) && container.selector !== undefined) {
         container = container[0];
     }
 

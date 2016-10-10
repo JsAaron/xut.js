@@ -435,7 +435,6 @@ if (plat.isAndroid && !plat.isBrowser) {
     if (window.MMXCONFIG && window.audioHandler) {
         audioPlayer = _cordovaMedia
     } else {
-
         //安卓 && ios手机端
         //用纯video 因为 safari要加autoplay
         if (plat.noAutoPlayMedia) {
@@ -445,7 +444,6 @@ if (plat.isAndroid && !plat.isBrowser) {
             //有客户端的内嵌浏览器模式
             audioPlayer = _Audio
         }
-
     }
     //2015.12.23
     //如果不支持audio改用flash

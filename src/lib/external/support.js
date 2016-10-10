@@ -145,7 +145,7 @@
          * 是webkit
          * 是手机端浏览器
          */
-        noAutoPlayMedia: !isWeiXin && isBrowser && isWebKit && (isIOS || isAndroid),
+        noAutoPlayMedia: !isWeiXin && isBrowser && SUPPORT_ONLY_TOUCH,
 
         /**
          * 支持触摸

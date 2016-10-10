@@ -31,3 +31,8 @@ export function setFlowTranslate(...arg) {
 export function getFlowDistance(...arg) {
     return flowConfig.distance(...arg)
 }
+
+
+export function expandDestory(...arg) {
+    _cache = {}
+}

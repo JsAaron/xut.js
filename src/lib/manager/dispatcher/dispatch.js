@@ -375,6 +375,7 @@ export class Dispatcher {
      *   2.翻页完毕
      */
     autoRun(para) {
+
         let options = this.options
         let pagePointer = this.pagePointer
         let prevIndex = pagePointer.leftIndex

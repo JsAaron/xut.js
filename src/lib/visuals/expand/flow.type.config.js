@@ -38,10 +38,16 @@ export default {
         if (config.visualMode === 3) {
             if (config.pptVertical) {
                 //竖版竖版
-                //高度100%,宽度会存在溢出
-                //所以需要修复flow页面是全屏状态
+                //存在溢出或者未填满全屏(ipad)的情况
                 if (config.screenVertical) {
-                    viewWidth = config.screenSize.width
+                    //溢出强制全屏
+                    if (config.viewSize.overflowWidth) {
+                        viewWidth = config.screenSize.width
+                    }
+                    //如果没有填满采用可视区大小
+                    if (config.viewSize.notFillWidth) {
+                        viewWidth = config.viewSize.width
+                    }
                 } else {
 
                 }
@@ -64,7 +70,7 @@ export default {
      * @return {[type]}            [description]
      */
     , translate(data, usefulData) {
-        if (config.visualMode === 3) {
+        if (config.viewSize.overflowWidth) {
             return {
                 left(offsetLeft) {
                     const middle = usefulData.getStyle('middle')
@@ -96,9 +102,8 @@ export default {
      * @return {[type]} [description]
      */
     , distance() {
-        if (config.visualMode === 3) {
+        if (config.viewSize.overflowWidth) {
             return {
-
                 flipMove: {
                     left(data) {
                         const leftFlow = data.$$checkFlows(data.$$leftIndex)
@@ -113,10 +118,20 @@ export default {
                         }
                     }
                 },
+                /**
+                 * 反弹是反向设置，这个需要注意
+                 * @type {Object}
+                 */
                 flipRebound: {
                     left(data) {
                         //往右边滑动反弹，所以left为左边处理
                         //而且只修正当期那是flow
+                        const middleFlow = data.$$checkFlows(data.$$middleIndex)
+                        if (middleFlow) {
+                            data.middle = Math.abs(config.viewSize.left)
+                        }
+                    },
+                    right(data) {
                         const middleFlow = data.$$checkFlows(data.$$middleIndex)
                         if (middleFlow) {
                             data.middle = Math.abs(config.viewSize.left)

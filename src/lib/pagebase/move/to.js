@@ -84,7 +84,6 @@ export default function(baseProto) {
             }
         }
 
-
         if (this.pageType === 'master') {
             //母版交接判断
             //用户事件的触发
@@ -96,7 +95,6 @@ export default function(baseProto) {
                 translation[action]($masterElement[0], distance, speed)
             }
         }
-
 
         //当前页面
         translation[action](pageNode, distance, speed, viewOffset)

@@ -143,7 +143,8 @@ export default class Swipe extends Observer {
 
         const callback = {
             start: this,
-            end: this
+            end: this,
+            cancel: this
         }
 
         //flipMode启动，没有滑动处理
@@ -165,7 +166,7 @@ export default class Swipe extends Observer {
      */
     _onStart(e) {
 
-        if(this._fliplock) return
+        if (this._fliplock) return
 
         if (e.touches && e.touches.length > 1) {
             return
@@ -231,7 +232,7 @@ export default class Swipe extends Observer {
         //     return
         // }
 
-        if(this._fliplock) return
+        if (this._fliplock) return
 
         //如果没有点击
         //或是Y轴滑动
@@ -310,7 +311,7 @@ export default class Swipe extends Observer {
      */
     _onEnd(e) {
 
-        if(this._fliplock) return
+        if (this._fliplock) return
 
         if (e.touches && e.touches.length > 1) {
             return

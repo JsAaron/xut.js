@@ -81,12 +81,15 @@ const createMain = function() {
 }
 
 
+let lauchOptions = []
 
 Xut.Application.Launch = function({
     el,
     paths,
     cursor
 } = {}) {
+
+    lauchOptions.push(arguments)
 
     //set supportLaunch == false on load
     if (!Xut.Application.supportLaunch) {
@@ -139,6 +142,17 @@ Xut.Application.Launch = function({
         content: $html
     }, init)
 }
+
+//横竖切换
+Xut.plat.isBrowser && window.addEventListener("orientationchange", function() {
+    Xut.Application.Destroy()
+    if (Xut.Application.Launch) {
+        Xut.Application.Launch.apply(null, lauchOptions.pop())
+    } else {
+        removeOldNode()
+        createMain()
+    }
+}, false)
 
 
 setTimeout(() => {
