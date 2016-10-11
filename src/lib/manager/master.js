@@ -111,8 +111,8 @@ export default class MasterMgr extends Abstract {
      */
     create(dataOpts, pageIndex, createCallBack) {
         var masterObj, reuseMasterId, reuseMasterKey
-        var pptMaster = dataOpts.chapterDas.pptMaster
-        var pageOffset = dataOpts.chapterDas.pageOffset
+        var pptMaster = dataOpts.chapterData.pptMaster
+        var pageOffset = dataOpts.chapterData.pageOffset
 
         //母板复用的标示
         reuseMasterId = pageOffset && pageOffset.split(rword);
@@ -135,7 +135,7 @@ export default class MasterMgr extends Abstract {
         masterObj = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
-                '$rootNode': this.rootNode, //根元素
+                'rootNode': this.rootNode, //根元素
                 'pptMaster': pptMaster //ppt母板ID
             })
         );

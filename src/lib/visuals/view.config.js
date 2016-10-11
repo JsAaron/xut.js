@@ -16,7 +16,6 @@ export default function setView(config, fullProportion) {
     let newTop = 0
     let newLeft = 0
 
-
     /**
      * 画轴拼接模式
      * 高度100%，正比缩放宽度，然后设置父容器溢出不隐藏了
@@ -49,7 +48,7 @@ export default function setView(config, fullProportion) {
             //word是两栏，竖版需要强制分开
             if (config.screenVertical) {
                 //启动虚拟双页模式
-                config.doublePageMode = true
+                // config.doublePageMode = true
             }
 
             //横版显示，默认0全屏

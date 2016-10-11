@@ -1,4 +1,4 @@
-import { execute } from '../util/execute'
+import execute from './execute'
 
 let statement = {}
 

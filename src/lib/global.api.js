@@ -231,13 +231,6 @@ _extend(View, {
             })() : 0;
         }
 
-
-        //如果启动了虚拟模式
-        if (config.doublePageMode) {
-            pageTotal = pageTotal * 2;
-        }
-
-
         /**
          * 传递的参数
          * seasonId    节ID
@@ -488,6 +481,7 @@ _extend(Application, {
         original();
     },
 
+
     /**
      * home显示
      * 后台弹回来
@@ -498,16 +492,29 @@ _extend(Application, {
         autoRun()
     },
 
+
     /**
      * 销毁应用
      */
     Destroy() {
-        globalDestroy()
+        globalDestroy('destroy')
+    },
+
+
+    /**
+     * 2016.10.11
+     * 刷新程序
+     * 这个与销毁有点区别
+     * 比如外联的数据，不需要删除
+     */
+    Refresh() {
+        globalDestroy('refresh')
     },
 
 
     /**
      * 退出app
+     * 提供给iframe方式加载后退出app处理接口
      */
     DropApp() {
 

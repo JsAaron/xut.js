@@ -20,8 +20,8 @@ export default function(baseProto) {
          * @type {Object}
          */
         this._dataCache = {}
-        this.scenarioId = this.chapterDas.seasonId
-        this.chapterId = this.chapterDas._id
+        this.scenarioId = this.chapterData.seasonId
+        this.chapterId = this.chapterData._id
 
         /**
          * 是否开启多线程,默认开启

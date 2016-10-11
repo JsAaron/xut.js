@@ -3,7 +3,7 @@
  * @param  {[type]} Utils   [description]
  */
 
-import { Observer } from '../../observer/index'
+import Observer from '../../observer/index'
 import {
     addRenderer,
     stopRenderer,

@@ -32,6 +32,14 @@ if (Xut.plat.isBrowser) {
 }
 
 /**
+ * 内部加载与外部接口调用，二选一的判断
+ * 如果外部加载先调用
+ * 内部加载则停止
+ * @type {Boolean}
+ */
+let appRunning = false
+
+/**
  * remove old html
  * @return {[type]} [description]
  */
@@ -51,8 +59,8 @@ const removeOldNode = function() {
  */
 const commonHTML = function() {
     return `<div class="xut-removelayer"></div>
-        <div class="xut-start-page xut-fullscreen"></div>
-        <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
+            <div class="xut-start-page xut-fullscreen"></div>
+            <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
 }
 
 const iconHTML = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
@@ -60,20 +68,22 @@ const iconHTML = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"><
 
 const createMain = function() {
 
+    appRunning = true
+
     let rootNode = $("#xxtppt-app-container")
-    let tempHTML = `${iconHTML} ${commonHTML()}`
+    let baseHTML = `${iconHTML} ${commonHTML()}`
 
     //create root node
     if (!rootNode.length) {
         rootNode = $('body')
-        tempHTML =
+        baseHTML =
             `<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow-hidden">
-            ${tempHTML}
-        </div>`
+                ${baseHTML}
+             </div>`
     }
     nextTick({
         container: rootNode,
-        content: $(tempHTML)
+        content: $(baseHTML)
     }, function() {
         rootNode = null
         init()
@@ -83,17 +93,15 @@ const createMain = function() {
 
 let lauchOptions = []
 
+//新版本加载
 Xut.Application.Launch = function({
     el,
     paths,
     cursor
-} = {}) {
-
-    lauchOptions.push(arguments)
+}) {
 
     //set supportLaunch == false on load
     if (!Xut.Application.supportLaunch) {
-        Xut.Application.isRun = true
         removeOldNode()
         createMain()
         return
@@ -104,6 +112,8 @@ Xut.Application.Launch = function({
         console.log('Is Xut.Application.Launch call,Must pass a root node')
         return
     }
+
+    lauchOptions.push(arguments)
 
     //清理旧节点
     removeOldNode()
@@ -143,21 +153,27 @@ Xut.Application.Launch = function({
     }, init)
 }
 
+// $('body').on('dblclick', function() {
+//     Xut.Application.Refresh()
+//     createMain()
+// })
+
 //横竖切换
 Xut.plat.isBrowser && window.addEventListener("orientationchange", function() {
-    Xut.Application.Destroy()
-    if (Xut.Application.Launch) {
+    Xut.Application.Refresh()
+    if (lauchOptions.length) {
         Xut.Application.Launch.apply(null, lauchOptions.pop())
     } else {
-        removeOldNode()
         createMain()
     }
 }, false)
 
 
+//老版本加载
 setTimeout(() => {
     //External interface call
-    if (!Xut.Application.supportLaunch && !Xut.Application.isRun) {
+    if (!Xut.Application.supportLaunch && !appRunning) {
+        //停止外部加载
         Xut.Application.Launch = function() {}
         removeOldNode()
         createMain()

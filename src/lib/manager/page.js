@@ -9,21 +9,20 @@ import { addEdges } from '../util/edge'
 import { removeVideo } from '../component/video/manager'
 import { execScript, extend } from '../util/index'
 
-import { translation } from '../pagebase/move/translation'
-
 import {
     suspend as _suspend,
     original as _original,
     autoRun as _autoRun
 } from '../command/index'
 
+import Swipe from './swipe'
 
 /**
  * 检测脚本注入
  * @return {[type]} [description]
  */
 const runScript = (pageObject, type) => {
-    const code = pageObject.chapterDas[type]
+    const code = pageObject.chapterData[type]
     if (code) {
         execScript(code, type)
     }
@@ -39,10 +38,6 @@ export default class PageMgr extends Abstract {
 
         //页面根节点
         this.pagesNode = vm.options.rootPage;
-
-        if(Xut.config.swipeMode){
-            this.pagesNode.style.width = Xut.config.viewSize.width * vm.options.pagetotal + 'px'
-        }
 
         //创建合集容器
         this.abstractCreateCollection();
@@ -61,7 +56,7 @@ export default class PageMgr extends Abstract {
         const pageObjs = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
-                '$rootNode': this.pagesNode //根元素
+                'rootNode': this.pagesNode //根元素
             })
         )
 
@@ -74,7 +69,7 @@ export default class PageMgr extends Abstract {
 
     /**
      * 移动页面
-     * @return {[type]}            [description]
+     * @return {[type]}
      */
     move({
         nodes,
@@ -85,14 +80,9 @@ export default class PageMgr extends Abstract {
         currIndex,
         rightIndex,
         direction,
-    } = {}) {
-
-        if (Xut.config.swipeMode) {
-            let distance = moveDist[1]
-            if (action === 'flipOver') {
-                this.pagesNode.setAttribute('data-view', true)
-            }
-            translation[action](this.pagesNode, distance, speed, moveDist)
+    }) {
+        if (this.swipe) {
+            this.swipe.move(action, speed, currIndex, moveDist)
         } else {
             _.each([
                 this.abstractGetPageObj(leftIndex),

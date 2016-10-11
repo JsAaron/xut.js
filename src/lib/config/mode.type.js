@@ -115,11 +115,14 @@ export default {
 
     /**
      * 翻页模式
-     * 0 dyd   动态模式处理每个page翻页
+     * 0 dyd   动态模式处理每个page翻页 piecewise
      * 1 linear  只处理根节点翻页
      * @type {[type]}
+     * 废弃，方案行不通
+     * 因为动态增减li页面，需要每次翻页修改父容器的滑动参数，这样会引起闪屏
+     * 除非是一次性生成所有的节点。这样宽度会溢出很大
      */
-    swipeMode: 0,
+    swipeMode: DEFAULT,
 
     /**
      * 调试模式

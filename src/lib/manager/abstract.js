@@ -102,7 +102,7 @@ export class Abstract {
             key = null;
         }
         if (pageObj = this.abstractGetPageObj(pageIndex, pageType)) {
-            return key ? pageObj.chapterDas[key] : pageObj.chapterDas;
+            return key ? pageObj.chapterData[key] : pageObj.chapterData;
         }
     }
 

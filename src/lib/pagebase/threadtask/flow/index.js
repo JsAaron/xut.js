@@ -5,14 +5,14 @@ import { isFlowPage } from '../../../component/flow/get'
  * 流式排版
  */
 export default function(base, successCallback) {
-    const chapterDas = base.chapterDas
+    const chapterData = base.chapterData
     //只有页面类型支持flow && chpater页存在flow数据
-    if (base.pageType === "page" && isFlowPage(chapterDas.seasonId, base.chapterId)) {
+    if (base.pageType === "page" && isFlowPage(chapterData.seasonId, base.chapterId)) {
         base._flows.register(
             new Flow({
                 pageIndex: base.pageIndex,
                 $pinchNode: base.getContainsNode(),
-                seasonId: base.chapterDas.seasonId,
+                seasonId: base.chapterData.seasonId,
                 chapterId: base.chapterId,
                 successCallback,
             })

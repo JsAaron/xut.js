@@ -4,7 +4,9 @@ import { removeCache } from './cache'
 /**
  * 数据销毁
  */
-export default function Destroy() {
-    removeResults()
-    removeCache()
+export default function Destroy(isRefresh) {
+    if (!isRefresh) {
+        removeResults() //json database
+    }
+    removeCache() //userCache
 }

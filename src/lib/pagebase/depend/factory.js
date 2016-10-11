@@ -1,5 +1,5 @@
 // 观察
-import { Observer } from '../../observer/index'
+import Observer from '../../observer/index'
 
 /**
  * canvas相关处理

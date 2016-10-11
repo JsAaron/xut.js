@@ -25,44 +25,22 @@ const createli = function({
 
     const getStyle = base.getStyle
 
-    let offsetLeft = 0
-    let virtualNode = ''
-
-    if (config.doublePageMode) {
-        if (base.virtualOffset === 'right') {
-            offsetLeft = -(config.screenSize.width - config.proportion.offsetLeft);
-        }
-        virtualNode = `<div style="width:${getStyle.viewWidth}px;left:${offsetLeft}px;height:100%;position:relative"></div>`
-    }
-
-    let dydStyle = ''
-    let dydClass = ''
-    if (config.swipeMode) {
-        dydStyle = `float:left;position:relative;`
-    } else {
-        dydStyle = `
-        left:${getStyle.viewLeft}px;
-        top:${getStyle.viewTop}px;
-        ${TANSFROM}:${translate};`
-        dydClass = ` class="xut-flip fix-transform"`
-    }
-
     return String.styleFormat(
         `<li id="${prefix}"
             data-id="${pageData._id}"
             data-map="${base.pid}"
             data-pageType="${base.pageType}"
             data-container="true"
-            ${dydClass}
+            class="xut-flip fix-transform"
             style="width:${getStyle.viewWidth}px;
                    height:${getStyle.viewHeight}px;
-                   ${dydStyle}
+                   left:${getStyle.viewLeft}px;
+                   top:${getStyle.viewTop}px;
+                   ${TANSFROM}:${translate};
                    ${background}
                    ${customStyle}
                    overflow:hidden;">
-            <div class="page-pinch">
-                ${virtualNode}
-            </div>
+            <div class="page-pinch"></div>
         </li>`
     )
 }
@@ -124,13 +102,8 @@ export default function(base, pageData, taskCallback) {
     //创建的flip结构体
     $pageNode = createContainer(base, pageData, getStyle, prefix)
 
-    //如果启动了wordMode模式,查找伪li
-    if (config.doublePageMode) {
-        $pseudoElement = $pageNode.find('div');
-    }
-
     Xut.nextTick({
-        container: base.$rootNode,
+        container: base.rootNode,
         content: $pageNode,
         position: getStyle.direction === 'before' ? 'first' : 'last'
     }, () => {

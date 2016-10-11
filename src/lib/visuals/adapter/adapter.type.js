@@ -1,4 +1,4 @@
-import flowConfig from './flow.type.config'
+import flowConfig from './flow.type'
 
 /**
  * 结果缓存

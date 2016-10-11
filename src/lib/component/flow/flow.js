@@ -5,7 +5,7 @@ import Swipe from '../../swipe/index'
 import render from './render'
 
 import getFlipDistance from '../../visuals/distance.config'
-import { getFlowView } from '../../visuals/expand/api.config'
+import { getFlowView } from '../../visuals/adapter/adapter.type'
 
 import Slide from '../../plugin/internal/slide'
 import closeButton from '../../plugin/internal/close.icon'

@@ -24,7 +24,7 @@ const _indexOf = (array, needle) => {
 
 
 
-export class Observer {
+export default class Observer {
 
     constructor() {
         this.$watch = this.bind

@@ -44,7 +44,7 @@ const calculateFlip = (complier, data, createCallback) => {
         collectContainers.push(function(targetIndex, pageIndex) {
             return function(callback) {
                 //创建新结构
-                complier.create([pageIndex], targetIndex, 'toPage', callback, {
+                complier.createPageBase([pageIndex], targetIndex, 'toPage', callback, {
                     'opacity': 0 //同页面切换,规定切换的样式
                 })
             }
@@ -95,7 +95,7 @@ const createContainerView = (complier, data) => {
     let pageMgr = complier.pageMgr
 
     //停止当前页面动作
-    complier.suspend({
+    complier.suspendPageBase({
         'stopPointer': prveHindex
     })
 
@@ -157,8 +157,14 @@ const createContainerView = (complier, data) => {
     jumpPocesss = null
 }
 
-
-export default function SwitchPage(complier, data, success) {
+/**
+ * 跳转页面逻辑处理
+ * @param  {[type]} complier [description]
+ * @param  {[type]} data     [description]
+ * @param  {[type]} success  [description]
+ * @return {[type]}          [description]
+ */
+export default function goToPage(complier, data, success) {
     //跳前逻辑
     improveIndex(complier, data);
     //处理逻辑

@@ -11,16 +11,36 @@ export function offsetPage(num) {
 }
 
 
-//如果是场景加载，转化页码数
-//转化按0开始
-//pageIndex 页码
-//visiblePid 可见页面chpaterId
-export function conversionPageOpts(pageIndex, visiblePid) {
-    var sectionRang;
+/**
+ * 页面之间关系
+ * @param  {[type]} createIndex [description]
+ * @param  {[type]} currIndex   [description]
+ * @return {[type]}             [description]
+ */
+export function getDirection(createIndex, currIndex) {
+    let direction
+    if (createIndex < currIndex) {
+        direction = 'before'
+    } else if (createIndex > currIndex) {
+        direction = 'after'
+    } else if (currIndex == createIndex) {
+        direction = 'middle'
+    }
+    return direction
+}
+
+
+/**
+ * 如果是场景加载，转化页码数
+ * 转化按0开始
+ * pageIndex 页码
+ * visiblePid 可见页面chpaterId
+ */
+export function converVisiblePid(pageIndex, visiblePid) {
     //转化可视区域值viewPageIndex
     if (this.options.multiScenario) {
-        sectionRang = this.options.sectionRang;
-        //如果传入的是数据
+        const sectionRang = this.options.sectionRang;
+        //如果传入的是数组数据
         if (!visiblePid && _.isArray(pageIndex)) {
             pageIndex.forEach(function(ele, index) {
                 pageIndex.splice(index, 1, ele - sectionRang.start)
@@ -32,13 +52,13 @@ export function conversionPageOpts(pageIndex, visiblePid) {
     } else {
         //pageIndex是数组，并且realPage为空
         if (_.isArray(pageIndex)) {
-            return pageIndex;
+            return pageIndex
         }
     }
 
     return {
-        'pageIndex': pageIndex,
-        'visiblePid': visiblePid
+        pageIndex,
+        visiblePid
     }
 }
 
@@ -101,19 +121,26 @@ export function initPointer(targetIndex, pageTotal, multiplePages) {
     }
 }
 
-//保证可视页面第一个分解
-//createPage 需要创建的页面 [0,1,2]
-//visualPage 可视区页面       [1]
-export function conversionCid(createPage, visualPage) {
 
-    var indexOf, start, less;
+
+/**
+ * 索引转化成chapter ID
+ * 确保解析的正确排序
+ * 保证可视页面第一个分解
+ * createPage 需要创建的页面 [0,1,2]
+ * visualPage 可视区页面       [1]
+ * @param  {[type]} createPage [description]
+ * @param  {[type]} visualPage [description]
+ * @return {[type]}            [description]
+ */
+export function indexConverChapterId(createPage, visualPage) {
 
     //如果第一个不是可视区域
     //切换位置
     //加快创建速度
     if (createPage[0] !== visualPage) {
-        indexOf = createPage.indexOf(visualPage)
-        less = createPage.splice(indexOf, 1)
+        const indexOf = createPage.indexOf(visualPage)
+        const less = createPage.splice(indexOf, 1)
         createPage = less.concat(createPage)
     }
 
@@ -123,8 +150,8 @@ export function conversionCid(createPage, visualPage) {
     if (this.options.multiScenario) {
         //需要提前解析数据库的排列方式
         //chpater的开始位置
-        start = this.options.sectionRang.start;
-        //拼接位置
+        const start = this.options.sectionRang.start
+            //拼接位置
         createPage.forEach(function(page, index) {
             createPage.splice(index, 1, page + start)
         })
@@ -140,7 +167,7 @@ export function conversionCid(createPage, visualPage) {
  * @param  {[type]} createPage [description]
  * @return {[type]}            [description]
  */
-export function conversionPids(createPage) {
+export function indexConverChapterData(createPage) {
     return query('chapter', createPage);
 }
 

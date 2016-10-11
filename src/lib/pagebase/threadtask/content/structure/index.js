@@ -73,7 +73,7 @@ let analysisPath = (wrapObj, conData) => {
 
     if (conData.category === "AutoCompSprite") {
         try {
-            resourcePath = config.pathAddress+ imgContent + "/app.json";
+            resourcePath = config.pathAddress + imgContent + "/app.json";
             results = getResources(resourcePath)
             var spiritList = results.spiritList[0]
             var actListName = spiritList.params.actList
@@ -284,14 +284,8 @@ export default function structure(callback, data, context) {
             //转换缩放比
             sizeResults = reviseSize(wrapObj.data);
 
-            //如果启用了virtualMode模式
-            //对象需要分离创建
-            if (config.doublePageMode) {
-                virtualCreate(sizeResults, wrapObj, content, contentId);
-            } else {
-                //正常模式下创建
-                startCreate(wrapObj, content, contentId)
-            }
+            //正常模式下创建
+            startCreate(wrapObj, content, contentId)
         } else {
             //或者数据出错
             checkComplete();
@@ -322,34 +316,6 @@ export default function structure(callback, data, context) {
     function clearContent(contentId) {
         data.createContentIds.splice(data.createContentIds.indexOf(contentId), 1);
         checkComplete();
-    }
-
-
-    /**
-     * 虚拟模式区分创建
-     * @param  {[type]} sizeResults [description]
-     * @param  {[type]} wrapObj     [description]
-     * @param  {[type]} content     [description]
-     * @param  {[type]} contentId   [description]
-     * @return {[type]}             [description]
-     */
-    function virtualCreate(sizeResults, wrapObj, content, contentId) {
-        // 创建分布左边的对象
-        if (wrapObj.virtualOffset === 'left') {
-            if (sizeResults.scaleLeft < config.screenSize.width) {
-                startCreate(wrapObj, content, contentId)
-            } else {
-                clearContent(contentId)
-            }
-        }
-        // 创建分布右边的对象
-        if (wrapObj.virtualOffset === 'right') {
-            if (sizeResults.scaleLeft > config.screenSize.width) {
-                startCreate(wrapObj, content, contentId)
-            } else {
-                clearContent(contentId)
-            }
-        }
     }
 
 

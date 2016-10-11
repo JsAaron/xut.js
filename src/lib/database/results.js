@@ -11,6 +11,7 @@ let result
  * 2 缓存
  */
 export function importResults(callback) {
+    //如果外联指定路径json数据
     const path = window.DYNAMICCONFIGT.database
     if (path) {
         //add window.SQLResult database
@@ -19,7 +20,9 @@ export function importResults(callback) {
             window.SQLResult = null
             callback()
         })
-    } else if (window.SQLResult) {
+    }
+    //如果外联index.html路径json数据
+    else if (window.SQLResult) {
         result = window.SQLResult
         window.SQLResult = null
         callback()

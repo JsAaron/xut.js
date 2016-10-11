@@ -128,7 +128,7 @@ export default function(instance) {
 
             //chapter=>note == 'flow'
             //因为设计chapter只有一个flow效果，所以直接跳过别的创建
-            if (instance.chapterDas.note == 'flow') {
+            if (instance.chapterData.note == 'flow') {
                 callContextTasks('Flow', function() {
                     createPinch('flow')
                     setNextRunTask('complete')

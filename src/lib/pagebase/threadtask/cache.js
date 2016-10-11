@@ -32,7 +32,7 @@ export default function(pid, callback) {
 
     query(pageType, {
         'pageIndex': pid,
-        'pageData': base.chapterDas,
+        'pageData': base.chapterData,
         'pptMaster': base.pptMaster
     }, function(data, activitys, autoData) {
         addCache.apply(addCache, arguments)

@@ -94,7 +94,7 @@ export default function(baseProto) {
 
         //移除li容器节点节点
         this.$pageNode.remove();
-        this.$rootNode = null;
+        this.rootNode = null;
         this.$pageNode = null;
     }
 

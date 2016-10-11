@@ -5,8 +5,8 @@
  *
  **********************************************************************/
 
-import { Observer } from '../observer/index'
-import { Dispatcher } from './dispatcher/dispatch'
+import Observer from '../observer/index'
+import Dispatcher from './scheduler/dispatcher'
 import { delegateHooks } from './hooks'
 import { filterProcessor } from './filter'
 
@@ -136,7 +136,7 @@ class Mediator extends Observer {
          * @return {[type]} [description]
          */
         $globalEvent.$watch('onMove', (data) => {
-            $dispatcher.move(data)
+            $dispatcher.movePageBase(data)
         });
 
 
@@ -164,7 +164,7 @@ class Mediator extends Observer {
          * @return {[type]}          [description]
          */
         $globalEvent.$watch('onUpSlider', (pointers) => {
-            $dispatcher.suspend(pointers)
+            $dispatcher.suspendPageBase(pointers)
         });
 
 
@@ -173,7 +173,7 @@ class Mediator extends Observer {
          * @return {[type]}              [description]
          */
         $globalEvent.$watch('onComplete', (...arg) => {
-            $dispatcher.complete(...arg)
+            $dispatcher.completePageBase(...arg)
         });
 
 
@@ -182,7 +182,7 @@ class Mediator extends Observer {
          * @return {[type]}      [description]
          */
         $globalEvent.$watch('onJumpPage', (data) => {
-            $dispatcher.jumpPage(data);
+            $dispatcher.gotoPageBase(data);
         });
 
 
@@ -375,7 +375,7 @@ def(medProto, '$suspend', function() {
 def(medProto, '$destroy', function() {
     this.$off();
     this.$globalEvent.destroy();
-    this.$dispatcher.destroy();
+    this.$dispatcher.PageBasedestroy();
     this.$dispatcher = null;
     this.$globalEvent = null;
 })

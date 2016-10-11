@@ -48,23 +48,6 @@ TaskComponents.prototype = {
             virtualOffset = data.virtualOffset,
             widgetRetStr = [];
 
-
-        function virtualCreate(actType, activityData) {
-            var scaleLeft = activityData.scaleLeft;
-            // 创建分布左边的对象
-            if (virtualOffset === 'left') {
-                if (scaleLeft < Xut.config.screenSize.width) {
-                    startCreate(actType, activityData)
-                }
-            }
-            //创建分布右边的对象
-            if (virtualOffset === 'right') {
-                if (scaleLeft > Xut.config.screenSize.width) {
-                    startCreate(actType, activityData)
-                }
-            }
-        }
-
         //创建
         function startCreate(actType, activityData) {
             //创建DOM元素结构
@@ -96,12 +79,7 @@ TaskComponents.prototype = {
                     //缩放比
                     activityData = reviseSize(activityData);
 
-                    //处理虚拟模式创建
-                    if (Xut.config.doublePageMode) {
-                        virtualCreate(actType, activityData)
-                    } else {
-                        startCreate(actType, activityData)
-                    }
+                    startCreate(actType, activityData)
                     break;
             }
         })

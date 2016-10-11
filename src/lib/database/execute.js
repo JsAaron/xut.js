@@ -1,4 +1,5 @@
-import { getResults } from '../database/results'
+import { getResults } from './results'
+import { config } from '../config/index'
 
 /**
  * 创建执行方法
@@ -20,50 +21,54 @@ function createfactory(sql, fn) {
  * @return {[type]}            [description]
  */
 function executeDB(sql, callback, errorCB, tName) {
-    let SQLResult = getResults()
-    if (SQLResult) {
-        if (SQLResult[tName]) {
-            let data = SQLResult[tName]
-            let SQLResultSetRowList = {}
-            SQLResultSetRowList = {
+    let jsonResult = getResults()
+    let data
+    let resultObj
+
+    //如果json格式数据
+    if (jsonResult) {
+        if (jsonResult[tName]) {
+            data = jsonResult[tName]
+            resultObj = {
                 length: Object.keys(data).length,
-                item: function(num) {
+                item(num) {
                     return data[num];
                 }
             }
-            callback(SQLResultSetRowList);
+            callback(resultObj);
         } else {
             errorCB({
                 tName: ':table not exist!!'
             });
         }
-    } else { //否则分次查询数据
+    }
+    //否则直接ajax php
+    else {
         $.ajax({
-            url: Xut.config.onlineModeUrl,
+            url: config.onlineModeUrl,
             dataType: 'json',
             data: {
                 xxtsql: sql
             },
-            success: function(rs) {
-                var data = rs,
-                    SQLResultSetRowList = {};
-                SQLResultSetRowList = {
+            success(rs) {
+                data = rs
+                resultObj = {
                     length: rs.length,
-                    item: function(num) {
+                    item(num) {
                         return data[num];
                     }
-                };
-                callback(SQLResultSetRowList);
+                }
+                callback(resultObj);
             },
             error: errorCB
         })
     }
 }
 
-//建立sql查询,
-export function execute(selectSql, callback) {
+//建立sql查询
+export default function execute(selectSql, callback) {
 
-    var database = Xut.config.db,
+    var database = config.db,
         tableName, //表名
         successResults = {}, //成功的数据
         tempClosure = [], //临时收集器
@@ -76,7 +81,6 @@ export function execute(selectSql, callback) {
                 return Object.keys(selectSql).length;
             }
         }()
-
 
     createfactory(selectSql, function(key, value) {
         //开始执行查询
@@ -131,14 +135,16 @@ export function execute(selectSql, callback) {
         return {
             tableName: tName,
             execute: function() {
-                //查询
+                //支持本地查询
                 if (database) {
                     database.transaction(function(tx) {
                         tx.executeSql(sql, [], function(tx, result) {
                             successResults[tName] = result.rows
                         });
                     }, errorCB, success);
-                } else {
+                }
+                //json与ajax
+                else {
                     executeDB(sql, function(result) {
                         successResults[tName] = result;
                         success();

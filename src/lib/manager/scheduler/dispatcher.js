@@ -7,33 +7,32 @@
  *                2. MasterMgr 模块
  *                                                                    *
  **********************************************************************/
-import { _set } from '../../util/stroage'
+
 import { config } from '../../config/index'
 import PageMgr from '../page'
 import MasterMgr from '../master'
-import SwitchPage from './switch'
+import goToPage from './goto.page'
 import { sceneController } from '../../scenario/controller'
 
-import Stack from '../../util/stack'
-
-import {
-    getFlowDistance
-} from '../../visuals/expand/api.config'
-
+import { getFlowDistance } from '../../visuals/adapter/adapter.type'
 import getFlipDistance from '../../visuals/distance.config'
 import containerStyle from '../../visuals/container.config'
 
+import { _set, hash } from '../../util/index'
+import Stack from '../../util/stack'
+
 import {
-    offsetPage,
-    conversionPageOpts,
     initPointer,
-    conversionCid,
-    conversionPids,
+    getDirection,
+    converVisiblePid,
+    indexConverChapterId,
+    indexConverChapterData,
     checkMasterCreate,
-} from './util'
+} from './conver'
 
 
-export class Dispatcher {
+
+export default class Dispatcher {
 
     constructor(vm) {
         this.vm = vm;
@@ -44,7 +43,7 @@ export class Dispatcher {
          * 创建前景页面管理模块
          * @type {PageMgr}
          */
-        this.pageMgr = new PageMgr(vm);
+        this.pageMgr = new PageMgr(vm)
 
         /**
          * 检测是否需要创母版模块
@@ -64,49 +63,57 @@ export class Dispatcher {
     initCreate() {
         const options = this.options
 
-        //createPointer,
-        //initPointer
+        //pointer
+        //  createPointer
+        //  initPointer
         const pointer = initPointer(options.initIndex, options.pagetotal, options.multiplePages)
 
         this.pagePointer = pointer.initPointer
 
-        //始化构建页面
-        this.create(pointer.createPointer, options.initIndex, 'init')
+        //初始化
+        if (this.pageMgr.swipe) {
+            this.pageMgr.swipe.initTranslation(pointer.createPointer, options.initIndex)
+        }
+
+        //始化构建页面容器对象
+        this.createPageBase(pointer.createPointer, options.initIndex, 'init')
     }
 
 
     /**
      *  创建普通页面
      *  创建母版页面
-     *  createPointer  需要创建的页面索引
-     *  visiblePage       当前可视区页面索引
-     *  action         toPage/init/flipOver
-     *  toPageCallback 跳转页面支持回调通知
-     *  userStyle      规定创建的style属性
+     *  createPointer     需要创建的页面索引
+     *  visiblePageIndex  当前可视区页面索引
+     *  action            创建的动作：toPage/init/flipOver
+     *  toPageCallback    跳转页面支持回调通知
+     *  userStyle         规定创建的style属性
      **/
-    create(createPage, visiblePage, action, toPageCallback, userStyle) {
+    createPageBase(createPageIndex, visiblePageIndex, action, toPageCallback, userStyle) {
 
         //2016.1.20
         //修正苗苗学问题 确保createPage不是undefined
-        if (undefined === createPage[0]) {
+        if (createPageIndex[0] === undefined) {
             return;
         }
 
-        let doublePageMode = config.doublePageMode
         let self = this
         let multiplePages = this.options.multiplePages //是否线性
-        let total = createPage.length
+        let createTotal = createPageIndex.length //需要创建的总页面
         let toPageAction = action === 'toPage' //如果是跳转
         let filpOverAction = action === 'flipOver' //如果是翻页
 
-        //使用第一个是分解可见页面
-        //将页码pageIndex转化成对应的chapter
-        let createPids = conversionCid.call(this, createPage, visiblePage)
+        //将页码pageIndex转化成对应的chapter && 使用第一个是分解可见页面
+        //不同场景会自动转化chapter的下标
+        //createChapterIndexs
+        //  创建的页码ID合集
+        //  代表数据库chpaterID的索引
+        let createChapterIndexs = indexConverChapterId.call(this, createPageIndex, visiblePageIndex)
 
         //收集创建的页面对象
         //用于处理2个页面在切换的时候闪屏问题
         //主要是传递createStyle自定义样式的处理
-        let collectCreatePageBase = []
+        let collectPageBase = []
 
         //是否触发母版的自动时间
         //因为页面每次翻页都会驱动auto事件
@@ -119,69 +126,39 @@ export class Dispatcher {
             let createContent = 0;
             return callback => {
                 ++createContent
-                if (createContent === total) {
+                if (createContent === createTotal) {
                     callback();
                 }
             }
         })()
 
-        /**
-         * 构建执行代码
-         * @type {Object}
-         */
+        //构建执行代码
         const callbackAction = {
-            /**
-             * 初始化
-             * @return {[type]} [description]
-             */
+            //初始化
             init() {
                 collectCallback(() => {
                     self._loadPage('init');
                 })
             },
-            /**
-             * 翻页
-             * @return {[type]} [description]
-             */
+            //翻页
             flipOver() {
                 collectCallback(() => {
-                    self.autoRun({ //翻页
-                        'createPointer': createPids,
+                    self._autoRun({ //翻页
+                        'createPointer': createChapterIndexs,
                         'createMaster': createMaster
                     });
                 })
             },
-            /**
-             * 跳转
-             * @return {[type]} [description]
-             */
+            //跳转
             toPage() {
                 collectCallback(() => {
-                    toPageCallback(collectCreatePageBase);
+                    toPageCallback(collectPageBase);
                 })
             }
         }
 
-
-        /**
-         * pid页码，转化成页面数据集合
-         * pid=>chpterData
-         * @type {[type]}
-         */
-        let chpaterResults = conversionPids(createPids);
-
-        /**
-         * 如果是最后一页
-         * 没有对应的虚拟数据，取前一页的
-         * @return {[type]}             [description]
-         */
-        if (doublePageMode && !chpaterResults.length) {
-            let virtualPid = _.extend([], createPids);
-            createPids.forEach(function(pid, index) {
-                virtualPid.splice(index, 1, --pid)
-            })
-            chpaterResults = conversionPids(virtualPid);
-        }
+        //chapter页码，转化成页面chapter数据集合
+        let chpaterResults = indexConverChapterData(createChapterIndexs);
 
 
         /**
@@ -193,60 +170,26 @@ export class Dispatcher {
          */
         const compile = new Stack()
 
-
         //收集有用的数据
-        let usefulData = Object.create(null)
+        let usefulData = hash()
         let hasFlow = false
         _.each(chpaterResults, (chapterData, index) => {
-            compile.push((function() {
-                //转化值
-                //chapterId => createPid
-                let createPid = createPids[index]
+            compile.push((() => {
 
-                //createPid
-                //pageIndex
-                let conversion = conversionPageOpts.call(self, createPid, visiblePage)
-                let visiblePid = conversion.visiblePid
+                //创建的页面索引
+                let createChapterIndex = createChapterIndexs[index]
+
+                //转化可视区页码对应的chapter的索引号
+                //获取出实际的pageIndex号
+                let conversion = converVisiblePid.call(self, createChapterIndex, visiblePageIndex)
+                let visibleChapterIndex = conversion.visiblePid
                 let pageIndex = conversion.pageIndex
 
-                /**
-                 * 如果启动了虚拟页面模式
-                 * @type {Boolean}
-                 */
-                let virtualPid = false; //虚拟页面的pid编号
-                let virtualOffset = false; //页面坐标left,right
-                if (doublePageMode) {
-                    //页面位置
-                    virtualOffset = offsetPage(pageIndex);
-
-                    //获取新的chpater数据
-                    const fixCids = function(originalIndex) {
-                        let originalPid = conversionCid.call(self, [originalIndex]);
-                        return conversionPids([originalPid])[0];
-                    }
-
-                    ////////////
-                    //如果是翻页创建 //
-                    //由于是拼接的所以chapter移位了
-                    ////////////
-                    if (virtualOffset === 'left') {
-                        chapterData = fixCids(pageIndex / 2)
-                    }
-                    //修正右边chapter
-                    if (virtualOffset === 'right') {
-                        chapterData = fixCids((pageIndex - 1) / 2)
-                    }
-                }
-
-                if (total === 1) {
+                if (createTotal === 1) {
                     self.options.chapterId = chapterData._id
                 }
 
-                /**
-                 * 确定存在flows类型页面
-                 * @param  {[type]} chapterData.note [description]
-                 * @return {[type]}                  [description]
-                 */
+                //确定存在flows类型页面
                 const isFlows = chapterData.note === 'flow'
                 if (isFlows) {
                     hasFlow = true
@@ -254,63 +197,36 @@ export class Dispatcher {
 
                 //跳转的时候，创建新页面可以自动样式信息
                 //优化设置，只是改变当前页面即可
-                if (toPageAction && visiblePid !== createPid) {
+                if (toPageAction && visibleChapterIndex !== createChapterIndex) {
                     userStyle = undefined
                 }
 
-
-                //页面之间关系
-                const _direction = function(createIndex, currIndex) {
-                        let direction
-                        if (createIndex < currIndex) {
-                            direction = 'before'
-                        } else if (createIndex > currIndex) {
-                            direction = 'after'
-                        } else if (currIndex == createIndex) {
-                            direction = 'middle'
-                        }
-                        return direction
-                    }
-                    //收集页面之间创建数据
-                usefulData[createPid] = {
+                //收集页面之间可配置数据
+                usefulData[createChapterIndex] = {
                     isFlows: isFlows,
-                    pid: createPid,
-                    visiblePid: visiblePid,
+                    pid: createChapterIndex,
+                    visiblePid: visibleChapterIndex,
                     userStyle: userStyle,
-                    direction: _direction(createPid, visiblePid)
+                    direction: getDirection(createChapterIndex, visibleChapterIndex)
                 }
 
-                /**
-                 *delay....
-                 * @return {[type]} [description]
-                 */
-                return function(newstyle) {
-
-                    /**
-                     * 构件新的页面
-                     * masterFilter 母板过滤器回调函数
-                     * @param  {[type]} masterFilter [description]
-                     * @return {[type]}              [description]
-                     */
-                    const createPageBase = function(masterFilter) {
-
-                        /**
-                         * 初始化构建页面对象
-                         * 1:page
-                         * 2:master
-                         * [pageBase description]
-                         * @type {[type]}
-                         */
+                //延迟创建
+                //先处理style规则
+                return newstyle => {
+                    //构件新的页面
+                    //masterFilter 母板过滤器回调函数
+                    const _createPageBase = function(masterFilter) {
+                        //初始化构建页面对象
+                        //1:page
+                        //2:master
                         const pageBase = this.create({
+                            'pid': createChapterIndex,
+                            'visiblePid': visibleChapterIndex,
+                            'chapterData': chapterData,
                             'isFlows': isFlows,
-                            'getStyle': newstyle[createPid],
+                            'getStyle': newstyle[createChapterIndex],
                             'pageIndex': pageIndex,
-                            'multiplePages': multiplePages,
-                            'pid': createPid, //页码chapterId
-                            'chapterDas': chapterData, //当前页面的chpater数据
-                            'visiblePid': visiblePid, //实际中页面显示的索引
-                            'virtualPid': virtualPid, //pid
-                            'virtualOffset': virtualOffset //虚拟页面位置
+                            'multiplePages': multiplePages
                         }, pageIndex, masterFilter)
 
                         //构建页面对象后
@@ -324,7 +240,7 @@ export class Dispatcher {
 
                             //收集自定义样式的页面对象
                             if (userStyle) {
-                                collectCreatePageBase.push(pageBase);
+                                collectPageBase.push(pageBase)
                             }
                         }
 
@@ -332,17 +248,17 @@ export class Dispatcher {
 
                     //母版层
                     if (chapterData.pptMaster && self.masterMgr) {
-                        createPageBase.call(self.masterMgr, () => {
+                        _createPageBase.call(self.masterMgr, () => {
                             //母版是否创建等待通知
                             //母版是共享的所以不一定每次翻页都会创建
                             //如果需要创建,则叠加总数
-                            ++total;
-                            createMaster = true;
-                        });
+                            ++createTotal
+                            createMaster = true
+                        })
                     }
 
                     //页面层
-                    createPageBase.call(self.pageMgr);
+                    _createPageBase.call(self.pageMgr)
                 }
 
             })())
@@ -369,12 +285,174 @@ export class Dispatcher {
 
 
     /**
+     * 滑动处理
+     *  1 滑动
+     *  2 反弹
+     *  3 翻页
+     */
+    movePageBase({
+        action,
+        speed,
+        distance,
+        leftIndex,
+        pageIndex,
+        rightIndex,
+        direction
+    }) {
+
+        let self = this
+        let currIndex = pageIndex
+
+        //用户强制直接切换模式
+        //禁止页面跟随滑动
+        if (this.options.flipMode && action == 'flipMove') {
+            return
+        }
+
+        //移动的距离
+        let moveDist = getFlipDistance({
+            action,
+            distance,
+            direction,
+            leftIndex,
+            pageIndex,
+            rightIndex
+        }, getFlowDistance())
+
+        //视觉差页面滑动
+        const currObj = this.pageMgr.abstractGetPageObj(currIndex)
+        const chapterData = currObj.chapterData
+        const nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined
+
+        const data = {
+            nodes,
+            speed,
+            action,
+            moveDist,
+            leftIndex,
+            currIndex,
+            rightIndex,
+            direction,
+        }
+
+        this.pageMgr.move(data)
+        this.masterContext(function() {
+            this.move(data)
+        })
+
+        //更新页码
+        if (action === 'flipOver') {
+            Xut.nextTick(() => {
+                this.vm.$emit('change:pageUpdate', {
+                    action,
+                    parentIndex: direction === 'next' ? rightIndex : leftIndex,
+                    direction
+                })
+            })
+        }
+    }
+
+
+    /**
+     * 翻页松手后
+     * 暂停页面的各种活动动作
+     * @param  {[type]} pointers [description]
+     * @return {[type]}          [description]
+     */
+    suspendPageBase(pointers) {
+        //关闭层事件
+        this.pageMgr.suspend(pointers);
+        this.masterContext(function() {
+            this.suspend(pointers)
+        })
+
+        //复位工具栏
+        this.vm.$emit('change:resetToolbar')
+    }
+
+
+    /**
+     * 翻页动画完毕后
+     * @return {[type]}              [description]
+     */
+    completePageBase(direction, pagePointer, unfliplock, isQuickTurn) {
+        //方向
+        this.direction = direction;
+        //是否快速翻页
+        this.isQuickTurn = isQuickTurn || false;
+        //解锁
+        this.unfliplock = unfliplock;
+        //清理上一个页面
+        this._clearPage(pagePointer.destroyPointer)
+        this._updatePointer(pagePointer);
+        //预创建下一页
+        this._advanceCreate(direction, pagePointer);
+    }
+
+
+    /**
+     * 页面跳转
+     * @param  {[type]} data [description]
+     * @return {[type]}      [description]
+     */
+    gotoPageBase(data) {
+
+        Xut.View.ShowBusy()
+
+        //如果是非线性,创建页面修改
+        if (!this.options.multiplePages) {
+            data.create = [data.targetIndex];
+            data.destroy = [data.currIndex];
+            data.ruleOut = [data.targetIndex];
+            data.pagePointer = {
+                currIndex: data.targetIndex
+            }
+        }
+
+        //执行页面切换
+        goToPage(this, data, function(data) {
+            this._updatePointer(data.pagePointer);
+            this._autoRun({
+                'action': 'toPage',
+                'createPointer': data['create']
+            });
+            Xut.View.HideBusy();
+        })
+    }
+
+
+    /**
+     * 调用母版管理器
+     * @return {[type]} [description]
+     */
+    masterContext(callback) {
+        if (this.masterMgr) {
+            callback.call(this.masterMgr)
+        }
+    }
+
+
+    /**
+     * 销毁接口
+     * 对应多场景操作
+     * @return {[type]} [description]
+     */
+    destroyPageBase() {
+        this.pageMgr.destroy()
+        this.masterContext(function() {
+            this.destroy()
+        })
+    }
+
+
+
+    /**
      * 自动运行处理
      *  流程四:执行自动触发动作
      *   1.初始化创建页面完毕
      *   2.翻页完毕
      */
-    autoRun(para) {
+    _autoRun(para) {
 
         let options = this.options
         let pagePointer = this.pagePointer
@@ -393,7 +471,7 @@ export class Dispatcher {
          * 转化页码标记
          */
         if (createPointer) {
-            createPointer = conversionPageOpts.call(this, createPointer)
+            createPointer = converVisiblePid.call(this, createPointer)
         }
 
         const data = {
@@ -408,14 +486,10 @@ export class Dispatcher {
             'suspendCallback': options.suspendAutoCallback,
             //构建完毕通知
             'buildComplete': function(scenarioId) {
-                //==========================================
-                //
-                //      构建完成通知,用于处理历史缓存记录
-                //      如果是调试模式
-                //      && 不是收费提示页面
-                //      && 多场景应用
-                //
-                //==========================================
+                /**
+                 * 构建完成通知,用于处理历史缓存记录
+                 * 如果是调试模式 && 不是收费提示页面 && 多场景应用
+                 */
                 if (config.recordHistory && !options.isInApp && options.multiScenario) {
                     var history;
                     if (history = sceneController.sequence(scenarioId, currIndex)) {
@@ -513,166 +587,6 @@ export class Dispatcher {
     }
 
 
-    /**
-     * 滑动处理
-     *  1 滑动
-     *  2 反弹
-     *  3 翻页
-     */
-    move({
-        action,
-        speed,
-        distance,
-        leftIndex,
-        pageIndex,
-        rightIndex,
-        direction
-    } = {}) {
-
-        let self = this
-        let currIndex = pageIndex
-
-        //用户强制直接切换模式
-        //禁止页面跟随滑动
-        if (this.options.flipMode && action == 'flipMove') {
-            return
-        }
-
-        //移动的距离
-        let moveDist = getFlipDistance({
-            action,
-            distance,
-            direction,
-            leftIndex,
-            pageIndex,
-            rightIndex
-        }, getFlowDistance())
-
-        //视觉差页面滑动
-        const currObj = this.pageMgr.abstractGetPageObj(currIndex)
-        const chapterData = currObj.chapterDas
-        const nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined
-
-        const data = {
-            nodes,
-            speed,
-            action,
-            moveDist,
-            leftIndex,
-            currIndex,
-            rightIndex,
-            direction,
-        }
-
-        this.pageMgr.move(data)
-        this.masterContext(function() {
-            this.move(data)
-        })
-
-        //更新页码
-        if (action === 'flipOver') {
-            Xut.nextTick(() => {
-                this.vm.$emit('change:pageUpdate', {
-                    action,
-                    parentIndex: direction === 'next' ? rightIndex : leftIndex,
-                    direction
-                })
-            })
-        }
-    }
-
-
-    /**
-     * 翻页松手后
-     * 暂停页面的各种活动动作
-     * @param  {[type]} pointers [description]
-     * @return {[type]}          [description]
-     */
-    suspend(pointers) {
-        //关闭层事件
-        this.pageMgr.suspend(pointers);
-        this.masterContext(function() {
-            this.suspend(pointers)
-        })
-
-        //复位工具栏
-        this.vm.$emit('change:resetToolbar')
-    }
-
-
-    /**
-     * 翻页动画完毕后
-     * @return {[type]}              [description]
-     */
-    complete(direction, pagePointer, unfliplock, isQuickTurn) {
-        //方向
-        this.direction = direction;
-        //是否快速翻页
-        this.isQuickTurn = isQuickTurn || false;
-        //解锁
-        this.unfliplock = unfliplock;
-        //清理上一个页面
-        this._clearPage(pagePointer.destroyPointer)
-        this._updatePointer(pagePointer);
-        //预创建下一页
-        this._advanceCreate(direction, pagePointer);
-    }
-
-
-    /**
-     * 页面跳转切换处
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
-     */
-    jumpPage(data) {
-
-        Xut.View.ShowBusy()
-
-        //如果是非线性,创建页面修改
-        if (!this.options.multiplePages) {
-            data.create = [data.targetIndex];
-            data.destroy = [data.currIndex];
-            data.ruleOut = [data.targetIndex];
-            data.pagePointer = {
-                currIndex: data.targetIndex
-            }
-        }
-
-        //执行页面切换
-        SwitchPage(this, data, function(data) {
-            this._updatePointer(data.pagePointer);
-            this.autoRun({
-                'action': 'toPage',
-                'createPointer': data['create']
-            });
-            Xut.View.HideBusy();
-        })
-    }
-
-
-    /**
-     * 调用母版管理器
-     * @return {[type]} [description]
-     */
-    masterContext(callback) {
-        if (this.masterMgr) {
-            callback.call(this.masterMgr)
-        }
-    }
-
-
-    /**
-     * 销毁接口
-     * 对应多场景操作
-     * @return {[type]} [description]
-     */
-    destroy() {
-        this.pageMgr.destroy()
-        this.masterContext(function() {
-            this.destroy()
-        })
-    }
-
 
     /**
      * 清理页面结构
@@ -712,14 +626,14 @@ export class Dispatcher {
             },
             //创建新的页面对象
             createNextContainer = function(createPointer, currIndex) {
-                this.create([createPointer], currIndex, 'flipOver');
+                this.createPageBase([createPointer], currIndex, 'flipOver');
             };
 
         //如果是右边翻页
         if (direction === 'next') {
             //首尾无须创建页面
             if (pagePointer.currIndex === pagetotal - 1) {
-                this.autoRun();
+                this._autoRun();
                 //如果总数只有2页，那么首页的按钮是关闭的，需要显示
                 if (pagetotal == 2) {
                     vm.$emit('change:showPrev');
@@ -740,7 +654,7 @@ export class Dispatcher {
         if (direction === 'prev') {
             //首尾无须创建页面
             if (pagePointer.currIndex === 0) {
-                this.autoRun();
+                this._autoRun();
                 //如果总数只有2页，那么首页的按钮是关闭的，需要显示
                 if (pagetotal == 2) {
                     vm.$emit('change:showNext');
@@ -772,7 +686,7 @@ export class Dispatcher {
 
         //触发自动任务
         function trigger() {
-            self.autoRun({
+            self._autoRun({
                 'action': 'init'
             });
         }

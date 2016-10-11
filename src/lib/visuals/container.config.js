@@ -1,10 +1,10 @@
-import containerConfig from './expand/container.type.config'
+import defaultContainer from './adapter/container.type'
 import Stack from '../util/stack'
 
 import {
     getFlowView,
     setFlowTranslate
-} from './expand/api.config'
+} from './adapter/adapter.type'
 
 /**
  * 自定义样式页面容器的样式
@@ -17,7 +17,7 @@ export default function styleConfig({
     action,
     hasFlow,
     usefulData
-} = {}) {
+}) {
 
     /**
      * 获取指定页面样式
@@ -31,39 +31,33 @@ export default function styleConfig({
 
     _.each(usefulData, function(data, index) {
 
-        //跳过getStyle
+        //跳过getStyle方法
         if (_.isFunction(data)) {
             return
         }
 
+        //只处理页面的样式对象
         //确保中间页第一个解析
         compile[data.direction == 'middle' ? 'shift' : 'push'](function() {
 
-            /**
-             * 默认尺寸
-             */
-            _.extend(data, containerConfig.view())
+            //容器默认默认尺寸
+            _.extend(data, defaultContainer.view())
 
-            /**
-             * 提供可自定义配置接口
-             * @param  {[type]} data.isFlows [description]
-             * @return {[type]}              [description]
-             */
+            //提供可自定义配置接口
             if (data.isFlows) {
                 _.extend(data, getFlowView())
             }
 
-            /**
-             * 设置容器的样式
-             * @type {[type]}
-             */
-            const hooks = hasFlow ? setFlowTranslate(data, usefulData) : {}
-            const translate = containerConfig.translate({
-                hooks,
+            //设置容器样式
+            const translate = defaultContainer.translate({
+                //提供容器的样式钩子
+                hooks: hasFlow ? setFlowTranslate(data, usefulData) : {},
                 createIndex: data.pid,
                 currIndex: data.visiblePid,
                 direction: data.direction
             })
+
+            //提供快速索引
             usefulData['_' + data.direction] = data.pid
             _.extend(data, translate)
         })
@@ -71,6 +65,7 @@ export default function styleConfig({
     })
 
     compile.shiftAll().destroy()
+
 
     return usefulData
 }

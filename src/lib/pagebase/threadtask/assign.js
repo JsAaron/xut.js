@@ -123,7 +123,7 @@ export default {
             return;
         }
 
-        const chapterDas = base.chapterDas
+        const chapterData = base.chapterData
         const baseData = base.baseData()
 
         /**
@@ -150,8 +150,8 @@ export default {
 
         base.createRelated.cacheTasks['components'] = new TaskComponents({
             '$containsNode': base.getContainsNode(),
-            'nodes': chapterDas['nodes'],
-            'pageOffset': chapterDas['pageOffset'],
+            'nodes': chapterData['nodes'],
+            'pageOffset': chapterData['pageOffset'],
             'activitys': base.baseActivits(),
             'chpaterData': baseData,
             'chapterId': baseData['_id'],
@@ -177,7 +177,7 @@ export default {
             return;
         }
 
-        const chapterDas = base.chapterDas
+        const chapterData = base.chapterData
         const baseData = base.baseData()
         const chapterId = baseData['_id']
         const activitys = base.baseActivits()
@@ -217,11 +217,11 @@ export default {
 
         base.createRelated.cacheTasks['contents'] = new TaskContents({
             'canvasRelated': base.canvasRelated,
-            '$rootNode': base.$rootNode,
+            '$rootNode': base.rootNode,
             '$containsNode': base.getContainsNode(),
             'pageType': base.pageType,
-            'nodes': chapterDas['nodes'],
-            'pageOffset': chapterDas['pageOffset'],
+            'nodes': chapterData['nodes'],
+            'pageOffset': chapterData['pageOffset'],
             'activitys': activitys,
             'chpaterData': baseData,
             'chapterId': chapterId,

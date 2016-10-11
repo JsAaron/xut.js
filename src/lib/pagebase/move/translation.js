@@ -11,12 +11,9 @@ const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 
-
 const dydTransform = (distance) => {
-    distance = config.doublePageMode ? distance / 2 : distance;
     return transform + ':' + 'translate(' + distance + 'px,0px)' + translateZ
 }
-
 
 /**
  * 创建translate初始值
@@ -24,23 +21,19 @@ const dydTransform = (distance) => {
  * @return {[type]}        [description]
  */
 const createTranslate = (offset) => {
-    offset = config.doublePageMode ? offset / 2 : offset
     return 'translate(' + offset + 'px,0px)' + translateZ
 }
-
-
 
 /**
  * 切换坐标
  */
 const toTranslate3d = (node, distance, speed, viewOffset) => {
-    distance = config.doublePageMode ? distance / 2 : distance
     if (node) {
         Xut.nextTick(function() {
-            node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
-        })
-        //修正flipMode切换页面的处理
-        //没有翻页效果
+                node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
+            })
+            //修正flipMode切换页面的处理
+            //没有翻页效果
         if (config.flipMode) {
             //可视区页面
             if (distance === viewOffset) {
@@ -53,6 +46,16 @@ const toTranslate3d = (node, distance, speed, viewOffset) => {
     }
 }
 
+/**
+ * 设置
+ * @param  {[type]} node [description]
+ * @return {[type]}      [description]
+ */
+const set = (node, x) => {
+    if (node) {
+        node.style[transform] = `translate(${x}px,0px) ${translateZ}`
+    }
+}
 
 /**
  * 复位
@@ -65,7 +68,6 @@ const reset = (node) => {
     }
 }
 
-
 /**
  * 移动
  * @return {[type]} [description]
@@ -73,7 +75,6 @@ const reset = (node) => {
 const flipMove = (...arg) => {
     toTranslate3d(...arg)
 }
-
 
 /**
  * 移动反弹
@@ -83,7 +84,6 @@ const flipRebound = (...arg) => {
     toTranslate3d(...arg)
 }
 
-
 /**
  * 移动结束
  * @return {[type]} [description]
@@ -92,12 +92,12 @@ const flipOver = (...arg) => {
     toTranslate3d(...arg)
 }
 
-
 /**
  * translation滑动接口
  * @type {Object}
  */
 export const translation = {
+    set: set,
     reset: reset,
     flipMove: flipMove,
     flipRebound: flipRebound,
