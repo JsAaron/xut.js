@@ -160,7 +160,7 @@ export default class MasterMgr extends Abstract {
         leftIndex,
         currIndex,
         rightIndex,
-        direction,
+        direction
     } = {}) {
 
         let isBoundary = false; //是边界处理

@@ -34,10 +34,8 @@ export default function Destroy(action) {
     //flow的一些接口缓存
     adapterDestory()
 
-    //DYNAMICCONFIGT模式销毁节点
-    if (window.DYNAMICCONFIGT) {
-        window.DYNAMICCONFIGT.removeNode()
-    }
+    //销毁节点
+    Xut.Application.__removeNode__()
 
     //清理节点内容
     $("#xxtppt-app-container").empty()

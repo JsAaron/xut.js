@@ -14,7 +14,7 @@ export default function(base, successCallback) {
                 $pinchNode: base.getContainsNode(),
                 seasonId: base.chapterData.seasonId,
                 chapterId: base.chapterId,
-                successCallback,
+                successCallback
             })
         )
     } else {

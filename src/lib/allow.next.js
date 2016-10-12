@@ -7,7 +7,7 @@
 const allowNext = () => {
     if (window.MMXCONFIG) {
         return () => {
-            return !(window.MMXCONFIG.back || Xut.Application.backstage)
+            return !(window.MMXCONFIG.back || Xut.Application.IsBackStage())
         }
     } else {
         return () => {

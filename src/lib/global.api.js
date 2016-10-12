@@ -31,6 +31,7 @@ import { SceneFactory } from './scenario/scenario'
 import { suspendHandles as globalStop, promptMessage } from './global.stop'
 import globalDestroy from './global.destroy'
 import loadScene from './initialize/scene'
+import Observer from './observer/index'
 
 import {
     ShowBusy,
@@ -437,36 +438,45 @@ _extend(Contents, {
 })
 
 
+/**
+ * 应用事件监听
+ * 1 完成
+ * Xut.Application.Watch('complete',fn)
+ */
+const __app__ = new Observer()
+Application.Watch = function(event, callback) {
+    __app__.$watch(`app:${event}`, function() {
+        callback.apply(__app__, arguments)
+    })
+}
+Application.Notify = function(event, options) {
+    __app__.$emit(`app:${event}`, options)
+}
+
+/**
+ * 后台运行
+ * @type {Number}
+ */
+let backstage = 0
+
+/**
+ * 应用加载状态
+ * false未加载
+ * true 已加载
+ * @type {Boolean}
+ */
+let appState = false
+
 
 _extend(Application, {
-
-    /**
-     * 应用平台
-     * @type {[type]}
-     */
-    Platform: (() => {
-        //平台缩写
-        var platformName = ['duku', 'pc', 'ios', 'android'];
-        if (window.GLOBALIFRAME) {
-            //嵌套iframe平台
-            return platformName[0]
-        } else {
-            if (config.isBrowser) {
-                return platformName[1];
-            } else if (Xut.plat.isIOS) {
-                return platformName[2];
-            } else if (Xut.plat.isAndroid) {
-                return platformName[3];
-            }
-        }
-    })(),
-
 
     /**
      * 后台运行
      * @type {Number}
      */
-    backstage: 0,
+    IsBackStage() {
+        return backstage
+    },
 
     /**
      * home隐藏
@@ -474,13 +484,11 @@ _extend(Application, {
      * 用于进来的时候激活Activate
      */
     Original() {
-        Application.backstage = 1
-
-        //传递一个完全关闭的参数
+        backstage = 1
+            //传递一个完全关闭的参数
         suspend('', '', true);
         original();
     },
-
 
     /**
      * home显示
@@ -488,18 +496,17 @@ _extend(Application, {
      * 激活应用行为
      */
     Activate() {
-        Application.backstage = 0
+        backstage = 0
         autoRun()
     },
-
 
     /**
      * 销毁应用
      */
     Destroy() {
+        __app__.$off()
         globalDestroy('destroy')
     },
-
 
     /**
      * 2016.10.11
@@ -510,7 +517,6 @@ _extend(Application, {
     Refresh() {
         globalDestroy('refresh')
     },
-
 
     /**
      * 退出app
@@ -600,7 +606,6 @@ _extend(Application, {
         }
     },
 
-
     /**
      * 暂停应用
      * skipMedia 跳过音频你处理(跨页面)
@@ -615,19 +620,8 @@ _extend(Application, {
         } else {
             opts.processed && opts.processed();
         }
-    },
-
-    /**
-     * 注册所有组件对象
-     * 2 widget 包括 视频 音频 Action 子文档 弹出口 类型
-     * 这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
-     * @param  {[type]} regData [description]
-     * @return {[type]}         [description]
-     */
-    injectionComponent(regData) {
-        var sceneObj = sceneController.containerObj('current')
-        sceneObj.vm.$injectionComponent = regData
     }
+
 })
 
 
@@ -640,18 +634,10 @@ _extend(Application, {
     Launch() {},
 
     /**
-     * 应用加载状态
-     * false未加载
-     * true 已加载
-     * @type {Boolean}
-     */
-    appState: false,
-
-    /**
      * 设置应用状态
      */
     setAppState() {
-        Application.appState = true;
+        appState = true;
     },
 
     /**
@@ -659,7 +645,7 @@ _extend(Application, {
      * @return {[type]} [description]
      */
     delAppState() {
-        Application.appState = false;
+        appState = false;
     },
 
     /**
@@ -667,7 +653,7 @@ _extend(Application, {
      * @return {[type]} [description]
      */
     getAppState() {
-        return Application.appState;
+        return appState;
     },
 
     /**

@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 837
+Xut.Version = 838
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -31,66 +31,89 @@ if (Xut.plat.isBrowser) {
     })
 }
 
-/**
- * 内部加载与外部接口调用，二选一的判断
- * 如果外部加载先调用
- * 内部加载则停止
- * @type {Boolean}
- */
-let appRunning = false
 
 /**
  * remove old html
  * @return {[type]} [description]
  */
 const removeOldNode = function() {
-    if (document.getElementById('sceneContainer')) {
+    const exists = document.getElementById('sceneContainer')
+    if (exists) {
         $("#busyIcon").hide().remove()
         $("#message").hide().remove()
         $("#removelayer").hide().remove()
         $("#startupPage").hide().remove()
         $("#sceneContainer").hide().remove()
     }
+    return exists
+}
+
+
+/**
+ * 创建基本结构
+ * @return {[type]} [description]
+ */
+const createHTML = function(nodeName, cursor = true) { //默认需要忙了光标
+    let $rootNode
+    if (nodeName) {
+        $rootNode = $(nodeName)
+    } else {
+        //如果没有传递节点名，直接放到body下面
+        $rootNode = $('body')
+    }
+
+    //忙碌可配置
+    let busyIcon = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
+    if (!cursor) {
+        disable(true)
+        busyIcon = ''
+    }
+
+    //基本结构
+    const commonHTML =
+        `<div class="xut-removelayer"></div>
+         <div class="xut-start-page xut-fullscreen"></div>
+         <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
+
+    let html = `${busyIcon}${commonHTML}`
+
+    //如果根节点不存在,配置根节点
+    if (!nodeName) {
+        html = `<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden "> ${html}</div>`
+    }
+
+    let $appNode = $(String.styleFormat(html))
+
+    $appNode.css('z-index', 9999999)
+
+    Xut.Application.__removeNode__ = function() {
+        $appNode.remove()
+        $rootNode = null
+        $appNode = null
+    }
+
+    nextTick({
+        container: $rootNode,
+        content: $appNode
+    }, init)
+}
+
+
+/**
+ * 加载应用app
+ * @return {[type]} [description]
+ */
+const loadApp = function(nodeName, cursor) {
+    //清理旧节点
+    removeOldNode()
+    createHTML(nodeName, cursor)
 }
 
 /**
- * common html
- * @return {[type]} [description]
+ * 接口接在参数
+ * 用户横竖切换刷新
+ * @type {Array}
  */
-const commonHTML = function() {
-    return `<div class="xut-removelayer"></div>
-            <div class="xut-start-page xut-fullscreen"></div>
-            <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
-}
-
-const iconHTML = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
-
-
-const createMain = function() {
-
-    appRunning = true
-
-    let rootNode = $("#xxtppt-app-container")
-    let baseHTML = `${iconHTML} ${commonHTML()}`
-
-    //create root node
-    if (!rootNode.length) {
-        rootNode = $('body')
-        baseHTML =
-            `<div id="xxtppt-app-container" class="xut-chapter xut-fullscreen xut-overflow-hidden">
-                ${baseHTML}
-             </div>`
-    }
-    nextTick({
-        container: rootNode,
-        content: $(baseHTML)
-    }, function() {
-        rootNode = null
-        init()
-    })
-}
-
-
 let lauchOptions = []
 
 //新版本加载
@@ -99,63 +122,22 @@ Xut.Application.Launch = function({
     paths,
     cursor
 }) {
+    if (Xut.Application.setConfig.lauchMode === 1) {
+        lauchOptions.push(arguments)
 
-    //set supportLaunch == false on load
-    if (!Xut.Application.supportLaunch) {
-        removeOldNode()
-        createMain()
-        return
+        //外部配置文件
+        window.DYNAMICCONFIGT = {
+            resource: paths.resource,
+            database: paths.database
+        }
+        loadApp(el, cursor)
     }
-
-    let $el = $(el)
-    if (!$el.length) {
-        console.log('Is Xut.Application.Launch call,Must pass a root node')
-        return
-    }
-
-    lauchOptions.push(arguments)
-
-    //清理旧节点
-    removeOldNode()
-
-    Xut.Application.supportLaunch = true
-
-    /**
-     * add dynamic config
-     * @type {Object}
-     */
-    window.DYNAMICCONFIGT = {
-        resource: paths.resource,
-        database: paths.database
-    }
-
-    let busyIcon = iconHTML
-
-    //disable cursor
-    if (!cursor) {
-        disable(true)
-        busyIcon = ''
-    }
-
-    let $html = $(`${busyIcon}${commonHTML()}`)
-
-    $el.css('z-index', 9999999)
-
-    window.DYNAMICCONFIGT.removeNode = function() {
-        $html.remove()
-        $html = null
-        $el = null
-    }
-
-    nextTick({
-        container: $el,
-        content: $html
-    }, init)
 }
 
-// $('body').on('dblclick', function() {
+
+// $('body').on('dblclick', () => {
 //     Xut.Application.Refresh()
-//     createMain()
+//     loadApp()
 // })
 
 //横竖切换
@@ -164,18 +146,22 @@ Xut.plat.isBrowser && window.addEventListener("orientationchange", function() {
     if (lauchOptions.length) {
         Xut.Application.Launch.apply(null, lauchOptions.pop())
     } else {
-        createMain()
+        loadApp()
     }
 }, false)
 
 
-//老版本加载
 setTimeout(() => {
-    //External interface call
-    if (!Xut.Application.supportLaunch && !appRunning) {
-        //停止外部加载
-        Xut.Application.Launch = function() {}
-        removeOldNode()
-        createMain()
+
+    //提供全局配置文件
+    if (Xut.Application.setConfig !== undefined) {
+        Xut.extend(config, Xut.Application.setConfig)
     }
+
+    //lauchMode = 0
+    //老版本加载
+    if (config.lauchMode === 0) {
+        loadApp()
+    }
+
 }, 100)

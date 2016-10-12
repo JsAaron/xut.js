@@ -2,7 +2,7 @@
  * 默认值，未定义
  * @type {[type]}
  */
-const DEFAULT = void 0
+const DEFAULT = undefined
 
 /**
  * 模式配置
@@ -123,6 +123,17 @@ export default {
      * 除非是一次性生成所有的节点。这样宽度会溢出很大
      */
     swipeMode: DEFAULT,
+
+
+    /**
+     * 应用的加载模式
+     * 0： 应用自行启动
+     * 1： 应用通过接口启动
+     *     Xut.Application.Launch
+     *     提供全局可配置参数
+     * @type {Number}
+     */
+    lauchMode: 0,
 
     /**
      * 调试模式

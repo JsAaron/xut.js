@@ -71,28 +71,31 @@ export default {
 
         let translate
         let offset
+        let offsetLeft
+        let offsetMiddle
+        let offsetRight
 
         const viewWidth = config.viewSize.width
 
         switch (direction) {
             case 'before':
-                let offsetLeft = -viewWidth
+                offsetLeft = -viewWidth
                 offsetLeft = mixHooks(offsetLeft, hooks.left)
                 translate = createTranslate(offsetLeft)
                 offset = offsetLeft
-                break
+                break;
             case 'middle':
-                let offsetMiddle = 0
+                offsetMiddle = 0
                 offsetMiddle = mixHooks(offsetMiddle, hooks.middle)
                 translate = createTranslate(offsetMiddle)
                 offset = offsetMiddle
-                break
+                break;
             case 'after':
-                let offsetRight = viewWidth
+                offsetRight = viewWidth
                 offsetRight = mixHooks(offsetRight, hooks.right)
                 translate = createTranslate(offsetRight)
                 offset = offsetRight
-                break
+                break;
         }
 
         return {

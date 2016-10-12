@@ -394,10 +394,8 @@ export default function overrideApi(vm) {
             'pageIndex': pagePointer.currIndex,
             'rightIndex': pagePointer.rightIndex
         }
-        $dispatcher.move(data)
+        $dispatcher.movePageBase(data)
     };
-
-
 
 
     /**
@@ -661,9 +659,23 @@ export default function overrideApi(vm) {
      * 应用滑动接口
      * @return {[type]}
      */
+
+    /**
+     * 禁止滑动
+     */
+    Xut.Application.Bansliding = function() {
+        $globalEvent.bansliding();
+    }
+
+    /**
+     * 允许滑动
+     */
+    Xut.Application.Allowliding = function() {
+        $globalEvent.allowliding();
+    }
+
+
     _.each([
-        "openFlip",
-        "closeFlip",
         "closeSwipe",
         "openSwipe"
     ], function(operate) {

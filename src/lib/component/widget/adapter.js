@@ -6,7 +6,7 @@
  *              构件5种类型
  *
  * *******************************************************************/
-
+import { sceneController } from '../../scenario/controller'
 import { parseJSON } from '../../util/dom'
 import { config } from '../../config/index'
 import pageWidget from './page/index'
@@ -15,8 +15,21 @@ import iframeWidget from './iframe/index'
 const FLOOR = Math.floor
 const CEIL = Math.ceil
 
+/**
+ * 注册所有组件对象
+ * 2 widget 包括 视频 音频 Action 子文档 弹出口 类型
+ * 这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
+ * @param  {[type]} regData [description]
+ * @return {[type]}         [description]
+ */
+const injectionComponent = function(regData) {
+    var sceneObj = sceneController.containerObj('current')
+    sceneObj.vm.$injectionComponent = regData
+}
+
+
 const load = (type, data, constructor) => {
-    Xut.Application.injectionComponent({
+    injectionComponent({
         'pageType': data.pageType, //标记类型区分
         'pageIndex': data.pageIndex,
         'widget': new constructor(data)

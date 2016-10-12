@@ -46,6 +46,7 @@ const initDefaults = (setData) => {
     config.appId = data.appId; //应用配置唯一标示符
     config.shortName = data.shortName;
     config.Inapp = data.Inapp; //是否为应用内购买
+    config.delayTime = data.delayTime
 
     //应用的唯一标识符
     //生成时间+appid

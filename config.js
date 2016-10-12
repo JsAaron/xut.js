@@ -46,7 +46,7 @@ module.exports = {
          * @type {Object}
          */
         test: {
-            launch: false,
+            launch: true,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: win ?
@@ -58,7 +58,7 @@ module.exports = {
          * @type {Object}
          */
         eslint: {
-            launch: false,
+            launch: true,
             //必须绝对路径
             dir: path.resolve(__dirname, 'src/lib'),
         },

@@ -375,7 +375,7 @@ def(medProto, '$suspend', function() {
 def(medProto, '$destroy', function() {
     this.$off();
     this.$globalEvent.destroy();
-    this.$dispatcher.PageBasedestroy();
+    this.$dispatcher.destroyPageBase();
     this.$dispatcher = null;
     this.$globalEvent = null;
 })

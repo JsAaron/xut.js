@@ -15,7 +15,6 @@ from '../util/index'
 
 const getCache = (name) => parseInt(_get(name))
 
-
 /**
  * 进入主页面
  * @return {[type]} [description]
@@ -48,9 +47,9 @@ const initMain = (novelData) => {
      */
     if (parameter = novelData.parameter) {
         parameter = parseJSON(parameter)
-        //配置全局翻页模式
-        //flipMode可以为0
-        //兼容flipMode错误,强制转化成数字类型
+            //配置全局翻页模式
+            //flipMode可以为0
+            //兼容flipMode错误,强制转化成数字类型
         if (parameter.pageflip !== undefined) {
             flipMode = toEmpty(parameter.pageflip)
             _set({ 'flipMode': flipMode })
@@ -129,7 +128,6 @@ const operation = () => {
             Xut.Application.DropApp();
         }, "*")
     }
-
     initApp()
 }
 
@@ -154,13 +152,14 @@ export default function init() {
     if (window.GLOBALIFRAME) {
         operation()
     } else {
+
         //brower or mobile(apk or ipa)
         if (config.isBrowser) {
             initApp()
         } else {
             window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
             document.addEventListener("deviceready", () => {
-                Xut.Plugin.XXTEbookInit.startup(config.dbName, operation, () => {});
+                Xut.Plugin.XXTEbookInit.startup(config.dbName, operation, function() {});
             }, false)
         }
     }

@@ -12,7 +12,7 @@ let result
  */
 export function importResults(callback) {
     //如果外联指定路径json数据
-    const path = window.DYNAMICCONFIGT.database
+    const path = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.database
     if (path) {
         //add window.SQLResult database
         request(path, () => {

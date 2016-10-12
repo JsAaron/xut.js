@@ -16,13 +16,13 @@
     var UV = inBrowser && window.navigator.appVersion.toLowerCase()
     var isAndroid = UA && UA.indexOf('android') > 0
     var isIphone = (/iphone|ipod/gi).test(UA)
-    var isIpad = (/ipod/gi).test(UA)
+    var isIpad = (/ipad/gi).test(UA)
     var isIOS = isIphone || isIpad
     var isIOS7 = isIOS && (/os\s7/gi).test(UA)
     var has3d = 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()
 
     //webkit内核
-    var isWebKit = /applewebKit/ig.test(UV)
+    var isWebKit = /applewebkit/ig.test(UV)
 
     //微信
     var isWeiXin = /micromessenger/ig.test(UV)
@@ -120,6 +120,7 @@
     var iosVersion = iosVersionMatch && iosVersionMatch[1].split('_')
     // detecting iOS UIWebView by indexedDB
     var hasMutationObserverBug = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
+
 
     /**
      * 平台支持

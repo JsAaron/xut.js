@@ -18,12 +18,13 @@ export default function api(Swipe) {
         })
     }
 
-
-    Swipe.prototype.openFlip = function() {
+    //允许滑动
+    Swipe.prototype.allowliding = function() {
         this._unlock()
     }
 
-    Swipe.prototype.closeFlip = function() {
+    //禁止滑动
+    Swipe.prototype.bansliding = function() {
         this._lock()
     }
 

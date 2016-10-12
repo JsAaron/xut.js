@@ -295,7 +295,7 @@ export default class Slide {
                     this.$buttonNode = this._createPinchButton()
                 }
             }
-            Xut.Application.closeFlip() //全局滑动
+            Xut.Application.Bansliding() //禁止全局滑动
             this._isRunning = true
             this.hammer.get('pan').set({ enable: true })
         }
@@ -309,7 +309,7 @@ export default class Slide {
         if (!this._isRunning) return
         this.hasButton && this.$buttonNode.hide()
         this._isRunning = false
-        Xut.Application.openFlip() //全局滑动
+        Xut.Application.Allowliding() //全局滑动
         this.hammer.get('pan').set({ enable: false })
     }
 

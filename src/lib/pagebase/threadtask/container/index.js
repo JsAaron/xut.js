@@ -94,7 +94,7 @@ export default function(base, pageData, taskCallback) {
     //在执行的时候节点已经存在
     //不需要在创建
     if (Xut.IBooks.runMode()) {
-        $pageNode = $("#" + prefix);
+        $pageNode = $("#" + prefix)
         taskCallback($pageNode, $pseudoElement)
         return
     }

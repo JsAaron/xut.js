@@ -60,7 +60,7 @@
      * 这样可以做自动切换xxtppt.js
      * @type {Boolean}
      */
-    window.DYNAMICCONFIGT = false
+    window.DYNAMICCONFIGT = undefined
 
 })(function() {
 

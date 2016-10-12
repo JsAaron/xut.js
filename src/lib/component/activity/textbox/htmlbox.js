@@ -84,6 +84,7 @@ function toolBar(fontSize) {
             </li>
         </ul>`
 
+
     return String.styleFormat(boxHTML)
 }
 
@@ -91,10 +92,10 @@ function toolBar(fontSize) {
  * 创建盒子容器
  * @return {[type]} [description]
  */
-function createWapper(context, iscrollName, textContent) {
+function createWapper(boxHeight, context, iscrollName, textContent) {
     var wapper =
         `<div class="htmlbox-container">
-            <div class="htmlbox-toolbar">${context}</div>
+            <div class="htmlbox-toolbar" style="height:${boxHeight}px;line-height:${boxHeight}px;">${context}</div>
             <div class="${iscrollName}" style="overflow:hidden;position:absolute;width:100%;height:92%;">
                 <ul>${textContent}</ul>
             </div>
@@ -147,6 +148,11 @@ export default class HtmlBox {
 
         const fontSize = getFontSize()
 
+        //工具栏的高度必须大于最大的字体大小
+        const boxHeight = fontSize[2]+2;
+        //关闭按钮的top值
+        const closeTop = Math.floor(boxHeight / 2);
+
         //获取保存的字体值
         const initValue = _get(this.storageName)
         if (initValue) {
@@ -160,8 +166,26 @@ export default class HtmlBox {
          * 创建容器
          * @type {[type]}
          */
-        this.$htmlbox = $(createWapper(toolBar(fontSize), iscrollName, textContent))
+        this.$htmlbox = $(createWapper(boxHeight, toolBar(fontSize), iscrollName, textContent))
+
+
+
+        //修正模式2下屏幕溢出高度 
+        const viewSize = config.viewSize
+        const left = viewSize.overflowWidth && Math.abs(viewSize.left) || 0
+        const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
+        this.$htmlbox[0].style.cssText += "margin-top:" + top + "px;";
+
+
         $contentNode.after(this.$htmlbox)
+
+        //修改::before伪元素top值 确保关闭按钮垂直居中
+        var str = window.getComputedStyle(this.$htmlbox.find('.htmlbox_close')[0], '::before').getPropertyValue('top');
+
+        document.styleSheets[0].addRule('.htmlbox_close::before', 'top:' + closeTop + 'px');
+        document.styleSheets[0].insertRule('.htmlbox_close::before { top:' + closeTop + 'px }', 0);
+        document.styleSheets[0].addRule('.htmlbox_close::after', 'top:' + closeTop + 'px');
+        document.styleSheets[0].insertRule('.htmlbox_close::after { top:' + closeTop + 'px }', 0);
 
         //卷滚
         this._createIscroll(this.$htmlbox, iscrollName)
@@ -192,6 +216,7 @@ export default class HtmlBox {
             self._adjustSize(defaultFontSize)
             self.removeBox()
             Xut.View.ShowToolBar('pageNumber')
+          
         }
 
 

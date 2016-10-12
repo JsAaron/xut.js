@@ -51,7 +51,7 @@ export default class Flow {
         let top = 0
         let left = 0
 
-        //宽度100% 自适应高度
+        //宽度100%适应宽度
         const widthFullAdaptiveHeight = () => {
             prop = screenWidth / width
             width = screenWidth
@@ -59,19 +59,27 @@ export default class Flow {
             top = (screenHeight - height) / 2
         }
 
-        //宽度100% 自适应宽度
+        //高度100% 自适应宽度
         const heightFullAdaptiveWidth = () => {
-            prop = screenWidth / width
-            width = screenWidth
-            height = height * prop
-            top = (screenHeight - height) / 2
+            prop = screenHeight / height
+            height = screenHeight
+            width = width * prop
+            left = (screenWidth - width) / 2
         }
 
-        //竖图，竖屏显示
-        if (isVerticalFigure && config.screenVertical) {
-            heightFullAdaptiveWidth()
-        } else {
-            //剩余3种情况，全部按照全宽自适应高度处理
+        //竖图
+        if (isVerticalFigure) {
+            //竖屏显示
+            if (config.screenVertical) {
+                widthFullAdaptiveHeight()
+            }
+            //横版显示
+            else {
+                heightFullAdaptiveWidth()
+            }
+        }
+        //横图
+        else {
             widthFullAdaptiveHeight()
         }
 
@@ -88,8 +96,8 @@ export default class Flow {
         const $pageImage = $(String.styleFormat(pageImageHTML))
         this.$pinchNode.after($pageImage)
 
-        this.swipe.closeFlip() //flow滑动
-        Xut.Application.closeFlip() //全局滑动
+        this.swipe.bansliding() //flow滑动
+        Xut.Application.Bansliding() //全局滑动
         Xut.View.HideToolBar('pageNumber') //工具栏
 
         //缩放
@@ -102,8 +110,8 @@ export default class Flow {
             $pageImage.remove()
             node.style.visibility = ''
             this._destroyZoomImage = null
-            this.swipe.openFlip()
-            Xut.Application.openFlip()
+            this.swipe.allowliding()
+            Xut.Application.Allowliding()
             Xut.View.ShowToolBar('pageNumber')
         }
 

@@ -57,7 +57,7 @@ const _nextTick = (function() {
         // webpack attempts to inject a shim for setImmediate
         // if it is used as a global, so we have to work around that to
         // avoid bundling unnecessary code.
-        const context = inBrowser ? window : typeof global !== 'undefined' ? global : {}
+        const context = Xut.plat.isBrowser ? window : typeof global !== 'undefined' ? global : {}
         timerFunc = context.setImmediate || setTimeout
     }
     return function(cb, ctx) {

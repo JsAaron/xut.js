@@ -29,6 +29,12 @@ export function getDirection(createIndex, currIndex) {
     return direction
 }
 
+const mixRang = function(pageIndex, start) {
+    return pageIndex.map(oldPageIndex => {
+        return oldPageIndex - start
+    })
+}
+
 
 /**
  * 如果是场景加载，转化页码数
@@ -39,16 +45,13 @@ export function getDirection(createIndex, currIndex) {
 export function converVisiblePid(pageIndex, visiblePid) {
     //转化可视区域值viewPageIndex
     if (this.options.multiScenario) {
-        const sectionRang = this.options.sectionRang;
+        let sectionRang = this.options.sectionRang;
         //如果传入的是数组数据
         if (!visiblePid && _.isArray(pageIndex)) {
-            pageIndex.forEach(function(ele, index) {
-                pageIndex.splice(index, 1, ele - sectionRang.start)
-            })
-            return pageIndex;
+            return mixRang(pageIndex, sectionRang.start)
         }
-        pageIndex -= sectionRang.start;
-        visiblePid += sectionRang.start;
+        pageIndex -= sectionRang.start
+        visiblePid += sectionRang.start
     } else {
         //pageIndex是数组，并且realPage为空
         if (_.isArray(pageIndex)) {

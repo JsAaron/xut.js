@@ -79,7 +79,7 @@ export default class PageMgr extends Abstract {
         leftIndex,
         currIndex,
         rightIndex,
-        direction,
+        direction
     }) {
         if (this.swipe) {
             this.swipe.move(action, speed, currIndex, moveDist)

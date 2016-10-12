@@ -4,7 +4,7 @@
  */
 
 import { access } from './access'
-import allowNext from '../backstage'
+import allowNext from '../allow.next'
 import directives from '../directive/index'
 
 const noop = function() {}

@@ -258,31 +258,24 @@ class _Audio extends BaseClass {
         let audio
         let self = this
 
-        let replaceAudio = hasAudioes()
+        let hasAudio = hasAudioes()
 
         //构建之前处理
         this.preRelated(trackId, options);
 
         if (instance[trackId]) {
-            audio = replaceAudio ? getAudio() : instance[trackId]
+            audio = hasAudio ? getAudio() : instance[trackId]
             audio.src = url
         } else {
-
-            //create a new Audio instance
-            //如果为ios browser 用Xut.fix.audioes 指定src 初始化见app.js
-            if (replaceAudio) {
+            if (hasAudio) {
                 audio = getAudio()
                 audio.src = url
             } else {
-                audio = new Audio(url);
+                audio = new Audio(url)
+                //更新音轨
+                //妙妙学方式不要音轨处理
+                instance[trackId] = audio
             }
-
-            //更新音轨
-            //妙妙学方式不要音轨处理
-            if (!replaceAudio) {
-                instance[trackId] = audio;
-            }
-
         }
 
         this._callback = () => {
@@ -435,15 +428,7 @@ if (plat.isAndroid && !plat.isBrowser) {
     if (window.MMXCONFIG && window.audioHandler) {
         audioPlayer = _cordovaMedia
     } else {
-        //安卓 && ios手机端
-        //用纯video 因为 safari要加autoplay
-        if (plat.noAutoPlayMedia) {
-            audioPlayer = _Audio
-        } else {
-            //特殊情况
-            //有客户端的内嵌浏览器模式
-            audioPlayer = _Audio
-        }
+        audioPlayer = _Audio
     }
     //2015.12.23
     //如果不支持audio改用flash

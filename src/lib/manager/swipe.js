@@ -22,13 +22,6 @@ export default class Swipe {
         this.swipeNode = swipeNode
         swipeNode.style.width = config.viewSize.width * 3 + 'px'
 
-        if (this.flipMode) {
-            callback.transitionend = this
-        } else if (this.multiplePages) {
-            callback.move = this
-            callback.transitionend = this
-        }
-
         bindEvent(this.swipeNode, {
             transitionend: this
         })

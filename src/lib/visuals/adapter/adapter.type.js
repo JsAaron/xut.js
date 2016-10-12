@@ -33,6 +33,6 @@ export function getFlowDistance(...arg) {
 }
 
 
-export function expandDestory(...arg) {
+export function adapterDestory(...arg) {
     _cache = {}
 }

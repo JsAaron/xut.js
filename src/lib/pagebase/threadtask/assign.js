@@ -21,11 +21,21 @@ const parseMode = function(pageData, base) {
     if (parameter) {
         try {
             parameter = JSON.parse(parameter)
-            if (parameter && parameter.contentMode && parameter.contentMode == 1) {
-                //非强制dom模式
-                if (!Xut.config.onlyDomMode) {
-                    //启动dom模式
-                    base.canvasRelated.enable = true;
+            if (parameter) {
+                if (parameter.contentMode && parameter.contentMode == 1) {
+                    //非强制dom模式
+                    if (!Xut.config.onlyDomMode) {
+                        //启动dom模式
+                        base.canvasRelated.enable = true;
+                    }
+                }
+                //如果是最后一页处理
+                if (parameter.lastPage) {
+                    //运行应用运行时间
+                    const runTime = Number(Xut.config.delayTime)
+                    runTime && setTimeout(() => {
+                        Xut.Application.Notify('complete',22)
+                    }, runTime * 1000) //转成秒
                 }
             }
         } catch (e) {

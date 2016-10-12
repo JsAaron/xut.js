@@ -27,7 +27,7 @@ import {
     converVisiblePid,
     indexConverChapterId,
     indexConverChapterData,
-    checkMasterCreate,
+    checkMasterCreate
 } from './conver'
 
 
@@ -332,7 +332,7 @@ export default class Dispatcher {
             leftIndex,
             currIndex,
             rightIndex,
-            direction,
+            direction
         }
 
         this.pageMgr.move(data)
@@ -682,47 +682,39 @@ export default class Dispatcher {
      * @return {[type]}        [description]
      */
     _loadPage(action) {
-        var self = this;
 
         //触发自动任务
-        function trigger() {
-            self._autoRun({
+        const trigger = () => {
+            this._autoRun({
                 'action': 'init'
-            });
-        }
-
-        //加载主场景页面
-        function firstLoading() {
-
-            $("#xut-main-scene").css({
-                'visibility': 'visible'
-            });
-
-            if (window.GLOBALIFRAME) {
-                trigger();
-                return;
-            }
-            //获取应用的状态
-            if (Xut.Application.getAppState()) {
-                //保留启动方法
-                var pre = Xut.Application.LaunchApp;
-                Xut.Application.LaunchApp = function() {
-                    pre();
-                    trigger();
-                };
-            } else {
-                trigger();
-            }
+            })
         }
 
         //创建完成回调
-        self.vm.$emit('change:createComplete', function() {
-            if (self.options.multiScenario) {
-                trigger();
+        this.vm.$emit('change:createComplete', () => {
+            if (this.options.multiScenario) {
+                trigger()
             } else {
                 //第一次加载
                 //进入应用
-                firstLoading();
+                $("#xut-main-scene").css({
+                    'visibility': 'visible'
+                })
+                if (window.GLOBALIFRAME) {
+                    trigger();
+                    return
+                }
+                //获取应用的状态
+                if (Xut.Application.getAppState()) {
+                    //保留启动方法
+                    var pre = Xut.Application.LaunchApp;
+                    Xut.Application.LaunchApp = function() {
+                        pre();
+                        trigger()
+                    };
+                } else {
+                    trigger()
+                }
             }
         })
     }

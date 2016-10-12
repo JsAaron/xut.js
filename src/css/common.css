@@ -13,6 +13,7 @@ html,
 body {
     height: 100%;
     font-size: 100%;
+    overflow: hidden;
 }
 
 
@@ -97,9 +98,7 @@ video {
 }
 
 
-/**
- * index.html
- */
+/** index.html */
 
 .xut-fullscreen {
     height: 100%;
@@ -875,7 +874,6 @@ video {
     -ms-filter: blur(5px);
     filter: blur(5px);
 }
-
 
 
 /** HTML文本框 ***/
