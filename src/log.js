@@ -2,10 +2,13 @@
 * 电子杂志更新日志记录
 **************************
 * v838  2016.10.12  重大更新：
-* 					1 增加flow功能支持
-* 					2 增加页面缩放
-* 					3 增加模式分辨率
-* 					4 为妙秒学增加应用watch方法
+	1 增加全新的flow页面排版
+	2 增加页面级缩放
+	3 增加图片放大功能并支持缩放
+	4 增加9种页面模式分辨率布局
+	5 为妙秒学增加应用watch方法监控
+	6 修正了妙妙学svg高度引起的图片问题
+	7 增加了全新的加载方式，可以通过接口动态切换不同应用
 * v837  2016.9.28  fix Article roll roll problem of svg.
 * v836  2016.9.10  Optimization of Xut. Platt is decomposed into Xut. Style and Xut. Plat
 * v835  2016.9.2   cursor
