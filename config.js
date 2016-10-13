@@ -46,7 +46,7 @@ module.exports = {
          * @type {Object}
          */
         test: {
-            launch: true,
+            launch: false,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: win ?

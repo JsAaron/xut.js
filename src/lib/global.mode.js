@@ -124,7 +124,6 @@ export default {
      */
     swipeMode: DEFAULT,
 
-
     /**
      * 应用的加载模式
      * 0： 应用自行启动
@@ -134,6 +133,17 @@ export default {
      * @type {Number}
      */
     lauchMode: 0,
+
+    /**
+     * 应用横竖自适应切换
+     * 默认在浏览器端打开
+     * 这里可以定义打开关闭
+     * 打开：1
+     * 默认：0
+     * [orientate description]
+     * @type {[type]}
+     */
+    orientateMode: DEFAULT,
 
     /**
      * 调试模式

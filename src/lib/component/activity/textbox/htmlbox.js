@@ -48,7 +48,6 @@ let whiteObject = {
  */
 const sizeArray = ["1", "1.5", "2.0"]
 
-
 const getFontSize = () => {
     newFontSize = defaultFontSize * config.proportion.width
     return [
@@ -149,7 +148,7 @@ export default class HtmlBox {
         const fontSize = getFontSize()
 
         //工具栏的高度必须大于最大的字体大小
-        const boxHeight = fontSize[2]+2;
+        const boxHeight = fontSize[2] + 2;
         //关闭按钮的top值
         const closeTop = Math.floor(boxHeight / 2);
 
@@ -168,25 +167,16 @@ export default class HtmlBox {
          */
         this.$htmlbox = $(createWapper(boxHeight, toolBar(fontSize), iscrollName, textContent))
 
-
-
-        //修正模式2下屏幕溢出高度 
-        const viewSize = config.viewSize
-        const left = viewSize.overflowWidth && Math.abs(viewSize.left) || 0
-        const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
-        this.$htmlbox[0].style.cssText += "margin-top:" + top + "px;";
-
-
         $contentNode.after(this.$htmlbox)
 
-        //修改::before伪元素top值 确保关闭按钮垂直居中
-        var str = window.getComputedStyle(this.$htmlbox.find('.htmlbox_close')[0], '::before').getPropertyValue('top');
-
+        //修改::before ::after伪元素top值 确保关闭按钮垂直居中
         document.styleSheets[0].addRule('.htmlbox_close::before', 'top:' + closeTop + 'px');
         document.styleSheets[0].insertRule('.htmlbox_close::before { top:' + closeTop + 'px }', 0);
         document.styleSheets[0].addRule('.htmlbox_close::after', 'top:' + closeTop + 'px');
         document.styleSheets[0].insertRule('.htmlbox_close::after { top:' + closeTop + 'px }', 0);
 
+        //修正htmlbox位置
+        this._relocateToolbar(iscrollName);
         //卷滚
         this._createIscroll(this.$htmlbox, iscrollName)
 
@@ -212,11 +202,11 @@ export default class HtmlBox {
          */
         const colse = function() {
             self._restoreColor()
-             //还原跟字体大小
+                //还原跟字体大小
             self._adjustSize(defaultFontSize)
             self.removeBox()
             Xut.View.ShowToolBar('pageNumber')
-          
+
         }
 
 
@@ -293,6 +283,46 @@ export default class HtmlBox {
                 }
             })
         });
+    }
+
+    /**
+     * 修正htmlbox位置
+     * @param  {[type]} iscrollName [description]
+     * @return {[type]}             [description]
+     */
+    _relocateToolbar(iscrollName) {
+        //修正模式2下屏幕溢出高度  
+        const viewSize = config.viewSize
+        const left = viewSize.overflowWidth && Math.abs(viewSize.left) || 0
+        const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
+        this.$htmlbox[0].style.cssText += "margin-top:" + top + "px";
+
+        //修正模式3下屏幕溢出宽度
+        //1.修正关闭按钮::before ::after伪元素left值 确保关闭按钮水平居中
+        //首先恢复到最开始的left:2%状态
+        document.styleSheets[0].addRule('.htmlbox_close::before', 'left:2%');
+        document.styleSheets[0].insertRule('.htmlbox_close::before { left:2% }', 0);
+        document.styleSheets[0].addRule('.htmlbox_close::after', 'left:2%');
+        document.styleSheets[0].insertRule('.htmlbox_close::after { left:2% }', 0);
+        const formerLeft = window.getComputedStyle(this.$htmlbox.find('.htmlbox_close')[0], '::before').getPropertyValue('left');
+        const currentLeft = parseInt(formerLeft) + left;
+
+
+        //开始修正
+        document.styleSheets[0].addRule('.htmlbox_close::before', 'left:' + currentLeft + 'px');
+        document.styleSheets[0].insertRule('.htmlbox_close::before { left:' + currentLeft + 'px }', 0);
+        document.styleSheets[0].addRule('.htmlbox_close::after', 'left:' + currentLeft + 'px');
+        document.styleSheets[0].insertRule('.htmlbox_close::after { left:' + currentLeft + 'px }', 0);
+        //2.修正字体放大ul按钮
+        this.$htmlbox.find(".htmlbox_fontsizeUl")[0].style.cssText += "margin-right:" + left + "px";
+        //3.修正文本框
+        this.$htmlbox.find("." + iscrollName)[0].style.cssText += "margin-left:" + left + "px;";
+        var formerScrollWidth = window.getComputedStyle(this.$htmlbox.find("." + iscrollName)[0]).getPropertyValue('width');
+  
+        var currentScrollWidth = parseInt(formerScrollWidth) - 2*left;
+
+        this.$htmlbox.find("." + iscrollName).width(currentScrollWidth)
+      
     }
 
     /**

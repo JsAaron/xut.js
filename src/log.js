@@ -9,6 +9,7 @@
 	5 为妙秒学增加应用watch方法监控
 	6 修正了妙妙学svg高度引起的图片问题
 	7 增加了全新的加载方式，可以通过接口动态切换不同应用
+	8 增加应用横竖模式定义切换
 * v837  2016.9.28  fix Article roll roll problem of svg.
 * v836  2016.9.10  Optimization of Xut. Platt is decomposed into Xut. Style and Xut. Plat
 * v835  2016.9.2   cursor

@@ -116,6 +116,27 @@ const loadApp = function(nodeName, cursor) {
  */
 let lauchOptions = []
 
+
+// $('body').on('dblclick', () => {
+//     Xut.Application.Refresh()
+//     loadApp()
+// })
+
+//横竖切换
+Xut.plat.isBrowser && window.addEventListener("orientationchange", function() {
+    //0模式，默认关闭横竖切换
+    if (config.orientateMode === 0) {
+        return
+    }
+    Xut.Application.Refresh()
+    if (lauchOptions.length) {
+        Xut.Application.Launch.apply(null, lauchOptions.pop())
+    } else {
+        loadApp()
+    }
+}, false)
+
+
 //新版本加载
 Xut.Application.Launch = function({
     el,
@@ -133,22 +154,6 @@ Xut.Application.Launch = function({
         loadApp(el, cursor)
     }
 }
-
-
-// $('body').on('dblclick', () => {
-//     Xut.Application.Refresh()
-//     loadApp()
-// })
-
-//横竖切换
-Xut.plat.isBrowser && window.addEventListener("orientationchange", function() {
-    Xut.Application.Refresh()
-    if (lauchOptions.length) {
-        Xut.Application.Launch.apply(null, lauchOptions.pop())
-    } else {
-        loadApp()
-    }
-}, false)
 
 
 setTimeout(() => {

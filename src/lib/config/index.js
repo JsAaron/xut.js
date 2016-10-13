@@ -22,7 +22,7 @@ import {
     getRealProportion
 } from '../visuals/proportion.config'
 
-import improtMode from './mode.type'
+import improtMode from '../global.mode'
 import improtData from './data.type'
 
 const plat = Xut.plat
