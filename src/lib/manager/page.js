@@ -116,6 +116,7 @@ export default class PageMgr extends Abstract {
         this._suspendInnerCreateTasks(pointers);
 
         //停止活动对象活动
+        suspendPageObj.destroyPageAction()
         _suspend(suspendPageObj, prveChpterId);
     }
 
@@ -155,9 +156,56 @@ export default class PageMgr extends Abstract {
 
         var self = this;
 
+       /**
+         * 预执行背景创建
+         * 支持多线程快速翻页
+         * 1 初始化,或者快速翻页补全前后页面
+         * 2 正常翻页创建前后
+         */
+        const preCreate = function(preCreateTask) {
+            var resumePointer;
+            if (data.isQuickTurn || !data.direction) {
+                resumePointer = [data.prevIndex, data.nextIndex];
+            } else {
+                resumePointer = data.createPointer || data.nextIndex || data.prevIndex
+            }
+            self._checkPreforkTasks(resumePointer, preCreateTask);
+        };
+
+
+        //激活自动运行对象
+        const startAutoRun = function(currPageObj, data) {
+
+            //结束通知
+            function complete() {
+                data.processComplete();
+                preCreate();
+            }
+
+            //如果页面容器存在,才处理自动运行
+            var currpagesNode = currPageObj.getContainsNode()
+            if (!currpagesNode) {
+                return complete()
+            }
+
+            //运行动作
+            function startRun() {
+                _autoRun(currPageObj, data.currIndex, complete);
+            }
+
+            //运行如果被中断,则等待
+            if (data.suspendCallback) {
+                data.suspendCallback(startRun)
+            } else {
+                startRun();
+            }
+        }
+
         //检测当前页面构建任务的情况
         //如果任务没有完成，则等待任务完成
         this._checkTaskCompleted(data.currIndex, function(currPageObj) {
+
+            currPageObj.createPageAction()
 
             //提升当前页面浮动对象的层级
             //因为浮动对象可以是并联的
@@ -188,52 +236,8 @@ export default class PageMgr extends Abstract {
 
             //等待动画结束后构建
             startAutoRun(currPageObj, data);
-        });
+        })
 
-        /**
-         * 预执行背景创建
-         * 支持多线程快速翻页
-         * 1 初始化,或者快速翻页补全前后页面
-         * 2 正常翻页创建前后
-         */
-        function preCreate(preCreateTask) {
-            var resumePointer;
-            if (data.isQuickTurn || !data.direction) {
-                resumePointer = [data.prevIndex, data.nextIndex];
-            } else {
-                resumePointer = data.createPointer || data.nextIndex || data.prevIndex
-            }
-            self._checkPreforkTasks(resumePointer, preCreateTask);
-        };
-
-
-        //激活自动运行对象
-        function startAutoRun(currPageObj, data) {
-
-            //结束通知
-            function complete() {
-                data.processComplete();
-                preCreate();
-            }
-
-            //如果页面容器存在,才处理自动运行
-            var currpagesNode = currPageObj.getContainsNode()
-            if (!currpagesNode) {
-                return complete()
-            }
-
-            //运行动作
-            function startRun() {
-                _autoRun(currPageObj, data.currIndex, complete);
-            }
-
-            //运行如果被中断,则等待
-            if (data.suspendCallback) {
-                data.suspendCallback(startRun)
-            } else {
-                startRun();
-            }
-        }
     }
 
 

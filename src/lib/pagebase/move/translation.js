@@ -17,8 +17,8 @@ const translateZ = Xut.style.translateZ
  */
 const toTranslate3d = (node, distance, speed, callback) => {
     node && Xut.nextTick(function() {
-        node.style[transitionDuration] = speed + 'ms'
         node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
+        node.style[transitionDuration] = speed + 'ms'
         callback && callback()
     })
 }

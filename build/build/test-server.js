@@ -19,11 +19,11 @@ module.exports = (conf) => {
             }, 5000)
         }
 
-        if (!fs.existsSync("./src/content/xxtebook.db")) {
-            console.log("【Can't test Because the xxtebook does not exist】")
-            reject()
-            return
-        }
+        // if (!fs.existsSync("./src/content/xxtebook.db")) {
+        //     console.log("【Can't test Because the xxtebook does not exist】")
+        //     reject()
+        //     return
+        // }
 
         if (!fs.existsSync("./src/content/SQLResult.js")) {
             console.log("【Can't test Because the SQLResult does not exist】")

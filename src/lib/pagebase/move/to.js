@@ -111,6 +111,7 @@ export default function(baseProto) {
             if (config.flipMode && isVisual) {
                 //设置动画完成
                 Xut.Application.SetTransitionComplete(pageNode, pageNode.getAttribute('data-view'))
+                return true
             }
         })
     }

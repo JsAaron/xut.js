@@ -151,7 +151,7 @@ export default class Swipe extends Observer {
 
         //flipMode启动，没有滑动处理
         if (this.flipMode) {
-            callback.transitionend = this
+            //不需要绑定transitionend，会设置手动会触发
         } else if (this.multiplePages) {
             callback.move = this
             callback.transitionend = this
@@ -666,7 +666,7 @@ export default class Swipe extends Observer {
 
     _distributed(...arg) {
         this._restore(...arg)
-        //延长获取更pagePointer的更新值
+            //延长获取更pagePointer的更新值
         setTimeout(() => {
             this.$emit('onComplete', this.direction, this.pagePointer, this._unlock.bind(this), this._isQuickTurn);
         }, 50)

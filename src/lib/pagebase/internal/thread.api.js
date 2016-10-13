@@ -44,6 +44,30 @@ export default function(baseProto) {
         }
     }
 
+    /**
+     * 处理最后一页动作
+     * [destroyPageAction description]
+     * @return {[type]} [description]
+     */
+    baseProto.destroyPageAction = function() {
+        if (this.stopLastPageAction) {
+            this.stopLastPageAction()
+            this.stopLastPageAction = null
+        }
+    }
+
+    /**
+     * 创建最后一次页面动作
+     * @return {[type]} [description]
+     */
+    baseProto.createPageAction = function() {
+        //如果有最后一个动作触发
+        //2016.10.13 给妙妙学增加watch('complete')
+        if (this.runLastPageAction) {
+            //返回停止方法
+            this.stopLastPageAction = this.runLastPageAction()
+        }
+    }
 
     /**
      * 检测任务是否完成
@@ -57,9 +81,6 @@ export default function(baseProto) {
         this._checkTasksCreate(() => {
             this.isAutoRun = false
             actTasksCallback()
-            //如果有最后一个动作触发
-            //2016.10.13 给妙妙学增加watch('complete')
-            this.runLastPageAction && this.runLastPageAction()
         })
     }
 

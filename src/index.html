@@ -59,10 +59,14 @@
 <script type="text/javascript">
 Xut.Application.setConfig = {
     visualMode: 0,
-    lauchMode: 1 //启动模式
+    lauchMode: 0 //启动模式
 }
 
-const appid = 21
+Xut.Application.Watch('complete',function(){
+    console.log('complete')
+})
+
+const appid =20
 Xut.Application.Launch({
     el: '#xxtppt-app-container',
     paths: {

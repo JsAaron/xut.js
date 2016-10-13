@@ -18,6 +18,8 @@ export default function(baseProto) {
             console.log('销毁图片出错')
         }
 
+        //最后一页动作处理
+        this.destroyPageAction()
 
         //2016/9/30
         //销毁缩放动作

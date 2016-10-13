@@ -30,13 +30,22 @@ const parseMode = function(pageData, base) {
                     }
                 }
                 //如果是最后一页处理
-                if (parameter.lastPage) {
+                if (parameter.lastPage && base.pageType === 'page') {
                     //运行应用运行时间
                     base.runLastPageAction = function() {
                         const runTime = Number(Xut.config.delayTime)
-                        runTime && setTimeout(() => {
-                                Xut.Application.Notify('complete')
-                            }, runTime * 1000) //转成秒
+                        let timeout
+                        if (runTime) {
+                            timeout = setTimeout(() => {
+                                    Xut.Application.Notify('complete')
+                                }, runTime * 1000) //转成秒
+                        }
+                        return function() { //返回停止方法
+                            if (timeout) {
+                                clearTimeout(timeout)
+                                timeout = null
+                            }
+                        }
                     }
 
                 }
@@ -64,8 +73,7 @@ export default {
         //同步数据
         updataCache.call(base, [base.pid], () => {
             const pageData = base.baseData()
-
-            //contentMode模式
+                //contentMode模式
             parseMode(pageData, base)
             TaskContainer(base, pageData, taskCallback)
         })

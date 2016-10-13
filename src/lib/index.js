@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 842
+Xut.Version = 845
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -53,12 +53,15 @@ const removeOldNode = function() {
  * 创建基本结构
  * @return {[type]} [description]
  */
-const createHTML = function(nodeName, cursor = true) { //默认需要忙了光标
+const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) { //默认需要忙了光标
     let $rootNode
     if (nodeName) {
         $rootNode = $(nodeName)
-    } else {
+    }
+
+    if (!$rootNode.length) {
         //如果没有传递节点名，直接放到body下面
+        nodeName = ''
         $rootNode = $('body')
     }
 
