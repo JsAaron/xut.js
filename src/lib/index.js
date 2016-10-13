@@ -37,15 +37,15 @@ if (Xut.plat.isBrowser) {
  * @return {[type]} [description]
  */
 const removeOldNode = function() {
-    const exists = document.getElementById('sceneContainer')
-    if (exists) {
-        $("#busyIcon").hide().remove()
-        $("#message").hide().remove()
-        $("#removelayer").hide().remove()
-        $("#startupPage").hide().remove()
-        $("#sceneContainer").hide().remove()
+    if (document.getElementById('sceneContainer')) {
+        const remove = id => {
+            $(`#${id}`).hide().remove()
+        }
+        "busyIcon message removelayer startupPage sceneContainer"
+        .split(' ').forEach(key => {
+            remove(key)
+        })
     }
-    return exists
 }
 
 
