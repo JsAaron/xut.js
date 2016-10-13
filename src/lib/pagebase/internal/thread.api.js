@@ -57,6 +57,9 @@ export default function(baseProto) {
         this._checkTasksCreate(() => {
             this.isAutoRun = false
             actTasksCallback()
+            //如果有最后一个动作触发
+            //2016.10.13 给妙妙学增加watch('complete')
+            this.runLastPageAction && this.runLastPageAction()
         })
     }
 

@@ -5,6 +5,7 @@ import { delegateHooks } from './hooks'
  * 简化委托处理，默认一层元素只能绑定一个委托事件
  */
 export function filterProcessor(event, pageType) {
+
     var i, k, attribute, attributes, value,
         cur = event.target;
 
@@ -33,7 +34,7 @@ export function filterProcessor(event, pageType) {
                 attributes = cur['attributes'];
                 for (k in delegateHooks) {
                     if (attribute = attributes[k]) {
-                        value = attribute['value' || 'nodeValue'];
+                        value = attribute['value' || 'nodeValue']
                         return {
                             'rootNode': this,
                             'elem': cur,

@@ -453,7 +453,6 @@ export default class Dispatcher {
      *   2.翻页完毕
      */
     _autoRun(para) {
-
         let options = this.options
         let pagePointer = this.pagePointer
         let prevIndex = pagePointer.leftIndex

@@ -661,6 +661,14 @@ export default function overrideApi(vm) {
      */
 
     /**
+     * 是否翻页中
+     * @return {Boolean} [description]
+     */
+    Application.Swiping = function() {
+        return $globalEvent.isMoving()
+    }
+
+    /**
      * 禁止滑动
      */
     Xut.Application.Bansliding = function() {
@@ -674,6 +682,12 @@ export default function overrideApi(vm) {
         $globalEvent.allowliding();
     }
 
+    /**
+     * 设置翻页完成
+     */
+    Xut.Application.SetTransitionComplete = function() {
+        $globalEvent.setTransitionComplete()
+    }
 
     _.each([
         "closeSwipe",
@@ -684,12 +698,6 @@ export default function overrideApi(vm) {
         }
     })
 
-    /**
-     * 是否翻页中
-     * @return {Boolean} [description]
-     */
-    Application.Swiping = function() {
-        return $globalEvent.isMoving()
-    }
+
 
 }

@@ -308,9 +308,15 @@ taskProto.dataStrCheck = function(data, contentDas) {
 }
 
 
-///////////////
-//创建浮动相关的信息 //
-///////////////
+/**
+ * 创建浮动相关的信息
+ * @param  {Function} callback  [description]
+ * @param  {[type]}   floatName [description]
+ * @param  {[type]}   dasFloat  [description]
+ * @param  {[type]}   data      [description]
+ * @param  {[type]}   base      [description]
+ * @return {[type]}             [description]
+ */
 function crateFloat(callback, floatName, dasFloat, data, base) {
 
     var $containsNodes = [];
@@ -467,13 +473,13 @@ taskProto.eventAfterCheck = function(data, delayHooks) {
         //浮动对象比任何层级都都要高
         //超过母版
         if (data.floatPages.ids && data.floatPages.ids.length) {
-            createFloatPage(this, data, complete);
+            createFloatPage(this, data, complete)
         }
 
         //如果存在母版浮动节点
         //在创建节点structure中过滤出来，根据参数的tipmost
         if (data.floatMaters.ids && data.floatMaters.ids.length) {
-            createFloatMater(this, data, complete);
+            createFloatMater(this, data, complete)
         }
 
 
@@ -516,7 +522,7 @@ taskProto.clearReference = function() {
         delete Xut.Contents.contentsFragment[this.chapterId]
     }
     this.$containsNode = null;
-    this.$rootNode = null;
+    this.rootNode = null;
     this.contentsFragment = null;
 }
 

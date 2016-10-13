@@ -32,10 +32,13 @@ const parseMode = function(pageData, base) {
                 //如果是最后一页处理
                 if (parameter.lastPage) {
                     //运行应用运行时间
-                    const runTime = Number(Xut.config.delayTime)
-                    runTime && setTimeout(() => {
-                        Xut.Application.Notify('complete',22)
-                    }, runTime * 1000) //转成秒
+                    base.runLastPageAction = function() {
+                        const runTime = Number(Xut.config.delayTime)
+                        runTime && setTimeout(() => {
+                                Xut.Application.Notify('complete')
+                            }, runTime * 1000) //转成秒
+                    }
+
                 }
             }
         } catch (e) {
@@ -227,7 +230,7 @@ export default {
 
         base.createRelated.cacheTasks['contents'] = new TaskContents({
             'canvasRelated': base.canvasRelated,
-            '$rootNode': base.rootNode,
+            'rootNode': base.rootNode,
             '$containsNode': base.getContainsNode(),
             'pageType': base.pageType,
             'nodes': chapterData['nodes'],

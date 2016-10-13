@@ -11,39 +11,16 @@ const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 
-const dydTransform = (distance) => {
-    return transform + ':' + 'translate(' + distance + 'px,0px)' + translateZ
-}
-
-/**
- * 创建translate初始值
- * @param  {[type]} offset [description]
- * @return {[type]}        [description]
- */
-const createTranslate = (offset) => {
-    return 'translate(' + offset + 'px,0px)' + translateZ
-}
-
 /**
  * 切换坐标
+ * 保证只是pageType === page才捕获动作
  */
-const toTranslate3d = (node, distance, speed, viewOffset) => {
-    if (node) {
-        Xut.nextTick(function() {
-                node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
-            })
-            //修正flipMode切换页面的处理
-            //没有翻页效果
-        if (config.flipMode) {
-            //可视区页面
-            if (distance === viewOffset) {
-                const cur = Xut.sceneController.containerObj('current')
-                cur.vm.$globalEvent.transitionendComplete(node, node.getAttribute('data-view'))
-            }
-        } else {
-            node.style[transitionDuration] = speed + 'ms'
-        }
-    }
+const toTranslate3d = (node, distance, speed, callback) => {
+    node && Xut.nextTick(function() {
+        node.style[transitionDuration] = speed + 'ms'
+        node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
+        callback && callback()
+    })
 }
 
 /**
@@ -105,6 +82,14 @@ export const translation = {
 }
 
 
+/**
+ * 创建translate初始值
+ * @param  {[type]} offset [description]
+ * @return {[type]}        [description]
+ */
+const createTranslate = (offset) => {
+    return 'translate(' + offset + 'px,0px)' + translateZ
+}
 
 /**
  * 修正坐标

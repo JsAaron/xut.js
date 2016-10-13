@@ -9,53 +9,32 @@ import directives from '../directive/index'
 
 const noop = function() {}
 
-//content任务超时Id
-let contentTaskTimer
-
-const cleanTimer = function() {
-    if (contentTaskTimer) {
-        clearTimeout(contentTaskTimer)
-        contentTaskTimer = null
-    }
-}
-
 /**
  * 运行自动的content对象
  * 延时500毫秒执行
  * @return {[type]} [description]
  */
 const autoContents = (contentObjs, taskAnimCallback) => {
-    cleanTimer()
 
-    contentTaskTimer = setTimeout(() => {
-
-        cleanTimer()
-
-        /**
-         * 完成通知
-         * @param  {[type]} () [description]
-         * @return {[type]}    [description]
-         */
-        let markComplete = (() => {
-            let completeStatistics = contentObjs.length; //动画完成统计
-            return () => {
-                if (completeStatistics === 1) {
-                    taskAnimCallback && taskAnimCallback();
-                    markComplete = null;
-                }
-                completeStatistics--;
+    let markComplete = (() => {
+        let completeStatistics = contentObjs.length; //动画完成统计
+        return () => {
+            if (completeStatistics === 1) {
+                taskAnimCallback && taskAnimCallback();
+                markComplete = null;
             }
-        })()
+            completeStatistics--;
+        }
+    })()
 
-        _.each(contentObjs, (obj, index) => {
-            if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
-                obj.autoPlay(markComplete)
-            } else {
-                markComplete();
-            }
-        })
+    _.each(contentObjs, (obj, index) => {
+        if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+            obj.autoPlay(markComplete)
+        } else {
+            markComplete();
+        }
+    })
 
-    }, 500)
 }
 
 
@@ -76,13 +55,13 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
         dir = directives[data.actType]
         if (dir && dir.autoPlay) {
             dir.autoPlay({
-                'id'        : data.id,
-                'pageType'  : pageType,
-                'rootNode'  : pageObj.getContainsNode(),
-                'chapterId' : chapterId,
-                'category'  : data.category,
-                'autoPlay'  : data.autoPlay,
-                'pageIndex' : pageIndex
+                'id': data.id,
+                'pageType': pageType,
+                'rootNode': pageObj.getContainsNode(),
+                'chapterId': chapterId,
+                'category': data.category,
+                'autoPlay': data.autoPlay,
+                'pageIndex': pageIndex
             })
         }
     });

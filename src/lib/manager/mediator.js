@@ -99,8 +99,8 @@ class Mediator extends Observer {
         //配置多页面参数
         configMultiple(options)
 
-        const $globalEvent = vm.$globalEvent = new GlobalEvent(options);
-        const $dispatcher = vm.$dispatcher = new Dispatcher(vm);
+        const $globalEvent = vm.$globalEvent = new GlobalEvent(options)
+        const $dispatcher = vm.$dispatcher = new Dispatcher(vm)
 
         //如果是主场景,才能切换系统工具栏
         if (options.multiplePages) {
@@ -120,8 +120,8 @@ class Mediator extends Observer {
             preventDefault(evtObj, target);
             //页面类型
             let pageType = isBelong(target);
-            //根节点
-            let parentNode = $globalEvent.findRootElement(point, pageType);
+            //冒泡的ul根节点
+            let parentNode = $globalEvent.findBubbleRootNode(point, pageType);
             //执行过滤处理
             handlerObj = filterProcessor.call(parentNode, point, pageType);
             //停止翻页,针对content对象可以拖动,滑动的情况处理
@@ -147,7 +147,7 @@ class Mediator extends Observer {
         $globalEvent.$watch('onTap', (pageIndex, hookCallback) => {
             if (handlerObj) {
                 if (handlerObj.handlers) {
-                    handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex);
+                    handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex)
                 } else {
                     if (!Xut.Contents.Canvas.getIsTap()) {
                         vm.$emit('change:toggleToolbar')

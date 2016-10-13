@@ -110,7 +110,7 @@ export default {
     toolType: { //默认不设置，待数据库填充。如设置,数据库设置忽略
         mian: DEFAULT, //主场景，系统工具栏
         deputy: DEFAULT, //副场景，函数工具栏
-        number: true //独立配置，默认会启动页面，针对分栏处理
+        number: DEFAULT //独立配置，默认会启动页面，针对分栏处理
     },
 
     /**

@@ -204,7 +204,7 @@ export class SceneFactory {
         //新增页码显示
         //如果有分栏
         const flowCounts = getFlowCount(this.seasonId)
-        if (config.toolType.number && flowCounts) {
+        if (config.toolType.number !== false && flowCounts) {
             //获取分栏的chapter数，总数需要减去
             const flowChpterCount = getFlowChpaterCount(this.seasonId)
             this.numberToolbar = new NumberBar({

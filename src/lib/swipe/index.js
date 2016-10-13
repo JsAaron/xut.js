@@ -60,8 +60,9 @@ export default class Swipe extends Observer {
         preventDefault,
         linear = false, //线性模式
         borderBounce = false, //边界反弹
-        extraGap = 0 //间隔
-    } = {}) {
+        extraGap = 0, //间隔
+        sectionRang //分段值
+    }) {
 
         super()
 
@@ -71,6 +72,7 @@ export default class Swipe extends Observer {
         this.multiplePages = multiplePages
         this.element = container
         this.flipMode = flipMode
+        this.sectionRang = sectionRang
 
         this._viewWidth = flipWidth || config.viewSize.width
 
@@ -118,7 +120,7 @@ export default class Swipe extends Observer {
         this._initEvents()
 
         //用于查找跟元素
-        const li = this.element.children
+        const li = this.element.querySelectorAll('ul')
         this._bubbleNode = {
             page: li[0],
             master: li[1]
@@ -640,6 +642,7 @@ export default class Swipe extends Observer {
             }
             return
         }
+
         this._distributed(node, view)
     }
 
@@ -663,7 +666,6 @@ export default class Swipe extends Observer {
 
     _distributed(...arg) {
         this._restore(...arg)
-
         //延长获取更pagePointer的更新值
         setTimeout(() => {
             this.$emit('onComplete', this.direction, this.pagePointer, this._unlock.bind(this), this._isQuickTurn);

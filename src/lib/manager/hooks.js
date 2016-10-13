@@ -24,6 +24,8 @@
 
      /**
       * Action', 'Widget', 'Video', 'ShowNote', 'SubDoc'委托
+      * arg
+      *   target, attribute, rootNode, pageIndex
       */
      'data-delegate' (target, attribute, rootNode, pageIndex) {
          trigger.apply(null, arguments);

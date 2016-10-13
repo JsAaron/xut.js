@@ -7,19 +7,18 @@ import directives from '../directive/index'
 
 export function trigger(target, attribute, rootNode, pageIndex) {
 
-    var key, tag, type, id, dir, data, pageType, instance;
+    const key = target.id
 
-    if (key = target.id) {
-
-        tag = key.split('_');
-        type = tag[0];
-        id = tag[1];
-        dir = directives[type];
+    if (key) {
+        const tag = key.split('_');
+        const type = tag[0];
+        const id = tag[1];
+        const dir = directives[type];
 
         if (dir && dir.trigger) {
 
             //获取页面类型
-            pageType = function() {
+            const pageType = function() {
                 if (rootNode && rootNode.id) {
                     return /page/.test(rootNode.id) ? 'page' : 'master';
                 } else {
@@ -27,7 +26,7 @@ export function trigger(target, attribute, rootNode, pageIndex) {
                 }
             }();
 
-            data = {
+            const data = {
                 "id": id,
                 "activityId": id,
                 "key": key,
@@ -39,6 +38,7 @@ export function trigger(target, attribute, rootNode, pageIndex) {
             };
 
             //如果是重复点击
+            let instance
             if (instance = Xut.Application.GetSpecifiedObject(pageType, data)) {
                 if (instance.dispatchProcess) {
                     //如果有对应的处理方法

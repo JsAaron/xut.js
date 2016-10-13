@@ -189,7 +189,7 @@ export default function api(Swipe) {
      * 调用动画完成
      * @param {[type]} element [description]
      */
-    Swipe.prototype.transitionendComplete = function(...arg) {
+    Swipe.prototype.setTransitionComplete = function(...arg) {
         this._distributed(...arg)
     }
 
@@ -200,7 +200,7 @@ export default function api(Swipe) {
      * @param  {Function} callback [description]
      * @return {[type]}            [description]
      */
-    Swipe.prototype.findRootElement = function(point, pageType) {
+    Swipe.prototype.findBubbleRootNode = function(point, pageType) {
         let liNode, map
         let _hindex = this._hindex
         let sectionRang = this.sectionRang
