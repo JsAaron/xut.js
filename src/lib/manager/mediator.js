@@ -7,8 +7,8 @@
 
 import Observer from '../observer/index'
 import Dispatcher from './scheduler/dispatcher'
-import { delegateHooks } from './hooks'
-import { filterProcessor } from './filter'
+import delegateHooks from './delegate'
+import closestProcessor from './closest'
 
 import {
     defProtected as def,
@@ -123,7 +123,7 @@ class Mediator extends Observer {
             //冒泡的ul根节点
             let parentNode = $globalEvent.findBubbleRootNode(point, pageType);
             //执行过滤处理
-            handlerObj = filterProcessor.call(parentNode, point, pageType);
+            handlerObj = closestProcessor.call(parentNode, point, pageType);
             //停止翻页,针对content对象可以拖动,滑动的情况处理
             if (!handlerObj || handlerObj.attribute === 'disable') {
                 hookCallback();

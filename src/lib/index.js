@@ -4,7 +4,7 @@ import { api } from './global.api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { fixAudio } from './component/audio/fix'
-import { disable } from './util/cursor'
+import { disable } from './initialize/lauch.cursor'
 //nextTick
 import nextTick from './util/nexttick'
 //A predictable state container for apps.

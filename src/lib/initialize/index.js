@@ -1,8 +1,8 @@
 import { config } from '../config/index'
-import { plugVideo, html5Video } from './video'
-import dynamic from './set'
-import button from './button'
-import loadScene from './scene'
+import { plugVideo, html5Video } from './lauch.video'
+import dynamic from './dynamic.set'
+import button from './android.button'
+import loadScene from './lauch.scene'
 
 import {
     _set,

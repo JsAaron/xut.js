@@ -1,10 +1,10 @@
 //事件钩子
-import { delegateHooks } from './hooks'
+import delegateHooks from './delegate'
 
 /**
  * 简化委托处理，默认一层元素只能绑定一个委托事件
  */
-export function filterProcessor(event, pageType) {
+export default function closestProcessor(event, pageType) {
 
     var i, k, attribute, attributes, value,
         cur = event.target;

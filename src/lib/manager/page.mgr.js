@@ -3,7 +3,7 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import { Abstract } from './abstract'
+import { Abstract } from './abstract.mgr'
 import { Pagebase } from '../pagebase/pagebase'
 import { addEdges } from '../util/edge'
 import { removeVideo } from '../component/video/manager'

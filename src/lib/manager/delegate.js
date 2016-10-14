@@ -3,7 +3,7 @@
 
 
  //委托事件处理钩子
- export const delegateHooks = {
+ export default {
 
      /**
       * 超连接,跳转
@@ -35,7 +35,7 @@
      /**
       * 有效,可滑动
       */
-     'data-flow'(){
+     'data-flow' () {
 
      },
 
@@ -46,4 +46,3 @@
          // alert(1)
      }
  }
-

@@ -1,4 +1,4 @@
-import { createCursor } from '../util/cursor'
+import { createCursor } from './lauch.cursor'
 import initFlows from '../component/flow/layout'
 import { importResults } from '../database/results'
 
@@ -10,7 +10,7 @@ import {
     initPathAddress
 } from '../config/index'
 
-import initData from './data'
+import initTooBar from './toolbar.data'
 
 /**
  * 加载css
@@ -81,8 +81,9 @@ export default function dynamic(callback) {
     //导入数据缓存
     importResults(() => {
 
-        //初始化数据库设置
-        initData((novelData, tempSettingData) => {
+        //初始化工具栏
+        //与数据库setting数据
+        initTooBar((novelData, tempSettingData) => {
 
             //初始化配置一些信息
             initConfig(novelData.pptWidth, novelData.pptHeight)
