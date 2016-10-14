@@ -78,51 +78,6 @@ export function extend(subClass, superClass) {
 }
 
 
-/**
- * 缩放比
- * @param  {[type]} width  [description]
- * @param  {[type]} height [description]
- * @param  {[type]} left   [description]
- * @param  {[type]} top    [description]
- * @return {[type]}        [description]
- */
-function fiexdProportion(width, height, left, top) {
-    var proportion = Xut.config.proportion;
-    return {
-        width: width * proportion.width,
-        height: height * proportion.height,
-        left: left * proportion.left,
-        top: top * proportion.top
-    }
-}
-
-
-/**
- * 修正元素尺寸
- * @param  {[type]} results [description]
- * @return {[type]}         [description]
- */
-export function revisesize(results) {
-    //不同设备下缩放比计算
-    var layerSize = fiexdProportion(results.width, results.height, results.left, results.top);
-    //新的背景图尺寸
-    var backSize = fiexdProportion(results.backwidth, results.backheight, results.backleft, results.backtop);
-
-    //赋值新的坐标
-    results.scaleWidth = Math.ceil(layerSize.width);
-    results.scaleHeight = Math.ceil(layerSize.height);
-    results.scaleLeft = Math.floor(layerSize.left);
-    results.scaleTop = Math.floor(layerSize.top);
-
-    //背景坐标
-    results.scaleBackWidth = Math.ceil(backSize.width);
-    results.scaleBackHeight = Math.ceil(backSize.height);
-    results.scaleBackLeft = Math.floor(backSize.left);
-    results.scaleBackTop = Math.floor(backSize.top);
-
-    return results;
-}
-
 
 export function _extend(object, config) {
     for (var i in config) {

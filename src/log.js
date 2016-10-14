@@ -1,6 +1,7 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* v846  2016.10.14 修正尺寸比值问题 Math.floor => Math.ceil
 * v845  修正xxtppt-app-container存在的情况，不创建xxtppt-app-container节点
 * v844  修正flipMode=1下快速翻页导致是多重事件触发，这里要去掉全部transitionend
 * v843  最后一页任务触发回调，增加翻页销毁函数

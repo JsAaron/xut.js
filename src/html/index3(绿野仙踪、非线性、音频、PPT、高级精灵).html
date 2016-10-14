@@ -14,7 +14,7 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-    <script type="text/javascript" src="content/SQLResult.js"></script>
+    <script src="content/SQLResult.js"></script>
     <script src="lib/external/environ.js"></script>
     <script src="lib/external/namespace.js"></script>
     <script src="lib/external/support.js"></script>
@@ -52,24 +52,17 @@
 </head>
 
 <body>
-    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow"></div>
+    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
 </html>
 <script type="text/javascript">
 Xut.Application.setConfig = {
     visualMode: 0,
-    toolType: {
-        // deputy:[1]
-        // mian: [0]
-        // number:false
-    }
+    lauchMode: 1 //启动模式
 }
 
-
-
-Xut.Application.supportLaunch = true
-const appid = 16
+const appid = 3
 Xut.Application.Launch({
     el: '#xxtppt-app-container',
     paths: {

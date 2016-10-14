@@ -2,28 +2,32 @@
  * 配置文件
  * @return {[type]}         [description]
  */
-import nativeConf from './native'
-import iframeConf from './iframe'
+import nativeConf from './native.path'
+import iframeConf from './iframe.path'
 
 import {
     getWidgetPath,
     getSourcePath
-} from './default'
+} from './get.path'
 
 import {
     getSize,
     getLayerMode
 }
-from './get'
+from './get.size'
 
 import getViewSize from '../visuals/view.config'
+
 import {
     getFullProportion,
     getRealProportion
 } from '../visuals/proportion.config'
 
+/**
+ * 默认配置与模式
+ */
 import improtMode from '../global.mode'
-import improtData from './data.type'
+import improtDefault from './default.config'
 
 const plat = Xut.plat
 const isIphone = Xut.plat.isIphone
@@ -306,7 +310,7 @@ _.extend(config, {
      */
     dbSize: 1
 
-}, improtMode, improtData)
+}, improtMode, improtDefault)
 
 
 Xut.config = config

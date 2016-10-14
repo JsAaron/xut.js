@@ -3,6 +3,9 @@ import { parseJSON } from './dom'
 import { messageBox as box } from './notice'
 import { config } from '../config/index'
 
+const CEIL = Math.ceil
+const FLOOR = Math.floor
+
 /**
  * 获取资源
  * @param  {[type]} url [description]
@@ -45,8 +48,15 @@ export function messageBox(message) {
 
 
 
-//缩放比
-function fiexdProportion(width, height, left, top) {
+/**
+ * 转化缩放比
+ * @param  {[type]} width  [description]
+ * @param  {[type]} height [description]
+ * @param  {[type]} left   [description]
+ * @param  {[type]} top    [description]
+ * @return {[type]}        [description]
+ */
+const transformProportion = function(width, height, left, top) {
     var proportion = config.proportion;
     return {
         width: width * proportion.width,
@@ -58,7 +68,7 @@ function fiexdProportion(width, height, left, top) {
 
 
 export function setProportion(width, height, left, top) {
-    return fiexdProportion(width, height, left, top)
+    return transformProportion(width, height, left, top)
 }
 
 
@@ -66,26 +76,26 @@ export function setProportion(width, height, left, top) {
  * 修复元素的尺寸
  * @type {[type]}
  */
-
 export function reviseSize(results) {
+
     //不同设备下缩放比计算
-    var layerSize = fiexdProportion(results.width, results.height, results.left, results.top);
+    const layerSize = transformProportion(results.width, results.height, results.left, results.top);
     //新的背景图尺寸
-    var backSize = fiexdProportion(results.backwidth, results.backheight, results.backleft, results.backtop);
+    const backSize = transformProportion(results.backwidth, results.backheight, results.backleft, results.backtop);
 
     //赋值新的坐标
-    results.scaleWidth = Math.ceil(layerSize.width);
-    results.scaleHeight = Math.ceil(layerSize.height);
-    results.scaleLeft = Math.floor(layerSize.left);
-    results.scaleTop = Math.floor(layerSize.top);
+    results.scaleWidth = CEIL(layerSize.width)
+    results.scaleHeight = CEIL(layerSize.height)
+    results.scaleLeft = CEIL(layerSize.left)
+    results.scaleTop = CEIL(layerSize.top)
 
     //背景坐标
-    results.scaleBackWidth = Math.ceil(backSize.width);
-    results.scaleBackHeight = Math.ceil(backSize.height);
-    results.scaleBackLeft = Math.floor(backSize.left);
-    results.scaleBackTop = Math.floor(backSize.top);
+    results.scaleBackWidth = CEIL(backSize.width)
+    results.scaleBackHeight = CEIL(backSize.height)
+    results.scaleBackLeft = CEIL(backSize.left)
+    results.scaleBackTop = CEIL(backSize.top)
 
-    return results;
+    return results
 }
 
 

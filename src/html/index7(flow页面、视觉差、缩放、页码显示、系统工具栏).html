@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <!--隐藏浏览器的工具栏和菜单栏,对iso系统起用-->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -14,14 +14,12 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-
-    <script src="content/sqlResult.js"></script>
-
+    <script src="content/SQLResult.js"></script>
     <script src="lib/external/environ.js"></script>
     <script src="lib/external/namespace.js"></script>
     <script src="lib/external/support.js"></script>
     <script src="lib/external/postmessage.js"></script>
-    <script src="lib/external/ibooks-epub.js"></script>
+    <script src="lib/external/ibooks.epub.js"></script>
     <script src="lib/plugin/library/jquery.js"></script>
     <script src="lib/plugin/library/underscore.js"></script>
     <script src="lib/plugin/library/video.js"></script>
@@ -54,10 +52,7 @@
 </head>
 
 <body>
-
-    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow"></div>
-
-
+    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
     <div id="xut-stream-flow" style="display:none;z-index:-1">
         <div id="season-flow-1">
             <div id="chapter-flow-4" data-margin="9.07173,7.78098,5.696203,7.78098">
@@ -133,7 +128,7 @@ class="st_d5a74ad4f3b93514">30</span>岁。<span class="st_d5a74ad4f3b93514">“
                 <div class="WordSection1">
                     <p class="MsoNormal"><span class="st_fb5f068cce9bc243">&#160;</span></p>
                     <p class="MsoNormal"><span class="st_3acd961a467ae943"><img   
-src="content/gallery/c86806ff1d5085932de109c1537dfe1c.jpg" alt="img8420a0b2eb473736" class="st_f2a5bfa1ee8b7421" id="img_e56a2da69c8afef0" /></span></p>
+src="content/app4/gallery/c86806ff1d5085932de109c1537dfe1c.jpg" alt="img8420a0b2eb473736" class="st_f2a5bfa1ee8b7421" id="img_e56a2da69c8afef0" /></span></p>
                     <p class="ac"><span class="st_27639265463bd7df">一张健身歌单的理由</span></p>
                     <p class="a9 st_a69443b393f3fc2f"><span class="st_cdea5446d8c8d7df">TH
 </span><span class="st_fbe5f432540ad7df">听着新专辑《今日营业中》（<span class="st_3acd961a467ae943">53</span>分<span class="st_3acd961a467ae943">75</span>秒）健身的话，你会如何排序？</span>
@@ -156,49 +151,22 @@ class="st_3acd961a467ae943">2011</span>年<span class="st_3acd961a467ae943">8</s
             </div>
         </div>
     </div>
-
-
-    <!-- click -->
-    <button id="testSwitch" style="position:absolute;left:0;top:0;z-index:9999999">点击加载</button>
-    <button id="testDestroy" style="position:absolute;left:80px;top:0;z-index:9999999">点击销毁</button>
-
-    <script type="text/javascript">
-    var appid = 4
-    var switchApp = function() {
-        appid++
-        if (appid == 4) {
-            appid = 1
-        }
-    }
-    var isClick = false
-
-    window.onload = function() {
-        // Xut.Application.supportLaunch = true
-    }
-
-    $("#testSwitch").click(function() {
-        if (isClick) {
-            console.log('先销毁')
-            return
-        }
-        isClick = true
-
-        Xut.Application.Launch({
-            el: '#xxtppt-app-container',
-            paths: {
-                resource: 'content/app' + appid,
-                database: 'content/app' + appid + '/SQLResult.js'
-            },
-            cursor: false
-        });
-        // switchApp()
-    })
-
-    $("#testDestroy").click(function() {
-        isClick = false
-        Xut.Application.DropApp()
-    })
-    </script>
 </body>
 
 </html>
+<script type="text/javascript">
+Xut.Application.setConfig = {
+    visualMode: 0,
+    lauchMode: 1 //启动模式
+}
+
+const appid = 7
+Xut.Application.Launch({
+    el: '#xxtppt-app-container',
+    paths: {
+        resource: 'content/app' + appid,
+        database: 'content/app' + appid + '/SQLResult.js'
+    },
+    cursor: false
+});
+</script>

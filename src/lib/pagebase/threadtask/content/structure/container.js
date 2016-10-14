@@ -1,5 +1,4 @@
-
-import {reviseSize } from '../../../../util/index'
+import { reviseSize } from '../../../../util/option'
 import { parseContentDas } from './parsecontent'
 
 /**
@@ -13,10 +12,7 @@ let createContainerWrap = (containerName, contentId, pid) => {
 
     let contentDas = parseContentDas([contentId]),
         data = reviseSize(contentDas[0]),
-        wapper = '<div'
-                + ' id="{0}"'
-                + ' data-behavior="click-swipe"'
-                + ' style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">'
+        wapper = '<div' + ' id="{0}"' + ' data-behavior="click-swipe"' + ' style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">'
 
     return String.format(wapper,
         containerName, data.scaleWidth, data.scaleHeight, data.scaleTop, data.scaleLeft, data.zIndex)

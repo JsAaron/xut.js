@@ -1,7 +1,4 @@
 
-
-const isBrowser = Xut.plat.isBrowser
-
 /**
  * 屏幕尺寸
  * @return {[type]} [description]

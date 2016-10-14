@@ -18,7 +18,6 @@ export default {
      */
     isPlugin: window.DUKUCONFIG && Xut.plat.isIOS,
 
-
     /**
      * 数据库名
      * @type {[type]}

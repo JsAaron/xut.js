@@ -14,6 +14,7 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
+    <script src="content/SQLResult.js"></script>
     <script src="lib/external/environ.js"></script>
     <script src="lib/external/namespace.js"></script>
     <script src="lib/external/support.js"></script>
@@ -51,21 +52,18 @@
 </head>
 
 <body>
-    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow"></div>
-
-
- 
+    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
     <div id="xut-stream-flow" style="display:none;z-index:-1">
         <div id="season-flow-1">
             <div id="chapter-flow-1" data-margin="12,7.78,5.7,7.78">
                 <div class="WordSection1">
                     <p class="MsoNormal"><span class="st_4fc86041a111cfd3"><img   
-src="content/gallery/5bc25a82f5e27e5946a15c1a04f1d0d5.png" alt="img6609ef0ff75bd2f5" class="st_7a07297d2c8e4fb2" id="img_af1fabe12bd0365f" /></span></p>
+src="content/app14/gallery/5bc25a82f5e27e5946a15c1a04f1d0d5.png" alt="img6609ef0ff75bd2f5" class="st_7a07297d2c8e4fb2" id="img_af1fabe12bd0365f" /></span></p>
                     <table class="MsoTableGrid st_8800f8c5dbbca74e">
                         <tr>
                             <td class="st_7faaa4cfbdd5003e">
                                 <p class="MsoNormal st_8104a44376d3003e" id="tac_672a76c6480f8762"><span class="st_4fc86041a111cfd3"><img   
-  src="content/gallery/03a2756394fd701740ec068563ffbd2b.png" alt="img22d6700c7fce6ef5" class="st_fd78b1d53bab992d" id="img_f6c114cefd5d721c" /></span></p>
+  src="content/app14/gallery/03a2756394fd701740ec068563ffbd2b.png" alt="img22d6700c7fce6ef5" class="st_fd78b1d53bab992d" id="img_f6c114cefd5d721c" /></span></p>
                             </td>
                             <td class="st_b1a83449224a38dc">
                                 <p class="MsoNormal st_52f2fe807a5bf21c" id="tac_801c1f78e6eac0c2"><b><span class="st_7ffed5d64411721c">李子勋</span></b></p>
@@ -104,21 +102,15 @@ class="st_ad0cb556c65923fb">纸质阅读不会给知觉带来太大压力，同�
             </div>
         </div>
     </div>
-
 </body>
 
 </html>
 <script type="text/javascript">
 Xut.Application.setConfig = {
     visualMode: 0,
-    saleMode:true,
-    toolType: {
-        // deputy:[1]
-        // mian: [0]
-        number:true
-    }
+    lauchMode: 1 //启动模式
 }
-Xut.Application.supportLaunch = true
+
 const appid = 14
 Xut.Application.Launch({
     el: '#xxtppt-app-container',
