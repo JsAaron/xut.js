@@ -33,23 +33,6 @@ if (Xut.plat.isBrowser) {
 
 
 /**
- * remove old html
- * @return {[type]} [description]
- */
-const removeOldNode = function() {
-    if (document.getElementById('sceneContainer')) {
-        const remove = id => {
-            $(`#${id}`).hide().remove()
-        }
-        "busyIcon message removelayer startupPage sceneContainer"
-        .split(' ').forEach(key => {
-            remove(key)
-        })
-    }
-}
-
-
-/**
  * 创建基本结构
  * @return {[type]} [description]
  */
@@ -108,7 +91,13 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
  */
 const loadApp = function(nodeName, cursor) {
     //清理旧节点
-    removeOldNode()
+    if (document.getElementById('sceneContainer')) {
+        "busyIcon message removelayer startupPage sceneContainer"
+        .split(' ').forEach(id => {
+            $(`#${id}`).hide().remove()
+        })
+    }
+    //创建新节点
     createHTML(nodeName, cursor)
 }
 
