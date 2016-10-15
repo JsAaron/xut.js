@@ -37,6 +37,7 @@ if (Xut.plat.isBrowser) {
  * @return {[type]} [description]
  */
 const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) { //默认需要忙了光标
+    console.log(nodeName,cursor)
     let $rootNode
     if (nodeName) {
         $rootNode = $(nodeName)
@@ -89,7 +90,7 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
  * 加载应用app
  * @return {[type]} [description]
  */
-const loadApp = function(nodeName, cursor) {
+const loadApp = function(...arg) {
     //清理旧节点
     if (document.getElementById('sceneContainer')) {
         "busyIcon message removelayer startupPage sceneContainer"
@@ -98,7 +99,7 @@ const loadApp = function(nodeName, cursor) {
         })
     }
     //创建新节点
-    createHTML(nodeName, cursor)
+    createHTML(...arg)
 }
 
 /**
