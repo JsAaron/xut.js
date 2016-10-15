@@ -37,7 +37,7 @@ if (Xut.plat.isBrowser) {
  * @return {[type]} [description]
  */
 const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) { //默认需要忙了光标
-    console.log(nodeName,cursor)
+
     let $rootNode
     if (nodeName) {
         $rootNode = $(nodeName)
