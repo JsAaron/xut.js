@@ -1,5 +1,5 @@
  //调度器
- import { trigger } from '../command/index'
+ import { trigger } from '../../command/index'
 
 
  //委托事件处理钩子

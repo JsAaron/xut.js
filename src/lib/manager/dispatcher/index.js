@@ -9,8 +9,8 @@
  **********************************************************************/
 
 import { config } from '../../config/index'
-import PageMgr from '../page.mgr'
-import MasterMgr from '../master.mgr'
+import PageMgr from '../container/page'
+import MasterMgr from '../container/master'
 import goToPage from './goto.page'
 import { sceneController } from '../../scenario/controller'
 

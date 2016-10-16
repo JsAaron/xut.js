@@ -7,8 +7,8 @@
 
 import Observer from '../observer/index'
 import Dispatcher from './dispatcher/index'
-import delegateHooks from './delegate.hook'
-import closestProcessor from './delegate.closest'
+import delegateHooks from './delegate/hooks'
+import closestProcessor from './delegate/closest'
 
 import {
     defProtected as def,
