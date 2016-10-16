@@ -15,7 +15,6 @@ import {
     autoRun as _autoRun
 } from '../command/index'
 
-import Swipe from './swipe'
 
 /**
  * 检测脚本注入

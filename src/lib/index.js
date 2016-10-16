@@ -13,6 +13,7 @@ import init from './initialize/index'
 
 Xut.Version = 846
 
+
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
     if (Xut.plat.noAutoPlayMedia) {
@@ -28,7 +29,7 @@ if (Xut.plat.isBrowser) {
                 Xut.View.GotoNextSlide()
                 break;
         }
-    })
+    }) 
 }
 
 

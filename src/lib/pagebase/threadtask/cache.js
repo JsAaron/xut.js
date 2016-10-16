@@ -1,5 +1,5 @@
 
-import { query } from '../../manager/query'
+import { query } from '../../manager/query.mgr'
 
 /**
  * 更新数据缓存

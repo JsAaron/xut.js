@@ -6,9 +6,9 @@
  **********************************************************************/
 
 import Observer from '../observer/index'
-import Dispatcher from './scheduler/dispatcher'
-import delegateHooks from './delegate'
-import closestProcessor from './closest'
+import Dispatcher from './dispatcher/index'
+import delegateHooks from './delegate.hook'
+import closestProcessor from './delegate.closest'
 
 import {
     defProtected as def,
