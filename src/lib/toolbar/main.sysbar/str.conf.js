@@ -115,3 +115,17 @@ export function createCloseIcon(height) {
     //     }
     // );
 }
+
+
+/**
+ * 关闭子文档按钮(font字体版本)
+ * @param  {[type]} height [description]
+ * @return {[type]}        [description]
+ */
+export function createCloseIconFont(height) {
+    return `<div class="si-icon icomoon icon-close"
+                 data-icon-name="close"
+                 style="float:right;margin-right:4px;width:${height}px;height:${height}px">
+            </div>`
+
+}

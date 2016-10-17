@@ -35,6 +35,8 @@ export default class fnBar extends Bar {
         this.pageTotal = pageTotal;
         this.currentPage = currentPage;
 
+
+        this.svgButton = Xut.config.settings.svgButton
         this._initTool();
     }
 
@@ -61,18 +63,18 @@ export default class fnBar extends Bar {
         $sceneNode.hide();
 
         this.controlBar = []
-
-        //配置工具栏
+        const svgButton = this.svgButton
+            //配置工具栏
         while (type = this.toolType.shift()) {
             switch (type) {
                 case 1:
                     this._createSystemBar();
                     break;
                 case 2:
-                    this._createCloseIcon();
+                    svgButton ? this._createCloseIcon() : this._createCloseIconFont();
                     break;
                 case 3:
-                    this._createBackIcon($sceneNode);
+                    svgButton ? this._createBackIcon($sceneNode) : this._createBackIconFont($sceneNode);
                     break;
                 case 4:
                     this._createPageTips();
@@ -204,7 +206,7 @@ export default class fnBar extends Bar {
     }
 
     /**
-     * 关闭按钮
+     * svg版本：关闭按钮
      * @return {[type]} [description]
      */
     _createCloseIcon() {
@@ -221,7 +223,7 @@ export default class fnBar extends Bar {
     }
 
     /**
-     * 返回按钮
+     * svg版本：返回按钮
      * @return {[type]} [description]
      */
     _createBackIcon($sceneNode) {
@@ -233,6 +235,45 @@ export default class fnBar extends Bar {
             </div>`
         html = $(String.styleFormat(html))
         this.super_createSVGIcon(html[0], () => Xut.View.CloseScenario())
+        this.controlBar.push(html);
+        $sceneNode.append(html);
+    }
+
+    /**
+     * font字体版本：关闭按钮
+     * @return {[type]} [description]
+     */
+    _createCloseIconFont() {
+        const height = this.super_iconHeight;
+        let html = `<div class="si-icon xut-scenario-close icomoon icon-close" 
+                  style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;text-align:center;font-size:3vh;">
+            </div>`;
+
+        html = $(String.styleFormat(html))
+
+        html.on("touchend mouseup", function() {
+            Xut.View.CloseScenario()
+        });
+
+        this.controlBar.push(html);
+        this.$sceneNode.append(html);
+    }
+
+    /**
+     * font字体版本：返回按钮
+     * @return {[type]} [description]
+     */
+    _createBackIconFont($sceneNode) {
+        const height = this.super_iconHeight;
+        let html =
+            `<div class="si-icon xut-scenario-back icomoon icon-arrow-left" 
+                  style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;">
+            </div>`
+        html = $(String.styleFormat(html))
+
+        html.on("touchend mouseup", function() {
+            Xut.View.CloseScenario()
+        });
         this.controlBar.push(html);
         $sceneNode.append(html);
     }

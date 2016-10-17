@@ -81,15 +81,17 @@ export default class Bar {
 
         //是否使用自定义的翻页按钮: true /false
         //图标名称是客户端指定的：pageforward_'+appId+'.svg
+        //是否使用svg创建翻页按钮 true是 false使用font字体画翻页图标
         const isCustom = this.settings.customButton;
+        const isSvgButton = this.settings.svgButton;
         if (isCustom) {
             //动态图标，数据库定义的翻页图标
             this._createLeftIcon()
             this._createRightIcon()
         } else {
             //默认的svg图片
-            this._createLeftArrowSVG()
-            this._createRightArrowSVG()
+            isSvgButton ? this._createLeftArrowSVG() : this._createLeftArrowFont()
+            isSvgButton ? this._createRightArrowSVG() : this._createRightArrowFont()
         }
     }
 
@@ -138,6 +140,53 @@ export default class Bar {
             able: true
         };
     }
+
+    /**
+     * font字体版本：左箭头翻页按钮
+     * @return {[type]} [description]
+     */
+    _createLeftArrowFont() {
+        var style = getArrowStyle(),
+            state = this.barStatus ? '' : 'hide',
+            config = Xut.config,
+            height = config.iconHeight,
+            $dom;
+
+        $dom = $('<div class="si-icon xut-flip-control xut-flip-control-left icomoon icon-angle-left ' + state + '" style="' + style + ';text-align:center;line-height:' + height + 'px;font-size:4vh;"></div>');
+
+        $dom.on("touchend mouseup", function() {
+            Xut.View.GotoPrevSlide();
+        });
+        this.$sceneNode.append($dom);
+        this.arrows.prev = {
+            el: $dom,
+            able: true
+        };
+    }
+
+    /**
+     * font字体版本：右箭头翻页按钮
+     * @return {[type]} [description]
+     */
+    _createRightArrowFont() {
+        var style = getArrowStyle(),
+            state = this.barStatus ? '' : 'hide',
+            config = Xut.config,
+            height = config.iconHeight,
+            $dom;
+        $dom = $('<div class="si-icon xut-flip-control xut-flip-control-right icomoon icon-angle-right ' + state + '" style="' + style + ';text-align:center;line-height:' + height + 'px;"></div>');
+
+        $dom.on("touchend mouseup", function() {
+            Xut.View.GotoNextSlide();
+        });
+
+        this.$sceneNode.append($dom);
+        this.arrows.next = {
+            el: $dom,
+            able: true
+        };
+    }
+
 
     /**
      * 客户端指定：自定义左翻页按钮

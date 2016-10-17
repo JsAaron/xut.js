@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 846
+Xut.Version = 847
 
 
 if (Xut.plat.isBrowser) {
@@ -58,8 +58,12 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
     }
 
     //基本结构
+    //默认背景图
+    const cover = window.DYNAMICCONFIGT.resource
+        ? window.DYNAMICCONFIGT.resource
+        + '/gallery/cover.jpg' : './content/gallery/cover.jpg'
     const commonHTML =
-        `<div class="xut-removelayer"></div>
+        `<div class="xut-removelayer" style="background-image: url(${cover});"></div>
          <div class="xut-start-page xut-fullscreen"></div>
          <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
 

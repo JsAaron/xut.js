@@ -62,13 +62,12 @@ Xut.Application.setConfig = {
     lauchMode: 1 //启动模式
 }
 
-
-const appid = 1
+const appid = 102
 Xut.Application.Launch({
     el: '#xxtppt-app-container',
     paths: {
-        resource: 'content/app' + appid,
-        database: 'content/app' + appid + '/SQLResult.js'
+        resource: 'content/' + appid,
+        database: 'content/' + appid + '/SQLResult.js'
     },
     cursor: false
 });

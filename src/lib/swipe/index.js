@@ -152,9 +152,10 @@ export default class Swipe extends Observer {
             //用于查找跟元素
             //ul => page
             //ul => master
+            const ul = container.querySelectorAll('ul')
             this._bubbleNode = {
-                page: this.container.querySelector('#xut-page-container'),
-                master: this.container.querySelector('#xut-master-container')
+                page: ul[0],
+                master:ul[1]
             }
         }
 

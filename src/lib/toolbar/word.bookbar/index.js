@@ -42,13 +42,18 @@ export default class BookBar extends Bar {
      * 初始化
      */
     initTool() {
+        const svgButton = Xut.config.settings.svgButton;
+
+
         //工具栏的显示状态
         var display = this.$controlNode.css('display');
         this.barStatus = display == 'none' ? false : true;
         this.setToolbarStyle();
-        this.createBackIcon();
-        this.createDirIcon();
-        this.createMarkIcon();
+
+        svgButton ? this.createBackIcon() : this.createBackIconFont();
+        svgButton ? this.createDirIcon() : this.createDirIconFont();
+        svgButton ? this.createMarkIcon() : this.createMarkIconFont();
+
         // this.createStarIcon();
 
         //翻页按钮
@@ -92,9 +97,9 @@ export default class BookBar extends Bar {
 
 
     /**
-     * 创建目录图标
+     * svg版本：创建目录图标
      */
-    createDirIcon(bar) {
+    createDirIcon() {
         var icon = document.createElement('div');
         icon.innerHTML = '目录';
         icon.style.width = this.super_iconHeight + 'px';
@@ -103,19 +108,88 @@ export default class BookBar extends Bar {
         this.$controlNode.append(icon)
     }
 
+    /**
+     *  font版本：创建目录图标
+     * @return {[type]} [description]
+     */
+    createDirIconFont() {
+        var parent = document.createElement('div');
+        var icon = document.createElement('div');
+        var iconText = document.createElement('div');
+
+        parent.style.width = '48px';
+        parent.style.height = "100%";
+        parent.style.float = "left";
+        parent.style.marginLeft = "3vw";
+        parent.style.cursor = "pointer";
+        parent.style.position = "relative";
+
+        icon.style.fontSize = "2.5vh";
+        icon.style.color = "#fff";
+        icon.className = 'icomoon icon-th-list2';
+        icon.style.position = "absolute";
+        icon.style.bottom = this.super_iconHeight * 0.5 + 'px';
+
+        iconText.innerHTML = '目录';
+        iconText.className = "xut-book-dirFont"
+        // iconText.style.height = "40%";
+        // iconText.style.width = "100%";
+        iconText.style.position = "absolute";
+        iconText.style.bottom = "0";
+
+        parent.appendChild(icon);
+        parent.appendChild(iconText);
+        this.$controlNode.append(parent)
+    }
+
 
     /**
-     * 创建书签图标
+     * svg版本：创建书签图标
      * @param  {[type]} bar [description]
      * @return {[type]}     [description]
      */
-    createMarkIcon(bar) {
+    createMarkIcon() {
         var icon = document.createElement('div');
         icon.innerHTML = '书签';
         icon.style.width = this.super_iconHeight + 'px';
         icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
         icon.className = 'xut-book-bar-mark';
         this.$controlNode.append(icon)
+    }
+
+    /**
+     * font版本：创建书签图标
+     * @return {[type]} [description]
+     */
+    createMarkIconFont() {
+        var parent = document.createElement('div');
+        var icon = document.createElement('div');
+        var iconText = document.createElement('div');
+
+        parent.style.width = '48px';
+        parent.style.height = "100%";
+        parent.style.float = "left";
+        parent.style.marginLeft = "1vw";
+        parent.style.cursor = "pointer";
+        parent.style.position = "relative";
+
+        icon.style.fontSize = "2.5vh";
+        icon.style.color = "#fff";
+        icon.style.position = "absolute";
+        icon.style.bottom = this.super_iconHeight * 0.5 + 'px';
+        icon.className = 'icomoon icon-bookmark2';
+
+        iconText.innerHTML = '书签';
+        iconText.className = "xut-book-markFont"
+        //iconText.style.height = "40%";
+        iconText.style.position = "absolute";
+        iconText.style.bottom = "0";
+
+        parent.appendChild(icon);
+        parent.appendChild(iconText);
+        this.$controlNode.append(parent)
+
+
     }
 
     /**
@@ -131,13 +205,28 @@ export default class BookBar extends Bar {
     }
 
     /**
-     * 后退按钮
+     * svg版本：后退按钮
      * @return {[type]} [description]
      */
     createBackIcon() {
         var icon = document.createElement('div');
         icon.style.width = this.topBarHeight + 'px';
         icon.className = 'xut-book-bar-back';
+        this.$controlNode.append(icon)
+    }
+
+    /**
+     * font字体版本：后退按钮
+     * @return {[type]} [description]
+     */
+    createBackIconFont() {
+        var icon = document.createElement('div');
+        icon.style.width = this.topBarHeight + 'px';
+        icon.style.lineHeight = this.topBarHeight + 'px';
+        icon.style.color = "#fff";
+
+        icon.className = 'icomoon icon-angle-left icon-book-bar';
+        icon.style.fontSize = "6vh";
         this.$controlNode.append(icon)
     }
 
@@ -193,6 +282,8 @@ export default class BookBar extends Bar {
         });
     }
 
+
+    hideNavbar(){}
 
     /**
      * 创建目录菜单
@@ -412,14 +503,19 @@ export default class BookBar extends Bar {
 
         switch (name) {
             case 'xut-book-bar-back':
+            case 'icomoon icon-angle-left icon-book-bar':
                 this.goBack();
                 //返回
                 break;
             case 'xut-book-bar-dir':
+            case 'icomoon icon-th-list2':
+            case 'xut-book-dirFont':
                 //目录
                 this.showDirMenu();
                 break;
             case 'xut-book-bar-mark':
+            case 'icomoon icon-bookmark2':
+            case 'xut-book-markFont':
                 //书签
                 this.showBookMark();
                 break;

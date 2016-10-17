@@ -211,8 +211,7 @@ let createWapper = (data, wrapObj) => {
     if (wrapObj.isJs) {
         wapper = `<div id="${containerName}"
                        data-behavior="click-swipe"
-                       style="overflow:hidden;
-                              width:${backwidth}px;
+                       style="width:${backwidth}px;
                               height:${backheight}px;
                               top:${backtop}px;
                               left:${backleft}px;
@@ -228,8 +227,7 @@ let createWapper = (data, wrapObj) => {
     //正常content类型
     wapper = `<div id="${containerName}"
                    data-behavior="click-swipe"
-                   style="overflow:hidden;
-                          width:${backwidth}px;
+                   style="width:${backwidth}px;
                           height:${backheight}px;
                           top:${backtop}px;
                           left:${backleft}px;

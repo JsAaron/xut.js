@@ -10,12 +10,19 @@ import { parseContentDas } from './parsecontent'
  */
 let createContainerWrap = (containerName, contentId, pid) => {
 
-    let contentDas = parseContentDas([contentId]),
-        data = reviseSize(contentDas[0]),
-        wapper = '<div' + ' id="{0}"' + ' data-behavior="click-swipe"' + ' style="width:{1}px;height:{2}px;top:{3}px;left:{4}px;position:absolute;z-index:{5};">'
+    const contentDas = parseContentDas([contentId])
+    const data = reviseSize(contentDas[0])
+    const wapper =
+        `<div  id="${containerName}" 
+               data-behavior="click-swipe"
+               style="width:${data.scaleWidth}px;
+                      height:${data.scaleHeight}px;
+                      top:${data.scaleTop}px;
+                      left:${data.scaleLeft}px;
+                      position:absolute;
+                      z-index:${data.zIndex};">`
 
-    return String.format(wapper,
-        containerName, data.scaleWidth, data.scaleHeight, data.scaleTop, data.scaleLeft, data.zIndex)
+    return String.styleFormat(wapper)
 }
 
 
