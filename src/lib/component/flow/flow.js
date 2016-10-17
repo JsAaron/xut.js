@@ -184,8 +184,7 @@ export default class Flow {
         })
 
         let moveDistance = 0
-        let lastDistance = swipe._initDistance
-
+        let lastDistance = swipe.getInitDistance()
 
         swipe.$watch('onTap', (pageIndex, hookCallback, ev) => {
             //图片缩放

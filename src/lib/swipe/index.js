@@ -60,38 +60,15 @@ export default class Swipe extends Observer {
         preventDefault,
         linear = false, //线性模式
         borderBounce = false, //边界反弹
-        extraGap = 0, //间隔
+        extraGap = 0, //间隔,flow处理
         sectionRang //分段值
     }) {
 
         super()
 
-        this._hindex = initIndex
-        this._extraGap = extraGap
-        this.pagetotal = pagetotal
-        this.multiplePages = multiplePages
-        this.element = container
-        this.flipMode = flipMode
-        this.sectionRang = sectionRang
-
-        this._viewWidth = flipWidth || config.viewSize.width
-
-        //翻页时间
-        this._pageTime = flipMode ? DEFAULTTIME.min : DEFAULTTIME.mix
-
-        //翻页速率
-        this._speedRate = this._originalRate = this._pageTime / this._viewWidth
-
-        //是否移动中
-        this._isMoving = false
-
-        //计算初始化页码
-        this.pagePointer = initPointer(initIndex, pagetotal)
-
-
         this.options = {
 
-            stopPropagation: stopPropagation,
+            stopPropagation,
 
             preventDefault: preventDefault !== undefined ? preventDefault : true,
 
@@ -100,41 +77,92 @@ export default class Swipe extends Observer {
              * 默认是
              * @type {[type]}
              */
-            linear: linear,
+            linear,
 
             /**
              * 启动边界反弹
              * @type {[type]}
              */
-            borderBounce: borderBounce
+            borderBounce,
+
+            /**
+             * flipMode
+             * 1 翻页没有直接效果，速度改为0
+             * 2 翻页后没有动画回调
+             * @type {[type]}
+             */
+            flipMode,
+
+            /**
+             * 是否有多页面
+             */
+            multiplePages,
+
+            /**
+             * section分段拼接
+             * @type {[type]}
+             */
+            sectionRang
         }
 
-        //增加回到标记
+        this._hindex = initIndex
+        this.pagetotal = pagetotal
+        this.container = container
+
+        /**
+         * 视图宽度
+         * @type {[type]}
+         */
+        this._viewWidth = flipWidth || config.viewSize.width
+
+        /**
+         * 翻页时间
+         * @type {[type]}
+         */
+        this._pageTime = this.options.flipMode ? DEFAULTTIME.min : DEFAULTTIME.mix
+
+        /**
+         * 翻页速率
+         * @type {[type]}
+         */
+        this._speedRate = this._originalRate = this._pageTime / this._viewWidth
+
+        /**
+         * 是否移动中
+         * @type {Boolean}
+         */
+        this._isMoving = false
+
+        /**
+         * 计算初始化页码
+         * @type {[type]}
+         */
+        this.pagePointer = initPointer(initIndex, pagetotal)
+
+        //初始化线性翻页
+        //全局只创建一个翻页容器
         if (linear) {
             container.setAttribute(LINEARTAG, true)
-        }
 
-        this._initTransform()
+            //this._initDistance 提供给flow调用
+            this._initDistance = -this._hindex * (this._viewWidth + extraGap)
+            container.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
+            container.style.width = this._viewWidth * this.pagetotal + 'px'
+        } else {
+            //用于查找跟元素
+            //ul => page
+            //ul => master
+            this._bubbleNode = {
+                page: this.container.querySelector('#xut-page-container'),
+                master: this.container.querySelector('#xut-master-container')
+            }
+        }
 
         //绑定行为
         this._initEvents()
-
-        //用于查找跟元素
-        const li = this.element.querySelectorAll('ul')
-        this._bubbleNode = {
-            page: li[0],
-            master: li[1]
-        }
     }
 
 
-    _initTransform(distance) {
-        if (this.options.linear) {
-            this._initDistance = -this._hindex * (this._viewWidth + this._extraGap)
-            this.element.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
-            this.element.style.width = this._viewWidth * this.pagetotal + 'px'
-        }
-    }
 
 
     /**
@@ -150,14 +178,14 @@ export default class Swipe extends Observer {
         }
 
         //flipMode启动，没有滑动处理
-        if (this.flipMode) {
+        if (this.options.flipMode) {
             //不需要绑定transitionend，会设置手动会触发
-        } else if (this.multiplePages) {
+        } else if (this.options.multiplePages) {
             callback.move = this
             callback.transitionend = this
         }
 
-        bindEvent(this.element, callback)
+        bindEvent(this.container, callback)
     }
 
 
@@ -168,9 +196,9 @@ export default class Swipe extends Observer {
      */
     _onStart(e) {
 
-        if (this._fliplock) return
-
-        if (e.touches && e.touches.length > 1) {
+        //如果停止滑动
+        //或者多点触发
+        if (this._fliplock || e.touches && e.touches.length > 1) {
             return
         }
 
@@ -230,16 +258,11 @@ export default class Swipe extends Observer {
      */
     _onMove(e) {
 
-        // if (e.touches && e.touches.length > 1) {
-        //     return
-        // }
-
-        if (this._fliplock) return
-
-        //如果没有点击
+        //如果停止翻页
+        //或者没有点击
         //或是Y轴滑动
         //或者是阻止滑动
-        if (!this._isTap || this._isRollY || this._preventSwipe) return
+        if (this._fliplock || !this._isTap || this._isRollY || this._preventSwipe) return
 
         this._isMoving = true
 
@@ -313,9 +336,9 @@ export default class Swipe extends Observer {
      */
     _onEnd(e) {
 
-        if (this._fliplock) return
-
-        if (e.touches && e.touches.length > 1) {
+        //停止滑动
+        //或者多点触发
+        if (this._fliplock || e.touches && e.touches.length > 1) {
             return
         }
 
@@ -666,7 +689,8 @@ export default class Swipe extends Observer {
 
     _distributed(...arg) {
         this._restore(...arg)
-            //延长获取更pagePointer的更新值
+
+        //延长获取更pagePointer的更新值
         setTimeout(() => {
             this.$emit('onComplete', this.direction, this.pagePointer, this._unlock.bind(this), this._isQuickTurn);
         }, 50)
@@ -687,7 +711,7 @@ export default class Swipe extends Observer {
      * @return {[type]} [description]
      */
     _evtDestroy() {
-        offEvent(this.element, {
+        offEvent(this.container, {
             start: this,
             move: this,
             end: this,

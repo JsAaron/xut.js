@@ -29,7 +29,7 @@ if (Xut.plat.isBrowser) {
                 Xut.View.GotoNextSlide()
                 break;
         }
-    }) 
+    })
 }
 
 

@@ -62,6 +62,7 @@ Xut.Application.setConfig = {
     lauchMode: 1 //启动模式
 }
 
+
 const appid = 1
 Xut.Application.Launch({
     el: '#xxtppt-app-container',
@@ -69,6 +70,6 @@ Xut.Application.Launch({
         resource: 'content/app' + appid,
         database: 'content/app' + appid + '/SQLResult.js'
     },
-    cursor: true
+    cursor: false
 });
 </script>

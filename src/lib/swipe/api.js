@@ -8,6 +8,14 @@ import {
 export default function api(Swipe) {
 
     /**
+     * 获取初始化距离值
+     * @return {[type]} [description]
+     */
+    Swipe.prototype.getInitDistance = function(){
+        return this._initDistance
+    }
+
+    /**
      * 模拟完成状态调用
      * @return {[type]} [description]
      */
@@ -142,7 +150,7 @@ export default function api(Swipe) {
         switch (targetIndex) {
             //前一页
             case (currIndex - 1):
-                if (this.multiplePages) {
+                if (this.options.multiplePages) {
                     return this.prev();
                 }
                 break
@@ -154,7 +162,7 @@ export default function api(Swipe) {
                 return
                 //后一页
             case (currIndex + 1):
-                if (this.multiplePages) {
+                if (this.options.multiplePages) {
                     return this.next();
                 }
                 break
@@ -179,9 +187,11 @@ export default function api(Swipe) {
     Swipe.prototype.destroy = function() {
         this._evtDestroy();
         this.$off();
-        this._bubbleNode.page = null;
-        this._bubbleNode.master = null;
-        this.element = null;
+        if (this._bubbleNode) {
+            this._bubbleNode.page = null
+            this._bubbleNode.master = null
+        }
+        this.container = null
     }
 
 
@@ -203,14 +213,14 @@ export default function api(Swipe) {
     Swipe.prototype.findBubbleRootNode = function(point, pageType) {
         let liNode, map
         let _hindex = this._hindex
-        let sectionRang = this.sectionRang
+        let sectionRang = this.options.sectionRang
 
         //找到对应的li
         let childNodes = this._bubbleNode[pageType].childNodes
-        let numNodes = childNodes.length
+        let nodeTotal = childNodes.length
 
-        while (numNodes--) {
-            liNode = childNodes[numNodes];
+        while (nodeTotal--) {
+            liNode = childNodes[nodeTotal]
             map = liNode.getAttribute('data-map');
             if (sectionRang) {
                 _hindex += sectionRang.start;
