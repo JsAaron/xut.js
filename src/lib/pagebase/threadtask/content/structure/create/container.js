@@ -1,5 +1,5 @@
-import { reviseSize } from '../../../../util/option'
-import { parseContentDas } from './parsecontent'
+import { reviseSize } from '../../../../../util/option'
+import { parseContentDas } from '../parsecontent'
 
 /**
  * 针对容器类型的处理
@@ -8,12 +8,12 @@ import { parseContentDas } from './parsecontent'
  * @param  {[type]} pid     [description]
  * @return {[type]}               [description]
  */
-let createContainerWrap = (containerName, contentId, pid) => {
+const createContainerWrap = (containerName, contentId, pid) => {
 
     const contentDas = parseContentDas([contentId])
     const data = reviseSize(contentDas[0])
     const wapper =
-        `<div  id="${containerName}" 
+        `<div  id="${containerName}"
                data-behavior="click-swipe"
                style="width:${data.scaleWidth}px;
                       height:${data.scaleHeight}px;

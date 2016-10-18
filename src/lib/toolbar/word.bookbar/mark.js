@@ -13,9 +13,6 @@ import {
 }
 from '../../util/index'
 
-let icons = {
-    hide: 'images/icons/arrowDown.svg'
-}
 
 /**
  * 行高
@@ -55,8 +52,7 @@ export default class Mark {
      * @return {[type]} [description]
      */
     init() {
-        var svgMode = Xut.config.settings.svgButton;
-        var $bookMark = svgMode ? this.createBookMark() : this.createBookMarkFont(),
+        var $bookMark = this.createBookMarkFont(),
             dom = this.parent[0],
             that = this;
 
@@ -76,53 +72,30 @@ export default class Mark {
     }
 
 
-    /**
-     * 创建书签
-     * @return {[object]} [jquery生成的dom对象]
-     */
-    createBookMark() {
-        var height = sLineHeiht * 3, // menu的高为3em
-            box = '<div class="xut-bookmark-menu" style="width:100%;height:{0}px;left:0;top:{1}px;">' +
-            '<div class="xut-bookmark-wrap">' +
-            '<div class="xut-bookmark-add">加入书签</div>' +
-            '<div class="xut-bookmark-off" style="background-image:url({2})"></div>' +
-            '<div class="xut-bookmark-view">书签记录</div>' +
-            '</div>' +
-            '</div>' +
-            '<div class="xut-bookmark-list" style="display:none;width:100%;height:{3}px;">' +
-            '<ul class="xut-bookmark-head">' +
-            '<li class="xut-bookmark-back">返回</li>' +
-            '<li>书签</li>' +
-            '</ul>' +
-            '<ul class="xut-bookmark-body"></ul>' +
-            '</div>';
-        box = String.format(box, height, this.sHeight, icons.hide, this.sHeight);
-        this.markHeight = height;
-        return $(box);
-    }
-
 
     /**
      * 创建书签(font版本)
      * @return {[object]} [jquery生成的dom对象]
      */
     createBookMarkFont() {
-        var height = sLineHeiht * 3, // menu的高为3em
-            box = '<div class="xut-bookmark-menu" style="width:100%;height:{0}px;left:0;top:{1}px;">' +
-            '<div class="xut-bookmark-wrap">' +
-            '<div class="xut-bookmark-add">加入书签</div>' +
-            '<div class="xut-bookmark-off icomoon icon-chevron-down" style="vertical-align:bottom;"></div>' +
-            '<div class="xut-bookmark-view">书签记录</div>' +
-            '</div>' +
-            '</div>' +
-            '<div class="xut-bookmark-list" style="display:none;width:100%;height:{2}px;">' +
-            '<ul class="xut-bookmark-head">' +
-            '<li class="xut-bookmark-back">返回</li>' +
-            '<li>书签</li>' +
-            '</ul>' +
-            '<ul class="xut-bookmark-body"></ul>' +
-            '</div>';
-        box = String.format(box, height, this.sHeight, this.sHeight);
+        const height = sLineHeiht * 3 // menu的高为3em
+        const sHeight = this.sHeight
+        const box =
+            `<div class="xut-bookmark-menu" 
+               style="width:100%;height:${height}px;left:0;top:${sHeight}px;">
+              <div class="xut-bookmark-wrap">
+                <div class="xut-bookmark-add">加入书签</div>
+                <div class="xut-bookmark-off icomoon icon-chevron-down" style="vertical-align:bottom;"></div>
+                <div class="xut-bookmark-view">书签记录</div>
+              </div>
+            </div>
+            <div class="xut-bookmark-list" style="display:none;width:100%;height:${sHeight}px;">
+              <ul class="xut-bookmark-head">
+                <li class="xut-bookmark-back">返回</li>
+                <li>书签</li>
+              </ul>
+              <ul class="xut-bookmark-body"></ul>
+            </div>`;
         this.markHeight = height;
         return $(box);
     }
@@ -144,7 +117,11 @@ export default class Mark {
             seasonId = tmp[0];
             pageId = tmp[1];
             mark = self.getMarkId(seasonId, pageId);
-            list += '<li><a data-mark="' + mark + '" class="xut-bookmark-id" href="javascript:0">第' + pageId + '页</a><a class="xut-bookmark-del" data-mark="' + mark + '" href="javascript:0">X</a></li>';
+            list +=
+                `<li>
+               <a data-mark="${mark}" class="xut-bookmark-id" href="javascript:0">第${pageId}页</a>
+               <a class="xut-bookmark-del" data-mark="${mark}" href="javascript:0">X</a>
+             </li>`;
         })
 
         return list;
@@ -332,7 +309,7 @@ export default class Mark {
                 break;
                 //关闭书签
             case 'xut-bookmark-off':
-              case 'xut-bookmark-off icomoon icon-chevron-down':
+            case 'xut-bookmark-off icomoon icon-chevron-down':
                 this.closeBookMark(target);
                 break;
                 //返回书签主菜单

@@ -17,8 +17,7 @@ const defaults = {
     NavLeft: 1, //左翻页按钮[0不显示,1显示]
     NavRight: 1, //右翻页按钮[0不显示,1显示]
     customButton: 0, //自定义翻页按钮
-    CloseBut: window.SUbDOCCONTEXT ? 1 : 0, //关闭按钮[0不显示,1显示]
-    svgButton: false //默认创建svg按钮 false创建用字体画出来的按钮
+    CloseBut: window.SUbDOCCONTEXT ? 1 : 0 //关闭按钮[0不显示,1显示]
 }
 
 

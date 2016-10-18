@@ -95,7 +95,7 @@ export default class sysBar extends Bar {
 
         //关闭子文档
         if (setting.CloseBut) {
-            html += (setting.svgButton ? createCloseIcon(iconHeight) : createCloseIconFont(iconHeight));
+            html += createCloseIconFont(iconHeight);
         }
 
         //页码数

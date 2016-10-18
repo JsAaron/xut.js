@@ -10,7 +10,7 @@ import { parseJSON } from '../../../util/index'
 import { spiritAni } from './spirit'
 
 
-let getSpiritAni = (inputPara, data, canvasEl) => {
+const getSpiritAni = (inputPara, data, canvasEl) => {
     var path = data.resourcePath;
     var loop = data.loop;
     if (_.isObject(inputPara)) {
@@ -21,8 +21,8 @@ let getSpiritAni = (inputPara, data, canvasEl) => {
     }
 }
 
-
-let getResources = (data) => {
+const getResources = (data) => {
+    console.log(data.md5)
     var option;
     var ResourcePath = "content/gallery/" + data.md5 + "/";
     var xhr = new XMLHttpRequest();

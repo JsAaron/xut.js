@@ -1,4 +1,8 @@
-import { readFile } from '../../../util/option'
+import {
+    readFile,
+    replacePath
+} from '../../../util/option'
+
 import createBackground from './layout'
 
 /**
@@ -41,8 +45,9 @@ export default class TaskBackground {
 
         //背景是否需要SVG解析
         this.parseMaster(isSVGContent, content, function(svgContents) {
+            svgContents = replacePath(svgContents)
             //构建背景
-            var backgroundStr = createBackground(svgContents, data);
+            const backgroundStr = createBackground(svgContents, data);
             if (backgroundStr) {
                 svgContents = null;
                 self.compileSuspend($(backgroundStr), $containsNode);

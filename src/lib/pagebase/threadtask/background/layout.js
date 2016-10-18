@@ -59,12 +59,12 @@ export default function createBackground(svgContent, data) {
     var imageLayer,
         maskLayer,
         imageLayerData = data.imageLayer, //图片层
-        imageMaskData  = data.imageMask, //蒙版层
-        backImageData  = data.backImage, //真实图片层
-        backMaskData   = data.backMask, //真实蒙版层
-        masterData     = data.master, //母板
-        backText       = data.md5, //背景文字
-        pptMaster      = data.pptMaster; //母板PPTID
+        imageMaskData = data.imageMask, //蒙版层
+        backImageData = data.backImage, //真实图片层
+        backMaskData = data.backMask, //真实蒙版层
+        masterData = data.master, //母板
+        backText = data.md5, //背景文字
+        pptMaster = data.pptMaster; //母板PPTID
 
     /**
      * 未分层结构
@@ -74,14 +74,8 @@ export default function createBackground(svgContent, data) {
     if (backText && !masterData && !pptMaster && !imageLayerData) {
         if (svgContent) {
             return String.styleFormat(
-                `<div class="multilayer"
-                      data-multilayer ="true"
-                      style="width:100%;
-                             height:100%;
-                             left:0;
-                             top:0;
-                             position:absolute;
-                             z-index:0;">
+                `<div data-multilayer ="true"
+                      class="multilayer">
                     ${svgContent}
                 </div>`)
         } else {
@@ -111,13 +105,8 @@ export default function createBackground(svgContent, data) {
     if (masterData && !pptMaster) {
         const masterImage = data.path + masterData
         masterHTML =
-            `<div class="master"
-                  style="width:100%;
-                         height:100%;
-                         background-size:100% 100%;
-                         position:absolute;
-                         z-index:0;
-                         background-image:url(${masterImage})">
+            `<div class="multilayer-master"
+                  style="background-image:url(${masterImage})">
              </div>`
     }
 
@@ -131,14 +120,11 @@ export default function createBackground(svgContent, data) {
         const maskLayer = data.imageMask ? maskBoxImage + ":url(" + data.path + data.imageMask + ");" : "";
         const maskImage = data.path + imageLayerData
         maskHTML =
-            `<div class="imageLayer"
+            `<div class="multilayer-imageLayer"
                   style="width:${data.imageWidth}px;
                          height:${data.imageHeight}px;
                          top:${data.imageTop}px;
                          left:${data.imageLeft}px;
-                         position:absolute;
-                         z-index:2;
-                         background-size:100% 100%;
                          background-image:url(${maskImage});${maskLayer}">
             </div>`
     }
@@ -159,12 +145,8 @@ export default function createBackground(svgContent, data) {
             //带蒙版
             if (maskBoxImage != undefined) {
                 backImageHTML =
-                    `<div class="backImage"
+                    `<div class="multilayer-backImage"
                           style="width:${newWidth};
-                                 height:100%;
-                                 position:absolute;
-                                 z-index:1;
-                                 background-size:100% 100%;
                                  background-image:url(${newBackImage});
                                  ${maskBoxImage}:url(${newBackMask});
                                  ${ backImagePosition }">
@@ -172,29 +154,21 @@ export default function createBackground(svgContent, data) {
             } else {
                 //无蒙版
                 backImageHTML =
-                    `<canvas class="backImage edges"
+                    `<canvas class="multilayer-backImage edges"
                              height=${document.body.clientHeight}
                              width=${document.body.clientWidth}
                              src=${newBackImage}
                              mask=${newBackMask}
                              style="width:${newWidth};
                                     opacity:0;
-                                    height:100%;
-                                    background-size:100% 100%;
-                                    position:absolute;
-                                    z-index:1;
                                     ${maskBoxImage}:url(${newBackImage});
                                     ${ backImagePosition }">
                     </canvas>`
             }
         } else {
             //图片层
-            backImageHTML = `<div class="backImage"
+            backImageHTML = `<div class="multilayer-backImage"
                                   style="width:${newWidth};
-                                         height:100%;
-                                         position:absolute;
-                                         z-index:1;
-                                         background-size:100% 100%;
                                          background-image:url(${newBackImage});
                                          ${ backImagePosition }">
                             </div>`
@@ -207,25 +181,23 @@ export default function createBackground(svgContent, data) {
      */
     let backTextHTML = ''
     if (backText) {
-        backTextHTML = `<div class="words"
-                             style="width:100%;height:100%;top:0;left:0;position:absolute;z-index:3;">
+        backTextHTML = `<div class="multilayer-word">
                             ${svgContent}
                         </div>`
     }
-
 
 
     /**
      * 组层背景图开始
      * @type {String}
      */
-    const HTML =
-        `<div class="multilayer" data-multilayer ="true" style="width:100%; height:100%;position:absolute;left:0;top:0;z-index:0;">
+    return String.styleFormat(
+        `<div data-multilayer ="true"
+              class="multilayer">
             ${masterHTML}
             ${maskHTML}
             ${backImageHTML}
             ${backTextHTML}
         </div>`
-
-    return String.styleFormat(HTML)
+    )
 }

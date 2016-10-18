@@ -82,6 +82,7 @@ video {
 
 
 /*翻页按钮*/
+
 @font-face {
     font-family: 'icomoon';
     src: url('fonts/icomoon.eot?vv9atf');
@@ -199,6 +200,21 @@ video {
     -webkit-backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
     -webkit-perspective: 1000;
+}
+
+
+/**继承父容器尺寸 **/
+
+.inherit-size {
+    height: 100%;
+    width: 100%;
+}
+
+
+/*全屏背景*/
+
+.fullscreen-background {
+    background-size: 100% 100%;
 }
 
 
@@ -483,15 +499,69 @@ video {
     -webkit-perspective: 1000;
 }
 
-.xut-content-scroller-img {
+
+/*content 背景布局，简单布局*/
+
+.multilayer {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: 0;
+}
+
+
+/*背景图带母版*/
+
+.multilayer-master {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-size: 100% 100%;
+    z-index: 0;
+}
+
+
+/*图片层*/
+
+.multilayer-imageLayer {
+    position: absolute;
+    z-index: 2;
+    background-size: 100% 100%;
+}
+
+
+/*背景图片*/
+
+.multilayer-backImage {
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    background-size: 100% 100%;
+}
+
+
+/*背景图文字*/
+
+.multilayer-word {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: 3;
+}
+
+
+/*content类型，滚动条*/
+
+.content-image {
     width: 99%;
 }
 
 
-/**
- *  导航条CSS3切换
- *
- */
+/** 导航条CSS3切换 */
 
 #pane .navControlBar {
     transform-style: preserve-3d;
@@ -864,10 +934,6 @@ video {
 
 /*阅读模式工具栏*/
 
-.xut-book-bar-back,
-.xut-book-bar-dir,
-.xut-book-bar-mark,
-.xut-book-bar-star,
 .icon-book-bar {
     width: 48px;
     height: 100%;
@@ -878,32 +944,7 @@ video {
     text-align: center;
 }
 
-.xut-book-bar-back {
-    background-image: url('../images/icons/book-bar-back.svg');
-    background-size: 90% 90%;
-    /*    border-right: 1px solid rgb(63, 59, 59);
-    -webkit-box-shadow:1px 0px 10px #0F0E0E; */
-}
 
-.xut-book-bar-dir {
-    background-image: url('../images/icons/book-bar-list.svg');
-    margin-left: 1.5em;
-    background-size: 70% 70%;
-    background-position: center top;
-}
-
-.xut-book-bar-mark {
-    background-image: url('../images/icons/book-bar-mark.svg');
-    margin: auto 1.5em;
-    background-size: 50% 50%;
-    background-position: center 20%;
-}
-
-.xut-book-bar-star {
-    background-image: url('../images/icons/book-bar-star.svg');
-    background-size: 60% 60%;
-    background-position: center 10%;
-}
 
 
 /*工具栏结束*/

@@ -38,7 +38,7 @@ export default {
                 if (start.startImg) {
                     startImage = start.startImg;
                     tempData[_id]['startImg'] = startImage;
-                    startImage = 'background-image:url(' + startImage + ');';
+                    startImage = 'background-image:url(' + config.pathAddress +  startImage + ');';
                 }
                 if (start.script) {
                     tempData[_id]['startScript'] = start.script;
@@ -73,8 +73,8 @@ export default {
             const posX = (scaleWidth - mediaIconSize) / 2;
             const posY = (scaleHeight - mediaIconSize) / 2;
             const icon = 'background-image:url(images/icons/web_hotspot.png)'
-            mediaIcon = `<div id="icon_${_id}" 
-                                  type="icon" 
+            mediaIcon = `<div id="icon_${_id}"
+                                  type="icon"
                                   style="width:${mediaIconSize}px;
                                          height:${mediaIconSize}px;
                                          top:${posY}px;
@@ -90,9 +90,9 @@ export default {
         //Audio_1
         //Video_1
         return String.styleFormat(
-            `<div id="${mediaType + "_" + _id}" 
-                      data-belong="${pageType}" 
-                      data-delegate="${category}" 
+            `<div id="${mediaType + "_" + _id}"
+                      data-belong="${pageType}"
+                      data-delegate="${category}"
                       style="width:${scaleWidth}px;
                              height:${scaleHeight}px;
                              left:${scaleLeft}px;

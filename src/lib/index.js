@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 847
+Xut.Version = 848
 
 
 if (Xut.plat.isBrowser) {

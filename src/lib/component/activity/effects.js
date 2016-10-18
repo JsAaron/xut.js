@@ -89,21 +89,21 @@ export class Effects {
      * 8  其中 高级精灵动画是widget创建，需要等待
      * @return {[type]} [description]
      */
-    _buildCanvas(id, parameter, category, callback) {
+    _createCanvas(id, parameter, category, callback) {
 
-        var actionTypes, makeOpts, createPixiPPT, $veiw, setState, initstate
+        let initstate
 
         //动作类型
         //可能是组合动画
-        actionTypes = this.contentDas.actionTypes
-        makeOpts = {
+        const actionTypes = this.contentDas.actionTypes
+        const makeOpts = {
             data: this.contentDas,
             renderer: this.$contentNode,
             pageIndex: this.pageIndex
         }
 
         //创建pixi上下文的ppt对象
-        createPixiPPT = () => {
+        const createPixiPPT = () => {
             //parameter存在就是ppt动画
             if ((parameter || actionTypes.pptId) && this.$contentNode.view) {
                 this.pptObj = callback(PPT, $(this.$contentNode.view));
@@ -111,12 +111,12 @@ export class Effects {
             }
         }
 
-        $veiw = this.$contentNode.view
+        const $veiw = this.$contentNode.view
         if ($veiw) {
             initstate = $veiw.getAttribute('data-init')
         }
 
-        setState = () => {
+        const setState = () => {
             $veiw.setAttribute('data-init', true)
         }
 
@@ -167,10 +167,10 @@ export class Effects {
      * Build the dom of animation
      * @return {[type]} [description]
      */
-    _buildDom(category, callback) {
+    _createDom(category, callback) {
 
         if (category) {
-            var data = {
+            const data = {
                 id: this.id,
                 data: this.contentDas,
                 $contentNode: this.$contentNode
@@ -217,8 +217,8 @@ export class Effects {
         //dom mode
         //canvas mode
         this.domMode ?
-            this._buildDom(category, create) :
-            this._buildCanvas(id, parameter, category, create)
+            this._createDom(category, create) :
+            this._createCanvas(id, parameter, category, create)
     }
 
 

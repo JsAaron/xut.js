@@ -9,9 +9,9 @@
 
 import { config } from '../../../../config/index'
 import { parseCanvas } from './parsetype'
-import { createContainer } from './container'
-import { createDom } from './dom'
-import { createCanvas } from './canvas'
+import { createContainer } from './create/container'
+import { createDom } from './create/dom'
+import { createCanvas } from './create/canvas'
 import { parseContentDas } from './parsecontent'
 
 import {
@@ -58,7 +58,7 @@ let makeWarpObj = (contentId, content, pageType, pid, virtualOffset) => {
  * 创建图片地址
  * @return {[type]}         [description]
  */
-let analysisPath = (wrapObj, conData) => {
+const analysisPath = (wrapObj, conData) => {
     var pathImg, imgContent, isGif, originalPathImg, resourcePath, results, name
 
     imgContent = conData.md5
@@ -87,9 +87,9 @@ let analysisPath = (wrapObj, conData) => {
         }
     }
 
-    wrapObj['imgContent'] = imgContent;
-    wrapObj['isGif'] = isGif;
-    wrapObj['pathImg'] = pathImg;
+    wrapObj.imgContent = imgContent;
+    wrapObj.isGif = isGif;
+    wrapObj.pathImg = pathImg;
 }
 
 
@@ -106,13 +106,13 @@ let externalFile = (wrapObj, svgCallback) => {
     //svg零件不创建解析具体内容
     if (wrapObj.isSvg) {
         readFile(wrapObj.data.md5, (svgdata) => {
-            wrapObj['svgstr'] = svgdata;
+            wrapObj.svgstr = svgdata
             svgCallback(wrapObj)
         });
     } else if (wrapObj.isJs) {
         //如果是.js的svg文件
         readFile(wrapObj.data.md5, (htmldata) => {
-            wrapObj['htmlstr'] = htmldata;
+            wrapObj.htmlstr = htmldata
             svgCallback(wrapObj)
         }, "js")
     } else {
@@ -326,8 +326,9 @@ export default function structure(callback, data, context) {
      */
     function createRelated(contentId, wrapObj) {
         externalFile(wrapObj, function(wrapObj) {
-            var uuid, startStr, contentStr, conData
-            conData = wrapObj.data
+            let uuid, startStr, contentStr
+
+            const conData = wrapObj.data
 
             //拼接地址
             analysisPath(wrapObj, conData)

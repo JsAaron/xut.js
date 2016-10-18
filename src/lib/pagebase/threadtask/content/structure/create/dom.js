@@ -1,6 +1,10 @@
-import { parseJSON } from '../../../../util/index'
+import {
+    parseJSON,
+    replacePath
+} from '../../../../../util/index'
 
 const maskBoxImage = Xut.style.maskBoxImage
+const FLOOR = Math.floor
 
 /**
  * 蒙版动画
@@ -8,41 +12,37 @@ const maskBoxImage = Xut.style.maskBoxImage
  * @param  {[type]} wrapObj [description]
  * @return {[type]}         [description]
  */
-let maskContent = (data, wrapObj) => {
+const maskContent = (data, wrapObj) => {
 
     let restr = ""
 
     //如果有蒙版图
-    let isMaskImg = data.mask ? maskBoxImage + ":url(" + Xut.config.pathAddress + data.mask + ");" : ""
+    const isMaskImg = data.mask ? maskBoxImage + ":url(" + Xut.config.pathAddress + data.mask + ");" : ""
+    const pathImg = wrapObj.pathImg
 
     //蒙板图
     if (data.mask || wrapObj['isGif']) {
-
         //蒙版图
         if (maskBoxImage != undefined) {
-            restr += String.format(
-                '<img' +
-                ' id="img_{1}"' +
-                ' class="xut-content-scroller-img"' +
-                ' src="{0}"' +
-                ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%;{4}"/>',
-                wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg
-            );
+            restr += String.styleFormat(
+                `<img data-type="mask-images"
+                      class="inherit-size fullscreen-background edges"
+                      src="${pathImg}"
+                      style="${isMaskImg}"/>`
+            )
         } else {
             //canvas
-            restr += String.format(
-                ' <canvas src="{0}"' +
-                ' class="xut-content-scroller-img edges"' +
-                ' mask="{5}"' +
-                ' id = "img_{1}"' +
-                ' width="{2}"' +
-                ' height="{3}"' +
-                ' style="width:{2}px; height:{3}px;opacity:0; background-size:100% 100%; {4}"' +
-                ' />',
-                wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg, Xut.config.pathAddress.replace(/\//g, "\/") + data.mask);
+            restr += String.styleFormat(
+                `<canvas class="inherit-size fullscreen-background edges"
+                         src="${pathImg}"
+                         mask="${isMaskImg}"
+                         width="${data.scaleWidth}"
+                         height="${data.scaleHeight}"
+                         style="opacity:0;${Xut.config.pathAddress.replace(/\//g, "\/") + data.mask}"/>`
+            )
         }
 
-        //精灵图
+    //精灵图
     } else if (data.category == 'Sprite') {
 
         let matrixX = 100 * data.thecount;
@@ -58,44 +58,39 @@ let maskContent = (data, wrapObj) => {
                 matrixY = 100 * Number(matrix[1])
             }
         }
-        restr += String.format(
-            '<div' +
-            ' class="sprite"' +
-            ' style="height:{0}px;background-image:url({1});background-size:{2}% {3}%;">' +
-            '</div>',
-            data.scaleHeight, wrapObj['pathImg'], matrixX, matrixY
-        );
-
+        restr += String.styleFormat(
+            `<div data-type="sprite-images"
+                  class="sprite"
+                  style="height:${data.scaleHeight}px;
+                         background-image:url(${wrapObj['pathImg']});
+                         background-size:${matrixX}% ${matrixY}%;">
+            </div>`
+        )
     } else {
         //普通图片
-        restr += String.format(
-            '<img' +
-            ' src="{0}"' +
-            ' class="xut-content-scroller-img"' +
-            ' id="img_{1}"' +
-            ' style="width:{2}px;height:{3}px;position:absolute;background-size:100% 100%; {4}"/>',
-            wrapObj['pathImg'], data['_id'], data.scaleWidth, data.scaleHeight, isMaskImg
-        );
+        restr += String.styleFormat(
+            `<img data-type="ordinary-images"
+                  class="inherit-size fullscreen-background"
+                  src="${pathImg}"
+                  style="${isMaskImg}"/>`
+        )
     }
 
-    return restr;
+    return restr
 }
-
 
 /**
  * 纯文本内容
  * @param  {[type]} data [description]
  * @return {[type]}      [description]
  */
-let textContent = (data) => {
-    return String.format(
-        '<div' +
-        ' id = "{0}"' +
-        ' style="background-size:100% 100%;height:auto">{1}</div>',
-        data['_id'], data.content
+const textContent = (data) => {
+    return String.styleFormat(
+        `<div id = "${data['_id']}" style="background-size:100% 100%;height:auto">
+              ${data.content}
+         </div>`
     )
 }
-
 
 /**
  * 如果是.js结尾的
@@ -104,8 +99,7 @@ let textContent = (data) => {
  * @param  {[type]} wrapObj [description]
  * @return {[type]}         [description]
  */
-let jsContent = (data, wrapObj) => wrapObj["htmlstr"]
-
+const jsContent = (data, wrapObj) => replacePath(wrapObj.htmlstr)
 
 /**
  * 如果内容是svg
@@ -113,13 +107,17 @@ let jsContent = (data, wrapObj) => wrapObj["htmlstr"]
  * @param  {[type]} wrapObj [description]
  * @return {[type]}         [description]
  */
-let svgContent = (data, wrapObj) => {
+const svgContent = (data, wrapObj) => {
     let restr = ""
-    let svgstr = wrapObj['svgstr']
-    let scaleWidth = data['scaleWidth']
+    let svgstr = wrapObj.svgstr
+    let scaleWidth = data.scaleWidth
 
     //从SVG文件中，读取Viewport的值
     if (svgstr != undefined) {
+
+        //替换svg内部读取文件地址
+        svgstr = replacePath(svgstr)
+
         let startPos = svgstr.search('viewBox="');
         let searchTmp = svgstr.substring(startPos, startPos + 64).replace('viewBox="', '').replace('0 0 ', '');
         let endPos = searchTmp.search('"');
@@ -130,31 +128,32 @@ let svgContent = (data, wrapObj) => {
 
         //svg内容宽度:svg内容高度 = viewBox宽:viewBox高
         //svg内容高度 = svg内容宽度 * viewBox高 / viewBox宽
-        let svgRealHeight = Math.floor(scaleWidth * svgheight / svgwidth);
+        let svgRealHeight = FLOOR(scaleWidth * svgheight / svgwidth);
         //如果svg内容高度大于布局高度则添加滚动条
         if (svgRealHeight > (data.scaleHeight + 1)) {
-            let svgRealWidth = Math.floor(scaleWidth);
+            let svgRealWidth = FLOOR(scaleWidth);
             //if there do need scrollbar, then restore text to its original prop
             //布局位置
-            let marginleft = wrapObj['backMode'] ? data.scaleLeft - data.scaleBackLeft : 0;
-            let margintop = wrapObj['backMode'] ? data.scaleTop - data.scaleBackTop : 0;
+            let marginleft = wrapObj.backMode ? data.scaleLeft - data.scaleBackLeft : 0;
+            let margintop = wrapObj.backMode ? data.scaleTop - data.scaleBackTop : 0;
 
             if (data.isScroll) {
                 restr = String.styleFormat(
-                    `<div style="width:${svgRealWidth}px;
-                                     height:${svgRealHeight}px;
-                                     margin-left:${marginleft}px;
-                                     margin-top:${margintop}px;">
-                                     ${svgstr}
+                    `<div data-type="svg"
+                          style="width:${svgRealWidth}px;
+                                 height:${svgRealHeight}px;
+                                 margin-left:${marginleft}px;
+                                 margin-top:${margintop}px;">
+                        ${svgstr}
                      </div>`
                 )
             } else {
                 restr = String.styleFormat(
-                    `<div style="width:100%;
-                                     height:100%;
-                                     margin-left:${marginleft}px;
-                                     margin-top:${margintop}px;">
-                                     ${svgstr}
+                    `<div data-type="svg"
+                          class="inherit-size"
+                          style="margin-left:${marginleft}px;
+                                 margin-top:${margintop}px;">
+                        ${svgstr}
                     </div>`
                 )
             }
@@ -165,18 +164,54 @@ let svgContent = (data, wrapObj) => {
     return restr
 }
 
-
 /**
- * 创建包含容器
+ * 填充content内容
  * @param  {[type]} data    [description]
  * @param  {[type]} wrapObj [description]
  * @return {[type]}         [description]
  */
-let createWapper = (data, wrapObj) => {
+const fillContent = (data, wrapObj) => {
+    let restr = '';
+    //如果内容是图片
+    //如果是svg或者html
+    if (wrapObj.imgContent) {
+        //如果是SVG
+        if (wrapObj.isSvg) {
+            restr += svgContent(data, wrapObj);
+        }
+        //如果是.js结构的html文件
+        else if (wrapObj.isJs) {
+            restr += jsContent(data, wrapObj)
+        }
+        //如果是蒙板，或者是gif类型的动画，给高度
+        else {
+            restr += maskContent(data, wrapObj);
+        }
+    }
+    //纯文本文字
+    else {
+        restr += textContent(data, wrapObj);
+    }
+    return restr;
+}
+
+
+
+/**
+ * 创建包含容器content
+ * @param  {[type]} data    [description]
+ * @param  {[type]} wrapObj [description]
+ * @return {[type]}         [description]
+ */
+const createContainer = (data, wrapObj) => {
     let wapper
     let backwidth, backheight, backleft, backtop
-    let zIndex = data['zIndex']
-    let id = data['_id']
+    let zIndex = data.zIndex
+    let id = data._id
+
+    //Content_23_37
+    //Content_23_38
+    //Content_23_39
     let containerName = wrapObj.containerName
     let pid = wrapObj.pid
     let makeId = wrapObj.makeId
@@ -211,6 +246,7 @@ let createWapper = (data, wrapObj) => {
     if (wrapObj.isJs) {
         wapper = `<div id="${containerName}"
                        data-behavior="click-swipe"
+                       class="fullscreen-background "
                        style="width:${backwidth}px;
                               height:${backheight}px;
                               top:${backtop}px;
@@ -218,59 +254,34 @@ let createWapper = (data, wrapObj) => {
                               position:absolute;
                               z-index:${zIndex};
                               visibility:${visibility};
-                              background-size:100% 100%;{10}">
-                 <div id="${makeId('contentWrapper')}"
-                      style="width:${backwidth}px;position:absolute;">`
+                              {10}">
+                 <div data-type="scroller"
+                      style="width:${backwidth}px;
+                             position:absolute;">`
         return String.styleFormat(wapper)
     }
 
+    //scroller:=> absolute 因为别的元素有依赖
+
     //正常content类型
+    //如果是scroller需要绝对的尺寸，所以替换100% 不可以
     wapper = `<div id="${containerName}"
                    data-behavior="click-swipe"
                    style="width:${backwidth}px;
                           height:${backheight}px;
                           top:${backtop}px;
                           left:${backleft}px;
-                          position:absolute;z-index:
-                          ${zIndex};
+                          position:absolute;
+                          z-index:${zIndex};
                           visibility:${visibility}">
-              <div id="${makeId('contentWrapper')}"
+              <div data-type="scroller"
+                   class="fullscreen-background "
                    style="width:${backwidth}px;
                           height:${backheight}px;
-                          ${background}
                           position:absolute;
-                          background-size:100% 100%;">`
+                          ${background}">`
 
     return String.styleFormat(wapper)
-}
-
-
-/**
- * 创建内容
- * @param  {[type]} data    [description]
- * @param  {[type]} wrapObj [description]
- * @return {[type]}         [description]
- */
-let createContent = (data, wrapObj) => {
-    let restr = "";
-    //如果内容是图片
-    //如果是svg或者html
-    if (wrapObj.imgContent) {
-        //如果是SVG
-        if (wrapObj.isSvg) {
-            restr += svgContent(data, wrapObj);
-        } else if (wrapObj.isJs) {
-            //如果是.js结构的html文件
-            restr += jsContent(data, wrapObj)
-        } else {
-            //如果是蒙板，或者是gif类型的动画，给高度
-            restr += maskContent(data, wrapObj);
-        }
-    } else {
-        //纯文本文字
-        restr += textContent(data, wrapObj);
-    }
-    return restr;
 }
 
 
@@ -282,10 +293,13 @@ let createContent = (data, wrapObj) => {
  */
 export function createDom(data, wrapObj) {
     let restr = ''
-    //创建包装容器
-    restr += createWapper(data, wrapObj)
+
+    //创建包装容器content节点
+    restr += createContainer(data, wrapObj)
+
     //创建内容
-    restr += createContent(data, wrapObj)
+    restr += fillContent(data, wrapObj)
     restr += "</div></div>"
+
     return restr
 }

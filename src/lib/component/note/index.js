@@ -1,4 +1,3 @@
-import { Iscroll } from '../activity/iscroll'
 
 export class ShowNote {
 
@@ -27,7 +26,11 @@ export class ShowNote {
         $(this.rootNode).append(this._dom);
 
         this.show();
-        this.iscroll = Iscroll(this._dom.find('.content')[0]);
+
+        this.iscroll = new iScroll(this._dom.find('.content')[0], {
+            scrollbars: true,
+            fadeScrollbars: true
+        })
         return true;
     }
 

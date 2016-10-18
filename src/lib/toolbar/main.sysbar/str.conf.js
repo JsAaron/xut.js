@@ -124,7 +124,6 @@ export function createCloseIcon(height) {
  */
 export function createCloseIconFont(height) {
     return `<div class="si-icon icomoon icon-close"
-                 data-icon-name="close"
                  style="float:right;margin-right:4px;width:${height}px;height:${height}px">
             </div>`
 

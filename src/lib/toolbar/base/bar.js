@@ -1,5 +1,3 @@
-import iconsConfig from './iconconf.js'
-import { svgIcon } from './svgicon'
 import { config } from '../../config/index'
 
 import {
@@ -33,6 +31,14 @@ const getArrowStyle = function() {
             break;
     }
     return styleText;
+}
+
+const gotoPrevSlide = function() {
+    Xut.View.GotoPrevSlide();
+}
+
+const gotoNextSlide = function() {
+    Xut.View.GotoNextSlide();
 }
 
 
@@ -81,112 +87,76 @@ export default class Bar {
 
         //是否使用自定义的翻页按钮: true /false
         //图标名称是客户端指定的：pageforward_'+appId+'.svg
-        //是否使用svg创建翻页按钮 true是 false使用font字体画翻页图标
         const isCustom = this.settings.customButton;
-        const isSvgButton = this.settings.svgButton;
-        if (isCustom) {
-            //动态图标，数据库定义的翻页图标
-            this._createLeftIcon()
-            this._createRightIcon()
-        } else {
-            //默认的svg图片
-            isSvgButton ? this._createLeftArrowSVG() : this._createLeftArrowFont()
-            isSvgButton ? this._createRightArrowSVG() : this._createRightArrowFont()
+
+        //动态图标，数据库定义的翻页图标
+        //font字体画翻页图标
+        const left = isCustom ? this._createLeftIcon : this._createLeftArrow()
+        const right = isCustom ? this._createRightIcon : this._createRightArrow()
+
+        const $str = $(left + right)
+        const $left = $str.eq(0)
+        const $right = $str.eq(1)
+
+        this.arrows = {
+            prev: {
+                off: this._onArrow($left, gotoPrevSlide),
+                el: $left,
+                able: true
+            },
+            next: {
+                off: this._onArrow($right, gotoNextSlide),
+                el: $right,
+                able: true
+            }
+        }
+
+        this.$sceneNode.append($str)
+    }
+
+    _onArrow(el, callback) {
+        el.on("mouseup touchend", e => {
+            callback()
+            return false
+        })
+        return function() {
+            el.off()
+            el = null
         }
     }
 
-    /**
-     * svg版本：左箭头翻页按钮
-     * @return {[type]} [description]
-     */
-    _createLeftArrowSVG() {
+    _getArrowOption() {
         const style = getArrowStyle()
-        const state = this.toolBarStatus ? '' : 'hide'
-        const $dom = $(
-            `<div class="si-icon xut-flip-control xut-flip-control-left ${state}"
-                  data-icon-name="prevArrow"
-                  style="${style}">
-             </div>`)
-
-        //点击左翻页动作
-        this.super_createSVGIcon($dom[0], () => Xut.View.GotoPrevSlide())
-
-        this.$sceneNode.append($dom)
-        this.arrows.prev = {
-            el: $dom,
-            able: true
-        };
-    }
-
-    /**
-     * svg版本：右箭头翻页按钮
-     * @return {[type]} [description]
-     */
-    _createRightArrowSVG() {
-        const style = getArrowStyle()
-        const state = this.toolBarStatus ? '' : 'hide'
-        const $dom = $(
-            `<div class="si-icon xut-flip-control xut-flip-control-right ${state}"
-                  data-icon-name="nextArrow"
-                  style="${style}">
-             </div>`)
-
-        //点击右翻页动作
-        this.super_createSVGIcon($dom[0], () => Xut.View.GotoNextSlide())
-
-        this.$sceneNode.append($dom);
-        this.arrows.next = {
-            el: $dom,
-            able: true
-        };
+        const state = this.barStatus ? '' : 'hide'
+        const height = config.iconHeight
+        return {
+            style,
+            state,
+            height
+        }
     }
 
     /**
      * font字体版本：左箭头翻页按钮
      * @return {[type]} [description]
      */
-    _createLeftArrowFont() {
-        var style = getArrowStyle(),
-            state = this.barStatus ? '' : 'hide',
-            config = Xut.config,
-            height = config.iconHeight,
-            $dom;
-
-        $dom = $('<div class="si-icon xut-flip-control xut-flip-control-left icomoon icon-angle-left ' + state + '" style="' + style + ';text-align:center;line-height:' + height + 'px;font-size:4vh;"></div>');
-
-        $dom.on("touchend mouseup", function() {
-            Xut.View.GotoPrevSlide();
-        });
-        this.$sceneNode.append($dom);
-        this.arrows.prev = {
-            el: $dom,
-            able: true
-        };
+    _createLeftArrow() {
+        const option = this._getArrowOption()
+        return `<div class="si-icon xut-flip-control xut-flip-control-left icomoon icon-angle-left ${option.state}"
+                  style="${option.style};text-align:center;line-height:${option.height}px;font-size:4vh;">
+                </div>`
     }
 
     /**
      * font字体版本：右箭头翻页按钮
      * @return {[type]} [description]
      */
-    _createRightArrowFont() {
-        var style = getArrowStyle(),
-            state = this.barStatus ? '' : 'hide',
-            config = Xut.config,
-            height = config.iconHeight,
-            $dom;
-        $dom = $('<div class="si-icon xut-flip-control xut-flip-control-right icomoon icon-angle-right ' + state + '" style="' + style + ';text-align:center;line-height:' + height + 'px;"></div>');
-
-        $dom.on("touchend mouseup", function() {
-            Xut.View.GotoNextSlide();
-        });
-
-        this.$sceneNode.append($dom);
-        this.arrows.next = {
-            el: $dom,
-            able: true
-        };
+    _createRightArrow() {
+        const option = this._getArrowOption()
+        return `<div class="si-icon xut-flip-control xut-flip-control-right icomoon icon-angle-right ${option.state}"
+                  style="${option.style};text-align:center;line-height:${option.height}px;">
+                </div>`
     }
-
 
     /**
      * 客户端指定：自定义左翻页按钮
@@ -195,25 +165,12 @@ export default class Bar {
     _createLeftIcon() {
         let style = getArrowStyle()
         const state = this.toolBarStatus ? '' : 'hide'
-
-        //默认图标路径
+            //默认图标路径
         style += `;background-image:url(images/icons/pageforward_${config.appId}.svg);background-size:cover`
-
-        const $dom = $(
-            `<div name="prevArrow"
-                  class="xut-flip-control xut-flip-control-left ${state}"
-                  style="${style}">
-            </div>`)
-
-        $dom.on("touchend mouseup", function() {
-            Xut.View.GotoPrevSlide();
-        });
-
-        this.$sceneNode.append($dom);
-        this.arrows.prev = {
-            el: $dom,
-            able: true
-        };
+        return `<div name="prevArrow"
+                     class="xut-flip-control xut-flip-control-left ${state}"
+                     style="${style}">
+               </div>`
     }
 
     /**
@@ -223,25 +180,12 @@ export default class Bar {
     _createRightIcon() {
         let style = getArrowStyle()
         const state = this.toolBarStatus ? '' : 'hide'
-
-        //默认图标
+            //默认图标
         style += `;background-image:url(images/icons/pageback_${config.appId}.svg);background-size:cover`
-
-        const $dom = $(
-            `<div name="nextArrow"
-                  class="xut-flip-control xut-flip-control-right ${state}"
-                  style="${style}">
-            </div>`)
-
-        $dom.on("touchend mouseup", function() {
-            Xut.View.GotoNextSlide();
-        });
-
-        this.$sceneNode.append($dom);
-        this.arrows.next = {
-            el: $dom,
-            able: true
-        };
+        return `<div name="nextArrow"
+                     class="xut-flip-control xut-flip-control-right ${state}"
+                     style="${style}">
+                </div>`
     }
 
     /**
@@ -307,30 +251,15 @@ export default class Bar {
 
 
     /**
-     * 创建SVG按钮
-     * @param  {[type]}   el       [description]
-     * @param  {Function} callback [description]
-     * @return {[type]}            [description]
-     */
-    super_createSVGIcon(el, callback) {
-        var options = {
-            speed: 6000,
-            size: {
-                w: this.super_iconHeight,
-                h: this.super_iconHeight
-            },
-            onToggle: callback
-        };
-        return new svgIcon(el, iconsConfig, options);
-    }
-
-
-    /**
      * 超类销毁
      * @return {[type]} [description]
      */
     super_destory() {
-        this.arrows = null
+        if (this.arrows) {
+            this.arrows.prev.off();
+            this.arrows.next.off();
+            this.arrows = null
+        }
     }
 
 

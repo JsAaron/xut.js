@@ -47,6 +47,24 @@ export function messageBox(message) {
 }
 
 
+/**
+ * 路径替换
+ * svg html文件的路径是原始处理的
+ * 如果动态切换就需要替换
+ * @return {[type]} [description]
+ */
+export function replacePath(svgstr) {
+    if (window.DYNAMICCONFIGT) {
+        const defaultSourcePath = "content/gallery/"
+
+        //如果能找到对应的默认路径，则替换
+        if (-1 !== svgstr.indexOf(defaultSourcePath)) {
+            svgstr = svgstr.replace(defaultSourcePath, Xut.config.pathAddress)
+        }
+    }
+    return svgstr
+}
+
 
 /**
  * 转化缩放比

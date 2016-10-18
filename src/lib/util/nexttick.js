@@ -87,24 +87,22 @@ const nextTick = function({
         return
     }
 
-
-    const animatId = 'T' + (Math.random() * 10000 << 1)
-    let tick = DOC.createElement('input')
-    let observer = null
-
     if (!container || !content) {
         return;
     }
 
     //检查容器---$(container) 转为dom对象
-    if (_.isObject(container) && container.selector !== undefined) {
-        container = container[0];
+    if (container instanceof $) {
+        container = container[0]
     }
 
     if (container.nodeType !== 1) {
         console.log('nextTick: container must be HTMLLIElement ');
         return;
     }
+
+    const animatId = 'T' + (Math.random() * 10000 << 1)
+    const tick = DOC.createElement('input')
 
     //标记任务
     tick.setAttribute('value', animatId);
@@ -175,11 +173,11 @@ const nextTick = function({
 
 
     if (MutationObserver) {
-        observer = new MutationObserver(mutations => {
+        let observer = new MutationObserver(mutations => {
             mutations.forEach(record => {
                 if (record.oldValue === animatId) {
-                    _completeTask();
-                    observer = null;
+                    _completeTask()
+                    observer = null
                 }
             });
         });

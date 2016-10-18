@@ -39,6 +39,7 @@ export default class Slide {
 
         //初始化事件
         this._initEvent()
+
     }
 
 
@@ -316,5 +317,7 @@ export default class Slide {
 
     destroy() {
         this.hammer.destroy()
+        //关闭按钮
+        this.$buttonNode && this.$buttonNode.off()
     }
 }
