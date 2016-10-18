@@ -89,14 +89,17 @@ export default class Bar {
         //图标名称是客户端指定的：pageforward_'+appId+'.svg
         const isCustom = this.settings.customButton;
 
+        let $str
+
         //动态图标，数据库定义的翻页图标
         //font字体画翻页图标
-        const left = isCustom ? this._createLeftIcon : this._createLeftArrow()
-        const right = isCustom ? this._createRightIcon : this._createRightArrow()
-
-        const $str = $(left + right)
+        if (isCustom) {
+            $str = $(this._createIcon())
+        } else {
+            $str = $(this._createArrow())
+        }
         const $left = $str.eq(0)
-        const $right = $str.eq(1)
+        const $right = $str.eq($str.length - 1) //存在文本节点
 
         this.arrows = {
             prev: {
@@ -137,56 +140,42 @@ export default class Bar {
     }
 
     /**
-     * font字体版本：左箭头翻页按钮
+     * font字体版本：箭头翻页按钮
      * @return {[type]} [description]
      */
-    _createLeftArrow() {
+    _createArrow() {
         const option = this._getArrowOption()
         return `<div class="si-icon xut-flip-control xut-flip-control-left icomoon icon-angle-left ${option.state}"
-                  style="${option.style};text-align:center;line-height:${option.height}px;font-size:4vh;">
+                     style="${option.style};text-align:center;line-height:${option.height}px;font-size:4vh;">
+                </div>
+                <div class="si-icon xut-flip-control xut-flip-control-right icomoon icon-angle-right ${option.state}"
+                     style="${option.style};text-align:center;line-height:${option.height}px;">
                 </div>`
     }
 
-    /**
-     * font字体版本：右箭头翻页按钮
-     * @return {[type]} [description]
-     */
-    _createRightArrow() {
-        const option = this._getArrowOption()
-        return `<div class="si-icon xut-flip-control xut-flip-control-right icomoon icon-angle-right ${option.state}"
-                  style="${option.style};text-align:center;line-height:${option.height}px;">
-                </div>`
-    }
 
     /**
-     * 客户端指定：自定义左翻页按钮
+     * 客户端指定：自定义翻页按钮
      * @return {[type]} [description]
      */
-    _createLeftIcon() {
+    _createIcon() {
         let style = getArrowStyle()
-        const state = this.toolBarStatus ? '' : 'hide'
-            //默认图标路径
-        style += `;background-image:url(images/icons/pageforward_${config.appId}.svg);background-size:cover`
+        let state = this.toolBarStatus ? '' : 'hide'
+
+        //默认图标路径
+        let leftStyle = `${style};background-image:url(images/icons/pageforward_${config.appId}.svg);background-size:cover`
+        let rightStyle = `${style};background-image:url(images/icons/pageback_${config.appId}.svg);background-size:cover`
+
         return `<div name="prevArrow"
                      class="xut-flip-control xut-flip-control-left ${state}"
-                     style="${style}">
-               </div>`
-    }
-
-    /**
-     * 客户端指定：自定义右翻页按钮
-     * @return {[type]} [description]
-     */
-    _createRightIcon() {
-        let style = getArrowStyle()
-        const state = this.toolBarStatus ? '' : 'hide'
-            //默认图标
-        style += `;background-image:url(images/icons/pageback_${config.appId}.svg);background-size:cover`
-        return `<div name="nextArrow"
+                     style="${leftStyle}">
+               </div>
+                <div name="nextArrow"
                      class="xut-flip-control xut-flip-control-right ${state}"
-                     style="${style}">
+                     style="${rightStyle}">
                 </div>`
     }
+
 
     /**
      * 针对单个按钮的显示隐藏处理
