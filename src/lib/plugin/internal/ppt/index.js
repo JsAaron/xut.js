@@ -1,14 +1,14 @@
 import { config } from '../../../config/index'
 import { isMacOS, isDesktop } from './support'
 import { internal } from './internal'
-import { updateAction } from '../../../component/widget/page/advsprite'
+import { updateAction } from '../../../component/widget/page/extend/adv.sprite'
 import { createContentAudio } from '../../../component/audio/manager'
 
 import {
     execJson,
     parseJSON,
     enterReplace
-} from '../../../util/dom'
+} from '../../../util/lang'
 
 /**
  * 参数说明

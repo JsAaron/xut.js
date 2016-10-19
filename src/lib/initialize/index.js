@@ -5,15 +5,15 @@ import button from './android.button'
 import loadScene from './lauch.scene'
 
 import {
-    _set,
-    _get,
+    $$set,
+    $$get,
     toEmpty,
     parseJSON
 }
 from '../util/index'
 
 
-const getCache = (name) => parseInt(_get(name))
+const getCache = (name) => parseInt($$get(name))
 
 /**
  * 进入主页面
@@ -52,7 +52,7 @@ const initMain = (novelData) => {
             //兼容flipMode错误,强制转化成数字类型
         if (parameter.pageflip !== undefined) {
             flipMode = toEmpty(parameter.pageflip)
-            _set({ 'flipMode': flipMode })
+            $$set({ 'flipMode': flipMode })
         }
     }
 
@@ -76,7 +76,7 @@ const initMain = (novelData) => {
             return loadScene({
                 "novelId": novelId,
                 "pageIndex": pageIndex,
-                'history': _get('history')
+                'history': $$get('history')
             });
         }
     }

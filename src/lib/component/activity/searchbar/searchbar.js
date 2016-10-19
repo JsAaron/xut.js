@@ -4,7 +4,7 @@
  *
  */
 
-import { bindEvent } from '../../../util/event'
+import { $$on } from '../../../util/dom'
 
 //图标
 var icons = {
@@ -36,7 +36,7 @@ SearchBar.prototype.init = function() {
     this.searchBtn = $box.find('.xut-search-btn');
 
     //用户操作事件邦定
-    bindEvent(dom, {
+    $$on(dom, {
         end: this
     })
 

@@ -18,7 +18,7 @@ import { getFlowDistance } from '../../visuals/adapter/adapter.type'
 import getFlipDistance from '../../visuals/distance.config'
 import containerStyle from '../../visuals/container.config'
 
-import { _set, hash } from '../../util/index'
+import { $$set, hash } from '../../util/index'
 import Stack from '../../util/stack'
 
 import {
@@ -492,7 +492,7 @@ export default class Dispatcher {
                 if (config.recordHistory && !options.isInApp && options.multiScenario) {
                     var history;
                     if (history = sceneController.sequence(scenarioId, currIndex)) {
-                        _set("history", history)
+                        $$set("history", history)
                     }
                 }
             },
@@ -568,7 +568,7 @@ export default class Dispatcher {
          * 保存目录索引
          */
         if (!options.multiScenario) {
-            _set("pageIndex", currIndex);
+            $$set("pageIndex", currIndex);
         }
 
         /**

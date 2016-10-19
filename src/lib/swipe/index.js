@@ -3,10 +3,10 @@ import { config } from '../config/index'
 import api from './api'
 
 import {
-    bindEvent,
-    offEvent,
-    handle
-} from '../util/event'
+    $$on,
+    $$off,
+    $$handle
+} from '../util/dom'
 
 import {
     initPointer,
@@ -155,7 +155,7 @@ export default class Swipe extends Observer {
             const ul = container.querySelectorAll('ul')
             this._bubbleNode = {
                 page: ul[0],
-                master:ul[1]
+                master: ul[1]
             }
         }
 
@@ -186,7 +186,7 @@ export default class Swipe extends Observer {
             callback.transitionend = this
         }
 
-        bindEvent(this.container, callback)
+        $$on(this.container, callback)
     }
 
 
@@ -712,7 +712,7 @@ export default class Swipe extends Observer {
      * @return {[type]} [description]
      */
     _evtDestroy() {
-        offEvent(this.container, {
+        $$off(this.container, {
             start: this,
             move: this,
             end: this,
@@ -721,27 +721,27 @@ export default class Swipe extends Observer {
     }
 
 
+
     /**
      * 事件处理
      * @param  {[type]} e [description]
      * @return {[type]}   [description]
      */
     handleEvent(e) {
-        handle({
+        this.options.stopPropagation && e.stopPropagation()
+
+        //接受多事件的句柄
+        $$handle({
             start(e) {
-                this.options.stopPropagation && e.stopPropagation()
                 this._onStart(e)
             },
             move(e) {
-                this.options.stopPropagation && e.stopPropagation()
                 this._onMove(e)
             },
             end(e) {
-                this.options.stopPropagation && e.stopPropagation()
                 this._onEnd(e)
             },
             transitionend(e) {
-                this.options.stopPropagation && e.stopPropagation()
                 this._onAnimComplete(e)
             }
         }, this, e)

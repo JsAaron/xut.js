@@ -58,28 +58,9 @@ export function hasValue(value) {
     return value != undefined
 }
 
-/**
- * 简单继承
- * @return {[type]} [description]
- */
-export function extend(subClass, superClass) {
-    var F = function() {}
-    F.prototype = superClass.prototype
-    var fProto = new F();
-    for (var k in fProto) {
-        if (subClass.prototype[k]) {
-            console.log('子类与超类的方法名重叠了！')
-        } else {
-            subClass.prototype[k] = fProto[k]
-        }
-    }
-    subClass.prototype.constructor = subClass;
-    superClass = null;
-}
 
 
-
-export function _extend(object, config) {
+export function $$extend(object, config) {
     for (var i in config) {
         if (i) {
             if (object[i]) {
@@ -89,7 +70,44 @@ export function _extend(object, config) {
             }
         }
     }
-};
+}
+
+
+/**
+ * /解析json字符串
+ * @param  {[type]} itemArray [description]
+ * @return {[type]}           [description]
+ */
+export function parseJSON(itemArray) {
+    if (!itemArray) return
+    var anminJson;
+    try {
+        anminJson = JSON.parse(itemArray);
+    } catch (error) {
+        console.log('parseJSON失败:' + itemArray)
+    }
+    return anminJson;
+}
+
+
+export function execJson(itemArray) {
+    var json;
+    try {
+        json = (new Function("return " + itemArray))();
+    } catch (error) {
+        console.log('解析json出错' + itemArray)
+    }
+    return json;
+}
+
+
+/**
+ * 回车符处理
+ */
+export function enterReplace(str) {
+    return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
+}
+
 
 
 

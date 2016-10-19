@@ -1,4 +1,4 @@
-let dbId,onlyId
+let dbId, onlyId
 
 const TAG = 'aaron'
 const storage = window.localStorage
@@ -37,21 +37,12 @@ const filter = function(key) {
     return key + onlyId;
 };
 
-/**
- * *按索引值获取存储项的key
- * @param  {[type]} index [description]
- * @return {[type]}       [description]
- */
-export function _key(index) { //本地方法
-    return storage.key(index);
-};
 
-
-var set = function name(key, val) {
+const set = function name(key, val) {
     var setkey;
 
     //ipad ios8.3setItem出问题
-    function set(key, val) {
+    function setItem(key, val) {
         try {
             storage.setItem(key, val);
         } catch (e) {
@@ -63,53 +54,64 @@ var set = function name(key, val) {
         for (var i in key) {
             if (key.hasOwnProperty(i)) {
                 setkey = filter(i);
-                set(setkey, key[i])
+                setItem(setkey, key[i])
             }
         }
     } else {
         key = filter(key);
-        set(key, val);
+        setItem(key, val);
     }
 }
 
-var get = function(key) {
+const get = function(key) {
     key = filter(key);
     return storage.getItem(key) || undefined
 }
+
+
+/**
+ * *按索引值获取存储项的key
+ * @param  {[type]} index [description]
+ * @return {[type]}       [description]
+ */
+export function _key(index) { //本地方法
+    return storage.key(index);
+}
+
 
 /**
  * 设置localStorage
  * @param {[type]} key [description]
  * @param {[type]} val [description]
  */
-export {set as _set }
+export {set as $$set }
 
 /**
  * 获取localstorage中的值
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export {get as _get }
+export {get as $$get }
 
 /**
  * 删除localStorage中指定项
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export function _remove(key) {
+export function $$remove(key) {
     key = filter(key);
     storage.removeItem(key);
-};
+}
 
 /**
  * 序列化
  * @return {[type]} [description]
  */
-export function _fetch() {
+export function $$fetch() {
     return JSON.parse(get(name || TAG) || '[]');
 }
 
 
-export function _save(name, val) {
+export function $$save(name, val) {
     set(name || TAG, JSON.stringify(val));
 }

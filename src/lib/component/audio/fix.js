@@ -1,4 +1,7 @@
-import { bindEvent, offEvent } from '../../util/event'
+import {
+    $$on,
+    $$off
+} from '../../util/dom'
 
 /**
  * audio对象下标
@@ -23,13 +26,9 @@ export function fixAudio(obj, key, access) {
             audio.play()
             audioes.push(audio)
         }
-        offEvent(document, {
-            start: start
-        })
+        $$off(document, { start })
     }
-    bindEvent(document, {
-        start: start
-    })
+    $$on(document, { start })
 }
 
 

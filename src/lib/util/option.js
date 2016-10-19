@@ -1,5 +1,5 @@
 import { request } from './loader'
-import { parseJSON } from './dom'
+import { parseJSON } from './lang'
 import { messageBox as box } from './notice'
 import { config } from '../config/index'
 

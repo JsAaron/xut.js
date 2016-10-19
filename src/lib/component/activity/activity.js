@@ -206,21 +206,12 @@ export default class Activity {
          */
         const makeBindLinkFunction = function(contentNode) {
 
-            var prePocess = self.makePrefix('Content', scope.pid, scope.id),
-                preEle = self.getContextNode(prePocess)
-
-            //重置元素的翻页处理
-            // defaultBehavior(preEle);
-
             //ios or pc
             if (!Xut.plat.isAndroid) {
                 return function() {
                     self.iscroll = new iScroll(contentNode, {
                         scrollbars: true,
                         fadeScrollbars: true
-                            //click          : true,
-                            //tap            : true,
-                            //probeType      : 2
                     })
                 }
             }
@@ -228,11 +219,14 @@ export default class Activity {
             //在安卓上滚动文本的互斥不显示做一个补丁处理
             //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
             //如果是显示的,则不需要处理,
-            var visible = preEle.css('visibility'),
-                restore = function() {};
+            let prePocess = self.makePrefix('Content', scope.pid, scope.id)
+            let preEle = self.getContextNode(prePocess)
+            let visible = preEle.css('visibility')
+            let restore = function() {}
+            let opacity
 
             if (visible == 'hidden') {
-                var opacity = preEle.css('opacity');
+                opacity = preEle.css('opacity');
                 //如果设置了不透明,则简单设为可见的
                 //否则先设为不透明,再设为可见
                 if (opacity == 0) {
@@ -268,10 +262,8 @@ export default class Activity {
         }
 
         const bindIscroll = () => {
-            //去掉高度，因为有滚动文本框
-            $contentNode.children().css('height', '')
-                //增加元素溢出隐藏处理
-            $contentNode.css('overflow', 'hidden')
+            $contentNode.css('overflow', 'hidden') //增加元素溢出隐藏处理
+            $contentNode.children().css('height', '') //去掉子元素高度，因为有滚动文本框
             this.relatedCallback.iscrollHooks.push(makeBindLinkFunction($contentNode[0]))
         }
 

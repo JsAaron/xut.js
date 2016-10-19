@@ -1,6 +1,6 @@
-import Sprite from '../../../plugin/internal/sprite'
-import { parseJSON } from '../../../util/dom'
-import { config } from '../../../config/index'
+import Sprite from '../../../../plugin/internal/sprite'
+import { parseJSON } from '../../../../util/lang'
+import { config } from '../../../../config/index'
 
 let spiritObjs = {}
 

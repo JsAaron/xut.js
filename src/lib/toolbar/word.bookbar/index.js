@@ -1,6 +1,6 @@
 import BookMark from './mark'
 import { parseJSON } from '../../util/index'
-import { bindEvent } from '../../util/event'
+import { $$on } from '../../util/dom'
 import Bar from '../base/bar'
 /**
  * 阅读模式工具栏
@@ -60,7 +60,7 @@ export default class BookBar extends Bar {
         }
 
         //监听事件
-        bindEvent(this.$sceneNode[0], {
+        $$on(this.$sceneNode[0], {
             end: this
         })
     }

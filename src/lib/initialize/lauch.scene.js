@@ -1,8 +1,8 @@
 import { config } from '../config/index'
 
 import {
-    _set,
-    _get,
+    $$set,
+    $$get,
     execScript,
     toEmpty
 }
@@ -16,7 +16,7 @@ from '../util/index'
 const setDataToStorage = (parameter) => {
     config.pageIndex = parameter.pageIndex;
     config.novelId   = parameter.novelId;
-    _set({
+    $$set({
         "pageIndex" : parameter.pageIndex,
         "novelId"   : parameter.novelId
     });

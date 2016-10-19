@@ -11,8 +11,8 @@
 
 import { loader } from './loader'
 import { createData } from './data'
-import AdvSprite from './advsprite'
-
+import AdvSprite from './extend/adv.sprite'
+import ScrollArea from './extend/scroll.area'
 
 /**
  * 解析数据,获取content对象
@@ -59,12 +59,20 @@ export default class PageWidget {
      * @return {[type]} [description]
      */
     _init() {
+
+        //滚动区域
+        if (this.widgetId == 60 && this.widgetName == "scrollarea") {
+            var arg = this._getOptions()
+            this.pageObj = new ScrollArea(arg[0], arg[1])
+        }
         //Load the localized code first
         //Combined advanced Sprite
-        if (this.widgetId == "72" && this.widgetName == "spirit") {
+        else if (this.widgetId == 72 && this.widgetName == "spirit") {
             var arg = this._getOptions()
             this.pageObj = AdvSprite(arg[0], arg[1])
-        } else {
+        }
+        //直接扩展加载
+        else {
             //If there is no
             if (typeof window[this.widgetName + "Widget"] != "function") {
                 loader(this._executive, this)
@@ -104,7 +112,7 @@ export default class PageWidget {
      * @return {[type]} [description]
      */
     dispatchProcess() {
-        this.pageObj.toggle();
+        this.pageObj && this.pageObj.toggle && this.pageObj.toggle();
     }
 
 
@@ -127,9 +135,7 @@ export default class PageWidget {
      * @return {[type]} [description]
      */
     destroy() {
-        if (this.pageObj && this.pageObj.destroy) {
-            this.pageObj.destroy();
-        }
+        this.pageObj && this.pageObj.destroy && this.pageObj.destroy();
     }
 
 }

@@ -1,7 +1,7 @@
 import { createStore } from '../database/index'
 import { contentFilter } from '../component/activity/filter'
 import { config } from '../config/index'
-import { _set } from '../util/index'
+import { $$set } from '../util/index'
 
 
 /**
@@ -53,7 +53,7 @@ const initDefaults = (setData) => {
     config.appUUID = data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.adUpdateTime;
 
     //缓存应用ID
-    _set({
+    $$set({
         'appId': data.appId
     });
 

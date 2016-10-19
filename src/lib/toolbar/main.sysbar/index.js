@@ -18,10 +18,10 @@ import {
 
 import {
     hash,
-    handle,
-    bindEvent,
-    offEvent,
-    eventTarget
+    $$on,
+    $$off,
+    $$handle,
+    $$target
 } from '../../util/index'
 
 
@@ -110,7 +110,7 @@ export default class sysBar extends Bar {
         this.curTips = $controlNode.find('.control-current-page')
 
         //事件
-        bindEvent(this.eventElement, {
+        $$on(this.eventElement, {
             start: this
         })
     }
@@ -121,9 +121,9 @@ export default class sysBar extends Bar {
      * @return {[type]}   [description]
      */
     handleEvent(e) {
-        handle({
+        $$handle({
             start(e) {
-                switch (eventTarget(e).className) {
+                switch ($$target(e).className) {
                     //跳主页
                     case "xut-control-backhome":
                         goHomePage();
@@ -260,7 +260,7 @@ export default class sysBar extends Bar {
         this.navbarObj && this.navbarObj.destroy()
 
         //解除事件
-        offEvent(this.eventElement, {
+        $$off(this.eventElement, {
             start: this
         })
 

@@ -7,7 +7,7 @@ import { Abstract } from './abstract'
 import { Pagebase } from '../../pagebase/pagebase'
 import { addEdges } from '../../util/edge'
 import { removeVideo } from '../../component/video/manager'
-import { execScript, extend } from '../../util/index'
+import { execScript } from '../../util/index'
 
 import {
     suspend as _suspend,

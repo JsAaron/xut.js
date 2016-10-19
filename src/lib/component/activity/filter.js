@@ -1,8 +1,8 @@
 import {
-    _set,
-    _get,
-    _remove,
-    _save,
+    $$set,
+    $$get,
+    $$remove,
+    $$save,
     parseJSON,
     hash
 }
@@ -28,11 +28,11 @@ export function contentFilter(filterName) {
     }();
 
     function setCache(listFilters) {
-        _save(filterName, listFilters)
+        $$save(filterName, listFilters)
     }
 
     function getCache() {
-        var jsonStr = _get(filterName);
+        var jsonStr = $$get(filterName);
         return parseJSON(jsonStr);
     }
 
@@ -104,7 +104,7 @@ export function contentFilter(filterName) {
         },
 
         empty() {
-            _remove(filterName);
+            $$remove(filterName);
             listFilters = {};
         }
     }

@@ -40,12 +40,12 @@ import {
 } from './initialize/lauch.cursor'
 
 import {
-    _set,
-    _get,
-    _remove,
+    $$set,
+    $$get,
+    $$remove,
     hash,
     toNumber,
-    _extend,
+    $$extend,
     messageBox
 }
 from './util/index'
@@ -63,13 +63,13 @@ Xut.Assist = hash()
  * @param  {[type]} name [description]
  * @return {[type]}      [description]
  */
-const getStorage = (name) => parseInt(_get(name))
+const getStorage = (name) => parseInt($$get(name))
 
 
 /**
  * 忙碌光标
  * */
-_extend(View, {
+$$extend(View, {
     ShowBusy,
     HideBusy,
     ShowTextBusy
@@ -81,7 +81,7 @@ let repeatClick = false;
 /**
  * 场景
  * */
-_extend(View, {
+$$extend(View, {
 
     /**
      * 关闭场景
@@ -270,7 +270,7 @@ _extend(View, {
         //主场景判断（第一个节,因为工具栏的配置不同）
         if (options.main || sceneController.mianId === seasonId) {
             //清理缓存
-            _remove("history");
+            $$remove("history");
             //确定主场景
             sceneController.mianId = seasonId;
             //是否主场景
@@ -286,7 +286,7 @@ _extend(View, {
 /**
  * 行为
  * */
-_extend(View, {
+$$extend(View, {
     /**
      * 通过插件打开一个新view窗口
      */
@@ -304,7 +304,7 @@ _extend(View, {
 /**
  * content
  * */
-_extend(Contents, {
+$$extend(Contents, {
 
     //存在文档碎片
     //针对音频字幕增加的快捷查找
@@ -468,7 +468,7 @@ let backstage = 0
 let appState = false
 
 
-_extend(Application, {
+$$extend(Application, {
 
     /**
      * 后台运行
@@ -561,7 +561,7 @@ _extend(Application, {
         if (window.DUKUCONFIG) {
             //外部回调通知
             if (window.DUKUCONFIG.iframeDrop) {
-                var appId = _get('appId');
+                var appId = $$get('appId');
                 window.DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
             }
             window.DUKUCONFIG = null;
@@ -626,7 +626,7 @@ _extend(Application, {
 
 
 
-_extend(Application, {
+$$extend(Application, {
 
     /**
      * 启动应用
@@ -715,10 +715,10 @@ window.XXTAPI = {
      */
     ReadVar(variable, defaultValue) {
         var temp;
-        if (temp = _get(variable)) {
+        if (temp = $$get(variable)) {
             return temp;
         } else {
-            _set(variable, defaultValue);
+            $$set(variable, defaultValue);
             return defaultValue;
         }
     },
@@ -727,7 +727,7 @@ window.XXTAPI = {
      * 将变量的值保存起来
      */
     SaveVar(variable, value) {
-        _set(variable, value)
+        $$set(variable, value)
     },
 
     /*
@@ -735,7 +735,7 @@ window.XXTAPI = {
      *对于全局变量，这个函数将是主要使用的，替代简单的“=”赋值
      */
     SetVar(variable, value) {
-        _set(variable, value)
+        $$set(variable, value)
     }
 
 }

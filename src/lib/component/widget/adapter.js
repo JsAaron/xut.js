@@ -7,7 +7,7 @@
  *
  * *******************************************************************/
 import { sceneController } from '../../scenario/controller'
-import { parseJSON } from '../../util/dom'
+import { parseJSON } from '../../util/lang'
 import { config } from '../../config/index'
 import pageWidget from './page/index'
 import iframeWidget from './iframe/index'

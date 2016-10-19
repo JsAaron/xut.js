@@ -1,4 +1,4 @@
-﻿//Pre initialized
+//Pre initialized
 import { config } from './config/index'
 import { api } from './global.api'
 import { AudioManager } from './component/audio/manager'
@@ -59,9 +59,9 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
 
     //基本结构
     //默认背景图
-    const cover = window.DYNAMICCONFIGT.resource
-        ? window.DYNAMICCONFIGT.resource
-        + '/gallery/cover.jpg' : './content/gallery/cover.jpg'
+    const cover = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource
+            ? window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg'
+            : './content/gallery/cover.jpg'
     const commonHTML =
         `<div class="xut-removelayer" style="background-image: url(${cover});"></div>
          <div class="xut-start-page xut-fullscreen"></div>

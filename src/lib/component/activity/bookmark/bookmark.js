@@ -5,12 +5,12 @@
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
 
-import { bindEvent } from '../../../util/event'
+import { $$on } from '../../../util/dom'
 
 import {
-    _set,
-    _get,
-    _remove
+    $$set,
+    $$get,
+    $$remove
 }
 from '../../../util/stroage'
 
@@ -48,7 +48,7 @@ BookMark.prototype.init = function() {
     BOOKCACHE = this.getHistory();
 
     //邦定用户事件
-    bindEvent(dom, {
+    $$on(dom, {
         end: this
     })
 }
@@ -116,7 +116,7 @@ BookMark.prototype.getMarkId = function(seasonId, pageId) {
  * @return {[type]} [description]
  */
 BookMark.prototype.getHistory = function() {
-    var mark = _get('bookMark');
+    var mark = $$get('bookMark');
     if (mark) {
         return mark.split(',');
     }
@@ -138,7 +138,7 @@ BookMark.prototype.addBookMark = function() {
         return;
     }
     BOOKCACHE.push(key)
-    _set('bookMark', BOOKCACHE);
+    $$set('bookMark', BOOKCACHE);
 }
 
 /**
@@ -163,10 +163,10 @@ BookMark.prototype.delBookMark = function(target) {
         index = BOOKCACHE.indexOf(key);
 
     BOOKCACHE.splice(index, 1);
-    _set('bookMark', BOOKCACHE);
+    $$set('bookMark', BOOKCACHE);
 
     if (BOOKCACHE.length == 0) {
-        _remove('bookMark');
+        $$remove('bookMark');
     }
 
     //移除该行
@@ -201,7 +201,7 @@ BookMark.prototype.viewBookMark = function(target) {
 BookMark.prototype.iconManager = function(target) {
     var $icon = this.bookMarkIcon = $(target),
         restore = this.iconRestore;
-console.log(Xut.style)
+    console.log(Xut.style)
     $icon.css({
         'transform': 'scale(1.2)',
         'transition-duration': '500ms'
@@ -321,7 +321,7 @@ BookMark.prototype.restore = function() {
  */
 BookMark.prototype.destroy = function() {
     var dom = this.parent[0]
-    
+
     dom.removeEventListener('touchend', this, false);
     dom.removeEventListener('mouseup', this, false);
 

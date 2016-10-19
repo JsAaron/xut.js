@@ -1,7 +1,7 @@
 import {
-    bindEvent,
-    offEvent
-} from '../../../util/event'
+    $$on,
+    $$off
+} from '../../../util/dom'
 
 /**
  * ie10下面mouse事件怪异
@@ -88,7 +88,7 @@ export function simpleEvent(eventContext, eventHandle, supportSwipe) {
         eventContext.addEventListener('click', end, false);
     } else {
 
-        bindEvent(eventContext, {
+        $$on(eventContext, {
             start: start,
             move: move,
             end: end
@@ -101,7 +101,7 @@ export function simpleEvent(eventContext, eventHandle, supportSwipe) {
                 if (isIE10) {
                     eventContext.removeEventListener('click', end, false);
                 } else {
-                    offEvent(eventContext, {
+                    $$off(eventContext, {
                         start: start,
                         move: move,
                         end: end

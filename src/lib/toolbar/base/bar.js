@@ -2,9 +2,8 @@ import { config } from '../../config/index'
 
 import {
     hash,
-    bindEvent,
-    offEvent,
-    eventTarget
+    $$on,
+    $$off
 } from '../../util/index'
 
 const isIOS = Xut.plat.isIOS

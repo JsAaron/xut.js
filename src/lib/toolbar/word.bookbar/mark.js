@@ -4,12 +4,12 @@
  * @param options object
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
-import { bindEvent } from '../../util/event'
 import { config } from '../../config/index'
 import {
-    _set,
-    _get,
-    _remove
+    $$on,
+    $$set,
+    $$get,
+    $$remove
 }
 from '../../util/index'
 
@@ -66,7 +66,7 @@ export default class Mark {
         BOOKCACHE = this.getHistory();
 
         //邦定用户事件
-        bindEvent(dom, {
+        $$on(dom, {
             end: this
         })
     }
@@ -143,7 +143,7 @@ export default class Mark {
      * @return {[type]} [description]
      */
     getHistory() {
-        var mark = _get('bookMark');
+        var mark = $$get('bookMark');
         if (mark) {
             return mark.split(',');
         }
@@ -166,7 +166,7 @@ export default class Mark {
             return;
         }
         BOOKCACHE.push(key)
-        _set('bookMark', BOOKCACHE);
+        $$set('bookMark', BOOKCACHE);
     }
 
 
@@ -193,10 +193,10 @@ export default class Mark {
             index = BOOKCACHE.indexOf(key);
 
         BOOKCACHE.splice(index, 1);
-        _set('bookMark', BOOKCACHE);
+        $$set('bookMark', BOOKCACHE);
 
         if (BOOKCACHE.length == 0) {
-            _remove('bookMark');
+            $$remove('bookMark');
         }
 
         //移除该行
