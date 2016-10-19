@@ -7,11 +7,14 @@ import { config } from '../config/index'
 
 const isIOS = Xut.plat.isIOS
 
+const closeScenario = function() {
+    Xut.View.CloseScenario()
+}
+
 export default class fnBar extends Bar {
 
     constructor({
         pageMode,
-        id,
         sceneNode,
         toolType,
         pageTotal,
@@ -29,14 +32,10 @@ export default class fnBar extends Bar {
 
         //options
         this.pageMode = pageMode;
-        this.id = id;
         this.$sceneNode = sceneNode;
         this.toolType = toolType;
         this.pageTotal = pageTotal;
         this.currentPage = currentPage;
-        this.closeScenario = function() {
-            Xut.View.CloseScenario()
-        }
 
         this._initTool();
     }
@@ -74,7 +73,7 @@ export default class fnBar extends Bar {
                     this._createCloseIcon();
                     break;
                 case 3:
-                    this._createBackIcon($sceneNode);
+                    this._createBackIcon();
                     break;
                 case 4:
                     this._createPageTips();
@@ -92,6 +91,7 @@ export default class fnBar extends Bar {
         }
 
         $sceneNode.show();
+
     }
 
 
@@ -99,7 +99,6 @@ export default class fnBar extends Bar {
      * 系统工具栏
      */
     _createSystemBar() {
-        const id = this.id
         const height = this.super_barHeight
         let html = `<div class="xut-control-bar"
                          style="top:0;height:${this.super_iconHeight}px;padding-top:${height}px">
@@ -205,19 +204,30 @@ export default class fnBar extends Bar {
         }
     }
 
+    _onBackClose(el) {
+        el.on("mouseup touchend", e => {
+            closeScenario()
+            return false
+        })
+        return function() {
+            el.off()
+            el = null
+        }
+    }
+
     /**
      * font字体版本：关闭按钮
      * @return {[type]} [description]
      */
     _createCloseIcon() {
         const height = this.super_iconHeight;
-        let html = $(
+        const html = $(
             `<div class="si-icon xut-scenario-close icomoon icon-close" 
                 style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;text-align:center;font-size:3vh;">
             </div>`);
 
         this.$closeIcon = html;
-        this.$closeIcon.on("touchend mouseup", this.closeScenario);
+        this._onBackClose(this.$closeIcon);
         this.controlBar.push(html);
         this.$sceneNode.append(html);
     }
@@ -226,16 +236,17 @@ export default class fnBar extends Bar {
      * font字体版本：返回按钮
      * @return {[type]} [description]
      */
-    _createBackIcon($sceneNode) {
+    _createBackIcon() {
         const height = this.super_iconHeight;
         const html = $(
-                `<div class="si-icon xut-scenario-back icomoon icon-arrow-left" 
+            `<div class="si-icon xut-scenario-back icomoon icon-arrow-left" 
                   style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;">
-            </div>`)
+            </div>`);
+
         this.$backIcon = html;
-        this.$backIcon.on("touchend mouseup", this.closeScenario);
+        this._onBackClose(this.$backIcon);
         this.controlBar.push(html);
-        $sceneNode.append(html);
+        this.$sceneNode.append(html);
     }
 
     /**

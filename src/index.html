@@ -47,9 +47,26 @@
     <script src="lib/plugin/animate/throwprops.min.js"></script>
     <link rel="stylesheet" href="css/common.css" type="text/css" />
     <link href="css/video-js.css" rel="stylesheet">
+    <style type="text/css">
+    .bt1 {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 9999999999
+    }
+    
+    .bt2 {
+        position: absolute;
+        left: 50px;
+        top: 0;
+        z-index: 9999999999
+    }
+    </style>
 </head>
 
 <body>
+    <button class="bt1">点击</button>
+    <button class="bt2">销毁</button>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
@@ -60,13 +77,31 @@ Xut.Application.setConfig = {
     lauchMode: 1 //启动模式
 }
 
-const appid = 203
-Xut.Application.Launch({
-    el: '#xxtppt-app-container',
-    paths: {
-        resource: 'content/' + appid,
-        database: 'content/' + appid + '/SQLResult.js'
-    },
-    cursor: false
-});
+let appid = 203
+let length = 0
+let max = appid + length
+
+const Launch = function() {
+    Xut.Application.Launch({
+        el: '#xxtppt-app-container',
+        paths: {
+            resource: 'content/' + appid,
+            database: 'content/' + appid + '/SQLResult.js'
+        }
+    });
+}
+
+$(".bt1").click(function() {
+    if (appid > max) {
+        appid = max - length
+    }
+    ++appid
+    Launch()
+})
+
+$(".bt2").click(function() {
+    Xut.Application.Destroy(function() {
+        console.log('销毁完毕')
+    })
+})
 </script>

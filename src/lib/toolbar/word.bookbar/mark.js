@@ -7,6 +7,9 @@
 import { config } from '../../config/index'
 import {
     $$on,
+    $$off,
+    $$handle,
+    $$target,
     $$set,
     $$get,
     $$remove
@@ -294,40 +297,44 @@ export default class Mark {
      * @param  {[type]} evt [事件]
      * @return {[type]}     [description]
      */
-    handleEvent(evt) {
-        var target = evt.target;
-        switch (target.className) {
-            //加入书签
-            case 'xut-bookmark-add':
-                this.addBookMark();
-                this.iconManager(target);
-                break;
-                //显示书签记录
-            case 'xut-bookmark-view':
-                this.viewBookMark(target);
-                this.iconManager(target);
-                break;
-                //关闭书签
-            case 'xut-bookmark-off':
-            case 'xut-bookmark-off icomoon icon-chevron-down':
-                this.closeBookMark(target);
-                break;
-                //返回书签主菜单
-            case 'xut-bookmark-back':
-                this.backBookMark();
-                break;
-                //删除书签记录
-            case 'xut-bookmark-del':
-                this.delBookMark(target);
-                break;
-                //跳转到书签页
-            case 'xut-bookmark-id':
-                this.goBookMark(target);
-                break;
-            default:
-                //console.log(target.className)
-                break;
-        }
+    handleEvent(e) {
+        var target = e.target;
+        $$handle({
+            end(e) {
+                switch ($$target(e).className) {
+                    //加入书签
+                    case 'xut-bookmark-add':
+                        this.addBookMark();
+                        this.iconManager(target);
+                        break;
+                        //显示书签记录
+                    case 'xut-bookmark-view':
+                        this.viewBookMark(target);
+                        this.iconManager(target);
+                        break;
+                        //关闭书签
+                    case 'xut-bookmark-off':
+                    case 'xut-bookmark-off icomoon icon-chevron-down':
+                        this.closeBookMark(target);
+                        break;
+                        //返回书签主菜单
+                    case 'xut-bookmark-back':
+                        this.backBookMark();
+                        break;
+                        //删除书签记录
+                    case 'xut-bookmark-del':
+                        this.delBookMark(target);
+                        break;
+                        //跳转到书签页
+                    case 'xut-bookmark-id':
+                        this.goBookMark(target);
+                        break;
+                    default:
+                        //console.log(target.className)
+                        break;
+                }
+            }
+        }, this, e)
 
     }
 
@@ -362,8 +369,9 @@ export default class Mark {
     destroy() {
         var dom = this.parent[0]
 
-        dom.removeEventListener('touchend', this, false);
-        dom.removeEventListener('mouseup', this, false);
+        $$off(dom, {
+                end: this
+            })
 
         //菜单部分
         if (this.bookMarkMenu) {

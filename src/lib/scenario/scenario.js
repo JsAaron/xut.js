@@ -189,7 +189,6 @@ export class SceneFactory {
             barConfig = pDeputyBar(this.barInfo, pageTotal)
             if (_.some(barConfig.toolType)) {
                 this.deputyToolbar = new DeputyBar({
-                    id: scenarioId,
                     sceneNode: $rootNode,
                     toolType: barConfig.toolType,
                     pageTotal: pageTotal,
@@ -373,7 +372,6 @@ export class SceneFactory {
             //正常加载
             vm.$init();
         }
-
     }
 
 

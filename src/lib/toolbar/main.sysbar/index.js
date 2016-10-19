@@ -12,8 +12,7 @@ import {
     createTitle,
     createPageNumber,
     createHideToolbar,
-    createCloseIcon,
-    createCloseIconFont
+    createCloseIcon
 } from './str.conf'
 
 import {
@@ -95,7 +94,7 @@ export default class sysBar extends Bar {
 
         //关闭子文档
         if (setting.CloseBut) {
-            html += createCloseIconFont(iconHeight);
+            html += createCloseIcon(iconHeight);
         }
 
         //页码数

@@ -94,35 +94,13 @@ export function createHideToolbar(height) {
             </div>`
 }
 
-/**
- * 关闭子文档按钮
- * @param  {[type]} bar [description]
- * @return {[type]}     [description]
- */
-export function createCloseIcon(height) {
-    return `<div class="si-icon"
-                 data-icon-name="close"
-                 style="float:right;margin-right:4px;width:${height}px;height:${height}px">
-            </div>`
-
-    // this.super_createSVGIcon(html[0],
-    //     function() {
-    //         if (window.SUbDOCCONTEXT) {
-    //             window.SUbDOCCONTEXT.Xut.publish('subdoc:dropApp');
-    //         } else {
-    //             Xut.publish('magazine:dropApp');
-    //         }
-    //     }
-    // );
-}
-
 
 /**
  * 关闭子文档按钮(font字体版本)
  * @param  {[type]} height [description]
  * @return {[type]}        [description]
  */
-export function createCloseIconFont(height) {
+export function createCloseIcon(height) {
     return `<div class="si-icon icomoon icon-close"
                  style="float:right;margin-right:4px;width:${height}px;height:${height}px">
             </div>`

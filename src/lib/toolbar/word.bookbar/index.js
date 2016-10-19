@@ -1,6 +1,6 @@
 import BookMark from './mark'
 import { parseJSON } from '../../util/index'
-import { $$on } from '../../util/dom'
+import { $$on, $$off, $$handle, $$target } from '../../util/dom'
 import Bar from '../base/bar'
 /**
  * 阅读模式工具栏
@@ -395,7 +395,6 @@ export default class BookBar extends Bar {
             this.selectedChild.className = 'xut-book-menu-item';
         }
         element = element || this.menu.querySelectorAll('li')[1].children[0];
-        
         element.className = 'select';
         this.selectedChild = element;
     }
@@ -455,45 +454,46 @@ export default class BookBar extends Bar {
 
 
     /**
-     * 事件处理
+     * 相应事件
+     * @param  {[type]} e [description]
+     * @return {[type]}   [description]
      */
     handleEvent(e) {
-
         var target = e.target || e.srcElement;
-
-        var name = target.className;
-
-        switch (name) {
-            case 'icomoon icon-angle-left icon-book-bar':
-                this.goBack();
-                //返回
-                break;
-            case 'icomoon icon-th-list2':
-            case 'xut-book-dirFont':
-                //目录
-                this.showDirMenu();
-                break;
-            case 'icomoon icon-bookmark2':
-            case 'xut-book-markFont':
-                //书签
-                this.showBookMark();
-                break;
-            case 'xut-book-bar-star':
-                //评分
-                break;
-            case 'xut-book-menu-item':
-                //跳转
-                this.turnToPage(target);
-                break;
-            case 'xut-book-menu-mask':
-            case 'select':
-                this.hideDirMenu();
-                break;
-            default:
-                // console.log(name+':undefined')
-                break;
-        }
-
+        $$handle({
+            end(e) {
+                switch ($$target(e).className) {
+                    case 'icomoon icon-angle-left icon-book-bar':
+                        this.goBack();
+                        //返回
+                        break;
+                    case 'icomoon icon-th-list2':
+                    case 'xut-book-dirFont':
+                        //目录
+                        this.showDirMenu();
+                        break;
+                    case 'icomoon icon-bookmark2':
+                    case 'xut-book-markFont':
+                        //书签
+                        this.showBookMark();
+                        break;
+                    case 'xut-book-bar-star':
+                        //评分
+                        break;
+                    case 'xut-book-menu-item':
+                        //跳转
+                        this.turnToPage(target);
+                        break;
+                    case 'xut-book-menu-mask':
+                    case 'select':
+                        this.hideDirMenu();
+                        break;
+                    default:
+                        // console.log(name+':undefined')
+                        break;
+                }
+            }
+        }, this, e)
     }
 
     /**
@@ -502,9 +502,9 @@ export default class BookBar extends Bar {
     destroy() {
         this.iscroll && this.iscroll.destroy();
         this.bookMark && this.bookMark.destroy();
-        var ele = this.$sceneNode[0];
-        ele.removeEventListener('touchend', this, false);
-        ele.removeEventListener('mouseup', this, false);
+        $$off(this.$sceneNode[0], {
+            end: this
+        })
         this.iscroll = null;
         this.menu = null;
         this.page = null;

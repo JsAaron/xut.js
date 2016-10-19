@@ -454,6 +454,16 @@ Application.Notify = function(event, options) {
 }
 
 /**
+ * 注册初始化完成
+ * @return {[type]}   [description]
+ */
+let initComplete = false
+Xut.Application.Watch('initComplete', function() {
+    initComplete = true
+    Application.Notify('initDestroy') //如果在没完成就注册了
+})
+
+/**
  * 后台运行
  * @type {Number}
  */
@@ -485,7 +495,8 @@ $$extend(Application, {
      */
     Original() {
         backstage = 1
-            //传递一个完全关闭的参数
+
+        //传递一个完全关闭的参数
         suspend('', '', true);
         original();
     },
@@ -503,9 +514,23 @@ $$extend(Application, {
     /**
      * 销毁应用
      */
-    Destroy() {
-        __app__.$off()
-        globalDestroy('destroy')
+    Destroy(callback) {
+        //如果提供回调
+        //就需要监听销毁的正确性
+        if (callback) {
+            if (initComplete) {
+                globalDestroy('destroy')
+                callback()
+            } else {
+                //如果没完成，注册完成
+                Application.Watch('initDestroy', () => {
+                    globalDestroy('destroy')
+                    callback()
+                })
+            }
+        } else {
+            globalDestroy('destroy')
+        }
     },
 
     /**
@@ -541,6 +566,8 @@ $$extend(Application, {
          * @return {[type]} [description]
          */
         let destroy = () => {
+            __app__.$off()
+
             //销毁内存对象
             Application.Destroy();
             window.GLOBALCONTEXT = null;
