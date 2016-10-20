@@ -13,16 +13,16 @@
  *                                      *
  ******************************************/
 
-import Contents from './content'
-import Tasks from './task'
-import { destroyContentEvent } from './event/event'
-
 import textBoxMixin from './textbox/index'
 import bookMarkMixin from './bookmark/index'
 import searchBarMixin from './searchbar/index'
 import eventMixin from './event/index'
 
 import { hasAudioes } from '../audio/fix'
+import { destroyContentEvent } from './event/event'
+
+import createContent from './content/index'
+import createTask from './task'
 
 /**
  * 处理拖动对象
@@ -54,7 +54,7 @@ export default class Activity {
          * 任务必须等待context上下创建
          * context就是pixi的直接对象，精灵..都是异步的
          */
-        this.nextTask = Tasks(this.noticeComplete)
+        this.nextTask = createTask(this.noticeComplete)
 
         /**
          * 填充事件数据
@@ -65,7 +65,7 @@ export default class Activity {
          * 保存子对象content
          * @type {Array}
          */
-        this.abstractContents = Contents(this);
+        this.abstractContents = createContent(this);
 
         /**
          * 处理html文本框
@@ -413,7 +413,7 @@ export default class Activity {
      * @return {[type]}             [description]
      * evenyClick 每次都算有效点击
      */
-    runEffects(outComplete, evenyClick) {
+    runAnimation(outComplete, evenyClick) {
 
         let self = this
         let pageId = this.relatedData.pageId
@@ -532,7 +532,7 @@ export default class Activity {
      * 停止动画
      * @return {[type]} [description]
      */
-    stopEffects() {
+    stopAnimation() {
         var pageId = this.relatedData.pageId;
         this.runState = false;
         this.eachAssistContents(function(scope) {
@@ -546,7 +546,7 @@ export default class Activity {
      * 复位状态
      * @return {[type]} [description]
      */
-    resetEffects() {
+    resetAnimation() {
         this.eachAssistContents(function(scope) {
             !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
         })
@@ -560,7 +560,7 @@ export default class Activity {
      * @param  {[type]} elementCallback [description]
      * @return {[type]}                 [description]
      */
-    destroyEffects(elementCallback) {
+    destroyAnimation(elementCallback) {
         //销毁拖动对象
         accessDrop(this.eventData, function(drop) {
             drop.destroy();
@@ -582,7 +582,7 @@ export default class Activity {
     autoPlay(outComplete) {
         var eventData = this.eventData;
         if (eventData && eventData.eventName === 'auto') {
-            this.runEffects(outComplete);
+            this.runAnimation(outComplete);
         } else {
             outComplete();
         }
@@ -595,7 +595,7 @@ export default class Activity {
      */
     flipOver() {
         if (this.runState) {
-            this.stopEffects();
+            this.stopAnimation();
         }
         this.preventRepeat = false
 
@@ -625,7 +625,7 @@ export default class Activity {
      * @return {[type]} [description]
      */
     flipComplete() {
-        this.resetEffects();
+        this.resetAnimation()
     }
 
 
@@ -652,7 +652,8 @@ export default class Activity {
         }
 
         //销毁动画
-        this.destroyEffects(elementCallback);
+        this.destroyAnimation(elementCallback);
+        this.abstractContents = null
 
         //iscroll销毁
         if (this.iscroll) {
@@ -683,7 +684,7 @@ export default class Activity {
      */
     recovery() {
         if (this.runState) {
-            this.stopEffects();
+            this.stopAnimation();
             return true
         }
         return false

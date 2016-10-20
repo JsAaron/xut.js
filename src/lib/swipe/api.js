@@ -52,7 +52,7 @@ export default function api(Swipe) {
      */
     Swipe.prototype.closeSwipe = function() {
         if (!this._isMoving) {
-            this._evtDestroy()
+            this._off()
         }
     }
 
@@ -185,7 +185,7 @@ export default function api(Swipe) {
      * @return {[type]} [description]
      */
     Swipe.prototype.destroy = function() {
-        this._evtDestroy();
+        this._off();
         this.$off();
         if (this._bubbleNode) {
             this._bubbleNode.page = null

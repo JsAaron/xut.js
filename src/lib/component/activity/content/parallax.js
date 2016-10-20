@@ -2,7 +2,7 @@
  * 视觉差对象初始化操作
  */
 
-import { config } from '../../config/index'
+import { config } from '../../../config/index'
 
 const transform = Xut.style.transform
 const setTranslateZ = Xut.style.setTranslateZ
@@ -115,7 +115,7 @@ const conversionValue = function(parameters, nodeProportion) {
 }
 
 
-export function Parallax(data) {
+export default function Parallax(data) {
     let parameters
     try {
         //转化所有css特效的参数的比例
@@ -156,11 +156,11 @@ export function Parallax(data) {
                 'end': pageRange - currPageOffset + pid
             }
         },
-        'translate'       : translate,
-        'offsetTranslate' : offsetTranslate,
-        'nodeProportion'  : nodeProportion,
-        '$contentNode'    : data.$contentNode,
-        'parallaxOffset'  : parallaxOffset //经过视觉差修正后的偏移量
+        'translate': translate,
+        'offsetTranslate': offsetTranslate,
+        'nodeProportion': nodeProportion,
+        '$contentNode': data.$contentNode,
+        'parallaxOffset': parallaxOffset //经过视觉差修正后的偏移量
     }
 
     return data;

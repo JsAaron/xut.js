@@ -5,7 +5,7 @@ import DeputyBar from '../toolbar/deputy.fnbar'
 import BookBar from '../toolbar/word.bookbar/index'
 import NumberBar from '../toolbar/page.number'
 import { sceneController } from './controller'
-import { Mediator } from '../manager/mediator'
+import Mediator from '../manager/mediator'
 
 import {
     getFlowCount,

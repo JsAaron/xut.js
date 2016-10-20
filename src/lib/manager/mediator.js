@@ -16,7 +16,7 @@ import {
 } from '../util/index'
 
 import GlobalEvent from '../swipe/index.js'
-import overrideApi from '../dynamic.api'
+import setDynamicApi from '../dynamic.api'
 
 /**
  * 配置多页面参数
@@ -74,7 +74,7 @@ const preventDefault = (evtObj, target) => {
 }
 
 
-class Mediator extends Observer {
+export default class Mediator extends Observer {
 
     constructor(parameter) {
 
@@ -207,7 +207,11 @@ class Mediator extends Observer {
             }
         });
 
-        vm.$overrideApi();
+        /**
+         * 销毁接口api
+         * @type {[type]}
+         */
+        this.destoryDynamicApi = setDynamicApi(this)
     }
 
 
@@ -249,17 +253,14 @@ class Mediator extends Observer {
 }
 
 
-var medProto = Mediator.prototype
-
-
 /**
  * 是否多场景模式
  */
-defAccess(medProto, '$multiScenario', {
+defAccess(Mediator.prototype, '$multiScenario', {
     get: function() {
         return this.options.multiScenario
     }
-});
+})
 
 
 /**
@@ -270,7 +271,7 @@ defAccess(medProto, '$multiScenario', {
  *  widget 包括 视频 音频 Action 子文档 弹出口 类型
  *  这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
  */
-defAccess(medProto, '$injectionComponent', {
+defAccess(Mediator.prototype, '$injectionComponent', {
     set: function(regData) {
         var injection;
         if (injection = this.$dispatcher[regData.pageType + 'Mgr']) {
@@ -287,7 +288,7 @@ defAccess(medProto, '$injectionComponent', {
  * 得到当前的视图页面
  * @return {[type]}   [description]
  */
-defAccess(medProto, '$curVmPage', {
+defAccess(Mediator.prototype, '$curVmPage', {
     get: function() {
         return this.$dispatcher.pageMgr.abstractGetPageObj(this.$globalEvent.getHindex());
     }
@@ -320,7 +321,7 @@ defAccess(medProto, '$curVmPage', {
  *          'suspendAutoCallback': null
  *
  */
-def(medProto, '$bind', function(key, callback) {
+def(Mediator.prototype, '$bind', function(key, callback) {
     var vm = this
     vm.$watch('change:' + key, function() {
         callback.apply(vm, arguments)
@@ -332,7 +333,7 @@ def(medProto, '$bind', function(key, callback) {
  * 创建页面
  * @return {[type]} [description]
  */
-def(medProto, '$init', function() {
+def(Mediator.prototype, '$init', function() {
     this.$dispatcher.initCreate();
 });
 
@@ -341,7 +342,7 @@ def(medProto, '$init', function() {
  * 运动动画
  * @return {[type]} [description]
  */
-def(medProto, '$run', function() {
+def(Mediator.prototype, '$run', function() {
     var vm = this;
     vm.$dispatcher.pageMgr.activateAutoRuns(
         vm.$globalEvent.getHindex(), Xut.Presentation.GetPageObj()
@@ -353,7 +354,7 @@ def(medProto, '$run', function() {
  * 复位对象
  * @return {[type]} [description]
  */
-def(medProto, '$reset', function() {
+def(Mediator.prototype, '$reset', function() {
     return this.$dispatcher.pageMgr.resetOriginal(this.$globalEvent.getHindex());
 });
 
@@ -362,7 +363,7 @@ def(medProto, '$reset', function() {
  * 停止所有任务
  * @return {[type]} [description]
  */
-def(medProto, '$suspend', function() {
+def(Mediator.prototype, '$suspend', function() {
     Xut.Application.Suspend({
         skipMedia: true //跨页面不处理
     })
@@ -372,23 +373,13 @@ def(medProto, '$suspend', function() {
  * 销毁场景内部对象
  * @return {[type]} [description]
  */
-def(medProto, '$destroy', function() {
-    this.$off();
-    this.$globalEvent.destroy();
-    this.$dispatcher.destroyPageBase();
+def(Mediator.prototype, '$destroy', function() {
+    this.$off(); //观察事件
+    this.$globalEvent.destroy(); //全局事件
+    this.$dispatcher.destroyPageBase(); //派发器
     this.$dispatcher = null;
     this.$globalEvent = null;
-})
-
-/**
- * 设置所有API接口
- * @return {[type]} [description]
- */
-def(medProto, '$overrideApi', function() {
-    overrideApi(this)
+    this.destoryDynamicApi() //动态api
 })
 
 
-export {
-    Mediator
-}

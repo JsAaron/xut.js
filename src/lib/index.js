@@ -34,6 +34,14 @@ if (Xut.plat.isBrowser) {
 
 
 /**
+ * 接口接在参数
+ * 用户横竖切换刷新
+ * @type {Array}
+ */
+let lauchOptions
+
+
+/**
  * 创建基本结构
  * @return {[type]} [description]
  */
@@ -59,9 +67,7 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
 
     //基本结构
     //默认背景图
-    const cover = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource
-            ? window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg'
-            : './content/gallery/cover.jpg'
+    const cover = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource ? window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg' : './content/gallery/cover.jpg'
     const commonHTML =
         `<div class="xut-removelayer" style="background-image: url(${cover});"></div>
          <div class="xut-start-page xut-fullscreen"></div>
@@ -78,7 +84,8 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
 
     $appNode.css('z-index', 9999999)
 
-    Xut.Application.__removeNode__ = function() {
+    Xut.Application.$$removeNode = function() {
+        lauchOptions = null
         $appNode.remove()
         $rootNode = null
         $appNode = null
@@ -107,14 +114,6 @@ const loadApp = function(...arg) {
     createHTML(...arg)
 }
 
-/**
- * 接口接在参数
- * 用户横竖切换刷新
- * @type {Array}
- */
-let lauchOptions = []
-
-
 // $('body').on('dblclick', () => {
 //     Xut.Application.Refresh()
 //     loadApp()
@@ -142,8 +141,7 @@ Xut.Application.Launch = function({
     cursor
 }) {
     if (Xut.Application.setConfig.lauchMode === 1) {
-        lauchOptions.push(arguments)
-
+        (lauchOptions = []).push(arguments)
         //外部配置文件
         window.DYNAMICCONFIGT = {
             resource: paths.resource,

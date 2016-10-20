@@ -74,29 +74,24 @@ const createExistIndex = ($globalEvent) => {
 }
 
 
-export default function overrideApi(vm) {
+export default function setDynamicApi(vm) {
 
-    const $globalEvent = vm.$globalEvent
-    const options = vm.options
-    const $dispatcher = vm.$dispatcher
+    let $globalEvent = vm.$globalEvent
+    let options = vm.options
+    let $dispatcher = vm.$dispatcher
 
     //页面与母版的管理器
-    const access = createaAccess({
+    let access = createaAccess({
         page: $dispatcher.pageMgr,
         master: $dispatcher.masterMgr
     })
 
-    const isExistIndex = createExistIndex($globalEvent);
-
-    /**
-     * 数据接口
-     */
-    const Presentation = Xut.Presentation;
+    let isExistIndex = createExistIndex($globalEvent);
 
     /**
      * 获取当前页码
      */
-    Presentation.GetPageIndex = () => $globalEvent.getHindex()
+    Xut.Presentation.GetPageIndex = () => $globalEvent.getHindex()
 
     /**
      * 获取页面的总数据
@@ -108,7 +103,7 @@ export default function overrideApi(vm) {
         "Section",
         "Page"
     ], (apiName) => {
-        Presentation['GetApp' + apiName + 'Data'] = (callback) => {
+        Xut.Presentation['GetApp' + apiName + 'Data'] = (callback) => {
             var i = 0,
                 temp = [],
                 cps = Xut.data.query('app' + apiName),
@@ -125,7 +120,7 @@ export default function overrideApi(vm) {
      * 获取首页的pageId
      * @param {[type]} seasonId [description]
      */
-    Presentation.GetFirstPageId = (seasonId) => {
+    Xut.Presentation.GetFirstPageId = (seasonId) => {
         var sectionRang = Xut.data.query('sectionRelated', seasonId);
         var pageData = Xut.data.query('appPage');
         return pageData.item(sectionRang.start);
@@ -146,7 +141,7 @@ export default function overrideApi(vm) {
         "GetPageData",
         "GetPageObj"
     ], (apiName) => {
-        Presentation[apiName] = (pageType, pageIndex) => {
+        Xut.Presentation[apiName] = (pageType, pageIndex) => {
             return access((manager, pageType, pageIndex) => {
                 pageIndex = isExistIndex(pageIndex)
                 return manager["abstract" + apiName](pageIndex, pageType)
@@ -159,8 +154,8 @@ export default function overrideApi(vm) {
      * 得到页面根节点
      * li节点
      */
-    Presentation.GetPageElement = () => {
-        var obj = Presentation.GetPageObj()
+    Xut.Presentation.GetPageElement = () => {
+        var obj = Xut.Presentation.GetPageObj()
         return obj.$pageNode
     };
 
@@ -173,8 +168,8 @@ export default function overrideApi(vm) {
      * 但是每一个章节页面的索引是从0开始的
      * 区分pageIndex
      */
-    Presentation.GetPagePrefix = (pageType, pageIndex) => {
-        let pageObj = Presentation.GetPageObj(pageType, pageIndex);
+    Xut.Presentation.GetPagePrefix = (pageType, pageIndex) => {
+        let pageObj = Xut.Presentation.GetPageObj(pageType, pageIndex);
         return pageObj.pid;
     };
 
@@ -185,34 +180,27 @@ export default function overrideApi(vm) {
     /**
      * 创建一个content的命名规则
      */
-    Presentation.MakeContentPrefix = function(pageIndex) {
-        return prefix + Presentation.GetPagePrefix(pageIndex) + "_";
+    Xut.Presentation.MakeContentPrefix = function(pageIndex) {
+        return prefix + Xut.Presentation.GetPagePrefix(pageIndex) + "_";
     }
 
     /**
      * 获取命名规则
      */
-    Presentation.GetContentName = function(id) {
+    Xut.Presentation.GetContentName = function(id) {
         if (id) {
-            return prefix + Presentation.GetPagePrefix() + "_" + id;
+            return prefix + Xut.Presentation.GetPagePrefix() + "_" + id;
         } else {
-            return prefix + Presentation.GetPagePrefix()
+            return prefix + Xut.Presentation.GetPagePrefix()
         }
     }
 
-
-
-    /**
-     *  视图接口
-     * @type {[type]}
-     */
-    const View = Xut.View;
 
     /**
      * 设置页面的potion编码
      * 为分栏修改
      */
-    View.setPointer = function(pageIndex) {
+    Xut.View.setPointer = function(pageIndex) {
         $globalEvent.setPointer(pageIndex)
     }
 
@@ -222,7 +210,7 @@ export default function overrideApi(vm) {
      *   parentIndex  父索引
      *   subIndex     子索引
      */
-    View.PageUpdate = function(...arg) {
+    Xut.View.PageUpdate = function(...arg) {
         vm.$emit('change:pageUpdate', ...arg)
     }
 
@@ -231,7 +219,7 @@ export default function overrideApi(vm) {
      * 没有参数显示 工具栏与控制翻页按钮
      * 有参数单独显示指定的
      */
-    View.ShowToolBar = function(point) {
+    Xut.View.ShowToolBar = function(point) {
         vm.$emit('change:toggleToolbar', 'show', point)
     }
 
@@ -240,7 +228,7 @@ export default function overrideApi(vm) {
      * 没有参数隐藏 工具栏与控制翻页按钮
      * 有参数单独隐藏指定
      */
-    View.HideToolBar = function(point) {
+    Xut.View.HideToolBar = function(point) {
         vm.$emit('change:toggleToolbar', 'hide', point)
     }
 
@@ -257,14 +245,14 @@ export default function overrideApi(vm) {
      *
      * @return {[type]} [description]
      */
-    View.Toolbar = function(cfg) {
+    Xut.View.Toolbar = function(cfg) {
         vm.$emit('change:toggleToolbar', cfg)
     };
 
     /**
      * 跳转到上一个页面
      */
-    View.GotoPrevSlide = function(seasonId, chapterId) {
+    Xut.View.GotoPrevSlide = function(seasonId, chapterId) {
         if (seasonId && chapterId) {
             Xut.View.LoadScenario({
                 'scenarioId': seasonId,
@@ -286,7 +274,7 @@ export default function overrideApi(vm) {
     /**
      * 跳转到下一个页面
      */
-    View.GotoNextSlide = function(seasonId, chapterId) {
+    Xut.View.GotoNextSlide = function(seasonId, chapterId) {
         if (seasonId && chapterId) {
             Xut.View.LoadScenario({
                 'scenarioId': seasonId,
@@ -314,7 +302,7 @@ export default function overrideApi(vm) {
      * 文本框跳转
      * ........
      */
-    View.GotoSlide = function(seasonId, chapterId) {
+    Xut.View.GotoSlide = function(seasonId, chapterId) {
 
         //修正参数
         const fixParameter = function(pageIndex) {
@@ -352,7 +340,7 @@ export default function overrideApi(vm) {
         }
 
         //场景与场景的跳转
-        return View.LoadScenario({
+        return Xut.View.LoadScenario({
             'scenarioId': seasonId,
             'chapterId': chapterId
         })
@@ -363,7 +351,7 @@ export default function overrideApi(vm) {
      * 是否为翻页的边界
      * @return {Boolean} [description]
      */
-    View.isFlipBorderBounce = function(distance) {
+    Xut.View.isFlipBorderBounce = function(distance) {
         return $globalEvent.isBorder(distance)
     }
 
@@ -375,7 +363,7 @@ export default function overrideApi(vm) {
      * @param {[type]} direction [description]
      * @param {[type]} action    [description]
      */
-    View.MovePage = function(distance, speed, direction, action) {
+    Xut.View.MovePage = function(distance, speed, direction, action) {
 
         //如果禁止翻页模式 || 如果是滑动,不是边界
         if (!options.multiplePages ||
@@ -407,13 +395,11 @@ export default function overrideApi(vm) {
      * 1 零件
      * 2 音频动画
      */
-    const Assist = Xut.Assist;
-
     _.each([
         "Run",
         "Stop"
     ], function(apiName) {
-        Assist[apiName] = function(pageType, activityId, outCallBack) {
+        Xut.Assist[apiName] = function(pageType, activityId, outCallBack) {
             access(function(manager, pageType, activityId, outCallBack) {
                 //数组
                 if (_.isArray(activityId)) {
@@ -444,7 +430,6 @@ export default function overrideApi(vm) {
      * 针对page页面的content类型操作接口
      * @type {[type]}
      */
-    const Contents = Xut.Contents;
 
     /**
      * 获取指定的对象
@@ -454,12 +439,12 @@ export default function overrideApi(vm) {
      * @param {[type]}   contentIds  [description]
      * @param {Function} eachContext 回调遍历每一个上下文
      */
-    Contents.Get = function(pageType, contentIds, eachContext) {
+    Xut.Contents.Get = function(pageType, contentIds, eachContext) {
 
         return access(function(manager, pageType, contentIds, eachContext) {
 
             var contentObj, contentObjs,
-                pageIndex = Presentation.GetPageIndex();
+                pageIndex = Xut.Presentation.GetPageIndex();
 
             function findContent(currIndex, contentId) {
                 var pageObj;
@@ -513,7 +498,7 @@ export default function overrideApi(vm) {
      * @param  {[type]} contentId [description]
      * @return {[type]}           [description]
      */
-    Contents.GetPageWidgetData = function(pageType, contentId) {
+    Xut.Contents.GetPageWidgetData = function(pageType, contentId) {
 
         //如果没有传递pageType取默认
         if (-1 === typeFilter.indexOf(pageType)) {
@@ -533,7 +518,7 @@ export default function overrideApi(vm) {
 
         var contentDas, contents = [];
 
-        Contents.Get(pageType, contentId, function(cid, content) {
+        Xut.Contents.Get(pageType, contentId, function(cid, content) {
             //是内部对象
             if (content && (contentDas = content.contentDas)) { //通过内部管理获取对象
                 contents.push({
@@ -552,7 +537,7 @@ export default function overrideApi(vm) {
                 //如果通过内部找不到对象的content数据,则直接查找数据库
                 //可能是一个事件的钩子对象
                 if (contentDas = seekQuery(cid)) {
-                    var actName = Presentation.GetContentName(cid);
+                    var actName = Xut.Presentation.GetContentName(cid);
                     var element;
                     //如果对象是事件钩子或者是浮动对象
                     //没有具体的数据
@@ -612,7 +597,7 @@ export default function overrideApi(vm) {
         "Hide",
         "StopAnim"
     ], function(operate) {
-        Contents[operate] = function(pageType, nameList) {
+        Xut.Contents[operate] = function(pageType, nameList) {
             access(function(manager, pageType, nameList) {
                 if (typeCheck(nameList)) return;
                 var pageBaseObj;
@@ -629,19 +614,11 @@ export default function overrideApi(vm) {
 
 
     /**
-     *  Application
-     * [Application description]
-     * @type {[type]}
-     */
-    const Application = Xut.Application;
-
-
-    /**
      * 获取一个存在的实例对象
      * 区分不同层级page/master
      * 不同类型    content/widget
      */
-    Application.GetSpecifiedObject = function(pageType, data) {
+    Xut.Application.GetSpecifiedObject = function(pageType, data) {
         return access(function(manager, pageType) {
             var pageObj;
             if (pageObj = manager.abstractGetPageObj(data.pageIndex)) {
@@ -664,7 +641,7 @@ export default function overrideApi(vm) {
      * 是否翻页中
      * @return {Boolean} [description]
      */
-    Application.Swiping = function() {
+    Xut.Application.Swiping = function() {
         return $globalEvent.isMoving()
     }
 
@@ -693,11 +670,15 @@ export default function overrideApi(vm) {
         "closeSwipe",
         "openSwipe"
     ], function(operate) {
-        Application[operate] = function() {
+        Xut.Application[operate] = function() {
             $globalEvent[operate]();
         }
     })
 
-
-
+    return function() {
+        $globalEvent = null
+        $dispatcher = null
+        access = null
+        isExistIndex = null
+    }
 }

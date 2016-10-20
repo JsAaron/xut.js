@@ -21,9 +21,10 @@ import {
  * startEvent: 整个动画开始事件
  * completeEvent: 整个动画结束事件
  **/
-export class PPT {
+export default class Powepoint {
 
     constructor(pageIndex, pageType, chapterId, element, itemArray, container, hasLoop, startEvent, completeEvent) {
+
         this.screenWidth = config.viewSize.width
         this.screenHeight = config.viewSize.height
         this.container = container ? $(container) : $(document.body); //父容器(主要用于手势控制路径动画)
@@ -626,4 +627,4 @@ export class PPT {
 
 
 //动画扩展
-internal(PPT.prototype)
+internal(Powepoint.prototype)

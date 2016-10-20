@@ -9,7 +9,7 @@
  * ***************************************************/
 import contentParser from './data'
 import contentStructure from './structure/index'
-import ActivityClass from '../../../component/activity/activity'
+import ActivityClass from '../../../component/activity/index'
 
 import {
     parseJSON,

@@ -117,10 +117,10 @@ export default function(activitProto) {
                 //比如对象只是一个小范围的内的改变
                 //正负10px的移动是允许接受的
                 if (originalLeft > (newLeft - boundary) && originalLeft < (newLeft + boundary) || originalTop > (newTop - boundary) && originalTop < (newTop + boundary)) {
-                    self.runEffects();
+                    self.runAnimation();
                 }
             } else {
-                self.runEffects();
+                self.runAnimation();
             }
         }
 
@@ -185,7 +185,7 @@ export default function(activitProto) {
             //拖拽结束的处理
             stopRun: function(isEnter) {
                 if (isEnter) { //为true表示拖拽进入目标对象区域
-                    self.runEffects();
+                    self.runAnimation();
                 }
             }
         }

@@ -711,11 +711,12 @@ export default class Swipe extends Observer {
      * 销毁事件
      * @return {[type]} [description]
      */
-    _evtDestroy() {
+    _off() {
         $$off(this.container, {
             start: this,
             move: this,
             end: this,
+            cancel: this,
             transitionend: this
         })
     }

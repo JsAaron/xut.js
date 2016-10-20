@@ -54,7 +54,7 @@
         top: 0;
         z-index: 9999999999
     }
-    
+
     .bt2 {
         position: absolute;
         left: 50px;
@@ -100,8 +100,6 @@ $(".bt1").click(function() {
 })
 
 $(".bt2").click(function() {
-    Xut.Application.Destroy(function() {
-        console.log('销毁完毕')
-    })
+    Xut.Application.Destroy()
 })
 </script>

@@ -319,6 +319,18 @@ export { config }
 
 
 /**
+ * 销毁配置
+ * @return {[type]} [description]
+ */
+export function destroyConfig() {
+    cacheVideoPath = null
+    cacheAudioPath = null
+    cacheSvgPath = null
+    cacheJsWidgetPath = null
+}
+
+
+/**
  * 初始化资源路径
  * 配置图片路径地址
  * @return {[type]} [description]

@@ -8,20 +8,22 @@ export default function(baseProto) {
      */
     baseProto.baseDestroy = function() {
 
-        //清理图片缓存
-        //读库快速退出模式下报错修正
-        try {
-            this.$pageNode.hide().find('img').each(function(aaa, img) {
-                img.src = 'images/icons/clearmem.png'
-            })
-        } catch (e) {
-            console.log('销毁图片出错')
-        }
+        // //清理图片缓存
+        // //读库快速退出模式下报错修正
+        // try {
+        //     this.$pageNode.hide().find('img').each(function(aaa, img) {
+        //         img.src = 'images/icons/clearmem.png'
+        //     })
+        // } catch (e) {
+        //     console.log('销毁图片出错')
+        // }
 
         //最后一页动作处理
+        //for miaomiaoxue
         this.destroyPageAction()
 
         //2016/9/30
+        //for flow
         //销毁缩放动作
         if(this._pinchObj){
             this._pinchObj.destroy()

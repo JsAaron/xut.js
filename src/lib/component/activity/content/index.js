@@ -4,13 +4,12 @@
  * 2 视觉差作用域
  * @type {Array}
  */
-import { Effects } from './effects'
-import { Parallax } from './parallax'
+import Animation from './animation'
+import Parallax from './parallax'
 
 //2016.7.15废弃
 //pixi暂时不使用
 // import { Context } from '../pixi/context'
-
 
 /**
  * 预运行动作
@@ -163,7 +162,7 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
     /**
      * 生成子作用域对象，用于抽象处理动画,行为
      */
-    return new Effects(data);
+    return new Animation(data)
 }
 
 

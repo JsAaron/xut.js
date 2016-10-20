@@ -550,7 +550,6 @@ export default class Dispatcher {
                 setTimeout(function() {
                     $(".xut-start-page").hide().remove();
                     $(".xut-removelayer").hide().remove();
-                    Xut.Application.Notify('initComplete') //初始化完成
                 }, 0)
                 break;
             case 'toPage':

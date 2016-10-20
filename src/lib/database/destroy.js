@@ -1,12 +1,19 @@
 import { removeResults } from './results'
 import { removeCache } from './cache'
 
+
 /**
- * 数据销毁
+ * 销毁缓存
  */
-export default function Destroy(isRefresh) {
-    if (!isRefresh) {
-        removeResults() //json database
-    }
+export function destroyCache(isRefresh) {
     removeCache() //userCache
+}
+
+/**
+ * 销毁结果集
+ * @param  {Boolean} isRefresh [description]
+ * @return {[type]}            [description]
+ */
+export function destroyResult(isRefresh) {
+    removeResults() //json database
 }

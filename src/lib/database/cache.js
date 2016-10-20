@@ -32,17 +32,6 @@ let errortables
 
 
 /**
- * 销毁数据
- * @return {[type]} [description]
- */
-export function removeCache() {
-    dataCache = null
-    sectionRelated = null
-    videoActivityIdCache = null
-    errortables = null
-}
-
-/**
  * 错误表
  * @return {[type]} [description]
  */
@@ -61,6 +50,18 @@ export function saveCache(results, collectError) {
 
     //数据结果集
     Xut.data = dataCache = results
+}
+
+
+/**
+ * 销毁数据
+ * @return {[type]} [description]
+ */
+export function removeCache() {
+    dataCache = null
+    sectionRelated = null
+    videoActivityIdCache = null
+    Xut.data = null
 }
 
 /**

@@ -1,5 +1,5 @@
-import css3 from '../../../plugin/internal/css3'
-import keyframe from '../../../plugin/internal/keyframe'
+import css3 from '../../../../plugin/internal/css3'
+import keyframe from '../../../../plugin/internal/keyframe'
 
 //判断是否支持css3属性
 const animationPlayState = Xut.style.animationPlayState

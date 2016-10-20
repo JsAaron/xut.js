@@ -170,10 +170,10 @@ export default function(baseProto) {
             _.each(activity.get(), function(contentObj, index) {
                 if (activityId == contentObj.activityId) {
                     if (actionName == 'Run') {
-                        contentObj.runEffects(outCallBack, true);
+                        contentObj.runAnimation(outCallBack, true);
                     }
                     if (actionName == 'Stop') {
-                        contentObj.stopEffects(outCallBack);
+                        contentObj.stopAnimation(outCallBack);
                     }
                 }
             }, this);

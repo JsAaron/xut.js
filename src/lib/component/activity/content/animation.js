@@ -8,10 +8,10 @@
  * @return {[type]} [description]
  *
  ********************************************************************/
-import { PPT } from '../../plugin/internal/ppt/index'
+import Powepoint from '../../../plugin/internal/powerpoint/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
-import { clearContentAudio } from '../audio/manager'
+import { clearContentAudio } from '../../audio/manager'
 
 //2016.7.15废弃
 //pixi暂时不使用
@@ -72,7 +72,7 @@ const access = (callback) => {
  * 动画效果
  * @param {[type]} options [description]
  */
-export class Effects {
+export default class Animation {
 
     constructor(options) {
         _.extend(this, options);
@@ -106,7 +106,7 @@ export class Effects {
         const createPixiPPT = () => {
             //parameter存在就是ppt动画
             if ((parameter || actionTypes.pptId) && this.$contentNode.view) {
-                this.pptObj = callback(PPT, $(this.$contentNode.view));
+                this.pptObj = callback(Powepoint, $(this.$contentNode.view));
                 this.pptObj.contentId = id
             }
         }
@@ -188,7 +188,7 @@ export class Effects {
         }
 
         //ppt动画
-        this.pptObj = callback(PPT)
+        this.pptObj = callback(Powepoint)
     }
 
 
@@ -307,6 +307,7 @@ export class Effects {
         access((key) => {
             this[key] = null
         })
+
 
         this.getParameter = null
 

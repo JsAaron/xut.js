@@ -39,7 +39,7 @@ const makeRunBinding = function(pagebase) {
     return function() {
         var activityId = registers[0];
         getActivity.call(pagebase, activityId, function(activityObj) {
-            activityObj.runEffects(function() {
+            activityObj.runAnimation(function() {
                 shift = registers.shift();
                 registers.push(shift);
             })
@@ -65,18 +65,18 @@ const combineEvents = function(pagebase, eventRelated) {
             }
             eventName = conversionEventType(scope.eventType);
             //制动运行动作
-            scope.runEffects = makeRunBinding.call(scope, pagebase);
+            scope.runAnimation = makeRunBinding.call(scope, pagebase);
             //销毁方法
             scope.destroy = function() {
                 destroyContentEvent(scope, eventName);
                 scope.registers = null
-                scope.runEffects = null;
+                scope.runAnimation = null;
             }
 
             //事件绑定
             bindContentEvent({
                 'eventRun': function() {
-                    scope.runEffects();
+                    scope.runAnimation();
                 },
                 'eventHandler': function(eventReference, eventHandler) {
                     scope.eventReference = eventReference;

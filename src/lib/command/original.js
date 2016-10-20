@@ -51,7 +51,7 @@ export function original(pageObj) {
             //停止动作
             ContentObjs && _.each(ContentObjs, (obj) => {
                 if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
-                    obj.resetEffects && obj.resetEffects();
+                    obj.resetAnimation && obj.resetAnimation();
                 }
             })
 

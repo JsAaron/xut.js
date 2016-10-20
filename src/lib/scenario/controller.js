@@ -122,9 +122,11 @@ const sceneController = {
      */
     remove(scenarioId) {
         var indexOf = this.findIndexOfId(scenarioId)
-            //删除索引
+
+        //删除索引
         sceneCollection.scenarioStack.splice(indexOf, 1)
-            //删除场景对象区域
+
+        //删除场景对象区域
         delete sceneCollection['scenarioId->' + scenarioId];
     },
 
@@ -138,7 +140,7 @@ const sceneController = {
         _.each(cache, function(scenarioId) {
             sceneCollection['scenarioId->' + scenarioId].destroy();
         });
-        sceneCollection.scenarioChain = [];
+        sceneCollection.scenarioChain = []
     },
 
 

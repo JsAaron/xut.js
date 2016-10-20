@@ -31,6 +31,16 @@ export function fixAudio(obj, key, access) {
     $$on(document, { start })
 }
 
+/**
+ * 销毁创建的video对象
+ * @return {[type]} [description]
+ */
+export function destroyFixAudio() {
+    for (let i = 0; i < audioes.length; i++) {
+        audioes[i] = null
+    }
+    audioes = null
+}
 
 export function hasAudioes() {
     return audioes.length
