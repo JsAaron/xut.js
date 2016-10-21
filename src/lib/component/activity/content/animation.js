@@ -8,7 +8,7 @@
  * @return {[type]} [description]
  *
  ********************************************************************/
-import Powepoint from '../../../plugin/internal/powerpoint/index'
+import Powepoint from '../../../plugin/extend/powerpoint/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
 import { clearContentAudio } from '../../audio/manager'
@@ -205,11 +205,11 @@ export default class Animation {
         category = this.contentDas.category
         pageIndex = this.pageIndex
         create = (constr, newContext) => {
-            let node = newContext || context
-            if (node.length) {
-                return new constr(pageIndex, pageType, chapterId, node, parameter, $containsNode);
+            let element = newContext || context
+            if (element.length) {
+                return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode);
             } else {
-                console.log(id, this)
+                console.log(`创建:${constr}失败`)
             }
         }
 
@@ -228,7 +228,7 @@ export default class Animation {
      * @param  {[type]} canvasContainer [description]
      * @return {[type]}                 [description]
      */
-    play(scopeComplete) {
+    play(playComplete) {
 
         var $contentNode = this.$contentNode
 
@@ -248,7 +248,7 @@ export default class Animation {
                         })
                     }
                 }
-                this[key].play && this[key].play(scopeComplete)
+                this[key].play && this[key].play(playComplete)
             }
         })
     }

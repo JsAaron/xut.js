@@ -54,6 +54,4 @@ export default function Destroy(action = 'destory') {
 
     //销毁节点
     Xut.Application.$$removeNode()
-
-    console.log(Xut)
 }

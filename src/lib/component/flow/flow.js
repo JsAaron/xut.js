@@ -7,8 +7,8 @@ import render from './render'
 import getFlipDistance from '../../visuals/distance.config'
 import { getFlowView } from '../../visuals/adapter/adapter.type'
 
-import Slide from '../../plugin/internal/slide'
-import closeButton from '../../plugin/internal/close.icon'
+import Slide from '../../plugin/extend/slide'
+import closeButton from '../../plugin/extend/close.icon'
 
 /**
  * 2017.9.7

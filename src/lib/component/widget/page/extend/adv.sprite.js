@@ -1,4 +1,4 @@
-import Sprite from '../../../../plugin/internal/sprite'
+import Sprite from '../../../../plugin/extend/sprite'
 import { parseJSON } from '../../../../util/lang'
 import { config } from '../../../../config/index'
 

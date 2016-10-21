@@ -31,10 +31,10 @@ export default class {
     init() {
         if (this.dragObject != null) return;
 
-        var dragObject, self = this,
-            defaultPoint;
+        let self = this
+
         //now make both boxes draggable.
-        dragObject = this.dragObject = Draggable.create(this.dragElement, {
+        let dragObject = this.dragObject = Draggable.create(this.dragElement, {
             bounds: this.container,
             dragResistance: 0,
             edgeResistance: 0.8,
@@ -164,7 +164,7 @@ export default class {
 
 
     destroy() {
-        this.dragObject && this.dragObject.disable();
+        this.dragObject && this.dragObject.kill();
         this.dropElement = null;
         this.dragElement = null;
         this.dragObject = null;

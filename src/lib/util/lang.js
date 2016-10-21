@@ -90,17 +90,6 @@ export function parseJSON(itemArray) {
 }
 
 
-export function execJson(itemArray) {
-    var json;
-    try {
-        json = (new Function("return " + itemArray))();
-    } catch (error) {
-        console.log('解析json出错' + itemArray)
-    }
-    return json;
-}
-
-
 /**
  * 回车符处理
  */
@@ -109,6 +98,21 @@ export function enterReplace(str) {
 }
 
 
+/**
+ * 解析json代码
+ * 包装脚本
+ * @param  {[type]} itemArray [description]
+ * @return {[type]}           [description]
+ * execJson("(function(){" + enterReplace(data.postCode) + "})");
+ */
+export function makeJsonPack(code) {
+    try {
+        let post = "(function(){" + enterReplace(code) + "})"
+        return (new Function("return " + post))();
+    } catch (error) {
+        console.log('解析json出错' + code)
+    }
+}
 
 
 /**

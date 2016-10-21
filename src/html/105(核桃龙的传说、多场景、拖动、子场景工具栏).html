@@ -14,41 +14,7 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-    <script src="content/SQLResult.js"></script>
-    <script src="lib/external/environ.js"></script>
-    <script src="lib/external/namespace.js"></script>
-    <script src="lib/external/support.js"></script>
-    <script src="lib/external/postmessage.js"></script>
-    <script src="lib/external/ibooks.epub.js"></script>
-    <script src="lib/plugin/library/jquery.js"></script>
-    <script src="lib/plugin/library/underscore.js"></script>
-    <script src="lib/plugin/library/video.js"></script>
-    <script src="lib/plugin/library/audio5.js"></script>
-    <script src="lib/plugin/library/iscroll.js"></script>
-    <script src="lib/plugin/library/hammer.js"></script>
-    <script src="lib/plugin/library/redux.js"></script>
-    <script src="lib/plugin/cordova/cordova.js"></script>
-    <script src="lib/plugin/cordova/readAssetsFilePlugin.js"></script>
-    <script src="lib/plugin/cordova/initDatabase.js"></script>
-    <script src="lib/plugin/cordova/web.js"></script>
-    <script src="lib/plugin/cordova/video.js"></script>
-    <script src="lib/plugin/cordova/openAppPlugin.js"></script>
-    <script src="lib/plugin/cordova/tabletPlugin.js"></script>
-    <script src="lib/plugin/cordova/statusbar.js"></script>
-    <script src="lib/plugin/cordova/iap.js"></script>
-    <script src="lib/plugin/cordova/AppStoreLink.js"></script>
-    <script src="lib/plugin/cordova/downloadPlugin.js"></script>
-    <script src="lib/plugin/cordova/xxteManager.js"></script>
-    <script src="lib/plugin/cordova/unzipPlugin.js"></script>
-    <script src="lib/plugin/cordova/readPlugin.js"></script>
-    <script src="lib/plugin/cordova/deletePlugin.js"></script>
-    <script src="lib/plugin/animate/pixi.js"></script>
-    <script src="lib/plugin/animate/draggable.min.js"></script>
-    <script src="lib/plugin/animate/tweenmax.min.js"></script>
-    <script src="lib/plugin/animate/throwprops.min.js"></script>
-    <script src="lib/plugin/animate/snap.min.js"></script>
-    <link rel="stylesheet" href="css/common.css" type="text/css" />
-    <link href="css/video-js.css" rel="stylesheet">
+    <script src="lib/import.external.js"></script>
 </head>
 
 <body>
@@ -61,7 +27,6 @@ Xut.Application.setConfig = {
     visualMode: 0,
     lauchMode: 1 //启动模式
 }
-
 
 const appid = 105
 Xut.Application.Launch({

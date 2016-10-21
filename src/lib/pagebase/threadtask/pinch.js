@@ -1,4 +1,4 @@
-import Slide from '../../plugin/internal/slide'
+import Slide from '../../plugin/extend/slide'
 
 const transform = Xut.style.transform
 const transitionDuration = Xut.style.transitionDuration

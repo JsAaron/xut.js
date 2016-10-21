@@ -63,7 +63,7 @@ onTouchMove.prototype = {
     },
     _move: function (e) {
         if (typeof (this.moveCallback) == "function") this.moveCallback(e);
-    }, 
+    },
     _end: function (e) {
         this._unbind(moveEventType);
         this._unbind(endEventType);
