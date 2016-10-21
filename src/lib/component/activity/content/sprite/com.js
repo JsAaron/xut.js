@@ -1,5 +1,5 @@
-import css3 from '../../../../plugin/extend/css3'
-import keyframe from '../../../../plugin/extend/keyframe'
+import css3 from '../../../../plugin/extend/sprite/css3'
+import keyframe from '../../../../plugin/extend/sprite/frame'
 
 //判断是否支持css3属性
 const animationPlayState = Xut.style.animationPlayState

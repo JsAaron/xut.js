@@ -1,4 +1,4 @@
-import Slide from '../../plugin/extend/slide'
+import PanPinch from '../../plugin/extend/pan.pinch'
 
 const transform = Xut.style.transform
 const transitionDuration = Xut.style.transitionDuration
@@ -15,7 +15,7 @@ export default function Pinch($pagePinch, pageIndex) {
         pageMasterNode = relatedMasterObj.getContainsNode()[0]
     }
 
-    return new Slide({
+    return new PanPinch({
         $pagePinch,
         update(styleText, speed) {
             if (pageMasterNode) {

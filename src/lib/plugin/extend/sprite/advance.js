@@ -7,11 +7,10 @@
  *   提供给普通转化高级使用
  */
 
-import { imgReady } from '../../util/loader'
-import { config } from '../../config/index'
+import { imgReady } from '../../../util/loader'
+import { config } from '../../../config/index'
 
 export default class {
-
 
     constructor(data, options) {
         this.data = data

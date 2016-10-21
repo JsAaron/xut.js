@@ -1,4 +1,4 @@
-import closeButton from './close.icon'
+import closeButton from './close.button'
 import { config } from '../../config/index'
 
 const transform = Xut.style.transform
@@ -12,7 +12,7 @@ const START_Y = 0
 /**
  * 缩放、平移操作
  */
-export default class Slide {
+export default class PanPinch {
 
     constructor({
         $pagePinch,

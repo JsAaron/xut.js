@@ -57,6 +57,7 @@ if (typeof exports === "object" && typeof module !== "undefined") {
     })
 
     load(jsName, name => {
-        return `<script src="${name}?random=${Math.random()}"><\/script>`})
+        return `<script src="${name}?random=${Math.random()}"><\/script>`
+    })
 
 }

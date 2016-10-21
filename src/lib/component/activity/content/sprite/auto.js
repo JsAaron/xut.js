@@ -3,7 +3,7 @@
  * if comsprites is too large，
  * The client will comsprite become the advsprite  by default
  */
-import AutoSprite from '../../../../plugin/extend/sprite'
+import AutoSprite from '../../../../plugin/extend/sprite/advance'
 
 
 let moveContent = (contentPrefix, id, parentId) => {

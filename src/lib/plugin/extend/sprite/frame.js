@@ -3,7 +3,7 @@
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-import { parseJSON } from '../../util/index'
+import { parseJSON } from '../../../util/lang'
 
 export default function keyframe(options) {
     let matrix, parameter,timer, x, y

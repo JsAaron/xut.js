@@ -3,7 +3,7 @@
  * dom版本
  * css3模式
  */
-import { parseJSON } from '../../util/index'
+import { parseJSON } from '../../../util/lang'
 
 const style = Xut.style
 const keyframes = style.keyframes

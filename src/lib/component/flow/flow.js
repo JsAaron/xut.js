@@ -7,8 +7,8 @@ import render from './render'
 import getFlipDistance from '../../visuals/distance.config'
 import { getFlowView } from '../../visuals/adapter/adapter.type'
 
-import Slide from '../../plugin/extend/slide'
-import closeButton from '../../plugin/extend/close.icon'
+import PanPinch from '../../plugin/extend/pan.pinch'
+import closeButton from '../../plugin/extend/close.button'
 
 /**
  * 2017.9.7
@@ -116,7 +116,7 @@ export default class Flow {
         }
 
         if (Xut.plat.hasTouch && config.saleMode !== false) {
-            slide = new Slide({
+            slide = new PanPinch({
                 hasButton: false,
                 $pagePinch: $pageImage.children(),
                 doubletap: destory
