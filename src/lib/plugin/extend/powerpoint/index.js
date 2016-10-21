@@ -100,12 +100,6 @@ export default class Powepoint {
         this.codeDelay = 0
 
         /**
-         * 是否继续运行
-         * @type {Boolean}
-         */
-        this.hasRunning = true;
-
-        /**
          * 是否完全执行过(用于解决重复执行问题)
          * @type {Boolean}
          */
@@ -592,7 +586,6 @@ export default class Powepoint {
      * @return {[type]}               [description]
      */
     play(animComplete) {
-        if (this.hasRunning == false) return;
         if (this.isCompleted) {
             this.reset()
         }
@@ -630,7 +623,6 @@ export default class Powepoint {
             this.element.css("-webkit-transform", "none");
             this.element[0]["_gsTransform"] = null; //清理对象上绑定的动画属性
         }
-        if (this.hasRunning == false) this._unlockHandler();
         this.isCompleted = false;
     }
 
