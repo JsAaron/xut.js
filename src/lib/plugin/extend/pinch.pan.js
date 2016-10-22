@@ -12,7 +12,7 @@ const START_Y = 0
 /**
  * 缩放、平移操作
  */
-export default class PanPinch {
+export default class PinchPan {
 
     constructor({
         $pagePinch,
