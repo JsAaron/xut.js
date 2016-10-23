@@ -1,5 +1,4 @@
 import { config } from '../../../config/index'
-import { isMacOS, isDesktop } from './support'
 import { updateAction } from '../../../component/widget/page/extend/adv.sprite'
 import { createContentAudio } from '../../../component/audio/manager'
 
@@ -11,6 +10,8 @@ import special from './extend/special'
 import zoom from './extend/zoom'
 import shape from './extend/shape'
 
+console.log()
+
 import {
     parseJSON,
     makeJsonPack
@@ -18,6 +19,9 @@ import {
 
 const ROUND = Math.round
 const CEIL = Math.ceil
+
+const isMacOS = Xut.plat.isMacOS
+const isDesktop = Xut.plat.isDesktop
 
 /**
  * 参数说明

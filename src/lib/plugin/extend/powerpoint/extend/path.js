@@ -1,9 +1,11 @@
-import { hasTouch, onTouchMove } from '../support'
-
 import {
     calculateDistance,
     calculateDirection
 } from '../util'
+
+import MoveMent from '../move.ment'
+
+const hasTouch = Xut.plat.hasTouch
 
 /**
  * 路径动画
@@ -24,6 +26,7 @@ export default function path(animproto) {
         });
         var path = (parameter.path) ? parameter.path : ""; //路径
         if (!path || path == "") return t1;
+
         var autoReverse = (parameter.autoReverse == 1) ? true : false; //自动翻转(系统自带,实为沿路径返回)
         var subRepeat = (autoReverse == true) ? 1 : 0; //如果autoReverse为真而子动画必须为1，否则默认为0
         var autoRotate = (parameter.objFollow == 1) ? true : false; //是否跟随路径旋转对象(Z轴)
@@ -32,6 +35,7 @@ export default function path(animproto) {
         var axis = 0;
         var degree = 0; //旋转角度
         var scaleFactor = null; //缩放比例(未设置时必须为null才能不影响其它动画效果)
+
         // var motionScript = ""; //连续脚本
         if (parameter.attrAlongPath) {
             axis = parameter.attrAlongPath.axis ? parameter.attrAlongPath.axis : 0;
@@ -143,6 +147,7 @@ export default function path(animproto) {
                     break;
             }
         }
+
         //启用手势
         if (parameter.gesture) {
             t1 = new TimelineMax({
@@ -320,8 +325,11 @@ export default function path(animproto) {
             }
 
             var objectId = object[0].id;
-            if (parameter.gesture.controlType == 1) objectId = controlId;
-            new onTouchMove(parameter.pageType, controlId, objectId, startEvent, moveEvent, moveEnd);
+            if (parameter.gesture.controlType == 1) {
+                objectId = controlId
+            }
+
+            new MoveMent(parameter.pageType, controlId, objectId, startEvent, moveEvent, moveEnd);
         }
         //贝赛尔曲线参数构造
         var bezierObj = {
@@ -329,11 +337,13 @@ export default function path(animproto) {
             values: quArr,
             autoRotate: autoRotate
         };
-        if (isCurve == true) bezierObj = {
-            curviness: 0, //curviness圆滑度(数字越大越圆滑),默认为1,0是直线运动
-            values: quArr,
-            autoRotate: autoRotate
-        };
+        if (isCurve == true) {
+            bezierObj = {
+                curviness: 0, //curviness圆滑度(数字越大越圆滑),默认为1,0是直线运动
+                values: quArr,
+                autoRotate: autoRotate
+            }
+        }
         //实例化动画参数
         if (degree == 0) {
             t1.to(object, duration, {
@@ -382,11 +392,13 @@ export default function path(animproto) {
                     break;
             }
         }
+
         //初始化定位(百分比)
         if (parameter.gesture && parameter.gesture.initPos > 0) {
             currentFrame = duration * parameter.gesture.initPos;
             t1.seek(currentFrame);
         }
+
         return t1;
 
         function updateTurnState() {
@@ -425,6 +437,7 @@ export default function path(animproto) {
                 }
             }
         }
+
     }
 
 }

@@ -15,6 +15,7 @@
     var UA = inBrowser && window.navigator.userAgent.toLowerCase()
     var UV = inBrowser && window.navigator.appVersion.toLowerCase()
     var isAndroid = UA && UA.indexOf('android') > 0
+    var isMacOS = UA && UA.indexOf('mac') > 0
     var isIphone = (/iphone|ipod/gi).test(UA)
     var isIpad = (/ipad/gi).test(UA)
     var isIOS = isIphone || isIpad
@@ -118,7 +119,7 @@
     //有hasMutationObserverBug
     var iosVersionMatch = isIOS && UA.match(/os ([\d_]+)/)
     var iosVersion = iosVersionMatch && iosVersionMatch[1].split('_')
-    // detecting iOS UIWebView by indexedDB
+        // detecting iOS UIWebView by indexedDB
     var hasMutationObserverBug = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
 
 
@@ -133,8 +134,9 @@
         isIpad: isIpad,
         isIOS: isIOS,
         isIOS7: isIOS7,
+        isMacOS: isMacOS,
 
-        hasMutationObserverBug:hasMutationObserverBug,
+        hasMutationObserverBug: hasMutationObserverBug,
 
         /**
          * 不能自动播放媒体
@@ -169,12 +171,18 @@
         isSurface: SUPPORT_TOUCH && SUPPORT_MOUSE && !SUPPORT_ONLY_TOUCH,
 
         /**
+         * 是否桌面
+         * @type {Boolean}
+         */
+        isDesktop: !SUPPORT_ONLY_TOUCH,
+
+        /**
          * 事件对象
          * @param  {[type]} event    [description]
          * @param  {[type]} original [description]
          * @return {[type]}          [description]
          */
-        evtTarget: function(event, original) {
+            evtTarget: function(event, original) {
             var currTouches = null;
             if (SUPPORT_ONLY_TOUCH) {
                 currTouches = event.touches;
