@@ -10,8 +10,6 @@ import special from './extend/special'
 import zoom from './extend/zoom'
 import shape from './extend/shape'
 
-console.log()
-
 import {
     parseJSON,
     makeJsonPack
