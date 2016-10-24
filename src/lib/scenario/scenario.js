@@ -91,7 +91,7 @@ export class SceneFactory {
         const options = _.extend(this, data, {
             'scenarioId': seasonId,
             'chapterId': chapterId,
-            '$container': $('#xut-scene-container')
+            '$container': $('.xut-scene-container')
         })
 
         //创建主场景

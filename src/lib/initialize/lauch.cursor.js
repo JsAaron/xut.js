@@ -57,7 +57,7 @@ export function createCursor() {
     let container = ''
 
     while (count--) {
-        html =
+        container +=
             `<div class="xut-busy-spinner"
                   style="${transform}:rotate(${deg[count]}deg) translate(0,-142%);${animationDelay}:-${delay[count]}s">
             </div>`
@@ -70,7 +70,7 @@ export function createCursor() {
             <div class="xut-busy-text"></div>
         </div>`
 
-    node = $('#xut-busy-icon').html(String.styleFormat(html));
+    node = $('.xut-busy-icon').html(String.styleFormat(html));
 }
 
 

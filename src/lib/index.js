@@ -11,8 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 848
-
+Xut.Version = 849
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -59,7 +58,7 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
     }
 
     //忙碌可配置
-    let busyIcon = '<div id="xut-busy-icon" class="xut-busy-wrap xut-fullscreen"></div>'
+    let busyIcon = '<div class="xut-busy-icon xut-fullscreen"></div>'
     if (!cursor) {
         disable(true)
         busyIcon = ''
@@ -69,9 +68,8 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
     //默认背景图
     const cover = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource ? window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg' : './content/gallery/cover.jpg'
     const commonHTML =
-        `<div class="xut-removelayer" style="background-image: url(${cover});"></div>
-         <div class="xut-start-page xut-fullscreen"></div>
-         <div id="xut-scene-container" class="xut-chapter xut-fullscreen xut-overflow-hidden"></div>`
+        `<div class="xut-cover xut-fullscreen" style="background-image: url(${cover});"></div>
+         <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
 
     let html = `${busyIcon}${commonHTML}`
 
@@ -81,8 +79,6 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
     }
 
     let $appNode = $(String.styleFormat(html))
-
-    $appNode.css('z-index', 9999999)
 
     Xut.Application.$$removeNode = function() {
         lauchOptions = null

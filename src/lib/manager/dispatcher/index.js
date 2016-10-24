@@ -547,10 +547,11 @@ export default class Dispatcher {
                     direction
                 })
                 setToolbar.call(this)
-                setTimeout(function() {
-                    $(".xut-start-page").hide().remove();
-                    $(".xut-removelayer").hide().remove();
-                }, 0)
+                $(".xut-cover").animate({
+                    opacity: 0
+                }, 1000, function() {
+                    $(this).remove()
+                });
                 break;
             case 'toPage':
                 //更新页码标示
