@@ -17,11 +17,11 @@ export default function zoom(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object, {
                     visibility: "visible"
                 }],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             switch (direction) {
@@ -74,9 +74,9 @@ export default function zoom(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     visibility: "hidden"
                 }]
@@ -154,11 +154,11 @@ export default function zoom(animproto) {
                 t1 = new TimelineMax({
                     delay: delay,
                     repeat: repeat,
-                    onStart: this.startHandler,
+                    onStart: this._startHandler,
                     onStartParams: [parameter, object, {
                         opacity: 0
                     }],
-                    onComplete: this.completeHandler,
+                    onComplete: this._completeHandler,
                     onCompleteParams: [parameter, object]
                 });
                 t1.to(object, duration, {
@@ -172,9 +172,9 @@ export default function zoom(animproto) {
                 t1 = new TimelineMax({
                     delay: delay,
                     repeat: repeat,
-                    onStart: this.startHandler,
+                    onStart: this._startHandler,
                     onStartParams: [parameter, object],
-                    onComplete: this.completeHandler,
+                    onComplete: this._completeHandler,
                     onCompleteParams: [parameter, object]
                 });
                 t1.to(object, duration, {
@@ -189,9 +189,9 @@ export default function zoom(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             switch (direction) {
@@ -239,9 +239,9 @@ export default function zoom(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1
                 }]
@@ -303,9 +303,9 @@ export default function zoom(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         if (fullScreen == true) {

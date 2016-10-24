@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html> -->
 <html>
 
 <head>
@@ -14,7 +14,7 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-    <script src="lib/import.external.js"></script>
+    <script type="text/javascript" src="lib/import.external.js"></script>
     <style type="text/css">
     .bt1 {
         position: absolute;
@@ -22,7 +22,6 @@
         top: 0;
         z-index: 9999999999
     }
-
     .bt2 {
         position: absolute;
         left: 50px;
@@ -45,7 +44,7 @@ Xut.Application.setConfig = {
     lauchMode: 1 //启动模式
 }
 
-let appid = 104
+let appid =  101
 let length = 0
 let max = appid + length
 
@@ -64,9 +63,9 @@ $(".bt1").click(function() {
         appid = max - length
     }
     Launch()
-    ++appid
+        ++appid
 })
-    Launch()
+Launch()
 
 $(".bt2").click(function() {
     Xut.Application.Destroy()

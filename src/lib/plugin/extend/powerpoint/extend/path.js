@@ -19,9 +19,9 @@ export default function path(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         var path = (parameter.path) ? parameter.path : ""; //路径

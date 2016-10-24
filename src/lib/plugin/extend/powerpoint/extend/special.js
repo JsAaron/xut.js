@@ -15,11 +15,11 @@ export default function special(animproto) {
         var svgElement = object.find("svg").children();
         var t1 = new TimelineMax({
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object, {
                 visibility: "visible"
             }],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         switch (type) {
@@ -68,9 +68,9 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         var range = (Number(parameter.range)) ? parameter.range : 0.1;
@@ -94,11 +94,11 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object, {
                 visibility: "visible"
             }],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         t1.to(object, duration, {
@@ -177,11 +177,11 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object, {
                 visibility: "visible"
             }],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         t1.to(object, duration, {
@@ -249,16 +249,16 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object, {
                 visibility: "visible"
             }],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         var objInfo = this._getObjectInfo(object);
         if (isExit == false) {
-            //t1.to(object,duration,{onStart:this.startHandler,onStartParams:[object],onUpdate:this.updateLineGradient,onUpdateParams:[t1,object,isExit,direction]});
+            //t1.to(object,duration,{onStart:this._startHandler,onStartParams:[object],onUpdate:this.updateLineGradient,onUpdateParams:[t1,object,isExit,direction]});
             t1.to(object, duration, {
                 onUpdate: this._updateClipRect,
                 onUpdateParams: [t1, object, isExit, direction, objInfo]
@@ -280,9 +280,9 @@ export default function special(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -296,9 +296,9 @@ export default function special(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1,
                     scale: 1,
@@ -322,9 +322,9 @@ export default function special(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -337,9 +337,9 @@ export default function special(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1,
                     scale: 1,
@@ -363,9 +363,9 @@ export default function special(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -377,9 +377,9 @@ export default function special(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1,
                     rotationY: "0deg"
@@ -405,9 +405,9 @@ export default function special(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -423,9 +423,9 @@ export default function special(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1
                 }]
@@ -458,12 +458,12 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object, {
                 visibility: "visible",
                 top: top + "px"
             }],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         t1.to(object, duration, {
@@ -478,11 +478,11 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object, {
                 visibility: "visible"
             }],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         var objInfo = this._getObjectInfo(object);
@@ -654,9 +654,9 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object, {
                 //"box-shadow": "none"
                 filter: "none"
@@ -681,9 +681,9 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         // var mode = parameter.mode;
@@ -803,11 +803,11 @@ export default function special(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object, {
                 "z-Index": zIndex + 100
             }],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object, {
                 "z-Index": zIndex
             }]

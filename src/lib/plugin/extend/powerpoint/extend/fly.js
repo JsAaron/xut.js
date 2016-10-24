@@ -26,11 +26,11 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object, {
                     visibility: "visible"
                 }],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     visibility: "visible"
                 }]
@@ -116,9 +116,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     x: 0,
                     y: 0,
@@ -213,9 +213,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             //t1.to(object, 0.001, {opacity: 0, y: 100}).to(object, duration - 0.001, {autoAlpha: 1, y: 0, ease: parameter.tweenEase});
@@ -229,9 +229,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1,
                     y: 0
@@ -254,9 +254,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             //t1.to(object, 0.001, {y: -100}).to(object, duration - 0.001, {autoAlpha: 1, y: 0, ease: parameter.tweenEase});
@@ -270,9 +270,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1
                 }]
@@ -296,11 +296,11 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object, {
                     visibility: "visible"
                 }],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             switch (direction) {
@@ -344,9 +344,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             switch (direction) {
@@ -395,11 +395,11 @@ export default function fly(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object, {
                 visibility: "visible"
             }],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         var easeString = Power1.easeInOut;
@@ -459,9 +459,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -489,9 +489,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1,
                     scale: 1
@@ -534,9 +534,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -548,9 +548,9 @@ export default function fly(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1
                 }]

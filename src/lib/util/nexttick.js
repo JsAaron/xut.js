@@ -101,8 +101,8 @@ const nextTick = function({
         return;
     }
 
-    const animatId = 'T' + (Math.random() * 10000 << 1)
-    const tick = DOC.createElement('input')
+    let animatId = 'T' + (Math.random() * 10000 << 1)
+    let tick = DOC.createElement('input')
 
     //标记任务
     tick.setAttribute('value', animatId);
@@ -115,51 +115,8 @@ const nextTick = function({
             temp = DOC.createTextNode(content);
             temp = $(temp);
         }
-        content = temp;
-    }
-
-    /**
-     * 组装内容到临时片段
-     * @return {[type]} [description]
-     */
-    const _createFragment = () => {
-        var frag = DOC.createDocumentFragment(),
-            len = content.length;
-        for (var i = 0; i < len; i++) {
-            frag.appendChild(content[i]);
-        }
-        return frag;
-    }
-
-    /**
-     * 将内容加入父容器
-     * @return {[type]} [description]
-     */
-    const _appendChild = () => {
-        //拼接内容
-        content = _createFragment();
-        content.appendChild(tick);
-        //判断插入的位置
-        if (position === 'first') {
-            container.insertBefore(content, container.firstChild);
-        } else {
-            container.appendChild(content);
-        }
-        //触发变动事件
-        tick.setAttribute('value', animatId);
-    }
-
-    /**
-     * 完成任务后处理&Event
-     * @param  {[type]} event [description]
-     * @return {[type]}       [description]
-     */
-    const _finishTask = (event) => {
-        if (event.target.value === animatId) {
-            //container.removeEventListener('DOMNodeRemoved',_finishTask,false);
-            container.removeEventListener('DOMNodeInserted', _finishTask, false);
-            callback.call(context);
-        }
+        content = temp
+        temp = null
     }
 
     /**
@@ -168,9 +125,38 @@ const nextTick = function({
      */
     const _completeTask = () => {
         container.removeChild(tick);
-        callback.call(context);
+        callback.call(context)
+        container = null
+        tick = null
+        context = null
     }
 
+    /**
+     * 将内容加入父容器
+     * @return {[type]} [description]
+     */
+    const _appendChild = () => {
+        //拼接内容
+        let frag = DOC.createDocumentFragment()
+        let len = content.length;
+        for (let i = 0; i < len; i++) {
+            frag.appendChild(content[i]);
+        }
+        frag.appendChild(tick)
+
+        //判断插入的位置
+        if (position === 'first') {
+            container.insertBefore(frag, container.firstChild);
+        } else {
+            container.appendChild(frag);
+        }
+
+        frag = null
+
+        //触发变动事件
+        tick.setAttribute('value', animatId);
+
+    }
 
     if (MutationObserver) {
         let observer = new MutationObserver(mutations => {
@@ -194,8 +180,23 @@ const nextTick = function({
 
     } else {
 
+
         //检测是否支持DOM变动事件
         if (implementation) {
+
+            /**
+             * 完成任务后处理&Event
+             * @param  {[type]} event [description]
+             * @return {[type]}       [description]
+             */
+            const _finishTask = (event) => {
+                if (event.target.value === animatId) {
+                    //container.removeEventListener('DOMNodeRemoved',_finishTask,false);
+                    container.removeEventListener('DOMNodeInserted', _finishTask, false);
+                    callback.call(context);
+                }
+            }
+
             //container.addEventListener('DOMNodeRemoved',_finishTask,false);
             container.addEventListener('DOMNodeInserted', _finishTask, false);
             _appendChild();

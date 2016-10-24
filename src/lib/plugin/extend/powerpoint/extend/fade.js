@@ -13,9 +13,9 @@ export default function fade(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         if (isExit == false)
@@ -38,9 +38,9 @@ export default function fade(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -52,9 +52,9 @@ export default function fade(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1
                 }]
@@ -72,9 +72,9 @@ export default function fade(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         var time = duration / 3;
@@ -97,9 +97,9 @@ export default function fade(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object, {
                 filter: "none"
             }]
@@ -124,9 +124,9 @@ export default function fade(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object, {
                 filter: "none"
             }]
@@ -151,9 +151,9 @@ export default function fade(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object, {
                 filter: "none"
             }]
@@ -177,9 +177,9 @@ export default function fade(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         t1.to(object, duration, {

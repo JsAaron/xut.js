@@ -16,11 +16,11 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object, {
                     visibility: "visible"
                 }],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             switch (direction) {
@@ -44,9 +44,9 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     visibility: "hidden"
                 }]
@@ -111,9 +111,9 @@ export default function rotate(animproto) {
         var t1 = new TimelineMax({
             delay: delay,
             repeat: repeat,
-            onStart: this.startHandler,
+            onStart: this._startHandler,
             onStartParams: [parameter, object],
-            onComplete: this.completeHandler,
+            onComplete: this._completeHandler,
             onCompleteParams: [parameter, object]
         });
         //t1.to(object, duration, {rotation:degree+"deg",ease:parameter.tweenEase});
@@ -149,9 +149,9 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.add(TweenMax.to(object, 0.01, {
@@ -175,9 +175,9 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1,
                     x: 0,
@@ -210,11 +210,11 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object, {
                     visibility: "visible"
                 }],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -240,9 +240,9 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     visibility: "hidden"
                 }]
@@ -279,11 +279,11 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object, {
                     visibility: "visible"
                 }],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             t1.from(object, duration, {
@@ -295,9 +295,9 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     visibility: "hidden",
                     scale: 1,
@@ -354,9 +354,9 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object]
             });
             //t1.from(object,duration,{autoAlpha:0,rotationY:"540deg",ease:Linear.easeNone}); //PPT默认效果
@@ -391,9 +391,9 @@ export default function rotate(animproto) {
             t1 = new TimelineMax({
                 delay: delay,
                 repeat: repeat,
-                onStart: this.startHandler,
+                onStart: this._startHandler,
                 onStartParams: [parameter, object],
-                onComplete: this.completeHandler,
+                onComplete: this._completeHandler,
                 onCompleteParams: [parameter, object, {
                     opacity: 1
                 }]

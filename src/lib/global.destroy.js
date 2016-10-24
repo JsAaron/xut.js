@@ -52,6 +52,8 @@ export default function Destroy(action = 'destory') {
     //flow的一些接口缓存
     adapterDestory()
 
+    Xut.TransformFilter = null
+
     //销毁节点
     Xut.Application.$$removeNode()
 }

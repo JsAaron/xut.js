@@ -10,9 +10,9 @@ export default function(baseProto) {
      * @return {[type]} [description]
      */
     baseProto.checkInstanceTasks = function(taskName) {
-        var tasksObj;
+        var tasksObj
         if (tasksObj = this.createRelated.cacheTasks[taskName]) {
-            tasksObj.runSuspendTasks();
+            tasksObj.runSuspendTasks()
             return true;
         }
     }

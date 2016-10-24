@@ -259,8 +259,7 @@ export default class Powepoint {
      * @param  {[type]} params    [description]
      * @return {[type]}           [description]
      */
-    startHandler(parameter, object, params) {
-
+    _startHandler(parameter, object, params) {
         for (var item in params) {
             switch (item) {
                 case "x":
@@ -333,7 +332,7 @@ export default class Powepoint {
      * @param  {[type]} params    [description]
      * @return {[type]}           [description]
      */
-    completeHandler(parameter, object, params) {
+    _completeHandler(parameter, object, params) {
         //if(parameter.pptAudio) parameter.pptAudio.end(); //声音存在延时问题，马上结束可导制无法听到声音
         for (var item in params) {
             switch (item) {
@@ -405,8 +404,8 @@ export default class Powepoint {
         parameter.videoId = data.videoId;
 
         let animationName = parameter.animationName
-        // console.log(this.element, animationName)
-            //文字动画
+
+        //文字动画
         if (animationName == "xxtTextEffect") {
             return this.getTextAnimation(parameter, object, duration, delay, repeat);
         }
@@ -527,7 +526,7 @@ export default class Powepoint {
             }
         }
 
-        let start = new TimelineLite({
+        let tl = new TimelineLite({
             paused: true,
             onStartParams: [this.preCode],
             onCompleteParams: [this.postCode, this.codeDelay],
@@ -569,16 +568,16 @@ export default class Powepoint {
 
         for (var i = 0; i < this.options.length; i++) {
             if (i == 0) {
-                start.add(this._getTimeline(this.options[i], i), "shape0");
+                tl.add(this._getTimeline(this.options[i], i), "shape0");
             } else {
                 var invokeMode = this.options[i].invokeMode;
                 if (invokeMode == 2)
-                    start.add(this._getTimeline(this.options[i], i));
+                    tl.add(this._getTimeline(this.options[i], i));
                 else
-                    start.add(this._getTimeline(this.options[i], i), "shape0"); //"shape"+(i-1)
+                    tl.add(this._getTimeline(this.options[i], i), "shape0"); //"shape"+(i-1)
             }
         }
-        return start;
+        return tl;
     }
 
 
@@ -591,10 +590,10 @@ export default class Powepoint {
         if (this.isCompleted) {
             this.reset()
         }
+        this.animation && this.stop();
         this.animation = this._initAnimation(animComplete)
         this.animation.play()
     }
-
 
     /**
      * 停止动画
@@ -602,9 +601,10 @@ export default class Powepoint {
      */
     stop() {
         if (this.animation instanceof TimelineLite) {
-            this.animation.stop();
-            this.animation.kill();
-            this.animation.clear();
+            this.animation.stop()
+            this.animation.kill()
+            this.animation.clear()
+            this.animation.vars = null
         }
         this.animation = null;
     }
@@ -615,11 +615,13 @@ export default class Powepoint {
      * @return {[type]} [description]
      */
     reset() {
-        this.stop();
-        if (this.elementStyle && this.elementStyle.length > 0) {
-            var origin = this.element.css("-webkit-transform-origin");
-            var isscroll = this.element.attr("isscroll");
-            if (isscroll == null) this.element[0].style.cssText = this.elementStyle; //卷滚区域里的对象不需要还原
+        this.animation && this.stop();
+        if (this.elementStyle && this.elementStyle.length) {
+            const origin = this.element.css("-webkit-transform-origin");
+            //卷滚区域里的对象不需要还原
+            if (this.element.attr("isscroll") == null) {
+                this.element[0].style.cssText = this.elementStyle;
+            }
             this.element.css("-webkit-transform-origin", origin);
             this.element.css("visibility", this.elementVisibility);
             this.element.css("-webkit-transform", "none");
