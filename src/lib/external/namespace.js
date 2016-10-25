@@ -2,28 +2,27 @@
  * 电子杂志全局命名
  * @singleton
  */
-window.Xut = Object.create(null)
+//sf浏览器调试 不能用hash 否则报错
+window.Xut = {}
 
 /**
  * 插件
  * @type {[type]}
  */
-Xut.Plugin = Object.create(null)
-Xut.plugins = Object.create(null)
+Xut.Plugin = {}
+Xut.plugins = {}
 
 /**
  * 平台
  * @type {[type]}
  */
-Xut.plat = Object.create(null)
+Xut.plat = {}
 
 /**
  * 样式
  * @type {[type]}
  */
-Xut.style = Object.create(null)
-
-
+Xut.style = {}
 
 /**
  * 浅拷贝

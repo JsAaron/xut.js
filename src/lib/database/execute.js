@@ -1,4 +1,4 @@
-import { getResults } from './results'
+import { getResults } from './result'
 import { config } from '../config/index'
 
 /**

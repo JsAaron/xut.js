@@ -4,14 +4,14 @@ import { api } from './global.api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { fixAudio } from './component/audio/fix'
-import { disable } from './initialize/lauch.cursor'
+import { disable } from './initialize/busy.cursor'
 //nextTick
 import nextTick from './util/nexttick'
 //A predictable state container for apps.
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 849
+Xut.Version = 851
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -151,7 +151,7 @@ Xut.Application.Launch = function({
 setTimeout(() => {
 
     //提供全局配置文件
-    if (Xut.Application.setConfig !== undefined) {
+    if (Xut.Application.setConfig) {
         Xut.extend(config, Xut.Application.setConfig)
     }
 

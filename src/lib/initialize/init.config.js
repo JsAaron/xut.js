@@ -1,6 +1,6 @@
-import { createCursor } from './lauch.cursor'
-import initFlows from '../component/flow/layout'
-import { importResults } from '../database/results'
+import { createCursor } from './busy.cursor'
+import { contentFilter } from '../component/activity/content/filter'
+import { importDatabase } from '../database/result'
 
 import { loader } from '../util/index'
 
@@ -11,6 +11,7 @@ import {
 } from '../config/index'
 
 import initTooBar from './toolbar.data'
+import initFlows from '../component/flow/layout'
 
 /**
  * 加载css
@@ -78,12 +79,17 @@ const setMode = function(data) {
  * 动态代码变动区域
  */
 export default function dynamic(callback) {
+
     //导入数据缓存
-    importResults(() => {
+    importDatabase(() => {
 
         //初始化工具栏
         //与数据库setting数据
         initTooBar((novelData, tempSettingData) => {
+
+            //创建过滤器
+            Xut.CreateFilter = contentFilter('createFilter');
+            Xut.TransformFilter = contentFilter('transformFilter');
 
             //初始化配置一些信息
             initConfig(novelData.pptWidth, novelData.pptHeight)

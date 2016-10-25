@@ -26,10 +26,10 @@ export default class ScrollArea {
         return String.styleFormat(
             `<div data-type="area-wrapper"
                   style="position:absolute;width:100%; height:100%;overflow:hidden;">
-                <div data-type="area-scroller"
+                <ul data-type="area-scroller"
                      data-behavior="disable"
                      style="position:absolute; width:100%; height:100%;overflow:hidden;">
-                </div>
+                </ul>
              </div>`
         )
     }
@@ -69,9 +69,15 @@ export default class ScrollArea {
         //如果来回翻页
         //因为子节点的排列关系已经被改变
         //所以这里直接处理事件
-        if (contentPanle.attr("data-iscroll") == "true") {
-            $wrapper = contentPanle.children('div[data-type="area-wrapper"]')
-            return this._bindIscroll($wrapper[0], scrollX, scrollY, cid)
+        const hasIscroll = contentPanle.attr("data-iscroll")
+        if (hasIscroll) {
+            //需要滚动条
+            if (hasIscroll === 'visible') {
+                $wrapper = contentPanle.children('div[data-type="area-wrapper"]')
+                return this._bindIscroll($wrapper[0], scrollX, scrollY, cid)
+            }
+            //hidden
+            return
         }
 
         //去掉默认行为
@@ -95,8 +101,6 @@ export default class ScrollArea {
         let $scroller = $wrapper.children()
         contentPanle.append($wrapper)
 
-
-
         //设置滚动容器宽高
         this._setScrollerStyle(max, min, contentSize, scrollX, scrollY, $scroller)
 
@@ -107,31 +111,30 @@ export default class ScrollArea {
 
         //若只存在一个snap容器则不需要进行卷滚
         if ((scrollX && colsObj.snapXCount == 1) || (scrollY && colsObj.snapYCount == 1)) {
+            contentPanle.attr("data-iscroll", "hidden");
             return;
         }
 
         //创建snap容器
-        this._createSnapContainer(colsObj, $scroller, cid, scrollX, scrollY)
+        let snapContainer = this._createSnapContainer(colsObj, $scroller, cid, scrollX, scrollY)
 
         //将content添加到snap容器中
         if (scrollX) {
             for (var j = 0; j < obj.length; j++) {
                 var childId = prefix + obj[j];
                 var childObj = $("#" + childId);
-                childObj.appendTo($(".contentsContainer" + cid)[Math.floor(j / colsObj
-                    .contentsPerSnapX)]);
+                childObj.appendTo(snapContainer[Math.floor(j / colsObj.contentsPerSnapX)]);
             }
         }
         if (scrollY) {
             for (var j = 0; j < obj.length; j++) {
                 var childId = prefix + obj[j];
                 var childObj = $("#" + childId);
-                childObj.appendTo($(".contentsContainer" + cid)[Math.floor(j / colsObj
-                    .contentsPerSnapY)]);
+                childObj.appendTo(snapContainer[Math.floor(j / colsObj.contentsPerSnapY)])
             }
         }
 
-        contentPanle.attr("data-iscroll", "true");
+        contentPanle.attr("data-iscroll", "visible");
 
         return this._bindIscroll($wrapper[0], scrollX, scrollY, cid)
     }
@@ -388,38 +391,44 @@ export default class ScrollArea {
      * @return {[type]}           [description]
      */
     _createSnapContainer(colsObj, $scroller, cid, scrollX, scrollY) {
-        let snapContainer;
+        let snapContainer = '';
 
         if (scrollX) {
             const scrollerWidth = parseInt($scroller.css("width"));
             const snapXCount = colsObj.snapXCount;
             const snapContainerWidth = colsObj.snapContainerWidth
             const lastSnapContainerWidth = scrollerWidth - (snapXCount - 1) * snapContainerWidth;
-
+            let containerWidth
             for (var i = 0; i < colsObj.snapXCount; i++) {
                 //最后一个snap容器的宽度需要单独设置 否则可能所有的snap容器宽度和会大于scroller的宽度
                 if (i == colsObj.snapXCount - 1) {
-                    snapContainer = $("<div style='width:" + lastSnapContainerWidth + "px;height:100%;float:left;'></div>");
+                    containerWidth = lastSnapContainerWidth
                 } else {
-                    snapContainer = $("<div style='width:" + snapContainerWidth + "px;height:100%;float:left;'></div>");
+                    containerWidth = snapContainerWidth
                 }
-                snapContainer.addClass("contentsContainer" + cid)
-                snapContainer.appendTo($scroller)
+                snapContainer += `<li class="contentsContainer${cid}"
+                                      style='width:${containerWidth}px;height:100%;float:left;'>
+                                  </li>`
             }
         }
-        if (scrollY) {
+        //Y轴滚动
+        else if (scrollY) {
             const scrollerHeight = parseInt($scroller.css("height"))
             const snapYCount = colsObj.snapYCount;
             const snapContainerHeight = colsObj.snapContainerHeight
             const lastSnapContainerHeight = scrollerHeight - (snapYCount - 1) * snapContainerHeight;
             for (var i = 0; i < colsObj.snapYCount; i++) {
-                snapContainer = $("<div style='height:" + snapContainerHeight + "px;width:100%;float:left;'></div>");
-                snapContainer.addClass("contentsContainer" + cid)
-                snapContainer.appendTo($scroller)
+                snapContainer += `<li class="contentsContainer${cid}"
+                                      style='height:${snapContainerHeight}px;width:100%;float:left;'>
+                                  </li>`
             }
         }
 
+        snapContainer = $(snapContainer)
+        snapContainer.appendTo($scroller)
+        return snapContainer
     }
+
     destroy() {
         if (this.scrolls.length) {
             for (let i = 0; i < this.scrolls.length; i++) {
@@ -428,7 +437,10 @@ export default class ScrollArea {
                 obj.destroy()
                 this.scrolls[i] = null
             }
+            this.scrolls = null
         }
+        this.data.container = null
+        this.options = null
     }
 
 }

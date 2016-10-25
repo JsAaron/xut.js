@@ -32,23 +32,22 @@
 </head>
 
 <body>
-    <button class="bt1">点击</button>
-    <button class="bt2">销毁</button>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
 </html>
 <script type="text/javascript">
+
 Xut.Application.setConfig = {
     visualMode: 0,
     lauchMode: 1 //启动模式
 }
 
-let appid =  112
-let length = 0
-let max = appid + length
+var appid =  101
+var length = 0
+var max = appid + length
 
-const Launch = function() {
+var Launch = function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container',
         paths: {

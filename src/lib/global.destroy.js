@@ -53,6 +53,7 @@ export default function Destroy(action = 'destory') {
     adapterDestory()
 
     Xut.TransformFilter = null
+    Xut.CreateFilter = null
 
     //销毁节点
     Xut.Application.$$removeNode()

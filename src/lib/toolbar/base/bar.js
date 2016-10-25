@@ -7,6 +7,7 @@ import {
 } from '../../util/index'
 
 const isIOS = Xut.plat.isIOS
+const isBrowser = Xut.plat.isBrowser
 
 /**
  * 获取翻页按钮位置
@@ -225,7 +226,7 @@ export default class Bar {
      * @return {[type]} [description]
      */
     super_showSystemBar() {
-        isIOS && Xut.Plugin.statusbarPlugin.setStatus(null, null, 0);
+        isIOS && Xut.plat.hasPlugin && Xut.Plugin.statusbarPlugin.setStatus(null, null, 0);
     }
 
 
@@ -234,9 +235,8 @@ export default class Bar {
      * @return {[type]} [description]
      */
     super_hideSystemBar() {
-        isIOS && Xut.Plugin.statusbarPlugin.setStatus(null, null, 1);
+        isIOS && Xut.plat.hasPlugin && Xut.Plugin.statusbarPlugin.setStatus(null, null, 1);
     }
-
 
     /**
      * 超类销毁
@@ -249,7 +249,6 @@ export default class Bar {
             this.arrows = null
         }
     }
-
 
     /**
      * 隐藏下一页按钮

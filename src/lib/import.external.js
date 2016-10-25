@@ -1,9 +1,9 @@
-const cssName = [
+var cssName = [
     'css/common.css',
     'css/video-js.css'
 ]
 
-const jsName = [
+var jsName = [
     'content/SQLResult.js',
 
     'lib/external/environ.js',
@@ -39,25 +39,24 @@ const jsName = [
     'lib/plugin/animate/tweenmax.min.js'
 ]
 
+
+function load(fileList, temp) {
+    var list = ''
+    fileList.forEach(function(name) {
+        list += temp(name)
+    })
+    document.write(list)
+}
+
 //for build
 if (typeof exports === "object" && typeof module !== "undefined") {
     module.exports = jsName
 } else {
     //for index.html
-    const load = function(fileList, temp) {
-        let list = ''
-        fileList.forEach(name => {
-            list += temp(name)
-        })
-        document.write(list)
-    }
-
-    load(cssName, name => {
-        return `<link type="text/css" rel="stylesheet" href="${name}?random=${Math.random()}">`
+    load(cssName, function(name) {
+        return '<link type="text/css" rel="stylesheet" href="' + name + '?random=' + Math.random() + '">'
     })
-
-    load(jsName, name => {
-        return `<script type="text/javascript" src="${name}?random=${Math.random()}"><\/script>`
+    load(jsName, function(name) {
+        return '<script type="text/javascript" src="' + name + '?random=' + Math.random() + '"><\/script>'
     })
-
 }

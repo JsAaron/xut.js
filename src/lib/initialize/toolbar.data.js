@@ -1,5 +1,4 @@
 import { createStore } from '../database/index'
-import { contentFilter } from '../component/activity/filter'
 import { config } from '../config/index'
 import { $$set } from '../util/index'
 
@@ -60,10 +59,6 @@ const initDefaults = (setData) => {
     //广告Id
     //2014.9.2
     Xut.Presentation.AdsId = data.adsId;
-
-    //创建过滤器
-    Xut.CreateFilter = contentFilter('createFilter');
-    Xut.TransformFilter = contentFilter('transformFilter');
 
     return data
 }

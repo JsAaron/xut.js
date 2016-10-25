@@ -10,7 +10,7 @@ let result
  * 1 去掉全局挂着
  * 2 缓存
  */
-export function importResults(callback) {
+export function importDatabase(callback) {
     //如果外联指定路径json数据
     const path = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.database
     if (path) {

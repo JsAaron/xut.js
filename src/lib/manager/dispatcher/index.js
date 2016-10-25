@@ -627,7 +627,7 @@ export default class Dispatcher {
             //创建新的页面对象
             createNextContainer = function(createPointer, currIndex) {
                 this.createPageBase([createPointer], currIndex, 'flipOver');
-            };
+            }
 
         //如果是右边翻页
         if (direction === 'next') {

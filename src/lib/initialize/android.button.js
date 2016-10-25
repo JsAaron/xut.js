@@ -1,7 +1,7 @@
 import {
     getPlugVideoState,
     closePlugVideo
-} from './lauch.video'
+} from './app.video'
 
 /**
  * 退出加锁,防止过快点击

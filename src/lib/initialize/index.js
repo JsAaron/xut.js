@@ -1,8 +1,8 @@
 import { config } from '../config/index'
-import { plugVideo, html5Video } from './lauch.video'
-import dynamic from './dynamic.set'
+import { plugVideo, html5Video } from './app.video'
+import initConfig from './init.config'
 import button from './android.button'
-import loadScene from './lauch.scene'
+import loadScene from './load.app'
 
 import {
     $$set,
@@ -95,7 +95,7 @@ const initMain = (novelData) => {
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-const initApp = () => dynamic(initMain)
+const initApp = () => initConfig(initMain)
 
 
 /**
@@ -159,6 +159,7 @@ export default function init() {
         } else {
             window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
             document.addEventListener("deviceready", () => {
+                Xut.plat.hasPlugin = true //支持插件
                 Xut.Plugin.XXTEbookInit.startup(config.dbName, operation, function() {});
             }, false)
         }

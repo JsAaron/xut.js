@@ -139,6 +139,13 @@
         hasMutationObserverBug: hasMutationObserverBug,
 
         /**
+         * 是否在支持插件
+         * phonegap
+         * @type {Boolean}
+         */
+        hasPlugin:false,
+
+        /**
          * 不能自动播放媒体
          * audio
          * video

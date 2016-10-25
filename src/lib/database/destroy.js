@@ -1,4 +1,4 @@
-import { removeResults } from './results'
+import { removeResults } from './result'
 import { removeCache } from './cache'
 
 

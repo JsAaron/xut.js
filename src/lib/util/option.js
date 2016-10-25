@@ -55,11 +55,9 @@ export function messageBox(message) {
  */
 export function replacePath(svgstr) {
     if (window.DYNAMICCONFIGT) {
-        const defaultSourcePath = "content/gallery/"
-
         //如果能找到对应的默认路径，则替换
-        if (-1 !== svgstr.indexOf(defaultSourcePath)) {
-            svgstr = svgstr.replace(defaultSourcePath, Xut.config.pathAddress)
+        if (-1 !== svgstr.indexOf('content/gallery/')) {
+            svgstr = svgstr.replace(/content\/gallery/ig, Xut.config.pathAddress)
         }
     }
     return svgstr

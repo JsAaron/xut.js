@@ -22,7 +22,7 @@ const getSpiritAni = (inputPara, data, canvasEl) => {
 }
 
 const getResources = (data) => {
-    console.log(data.md5)
+    console.log(1111)
     var option;
     var ResourcePath = "content/gallery/" + data.md5 + "/";
     var xhr = new XMLHttpRequest();

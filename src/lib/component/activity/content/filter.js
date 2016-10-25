@@ -6,7 +6,7 @@ import {
     parseJSON,
     hash
 }
-from '../../util/index'
+from '../../../util/index'
 
 /**
  * content对象的创建过滤器
