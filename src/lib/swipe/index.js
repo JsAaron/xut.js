@@ -70,7 +70,11 @@ export default class Swipe extends Observer {
 
             stopPropagation,
 
-            preventDefault: preventDefault !== undefined ? preventDefault : true,
+            /**
+             * 默认阻止所有行为
+             * @type {[type]}
+             */
+            preventDefault: preventDefault ? preventDefault : true,
 
             /**
              * 是否分段处理
@@ -288,10 +292,6 @@ export default class Swipe extends Observer {
         //前尾是否允许反弹
         if (!this.options.borderBounce) {
             if (this._isBounce = this._borderBounce(deltaX)) return;
-        }
-
-        if (this.options.preventDefault) {
-            e.preventDefault()
         }
 
         //滑动方向
@@ -729,6 +729,8 @@ export default class Swipe extends Observer {
      * @return {[type]}   [description]
      */
     handleEvent(e) {
+
+        this.options.preventDefault && e.preventDefault()
         this.options.stopPropagation && e.stopPropagation()
 
         //接受多事件的句柄

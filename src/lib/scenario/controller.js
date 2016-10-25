@@ -232,8 +232,3 @@ Xut.sceneController = sceneController
 export { sceneController }
 
 
-// Xut.test = function() {
-//     console.log('场景对象', Xut.sceneController.containerObj('current')),
-//         console.log('vm对象', Xut.sceneController.containerObj('current').vm),
-//         console.log('页面对象', Xut.sceneController.containerObj('current').vm.$scheduler)
-// }

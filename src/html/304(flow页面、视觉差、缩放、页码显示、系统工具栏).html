@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html> -->
 <html>
 
 <head>
@@ -14,11 +14,27 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-    <script src="lib/import.external.js"></script>
+    <script type="text/javascript" src="lib/import.external.js"></script>
+    <style type="text/css">
+    .bt1 {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 9999999999
+    }
+    .bt2 {
+        position: absolute;
+        left: 50px;
+        top: 0;
+        z-index: 9999999999
+    }
+    </style>
 </head>
 
 <body>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
+
+
     <div id="xut-stream-flow" style="display:none;z-index:-1">
         <div id="season-flow-1">
             <div id="chapter-flow-4" data-margin="9.07173,7.78098,5.696203,7.78098">
@@ -94,7 +110,7 @@ class="st_d5a74ad4f3b93514">30</span>岁。<span class="st_d5a74ad4f3b93514">“
                 <div class="WordSection1">
                     <p class="MsoNormal"><span class="st_fb5f068cce9bc243">&#160;</span></p>
                     <p class="MsoNormal"><span class="st_3acd961a467ae943"><img   
-src="content/304/gallery/c86806ff1d5085932de109c1537dfe1c.jpg" alt="img8420a0b2eb473736" class="st_f2a5bfa1ee8b7421" id="img_e56a2da69c8afef0" /></span></p>
+src="content/304/gallery/216194dc8b363a1442ecd279cbc64522.png" alt="img8420a0b2eb473736" class="st_f2a5bfa1ee8b7421" id="img_e56a2da69c8afef0" /></span></p>
                     <p class="ac"><span class="st_27639265463bd7df">一张健身歌单的理由</span></p>
                     <p class="a9 st_a69443b393f3fc2f"><span class="st_cdea5446d8c8d7df">TH
 </span><span class="st_fbe5f432540ad7df">听着新专辑《今日营业中》（<span class="st_3acd961a467ae943">53</span>分<span class="st_3acd961a467ae943">75</span>秒）健身的话，你会如何排序？</span>
@@ -117,22 +133,29 @@ class="st_3acd961a467ae943">2011</span>年<span class="st_3acd961a467ae943">8</s
             </div>
         </div>
     </div>
+
 </body>
 
 </html>
 <script type="text/javascript">
+
 Xut.Application.setConfig = {
-    visualMode: 0,
+    visualMode: 3,
     lauchMode: 1 //启动模式
 }
 
-const appid = 304
-Xut.Application.Launch({
-    el: '#xxtppt-app-container',
-    paths: {
-        resource: 'content/' + appid,
-        database: 'content/' + appid + '/SQLResult.js'
-    },
-    cursor: false
-});
+var appid =  304
+var length = 0
+var max = appid + length
+
+var Launch = function() {
+    Xut.Application.Launch({
+        el: '#xxtppt-app-container',
+        paths: {
+            resource: 'content/' + appid,
+            database: 'content/' + appid + '/SQLResult.js'
+        }
+    });
+}
+
 </script>

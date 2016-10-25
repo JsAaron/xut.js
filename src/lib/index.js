@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 851
+Xut.Version = 852
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing

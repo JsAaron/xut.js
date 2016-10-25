@@ -144,10 +144,10 @@ export default function setView(config, fullProportion) {
      * @return {[type]}
      */
     return {
-        width: newWidth,
-        height: newHeight,
-        left: newLeft,
-        top: newTop
+        width: CEIL(newWidth),
+        height: CEIL(newHeight),
+        left: CEIL(newLeft),
+        top: CEIL(newTop)
     }
 
 }

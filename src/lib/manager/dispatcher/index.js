@@ -300,14 +300,13 @@ export default class Dispatcher {
         direction
     }) {
 
-        let self = this
-        let currIndex = pageIndex
-
         //用户强制直接切换模式
         //禁止页面跟随滑动
         if (this.options.flipMode && action == 'flipMove') {
             return
         }
+
+        let currIndex = pageIndex
 
         //移动的距离
         let moveDist = getFlipDistance({
@@ -615,64 +614,61 @@ export default class Dispatcher {
      * @return {[type]}             [description]
      */
     _advanceCreate(direction, pagePointer) {
-        var pagetotal = this.options.pagetotal,
-            vm = this.vm,
-            createPointer = pagePointer.createPointer,
-            destroyPointer = pagePointer.destroyPointer,
-            //清理页码
-            clear = function() {
-                delete pagePointer.createPointer;
-                delete pagePointer.destroyPointer;
-            },
-            //创建新的页面对象
-            createNextContainer = function(createPointer, currIndex) {
-                this.createPageBase([createPointer], currIndex, 'flipOver');
-            }
+        let pagetotal = this.options.pagetotal
+        let vm = this.vm
+        let createPointer = pagePointer.createPointer
 
-        //如果是右边翻页
-        if (direction === 'next') {
-            //首尾无须创建页面
-            if (pagePointer.currIndex === pagetotal - 1) {
-                this._autoRun();
-                //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-                if (pagetotal == 2) {
-                    vm.$emit('change:showPrev');
-                }
-                //多页处理
-                vm.$emit('change:hideNext');
-                return
-            }
-            if (createPointer < pagetotal) { //创建的页面
-                createNextContainer.call(this, createPointer, pagePointer.currIndex);
-                clear();
-                vm.$emit('change:showPrev');
-                return;
-            }
+        //清理页码
+        let clearPointer = function() {
+            delete pagePointer.createPointer;
+            delete pagePointer.destroyPointer;
         }
+
+        //创建新的页面对象
+        let createNextPageBase = currIndex => this.createPageBase([createPointer], currIndex, 'flipOver')
 
         //如果是左边翻页
         if (direction === 'prev') {
             //首尾无须创建页面
             if (pagePointer.currIndex === 0) {
-                this._autoRun();
-                //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-                if (pagetotal == 2) {
-                    vm.$emit('change:showNext');
+                this._autoRun()
+                if (pagetotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+                    vm.$emit('change:showNext')
                 }
-                vm.$emit('change:hidePrev');
+                vm.$emit('change:hidePrev')
                 return
             }
             if (pagePointer.currIndex > -1) { //创建的页面
-                createNextContainer.call(this, createPointer, pagePointer.currIndex);
-                clear();
-                vm.$emit('change:showNext');
+                createNextPageBase(pagePointer.currIndex)
+                clearPointer()
+                vm.$emit('change:showNext')
                 return;
             }
         }
 
-        clear();
+        //如果是右边翻页
+        if (direction === 'next') {
+            //首尾无须创建页面
+            if (pagePointer.currIndex === pagetotal - 1) {
+                this._autoRun()
+                if (pagetotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+                    vm.$emit('change:showPrev')
+                }
+                //多页处理
+                vm.$emit('change:hideNext')
+                return
+            }
+            if (createPointer < pagetotal) { //创建的页面
+                createNextPageBase(pagePointer.currIndex)
+                clearPointer()
+                vm.$emit('change:showPrev')
+                return
+            }
+        }
 
-        return;
+        clearPointer()
+
+        return
     }
 
 

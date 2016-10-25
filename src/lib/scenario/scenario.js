@@ -13,9 +13,9 @@ import {
 } from '../component/flow/get'
 
 import {
-    home,
-    scene
-} from './layout'
+    mainScene,
+    deputyScene
+} from './scene.layout'
 
 import {
     pMainBar,
@@ -122,15 +122,15 @@ export class SceneFactory {
             return;
         }
 
-        let str
+        let layout
 
         if (options.isMain) {
-            str = home()
+            layout = mainScene()
         } else {
-            str = scene(this.scenarioId)
+            layout = deputyScene(this.scenarioId)
         }
 
-        this.$rootNode = $(str)
+        this.$rootNode = $(layout)
 
         Xut.nextTick({
             'container': this.$container,
@@ -381,25 +381,21 @@ export class SceneFactory {
      */
     destroy() {
 
-        /**
-         * 销毁当前场景
-         */
+        //销毁当前场景
         this.vm.$destroy();
 
-        /**
-         * 销毁工具栏
-         */
+        //销毁工具栏
         if (this.isToolbar) {
-            this.isToolbar.destroy();
-            this.isToolbar = null;
+            this.isToolbar.destroy()
+            this.isToolbar = null
         }
 
-        this.$container = null;
+        this.$container = null
 
         //销毁节点
-        this.$rootNode.off();
-        this.$rootNode.remove();
-        this.$rootNode = null;
+        this.$rootNode.off()
+        this.$rootNode.remove()
+        this.$rootNode = null
 
         //销毁引用
         sceneController.remove(this.scenarioId)

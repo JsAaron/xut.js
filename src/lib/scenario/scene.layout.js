@@ -13,10 +13,10 @@ const isIOS = Xut.plat.isIOS
 const TOP = isIOS ? 20 : 0
 
 /**
- * 首页布局
+ * 主场景
  * @return {[type]} [description]
  */
-export function home() {
+export function mainScene() {
 
     let iconHeight = config.iconHeight
     let proportion = config.proportion
@@ -79,11 +79,11 @@ export function home() {
 
 
 /**
- * [scene 创建场景]
+ * 副场景
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-export function scene(id) {
+export function deputyScene(id) {
 
     const scenarioId = 'scenario-' + id
     const overflow = config.visualMode === 1 ? 'visible' : 'hidden'

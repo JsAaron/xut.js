@@ -106,6 +106,7 @@ export default class PinchPan {
             'pinchcancel': '_onPinchEnd'
         }, (value, key) => {
             this.hammer.on(key, (e) => {
+                e.preventDefault()
                 e.srcEvent.stopPropagation()
                 this[value](e)
             })
