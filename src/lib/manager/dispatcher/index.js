@@ -546,11 +546,6 @@ export default class Dispatcher {
                     direction
                 })
                 setToolbar.call(this)
-                $(".xut-cover").animate({
-                    opacity: 0
-                }, 1000, function() {
-                    $(this).remove()
-                });
                 break;
             case 'toPage':
                 //更新页码标示
@@ -679,25 +674,39 @@ export default class Dispatcher {
      */
     _loadPage(action) {
 
+        let self = this
+
         //触发自动任务
-        const trigger = () => {
-            this._autoRun({
-                'action': 'init'
-            })
+        let triggerAuto = function() {
+            let $cover = $(".xut-cover")
+            if ($cover.length) {
+                $cover.animate({
+                    opacity: 0
+                }, 1000, function() {
+                    $cover.hide().remove()
+                    self._autoRun({
+                        'action': action
+                    })
+                })
+            } else {
+                self._autoRun({
+                    'action': action
+                })
+                $cover = null
+                self = null
+            }
         }
 
         //创建完成回调
         this.vm.$emit('change:createComplete', () => {
             if (this.options.multiScenario) {
-                trigger()
-            } else {
-                //第一次加载
-                //进入应用
-                $("#xut-main-scene").css({
-                    'visibility': 'visible'
-                })
+                triggerAuto()
+            }
+            //第一次加载
+            //进入应用
+            else {
                 if (window.GLOBALIFRAME) {
-                    trigger();
+                    triggerAuto()
                     return
                 }
                 //获取应用的状态
@@ -705,11 +714,11 @@ export default class Dispatcher {
                     //保留启动方法
                     var pre = Xut.Application.LaunchApp;
                     Xut.Application.LaunchApp = function() {
-                        pre();
-                        trigger()
+                        pre()
+                        triggerAuto()
                     };
                 } else {
-                    trigger()
+                    triggerAuto()
                 }
             }
         })

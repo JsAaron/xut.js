@@ -9,7 +9,7 @@ import { destroyConfig } from './config/index'
 /**
  * 销毁接口
  * action 可能是
- * 1 destory 默认
+ * 1 destory 默认，单页面切换，只做销毁。但是代码还是同一份
  * 2 refresh 刷新，旋转切换（需要做一些数据保留，比如外联json数据）
  * 3 exit 退出应用，所以这个应该是全销毁
  * @param {[type]} action [description]
@@ -23,16 +23,16 @@ export default function Destroy(action = 'destory') {
     //修复的音频对象
     //数据的结果集
     if (action === 'exit') {
-        //桌面左右按钮
         if (Xut.plat.isBrowser) {
-            $(document).off()
+            $(document).off() //左右按钮
+            $(window).off() //横竖切换
         }
         //修复的音频对象
         destroyFixAudio()
     }
 
-    //横竖切换应用，数据集合不删除
-    if (action !== 'refresh') {
+    //refresh状态不删除结果集
+    if (action === 'destory' || action === 'exit') {
         destroyResult()
     }
 

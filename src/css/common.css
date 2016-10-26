@@ -239,7 +239,7 @@ video {
 
 .xut-cover {
     position: absolute;
-    z-index: 3;
+    z-index: 2;
 }
 
 /*根节点*/
@@ -253,7 +253,7 @@ video {
 
 .xut-busy-icon {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
 }
 
 .xut-busy-middle {

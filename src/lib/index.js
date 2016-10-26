@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 852
+Xut.Version = 857
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -30,7 +30,6 @@ if (Xut.plat.isBrowser) {
         }
     })
 }
-
 
 /**
  * 接口接在参数
@@ -85,6 +84,7 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
         $appNode.remove()
         $rootNode = null
         $appNode = null
+        Xut.Application.$$removeNode = null
     }
 
     nextTick({
@@ -116,18 +116,20 @@ const loadApp = function(...arg) {
 // })
 
 //横竖切换
-Xut.plat.isBrowser && window.addEventListener("orientationchange", function() {
+Xut.plat.isBrowser && $(window).on('orientationchange', function() {
     //0模式，默认关闭横竖切换
     if (config.orientateMode === 0) {
         return
     }
+    let temp = lauchOptions
     Xut.Application.Refresh()
-    if (lauchOptions.length) {
-        Xut.Application.Launch.apply(null, lauchOptions.pop())
+    if (temp.length) {
+        Xut.Application.Launch.apply(null, temp.pop())
+        temp = null
     } else {
         loadApp()
     }
-}, false)
+})
 
 
 //新版本加载
@@ -138,8 +140,7 @@ Xut.Application.Launch = function({
 }) {
     if (Xut.Application.setConfig.lauchMode === 1) {
         (lauchOptions = []).push(arguments)
-        //外部配置文件
-        window.DYNAMICCONFIGT = {
+        window.DYNAMICCONFIGT = { //外部配置文件
             resource: paths.resource,
             database: paths.database
         }

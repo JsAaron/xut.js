@@ -24,7 +24,7 @@ const initMain = (novelData) => {
     let novelId
     let parameter
     let pageIndex = getCache('pageIndex')
-    let flipMode = getCache('flipMode')
+    let flipMode = getCache('flipMode') || 0
 
     /**
      * IBOOS模式
@@ -47,9 +47,10 @@ const initMain = (novelData) => {
      */
     if (parameter = novelData.parameter) {
         parameter = parseJSON(parameter)
-            //配置全局翻页模式
-            //flipMode可以为0
-            //兼容flipMode错误,强制转化成数字类型
+
+        //配置全局翻页模式
+        //flipMode可以为0
+        //兼容flipMode错误,强制转化成数字类型
         if (parameter.pageflip !== undefined) {
             flipMode = toEmpty(parameter.pageflip)
             $$set({ 'flipMode': flipMode })

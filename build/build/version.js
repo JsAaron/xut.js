@@ -19,7 +19,7 @@ module.exports = (conf) => {
         let rpath = conf.tarDir + conf.devName
         let wpath = conf.tarDir + 'version.js'
         let data = readFile(rpath)
-        let vs = data.match(/Xut.Version\s?=\s?(\d)+/ig)[0].match(/\d+/ig)[0]
+        let vs = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
         writeFile(wpath, vs)
         resolve && resolve()
     })

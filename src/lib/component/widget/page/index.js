@@ -9,7 +9,7 @@
  *
  * *******************************************************************/
 
-import { loader } from './loader'
+import { loadFile, removeLoad } from './loader'
 import { createData } from './data'
 import AdvSprite from './extend/adv.sprite'
 import ScrollArea from './extend/scroll.area'
@@ -32,7 +32,6 @@ let parseContentObjs = (pageType, inputPara) => {
  * @param {[type]} data [description]
  */
 export default class PageWidget {
-
 
     constructor(data) {
         _.extend(this, data)
@@ -75,9 +74,9 @@ export default class PageWidget {
         else {
             //If there is no
             if (typeof window[this.widgetName + "Widget"] != "function") {
-                loader(this._executive, this)
+                loadFile(this._executive, this)
             } else {
-                this._executive();
+                this._executive()
             }
         }
     }
@@ -135,6 +134,7 @@ export default class PageWidget {
      * @return {[type]} [description]
      */
     destroy() {
+        removeLoad()
         this.pageObj && this.pageObj.destroy && this.pageObj.destroy();
     }
 

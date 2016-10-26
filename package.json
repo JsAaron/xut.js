@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node build/dev/index.js",
     "build": "node build/build/index.js",
+    "build-widget":"node build/build/compiler-widget.js",
     "copy": "node build/copy/index.js",
     "remote": "node build/remote/index.js",
     "lint": "eslint dist/xxtppt.dev.js",

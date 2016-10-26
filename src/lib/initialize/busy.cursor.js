@@ -11,7 +11,7 @@ const animationDelay = Xut.style.animationDelay
  * 延时加载
  * @type {Number}
  */
-const delay = 1000
+const delay = 500
 
 /**
  * 光标对象

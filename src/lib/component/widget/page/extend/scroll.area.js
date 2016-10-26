@@ -18,7 +18,10 @@ export default class ScrollArea {
         const prefix = this.data.contentPrefix;
         //创建多个眷滚区域
         for (let i = 0; i < content.length; i++) {
-            this.scrolls.push(this._create(content[i], prefix))
+            let obj = this._create(content[i], prefix)
+            if (obj) {
+                this.scrolls.push(obj)
+            }
         }
     }
 
@@ -109,12 +112,6 @@ export default class ScrollArea {
         //y轴方向卷滚：snap容器的高度 个数以及每个snap容器包含的content个数
         const colsObj = this._resetContents(obj, prefix, contentSize, scrollX, scrollY, min);
 
-        //若只存在一个snap容器则不需要进行卷滚
-        if ((scrollX && colsObj.snapXCount == 1) || (scrollY && colsObj.snapYCount == 1)) {
-            contentPanle.attr("data-iscroll", "hidden");
-            return;
-        }
-
         //创建snap容器
         let snapContainer = this._createSnapContainer(colsObj, $scroller, cid, scrollX, scrollY)
 
@@ -134,17 +131,48 @@ export default class ScrollArea {
             }
         }
 
-        contentPanle.attr("data-iscroll", "visible");
+        //如果不满足溢出条件
+        let $areaScroller = snapContainer.parent()
+        if (scrollX) {
+            let snapContainerWidth = parseInt($areaScroller.css('width'))
+            if (snapContainerWidth < contentSize.w) {
+                scrollX = false
+            }
+        }
+        if (scrollY) {
+            let snapContainerHeight = parseInt($areaScroller.css('height'))
+            if (snapContainerHeight < contentSize.h) {
+                scrollY = false
+            }
+        }
 
-        return this._bindIscroll($wrapper[0], scrollX, scrollY, cid)
+        if (scrollY || scrollX) {
+            contentPanle.attr("data-iscroll", "visible");
+           //只存在一屏 需要卷滚时 不要要snap
+            if (snapContainer.length == 1) {
+                return this._bindIscroll($wrapper[0], scrollX, scrollY)
+            }
+            return this._bindIscroll($wrapper[0], scrollX, scrollY, cid)
+        } else {
+            contentPanle.attr("data-iscroll", "hidden");
+        }
+
     }
 
-    _bindIscroll(wrapper, scrollX, scrollY, cid) {
-        return new iScroll(wrapper, {
-            scrollX: scrollX ? true : false,
-            scrollY: scrollY ? true : false,
-            snap: ".contentsContainer" + cid
-        })
+    _bindIscroll(wrapper, hasScrollX, hasScrollY, cid) {
+        if (cid) {
+            return new iScroll(wrapper, {
+                scrollX: hasScrollX ? true : false,
+                scrollY: hasScrollY ? true : false,
+                snap: ".contentsContainer" + cid
+            })
+        } else {
+            return new iScroll(wrapper, {
+                scrollX: hasScrollX ? true : false,
+                scrollY: hasScrollY ? true : false
+            })
+        }
+
     }
 
     _getSize(objIds, prefix) {
@@ -433,8 +461,10 @@ export default class ScrollArea {
         if (this.scrolls.length) {
             for (let i = 0; i < this.scrolls.length; i++) {
                 let obj = this.scrolls[i]
-                obj.scrollTo(0, 0)
-                obj.destroy()
+                if (obj) {
+                    obj.scrollTo(0, 0)
+                    obj.destroy()
+                }
                 this.scrolls[i] = null
             }
             this.scrolls = null

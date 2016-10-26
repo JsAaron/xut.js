@@ -143,7 +143,7 @@ export default {
      * [orientate description]
      * @type {[type]}
      */
-    orientateMode: DEFAULT,
+    orientateMode: Xut.plat.isBrowser ? 1 : 0,
 
     /**
      * 调试模式
