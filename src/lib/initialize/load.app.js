@@ -3,8 +3,7 @@ import { config } from '../config/index'
 import {
     $$set,
     $$get,
-    execScript,
-    toEmpty
+    execScript
 }
 from '../util/index'
 
@@ -29,8 +28,8 @@ const setDataToStorage = (parameter) => {
  */
 const initDefaultValues = (options) => {
     return {
-        'novelId'   : toEmpty(options.novelId),
-        'pageIndex' : toEmpty(options.pageIndex),
+        'novelId'   : Number(options.novelId),
+        'pageIndex' : Number(options.pageIndex),
         'history'   : options.history
     }
 };

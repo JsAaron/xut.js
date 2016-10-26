@@ -115,7 +115,7 @@ export default class Flow {
             Xut.View.ShowToolBar('pageNumber')
         }
 
-        if (Xut.plat.hasTouch && config.saleMode !== false) {
+        if (Xut.plat.hasTouch && config.saleMode) {
             slide = new PinchPan({
                 hasButton: false,
                 $pagePinch: $pageImage.children(),

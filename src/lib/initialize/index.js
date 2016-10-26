@@ -7,7 +7,6 @@ import loadScene from './load.app'
 import {
     $$set,
     $$get,
-    toEmpty,
     parseJSON
 }
 from '../util/index'
@@ -52,17 +51,16 @@ const initMain = (novelData) => {
         //flipMode可以为0
         //兼容flipMode错误,强制转化成数字类型
         if (parameter.pageflip !== undefined) {
-            flipMode = toEmpty(parameter.pageflip)
+            flipMode = Number(parameter.pageflip)
             $$set({ 'flipMode': flipMode })
         }
     }
 
     /**
      * 设置全局翻页模式
-     * @param  {[type]} _.isUndefined(config.flipMode) [description]
-     * @return {[type]}                                [description]
+     * @return {[type]} [description]
      */
-    if (_.isUndefined(config.flipMode)) {
+    if (flipMode) {
         config.flipMode = Number(flipMode)
     }
 

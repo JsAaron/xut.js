@@ -111,7 +111,7 @@ export default function(instance) {
 
             //创建缩放
             const createPinch = function(flow) {
-                if (instance.pageType === 'page' && config.saleMode !== false) {
+                if (instance.pageType === 'page' && config.saleMode) {
                     const $pagePinch = instance.getContainsNode()
                     if (flow) {
                         //flow页面不处理

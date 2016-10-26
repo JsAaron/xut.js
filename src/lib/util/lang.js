@@ -35,13 +35,6 @@ export function toNumber(o) {
     return Number(o) || null;
 };
 
-/**
- * 保证有效值
- * @return {[type]} [description]
- */
-export function toEmpty(val) {
-    return Number(val);
-}
 
 /**
  * 创建一个纯存的hash对象
@@ -57,7 +50,6 @@ export function hash() {
 export function hasValue(value) {
     return value != undefined
 }
-
 
 
 export function $$extend(object, config) {

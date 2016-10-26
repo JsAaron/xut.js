@@ -27,11 +27,13 @@ const configMultiple = (options) => {
     if (Xut.IBooks.Enabled) {
         options.multiplePages = false
     } else {
-
         //判断多页面情况
         //1 数据库定义
         //2 系统优化
-        options.multiplePages = options.flipMode ? options.flipMode : options.pageMode ? true : false
+        options.multiplePages =
+            options.flipMode ?
+            options.flipMode :
+            options.pageMode ? true : false
     }
 }
 
@@ -381,5 +383,3 @@ def(Mediator.prototype, '$destroy', function() {
     this.$globalEvent = null;
     this.destoryDynamicApi() //动态api
 })
-
-

@@ -42,29 +42,8 @@ export default {
     visualMode: 0,
 
     /**
-     * 双页面模式，竖版ppt在横版显示
-     * 一个view中，显示2个page
-     * 一个页面宽度50%，拼接2个页面100%
-     * 高度正比，这样高度不溢出，中间布局留空白
-     * 默认禁止：
-     * 1 true 启动
-     * 2 false 禁止
-     */
-    doublePageMode: false,
-
-    /**
-     * 是否启动页面缩放，mini排版处理
-     * 默认自动，根据是否存在flow数据处理
-     * 如果强行介入，这里设置
-     * 1 true 启动
-     * 2 false 禁止
-     */
-    saleMode: DEFAULT,
-
-    /**
      * 全局翻页模式
      * 给妙妙单独开的一个模式
-     * 有用
      * 一个novel对应多个season表 所以这里其实不能算全局设置，可以存在多个novel
      * novel表定义，数据库定义的翻页模式
      * 用来兼容客户端的制作模式
@@ -74,7 +53,37 @@ export default {
      * 1 禁止滑动,直接快速切换页面(通过左右按键快速切换页面)
      * @type {Number}
      */
-    flipMode: DEFAULT, //默认不设置，待数据库填充。如设置,数据库设置忽略
+    flipMode: 0, //默认0，待数据库填充
+
+    /**
+     * 应用的加载模式
+     * 0： 应用自行启动
+     * 1： 应用通过接口启动
+     *     Xut.Application.Launch
+     *     提供全局可配置参数
+     * @type {Number}
+     */
+    lauchMode: 0,
+
+    /**
+     * 应用横竖自适应切换
+     * 默认在浏览器端打开
+     * 这里可以定义打开关闭
+     * 打开：1
+     * 默认：0
+     * [orientate description]
+     * @type {[type]}
+     */
+    orientateMode: Xut.plat.isBrowser ? true : false,
+
+    /**
+     * 是否启动页面缩放，mini排版处理
+     * 默认自动，根据是否存在flow数据处理
+     * 如果强行介入，这里设置
+     * 1 true 启动
+     * 2 false 禁止
+     */
+    saleMode: false, //默认关闭
 
     /**
      *  仅做测试处理，因为每个section都可以对应配置pageMode参数
@@ -114,36 +123,15 @@ export default {
     },
 
     /**
-     * 翻页模式
-     * 0 dyd   动态模式处理每个page翻页 piecewise
-     * 1 linear  只处理根节点翻页
-     * @type {[type]}
-     * 废弃，方案行不通
-     * 因为动态增减li页面，需要每次翻页修改父容器的滑动参数，这样会引起闪屏
-     * 除非是一次性生成所有的节点。这样宽度会溢出很大
+     * 双页面模式，竖版ppt在横版显示
+     * 一个view中，显示2个page
+     * 一个页面宽度50%，拼接2个页面100%
+     * 高度正比，这样高度不溢出，中间布局留空白
+     * 默认禁止：
+     * 1 true 启动
+     * 2 false 禁止
      */
-    swipeMode: DEFAULT,
-
-    /**
-     * 应用的加载模式
-     * 0： 应用自行启动
-     * 1： 应用通过接口启动
-     *     Xut.Application.Launch
-     *     提供全局可配置参数
-     * @type {Number}
-     */
-    lauchMode: 0,
-
-    /**
-     * 应用横竖自适应切换
-     * 默认在浏览器端打开
-     * 这里可以定义打开关闭
-     * 打开：1
-     * 默认：0
-     * [orientate description]
-     * @type {[type]}
-     */
-    orientateMode: Xut.plat.isBrowser ? 1 : 0,
+    doublePageMode: false,
 
     /**
      * 调试模式

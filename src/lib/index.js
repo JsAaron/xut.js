@@ -117,17 +117,16 @@ const loadApp = function(...arg) {
 
 //横竖切换
 Xut.plat.isBrowser && $(window).on('orientationchange', function() {
-    //0模式，默认关闭横竖切换
-    if (config.orientateMode === 0) {
-        return
-    }
-    let temp = lauchOptions
-    Xut.Application.Refresh()
-    if (temp.length) {
-        Xut.Application.Launch.apply(null, temp.pop())
-        temp = null
-    } else {
-        loadApp()
+    //如果启动了这个模式
+    if (config.orientateMode) {
+        let temp = lauchOptions
+        Xut.Application.Refresh()
+        if (temp.length) {
+            Xut.Application.Launch.apply(null, temp.pop())
+            temp = null
+        } else {
+            loadApp()
+        }
     }
 })
 
