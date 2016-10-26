@@ -15,9 +15,18 @@
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
     <script type="text/javascript" src="lib/import.external.js"></script>
+    <style type="text/css">
+    .switch {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 9999999999
+    }
+    </style>
 </head>
 
 <body>
+    <button class="switch">切换</button>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
@@ -28,11 +37,37 @@ Xut.Application.setConfig = {
 }
 
 var appid = 101
-Xut.Application.Launch({
-    el: '#xxtppt-app-container',
-    paths: {
-        resource: 'content/' + appid,
-        database: 'content/' + appid + '/SQLResult.js'
+var length = 3
+var max = appid + length
+
+var launch = function() {
+    state = true
+    Xut.Application.Launch({
+        el: '#xxtppt-app-container',
+        paths: {
+            resource: 'content/' + appid,
+            database: 'content/' + appid + '/SQLResult.js'
+        }
+    });
+    ++appid
+}
+
+var destory = function() {
+    state = false
+    Xut.Application.Destroy()
+}
+
+var state = false
+
+$(".switch").click(function() {
+    if (appid > max) {
+        appid = max - length
     }
+    if (state) {
+        destory()
+    } else {
+        launch()
+    }
+
 })
 </script>

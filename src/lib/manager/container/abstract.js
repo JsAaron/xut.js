@@ -62,7 +62,7 @@ export class Abstract {
                 pageIndex = this._conversionMasterId(pageIndex); //转化成母版id
             }
         }
-        return this.Collections[pageIndex];
+        return this.Collections && this.Collections[pageIndex];
     }
 
     /**
