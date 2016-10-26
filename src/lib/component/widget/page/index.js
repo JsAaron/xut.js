@@ -74,6 +74,7 @@ export default class PageWidget {
         else {
             //If there is no
             if (typeof window[this.widgetName + "Widget"] != "function") {
+                this.hasload = true
                 loadFile(this._executive, this)
             } else {
                 this._executive()
@@ -134,7 +135,7 @@ export default class PageWidget {
      * @return {[type]} [description]
      */
     destroy() {
-        removeLoad()
+        this.hasload && removeLoad()
         this.pageObj && this.pageObj.destroy && this.pageObj.destroy();
     }
 
