@@ -12,8 +12,8 @@
     "test-server": "node build/test.server.js",
     "unit": "karma start test/unit/karma.conf.js",
     "karma": "karma start karma.conf.js --log-level debug --single-run",
-    "git": "bash build/git.sh",
-    "svn": "bash build/svn.sh"
+    "git": "bash build/shell/git.sh",
+    "svn": "bash build/shell/svn.sh"
   },
   "repository": {
     "type": "git",
