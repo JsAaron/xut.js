@@ -1,6 +1,5 @@
 import { request } from './loader'
 import { parseJSON } from './lang'
-import { messageBox as box } from './notice'
 import { config } from '../config/index'
 
 const CEIL = Math.ceil
@@ -34,16 +33,6 @@ export function execScript(code, type) {
     } catch (e) {
         console.log('加载脚本错误', type)
     }
-}
-
-
-/**
- * [ 消息框]
- * @param  {[type]} message [description]
- * @return {[type]}         [description]
- */
-export function messageBox(message) {
-    box(message);
 }
 
 

@@ -82,24 +82,4 @@ export default {
         return Adapter(data)
     }
 
-
-    /**
-     *  复位状态通知
-     *
-     *  作用：用户按页面右上角返回，或者pad手机上的物理返回键
-     *
-     *  那么：
-     *      1 按一次， 如果当前页面有活动热点，并且热点对象还在可视活动状态（比如文本，是显示，音频正在播放）
-     *        那么则调用此方法，做复位处理，即文本隐藏，音频关闭
-     *        然后返回true, 用于反馈给控制器,停止下一步调用
-     *        按第二次,则退出页面
-     *
-     *     2 按一次，如果没有活动的对象，return false,这直接退出页面
-     *
-     * @param  {[type]} activeObejct [description]
-     * @return {[type]}              [description]
-     */
-    , recovery(opts) {
-        return this.recovery();
-    }
 }

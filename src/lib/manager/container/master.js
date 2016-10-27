@@ -7,9 +7,9 @@ import { Abstract } from './abstract'
 import { Pagebase } from '../../pagebase/pagebase'
 
 import {
-    suspend as _suspend,
-    original as _original,
-    autoRun as _autoRun
+    $$suspend,
+    $$original,
+    $$autoRun
 } from '../../command/index'
 
 import {
@@ -211,7 +211,7 @@ export default class MasterMgr extends Abstract {
         if (masterObj = this.abstractGetPageObj(stopPointer)) {
             var pageId = masterObj.baseGetPageId(stopPointer);
             //停止活动对象活动
-            _suspend(masterObj, pageId);
+            $$suspend(masterObj, pageId);
         }
     }
 
@@ -223,7 +223,7 @@ export default class MasterMgr extends Abstract {
     resetOriginal(pageIndex) {
         var originalPageObj;
         if (originalPageObj = this.abstractGetPageObj(pageIndex)) {
-            _original(originalPageObj);
+            $$original(originalPageObj);
         }
     }
 
@@ -236,7 +236,7 @@ export default class MasterMgr extends Abstract {
         if (masterObj = this.abstractGetPageObj(data.currIndex)) {
             //热点状态复位
             this.resetOriginal(data.suspendIndex)
-            _autoRun(masterObj, data.currIndex);
+            $$autoRun(masterObj, data.currIndex);
         }
     }
 
@@ -528,7 +528,7 @@ export default class MasterMgr extends Abstract {
         let contentObjs
         let prevNodes
         let nodes
- 
+
         const repairNodes = function(scope, currPageIndex, targetIndex) {
             var rangePage = scope.calculateRangePage(),
                 $contentNode = scope.$contentNode,

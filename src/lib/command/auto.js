@@ -3,7 +3,7 @@
  * @return {[type]} [description]
  */
 
-import { access } from './access'
+import access from './access'
 import allowNext from '../allow.next'
 import directives from '../directive/index'
 
@@ -29,6 +29,8 @@ const autoContents = (contentObjs, taskAnimCallback) => {
 
     _.each(contentObjs, (obj, index) => {
         if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+            //同一个对象类型
+            //直接调用对象接口
             obj.autoPlay(markComplete)
         } else {
             markComplete();
@@ -53,6 +55,8 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
 
     _.each(autoData, (data, index) => {
         dir = directives[data.actType]
+        //零件类型的接口调用不一致
+        //这里需要转接口处理
         if (dir && dir.autoPlay) {
             dir.autoPlay({
                 'id': data.id,
@@ -75,7 +79,7 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
  * @param  {[type]} taskAnimCallback [description]
  * @return {[type]}                  [description]
  */
-export function autoRun(pageObj, pageIndex, taskAnimCallback) {
+export function $$autoRun(pageObj, pageIndex, taskAnimCallback) {
 
     /**
      * 编译IBOOKSCONFIG的时候过滤自动运行的调用

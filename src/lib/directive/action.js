@@ -56,22 +56,4 @@ export default {
         Action(data)
     }
 
-
-    /**
-     * 复位对象
-     * 通过按物理键，关闭当前热点
-     * 如果当前没有需要处理的Action
-     * 需要返回一个状态标示告诉当前是否应该退出应用
-     * @param  {[type]} opts [description]
-     * @return {[type]}      [description]
-     */
-    , recovery(opts) {
-        if (this.state) {
-            this.state = false;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
 }

@@ -4,7 +4,7 @@
  */
 export function goHomePage() {
     if (window.DUKUCONFIG) {
-        Xut.Application.Suspend({
+        Xut.Application.Stop({
             dispose: function() {
                 Xut.Application.DropApp() //退出应用
             },
@@ -16,10 +16,9 @@ export function goHomePage() {
     }
     //动作处理
     //如果有动作则关闭，否则直接跳转
-    Xut.Application.Suspend({
-        dispose: function(promptMessage) {
+    Xut.Application.Stop({
+        dispose: function() {
             //停止热点动作
-            // promptMessage('关闭所有动作，再按一次将跳至首页！')
         },
         processed: function() {
             Xut.View.GotoSlide(1)

@@ -1,7 +1,6 @@
 
 import {
-    suspendHandles,
-    promptMessage
+    stopProcessor
 } from '../../global.stop'
 
 import { config } from '../../config/index'
@@ -88,14 +87,14 @@ export default function(Action) {
 
             if (iframe) {
                 //子文档操作
-                if (suspendHandles()) {
-                    promptMessage('再按一次将退出子目录！')
+                if (stopProcessor()) {
+
                 } else {
                     clear();
                 }
             } else {
                 //父级操作
-                suspendHandles()
+                stopProcessor()
             }
 
         } catch (err) {

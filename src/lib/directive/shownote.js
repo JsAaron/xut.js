@@ -46,16 +46,6 @@ export default {
      */
     , autoPlay() {}
 
-    /**
-     * 翻页后处理页面中活动热点的状态
-     * @param  {[type]} activeObejct [需要处理的活动对象]
-     *
-     * 比如音频,视频 翻页需要暂停，也可以销毁
-     */
-    , flipOver(opts) {
-        //console.log('翻页处理活动对象', activeObejct ,pageIndex);
-    }
-
 
     /**
      * 销毁页面hotspot事件与Action或widget事件
@@ -68,20 +58,4 @@ export default {
         this && this.destroy();
     }
 
-
-    /**
-     * 复位对象
-     * 通过按物理键，关闭当前热点
-     *  @return 如果当前没有需要处理的Action
-     *  需要返回一个状态标示告诉当前是否应该退出应用
-     * @param  {[type]} opts [description]
-     * @return {[type]}      [description]
-     */
-    , recovery(opts) {
-        if (this.state) {
-            this.dispatchProcess();
-            return true;
-        }
-        return false
-    }
 }

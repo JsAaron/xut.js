@@ -3,7 +3,7 @@
  * 如果pageObj 不存在，则取当前页面的
  * @return {[type]} [description]
  */
-export function access(pageObj, callback) {
+export default function access(pageObj, callback) {
     let flag, contents, components, pageType
     pageObj = pageObj || Xut.Presentation.GetPageObj()
     if (pageObj) {

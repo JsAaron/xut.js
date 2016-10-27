@@ -39,7 +39,6 @@ export default class PageWidget {
         this._init()
     }
 
-
     /**
      * 获取参数
      * 得到content对象与数据
@@ -51,7 +50,6 @@ export default class PageWidget {
             parseContentObjs(this.pageType, this.inputPara)
         ]
     }
-
 
     /**
      * 初始化,加载文件
@@ -95,40 +93,32 @@ export default class PageWidget {
             console.error("Function [" + this.widgetName + "Widget] does not exist.");
         }
     }
+ 
 
-
+    /**
+     * 动画运行
+     * @return {[type]} [description]
+     */
     play() {
         return this.pageObj.play();
     }
 
 
-    getIdName() {
-        return this.pageObj.getIdName();
-    }
-
-
     /**
-     * 外部调用接口
+     * 外部切换调用接口
      * @return {[type]} [description]
      */
-    dispatchProcess() {
+    toggle() {
         this.pageObj && this.pageObj.toggle && this.pageObj.toggle();
     }
 
-
     /**
-     * 处理包装容器的状态
+     * 动作停止接口
      * @return {[type]} [description]
      */
-    domWapper() {
-        if (!this.wapper) return;
-        if (this.state) {
-            this.$wapper.hide();
-        } else {
-            this.$wapper.show();
-        }
+    stop() {
+        this.pageObj && this.pageObj.stop && this.pageObj.stop();
     }
-
 
     /**
      * 销毁页面零件

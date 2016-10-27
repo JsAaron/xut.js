@@ -57,12 +57,12 @@ export default class iframeWidget {
         const rootPath = config.pathAddress.replace('gallery/', '')
         const path = rootPath + 'widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key
 
-        ifr.id           = 'iframe_' + this.id
-        ifr.src          = path
-        ifr.style.width  = '100%'
+        ifr.id = 'iframe_' + this.id
+        ifr.src = path
+        ifr.style.width = '100%'
         ifr.style.height = '100%'
-        ifr.sandbox      = "allow-scripts allow-same-origin"
-        ifr.frameborder  = 0
+        ifr.sandbox = "allow-scripts allow-same-origin"
+        ifr.frameborder = 0
 
         if (ifr.attachEvent) {
             ifr.attachEvent('onload', () => {
@@ -84,17 +84,15 @@ export default class iframeWidget {
     _iframeComplete() {
 
         var dataSource = this._loadData()
-        var width      = this._$iframe.offsetWidth
-        var height     = this._$iframe.offsetHeight
+        var width = this._$iframe.offsetWidth
+        var height = this._$iframe.offsetHeight
 
-        if (dataSource.screenSize.width * 0.98 <= width
-            && dataSource.screenSize.height * 0.98 <= height) {
+        if (dataSource.screenSize.width * 0.98 <= width && dataSource.screenSize.height * 0.98 <= height) {
             Xut.View.Toolbar({
                 show: 'button',
                 hide: 'controlBar'
             })
-        } else if (dataSource.screenSize.width * 0.7 <= width
-            && dataSource.screenSize.height * 0.7 <= height) {
+        } else if (dataSource.screenSize.width * 0.7 <= width && dataSource.screenSize.height * 0.7 <= height) {
             Xut.View.Toolbar({
                 show: 'button'
             })
@@ -106,7 +104,7 @@ export default class iframeWidget {
             type: 'loadData',
             data: dataSource,
             //消息传递完毕后的回调
-            success: function(){},
+            success: function() {},
             error: function() {}
         })
 
@@ -169,11 +167,11 @@ export default class iframeWidget {
             clearVideo()
 
             $wapper.css({
-                width  : '100%',
-                height : '100%',
-                zIndex : Xut.zIndexlevel(),
-                top    : 0,
-                left   : 0
+                width: '100%',
+                height: '100%',
+                zIndex: Xut.zIndexlevel(),
+                top: 0,
+                left: 0
             })
 
             //Widget全屏尺寸自动调整
@@ -199,11 +197,11 @@ export default class iframeWidget {
                     top = (height - size.h) / 2;
 
                 $iframe.css({
-                    width    : size.w,
-                    height   : size.h,
-                    position : 'absolute',
-                    top      : top,
-                    left     : left
+                    width: size.w,
+                    height: size.h,
+                    position: 'absolute',
+                    top: top,
+                    left: left
                 });
             }
             //隐藏工作条
@@ -217,20 +215,20 @@ export default class iframeWidget {
             if (!$iframe.length) return;
 
             $wapper.css({
-                zIndex : this.zIndex,
-                width  : this.width + 'px',
-                height : this.height + 'px',
-                top    : this.top + 'px',
-                left   : this.left + 'px'
+                zIndex: this.zIndex,
+                width: this.width + 'px',
+                height: this.height + 'px',
+                top: this.top + 'px',
+                left: this.left + 'px'
             });
 
             //还原iframe样式
             $iframe.css({
-                width    : '100%',
-                height   : '100%',
-                position : '',
-                top      : '0',
-                left     : '0'
+                width: '100%',
+                height: '100%',
+                position: '',
+                top: '0',
+                left: '0'
             })
 
             Xut.View.Toolbar("show");
@@ -254,21 +252,6 @@ export default class iframeWidget {
     }
 
 
-
-    /**
-     * 外部调用接口
-     * 显示隐藏
-     * @return {[type]} [description]
-     */
-    dispatchProcess() {
-        if (this.state) {
-            this._stop()
-        } else {
-            this._start()
-        }
-    }
-
-
     /**
      * 开始
      * @return {[type]} [description]
@@ -276,10 +259,10 @@ export default class iframeWidget {
     _start() {
         this._domWapper()
         PMS.send({
-            target : this._$iframe.contentWindow,
-            url    : this._$iframe.src,
-            origin : '*',
-            type   : 'onShow',
+            target: this._$iframe.contentWindow,
+            url: this._$iframe.src,
+            origin: '*',
+            type: 'onShow',
             success: function() {
                 // alert(123)
             }
@@ -297,10 +280,10 @@ export default class iframeWidget {
     _stop() {
         this._domWapper()
         PMS.send({
-            target : this._$iframe.contentWindow,
-            url    : this._$iframe.src,
-            origin : '*',
-            type   : 'onHide',
+            target: this._$iframe.contentWindow,
+            url: this._$iframe.src,
+            origin: '*',
+            type: 'onHide',
             success: function() {}
         });
         setTimeout(() => {
@@ -323,25 +306,25 @@ export default class iframeWidget {
 
 
     /**
-     * 复位
+     * 停止
      * @return {[type]} [description]
      */
-    recovery() {
-        if (this.state) {
-            PMS.send({
-                target  : this._$iframe.contentWindow,
-                url     : this._$iframe.src,
-                origin  : '*',
-                type    : 'onHide',
-                success : function() {}
-            });
-            this._domWapper()
-            this.state = false
-            return true
-        }
-        return false
+    stop() {
+        this._stop()
     }
 
+    /**
+     * 外部调用接口
+     * 显示隐藏
+     * @return {[type]} [description]
+     */
+    toggle() {
+        if (this.state) {
+            this._stop()
+        } else {
+            this._start()
+        }
+    }
 
     /**
      * 销毁接口
@@ -351,10 +334,10 @@ export default class iframeWidget {
 
         //销毁内部事件
         PMS.send({
-            target : this._$iframe.contentWindow,
-            url    : this._$iframe.src,
-            origin : '*',
-            type   : 'onDestory',
+            target: this._$iframe.contentWindow,
+            url: this._$iframe.src,
+            origin: '*',
+            type: 'onDestory',
             success: function() {}
         })
 

@@ -3,14 +3,14 @@
  * @return {[type]} [description]
  */
 
-import { access } from './access'
+import access from './access'
 
 /**
  * 优化检测
  * @param  {Function} fn [description]
  * @return {[type]}      [description]
  */
-let checkOptimize = (fn) => {
+let hasOptimize = (fn) => {
     if (!Xut.config.visualMode !== 1) {
         fn && fn()
     }
@@ -25,9 +25,9 @@ let checkOptimize = (fn) => {
  * @param  {[type]} pageObj [description]
  * @return {[type]}         [description]
  */
-export function original(pageObj) {
+export function $$original(pageObj) {
 
-    access(pageObj, (pageObj, ContentObjs, ComponentObjs) => {
+    access(pageObj, (pageObj, contentObjs, componentObjs) => {
 
         //母版对象不还原
         if (pageObj.pageType === 'master') return;
@@ -35,27 +35,30 @@ export function original(pageObj) {
         var $containsNode
 
         if ($containsNode = pageObj.getContainsNode()) {
-            checkOptimize(() => {
+
+            //隐藏根节点
+            //display:none下刷新
+            hasOptimize(() => {
                 $containsNode.hide()
             })
 
-            //销毁所有widget类型的节点
-            if (ComponentObjs) {
-                _.each(ComponentObjs, (obj) => {
-                    obj && obj.destroy();
-                });
-                //销毁widget对象管理
-                pageObj.baseRemoveComponent();
-            }
-
-            //停止动作
-            ContentObjs && _.each(ContentObjs, (obj) => {
+            //content类型复位
+            contentObjs && _.each(contentObjs, (obj) => {
                 if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
-                    obj.resetAnimation && obj.resetAnimation();
+                    obj.reset && obj.reset();
                 }
             })
 
-            checkOptimize(() => {
+            //销毁所有widget类型的节点
+            if (componentObjs) {
+                _.each(componentObjs, (obj) => {
+                    obj && obj.destroy();
+                });
+                //销毁widget对象管理
+                pageObj.baseRemoveComponent()
+            }
+
+            hasOptimize(() => {
                 setTimeout(() => {
                     $containsNode.show();
                     $containsNode = null;

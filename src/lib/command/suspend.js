@@ -2,7 +2,7 @@
  * 暂停控制
  * @return {[type]} [description]
  */
-import { access } from './access'
+import access from './access'
 import { hangUpAudio } from '../component/audio/manager'
 import { removeVideo, hangUpVideo } from '../component/video/manager'
 
@@ -19,8 +19,11 @@ import { removeVideo, hangUpVideo } from '../component/video/manager'
  * @param  {[type]} all     [description]
  * @return {[type]}         [description]
  */
-export function suspend(pageObj, pageId, allHandle) {
+export function $$suspend(pageObj, pageId, allHandle) {
 
+    //零件对象翻页就直接销毁了
+    //无需暂时
+    //这里只处理音频 + content类型
     access(pageObj, (pageObj, ContentObjs, ComponentObjs) => {
 
         //多媒体处理
@@ -36,7 +39,7 @@ export function suspend(pageObj, pageId, allHandle) {
         //content类型
         if (ContentObjs) {
             _.each(ContentObjs, (obj) => {
-                obj.flipOver && obj.flipOver();
+                obj.stop && obj.stop();
             })
         }
 

@@ -25,7 +25,7 @@ const controller = (state) => {
     //正常逻辑
     outLock = true;
 
-    Xut.Application.Suspend({
+    Xut.Application.Stop({
 
         /**
          * 停止热点动作

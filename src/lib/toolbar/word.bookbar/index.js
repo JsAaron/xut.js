@@ -440,10 +440,9 @@ export default class BookBar extends Bar {
      */
     goBack() {
         var self = this;
-        Xut.Application.Suspend({
-            dispose: function(promptMessage) {
-                //停止热点动作
-                //promptMessage('再按一次将跳至首页！')
+        Xut.Application.Stop({
+            dispose: function() {
+
             },
             processed: function() {
                 Xut.View.GotoSlide(1) //调整到首页

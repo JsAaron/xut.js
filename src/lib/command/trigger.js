@@ -4,8 +4,7 @@
  */
 import directives from '../directive/index'
 
-
-export function trigger(target, attribute, rootNode, pageIndex) {
+export function $$trigger(target, attribute, rootNode, pageIndex) {
 
     const key = target.id
 
@@ -40,9 +39,9 @@ export function trigger(target, attribute, rootNode, pageIndex) {
             //如果是重复点击
             let instance
             if (instance = Xut.Application.GetSpecifiedObject(pageType, data)) {
-                if (instance.dispatchProcess) {
+                if (instance.toggle) {
                     //如果有对应的处理方法
-                    return instance.dispatchProcess();
+                    return instance.toggle()
                 }
             }
 

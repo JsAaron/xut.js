@@ -25,10 +25,11 @@
  */
 
 import { config } from './config/index'
-import { sceneController } from './scenario/controller'
-import { autoRun, original, suspend } from './command/index'
 import { SceneFactory } from './scenario/scenario'
-import { suspendHandles as globalStop, promptMessage } from './global.stop'
+import { sceneController } from './scenario/controller'
+import { $$autoRun, $$original, $$suspend } from './command/index'
+import { stopProcessor } from './global.stop'
+
 import globalDestroy from './global.destroy'
 import loadScene from './initialize/load.app'
 import Observer from './observer/index'
@@ -45,8 +46,7 @@ import {
     $$remove,
     hash,
     toNumber,
-    $$extend,
-    messageBox
+    $$extend
 }
 from './util/index'
 
@@ -256,9 +256,15 @@ $$extend(View, {
             sectionRang: sectionRang,
             //制作场景切换后处理
             complete(nextBack) {
+
+                // if(current &&current.chapterId === 2){
+                //     console.log(1)
+                //     return
+                // }
+
                 //销毁多余场景
-                current && current.destroy();
-                //下一个任务存在,执行切换回调后,在执行页面任务
+                current && current.destroy()
+                    //下一个任务存在,执行切换回调后,在执行页面任务
                 nextBack && nextBack();
                 //去掉忙碌
                 View.HideBusy();
@@ -487,8 +493,8 @@ $$extend(Application, {
         backstage = 1
 
         //传递一个完全关闭的参数
-        suspend('', '', true);
-        original();
+        $$suspend('', '', true);
+        $$original();
     },
 
     /**
@@ -498,7 +504,7 @@ $$extend(Application, {
      */
     Activate() {
         backstage = 0
-        autoRun()
+        $$autoRun()
     },
 
     /**
@@ -542,7 +548,7 @@ $$extend(Application, {
          */
         let destroy = () => {
             __app__.$off()
-            //退出应用
+                //退出应用
             globalDestroy('exit')
             window.GLOBALCONTEXT = null;
         }
@@ -608,20 +614,27 @@ $$extend(Application, {
     },
 
     /**
-     * 暂停应用
+     * 停止应用
      * skipMedia 跳过音频你处理(跨页面)
      * dispose   成功处理回调
      * processed 处理完毕回调
      */
-    Suspend(opts) {
-        if (globalStop(opts.skipMedia)) { //停止热点动作
-            if (opts.dispose) {
-                opts.dispose(promptMessage);
-            }
+    Stop({
+        skipAudio,
+        dispose,
+        processed
+    }) {
+        //是否存在动作
+        const hasAction = stopProcessor(skipAudio)
+        if (hasAction) {
+            dispose && dispose()
         } else {
-            opts.processed && opts.processed();
+            processed && processed()
         }
-    }
+    },
+
+    //stop引用
+    Suspend: Application.Stop
 
 })
 

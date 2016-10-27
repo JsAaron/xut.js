@@ -543,24 +543,11 @@ export default class Activity {
 
 
     /**
-     * 复位状态
-     * @return {[type]} [description]
-     */
-    resetAnimation() {
-        this.eachAssistContents(function(scope) {
-            !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
-        })
-
-        this._resetAloneAnim();
-    }
-
-
-    /**
      * 销毁动画
      * @param  {[type]} elementCallback [description]
      * @return {[type]}                 [description]
      */
-    destroyAnimation(elementCallback) {
+    _destroyAnimation(elementCallback) {
         //销毁拖动对象
         accessDrop(this.eventData, function(drop) {
             drop.destroy();
@@ -590,10 +577,23 @@ export default class Activity {
 
 
     /**
-     * 翻页开始
+     * 复位状态
      * @return {[type]} [description]
      */
-    flipOver() {
+    reset() {
+        this.eachAssistContents(function(scope) {
+            !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
+        })
+
+        this._resetAloneAnim();
+    }
+
+
+    /**
+     * 停止动作
+     * @return {[type]} [description]
+     */
+    stop() {
         if (this.runState) {
             this.stopAnimation();
         }
@@ -620,15 +620,6 @@ export default class Activity {
     }
 
 
-    /**
-     * 翻页完成复位动画
-     * @return {[type]} [description]
-     */
-    flipComplete() {
-        this.resetAnimation()
-    }
-
-
     //销毁
     //提供一个删除回调
     //用于处理浮动对象的销毁
@@ -652,7 +643,7 @@ export default class Activity {
         }
 
         //销毁动画
-        this.destroyAnimation(elementCallback);
+        this._destroyAnimation(elementCallback);
         this.abstractContents = null
 
         //iscroll销毁
@@ -675,19 +666,6 @@ export default class Activity {
 
         this.$containsNode = null;
 
-    }
-
-
-    /**
-     * 复位
-     * @return {[type]} [description]
-     */
-    recovery() {
-        if (this.runState) {
-            this.stopAnimation();
-            return true
-        }
-        return false
     }
 
 }

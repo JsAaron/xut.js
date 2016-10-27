@@ -21,7 +21,7 @@ export class ShowNote {
 
         this._dom = $(retStr);
         this._dom.find('.close').on("touchend mouseup", function() {
-            that.dispatchProcess();
+            that.toggle();
         });
         $(this.rootNode).append(this._dom);
 
@@ -35,16 +35,16 @@ export class ShowNote {
     }
 
     //外部调用接口
-    dispatchProcess() {
+    toggle() {
         //自动热点 取消关闭
         if (this.isAutoPlay) return;
         //当前对象状态
         this.state ? this.hide() : this.show();
     }
 
-    recovery() {
+    stop() {
         if (this.state) {
-            this.dispatchProcess();
+            this.toggle();
             return true;
         }
         return false

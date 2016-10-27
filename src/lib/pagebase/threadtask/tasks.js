@@ -47,10 +47,10 @@ export default function(instance) {
                 instance.$pseudoElement = $pseudoElement
 
                 /**
+                 * 获取根节点
                  * 获取包含容器
                  * @return {[type]} [description]
                  */
-                //获取根节点
                 const $containsElement = $pageNode.children('.page-pinch')
                 instance.getContainsNode = function() {
                     return $pseudoElement ? $pseudoElement : $containsElement

@@ -10,9 +10,9 @@ import { removeVideo } from '../../component/video/manager'
 import { execScript } from '../../util/index'
 
 import {
-    suspend as _suspend,
-    original as _original,
-    autoRun as _autoRun
+    $$suspend,
+    $$original,
+    $$autoRun
 } from '../../command/index'
 
 
@@ -112,11 +112,11 @@ export default class PageMgr extends Abstract {
         runScript(suspendPageObj, 'postCode');
 
         //中断节点创建任务
-        this._suspendInnerCreateTasks(pointers);
+        this.$$suspendInnerCreateTasks(pointers);
 
         //停止活动对象活动
         suspendPageObj.destroyPageAction()
-        _suspend(suspendPageObj, prveChpterId);
+        $$suspend(suspendPageObj, prveChpterId);
     }
 
 
@@ -136,7 +136,7 @@ export default class PageMgr extends Abstract {
                     'overflow': 'hidden'
                 })
             }
-            _original(originalPageObj);
+            $$original(originalPageObj);
         }
     }
 
@@ -155,7 +155,7 @@ export default class PageMgr extends Abstract {
 
         var self = this;
 
-       /**
+        /**
          * 预执行背景创建
          * 支持多线程快速翻页
          * 1 初始化,或者快速翻页补全前后页面
@@ -189,7 +189,7 @@ export default class PageMgr extends Abstract {
 
             //运行动作
             function startRun() {
-                _autoRun(currPageObj, data.currIndex, complete);
+                $$autoRun(currPageObj, data.currIndex, complete);
             }
 
             //运行如果被中断,则等待
@@ -279,7 +279,7 @@ export default class PageMgr extends Abstract {
      * @param {[type]}   currIndex [description]
      * @param {Function} callback  [description]
      */
-    _suspendInnerCreateTasks(pointers) {
+    $$suspendInnerCreateTasks(pointers) {
         var pageObj,
             self = this;
         [pointers.leftIndex, pointers.currIndex, pointers.rightIndex].forEach(function(pointer) {
