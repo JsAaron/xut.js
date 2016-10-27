@@ -14,30 +14,44 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-    <script type="text/javascript" src="lib/import.external.js"></script>
+    <script type="text/javascript" src="lib/external.js"></script>
     <style type="text/css">
-    .showcontariner {
+    .apptest {
+        width: 38vw;
         position: absolute;
-        left: 40%;
+        left: 32vw;
         top: 0;
         z-index: 9999999999;
+    }
+    
+    .apptest li {
+        width: 36%;
+        float: left;
+    }
+    
+    .apptest li:first-child {
+        width: 25%;
     }
     </style>
 </head>
 
 <body>
-    <div class="showcontariner">
-        应用编号：<a class="showpage">1</a>
-        <button class="switch1">上一个应用</button>
-        <button class="switch2">下一个应用</button>
-    </div>
+    <ul class="apptest">
+        <li><a class="showpage">1</a></li>
+        <li>
+            <button class="switch1">上个</button>
+        </li>
+        <li>
+            <button class="switch2">下个</button>
+        </li>
+    </ul>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
 </html>
 <script type="text/javascript">
 Xut.Application.setConfig = {
-    visualMode:0,
+    visualMode: 0,
     lauchMode: 1 //启动模式
 }
 

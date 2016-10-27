@@ -28,7 +28,7 @@ import { clearVideo } from '../component/video/manager'
  * @param  {[type]} pageObj [description]
  * @return {[type]}         [description]
  */
-export function $$stop(pageObj) {
+export function $$stop() {
 
     //清理音频
     clearAudio()
@@ -37,7 +37,7 @@ export function $$stop(pageObj) {
     clearVideo()
 
     //停止热点
-    return access(pageObj, (pageObj, contentObjs, componentObjs) => {
+    return access(function(pageObj, contentObjs, componentObjs) {
 
         //如果返回值是false,则是算热点处理行为
         let falg = false
