@@ -64,7 +64,7 @@ export function createCursor() {
     }
 
     html =
-        `<div style="width:${width}px;height:${width}px;margin:${space}px auto;">
+        `<div style="width:${width}px;height:${width}px;margin:${space}px auto;margin-top:${config.viewSize.top+space}px;">
             <div style="height:30%;"></div>
             <div class="xut-busy-middle">${container}</div>
             <div class="xut-busy-text"></div>

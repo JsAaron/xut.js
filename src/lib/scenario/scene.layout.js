@@ -60,9 +60,9 @@ export function mainScene() {
     //主体
     const homeHTML =
         `<div id="xut-main-scene"
-              class="xut-chapter"
               style="width:${homeWidth}px;
                      height:100%;
+                     top:0;
                      left:${homeLeft}px;
                      position:absolute;
                      z-index:${homeIndex};

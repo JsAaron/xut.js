@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 860
+Xut.Version = 860.1
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -131,13 +131,25 @@ Xut.plat.isBrowser && $(window).on('orientationchange', function() {
 })
 
 
+/**
+ * 提供全局配置文件
+ * @return {[type]} [description]
+ */
+const configMode = function(setConfig) {
+    if (setConfig) {
+        Xut.extend(config, setConfig)
+    }
+}
+
 //新版本加载
 Xut.Application.Launch = function({
     el,
     paths,
     cursor
 }) {
-    if (Xut.Application.setConfig.lauchMode === 1) {
+    const setConfig = Xut.Application.setConfig
+    if (setConfig && setConfig.lauchMode === 1) {
+        configMode(setConfig);
         (lauchOptions = []).push(arguments)
         window.DYNAMICCONFIGT = { //外部配置文件
             resource: paths.resource,
@@ -147,18 +159,11 @@ Xut.Application.Launch = function({
     }
 }
 
-
+//老版本加载
 setTimeout(() => {
-
-    //提供全局配置文件
-    if (Xut.Application.setConfig) {
-        Xut.extend(config, Xut.Application.setConfig)
-    }
-
-    //lauchMode = 0
-    //老版本加载
-    if (config.lauchMode === 0) {
+    const setConfig = Xut.Application.setConfig
+    if (!setConfig || setConfig && setConfig.lauchMode === 0) {
+        configMode(setConfig)
         loadApp()
     }
-
 }, 100)
