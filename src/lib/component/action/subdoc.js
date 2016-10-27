@@ -1,10 +1,5 @@
-
-import {
-    stopProcessor
-} from '../../global.stop'
-
+import { $$stop } from '../../command/index'
 import { config } from '../../config/index'
-
 
 /**
  * 扩展子文档
@@ -87,14 +82,14 @@ export default function(Action) {
 
             if (iframe) {
                 //子文档操作
-                if (stopProcessor()) {
+                if ($$stop()) {
 
                 } else {
                     clear();
                 }
             } else {
                 //父级操作
-                stopProcessor()
+                $$stop()
             }
 
         } catch (err) {

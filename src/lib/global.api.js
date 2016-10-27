@@ -27,8 +27,6 @@
 import { config } from './config/index'
 import { SceneFactory } from './scenario/scenario'
 import { sceneController } from './scenario/controller'
-import { $$autoRun, $$original, $$suspend } from './command/index'
-import { stopProcessor } from './global.stop'
 
 import globalDestroy from './global.destroy'
 import loadScene from './initialize/load.app'
@@ -39,6 +37,13 @@ import {
     HideBusy,
     ShowTextBusy
 } from './initialize/busy.cursor'
+
+import {
+    $$autoRun,
+    $$original,
+    $$suspend,
+    $$stop
+} from './command/index'
 
 import {
     $$set,
@@ -625,7 +630,7 @@ $$extend(Application, {
         processed
     }) {
         //是否存在动作
-        const hasAction = stopProcessor(skipAudio)
+        const hasAction = $$stop(skipAudio)
         if (hasAction) {
             dispose && dispose()
         } else {

@@ -34,9 +34,10 @@ export function $$trigger(target, attribute, rootNode, pageIndex) {
                 "target": target,
                 "pageIndex": pageIndex,
                 'pageType': pageType
-            };
+            }
 
             //如果是重复点击
+            //比如widget零件
             let instance
             if (instance = Xut.Application.GetSpecifiedObject(pageType, data)) {
                 if (instance.toggle) {

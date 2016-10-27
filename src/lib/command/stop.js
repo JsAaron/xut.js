@@ -6,6 +6,20 @@
  */
 import access from './access'
 
+import { clearAudio } from '../component/audio/manager'
+import { clearVideo } from '../component/video/manager'
+
+/**
+ * 停止所有热点动作,并返回状态
+ * 1 content
+ * 2 widget
+ * 动画,视频,音频...........................
+ * 增加场景模式判断
+ *
+ *  skipAudio 是否跳过音频，不处理
+ *    true 跳过
+ *    false 不跳过
+ */
 
 /**
  * 复位状态/状态控制
@@ -16,6 +30,13 @@ import access from './access'
  */
 export function $$stop(pageObj) {
 
+    //清理音频
+    clearAudio()
+
+    //清理视频
+    clearVideo()
+
+    //停止热点
     return access(pageObj, (pageObj, contentObjs, componentObjs) => {
 
         //如果返回值是false,则是算热点处理行为
