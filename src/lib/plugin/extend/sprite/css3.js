@@ -81,7 +81,7 @@ function deleteCSSRule(ruleName) {
  */
 export default function css3(options) {
 
-    let matrix, parameter, rule1, rule2 
+    let matrix, parameter, rule1, rule2, timer
 
     let $spriteNode = options.$contentNode.find('.sprite')
     let data = options.data
@@ -185,7 +185,10 @@ export default function css3(options) {
     return {
 
         play: function() {
-            $spriteNode.css(playState, 'running');
+            //添加定时器 解决设备卡顿时普通精灵动画不播放的问题
+            timer = setTimeout(function() {
+                $spriteNode.css(playState, 'running');
+            }, 50)
         },
 
         stop: function() {
@@ -196,6 +199,8 @@ export default function css3(options) {
             //停止精灵动画
             deleteCSSRule(aniName);
             $spriteNode.off(animationEnd, callback);
+            clearTimeout(timer);
+            timer = null;
             $spriteNode = null;
         }
 

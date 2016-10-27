@@ -5,6 +5,7 @@ import { adapterDestory } from './visuals/adapter/adapter.type'
 import { destroyFixAudio } from './component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
 import { destroyConfig } from './config/index'
+import { $$resetUUID } from './util/stroage'
 
 /**
  * 销毁接口
@@ -51,6 +52,13 @@ export default function Destroy(action = 'destory') {
     //expand销毁
     //flow的一些接口缓存
     adapterDestory()
+
+    /**
+     * 重设缓存的UUID
+     * 为了只计算一次
+     * @return {[type]} [description]
+     */
+    $$resetUUID()
 
     Xut.TransformFilter = null
     Xut.CreateFilter = null

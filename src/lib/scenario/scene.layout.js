@@ -64,6 +64,7 @@ export function mainScene() {
               style="width:${homeWidth}px;
                      height:100%;
                      left:${homeLeft}px;
+                     position:absolute;
                      z-index:${homeIndex};
                      overflow:${homeOverflow};">
 
@@ -96,6 +97,7 @@ export function deputyScene(id) {
                      height:100%;
                      left:${config.viewSize.left}px;
                      z-index:${Xut.sceneController.createIndex()};
+                     position:absolute;
                      overflow:${overflow};">
             <ul id="${pageId}" class="xut-flip" style="z-index:2"></ul>
             <ul id="${masterId}" class="xut-flip" style="z-index:1"></ul>

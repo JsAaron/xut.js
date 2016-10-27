@@ -153,19 +153,18 @@ export default class {
         let resourcePath = this.resourcePath
         let html = ''
 
-        if (this.animationType) {
-            framId = this.data.framId
-        } else {
-            let contentId = this.contentId;
-            framId = contentId + '_' + this.data.framId
-        }
+        // if (this.animationType) {
+        //     framId = this.data.framId
+        // } else {
+        //     let contentId = this.contentId;
+        //     framId = contentId + '_' + this.data.framId
+        // }
 
         if (this.isMask) {
             const filename = this._getFilename(this.originalImageList[0].name)
             const maskUrl = resourcePath + filename
             html =
-                `<div id="spImg_${framId}"
-                      style="width:100%;height:100%;position:absolute;
+                `<div style="width:100%;height:100%;
                              background: url(${maskUrl}.jpg) no-repeat;
                              background-size: 100% 100%;
                              -webkit-mask: url(${maskUrl}.png) no-repeat;
@@ -175,10 +174,7 @@ export default class {
             obj.append(this.sprObj);
         } else {
             const src = resourcePath + this.originalImageList[0].name
-            html =
-                `<img id="spImg_${framId}"
-                      src="${src}"
-                      style="width:100%;height:100%;position:absolute;"/>`
+            html = `<img src="${src}" style="width:100%;height:100%;"/>`
 
             this.sprObj = $(String.styleFormat(html))
             obj.html(this.sprObj)
@@ -279,6 +275,8 @@ export default class {
 
     _time() {
         this.timer = setTimeout(() => {
+            clearTimeout(this.timer)
+            this.timer = null
             this._change();
             this.curFPS++;
             this._set();
@@ -314,9 +312,9 @@ export default class {
         if (this.timer) {
             clearTimeout(this.timer);
             this.timer = null
-            this.curFPS = 0
-            this.resetCount = 0
         }
+        this.curFPS = 0
+        this.resetCount = 0
     }
 
 
@@ -353,11 +351,14 @@ export default class {
      */
     destroy() {
         this._stop();
-        this.data.params = null;
-        this.data = null;
+        this.obj = null
+        this.sprObj = null
+        this.data.params = null
+        this.data = null
         this._imgArray.forEach(function(img) {
             img = null
         })
+        this.originalImageList = null
         this._imgArray = null
     }
 

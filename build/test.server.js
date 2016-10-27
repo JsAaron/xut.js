@@ -1,4 +1,4 @@
-const killOccupied = require('./kill-occupied')
+const killOccupied = require('./kill.occupied')
 const browserSync = require("browser-sync");
 
 const prot = 3000

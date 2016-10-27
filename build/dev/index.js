@@ -12,9 +12,9 @@ const cp = require('child_process');
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
-const killOccupied = require('../kill-occupied')
-const convertSVG = require('../convert-svg')
-const serialData = require('./serial-data')
+const killOccupied = require('../kill.occupied')
+const convertSVG = require('./convert.svg')
+const serialData = require('./serial.data')
 const spinner = ora('【Begin to pack , Please wait for】\n')
 // spinner.start()
 
@@ -117,7 +117,7 @@ watch(conf.assetsRoot + '/app.js', () => {
             preChildRun.kill()
             preChildRun = null
         }
-        let child = cp.spawn('node', ['build/dev/test-pack.js', ['test=' + config.dev.test.dir]]);
+        let child = cp.spawn('node', ['build/dev/test.pack.js', ['test=' + config.dev.test.dir]]);
         child.stdout.on('data', (data) => console.log('\n' + data))
         child.stderr.on('data', (data) => console.log('fail out：\n' + data));
         child.on('close', (code) => console.log('complete：' + code));

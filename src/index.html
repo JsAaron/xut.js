@@ -16,17 +16,21 @@
     <title>AppCarrier</title>
     <script type="text/javascript" src="lib/import.external.js"></script>
     <style type="text/css">
-    .switch {
+    .showcontariner {
         position: absolute;
-        left: 0;
+        left: 40%;
         top: 0;
-        z-index: 9999999999
+        z-index: 9999999999;
     }
     </style>
 </head>
 
 <body>
-    <button class="switch">切换</button>
+    <div class="showcontariner">
+        应用编号：<a class="showpage">1</a>
+        <button class="switch1">上一个应用</button>
+        <button class="switch2">下一个应用</button>
+    </div>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
@@ -36,9 +40,14 @@ Xut.Application.setConfig = {
     lauchMode: 1 //启动模式
 }
 
-var appid = 101
-var length = 3
+var testId = localStorage.getItem('test-appId')
+
+var start = 505
+var appid = start
+var length = 19
 var max = appid + length
+
+var $page = $('.showpage')
 
 var launch = function() {
     state = true
@@ -49,25 +58,33 @@ var launch = function() {
             database: 'content/' + appid + '/SQLResult.js'
         }
     });
-    ++appid
+    $page.html(appid)
+    localStorage.setItem('test-appId', appid);
 }
 
 var destory = function() {
-    state = false
     Xut.Application.Destroy()
+    $page.html(appid)
 }
 
-var state = false
 
-$(".switch").click(function() {
-    if (appid > max) {
-        appid = max - length
+$(".switch1").click(function() {
+    if (appid <= start) {
+        return
     }
-    if (state) {
-        destory()
-    } else {
-        launch()
-    }
-
+    --appid
+    destory()
+    setTimeout(launch)
 })
+
+$(".switch2").click(function() {
+    if (appid > max) {
+        appid = start - 1
+    }
+    ++appid
+    destory()
+    setTimeout(launch)
+})
+
+launch()
 </script>

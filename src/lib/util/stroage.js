@@ -1,4 +1,4 @@
-let dbId, onlyId
+let onlyId
 
 const TAG = 'aaron'
 const storage = window.localStorage
@@ -101,6 +101,15 @@ export {get as $$get }
 export function $$remove(key) {
     key = filter(key);
     storage.removeItem(key);
+}
+
+/**
+ * 重设缓存的UUID
+ * 为了只计算一次
+ * @return {[type]} [description]
+ */
+export function $$resetUUID() {
+    onlyId = null
 }
 
 /**
