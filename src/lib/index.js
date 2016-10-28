@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 862
+Xut.Version = 863
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -121,7 +121,7 @@ Xut.plat.isBrowser && $(window).on('orientationchange', function() {
     if (config.orientateMode) {
         let temp = lauchOptions
         Xut.Application.Refresh()
-        if (temp.length) {
+        if (temp && temp.length) {
             Xut.Application.Launch.apply(null, temp.pop())
             temp = null
         } else {
