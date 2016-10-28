@@ -4,12 +4,6 @@ import {
 } from './app.video'
 
 /**
- * 退出加锁,防止过快点击
- * @type {Boolean}
- */
-let outLock = false;
-
-/**
  * 回退按钮状态控制器
  * @param  {[type]} state [description]
  * @return {[type]}       [description]
@@ -21,28 +15,18 @@ const controller = (state) => {
         Xut.publish('subdoc:dropApp');
         return;
     }
-
-    //正常逻辑
-    outLock = true;
-
-    Xut.Application.Stop({
-
-        /**
-         * 停止热点动作
-         * @return {[type]} [description]
-         */
-        dispose() {
-            setTimeout(() => { outLock = false }, 100)
+    window.GLOBALCONTEXT.navigator.notification.confirm('您确认要退出吗？',
+        function(button) {
+            if (1 == button) {
+                Xut.Application.Stop({
+                    processed() {
+                        window.GLOBALCONTEXT.navigator.app.exitApp()
+                    }
+                })
+            }
         },
-
-        /**
-         * 退出应用
-         * @return {[type]} [description]
-         */
-        processed() {
-            state === 'back' && Xut.Application.DropApp();
-        }
-    });
+        '退出', '确定,取消'
+    )
 }
 
 /**

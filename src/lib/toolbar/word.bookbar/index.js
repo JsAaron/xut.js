@@ -118,8 +118,8 @@ export default class BookBar extends Bar {
 
         iconText.innerHTML = '目录';
         iconText.className = "xut-book-dirFont"
-        // iconText.style.height = "40%";
-        // iconText.style.width = "100%";
+            // iconText.style.height = "40%";
+            // iconText.style.width = "100%";
         iconText.style.position = "absolute";
         iconText.style.bottom = "0";
 
@@ -153,7 +153,7 @@ export default class BookBar extends Bar {
 
         iconText.innerHTML = '书签';
         iconText.className = "xut-book-markFont"
-        //iconText.style.height = "40%";
+            //iconText.style.height = "40%";
         iconText.style.position = "absolute";
         iconText.style.bottom = "0";
 
@@ -245,7 +245,7 @@ export default class BookBar extends Bar {
     }
 
 
-    hideNavbar(){}
+    hideNavbar() {}
 
     /**
      * 创建目录菜单
@@ -441,9 +441,6 @@ export default class BookBar extends Bar {
     goBack() {
         var self = this;
         Xut.Application.Stop({
-            dispose: function() {
-
-            },
             processed: function() {
                 Xut.View.GotoSlide(1) //调整到首页
                 self.setColor();

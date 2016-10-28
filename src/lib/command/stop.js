@@ -43,14 +43,15 @@ export function $$stop() {
         let falg = false
 
         //content类型
-        _.each(contentObjs, function(obj) {
+        contentObjs && _.each(contentObjs, function(obj) {
             if (obj.stop && obj.stop()) {
                 falg = true
             }
         })
 
+
         //零件类型
-        _.each(componentObjs, function(obj) {
+        componentObjs && _.each(componentObjs, function(obj) {
             if (obj.stop && obj.stop()) {
                 falg = true
             }

@@ -93,7 +93,7 @@ export default class PageWidget {
             console.error("Function [" + this.widgetName + "Widget] does not exist.");
         }
     }
- 
+
 
     /**
      * 动画运行

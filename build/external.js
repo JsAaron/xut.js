@@ -1,7 +1,7 @@
 const fs = require('fs')
 const index = './src/index.html'
 
-const getImportExternal = require('../src/lib/import.external.js')
+const getImportExternal = require('../src/lib/external.js')
 
 module.exports = (conf) => {
     let srcDir, exclude

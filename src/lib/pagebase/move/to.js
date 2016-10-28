@@ -150,7 +150,7 @@ export default function(baseProto) {
                         if (action === "flipMove" && contentObj.anminInstance && !contentObj.parallaxProcessed) {
                             //标记
                             var actName = contentObj.actName;
-                            contentObj.stop();
+                            contentObj.stopAnimations();
                             //视觉差处理一次,停止过动画
                             contentObj.parallaxProcessed = true;
                             //增加标记

@@ -11,11 +11,46 @@ const conf = config.build.conf
 const rootPath = conf.srcDir + 'content/'
 const contentFiles = fs.readdirSync(rootPath)
 
+
 const writeFile = (filename, content) => {
     fs.writeFileSync(filename, content, {
         encoding: 'utf8',
         flag: 'w+'
     })
+}
+
+/**
+ * 编译文件的j's
+ * traverse：是不是子节点: 默认递归
+ * @param  {[type]}   srcPath  [description]
+ * @param  {Function} callback [description]
+ * @param  {[type]}   traverse [description]
+ * @return {[type]}            [description]
+ */
+const compilecJs = function(srcPath, callback, traverse = true) {
+
+    console.log('start compile: ' + srcPath)
+
+    let minPath = srcPath + '.min';
+    //copy all files
+    fsextra.copySync(srcPath, minPath);
+
+    //如果递归全部
+    //否则不扫描子路径
+    let scanPath = traverse ? minPath + '/**/*.js' : minPath + '/*.js'
+
+    //replace js
+    gulp.src(scanPath)
+        .pipe(uglify())
+        .pipe(gulp.dest(minPath))
+        .on('error', (err) => {
+            console.log('concat Error!', err.message);
+            this.end();
+        })
+        .on('end', (err) => {
+            console.log('compile complete: ' + minPath)
+            callback && callback()
+        })
 }
 
 
@@ -34,24 +69,7 @@ const eachFile = function(src) {
                     //is widget files
                     if (/^\d+$/ig.test(file)) {
                         compile.push(function(callback) {
-                            let srcPath = widgetPath + '/' + file
-                            let minPath = widgetPath + '/' + file + '.min'
-                            //copy all files
-                            fsextra.copySync(srcPath, minPath)
-                            //replace js
-                            gulp.src(minPath + '/**/*.js')
-                                .pipe(uglify())
-                                .pipe(gulp.dest(minPath))
-                                .on('error', (err) => {
-                                    console.log('concat Error!', err.message);
-                                    this.end();
-                                })
-                                .on('end', (err) => {
-                                    console.log(
-                                        '【' + minPath + '】compile complete'
-                                    )
-                                    callback && callback()
-                                })
+                            compilecJs(widgetPath + '/' + file, callback)
                         })
                     }
                 })
@@ -72,4 +90,21 @@ const eachFile = function(src) {
     startCompile()
 }
 
+
+//指定编译
+//206 81
+//contentName widgetName 是否递归
+let hasWidgetSerial = process.argv[process.argv.length - 1]
+if (hasWidgetSerial) {
+    let hasValue
+    if (hasValue = hasWidgetSerial.match(/(\d+)-(\d+)/)) {
+        let contentName = hasValue[1]
+        let widgetName = hasValue[2]
+        let path = rootPath + contentName + '/widget/' + widgetName
+        compilecJs(path, function() {}, false)
+        return
+    }
+}
+
+//全部编辑
 eachFile(rootPath)

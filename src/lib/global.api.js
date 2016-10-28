@@ -157,7 +157,6 @@ $$extend(View, {
             return
         }
 
-
         /**
          * 场景外部跳转
          * 节与节的跳转,需要对场景的处理
@@ -261,12 +260,6 @@ $$extend(View, {
             sectionRang: sectionRang,
             //制作场景切换后处理
             complete(nextBack) {
-
-                // if(current &&current.chapterId === 2){
-                //     console.log(1)
-                //     return
-                // }
-
                 //销毁多余场景
                 current && current.destroy()
                     //下一个任务存在,执行切换回调后,在执行页面任务
@@ -540,7 +533,7 @@ $$extend(Application, {
          * 安卓销毁按键事件
          * @return {[type]} [description]
          */
-        let unEvent = () => {
+        const unEvent = () => {
             if (Xut.plat.isAndroid) {
                 window.GLOBALCONTEXT.document.removeEventListener("backbutton", config._event.back, false);
                 window.GLOBALCONTEXT.document.removeEventListener("pause", config._event.pause, false);
@@ -551,9 +544,9 @@ $$extend(Application, {
          * iframe模式,退出处理
          * @return {[type]} [description]
          */
-        let destroy = () => {
+        const destroy = () => {
             __app__.$off()
-                //退出应用
+            //退出应用
             globalDestroy('exit')
             window.GLOBALCONTEXT = null;
         }
@@ -604,18 +597,6 @@ $$extend(Application, {
             destroy();
             return;
         }
-
-        //单应用dialogs
-        if (!plat.isBrowser) {
-            window.GLOBALCONTEXT.navigator.notification.confirm('您确认要退出吗？',
-                function(button) {
-                    if (1 == button) {
-                        window.GLOBALCONTEXT.navigator.app.exitApp();
-                    }
-                },
-                '退出', '确定,取消'
-            );
-        }
     },
 
     /**
@@ -632,7 +613,11 @@ $$extend(Application, {
         //是否存在动作
         const hasAction = $$stop(skipAudio)
         if (hasAction) {
-            dispose && dispose()
+            if (dispose) {
+                dispose()
+            } else {
+                processed && processed()
+            }
         } else {
             processed && processed()
         }
