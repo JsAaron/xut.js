@@ -1,7 +1,6 @@
 const fs = require('fs')
 const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
-const eslint = require('rollup-plugin-eslint')
 const fsextra = require('fs-extra')
 const utils = require('./utils')
 
@@ -18,8 +17,18 @@ module.exports = (conf, fail) => {
                 entry: conf.entry,
                 plugins: [
                     babel({
+                        babelrc: false,
                         exclude: 'node_modules/**',
-                        "presets": ["es2015-rollup"]
+                        "presets": [
+                            [
+                                "es2015", {
+                                    "modules": false
+                                }
+                            ]
+                        ],
+                        "plugins": [
+                            "external-helpers"
+                        ]
                     })
                 ]
             }).then((bundle) => {
