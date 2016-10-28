@@ -11,7 +11,7 @@ import nextTick from './util/nexttick'
 // import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 861
+Xut.Version = 862
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -161,8 +161,9 @@ Xut.Application.Launch = function({
 
 //老版本加载
 setTimeout(() => {
+
     const setConfig = Xut.Application.setConfig
-    if (!setConfig || setConfig && setConfig.lauchMode === 0) {
+    if (!setConfig || setConfig && !setConfig.lauchMode) {
         configMode(setConfig)
         loadApp()
     }
