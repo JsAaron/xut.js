@@ -45407,119 +45407,6 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 	    }
 	}
 
-	var asyncGenerator = function () {
-	  function AwaitValue(value) {
-	    this.value = value;
-	  }
-
-	  function AsyncGenerator(gen) {
-	    var front, back;
-
-	    function send(key, arg) {
-	      return new Promise(function (resolve, reject) {
-	        var request = {
-	          key: key,
-	          arg: arg,
-	          resolve: resolve,
-	          reject: reject,
-	          next: null
-	        };
-
-	        if (back) {
-	          back = back.next = request;
-	        } else {
-	          front = back = request;
-	          resume(key, arg);
-	        }
-	      });
-	    }
-
-	    function resume(key, arg) {
-	      try {
-	        var result = gen[key](arg);
-	        var value = result.value;
-
-	        if (value instanceof AwaitValue) {
-	          Promise.resolve(value.value).then(function (arg) {
-	            resume("next", arg);
-	          }, function (arg) {
-	            resume("throw", arg);
-	          });
-	        } else {
-	          settle(result.done ? "return" : "normal", result.value);
-	        }
-	      } catch (err) {
-	        settle("throw", err);
-	      }
-	    }
-
-	    function settle(type, value) {
-	      switch (type) {
-	        case "return":
-	          front.resolve({
-	            value: value,
-	            done: true
-	          });
-	          break;
-
-	        case "throw":
-	          front.reject(value);
-	          break;
-
-	        default:
-	          front.resolve({
-	            value: value,
-	            done: false
-	          });
-	          break;
-	      }
-
-	      front = front.next;
-
-	      if (front) {
-	        resume(front.key, front.arg);
-	      } else {
-	        back = null;
-	      }
-	    }
-
-	    this._invoke = send;
-
-	    if (typeof gen.return !== "function") {
-	      this.return = undefined;
-	    }
-	  }
-
-	  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-	    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-	      return this;
-	    };
-	  }
-
-	  AsyncGenerator.prototype.next = function (arg) {
-	    return this._invoke("next", arg);
-	  };
-
-	  AsyncGenerator.prototype.throw = function (arg) {
-	    return this._invoke("throw", arg);
-	  };
-
-	  AsyncGenerator.prototype.return = function (arg) {
-	    return this._invoke("return", arg);
-	  };
-
-	  return {
-	    wrap: function (fn) {
-	      return function () {
-	        return new AsyncGenerator(fn.apply(this, arguments));
-	      };
-	    },
-	    await: function (value) {
-	      return new AwaitValue(value);
-	    }
-	  };
-	}();
-
 	var classCallCheck = function (instance, Constructor) {
 	  if (!(instance instanceof Constructor)) {
 	    throw new TypeError("Cannot call a class as a function");
@@ -46464,7 +46351,7 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 	 * @return {[type]}     [description]
 	 */
 	function createHomeIcon(height) {
-	    return "<div class=\"xut-control-backhome\"\n                 style=\"float:left;text-indent:0.25em;height:" + height + "px;line-height:" + height + "px;color:#007aff\">\n                \u4E3B\u9875\n            </div>";
+	    return "<div class=\"xut-control-backhome\"\n                 style=\"float:left;text-indent:0.25em;height:" + height + "px;line-height:" + height + "px;color:#007aff\">\n                主页\n            </div>";
 	}
 
 	/**
@@ -47259,7 +47146,7 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 	        value: function createBookMarkFont() {
 	            var height = sLineHeiht * 3; // menu的高为3em
 	            var sHeight = this.sHeight;
-	            var box = '<div class="xut-bookmark-menu" \n               style="width:100%;height:' + height + 'px;left:0;top:' + sHeight + 'px;">\n              <div class="xut-bookmark-wrap">\n                <div class="xut-bookmark-add">\u52A0\u5165\u4E66\u7B7E</div>\n                <div class="xut-bookmark-off icomoon icon-chevron-down" style="vertical-align:bottom;"></div>\n                <div class="xut-bookmark-view">\u4E66\u7B7E\u8BB0\u5F55</div>\n              </div>\n            </div>\n            <div class="xut-bookmark-list" style="display:none;width:100%;height:' + sHeight + 'px;">\n              <ul class="xut-bookmark-head">\n                <li class="xut-bookmark-back">\u8FD4\u56DE</li>\n                <li>\u4E66\u7B7E</li>\n              </ul>\n              <ul class="xut-bookmark-body"></ul>\n            </div>';
+	            var box = '<div class="xut-bookmark-menu" \n               style="width:100%;height:' + height + 'px;left:0;top:' + sHeight + 'px;">\n              <div class="xut-bookmark-wrap">\n                <div class="xut-bookmark-add">加入书签</div>\n                <div class="xut-bookmark-off icomoon icon-chevron-down" style="vertical-align:bottom;"></div>\n                <div class="xut-bookmark-view">书签记录</div>\n              </div>\n            </div>\n            <div class="xut-bookmark-list" style="display:none;width:100%;height:' + sHeight + 'px;">\n              <ul class="xut-bookmark-head">\n                <li class="xut-bookmark-back">返回</li>\n                <li>书签</li>\n              </ul>\n              <ul class="xut-bookmark-body"></ul>\n            </div>';
 	            this.markHeight = height;
 	            return $(box);
 	        }
@@ -47285,7 +47172,7 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 	                seasonId = tmp[0];
 	                pageId = tmp[1];
 	                mark = self.getMarkId(seasonId, pageId);
-	                list += '<li>\n               <a data-mark="' + mark + '" class="xut-bookmark-id" href="javascript:0">\u7B2C' + pageId + '\u9875</a>\n               <a class="xut-bookmark-del" data-mark="' + mark + '" href="javascript:0">X</a>\n             </li>';
+	                list += '<li>\n               <a data-mark="' + mark + '" class="xut-bookmark-id" href="javascript:0">第' + pageId + '页</a>\n               <a class="xut-bookmark-del" data-mark="' + mark + '" href="javascript:0">X</a>\n             </li>';
 	            });
 
 	            return list;
@@ -59224,7 +59111,7 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 	                if (element.length) {
 	                    return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode);
 	                } else {
-	                    console.log('\u521B\u5EFA:' + constr + '\u5931\u8D25');
+	                    console.log('创建:' + constr + '失败');
 	                }
 	            };
 
