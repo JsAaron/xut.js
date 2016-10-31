@@ -182,28 +182,35 @@ export default function css3(options) {
     setKeyframes(rule2);
     $spriteNode.on(animationEnd, callback);
 
+    const clearTimer = function() {
+        if (timer) {
+            clearTimeout(timer)
+            timer = null
+        }
+    }
+
     return {
 
-        play: function() {
+        play() {
             //添加定时器 解决设备卡顿时普通精灵动画不播放的问题
             timer = setTimeout(function() {
+                clearTimer()
                 $spriteNode.css(playState, 'running');
-            }, 50)
+            }, 0)
         },
 
-        stop: function() {
+        stop() {
+            clearTimer()
             $spriteNode.css(playState, 'paused');
         },
 
-        destroy: function() {
+        destroy() {
             //停止精灵动画
             deleteCSSRule(aniName);
             $spriteNode.off(animationEnd, callback);
-            clearTimeout(timer);
-            timer = null;
+            clearTimer()
             $spriteNode = null;
         }
-
 
     }
 }

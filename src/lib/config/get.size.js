@@ -1,4 +1,3 @@
-
 /**
  * 屏幕尺寸
  * @return {[type]} [description]
@@ -15,8 +14,8 @@ export function getSize() {
         }
     }
     return {
-        "width": $(window).width(),
-        "height": $(window).height()
+        "width": document.documentElement.clientWidth || $(window).width(),
+        "height": document.documentElement.clientHeight || $(window).height()
     }
 }
 
@@ -28,5 +27,3 @@ export function getSize() {
 export function getLayerMode(screenSize) {
     return screenSize.width > screenSize.height ? "horizontal" : "vertical"
 }
-
-
