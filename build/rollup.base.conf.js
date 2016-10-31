@@ -9,7 +9,11 @@ module.exports = (conf, fail) => {
     fsextra.emptyDirSync(conf.tarDir)
     fsextra.emptyDirSync(conf.testDir)
 
-    console.log('【Delete the directory, the path is:' + conf.tarDir + ' and ' + conf.testDir + '】')
+    console.log(`
+        delete the directory,
+            ${conf.tarDir}
+            ${conf.testDir}
+        `)
 
     return new Promise((resolve, reject) => {
 
@@ -19,16 +23,7 @@ module.exports = (conf, fail) => {
                     babel({
                         babelrc: false,
                         exclude: 'node_modules/**',
-                        "presets": [
-                            [
-                                "es2015", {
-                                    "modules": false
-                                }
-                            ]
-                        ],
-                        "plugins": [
-                            "external-helpers"
-                        ]
+                        "presets": ["es2015-rollup"]
                     })
                 ]
             }).then((bundle) => {

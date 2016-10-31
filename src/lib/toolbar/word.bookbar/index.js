@@ -440,7 +440,7 @@ export default class BookBar extends Bar {
      */
     goBack() {
         var self = this;
-        Xut.Application.Stop({
+        Xut.Application.Suspend({
             processed: function() {
                 Xut.View.GotoSlide(1) //调整到首页
                 self.setColor();

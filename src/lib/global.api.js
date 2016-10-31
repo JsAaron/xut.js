@@ -27,7 +27,6 @@
 import { config } from './config/index'
 import { SceneFactory } from './scenario/scenario'
 import { sceneController } from './scenario/controller'
-
 import globalDestroy from './global.destroy'
 import loadScene from './initialize/load.app'
 import Observer from './observer/index'
@@ -56,12 +55,12 @@ import {
 from './util/index'
 
 const plat = Xut.plat
-const Presentation = Xut.Presentation = hash()
-const View = Xut.View = hash()
-const Contents = Xut.Contents = hash()
-const Application = Xut.Application = hash()
+const Presentation = Xut.Presentation = {}
+const View = Xut.View = {}
+const Contents = Xut.Contents = {}
+const Application = Xut.Application = {}
 
-Xut.Assist = hash()
+Xut.Assist = {}
 
 /**
  * 获取缓存
@@ -529,24 +528,12 @@ $$extend(Application, {
     DropApp() {
 
         /**
-         * 并且是安卓情况下
-         * 安卓销毁按键事件
-         * @return {[type]} [description]
-         */
-        const unEvent = () => {
-            if (Xut.plat.isAndroid) {
-                window.GLOBALCONTEXT.document.removeEventListener("backbutton", config._event.back, false);
-                window.GLOBALCONTEXT.document.removeEventListener("pause", config._event.pause, false);
-            }
-        }
-
-        /**
          * iframe模式,退出处理
          * @return {[type]} [description]
          */
         const destroy = () => {
             __app__.$off()
-            //退出应用
+                //退出应用
             globalDestroy('exit')
             window.GLOBALCONTEXT = null;
         }
@@ -557,7 +544,6 @@ $$extend(Application, {
          * @return {[type]}                       [description]
          */
         if (window.DYNAMICCONFIGT) {
-            unEvent()
             destroy()
             return
         }
@@ -570,7 +556,6 @@ $$extend(Application, {
                 window.DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
             }
             window.DUKUCONFIG = null;
-            unEvent();
             destroy();
             return;
         }
@@ -582,7 +567,6 @@ $$extend(Application, {
                 window.CLIENTCONFIGT.iframeDrop();
             }
             window.CLIENTCONFIGT = null;
-            unEvent();
             destroy();
             return;
         }
@@ -605,26 +589,14 @@ $$extend(Application, {
      * dispose   成功处理回调
      * processed 处理完毕回调
      */
-    Stop({
+    Suspend({
         skipAudio,
         dispose,
         processed
     }) {
-        //是否存在动作
-        const hasAction = $$stop(skipAudio)
-        if (hasAction) {
-            if (dispose) {
-                dispose()
-            } else {
-                processed && processed()
-            }
-        } else {
-            processed && processed()
-        }
-    },
-
-    //stop引用
-    Suspend: Application.Stop
+        $$stop(skipAudio)
+        processed && processed()
+    }
 
 })
 

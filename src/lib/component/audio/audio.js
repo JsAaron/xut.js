@@ -3,7 +3,6 @@
  * @param  {[type]} global [description]
  * @return {[type]}        [description]
  */
-import { hash } from '../../util/lang'
 import { config } from '../../config/index'
 import { BaseClass } from './baseclass'
 import { hasAudioes, getAudio } from './fix'
@@ -11,7 +10,7 @@ import { hasAudioes, getAudio } from './fix'
 
 let Player = null
 const noop = function() {}
-let instance = hash() //存放不同音轨的一个实例
+let instance = {} //存放不同音轨的一个实例
 let audioPlayer
 const plat = Xut.plat
 

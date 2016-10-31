@@ -2,7 +2,7 @@ const path = require('path')
 const resolve = path.resolve
 const _ = require("underscore");
 const root = resolve(__dirname)
-const win = process.platform === 'win32'
+const isWinPlat = process.platform === 'win32'
 
 /**
  * 公共配置
@@ -49,7 +49,7 @@ module.exports = {
             launch: false,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
-            dir: win ?
+            dir: isWinPlat ?
                 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build' : '/Users/mac/project/xcode/www/lib'
         },
 

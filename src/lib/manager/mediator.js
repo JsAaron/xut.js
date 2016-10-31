@@ -366,7 +366,7 @@ def(Mediator.prototype, '$reset', function() {
  * @return {[type]} [description]
  */
 def(Mediator.prototype, '$suspend', function() {
-    Xut.Application.Stop({
+    Xut.Application.Suspend({
         skipAudio: true //跨页面不处理
     })
 })

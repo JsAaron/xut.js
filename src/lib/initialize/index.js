@@ -1,7 +1,7 @@
 import { config } from '../config/index'
 import { plugVideo, html5Video } from './app.video'
 import initConfig from './init.config'
-import button from './android.button'
+import { bindAndroid } from './android.button'
 import loadScene from './load.app'
 
 import {
@@ -115,8 +115,7 @@ const operation = () => {
         //不是子文档指定绑定按键
         if (!window.SUbCONFIGT) {
             Xut.Application.AddEventListener = () => {
-                window.GLOBALCONTEXT.document.addEventListener("backbutton", config._event.back, false);
-                window.GLOBALCONTEXT.document.addEventListener("pause", config._event.pause, false);
+                bindAndroid()
             }
         }
     }
@@ -132,9 +131,6 @@ const operation = () => {
 
 
 export default function init() {
-
-    //安卓按键
-    button(config)
 
     //如果不是读库模式
     //播放HTML5视频

@@ -6,6 +6,7 @@ import { destroyFixAudio } from './component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
 import { destroyConfig } from './config/index'
 import { $$resetUUID } from './util/stroage'
+import { offAndroid } from './initialize/android.button'
 
 /**
  * 销毁接口
@@ -28,6 +29,7 @@ export default function Destroy(action = 'destory') {
             $(document).off() //左右按钮
             $(window).off() //横竖切换
         }
+
         //修复的音频对象
         destroyFixAudio()
     }
@@ -52,6 +54,9 @@ export default function Destroy(action = 'destory') {
     //expand销毁
     //flow的一些接口缓存
     adapterDestory()
+
+    //销毁独立APK的键盘事件
+    offAndroid()
 
     /**
      * 重设缓存的UUID

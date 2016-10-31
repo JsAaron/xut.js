@@ -4,7 +4,7 @@
  */
 export function goHomePage() {
     if (window.DUKUCONFIG) {
-        Xut.Application.Stop({
+        Xut.Application.Suspend({
             processed: function() {
                 Xut.Application.DropApp() //退出应用
             }
@@ -13,7 +13,7 @@ export function goHomePage() {
     }
     //动作处理
     //如果有动作则关闭，否则直接跳转
-    Xut.Application.Stop({
+    Xut.Application.Suspend({
         processed: function() {
             Xut.View.GotoSlide(1)
         }

@@ -3,14 +3,13 @@
 */
 import { VideoClass } from './video'
 import { config } from '../../config/index'
-import { hash } from '../../util/index'
 
 let pageBox
 let playBox
 
 let initBox = () => {
-    pageBox = hash() //当前页面包含的视频数据
-    playBox = hash() //播放过的视频数据 （播放集合)
+    pageBox = {} //当前页面包含的视频数据
+    playBox = {}//播放过的视频数据 （播放集合)
 }
 
 initBox()
