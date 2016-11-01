@@ -3,6 +3,7 @@ const fs = require('fs');
 const _ = require("underscore")
 const fsextra = require('fs-extra')
 const watch = require('gulp-watch');
+const utils = require('../utils')
 
 const GALLERY = 'gallery'
 const WIDGET = 'widget'
@@ -12,15 +13,15 @@ const DBNAME = 'xxtebook.db'
 
 const get = function(paths, callback) {
     if (!paths.length) {
-        console.log(`数据解析完毕`)
+        utils.log(`\nconvert a json SQLResult.js\n`)
         callback()
         return
     }
     let path = paths.shift()
     if (!fs.existsSync(path + '/SQLResult.js')) {
-        console.log('【SQLResult.js not available!】')
+        utils.log('【SQLResult.js not available!】')
         sqlite.resolve(path, path + '/' + DBNAME, function() {
-            console.log(`解析数据: ${path + '/' + DBNAME}`)
+            utils.log(`解析数据: ${path + '/' + DBNAME}`)
             get(paths, callback)
         })
     } else {
@@ -54,9 +55,9 @@ const monitor = (path) => {
     watch(paths, {
         events: ['add', 'change']
     }, (name) => {
-        console.log(`${name} is change`)
+        utils.log(`${name} is change`)
         get(getPaths(path), function() {
-            console.log(`${name} is complete`)
+            utils.log(`${name} is complete`)
         })
     })
 }

@@ -43,11 +43,13 @@ const blue = (str) => {
 }
 
 exports.log = (str, code) => {
-    if (code) {
-        console.log(str[code])
-    } else {
-        console.log(str)
-    }
+    console.log(str.red)
+    // return 
+    // if (code) {
+    //     console.log(str[code])
+    // } else {
+    //     console.log(str)
+    // }
 }
 
 exports.write = (path, code) => {
