@@ -4,18 +4,20 @@ const babel = require('rollup-plugin-babel')
 const fsextra = require('fs-extra')
 const utils = require('./utils')
 
-module.exports = (conf, fail) => {
+module.exports = (conf) => {
 
     fsextra.emptyDirSync(conf.tarDir)
     fsextra.emptyDirSync(conf.testDir)
 
-    console.log(`
-        delete the directory,
-            ${conf.tarDir}
-            ${conf.testDir}
-        `)
+    utils.log(`
+delete the directory:
+${conf.tarDir}
+${conf.testDir}
+`, 'prompt')
 
     return new Promise((resolve, reject) => {
+
+        utils.log('【compile rollup】', 'debug')
 
         rollup.rollup({
                 entry: conf.entry,
@@ -23,14 +25,23 @@ module.exports = (conf, fail) => {
                     babel({
                         babelrc: false,
                         exclude: 'node_modules/**',
-                        "presets": ["es2015-rollup"]
+                        "presets": [
+                            [
+                                "es2015", {
+                                    "modules": false
+                                }
+                            ]
+                        ],
+                        "plugins": [
+                            "external-helpers"
+                        ]
                     })
                 ]
             }).then((bundle) => {
                 var code
                 if (!fs.existsSync(conf.tarDir)) {
                     fs.mkdirSync(conf.tarDir);
-                    console.log(conf.tarDir + '目录创建成功');
+                    utils.log(conf.tarDir + '目录创建成功', 'info');
                 }
                 code = bundle.generate({
                     format: 'umd',
@@ -41,8 +52,8 @@ module.exports = (conf, fail) => {
                 resolve()
             })
             .catch((err) => {
-                console.log('错误：' + err)
-                fail()
+                utils.log('错误：' + err, 'error')
+                reject()
             })
     })
 }

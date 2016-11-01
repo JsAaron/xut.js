@@ -5,7 +5,7 @@
 //
 
 const fs = require("fs")
-const SQL = require('sql.js')
+const SQL = require('./sql.js')
 const _ = require("underscore")
 
 let db

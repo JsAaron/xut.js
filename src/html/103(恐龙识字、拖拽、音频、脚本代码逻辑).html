@@ -24,17 +24,23 @@
 </html>
 <script type="text/javascript">
 Xut.Application.setConfig = {
-    visualMode: 0,
-    lauchMode: 1 //启动模式
+    lauchMode: 1, //启动模式
+    saleMode: true, //启动缩放
+    visualMode: 3, //模式3
+    orientateMode: true //允许横竖切换
 }
 
-const appid = 103
 Xut.Application.Launch({
-    el: '#xxtppt-app-container',
+    el: '#xxtppt-app-container', //页面根节点
     paths: {
-        resource: 'content/' + appid,
-        database: 'content/' + appid + '/SQLResult.js'
+        resource: 'content/', //资源路径
+        database: 'content/SQLResult.js' //数据库文件
     },
-    cursor: false
+    cursor: false //关闭光标
 });
+
+//销毁应用
+ //Xut.Application.Destroy()
+
+
 </script>

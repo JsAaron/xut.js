@@ -1,5 +1,6 @@
 const net = require('net')
 const cp = require('child_process');
+const utils = require('./utils')
 
 module.exports = (port, callback) => {
     var server, killPort
@@ -7,16 +8,16 @@ module.exports = (port, callback) => {
     server = net.createServer().listen(port)
     server.on('listening', () => {
         server.close()
-        console.log(`The port ${port} is available.`)
+        utils.log(`The port ${port} is available.`,'prompt')
         callback()
     })
 
     killPort = (pid) => {
         cp.exec('kill -9 ' + pid, (e, stdout, stderr) => {
             if (e) {
-                console.log(`Command kill -9 ${pid} fails`)
+                utils.log(`Command kill -9 ${pid} fails`,'error')
             } else {
-                console.log(`Command kill -9 ${pid} success`)
+                utils.log(`Command kill -9 ${pid} success`,'prompt')
                 callback()
             }
         })
@@ -24,11 +25,11 @@ module.exports = (port, callback) => {
 
     server.on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
-            console.log(`The port ${port} is occupied, please waiting.`)
+            utils.log(`The port ${port} is occupied, please waiting.`,'prompt')
             var command = 'lsof -i:' + port
             cp.exec(command, (e, stdout, stderr) => {　　
                 if (e) {
-                    console.log(`Command ${command} fails`)
+                    utils.log(`Command ${command} fails`,'error')
                 }　
                 else {　　
                     var pid = /node(\s*)(\d+)/ig.exec(stdout)[2]

@@ -1,5 +1,5 @@
 const fs = require('fs')
-
+const utils = require('../utils')
 const readFile = (path) => {
     return fs.readFileSync(path, {
         flag: 'r+',
@@ -20,6 +20,7 @@ module.exports = (conf) => {
         let wpath = conf.tarDir + 'version.js'
         let data = readFile(rpath)
         let vs = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
+        utils.log(`【create Xut.Version = ${vs}】`, 'debug')
         writeFile(wpath, vs)
         resolve && resolve()
     })

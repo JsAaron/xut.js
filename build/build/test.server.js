@@ -1,11 +1,12 @@
 const fs = require('fs')
 const browserSync = require("browser-sync");
+const utils = require('../utils')
 const sqlite = require('../sqlite/index')
 
 module.exports = (conf) => {
     return new Promise((resolve, reject) => {
         let complete = () => {
-            console.log("【Build complete, Will open the HTTP to test wait for 5 seconds  】")
+            utils.log(`\n【Build complete, Will open the HTTP to test wait for 5 seconds  】`, 'data')
             resolve()
             conf.server && setTimeout(() => {
                 browserSync({
@@ -19,14 +20,8 @@ module.exports = (conf) => {
             }, 5000)
         }
 
-        // if (!fs.existsSync("./src/content/xxtebook.db")) {
-        //     console.log("【Can't test Because the xxtebook does not exist】")
-        //     reject()
-        //     return
-        // }
-
         if (!fs.existsSync("./src/content/SQLResult.js")) {
-            console.log("【Can't test Because the SQLResult does not exist】")
+            utils.log("【Can't test Because the SQLResult does not exist】", 'data')
             reject()
             return
         }

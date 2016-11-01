@@ -1,13 +1,31 @@
-const build = require('./build')
-const startserver = require('./test.server')
-const ora = require('ora')
+const rollup = require('../rollup.base.conf')
+const getScript = require('../external')
+const compilerCSS = require('./compiler.css')
+const compilerJs = require('./compiler.js')
+const version = require('./version')
+const webServer = require('./test.server')
+const _ = require("underscore");
+const config = require('../../config')
 
-const spinner = ora('Begin to pack , Please wait for\n')
-// spinner.start()
-const stop = () => {
-    // spinner.stop()
-}
+const conf = _.extend(config.build.conf, {
+    rollup: config.build.conf.tarDir + 'rollup.js',
+    exclude: config.build.exclude,
+    server: config.build.server
+})
 
-build(stop).then((conf) => {
-    startserver(conf).then(() => stop, () => stop)
-}, stop)
+rollup(conf)
+    .then(() => {
+        return getScript(conf)
+    })
+    .then((scriptUrl) => {
+        return compilerJs(conf, scriptUrl)
+    })
+    .then(() => {
+        return version(conf)
+    })
+    .then(() => {
+        return compilerCSS(conf)
+    })
+    .then(() => {
+        webServer(conf)
+    })

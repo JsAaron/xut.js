@@ -1,5 +1,6 @@
 const fs = require('fs')
 const index = './src/index.html'
+const utils = require('./utils')
 
 const getImportExternal = require('../src/lib/external.js')
 
@@ -25,9 +26,7 @@ module.exports = (conf) => {
                     paths.push(srcDir + path)
                 }
             })
-            console.log(
-                `【The introduction of external js :${paths.length}个`
-            )
+            utils.log(`【external js：${paths.length}】`, 'debug')
 
             resolve(paths)
         } else {
@@ -58,10 +57,7 @@ module.exports = (conf) => {
                         }
                     }
                 })
-                console.log(
-                    `【The introduction of external js :${scripts.length}个`
-                )
-
+                utils.log(`【external js：${scripts.length}】`, 'debug')
                 resolve(paths)
             })
         }

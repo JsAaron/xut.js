@@ -2,7 +2,7 @@ const fs = require('fs')
 const http = require('http');
 const express = require('express')
 const webpack = require('webpack')
-const ora = require('ora')
+
 const open = require("open");
 const watch = require('gulp-watch');
 const path = require('path')
@@ -15,8 +15,6 @@ const webpacHotMiddleware = require('webpack-hot-middleware')
 const killOccupied = require('../kill.occupied')
 const convertSVG = require('./convert.svg')
 const serialData = require('./serial.data')
-const spinner = ora('【Begin to pack , Please wait for】\n')
-// spinner.start()
 
 const app = express()
 const config = require('../../config')
@@ -27,7 +25,7 @@ const conf = _.extend(config.dev.conf, {
 })
 
 convertSVG(conf.srcDir)
-serialData(conf, spinner)
+serialData(conf)
 
 fsextra.removeSync(conf.assetsRoot)
 fsextra.mkdirSync(conf.assetsRoot);
@@ -104,7 +102,6 @@ let first = true
 let preChildRun = null
 watch(conf.assetsRoot + '/app.js', () => {
     if (first) {
-        spinner.stop()
         open("http://localhost:" + port)
         first = false
     }

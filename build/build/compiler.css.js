@@ -2,6 +2,7 @@ const gulp = require('gulp');
 const cleanCSS = require('gulp-clean-css');
 const autoprefixer = require('gulp-autoprefixer');
 const csspath = './src/css/*.css'
+const utils = require('../utils')
 
 module.exports = (conf) => {
     return new Promise((resolve, reject) => {
@@ -19,11 +20,11 @@ module.exports = (conf) => {
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.testDir))
             .on('error', (err) => {
-                console.log('【css】compile complete error')
+                utils.log('【css】compile complete error', 'debug')
                 reject()
             })
             .on('end', () => {
-                console.log('【css】compile complete')
+                utils.log('【css】compile complete', 'debug')
                 resolve()
             })
     })

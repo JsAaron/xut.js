@@ -3,7 +3,6 @@ const fsextra = require('fs-extra')
 const _ = require("underscore");
 const uglify = require('gulp-uglify');
 const concat = require('gulp-concat')
-const ora = require('ora')
 const base = require('../rollup.base.conf.js')
 const config = require('../../config')
 const getSrcipt = require('../external')
