@@ -131,26 +131,37 @@ export default function(activitProto) {
          */
         var setBehavior = function(feedbackBehavior) {
 
-            var behaviorSound;
+            let behaviorSound
+
             //音频地址
             if (behaviorSound = feedbackBehavior.behaviorSound) {
-
-                var createAuido = function() {
-                        return new audioPlayer({
-                            url: behaviorSound,
-                            trackId: 9999,
-                            complete: function() {
-                                this.play()
-                            }
-                        })
-                    }
-                    //妙妙学客户端强制删除
+                //妙妙学客户端强制删除
                 if (window.MMXCONFIG && window.audioHandler) {
-                    self._fixAudio.push(createAuido())
+                    self._fixAudio.push(new audioPlayer({
+                        url: behaviorSound,
+                        trackId: 9999,
+                        complete: function() {
+                            this.play()
+                        }
+                    }))
                 } else {
-                    createAuido();
+                    //其余平台,如果存在点击过的
+                    //这里主要是防止重复点击创建
+                    let audio = self._cacheBehaviorAudio[behaviorSound]
+                    if (audio) {
+                        audio.play()
+                    } else {
+                        //相同对象创建一次
+                        //以后取缓存
+                        audio = new audioPlayer({
+                            url: behaviorSound
+                        })
+                        audio.play()
+                        self._cacheBehaviorAudio[behaviorSound] = audio
+                    }
                 }
             }
+
             //反弹效果
             if (feedbackBehavior.isButton) {
                 //div通过css实现反弹

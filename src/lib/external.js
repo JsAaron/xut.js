@@ -13,6 +13,7 @@ var jsName = [
     'lib/external/ibooks.epub.js',
 
     'lib/plugin/library/jquery.js',
+    'lib/plugin/library/jquery.transit.js',//2016.11.2 新增
     'lib/plugin/library/underscore.js',
     'lib/plugin/library/video.js',
     'lib/plugin/library/audio5.js',

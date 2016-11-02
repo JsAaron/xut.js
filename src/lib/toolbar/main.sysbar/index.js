@@ -203,7 +203,7 @@ export default class sysBar extends Bar {
      * @return {[type]} [description]
      */
     showTopBar() {
-        var that = this;
+        var self = this;
 
         if (this.toolBarStatus) {
             this.Lock = false;
@@ -214,16 +214,14 @@ export default class sysBar extends Bar {
             'opacity': 0
         });
 
-        Xut.nextTick(function() {
-            that.$controlNode && that.$controlNode.animate({
-                'opacity': 1
-            }, that.delay, 'linear', function() {
-                that.hideNavbar()
-                that.super_showSystemBar()
-                that.toolBarStatus = true
-                that.Lock = false
-            });
-        })
+        self.$controlNode && self.$controlNode.transition({
+            'opacity': 1
+        }, self.delay, 'in', function() {
+            self.hideNavbar()
+            self.super_showSystemBar()
+            self.toolBarStatus = true
+            self.Lock = false
+        });
     }
 
     /**
@@ -231,21 +229,21 @@ export default class sysBar extends Bar {
      * @return {[type]} [description]
      */
     hideTopBar() {
-        var that = this;
+        var self = this;
 
         if (!this.toolBarStatus) {
             this.Lock = false;
             return;
         }
 
-        this.$controlNode.animate({
+        this.$controlNode && this.$controlNode.transition({
             'opacity': 0
-        }, that.delay, 'linear', function() {
-            that.hideNavbar()
-            that.$controlNode.hide();
-            that.super_hideSystemBar();
-            that.toolBarStatus = false;
-            that.Lock = false;
+        }, self.delay, 'in', function() {
+            self.hideNavbar()
+            self.$controlNode.hide();
+            self.super_hideSystemBar();
+            self.toolBarStatus = false;
+            self.Lock = false;
         });
     }
 

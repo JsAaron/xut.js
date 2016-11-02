@@ -10,6 +10,12 @@ const DEFAULT = undefined
 export default {
 
     /**
+     * 是否支持错误日志打印
+     * @type {Boolean}
+     */
+    silent: process.env.NODE_ENV !== 'production',
+
+    /**
      * 页面可视模式
      * 2016.9.19
      * 4种分辨率显示模式:

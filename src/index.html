@@ -1,4 +1,5 @@
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -44,13 +45,13 @@
 </html>
 <script type="text/javascript">
 Xut.Application.setConfig = {
-    visualMode: 0,
-    lauchMode: 1 //启动模式
+    lauchMode: 1, //启动模式
+    visualMode: 0
 }
 
 var testId = localStorage.getItem('test-appId')
 
-var start = 101
+var start = testId || 501
 var appid = start
 var length = 19
 var max = appid + length

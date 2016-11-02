@@ -70,14 +70,13 @@ export default class BookBar extends Bar {
      * 工具条的样式
      */
     setToolbarStyle() {
-        var height = this.topBarHeight,
-            TOP = this.barHeight; //系统工具栏占用的高度
+        const height = this.topBarHeight
 
         //在顶部
         this.$controlNode.css({
             top: 0,
             height: height + 'px',
-            paddingTop: TOP + 'px',
+            paddingTop: this.super_barHeight + 'px', //系统工具栏占用的高度
             backgroundColor: 'rgba(0, 0, 0, 0.2)', //transparent
             fontSize: '0.625em',
             color: 'white'
@@ -211,7 +210,7 @@ export default class BookBar extends Bar {
         });
 
         setTimeout(function() {
-            that.$controlNode.animate({
+            that.$controlNode.transition({
                 'opacity': 1
             }, that.delay, 'linear', function() {
                 that.super_showSystemBar();
@@ -234,7 +233,7 @@ export default class BookBar extends Bar {
             return;
         }
 
-        this.$controlNode.animate({
+        this.$controlNode.transition({
             'opacity': 0
         }, that.delay, 'linear', function() {
             that.$controlNode.hide();

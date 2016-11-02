@@ -242,7 +242,16 @@ video {
     z-index: 2;
 }
 
+
+/*默认背景图，加快白板显示*/
+
+.xut-cover-image {
+    background-image: url("../content/gallery/cover.jpg");
+}
+
+
 /*根节点*/
+
 .xut-scene-container {
     position: absolute;
     z-index: 1;

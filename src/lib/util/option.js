@@ -1,4 +1,6 @@
-import { request } from './loader'
+import {
+    request
+} from './loader'
 import { parseJSON } from './lang'
 import { config } from '../config/index'
 

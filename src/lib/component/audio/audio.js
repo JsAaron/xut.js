@@ -4,7 +4,7 @@
  * @return {[type]}        [description]
  */
 import { config } from '../../config/index'
-import { BaseClass } from './baseclass'
+import BaseAudio from './base.class'
 import { hasAudioes, getAudio } from './fix'
 
 
@@ -55,7 +55,7 @@ let supportAudio = (fail) => {
  * @param  {string} url 路径
  * @return {[type]}      [description]
  */
-class _Media extends BaseClass {
+class _Media extends BaseAudio {
 
     constructor(options, controlDoms) {
         super()
@@ -130,7 +130,7 @@ class _Media extends BaseClass {
  * 采用Falsh播放
  * @type {[type]}
  */
-class _Flash extends BaseClass {
+class _Flash extends BaseAudio {
 
     constructor(options, controlDoms) {
         super()
@@ -187,155 +187,11 @@ class _Flash extends BaseClass {
 
 
 /**
- * 采用_Audio5js播放
- * @type {[type]}
- */
-class _Audio5js extends BaseClass {
-
-    constructor(options, controlDoms) {
-        super()
-        var trackId = options.trackId,
-            url = config.audioPath() + options.url,
-            self = this,
-            audio;
-
-        //构建之前处理
-        this.preRelated(trackId, options);
-
-        audio = new Audio5js({
-            ready: function(player) {
-                this.load(url);
-                //如果调用了播放
-                this.play()
-                self.status = "playing"
-            }
-        });
-
-        this.audio = audio;
-        this.trackId = trackId;
-        this.status = 'playing';
-        this.options = options;
-
-        //相关数据
-        this.afterRelated(options, controlDoms);
-    }
-
-    /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
-     * @return {[type]} [description]
-     */
-    getAudioTime(callback) {
-        callback(Math.round(this.audio.audio.audio.currentTime * 1000))
-    }
-
-    end() {
-        if (this.audio) {
-            this.audio.destroy();
-            this.audio = null;
-        }
-        this.status = 'ended';
-        this.destroyRelated();
-    }
-}
-
-
-/**
- * 使用html5的audio播放
- * @param  {string} url    音频路径
- * @param  {object} options 可选参数
- * @return {object}         [description]
- */
-class _Audio extends BaseClass {
-
-    constructor(options, controlDoms) {
-        super()
-
-        let trackId = options.trackId
-        let url = config.audioPath() + options.url
-        let audio
-        let self = this
-
-        let hasAudio = hasAudioes()
-
-        //构建之前处理
-        this.preRelated(trackId, options);
-
-        if (instance[trackId]) {
-            audio = hasAudio ? getAudio() : instance[trackId]
-            audio.src = url
-        } else {
-            if (hasAudio) {
-                audio = getAudio()
-                audio.src = url
-            } else {
-                audio = new Audio(url)
-                //更新音轨
-                //妙妙学方式不要音轨处理
-                instance[trackId] = audio
-            }
-        }
-
-        this._callback = () => {
-            self.callbackProcess()
-        }
-
-        this._throughCallback = () => {
-            self.play()
-        }
-
-        /**
-         * safari 自动播放
-         * 手机浏览器需要加
-         * 2016.8.26
-         * @type {Boolean}
-         */
-        audio.autoplay = true
-
-        audio.addEventListener('canplaythrough', this._throughCallback, false)
-        audio.addEventListener('ended', this._callback, false)
-        audio.addEventListener('error', this._callback, false)
-
-        this.audio = audio;
-        this.trackId = trackId;
-        this.status = 'playing';
-        this.options = options;
-
-        //相关数据
-        this.afterRelated(options, controlDoms)
-    }
-
-    /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
-     * @return {[type]} [description]
-     */
-    getAudioTime(callback) {
-        callback(Math.round(this.audio.currentTime * 1000))
-    }
-
-    end() {
-        if (this.audio) {
-            this.audio.pause();
-            this.audio.removeEventListener('canplaythrough', this._throughCallback, false)
-            this.audio.removeEventListener('ended', this._callback, false)
-            this.audio.removeEventListener('error', this._callback, false)
-            this.audio = null;
-        }
-        this.status = 'ended';
-        this.destroyRelated();
-    }
-}
-
-
-/**
  * 使用PhoneGap的 js直接调用 cordova Media播放
  * @param  {string} url 路径
  * @return {[type]}      [description]
  */
-class _cordovaMedia extends BaseClass {
+class _cordovaMedia extends BaseAudio {
 
     constructor(options, controlDoms) {
         super()
@@ -417,6 +273,153 @@ class _cordovaMedia extends BaseClass {
         this.destroyRelated();
     }
 }
+
+
+/**
+ * 采用_Audio5js播放
+ * @type {[type]}
+ */
+class _Audio5js extends BaseAudio {
+
+    constructor(options, controlDoms) {
+        super()
+        var trackId = options.trackId,
+            url = config.audioPath() + options.url,
+            self = this,
+            audio;
+
+        //构建之前处理
+        this.preRelated(trackId, options);
+
+        audio = new Audio5js({
+            ready: function(player) {
+                this.load(url);
+                //如果调用了播放
+                this.play()
+                self.status = "playing"
+            }
+        });
+
+        this.audio = audio;
+        this.trackId = trackId;
+        this.status = 'playing';
+        this.options = options;
+
+        //相关数据
+        this.afterRelated(options, controlDoms);
+    }
+
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        callback(Math.round(this.audio.audio.audio.currentTime * 1000))
+    }
+
+    end() {
+        if (this.audio) {
+            this.audio.destroy();
+            this.audio = null;
+        }
+        this.status = 'ended';
+        this.destroyRelated();
+    }
+}
+
+
+/**
+ * 使用html5的audio播放
+ * @param  {string} url    音频路径
+ * @param  {object} options 可选参数
+ * @return {object}         [description]
+ */
+class _Audio extends BaseAudio {
+
+    constructor(options, controlDoms) {
+
+        super()
+
+        let trackId = options.trackId
+        let url = config.audioPath() + options.url
+        let audio
+        let self = this
+
+        let hasAudio = hasAudioes()
+
+        //构建之前处理
+        this.preRelated(trackId, options);
+
+        if (instance[trackId]) {
+            audio = hasAudio ? getAudio() : instance[trackId]
+            audio.src = url
+        } else {
+            if (hasAudio) {
+                audio = getAudio()
+                audio.src = url
+            } else {
+                audio = new Audio(url)
+                    //更新音轨
+                    //妙妙学方式不要音轨处理
+                instance[trackId] = audio
+            }
+        }
+
+        this._callback = () => {
+            self.callbackProcess()
+        }
+
+        this._throughCallback = () => {
+            self.play()
+        }
+
+        /**
+         * safari 自动播放
+         * 手机浏览器需要加
+         * 2016.8.26
+         * @type {Boolean}
+         */
+        audio.autoplay = true
+
+        audio.addEventListener('canplaythrough', this._throughCallback, false)
+        audio.addEventListener('ended', this._callback, false)
+        audio.addEventListener('error', this._callback, false)
+
+        this.audio = audio;
+        this.trackId = trackId;
+        this.status = 'playing';
+        this.options = options;
+
+        //相关数据
+        this.afterRelated(options, controlDoms)
+    }
+
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        callback(Math.round(this.audio.currentTime * 1000))
+    }
+
+    end() {
+        if (this.audio) {
+            this.audio.pause();
+            this.audio.removeEventListener('canplaythrough', this._throughCallback, false)
+            this.audio.removeEventListener('ended', this._callback, false)
+            this.audio.removeEventListener('error', this._callback, false)
+            this.audio = null;
+        }
+        this.status = 'ended';
+        this.destroyRelated();
+    }
+}
+
+
 
 
 //安卓客户端apk的情况下

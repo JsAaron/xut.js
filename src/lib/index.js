@@ -1,17 +1,13 @@
-//Pre initialized
 import { config } from './config/index'
 import { api } from './global.api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { fixAudio } from './component/audio/fix'
 import { disable } from './initialize/busy.cursor'
-//nextTick
 import nextTick from './util/nexttick'
-//A predictable state container for apps.
-// import store from './redex/store'
 import init from './initialize/index'
 
-Xut.Version = 867
+Xut.Version = 867.4
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -63,14 +59,17 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
         busyIcon = ''
     }
 
-    //基本结构
     //默认背景图
-    const cover = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource ? window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg' : './content/gallery/cover.jpg'
-    const commonHTML =
-        `<div class="xut-cover xut-fullscreen" style="background-image: url(${cover});"></div>
-         <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
+    let coverImage = '<div class="xut-cover xut-fullscreen xut-cover-image"></div>'
+    //重写背景图
+    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
+        let coverUrl = window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg'
+        coverImage = `<div class="xut-cover xut-fullscreen" style="background-image: url(${coverUrl});"></div>`
+    }
 
-    let html = `${busyIcon}${commonHTML}`
+    let html = `${busyIcon}
+                ${coverImage}
+                <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
 
     //如果根节点不存在,配置根节点
     if (!nodeName) {

@@ -28,7 +28,6 @@ import { config } from './config/index'
 import { SceneFactory } from './scenario/scenario'
 import { sceneController } from './scenario/controller'
 import globalDestroy from './global.destroy'
-import loadScene from './initialize/load.app'
 import Observer from './observer/index'
 
 import {
@@ -50,7 +49,8 @@ import {
     $$remove,
     hash,
     toNumber,
-    $$extend
+    $$extend,
+    $$warn
 }
 from './util/index'
 
@@ -139,7 +139,7 @@ $$extend(View, {
             var curVmPage;
             if (curVmPage = current.vm.$curVmPage) {
                 if (curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
-                    console.log('过滤多次重复点击加载页面')
+                    $$warn(`重复触发页面加载:seasonId:${seasonId},chapterId:${chapterId}`)
                     return
                 }
             }

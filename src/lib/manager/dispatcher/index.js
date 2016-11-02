@@ -678,16 +678,22 @@ export default class Dispatcher {
 
         //触发自动任务
         let triggerAuto = function() {
+            //第一次进入，处理背景
             let $cover = $(".xut-cover")
             if ($cover.length) {
-                $cover.animate({
-                    opacity: 0
-                }, 1000, function() {
-                    $cover.hide().remove()
-                    self._autoRun({
-                        'action': action
-                    })
-                })
+                $cover.transition({
+                    opacity: 0,
+                    duration: 1000,
+                    easing: 'in',
+                    complete() {
+                        $cover.hide().remove()
+                        self._autoRun({
+                            'action': action
+                        })
+                        $cover = null
+                        self = null
+                    }
+                });
             } else {
                 self._autoRun({
                     'action': action

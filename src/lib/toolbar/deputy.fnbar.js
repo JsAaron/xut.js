@@ -24,7 +24,7 @@ export default class fnBar extends Bar {
         this.pageTips = null;
         this.currTip = null;
         this.tipsMode = 0;
-        this.top = 0;
+        this.top = this.super_barHeight;
         this.Lock = false;
         this.delay = 50;
         this.hasTopBar = false;
@@ -98,13 +98,11 @@ export default class fnBar extends Bar {
     /**
      * 系统工具栏
      */
-    _createSystemBar() {
-        const height = this.super_barHeight
+    _createSystemBar() {       
         let html = `<div class="xut-control-bar"
-                         style="top:0;height:${this.super_iconHeight}px;padding-top:${height}px">
+                         style="top:0;height:${this.super_iconHeight}px;padding-top:${this.top}px">
                     </div>`
         html = $(String.styleFormat(html))
-        this.top = height;
         this.super_showSystemBar();
         this._createBackIcon(html)
         this._createTitle(html)
@@ -312,7 +310,7 @@ export default class fnBar extends Bar {
                 'opacity': 0
             });
             setTimeout(function() {
-                controlBar.animate({
+                controlBar.transition({
                     'opacity': 1
                 }, delay, 'linear', function() {
                     that.__showSystemBar();
@@ -343,7 +341,7 @@ export default class fnBar extends Bar {
             return;
         }
         if (this.hasTopBar) {
-            controlBar.animate({
+            controlBar.transition({
                 'opacity': 0
             }, delay, 'linear', function() {
                 that.controlBar.hide();

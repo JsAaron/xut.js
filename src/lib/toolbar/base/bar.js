@@ -51,9 +51,10 @@ export default class Bar {
 
         /**
          * 系统状态栏高度
+         * 在ios浏览器中状态栏高度为0
          * @type {[type]}
          */
-        this.super_barHeight = isIOS ? 20 : 0
+        this.super_barHeight = isIOS && !isBrowser ? 20 : 0
 
         const prop = config.proportion;
         const iconHeight = config.iconHeight;

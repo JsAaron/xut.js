@@ -76,12 +76,12 @@ export default class Activity {
         /**
          * 绑定事件
          */
-        this.bindEventBehavior();
+        this.bindEventBehavior()
 
         /**
          * 初始化content行为
          */
-        this._initContents();
+        this._initContents()
 
         /**
          * 2016.2.26
@@ -90,7 +90,15 @@ export default class Activity {
          * 点击效果的音频处理
          * @type {Array}
          */
-        this._fixAudio = [];
+        this._fixAudio = []
+
+        /**
+         * 2016.11.2
+         * 缓存点击的音频对象
+         * 这样用于优化重复点击按钮的时候触发音频
+         * @type {Array}
+         */
+        this._cacheBehaviorAudio = {}
 
         /**
          * 如果存在content
@@ -662,6 +670,16 @@ export default class Activity {
         if (this.bookMark) {
             this.bookMark.destroy();
             this.bookMark = null;
+        }
+
+        //如果有点击音频
+        if(Object.keys(this._cacheBehaviorAudio).length){
+            for(let key in this._cacheBehaviorAudio){
+                let audio = this._cacheBehaviorAudio[key]
+                if(audio){
+                    audio.end()
+                }
+            }
         }
 
         this.$containsNode = null;

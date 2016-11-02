@@ -77,7 +77,7 @@ export function plugVideo() {
  */
 export function html5Video() {
     //延时应用开始
-    Xut.Application.delayAppRun();
+    Xut.Application.delayAppRun()
     Video5({
         url: 'duku.mp4',
         startBoot: function() {

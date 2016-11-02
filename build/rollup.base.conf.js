@@ -1,6 +1,7 @@
 const fs = require('fs')
 const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
+const replace = require('rollup-plugin-replace')
 const fsextra = require('fs-extra')
 const utils = require('./utils')
 
@@ -35,6 +36,10 @@ ${conf.testDir}
                         "plugins": [
                             "external-helpers"
                         ]
+                    }),
+                    replace({
+                        exclude: 'node_modules/**',
+                        'process.env.NODE_ENV': JSON.stringify('production')
                     })
                 ]
             }).then((bundle) => {

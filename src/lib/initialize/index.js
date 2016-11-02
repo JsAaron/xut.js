@@ -1,8 +1,8 @@
 import { config } from '../config/index'
 import { plugVideo, html5Video } from './app.video'
-import initConfig from './init.config'
+import setConfig from './set.config'
 import { bindAndroid } from './android.button'
-import loadScene from './load.app'
+import loadScene from './load.scenario'
 
 import {
     $$set,
@@ -94,7 +94,7 @@ const initMain = (novelData) => {
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-const initApp = () => initConfig(initMain)
+const initApp = () => setConfig(initMain)
 
 
 /**
@@ -135,9 +135,9 @@ export default function init() {
     //如果不是读库模式
     //播放HTML5视频
     //在IOS
-    if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
-        html5Video()
-    }
+    // if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
+    //     html5Video()
+    // }
 
     //Ifarme嵌套处理
     //1 新阅读
