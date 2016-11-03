@@ -7,7 +7,8 @@ import { disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 867.4
+Xut.Version = 868
+
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -27,31 +28,11 @@ if (Xut.plat.isBrowser) {
     })
 }
 
-/**
- * 接口接在参数
- * 用户横竖切换刷新
- * @type {Array}
- */
-let lauchOptions
-
 
 /**
- * 创建基本结构
- * @return {[type]} [description]
+ * 基本结构
  */
-const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) { //默认需要忙了光标
-
-    let $rootNode
-    if (nodeName) {
-        $rootNode = $(nodeName)
-    }
-
-    if (!$rootNode.length) {
-        //如果没有传递节点名，直接放到body下面
-        nodeName = ''
-        $rootNode = $('body')
-    }
-
+const getContentHTML = cursor => {
     //忙碌可配置
     let busyIcon = '<div class="xut-busy-icon xut-fullscreen"></div>'
     if (!cursor) {
@@ -61,52 +42,74 @@ const createHTML = function(nodeName = '#xxtppt-app-container', cursor = true) {
 
     //默认背景图
     let coverImage = '<div class="xut-cover xut-fullscreen xut-cover-image"></div>'
+
     //重写背景图
     if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
         let coverUrl = window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg'
         coverImage = `<div class="xut-cover xut-fullscreen" style="background-image: url(${coverUrl});"></div>`
     }
 
-    let html = `${busyIcon}
-                ${coverImage}
-                <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
+    return `${busyIcon}
+            ${coverImage}
+            <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
+}
+
+/**
+ * 根节点
+ */
+const getNode = (nodeName = '#xxtppt-app-container', cursor = true) => {
+    let $rootNode
+    if (nodeName) {
+        $rootNode = $(nodeName)
+    }
+    if (!$rootNode.length) {
+        //如果没有传递节点名，直接放到body下面
+        nodeName = ''
+        $rootNode = $('body')
+    }
+
+    let contentHtml = getContentHTML(cursor)
 
     //如果根节点不存在,配置根节点
     if (!nodeName) {
-        html = `<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden "> ${html}</div>`
+        contentHtml = `<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden">
+                            ${contentHtml}
+                       </div>`
     }
 
-    let $appNode = $(String.styleFormat(html))
-
-    Xut.Application.$$removeNode = function() {
-        lauchOptions = null
-        $appNode.remove()
-        $rootNode = null
-        $appNode = null
-        Xut.Application.$$removeNode = null
+    return {
+        $rootNode,
+        $contentNode: $(String.styleFormat(contentHtml))
     }
-
-    nextTick({
-        container: $rootNode,
-        content: $appNode
-    }, init)
 }
+
+
+/**
+ * 接口接在参数
+ * 用户横竖切换刷新
+ * @type {Array}
+ */
+let lauchOptions
 
 
 /**
  * 加载应用app
  * @return {[type]} [description]
  */
-const loadApp = function(...arg) {
-    //清理旧节点
-    if (document.getElementById('sceneContainer')) {
-        "busyIcon message removelayer startupPage sceneContainer"
-        .split(' ').forEach(id => {
-            $(`#${id}`).hide().remove()
-        })
+const loadApp = (...arg) => {
+    let node = getNode(...arg)
+    Xut.Application.$$removeNode = () => {
+        lauchOptions = null
+        node.$contentNode.remove()
+        node.$contentNode = null
+        node.$rootNode = null
+        node = null
+        Xut.Application.$$removeNode = null
     }
-    //创建新节点
-    createHTML(...arg)
+    nextTick({
+        container: node.$rootNode,
+        content: node.$contentNode
+    }, init)
 }
 
 // $('body').on('dblclick', () => {
@@ -114,8 +117,10 @@ const loadApp = function(...arg) {
 //     loadApp()
 // })
 
-//横竖切换
-Xut.plat.isBrowser && $(window).on('orientationchange', function() {
+/**
+ * 横竖切换
+ */
+Xut.plat.isBrowser && $(window).on('orientationchange', () => {
     //如果启动了这个模式
     if (config.orientateMode) {
         let temp = lauchOptions
@@ -132,23 +137,24 @@ Xut.plat.isBrowser && $(window).on('orientationchange', function() {
 
 /**
  * 提供全局配置文件
- * @return {[type]} [description]
  */
-const configMode = function(setConfig) {
+const setMode = setConfig => {
     if (setConfig) {
         Xut.extend(config, setConfig)
     }
 }
 
-//新版本加载
-Xut.Application.Launch = function({
+/**
+ * 新版本加载
+ */
+Xut.Application.Launch = ({
     el,
     paths,
     cursor
-}) {
+}) => {
     const setConfig = Xut.Application.setConfig
     if (setConfig && setConfig.lauchMode === 1) {
-        configMode(setConfig);
+        setMode(setConfig);
         (lauchOptions = []).push(arguments)
         window.DYNAMICCONFIGT = { //外部配置文件
             resource: paths.resource,
@@ -158,12 +164,13 @@ Xut.Application.Launch = function({
     }
 }
 
-//老版本加载
+/**
+ * 老版本加载
+ */
 setTimeout(() => {
-
     const setConfig = Xut.Application.setConfig
     if (!setConfig || setConfig && !setConfig.lauchMode) {
-        configMode(setConfig)
+        setMode(setConfig)
         loadApp()
     }
 }, 100)

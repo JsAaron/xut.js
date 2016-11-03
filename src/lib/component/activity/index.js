@@ -673,11 +673,12 @@ export default class Activity {
         }
 
         //如果有点击音频
-        if(Object.keys(this._cacheBehaviorAudio).length){
-            for(let key in this._cacheBehaviorAudio){
+        if (Object.keys(this._cacheBehaviorAudio).length) {
+            for (let key in this._cacheBehaviorAudio) {
                 let audio = this._cacheBehaviorAudio[key]
-                if(audio){
+                if (audio) {
                     audio.end()
+                    this._cacheBehaviorAudio[key] = null
                 }
             }
         }
