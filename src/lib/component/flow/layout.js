@@ -38,7 +38,7 @@ const createStr = (chapterId, data, viewWidth, viewHeight, margin) => {
 
     //重复加载杂志
     //不刷新的情况处理
-    if(/fix-transform/.test(data)){
+    if (/fix-transform/.test(data)) {
         data = $(data).find("#columns-content").html()
     }
 
@@ -148,4 +148,11 @@ export default function initFlows() {
     $container.hide()
 
     set(flowCounts)
+
+
+    //存在
+    if (Object.keys(flowCounts).length) {
+        return true
+    }
+
 }

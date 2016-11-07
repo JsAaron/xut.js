@@ -382,7 +382,7 @@ export default function setDynamicApi(vm) {
             'pageIndex': pagePointer.currIndex,
             'rightIndex': pagePointer.rightIndex
         }
-        $dispatcher.movePageBase(data)
+        $dispatcher.movePageBases(data)
     };
 
 

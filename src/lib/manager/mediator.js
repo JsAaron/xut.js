@@ -138,7 +138,7 @@ export default class Mediator extends Observer {
          * @return {[type]} [description]
          */
         $globalEvent.$watch('onMove', (data) => {
-            $dispatcher.movePageBase(data)
+            $dispatcher.movePageBases(data)
         });
 
 
@@ -166,7 +166,7 @@ export default class Mediator extends Observer {
          * @return {[type]}          [description]
          */
         $globalEvent.$watch('onUpSlider', (pointers) => {
-            $dispatcher.suspendPageBase(pointers)
+            $dispatcher.suspendPageBases(pointers)
         });
 
 
@@ -175,7 +175,7 @@ export default class Mediator extends Observer {
          * @return {[type]}              [description]
          */
         $globalEvent.$watch('onComplete', (...arg) => {
-            $dispatcher.completePageBase(...arg)
+            $dispatcher.completePageBases(...arg)
         });
 
 
@@ -184,7 +184,7 @@ export default class Mediator extends Observer {
          * @return {[type]}      [description]
          */
         $globalEvent.$watch('onJumpPage', (data) => {
-            $dispatcher.gotoPageBase(data);
+            $dispatcher.gotoPageBases(data);
         });
 
 
@@ -378,7 +378,7 @@ def(Mediator.prototype, '$suspend', function() {
 def(Mediator.prototype, '$destroy', function() {
     this.$off(); //观察事件
     this.$globalEvent.destroy(); //全局事件
-    this.$dispatcher.destroyPageBase(); //派发器
+    this.$dispatcher.destroyPageBases(); //派发器
     this.$dispatcher = null;
     this.$globalEvent = null;
     this.destoryDynamicApi() //动态api

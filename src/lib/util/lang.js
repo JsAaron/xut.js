@@ -70,15 +70,16 @@ export function $$extend(object, config) {
  * @param  {[type]} itemArray [description]
  * @return {[type]}           [description]
  */
-export function parseJSON(itemArray) {
-    if (!itemArray) return
-    var anminJson;
+export function parseJSON(parameter) {
+    if (!parameter) return
+    let json
     try {
-        anminJson = JSON.parse(itemArray);
+        json = JSON.parse(parameter)
     } catch (error) {
-        console.log('parseJSON失败:' + itemArray)
+        console.log(`parseJSON失败:${parameter}`)
+        return false
     }
-    return anminJson;
+    return json
 }
 
 

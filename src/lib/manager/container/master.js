@@ -13,10 +13,10 @@ import {
 } from '../../command/index'
 
 import {
-    _overMemory,
-    _transformNodes,
-    _transformConversion
-} from '../../pagebase/move/parallax'
+    overMemory,
+    transformConversion,
+    getParallaxStyle
+} from '../../pagebase/move/util.parallax'
 
 import { config } from '../../config/index'
 
@@ -163,27 +163,28 @@ export default class MasterMgr extends Abstract {
         direction
     } = {}) {
 
-        let isBoundary = false; //是边界处理
+        //是边界处理
+        //边界外处理母版
+        //边界内处理视觉差
+        let isBoundary = false
 
         //找到需要滑动的母版
-        const masterObjs = this._findMaster(leftIndex, currIndex, rightIndex, direction, action)
-
+        let masterObjs = this._findMaster(leftIndex, currIndex, rightIndex, direction, action)
         _.each(masterObjs, function(pageObj, index) {
             if (pageObj) {
                 isBoundary = true
-                let dist = moveDist[index]
-                pageObj.toMove(action, dist, speed, moveDist[3])
+                pageObj.movePageBaseContainer(action, moveDist[index], speed, moveDist[3])
             }
         })
 
         //越界不需要处理内部视察对象
         this.isBoundary = isBoundary;
         if (isBoundary) {
-            return;
+            return
         }
 
         //移动视察对象
-        const moveParallaxObject = (nodes) => {
+        let moveParallaxObject = (nodes) => {
             this._moveParallaxs(currIndex, action, direction, moveDist, speed, nodes, this.parallaxProcessedContetns)
         }
 
@@ -358,7 +359,7 @@ export default class MasterMgr extends Abstract {
 
         //处理当前页面内的视觉差对象效果
         if (currParallaxObj) {
-            currParallaxObj.moveParallax(...arg)
+            currParallaxObj.movePageBaseParallax(...arg)
         }
     }
 
@@ -412,7 +413,7 @@ export default class MasterMgr extends Abstract {
             /**
              * 设置移动
              */
-            const toMove = function(distance, speed) {
+            const _fixToMove = function(distance, speed) {
                 var $pageNode = parallaxObj.$pageNode;
                 if ($pageNode) {
                     $pageNode.css(transitionDuration, speed + 'ms');
@@ -421,11 +422,11 @@ export default class MasterMgr extends Abstract {
             }
 
             if (position === 'prev') {
-                toMove(-self.viewWidth);
+                _fixToMove(-self.viewWidth);
             } else if (position === 'next') {
-                toMove(self.viewWidth);
+                _fixToMove(self.viewWidth);
             } else if (position === 'curr') {
-                toMove(0);
+                _fixToMove(0);
             }
         }
 
@@ -549,9 +550,20 @@ export default class MasterMgr extends Abstract {
                 }
             }
 
-            moveTranslate = _transformConversion(translate, -self.viewWidth, nodes);
-            _transformNodes($contentNode, 300, moveTranslate, offsetTranslate.opacityStart);
-            _overMemory(moveTranslate, offsetTranslate);
+            moveTranslate = transformConversion(translate, -self.viewWidth, nodes);
+
+            //直接操作元素
+            let parallaxConfig = getParallaxStyle({
+                property: moveTranslate,
+                speed: 300,
+                opacityStart: offsetTranslate.opacityStart
+            })
+
+            if (parallaxConfig.style) {
+                $contentNode.css(parallaxConfig.style)
+            }
+
+            overMemory(moveTranslate, offsetTranslate);
         }
 
 

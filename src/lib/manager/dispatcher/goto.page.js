@@ -1,4 +1,4 @@
-import { fix as _fix } from '../../pagebase/move/translation'
+import { fix as _fix } from '../../pagebase/move/util.translation'
 
 /**
  * 跳转之前提高层级问题
@@ -44,7 +44,7 @@ const calculateFlip = (complier, data, createCallback) => {
         collectContainers.push(function(targetIndex, pageIndex) {
             return function(callback) {
                 //创建新结构
-                complier.createPageBase([pageIndex], targetIndex, 'toPage', callback, {
+                complier.createPageBases([pageIndex], targetIndex, 'toPage', callback, {
                     'opacity': 0 //同页面切换,规定切换的样式
                 })
             }
@@ -95,7 +95,7 @@ const createContainerView = (complier, data) => {
     let pageMgr = complier.pageMgr
 
     //停止当前页面动作
-    complier.suspendPageBase({
+    complier.suspendPageBases({
         'stopPointer': prveHindex
     })
 

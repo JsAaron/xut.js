@@ -61,6 +61,7 @@ export default class Dispatcher {
      * @return {[type]} [description]
      */
     initCreate() {
+
         const options = this.options
 
         //pointer
@@ -76,7 +77,7 @@ export default class Dispatcher {
         }
 
         //始化构建页面容器对象
-        this.createPageBase(pointer.createPointer, options.initIndex, 'init')
+        this.createPageBases(pointer.createPointer, options.initIndex, 'init')
     }
 
 
@@ -89,7 +90,7 @@ export default class Dispatcher {
      *  toPageCallback    跳转页面支持回调通知
      *  userStyle         规定创建的style属性
      **/
-    createPageBase(createPageIndex, visiblePageIndex, action, toPageCallback, userStyle) {
+    createPageBases(createPageIndex, visiblePageIndex, action, toPageCallback, userStyle) {
 
         //2016.1.20
         //修正苗苗学问题 确保createPage不是undefined
@@ -290,7 +291,7 @@ export default class Dispatcher {
      *  2 反弹
      *  3 翻页
      */
-    movePageBase({
+    movePageBases({
         action,
         speed,
         distance,
@@ -358,7 +359,7 @@ export default class Dispatcher {
      * @param  {[type]} pointers [description]
      * @return {[type]}          [description]
      */
-    suspendPageBase(pointers) {
+    suspendPageBases(pointers) {
         //关闭层事件
         this.pageMgr.suspend(pointers);
         this.masterContext(function() {
@@ -374,7 +375,7 @@ export default class Dispatcher {
      * 翻页动画完毕后
      * @return {[type]}              [description]
      */
-    completePageBase(direction, pagePointer, unfliplock, isQuickTurn) {
+    completePageBases(direction, pagePointer, unfliplock, isQuickTurn) {
         //方向
         this.direction = direction;
         //是否快速翻页
@@ -394,7 +395,7 @@ export default class Dispatcher {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    gotoPageBase(data) {
+    gotoPageBases(data) {
 
         Xut.View.ShowBusy()
 
@@ -436,7 +437,7 @@ export default class Dispatcher {
      * 对应多场景操作
      * @return {[type]} [description]
      */
-    destroyPageBase() {
+    destroyPageBases() {
         this.pageMgr.destroy()
         this.masterContext(function() {
             this.destroy()
@@ -488,7 +489,7 @@ export default class Dispatcher {
                  * 构建完成通知,用于处理历史缓存记录
                  * 如果是调试模式 && 不是收费提示页面 && 多场景应用
                  */
-                if (config.recordHistory && !options.isInApp && options.multiScenario) {
+                if (config.historyMode && !options.isInApp && options.multiScenario) {
                     var history;
                     if (history = sceneController.sequence(scenarioId, currIndex)) {
                         $$set("history", history)
@@ -620,7 +621,7 @@ export default class Dispatcher {
         }
 
         //创建新的页面对象
-        let createNextPageBase = currIndex => this.createPageBase([createPointer], currIndex, 'flipOver')
+        let createNextPageBase = currIndex => this.createPageBases([createPointer], currIndex, 'flipOver')
 
         //如果是左边翻页
         if (direction === 'prev') {

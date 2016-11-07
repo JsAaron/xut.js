@@ -122,13 +122,16 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
      * @type {[type]}
      */
     if (hasParallax && pageType === 'master') {
-        data.processType = 'parallax';
+        data.processType = 'parallax'
     } else {
-        data.processType = 'animation';
+        data.processType = 'animation'
     }
 
 
-    //生成查询方法
+    /**
+     * 生成查询方法
+     * @return {[type]} [description]
+     */
     data.getParameter = function() {
         //分区母版与页面的数据结构
         //parameter-master-parallax
@@ -143,13 +146,11 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
 
 
     /**
-     * 生成视觉差作用域
+     * 生成视觉差对象
      * @type {[type]}
      */
     if (data.processType === 'parallax') {
-        //初始化视觉差对象的坐标偏移量
-        data.transformOffset = base.relatedData.transformOffset(data.id)
-        return Parallax.call(base, data);
+        return Parallax(data, base.relatedData)
     }
 
     /**
@@ -230,7 +231,6 @@ export default function(base) {
         abstractContents = [],
         //创建引用
         batcheCreate = fnCreate(base);
-
 
     switch (base.pageType) {
         case 'page':

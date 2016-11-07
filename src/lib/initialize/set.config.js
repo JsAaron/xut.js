@@ -54,18 +54,18 @@ const loadStyle = (callback) => {
  * @return {[type]}      [description]
  */
 const setHistory = (data) => {
-    let recordHistory = 1; //默认启动
+    let historyMode = 1; //默认启动
     if (data.recordHistory !== undefined) {
-        recordHistory = Number(data.recordHistory);
+        historyMode = Number(data.recordHistory);
     }
 
     //如果启动桌面调试模式
     //自动打开缓存加载
-    if (!recordHistory && config.isBrowser && config.debugMode) {
-        recordHistory = 1;
+    if (!historyMode && config.isBrowser && config.debugMode) {
+        historyMode = 1;
     }
 
-    config.recordHistory = recordHistory
+    config.historyMode = historyMode
 }
 
 const setMode = function(data) {
@@ -95,7 +95,10 @@ export default function dynamic(callback) {
             initConfig(novelData.pptWidth, novelData.pptHeight)
 
             //新增模式,用于记录浏览器退出记录
-            setHistory(tempSettingData)
+            //如果强制配置文件recordHistory = false则跳过数据库的给值
+            if (config.historyMode !== false) {
+                setHistory(tempSettingData)
+            }
 
             //2015.2.26
             //启动画轴模式
@@ -112,8 +115,11 @@ export default function dynamic(callback) {
             /**
              * 初始flows排版
              * 嵌入index
+             * 默认有flow并且没有强制设置关闭的情况，打开缩放
              */
-            initFlows()
+            if (initFlows() && config.saleMode !== false) {
+                config.saleMode = true
+            }
 
             //iframe要要Xut.config
             loadStyle(() => callback(novelData))

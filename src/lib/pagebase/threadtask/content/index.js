@@ -228,7 +228,7 @@ function bindActivitys(data, contentDas, callback) {
     //那么在布局的时候想对点不一样
     //如果在浮动区域就取浮动初始值
     //否则就是默认的想对点0
-    var transformOffset = function(ids, initTransformOffset) {
+    var getTransformOffset = function(ids, initTransformOffset) {
         return function(id) {
             //匹配是不是属于浮动对象
             if (ids.length && ids[id]) {
@@ -260,7 +260,7 @@ function bindActivitys(data, contentDas, callback) {
         'pageOffset': data.pageOffset,
         'createContentIds': data.createContentIds,
         'partContentRelated': data.partContentRelated,
-        'transformOffset': transformOffset,
+        'getTransformOffset': getTransformOffset,
         'contentsFragment': data.contentsFragment,
         'contentHtmlBoxIds': data.contentHtmlBoxIds
     }

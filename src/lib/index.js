@@ -7,7 +7,7 @@ import { disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 868
+Xut.Version = 868.2
 
 
 if (Xut.plat.isBrowser) {
@@ -99,7 +99,6 @@ let lauchOptions
 const loadApp = (...arg) => {
     let node = getNode(...arg)
     Xut.Application.$$removeNode = () => {
-        lauchOptions = null
         node.$contentNode.remove()
         node.$contentNode = null
         node.$rootNode = null
@@ -113,6 +112,7 @@ const loadApp = (...arg) => {
 }
 
 // $('body').on('dblclick', () => {
+//     alert(11)
 //     Xut.Application.Refresh()
 //     loadApp()
 // })
@@ -126,7 +126,7 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
         let temp = lauchOptions
         Xut.Application.Refresh()
         if (temp && temp.length) {
-            Xut.Application.Launch.apply(null, temp.pop())
+            Xut.Application.Launch(temp.pop())
             temp = null
         } else {
             loadApp()
@@ -155,7 +155,11 @@ Xut.Application.Launch = ({
     const setConfig = Xut.Application.setConfig
     if (setConfig && setConfig.lauchMode === 1) {
         setMode(setConfig);
-        (lauchOptions = []).push(arguments)
+        lauchOptions = [{
+            el,
+            paths,
+            cursor
+        }]
         window.DYNAMICCONFIGT = { //外部配置文件
             resource: paths.resource,
             database: paths.database

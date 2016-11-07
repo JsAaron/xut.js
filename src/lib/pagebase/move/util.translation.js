@@ -3,7 +3,6 @@
  * 平移
  * @return {[type]} [description]
  */
-
 import { config } from '../../config/index'
 
 const reqAnimationFrame = Xut.style.reqAnimationFrame

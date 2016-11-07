@@ -80,20 +80,16 @@ export default class PageMgr extends Abstract {
         rightIndex,
         direction
     }) {
-        if (this.swipe) {
-            this.swipe.move(action, speed, currIndex, moveDist)
-        } else {
-            _.each([
-                this.abstractGetPageObj(leftIndex),
-                this.abstractGetPageObj(currIndex),
-                this.abstractGetPageObj(rightIndex)
-            ], function(pageObj, index) {
-                if (pageObj) {
-                    let distance = moveDist[index]
-                    pageObj.toMove(action, distance, speed, moveDist[3])
-                }
-            })
-        }
+        _.each([
+            this.abstractGetPageObj(leftIndex),
+            this.abstractGetPageObj(currIndex),
+            this.abstractGetPageObj(rightIndex)
+        ], function(pageObj, index) {
+            if (pageObj) {
+                let distance = moveDist[index]
+                pageObj.movePageBaseContainer(action, distance, speed, moveDist[3])
+            }
+        })
     }
 
 

@@ -67,9 +67,8 @@ const initMain = (novelData) => {
     /**
      * 缓存加载
      * 如果启动recordHistory记录
-     * [if description]
      */
-    if (config.recordHistory && pageIndex !== undefined) {
+    if (config.historyMode && pageIndex !== undefined) {
         //加强判断
         if (novelId = getCache("novelId")) {
             return loadScene({

@@ -89,7 +89,15 @@ export default {
      * 1 true 启动
      * 2 false 禁止
      */
-    saleMode: false, //默认关闭
+    saleMode: DEFAULT, //默认不配置，系统指定，如果有flow自动打开，否则按照配置文件处理
+
+    /**
+     * 是否需要保存记录加载
+     * 1 true 启动缓存
+     * 2 false 关闭缓存
+     * @type {[type]}
+     */
+    historyMode: DEFAULT, //默认不配置，这里需要数据库填充， 如果指定了false，跳过数据库填充
 
     /**
      *  仅做测试处理，因为每个section都可以对应配置pageMode参数
