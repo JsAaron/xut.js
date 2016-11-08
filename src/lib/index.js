@@ -7,7 +7,7 @@ import { disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 868.2
+Xut.Version = 868.5
 
 
 if (Xut.plat.isBrowser) {
@@ -16,7 +16,7 @@ if (Xut.plat.isBrowser) {
         fixAudio()
     }
     //Desktop binding mouse control
-    $(document).keyup((event) => {
+    $(document).keyup(event => {
         switch (event.keyCode) {
             case 37:
                 Xut.View.GotoPrevSlide()
@@ -112,7 +112,7 @@ const loadApp = (...arg) => {
 }
 
 // $('body').on('dblclick', () => {
-//     alert(11)
+//     // alert(11)
 //     Xut.Application.Refresh()
 //     loadApp()
 // })
@@ -121,15 +121,27 @@ const loadApp = (...arg) => {
  * 横竖切换
  */
 Xut.plat.isBrowser && $(window).on('orientationchange', () => {
+
+    //安卓设备上,对横竖切换的处理反映很慢
+    //所以这里需要延时加载获取设备新的分辨率
+    //2016.11.8
+    let delay = function(fn) {
+        setTimeout(fn, 500)
+    }
+
     //如果启动了这个模式
     if (config.orientateMode) {
         let temp = lauchOptions
         Xut.Application.Refresh()
         if (temp && temp.length) {
-            Xut.Application.Launch(temp.pop())
-            temp = null
+            delay(() => {
+                Xut.Application.Launch(temp.pop())
+                temp = null
+            })
         } else {
-            loadApp()
+            delay(() => {
+                loadApp()
+            })
         }
     }
 })

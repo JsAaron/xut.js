@@ -128,7 +128,7 @@ export function $$autoRun(pageObj, pageIndex, taskAnimCallback) {
             taskAnimCallback(); //无动画
         }
 
-        Xut.log('debug', pageType + '层，第' + (pageIndex + 1) + '页开始,本页面Id为' + pageObj.chapterId)
+        // console.log('debug', pageType + '层，第' + (pageIndex + 1) + '页开始,本页面Id为' + pageObj.chapterId)
     })
 
 }

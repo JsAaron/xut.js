@@ -100,11 +100,19 @@ export default class Flow {
         Xut.Application.Bansliding() //全局滑动
         Xut.View.HideToolBar('pageNumber') //工具栏
 
+        //按钮
+        let $buttonNode = closeButton(() => destory())
+
         //缩放
         let slide
 
         //销毁
         const destory = () => {
+            if ($buttonNode) {
+                $buttonNode.off()
+                $buttonNode = null
+            }
+
             img = null
             slide && slide.destroy()
             $pageImage.remove()
@@ -123,8 +131,6 @@ export default class Flow {
             })
         }
 
-        //按钮
-        const $buttonNode = closeButton(() => destory())
 
         node.style.visibility = 'hidden'
         $pageImage.append($buttonNode)

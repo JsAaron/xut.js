@@ -11,9 +11,9 @@
  *
  * 此接口函数有作用域隔离
  */
-import DragDrop from './drag'
-import { simpleEvent } from './simple'
-import { complexEvent } from './complex'
+import DragDrop from './bind/drag'
+import { simpleEvent } from './bind/simple'
+import { complexEvent } from './bind/complex'
 
 
 /**
@@ -42,7 +42,7 @@ var eventName = ['null', 'auto', 'tap', 'drag', 'dragTag',
  * 过滤事件
  * 如果用户指定了如下操作行为,将覆盖默认的翻页行为
  **/
-var filterEvent = ['drag', 'dragTag', 'swipeleft', 'swiperight', 'swipeup', 'swipedown'];
+const filterEvent = ['drag', 'dragTag', 'swipeleft', 'swiperight', 'swipeup', 'swipedown']
 
 
 /**
@@ -50,7 +50,7 @@ var filterEvent = ['drag', 'dragTag', 'swipeleft', 'swiperight', 'swipeup', 'swi
  * @param  {[type]} evtName [description]
  * @return {[type]}         [description]
  */
-function isfilter(eventName) {
+const isfilter = eventName => {
     return filterEvent.indexOf(eventName) === -1 ? true : false;
 }
 
@@ -63,7 +63,7 @@ function isfilter(eventName) {
  * @param  {[type]} evtName [事件名]
  * @return {[type]}         [description]
  */
-function setDefaultBehavior(supportSwipe, $contentNode) {
+const setDefaultBehavior = function(supportSwipe, $contentNode) {
     if (supportSwipe) {
         //静态事件，默认可以翻页，还可以切换工具栏
         $contentNode.attr('data-behavior', 'swipe');
@@ -73,10 +73,11 @@ function setDefaultBehavior(supportSwipe, $contentNode) {
     }
 }
 
+
 /**
  * 针对软件培训的操作行为下光标状态需求
  */
-function addCursor(eventName, $contentNode) {
+const addCursor = function(eventName, $contentNode) {
     if ($contentNode) {
         if (!$contentNode.prop('setCursor')) { //只设置一次
             if (eventName === ('drag' || 'dragTag')) {
@@ -96,38 +97,32 @@ function addCursor(eventName, $contentNode) {
  * @param  {[type]} data      [description]
  * @return {[type]}           [description]
  */
-function bindEvnet(eventDrop, data) {
-    var dragObj, eventHandler, eventReference, eventContext, eventName, supportSwipe
+const bind = function(eventDrop, data) {
+    let dragObj
+    let handler
+    let reference
+    let eventContext = data.eventContext
+    let eventName = data.eventName
+    let supportSwipe = data.supportSwipe
 
-    eventContext = data.eventContext
-    eventName = data.eventName
-    supportSwipe = data.supportSwipe
-
-    switch (eventName) {
-        case 'drag': //拖动
-            dragObj = new DragDrop(eventContext, null, data.parameter, eventDrop.startRun, eventDrop.stopRun);
-            break;
-        case 'dragTag': //拖拽
-            dragObj = new DragDrop(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
-            break;
-        default:
-
-            //事件句柄
-            eventHandler = function() {
-                data.eventRun.call(eventContext);
-            }
-
-            //简单单机
-            if (eventName === 'tap') {
-                eventReference = simpleEvent(eventContext, eventHandler, supportSwipe)
-            } else {
-                //复杂用hammer
-                eventReference = complexEvent(eventContext, eventName, eventHandler, supportSwipe)
-            }
-            break;
+    if (eventName === 'drag') { //拖动
+        dragObj = new DragDrop(eventContext, null, data.parameter, eventDrop.startRun, eventDrop.stopRun);
+    } else if (eventName === 'dragTag') { //拖拽
+        dragObj = new DragDrop(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
+    } else {
+        handler = function() { data.eventRun.call(eventContext); }
+        if (eventName === 'tap') { //单机bind
+            reference = simpleEvent(eventContext, handler, supportSwipe)
+        } else { //复杂用hammer
+            reference = complexEvent(eventContext, eventName, handler, supportSwipe)
+        }
     }
 
-    return [dragObj, eventReference, eventHandler]
+    return {
+        dragObj,
+        reference,
+        handler
+    }
 }
 
 
@@ -136,29 +131,26 @@ function bindEvnet(eventDrop, data) {
  * /匹配事件
  * parameter 参数
  * 1：对于自由拖动drag，para参数为0，表示松手后，停留在松手的地方
- *                      para参数为1，表示松手后，返回原来的位置
+ *                    para参数为1，表示松手后，返回原来的位置
  * 2: 对于拖拽dragTag， para表示目标对象的target
  */
-function matchEvent(data) {
+function distribute(data) {
     //针对软件培训的操作行为下光标状态需求
-    Xut.plat.isBrowser &&
-        data.domMode &&
-        addCursor(data.eventName, data.eventContext)
+    Xut.plat.isBrowser && data.domMode && addCursor(data.eventName, data.eventContext)
 
     //绑定事件
-    var eventDrop = data.eventDrop
+    let eventDrop = data.eventDrop
 
     //拖动,引用,回调
-    var eventObj = bindEvnet(eventDrop, data)
+    let eventObj = bind(eventDrop, data)
 
     //拖动,拖拽对象处理
-    //动作初始化
-    if (eventObj[0] && eventDrop.init) {
-        eventDrop.init(eventObj[0]);
-    } else {
-        //传递引用
-        data.eventHandler(eventObj[1], eventObj[2])
+    if (eventObj.dragObj && eventDrop.init) {
+        eventDrop.init(eventObj.dragObj)
+        return
     }
+    //其余事件
+    data.eventHandler(eventObj.reference, eventObj.handler)
 }
 
 
@@ -193,13 +185,12 @@ export function defaultBehavior($contentNode) {
  */
 export function bindContentEvent(data) {
     //是否支持翻页
-    var supportSwipe = data.supportSwipe = isfilter(data.eventName);
+    let supportSwipe = data.supportSwipe = isfilter(data.eventName);
     //检测是否移除元素的默认行为,因为元素都具有翻页的特性
     if (data.domMode) {
         setDefaultBehavior(supportSwipe, data.eventContext);
     }
-    //执行事件绑定
-    matchEvent(data);
+    distribute(data)
 }
 
 

@@ -317,8 +317,12 @@ export default class PinchPan {
 
 
     destroy() {
+        if (this.$buttonNode) {
+            this.$buttonNode.off()
+            this.$buttonNode = null
+        }
         this.hammer.destroy()
-        //关闭按钮
+            //关闭按钮
         this.$buttonNode && this.$buttonNode.off()
     }
 }

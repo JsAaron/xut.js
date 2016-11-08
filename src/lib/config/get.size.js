@@ -13,11 +13,13 @@ export function getSize() {
             }
         }
     }
+
     return {
         "width": document.documentElement.clientWidth || $(window).width(),
         "height": document.documentElement.clientHeight || $(window).height()
     }
 }
+
 
 
 /**

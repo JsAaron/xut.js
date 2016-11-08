@@ -464,7 +464,7 @@ export default function setDynamicApi(vm) {
                         if (contentObj) {
                             contentObjs.push(contentObj);
                         } else {
-                            Xut.log('error', '找不到对应的content数据' + id)
+                            // console.log('error', '找不到对应的content数据' + id)
                         }
                     }
                 })
@@ -559,7 +559,7 @@ export default function setDynamicApi(vm) {
                         'source': 'dataBase'
                     });
                 } else {
-                    Xut.log('error', '找不到对应的GetPageWidgetData数据' + cid)
+                    // console.log('error', '找不到对应的GetPageWidgetData数据' + cid)
                 }
             }
         });

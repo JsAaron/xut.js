@@ -59,7 +59,7 @@ export default class Swipe extends Observer {
         stopPropagation = false,
         preventDefault,
         linear = false, //线性模式
-        borderBounce = false, //边界反弹
+        borderBounce = true, //边界反弹
         extraGap = 0, //间隔,flow处理
         sectionRang //分段值
     }) {
@@ -247,6 +247,7 @@ export default class Swipe extends Observer {
         this._isRollX = false //是否为X轴滑动
         this._isRollY = false //是否为Y轴滑动
         this._isTap = true //点击了屏幕
+        this._isInvalid = false //无效的触发
 
         this._start = {
             pageX: point.pageX,
@@ -320,12 +321,19 @@ export default class Swipe extends Observer {
             xWait = (-xWait)
         }
 
+        //是否无效函数
+        //如果无效，end方法抛弃掉
+        const setSwipeInvalid = () => {
+            this._isInvalid = true
+        }
+
         this._distributeMove({
-            'pageIndex': this._hindex,
-            'distance': this._deltaX + xWait,
-            'speed': 0,
-            'direction': this.direction,
-            'action': 'flipMove'
+            pageIndex: this._hindex,
+            distance: this._deltaX + xWait,
+            speed: 0,
+            direction: this.direction,
+            action: 'flipMove',
+            setSwipeInvalid
         })
     }
 
@@ -337,16 +345,16 @@ export default class Swipe extends Observer {
      */
     _onEnd(e) {
 
-        //停止滑动
-        //或者多点触发
-        if (this._fliplock || e.touches && e.touches.length > 1) {
-            return
-        }
-
         this._isTap = false
         this._isMoving = false
 
-        if (this._isBounce || this._preventSwipe) return
+        //停止滑动
+        //或者多点触发
+        //或者是边界
+        //或者是停止翻页
+        if (this._fliplock || e.touches && e.touches.length > 1 || this._isBounce || this._preventSwipe) {
+            return
+        }
 
         //点击
         if (!this._isRollX && !this._isRollY) {
@@ -369,15 +377,32 @@ export default class Swipe extends Observer {
             //_slideTo的最低值要求
             //1 fast: time < 200 && x >30
             //2 common: x > veiwWidth/6
-            let isValidSlide = Number(duration) < 200 && Math.abs(deltaX) > 30 || Math.abs(deltaX) > this._viewWidth / 6
+            let isValidSlide = duration < 200 && deltaX > 30 || deltaX > this._viewWidth / 6
 
-            //跟随移动
-            if (isValidSlide && !isPastBounds) {
-                //true:right, false:left
-                this._slideTo(this._deltaX < 0 ? 'next' : 'prev')
+            //如果是无效的动作，则不相应
+            //还原默认设置
+            //move的情况会引起
+            //mini功能，合并翻页时事件
+            if (this._isInvalid) {
+                let hasSwipe = duration < 200 && deltaX > this._viewWidth / 10
+                if (hasSwipe) {
+                    this._distributeMove({
+                        pageIndex: this._hindex,
+                        direction: this._deltaX > 0 ? 'prev' : 'next',
+                        action: 'swipe'
+                    })
+                }
+                this._restore()
+                return
             } else {
-                //反弹
-                this._setRebound(this._hindex, this._deltaX > 0 ? 'prev' : 'next')
+                //跟随移动
+                if (isValidSlide && !isPastBounds) {
+                    //true:right, false:left
+                    this._slideTo(this._deltaX < 0 ? 'next' : 'prev')
+                } else {
+                    //反弹
+                    this._setRebound(this._hindex, this._deltaX > 0 ? 'prev' : 'next')
+                }
             }
         }
 
@@ -410,7 +435,7 @@ export default class Swipe extends Observer {
             'distance': 0,
             'speed': 300,
             'action': 'flipRebound'
-        });
+        })
     }
 
 

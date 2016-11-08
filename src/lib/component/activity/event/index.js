@@ -1,3 +1,6 @@
+import { config } from '../../../config/index'
+//音频
+import { audioPlayer } from '../../audio/audio'
 //dom事件
 import {
     conversionEventType,
@@ -5,8 +8,6 @@ import {
 }
 from './event'
 
-//音频
-import { audioPlayer } from '../../audio/audio'
 
 
 export default function(activitProto) {
@@ -15,7 +16,7 @@ export default function(activitProto) {
      * 构建事件体系
      * @return {[type]} [description]
      */
-    activitProto.fillEventData = function() {
+    activitProto._fillEventData = function() {
 
         //配置事件节点
         var eventId,
@@ -92,17 +93,17 @@ export default function(activitProto) {
      * 绑定事件行为
      * @return {[type]} [description]
      */
-    activitProto.bindEventBehavior = function(callback) {
-        var self = this,
-            eventData = this.eventData,
-            eventName = eventData.eventName,
-            eventContext = eventData.eventContext;
+    activitProto._bindEventBehavior = function(callback) {
+        let self = this
+        let eventData = this.eventData
+        let eventName = eventData.eventName
+        let eventContext = eventData.eventContext
 
         /**
          * 运行动画
          * @return {[type]} [description]
          */
-        var startRunAnim = function() {
+        let startRunAnim = function() {
             //当前事件对象没有动画的时候才能触发关联动作
             var animOffset,
                 boundary = 5; //边界值
@@ -117,10 +118,10 @@ export default function(activitProto) {
                 //比如对象只是一个小范围的内的改变
                 //正负10px的移动是允许接受的
                 if (originalLeft > (newLeft - boundary) && originalLeft < (newLeft + boundary) || originalTop > (newTop - boundary) && originalTop < (newTop + boundary)) {
-                    self.runAnimation();
+                    self.runAnimation()
                 }
             } else {
-                self.runAnimation();
+                self.runAnimation()
             }
         }
 
@@ -129,7 +130,7 @@ export default function(activitProto) {
          * 音频
          * 反弹
          */
-        var setBehavior = function(feedbackBehavior) {
+        let setBehavior = function(feedbackBehavior) {
 
             let behaviorSound
 
@@ -184,7 +185,7 @@ export default function(activitProto) {
          * 用户注册与执行
          * @type {Object}
          */
-        var eventDrop = {
+        let eventDrop = {
             //保存引用,方便直接销毁
             init: function(drag) {
                 eventData.dragDrop = drag;
@@ -207,7 +208,7 @@ export default function(activitProto) {
          * 点击,双击,滑动等等....
          * @return {[type]} [description]
          */
-        var eventRun = function() {
+        let eventRun = function() {
             //如果存在反馈动作
             //优先于动画执行
             var feedbackBehavior;
@@ -223,7 +224,7 @@ export default function(activitProto) {
          * 事件对象引用
          * @return {[type]} [description]
          */
-        var eventHandler = function(eventReference, eventHandler) {
+        let eventHandler = function(eventReference, eventHandler) {
             eventData.eventReference = eventReference;
             eventData.eventHandler = eventHandler;
         }
@@ -232,33 +233,45 @@ export default function(activitProto) {
         //绑定用户自定义事件
         if (eventContext && eventName) {
 
-            var domName,
-                target,
-                dragdropPara;
+            //如果是翻页委托启动了
+            //这里处理swiperight与swipeleft
+            if (config.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
+                self.relatedCallback.swipeDelegateContents(eventName, (callback) => {
+                    self.runAnimation(callback)
+                })
+            }
+            //给独立对象绑定事件
+            else {
 
-            dragdropPara = eventData.dragdropPara;
+                let domName
+                let target
+                let dragdropPara
 
-            //获取拖拽目标对象
-            if (eventName === 'dragTag') {
-                domName = this.makePrefix('Content', this.pid, dragdropPara);
-                target = this.getContextNode(domName);
+                dragdropPara = eventData.dragdropPara;
+
+                //获取拖拽目标对象
+                if (eventName === 'dragTag') {
+                    domName = this.makePrefix('Content', this.pid, dragdropPara);
+                    target = this.getContextNode(domName);
+                }
+
+                //增加事件绑定标示
+                //针对动态加载节点事件的行为过滤
+                eventData.isBind = true;
+
+                bindContentEvent({
+                    'eventDrop': eventDrop,
+                    'eventRun': eventRun,
+                    'eventHandler': eventHandler,
+                    'eventContext': eventContext,
+                    'eventName': eventName,
+                    'parameter': dragdropPara,
+                    'target': target,
+                    'domMode': eventData.domMode
+                })
             }
 
-            //增加事件绑定标示
-            //针对动态加载节点事件的行为过滤
-            eventData.isBind = true;
 
-
-            bindContentEvent({
-                'eventDrop': eventDrop,
-                'eventRun': eventRun,
-                'eventHandler': eventHandler,
-                'eventContext': eventContext,
-                'eventName': eventName,
-                'parameter': dragdropPara,
-                'target': target,
-                'domMode': eventData.domMode
-            })
         }
     }
 

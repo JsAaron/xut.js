@@ -71,7 +71,7 @@ export default function(baseProto) {
          * 1对1的关系
          * @type {Object}
          */
-        this._contentsCollector = {};
+        this._contentsCollector = {}
 
         /**
          * 2016.9.7
@@ -90,6 +90,22 @@ export default function(baseProto) {
             this.isFlows = false
         }
 
+        /**
+         * 为mini杂志新功能
+         * 动画的调用序列
+         * 收集滑动委托对象，针对事件合集触发处理
+         * 2016.11.8
+         * @type {Array}
+         */
+        this._callAnimSequence = {
+            state:false,//动画状态
+            swipeleft: [],
+            swiperight: [],
+            swipeleftTotal: 0,
+            swiperightTotal: 0,
+            swipeleftIndex: 0,
+            swiperightIndex: 0
+        }
 
         /**
          * 浮动对象
@@ -138,93 +154,93 @@ export default function(baseProto) {
              * @param  {[type]} contentsObjs [description]
              * @return {[type]}              [description]
              */
-            registerAbstractActivity(contentsObjs) {
+            registerActivitys(contentsObjs) {
                 instance._abActivitys.register(contentsObjs);
             },
 
             /**
-             * 收集器
-             * @type {Object}
+             * 搜集所有的content(每一个content对象)
+             * 因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
              */
-            collector: {
-                //搜集所有的content(每一个content对象)
-                //因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
-                contents(pid, id, contentScope) {
-                    const scope = instance.baseGetContentObject[id]
-                        //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
-                    if (scope && scope.isBindEventHooks) {
-                        instance._contentsCollector[id] = contentScope;
-                    }
-                    if (!scope) {
-                        instance._contentsCollector[id] = contentScope;
-                    }
-                },
-
-                //2014.11.7
-                //新概念，浮动页面对象
-                //用于是最顶层的，比母版浮动对象还要高
-                //所以这个浮动对象需要跟随页面动
-                floatPages(data) {
-                    //浮动页面对象容器
-                    let contentObj
-                    floatContents.PageContainer = data.container;
-                    _.each(data.ids, function(id) {
-                        if (contentObj = instance.baseGetContentObject(id)) {
-                            //初始视察坐标
-                            if (contentObj.parallax) {
-                                contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
-                            }
-                            floatContents.Page[id] = contentObj
-                        } else {
-                            console.log('页面浮动对象找不到')
-                        }
-                    })
-                },
-
-                //浮动母版对象
-                //1 浮动的对象是有动画数据或者视觉差数据
-                //2 浮动的对象是用于零件类型,这边只提供创建
-                //  所以需要制造一个空的容器，用于母版交界动
-                floatMaters(data) {
-                    let prefix
-                    let contentObj
-                    let contentNode
-                    let contentsFragment
-
-                    //浮动容器
-                    floatContents.MasterContainer = data.container;
-                    //浮动对象
-                    _.each(data.ids, function(id) {
-                        //转化成实际操作的浮动对象,保存
-                        if (contentObj = instance.baseGetContentObject(id)) {
-                            //初始视察坐标
-                            if (contentObj.parallax) {
-                                contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
-                            }
-                            floatContents.Master[id] = contentObj
-                        } else {
-                            Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
-                                //获取DOM节点
-                            if (contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
-                                prefix = 'Content_' + instance.pid + "_"
-                                _.each(contentsFragment, function(dom) {
-                                    var makePrefix = prefix + id;
-                                    if (dom.id == makePrefix) {
-                                        contentNode = dom;
-                                    }
-                                })
-                            }
-                            //制作一个伪数据
-                            //作为零件类型的空content处理
-                            floatContents.Master[id] = {
-                                id: id,
-                                pid: instance.pid,
-                                $contentNode: $(contentNode),
-                                'empty': true //空类型
-                            }
-                        }
-                    })
+            contents(pid, id, contentScope) {
+                const scope = instance.baseGetContentObject[id]
+                    //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
+                if (scope && scope.isBindEventHooks) {
+                    instance._contentsCollector[id] = contentScope;
                 }
+                if (!scope) {
+                    instance._contentsCollector[id] = contentScope;
+                }
+            },
+
+            /**
+             * 2014.11.7
+             * 新概念，浮动页面对象
+             * 用于是最顶层的，比母版浮动对象还要高
+             * 所以这个浮动对象需要跟随页面动
+             */
+            floatPages(data) {
+                //浮动页面对象容器
+                let contentObj
+                floatContents.PageContainer = data.container;
+                _.each(data.ids, function(id) {
+                    if (contentObj = instance.baseGetContentObject(id)) {
+                        //初始视察坐标
+                        if (contentObj.parallax) {
+                            contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
+                        }
+                        floatContents.Page[id] = contentObj
+                    } else {
+                        console.log('页面浮动对象找不到')
+                    }
+                })
+            },
+
+            /**
+             * 浮动母版对象
+             * 1 浮动的对象是有动画数据或者视觉差数据
+             * 2 浮动的对象是用于零件类型,这边只提供创建
+             *  所以需要制造一个空的容器，用于母版交界动
+             */
+            floatMaters(data) {
+                let prefix
+                let contentObj
+                let contentNode
+                let contentsFragment
+
+                //浮动容器
+                floatContents.MasterContainer = data.container;
+                //浮动对象
+                _.each(data.ids, function(id) {
+                    //转化成实际操作的浮动对象,保存
+                    if (contentObj = instance.baseGetContentObject(id)) {
+                        //初始视察坐标
+                        if (contentObj.parallax) {
+                            contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
+                        }
+                        floatContents.Master[id] = contentObj
+                    } else {
+                        Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
+                            //获取DOM节点
+                        if (contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
+                            prefix = 'Content_' + instance.pid + "_"
+                            _.each(contentsFragment, function(dom) {
+                                var makePrefix = prefix + id;
+                                if (dom.id == makePrefix) {
+                                    contentNode = dom;
+                                }
+                            })
+                        }
+                        //制作一个伪数据
+                        //作为零件类型的空content处理
+                        floatContents.Master[id] = {
+                            id: id,
+                            pid: instance.pid,
+                            $contentNode: $(contentNode),
+                            'empty': true //空类型
+                        }
+                    }
+                })
             },
 
             /**
@@ -235,9 +251,19 @@ export default function(baseProto) {
              */
             eventBinding(eventRelated) {
                 _create(instance, eventRelated);
+            },
+
+            /**
+             * 2016.11.8
+             * 收集滑动委托对象，针对事件合集触发处理
+             * @return {[type]} [description]
+             */
+            swipeDelegateContents(eventName, fn) {
+                ++instance._callAnimSequence[eventName + 'Total']
+                instance._callAnimSequence[eventName].push(fn)
+
             }
         }
-
 
         /**
          * 初始化任务

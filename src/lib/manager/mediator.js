@@ -23,6 +23,7 @@ import setDynamicApi from '../dynamic.api'
  * @return {[type]} [description]
  */
 const configMultiple = (options) => {
+
     //如果是epub,强制转换为单页面
     if (Xut.IBooks.Enabled) {
         options.multiplePages = false

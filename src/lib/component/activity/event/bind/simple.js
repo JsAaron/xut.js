@@ -1,7 +1,7 @@
 import {
     $$on,
     $$off
-} from '../../../util/dom'
+} from '../../../../util/dom'
 
 /**
  * ie10下面mouse事件怪异

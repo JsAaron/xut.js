@@ -100,6 +100,17 @@ export default {
     historyMode: DEFAULT, //默认不配置，这里需要数据库填充， 如果指定了false，跳过数据库填充
 
     /**
+     * 滑动事件委托
+     * 这个东东是针对mini开发的
+     * 左右翻页手势提升到全局响应
+     * 相应的对象形成形成事件队列
+     * [content1,content2,...,翻页]
+     * 1 true 启动
+     * 2 false 禁止
+     */
+    swipeDelegate: false, //默认关闭，min杂志自动启用
+
+    /**
      *  仅做测试处理，因为每个section都可以对应配置pageMode参数
      *  翻页模式（数据库section指定）
      *
@@ -146,17 +157,6 @@ export default {
      * 2 false 禁止
      */
     doublePageMode: false,
-
-    /**
-     * 调试模式
-     * 如果启动桌面调试模式,自动打开缓存加载,就是每次都打开都回到最后看到的一页
-     *
-     * 默认禁止：
-     * 1 true 启动
-     * 2 false 禁止
-     * @type {Boolean}
-     */
-    debugMode: false,
 
     /**
      * 独立canvas模式处理

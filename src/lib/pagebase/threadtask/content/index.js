@@ -172,7 +172,7 @@ function createFloatMater(base, data, complete) {
             'content': $containsNodes
         }, function() {
             //收集浮动母版对象标识
-            base.pageBaseHooks.collector.floatMaters(data.floatMaters);
+            base.pageBaseHooks.floatMaters(data.floatMaters);
             complete(data);
         });
     }, 'floatMaters', data.floatMaters, data, base)
@@ -191,7 +191,7 @@ function createFloatPage(base, data, complete) {
             'content': $containsNodes
         }, function() {
             //收集浮动母版对象标识
-            base.pageBaseHooks.collector.floatPages(data.floatPages);
+            base.pageBaseHooks.floatPages(data.floatPages);
             complete(data);
         });
     }, 'floatPages', data.floatPages, data, base)
@@ -241,10 +241,23 @@ function bindActivitys(data, contentDas, callback) {
 
     //相关回调
     var relatedCallback = {
-        //绑定卷滚条钩子
+
+        /**
+         * 绑定卷滚条钩子
+         */
         'iscrollHooks': [],
-        //contetn钩子回调
-        'contentsHooks': pageBaseHooks.collector.contents
+
+        /**
+         * contetn钩子回调
+         */
+        'contentsHooks': pageBaseHooks.contents,
+
+        /**
+         * 收集滑动事件
+         * 针对mini
+         * 2016.11.8
+         */
+        'swipeDelegateContents': pageBaseHooks.swipeDelegateContents
     }
 
     //相关数据
@@ -337,9 +350,7 @@ function bindActivitys(data, contentDas, callback) {
             }
 
             //注册引用
-            pageBaseHooks.registerAbstractActivity(
-                new ActivityClass(actdata)
-            );
+            pageBaseHooks.registerActivitys(new ActivityClass(actdata))
         }
     }
 
@@ -525,18 +536,19 @@ export default class TaskContents {
              * 2 canvas事件绑定
              * @return {[type]} [description]
              */
-            var completeHooks = function() {
-                var hooks;
-                _.each(delayHooks, function(fns) {
-                    while (hooks = fns.shift()) {
-                        hooks();
+            var callHooks = function() {
+                let iscrollHooks = delayHooks.iscrollHooks
+                let hook
+                if (iscrollHooks.length) {
+                    while (hook = iscrollHooks.shift()) {
+                        hook()
                     }
-                })
+                }
             }
 
             var nextTask = function() {
-                completeHooks();
-                self._applyAfterCheck();
+                callHooks()
+                self._applyAfterCheck()
             }
 
             /**

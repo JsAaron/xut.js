@@ -194,31 +194,9 @@ const _jsWidgetPath = () => {
         GLOBALIFRAME ? iframeConf.jsWidget() : nativeConf.jsWidget()
 }
 
-/**
- * 打印信息
- * @param  {[type]} info [description]
- * @param  {[type]} name [description]
- * @return {[type]}      [description]
- */
-Xut.log = function(info, name) {
-    if (!config.debugMode) return;
-    switch (info) {
-        case 'error':
-            console.error && console.error(name);
-            break;
-        case 'debug':
-            console.debug && console.debug(name);
-            break;
-        default:
-            console.log(info)
-            break;
-    }
-}
-
 
 /**
  * 全局配置文件
- * [debugMode description]
  * @type {Boolean}
  */
 _.extend(config, {

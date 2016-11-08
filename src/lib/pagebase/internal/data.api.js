@@ -1,9 +1,65 @@
+import { config } from '../../config/index'
+
 /**
  * 构建模块任务对象
  * taskCallback 每个模块任务完毕后的回调
  * 用于继续往下个任务构建
  */
 export default function(baseProto) {
+
+    /**
+     * 转化序列名
+     * @return {[type]} [description]
+     */
+    baseProto._converSequenceName = function(direction) {
+        return direction === 'prev' ? 'swipeleft' : 'swiperight'
+    }
+
+
+    /**
+     * 是否有动画序列
+     */
+    baseProto.hasAnimSequence = function(direction) {
+        let eventName = this._converSequenceName(direction)
+        let index = this._callAnimSequence[eventName + 'Index']
+        let total = this._callAnimSequence[eventName + 'Total']
+            //如果执行完毕了
+        if (total === index) {
+            return false
+        }
+        return this._callAnimSequence[eventName].length
+    }
+
+    /**
+     * 执行动画序列
+     * @return {[type]} [description]
+     */
+    baseProto.callAnimSequence = function(direction) {
+        if (this._callAnimSequence.state) {
+            return
+        }
+        this._callAnimSequence.state = true
+        let eventName = this._converSequenceName(direction)
+        let sequence = this._callAnimSequence[eventName]
+        let callAnim = sequence[this._callAnimSequence[eventName + 'Index']]
+        callAnim && callAnim(() => {
+            ++this._callAnimSequence[eventName + 'Index']
+            this._callAnimSequence.state = false
+        })
+    }
+
+
+    /**
+     * 复位动画序列
+     * @param  {[type]} direction [description]
+     * @return {[type]}           [description]
+     */
+    baseProto.resetAnimSequence = function() {
+        this._callAnimSequence.state = false
+        this._callAnimSequence.swipeleftIndex = 0
+        this._callAnimSequence.swiperightIndex = 0
+    }
+
 
     /**
      * 对象实例内部构建

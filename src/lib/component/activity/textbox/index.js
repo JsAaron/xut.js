@@ -9,7 +9,7 @@ export default function (activitProto) {
      * 检测是HTML文本框处理
      * @return {[type]} [description]
     */
-    activitProto.htmlTextBox = function () {
+    activitProto._htmlTextBox = function () {
         var self = this;
         var relatedData = this.relatedData;
         var contentHtmlBoxIds = relatedData.contentHtmlBoxIds;

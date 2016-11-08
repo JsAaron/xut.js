@@ -61,7 +61,7 @@ const setHistory = (data) => {
 
     //如果启动桌面调试模式
     //自动打开缓存加载
-    if (!historyMode && config.isBrowser && config.debugMode) {
+    if (!historyMode && config.isBrowser) {
         historyMode = 1;
     }
 

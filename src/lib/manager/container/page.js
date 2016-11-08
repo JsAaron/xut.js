@@ -112,6 +112,8 @@ export default class PageMgr extends Abstract {
 
         //停止活动对象活动
         suspendPageObj.destroyPageAction()
+        suspendPageObj.resetAnimSequence()
+
         $$suspend(suspendPageObj, prveChpterId);
     }
 

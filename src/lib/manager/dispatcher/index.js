@@ -298,7 +298,8 @@ export default class Dispatcher {
         leftIndex,
         pageIndex,
         rightIndex,
-        direction
+        direction,
+        setSwipeInvalid //设置翻页无效
     }) {
 
         //用户强制直接切换模式
@@ -308,6 +309,28 @@ export default class Dispatcher {
         }
 
         let currIndex = pageIndex
+        let currObj = this.pageMgr.abstractGetPageObj(currIndex)
+
+
+        //2016.11.8
+        //mini杂志功能
+        //如果是swipe就全局处理
+        if(action === 'swipe'){
+            //执行动画序列
+            currObj.callAnimSequence(direction)
+            return
+        }
+
+        //2016.11.8
+        //mini杂志功能
+        //如果有动画序列
+        //拦截翻页动作
+        //执行序列动作
+        if (currObj.hasAnimSequence(direction)) {
+            //设置为无效翻页
+            setSwipeInvalid && setSwipeInvalid()
+            return
+        }
 
         //移动的距离
         let moveDist = getFlipDistance({
@@ -320,7 +343,6 @@ export default class Dispatcher {
         }, getFlowDistance())
 
         //视觉差页面滑动
-        const currObj = this.pageMgr.abstractGetPageObj(currIndex)
         const chapterData = currObj.chapterData
         const nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined
 

@@ -60,7 +60,7 @@ const combineEvents = function(pagebase, eventRelated) {
         _.each(edata, function(scope) {
             contentObj = pagebase.baseGetContentObject(scope.eventContentId)
             if (!contentObj) {
-                Xut.log('error', 'pagebase.js第' + pagebase.pageIndex + '页多事件处理出错!!!!')
+                // console.log('error', 'pagebase.js第' + pagebase.pageIndex + '页多事件处理出错!!!!')
                 return
             }
             eventName = conversionEventType(scope.eventType);

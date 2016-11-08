@@ -45,7 +45,7 @@ export default class Activity {
      */
     constructor(data) {
 
-        _.extend(this, data);
+        _.extend(this, data)
 
         /**
          * 2016.4.11
@@ -59,7 +59,7 @@ export default class Activity {
         /**
          * 填充事件数据
          */
-        this.fillEventData();
+        this._fillEventData();
 
         /**
          * 保存子对象content
@@ -71,12 +71,12 @@ export default class Activity {
          * 处理html文本框
          * 2016.1.6
          */
-        this.htmlTextBox();
+        this._htmlTextBox();
 
         /**
          * 绑定事件
          */
-        this.bindEventBehavior()
+        this._bindEventBehavior()
 
         /**
          * 初始化content行为
