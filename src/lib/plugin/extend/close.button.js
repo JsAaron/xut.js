@@ -5,10 +5,24 @@
  * @return {[type]}       [description]
  */
 const createCloseIcon = function(right, top) {
-    const html =
-        `<div class="page-pinch-close" style="right:${right}px;top:${top}px;">
-           <div class="si-icon icomoon icon-close" style="font-size:4vh;background:white;border-radius:4vh;width:4vh;height:4vh;position:absolute;right:0;"></div>
+    let html
+    const screenSize = Xut.config.screenSize
+    const width = screenSize.width
+    const height = screenSize.height
+
+    if(width > height) {
+          html=
+        `<div class="page-pinch-close" style="position: absolute;right:${right}px;top:${top}px;">
+           <div class="si-icon icomoon icon-close" style="font-size:5vw;background-color:white;width:5vw;height:5vw;border-radius:50%;right:0"></div>
         </div>`
+    }else {
+          html=
+        `<div class="page-pinch-close" style="position: absolute;right:${right}px;top:${top}px;">
+           <div class="si-icon icomoon icon-close" style="font-size:6vh;background-color:white;width:6vh;height:6vh;border-radius:50%;right:0"></div>
+        </div>`
+    }
+   
+      
     return $(String.styleFormat(html))
 }
 

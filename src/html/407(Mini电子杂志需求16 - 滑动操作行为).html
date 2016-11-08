@@ -1,0 +1,100 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta content="email=no" name="format-detection" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <title>AppCarrier</title>
+    <script type="text/javascript" src="lib/external.js"></script>
+    <style type="text/css">
+    .apptest {
+        width: 38vw;
+        position: absolute;
+        left: 32vw;
+        top: 0;
+        z-index: 9999999999;
+    }
+    .apptest li {
+        width: 36%;
+        float: left;
+    }
+    .apptest li:first-child {
+        width: 25%;
+    }
+    </style>
+</head>
+
+<body>
+    <ul class="apptest">
+        <li><a class="showpage">1</a></li>
+        <li>
+            <button class="switch1">上个</button>
+        </li>
+        <li>
+            <button class="switch2">下个</button>
+        </li>
+    </ul>
+    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
+</body>
+
+</html>
+<script type="text/javascript">
+Xut.Application.setConfig = {
+    swipeDelegate: true,
+    lauchMode: 1, //启动模式
+    visualMode: 3
+}
+
+var testId = localStorage.getItem('test-appId')
+
+var start = 407 || 501
+var appid = start
+var length = 19
+var max = appid + length
+
+var $page = $('.showpage')
+
+var launch = function() {
+    state = true
+    Xut.Application.Launch({
+        el: '#xxtppt-app-container',
+        paths: {
+            resource: 'content/' + appid,
+            database: 'content/' + appid + '/SQLResult.js'
+        }
+    });
+    $page.html(appid)
+    localStorage.setItem('test-appId', appid);
+}
+
+var destory = function() {
+    Xut.Application.Destroy()
+    $page.html(appid)
+}
+
+
+$(".switch1").click(function() {
+    if (appid <= start) {
+        return
+    }
+    --appid
+    destory()
+    setTimeout(launch)
+})
+
+$(".switch2").click(function() {
+    if (appid > max) {
+        appid = start - 1
+    }
+    ++appid
+    destory()
+    setTimeout(launch)
+})
+
+launch()
+</script>

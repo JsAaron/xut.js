@@ -1125,16 +1125,17 @@ video {
 
 /** 关闭按钮 **/
 
-.page-pinch-close {
+/*.page-pinch-close {
     width: 3rem;
     height: 3rem;
+    line-height: 3rem;
     position: absolute;
     top: 0;
 }
 
 .page-pinch-close > div {
-    padding: 0.2rem
-}
+    /*padding: 0.2rem
+}*/
 
 
 /**页码样式**/
