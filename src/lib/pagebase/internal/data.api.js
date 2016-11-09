@@ -19,33 +19,31 @@ export default function(baseProto) {
     /**
      * 是否有动画序列
      */
-    baseProto.hasAnimSequence = function(direction) {
+    baseProto.hasSwipeSequence = function(direction) {
         let eventName = this._converSequenceName(direction)
-        let index = this._callAnimSequence[eventName + 'Index']
-        let total = this._callAnimSequence[eventName + 'Total']
+        let swipeSequence = this._swipeSequence
             //如果执行完毕了
-        if (total === index) {
+        if (swipeSequence[eventName + 'Index'] === swipeSequence[eventName + 'Total']) {
             return false
         }
-        return this._callAnimSequence[eventName].length
+        return swipeSequence[eventName].length
     }
 
     /**
      * 执行动画序列
      * @return {[type]} [description]
      */
-    baseProto.callAnimSequence = function(direction) {
-        if (this._callAnimSequence.state) {
+    baseProto.callSwipeSequence = function(direction) {
+        if (!this._swipeSequence) {
             return
         }
-        this._callAnimSequence.state = true
         let eventName = this._converSequenceName(direction)
-        let sequence = this._callAnimSequence[eventName]
-        let callAnim = sequence[this._callAnimSequence[eventName + 'Index']]
-        callAnim && callAnim(() => {
-            ++this._callAnimSequence[eventName + 'Index']
-            this._callAnimSequence.state = false
-        })
+        let sequence = this._swipeSequence[eventName]
+        let callAnimSequence = sequence[this._swipeSequence[eventName + 'Index']]
+        if (callAnimSequence) {
+            ++this._swipeSequence[eventName + 'Index']
+            callAnimSequence() //动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
+        }
     }
 
 
@@ -54,10 +52,12 @@ export default function(baseProto) {
      * @param  {[type]} direction [description]
      * @return {[type]}           [description]
      */
-    baseProto.resetAnimSequence = function() {
-        this._callAnimSequence.state = false
-        this._callAnimSequence.swipeleftIndex = 0
-        this._callAnimSequence.swiperightIndex = 0
+    baseProto.resetSwipeSequence = function() {
+        if (!this._swipeSequence) {
+            return
+        }
+        this._swipeSequence.swipeleftIndex = 0
+        this._swipeSequence.swiperightIndex = 0
     }
 
 

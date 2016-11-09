@@ -7,7 +7,7 @@ import { disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 868.5
+Xut.Version = 869
 
 
 if (Xut.plat.isBrowser) {

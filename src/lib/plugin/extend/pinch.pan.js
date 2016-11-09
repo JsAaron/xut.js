@@ -45,7 +45,16 @@ export default class PinchPan {
 
     _initState() {
 
-        //允许溢出值
+        /**
+         * 最大缩放值
+         * @type {Number}
+         */
+        this.maxScale = config.saleMultiples || 4
+
+        /**
+         * 允许溢出值
+         * @type {Number}
+         */
         this.overflowValue = 0.3
 
         /**
@@ -131,6 +140,7 @@ export default class PinchPan {
      * @return {[type]}    [description]
      */
     _onPinchMove(ev) {
+
         //允许溢出值
         if (!this.scaleing) {
             if (ev.scale < this.overflowValue + 1) {
@@ -140,9 +150,15 @@ export default class PinchPan {
         }
 
         let scale = ev.scale - this.overflowValue
+        scale = this.lastScale * scale
+
+        //限定缩放的倍数
+        if (scale > this.maxScale) {
+            return
+        }
 
         //新的缩放值
-        this.data.scale = this.lastScale * scale
+        this.data.scale = scale
 
         this._buttonShow()
         this._isBoundry()

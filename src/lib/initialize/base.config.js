@@ -117,9 +117,17 @@ export default function dynamic(callback) {
              * 嵌入index
              * 默认有flow并且没有强制设置关闭的情况，打开缩放
              */
-            if (initFlows() && config.saleMode !== false) {
-                config.saleMode = true
+            if (initFlows()) {
+                //缩放
+                if (config.saleMode !== false) {
+                    config.saleMode = true
+                }
+                //动画事件委托
+                if (config.swipeDelegate !== false) {
+                    config.swipeDelegate = true
+                }
             }
+
 
             //iframe要要Xut.config
             loadStyle(() => callback(novelData))

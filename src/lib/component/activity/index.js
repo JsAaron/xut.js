@@ -212,48 +212,37 @@ export default class Activity {
          * @param  {[type]} contentNode [description]
          * @return {[type]}             [description]
          */
-        const makeBindLinkFunction = function(contentNode) {
+        const makeBindLinkFunction = function(scrollNode) {
 
-            //ios or pc
-            if (!Xut.plat.isAndroid) {
-                return function() {
-                    self.iscroll = new iScroll(contentNode, {
-                        scrollbars: true,
-                        fadeScrollbars: true
-                    })
-                }
-            }
-
-            //在安卓上滚动文本的互斥不显示做一个补丁处理
+            //滚动文本的互斥不显示做一个补丁处理
             //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
             //如果是显示的,则不需要处理,
-            let prePocess = self.makePrefix('Content', scope.pid, scope.id)
-            let preEle = self.getContextNode(prePocess)
-            let visible = preEle.css('visibility')
-            let restore = function() {}
+            let $parentNode = self.getContextNode(self.makePrefix('Content', scope.pid, scope.id))
+            let visible = $parentNode.css('visibility')
+            let resetStyle = function() {}
             let opacity
 
             if (visible == 'hidden') {
-                opacity = preEle.css('opacity');
+                opacity = $parentNode.css('opacity')
                 //如果设置了不透明,则简单设为可见的
                 //否则先设为不透明,再设为可见
                 if (opacity == 0) {
-                    preEle.css({
+                    $parentNode.css({
                         'visibility': 'visible'
                     })
-                    restore = function() {
-                        preEle.css({
+                    resetStyle = function() {
+                        $parentNode.css({
                             'visibility': visible
                         })
                     }
                 } else {
-                    preEle.css({
+                    $parentNode.css({
                         'opacity': 0
                     }).css({
                         'visibility': 'visible'
                     })
-                    restore = function() {
-                        preEle.css({
+                    resetStyle = function() {
+                        $parentNode.css({
                             'opacity': opacity
                         }).css({
                             'visibility': visible
@@ -263,9 +252,14 @@ export default class Activity {
             }
 
             return function() {
-                restore()
-                preEle = null
-                restore = null
+                self.iscroll = new iScroll(scrollNode, {
+                    scrollbars: true,
+                    fadeScrollbars: true
+                })
+                resetStyle()
+                resetStyle = null
+                $parentNode = null
+                scrollNode = null
             }
         }
 

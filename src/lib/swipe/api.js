@@ -22,18 +22,18 @@ export default function api(Swipe) {
     Swipe.prototype.simulationComplete = function() {
         setTimeout(() => {
             this._restore()
-            this._unlock()
+            this._unlockSwipe()
         })
     }
 
     //允许滑动
     Swipe.prototype.allowliding = function() {
-        this._unlock()
+        this._unlockSwipe()
     }
 
     //禁止滑动
     Swipe.prototype.bansliding = function() {
-        this._lock()
+        this._lockSwipe()
     }
 
 

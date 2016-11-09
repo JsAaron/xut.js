@@ -12,8 +12,8 @@ const isSurface = Xut.plat.isSurface
 const hasTouch = Xut.plat.hasTouch
 
 //触发事件名
-const touchName = ['touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd]
-const mouseName = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd]
+const touchList = ['touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd]
+const mouseList = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseout']
 
 //绑定事件名排序
 const orderName = {
@@ -21,17 +21,18 @@ const orderName = {
     move: 1,
     end: 2,
     cancel: 3,
-    transitionend: 4
+    transitionend: 4,
+    out: 5
 }
 
-const EVENT_NAME = (() => {
+const eventNames = (() => {
     if (isSurface) {
         return {
-            touch: touchName,
-            mouse: mouseName
+            touch: touchList,
+            mouse: mouseList
         }
     }
-    return hasTouch ? touchName : mouseName
+    return hasTouch ? touchList : mouseList
 })()
 
 
@@ -46,7 +47,7 @@ const eachApply = (events, callbacks, processor) => {
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
-const _on = (context, events, callbacks) => {
+const addEvent = (context, events, callbacks) => {
     eachApply(events, callbacks, (eventName, hook) => context.addEventListener(eventName, hook, false))
 }
 
@@ -56,7 +57,7 @@ const _on = (context, events, callbacks) => {
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
-const _off = (context, events, callbacks) => {
+const removeEvent = (context, events, callbacks) => {
     eachApply(events, callbacks, (eventName, hook) => context.removeEventListener(eventName, hook, false))
 }
 
@@ -68,15 +69,15 @@ const _off = (context, events, callbacks) => {
  * @param  {Function} callback     [回调函数]
  * @return {[type]}                [description]
  */
-const bind = (context, element, callbacks) => {
+const adaptive = (process, element, callbacks) => {
     //如果两者都支持
     //鼠标与触摸
     if (isSurface) {
-        _.each(EVENT_NAME, events => {
-            context(element, events, callbacks);
+        _.each(eventNames, events => {
+            process(element, events, callbacks)
         })
     } else {
-        context(element, EVENT_NAME, callbacks);
+        process(element, eventNames, callbacks)
     }
 }
 
@@ -92,7 +93,7 @@ const bind = (context, element, callbacks) => {
  * @return {[type]} [description]
  */
 export function $$on(element, callbacks) {
-    bind(_on, element, callbacks)
+    adaptive(addEvent, element, callbacks)
 }
 
 
@@ -103,7 +104,7 @@ export function $$on(element, callbacks) {
  * @return {[type]}         [description]
  */
 export function $$off(element, callbacks) {
-    bind(_off, element, callbacks)
+    adaptive(removeEvent, element, callbacks)
 }
 
 
@@ -129,6 +130,7 @@ export function $$handle(callbacks, context, event) {
         case 'mouseup':
         case 'mousecancel':
         case 'touchcancel':
+        case 'mouseout':
             callbacks.end && callbacks.end.call(context, event)
             break;
         case transitionEnd:
@@ -148,3 +150,5 @@ export function $$target(event, original) {
     }
     return original ? event : event.target;
 }
+
+

@@ -131,7 +131,6 @@ export default class Flow {
             })
         }
 
-
         node.style.visibility = 'hidden'
         $pageImage.append($buttonNode)
     }

@@ -14,7 +14,7 @@ import {
 
 import {
     overMemory,
-    transformConversion,
+    converValue,
     getParallaxStyle
 } from '../../pagebase/move/util.parallax'
 
@@ -183,9 +183,24 @@ export default class MasterMgr extends Abstract {
             return
         }
 
-        //移动视察对象
-        let moveParallaxObject = (nodes) => {
-            this._moveParallaxs(currIndex, action, direction, moveDist, speed, nodes, this.parallaxProcessedContetns)
+        /**
+         * 移动内部的视察对象
+         * 处理当前页面内的视觉差对象效果
+         */
+        const moveParallaxObject = (nodes) => {
+            let getMasterId = this._conversionMasterId(currIndex)
+            let currParallaxObj = this.abstractGetPageObj(getMasterId)
+            if (currParallaxObj) {
+                //处理当前页面内的视觉差对象效果
+                currParallaxObj.movePageBaseParallax({
+                    action,
+                    direction,
+                    moveDist,
+                    speed,
+                    nodes,
+                    parallaxProcessedContetns: this.parallaxProcessedContetns
+                })
+            }
         }
 
         //移动视察对象
@@ -346,21 +361,6 @@ export default class MasterMgr extends Abstract {
                 break;
         }
         return [prevMasterObj, currMasterObj, nextMasterObj];
-    }
-
-
-    /**
-     * 移动内部的视察对象
-     * 处理当前页面内的视觉差对象效果
-     */
-    _moveParallaxs(currIndex, ...arg) {
-        const getMasterId = this._conversionMasterId(currIndex)
-        const currParallaxObj = this.abstractGetPageObj(getMasterId)
-
-        //处理当前页面内的视觉差对象效果
-        if (currParallaxObj) {
-            currParallaxObj.movePageBaseParallax(...arg)
-        }
     }
 
 
@@ -530,48 +530,49 @@ export default class MasterMgr extends Abstract {
         let prevNodes
         let nodes
 
-        const repairNodes = function(scope, currPageIndex, targetIndex) {
-            var rangePage = scope.calculateRangePage(),
-                $contentNode = scope.$contentNode,
-                translate = scope.translate,
-                offsetTranslate = scope.offsetTranslate,
-                moveTranslate,
-                nodes = Xut.Presentation.GetPageNode(targetIndex - 1);
+        const repairNodes = function(parallax) {
+            let rangePage = parallax.calculateRangePage()
+            let $contentNode = parallax.$contentNode
+            let parameters = parallax.parameters
+            let initProperty = parallax.initProperty
 
             if (targetIndex > currPageIndex) {
                 //next
                 if (targetIndex > rangePage['end']) {
-                    nodes = 1;
+                    nodes = 1
                 }
             } else {
                 //prev
                 if (targetIndex < rangePage['start']) {
-                    nodes = 0;
+                    nodes = 0
                 }
             }
 
-            moveTranslate = transformConversion(translate, -self.viewWidth, nodes);
+            let property = converValue(parameters, -self.viewWidth, nodes);
 
             //直接操作元素
             let parallaxConfig = getParallaxStyle({
-                property: moveTranslate,
+                action: 'master',
+                property: property,
                 speed: 300,
-                opacityStart: offsetTranslate.opacityStart
+                opacityStart: initProperty.opacityStart
             })
 
             if (parallaxConfig.style) {
                 $contentNode.css(parallaxConfig.style)
             }
 
-            overMemory(moveTranslate, offsetTranslate);
+            overMemory(property, initProperty);
         }
 
 
         if (contentObjs = parallaxObj.baseGetContent()) {
+            //获取到页面nodes
+            nodes = Xut.Presentation.GetPageNode(targetIndex - 1);
             contentObjs.forEach(function(contentObj) {
                 contentObj.eachAssistContents(function(scope) {
                     if (scope.parallax) {
-                        repairNodes.call(self, scope.parallax, currPageIndex, targetIndex);
+                        repairNodes(scope.parallax)
                     }
                 })
             })

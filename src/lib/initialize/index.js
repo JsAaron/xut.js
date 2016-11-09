@@ -1,6 +1,6 @@
 import { config } from '../config/index'
 import { plugVideo, html5Video } from './app.video'
-import setConfig from './set.config'
+import baseConfig from './base.config'
 import { bindAndroid } from './android.button'
 import loadScene from './load.scenario'
 
@@ -93,7 +93,7 @@ const initMain = (novelData) => {
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-const initApp = () => setConfig(initMain)
+const initApp = () => baseConfig(initMain)
 
 
 /**

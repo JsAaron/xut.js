@@ -14,14 +14,15 @@ import { getParallaxStyle } from '../../../pagebase/move/util.parallax'
  * @return {[type]}            [description]
  */
 const setTransformNodes = function($contentNode, property, pageOffset) {
-    let parallaxConfig = getParallaxStyle({
+    let value = getParallaxStyle({
+        action: 'init',
         property,
         pageOffset
     })
-    if (parallaxConfig.style) {
-        $contentNode.css(parallaxConfig.style)
+    if (value.style) {
+        $contentNode.css(value.style)
     }
-    return parallaxConfig.parallaxOffset
+    return value.parallaxOffset
 }
 
 
@@ -30,12 +31,12 @@ const setTransformNodes = function($contentNode, property, pageOffset) {
  * @param  {[type]} parameters [description]
  * @return {[type]}            [description]
  */
-const conversionRatio = function(parameters) {
+const converParameters = function(parameters) {
     if (parameters.opacityStart > -1) {
         parameters.opacity = (parameters.opacityEnd || 1) - parameters.opacityStart;
         delete parameters.opacityEnd;
     }
-    return parameters;
+    return parameters
 }
 
 
@@ -45,7 +46,7 @@ const conversionRatio = function(parameters) {
  * @param  {[type]} nodeProportion [description]
  * @return {[type]}                [description]
  */
-const conversionValue = function(parameters, nodeProportion) {
+const converValue = function(parameters, nodeProportion) {
     var results = {},
         width = -config.viewSize.width,
         height = -config.viewSize.height;
@@ -79,8 +80,9 @@ export default function Parallax(data, relatedData) {
         return
     }
 
+    parameters = converParameters(parameters)
+
     let pid = data.pid
-    let translate = conversionRatio(parameters)
 
     //页面偏移量
     //["3", "6", "1"]
@@ -95,15 +97,15 @@ export default function Parallax(data, relatedData) {
     //页面偏移比例
     let nodeOffsetProportion = (currPageOffset - 1) / (pageRange - 1)
 
-    //计算出偏移值
-    let offsetTranslate = conversionValue(translate, nodeOffsetProportion)
+    //计算出新的新的值
+    let property = converValue(parameters, nodeOffsetProportion)
 
     //页面分割比
     let nodeProportion = 1 / (pageRange - 1)
 
     //初始化视觉差对象的坐标偏移量
     let transformOffset = relatedData.getTransformOffset(data.id)
-    let parallaxOffset = setTransformNodes(data.$contentNode, offsetTranslate, transformOffset)
+    let parallaxOffset = setTransformNodes(data.$contentNode, property, transformOffset)
 
     /**
      * 为了兼容动画，把视觉差当作一种行为处理
@@ -121,8 +123,8 @@ export default function Parallax(data, relatedData) {
                 'end': pageRange - currPageOffset + pid
             }
         },
-        translate,
-        offsetTranslate,
+        parameters,
+        initProperty: property,
         nodeProportion,
         /**
          * 经过视觉差修正后的偏移量

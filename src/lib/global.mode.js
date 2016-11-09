@@ -90,6 +90,7 @@ export default {
      * 2 false 禁止
      */
     saleMode: DEFAULT, //默认不配置，系统指定，如果有flow自动打开，否则按照配置文件处理
+    saleMultiples: 4, //默认缩放的倍数4倍
 
     /**
      * 是否需要保存记录加载
@@ -108,7 +109,7 @@ export default {
      * 1 true 启动
      * 2 false 禁止
      */
-    swipeDelegate: false, //默认关闭，min杂志自动启用
+    swipeDelegate: DEFAULT, //默认关闭，min杂志自动启用
 
     /**
      *  仅做测试处理，因为每个section都可以对应配置pageMode参数

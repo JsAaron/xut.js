@@ -311,25 +311,30 @@ export default class Dispatcher {
         let currIndex = pageIndex
         let currObj = this.pageMgr.abstractGetPageObj(currIndex)
 
-
         //2016.11.8
         //mini杂志功能
-        //如果是swipe就全局处理
-        if(action === 'swipe'){
-            //执行动画序列
-            currObj.callAnimSequence(direction)
-            return
-        }
+        //一次是拦截
+        //一次是触发动作
+        if (config.swipeDelegate) {
 
-        //2016.11.8
-        //mini杂志功能
-        //如果有动画序列
-        //拦截翻页动作
-        //执行序列动作
-        if (currObj.hasAnimSequence(direction)) {
-            //设置为无效翻页
-            setSwipeInvalid && setSwipeInvalid()
-            return
+            //如果是swipe就全局处理
+            if (action === 'swipe') {
+                //执行动画序列
+                currObj.callSwipeSequence(direction)
+                return
+            }
+
+            //2016.11.8
+            //mini杂志功能
+            //如果有动画序列
+            //拦截翻页动作
+            //执行序列动作
+            //拦截
+            if (currObj.hasSwipeSequence(direction)) {
+                //设置为无效翻页
+                setSwipeInvalid && setSwipeInvalid()
+                return
+            }
         }
 
         //移动的距离

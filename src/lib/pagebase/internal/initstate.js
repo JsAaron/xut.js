@@ -1,3 +1,4 @@
+import { config } from '../../config/index'
 import { create as _create } from '../depend/multievent'
 import Collection from '../depend/collection'
 import initTasks from '../threadtask/tasks'
@@ -97,14 +98,15 @@ export default function(baseProto) {
          * 2016.11.8
          * @type {Array}
          */
-        this._callAnimSequence = {
-            state:false,//动画状态
-            swipeleft: [],
-            swiperight: [],
-            swipeleftTotal: 0,
-            swiperightTotal: 0,
-            swipeleftIndex: 0,
-            swiperightIndex: 0
+        if (config.swipeDelegate) {
+            this._swipeSequence = {
+                swipeleft: [],
+                swiperight: [],
+                swipeleftTotal: 0,
+                swiperightTotal: 0,
+                swipeleftIndex: 0,
+                swiperightIndex: 0
+            }
         }
 
         /**
@@ -259,9 +261,8 @@ export default function(baseProto) {
              * @return {[type]} [description]
              */
             swipeDelegateContents(eventName, fn) {
-                ++instance._callAnimSequence[eventName + 'Total']
-                instance._callAnimSequence[eventName].push(fn)
-
+                ++instance._swipeSequence[eventName + 'Total']
+                instance._swipeSequence[eventName].push(fn)
             }
         }
 

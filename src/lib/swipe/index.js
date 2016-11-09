@@ -168,8 +168,6 @@ export default class Swipe extends Observer {
     }
 
 
-
-
     /**
      * 绑定事件
      * @return {[type]} [description]
@@ -195,6 +193,42 @@ export default class Swipe extends Observer {
 
 
     /**
+     * 事件处理
+     * @param  {[type]} e [description]
+     * @return {[type]}   [description]
+     */
+    handleEvent(e) {
+
+        this.options.preventDefault && e.preventDefault()
+        this.options.stopPropagation && e.stopPropagation()
+
+        //接受多事件的句柄
+        $$handle({
+            start(e) {
+                this._onStart(e)
+            },
+            move(e) {
+                this._onMove(e)
+            },
+            end(e) {
+                this._onEnd(e)
+            },
+            transitionend(e) {
+                this._onAnimComplete(e)
+            }
+        }, this, e)
+    }
+
+
+    /**
+     * 是否多点触发
+     * @return {Boolean} [description]
+     */
+    _hasMultipleTouches(e) {
+        return e.touches && e.touches.length > 1
+    }
+
+    /**
      * 触发
      * @param  {[type]} e [description]
      * @return {[type]}   [description]
@@ -203,7 +237,7 @@ export default class Swipe extends Observer {
 
         //如果停止滑动
         //或者多点触发
-        if (this._fliplock || e.touches && e.touches.length > 1) {
+        if (this._fliplock || this._hasMultipleTouches(e)) {
             return
         }
 
@@ -323,6 +357,8 @@ export default class Swipe extends Observer {
 
         //是否无效函数
         //如果无效，end方法抛弃掉
+        //必须是同步方法：
+        //动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
         const setSwipeInvalid = () => {
             this._isInvalid = true
         }
@@ -345,16 +381,15 @@ export default class Swipe extends Observer {
      */
     _onEnd(e) {
 
-        this._isTap = false
-        this._isMoving = false
-
         //停止滑动
         //或者多点触发
         //或者是边界
         //或者是停止翻页
-        if (this._fliplock || e.touches && e.touches.length > 1 || this._isBounce || this._preventSwipe) {
+        if (this._fliplock || this._isBounce || this._preventSwipe || this._hasMultipleTouches(e)) {
             return
         }
+
+        this._isTap = this._isMoving = false
 
         //点击
         if (!this._isRollX && !this._isRollY) {
@@ -408,7 +443,6 @@ export default class Swipe extends Observer {
 
     }
 
-
     /**
      * 前尾边界反弹判断
      * @param  {[type]} deltaX [description]
@@ -424,7 +458,6 @@ export default class Swipe extends Observer {
         }
     }
 
-
     /**
      * 设置反弹
      */
@@ -437,7 +470,6 @@ export default class Swipe extends Observer {
             'action': 'flipRebound'
         })
     }
-
 
     /**
      * 处理松手后滑动
@@ -455,7 +487,6 @@ export default class Swipe extends Observer {
         data.rightIndex = pointer.rightIndex
         this.$emit('onMove', data)
     }
-
 
     /**
      * 边界控制
@@ -489,7 +520,6 @@ export default class Swipe extends Observer {
         this._isQuickTurn = false;
     }
 
-
     /**
      * 快速翻页时间计算
      */
@@ -497,7 +527,6 @@ export default class Swipe extends Observer {
         this._speedRate = 50 / this._viewWidth;
         this._isQuickTurn = true;
     }
-
 
     /**
      * 判断是否快速翻页
@@ -513,15 +542,13 @@ export default class Swipe extends Observer {
         this._preTapTime = getDate();
     }
 
-
     /**
      * 翻页加锁
      * @return {[type]} [description]
      */
-    _lock() {
+    _lockSwipe() {
         this._fliplock = true;
     }
-
 
     /**
      * 修正页面索引
@@ -529,7 +556,6 @@ export default class Swipe extends Observer {
     _fixHindex(currIndex) {
         this._hindex = currIndex; //翻页索引
     }
-
 
 
     /**
@@ -612,7 +638,6 @@ export default class Swipe extends Observer {
         this.pagePointer.stopPointer = stopPointer
     }
 
-
     /**
      * 滑动到上下页面
      * direction
@@ -623,7 +648,7 @@ export default class Swipe extends Observer {
     _slideTo(direction) {
         //如果在忙碌状态,如果翻页还没完毕
         if (this._fliplock) {
-            return;
+            return
         }
 
         //前后边界
@@ -631,7 +656,7 @@ export default class Swipe extends Observer {
             if (this._isBorder(direction)) return;
         }
 
-        this._lock()
+        this._lockSwipe()
         this.direction = direction
         this._quickTurn()
 
@@ -696,6 +721,16 @@ export default class Swipe extends Observer {
     }
 
 
+    _distributed(...arg) {
+        this._restore(...arg)
+
+        //延长获取更pagePointer的更新值
+        setTimeout(() => {
+            this.$emit('onComplete', this.direction, this.pagePointer, this._unlockSwipe.bind(this), this._isQuickTurn)
+        }, 50)
+    }
+
+
     /**
      * 还原设置
      * @return {[type]} [description]
@@ -713,22 +748,12 @@ export default class Swipe extends Observer {
     }
 
 
-    _distributed(...arg) {
-        this._restore(...arg)
-
-        //延长获取更pagePointer的更新值
-        setTimeout(() => {
-            this.$emit('onComplete', this.direction, this.pagePointer, this._unlock.bind(this), this._isQuickTurn);
-        }, 50)
-    }
-
-
     /**
      * 解锁翻页
      * @return {[type]} [description]
      */
-    _unlock() {
-        this._fliplock = false;
+    _unlockSwipe() {
+        this._fliplock = false
     }
 
 
@@ -742,38 +767,12 @@ export default class Swipe extends Observer {
             move: this,
             end: this,
             cancel: this,
-            transitionend: this
+            transitionend: this,
+            out: this
         })
     }
 
 
-
-    /**
-     * 事件处理
-     * @param  {[type]} e [description]
-     * @return {[type]}   [description]
-     */
-    handleEvent(e) {
-
-        this.options.preventDefault && e.preventDefault()
-        this.options.stopPropagation && e.stopPropagation()
-
-        //接受多事件的句柄
-        $$handle({
-            start(e) {
-                this._onStart(e)
-            },
-            move(e) {
-                this._onMove(e)
-            },
-            end(e) {
-                this._onEnd(e)
-            },
-            transitionend(e) {
-                this._onAnimComplete(e)
-            }
-        }, this, e)
-    }
 }
 
 

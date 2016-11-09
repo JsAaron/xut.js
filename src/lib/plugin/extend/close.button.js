@@ -9,7 +9,6 @@ const createCloseIcon = function(right, top) {
     const screenSize = Xut.config.screenSize
     const width = screenSize.width
     const height = screenSize.height
-
     if(width > height) {
           html=
         `<div class="page-pinch-close" style="position: absolute;right:${right}px;top:${top}px;">
@@ -18,11 +17,9 @@ const createCloseIcon = function(right, top) {
     }else {
           html=
         `<div class="page-pinch-close" style="position: absolute;right:${right}px;top:${top}px;">
-           <div class="si-icon icomoon icon-close" style="font-size:6vh;background-color:white;width:6vh;height:6vh;border-radius:50%;right:0"></div>
+           <div class="si-icon icomoon icon-close" style="font-size:5vh;background-color:white;width:5vh;height:5vh;border-radius:50%;right:0"></div>
         </div>`
     }
-   
-      
     return $(String.styleFormat(html))
 }
 

@@ -5,7 +5,6 @@ const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 const setTranslateZ = Xut.style.setTranslateZ
 
-
 const hasValue = function(value) {
     return value != undefined
 }
@@ -19,21 +18,21 @@ const accessValue = function(x, y, z) {
  * @return {[type]} [description]
  */
 export function getParallaxStyle({
+    action, //初始化设置
     property,
-    opacityStart,
     speed = 0,
-    pageOffset = 0
+    pageOffset = 0,
+    opacityStart = 0 //透明度开始值
 }) {
     let style = {}
     let effect = ''
-    let parallaxOffset //最终的偏移量X
     let x = 0
     let y = 0
     let z = 0
     let round = Math.round
 
     //视觉差对象初始化偏移量
-    parallaxOffset = pageOffset
+    let parallaxOffset = pageOffset
 
     //x平移
     if (accessValue(property.translateX, property.translateY, property.translateZ)) {
@@ -65,13 +64,15 @@ export function getParallaxStyle({
 
     //透明度
     if (accessValue(property.opacity)) {
-        if (hasValue(opacityStart)) {
+        if (action === 'init') {
             style.opacity = round((property.opacityStart + property.opacity) * 100) / 100;
-        } else {
+        }
+        if (action === 'master') {
             style.opacity = round(property.opacity * 100) / 100 + opacityStart;
         }
         effect += ';'
     }
+
 
     if (effect) {
         style[transitionDuration] = speed + 'ms';
@@ -90,7 +91,7 @@ export function getParallaxStyle({
 /**
  * transform转化成相对应的偏移量
  */
-export function transformConversion(property, distance, nodes) {
+export function converValue(property, distance, nodes) {
     var temp = {},
         i;
 
