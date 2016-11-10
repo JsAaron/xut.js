@@ -95,7 +95,7 @@ export default class MasterMgr extends Abstract {
      * @return {[type]}            [description]
      */
     register(pageIndex, type, hotspotObj) {
-        var parallaxObj = this.abstractGetPageObj(this._conversionMasterId(pageIndex))
+        var parallaxObj = this.abstractGetPageObj(this.converMasterId(pageIndex))
         if (parallaxObj) {
             parallaxObj.registerCotents.apply(parallaxObj, arguments);
         }
@@ -110,12 +110,12 @@ export default class MasterMgr extends Abstract {
      * @return {[type]}                [description]
      */
     create(dataOpts, pageIndex, createCallBack) {
-        var masterObj, reuseMasterId, reuseMasterKey
-        var pptMaster = dataOpts.chapterData.pptMaster
-        var pageOffset = dataOpts.chapterData.pageOffset
+        let reuseMasterKey
+        let pptMaster = dataOpts.chapterData.pptMaster
+        let pageOffset = dataOpts.chapterData.pageOffset
 
         //母板复用的标示
-        reuseMasterId = pageOffset && pageOffset.split(rword);
+        let reuseMasterId = pageOffset && pageOffset.split(rword);
 
         //组合下标
         if (reuseMasterId && reuseMasterId.length === 3) {
@@ -132,7 +132,7 @@ export default class MasterMgr extends Abstract {
         //通知外部,需要创建的母版
         createCallBack();
 
-        masterObj = new Pagebase(
+        let masterObj = new Pagebase(
             _.extend(dataOpts, {
                 'pageType': this.pageType, //创建页面的类型
                 'rootNode': this.rootNode, //根元素
@@ -188,7 +188,7 @@ export default class MasterMgr extends Abstract {
          * 处理当前页面内的视觉差对象效果
          */
         const moveParallaxObject = (nodes) => {
-            let getMasterId = this._conversionMasterId(currIndex)
+            let getMasterId = this.converMasterId(currIndex)
             let currParallaxObj = this.abstractGetPageObj(getMasterId)
             if (currParallaxObj) {
                 //处理当前页面内的视觉差对象效果
@@ -296,7 +296,7 @@ export default class MasterMgr extends Abstract {
             pre: function() {
                 var targetIndex = data.targetIndex;
                 //目标母板对象
-                var targetkey = master._conversionMasterId(targetIndex);
+                var targetkey = master.converMasterId(targetIndex);
                 //得到过滤的边界keys
                 //在filter中的页面为过滤
                 filter = master._scanBounds(targetIndex, targetkey);
@@ -336,9 +336,9 @@ export default class MasterMgr extends Abstract {
             prevMasterObj,
             currMasterObj,
             nextMasterObj,
-            prevMasterId = this._conversionMasterId(leftIndex),
-            currMasterId = this._conversionMasterId(currIndex),
-            nextMasterId = this._conversionMasterId(rightIndex);
+            prevMasterId = this.converMasterId(leftIndex),
+            currMasterId = this.converMasterId(currIndex),
+            nextMasterId = this.converMasterId(rightIndex);
 
         switch (direction) {
             case 'prev':
@@ -368,14 +368,14 @@ export default class MasterMgr extends Abstract {
     //扫描key的左右边界
     //当前页面的左右边
     _scanBounds(currPage, currkey) {
-        var currKey = this._conversionMasterId(currPage),
+        var currKey = this.converMasterId(currPage),
             filter = {},
             i = currPage,
             prevKey, nextKey;
 
         //往前
         while (i--) {
-            prevKey = this._conversionMasterId(i);
+            prevKey = this.converMasterId(i);
             if (prevKey && prevKey !== currkey) {
                 filter['prev'] = prevKey;
                 break;
@@ -383,7 +383,7 @@ export default class MasterMgr extends Abstract {
         }
 
         //往后
-        nextKey = this._conversionMasterId(currPage + 1);
+        nextKey = this.converMasterId(currPage + 1);
 
         //如果有下一条记录
         if (nextKey && nextKey !== currkey) {
@@ -497,8 +497,9 @@ export default class MasterMgr extends Abstract {
     _updatadParallaxMaster(reuseMasterKey, pageIndex) {
         //记录页面与模板标示的映射
         this.recordMasterId[pageIndex] = reuseMasterKey;
+
         //更新可视区母板的编号
-        this.currMasterId = this._conversionMasterId(Xut.Presentation.GetPageIndex())
+        this.currMasterId = this.converMasterId(Xut.Presentation.GetPageIndex())
     }
 
 
@@ -635,7 +636,7 @@ export default class MasterMgr extends Abstract {
      * @param  {[type]} pageIndex [description]
      * @return {[type]}           [description]
      */
-    _conversionMasterId(pageIndex) {
+    converMasterId(pageIndex) {
         return this.recordMasterId ? this.recordMasterId[pageIndex] : undefined;
     }
 

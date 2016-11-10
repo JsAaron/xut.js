@@ -3,11 +3,11 @@ import { api } from './global.api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { fixAudio } from './component/audio/fix'
-import { disable } from './initialize/busy.cursor'
+import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 869
+Xut.Version = 869.3
 
 
 if (Xut.plat.isBrowser) {
@@ -38,6 +38,10 @@ const getContentHTML = cursor => {
     if (!cursor) {
         disable(true)
         busyIcon = ''
+    }
+
+    if (config.cursor && config.cursor.time) {
+        setDelay(config.cursor.time)
     }
 
     //默认背景图

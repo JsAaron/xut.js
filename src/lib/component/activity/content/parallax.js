@@ -6,6 +6,11 @@ import { config } from '../../../config/index'
 import { parseJSON } from '../../../util/lang'
 import { getParallaxStyle } from '../../../pagebase/move/util.parallax'
 
+import {
+    hasFlow,
+    getFlowCount
+} from '../../flow/get'
+
 /**
  * 变化节点的css3transform属性
  * @param  {[type]} $contentNode   [description]
@@ -46,7 +51,7 @@ const converParameters = function(parameters) {
  * @param  {[type]} nodeProportion [description]
  * @return {[type]}                [description]
  */
-const converValue = function(parameters, nodeProportion) {
+const converValue = function(parameters, nodeOffsetProportion) {
     var results = {},
         width = -config.viewSize.width,
         height = -config.viewSize.height;
@@ -55,22 +60,36 @@ const converValue = function(parameters, nodeProportion) {
         switch (i) {
             case 'translateX':
             case 'translateZ':
-                results[i] = parameters[i] * nodeProportion * width;
+                results[i] = parameters[i] * nodeOffsetProportion * width;
                 break;
             case 'translateY':
-                results[i] = parameters[i] * nodeProportion * height;
+                results[i] = parameters[i] * nodeOffsetProportion * height;
                 break;
             case 'opacityStart':
                 results[i] = parameters[i];
                 break;
             default:
-                results[i] = parameters[i] * nodeProportion;
+                results[i] = parameters[i] * nodeOffsetProportion;
         }
     }
 
     return results;
 }
 
+/**
+ * 如果母版依赖的页面是flow页面
+ * 需要获取到具体的页面长度
+ * @return {[type]} [description]
+ */
+const getFlowFange = function(pageIndex) {
+    var relyPageObj = Xut.Presentation.GetPageObj('page', pageIndex)
+    if (relyPageObj && relyPageObj.chapterData.note === 'flow') {
+        let seasonId = relyPageObj.chapterData.seasonId
+        let chapterId = relyPageObj.chapterId
+        let range = getFlowCount(seasonId, chapterId) //分页总数
+        return range
+    }
+}
 
 export default function Parallax(data, relatedData) {
 
@@ -84,18 +103,32 @@ export default function Parallax(data, relatedData) {
 
     let pid = data.pid
 
-    //页面偏移量
-    //["3", "6", "1"]
-    let pageOffset = relatedData.pageOffset && relatedData.pageOffset.split("-")
+    //首位分割点
+    let currPageOffset
 
-    //开始的nodes值
-    let currPageOffset = pageOffset[0]
+    //如果是flow页面，拿到分页数
+    let pageRange = hasFlow() && getFlowFange(data.pageIndex)
 
-    //范围区域
-    let pageRange = pageOffset[1]
+    if (pageRange) {
+        let visualIndex = Xut.Presentation.GetPageIndex()
+        if (data.pageIndex == visualIndex || data.pageIndex > visualIndex) {
+            currPageOffset = 1
+        } else {
+            currPageOffset = pageRange
+        }
+    } else {
+        //页面偏移量
+        //["3", "6", "4"]
+        //表示第4次采用了这个母板，中间有其他模板间隔开了的情况
+        let pageOffset = relatedData.pageOffset && relatedData.pageOffset.split("-");
+        //开始的nodes值
+        currPageOffset = parseInt(pageOffset[0]);
+        //范围区域
+        pageRange = parseInt(pageOffset[1])
+    }
 
     //页面偏移比例
-    let nodeOffsetProportion = (currPageOffset - 1) / (pageRange - 1)
+    let nodeOffsetProportion = (currPageOffset - 1) / (pageRange - 1) || 0
 
     //计算出新的新的值
     let property = converValue(parameters, nodeOffsetProportion)

@@ -12,7 +12,7 @@ export default function(baseProto) {
      * @return {[type]} [description]
      */
     baseProto._converSequenceName = function(direction) {
-        return direction === 'prev' ? 'swipeleft' : 'swiperight'
+        return direction === 'next' ? 'swipeleft' : 'swiperight'
     }
 
 
@@ -22,7 +22,8 @@ export default function(baseProto) {
     baseProto.hasSwipeSequence = function(direction) {
         let eventName = this._converSequenceName(direction)
         let swipeSequence = this._swipeSequence
-            //如果执行完毕了
+
+        //如果执行完毕了
         if (swipeSequence[eventName + 'Index'] === swipeSequence[eventName + 'Total']) {
             return false
         }

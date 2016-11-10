@@ -10,6 +10,7 @@ export default function(base, successCallback) {
     if (base.pageType === "page" && isFlowPage(chapterData.seasonId, base.chapterId)) {
         base._flows.register(
             new Flow({
+                pptMaster:base.chapterData.pptMaster, //母版ID
                 pageIndex: base.pageIndex,
                 $pinchNode: base.getContainsNode(),
                 seasonId: base.chapterData.seasonId,

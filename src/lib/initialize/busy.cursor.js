@@ -11,7 +11,7 @@ const animationDelay = Xut.style.animationDelay
  * 延时加载
  * @type {Number}
  */
-const delay = 500
+let delay = 500
 
 /**
  * 光标对象
@@ -56,17 +56,27 @@ export function createCursor() {
     let html = ''
     let container = ''
 
-    while (count--) {
-        container +=
-            `<div class="xut-busy-spinner"
-                  style="${transform}:rotate(${deg[count]}deg) translate(0,-142%);${animationDelay}:-${delay[count]}s">
-            </div>`
+    //忙碌光标自定义
+    if (config.cursor && config.cursor.url) {
+        container += `<div class="xut-busy-middle fullscreen-background"
+                           style="background-image: url(${config.cursor.url});">
+                      </div>`
+    } else {
+        while (count--) {
+            container +=
+                `<div class="xut-busy-spinner"
+                      style="${transform}:rotate(${deg[count]}deg) translate(0,-142%);${animationDelay}:-${delay[count]}s">
+                 </div>`
+        }
+        container = `<div class="xut-busy-middle">${container}</div>`
     }
+
+
 
     html =
         `<div style="width:${width}px;height:${width}px;margin:${space}px auto;margin-top:${config.viewSize.top+space}px;">
             <div style="height:30%;"></div>
-            <div class="xut-busy-middle">${container}</div>
+            ${container}
             <div class="xut-busy-text"></div>
         </div>`
 
@@ -119,6 +129,14 @@ export const ShowTextBusy = (txt) => {
     ShowBusy();
 }
 
+/**
+ * 设置时间
+ * @param  {[type]} time [description]
+ * @return {[type]}      [description]
+ */
+export const setDelay = (time) => {
+    delay = time
+}
 
 /**
  * 禁用光标

@@ -25,16 +25,18 @@ const translateParallax = function({
 
     let parameters = scope.parameters
     let initProperty = scope.initProperty
-    let nodes_1
 
     //往前翻页
     if (direction === 'prev') {
         //分割的比例
-        nodes_1 = scope.nodeProportion;
+        let nodes_1 = scope.nodeProportion;
         //如果往前溢出则取0
         nodes = (nodes == nodes_1) ? 0 : nodes_1;
     }
 
+        // if($contentNode[0].id ==='Content_11_12'){
+        //             console.log(distance, nodes)
+        // }
     //视觉对象移动的距离
     let property = converValue(parameters, distance, nodes);
 
@@ -55,6 +57,7 @@ const translateParallax = function({
 
     //直接操作元素
     let value = getParallaxStyle({
+        $contentNode,
         action: 'master',
         property: property,
         speed: speed,
@@ -150,13 +153,14 @@ export default function(baseProto) {
         }
 
         //移动距离
-        let distance = moveDist[1]
+        let distance = moveDist.length ? moveDist[1] : moveDist
 
         //遍历所有活动对象
         _.each(baseContents, content => {
             content.eachAssistContents(scope => {
                 //如果是视察对象移动
                 if (scope.parallax) {
+
                     let $contentNode = scope.parallax.$contentNode;
                     let contentObj = base.baseGetContentObject(scope.id)
 

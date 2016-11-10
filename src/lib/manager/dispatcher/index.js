@@ -714,7 +714,7 @@ export default class Dispatcher {
                     duration: 1000,
                     easing: 'in',
                     complete() {
-                        $cover.hide().remove()
+                        $cover && $cover.hide().remove()
                         self._autoRun({
                             'action': action
                         })

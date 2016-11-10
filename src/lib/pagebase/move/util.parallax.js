@@ -5,19 +5,12 @@ const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 const setTranslateZ = Xut.style.setTranslateZ
 
-const hasValue = function(value) {
-    return value != undefined
-}
-
-const accessValue = function(x, y, z) {
-    return hasValue(x) || hasValue(z) || hasValue(z)
-}
-
 /**
  * 获取视觉差parallax配置
  * @return {[type]} [description]
  */
 export function getParallaxStyle({
+    $contentNode,
     action, //初始化设置
     property,
     speed = 0,
@@ -34,8 +27,10 @@ export function getParallaxStyle({
     //视觉差对象初始化偏移量
     let parallaxOffset = pageOffset
 
-    //x平移
-    if (accessValue(property.translateX, property.translateY, property.translateZ)) {
+    //平移
+    if (property.translateX !== undefined
+        || property.translateY !== undefined
+        || property.translateZ !== undefined) {
         x = round(property.translateX) || 0
         y = round(property.translateY) || 0
         z = round(property.translateZ) || 0
@@ -44,8 +39,10 @@ export function getParallaxStyle({
         effect += `translate(${parallaxOffset}px,${y}px) ${translateZ}`
     }
 
-    //y竖移
-    if (accessValue(property.rotateX, property.rotateY, property.rotateZ)) {
+    //旋转
+    if (property.rotateX !== undefined
+        || property.rotateY !== undefined
+        || property.rotateZ !== undefined) {
         x = round(property.rotateX);
         y = round(property.rotateY);
         z = round(property.rotateZ);
@@ -55,7 +52,9 @@ export function getParallaxStyle({
     }
 
     //缩放
-    if (accessValue(property.scaleX, property.scaleY, property.scaleZ)) {
+    if (property.scaleX !== undefined
+        || property.scaleY !== undefined
+        || property.scaleZ !== undefined) {
         x = round(property.scaleX * 100) / 100 || 1;
         y = round(property.scaleY * 100) / 100 || 1;
         z = round(property.scaleZ * 100) / 100 || 1;
@@ -63,7 +62,7 @@ export function getParallaxStyle({
     }
 
     //透明度
-    if (accessValue(property.opacity)) {
+    if (property.opacity !== undefined) {
         if (action === 'init') {
             style.opacity = round((property.opacityStart + property.opacity) * 100) / 100;
         }
@@ -126,7 +125,9 @@ export function flipMove(property, repairProperty) {
     for (var i in property) {
         temp[i] = property[i] + repairProperty[i];
     }
-    if (start > -1) temp.opacityStart = start;
+    if (start > -1) {
+        temp.opacityStart = start;
+    }
     return temp;
 }
 

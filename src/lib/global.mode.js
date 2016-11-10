@@ -16,6 +16,19 @@ export default {
     silent: process.env.NODE_ENV !== 'production',
 
     /**
+     * 忙碌光标
+     * cursor: {
+     *   url: 'images/icons/showNote.png',
+     *   time: 500
+     * },
+     * @type {[type]}
+     */
+    cursor: {
+        delayTime: DEFAULT, //延时间显示时间
+        url: DEFAULT //url
+    },
+
+    /**
      * 页面可视模式
      * 2016.9.19
      * 4种分辨率显示模式:

@@ -17,6 +17,7 @@ import closeButton from '../../plugin/extend/close.button'
 export default class Flow {
 
     constructor({
+        pptMaster, //母版ID
         pageIndex,
         $pinchNode,
         seasonId,
@@ -24,13 +25,13 @@ export default class Flow {
         successCallback
     } = {}) {
 
-        const self = this
-        const dataNode = $('#chapter-flow-' + chapterId)
+        let self = this
         this.initIndex = pageIndex
         this.$pinchNode = $pinchNode
+        this.pptMaster = pptMaster
         render({
             $pinchNode,
-            dataNode,
+            dataNode: $('#chapter-flow-' + chapterId),
             chapterId,
             callback($container) {
                 self._init($container, seasonId, chapterId)
@@ -39,6 +40,18 @@ export default class Flow {
         })
     }
 
+    /**
+     * 获取母版对象
+     * @return {[type]} [description]
+     */
+    _getMasterObj() {
+        if (this._masterObj) {
+            return this._masterObj
+        }
+        if (this.pptMaster) {
+            this._masterObj = Xut.Presentation.GetPageObj('master', this.initIndex)
+        }
+    }
 
     _setImage(node, img, width, height, src) {
 
@@ -152,6 +165,23 @@ export default class Flow {
         }
     }
 
+    //pagesCount = 5
+    // =>
+    //   0.25
+    //   0.5
+    //   0.75
+    //   1
+    //   0
+    _makeNodes(count) {
+        let nodes = []
+        let nodeProportion = 1 / (count - 1) //比值
+        for (let i = 1; i < count; i++) {
+            nodes.push(i * nodeProportion)
+        }
+        nodes.push(0)
+        return nodes
+    }
+
     /**
      * 初始化
      * @param  {[type]} $container [description]
@@ -160,6 +190,7 @@ export default class Flow {
      */
     _init($container, seasonId, chapterId) {
 
+        const flowObject = this
         const pagesCount = getFlowCount(seasonId, chapterId)
         const flowView = getFlowView()
 
@@ -171,6 +202,11 @@ export default class Flow {
         const View = Xut.View
         const initIndex = this.initIndex
         const container = $container[0]
+
+        let nodes
+        if (this.pptMaster) {
+            nodes = this._makeNodes(pagesCount)
+        }
 
         /**
          * 分栏整体控制
@@ -307,7 +343,25 @@ export default class Flow {
                     })
                 }
 
+                //移动视觉差
+                const moveParallaxObject = () => {
+                    let masterObj = flowObject._getMasterObj()
+                    if (masterObj) {
+                        // console.log(distance,action)
+                        //处理当前页面内的视觉差对象效果
+                        masterObj.movePageBaseParallax({
+                            action,
+                            direction,
+                            moveDist: viewBeHideDistance,
+                            speed: speed,
+                            nodes: nodes[this._hindex]
+                                // parallaxProcessedContetns: this.parallaxProcessedContetns
+                        })
+                    }
+                }
+
                 translation[action](container, moveDistance, speed)
+                moveParallaxObject()
             }
 
         })

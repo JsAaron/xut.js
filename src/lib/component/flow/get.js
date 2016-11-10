@@ -8,6 +8,15 @@ export function set(flowCounts) {
 }
 
 /**
+ * 是否有流式排版
+ * 加快计算
+ * @return {Boolean} [description]
+ */
+export function hasFlow(){
+    return cacheCounts
+}
+
+/**
  * 获取当前当前到前置的总和
  * @return {[type]} [description]
  */

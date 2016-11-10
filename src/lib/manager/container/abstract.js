@@ -58,11 +58,13 @@ export class Abstract {
         pageType = pageType || this.pageType;
         //模板传递的可能不是页码
         if (pageType === 'master') {
-            if (!/-/.test(pageIndex)) { //如果不是母版ID，只是页码
-                pageIndex = this._conversionMasterId(pageIndex); //转化成母版id
+            //如果不是母版ID，只是页码
+            if (!/-/.test(pageIndex)) {
+                //转化成母版id
+                pageIndex = this.converMasterId(pageIndex)
             }
         }
-        return this.Collections && this.Collections[pageIndex];
+        return this.Collections && this.Collections[pageIndex]
     }
 
     /**

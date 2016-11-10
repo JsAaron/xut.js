@@ -109,9 +109,12 @@ export default function(instance) {
          */
         flow() {
 
+            //如果是页面类型
+            let isPageType = instance.pageType === 'page'
+
             //创建缩放
-            const createPinch = function(flow) {
-                if (instance.pageType === 'page' && config.saleMode) {
+            let createPinch = function(flow) {
+                if (isPageType && config.saleMode) {
                     const $pagePinch = instance.getContainsNode()
                     if (flow) {
                         //flow页面不处理
@@ -128,7 +131,9 @@ export default function(instance) {
 
             //chapter=>note == 'flow'
             //因为设计chapter只有一个flow效果，所以直接跳过别的创建
-            if (instance.chapterData.note == 'flow') {
+            //只处理页面类型
+            //母版跳过
+            if (isPageType && instance.chapterData.note == 'flow') {
                 callContextTasks('Flow', function() {
                     createPinch('flow')
                     setNextRunTask('complete')
