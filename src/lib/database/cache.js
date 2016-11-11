@@ -7,7 +7,7 @@ import {
 import {
     dataRemove,
     oneQuery
-} from './query'
+} from './sql'
 
 
 /**

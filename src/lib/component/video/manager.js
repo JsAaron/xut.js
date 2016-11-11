@@ -9,7 +9,7 @@ let playBox
 
 let initBox = () => {
     pageBox = {} //当前页面包含的视频数据
-    playBox = {}//播放过的视频数据 （播放集合)
+    playBox = {} //播放过的视频数据 （播放集合)
 }
 
 initBox()
@@ -123,6 +123,16 @@ let initVideo = (pageId, activityId, container) => {
     loadVideo(pageId, activityId, container);
 }
 
+
+/**
+ * 是否有视频对象
+ * @return {Boolean} [description]
+ */
+export function hasVideoObj(pageId, activityId) {
+    if (playBox[pageId]) {
+        return playBox[pageId][activityId]
+    }
+}
 
 /**
  * 自动播放

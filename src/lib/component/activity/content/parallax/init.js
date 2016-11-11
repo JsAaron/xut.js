@@ -2,14 +2,14 @@
  * 视觉差对象初始化操作
  */
 
-import { config } from '../../../config/index'
-import { parseJSON } from '../../../util/lang'
-import { getParallaxStyle } from '../../../pagebase/move/util.parallax'
+import { config } from '../../../../config/index'
+import { parseJSON } from '../../../../util/lang'
+import { setStyle } from './util'
 
 import {
     hasFlow,
     getFlowCount
-} from '../../flow/get'
+} from '../../../flow/get'
 
 /**
  * 变化节点的css3transform属性
@@ -19,15 +19,12 @@ import {
  * @return {[type]}            [description]
  */
 const setTransformNodes = function($contentNode, property, pageOffset) {
-    let value = getParallaxStyle({
+    return setStyle({ //return parallaxOffset
+        $contentNode,
         action: 'init',
         property,
         pageOffset
     })
-    if (value.style) {
-        $contentNode.css(value.style)
-    }
-    return value.parallaxOffset
 }
 
 

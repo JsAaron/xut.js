@@ -16,7 +16,7 @@ let spiritObjs = {}
  */
 const getData = (inputPara, contents) => {
     let option;
-    let resourcePath = config.jsWidgetPath() + "gallery/" + inputPara.id + "/";
+    let resourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
     let xhr = new XMLHttpRequest();
     xhr.open('GET', resourcePath + 'app.json', false);
     xhr.send(null);
@@ -70,7 +70,7 @@ export function updateAction(id, params) {
 
 export default function(inputPara, contents) {
     let option = getData(inputPara, contents)
-    let ResourcePath = config.jsWidgetPath() + "gallery/" + inputPara.id + "/";
+    let ResourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
     let contentPrefix = inputPara.contentPrefix
     let ids = []
     let options = {};

@@ -6,6 +6,7 @@
  *    3: 基于videoJS用flash实现的播放 for pc
  *    4: 用于插入一个网页的webview
  */
+import { config } from '../../config/index'
 import { removeVideo } from './manager'
 import {
     supportVideo,
@@ -167,7 +168,7 @@ let _Media = (options) => {
             //成功回调
         }, () => {
             //失败回调
-        }, Xut.config.videoPath() + url, 1, left, top, height, width);
+        }, config.getVideoPath() + url, 1, left, top, height, width);
     }
 
     let close = () => {
@@ -196,21 +197,25 @@ let _Media = (options) => {
 let _Video5 = (options) => {
 
     let container = options.container || $('body')
-    let url = Xut.config.videoPath() + options.url
+    let url = config.getVideoPath() + options.url
     let width = options.width
     let height = options.height
     let top = options.top
     let left = options.left
     let zIndex = options.zIndex
+    let videoWrap =
+        `<div style="width:${width};
+                     height:${height};
+                     position:absolute;
+                     visibility:hidden;
+                     z-index:${zIndex};
+                     top:${top};
+                     left:${left};">
+         </div>`
 
-
-    let $videoWrap = $('<div></div>')
-    let $video = $(document.createElement('video'))
-    let video = $video[0]
-
-
-    //video节点
-    $video.css({
+    let $videoWrap = $(String.styleFormat(videoWrap))
+    let video = document.createElement('video')
+    let $videoNode = $(video).css({
         width: width,
         height: height
     }).attr({
@@ -220,106 +225,94 @@ let _Video5 = (options) => {
     })
 
     //父容器
-    $videoWrap.append($video).css({
-        position: 'absolute',
-        'z-index': -1,
-        top: top,
-        left: left,
-        width: 0,
-        height: 0
-    })
+    $videoWrap.append($videoNode)
 
     /**
      * 播放视频
      * @return {[type]} [description]
      */
-    let _paly = () => {
+    function play() {
+        //iphone手机上，系统接管后，点击完成
+        //必须这样处理后，才能再次显示
         $videoWrap.show()
         video.play()
     }
 
-    //////////////////////////
-    ///2016.6.23
-    //安卓ios需要直接调用play开始
-    ////////////////////////
-    if (Xut.plat.isIOS || Xut.plat.isAndroid) {
-        _paly()
+    function start() {
+        play();
+        //防止播放错误时播放界面闪现
+        $videoWrap.css('visibility', 'visible')
     }
 
     /**
      * 停止
      * @return {[type]} [description]
      */
-    let stop = () => {
-
-        video.pause();
-
+    function stop() {
+        video.pause()
         //妙妙学只需要停止
         if (!window.MMXCONFIG) {
             //复位视频
             if (video.duration) {
                 video.currentTime = 0.01;
             }
-
             $videoWrap.hide();
-
             //用于启动视频
             if (options.startBoot) {
                 options.startBoot();
                 destroy();
             }
         }
-
     }
+
 
     /**
      * 错误
      * @return {[type]} [description]
      */
-    let error = () => {
-        //用于启动视频
+    function error() {
         if (options.startBoot) {
             options.startBoot();
-            destroy()
         }
+        removeVideo(options.pageId);
     }
 
-    /**
-     * 防止播放错误时播放界面闪现
-     * @return {[type]} [description]
-     */
-    let start = () => {
-        $videoWrap.css({
-            width: width + 'px',
-            height: height + 'px',
-            zIndex: zIndex
-        })
-
-        //加完后播放视频
-        _paly()
+    function clear(){
+        stop()
+        removeVideo(options.pageId);
     }
 
     /**
      * 销毁
-     * @return {[type]} [description]
      */
-    let destroy = () => {
-        video.removeEventListener('ended', stop, false)
+    function destroy() {
+        video.removeEventListener('ended', clear, false)
         video.removeEventListener('error', error, false)
         video.removeEventListener('loadeddata', start, false)
         video.removeEventListener('webkitendfullscreen', stop, false)
-        $videoWrap.hide().remove()
+        $videoWrap.remove()
+        $videoNode = null
+        $videoWrap = null
     }
 
-    container.append($videoWrap);
-
-    video.addEventListener('ended', stop, false)
+    video.addEventListener('ended', clear, false)
     video.addEventListener('error', error, false)
     video.addEventListener('loadeddata', start, false)
     video.addEventListener('webkitendfullscreen', stop, false)
 
+    //////////////////////////
+    ///2016.6.23
+    //安卓ios需要直接调用play开始
+    //移动端必须触发2次play
+    ////////////////////////
+    if (Xut.plat.isIOS || Xut.plat.isAndroid) {
+        play()
+    }
+
+    container.append($videoWrap);
+
     return {
-        play: _paly,
+        play: play,
         stop: stop,
         close: destroy
     }
@@ -332,18 +325,17 @@ let _Video5 = (options) => {
  * @param {[type]} options [description]
  */
 let _VideoJS = (options) => {
-    var container = options.container || $('body'),
-        videoId = options.videoId,
-        url = Xut.config.videoPath() + options.url,
-        width = options.width,
-        height = options.height,
-        zIndex = options.zIndex,
-        top = options.top,
-        left = options.left,
-        video, source, player;
+    let container = options.container || $('body')
+    let videoId = options.videoId
+    let url = config.getVideoPath() + options.url
+    let width = options.width
+    let height = options.height
+    let zIndex = options.zIndex
+    let top = options.top
+    let left = options.left
+    let video = document.createElement('video');
+    let source = document.createElement('source');
 
-    video = document.createElement('video');
-    source = document.createElement('source');
     source.setAttribute('src', url);
     source.setAttribute('type', 'video/mp4');
     video.id = 'video_' + videoId;
@@ -353,13 +345,15 @@ let _VideoJS = (options) => {
     //指定本地的swf地址取代网络地址
     videojs.options.flash.swf = "lib/data/video-js.swf";
 
-    var clear = function() {
+    let clear = function() {
         //结束后清理自己
         removeVideo(options.pageId);
     }
 
+    let $closeButtom
+
     //videojs是videojs定义的全局函数
-    player = videojs(video, {
+    let player = videojs(video, {
         //视频引擎顺序,位置排前面的优先级越高
         "techOrder": ["html5", "flash"],
         //预加载
@@ -383,28 +377,30 @@ let _VideoJS = (options) => {
         },
         //控制条相关设置
         controlBar: {
+
             //是否显示字幕按钮
             captionsButton: false,
             chaptersButton: false,
 
             liveDisplay: false,
             //是否显示剩余时间
-            remainingTimeDisplay: true,
+            remainingTimeDisplay: false,
             //是否显示子标题按钮
             subtitlesButton: false,
             //是否显示回放菜单按钮
             playbackRateMenuButton: false,
             //是否显示时间分隔符"/"
-            timeDivider: false,
+            timeDivider: true,
             //是否显示当前视频的当前时间值
-            currentTimeDisplay: false,
+            currentTimeDisplay: true,
             //是否显示视频时长
-            durationDisplay: false
+            durationDisplay: true
         }
     }, function() {
-        //可以播放时提升层级，防止闪现
-        this.on('canplay', function() {
-            wrap.style.zIndex = zIndex;
+
+        //数据加载完毕后，才显示播放界面
+        this.on('loadeddata', function() {
+            wrap.style.visibility = 'visible';
         });
 
         //播放完毕后自动关闭
@@ -418,7 +414,8 @@ let _VideoJS = (options) => {
         });
 
         //因为没有关闭按钮,又不想自己做,就把全屏变成关闭好了.
-        this.on("touchend mouseup", function(e) {
+        $closeButtom = $(this.el_)
+        $closeButtom.on("touchend mouseup", function(e) {
             var className = e.target.className.toLowerCase();
             if (-1 != className.indexOf('vjs-fullscreen-control')) {
                 clear()
@@ -428,24 +425,31 @@ let _VideoJS = (options) => {
 
     //修正视频样式
     var wrap = player.el()
-    var videoElement = wrap.children[0]
     wrap.style.left = left + 'px'
     wrap.style.top = top + 'px'
-    wrap.style.zIndex = -1
+    wrap.style.zIndex = zIndex
+    wrap.style.visibility = 'hidden'
 
     return {
 
         play: function() {
-            console.log(111);
+            player && player.play()
         },
 
         stop: function() {
-            player.pause();
+            player && player.pause();
         },
 
         close: function() {
-            player.dispose();
-            player = null;
+            if ($closeButtom) {
+                $closeButtom.off()
+                $closeButtom = null
+            }
+            if (player) {
+                player.pause()
+                player.dispose()
+                player = null;
+            }
         }
     }
 
@@ -453,12 +457,19 @@ let _VideoJS = (options) => {
 }
 
 
-
 //浏览器平台
 if (Xut.plat.isBrowser) {
-    VideoPlayer = _Video5
+    // 安卓妙妙学强制走h5
+    // 由于原生H5控制条不显示的问题
+    // 这里用插件播放
+    if (Xut.plat.isAndroid) {
+        VideoPlayer = _VideoJS
+    } else {
+        //pc ios 浏览器打开方式
+        VideoPlayer = _Video5
+    }
 } else {
-    //检测平台
+    //apk ipa
     if (Xut.plat.isIOS || top.EduStoreClient) {
         //如果是ibooks模式
         if (Xut.IBooks.Enabled) {
@@ -470,7 +481,9 @@ if (Xut.plat.isBrowser) {
     } else if (Xut.plat.isAndroid) {
         if (window.MMXCONFIG) {
             // 安卓妙妙学强制走h5
-            VideoPlayer = _Video5
+            // 由于原生H5控制条不显示的问题
+            // 这里用插件播放
+            VideoPlayer = _VideoJS
         } else {
             //android平台
             VideoPlayer = _Media

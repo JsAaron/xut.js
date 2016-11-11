@@ -1,15 +1,16 @@
-import { config } from '../../config/index'
+import { config } from '../../../../config/index'
 
 const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 const setTranslateZ = Xut.style.setTranslateZ
+const round = Math.round
 
 /**
  * 获取视觉差parallax配置
  * @return {[type]} [description]
  */
-export function getParallaxStyle({
+export function setStyle({
     $contentNode,
     action, //初始化设置
     property,
@@ -22,7 +23,6 @@ export function getParallaxStyle({
     let x = 0
     let y = 0
     let z = 0
-    let round = Math.round
 
     //视觉差对象初始化偏移量
     let parallaxOffset = pageOffset
@@ -72,17 +72,13 @@ export function getParallaxStyle({
         effect += ';'
     }
 
-
     if (effect) {
         style[transitionDuration] = speed + 'ms';
         style[transform] = effect
+        $contentNode && $contentNode.css(style)
     }
 
-    return {
-        style,
-        parallaxOffset
-    }
-
+    return parallaxOffset
 }
 
 

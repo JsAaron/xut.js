@@ -1,7 +1,7 @@
 import { parseJSON } from '../util/index'
 import { config } from '../config/index'
 import { triggerAudio, autoAudio } from '../component/audio/manager'
-import { triggerVideo, autoVideo } from '../component/video/manager'
+import { triggerVideo, autoVideo, hasVideoObj } from '../component/video/manager'
 
 //临时音频动作数据
 const tempData = {}
@@ -38,7 +38,7 @@ export default {
                 if (start.startImg) {
                     startImage = start.startImg;
                     tempData[_id]['startImg'] = startImage;
-                    startImage = 'background-image:url(' + config.pathAddress +  startImage + ');';
+                    startImage = 'background-image:url(' + config.pathAddress + startImage + ');';
                 }
                 if (start.script) {
                     tempData[_id]['startScript'] = start.script;
@@ -133,7 +133,7 @@ export default {
         rootNode,
         pageIndex,
         chapterId
-    } = {}) {
+    }) {
         if (!category) return
         if (category == 'audio') {
             autoAudio(chapterId, id, this.onlyCreateOnce(id));
@@ -153,7 +153,7 @@ export default {
         rootNode,
         pageIndex,
         activityId
-    } = {}) {
+    }) {
         const category = target.getAttribute('data-delegate')
         if (category) {
             const chapterId = Xut.Presentation.GetPageId(pageIndex);
@@ -166,7 +166,12 @@ export default {
             if (category == 'audio') {
                 triggerAudio(chapterId, activityId, this.onlyCreateOnce(id))
             } else {
-                triggerVideo(chapterId, activityId, $(rootNode))
+                let videoObj = hasVideoObj(chapterId, activityId)
+                if (videoObj) {
+                    videoObj.play()
+                } else {
+                    triggerVideo(chapterId, activityId, $(rootNode))
+                }
             }
         }
     }

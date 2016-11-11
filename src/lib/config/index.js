@@ -205,7 +205,7 @@ _.extend(config, {
      * 视频文件路径
      * @return {[type]} [description]
      */
-    videoPath() {
+    getVideoPath() {
         if (isCacheVideoPath && cacheVideoPath) {
             return cacheVideoPath
         }
@@ -217,7 +217,7 @@ _.extend(config, {
      * 音频文件路径
      * @return {[type]} [description]
      */
-    audioPath() {
+    getAudioPath() {
         if (isCacheAudioPath && cacheAudioPath) {
             return cacheAudioPath
         }
@@ -230,7 +230,7 @@ _.extend(config, {
      * 配置SVG文件路径
      * @return {[type]} [description]
      */
-    svgPath() {
+    getSvgPath() {
         if (isCacheSvgPath && cacheSvgPath) {
             return cacheSvgPath
 
@@ -244,7 +244,7 @@ _.extend(config, {
      * 2016.8.3增加
      * @return {[type]} [description]
      */
-    jsWidgetPath() {
+    getWidgetPath() {
         if (isCacheJsWidgetPath && cacheJsWidgetPath) {
             return cacheJsWidgetPath
         }

@@ -7,7 +7,7 @@ import { config } from '../../../config/index'
  * @return {[type]}      [description]
  */
 function path(fileName, widgetId) {
-    return config.jsWidgetPath() + widgetId + '/' + fileName
+    return config.getWidgetPath() + widgetId + '/' + fileName
 }
 
 

@@ -1,4 +1,4 @@
-import { dataQuery } from './query'
+import { dataQuery } from './sql'
 
 import {
     setApi,

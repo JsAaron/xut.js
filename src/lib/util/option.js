@@ -128,7 +128,7 @@ export function readFile(path, callback, type) {
         }
 
         //全路径
-        paths = config.svgPath().replace("svg", 'js') + path;
+        paths = config.getSvgPath().replace("svg", 'js') + path;
         //文件名
         name = path.replace(".js", '')
 
@@ -152,7 +152,7 @@ export function readFile(path, callback, type) {
     //如果是js动态文件
     //content的html结构
     if (type === "js") {
-        paths = config.svgPath() + path;
+        paths = config.getSvgPath() + path;
         name = path.replace(".js", '')
         request(paths, function() {
             data = window.window.HTMLCONFIG[name];
@@ -172,7 +172,7 @@ export function readFile(path, callback, type) {
         $.ajax({
             type: 'get',
             dataType: 'html',
-            url: config.svgPath().replace("www/", "") + path,
+            url: config.getSvgPath().replace("www/", "") + path,
             success: function(svgContent) {
                 callback(svgContent);
             },
@@ -182,7 +182,7 @@ export function readFile(path, callback, type) {
             }
         })
     } else {
-        Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.svgPath() + path, function(svgContent) {
+        Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function(svgContent) {
             callback(svgContent);
         }, function(err) {
             callback('数据加载失败');

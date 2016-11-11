@@ -15,8 +15,8 @@ import {
 import {
     overMemory,
     converValue,
-    getParallaxStyle
-} from '../../pagebase/move/util.parallax'
+    setStyle
+} from '../../component/activity/content/parallax/util'
 
 import { config } from '../../config/index'
 
@@ -173,7 +173,7 @@ export default class MasterMgr extends Abstract {
         _.each(masterObjs, function(pageObj, index) {
             if (pageObj) {
                 isBoundary = true
-                pageObj.movePageBaseContainer(action, moveDist[index], speed, moveDist[3])
+                pageObj.moveContainer(action, moveDist[index], speed, moveDist[3])
             }
         })
 
@@ -192,7 +192,7 @@ export default class MasterMgr extends Abstract {
             let currParallaxObj = this.abstractGetPageObj(getMasterId)
             if (currParallaxObj) {
                 //处理当前页面内的视觉差对象效果
-                currParallaxObj.movePageBaseParallax({
+                currParallaxObj.moveParallax({
                     action,
                     direction,
                     moveDist,
@@ -533,7 +533,6 @@ export default class MasterMgr extends Abstract {
 
         const repairNodes = function(parallax) {
             let rangePage = parallax.calculateRangePage()
-            let $contentNode = parallax.$contentNode
             let parameters = parallax.parameters
             let initProperty = parallax.initProperty
 
@@ -552,16 +551,13 @@ export default class MasterMgr extends Abstract {
             let property = converValue(parameters, -self.viewWidth, nodes);
 
             //直接操作元素
-            let parallaxConfig = getParallaxStyle({
+            setStyle({
+                $contentNode:parallax.$contentNode,
                 action: 'master',
                 property: property,
                 speed: 300,
                 opacityStart: initProperty.opacityStart
             })
-
-            if (parallaxConfig.style) {
-                $contentNode.css(parallaxConfig.style)
-            }
 
             overMemory(property, initProperty);
         }

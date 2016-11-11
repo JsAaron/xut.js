@@ -1,5 +1,5 @@
 import { errorTable } from '../../database/cache'
-import { query } from '../complex.query'
+import { query } from '../../database/query'
 
 /**
  * 判断是否能整除2

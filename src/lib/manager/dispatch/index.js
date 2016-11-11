@@ -9,9 +9,9 @@
  **********************************************************************/
 
 import { config } from '../../config/index'
-import PageMgr from '../container/page'
-import MasterMgr from '../container/master'
-import goToPage from './goto.page'
+import PageMgr from '../mgr/page'
+import MasterMgr from '../mgr/master'
+import goToPage from './goto'
 import { sceneController } from '../../scenario/controller'
 
 import { getFlowDistance } from '../../visuals/adapter/adapter.type'

@@ -31,7 +31,7 @@ export function createData(outputPara, scrollPaintingMode, calculate) {
      * 给妙妙学的js零件增加前缀
      * @type {[type]}
      */
-    outputPara.rootPath = Xut.config.jsWidgetPath()
+    outputPara.rootPath = Xut.config.getWidgetPath()
 
 
     return outputPara;

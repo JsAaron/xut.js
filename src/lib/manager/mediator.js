@@ -6,7 +6,7 @@
  **********************************************************************/
 
 import Observer from '../observer/index'
-import Dispatcher from './dispatcher/index'
+import Dispatcher from './dispatch/index'
 import delegateHooks from './delegate/hooks'
 import closestProcessor from './delegate/closest'
 

@@ -60,7 +60,7 @@ class _Media extends BaseAudio {
     constructor(options, controlDoms) {
         super()
 
-        var url = config.audioPath() + options.url,
+        var url = config.getAudioPath() + options.url,
             trackId = options.trackId,
             self = this,
             audio;
@@ -135,7 +135,7 @@ class _Flash extends BaseAudio {
     constructor(options, controlDoms) {
         super()
         var trackId = options.trackId,
-            url = config.audioPath() + options.url,
+            url = config.getAudioPath() + options.url,
             self = this,
             audio;
 
@@ -195,7 +195,7 @@ class _cordovaMedia extends BaseAudio {
 
     constructor(options, controlDoms) {
         super()
-        var url = config.audioPath() + options.url,
+        var url = config.getAudioPath() + options.url,
             trackId = options.trackId,
             self = this,
             audio;
@@ -284,7 +284,7 @@ class _Audio5js extends BaseAudio {
     constructor(options, controlDoms) {
         super()
         var trackId = options.trackId,
-            url = config.audioPath() + options.url,
+            url = config.getAudioPath() + options.url,
             self = this,
             audio;
 
@@ -343,7 +343,7 @@ class _Audio extends BaseAudio {
         super()
 
         let trackId = options.trackId
-        let url = config.audioPath() + options.url
+        let url = config.getAudioPath() + options.url
         let audio
         let self = this
 

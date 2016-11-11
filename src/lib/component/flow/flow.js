@@ -1,5 +1,5 @@
 import { config } from '../../config/index'
-import { translation } from '../../pagebase/move/util.translation'
+import { translation } from '../../pagebase/move/translation'
 import { getFlowCount } from './get'
 import Swipe from '../../swipe/index'
 import render from './render'
@@ -349,7 +349,7 @@ export default class Flow {
                     if (masterObj) {
                         // console.log(distance,action)
                         //处理当前页面内的视觉差对象效果
-                        masterObj.movePageBaseParallax({
+                        masterObj.moveParallax({
                             action,
                             direction,
                             moveDist: viewBeHideDistance,

@@ -87,7 +87,7 @@ export default class PageMgr extends Abstract {
         ], function(pageObj, index) {
             if (pageObj) {
                 let distance = moveDist[index]
-                pageObj.movePageBaseContainer(action, distance, speed, moveDist[3])
+                pageObj.moveContainer(action, distance, speed, moveDist[3])
             }
         })
     }
