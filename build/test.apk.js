@@ -7,8 +7,8 @@ killOccupied(prot, () => {
     browserSync({
         port: prot,
         server: {
-            baseDir: "./src",
-            index: "test.html"
+            baseDir: "./apk",
+            index: "index.html"
         },
         open: true
     })

@@ -204,13 +204,13 @@ let _Video5 = (options) => {
     let left = options.left
     let zIndex = options.zIndex
     let videoWrap =
-        `<div style="width:${width};
-                     height:${height};
+        `<div style="width:${width}px;
+                     height:${height}px;
                      position:absolute;
                      visibility:hidden;
                      z-index:${zIndex};
-                     top:${top};
-                     left:${left};">
+                     top:${top}px;
+                     left:${left};px">
          </div>`
 
     let $videoWrap = $(String.styleFormat(videoWrap))
@@ -288,7 +288,7 @@ let _Video5 = (options) => {
     function destroy() {
         video.removeEventListener('ended', clear, false)
         video.removeEventListener('error', error, false)
-        video.removeEventListener('loadeddata', start, false)
+        video.removeEventListener('canplay', start, false)
         video.removeEventListener('webkitendfullscreen', stop, false)
         $videoWrap.remove()
         $videoNode = null
@@ -297,7 +297,7 @@ let _Video5 = (options) => {
 
     video.addEventListener('ended', clear, false)
     video.addEventListener('error', error, false)
-    video.addEventListener('loadeddata', start, false)
+    video.addEventListener('canplay', start, false)
     video.addEventListener('webkitendfullscreen', stop, false)
 
     //////////////////////////
@@ -327,7 +327,20 @@ let _FlareVideo = function(options) {
     let top = options.top
     let left = options.left
     let zIndex = options.zIndex
-    var fv = $('#Video_' + options.videoId).flareVideo({
+
+    let videoWrap =
+        `<div style="width:${width}px;
+                     height:${height}px;
+                     position:absolute;
+                     visibility:hidden;
+                     z-index:${zIndex};
+                     top:${top}px;
+                     left:${left};px">
+         </div>`
+
+    let $videoWrap = $(String.styleFormat(videoWrap))
+
+    let fv = $videoWrap.flareVideo({
         width,
         height,
         autoplay:true,
@@ -337,6 +350,8 @@ let _FlareVideo = function(options) {
         src: url,
         type: 'video/mp4'
     }])
+
+    container.append($videoWrap);
 
     return {
         play: function(){
@@ -386,7 +401,7 @@ if (Xut.plat.isBrowser) {
         }
     }
 }
-
+// VideoPlayer = _FlareVideo
 class VideoClass {
 
     constructor(options, container) {
