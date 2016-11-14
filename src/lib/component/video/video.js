@@ -250,7 +250,7 @@ let _Video5 = (options) => {
      */
     function stop() {
         video.pause()
-        //妙妙学只需要停止
+            //妙妙学只需要停止
         if (!window.MMXCONFIG) {
             //复位视频
             if (video.duration) {
@@ -277,7 +277,7 @@ let _Video5 = (options) => {
         removeVideo(options.pageId);
     }
 
-    function clear(){
+    function clear() {
         stop()
         removeVideo(options.pageId);
     }
@@ -316,144 +316,40 @@ let _Video5 = (options) => {
         stop: stop,
         close: destroy
     }
-};
+}
 
 
-/**
- * https://github.com/videojs/video.js/blob/master/docs/guides/setup.md
- * 基于video.js的web播放器,在pc端flash优先
- * @param {[type]} options [description]
- */
-let _VideoJS = (options) => {
+let _FlareVideo = function(options) {
     let container = options.container || $('body')
-    let videoId = options.videoId
     let url = config.getVideoPath() + options.url
     let width = options.width
     let height = options.height
-    let zIndex = options.zIndex
     let top = options.top
     let left = options.left
-    let video = document.createElement('video');
-    let source = document.createElement('source');
-
-    source.setAttribute('src', url);
-    source.setAttribute('type', 'video/mp4');
-    video.id = 'video_' + videoId;
-    video.className = "video-js vjs-sublime-skin";
-    video.appendChild(source);
-    container.append(video);
-    //指定本地的swf地址取代网络地址
-    videojs.options.flash.swf = "lib/data/video-js.swf";
-
-    let clear = function() {
-        //结束后清理自己
-        removeVideo(options.pageId);
-    }
-
-    let $closeButtom
-
-    //videojs是videojs定义的全局函数
-    let player = videojs(video, {
-        //视频引擎顺序,位置排前面的优先级越高
-        "techOrder": ["html5", "flash"],
-        //预加载
-        "preload": "auto",
-        //是否有控制条
-        "controls": true,
-        "autoplay": true,
-        "width": width,
-        "height": height,
-        //播放元素相关设置
-        children: {
-            //暂停时是否显示大大的播放按钮
-            bigPlayButton: false,
-            //是否显示错误提示
-            errorDisplay: false,
-            //是否显示视频快照
-            posterImage: false,
-            //是否显示字幕
-            textTrackDisplay: false,
-            volumeMenuButton: false
-        },
-        //控制条相关设置
-        controlBar: {
-
-            //是否显示字幕按钮
-            captionsButton: false,
-            chaptersButton: false,
-
-            liveDisplay: false,
-            //是否显示剩余时间
-            remainingTimeDisplay: false,
-            //是否显示子标题按钮
-            subtitlesButton: false,
-            //是否显示回放菜单按钮
-            playbackRateMenuButton: false,
-            //是否显示时间分隔符"/"
-            timeDivider: true,
-            //是否显示当前视频的当前时间值
-            currentTimeDisplay: true,
-            //是否显示视频时长
-            durationDisplay: true
-        }
-    }, function() {
-
-        //数据加载完毕后，才显示播放界面
-        this.on('loadeddata', function() {
-            wrap.style.visibility = 'visible';
-        });
-
-        //播放完毕后自动关闭
-        this.on('ended', function() {
-            //结束后清理自己
-            clear()
-        });
-
-        this.on('error', function() {
-            clear()
-        });
-
-        //因为没有关闭按钮,又不想自己做,就把全屏变成关闭好了.
-        $closeButtom = $(this.el_)
-        $closeButtom.on("touchend mouseup", function(e) {
-            var className = e.target.className.toLowerCase();
-            if (-1 != className.indexOf('vjs-fullscreen-control')) {
-                clear()
-            }
-        })
+    let zIndex = options.zIndex
+    var fv = $('#Video_' + options.videoId).flareVideo({
+        width,
+        height,
+        autoplay:true,
+        flashSrc:'lib/data/FlareVideo.swf'
     })
-
-    //修正视频样式
-    var wrap = player.el()
-    wrap.style.left = left + 'px'
-    wrap.style.top = top + 'px'
-    wrap.style.zIndex = zIndex
-    wrap.style.visibility = 'hidden'
+    fv.load([{
+        src: url,
+        type: 'video/mp4'
+    }])
 
     return {
-
-        play: function() {
-            player && player.play()
+        play: function(){
+            fv.play()
         },
-
-        stop: function() {
-            player && player.pause();
+        stop: function(){
+            fv.pause()
         },
-
-        close: function() {
-            if ($closeButtom) {
-                $closeButtom.off()
-                $closeButtom = null
-            }
-            if (player) {
-                player.pause()
-                player.dispose()
-                player = null;
-            }
+        close: function(){
+            fv.remove()
+            fv = null
         }
     }
-
-
 }
 
 
@@ -463,7 +359,7 @@ if (Xut.plat.isBrowser) {
     // 由于原生H5控制条不显示的问题
     // 这里用插件播放
     if (Xut.plat.isAndroid) {
-        VideoPlayer = _VideoJS
+        VideoPlayer = _FlareVideo
     } else {
         //pc ios 浏览器打开方式
         VideoPlayer = _Video5
@@ -473,7 +369,7 @@ if (Xut.plat.isBrowser) {
     if (Xut.plat.isIOS || top.EduStoreClient) {
         //如果是ibooks模式
         if (Xut.IBooks.Enabled) {
-            VideoPlayer = _VideoJS
+            VideoPlayer = _FlareVideo
         } else {
             //如果是ios或读酷pc版则使用html5播放
             VideoPlayer = _Video5
@@ -483,15 +379,13 @@ if (Xut.plat.isBrowser) {
             // 安卓妙妙学强制走h5
             // 由于原生H5控制条不显示的问题
             // 这里用插件播放
-            VideoPlayer = _VideoJS
+            VideoPlayer = _FlareVideo
         } else {
             //android平台
             VideoPlayer = _Media
         }
     }
 }
-
-
 
 class VideoClass {
 

@@ -1,7 +1,13 @@
 var cssName = [
     'css/common.css',
-    'css/video-js.css'
+    'css/video/flarevideo.css',
+    'css/video/flarevideo.default.css'
 ]
+
+//2016.11.14 去掉代码区域
+//'css/video-js.css',
+//'lib/plugin/library/redux.js',
+//'lib/plugin/library/video.js',
 
 var jsName = [
     'content/SQLResult.js',
@@ -15,11 +21,16 @@ var jsName = [
     'lib/plugin/library/jquery.js',
     'lib/plugin/library/jquery.transit.js',//2016.11.2 新增
     'lib/plugin/library/underscore.js',
-    'lib/plugin/library/video.js',
     'lib/plugin/library/audio5.js',
     'lib/plugin/library/iscroll.js',
     'lib/plugin/library/hammer.js',
-    'lib/plugin/library/redux.js',
+
+    // 视频插件
+    'lib/plugin/library/video/jquery.hammer.js',
+    'lib/plugin/library/video/jquery.flash.js',
+    'lib/plugin/library/video/jquery.ui.slider.js',
+    'lib/plugin/library/video/jquery.ui.touch-punch.js',
+    'lib/plugin/library/video/flarevideo.js',
 
     'lib/plugin/cordova/cordova.js',
     'lib/plugin/cordova/readAssetsFilePlugin.js',

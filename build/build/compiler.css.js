@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 const cleanCSS = require('gulp-clean-css');
 const autoprefixer = require('gulp-autoprefixer');
-const csspath = './src/css/*.css'
+const csspath = './src/css/**/*.css'
 const utils = require('../utils')
 
 module.exports = (conf) => {

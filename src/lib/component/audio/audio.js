@@ -33,24 +33,6 @@ let createUUID = () => [4, 2, 2, 2, 6].map(UUIDcreatePart).join('-')
 
 
 /**
- * 检测是否支持HTML5的audio播放
- * @param  {[type]} success [description]
- * @param  {[type]} fail    [description]
- * @return {[type]}         [description]
- */
-let supportAudio = (fail) => {
-    try {
-        var audio = new Audio("lib/data/support.mp3");
-        //如果错误
-        audio.addEventListener('error', function(e) {
-            audio = null;
-            fail()
-        }, false);
-    } catch (er) {}
-}
-
-
-/**
  * 使用PhoneGap的Media播放
  * @param  {string} url 路径
  * @return {[type]}      [description]
@@ -432,11 +414,6 @@ if (plat.isAndroid && !plat.isBrowser) {
     } else {
         audioPlayer = _Audio
     }
-    //2015.12.23
-    //如果不支持audio改用flash
-    // supportAudio(function() {
-    //     Xut.Audio = Flash;
-    // });
 }
 
 
