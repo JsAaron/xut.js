@@ -170,7 +170,7 @@ export default {
                 if (videoObj) {
                     videoObj.play()
                 } else {
-                    triggerVideo(chapterId, activityId, $(rootNode))
+                    triggerVideo(chapterId, activityId, rootNode)
                 }
             }
         }

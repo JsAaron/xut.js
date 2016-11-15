@@ -19,62 +19,79 @@ export function setStyle({
     opacityStart = 0 //透明度开始值
 }) {
     let style = {}
-    let effect = ''
+    let transformEffect = ''
     let x = 0
     let y = 0
     let z = 0
+    let translateZ
 
     //视觉差对象初始化偏移量
     let parallaxOffset = pageOffset
 
     //平移
-    if (property.translateX !== undefined
-        || property.translateY !== undefined
-        || property.translateZ !== undefined) {
+    let hasTranslateX = property.translateX !== undefined
+    let hasTranslateY = property.translateY !== undefined
+    let hasTranslateZ = property.translateZ !== undefined
+    if (hasTranslateX) {
         x = round(property.translateX) || 0
-        y = round(property.translateY) || 0
-        z = round(property.translateZ) || 0
         parallaxOffset += x
-        let translateZ = setTranslateZ(z)
-        effect += `translate(${parallaxOffset}px,${y}px) ${translateZ}`
+        transformEffect += `translateX(${parallaxOffset}px)`
     }
+    if (hasTranslateY) {
+        y = round(property.translateY) || 0
+        transformEffect += `translateY(${y}px)`
+    }
+    if (hasTranslateX || hasTranslateY || hasTranslateZ) {
+        z = round(property.translateZ) || 0
+        transformEffect += setTranslateZ(z)
+    }
+
 
     //旋转
-    if (property.rotateX !== undefined
-        || property.rotateY !== undefined
-        || property.rotateZ !== undefined) {
-        x = round(property.rotateX);
-        y = round(property.rotateY);
-        z = round(property.rotateZ);
-        effect += x ? 'rotateX(' + x + 'deg) ' : '';
-        effect += y ? 'rotateY(' + y + 'deg) ' : '';
-        effect += z ? 'rotateZ(' + z + 'deg) ' : '';
+    if (property.rotateX !== undefined) {
+        transformEffect += `rotateX(${round(property.rotateX)}deg)`
+    }
+    if (property.rotateY !== undefined) {
+        transformEffect += `rotateY(${round(property.rotateY)}deg)`
+    }
+    if (property.rotateZ !== undefined) {
+        transformEffect += `rotateZ(${round(property.rotateZ)}deg)`
     }
 
+
     //缩放
-    if (property.scaleX !== undefined
-        || property.scaleY !== undefined
-        || property.scaleZ !== undefined) {
-        x = round(property.scaleX * 100) / 100 || 1;
-        y = round(property.scaleY * 100) / 100 || 1;
-        z = round(property.scaleZ * 100) / 100 || 1;
-        effect += String.format('scale3d({0},{1},{2}) ', x, y, z);
+    if (property.scaleX !== undefined) {
+        x = round(property.scaleX * 100) / 100
+        transformEffect += `scaleX(${x})`
+    }
+    if (property.scaleY !== undefined) {
+        y = round(property.scaleY * 100) / 100
+        transformEffect += `scaleY(${y})`
+    }
+    if (property.scaleZ !== undefined) {
+        z = round(property.scaleZ * 100) / 100
+        transformEffect += `scaleZ(${z})`
     }
 
     //透明度
+    let hasOpacity = false
     if (property.opacity !== undefined) {
         if (action === 'init') {
             style.opacity = round((property.opacityStart + property.opacity) * 100) / 100;
+            hasOpacity = true
         }
         if (action === 'master') {
             style.opacity = round(property.opacity * 100) / 100 + opacityStart;
+            hasOpacity = true
         }
-        effect += ';'
     }
 
-    if (effect) {
-        style[transitionDuration] = speed + 'ms';
-        style[transform] = effect
+    //style可以单独设置opacity属性
+    if (transformEffect || hasOpacity) {
+        if (transformEffect) {
+            style[transitionDuration] = speed + 'ms';
+            style[transform] = transformEffect
+        }
         $contentNode && $contentNode.css(style)
     }
 
@@ -84,27 +101,82 @@ export function setStyle({
 
 
 /**
- * transform转化成相对应的偏移量
+ * 初始化元素属性
+ * @param  {[type]} parameters     [description]
+ * @param  {[type]} nodeProportion [description]
+ * @return {[type]}                [description]
  */
-export function converValue(property, distance, nodes) {
-    var temp = {},
-        i;
+export function getInitProperty(property, nodeOffsetProportion) {
+    var results = {},
+        width = -config.viewSize.width,
+        height = -config.viewSize.height;
 
-    for (i in property) {
-        switch (i) {
+    for (let key in property) {
+        switch (key) {
+            case 'scaleX':
+            case 'scaleY':
+            case 'scaleZ':
+                //缩放的初始值都为1
+                //或者等比变化值
+                results[key] = property[key] * nodeOffsetProportion || 1
+                break;
             case 'translateX':
             case 'translateZ':
-                temp[i] = distance * nodes * property[i];
+                results[key] = property[key] * nodeOffsetProportion * width;
                 break;
             case 'translateY':
-                temp[i] = distance * (config.viewSize.height / config.viewSize.width) * nodes * property[i]
+                results[key] = property[key] * nodeOffsetProportion * height;
                 break;
             case 'opacityStart':
-                temp[i] = property.opacityStart;
+                results[key] = property[key];
+                break;
+            default:
+                results[key] = property[key] * nodeOffsetProportion;
+        }
+    }
+
+    return results;
+}
+
+
+
+/**
+ * 转化属性值
+ */
+export function converProperty({
+    nodes,
+    distance,
+    initProperty,
+    originalProperty
+}) {
+    let temp = {}
+    let viewSize = config.viewSize
+    let viewWidth = viewSize.width
+    for (let key in originalProperty) {
+        switch (key) {
+            case 'scaleX':
+            case 'scaleY':
+            case 'scaleZ':
+            console.log(-1 * scaleRange * nodes * distance/viewWidth * originalProperty[key])
+                //缩放的范围区间
+                var scaleRange = originalProperty[key] - initProperty[key];
+                // console.log(distance/viewWidth)
+                //在指定范围区域，每次滑动的数据
+                temp[key] = -1 * scaleRange * nodes * distance/viewWidth
+                break;
+            case 'translateX':
+            case 'translateZ':
+                temp[key] = distance * nodes * originalProperty[key];
+                break;
+            case 'translateY':
+                temp[key] = distance * (config.viewSize.height / viewWidth) * nodes * originalProperty[key]
+                break;
+            case 'opacityStart':
+                temp[key] = originalProperty.opacityStart;
                 break;
             default:
                 //乘以-1是为了向右翻页时取值为正,位移不需这样做
-                temp[i] = -1 * distance / config.viewSize.width * property[i] * nodes;
+                temp[key] = -1 * distance / viewWidth * originalProperty[key] * nodes
         }
     }
     return temp;

@@ -214,7 +214,6 @@ export default class Flow {
          */
         const swipe = this.swipe = new Swipe({
             flipWidth: flipWidth,
-            borderBounce: true,
             linear: true,
             initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
             container,
@@ -347,15 +346,13 @@ export default class Flow {
                 const moveParallaxObject = () => {
                     let masterObj = flowObject._getMasterObj()
                     if (masterObj) {
-                        // console.log(distance,action)
                         //处理当前页面内的视觉差对象效果
                         masterObj.moveParallax({
                             action,
                             direction,
                             moveDist: viewBeHideDistance,
                             speed: speed,
-                            nodes: nodes[this._hindex]
-                                // parallaxProcessedContetns: this.parallaxProcessedContetns
+                            nodes: direction === 'next' ? nodes[this._hindex] : ''
                         })
                     }
                 }

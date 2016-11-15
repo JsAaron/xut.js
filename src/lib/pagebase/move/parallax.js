@@ -1,10 +1,9 @@
-
 import {
     flipMove,
     flipOver,
     flipRebound,
     overMemory,
-    converValue,
+    converProperty,
     setStyle
 } from '../../component/activity/content/parallax/util'
 
@@ -21,8 +20,8 @@ const translateParallax = function({
     distance
 }) {
 
-    let parameters = scope.parameters
     let initProperty = scope.initProperty
+    let originalProperty = scope.originalProperty
 
     //往前翻页
     if (direction === 'prev') {
@@ -32,7 +31,17 @@ const translateParallax = function({
         nodes = (nodes == nodes_1) ? 0 : nodes_1;
     }
 
-    let property = converValue(parameters, distance, nodes);
+
+    let property = converProperty({
+        nodes,
+        distance,
+        initProperty,
+        originalProperty
+    })
+
+    if($contentNode[0].id == 'Content_1_4'){
+        // console.log(property)
+    }
 
     switch (action) {
         case 'flipMove': //移动中
@@ -41,13 +50,27 @@ const translateParallax = function({
         case 'flipRebound': //反弹
             property = flipRebound(property, initProperty);
             break;
-        case 'flipOver': //翻页结束,记录上一页的坐标
+        case 'flipOver':
             if (direction === 'prev') {
                 property = flipOver(property, initProperty);
             }
+
+            //缩放特殊
+            //值需要从1开始算起
+            if (direction === 'next') {
+                if (property.scaleX) {
+                    property.scaleX = property.scaleX + (originalProperty.scaleX - initProperty.scaleX)
+                }
+                if (property.scaleY) {
+                    property.scaleY = property.scaleY + (originalProperty.scaleX - initProperty.scaleX)
+                }
+            }
+
+            //翻页结束,记录上一页的坐标
             overMemory(property, initProperty);
             break
     }
+
 
     //直接操作元素
     setStyle({
@@ -97,7 +120,6 @@ export default function(baseProto) {
                 if (scope.parallax) {
 
                     let $contentNode = scope.parallax.$contentNode;
-                    let contentObj = base.baseGetContentObject(scope.id)
 
                     /**
                      * 如果有这个动画效果
@@ -110,20 +132,24 @@ export default function(baseProto) {
                      * 然后给每一个视察对象打上对应的hack=>data-parallaxProcessed
                      * 通过动画回调在重新加载动画
                      */
-                    if (contentObj
-                        && action === "flipMove"
-                        && contentObj.pptObj //ppt动画
-                        && !contentObj.parallaxProcessed) {
-                        //标记
-                        let actName = contentObj.actName;
-                        contentObj.stopAnimations();
-                        //视觉差处理一次,停止过动画
-                        contentObj.parallaxProcessed = true;
-                        //增加标记
-                        $contentNode.attr('data-parallaxProcessed', actName);
-                        //记录
-                        parallaxProcessedContetns[actName] = contentObj
+                    if (parallaxProcessedContetns) {
+                        let contentObj = base.baseGetContentObject(scope.id)
+                        if (contentObj &&
+                            action === "flipMove" &&
+                            contentObj.pptObj && //ppt动画
+                            !contentObj.parallaxProcessed) {
+                            //标记
+                            let actName = contentObj.actName;
+                            contentObj.stopAnimations();
+                            //视觉差处理一次,停止过动画
+                            contentObj.parallaxProcessed = true;
+                            //增加标记
+                            $contentNode.attr('data-parallaxProcessed', actName);
+                            //记录
+                            parallaxProcessedContetns[actName] = contentObj
+                        }
                     }
+
 
                     //移动视觉差对象
                     translateParallax({

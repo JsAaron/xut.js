@@ -702,32 +702,30 @@ export default class Dispatcher {
      */
     _loadPage(action) {
 
-        let self = this
+        const _autoRun = () => {
+            this._autoRun({
+                'action': action
+            })
+        }
 
         //触发自动任务
-        let triggerAuto = function() {
+        let triggerAuto = () => {
             //第一次进入，处理背景
             let $cover = $(".xut-cover")
-            if ($cover.length) {
+            if ($cover.length) { //主动探测,只检查一次
                 $cover.transition({
                     opacity: 0,
                     duration: 1000,
                     easing: 'in',
                     complete() {
                         $cover && $cover.hide().remove()
-                        self._autoRun({
-                            'action': action
-                        })
                         $cover = null
-                        self = null
+                        _autoRun()
                     }
                 });
             } else {
-                self._autoRun({
-                    'action': action
-                })
+                _autoRun()
                 $cover = null
-                self = null
             }
         }
 

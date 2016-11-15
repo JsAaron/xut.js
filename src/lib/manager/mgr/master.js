@@ -14,7 +14,7 @@ import {
 
 import {
     overMemory,
-    converValue,
+    converProperty,
     setStyle
 } from '../../component/activity/content/parallax/util'
 
@@ -533,7 +533,6 @@ export default class MasterMgr extends Abstract {
 
         const repairNodes = function(parallax) {
             let rangePage = parallax.calculateRangePage()
-            let parameters = parallax.parameters
             let initProperty = parallax.initProperty
 
             if (targetIndex > currPageIndex) {
@@ -548,11 +547,15 @@ export default class MasterMgr extends Abstract {
                 }
             }
 
-            let property = converValue(parameters, -self.viewWidth, nodes);
+            let property = converProperty({
+                originalProperty: parallax.originalProperty,
+                distance: -self.viewWidth,
+                nodes: nodes
+            });
 
             //直接操作元素
             setStyle({
-                $contentNode:parallax.$contentNode,
+                $contentNode: parallax.$contentNode,
                 action: 'master',
                 property: property,
                 speed: 300,

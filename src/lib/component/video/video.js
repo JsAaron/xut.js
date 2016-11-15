@@ -20,12 +20,21 @@ let VideoPlayer = null
 
 
 /**
+ * 获取容器
+ * @return {[type]} [description]
+ */
+const getContainer = container => {
+    return container.children ? $(container.children) : $('body')
+}
+
+/**
  * 网页
  * @param {[type]} options [description]
  */
-let _WebPage = (options) => {
+const _WebPage = options => {
 
-    var pageUrl = options.pageUrl;
+    let pageUrl = options.pageUrl;
+    let container = getContainer(options.container)
 
     //跳转app市场
     //普通网页是1
@@ -60,7 +69,7 @@ let _WebPage = (options) => {
             '</div>' +
             '</div>');
 
-        options.container.append($videoNode);
+        container.append($videoNode);
     }
 
 
@@ -69,23 +78,21 @@ let _WebPage = (options) => {
         $videoNode && $videoNode.show();
     }
 
-    function stop() {
-        $videoNode && $videoNode.hide();
-    }
-
-    function close() {
-        if ($videoNode) {
-            $videoNode.remove();
-            $videoNode = null;
-        }
-    }
 
     play()
 
     return {
         play: play,
-        stop: stop,
-        close: close
+        stop() {
+            $videoNode && $videoNode.hide();
+        },
+        close() {
+            if ($videoNode) {
+                $videoNode.remove();
+                $videoNode = null;
+            }
+            container = null
+        }
     }
 }
 
@@ -95,7 +102,7 @@ let _WebPage = (options) => {
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-let webView = (options) => {
+const webView = options => {
     var width = options.width,
         height = options.height,
         pageUrl = options.pageUrl,
@@ -112,17 +119,15 @@ let webView = (options) => {
         }, 500);
     }
 
-    function close() {
-        Xut.Plugin.WebView.close();
-        Xut.openWebView = false;
-    }
-
     play()
 
     return {
         play: play,
         stop: close,
-        close: close
+        close() {
+            Xut.Plugin.WebView.close();
+            Xut.openWebView = false;
+        }
     }
 }
 
@@ -132,7 +137,7 @@ let webView = (options) => {
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-let _Media = (options) => {
+const _Media = options => {
 
     let width
     let height
@@ -185,6 +190,31 @@ let _Media = (options) => {
 }
 
 /**
+ * 创建视频容器
+ */
+const createVideoWrap = function({
+    type,
+    width,
+    height,
+    zIndex,
+    top,
+    left
+}) {
+    let wrap =
+        `<div data-type="${type}"
+              style="width:${width}px;
+                     height:${height}px;
+                     position:absolute;
+                     visibility:hidden;
+                     z-index:${zIndex};
+                     top:${top}px;
+                     left:${left}px;">
+         </div>`
+
+    return $(String.styleFormat(wrap))
+}
+
+/**
  *   html5的video播放器
  *   API :
  *   play();播放
@@ -194,26 +224,21 @@ let _Media = (options) => {
  *  var video = new Video({url:'1.mp4',width:'320',...});
  *  video.play();
  */
-let _Video5 = (options) => {
+const _Video5 = options => {
 
-    let container = options.container || $('body')
+    let container = getContainer(options.container)
     let url = config.getVideoPath() + options.url
     let width = options.width
     let height = options.height
-    let top = options.top
-    let left = options.left
-    let zIndex = options.zIndex
-    let videoWrap =
-        `<div style="width:${width}px;
-                     height:${height}px;
-                     position:absolute;
-                     visibility:hidden;
-                     z-index:${zIndex};
-                     top:${top}px;
-                     left:${left};px">
-         </div>`
 
-    let $videoWrap = $(String.styleFormat(videoWrap))
+    let $videoWrap = createVideoWrap({
+        type:'video-h5',
+        width,
+        height,
+        top: options.top,
+        left: options.left,
+        zIndex: options.zIndex
+    })
     let video = document.createElement('video')
     let $videoNode = $(video).css({
         width: width,
@@ -293,6 +318,7 @@ let _Video5 = (options) => {
         $videoWrap.remove()
         $videoNode = null
         $videoWrap = null
+        container = null
     }
 
     video.addEventListener('ended', clear, false)
@@ -319,32 +345,29 @@ let _Video5 = (options) => {
 }
 
 
-let _FlareVideo = function(options) {
-    let container = options.container || $('body')
+/**
+ * html5 and flash player
+ * @param  {[type]} options [description]
+ * @return {[type]}         [description]
+ */
+const _FlareVideo = function(options) {
+    let container = getContainer(options.container)
     let url = config.getVideoPath() + options.url
     let width = options.width
     let height = options.height
-    let top = options.top
-    let left = options.left
-    let zIndex = options.zIndex
 
-    let videoWrap =
-        `<div style="width:${width}px;
-                     height:${height}px;
-                     position:absolute;
-                     visibility:hidden;
-                     z-index:${zIndex};
-                     top:${top}px;
-                     left:${left};px">
-         </div>`
-
-    let $videoWrap = $(String.styleFormat(videoWrap))
-
-    let fv = $videoWrap.flareVideo({
+    let $videoWrap = createVideoWrap({
+        type:'video-flare',
         width,
         height,
-        autoplay:true,
-        flashSrc:'lib/data/FlareVideo.swf'
+        top: options.top,
+        left: options.left,
+        zIndex: options.zIndex
+    })
+
+    let fv = $videoWrap.flareVideo({
+        autoplay: true,
+        flashSrc: 'lib/data/FlareVideo.swf'
     })
     fv.load([{
         src: url,
@@ -354,15 +377,16 @@ let _FlareVideo = function(options) {
     container.append($videoWrap);
 
     return {
-        play: function(){
+        play: function() {
             fv.play()
         },
-        stop: function(){
+        stop: function() {
             fv.pause()
         },
-        close: function(){
+        close: function() {
             fv.remove()
             fv = null
+            container = null
         }
     }
 }
@@ -372,7 +396,7 @@ let _FlareVideo = function(options) {
 if (Xut.plat.isBrowser) {
     // 安卓妙妙学强制走h5
     // 由于原生H5控制条不显示的问题
-    // 这里用插件播放
+    // 这里用插件播放ch
     if (Xut.plat.isAndroid) {
         VideoPlayer = _FlareVideo
     } else {
@@ -401,7 +425,8 @@ if (Xut.plat.isBrowser) {
         }
     }
 }
-// VideoPlayer = _FlareVideo
+
+
 class VideoClass {
 
     constructor(options, container) {

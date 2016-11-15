@@ -187,7 +187,6 @@ export default class Swipe extends Observer {
             callback.move = this
             callback.transitionend = this
         }
-
         $$on(this.container, callback)
     }
 

@@ -7,7 +7,7 @@ import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 870.3
+Xut.Version = 870.5
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing

@@ -63,19 +63,26 @@ export function replacePath(svgstr) {
  * @param  {[type]} top    [description]
  * @return {[type]}        [description]
  */
-const transformProportion = function(width, height, left, top) {
-    var proportion = config.proportion;
+const converProportion = function({
+    width,
+    height,
+    left,
+    top,
+    padding
+}) {
+    let proportion = config.proportion;
     return {
-        width: width * proportion.width,
-        height: height * proportion.height,
-        left: left * proportion.left,
-        top: top * proportion.top
+        width: CEIL(width * proportion.width) || 0,
+        height: CEIL(height * proportion.height) || 0,
+        left: CEIL(left * proportion.left) || 0,
+        top: CEIL(top * proportion.top) || 0,
+        padding: CEIL(padding * proportion.width) || 0
     }
 }
 
 
-export function setProportion(width, height, left, top) {
-    return transformProportion(width, height, left, top)
+export function setProportion(...arg) {
+    return converProportion(...arg)
 }
 
 
@@ -86,21 +93,32 @@ export function setProportion(width, height, left, top) {
 export function reviseSize(results) {
 
     //不同设备下缩放比计算
-    const layerSize = transformProportion(results.width, results.height, results.left, results.top);
+    const layerSize = converProportion({
+        width: results.width,
+        height: results.height,
+        left: results.left,
+        top: results.top
+    })
+
     //新的背景图尺寸
-    const backSize = transformProportion(results.backwidth, results.backheight, results.backleft, results.backtop);
+    const backSize = converProportion({
+        width: results.backwidth,
+        height: results.backheight,
+        left: results.backleft,
+        top: results.backtop
+    })
 
     //赋值新的坐标
-    results.scaleWidth = CEIL(layerSize.width)
-    results.scaleHeight = CEIL(layerSize.height)
-    results.scaleLeft = CEIL(layerSize.left)
-    results.scaleTop = CEIL(layerSize.top)
+    results.scaleWidth = layerSize.width
+    results.scaleHeight = layerSize.height
+    results.scaleLeft = layerSize.left
+    results.scaleTop = layerSize.top
 
     //背景坐标
-    results.scaleBackWidth = CEIL(backSize.width)
-    results.scaleBackHeight = CEIL(backSize.height)
-    results.scaleBackLeft = CEIL(backSize.left)
-    results.scaleBackTop = CEIL(backSize.top)
+    results.scaleBackWidth = backSize.width
+    results.scaleBackHeight = backSize.height
+    results.scaleBackLeft = backSize.left
+    results.scaleBackTop = backSize.top
 
     return results
 }

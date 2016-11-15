@@ -328,7 +328,7 @@ export function initPathAddress() {
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
  * @type {[type]}
  */
-const setProportion = function(pptWidth, pptHeight) {
+const resetProportion = function(pptWidth, pptHeight) {
 
     //数据ppt排版设计
     if (pptWidth && pptHeight) {
@@ -413,5 +413,5 @@ export function initConfig(pptWidth, pptHeight) {
     /**
      * 设置缩放比
      */
-    setProportion(pptWidth, pptHeight)
+    resetProportion(pptWidth, pptHeight)
 }

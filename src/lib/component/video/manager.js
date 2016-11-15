@@ -3,6 +3,7 @@
 */
 import { VideoClass } from './video'
 import { config } from '../../config/index'
+import { setProportion } from '../../util/option'
 
 let pageBox
 let playBox
@@ -26,16 +27,24 @@ let deployVideo = (data, pageId, activityId) => {
 
     let proportion = config.proportion
 
+    let layerSize = setProportion({
+        width: data.width || config.viewSize.width,
+        height: data.height || config.viewSize.height,
+        left: data.left,
+        top: data.top,
+        padding: data.padding
+    })
+
     let videoInfo = {
         'pageId': pageId,
         'videoId': activityId,
         'url': data.md5,
         'pageUrl': data.url,
-        'left': data.left * proportion.left || 0,
-        'top': data.top * proportion.top || 0,
-        'width': data.width * proportion.width || config.viewSize.width,
-        'height': data.height * proportion.height || config.viewSize.height,
-        'padding': data.padding * proportion.left || 0,
+        'left': layerSize.left,
+        'top': layerSize.top,
+        'width': layerSize.width,
+        'height': layerSize.height,
+        'padding': layerSize.padding,
         'zIndex': data.zIndex || 2147483647,
         'background': data.background,
         'category': data.category,

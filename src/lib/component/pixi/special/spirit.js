@@ -61,7 +61,12 @@ export class spiritAni {
      */
     setContainer() {
         //尺寸
-        var proportion = setProportion(this.data.width, this.data.height, this.imageList[0].X, this.imageList[0].Y)
+        var proportion = setProportion({
+            width: this.data.width,
+            height: this.data.height,
+            left: this.imageList[0].X,
+            top: this.imageList[0].Y
+        })
         this.spiritWidth = parseInt(proportion.width);
         this.spiritHeight = parseInt(proportion.height);
         this.canvasEl.width = this.spiritWidth;
