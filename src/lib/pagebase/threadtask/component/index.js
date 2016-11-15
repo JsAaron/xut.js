@@ -74,10 +74,8 @@ TaskComponents.prototype = {
                 case 'Action':
                 case 'Widget':
                 case 'Audio':
-                case 'Video':
-
                     //缩放比
-                    activityData = reviseSize(activityData);
+                    activityData = reviseSize(activityData, data.getStyle.isFlows);
 
                     startCreate(actType, activityData)
                     break;

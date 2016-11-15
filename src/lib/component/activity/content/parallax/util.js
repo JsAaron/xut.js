@@ -154,16 +154,16 @@ export function converProperty({
     let viewWidth = viewSize.width
     for (let key in originalProperty) {
         switch (key) {
-            case 'scaleX':
-            case 'scaleY':
-            case 'scaleZ':
-            console.log(-1 * scaleRange * nodes * distance/viewWidth * originalProperty[key])
-                //缩放的范围区间
-                var scaleRange = originalProperty[key] - initProperty[key];
-                // console.log(distance/viewWidth)
-                //在指定范围区域，每次滑动的数据
-                temp[key] = -1 * scaleRange * nodes * distance/viewWidth
-                break;
+            // case 'scaleX':
+            // case 'scaleY':
+            // case 'scaleZ':
+            // // console.log(-1 * scaleRange * nodes * distance/viewWidth * originalProperty[key])
+            //     //缩放的范围区间
+            //     var scaleRange = originalProperty[key] - initProperty[key];
+            //     // console.log(distance/viewWidth)
+            //     //在指定范围区域，每次滑动的数据
+            //     temp[key] = -1 * scaleRange * nodes * distance/viewWidth
+            //     break;
             case 'translateX':
             case 'translateZ':
                 temp[key] = distance * nodes * originalProperty[key];

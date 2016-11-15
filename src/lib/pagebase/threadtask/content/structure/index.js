@@ -178,7 +178,7 @@ export default function structure(callback, data, context) {
      * 容器结构创建
      */
     if (containerRelated && containerRelated.length) {
-        containerObj = createContainer(containerRelated, pid);
+        containerObj = createContainer(containerRelated, pid, data.getStyle.isFlows);
     }
 
 
@@ -282,7 +282,7 @@ export default function structure(callback, data, context) {
                 contentHtmlBoxIds.push(contentId)
             }
             //转换缩放比
-            sizeResults = reviseSize(wrapObj.data);
+            sizeResults = reviseSize(wrapObj.data, data.getStyle.isFlows);
 
             //正常模式下创建
             startCreate(wrapObj, content, contentId)

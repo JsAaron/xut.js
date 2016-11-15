@@ -178,7 +178,8 @@ export default {
             'chapterId': baseData['_id'],
             'pid': base.pid,
             'pageType': base.pageType,
-            'virtualOffset': base.virtualOffset
+            'virtualOffset': base.virtualOffset,
+            'getStyle': base.getStyle
         }, suspendCallback, successCallback);
     },
 

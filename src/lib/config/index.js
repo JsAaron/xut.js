@@ -20,7 +20,8 @@ import getViewSize from '../visuals/view.config'
 
 import {
     getFullProportion,
-    getRealProportion
+    getRealProportion,
+    getFlowProportion
 } from '../visuals/proportion.config'
 
 /**
@@ -384,6 +385,16 @@ const resetProportion = function(pptWidth, pptHeight) {
      * @type {[type]}
      */
     proportion = config.proportion = getRealProportion(config, viewSize, fullProportion)
+
+    /**
+     * 2016.11.15
+     * 浮动页面缩放比
+     * 获取浮动页面缩放比
+     * 这个比较特殊
+     * 在模式3下面
+     * 母版是依赖的页面，如果页面是flow那么母版中的元素的缩放比需要调整
+     */
+    config.flowProportion = getFlowProportion(config, config.screenSize, fullProportion)
 }
 
 

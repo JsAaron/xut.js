@@ -68,9 +68,10 @@ const converProportion = function({
     height,
     left,
     top,
-    padding
+    padding,
+    hasFlow //这个很关键，这个是针对flow类型页面处理，因为模式3的情况导致母版的缩放比错误
 }) {
-    let proportion = config.proportion;
+    let proportion = hasFlow ? config.flowProportion : config.proportion;
     return {
         width: CEIL(width * proportion.width) || 0,
         height: CEIL(height * proportion.height) || 0,
@@ -88,12 +89,14 @@ export function setProportion(...arg) {
 
 /*
  * 修复元素的尺寸
+ * hasFlow页面额外用全屏的分辨率修正
  * @type {[type]}
  */
-export function reviseSize(results) {
+export function reviseSize(results, hasFlow) {
 
     //不同设备下缩放比计算
     const layerSize = converProportion({
+        hasFlow,
         width: results.width,
         height: results.height,
         left: results.left,
@@ -102,6 +105,7 @@ export function reviseSize(results) {
 
     //新的背景图尺寸
     const backSize = converProportion({
+        hasFlow,
         width: results.backwidth,
         height: results.backheight,
         left: results.backleft,

@@ -39,9 +39,9 @@ const translateParallax = function({
         originalProperty
     })
 
-    if($contentNode[0].id == 'Content_1_4'){
-        // console.log(property)
-    }
+    // if($contentNode[0].id == 'Content_1_4'){
+    //     // console.log(property)
+    // }
 
     switch (action) {
         case 'flipMove': //移动中
@@ -57,14 +57,14 @@ const translateParallax = function({
 
             //缩放特殊
             //值需要从1开始算起
-            if (direction === 'next') {
-                if (property.scaleX) {
-                    property.scaleX = property.scaleX + (originalProperty.scaleX - initProperty.scaleX)
-                }
-                if (property.scaleY) {
-                    property.scaleY = property.scaleY + (originalProperty.scaleX - initProperty.scaleX)
-                }
-            }
+            // if (direction === 'next') {
+            //     if (property.scaleX) {
+            //         property.scaleX = property.scaleX + (originalProperty.scaleX - initProperty.scaleX)
+            //     }
+            //     if (property.scaleY) {
+            //         property.scaleY = property.scaleY + (originalProperty.scaleX - initProperty.scaleX)
+            //     }
+            // }
 
             //翻页结束,记录上一页的坐标
             overMemory(property, initProperty);

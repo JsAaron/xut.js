@@ -39,6 +39,16 @@ export function getFullProportion(config, pptWidth, pptHeight) {
     }
 }
 
+/**
+ * 获取浮动页面缩放比
+ * 这个比较特殊
+ * 在模式3下面
+ * 母版是依赖的页面，如果页面是flow那么母版中的元素的缩放比需要调整
+ * config, viewSize, fullProportion
+ */
+export function getFlowProportion(...arg) {
+    return getRealProportion(...arg)
+}
 
 /**
  * 计算真正的缩放比
