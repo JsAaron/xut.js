@@ -13,8 +13,8 @@ import {
 } from '../../command/index'
 
 import {
-    overMemory,
-    converProperty,
+    cacheProperty,
+    getStepProperty,
     setStyle
 } from '../../component/activity/content/parallax/util'
 
@@ -533,7 +533,7 @@ export default class MasterMgr extends Abstract {
 
         const repairNodes = function(parallax) {
             let rangePage = parallax.calculateRangePage()
-            let initProperty = parallax.initProperty
+            let lastProperty = parallax.lastProperty
 
             if (targetIndex > currPageIndex) {
                 //next
@@ -547,7 +547,7 @@ export default class MasterMgr extends Abstract {
                 }
             }
 
-            let property = converProperty({
+            let property = getStepProperty({
                 originalProperty: parallax.originalProperty,
                 distance: -self.viewWidth,
                 nodes: nodes
@@ -559,10 +559,10 @@ export default class MasterMgr extends Abstract {
                 action: 'master',
                 property: property,
                 speed: 300,
-                opacityStart: initProperty.opacityStart
+                opacityStart: lastProperty.opacityStart
             })
 
-            overMemory(property, initProperty);
+            cacheProperty(property, lastProperty);
         }
 
 

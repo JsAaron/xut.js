@@ -139,59 +139,51 @@ export function getInitProperty(property, nodeOffsetProportion) {
 }
 
 
-
 /**
- * 转化属性值
+ * 获取属性单步变化的比值
  */
-export function converProperty({
+export function getStepProperty({
     nodes,
+    isFlows,
     distance,
-    initProperty,
+    lastProperty,
     originalProperty
 }) {
     let temp = {}
-    let viewSize = config.viewSize
-    let viewWidth = viewSize.width
+    //这里有页面模式的配置处理
+    //获取的页面翻页的区域值不一样
+    let size = isFlows ? config.screenSize : config.viewSize
+    let width = size.width
+    let height = size.height
     for (let key in originalProperty) {
         switch (key) {
-            // case 'scaleX':
-            // case 'scaleY':
-            // case 'scaleZ':
-            // // console.log(-1 * scaleRange * nodes * distance/viewWidth * originalProperty[key])
-            //     //缩放的范围区间
-            //     var scaleRange = originalProperty[key] - initProperty[key];
-            //     // console.log(distance/viewWidth)
-            //     //在指定范围区域，每次滑动的数据
-            //     temp[key] = -1 * scaleRange * nodes * distance/viewWidth
-            //     break;
             case 'translateX':
             case 'translateZ':
                 temp[key] = distance * nodes * originalProperty[key];
                 break;
             case 'translateY':
-                temp[key] = distance * (config.viewSize.height / viewWidth) * nodes * originalProperty[key]
+                temp[key] = distance * (height / width) * nodes * originalProperty[key]
                 break;
             case 'opacityStart':
                 temp[key] = originalProperty.opacityStart;
                 break;
             default:
                 //乘以-1是为了向右翻页时取值为正,位移不需这样做
-                temp[key] = -1 * distance / viewWidth * originalProperty[key] * nodes
+                temp[key] = -1 * distance / width * originalProperty[key] * nodes
         }
     }
     return temp;
 }
 
 
-
 /**
  * 移动叠加值
  */
 export function flipMove(property, repairProperty) {
-    var temp = {};
-    var start = property.opacityStart;
-    for (var i in property) {
-        temp[i] = property[i] + repairProperty[i];
+    let temp = {};
+    let start = property.opacityStart;
+    for (let i in property) { //叠加值
+        temp[i] = property[i] + repairProperty[i]
     }
     if (start > -1) {
         temp.opacityStart = start;
@@ -223,7 +215,7 @@ export function flipRebound(property, repairProperty) {
 /**
  * 结束后缓存上一个记录
  */
-export function overMemory(property, repairProperty) {
+export function cacheProperty(property, repairProperty) {
     for (var i in property) {
         repairProperty[i] = property[i];
     }

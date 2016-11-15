@@ -143,7 +143,7 @@
          * phonegap
          * @type {Boolean}
          */
-        hasPlugin:false,
+        hasPlugin: false,
 
         /**
          * 不能自动播放媒体
@@ -189,7 +189,7 @@
          * @param  {[type]} original [description]
          * @return {[type]}          [description]
          */
-            evtTarget: function(event, original) {
+        evtTarget: function(event, original) {
             var currTouches = null;
             if (SUPPORT_ONLY_TOUCH) {
                 currTouches = event.touches;

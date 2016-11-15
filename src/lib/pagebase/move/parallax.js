@@ -2,8 +2,9 @@ import {
     flipMove,
     flipOver,
     flipRebound,
-    overMemory,
-    converProperty,
+    cacheProperty,
+    getStepProperty,
+    setFlipOverScale,
     setStyle
 } from '../../component/activity/content/parallax/util'
 
@@ -17,10 +18,11 @@ const translateParallax = function({
     action,
     speed,
     nodes,
-    distance
+    distance,
+    isFlows
 }) {
 
-    let initProperty = scope.initProperty
+    let lastProperty = scope.lastProperty
     let originalProperty = scope.originalProperty
 
     //往前翻页
@@ -31,54 +33,54 @@ const translateParallax = function({
         nodes = (nodes == nodes_1) ? 0 : nodes_1;
     }
 
-
-    let property = converProperty({
+    //每次单步变化属性值
+    let stepProperty = getStepProperty({
         nodes,
+        isFlows,
         distance,
-        initProperty,
+        lastProperty,
         originalProperty
     })
 
-    // if($contentNode[0].id == 'Content_1_4'){
-    //     // console.log(property)
-    // }
-
     switch (action) {
         case 'flipMove': //移动中
-            property = flipMove(property, initProperty);
+            stepProperty = flipMove(stepProperty, lastProperty)
             break;
         case 'flipRebound': //反弹
-            property = flipRebound(property, initProperty);
+            stepProperty = flipRebound(stepProperty, lastProperty)
             break;
         case 'flipOver':
             if (direction === 'prev') {
-                property = flipOver(property, initProperty);
+                stepProperty = flipOver(stepProperty, lastProperty)
             }
 
-            //缩放特殊
-            //值需要从1开始算起
-            // if (direction === 'next') {
-            //     if (property.scaleX) {
-            //         property.scaleX = property.scaleX + (originalProperty.scaleX - initProperty.scaleX)
-            //     }
-            //     if (property.scaleY) {
-            //         property.scaleY = property.scaleY + (originalProperty.scaleX - initProperty.scaleX)
-            //     }
+            // if (stepProperty.scaleX !== undefined) {
+            //     stepProperty.scaleX += 1
+            // }
+            // if (stepProperty.scaleY !== undefined) {
+            //     stepProperty.scaleY += 1
             // }
 
             //翻页结束,记录上一页的坐标
-            overMemory(property, initProperty);
+            cacheProperty(stepProperty, lastProperty)
             break
     }
+
+
+
+    if ($contentNode[0].id === 'Content_0_1') {
+        // console.log(stepProperty)
+    }
+
 
 
     //直接操作元素
     setStyle({
         $contentNode,
         action: 'master',
-        property: property,
+        property: stepProperty,
         speed: speed,
-        opacityStart: initProperty.opacityStart
+        opacityStart: lastProperty.opacityStart
     })
 
 }
@@ -109,6 +111,9 @@ export default function(baseProto) {
         if (!baseContents) {
             return
         }
+
+        //是flow页面，那么翻页的参数需要转化
+        let isFlows = base.getStyle.isFlows
 
         //移动距离
         let distance = moveDist.length ? moveDist[1] : moveDist
@@ -150,7 +155,6 @@ export default function(baseProto) {
                         }
                     }
 
-
                     //移动视觉差对象
                     translateParallax({
                         $contentNode,
@@ -159,7 +163,8 @@ export default function(baseProto) {
                         action,
                         speed,
                         nodes,
-                        distance
+                        distance,
+                        isFlows
                     })
 
                 }

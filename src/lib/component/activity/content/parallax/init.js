@@ -68,10 +68,6 @@ export default function Parallax(data, relatedData) {
         return
     }
 
-    if(originalProperty.scaleX){
-        originalProperty.scaleX = 3
-    }
-
     originalProperty = converParameters(originalProperty)
 
     let pid = data.pid
@@ -81,7 +77,6 @@ export default function Parallax(data, relatedData) {
 
     //如果是flow页面，拿到分页数
     let pageRange = hasFlow() && getFlowFange(data.pageIndex)
-
     if (pageRange) {
         let visualIndex = Xut.Presentation.GetPageIndex()
         if (data.pageIndex == visualIndex || data.pageIndex > visualIndex) {
@@ -100,19 +95,21 @@ export default function Parallax(data, relatedData) {
         pageRange = parseInt(pageOffset[1])
     }
 
+
     //页面偏移比例
     let nodeOffsetProportion = (currPageOffset - 1) / (pageRange - 1) || 0
 
     //计算出新的新的值
-    let initProperty = getInitProperty(originalProperty, nodeOffsetProportion)
+    let lastProperty = getInitProperty(originalProperty, nodeOffsetProportion)
 
     //页面分割比
     let nodeProportion = 1 / (pageRange - 1)
 
     //初始化视觉差对象的坐标偏移量
     let transformOffset = relatedData.getTransformOffset(data.id)
-    let parallaxOffset = setTransformNodes(data.$contentNode, initProperty, transformOffset)
-// console.log(initProperty,originalProperty)
+    let parallaxOffset = setTransformNodes(data.$contentNode, lastProperty, transformOffset)
+
+
     /**
      * 为了兼容动画，把视觉差当作一种行为处理
      * 合并data数据
@@ -130,7 +127,7 @@ export default function Parallax(data, relatedData) {
             }
         },
         originalProperty, //原始属性
-        initProperty,//初始化属性
+        lastProperty,//最后一个属性值
         nodeProportion,
         /**
          * 经过视觉差修正后的偏移量
