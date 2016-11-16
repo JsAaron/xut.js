@@ -7,7 +7,7 @@ import { parseJSON } from '../../../../util/lang'
 import {
     setStyle,
     getInitProperty
-} from './util'
+} from './calculate'
 
 import {
     hasFlow,
@@ -97,13 +97,13 @@ export default function Parallax(data, relatedData) {
 
 
     //页面偏移比例
-    let nodeOffsetProportion = (currPageOffset - 1) / (pageRange - 1) || 0
+    let nodeOffset = (currPageOffset - 1) / (pageRange - 1) || 0
 
     //计算出新的新的值
-    let lastProperty = getInitProperty(originalProperty, nodeOffsetProportion)
+    let lastProperty = getInitProperty(originalProperty, nodeOffset)
 
     //页面分割比
-    let nodeProportion = 1 / (pageRange - 1)
+    let nodeRatio = 1 / (pageRange - 1)
 
     //初始化视觉差对象的坐标偏移量
     let transformOffset = relatedData.getTransformOffset(data.id)
@@ -127,12 +127,9 @@ export default function Parallax(data, relatedData) {
             }
         },
         originalProperty, //原始属性
-        lastProperty,//最后一个属性值
-        nodeProportion,
-        /**
-         * 经过视觉差修正后的偏移量
-         */
-        parallaxOffset
+        lastProperty, //最后一个属性值
+        nodeRatio, //比值
+        parallaxOffset //经过视觉差修正后的偏移量
     }
 
 

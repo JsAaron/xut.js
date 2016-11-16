@@ -1,10 +1,10 @@
-import defaultContainer from './adapter/container.type'
+import defaultContainer from './hooks/container.hook'
 import Stack from '../util/stack'
 
 import {
     getFlowView,
     setFlowTranslate
-} from './adapter/adapter.type'
+} from './hooks/adapter'
 
 /**
  * 自定义样式页面容器的样式

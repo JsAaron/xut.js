@@ -1,7 +1,7 @@
 import { sceneController } from './scenario/controller'
 import { clearAudio } from './component/audio/manager'
 import { clearVideo } from './component/video/manager'
-import { adapterDestory } from './visuals/adapter/adapter.type'
+import { adapterDestory } from './visuals/hooks/adapter'
 import { destroyFixAudio } from './component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
 import { destroyConfig } from './config/index'

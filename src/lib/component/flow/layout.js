@@ -1,6 +1,6 @@
 import { config } from '../../config/index'
 import {set } from './get'
-import { getFlowView } from '../../visuals/adapter/adapter.type'
+import { getFlowView } from '../../visuals/hooks/adapter'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap

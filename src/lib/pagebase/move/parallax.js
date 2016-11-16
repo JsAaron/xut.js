@@ -6,7 +6,7 @@ import {
     getStepProperty,
     setFlipOverScale,
     setStyle
-} from '../../component/activity/content/parallax/util'
+} from '../../component/activity/content/parallax/calculate'
 
 /**
  * 移动视觉差对象
@@ -28,9 +28,10 @@ const translateParallax = function({
     //往前翻页
     if (direction === 'prev') {
         //分割的比例
-        let nodes_1 = scope.nodeProportion;
+        let nodeRatio = scope.nodeRatio
+
         //如果往前溢出则取0
-        nodes = (nodes == nodes_1) ? 0 : nodes_1;
+        nodes = (nodes == nodeRatio) ? 0 : nodeRatio
     }
 
     //每次单步变化属性值

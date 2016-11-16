@@ -57,7 +57,6 @@ TaskComponents.prototype = {
             ));
         }
 
-
         //需要创建的数据结构
         createWidgets.forEach(function(activityData, index) {
 
@@ -74,9 +73,9 @@ TaskComponents.prototype = {
                 case 'Action':
                 case 'Widget':
                 case 'Audio':
+                case 'Video':
                     //缩放比
                     activityData = reviseSize(activityData, data.getStyle.isFlows);
-
                     startCreate(actType, activityData)
                     break;
             }

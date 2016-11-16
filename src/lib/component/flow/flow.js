@@ -5,7 +5,7 @@ import Swipe from '../../swipe/index'
 import render from './render'
 
 import getFlipDistance from '../../visuals/distance.config'
-import { getFlowView } from '../../visuals/adapter/adapter.type'
+import { getFlowView } from '../../visuals/hooks/adapter'
 
 import PinchPan from '../../plugin/extend/pinch.pan'
 import closeButton from '../../plugin/extend/close.button'
@@ -174,9 +174,9 @@ export default class Flow {
     //   0
     _makeNodes(count) {
         let nodes = []
-        let nodeProportion = 1 / (count - 1) //比值
+        let ratio = 1 / (count - 1) //比值
         for (let i = 1; i < count; i++) {
-            nodes.push(i * nodeProportion)
+            nodes.push(i * ratio)
         }
         nodes.push(0)
         return nodes

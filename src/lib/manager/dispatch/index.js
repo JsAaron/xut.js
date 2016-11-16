@@ -14,7 +14,7 @@ import MasterMgr from '../mgr/master'
 import goToPage from './goto'
 import { sceneController } from '../../scenario/controller'
 
-import { getFlowDistance } from '../../visuals/adapter/adapter.type'
+import { getFlowDistance } from '../../visuals/hooks/adapter'
 import getFlipDistance from '../../visuals/distance.config'
 import containerStyle from '../../visuals/container.config'
 

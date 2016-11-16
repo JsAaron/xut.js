@@ -16,7 +16,7 @@ import {
     cacheProperty,
     getStepProperty,
     setStyle
-} from '../../component/activity/content/parallax/util'
+} from '../../component/activity/content/parallax/calculate'
 
 import { config } from '../../config/index'
 

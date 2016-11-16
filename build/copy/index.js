@@ -7,7 +7,7 @@ const createRE = require('./filter')
 
 const src = '.'
 const dists = [
-    '/Users/mac/project/git/es6-magazine/',
+    '/Users/mac/project/git/Xut/',
     '/Users/mac/project/svn/server/magazine-develop/www/'
 ]
 

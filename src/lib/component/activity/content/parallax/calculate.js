@@ -102,11 +102,8 @@ export function setStyle({
 
 /**
  * 初始化元素属性
- * @param  {[type]} parameters     [description]
- * @param  {[type]} nodeProportion [description]
- * @return {[type]}                [description]
  */
-export function getInitProperty(property, nodeOffsetProportion) {
+export function getInitProperty(property, nodeOffset) {
     var results = {},
         width = -config.viewSize.width,
         height = -config.viewSize.height;
@@ -118,20 +115,20 @@ export function getInitProperty(property, nodeOffsetProportion) {
             case 'scaleZ':
                 //缩放的初始值都为1
                 //或者等比变化值
-                results[key] = property[key] * nodeOffsetProportion || 1
+                results[key] = property[key] * nodeOffset || 1
                 break;
             case 'translateX':
             case 'translateZ':
-                results[key] = property[key] * nodeOffsetProportion * width;
+                results[key] = property[key] * nodeOffset * width;
                 break;
             case 'translateY':
-                results[key] = property[key] * nodeOffsetProportion * height;
+                results[key] = property[key] * nodeOffset * height;
                 break;
             case 'opacityStart':
                 results[key] = property[key];
                 break;
             default:
-                results[key] = property[key] * nodeOffsetProportion;
+                results[key] = property[key] * nodeOffset;
         }
     }
 
