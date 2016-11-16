@@ -113,9 +113,10 @@ export function getInitProperty(property, nodeOffset) {
             case 'scaleX':
             case 'scaleY':
             case 'scaleZ':
-                //缩放的初始值都为1
-                //或者等比变化值
-                results[key] = property[key] * nodeOffset
+                //缩放是从1开始
+                //变化值是property[key] - 1
+                //然后用nodeOffset处理，算出比值
+                results[key] = 1 + (property[key] - 1) * nodeOffset
                 break;
             case 'translateX':
             case 'translateZ':
@@ -144,7 +145,7 @@ export function getStepProperty({
     isFlows,
     distance,
     lastProperty,
-    originalProperty
+    targetProperty
 }) {
     let temp = {}
 
@@ -153,21 +154,26 @@ export function getStepProperty({
     let size = isFlows ? config.screenSize : config.viewSize
     let width = size.width
     let height = size.height
-    for (let key in originalProperty) {
+    for (let key in targetProperty) {
         switch (key) {
+            case 'scaleX':
+            case 'scaleY':
+            case 'scaleZ':
+                temp[key] = -1 * distance / width * (targetProperty[key] - 1) * nodes
+                break;
             case 'translateX':
             case 'translateZ':
-                temp[key] = distance * nodes * originalProperty[key]
+                temp[key] = distance * nodes * targetProperty[key]
                 break;
             case 'translateY':
-                temp[key] = distance * (height / width) * nodes * originalProperty[key]
+                temp[key] = distance * (height / width) * nodes * targetProperty[key]
                 break;
             case 'opacityStart':
-                temp[key] = originalProperty.opacityStart;
+                temp[key] = targetProperty.opacityStart;
                 break;
             default:
                 //乘以-1是为了向右翻页时取值为正,位移不需这样做
-                temp[key] = -1 * distance / width * originalProperty[key] * nodes
+                temp[key] = -1 * distance / width * targetProperty[key] * nodes
         }
     }
     return temp

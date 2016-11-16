@@ -548,7 +548,7 @@ export default class MasterMgr extends Abstract {
             }
 
             let property = getStepProperty({
-                originalProperty: parallax.originalProperty,
+                targetProperty: parallax.targetProperty,
                 distance: -self.viewWidth,
                 nodes: nodes
             });

@@ -32,11 +32,11 @@ const setTransformNodes = function($contentNode, property, pageOffset) {
 
 
 /**
- * 转换成比例值
+ * 转换属性
  * @param  {[type]} parameters [description]
  * @return {[type]}            [description]
  */
-const converParameters = function(property) {
+const converProperty = function(property) {
     if (property.opacityStart > -1) {
         property.opacity = (property.opacityEnd || 1) - property.opacityStart;
         delete property.opacityEnd;
@@ -63,12 +63,12 @@ const getFlowFange = function(pageIndex) {
 export default function Parallax(data, relatedData) {
 
     //转化所有css特效的参数的比例
-    let originalProperty = parseJSON(data.getParameter()[0]['parameter'])
-    if (!originalProperty) {
+    let targetProperty = parseJSON(data.getParameter()[0]['parameter'])
+    if (!targetProperty) {
         return
     }
 
-    originalProperty = converParameters(originalProperty)
+    targetProperty = converProperty(targetProperty)
 
     let pid = data.pid
 
@@ -100,7 +100,7 @@ export default function Parallax(data, relatedData) {
     let nodeOffset = (currPageOffset - 1) / (pageRange - 1) || 0
 
     //计算出新的新的值
-    let lastProperty = getInitProperty(originalProperty, nodeOffset)
+    let lastProperty = getInitProperty(targetProperty, nodeOffset)
 
     //页面分割比
     let nodeRatio = 1 / (pageRange - 1)
@@ -108,7 +108,6 @@ export default function Parallax(data, relatedData) {
     //初始化视觉差对象的坐标偏移量
     let transformOffset = relatedData.getTransformOffset(data.id)
     let parallaxOffset = setTransformNodes(data.$contentNode, lastProperty, transformOffset)
-
 
     /**
      * 为了兼容动画，把视觉差当作一种行为处理
@@ -127,9 +126,9 @@ export default function Parallax(data, relatedData) {
             }
         },
         /**
-         * 原始属性
+         * 目标属性
          */
-        originalProperty,
+        targetProperty,
         /**
          * 最后一个属性值
          */

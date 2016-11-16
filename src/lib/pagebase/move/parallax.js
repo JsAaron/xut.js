@@ -23,7 +23,7 @@ const translateParallax = function({
 }) {
 
     let lastProperty = scope.lastProperty
-    let originalProperty = scope.originalProperty
+    let targetProperty = scope.targetProperty
 
     //往前翻页
     if (direction === 'prev') {
@@ -40,7 +40,7 @@ const translateParallax = function({
         isFlows,
         distance,
         lastProperty,
-        originalProperty
+        targetProperty
     })
 
     switch (action) {
@@ -54,6 +54,22 @@ const translateParallax = function({
             if (direction === 'prev') {
                 stepProperty = flipOver(stepProperty, lastProperty)
             }
+
+            //缩放单独处理
+            //因为缩放是从1开始的
+            //所以每次计算出单步的值后，需要叠加原始的值1
+            if(direction === 'next'){
+                if(stepProperty.scaleX !== undefined){
+                    stepProperty.scaleX = stepProperty.scaleX + 1
+                }
+                if(stepProperty.scaleY !== undefined){
+                    stepProperty.scaleY = stepProperty.scaleY + 1
+                }
+                if(stepProperty.scaleZ !== undefined){
+                    stepProperty.scaleZ = stepProperty.scaleZ + 1
+                }
+            }
+
             //翻页结束,记录上一页的坐标
             cacheProperty(stepProperty, lastProperty)
             break
