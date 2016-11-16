@@ -115,7 +115,7 @@ export function getInitProperty(property, nodeOffset) {
             case 'scaleZ':
                 //缩放的初始值都为1
                 //或者等比变化值
-                results[key] = property[key] * nodeOffset || 1
+                results[key] = property[key] * nodeOffset
                 break;
             case 'translateX':
             case 'translateZ':
@@ -147,6 +147,7 @@ export function getStepProperty({
     originalProperty
 }) {
     let temp = {}
+
     //这里有页面模式的配置处理
     //获取的页面翻页的区域值不一样
     let size = isFlows ? config.screenSize : config.viewSize
@@ -156,7 +157,7 @@ export function getStepProperty({
         switch (key) {
             case 'translateX':
             case 'translateZ':
-                temp[key] = distance * nodes * originalProperty[key];
+                temp[key] = distance * nodes * originalProperty[key]
                 break;
             case 'translateY':
                 temp[key] = distance * (height / width) * nodes * originalProperty[key]
@@ -169,18 +170,18 @@ export function getStepProperty({
                 temp[key] = -1 * distance / width * originalProperty[key] * nodes
         }
     }
-    return temp;
+    return temp
 }
 
 
 /**
  * 移动叠加值
  */
-export function flipMove(property, repairProperty) {
+export function flipMove(stepProperty, lastProperty) {
     let temp = {};
-    let start = property.opacityStart;
-    for (let i in property) { //叠加值
-        temp[i] = property[i] + repairProperty[i]
+    let start = stepProperty.opacityStart;
+    for (let i in stepProperty) { //叠加值
+        temp[i] = stepProperty[i] + lastProperty[i]
     }
     if (start > -1) {
         temp.opacityStart = start;
@@ -192,18 +193,18 @@ export function flipMove(property, repairProperty) {
 /**
  * 翻页结束
  */
-export function flipOver(property, repairProperty) {
-    return flipMove(property, repairProperty);
+export function flipOver(...arg) {
+    return flipMove(...arg)
 }
 
 
 /**
  * 反弹
  */
-export function flipRebound(property, repairProperty) {
+export function flipRebound(stepProperty, lastProperty) {
     var temp = {};
-    for (var i in property) {
-        temp[i] = repairProperty[i] || property[i];
+    for (var i in stepProperty) {
+        temp[i] = lastProperty[i] || stepProperty[i];
     }
     return temp;
 }
@@ -212,8 +213,8 @@ export function flipRebound(property, repairProperty) {
 /**
  * 结束后缓存上一个记录
  */
-export function cacheProperty(property, repairProperty) {
-    for (var i in property) {
-        repairProperty[i] = property[i];
+export function cacheProperty(stepProperty, lastProperty) {
+    for (var i in stepProperty) {
+        lastProperty[i] = stepProperty[i];
     }
 }

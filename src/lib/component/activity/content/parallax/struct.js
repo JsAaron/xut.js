@@ -126,10 +126,22 @@ export default function Parallax(data, relatedData) {
                 'end': pageRange - currPageOffset + pid
             }
         },
-        originalProperty, //原始属性
-        lastProperty, //最后一个属性值
-        nodeRatio, //比值
-        parallaxOffset //经过视觉差修正后的偏移量
+        /**
+         * 原始属性
+         */
+        originalProperty,
+        /**
+         * 最后一个属性值
+         */
+        lastProperty, 
+        /**
+         * 比值
+         */
+        nodeRatio, 
+        /**
+         * 经过视觉差修正后的偏移量
+         */
+        parallaxOffset 
     }
 
 

@@ -54,25 +54,14 @@ const translateParallax = function({
             if (direction === 'prev') {
                 stepProperty = flipOver(stepProperty, lastProperty)
             }
-
-            // if (stepProperty.scaleX !== undefined) {
-            //     stepProperty.scaleX += 1
-            // }
-            // if (stepProperty.scaleY !== undefined) {
-            //     stepProperty.scaleY += 1
-            // }
-
             //翻页结束,记录上一页的坐标
             cacheProperty(stepProperty, lastProperty)
             break
     }
 
-
-
-    if ($contentNode[0].id === 'Content_0_1') {
-        // console.log(stepProperty)
-    }
-
+    // if($contentNode[0].id === 'Content_1_4'){
+    //     console.log(stepProperty)
+    // }
 
 
     //直接操作元素
