@@ -60,18 +60,26 @@ export function setStyle({
 
 
     //缩放
-    if (property.scaleX !== undefined) {
+    let hasScaleX = property.scaleX !== undefined
+    let hasScaleY = property.scaleY !== undefined
+    let hasScaleZ = property.scaleZ !== undefined
+    if (hasScaleX) {
         x = round(property.scaleX * 100) / 100
         transformEffect += `scaleX(${x})`
     }
-    if (property.scaleY !== undefined) {
+    if (hasScaleY) {
         y = round(property.scaleY * 100) / 100
         transformEffect += `scaleY(${y})`
     }
-    if (property.scaleZ !== undefined) {
+    if (hasScaleZ) {
         z = round(property.scaleZ * 100) / 100
         transformEffect += `scaleZ(${z})`
     }
+    //如果设了XY的缩放，默认增加Z处理
+    if (!hasScaleZ && (hasScaleX || hasScaleY)) {
+        transformEffect += `scaleZ(1)` //默认打开3D，如不指定iphone闪屏
+    }
+
 
     //透明度
     let hasOpacity = false

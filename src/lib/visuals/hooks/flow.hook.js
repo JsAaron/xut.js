@@ -80,16 +80,26 @@ export default {
                 /**
                  * 初始化左边页面的translate坐标
                  */
-                left(offsetLeft) {
-                    const middle = usefulData.getStyle('middle')
+                left() {
+                    //如果中间页面有flow
+                    let middle = usefulData.getStyle('middle')
                     if (middle && middle.isFlows) {
+
+                        //如果本身页面是flow类型
+                        //本身与后面一页面连续flow出现
+                        if (usefulData.hasFlow('before')) {
+                            return -config.screenSize.width + config.viewSize.overflowLeftPositive
+                        }
+
+                        //本身不是flow
+                        //后面一页是flow
                         return -(middle.viewWidth + middle.offset)
                     }
                 },
                 /**
                  * 初始化中间页面的translate坐标
                  */
-                middle(originalOffset) {
+                middle() {
                     if (data.isFlows) {
                         return -config.viewSize.left
                     }
@@ -97,12 +107,21 @@ export default {
                 /**
                  * 初始化右边页面的translate坐标
                  */
-                right(originalOffset) {
+                right() {
                     //获取上一页的styles状态
                     //如果上一页是通过flow方式处理过的
                     //当前页面小姐要不去重新处理
-                    const middle = usefulData.getStyle('middle')
+                    let middle = usefulData.getStyle('middle')
                     if (middle && middle.isFlows) {
+
+                        //如果本身页面是flow类型
+                        //前面与本身连续flow出现
+                        if (usefulData.hasFlow('after')) {
+                            return config.screenSize.width + config.viewSize.overflowLeftPositive
+                        }
+
+                        //本身不是flow
+                        //前面一页是flow
                         return middle.viewWidth + middle.offset
                     }
                 }
@@ -119,16 +138,20 @@ export default {
         if (config.viewSize.overflowWidth) {
             return {
                 flipMove: {
-                    left(data) {
-                        const leftFlow = data.$$checkFlows(data.$$leftIndex)
-                        if (leftFlow) {
-                            data.left = data.$$left + Math.abs(config.viewSize.left) * 2
+                    /**
+                     * 左滑动
+                     */
+                    left(offset) {
+                        if (offset.hasFlow(offset.leftIndex)) {
+                            offset.left = offset.left + config.viewSize.overflowWidth
                         }
                     },
-                    right(data) {
-                        const middleFlow = data.$$checkFlows(data.$$middleIndex)
-                        if (middleFlow) {
-                            data.right = data.$$right - Math.abs(config.viewSize.left) * 2
+                    /**
+                     * 右滑动
+                     */
+                    right(offset) {
+                        if (offset.hasFlow(offset.middleIndex)) {
+                            offset.right = offset.right - config.viewSize.overflowWidth
                         }
                     }
                 },
@@ -137,31 +160,29 @@ export default {
                  * @type {Object}
                  */
                 flipRebound: {
-                    left(data) {
+                    left(offset) {
                         //往右边滑动反弹，所以left为左边处理
                         //而且只修正当期那是flow
-                        let middleFlow = data.$$checkFlows(data.$$middleIndex)
-                        if (middleFlow) {
+                        if (offset.hasFlow(offset.middleIndex)) {
                             //中间页面是flow
-                            let overLeft = Math.abs(config.viewSize.left)
-                            data.middle = overLeft
+                            let overLeft = config.viewSize.overflowLeftPositive
+                            offset.middle = overLeft
 
-                            let leftFlow = data.$$checkFlows(data.$$leftIndex)
-                            if (leftFlow) {
+                            if (offset.hasFlow(offset.leftIndex)) {
                                 //如果左边页面是flow，那么反弹的时候要处理
-                                data.left = -config.screenSize.width + overLeft
+                                offset.left = -config.screenSize.width + overLeft
                             }
                         }
                     },
-                    right(data) {
-                        const middleFlow = data.$$checkFlows(data.$$middleIndex)
-                        if (middleFlow) {
-                            data.middle = Math.abs(config.viewSize.left)
+                    right(offset) {
+                        //中间flow
+                        if (offset.hasFlow(offset.middleIndex)) {
+                            offset.middle = config.viewSize.overflowLeftPositive
 
-                            let rightFlow = data.$$checkFlows(data.$$rightIndex)
-                            if (rightFlow) {
+                            //右边flow
+                            if (offset.hasFlow(offset.rightIndex)) {
                                 //如果左边页面是flow，那么反弹的时候要处理
-                                data.right = config.screenSize.width - config.viewSize.left
+                                offset.right = config.screenSize.width - config.viewSize.left
                             }
                         }
                     }
@@ -170,27 +191,24 @@ export default {
                     /**
                      * 前翻页
                      */
-                    left(data) {
-                        const leftFlow = data.$$checkFlows(data.$$leftIndex)
-                        if (leftFlow) {
-                            data.left = -config.viewSize.left
-                            const middleFlow = data.$$checkFlows(data.$$middleIndex)
-                            if (middleFlow) {
-                                data.middle = config.screenSize.width + Math.abs(config.viewSize.left)
+                    left(offset) {
+                        if (offset.hasFlow(offset.leftIndex)) {
+                            offset.left = config.viewSize.overflowLeftPositive
+
+                            if (offset.hasFlow(offset.middleIndex)) {
+                                offset.middle = config.screenSize.width + config.viewSize.overflowLeftPositive
                             }
                         }
                     },
                     /**
                      * 后翻页
                      */
-                    right(data) {
-                        const rightFlow = data.$$checkFlows(data.$$rightIndex)
-                            //当前正常页面，下一页flow
-                        if (rightFlow) {
-                            data.right = Math.abs(config.viewSize.left)
-                            const middleFlow = data.$$checkFlows(data.$$middleIndex)
-                            if (middleFlow) {
-                                data.middle = -config.screenSize.width + Math.abs(config.viewSize.left)
+                    right(offset) {
+                        //当前正常页面，下一页flow
+                        if (offset.hasFlow(offset.rightIndex)) {
+                            offset.right = config.viewSize.overflowLeftPositive
+                            if (offset.hasFlow(offset.middleIndex)) {
+                                offset.middle = -config.screenSize.width + config.viewSize.overflowLeftPositive
                             }
                         }
 

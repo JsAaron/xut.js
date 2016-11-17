@@ -132,15 +132,15 @@ export default function Parallax(data, relatedData) {
         /**
          * 最后一个属性值
          */
-        lastProperty, 
+        lastProperty,
         /**
          * 比值
          */
-        nodeRatio, 
+        nodeRatio,
         /**
          * 经过视觉差修正后的偏移量
          */
-        parallaxOffset 
+        parallaxOffset
     }
 
 

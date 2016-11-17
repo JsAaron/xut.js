@@ -291,7 +291,7 @@ export default class HtmlBox {
      * @return {[type]}             [description]
      */
     _relocateToolbar(iscrollName) {
-        //修正模式2下屏幕溢出高度  
+        //修正模式2下屏幕溢出高度
         const viewSize = config.viewSize
         const left = viewSize.overflowWidth && Math.abs(viewSize.left) || 0
         const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0

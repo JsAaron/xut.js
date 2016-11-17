@@ -27,6 +27,28 @@ export default function styleConfig({
         return this[this['_' + pageName]]
     }
 
+    /**
+     * 判断是否存在flow页面
+     * middle
+     * before
+     * after
+     * @param  {[type]}  pageName [description]
+     * @return {Boolean}          [description]
+     */
+    usefulData.hasFlow = function(pageName) {
+        let key, value
+        for (key in this) {
+            value = this[key]
+            if (_.isFunction(value)) {
+                continue;
+            }
+            if (value.direction == pageName) {
+                return value.isFlows
+            }
+        }
+    }
+
+
     const compile = new Stack()
 
     _.each(usefulData, function(data, index) {

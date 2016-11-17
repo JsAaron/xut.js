@@ -245,7 +245,7 @@ export default class Flow {
             pageIndex,
             rightIndex,
             direction
-        } = {}) {
+        }) {
 
             /**
              * 首页边界
@@ -290,10 +290,7 @@ export default class Flow {
              */
             else {
 
-                /**
-                 * 修正内部翻页的翻页算法
-                 * @type {Object}
-                 */
+                //修正内部翻页的翻页算法
                 let hooks
                 if (config.viewSize.overflowWidth) {
                     hooks = {
@@ -308,7 +305,7 @@ export default class Flow {
                     }
                 }
 
-                const viewBeHideDistance = getFlipDistance({
+                let viewBeHideDistance = getFlipDistance({
                     action,
                     distance,
                     direction
@@ -343,7 +340,7 @@ export default class Flow {
                 }
 
                 //移动视觉差
-                const moveParallaxObject = () => {
+                let moveParallaxObject = () => {
                     let masterObj = flowObject._getMasterObj()
                     if (masterObj) {
                         //处理当前页面内的视觉差对象效果

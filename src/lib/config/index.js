@@ -355,14 +355,22 @@ const resetProportion = function(pptWidth, pptHeight) {
      */
     viewSize.overflowWidth = false
     viewSize.notFillWidth = false
+
+    /**
+     * 快速获取溢出left正负
+     */
+    if (viewSize.left !== 0) {
+        viewSize.overflowLeftPositive = Math.abs(viewSize.left)
+        viewSize.overflowLeftNegative = -viewSize.overflowLeftPositive
+    }
+
     if (viewSize.left < 0) {
         //溢出宽度
-        viewSize.overflowWidth = true
+        viewSize.overflowWidth = Math.abs(viewSize.left) * 2
     } else if (viewSize.left > 0) {
         //没有填满宽度
         viewSize.notFillWidth = true
     }
-
 
     /**
      * 溢出高度
