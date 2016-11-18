@@ -5,7 +5,7 @@
  * @type {Array}
  */
 import Animation from './animation'
-import Parallax from './parallax/struct'
+import Parallax from './parallax/init'
 
 //2016.7.15废弃
 //pixi暂时不使用

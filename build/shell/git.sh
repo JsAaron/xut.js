@@ -33,6 +33,6 @@ done < $log
 
 git add .
 git commit -m "$content"
-git remote add origin git://github.com/JsAaron/es6-magazine.git
+git remote add origin git://github.com/JsAaron/xut.git
 git push origin master
 

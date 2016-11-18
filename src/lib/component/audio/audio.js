@@ -343,18 +343,24 @@ class _Audio extends BaseAudio {
                 audio.src = url
             } else {
                 audio = new Audio(url)
-                    //更新音轨
-                    //妙妙学方式不要音轨处理
-                instance[trackId] = audio
+                //更新音轨
+                //妙妙学方式不要音轨处理
+                if(trackId){
+                    instance[trackId] = audio
+                }
             }
         }
 
         this._callback = () => {
-            self.callbackProcess()
+            this.callbackProcess()
         }
 
-        this._throughCallback = () => {
-            self.play()
+        //自动播放，只处理一次
+        //手动调用的时候会调用play的时候会调用canplay
+        //导致重复播放，所以在第一次的去掉这个事件
+        this._canplayCallback = () => {
+            this.play()
+            this.audio.removeEventListener('canplay', this._canplayCallback, false)
         }
 
         /**
@@ -365,7 +371,7 @@ class _Audio extends BaseAudio {
          */
         audio.autoplay = true
 
-        audio.addEventListener('canplaythrough', this._throughCallback, false)
+        audio.addEventListener('canplay', this._canplayCallback, false)
         audio.addEventListener('ended', this._callback, false)
         audio.addEventListener('error', this._callback, false)
 
@@ -391,7 +397,6 @@ class _Audio extends BaseAudio {
     end() {
         if (this.audio) {
             this.audio.pause();
-            this.audio.removeEventListener('canplaythrough', this._throughCallback, false)
             this.audio.removeEventListener('ended', this._callback, false)
             this.audio.removeEventListener('error', this._callback, false)
             this.audio = null;

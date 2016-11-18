@@ -1,4 +1,4 @@
-import flowConfig from './flow.hook'
+import flowConfig from './flow'
 
 /**
  * 结果缓存

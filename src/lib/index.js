@@ -7,7 +7,7 @@ import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 870.9
+Xut.Version = 871.1
 
 if (Xut.plat.isBrowser) {
     //Mobile browser automatically broadcast platform media processing
@@ -26,7 +26,6 @@ if (Xut.plat.isBrowser) {
         }
     })
 }
-
 
 /**
  * 基本结构
@@ -99,7 +98,7 @@ let lauchOptions
  * 加载应用app
  * @return {[type]} [description]
  */
-const loadApp = (...arg) => {
+let loadApp = (...arg) => {
     let node = getNode(...arg)
     Xut.Application.$$removeNode = () => {
         node.$contentNode.remove()
@@ -153,7 +152,7 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
 /**
  * 提供全局配置文件
  */
-const setMode = setConfig => {
+let setMode = setConfig => {
     if (setConfig) {
         Xut.extend(config, setConfig)
     }
@@ -167,7 +166,7 @@ Xut.Application.Launch = ({
     paths,
     cursor
 }) => {
-    const setConfig = Xut.Application.setConfig
+    let setConfig = Xut.Application.setConfig
     if (setConfig && setConfig.lauchMode === 1) {
         setMode(setConfig);
         lauchOptions = [{
@@ -187,7 +186,7 @@ Xut.Application.Launch = ({
  * 老版本加载
  */
 setTimeout(() => {
-    const setConfig = Xut.Application.setConfig
+    let setConfig = Xut.Application.setConfig
     if (!setConfig || setConfig && !setConfig.lauchMode) {
         setMode(setConfig)
         loadApp()

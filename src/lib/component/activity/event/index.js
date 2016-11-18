@@ -157,7 +157,6 @@ export default function(activitProto) {
                         audio = new audioPlayer({
                             url: behaviorSound
                         })
-                        audio.play()
                         self._cacheBehaviorAudio[behaviorSound] = audio
                     }
                 }

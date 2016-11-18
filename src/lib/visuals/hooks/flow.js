@@ -79,20 +79,17 @@ export default {
             return {
                 /**
                  * 初始化左边页面的translate坐标
+                 * 初始化处理需要考虑前后相邻的页面之间的依赖
+                 * 1.如果中间页面是flow
+                 * 2.处理left页面是flow的情况
+                 * 3.处理本身(middle)是正常页面，后面(middle)是flow的的情况
                  */
                 left() {
-                    //如果中间页面有flow
                     let middle = usefulData.getStyle('middle')
                     if (middle && middle.isFlows) {
-
-                        //如果本身页面是flow类型
-                        //本身与后面一页面连续flow出现
                         if (usefulData.hasFlow('before')) {
                             return -config.screenSize.width + config.viewSize.overflowLeftPositive
                         }
-
-                        //本身不是flow
-                        //后面一页是flow
                         return -(middle.viewWidth + middle.offset)
                     }
                 },
@@ -106,22 +103,17 @@ export default {
                 },
                 /**
                  * 初始化右边页面的translate坐标
+                 * 初始化处理需要考虑前后相邻的页面之间的依赖
+                 * 1.如果中间页面是flow
+                 * 2.处理right页面是flow的情况
+                 * 3.处理本身(middle)是正常页面，前面(middle)是flow的的情况
                  */
                 right() {
-                    //获取上一页的styles状态
-                    //如果上一页是通过flow方式处理过的
-                    //当前页面小姐要不去重新处理
                     let middle = usefulData.getStyle('middle')
                     if (middle && middle.isFlows) {
-
-                        //如果本身页面是flow类型
-                        //前面与本身连续flow出现
                         if (usefulData.hasFlow('after')) {
                             return config.screenSize.width + config.viewSize.overflowLeftPositive
                         }
-
-                        //本身不是flow
-                        //前面一页是flow
                         return middle.viewWidth + middle.offset
                     }
                 }
@@ -160,55 +152,70 @@ export default {
                  * @type {Object}
                  */
                 flipRebound: {
+                    /**
+                     * 左边滑动，往右边反弹
+                     * 1 判断当前页面是不是flow
+                     * 2 修正左边页面flow的情况
+                     * 3 修正右边正常页面的情况
+                     */
                     left(offset) {
-                        //往右边滑动反弹，所以left为左边处理
-                        //而且只修正当期那是flow
                         if (offset.hasFlow(offset.middleIndex)) {
-                            //中间页面是flow
                             let overLeft = config.viewSize.overflowLeftPositive
                             offset.middle = overLeft
-
                             if (offset.hasFlow(offset.leftIndex)) {
-                                //如果左边页面是flow，那么反弹的时候要处理
                                 offset.left = -config.screenSize.width + overLeft
+                            } else {
+                                offset.left = -(config.viewSize.width - overLeft)
                             }
                         }
                     },
+                    /**
+                     * 右边滑动，往左边反弹
+                     * 1 判断当前页面是不是flow
+                     * 2 修正右边页面flow与正常页面的情况
+                     * 3 修正右边页面是正常页面的情况
+                     */
                     right(offset) {
-                        //中间flow
                         if (offset.hasFlow(offset.middleIndex)) {
-                            offset.middle = config.viewSize.overflowLeftPositive
-
-                            //右边flow
-                            if (offset.hasFlow(offset.rightIndex)) {
-                                //如果左边页面是flow，那么反弹的时候要处理
-                                offset.right = config.screenSize.width - config.viewSize.left
-                            }
+                            let overLeft = config.viewSize.overflowLeftPositive
+                            offset.middle = overLeft;
+                            //因为中间页面是flow，所有右边页面是不是flow与正常页面都无所谓，都是一样的处理
+                            offset.right = config.screenSize.width + overLeft
                         }
                     }
                 },
                 flipOver: {
                     /**
-                     * 前翻页
+                     * 前翻页，这里涉及了页面的转换
+                     * left=>middle
+                     * middle=>right
+                     * 1.如果当前flow页面
+                     * 2.left=>middle，只需要给出溢出值
+                     * 3.middle=>right，因为中间是flow，所以right是screenSize+overLeft
                      */
                     left(offset) {
                         if (offset.hasFlow(offset.leftIndex)) {
-                            offset.left = config.viewSize.overflowLeftPositive
-
+                            let overLeft = config.viewSize.overflowLeftPositive
+                            offset.left = overLeft
                             if (offset.hasFlow(offset.middleIndex)) {
-                                offset.middle = config.screenSize.width + config.viewSize.overflowLeftPositive
+                                offset.middle = config.screenSize.width + overLeft
                             }
                         }
                     },
                     /**
-                     * 后翻页
+                     * 后翻页，这里涉及了页面的转换
+                     * right =》middle
+                     * middle =》right
+                     * 1.如果当前是flow
+                     * 2.right =》middle，所以当前页面的最终只是溢出的left
+                     * 3.middle =》right，所以右边页面的溢出值，
                      */
                     right(offset) {
-                        //当前正常页面，下一页flow
                         if (offset.hasFlow(offset.rightIndex)) {
-                            offset.right = config.viewSize.overflowLeftPositive
+                            let overLeft = config.viewSize.overflowLeftPositive
+                            offset.right = overLeft
                             if (offset.hasFlow(offset.middleIndex)) {
-                                offset.middle = -config.screenSize.width + config.viewSize.overflowLeftPositive
+                                offset.middle = -config.screenSize.width + overLeft
                             }
                         }
 

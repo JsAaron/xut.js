@@ -1,4 +1,4 @@
-import defaultContainer from './hooks/container.hook'
+import defaultContainer from './hooks/container'
 import Stack from '../util/stack'
 
 import {
@@ -49,7 +49,7 @@ export default function styleConfig({
     }
 
 
-    const compile = new Stack()
+    let compile = new Stack()
 
     _.each(usefulData, function(data, index) {
 
@@ -71,7 +71,7 @@ export default function styleConfig({
             }
 
             //设置容器样式
-            const translate = defaultContainer.translate({
+            let translate = defaultContainer.translate({
                 //提供容器的样式钩子
                 hooks: hasFlow ? setFlowTranslate(data, usefulData) : {},
                 createIndex: data.pid,

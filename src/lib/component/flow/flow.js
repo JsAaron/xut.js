@@ -347,6 +347,7 @@ export default class Flow {
                         masterObj.moveParallax({
                             action,
                             direction,
+                            pageIndex:this._hindex + 1,
                             moveDist: viewBeHideDistance,
                             speed: speed,
                             nodes: direction === 'next' ? nodes[this._hindex] : ''

@@ -8,8 +8,8 @@ const CEIL = Math.ceil
  */
 export default function setView(config, fullProportion) {
 
-    const screenWidth = config.screenSize.width
-    const screenHeight = config.screenSize.height
+    let screenWidth = config.screenSize.width
+    let screenHeight = config.screenSize.height
 
     let newWidth = screenWidth
     let newHeight = screenHeight
@@ -25,8 +25,8 @@ export default function setView(config, fullProportion) {
      */
     if (config.visualMode === 1) {
 
-        const designWidth = fullProportion.pptWidth
-        const designHeight = fullProportion.pptHeight
+        let designWidth = fullProportion.pptWidth
+        let designHeight = fullProportion.pptHeight
 
         //竖版PPT
         if (config.pptVertical) {

@@ -15,6 +15,7 @@ const translateParallax = function({
     $contentNode,
     scope,
     direction,
+    pageIndex,
     action,
     speed,
     nodes,
@@ -40,6 +41,7 @@ const translateParallax = function({
         isFlows,
         distance,
         lastProperty,
+        pageIndex,
         targetProperty
     })
 
@@ -84,6 +86,9 @@ const translateParallax = function({
     setStyle({
         $contentNode,
         action: 'master',
+        interaction:action,
+        pageIndex,
+        targetProperty,
         property: stepProperty,
         speed: speed,
         opacityStart: lastProperty.opacityStart
@@ -106,6 +111,7 @@ export default function(baseProto) {
         action,
         direction,
         moveDist,
+        pageIndex,
         speed,
         nodes,
         parallaxProcessedContetns
@@ -163,6 +169,7 @@ export default function(baseProto) {
 
                     //移动视觉差对象
                     translateParallax({
+                        pageIndex,
                         $contentNode,
                         scope: scope.parallax,
                         direction,

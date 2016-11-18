@@ -1,7 +1,6 @@
 /**
  * 视觉差对象初始化操作
  */
-
 import { config } from '../../../../config/index'
 import { parseJSON } from '../../../../util/lang'
 import {
@@ -93,6 +92,27 @@ export default function Parallax(data, relatedData) {
         currPageOffset = parseInt(pageOffset[0]);
         //范围区域
         pageRange = parseInt(pageOffset[1])
+    }
+
+    //非匀速视觉差，初始化一些参数
+    //增加特殊记录历史记录
+    if (targetProperty.special) {
+        //筛选出所有属性最大的值
+        let maxProperty = {}
+        let specialProperty = targetProperty.special
+        for (let key in specialProperty) {
+            for (let name in specialProperty[key]) {
+                if (maxProperty[name]) {
+                    if (maxProperty[name] < specialProperty[key][name]) {
+                        maxProperty[name] = specialProperty[key][name]
+                    }
+                } else {
+                    maxProperty[name] = specialProperty[key][name]
+                }
+            }
+        }
+        targetProperty.special.maxProperty = maxProperty
+        targetProperty.special.lastProperty = {}
     }
 
 
