@@ -5,7 +5,7 @@ const uglify = require('gulp-uglify');
 const concat = require('gulp-concat')
 const base = require('../rollup.base.conf.js')
 const config = require('../../config')
-const getSrcipt = require('../external')
+const getSrcipt = require('../external.script')
 
 let debugDir, args, scriptUrl, conf
 

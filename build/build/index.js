@@ -1,5 +1,5 @@
 const rollup = require('../rollup.base.conf')
-const getScript = require('../external')
+const getScript = require('../external.script')
 const compilerCSS = require('./compiler.css')
 const compilerJs = require('./compiler.js')
 const version = require('./version')

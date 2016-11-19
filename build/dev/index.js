@@ -2,7 +2,6 @@ const fs = require('fs')
 const http = require('http');
 const express = require('express')
 const webpack = require('webpack')
-
 const open = require("open");
 const watch = require('gulp-watch');
 const path = require('path')
@@ -13,8 +12,8 @@ const cp = require('child_process');
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
 const killOccupied = require('../kill.occupied')
-const convertSVG = require('./convert.svg')
-const serialData = require('./serial.data')
+const convertSVG = require('../convert.svg')
+const serialData = require('../serial.data')
 
 const app = express()
 const config = require('../../config')
@@ -25,7 +24,7 @@ const conf = _.extend(config.dev.conf, {
 })
 
 convertSVG(conf.srcDir)
-serialData(conf)
+serialData(conf.srcDir)
 
 fsextra.removeSync(conf.assetsRoot)
 fsextra.mkdirSync(conf.assetsRoot);

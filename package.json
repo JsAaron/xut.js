@@ -9,12 +9,12 @@
     "copy": "node build/copy/index.js",
     "remote": "node build/remote/index.js",
     "lint": "eslint dist/xxtppt.dev.js",
-    "test-apk": "node build/test.apk.js",
+    "template": "node build/template/index.js",
     "unit": "karma start test/unit/karma.conf.js",
     "karma": "karma start karma.conf.js --log-level debug --single-run",
     "git": "bash build/shell/git.sh",
     "svn": "bash build/shell/svn.sh",
-    "update-package": "node build/ncu.js"
+    "update-package": "node build/ncu.package.js"
   },
   "repository": {
     "type": "git",
