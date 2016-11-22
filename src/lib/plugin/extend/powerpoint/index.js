@@ -530,6 +530,11 @@ export default class Powepoint {
             paused: true,
             onStartParams: [this.preCode],
             onCompleteParams: [this.postCode, this.codeDelay],
+            /**
+             * 动画执行前的初始化
+             * @param  {[type]} preCode [description]
+             * @return {[type]}         [description]
+             */
             onStart(preCode) {
                 //条件判断动画是否执行
                 if (preCode && _.isFunction(preCode)) {
@@ -548,19 +553,29 @@ export default class Powepoint {
                     }
                 }
             },
+            /**
+             * 动画完成
+             * @param  {[type]} postCode  [description]
+             * @param  {[type]} codeDelay [description]
+             * @return {[type]}           [description]
+             */
             onComplete(postCode, codeDelay) {
                 self.isCompleted = true;
+
                 //延迟执行postCode代码
-                try {
-                    if (typeof(postCode) == "function") {
-                        if (codeDelay > 0) {
-                            setTimeout(postCode, codeDelay);
-                        } else {
-                            postCode()
+                if (postCode) {
+                    try {
+                        //简单判断是函数可执行
+                        if (_.isFunction(postCode)) {
+                            if (codeDelay > 0) {
+                                setTimeout(postCode, codeDelay)
+                            } else {
+                                postCode()
+                            }
                         }
+                    } catch (error) {
+                        console.log("Run postCode is error in completeHandler:" + error)
                     }
-                } catch (error) {
-                    console.log("Run postCode is error in completeHandler:" + error)
                 }
                 completeAction()
             }

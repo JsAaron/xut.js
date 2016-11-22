@@ -18,7 +18,8 @@ import {
     parseJSON,
     reviseSize,
     readFile,
-    getResources
+    getResources,
+    createRandomImg
 } from '../../../../util/index'
 
 /**
@@ -65,11 +66,8 @@ const analysisPath = (wrapObj, conData) => {
     isGif = /.gif$/i.test(imgContent) //是gif格式
     originalPathImg = config.pathAddress + imgContent //原始地址
 
-    if (isGif) {
-        pathImg = Xut.createRandomImg(originalPathImg) //处理gif图片缓存+随机数
-    } else {
-        pathImg = originalPathImg
-    }
+    //处理gif图片缓存+随机数
+    pathImg = isGif ? createRandomImg(originalPathImg) : originalPathImg
 
     if (conData.category === "AutoCompSprite") {
         try {

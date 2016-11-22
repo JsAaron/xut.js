@@ -157,7 +157,7 @@ export default function(baseProto) {
                             !contentObj.parallaxProcessed) {
                             //标记
                             let actName = contentObj.actName;
-                            contentObj.stopAnimations();
+                            contentObj.stop && contentObj.stop();
                             //视觉差处理一次,停止过动画
                             contentObj.parallaxProcessed = true;
                             //增加标记

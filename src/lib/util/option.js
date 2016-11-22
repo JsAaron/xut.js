@@ -31,12 +31,19 @@ export function execScript(code, type) {
         return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
     }
     try {
-        (new Function("return " + enterReplace(code)))();
+        new Function(enterReplace(code))()
     } catch (e) {
         console.log('加载脚本错误', type)
     }
 }
 
+/**
+ * 创建gif随机数
+ * @return {[type]} [description]
+ */
+export function createRandomImg(url){
+    return url + `?${Math.random()}`
+}
 
 /**
  * 路径替换

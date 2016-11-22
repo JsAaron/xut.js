@@ -1,3 +1,5 @@
+
+
 /**
  * 普通精灵动画
  */
@@ -74,7 +76,7 @@ export class Sprite {
             originalPathImg = Xut.config.pathAddress + imgContent;
         if (isGif) {
             //处理gif图片缓存+随机数
-            pathImg = Xut.createRandomImg(originalPathImg)
+            // pathImg = Xut.createRandomImg(originalPathImg)
         } else {
             pathImg = originalPathImg;
         }

@@ -115,7 +115,6 @@ export default function Parallax(data, relatedData) {
         targetProperty.special.lastProperty = {}
     }
 
-
     //页面偏移比例
     let nodeOffset = (currPageOffset - 1) / (pageRange - 1) || 0
 

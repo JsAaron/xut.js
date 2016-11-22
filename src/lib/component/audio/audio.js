@@ -343,9 +343,9 @@ class _Audio extends BaseAudio {
                 audio.src = url
             } else {
                 audio = new Audio(url)
-                //更新音轨
-                //妙妙学方式不要音轨处理
-                if(trackId){
+                    //更新音轨
+                    //妙妙学方式不要音轨处理
+                if (trackId) {
                     instance[trackId] = audio
                 }
             }
@@ -360,7 +360,7 @@ class _Audio extends BaseAudio {
         //导致重复播放，所以在第一次的去掉这个事件
         this._canplayCallback = () => {
             this.play()
-            this.audio.removeEventListener('canplay', this._canplayCallback, false)
+            this.audio && this.audio.removeEventListener('canplay', this._canplayCallback, false)
         }
 
         /**
@@ -397,6 +397,8 @@ class _Audio extends BaseAudio {
     end() {
         if (this.audio) {
             this.audio.pause();
+            //快速切换，防止在播放中就移除，导致没有销毁
+            this.audio.removeEventListener('canplay', this._canplayCallback, false)
             this.audio.removeEventListener('ended', this._callback, false)
             this.audio.removeEventListener('error', this._callback, false)
             this.audio = null;

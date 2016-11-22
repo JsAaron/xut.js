@@ -15,7 +15,7 @@ export function setStyle({
     action, //初始化设置
     property,
     pageIndex,
-    targetProperty,
+    targetProperty = {}, //必须给初始值，master页面没有传递
     interaction,
     speed = 0,
     pageOffset = 0,

@@ -3,6 +3,10 @@
  * @param  {[type]} global [description]
  * @return {[type]}        [description]
  */
+
+import { config } from '../../config/index'
+import { setProportion } from '../../util/option'
+
 //字幕检测时间
 let Interval = 50;
 
@@ -50,13 +54,12 @@ export class Subtitle {
 
         //phonegap getCurrentPosition得到的音频播放位置不从0开始 记录起始位置
         this.changeValue = 0;
-
         _.each(options.subtitles, (data) => {
             checkData[data.start + '-start'] = data;
             checkData[data.end + '-end'] = data;
         })
 
-        this.createSubtitle(checkData)
+        this._createSubtitle(checkData)
     }
 
 
@@ -64,57 +67,35 @@ export class Subtitle {
      * 运行字幕
      * @return {[type]}
      */
-    createSubtitle(checkData) {
-
-        let getAudioTime = this.getAudioTime
-        let options = this.options
-
-        /**
-         * 准备创建字幕
-         * @param  {[type]} audioTime [description]
-         * @return {[type]}           [description]
-         */
-        let createAction = (audioTime) => {
-            let match
-            _.each(checkData, (data, key) => {
-                match = key.split('-');
-                //创建动作
-                this.action(match[0], audioTime, match[1], data);
-            })
-            this.createSubtitle(checkData);
-        }
-
-        /**
-         * 判断不同的播放平台
-         * @return {[type]} [description]
-         */
-        let JudgePlat = () => {
-            getAudioTime((audioTime) => {
-                createAction(audioTime)
-            })
-        }
-
+    _createSubtitle(checkData) {
         this.timer = setTimeout(() => {
-            JudgePlat();
-        }, Interval);
+            this.getAudioTime(audioTime => {
+                let match
+                _.each(checkData, (data, key) => {
+                    match = key.split('-')
+                    this._action(match[0], audioTime, match[1], data);
+                })
+                this._createSubtitle(checkData);
+            })
+        }, Interval)
     }
 
-    //执行动作
-    //创建文本框
-    //显示/隐藏
-    action(currentTime, audioTime, action, data) {
+    /**
+     * 执行动作
+     * 创建文本框
+     * 显示/隐藏文本框
+     */
+    _action(currentTime, audioTime, action, data) {
         if (audioTime > currentTime - Interval && audioTime < currentTime + Interval) {
             //创建
             if (!this.recordRepart[data.start] && action === 'start') {
-                this.recordRepart[data.start] = true;
-                //创建字幕dom
-                this.createDom(data);
-
-                //如果是一段字幕结束处理
-            } else if (!this.recordRepart[data.end] && action === 'end') {
-                this.recordRepart[data.end] = true;
-                // //隐藏
-                var ancestorNode = this.ancestors[data.id];
+                this.recordRepart[data.start] = true
+                this._createDom(data)
+            }
+            //如果是一段字幕结束处理
+            else if (!this.recordRepart[data.end] && action === 'end') {
+                this.recordRepart[data.end] = true
+                var ancestorNode = this.ancestors[data.id]
                 if (ancestorNode) {
                     ancestorNode.style.visibility = "hidden"
                 }
@@ -122,9 +103,7 @@ export class Subtitle {
         }
     }
 
-    createDom(data) {
-
-        var config = Xut.config
+    _createDom(data) {
 
         //屏幕分辨率
         var proportion = config.proportion;
@@ -137,14 +116,60 @@ export class Subtitle {
         var preDiv = this.cacheCreateDivs[cid];
         var preP = preDiv && preDiv.children[0];
 
-        //缩放
-        var sTop = data.top * proportion.top;
-        var sLeft = data.left * proportion.left;
-        var sHeight = data.height * proportion.height;
-        var sWidth = data.width * proportion.width;
-
         //转换行高
         var sLineHeight = data.lineHeight ? data.lineHeight : '100%';
+
+        /**
+         * 设置父容器div 字体颜色，大小，类型，位置，文本水平、垂直居中
+         */
+        function createDivStyle(parent, data) {
+            let value = setProportion({
+                width: data.width,
+                height: data.height,
+                left: data.left,
+                top: data.top
+            })
+
+            let cssText =
+                `position:absolute;
+                 display:table;
+                 vertical-align:center;
+                 width:${value.width}px;
+                 height:${value.height}px;
+                 top:${value.top}px;
+                 left:${value.left}px;`
+
+            parent.style.cssText = String.styleFormat(cssText)
+        }
+
+        /**
+         * 内容元素的样式
+         */
+        function createPStyle(p, data) {
+            let cssText =
+                `text-align:center;
+                 display:table-cell;
+                 vertical-align :middle;
+                 color:${data.fontColor};
+                 font-family:${data.fontName};
+                 font-bold:${data.fontBold};
+                 font-size:${data.fontSize * proportionWidth}px;
+                 line-height:${sLineHeight}%`
+
+            //设置字体间距
+            p.style.cssText = String.styleFormat(cssText)
+
+            //设置文字内容
+            p.innerHTML = data.title;
+        }
+
+        /**
+         * 创建内容
+         */
+        function createContent(parent, p, data) {
+            createDivStyle(parent, data) //设置div
+            createPStyle(p, data)
+        }
 
         //公用同一个contengid,已经存在
         if (preDiv) {
@@ -155,65 +180,10 @@ export class Subtitle {
             var createP = document.createElement('p');
             //设置样式
             createContent(createDiv, createP, data);
-            createDiv.appendChild(createP) //添加到指定的父元素  
-
+            createDiv.appendChild(createP) //添加到指定的父元素
             parentNode.appendChild(createDiv);
-
-            //保存引用
-            this.cacheCreateDivs[cid] = createDiv;
+            this.cacheCreateDivs[cid] = createDiv; //保存引用
         }
-
-        //创建内容
-        function createContent(parent, p, data) {
-            createDivStyle(parent, data) //设置div
-            createPStyle(p, data)
-        }
-
-        //设置父容器div 字体颜色，大小，类型，位置，文本水平、垂直居中
-        function createDivStyle(parent, data) {
-            var cssText =
-                'position       :absolute; ' +
-                'display        :table;' +
-                'vertical-align :center;' +
-                'top            :{0}px;' +
-                'left           :{1}px;' +
-                'height         :{2}px;' +
-                'width          :{3}px;'
-
-            parent.style.cssText = String.format(cssText,
-                sTop,
-                sLeft,
-                sHeight,
-                sWidth
-            )
-        }
-
-        //内容元素的样式
-        function createPStyle(p, data) {
-
-            var cssText =
-                ' text-align     :center;' +
-                ' display        :table-cell;' +
-                ' vertical-align :middle;' +
-                ' color          :{0};' +
-                ' font-family    :{1};' +
-                ' font-bold      :{2};' +
-                ' font-size      :{3}px;' +
-                ' line-height    :{4}%';
-
-            //设置字体间距
-            p.style.cssText = String.format(
-                    cssText,
-                    data.fontColor,
-                    data.fontName,
-                    data.fontBold,
-                    data.fontSize * proportionWidth,
-                    sLineHeight
-                )
-                //设置文字内容
-            p.innerHTML = data.title;
-        }
-
 
         //操作最外层的content节点
         if (ancestorNode) {
