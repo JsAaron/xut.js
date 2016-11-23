@@ -154,8 +154,14 @@ export default class Flow {
      */
     _zoomImage(node) {
         //图片地址
-        const src = Xut.config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
-        var img = new Image()
+        let src = config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
+
+        //如果配置了高清后缀
+        if (config.hqUrlSuffix) {
+            src = src.replace('.', `.${config.hqUrlSuffix}.`)
+        }
+
+        let img = new Image()
         img.src = src
         img.onload = () => { //防止图片为加载完毕
             this._setImage(node, img, img.width, img.height, src)
@@ -347,7 +353,7 @@ export default class Flow {
                         masterObj.moveParallax({
                             action,
                             direction,
-                            pageIndex:this._hindex + 1,
+                            pageIndex: this._hindex + 1,
                             moveDist: viewBeHideDistance,
                             speed: speed,
                             nodes: direction === 'next' ? nodes[this._hindex] : ''

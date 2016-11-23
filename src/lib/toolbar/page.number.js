@@ -85,6 +85,7 @@ export default class NumberBar {
         let beforeCount = getBeforeCount(chapterData.seasonId, chapterData._id)
         let updateIndex = parentIndex + beforeCount + sonIndex
 
+
         //前翻页，需要叠加flow的总和
         if (direction === 'prev') {
             //前翻页：内部翻页

@@ -29,6 +29,15 @@ export default {
     },
 
     /**
+     * 配置高清图的标记
+     * 为flow提供高清图片接口"
+     *  if (config.hqUrlSuffix) {
+     *      src = src.replace('.', `.${config.hqUrlSuffix}.`)
+     *  }
+     */
+    hqUrlSuffix: DEFAULT,
+
+    /**
      * 页面可视模式
      * 2016.9.19
      * 4种分辨率显示模式:

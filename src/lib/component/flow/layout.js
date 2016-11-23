@@ -139,7 +139,7 @@ export default function initFlows() {
 
         $chapters.each(function(index, node) {
             const tag = node.id
-            const chpaterId = tag.match(/\d/)[0]
+            const chpaterId = tag.match(/\d+/)[0]
             let count = resolveCount($(node))
             flowCounts[seasonsId][chpaterId] = Number(count)
         })
