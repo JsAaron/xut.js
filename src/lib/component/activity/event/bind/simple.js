@@ -91,7 +91,8 @@ export function simpleEvent(eventContext, eventHandle, supportSwipe) {
         $$on(eventContext, {
             start: start,
             move: move,
-            end: end
+            end: end,
+            cancel: end
         })
     }
 
@@ -104,7 +105,8 @@ export function simpleEvent(eventContext, eventHandle, supportSwipe) {
                     $$off(eventContext, {
                         start: start,
                         move: move,
-                        end: end
+                        end: end,
+                        cancel: end
                     })
                 }
                 eventContext = null;

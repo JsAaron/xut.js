@@ -61,7 +61,8 @@ export default class BookBar extends Bar {
 
         //监听事件
         $$on(this.$sceneNode[0], {
-            end: this
+            end: this,
+            cancel: this
         })
     }
 
@@ -498,7 +499,8 @@ export default class BookBar extends Bar {
         this.iscroll && this.iscroll.destroy();
         this.bookMark && this.bookMark.destroy();
         $$off(this.$sceneNode[0], {
-            end: this
+            end: this,
+            cancel: this
         })
         this.iscroll = null;
         this.menu = null;

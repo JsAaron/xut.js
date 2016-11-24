@@ -4,7 +4,7 @@
  *
  */
 
-import { $$on } from '../../../util/dom'
+import { $$on, $$off } from '../../../util/dom'
 
 //图标
 var icons = {
@@ -37,7 +37,8 @@ SearchBar.prototype.init = function() {
 
     //用户操作事件邦定
     $$on(dom, {
-        end: this
+        end: this,
+        cancel: this
     })
 
     //即时搜索
@@ -192,9 +193,13 @@ SearchBar.prototype.restore = function() {
  */
 SearchBar.prototype.destroy = function() {
     var dom = this.parent[0];
+
+    $$off(dom, {
+        end: this,
+        cancel: this
+    })
+
     dom.removeEventListener('keyup', this, false);
-    dom.removeEventListener('touchend', this, false);
-    dom.removeEventListener('mouseup', this, false);
 
     this.searchBox.remove();
     this.searchBox = null;

@@ -330,9 +330,13 @@ export default class Flow {
 
                 //反弹
                 if (action === 'flipRebound') {
-                    moveDistance = direction === 'next' ?
-                        (-flipWidth * this._hindex - this._hindex) :
-                        -(flipWidth * this._hindex + this._hindex)
+                    if (direction === 'next') {
+                        //右翻页，左反弹
+                        moveDistance = (-flipWidth * this._hindex)
+                    } else {
+                        //左翻页，右反弹
+                        moveDistance = -(flipWidth * this._hindex)
+                    }
                 }
 
                 //更新页码

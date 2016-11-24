@@ -5,7 +5,7 @@
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
 
-import { $$on } from '../../../util/dom'
+import { $$on, $$off } from '../../../util/dom'
 
 import {
     $$set,
@@ -49,7 +49,8 @@ BookMark.prototype.init = function() {
 
     //邦定用户事件
     $$on(dom, {
-        end: this
+        end: this,
+        cancel: this
     })
 }
 
@@ -322,8 +323,10 @@ BookMark.prototype.restore = function() {
 BookMark.prototype.destroy = function() {
     var dom = this.parent[0]
 
-    dom.removeEventListener('touchend', this, false);
-    dom.removeEventListener('mouseup', this, false);
+    $$off(dom, {
+        end: this,
+        cancel: this
+    })
 
     //菜单部分
     if (this.bookMarkMenu) {
