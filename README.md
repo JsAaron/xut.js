@@ -17,7 +17,7 @@ This is a template program, used to batch production of app, using the front end
 ##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
 
-##The front-end developer can do？
+##The front-end developer can do
 Front end not just write page, also can do the app, and even desktop client application
 #####My work
 * Web pages with shell: [miaomiaoxue](http://www.miaomiaoxue.com/)
