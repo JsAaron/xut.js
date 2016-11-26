@@ -291,7 +291,7 @@ export default class {
      */
     _set() {
         //循环复位
-        if (this.curFPS >= (this.totalFPS - 1)) {
+        if (this.curFPS >= this.totalFPS) {
             this.curFPS = 0
             this.resetCount++
         }
