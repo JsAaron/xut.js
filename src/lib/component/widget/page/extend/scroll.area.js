@@ -148,7 +148,7 @@ export default class ScrollArea {
 
         if (scrollY || scrollX) {
             contentPanle.attr("data-iscroll", "visible");
-           //只存在一屏 需要卷滚时 不要要snap
+            //只存在一屏 需要卷滚时 不要要snap
             if (snapContainer.length == 1) {
                 return this._bindIscroll($wrapper[0], scrollX, scrollY)
             }
@@ -304,6 +304,8 @@ export default class ScrollArea {
             snapContainerHeight
         let contentsXTemp = 0;
         let contentsYTemp = 0;
+        let leftArray = new Array();
+        let topArray = new Array();
         const contentsLength = obj.length;
 
         for (var j = 0; j < contentsLength; j++) {
@@ -332,35 +334,34 @@ export default class ScrollArea {
             childObj.css("left", childLeft);
             childObj.css("top", childTop);
 
-            //x轴卷滚
-            if (scrollX) {
-                if (childLeft < contentSize.w) {
-                    contentsXTemp++;
-                } else {
-                    if (!contentsPerSnapX) {
-                        contentsPerSnapX = contentsXTemp;
-                        snapContainerWidth = childLeft
-                    }
-                }
-            }
-            //y轴卷滚
-            if (scrollY) {
-                if (childTop < contentSize.h) {
-                    contentsYTemp++;
-                } else {
-                    if (!contentsPerSnapY) {
-                        contentsPerSnapY = contentsYTemp;
-                        snapContainerHeight = childTop
-                    }
-                }
-            }
+
+            leftArray.push(childLeft)
+            topArray.push(childTop)
+
 
             childObj.css("visibility", "inherit")
             childObj.attr("data-iscroll", "true")
         }
 
+        //将left值进行冒泡排序处理 以便后面比较left值与content宽之间的大小 确定一个snap容器中可以放几个content以及snap容器的宽度
+        //将top值进行冒泡排序处理 以便后面比较top值与content高之间的大小 确定一个snap容器中可以放几个content以及snap容器的高度
+        leftArray = this._bubbleSort(leftArray)
+        topArray = this._bubbleSort(topArray)
 
+        //x轴卷滚
         if (scrollX) {
+            for (var i = 0; i < leftArray.length; i++) {
+                var temp = leftArray[i];
+                if (temp < contentSize.w) {
+                    contentsXTemp++;
+                } else {
+                    if (!contentsPerSnapX) {
+                        contentsPerSnapX = contentsXTemp;
+                        snapContainerWidth = temp
+                    }
+                }
+            }
+
             //无需创建卷滚
             if (!contentsPerSnapX) {
                 contentsPerSnapX = obj.length;
@@ -370,8 +371,20 @@ export default class ScrollArea {
                 snapXCount = Math.ceil(obj.length / contentsPerSnapX);
             }
         }
-
+        //y轴卷滚
         if (scrollY) {
+            for (var i = 0; i < topArray.length; i++) {
+                var temp = topArray[i];
+                if (temp < contentSize.h) {
+                    contentsYTemp++;
+                } else {
+                    if (!contentsPerSnapY) {
+                        contentsPerSnapY = contentsYTemp;
+                        snapContainerHeight = temp
+                    }
+                }
+            }
+
             //得到卷滚区域一行可以放多少列
             let colsPerRow = 1;
             for (var k = 0; k < contentsLength; k++) {
@@ -400,7 +413,6 @@ export default class ScrollArea {
             }
         }
 
-
         return {
             contentsPerSnapX,
             snapXCount,
@@ -409,6 +421,24 @@ export default class ScrollArea {
             snapYCount,
             snapContainerHeight
         }
+    }
+
+    /**
+     * 冒泡排序
+     * @param  {[type]} array [description]
+     * @return {[type]}       [description]
+     */
+    _bubbleSort(array) {
+        for (var i = 0; i < array.length - 1; i++) {
+            for (var j = 0; j < array.length - 1 - i; j++) {
+                if (array[j] > array[j + 1]) {
+                    var temp = array[j]
+                    array[j] = array[j + 1]
+                    array[j + 1] = temp;
+                }
+            }
+        }
+        return array;
     }
 
     /**
