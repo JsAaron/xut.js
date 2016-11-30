@@ -98,6 +98,15 @@ module.exports = {
 
     },
 
+    /**
+     * 模板apk测试
+     * @type {Object}
+     */
+    template: {
+        rootPath: './apk/'
+        sqlPath: template.rootPath + 'content/SQLResult.js'
+        targetSqlPath: template.rootPath + 'datacache/SQLResult.js'
+    },
 
     /**
      * 远程调试
