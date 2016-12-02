@@ -103,9 +103,24 @@ module.exports = {
      * @type {Object}
      */
     template: {
-        rootPath: './apk/'
-        sqlPath: template.rootPath + 'content/SQLResult.js'
-        targetSqlPath: template.rootPath + 'datacache/SQLResult.js'
+
+        /**
+         * apk测试模板文件
+         * @type {String}
+         */
+        rootPath: './apk/',
+
+        /**
+         * 数据库
+         * @type {String}
+         */
+        sqlPath: './apk/content/SQLResult.js',
+
+        /**
+         * 解析后靠拷贝的路径
+         * @type {String}
+         */
+        targetSqlPath: './apk/datacache/SQLResult.js'
     },
 
     /**

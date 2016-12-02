@@ -152,7 +152,7 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
 /**
  * 提供全局配置文件
  */
-let setMode = setConfig => {
+let mixModeConfig = setConfig => {
     if (setConfig) {
         Xut.extend(config, setConfig)
     }
@@ -168,7 +168,7 @@ Xut.Application.Launch = ({
 }) => {
     let setConfig = Xut.Application.setConfig
     if (setConfig && setConfig.lauchMode === 1) {
-        setMode(setConfig);
+        mixModeConfig(setConfig);
         lauchOptions = [{
             el,
             paths,
@@ -188,7 +188,7 @@ Xut.Application.Launch = ({
 setTimeout(() => {
     let setConfig = Xut.Application.setConfig
     if (!setConfig || setConfig && !setConfig.lauchMode) {
-        setMode(setConfig)
+        mixModeConfig(setConfig)
         loadApp()
     }
 }, 100)

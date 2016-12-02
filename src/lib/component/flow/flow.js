@@ -23,7 +23,7 @@ export default class Flow {
         seasonId,
         chapterId,
         successCallback
-    } = {}) {
+    }) {
 
         let self = this
         this.initIndex = pageIndex

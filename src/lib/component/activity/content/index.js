@@ -18,26 +18,27 @@ import Parallax from './parallax/init'
  * @return {[type]}         [description]
  */
 const preRunAction = function(data, eventName) {
-    var para, state, category, parameter
-    parameter = data.getParameter()
-
+    var parameter = data.getParameter()
     //过滤预生成动画
-    if (parameter.length === 1) {
-        category = data.contentDas.category
-        para = parameter[0];
-        if (para.animationName === 'EffectAppear' && data.domMode //并且只有dom模式才可以，canvas排除
-            && eventName === 'auto' && !para.videoId && !para.delay && category !== 'Sprite' && category !== 'AutoCompSprite' && !para.preCode //动画前脚本
+    if (parameter && parameter.length === 1) {
+        var category = data.contentDas.category
+        var para = parameter[0];
+        if (para.animationName === 'EffectAppear'
+            && data.domMode //并且只有dom模式才可以，canvas排除
+            && eventName === 'auto'
+            && !para.videoId
+            && !para.delay
+            && category !== 'Sprite'
+            && category !== 'AutoCompSprite'
+            && !para.preCode //动画前脚本
             && !para.postCode //动画后脚本
             && !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
-
             /**
              *针对预处理动作,并且没有卷滚的不注册
              *满足是静态动画
              *true是显示,false隐藏å
              */
-            var state = data.isRreRun = /"exit":"False"/i.test(para.parameter) === true ? 'visible' : 'hidden';
-
-            return state
+            return data.isRreRun = /"exit":"False"/i.test(para.parameter) === true ? 'visible' : 'hidden';
         }
     }
 }

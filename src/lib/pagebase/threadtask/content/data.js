@@ -87,15 +87,12 @@ function adapterItemArrayRelated(relateds, activitys, tokens) {
 }
 
 
-
-/**************************************************************************
- *
- *      分组Content表中对应的多个Conte
- *      1：Animation表
- *      2: Parallax表
- *      3: seed种子合集 就是解析1：Animation表，Parallax表得到的数据
- *
- ****************************************************************************/
+/**
+ * 分组Content表中对应的多个Conte
+ *  1：Animation表
+ *  2: Parallax表
+ *  3: seed种子合集 就是解析1：Animation表，Parallax表得到的数据
+ */
 function resolveContentToActivity(callback, activity, pageType, pid) {
     var animContentIds,
         paraContentIds,
@@ -105,10 +102,10 @@ function resolveContentToActivity(callback, activity, pageType, pid) {
         animationDas = '',
         eventId = activity.imageId,
         //需要分解的contentIds合集
-        // 1 动画表数据      Animation
-        // 2 视觉差数据     Parallax
-        // 3 超链接            seasonId
-        // 4 收费         Inapp
+        // 1 动画表数据    Animation
+        // 2 视觉差数据    Parallax
+        // 3 超链接        seasonId
+        // 4 收费          Inapp
         tokens = tokenize(activity['itemArray']) || [],
         //解析Animations,Parallaxs数据
         //  seed {
@@ -210,13 +207,11 @@ function resolveContentToActivity(callback, activity, pageType, pid) {
 }
 
 
-/************************************************************************
- *
- *     合并,过滤需要处理的content
- *     combineImageIds  可以创建的imageId合集，也就是content的合集,用来绑定自定义事件
- *     createContentIds 可以创建的content合集,过滤合并重复
- *
- * **********************************************************************/
+ /**
+  * 合并,过滤需要处理的content
+  *  combineImageIds  可以创建的imageId合集，也就是content的合集,用来绑定自定义事件
+  *  createContentIds 可以创建的content合集,过滤合并重复
+  */
 function toRepeatCombineGroup(compilerActivitys, mixFilterRelated, pageType) {
     var ids,
         contentIds,
@@ -355,30 +350,28 @@ function inGroup(tableName, contentIds) {
 
 //解析itemArray序列,得到对应的id
 function tokenize(itemArray) {
-    var itemJson,
-        actType,
-        anmins = {};
     if (!itemArray) return;
-    itemJson = parseJSON(itemArray);
+    var actType
+    var animToken = {}
+    var itemJson = parseJSON(itemArray)
     //解析多个参数
     if (itemJson.length) {
         _.each(itemJson, function(opts) {
             actType = opts.actType;
-            if (!anmins[actType]) {
-                anmins[actType] = [];
+            if (!animToken[actType]) {
+                animToken[actType] = [];
             }
-            anmins[actType].push(opts.id);
+            animToken[actType].push(opts.id);
         })
     } else {
         actType = itemJson.actType;
-        anmins[actType] = [];
+        animToken[actType] = [];
         //actType: "Animation", id: 14
         //actType: "Inapp", value: 0
-        anmins[actType].push(itemJson.id || itemJson.value)
+        animToken[actType].push(itemJson.id || itemJson.value)
     }
-    return anmins;
+    return animToken
 }
-
 
 /**
  * 解析出需要构建的content对象
@@ -494,11 +487,11 @@ export function contentParser(compileActivitys, data) {
                 //给content注册多个绑定事件
                 var eventId = activitys.imageId;
                 var eventData = {
-                    'eventContentId': eventId,
-                    'activityId': activitys._id,
-                    'registers': item['activity'],
-                    'eventType': activitys.eventType,
-                    'dragdropPara': activitys.para1 //拖拽对象
+                    'eventContentId' : eventId,
+                    'activityId'     : activitys._id,
+                    'registers'      : item['activity'],
+                    'eventType'      : activitys.eventType,
+                    'dragdropPara'   : activitys.para1 //拖拽对象
                 }
                 var isEvt = relateds.eventRelated['eventContentId->' + eventId];
                 if (isEvt) {
@@ -540,10 +533,12 @@ export function contentParser(compileActivitys, data) {
         hookType = unifyType(activitys)
         if (!hookResolve[hookType] //类型匹配
             || (hookResolve[hookType] && hookResolve[hookType](relateds))) { //钩子事件
+
             //如果是动画表,视觉差表关联的content类型
             resultsActivitys = createResolve(function(tokens) {
                 //解析itemArray字段中的相关的信息
                 adapterItemArrayRelated(relateds, activitys, tokens)
+
                 if (pageType === 'page') {
                     //页面只有动画
                     return parseTypeRelation(['Animation'], tokens)
@@ -552,6 +547,7 @@ export function contentParser(compileActivitys, data) {
                     //视觉差支持所有content动画
                     return parseTypeRelation(['Animation', 'Parallax'], tokens)
                 }
+
             })
 
             //如果有手动触发器,置于最后

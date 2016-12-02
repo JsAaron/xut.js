@@ -10,6 +10,7 @@ const specialKey = {
 }
 
 const excludeKeywords = [
+    'apk/content',
     '.svn',
     'epub',
     'node_modules',

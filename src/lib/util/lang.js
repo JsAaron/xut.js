@@ -67,7 +67,6 @@ export function $$extend(object, config) {
 
 /**
  * /解析json字符串
- * @param  {[type]} itemArray [description]
  * @return {[type]}           [description]
  */
 export function parseJSON(parameter) {
@@ -95,7 +94,6 @@ export function enterReplace(str) {
  * 解析json代码
  * 包装脚本
  * @param  {[type]} itemArray [description]
- * @return {[type]}           [description]
  * execJson("(function(){" + enterReplace(data.postCode) + "})");
  */
 export function makeJsonPack(code) {
