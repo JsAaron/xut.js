@@ -387,7 +387,6 @@ const resetProportion = function(pptWidth, pptHeight) {
         viewSize.notFillHeight = true
     }
 
-
     /**
      * 获取全局缩放比
      * @type {[type]}

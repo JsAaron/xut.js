@@ -5,7 +5,7 @@
 export function getSize() {
     //如果是IBooks模式处理
     if (Xut.IBooks.Enabled) {
-        const screen = Xut.IBooks.CONFIG.screenSize;
+        let screen = Xut.IBooks.CONFIG.screenSize;
         if (screen) {
             return {
                 "width": screen.width,
