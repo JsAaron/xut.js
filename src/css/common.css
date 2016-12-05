@@ -226,6 +226,116 @@ video {
       opacity: 0.5;
 }
 
+
+
+
+/* 图片缩放功能 */
+
+@font-face {
+    font-family: 'entypo-selected';
+    src: url("zoom/entypo-selected.eot");
+    src: url("zoom/entypo-selected.eot?#iefix") format('embedded-opentype'), url("zoom/entypo-selected.woff") format('woff'), url("zoom/entypo-selected.ttf") format('truetype'), url("zoom/entypo-selected.svg#entypo-selected") format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.gamma-overlay {
+    background: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    display: none;
+    z-index: 9999;
+}
+
+.gamma-img-fly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+}
+
+.gamma-single-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    text-align: center;
+    display: none;
+}
+
+.gamma-single-view img {
+    position: absolute;
+    cursor: pointer;
+}
+
+.gamma-single-view.gamma-loading {
+    background: transparent url(../css/zoom/loader_light.gif) no-repeat center center;
+}
+
+.gamma-buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10001;
+    text-align: center;
+}
+
+.gamma-buttons button {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    float: left;
+    background: #333;
+    color: #fff;
+    display: block;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+.gamma-buttons button:before {
+    font-family: 'entypo-selected';
+    font-style: normal;
+    font-weight: normal;
+    speak: none;
+    display: block;
+    text-align: center;
+    opacity: 0.7;
+    outline: none;
+}
+
+.no-touch .gamma-buttons button:hover {
+    background: #666;
+}
+
+button.gamma-btn-close:before {
+    content: '\2715';
+}
+
+button.gamma-btn-closeVertical:before {
+    font-size: 2.5vh;
+    position: absolute;
+    left: 1vh;
+    top: 0.7vh;
+}
+
+button.gamma-btn-closeHorizontal:before {
+    font-size: 2.5vw;
+    position: absolute;
+    left: 1vw;
+    top: 0.7vw;
+}
+
+
 /**
  * 修正闪烁
  * 隐藏转换的元素的背面

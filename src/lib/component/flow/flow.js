@@ -7,6 +7,7 @@ import render from './render'
 import getFlipDistance from '../../visuals/distance.config'
 import { getFlowView } from '../../visuals/hooks/adapter'
 
+import Zoom from '../../plugin/extend/zoom'
 import PinchPan from '../../plugin/extend/pinch.pan'
 import closeButton from '../../plugin/extend/close.button'
 
@@ -164,7 +165,9 @@ export default class Flow {
         let img = new Image()
         img.src = src
         img.onload = () => { //防止图片为加载完毕
-            this._setImage(node, img, img.width, img.height, src)
+            // console.log(src)
+            new Zoom(src,src)
+            // this._setImage(node, img, img.width, img.height, src)
         }
         img.onerror = () => { //失败
             img = null
