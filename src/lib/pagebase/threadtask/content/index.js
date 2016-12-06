@@ -25,6 +25,15 @@ import {
 
 import nextTick from '../../../util/nexttick'
 
+/**
+ * 点击缩放功能，独立的
+ */
+import {
+    $$on,
+    $$off
+} from '../../../util/dom'
+import Zoom from '../../../plugin/extend/zoom'
+
 
 function createFn(obj, id, callback) {
     var cObj = obj[id];
@@ -66,13 +75,25 @@ function toObject(cachedContentStr) {
  *      弹动
  *      音频URl
  *  }
+ *  2016.12.6
+ *     增加，点击放大 zoom
  */
-function addBehavior(data) {
-    var parameter, soundSrc, contentId, isButton,
-        feedbackBehavior = data.feedbackBehavior = {};
+function parseBehavior(data) {
+    let parameter
+    let soundSrc
+    let contentId
+    let isButton
+    let feedbackBehavior = data.feedbackBehavior = {} //点击行为
+    let zoomBehavior = data.zoomBehavior = {} //缩放行为
+    let hasZoom
+    let pid = data.pid
+    let prefix
+    let id
+
     _.each(data.activitys, function(activitys) {
         if (activitys.parameter && (parameter = parseJSON(activitys.parameter))) {
             contentId = activitys.imageId;
+
             //视觉反馈
             if (isButton = parameter['isButton']) {
                 if (isButton != 0) { //过滤数据的字符串类型
@@ -81,6 +102,7 @@ function addBehavior(data) {
                     })
                 }
             }
+
             //音频行为
             if (soundSrc = parameter['behaviorSound']) {
                 if (soundSrc != 0) {
@@ -89,8 +111,26 @@ function addBehavior(data) {
                     })
                 }
             }
+
+            //点击图片放大
+            if (hasZoom = parameter['zoom']) {
+                if (hasZoom.length) {
+                    _.each(hasZoom, function(zoomData) {
+                        id = zoomData.content
+                        if (id) {
+                            //保存于节点node命名一致，方便快速查找
+                            prefix = "Content_" + pid + "_" + id
+                            createFn(zoomBehavior, prefix, function() {
+                                //缩放提示图片
+                                this['prompt'] = zoomData.prompt ? true : false
+                            })
+                        }
+                    })
+                }
+            }
         }
     })
+
 }
 
 
@@ -110,15 +150,15 @@ function autoUUID() {
  * 5 canvas动画
  * @return {[type]} [description]
  */
-function bindActivitys(data, contentDas, callback) {
+function applyActivitys(data, contentDas, callback) {
     var compiler,
-        $containsNode    = data.$containsNode,
-        eventRelated     = data.eventRelated, //合集事件
-        pid              = data.pid,
-        createActivitys  = data.createActivitys,
+        $containsNode = data.$containsNode,
+        eventRelated = data.eventRelated, //合集事件
+        pid = data.pid,
+        createActivitys = data.createActivitys,
         feedbackBehavior = data.feedbackBehavior, //反馈数据,跟事件相关
-        pageBaseHooks    = data.pageBaseHooks,
-        pageId           = data.chapterId;
+        pageBaseHooks = data.pageBaseHooks,
+        pageId = data.chapterId;
 
     //如果有浮动对象,才需要计算偏移量
     //母版里面可能存在浮动或者不浮动的对象
@@ -159,20 +199,20 @@ function bindActivitys(data, contentDas, callback) {
 
     //相关数据
     var relatedData = {
-        'floatMaters'        : data.floatMaters,
-        'seasonId'           : data.chpaterData.seasonId,
-        'pageId'             : pageId,
-        'contentDas'         : contentDas, //所有的content数据合集
-        'container'          : data.liRootNode,
-        'seasonRelated'      : data.seasonRelated,
-        'containerPrefix'    : data.containerPrefix,
-        'nodes'              : data.nodes,
-        'pageOffset'         : data.pageOffset,
-        'createContentIds'   : data.createContentIds,
-        'partContentRelated' : data.partContentRelated,
-        'getTransformOffset' : getTransformOffset,
-        'contentsFragment'   : data.contentsFragment,
-        'contentHtmlBoxIds'  : data.contentHtmlBoxIds
+        'floatMaters': data.floatMaters,
+        'seasonId': data.chpaterData.seasonId,
+        'pageId': pageId,
+        'contentDas': contentDas, //所有的content数据合集
+        'container': data.liRootNode,
+        'seasonRelated': data.seasonRelated,
+        'containerPrefix': data.containerPrefix,
+        'nodes': data.nodes,
+        'pageOffset': data.pageOffset,
+        'createContentIds': data.createContentIds,
+        'partContentRelated': data.partContentRelated,
+        'getTransformOffset': getTransformOffset,
+        'contentsFragment': data.contentsFragment,
+        'contentHtmlBoxIds': data.contentHtmlBoxIds
     }
 
     /**
@@ -197,10 +237,10 @@ function bindActivitys(data, contentDas, callback) {
     var makeActivitys = function(compiler) {
         return function(callback) {
             var filters;
-            var imageId        = compiler['imageIds']; //父id
-            var activity       = compiler['activity'];
-            var eventType      = activity.eventType;
-            var dragdropPara   = activity.para1;
+            var imageId = compiler['imageIds']; //父id
+            var activity = compiler['activity'];
+            var eventType = activity.eventType;
+            var dragdropPara = activity.para1;
             var eventContentId = imageId;
 
             /**
@@ -223,27 +263,27 @@ function bindActivitys(data, contentDas, callback) {
 
             //需要绑定事件的数据
             var eventData = {
-                'eventContentId'   : eventContentId,
-                'eventType'        : eventType,
-                'dragdropPara'     : dragdropPara,
-                'feedbackBehavior' : feedbackBehavior
+                'eventContentId': eventContentId,
+                'eventType': eventType,
+                'dragdropPara': dragdropPara,
+                'feedbackBehavior': feedbackBehavior
             }
 
             var actdata = {
-                'noticeComplete'  : callback, //监听完成
-                'pageIndex'       : data.pageIndex,
-                'canvasRelated'   : data.canvasRelated, //父类引用
-                'id'              : imageId || autoUUID(),
-                "type"            : 'Content',
-                'pageId'          : pageId,
-                'activityId'      : activity._id,
-                '$containsNode'   : $containsNode,
-                'pageType'        : compiler['pageType'], //构建类型 page/master
-                'seed'            : compiler['seed'], //动画表数据 or 视觉差表数据
-                "pid"             : pid, //页码
-                'eventData'       : eventData, //事件数据
-                'relatedData'     : relatedData, //相关数据,所有子作用域Activity对象共享
-                'relatedCallback' : relatedCallback //相关回调
+                'noticeComplete': callback, //监听完成
+                'pageIndex': data.pageIndex,
+                'canvasRelated': data.canvasRelated, //父类引用
+                'id': imageId || autoUUID(),
+                "type": 'Content',
+                'pageId': pageId,
+                'activityId': activity._id,
+                '$containsNode': $containsNode,
+                'pageType': compiler['pageType'], //构建类型 page/master
+                'seed': compiler['seed'], //动画表数据 or 视觉差表数据
+                "pid": pid, //页码
+                'eventData': eventData, //事件数据
+                'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
+                'relatedCallback': relatedCallback //相关回调
             }
 
             //注册引用
@@ -289,9 +329,8 @@ export default class TaskContents {
         if (compileActivitys) {
             //解析动画表数据结构
             activityData = contentParser(compileActivitys, activityData)
-
-            //如果有需要构建的content
-            //开始多线程处理
+                //如果有需要构建的content
+                //开始多线程处理
             activityData.createContentIds.length ? this._dataAfterCheck(activityData) : this._loadComplete();
         } else {
             this._loadComplete();
@@ -354,8 +393,10 @@ export default class TaskContents {
                 'zIndex': {}
             }
 
-            //增加点击行为反馈
-            addBehavior(data)
+            //解析activitys.parameter中的数据里
+            //点击反馈
+            //点击缩放
+            parseBehavior(data)
 
             //构建页面content类型结构
             //contentDas, contentStr, containerPrefix, idFix, contentHtmlBoxIds
@@ -405,11 +446,35 @@ export default class TaskContents {
      */
     _dataStrCheck(data, contentDas) {
         this._assert('strAfter', function() {
+
+            //如果有点击放大的功能
+            if (Object.keys(data.zoomBehavior).length) {
+                _.each(data.contentsFragment, function(node) {
+                    //需要单独绑定点击放大功能
+                    let zoomBehavior = data.zoomBehavior[node.id]
+                    if (zoomBehavior) {
+                        //提示图片
+                        let prompt = zoomBehavior.prompt
+                        let start = function() {
+                            alert('缩放图片')
+                        }
+                        $$on(node, { start })
+                        zoomBehavior.off = function() {
+                            $$off(node, { start })
+                            node = null
+                        }
+                    }
+                })
+                this.zoomBehavior = data.zoomBehavior
+            }
+
+
             //保留场景的留信息
             //用做软件制作单页预加载
             Xut.sceneController.seasonRelated = data.seasonRelated
+
             //初始化content对象
-            bindActivitys(data, contentDas, delayHooks => this._eventAfterCheck(data, delayHooks))
+            applyActivitys(data, contentDas, delayHooks => this._eventAfterCheck(data, delayHooks))
         })
     }
 
@@ -525,6 +590,17 @@ export default class TaskContents {
         if (Xut.Contents.contentsFragment[this.chapterId]) {
             delete Xut.Contents.contentsFragment[this.chapterId]
         }
+
+        //清理放大图片功能
+        if (this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
+            _.each(this.zoomBehavior, function(zoomBehavior) {
+                console.log('清理图片放大')
+                if (zoomBehavior.off) {
+                    zoomBehavior.off()
+                }
+            })
+        }
+
         this.canvasRelated = null
         this.pageBaseHooks = null
         this.$containsNode = null;

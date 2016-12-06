@@ -30,6 +30,8 @@ export default class Flow {
         this.initIndex = pageIndex
         this.$pinchNode = $pinchNode
         this.pptMaster = pptMaster
+        this.zoom = {}
+
         render({
             $pinchNode,
             dataNode: $('#chapter-flow-' + chapterId),
@@ -157,17 +159,18 @@ export default class Flow {
         //图片地址
         let src = config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
 
-        //如果配置了高清后缀
+         //如果配置了高清后缀
+        let hqSrc
         if (config.hqUrlSuffix) {
-            src = src.replace('.', `.${config.hqUrlSuffix}.`)
+            hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
         }
 
         let img = new Image()
         img.src = src
         img.onload = () => { //防止图片为加载完毕
-            // console.log(src)
-            new Zoom(src,src)
-            // this._setImage(node, img, img.width, img.height, src)
+            if (!this.zoom[src]) {
+                this.zoom[src] = new Zoom(node, src, hqSrc)
+            }
         }
         img.onerror = () => { //失败
             img = null
@@ -388,6 +391,15 @@ export default class Flow {
      * @return {[type]} [description]
      */
     destroy() {
+
+        //销毁缩放图片
+        if(Object.keys(this.zoom).length){
+            _.each(this.zoom,(obj,key) =>{
+                obj.destroy()
+                this.zoom[key] = null
+            })
+        }
+
         this.swipe && this.swipe.destroy()
     }
 

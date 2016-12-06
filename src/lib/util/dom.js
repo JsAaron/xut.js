@@ -37,7 +37,9 @@ const eventNames = (() => {
 
 
 const eachApply = (events, callbacks, processor) => {
-    _.each(callbacks, (hooks, key) => hooks && processor(events[orderName[key]], hooks))
+    _.each(callbacks, function(hooks, key) {
+        hooks && processor(events[orderName[key]], hooks)
+    })
 }
 
 
@@ -48,7 +50,9 @@ const eachApply = (events, callbacks, processor) => {
  * @return {[type]} [description]
  */
 const addEvent = (context, events, callbacks) => {
-    eachApply(events, callbacks, (eventName, hook) => context.addEventListener(eventName, hook, false))
+    eachApply(events, callbacks, function(eventName, hook) {
+        context.addEventListener(eventName, hook, false)
+    })
 }
 
 /**
@@ -58,7 +62,9 @@ const addEvent = (context, events, callbacks) => {
  * @return {[type]} [description]
  */
 const removeEvent = (context, events, callbacks) => {
-    eachApply(events, callbacks, (eventName, hook) => context.removeEventListener(eventName, hook, false))
+    eachApply(events, callbacks, function(eventName, hook) {
+        context.removeEventListener(eventName, hook, false)
+    })
 }
 
 
@@ -69,15 +75,15 @@ const removeEvent = (context, events, callbacks) => {
  * @param  {Function} callback     [回调函数]
  * @return {[type]}                [description]
  */
-const adaptive = (process, element, callbacks) => {
+const compatibility = (apply, element, callbacks) => {
     //如果两者都支持
     //鼠标与触摸
     if (isSurface) {
         _.each(eventNames, events => {
-            process(element, events, callbacks)
+            apply(element, events, callbacks)
         })
     } else {
-        process(element, eventNames, callbacks)
+        apply(element, eventNames, callbacks)
     }
 }
 
@@ -93,7 +99,7 @@ const adaptive = (process, element, callbacks) => {
  * @return {[type]} [description]
  */
 export function $$on(element, callbacks) {
-    adaptive(addEvent, element, callbacks)
+    compatibility(addEvent, element, callbacks)
 }
 
 
@@ -104,7 +110,7 @@ export function $$on(element, callbacks) {
  * @return {[type]}         [description]
  */
 export function $$off(element, callbacks) {
-    adaptive(removeEvent, element, callbacks)
+    compatibility(removeEvent, element, callbacks)
 }
 
 
@@ -150,5 +156,3 @@ export function $$target(event, original) {
     }
     return original ? event : event.target;
 }
-
-

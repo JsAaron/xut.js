@@ -1,3 +1,4 @@
+import { config } from '../../config/index'
 /**
  * 随机生成0-30之间的不重复的数字作为li的id
  * @return {[type]} [description]
@@ -10,7 +11,7 @@ function createUnpeatableNumbers() {
     return rand;
 }
 
-const transEndEventName = Xut.plat.transitionEnd
+const transEndEventName = Xut.style.transitionEnd
 const supportTransitions = true
 
 /**
@@ -19,21 +20,23 @@ const supportTransitions = true
  */
 export default class Zoom {
 
-    constructor(originSrc, hdSrc) {
+    constructor(node, originSrc, hdSrc) {
+
 
         var uniqueId = createUnpeatableNumbers();
-
         this.liId = "oriHdimg" + uniqueId;
         this.originSrc = originSrc;
+        this.imgNode = node;
         var self = this;
-        _initStructure(originSrc);
+        this.container = $('body');
+        _initStructure(node);
 
-        let svImageTransitionSpeedFade = 300,
+        let svImageTransitionSpeedFade = 100,
             svImageTransitionEasingFade = 'ease-in-out',
-            svImageTransitionSpeedResize = 300,
+            svImageTransitionSpeedResize = 200,
             svImageTransitionEasingResize = 'ease-in-out',
             svMargins = { vertical: 0, horizontal: 0 },
-            speed = 300,
+            speed = 100,
             easing = 'ease',
             overlayAnimated = true;
 
@@ -43,14 +46,13 @@ export default class Zoom {
         this.isAnimating = true;
         this.fly = null;
         this.svImage = null;
-        this.container = $('body');
+
         this.overlay = $('div.gamma-overlay')
         this.svclose = null;
         this.singleview = null;
 
         this.screenWidth = document.documentElement.clientWidth || $(window).width();
         this.screenHeight = document.documentElement.clientHeight || $(window).height();
-
 
         //放大层是否已经出现
         this.isSV = false;
@@ -79,44 +81,41 @@ export default class Zoom {
         function _createSingleView() {
             // the single view will include the image, navigation buttons and close, play, and pause buttons
             if (!$("div.gamma-single-view").length) {
-                var isPc = _IsPC();
-                //pc端
-                if (isPc) {
-                    $('<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-buttons" ><button style="width:30px;height:30px;font-size:14px;margin-left:5px;" class="gamma-btn-close"></button></div></div></div>')
-                        .appendTo(self.container);
+                let html;
+                const viewSize = config.viewSize
+                const right = viewSize.overflowWidth && Math.abs(viewSize.right) || 0
+                const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
+
+
+                const rightCopy = right + 4;
+                const rightCopy2 = right + 3.5;
+                const topCopy = top + 4;
+                //移动端
+                //横屏
+                if (self.screenWidth > self.screenHeight) {
+                    html = `<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-btn-close ionicons ion-ios-close" style="font-size:6vw;width:6vw;height:6vw; position:absolute;top:${topCopy}px;right:${rightCopy}px;z-index:10001;text-align:center;cursor:pointer;"><div class="ionicons ion-ios-close-outline" style="position:absolute;top:0;right:${rightCopy2}px;cursor:pointer;"></div></div></div></div>`;
                 } else {
-                    //移动端
-                    //横屏
-                    if (self.screenWidth > self.screenHeight) {
-                        $('<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-buttons" style="width:4vw;height:4vw;"><button class="gamma-btn-closeHorizontal gamma-btn-close"  style="width:100%;height:100%;font-size:2vw;"></button></div></div></div>')
-                            .appendTo(self.container);
-                    } else {
-                        //竖屏
-                        $('<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-buttons" style="width:4vh;height:4vh;"><button class="gamma-btn-closeVertical gamma-btn-close" style="width:100%;height:100%;"></button></div></div></div>')
-                            .appendTo(self.container);
-                    }
+                    //竖屏
+                    html = `<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-btn-close ionicons ion-ios-close" style="font-size:6vh;width:6vh;height:6vh;position:absolute;top:${topCopy}px;right:${rightCopy}px;z-index:10001;text-align:center;cursor:pointer;"><div class="ionicons ion-ios-close-outline" style="position:absolute;top:0;right:${rightCopy2};cursor:pointer;"></div></div></div></div>`;
+
                 }
-
-
-
+                $(String.styleFormat(html)).appendTo(self.container);
 
             }
             self.singleview = self.container.children('div.gamma-single-view');
+            self.svclose = $('div.gamma-btn-close');
+            self.svclose.on('touchend mouseup', _closeSingleView);
+            self.svclose.hide();
             self.singleview.show();
-            self.svclose = $('button.gamma-btn-close');
-            self.svclose.on('click', _closeSingleView);
+
         }
 
         // closes the single view
         function _closeSingleView() {
-
             if (self.isAnimating || self.fly) return false;
-
             self.isSV = false;
-
             var $item = self.$element,
                 $img = $item.children('img');
-
             // scroll window to item's position if item is not "partially" visible
             var wst = $(window).scrollTop();
 
@@ -126,9 +125,6 @@ export default class Zoom {
                 if (wst > diff) wst = diff;
                 $(window).scrollTop(wst);
             }
-
-
-
             var l = self.svImage.position().left + $(window).scrollLeft(),
                 t = self.svImage.position().top + wst;
 
@@ -143,47 +139,49 @@ export default class Zoom {
             self.singleview.hide();
             self.$body.css('overflow-y', 'scroll');
 
-            self._closeSingleViewTimer = setTimeout(function() {
-                var styleCSS = {
-                    width: $img.width(),
-                    height: $img.height(),
-                    left: $item.offset().left + ($item.outerWidth(true) - $item.width()) / 2,
-                    top: $item.offset().top + ($item.outerHeight(true) - $item.height()) / 2
+
+            var styleCSS = {
+                width: $img.width(),
+                height: $img.height(),
+                left: $item.offset().left + ($item.outerWidth(true) - $item.width()) / 2,
+                top: $item.offset().top + ($item.outerHeight(true) - $item.height()) / 2
+            }
+            _applyAnimation(self.svImage, styleCSS, speed, supportTransitions, function() {
+                $item.css('visibility', 'visible');
+                $(this).remove();
+                self.svImage = null;
+            });
+
+            // transition: overlay opacity
+            if (overlayAnimated) {
+                if (supportTransitions) {
+                    _setTransition(self.overlay, 'opacity');
                 }
-                _applyAnimation(self.svImage, styleCSS, speed, supportTransitions, function() {
-                    $item.css('visibility', 'visible');
-                    $(this).remove();
-                    self.svImage = null;
+                _applyAnimation(self.overlay, { 'opacity': 0 }, speed, supportTransitions, function() {
+                    var $this = $(this);
+                    if (supportTransitions) $this.off(transEndEventName);
+                    $this.hide();
                 });
-
-                // transition: overlay opacity
-                if (overlayAnimated) {
-                    if (supportTransitions) {
-                        _setTransition(self.overlay, 'opacity');
-                    }
-                    _applyAnimation(self.overlay, { 'opacity': 0 }, speed, supportTransitions, function() {
-                        var $this = $(this);
-                        if (supportTransitions) $this.off(transEndEventName);
-                        $this.hide();
-                    });
-                } else {
-                    self.overlay.hide();
-                }
-                //清除定时器
-                _destroyTimer();
-
-
-            }, 25);
+            } else {
+                self.overlay.hide();
+            }
 
             //移除高清图片层
             self.singleview.remove();
+
+
+            //还原原有图片结构
+
+            // self.imgObject.insertBefore($("#" + self.liId).parent().parent())
+            // self.imgObject.next().remove();
+            // self.imgObject = null;
 
         }
 
         // sets a transition for an element
         function _setTransition(el, property, speed, easing) {
             if (!property) property = 'all';
-            if (!speed) speed = 300;
+            if (!speed) speed = 100;
             if (!easing) easing = 'ease';
             el.css('transition', property + ' ' + speed + 'ms ' + easing);
         }
@@ -209,18 +207,6 @@ export default class Zoom {
             }
         }
 
-        function _IsPC() {
-            var userAgentInfo = navigator.userAgent;
-            var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
-            var flag = true;
-            for (var v = 0; v < Agents.length; v++) {
-                if (userAgentInfo.indexOf(Agents[v]) > 0) {
-                    flag = false;
-                    break;
-                }
-            }
-            return flag;
-        }
 
         // given the wrapper's width and height, calculates the final width, height, left and top for the image to fit inside
         function _getFinalSizePosition(imageSize, wrapperSize) {
@@ -363,40 +349,37 @@ export default class Zoom {
             // transition: overlay opacity
             self.overlay.show();
             _setTransition(self.overlay, 'opacity');
-            self.singleViewItemTimer = setTimeout(function() {
-                _applyAnimation(self.overlay, { 'opacity': 1 }, 300, supportTransitions || !anim, function() {
-                    if (self.isSV) return false;
-                    if (supportTransitions) $(this).off(transEndEventName);
-                    // set the overflow-y to hidden
-                    self.$body.css('overflow-y', 'hidden');
-                    // force repaint. Chrome in Windows does not remove overflow..
-                    // http://stackoverflow.com/a/3485654/989439
-                    self.overlay[0].style.display = 'none';
-                    // self.overlay[0].offsetHeight; // no need to store this anywhere, the reference is enough
-                    self.overlay[0].style.display = 'block';
-                });
-                $item.css('visibility', 'hidden');
-                if (!anim) {
+            _applyAnimation(self.overlay, { 'opacity': 1 }, 100, supportTransitions || !anim, function() {
+                if (self.isSV) return false;
+                if (supportTransitions) $(this).off(transEndEventName);
+                // set the overflow-y to hidden
+                self.$body.css('overflow-y', 'hidden');
+                // force repaint. Chrome in Windows does not remove overflow..
+                // http://stackoverflow.com/a/3485654/989439
+                self.overlay[0].style.display = 'none';
+                // self.overlay[0].offsetHeight; // no need to store this anywhere, the reference is enough
+                self.overlay[0].style.display = 'block';
+            });
+            $item.css('visibility', 'hidden');
+            if (!anim) {
+                _loadSVItemFromGrid(data, finalSizePosition, source.src);
+            } else {
+                var styleCSS = {
+                        width: finalSizePosition.width,
+                        height: finalSizePosition.height,
+                        left: finalSizePosition.left + $(window).scrollLeft() + svMargins.horizontal / 2,
+                        top: finalSizePosition.top + $(window).scrollTop() + svMargins.vertical / 2
+                    },
+                    cond = supportTransitions;
+
+                _applyAnimation(self.fly, styleCSS, speed, cond, function() {
+                    if (cond) {
+                        $(this).off(transEndEventName);
+                    }
                     _loadSVItemFromGrid(data, finalSizePosition, source.src);
-                } else {
-                    var styleCSS = {
-                            width: finalSizePosition.width,
-                            height: finalSizePosition.height,
-                            left: finalSizePosition.left + $(window).scrollLeft() + svMargins.horizontal / 2,
-                            top: finalSizePosition.top + $(window).scrollTop() + svMargins.vertical / 2
-                        },
-                        cond = supportTransitions;
 
-                    _applyAnimation(self.fly, styleCSS, speed, cond, function() {
-                        //if(!self.isFly) return false;
-                        if (cond) {
-                            $(this).off(transEndEventName);
-                        }
-                        _loadSVItemFromGrid(data, finalSizePosition, source.src);
-
-                    });
-                }
-            }, 25);
+                });
+            }
         }
 
         // load new image for the new item to show
@@ -426,19 +409,18 @@ export default class Zoom {
 
                 if (self.fly) {
                     if (supportTransitions) {
-                        _setTransition(self.fly, 'opacity', 1000);
+                        _setTransition(self.fly, 'opacity', 100);
                     }
-                    self.flyTimer = setTimeout(function() {
-                        _applyAnimation(self.fly, { 'opacity': 0 }, 1000, supportTransitions, function() {
-                            var $this = $(this);
-                            if (supportTransitions) {
-                                $this.off(transEndEventName);
-                            }
-                            $this.remove();
-                            self.fly = null;
-                            self.isAnimating = false;
-                        });
-                    }, 25);
+                    _applyAnimation(self.fly, { 'opacity': 0 }, 100, supportTransitions, function() {
+                        var $this = $(this);
+                        if (supportTransitions) {
+                            $this.off(transEndEventName);
+                        }
+                        $this.remove();
+                        self.fly = null;
+                        self.isAnimating = false;
+                        self.svclose.show();
+                    });
                 } else {
                     self.isAnimating = false;
                 }
@@ -447,50 +429,44 @@ export default class Zoom {
         }
 
 
-        function _initStructure(originSrc) {
-            self.imgObject = $('img[src|="' + originSrc + '"]')
+        function _initStructure(node) {
+            //添加已经初始化成功标记 不再重复new对象
+            $(node).data("alreadyInit", true);
+            //self.imgObject = $('img[src|="' + originSrc + '"]')
+            self.imgObject = $(node);
             self.imgObject.wrap("<div/>").wrap("<ul/>").wrap('<li id="' + self.liId + '" />')
                 //存在背景层则不重复添加到页面上
             if (!$("div.gamma-overlay").length) {
-                $(' <div class="gamma-overlay"></div>').appendTo(self.imgObject.parent().parent().parent().parent())
+                $('<div class="gamma-overlay"></div>').appendTo(self.container)
             }
 
         }
 
-        function _destroyTimer() {
-            //清除定时器
-            self._closeSingleViewTimer && clearTimeout(self._closeSingleViewTimer)
-            self._closeSingleViewTimer = null;
-
-            self.singleViewItemTimer && clearTimeout(self.singleViewItemTimer)
-            self.singleViewItemTimer = null;
-
-            self.flyTimer && clearTimeout(self.flyTimer)
-            self.flyTimer = null;
-        }
-
+        $(node).on("touchend mouseup", _bindGamma);
 
         function _bindGamma() {
-            $("#" + self.liId + " img").on("click", function() {
-                _createSingleView();
-                var $item = $("#" + self.liId),
-                    $picEl = $(this);
 
+            _createSingleView();
+            var $item = $("#" + self.liId),
+                $picEl = $item.children();
 
-                // data is saved in the <li> element*/
-                $item.data({
-                    source: [{
-                        pos: 0,
-                        src: hdSrc,
-                        width: 200
-                    }]
-                });
-                _singleviewitem($item, true);
+            // data is saved in the <li> element*/
+            $item.data({
+                source: [{
+                    pos: 0,
+                    src: hdSrc ? hdSrc : originSrc,
+                    width: 200
+                }]
             });
+            _singleviewitem($item, true);
+
+
         }
 
 
         _bindGamma();
+
+
 
     }
 
@@ -506,7 +482,8 @@ export default class Zoom {
 
         //解除关闭按钮绑定事件 
         if (this.svclose) {
-            this.svclose.off("click", this._closeSingleView)
+            this.svclose.off("touchend", this._closeSingleView)
+            this.svclose.off("mouseup", this._closeSingleView)
             this.svclose = null;
         }
 
@@ -517,20 +494,11 @@ export default class Zoom {
             this.finalConfig = null;
         }
 
-        //清除定时器
-        this._closeSingleViewTimer && clearTimeout(this._closeSingleViewTimer)
-        this._closeSingleViewTimer = null;
-
-        this.singleViewItemTimer && clearTimeout(this.singleViewItemTimer)
-        this.singleViewItemTimer = null;
-
-        this.flyTimer && clearTimeout(this.flyTimer)
-        this.flyTimer = null;
-
 
         //解除img绑定的事件 清空数据
 
-        $("#" + this.liId + " img").off("click");
+        $(this.imgNode).off("touchend", this._bindGamma);
+        $(this.imgNode).off("mouseup", this._bindGamma);
         $("#" + this.liId).removeData();
         this.$element = null;
 
