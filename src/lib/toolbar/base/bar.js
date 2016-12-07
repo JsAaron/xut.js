@@ -95,9 +95,9 @@ export default class Bar {
         //动态图标，数据库定义的翻页图标
         //font字体画翻页图标
         if (isCustom) {
-            $str = $(this._createIcon())
+            $str = $(String.styleFormat(this._createIcon()))
         } else {
-            $str = $(this._createArrow())
+            $str = $(String.styleFormat(this._createArrow()))
         }
         const $left = $str.eq(0)
         const $right = $str.eq($str.length - 1) //存在文本节点

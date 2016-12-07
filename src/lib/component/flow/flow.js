@@ -158,22 +158,26 @@ export default class Flow {
     _zoomImage(node) {
         //图片地址
         let src = config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
-
-         //如果配置了高清后缀
-        let hqSrc
-        if (config.hqUrlSuffix) {
-            hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
-        }
-
-        let img = new Image()
-        img.src = src
-        img.onload = () => { //防止图片为加载完毕
-            if (!this.zoom[src]) {
-                this.zoom[src] = new Zoom(node, src, hqSrc)
+        if (!this.zoom[src]) {
+            //如果配置了高清后缀
+            let hqSrc
+            if (config.hqUrlSuffix) {
+                hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
             }
-        }
-        img.onerror = () => { //失败
-            img = null
+
+            let img = new Image()
+            img.src = src
+            img.onload = () => { //防止图片为加载完毕
+                this.zoom[src] = new Zoom({
+                    container:this.$pinchNode,
+                    element: $(node),
+                    originalSrc: src,
+                    hdSrc:hqSrc
+                })
+            }
+            img.onerror = () => { //失败
+                img = null
+            }
         }
     }
 
@@ -393,8 +397,8 @@ export default class Flow {
     destroy() {
 
         //销毁缩放图片
-        if(Object.keys(this.zoom).length){
-            _.each(this.zoom,(obj,key) =>{
+        if (Object.keys(this.zoom).length) {
+            _.each(this.zoom, (obj, key) => {
                 obj.destroy()
                 this.zoom[key] = null
             })

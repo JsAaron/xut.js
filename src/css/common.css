@@ -233,14 +233,8 @@ video {
 
 .gamma-overlay {
     background: #fff;
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0;
-    display: none;
-    z-index: 9999;
 }
 
 .gamma-img-fly {
@@ -251,14 +245,13 @@ video {
 }
 
 .gamma-single-view {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: 10000;
     text-align: center;
-    display: none;
 }
 
 .gamma-single-view img {

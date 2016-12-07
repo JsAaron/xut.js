@@ -8,6 +8,8 @@
  *
  * ***************************************************/
 
+import { config } from '../../../config/index'
+
 import contentStructure from './structure/index'
 import ActivityClass from '../../../component/activity/index'
 
@@ -449,6 +451,8 @@ export default class TaskContents {
 
             //如果有点击放大的功能
             if (Object.keys(data.zoomBehavior).length) {
+                let self = this
+                self.zoomObj = {} //保存缩放对象
                 _.each(data.contentsFragment, function(node) {
                     //需要单独绑定点击放大功能
                     let zoomBehavior = data.zoomBehavior[node.id]
@@ -456,7 +460,20 @@ export default class TaskContents {
                         //提示图片
                         let prompt = zoomBehavior.prompt
                         let start = function() {
-                            alert('缩放图片')
+                            let $node = $(node)
+                            let $imgNode = $node.find('img')
+                            let src = config.pathAddress + $imgNode[0].src.match(/\w+.(jpg|png)/gi)
+                            let zoomObj = self.zoomObj[src]
+                            if (zoomObj) {
+                                zoomObj.play()
+                            } else {
+                                self.zoomObj[src] = new Zoom({
+                                    container: $node,
+                                    element: $imgNode,
+                                    originalSrc: src,
+                                    hdSrc: 'content/410/gallery/8e1394802680df781ad17763c354b28a.hi.png'
+                                })
+                            }
                         }
                         $$on(node, { start })
                         zoomBehavior.off = function() {
@@ -593,12 +610,19 @@ export default class TaskContents {
 
         //清理放大图片功能
         if (this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
+            //清理缩放绑定事件
             _.each(this.zoomBehavior, function(zoomBehavior) {
-                console.log('清理图片放大')
                 if (zoomBehavior.off) {
                     zoomBehavior.off()
                 }
             })
+            this.zoomBehavior = null
+
+            //清理缩放对象
+            _.each(this.zoomObj, function(zoomObj) {
+                zoomObj.destroy()
+            })
+            this.zoomObj = null
         }
 
         this.canvasRelated = null
