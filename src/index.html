@@ -11,38 +11,10 @@
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
     <script type="text/javascript" src="lib/external.js"></script>
-    <style type="text/css">
-    .apptest {
-        width: 38vw;
-        position: absolute;
-        left: 32vw;
-        top: 0;
-        z-index: 9999999999;
-    }
-    
-    .apptest li {
-        width: 36%;
-        float: left;
-    }
-    
-    .apptest li:first-child {
-        width: 25%;
-    }
-    </style>
 </head>
 
 <body>
-    <ul class="apptest">
-        <li><a class="showpage">1</a></li>
-        <li>
-            <button class="switch1">上个</button>
-        </li>
-        <li>
-            <button class="switch2">下个</button>
-        </li>
-    </ul>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
-
 
 
     <div id="xut-stream-flow" style="display:none;z-index:-1">
@@ -418,61 +390,27 @@ class="st_adfd20a9cddbffd6">“</span>一方面，带孩子也很辛苦的工作
     </div>
 
 
+
+
 </body>
 
 </html>
 <script type="text/javascript">
 Xut.Application.setConfig = {
-    lauchMode: 1, //启动模式
-    hqUrlSuffix: 'hi', //图片为hi的后缀,
-    visualMode: 3
-}
+    historyMode:true,
+    lauchMode: 1,
+    visualMode: 3,
+    saleMode: true,
+    hasQRCode:true,
+    hqUrlSuffix: 'hi'
+};
 
-var testId = localStorage.getItem('test-appId')
-
-var start = 310 || 501
-var appid = start
-var length = 19
-var max = appid + length
-
-var $page = $('.showpage')
-
-var launch = function() {
-    state = true
-    Xut.Application.Launch({
-        el: '#xxtppt-app-container',
-        paths: {
-            resource: 'content/' + appid,
-            database: 'content/' + appid + '/SQLResult.js'
-        }
-    });
-    $page.html(appid)
-    localStorage.setItem('test-appId', appid);
-}
-
-var destory = function() {
-    Xut.Application.Destroy()
-    $page.html(appid)
-}
-
-
-$(".switch1").click(function() {
-    if (appid <= start) {
-        return
+var appid = 310
+Xut.Application.Launch({
+    el: '#xxtppt-app-container',
+    paths: {
+        resource: 'content/' + appid,
+        database: 'content/' + appid + '/SQLResult.js'
     }
-    --appid
-    destory()
-    setTimeout(launch)
-})
-
-$(".switch2").click(function() {
-    if (appid > max) {
-        appid = start - 1
-    }
-    ++appid
-    destory()
-    setTimeout(launch)
-})
-
-launch()
+});
 </script>

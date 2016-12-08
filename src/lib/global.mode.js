@@ -16,6 +16,13 @@ export default {
     silent: process.env.NODE_ENV !== 'production',
 
     /**
+     * 是否有二维码图片
+     * 如果有二维码针对img元素放开默认行为的阻止
+     * @type {Boolean}
+     */
+    hasQRCode:false,
+
+    /**
      * 忙碌光标
      * cursor: {
      *   url: 'images/icons/showNote.png',

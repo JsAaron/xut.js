@@ -34,7 +34,7 @@ import {
     $$on,
     $$off
 } from '../../../util/dom'
-import Zoom from '../../../plugin/extend/zoom'
+import Zoom from '../../../plugin/extend/zoom/index'
 
 
 function createFn(obj, id, callback) {
@@ -459,6 +459,19 @@ export default class TaskContents {
                     if (zoomBehavior) {
                         //提示图片
                         let prompt = zoomBehavior.prompt
+                        if (prompt) {
+                            let zoomIcon
+                            //横屏
+                            if (config.screenSize.width > config.screenSize.height) {
+                                zoomIcon = `<div class="ionicons ion-arrow-expand" style="font-size:4vw;position:absolute;right:0;top:-0.5vw;"></div>`
+                            } else {
+                                //竖屏
+                                zoomIcon = `<div class="ionicons ion-arrow-expand" style="font-size:3vh;position:absolute;right:0;top:-0.375vh;"></div>`
+
+                            }
+                            $(node).append(String.styleFormat(zoomIcon))
+
+                        }
                         let start = function() {
                             let $node = $(node)
                             let $imgNode = $node.find('img')
@@ -467,11 +480,15 @@ export default class TaskContents {
                             if (zoomObj) {
                                 zoomObj.play()
                             } else {
+                                let hqSrc
+                                if (config.hqUrlSuffix) {
+                                    hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
+                                }
                                 self.zoomObj[src] = new Zoom({
                                     container: $node,
                                     element: $imgNode,
                                     originalSrc: src,
-                                    hdSrc: 'content/410/gallery/8e1394802680df781ad17763c354b28a.hi.png'
+                                    hdSrc: hqSrc
                                 })
                             }
                         }

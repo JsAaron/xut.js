@@ -57,7 +57,7 @@ export default class Swipe extends Observer {
         pagetotal, //总数
         multiplePages, //多页面
         stopPropagation = false,
-        preventDefault,
+        preventDefault = true,
         linear = false, //线性模式
         borderBounce = true, //边界反弹
         extraGap = 0, //间隔,flow处理
@@ -74,7 +74,7 @@ export default class Swipe extends Observer {
              * 默认阻止所有行为
              * @type {[type]}
              */
-            preventDefault: preventDefault ? preventDefault : true,
+            preventDefault,
 
             /**
              * 是否分段处理
@@ -197,8 +197,12 @@ export default class Swipe extends Observer {
      * @return {[type]}   [description]
      */
     handleEvent(e) {
-
-        this.options.preventDefault && e.preventDefault()
+        //如果是图片
+        //有可能是二维码，所以这里默认行为不阻止了
+        if(config.hasQRCode && e.target.nodeName.toLowerCase() === "img"){
+        }else{
+            this.options.preventDefault && e.preventDefault()
+        }
         this.options.stopPropagation && e.stopPropagation()
 
         //接受多事件的句柄
@@ -390,17 +394,18 @@ export default class Swipe extends Observer {
 
         this._isTap = this._isMoving = false
 
+        let duration = getDate() - this._start.time
+
         //点击
         if (!this._isRollX && !this._isRollY) {
             let isReturn = false
-            this.$emit('onTap', this._hindex, () => isReturn = true, e);
+            this.$emit('onTap', this._hindex, () => isReturn = true, e, duration)
             if (isReturn) return
         }
 
         //如果是左右滑动
         if (this._isRollX) {
 
-            let duration = getDate() - this._start.time
             let deltaX = Math.abs(this._deltaX)
 
             //如果是首尾

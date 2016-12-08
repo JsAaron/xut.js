@@ -9,7 +9,17 @@ import init from './initialize/index'
 
 Xut.Version = 872.2
 
+
 if (Xut.plat.isBrowser) {
+
+    /**
+     * 禁止全局的缩放处理
+     * @return {[type]}    [description]
+     */
+    $('body').on('touchmove', function(e) {
+        e.preventDefault && e.preventDefault()
+    })
+
     //Mobile browser automatically broadcast platform media processing
     if (Xut.plat.noAutoPlayMedia) {
         fixAudio()

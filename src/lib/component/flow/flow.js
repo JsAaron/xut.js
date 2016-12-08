@@ -7,7 +7,7 @@ import render from './render'
 import getFlipDistance from '../../visuals/distance.config'
 import { getFlowView } from '../../visuals/hooks/adapter'
 
-import Zoom from '../../plugin/extend/zoom'
+import Zoom from '../../plugin/extend/zoom/index'
 import PinchPan from '../../plugin/extend/pinch.pan'
 import closeButton from '../../plugin/extend/close.button'
 
@@ -30,7 +30,7 @@ export default class Flow {
         this.initIndex = pageIndex
         this.$pinchNode = $pinchNode
         this.pptMaster = pptMaster
-        this.zoom = {}
+        this.zoomObjs = {}
 
         render({
             $pinchNode,
@@ -56,101 +56,6 @@ export default class Flow {
         }
     }
 
-    _setImage(node, img, width, height, src) {
-
-        //是竖版图片
-        const isVerticalFigure = width < height
-        const screenWidth = config.screenSize.width
-        const screenHeight = config.screenSize.height
-
-        let prop
-        let top = 0
-        let left = 0
-
-        //宽度100%适应宽度
-        const widthFullAdaptiveHeight = () => {
-            prop = screenWidth / width
-            width = screenWidth
-            height = height * prop
-            top = (screenHeight - height) / 2
-        }
-
-        //高度100% 自适应宽度
-        const heightFullAdaptiveWidth = () => {
-            prop = screenHeight / height
-            height = screenHeight
-            width = width * prop
-            left = (screenWidth - width) / 2
-        }
-
-        //竖图
-        if (isVerticalFigure) {
-            //竖屏显示
-            if (config.screenVertical) {
-                widthFullAdaptiveHeight()
-            }
-            //横版显示
-            else {
-                heightFullAdaptiveWidth()
-            }
-        }
-        //横图
-        else {
-            widthFullAdaptiveHeight()
-        }
-
-        const pageImageHTML =
-            `<div class="page-pinch-image">
-                    <div style="width:${width}px;
-                                height:${height}px;
-                                top:${top}px;
-                                left:${left}px;
-                                background-image:url(${src});">
-                    </div>
-             </div>`
-
-        const $pageImage = $(String.styleFormat(pageImageHTML))
-        this.$pinchNode.after($pageImage)
-
-        this.swipe.bansliding() //flow滑动
-        Xut.Application.Bansliding() //全局滑动
-        Xut.View.HideToolBar('pageNumber') //工具栏
-
-        //按钮
-        let $buttonNode = closeButton(() => destory())
-
-        //缩放
-        let slide
-
-        //销毁
-        const destory = () => {
-            if ($buttonNode) {
-                $buttonNode.off()
-                $buttonNode = null
-            }
-
-            img = null
-            slide && slide.destroy()
-            $pageImage.remove()
-            node.style.visibility = ''
-            this._destroyZoomImage = null
-            this.swipe.allowliding()
-            Xut.Application.Allowliding()
-            Xut.View.ShowToolBar('pageNumber')
-        }
-
-        if (Xut.plat.hasTouch && config.saleMode) {
-            slide = new PinchPan({
-                hasButton: false,
-                $pagePinch: $pageImage.children(),
-                doubletap: destory
-            })
-        }
-
-        node.style.visibility = 'hidden'
-        $pageImage.append($buttonNode)
-    }
-
     /**
      * 缩放图片
      * @return {[type]} [description]
@@ -158,21 +63,22 @@ export default class Flow {
     _zoomImage(node) {
         //图片地址
         let src = config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
-        if (!this.zoom[src]) {
+        if (this.zoomObjs[src]) {
+            //重复调用
+            this.zoomObjs[src].play()
+        } else {
             //如果配置了高清后缀
             let hqSrc
             if (config.hqUrlSuffix) {
                 hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
             }
-
             let img = new Image()
             img.src = src
             img.onload = () => { //防止图片为加载完毕
-                this.zoom[src] = new Zoom({
-                    container:this.$pinchNode,
+                this.zoomObjs[src] = new Zoom({
                     element: $(node),
                     originalSrc: src,
-                    hdSrc:hqSrc
+                    hdSrc: hqSrc
                 })
             }
             img.onerror = () => { //失败
@@ -235,6 +141,7 @@ export default class Flow {
             container,
             flipMode: 0,
             multiplePages: 1,
+            // preventDefault:,
             stopPropagation: true,
             pagetotal: pagesCount
         })
@@ -242,7 +149,11 @@ export default class Flow {
         let moveDistance = 0
         let lastDistance = swipe.getInitDistance()
 
-        swipe.$watch('onTap', (pageIndex, hookCallback, ev) => {
+        swipe.$watch('onTap', (pageIndex, hookCallback, ev, duration) => {
+            //如果是长按，是针对默认的事件处理
+            if (config.hasQRCode && duration > 500) {
+                return
+            }
             //图片缩放
             const node = ev.target
             if (node && node.nodeName.toLowerCase() === "img") {
@@ -397,10 +308,10 @@ export default class Flow {
     destroy() {
 
         //销毁缩放图片
-        if (Object.keys(this.zoom).length) {
-            _.each(this.zoom, (obj, key) => {
+        if (Object.keys(this.zoomObjs).length) {
+            _.each(this.zoomObjs, (obj, key) => {
                 obj.destroy()
-                this.zoom[key] = null
+                this.zoomObjs[key] = null
             })
         }
 

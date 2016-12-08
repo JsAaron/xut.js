@@ -126,7 +126,7 @@ export default class PinchPan {
         if (this.doubletap) {
             this.doubletap()
         } else {
-            this._reset()
+            this.reset()
         }
     }
 
@@ -274,7 +274,7 @@ export default class PinchPan {
      * 还原
      * @return {[type]} [description]
      */
-    _reset() {
+    reset() {
         this._initState()
         this._updateNodeStyle(500)
     }
@@ -289,7 +289,7 @@ export default class PinchPan {
         const left = viewSize.overflowWidth && Math.abs(viewSize.left) || 0
         const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
         const $node = closeButton(() => {
-            this._reset()
+            this.reset()
         }, left, top)
         this.$pinchNode.after($node)
         return $node
