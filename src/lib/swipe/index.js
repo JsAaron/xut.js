@@ -199,7 +199,7 @@ export default class Swipe extends Observer {
     handleEvent(e) {
         //如果是图片
         //有可能是二维码，所以这里默认行为不阻止了
-        if(config.hasQRCode && e.target.nodeName.toLowerCase() === "img"){
+        if(config.supportQR && e.target.nodeName.toLowerCase() === "img"){
         }else{
             this.options.preventDefault && e.preventDefault()
         }

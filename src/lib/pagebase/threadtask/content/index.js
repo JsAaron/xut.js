@@ -485,7 +485,6 @@ export default class TaskContents {
                                     hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
                                 }
                                 self.zoomObj[src] = new Zoom({
-                                    container: $node,
                                     element: $imgNode,
                                     originalSrc: src,
                                     hdSrc: hqSrc

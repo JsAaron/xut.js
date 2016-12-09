@@ -8,7 +8,6 @@ import getFlipDistance from '../../visuals/distance.config'
 import { getFlowView } from '../../visuals/hooks/adapter'
 
 import Zoom from '../../plugin/extend/zoom/index'
-import PinchPan from '../../plugin/extend/pinch.pan'
 import closeButton from '../../plugin/extend/close.button'
 
 /**
@@ -151,7 +150,7 @@ export default class Flow {
 
         swipe.$watch('onTap', (pageIndex, hookCallback, ev, duration) => {
             //如果是长按，是针对默认的事件处理
-            if (config.hasQRCode && duration > 500) {
+            if (config.supportQR && duration > 500) {
                 return
             }
             //图片缩放

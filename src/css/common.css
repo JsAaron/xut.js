@@ -186,51 +186,7 @@ video {
 }
 
 
-/**
- * 页面缩放关闭按钮
- */
 
-@font-face {
-    font-family: 'ionicons';
-    src: url('fonts/ionicons.eot?vv9atf');
-    src: url('fonts/ionicons.eot?vv9atf#iefix') format('embedded-opentype'), url('fonts/ionicons.ttf?vv9atf') format('truetype'), url('fonts/ionicons.woff?vv9atf') format('woff'), url('fonts/ionicons.svg?vv9atf#ionicons') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
-[class^="ion-"],
-[class*=" ion-"] {
-    /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'ionicons' !important;
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    /*  color: #007aff;*/
-    /* Better Font Rendering =========== */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.ion-ios-close-outline:before {
-    content: "\f405";
-}
-
-.ion-ios-close:before {
-    content: "\f406";
-    color: #fff;
-    filter: alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-}
-
-.ion-arrow-expand:before {
-    content: "\f25e";
-     color: rgba(0, 0, 0, 0.25);
-}
 
 /* 图片缩放功能 */
 
@@ -239,26 +195,27 @@ video {
     width: 100%;
     height: 100%;
     opacity: 0;
+    position: fixed;
+    display: none;
+    left: 0;
+    top: 0;
+    z-index: 10
 }
 
 .gamma-container {
     width: 100%;
     height: 100%;
-    z-index: 3;
-    top: 0;
-    right: 0;
-    position: absolute;
 }
 
 .gamma-img-fly {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 2;
+    z-index: 11;
 }
 
 .gamma-single-view {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -271,9 +228,6 @@ video {
     cursor: pointer;
 }
 
-.gamma-single-view.gamma-loading {
-    background: transparent url(../css/zoom/loader_light.gif) no-repeat center center;
-}
 
 
 /**

@@ -15,9 +15,29 @@ import {
 } from './util'
 
 
-function setTransition(el, property = 'all', speed = 150, easing = 'ease') {
+function setTransition(el, property, speed, easing) {
+    if (!property) property = 'all';
+    if (!speed) speed = 150;
+    if (!easing) easing = 'ease';
     el.css('transition', property + ' ' + speed + 'ms ' + easing);
 }
+
+
+/**
+ * apply a transition or fallback to jquery animate based on condition (cond)
+ * @return {[type]}            [description]
+ */
+const transEndEventName = Xut.style.transitionEnd
+
+function _applyAnimation(el, styleCSS, speed, fncompvare) {
+    $.fn.applyStyle = $.fn.css
+    if (fncompvare) el.on(transEndEventName, fncompvare);
+    fncompvare = fncompvare || function() {
+        return false;
+    };
+    el.stop().applyStyle(styleCSS, $.extend(true, [], { duration: speed + 'ms', compvare: fncompvare }));
+}
+
 
 /**
  * 图片缩放功能
@@ -36,11 +56,10 @@ export default class Zoom {
         //这里主要给flow的流式排版处理
         //img是行内元素，获取尺寸有问题
         let container = element.wrap('<div/>').parent()
-
-        //白色背景
         if (!$("div.gamma-overlay").length) {
             $('<div class="gamma-overlay"></div>').appendTo($('body'))
         }
+
         this.$overlay = $('div.gamma-overlay')
 
         //获取图片的可视区的绝对布局尺寸
@@ -52,9 +71,7 @@ export default class Zoom {
         this.originSrc = originalSrc
         this.hdSrc = hdSrc
         this.$imgNode = element
-        this.$container = container
-
-        this.$body = $('body')
+            // this.$container = container
 
         //动画中
         this.isAniming = false
@@ -82,41 +99,34 @@ export default class Zoom {
      */
     _init() {
         this._initSingleView()
-        this._createFlyNode()
-        this.targetSize = this._getData()
-        this._startZoom()
+        this._createFlyImgNode()
+            // this.targetSize = this._getData()
+            // this._startZoom()
     }
 
+    /**
+     * 构建容器
+     * @return {[type]} [description]
+     */
     _initSingleView() {
-        if (!$("div.gamma-single-view").length) {
-            let html;
-            const viewSize = config.viewSize
-            const right = viewSize.overflowWidth && Math.abs(viewSize.right) || 0
-            const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
-
-            const rightCopy = right + 4;
-            const rightCopy2 = right + 3.5;
-            const topCopy = top + 4;
-            //移动端
-            //横屏
-            if (this.screenWidth > this.screenHeight) {
-                html = `<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-btn-close ionicons ion-ios-close" style="font-size:6vw;width:6vw;height:6vw; position:absolute;top:${topCopy}px;right:${rightCopy}px;z-index:10001;text-align:center;cursor:pointer;"><div class="ionicons ion-ios-close-outline" style="position:absolute;top:0;right:${rightCopy2}px;cursor:pointer;"></div></div></div></div>`;
-            } else {
-                //竖屏
-                html = `<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-btn-close ionicons ion-ios-close" style="font-size:6vh;width:6vh;height:6vh;position:absolute;top:${topCopy}px;right:${rightCopy}px;z-index:10001;text-align:center;cursor:pointer;"><div class="ionicons ion-ios-close-outline" style="position:absolute;top:0;right:${rightCopy2};cursor:pointer;"></div></div></div></div>`;
-
-            }
-            $(String.styleFormat(html)).appendTo(this.$body);
+        //全局只保留一个缩放容器
+        if ($('.gamma-single-view').length) {
+            this.$singleView = $('.gamma-single-view')
+            this.$singleView.show()
+        } else {
+            this.$singleView = $('<div class="gamma-single-view"></div>')
+            this.$singleView.appendTo($('body'))
         }
-        this.$singleView = this.$body.children('div.gamma-single-view');
-        this.$closeButton = this.$singleView.find('div.gamma-btn-close')
-        this.$closeButton.hide();
+        this.$viewContainer = $(createContainerView())
+        this.$singleView.append(this.$viewContainer)
+            // this.$overlay = this.$viewContainer.find('.gamma-overlay')
+        this.$svclose = this.$viewContainer.find('div.gamma-btn-close')
         this.callbackEnd = () => {
             this._closeSingleView()
         }
 
         //关闭按钮
-        $$on(this.$closeButton[0], {
+        $$on(this.$svclose[0], {
             end: this.callbackEnd,
             cancel: this.callbackEnd
         })
@@ -127,7 +137,7 @@ export default class Zoom {
      * 用于缩放
      * @return {[type]} [description]
      */
-    _createFlyNode() {
+    _createFlyImgNode() {
         this.$flyNode = $('<img/>').attr('src', this.originSrc).addClass('gamma-img-fly').css({
             width: this.originImgWidth,
             height: this.originImgHeight,
@@ -155,6 +165,7 @@ export default class Zoom {
         })
     }
 
+
     /**
      * 执行缩放
      * @return {[type]} [description]
@@ -163,71 +174,88 @@ export default class Zoom {
         let source = this.targetSize.source
         let position = this.targetSize.position
 
-        //白色背景动画
+        // transition: overlay opacity
         this.$overlay.show()
         setTransition(this.$overlay, 'opacity');
-        execAnimation({
-            element: this.$overlay,
-            style: { opacity: 1 },
-            speed: 100
-        })
+        _applyAnimation(self.overlay, { 'opacity': 1 }, 100, function() {
+            $(this).off(transEndEventName)
+        });
 
-        this.$container.css('visibility', 'hidden')
 
-        this.$closeButton.show()
+        // //白色背景动画
+        // execAnimation({
+        //     element: this.$overlay,
+        //     style: { opacity: 1 },
+        //     speed: 100
+        // })
 
-        //克隆的原图放大动画
-        execAnimation({
-            element: this.$flyNode,
-            style: {
-                width: position.width,
-                height: position.height,
-                left: position.left + $(window).scrollLeft(),
-                top: position.top + $(window).scrollTop()
-            },
-            speed: 200
-        }, () => {
-            this._replaceHQIMG(position, source.src)
-        })
+        // this.$container.css('visibility', 'hidden')
+
+        // //克隆的原图放大动画
+        // execAnimation({
+        //     element: this.$flyNode,
+        //     style: {
+        //         width: position.width,
+        //         height: position.height,
+        //         left: position.left,
+        //         top: position.top
+        //     },
+        //     speed: 100
+        // }, () => {
+        //     this._replaceHQ(position, source.src)
+        // })
 
     }
 
     /**
      * 创建高清图
+     * @return {[type]} [description]
      */
-    _createHQIMG(position, src, callback) {
-        var self = this
-        this.$hQNode = $('<img/>').load(function() {
-            let $img = $(this);
-            //高清图
-            $img.css({
-                width: position.width,
-                height: position.height,
-                left: position.left,
-                top: position.top
-            }).appendTo(self.$singleView);
-            setTransition($img, 'all', 100, 'ease-in-out');
-            callback()
-        }).attr('src', src);
+    _createHQ(position) {
+        let width = position.width
+        let height = position.height
+        let left = position.left
+        let top = position.top
+
+        //创建高清img对象，克隆到新的节点
+        if (this.$hQNode) {
+            //因为高清图是被关闭缩小了，所以重新play的时候需要复位
+            this.$hQNode.css({ width, height, left, top }).show()
+        } else {
+            let hdImgHTML =
+                String.styleFormat(
+                    `<img src="${this.hdSrc}"
+                              class="gamma-img-fly"
+                              style="width:${width}px;
+                                     height:${height}px;
+                                     left:${left}px;
+                                     top:${top}px;">`)
+
+            this.$hQNode = $(hdImgHTML)
+            this.$viewContainer.append(this.$hQNode)
+        }
     }
 
     /**
      * 替换成高清图
      */
-    _replaceHQIMG(position, src) {
+    _replaceHQ(position, src) {
         //如果存在高清图
         if (this.hdSrc) {
-            this._createHQIMG(position, src, () => {
-                setTransition(this.$flyNode, 'opacity', 100);
-                //删除飞入图片
-                //用高清图替代了
-                execAnimation({
-                    element: this.$flyNode,
-                    style: { 'opacity': 0 },
-                    speed: 100
-                }, () => {
-                    this.$flyNode.remove()
-                    this.$flyNode = null
+
+            //创建高清图
+            this._createHQ(position)
+
+            //动画隐藏缩放的图片
+            //这样就可以透出高清图了
+            execAnimation({
+                element: this.$flyNode,
+                style: { 'opacity': 0 },
+                speed: 500
+            }, () => {
+                this.$flyNode.css({
+                    'display': 'none',
+                    'opacity': 1
                 })
             })
         }
@@ -235,7 +263,7 @@ export default class Zoom {
         //是否启动图片缩放
         if (!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
             //如果没有高清图，采用原图
-            let $node = this.hdSrc ? this.$hQNode : this.$flyNode
+            let $node = this.$hQNode ? this.$hQNode : this.$flyNode
             this.slideObj = new PinchPan({
                 hasButton: false,
                 $pagePinch: $node
@@ -271,42 +299,47 @@ export default class Zoom {
             return
         }
         this.isAniming = true
-        let $node = this.hdSrc ? this.$hQNode : this.$flyNode
-        let l = $node.position().left + $(window).scrollLeft()
-        let t = $node.position().top
 
-        $node.appendTo(this.$body).css({
-            position: 'absolute',
-            zIndex: 10000,
-            left: l,
-            top: t
-        });
+        //如果没有高清图，采用原图
+        let $animNode = this.$hQNode ? this.$hQNode : this.$flyNode
 
-        setTransition($node, 'all', 300);
-        this.$singleView.hide();
-
+        //关闭节点，处理高清图片的复位
         execAnimation({
-            element: $node,
+            element: $animNode,
             style: {
                 width: this.originImgWidth,
                 height: this.originImgHeight,
                 left: this.originImgLeft,
                 top: this.originImgTop
-            },
-            speed: 100
+            }
         }, () => {
-            this.$container.css('visibility', 'visible');
-            $node.remove()
+            if (this.$hQNode) {
+                execAnimation({
+                    element: this.$hQNode,
+                    style: { 'opacity': 0 }
+                }, () => {
+                    this._resetOriginPox()
+                    this.$hQNode.css({
+                        'display': 'none',
+                        'opacity': 1
+                    })
+                    this.$singleView.hide()
+                    this.$viewContainer.hide() //容器隐藏
+                })
+            } else {
+                this.$singleView.hide()
+                this.$viewContainer.hide() //容器隐藏
+            }
+            //保证关闭图标一定是关闭后，排除重复点击
+            setTimeout(() => {
+                this.isAniming = false
+            }, 500)
         })
 
-        //消失背景
-        setTransition(this.$overlay, 'opacity')
+        //白色背景动画
         execAnimation({
             element: this.$overlay,
-            style: { opacity: 0 },
-            speed: 100
-        }, () => {
-            this.$overlay.hide()
+            style: { opacity: 0 }
         })
 
         //还原原节点
@@ -320,7 +353,11 @@ export default class Zoom {
      * @return {[type]} [description]
      */
     play() {
-        this._init()
+        this._createWarp()
+        this.$flyNode.show()
+        this.$viewContainer.show()
+        this.$singleView.show()
+        this._startZoom()
     }
 
     /**
@@ -337,7 +374,7 @@ export default class Zoom {
         this.$hQNode && this.$hQNode.remove()
 
         //关闭按钮
-        $$off(this.$closeButton[0], {
+        $$off(this.$svclose[0], {
             end: this.callbackEnd,
             cancel: this.callbackEnd
         })
@@ -352,7 +389,7 @@ export default class Zoom {
         this.$imgNode = null
         this.$overlay = null
         this.$singleView = null
-        this.$closeButton = null
+        this.$svclose = null
         this.$viewContainer.remove()
         this.$viewContainer = null
     }

@@ -112,20 +112,23 @@ export default function(instance) {
             //如果是页面类型
             let isPageType = instance.pageType === 'page'
 
-            //创建缩放
+            /**
+             * 创建页面缩放缩放
+             * flow页面不允许缩放
+             * page页面可以配置缩放
+             * @param  {[type]} flow [description]
+             * @return {[type]}      [description]
+             */
             let createPinch = function(flow) {
-                if (isPageType && config.saleMode) {
-                    const $pagePinch = instance.getContainsNode()
-                    if (flow) {
-                        //flow页面不处理
-                        //目前只处理图片
-                        // instance._pinchObj = Pinch( $pagePinch.find('.page-flow-pinch'), $pagePinch)
-                    } else {
-                        instance._pinchObj = new Pinch(
-                            $pagePinch,
-                            instance.pageIndex
-                        )
-                    }
+                //页面类型
+                //如果启用了页面缩放
+                //获取开启了全部缩放
+                if (isPageType && (config.salePageType === 'page' || config.salePageType === 'all')) {
+                    let $pagePinch = instance.getContainsNode()
+                    instance._pinchObj = new Pinch(
+                        $pagePinch,
+                        instance.pageIndex
+                    )
                 }
             }
 
@@ -135,7 +138,7 @@ export default function(instance) {
             //母版跳过
             if (isPageType && instance.chapterData.note == 'flow') {
                 callContextTasks('Flow', function() {
-                    createPinch('flow')
+                    // createPinch('flow')
                     setNextRunTask('complete')
                     createRelated.createTasksComplete()
                 })

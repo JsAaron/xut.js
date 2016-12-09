@@ -49,7 +49,7 @@ export default class PinchPan {
          * 最大缩放值
          * @type {Number}
          */
-        this.maxScale = config.saleMultiples || 4
+        this.maxScale = config.salePictureMultiples || 4
 
         /**
          * 允许溢出值

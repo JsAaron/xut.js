@@ -26,6 +26,7 @@ export default function Destroy(action = 'destory') {
     //数据的结果集
     if (action === 'exit') {
         if (Xut.plat.isBrowser) {
+            $('body').off() //默认事件
             $(document).off() //左右按钮
             $(window).off() //横竖切换
         }

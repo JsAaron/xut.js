@@ -16,11 +16,11 @@ export default {
     silent: process.env.NODE_ENV !== 'production',
 
     /**
-     * 是否有二维码图片
+     * 支持二维码图片
      * 如果有二维码针对img元素放开默认行为的阻止
      * @type {Boolean}
      */
-    hasQRCode:false,
+    supportQR: false,
 
     /**
      * 忙碌光标
@@ -109,14 +109,21 @@ export default {
     orientateMode: Xut.plat.isBrowser ? true : false,
 
     /**
-     * 是否启动页面缩放，mini排版处理
-     * 默认自动，根据是否存在flow数据处理
-     * 如果强行介入，这里设置
-     * 1 true 启动
-     * 2 false 禁止
+     * 是否允许图片缩放
      */
-    saleMode: DEFAULT, //默认不配置，系统指定，如果有flow自动打开，否则按照配置文件处理
-    saleMultiples: 4, //默认缩放的倍数4倍
+    salePicture: true, //默认启动图片缩放的
+    salePictureMultiples: 4, //默认缩放的倍数4倍
+
+    /**
+     * 是否允许页面缩放页面
+     * 默认情况下页面是不允许被缩放的
+     * @type {[type]}
+     * salePageType:['flow','page','all']
+     * 可选项，缩放流式页面
+     *        缩放page页面
+     *        all全部支持
+     */
+    salePageType: DEFAULT, //默认页面是不允许被缩放的，这里可以单独启动页面缩放
 
     /**
      * 是否需要保存记录加载
