@@ -12,10 +12,7 @@ Xut.Version = 872.3
 
 if (Xut.plat.isBrowser) {
 
-    /**
-     * 禁止全局的缩放处理
-     * @return {[type]}    [description]
-     */
+    //禁止全局的缩放处理
     $('body').on('touchmove', function(e) {
         e.preventDefault && e.preventDefault()
     })
@@ -24,6 +21,7 @@ if (Xut.plat.isBrowser) {
     if (Xut.plat.noAutoPlayMedia) {
         fixAudio()
     }
+
     //Desktop binding mouse control
     $(document).keyup(event => {
         switch (event.keyCode) {
