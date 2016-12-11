@@ -12,10 +12,13 @@ Xut.Version = 872.3
 
 if (Xut.plat.isBrowser) {
 
+    //移动端
     //禁止全局的缩放处理
-    $('body').on('touchmove', function(e) {
-        e.preventDefault && e.preventDefault()
-    })
+    if (Xut.plat.hasTouch) {
+        $('body').on('touchmove', function(e) {
+            e.preventDefault && e.preventDefault()
+        })
+    }
 
     //Mobile browser automatically broadcast platform media processing
     if (Xut.plat.noAutoPlayMedia) {
