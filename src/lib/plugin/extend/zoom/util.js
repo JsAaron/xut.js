@@ -102,23 +102,23 @@ export function createContainerView() {
     let rightCopy2 = right + 3.5;
     let topCopy = top + 4;
 
-    //移动端
-    //横屏
-    if (config.screenSize.width > config.screenSize.height) {
-        html = `<div class="gamma-container">
-                        <div class="gamma-btn-close" style="position: absolute;z-index:3;right:${rightCopy}px;top:${topCopy}px;">
-                           <div class="si-icon icomoon icon-close" style="font-size:5vw;background-color:white;width:5vw;height:5vw;border-radius:50%;right:0">
-                           </div>
-                        </div>
-                </div>`;
+    if (config.screenHorizontal) {
+        html = `<div class="gamma-single-view">
+                            <div class="gamma-overlay"></div>
+                            <div class="gamma-btn-close" style="right:${rightCopy}px;top:${topCopy}px;">
+                                <div class="si-icon Flaticon flaticon-error" style="font-size:5vw;border-radius:50%;right:0">
+                                </div>
+                            </div>
+                        </div>`;
     } else {
         //竖屏
-        html = `<div class="gamma-container">
-                       <div class="gamma-btn-close" style="position: absolute;z-index:3;right:${rightCopy}px;top:${topCopy}px;">
-                           <div class="si-icon icomoon icon-close" style="font-size:5vh;background-color:white;width:5vh;height:5vh;border-radius:50%;right:0">
-                           </div>
-                        </div>
-                </div>`;
+        html = `<div class="gamma-single-view">
+                            <div class="gamma-overlay"></div>
+                            <div class="gamma-btn-close" style=";right:${rightCopy}px;top:${topCopy}px;">
+                                <div class="si-icon Flaticon flaticon-error" style="font-size:5vh;border-radius:50%;right:0">
+                                </div>
+                            </div>
+                        </div>`;
 
     }
 
@@ -148,8 +148,9 @@ export function execAnimation({
     style,
     speed = 100
 }, callback = function() {}) {
+    if (!element) return
     setTimeout(function() {
-        element.stop().transition(style, speed, 'ease', callback)
+        element.stop().transition(style, speed, 'linear', callback)
     }, 0)
 }
 

@@ -116,8 +116,18 @@ video {
     font-size: 4vh;
 }
 
-.icon-close:before {
+
+/*.icon-close:before {
     content: "\e905";
+}*/
+
+.icon-close:before {
+    /*   content: "\e908";*/
+    /*   content: "\e043";*/
+    content: "\ea0d";
+    color: #000;
+    position: relative;
+    top: 0.12vh;
 }
 
 .icon-arrow-left:before {
@@ -185,21 +195,59 @@ video {
     content: "\e903";
 }
 
+@font-face {
+    font-family: "Flaticon";
+    src: url("fonts/Flaticon.eot");
+    src: url("fonts/Flaticon.eot?#iefix") format("embedded-opentype"), url("fonts/Flaticon.woff") format("woff"), url("fonts/Flaticon.ttf") format("truetype"), url("fonts/Flaticon.svg#Flaticon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
 
+[class^="flaticon-"],
+[class*=" flaticon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'Flaticon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    color: #007aff;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.flaticon-error:before {
+    content: "\f100";
+    color: #000;
+   /* background-color: rgba(0, 0, 0, 0.25);*/
+    border-radius: 100%;
+}
 
 
 /* 图片缩放功能 */
+
+.icon-maximize:before {
+    content: "\f0b2";
+    color: rgba(0, 0, 0, 0.25);
+}
 
 .gamma-overlay {
     background: #fff;
     width: 100%;
     height: 100%;
     opacity: 0;
-    position: fixed;
-    display: none;
+    position: absolute;
     left: 0;
     top: 0;
-    z-index: 10
+    z-index: 1
+}
+
+.gamma-btn-close{
+    position: absolute;
+    z-index:3
 }
 
 .gamma-container {
@@ -211,16 +259,16 @@ video {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 11;
+    z-index: 2;
 }
 
 .gamma-single-view {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 100;
+    z-index: 12;
 }
 
 .gamma-single-view img {
@@ -228,8 +276,10 @@ video {
     cursor: pointer;
 }
 
-
-
+/*.gamma-btn-close{
+    display: none;
+    background-color: red;
+}*/
 /**
  * 修正闪烁
  * 隐藏转换的元素的背面

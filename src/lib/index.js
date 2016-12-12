@@ -12,19 +12,18 @@ Xut.Version = 872.3
 
 if (Xut.plat.isBrowser) {
 
-    //移动端
-    //禁止全局的缩放处理
-    if (Xut.plat.hasTouch) {
-        $('body').on('touchmove', function(e) {
-            e.preventDefault && e.preventDefault()
-        })
-    }
+    /**
+     * 禁止全局的缩放处理
+     * @return {[type]}    [description]
+     */
+    $('body').on('touchmove', function(e) {
+        e.preventDefault && e.preventDefault()
+    })
 
     //Mobile browser automatically broadcast platform media processing
     if (Xut.plat.noAutoPlayMedia) {
         fixAudio()
     }
-
     //Desktop binding mouse control
     $(document).keyup(event => {
         switch (event.keyCode) {
