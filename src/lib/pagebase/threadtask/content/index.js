@@ -453,7 +453,7 @@ export default class TaskContents {
             if (Object.keys(data.zoomBehavior).length) {
                 let self = this
                 self.zoomObj = {} //保存缩放对象
-                _.each(data.contentsFragment, function(node) {
+                _.each(data.contentsFragment, function(node) {               
                     //需要单独绑定点击放大功能
                     let zoomBehavior = data.zoomBehavior[node.id]
                     if (zoomBehavior) {
@@ -463,10 +463,10 @@ export default class TaskContents {
                             let zoomIcon
                             //横屏
                             if (config.screenSize.width > config.screenSize.height) {
-                                zoomIcon = `<div class="ionicons ion-arrow-expand" style="font-size:4vw;position:absolute;right:0;top:-0.5vw;"></div>`
+                                zoomIcon = `<div class="icomoon icon-maximize" style="font-size:2vw;position:absolute;right:0;"></div>`
                             } else {
                                 //竖屏
-                                zoomIcon = `<div class="ionicons ion-arrow-expand" style="font-size:3vh;position:absolute;right:0;top:-0.375vh;"></div>`
+                                zoomIcon = `<div class="icomoon icon-maximize" style="font-size:2vh;position:absolute;right:0;"></div>`
 
                             }
                             $(node).append(String.styleFormat(zoomIcon))

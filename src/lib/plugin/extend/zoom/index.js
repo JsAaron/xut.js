@@ -15,10 +15,6 @@ import {
 } from './util'
 
 
-function setTransition(el, property = 'all', speed = 150, easing = 'ease') {
-    el.css('transition', property + ' ' + speed + 'ms ' + easing);
-}
-
 /**
  * 图片缩放功能
  * 2016.12.5
@@ -31,30 +27,16 @@ export default class Zoom {
         hdSrc //高清图地址
     }) {
 
-        //如果没有传递父容器
-        //需要给元素的子元素包含一个div父容器
-        //这里主要给flow的流式排版处理
-        //img是行内元素，获取尺寸有问题
-        let container = element.wrap('<div/>').parent()
-
-        //白色背景
-        if (!$("div.gamma-overlay").length) {
-            $('<div class="gamma-overlay"></div>').appendTo($('body'))
-        }
-        this.$overlay = $('div.gamma-overlay')
+        this.$body = $('body')
+        this.$imgNode = element
+        this.originSrc = originalSrc
+        this.hdSrc = hdSrc
 
         //获取图片的可视区的绝对布局尺寸
         this.originImgWidth = element.width()
         this.originImgHeight = element.height()
-        this.originImgLeft = container.offset().left + (container.outerWidth(true) - container.width()) / 2
-        this.originImgTop = container.offset().top + (container.outerHeight(true) - container.height()) / 2
-
-        this.originSrc = originalSrc
-        this.hdSrc = hdSrc
-        this.$imgNode = element
-        this.$container = container
-
-        this.$body = $('body')
+        this.originImgLeft = element.offset().left + (element.outerWidth(true) - element.width()) / 2
+        this.originImgTop = element.offset().top + (element.outerHeight(true) - element.height()) / 2
 
         //动画中
         this.isAniming = false
@@ -69,53 +51,29 @@ export default class Zoom {
     }
 
     /**
-     * 创建包裹容器
-     * @return {[type]} [description]
-     */
-    _createWarp() {
-        this.$container = this.$imgNode.wrap('<div/>').parent()
-    }
-
-    /**
      * 初始化
      * @return {[type]} [description]
      */
     _init() {
         this._initSingleView()
         this._createFlyNode()
-        this.targetSize = this._getData()
+        if (!this.targetSize) {
+            this.targetSize = this._getData()
+        }
         this._startZoom()
     }
 
     _initSingleView() {
-        if (!$("div.gamma-single-view").length) {
-            let html;
-            const viewSize = config.viewSize
-            const right = viewSize.overflowWidth && Math.abs(viewSize.right) || 0
-            const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
 
-            const rightCopy = right + 4;
-            const rightCopy2 = right + 3.5;
-            const topCopy = top + 4;
-            //移动端
-            //横屏
-            if (this.screenWidth > this.screenHeight) {
-                html = `<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-btn-close ionicons ion-ios-close" style="font-size:6vw;width:6vw;height:6vw; position:absolute;top:${topCopy}px;right:${rightCopy}px;z-index:10001;text-align:center;cursor:pointer;"><div class="ionicons ion-ios-close-outline" style="position:absolute;top:0;right:${rightCopy2}px;cursor:pointer;"></div></div></div></div>`;
-            } else {
-                //竖屏
-                html = `<div class="gamma-single-view"><div class="gamma-options gamma-options-single"><div class="gamma-btn-close ionicons ion-ios-close" style="font-size:6vh;width:6vh;height:6vh;position:absolute;top:${topCopy}px;right:${rightCopy}px;z-index:10001;text-align:center;cursor:pointer;"><div class="ionicons ion-ios-close-outline" style="position:absolute;top:0;right:${rightCopy2};cursor:pointer;"></div></div></div></div>`;
+        this.$singleView = $(createContainerView())
+        this.$closeButton = this.$singleView.find('.gamma-btn-close')
+        this.$overlay = this.$singleView.find('.gamma-overlay')
+        this.$singleView.appendTo(this.$body)
 
-            }
-            $(String.styleFormat(html)).appendTo(this.$body);
-        }
-        this.$singleView = this.$body.children('div.gamma-single-view');
-        this.$closeButton = this.$singleView.find('div.gamma-btn-close')
-        this.$closeButton.hide();
+        //关闭按钮
         this.callbackEnd = () => {
             this._closeSingleView()
         }
-
-        //关闭按钮
         $$on(this.$closeButton[0], {
             end: this.callbackEnd,
             cancel: this.callbackEnd
@@ -133,8 +91,7 @@ export default class Zoom {
             height: this.originImgHeight,
             left: this.originImgLeft,
             top: this.originImgTop
-        }).appendTo($('body'))
-        setTransition(this.$flyNode)
+        }).appendTo(this.$singleView)
     }
 
     /**
@@ -163,33 +120,26 @@ export default class Zoom {
         let source = this.targetSize.source
         let position = this.targetSize.position
 
-        //白色背景动画
-        this.$overlay.show()
-        setTransition(this.$overlay, 'opacity');
-        execAnimation({
-            element: this.$overlay,
-            style: { opacity: 1 },
-            speed: 100
-        })
-
-        this.$container.css('visibility', 'hidden')
-
-        this.$closeButton.show()
-
         //克隆的原图放大动画
         execAnimation({
             element: this.$flyNode,
             style: {
                 width: position.width,
                 height: position.height,
-                left: position.left + $(window).scrollLeft(),
-                top: position.top + $(window).scrollTop()
+                left: position.left,
+                top: position.top
             },
-            speed: 200
+            speed: 300
         }, () => {
             this._replaceHQIMG(position, source.src)
         })
 
+        //白背景
+        execAnimation({
+            element: this.$overlay,
+            style: { opacity: 1 },
+            speed: 300
+        })
     }
 
     /**
@@ -197,28 +147,43 @@ export default class Zoom {
      */
     _createHQIMG(position, src, callback) {
         var self = this
-        this.$hQNode = $('<img/>').load(function() {
-            let $img = $(this);
-            //高清图
-            $img.css({
-                width: position.width,
-                height: position.height,
-                left: position.left,
-                top: position.top
-            }).appendTo(self.$singleView);
-            setTransition($img, 'all', 100, 'ease-in-out');
+        if (this.$hQNode) {
+            this.$hQNode.show()
             callback()
-        }).attr('src', src);
+        } else {
+            this.$hQNode = $('<img/>').load(function() {
+                $(this).css({
+                    width: position.width,
+                    height: position.height,
+                    left: position.left,
+                    top: position.top
+                }).addClass('gamma-img-fly').appendTo(self.$singleView);
+                callback()
+            }).attr('src', src);
+        }
+    }
+
+    /**
+     * 是否启动图片缩放
+     */
+    _addPinchPan() {
+        if (!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
+            //如果没有高清图，采用原图
+            let $imgNode = this.hdSrc ? this.$hQNode : this.$flyNode
+            this.slideObj = new PinchPan({
+                hasButton: false,
+                $pagePinch: $imgNode
+            })
+        }
     }
 
     /**
      * 替换成高清图
      */
     _replaceHQIMG(position, src) {
-        //如果存在高清图
+        //高清图
         if (this.hdSrc) {
             this._createHQIMG(position, src, () => {
-                setTransition(this.$flyNode, 'opacity', 100);
                 //删除飞入图片
                 //用高清图替代了
                 execAnimation({
@@ -226,36 +191,47 @@ export default class Zoom {
                     style: { 'opacity': 0 },
                     speed: 100
                 }, () => {
-                    this.$flyNode.remove()
-                    this.$flyNode = null
+                    this.$flyNode.hide()
+                    this._addPinchPan()
                 })
             })
         }
-
-        //是否启动图片缩放
-        if (!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
-            //如果没有高清图，采用原图
-            let $node = this.hdSrc ? this.$hQNode : this.$flyNode
-            this.slideObj = new PinchPan({
-                hasButton: false,
-                $pagePinch: $node
-            })
+        //普通图
+        else {
+            this._addPinchPan()
         }
+
     }
 
     /**
-     * 复位原始图的坐标
+     * 复位
+     * 便于第二次play
      * @return {[type]} [description]
      */
-    _resetOriginPox() {
+    _reset() {
         this.$flyNode.css({
             width: this.originImgWidth,
             height: this.originImgHeight,
             left: this.originImgLeft,
-            top: this.originImgTop
+            top: this.originImgTop,
+            opacity: 1,
+            display: 'block'
         })
 
-        //还原缩放
+        if (this.$hQNode) {
+            let position = this.targetSize.position
+            this.$hQNode.css({
+                width: position.width,
+                height: position.height,
+                left: position.left,
+                top: position.top,
+                display: 'none'
+            })
+        }
+
+        this.$closeButton.show()
+        this.$overlay.css('opacity', 0)
+
         if (this.slideObj) {
             this.slideObj.reset()
         }
@@ -266,52 +242,35 @@ export default class Zoom {
      * @return {[type]} [description]
      */
     _closeSingleView() {
-
         if (this.isAniming) {
             return
         }
         this.isAniming = true
-        let $node = this.hdSrc ? this.$hQNode : this.$flyNode
-        let l = $node.position().left + $(window).scrollLeft()
-        let t = $node.position().top
+        let $imgNode = this.hdSrc ? this.$hQNode : this.$flyNode
 
-        $node.appendTo(this.$body).css({
-            position: 'absolute',
-            zIndex: 10000,
-            left: l,
-            top: t
-        });
-
-        setTransition($node, 'all', 300);
-        this.$singleView.hide();
+        this.$closeButton.hide()
 
         execAnimation({
-            element: $node,
+            element: $imgNode,
             style: {
                 width: this.originImgWidth,
                 height: this.originImgHeight,
                 left: this.originImgLeft,
                 top: this.originImgTop
             },
-            speed: 100
+            speed: 300
         }, () => {
-            this.$container.css('visibility', 'visible');
-            $node.remove()
+            this.$singleView.hide()
+            this._reset()
+            this.isAniming = false
         })
 
         //消失背景
-        setTransition(this.$overlay, 'opacity')
         execAnimation({
             element: this.$overlay,
             style: { opacity: 0 },
-            speed: 100
-        }, () => {
-            this.$overlay.hide()
+            speed: 200
         })
-
-        //还原原节点
-        this.$imgNode.insertBefore(this.$container)
-        this.$container.remove()
     }
 
     /**
@@ -320,7 +279,8 @@ export default class Zoom {
      * @return {[type]} [description]
      */
     play() {
-        this._init()
+        this.$singleView.show()
+        this._startZoom()
     }
 
     /**
@@ -330,31 +290,26 @@ export default class Zoom {
      */
     destroy() {
 
-        this.$viewContainer.hide()
+        if (this.slideObj) {
+            this.slideObj.destroy()
+            this.slideObj = null
+        }
 
-        //创建2个图片node
-        this.$flyNode.remove()
-        this.$hQNode && this.$hQNode.remove()
-
-        //关闭按钮
         $$off(this.$closeButton[0], {
             end: this.callbackEnd,
             cancel: this.callbackEnd
         })
 
-        if (this.slideObj) {
-            this.slideObj.destroy()
-        }
-
-        this.$container = null
-        this.$flyNode = null
-        this.$hQNode = null
-        this.$imgNode = null
-        this.$overlay = null
-        this.$singleView = null
         this.$closeButton = null
-        this.$viewContainer.remove()
-        this.$viewContainer = null
+        this.$hQNode = null
+        this.$overlay = null
+        this.$body = null
+        this.$flyNode = null
+        this.$imgNode = null
+
+        this.$singleView.remove()
+        this.$singleView = null
+
     }
 
 }

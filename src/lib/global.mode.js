@@ -118,7 +118,7 @@ export default {
      * 是否允许页面缩放页面
      * 默认情况下页面是不允许被缩放的
      * @type {[type]}
-     * salePageType:['flow','page','all']
+     * salePageType:'flow' / 'page' / 'all'
      * 可选项，缩放流式页面
      *        缩放page页面
      *        all全部支持
