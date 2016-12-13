@@ -6,7 +6,7 @@ const _ = require("underscore");
 const createRE = require('./filter')
 
 const src = '.'
-const dists = [
+const dists = process.platform === 'win32' ? ['D:/github/xut'] : [
     '/Users/mac/project/git/xut.js/',
     '/Users/mac/project/svn/server/magazine-develop/www/'
 ]
@@ -43,10 +43,10 @@ const ls = (src, dist) => {
         var filename = rootPath + files[fn]
         var stat = fs.lstatSync(filename);
         if (stat.isDirectory() == true) {
-            ls(filename,dist)
+            ls(filename, dist)
         } else {
             if (!filterRE.test(rootPath)) {
-                 fsextra.copySync(filename, dist + filename)
+                fsextra.copySync(filename, dist + filename)
             }
         }
     }
@@ -54,9 +54,7 @@ const ls = (src, dist) => {
 
 
 dists.forEach((dist) => {
-    del(dist)
+  //  del(dist)
     ls(src, dist)
     console.log('copy: ' + dist)
 })
-
-
