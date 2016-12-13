@@ -331,7 +331,9 @@ export function initPathAddress() {
  */
 const resetProportion = function(pptWidth, pptHeight) {
 
-    //数据ppt排版设计
+    /**
+     * 数据ppt排版设计
+     */
     if (pptWidth && pptHeight) {
         config.pptHorizontal = pptWidth > pptHeight ? true : false
         config.pptVertical = !config.pptHorizontal
@@ -339,19 +341,17 @@ const resetProportion = function(pptWidth, pptHeight) {
 
     /**
      * 获取全屏比值，用来设定view的尺寸
-     * @type {[type]}
+     * 根据分辨率与PPT排版的比值来确定
      */
-    const fullProportion = getFullProportion(config, pptWidth, pptHeight)
+    let fullProportion = getFullProportion(config, pptWidth, pptHeight)
 
     /**
      * 可视区域尺寸
-     * @type {Object}
      */
-    const viewSize = config.viewSize = getViewSize(config, fullProportion)
+    let viewSize = config.viewSize = getViewSize(config, fullProportion)
 
     /**
      * 判断是否溢出与是否填充
-     * @return {[type]} [description]
      */
     viewSize.overflowWidth = false
     viewSize.notFillWidth = false
@@ -374,8 +374,6 @@ const resetProportion = function(pptWidth, pptHeight) {
 
     /**
      * 溢出高度
-     * @param  {[type]}
-     * @return {[type]}
      * */
     viewSize.overflowHeight = false
     viewSize.notFillHeight = false
@@ -389,7 +387,6 @@ const resetProportion = function(pptWidth, pptHeight) {
 
     /**
      * 获取全局缩放比
-     * @type {[type]}
      */
     proportion = config.proportion = getRealProportion(config, viewSize, fullProportion)
 

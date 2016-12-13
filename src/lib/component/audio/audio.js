@@ -33,6 +33,121 @@ let createUUID = () => [4, 2, 2, 2, 6].map(UUIDcreatePart).join('-')
 
 
 /**
+ * 采用Falsh播放
+ * @type {[type]}
+ */
+class _Flash extends BaseAudio {
+
+    constructor(options, controlDoms) {
+        super()
+        var trackId = options.trackId,
+            url = config.getAudioPath() + options.url,
+            self = this,
+            audio;
+
+        //构建之前处理
+        this.preRelated(trackId, options);
+
+        audio = new Audio5js({
+            swf_path: './lib/data/audio5js.swf',
+            throw_errors: true,
+            format_time: true,
+            ready: function(player) {
+                this.load(url);
+                //如果调用了播放
+                this.play()
+                self.status = "playing"
+            }
+        });
+
+        this.audio = audio;
+        this.trackId = trackId;
+        this.status = 'playing';
+        this.options = options;
+
+        this.isFlash = true;
+
+        //相关数据
+        this.afterRelated(options, controlDoms);
+    }
+
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        callback(Math.round(this.audio.audio.audio.currentTime * 1000))
+    }
+
+    end() {
+        if (this.audio) {
+            this.audio.destroy();
+            this.audio = null;
+        }
+        this.status = 'ended';
+        this.destroyRelated();
+    }
+}
+
+
+/**
+ * 采用_Audio5js播放
+ * @type {[type]}
+ */
+class _Audio5js extends BaseAudio {
+
+    constructor(options, controlDoms) {
+        super()
+        var trackId = options.trackId,
+            url = config.getAudioPath() + options.url,
+            self = this,
+            audio;
+
+        //构建之前处理
+        this.preRelated(trackId, options);
+
+        audio = new Audio5js({
+            ready: function(player) {
+                this.load(url);
+                //如果调用了播放
+                this.play()
+                self.status = "playing"
+            }
+        });
+
+        this.audio = audio;
+        this.trackId = trackId;
+        this.status = 'playing';
+        this.options = options;
+
+        //相关数据
+        this.afterRelated(options, controlDoms);
+    }
+
+    /**
+     * Compatible with asynchronous
+     * for subitile use
+     * get audio
+     * @return {[type]} [description]
+     */
+    getAudioTime(callback) {
+        callback(Math.round(this.audio.audio.audio.currentTime * 1000))
+    }
+
+    end() {
+        if (this.audio) {
+            this.audio.destroy();
+            this.audio = null;
+        }
+        this.status = 'ended';
+        this.destroyRelated();
+    }
+}
+
+
+/**
  * 使用PhoneGap的Media播放
  * @param  {string} url 路径
  * @return {[type]}      [description]
@@ -100,66 +215,6 @@ class _Media extends BaseAudio {
     end() {
         if (this.audio) {
             this.audio.release();
-            this.audio = null;
-        }
-        this.status = 'ended';
-        this.destroyRelated();
-    }
-}
-
-
-/**
- * 采用Falsh播放
- * @type {[type]}
- */
-class _Flash extends BaseAudio {
-
-    constructor(options, controlDoms) {
-        super()
-        var trackId = options.trackId,
-            url = config.getAudioPath() + options.url,
-            self = this,
-            audio;
-
-        //构建之前处理
-        this.preRelated(trackId, options);
-
-        audio = new Audio5js({
-            swf_path: './lib/data/audio5js.swf',
-            throw_errors: true,
-            format_time: true,
-            ready: function(player) {
-                this.load(url);
-                //如果调用了播放
-                this.play()
-                self.status = "playing"
-            }
-        });
-
-        this.audio = audio;
-        this.trackId = trackId;
-        this.status = 'playing';
-        this.options = options;
-
-        this.isFlash = true;
-
-        //相关数据
-        this.afterRelated(options, controlDoms);
-    }
-
-    /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
-     * @return {[type]} [description]
-     */
-    getAudioTime(callback) {
-        callback(Math.round(this.audio.audio.audio.currentTime * 1000))
-    }
-
-    end() {
-        if (this.audio) {
-            this.audio.destroy();
             this.audio = null;
         }
         this.status = 'ended';
@@ -258,67 +313,12 @@ class _cordovaMedia extends BaseAudio {
 
 
 /**
- * 采用_Audio5js播放
- * @type {[type]}
- */
-class _Audio5js extends BaseAudio {
-
-    constructor(options, controlDoms) {
-        super()
-        var trackId = options.trackId,
-            url = config.getAudioPath() + options.url,
-            self = this,
-            audio;
-
-        //构建之前处理
-        this.preRelated(trackId, options);
-
-        audio = new Audio5js({
-            ready: function(player) {
-                this.load(url);
-                //如果调用了播放
-                this.play()
-                self.status = "playing"
-            }
-        });
-
-        this.audio = audio;
-        this.trackId = trackId;
-        this.status = 'playing';
-        this.options = options;
-
-        //相关数据
-        this.afterRelated(options, controlDoms);
-    }
-
-    /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
-     * @return {[type]} [description]
-     */
-    getAudioTime(callback) {
-        callback(Math.round(this.audio.audio.audio.currentTime * 1000))
-    }
-
-    end() {
-        if (this.audio) {
-            this.audio.destroy();
-            this.audio = null;
-        }
-        this.status = 'ended';
-        this.destroyRelated();
-    }
-}
-
-
-/**
  * 使用html5的audio播放
  * @param  {string} url    音频路径
  * @param  {object} options 可选参数
  * @return {object}         [description]
  */
-class _Audio extends BaseAudio {
+class _nativeVideo extends BaseAudio {
 
     constructor(options, controlDoms) {
 
@@ -410,7 +410,6 @@ class _Audio extends BaseAudio {
 
 
 
-
 //安卓客户端apk的情况下
 if (plat.isAndroid && !plat.isBrowser) {
     audioPlayer = _Media
@@ -419,7 +418,7 @@ if (plat.isAndroid && !plat.isBrowser) {
     if (window.MMXCONFIG && window.audioHandler) {
         audioPlayer = _cordovaMedia
     } else {
-        audioPlayer = _Audio
+        audioPlayer = _nativeVideo
     }
 }
 

@@ -366,15 +366,16 @@ const _FlareVideo = function(options) {
     })
 
     let fv = $videoWrap.flareVideo({
-        autoplay: true,
-        flashSrc: 'lib/data/FlareVideo.swf'
+        width,
+        height,
+        autoplay: true
     })
     fv.load([{
         src: url,
         type: 'video/mp4'
     }])
 
-    container.append($videoWrap);
+    container.append($videoWrap)
 
     return {
         play: function() {

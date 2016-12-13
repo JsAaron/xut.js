@@ -17,6 +17,7 @@ import {
 
 import GlobalEvent from '../swipe/index.js'
 import setDynamicApi from '../dynamic.api'
+import { config } from '../config/index'
 
 /**
  * 配置多页面参数
@@ -70,9 +71,11 @@ const isBelong = (target) => {
  * 读库强制PC模式了
  */
 const preventDefault = (evtObj, target) => {
-    //var tagName = target.nodeName.toLowerCase();
     if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
-        evtObj.preventDefault && evtObj.preventDefault();
+        //是否支持二维码
+        if (config.supportQR && evtObj.target.nodeName.toLowerCase() === "img") {} else {
+            evtObj.preventDefault && evtObj.preventDefault();
+        }
     }
 }
 

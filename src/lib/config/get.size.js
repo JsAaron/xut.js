@@ -21,7 +21,6 @@ export function getSize() {
 }
 
 
-
 /**
  * 排版判断
  * @return {[type]} [description]

@@ -1,7 +1,6 @@
 (function($) {
 
     var clickName = 'touchstart mousedown'
-
     var idleEvents = "touchstart mousemove keydown DOMMouseScroll mousewheel mousedown reset.idle";
 
     /**
@@ -82,11 +81,13 @@
 
         this.setupElement();
 
-        if (this.options.useNative) {
-            this.setupNative();
-        } else {
-            this.setupFlash();
-        }
+         this.setupNative();
+
+        // if (this.options.useNative) {
+        //     this.setupNative();
+        // } else {
+        //     this.setupFlash();
+        // }
 
         this.ready($.proxy(function() {
             this.setupEvents();
@@ -350,6 +351,7 @@
             width: this.options.width,
             height: this.options.height
         }, {
+            update:false,
             version: 9,
             expressInstall: true
         });
@@ -357,8 +359,8 @@
         this.video = this.videoElement.find("embed")[0];
         if (!this.video) throw 'Flash Player not installed';
 
-        if ($.browser.msie)
-            this.fixExternalInterface();
+        // if ($.browser.msie)
+        //     this.fixExternalInterface();
 
         var self = this;
         this.video.loadSources = function(srcs) {
@@ -572,7 +574,7 @@
         this.element.unload();
         this.remove()
         this.setupElement();
-        this.setupFlash();
+        // this.setupFlash();
     };
 
     FlareVideo.fn.setupEvents = function() {

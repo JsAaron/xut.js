@@ -5,7 +5,7 @@ const CEIL = Math.ceil
  * 全局可视区域布局处理
  * 4种可选模式，0/1/2/3
  */
-export default function setView(config, fullProportion) {
+export default function getViewSize(config, fullProportion) {
 
     let screenWidth = config.screenSize.width
     let screenHeight = config.screenSize.height
@@ -54,6 +54,15 @@ export default function setView(config, fullProportion) {
             }
         }
 
+        /**
+         * 2016.12.13增加
+         * 保证模式2高度不能溢出分辨率最大距离
+         * @return {[type]}            [description]
+         */
+        if (newHeight > screenHeight) {
+            newHeight = screenHeight
+            newTop = 0
+        }
     }
 
     /**

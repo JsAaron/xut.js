@@ -393,14 +393,10 @@ class="st_adfd20a9cddbffd6">“</span>一方面，带孩子也很辛苦的工作
 Xut.Application.setConfig = {
     historyMode: true, //是否保留历史记录
     lauchMode: 1, //加载模式，这个是通过Xut.Application.Launc接口加载应用
-    visualMode: 3, //按照宽度，自适应高度，正比缩放应用
-    salePageType: 'page', //启动page页面缩放，这里可以区分 page页面  flow页面
-    salePicture: true, //启动图片缩放
-    supportQR: true, //支持二维码
-    hqUrlSuffix: 'hi' //高清图后缀
+    visualMode: 3 //按照宽度，自适应高度，正比缩放应用
 };
 
-var appid = 310
+var appid = 204
 Xut.Application.Launch({
     el: '#xxtppt-app-container',
     paths: {

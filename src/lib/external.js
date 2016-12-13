@@ -21,13 +21,11 @@ var jsName = [
     'lib/plugin/library/jquery.js',
     'lib/plugin/library/jquery.transit.js',//2016.11.2 新增
     'lib/plugin/library/underscore.js',
-    'lib/plugin/library/audio5.js',
     'lib/plugin/library/iscroll.js',
     'lib/plugin/library/hammer.js',
 
     // 视频插件
     'lib/plugin/library/video/jquery.hammer.js',
-    'lib/plugin/library/video/jquery.flash.js',
     'lib/plugin/library/video/jquery.ui.slider.js',
     'lib/plugin/library/video/jquery.ui.touch-punch.js',
     'lib/plugin/library/video/flarevideo.js',

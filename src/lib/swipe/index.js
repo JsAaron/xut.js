@@ -199,8 +199,7 @@ export default class Swipe extends Observer {
     handleEvent(e) {
         //如果是图片
         //有可能是二维码，所以这里默认行为不阻止了
-        if(config.supportQR && e.target.nodeName.toLowerCase() === "img"){
-        }else{
+        if (config.supportQR && e.target.nodeName.toLowerCase() === "img") {} else {
             this.options.preventDefault && e.preventDefault()
         }
         this.options.stopPropagation && e.stopPropagation()
@@ -394,7 +393,11 @@ export default class Swipe extends Observer {
 
         this._isTap = this._isMoving = false
 
-        let duration = getDate() - this._start.time
+        let duration
+        //可能没有点击页面，没有触发start事件
+        if (this._start) {
+            duration = getDate() - this._start.time
+        }
 
         //点击
         if (!this._isRollX && !this._isRollY) {

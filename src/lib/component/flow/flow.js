@@ -150,7 +150,7 @@ export default class Flow {
 
         swipe.$watch('onTap', (pageIndex, hookCallback, ev, duration) => {
             //如果是长按，是针对默认的事件处理
-            if (config.supportQR && duration > 500) {
+            if (config.supportQR && duration && duration > 500) {
                 return
             }
             //图片缩放
