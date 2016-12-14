@@ -24,6 +24,11 @@ let VideoPlayer = null
  * @return {[type]} [description]
  */
 const getContainer = container => {
+    //jquery对象
+    if(container.length){
+        return container.children()
+    }
+    //dom
     return container.children ? $(container.children) : $('body')
 }
 

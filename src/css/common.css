@@ -76,6 +76,14 @@ svg {
     border: none;
 }
 
+/**
+ * 上下图去间距
+ */
+img {
+  outline-width:0px;
+  vertical-align:top;
+}
+
 video {
     background: #000;
 }
@@ -222,7 +230,7 @@ video {
 .flaticon-error:before {
     content: "\f100";
     color: #000;
-   /* background-color: rgba(0, 0, 0, 0.25);*/
+    /* background-color: rgba(0, 0, 0, 0.25);*/
     border-radius: 100%;
 }
 
@@ -245,9 +253,9 @@ video {
     z-index: 1
 }
 
-.gamma-btn-close{
+.gamma-btn-close {
     position: absolute;
-    z-index:3
+    z-index: 3
 }
 
 .gamma-container {
@@ -276,10 +284,13 @@ video {
     cursor: pointer;
 }
 
+
 /*.gamma-btn-close{
     display: none;
     background-color: red;
 }*/
+
+
 /**
  * 修正闪烁
  * 隐藏转换的元素的背面
