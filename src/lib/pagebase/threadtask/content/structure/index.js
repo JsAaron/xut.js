@@ -189,6 +189,14 @@ export default function structure(callback, data, context) {
     let eachPara = (parameter, contentId, conData) => {
         var zIndex;
         _.each(parameter, (para) => {
+
+            //保持图片正比缩放
+            //给mini使用
+            //2016.12.15
+            if(para.fixRadio){
+                conData.fixRadio = true
+            }
+
             //针对母版content的topmost数据处理，找出浮动的对象Id
             //排除数据topmost为0的处理
             zIndex = para['topmost']
@@ -252,7 +260,6 @@ export default function structure(callback, data, context) {
     contentCollection = parseContentDas(data.createContentIds, prefilter);
     contentCount = cloneContentCount = contentCollection.length;
 
-
     //如果是启动了特殊高精灵动画
     //强制打开canvas模式设置
     //这里可以排除掉其余的canvas动画
@@ -269,6 +276,7 @@ export default function structure(callback, data, context) {
 
         //根据数据创content结构
         if (content = contentCollection[contentCount]) {
+
             contentId = content['_id'];
 
             //创建包装器,处理数据引用关系
@@ -279,8 +287,9 @@ export default function structure(callback, data, context) {
             if (wrapObj.isJs) {
                 contentHtmlBoxIds.push(contentId)
             }
+
             //转换缩放比
-            sizeResults = reviseSize(wrapObj.data, data.getStyle.isFlows);
+            sizeResults = reviseSize(wrapObj.data, data.getStyle.isFlows,content.fixRadio);
 
             //正常模式下创建
             startCreate(wrapObj, content, contentId)

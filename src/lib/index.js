@@ -7,7 +7,7 @@ import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 873
+Xut.Version = 873.1
 
 
 if (Xut.plat.isBrowser) {

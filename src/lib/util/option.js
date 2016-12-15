@@ -41,7 +41,7 @@ export function execScript(code, type) {
  * 创建gif随机数
  * @return {[type]} [description]
  */
-export function createRandomImg(url){
+export function createRandomImg(url) {
     return url + `?${Math.random()}`
 }
 
@@ -76,15 +76,37 @@ const converProportion = function({
     left,
     top,
     padding,
-    hasFlow //这个很关键，这个是针对flow类型页面处理，因为模式3的情况导致母版的缩放比错误
+    hasFlow, //这个很关键，这个是针对flow类型页面处理，因为模式3的情况导致母版的缩放比错误
+    fixRadio //迷你使用，按照宽度正比缩放高度，相应的要调整top的值
 }) {
     let proportion = hasFlow ? config.flowProportion : config.proportion;
-    return {
-        width: CEIL(width * proportion.width) || 0,
-        height: CEIL(height * proportion.height) || 0,
-        left: CEIL(left * proportion.left) || 0,
-        top: CEIL(top * proportion.top) || 0,
-        padding: CEIL(padding * proportion.width) || 0
+
+    //需要正比缩放
+    if (fixRadio) {
+        width = CEIL(width * proportion.width) || 0
+        height = CEIL(height * proportion.width) || 0
+        //应该的正常高度
+        let normalHeight = CEIL(height * proportion.height) || 0
+        let heightPoor = normalHeight - height
+
+        top = CEIL(top * proportion.top) || 0
+        //真正的高度
+        top = top - heightPoor/2
+        return {
+            width,
+            height,
+            top,
+            left: CEIL(left * proportion.left) || 0,
+            padding: CEIL(padding * proportion.width) || 0
+        }
+    } else {
+        return {
+            width: CEIL(width * proportion.width) || 0,
+            height: CEIL(height * proportion.height) || 0,
+            left: CEIL(left * proportion.left) || 0,
+            top: CEIL(top * proportion.top) || 0,
+            padding: CEIL(padding * proportion.width) || 0
+        }
     }
 }
 
@@ -97,12 +119,14 @@ export function setProportion(...arg) {
 /*
  * 修复元素的尺寸
  * hasFlow页面额外用全屏的分辨率修正
+ * fixRadio 是否保持宽度正比缩放 //2016.12.15 mini使用
  * @type {[type]}
  */
-export function reviseSize(results, hasFlow) {
+export function reviseSize(results, hasFlow, fixRadio) {
 
     //不同设备下缩放比计算
     const layerSize = converProportion({
+        fixRadio,
         hasFlow,
         width: results.width,
         height: results.height,
@@ -112,6 +136,7 @@ export function reviseSize(results, hasFlow) {
 
     //新的背景图尺寸
     const backSize = converProportion({
+        fixRadio,
         hasFlow,
         width: results.backwidth,
         height: results.backheight,
