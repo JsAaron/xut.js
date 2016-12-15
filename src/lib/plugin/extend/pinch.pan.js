@@ -18,11 +18,15 @@ export default class PinchPan {
         $pagePinch,
         hasButton = true,
         update,
-        doubletap
+        doubletapBan = false, //默认双击不关闭
+        doubletap, //双击
+        tap //单机
     }) {
 
         this.update = update
-        this.doubletap = doubletap
+        this.doubletapHander = doubletap
+        this.doubletapBan = doubletapBan
+        this.tapHander = tap
 
         //是否配置关闭按钮
         this.hasButton = hasButton
@@ -100,10 +104,15 @@ export default class PinchPan {
      */
     _initEvent() {
         this.hammer = new Hammer.Manager(this.pinchNode)
-        this.hammer.add(new Hammer.Pan({ threshold: 0, pointers: 0, enable: false }));
+        this.hammer.add(new Hammer.Pan({ threshold: 0, pointers: 0, enable: false }))
         this.hammer.add(new Hammer.Pinch({ threshold: 0 })).recognizeWith(this.hammer.get('pan'))
-        this.hammer.add(new Hammer.Tap({ event: 'doubletap', taps: 2, posThreshold: 30 }));
-        this.hammer.add(new Hammer.Tap());
+
+        //配置双击影响
+        if (!this.doubletapBan) {
+            this.hammer.add(new Hammer.Tap({ event: 'doubletap', taps: 2, posThreshold: 30 }))
+        }
+
+        this.hammer.add(new Hammer.Tap())
 
         _.each({
             'doubletap': '_onDoubletap',
@@ -122,9 +131,13 @@ export default class PinchPan {
         })
     }
 
+    _onTap() {
+
+    }
+
     _onDoubletap() {
-        if (this.doubletap) {
-            this.doubletap()
+        if (this.doubletapHander) {
+            this.doubletapHander()
         } else {
             this.reset()
         }

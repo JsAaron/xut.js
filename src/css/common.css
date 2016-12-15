@@ -255,7 +255,8 @@ video {
 
 .gamma-btn-close {
     position: absolute;
-    z-index: 3
+    z-index: 3;
+    display: none;
 }
 
 .gamma-container {
@@ -285,10 +286,6 @@ video {
 }
 
 
-/*.gamma-btn-close{
-    display: none;
-    background-color: red;
-}*/
 
 
 /**
@@ -345,13 +342,6 @@ video {
 .xut-cover {
     position: absolute;
     z-index: 2;
-}
-
-
-/*默认背景图，加快白板显示*/
-
-.xut-cover-image {
-    background-image: url("../content/gallery/cover.jpg");
 }
 
 

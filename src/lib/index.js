@@ -7,7 +7,7 @@ import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 872.9
+Xut.Version = 873
 
 
 if (Xut.plat.isBrowser) {
@@ -52,17 +52,23 @@ const getContentHTML = cursor => {
         setDelay(config.cursor.time)
     }
 
-    //默认背景图
-    let coverImage = '<div class="xut-cover xut-fullscreen xut-cover-image"></div>'
+    let coverStyle = ''
 
-    //重写背景图
-    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
-        let coverUrl = window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg'
-        coverImage = `<div class="xut-cover xut-fullscreen" style="background-image: url(${coverUrl});"></div>`
+    //mini平台不要背景图
+    if (Xut.config.platform === 'mini') {
+    } else {
+        //默认背景图
+        let coverUrl = './content/gallery/cover.jpg'
+        //重写背景图
+        if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
+            coverUrl = window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg'
+        }
+        //背景样式
+        coverStyle = `style="background-image: url(${coverUrl});"`
     }
 
     return `${busyIcon}
-            ${coverImage}
+            <div class="xut-cover xut-fullscreen" ${coverStyle}></div>
             <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
 }
 

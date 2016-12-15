@@ -27,7 +27,7 @@ import {
 /**
  * 默认配置与模式
  */
-import improtMode from '../global.mode'
+import improtConfig from '../global.config'
 import improtDefault from './default.config'
 
 const plat = Xut.plat
@@ -289,7 +289,7 @@ _.extend(config, {
      */
     dbSize: 1
 
-}, improtMode, improtDefault)
+}, improtConfig, improtDefault)
 
 
 Xut.config = config

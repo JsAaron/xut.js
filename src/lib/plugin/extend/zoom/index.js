@@ -24,13 +24,15 @@ export default class Zoom {
     constructor({
         element, //img node
         originalSrc, //原始图地址
-        hdSrc //高清图地址
+        hdSrc, //高清图地址
+        hasButton = false //是否需要关闭按钮
     }) {
 
         this.$body = $('body')
         this.$imgNode = element
         this.originSrc = originalSrc
         this.hdSrc = hdSrc
+        this.hasButton = hasButton
 
         //获取图片的可视区的绝对布局尺寸
         this.originImgWidth = element.width()
@@ -66,18 +68,22 @@ export default class Zoom {
     _initSingleView() {
 
         this.$singleView = $(createContainerView())
-        this.$closeButton = this.$singleView.find('.gamma-btn-close')
         this.$overlay = this.$singleView.find('.gamma-overlay')
-        this.$singleView.appendTo(this.$body)
 
         //关闭按钮
-        this.callbackEnd = () => {
-            this._closeSingleView()
+        if (this.hasButton) {
+            this.$closeButton = this.$singleView.find('.gamma-btn-close')
+            this.callbackEnd = () => {
+                this._closeSingleView()
+            }
+            $$on(this.$closeButton[0], {
+                end: this.callbackEnd,
+                cancel: this.callbackEnd
+            })
+            this.$closeButton.show()
         }
-        $$on(this.$closeButton[0], {
-            end: this.callbackEnd,
-            cancel: this.callbackEnd
-        })
+
+        this.$singleView.appendTo(this.$body)
     }
 
     /**
@@ -167,15 +173,58 @@ export default class Zoom {
      * 是否启动图片缩放
      */
     _addPinchPan() {
+        //如果没有高清图，采用原图
+        let $imgNode = this.hdSrc ? this.$hQNode : this.$flyNode
         if (!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
-            //如果没有高清图，采用原图
-            let $imgNode = this.hdSrc ? this.$hQNode : this.$flyNode
             this.slideObj = new PinchPan({
                 hasButton: false,
+                doubletapBan: true, //禁止双击事件
                 $pagePinch: $imgNode
             })
         }
+        //单击关闭处理
+        if (!this.offTap) {
+            this._bindTap($imgNode)
+        }
     }
+
+
+    /**
+     * 绑定单击关闭
+     * @return {[type]} [description]
+     */
+    _bindTap($imgNode) {
+
+        let isMove = false
+        let start = () => {
+            isMove = false
+        }
+        let move = () => {
+            isMove = true
+        }
+        let end = () => {
+            if (!isMove) {
+                this._closeSingleView()
+            }
+        }
+
+        $$on($imgNode[0], {
+            start: start,
+            move: move,
+            end: end,
+            cancel: end
+        })
+
+        this.offTap = () => {
+            $$off($imgNode[0], {
+                start: start,
+                move: move,
+                end: end,
+                cancel: end
+            })
+        }
+    }
+
 
     /**
      * 替换成高清图
@@ -229,7 +278,10 @@ export default class Zoom {
             })
         }
 
-        this.$closeButton.show()
+        if (this.hasButton) {
+            this.$closeButton.show()
+        }
+
         this.$overlay.css('opacity', 0)
 
         if (this.slideObj) {
@@ -248,7 +300,9 @@ export default class Zoom {
         this.isAniming = true
         let $imgNode = this.hdSrc ? this.$hQNode : this.$flyNode
 
-        this.$closeButton.hide()
+        if (this.hasButton) {
+            this.$closeButton.hide()
+        }
 
         execAnimation({
             element: $imgNode,
@@ -290,17 +344,26 @@ export default class Zoom {
      */
     destroy() {
 
+        //缩放
         if (this.slideObj) {
             this.slideObj.destroy()
             this.slideObj = null
         }
 
-        $$off(this.$closeButton[0], {
-            end: this.callbackEnd,
-            cancel: this.callbackEnd
-        })
+        //关闭按钮
+        if (this.hasButton) {
+            $$off(this.$closeButton[0], {
+                end: this.callbackEnd,
+                cancel: this.callbackEnd
+            })
+            this.$closeButton = null
+        }
 
-        this.$closeButton = null
+        //销毁单击关闭
+        if (this.offTap) {
+            this.offTap()
+        }
+
         this.$hQNode = null
         this.$overlay = null
         this.$body = null

@@ -10,6 +10,13 @@ const DEFAULT = undefined
 export default {
 
     /**
+     * 适配平台
+     * mini //迷你杂志
+     * @type {[type]}
+     */
+    platform: DEFAULT,
+
+    /**
      * 是否支持错误日志打印
      * @type {Boolean}
      */
