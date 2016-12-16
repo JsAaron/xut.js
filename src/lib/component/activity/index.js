@@ -496,7 +496,7 @@ export default class Activity {
                     } else {
                         //因为执行的顺序问题，动画与页面零件
                         //isscroll标记控制
-                        if (!scope.$contentNode.attr('isscroll')) {
+                        if (!scope.$contentNode.attr('data-iscroll')) {
                             scope.$contentNode.css({
                                 'visibility': scope.isRreRun
                             })

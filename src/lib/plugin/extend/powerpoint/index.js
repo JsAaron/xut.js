@@ -634,7 +634,7 @@ export default class Powepoint {
         if (this.elementStyle && this.elementStyle.length) {
             const origin = this.element.css("-webkit-transform-origin");
             //卷滚区域里的对象不需要还原
-            if (this.element.attr("isscroll") == null) {
+            if (this.element.attr("data-iscroll") == null) {
                 this.element[0].style.cssText = this.elementStyle;
             }
             this.element.css("-webkit-transform-origin", origin);
