@@ -85,13 +85,13 @@ const converProportion = function({
     if (fixRadio) {
         width = CEIL(width * proportion.width) || 0
         height = CEIL(height * proportion.width) || 0
-        //应该的正常高度
+            //应该的正常高度
         let normalHeight = CEIL(height * proportion.height) || 0
         let heightPoor = normalHeight - height
 
         top = CEIL(top * proportion.top) || 0
-        //真正的高度
-        top = top - heightPoor/2
+            //真正的高度
+        top = top - heightPoor / 2
         return {
             width,
             height,
@@ -223,10 +223,17 @@ export function readFile(path, callback, type) {
     //svg文件
     //游览器模式 && 非强制插件模式
     if (Xut.plat.isBrowser && !config.isPlugin) {
+        let svgUrl
+        //mini杂志的情况，不处理目录的www
+        if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
+            svgUrl = config.getSvgPath() + path
+        } else {
+            svgUrl = config.getSvgPath().replace("www/", "") + path
+        }
         $.ajax({
             type: 'get',
             dataType: 'html',
-            url: config.getSvgPath().replace("www/", "") + path,
+            url: svgUrl,
             success: function(svgContent) {
                 callback(svgContent);
             },

@@ -702,7 +702,7 @@ export default class Dispatcher {
      */
     _loadPage(action) {
 
-        const _autoRun = () => {
+        let autoRun = () => {
             this._autoRun({
                 'action': action
             })
@@ -713,19 +713,29 @@ export default class Dispatcher {
             //第一次进入，处理背景
             let $cover = $(".xut-cover")
             if ($cover.length) { //主动探测,只检查一次
-                $cover.transition({
-                    opacity: 0,
-                    duration: 1000,
-                    easing: 'in',
-                    complete() {
-                        $cover && $cover.hide().remove()
-                        $cover = null
-                        _autoRun()
-                    }
-                });
-            } else {
-                _autoRun()
+                let complete = function() {
+                    $cover && $cover.remove()
+                    $cover = null
+                    autoRun()
+                }
+
+                //是否配置启动动画关闭
+                if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.launchAnim == false) {
+                    complete()
+                } else {
+                    //有动画
+                    $cover.transition({
+                        opacity: 0,
+                        duration: 1000,
+                        easing: 'in',
+                        complete
+                    });
+                }
+            }
+            //第二次
+            else {
                 $cover = null
+                autoRun()
             }
         }
 

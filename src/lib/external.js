@@ -45,6 +45,7 @@ var jsName = [
     'lib/plugin/cordova/unzipPlugin.js',
     'lib/plugin/cordova/readPlugin.js',
     'lib/plugin/cordova/deletePlugin.js',
+
     'lib/plugin/animate/draggable.min.js',
     'lib/plugin/animate/tweenmax.min.js'
 ]
