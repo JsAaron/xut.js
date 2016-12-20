@@ -233,6 +233,7 @@ export default class Dispatcher {
                         //构建页面对象后
                         //开始执行
                         if (pageBase) {
+
                             //开始线程任务
                             //当为滑动模式,支持快速创建
                             pageBase.startThreadTask(filpOverAction, function() {

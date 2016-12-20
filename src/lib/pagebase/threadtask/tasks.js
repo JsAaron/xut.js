@@ -21,11 +21,9 @@ export default function(instance) {
         createRelated.nextRunTask = taskName;
     }
 
-
     const callContextTasks = (taskName, fn) => {
         return assignedTasks[taskName](fn, instance)
     }
-
 
     /**
      * 任务钩子
@@ -59,6 +57,7 @@ export default function(instance) {
                 setNextRunTask('background')
 
                 //构建主容器li完毕,可以提前执行翻页动作
+                //必须是启动了快速翻页
                 createRelated.preforkComplete()
 
                 //视觉差不管
@@ -72,7 +71,6 @@ export default function(instance) {
                 }
             })
         },
-
 
         /**
          * 背景
@@ -99,7 +97,6 @@ export default function(instance) {
                 }
             })
         },
-
 
         /**
          * 2016.9.7
@@ -149,7 +146,6 @@ export default function(instance) {
             }
         },
 
-
         /**
          * 组件
          * @return {[type]} [description]
@@ -166,7 +162,6 @@ export default function(instance) {
                 });
             })
         },
-
 
         /**
          * content

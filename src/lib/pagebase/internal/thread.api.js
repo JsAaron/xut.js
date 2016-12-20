@@ -1,3 +1,5 @@
+import { config } from '../../config/index'
+
 /**
  *  对外接口
  *  1 开始调用任务
@@ -20,11 +22,17 @@ export default function(baseProto) {
         //构建container调用preforkComplete
         this.createRelated.preforkComplete = (() => {
             return () => {
-                //1 滑动允许打断创建
-                //
-                //swich
-                //2 所有继续分解任务
-                flipOver ? callback() : this._checkTasksCreate(callback, this)
+                if (config.quickFlip) {
+                    //1 滑动允许打断创建
+                    //
+                    //swich
+                    //2 所有继续分解任务
+                    flipOver ? callback() : this._checkTasksCreate(callback, this)
+                } else {
+                    //如果不允许快速翻页
+                    //必须等待页面创建完毕
+                    this._checkTasksCreate(callback, this)
+                }
             }
         })()
 

@@ -1,6 +1,8 @@
 import { config } from '../../config/index'
 import {set } from './get'
 import { getFlowView } from '../../visuals/hooks/adapter'
+import { getResults, removeFlowData } from '../../database/result'
+import nextTick from '../../util/nexttick'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -60,7 +62,7 @@ const createStr = (chapterId, data, viewWidth, viewHeight, margin) => {
 
 
 const resolveCount = ($content) => {
-    const theChildren = $content.find('#columns-content').children()
+    let theChildren = $content.find('#columns-content').children()
     let paraHeight = 0
     for (let i = 0; i < theChildren.length; i++) {
         paraHeight += $(theChildren[i]).height()
@@ -94,65 +96,85 @@ const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, flowCounts) => {
  * 构建flow页面代码结构
  * @return {[type]} [description]
  */
-export default function initFlows() {
+export default function initFlows(callback) {
 
-    const $container = $("#xut-stream-flow")
-    if (!$container.length) return
-    const $seasons = $container.children()
-    if (!$seasons.length) return
+    let $container = $("#xut-stream-flow")
 
     /**
-     * seasonId:{
-     *    chpaterID:count
-     * }
-     * @type {[type]}
+     * 初始化flow数据
+     * @param  {[type]} initFlow [description]
+     * @return {[type]}          [description]
      */
-    let flowCounts = Object.create(null)
+    let initFlow = function() {
 
-    /**
-     * 容器尺寸设置
-     * @type {[type]}
-     */
-    const flowView = getFlowView()
+        //保证有子数据
+        let $seasons = $container.children()
+        if (!$seasons.length) {
+            callback()
+            return
+        }
 
-    const vWidth = flowView.viewWidth
-    const vHeight = newViewHight = flowView.viewHeight
+        /**
+         * seasonId:{
+         *    chpaterID:count
+         * }
+         * @type {[type]}
+         */
+        let flowCounts = {}
 
-    $seasons.each((index, node) => {
-        const tag = node.id
-        const seasonsId = tag.match(/\d/)[0]
-        const $chapters = $seasons.children()
-        flowCounts[seasonsId] = Object.create(null)
-        insertColumn(node, seasonsId, vWidth, vHeight, flowCounts)
-    })
+        //容器尺寸设置
+        let flowView = getFlowView()
+        let vWidth = flowView.viewWidth
+        let vHeight = newViewHight = flowView.viewHeight
 
-    $container.css({
-        width: vWidth,
-        height: vHeight,
-        overflow: 'hidden'
-    }).show()
-
-    $seasons.each((index, node) => {
-        const tag = node.id
-        const seasonsId = tag.match(/\d/)[0]
-        const $chapters = $seasons.children()
-
-        $chapters.each(function(index, node) {
-            const tag = node.id
-            const chpaterId = tag.match(/\d+/)[0]
-            let count = resolveCount($(node))
-            flowCounts[seasonsId][chpaterId] = Number(count)
+        $seasons.each((index, node) => {
+            let tag = node.id
+            let seasonsId = tag.match(/\d/)[0]
+            let $chapters = $seasons.children()
+            flowCounts[seasonsId] = {}
+            insertColumn(node, seasonsId, vWidth, vHeight, flowCounts)
         })
-    })
 
-    $container.hide()
+        $container.css({
+            width: vWidth,
+            height: vHeight,
+            overflow: 'hidden'
+        }).show()
 
-    set(flowCounts)
 
+        $seasons.each((index, node) => {
+            let tag = node.id
+            let seasonsId = tag.match(/\d/)[0]
+            let $chapters = $seasons.children()
+            $chapters.each(function(index, node) {
+                let tag = node.id
+                let chapterId = tag.match(/\d+/)[0]
+                let count = resolveCount($(node))
+                flowCounts[seasonsId][chapterId] = Number(count)
+            })
+        })
 
-    //存在
-    if (Object.keys(flowCounts).length) {
-        return true
+        $container.hide()
+        set(flowCounts)
+        callback(Object.keys(flowCounts).length)
     }
+
+    if (!$container.length) {
+        //如果存在json的flow数据
+        let results = getResults()
+        if (results && results.FlowData) {
+            $container = $(results.FlowData)
+            removeFlowData() //删除flowdata，优化缓存
+            $('body').append($container)
+            setTimeout(initFlow, 100)
+        }else{
+            //没有任何flow
+            callback()
+        }
+        return
+    }
+
+    //嵌入在index.html中的数据
+    setTimeout(initFlow, 100)
 
 }

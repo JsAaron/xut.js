@@ -15,11 +15,20 @@ export function importDatabase(callback) {
     const path = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.database
     if (path) {
         //add window.SQLResult database
-        request(path, () => {
-            result = window.SQLResult
-            window.SQLResult = null
-            callback()
-        })
+        request(path, function() {
+            result = window.SQLResult;
+            //配置了远程地址
+            if (window.DYNAMICCONFIGT.request === 'remote' && result.FlowData) {
+                //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
+                //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
+                let remoteUrl = window.DYNAMICCONFIGT.resource
+                result.FlowData = result.FlowData.replace(/<img\s*src=\"[\w\/]+gallery/ig, '<img src=\"' + remoteUrl + 'gallery')
+                result.FlowData = result.FlowData.replace(/xlink:href=\"[\w\/]+gallery/ig, 'xlink:href=\"' + remoteUrl + 'gallery')
+
+            }
+            window.SQLResult = null;
+            callback();
+        });
     }
     //如果外联index.html路径json数据
     else if (window.SQLResult) {
@@ -29,6 +38,14 @@ export function importDatabase(callback) {
     } else {
         callback()
     }
+}
+
+/**
+ * 删除挂载的flow数据
+ * @return {[type]} [description]
+ */
+export function removeFlowData() {
+    result['FlowData'] = null
 }
 
 /**

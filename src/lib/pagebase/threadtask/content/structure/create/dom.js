@@ -70,7 +70,7 @@ const maskContent = (data, wrapObj) => {
         //普通图片
         restr += String.styleFormat(
             `<img data-type="ordinary-images"
-                  class="inherit-size fullscreen-background"
+                  class="inherit-size fullscreen-background fix-miaomiaoxue-img"
                   src="${pathImg}"
                   style="${isMaskImg}"/>`
         )

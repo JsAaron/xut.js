@@ -197,9 +197,28 @@ export function readFile(path, callback, type) {
                 callback('编译:脚本加载失败,文件名:' + name);
             }
         })
-
         return
     }
+
+
+    /**
+     * js脚本加载
+     * @param  {[type]} fileUrl  [description]
+     * @param  {[type]} fileName [description]
+     * @return {[type]}          [description]
+     */
+    let jsRequest = (fileUrl, fileName) => {
+        request(fileUrl, function() {
+            data = window.HTMLCONFIG[fileName];
+            if (data) {
+                callback(data)
+                delete window.HTMLCONFIG[fileName];
+            } else {
+                callback('运行：脚本加载失败,文件名:' + path);
+            }
+        })
+    }
+
 
     //con str
     //externalFile使用
@@ -208,28 +227,34 @@ export function readFile(path, callback, type) {
     if (type === "js") {
         paths = config.getSvgPath() + path;
         name = path.replace(".js", '')
-        request(paths, function() {
-            data = window.window.HTMLCONFIG[name];
-            if (data) {
-                callback(data)
-                delete window.window.HTMLCONFIG[name];
-            } else {
-                callback('运行：脚本加载失败,文件名:' + path);
-            }
-        })
+        jsRequest(paths, name)
         return
     }
 
     //svg文件
     //游览器模式 && 非强制插件模式
     if (Xut.plat.isBrowser && !config.isPlugin) {
-        let svgUrl
-        //mini杂志的情况，不处理目录的www
-        if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
-            svgUrl = config.getSvgPath() + path
-        } else {
-            svgUrl = config.getSvgPath().replace("www/", "") + path
+
+        //默认的地址
+        let svgUrl = config.getSvgPath().replace("www/", "") + path
+
+        //如果是动态接口执行
+        if (window.DYNAMICCONFIGT) {
+            //如果是网络请求
+            //直接把.svg的文件，改成.js的文件处理
+            if (window.DYNAMICCONFIGT.request === 'remote') {
+                path = path.replace('.svg', '.js')
+                name = path.replace(".js", '')
+                svgUrl = config.getSvgPath() + path
+                jsRequest(svgUrl, name) //直接采用脚本加载
+                return
+            }
+            //mini杂志的情况，不处理目录的www
+            if (window.DYNAMICCONFIGT.resource) {
+                svgUrl = config.getSvgPath() + path
+            }
         }
+
         $.ajax({
             type: 'get',
             dataType: 'html',
@@ -242,6 +267,7 @@ export function readFile(path, callback, type) {
                 console.log('SVG' + path + '解析出错!');
             }
         })
+
     } else {
         Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function(svgContent) {
             callback(svgContent);

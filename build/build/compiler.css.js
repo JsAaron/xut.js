@@ -1,5 +1,7 @@
 const gulp = require('gulp');
 const cleanCSS = require('gulp-clean-css');
+const concat = require('gulp-concat')
+const rename = require("gulp-rename");
 const autoprefixer = require('gulp-autoprefixer');
 const csspath = './src/css/**/*.css'
 const utils = require('../utils')
@@ -14,9 +16,11 @@ module.exports = (conf) => {
                 //        transform: rotate(45deg);
                 remove: true //是否去掉不必要的前缀 默认：true
             }))
-            .pipe(cleanCSS({
-                compatibility: 'ie8'
-            }))
+            .pipe(concat('xxtppt.dev.css'))
+            .pipe(gulp.dest(conf.tarDir))
+            .pipe(gulp.dest(conf.testDir))
+            .pipe(cleanCSS({ compatibility: 'ie8' }))
+            .pipe(rename('xxtppt.min.css'))
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.testDir))
             .on('error', (err) => {

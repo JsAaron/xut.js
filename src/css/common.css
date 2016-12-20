@@ -77,9 +77,12 @@ svg {
 }
 
 /**
+ * 2016.12.20
+ * 单独修复妙妙学
+ * content下面img空白的问题
  * 上下图去间距
  */
-img {
+.fix-miaomiaoxue-img {
   outline-width:0px;
   vertical-align:top;
 }
@@ -89,12 +92,13 @@ video {
 }
 
 
+
 /*翻页按钮*/
 
 @font-face {
     font-family: 'icomoon';
-    src: url('fonts/icomoon.eot?vv9atf');
-    src: url('fonts/icomoon.eot?vv9atf#iefix') format('embedded-opentype'), url('fonts/icomoon.ttf?vv9atf') format('truetype'), url('fonts/icomoon.woff?vv9atf') format('woff'), url('fonts/icomoon.svg?vv9atf#icomoon') format('svg');
+    src: url('../images/fonts/icomoon.eot?vv9atf');
+    src: url('../images/fonts/icomoon.eot?vv9atf#iefix') format('embedded-opentype'), url('../images/fonts/icomoon.ttf?vv9atf') format('truetype'), url('../images/fonts/icomoon.woff?vv9atf') format('woff'), url('../images/fonts/icomoon.svg?vv9atf#icomoon') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -204,9 +208,9 @@ video {
 }
 
 @font-face {
-    font-family: "Flaticon";
-    src: url("fonts/Flaticon.eot");
-    src: url("fonts/Flaticon.eot?#iefix") format("embedded-opentype"), url("fonts/Flaticon.woff") format("woff"), url("fonts/Flaticon.ttf") format("truetype"), url("fonts/Flaticon.svg#Flaticon") format("svg");
+    font-family: "flaticon";
+    src: url("../images/fonts/flaticon.eot");
+    src: url("../images/fonts/flaticon.eot?#iefix") format("embedded-opentype"), url("../images/fonts/flaticon.woff") format("woff"), url("../images/fonts/flaticon.ttf") format("truetype"), url("../images/fonts/flaticon.svg#flaticon") format("svg");
     font-weight: normal;
     font-style: normal;
 }
@@ -214,7 +218,7 @@ video {
 [class^="flaticon-"],
 [class*=" flaticon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'Flaticon' !important;
+    font-family: 'flaticon' !important;
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -1269,3 +1273,16 @@ video {
 .xut-page-number > div:last-child {
     font-weight: normal;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

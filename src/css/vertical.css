@@ -1,44 +1,49 @@
 /**
+ * 竖屏 css
+ * @param  {[type]} orientation: landscape     [description]
+ * @return {[type]}              [description]
+ */
+
+@media screen and (orientation: portrait) {
+
+    /**
 *  node 信息提示
 */
-
-.xut-showNote {
-    position: absolute;
-    background-image: url(../images/icons/hideNote.png);
-    bottom: 5%;
-    left: 5%;
-    z-index: 3;
-    background-size: 100% 100%;
-    cursor: pointer;
-}
-
-.xut-shownote-box {
-    left: 5%;
-    position: absolute;
-    bottom: 5%;
-    z-index: 30;
-    display: none;
-    width: 60%;
-    height: 60%;
-    background-image: url(../images/vertical/nodeinfo.png);
-    background-size: 100% 100%;
-}
-
-.xut-shownote-box>.close {
-    background-image: url(../images/icons/nodeClose.png);
-    background-size: 100% 100%;
-    position: absolute;
-    top: 0;
-    right: 0;
-    cursor: pointer;
-}
-
-.xut-shownote-box>.content {
-    margin: 10% auto;
-    width: 90%;
-    height: 80%;
-    letter-spacing: 2px;
-    line-height: 150%;
-    text-indent: 15%;
-    overflow: hidden;
+    .xut-showNote {
+        position: absolute;
+        background-image: url(../images/icons/hideNote.png);
+        bottom: 5%;
+        left: 5%;
+        z-index: 3;
+        background-size: 100% 100%;
+        cursor: pointer;
+    }
+    .xut-shownote-box {
+        left: 5%;
+        position: absolute;
+        bottom: 5%;
+        z-index: 30;
+        display: none;
+        width: 60%;
+        height: 60%;
+        background-image: url(../images/vertical/nodeinfo.png);
+        background-size: 100% 100%;
+    }
+    .xut-shownote-box>.close {
+        background-image: url(../images/icons/nodeClose.png);
+        background-size: 100% 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        cursor: pointer;
+    }
+    .xut-shownote-box>.content {
+        margin: 10% auto;
+        width: 90%;
+        height: 80%;
+        letter-spacing: 2px;
+        line-height: 150%;
+        text-indent: 15%;
+        overflow: hidden;
+    }
 }

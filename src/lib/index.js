@@ -7,7 +7,7 @@ import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 873.4
+Xut.Version = 873.5
 
 
 if (Xut.plat.isBrowser) {
@@ -58,7 +58,8 @@ const getContentHTML = cursor => {
     if (Xut.config.platform === 'mini') {} else {
         //默认背景图
         let coverUrl = './content/gallery/cover.jpg'
-            //重写背景图
+
+        //重写背景图
         if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
             coverUrl = window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg'
         }
@@ -180,7 +181,8 @@ Xut.Application.Launch = ({
     el,
     paths,
     launchAnim,
-    cursor
+    cursor,
+    request //请求 ，默认本地
 }) => {
     let setConfig = Xut.Application.setConfig
     if (setConfig && setConfig.lauchMode === 1) {
@@ -193,7 +195,8 @@ Xut.Application.Launch = ({
         window.DYNAMICCONFIGT = { //外部配置文件
             resource: paths.resource,
             database: paths.database, //数据库
-            launchAnim: launchAnim //启动动画
+            launchAnim, //启动动画
+            request //请求。本地/网络  默认本地
         }
         loadApp(el, cursor)
     }

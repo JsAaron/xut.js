@@ -14,31 +14,14 @@ import initTooBar from './toolbar.data'
 import initFlows from '../component/flow/layout'
 
 /**
- * 加载css
+ * 加载svg的css
  * @return {[type]} [description]
  */
 const loadStyle = (callback) => {
-
-    const svgsheet = window.DYNAMICCONFIGT ?
+    let svgsheet = window.DYNAMICCONFIGT ?
         window.DYNAMICCONFIGT.resource + '/gallery/svgsheet.css' :
         config.pathAddress + 'svgsheet.css'
-
-    //加载横版或者竖版css
-    //nodeBuildMode 是node build下的test.html文件
-    //加载build/*.css压缩文件
-    //否则就是默认的css/*.css
-    const baseCss = window.nodeBuildMode ? window.nodeBuildMode.csspath : './css/' + (config.layoutMode) + '.css'
-    let cssArr = [baseCss, svgsheet]
-
-    //是否需要加载svg
-    //如果是ibooks模式
-    //并且没有svg
-    //兼容安卓2.x
-    if (Xut.IBooks.Enabled && !Xut.IBooks.existSvg) {
-        cssArr = [baseCss]
-    }
-
-    loader.load(cssArr, callback, null, true);
+    loader.load([svgsheet], callback, null, true);
 }
 
 
@@ -117,16 +100,18 @@ export default function dynamic(callback) {
              * 嵌入index
              * 默认有flow并且没有强制设置关闭的情况，打开缩放
              */
-            if (initFlows()) {
-                //动画事件委托
-                if (config.swipeDelegate !== false) {
-                    config.swipeDelegate = true
+            initFlows(function(hasFlowCounts) {
+                if (hasFlowCounts) {
+                    //动画事件委托
+                    if (config.swipeDelegate !== false) {
+                        config.swipeDelegate = true
+                    }
                 }
-            }
+                //iframe要要Xut.config
+                loadStyle(() => callback(novelData))
+            })
 
 
-            //iframe要要Xut.config
-            loadStyle(() => callback(novelData))
         })
     })
 }

@@ -78,20 +78,24 @@ export default function(inputPara, contents) {
     options.resourcePath = ResourcePath;
     options.type = 'seniorSprite';
 
-    for (let i = 0; i < option.spiritList.length; i++) {
-        let spiritList = option.spiritList[i];
-        let id = getId(spiritList, contentPrefix)
-        let framId = spiritList.framId
-        let parentId = spiritList.parentId
-        if (_.isObject(inputPara)) {
-            if (parentId != "0") {
-                moveContent(contentPrefix, framId, parentId)
+    if (option.spiritList) {
+        for (let i = 0; i < option.spiritList.length; i++) {
+            let spiritList = option.spiritList[i];
+            let id = getId(spiritList, contentPrefix)
+            let framId = spiritList.framId
+            let parentId = spiritList.parentId
+            if (_.isObject(inputPara)) {
+                if (parentId != "0") {
+                    moveContent(contentPrefix, framId, parentId)
+                }
+                spiritObjs[id] = new Sprite(spiritList, options)
+                ids.push(id)
+            } else {
+                console.log("inputPara undefine Spirit")
             }
-            spiritObjs[id] = new Sprite(spiritList, options)
-            ids.push(id)
-        } else {
-            console.log("inputPara undefine Spirit")
         }
+    }else{
+        console.log('没有高级精灵动画数据')
     }
 
 

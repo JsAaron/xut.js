@@ -47,14 +47,14 @@
 
 .flareVideo .controls .seek .seekRange::-webkit-slider-thumb {
     -khtml-appearance: none;
-    background: url(./default/slider-thumb.png) no-repeat;
+    background: url(../images/flarevideo/slider-thumb.png) no-repeat;
     width: 8px;
     height: 8px;
 }
 
 .flareVideo .controls .seek .seekRange .ui-slider-handle {
     display: block;
-    background: url(./default/slider-thumb.png) no-repeat;
+    background: url(../images/flarevideo/slider-thumb.png) no-repeat;
     width: 8px;
     height: 8px;
 }
@@ -63,7 +63,7 @@
     width: 16px;
     height: 16px;
     text-indent: -5000px;
-    background: url(./default/full-screen.png) no-repeat center center;
+    background: url(../images/flarevideo/full-screen.png) no-repeat center center;
 }
 
 .flareVideo .controls .volume {
@@ -78,13 +78,13 @@
 .flareVideo .controls .volume .volMin {
     width: 10px;
     height: 10px;
-    background: url(./default/vol-min.png) no-repeat center center;
+    background: url(../images/flarevideo/vol-min.png) no-repeat center center;
 }
 
 .flareVideo .controls .volume .volMax {
     width: 15px;
     height: 14px;
-    background: url(./default/vol-max.png) no-repeat center center;
+    background: url(../images/flarevideo/vol-max.png) no-repeat center center;
 }
 
 .flareVideo .controls .volume .volRange {
@@ -93,14 +93,14 @@
 
 .flareVideo .controls .volume::-webkit-slider-thumb {
     -khtml-appearance: none;
-    background: url(./default/volume-thumb.png) no-repeat;
+    background: url(../images/flarevideo/volume-thumb.png) no-repeat;
     width: 10px;
     height: 11px;
 }
 
 .flareVideo .controls .volume .ui-slider-handle {
     display: block;
-    background: url(./default/volume-thumb.png) no-repeat;
+    background: url(../images/flarevideo/volume-thumb.png) no-repeat;
     width: 10px;
     height: 11px;
 }
@@ -123,12 +123,12 @@
 
 .flareVideo .controls .pause {
     display: none;
-    background: url(./default/pause.png) no-repeat center center;
+    background: url(../images/flarevideo/pause.png) no-repeat center center;
 }
 
 .flareVideo .controls .play {
     display: block;
-    background: url(./default/play.png) no-repeat center center;
+    background: url(../images/flarevideo/play.png) no-repeat center center;
 }
 
 .flareVideo.playing .controls .play {

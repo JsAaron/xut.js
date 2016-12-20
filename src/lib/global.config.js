@@ -17,6 +17,12 @@ export default {
     platform: DEFAULT,
 
     /**
+     * 是否支持快速翻页
+     * 这个为超星处理，可以配置关闭快速翻页，必须要等页面创建完毕后才能翻页
+     */
+    quickFlip: true, //默认是支持
+
+    /**
      * 是否支持错误日志打印
      * @type {Boolean}
      */
