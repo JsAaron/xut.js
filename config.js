@@ -14,7 +14,7 @@ const common = {
     entry: './src/lib/index.js',
     //生成名称
     devName: 'xxtppt.dev.js',
-    distName: 'xxtppt.min.js',
+    distName: 'xxtppt.js',
     //目录
     srcDir: './src/',
     tarDir: './dist/',

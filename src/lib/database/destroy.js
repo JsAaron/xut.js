@@ -1,4 +1,4 @@
-import { removeResults } from './result'
+import { removeResults, removeStyle } from './result'
 import { removeCache } from './cache'
 
 
@@ -7,6 +7,7 @@ import { removeCache } from './cache'
  */
 export function destroyCache(isRefresh) {
     removeCache() //userCache
+    removeStyle()
 }
 
 /**

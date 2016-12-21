@@ -64,7 +64,7 @@ const setMode = function(data) {
 export default function dynamic(callback) {
 
     //导入数据缓存
-    importDatabase(() => {
+    importDatabase((hasSvgsheet) => {
 
         //初始化工具栏
         //与数据库setting数据
@@ -108,7 +108,13 @@ export default function dynamic(callback) {
                     }
                 }
                 //iframe要要Xut.config
-                loadStyle(() => callback(novelData))
+                //如果存在了Svgsheet就不需要动态加载了
+                if (hasSvgsheet) {
+                    callback(novelData)
+                } else {
+                    loadStyle(() => callback(novelData))
+                }
+
             })
 
 

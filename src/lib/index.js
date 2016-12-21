@@ -7,7 +7,7 @@ import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 873.5
+Xut.Version = 873.7
 
 
 if (Xut.plat.isBrowser) {
@@ -179,24 +179,38 @@ let mixModeConfig = setConfig => {
  */
 Xut.Application.Launch = ({
     el,
-    paths,
+    path,
     launchAnim,
     cursor,
-    request //请求 ，默认本地
+    networkRequest, //可选 true,用来修改flow中的img地址
+    svgConvertJs //'svg' 资源转化svg=>js，用来读取数据
 }) => {
+
+    if(window.DYNAMICCONFIGT){
+        return
+    }
+
     let setConfig = Xut.Application.setConfig
     if (setConfig && setConfig.lauchMode === 1) {
         mixModeConfig(setConfig);
         lauchOptions = [{
             el,
-            paths,
+            path,
             cursor
         }]
+
+        //地址结尾是否包含了斜杠，如果包含了去掉
+        let resource = path.resource
+        if (/\/$/.test(resource)) {
+            resource = resource.substring(0, resource.length - 1)
+        }
+
         window.DYNAMICCONFIGT = { //外部配置文件
-            resource: paths.resource,
-            database: paths.database, //数据库
+            resource: resource, //资源路径
+            database: path.database, //数据库
             launchAnim, //启动动画
-            request //请求。本地/网络  默认本地
+            svgConvertJs, //资源转化svg=>js
+            networkRequest
         }
         loadApp(el, cursor)
     }

@@ -69,7 +69,9 @@ export default class Flow {
             //如果配置了高清后缀
             let hqSrc
             if (config.hqUrlSuffix) {
-                hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
+                let index = src.lastIndexOf('.')
+                let imgType = src.substring(index + 1, src.length)
+                hqSrc = src.replace(imgType, `${config.hqUrlSuffix}.` + imgType)
             }
             let img = new Image()
             img.src = src

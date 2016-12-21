@@ -20,7 +20,7 @@ module.exports = (conf) => {
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.testDir))
             .pipe(cleanCSS({ compatibility: 'ie8' }))
-            .pipe(rename('xxtppt.min.css'))
+            .pipe(rename('xxtppt.css'))
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.testDir))
             .on('error', (err) => {

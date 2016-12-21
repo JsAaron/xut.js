@@ -166,46 +166,13 @@ export function reviseSize(results, hasFlow, fixRadio) {
  */
 export function readFile(path, callback, type) {
 
-    var paths, name, data;
-
-    /**
-     * ibooks模式 单独处理svg转化策划给你js,加载js文件
-     * @param  {[type]} window.IBOOKSCONFIG [description]
-     * @return {[type]}              [description]
-     */
-    if (Xut.IBooks.CONFIG) {
-
-        //如果是.svg结尾
-        //把svg替换成js
-        if (/.svg$/.test(path)) {
-            path = path.replace(".svg", '.js')
-        }
-
-        //全路径
-        paths = config.getSvgPath().replace("svg", 'js') + path;
-        //文件名
-        name = path.replace(".js", '')
-
-        //加载脚本
-        request(paths, function() {
-            data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
-            if (data) {
-                callback(data)
-                delete window.HTMLCONFIG[name];
-                delete window.IBOOKSCONFIG[name]
-            } else {
-                callback('编译:脚本加载失败,文件名:' + name);
-            }
-        })
-        return
-    }
-
+    let paths
+    let name
+    let data
+    let svgUrl
 
     /**
      * js脚本加载
-     * @param  {[type]} fileUrl  [description]
-     * @param  {[type]} fileName [description]
-     * @return {[type]}          [description]
      */
     let jsRequest = (fileUrl, fileName) => {
         request(fileUrl, function() {
@@ -231,30 +198,56 @@ export function readFile(path, callback, type) {
         return
     }
 
+    /**
+     * 如果配置了convert === 'svg'
+     * 那么所有的svg文件就强制转化成js读取
+     */
+    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.svgConvertJs) {
+        path = path.replace('.svg', '.js')
+        name = path.replace(".js", '')
+        svgUrl = config.getSvgPath() + path
+        jsRequest(svgUrl, name) //直接采用脚本加载
+        return
+    }
+
+
+    /**
+     * ibooks模式 单独处理svg转化策划给你js,加载js文件
+     */
+    if (Xut.IBooks.CONFIG) {
+        //如果是.svg结尾
+        //把svg替换成js
+        if (/.svg$/.test(path)) {
+            path = path.replace(".svg", '.js')
+        }
+        //全路径
+        paths = config.getSvgPath().replace("svg", 'js') + path;
+        //文件名
+        name = path.replace(".js", '')
+        //加载脚本
+        request(paths, function() {
+            data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
+            if (data) {
+                callback(data)
+                delete window.HTMLCONFIG[name];
+                delete window.IBOOKSCONFIG[name]
+            } else {
+                callback('编译:脚本加载失败,文件名:' + name);
+            }
+        })
+        return
+    }
+
+
     //svg文件
     //游览器模式 && 非强制插件模式
     if (Xut.plat.isBrowser && !config.isPlugin) {
-
         //默认的地址
-        let svgUrl = config.getSvgPath().replace("www/", "") + path
-
-        //如果是动态接口执行
-        if (window.DYNAMICCONFIGT) {
-            //如果是网络请求
-            //直接把.svg的文件，改成.js的文件处理
-            if (window.DYNAMICCONFIGT.request === 'remote') {
-                path = path.replace('.svg', '.js')
-                name = path.replace(".js", '')
-                svgUrl = config.getSvgPath() + path
-                jsRequest(svgUrl, name) //直接采用脚本加载
-                return
-            }
-            //mini杂志的情况，不处理目录的www
-            if (window.DYNAMICCONFIGT.resource) {
-                svgUrl = config.getSvgPath() + path
-            }
+        svgUrl = config.getSvgPath().replace("www/", "") + path
+        //mini杂志的情况，不处理目录的www
+        if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
+            svgUrl = config.getSvgPath() + path
         }
-
         $.ajax({
             type: 'get',
             dataType: 'html',
@@ -267,12 +260,18 @@ export function readFile(path, callback, type) {
                 console.log('SVG' + path + '解析出错!');
             }
         })
-
-    } else {
-        Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function(svgContent) {
-            callback(svgContent);
-        }, function(err) {
-            callback('数据加载失败');
-        });
+        return
     }
+
+
+    /**
+     * 插件读取
+     * 手机客户端模式
+     */
+    Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function(svgContent) {
+        callback(svgContent);
+    }, function(err) {
+        callback('数据加载失败');
+    });
+
 }

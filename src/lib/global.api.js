@@ -508,7 +508,10 @@ $$extend(Application, {
      * 销毁应用
      */
     Destroy() {
-        globalDestroy('destroy')
+        if (window.DYNAMICCONFIGT) {
+            globalDestroy('destroy')
+            window.DYNAMICCONFIGT = null
+        }
     },
 
     /**
