@@ -7,7 +7,7 @@ import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 873.7
+Xut.Version = 873.9
 
 
 if (Xut.plat.isBrowser) {
@@ -182,8 +182,7 @@ Xut.Application.Launch = ({
     path,
     launchAnim,
     cursor,
-    networkRequest, //可选 true,用来修改flow中的img地址
-    svgConvertJs //'svg' 资源转化svg=>js，用来读取数据
+    convert //'svg' 资源转化svg=>js，用来读取数据
 }) => {
 
     if(window.DYNAMICCONFIGT){
@@ -209,8 +208,7 @@ Xut.Application.Launch = ({
             resource: resource, //资源路径
             database: path.database, //数据库
             launchAnim, //启动动画
-            svgConvertJs, //资源转化svg=>js
-            networkRequest
+            convert //资源转化svg=>js
         }
         loadApp(el, cursor)
     }

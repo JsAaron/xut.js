@@ -13,7 +13,7 @@ const hasTouch = Xut.plat.hasTouch
 
 //触发事件名
 const touchList = ['touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd]
-const mouseList = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseout']
+const mouseList = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseleave']
 
 //绑定事件名排序
 const orderName = {
@@ -22,7 +22,7 @@ const orderName = {
     end: 2,
     cancel: 3,
     transitionend: 4,
-    out: 5
+    leave: 5
 }
 
 const eventNames = (() => {
@@ -136,7 +136,7 @@ export function $$handle(callbacks, context, event) {
         case 'mouseup':
         case 'mousecancel':
         case 'touchcancel':
-        case 'mouseout':
+        case 'mouseleave':
             callbacks.end && callbacks.end.call(context, event)
             break;
         case transitionEnd:

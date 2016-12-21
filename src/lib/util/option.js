@@ -202,7 +202,7 @@ export function readFile(path, callback, type) {
      * 如果配置了convert === 'svg'
      * 那么所有的svg文件就强制转化成js读取
      */
-    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.svgConvertJs) {
+    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.convert === 'svg') {
         path = path.replace('.svg', '.js')
         name = path.replace(".js", '')
         svgUrl = config.getSvgPath() + path

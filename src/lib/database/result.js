@@ -37,7 +37,7 @@ function flowFilter() {
 
     //配置了远程地址
     //需要把flow的给处理掉
-    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.networkRequest && result.FlowData) {
+    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource && result.FlowData) {
         //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
         var remoteUrl = window.DYNAMICCONFIGT.resource;

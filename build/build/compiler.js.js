@@ -26,7 +26,6 @@ module.exports = (conf, scriptUrl, stop) => {
             })
             .pipe(rename(conf.distName))
             .pipe(gulp.dest(conf.tarDir))
-            .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.testDir))
             .on('end', (err) => {
                 utils.log(`【${conf.devName}、${conf.distName}】compile complete`, 'debug')

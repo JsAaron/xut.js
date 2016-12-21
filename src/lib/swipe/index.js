@@ -177,7 +177,8 @@ export default class Swipe extends Observer {
         const callback = {
             start: this,
             end: this,
-            cancel: this
+            cancel: this,
+            leave:this
         }
 
         //flipMode启动，没有滑动处理
@@ -190,6 +191,13 @@ export default class Swipe extends Observer {
         $$on(this.container, callback)
     }
 
+    /**
+     * 停止默认的行为
+     * @return {[type]} [description]
+     */
+    _stopDefault(e) {
+        this.options.preventDefault && e.preventDefault()
+    }
 
     /**
      * 事件处理
@@ -197,25 +205,29 @@ export default class Swipe extends Observer {
      * @return {[type]}   [description]
      */
     handleEvent(e) {
-        //如果是图片
-        //有可能是二维码，所以这里默认行为不阻止了
-        if (config.supportQR && e.target.nodeName.toLowerCase() === "img") {} else {
-            this.options.preventDefault && e.preventDefault()
-        }
+
         this.options.stopPropagation && e.stopPropagation()
 
         //接受多事件的句柄
         $$handle({
             start(e) {
+                this._stopDefault(e)
                 this._onStart(e)
             },
             move(e) {
+                //如果是图片
+                //有可能是二维码，所以这里默认行为不阻止了
+                if (config.supportQR && e.target.nodeName.toLowerCase() === "img") {} else {
+                    this._stopDefault(e)
+                }
                 this._onMove(e)
             },
             end(e) {
+                this._stopDefault(e)
                 this._onEnd(e)
             },
             transitionend(e) {
+                this._stopDefault(e)
                 this._onAnimComplete(e)
             }
         }, this, e)
@@ -394,7 +406,7 @@ export default class Swipe extends Observer {
         this._isTap = this._isMoving = false
 
         let duration
-        //可能没有点击页面，没有触发start事件
+            //可能没有点击页面，没有触发start事件
         if (this._start) {
             duration = getDate() - this._start.time
         }
@@ -775,7 +787,7 @@ export default class Swipe extends Observer {
             end: this,
             cancel: this,
             transitionend: this,
-            out: this
+            leave: this
         })
     }
 

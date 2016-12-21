@@ -15,6 +15,7 @@
         position: absolute;
         z-index: 99999
     }
+    
     #closeMini {
         left: 100px;
     }
@@ -34,31 +35,33 @@ Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
     historyMode: true,
-    visualMode: 3,
+    visualMode: 2,
     salePageType: 'page',
     cursor: {
         url: 'images/icons/busyIcon.gif',
         delayTime: 300
     },
     hqUrlSuffix: 'hi',
+    supportQR: true,
     swipeDelegate: true
 };
 
+var appId = 312
+Xut.Application.Launch({
+    el: '#xxtppt-app-container', //根节点
+    launchAnim: false, //关闭启动动画
+    cursor: false, //关闭忙了光标
+    convert: 'svg', //转化资源svg转化成js
+    path: {
+        resource: 'content/' + appId,
+        database: 'content/' + appId + '/SQLResult.js'
+            // resource: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310',
+            // database: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310/SQLResult.js'
+    }
+});
+
 $("#launchMini").click(function() {
-    var appId = 7
-    Xut.Application.Launch({
-        el: '#xxtppt-app-container', //根节点
-        launchAnim: false, //关闭启动动画
-        cursor: false, //关闭忙了光标
-        networkRequest: true, //远程请求
-        svgConvertJs: true, //转化资源svg转化成js
-        path: {
-            resource: 'content/' + appId,
-            database: 'content/' + appId + '/SQLResult.js'
-                // resource: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310',
-                // database: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310/SQLResult.js'
-        }
-    });
+
 })
 
 $("#closeMini").click(function() {
