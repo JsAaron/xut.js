@@ -1,6 +1,8 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* V874.1 2016.12.22 针对mini杂志，外部接口区分，增加退出Xut.Application.Exit接口，销毁Xut.Application.Destroy
+* V874   2016.12.22 针对mini杂志，统一了Xut.Application.Launch接口调用，修改Xut.launchConfig入口配置对象
 * V873.9 2016.12.21 针对mini杂志，增加翻页的mouseleave事件
 * V873.8 2016.12.21 针对mini杂志，修正转化svg接口
 * V873.7 2016.12.21 针对mini杂志，合并了flow数据，样式，svgcss到数据的json文件中

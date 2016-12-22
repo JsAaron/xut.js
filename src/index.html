@@ -46,17 +46,20 @@ Xut.Application.setConfig = {
     swipeDelegate: true
 };
 
-var appId = 312
+var appId = 10
 Xut.Application.Launch({
     el: '#xxtppt-app-container', //根节点
     launchAnim: false, //关闭启动动画
-    cursor: false, //关闭忙了光标
+    // cursor: false, //关闭忙了光标
     convert: 'svg', //转化资源svg转化成js
     path: {
+        //本地资源
         resource: 'content/' + appId,
         database: 'content/' + appId + '/SQLResult.js'
-            // resource: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310',
-            // database: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310/SQLResult.js'
+
+        //网络资源
+        // resource: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310',
+        // database: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310/SQLResult.js'
     }
 });
 
@@ -65,6 +68,6 @@ $("#launchMini").click(function() {
 })
 
 $("#closeMini").click(function() {
-    Xut.Application.Destroy()
+    Xut.Application.Exit()
 })
 </script>

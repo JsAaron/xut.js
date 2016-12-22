@@ -7,7 +7,7 @@ import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 
-Xut.Version = 873.9
+Xut.Version = 874.1
 
 
 if (Xut.plat.isBrowser) {
@@ -60,8 +60,8 @@ const getContentHTML = cursor => {
         let coverUrl = './content/gallery/cover.jpg'
 
         //重写背景图
-        if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
-            coverUrl = window.DYNAMICCONFIGT.resource + '/gallery/cover.jpg'
+        if (Xut.launchConfig && Xut.launchConfig.resource) {
+            coverUrl = Xut.launchConfig.resource + '/gallery/cover.jpg'
         }
         //背景样式
         coverStyle = `style="background-image: url(${coverUrl});"`
@@ -185,7 +185,7 @@ Xut.Application.Launch = ({
     convert //'svg' 资源转化svg=>js，用来读取数据
 }) => {
 
-    if(window.DYNAMICCONFIGT){
+    if(Xut.launchConfig){
         return
     }
 
@@ -204,7 +204,11 @@ Xut.Application.Launch = ({
             resource = resource.substring(0, resource.length - 1)
         }
 
-        window.DYNAMICCONFIGT = { //外部配置文件
+        /**
+         * 应用启动配置
+         * @type {Object}
+         */
+        Xut.launchConfig = { //外部配置文件
             resource: resource, //资源路径
             database: path.database, //数据库
             launchAnim, //启动动画

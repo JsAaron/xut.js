@@ -505,12 +505,12 @@ $$extend(Application, {
     },
 
     /**
-     * 销毁应用
+     * 退出应用
      */
-    Destroy() {
-        if (window.DYNAMICCONFIGT) {
-            globalDestroy('destroy')
-            window.DYNAMICCONFIGT = null
+    Exit() {
+        if (Xut.launchConfig) {
+            globalDestroy('exit')
+            Xut.launchConfig = null
         }
     },
 
@@ -525,6 +525,14 @@ $$extend(Application, {
     },
 
     /**
+     * 销毁应用
+     */
+    Destroy(){
+        Application.DropApp()
+    },
+
+    /**
+     * 销毁
      * 退出app
      * 提供给iframe方式加载后退出app处理接口
      */
@@ -536,17 +544,16 @@ $$extend(Application, {
          */
         const destroy = () => {
             __app__.$off()
-                //退出应用
-            globalDestroy('exit')
+            globalDestroy('destory')
             window.GLOBALCONTEXT = null;
         }
 
         /**
          * 动态配置
-         * @param  {[type]} window.DYNAMICCONFIGT [description]
+         * @param  {[type]} Xut.launchConfig [description]
          * @return {[type]}                       [description]
          */
-        if (window.DYNAMICCONFIGT) {
+        if (Xut.launchConfig) {
             destroy()
             return
         }

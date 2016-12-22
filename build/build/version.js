@@ -22,6 +22,7 @@ module.exports = (conf) => {
         let vs = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
         utils.log(`【create Xut.Version = ${vs}】`, 'debug')
         writeFile(wpath, vs)
+        writeFile('./template/test/lib/version.js', vs)
         resolve && resolve()
     })
 }

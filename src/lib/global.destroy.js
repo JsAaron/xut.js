@@ -11,12 +11,12 @@ import { offAndroid } from './initialize/android.button'
 /**
  * 销毁接口
  * action 可能是
- * 1 destory 默认，单页面切换，只做销毁。但是代码还是同一份
+ * 1 exit 默认，单页面切换，只做销毁。但是代码还是同一份
  * 2 refresh 刷新，旋转切换（需要做一些数据保留，比如外联json数据）
- * 3 exit 退出应用，所以这个应该是全销毁
+ * 3 destory 退出应用，所以这个应该是全销毁
  * @param {[type]} action [description]
  */
-export default function Destroy(action = 'destory') {
+export default function Destroy(action = 'exit') {
 
     //销毁所有场景
     sceneController.destroyAllScene()
@@ -24,7 +24,7 @@ export default function Destroy(action = 'destory') {
     //销毁只创建一次的对象
     //修复的音频对象
     //数据的结果集
-    if (action === 'exit') {
+    if (action === 'destory') {
         if (Xut.plat.isBrowser) {
             $('body').off() //默认事件
             $(document).off() //左右按钮

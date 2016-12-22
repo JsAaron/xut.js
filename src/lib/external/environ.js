@@ -53,15 +53,6 @@
     //秒秒学客户端配置
     window.MMXCONFIG = CONFIG.mmxConfig;
 
-    /**
-     * 2016.9.13
-     * 新增动态模式
-     * 本意去掉iframe模式
-     * 这样可以做自动切换xxtppt.js
-     * @type {Boolean}
-     */
-    window.DYNAMICCONFIGT = undefined
-
 })(function() {
 
     //是否为iframe加载

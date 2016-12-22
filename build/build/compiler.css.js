@@ -23,6 +23,7 @@ module.exports = (conf) => {
             .pipe(rename('xxtppt.css'))
             .pipe(gulp.dest(conf.tarDir))
             .pipe(gulp.dest(conf.testDir))
+            .pipe(gulp.dest('./template/test/css'))
             .on('error', (err) => {
                 utils.log('【css】compile complete error', 'debug')
                 reject()

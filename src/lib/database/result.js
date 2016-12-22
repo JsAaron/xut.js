@@ -32,31 +32,36 @@ function insertStyle(rule, attribute, value) {
  * 2 flow样式
  * 3 svgsheet
  */
-function flowFilter() {
-    result = window.SQLResult;
+function flowJsonFilter() {
+    result = window.SQLResult
+
+    if (!result) {
+        console.log('json数据库加载出错')
+        return
+    }
 
     //配置了远程地址
     //需要把flow的给处理掉
-    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource && result.FlowData) {
+    if (Xut.launchConfig && Xut.launchConfig.resource && result.FlowData) {
         //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-        var remoteUrl = window.DYNAMICCONFIGT.resource;
+        let remoteUrl = Xut.launchConfig.resource;
         result.FlowData = result.FlowData.replace(/<img\s*src=\"[\w\/]+gallery/ig, '<img src=\"' + remoteUrl + '/gallery');
         result.FlowData = result.FlowData.replace(/xlink:href=\"[\w\/]+gallery/ig, 'xlink:href=\"' + remoteUrl + '/gallery');
     }
 
-    //存在flow样式
-    if (result.FlowStyle) {
-        insertStyle(result.FlowStyle, 'data-flow', 'true');
-        result.FlowStyle = null;
-    }
-
-    //存在svg样式
-    var hasSvgsheet;
+    //全局svg样式
+    let hasSvgsheet
     if (result.svgsheet) {
         hasSvgsheet = true;
         insertStyle(result.svgsheet, 'data-svg', 'true');
         result.svgsheet = null;
+    }
+
+    //全局flow样式
+    if (result.FlowStyle) {
+        insertStyle(result.FlowStyle, 'data-flow', 'true');
+        result.FlowStyle = null;
     }
 
     window.SQLResult = null;
@@ -67,23 +72,28 @@ function flowFilter() {
 
 /**
  * 设置数据缓存
+ * 加载配置文件指定路径数据库
+ * 加载外部动态js加载的数据库文件
+ *
  * 1 去掉全局挂着
  * 2 缓存
  */
-export function importDatabase(callback) {
+export function importJsonDatabase(callback) {
+
     //如果外联指定路径json数据
-    var path = window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.database;
+    let path = Xut.launchConfig && Xut.launchConfig.database;
     if (path) {
-        //add window.SQLResult database
+        //防止外部链接影响
+        window.SQLResult = null
         request(path, function() {
-            callback(flowFilter())
-        });
+            callback(flowJsonFilter())
+        })
     }
     //如果外联index.html路径json数据
     else if (window.SQLResult) {
-        callback(flowFilter())
+        callback(flowJsonFilter())
     } else {
-        callback();
+        callback()
     }
 }
 

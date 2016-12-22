@@ -1,6 +1,6 @@
 import { createCursor } from './busy.cursor'
 import { contentFilter } from '../component/activity/content/filter'
-import { importDatabase } from '../database/result'
+import { importJsonDatabase } from '../database/result'
 
 import { loader } from '../util/index'
 
@@ -18,8 +18,8 @@ import initFlows from '../component/flow/layout'
  * @return {[type]} [description]
  */
 const loadStyle = (callback) => {
-    let svgsheet = window.DYNAMICCONFIGT ?
-        window.DYNAMICCONFIGT.resource + '/gallery/svgsheet.css' :
+    let svgsheet = Xut.launchConfig ?
+        Xut.launchConfig.resource + '/gallery/svgsheet.css' :
         config.pathAddress + 'svgsheet.css'
     loader.load([svgsheet], callback, null, true);
 }
@@ -61,10 +61,10 @@ const setMode = function(data) {
 /**
  * 动态代码变动区域
  */
-export default function dynamic(callback) {
+export default function baseConfig(callback) {
 
-    //导入数据缓存
-    importDatabase((hasSvgsheet) => {
+    //导入JSON数据缓存
+    importJsonDatabase((hasSvgsheet) => {
 
         //初始化工具栏
         //与数据库setting数据

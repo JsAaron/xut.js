@@ -101,7 +101,7 @@ const initApp = () => baseConfig(initMain)
  * 绑定事件
  * @return {[type]} [description]
  */
-const operation = () => {
+const bindPlatEvent = () => {
     //安卓上
     if (Xut.plat.isAndroid) {
         //预加载处理视频
@@ -144,17 +144,18 @@ export default function init() {
     //3 pc
     //4 ios/android
     if (window.GLOBALIFRAME) {
-        operation()
+        bindPlatEvent()
     } else {
 
-        //brower or mobile(apk or ipa)
+        //brower
         if (config.isBrowser) {
             initApp()
         } else {
+            //mobile(apk or ipa)
             window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
             document.addEventListener("deviceready", () => {
                 Xut.plat.hasPlugin = true //支持插件
-                Xut.Plugin.XXTEbookInit.startup(config.dbName, operation, function() {});
+                Xut.Plugin.XXTEbookInit.startup(config.dbName, bindPlatEvent, function() {});
             }, false)
         }
     }

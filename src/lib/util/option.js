@@ -52,7 +52,7 @@ export function createRandomImg(url) {
  * @return {[type]} [description]
  */
 export function replacePath(svgstr) {
-    if (window.DYNAMICCONFIGT) {
+    if (Xut.launchConfig) {
         //如果能找到对应的默认路径，则替换
         if (-1 !== svgstr.indexOf('content/gallery/')) {
             svgstr = svgstr.replace(/content\/gallery/ig, Xut.config.pathAddress)
@@ -202,7 +202,7 @@ export function readFile(path, callback, type) {
      * 如果配置了convert === 'svg'
      * 那么所有的svg文件就强制转化成js读取
      */
-    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.convert === 'svg') {
+    if (Xut.launchConfig && Xut.launchConfig.convert === 'svg') {
         path = path.replace('.svg', '.js')
         name = path.replace(".js", '')
         svgUrl = config.getSvgPath() + path
@@ -245,7 +245,7 @@ export function readFile(path, callback, type) {
         //默认的地址
         svgUrl = config.getSvgPath().replace("www/", "") + path
         //mini杂志的情况，不处理目录的www
-        if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.resource) {
+        if (Xut.launchConfig && Xut.launchConfig.resource) {
             svgUrl = config.getSvgPath() + path
         }
         $.ajax({
