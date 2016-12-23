@@ -3,19 +3,16 @@ import { api } from './global.api'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { fixAudio } from './component/audio/fix'
-import { setDelay, disable } from './initialize/busy.cursor'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
+import initNode from './initialize/init.node'
 
 Xut.Version = 874.1
 
 
 if (Xut.plat.isBrowser) {
 
-    /**
-     * 禁止全局的缩放处理
-     * @return {[type]}    [description]
-     */
+    //禁止全局的缩放处理
     $('body').on('touchmove', function(e) {
         e.preventDefault && e.preventDefault()
     })
@@ -24,6 +21,7 @@ if (Xut.plat.isBrowser) {
     if (Xut.plat.noAutoPlayMedia) {
         fixAudio()
     }
+
     //Desktop binding mouse control
     $(document).keyup(event => {
         switch (event.keyCode) {
@@ -37,85 +35,14 @@ if (Xut.plat.isBrowser) {
     })
 }
 
-/**
- * 基本结构
- */
-const getContentHTML = cursor => {
-    //忙碌可配置
-    let busyIcon = '<div class="xut-busy-icon xut-fullscreen"></div>'
-    if (!cursor) {
-        disable(true)
-        busyIcon = ''
-    }
-
-    if (config.cursor && config.cursor.time) {
-        setDelay(config.cursor.time)
-    }
-
-    let coverStyle = ''
-
-    //mini平台不要背景图
-    if (Xut.config.platform === 'mini') {} else {
-        //默认背景图
-        let coverUrl = './content/gallery/cover.jpg'
-
-        //重写背景图
-        if (Xut.launchConfig && Xut.launchConfig.resource) {
-            coverUrl = Xut.launchConfig.resource + '/gallery/cover.jpg'
-        }
-        //背景样式
-        coverStyle = `style="background-image: url(${coverUrl});"`
-    }
-
-    return `${busyIcon}
-            <div class="xut-cover xut-fullscreen" ${coverStyle}></div>
-            <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
-}
-
-/**
- * 根节点
- */
-const getNode = (nodeName = '#xxtppt-app-container', cursor = true) => {
-    let $rootNode
-    if (nodeName) {
-        $rootNode = $(nodeName)
-    }
-    if (!$rootNode.length) {
-        //如果没有传递节点名，直接放到body下面
-        nodeName = ''
-        $rootNode = $('body')
-    }
-
-    let contentHtml = getContentHTML(cursor)
-
-    //如果根节点不存在,配置根节点
-    if (!nodeName) {
-        contentHtml = `<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden">
-                            ${contentHtml}
-                       </div>`
-    }
-
-    return {
-        $rootNode,
-        $contentNode: $(String.styleFormat(contentHtml))
-    }
-}
-
-
-/**
- * 接口接在参数
- * 用户横竖切换刷新
- * @type {Array}
- */
-let lauchOptions
-
 
 /**
  * 加载应用app
+ * arg : el / cursor
  * @return {[type]} [description]
  */
-let loadApp = (...arg) => {
-    let node = getNode(...arg)
+const loadApp = (...arg) => {
+    let node = initNode(...arg)
     Xut.Application.$$removeNode = () => {
         node.$contentNode.remove()
         node.$contentNode = null
@@ -129,11 +56,24 @@ let loadApp = (...arg) => {
     }, init)
 }
 
-// $('body').on('dblclick', () => {
-//     // alert(11)
-//     Xut.Application.Refresh()
-//     loadApp()
-// })
+
+/**
+ * 提供全局配置文件
+ */
+const mixModeConfig = setConfig => {
+    if (setConfig) {
+        Xut.extend(config, setConfig)
+    }
+}
+
+
+/**
+ * 接口接在参数
+ * 用户横竖切换刷新
+ * @type {Array}
+ */
+let cacheOptions
+
 
 /**
  * 横竖切换
@@ -149,7 +89,7 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
 
     //如果启动了这个模式
     if (config.orientateMode) {
-        let temp = lauchOptions
+        let temp = cacheOptions
         Xut.Application.Refresh()
         if (temp && temp.length) {
             delay(() => {
@@ -166,15 +106,6 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
 
 
 /**
- * 提供全局配置文件
- */
-let mixModeConfig = setConfig => {
-    if (setConfig) {
-        Xut.extend(config, setConfig)
-    }
-}
-
-/**
  * 新版本加载
  */
 Xut.Application.Launch = ({
@@ -185,14 +116,14 @@ Xut.Application.Launch = ({
     convert //'svg' 资源转化svg=>js，用来读取数据
 }) => {
 
-    if(Xut.launchConfig){
+    if (Xut.launchConfig) {
         return
     }
 
     let setConfig = Xut.Application.setConfig
     if (setConfig && setConfig.lauchMode === 1) {
         mixModeConfig(setConfig);
-        lauchOptions = [{
+        cacheOptions = [{
             el,
             path,
             cursor
