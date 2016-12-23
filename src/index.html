@@ -50,12 +50,18 @@ var appId = 10
 Xut.Application.Launch({
     el: '#xxtppt-app-container', //根节点
     launchAnim: false, //关闭启动动画
+    cursor: {
+        url: 'http://123.56.220.137/files/16122316461545/page/images/icons/busyIcon.gif',
+        delayTime: 300
+    },
     // cursor: false, //关闭忙了光标
     convert: 'svg', //转化资源svg转化成js
     path: {
-        //本地资源
-        resource: 'content/' + appId,
-        database: 'content/' + appId + '/SQLResult.js'
+
+        resource: 'http://123.56.220.137/files/16122316461545/page/content',
+        database: 'http://123.56.220.137/files/16122316461545/page/datacache/sqlResult.js' //本地资源
+            // resource: 'content/' + appId,
+            // database: 'content/' + appId + '/SQLResult.js'
 
         //网络资源
         // resource: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310',

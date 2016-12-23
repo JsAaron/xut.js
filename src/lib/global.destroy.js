@@ -7,6 +7,7 @@ import { destroyCache, destroyResult } from './database/destroy'
 import { destroyConfig } from './config/index'
 import { $$resetUUID } from './util/stroage'
 import { offAndroid } from './initialize/android.button'
+import { cleanCursor } from './initialize/busy.cursor'
 
 /**
  * 销毁接口
@@ -58,6 +59,9 @@ export default function Destroy(action = 'exit') {
 
     //销毁独立APK的键盘事件
     offAndroid()
+
+    //忙了光标设置
+    cleanCursor()
 
     /**
      * 重设缓存的UUID

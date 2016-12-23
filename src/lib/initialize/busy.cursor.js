@@ -38,6 +38,10 @@ let isCallHide = false
  */
 let timer = null
 
+/**
+ * 单独重设的数据
+ */
+let newCursor
 
 /**
  * create
@@ -57,9 +61,10 @@ export function createCursor() {
     let container = ''
 
     //忙碌光标自定义
-    if (config.cursor && config.cursor.url) {
+    if (config.cursor && config.cursor.url || newCursor) {
+        let newUrl = newCursor ? newCursor.url : config.cursor.url
         container += `<div class="xut-busy-middle fullscreen-background"
-                           style="background-image: url(${config.cursor.url});">
+                           style="background-image: url(${newUrl});">
                       </div>`
     } else {
         while (count--) {
@@ -101,7 +106,27 @@ export const ShowBusy = () => {
             HideBusy()
             isCallHide = false
         }
-    }, delay)
+    }, newCursor ? newCursor.delayTime : delay)
+}
+
+
+/**
+ * 通过lanuch重设接口
+ * @param  {[type]} newCursor [description]
+ * @return {[type]}           [description]
+ */
+export const resetCursor = (data) => {
+    newCursor = data
+}
+
+
+/**
+ * 清理忙了光标数据
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
+export const cleanCursor = (data) => {
+    newCursor = null
 }
 
 

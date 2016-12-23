@@ -1,20 +1,26 @@
 import { config } from '../config/index'
-import { setDelay, disable } from '../initialize/busy.cursor'
+import { setDelay, disable, resetCursor } from '../initialize/busy.cursor'
 
 /**
  * 初始化根节点
  */
 
-const getContentHTML = cursor => {
+const getContentHTML = newCursor => {
     //忙碌可配置
     let busyIcon = '<div class="xut-busy-icon xut-fullscreen"></div>'
-    if (!cursor) {
+    if (newCursor == false) {
         disable(true)
         busyIcon = ''
     }
 
+    //全局设置
     if (config.cursor && config.cursor.time) {
         setDelay(config.cursor.time)
+    }
+
+    //单独重设忙了光标
+    if (newCursor && newCursor.url) {
+        resetCursor(newCursor)
     }
 
     let coverStyle = ''
@@ -40,7 +46,7 @@ const getContentHTML = cursor => {
 /**
  * 根节点
  */
-export default function initNode(nodeName = '#xxtppt-app-container', cursor = true) {
+export default function initNode(nodeName = '#xxtppt-app-container', cursor) {
     let $rootNode
     if (nodeName) {
         $rootNode = $(nodeName)
