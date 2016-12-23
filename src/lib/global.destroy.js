@@ -36,9 +36,19 @@ export default function Destroy(action = 'exit') {
         destroyFixAudio()
     }
 
-    //refresh状态不删除结果集
+    // refresh状态不删除结果集
+    // 只处理destory与exit状态
     if (action === 'destory' || action === 'exit') {
+
+        //删除结果集
         destroyResult()
+
+        //删除流式布局的数据
+        let $flowNode = $("#xut-stream-flow")
+        if ($flowNode.length) {
+            $flowNode.remove()
+            $flowNode = null
+        }
     }
 
     //config路径缓存

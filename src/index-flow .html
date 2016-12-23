@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta content="email=no" name="format-detection" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <title>AppCarrier</title>
+    <script type="text/javascript" src="lib/external.js"></script>
+    <style type="text/css">
+    .app-buttom {
+        position: absolute;
+        z-index: 999999;
+        left: 0;
+        top: 0;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="app-buttom">
+        <button id="app-launch">加载应用:Launch</button>
+        <button id="app-exit">销毁当前应用:Exit</button>
+        <button id="app-destroy">销毁所有:Destroy</button>
+        <button id="app-name"></button>
+    </div>
+    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
+</body>
+
+
+
+    <script type="text/javascript">
+    Xut.Application.setConfig = {
+        lauchMode: 1,
+        platform: 'mini',
+        historyMode: false,
+        visualMode: 2,
+        salePageType: 'page',
+        hqUrlSuffix: 'hi',
+        supportQR: true,
+        swipeDelegate: true
+    };
+
+
+    let appFileName = ['16122316461545', '161223164500911', '161223164258457', '161223164159140']
+    let appIndex = 0
+
+
+    function launch() {
+        Xut.Application.Launch({
+            el: '#xxtppt-app-container',
+            launchAnim: false,
+            cursor: {
+                url: 'http://123.56.220.137/files/' + appFileName[appIndex] + '/page/images/icons/busyIcon.gif',
+                delayTime: 300
+            },
+            convert: 'svg',
+            path: {
+                //网络资源
+                resource: 'http://123.56.220.137/files/' + appFileName[appIndex] + '/page/content',
+                database: 'http://123.56.220.137/files/' + appFileName[appIndex] + '/page/datacache/sqlResult.js'
+            }
+        });
+    }
+
+
+    $("#app-launch").click(function() {
+        if (appIndex === appFileName.length) {
+            appIndex = 0
+        }
+        $("#app-name").text('应用索引: ' + (appIndex + 1))
+        launch();
+        ++appIndex
+    })
+
+    $("#app-exit").click(function() {
+        Xut.Application.Exit()
+    })
+
+    $("#app-destroy").click(function() {
+        Xut.Application.Destroy()
+    })
+    </script>
+</html>
