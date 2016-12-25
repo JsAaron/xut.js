@@ -51,19 +51,16 @@ export function mainScene() {
         </div>`
 
 
-    const homeWidth = config.viewSize.width
-        // const homeHeight = config.viewSize.height
-    const homeLeft = config.viewSize.left
     const homeIndex = Xut.sceneController.createIndex()
     const homeOverflow = config.visualMode === 1 ? 'visible' : 'hidden'
 
     //主体
     const homeHTML =
         `<div id="xut-main-scene"
-              style="width:${homeWidth}px;
-                     height:100%;
+              style="width:${config.viewSize.width}px;
+                     height:${config.screenSize.height}px;
                      top:0;
-                     left:${homeLeft}px;
+                     left:${config.viewSize.left}px;
                      position:absolute;
                      z-index:${homeIndex};
                      overflow:${homeOverflow};">

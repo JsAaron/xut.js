@@ -65,7 +65,6 @@ export default function initNode(nodeName = '#xxtppt-app-container', cursor) {
                             ${contentHtml}
                        </div>`
     }
-
     return {
         $rootNode,
         $contentNode: $(String.styleFormat(contentHtml))

@@ -50,10 +50,26 @@ const loadApp = (...arg) => {
         node = null
         Xut.Application.$$removeNode = null
     }
+
     nextTick({
         container: node.$rootNode,
         content: node.$contentNode
-    }, init)
+    }, function() {
+
+        //如果是应用加载模式
+        //可能的可视区不一定是全屏的范围
+        //所以要探测下实际的尺寸
+        if (Xut.launchConfig) {
+            let $scene = node.$rootNode.find('.xut-scene-container')
+            let top = parseInt($scene.css('top'))
+            if (top) {
+                //应用的高度
+                Xut.launchConfig.appViewTop = top
+            }
+        }
+
+        init()
+    })
 }
 
 
