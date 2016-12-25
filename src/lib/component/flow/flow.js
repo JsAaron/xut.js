@@ -73,18 +73,11 @@ export default class Flow {
                 let imgType = src.substring(index + 1, src.length)
                 hqSrc = src.replace(imgType, `${config.hqUrlSuffix}.` + imgType)
             }
-            let img = new Image()
-            img.src = src
-            img.onload = () => { //防止图片为加载完毕
-                this.zoomObjs[src] = new Zoom({
-                    element: $(node),
-                    originalSrc: src,
-                    hdSrc: hqSrc
-                })
-            }
-            img.onerror = () => { //失败
-                img = null
-            }
+            this.zoomObjs[src] = new Zoom({
+                element: $(node),
+                originalSrc: src,
+                hdSrc: hqSrc
+            })
         }
     }
 

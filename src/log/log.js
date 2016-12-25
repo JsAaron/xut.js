@@ -1,6 +1,8 @@
 ﻿/*************************
 * 电子杂志更新日志记录
 **************************
+* V874.2 2016.12.25 针对mini杂志，1.修正单击图片放大的预加载等待，
+* 								  2.修正Launch进入到应用，可以设置一个可视区范围
 * V874.2 2016.12.23 针对mini杂志，fix flow bug
 * V874.1 2016.12.22 针对mini杂志，外部接口区分，增加退出Xut.Application.Exit接口，销毁Xut.Application.Destroy
 * V874   2016.12.22 针对mini杂志，统一了Xut.Application.Launch接口调用，修改Xut.launchConfig入口配置对象

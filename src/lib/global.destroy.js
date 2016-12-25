@@ -84,5 +84,5 @@ export default function Destroy(action = 'exit') {
     Xut.CreateFilter = null
 
     //销毁节点
-    Xut.Application.$$removeNode()
+    Xut.Application.$$removeNode && Xut.Application.$$removeNode()
 }
