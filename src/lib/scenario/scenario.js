@@ -85,10 +85,10 @@ export class SceneFactory {
     constructor(data) {
 
         //基本配置信息
-        const seasonId = data.seasonId;
-        const chapterId = data.chapterId;
+        let seasonId = data.seasonId;
+        let chapterId = data.chapterId;
 
-        const options = _.extend(this, data, {
+        let options = _.extend(this, data, {
             'scenarioId': seasonId,
             'chapterId': chapterId,
             '$container': $('.xut-scene-container')
@@ -202,14 +202,21 @@ export class SceneFactory {
         //2016.9.29
         //新增页码显示
         //如果有分栏
-        const flowCounts = getFlowCount(this.seasonId)
-        if (config.toolType.number !== false && flowCounts) {
-            //获取分栏的chapter数，总数需要减去
-            const flowChpterCount = getFlowChpaterCount(this.seasonId)
+        let flowCounts = getFlowCount(this.seasonId)
+
+        //如果是min平台强制启动
+        if (Xut.config.platform === 'mini' || (config.toolType.number !== false && flowCounts)) {
+            let flowChpterCount
+            if (flowCounts) {
+                //获取分栏的chapter数，总数需要减去
+                flowChpterCount = getFlowChpaterCount(this.seasonId)
+            }
             this.numberToolbar = new NumberBar({
                 $rootNode: $rootNode,
                 currentPage: pageIndex,
-                pageTotal: pageTotal + flowCounts - flowChpterCount
+                //如果有flowCounts则用
+                //否则就用页面的总数
+                pageTotal: flowCounts ? pageTotal + flowCounts - flowChpterCount : pageTotal
             })
         }
 

@@ -112,7 +112,7 @@ export default class BookBar extends Bar {
 
         icon.style.fontSize = "2.5vh";
         icon.style.color = "#fff";
-        icon.className = 'icomoon icon-th-list2';
+        icon.className = 'icon-th-list2';
         icon.style.position = "absolute";
         icon.style.bottom = this.super_iconHeight * 0.5 + 'px';
 
@@ -149,7 +149,7 @@ export default class BookBar extends Bar {
         icon.style.color = "#fff";
         icon.style.position = "absolute";
         icon.style.bottom = this.super_iconHeight * 0.5 + 'px';
-        icon.className = 'icomoon icon-bookmark2';
+        icon.className = 'icon-bookmark2';
 
         iconText.innerHTML = '书签';
         iconText.className = "xut-book-markFont"
@@ -187,7 +187,7 @@ export default class BookBar extends Bar {
         icon.style.lineHeight = this.topBarHeight + 'px';
         icon.style.color = "#fff";
 
-        icon.className = 'icomoon icon-angle-left icon-book-bar';
+        icon.className = 'icon-angle-left icon-book-bar';
         icon.style.fontSize = "6vh";
         this.$controlNode.append(icon)
     }
@@ -459,16 +459,16 @@ export default class BookBar extends Bar {
         $$handle({
             end(e) {
                 switch ($$target(e).className) {
-                    case 'icomoon icon-angle-left icon-book-bar':
+                    case 'icon-angle-left icon-book-bar':
                         this.goBack();
                         //返回
                         break;
-                    case 'icomoon icon-th-list2':
+                    case 'icon-th-list2':
                     case 'xut-book-dirFont':
                         //目录
                         this.showDirMenu();
                         break;
-                    case 'icomoon icon-bookmark2':
+                    case 'icon-bookmark2':
                     case 'xut-book-markFont':
                         //书签
                         this.showBookMark();

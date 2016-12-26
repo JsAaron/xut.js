@@ -689,7 +689,7 @@ export default class Swipe extends Observer {
 
         this._distributeMove({
             'pageIndex': this._hindex,
-            'speed': calculatespeed(),
+            'speed': Math.abs(calculatespeed()),
             'distance': 0,
             'direction': this.direction,
             'action': 'flipOver'

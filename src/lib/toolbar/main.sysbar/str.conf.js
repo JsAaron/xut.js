@@ -94,7 +94,7 @@ export function createHideToolbar(height) {
  * @return {[type]}        [description]
  */
 export function createCloseIcon(height) {
-    return `<div class="si-icon icomoon icon-close"
+    return `<div class="si-icon icon-close2"
                  style="float:right;margin-right:4px;width:${height}px;height:${height}px">
             </div>`
 

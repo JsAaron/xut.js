@@ -76,15 +76,17 @@ svg {
     border: none;
 }
 
+
 /**
  * 2016.12.20
  * 单独修复妙妙学
  * content下面img空白的问题
  * 上下图去间距
  */
+
 .fix-miaomiaoxue-img {
-  outline-width:0px;
-  vertical-align:top;
+    outline-width: 0px;
+    vertical-align: top;
 }
 
 video {
@@ -92,11 +94,16 @@ video {
 }
 
 
-
-/*翻页按钮*/
+/*翻页按钮
+注意这个bug问题
+[16/12/26 上午3:22:10] 张 昀: 出现这个问题，并非因为字体在线的原因，而是ionic的<ion-refresher>标记，有某种bug
+[16/12/26 上午3:23:17] 张 昀: 只要遇到名为icomoon的字体，就会出现上述问题
+[16/12/26 上午3:23:48] 张 昀: 把xxtppt.css中的@font-face{font-family:icomoon这句，随便改成其他名字
+[16/12/26 上午3:24:04] 张 昀: 例如@font-face{font-family:icomoon2，就不再报字体错误了
+*/
 
 @font-face {
-    font-family: 'icomoon';
+    font-family: 'pageFontFamily';
     src: url('../images/fonts/icomoon.eot?vv9atf');
     src: url('../images/fonts/icomoon.eot?vv9atf#iefix') format('embedded-opentype'), url('../images/fonts/icomoon.ttf?vv9atf') format('truetype'), url('../images/fonts/icomoon.woff?vv9atf') format('woff'), url('../images/fonts/icomoon.svg?vv9atf#icomoon') format('svg');
     font-weight: normal;
@@ -106,7 +113,7 @@ video {
 [class^="icon-"],
 [class*=" icon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'icomoon' !important;
+    font-family: 'pageFontFamily' !important;
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -138,6 +145,14 @@ video {
     /*   content: "\e043";*/
     content: "\ea0d";
     color: #000;
+    position: relative;
+    top: 0.12vh;
+}
+
+.icon-close2:before {
+    /*   content: "\e908";*/
+    /*   content: "\e043";*/
+    content: "\ea0d";
     position: relative;
     top: 0.12vh;
 }
@@ -288,8 +303,6 @@ video {
     position: absolute;
     cursor: pointer;
 }
-
-
 
 
 /**
@@ -1246,18 +1259,23 @@ video {
     display: none;
     bottom: 0;
     padding: .3rem;
+    display: table;
 }
 
 .xut-page-number strong {
+    padding: 0 0.2rem;
+    display: table-cell;
+    vertical-align: middle;
+    color: rgba(0, 0, 0, 0.25);
     font-weight: bold;
 }
 
 .xut-page-number > div {
-    font-size: 1.2rem;
+    font-size: 1rem;
     text-decoration: none;
     display: inline-block;
-    height: 1.2rem;
-    line-height: 1.2rem;
+    height: 1rem;
+    line-height: 1rem;
     border: 1px solid #ddd;
     color: white;
     background-color: rgba(0, 0, 0, 0.25);
@@ -1273,16 +1291,3 @@ video {
 .xut-page-number > div:last-child {
     font-weight: normal;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

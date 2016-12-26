@@ -1,6 +1,7 @@
 import { config } from '../config/index'
 
 import {
+    hasFlow,
     getBeforeCount,
     getCurrentBeforeCount
 } from '../component/flow/get'
@@ -64,6 +65,15 @@ export default class NumberBar {
         }
     }
 
+    _updateText(action, updateIndex) {
+        Xut.nextTick(() => {
+            this.$currtNode.text(updateIndex)
+            if (action === 'init') {
+                this.$container.show()
+            }
+        })
+    }
+
     /**
      * 更新页码
      * @return {[type]} [description]
@@ -76,10 +86,15 @@ export default class NumberBar {
         sonIndex = 0
     }) {
 
-        const chapterData = Xut.Presentation.GetPageData('page', parentIndex)
+        let chapterData = Xut.Presentation.GetPageData('page', parentIndex)
 
         //从正索引开始
         ++parentIndex
+
+        if (!hasFlow()) {
+            this._updateText(action, parentIndex)
+            return
+        }
 
         //默认，需要拿到前置的总和(出去当前)
         let beforeCount = getBeforeCount(chapterData.seasonId, chapterData._id)
@@ -99,12 +114,7 @@ export default class NumberBar {
             }
         }
 
-        Xut.nextTick(() => {
-            this.$currtNode.text(updateIndex)
-            if (action === 'init') {
-                this.$container.show()
-            }
-        })
+        this._updateText(action, updateIndex)
     }
 
 }

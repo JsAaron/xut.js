@@ -146,10 +146,10 @@ export default class Bar {
      */
     _createArrow() {
         const option = this._getArrowOption()
-        return `<div class="si-icon xut-flip-control xut-flip-control-left icomoon icon-angle-left ${option.state}"
+        return `<div class="si-icon xut-flip-control xut-flip-control-left icon-angle-left ${option.state}"
                      style="${option.style};text-align:center;line-height:${option.height}px;font-size:4vh;">
                 </div>
-                <div class="si-icon xut-flip-control xut-flip-control-right icomoon icon-angle-right ${option.state}"
+                <div class="si-icon xut-flip-control xut-flip-control-right icon-angle-right ${option.state}"
                      style="${option.style};text-align:center;line-height:${option.height}px;">
                 </div>`
     }

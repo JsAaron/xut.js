@@ -18,7 +18,7 @@ export function getSize() {
     let clientHeight = document.documentElement.clientHeight || $(window).height()
 
     //启动模式
-    if (Xut.launchConfig.appViewTop) {
+    if (Xut.launchConfig && Xut.launchConfig.appViewTop) {
         clientHeight = clientHeight -  Xut.launchConfig.appViewTop
     }
 
