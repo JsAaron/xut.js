@@ -36,6 +36,13 @@ export default {
     supportQR: false,
 
     /**
+     * 控制可视区的高度
+     * 给mini杂志的客户端使用
+     * 因为有工具栏挤压的问题
+     */
+    visualHeight: DEFAULT,
+
+    /**
      * 忙碌光标
      * cursor: {
      *   url: 'images/icons/showNote.png',

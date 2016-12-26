@@ -1259,7 +1259,7 @@ video {
     display: none;
     bottom: 0;
     padding: .3rem;
-    display: table;
+    /*display: table;*/
 }
 
 .xut-page-number strong {
@@ -1271,9 +1271,9 @@ video {
 }
 
 .xut-page-number > div {
-    font-size: 1rem;
+    display: table-cell;
+    vertical-align: middle;
     text-decoration: none;
-    display: inline-block;
     height: 1rem;
     line-height: 1rem;
     border: 1px solid #ddd;

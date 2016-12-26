@@ -7,7 +7,7 @@ import nextTick from './util/nexttick'
 import init from './initialize/index'
 import initNode from './initialize/init.node'
 
-Xut.Version = 874.5
+Xut.Version = 874.6
 
 
 if (Xut.plat.isBrowser) {
@@ -54,22 +54,7 @@ const loadApp = (...arg) => {
     nextTick({
         container: node.$rootNode,
         content: node.$contentNode
-    }, function() {
-
-        //如果是应用加载模式
-        //可能的可视区不一定是全屏的范围
-        //所以要探测下实际的尺寸
-        if (Xut.launchConfig) {
-            let $scene = node.$rootNode.find('.xut-scene-container')
-            let top = parseInt($scene.css('top'))
-            if (top) {
-                //应用的高度
-                Xut.launchConfig.appViewTop = top
-            }
-        }
-
-        init()
-    })
+    }, init)
 }
 
 

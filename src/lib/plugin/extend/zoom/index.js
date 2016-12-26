@@ -151,21 +151,28 @@ export default class Zoom {
     /**
      * 创建高清图
      */
-    _createHQIMG(position, src, callback) {
-        var self = this
+    _createHQIMG(position, src, success, fail) {
         if (this.$hQNode) {
             this.$hQNode.show()
-            callback()
+            success()
         } else {
-            this.$hQNode = $('<img/>').load(function() {
-                $(this).css({
+            var img = new Image();
+            img.onload = () => {
+                this.$hQNode = $(img)
+                this.$hQNode.css({
                     width: position.width,
                     height: position.height,
                     left: position.left,
                     top: position.top
-                }).addClass('gamma-img-fly').appendTo(self.$singleView);
-                callback()
-            }).attr('src', src);
+                }).addClass('gamma-img-fly').appendTo(this.$singleView);
+                success()
+            }
+            img.onerror = () => {
+                //失败
+                this.hdSrc = null
+                fail()
+            }
+            img.src = src
         }
     }
 
@@ -243,6 +250,8 @@ export default class Zoom {
                     this.$flyNode.hide()
                     this._addPinchPan()
                 })
+            }, () => {
+                this._addPinchPan()
             })
         }
         //普通图
