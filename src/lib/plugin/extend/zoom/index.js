@@ -22,6 +22,7 @@ import {
 export default class Zoom {
 
     constructor({
+        pageType,
         element, //img node
         originalSrc, //原始图地址
         hdSrc, //高清图地址
@@ -30,19 +31,33 @@ export default class Zoom {
 
         this.$container = $('#xut-main-scene')
         if (!this.$container.length) {
-            this.$container = $('body')
+            console.log('#xut-main-scene容器存在')
+            return
         }
+
+        //因为取的是xut-main-scene的坐标参考
+        //所以坐标的算法是有区别了
+        let containerLeft = 0
+        let containerTop = 0
+        if (config.viewSize.left) {
+            containerLeft = config.viewSize.left
+            containerTop = config.viewSize.top
+        }
+
 
         this.$imgNode = element
         this.originSrc = originalSrc
         this.hdSrc = hdSrc
         this.hasButton = hasButton
+        this.pageType = pageType
 
         //获取图片的可视区的绝对布局尺寸
         this.originImgWidth = element.width()
         this.originImgHeight = element.height()
-        this.originImgLeft = element.offset().left + (element.outerWidth(true) - element.width()) / 2
-        this.originImgTop = element.offset().top + (element.outerHeight(true) - element.height()) / 2 - Xut.config.visualTop
+
+        let offset = element.offset()
+        this.originImgLeft = offset.left - containerLeft
+        this.originImgTop = offset.top - containerTop - Xut.config.visualTop
 
         //动画中
         this.isAniming = false
@@ -109,11 +124,28 @@ export default class Zoom {
      * @return {[type]} [description]
      */
     _getData() {
+
+        let view = config.screenSize
+        let overflowLeft = 0
+
+        //如果有宽度溢出
+        //就是说用了窗口指定模式
+        if (config.viewSize.left) {
+            view = config.viewSize
+        }
+
+        //虚拟模拟3下，宽度可能溢出，所以需要取屏幕宽度
+        if (config.visualMode === 3) {
+            view = config.screenSize
+            overflowLeft = config.viewSize.left
+        }
+
         return getImgConfig({
             sources: this.source,
             wrapper: {
-                width: config.screenSize.width,
-                height: config.screenSize.height
+                width: view.width,
+                height: view.height,
+                left: overflowLeft //模式3下溢出的left
             },
             image: {
                 width: this.originImgWidth,
@@ -130,7 +162,7 @@ export default class Zoom {
         let source = this.targetSize.source
         let position = this.targetSize.position
 
-        //克隆的原图放大动画
+        // 克隆的原图放大动画
         execAnimation({
             element: this.$flyNode,
             style: {
@@ -222,7 +254,7 @@ export default class Zoom {
             }).addClass('gamma-img-fly').appendTo(self.$singleView);
             img = null
             destroyTap()
-            success()
+            setTimeout(success, 0)
         }
         img.onerror = function() {
             isFail()

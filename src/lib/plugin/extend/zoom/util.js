@@ -36,20 +36,21 @@ function getFinalSizePosition(imageSize, wrapperSize) {
 
     //高度100% 自适应宽度
     var heightFullAdaptiveWidth = function() {
-            finalH = wrapperH;
-            // calculate the width given the finalH
-            ratio = imgH / wrapperH;
-            finalW = imgW / ratio;
-            checksource = true;
-            if (finalW > wrapperW) {
-                checksource = false;
-                ratio = finalW / wrapperW;
-                finalW = wrapperW;
-                finalH /= ratio;
-            }
+        finalH = wrapperH;
+        // calculate the width given the finalH
+        ratio = imgH / wrapperH;
+        finalW = imgW / ratio;
+        checksource = true;
+        if (finalW > wrapperW) {
+            checksource = false;
+            ratio = finalW / wrapperW;
+            finalW = wrapperW;
+            finalH /= ratio;
         }
-        // check which image side is bigger
-        //横屏图片
+    }
+
+    // check which image side is bigger
+    //横屏图片
     if (imgW > imgH) {
         widthFullAdaptiveHeight();
     } else {
@@ -68,8 +69,8 @@ function getFinalSizePosition(imageSize, wrapperSize) {
     return {
         width: finalW,
         height: finalH,
-        left: wrapperW / 2 - finalW / 2,
-        top: wrapperH / 2 - finalH / 2,
+        left: (wrapperW - finalW) / 2 - wrapperSize.left,
+        top: (wrapperH - finalH) / 2,
         checksource: checksource
     }
 }
@@ -155,12 +156,15 @@ export function execAnimation({
 }
 
 
-export function getImgConfig(properties, imgMaxW = 0, imgMaxH = 0) {
+export function getImgConfig(properties) {
+    let imgMaxW = 0
+    let imgMaxH = 0
     let sources = properties.sources
     let source = chooseImgSource(sources, properties.wrapper.width)
 
     // calculate final size and position of image
     let finalSizePosition = getFinalSizePosition(properties.image, properties.wrapper)
+
 
     // we still need to check one more detail:
     // if the source is the largest one provided in the html rules,
