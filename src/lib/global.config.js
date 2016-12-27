@@ -41,6 +41,7 @@ export default {
      * 因为有工具栏挤压的问题
      */
     visualHeight: DEFAULT,
+    visualTop:0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
 
     /**
      * 忙碌光标

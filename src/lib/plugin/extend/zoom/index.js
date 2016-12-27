@@ -28,7 +28,11 @@ export default class Zoom {
         hasButton = false //是否需要关闭按钮
     }) {
 
-        this.$body = $('body')
+        this.$container = $('#xut-main-scene')
+        if (!this.$container.length) {
+            this.$container = $('body')
+        }
+
         this.$imgNode = element
         this.originSrc = originalSrc
         this.hdSrc = hdSrc
@@ -38,7 +42,7 @@ export default class Zoom {
         this.originImgWidth = element.width()
         this.originImgHeight = element.height()
         this.originImgLeft = element.offset().left + (element.outerWidth(true) - element.width()) / 2
-        this.originImgTop = element.offset().top + (element.outerHeight(true) - element.height()) / 2
+        this.originImgTop = element.offset().top + (element.outerHeight(true) - element.height()) / 2 - Xut.config.visualTop
 
         //动画中
         this.isAniming = false
@@ -83,7 +87,7 @@ export default class Zoom {
             this.$closeButton.show()
         }
 
-        this.$singleView.appendTo(this.$body)
+        this.$singleView.appendTo(this.$container)
     }
 
     /**
@@ -150,38 +154,85 @@ export default class Zoom {
 
     /**
      * 创建高清图
+     * 这里存在网络是2G下载非常慢的情况
+     * 会导致高清图的加载会引起卡死的现象
+     * 所以针对这样的情况做了处理
      */
     _createHQIMG(position, src, success, fail) {
+
+        //如果高清图已经存在
         if (this.$hQNode) {
             this.$hQNode.show()
             success()
-        } else {
-            var img = new Image();
-            img.onload = () => {
-                this.$hQNode = $(img)
-                this.$hQNode.css({
-                    width: position.width,
-                    height: position.height,
-                    left: position.left,
-                    top: position.top
-                }).addClass('gamma-img-fly').appendTo(this.$singleView);
-                success()
-            }
-            img.onerror = () => {
-                //失败
-                this.hdSrc = null
-                fail()
-            }
-            img.src = src
+            return
         }
+
+        //如果创建
+        //创建的时候图片太大，网络太慢需要优化
+        let img = new Image();
+
+        //保证失败回调只处理一次
+        let hasFail = false
+        let self = this
+
+        //图片失败处理
+        function isFail() {
+            if (hasFail) {
+                return
+            }
+            hasFail = true
+            img = null
+            destroyTap()
+            fail()
+        }
+
+        //如果在高清图还没有出来的时候
+        //就点击了放大图
+        //那么高清图就抛弃
+        let hasClick = false
+
+        function tap() {
+            hasClick = true
+            if (!self.$hQNode) {
+                isFail()
+            }
+        }
+
+        function destroyTap() {
+            $$off(self.$flyNode[0], {
+                start: tap
+            })
+        }
+
+        $$on(self.$flyNode[0], {
+            start: tap
+        })
+
+        img.onload = function() {
+            if (hasClick) {
+                isFail()
+                return
+            }
+            self.$hQNode = $(img)
+            self.$hQNode.css({
+                width: position.width,
+                height: position.height,
+                left: position.left,
+                top: position.top
+            }).addClass('gamma-img-fly').appendTo(self.$singleView);
+            img = null
+            destroyTap()
+            success()
+        }
+        img.onerror = function() {
+            isFail()
+        }
+        img.src = src
+
     }
 
-    /**
-     * 是否启动图片缩放
-     */
-    _addPinchPan() {
-        //如果没有高清图，采用原图
-        let $imgNode = this.hdSrc ? this.$hQNode : this.$flyNode
+
+    _bindPan($imgNode) {
         if (!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
             this.slideObj = new PinchPan({
                 hasButton: false,
@@ -191,7 +242,29 @@ export default class Zoom {
         }
         //单击关闭处理
         if (!this.offTap) {
-            this._bindTap($imgNode)
+            this._bindTapClose($imgNode)
+        }
+    }
+
+    /**
+     * 是否启动图片缩放
+     */
+    _addPinchPan() {
+        //高清图
+        if (this.$hQNode) {
+            //如果高清图存在
+            //因为高清可能是加载有延时
+            //所以可能存在fly图先加载过的情况，这里需要直接清理
+            if (this._hasBindFlyPan) {
+                this._hasBindFlyPan = false
+                this._destroyRelated()
+            }
+            this._bindPan(this.$hQNode)
+        }
+        //普通图
+        else if (this.$flyNode) {
+            this._hasBindFlyPan = true
+            this._bindPan(this.$flyNode)
         }
     }
 
@@ -200,7 +273,7 @@ export default class Zoom {
      * 绑定单击关闭
      * @return {[type]} [description]
      */
-    _bindTap($imgNode) {
+    _bindTapClose($imgNode) {
 
         let isMove = false
         let start = () => {
@@ -229,6 +302,7 @@ export default class Zoom {
                 end: end,
                 cancel: end
             })
+            $imgNode = null
         }
     }
 
@@ -307,7 +381,7 @@ export default class Zoom {
             return
         }
         this.isAniming = true
-        let $imgNode = this.hdSrc ? this.$hQNode : this.$flyNode
+        let $imgNode = this.$hQNode ? this.$hQNode : this.$flyNode
 
         if (this.hasButton) {
             this.$closeButton.hide()
@@ -347,17 +421,29 @@ export default class Zoom {
     }
 
     /**
+     * 销毁相关的一些数据
+     */
+    _destroyRelated() {
+        //缩放
+        if (this.slideObj) {
+            this.slideObj.destroy()
+            this.slideObj = null
+        }
+        //销毁单击关闭
+        if (this.offTap) {
+            this.offTap()
+            this.offTap = null
+        }
+    }
+
+    /**
      * 对外接口
      * 销毁
      * @return {[type]} [description]
      */
     destroy() {
 
-        //缩放
-        if (this.slideObj) {
-            this.slideObj.destroy()
-            this.slideObj = null
-        }
+        this._destroyRelated()
 
         //关闭按钮
         if (this.hasButton) {
@@ -368,14 +454,9 @@ export default class Zoom {
             this.$closeButton = null
         }
 
-        //销毁单击关闭
-        if (this.offTap) {
-            this.offTap()
-        }
-
         this.$hQNode = null
         this.$overlay = null
-        this.$body = null
+        this.$container = null
         this.$flyNode = null
         this.$imgNode = null
 

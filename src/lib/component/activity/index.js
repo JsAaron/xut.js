@@ -256,6 +256,11 @@ export default class Activity {
                     scrollbars: true,
                     fadeScrollbars: true
                 })
+
+                //增加标记
+                //在PPT动画中reset不还原
+                scrollNode.setAttribute("data-iscroll", "true")
+
                 resetStyle()
                 resetStyle = null
                 $parentNode = null

@@ -7,7 +7,7 @@ import nextTick from './util/nexttick'
 import init from './initialize/index'
 import initNode from './initialize/init.node'
 
-Xut.Version = 874.6
+Xut.Version = 874.9
 
 
 if (Xut.plat.isBrowser) {
