@@ -256,12 +256,16 @@ video {
 
 /* 图片缩放功能 */
 
-.icon-maximize:before {
-    content: "\f0b2";
-    color: rgba(0, 0, 0, 0.25);
+.xut-zoom-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 12;
 }
 
-.gamma-overlay {
+.xut-zoom-overlay {
     background: #fff;
     width: 100%;
     height: 100%;
@@ -272,37 +276,35 @@ video {
     z-index: 1
 }
 
-.gamma-btn-close {
+.xut-zoom-close {
     position: absolute;
-    z-index: 3;
+    z-index: 4;
     display: none;
 }
 
-.gamma-container {
-    width: 100%;
-    height: 100%;
+.xut-zoom-fly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
 }
 
-.gamma-img-fly {
+.xut-zoom-hd {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 2;
 }
 
-.gamma-single-view {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 12;
+
+.icon-maximize:before {
+    content: "\f0b2";
+    color: rgba(0, 0, 0, 0.25);
 }
 
-.gamma-single-view img {
-    position: absolute;
-    cursor: pointer;
-}
+
+
+
 
 
 /**

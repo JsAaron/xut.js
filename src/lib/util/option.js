@@ -83,20 +83,15 @@ const converProportion = function({
 
     //需要正比缩放
     if (fixRadio) {
-        width = CEIL(width * proportion.width) || 0
-        height = CEIL(height * proportion.width) || 0
-            //应该的正常高度
-        let normalHeight = CEIL(height * proportion.height) || 0
-        let heightPoor = normalHeight - height
-
-        top = CEIL(top * proportion.top) || 0
-            //真正的高度
-        top = top - heightPoor / 2
+        let originalHeight = CEIL(height * proportion.height) || 0
+        let proportionalHeight = CEIL(height * proportion.width) || 0
+        let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
+        top = CEIL(top * proportion.top) + proportionalTop
         return {
-            width,
-            height,
-            top,
+            width: CEIL(width * proportion.width) || 0,
+            height: proportionalHeight,
             left: CEIL(left * proportion.left) || 0,
+            top: top,
             padding: CEIL(padding * proportion.width) || 0
         }
     } else {
@@ -224,7 +219,7 @@ export function readFile(path, callback, type) {
         paths = config.getSvgPath().replace("svg", 'js') + path;
         //文件名
         name = path.replace(".js", '')
-        //加载脚本
+            //加载脚本
         request(paths, function() {
             data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
             if (data) {
@@ -244,7 +239,7 @@ export function readFile(path, callback, type) {
     if (Xut.plat.isBrowser && !config.isPlugin) {
         //默认的地址
         svgUrl = config.getSvgPath().replace("www/", "") + path
-        //mini杂志的情况，不处理目录的www
+            //mini杂志的情况，不处理目录的www
         if (Xut.launchConfig && Xut.launchConfig.resource) {
             svgUrl = config.getSvgPath() + path
         }

@@ -74,7 +74,6 @@ export default class Flow {
                 hqSrc = src.replace(imgType, `${config.hqUrlSuffix}.` + imgType)
             }
             this.zoomObjs[src] = new Zoom({
-                pageType:'flow',
                 element: $(node),
                 originalSrc: src,
                 hdSrc: hqSrc

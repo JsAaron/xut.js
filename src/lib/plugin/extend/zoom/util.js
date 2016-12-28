@@ -94,7 +94,7 @@ export function createUnpeatableNumbers() {
  * navigation buttons and close, play, and pause buttons
  * @return {[type]} [description]
  */
-export function createContainerView() {
+export function createContainerView(imgContainer) {
     let html;
     let viewSize = config.viewSize
     let right = viewSize.overflowWidth && Math.abs(viewSize.right) || 0
@@ -103,22 +103,31 @@ export function createContainerView() {
     let rightCopy2 = right + 3.5;
     let topCopy = top + 4;
 
+    let zoomImg = `<img class="xut-zoom-fly"
+                        src="${imgContainer.originSrc}"
+                        style="width:${imgContainer.width}px;
+                               height:${imgContainer.height}px;
+                               top:${imgContainer.top}px;
+                               left:${imgContainer.left}px;" />`
+
     if (config.screenHorizontal) {
-        html = `<div class="gamma-single-view">
-                            <div class="gamma-overlay"></div>
-                            <div class="gamma-btn-close" style="right:${rightCopy}px;top:${topCopy}px;">
+        html = `<div class="xut-zoom-view">
+                            <div class="xut-zoom-overlay"></div>
+                            <div class="xut-zoom-close" style="right:${rightCopy}px;top:${topCopy}px;">
                                 <div class="si-icon Flaticon flaticon-error" style="font-size:5vw;border-radius:50%;right:0">
                                 </div>
                             </div>
+                            ${zoomImg}
                         </div>`;
     } else {
         //竖屏
-        html = `<div class="gamma-single-view">
-                            <div class="gamma-overlay"></div>
-                            <div class="gamma-btn-close" style=";right:${rightCopy}px;top:${topCopy}px;">
+        html = `<div class="xut-zoom-view">
+                            <div class="xut-zoom-overlay"></div>
+                            <div class="xut-zoom-close" style=";right:${rightCopy}px;top:${topCopy}px;">
                                 <div class="si-icon Flaticon flaticon-error" style="font-size:5vh;border-radius:50%;right:0">
                                 </div>
                             </div>
+                            ${zoomImg}
                         </div>`;
 
     }

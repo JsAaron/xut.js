@@ -14,6 +14,7 @@ import {
     getFinalImgConfig
 } from './util'
 
+import { sceneController } from '../../../scenario/controller'
 
 /**
  * 图片缩放功能
@@ -22,16 +23,18 @@ import {
 export default class Zoom {
 
     constructor({
-        pageType,
         element, //img node
         originalSrc, //原始图地址
         hdSrc, //高清图地址
         hasButton = false //是否需要关闭按钮
     }) {
 
-        this.$container = $('#xut-main-scene')
+        let current = sceneController.containerObj('current')
+        if (current && current.$rootNode) {
+            this.$container = current.$rootNode
+        }
         if (!this.$container.length) {
-            console.log('#xut-main-scene容器存在')
+            console.log('图片缩放依赖的容器不存在')
             return
         }
 
@@ -49,7 +52,6 @@ export default class Zoom {
         this.originSrc = originalSrc
         this.hdSrc = hdSrc
         this.hasButton = hasButton
-        this.pageType = pageType
 
         //获取图片的可视区的绝对布局尺寸
         this.originImgWidth = element.width()
@@ -77,7 +79,6 @@ export default class Zoom {
      */
     _init() {
         this._initSingleView()
-        this._createFlyNode()
         if (!this.targetSize) {
             this.targetSize = this._getData()
         }
@@ -86,12 +87,19 @@ export default class Zoom {
 
     _initSingleView() {
 
-        this.$singleView = $(createContainerView())
-        this.$overlay = this.$singleView.find('.gamma-overlay')
+        this.$singleView = $(createContainerView({
+            width: this.originImgWidth,
+            height: this.originImgHeight,
+            left: this.originImgLeft,
+            top: this.originImgTop,
+            originSrc: this.originSrc
+        }))
+        this.$overlay = this.$singleView.find('.xut-zoom-overlay')
+        this.$flyNode = this.$singleView.find('.xut-zoom-fly')
 
         //关闭按钮
         if (this.hasButton) {
-            this.$closeButton = this.$singleView.find('.gamma-btn-close')
+            this.$closeButton = this.$singleView.find('.xut-zoom-close')
             this.callbackEnd = () => {
                 this._closeSingleView()
             }
@@ -105,19 +113,6 @@ export default class Zoom {
         this.$singleView.appendTo(this.$container)
     }
 
-    /**
-     * 创建原图img对象，克隆到新的节点
-     * 用于缩放
-     * @return {[type]} [description]
-     */
-    _createFlyNode() {
-        this.$flyNode = $('<img/>').attr('src', this.originSrc).addClass('gamma-img-fly').css({
-            width: this.originImgWidth,
-            height: this.originImgHeight,
-            left: this.originImgLeft,
-            top: this.originImgTop
-        }).appendTo(this.$singleView)
-    }
 
     /**
      * 初始化缩放数据
@@ -239,7 +234,6 @@ export default class Zoom {
         $$on(self.$flyNode[0], {
             start: tap
         })
-
         img.onload = function() {
             if (hasClick) {
                 isFail()
@@ -251,10 +245,10 @@ export default class Zoom {
                 height: position.height,
                 left: position.left,
                 top: position.top
-            }).addClass('gamma-img-fly').appendTo(self.$singleView);
+            }).addClass('xut-zoom-hd').appendTo(self.$singleView)
             img = null
             destroyTap()
-            setTimeout(success, 0)
+            success(500)
         }
         img.onerror = function() {
             isFail()
@@ -262,7 +256,6 @@ export default class Zoom {
         img.src = src
 
     }
-
 
     _bindPan($imgNode) {
         if (!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
@@ -345,14 +338,15 @@ export default class Zoom {
     _replaceHQIMG(position, src) {
         //高清图
         if (this.hdSrc) {
-            this._createHQIMG(position, src, () => {
-                //删除飞入图片
-                //用高清图替代了
+            this._createHQIMG(position, src, (speed = 200) => {
+                //第一次高清图切换
                 execAnimation({
                     element: this.$flyNode,
                     style: { 'opacity': 0 },
-                    speed: 100
+                    speed: speed
                 }, () => {
+                    //删除飞入图片
+                    //用高清图替代了
                     this.$flyNode.hide()
                     this._addPinchPan()
                 })
