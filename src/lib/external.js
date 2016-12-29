@@ -1,4 +1,5 @@
 var cssName = [
+    'css/font.css',
     'css/common.css',
     'css/horizontal.css',
     'css/vertical.css',

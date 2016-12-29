@@ -73,10 +73,10 @@ const resolveCount = ($content) => {
 
 const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, flowCounts) => {
     for (let i = 0; i < seasonNode.childNodes.length; i++) {
-        const chapterNode = seasonNode.childNodes[i]
+        let chapterNode = seasonNode.childNodes[i]
         if (chapterNode.nodeType == 1) {
-            const tag = chapterNode.id
-            const id = tag.match(/\d/)[0]
+            let tag = chapterNode.id
+            let id = tag.match(/\d/)[0]
 
             //传递的数据
             let margin = chapterNode.getAttribute('data-margin')
@@ -114,18 +114,18 @@ export default function initFlows(callback) {
             return
         }
 
-        /**
-         * seasonId:{
-         *    chpaterID:count
-         * }
-         * @type {[type]}
-         */
         let flowCounts = {}
 
         //容器尺寸设置
         let flowView = getFlowView()
         let vWidth = flowView.viewWidth
         let vHeight = newViewHight = flowView.viewHeight
+
+        $container.css({
+            width: vWidth,
+            height: vHeight,
+            display: 'block'
+        })
 
         $seasons.each((index, node) => {
             let tag = node.id
@@ -135,46 +135,41 @@ export default function initFlows(callback) {
             insertColumn(node, seasonsId, vWidth, vHeight, flowCounts)
         })
 
-        $container.css({
-            width: vWidth,
-            height: vHeight,
-            overflow: 'hidden'
-        }).show()
+        $('body').append($container)
 
-
-        $seasons.each((index, node) => {
-            let tag = node.id
-            let seasonsId = tag.match(/\d/)[0]
-            let $chapters = $seasons.children()
-            $chapters.each(function(index, node) {
+        //渲染延时
+        //如果不延时获取的这个DOM是不完整的高度
+        setTimeout(function() {
+            $seasons.each((index, node) => {
                 let tag = node.id
-                let chapterId = tag.match(/\d+/)[0]
-                let count = resolveCount($(node))
-                flowCounts[seasonsId][chapterId] = Number(count)
+                let seasonsId = tag.match(/\d/)[0]
+                let $chapters = $seasons.children()
+                $chapters.each(function(index, node) {
+                    let tag = node.id
+                    let chapterId = tag.match(/\d+/)[0]
+                    let count = resolveCount($(node))
+                    flowCounts[seasonsId][chapterId] = Number(count)
+                })
             })
-        })
-
-        $container.hide()
-        set(flowCounts)
-        callback(Object.keys(flowCounts).length)
+            $container.hide()
+            set(flowCounts)
+            callback(Object.keys(flowCounts).length)
+        }, 100)
     }
 
-    if (!$container.length) {
+    if ($container.length) {
+        $container.remove()
+    } else {
         //如果存在json的flow数据
         let results = getResults()
         if (results && results.FlowData) {
             $container = $(results.FlowData)
             removeFlowData() //删除flowdata，优化缓存
-            $('body').append($container)
-            setTimeout(initFlow, 100)
-        }else{
+            initFlow()
+        } else {
             //没有任何flow
             callback()
         }
-        return
     }
-
-    //嵌入在index.html中的数据
-    setTimeout(initFlow, 100)
 
 }
