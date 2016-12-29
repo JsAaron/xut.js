@@ -50,17 +50,24 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
     //在非视区增加overflow:hidden
     //可视区域overflow:''
     var overflow = 'overflow:hidden;'
-        //如果是母板,排除
+
+    //如果是母板,排除
     if (floatName === 'floatMaters') {
         overflow = ''
     }
 
-    var floatStr = String.format(
-        '<div id="' + floatName + '-li-{0}" class="xut-float" style="' + TRANSFORM + ':{1};z-index:' + zIndex + ';{2}"></div>',
-        data.pid, data.getStyle.translate, overflow
-    )
+    let getStyle = base.getStyle
 
-    var container = $(floatStr)
+    let flowHtml = `<div id="${floatName}-li-${data.pid}"
+                     class="xut-float"
+                     style="width:${getStyle.viewWidth}px;
+                            height:${getStyle.viewHeight}px;
+                            left:${getStyle.viewLeft}px;
+                            top:${getStyle.viewTop}px;
+                            ${TRANSFORM}:${data.getStyle.translate};z-index:${zIndex};${overflow}"></div>`
+
+
+    let container = $(String.styleFormat(flowHtml))
 
     //增加浮动容器
     $(data.rootNode).after(container)

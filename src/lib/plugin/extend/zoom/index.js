@@ -47,7 +47,6 @@ export default class Zoom {
             containerTop = config.viewSize.top
         }
 
-
         this.$imgNode = element
         this.originSrc = originalSrc
         this.hdSrc = hdSrc
@@ -61,8 +60,8 @@ export default class Zoom {
         this.originImgLeft = offset.left - containerLeft
         this.originImgTop = offset.top - containerTop - Xut.config.visualTop
 
-        //动画中
-        this.isAniming = false
+        //关闭动画中执行中
+        this.isCloseAniming = false
 
         this.source = [{
             pos: 0,
@@ -79,6 +78,7 @@ export default class Zoom {
      */
     _init() {
         this._initSingleView()
+        this._bindTapClose()
         if (!this.targetSize) {
             this.targetSize = this._getData()
         }
@@ -103,7 +103,7 @@ export default class Zoom {
             this.callbackEnd = () => {
                 this._closeSingleView()
             }
-            $$on(this.$closeButton[0], {
+            $$on(this.$closeButton, {
                 end: this.callbackEnd,
                 cancel: this.callbackEnd
             })
@@ -209,33 +209,13 @@ export default class Zoom {
             }
             hasFail = true
             img = null
-            destroyTap()
             fail()
         }
 
-        //如果在高清图还没有出来的时候
-        //就点击了放大图
-        //那么高清图就抛弃
-        let hasClick = false
-
-        function tap() {
-            hasClick = true
-            if (!self.$hQNode) {
-                isFail()
-            }
-        }
-
-        function destroyTap() {
-            $$off(self.$flyNode[0], {
-                start: tap
-            })
-        }
-
-        $$on(self.$flyNode[0], {
-            start: tap
-        })
         img.onload = function() {
-            if (hasClick) {
+            //关闭动画正在执行中
+            //这里要强制退出
+            if (self.isCloseAniming) {
                 isFail()
                 return
             }
@@ -247,14 +227,12 @@ export default class Zoom {
                 top: position.top
             }).addClass('xut-zoom-hd').appendTo(self.$singleView)
             img = null
-            destroyTap()
             success(500)
         }
         img.onerror = function() {
             isFail()
         }
         img.src = src
-
     }
 
     _bindPan($imgNode) {
@@ -264,10 +242,6 @@ export default class Zoom {
                 doubletapBan: true, //禁止双击事件
                 $pagePinch: $imgNode
             })
-        }
-        //单击关闭处理
-        if (!this.offTap) {
-            this._bindTapClose($imgNode)
         }
     }
 
@@ -299,36 +273,26 @@ export default class Zoom {
      * @return {[type]} [description]
      */
     _bindTapClose($imgNode) {
-
         let isMove = false
-        let start = () => {
-            isMove = false
-        }
-        let move = () => {
-            isMove = true
-        }
         let end = () => {
             if (!isMove) {
                 this._closeSingleView()
             }
         }
 
-        $$on($imgNode[0], {
-            start: start,
-            move: move,
+        /********************************
+         * 设置全局容器捕获处理
+         ********************************/
+        $$on(this.$singleView, {
+            start: function() {
+                isMove = false
+            },
+            move: function() {
+                isMove = true
+            },
             end: end,
             cancel: end
-        })
-
-        this.offTap = () => {
-            $$off($imgNode[0], {
-                start: start,
-                move: move,
-                end: end,
-                cancel: end
-            })
-            $imgNode = null
-        }
+        }, true)
     }
 
 
@@ -403,10 +367,10 @@ export default class Zoom {
      * @return {[type]} [description]
      */
     _closeSingleView() {
-        if (this.isAniming) {
+        if (this.isCloseAniming) {
             return
         }
-        this.isAniming = true
+        this.isCloseAniming = true
         let $imgNode = this.$hQNode ? this.$hQNode : this.$flyNode
 
         if (this.hasButton) {
@@ -425,7 +389,7 @@ export default class Zoom {
         }, () => {
             this.$singleView.hide()
             this._reset()
-            this.isAniming = false
+            this.isCloseAniming = false
         })
 
         //消失背景
@@ -450,15 +414,9 @@ export default class Zoom {
      * 销毁相关的一些数据
      */
     _destroyRelated() {
-        //缩放
         if (this.slideObj) {
             this.slideObj.destroy()
             this.slideObj = null
-        }
-        //销毁单击关闭
-        if (this.offTap) {
-            this.offTap()
-            this.offTap = null
         }
     }
 
@@ -471,12 +429,11 @@ export default class Zoom {
 
         this._destroyRelated()
 
+        $$off(this.$singleView)
+
         //关闭按钮
         if (this.hasButton) {
-            $$off(this.$closeButton[0], {
-                end: this.callbackEnd,
-                cancel: this.callbackEnd
-            })
+            $$off(this.$closeButton)
             this.$closeButton = null
         }
 

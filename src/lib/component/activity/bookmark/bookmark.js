@@ -35,7 +35,6 @@ function BookMark(options) {
  */
 BookMark.prototype.init = function() {
     var $bookMark = this.createBookMark(),
-        dom = this.parent[0],
         that = this;
 
     this.parent.append($bookMark);
@@ -48,7 +47,7 @@ BookMark.prototype.init = function() {
     BOOKCACHE = this.getHistory();
 
     //邦定用户事件
-    $$on(dom, {
+    $$on(this.parent, {
         end: this,
         cancel: this
     })
@@ -321,12 +320,8 @@ BookMark.prototype.restore = function() {
  * @return {[type]} [description]
  */
 BookMark.prototype.destroy = function() {
-    var dom = this.parent[0]
 
-    $$off(dom, {
-        end: this,
-        cancel: this
-    })
+    $$off(this.parent)
 
     //菜单部分
     if (this.bookMarkMenu) {

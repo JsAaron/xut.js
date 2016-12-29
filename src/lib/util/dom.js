@@ -36,12 +36,54 @@ const eventNames = (() => {
 })()
 
 
-const eachApply = (events, callbacks, processor) => {
-    _.each(callbacks, function(hooks, key) {
-        hooks && processor(events[orderName[key]], hooks)
-    })
+/**
+ * 事件数据缓存
+ * @type {Object}
+ */
+let eventDataCache = {}
+let guid = 1
+
+/**
+ * 增加缓存句柄
+ * @param {[type]} element   [description]
+ * @param {[type]} eventName [description]
+ * @param {[type]} handler   [description]
+ */
+function addHandler(element, eventName, handler, capture) {
+    if (element.xutHandler) {
+        let uuid = element.xutHandler
+        let dataCache = eventDataCache[uuid]
+        if (dataCache) {
+            if (dataCache[eventName]) {
+                console.log('事件重复添加')
+            } else {
+                dataCache[eventName] = [handler, capture]
+            }
+        }
+    } else {
+        eventDataCache[guid] = {
+            [eventName]: [handler, capture]
+        }
+        element.xutHandler = guid++
+    }
+    // console.log(eventDataCache)
 }
 
+const eachApply = (events, callbacks, processor, isRmove) => {
+    _.each(callbacks, function(handler, key) {
+        if (isRmove) {
+            //如果是移除，callbacks是数组
+            //转化事件名
+            let eventName = events[orderName[handler]]
+            if (eventName) {
+                processor(eventName)
+            }
+        } else {
+            //on的情况，需要传递handler
+            handler && processor(events[orderName[key]], handler)
+        }
+    })
+}
 
 /**
  * 合并事件绑定处理
@@ -49,10 +91,60 @@ const eachApply = (events, callbacks, processor) => {
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
-const addEvent = (context, events, callbacks) => {
-    eachApply(events, callbacks, function(eventName, hook) {
-        context.addEventListener(eventName, hook, false)
+const addEvent = (element, events, callbacks, capture) => {
+    eachApply(events, callbacks, function(eventName, handler) {
+        addHandler(element, eventName, handler, capture)
+        element.addEventListener(eventName, handler, capture)
     })
+    // console.log(eventDataCache)
+}
+
+
+/**
+ * 移除所有事件
+ * @param  {[type]} element [description]
+ * @return {[type]}         [description]
+ */
+function removeAll(element) {
+    let uuid = element.xutHandler
+    let dataCache = eventDataCache[uuid]
+    if (!dataCache) {
+        console.log('移除所有事件出错')
+        return
+    }
+    _.each(dataCache, function(data, eventName) {
+        if (data) {
+            element.removeEventListener(eventName, data[0], data[1])
+            dataCache[eventName] = null
+        }
+    })
+    delete eventDataCache[uuid]
+}
+
+/**
+ * 移除指定的事件
+ * @return {[type]} [description]
+ */
+function removeone(element, eventName) {
+    let uuid = element.xutHandler
+    let dataCache = eventDataCache[uuid]
+    if (!dataCache) {
+        console.log('移除事件' + eventName + '出错')
+        return
+    }
+    let data = dataCache[eventName]
+    if (data) {
+        element.removeEventListener(eventName, data[0], data[1])
+        dataCache[eventName] = null
+        delete dataCache[eventName]
+    } else {
+        console.log('移除事件' + eventName + '出错')
+    }
+
+    //如果没有数据
+    if (!Object.keys(dataCache).length) {
+        delete eventDataCache[uuid]
+    }
 }
 
 /**
@@ -61,10 +153,10 @@ const addEvent = (context, events, callbacks) => {
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
-const removeEvent = (context, events, callbacks) => {
-    eachApply(events, callbacks, function(eventName, hook) {
-        context.removeEventListener(eventName, hook, false)
-    })
+const removeEvent = (element, events, callbacks) => {
+    eachApply(events, callbacks, function(eventName) {
+        removeone(element, eventName)
+    }, 'remove')
 }
 
 
@@ -75,16 +167,28 @@ const removeEvent = (context, events, callbacks) => {
  * @param  {Function} callback     [回调函数]
  * @return {[type]}                [description]
  */
-const compatibility = (apply, element, callbacks) => {
+const compatibility = (controller, element, callbacks, capture) => {
     //如果两者都支持
     //鼠标与触摸
     if (isSurface) {
         _.each(eventNames, events => {
-            apply(element, events, callbacks)
+            controller(element, events, callbacks, capture)
         })
     } else {
-        apply(element, eventNames, callbacks)
+        controller(element, eventNames, callbacks, capture)
     }
+}
+
+/**
+ * 变成节点对象
+ * @param  {[type]} element [description]
+ * @return {[type]}         [description]
+ */
+function toNodeObj(element) {
+    if (element.length) {
+        element = element[0]
+    }
+    return element
 }
 
 /**
@@ -96,10 +200,11 @@ const compatibility = (apply, element, callbacks) => {
  *     move    : move,
  *     end     : end
  * })
+ * capture 默认是冒泡，提供捕获处理
  * @return {[type]} [description]
  */
-export function $$on(element, callbacks) {
-    compatibility(addEvent, element, callbacks)
+export function $$on(element, callbacks, capture = false) {
+    compatibility(addEvent, toNodeObj(element), callbacks, capture)
 }
 
 
@@ -110,6 +215,25 @@ export function $$on(element, callbacks) {
  * @return {[type]}         [description]
  */
 export function $$off(element, callbacks) {
+
+    if (!element) {
+        console.error('移除事件对象不存在')
+        return
+    }
+
+    element = toNodeObj(element)
+
+    //全部移除
+    if (arguments.length === 1) {
+        removeAll(element)
+        return
+    }
+
+    if (!_.isArray(callbacks)) {
+        console.error('移除的事件句柄参数，必须是数组')
+        return
+    }
+
     compatibility(removeEvent, element, callbacks)
 }
 

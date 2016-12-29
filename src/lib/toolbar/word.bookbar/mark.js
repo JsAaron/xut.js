@@ -367,11 +367,8 @@ export default class Mark {
      * @return {[type]} [description]
      */
     destroy() {
-        var dom = this.parent[0]
 
-        $$off(dom, {
-                end: this
-            })
+        $$off(this.parent)
 
         //菜单部分
         if (this.bookMarkMenu) {

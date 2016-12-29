@@ -493,7 +493,7 @@ export default class TaskContents {
                         }
                         $$on(node, { start })
                         zoomBehavior.off = function() {
-                            $$off(node, { start })
+                            $$off(node)
                             node = null
                         }
                     }

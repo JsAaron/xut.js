@@ -257,9 +257,7 @@ export default class sysBar extends Bar {
         this.navbarObj && this.navbarObj.destroy()
 
         //解除事件
-        $$off(this.eventElement, {
-            start: this
-        })
+        $$off(this.eventElement)
 
         //销毁超类
         this.super_destory()

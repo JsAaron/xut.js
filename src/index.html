@@ -15,7 +15,6 @@
         position: absolute;
         z-index: 99999
     }
-    
     #closeMini {
         left: 100px;
     }
@@ -31,7 +30,6 @@
 
 </html>
 <script type="text/javascript">
-
 Xut.Application.setConfig = {
     // visualHeight: window.innerHeight - 44,
     lauchMode: 1,
@@ -47,31 +45,21 @@ Xut.Application.setConfig = {
     supportQR: true,
     swipeDelegate: true
 };
+var appId = 314
 
-var appId = 26
-Xut.Application.Launch({
-    el: '#xxtppt-app-container', //根节点
-    launchAnim: false, //关闭启动动画
-    // cursor: { // url: 'http://123.56.220.137/files/16122316461545/page/images/icons/busyIcon.gif', // delayTime: 300 // },
-
-    // cursor: false, //关闭忙了光标
-    convert: 'svg', //转化资源svg转化成js
-    path: {
-
-        // resource: 'http://123.56.220.137/files/16122316461545/page/content',
-        // database: 'http://123.56.220.137/files/16122316461545/page/datacache/sqlResult.js' //本地资源
-        resource: 'content/' + appId,
-        database: 'content/' + appId + '/SQLResult.js'
-
-        //网络资源
-        // resource: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310',
-        // database: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310/SQLResult.js'
-    }
-});
 
 $("#launchMini").click(function() {
-
+    Xut.Application.Launch({
+        el: '#xxtppt-app-container', //根节点
+        launchAnim: false, //关闭启动动画
+        // convert: 'svg', //转化资源svg转化成js
+        path: {
+            resource: 'content/' + appId,
+            database: 'content/' + appId + '/SQLResult.js'
+        }
+    });
 })
+$("#launchMini").trigger('click')
 
 $("#closeMini").click(function() {
     Xut.Application.Exit()

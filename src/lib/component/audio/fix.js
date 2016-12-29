@@ -26,7 +26,7 @@ export function fixAudio(obj, key, access) {
             audio.play()
             audioes.push(audio)
         }
-        $$off(document, { start })
+        $$off(document)
     }
     $$on(document, { start })
 }

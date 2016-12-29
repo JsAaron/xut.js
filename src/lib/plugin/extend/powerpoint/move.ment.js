@@ -72,21 +72,12 @@ export default class MoveMent {
     }
 
     _end(e) {
-        $$off(this.scroller, {
-            move: this,
-            end: this,
-            cancel: this
-        })
+        $$off(this.scroller)
         if (typeof(this.endCallback) == "function") this.endCallback(e);
     }
 
     destroy(type, el, bubble) {
-        $$off(this.scroller, {
-            start: this,
-            move: this,
-            end: this,
-            cancel: this
-        })
+        $$off(this.scroller)
         this.scroller = null
     }
 

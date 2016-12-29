@@ -1,9 +1,7 @@
 import { config } from '../../config/index'
 
 import {
-    hash,
-    $$on,
-    $$off
+    hash
 } from '../../util/index'
 
 const isIOS = Xut.plat.isIOS

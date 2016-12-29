@@ -348,11 +348,8 @@ export default class HtmlBox {
      * @return {[type]} [description]
      */
     removeBox() {
-        $$off(this.eventContext, {
-            start: this.start
-        })
+        $$off(this.eventContext)
         this.$htmlbox && this.$htmlbox.remove()
-
         if (this.iscroll) {
             this.iscroll.destroy()
             this.iscroll = null

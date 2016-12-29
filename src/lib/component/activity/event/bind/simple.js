@@ -102,12 +102,7 @@ export function simpleEvent(eventContext, eventHandle, supportSwipe) {
                 if (isIE10) {
                     eventContext.removeEventListener('click', end, false);
                 } else {
-                    $$off(eventContext, {
-                        start: start,
-                        move: move,
-                        end: end,
-                        cancel: end
-                    })
+                    $$off(eventContext)
                 }
                 eventContext = null;
             }

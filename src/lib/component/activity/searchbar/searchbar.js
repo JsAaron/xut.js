@@ -194,11 +194,7 @@ SearchBar.prototype.restore = function() {
 SearchBar.prototype.destroy = function() {
     var dom = this.parent[0];
 
-    $$off(dom, {
-        end: this,
-        cancel: this
-    })
-
+    $$off(dom)
     dom.removeEventListener('keyup', this, false);
 
     this.searchBox.remove();

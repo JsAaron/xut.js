@@ -781,14 +781,7 @@ export default class Swipe extends Observer {
      * @return {[type]} [description]
      */
     _off() {
-        $$off(this.container, {
-            start: this,
-            move: this,
-            end: this,
-            cancel: this,
-            transitionend: this,
-            leave: this
-        })
+        $$off(this.container)
     }
 
 
