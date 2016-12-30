@@ -139,10 +139,9 @@ export default function initFlows(callback) {
             insertColumn(node, seasonsId, vWidth, vHeight, flowCounts)
         })
 
-        nextTick({
-            container: $('body'),
-            content: $container
-        }, function() {
+        $('body').append($container)
+
+        setTimeout(function() {
             $seasons.each((index, node) => {
                 let tag = node.id
                 let seasonsId = tag.match(/\d/)[0]
@@ -157,7 +156,7 @@ export default function initFlows(callback) {
             $container.hide()
             set(flowCounts)
             callback(Object.keys(flowCounts).length)
-        })
+        }, 100)
     }
 
     //删除存在的节点

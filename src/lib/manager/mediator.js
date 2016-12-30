@@ -129,6 +129,13 @@ export default class Mediator extends Observer {
             let parentNode = $globalEvent.findBubbleRootNode(point, pageType);
             //执行过滤处理
             handlerObj = closestProcessor.call(parentNode, point, pageType);
+
+            //如果找到是空节点
+            //并且是虚拟模式2的话
+            //默认允许滑动
+            if(!handlerObj && config.visualMode == 2){
+                return
+            }
             //停止翻页,针对content对象可以拖动,滑动的情况处理
             if (!handlerObj || handlerObj.attribute === 'disable') {
                 hookCallback();

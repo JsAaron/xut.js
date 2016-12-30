@@ -211,12 +211,20 @@ export default class Swipe extends Observer {
         //接受多事件的句柄
         $$handle({
             start(e) {
-                //如果是移动端的情况下 && 支持二维码 && 是图片 就不组织默认行为
+
+                //禁止鼠标右键
+                if(e.button && e.button == 2){
+                    return
+                }
+
                 //这样是为了触发二维码
-                if (Xut.plat.hasTouch && config.supportQR && e.target.nodeName.toLowerCase() === "img") {} else {
+                if (Xut.plat.hasTouch && config.supportQR && e.target.nodeName.toLowerCase() === "img") {
+                    //如果是移动端的情况下 && 支持二维码 && 是图片 就不组织默认行为
+                } else {
                     //浏览器上就直接阻止
                     this._stopDefault(e)
                 }
+
                 this._onStart(e)
             },
             move(e) {
@@ -326,6 +334,7 @@ export default class Swipe extends Observer {
         let deltaY = point.pageY - this._start.pageY
         let absDeltaX = Math.abs(deltaX)
         let absDeltaY = Math.abs(deltaY)
+
 
         //=========Y轴滑动=========
         if (!this._isRollY) {
