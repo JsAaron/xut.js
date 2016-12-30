@@ -26,16 +26,20 @@ const createStr = (chapterId, data, viewWidth, viewHeight, margin) => {
 
     //减去的宽度值
     const negativeWidth = viewWidth / 100 * (percentageLeft + percentageRight)
-        //减去的高度值
+
+    //减去的高度值
     const negativeHeight = viewHeight / 100 * (percentageTop + percentageBottom)
 
     //容器宽度 = 宽度 - 左右距离比值
     const containerWidth = viewWidth - negativeWidth
-        //容器高度值 = 宽度 - 上下距离比值
+
+    //容器高度值 = 宽度 - 上下距离比值
     const containerHeight = viewHeight - negativeHeight
-        //容器左边偏移量
+
+    //容器左边偏移量
     const containerLeft = negativeWidth / 2
-        //容器上偏移量
+
+    //容器上偏移量
     const containerTop = viewHeight / 100 * percentageTop
 
     //重复加载杂志
@@ -135,11 +139,10 @@ export default function initFlows(callback) {
             insertColumn(node, seasonsId, vWidth, vHeight, flowCounts)
         })
 
-        $('body').append($container)
-
-        //渲染延时
-        //如果不延时获取的这个DOM是不完整的高度
-        setTimeout(function() {
+        nextTick({
+            container: $('body'),
+            content: $container
+        }, function() {
             $seasons.each((index, node) => {
                 let tag = node.id
                 let seasonsId = tag.match(/\d/)[0]
@@ -154,22 +157,23 @@ export default function initFlows(callback) {
             $container.hide()
             set(flowCounts)
             callback(Object.keys(flowCounts).length)
-        }, 100)
+        })
     }
 
+    //删除存在的节点
     if ($container.length) {
         $container.remove()
+    }
+
+    //如果存在json的flow数据
+    let results = getResults()
+    if (results && results.FlowData) {
+        $container = $(results.FlowData)
+        removeFlowData() //删除flowdata，优化缓存
+        initFlow()
     } else {
-        //如果存在json的flow数据
-        let results = getResults()
-        if (results && results.FlowData) {
-            $container = $(results.FlowData)
-            removeFlowData() //删除flowdata，优化缓存
-            initFlow()
-        } else {
-            //没有任何flow
-            callback()
-        }
+        //没有任何flow
+        callback()
     }
 
 }

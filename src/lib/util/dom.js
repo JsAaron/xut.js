@@ -11,6 +11,7 @@ const transitionEnd = Xut.style.transitionEnd
 const isSurface = Xut.plat.isSurface
 const hasTouch = Xut.plat.hasTouch
 
+
 //触发事件名
 const touchList = ['touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd]
 const mouseList = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseleave']
@@ -55,7 +56,12 @@ function addHandler(element, eventName, handler, capture) {
         let dataCache = eventDataCache[uuid]
         if (dataCache) {
             if (dataCache[eventName]) {
-                console.log('事件重复添加')
+                //如果是isSurface支持同样的事件
+                //所以transitionend就比较特殊了，因为都是同一个事件名称
+                //所以只要一份，所以重复绑定就需要去掉
+                if (eventName !== 'transitionend') {
+                    console.log(eventName + '：事件重复绑定添加')
+                }
             } else {
                 dataCache[eventName] = [handler, capture]
             }
@@ -71,16 +77,17 @@ function addHandler(element, eventName, handler, capture) {
 
 const eachApply = (events, callbacks, processor, isRmove) => {
     _.each(callbacks, function(handler, key) {
+        let eventName
         if (isRmove) {
             //如果是移除，callbacks是数组
             //转化事件名
-            let eventName = events[orderName[handler]]
-            if (eventName) {
+            if (eventName = events[orderName[handler]]) {
                 processor(eventName)
             }
         } else {
+            eventName = events[orderName[key]];
             //on的情况，需要传递handler
-            handler && processor(events[orderName[key]], handler)
+            handler && eventName && processor(eventName, handler)
         }
     })
 }
@@ -96,7 +103,6 @@ const addEvent = (element, events, callbacks, capture) => {
         addHandler(element, eventName, handler, capture)
         element.addEventListener(eventName, handler, capture)
     })
-    // console.log(eventDataCache)
 }
 
 

@@ -72,7 +72,6 @@ const isBelong = (target) => {
  */
 const preventDefault = (evtObj, target) => {
     if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
-        //是否支持二维码
         if (config.supportQR && evtObj.target.nodeName.toLowerCase() === "img") {} else {
             evtObj.preventDefault && evtObj.preventDefault();
         }
