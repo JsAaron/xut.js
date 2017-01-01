@@ -13,8 +13,8 @@ const defaultWidgetPath = "content/widget/"
  * @type {String}
  */
 export const getSourcePath = function() {
-    if (Xut.launchConfig) {
-        return Xut.launchConfig.resource + '/gallery/'
+    if (Xut.config.launch) {
+        return Xut.config.launch.resource + '/gallery/'
     } else {
         return defaultSourcePath
     }
@@ -26,8 +26,8 @@ export const getSourcePath = function() {
  * @return {[type]}          [description]
  */
 export const getWidgetPath = function() {
-    if (Xut.launchConfig) {
-        return Xut.launchConfig.resource + '/widget/'
+    if (Xut.config.launch) {
+        return Xut.config.launch.resource + '/widget/'
     } else {
         return defaultWidgetPath
     }

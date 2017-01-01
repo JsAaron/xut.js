@@ -63,7 +63,7 @@ if (/xinxuetang/.test(window.location.href)) {
  * 是否启动缓存机制
  * 第一次默认是关闭
  * 必须读取一次后，缓存启动
- * 为了支持Xut.launchConfig模式
+ * 为了支持Xut.config.launch模式
  * @type {Boolean}
  */
 let isCacheVideoPath = false
@@ -86,7 +86,7 @@ const desktopPlat = () => {
 
     //2016.9.13
     //新增动态模式
-    if (Xut.launchConfig) {
+    if (Xut.config.launch) {
         return getSourcePath()
     }
 
