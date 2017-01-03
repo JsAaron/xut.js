@@ -1,4 +1,4 @@
-##Magazine what is it?
+##What is this?
 This is a template program, used to batch production of app, using the front end of the technology to achieve the simulation of the original app effect. Through the combination of various modules, integrated into a customized app applications
 
 ##Preview
