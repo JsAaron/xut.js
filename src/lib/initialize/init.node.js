@@ -31,8 +31,8 @@ const getContentHTML = newCursor => {
         let coverUrl = './content/gallery/cover.jpg'
 
         //重写背景图
-        if (Xut.launchConfig && Xut.launchConfig.resource) {
-            coverUrl = Xut.launchConfig.resource + '/gallery/cover.jpg'
+        if (config.launch && config.launch.resource) {
+            coverUrl = config.launch.resource + '/gallery/cover.jpg'
         }
         //背景样式
         coverStyle = `style="background-image: url(${coverUrl});"`

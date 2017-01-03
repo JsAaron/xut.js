@@ -261,7 +261,7 @@ let loadAudio = (pageId, queryId, type) => {
     var seAudio = preCheck(pageId, queryId, type);
 
     //播放音频时关掉视频
-    clearVideo()
+    // clearVideo()
 
     //构建播放列表
     if (!playBox[type]) {

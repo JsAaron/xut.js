@@ -508,9 +508,9 @@ $$extend(Application, {
      * 退出应用
      */
     Exit() {
-        if (Xut.launchConfig) {
+        if (config.launch) {
             globalDestroy('exit')
-            Xut.launchConfig = null
+            config.launch = null
         }
     },
 
@@ -550,10 +550,10 @@ $$extend(Application, {
 
         /**
          * 动态配置
-         * @param  {[type]} Xut.launchConfig [description]
+         * @param  {[type]} config.launch [description]
          * @return {[type]}                       [description]
          */
-        if (Xut.launchConfig) {
+        if (config.launch) {
             destroy()
             return
         }

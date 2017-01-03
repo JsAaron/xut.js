@@ -4,6 +4,7 @@
  * widget 是零件资源文件
  * @type {String}
  */
+import { config } from './index'
 
 const defaultSourcePath = "content/gallery/"
 const defaultWidgetPath = "content/widget/"
@@ -13,8 +14,8 @@ const defaultWidgetPath = "content/widget/"
  * @type {String}
  */
 export const getSourcePath = function() {
-    if (Xut.launchConfig) {
-        return Xut.launchConfig.resource + '/gallery/'
+    if (config.launch) {
+        return config.launch.resource + '/gallery/'
     } else {
         return defaultSourcePath
     }
@@ -26,8 +27,8 @@ export const getSourcePath = function() {
  * @return {[type]}          [description]
  */
 export const getWidgetPath = function() {
-    if (Xut.launchConfig) {
-        return Xut.launchConfig.resource + '/widget/'
+    if (config.launch) {
+        return config.launch.resource + '/widget/'
     } else {
         return defaultWidgetPath
     }

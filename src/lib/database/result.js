@@ -1,4 +1,5 @@
 import { request } from '../util/loader'
+import { config } from '../config/index'
 
 /**
  * 数据库缓存结果集
@@ -42,10 +43,10 @@ function flowJsonFilter() {
 
     //配置了远程地址
     //需要把flow的给处理掉
-    if (Xut.launchConfig && Xut.launchConfig.resource && result.FlowData) {
+    if (config.launch && config.launch.resource && result.FlowData) {
         //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-        let remoteUrl = Xut.launchConfig.resource;
+        let remoteUrl = config.launch.resource;
         result.FlowData = result.FlowData.replace(/<img\s*src=\"[\w\/]+gallery/ig, '<img src=\"' + remoteUrl + '/gallery');
         result.FlowData = result.FlowData.replace(/xlink:href=\"[\w\/]+gallery/ig, 'xlink:href=\"' + remoteUrl + '/gallery');
     }
@@ -81,7 +82,7 @@ function flowJsonFilter() {
 export function importJsonDatabase(callback) {
 
     //如果外联指定路径json数据
-    let path = Xut.launchConfig && Xut.launchConfig.database;
+    let path = config.launch && config.launch.database;
     if (path) {
         //防止外部链接影响
         window.SQLResult = null

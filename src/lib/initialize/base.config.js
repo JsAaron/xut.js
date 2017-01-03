@@ -18,8 +18,8 @@ import initFlows from '../component/flow/layout'
  * @return {[type]} [description]
  */
 const loadStyle = (callback) => {
-    let svgsheet = Xut.launchConfig ?
-        Xut.launchConfig.resource + '/gallery/svgsheet.css' :
+    let svgsheet = config.launch ?
+        config.launch.resource + '/gallery/svgsheet.css' :
         config.pathAddress + 'svgsheet.css'
     loader.load([svgsheet], callback, null, true);
 }
