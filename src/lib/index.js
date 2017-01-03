@@ -116,7 +116,7 @@ Xut.Application.Launch = ({
     convert //'svg' 资源转化svg=>js，用来读取数据
 }) => {
 
-    if (Xut.launchConfig) {
+    if (Xut.config.launch) {
         return
     }
 
@@ -139,7 +139,7 @@ Xut.Application.Launch = ({
          * 应用启动配置
          * @type {Object}
          */
-        Xut.launchConfig = { //外部配置文件
+        Xut.config.launch = { //外部配置文件
             resource: resource, //资源路径
             database: path.database, //数据库
             launchAnim, //启动动画
