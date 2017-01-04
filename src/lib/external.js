@@ -27,6 +27,12 @@ var jsName = [
     'lib/plugin/library/iscroll.js',
     'lib/plugin/library/hammer.js',
 
+    //文字特效
+    'lib/plugin/library/textfx/charming.min.js',
+    'lib/plugin/library/textfx/anime.min.js',
+    'lib/plugin/library/textfx/textfx.js',
+
+
     // 视频插件
     'lib/plugin/library/video/jquery.hammer.js',
     'lib/plugin/library/video/jquery.ui.slider.js',

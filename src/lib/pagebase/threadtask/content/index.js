@@ -12,6 +12,7 @@ import { config } from '../../../config/index'
 
 import contentStructure from './structure/index'
 import ActivityClass from '../../../component/activity/index'
+import TextAnim from '../../../component/activity/content/text.anim'
 
 import {
     contentParser,
@@ -433,11 +434,89 @@ export default class TaskContents {
                     /* elist-enable */
 
                 //开始下一个任务
-                this._dataStrCheck(data, userData.contentDas);
+                this._dataStrCheck(data, userData);
 
             }, data, this)
 
         })
+    }
+
+    /**
+     * 点击放大图
+     * @return {[type]} [description]
+     */
+    _zoomImage(data) {
+        let self = this
+        self.zoomObj = {} //保存缩放对象
+        _.each(data.contentsFragment, function(node) {
+            //需要单独绑定点击放大功能
+            let behaviorData = data.zoomBehavior[node.id]
+            let size
+            let promptHtml
+            if (behaviorData) {
+                //缩放提示图片
+                if (behaviorData.prompt) {
+                    if (config.screenSize.width > config.screenSize.height) {
+                        size = '2vw' //横屏
+                    } else { //竖屏
+                        size = '2vh'
+                    }
+                    promptHtml = `<div class="icon-maximize"
+                                            style="font-size:${size};position:absolute;right:0;">
+                                      </div>`
+                    $(node).append(String.styleFormat(promptHtml))
+                }
+                $$on(node, {
+                    start: function() {
+                        let $node = $(node)
+                        let $imgNode = $node.find('img')
+                        let src = config.pathAddress + $imgNode[0].src.match(/\w+.(jpg|png)/gi)
+                        let zoomObj = self.zoomObj[src]
+                        if (zoomObj) {
+                            zoomObj.play()
+                        } else {
+                            let hqSrc
+                            if (config.hqUrlSuffix) {
+                                hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
+                            }
+                            self.zoomObj[src] = new Zoom({
+                                element: $imgNode,
+                                originalSrc: src,
+                                hdSrc: hqSrc
+                            })
+                        }
+                    }
+                })
+                behaviorData.off = function() {
+                    $$off(node)
+                    node = null
+                }
+            }
+        })
+        this.zoomBehavior = data.zoomBehavior
+    }
+
+    /**
+     * 文本特效
+     * @return {[type]} [description]
+     */
+    _textFx(data, textFx) {
+        //文本特效对象
+        this.textFxObj = []
+        let content
+        let contentNode
+        let serial
+        while (content = textFx.shift()) {
+            if (contentNode = data.contentsFragment[content.texteffectId]) {
+                contentNode.querySelectorAll('text').forEach(textNode => {
+                    //获取对应的文本效果节点与编号
+                    if (serial = textNode.getAttribute('data-textfx')) {
+                        this.textFxObj.push(new TextAnim(textNode,serial))
+                    }
+                })
+            }
+        }
+        console.log(this.textFxObj )
     }
 
     /**
@@ -446,61 +525,20 @@ export default class TaskContents {
      * @param  {[type]} contentDas [description]
      * @return {[type]}            [description]
      */
-    _dataStrCheck(data, contentDas) {
+    _dataStrCheck(data, userData) {
         this._assert('strAfter', function() {
 
-            //如果有点击放大的功能
+            let contentDas = userData.contentDas
+
+            //放大图片
             if (Object.keys(data.zoomBehavior).length) {
-                let self = this
-                self.zoomObj = {} //保存缩放对象
-                _.each(data.contentsFragment, function(node) {
-                    //需要单独绑定点击放大功能
-                    let zoomBehavior = data.zoomBehavior[node.id]
-                    if (zoomBehavior) {
-                        //提示图片
-                        let prompt = zoomBehavior.prompt
-                        if (prompt) {
-                            let zoomIcon
-                            //横屏
-                            if (config.screenSize.width > config.screenSize.height) {
-                                zoomIcon = `<div class="icon-maximize" style="font-size:2vw;position:absolute;right:0;"></div>`
-                            } else {
-                                //竖屏
-                                zoomIcon = `<div class="icon-maximize" style="font-size:2vh;position:absolute;right:0;"></div>`
-
-                            }
-                            $(node).append(String.styleFormat(zoomIcon))
-
-                        }
-                        let start = function() {
-                            let $node = $(node)
-                            let $imgNode = $node.find('img')
-                            let src = config.pathAddress + $imgNode[0].src.match(/\w+.(jpg|png)/gi)
-                            let zoomObj = self.zoomObj[src]
-                            if (zoomObj) {
-                                zoomObj.play()
-                            } else {
-                                let hqSrc
-                                if (config.hqUrlSuffix) {
-                                    hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
-                                }
-                                self.zoomObj[src] = new Zoom({
-                                    element: $imgNode,
-                                    originalSrc: src,
-                                    hdSrc: hqSrc
-                                })
-                            }
-                        }
-                        $$on(node, { start })
-                        zoomBehavior.off = function() {
-                            $$off(node)
-                            node = null
-                        }
-                    }
-                })
-                this.zoomBehavior = data.zoomBehavior
+                this._zoomImage(data)
             }
 
+            //文本特效
+            if (userData.textFx.length) {
+                this._textFx(data, userData.textFx)
+            }
 
             //保留场景的留信息
             //用做软件制作单页预加载

@@ -165,11 +165,15 @@ export default function structure(callback, data, context) {
         //返回出去给ibooks预编译使用
         idFix = [],
 
+        //文本效果
+        //2017.1.3
+        //收集对应的content数据
+        textFx = [],
+
         //缓存contentDas
         contentDas = {},
         //缓存content结构
         cachedContentStr = [];
-
 
 
     /**
@@ -193,7 +197,7 @@ export default function structure(callback, data, context) {
             //保持图片正比缩放
             //给mini使用
             //2016.12.15
-            if(para.fixRadio){
+            if (para.fixRadio) {
                 conData.fixRadio = true
             }
 
@@ -283,13 +287,19 @@ export default function structure(callback, data, context) {
             wrapObj = makeWarpObj(contentId, content, pageType, pid, virtualOffset);
             idFix.push(wrapObj.containerName)
 
+            //如果有文本效果标记
+            if (content.texteffect) {
+                content.texteffectId = wrapObj.containerName
+                textFx.push(content)
+            }
+
             //保存文本框content的Id
             if (wrapObj.isJs) {
                 contentHtmlBoxIds.push(contentId)
             }
 
             //转换缩放比
-            sizeResults = reviseSize(wrapObj.data, data.getStyle.isFlows,content.fixRadio);
+            sizeResults = reviseSize(wrapObj.data, data.getStyle.isFlows, content.fixRadio);
 
             //正常模式下创建
             startCreate(wrapObj, content, contentId)
@@ -334,8 +344,7 @@ export default function structure(callback, data, context) {
     function createRelated(contentId, wrapObj) {
         externalFile(wrapObj, function(wrapObj) {
             let uuid, startStr, contentStr
-
-            const conData = wrapObj.data
+            let conData = wrapObj.data
 
             //拼接地址
             analysisPath(wrapObj, conData)
@@ -368,13 +377,15 @@ export default function structure(callback, data, context) {
      */
     function checkComplete() {
         if (cloneContentCount === 1) {
-            var data = {
-                    contentDas: contentDas,
-                    idFix: idFix,
-                    contentHtmlBoxIds: contentHtmlBoxIds,
-                    containerPrefix: ''
-                }
-                //针对容器处理
+            let data = {
+                contentDas,
+                idFix,
+                textFx,
+                contentHtmlBoxIds,
+                containerPrefix: ''
+            }
+
+            //针对容器处理
             if (containerObj) {
                 var start, end, containerPrefix, containerStr
                 containerStr = []
