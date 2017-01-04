@@ -8,6 +8,7 @@
     "node": true
   },
   "globals": {
+    "TextFx":true,
     "Redux":true,
     "navigator": true,
     "Xut": true,
