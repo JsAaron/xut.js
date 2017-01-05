@@ -516,7 +516,7 @@ export default class TaskContents {
                 })
             }
         }
-        console.log(this.textFxObj )
+        // console.log(this.textFxObj )
     }
 
     /**

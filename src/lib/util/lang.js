@@ -1,3 +1,5 @@
+import { $$warn } from './debug'
+
 //定义属性
 var def = Object.defineProperty;
 
@@ -56,7 +58,7 @@ export function $$extend(object, config) {
     for (var i in config) {
         if (i) {
             if (object[i]) {
-                console.log('接口方法重复', 'Key->' + i, 'Value->' + object[i])
+                $$warn('接口方法重复', 'Key->' + i, 'Value->' + object[i])
             } else {
                 object[i] = config[i];
             }
@@ -75,7 +77,7 @@ export function parseJSON(parameter) {
     try {
         json = JSON.parse(parameter)
     } catch (error) {
-        console.log(`parseJSON失败:${parameter}`)
+        $$warn(`parseJSON失败:${parameter}`)
         return false
     }
     return json
@@ -101,7 +103,7 @@ export function makeJsonPack(code) {
         let post = "(function(){" + enterReplace(code) + "})"
         return (new Function("return " + post))();
     } catch (error) {
-        console.log('解析json出错' + code)
+        $$warn('解析json出错' + code)
     }
 }
 
@@ -261,7 +263,7 @@ export function joinPaths() {
                 paths.push(arg);
             }
         } catch (e) {
-            console.log(e);
+            $$warn(e);
         }
 
     }

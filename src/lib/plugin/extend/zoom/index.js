@@ -5,6 +5,8 @@ import {
     $$off
 } from '../../../util/dom'
 
+import { $$warn } from '../../../util/debug'
+
 import {
     createUnpeatableNumbers,
     createContainerView,
@@ -34,7 +36,7 @@ export default class Zoom {
             this.$container = current.$rootNode
         }
         if (!this.$container.length) {
-            console.log('图片缩放依赖的容器不存在')
+            $$warn('图片缩放依赖的容器不存在')
             return
         }
 

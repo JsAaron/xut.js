@@ -1,6 +1,7 @@
 import {
     request
 } from './loader'
+import { $$warn } from './debug'
 import { parseJSON } from './lang'
 import { config } from '../config/index'
 
@@ -33,7 +34,7 @@ export function execScript(code, type) {
     try {
         new Function(enterReplace(code))()
     } catch (e) {
-        console.log('加载脚本错误', type)
+        $$warn('加载脚本错误', type)
     }
 }
 
@@ -176,7 +177,8 @@ export function readFile(path, callback, type) {
                 callback(data)
                 delete window.HTMLCONFIG[fileName];
             } else {
-                callback('运行：脚本加载失败,文件名:' + path);
+                $$warn('js文件加载失败，文件名:' + path);
+                callback('')
             }
         })
     }
@@ -227,7 +229,8 @@ export function readFile(path, callback, type) {
                 delete window.HTMLCONFIG[name];
                 delete window.IBOOKSCONFIG[name]
             } else {
-                callback('编译:脚本加载失败,文件名:' + name);
+                $$warn('编译:脚本加载失败，文件名:' + name)
+                callback('');
             }
         })
         return
@@ -239,7 +242,8 @@ export function readFile(path, callback, type) {
     if (Xut.plat.isBrowser && !config.isPlugin) {
         //默认的地址
         svgUrl = config.getSvgPath().replace("www/", "") + path
-            //mini杂志的情况，不处理目录的www
+
+        //mini杂志的情况，不处理目录的www
         if (config.launch && config.launch.resource) {
             svgUrl = config.getSvgPath() + path
         }
@@ -251,8 +255,8 @@ export function readFile(path, callback, type) {
                 callback(svgContent);
             },
             error: function(xhr, type) {
-                callback('ReadFile数据加载失败');
-                console.log('SVG' + path + '解析出错!');
+                $$warn('svg文件解释出错，文件名:' + path);
+                callback('');
             }
         })
         return
@@ -266,7 +270,7 @@ export function readFile(path, callback, type) {
     Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function(svgContent) {
         callback(svgContent);
     }, function(err) {
-        callback('数据加载失败');
+        callback('')
     });
 
 }

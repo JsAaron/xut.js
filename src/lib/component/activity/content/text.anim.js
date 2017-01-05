@@ -13,12 +13,8 @@ export default class textAnim {
 	 * @return {[type]}        [description]
 	 */
 	constructor(node,serial){
-		console.log(node)
-		this.text = new TextFx(node)
-		setTimeout(()=>{
-			console.log(31)
-			this.text.show("fx5");
-			this.text.show("fx6");
-		},1000)
+		// console.log(node)
+		// this.text = new TextFx(node)
+		// this.text.show("fx1");
 	}
 }

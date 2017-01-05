@@ -1,3 +1,5 @@
+import { $$warn } from './debug'
+
 /**
  * 2015.3.24
  * 1 isBrowser
@@ -60,7 +62,7 @@ function addHandler(element, eventName, handler, capture) {
                 //所以transitionend就比较特殊了，因为都是同一个事件名称
                 //所以只要一份，所以重复绑定就需要去掉
                 if (eventName !== 'transitionend') {
-                    console.log(eventName + '：事件重复绑定添加')
+                    $$warn(eventName + '：事件重复绑定添加')
                 }
             } else {
                 dataCache[eventName] = [handler, capture]
@@ -72,7 +74,6 @@ function addHandler(element, eventName, handler, capture) {
         }
         element.xutHandler = guid++
     }
-    // console.log(eventDataCache)
 }
 
 const eachApply = (events, callbacks, processor, isRmove) => {
@@ -115,7 +116,7 @@ function removeAll(element) {
     let uuid = element.xutHandler
     let dataCache = eventDataCache[uuid]
     if (!dataCache) {
-        console.log('移除所有事件出错')
+        $$warn('移除所有事件出错')
         return
     }
     _.each(dataCache, function(data, eventName) {
@@ -135,7 +136,7 @@ function removeone(element, eventName) {
     let uuid = element.xutHandler
     let dataCache = eventDataCache[uuid]
     if (!dataCache) {
-        console.log('移除事件' + eventName + '出错')
+        $$warn('移除事件' + eventName + '出错')
         return
     }
     let data = dataCache[eventName]
@@ -144,7 +145,7 @@ function removeone(element, eventName) {
         dataCache[eventName] = null
         delete dataCache[eventName]
     } else {
-        console.log('移除事件' + eventName + '出错')
+        $$warn('移除事件' + eventName + '出错')
     }
 
     //如果没有数据

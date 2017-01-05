@@ -8,7 +8,7 @@ const utils = require('./utils')
 module.exports = (conf) => {
 
     fsextra.emptyDirSync(conf.tarDir)
-    fsextra.emptyDirSync(conf.testDir)
+    conf.testDir && fsextra.emptyDirSync(conf.testDir)
 
     utils.log(`
 delete the directory:

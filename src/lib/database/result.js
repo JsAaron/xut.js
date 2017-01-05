@@ -1,4 +1,5 @@
 import { request } from '../util/loader'
+import { $$warn } from '../util/debug'
 import { config } from '../config/index'
 
 /**
@@ -37,7 +38,7 @@ function flowJsonFilter() {
     result = window.SQLResult
 
     if (!result) {
-        console.log('json数据库加载出错')
+        $$warn('json数据库加载出错')
         return
     }
 
