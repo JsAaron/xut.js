@@ -8,6 +8,19 @@ import { config } from '../../config/index'
 export default function(baseProto) {
 
     /**
+     * 获取文字动画对象
+     * 2017.1.6
+     * @return {[type]} [description]
+     */
+    baseProto.getLetterObjs = function(contentId) {
+        let contents = this.createRelated.cacheTasks['contents']
+        if(contents && contents.textFxObjs){
+            return contents.textFxObjs[contentId]
+        }
+    }
+
+
+    /**
      * 转化序列名
      * @return {[type]} [description]
      */

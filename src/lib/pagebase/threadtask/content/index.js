@@ -12,7 +12,7 @@ import { config } from '../../../config/index'
 
 import contentStructure from './structure/index'
 import ActivityClass from '../../../component/activity/index'
-import TextAnim from '../../../component/activity/content/text.anim'
+import LetterEffect from '../../../component/activity/content/letter.effect'
 
 import {
     contentParser,
@@ -332,8 +332,9 @@ export default class TaskContents {
         if (compileActivitys) {
             //解析动画表数据结构
             activityData = contentParser(compileActivitys, activityData)
-                //如果有需要构建的content
-                //开始多线程处理
+
+            //如果有需要构建的content
+            //开始多线程处理
             activityData.createContentIds.length ? this._dataAfterCheck(activityData) : this._loadComplete();
         } else {
             this._loadComplete();
@@ -501,22 +502,41 @@ export default class TaskContents {
      * @return {[type]} [description]
      */
     _textFx(data, textFx) {
-        //文本特效对象
-        this.textFxObj = []
+
+        let uuid = 1
         let content
         let contentNode
-        let serial
+        let parentNodes = [] //收集父节点做比对
+        let group = {}
+        let textfxNodes
+        let parentNode
+
+        //文本特效对象
+        let textFxObjs = {}
+
         while (content = textFx.shift()) {
             if (contentNode = data.contentsFragment[content.texteffectId]) {
-                contentNode.querySelectorAll('text').forEach(textNode => {
-                    //获取对应的文本效果节点与编号
-                    if (serial = textNode.getAttribute('data-textfx')) {
-                        this.textFxObj.push(new TextAnim(textNode,serial))
+                let contentId = content._id
+                    //初始化文本对象
+                textFxObjs[contentId] = new LetterEffect(contentId)
+                textfxNodes = contentNode.querySelectorAll('a[data-textfx]')
+                textfxNodes.forEach(node => {
+                    //如果是共享了父节点
+                    parentNode = node.parentNode
+                    if (-1 != parentNodes.indexOf(parentNode)) {
+                        group[parentNode.textFxId].push(node)
+                    } else {
+                        parentNode.textFxId = uuid
+                        group[uuid] = []
+                        group[uuid++].push(node)
                     }
+                    parentNodes.push(parentNode)
+                    textFxObjs[contentId].addQueue(node, node.getAttribute('data-textfx'))
                 })
             }
         }
-        // console.log(this.textFxObj )
+
+        this.textFxObjs = textFxObjs
     }
 
     /**
@@ -657,6 +677,14 @@ export default class TaskContents {
      * @return {[type]} [description]
      */
     clearReference() {
+
+        //文字动画
+        if(this.textFxObjs){
+            _.each(this.textFxObjs,function(obj){
+                obj.destroy()
+            })
+        }
+
         //删除字幕用的碎片文档
         if (Xut.Contents.contentsFragment[this.chapterId]) {
             delete Xut.Contents.contentsFragment[this.chapterId]

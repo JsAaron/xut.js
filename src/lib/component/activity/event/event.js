@@ -110,7 +110,9 @@ const bind = function(eventDrop, data) {
     } else if (eventName === 'dragTag') { //拖拽
         dragObj = new DragDrop(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
     } else {
-        handler = function() { data.eventRun.call(eventContext); }
+        handler = function() {
+            data.eventRun.call(eventContext)
+        }
         if (eventName === 'tap') { //单机bind
             reference = simpleEvent(eventContext, handler, supportSwipe)
         } else { //复杂用hammer

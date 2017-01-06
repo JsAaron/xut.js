@@ -398,7 +398,7 @@
 		this.letters = [].slice.call(this.el.querySelectorAll('span'));
 		this.lettersTotal = this.letters.length;
 	};
-	
+
 	TextFx.prototype._stop = function() {
 		anime.remove(this.letters);
 		this.letters.forEach(function(letter) { letter.style.WebkitTransform = letter.style.transform = ''; });

@@ -224,7 +224,7 @@ export function $$on(element, callbacks, capture = false) {
 export function $$off(element, callbacks) {
 
     if (!element) {
-        console.error('移除事件对象不存在')
+        $$warn('移除事件对象不存在')
         return
     }
 
@@ -237,7 +237,7 @@ export function $$off(element, callbacks) {
     }
 
     if (!_.isArray(callbacks)) {
-        console.error('移除的事件句柄参数，必须是数组')
+        $$warn('移除的事件句柄参数，必须是数组')
         return
     }
 

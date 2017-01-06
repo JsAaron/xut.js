@@ -202,11 +202,11 @@ export default class HtmlBox {
          */
         const colse = function() {
             self._restoreColor()
-                //还原跟字体大小
+
+            //还原跟字体大小
             self._adjustSize(defaultFontSize)
             self.removeBox()
             Xut.View.ShowToolBar('pageNumber')
-
         }
 
 
@@ -225,14 +225,11 @@ export default class HtmlBox {
             }
         }
 
-        //冒泡匹配按钮点击
-        this.start = function(e) {
-            var className = e.target.className;
-            process[className] && process[className]();
-        }
-
         $$on(this.eventContext, {
-            start: this.start
+            start: function(e) {
+                var className = e.target.className;
+                process[className] && process[className]();
+            }
         })
     }
 
@@ -318,11 +315,11 @@ export default class HtmlBox {
         //3.修正文本框
         this.$htmlbox.find("." + iscrollName)[0].style.cssText += "margin-left:" + left + "px;";
         var formerScrollWidth = window.getComputedStyle(this.$htmlbox.find("." + iscrollName)[0]).getPropertyValue('width');
-  
-        var currentScrollWidth = parseInt(formerScrollWidth) - 2*left;
+
+        var currentScrollWidth = parseInt(formerScrollWidth) - 2 * left;
 
         this.$htmlbox.find("." + iscrollName).width(currentScrollWidth)
-      
+
     }
 
     /**
@@ -348,7 +345,10 @@ export default class HtmlBox {
      * @return {[type]} [description]
      */
     removeBox() {
-        $$off(this.eventContext)
+        if(this.eventContext){
+            $$off(this.eventContext)
+            this.eventContext = null
+        }
         this.$htmlbox && this.$htmlbox.remove()
         if (this.iscroll) {
             this.iscroll.destroy()

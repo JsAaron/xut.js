@@ -424,6 +424,17 @@ export default function setDynamicApi(vm) {
         }
     })
 
+    /**
+     * 文字动画
+     * @param {[type]} contentId [description]
+     */
+    Xut.Assist.TextFx = function(contentId) {
+        let pageObj = Xut.Presentation.GetPageObj()
+        let fxObj =pageObj.getLetterObjs(contentId)
+        if(fxObj){
+            fxObj.play()
+        }
+    }
 
 
     /**
