@@ -157,6 +157,15 @@ export function reviseSize(results, hasFlow, fixRadio) {
 
 
 /**
+ * 随机Url地址
+ * @param  {[type]} url [description]
+ * @return {[type]}     [description]
+ */
+function randomUrl(url) {
+    return url + '?r=' + new Date().getTime()
+}
+
+/**
  *  读取SVG内容
  *  @return {[type]} [string]
  */
@@ -171,7 +180,7 @@ export function readFile(path, callback, type) {
      * js脚本加载
      */
     let jsRequest = (fileUrl, fileName) => {
-        request(fileUrl, function() {
+        request(randomUrl(fileUrl), function() {
             data = window.HTMLCONFIG[fileName];
             if (data) {
                 callback(data)
@@ -220,9 +229,9 @@ export function readFile(path, callback, type) {
         //全路径
         paths = config.getSvgPath().replace("svg", 'js') + path;
         //文件名
-        name = path.replace(".js", '')
-            //加载脚本
-        request(paths, function() {
+        name = path.replace(".js", '');
+        //加载脚本
+        request(randomUrl(paths), function() {
             data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
             if (data) {
                 callback(data)
@@ -247,10 +256,11 @@ export function readFile(path, callback, type) {
         if (config.launch && config.launch.resource) {
             svgUrl = config.getSvgPath() + path
         }
+
         $.ajax({
             type: 'get',
             dataType: 'html',
-            url: svgUrl,
+            url: randomUrl(svgUrl),
             success: function(svgContent) {
                 callback(svgContent);
             },

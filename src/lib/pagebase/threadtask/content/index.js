@@ -467,8 +467,16 @@ export default class TaskContents {
                                       </div>`
                     $(node).append(String.styleFormat(promptHtml))
                 }
+                let hasMove = false
                 $$on(node, {
                     start: function() {
+                        hasMove = false
+                    },
+                    move: function() {
+                        hasMove = true
+                    },
+                    end: function() {
+                        if (hasMove) return
                         let $node = $(node)
                         let $imgNode = $node.find('img')
                         let src = config.pathAddress + $imgNode[0].src.match(/\w+.(jpg|png)/gi)
@@ -517,7 +525,8 @@ export default class TaskContents {
         while (content = textFx.shift()) {
             if (contentNode = data.contentsFragment[content.texteffectId]) {
                 let contentId = content._id
-                    //初始化文本对象
+
+                //初始化文本对象
                 textFxObjs[contentId] = new LetterEffect(contentId)
                 textfxNodes = contentNode.querySelectorAll('a[data-textfx]')
                 textfxNodes.forEach(node => {
@@ -546,6 +555,7 @@ export default class TaskContents {
      * @return {[type]}            [description]
      */
     _dataStrCheck(data, userData) {
+
         this._assert('strAfter', function() {
 
             let contentDas = userData.contentDas
@@ -565,7 +575,9 @@ export default class TaskContents {
             Xut.sceneController.seasonRelated = data.seasonRelated
 
             //初始化content对象
-            applyActivitys(data, contentDas, delayHooks => this._eventAfterCheck(data, delayHooks))
+            applyActivitys(data, contentDas, delayHooks => {
+                this._eventAfterCheck(data, delayHooks)
+            })
         })
     }
 
@@ -618,7 +630,6 @@ export default class TaskContents {
                 }
             }(data);
 
-
             //浮动页面对
             //浮动对象比任何层级都都要高
             //超过母版
@@ -631,7 +642,6 @@ export default class TaskContents {
             if (data.floatMaters.ids && data.floatMaters.ids.length) {
                 createFloatMater(this, data, complete)
             }
-
 
             //iboosk节点预编译
             //在执行的时候节点已经存在
@@ -679,10 +689,11 @@ export default class TaskContents {
     clearReference() {
 
         //文字动画
-        if(this.textFxObjs){
-            _.each(this.textFxObjs,function(obj){
+        if (this.textFxObjs) {
+            _.each(this.textFxObjs, function(obj) {
                 obj.destroy()
             })
+            this.textFxObjs = null
         }
 
         //删除字幕用的碎片文档

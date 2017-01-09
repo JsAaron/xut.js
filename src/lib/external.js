@@ -28,8 +28,8 @@ var jsName = [
     'lib/plugin/library/hammer.js',
 
     //文字特效
-    'lib/plugin/library/textfx/charming.min.js',
-    'lib/plugin/library/textfx/anime.min.js',
+    'lib/plugin/library/textfx/charming.js',
+    'lib/plugin/library/textfx/anime.js',
     'lib/plugin/library/textfx/textfx.js',
 
 

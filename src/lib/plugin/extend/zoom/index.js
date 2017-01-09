@@ -276,7 +276,8 @@ export default class Zoom {
      */
     _bindTapClose($imgNode) {
         let isMove = false
-        let end = () => {
+        let end = (e) => {
+            e.stopPropagation && e.stopPropagation()
             if (!isMove) {
                 this._closeSingleView()
             }
@@ -286,10 +287,12 @@ export default class Zoom {
          * 设置全局容器捕获处理
          ********************************/
         $$on(this.$singleView, {
-            start: function() {
+            start: function(e) {
+                e.stopPropagation && e.stopPropagation()
                 isMove = false
             },
-            move: function() {
+            move: function(e) {
+                e.stopPropagation && e.stopPropagation()
                 isMove = true
             },
             end: end,
