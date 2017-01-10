@@ -4,6 +4,7 @@ const babel = require('rollup-plugin-babel')
 const replace = require('rollup-plugin-replace')
 const fsextra = require('fs-extra')
 const utils = require('./utils')
+const flow = require('rollup-plugin-flow');
 
 module.exports = (conf) => {
 
@@ -23,6 +24,7 @@ ${conf.testDir}
         rollup.rollup({
                 entry: conf.entry,
                 plugins: [
+                    flow(),
                     babel({
                         babelrc: false,
                         exclude: 'node_modules/**',

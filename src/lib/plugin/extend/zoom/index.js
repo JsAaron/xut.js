@@ -269,6 +269,10 @@ export default class Zoom {
         }
     }
 
+    _stopDefault(e) {
+        e.stopPropagation && e.stopPropagation()
+        e.preventDefault && e.preventDefault()
+    }
 
     /**
      * 绑定单击关闭
@@ -276,28 +280,29 @@ export default class Zoom {
      */
     _bindTapClose($imgNode) {
         let isMove = false
-        let end = (e) => {
-            e.stopPropagation && e.stopPropagation()
+        let start = e => {
+            this._stopDefault(e)
+            isMove = false
+        }
+        let move = e => {
+            this._stopDefault(e)
+            isMove = true
+        }
+        let end = e => {
+            this._stopDefault(e)
             if (!isMove) {
                 this._closeSingleView()
             }
         }
-
         /********************************
          * 设置全局容器捕获处理
          ********************************/
         $$on(this.$singleView, {
-            start: function(e) {
-                e.stopPropagation && e.stopPropagation()
-                isMove = false
-            },
-            move: function(e) {
-                e.stopPropagation && e.stopPropagation()
-                isMove = true
-            },
-            end: end,
+            start,
+            move,
+            end,
             cancel: end
-        }, true)
+        })
     }
 
 

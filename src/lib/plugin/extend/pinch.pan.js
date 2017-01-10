@@ -131,10 +131,6 @@ export default class PinchPan {
         })
     }
 
-    _onTap() {
-
-    }
-
     _onDoubletap() {
         if (this.doubletapHander) {
             this.doubletapHander()
