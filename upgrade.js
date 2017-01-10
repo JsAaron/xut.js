@@ -1,0 +1,23 @@
+"UPDATE DATA: Tue Jan 10 2017 16:12:47 GMT+0800 (CST)" 
+{
+"babel-eslint":"^7.1.1",
+"babel-loader":"^6.2.10",
+"browser-sync":"^2.18.6",
+"eslint":"^3.13.1",
+"eslint-friendly-formatter":"^2.0.7",
+"eslint-loader":"^1.6.1",
+"eslint-plugin-promise":"^3.4.0",
+"fs-extra":"^1.0.0",
+"gulp-clean-css":"^2.3.2",
+"gulp-concat":"^2.6.1",
+"gulp-watch":"^4.3.11",
+"html-webpack-plugin":"^2.26.0",
+"npm-check-updates":"^2.8.9",
+"rollup":"^0.41.1",
+"rollup-plugin-babel":"^2.7.1",
+"webpack":"^1.14.0",
+"webpack-dev-middleware":"^1.9.0",
+"webpack-hot-middleware":"^2.15.0",
+"webpack-merge":"^2.3.1",
+"write-file-webpack-plugin":"^3.4.2"
+}

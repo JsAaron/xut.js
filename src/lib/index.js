@@ -6,9 +6,9 @@ import { fixAudio } from './component/audio/fix'
 import nextTick from './util/nexttick'
 import init from './initialize/index'
 import initNode from './initialize/init.node'
-import test from './test'
+// import test from './test'
 
-test()
+// test()
 
 Xut.Version = 875.9
 

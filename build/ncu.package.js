@@ -10,5 +10,5 @@ ncu.run({
         // upgradeAll: true
 }).then((upgraded) => {
     const data = JSON.stringify(upgraded).replace(/,/g, ",\n").replace(/{/, '{\n').replace(/}/, '\n}')
-    fs.writeFileSync('package.upgrade.js', `"UPDATE DATA: ${new Date()}" \n` + data)
+    fs.writeFileSync('upgrade.js', `"UPDATE DATA: ${new Date()}" \n` + data)
 });

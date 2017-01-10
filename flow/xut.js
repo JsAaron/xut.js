@@ -1,3 +1,4 @@
-declare module react {
-    declare function create(): any;
+
+declare type Xut = {
+  type: Object;
 }
