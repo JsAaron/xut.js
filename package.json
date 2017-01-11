@@ -16,7 +16,8 @@
     "git": "bash build/shell/git.sh",
     "svn": "bash build/shell/svn.sh",
     "update-package": "node build/ncu.package.js",
-    "flow": "flow; test $? -eq 0 -o $? -eq 2"
+    "check": "flow; test $? -eq 0 -o $? -eq 2",
+    "flow:check":"flow check"
   },
   "repository": {
     "type": "git",
