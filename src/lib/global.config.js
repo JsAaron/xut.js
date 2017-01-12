@@ -1,13 +1,23 @@
+/* @flow */
+
 /**
  * 默认值，未定义
  * @type {[type]}
  */
-const DEFAULT = undefined
+const DEFAULT: void = undefined
 
-/**
- * 模式配置
- */
-export default {
+export type Config = {
+    platform: void;
+    quickFlip: boolean;
+    silent: boolean;
+    supportQR: boolean;
+    visualHeight: ? number | void;
+    visualTop: number;
+    hqUrlSuffix: void;
+    lauchMode: ? number | void;
+}
+
+const config: Config = {
 
     /**
      * 适配平台
@@ -41,7 +51,7 @@ export default {
      * 因为有工具栏挤压的问题
      */
     visualHeight: DEFAULT,
-    visualTop:0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
+    visualTop: 0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
 
     /**
      * 忙碌光标
@@ -240,3 +250,5 @@ export default {
      */
     deBugHistory: DEFAULT
 }
+
+export default config
