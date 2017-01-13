@@ -1,1 +1,1 @@
-declare var Xut: Object;
+declare var Xut: any;

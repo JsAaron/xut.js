@@ -8,3 +8,4 @@
 flow
 
 [options]
+module.name_mapper='^compiler/\(.*\)$' -> '<PROJECT_ROOT>/src/lib/flowtest/\1'
