@@ -1,22 +1,18 @@
 import { config } from '../config/index'
-
 import MainBar from '../toolbar/main.sysbar/index'
 import DeputyBar from '../toolbar/deputy.fnbar'
 import BookBar from '../toolbar/word.bookbar/index'
 import NumberBar from '../toolbar/page.number'
 import { sceneController } from './controller'
-import Mediator from '../manager/mediator'
-
+import Mediator from '../core/mediator'
 import {
     getFlowCount,
     getFlowChpaterCount
-} from '../component/flow/get'
-
+} from '../core/component/flow/get'
 import {
     mainScene,
     deputyScene
 } from './scene.layout'
-
 import {
     pMainBar,
     pDeputyBar

@@ -41,7 +41,7 @@ import {
     $$original,
     $$suspend,
     $$stop
-} from './command/index'
+} from './core/command/index'
 
 import {
     $$set,
