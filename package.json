@@ -17,7 +17,7 @@
     "svn": "bash build/shell/svn.sh",
     "update:package": "node build/ncu.package.js",
     "check": "flow; test $? -eq 0 -o $? -eq 2",
-    "flow:check":"flow check"
+    "flow:check": "flow check"
   },
   "repository": {
     "type": "git",
@@ -58,6 +58,7 @@
     "open": "0.0.5",
     "rollup": "^0.36.3",
     "rollup-plugin-babel": "^2.6.1",
+    "rollup-plugin-flow": "^1.1.1",
     "rollup-plugin-replace": "^1.1.1",
     "underscore": "^1.8.3",
     "webpack": "^1.13.3",
@@ -65,8 +66,5 @@
     "webpack-hot-middleware": "^2.13.1",
     "webpack-merge": "^0.15.0",
     "write-file-webpack-plugin": "^3.3.0"
-  },
-  "dependencies": {
-    "rollup-plugin-flow": "^1.1.1"
   }
 }
