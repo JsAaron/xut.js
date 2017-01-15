@@ -13,7 +13,7 @@ Xut.Version = 875.9
 if (Xut.plat.isBrowser) {
 
     //禁止全局的缩放处理
-    $('body').on('touchmove', function(e) {
+    $('body').on('touchmove', e => {
         e.preventDefault && e.preventDefault()
     })
 
@@ -50,7 +50,6 @@ const loadApp = (...arg) => {
         node = null
         Xut.Application.$$removeNode = null
     }
-
     nextTick({
         container: node.$rootNode,
         content: node.$contentNode
@@ -116,11 +115,9 @@ Xut.Application.Launch = ({
     cursor,
     convert //'svg' 资源转化svg=>js，用来读取数据
 }) => {
-
     if (config.launch) {
         return
     }
-
     let setConfig = Xut.Application.setConfig
     if (setConfig && setConfig.lauchMode === 1) {
         mixModeConfig(setConfig);

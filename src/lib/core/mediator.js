@@ -10,7 +10,7 @@ import Dispatcher from './transform/index'
 import delegateHooks from './delegate/hooks'
 import closestProcessor from './delegate/closest'
 import GlobalEvent from '../swipe/index.js'
-import setDynamicApi from '../dynamic.api'
+import setDynamicApi from './dynamic.api'
 
 import {
     defProtected as def,
