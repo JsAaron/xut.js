@@ -1,4 +1,4 @@
-import { getSourcePath } from './get.path'
+import { getSourcePath } from './depend/path'
 
 const isIOS = Xut.plat.isIOS
 const isAndroid = Xut.plat.isAndroid

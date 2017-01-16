@@ -6,8 +6,8 @@ import { destroyFixAudio } from './core/component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
 import { destroyConfig } from './config/index'
 import { $$resetUUID } from './util/stroage'
-import { offAndroid } from './initialize/android.button'
-import { cleanCursor } from './initialize/busy.cursor'
+import { offAndroid } from './initialize/depend/button'
+import { cleanCursor } from './initialize/depend/cursor'
 
 /**
  * 销毁接口

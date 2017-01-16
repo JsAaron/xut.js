@@ -1,5 +1,5 @@
-import { config } from '../config/index'
-import { setDelay, disable, resetCursor } from '../initialize/busy.cursor'
+import { config } from '../../config/index'
+import { setDelay, disable, resetCursor } from './cursor'
 
 /**
  * 初始化根节点
@@ -46,7 +46,7 @@ const getContentHTML = newCursor => {
 /**
  * 根节点
  */
-export default function initNode(nodeName = '#xxtppt-app-container', cursor) {
+export function initNode(nodeName = '#xxtppt-app-container', cursor) {
     let $rootNode
     if (nodeName) {
         $rootNode = $(nodeName)

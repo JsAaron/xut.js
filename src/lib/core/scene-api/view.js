@@ -1,0 +1,198 @@
+/********************************************
+ * 场景API
+ * 视图接口。视图是窗口的展示方式，和页面相关的接口，都在这里。
+ ********************************************/
+export function extendView(vm, access, $globalEvent) {
+
+    let options = vm.options
+
+    /**
+     * 设置页面的potion编码
+     * 为分栏修改
+     */
+    Xut.View.setPointer = function(pageIndex) {
+        $globalEvent.setPointer(pageIndex)
+    }
+
+    /**
+     * 更新页码
+     * @param {[type]} point [description]
+     *   parentIndex  父索引
+     *   subIndex     子索引
+     */
+    Xut.View.PageUpdate = function(...arg) {
+        vm.$emit('change:pageUpdate', ...arg)
+    }
+
+    /**
+     * 显示工具栏
+     * 没有参数显示 工具栏与控制翻页按钮
+     * 有参数单独显示指定的
+     */
+    Xut.View.ShowToolBar = function(point) {
+        vm.$emit('change:toggleToolbar', 'show', point)
+    }
+
+    /**
+     * 隐藏工具栏
+     * 没有参数隐藏 工具栏与控制翻页按钮
+     * 有参数单独隐藏指定
+     */
+    Xut.View.HideToolBar = function(point) {
+        vm.$emit('change:toggleToolbar', 'hide', point)
+    }
+
+    /**
+     * 指定特定的显示与隐藏
+     *  Xut.View.Toolbar({
+     *       show :'bottom',
+     *       hide :'controlBar'
+     *   })
+     *
+     *  //工具栏与翻页按钮全部显示/隐藏
+     *  Xut.View.Toolbar('show')
+     *  Xut.View.Toolbar('hide')
+     *
+     * @return {[type]} [description]
+     */
+    Xut.View.Toolbar = function(cfg) {
+        vm.$emit('change:toggleToolbar', cfg)
+    };
+
+    /**
+     * 跳转到上一个页面
+     */
+    Xut.View.GotoPrevSlide = function(seasonId, chapterId) {
+        if(seasonId && chapterId) {
+            Xut.View.LoadScenario({
+                'scenarioId': seasonId,
+                'chapterId': chapterId
+            })
+            return;
+        }
+
+        //ibooks模式下的跳转
+        //全部转化成超链接
+        if(Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
+            location.href = (Xut.IBooks.pageIndex - 1) + ".xhtml";
+            return
+        }
+
+        options.multiplePages && $globalEvent.prev()
+    };
+
+    /**
+     * 跳转到下一个页面
+     */
+    Xut.View.GotoNextSlide = function(seasonId, chapterId) {
+        if(seasonId && chapterId) {
+            Xut.View.LoadScenario({
+                'scenarioId': seasonId,
+                'chapterId': chapterId
+            })
+            return;
+        }
+
+        //ibooks模式下的跳转
+        //全部转化成超链接
+        if(Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
+            location.href = (Xut.IBooks.pageIndex + 1) + ".xhtml";
+            return
+        }
+
+        options.multiplePages && $globalEvent.next();
+    };
+
+    /**
+     * 跳转页面
+     * 场景内部切换
+     * 跳转到指定编号的页面
+     * Action 类型跳转
+     * xxtlink 超连接跳转,svg内嵌跳转标记处理
+     * 文本框跳转
+     * ........
+     */
+    Xut.View.GotoSlide = function(seasonId, chapterId) {
+
+        //修正参数
+        const fixParameter = function(pageIndex) {
+            pageIndex = Number(pageIndex) - 1
+            if(pageIndex < 0) {
+                pageIndex = 0
+            }
+            return pageIndex
+        }
+
+        //ibooks模式下的跳转
+        //全部转化成超链接
+        if(Xut.IBooks.Enabled && Xut.IBooks.runMode() && chapterId) {
+            location.href = chapterId + ".xhtml";
+            return
+        }
+
+        //兼容数据错误
+        if(!seasonId && !chapterId) return;
+
+        //如果是一个参数是传递页码数,则为内部跳转
+        if(arguments.length === 1) {
+            //复位翻页按钮
+            vm.$emit('change:showNext')
+            return $globalEvent.scrollToPage(fixParameter(seasonId))
+        }
+
+        //场景模式内部跳转
+        if(options.scenarioId == seasonId) {
+            //chpaterId 转化成实际页码
+            var sectionRang = Xut.data.query('sectionRelated', seasonId)
+            var pageIndex = chapterId - sectionRang.start
+            vm.$emit('change:showNext')
+            return $globalEvent.scrollToPage(fixParameter(pageIndex))
+        }
+
+        //场景与场景的跳转
+        return Xut.View.LoadScenario({
+            'scenarioId': seasonId,
+            'chapterId': chapterId
+        })
+    }
+
+
+    /**
+     * 是否为翻页的边界
+     * @return {Boolean} [description]
+     */
+    Xut.View.isFlipBorderBounce = function(distance) {
+        return $globalEvent.isBorder(distance)
+    }
+
+
+    /**
+     * 页面滑动
+     * @param {[type]} distance  [description]
+     * @param {[type]} speed     [description]
+     * @param {[type]} direction [description]
+     * @param {[type]} action    [description]
+     */
+    Xut.View.MovePage = function(distance, speed, direction, action) {
+
+        //如果禁止翻页模式 || 如果是滑动,不是边界
+        if(!options.multiplePages ||
+            $globalEvent.isMoving() ||
+            action === 'flipMove' && $globalEvent.isBorder(distance)) {
+            return
+        }
+
+        const pagePointer = $globalEvent.getPointer()
+        const data = {
+            'distance': distance,
+            'speed': speed,
+            'direction': direction,
+            'action': action,
+            'leftIndex': pagePointer.leftIndex,
+            'pageIndex': pagePointer.currIndex,
+            'rightIndex': pagePointer.rightIndex
+        }
+        vm.$dispatcher.movePageBases(data)
+    };
+
+}

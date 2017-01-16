@@ -2,7 +2,7 @@ import { config } from '../../../config/index'
 import {set } from './get'
 import { getFlowView } from '../../../visuals/hooks/adapter'
 import { getResults, removeFlowData } from '../../../database/result'
-import nextTick from '../../../util/nexttick'
+import { nextTick } from '../../../util/nexttick'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap

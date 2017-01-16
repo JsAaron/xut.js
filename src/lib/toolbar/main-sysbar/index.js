@@ -13,7 +13,7 @@ import {
     createPageNumber,
     createHideToolbar,
     createCloseIcon
-} from './str.conf'
+} from './str-conf'
 
 import {
     hash,

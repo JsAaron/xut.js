@@ -1,7 +1,7 @@
 import {
     getWidgetPath,
     getSourcePath
-} from './get.path'
+} from './depend/path'
 
 const isIOS = Xut.plat.isIOS
 const isAndroid = Xut.plat.isAndroid

@@ -37,12 +37,12 @@ const _nextTick = (function() {
         pending = false
         var copies = callbacks.slice(0)
         callbacks = []
-        for (var i = 0; i < copies.length; i++) {
+        for(var i = 0; i < copies.length; i++) {
             copies[i]()
         }
     }
 
-    if (typeof MutationObserver !== 'undefined' && !Xut.plat.hasMutationObserverBug) {
+    if(typeof MutationObserver !== 'undefined' && !Xut.plat.hasMutationObserverBug) {
         var counter = 1
         var observer = new MutationObserver(nextTickHandler)
         var textNode = document.createTextNode(counter)
@@ -63,7 +63,7 @@ const _nextTick = (function() {
     return function(cb, ctx) {
         var func = ctx ? function() { cb.call(ctx) } : cb
         callbacks.push(func)
-        if (pending) return
+        if(pending) return
         pending = true
         timerFunc(nextTickHandler, 0)
     }
@@ -75,28 +75,28 @@ const nextTick = function({
     content,
     position,
     delay = 0
-} = {}, callback, context) {
+}, callback, context) {
 
     //如果只提供一个回到函数
-    if (arguments.length === 1 && typeof arguments[0] === 'function') {
+    if(arguments.length === 1 && typeof arguments[0] === 'function') {
         callback = arguments[0]
-        if (typeof callback === 'function') {
+        if(typeof callback === 'function') {
             return _nextTick(callback)
         }
         console.log('nextTick: 参数提供错误');
         return
     }
 
-    if (!container || !content) {
+    if(!container || !content) {
         return;
     }
 
     //检查容器---$(container) 转为dom对象
-    if (container instanceof $) {
+    if(container instanceof $) {
         container = container[0]
     }
 
-    if (container.nodeType !== 1) {
+    if(container.nodeType !== 1) {
         console.log('nextTick: container must be HTMLLIElement ');
         return;
     }
@@ -108,9 +108,9 @@ const nextTick = function({
     tick.setAttribute('value', animatId);
 
     //检查内容
-    if (typeof content === 'string') {
+    if(typeof content === 'string') {
         let temp = $(content);
-        if (!temp[0]) {
+        if(!temp[0]) {
             //纯文本内容
             temp = DOC.createTextNode(content);
             temp = $(temp);
@@ -139,13 +139,13 @@ const nextTick = function({
         //拼接内容
         let frag = DOC.createDocumentFragment()
         let len = content.length;
-        for (let i = 0; i < len; i++) {
+        for(let i = 0; i < len; i++) {
             frag.appendChild(content[i]);
         }
         frag.appendChild(tick)
 
         //判断插入的位置
-        if (position === 'first') {
+        if(position === 'first') {
             container.insertBefore(frag, container.firstChild);
         } else {
             container.appendChild(frag);
@@ -158,10 +158,10 @@ const nextTick = function({
 
     }
 
-    if (MutationObserver) {
+    if(MutationObserver) {
         let observer = new MutationObserver(mutations => {
             mutations.forEach(record => {
-                if (record.oldValue === animatId) {
+                if(record.oldValue === animatId) {
                     _completeTask()
                     observer = null
                 }
@@ -182,7 +182,7 @@ const nextTick = function({
 
 
         //检测是否支持DOM变动事件
-        if (implementation) {
+        if(implementation) {
 
             /**
              * 完成任务后处理&Event
@@ -190,7 +190,7 @@ const nextTick = function({
              * @return {[type]}       [description]
              */
             const _finishTask = (event) => {
-                if (event.target.value === animatId) {
+                if(event.target.value === animatId) {
                     //container.removeEventListener('DOMNodeRemoved',_finishTask,false);
                     container.removeEventListener('DOMNodeInserted', _finishTask, false);
                     callback.call(context);
@@ -213,4 +213,4 @@ const nextTick = function({
 
 Xut.nextTick = nextTick
 
-export default nextTick
+export { nextTick }

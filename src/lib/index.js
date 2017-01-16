@@ -1,30 +1,31 @@
 import { config } from './config/index'
-import { api } from './global.api'
+import { initGlobalAPI } from './global-api/index'
 import { AudioManager } from './core/component/audio/manager'
 import { VideoManager } from './core/component/video/manager'
 import { fixAudio } from './core/component/audio/fix'
-import nextTick from './util/nexttick'
+import { nextTick } from './util/nexttick'
+import { initNode } from './initialize/depend/node'
 import init from './initialize/index'
-import initNode from './initialize/init.node'
 
+initGlobalAPI()
 
 Xut.Version = 875.9
 
-if (Xut.plat.isBrowser) {
+if(Xut.plat.isBrowser) {
 
     //禁止全局的缩放处理
     $('body').on('touchmove', e => {
         e.preventDefault && e.preventDefault()
     })
 
-    //Mobile browser automatically broadcast platform media processing
-    if (Xut.plat.noAutoPlayMedia) {
+    //修复H5音频自动播放bug
+    if(Xut.plat.noAutoPlayMedia) {
         fixAudio()
     }
 
-    //Desktop binding mouse control
+    //桌面鼠标控制翻页
     $(document).keyup(event => {
-        switch (event.keyCode) {
+        switch(event.keyCode) {
             case 37:
                 Xut.View.GotoPrevSlide()
                 break;
@@ -61,7 +62,7 @@ const loadApp = (...arg) => {
  * 提供全局配置文件
  */
 const mixModeConfig = setConfig => {
-    if (setConfig) {
+    if(setConfig) {
         Xut.extend(config, setConfig)
     }
 }
@@ -88,10 +89,10 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
     }
 
     //如果启动了这个模式
-    if (config.orientateMode) {
+    if(config.orientateMode) {
         let temp = cacheOptions
         Xut.Application.Refresh()
-        if (temp && temp.length) {
+        if(temp && temp.length) {
             delay(() => {
                 Xut.Application.Launch(temp.pop())
                 temp = null
@@ -115,11 +116,11 @@ Xut.Application.Launch = ({
     cursor,
     convert //'svg' 资源转化svg=>js，用来读取数据
 }) => {
-    if (config.launch) {
+    if(config.launch) {
         return
     }
     let setConfig = Xut.Application.setConfig
-    if (setConfig && setConfig.lauchMode === 1) {
+    if(setConfig && setConfig.lauchMode === 1) {
         mixModeConfig(setConfig);
         cacheOptions = [{
             el,
@@ -129,7 +130,7 @@ Xut.Application.Launch = ({
 
         //地址结尾是否包含了斜杠，如果包含了去掉
         let resource = path.resource
-        if (/\/$/.test(resource)) {
+        if(/\/$/.test(resource)) {
             resource = resource.substring(0, resource.length - 1)
         }
 
@@ -152,7 +153,7 @@ Xut.Application.Launch = ({
  */
 setTimeout(() => {
     let setConfig = Xut.Application.setConfig
-    if (!setConfig || setConfig && !setConfig.lauchMode) {
+    if(!setConfig || setConfig && !setConfig.lauchMode) {
         mixModeConfig(setConfig)
         loadApp()
     }

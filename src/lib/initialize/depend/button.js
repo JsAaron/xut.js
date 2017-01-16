@@ -1,7 +1,7 @@
 import {
     getPlugVideoState,
     closePlugVideo
-} from './app.video'
+} from './video'
 
 /**
  * 回退按钮状态控制器

@@ -12,7 +12,7 @@ import { config } from '../../../../config/index'
 import contentStructure from './structure/index'
 import ActivityClass from '../../../component/activity/index'
 import LetterEffect from '../../../component/activity/content/letter.effect'
-import nextTick from '../../../../util/nexttick'
+import { nextTick } from '../../../../util/nexttick'
 import { parseJSON } from '../../../../util/index'
 import Zoom from '../../../../plugin/extend/zoom/index'
 

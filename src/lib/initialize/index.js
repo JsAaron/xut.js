@@ -1,8 +1,8 @@
 import { config } from '../config/index'
-import { plugVideo, html5Video } from './app.video'
-import baseConfig from './base.config'
-import { bindAndroid } from './android.button'
-import loadScene from './load.scenario'
+import { plugVideo, html5Video } from './depend/video'
+import baseConfig from './base'
+import { bindAndroid } from './depend/button'
+import loadScene from './scenario'
 
 import {
     $$set,

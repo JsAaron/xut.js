@@ -1,4 +1,4 @@
-import { createCursor } from './busy.cursor'
+import { createCursor } from './depend/cursor'
 import { contentFilter } from '../core/component/activity/content/filter'
 import { importJsonDatabase } from '../database/result'
 
@@ -10,7 +10,7 @@ import {
     initPathAddress
 } from '../config/index'
 
-import initTooBar from './toolbar.data'
+import initTooBar from './toolbar'
 import initFlows from '../core/component/flow/layout'
 
 /**

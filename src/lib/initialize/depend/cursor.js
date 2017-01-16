@@ -1,4 +1,4 @@
-import { config } from '../config/index'
+import { config } from '../../config/index'
 
 /**
  * 用css3实现的忙碌光标

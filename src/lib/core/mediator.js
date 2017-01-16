@@ -5,12 +5,12 @@
  *
  **********************************************************************/
 import { config } from '../config/index'
-import Observer from '../observer/index'
+import { Observer }  from '../observer/index'
 import Dispatcher from './transform/index'
 import delegateHooks from './delegate/hooks'
 import closestProcessor from './delegate/closest'
 import GlobalEvent from '../swipe/index.js'
-import setDynamicApi from './dynamic.api'
+import { initSceneApi } from './scene-api/index'
 
 import {
     defProtected as def,
@@ -222,7 +222,7 @@ export default class Mediator extends Observer {
          * 销毁接口api
          * @type {[type]}
          */
-        this.destoryDynamicApi = setDynamicApi(this)
+        this.destorySceneApi = initSceneApi(this)
     }
 
 
@@ -390,5 +390,5 @@ def(Mediator.prototype, '$destroy', function() {
     this.$dispatcher.destroyPageBases(); //派发器
     this.$dispatcher = null;
     this.$globalEvent = null;
-    this.destoryDynamicApi() //动态api
+    this.destorySceneApi() //动态api
 })

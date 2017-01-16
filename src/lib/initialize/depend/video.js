@@ -1,4 +1,4 @@
-import { Video5 } from '../core/component/video/video'
+import { Video5 } from '../../core/component/video/video'
 
 
 const preloadVideo = {

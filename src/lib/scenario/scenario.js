@@ -1,8 +1,8 @@
 import { config } from '../config/index'
-import MainBar from '../toolbar/main.sysbar/index'
-import DeputyBar from '../toolbar/deputy.fnbar'
-import BookBar from '../toolbar/word.bookbar/index'
-import NumberBar from '../toolbar/page.number'
+import MainBar from '../toolbar/main-sysbar/index'
+import DeputyBar from '../toolbar/deputy-fnbar'
+import BookBar from '../toolbar/word-bookbar/index'
+import NumberBar from '../toolbar/page-number'
 import { sceneController } from './controller'
 import Mediator from '../core/mediator'
 import {
@@ -12,11 +12,11 @@ import {
 import {
     mainScene,
     deputyScene
-} from './scene.layout'
+} from './layout'
 import {
     pMainBar,
     pDeputyBar
-} from './bar.config'
+} from './bar'
 
 
 /**

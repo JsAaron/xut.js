@@ -4,7 +4,7 @@ import { getFlowCount } from './get'
 import Swipe from '../../../swipe/index'
 import render from './render'
 
-import getFlipDistance from '../../../visuals/distance.config'
+import getFlipDistance from '../../../visuals/distance'
 import { getFlowView } from '../../../visuals/hooks/adapter'
 
 import Zoom from '../../../plugin/extend/zoom/index'

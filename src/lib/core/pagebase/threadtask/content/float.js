@@ -1,4 +1,4 @@
-import nextTick from '../../../../util/nexttick'
+import { nextTick } from '../../../../util/nexttick'
 import { arrayUnique } from '../../../../util/index'
 
 const TRANSFORM = Xut.style.transform
