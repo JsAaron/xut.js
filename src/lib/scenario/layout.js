@@ -13,6 +13,15 @@ const isIOS = Xut.plat.isIOS
 const TOP = isIOS ? 20 : 0
 
 /**
+ * 是否需要溢出隐藏容器
+ * @return {[type]} [description]
+ */
+const hasOverflow = () =>{
+    //如果是页面拼接模式
+    return config.visualMode === 1 ? 'visible' : 'hidden'
+}
+
+/**
  * 主场景
  * @return {[type]} [description]
  */
@@ -21,7 +30,7 @@ export function mainScene() {
     let iconHeight = config.iconHeight
     let proportion = config.proportion
 
-    const sWidth  = config.viewSize.width
+    const sWidth = config.viewSize.width
     const sHeight = config.viewSize.height
 
     //横版模式
@@ -30,11 +39,11 @@ export function mainScene() {
     proportion = isHorizontal ? proportion.width : proportion.height
     iconHeight = isIOS ? iconHeight : round(proportion * iconHeight)
 
-    const navBarWidth     = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px'
-    const navBarHeight    = isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96)
-    const navBarTop       = isHorizontal ? '' : 'top:' + (iconHeight + TOP + 2) + 'px;'
-    const navBarLeft      = isHorizontal ? '' : 'left:' + iconHeight + 'px;'
-    const navBarBottom    = isHorizontal ? 'bottom:4px;' : ''
+    const navBarWidth = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px'
+    const navBarHeight = isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96)
+    const navBarTop = isHorizontal ? '' : 'top:' + (iconHeight + TOP + 2) + 'px;'
+    const navBarLeft = isHorizontal ? '' : 'left:' + iconHeight + 'px;'
+    const navBarBottom = isHorizontal ? 'bottom:4px;' : ''
     const navBaroOverflow = isHorizontal ? 'hidden' : 'visible'
 
     //导航
@@ -50,10 +59,6 @@ export function mainScene() {
                      overflow:${navBaroOverflow};">
         </div>`
 
-
-    const homeIndex = Xut.sceneController.createIndex()
-    const homeOverflow = config.visualMode === 1 ? 'visible' : 'hidden'
-
     //主体
     const homeHTML =
         `<div id="xut-main-scene"
@@ -62,8 +67,8 @@ export function mainScene() {
                      top:0;
                      left:${config.viewSize.left}px;
                      position:absolute;
-                     z-index:${homeIndex};
-                     overflow:${homeOverflow};">
+                     z-index:${Xut.sceneController.createIndex()};
+                     overflow:${hasOverflow()};">
 
             <div id="xut-control-bar" class="xut-control-bar"></div>
             <ul id="xut-page-container" class="xut-flip"></ul>
@@ -82,22 +87,16 @@ export function mainScene() {
  * @return {[type]}         [description]
  */
 export function deputyScene(id) {
-
-    const scenarioId = 'scenario-' + id
-    const overflow = config.visualMode === 1 ? 'visible' : 'hidden'
-    const pageId = 'scenarioPage-' + id
-    const masterId = 'scenarioMaster-' + id
-
     const html =
-        `<div id="${scenarioId}"
+        `<div id="${'scenario-' + id}"
               style="width:${config.viewSize.width}px;
                      height:100%;
                      left:${config.viewSize.left}px;
                      z-index:${Xut.sceneController.createIndex()};
                      position:absolute;
-                     overflow:${overflow};">
-            <ul id="${pageId}" class="xut-flip" style="z-index:2"></ul>
-            <ul id="${masterId}" class="xut-flip" style="z-index:1"></ul>
+                     overflow:${hasOverflow()};">
+            <ul id="${'scenarioPage-' + id}" class="xut-flip" style="z-index:2"></ul>
+            <ul id="${'scenarioMaster-' + id}" class="xut-flip" style="z-index:1"></ul>
         </div>`
 
     return String.styleFormat(html)

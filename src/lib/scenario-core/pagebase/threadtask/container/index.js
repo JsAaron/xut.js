@@ -21,10 +21,11 @@ const createli = function({
     customStyle,
     pageData,
     background
-} = {}) {
-
+}) {
     const getStyle = base.getStyle
 
+    //增加一个main-content放body内容
+    //增加一个header-footer放溢出的页眉页脚
     return String.styleFormat(
         `<li id="${prefix}"
             data-id="${pageData._id}"
@@ -38,9 +39,11 @@ const createli = function({
                    top:${getStyle.viewTop}px;
                    ${TANSFROM}:${translate};
                    ${background}
-                   ${customStyle}
-                   overflow:hidden;">
-            <div class="page-pinch"></div>
+                   ${customStyle}">
+            <div class="page-pinch">
+                <div data-type="main-content"></div>
+                <div data-type="header-footer"></div>
+            </div>
         </li>`
     )
 }
@@ -54,7 +57,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
     let background = ''
 
     //chpater有背景，不是svg格式
-    if (!/.svg$/i.test(pageData.md5)) {
+    if(!/.svg$/i.test(pageData.md5)) {
         background = 'background-image:url(' + config.pathAddress + pageData.md5 + ');'
     }
 
@@ -64,7 +67,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
      */
     let customStyle = ''
     let userStyle = getStyle.userStyle
-    if (userStyle !== undefined) {
+    if(userStyle !== undefined) {
         //解析自定义规则
         _.each(userStyle, (value, key) => {
             customStyle += key + ':' + value + ';'
@@ -93,7 +96,7 @@ export default function(base, pageData, taskCallback) {
     //iboosk编译
     //在执行的时候节点已经存在
     //不需要在创建
-    if (Xut.IBooks.runMode()) {
+    if(Xut.IBooks.runMode()) {
         $pageNode = $("#" + prefix)
         taskCallback($pageNode, $pseudoElement)
         return

@@ -1,7 +1,7 @@
 import { config } from '../../../config/index'
 import { create as _create } from '../depend/multievent'
 import Collection from '../depend/collection'
-import initTasks from '../threadtask/tasks'
+import initTasks from '../threadtask/init-task'
 import Factory from '../depend/factory'
 
 export default function(baseProto) {

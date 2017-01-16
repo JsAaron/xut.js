@@ -38,7 +38,7 @@ const createaAccess = mgr => {
         if(mgr[pageType]) {
             return callback(mgr[pageType], pageType, args, eachContext)
         } else {
-            $$warn('传递到access的pageType错误！')
+            // $$warn('传递到access的pageType错误,pageType='+ pageType)
         }
     }
 }

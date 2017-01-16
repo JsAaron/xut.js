@@ -13,7 +13,7 @@ import {
     $$original,
     $$suspend,
     $$stop
-} from '../core/command/index'
+} from '../scenario-core/command/index'
 
 export function initApplication() {
 

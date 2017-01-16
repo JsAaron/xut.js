@@ -1,4 +1,4 @@
-import closeButton from './close.button'
+import { closeButton } from './close-button'
 import { config } from '../../config/index'
 
 const transform = Xut.style.transform
@@ -12,24 +12,20 @@ const START_Y = 0
 /**
  * 缩放、平移操作
  */
-export default class PinchPan {
+export class PinchPan {
 
     constructor({
         $pagePinch,
         hasButton = true,
         update,
-        doubletapBan = false, //默认双击不关闭
-        doubletap, //双击
-        tap //单机
+        tapClose = false, //支持单击关闭
+        tapCallabck //关闭回调
     }) {
 
-        this.update = update
-        this.doubletapHander = doubletap
-        this.doubletapBan = doubletapBan
-        this.tapHander = tap
-
-        //是否配置关闭按钮
         this.hasButton = hasButton
+        this.update = update
+        this.tapClose = tapClose
+        this.tapCallabck = tapCallabck
 
         //缩放根节点
         this.$pinchNode = $pagePinch
@@ -60,6 +56,12 @@ export default class PinchPan {
          * @type {Number}
          */
         this.overflowValue = 0.3
+
+        /**
+         * 已经缩放
+         * @type {Boolean}
+         */
+        this.hasZoom = false
 
         /**
          * 缩放中
@@ -108,21 +110,28 @@ export default class PinchPan {
         this.hammer.add(new Hammer.Pinch({ threshold: 0 })).recognizeWith(this.hammer.get('pan'))
 
         //配置双击影响
-        if (!this.doubletapBan) {
-            this.hammer.add(new Hammer.Tap({ event: 'doubletap', taps: 2, posThreshold: 30 }))
-        }
+        // if(!this.doubletapBan) {
+        //     this.hammer.add(new Hammer.Tap({ event: 'doubletap', taps: 2, posThreshold: 30 }))
+        // }
 
         this.hammer.add(new Hammer.Tap())
 
-        _.each({
-            'doubletap': '_onDoubletap',
+        let bindHash = {
             'pinchstart': '_onPinchStart',
             'pinchmove': '_onPinchMove',
             'pinchend': '_onPinchEnd',
             'panstart panmove': '_onPan',
             'panend': '_onPanEnd',
             'pinchcancel': '_onPinchEnd'
-        }, (value, key) => {
+        }
+
+        //如果单击关闭存在，就增加
+        //否则不能阻止外部的事件关闭
+        if(this.tapClose) {
+            bindHash['tap'] = '_onTap'
+        }
+
+        _.each(bindHash, (value, key) => {
             this.hammer.on(key, (e) => {
                 e.preventDefault()
                 e.srcEvent.stopPropagation()
@@ -131,12 +140,23 @@ export default class PinchPan {
         })
     }
 
-    _onDoubletap() {
-        if (this.doubletapHander) {
-            this.doubletapHander()
+    /**
+     * 如果启动了单击关闭
+       并且有缩放
+     * @return {[type]} [description]
+     */
+    _onTap() {
+        if(this.tapCallabck) {
+            this.tapCallabck()
         } else {
-            this.reset()
+            if(this.tapClose && this.data.scale != 1) {
+                this.reset()
+            }
         }
+    }
+
+    _onDoubletap() {
+        this.reset()
     }
 
     _onPinchStart(ev) {
@@ -151,8 +171,8 @@ export default class PinchPan {
     _onPinchMove(ev) {
 
         //允许溢出值
-        if (!this.scaleing) {
-            if (ev.scale < this.overflowValue + 1) {
+        if(!this.scaleing) {
+            if(ev.scale < this.overflowValue + 1) {
                 return
             }
             this.scaleing = true
@@ -162,7 +182,7 @@ export default class PinchPan {
         scale = this.lastScale * scale
 
         //限定缩放的倍数
-        if (scale > this.maxScale) {
+        if(scale > this.maxScale) {
             return
         }
 
@@ -180,7 +200,7 @@ export default class PinchPan {
      * @return {[type]} [description]
      */
     _onPinchEnd(ev) {
-        if (this.data.scale <= 1) {
+        if(this.data.scale <= 1) {
             Xut.nextTick(() => {
                 this._initState()
                 this._updateNodeStyle(500)
@@ -196,8 +216,8 @@ export default class PinchPan {
      * @return {[type]}    [description]
      */
     _onPan(ev) {
-        if (this._isRunning) {
-            if (this.currentX != START_X || this.currentY != START_Y) {
+        if(this._isRunning) {
+            if(this.currentX != START_X || this.currentY != START_Y) {
                 this.data.translate = {
                     x: this.currentX + ev.deltaX,
                     y: this.currentY + ev.deltaY
@@ -229,24 +249,24 @@ export default class PinchPan {
      * @return {Boolean} [description]
      */
     _isBoundry() {
-        if (this._isRunning) {
+        if(this._isRunning) {
             var horizontalBoundry = (this.data.scale - 1) / 2 * this._offsetWidth
             var verticalBoundry = (this.data.scale - 1) / 2 * this._offsetHeight
 
             //左边界
-            if (this.data.translate.x >= horizontalBoundry) {
+            if(this.data.translate.x >= horizontalBoundry) {
                 this.data.translate.x = horizontalBoundry
             }
             //右边界
-            if (this.data.translate.x <= -horizontalBoundry) {
+            if(this.data.translate.x <= -horizontalBoundry) {
                 this.data.translate.x = -horizontalBoundry
             }
             //上边界
-            if (this.data.translate.y >= verticalBoundry) {
+            if(this.data.translate.y >= verticalBoundry) {
                 this.data.translate.y = verticalBoundry
             }
             //下边界
-            if (this.data.translate.y <= -verticalBoundry) {
+            if(this.data.translate.y <= -verticalBoundry) {
                 this.data.translate.y = -verticalBoundry
             }
 
@@ -263,7 +283,7 @@ export default class PinchPan {
      * @return {[type]} [description]
      */
     _updateNodeStyle(speed = 0) {
-        if (!this.ticking) {
+        if(!this.ticking) {
             Xut.nextTick(() => {
                 const data = this.data
                 const styleText =
@@ -288,7 +308,6 @@ export default class PinchPan {
         this._updateNodeStyle(500)
     }
 
-
     /**
      * 创建按钮
      * @return {[type]} [description]
@@ -310,11 +329,11 @@ export default class PinchPan {
      */
     _buttonShow() {
         //to heavy
-        if (this._isRunning) return
-        if (this.data.scale > 1) {
+        if(this._isRunning) return
+        if(this.data.scale > 1) {
             //必须启动配置
-            if (this.hasButton) {
-                if (this.$buttonNode) {
+            if(this.hasButton) {
+                if(this.$buttonNode) {
                     Xut.nextTick(() => {
                         this.$buttonNode.show()
                     })
@@ -333,7 +352,7 @@ export default class PinchPan {
      * @return {[type]} [description]
      */
     _buttonHide() {
-        if (!this._isRunning) return
+        if(!this._isRunning) return
         this.hasButton && this.$buttonNode.hide()
         this._isRunning = false
         Xut.Application.Allowliding() //全局滑动
@@ -342,7 +361,7 @@ export default class PinchPan {
 
 
     destroy() {
-        if (this.$buttonNode) {
+        if(this.$buttonNode) {
             this.$buttonNode.off()
             this.$buttonNode = null
         }

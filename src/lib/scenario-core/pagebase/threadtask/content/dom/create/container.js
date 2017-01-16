@@ -1,5 +1,5 @@
 import { reviseSize } from '../../../../../../util/option'
-import { parseContentDas } from '../parsecontent'
+import { parseContentDas } from '../parse/content'
 
 /**
  * 针对容器类型的处理

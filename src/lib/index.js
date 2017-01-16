@@ -1,15 +1,15 @@
 import { config } from './config/index'
 import { initGlobalAPI } from './global-api/index'
-import { AudioManager } from './core/component/audio/manager'
-import { VideoManager } from './core/component/video/manager'
-import { fixAudio } from './core/component/audio/fix'
+import { AudioManager } from './scenario-core/component/audio/manager'
+import { VideoManager } from './scenario-core/component/video/manager'
+import { fixAudio } from './scenario-core/component/audio/fix'
 import { nextTick } from './util/nexttick'
 import { initNode } from './initialize/depend/node'
 import init from './initialize/index'
 
 initGlobalAPI()
 
-Xut.Version = 875.9
+Xut.Version = 876
 
 if(Xut.plat.isBrowser) {
 

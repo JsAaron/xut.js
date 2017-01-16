@@ -1,5 +1,5 @@
 import { config } from '../../../config/index'
-import assignedTasks from './assign'
+import assignedTasks from './assign-task'
 import initstate from './states'
 import Pinch from './pinch'
 
@@ -49,10 +49,19 @@ export default function(instance) {
                  * 获取包含容器
                  * @return {[type]} [description]
                  */
-                const $containsElement = $pageNode.children('.page-pinch')
+                const $containsElement = $pageNode.find('.page-pinch > div:first-child')
                 instance.getContainsNode = function() {
                     return $pseudoElement ? $pseudoElement : $containsElement
                 }
+                //页眉页脚
+                instance.getHeadFootNode = function() {
+                    return $pageNode.find('.page-pinch > div:last-child')
+                }
+                //缩放根节点
+                instance.getPinchNode = function() {
+                    return $pseudoElement ? $pseudoElement : $pageNode.find('.page-pinch')
+                }
+
 
                 setNextRunTask('background')
 
@@ -61,7 +70,7 @@ export default function(instance) {
                 createRelated.preforkComplete()
 
                 //视觉差不管
-                if (instance.isMaster) {
+                if(instance.isMaster) {
                     instance.nextTasks({
                         'taskName': '外部Background',
                         'outNextTasks': function() {
@@ -82,7 +91,7 @@ export default function(instance) {
                 setNextRunTask('flow')
 
                 //针对当前页面的检测
-                if (!createRelated.tasksHang || instance.isMaster) {
+                if(!createRelated.tasksHang || instance.isMaster) {
                     instance.nextTasks({
                         'taskName': '外部widgets',
                         outNextTasks: function() {
@@ -92,7 +101,7 @@ export default function(instance) {
                 }
 
                 //如果有挂起任务，则继续执行
-                if (createRelated.tasksHang) {
+                if(createRelated.tasksHang) {
                     createRelated.tasksHang();
                 }
             })
@@ -120,8 +129,8 @@ export default function(instance) {
                 //页面类型
                 //如果启用了页面缩放
                 //获取开启了全部缩放
-                if (isPageType && (config.salePageType === 'page' || config.salePageType === 'all')) {
-                    let $pagePinch = instance.getContainsNode()
+                if(isPageType && (config.salePageType === 'page' || config.salePageType === 'all')) {
+                    let $pagePinch = instance.getPinchNode()
                     instance._pinchObj = new Pinch(
                         $pagePinch,
                         instance.pageIndex
@@ -133,7 +142,7 @@ export default function(instance) {
             //因为设计chapter只有一个flow效果，所以直接跳过别的创建
             //只处理页面类型
             //母版跳过
-            if (isPageType && instance.chapterData.note == 'flow') {
+            if(isPageType && instance.chapterData.note == 'flow') {
                 callContextTasks('Flow', function() {
                     // createPinch('flow')
                     setNextRunTask('complete')

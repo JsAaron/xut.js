@@ -10,14 +10,14 @@ const createCloseIcon = function(right, top) {
     const width = screenSize.width
     const height = screenSize.height
     if(width > height) {
-          html=
-        `<div class="page-pinch-close" style="position: absolute;right:${right}px;top:${top}px;">
+        html =
+            `<div class="page-pinch-close" style="position: absolute;right:${right}px;top:${top}px;">
            <div class="si-icon Flaticon flaticon-error" style="font-size:5.3vw;border-radius:50%;right:0">
            </div>
         </div>`
-    }else {
-          html=
-        `<div class="page-pinch-close" style="position: absolute;right:${right}px;top:${top}px;">
+    } else {
+        html =
+            `<div class="page-pinch-close" style="position: absolute;right:${right}px;top:${top}px;">
              <div class="si-icon Flaticon flaticon-error" style="font-size:5.3vh;border-radius:50%;right:0;"></div>
         </div>`
     }
@@ -30,7 +30,7 @@ const createCloseIcon = function(right, top) {
  * 创建关闭按钮
  * @return {[type]} [description]
  */
-export default function pinchButton(callback, right = 0, top = 0) {
+export function pinchButton(callback, right = 0, top = 0) {
     const $closeNode = createCloseIcon(right + 4, top + 8)
     $closeNode.on("touchend mouseup", function() {
         callback();

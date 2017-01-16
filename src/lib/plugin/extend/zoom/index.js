@@ -1,5 +1,5 @@
 import { config } from '../../../config/index'
-import PinchPan from '../pinch.pan'
+import { PinchPan } from '../pinch-pan'
 import {
     $$on,
     $$off
@@ -22,7 +22,7 @@ import { sceneController } from '../../../scenario/controller'
  * 图片缩放功能
  * 2016.12.5
  */
-export default class Zoom {
+export class Zoom {
 
     constructor({
         element, //img node
@@ -32,10 +32,10 @@ export default class Zoom {
     }) {
 
         let current = sceneController.containerObj('current')
-        if (current && current.$rootNode) {
+        if(current && current.$rootNode) {
             this.$container = current.$rootNode
         }
-        if (!this.$container.length) {
+        if(!this.$container.length) {
             $$warn('图片缩放依赖的容器不存在')
             return
         }
@@ -44,7 +44,7 @@ export default class Zoom {
         //所以坐标的算法是有区别了
         let containerLeft = 0
         let containerTop = 0
-        if (config.viewSize.left) {
+        if(config.viewSize.left) {
             containerLeft = config.viewSize.left
             containerTop = config.viewSize.top
         }
@@ -81,7 +81,7 @@ export default class Zoom {
     _init() {
         this._initSingleView()
         this._bindTapClose()
-        if (!this.targetSize) {
+        if(!this.targetSize) {
             this.targetSize = this._getData()
         }
         this._startZoom()
@@ -100,7 +100,7 @@ export default class Zoom {
         this.$flyNode = this.$singleView.find('.xut-zoom-fly')
 
         //关闭按钮
-        if (this.hasButton) {
+        if(this.hasButton) {
             this.$closeButton = this.$singleView.find('.xut-zoom-close')
             this.callbackEnd = () => {
                 this._closeSingleView()
@@ -127,12 +127,12 @@ export default class Zoom {
 
         //如果有宽度溢出
         //就是说用了窗口指定模式
-        if (config.viewSize.left) {
+        if(config.viewSize.left) {
             view = config.viewSize
         }
 
         //虚拟模拟3下，宽度可能溢出，所以需要取屏幕宽度
-        if (config.visualMode === 3) {
+        if(config.visualMode === 3) {
             view = config.screenSize
             overflowLeft = config.viewSize.left
         }
@@ -190,7 +190,7 @@ export default class Zoom {
     _createHQIMG(position, src, success, fail) {
 
         //如果高清图已经存在
-        if (this.$hQNode) {
+        if(this.$hQNode) {
             this.$hQNode.show()
             success()
             return
@@ -206,7 +206,7 @@ export default class Zoom {
 
         //图片失败处理
         function isFail() {
-            if (hasFail) {
+            if(hasFail) {
                 return
             }
             hasFail = true
@@ -217,7 +217,7 @@ export default class Zoom {
         img.onload = function() {
             //关闭动画正在执行中
             //这里要强制退出
-            if (self.isCloseAniming) {
+            if(self.isCloseAniming) {
                 isFail()
                 return
             }
@@ -238,11 +238,13 @@ export default class Zoom {
     }
 
     _bindPan($imgNode) {
-        if (!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
+        if(!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
+            let tapCallabck = () => this._closeSingleView()
             this.slideObj = new PinchPan({
                 hasButton: false,
-                doubletapBan: true, //禁止双击事件
-                $pagePinch: $imgNode
+                $pagePinch: $imgNode,
+                tapClose: true,
+                tapCallabck
             })
         }
     }
@@ -252,18 +254,18 @@ export default class Zoom {
      */
     _addPinchPan() {
         //高清图
-        if (this.$hQNode) {
+        if(this.$hQNode) {
             //如果高清图存在
             //因为高清可能是加载有延时
             //所以可能存在fly图先加载过的情况，这里需要直接清理
-            if (this._hasBindFlyPan) {
+            if(this._hasBindFlyPan) {
                 this._hasBindFlyPan = false
                 this._destroyRelated()
             }
             this._bindPan(this.$hQNode)
         }
         //普通图
-        else if (this.$flyNode) {
+        else if(this.$flyNode) {
             this._hasBindFlyPan = true
             this._bindPan(this.$flyNode)
         }
@@ -290,10 +292,17 @@ export default class Zoom {
         }
         let end = e => {
             this._stopDefault(e)
-            if (!isMove) {
-                this._closeSingleView()
+            if(!isMove) {
+                if(this.slideObj) {
+                    //如果有zoom对象后，关闭由zoom接管
+                    //因为缩放的情况下，如果没有移动页面，会默认关闭
+                    //这个逻辑是不对的，只能让zoom自己检测
+                } else {
+                    this._closeSingleView()
+                }
             }
         }
+
         /********************************
          * 设置全局容器捕获处理
          ********************************/
@@ -311,7 +320,7 @@ export default class Zoom {
      */
     _replaceHQIMG(position, src) {
         //高清图
-        if (this.hdSrc) {
+        if(this.hdSrc) {
             this._createHQIMG(position, src, (speed = 200) => {
                 //第一次高清图切换
                 execAnimation({
@@ -350,7 +359,7 @@ export default class Zoom {
             display: 'block'
         })
 
-        if (this.$hQNode) {
+        if(this.$hQNode) {
             let position = this.targetSize.position
             this.$hQNode.css({
                 width: position.width,
@@ -361,13 +370,13 @@ export default class Zoom {
             })
         }
 
-        if (this.hasButton) {
+        if(this.hasButton) {
             this.$closeButton.show()
         }
 
         this.$overlay.css('opacity', 0)
 
-        if (this.slideObj) {
+        if(this.slideObj) {
             this.slideObj.reset()
         }
     }
@@ -377,13 +386,13 @@ export default class Zoom {
      * @return {[type]} [description]
      */
     _closeSingleView() {
-        if (this.isCloseAniming) {
+        if(this.isCloseAniming) {
             return
         }
         this.isCloseAniming = true
         let $imgNode = this.$hQNode ? this.$hQNode : this.$flyNode
 
-        if (this.hasButton) {
+        if(this.hasButton) {
             this.$closeButton.hide()
         }
 
@@ -424,7 +433,7 @@ export default class Zoom {
      * 销毁相关的一些数据
      */
     _destroyRelated() {
-        if (this.slideObj) {
+        if(this.slideObj) {
             this.slideObj.destroy()
             this.slideObj = null
         }
@@ -442,7 +451,7 @@ export default class Zoom {
         $$off(this.$singleView)
 
         //关闭按钮
-        if (this.hasButton) {
+        if(this.hasButton) {
             $$off(this.$closeButton)
             this.$closeButton = null
         }

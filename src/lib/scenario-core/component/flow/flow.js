@@ -7,8 +7,8 @@ import render from './render'
 import getFlipDistance from '../../../visuals/distance'
 import { getFlowView } from '../../../visuals/hooks/adapter'
 
-import Zoom from '../../../plugin/extend/zoom/index'
-import closeButton from '../../../plugin/extend/close.button'
+import { Zoom } from '../../../plugin/extend/zoom/index'
+import { closeButton } from '../../../plugin/extend/close-button'
 
 /**
  * 2017.9.7
@@ -24,13 +24,11 @@ export default class Flow {
         chapterId,
         successCallback
     }) {
-
         let self = this
         this.initIndex = pageIndex
         this.$pinchNode = $pinchNode
         this.pptMaster = pptMaster
         this.zoomObjs = {}
-
         render({
             $pinchNode,
             dataNode: $('#chapter-flow-' + chapterId),
@@ -47,10 +45,10 @@ export default class Flow {
      * @return {[type]} [description]
      */
     _getMasterObj() {
-        if (this._masterObj) {
+        if(this._masterObj) {
             return this._masterObj
         }
-        if (this.pptMaster) {
+        if(this.pptMaster) {
             this._masterObj = Xut.Presentation.GetPageObj('master', this.initIndex)
         }
     }
@@ -62,13 +60,13 @@ export default class Flow {
     _zoomImage(node) {
         //图片地址
         let src = config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
-        if (this.zoomObjs[src]) {
+        if(this.zoomObjs[src]) {
             //重复调用
             this.zoomObjs[src].play()
         } else {
             //如果配置了高清后缀
             let hqSrc
-            if (config.hqUrlSuffix) {
+            if(config.hqUrlSuffix) {
                 let index = src.lastIndexOf('.')
                 let imgType = src.substring(index + 1, src.length)
                 hqSrc = src.replace(imgType, `${config.hqUrlSuffix}.` + imgType)
@@ -91,7 +89,7 @@ export default class Flow {
     _makeNodes(count) {
         let nodes = []
         let ratio = 1 / (count - 1) //比值
-        for (let i = 1; i < count; i++) {
+        for(let i = 1; i < count; i++) {
             nodes.push(i * ratio)
         }
         nodes.push(0)
@@ -120,7 +118,7 @@ export default class Flow {
         const container = $container[0]
 
         let nodes
-        if (this.pptMaster) {
+        if(this.pptMaster) {
             nodes = this._makeNodes(pagesCount)
         }
 
@@ -145,15 +143,15 @@ export default class Flow {
 
         swipe.$watch('onTap', (pageIndex, hookCallback, ev, duration) => {
             //如果是长按，是针对默认的事件处理
-            if (config.supportQR && duration && duration > 500) {
+            if(config.supportQR && duration && duration > 500) {
                 return
             }
             //图片缩放
             const node = ev.target
-            if (node && node.nodeName.toLowerCase() === "img") {
+            if(node && node.nodeName.toLowerCase() === "img") {
                 this._zoomImage(node)
             }
-            if (!Xut.Contents.Canvas.getIsTap()) {
+            if(!Xut.Contents.Canvas.getIsTap()) {
                 View.Toolbar()
             }
         });
@@ -173,12 +171,12 @@ export default class Flow {
              * @param  {[type]} this._hindex [description]
              * @return {[type]}              [description]
              */
-            if (this._hindex === MIN && this.direction === 'prev') {
-                if (action === 'flipOver') {
+            if(this._hindex === MIN && this.direction === 'prev') {
+                if(action === 'flipOver') {
                     View.GotoPrevSlide()
                     this.simulationComplete()
                 } else {
-                    if (config.viewSize.overflowWidth) {
+                    if(config.viewSize.overflowWidth) {
                         //内部页面边间翻页
                         //要除去被溢出的值
                         distance -= viewLeft
@@ -192,14 +190,14 @@ export default class Flow {
              * @param  {[type]} this._hindex [description]
              * @return {[type]}              [description]
              */
-            else if (this._hindex === MAX && this.direction === 'next') {
-                if (action === 'flipOver') {
+            else if(this._hindex === MAX && this.direction === 'next') {
+                if(action === 'flipOver') {
                     View.GotoNextSlide()
                     this.simulationComplete()
                 } else {
                     //内部页面边间翻页
                     //要除去被溢出的值
-                    if (config.viewSize.overflowWidth) {
+                    if(config.viewSize.overflowWidth) {
                         distance -= viewLeft
                     }
                     //后边界前移反弹
@@ -213,7 +211,7 @@ export default class Flow {
 
                 //修正内部翻页的翻页算法
                 let hooks
-                if (config.viewSize.overflowWidth) {
+                if(config.viewSize.overflowWidth) {
                     hooks = {
                         flipOver: {
                             left(data) {
@@ -234,7 +232,7 @@ export default class Flow {
 
                 moveDistance = viewBeHideDistance
 
-                switch (direction) {
+                switch(direction) {
                     case 'next':
                         moveDistance = moveDistance + lastDistance
                         break
@@ -244,8 +242,8 @@ export default class Flow {
                 }
 
                 //反弹
-                if (action === 'flipRebound') {
-                    if (direction === 'next') {
+                if(action === 'flipRebound') {
+                    if(direction === 'next') {
                         //右翻页，左反弹
                         moveDistance = (-flipWidth * this._hindex)
                     } else {
@@ -255,7 +253,7 @@ export default class Flow {
                 }
 
                 //更新页码
-                if (action === 'flipOver') {
+                if(action === 'flipOver') {
                     Xut.View.PageUpdate({
                         parentIndex: initIndex,
                         sonIndex: swipe.getHindex() + 1,
@@ -267,7 +265,7 @@ export default class Flow {
                 //移动视觉差
                 let moveParallaxObject = () => {
                     let masterObj = flowObject._getMasterObj()
-                    if (masterObj) {
+                    if(masterObj) {
                         //处理当前页面内的视觉差对象效果
                         masterObj.moveParallax({
                             action,
@@ -302,7 +300,7 @@ export default class Flow {
     destroy() {
 
         //销毁缩放图片
-        if (Object.keys(this.zoomObjs).length) {
+        if(Object.keys(this.zoomObjs).length) {
             _.each(this.zoomObjs, (obj, key) => {
                 obj.destroy()
                 this.zoomObjs[key] = null

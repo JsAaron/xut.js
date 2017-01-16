@@ -4,11 +4,11 @@ import DeputyBar from '../toolbar/deputy-fnbar'
 import BookBar from '../toolbar/word-bookbar/index'
 import NumberBar from '../toolbar/page-number'
 import { sceneController } from './controller'
-import Mediator from '../core/mediator'
+import Mediator from '../scenario-core/index'
 import {
     getFlowCount,
     getFlowChpaterCount
-} from '../core/component/flow/get'
+} from '../scenario-core/component/flow/get'
 import {
     mainScene,
     deputyScene

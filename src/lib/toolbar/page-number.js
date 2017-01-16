@@ -4,7 +4,7 @@ import {
     hasFlow,
     getBeforeCount,
     getCurrentBeforeCount
-} from '../core/component/flow/get'
+} from '../scenario-core/component/flow/get'
 
 /**
  * 页码显示

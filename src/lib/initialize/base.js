@@ -1,5 +1,5 @@
 import { createCursor } from './depend/cursor'
-import { contentFilter } from '../core/component/activity/content/filter'
+import { contentFilter } from '../scenario-core/component/activity/content/filter'
 import { importJsonDatabase } from '../database/result'
 
 import { loader } from '../util/index'
@@ -11,7 +11,7 @@ import {
 } from '../config/index'
 
 import initTooBar from './toolbar'
-import initFlows from '../core/component/flow/layout'
+import initFlows from '../scenario-core/component/flow/layout'
 
 /**
  * 加载svg的css

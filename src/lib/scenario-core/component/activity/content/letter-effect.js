@@ -3,7 +3,7 @@
  https://tympanus.net/codrops/2016/10/18/inspiration-for-letter-effects/
 ******************/
 
-export default class LetterEffect {
+export class LetterEffect {
 
     /**
      * 文本节点
@@ -41,7 +41,7 @@ export default class LetterEffect {
     _animate(action) {
         let fxName = this.fxQueue[this.queueIndex]
         let fxObj = this.fxQueue[++this.queueIndex]
-        if (fxName && fxObj) {
+        if(fxName && fxObj) {
             fxObj[action](fxName, () => {
                 ++this.queueIndex
                 this._animate(action)
