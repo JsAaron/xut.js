@@ -1,5 +1,4 @@
 
-
 /**
  * 滑动距离
  * @return {[type]} [description]

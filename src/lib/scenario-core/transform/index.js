@@ -13,9 +13,8 @@ import PageMgr from '../page'
 import MasterMgr from '../master'
 import goToPage from './topage'
 import { sceneController } from '../../scenario/controller'
-import { visualView } from '../../visuals/visual-config/view'
 import { getDistance } from '../../visuals/distance'
-import setStyle from '../../visuals/style'
+import styleConfig from '../../visuals/style-config'
 import { $$set, hash, $$warn } from '../../util/index'
 import Stack from '../../util/stack'
 
@@ -254,9 +253,8 @@ export default class Dispatcher {
          * @param  {[type]} hasFlows [description]
          * @return {[type]}            [description]
          */
-        const pageStyle = setStyle({
+        const pageStyle = styleConfig({
             action,
-            hasFlow,
             usefulData
         })
 
@@ -351,7 +349,7 @@ export default class Dispatcher {
             leftIndex,
             pageIndex,
             rightIndex
-        }, visualView())
+        })
 
         //视觉差页面滑动
         const chapterData = currObj.chapterData

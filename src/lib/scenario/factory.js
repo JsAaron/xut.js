@@ -194,10 +194,10 @@ export class SceneFactory {
         let columnCounts = getColumnCount(this.seasonId)
 
         //如果是min平台强制启动
-        if(Xut.config.platform === 'mini' || (config.toolType.number !== false && columnCounts)) {
+        if(Xut.config.platform === 'mini' 
+            || (config.toolType.number !== false && columnCounts)) {
             let columnChpterCount = 0
             if(columnCounts) {
-                //获取分栏的chapter数，总数需要减去
                 columnChpterCount = getColumnChpaterCount(this.seasonId)
             }
             this.numberToolbar = new NumberBar({

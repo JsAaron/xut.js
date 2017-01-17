@@ -1,7 +1,7 @@
 import Stack from '../util/stack'
 import { visualView } from './visual-config/view'
 import { visualProportion } from './visual-config/proportion'
-import { visualTranslate } from './visual-config/translate'
+import { visualInitTranslate } from './visual-config/translate'
 
 /**
  * 自定义样式页面容器的样式
@@ -10,9 +10,8 @@ import { visualTranslate } from './visual-config/translate'
  * 是否初始化创建
  * @return {[type]} [description]
  */
-export default function setStyleConfig({
+export default function styleConfig({
     action,
-    hasFlow,
     usefulData
 }) {
 
@@ -24,30 +23,7 @@ export default function setStyleConfig({
         return this[this['_' + pageName]]
     }
 
-    /**
-     * 判断是否存在flow页面
-     * middle
-     * before
-     * after
-     * @param  {[type]}  pageName [description]
-     * @return {Boolean}          [description]
-     */
-    usefulData.hasFlow = function(pageName) {
-        let key, value
-        for (key in this) {
-            value = this[key]
-            if (_.isFunction(value)) {
-                continue;
-            }
-            if (value.direction == pageName) {
-                return value.isFlows
-            }
-        }
-    }
-
-
     let compile = new Stack()
-
     _.each(usefulData, function(data, index) {
 
         //跳过getStyle方法
@@ -66,13 +42,11 @@ export default function setStyleConfig({
             data.dynamicProportion = visualProportion(data)
 
             //设置容器样式
-            let translate = visualTranslate({
+            let translate = visualInitTranslate({
                 createIndex: data.pid,
                 currIndex: data.visiblePid,
                 direction: data.direction,
-                viewWidth: data.viewWidth,
-                overflowLeft: data.overflowLeft,
-                dynamicVisualMode: data.dynamicVisualMode
+                viewWidth: data.viewWidth
             })
 
             //提供快速索引

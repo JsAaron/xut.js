@@ -42,14 +42,12 @@ const mixHooks = function(original, hook) {
  * @param  {Object} currIndex                     } [description]
  * @return {[type]}               [description]
  */
-export function visualTranslate({
+export function visualInitTranslate({
     hooks = {},
     createIndex,
     currIndex,
     direction,
-    viewWidth,
-    overflowLeft,
-    dynamicVisualMode
+    viewWidth
 }) {
 
     let translate
@@ -62,31 +60,19 @@ export function visualTranslate({
 
     switch (direction) {
         case 'before':
-            if (dynamicVisualMode === 3) {
-                offsetLeft = -viewWidth + overflowLeft
-            } else {
-                offsetLeft = -viewWidth
-            }
+            offsetLeft = -viewWidth
             offsetLeft = mixHooks(offsetLeft, hooks.left)
             translate = createTranslate(offsetLeft)
             offset = offsetLeft
             break;
         case 'middle':
-            if (dynamicVisualMode === 3) {
-                offsetMiddle = overflowLeft
-            } else {
-                offsetMiddle = 0
-            }
+            offsetMiddle = 0
             offsetMiddle = mixHooks(offsetMiddle, hooks.middle)
             translate = createTranslate(offsetMiddle)
             offset = offsetMiddle
             break;
         case 'after':
-            if (dynamicVisualMode === 3) {
-                offsetRight = viewWidth + overflowLeft
-            } else {
-                offsetRight = viewWidth
-            }
+            offsetRight = viewWidth
             offsetRight = mixHooks(offsetRight, hooks.right)
             translate = createTranslate(offsetRight)
             offset = offsetRight

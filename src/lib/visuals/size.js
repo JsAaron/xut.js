@@ -19,14 +19,15 @@ export default function getViewSize(config, fullProportion, setVisualMode) {
     setVisualMode = setVisualMode || config.visualMode
 
     /**
-     * 模式2：宽度100%，正比缩放高度
+     * 模式2：
+     * 宽度100%，正比缩放高度
      */
-    if(setVisualMode === 2) {
+    if (setVisualMode === 2) {
 
         //竖版PPT
-        if(config.pptVertical) {
+        if (config.pptVertical) {
             //竖版显示
-            if(config.screenVertical) {
+            if (config.screenVertical) {
                 newHeight = fullProportion.pptHeight * fullProportion.width
                 newTop = (screenHeight - newHeight) / 2
             }
@@ -38,9 +39,9 @@ export default function getViewSize(config, fullProportion, setVisualMode) {
         }
 
         //横版PPT
-        if(config.pptHorizontal) {
+        if (config.pptHorizontal) {
             //竖版显示(宽度100%。上下自适应，显示居中小块)
-            if(config.screenVertical) {
+            if (config.screenVertical) {
                 newHeight = fullProportion.pptHeight * fullProportion.width
                 newTop = (screenHeight - newHeight) / 2
             }
@@ -51,31 +52,58 @@ export default function getViewSize(config, fullProportion, setVisualMode) {
          * 保证模式2高度不能溢出分辨率最大距离
          * @return {[type]}            [description]
          */
-        if(newHeight > screenHeight) {
+        if (newHeight > screenHeight) {
             newHeight = screenHeight
             newTop = 0
         }
     }
 
-    /**
-     * 模式3：高度100%，正比缩放宽度
-     */
-    if(setVisualMode === 3) {
 
+    /**
+     * 模式3：
+     * 高度100%,宽度溢出可视区隐藏
+     */
+    if (setVisualMode === 3) {
         //竖版PPT
-        if(config.pptVertical) {
+        if (config.pptVertical) {
             //竖版显示
-            //高度100%，宽度溢出
-            if(config.screenVertical) {
+            //高度100%，宽度溢出隐藏
+            if (config.screenVertical) {
                 newWidth = fullProportion.pptWidth * fullProportion.height
                 newLeft = (screenWidth - newWidth) / 2
             }
         }
 
         //横版PPT
-        if(config.pptHorizontal) {
+        if (config.pptHorizontal) {
+            if (config.screenVertical) {
+                console.log('模式3')
+            }
+        }
+
+    }
+
+
+    /**
+     * 模式4：
+     * 高度100%，正比缩放宽度
+     */
+    if (setVisualMode === 4) {
+
+        //竖版PPT
+        if (config.pptVertical) {
+            //竖版显示
+            //高度100%，宽度溢出
+            if (config.screenVertical) {
+                newWidth = fullProportion.pptWidth * fullProportion.height
+                newLeft = (screenWidth - newWidth) / 2
+            }
+        }
+
+        //横版PPT
+        if (config.pptHorizontal) {
             //竖版显示(宽度100%。上下自适应，显示居中小块)
-            if(config.screenVertical) {
+            if (config.screenVertical) {
                 newHeight = fullProportion.pptHeight * fullProportion.width
                 newTop = (screenHeight - newHeight) / 2
             }

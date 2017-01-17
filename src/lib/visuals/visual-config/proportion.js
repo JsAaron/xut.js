@@ -5,7 +5,7 @@ import { dynamicProportion } from '../../config/index'
  * @return {[type]} [description]
  */
 export function visualProportion(data) {
-    if (data.needResetProportion) {
+    if (data.needRecalculate) {
         return dynamicProportion({
             width: data.viewWidth,
             height: data.viewHeight,
