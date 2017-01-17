@@ -13,8 +13,7 @@ const createContainerWrap = (containerName, contentId, pid, getStyle) => {
     const contentDas = parseContentDas([contentId])
     const data = reviseSize({
         results: contentDas[0],
-        hasFlow: getStyle.isFlows,
-        dynamicProportion: getStyle.dynamicProportion
+        proportion: getStyle.dynamicProportion
     })
 
     const wapper =

@@ -77,8 +77,7 @@ TaskComponents.prototype = {
                     //缩放比
                     activityData = reviseSize({
                         results: activityData,
-                        hasFlow: data.getStyle.isFlows,
-                        dynamicProportion: data.getStyle.dynamicProportion
+                        proportion: data.getStyle.dynamicProportion
                     });
                     startCreate(actType, activityData)
                     break;

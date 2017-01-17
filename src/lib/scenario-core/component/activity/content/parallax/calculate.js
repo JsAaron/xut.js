@@ -216,7 +216,7 @@ export function getInitProperty(property, nodeOffset, specialProperty) {
  */
 export function getStepProperty({
     nodes,
-    isFlows,
+    isColumn,
     distance,
     pageIndex,
     lastProperty,
@@ -240,7 +240,7 @@ export function getStepProperty({
 
     //这里有页面模式的配置处理
     //获取的页面翻页的区域值不一样
-    let size = isFlows ? config.screenSize : config.viewSize
+    let size = isColumn ? config.screenSize : config.viewSize
     let width = size.width
     let height = size.height
 

@@ -155,8 +155,6 @@ export default class Dispatcher {
 
         //收集有用的数据
         let usefulData = hash()
-        let hasFlow = false
-
         _.each(chpaterResults, (chapterData, index) => {
             compile.push((() => {
 
@@ -173,12 +171,7 @@ export default class Dispatcher {
                     self.options.chapterId = chapterData._id
                 }
 
-                //确定存在flows类型页面
-                let isFlows = chapterData.note === 'flow'
-                if (isFlows) {
-                    hasFlow = true
-                }
-
+  
                 //跳转的时候，创建新页面可以自动样式信息
                 //优化设置，只是改变当前页面即可
                 if (toPageAction && visibleChapterIndex !== createChapterIndex) {
@@ -187,13 +180,12 @@ export default class Dispatcher {
 
                 //收集页面之间可配置数据
                 usefulData[createChapterIndex] = {
-                    isFlows: isFlows,
                     pid: createChapterIndex,
                     visiblePid: visibleChapterIndex,
                     userStyle: userStyle,
                     direction: getDirection(createChapterIndex, visibleChapterIndex),
                     //新的页面模式
-                    dynamicVisualMode: this._getVisualMode(hasFlow, chapterData)
+                    dynamicVisualMode: this._getVisualMode(chapterData)
                 }
 
                 //延迟创建,先处理style规则
@@ -206,7 +198,6 @@ export default class Dispatcher {
                             'pid': createChapterIndex,
                             'visiblePid': visibleChapterIndex,
                             'chapterData': chapterData,
-                            'isFlows': isFlows,
                             'getStyle': pageStyle[createChapterIndex],
                             'pageIndex': pageIndex,
                             'multiplePages': multiplePages
@@ -250,17 +241,12 @@ export default class Dispatcher {
          * 创建页面的样式与翻页的布局
          * 存在存在flows页面处理
          * 这里创建处理的Transfrom
-         * @param  {[type]} hasFlows [description]
-         * @return {[type]}            [description]
          */
         const pageStyle = styleConfig({
             action,
             usefulData
         })
 
-        /**
-         * 执行编译
-         */
         compile.shiftAll(pageStyle).destroy()
     }
 
@@ -272,9 +258,9 @@ export default class Dispatcher {
      * 母版关联的页面必须跟这个参数统一
      * @return {[type]} [description]
      */
-    _getVisualMode(hasFlow, chapterData) {
+    _getVisualMode(chapterData) {
         //flow页面返回1
-        if (hasFlow) {
+        if (chapterData.note === 'flow') {
             return 1
         }
         //如果有独立的页面模式

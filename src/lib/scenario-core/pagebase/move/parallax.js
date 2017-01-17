@@ -20,7 +20,7 @@ const translateParallax = function({
     speed,
     nodes,
     distance,
-    isFlows
+    isColumn
 }) {
 
     let lastProperty = scope.lastProperty
@@ -38,7 +38,7 @@ const translateParallax = function({
     //每次单步变化属性值
     let stepProperty = getStepProperty({
         nodes,
-        isFlows,
+        isColumn,
         distance,
         lastProperty,
         pageIndex,
@@ -124,8 +124,8 @@ export default function(baseProto) {
             return
         }
 
-        //是flow页面，那么翻页的参数需要转化
-        let isFlows = base.getStyle.isFlows
+        //是珊栏页面，那么翻页的参数需要转化
+        let isColumn = base.getStyle.dynamicVisualMode === 1
 
         //移动距离
         let distance = moveDist.length ? moveDist[1] : moveDist
@@ -177,7 +177,7 @@ export default function(baseProto) {
                         speed,
                         nodes,
                         distance,
-                        isFlows
+                        isColumn
                     })
 
                 }

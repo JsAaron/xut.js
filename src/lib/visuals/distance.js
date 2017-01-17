@@ -47,7 +47,6 @@ export function getDistance({
      */
     let mixHooks = function(hookFunction) {
         if (hookFunction) {
-            offset.hasFlow = checkFlows
             offset.leftIndex = leftIndex
             offset.middleIndex = pageIndex
             offset.rightIndex = rightIndex

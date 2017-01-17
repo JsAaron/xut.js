@@ -360,9 +360,8 @@ export function contentStructure(callback, data, context) {
             //转换缩放比
             sizeResults = reviseSize({
                 results: wrapObj.data,
-                hasFlow: getStyle.isFlows,
                 fixRadio: content.fixRadio,
-                dynamicProportion: getStyle.dynamicProportion
+                proportion: getStyle.dynamicProportion
             })
 
             //正常模式下创建

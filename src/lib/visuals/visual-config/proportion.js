@@ -1,4 +1,4 @@
-import { dynamicProportion } from '../../config/index'
+import { config, dynamicProportion } from '../../config/index'
 
 /**
  * 修复动态的缩放比
@@ -12,5 +12,7 @@ export function visualProportion(data) {
             top: data.viewTop,
             left: data.viewLeft
         })
+    } else {
+        return config.proportion
     }
 }

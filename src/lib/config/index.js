@@ -299,7 +299,6 @@ export { config }
 
 /**
  * 销毁配置
- * @return {[type]} [description]
  */
 export function destroyConfig() {
     cacheVideoPath = null
@@ -312,7 +311,6 @@ export function destroyConfig() {
 /**
  * 初始化资源路径
  * 配置图片路径地址
- * @return {[type]} [description]
  */
 export function initPathAddress() {
     //设置资源缓存关闭
@@ -328,84 +326,41 @@ export function initPathAddress() {
 /**
  * 重写默认设置
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
- * @type {[type]}
  */
 const resetProportion = function(pptWidth, pptHeight) {
 
-    /**
-     * 数据ppt排版设计
-     */
+    //数据ppt排版设计
     if(pptWidth && pptHeight) {
         config.pptHorizontal = pptWidth > pptHeight ? true : false
         config.pptVertical = !config.pptHorizontal
     }
 
-    /**
-     * 获取全屏比值，用来设定view的尺寸
-     * 根据分辨率与PPT排版的比值来确定
-     */
+    //获取全屏比值，用来设定view的尺寸
+    //根据分辨率与PPT排版的比值来确定
     fullProportion = getFullProportion(config, pptWidth, pptHeight)
 
-    /**
-     * 可视区域尺寸
-     */
+    //可视区域尺寸
     let viewSize = config.viewSize = getViewSize(config, fullProportion)
 
-    /**
-     * 判断是否溢出与是否填充
-     */
+    //溢出宽度
     viewSize.overflowWidth = false
-    viewSize.notFillWidth = false
-
-    /**
-     * 快速获取溢出left正负
-     */
-    if(viewSize.left !== 0) {
-        viewSize.overflowLeftPositive = Math.abs(viewSize.left)
-        viewSize.overflowLeftNegative = -viewSize.overflowLeftPositive
-    }
-
     if(viewSize.left < 0) {
-        //溢出宽度
         viewSize.overflowWidth = Math.abs(viewSize.left) * 2
-    } else if(viewSize.left > 0) {
-        //没有填满宽度
-        viewSize.notFillWidth = true
     }
 
-    /**
-     * 溢出高度
-     * */
+    //溢出高度
     viewSize.overflowHeight = false
-    viewSize.notFillHeight = false
     if(viewSize.top < 0) {
-        //溢出宽度
         viewSize.overflowHeight = true
-    } else if(viewSize.top > 0) {
-        //没有填满宽度
-        viewSize.notFillHeight = true
     }
 
-    /**
-     * 获取全局缩放比
-     */
+    //获取全局缩放比
     proportion = config.proportion = getRealProportion(config, viewSize, fullProportion)
-
-    /**
-     * 2016.11.15
-     * 浮动页面缩放比
-     * 获取浮动页面缩放比
-     * 这个比较特殊
-     * 在模式3下面
-     * 母版是依赖的页面，如果页面是flow那么母版中的元素的缩放比需要调整
-     */
-    config.flowProportion = getFlowProportion(config, config.screenSize, fullProportion)
 }
 
 /**
  * 动态计算计算可视区View
  * 每个页面可以重写页面的view
- * @return {[type]} [description]
  */
 export function dynamicView(setVisualMode) {
     return getViewSize(config, fullProportion, setVisualMode)
@@ -414,8 +369,6 @@ export function dynamicView(setVisualMode) {
 /**
  * 动态计算缩放比
  * 每个页面可以重写页面的元素缩放比
- * @param  {[type]} setVisualMode [description]
- * @return {[type]}               [description]
  */
 export function dynamicProportion(newViewSize) {
     return getRealProportion(config, newViewSize, fullProportion)
@@ -429,24 +382,15 @@ export function dynamicProportion(newViewSize) {
  */
 export function initConfig(pptWidth, pptHeight) {
 
-    /**
-     * 获取分辨率
-     * @type {[type]}
-     */
+    //获取分辨率
     config.screenSize = getSize()
 
-    /**
-     * 根据设备判断设备的横竖屏
-     * @type {[type]}
-     */
+    //根据设备判断设备的横竖屏
     config.screenHorizontal = config.screenSize.width > config.screenSize.height ? true : false
     config.screenVertical = !config.screenHorizontal
 
-
     layoutMode = config.layoutMode = getLayerMode(config.screenSize)
 
-    /**
-     * 设置缩放比
-     */
+    //设置缩放比
     resetProportion(pptWidth, pptHeight)
 }
