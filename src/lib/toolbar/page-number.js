@@ -1,10 +1,10 @@
 import { config } from '../config/index'
 
 import {
-    hasFlow,
+    hasColumn,
     getBeforeCount,
     getCurrentBeforeCount
-} from '../scenario-core/component/flow/get'
+} from '../scenario-core/component/column/get'
 
 /**
  * 页码显示
@@ -91,7 +91,7 @@ export default class NumberBar {
         //从正索引开始
         ++parentIndex
 
-        if (!hasFlow()) {
+        if (!hasColumn()) {
             this._updateText(action, parentIndex)
             return
         }

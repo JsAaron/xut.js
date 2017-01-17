@@ -9,9 +9,9 @@ import {
 } from './calculate'
 
 import {
-    hasFlow,
-    getFlowCount
-} from '../../../flow/get'
+    hasColumn,
+    getColumnCount
+} from '../../../column/get'
 
 /**
  * 变化节点的css3transform属性
@@ -54,7 +54,7 @@ const getFlowFange = function(pageIndex) {
     if (relyPageObj && relyPageObj.chapterData.note === 'flow') {
         let seasonId = relyPageObj.chapterData.seasonId
         let chapterId = relyPageObj.chapterId
-        let range = getFlowCount(seasonId, chapterId) //分页总数
+        let range = getColumnCount(seasonId, chapterId) //分页总数
         return range
     }
 }
@@ -75,7 +75,7 @@ export default function Parallax(data, relatedData) {
     let currPageOffset
 
     //如果是flow页面，拿到分页数
-    let pageRange = hasFlow() && getFlowFange(data.pageIndex)
+    let pageRange = hasColumn() && getFlowFange(data.pageIndex)
     if (pageRange) {
         let visualIndex = Xut.Presentation.GetPageIndex()
         if (data.pageIndex == visualIndex || data.pageIndex > visualIndex) {

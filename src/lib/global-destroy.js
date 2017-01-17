@@ -1,7 +1,6 @@
 import { sceneController } from './scenario/controller'
 import { clearAudio } from './scenario-core/component/audio/manager'
 import { clearVideo } from './scenario-core/component/video/manager'
-import { adapterDestory } from './visuals/hooks/adapter'
 import { destroyFixAudio } from './scenario-core/component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
 import { destroyConfig } from './config/index'
@@ -62,10 +61,6 @@ export default function Destroy(action = 'exit') {
 
     //音频
     clearVideo()
-
-    //expand销毁
-    //flow的一些接口缓存
-    adapterDestory()
 
     //销毁独立APK的键盘事件
     offAndroid()

@@ -1,6 +1,5 @@
-import { config } from '../../../config/index'
+import { config, dynamicView } from '../../../config/index'
 import {set } from './get'
-import { getFlowView } from '../../../visuals/hooks/adapter'
 import { getResults, removeFlowData } from '../../../database/result'
 import { nextTick } from '../../../util/nexttick'
 
@@ -121,9 +120,9 @@ export default function initFlows(callback) {
         let flowCounts = {}
 
         //容器尺寸设置
-        let flowView = getFlowView()
-        let vWidth = flowView.viewWidth
-        let vHeight = newViewHight = flowView.viewHeight
+        let flowView = dynamicView(1)
+        let vWidth = flowView.width
+        let vHeight = newViewHight = flowView.height
 
         $container.css({
             width: vWidth,

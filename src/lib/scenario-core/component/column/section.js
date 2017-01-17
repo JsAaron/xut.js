@@ -1,12 +1,10 @@
-import { config } from '../../../config/index'
+import { config ,dynamicView} from '../../../config/index'
 import { translation } from '../../pagebase/move/translation'
-import { getFlowCount } from './get'
+import { getColumnCount } from './get'
 import Swipe from '../../../swipe/index'
 import render from './render'
 
-import getFlipDistance from '../../../visuals/distance'
-import { getFlowView } from '../../../visuals/hooks/adapter'
-
+import { getDistance } from '../../../visuals/distance'
 import { Zoom } from '../../../plugin/extend/zoom/index'
 import { closeButton } from '../../../plugin/extend/close-button'
 
@@ -14,7 +12,7 @@ import { closeButton } from '../../../plugin/extend/close-button'
  * 2017.9.7
  * 流式排版
  */
-export default class Flow {
+export default class Section {
 
     constructor({
         pptMaster, //母版ID
@@ -105,13 +103,13 @@ export default class Flow {
     _init($container, seasonId, chapterId) {
 
         const flowObject = this
-        const pagesCount = getFlowCount(seasonId, chapterId)
-        const flowView = getFlowView()
+        const pagesCount = getColumnCount(seasonId, chapterId)
+        const flowView = dynamicView(1)
 
         const MIN = 0
         const MAX = pagesCount - 1
-        const flipWidth = flowView.viewWidth
-        const flipLeft = flowView.viewLeft
+        const flipWidth = flowView.width
+        const flipLeft = flowView.height
         const viewLeft = config.viewSize.left
         const View = Xut.View
         const initIndex = this.initIndex
@@ -224,7 +222,7 @@ export default class Flow {
                     }
                 }
 
-                let viewBeHideDistance = getFlipDistance({
+                let viewBeHideDistance = getDistance({
                     action,
                     distance,
                     direction

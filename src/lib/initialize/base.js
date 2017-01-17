@@ -11,7 +11,7 @@ import {
 } from '../config/index'
 
 import initTooBar from './toolbar'
-import initFlows from '../scenario-core/component/flow/layout'
+import initColumn from '../scenario-core/component/column/layout'
 
 /**
  * 加载svg的css
@@ -96,12 +96,12 @@ export default function baseConfig(callback) {
             initPathAddress()
 
             /**
-             * 初始flows排版
-             * 嵌入index
-             * 默认有flow并且没有强制设置关闭的情况，打开缩放
+             * 初始分栏排版
+             * 嵌入index分栏
+             * 默认有并且没有强制设置关闭的情况，打开缩放
              */
-            initFlows(function(hasFlowCounts) {
-                if (hasFlowCounts) {
+            initColumn(function(haColumnCounts) {
+                if (haColumnCounts) {
                     //动画事件委托
                     if (config.swipeDelegate !== false) {
                         config.swipeDelegate = true

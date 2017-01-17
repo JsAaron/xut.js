@@ -20,7 +20,7 @@ const checkFlows = function(pageIndex) {
  * 动态计算翻页距离
  * @return {[type]} [description]
  */
-export default function getFlipDistance({
+export function getDistance({
     action,
     distance,
     direction,

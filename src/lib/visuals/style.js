@@ -1,5 +1,7 @@
-import visualConfig from './visual-config'
 import Stack from '../util/stack'
+import { visualView } from './visual-config/view'
+import { visualProportion } from './visual-config/proportion'
+import { visualTranslate } from './visual-config/translate'
 
 /**
  * 自定义样式页面容器的样式
@@ -32,12 +34,12 @@ export default function setStyleConfig({
      */
     usefulData.hasFlow = function(pageName) {
         let key, value
-        for(key in this) {
+        for (key in this) {
             value = this[key]
-            if(_.isFunction(value)) {
+            if (_.isFunction(value)) {
                 continue;
             }
-            if(value.direction == pageName) {
+            if (value.direction == pageName) {
                 return value.isFlows
             }
         }
@@ -49,7 +51,7 @@ export default function setStyleConfig({
     _.each(usefulData, function(data, index) {
 
         //跳过getStyle方法
-        if(_.isFunction(data)) {
+        if (_.isFunction(data)) {
             return
         }
 
@@ -58,19 +60,19 @@ export default function setStyleConfig({
         compile[data.direction == 'middle' ? 'shift' : 'push'](function() {
 
             //容器可视区尺寸
-            _.extend(data, visualConfig.view(data.dynamicVisualMode, data.direction))
+            _.extend(data, visualView(data.dynamicVisualMode, data.direction))
 
             //容器内部元素的缩放比
-            data.dynamicProportion = visualConfig.proportion(data)
+            data.dynamicProportion = visualProportion(data)
 
             //设置容器样式
-            let translate = visualConfig.translate({
-                createIndex       : data.pid,
-                currIndex         : data.visiblePid,
-                direction         : data.direction,
-                viewWidth         : data.viewWidth,
-                overflowLeft      : data.overflowLeft,
-                dynamicVisualMode : data.dynamicVisualMode
+            let translate = visualTranslate({
+                createIndex: data.pid,
+                currIndex: data.visiblePid,
+                direction: data.direction,
+                viewWidth: data.viewWidth,
+                overflowLeft: data.overflowLeft,
+                dynamicVisualMode: data.dynamicVisualMode
             })
 
             //提供快速索引

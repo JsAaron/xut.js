@@ -6,9 +6,9 @@ import NumberBar from '../toolbar/page-number'
 import { sceneController } from './controller'
 import Mediator from '../scenario-core/index'
 import {
-    getFlowCount,
-    getFlowChpaterCount
-} from '../scenario-core/component/flow/get'
+    getColumnCount,
+    getColumnChpaterCount
+} from '../scenario-core/component/column/get'
 import {
     mainScene,
     deputyScene
@@ -191,21 +191,21 @@ export class SceneFactory {
         //2016.9.29
         //新增页码显示
         //如果有分栏
-        let flowCounts = getFlowCount(this.seasonId)
+        let columnCounts = getColumnCount(this.seasonId)
 
         //如果是min平台强制启动
-        if(Xut.config.platform === 'mini' || (config.toolType.number !== false && flowCounts)) {
-            let flowChpterCount
-            if(flowCounts) {
+        if(Xut.config.platform === 'mini' || (config.toolType.number !== false && columnCounts)) {
+            let columnChpterCount = 0
+            if(columnCounts) {
                 //获取分栏的chapter数，总数需要减去
-                flowChpterCount = getFlowChpaterCount(this.seasonId)
+                columnChpterCount = getColumnChpaterCount(this.seasonId)
             }
             this.numberToolbar = new NumberBar({
                 $rootNode: $rootNode,
                 currentPage: pageIndex,
                 //如果有flowCounts则用
                 //否则就用页面的总数
-                pageTotal: flowCounts ? pageTotal + flowCounts - flowChpterCount : pageTotal
+                pageTotal: columnCounts ? pageTotal + columnCounts - columnChpterCount : pageTotal
             })
         }
 

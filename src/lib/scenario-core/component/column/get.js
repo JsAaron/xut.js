@@ -12,7 +12,7 @@ export function set(flowCounts) {
  * 加快计算
  * @return {Boolean} [description]
  */
-export function hasFlow(){
+export function hasColumn(){
     return cacheCounts
 }
 
@@ -57,7 +57,7 @@ export function getBeforeCount(seasonId, chapterId) {
  * @param  {[type]} seasonId [description]
  * @return {[type]}          [description]
  */
-export function getFlowChpaterCount(seasonId) {
+export function getColumnChpaterCount(seasonId) {
     if (!cacheCounts) return
     return Object.keys(cacheCounts[seasonId]).length
 }
@@ -69,7 +69,7 @@ export function getFlowChpaterCount(seasonId) {
  * @param  {[type]} chpaterId [description]
  * @return {[type]}           [description]
  */
-export function getFlowCount(seasonId, chapterId) {
+export function getColumnCount(seasonId, chapterId) {
     if (!cacheCounts) return
     if (seasonId) {
         if (chapterId) {
@@ -89,11 +89,11 @@ export function getFlowCount(seasonId, chapterId) {
 
 
 /**
- * 判断是否为流式布局页面
+ * 判断是否为分栏布局页面
  * @param  {[type]} seasonId  [description]
  * @param  {[type]} chpaterId [description]
  * @return {[type]}           [description]
  */
-export function isFlowPage(seasonId, chapterId) {
-    return getFlowCount(seasonId, chapterId) ? true : false
+export function isColumnPage(seasonId, chapterId) {
+    return getColumnCount(seasonId, chapterId) ? true : false
 }
