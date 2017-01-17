@@ -159,11 +159,14 @@ export function contentStructure(callback, data, context) {
         //缓存contentDas
         contentDas = {},
         //缓存content结构
-        cachedContentStr = [];
+        cachedContentStr = [],
+        //自定义样式
+        getStyle = data.getStyle;
+
 
     //容器结构创建
     if(containerRelated && containerRelated.length) {
-        containerObj = createContainer(containerRelated, pid, data.getStyle.isFlows);
+        containerObj = createContainer(containerRelated, pid, getStyle);
     }
 
     /**
@@ -353,8 +356,15 @@ export function contentStructure(callback, data, context) {
             if(wrapObj.isJs) {
                 contentHtmlBoxIds.push(contentId)
             }
+
             //转换缩放比
-            sizeResults = reviseSize(wrapObj.data, data.getStyle.isFlows, content.fixRadio);
+            sizeResults = reviseSize({
+                results: wrapObj.data,
+                hasFlow: getStyle.isFlows,
+                fixRadio: content.fixRadio,
+                dynamicProportion: getStyle.dynamicProportion
+            })
+
             //正常模式下创建
             startCreate(wrapObj, content, contentId)
         } else {

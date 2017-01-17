@@ -12,6 +12,7 @@ import { Zoom } from '../../../../plugin/extend/zoom/index'
 import { contentParser, activityParser } from './data'
 import { createFloatMater, createFloatPage } from './float'
 import { $$on, $$off } from '../../../../util/dom'
+import { sceneController } from '../../../../scenario/controller'
 import {
     createFn,
     toArray,
@@ -130,8 +131,8 @@ export default class TaskContents {
             }
             //保留场景的留信息
             //用做软件制作单页预加载
-            Xut.sceneController.seasonRelated = data.seasonRelated
-                //初始化content对象
+            sceneController.seasonRelated = data.seasonRelated;
+            //初始化content对象
             applyActivitys(data, contentDas, delayHooks => {
                 this._eventAfterCheck(data, delayHooks)
             })

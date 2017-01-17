@@ -15,6 +15,7 @@ const checkFlows = function(pageIndex) {
     return pageObj && pageObj.isFlows
 }
 
+
 /**
  * 动态计算翻页距离
  * @return {[type]} [description]
@@ -28,7 +29,7 @@ export default function getFlipDistance({
     rightIndex
 }, hooks) {
 
-    //区域尺寸
+    //默认的区域尺寸
     let veiwWidth = config.viewSize.width
 
     let offset = {

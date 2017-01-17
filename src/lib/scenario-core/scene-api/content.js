@@ -146,7 +146,9 @@ export function extendContent(access, $globalEvent) {
     function seekQuery(id) {
         var contentData = Xut.data.query('Content', id);
         if(contentData) {
-            return reviseSize(_.extend({}, contentData));
+            return reviseSize({
+                results: _.extend({}, contentData)
+            })
         }
     }
 

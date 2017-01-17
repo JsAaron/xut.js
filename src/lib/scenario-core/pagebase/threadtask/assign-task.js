@@ -73,7 +73,7 @@ export default {
         //同步数据
         updataCache.call(base, [base.pid], () => {
             const pageData = base.baseData()
-                //contentMode模式
+            //contentMode模式
             parseMode(pageData, base)
             TaskContainer(base, pageData, taskCallback)
         })

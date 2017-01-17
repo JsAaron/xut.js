@@ -21,7 +21,7 @@ const sceneCollection = {
 }
 
 
-const sceneController = {
+export const sceneController = {
 
     /**
      * 场景层级控制
@@ -226,9 +226,5 @@ const sceneController = {
     }
 }
 
-Xut.sceneController = sceneController
-
-
-export { sceneController }
 
 

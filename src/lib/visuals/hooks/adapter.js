@@ -1,4 +1,5 @@
 import flowConfig from './flow'
+import defaultConfig from './default'
 
 /**
  * 结果缓存
@@ -27,10 +28,6 @@ export function setFlowTranslate(...arg) {
     return flowConfig.translate(...arg)
 }
 
-
-export function getFlowDistance(...arg) {
-    return flowConfig.distance(...arg)
-}
 
 
 export function adapterDestory(...arg) {

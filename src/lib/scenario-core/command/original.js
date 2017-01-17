@@ -11,7 +11,7 @@ import access from './access'
  * @return {[type]}      [description]
  */
 let hasOptimize = (fn) => {
-    if (!Xut.config.visualMode !== 1) {
+    if (!Xut.config.visualMode !== 4) {
         fn && fn()
     }
 }

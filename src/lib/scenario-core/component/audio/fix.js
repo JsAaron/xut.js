@@ -8,7 +8,7 @@ import {
  * @type {Number}
  */
 let index = 0
-let loop = 5
+let loop = 10
 let audioes = []
 
 /**

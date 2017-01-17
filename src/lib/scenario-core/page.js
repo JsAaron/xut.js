@@ -3,8 +3,8 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import Abstract from './abstract'
-import { Pagebase } from './pagebase/pagebase'
+import { Abstract } from './abstract'
+import { Pagebase } from './pagebase/index'
 import { removeVideo } from './component/video/manager'
 import { addEdges } from '../util/edge'
 import { execScript } from '../util/index'
@@ -31,12 +31,9 @@ export default class PageMgr extends Abstract {
 
     constructor(vm) {
         super()
-
         this.pageType = 'page';
-
         //页面根节点
         this.pagesNode = vm.options.rootPage;
-
         //创建合集容器
         this.abstractCreateCollection();
     }
@@ -49,7 +46,6 @@ export default class PageMgr extends Abstract {
      * @return {[type]}           [description]
      */
     create(dataOpts, pageIndex) {
-
         //生成指定页面对象
         const pageObjs = new Pagebase(
             _.extend(dataOpts, {
@@ -57,10 +53,8 @@ export default class PageMgr extends Abstract {
                 'rootNode': this.pagesNode //根元素
             })
         )
-
         //增加页面管理
         this.abstractAddCollection(pageIndex, pageObjs);
-
         return pageObjs;
     }
 
@@ -105,14 +99,11 @@ export default class PageMgr extends Abstract {
 
         //翻页结束脚本
         runScript(suspendPageObj, 'postCode');
-
         //中断节点创建任务
         this.$$suspendInnerCreateTasks(pointers);
-
         //停止活动对象活动
         suspendPageObj.destroyPageAction()
         suspendPageObj.resetSwipeSequence()
-
         $$suspend(suspendPageObj, prveChpterId);
     }
 

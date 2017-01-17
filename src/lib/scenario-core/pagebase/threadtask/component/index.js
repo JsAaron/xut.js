@@ -12,12 +12,12 @@ import { reviseSize } from '../../../../util/option'
 export default function TaskComponents(data, suspendCallback, successCallback) {
 
     //预编译模式跳过创建
-    if (Xut.IBooks.runMode()) {
+    if(Xut.IBooks.runMode()) {
         successCallback();
         return;
     }
 
-    if (data['activitys'].length) {
+    if(data['activitys'].length) {
         var str;
         this.$containsNode = data['$containsNode'];
         this.callback = {
@@ -64,18 +64,22 @@ TaskComponents.prototype = {
             actType = activityData.actType || activityData.animation;
 
             //特殊类型 showNote
-            if (!actType && activityData.note) {
+            if(!actType && activityData.note) {
                 activityData['actType'] = actType = "ShowNote";
             }
 
-            switch (actType) {
+            switch(actType) {
                 case 'ShowNote':
                 case 'Action':
                 case 'Widget':
                 case 'Audio':
                 case 'Video':
                     //缩放比
-                    activityData = reviseSize(activityData, data.getStyle.isFlows);
+                    activityData = reviseSize({
+                        results: activityData,
+                        hasFlow: data.getStyle.isFlows,
+                        dynamicProportion: data.getStyle.dynamicProportion
+                    });
                     startCreate(actType, activityData)
                     break;
             }
@@ -117,9 +121,9 @@ TaskComponents.prototype = {
 
     //运行被阻断的线程任务
     runSuspendTasks: function() {
-        if (this.suspendQueues) {
+        if(this.suspendQueues) {
             var fn;
-            if (fn = this.suspendQueues.pop()) {
+            if(fn = this.suspendQueues.pop()) {
                 fn();
             }
             this.suspendQueues = null;

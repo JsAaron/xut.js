@@ -33,7 +33,7 @@ export function execScript(code, type) {
     }
     try {
         new Function(enterReplace(code))()
-    } catch (e) {
+    } catch(e) {
         $$warn('加载脚本错误', type)
     }
 }
@@ -53,9 +53,9 @@ export function createRandomImg(url) {
  * @return {[type]} [description]
  */
 export function replacePath(svgstr) {
-    if (config.launch) {
+    if(config.launch) {
         //如果能找到对应的默认路径，则替换
-        if (-1 !== svgstr.indexOf('content/gallery/')) {
+        if(-1 !== svgstr.indexOf('content/gallery/')) {
             svgstr = svgstr.replace(/content\/gallery/ig, config.pathAddress)
         }
     }
@@ -78,12 +78,15 @@ const converProportion = function({
     top,
     padding,
     hasFlow, //这个很关键，这个是针对flow类型页面处理，因为模式3的情况导致母版的缩放比错误
-    fixRadio //迷你使用，按照宽度正比缩放高度，相应的要调整top的值
+    fixRadio, //迷你使用，按照宽度正比缩放高度，相应的要调整top的值
+    dynamicProportion //如果有独立的缩放比
 }) {
-    let proportion = hasFlow ? config.flowProportion : config.proportion;
+    let proportion = dynamicProportion ?
+        dynamicProportion :
+        hasFlow ? config.flowProportion : config.proportion;
 
     //需要正比缩放
-    if (fixRadio) {
+    if(fixRadio) {
         let originalHeight = CEIL(height * proportion.height) || 0
         let proportionalHeight = CEIL(height * proportion.width) || 0
         let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
@@ -118,12 +121,18 @@ export function setProportion(...arg) {
  * fixRadio 是否保持宽度正比缩放 //2016.12.15 mini使用
  * @type {[type]}
  */
-export function reviseSize(results, hasFlow, fixRadio) {
+export function reviseSize({
+    results,
+    hasFlow,
+    fixRadio,
+    dynamicProportion
+}) {
 
     //不同设备下缩放比计算
-    const layerSize = converProportion({
+    let layerSize = converProportion({
         fixRadio,
         hasFlow,
+        dynamicProportion,
         width: results.width,
         height: results.height,
         left: results.left,
@@ -131,9 +140,10 @@ export function reviseSize(results, hasFlow, fixRadio) {
     })
 
     //新的背景图尺寸
-    const backSize = converProportion({
+    let backSize = converProportion({
         fixRadio,
         hasFlow,
+        dynamicProportion,
         width: results.backwidth,
         height: results.backheight,
         left: results.backleft,
@@ -182,7 +192,7 @@ export function readFile(path, callback, type) {
     let jsRequest = (fileUrl, fileName) => {
         request(randomUrl(fileUrl), function() {
             data = window.HTMLCONFIG[fileName];
-            if (data) {
+            if(data) {
                 callback(data)
                 delete window.HTMLCONFIG[fileName];
             } else {
@@ -197,7 +207,7 @@ export function readFile(path, callback, type) {
     //externalFile使用
     //如果是js动态文件
     //content的html结构
-    if (type === "js") {
+    if(type === "js") {
         paths = config.getSvgPath() + path;
         name = path.replace(".js", '')
         jsRequest(paths, name)
@@ -208,7 +218,7 @@ export function readFile(path, callback, type) {
      * 如果配置了convert === 'svg'
      * 那么所有的svg文件就强制转化成js读取
      */
-    if (config.launch && config.launch.convert === 'svg') {
+    if(config.launch && config.launch.convert === 'svg') {
         path = path.replace('.svg', '.js')
         name = path.replace(".js", '')
         svgUrl = config.getSvgPath() + path
@@ -220,10 +230,10 @@ export function readFile(path, callback, type) {
     /**
      * ibooks模式 单独处理svg转化策划给你js,加载js文件
      */
-    if (Xut.IBooks.CONFIG) {
+    if(Xut.IBooks.CONFIG) {
         //如果是.svg结尾
         //把svg替换成js
-        if (/.svg$/.test(path)) {
+        if(/.svg$/.test(path)) {
             path = path.replace(".svg", '.js')
         }
         //全路径
@@ -233,7 +243,7 @@ export function readFile(path, callback, type) {
         //加载脚本
         request(randomUrl(paths), function() {
             data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
-            if (data) {
+            if(data) {
                 callback(data)
                 delete window.HTMLCONFIG[name];
                 delete window.IBOOKSCONFIG[name]
@@ -248,12 +258,12 @@ export function readFile(path, callback, type) {
 
     //svg文件
     //游览器模式 && 非强制插件模式
-    if (Xut.plat.isBrowser && !config.isPlugin) {
+    if(Xut.plat.isBrowser && !config.isPlugin) {
         //默认的地址
         svgUrl = config.getSvgPath().replace("www/", "") + path
 
         //mini杂志的情况，不处理目录的www
-        if (config.launch && config.launch.resource) {
+        if(config.launch && config.launch.resource) {
             svgUrl = config.getSvgPath() + path
         }
 

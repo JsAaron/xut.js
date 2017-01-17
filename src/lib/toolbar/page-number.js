@@ -31,7 +31,7 @@ export default class NumberBar {
         //存在模式3的情况，所以页码要处理溢出的情况。left值
         let right = 0
         if (config.viewSize.overflowWidth) {
-            right = Math.abs(config.viewSize.left) + 'px'
+            right = Math.abs(config.viewSize.left * 2) + 'px'
         }
         return $(
             `<div class="xut-page-number" style="right:${right};">

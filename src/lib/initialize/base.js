@@ -54,7 +54,7 @@ const setHistory = (data) => {
 const setMode = function(data) {
     //如果没有config配置，默认数据库
     if (!config.visualMode && Number(data.scrollPaintingMode)) {
-        config.visualMode = 1
+        config.visualMode = 4
     }
 }
 

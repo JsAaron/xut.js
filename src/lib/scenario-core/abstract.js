@@ -2,8 +2,7 @@
  * 抽象管理接口
  * @return {[type]} [description]
  */
-
-export default class AbstractInterface {
+export class Abstract {
 
     /**
      * 创建页面合集

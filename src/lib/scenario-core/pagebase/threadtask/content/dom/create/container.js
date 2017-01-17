@@ -8,10 +8,15 @@ import { parseContentDas } from '../parse/content'
  * @param  {[type]} pid     [description]
  * @return {[type]}               [description]
  */
-const createContainerWrap = (containerName, contentId, pid, isFlows) => {
+const createContainerWrap = (containerName, contentId, pid, getStyle) => {
 
     const contentDas = parseContentDas([contentId])
-    const data = reviseSize(contentDas[0], isFlows)
+    const data = reviseSize({
+        results: contentDas[0],
+        hasFlow: getStyle.isFlows,
+        dynamicProportion: getStyle.dynamicProportion
+    })
+
     const wapper =
         `<div  id="${containerName}"
                data-behavior="click-swipe"
@@ -26,7 +31,7 @@ const createContainerWrap = (containerName, contentId, pid, isFlows) => {
 }
 
 
-export function createContainer(containerRelated, pid, isFlows) {
+export function createContainer(containerRelated, pid, getStyle) {
     var itemIds,
         uuid,
         contentId,
@@ -41,7 +46,7 @@ export function createContainer(containerRelated, pid, isFlows) {
         containerName = "Container_" + pid + "_" + contentId
         uuid = "aaron" + Math.random()
         containerObj[uuid] = {
-            'start': [createContainerWrap(containerName, contentId, pid, isFlows)],
+            'start': [createContainerWrap(containerName, contentId, pid, getStyle)],
             'end': '</div>'
         };
         containerObj.createUUID.push(uuid);

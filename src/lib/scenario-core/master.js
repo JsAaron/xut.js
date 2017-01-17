@@ -3,9 +3,9 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import Abstract from './abstract'
 import { config } from '../config/index'
-import { Pagebase } from './pagebase/pagebase'
+import { Abstract } from './abstract'
+import { Pagebase } from './pagebase/index'
 import {
     $$suspend,
     $$original,
@@ -48,7 +48,7 @@ const translateZ = Xut.style.translateZ
  *      0: 9001
  *      1: 9001
  *
- *  recordMasterscope: Object
+ *  recordMasterRange: Object
  *      9001: Array[2]
  *
  *  rootNode: ul # parallax.xut - parallax xut - flip
@@ -67,7 +67,7 @@ export default class MasterMgr extends Abstract {
         this.pageType = 'master';
 
         this.rootNode = vm.options.rootMaster;
-        this.recordMasterscope = {}; //记录master区域范围
+        this.recordMasterRange = {}; //记录master区域范围
         this.recordMasterId = {}; //记录页面与母板对应的编号
         this.currMasterId = null; //可视区母板编号
 
@@ -463,26 +463,26 @@ export default class MasterMgr extends Abstract {
      */
     _toRepeat(reuseMasterKey, pageIndex) {
         var temp;
-        if (temp = this.recordMasterscope[reuseMasterKey]) {
+        if (temp = this.recordMasterRange[reuseMasterKey]) {
             return temp;
         }
         return false;
     }
 
     //更新母板作用域范围
-    //recordMasterscope:{
+    //recordMasterRange:{
     //   9001-1:[0,1], master 对应记录的页码
     //   9002-1:[2,3]
     //   9001-2:[4,5]
     //}
     _updataMasterscope(reuseMasterKey, pageIndex) {
         var scope;
-        if (scope = this.recordMasterscope[reuseMasterKey]) {
+        if (scope = this.recordMasterRange[reuseMasterKey]) {
             if (-1 === scope.indexOf(pageIndex)) {
                 scope.push(pageIndex);
             }
         } else {
-            this.recordMasterscope[reuseMasterKey] = [pageIndex]
+            this.recordMasterRange[reuseMasterKey] = [pageIndex]
         }
     }
 
@@ -620,10 +620,10 @@ export default class MasterMgr extends Abstract {
                 pageObj.baseDestroy();
                 //移除列表
                 self.abstractRemoveCollection(removekey)
-                self._removeRecordMasterscope(removekey)
+                self._removeRecordMasterRange(removekey)
             }
             //清理作用域缓存
-            delete self.recordMasterscope[removekey];
+            delete self.recordMasterRange[removekey];
         })
     }
 
@@ -638,11 +638,11 @@ export default class MasterMgr extends Abstract {
     }
 
 
-    _removeRecordMasterscope(removekey) {
+    _removeRecordMasterRange(removekey) {
         var me = this;
-        var recordMasterscope = me.recordMasterscope[removekey];
+        var recordMasterRange = me.recordMasterRange[removekey];
         //清理页码指示标记
-        recordMasterscope.forEach(function(scope) {
+        recordMasterRange.forEach(function(scope) {
             delete me.recordMasterId[scope];
         })
     }

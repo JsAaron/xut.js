@@ -6,20 +6,12 @@
  * @return {[type]}        [description]
  */
 import { config } from '../config/index'
+import { sceneController } from './controller'
 
 const round = Math.round
 const ratio = 6
 const isIOS = Xut.plat.isIOS
 const TOP = isIOS ? 20 : 0
-
-/**
- * 是否需要溢出隐藏容器
- * @return {[type]} [description]
- */
-const hasOverflow = () =>{
-    //如果是页面拼接模式
-    return config.visualMode === 1 ? 'visible' : 'hidden'
-}
 
 /**
  * 主场景
@@ -65,10 +57,10 @@ export function mainScene() {
               style="width:${config.viewSize.width}px;
                      height:${config.screenSize.height}px;
                      top:0;
-                     left:${config.viewSize.left}px;
+                     left:0;
                      position:absolute;
-                     z-index:${Xut.sceneController.createIndex()};
-                     overflow:${hasOverflow()};">
+                     z-index:${sceneController.createIndex()};
+                     overflow:hidden;">
 
             <div id="xut-control-bar" class="xut-control-bar"></div>
             <ul id="xut-page-container" class="xut-flip"></ul>
@@ -91,10 +83,11 @@ export function deputyScene(id) {
         `<div id="${'scenario-' + id}"
               style="width:${config.viewSize.width}px;
                      height:100%;
-                     left:${config.viewSize.left}px;
-                     z-index:${Xut.sceneController.createIndex()};
+                     top:0;
+                     left:0;
+                     z-index:${sceneController.createIndex()};
                      position:absolute;
-                     overflow:${hasOverflow()};">
+                     overflow:hidden;">
             <ul id="${'scenarioPage-' + id}" class="xut-flip" style="z-index:2"></ul>
             <ul id="${'scenarioMaster-' + id}" class="xut-flip" style="z-index:1"></ul>
         </div>`

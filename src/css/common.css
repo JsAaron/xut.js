@@ -157,6 +157,8 @@ video {
     left: 0;
     z-index: 2;
     background-size: 100% 100%;
+    -webkit-box-sizing: border-box;
+    border: 1px solid red;
 }
 .xut-flip .xut-page {
     position: absolute;

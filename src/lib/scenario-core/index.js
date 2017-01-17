@@ -5,27 +5,21 @@
  *
  **********************************************************************/
 import { config } from '../config/index'
-import { Observer }  from '../observer/index'
+import { Observer } from '../observer/index'
 import Dispatcher from './transform/index'
 import delegateHooks from './delegate/hooks'
 import closestProcessor from './delegate/closest'
 import GlobalEvent from '../swipe/index.js'
 import { initSceneApi } from './scene-api/index'
-
-import {
-    defProtected as def,
-    defAccess
-} from '../util/index'
-
+import { defProtected, defAccess } from '../util/index'
 
 /**
  * 配置多页面参数
  * @return {[type]} [description]
  */
 const configMultiple = (options) => {
-
     //如果是epub,强制转换为单页面
-    if (Xut.IBooks.Enabled) {
+    if(Xut.IBooks.Enabled) {
         options.multiplePages = false
     } else {
         //判断多页面情况
@@ -50,7 +44,7 @@ const configMultiple = (options) => {
  */
 const isBelong = (target) => {
     var pageType = 'page';
-    if (target.dataset && target.dataset.belong) {
+    if(target.dataset && target.dataset.belong) {
         pageType = target.dataset.belong;
     }
     return pageType
@@ -70,8 +64,8 @@ const isBelong = (target) => {
  * 读库强制PC模式了
  */
 const preventDefault = (evtObj, target) => {
-    if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
-        if (config.supportQR && evtObj.target.nodeName.toLowerCase() === "img") {} else {
+    if(Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
+        if(config.supportQR && evtObj.target.nodeName.toLowerCase() === "img") {} else {
             evtObj.preventDefault && evtObj.preventDefault();
         }
     }
@@ -99,7 +93,6 @@ export default class Mediator extends Observer {
             flipMode: Xut.config.flipMode
         })
 
-
         //配置多页面参数
         configMultiple(options)
 
@@ -107,7 +100,7 @@ export default class Mediator extends Observer {
         const $dispatcher = vm.$dispatcher = new Dispatcher(vm)
 
         //如果是主场景,才能切换系统工具栏
-        if (options.multiplePages) {
+        if(options.multiplePages) {
             this.addTools(vm)
         }
 
@@ -132,11 +125,11 @@ export default class Mediator extends Observer {
             //如果找到是空节点
             //并且是虚拟模式2的话
             //默认允许滑动
-            if(!handlerObj && config.visualMode == 2){
+            if(!handlerObj && config.visualMode == 2) {
                 return
             }
             //停止翻页,针对content对象可以拖动,滑动的情况处理
-            if (!handlerObj || handlerObj.attribute === 'disable') {
+            if(!handlerObj || handlerObj.attribute === 'disable') {
                 hookCallback();
             }
         });
@@ -156,11 +149,11 @@ export default class Mediator extends Observer {
          * 无滑动
          */
         $globalEvent.$watch('onTap', (pageIndex, hookCallback) => {
-            if (handlerObj) {
-                if (handlerObj.handlers) {
+            if(handlerObj) {
+                if(handlerObj.handlers) {
                     handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex)
                 } else {
-                    if (!Xut.Contents.Canvas.getIsTap()) {
+                    if(!Xut.Contents.Canvas.getIsTap()) {
                         vm.$emit('change:toggleToolbar')
                     }
                 }
@@ -213,7 +206,7 @@ export default class Mediator extends Observer {
          * 删除parallaxProcessed
          */
         $globalEvent.$watch('onMasterMove', (hindex, target) => {
-            if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
+            if(/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
                 $dispatcher.masterMgr && $dispatcher.masterMgr.reactivation(target);
             }
         });
@@ -253,7 +246,7 @@ export default class Mediator extends Observer {
              */
             'data-behavior' (target, attribute, rootNode, pageIndex) {
                 //没有事件的元素,即可翻页又可点击切换工具栏
-                if (attribute == 'click-swipe') {
+                if(attribute == 'click-swipe') {
                     vm.$emit('change:toggleToolbar')
                 }
             }
@@ -285,7 +278,7 @@ defAccess(Mediator.prototype, '$multiScenario', {
 defAccess(Mediator.prototype, '$injectionComponent', {
     set: function(regData) {
         var injection;
-        if (injection = this.$dispatcher[regData.pageType + 'Mgr']) {
+        if(injection = this.$dispatcher[regData.pageType + 'Mgr']) {
             injection.abstractAssistPocess(regData.pageIndex, function(pageObj) {
                 pageObj.baseRegisterComponent.call(pageObj, regData.widget);
             })
@@ -332,7 +325,7 @@ defAccess(Mediator.prototype, '$curVmPage', {
  *          'suspendAutoCallback': null
  *
  */
-def(Mediator.prototype, '$bind', function(key, callback) {
+defProtected(Mediator.prototype, '$bind', function(key, callback) {
     var vm = this
     vm.$watch('change:' + key, function() {
         callback.apply(vm, arguments)
@@ -344,7 +337,7 @@ def(Mediator.prototype, '$bind', function(key, callback) {
  * 创建页面
  * @return {[type]} [description]
  */
-def(Mediator.prototype, '$init', function() {
+defProtected(Mediator.prototype, '$init', function() {
     this.$dispatcher.initCreate();
 });
 
@@ -353,7 +346,7 @@ def(Mediator.prototype, '$init', function() {
  * 运动动画
  * @return {[type]} [description]
  */
-def(Mediator.prototype, '$run', function() {
+defProtected(Mediator.prototype, '$run', function() {
     var vm = this;
     vm.$dispatcher.pageMgr.activateAutoRuns(
         vm.$globalEvent.getHindex(), Xut.Presentation.GetPageObj()
@@ -365,7 +358,7 @@ def(Mediator.prototype, '$run', function() {
  * 复位对象
  * @return {[type]} [description]
  */
-def(Mediator.prototype, '$reset', function() {
+defProtected(Mediator.prototype, '$reset', function() {
     return this.$dispatcher.pageMgr.resetOriginal(this.$globalEvent.getHindex());
 });
 
@@ -374,7 +367,7 @@ def(Mediator.prototype, '$reset', function() {
  * 停止所有任务
  * @return {[type]} [description]
  */
-def(Mediator.prototype, '$suspend', function() {
+defProtected(Mediator.prototype, '$suspend', function() {
     Xut.Application.Suspend({
         skipAudio: true //跨页面不处理
     })
@@ -384,7 +377,7 @@ def(Mediator.prototype, '$suspend', function() {
  * 销毁场景内部对象
  * @return {[type]} [description]
  */
-def(Mediator.prototype, '$destroy', function() {
+defProtected(Mediator.prototype, '$destroy', function() {
     this.$off(); //观察事件
     this.$globalEvent.destroy(); //全局事件
     this.$dispatcher.destroyPageBases(); //派发器

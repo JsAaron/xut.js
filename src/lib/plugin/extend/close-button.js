@@ -30,7 +30,7 @@ const createCloseIcon = function(right, top) {
  * 创建关闭按钮
  * @return {[type]} [description]
  */
-export function pinchButton(callback, right = 0, top = 0) {
+export function closeButton(callback, right = 0, top = 0) {
     const $closeNode = createCloseIcon(right + 4, top + 8)
     $closeNode.on("touchend mouseup", function() {
         callback();

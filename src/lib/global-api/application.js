@@ -122,8 +122,6 @@ export function initApplication() {
 
         /**
          * 动态配置
-         * @param  {[type]} config.launch [description]
-         * @return {[type]}                       [description]
          */
         if(config.launch) {
             destroy()

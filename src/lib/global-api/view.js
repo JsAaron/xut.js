@@ -12,7 +12,7 @@ import {
 }
 from '../util/index'
 
-import { SceneFactory } from '../scenario/scenario'
+import { SceneFactory } from '../scenario/factory'
 import { sceneController } from '../scenario/controller'
 
 export function initView() {

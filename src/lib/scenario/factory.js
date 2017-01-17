@@ -26,7 +26,7 @@ import {
 const findContainer = ($rootNode, scenarioId, isMain) => {
     return function(pane, parallax) {
         var node;
-        if (isMain) {
+        if(isMain) {
             node = '#' + pane;
         } else {
             node = '#' + parallax + scenarioId;
@@ -44,15 +44,15 @@ const findContainer = ($rootNode, scenarioId, isMain) => {
 const checkHistory = (history) => {
 
     //直接启用快捷调试模式
-    if (config.deBugHistory) {
+    if(config.deBugHistory) {
         Xut.View.LoadScenario(config.deBugHistory)
         return true;
     }
 
     //如果有历史记录
-    if (history) {
+    if(history) {
         var scenarioInfo = sceneController.seqReverse(history)
-        if (scenarioInfo) {
+        if(scenarioInfo) {
             scenarioInfo = scenarioInfo.split('-');
             Xut.View.LoadScenario({
                 'scenarioId': scenarioInfo[0],
@@ -79,26 +79,19 @@ const checkHistory = (history) => {
 export class SceneFactory {
 
     constructor(data) {
-
-        //基本配置信息
         let seasonId = data.seasonId;
         let chapterId = data.chapterId;
-
         let options = _.extend(this, data, {
             'scenarioId': seasonId,
             'chapterId': chapterId,
             '$container': $('.xut-scene-container')
-        })
-
+        });
         //创建主场景
         this._createHTML(options, () => {
-            //配置工具栏行为
-            if (!Xut.IBooks.Enabled) {
+            if(!Xut.IBooks.Enabled) {
                 _.extend(this, this._initToolBar())
             }
-            //构建Mediator对象
             this._createMediator();
-            //注入场景管理
             sceneController.add(seasonId, chapterId, this);
         })
     }
@@ -112,7 +105,7 @@ export class SceneFactory {
         //如果是静态文件执行期
         //支持Xut.IBooks模式
         //都不需要创建节点
-        if (Xut.IBooks.runMode()) {
+        if(Xut.IBooks.runMode()) {
             this.$rootNode = $('#xut-main-scene')
             callback()
             return;
@@ -120,7 +113,7 @@ export class SceneFactory {
 
         let layout
 
-        if (options.isMain) {
+        if(options.isMain) {
             layout = mainScene()
         } else {
             layout = deputyScene(this.scenarioId)
@@ -155,19 +148,19 @@ export class SceneFactory {
         let barConfig = {}
 
         //主场景工具栏设置
-        if (this.isMain) {
+        if(this.isMain) {
             barConfig = pMainBar(scenarioId, pageTotal)
-            if (config.visualMode === 1) {
+            if(config.visualMode === 4) {
                 //word模式,自动启动工具条
-                this.mainToolbar = new BookBar({
-                    sceneNode: $rootNode,
-                    controlNode: findControlBar(),
-                    pageMode: barConfig.pageMode
-                })
+                // this.mainToolbar = new BookBar({
+                //     sceneNode: $rootNode,
+                //     controlNode: findControlBar(),
+                //     pageMode: barConfig.pageMode
+                // })
             }
             //如果工具拦提供可配置
             //或者config.pageMode 带翻页按钮
-            else if (_.some(barConfig.toolType)) {
+            else if(_.some(barConfig.toolType)) {
                 //普通模式
                 this.mainToolbar = new MainBar({
                     sceneNode: $rootNode,
@@ -183,7 +176,7 @@ export class SceneFactory {
         else {
             //副场工具栏配置
             barConfig = pDeputyBar(this.barInfo, pageTotal)
-            if (_.some(barConfig.toolType)) {
+            if(_.some(barConfig.toolType)) {
                 this.deputyToolbar = new DeputyBar({
                     sceneNode: $rootNode,
                     toolType: barConfig.toolType,
@@ -201,9 +194,9 @@ export class SceneFactory {
         let flowCounts = getFlowCount(this.seasonId)
 
         //如果是min平台强制启动
-        if (Xut.config.platform === 'mini' || (config.toolType.number !== false && flowCounts)) {
+        if(Xut.config.platform === 'mini' || (config.toolType.number !== false && flowCounts)) {
             let flowChpterCount
-            if (flowCounts) {
+            if(flowCounts) {
                 //获取分栏的chapter数，总数需要减去
                 flowChpterCount = getFlowChpaterCount(this.seasonId)
             }
@@ -232,13 +225,9 @@ export class SceneFactory {
         var pageIndex = this.pageIndex;
         var $rootNode = this.$rootNode;
         var isMain = this.isMain;
-        var tempfind = findContainer($rootNode, scenarioId, isMain)
-
-        //页面容器
+        var tempfind = findContainer($rootNode, scenarioId, isMain);
         var scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
-        //视差容器
         var scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
-
 
         //场景容器对象
         var vm = this.vm = new Mediator({
@@ -272,7 +261,7 @@ export class SceneFactory {
          */
         vm.$bind('pageUpdate', (...arg) => {
             isToolbar && isToolbar.updatePointer(...arg)
-            if (this.numberToolbar) {
+            if(this.numberToolbar) {
                 this.numberToolbar && this.numberToolbar.updatePointer(...arg)
             }
         })
@@ -321,7 +310,7 @@ export class SceneFactory {
          */
         vm.$bind('toggleToolbar', (...arg) => {
             isToolbar && isToolbar.toggle(...arg)
-            if (this.numberToolbar) {
+            if(this.numberToolbar) {
                 this.numberToolbar && this.numberToolbar.toggle(...arg)
             }
         })
@@ -332,7 +321,7 @@ export class SceneFactory {
          * @return {[type]} [description]
          */
         vm.$bind('resetToolbar', () => {
-            if (this.mainToolbar) {
+            if(this.mainToolbar) {
                 this.mainToolbar.resetArrow() //左右翻页按钮
                 this.mainToolbar.hideNavbar() //导航栏
             }
@@ -345,11 +334,11 @@ export class SceneFactory {
          */
         vm.$bind('createComplete', (nextAction) => {
             self.complete && setTimeout(() => {
-                if (isMain) {
+                if(isMain) {
                     self.complete(() => {
                         Xut.View.HideBusy()
                             //检测是不是有缓存加载
-                        if (!checkHistory(self.history)) {
+                        if(!checkHistory(self.history)) {
                             //指定自动运行的动作
                             nextAction && nextAction();
                         }
@@ -364,11 +353,11 @@ export class SceneFactory {
 
 
         //如果是读酷端加载
-        if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
+        if(window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
             window.DUKUCONFIG.success();
             vm.$init();
             //如果是客户端加载
-        } else if (window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
+        } else if(window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
             window.CLIENTCONFIGT.success();
             vm.$init();
         } else {
@@ -388,7 +377,7 @@ export class SceneFactory {
         this.vm.$destroy();
 
         //销毁工具栏
-        if (this.isToolbar) {
+        if(this.isToolbar) {
             this.isToolbar.destroy()
             this.isToolbar = null
         }

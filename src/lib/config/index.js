@@ -16,7 +16,7 @@ import {
 }
 from './depend/size'
 
-import getViewSize from '../visuals/view'
+import getViewSize from '../visuals/size'
 
 import {
     getFullProportion,
@@ -40,7 +40,7 @@ const MMXCONFIG = window.MMXCONFIG
 let config = Object.create(null)
 let layoutMode
 let proportion
-
+let fullProportion
 
 /**
  * 层级关系
@@ -53,7 +53,7 @@ Xut.zIndexlevel = () => {
 
 //通过新学堂加载
 //用于处理iframe窗口去全屏
-if (/xinxuetang/.test(window.location.href)) {
+if(/xinxuetang/.test(window.location.href)) {
     config.iframeFullScreen = true;
 }
 
@@ -86,24 +86,24 @@ const desktopPlat = () => {
 
     //2016.9.13
     //新增动态模式
-    if (config.launch) {
+    if(config.launch) {
         return getSourcePath()
     }
 
     //如果是iframe加载
     //而且是客户端模式
-    if (GLOBALIFRAME && CLIENTCONFIGT) {
+    if(GLOBALIFRAME && CLIENTCONFIGT) {
         return CLIENTCONFIGT.path
     }
 
-    if (typeof initGalleryUrl != 'undefined') {
+    if(typeof initGalleryUrl != 'undefined') {
         return getSourcePath()
     } else {
         //资源存放位置
         // * storageMode 存放的位置
         // * 0 APK应用本身
         // 1 外置SD卡
-        if (Number(config.storageMode)) {
+        if(Number(config.storageMode)) {
             return "sdcard/" + config.appId + "/" + getSourcePath()
         } else {
             return getSourcePath()
@@ -121,7 +121,7 @@ const desktopPlat = () => {
  * @return {[type]} [description]
  */
 const runMode = (() => {
-    if (MMXCONFIG) {
+    if(MMXCONFIG) {
         return false
     }
     return isBrowser
@@ -207,7 +207,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getVideoPath() {
-        if (isCacheVideoPath && cacheVideoPath) {
+        if(isCacheVideoPath && cacheVideoPath) {
             return cacheVideoPath
         }
         isCacheVideoPath = true
@@ -219,7 +219,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getAudioPath() {
-        if (isCacheAudioPath && cacheAudioPath) {
+        if(isCacheAudioPath && cacheAudioPath) {
             return cacheAudioPath
         }
         isCacheAudioPath = true
@@ -232,7 +232,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getSvgPath() {
-        if (isCacheSvgPath && cacheSvgPath) {
+        if(isCacheSvgPath && cacheSvgPath) {
             return cacheSvgPath
 
         }
@@ -246,7 +246,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getWidgetPath() {
-        if (isCacheJsWidgetPath && cacheJsWidgetPath) {
+        if(isCacheJsWidgetPath && cacheJsWidgetPath) {
             return cacheJsWidgetPath
         }
         isCacheJsWidgetPath = true
@@ -324,6 +324,7 @@ export function initPathAddress() {
 }
 
 
+
 /**
  * 重写默认设置
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
@@ -334,7 +335,7 @@ const resetProportion = function(pptWidth, pptHeight) {
     /**
      * 数据ppt排版设计
      */
-    if (pptWidth && pptHeight) {
+    if(pptWidth && pptHeight) {
         config.pptHorizontal = pptWidth > pptHeight ? true : false
         config.pptVertical = !config.pptHorizontal
     }
@@ -343,7 +344,7 @@ const resetProportion = function(pptWidth, pptHeight) {
      * 获取全屏比值，用来设定view的尺寸
      * 根据分辨率与PPT排版的比值来确定
      */
-    let fullProportion = getFullProportion(config, pptWidth, pptHeight)
+    fullProportion = getFullProportion(config, pptWidth, pptHeight)
 
     /**
      * 可视区域尺寸
@@ -359,15 +360,15 @@ const resetProportion = function(pptWidth, pptHeight) {
     /**
      * 快速获取溢出left正负
      */
-    if (viewSize.left !== 0) {
+    if(viewSize.left !== 0) {
         viewSize.overflowLeftPositive = Math.abs(viewSize.left)
         viewSize.overflowLeftNegative = -viewSize.overflowLeftPositive
     }
 
-    if (viewSize.left < 0) {
+    if(viewSize.left < 0) {
         //溢出宽度
         viewSize.overflowWidth = Math.abs(viewSize.left) * 2
-    } else if (viewSize.left > 0) {
+    } else if(viewSize.left > 0) {
         //没有填满宽度
         viewSize.notFillWidth = true
     }
@@ -377,10 +378,10 @@ const resetProportion = function(pptWidth, pptHeight) {
      * */
     viewSize.overflowHeight = false
     viewSize.notFillHeight = false
-    if (viewSize.top < 0) {
+    if(viewSize.top < 0) {
         //溢出宽度
         viewSize.overflowHeight = true
-    } else if (viewSize.top > 0) {
+    } else if(viewSize.top > 0) {
         //没有填满宽度
         viewSize.notFillHeight = true
     }
@@ -399,6 +400,25 @@ const resetProportion = function(pptWidth, pptHeight) {
      * 母版是依赖的页面，如果页面是flow那么母版中的元素的缩放比需要调整
      */
     config.flowProportion = getFlowProportion(config, config.screenSize, fullProportion)
+}
+
+/**
+ * 动态计算计算可视区View
+ * 每个页面可以重写页面的view
+ * @return {[type]} [description]
+ */
+export function dynamicView(setVisualMode) {
+    return getViewSize(config, fullProportion, setVisualMode)
+}
+
+/**
+ * 动态计算缩放比
+ * 每个页面可以重写页面的元素缩放比
+ * @param  {[type]} setVisualMode [description]
+ * @return {[type]}               [description]
+ */
+export function dynamicProportion(newViewSize) {
+    return getRealProportion(config, newViewSize, fullProportion)
 }
 
 

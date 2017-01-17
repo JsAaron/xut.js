@@ -1,10 +1,5 @@
-import defaultContainer from './hooks/container'
+import visualConfig from './visual-config'
 import Stack from '../util/stack'
-
-import {
-    getFlowView,
-    setFlowTranslate
-} from './hooks/adapter'
 
 /**
  * 自定义样式页面容器的样式
@@ -13,7 +8,7 @@ import {
  * 是否初始化创建
  * @return {[type]} [description]
  */
-export default function styleConfig({
+export default function setStyleConfig({
     action,
     hasFlow,
     usefulData
@@ -37,12 +32,12 @@ export default function styleConfig({
      */
     usefulData.hasFlow = function(pageName) {
         let key, value
-        for (key in this) {
+        for(key in this) {
             value = this[key]
-            if (_.isFunction(value)) {
+            if(_.isFunction(value)) {
                 continue;
             }
-            if (value.direction == pageName) {
+            if(value.direction == pageName) {
                 return value.isFlows
             }
         }
@@ -54,7 +49,7 @@ export default function styleConfig({
     _.each(usefulData, function(data, index) {
 
         //跳过getStyle方法
-        if (_.isFunction(data)) {
+        if(_.isFunction(data)) {
             return
         }
 
@@ -62,21 +57,20 @@ export default function styleConfig({
         //确保中间页第一个解析
         compile[data.direction == 'middle' ? 'shift' : 'push'](function() {
 
-            //容器默认默认尺寸
-            _.extend(data, defaultContainer.view())
+            //容器可视区尺寸
+            _.extend(data, visualConfig.view(data.dynamicVisualMode, data.direction))
 
-            //提供可自定义配置接口
-            if (data.isFlows) {
-                _.extend(data, getFlowView())
-            }
+            //容器内部元素的缩放比
+            data.dynamicProportion = visualConfig.proportion(data)
 
             //设置容器样式
-            let translate = defaultContainer.translate({
-                //提供容器的样式钩子
-                hooks: hasFlow ? setFlowTranslate(data, usefulData) : {},
-                createIndex: data.pid,
-                currIndex: data.visiblePid,
-                direction: data.direction
+            let translate = visualConfig.translate({
+                createIndex       : data.pid,
+                currIndex         : data.visiblePid,
+                direction         : data.direction,
+                viewWidth         : data.viewWidth,
+                overflowLeft      : data.overflowLeft,
+                dynamicVisualMode : data.dynamicVisualMode
             })
 
             //提供快速索引
@@ -87,7 +81,6 @@ export default function styleConfig({
     })
 
     compile.shiftAll().destroy()
-
 
     return usefulData
 }
