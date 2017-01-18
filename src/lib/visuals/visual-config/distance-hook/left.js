@@ -9,96 +9,66 @@ export const leftPageHook = {
             let middlePageStyle = pageStyles.middle
             let leftPageStyle = pageStyles.left
 
-            //左边：溢出
-            if(leftPageStyle && leftPageStyle.viewLeftInteger) {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
+            //中间：溢出
+            if (middlePageStyle && middlePageStyle.viewLeftInteger) {
+                //左边：溢出
+                if (leftPageStyle && leftPageStyle.viewLeftInteger) {
                     return -leftPageStyle.viewWidth + distance
                 }
-                //中间：正常
+                //左边：正常
                 else {
-                    return distance - leftPageStyle.viewWidth + leftPageStyle.viewLeftInteger
-                }
-            }
-            //左边：正常
-            else {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
                     return distance - leftPageStyle.viewWidth - middlePageStyle.viewLeftInteger
                 }
-                //中间：正常
+            }
+            //中间：正常
+            else {
+                //左边：溢出
+                if (leftPageStyle && leftPageStyle.viewLeftInteger) {
+                    return distance - leftPageStyle.viewWidth + leftPageStyle.viewLeftInteger
+                }
+                //左边：正常
                 else {
                     return distance - leftPageStyle.viewWidth
                 }
             }
         },
-        next(distance, pageStyles) {}
+        next() {}
     },
     flipRebound: {
         prev(distance, pageStyles) {
             let middlePageStyle = pageStyles.middle
             let leftPageStyle = pageStyles.left
 
-            //左边：溢出
-            if(leftPageStyle && leftPageStyle.viewLeftInteger) {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
+            //中间：溢出
+            if (middlePageStyle && middlePageStyle.viewLeftInteger) {
+                //左边：溢出
+                if (leftPageStyle && leftPageStyle.viewLeftInteger) {
                     return -leftPageStyle.viewWidth
                 }
-                //中间：正常
+                //左边：正常
                 else {
+                    return -(leftPageStyle.viewWidth + middlePageStyle.viewLeftInteger)
+                }
+            }
+            //中间：正常
+            else {
+                //左边：溢出
+                if (leftPageStyle && leftPageStyle.viewLeftInteger) {
                     return -(leftPageStyle.viewWidth - leftPageStyle.viewLeftInteger)
                 }
-            }
-            //左边：正常
-            else {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
-                    return -leftPageStyle.viewWidth
-                }
-                //中间：正常
+                //左边：正常
                 else {
                     return -leftPageStyle.viewWidth
                 }
             }
+
         },
-        next() {
-            //右翻页反弹
-            //左边页面不动
-        }
+        next() {}
     },
     flipOver: {
-        prev(distance, pageStyles) {
-            let middlePageStyle = pageStyles.middle
-            let leftPageStyle = pageStyles.left
-
-            //左边：溢出
-            if(leftPageStyle && leftPageStyle.viewLeftInteger) {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
-                    return 0
-                }
-                //中间：正常
-                else {
-                    return 0
-                }
-            }
-            //左边：正常
-            else {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
-                    return 0
-                }
-                //中间：正常
-                else {
-                    return 0
-                        // return distance + middlePageStyle.viewWidth + middlePageStyle.viewLeftInteger
-                }
-            }
-
+        prev() {
+            return 0
         },
-        next(distance, pageStyles) {
-
-        }
+        next() {}
     }
 }

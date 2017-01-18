@@ -4,6 +4,16 @@ import { visualProportion } from './visual-config/proportion'
 import { initTranslate } from './visual-config/translate-hook/init'
 
 /**
+ * 获取页面对象的样式配置对象
+ * @param  {[type]} pageIndex [description]
+ * @return {[type]}           [description]
+ */
+const getPageStyle = function(pageIndex) {
+    let pageBase = Xut.Presentation.GetPageObj(pageIndex)
+    return pageBase && pageBase.getStyle
+}
+
+/**
  * 自定义样式页面容器的样式
  * 创建页面的样式，与布局
  * 1 创建页面的初始化的Transform值
@@ -28,9 +38,23 @@ export function styleConfig({
 
     /**
      * 获取指定页面样式
-     * @return {[type]} [description]
+     * pageName
+     * standbyName 备用名，用于翻页获取
      */
-    usefulData.getPageStyle = function(pageName) {
+    usefulData.getPageStyle = function(pageName, standbyName) {
+        let pageStyle = this[this['_' + pageName]]
+
+        //翻页动态创建的时候，只能索取到一页
+        //所以这里需要动态获取关联的中间页面对象
+        if (!pageStyle && pageName === 'middle') {
+            let standbyStyle = this.getPageStyle(standbyName)
+            if (standbyName === 'before') {
+                return getPageStyle(standbyStyle.pid + 1)
+            }
+            if (standbyName === 'after') {
+                return getPageStyle(standbyStyle.pid - 1)
+            }
+        }
         return this[this['_' + pageName]]
     }
 
@@ -44,13 +68,12 @@ export function styleConfig({
         //容器的初始translate值
         _.extend(data, initTranslate({
             usefulData,
-            createIndex : data.pid,
-            currIndex   : data.visiblePid,
-            direction   : data.direction,
-            viewWidth   : data.viewWidth
+            createIndex: data.pid,
+            currIndex: data.visiblePid,
+            direction: data.direction
         }))
     })
 
- 
+
     return usefulData
 }

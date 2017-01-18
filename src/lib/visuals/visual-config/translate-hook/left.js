@@ -3,7 +3,7 @@
  ************************/
 
 export function leftTranslate(usefulData) {
-    let middlePageStyle = usefulData.getPageStyle('middle')
+    let middlePageStyle = usefulData.getPageStyle('middle', 'before')
     let leftPageStyle = usefulData.getPageStyle('before')
 
     //中间：溢出

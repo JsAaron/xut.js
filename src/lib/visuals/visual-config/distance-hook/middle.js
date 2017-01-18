@@ -3,8 +3,8 @@
  *************************/
 export const middlePageHook = {
     flipMove: {
-        prev(distance, pageStyles) {},
-        next(distance, pageStyles) {}
+        prev() {},
+        next() {}
     },
     flipOver: {
         /**
@@ -14,24 +14,24 @@ export const middlePageHook = {
             let middlePageStyle = pageStyles.middle
             let leftPageStyle = pageStyles.left
 
-            //左边：溢出
-            if(leftPageStyle && leftPageStyle.viewLeftInteger) {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
+            //中间：溢出
+            if (middlePageStyle && middlePageStyle.viewLeftInteger) {
+                //左边：溢出
+                if (leftPageStyle && leftPageStyle.viewLeftInteger) {
                     return middlePageStyle.viewWidth
                 }
-                //中间：正常
+                //左边：正常
                 else {
-                    return middlePageStyle.viewWidth + leftPageStyle.viewLeftInteger
-                }
-            }
-            //左边：正常
-            else {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
                     return middlePageStyle.viewWidth - middlePageStyle.viewLeftInteger
                 }
-                //中间：正常
+            }
+            //中间：正常
+            else {
+                //左边：溢出
+                if (leftPageStyle && leftPageStyle.viewLeftInteger) {
+                    return middlePageStyle.viewWidth + leftPageStyle.viewLeftInteger
+                }
+                //左边：正常
                 else {
                     return middlePageStyle.viewWidth
                 }
@@ -41,28 +41,27 @@ export const middlePageHook = {
          * 右翻页结束
          */
         next(distance, pageStyles) {
-
             let middlePageStyle = pageStyles.middle
             let rightPageStyle = pageStyles.right
 
-            //左边：溢出
-            if(rightPageStyle && rightPageStyle.viewLeftInteger) {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
+            //中间：溢出
+            if (middlePageStyle && middlePageStyle.viewLeftInteger) {
+                //右边：溢出
+                if (rightPageStyle && rightPageStyle.viewLeftInteger) {
                     return -middlePageStyle.viewWidth
                 }
-                //中间：正常
+                //右边：正常
                 else {
-                    return -(middlePageStyle.viewWidth + rightPageStyle.viewLeftInteger)
-                }
-            }
-            //左边：正常
-            else {
-                //中间：溢出
-                if(middlePageStyle && middlePageStyle.viewLeftInteger) {
                     return -(middlePageStyle.viewWidth - middlePageStyle.viewLeftInteger)
                 }
-                //中间：正常
+            }
+            //中间：正常
+            else {
+                //右边：溢出
+                if (rightPageStyle && rightPageStyle.viewLeftInteger) {
+                    return -(middlePageStyle.viewWidth + rightPageStyle.viewLeftInteger)
+                }
+                //右边：正常
                 else {
                     return -rightPageStyle.viewWidth
                 }

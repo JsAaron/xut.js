@@ -4,14 +4,13 @@
 
 export function rightTranslate(usefulData) {
 
-    let middlePageStyle = usefulData.getPageStyle('middle')
+    let middlePageStyle = usefulData.getPageStyle('middle', 'after')
     let rightPageStyle = usefulData.getPageStyle('after')
 
     //中间：溢出
     if (middlePageStyle && middlePageStyle.viewLeftInteger) {
         //右边：溢出
         if (rightPageStyle && rightPageStyle.viewLeftInteger) {
-            console.log(2)
         }
         //右边：正常
         else {
@@ -26,7 +25,7 @@ export function rightTranslate(usefulData) {
         }
         //右边：正常
         else {
-            return rightPageStyle.viewWidth
+            return rightPageStyle.viewWidth + rightPageStyle.viewLeftInteger
         }
     }
 
