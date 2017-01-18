@@ -4,7 +4,7 @@ import { getColumnCount } from './get'
 import Swipe from '../../../swipe/index'
 import render from './render'
 
-import { getDistance } from '../../../visuals/distance'
+import { getDistance } from '../../../visuals/view-distance'
 import { Zoom } from '../../../plugin/extend/zoom/index'
 import { closeButton } from '../../../plugin/extend/close-button'
 
@@ -174,11 +174,6 @@ export default class Section {
                     View.GotoPrevSlide()
                     this.simulationComplete()
                 } else {
-                    if(config.viewSize.overflowWidth) {
-                        //内部页面边间翻页
-                        //要除去被溢出的值
-                        distance -= viewLeft
-                    }
                     //前边界前移反弹
                     View.MovePage(distance, speed, this.direction, action)
                 }
@@ -193,11 +188,6 @@ export default class Section {
                     View.GotoNextSlide()
                     this.simulationComplete()
                 } else {
-                    //内部页面边间翻页
-                    //要除去被溢出的值
-                    if(config.viewSize.overflowWidth) {
-                        distance -= viewLeft
-                    }
                     //后边界前移反弹
                     View.MovePage(distance, speed, this.direction, action)
                 }
@@ -207,26 +197,11 @@ export default class Section {
              */
             else {
 
-                //修正内部翻页的翻页算法
-                let hooks
-                if(config.viewSize.overflowWidth) {
-                    hooks = {
-                        flipOver: {
-                            left(data) {
-                                data.middle = flipWidth
-                            },
-                            right(data) {
-                                data.middle = -flipWidth
-                            }
-                        }
-                    }
-                }
-
                 let viewBeHideDistance = getDistance({
                     action,
                     distance,
                     direction
-                }, hooks)[1]
+                })[1]
 
                 moveDistance = viewBeHideDistance
 

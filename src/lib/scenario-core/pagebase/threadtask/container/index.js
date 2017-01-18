@@ -22,12 +22,45 @@ const createli = function({
     pageData,
     background
 }) {
-    const getStyle = base.getStyle
+    let getStyle = base.getStyle
+    let html = ''
 
-    //增加一个main-content放body内容
-    //增加一个header-footer放溢出的页眉页脚
-    return String.styleFormat(
-        `<li id="${prefix}"
+    //如果是模式3，需要设置main-content的坐标
+    //而不是li节点的坐标,li是全屏状态
+    //设置li溢出隐藏
+    //子容器全尺寸
+    if(getStyle.dynamicVisualMode === 4) {
+        let subViewSize = getStyle.subViewSize
+        html =
+            `<li id="${prefix}"
+                 data-id="${pageData._id}"
+                 data-map="${base.pid}"
+                 data-pageType="${base.pageType}"
+                 data-container="true"
+                 class="xut-flip fix-transform"
+                 style="width:${getStyle.viewWidth}px;
+                        height:${getStyle.viewHeight}px;
+                        left:0;
+                        top:0;
+                        overflow:hidden;
+                        ${TANSFROM}:${translate};
+                        ${background}
+                        ${customStyle}">
+                <div class="page-pinch">
+                    <div data-type="main-content"
+                         style="width:${subViewSize.viewWidth}px;
+                                height:${subViewSize.viewHeight}px;
+                                left:${subViewSize.viewLeft}px;
+                                top:${subViewSize.viewTop}px;">
+                    </div>
+                    <div data-type="header-footer"></div>
+                </div>
+        </li>`
+    } else {
+        //增加一个main-content放body内容
+        //增加一个header-footer放溢出的页眉页脚
+        html =
+            `<li id="${prefix}"
             data-id="${pageData._id}"
             data-map="${base.pid}"
             data-pageType="${base.pageType}"
@@ -45,7 +78,9 @@ const createli = function({
                 <div data-type="header-footer"></div>
             </div>
         </li>`
-    )
+    }
+
+    return String.styleFormat(html)
 }
 
 

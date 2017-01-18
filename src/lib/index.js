@@ -36,7 +36,6 @@ if(Xut.plat.isBrowser) {
     })
 }
 
-
 /**
  * 加载应用app
  * arg : el / cursor

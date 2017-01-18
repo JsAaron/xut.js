@@ -6,7 +6,7 @@
  **********************************************************************/
 import { config } from '../config/index'
 import { Observer } from '../observer/index'
-import Dispatcher from './transform/index'
+import Dispatcher from './controller/index'
 import delegateHooks from './delegate/hooks'
 import closestProcessor from './delegate/closest'
 import GlobalEvent from '../swipe/index.js'

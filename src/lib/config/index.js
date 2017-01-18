@@ -16,13 +16,12 @@ import {
 }
 from './depend/size'
 
-import getViewSize from '../visuals/size'
+import { getViewLayout } from '../visuals/view-layout'
 
 import {
     getFullProportion,
-    getRealProportion,
-    getFlowProportion
-} from '../visuals/proportion'
+    getRealProportion
+} from '../visuals/view-proportion'
 
 /**
  * 默认配置与模式
@@ -340,7 +339,7 @@ const resetProportion = function(pptWidth, pptHeight) {
     fullProportion = getFullProportion(config, pptWidth, pptHeight)
 
     //可视区域尺寸
-    let viewSize = config.viewSize = getViewSize(config, fullProportion)
+    let viewSize = config.viewSize = getViewLayout(config, fullProportion)
 
     //溢出宽度
     viewSize.overflowWidth = false
@@ -363,7 +362,7 @@ const resetProportion = function(pptWidth, pptHeight) {
  * 每个页面可以重写页面的view
  */
 export function dynamicView(setVisualMode) {
-    return getViewSize(config, fullProportion, setVisualMode)
+    return getViewLayout(config, fullProportion, setVisualMode)
 }
 
 /**

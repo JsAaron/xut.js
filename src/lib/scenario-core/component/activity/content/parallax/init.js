@@ -36,7 +36,7 @@ const setTransformNodes = function($contentNode, property, pageOffset) {
  * @return {[type]}            [description]
  */
 const converProperty = function(property) {
-    if (property.opacityStart > -1) {
+    if(property.opacityStart > -1) {
         property.opacity = (property.opacityEnd || 1) - property.opacityStart;
         delete property.opacityEnd;
     }
@@ -51,7 +51,7 @@ const converProperty = function(property) {
  */
 const getFlowFange = function(pageIndex) {
     var relyPageObj = Xut.Presentation.GetPageObj('page', pageIndex)
-    if (relyPageObj && relyPageObj.chapterData.note === 'flow') {
+    if(relyPageObj && relyPageObj.chapterData.note === 'flow') {
         let seasonId = relyPageObj.chapterData.seasonId
         let chapterId = relyPageObj.chapterId
         let range = getColumnCount(seasonId, chapterId) //分页总数
@@ -63,7 +63,7 @@ export default function Parallax(data, relatedData) {
 
     //转化所有css特效的参数的比例
     let targetProperty = parseJSON(data.getParameter()[0]['parameter'])
-    if (!targetProperty) {
+    if(!targetProperty) {
         return
     }
 
@@ -76,9 +76,9 @@ export default function Parallax(data, relatedData) {
 
     //如果是flow页面，拿到分页数
     let pageRange = hasColumn() && getFlowFange(data.pageIndex)
-    if (pageRange) {
+    if(pageRange) {
         let visualIndex = Xut.Presentation.GetPageIndex()
-        if (data.pageIndex == visualIndex || data.pageIndex > visualIndex) {
+        if(data.pageIndex == visualIndex || data.pageIndex > visualIndex) {
             currPageOffset = 1
         } else {
             currPageOffset = pageRange
@@ -96,14 +96,14 @@ export default function Parallax(data, relatedData) {
 
     //非匀速视觉差，初始化一些参数
     //增加特殊记录历史记录
-    if (targetProperty.special) {
+    if(targetProperty.special) {
         //筛选出所有属性最大的值
         let maxProperty = {}
         let specialProperty = targetProperty.special
-        for (let key in specialProperty) {
-            for (let name in specialProperty[key]) {
-                if (maxProperty[name]) {
-                    if (maxProperty[name] < specialProperty[key][name]) {
+        for(let key in specialProperty) {
+            for(let name in specialProperty[key]) {
+                if(maxProperty[name]) {
+                    if(maxProperty[name] < specialProperty[key][name]) {
                         maxProperty[name] = specialProperty[key][name]
                     }
                 } else {
@@ -119,7 +119,7 @@ export default function Parallax(data, relatedData) {
     let nodeOffset = (currPageOffset - 1) / (pageRange - 1) || 0
 
     //计算出新的新的值
-    let lastProperty = getInitProperty(targetProperty, nodeOffset)
+    let lastProperty = getInitProperty(targetProperty, nodeOffset, '', data.base && data.base.getStyle)
 
     //页面分割比
     let nodeRatio = 1 / (pageRange - 1)

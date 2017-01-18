@@ -28,22 +28,22 @@ export function setStyle({
     let z = 0
     let translateZ
 
-    if (action === 'init') {
+    if(action === 'init') {
         //如果有special属性
         //提取出第一个对象的设置，混入到special
         let special = property.special
-        if (special && special[1]) {
+        if(special && special[1]) {
             _.extend(property, special[1])
         }
     }
 
     let specialProperty //特殊属性值
     let lastProperty
-    if (action === 'master') {
+    if(action === 'master') {
         let special = targetProperty.special
-        if (special) {
+        if(special) {
             specialProperty = special[pageIndex]
-            if (!specialProperty) {
+            if(!specialProperty) {
                 //上一个属性
                 lastProperty = special.lastProperty
             }
@@ -57,29 +57,29 @@ export function setStyle({
     let hasTranslateX = property.translateX !== undefined
     let hasTranslateY = property.translateY !== undefined
     let hasTranslateZ = property.translateZ !== undefined
-    if (hasTranslateX) {
+    if(hasTranslateX) {
         x = round(property.translateX) || 0
         parallaxOffset += x
         transformProperty.translateX = `translateX(${parallaxOffset}px)`
     }
-    if (hasTranslateY) {
+    if(hasTranslateY) {
         y = round(property.translateY) || 0
         transformProperty.translateY = `translateY(${y}px)`
     }
-    if (hasTranslateX || hasTranslateY || hasTranslateZ) {
+    if(hasTranslateX || hasTranslateY || hasTranslateZ) {
         z = round(property.translateZ) || 0
         transformProperty.translateZ = setTranslateZ(z)
     }
 
 
     //旋转
-    if (property.rotateX !== undefined) {
+    if(property.rotateX !== undefined) {
         transformProperty.rotateX = `rotateX(${round(property.rotateX)}deg)`
     }
-    if (property.rotateY !== undefined) {
+    if(property.rotateY !== undefined) {
         transformProperty.rotateY = `rotateY(${round(property.rotateY)}deg)`
     }
-    if (property.rotateZ !== undefined) {
+    if(property.rotateZ !== undefined) {
         transformProperty.rotateZ = `rotateZ(${round(property.rotateZ)}deg)`
     }
 
@@ -88,63 +88,63 @@ export function setStyle({
     let hasScaleX = property.scaleX !== undefined
     let hasScaleY = property.scaleY !== undefined
     let hasScaleZ = property.scaleZ !== undefined
-    if (hasScaleX) {
+    if(hasScaleX) {
         x = round(property.scaleX * 100) / 100
         transformProperty.scaleX = `scaleX(${x})`
     }
-    if (hasScaleY) {
+    if(hasScaleY) {
         y = round(property.scaleY * 100) / 100
         transformProperty.scaleY = `scaleY(${y})`
     }
-    if (hasScaleZ) {
+    if(hasScaleZ) {
         z = round(property.scaleZ * 100) / 100
         transformProperty.scaleZ = `scaleZ(${z})`
     }
     //如果设了XY的缩放，默认增加Z处理
-    if (!hasScaleZ && (hasScaleX || hasScaleY)) {
+    if(!hasScaleZ && (hasScaleX || hasScaleY)) {
         transformProperty.scaleZ = `scaleZ(1)` //默认打开3D，如不指定iphone闪屏
     }
 
 
     //透明度
     let hasOpacity = false
-    if (property.opacity !== undefined) {
-        if (action === 'init') {
+    if(property.opacity !== undefined) {
+        if(action === 'init') {
             style.opacity = round((property.opacityStart + property.opacity) * 100) / 100;
             hasOpacity = true
         }
-        if (action === 'master') {
+        if(action === 'master') {
             style.opacity = round(property.opacity * 100) / 100 + opacityStart;
             hasOpacity = true
         }
     }
 
     //style可以单独设置opacity属性
-    if (transformProperty || hasOpacity) {
-        if (transformProperty) {
+    if(transformProperty || hasOpacity) {
+        if(transformProperty) {
 
-            if (lastProperty) {
+            if(lastProperty) {
                 _.extend(transformProperty, lastProperty)
             }
 
             style[transitionDuration] = speed + 'ms';
             let tempProperty = ''
-            for (let key in transformProperty) {
+            for(let key in transformProperty) {
                 tempProperty += transformProperty[key]
             }
-            if (tempProperty) {
+            if(tempProperty) {
                 style[transform] = tempProperty
             }
         }
         //拿到属性的最终值
-        if ($contentNode) {
+        if($contentNode) {
             $contentNode.css(style)
                 //翻页做上一个完成记录
-            if (interaction === 'flipOver' && specialProperty) {
-                for (let key in specialProperty) {
+            if(interaction === 'flipOver' && specialProperty) {
+                for(let key in specialProperty) {
                     let speciaValue = specialProperty[key]
                     let result = transformProperty[key]
-                    if (result) {
+                    if(result) {
                         //保存特殊的值
                         targetProperty.special.lastProperty[key] = result
                     }
@@ -161,24 +161,24 @@ export function setStyle({
 /**
  * 初始化元素属性
  */
-export function getInitProperty(property, nodeOffset, specialProperty) {
+export function getInitProperty(property, nodeOffset, specialProperty, getStyle) {
     let results = {}
-    let width = -config.viewSize.width
-    let height = -config.viewSize.height
+    let width = getStyle ? -getStyle.viewWidth : -config.viewSize.width
+    let height = getStyle ? -getStyle.viewHeigth : -config.viewSize.height
 
-    for (let key in property) {
+    for(let key in property) {
         //special使用
         //给属性打上标记，用于翻页的时候过滤
         //因为采用动态滑动视觉差
         //可能在某些页面设置属性，某些页面跳过
-        if (specialProperty) {
+        if(specialProperty) {
             specialProperty.special[key] = true
         }
 
-        switch (key) {
+        switch(key) {
             case 'special': //特殊属性
                 results[key] = {}
-                for (let i in property[key]) {
+                for(let i in property[key]) {
                     //因为是独立设置，所以nodeOffset的比值不需要了
                     //nodeOffset = 1
                     let props = getInitProperty(property[key][i], 1, property)
@@ -229,10 +229,10 @@ export function getStepProperty({
     //动态属性页面
     let specialProperty
     let nextSpecialProperty
-    if (targetProperty.special) {
+    if(targetProperty.special) {
         specialProperty = targetProperty.special[pageIndex]
         nextSpecialProperty = targetProperty.special[pageIndex + 1]
-        if (specialProperty) {
+        if(specialProperty) {
             //深复制，这样修改的目的是混入了specialProperty后，不会改变targetProperty原对象
             property = _.extend({}, targetProperty, specialProperty)
         }
@@ -244,18 +244,18 @@ export function getStepProperty({
     let width = size.width
     let height = size.height
 
-    for (let key in property) {
-        switch (key) {
+    for(let key in property) {
+        switch(key) {
             case 'scaleX':
             case 'scaleY':
             case 'scaleZ':
                 //特殊属性的计算
                 //没有中间值，直接就 = 百分比*变化区间
-                if (specialProperty[key]) {
+                if(specialProperty[key]) {
                     var percentage = -distance / width
-                    if (nextSpecialProperty[key]) {
+                    if(nextSpecialProperty[key]) {
                         var changeProperty = nextSpecialProperty[key] - specialProperty[key]
-                        if (changeProperty) {
+                        if(changeProperty) {
                             temp[key] = percentage * changeProperty
                         }
                     }
@@ -288,10 +288,10 @@ export function getStepProperty({
 export function flipMove(stepProperty, lastProperty) {
     let temp = {};
     let start = stepProperty.opacityStart;
-    for (let i in stepProperty) { //叠加值
+    for(let i in stepProperty) { //叠加值
         temp[i] = stepProperty[i] + lastProperty[i]
     }
-    if (start > -1) {
+    if(start > -1) {
         temp.opacityStart = start;
     }
     return temp;
@@ -311,7 +311,7 @@ export function flipOver(...arg) {
  */
 export function flipRebound(stepProperty, lastProperty) {
     var temp = {};
-    for (var i in stepProperty) {
+    for(var i in stepProperty) {
         temp[i] = lastProperty[i] || stepProperty[i];
     }
     return temp;
@@ -322,7 +322,7 @@ export function flipRebound(stepProperty, lastProperty) {
  * 结束后缓存上一个记录
  */
 export function cacheProperty(stepProperty, lastProperty) {
-    for (var i in stepProperty) {
+    for(var i in stepProperty) {
         lastProperty[i] = stepProperty[i];
     }
 }

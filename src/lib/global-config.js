@@ -33,6 +33,12 @@ const config: Config = {
     quickFlip: true, //默认是支持
 
     /**
+     * 支持调试模式
+     * @type {[type]}
+     */
+    devtools: process.env.NODE_ENV !== 'production',
+
+    /**
      * 是否支持错误日志打印
      * @type {Boolean}
      */

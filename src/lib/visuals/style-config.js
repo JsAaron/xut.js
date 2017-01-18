@@ -1,5 +1,5 @@
 import Stack from '../util/stack'
-import { visualView } from './visual-config/view'
+import { visualLayout } from './visual-config/layout'
 import { visualProportion } from './visual-config/proportion'
 import { visualInitTranslate } from './visual-config/translate'
 
@@ -10,7 +10,7 @@ import { visualInitTranslate } from './visual-config/translate'
  * 是否初始化创建
  * @return {[type]} [description]
  */
-export default function styleConfig({
+export function styleConfig({
     action,
     usefulData
 }) {
@@ -19,7 +19,7 @@ export default function styleConfig({
      * 获取指定页面样式
      * @return {[type]} [description]
      */
-    usefulData.getStyle = function(pageName) {
+    usefulData.getPageStyle = function(pageName) {
         return this[this['_' + pageName]]
     }
 
@@ -27,7 +27,7 @@ export default function styleConfig({
     _.each(usefulData, function(data, index) {
 
         //跳过getStyle方法
-        if (_.isFunction(data)) {
+        if(_.isFunction(data)) {
             return
         }
 
@@ -36,7 +36,7 @@ export default function styleConfig({
         compile[data.direction == 'middle' ? 'shift' : 'push'](function() {
 
             //容器可视区尺寸
-            _.extend(data, visualView(data.dynamicVisualMode, data.direction))
+            _.extend(data, visualLayout(data.dynamicVisualMode, data.direction))
 
             //容器内部元素的缩放比
             data.dynamicProportion = visualProportion(data)
