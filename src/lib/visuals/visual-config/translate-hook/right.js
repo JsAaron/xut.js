@@ -11,6 +11,7 @@ export function rightTranslate(usefulData) {
     if (middlePageStyle && middlePageStyle.viewLeftInteger) {
         //右边：溢出
         if (rightPageStyle && rightPageStyle.viewLeftInteger) {
+            return rightPageStyle.viewWidth - rightPageStyle.viewLeftInteger
         }
         //右边：正常
         else {

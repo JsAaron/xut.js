@@ -10,7 +10,7 @@ export function leftTranslate(usefulData) {
     if (middlePageStyle && middlePageStyle.viewLeftInteger) {
         //左边：溢出
         if (leftPageStyle && leftPageStyle.viewLeftInteger) {
-            console.log(1)
+           return -middlePageStyle.viewWidth
         }
         //左边：正常
         else {

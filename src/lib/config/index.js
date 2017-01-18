@@ -52,7 +52,7 @@ Xut.zIndexlevel = () => {
 
 //通过新学堂加载
 //用于处理iframe窗口去全屏
-if(/xinxuetang/.test(window.location.href)) {
+if (/xinxuetang/.test(window.location.href)) {
     config.iframeFullScreen = true;
 }
 
@@ -85,24 +85,24 @@ const desktopPlat = () => {
 
     //2016.9.13
     //新增动态模式
-    if(config.launch) {
+    if (config.launch) {
         return getSourcePath()
     }
 
     //如果是iframe加载
     //而且是客户端模式
-    if(GLOBALIFRAME && CLIENTCONFIGT) {
+    if (GLOBALIFRAME && CLIENTCONFIGT) {
         return CLIENTCONFIGT.path
     }
 
-    if(typeof initGalleryUrl != 'undefined') {
+    if (typeof initGalleryUrl != 'undefined') {
         return getSourcePath()
     } else {
         //资源存放位置
         // * storageMode 存放的位置
         // * 0 APK应用本身
         // 1 外置SD卡
-        if(Number(config.storageMode)) {
+        if (Number(config.storageMode)) {
             return "sdcard/" + config.appId + "/" + getSourcePath()
         } else {
             return getSourcePath()
@@ -120,7 +120,7 @@ const desktopPlat = () => {
  * @return {[type]} [description]
  */
 const runMode = (() => {
-    if(MMXCONFIG) {
+    if (MMXCONFIG) {
         return false
     }
     return isBrowser
@@ -206,7 +206,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getVideoPath() {
-        if(isCacheVideoPath && cacheVideoPath) {
+        if (isCacheVideoPath && cacheVideoPath) {
             return cacheVideoPath
         }
         isCacheVideoPath = true
@@ -218,7 +218,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getAudioPath() {
-        if(isCacheAudioPath && cacheAudioPath) {
+        if (isCacheAudioPath && cacheAudioPath) {
             return cacheAudioPath
         }
         isCacheAudioPath = true
@@ -231,7 +231,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getSvgPath() {
-        if(isCacheSvgPath && cacheSvgPath) {
+        if (isCacheSvgPath && cacheSvgPath) {
             return cacheSvgPath
 
         }
@@ -245,7 +245,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getWidgetPath() {
-        if(isCacheJsWidgetPath && cacheJsWidgetPath) {
+        if (isCacheJsWidgetPath && cacheJsWidgetPath) {
             return cacheJsWidgetPath
         }
         isCacheJsWidgetPath = true
@@ -329,7 +329,7 @@ export function initPathAddress() {
 const resetProportion = function(pptWidth, pptHeight) {
 
     //数据ppt排版设计
-    if(pptWidth && pptHeight) {
+    if (pptWidth && pptHeight) {
         config.pptHorizontal = pptWidth > pptHeight ? true : false
         config.pptVertical = !config.pptHorizontal
     }
@@ -339,17 +339,24 @@ const resetProportion = function(pptWidth, pptHeight) {
     fullProportion = getFullProportion(config, pptWidth, pptHeight)
 
     //可视区域尺寸
-    let viewSize = config.viewSize = getViewLayout(config, fullProportion)
+    let setVisualMode = config.visualMode
+    //特殊处理
+    //如果是全局3模式
+    //需要转化成每一个模式处理
+    if (config.visualMode === 3) {
+        setVisualMode = 1
+    }
+    let viewSize = config.viewSize = getViewLayout(config, fullProportion, setVisualMode)
 
     //溢出宽度
     viewSize.overflowWidth = false
-    if(viewSize.left < 0) {
+    if (viewSize.left < 0) {
         viewSize.overflowWidth = Math.abs(viewSize.left) * 2
     }
 
     //溢出高度
     viewSize.overflowHeight = false
-    if(viewSize.top < 0) {
+    if (viewSize.top < 0) {
         viewSize.overflowHeight = true
     }
 
