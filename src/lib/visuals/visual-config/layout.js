@@ -24,18 +24,6 @@ export function visualLayout(dynamicVisualMode) {
         viewSize = config.viewSize
     }
 
-    //模式4的特殊性
-    //转化成模式1，采用子视图属性的方式处理坐标系
-    if(dynamicVisualMode === 4) {
-        subViewSize = {
-            viewWidth: viewSize.width,
-            viewHeight: viewSize.height,
-            viewTop: viewSize.top,
-            viewLeft: viewSize.left
-        }
-        viewSize = dynamicView(1)
-    }
-
     return {
         viewWidth: viewSize.width,
         viewHeight: viewSize.height,

@@ -1,5 +1,6 @@
-import { config } from '../../config/index'
-
+import { config } from '../../../config/index'
+import { leftTranslate } from './left'
+import { rightTranslate } from './right'
 
 /**
  * 设置默认的样式
@@ -15,25 +16,8 @@ const translateZ = Xut.style.translateZ
  * @return {[type]}        [description]
  */
 const createTranslate = (offset) => {
-    return 'translate(' + offset + 'px,0px)' + translateZ
+    return `translate(${offset}px,0) ${translateZ}`
 }
-
-/**
- * 混入钩子处理
- * @param  {[type]} original [description]
- * @param  {[type]} hook     [description]
- * @return {[type]}          [description]
- */
-const mixHooks = function(original, hook) {
-    if (hook) {
-        let newValue = hook(original)
-        if (newValue !== undefined) {
-            return newValue
-        }
-    }
-    return original
-}
-
 
 /**
  * 默认样式
@@ -42,38 +26,29 @@ const mixHooks = function(original, hook) {
  * @param  {Object} currIndex                     } [description]
  * @return {[type]}               [description]
  */
-export function visualInitTranslate({
-    hooks = {},
+export function initTranslate({
     createIndex,
     currIndex,
     direction,
-    viewWidth
+    usefulData
 }) {
 
     let translate
     let offset
-    let offsetLeft
-    let offsetMiddle
-    let offsetRight
-
-    viewWidth = viewWidth || config.viewSize.width
 
     switch (direction) {
         case 'before':
-            offsetLeft = -viewWidth
-            offsetLeft = mixHooks(offsetLeft, hooks.left)
+            let offsetLeft = leftTranslate(usefulData)
             translate = createTranslate(offsetLeft)
             offset = offsetLeft
             break;
         case 'middle':
-            offsetMiddle = 0
-            offsetMiddle = mixHooks(offsetMiddle, hooks.middle)
+            let offsetMiddle = 0
             translate = createTranslate(offsetMiddle)
             offset = offsetMiddle
             break;
         case 'after':
-            offsetRight = viewWidth
-            offsetRight = mixHooks(offsetRight, hooks.right)
+            let offsetRight = rightTranslate(usefulData)
             translate = createTranslate(offsetRight)
             offset = offsetRight
             break;
