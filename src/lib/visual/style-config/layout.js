@@ -27,7 +27,7 @@ export function visualLayout(pageVisualMode) {
         if(visualSize.left) {
             //总模式2的时候，竖版应用横版显示处理
             //反向模式的处理
-            visualLeft = 0
+            // visualLeft = 0
         } else {
             visualLeft = visualSize.left
         }

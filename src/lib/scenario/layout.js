@@ -57,7 +57,7 @@ export function mainScene() {
               style="width:${config.visualSize.width}px;
                      height:${config.screenSize.height}px;
                      top:0;
-                     left:${config.visualSize.left}px;
+                     left:${config.originalVisualSize.left}px;
                      position:absolute;
                      z-index:${sceneController.createIndex()};
                      overflow:hidden;">
@@ -84,7 +84,7 @@ export function deputyScene(id) {
               style="width:${config.visualSize.width}px;
                      height:100%;
                      top:0;
-                     left:${config.visualSize.left}px;
+                     left:${config.originalVisualSize.left}px;
                      z-index:${sceneController.createIndex()};
                      position:absolute;
                      overflow:hidden;">
