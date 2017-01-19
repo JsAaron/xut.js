@@ -2,7 +2,7 @@
  * 场景API
  * 数据接口。和电子杂志的数据相关的接口，都在这里。
  ********************************************/
-
+import { $$warn } from '../../util/debug'
 /**
  * 命名前缀
  * @type {String}
@@ -94,6 +94,19 @@ export function extendPresentation(access, $globalEvent) {
     Xut.Presentation.GetPageElement = () => {
         var obj = Xut.Presentation.GetPageObj()
         return obj.$pageNode
+    }
+
+    /**
+     * 获取页面样式配置文件
+     * @return {[type]} [description]
+     */
+    Xut.Presentation.GetPageStyle = (pageIndex) => {
+        let pageBase = Xut.Presentation.GetPageObj(pageIndex)
+        if(pageBase && pageBase.getStyle) {
+            return pageBase.getStyle
+        } else {
+            $$warn('页面Style配置文件获取失败,pageIndex:' + pageIndex)
+        }
     }
 
     /**

@@ -163,8 +163,8 @@ export function setStyle({
  */
 export function getInitProperty(property, nodeOffset, specialProperty, getStyle) {
     let results = {}
-    let width = getStyle ? -getStyle.viewWidth : -config.viewSize.width
-    let height = getStyle ? -getStyle.viewHeigth : -config.viewSize.height
+    let width = -getStyle.visualWidth
+    let height = -getStyle.visualHeight
 
     for(let key in property) {
         //special使用
@@ -240,7 +240,7 @@ export function getStepProperty({
 
     //这里有页面模式的配置处理
     //获取的页面翻页的区域值不一样
-    let size = isColumn ? config.screenSize : config.viewSize
+    let size = isColumn ? config.screenSize : config.visualSize
     let width = size.width
     let height = size.height
 

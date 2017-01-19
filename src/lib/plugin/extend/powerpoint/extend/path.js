@@ -82,8 +82,8 @@ export default function path(animproto) {
             switch (str) {
                 case "M": //移动（开始）
                 case "m":
-                    x = Math.round(ArrPath[k + 1] * this.screenWidth);
-                    y = Math.round(ArrPath[k + 2] * this.screenHeight);
+                    x = Math.round(ArrPath[k + 1] * this.visualWidth);
+                    y = Math.round(ArrPath[k + 2] * this.visualHeight);
                     /*t1.add(TweenMax.to(object, 0.001, {
                         x: x,
                         y: y
@@ -98,12 +98,12 @@ export default function path(animproto) {
                     break;
                 case "C": //曲线
                 case "c":
-                    var x1 = x0 + Math.round(ArrPath[k + 1] * this.screenWidth);
-                    var y1 = y0 + Math.round(ArrPath[k + 2] * this.screenHeight);
-                    var x2 = x0 + Math.round(ArrPath[k + 3] * this.screenWidth);
-                    var y2 = y0 + Math.round(ArrPath[k + 4] * this.screenHeight);
-                    var x3 = x0 + Math.round(ArrPath[k + 5] * this.screenWidth);
-                    var y3 = y0 + Math.round(ArrPath[k + 6] * this.screenHeight);
+                    var x1 = x0 + Math.round(ArrPath[k + 1] * this.visualWidth);
+                    var y1 = y0 + Math.round(ArrPath[k + 2] * this.visualHeight);
+                    var x2 = x0 + Math.round(ArrPath[k + 3] * this.visualWidth);
+                    var y2 = y0 + Math.round(ArrPath[k + 4] * this.visualHeight);
+                    var x3 = x0 + Math.round(ArrPath[k + 5] * this.visualWidth);
+                    var y3 = y0 + Math.round(ArrPath[k + 6] * this.visualHeight);
                     quArr.push({
                         x: x1,
                         y: y1
@@ -120,8 +120,8 @@ export default function path(animproto) {
                     break;
                 case "L": //直线
                 case "l":
-                    x = x0 + Math.round(ArrPath[k + 1] * this.screenWidth);
-                    y = y0 + Math.round(ArrPath[k + 2] * this.screenHeight);
+                    x = x0 + Math.round(ArrPath[k + 1] * this.visualWidth);
+                    y = y0 + Math.round(ArrPath[k + 2] * this.visualHeight);
                     if (x == cx && y == cy) {
                         k = k + 2;
                         break;

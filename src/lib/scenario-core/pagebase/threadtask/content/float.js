@@ -60,8 +60,8 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
 
     let flowHtml = `<div id="${floatName}-li-${data.pid}"
                      class="xut-float"
-                     style="left:${getStyle.viewLeft}px;
-                            top:${getStyle.viewTop}px;
+                     style="left:${getStyle.visualLeft}px;
+                            top:${getStyle.visualTop}px;
                             ${TRANSFORM}:${data.getStyle.translate};z-index:${zIndex};${overflow}"></div>`
 
 

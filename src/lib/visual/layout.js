@@ -5,7 +5,7 @@ const CEIL = Math.ceil
  * 全局可视区域布局处理
  * 4种可选模式，1/2/3/4
  */
-export function getViewLayout(config, fullProportion, setVisualMode) {
+export function getVisualLayout(config, fullProportion, setVisualMode) {
 
     let screenWidth = config.screenSize.width
     let screenHeight = config.screenSize.height
@@ -66,11 +66,22 @@ export function getViewLayout(config, fullProportion, setVisualMode) {
 
         //竖版PPT
         if(config.pptVertical) {
-            //竖版显示
-            //高度100%，宽度溢出
+
+            //竖版显示，正向显示
             if(config.screenVertical) {
                 newWidth = fullProportion.pptWidth * fullProportion.height
                 newLeft = (screenWidth - newWidth) / 2
+            }
+            //横版显示，反向显示
+            else {
+                newWidth = fullProportion.pptWidth * fullProportion.height
+                newLeft = (config.visualSize.width - newWidth) / 2
+            }
+
+            //竖版显示
+            //高度100%，宽度溢出
+            if(config.screenVertical) {
+
             }
         }
 
@@ -110,9 +121,23 @@ export function getViewLayout(config, fullProportion, setVisualMode) {
     }
 
 
+    /**
+     * 模式1：
+     * 总模式,模式2的时候，竖版应用横版显示处理
+     * 反向显示处理，存在left处理
+     */
+    if(setVisualMode === 1 && config.visualSize) {
+        return {
+            width: CEIL(config.visualSize.width), //宽度改为可视区宽
+            height: CEIL(newHeight),
+            left: CEIL(newLeft),
+            top: CEIL(newTop)
+        }
+    }
+
 
     /**
-     * 模式1：默认平铺全屏
+     * 模式2.3.4
      * config.visualMode === 1
      * @return {[type]}
      */

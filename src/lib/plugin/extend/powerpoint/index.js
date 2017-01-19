@@ -34,17 +34,18 @@ const isDesktop = Xut.plat.isDesktop
  **/
 export default class Powepoint {
 
-    constructor(pageIndex, pageType, chapterId, element, parameter, container) {
+    constructor(pageIndex, pageType, chapterId, element, parameter, container, getStyle) {
 
-        if (_.isArray(parameter) && parameter.length) {
+        if(_.isArray(parameter) && parameter.length) {
             this.options = parameter
         } else {
             console.log("Animation options error is not Array.");
             return
         }
 
-        this.screenWidth = config.viewSize.width
-        this.screenHeight = config.viewSize.height
+        this.visualWidth = getStyle.visualWidth
+        this.visualHeight = getStyle.visualHeight
+
         this.container = container || $(document.body); //父容器(主要用于手势控制路径动画)
         this.isDebug = false; //是否显示调试信息
 
@@ -120,9 +121,9 @@ export default class Powepoint {
      * @return {[type]} [description]
      */
     _parseCode(code1, code2) {
-        if (code1 && code1.length > 0) {
+        if(code1 && code1.length > 0) {
             return makeJsonPack(code1)
-        } else if (code2 && code2.length > 0) {
+        } else if(code2 && code2.length > 0) {
             return makeJsonPack(code2)
         }
     }
@@ -134,9 +135,9 @@ export default class Powepoint {
      * @return {[type]}       [description]
      */
     _parseDelayCode(code1, code2) {
-        if (code1 && code1.length > 0) {
+        if(code1 && code1.length > 0) {
             return code1
-        } else if (code2 && code2.length > 0) {
+        } else if(code2 && code2.length > 0) {
             return code2
         }
     }
@@ -168,14 +169,14 @@ export default class Powepoint {
         this.codeDelay = this._parseDelayCode(data.codeDelay, this.parameter0.codeDelay)
 
         //给元素增加ppt属性标记
-        if (!this.element.attr("data-pptAnimation")) {
+        if(!this.element.attr("data-pptAnimation")) {
             let animationName = data.animationName
 
             //路径动画对象默认显示
-            if (animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
+            if(animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
                 this.element.css("visibility", "visible");
             } else {
-                switch (animationName) {
+                switch(animationName) {
                     //强调动画默认显示
                     case "EffectFlashBulb": //脉冲
                     case "EffectFlicker": //彩色脉冲
@@ -197,7 +198,7 @@ export default class Powepoint {
                         this.element.css("visibility", "hidden");
                         break;
                     default:
-                        if (this.isExit0)
+                        if(this.isExit0)
                             this.element.css("visibility", "visible"); //退出动画默认显示
                         else
                             this.element.css("visibility", "hidden"); //进入动画默认隐藏
@@ -225,20 +226,20 @@ export default class Powepoint {
         var left = ROUND(parseInt(object.css("left")))
         var offsetTop = ROUND(object.offset().top);
 
-        if (object.attr("offsetTop")) {
+        if(object.attr("offsetTop")) {
             offsetTop = parseInt(object.attr("offsetTop"));
         } else {
             object.attr("offsetTop", offsetTop);
         }
 
-        var offsetBottom = CEIL(this.screenHeight - offsetTop - height);
+        var offsetBottom = CEIL(this.visualHeight - offsetTop - height);
         var offsetLeft = ROUND(object.offset().left);
-        if (object.attr("offsetLeft")) {
+        if(object.attr("offsetLeft")) {
             offsetLeft = parseInt(object.attr("offsetLeft"));
         } else {
             object.attr("offsetLeft", offsetLeft);
         }
-        var offsetRight = CEIL(this.screenWidth - offsetLeft - width)
+        var offsetRight = CEIL(this.visualWidth - offsetLeft - width)
 
         return {
             width,
@@ -260,8 +261,8 @@ export default class Powepoint {
      * @return {[type]}           [description]
      */
     _startHandler(parameter, object, params) {
-        for (var item in params) {
-            switch (item) {
+        for(var item in params) {
+            switch(item) {
                 case "x":
                     TweenLite.set(object, {
                         x: params[item]
@@ -300,17 +301,17 @@ export default class Powepoint {
 
 
         //ppt动画音频
-        if (parameter.videoId > 0) {
+        if(parameter.videoId > 0) {
             createContentAudio(parameter.chapterId, parameter.videoId)
         }
 
         /*eslint-disable */
 
         //ppt动画扩展处理
-        if (parameter.pptanimation && parameter.pptanimation.pptapi) {
+        if(parameter.pptanimation && parameter.pptanimation.pptapi) {
 
             var params = parameter.pptanimation.parameters ? parameter.pptanimation.parameters : {};
-            switch (parameter.pptanimation.pptapi) {
+            switch(parameter.pptanimation.pptapi) {
                 case "bonesWidget": //骨骼动画
                     bonesWidget.updateAction(object.attr("id"), params.actList);
                     break;
@@ -334,8 +335,8 @@ export default class Powepoint {
      */
     _completeHandler(parameter, object, params) {
         //if(parameter.pptAudio) parameter.pptAudio.end(); //声音存在延时问题，马上结束可导制无法听到声音
-        for (var item in params) {
-            switch (item) {
+        for(var item in params) {
+            switch(item) {
                 case "x":
                     TweenLite.set(object, {
                         x: params[item]
@@ -383,17 +384,17 @@ export default class Powepoint {
         var object = this.element;
         var parameter = this.parameter0;
         var isExit = this.isExit0;
-        if (index > 0 || this.parameter0 == null) {
+        if(index > 0 || this.parameter0 == null) {
             parameter = parseJSON(data.parameter);
             isExit = parameter.exit ? (parameter.exit).toLowerCase() == "true" : false; //false:进入 true:消失
-            if (index == 0) {
+            if(index == 0) {
                 this.parameter0 = parameter;
                 this.isExit0 = isExit;
             }
         }
         var duration = data.speed / 1000; //执行时间
         var delay = data.delay / 1000; //延时时间
-        if (navigator.epubReadingSystem) { //如果是epub阅读器则动画延时0.15秒
+        if(navigator.epubReadingSystem) { //如果是epub阅读器则动画延时0.15秒
             delay += 0.15
         }
         var repeat = (data.repeat >= 0) ? data.repeat - 1 : 0; //重复次数
@@ -406,16 +407,16 @@ export default class Powepoint {
         let animationName = parameter.animationName
 
         //文字动画
-        if (animationName == "xxtTextEffect") {
+        if(animationName == "xxtTextEffect") {
             return this.getTextAnimation(parameter, object, duration, delay, repeat);
         }
 
         //路径动画
-        if (animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
+        if(animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
             return this.getPathAnimation(parameter, object, duration, delay, repeat);
         }
 
-        switch (animationName) {
+        switch(animationName) {
             case "EffectFade": //淡出
                 return this.getEffectFade(parameter, object, isExit, duration, delay, repeat);
             case "EffectFly": //飞入/飞出
@@ -521,7 +522,7 @@ export default class Powepoint {
          * @return {[type]} [description]
          */
         let completeAction = function() {
-            if (completeEvent && _.isFunction(completeEvent)) {
+            if(completeEvent && _.isFunction(completeEvent)) {
                 completeEvent()
             }
         }
@@ -537,15 +538,15 @@ export default class Powepoint {
              */
             onStart(preCode) {
                 //条件判断动画是否执行
-                if (preCode && _.isFunction(preCode)) {
+                if(preCode && _.isFunction(preCode)) {
                     self.animation.pause();
                     let result = false;
                     try {
                         result = preCode();
-                    } catch (error) {
+                    } catch(error) {
                         console.log("Run preCode is error in startHandler:" + error)
                     }
-                    if (result == true)
+                    if(result == true)
                         self.animation.resume()
                     else {
                         self.animation.stop()
@@ -563,17 +564,17 @@ export default class Powepoint {
                 self.isCompleted = true;
 
                 //延迟执行postCode代码
-                if (postCode) {
+                if(postCode) {
                     try {
                         //简单判断是函数可执行
-                        if (_.isFunction(postCode)) {
-                            if (codeDelay > 0) {
+                        if(_.isFunction(postCode)) {
+                            if(codeDelay > 0) {
                                 setTimeout(postCode, codeDelay)
                             } else {
                                 postCode()
                             }
                         }
-                    } catch (error) {
+                    } catch(error) {
                         console.log("Run postCode is error in completeHandler:" + error)
                     }
                 }
@@ -581,12 +582,12 @@ export default class Powepoint {
             }
         });
 
-        for (var i = 0; i < this.options.length; i++) {
-            if (i == 0) {
+        for(var i = 0; i < this.options.length; i++) {
+            if(i == 0) {
                 tl.add(this._getTimeline(this.options[i], i), "shape0");
             } else {
                 var invokeMode = this.options[i].invokeMode;
-                if (invokeMode == 2)
+                if(invokeMode == 2)
                     tl.add(this._getTimeline(this.options[i], i));
                 else
                     tl.add(this._getTimeline(this.options[i], i), "shape0"); //"shape"+(i-1)
@@ -602,7 +603,7 @@ export default class Powepoint {
      * @return {[type]}               [description]
      */
     play(animComplete) {
-        if (this.isCompleted) {
+        if(this.isCompleted) {
             this.reset()
         }
         this.animation && this.stop();
@@ -615,7 +616,7 @@ export default class Powepoint {
      * @return {[type]} [description]
      */
     stop() {
-        if (this.animation instanceof TimelineLite) {
+        if(this.animation instanceof TimelineLite) {
             this.animation.stop()
             this.animation.kill()
             this.animation.clear()
@@ -631,10 +632,10 @@ export default class Powepoint {
      */
     reset() {
         this.animation && this.stop();
-        if (this.elementStyle && this.elementStyle.length) {
+        if(this.elementStyle && this.elementStyle.length) {
             const origin = this.element.css("-webkit-transform-origin");
             //卷滚区域里的对象不需要还原
-            if (this.element.attr("data-iscroll") == null) {
+            if(this.element.attr("data-iscroll") == null) {
                 this.element[0].style.cssText = this.elementStyle;
             }
             this.element.css("-webkit-transform-origin", origin);

@@ -89,7 +89,7 @@ const adapterType = {
  */
 const filterData = (data) => {
     //直接通过id查询数据
-    if (data.widgetId) {
+    if(data.widgetId) {
         _.extend(data, Xut.data.query('Widget', data.widgetId))
     } else {
         //直接通过activityId查询数据
@@ -132,7 +132,7 @@ const filtrateDas = (data) => {
 const parsePara = (data) => {
     var inputPara, //输入数据
         outputPara; //输出数据
-    if (inputPara = data.inputPara) {
+    if(inputPara = data.inputPara) {
         outputPara = parseJSON(inputPara)
     }
     return outputPara;
@@ -143,31 +143,47 @@ const parsePara = (data) => {
 export function Adapter(para) {
 
     //获取数据
-    const data = filtrateDas(para)
+    let data = filtrateDas(para)
 
     data.id = data.activityId
 
     //解析数据
     data.inputPara = parsePara(data)
 
-    if (!data.inputPara) {
+    if(!data.inputPara) {
         data.inputPara = {}
     }
 
     //增加属性参数
-    if (data.widgetType === 'page') {
+    if(data.widgetType === 'page') {
         data.inputPara.container = data.rootNode
+    }
+
+    //重新定义页面的布局参数
+    let pageVisualSize
+    let pageStyle = Xut.Presentation.GetPageStyle(para.pageIndex)
+    if(pageStyle && pageStyle.visualWidth) {
+        pageVisualSize = {
+            width: pageStyle.visualWidth,
+            height: pageStyle.visualHeight,
+            left: pageStyle.visualLeft,
+            top: pageStyle.visualTop
+        }
+        data.pageProportion = pageStyle.pageProportion
+    } else {
+        pageVisualSize = config.visualSize
+        data.pageProportion = config.proportion
     }
 
     data.inputPara.uuid = config.appId + '-' + data.activityId; //唯一ID标示
     data.inputPara.id = data.activityId;
-    data.inputPara.screenSize = config.viewSize;
+    data.inputPara.screenSize = pageVisualSize
     //content的命名前缀
     data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType)
 
     //画轴模式
     data.scrollPaintingMode = config.visualMode === 4;
-    data.calculate = config.viewSize
+    data.calculate = pageVisualSize
 
     //执行类构建
     adapterType[(data.widgetType || 'widget').toLowerCase()](data);

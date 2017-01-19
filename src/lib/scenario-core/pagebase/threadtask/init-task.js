@@ -88,7 +88,7 @@ export default function(instance) {
         background() {
             callContextTasks('Background', function() {
                 createRelated.preCreateTasks = false;
-                setNextRunTask('flow')
+                setNextRunTask('Column')
 
                 //针对当前页面的检测
                 if(!createRelated.tasksHang || instance.isMaster) {
@@ -113,7 +113,7 @@ export default function(instance) {
          * 是否为流式排版
          * @return {[type]} [description]
          */
-        flow() {
+        Column() {
 
             //如果是页面类型
             let isPageType = instance.pageType === 'page'
@@ -143,8 +143,7 @@ export default function(instance) {
             //只处理页面类型
             //母版跳过
             if(isPageType && instance.chapterData.note == 'flow') {
-                callContextTasks('Flow', function() {
-                    // createPinch('flow')
+                callContextTasks('Column', function() {
                     setNextRunTask('complete')
                     createRelated.createTasksComplete()
                 })

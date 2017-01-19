@@ -3,7 +3,7 @@ import TaskContainer from './container/index'
 import TaskBackground from './background/index'
 import TaskContents from './content/index'
 import TaskComponents from './component/index'
-import TaskFlow from './flow/index'
+import TaskColumns from './column/index'
 
 /**
  * 解析canvas配置
@@ -83,8 +83,8 @@ export default {
     /**
      * 流式排版
      */
-    'Flow' (taskCallback, base) {
-        TaskFlow(base, taskCallback)
+    'Column' (taskCallback, base) {
+        TaskColumns(base, taskCallback)
     },
 
 
@@ -241,6 +241,7 @@ export default {
             'canvasRelated': base.canvasRelated,
             'rootNode': base.rootNode,
             '$containsNode': base.getContainsNode(),
+            '$headFootNode':base.getHeadFootNode(),
             'pageType': base.pageType,
             'nodes': chapterData['nodes'],
             'pageOffset': chapterData['pageOffset'],

@@ -11,7 +11,7 @@ import {
 } from '../config/index'
 
 import initTooBar from './toolbar'
-import initColumn from '../scenario-core/component/column/layout'
+import initColumn from '../scenario-core/component/column/init'
 
 /**
  * 加载svg的css

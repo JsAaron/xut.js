@@ -40,9 +40,9 @@ export default class Mark {
         this.pageId = pageId;
         this.seasonId = seasonId;
 
-        this.viewSize = config.viewSize
-        this.sHeight = this.viewSize.height
-        this.sWidth = this.viewSize.width
+        let visualSize = config.visualSize
+        this.sHeight = visualSize.height
+        this.sWidth =  visualSize.width
 
         //是否已存储
         this.isStored = false;

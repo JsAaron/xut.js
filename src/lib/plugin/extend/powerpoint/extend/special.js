@@ -448,11 +448,11 @@ export default function special(animproto) {
             top = 0;
         if (isExit == false) {
             //从下往上移
-            y = 0 - (this.screenHeight + objInfo.height);
+            y = 0 - (this.visualHeight + objInfo.height);
             top = objInfo.top + objInfo.offsetBottom + objInfo.height;
         } else {
             //从上往下移
-            y = this.screenHeight + objInfo.height;
+            y = this.visualHeight + objInfo.height;
             top = objInfo.top - (objInfo.offsetTop + objInfo.height);
         }
         var t1 = new TimelineMax({
@@ -497,7 +497,7 @@ export default function special(animproto) {
             time4 = total / 40;
             time5 = total / 80;
             width = 50 + 20 + 10 + 5 + 2.5 + 1 + 0.5 + 0.2 + 0.1;
-            height = this.screenHeight / 4;
+            height = this.visualHeight / 4;
             y1 = height / 2;
             y2 = height / 4;
             y3 = height / 8;
@@ -570,7 +570,7 @@ export default function special(animproto) {
             time3 = total / 20;
             time4 = total / 40;
             time5 = total / 80;
-            height = this.screenHeight / 4;
+            height = this.visualHeight / 4;
             y1 = height / 2;
             y2 = height / 4;
             y3 = height / 8;

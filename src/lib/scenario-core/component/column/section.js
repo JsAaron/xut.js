@@ -1,10 +1,10 @@
-import { config ,dynamicView} from '../../../config/index'
+import { config ,resetVisualLayout} from '../../../config/index'
 import { translation } from '../../pagebase/move/translation'
 import { getColumnCount } from './get'
 import Swipe from '../../../swipe/index'
 import render from './render'
 
-import { getDistance } from '../../../visuals/view-distance'
+import { getVisualDistance } from '../../../visual/distance'
 import { Zoom } from '../../../plugin/extend/zoom/index'
 import { closeButton } from '../../../plugin/extend/close-button'
 
@@ -104,13 +104,11 @@ export default class Section {
 
         const flowObject = this
         const pagesCount = getColumnCount(seasonId, chapterId)
-        const flowView = dynamicView(1)
+        const flowView = resetVisualLayout(1)
 
         const MIN = 0
         const MAX = pagesCount - 1
         const flipWidth = flowView.width
-        const flipLeft = flowView.height
-        const viewLeft = config.viewSize.left
         const View = Xut.View
         const initIndex = this.initIndex
         const container = $container[0]
@@ -197,7 +195,7 @@ export default class Section {
              */
             else {
 
-                let viewBeHideDistance = getDistance({
+                let viewBeHideDistance = getVisualDistance({
                     action,
                     distance,
                     direction

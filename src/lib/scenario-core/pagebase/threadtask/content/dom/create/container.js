@@ -13,7 +13,7 @@ const createContainerWrap = (containerName, contentId, pid, getStyle) => {
     const contentDas = parseContentDas([contentId])
     const data = reviseSize({
         results: contentDas[0],
-        proportion: getStyle.dynamicProportion
+        proportion: getStyle.pageProportion
     })
 
     const wapper =

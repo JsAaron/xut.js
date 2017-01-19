@@ -1,6 +1,6 @@
-import { config } from '../../../config/index'
-import { leftTranslate } from './left'
-import { rightTranslate } from './right'
+import { config } from '../../config/index'
+import { leftTranslate } from './translate-hook/left'
+import { rightTranslate } from './translate-hook/right'
 
 /**
  * 设置默认的样式
@@ -26,7 +26,7 @@ const createTranslate = (offset) => {
  * @param  {Object} currIndex                     } [description]
  * @return {[type]}               [description]
  */
-export function initTranslate({
+export function layoutTranslate({
     createIndex,
     currIndex,
     direction,
@@ -36,22 +36,18 @@ export function initTranslate({
     let translate
     let offset
 
-    switch (direction) {
-        case 'before':
-            let offsetLeft = leftTranslate(usefulData)
-            translate = createTranslate(offsetLeft)
-            offset = offsetLeft
-            break;
-        case 'middle':
-            let offsetMiddle = 0
-            translate = createTranslate(offsetMiddle)
-            offset = offsetMiddle
-            break;
-        case 'after':
-            let offsetRight = rightTranslate(usefulData)
-            translate = createTranslate(offsetRight)
-            offset = offsetRight
-            break;
+    if(direction === 'before') {
+        let offsetLeft = leftTranslate(usefulData)
+        translate = createTranslate(offsetLeft)
+        offset = offsetLeft
+    } else if(direction === 'middle') {
+        let offsetMiddle = 0
+        translate = createTranslate(offsetMiddle)
+        offset = offsetMiddle
+    } else if(direction === 'after') {
+        let offsetRight = rightTranslate(usefulData)
+        translate = createTranslate(offsetRight)
+        offset = offsetRight
     }
 
     return {

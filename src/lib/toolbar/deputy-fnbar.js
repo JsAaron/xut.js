@@ -133,7 +133,7 @@ export default class fnBar extends Bar {
         const width = 2.5 * size //圆点间距
         const tipsWidth = chapters * width //圆点总宽度
         const top = (height - size) / 2 //保持圆点垂直居中
-        const left = (config.viewSize.width - tipsWidth) / 2 //保持圆点水平居中
+        const left = (config.visualSize.width - tipsWidth) / 2 //保持圆点水平居中
 
 
         for (var i = 1; i <= chapters; i++) {

@@ -15,25 +15,25 @@ export const middlePageHook = {
             let leftPageStyle = pageStyles.left
 
             //中间：溢出
-            if (middlePageStyle && middlePageStyle.viewLeftInteger) {
+            if (middlePageStyle && middlePageStyle.visualLeftInteger) {
                 //左边：溢出
-                if (leftPageStyle && leftPageStyle.viewLeftInteger) {
-                    return middlePageStyle.viewWidth
+                if (leftPageStyle && leftPageStyle.visualLeftInteger) {
+                    return middlePageStyle.visualWidth
                 }
                 //左边：正常
                 else {
-                    return middlePageStyle.viewWidth - middlePageStyle.viewLeftInteger
+                    return middlePageStyle.visualWidth - middlePageStyle.visualLeftInteger
                 }
             }
             //中间：正常
             else {
                 //左边：溢出
-                if (leftPageStyle && leftPageStyle.viewLeftInteger) {
-                    return middlePageStyle.viewWidth + leftPageStyle.viewLeftInteger
+                if (leftPageStyle && leftPageStyle.visualLeftInteger) {
+                    return middlePageStyle.visualWidth + leftPageStyle.visualLeftInteger
                 }
                 //左边：正常
                 else {
-                    return middlePageStyle.viewWidth
+                    return middlePageStyle.visualWidth
                 }
             }
         },
@@ -45,25 +45,25 @@ export const middlePageHook = {
             let rightPageStyle = pageStyles.right
 
             //中间：溢出
-            if (middlePageStyle && middlePageStyle.viewLeftInteger) {
+            if (middlePageStyle && middlePageStyle.visualLeftInteger) {
                 //右边：溢出
-                if (rightPageStyle && rightPageStyle.viewLeftInteger) {
-                    return -middlePageStyle.viewWidth
+                if (rightPageStyle && rightPageStyle.visualLeftInteger) {
+                    return -middlePageStyle.visualWidth
                 }
                 //右边：正常
                 else {
-                    return -(middlePageStyle.viewWidth - middlePageStyle.viewLeftInteger)
+                    return -(middlePageStyle.visualWidth - middlePageStyle.visualLeftInteger)
                 }
             }
             //中间：正常
             else {
                 //右边：溢出
-                if (rightPageStyle && rightPageStyle.viewLeftInteger) {
-                    return -(middlePageStyle.viewWidth + rightPageStyle.viewLeftInteger)
+                if (rightPageStyle && rightPageStyle.visualLeftInteger) {
+                    return -(middlePageStyle.visualWidth + rightPageStyle.visualLeftInteger)
                 }
                 //右边：正常
                 else {
-                    return -rightPageStyle.viewWidth
+                    return -rightPageStyle.visualWidth
                 }
             }
         }

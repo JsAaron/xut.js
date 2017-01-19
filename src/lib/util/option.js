@@ -1,7 +1,8 @@
 import { request } from './loader'
 import { $$warn } from './debug'
 import { parseJSON } from './lang'
-import { config } from '../config/index'
+import { config, resetVisualProportion } from '../config/index'
+
 
 const CEIL = Math.ceil
 const FLOOR = Math.floor
@@ -31,7 +32,7 @@ export function execScript(code, type) {
     }
     try {
         new Function(enterReplace(code))()
-    } catch (e) {
+    } catch(e) {
         $$warn('加载脚本错误', type)
     }
 }
@@ -51,9 +52,9 @@ export function createRandomImg(url) {
  * @return {[type]} [description]
  */
 export function replacePath(svgstr) {
-    if (config.launch) {
+    if(config.launch) {
         //如果能找到对应的默认路径，则替换
-        if (-1 !== svgstr.indexOf('content/gallery/')) {
+        if(-1 !== svgstr.indexOf('content/gallery/')) {
             svgstr = svgstr.replace(/content\/gallery/ig, config.pathAddress)
         }
     }
@@ -75,29 +76,89 @@ const converProportion = function({
     left,
     top,
     padding,
-    fixRadio, //迷你使用，按照宽度正比缩放高度，相应的要调整top的值
-    proportion //如果需要缩放比
+    proportion,
+    proportionMode, //缩放比模式
+    getStyle
 }) {
 
-    if (!proportion) {
+    if(!proportion) {
         $$warn('没有传递缩放比')
         proportion = config.proportion
     }
 
-    //需要正比缩放
-    if (fixRadio) {
-        let originalHeight = CEIL(height * proportion.height) || 0
-        let proportionalHeight = CEIL(height * proportion.width) || 0
-        let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
-        top = CEIL(top * proportion.top) + proportionalTop
-        return {
-            width: CEIL(width * proportion.width) || 0,
-            height: proportionalHeight,
-            left: CEIL(left * proportion.left) || 0,
-            top: top,
-            padding: CEIL(padding * proportion.width) || 0
+    //需要修复比值关系
+    if(proportionMode) {
+
+        let visualTop = getStyle.visualTop
+
+        //按照宽度保持横纵
+        if(proportionMode === 1) {
+            let proportionalHeight = CEIL(height * proportion.width) || 0;
+            return {
+                width: CEIL(width * proportion.width) || 0,
+                height: proportionalHeight,
+                left: CEIL(left * proportion.left) || 0,
+                top: CEIL(top * proportion.top) || 0,
+                padding: CEIL(padding * proportion.width) || 0,
+                isHide: proportionalHeight > visualTop //正比高度大于显示高度，隐藏元素
+            }
         }
+        //1：正比缩放
+        //2：自适应缩放
+        else if(proportionMode === 2) {
+            //正比高度
+            let proportionalHeight = CEIL(height * proportion.width) || 0;
+            //没有溢出，用模式正比缩放
+            if(proportionalHeight < visualTop) {
+                return {
+                    width: CEIL(width * proportion.width) || 0,
+                    height: proportionalHeight,
+                    left: CEIL(left * proportion.left) || 0,
+                    top: CEIL(top * proportion.top) || 0,
+                    padding: CEIL(padding * proportion.width) || 0
+                }
+            }
+            //溢出了，用自适应缩放
+            //元素的高度设置visualTop的高度
+            if(proportionalHeight > visualTop) {
+                //重新设置缩放比，因为高度变了
+                //高度采用visualTop的
+                // let newProportion = resetVisualProportion({
+                //     width: getStyle.visualWidth,
+                //     height: getStyle.visualTop, //这里用高度
+                //     top: 0,
+                //     left: 0
+                // })
+                let originalHeight = CEIL(height * proportion.height) || 0
+                let proportionalHeight = CEIL(height * proportion.width) || 0
+                let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
+                top = CEIL(top * proportion.top) + proportionalTop
+                return {
+                    width: CEIL(width * proportion.width) || 0,
+                    height: proportionalHeight,
+                    left: CEIL(left * proportion.left) || 0,
+                    top: top,
+                    padding: CEIL(padding * proportion.width) || 0
+                }
+            }
+        }
+        //图片正比缩放，而且保持上下居中
+        else if(proportionMode === 3) {
+            let originalHeight = CEIL(height * proportion.height) || 0
+            let proportionalHeight = CEIL(height * proportion.width) || 0
+            let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
+            top = CEIL(top * proportion.top) + proportionalTop
+            return {
+                width: CEIL(width * proportion.width) || 0,
+                height: proportionalHeight,
+                left: CEIL(left * proportion.left) || 0,
+                top: top,
+                padding: CEIL(padding * proportion.width) || 0
+            }
+        }
+
     } else {
+        //默认缩放比
         return {
             width: CEIL(width * proportion.width) || 0,
             height: CEIL(height * proportion.height) || 0,
@@ -116,19 +177,20 @@ export function setProportion(...arg) {
 
 /*
  * 修复元素的尺寸
- * fixRadio 是否保持宽度正比缩放 //2016.12.15 mini使用
  * @type {[type]}
  */
 export function reviseSize({
     results,
-    fixRadio,
-    proportion
+    proportion,
+    proportionMode,
+    getStyle
 }) {
 
     //不同设备下缩放比计算
     let layerSize = converProportion({
-        fixRadio,
         proportion,
+        proportionMode,
+        getStyle,
         width: results.width,
         height: results.height,
         left: results.left,
@@ -137,8 +199,9 @@ export function reviseSize({
 
     //新的背景图尺寸
     let backSize = converProportion({
-        fixRadio,
         proportion,
+        proportionMode,
+        getStyle,
         width: results.backwidth,
         height: results.backheight,
         left: results.backleft,
@@ -150,6 +213,8 @@ export function reviseSize({
     results.scaleHeight = layerSize.height
     results.scaleLeft = layerSize.left
     results.scaleTop = layerSize.top
+        //元素状态
+    results.isHide = layerSize.isHide
 
     //背景坐标
     results.scaleBackWidth = backSize.width
@@ -187,7 +252,7 @@ export function readFile(path, callback, type) {
     let jsRequest = (fileUrl, fileName) => {
         request(randomUrl(fileUrl), function() {
             data = window.HTMLCONFIG[fileName];
-            if (data) {
+            if(data) {
                 callback(data)
                 delete window.HTMLCONFIG[fileName];
             } else {
@@ -202,7 +267,7 @@ export function readFile(path, callback, type) {
     //externalFile使用
     //如果是js动态文件
     //content的html结构
-    if (type === "js") {
+    if(type === "js") {
         paths = config.getSvgPath() + path;
         name = path.replace(".js", '')
         jsRequest(paths, name)
@@ -213,7 +278,7 @@ export function readFile(path, callback, type) {
      * 如果配置了convert === 'svg'
      * 那么所有的svg文件就强制转化成js读取
      */
-    if (config.launch && config.launch.convert === 'svg') {
+    if(config.launch && config.launch.convert === 'svg') {
         path = path.replace('.svg', '.js')
         name = path.replace(".js", '')
         svgUrl = config.getSvgPath() + path
@@ -225,10 +290,10 @@ export function readFile(path, callback, type) {
     /**
      * ibooks模式 单独处理svg转化策划给你js,加载js文件
      */
-    if (Xut.IBooks.CONFIG) {
+    if(Xut.IBooks.CONFIG) {
         //如果是.svg结尾
         //把svg替换成js
-        if (/.svg$/.test(path)) {
+        if(/.svg$/.test(path)) {
             path = path.replace(".svg", '.js')
         }
         //全路径
@@ -238,7 +303,7 @@ export function readFile(path, callback, type) {
         //加载脚本
         request(randomUrl(paths), function() {
             data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
-            if (data) {
+            if(data) {
                 callback(data)
                 delete window.HTMLCONFIG[name];
                 delete window.IBOOKSCONFIG[name]
@@ -253,12 +318,12 @@ export function readFile(path, callback, type) {
 
     //svg文件
     //游览器模式 && 非强制插件模式
-    if (Xut.plat.isBrowser && !config.isPlugin) {
+    if(Xut.plat.isBrowser && !config.isPlugin) {
         //默认的地址
         svgUrl = config.getSvgPath().replace("www/", "") + path
 
         //mini杂志的情况，不处理目录的www
-        if (config.launch && config.launch.resource) {
+        if(config.launch && config.launch.resource) {
             svgUrl = config.getSvgPath() + path
         }
 

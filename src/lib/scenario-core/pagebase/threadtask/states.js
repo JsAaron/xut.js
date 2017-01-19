@@ -47,7 +47,7 @@ export default function initstate(instance) {
          */
         cacheTasks: function() {
             const cacheTasks = {};
-            _.each(["Flow", "background", "components", "contents"], function(taskName) {
+            _.each(["Column", "background", "components", "contents"], function(taskName) {
                 cacheTasks[taskName] = false;
             })
             return cacheTasks;

@@ -56,7 +56,7 @@ export default function zoom(animproto) {
                     //屏幕底部缩小(理解为底部的中间开始)
                     t1.from(object, duration, {
                         scale: 2,
-                        top: this.screenWidth + "px",
+                        top: this.visualWidth + "px",
                         ease: parameter.tweenEase
                     });
                     break;
@@ -112,7 +112,7 @@ export default function zoom(animproto) {
                 case "DirectionOutBottom":
                     t1.to(object, duration, {
                         scale: 2,
-                        top: this.screenHeight + "px",
+                        top: this.visualHeight + "px",
                         ease: parameter.tweenEase
                     });
                     break;
@@ -145,8 +145,8 @@ export default function zoom(animproto) {
         var result
         if (fullScreen == true) {
             //计算比例
-            var xScale = this.screenWidth / object.width();
-            var yScale = this.screenHeight / object.height();
+            var xScale = this.visualWidth / object.width();
+            var yScale = this.visualHeight / object.height();
             var scaleValue = xScale;
             if (xScale > yScale) scaleValue = yScale;
             result = this._getDirectionInCenter(object);
@@ -310,8 +310,8 @@ export default function zoom(animproto) {
         });
         if (fullScreen == true) {
             //计算比例
-            var xScale = this.screenWidth / object.width();
-            var yScale = this.screenHeight / object.height();
+            var xScale = this.visualWidth / object.width();
+            var yScale = this.visualHeight / object.height();
             var scaleValue = xScale;
             if (xScale > yScale) scaleValue = yScale;
             var result = this._getDirectionInCenter(object);
@@ -343,8 +343,8 @@ export default function zoom(animproto) {
      */
     animproto._getDirectionInCenter = function(object) {
         var objInfo = this._getObjectInfo(object);
-        var x = Math.round(this.screenWidth / 2 - objInfo.offsetLeft - objInfo.width / 2);
-        var y = Math.round(this.screenHeight / 2 - objInfo.offsetTop - objInfo.height / 2);
+        var x = Math.round(this.visualWidth / 2 - objInfo.offsetLeft - objInfo.width / 2);
+        var y = Math.round(this.visualHeight / 2 - objInfo.offsetTop - objInfo.height / 2);
         return {
             x: x,
             y: y

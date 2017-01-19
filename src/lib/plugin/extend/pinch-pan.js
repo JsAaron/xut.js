@@ -313,9 +313,9 @@ export class PinchPan {
      * @return {[type]} [description]
      */
     _createPinchButton() {
-        const viewSize = config.viewSize
-        const left = viewSize.overflowWidth && Math.abs(viewSize.left) || 0
-        const top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
+        const visualSize = config.visualSize
+        const left = visualSize.overflowWidth && Math.abs(visualSize.left) || 0
+        const top = visualSize.overflowHeight && Math.abs(visualSize.top) || 0
         const $node = closeButton(() => {
             this.reset()
         }, left, top)
