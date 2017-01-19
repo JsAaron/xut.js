@@ -1,4 +1,4 @@
-import { Adapter } from '../component/widget/adapter'
+import { Adapter } from '../component/widget/index'
 
 export default {
 

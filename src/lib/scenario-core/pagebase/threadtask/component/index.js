@@ -77,7 +77,7 @@ TaskComponents.prototype = {
                     //缩放比
                     activityData = reviseSize({
                         results: activityData,
-                        proportion: data.getStyle.dynamicProportion
+                        proportion: data.getStyle.pageProportion
                     });
                     startCreate(actType, activityData)
                     break;

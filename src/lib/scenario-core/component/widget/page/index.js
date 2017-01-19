@@ -18,12 +18,12 @@ import ScrollArea from './extend/scroll.area'
  * 解析数据,获取content对象
  * @return {[type]} [description]
  */
-let parseContentObjs = (pageType, inputPara) => {
+let parseContentObjs = (pageType, inputPara, pageProportion) => {
     let contentIds = [];
     inputPara.content && _.each(inputPara.content, (contentId) => {
         contentIds.push(contentId);
     });
-    return Xut.Contents.GetPageWidgetData(pageType, contentIds)
+    return Xut.Contents.GetPageWidgetData(pageType, contentIds, pageProportion)
 }
 
 
@@ -47,7 +47,7 @@ export default class PageWidget {
     _getOptions() {
         return [
             createData(this.inputPara, this.scrollPaintingMode, this.calculate),
-            parseContentObjs(this.pageType, this.inputPara)
+            parseContentObjs(this.pageType, this.inputPara, this.pageProportion)
         ]
     }
 
@@ -56,22 +56,21 @@ export default class PageWidget {
      * @return {[type]} [description]
      */
     _init() {
-
         //滚动区域
-        if (this.widgetId == 60 && this.widgetName == "scrollarea") {
+        if(this.widgetId == 60 && this.widgetName == "scrollarea") {
             var arg = this._getOptions()
             this.pageObj = new ScrollArea(arg[0], arg[1])
         }
         //Load the localized code first
         //Combined advanced Sprite
-        else if (this.widgetId == 72 && this.widgetName == "spirit") {
+        else if(this.widgetId == 72 && this.widgetName == "spirit") {
             var arg = this._getOptions()
             this.pageObj = AdvSprite(arg[0], arg[1])
         }
         //直接扩展加载
         else {
             //If there is no
-            if (typeof window[this.widgetName + "Widget"] != "function") {
+            if(typeof window[this.widgetName + "Widget"] != "function") {
                 this.hasload = true
                 loadFile(this._executive, this)
             } else {
@@ -86,7 +85,7 @@ export default class PageWidget {
      * @return {[type]} [description]
      */
     _executive() {
-        if (typeof(window[this.widgetName + "Widget"]) == "function") {
+        if(typeof(window[this.widgetName + "Widget"]) == "function") {
             var arg = this._getOptions()
             this.pageObj = new window[this.widgetName + "Widget"](arg[0], arg[1]);
         } else {

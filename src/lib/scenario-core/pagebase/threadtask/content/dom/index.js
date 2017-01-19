@@ -361,7 +361,7 @@ export function contentStructure(callback, data, context) {
             sizeResults = reviseSize({
                 results: wrapObj.data,
                 fixRadio: content.fixRadio,
-                proportion: getStyle.dynamicProportion
+                proportion: getStyle.pageProportion
             })
 
             //正常模式下创建

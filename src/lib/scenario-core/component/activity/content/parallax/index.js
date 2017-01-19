@@ -6,7 +6,7 @@ import { parseJSON } from '../../../../../util/lang'
 import {
     setStyle,
     getInitProperty
-} from './calculate'
+} from './depend'
 
 import {
     hasColumn,
@@ -59,7 +59,7 @@ const getFlowFange = function(pageIndex) {
     }
 }
 
-export default function Parallax(data, relatedData) {
+export default function index(data, relatedData, getStyle) {
 
     //转化所有css特效的参数的比例
     let targetProperty = parseJSON(data.getParameter()[0]['parameter'])
@@ -119,7 +119,7 @@ export default function Parallax(data, relatedData) {
     let nodeOffset = (currPageOffset - 1) / (pageRange - 1) || 0
 
     //计算出新的新的值
-    let lastProperty = getInitProperty(targetProperty, nodeOffset, '', data.base && data.base.getStyle)
+    let lastProperty = getInitProperty(targetProperty, nodeOffset, '', getStyle)
 
     //页面分割比
     let nodeRatio = 1 / (pageRange - 1)

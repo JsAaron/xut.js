@@ -5,7 +5,7 @@ const CEIL = Math.ceil
  * 全局可视区域布局处理
  * 4种可选模式，1/2/3/4
  */
-export function getViewLayout(config, fullProportion, setVisualMode) {
+export function getVisualLayout(config, fullProportion, setVisualMode) {
 
     let screenWidth = config.screenSize.width
     let screenHeight = config.screenSize.height

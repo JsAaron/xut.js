@@ -7,10 +7,10 @@ import { config, dynamicProportion } from '../../config/index'
 export function visualProportion(data) {
     if(data.needRecalculate) {
         return dynamicProportion({
-            width: data.viewWidth,
-            height: data.viewHeight,
-            top: data.viewTop,
-            left: data.viewLeft
+            width: data.visualWidth,
+            height: data.visualHeight,
+            top: data.visualTop,
+            left: data.visualLeft
         })
     } else {
         return config.proportion

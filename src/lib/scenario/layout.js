@@ -22,8 +22,8 @@ export function mainScene() {
     let iconHeight = config.iconHeight
     let proportion = config.proportion
 
-    const sWidth = config.viewSize.width
-    const sHeight = config.viewSize.height
+    const sWidth = config.visualSize.width
+    const sHeight = config.visualSize.height
 
     //横版模式
     const isHorizontal = config.layoutMode == 'horizontal'
@@ -54,7 +54,7 @@ export function mainScene() {
     //主体
     const homeHTML =
         `<div id="xut-main-scene"
-              style="width:${config.viewSize.width}px;
+              style="width:${config.visualSize.width}px;
                      height:${config.screenSize.height}px;
                      top:0;
                      left:0;
@@ -81,7 +81,7 @@ export function mainScene() {
 export function deputyScene(id) {
     const html =
         `<div id="${'scenario-' + id}"
-              style="width:${config.viewSize.width}px;
+              style="width:${config.visualSize.width}px;
                      height:100%;
                      top:0;
                      left:0;

@@ -96,9 +96,9 @@ export function createUnpeatableNumbers() {
  */
 export function createContainerView(imgContainer) {
     let html;
-    let viewSize = config.viewSize
-    let right = viewSize.overflowWidth && Math.abs(viewSize.right) || 0
-    let top = viewSize.overflowHeight && Math.abs(viewSize.top) || 0
+    let visualSize = config.visualSize
+    let right = visualSize.overflowWidth && Math.abs(visualSize.right) || 0
+    let top = visualSize.overflowHeight && Math.abs(visualSize.top) || 0
     let rightCopy = right + 4;
     let rightCopy2 = right + 3.5;
     let topCopy = top + 4;

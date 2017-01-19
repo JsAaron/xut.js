@@ -28,8 +28,8 @@ let deployVideo = (data, pageId, activityId) => {
     let proportion = config.proportion
 
     let layerSize = setProportion({
-        width: data.width || config.viewSize.width,
-        height: data.height || config.viewSize.height,
+        width: data.width || config.visualSize.width,
+        height: data.height || config.visualSize.height,
         left: data.left,
         top: data.top,
         padding: data.padding

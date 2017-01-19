@@ -74,7 +74,7 @@ export function extendContent(access, $globalEvent) {
      * @param  {[type]} contentId [description]
      * @return {[type]}           [description]
      */
-    Xut.Contents.GetPageWidgetData = function(pageType, contentId) {
+    Xut.Contents.GetPageWidgetData = function(pageType, contentId, pageProportion) {
 
         //如果没有传递pageType取默认
         if(-1 === typeFilter.indexOf(pageType)) {
@@ -112,7 +112,7 @@ export function extendContent(access, $globalEvent) {
             } else {
                 //如果通过内部找不到对象的content数据,则直接查找数据库
                 //可能是一个事件的钩子对象
-                if(contentDas = seekQuery(cid)) {
+                if(contentDas = seekQuery(cid, pageProportion)) {
                     var actName = Xut.Presentation.GetContentName(cid);
                     var element;
                     //如果对象是事件钩子或者是浮动对象
@@ -143,11 +143,12 @@ export function extendContent(access, $globalEvent) {
     }
 
     //数据库查找
-    function seekQuery(id) {
+    function seekQuery(id, proportion) {
         var contentData = Xut.data.query('Content', id);
         if(contentData) {
             return reviseSize({
-                results: _.extend({}, contentData)
+                results: _.extend({}, contentData),
+                proportion
             })
         }
     }

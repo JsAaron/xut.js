@@ -4,7 +4,7 @@ import { getColumnCount } from './get'
 import Swipe from '../../../swipe/index'
 import render from './render'
 
-import { getDistance } from '../../../visuals/view-distance'
+import { getVisualDistance } from '../../../visual/distance'
 import { Zoom } from '../../../plugin/extend/zoom/index'
 import { closeButton } from '../../../plugin/extend/close-button'
 
@@ -109,8 +109,6 @@ export default class Section {
         const MIN = 0
         const MAX = pagesCount - 1
         const flipWidth = flowView.width
-        const flipLeft = flowView.height
-        const viewLeft = config.viewSize.left
         const View = Xut.View
         const initIndex = this.initIndex
         const container = $container[0]
@@ -197,7 +195,7 @@ export default class Section {
              */
             else {
 
-                let viewBeHideDistance = getDistance({
+                let viewBeHideDistance = getVisualDistance({
                     action,
                     distance,
                     direction

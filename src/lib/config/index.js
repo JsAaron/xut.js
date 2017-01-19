@@ -16,12 +16,12 @@ import {
 }
 from './depend/size'
 
-import { getViewLayout } from '../visuals/view-layout'
+import { getVisualLayout } from '../visual/layout'
 
 import {
     getFullProportion,
     getRealProportion
-} from '../visuals/view-proportion'
+} from '../visual/proportion'
 
 /**
  * 默认配置与模式
@@ -346,22 +346,22 @@ const resetProportion = function(pptWidth, pptHeight) {
     if (config.visualMode === 3) {
         setVisualMode = 1
     }
-    let viewSize = config.viewSize = getViewLayout(config, fullProportion, setVisualMode)
+    let visualSize = config.visualSize = getVisualLayout(config, fullProportion, setVisualMode)
 
     //溢出宽度
-    viewSize.overflowWidth = false
-    if (viewSize.left < 0) {
-        viewSize.overflowWidth = Math.abs(viewSize.left) * 2
+    visualSize.overflowWidth = false
+    if (visualSize.left < 0) {
+        visualSize.overflowWidth = Math.abs(visualSize.left) * 2
     }
 
     //溢出高度
-    viewSize.overflowHeight = false
-    if (viewSize.top < 0) {
-        viewSize.overflowHeight = true
+    visualSize.overflowHeight = false
+    if (visualSize.top < 0) {
+        visualSize.overflowHeight = true
     }
 
     //获取全局缩放比
-    proportion = config.proportion = getRealProportion(config, viewSize, fullProportion)
+    proportion = config.proportion = getRealProportion(config, visualSize, fullProportion)
 }
 
 /**
@@ -369,21 +369,21 @@ const resetProportion = function(pptWidth, pptHeight) {
  * 每个页面可以重写页面的view
  */
 export function dynamicView(setVisualMode) {
-    return getViewLayout(config, fullProportion, setVisualMode)
+    return getVisualLayout(config, fullProportion, setVisualMode)
 }
 
 /**
  * 动态计算缩放比
  * 每个页面可以重写页面的元素缩放比
  */
-export function dynamicProportion(newViewSize) {
-    return getRealProportion(config, newViewSize, fullProportion)
+export function dynamicProportion(newVisualSize) {
+    return getRealProportion(config, newVisualSize, fullProportion)
 }
 
 
 /**
  * 默认设置
- * viewSize,screenSize,layoutMode,proportion
+ * visualSize,screenSize,layoutMode,proportion
  * @return {[type]} [description]
  */
 export function initConfig(pptWidth, pptHeight) {

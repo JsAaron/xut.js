@@ -7,25 +7,25 @@ export function leftTranslate(usefulData) {
     let leftPageStyle = usefulData.getPageStyle('before')
 
     //中间：溢出
-    if (middlePageStyle && middlePageStyle.viewLeftInteger) {
+    if (middlePageStyle && middlePageStyle.visualLeftInteger) {
         //左边：溢出
-        if (leftPageStyle && leftPageStyle.viewLeftInteger) {
-           return -middlePageStyle.viewWidth
+        if (leftPageStyle && leftPageStyle.visualLeftInteger) {
+           return -middlePageStyle.visualWidth
         }
         //左边：正常
         else {
-            return -(middlePageStyle.viewWidth - middlePageStyle.viewLeftInteger)
+            return -(middlePageStyle.visualWidth - middlePageStyle.visualLeftInteger)
         }
     }
     //中间：正常
     else {
         //左边：溢出
-        if (leftPageStyle && leftPageStyle.viewLeftInteger) {
-            return -(leftPageStyle.viewWidth - leftPageStyle.viewLeftInteger)
+        if (leftPageStyle && leftPageStyle.visualLeftInteger) {
+            return -(leftPageStyle.visualWidth - leftPageStyle.visualLeftInteger)
         }
         //左边：正常
         else {
-            return -leftPageStyle.viewWidth
+            return -leftPageStyle.visualWidth
         }
     }
 

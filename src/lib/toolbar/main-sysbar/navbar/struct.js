@@ -9,18 +9,18 @@ const getNavOptions = () => {
 
     let iconHeight = config.iconHeight
     let proportion = config.proportion
-    const viewSize = config.viewSize
+    let visualSize = config.visualSize
 
     //横版模式
-    const isHorizontal = config.layoutMode == 'horizontal'
+    let isHorizontal = config.layoutMode == 'horizontal'
 
     proportion = isHorizontal ? proportion.width : proportion.height
     iconHeight = isIOS ? iconHeight : round(proportion * iconHeight)
 
     //导航菜单宽高
     let navHeight, navWidth
-    let sWidth = viewSize.width
-    let sHeight = viewSize.height
+    let sWidth = visualSize.width
+    let sHeight = visualSize.height
 
     //横版模版
     if (isHorizontal) {

@@ -15,7 +15,6 @@
         position: absolute;
         z-index: 99999
     }
-    
     #closeMini {
         left: 100px;
     }
@@ -30,25 +29,26 @@
 </body>
 
 </html>
+
 <script type="text/javascript">
 Xut.Application.setConfig = {
     // visualHeight: window.innerHeight - 44,
     lauchMode: 1,
+    historyMode:false,
     platform: 'mini',
     historyMode: true,
     visualMode: 2,
     salePageType: 'page',
-    cursor: {
-        url: 'images/icons/busyIcon.gif',
-        delayTime: 300
-    },
+    // cursor: {
+    //     url: 'images/icons/busyIcon.gif',
+    //     delayTime: 300
+    // },
     hqUrlSuffix: 'hi',
     supportQR: true,
     swipeDelegate: true
 };
-var appId = 314
 
-
+var appId = 305
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

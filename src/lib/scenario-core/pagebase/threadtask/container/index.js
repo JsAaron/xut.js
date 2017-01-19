@@ -34,10 +34,10 @@ const createli = function({
             data-pageType="${base.pageType}"
             data-container="true"
             class="xut-flip fix-transform"
-            style="width:${getStyle.viewWidth}px;
-                   height:${getStyle.viewHeight}px;
-                   left:${getStyle.viewLeft}px;
-                   top:${getStyle.viewTop}px;
+            style="width:${getStyle.visualWidth}px;
+                   height:${getStyle.visualHeight}px;
+                   left:${getStyle.visualLeft}px;
+                   top:${getStyle.visualTop}px;
                    ${TANSFROM}:${translate};
                    ${background}
                    ${customStyle}">

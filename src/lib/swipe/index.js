@@ -117,7 +117,7 @@ export default class Swipe extends Observer {
          * 视图宽度
          * @type {[type]}
          */
-        this._viewWidth = flipWidth || config.viewSize.width
+        this._visualWidth = flipWidth || config.visualSize.width
 
         /**
          * 翻页时间
@@ -129,7 +129,7 @@ export default class Swipe extends Observer {
          * 翻页速率
          * @type {[type]}
          */
-        this._speedRate = this._originalRate = this._pageTime / this._viewWidth
+        this._speedRate = this._originalRate = this._pageTime / this._visualWidth
 
         /**
          * 是否移动中
@@ -149,9 +149,9 @@ export default class Swipe extends Observer {
             container.setAttribute(LINEARTAG, true)
 
             //this._initDistance 提供给flow调用
-            this._initDistance = -this._hindex * (this._viewWidth + extraGap)
+            this._initDistance = -this._hindex * (this._visualWidth + extraGap)
             container.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
-            container.style.width = this._viewWidth * this.pagetotal + 'px'
+            container.style.width = this._visualWidth * this.pagetotal + 'px'
         } else {
             //用于查找跟元素
             //ul => page
@@ -359,7 +359,7 @@ export default class Swipe extends Observer {
         this._deltaX = deltaX / ((!this._hindex && deltaX > 0 // 在首页
             || this._hindex == this.pagetotal - 1 // 尾页
             && deltaX < 0 // 中间
-        ) ? (absDeltaX / this._viewWidth + 1) : 1)
+        ) ? (absDeltaX / this._visualWidth + 1) : 1)
 
 
         if (!this._isRollX && this._deltaX) {
@@ -441,14 +441,14 @@ export default class Swipe extends Observer {
             //_slideTo的最低值要求
             //1 fast: time < 200 && x >30
             //2 common: x > veiwWidth/6
-            let isValidSlide = duration < 200 && deltaX > 30 || deltaX > this._viewWidth / 6
+            let isValidSlide = duration < 200 && deltaX > 30 || deltaX > this._visualWidth / 6
 
             //如果是无效的动作，则不相应
             //还原默认设置
             //move的情况会引起
             //mini功能，合并翻页时事件
             if (this._isInvalid) {
-                let hasSwipe = duration < 200 && deltaX > this._viewWidth / 10
+                let hasSwipe = duration < 200 && deltaX > this._visualWidth / 10
                 if (hasSwipe) {
                     this._distributeMove({
                         pageIndex: this._hindex,
@@ -553,7 +553,7 @@ export default class Swipe extends Observer {
      * 快速翻页时间计算
      */
     _setRate() {
-        this._speedRate = 50 / this._viewWidth;
+        this._speedRate = 50 / this._visualWidth;
         this._isQuickTurn = true;
     }
 
@@ -694,7 +694,7 @@ export default class Swipe extends Observer {
          * @return {[type]} [description]
          */
         const calculatespeed = () => {
-            return (this._viewWidth - (Math.abs(this._deltaX))) * this._speedRate || this._pageTime;
+            return (this._visualWidth - (Math.abs(this._deltaX))) * this._speedRate || this._pageTime;
         }
 
         this._distributeMove({

@@ -15,7 +15,7 @@ import {
     cacheProperty,
     getStepProperty,
     setStyle
-} from '../component/activity/content/parallax/calculate'
+} from '../component/activity/content/parallax/depend'
 
 
 /**
@@ -60,8 +60,8 @@ export default class MasterMgr extends Abstract {
     constructor(vm) {
         super()
 
-        this.viewWidth = config.viewSize.width
-        this.viewHeight = config.viewSize.height
+        this.visualWidth = config.visualSize.width
+        this.visualHeight = config.visualSize.height
 
         this.pageType = 'master';
 
@@ -415,9 +415,9 @@ export default class MasterMgr extends Abstract {
             }
 
             if(position === 'prev') {
-                _fixToMove(-self.viewWidth);
+                _fixToMove(-self.visualWidth);
             } else if(position === 'next') {
-                _fixToMove(self.viewWidth);
+                _fixToMove(self.visualWidth);
             } else if(position === 'curr') {
                 _fixToMove(0);
             }
@@ -535,7 +535,7 @@ export default class MasterMgr extends Abstract {
 
             let property = getStepProperty({
                 targetProperty: parallax.targetProperty,
-                distance: -self.viewWidth,
+                distance: -self.visualWidth,
                 nodes: nodes
             });
 

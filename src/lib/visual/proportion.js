@@ -47,9 +47,9 @@ export function getFullProportion(config, pptWidth, pptHeight) {
  * @param  {[type]} pptHeight [description]
  * @return {[type]}           [description]
  */
-export function getRealProportion(config, viewSize, fullProportion) {
-    let widthProp = viewSize.width / fullProportion.pptWidth
-    let heightProp = viewSize.height / fullProportion.pptHeight
+export function getRealProportion(config, visualSize, fullProportion) {
+    let widthProp = visualSize.width / fullProportion.pptWidth
+    let heightProp = visualSize.height / fullProportion.pptHeight
 
     //布局的偏移量，可能是采用了画轴模式，一个可视区可以容纳3个页面
     let offsetTop = 0

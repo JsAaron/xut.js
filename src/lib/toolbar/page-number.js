@@ -19,9 +19,7 @@ export default class NumberBar {
         this.$container = this._createDom(pageTotal)
         this.$currtNode = this.$container.find('div:first')
         this.$allNode = this.$container.find('div:last')
-
         this.toolBarStatus = true
-
         Xut.nextTick(() => {
             $rootNode.append(this.$container)
         })
@@ -30,8 +28,8 @@ export default class NumberBar {
     _createDom(pageTotal) {
         //存在模式3的情况，所以页码要处理溢出的情况。left值
         let right = 0
-        if (config.viewSize.overflowWidth) {
-            right = Math.abs(config.viewSize.left * 2) + 'px'
+        if (config.visualSize.overflowWidth) {
+            right = Math.abs(config.visualSize.left * 2) + 'px'
         }
         return $(
             `<div class="xut-page-number" style="right:${right};">

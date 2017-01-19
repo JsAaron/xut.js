@@ -11,8 +11,8 @@ import PageMgr from '../manage/page'
 import MasterMgr from '../manage/master'
 import goToPage from './topage'
 import { sceneController } from '../../scenario/controller'
-import { getDistance } from '../../visuals/view-distance'
-import { styleConfig } from '../../visuals/style-config'
+import { getVisualDistance } from '../../visual/distance'
+import { setVisualStyle } from '../../visual/style'
 import { $$set, hash, $$warn } from '../../util/index'
 import Stack from '../../util/stack'
 
@@ -206,7 +206,7 @@ export default class Controller {
                     userStyle: userStyle,
                     direction: getDirection(createChapterIndex, visibleChapterIndex),
                     //新的页面模式
-                    dynamicVisualMode: getVisualMode(chapterData)
+                    pageVisualMode: getVisualMode(chapterData)
                 }
 
                 //延迟创建,先处理style规则
@@ -224,8 +224,8 @@ export default class Controller {
                             'pageIndex': pageIndex,
                             'multiplePages': multiplePages
                         }, pageIndex, masterFilter, function(shareMaster) {
-                            if(shareMaster.getStyle.dynamicVisualMode !== currentStyle.dynamicVisualMode) {
-                                $$warn(`母版与页面VisualMode不一致，母版visualMode:${shareMaster.getStyle.dynamicVisualMode}，页面visualMode:${currentStyle.dynamicVisualMode}，错误页码:${pageIndex}`)
+                            if(shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
+                                $$warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
                             }
                         })
 
@@ -268,7 +268,7 @@ export default class Controller {
          * 存在存在flows页面处理
          * 这里创建处理的Transfrom
          */
-        const pageStyle = styleConfig({
+        const pageStyle = setVisualStyle({
             action,
             usefulData
         })
@@ -330,7 +330,7 @@ export default class Controller {
         }
 
         //移动的距离
-        let moveDist = getDistance({
+        let moveDist = getVisualDistance({
             action,
             distance,
             direction,

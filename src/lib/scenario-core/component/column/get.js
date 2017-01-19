@@ -1,10 +1,10 @@
-let cacheCounts
+let cacheColumns
 
 /**
- * 设置流式布局排版信息
+ * 缓存流式布局对象
  */
-export function set(flowCounts) {
-    cacheCounts = flowCounts
+export function setCache(columnCount) {
+    cacheColumns = columnCount
 }
 
 /**
@@ -13,7 +13,7 @@ export function set(flowCounts) {
  * @return {Boolean} [description]
  */
 export function hasColumn(){
-    return cacheCounts
+    return cacheColumns
 }
 
 /**
@@ -21,9 +21,9 @@ export function hasColumn(){
  * @return {[type]} [description]
  */
 export function getCurrentBeforeCount(seasonId, chapterId) {
-    if (!cacheCounts) return
+    if (!cacheColumns) return
     if (!seasonId && !chapterId) return
-    let seasonIds = cacheCounts[seasonId]
+    let seasonIds = cacheColumns[seasonId]
     let count = 0
     for (let key in seasonIds) {
         if (key <= chapterId) {
@@ -39,9 +39,9 @@ export function getCurrentBeforeCount(seasonId, chapterId) {
  * @return {[type]} [description]
  */
 export function getBeforeCount(seasonId, chapterId) {
-    if (!cacheCounts) return
+    if (!cacheColumns) return
     if (!seasonId && !chapterId) return
-    let seasonIds = cacheCounts[seasonId]
+    let seasonIds = cacheColumns[seasonId]
     let count = 0
     for (let key in seasonIds) {
         if (key < chapterId) {
@@ -58,8 +58,8 @@ export function getBeforeCount(seasonId, chapterId) {
  * @return {[type]}          [description]
  */
 export function getColumnChpaterCount(seasonId) {
-    if (!cacheCounts) return
-    return Object.keys(cacheCounts[seasonId]).length
+    if (!cacheColumns) return
+    return Object.keys(cacheColumns[seasonId]).length
 }
 
 /**
@@ -70,12 +70,12 @@ export function getColumnChpaterCount(seasonId) {
  * @return {[type]}           [description]
  */
 export function getColumnCount(seasonId, chapterId) {
-    if (!cacheCounts) return
+    if (!cacheColumns) return
     if (seasonId) {
         if (chapterId) {
-            return cacheCounts[seasonId] && cacheCounts[seasonId][chapterId]
+            return cacheColumns[seasonId] && cacheColumns[seasonId][chapterId]
         } else {
-            let seasonIds = cacheCounts[seasonId]
+            let seasonIds = cacheColumns[seasonId]
             let count = 0
             for (let key in seasonIds) {
                 count += seasonIds[key]

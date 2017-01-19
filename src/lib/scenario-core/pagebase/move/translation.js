@@ -95,7 +95,7 @@ const createTranslate = (offset) => {
  * @return {[type]} [description]
  */
 export function fix($node, action) {
-    const viewWidth = config.viewSize.width
-    const translate = action === 'prevEffect' ? createTranslate(-viewWidth) : createTranslate(viewWidth)
+    const visualWidth = config.visualSize.width
+    const translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth)
     $node.css(transform, translate)
 }

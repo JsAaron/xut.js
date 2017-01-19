@@ -3,7 +3,7 @@ import {
     rightPageHook,
     middlePageHook,
     leftPageHook
-} from './visual-config/distance-hook/index'
+} from './style-config/distance-hook/index'
 import {
     hasValue,
     hash
@@ -26,7 +26,7 @@ const getPageStyle = function(pageIndex) {
  */
 const getPageVisualWidth = function(pageStyle) {
     if(pageStyle) {
-        return pageStyle.viewWidth
+        return pageStyle.visualWidth
     }
     return 0
 }
@@ -35,7 +35,7 @@ const getPageVisualWidth = function(pageStyle) {
  * 动态计算翻页距离
  * @return {[type]} [description]
  */
-export function getDistance({
+export function getVisualDistance({
     action,
     distance,
     direction,

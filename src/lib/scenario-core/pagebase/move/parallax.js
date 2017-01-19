@@ -6,7 +6,7 @@ import {
     getStepProperty,
     setFlipOverScale,
     setStyle
-} from '../../component/activity/content/parallax/calculate'
+} from '../../component/activity/content/parallax/depend'
 
 /**
  * 移动视觉差对象
@@ -125,7 +125,7 @@ export default function(baseProto) {
         }
 
         //是珊栏页面，那么翻页的参数需要转化
-        let isColumn = base.getStyle.dynamicVisualMode === 1
+        let isColumn = base.getStyle.pageVisualMode === 1
 
         //移动距离
         let distance = moveDist.length ? moveDist[1] : moveDist

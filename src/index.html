@@ -34,6 +34,7 @@
 Xut.Application.setConfig = {
     // visualHeight: window.innerHeight - 44,
     lauchMode: 1,
+    historyMode:false,
     platform: 'mini',
     historyMode: true,
     visualMode: 2,
@@ -47,7 +48,7 @@ Xut.Application.setConfig = {
     swipeDelegate: true
 };
 
-var appId = 304
+var appId = 301
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

@@ -44,9 +44,10 @@ export class Zoom {
         //所以坐标的算法是有区别了
         let containerLeft = 0
         let containerTop = 0
-        if(config.viewSize.left) {
-            containerLeft = config.viewSize.left
-            containerTop = config.viewSize.top
+        let visualSize = config.visualSize
+        if(visualSize.left) {
+            containerLeft = visualSize.left
+            containerTop = visualSize.top
         }
 
         this.$imgNode = element
@@ -127,14 +128,14 @@ export class Zoom {
 
         //如果有宽度溢出
         //就是说用了窗口指定模式
-        if(config.viewSize.left) {
-            view = config.viewSize
+        if(config.visualSize.left) {
+            view = config.visualSize
         }
 
         //虚拟模拟3下，宽度可能溢出，所以需要取屏幕宽度
         if(config.visualMode === 3) {
             view = config.screenSize
-            overflowLeft = config.viewSize.left
+            overflowLeft = config.visualSize.left
         }
 
         return getImgConfig({
