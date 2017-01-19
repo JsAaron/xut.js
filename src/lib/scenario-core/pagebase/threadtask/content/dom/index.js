@@ -7,7 +7,7 @@
  * @return {[type]} [description]
  */
 
-import { config } from '../../../../../config/index'
+import { config, $$warn } from '../../../../../config/index'
 import { parseCanvas } from './parse/canvas'
 import { createContainer } from './create/container'
 import { createDom } from './create/dom'
@@ -111,6 +111,25 @@ const externalFile = (wrapObj, svgCallback) => {
 }
 
 
+/**
+ * 分配缩放比
+ * @return {[type]} [description]
+ */
+const allotRatio = (fixRadio, headerFooterMode) => {
+
+    if(fixRadio && headerFooterMode) {
+        config.devtools && $$warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式')
+    }
+
+    //优先选择页眉页脚的模式1与2
+    if(headerFooterMode) {
+        return headerFooterMode
+    }
+    //设置图片缩放模式为3
+    if(fixRadio) {
+        return 3
+    }
+}
 
 //=====================================================
 //
@@ -160,6 +179,8 @@ export function contentStructure(callback, data, context) {
         contentDas = {},
         //缓存content结构
         cachedContentStr = [],
+        //页眉页脚对象合集
+        headerFooterMode = {},
         //自定义样式
         getStyle = data.getStyle;
 
@@ -191,9 +212,18 @@ export function contentStructure(callback, data, context) {
      * 页面或者母板浮动对象
      * 页面是最顶级的
      */
-    function eachPara(parameter, contentId, conData) {
+    function parseParameter(parameter, contentId, conData) {
         var zIndex;
         _.each(parameter, (para) => {
+
+            //有页眉页脚对象
+            //2017.1.18
+            if(para.headerFooter) {
+                if(headerFooterMode[contentId]) {
+                    $$warn('页眉页脚对象重复设置,cid:' + contentId)
+                }
+                headerFooterMode[contentId] = para.headerFooter
+            }
 
             //保持图片正比缩放
             //给mini使用
@@ -246,7 +276,7 @@ export function contentStructure(callback, data, context) {
             if(conData.parameter) {
                 if(parameter = parseJSON(conData.parameter)) {
                     //parameter保持数组格式
-                    eachPara(parameter.length ? parameter : [parameter], contentId, conData)
+                    parseParameter(parameter.length ? parameter : [parameter], contentId, conData)
                 }
             }
         }
@@ -310,6 +340,7 @@ export function contentStructure(callback, data, context) {
                 idFix,
                 textFx,
                 contentHtmlBoxIds,
+                headerFooterMode,
                 containerPrefix: ''
             }
 
@@ -347,7 +378,8 @@ export function contentStructure(callback, data, context) {
             //创建包装器,处理数据引用关系
             wrapObj = makeWarpObj(contentId, content, pageType, pid, virtualOffset);
             idFix.push(wrapObj.containerName)
-                //如果有文本效果标记
+
+            //如果有文本效果标记
             if(content.texteffect) {
                 content.texteffectId = wrapObj.containerName
                 textFx.push(content)
@@ -360,9 +392,15 @@ export function contentStructure(callback, data, context) {
             //转换缩放比
             sizeResults = reviseSize({
                 results: wrapObj.data,
-                fixRadio: content.fixRadio,
-                proportion: getStyle.pageProportion
+                getStyle: getStyle,
+                proportion: getStyle.pageProportion,
+                proportionMode: allotRatio(content.fixRadio, headerFooterMode[contentId])
             })
+
+            //如果是隐藏的页面页脚，重写这个标记
+            if(sizeResults.isHide) {
+                headerFooterMode[contentId] = 'hide'
+            }
 
             //正常模式下创建
             startCreate(wrapObj, content, contentId)

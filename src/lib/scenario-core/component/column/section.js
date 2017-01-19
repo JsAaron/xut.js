@@ -1,4 +1,4 @@
-import { config ,dynamicView} from '../../../config/index'
+import { config ,resetVisualLayout} from '../../../config/index'
 import { translation } from '../../pagebase/move/translation'
 import { getColumnCount } from './get'
 import Swipe from '../../../swipe/index'
@@ -104,7 +104,7 @@ export default class Section {
 
         const flowObject = this
         const pagesCount = getColumnCount(seasonId, chapterId)
-        const flowView = dynamicView(1)
+        const flowView = resetVisualLayout(1)
 
         const MIN = 0
         const MAX = pagesCount - 1

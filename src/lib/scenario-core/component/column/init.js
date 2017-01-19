@@ -1,4 +1,4 @@
-import { config, dynamicView } from '../../../config/index'
+import { config, resetVisualLayout } from '../../../config/index'
 import { setCache } from './get'
 import { getResults, removeFlowData } from '../../../database/result'
 import { nextTick } from '../../../util/nexttick'
@@ -115,7 +115,7 @@ export default function initColumn(callback) {
         let columnCount = {}
 
         //容器尺寸设置
-        let flowView = dynamicView(1)
+        let flowView = resetVisualLayout(1)
         let vWidth = flowView.width
         let vHeight = newViewHight = flowView.height
 

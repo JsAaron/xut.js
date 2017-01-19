@@ -11,15 +11,31 @@ export function createFn(obj, id, callback) {
 
 /**
  * 转成数组格式
+ * 分组
+ *     主体部分内容
+ *     页眉页脚内容
  * @param  {[type]} contentsFragment [description]
  * @return {[type]}                  [description]
  */
-export function toArray(o) {
-    var contentsFragment = [];
-    _.each(o, function($node) {
-        contentsFragment.push($node)
+export function toArray(contentsFragment, headerFooterMode) {
+    let bodyContent = []
+    let headerFooterContent = []
+    _.each(contentsFragment, function($node, key) {
+        let id = key.split('_').pop()
+        let state
+        if(headerFooterMode && (state = headerFooterMode[id])) {
+            if(state !== 'hide') {//隐藏抛弃的元素，不需要显示了
+                headerFooterContent.push($node)
+            }
+        } else {
+            bodyContent.push($node)
+        }
     })
-    return contentsFragment;
+
+    return {
+        bodyContent,
+        headerFooterContent
+    }
 }
 
 /**
@@ -236,21 +252,21 @@ export function applyActivitys(data, contentDas, callback) {
             }
 
             var actdata = {
-                'noticeComplete'  : callback, //监听完成
-                'pageIndex'       : data.pageIndex,
-                'canvasRelated'   : data.canvasRelated, //父类引用
-                'id'              : imageId || autoUUID(),
-                "type"            : 'Content',
-                'pageId'          : pageId,
-                'getStyle'        : data.getStyle,
-                'activityId'      : activity._id,
-                '$containsNode'   : $containsNode,
-                'pageType'        : compiler['pageType'], //构建类型 page/master
-                'seed'            : compiler['seed'], //动画表数据 or 视觉差表数据
-                "pid"             : pid, //页码
-                'eventData'       : eventData, //事件数据
-                'relatedData'     : relatedData, //相关数据,所有子作用域Activity对象共享
-                'relatedCallback' : relatedCallback //相关回调
+                'noticeComplete': callback, //监听完成
+                'pageIndex': data.pageIndex,
+                'canvasRelated': data.canvasRelated, //父类引用
+                'id': imageId || autoUUID(),
+                "type": 'Content',
+                'pageId': pageId,
+                'getStyle': data.getStyle,
+                'activityId': activity._id,
+                '$containsNode': $containsNode,
+                'pageType': compiler['pageType'], //构建类型 page/master
+                'seed': compiler['seed'], //动画表数据 or 视觉差表数据
+                "pid": pid, //页码
+                'eventData': eventData, //事件数据
+                'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
+                'relatedCallback': relatedCallback //相关回调
             }
 
             //注册引用

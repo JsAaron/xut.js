@@ -121,20 +121,24 @@ export default class TaskContents {
     _dataStrCheck(data, userData) {
         this._assert('strAfter', function() {
             let contentDas = userData.contentDas
-                //放大图片
+
+            //放大图片
             if(Object.keys(data.zoomBehavior).length) {
                 this._zoomImage(data)
             }
+
             //文本特效
             if(userData.textFx.length) {
                 this._textFx(data, userData.textFx)
             }
+
             //保留场景的留信息
             //用做软件制作单页预加载
             sceneController.seasonRelated = data.seasonRelated;
+
             //初始化content对象
             applyActivitys(data, contentDas, delayHooks => {
-                this._eventAfterCheck(data, delayHooks)
+                this._eventAfterCheck(data, delayHooks, userData.headerFooterMode)
             })
         })
     }
@@ -144,7 +148,7 @@ export default class TaskContents {
      * @param  {[type]} iScrollHooks [description]
      * @return {[type]}              [description]
      */
-    _eventAfterCheck(data, delayHooks) {
+    _eventAfterCheck(data, delayHooks, headerFooterMode) {
 
         var self = this;
 
@@ -207,11 +211,40 @@ export default class TaskContents {
             if(Xut.IBooks.runMode()) {
                 complete();
             } else {
-                //正常对象
-                nextTick({
-                    'container': data.$containsNode,
-                    'content': toArray(data.contentsFragment)
-                }, complete);
+
+                let fragment = toArray(data.contentsFragment, headerFooterMode)
+                let bodyContent = fragment.bodyContent
+                let headerFooterContent = fragment.headerFooterContent
+                let watchNextTick = function() {
+                    let watchCount = 0
+                    headerFooterContent.length && ++watchCount
+                    bodyContent.length && ++watchCount
+                    return() => {
+                        if(watchCount === 1) {
+                            complete()
+                            return
+                        }
+                        --watchCount
+                    }
+                }()
+
+                //页眉页脚
+                if(headerFooterContent.length) {
+                    nextTick({
+                        'container': data.$headFootNode,
+                        'content': fragment.headerFooterContent
+                    }, watchNextTick);
+                }
+
+                //主体内容
+                if(bodyContent.length) {
+                    nextTick({
+                        'container': data.$containsNode,
+                        'content': fragment.bodyContent
+                    }, watchNextTick);
+                }
+
+
             }
         })
     }

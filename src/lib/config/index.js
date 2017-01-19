@@ -368,7 +368,7 @@ const resetProportion = function(pptWidth, pptHeight) {
  * 动态计算计算可视区View
  * 每个页面可以重写页面的view
  */
-export function dynamicView(setVisualMode) {
+export function resetVisualLayout(setVisualMode) {
     return getVisualLayout(config, fullProportion, setVisualMode)
 }
 
@@ -376,7 +376,7 @@ export function dynamicView(setVisualMode) {
  * 动态计算缩放比
  * 每个页面可以重写页面的元素缩放比
  */
-export function dynamicProportion(newVisualSize) {
+export function resetVisualProportion(newVisualSize) {
     return getRealProportion(config, newVisualSize, fullProportion)
 }
 

@@ -848,12 +848,14 @@ video {
     background-size: 100% 100%;
 }
 .page-pinch > div {
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 100%;
+    z-index: 1
 }
 .page-pinch > div:first-child {
     overflow: hidden;
+    z-index: 2
 }
 
 
