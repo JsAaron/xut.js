@@ -11,8 +11,8 @@ import PageMgr from '../manage/page'
 import MasterMgr from '../manage/master'
 import goToPage from './topage'
 import { sceneController } from '../../scenario/controller'
-import { getVisualDistance } from '../../visual/distance'
-import { setVisualStyle } from '../../visual/style'
+import { getVisualDistance } from '../../visual/visual-distance'
+import { setVisualStyle } from '../../visual/visual-style'
 import { $$set, hash, $$warn } from '../../util/index'
 import Stack from '../../util/stack'
 
@@ -34,10 +34,18 @@ import {
  * @return {[type]} [description]
  */
 const getVisualMode = function(chapterData) {
+
+    //反向模式设置
+    //如果是全局模式1，并且是反模式设置
+    if(config.visualMode === 1 && config.visualReverseMode){
+        return 1
+    }
+
     //flow页面返回1
     if(chapterData.note === 'flow') {
         return 1
     }
+
     //如果有独立的页面模式
     let parameter = chapterData.parameter
     if(parameter) {
@@ -46,6 +54,7 @@ const getVisualMode = function(chapterData) {
             return Number(matchMode[1])
         }
     }
+    
     //返回全局页面模式
     return config.visualMode || 1
 }

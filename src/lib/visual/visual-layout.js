@@ -1,3 +1,5 @@
+import { $$warn } from '../util/debug'
+
 const FLOOR = Math.floor
 const CEIL = Math.ceil
 
@@ -15,8 +17,9 @@ export function getVisualLayout(config, fullProportion, setVisualMode) {
     let newTop = 0
     let newLeft = 0
 
-    //页面显示模式
-    setVisualMode = setVisualMode || config.visualMode
+    if(!setVisualMode){
+        $$warn('getVisualLayout没有提供setVisualMode')
+    }
 
     /**
      * 模式2：
@@ -66,7 +69,6 @@ export function getVisualLayout(config, fullProportion, setVisualMode) {
 
         //竖版PPT
         if(config.pptVertical) {
-
             //竖版显示，正向显示
             if(config.screenVertical) {
                 newWidth = fullProportion.pptWidth * fullProportion.height
@@ -75,13 +77,7 @@ export function getVisualLayout(config, fullProportion, setVisualMode) {
             //横版显示，反向显示
             else {
                 newWidth = fullProportion.pptWidth * fullProportion.height
-                newLeft = (config.visualSize.width - newWidth) / 2
-            }
-
-            //竖版显示
-            //高度100%，宽度溢出
-            if(config.screenVertical) {
-
+                newLeft = (screenWidth - newWidth) / 2
             }
         }
 
@@ -94,45 +90,6 @@ export function getVisualLayout(config, fullProportion, setVisualMode) {
             }
         }
 
-    }
-
-    /**
-     * 模式4：
-     * 高度100%，正比缩放宽度
-     */
-    if(setVisualMode === 4) {
-        if(config.pptVertical) {
-            //ppt：竖
-            //设备：竖
-            if(config.screenVertical) {
-                newWidth = fullProportion.pptWidth * fullProportion.height
-                newLeft = (screenWidth - newWidth) / 2
-            }
-        }
-
-        if(config.pptHorizontal) {
-            //ppt：横
-            //设备：横
-            if(config.screenVertical) {
-                console.log('模式3横版PPT')
-            }
-        }
-
-    }
-
-
-    /**
-     * 模式1：
-     * 总模式,模式2的时候，竖版应用横版显示处理
-     * 反向显示处理，存在left处理
-     */
-    if(setVisualMode === 1 && config.visualSize) {
-        return {
-            width: CEIL(config.visualSize.width), //宽度改为可视区宽
-            height: CEIL(newHeight),
-            left: CEIL(newLeft),
-            top: CEIL(newTop)
-        }
     }
 
 

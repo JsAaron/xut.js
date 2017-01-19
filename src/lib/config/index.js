@@ -16,12 +16,12 @@ import {
 }
 from './depend/size'
 
-import { getVisualLayout } from '../visual/layout'
+import { getVisualLayout } from '../visual/visual-layout'
 
 import {
     getFullProportion,
     getRealProportion
-} from '../visual/proportion'
+} from '../visual/visual-proportion'
 
 /**
  * 默认配置与模式
@@ -52,7 +52,7 @@ Xut.zIndexlevel = () => {
 
 //通过新学堂加载
 //用于处理iframe窗口去全屏
-if(/xinxuetang/.test(window.location.href)) {
+if (/xinxuetang/.test(window.location.href)) {
     config.iframeFullScreen = true;
 }
 
@@ -85,24 +85,24 @@ const desktopPlat = () => {
 
     //2016.9.13
     //新增动态模式
-    if(config.launch) {
+    if (config.launch) {
         return getSourcePath()
     }
 
     //如果是iframe加载
     //而且是客户端模式
-    if(GLOBALIFRAME && CLIENTCONFIGT) {
+    if (GLOBALIFRAME && CLIENTCONFIGT) {
         return CLIENTCONFIGT.path
     }
 
-    if(typeof initGalleryUrl != 'undefined') {
+    if (typeof initGalleryUrl != 'undefined') {
         return getSourcePath()
     } else {
         //资源存放位置
         // * storageMode 存放的位置
         // * 0 APK应用本身
         // 1 外置SD卡
-        if(Number(config.storageMode)) {
+        if (Number(config.storageMode)) {
             return "sdcard/" + config.appId + "/" + getSourcePath()
         } else {
             return getSourcePath()
@@ -120,7 +120,7 @@ const desktopPlat = () => {
  * @return {[type]} [description]
  */
 const runMode = (() => {
-    if(MMXCONFIG) {
+    if (MMXCONFIG) {
         return false
     }
     return isBrowser
@@ -206,7 +206,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getVideoPath() {
-        if(isCacheVideoPath && cacheVideoPath) {
+        if (isCacheVideoPath && cacheVideoPath) {
             return cacheVideoPath
         }
         isCacheVideoPath = true
@@ -218,7 +218,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getAudioPath() {
-        if(isCacheAudioPath && cacheAudioPath) {
+        if (isCacheAudioPath && cacheAudioPath) {
             return cacheAudioPath
         }
         isCacheAudioPath = true
@@ -231,7 +231,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getSvgPath() {
-        if(isCacheSvgPath && cacheSvgPath) {
+        if (isCacheSvgPath && cacheSvgPath) {
             return cacheSvgPath
 
         }
@@ -245,7 +245,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getWidgetPath() {
-        if(isCacheJsWidgetPath && cacheJsWidgetPath) {
+        if (isCacheJsWidgetPath && cacheJsWidgetPath) {
             return cacheJsWidgetPath
         }
         isCacheJsWidgetPath = true
@@ -326,7 +326,7 @@ export function initPathAddress() {
 const setProportion = function(pptWidth, pptHeight, setVisualMode) {
 
     //数据ppt排版设计
-    if(pptWidth && pptHeight) {
+    if (pptWidth && pptHeight) {
         config.pptHorizontal = pptWidth > pptHeight ? true : false
         config.pptVertical = !config.pptHorizontal
     }
@@ -335,28 +335,17 @@ const setProportion = function(pptWidth, pptHeight, setVisualMode) {
     //根据分辨率与PPT排版的比值来确定
     fullProportion = getFullProportion(config, pptWidth, pptHeight)
 
-    //可视区域尺寸
-    if(!setVisualMode) {
-        setVisualMode = config.visualMode;
-        //特殊处理
-        //如果是全局3模式
-        //需要转化成每一个模式处理
-        if(config.visualMode === 3) {
-            setVisualMode = 1
-        }
-    }
-
     let visualSize = config.visualSize = getVisualLayout(config, fullProportion, setVisualMode)
 
     //溢出宽度
     visualSize.overflowWidth = false
-    if(visualSize.left < 0) {
+    if (visualSize.left < 0) {
         visualSize.overflowWidth = Math.abs(visualSize.left) * 2
     }
 
     //溢出高度
     visualSize.overflowHeight = false
-    if(visualSize.top < 0) {
+    if (visualSize.top < 0) {
         visualSize.overflowHeight = true
     }
 
@@ -396,6 +385,7 @@ export function resetVisualProportion(newVisualSize) {
     return getRealProportion(config, newVisualSize, fullProportion)
 }
 
+
 /**
  * 默认设置
  * visualSize,screenSize,layoutMode,proportion
@@ -403,19 +393,49 @@ export function resetVisualProportion(newVisualSize) {
  */
 export function initConfig(pptWidth, pptHeight) {
 
-    //3模式从新
-    setConfig(pptWidth, pptHeight)
+    //强制检测是否是反向显示模式
+    //模式3的情况下，用2检测
+    setConfig(pptWidth, pptHeight, '', config.visualMode === 3 ? 2 : config.visualMode)
 
     //如果是PPT与设备反向显示
     //这里可能会溢出left的值
     //那么把每个visual就当做一个整体处理
-    config.originalScreenSize = config.screenSize
+    // config.originalScreenSize = config.screenSize
     config.originalVisualSize = config.visualSize
-    if(config.visualSize.left) {
-        setConfig(pptWidth, pptHeight, {
-            width: config.visualSize.width,
-            height: config.visualSize.height
-        })
+
+    //判断是不是反向模式
+    //竖版PPT,横版显示
+    if (config.pptVertical && config.screenHorizontal) {
+        config.visualReverseMode = true
     }
-    console.log(config)
+
+    //横版PPT,竖版显示
+    if (config.pptHorizontal && config.screenVertical) {
+        config.visualReverseMode = true
+    }
+
+    if (config.visualMode === 2) {
+        //如果是反向模式
+        //强制设置visualSize=screenSize
+        //从新计算config依赖比值
+        if (config.visualSize.left) {
+            setConfig(pptWidth, pptHeight, {
+                width: config.visualSize.width,
+                height: config.visualSize.height
+            }, config.visualMode)
+        }
+    } else if (config.visualMode === 3) {
+        //反模式下，重置高度
+        if (config.visualSize.left) {
+            setConfig(pptWidth, pptHeight, {
+                width: config.visualSize.width,
+                height: config.visualSize.height
+            }, 1)
+        } else {
+            //重新把3模式下按照正常1的情况设置
+            //2不行，因为高度不对，只有1与3接近
+            setConfig(pptWidth, pptHeight, '', 1)
+        }
+    }
+
 }

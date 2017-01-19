@@ -19,6 +19,7 @@ export function getSize() {
 
 
     //配置可视区窗口
+    //用户在外部指定了可视区域
     if (Xut.config.visualHeight) {
         Xut.config.visualTop = clientHeight - Xut.config.visualHeight
         clientHeight = Xut.config.visualHeight

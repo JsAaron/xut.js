@@ -26,7 +26,7 @@ const createTranslate = (offset) => {
  * @param  {Object} currIndex                     } [description]
  * @return {[type]}               [description]
  */
-export function layoutTranslate({
+export function styleTranslate({
     createIndex,
     currIndex,
     direction,

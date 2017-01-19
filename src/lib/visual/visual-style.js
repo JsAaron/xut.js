@@ -1,7 +1,7 @@
 import Stack from '../util/stack'
-import { visualLayout } from './style-config/layout'
-import { visualProportion } from './style-config/proportion'
-import { layoutTranslate } from './style-config/translate'
+import { styleLayout } from './style-config/style-layout'
+import { styleProportion } from './style-config/style-proportion'
+import { styleTranslate } from './style-config/style-translate'
 
 /**
  * 获取页面对象的样式配置对象
@@ -27,10 +27,10 @@ export function setVisualStyle({
 
     _.each(usefulData, function(data, index) {
         //容器可视区尺寸
-        _.extend(data, visualLayout(data.pageVisualMode, data.direction))
+        _.extend(data, styleLayout(data.pageVisualMode, data.direction))
 
         //容器内部元素的缩放比
-        data.pageProportion = visualProportion(data)
+        data.pageProportion = styleProportion(data)
 
         //提供快速索引
         usefulData['_' + data.direction] = data.pid
@@ -66,7 +66,7 @@ export function setVisualStyle({
         }
 
         //容器的初始translate值
-        _.extend(data, layoutTranslate({
+        _.extend(data, styleTranslate({
             usefulData,
             createIndex: data.pid,
             currIndex: data.visiblePid,

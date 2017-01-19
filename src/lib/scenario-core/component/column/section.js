@@ -4,7 +4,7 @@ import { getColumnCount } from './get'
 import Swipe from '../../../swipe/index'
 import render from './render'
 
-import { getVisualDistance } from '../../../visual/distance'
+import { getVisualDistance } from '../../../visual/visual-distance'
 import { Zoom } from '../../../plugin/extend/zoom/index'
 import { closeButton } from '../../../plugin/extend/close-button'
 
