@@ -121,14 +121,21 @@ const allotRatio = (fixRadio, headerFooterMode) => {
         config.devtools && $$warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式')
     }
 
-    //优先选择页眉页脚的模式1与2
-    if(headerFooterMode) {
-        return headerFooterMode
-    }
-    //设置图片缩放模式为3
+    //设置图片缩放模式1
     if(fixRadio) {
+        return 1
+    }
+
+    //页眉横纵比
+    if(headerFooterMode === 'header') {
+        return 2
+    }
+
+    //页脚横纵比
+    if(headerFooterMode === 'footer') {
         return 3
     }
+
 }
 
 //=====================================================
