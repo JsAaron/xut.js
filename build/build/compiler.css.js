@@ -18,11 +18,11 @@ function createFile(fileName, path, conf, resolve, reject) {
         }))
         .pipe(concat(fileName + '.dev.css'))
         .pipe(gulp.dest(conf.tarDir))
-        .pipe(gulp.dest(conf.testDir))
+        // .pipe(gulp.dest(conf.testDir))
         .pipe(cleanCSS({ compatibility: 'ie8' }))
         .pipe(rename(fileName + '.css'))
         .pipe(gulp.dest(conf.tarDir))
-        .pipe(gulp.dest(conf.testDir))
+        // .pipe(gulp.dest(conf.testDir))
         .pipe(gulp.dest('./template/test/css'))
         .on('error', (err) => {
             utils.log('【css】compile complete error', 'debug')

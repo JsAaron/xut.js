@@ -52,7 +52,7 @@ Xut.zIndexlevel = () => {
 
 //通过新学堂加载
 //用于处理iframe窗口去全屏
-if (/xinxuetang/.test(window.location.href)) {
+if(/xinxuetang/.test(window.location.href)) {
     config.iframeFullScreen = true;
 }
 
@@ -85,24 +85,24 @@ const desktopPlat = () => {
 
     //2016.9.13
     //新增动态模式
-    if (config.launch) {
+    if(config.launch) {
         return getSourcePath()
     }
 
     //如果是iframe加载
     //而且是客户端模式
-    if (GLOBALIFRAME && CLIENTCONFIGT) {
+    if(GLOBALIFRAME && CLIENTCONFIGT) {
         return CLIENTCONFIGT.path
     }
 
-    if (typeof initGalleryUrl != 'undefined') {
+    if(typeof initGalleryUrl != 'undefined') {
         return getSourcePath()
     } else {
         //资源存放位置
         // * storageMode 存放的位置
         // * 0 APK应用本身
         // 1 外置SD卡
-        if (Number(config.storageMode)) {
+        if(Number(config.storageMode)) {
             return "sdcard/" + config.appId + "/" + getSourcePath()
         } else {
             return getSourcePath()
@@ -120,7 +120,7 @@ const desktopPlat = () => {
  * @return {[type]} [description]
  */
 const runMode = (() => {
-    if (MMXCONFIG) {
+    if(MMXCONFIG) {
         return false
     }
     return isBrowser
@@ -206,7 +206,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getVideoPath() {
-        if (isCacheVideoPath && cacheVideoPath) {
+        if(isCacheVideoPath && cacheVideoPath) {
             return cacheVideoPath
         }
         isCacheVideoPath = true
@@ -218,7 +218,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getAudioPath() {
-        if (isCacheAudioPath && cacheAudioPath) {
+        if(isCacheAudioPath && cacheAudioPath) {
             return cacheAudioPath
         }
         isCacheAudioPath = true
@@ -231,7 +231,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getSvgPath() {
-        if (isCacheSvgPath && cacheSvgPath) {
+        if(isCacheSvgPath && cacheSvgPath) {
             return cacheSvgPath
 
         }
@@ -245,7 +245,7 @@ _.extend(config, {
      * @return {[type]} [description]
      */
     getWidgetPath() {
-        if (isCacheJsWidgetPath && cacheJsWidgetPath) {
+        if(isCacheJsWidgetPath && cacheJsWidgetPath) {
             return cacheJsWidgetPath
         }
         isCacheJsWidgetPath = true
@@ -323,29 +323,23 @@ export function initPathAddress() {
  * 默认设置
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
  */
-const setProportion = function(pptWidth, pptHeight, setVisualMode) {
-
-    //数据ppt排版设计
-    if (pptWidth && pptHeight) {
-        config.pptHorizontal = pptWidth > pptHeight ? true : false
-        config.pptVertical = !config.pptHorizontal
-    }
+const setProportion = function(pptWidth, pptHeight, setVisualMode, noModifyValue) {
 
     //获取全屏比值，用来设定view的尺寸
     //根据分辨率与PPT排版的比值来确定
     fullProportion = getFullProportion(config, pptWidth, pptHeight)
 
-    let visualSize = config.visualSize = getVisualLayout(config, fullProportion, setVisualMode)
+    let visualSize = config.visualSize = getVisualLayout(config, fullProportion, setVisualMode, noModifyValue)
 
     //溢出宽度
     visualSize.overflowWidth = false
-    if (visualSize.left < 0) {
+    if(visualSize.left < 0) {
         visualSize.overflowWidth = Math.abs(visualSize.left) * 2
     }
 
     //溢出高度
     visualSize.overflowHeight = false
-    if (visualSize.top < 0) {
+    if(visualSize.top < 0) {
         visualSize.overflowHeight = true
     }
 
@@ -354,9 +348,9 @@ const setProportion = function(pptWidth, pptHeight, setVisualMode) {
 }
 
 /**
- * 设置配置文件
+ * 设置布局
  */
-const setConfig = function(pptWidth, pptHeight, screenSize, setVisualMode) {
+const setLayout = function(pptWidth, pptHeight, screenSize) {
     //获取分辨率
     config.screenSize = screenSize || getSize()
 
@@ -365,8 +359,19 @@ const setConfig = function(pptWidth, pptHeight, screenSize, setVisualMode) {
     config.screenVertical = !config.screenHorizontal
     layoutMode = config.layoutMode = getLayerMode(config.screenSize)
 
-    //设置缩放比
-    setProportion(pptWidth, pptHeight, setVisualMode)
+    //数据ppt排版设计
+    if(pptWidth && pptHeight) {
+        config.pptHorizontal = pptWidth > pptHeight ? true : false
+        config.pptVertical = !config.pptHorizontal
+    }
+}
+
+/**
+ * 设置配置文件
+ */
+const setConfig = function(pptWidth, pptHeight, screenSize, setVisualMode, noModifyValue) {
+    setLayout(pptWidth, pptHeight, screenSize)
+    setProportion(pptWidth, pptHeight, setVisualMode, noModifyValue)
 }
 
 /**
@@ -393,9 +398,27 @@ export function resetVisualProportion(newVisualSize) {
  */
 export function initConfig(pptWidth, pptHeight) {
 
-    //强制检测是否是反向显示模式
-    //模式3的情况下，用2检测
-    setConfig(pptWidth, pptHeight, '', config.visualMode === 3 ? 2 : config.visualMode)
+    /****************************************
+     *  反向模式探测
+     *  为了在originalVisualSize中重置容器的布局
+     *  让容器的布局是反向模式的等比缩放的尺寸
+     *  这样算法可以保持兼容正向一致
+     * ***************************************/
+
+    //探测PPT与屏幕
+    setLayout(pptWidth, pptHeight)
+
+    //如果是横版PPT，横版显示的情况下，并且是全局模式3的情况
+    //可能存在宽度，不能铺满全屏的情况
+    //所以可能存在要修改尺寸
+    if(config.pptHorizontal && config.screenHorizontal && config.visualMode === 3) {
+        //可能会修改全局布局尺寸，所以采用3模式探测
+        setProportion(pptWidth, pptHeight, config.visualMode, true)
+    } else {
+        //强制检测是否是反向显示模式
+        //模式3的情况下，用2检测
+        setProportion(pptWidth, pptHeight, config.visualMode === 3 ? 2 : config.visualMode)
+    }
 
     //如果是PPT与设备反向显示
     //这里可能会溢出left的值
@@ -403,30 +426,32 @@ export function initConfig(pptWidth, pptHeight) {
     // config.originalScreenSize = config.screenSize
     config.originalVisualSize = config.visualSize
 
-    //判断是不是反向模式
     //竖版PPT,横版显示
-    if (config.pptVertical && config.screenHorizontal) {
-        config.visualReverseMode = true
+    if(config.pptVertical && config.screenHorizontal) {
+        config.verticalToHorizontalVisual = true
     }
 
     //横版PPT,竖版显示
-    if (config.pptHorizontal && config.screenVertical) {
-        config.visualReverseMode = true
+    if(config.pptHorizontal && config.screenVertical) {
+        config.horizontalToVerticalVisual = true
     }
 
-    if (config.visualMode === 2) {
+    /*******************************
+     *   反向检测影响了，需要修正config
+     * ******************************/
+    if(config.visualMode === 2) {
         //如果是反向模式
         //强制设置visualSize=screenSize
         //从新计算config依赖比值
-        if (config.visualSize.left) {
+        if(config.visualSize.left) {
             setConfig(pptWidth, pptHeight, {
                 width: config.visualSize.width,
                 height: config.visualSize.height
             }, config.visualMode)
         }
-    } else if (config.visualMode === 3) {
+    } else if(config.visualMode === 3) {
         //反模式下，重置高度
-        if (config.visualSize.left) {
+        if(config.visualSize.left) {
             setConfig(pptWidth, pptHeight, {
                 width: config.visualSize.width,
                 height: config.visualSize.height

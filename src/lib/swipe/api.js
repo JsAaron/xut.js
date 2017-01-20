@@ -8,6 +8,14 @@ import {
 export default function api(Swipe) {
 
     /**
+     * 获取翻页over速率
+     * @return {[type]} [description]
+     */
+    Swipe.prototype.getFlipOverSpeed = function(newVisualWidth){
+        return this._flipOverSpeed(newVisualWidth)
+    }
+
+    /**
      * 获取初始化距离值
      * @return {[type]} [description]
      */

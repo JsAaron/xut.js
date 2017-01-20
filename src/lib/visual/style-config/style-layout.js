@@ -19,10 +19,6 @@ export function styleLayout(pageVisualMode) {
     //visualMode结构需要变动，必须重置
     //pageVisualMode=3的情况下，每一个都重新计算新
     if (pageVisualMode && pageVisualMode !== config.visualMode || pageVisualMode === 3) {
-
-        if(pageVisualMode===2){
-                    console.log(pageVisualMode)
-        }
         visualSize = resetVisualLayout(pageVisualMode)
         needRecalculate = true
     } else {

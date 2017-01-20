@@ -7,13 +7,14 @@
  * @return {[type]} [description]
  */
 
-import { config, $$warn } from '../../../../../config/index'
+import { config} from '../../../../../config/index'
 import { parseCanvas } from './parse/canvas'
 import { createContainer } from './create/container'
 import { createDom } from './create/dom'
 import { createCanvas } from './create/canvas'
 import { parseContentDas } from './parse/content'
 import {
+    $$warn,
     parseJSON,
     reviseSize,
     readFile,
@@ -121,21 +122,15 @@ const allotRatio = (fixRadio, headerFooterMode) => {
         config.devtools && $$warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式')
     }
 
+    //页眉页脚模式
+    if(headerFooterMode){
+        return headerFooterMode
+    }
+
     //设置图片缩放模式1
     if(fixRadio) {
-        return 1
-    }
-
-    //页眉横纵比
-    if(headerFooterMode === 'header') {
-        return 2
-    }
-
-    //页脚横纵比
-    if(headerFooterMode === 'footer') {
         return 3
     }
-
 }
 
 //=====================================================
@@ -225,11 +220,11 @@ export function contentStructure(callback, data, context) {
 
             //有页眉页脚对象
             //2017.1.18
-            if(para.headerFooter) {
+            if(para.HeaderOrFooter) {
                 if(headerFooterMode[contentId]) {
                     $$warn('页眉页脚对象重复设置,cid:' + contentId)
                 }
-                headerFooterMode[contentId] = para.headerFooter
+                headerFooterMode[contentId] = Number(para.HeaderOrFooter)
             }
 
             //保持图片正比缩放

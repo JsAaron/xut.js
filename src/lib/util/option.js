@@ -32,7 +32,7 @@ export function execScript(code, type) {
     }
     try {
         new Function(enterReplace(code))()
-    } catch (e) {
+    } catch(e) {
         $$warn('加载脚本错误', type)
     }
 }
@@ -52,9 +52,9 @@ export function createRandomImg(url) {
  * @return {[type]} [description]
  */
 export function replacePath(svgstr) {
-    if (config.launch) {
+    if(config.launch) {
         //如果能找到对应的默认路径，则替换
-        if (-1 !== svgstr.indexOf('content/gallery/')) {
+        if(-1 !== svgstr.indexOf('content/gallery/')) {
             svgstr = svgstr.replace(/content\/gallery/ig, config.pathAddress)
         }
     }
@@ -81,29 +81,15 @@ const converProportion = function({
     getStyle
 }) {
 
-    if (!proportion) {
+    if(!proportion) {
         $$warn('没有传递缩放比')
         proportion = config.proportion
     }
 
-    //图片正比缩放，而且保持上下居中
-    if (proportionMode === 1) {
-        let originalHeight = CEIL(height * proportion.height) || 0
-        let proportionalHeight = CEIL(height * proportion.width) || 0
-        let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
-        top = CEIL(top * proportion.top) + proportionalTop
-        return {
-            width: CEIL(width * proportion.width) || 0,
-            height: proportionalHeight,
-            left: CEIL(left * proportion.left) || 0,
-            top: top,
-            padding: CEIL(padding * proportion.width) || 0
-        }
-    }
     //页眉，保持横纵比
     //计算顶部显示中线位置
     //如果溢出就溢出，高度设置为白边中线
-    else if (proportionMode === 2) {
+    if(proportionMode === 1) {
         let visualTop = getStyle.visualTop
         let proportionalHeight = CEIL(height * proportion.width) || 0;
         return {
@@ -115,20 +101,34 @@ const converProportion = function({
             isHide: proportionalHeight > visualTop //正比高度大于显示高度，隐藏元素
         }
 
-    } 
+    }
     //页脚，保持横纵比
     //计算底部显示中线位置
     //如果溢出就隐藏，高度设置为白边中线
-    else if (proportionMode === 3) {
+    else if(proportionMode === 2) {
         let visualTop = getStyle.visualTop
         let proportionalHeight = CEIL(height * proportion.width) || 0;
         return {
             width: CEIL(width * proportion.width) || 0,
             height: proportionalHeight,
             left: CEIL(left * proportion.left) || 0,
-            top: getStyle.visualHeight + visualTop/ 2 - proportionalHeight / 2 || 0,
+            top: getStyle.visualHeight + visualTop / 2 - proportionalHeight / 2 || 0,
             padding: CEIL(padding * proportion.width) || 0,
             isHide: proportionalHeight > visualTop //正比高度大于显示高度，隐藏元素
+        }
+    }
+    //图片正比缩放，而且保持上下居中
+    else if(proportionMode === 3) {
+        let originalHeight = CEIL(height * proportion.height) || 0
+        let proportionalHeight = CEIL(height * proportion.width) || 0
+        let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
+        top = CEIL(top * proportion.top) + proportionalTop
+        return {
+            width: CEIL(width * proportion.width) || 0,
+            height: proportionalHeight,
+            left: CEIL(left * proportion.left) || 0,
+            top: top,
+            padding: CEIL(padding * proportion.width) || 0
         }
     }
     //默认缩放比
@@ -226,7 +226,7 @@ export function readFile(path, callback, type) {
     let jsRequest = (fileUrl, fileName) => {
         request(randomUrl(fileUrl), function() {
             data = window.HTMLCONFIG[fileName];
-            if (data) {
+            if(data) {
                 callback(data)
                 delete window.HTMLCONFIG[fileName];
             } else {
@@ -241,7 +241,7 @@ export function readFile(path, callback, type) {
     //externalFile使用
     //如果是js动态文件
     //content的html结构
-    if (type === "js") {
+    if(type === "js") {
         paths = config.getSvgPath() + path;
         name = path.replace(".js", '')
         jsRequest(paths, name)
@@ -252,7 +252,7 @@ export function readFile(path, callback, type) {
      * 如果配置了convert === 'svg'
      * 那么所有的svg文件就强制转化成js读取
      */
-    if (config.launch && config.launch.convert === 'svg') {
+    if(config.launch && config.launch.convert === 'svg') {
         path = path.replace('.svg', '.js')
         name = path.replace(".js", '')
         svgUrl = config.getSvgPath() + path
@@ -264,10 +264,10 @@ export function readFile(path, callback, type) {
     /**
      * ibooks模式 单独处理svg转化策划给你js,加载js文件
      */
-    if (Xut.IBooks.CONFIG) {
+    if(Xut.IBooks.CONFIG) {
         //如果是.svg结尾
         //把svg替换成js
-        if (/.svg$/.test(path)) {
+        if(/.svg$/.test(path)) {
             path = path.replace(".svg", '.js')
         }
         //全路径
@@ -277,7 +277,7 @@ export function readFile(path, callback, type) {
         //加载脚本
         request(randomUrl(paths), function() {
             data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
-            if (data) {
+            if(data) {
                 callback(data)
                 delete window.HTMLCONFIG[name];
                 delete window.IBOOKSCONFIG[name]
@@ -292,12 +292,12 @@ export function readFile(path, callback, type) {
 
     //svg文件
     //游览器模式 && 非强制插件模式
-    if (Xut.plat.isBrowser && !config.isPlugin) {
+    if(Xut.plat.isBrowser && !config.isPlugin) {
         //默认的地址
         svgUrl = config.getSvgPath().replace("www/", "") + path
 
         //mini杂志的情况，不处理目录的www
-        if (config.launch && config.launch.resource) {
+        if(config.launch && config.launch.resource) {
             svgUrl = config.getSvgPath() + path
         }
 

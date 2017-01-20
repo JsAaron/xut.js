@@ -166,7 +166,7 @@ export default class MasterMgr extends Abstract {
         _.each(masterObjs, function(pageObj, index) {
             if(pageObj) {
                 isBoundary = true
-                pageObj.moveContainer(action, moveDist[index], speed, moveDist[3])
+                pageObj.moveContainer(action, moveDist[index], speed, moveDist[3], direction)
             }
         })
 

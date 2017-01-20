@@ -12,28 +12,28 @@ export default function(baseProto) {
      * 页面移动
      * @return {[type]} [description]
      */
-    baseProto.moveContainer = function(action, distance, speed, viewOffset) {
+    baseProto.moveContainer = function(action, distance, speed, viewOffset, direction) {
 
         const pageNode = this.$pageNode[0]
 
         //浮动页面
-        if (this.pageType === 'page') {
+        if(this.pageType === 'page') {
             //移动浮动页面容器
             const $floatElement = this.floatContents.PageContainer
-            if ($floatElement) {
+            if($floatElement) {
                 translation[action]($floatElement[0], distance, speed)
             }
         }
 
         //浮动母版
-        if (this.pageType === 'master') {
+        if(this.pageType === 'master') {
             //母版交接判断
             //用户事件的触发
             this.onceMaster = false
 
             //移动浮动容器
             const $masterElement = this.floatContents.MasterContainer
-            if ($masterElement) {
+            if($masterElement) {
                 translation[action]($masterElement[0], distance, speed)
             }
         }
@@ -42,10 +42,12 @@ export default function(baseProto) {
         //保证指向始终是当前页面
         //翻页 && 是母版页 && 是当前页面
         let isVisual = false // 是可视页面
-        if (action === 'flipOver' && this.pageType === 'page' && distance === viewOffset) {
-            //增加可视页面标记
-            pageNode.setAttribute('data-view', true)
-            isVisual = true
+        if(action === 'flipOver') {
+            if(this.pageType === 'page' && distance === viewOffset) {
+                //增加可视页面标记
+                pageNode.setAttribute('data-view', true)
+                isVisual = true
+            }
         }
 
         //当前页面
@@ -55,7 +57,7 @@ export default function(baseProto) {
             //强制给动画结束触发
             //可视区页面
             //排除母版的情况
-            if (config.flipMode && isVisual) {
+            if(config.flipMode && isVisual) {
                 //设置动画完成
                 Xut.Application.SetTransitionComplete(pageNode, pageNode.getAttribute('data-view'))
                 return true

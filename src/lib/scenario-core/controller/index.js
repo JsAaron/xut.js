@@ -25,39 +25,8 @@ import {
     hasMaster
 } from './depend'
 
-/**
- * 获取母版页面的visualMode设置
- * 覆盖全局的设置
- * 预先抽出母版上的页面模式定义
- * 定义visualMode：1/2/3/4 覆盖全局页面模式
- * 母版关联的页面必须跟这个参数统一
- * @return {[type]} [description]
- */
-const getVisualMode = function(chapterData) {
+import { setVisualMode } from './set-mode'
 
-    //反向模式设置
-    //如果是全局模式1，并且是反模式设置
-    if(config.visualMode === 1 && config.visualReverseMode){
-        return 1
-    }
-
-    //flow页面返回1
-    if(chapterData.note === 'flow') {
-        return 1
-    }
-
-    //如果有独立的页面模式
-    let parameter = chapterData.parameter
-    if(parameter) {
-        let matchMode = parameter.match(/visualMode[":]+(\d)/)
-        if(matchMode) {
-            return Number(matchMode[1])
-        }
-    }
-    
-    //返回全局页面模式
-    return config.visualMode || 1
-}
 
 export default class Controller {
 
@@ -215,7 +184,7 @@ export default class Controller {
                     userStyle: userStyle,
                     direction: getDirection(createChapterIndex, visibleChapterIndex),
                     //新的页面模式
-                    pageVisualMode: getVisualMode(chapterData)
+                    pageVisualMode: setVisualMode(chapterData)
                 }
 
                 //延迟创建,先处理style规则

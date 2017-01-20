@@ -199,6 +199,16 @@ function toNodeObj(element) {
 }
 
 /**
+ * 检测end事件，默认要绑定cancel
+ * @return {[type]} [description]
+ */
+const checkBindCancel = function(callbacks){
+    if(callbacks && callbacks.end && !callbacks.cancel){
+        callbacks.cancel = callbacks.end
+    }
+}
+
+/**
  * 合并事件绑定处理
  * 因为isSurface设备上
  * 要同时支持2种方式
@@ -211,6 +221,7 @@ function toNodeObj(element) {
  * @return {[type]} [description]
  */
 export function $$on(element, callbacks, capture = false) {
+    checkBindCancel(callbacks)
     compatibility(addEvent, toNodeObj(element), callbacks, capture)
 }
 
@@ -241,6 +252,7 @@ export function $$off(element, callbacks) {
         return
     }
 
+    checkBindCancel(callbacks)
     compatibility(removeEvent, element, callbacks)
 }
 

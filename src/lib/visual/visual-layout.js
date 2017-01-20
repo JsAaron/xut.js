@@ -6,8 +6,10 @@ const CEIL = Math.ceil
 /**
  * 全局可视区域布局处理
  * 4种可选模式，1/2/3/4
+ *
+ * noModifyValue 是否强制修改值，主要用来第一次进应用探测是否有全局宽度溢出的情况
  */
-export function getVisualLayout(config, fullProportion, setVisualMode) {
+export function getVisualLayout(config, fullProportion, setVisualMode, noModifyValue) {
 
     let screenWidth = config.screenSize.width
     let screenHeight = config.screenSize.height
@@ -17,7 +19,7 @@ export function getVisualLayout(config, fullProportion, setVisualMode) {
     let newTop = 0
     let newLeft = 0
 
-    if(!setVisualMode){
+    if(!setVisualMode) {
         $$warn('getVisualLayout没有提供setVisualMode')
     }
 
@@ -29,13 +31,13 @@ export function getVisualLayout(config, fullProportion, setVisualMode) {
 
         //竖版PPT
         if(config.pptVertical) {
-            //竖版显示
+            //竖版显示：正常
             if(config.screenVertical) {
                 newHeight = fullProportion.pptHeight * fullProportion.width
                 newTop = (screenHeight - newHeight) / 2
             }
-            //横版显示
-            else {
+            //横版显示：反向
+            if(config.screenHorizontal) {
                 newWidth = fullProportion.pptWidth * fullProportion.height
                 newLeft = (screenWidth - newWidth) / 2
             }
@@ -43,18 +45,19 @@ export function getVisualLayout(config, fullProportion, setVisualMode) {
 
         //横版PPT
         if(config.pptHorizontal) {
-            //竖版显示(宽度100%。上下自适应，显示居中小块)
+            //横版显示：正常
+            if(config.screenHorizontal) {
+                newHeight = fullProportion.pptHeight * fullProportion.width
+                newTop = (screenHeight - newHeight) / 2
+            }
+            //竖版显示：反向
             if(config.screenVertical) {
                 newHeight = fullProportion.pptHeight * fullProportion.width
                 newTop = (screenHeight - newHeight) / 2
             }
         }
 
-        /**
-         * 2016.12.13增加
-         * 保证模式2高度不能溢出分辨率最大距离
-         * @return {[type]}            [description]
-         */
+        //保证模式2高度不能溢出分辨率最大距离
         if(newHeight > screenHeight) {
             newHeight = screenHeight
             newTop = 0
@@ -67,23 +70,45 @@ export function getVisualLayout(config, fullProportion, setVisualMode) {
      */
     if(setVisualMode === 3) {
 
-        //竖版PPT
+        //竖版：PPT
         if(config.pptVertical) {
-            //竖版显示，正向显示
+            //竖版显示：正常
             if(config.screenVertical) {
+                //宽度溢出的情况
                 newWidth = fullProportion.pptWidth * fullProportion.height
                 newLeft = (screenWidth - newWidth) / 2
+
+                //宽度没办法溢出
+                //要强制宽度100%
+                if(newWidth < screenWidth) {
+                    newWidth = screenWidth
+                    newLeft = 0
+                }
             }
-            //横版显示，反向显示
-            else {
+            //横版显示：反向
+            if(config.screenHorizontal) {
                 newWidth = fullProportion.pptWidth * fullProportion.height
                 newLeft = (screenWidth - newWidth) / 2
             }
         }
 
-        //横版PPT
+        //横版：PPT
         if(config.pptHorizontal) {
-            //竖版显示(宽度100%。上下自适应，显示居中小块)
+
+            //横版显示:正常
+            if(config.screenHorizontal) {
+                newWidth = fullProportion.pptWidth * fullProportion.height
+                newLeft = (screenWidth - newWidth) / 2
+
+                //宽度没办法溢出
+                //要强制宽度100%
+                if(!noModifyValue && newWidth < screenWidth) {
+                    newWidth = screenWidth
+                    newLeft = 0
+                }
+            }
+
+            //竖版显示：反向
             if(config.screenVertical) {
                 newHeight = fullProportion.pptHeight * fullProportion.width
                 newTop = (screenHeight - newHeight) / 2

@@ -10,40 +10,59 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
+    <style type="text/css">
+    button {
+        position: absolute;
+        z-index: 99999
+    }
+    #closeMini {
+        left: 100px;
+    }
+    </style>
     <script type="text/javascript" src="lib/external.js"></script>
 </head>
 
 <body>
+    <button id="launchMini">加载新的图书</button>
+    <button id="closeMini">关闭图书</button>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
 </html>
+
 <script type="text/javascript">
 Xut.Application.setConfig = {
+    // visualHeight: window.innerHeight - 44,
     lauchMode: 1,
+    historyMode:false,
     platform: 'mini',
     historyMode: true,
-    visualMode: 3,
+    visualMode: 2,
     salePageType: 'page',
-    cursor: {
-        url: 'images/icons/busyIcon.gif',
-        delayTime: 300
-    },
+    // cursor: {
+    //     url: 'images/icons/busyIcon.gif',
+    //     delayTime: 300
+    // },
     hqUrlSuffix: 'hi',
+    supportQR: true,
     swipeDelegate: true
 };
 
-Xut.Application.Launch({
-    el: '#xxtppt-app-container', //根节点
-    launchAnim: false, //关闭启动动画
-    cursor: false, //关闭忙了光标
-    // networkRequest: true, //远程请求
-    svgConvertJs: true, //转化资源svg转化成js
-    path: {
-        resource: 'content/310',
-        database: 'content/310/SQLResult.js'
-        // resource: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310/',
-        // database: 'http://192.168.1.113:8000/d/svn/www/www-dev-new/src/content/310/SQLResult.js'
-    }
-});
+var appId = 302
+$("#launchMini").click(function() {
+    Xut.Application.Launch({
+        el: '#xxtppt-app-container', //根节点
+        launchAnim: false, //关闭启动动画
+        // convert: 'svg', //转化资源svg转化成js
+        path: {
+            resource: 'content/' + appId,
+            database: 'content/' + appId + '/SQLResult.js'
+        }
+    });
+})
+$("#launchMini").trigger('click')
+
+$("#closeMini").click(function() {
+    Xut.Application.Exit()
+})
 </script>
