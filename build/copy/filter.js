@@ -16,7 +16,7 @@ const excludeKeywords = [
     'epub',
     'node_modules',
     'temp',
-    'dist',
+    // 'dist',
     'src/*.number',
     'src/content',
     'src/test'

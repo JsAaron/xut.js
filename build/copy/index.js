@@ -7,8 +7,8 @@ const createRE = require('./filter')
 
 const src = '.'
 const dists = [
-    '/Users/mac/project/git/xut.js/',
-    '/Users/mac/project/svn/server/magazine-develop/www/'
+    '/Users/mac/project/git/xut.js/'
+    // '/Users/mac/project/svn/server/magazine-develop/www/'
 ]
 
 const filterRE = createRE()
@@ -24,7 +24,6 @@ console.log(
     filterRE +
     '\n'
 )
-
 
 const del = (dist) => {
     var files = fs.readdirSync(dist);
