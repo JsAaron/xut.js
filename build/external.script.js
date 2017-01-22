@@ -1,6 +1,6 @@
 const fs = require('fs')
 const utils = require('./utils')
-const getImportExternal = require('../src/lib/external.js')
+const external = require('../src/lib/external.js')
 
 const index = './src/index.html'
 
@@ -14,14 +14,14 @@ module.exports = (conf) => {
          * @param  {[type]} getImportExternal [description]
          * @return {[type]}                   [description]
          */
-        if (getImportExternal) {
+        if (external.jsName) {
             let paths = []
             let len = exclude.length
             if (len) {
                 exclude = exclude.join(',')
                 exclude = new RegExp('(' + exclude.replace(/,/g, '|') + ')')
             }
-            getImportExternal.forEach((path) => {
+            external.jsName.forEach((path) => {
                 if (!exclude.test(path)) {
                     paths.push(srcDir + path)
                 }

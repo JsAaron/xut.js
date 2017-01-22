@@ -5,15 +5,23 @@ const rename = require("gulp-rename");
 const autoprefixer = require('gulp-autoprefixer');
 const csspath = './src/css/**/*.css'
 const utils = require('../utils')
+const external = require('../../src/lib/external.js')
 
-const cssName = [
-    './src/css/common.css',
-    './src/css/horizontal.css',
-    './src/css/vertical.css',
-    './src/css/adaptive-image.css',
-    './src/css/flarevideo.css',
-    './src/css/flarevideo.default.css'
-]
+let cssName = []
+
+// const cssName = [
+//     './src/css/common.css',
+//     './src/css/horizontal.css',
+//     './src/css/vertical.css',
+//     './src/css/adaptive-image.css',
+//     './src/css/flarevideo.css',
+//     './src/css/flarevideo.default.css'
+// ]
+
+external.cssName.forEach(function(url){
+    cssName.push('./src/'+ url)
+})
+
 
 const createFile = function(fileName, path, conf, resolve, reject) {
     gulp.src(path)

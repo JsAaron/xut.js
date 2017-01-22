@@ -1,5 +1,5 @@
+var footName = ['css/font.css']
 var cssName = [
-    'css/font.css',
     'css/common.css',
     'css/horizontal.css',
     'css/vertical.css',
@@ -71,10 +71,11 @@ function load(fileList, temp) {
 
 //for build
 if (typeof exports === "object" && typeof module !== "undefined") {
-    module.exports = jsName
+    exports.cssName = cssName
+    exports.jsName = jsName
 } else {
     //for index.html
-    load(cssName, function(name) {
+    load(cssName.concat(footName), function(name) {
         return '<link type="text/css" rel="stylesheet" href="' + name + '?random=' + Math.random() + '">'
     })
     load(jsName, function(name) {

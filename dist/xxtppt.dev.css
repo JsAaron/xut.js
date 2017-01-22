@@ -1,0 +1,1731 @@
+/* 设置默认字体,禁止选取,移除按下时的背景色 */
+
+body {
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    -ms-user-select: none;
+        user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+html,
+body {
+    height: 100%;
+    font-size: 100%;
+    overflow: hidden;
+}
+
+
+/* 清除内外边距 */
+html,
+body,
+p,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+iframe,
+object,
+video {
+    margin: 0;
+    padding: 0;
+}
+
+
+/*键盘零件中input要可选中*/
+input,
+textarea {
+    -webkit-user-select: text;
+       -moz-user-select: text;
+        -ms-user-select: text;
+            user-select: text;
+}
+
+
+/*移除ie11输入框中的叉*/
+input::-ms-clear {
+    display: none;
+}
+
+
+/* 重置列表元素 */
+ul,
+ol {
+    list-style: none;
+}
+
+
+/* 重置文本格式元素 */
+
+a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+/*无边框 */
+
+img,
+iframe,
+object,
+svg {
+    border: none;
+}
+
+
+/**
+ * 2016.12.20
+ * 单独修复妙妙学
+ * content下面img空白的问题
+ * 上下图去间距
+ */
+.fix-miaomiaoxue-img {
+    outline-width: 0px;
+    vertical-align: top;
+}
+
+video {
+    background: #000;
+}
+
+/**
+ * 修正闪烁
+ * 隐藏转换的元素的背面
+ * 使被转换的元素的子元素保留其 3D 转换
+ * 开启GPU硬件加速模式，使用GPU代替CPU渲染动画（在安卓系统中有时会有莫名其妙的BUG，建议慎重）
+ */
+.fix-transform {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    perspective: 1000;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    -webkit-perspective: 1000;
+}
+
+/**继承父容器尺寸 **/
+.inherit-size {
+    height: 100%;
+    width: 100%;
+}
+
+/**全屏背景**/
+.fullscreen-background {
+    background-size: 100% 100%;
+}
+
+/**对IOS-webkit-overflow-scrolling 的支持css效果**/
+.ios5overflow {
+    -webkit-box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/******************
+*   index.html页面
+* *******************/
+.xut-fullscreen {
+    height: 100%;
+    width: 100%;
+    background-size: 100% 100%;
+}
+.xut-overflow-hidden {
+    overflow: hidden;
+}
+.xut-hide {
+    display: none;
+}
+.xut-cover {
+    position: absolute;
+    z-index: 2;
+}
+.xut-scene-container {
+    position: absolute;
+    z-index: 1;
+}
+
+
+/******************
+*   翻页控制
+* *******************/
+.xut-flip {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-size: 100% 100%;
+/*    -webkit-box-sizing: border-box;
+    border: 1px solid red;*/
+}
+.xut-flip .xut-page {
+    position: absolute;
+    overflow: hidden;
+    background-size: 100% 100%;
+}
+.xut-flip .xut-page p {
+    line-height: 150%;
+    padding: 12px;
+}
+
+
+/******************
+*   主页：左右翻页按钮
+* *******************/
+.xut-flip-control {
+    position: absolute;
+    top: 50%;
+    z-index: 9998;
+    background-size: 100% 100%;
+}
+.xut-flip-control-left {
+    left: 0;
+}
+.xut-flip-control-right {
+    right: 0;
+}
+
+
+/******************
+*  content 背景布局，简单布局
+* *******************/
+.multilayer {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: 0;
+}
+/*背景图带母版*/
+.multilayer-master {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-size: 100% 100%;
+    z-index: 0;
+}
+/*图片层*/
+.multilayer-imageLayer {
+    position: absolute;
+    z-index: 2;
+    background-size: 100% 100%;
+}
+/*背景图片*/
+.multilayer-backImage {
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    background-size: 100% 100%;
+}
+/*背景图文字*/
+.multilayer-word {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: 3;
+}
+/*content类型，滚动条*/
+.content-image {
+    width: 99%;
+}
+
+
+/******************
+*   忙碌光标
+* *******************/
+.xut-busy-icon {
+    position: absolute;
+    z-index: 3;
+}
+.xut-busy-middle {
+    height: 40%;
+    width: 40%;
+    position: relative;
+    margin: 0 auto;
+}
+.xut-busy-text {
+    height: 30%;
+    font-weight: bold;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap;
+}
+.xut-busy-spinner {
+    width: 12%;
+    height: 26%;
+    background-color: black;
+    position: absolute;
+    left: 44.5%;
+    top: 37%;
+    animation: kfnavControlBar 1s linear infinite;
+    -webkit-animation: kfnavControlBar 1s linear infinite;
+    border-radius: 40%;
+}
+
+
+/******************
+*   工具栏*
+* *******************/
+.xut-control-bar {
+    position: absolute;
+    z-index: 9999;
+    overflow: hidden;
+    width: 100%;
+    background-color: white;
+    font-size: 1rem;
+}
+/*工具栏:导航*/
+.xut-control-navbar {
+    background-image: url(../images/icons/directory.png);
+}
+/*工具栏,标题*/
+.xut-control-title {
+    text-align: center;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+}
+/*工具栏：页码场景顶部小圆样式结束*/
+.xut-control-pageIndex {
+    font-family: sans-serif;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+/*工具栏：nav导航按钮，收起工具栏*/
+.xut-control-hidebar {
+    background-image: url(../images/icons/hideToolbar.png);
+}
+/*工具栏：下拉导航菜单*/
+.xut-nav-bar {
+    background-size: 100% 100%;
+    position: absolute;
+    display: none;
+    left: 0;
+}
+.xut-nav-bar li {
+    display: table;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+.xut-nav-bar li > div {
+    opacity: 0.5;
+    color: #007aff;
+    z-index: 9999;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+
+/******************
+*   函数工具栏
+* *******************/
+.xut-scenario-close,
+.xut-scenario-back,
+.xut-scenario-tips {
+    position: absolute;
+    top: 0.25rem;
+    z-index: 9999;
+}
+.xut-Bar-left {
+    float: left;
+    white-space: nowrap;
+}
+.xut-Bar-right {
+    float: right;
+}
+.xut-Bar-middle {
+    width: 60%;
+    margin: 0 auto;
+}
+.xut-Bar-left li,
+.xut-Bar-right li {
+    float: left;
+    background-size: 100%;
+    cursor: pointer;
+}
+/*场景页关闭按钮*/
+.xut-scenario-close {
+    right: 0.25rem;
+}
+/*返回按钮*/
+.xut-scenario-back {
+    left: 0.25rem;
+}
+.xut-scenario-close,
+.xut-scenario-back {
+    background-size: 100%;
+}
+/*场景顶部小圆样式开始*/
+.xut-scenario-radius {
+    border-radius: 100%;
+    pointer-events: none;
+}
+.xut-scenario-dark >div {
+    background-color: #007aff;
+}
+.xut-scenario-light >div {
+    background-color: red;
+}
+
+
+/******************
+*   视觉差
+* *******************/
+.xut-master {
+    z-index: 1
+}
+.xut-floatMaters {
+    z-index: 1000;
+}
+.xut-floatPages {
+    z-index: 2000;
+}
+.xut-float {
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /*pointer-events:none;*/
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    perspective: 1000;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+}
+
+
+/******************
+*   导航条CSS3切换
+* *******************/
+#pane .navControlBar {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    animation-name: kfnavControlBar;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -webkit-animation-name: kfnavControlBar;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: ease-out;
+    -webkit-animation-fill-mode: forwards;
+}
+/*for firefox*/
+@keyframes kfnavControlBar {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+/*for chorme,safari,opera*/
+@-webkit-keyframes kfnavControlBar {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+@keyframes wobble {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@-webkit-keyframes wobble {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
+/******************
+*  消息弹出框
+* *******************/
+.messageBox {
+    border: 1px solid #CCCED1;
+    border-radius: 5px;
+    background-color: #EFF3F8;
+    margin: 25% auto;
+    text-align: center;
+}
+.messageTex {
+    padding: 1em 2em;
+    overflow: hidden;
+}
+.messageBtn {
+    padding: 0.2em 0;
+    border-top: 1px solid #D1D7DF;
+    color: #007aff;
+    font-weight: bold;
+}
+
+
+/*******************
+*  响应点击动作反弹效果
+* *******************/
+.xut-behavior {
+    animation: behaviorAnim 0.5s;
+    -webkit-animation: behaviorAnim 0.5s;
+}
+
+@keyframes behaviorAnim {
+    0% {
+        -webkit-transform: scale(1);
+                transform: scale(1)
+    }
+    50% {
+        -webkit-transform: scale(1.2);
+                transform: scale(1.2)
+    }
+    100% {
+        -webkit-transform: scale(1);
+                transform: scale(1)
+    }
+}
+@-webkit-keyframes behaviorAnim {
+    0% {
+        -webkit-transform: scale(1)
+    }
+    50% {
+        -webkit-transform: scale(1.2)
+    }
+    100% {
+        -webkit-transform: scale(1)
+    }
+}
+
+
+/*******************
+*  搜索框
+* *******************/
+.xut-form-search {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: rgb(64, 64, 64);
+    height: 100%;
+    z-index: 9999;
+}
+/*搜索框居中*/
+.xut-form-search-wrap {
+    width: 90%;
+    height: 100%;
+    margin: 0 auto;
+    color: white;
+}
+/*搜索输入框*/
+.xut-search-row {
+    width: 99%;
+    height: 40%;
+    border-radius: 0.25em;
+    border: 1px solid white;
+    display: table;
+}
+.xut-search-input {
+    height: 100%;
+    width: 100%;
+    display: table-cell;
+    background-color: transparent;
+    border: none;
+    text-indent: 1em;
+    color: white;
+}
+/*搜索按钮*/
+.xut-search-btn {
+    display: table-cell;
+    width: 20%;
+    height: 100%;
+    text-align: center;
+    border-left: 1px solid white;
+}
+/*搜索提示信息*/
+.xut-search-tips {
+    text-align: center;
+    overflow: hidden;
+    font-size: 0.75em;
+    height: 35%;
+}
+/*搜索结果列表*/
+.xut-search-result {
+    border: 1px solid white;
+    height: 100%;
+    overflow-y: auto;
+}
+/*结果行*/
+.xut-search-result li {
+    width: 94%;
+    margin: 0 auto;
+    line-height: 1.5em;
+}
+.xut-search-result a {
+    color: white;
+}
+/*关闭搜索框*/
+.xut-search-exit {
+    width: 20%;
+    height: 100%;
+    margin-left: 80%;
+}
+.xut-search-btn,
+.xut-search-exit {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+/******************
+*   HTML文本框
+* *******************/
+.htmlbox-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 9999;
+    position: absolute;
+    background: #fff;
+}
+.htmlbox-toolbar {
+    width: 100%;
+    line-height: 8%;
+    border-bottom: 1px solid #ccc;
+    height: 8%;
+}
+.htmlbox_close_container {
+    width: 8%;
+    height: 100%;
+    float: left;
+    display: block;
+}
+.htmlbox_close::before,
+.htmlbox_close::after {
+    content: '';
+    position: absolute;
+    height: 2px;
+    top: 4%;
+    width: 3%;
+    left: 2%;
+    margin-top: -1px;
+    background: #51aed9;
+    height: 1.1%;
+}
+.htmlbox_close::before {
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.htmlbox_close::after {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+.htmlbox_fontsizeUl {
+    float: right;
+    width: 18%;
+    height: 100%;
+    position: relative;
+}
+.htmlbox_fontsizeUl li {
+    width: 33%;
+    height: 100%;
+    float: left;
+}
+.htmlbox_fontsizeUl li a {
+    display: block;
+    /*    width: 50%;
+    height: 50%;*/
+    border-radius: 50%;
+    background: #51aed9;
+    position: absolute;
+    top: 50%;
+}
+
+
+/******************
+*   书签工具栏
+* *******************/
+.xut-bookmark-menu {
+    position: absolute;
+    left: 0;
+    z-index: 9998;
+    width: 100%;
+}
+/*书签居中显示*/
+.xut-bookmark-wrap {
+    width: 43%;
+    height: 100%;
+    margin: 0 auto;
+    display: table;
+    background-color: white;
+    border-top-left-radius: 0.25em;
+    border-top-right-radius: 0.25em;
+    border: 1px solid rgb(233, 231, 231);
+}
+/*书签功能项*/
+.xut-bookmark-wrap div {
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 0.75em;
+    text-align: center;
+    font-weight: bold;
+}
+/*关闭书签*/
+.xut-bookmark-off {
+    width: 2em;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom;
+}
+/*书签列表*/
+.xut-bookmark-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    background-color: white;
+    overflow: hidden;
+}
+/*书签标题栏*/
+.xut-bookmark-head {
+    width: 100%;
+    height: 10%;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+    font-size: 0.85em;
+    display: table;
+}
+.xut-bookmark-head li {
+    display: table-cell;
+    height: 100%;
+    width: 50%;
+    vertical-align: bottom;
+    padding-bottom: 0.5em;
+}
+/*返回按钮*/
+.xut-bookmark-back {
+    text-indent: 1em;
+    color: #007aff;
+    font-size: 0.75em;
+}
+/*书签内容*/
+.xut-bookmark-body {
+    width: 94%;
+    height: 89%;
+    margin-left: 6%;
+    font-weight: bold;
+    font-size: 0.75em;
+    overflow-y: auto;
+}
+/*书签行*/
+.xut-bookmark-body li {
+    height: 2em;
+    border-bottom: 1px solid #eee;
+    line-height: 2em;
+}
+/*书签标题*/
+.xut-bookmark-id {
+    float: left;
+    color: #007aff;
+}
+/*删除书签*/
+.xut-bookmark-del {
+    float: right;
+    width: 2em;
+    text-align: center;
+    color: red;
+}
+
+
+/******************
+*   阅读模式菜单
+* *******************/
+.xut-book-menu {
+    position: relative;
+    width: 40%;
+    height: 100%;
+    z-index: 10000;
+    background-color: white;
+}
+.xut-book-menu ul {
+    width: 80%;
+    margin: 0 auto;
+}
+.xut-book-menu li {
+    height: auto;
+    line-height: 2em;
+    /*border-bottom: 1px dashed gray;*/
+    font-weight: bold;
+    overflow: hidden;
+}
+.xut-book-menu li a {
+    line-height: 1.5em;
+}
+.xut-book-menu li section {
+    text-indent: 2em;
+    font-weight: normal;
+}
+.xut-book-menu .select {
+    color: orange;
+    font-style: normal;
+}
+.xut-book-menu li.title {
+    height: 3em;
+    line-height: 3em;
+    font-size: 1.5em;
+    border-bottom: none;
+}
+.xut-book-menu-mask {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 150%;
+    height: 100%;
+    background-color: gray;
+    opacity: 0.7;
+}
+.xut-book-menu-item {
+    display: block;
+    color: rgb(64, 64, 64);
+}
+/*用于遮罩层的模糊效果*/
+.filter {
+    -webkit-filter: blur(5px);
+    /* Chrome, Opera */
+    -moz-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+}
+/*阅读模式工具栏*/
+.icon-book-bar {
+    width: 48px;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: left center;
+    float: left;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+/******************
+*   页面放大
+* *******************/
+.page-pinch {
+    width: 100%;
+    height: 100%;
+}
+.page-pinch-image {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white;
+}
+.page-pinch-image >div:first-child {
+    position: absolute;
+    background-size: 100% 100%;
+}
+.page-pinch > div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1
+}
+.page-pinch > div:first-child {
+    overflow: hidden;
+    z-index: 2
+}
+
+
+/******************
+*   图片缩放功能
+* *******************/
+.xut-zoom-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 12;
+}
+.xut-zoom-overlay {
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1
+}
+.xut-zoom-close {
+    position: absolute;
+    z-index: 4;
+    display: none;
+}
+.xut-zoom-fly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+}
+.xut-zoom-hd {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+/******************
+*   flow容器根节点样式设置
+* *******************/
+#xut-stream-flow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    opacity: 0;
+    z-index: -1;
+    display: none;
+}
+
+
+/******************
+*   flow页码样式
+* *******************/
+.xut-page-number {
+    position: absolute;
+    z-index: 3;
+    display: none;
+    bottom: 0;
+    padding: .3rem;
+}
+.xut-page-number strong {
+    padding: 0 0.2rem;
+    display: table-cell;
+    vertical-align: middle;
+    color: rgba(0, 0, 0, 0.25);
+    font-weight: bold;
+}
+.xut-page-number > div {
+    display: table-cell;
+    vertical-align: middle;
+    text-decoration: none;
+    height: 1rem;
+    line-height: 1rem;
+    border: 1px solid #ddd;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    border-radius: 4px;
+    padding: .1rem .6rem;
+}
+.xut-page-number > div:first-child {
+    font-weight: bold;
+}
+.xut-page-number > div:last-child {
+    font-weight: normal;
+}
+
+
+/******************
+*   文字效果要样式
+*   2017.1.4
+* *******************/
+.letter-effect {
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -ms-flex-direction: row;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+            flex-direction: row;
+    -ms-flex-align: center;
+    -webkit-box-align: center;
+            align-items: center;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap
+}
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * 横屏 css
+ * @param  {[type]} orientation: landscape     [description]
+ * @return {[type]}              [description]
+ */
+@media screen and (orientation: landscape) {
+
+    /**
+*  node 信息按钮
+*/
+    .xut-showNote {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        background-image: url(../images/icons/hideNote.png);
+        background-size: 100% 100%;
+        left: 5%;
+        bottom: 5%;
+        z-index: 5;
+        cursor: hand;
+        cursor: pointer;
+    }
+    /**
+ * import widget/_shownote.css
+ * author : ming
+ */
+    .xut-shownote-box {
+        left: 5%;
+        position: absolute;
+        bottom: 0px;
+        width: 40%;
+        height: 80%;
+        opacity: 0;
+        z-index: 30;
+        display: none;
+        background-image: url(../images/horizontal/nodeinfo.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        -webkit-transform-style: preserve-3d;
+        -webkit-backface-visibility: hidden;
+        -webkit-animation-name: shownotebox;
+        -webkit-animation-duration: 0.5s;
+        -webkit-animation-iteration-count: 1;
+        -webkit-animation-timing-function: ease-in-out;
+        -webkit-animation-fill-mode: forwards
+    }
+    @-webkit-keyframes shownotebox {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    .xut-shownote-box>.close {
+        background-image: url(../images/icons/nodeClose.png);
+        background-size: 100% 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        cursor: pointer;
+    }
+    .xut-shownote-box>.content {
+        margin: 10% auto;
+        width: 80%;
+        height: 80%;
+        letter-spacing: 2px;
+        line-height: 150%;
+        text-indent: 15%;
+        overflow: hidden;
+    }
+}
+
+/**
+ * 竖屏 css
+ * @param  {[type]} orientation: landscape     [description]
+ * @return {[type]}              [description]
+ */
+
+@media screen and (orientation: portrait) {
+
+    /**
+*  node 信息提示
+*/
+    .xut-showNote {
+        position: absolute;
+        background-image: url(../images/icons/hideNote.png);
+        bottom: 5%;
+        left: 5%;
+        z-index: 3;
+        background-size: 100% 100%;
+        cursor: pointer;
+    }
+    .xut-shownote-box {
+        left: 5%;
+        position: absolute;
+        bottom: 5%;
+        z-index: 30;
+        display: none;
+        width: 60%;
+        height: 60%;
+        background-image: url(../images/vertical/nodeinfo.png);
+        background-size: 100% 100%;
+    }
+    .xut-shownote-box>.close {
+        background-image: url(../images/icons/nodeClose.png);
+        background-size: 100% 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        cursor: pointer;
+    }
+    .xut-shownote-box>.content {
+        margin: 10% auto;
+        width: 90%;
+        height: 80%;
+        letter-spacing: 2px;
+        line-height: 150%;
+        text-indent: 15%;
+        overflow: hidden;
+    }
+}
+
+/************************************
+* 匹配分辨情况
+* 750:  '', //0-1079
+* 1080: 'mi', //1080-1439
+* 1440: 'hi' //1440->
+* ***********************************/
+
+.xut-adaptive-image{
+    display: none;
+}
+/**
+ * iPhone (Original - 3GS)
+ * 320  480
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * iPhone 4 (4, 4S)
+ * 640 960
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * iPhone 5 (5c, 5s)
+ * 640  1136
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .xut-adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * Samsung Nexus S | Nokia Lumia 900 |Nokia Lumia 720 | Nokia Lumia 620 |
+ * Nokia Lumia 520 | Nokia Lumia (710, 800) |HTC Evo | HTC Desire HD |
+ * HTC Desire| Galaxy SII | Galaxy S Plus| Galaxy S | 
+ * Alcatel One Touch Ultra 995
+ * 480 800
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 1.5) {
+    @media (orientation: portrait) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * iPhone 6+
+ * 1080 1920
+ */
+@media (device-width: 414px) and (-webkit-min-device-pixel-ratio: 3) {
+    @media (orientation: portrait) {
+        .xut-adaptive-image{
+            width: 1080px;
+        }
+    }
+    @media (orientation: landscape) {
+        .xut-adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**
+ * BlackBerry Torch 9810
+ * 360  480
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Panasonic T44(480  800)
+ * Panasonic T50(480  854)
+ */
+@media (device-width: 480px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Droid
+ * 480  854
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 1.5) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Y51L | Xperia E4 Dual | BlackBerry Z3
+ * 540  960
+ */
+@media (device-width: 540px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Droid Razr Maxx | Droid Razr | Droid 3 & 4
+ * 540  960
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 1.5) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Zenfone Max ZC550KL | Sony Xperia T2 Ultra Dual | Phoenix 2 | 
+ * Panasonic Toughpad FZ-F1 | Panasonic Eluga I3 | Panasonic Eluga Arc | 
+ * Oppo F1 | Oppo A59 | Oppo A53 | BlackBerry Leap |
+ * BlackBerry Classic Non Camera
+ * 720  1280
+ */
+@media (device-width: 720px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * BlackBerry Q10
+ * 720  720
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Galaxy SIII | Galaxy Note II | Galaxy Nexus | Alcatel One Touch Idol Ultra
+ * 720  1280
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * BlackBerry Porsche Design P9982
+ * 768  1280
+ */
+@media (device-width: 768px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * Nokia Lumia 925 | Nokia Lumia 920 | Nokia Lumia 1020 |
+ * Google Nexus 4 by LG | BlackBerry Z10
+ * 768  1280
+ */
+@media (device-width: 384px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * Galaxy Note
+ * 800  1280
+ */
+@media (device-width: 400px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * Sony Xperia Z3 Plus | Sony Xperia Z1 | Sony Xperia X | Sony Xperia C4 Dual|
+ * Redmi Note 3 | Philips Sapphire S616 | Philips Sapphire Life V787 |
+ * Oppo R9 Plus | Oppo R9 | Oppo F1 Plus | Oppo A37 | Moto G4 Plus | M812i |
+ * Lenovo Vibe K4 Note | Lenovo K3 Note | GX F310L | Google Pixel 
+ * 1080 1920
+ */
+@media (device-width: 1080px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**
+ * Sony Xperia Z | HTC One | Galaxy SIV
+ * 1080 1920
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 3) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**
+ * BlackBerry Passport (1440 1440)
+ * BlackBerry Priv (1440 2560)
+ */
+@media (device-width: 1440px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**最特别的
+ * Google Pixel XL
+ * 1440 2560
+ */
+@media (device-width: 270px) and (-webkit-min-device-pixel-ratio: 5.34) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**
+ * Moto Z
+ * 2560 1440
+ */
+@media (device-width: 2560px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+.flareVideo {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  -webkit-user-select: none;
+  background: #000;
+  height: 100%;
+  
+  z-index: 90;
+}
+
+.flareVideo.fullScreen {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  overflow: hidden;
+}
+
+.flareVideo .controls .disabled {
+  display: none;
+}
+
+.flareVideo video,
+.flareVideo .video {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.flareVideo embed, .flareVideo object {
+  z-index: 100;
+}
+
+.flareVideo .controls {
+  z-index: 200;
+}
+
+.flareVideo .controls input[type="range"] {
+  margin: 0;
+  padding: 0;
+}
+
+/* jQuery UI Slider
+----------------------------------*/
+.flareVideo .ui-slider { position: relative; text-align: left; }
+.flareVideo .ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+.flareVideo .ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
+
+/*.flareVideo .ui-slider-horizontal { padding-left: 10px; }*/
+.flareVideo .ui-slider-horizontal .ui-slider-handle { margin-left: -5px; }
+.flareVideo .controls {
+    position: absolute;
+    bottom: 5%;
+    height: 57px;
+    min-width: 80%;
+    left: 10%;
+    border: 1px solid #1A1A1A;
+    border-top-color: #5F5F5F;
+    border-bottom-color: #1D1D1D;
+    background: #171717;
+    background: -moz-linear-gradient(top, #454545 0%, #2D2D2D 30%, #1F1F1F 35%, #171717 100%);
+    background: -webkit-gradient(linear, left top, left bottom, from(#454545), color-stop(0.3, #2D2D2D), color-stop(0.35, #1F1F1F), to(#171717));
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-box-shadow: 0 0 3px #000;
+    -moz-box-shadow: 0 0 3px #000;
+    opacity: 0.9;
+    -webkit-transition: opacity 0.5s linear;
+    -moz-transition: opacity 0.5s linear;
+}
+
+.flareVideo .controls .play,
+.flareVideo .controls .pause,
+.flareVideo .controls .fullScreen,
+.flareVideo .controls .volMin,
+.flareVideo .controls .volMax {
+    cursor: pointer;
+}
+
+.flareVideo .controls input[type="range"],
+.flareVideo .controls .ui-slider {
+    -khtml-appearance: none;
+    border: 1px solid #1B1B1B;
+    border-top-color: #060606;
+    border-bottom-color: #202020;
+    background: #0E0E0E;
+    background: -moz-linear-gradient(top, #0E0E0E, #141414);
+    background: -webkit-gradient(linear, left top, left bottom, from(#0E0E0E), to(#141414));
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    height: 10px;
+}
+
+.flareVideo .controls .seek .seekRange {
+    width: 100%;
+}
+
+.flareVideo .controls .seek .seekRange::-webkit-slider-thumb {
+    -khtml-appearance: none;
+    background: url(../images/flarevideo/slider-thumb.png) no-repeat;
+    width: 8px;
+    height: 8px;
+}
+
+.flareVideo .controls .seek .seekRange .ui-slider-handle {
+    display: block;
+    background: url(../images/flarevideo/slider-thumb.png) no-repeat;
+    width: 8px;
+    height: 8px;
+}
+
+.flareVideo .controls .fullScreen {
+    width: 16px;
+    height: 16px;
+    text-indent: -5000px;
+    background: url(../images/flarevideo/full-screen.png) no-repeat center center;
+}
+
+.flareVideo .controls .volume {
+    width: 90px;
+}
+
+.flareVideo .controls .volume .volMin,
+.flareVideo .controls .volume .volMax {
+    text-indent: -5000px;
+}
+
+.flareVideo .controls .volume .volMin {
+    width: 10px;
+    height: 10px;
+    background: url(../images/flarevideo/vol-min.png) no-repeat center center;
+}
+
+.flareVideo .controls .volume .volMax {
+    width: 15px;
+    height: 14px;
+    background: url(../images/flarevideo/vol-max.png) no-repeat center center;
+}
+
+.flareVideo .controls .volume .volRange {
+    width: 50px;
+}
+
+.flareVideo .controls .volume::-webkit-slider-thumb {
+    -khtml-appearance: none;
+    background: url(../images/flarevideo/volume-thumb.png) no-repeat;
+    width: 10px;
+    height: 11px;
+}
+
+.flareVideo .controls .volume .ui-slider-handle {
+    display: block;
+    background: url(../images/flarevideo/volume-thumb.png) no-repeat;
+    width: 10px;
+    height: 11px;
+}
+
+.flareVideo .controls .timeMin,
+.flareVideo .controls .timeMax {
+    font-family: Apex, "Helvetica Neue", "HelveticaNeue", helvetica, sans-serif;
+    font-size: 13px;
+    color: #C2C2C2;
+    font-weight: bold;
+    text-shadow: 0 1px 1px #000;
+}
+
+.flareVideo .controls .pause,
+.flareVideo .controls .play {
+    width: 23px;
+    height: 23px;
+    text-indent: -5000px;
+}
+
+.flareVideo .controls .pause {
+    display: none;
+    background: url(../images/flarevideo/pause.png) no-repeat center center;
+}
+
+.flareVideo .controls .play {
+    display: block;
+    background: url(../images/flarevideo/play.png) no-repeat center center;
+}
+
+.flareVideo.playing .controls .play {
+    display: none;
+}
+
+.flareVideo.playing .controls .pause {
+    display: block;
+}
+
+.flareVideo.idle .controls {
+    opacity: 0;
+}
+
+.flareVideo .controls .fullScreen {
+    position: absolute;
+    right: 13px;
+    top: 10px;
+}
+
+.flareVideo .controls .play,
+.flareVideo .controls .pause {
+    position: absolute;
+    left: 50%;
+    top: 6px;
+}
+
+.flareVideo .controls .seek {
+    position: absolute;
+    bottom: 8px;
+    left: 60px;
+    right: 60px;
+}
+
+.flareVideo .controls .timeMin {
+    position: absolute;
+    bottom: 8px;
+    left: 20px;
+}
+
+.flareVideo .controls .timeMax {
+    position: absolute;
+    bottom: 8px;
+    right: 14px;
+}
+
+.flareVideo .controls .volume {
+    position: absolute;
+    left: 10px;
+    top: 13px;
+}
+
+.flareVideo .controls .volume .volMin {
+    position: absolute;
+    left: 0;
+}
+
+.flareVideo .controls .volume .volMax {
+    position: absolute;
+    right: 0;
+}
+
+.flareVideo .controls .volume .volRange {
+    position: absolute;
+    left: 16px;
+}

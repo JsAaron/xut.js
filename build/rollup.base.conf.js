@@ -9,12 +9,10 @@ const flow = require('rollup-plugin-flow');
 module.exports = (conf) => {
 
     fsextra.emptyDirSync(conf.tarDir)
-    conf.testDir && fsextra.emptyDirSync(conf.testDir)
 
     utils.log(`
 delete the directory:
 ${conf.tarDir}
-${conf.testDir}
 `, 'prompt')
 
     return new Promise((resolve, reject) => {
