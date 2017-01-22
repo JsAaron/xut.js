@@ -36,8 +36,9 @@ export default class TaskContents {
         if(compileActivitys) {
             //解析动画表数据结构
             activityData = contentParser(compileActivitys, activityData)
-                //如果有需要构建的content
-                //开始多线程处理
+
+            //如果有需要构建的content
+            //开始多线程处理
             activityData.createContentIds.length ? this._dataAfterCheck(activityData) : this._loadComplete();
         } else {
             this._loadComplete();
@@ -317,8 +318,10 @@ export default class TaskContents {
                             zoomObj.play()
                         } else {
                             let hqSrc
-                            if(config.hqUrlSuffix) {
-                                hqSrc = src.replace('.', `.${config.hqUrlSuffix}.`)
+                            //如果启动了高清图片
+                            //并且找的到图片后缀
+                            if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
+                                hqSrc = src.replace('.', `.${config.imageSuffix['1440']}.`)
                             }
                             self.zoomObj[src] = new Zoom({
                                 element: $imgNode,

@@ -48,6 +48,10 @@ function flowJsonFilter() {
         //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
         let remoteUrl = config.launch.resource;
+        //有基础后缀，需要替换所有的图片地址
+        if(config.baseImageSuffix){
+            result.FlowData = result.FlowData.replace(/gallery\/[\w]+\./ig, '$&'+ config.baseImageSuffix +'.');
+        }
         result.FlowData = result.FlowData.replace(/<img\s*src=\"[\w\/]+gallery/ig, '<img src=\"' + remoteUrl + '/gallery');
         result.FlowData = result.FlowData.replace(/xlink:href=\"[\w\/]+gallery/ig, 'xlink:href=\"' + remoteUrl + '/gallery');
     }

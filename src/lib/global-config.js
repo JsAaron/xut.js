@@ -7,14 +7,46 @@
 const DEFAULT: void = undefined
 
 export type Config = {
-    platform: void;
+    platform: ? string;
     quickFlip: boolean;
+    devtools: boolean;
     silent: boolean;
     supportQR: boolean;
-    visualHeight: ? number | void;
-    visualTop: number;
-    hqUrlSuffix: void;
-    lauchMode: ? number | void;
+    visualHeight: ? number;
+    visualTop: ? number;
+    cursor: {
+        delayTime: ? number,
+        url: ? string
+    };
+    keepBaseImageZoom: boolean;
+    baseImageSuffix:string;
+    imageSuffix: ? {
+        750: ? string,
+        1080: ? string,
+        1440: ? string
+    },
+    useHDImageZoom:boolean;
+    visualMode: number;
+    flipMode: number;
+    orientateMode: boolean;
+    salePicture: boolean;
+    salePictureMultiples: number;
+    salePageType: ? string;
+    historyMode: ? boolean;
+    swipeDelegate: ? boolean;
+    pageMode: ? Object;
+    toolType: {
+        main: ? number,
+        deputy: ? number,
+        'number': ? number
+    };
+    doublePageMode: ? boolean;
+    onlyDomMode: ? boolean;
+    deBugHistory: ? {
+        scenarioId: ? number,
+        chapterId: ? number,
+        pageIndex: ? number
+    }
 }
 
 const config: Config = {
@@ -72,14 +104,27 @@ const config: Config = {
         url: DEFAULT //url
     },
 
+
     /**
-     * 配置高清图的标记
-     * 为flow提供高清图片接口"
-     *  if (config.hqUrlSuffix) {
-     *      src = src.replace('.', `.${config.hqUrlSuffix}.`)
-     *  }
+     * 自适应图片分辨率
+     * iphone的750*1334，android的720*1280及以下的设备，用标准的
+     * iphone plus的1080*1920，android的1080*1920，用mi后缀的
+     * android的1440*2560用hi后缀的
+     *{
+     *   750: '', //0-750
+     *   1080: '', //mi:751-1080
+     *   1440: '' //hi:1081->
+     *}
      */
-    hqUrlSuffix: DEFAULT,
+    imageSuffix: null,
+    baseImageSuffix: '', //基础图片后缀
+
+    /**
+     * 不使用高清图片
+     * false
+     * true
+     */
+    useHDImageZoom: true,
 
     /**
      * 页面可视模式
@@ -212,7 +257,7 @@ const config: Config = {
      *   填充数组格式，可以多项选择[1,2,3,4]
      */
     toolType: { //默认不设置，待数据库填充。如设置,数据库设置忽略
-        mian: DEFAULT, //主场景，系统工具栏
+        main: DEFAULT, //主场景，系统工具栏
         deputy: DEFAULT, //副场景，函数工具栏
         number: DEFAULT //独立配置，默认会启动页面，针对分栏处理
     },

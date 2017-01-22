@@ -50,6 +50,7 @@ const loadApp = (...arg) => {
         node = null
         Xut.Application.$$removeNode = null
     }
+
     nextTick({
         container: node.$rootNode,
         content: node.$contentNode

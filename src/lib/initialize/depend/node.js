@@ -39,6 +39,7 @@ const getContentHTML = newCursor => {
     }
 
     return `${busyIcon}
+            <div class="xut-adaptive-image"></div>
             <div class="xut-cover xut-fullscreen" ${coverStyle}></div>
             <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
 }

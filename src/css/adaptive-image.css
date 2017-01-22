@@ -1,0 +1,376 @@
+/************************************
+* 匹配分辨情况
+* 750:  '', //0-1079
+* 1080: 'mi', //1080-1439
+* 1440: 'hi' //1440->
+* ***********************************/
+
+.xut-adaptive-image{
+    display: none;
+}
+/**
+ * iPhone (Original - 3GS)
+ * 320  480
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * iPhone 4 (4, 4S)
+ * 640 960
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * iPhone 5 (5c, 5s)
+ * 640  1136
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .xut-adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * Samsung Nexus S | Nokia Lumia 900 |Nokia Lumia 720 | Nokia Lumia 620 |
+ * Nokia Lumia 520 | Nokia Lumia (710, 800) |HTC Evo | HTC Desire HD |
+ * HTC Desire| Galaxy SII | Galaxy S Plus| Galaxy S | 
+ * Alcatel One Touch Ultra 995
+ * 480 800
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 1.5) {
+    @media (orientation: portrait) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .xut-adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * iPhone 6+
+ * 1080 1920
+ */
+@media (device-width: 414px) and (-webkit-min-device-pixel-ratio: 3) {
+    @media (orientation: portrait) {
+        .xut-adaptive-image{
+            width: 1080px;
+        }
+    }
+    @media (orientation: landscape) {
+        .xut-adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**
+ * BlackBerry Torch 9810
+ * 360  480
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Panasonic T44(480  800)
+ * Panasonic T50(480  854)
+ */
+@media (device-width: 480px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Droid
+ * 480  854
+ */
+@media (device-width: 320px) and (-webkit-min-device-pixel-ratio: 1.5) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Y51L | Xperia E4 Dual | BlackBerry Z3
+ * 540  960
+ */
+@media (device-width: 540px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Droid Razr Maxx | Droid Razr | Droid 3 & 4
+ * 540  960
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 1.5) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Zenfone Max ZC550KL | Sony Xperia T2 Ultra Dual | Phoenix 2 | 
+ * Panasonic Toughpad FZ-F1 | Panasonic Eluga I3 | Panasonic Eluga Arc | 
+ * Oppo F1 | Oppo A59 | Oppo A53 | BlackBerry Leap |
+ * BlackBerry Classic Non Camera
+ * 720  1280
+ */
+@media (device-width: 720px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * BlackBerry Q10
+ * 720  720
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+}
+
+/**
+ * Galaxy SIII | Galaxy Note II | Galaxy Nexus | Alcatel One Touch Idol Ultra
+ * 720  1280
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * BlackBerry Porsche Design P9982
+ * 768  1280
+ */
+@media (device-width: 768px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * Nokia Lumia 925 | Nokia Lumia 920 | Nokia Lumia 1020 |
+ * Google Nexus 4 by LG | BlackBerry Z10
+ * 768  1280
+ */
+@media (device-width: 384px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * Galaxy Note
+ * 800  1280
+ */
+@media (device-width: 400px) and (-webkit-min-device-pixel-ratio: 2) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 750px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+}
+
+/**
+ * Sony Xperia Z3 Plus | Sony Xperia Z1 | Sony Xperia X | Sony Xperia C4 Dual|
+ * Redmi Note 3 | Philips Sapphire S616 | Philips Sapphire Life V787 |
+ * Oppo R9 Plus | Oppo R9 | Oppo F1 Plus | Oppo A37 | Moto G4 Plus | M812i |
+ * Lenovo Vibe K4 Note | Lenovo K3 Note | GX F310L | Google Pixel 
+ * 1080 1920
+ */
+@media (device-width: 1080px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**
+ * Sony Xperia Z | HTC One | Galaxy SIV
+ * 1080 1920
+ */
+@media (device-width: 360px) and (-webkit-min-device-pixel-ratio: 3) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1080px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**
+ * BlackBerry Passport (1440 1440)
+ * BlackBerry Priv (1440 2560)
+ */
+@media (device-width: 1440px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**最特别的
+ * Google Pixel XL
+ * 1440 2560
+ */
+@media (device-width: 270px) and (-webkit-min-device-pixel-ratio: 5.34) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}
+
+/**
+ * Moto Z
+ * 2560 1440
+ */
+@media (device-width: 2560px) and (-webkit-min-device-pixel-ratio: 1) {
+    @media (orientation: portrait) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+    @media (orientation: landscape) {
+        .adaptive-image{
+            width: 1440px;
+        }
+    }
+}

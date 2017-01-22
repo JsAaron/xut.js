@@ -7,7 +7,7 @@
  * @return {[type]} [description]
  */
 
-import { config} from '../../../../../config/index'
+import { config } from '../../../../../config/index'
 import { parseCanvas } from './parse/canvas'
 import { createContainer } from './create/container'
 import { createDom } from './create/dom'
@@ -53,23 +53,27 @@ const makeWarpObj = (contentId, content, pageType, pid, virtualOffset) => {
  * @return {[type]}         [description]
  */
 const analysisPath = (wrapObj, conData) => {
-    var pathImg, imgContent, isGif, originalPathImg, resourcePath, results, name
 
-    imgContent = conData.md5
-    isGif = /.gif$/i.test(imgContent) //是gif格式
-    originalPathImg = config.pathAddress + imgContent //原始地址
+    let imgContent = conData.md5
+
+    //如果基础图被重新定义过
+    if(config.baseImageSuffix){
+        imgContent = imgContent.replace(/\w+./,'$&' + config.baseImageSuffix + '.')
+    }
+
+    let isGif = /.gif$/i.test(imgContent) //是gif格式
+    let originalPathImg = config.pathAddress + imgContent //原始地址
 
     //处理gif图片缓存+随机数
-    pathImg = isGif ? createRandomImg(originalPathImg) : originalPathImg
+    let pathImg = isGif ? createRandomImg(originalPathImg) : originalPathImg
 
     if(conData.category === "AutoCompSprite") {
         try {
-            resourcePath = config.pathAddress + imgContent + "/app.json";
-            results = getResources(resourcePath)
-            var spiritList = results.spiritList[0]
-            var actListName = spiritList.params.actList
-            name = spiritList.params[actListName].ImageList[0].name
-
+            let resourcePath = config.pathAddress + imgContent + "/app.json";
+            let results = getResources(resourcePath)
+            let spiritList = results.spiritList[0]
+            let actListName = spiritList.params.actList
+            let name = spiritList.params[actListName].ImageList[0].name
             pathImg += '/' + name
             conData.resource = results
             conData.containerName = wrapObj.containerName
@@ -123,7 +127,7 @@ const allotRatio = (fixRadio, headerFooterMode) => {
     }
 
     //页眉页脚模式
-    if(headerFooterMode){
+    if(headerFooterMode) {
         return headerFooterMode
     }
 
@@ -291,9 +295,11 @@ export function contentStructure(callback, data, context) {
         externalFile(wrapObj, function(wrapObj) {
             let uuid, startStr, contentStr
             let conData = wrapObj.data
-                //拼接地址
+
+            //拼接地址
             analysisPath(wrapObj, conData)
-                //canvas节点
+
+            //canvas节点
             if(conData.canvasMode) {
                 contentStr = createCanvas(conData, wrapObj)
             } else {
@@ -350,7 +356,8 @@ export function contentStructure(callback, data, context) {
             if(containerObj) {
                 var start, end, containerPrefix, containerStr
                 containerStr = []
-                    //合并容器
+
+                //合并容器
                 containerObj.createUUID.forEach(function(uuid) {
                     start = containerObj[uuid].start.join('');
                     end = containerObj[uuid].end;
@@ -412,16 +419,3 @@ export function contentStructure(callback, data, context) {
         }
     }
 }
-
-
-/**
- * 针对分段处理
- * 只构件必要的节点节点对象
- * content字段中visible === 0 是构建显示的对象
- *                      === 1 是构建隐藏的对象
- *
- * 并且不是动态创建
- */
-// if (false && (1 == content.visible) && !data.dydCreate) {
-// endReturn();  //false 先屏蔽 ，客户端未实现
-// }else{}

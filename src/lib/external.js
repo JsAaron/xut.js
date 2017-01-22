@@ -3,6 +3,7 @@ var cssName = [
     'css/common.css',
     'css/horizontal.css',
     'css/vertical.css',
+    'css/adaptive-image.css',
     'css/flarevideo.css',
     'css/flarevideo.default.css'
 ]

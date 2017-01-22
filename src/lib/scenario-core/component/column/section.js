@@ -1,4 +1,4 @@
-import { config ,resetVisualLayout} from '../../../config/index'
+import { config, resetVisualLayout } from '../../../config/index'
 import { translation } from '../../pagebase/move/translation'
 import { getColumnCount } from './get'
 import Swipe from '../../../swipe/index'
@@ -64,10 +64,12 @@ export default class Section {
         } else {
             //如果配置了高清后缀
             let hqSrc
-            if(config.hqUrlSuffix) {
+            //如果启动了高清图片
+            //并且找的到图片后缀
+            if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
                 let index = src.lastIndexOf('.')
                 let imgType = src.substring(index + 1, src.length)
-                hqSrc = src.replace(imgType, `${config.hqUrlSuffix}.` + imgType)
+                hqSrc = src.replace(imgType, `${config.imageSuffix['1440']}.` + imgType)
             }
             this.zoomObjs[src] = new Zoom({
                 element: $(node),

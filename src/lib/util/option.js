@@ -61,7 +61,6 @@ export function replacePath(svgstr) {
     return svgstr
 }
 
-
 /**
  * 转化缩放比
  * @param  {[type]} width  [description]
