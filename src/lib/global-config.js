@@ -104,7 +104,6 @@ const config: Config = {
         url: DEFAULT //url
     },
 
-
     /**
      * 自适应图片分辨率
      * iphone的750*1334，android的720*1280及以下的设备，用标准的
@@ -117,7 +116,14 @@ const config: Config = {
      *}
      */
     imageSuffix: null,
-    baseImageSuffix: '', //基础图片后缀
+
+    /**
+     * 基础图片后缀
+     * content类型
+     * flow类型
+     * @type {String}
+     */
+    baseImageSuffix: '',
 
     /**
      * 不使用高清图片

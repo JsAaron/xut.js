@@ -154,7 +154,7 @@ export default class Controller {
         let compile = new Stack()
 
         //收集有用的数据
-        let usefulData = hash()
+        let useStyleData = hash()
         _.each(chpaterResults, (chapterData, index) => {
             compile.push((() => {
 
@@ -178,7 +178,7 @@ export default class Controller {
                 }
 
                 //收集页面之间可配置数据
-                usefulData[createChapterIndex] = {
+                useStyleData[createChapterIndex] = {
                     pid: createChapterIndex,
                     visiblePid: visibleChapterIndex,
                     userStyle: userStyle,
@@ -248,7 +248,7 @@ export default class Controller {
          */
         const pageStyle = setVisualStyle({
             action,
-            usefulData
+            useStyleData
         })
 
         compile.shiftAll(pageStyle).destroy()

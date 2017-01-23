@@ -22,18 +22,16 @@ const getPageStyle = function(pageIndex) {
  */
 export function setVisualStyle({
     action,
-    usefulData
+    useStyleData
 }) {
 
-    _.each(usefulData, function(data, index) {
+    _.each(useStyleData, function(data, index) {
         //容器可视区尺寸
         _.extend(data, styleLayout(data.pageVisualMode, data.direction))
-
         //容器内部元素的缩放比
         data.pageProportion = styleProportion(data)
-
         //提供快速索引
-        usefulData['_' + data.direction] = data.pid
+        useStyleData['_' + data.direction] = data.pid
     })
 
     /**
@@ -41,9 +39,8 @@ export function setVisualStyle({
      * pageName
      * standbyName 备用名，用于翻页获取
      */
-    usefulData.getPageStyle = function(pageName, standbyName) {
+    useStyleData.getPageStyle = function(pageName, standbyName) {
         let pageStyle = this[this['_' + pageName]]
-
         //翻页动态创建的时候，只能索取到一页
         //所以这里需要动态获取关联的中间页面对象
         if (!pageStyle && pageName === 'middle') {
@@ -58,7 +55,7 @@ export function setVisualStyle({
         return this[this['_' + pageName]]
     }
 
-    _.each(usefulData, function(data, index) {
+    _.each(useStyleData, function(data, index) {
 
         //跳过getStyle方法
         if (_.isFunction(data)) {
@@ -67,7 +64,7 @@ export function setVisualStyle({
 
         //容器的初始translate值
         _.extend(data, styleTranslate({
-            usefulData,
+            useStyleData,
             createIndex: data.pid,
             currIndex: data.visiblePid,
             direction: data.direction
@@ -75,5 +72,5 @@ export function setVisualStyle({
     })
 
 
-    return usefulData
+    return useStyleData
 }

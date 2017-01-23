@@ -43,14 +43,14 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
 
     //重复加载杂志
     //不刷新的情况处理
-    if(/fix-transform/.test(data)) {
+    if(/section-transform/.test(data)) {
         data = $(data).find("#columns-content").html()
     }
 
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
     const container = `
-            <section class="fix-transform" data-flow="true">
+            <section class="section-transform" data-flow="true">
                 <div class="page-flow-pinch" data-role="margin" style="width:${containerWidth}px;height:${containerHeight}px;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
                     <div data-role="column" id="columns-content" style="${columnWidth};height:100%;${columnGap}">
                         ${data}

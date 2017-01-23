@@ -2,12 +2,6 @@ import { config } from '../../config/index'
 import { leftTranslate } from './translate-hook/left'
 import { rightTranslate } from './translate-hook/right'
 
-/**
- * 设置默认的样式
- * @return {[type]} [description]
- */
-
-const transform = Xut.style.transform
 const translateZ = Xut.style.translateZ
 
 /**
@@ -30,22 +24,25 @@ export function styleTranslate({
     createIndex,
     currIndex,
     direction,
-    usefulData
+    useStyleData
 }) {
 
     let translate
     let offset
+    let offsetLeft
+    let offsetMiddle
+    let offsetRight
 
     if(direction === 'before') {
-        let offsetLeft = leftTranslate(usefulData)
+        offsetLeft = leftTranslate(useStyleData)
         translate = createTranslate(offsetLeft)
         offset = offsetLeft
     } else if(direction === 'middle') {
-        let offsetMiddle = 0
+        offsetMiddle = 0
         translate = createTranslate(offsetMiddle)
         offset = offsetMiddle
     } else if(direction === 'after') {
-        let offsetRight = rightTranslate(usefulData)
+        offsetRight = rightTranslate(useStyleData)
         translate = createTranslate(offsetRight)
         offset = offsetRight
     }

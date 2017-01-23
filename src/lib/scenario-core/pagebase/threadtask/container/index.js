@@ -33,7 +33,7 @@ const createli = function({
             data-map="${base.pid}"
             data-pageType="${base.pageType}"
             data-container="true"
-            class="xut-flip fix-transform"
+            class="xut-flip preserve-3d"
             style="width:${getStyle.visualWidth}px;
                    height:${getStyle.visualHeight}px;
                    left:${getStyle.visualLeft}px;

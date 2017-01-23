@@ -93,14 +93,26 @@ video {
  * 隐藏转换的元素的背面
  * 使被转换的元素的子元素保留其 3D 转换
  * 开启GPU硬件加速模式，使用GPU代替CPU渲染动画（在安卓系统中有时会有莫名其妙的BUG，建议慎重）
+ * perspective 文字会模糊
  */
-.fix-transform {
+.preserve-3d {
     backface-visibility: hidden;
     transform-style: preserve-3d;
     perspective: 1000;
     -webkit-backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
     -webkit-perspective: 1000;
+}
+
+/**
+ * section 流式布局下面去掉perspective
+ * 因为与overflow冲突，文字会模糊
+ */
+.section-transform{
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
 }
 
 /**继承父容器尺寸 **/
@@ -854,7 +866,7 @@ video {
     z-index: 1
 }
 .page-pinch > div:first-child {
-    overflow: hidden;
+    overflow: hidden; 
     z-index: 2
 }
 

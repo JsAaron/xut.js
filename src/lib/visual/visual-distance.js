@@ -1,9 +1,8 @@
 import { config } from '../config/index'
-import {
-    rightPageHook,
-    middlePageHook,
-    leftPageHook
-} from './style-config/distance-hook/index'
+import { leftPageHook } from './style-config/distance-hook/left'
+import { middlePageHook } from './style-config/distance-hook/middle'
+import { rightPageHook } from './style-config/distance-hook/right'
+
 import {
     hasValue,
     hash
@@ -15,20 +14,15 @@ import {
  * @param  {[type]} pageIndex [description]
  * @return {[type]}           [description]
  */
-const getPageStyle = function(pageIndex) {
+const getPageStyle = pageIndex => {
     let pageBase = Xut.Presentation.GetPageObj(pageIndex)
     return pageBase && pageBase.getStyle
 }
 
-/**
- * 获取页面的可视区宽度
- * @return {[type]} [description]
- */
-const getPageVisualWidth = function(pageStyle) {
-    if(pageStyle) {
-        return pageStyle.visualWidth
+const makeAccess = (action, direction, distance, pageStyles) => {
+    return(hooks) => {
+        return hooks[action][direction](distance, pageStyles)
     }
-    return 0
 }
 
 /**
@@ -44,6 +38,14 @@ export function getVisualDistance({
     rightIndex
 }) {
 
+    let left = 0
+    let middle = 0
+    let right = 0
+
+    //当前视图页面
+    //用来处理页面回调
+    let view = undefined
+
     //页面的配置样式
     let pageStyles = {
         left: getPageStyle(leftIndex),
@@ -51,37 +53,24 @@ export function getVisualDistance({
         right: getPageStyle(rightIndex)
     }
 
-    let offset = {
-        left: undefined,
-        middle: undefined,
-        right: undefined,
-        //当前视图页面
-        //用来处理页面回调
-        view: undefined
-    }
+    let hooks = makeAccess(action, direction, distance, pageStyles)
 
-    if(action === 'flipMove') {
-        offset.left = leftPageHook[action][direction](distance, pageStyles)
-        offset.middle = distance
-        offset.right = rightPageHook[action][direction](distance, pageStyles)
-    }
-
-    if(action === 'flipRebound') {
-        offset.left = leftPageHook[action][direction](distance, pageStyles)
-        offset.middle = distance
-        offset.right = rightPageHook[action][direction](distance, pageStyles)
+    if(action === 'flipMove' || action === 'flipRebound') {
+        left = hooks(leftPageHook)
+        middle = distance
+        right = hooks(rightPageHook)
     }
 
     if(action === 'flipOver') {
-        offset.left = leftPageHook[action][direction](distance, pageStyles)
-        offset.middle = middlePageHook[action][direction](distance, pageStyles)
-        offset.right = rightPageHook[action][direction](distance, pageStyles)
+        left = hooks(leftPageHook)
+        middle = hooks(middlePageHook)
+        right = hooks(rightPageHook)
         if(direction === 'prev') {
-            offset.view = offset.left
+            view = left
         } else {
-            offset.view = offset.right
+            view = right
         }
     }
 
-    return [offset.left, offset.middle, offset.right, offset.view]
+    return [left, middle, right, view]
 }

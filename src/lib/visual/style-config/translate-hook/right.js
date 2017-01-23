@@ -2,10 +2,10 @@
  * 右边页面Translate钩子
  ************************/
 
-export function rightTranslate(usefulData) {
+export function rightTranslate(useStyleData) {
 
-    let middlePageStyle = usefulData.getPageStyle('middle', 'after')
-    let rightPageStyle = usefulData.getPageStyle('after')
+    let middlePageStyle = useStyleData.getPageStyle('middle', 'after')
+    let rightPageStyle = useStyleData.getPageStyle('after')
 
     //中间：溢出
     if (middlePageStyle && middlePageStyle.visualLeftInteger) {

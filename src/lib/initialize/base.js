@@ -64,6 +64,33 @@ const getMaxWidth = function() {
         document.documentElement.clientWidth
 }
 
+
+/**
+ * 检车分辨率失败的情况
+ * 强制用js转化
+ * 750:  '', //0-1079
+ * 1080: 'mi', //1080-1439
+ * 1440: 'hi' //1440->
+ */
+const setDefaultSuffix = function() {
+    //竖版的情况才调整
+    if(config.screenVertical) {
+        let ratio = window.devicePixelRatio || 1
+        let maxWidth = getMaxWidth() * ratio
+
+        if(maxWidth > 1080 && maxWidth < 1439) {
+            config.baseImageSuffix = config.imageSuffix['1080']
+        }
+        if(maxWidth > 1440) {
+            config.baseImageSuffix = config.imageSuffix['1440']
+        }
+        if(config.devtools && config.baseImageSuffix) {
+            $$warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix =' + config.baseImageSuffix)
+        }
+    }
+}
+
+
 /**
  * 动态代码变动区域
  */
@@ -72,24 +99,6 @@ export default function baseConfig(callback) {
     //图片分辨了自适应
     if(config.imageSuffix) {
         let $adaptiveImageNode = $('.xut-adaptive-image')
-
-        //如果检测失败
-        //就默认设置
-        //1080-1439
-        let defaultSuffix = function() {
-            let ratio = window.devicePixelRatio || 1
-            let maxWidth = getMaxWidth() * ratio
-            if(maxWidth > 1080 && maxWidth < 1439) {
-                config.baseImageSuffix = config.imageSuffix['1080']
-            }
-            if(maxWidth > 1440) {
-                config.baseImageSuffix = config.imageSuffix['1440']
-            }
-            if(config.devtools && config.baseImageSuffix) {
-                $$warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix =' + config.baseImageSuffix)
-            }
-        }
-
         if($adaptiveImageNode.length) {
             let baseImageType = $adaptiveImageNode.width()
             let type = config.imageSuffix[baseImageType]
@@ -97,12 +106,11 @@ export default function baseConfig(callback) {
                 //定义基础的图片后缀
                 config.baseImageSuffix = type
             } else {
-                defaultSuffix()
+                setDefaultSuffix()
             }
         } else {
-            defaultSuffix()
+            setDefaultSuffix()
         }
-
     }
 
     //导入JSON数据缓存
