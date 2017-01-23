@@ -16,6 +16,7 @@ var cssName = [
 var jsName = [
     'content/SQLResult.js',
 
+    'lib/external/device.js',
     'lib/external/environ.js',
     'lib/external/namespace.js',
     'lib/external/support.js',

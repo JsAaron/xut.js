@@ -96,6 +96,12 @@ const setDefaultSuffix = function() {
  */
 export default function baseConfig(callback) {
 
+    //mini杂志设置
+    //如果是pad的情况下设置font为125%
+    if( config.platform ==='mini' && Xut.plat.isTablet){
+        $('body').css('font-size','125%')
+    }
+
     //图片分辨了自适应
     if(config.imageSuffix) {
         let $adaptiveImageNode = $('.xut-adaptive-image')
