@@ -4,13 +4,13 @@ import { $$warn } from './debug'
  * 2015.3.24
  * 1 isBrowser
  * 2 isMobile
- * 3 isSurface
+ * 3 isMouseTouch
  */
 const transitionEnd = Xut.style.transitionEnd
 
 //2015.3.23
 //可以点击与触摸
-const isSurface = Xut.plat.isSurface
+const isMouseTouch = Xut.plat.isMouseTouch
 const hasTouch = Xut.plat.hasTouch
 
 
@@ -29,7 +29,7 @@ const orderName = {
 }
 
 const eventNames = (() => {
-    if (isSurface) {
+    if (isMouseTouch) {
         return {
             touch: touchList,
             mouse: mouseList
@@ -58,7 +58,7 @@ function addHandler(element, eventName, handler, capture) {
         let dataCache = eventDataCache[uuid]
         if (dataCache) {
             if (dataCache[eventName]) {
-                //如果是isSurface支持同样的事件
+                //如果是isMouseTouch支持同样的事件
                 //所以transitionend就比较特殊了，因为都是同一个事件名称
                 //所以只要一份，所以重复绑定就需要去掉
                 if (eventName !== 'transitionend') {
@@ -95,7 +95,7 @@ const eachApply = (events, callbacks, processor, isRmove) => {
 
 /**
  * 合并事件绑定处理
- * 因为isSurface设备上
+ * 因为isMouseTouch设备上
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
@@ -156,7 +156,7 @@ function removeone(element, eventName) {
 
 /**
  * 销毁事件绑定处理
- * 因为isSurface设备上
+ * 因为isMouseTouch设备上
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
@@ -177,7 +177,7 @@ const removeEvent = (element, events, callbacks) => {
 const compatibility = (controller, element, callbacks, capture) => {
     //如果两者都支持
     //鼠标与触摸
-    if (isSurface) {
+    if (isMouseTouch) {
         _.each(eventNames, events => {
             controller(element, events, callbacks, capture)
         })
@@ -210,7 +210,7 @@ const checkBindCancel = function(callbacks){
 
 /**
  * 合并事件绑定处理
- * 因为isSurface设备上
+ * 因为isMouseTouch设备上
  * 要同时支持2种方式
  * bindTap(eventContext,{
  *     start   : start,

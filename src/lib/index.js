@@ -9,7 +9,7 @@ import init from './initialize/index'
 
 initGlobalAPI()
 
-Xut.Version = 876.2
+Xut.Version = 876.3
 
 if(Xut.plat.isBrowser) {
 
@@ -19,7 +19,7 @@ if(Xut.plat.isBrowser) {
     })
 
     //修复H5音频自动播放bug
-    if(Xut.plat.noAutoPlayMedia) {
+    if(!Xut.plat.hasAutoPlayAudio) {
         fixAudio()
     }
 

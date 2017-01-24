@@ -10,36 +10,37 @@
     //navigator.appVersion: "xxt 1.0.5260.29725"
     var userAgent    = window.navigator.userAgent.toLowerCase()
     var appVersion   = window.navigator.appVersion.toLowerCase()
-    var findPlatform = function(needle) {
-        return appVersion.indexOf(needle) !== -1;
-    }
 
+    var isAndroid    = device.android() || (/android/gi).test(appVersion)
+    var isDesktop    = device.desktop()
     var isMacOS      = device.find('mac')
     var isIphone     = device.iphone()
     var isIpad       = device.ipad()
     var isIOS        = device.ios()
-    var isWebKit     = findPlatform('applewebkit')//webkit内核
-    var isWeiXin     = findPlatform('micromessenger')//微信
+    var isWebKit     = device.find('applewebkit')//webkit内核
+    var isWeiXin     = device.find('micromessenger')//微信
     var hasTouch     = ('ontouchstart' in window)//支持触屏
-    var hasMouse     = ('onmousedown' in window)//支持鼠标
-    var onlyTouch    = hasTouch && device.mobile() //移动端仅仅只支持touch
+
+    //针对win8的处理
+    var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
+    //移动端仅仅只支持touch
+    var only_touch   = hasTouch && MOBILE_REGEX.test(userAgent)
     //判断是否为浏览器
-    //http           ://localhost:12344/index.html
-    var boolBrowser  = location.indexOf('http') > -1 || location.indexOf('https') > -1;
-    var isBrowser    = boolBrowser ? boolBrowser : !onlyTouch
+    var boolBrowser  = location.indexOf('http') > -1 || location.indexOf('https') > -1
+    var isBrowser    = boolBrowser ? boolBrowser : !only_touch
 
     //有hasMutationObserverBug
     //detecting iOS UIWebView by indexedDB
     var iosVersionMatch = isIOS && userAgent.match(/os ([\d_]+)/)
     var iosVersion      = iosVersionMatch && iosVersionMatch[1].split('_')
-    var hasMutationObserverBug = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
+    var hasMutationObserver = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
 
     /**
      * 平台支持
      */
     Xut.extend(Xut.plat, {
         has3d     :  'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix(),
-        isAndroid : device.android(),
+        isAndroid : isAndroid,
         isIphone  : isIphone,
         isIpad    : isIpad,
         isIOS     : isIOS,
@@ -52,8 +53,6 @@
          */
         isTablet: device.tablet(),
 
-        hasMutationObserverBug: hasMutationObserverBug,
-
         /**
          * 是否在支持插件
          * phonegap
@@ -62,7 +61,7 @@
         hasPlugin: false,
 
         /**
-         * 不能自动播放媒体
+         * 是否能自动播放媒体
          * audio
          * video
          * @type {[type]}
@@ -71,12 +70,12 @@
          * 是webkit
          * 是手机端浏览器
          */
-        noAutoPlayMedia: !isWeiXin && isBrowser && onlyTouch,
+        hasAutoPlayAudio: isWeiXin || isDesktop,
 
         /**
          * 支持触摸
          */
-        hasTouch: hasTouch,
+        hasTouch: only_touch,
 
         /**
          * 游览器平台 解决ios Android浏览器判断问题
@@ -86,17 +85,22 @@
 
         /**
          * 2015.3.23
-         * isSurface
          * 可以点击与触摸
          * @type {Boolean}
          */
-        isSurface: hasTouch && hasMouse && !onlyTouch,
+        isMouseTouch: hasTouch && ('onmousedown' in window) && !only_touch,
 
         /**
          * 是否桌面
          * @type {Boolean}
          */
-        isDesktop: device.desktop()
+        isDesktop: isDesktop,
+
+        /**
+         * 是否支持Mutation
+         * @type {Boolean}
+         */
+        supportMutationObserver: !hasMutationObserver,
     })
 
 

@@ -42,7 +42,7 @@ const _nextTick = (function() {
         }
     }
 
-    if(typeof MutationObserver !== 'undefined' && !Xut.plat.hasMutationObserverBug) {
+    if(typeof MutationObserver !== 'undefined' && Xut.plat.supportMutationObserver) {
         var counter = 1
         var observer = new MutationObserver(nextTickHandler)
         var textNode = document.createTextNode(counter)
