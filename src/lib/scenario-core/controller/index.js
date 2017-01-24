@@ -33,9 +33,11 @@ export default class Controller {
     constructor(vm) {
         this.vm = vm;
         this.options = vm.options;
+
         //创建前景页面管理模块
         this.pageMgr = new PageMgr(vm)
-            // 检测是否需要创母版模块
+
+        // 检测是否需要创母版模块
         if(hasMaster()) {
             this.masterMgr = new MasterMgr(vm);
         }
@@ -49,16 +51,10 @@ export default class Controller {
      */
     initCreate() {
         let options = this.options
-            //pointer
-            //  createPointer
-            //  initPointer
+        //createPointer
+        //initPointer
         let pointer = initPointer(options.initIndex, options.pagetotal, options.multiplePages)
         this.pagePointer = pointer.initPointer
-            //初始化
-        if(this.pageMgr.swipe) {
-            this.pageMgr.swipe.initTranslation(pointer.createPointer, options.initIndex)
-        }
-        //始化构建页面容器对象
         this.createPageBases(pointer.createPointer, options.initIndex, 'init')
     }
 

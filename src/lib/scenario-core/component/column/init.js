@@ -133,10 +133,10 @@ export default function initColumn(callback) {
             insertColumn(node, seasonsId, vWidth, vHeight, columnCount)
         })
 
-        nextTick({
-            container: $('body'),
-            content: $container
-        }, function() {
+        $('body').append($container)
+
+        //必须延时获取真正的高度
+        setTimeout(function() {
             $seasons.each((index, node) => {
                 let tag = node.id
                 let seasonsId = tag.match(/\d/)[0]
@@ -151,7 +151,7 @@ export default function initColumn(callback) {
             $container.hide()
             setCache(columnCount)
             callback(Object.keys(columnCount).length)
-        })
+        }, 500)
 
     }
 

@@ -31,31 +31,29 @@
 
 </html>
 <script type="text/javascript">
-Xut.Application.setConfig = {
-    // visualHeight: window.innerHeight - 44,
-    lauchMode: 1,
-    historyMode: false,
-    platform: 'mini',
-    historyMode: true,
-    visualMode: 1,
-    salePageType: 'page',
-    // imageSuffix:{
 
-    // },
-    // imageSuffix: {
-    //     1080: 'mi',
-    //     1440: 'hi'
-    // },
-    // cursor: {
-    //     url: 'images/icons/busyIcon.gif',
-    //     delayTime: 300
-    // },
-    hqUrlSuffix: 'hi',
+Xut.Application.setConfig = {
+    lauchMode: 1,
+    platform: 'mini',
+    historyMode: false,
+    visualMode: 2,
+    cursor: {
+        url: 'images/icons/busyicon.gif',
+        delayTime: 300
+    },
+    salePicture: true,
+    salePictureMultiples: 3,
+    imageSuffix: {
+        1080: 'mi',
+        1440: 'hi'
+    },
     supportQR: true,
-    swipeDelegate: true
+    swipeDelegate: true,
+    useHDImageZoom: true
 };
 
-var appId = 310
+
+var appId = 311
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点
