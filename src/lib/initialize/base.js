@@ -59,6 +59,9 @@ const setMode = function(data) {
 }
 
 const getMaxWidth = function() {
+    if(config.visualSize){
+        return config.visualSize.width
+    }
     return window.screen.width > document.documentElement.clientWidth ?
         window.screen.width :
         document.documentElement.clientWidth

@@ -82,7 +82,6 @@ export function initApplication() {
     Xut.Application.Exit = function() {
         if(config.launch) {
             globalDestroy('exit')
-            config.launch = null
         }
     }
 

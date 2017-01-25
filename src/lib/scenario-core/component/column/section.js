@@ -7,6 +7,7 @@ import render from './render'
 import { getVisualDistance } from '../../../visual/visual-distance'
 import { Zoom } from '../../../plugin/extend/zoom/index'
 import { closeButton } from '../../../plugin/extend/close-button'
+import { analysisImageName, insertImageUrlSuffix } from '../../../util/option'
 
 /**
  * 2017.9.7
@@ -56,24 +57,28 @@ export default class Section {
      * @return {[type]} [description]
      */
     _zoomImage(node) {
+
+        if(!node.src) {
+            return
+        }
+
+        let analysisName = analysisImageName(node.src)
+
         //图片地址
-        let src = config.pathAddress + node.src.match(/\w+.(jpg|png)/gi)
-        if(this.zoomObjs[src]) {
+        let originalSuffixUrl = config.pathAddress + analysisName.suffix
+        if(this.zoomObjs[originalSuffixUrl]) {
             //重复调用
-            this.zoomObjs[src].play()
+            this.zoomObjs[originalSuffixUrl].play()
         } else {
             //如果配置了高清后缀
             let hqSrc
             //如果启动了高清图片
-            //并且找的到图片后缀
             if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-                let index = src.lastIndexOf('.')
-                let imgType = src.substring(index + 1, src.length)
-                hqSrc = src.replace(imgType, `${config.imageSuffix['1440']}.` + imgType)
+                hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original,config.imageSuffix['1440'] )
             }
-            this.zoomObjs[src] = new Zoom({
+            this.zoomObjs[originalSuffixUrl] = new Zoom({
                 element: $(node),
-                originalSrc: src,
+                originalSrc: originalSuffixUrl,
                 hdSrc: hqSrc
             })
         }

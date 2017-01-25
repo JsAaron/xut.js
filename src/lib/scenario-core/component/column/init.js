@@ -74,7 +74,7 @@ const resolveCount = ($content) => {
 }
 
 
-const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, columnCount) => {
+const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnCount) => {
     for(let i = 0; i < seasonNode.childNodes.length; i++) {
         let chapterNode = seasonNode.childNodes[i]
         if(chapterNode.nodeType == 1) {
@@ -88,7 +88,7 @@ const insertColumn = (seasonNode, seasonsId, vWidth, vHeight, columnCount) => {
             } else {
                 margin = [0, 0, 0, 0]
             }
-            chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, vWidth, vHeight, margin)
+            chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin)
             columnCount[seasonsId][id] = 0
         }
     }
@@ -115,14 +115,14 @@ export default function initColumn(callback) {
         let columnCount = {}
 
         //容器尺寸设置
-        let flowView = resetVisualLayout(1)
-        let vWidth = flowView.width
-        let vHeight = newViewHight = flowView.height
+        let flowView     = resetVisualLayout(1)
+        let visualWidth  = flowView.width
+        let visualHeight = newViewHight = flowView.height
 
         $container.css({
-            width: vWidth,
-            height: vHeight,
-            display: 'block'
+            width   : visualWidth,
+            height  : visualHeight,
+            display : 'block'
         })
 
         $seasons.each((index, node) => {
@@ -130,7 +130,7 @@ export default function initColumn(callback) {
             let seasonsId = tag.match(/\d/)[0]
             let $chapters = $seasons.children()
             columnCount[seasonsId] = {}
-            insertColumn(node, seasonsId, vWidth, vHeight, columnCount)
+            insertColumn(node, seasonsId, visualWidth, visualHeight, columnCount)
         })
 
         $('body').append($container)

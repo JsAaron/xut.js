@@ -1,5 +1,6 @@
 import { request } from '../util/loader'
 import { $$warn } from '../util/debug'
+import { insertImageUrlSuffix } from '../util/option'
 import { config } from '../config/index'
 
 /**

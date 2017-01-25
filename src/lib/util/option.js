@@ -7,6 +7,62 @@ import { config, resetVisualProportion } from '../config/index'
 const CEIL = Math.ceil
 const FLOOR = Math.floor
 
+
+/**
+ * 获取正确的图片文件名
+ * 因为图片可能存在
+ * .mi.jpg
+ * .mi.php
+ * .hi.jpg
+ * .hi.php
+ * 等等这样的地址
+ * @return {[type]} [description]
+ */
+export function analysisImageName(src) {
+
+    let suffix = src
+    let original = src
+
+    //有基础后缀
+    if(config.baseImageSuffix) {
+        let baseImageSuffix = `.${config.baseImageSuffix}.`
+        let exp = new RegExp('\\w+' + baseImageSuffix + '(jpg|png)', 'gi')
+        let result = src.match(exp)
+        if(result && result.length) {
+            suffix = result[0]
+            original = suffix.replace(baseImageSuffix, '.')
+        } else {
+            $$warn('analysisImageUrl解析出错,result：' + result)
+        }
+    }
+    //如果没有后缀
+    else {
+        let result = src.match(/\w+.(jpg|png)/gi)
+        if(result && result.length) {
+            suffix = original = result[0]
+        } else {
+            $$warn('analysisImageUrl解析出错,result：' + result)
+        }
+    }
+
+    return {
+        original, //原始版
+        suffix //带有后缀
+    }
+
+}
+
+/**
+ * 给地址增加私有后缀
+ */
+export function insertImageUrlSuffix(originalUrl, suffix) {
+    if(originalUrl && suffix) {
+        return originalUrl.replace(/\w+\./ig, '$&' + suffix + '.')
+    }
+    return originalUrl
+}
+
+
 /**
  * 获取资源
  * @param  {[type]} url [description]

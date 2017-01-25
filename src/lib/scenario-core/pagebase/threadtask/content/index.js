@@ -7,12 +7,15 @@
 import { config } from '../../../../config/index'
 import { contentStructure } from './dom/index'
 import { LetterEffect } from '../../../component/activity/content/letter-effect'
-import { nextTick } from '../../../../util/nexttick'
 import { Zoom } from '../../../../plugin/extend/zoom/index'
 import { contentParser, activityParser } from './data'
 import { createFloatMater, createFloatPage } from './float'
-import { $$on, $$off } from '../../../../util/dom'
 import { sceneController } from '../../../../scenario/controller'
+
+import { nextTick } from '../../../../util/nexttick'
+import { $$on, $$off } from '../../../../util/dom'
+import { analysisImageName, insertImageUrlSuffix } from '../../../../util/option'
+
 import {
     createFn,
     toArray,
@@ -21,6 +24,8 @@ import {
     autoUUID,
     applyActivitys
 } from './depend'
+
+
 
 /**
  * content任务类
@@ -281,7 +286,7 @@ export default class TaskContents {
      */
     _zoomImage(data) {
         let self = this
-        self.zoomObj = {} //保存缩放对象
+        self.zoomObjs = {} //保存缩放对象
         _.each(data.contentsFragment, function(node) {
             //需要单独绑定点击放大功能
             let behaviorData = data.zoomBehavior[node.id]
@@ -302,30 +307,34 @@ export default class TaskContents {
                 }
                 let hasMove = false
                 $$on(node, {
-                    start: function() {
+                    start() {
                         hasMove = false
                     },
-                    move: function() {
+                    move() {
                         hasMove = true
                     },
-                    end: function() {
+                    end() {
                         if(hasMove) return
                         let $node = $(node)
                         let $imgNode = $node.find('img')
-                        let src = config.pathAddress + $imgNode[0].src.match(/\w+.(jpg|png)/gi)
-                        let zoomObj = self.zoomObj[src]
-                        if(zoomObj) {
-                            zoomObj.play()
+                            //图片src必须存在
+                        if($imgNode[0] && !$imgNode[0].src) {
+                            return
+                        }
+                        let analysisName = analysisImageName($imgNode[0].src)
+                        let originalSuffixUrl = config.pathAddress + analysisName.suffix
+                        if(self.zoomObjs[originalSuffixUrl]) {
+                            self.zoomObjs[originalSuffixUrl].play()
                         } else {
                             let hqSrc
+
                             //如果启动了高清图片
-                            //并且找的到图片后缀
                             if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-                                hqSrc = src.replace('.', `.${config.imageSuffix['1440']}.`)
+                                hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
                             }
-                            self.zoomObj[src] = new Zoom({
+                            self.zoomObjs[src] = new Zoom({
                                 element: $imgNode,
-                                originalSrc: src,
+                                originalSrc: originalSuffixUrl,
                                 hdSrc: hqSrc
                             })
                         }
@@ -446,10 +455,10 @@ export default class TaskContents {
             this.zoomBehavior = null
 
             //清理缩放对象
-            _.each(this.zoomObj, function(zoomObj) {
-                zoomObj.destroy()
+            _.each(this.zoomObjs, function(zoom) {
+                zoom.destroy()
             })
-            this.zoomObj = null
+            this.zoomObjs = null
         }
 
         this.canvasRelated = null

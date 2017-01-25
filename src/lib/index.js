@@ -9,7 +9,7 @@ import init from './initialize/index'
 
 initGlobalAPI()
 
-Xut.Version = 876.4
+Xut.Version = 876.5
 
 if(Xut.plat.isBrowser) {
 
@@ -74,7 +74,6 @@ const mixModeConfig = setConfig => {
  * @type {Array}
  */
 let cacheOptions
-
 
 /**
  * 横竖切换
