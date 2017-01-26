@@ -1,3 +1,309 @@
+// Device.js
+// (c) 2014 Matthew Hudson
+// Device.js is freely distributable under the MIT license.
+// For all details and documentation:
+// http://matthewhudson.me/projects/device.js/
+
+(function() {
+
+    var device,
+        previousDevice,
+        addClass,
+        documentElement,
+        find,
+        handleOrientation,
+        hasClass,
+        orientationEvent,
+        removeClass,
+        userAgent;
+
+    // Save the previous value of the device variable.
+    previousDevice = window.device;
+
+    device = {};
+
+    // Add device as a global object.
+    window.device = device;
+
+    // The <html> element.
+    documentElement = window.document.documentElement;
+
+    // The client user agent string.
+    // Lowercase, so we can use the more efficient indexOf(), instead of Regex
+    userAgent = window.navigator.userAgent.toLowerCase();
+
+    // Main functions
+    // --------------
+
+    device.ios = function() {
+        return device.iphone() || device.ipod() || device.ipad();
+    };
+
+    device.iphone = function() {
+        return !device.windows() && find('iphone');
+    };
+
+    device.ipod = function() {
+        return find('ipod');
+    };
+
+    device.ipad = function() {
+        return find('ipad');
+    };
+
+    device.android = function() {
+        return !device.windows() && find('android');
+    };
+
+    device.androidPhone = function() {
+        return device.android() && find('mobile');
+    };
+
+    device.androidTablet = function() {
+        return device.android() && !find('mobile');
+    };
+
+    device.blackberry = function() {
+        return find('blackberry') || find('bb10') || find('rim');
+    };
+
+    device.blackberryPhone = function() {
+        return device.blackberry() && !find('tablet');
+    };
+
+    device.blackberryTablet = function() {
+        return device.blackberry() && find('tablet');
+    };
+
+    device.windows = function() {
+        return find('windows');
+    };
+
+    device.windowsPhone = function() {
+        return device.windows() && find('phone');
+    };
+
+    device.windowsTablet = function() {
+        return device.windows() && (find('touch') && !device.windowsPhone());
+    };
+
+    device.fxos = function() {
+        return(find('(mobile;') || find('(tablet;')) && find('; rv:');
+    };
+
+    device.fxosPhone = function() {
+        return device.fxos() && find('mobile');
+    };
+
+    device.fxosTablet = function() {
+        return device.fxos() && find('tablet');
+    };
+
+    device.meego = function() {
+        return find('meego');
+    };
+
+    device.cordova = function() {
+        return window.cordova && location.protocol === 'file:';
+    };
+
+    device.nodeWebkit = function() {
+        return typeof window.process === 'object';
+    };
+
+    device.mobile = function() {
+        return device.androidPhone() || device.iphone() || device.ipod() || device.windowsPhone() || device.blackberryPhone() || device.fxosPhone() || device.meego();
+    };
+
+    device.tablet = function() {
+        return device.ipad() || device.androidTablet() || device.blackberryTablet() || device.windowsTablet() || device.fxosTablet();
+    };
+
+    device.desktop = function() {
+        return !device.tablet() && !device.mobile();
+    };
+
+    device.television = function() {
+        var i, tvString;
+
+        television = [
+            "googletv",
+            "viera",
+            "smarttv",
+            "internet.tv",
+            "netcast",
+            "nettv",
+            "appletv",
+            "boxee",
+            "kylo",
+            "roku",
+            "dlnadoc",
+            "roku",
+            "pov_tv",
+            "hbbtv",
+            "ce-html"
+        ];
+
+        i = 0;
+        while(i < television.length) {
+            if(find(television[i])) {
+                return true;
+            }
+            i++;
+        }
+        return false;
+    };
+
+    device.portrait = function() {
+        return(window.innerHeight / window.innerWidth) > 1;
+    };
+
+    device.landscape = function() {
+        return(window.innerHeight / window.innerWidth) < 1;
+    };
+
+    // Public Utility Functions
+    // ------------------------
+
+    // Run device.js in noConflict mode,
+    // returning the device variable to its previous owner.
+    device.noConflict = function() {
+        window.device = previousDevice;
+        return this;
+    };
+
+    // Private Utility Functions
+    // -------------------------
+
+    // Simple UA string search
+    find = function(needle) {
+        return userAgent.indexOf(needle) !== -1;
+    };
+
+    // Check if documentElement already has a given class.
+    hasClass = function(className) {
+        var regex;
+        regex = new RegExp(className, 'i');
+        return documentElement.className.match(regex);
+    };
+
+    // Add one or more CSS classes to the <html> element.
+    addClass = function(className) {
+        var currentClassNames = null;
+        if(!hasClass(className)) {
+            currentClassNames = documentElement.className.replace(/^\s+|\s+$/g, '');
+            documentElement.className = currentClassNames + " " + className;
+        }
+    };
+
+    // Remove single CSS class from the <html> element.
+    removeClass = function(className) {
+        if(hasClass(className)) {
+            documentElement.className = documentElement.className.replace(" " + className, "");
+        }
+    };
+
+    // HTML Element Handling
+    // ---------------------
+
+    // Insert the appropriate CSS class based on the _user_agent.
+
+    if(device.ios()) {
+        if(device.ipad()) {
+            addClass("ios ipad tablet");
+        } else if(device.iphone()) {
+            addClass("ios iphone mobile");
+        } else if(device.ipod()) {
+            addClass("ios ipod mobile");
+        }
+    } else if(device.android()) {
+        if(device.androidTablet()) {
+            addClass("android tablet");
+        } else {
+            addClass("android mobile");
+        }
+    } else if(device.blackberry()) {
+        if(device.blackberryTablet()) {
+            addClass("blackberry tablet");
+        } else {
+            addClass("blackberry mobile");
+        }
+    } else if(device.windows()) {
+        if(device.windowsTablet()) {
+            addClass("windows tablet");
+        } else if(device.windowsPhone()) {
+            addClass("windows mobile");
+        } else {
+            addClass("desktop");
+        }
+    } else if(device.fxos()) {
+        if(device.fxosTablet()) {
+            addClass("fxos tablet");
+        } else {
+            addClass("fxos mobile");
+        }
+    } else if(device.meego()) {
+        addClass("meego mobile");
+    } else if(device.nodeWebkit()) {
+        addClass("node-webkit");
+    } else if(device.television()) {
+        addClass("television");
+    } else if(device.desktop()) {
+        addClass("desktop");
+    }
+
+    if(device.cordova()) {
+        addClass("cordova");
+    }
+
+    // Orientation Handling
+    // --------------------
+
+    // Handle device orientation changes.
+    handleOrientation = function() {
+        if(device.landscape()) {
+            removeClass("portrait");
+            addClass("landscape");
+        } else {
+            removeClass("landscape");
+            addClass("portrait");
+        }
+        return;
+    };
+
+    // Detect whether device supports orientationchange event,
+    // otherwise fall back to the resize event.
+    if(Object.prototype.hasOwnProperty.call(window, "onorientationchange")) {
+        orientationEvent = "orientationchange";
+    } else {
+        orientationEvent = "resize";
+    }
+
+    // Listen for changes in orientation.
+    if(window.addEventListener) {
+        window.addEventListener(orientationEvent, handleOrientation, false);
+    } else if(window.attachEvent) {
+        window.attachEvent(orientationEvent, handleOrientation);
+    } else {
+        window[orientationEvent] = handleOrientation;
+    }
+
+    handleOrientation();
+
+    device.find = find
+
+    if(typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
+        define(function() {
+            return device;
+        });
+    } else if(typeof module !== 'undefined' && module.exports) {
+        module.exports = device;
+    } else {
+        window.device = device;
+    }
+
+}).call(this);
+
 /**
  * 判断加载环境 是否嵌套iframe
  * 1 单独杂志
@@ -281,138 +587,53 @@ String.styleFormat = function(format) {
 ;
 (function() {
 
-    // Browser environment sniffing
-    var inBrowser =
-        typeof window !== 'undefined' &&
-        Object.prototype.toString.call(window) !== '[object Object]'
-
+    var location     = document.location.href
     //在读酷pc端 navigator的值被改写过了!!
     //navigator.appVersion: "xxt 1.0.5260.29725"
-    var UA = inBrowser && window.navigator.userAgent.toLowerCase()
-    var UV = inBrowser && window.navigator.appVersion.toLowerCase()
-    var isAndroid = UA && UA.indexOf('android') > 0
-    var isMacOS = UA && UA.indexOf('mac') > 0
-    var isIphone = (/iphone|ipod/gi).test(UA)
-    var isIpad = (/ipad/gi).test(UA)
-    var isIOS = isIphone || isIpad
-    var isIOS7 = isIOS && (/os\s7/gi).test(UA)
-    var has3d = 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()
+    var userAgent    = window.navigator.userAgent.toLowerCase()
+    var appVersion   = window.navigator.appVersion.toLowerCase()
 
-    //webkit内核
-    var isWebKit = /applewebkit/ig.test(UV)
-
-    //微信
-    var isWeiXin = /micromessenger/ig.test(UV)
+    var isAndroid    = device.android() || (/android/gi).test(appVersion)
+    var isDesktop    = device.desktop()
+    var isMacOS      = device.find('mac')
+    var isIphone     = device.iphone()
+    var isIpad       = device.ipad()
+    var isIOS        = device.ios()
+    var isWebKit     = device.find('applewebkit')//webkit内核
+    var isWeiXin     = device.find('micromessenger')//微信
+    var hasTouch     = ('ontouchstart' in window)//支持触屏
 
     //针对win8的处理
     var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
-
-    //支持触屏
-    var SUPPORT_TOUCH = ('ontouchstart' in window)
-
-    //支持鼠标
-    var SUPPORT_MOUSE = ('onmousedown' in window)
-
     //移动端仅仅只支持touch
-    var SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH && MOBILE_REGEX.test(UA);
-
+    var only_touch   = hasTouch && MOBILE_REGEX.test(userAgent)
     //判断是否为浏览器
-    //http://localhost:12344/index.html
-    var location = document.location.href
-    var boolBrowser = location.indexOf('http') > -1 || location.indexOf('https') > -1;
-
-
-    /**
-     * 私有前缀
-     * @type {[type]}
-     */
-    var rdashAlpha = /-([a-z]|[0-9])/ig
-    var rmsPrefix = /^-ms-/
-    var fcamelCase = function(all, letter) {
-        return (letter + '').toUpperCase();
-    }
-    var camelCase = function(string) {
-        return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
-    }
-    var PREFIX = ['webkit', 'Moz', 'ms', 'o']
-    var _elementStyle = document.createElement('div').style
-    var _cache = Object.create(null)
-    var _prefixStyle = function(attr) {
-        var name
-            //缓存中存在
-        if (_cache[attr]) {
-            return _cache[attr];
-        }
-        //不需要加前缀
-        if (attr in _elementStyle) {
-            return _cache[attr] = attr;
-        }
-        //需要加前缀
-        PREFIX.forEach(function(v) {
-            if (camelCase(v + '-' + attr) in _elementStyle) {
-                name = '-' + v + '-' + attr;
-                return _cache[attr] = name;
-            }
-        })
-        return name;
-    }
-
-
-
-    /**
-     * css3 keyframes
-     * @return {[type]} [description]
-     */
-    var transitionEnd = 'transitionend'
-    var animationEnd = 'animationend'
-    var keyframes = '@keyframes '
-    var animation = _prefixStyle('animation');
-    (function() {
-        var vendors = animation
-        var transitionEnd_NAMES = {
-            "moz": "transitionend",
-            "webkit": "webkitTransitionEnd",
-            "ms": "MSTransitionEnd",
-            "o": "oTransitionEnd"
-        }
-        var animationEnd_NAMES = {
-            "moz": "animationend",
-            "webkit": "webkitAnimationEnd",
-            "ms": "MSAnimationEnd",
-            "o": "oAnimationEnd"
-        }
-        if (!vendors) return;
-        vendors = vendors.split('-');
-        if (!vendors[1]) return;
-        transitionEnd = transitionEnd_NAMES[vendors[1]];
-        animationEnd = animationEnd_NAMES[vendors[1]];
-        keyframes = '@-' + vendors[1] + '-keyframes ';
-    })()
-
-
-    var isBrowser = boolBrowser ? boolBrowser : !SUPPORT_ONLY_TOUCH
+    var boolBrowser  = location.indexOf('http') > -1 || location.indexOf('https') > -1
+    var isBrowser    = boolBrowser ? boolBrowser : !only_touch
 
     //有hasMutationObserverBug
-    var iosVersionMatch = isIOS && UA.match(/os ([\d_]+)/)
-    var iosVersion = iosVersionMatch && iosVersionMatch[1].split('_')
-        // detecting iOS UIWebView by indexedDB
-    var hasMutationObserverBug = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
-
+    //detecting iOS UIWebView by indexedDB
+    var iosVersionMatch = isIOS && userAgent.match(/os ([\d_]+)/)
+    var iosVersion      = iosVersionMatch && iosVersionMatch[1].split('_')
+    var hasMutationObserver = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
 
     /**
      * 平台支持
-     * @type {Object}
      */
     Xut.extend(Xut.plat, {
-        has3d: has3d,
-        isAndroid: isAndroid,
-        isIphone: isIphone,
-        isIpad: isIpad,
-        isIOS: isIOS,
-        isIOS7: isIOS7,
-        isMacOS: isMacOS,
+        has3d     :  'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix(),
+        isAndroid : isAndroid,
+        isIphone  : isIphone,
+        isIpad    : isIpad,
+        isIOS     : isIOS,
+        isMacOS   : isMacOS,
 
-        hasMutationObserverBug: hasMutationObserverBug,
+        /**
+         * 是平板设备
+         * ipad
+         * android Tablet
+         */
+        isTablet: device.tablet(),
 
         /**
          * 是否在支持插件
@@ -422,7 +643,7 @@ String.styleFormat = function(format) {
         hasPlugin: false,
 
         /**
-         * 不能自动播放媒体
+         * 是否能自动播放媒体
          * audio
          * video
          * @type {[type]}
@@ -431,13 +652,12 @@ String.styleFormat = function(format) {
          * 是webkit
          * 是手机端浏览器
          */
-        noAutoPlayMedia: !isWeiXin && isBrowser && SUPPORT_ONLY_TOUCH,
+        hasAutoPlayAudio: isWeiXin || isDesktop,
 
         /**
          * 支持触摸
-         * @type {Boolean}
          */
-        hasTouch: SUPPORT_ONLY_TOUCH,
+        hasTouch: only_touch,
 
         /**
          * 游览器平台 解决ios Android浏览器判断问题
@@ -447,45 +667,93 @@ String.styleFormat = function(format) {
 
         /**
          * 2015.3.23
-         * isSurface
          * 可以点击与触摸
          * @type {Boolean}
          */
-        isSurface: SUPPORT_TOUCH && SUPPORT_MOUSE && !SUPPORT_ONLY_TOUCH,
+        isMouseTouch: hasTouch && ('onmousedown' in window) && !only_touch,
 
         /**
          * 是否桌面
          * @type {Boolean}
          */
-        isDesktop: !SUPPORT_ONLY_TOUCH,
+        isDesktop: isDesktop,
 
         /**
-         * 事件对象
-         * @param  {[type]} event    [description]
-         * @param  {[type]} original [description]
-         * @return {[type]}          [description]
+         * 是否支持Mutation
+         * @type {Boolean}
          */
-        evtTarget: function(event, original) {
-            var currTouches = null;
-            if (SUPPORT_ONLY_TOUCH) {
-                currTouches = event.touches;
-                if (currTouches && currTouches.length > 0) {
-                    event = currTouches[0];
-                }
-            }
-            return original ? event : event.target;
-        }
+        supportMutationObserver: !hasMutationObserver,
     })
+
+
+    //私有前缀
+    var rdashAlpha = /-([a-z]|[0-9])/ig
+    var rmsPrefix = /^-ms-/
+    var fcamelCase = function(all, letter) {
+        return(letter + '').toUpperCase();
+    }
+    var camelCase = function(string) {
+        return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
+    }
+    var prefix = ['webkit', 'Moz', 'ms', 'o']
+    var elementStyle = document.createElement('div').style
+    var cache = Object.create(null)
+    var prefixStyle = function(attr) {
+        var name
+        //缓存中存在
+        if(cache[attr]) {
+            return cache[attr];
+        }
+        //不需要加前缀
+        if(attr in elementStyle) {
+            return cache[attr] = attr;
+        }
+        //需要加前缀
+        prefix.forEach(function(v) {
+            if(camelCase(v + '-' + attr) in elementStyle) {
+                name = '-' + v + '-' + attr;
+                return cache[attr] = name;
+            }
+        })
+        return name;
+    }
+
+    //css3 keyframes
+    var transitionEnd = 'transitionend'
+    var animationEnd = 'animationend'
+    var keyframes = '@keyframes '
+    var animation = prefixStyle('animation');
+    var adapterPrefix = function() {
+        var vendors = animation
+        var transitionName = {
+            "moz"    : "transitionend",
+            "webkit" : "webkitTransitionEnd",
+            "ms"     : "MSTransitionEnd",
+            "o"      : "oTransitionEnd"
+        }
+        var animationName = {
+            "moz"    : "animationend",
+            "webkit" : "webkitAnimationEnd",
+            "ms"     : "MSAnimationEnd",
+            "o"      : "oAnimationEnd"
+        }
+        if(!vendors) return;
+        vendors = vendors.split('-');
+        if(!vendors[1]) return;
+        transitionEnd = transitionName[vendors[1]];
+        animationEnd = animationName[vendors[1]];
+        keyframes = '@-' + vendors[1] + '-keyframes ';
+    }
+    adapterPrefix()
 
 
     /**
      * 支持转换效果
      * @type {Boolean}
      */
-    var hasPerspective = _prefixStyle('perspective') in _elementStyle
+    var hasPerspective = prefixStyle('perspective') in elementStyle
     var translateZ = hasPerspective ? ' translateZ(0)' : ''
-    var maskBoxImage = _prefixStyle('mask-box-image')
-
+    var maskBoxImage = prefixStyle('mask-box-image')
 
     var reqAnimationFrame = window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -512,18 +780,18 @@ String.styleFormat = function(format) {
          * 前缀
          * @type {[type]}
          */
-        prefixStyle: _prefixStyle,
+        prefixStyle: prefixStyle,
 
         /**
          * transform
          * @type {[type]}
          */
-        transform: _prefixStyle('transform'),
-        transition: _prefixStyle('transition'),
-        transitionDuration: _prefixStyle('transition-duration'),
-        transitionDelay: _prefixStyle('transition-delay'),
-        transformOrigin: _prefixStyle('transform-origin'),
-        transitionTimingFunction: _prefixStyle('transition-timing-function'),
+        transform: prefixStyle('transform'),
+        transition: prefixStyle('transition'),
+        transitionDuration: prefixStyle('transition-duration'),
+        transitionDelay: prefixStyle('transition-delay'),
+        transformOrigin: prefixStyle('transform-origin'),
+        transitionTimingFunction: prefixStyle('transition-timing-function'),
         transitionEnd: transitionEnd,
 
         /**
@@ -531,8 +799,8 @@ String.styleFormat = function(format) {
          * @type {[type]}
          */
         animation: animation,
-        animationDelay: _prefixStyle('animation-delay'),
-        animationPlayState: _prefixStyle('animation-play-state'),
+        animationDelay: prefixStyle('animation-delay'),
+        animationPlayState: prefixStyle('animation-play-state'),
         animationEnd: animationEnd,
         keyframes: keyframes,
 
@@ -549,16 +817,16 @@ String.styleFormat = function(format) {
          * 额外样式
          * @type {[type]}
          */
-        filter: _prefixStyle('filter'),
+        filter: prefixStyle('filter'),
         maskBoxImage: maskBoxImage,
-        borderRadius: _prefixStyle('border-radius'),
+        borderRadius: prefixStyle('border-radius'),
 
         /**
          * css3分栏
          * @type {[type]}
          */
-        columnWidth: _prefixStyle('column-width'),
-        columnGap: _prefixStyle('column-gap')
+        columnWidth: prefixStyle('column-width'),
+        columnGap: prefixStyle('column-gap')
 
     })
 
@@ -41322,7 +41590,14 @@ var config$1 = {
    *}
    */
   imageSuffix: null,
-  baseImageSuffix: '', //基础图片后缀
+
+  /**
+   * 基础图片后缀
+   * content类型
+   * flow类型
+   * @type {String}
+   */
+  baseImageSuffix: '',
 
   /**
    * 不使用高清图片
@@ -42360,13 +42635,13 @@ function normalizeUNCRoot(device) {
  * 2015.3.24
  * 1 isBrowser
  * 2 isMobile
- * 3 isSurface
+ * 3 isMouseTouch
  */
 var transitionEnd = Xut.style.transitionEnd;
 
 //2015.3.23
 //可以点击与触摸
-var isSurface = Xut.plat.isSurface;
+var isMouseTouch = Xut.plat.isMouseTouch;
 var hasTouch = Xut.plat.hasTouch;
 
 //触发事件名
@@ -42384,7 +42659,7 @@ var orderName = {
 };
 
 var eventNames = function () {
-    if (isSurface) {
+    if (isMouseTouch) {
         return {
             touch: touchList,
             mouse: mouseList
@@ -42412,7 +42687,7 @@ function addHandler(element, eventName, handler, capture) {
         var dataCache = eventDataCache[uuid];
         if (dataCache) {
             if (dataCache[eventName]) {
-                //如果是isSurface支持同样的事件
+                //如果是isMouseTouch支持同样的事件
                 //所以transitionend就比较特殊了，因为都是同一个事件名称
                 //所以只要一份，所以重复绑定就需要去掉
                 if (eventName !== 'transitionend') {
@@ -42447,7 +42722,7 @@ var eachApply = function eachApply(events, callbacks, processor, isRmove) {
 
 /**
  * 合并事件绑定处理
- * 因为isSurface设备上
+ * 因为isMouseTouch设备上
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
@@ -42507,7 +42782,7 @@ function removeone(element, eventName) {
 
 /**
  * 销毁事件绑定处理
- * 因为isSurface设备上
+ * 因为isMouseTouch设备上
  * 要同时支持2种方式
  * @return {[type]} [description]
  */
@@ -42527,7 +42802,7 @@ var removeEvent = function removeEvent(element, events, callbacks) {
 var compatibility = function compatibility(controller, element, callbacks, capture) {
     //如果两者都支持
     //鼠标与触摸
-    if (isSurface) {
+    if (isMouseTouch) {
         _.each(eventNames, function (events) {
             controller(element, events, callbacks, capture);
         });
@@ -42560,7 +42835,7 @@ var checkBindCancel = function checkBindCancel(callbacks) {
 
 /**
  * 合并事件绑定处理
- * 因为isSurface设备上
+ * 因为isMouseTouch设备上
  * 要同时支持2种方式
  * bindTap(eventContext,{
  *     start   : start,
@@ -43026,6 +43301,59 @@ function $$save(name, val) {
 }
 
 var CEIL$1 = Math.ceil;
+/**
+ * 获取正确的图片文件名
+ * 因为图片可能存在
+ * .mi.jpg
+ * .mi.php
+ * .hi.jpg
+ * .hi.php
+ * 等等这样的地址
+ * @return {[type]} [description]
+ */
+function analysisImageName(src) {
+
+    var suffix = src;
+    var original = src;
+
+    //有基础后缀
+    if (config.baseImageSuffix) {
+        var baseImageSuffix = '.' + config.baseImageSuffix + '.';
+        var exp = new RegExp('\\w+' + baseImageSuffix + '(jpg|png)', 'gi');
+        var result = src.match(exp);
+        if (result && result.length) {
+            suffix = result[0];
+            original = suffix.replace(baseImageSuffix, '.');
+        } else {
+            $$warn('analysisImageUrl解析出错,result：' + result);
+        }
+    }
+    //如果没有后缀
+    else {
+            var _result = src.match(/\w+.(jpg|png)/gi);
+            if (_result && _result.length) {
+                suffix = original = _result[0];
+            } else {
+                $$warn('analysisImageUrl解析出错,result：' + _result);
+            }
+        }
+
+    return {
+        original: original, //原始版
+        suffix: suffix //带有后缀
+    };
+}
+
+/**
+ * 给地址增加私有后缀
+ */
+function insertImageUrlSuffix(originalUrl, suffix) {
+    if (originalUrl && suffix) {
+        return originalUrl.replace(/\w+\./ig, '$&' + suffix + '.');
+    }
+    return originalUrl;
+}
+
 /**
  * 获取资源
  * @param  {[type]} url [description]
@@ -47615,7 +47943,7 @@ var createli = function createli(_ref) {
 
     //增加一个main-content放body内容
     //增加一个header-footer放溢出的页眉页脚
-    html = '<li id="' + prefix + '"\n            data-id="' + pageData._id + '"\n            data-map="' + base.pid + '"\n            data-pageType="' + base.pageType + '"\n            data-container="true"\n            class="xut-flip fix-transform"\n            style="width:' + getStyle.visualWidth + 'px;\n                   height:' + getStyle.visualHeight + 'px;\n                   left:' + getStyle.visualLeft + 'px;\n                   top:' + getStyle.visualTop + 'px;\n                   ' + TANSFROM + ':' + translate + ';\n                   ' + background + '\n                   ' + customStyle + '">\n            <div class="page-pinch">\n                <div data-type="main-content"></div>\n                <div data-type="header-footer"></div>\n            </div>\n        </li>';
+    html = '<li id="' + prefix + '"\n            data-id="' + pageData._id + '"\n            data-map="' + base.pid + '"\n            data-pageType="' + base.pageType + '"\n            data-container="true"\n            class="xut-flip preserve-3d"\n            style="width:' + getStyle.visualWidth + 'px;\n                   height:' + getStyle.visualHeight + 'px;\n                   left:' + getStyle.visualLeft + 'px;\n                   top:' + getStyle.visualTop + 'px;\n                   ' + TANSFROM + ':' + translate + ';\n                   ' + background + '\n                   ' + customStyle + '">\n            <div class="page-pinch">\n                <div data-type="main-content"></div>\n                <div data-type="header-footer"></div>\n            </div>\n        </li>';
 
     return String.styleFormat(html);
 };
@@ -48970,219 +49298,6 @@ var LetterEffect = function () {
     }]);
     return LetterEffect;
 }();
-
-/**
- * 当监听的节点内容发生变化时,触发指定的回调
- * @param opts {
- *   container:父容器,dom对象或jQuery对象
- *   content  :要加入父容器的内容,字符串或jQuery对象
- *   position :内容插入父容器的位置,'first' 表示在前加入,默认在末尾
- *   delay    :延时,默认0
- *   }
- * @version  1.02
- * @author [author] bjtqti
- * @return {[type]} [description]
- */
-
-var DOC = document;
-var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-
-var implementation = DOC.implementation.hasFeature("MutationEvents", "2.0");
-
-/**
- * Defer a task to execute it asynchronously. Ideally this
- * should be executed as a microtask, so we leverage
- * MutationObserver if it's available, and fallback to
- * setTimeout(0).
- *
- * @param {Function} cb
- * @param {Object} ctx
- */
-var _nextTick = function () {
-    var callbacks = [];
-    var pending = false;
-    var timerFunc;
-
-    function nextTickHandler() {
-        pending = false;
-        var copies = callbacks.slice(0);
-        callbacks = [];
-        for (var i = 0; i < copies.length; i++) {
-            copies[i]();
-        }
-    }
-
-    if (typeof MutationObserver !== 'undefined' && !Xut.plat.hasMutationObserverBug) {
-        var counter = 1;
-        var observer = new MutationObserver(nextTickHandler);
-        var textNode = document.createTextNode(counter);
-        observer.observe(textNode, {
-            characterData: true
-        });
-        timerFunc = function timerFunc() {
-            counter = (counter + 1) % 2;
-            textNode.data = counter;
-        };
-    } else {
-        // webpack attempts to inject a shim for setImmediate
-        // if it is used as a global, so we have to work around that to
-        // avoid bundling unnecessary code.
-        var context = Xut.plat.isBrowser ? window : typeof global !== 'undefined' ? global : {};
-        timerFunc = context.setImmediate || setTimeout;
-    }
-    return function (cb, ctx) {
-        var func = ctx ? function () {
-            cb.call(ctx);
-        } : cb;
-        callbacks.push(func);
-        if (pending) return;
-        pending = true;
-        timerFunc(nextTickHandler, 0);
-    };
-}();
-
-var nextTick = function nextTick(_ref, callback, context) {
-    var container = _ref.container,
-        content = _ref.content,
-        position = _ref.position,
-        _ref$delay = _ref.delay,
-        delay = _ref$delay === undefined ? 0 : _ref$delay;
-
-
-    //如果只提供一个回到函数
-    if (arguments.length === 1 && typeof arguments[0] === 'function') {
-        callback = arguments[0];
-        if (typeof callback === 'function') {
-            return _nextTick(callback);
-        }
-        console.log('nextTick: 参数提供错误');
-        return;
-    }
-
-    if (!container || !content) {
-        return;
-    }
-
-    //检查容器---$(container) 转为dom对象
-    if (container instanceof $) {
-        container = container[0];
-    }
-
-    if (container.nodeType !== 1) {
-        console.log('nextTick: container must be HTMLLIElement ');
-        return;
-    }
-
-    var animatId = 'T' + (Math.random() * 10000 << 1);
-    var tick = DOC.createElement('input');
-
-    //标记任务
-    tick.setAttribute('value', animatId);
-
-    //检查内容
-    if (typeof content === 'string') {
-        var temp = $(content);
-        if (!temp[0]) {
-            //纯文本内容
-            temp = DOC.createTextNode(content);
-            temp = $(temp);
-        }
-        content = temp;
-        temp = null;
-    }
-
-    /**
-     * 完成任务后处理&Observer
-     * @return {[type]} [description]
-     */
-    var _completeTask = function _completeTask() {
-        container.removeChild(tick);
-        callback.call(context);
-        container = null;
-        tick = null;
-        context = null;
-    };
-
-    /**
-     * 将内容加入父容器
-     * @return {[type]} [description]
-     */
-    var _appendChild = function _appendChild() {
-        //拼接内容
-        var frag = DOC.createDocumentFragment();
-        var len = content.length;
-        for (var i = 0; i < len; i++) {
-            frag.appendChild(content[i]);
-        }
-        frag.appendChild(tick);
-
-        //判断插入的位置
-        if (position === 'first') {
-            container.insertBefore(frag, container.firstChild);
-        } else {
-            container.appendChild(frag);
-        }
-
-        frag = null;
-
-        //触发变动事件
-        tick.setAttribute('value', animatId);
-    };
-
-    if (MutationObserver) {
-        var observer = new MutationObserver(function (mutations) {
-            mutations.forEach(function (record) {
-                if (record.oldValue === animatId) {
-                    _completeTask();
-                    observer = null;
-                }
-            });
-        });
-
-        //设置要监听的属性
-        observer.observe(tick, {
-            attributes: true,
-            //childList: true,
-            attributeOldValue: true,
-            attributeFilter: ["value"] //只监听value属性,提高性能
-        });
-
-        _appendChild();
-    } else {
-
-        //检测是否支持DOM变动事件
-        if (implementation) {
-            (function () {
-
-                /**
-                 * 完成任务后处理&Event
-                 * @param  {[type]} event [description]
-                 * @return {[type]}       [description]
-                 */
-                var _finishTask = function _finishTask(event) {
-                    if (event.target.value === animatId) {
-                        //container.removeEventListener('DOMNodeRemoved',_finishTask,false);
-                        container.removeEventListener('DOMNodeInserted', _finishTask, false);
-                        callback.call(context);
-                    }
-                };
-
-                //container.addEventListener('DOMNodeRemoved',_finishTask,false);
-                container.addEventListener('DOMNodeInserted', _finishTask, false);
-                _appendChild();
-                container.removeChild(tick);
-            })();
-        } else {
-            //歉容Android2.xx处理
-            _appendChild();
-            setTimeout(function () {
-                _completeTask();
-            }, delay);
-        }
-    }
-};
-
-Xut.nextTick = nextTick;
 
 /**
  * 关闭按钮
@@ -50915,6 +51030,219 @@ function contentParser(compileActivitys, data) {
         'createActivitys': activityRelated
     });
 }
+
+/**
+ * 当监听的节点内容发生变化时,触发指定的回调
+ * @param opts {
+ *   container:父容器,dom对象或jQuery对象
+ *   content  :要加入父容器的内容,字符串或jQuery对象
+ *   position :内容插入父容器的位置,'first' 表示在前加入,默认在末尾
+ *   delay    :延时,默认0
+ *   }
+ * @version  1.02
+ * @author [author] bjtqti
+ * @return {[type]} [description]
+ */
+
+var DOC = document;
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+
+var implementation = DOC.implementation.hasFeature("MutationEvents", "2.0");
+
+/**
+ * Defer a task to execute it asynchronously. Ideally this
+ * should be executed as a microtask, so we leverage
+ * MutationObserver if it's available, and fallback to
+ * setTimeout(0).
+ *
+ * @param {Function} cb
+ * @param {Object} ctx
+ */
+var _nextTick = function () {
+    var callbacks = [];
+    var pending = false;
+    var timerFunc;
+
+    function nextTickHandler() {
+        pending = false;
+        var copies = callbacks.slice(0);
+        callbacks = [];
+        for (var i = 0; i < copies.length; i++) {
+            copies[i]();
+        }
+    }
+
+    if (typeof MutationObserver !== 'undefined' && Xut.plat.supportMutationObserver) {
+        var counter = 1;
+        var observer = new MutationObserver(nextTickHandler);
+        var textNode = document.createTextNode(counter);
+        observer.observe(textNode, {
+            characterData: true
+        });
+        timerFunc = function timerFunc() {
+            counter = (counter + 1) % 2;
+            textNode.data = counter;
+        };
+    } else {
+        // webpack attempts to inject a shim for setImmediate
+        // if it is used as a global, so we have to work around that to
+        // avoid bundling unnecessary code.
+        var context = Xut.plat.isBrowser ? window : typeof global !== 'undefined' ? global : {};
+        timerFunc = context.setImmediate || setTimeout;
+    }
+    return function (cb, ctx) {
+        var func = ctx ? function () {
+            cb.call(ctx);
+        } : cb;
+        callbacks.push(func);
+        if (pending) return;
+        pending = true;
+        timerFunc(nextTickHandler, 0);
+    };
+}();
+
+var nextTick = function nextTick(_ref, callback, context) {
+    var container = _ref.container,
+        content = _ref.content,
+        position = _ref.position,
+        _ref$delay = _ref.delay,
+        delay = _ref$delay === undefined ? 0 : _ref$delay;
+
+
+    //如果只提供一个回到函数
+    if (arguments.length === 1 && typeof arguments[0] === 'function') {
+        callback = arguments[0];
+        if (typeof callback === 'function') {
+            return _nextTick(callback);
+        }
+        console.log('nextTick: 参数提供错误');
+        return;
+    }
+
+    if (!container || !content) {
+        return;
+    }
+
+    //检查容器---$(container) 转为dom对象
+    if (container instanceof $) {
+        container = container[0];
+    }
+
+    if (container.nodeType !== 1) {
+        console.log('nextTick: container must be HTMLLIElement ');
+        return;
+    }
+
+    var animatId = 'T' + (Math.random() * 10000 << 1);
+    var tick = DOC.createElement('input');
+
+    //标记任务
+    tick.setAttribute('value', animatId);
+
+    //检查内容
+    if (typeof content === 'string') {
+        var temp = $(content);
+        if (!temp[0]) {
+            //纯文本内容
+            temp = DOC.createTextNode(content);
+            temp = $(temp);
+        }
+        content = temp;
+        temp = null;
+    }
+
+    /**
+     * 完成任务后处理&Observer
+     * @return {[type]} [description]
+     */
+    var _completeTask = function _completeTask() {
+        container.removeChild(tick);
+        callback.call(context);
+        container = null;
+        tick = null;
+        context = null;
+    };
+
+    /**
+     * 将内容加入父容器
+     * @return {[type]} [description]
+     */
+    var _appendChild = function _appendChild() {
+        //拼接内容
+        var frag = DOC.createDocumentFragment();
+        var len = content.length;
+        for (var i = 0; i < len; i++) {
+            frag.appendChild(content[i]);
+        }
+        frag.appendChild(tick);
+
+        //判断插入的位置
+        if (position === 'first') {
+            container.insertBefore(frag, container.firstChild);
+        } else {
+            container.appendChild(frag);
+        }
+
+        frag = null;
+
+        //触发变动事件
+        tick.setAttribute('value', animatId);
+    };
+
+    if (MutationObserver) {
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (record) {
+                if (record.oldValue === animatId) {
+                    _completeTask();
+                    observer = null;
+                }
+            });
+        });
+
+        //设置要监听的属性
+        observer.observe(tick, {
+            attributes: true,
+            //childList: true,
+            attributeOldValue: true,
+            attributeFilter: ["value"] //只监听value属性,提高性能
+        });
+
+        _appendChild();
+    } else {
+
+        //检测是否支持DOM变动事件
+        if (implementation) {
+            (function () {
+
+                /**
+                 * 完成任务后处理&Event
+                 * @param  {[type]} event [description]
+                 * @return {[type]}       [description]
+                 */
+                var _finishTask = function _finishTask(event) {
+                    if (event.target.value === animatId) {
+                        //container.removeEventListener('DOMNodeRemoved',_finishTask,false);
+                        container.removeEventListener('DOMNodeInserted', _finishTask, false);
+                        callback.call(context);
+                    }
+                };
+
+                //container.addEventListener('DOMNodeRemoved',_finishTask,false);
+                container.addEventListener('DOMNodeInserted', _finishTask, false);
+                _appendChild();
+                container.removeChild(tick);
+            })();
+        } else {
+            //歉容Android2.xx处理
+            _appendChild();
+            setTimeout(function () {
+                _completeTask();
+            }, delay);
+        }
+    }
+};
+
+Xut.nextTick = nextTick;
 
 var TRANSFORM = Xut.style.transform;
 
@@ -61628,7 +61956,7 @@ var TaskContents = function () {
         key: '_zoomImage',
         value: function _zoomImage(data) {
             var self = this;
-            self.zoomObj = {}; //保存缩放对象
+            self.zoomObjs = {}; //保存缩放对象
             _.each(data.contentsFragment, function (node) {
                 //需要单独绑定点击放大功能
                 var behaviorData = data.zoomBehavior[node.id];
@@ -61659,20 +61987,24 @@ var TaskContents = function () {
                                 if (hasMove) return;
                                 var $node = $(node);
                                 var $imgNode = $node.find('img');
-                                var src = config.pathAddress + $imgNode[0].src.match(/\w+.(jpg|png)/gi);
-                                var zoomObj = self.zoomObj[src];
-                                if (zoomObj) {
-                                    zoomObj.play();
+                                //图片src必须存在
+                                if ($imgNode[0] && !$imgNode[0].src) {
+                                    return;
+                                }
+                                var analysisName = analysisImageName($imgNode[0].src);
+                                var originalSuffixUrl = config.pathAddress + analysisName.suffix;
+                                if (self.zoomObjs[originalSuffixUrl]) {
+                                    self.zoomObjs[originalSuffixUrl].play();
                                 } else {
                                     var hqSrc = void 0;
+
                                     //如果启动了高清图片
-                                    //并且找的到图片后缀
                                     if (config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-                                        hqSrc = src.replace('.', '.' + config.imageSuffix['1440'] + '.');
+                                        hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440']);
                                     }
-                                    self.zoomObj[src] = new Zoom({
+                                    self.zoomObjs[src] = new Zoom({
                                         element: $imgNode,
-                                        originalSrc: src,
+                                        originalSrc: originalSuffixUrl,
                                         hdSrc: hqSrc
                                     });
                                 }
@@ -61806,10 +62138,10 @@ var TaskContents = function () {
                 this.zoomBehavior = null;
 
                 //清理缩放对象
-                _.each(this.zoomObj, function (zoomObj) {
-                    zoomObj.destroy();
+                _.each(this.zoomObjs, function (zoom) {
+                    zoom.destroy();
                 });
-                this.zoomObj = null;
+                this.zoomObjs = null;
             }
 
             this.canvasRelated = null;
@@ -65716,6 +66048,12 @@ var getPageStyle = function getPageStyle(pageIndex) {
     return pageBase && pageBase.getStyle;
 };
 
+var makeAccess = function makeAccess(action, direction, distance, pageStyles) {
+    return function (hooks) {
+        return hooks[action][direction](distance, pageStyles);
+    };
+};
+
 /**
  * 动态计算翻页距离
  * @return {[type]} [description]
@@ -65729,6 +66067,14 @@ function getVisualDistance(_ref) {
         rightIndex = _ref.rightIndex;
 
 
+    var left = 0;
+    var middle = 0;
+    var right = 0;
+
+    //当前视图页面
+    //用来处理页面回调
+    var view = undefined;
+
     //页面的配置样式
     var pageStyles = {
         left: getPageStyle(leftIndex),
@@ -65736,39 +66082,26 @@ function getVisualDistance(_ref) {
         right: getPageStyle(rightIndex)
     };
 
-    var offset = {
-        left: undefined,
-        middle: undefined,
-        right: undefined,
-        //当前视图页面
-        //用来处理页面回调
-        view: undefined
-    };
+    var hooks = makeAccess(action, direction, distance, pageStyles);
 
-    if (action === 'flipMove') {
-        offset.left = leftPageHook[action][direction](distance, pageStyles);
-        offset.middle = distance;
-        offset.right = rightPageHook[action][direction](distance, pageStyles);
-    }
-
-    if (action === 'flipRebound') {
-        offset.left = leftPageHook[action][direction](distance, pageStyles);
-        offset.middle = distance;
-        offset.right = rightPageHook[action][direction](distance, pageStyles);
+    if (action === 'flipMove' || action === 'flipRebound') {
+        left = hooks(leftPageHook);
+        middle = distance;
+        right = hooks(rightPageHook);
     }
 
     if (action === 'flipOver') {
-        offset.left = leftPageHook[action][direction](distance, pageStyles);
-        offset.middle = middlePageHook[action][direction](distance, pageStyles);
-        offset.right = rightPageHook[action][direction](distance, pageStyles);
+        left = hooks(leftPageHook);
+        middle = hooks(middlePageHook);
+        right = hooks(rightPageHook);
         if (direction === 'prev') {
-            offset.view = offset.left;
+            view = left;
         } else {
-            offset.view = offset.right;
+            view = right;
         }
     }
 
-    return [offset.left, offset.middle, offset.right, offset.view];
+    return [left, middle, right, view];
 }
 
 /**
@@ -65827,24 +66160,28 @@ var Section$2 = function () {
     }, {
         key: '_zoomImage',
         value: function _zoomImage(node) {
+
+            if (!node.src) {
+                return;
+            }
+
+            var analysisName = analysisImageName(node.src);
+
             //图片地址
-            var src = config.pathAddress + node.src.match(/\w+.(jpg|png)/gi);
-            if (this.zoomObjs[src]) {
+            var originalSuffixUrl = config.pathAddress + analysisName.suffix;
+            if (this.zoomObjs[originalSuffixUrl]) {
                 //重复调用
-                this.zoomObjs[src].play();
+                this.zoomObjs[originalSuffixUrl].play();
             } else {
                 //如果配置了高清后缀
                 var hqSrc = void 0;
                 //如果启动了高清图片
-                //并且找的到图片后缀
                 if (config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-                    var index = src.lastIndexOf('.');
-                    var imgType = src.substring(index + 1, src.length);
-                    hqSrc = src.replace(imgType, config.imageSuffix['1440'] + '.' + imgType);
+                    hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440']);
                 }
-                this.zoomObjs[src] = new Zoom({
+                this.zoomObjs[originalSuffixUrl] = new Zoom({
                     element: $(node),
-                    originalSrc: src,
+                    originalSrc: originalSuffixUrl,
                     hdSrc: hqSrc
                 });
             }
@@ -69200,9 +69537,9 @@ function styleProportion(data) {
  * 左边页面Translate钩子
  ************************/
 
-function leftTranslate(usefulData) {
-    var middlePageStyle = usefulData.getPageStyle('middle', 'before');
-    var leftPageStyle = usefulData.getPageStyle('before');
+function leftTranslate(useStyleData) {
+    var middlePageStyle = useStyleData.getPageStyle('middle', 'before');
+    var leftPageStyle = useStyleData.getPageStyle('before');
 
     //中间：溢出
     if (middlePageStyle && middlePageStyle.visualLeftInteger) {
@@ -69232,10 +69569,10 @@ function leftTranslate(usefulData) {
  * 右边页面Translate钩子
  ************************/
 
-function rightTranslate(usefulData) {
+function rightTranslate(useStyleData) {
 
-    var middlePageStyle = usefulData.getPageStyle('middle', 'after');
-    var rightPageStyle = usefulData.getPageStyle('after');
+    var middlePageStyle = useStyleData.getPageStyle('middle', 'after');
+    var rightPageStyle = useStyleData.getPageStyle('after');
 
     //中间：溢出
     if (middlePageStyle && middlePageStyle.visualLeftInteger) {
@@ -69283,22 +69620,25 @@ function styleTranslate(_ref) {
     var createIndex = _ref.createIndex,
         currIndex = _ref.currIndex,
         direction = _ref.direction,
-        usefulData = _ref.usefulData;
+        useStyleData = _ref.useStyleData;
 
 
     var translate = void 0;
     var offset = void 0;
+    var offsetLeft = void 0;
+    var offsetMiddle = void 0;
+    var offsetRight = void 0;
 
     if (direction === 'before') {
-        var offsetLeft = leftTranslate(usefulData);
+        offsetLeft = leftTranslate(useStyleData);
         translate = createTranslate$1(offsetLeft);
         offset = offsetLeft;
     } else if (direction === 'middle') {
-        var offsetMiddle = 0;
+        offsetMiddle = 0;
         translate = createTranslate$1(offsetMiddle);
         offset = offsetMiddle;
     } else if (direction === 'after') {
-        var offsetRight = rightTranslate(usefulData);
+        offsetRight = rightTranslate(useStyleData);
         translate = createTranslate$1(offsetRight);
         offset = offsetRight;
     }
@@ -69328,18 +69668,16 @@ var getPageStyle$1 = function getPageStyle$1(pageIndex) {
  */
 function setVisualStyle(_ref) {
     var action = _ref.action,
-        usefulData = _ref.usefulData;
+        useStyleData = _ref.useStyleData;
 
 
-    _.each(usefulData, function (data, index) {
+    _.each(useStyleData, function (data, index) {
         //容器可视区尺寸
         _.extend(data, styleLayout(data.pageVisualMode, data.direction));
-
         //容器内部元素的缩放比
         data.pageProportion = styleProportion(data);
-
         //提供快速索引
-        usefulData['_' + data.direction] = data.pid;
+        useStyleData['_' + data.direction] = data.pid;
     });
 
     /**
@@ -69347,9 +69685,8 @@ function setVisualStyle(_ref) {
      * pageName
      * standbyName 备用名，用于翻页获取
      */
-    usefulData.getPageStyle = function (pageName, standbyName) {
+    useStyleData.getPageStyle = function (pageName, standbyName) {
         var pageStyle = this[this['_' + pageName]];
-
         //翻页动态创建的时候，只能索取到一页
         //所以这里需要动态获取关联的中间页面对象
         if (!pageStyle && pageName === 'middle') {
@@ -69364,7 +69701,7 @@ function setVisualStyle(_ref) {
         return this[this['_' + pageName]];
     };
 
-    _.each(usefulData, function (data, index) {
+    _.each(useStyleData, function (data, index) {
 
         //跳过getStyle方法
         if (_.isFunction(data)) {
@@ -69373,14 +69710,14 @@ function setVisualStyle(_ref) {
 
         //容器的初始translate值
         _.extend(data, styleTranslate({
-            usefulData: usefulData,
+            useStyleData: useStyleData,
             createIndex: data.pid,
             currIndex: data.visiblePid,
             direction: data.direction
         }));
     });
 
-    return usefulData;
+    return useStyleData;
 }
 
 /**
@@ -69539,13 +69876,13 @@ function flowJsonFilter() {
     //配置了远程地址
     //需要把flow的给处理掉
     if (config.launch && config.launch.resource && result.FlowData) {
-        //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
-        //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
         var remoteUrl = config.launch.resource;
         //有基础后缀，需要替换所有的图片地址
         if (config.baseImageSuffix) {
             result.FlowData = result.FlowData.replace(/gallery\/[\w]+\./ig, '$&' + config.baseImageSuffix + '.');
         }
+        //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
+        //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
         result.FlowData = result.FlowData.replace(/<img\s*src=\"[\w\/]+gallery/ig, '<img src=\"' + remoteUrl + '/gallery');
         result.FlowData = result.FlowData.replace(/xlink:href=\"[\w\/]+gallery/ig, 'xlink:href=\"' + remoteUrl + '/gallery');
     }
@@ -70289,8 +70626,10 @@ var Controller = function () {
 
         this.vm = vm;
         this.options = vm.options;
+
         //创建前景页面管理模块
         this.pageMgr = new PageMgr(vm);
+
         // 检测是否需要创母版模块
         if (hasMaster()) {
             this.masterMgr = new MasterMgr(vm);
@@ -70309,16 +70648,10 @@ var Controller = function () {
         key: 'initCreate',
         value: function initCreate() {
             var options = this.options;
-            //pointer
-            //  createPointer
-            //  initPointer
+            //createPointer
+            //initPointer
             var pointer = initPointer$1(options.initIndex, options.pagetotal, options.multiplePages);
             this.pagePointer = pointer.initPointer;
-            //初始化
-            if (this.pageMgr.swipe) {
-                this.pageMgr.swipe.initTranslation(pointer.createPointer, options.initIndex);
-            }
-            //始化构建页面容器对象
             this.createPageBases(pointer.createPointer, options.initIndex, 'init');
         }
 
@@ -70417,7 +70750,7 @@ var Controller = function () {
             var compile = new Stack();
 
             //收集有用的数据
-            var usefulData = hash();
+            var useStyleData = hash();
             _.each(chpaterResults, function (chapterData, index) {
                 compile.push(function () {
 
@@ -70441,7 +70774,7 @@ var Controller = function () {
                     }
 
                     //收集页面之间可配置数据
-                    usefulData[createChapterIndex] = {
+                    useStyleData[createChapterIndex] = {
                         pid: createChapterIndex,
                         visiblePid: visibleChapterIndex,
                         userStyle: userStyle,
@@ -70509,7 +70842,7 @@ var Controller = function () {
              */
             var pageStyle = setVisualStyle({
                 action: action,
-                usefulData: usefulData
+                useStyleData: useStyleData
             });
 
             compile.shiftAll(pageStyle).destroy();
@@ -73375,6 +73708,9 @@ function Destroy() {
 
     //销毁节点
     Xut.Application.$$removeNode && Xut.Application.$$removeNode();
+
+    //启动配置文件去掉
+    config.launch = null;
 }
 
 /****************************************************
@@ -73450,7 +73786,6 @@ function initApplication() {
     Xut.Application.Exit = function () {
         if (config.launch) {
             Destroy('exit');
-            config.launch = null;
         }
     };
 
@@ -73982,13 +74317,13 @@ var createStr = function createStr(chapterId, data, visualWidth, visualHeight, m
 
     //重复加载杂志
     //不刷新的情况处理
-    if (/fix-transform/.test(data)) {
+    if (/section-transform/.test(data)) {
         data = $(data).find("#columns-content").html();
     }
 
     var columnGap = COLUMNTAP + ':' + negativeWidth + 'px';
     var columnWidth = COLUMNWIDTH + ':' + containerWidth + 'px';
-    var container = '\n            <section class="fix-transform" data-flow="true">\n                <div class="page-flow-pinch" data-role="margin" style="width:' + containerWidth + 'px;height:' + containerHeight + 'px;margin-top:' + containerTop + 'px;margin-left:' + containerLeft + 'px;">\n                    <div data-role="column" id="columns-content" style="' + columnWidth + ';height:100%;' + columnGap + '">\n                        ' + data + '\n                    </div>\n                </div>\n            </section>';
+    var container = '\n            <section class="section-transform" data-flow="true">\n                <div class="page-flow-pinch" data-role="margin" style="width:' + containerWidth + 'px;height:' + containerHeight + 'px;margin-top:' + containerTop + 'px;margin-left:' + containerLeft + 'px;">\n                    <div data-role="column" id="columns-content" style="' + columnWidth + ';height:100%;' + columnGap + '">\n                        ' + data + '\n                    </div>\n                </div>\n            </section>';
 
     newViewHight = containerHeight;
 
@@ -74004,7 +74339,7 @@ var resolveCount = function resolveCount($content) {
     return Math.ceil(paraHeight / newViewHight);
 };
 
-var insertColumn = function insertColumn(seasonNode, seasonsId, vWidth, vHeight, columnCount) {
+var insertColumn = function insertColumn(seasonNode, seasonsId, visualWidth, visualHeight, columnCount) {
     for (var i = 0; i < seasonNode.childNodes.length; i++) {
         var chapterNode = seasonNode.childNodes[i];
         if (chapterNode.nodeType == 1) {
@@ -74018,7 +74353,7 @@ var insertColumn = function insertColumn(seasonNode, seasonsId, vWidth, vHeight,
             } else {
                 margin = [0, 0, 0, 0];
             }
-            chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, vWidth, vHeight, margin);
+            chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin);
             columnCount[seasonsId][id] = 0;
         }
     }
@@ -74045,12 +74380,12 @@ function initColumn(callback) {
 
         //容器尺寸设置
         var flowView = resetVisualLayout(1);
-        var vWidth = flowView.width;
-        var vHeight = newViewHight = flowView.height;
+        var visualWidth = flowView.width;
+        var visualHeight = newViewHight = flowView.height;
 
         $container.css({
-            width: vWidth,
-            height: vHeight,
+            width: visualWidth,
+            height: visualHeight,
             display: 'block'
         });
 
@@ -74059,13 +74394,13 @@ function initColumn(callback) {
             var seasonsId = tag.match(/\d/)[0];
             var $chapters = $seasons.children();
             columnCount[seasonsId] = {};
-            insertColumn(node, seasonsId, vWidth, vHeight, columnCount);
+            insertColumn(node, seasonsId, visualWidth, visualHeight, columnCount);
         });
 
-        nextTick({
-            container: $('body'),
-            content: $container
-        }, function () {
+        $('body').append($container);
+
+        //必须延时获取真正的高度
+        setTimeout(function () {
             $seasons.each(function (index, node) {
                 var tag = node.id;
                 var seasonsId = tag.match(/\d/)[0];
@@ -74080,7 +74415,7 @@ function initColumn(callback) {
             $container.hide();
             setCache(columnCount);
             callback(Object.keys(columnCount).length);
-        });
+        }, 500);
     };
 
     //删除存在的节点
@@ -74143,7 +74478,35 @@ var setMode = function setMode(data) {
 };
 
 var getMaxWidth = function getMaxWidth() {
+    if (config.visualSize) {
+        return config.visualSize.width;
+    }
     return window.screen.width > document.documentElement.clientWidth ? window.screen.width : document.documentElement.clientWidth;
+};
+
+/**
+ * 检车分辨率失败的情况
+ * 强制用js转化
+ * 750:  '', //0-1079
+ * 1080: 'mi', //1080-1439
+ * 1440: 'hi' //1440->
+ */
+var setDefaultSuffix = function setDefaultSuffix() {
+    //竖版的情况才调整
+    if (config.screenVertical) {
+        var ratio = window.devicePixelRatio || 1;
+        var maxWidth = getMaxWidth() * ratio;
+
+        if (maxWidth > 1080 && maxWidth < 1439) {
+            config.baseImageSuffix = config.imageSuffix['1080'];
+        }
+        if (maxWidth > 1440) {
+            config.baseImageSuffix = config.imageSuffix['1440'];
+        }
+        if (config.devtools && config.baseImageSuffix) {
+            $$warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix =' + config.baseImageSuffix);
+        }
+    }
 };
 
 /**
@@ -74151,27 +74514,15 @@ var getMaxWidth = function getMaxWidth() {
  */
 function baseConfig(callback) {
 
+    //mini杂志设置
+    //如果是pad的情况下设置font为125%
+    if (config.platform === 'mini' && Xut.plat.isTablet) {
+        $('body').css('font-size', '125%');
+    }
+
     //图片分辨了自适应
     if (config.imageSuffix) {
         var $adaptiveImageNode = $('.xut-adaptive-image');
-
-        //如果检测失败
-        //就默认设置
-        //1080-1439
-        var defaultSuffix = function defaultSuffix() {
-            var ratio = window.devicePixelRatio || 1;
-            var maxWidth = getMaxWidth() * ratio;
-            if (maxWidth > 1080 && maxWidth < 1439) {
-                config.baseImageSuffix = config.imageSuffix['1080'];
-            }
-            if (maxWidth > 1440) {
-                config.baseImageSuffix = config.imageSuffix['1440'];
-            }
-            if (config.devtools && config.baseImageSuffix) {
-                $$warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix =' + config.baseImageSuffix);
-            }
-        };
-
         if ($adaptiveImageNode.length) {
             var baseImageType = $adaptiveImageNode.width();
             var type = config.imageSuffix[baseImageType];
@@ -74179,10 +74530,10 @@ function baseConfig(callback) {
                 //定义基础的图片后缀
                 config.baseImageSuffix = type;
             } else {
-                defaultSuffix();
+                setDefaultSuffix();
             }
         } else {
-            defaultSuffix();
+            setDefaultSuffix();
         }
     }
 
@@ -74464,7 +74815,7 @@ function init$1() {
 
 initGlobalAPI();
 
-Xut.Version = 876;
+Xut.Version = 876.5;
 
 if (Xut.plat.isBrowser) {
 
@@ -74474,7 +74825,7 @@ if (Xut.plat.isBrowser) {
     });
 
     //修复H5音频自动播放bug
-    if (Xut.plat.noAutoPlayMedia) {
+    if (!Xut.plat.hasAutoPlayAudio) {
         fixAudio();
     }
 
