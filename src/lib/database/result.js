@@ -35,21 +35,21 @@ function insertStyle(rule, attribute, value) {
  * 2 flow样式
  * 3 svgsheet
  */
-function flowJsonFilter() {
+function filterColumnData() {
     result = window.SQLResult
 
-    if (!result) {
+    if(!result) {
         $$warn('json数据库加载出错')
         return
     }
 
     //配置了远程地址
     //需要把flow的给处理掉
-    if (config.launch && config.launch.resource && result.FlowData) {
+    if(config.launch && config.launch.resource && result.FlowData) {
         let remoteUrl = config.launch.resource;
         //有基础后缀，需要替换所有的图片地址
-        if(config.baseImageSuffix){
-            result.FlowData = result.FlowData.replace(/gallery\/[\w]+\./ig, '$&'+ config.baseImageSuffix +'.');
+        if(config.baseImageSuffix) {
+            result.FlowData = result.FlowData.replace(/gallery\/[\w]+\./ig, '$&' + config.baseImageSuffix + '.');
         }
         //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
@@ -59,22 +59,52 @@ function flowJsonFilter() {
 
     //全局svg样式
     let hasSvgsheet
-    if (result.svgsheet) {
+    if(result.svgsheet) {
         hasSvgsheet = true;
         insertStyle(result.svgsheet, 'data-svg', 'true');
         result.svgsheet = null;
-    }
-
-    //全局flow样式
-    if (result.FlowStyle) {
-        insertStyle(result.FlowStyle, 'data-flow', 'true');
-        result.FlowStyle = null;
     }
 
     window.SQLResult = null;
 
     return hasSvgsheet
 }
+
+
+/**
+ * width:42.48vw
+ * height  :  66.99vw
+ */
+function replacePara(str, param, prop) {
+    let exp = new RegExp(param + "\\s*:\\s*(\\d+[.0-9]*)\\s*([vw|vh]+)", "gi");
+    return str.replace(exp, function(a,value, unit) {
+        return `${param}:${value * prop}${unit}`
+    })
+}
+
+
+/**
+ * 插入column的样式
+ * 有工具栏
+ * 图片的单位是vw，所以因为工具栏的问题
+ * 所以相对点发生变化，图片要缩放vm
+ */
+export function insertColumnStyle(visualWidth, visualHeight) {
+    if(result.FlowStyle) {
+        let screen = window.screen
+        let screenWidth = screen.width
+        let screenHeight = screen.height
+        if(screenWidth > visualWidth) {
+            result.FlowStyle = replacePara(result.FlowStyle, 'width', visualWidth / screenWidth)
+        }
+        if(screenHeight > visualHeight) {
+            result.FlowStyle = replacePara(result.FlowStyle, 'height', visualHeight / screenHeight)
+        }
+        insertStyle(result.FlowStyle, 'data-flow', 'true');
+        result.FlowStyle = null;
+    }
+}
+
 
 
 /**
@@ -89,16 +119,16 @@ export function importJsonDatabase(callback) {
 
     //如果外联指定路径json数据
     let path = config.launch && config.launch.database;
-    if (path) {
+    if(path) {
         //防止外部链接影响
         window.SQLResult = null
         request(path, function() {
-            callback(flowJsonFilter())
+            callback(filterColumnData())
         })
     }
     //如果外联index.html路径json数据
-    else if (window.SQLResult) {
-        callback(flowJsonFilter())
+    else if(window.SQLResult) {
+        callback(filterColumnData())
     } else {
         callback()
     }
@@ -110,9 +140,9 @@ export function importJsonDatabase(callback) {
  * @return {[type]} [description]
  */
 export function removeStyle() {
-    if (styleElements.length) {
-        for (let i = 0; i < styleElements.length; i++) {
-            if (styleElements[i]) {
+    if(styleElements.length) {
+        for(let i = 0; i < styleElements.length; i++) {
+            if(styleElements[i]) {
                 document.head.removeChild(styleElements[i])
             }
             styleElements[i] = null
@@ -125,7 +155,7 @@ export function removeStyle() {
  * 删除挂载的flow数据
  * @return {[type]} [description]
  */
-export function removeFlowData() {
+export function removeColumnData() {
     result['FlowData'] = null
 }
 

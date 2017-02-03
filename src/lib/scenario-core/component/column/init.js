@@ -1,6 +1,6 @@
 import { config, resetVisualLayout } from '../../../config/index'
 import { setCache } from './get'
-import { getResults, removeFlowData } from '../../../database/result'
+import { getResults, removeColumnData, insertColumnStyle } from '../../../database/result'
 import { nextTick } from '../../../util/nexttick'
 
 const COLUMNWIDTH = Xut.style.columnWidth
@@ -102,7 +102,12 @@ const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnCo
 export default function initColumn(callback) {
 
     let $container = $("#xut-stream-flow")
-    let _initColumn = function() {
+    if($container.length) {
+        //删除存在的节点
+        $container.remove()
+    }
+
+    const init = function(visualWidth, visualHeight) {
 
         //保证有子数据
         let $seasons = $container.children()
@@ -114,15 +119,10 @@ export default function initColumn(callback) {
         //分栏数
         let columnCount = {}
 
-        //容器尺寸设置
-        let flowView     = resetVisualLayout(1)
-        let visualWidth  = flowView.width
-        let visualHeight = newViewHight = flowView.height
-
         $container.css({
-            width   : visualWidth,
-            height  : visualHeight,
-            display : 'block'
+            width: visualWidth,
+            height: visualHeight,
+            display: 'block'
         })
 
         $seasons.each((index, node) => {
@@ -135,8 +135,8 @@ export default function initColumn(callback) {
 
         $('body').append($container)
 
-        //必须延时获取真正的高度
-        setTimeout(function() {
+        //获取真正的高度
+        nextTick(() => {
             $seasons.each((index, node) => {
                 let tag = node.id
                 let seasonsId = tag.match(/\d/)[0]
@@ -151,21 +151,26 @@ export default function initColumn(callback) {
             $container.hide()
             setCache(columnCount)
             callback(Object.keys(columnCount).length)
-        }, 500)
+        })
 
-    }
-
-    //删除存在的节点
-    if($container.length) {
-        $container.remove()
     }
 
     //如果存在json的flow数据
-    let results = getResults()
+    const results = getResults()
     if(results && results.FlowData) {
+        //容器尺寸设置
+        let visuals = resetVisualLayout(1)
+        let visualWidth = visuals.width
+        let visualHeight = newViewHight = visuals.height
+
+        //动态加载样式
+        if(results.FlowStyle) {
+            insertColumnStyle(visualWidth, visualHeight)
+        }
+
         $container = $(results.FlowData)
-        removeFlowData() //删除flowdata，优化缓存
-        _initColumn()
+        removeColumnData() //删除flowdata，优化缓存
+        init(visualWidth, visualHeight)
     } else {
         //没有任何flow
         callback()
