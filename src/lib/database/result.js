@@ -46,15 +46,21 @@ function filterColumnData() {
     //配置了远程地址
     //需要把flow的给处理掉
     if(config.launch && config.launch.resource && result.FlowData) {
-        let remoteUrl = config.launch.resource;
+        let remoteUrl = config.launch.resource + '/';
+
         //有基础后缀，需要替换所有的图片地址
         if(config.baseImageSuffix) {
-            result.FlowData = result.FlowData.replace(/gallery\/[\w]+\./ig, '$&' + config.baseImageSuffix + '.');
+            result.FlowData = result.FlowData.replace(/gallery\/\w+\./ig, '$&' + config.baseImageSuffix + '.');
         }
+
+        // xlink:href
+        // <img src
+        //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-        result.FlowData = result.FlowData.replace(/<img\s*src=\"[\w\/]+gallery/ig, '<img src=\"' + remoteUrl + '/gallery');
-        result.FlowData = result.FlowData.replace(/xlink:href=\"[\w\/]+gallery/ig, 'xlink:href=\"' + remoteUrl + '/gallery');
+        result.FlowData = result.FlowData.replace(/(img\s+src|xlink:href)=\"[\w\/]*(?=gallery)/ig ,function(a,prefix){
+            return `${prefix}="${remoteUrl}`
+        })
     }
 
     //全局svg样式
@@ -72,13 +78,16 @@ function filterColumnData() {
 
 
 /**
- * width:42.48vw
- * height  :  66.99vw
+ * height:42vw
+ * height:42.48vw
+ * height : 42.48vw
+ * height:  66.99vw
+ * height:42.48 vw
  */
 function replacePara(str, param, prop) {
-    let exp = new RegExp(param + "\\s*:\\s*(\\d+[.0-9]*)\\s*([vw|vh]+)", "gi");
-    return str.replace(exp, function(a,value, unit) {
-        return `${param}:${value * prop}${unit}`
+    let exp = new RegExp(param + "\\s*:\\s*(\\d+[.\\d]*)\\s*(?=[vw|vh])", "ig");
+    return str.replace(exp, function(a,value) {
+        return `${param}:${value * prop}`
     })
 }
 
@@ -91,6 +100,7 @@ function replacePara(str, param, prop) {
  */
 export function insertColumnStyle(visualWidth, visualHeight) {
     if(result.FlowStyle) {
+        //是否有比值换算
         let screen = window.screen
         let screenWidth = screen.width
         let screenHeight = screen.height
@@ -100,6 +110,7 @@ export function insertColumnStyle(visualWidth, visualHeight) {
         if(screenHeight > visualHeight) {
             result.FlowStyle = replacePara(result.FlowStyle, 'height', visualHeight / screenHeight)
         }
+        //动态加载
         insertStyle(result.FlowStyle, 'data-flow', 'true');
         result.FlowStyle = null;
     }
