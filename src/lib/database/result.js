@@ -3,6 +3,13 @@ import { $$warn } from '../util/debug'
 import { insertImageUrlSuffix } from '../util/option'
 import { config } from '../config/index'
 
+const suffixRE = /gallery\/\w+\./ig
+const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*(?=gallery)/ig
+const sizeRE = {
+    width: /width\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi,
+    height: /height\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
+}
+
 /**
  * 数据库缓存结果集
  */
@@ -30,42 +37,42 @@ function insertStyle(rule, attribute, value) {
 
 
 /**
- * flow数据过滤
+ * json数据过滤
  * 1 flow数据
  * 2 flow样式
  * 3 svgsheet
  */
-function filterColumnData() {
+function filterJsonData() {
     result = window.SQLResult
 
-    if(!result) {
+    if (!result) {
         $$warn('json数据库加载出错')
         return
     }
 
     //配置了远程地址
     //需要把flow的给处理掉
-    if(config.launch && config.launch.resource && result.FlowData) {
-        let remoteUrl = config.launch.resource + '/';
+    if (config.launch && config.launch.resource && result.FlowData) {
 
         //有基础后缀，需要替换所有的图片地址
-        if(config.baseImageSuffix) {
-            result.FlowData = result.FlowData.replace(/gallery\/\w+\./ig, '$&' + config.baseImageSuffix + '.');
+        if (config.baseImageSuffix) {
+            result.FlowData = result.FlowData.replace(suffixRE, '$&' + config.baseImageSuffix + '.');
         }
 
-        // xlink:href
-        // <img src
+        //xlink:href
+        //<img src
         //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-        result.FlowData = result.FlowData.replace(/(img\s+src|xlink:href)=\"[\w\/]*(?=gallery)/ig ,function(a,prefix){
+        let remoteUrl = config.launch.resource + '/';
+        result.FlowData = result.FlowData.replace(urlRE, function(a, prefix) {
             return `${prefix}="${remoteUrl}`
         })
     }
 
     //全局svg样式
     let hasSvgsheet
-    if(result.svgsheet) {
+    if (result.svgsheet) {
         hasSvgsheet = true;
         insertStyle(result.svgsheet, 'data-svg', 'true');
         result.svgsheet = null;
@@ -78,15 +85,15 @@ function filterColumnData() {
 
 
 /**
+ * style width,height替换值
  * height:42vw
  * height:42.48vw
  * height : 42.48vw
  * height:  66.99vw
  * height:42.48 vw
  */
-function replacePara(str, param, prop) {
-    let exp = new RegExp(param + "\\s*:\\s*(\\d+[.\\d]*)\\s*(?=[vw|vh])", "ig");
-    return str.replace(exp, function(a,value) {
+function replaceSize(str, param, prop) {
+    return str.replace(sizeRE[param], function(a, value) {
         return `${param}:${value * prop}`
     })
 }
@@ -99,16 +106,16 @@ function replacePara(str, param, prop) {
  * 所以相对点发生变化，图片要缩放vm
  */
 export function insertColumnStyle(visualWidth, visualHeight) {
-    if(result.FlowStyle) {
+    if (result.FlowStyle) {
         //是否有比值换算
         let screen = window.screen
         let screenWidth = screen.width
         let screenHeight = screen.height
-        if(screenWidth > visualWidth) {
-            result.FlowStyle = replacePara(result.FlowStyle, 'width', visualWidth / screenWidth)
+        if (screenWidth > visualWidth) {
+            result.FlowStyle = replaceSize(result.FlowStyle, 'width', visualWidth / screenWidth)
         }
-        if(screenHeight > visualHeight) {
-            result.FlowStyle = replacePara(result.FlowStyle, 'height', visualHeight / screenHeight)
+        if (screenHeight >= visualHeight) {
+            result.FlowStyle = replaceSize(result.FlowStyle, 'height', visualHeight / screenHeight)
         }
         //动态加载
         insertStyle(result.FlowStyle, 'data-flow', 'true');
@@ -130,16 +137,16 @@ export function importJsonDatabase(callback) {
 
     //如果外联指定路径json数据
     let path = config.launch && config.launch.database;
-    if(path) {
+    if (path) {
         //防止外部链接影响
         window.SQLResult = null
         request(path, function() {
-            callback(filterColumnData())
+            callback(filterJsonData())
         })
     }
     //如果外联index.html路径json数据
-    else if(window.SQLResult) {
-        callback(filterColumnData())
+    else if (window.SQLResult) {
+        callback(filterJsonData())
     } else {
         callback()
     }
@@ -151,9 +158,9 @@ export function importJsonDatabase(callback) {
  * @return {[type]} [description]
  */
 export function removeStyle() {
-    if(styleElements.length) {
-        for(let i = 0; i < styleElements.length; i++) {
-            if(styleElements[i]) {
+    if (styleElements.length) {
+        for (let i = 0; i < styleElements.length; i++) {
+            if (styleElements[i]) {
                 document.head.removeChild(styleElements[i])
             }
             styleElements[i] = null
