@@ -114,7 +114,7 @@ export function insertColumnStyle(visualWidth, visualHeight) {
         if (screenWidth > visualWidth) {
             result.FlowStyle = replaceSize(result.FlowStyle, 'width', visualWidth / screenWidth)
         }
-        if (screenHeight >= visualHeight) {
+        if (screenHeight > visualHeight) {
             result.FlowStyle = replaceSize(result.FlowStyle, 'height', visualHeight / screenHeight)
         }
         //动态加载
