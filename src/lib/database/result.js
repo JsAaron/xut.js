@@ -3,11 +3,18 @@ import { $$warn } from '../util/debug'
 import { insertImageUrlSuffix } from '../util/option'
 import { config } from '../config/index'
 
-const suffixRE = /gallery\/\w+\./ig
-const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*(?=gallery)/ig
+//替换url
+//1. 路径
+//2. 基础后缀
+const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(?=\.[png|jpg]+)/ig
+
+//替换style中的vw,vh单位尺寸
+//width\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
+//height\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
+const makeSizeRE = para => new RegExp(para + "\\s*:\\s*(\\d+[.\\d]*)\\s*(?=[vw|vh])", "ig")
 const sizeRE = {
-    width: /width\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi,
-    height: /height\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
+    width: makeSizeRE('width'),
+    height: makeSizeRE('height')
 }
 
 /**
@@ -45,18 +52,19 @@ function insertStyle(rule, attribute, value) {
 function filterJsonData() {
     result = window.SQLResult
 
-    if (!result) {
+    if(!result) {
         $$warn('json数据库加载出错')
         return
     }
 
     //配置了远程地址
     //需要把flow的给处理掉
-    if (config.launch && config.launch.resource && result.FlowData) {
-
-        //有基础后缀，需要替换所有的图片地址
-        if (config.baseImageSuffix) {
-            result.FlowData = result.FlowData.replace(suffixRE, '$&' + config.baseImageSuffix + '.');
+    let remoteUrl = config.launch.resource
+    if(config.launch && remoteUrl && result.FlowData) {
+        //有基础后缀，需要补上所有的图片地址
+        let baseSuffix = ''
+        if(config.baseImageSuffix) {
+            baseSuffix = `.${config.baseImageSuffix}`
         }
 
         //xlink:href
@@ -64,15 +72,14 @@ function filterJsonData() {
         //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
         //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-        let remoteUrl = config.launch.resource + '/';
-        result.FlowData = result.FlowData.replace(urlRE, function(a, prefix) {
-            return `${prefix}="${remoteUrl}`
+        result.FlowData = result.FlowData.replace(urlRE, function(a, prefix, fileName) {
+            return `${prefix}="${remoteUrl}/gallery/${fileName}${baseSuffix}`
         })
     }
 
     //全局svg样式
     let hasSvgsheet
-    if (result.svgsheet) {
+    if(result.svgsheet) {
         hasSvgsheet = true;
         insertStyle(result.svgsheet, 'data-svg', 'true');
         result.svgsheet = null;
@@ -106,15 +113,15 @@ function replaceSize(str, param, prop) {
  * 所以相对点发生变化，图片要缩放vm
  */
 export function insertColumnStyle(visualWidth, visualHeight) {
-    if (result.FlowStyle) {
+    if(result.FlowStyle) {
         //是否有比值换算
         let screen = window.screen
         let screenWidth = screen.width
         let screenHeight = screen.height
-        if (screenWidth > visualWidth) {
+        if(screenWidth != visualWidth) {
             result.FlowStyle = replaceSize(result.FlowStyle, 'width', visualWidth / screenWidth)
         }
-        if (screenHeight > visualHeight) {
+        if(screenHeight != visualHeight) {
             result.FlowStyle = replaceSize(result.FlowStyle, 'height', visualHeight / screenHeight)
         }
         //动态加载
@@ -137,7 +144,7 @@ export function importJsonDatabase(callback) {
 
     //如果外联指定路径json数据
     let path = config.launch && config.launch.database;
-    if (path) {
+    if(path) {
         //防止外部链接影响
         window.SQLResult = null
         request(path, function() {
@@ -145,7 +152,7 @@ export function importJsonDatabase(callback) {
         })
     }
     //如果外联index.html路径json数据
-    else if (window.SQLResult) {
+    else if(window.SQLResult) {
         callback(filterJsonData())
     } else {
         callback()
@@ -158,9 +165,9 @@ export function importJsonDatabase(callback) {
  * @return {[type]} [description]
  */
 export function removeStyle() {
-    if (styleElements.length) {
-        for (let i = 0; i < styleElements.length; i++) {
-            if (styleElements[i]) {
+    if(styleElements.length) {
+        for(let i = 0; i < styleElements.length; i++) {
+            if(styleElements[i]) {
                 document.head.removeChild(styleElements[i])
             }
             styleElements[i] = null
