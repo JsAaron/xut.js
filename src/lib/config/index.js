@@ -323,7 +323,7 @@ export function initPathAddress() {
  * 默认设置
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
  */
-const setProportion = function(pptWidth, pptHeight, setVisualMode, noModifyValue) {
+const resetProportion = function(pptWidth, pptHeight, setVisualMode, noModifyValue) {
 
     //获取全屏比值，用来设定view的尺寸
     //根据分辨率与PPT排版的比值来确定
@@ -371,7 +371,7 @@ const setLayout = function(pptWidth, pptHeight, screenSize) {
  */
 const setConfig = function(pptWidth, pptHeight, screenSize, setVisualMode, noModifyValue) {
     setLayout(pptWidth, pptHeight, screenSize)
-    setProportion(pptWidth, pptHeight, setVisualMode, noModifyValue)
+    resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue)
 }
 
 /**
@@ -413,11 +413,11 @@ export function initConfig(pptWidth, pptHeight) {
     //所以可能存在要修改尺寸
     if(config.pptHorizontal && config.screenHorizontal && config.visualMode === 3) {
         //可能会修改全局布局尺寸，所以采用3模式探测
-        setProportion(pptWidth, pptHeight, config.visualMode, true)
+        resetProportion(pptWidth, pptHeight, config.visualMode, true)
     } else {
         //强制检测是否是反向显示模式
         //模式3的情况下，用2检测
-        setProportion(pptWidth, pptHeight, config.visualMode === 3 ? 2 : config.visualMode)
+        resetProportion(pptWidth, pptHeight, config.visualMode === 3 ? 2 : config.visualMode)
     }
 
     //如果是PPT与设备反向显示

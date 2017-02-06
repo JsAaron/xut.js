@@ -11,11 +11,7 @@ const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(?=\.[png|jpg]+)/ig
 //替换style中的vw,vh单位尺寸
 //width\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
 //height\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
-const makeSizeRE = para => new RegExp(para + "\\s*:\\s*(\\d+[.\\d]*)\\s*(?=[vw|vh])", "ig")
-const sizeRE = {
-    width: makeSizeRE('width'),
-    height: makeSizeRE('height')
-}
+const sizeRE = /([width|height]+)\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/ig
 
 /**
  * 数据库缓存结果集
@@ -99,9 +95,9 @@ function filterJsonData() {
  * height:  66.99vw
  * height:42.48 vw
  */
-function replaceSize(str, param, prop) {
-    return str.replace(sizeRE[param], function(a, value) {
-        return `${param}:${value * prop}`
+function replaceSize(str, prop) {
+    return str.replace(sizeRE, function(a, key, value) {
+        return `${key}:${value * prop}`
     })
 }
 
@@ -118,12 +114,25 @@ export function insertColumnStyle(visualWidth, visualHeight) {
         let screen = window.screen
         let screenWidth = screen.width
         let screenHeight = screen.height
-        if(screenWidth != visualWidth) {
-            result.FlowStyle = replaceSize(result.FlowStyle, 'width', visualWidth / screenWidth)
+
+        let prop = 0
+
+        //宽度与高度都被缩了
+        if(screenWidth != visualWidth && screenHeight != visualHeight) {
+            prop = Math.min(visualWidth / screenWidth, visualHeight / screenHeight)
         }
-        if(screenHeight != visualHeight) {
-            result.FlowStyle = replaceSize(result.FlowStyle, 'height', visualHeight / screenHeight)
+        //宽度缩了
+        else if(screenWidth != visualWidth) {
+            prop = visualWidth / screenWidth
         }
+        //高度缩了
+        else if(screenHeight != visualHeight) {
+            prop = visualHeight / screenHeight
+        }
+        if(prop) {
+            result.FlowStyle = replaceSize(result.FlowStyle, prop)
+        }
+
         //动态加载
         insertStyle(result.FlowStyle, 'data-flow', 'true');
         result.FlowStyle = null;

@@ -44,7 +44,7 @@ export class Subtitle {
         orgAncestorVisibility = this.orgAncestorVisibility = {}
         _.each(this.ancestors, (node, cid) => {
             visibility = getStyles(node, 'visibility');
-            if (visibility) {
+            if(visibility) {
                 orgAncestorVisibility[cid] = visibility;
             }
         })
@@ -86,17 +86,17 @@ export class Subtitle {
      * 显示/隐藏文本框
      */
     _action(currentTime, audioTime, action, data) {
-        if (audioTime > currentTime - Interval && audioTime < currentTime + Interval) {
+        if(audioTime > currentTime - Interval && audioTime < currentTime + Interval) {
             //创建
-            if (!this.recordRepart[data.start] && action === 'start') {
+            if(!this.recordRepart[data.start] && action === 'start') {
                 this.recordRepart[data.start] = true
                 this._createDom(data)
             }
             //如果是一段字幕结束处理
-            else if (!this.recordRepart[data.end] && action === 'end') {
+            else if(!this.recordRepart[data.end] && action === 'end') {
                 this.recordRepart[data.end] = true
                 var ancestorNode = this.ancestors[data.id]
-                if (ancestorNode) {
+                if(ancestorNode) {
                     ancestorNode.style.visibility = "hidden"
                 }
             }
@@ -172,7 +172,7 @@ export class Subtitle {
         }
 
         //公用同一个contengid,已经存在
-        if (preDiv) {
+        if(preDiv) {
             createContent(preDiv, preP, data);
         } else {
             //创建父元素与子元素
@@ -186,9 +186,9 @@ export class Subtitle {
         }
 
         //操作最外层的content节点
-        if (ancestorNode) {
+        if(ancestorNode) {
             var ancestorNodeValue = getStyles(ancestorNode, 'visibility')
-            if (ancestorNodeValue != 'visible') {
+            if(ancestorNodeValue != 'visible') {
                 ancestorNode.style.visibility = 'visible';
             }
         }
@@ -201,13 +201,14 @@ export class Subtitle {
     destroy() {
         var self = this;
         _.each(this.cacheCreateDivs, function(node) {
-                node.parentNode.removeChild(node)
-            })
-            //恢复初始状态
+            node.parentNode.removeChild(node)
+        })
+
+        //恢复初始状态
         _.each(this.ancestors, function(node, id) {
             var orgValue = self.orgAncestorVisibility[id];
             var currValue = getStyles(node, 'visibility')
-            if (currValue != orgValue) {
+            if(currValue != orgValue) {
                 node.style.visibility = orgValue;
             }
         })
@@ -216,7 +217,7 @@ export class Subtitle {
         this.cacheCreateDivs = null;
         this.changeValue = 0;
         this.parents = null;
-        if (this.timer) {
+        if(this.timer) {
             clearTimeout(this.timer)
             this.timer = 0;
         }
