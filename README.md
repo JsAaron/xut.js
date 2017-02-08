@@ -22,6 +22,7 @@ Front end not just write page, also can do the app, and even desktop client appl
 * Web pages with shell: [miaomiaoxue](http://www.miaomiaoxue.com/)
 * Mobile software: [appone](http://www.appone.cn/)
 * Desktop tools: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
+* Support more platforms......
 
 
 ##The support of the Xut.js
