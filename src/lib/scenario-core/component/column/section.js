@@ -58,17 +58,17 @@ export default class Section {
      */
     _zoomImage(node) {
 
-        if(!node.src) {
+        let src = node.src
+        if(!src) {
             return
         }
 
-        let analysisName = analysisImageName(node.src)
+        let analysisName = analysisImageName(src)
+        let imageOriginalName = analysisName.original
 
-        //图片地址
-        let originalSuffixUrl = config.pathAddress + analysisName.suffix
-        if(this.zoomObjs[originalSuffixUrl]) {
-            //重复调用
-            this.zoomObjs[originalSuffixUrl].play()
+        let zoomObj = this.zoomObjs[imageOriginalName]
+        if(zoomObj) {
+            zoomObj.play()
         } else {
             //如果配置了高清后缀
             let hqSrc
@@ -76,9 +76,9 @@ export default class Section {
             if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
                 hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original,config.imageSuffix['1440'] )
             }
-            this.zoomObjs[originalSuffixUrl] = new Zoom({
+            this.zoomObjs[imageOriginalName] = new Zoom({
                 element: $(node),
-                originalSrc: originalSuffixUrl,
+                originalSrc: config.pathAddress + analysisName.suffix,
                 hdSrc: hqSrc
             })
         }

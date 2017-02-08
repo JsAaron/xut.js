@@ -317,24 +317,26 @@ export default class TaskContents {
                         if(hasMove) return
                         let $node = $(node)
                         let $imgNode = $node.find('img')
-                            //图片src必须存在
-                        if($imgNode[0] && !$imgNode[0].src) {
+
+                        if(!$imgNode.length) {
                             return
                         }
-                        let analysisName = analysisImageName($imgNode[0].src)
-                        let originalSuffixUrl = config.pathAddress + analysisName.suffix
-                        if(self.zoomObjs[originalSuffixUrl]) {
-                            self.zoomObjs[originalSuffixUrl].play()
+
+                        let src = $imgNode[0].src
+                        let zoomObj = self.zoomObjs[src]
+
+                        if(zoomObj) {
+                            zoomObj.play()
                         } else {
                             let hqSrc
-
+                            let analysisName = analysisImageName(src)
                             //如果启动了高清图片
                             if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
                                 hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
                             }
                             self.zoomObjs[src] = new Zoom({
                                 element: $imgNode,
-                                originalSrc: originalSuffixUrl,
+                                originalSrc: config.pathAddress + analysisName.suffix,
                                 hdSrc: hqSrc
                             })
                         }
