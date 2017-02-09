@@ -194,19 +194,32 @@ export class SceneFactory {
         let columnCounts = getColumnCount(this.seasonId)
 
         //如果是min平台强制启动
-        if(Xut.config.platform === 'mini' 
-            || (config.toolType.number !== false && columnCounts)) {
-            let columnChpterCount = 0
-            if(columnCounts) {
-                columnChpterCount = getColumnChpaterCount(this.seasonId)
+        if(Xut.config.platform === 'mini' || (config.toolType.number !== false && columnCounts)) {
+
+            let getColumnTotal = (needGet) => {
+                if(needGet) {
+                    //高度变化后，重新获取
+                    columnCounts = getColumnCount(this.seasonId)
+                }
+                let columnChpterCount = 0
+                if(columnCounts) {
+                    columnChpterCount = getColumnChpaterCount(this.seasonId)
+                }
+                return columnCounts ? (pageTotal + columnCounts - columnChpterCount) : pageTotal
             }
+
             this.numberToolbar = new NumberBar({
                 $rootNode: $rootNode,
                 currentPage: pageIndex,
                 //如果有flowCounts则用
                 //否则就用页面的总数
-                pageTotal: columnCounts ? pageTotal + columnCounts - columnChpterCount : pageTotal
+                pageTotal: getColumnTotal()
             })
+
+            //页面总数改变
+            // Xut.Application.Watch('change:numberTotal', () => {
+            //     this.numberToolbar.updateTotal(getColumnTotal(true))
+            // })
         }
 
 

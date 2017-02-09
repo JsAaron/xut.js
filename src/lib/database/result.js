@@ -13,6 +13,22 @@ const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(?=\.[png|jpg]+)/ig
 //height\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
 const sizeRE = /([width|height]+)\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/ig
 
+//中文符号
+const symbols = {
+    "，": ",",
+    "。": ".",
+    "：": ":",
+    "；": ";",
+    "！": "!",
+    "？": "?",
+    "（": "(",
+    "）": ")",
+    "【": "[",
+    "】": "]"
+}
+const symbolRE = new RegExp(Object.keys(symbols).join("|"), "ig")
+
+
 /**
  * 数据库缓存结果集
  */
@@ -63,6 +79,12 @@ function filterJsonData() {
             baseSuffix = `.${config.baseImageSuffix}`
         }
 
+        // result.FlowData = result.FlowData.replace(symbolRE, function(symbolKey) {
+        //     if(symbols[symbolKey]) {
+        //         return symbols[symbolKey]
+        //     }
+        // })
+
         //xlink:href
         //<img src
         //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
@@ -85,6 +107,7 @@ function filterJsonData() {
 
     return hasSvgsheet
 }
+
 
 
 /**
@@ -110,29 +133,6 @@ function replaceSize(str, prop) {
  */
 export function insertColumnStyle(visualWidth, visualHeight) {
     if(result.FlowStyle) {
-        //是否有比值换算
-        let screen = window.screen
-        let screenWidth = screen.width
-        let screenHeight = screen.height
-
-        let prop = 0
-
-        //宽度与高度都被缩了
-        if(screenWidth != visualWidth && screenHeight != visualHeight) {
-            prop = Math.min(visualWidth / screenWidth, visualHeight / screenHeight)
-        }
-        //宽度缩了
-        else if(screenWidth != visualWidth) {
-            prop = visualWidth / screenWidth
-        }
-        //高度缩了
-        else if(screenHeight != visualHeight) {
-            prop = visualHeight / screenHeight
-        }
-        if(prop) {
-            result.FlowStyle = replaceSize(result.FlowStyle, prop)
-        }
-
         //动态加载
         insertStyle(result.FlowStyle, 'data-flow', 'true');
         result.FlowStyle = null;

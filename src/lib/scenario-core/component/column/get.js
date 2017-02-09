@@ -8,11 +8,24 @@ export function setCache(columnCount) {
 }
 
 /**
+ * 分页页面数
+ */
+export function getChpaterColumn(seasonsId, chapterId) {
+    return cacheColumns[seasonsId] ? cacheColumns[seasonsId][chapterId] : 0
+}
+
+export function setChpaterColumn(seasonsId, chapterId, value) {
+    if(cacheColumns[seasonsId] && cacheColumns[seasonsId][chapterId]) {
+        cacheColumns[seasonsId][chapterId] = value
+    }
+}
+
+/**
  * 是否有流式排版
  * 加快计算
  * @return {Boolean} [description]
  */
-export function hasColumn(){
+export function hasColumn() {
     return cacheColumns
 }
 
@@ -21,12 +34,12 @@ export function hasColumn(){
  * @return {[type]} [description]
  */
 export function getCurrentBeforeCount(seasonId, chapterId) {
-    if (!cacheColumns) return
-    if (!seasonId && !chapterId) return
+    if(!cacheColumns) return
+    if(!seasonId && !chapterId) return
     let seasonIds = cacheColumns[seasonId]
     let count = 0
-    for (let key in seasonIds) {
-        if (key <= chapterId) {
+    for(let key in seasonIds) {
+        if(key <= chapterId) {
             count += seasonIds[key]
                 --count
         }
@@ -39,12 +52,12 @@ export function getCurrentBeforeCount(seasonId, chapterId) {
  * @return {[type]} [description]
  */
 export function getBeforeCount(seasonId, chapterId) {
-    if (!cacheColumns) return
-    if (!seasonId && !chapterId) return
+    if(!cacheColumns) return
+    if(!seasonId && !chapterId) return
     let seasonIds = cacheColumns[seasonId]
     let count = 0
-    for (let key in seasonIds) {
-        if (key < chapterId) {
+    for(let key in seasonIds) {
+        if(key < chapterId) {
             count += seasonIds[key]
                 --count
         }
@@ -58,7 +71,7 @@ export function getBeforeCount(seasonId, chapterId) {
  * @return {[type]}          [description]
  */
 export function getColumnChpaterCount(seasonId) {
-    if (!cacheColumns) return
+    if(!cacheColumns) return
     return Object.keys(cacheColumns[seasonId]).length
 }
 
@@ -70,14 +83,14 @@ export function getColumnChpaterCount(seasonId) {
  * @return {[type]}           [description]
  */
 export function getColumnCount(seasonId, chapterId) {
-    if (!cacheColumns) return
-    if (seasonId) {
-        if (chapterId) {
+    if(!cacheColumns) return
+    if(seasonId) {
+        if(chapterId) {
             return cacheColumns[seasonId] && cacheColumns[seasonId][chapterId]
         } else {
             let seasonIds = cacheColumns[seasonId]
             let count = 0
-            for (let key in seasonIds) {
+            for(let key in seasonIds) {
                 count += seasonIds[key]
             }
             return count

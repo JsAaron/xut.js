@@ -28,7 +28,7 @@ export default class NumberBar {
     _createDom(pageTotal) {
         //存在模式3的情况，所以页码要处理溢出的情况。left值
         let right = 0
-        if (config.visualSize.overflowWidth) {
+        if(config.visualSize.overflowWidth) {
             right = Math.abs(config.visualSize.left * 2) + 'px'
         }
         return $(
@@ -48,8 +48,8 @@ export default class NumberBar {
     }
 
     toggle(state, pointer) {
-        if (pointer !== 'pageNumber') return
-        switch (state) {
+        if(pointer !== 'pageNumber') return
+        switch(state) {
             case 'show':
                 this._showToolBar();
                 break;
@@ -66,9 +66,19 @@ export default class NumberBar {
     _updateText(action, updateIndex) {
         Xut.nextTick(() => {
             this.$currtNode.text(updateIndex)
-            if (action === 'init') {
+            if(action === 'init') {
                 this.$container.show()
             }
+        })
+    }
+
+    /**
+     * 更新总页数
+     * @return {[type]} [description]
+     */
+    updateTotal(updateIndex) {
+        Xut.nextTick(() => {
+            this.$allNode.text(updateIndex)
         })
     }
 
@@ -89,7 +99,7 @@ export default class NumberBar {
         //从正索引开始
         ++parentIndex
 
-        if (!hasColumn()) {
+        if(!hasColumn()) {
             this._updateText(action, parentIndex)
             return
         }
@@ -100,9 +110,9 @@ export default class NumberBar {
 
 
         //前翻页，需要叠加flow的总和
-        if (direction === 'prev') {
+        if(direction === 'prev') {
             //前翻页：内部翻页
-            if (hasSon) {
+            if(hasSon) {
                 updateIndex = parentIndex + beforeCount + sonIndex - 2
             }
             //前翻页：外部往内部翻页，正好前一页是内部页，所以需要获取内部页总和

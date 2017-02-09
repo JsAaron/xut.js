@@ -1,7 +1,17 @@
 import { config, resetVisualLayout } from '../../../config/index'
-import { setCache } from './get'
-import { getResults, removeColumnData, insertColumnStyle } from '../../../database/result'
+import {
+    setCache,
+    getChpaterColumn,
+    setChpaterColumn
+} from './get'
 import { nextTick } from '../../../util/nexttick'
+import { $$warn } from '../../../util/debug'
+import { defAccess } from '../../../util/index'
+import {
+    getResults,
+    removeColumnData,
+    insertColumnStyle
+} from '../../../database/result'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -64,35 +74,91 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
 }
 
 
-const resolveCount = ($content) => {
-    let theChildren = $content.find('#columns-content').children()
-    let paraHeight = 0
-    for(let i = 0; i < theChildren.length; i++) {
-        paraHeight += $(theChildren[i]).height()
-    }
-    return Math.ceil(paraHeight / newViewHight)
-}
-
-
 const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnCount) => {
     for(let i = 0; i < seasonNode.childNodes.length; i++) {
         let chapterNode = seasonNode.childNodes[i]
         if(chapterNode.nodeType == 1) {
             let tag = chapterNode.id
-            let id = tag.match(/\d/)[0]
-
-            //传递的数据
-            let margin = chapterNode.getAttribute('data-margin')
-            if(margin) {
-                margin = margin.split(",")
+            if(tag) {
+                let id = /\d/.exec(tag)[0]
+                let margin = chapterNode.getAttribute('data-margin')
+                if(margin) {
+                    margin = margin.split(",")
+                } else {
+                    margin = [0, 0, 0, 0]
+                }
+                chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin)
+                columnCount[seasonsId][id] = 0
             } else {
-                margin = [0, 0, 0, 0]
+                $$warn('node tag is null on insertColumn')
             }
-            chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin)
-            columnCount[seasonsId][id] = 0
         }
     }
 }
+
+
+const eachColumn = function(columnCount, $seasons, visualWidth, visualHeight) {
+    $seasons.each((index, node) => {
+        let tag = node.id
+        let seasonsId = tag.match(/\d/)[0]
+        let $chapters = $seasons.children()
+        columnCount[seasonsId] = {}
+        insertColumn(node, seasonsId, visualWidth, visualHeight, columnCount)
+    })
+}
+
+
+const resolveCount = ($content) => {
+    let theChildren = $content.find('#columns-content').children()
+    let paraHeight = 0
+    for(let i = 0; i < theChildren.length; i++) {
+        paraHeight += Math.max(theChildren[i].scrollHeight, theChildren[i].clientHeight)
+    }
+    return Math.ceil(paraHeight / newViewHight)
+}
+
+
+/**
+ * 检测columns高度
+ * @return {[type]} [description]
+ */
+const watchColumn = function(seasonsId, chapterId, count) {
+    alert(count)
+    setChpaterColumn(seasonsId, chapterId, count)
+    Xut.Application.Notify('change:numberTotal')
+}
+
+const checkColumnHeight = function($seasons, columnCount, checkCount, callback) {
+    $seasons.each((index, node) => {
+        let tag = node.id
+        let seasonsId = tag.match(/\d/)[0]
+        let $chapters = $seasons.children()
+        $chapters.each(function(index, node) {
+            let tag = node.id
+            if(tag) {
+                let chapterId = tag.match(/\d+/)[0]
+                let count = Number(resolveCount($(node)))
+                if(columnCount[seasonsId][chapterId] != count) {
+                    columnCount[seasonsId][chapterId] = count
+                    watchColumn(seasonsId, chapterId, count)
+                }
+            }
+        })
+    })
+
+    --checkCount
+
+    if(checkCount) {
+        setTimeout(function() {
+            checkColumnHeight($seasons, columnCount, checkCount, callback)
+        }, 500)
+    } else {
+        callback()
+    }
+
+    return
+}
+
 
 
 /**
@@ -103,9 +169,9 @@ export default function initColumn(callback) {
 
     let $container = $("#xut-stream-flow")
     if($container.length) {
-        //删除存在的节点
         $container.remove()
     }
+
 
     const init = function(visualWidth, visualHeight) {
 
@@ -125,34 +191,37 @@ export default function initColumn(callback) {
             display: 'block'
         })
 
-        $seasons.each((index, node) => {
-            let tag = node.id
-            let seasonsId = tag.match(/\d/)[0]
-            let $chapters = $seasons.children()
-            columnCount[seasonsId] = {}
-            insertColumn(node, seasonsId, visualWidth, visualHeight, columnCount)
-        })
+        //插入分栏数据
+        eachColumn(columnCount, $seasons, visualWidth, visualHeight)
 
         $('body').append($container)
 
         //获取真正的高度
-        nextTick(() => {
+        nextTick(function() {
             $seasons.each((index, node) => {
                 let tag = node.id
                 let seasonsId = tag.match(/\d/)[0]
                 let $chapters = $seasons.children()
                 $chapters.each(function(index, node) {
                     let tag = node.id
-                    let chapterId = tag.match(/\d+/)[0]
-                    let count = resolveCount($(node))
-                    columnCount[seasonsId][chapterId] = Number(count)
+                    if(tag) {
+                        let chapterId = tag.match(/\d+/)[0]
+                        let count = resolveCount($(node))
+                        columnCount[seasonsId][chapterId] = Number(count)
+                    }
                 })
             })
-            $container.hide()
+
             setCache(columnCount)
+
+            //检测高度
+            // checkColumnHeight($seasons, $.extend(true, {}, columnCount), 20, function() {
+            //     $container.hide()
+            // })
+            $container.hide()
+
             callback(Object.keys(columnCount).length)
         })
-
     }
 
     //如果存在json的flow数据
@@ -167,7 +236,6 @@ export default function initColumn(callback) {
         if(results.FlowStyle) {
             insertColumnStyle(visualWidth, visualHeight)
         }
-
         $container = $(results.FlowData)
         removeColumnData() //删除flowdata，优化缓存
         init(visualWidth, visualHeight)
