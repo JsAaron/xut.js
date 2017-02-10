@@ -1,8 +1,8 @@
 import { request } from '../util/loader'
-import { $$warn } from '../util/debug'
 import { insertImageUrlSuffix } from '../util/option'
 import { config } from '../config/index'
-
+import { $$warn } from '../util/debug'
+import { loadfile } from '../util/loader'
 //替换url
 //1. 路径
 //2. 基础后缀
@@ -11,22 +11,22 @@ const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(?=\.[png|jpg]+)/ig
 //替换style中的vw,vh单位尺寸
 //width\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
 //height\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
-const sizeRE = /([width|height]+)\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/ig
+// const sizeRE = /([width|height]+)\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/ig
 
 //中文符号
-const symbols = {
-    "，": ",",
-    "。": ".",
-    "：": ":",
-    "；": ";",
-    "！": "!",
-    "？": "?",
-    "（": "(",
-    "）": ")",
-    "【": "[",
-    "】": "]"
-}
-const symbolRE = new RegExp(Object.keys(symbols).join("|"), "ig")
+// const symbols = {
+//     "，": ",",
+//     "。": ".",
+//     "：": ":",
+//     "；": ";",
+//     "！": "!",
+//     "？": "?",
+//     "（": "(",
+//     "）": ")",
+//     "【": "[",
+//     "】": "]"
+// }
+// const symbolRE = new RegExp(Object.keys(symbols).join("|"), "ig")
 
 
 /**
@@ -71,19 +71,13 @@ function filterJsonData() {
 
     //配置了远程地址
     //需要把flow的给处理掉
-    let remoteUrl = config.launch.resource
-    if(config.launch && remoteUrl && result.FlowData) {
+    let remoteUrl = config.launch && config.launch.resource
+    if(remoteUrl && result.FlowData) {
         //有基础后缀，需要补上所有的图片地址
         let baseSuffix = ''
         if(config.baseImageSuffix) {
             baseSuffix = `.${config.baseImageSuffix}`
         }
-
-        // result.FlowData = result.FlowData.replace(symbolRE, function(symbolKey) {
-        //     if(symbols[symbolKey]) {
-        //         return symbols[symbolKey]
-        //     }
-        // })
 
         //xlink:href
         //<img src
@@ -118,11 +112,11 @@ function filterJsonData() {
  * height:  66.99vw
  * height:42.48 vw
  */
-function replaceSize(str, prop) {
-    return str.replace(sizeRE, function(a, key, value) {
-        return `${key}:${value * prop}`
-    })
-}
+// function replaceSize(str, prop) {
+//     return str.replace(sizeRE, function(a, key, value) {
+//         return `${key}:${value * prop}`
+//     })
+// }
 
 
 /**
@@ -131,12 +125,19 @@ function replaceSize(str, prop) {
  * 图片的单位是vw，所以因为工具栏的问题
  * 所以相对点发生变化，图片要缩放vm
  */
-export function insertColumnStyle(visualWidth, visualHeight) {
+export function insertColumnStyle(callback) {
+
+    if(config.launch && config.launch.style) {
+        loadfile(config.launch.style, callback)
+        return
+    }
+
     if(result.FlowStyle) {
-        //动态加载
         insertStyle(result.FlowStyle, 'data-flow', 'true');
         result.FlowStyle = null;
     }
+
+    callback()
 }
 
 

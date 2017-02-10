@@ -107,7 +107,9 @@ const eachColumn = function(columnCount, $seasons, visualWidth, visualHeight) {
     })
 }
 
-
+/**
+ * 解析分栏高度
+ */
 const resolveCount = ($content) => {
     let theChildren = $content.find('#columns-content').children()
     let paraHeight = 0
@@ -117,18 +119,10 @@ const resolveCount = ($content) => {
     return Math.ceil(paraHeight / newViewHight)
 }
 
-
 /**
- * 检测columns高度
- * @return {[type]} [description]
+ * 获取分栏数量
  */
-const watchColumn = function(seasonsId, chapterId, count) {
-    alert(count)
-    setChpaterColumn(seasonsId, chapterId, count)
-    Xut.Application.Notify('change:numberTotal')
-}
-
-const checkColumnHeight = function($seasons, columnCount, checkCount, callback) {
+const getColumnCount = function($seasons, callback) {
     $seasons.each((index, node) => {
         let tag = node.id
         let seasonsId = tag.match(/\d/)[0]
@@ -137,28 +131,12 @@ const checkColumnHeight = function($seasons, columnCount, checkCount, callback) 
             let tag = node.id
             if(tag) {
                 let chapterId = tag.match(/\d+/)[0]
-                let count = Number(resolveCount($(node)))
-                if(columnCount[seasonsId][chapterId] != count) {
-                    columnCount[seasonsId][chapterId] = count
-                    watchColumn(seasonsId, chapterId, count)
-                }
+                let count = resolveCount($(node))
+                callback(seasonsId, chapterId, Number(count))
             }
         })
     })
-
-    --checkCount
-
-    if(checkCount) {
-        setTimeout(function() {
-            checkColumnHeight($seasons, columnCount, checkCount, callback)
-        }, 500)
-    } else {
-        callback()
-    }
-
-    return
 }
-
 
 
 /**
@@ -198,26 +176,14 @@ export default function initColumn(callback) {
 
         //获取真正的高度
         nextTick(function() {
-            $seasons.each((index, node) => {
-                let tag = node.id
-                let seasonsId = tag.match(/\d/)[0]
-                let $chapters = $seasons.children()
-                $chapters.each(function(index, node) {
-                    let tag = node.id
-                    if(tag) {
-                        let chapterId = tag.match(/\d+/)[0]
-                        let count = resolveCount($(node))
-                        columnCount[seasonsId][chapterId] = Number(count)
-                    }
-                })
+
+            //获取分栏数
+            getColumnCount($seasons, function(seasonsId, chapterId, count) {
+                columnCount[seasonsId][chapterId] = count
             })
 
             setCache(columnCount)
 
-            //检测高度
-            // checkColumnHeight($seasons, $.extend(true, {}, columnCount), 20, function() {
-            //     $container.hide()
-            // })
             $container.hide()
 
             callback(Object.keys(columnCount).length)
@@ -229,16 +195,15 @@ export default function initColumn(callback) {
     if(results && results.FlowData) {
         //容器尺寸设置
         let visuals = resetVisualLayout(1)
-        let visualWidth = visuals.width
         let visualHeight = newViewHight = visuals.height
 
-        //动态加载样式
-        if(results.FlowStyle) {
-            insertColumnStyle(visualWidth, visualHeight)
-        }
-        $container = $(results.FlowData)
-        removeColumnData() //删除flowdata，优化缓存
-        init(visualWidth, visualHeight)
+        //加载样式
+        insertColumnStyle(function() {
+            $container = $(results.FlowData)
+            removeColumnData() //删除flowdata，优化缓存
+            init(visuals.width, visualHeight)
+        })
+
     } else {
         //没有任何flow
         callback()

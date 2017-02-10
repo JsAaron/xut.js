@@ -9,7 +9,7 @@ import init from './initialize/index'
 
 initGlobalAPI()
 
-Xut.Version = 877
+Xut.Version = 877.2
 
 if(Xut.plat.isBrowser) {
 
@@ -140,6 +140,7 @@ Xut.Application.Launch = ({
         config.launch = { //外部配置文件
             resource: resource, //资源路径
             database: path.database, //数据库
+            style: path.style, //style样式文件
             launchAnim, //启动动画
             convert //资源转化svg=>js
         }
@@ -157,4 +158,3 @@ setTimeout(() => {
         loadApp()
     }
 }, 100)
-
