@@ -1,8 +1,9 @@
-import { request } from '../util/loader'
-import { insertImageUrlSuffix } from '../util/option'
 import { config } from '../config/index'
-import { $$warn } from '../util/debug'
-import { loadfile } from '../util/loader'
+import {
+    $$warn,
+    loadFile
+} from '../util/index'
+
 //替换url
 //1. 路径
 //2. 基础后缀
@@ -33,26 +34,6 @@ const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(?=\.[png|jpg]+)/ig
  * 数据库缓存结果集
  */
 let result
-
-/**
- * 动态样式元素合集
- * @type {Array}
- */
-let styleElements = []
-
-/**
- * [ description]动态插入一条样式规则
- * @param  {[type]} rule [样式规则]
- * @return {[type]}      [description]
- */
-function insertStyle(rule, attribute, value) {
-    let styleElement = document.createElement("style")
-    styleElement.type = 'text/css'
-    styleElement.innerHTML = rule
-    styleElement.setAttribute(attribute, value)
-    document.head.appendChild(styleElement)
-    styleElements.push(styleElement)
-}
 
 
 /**
@@ -89,17 +70,7 @@ function filterJsonData() {
         })
     }
 
-    //全局svg样式
-    let hasSvgsheet
-    if(result.svgsheet) {
-        hasSvgsheet = true;
-        insertStyle(result.svgsheet, 'data-svg', 'true');
-        result.svgsheet = null;
-    }
-
     window.SQLResult = null;
-
-    return hasSvgsheet
 }
 
 
@@ -119,28 +90,6 @@ function filterJsonData() {
 // }
 
 
-/**
- * 插入column的样式
- * 有工具栏
- * 图片的单位是vw，所以因为工具栏的问题
- * 所以相对点发生变化，图片要缩放vm
- */
-export function insertColumnStyle(callback) {
-
-    if(config.launch && config.launch.style) {
-        loadfile(config.launch.style, callback)
-        return
-    }
-
-    if(result.FlowStyle) {
-        insertStyle(result.FlowStyle, 'data-flow', 'true');
-        result.FlowStyle = null;
-    }
-
-    callback()
-}
-
-
 
 /**
  * 设置数据缓存
@@ -157,7 +106,7 @@ export function importJsonDatabase(callback) {
     if(path) {
         //防止外部链接影响
         window.SQLResult = null
-        request(path, function() {
+        loadFile(path, function() {
             callback(filterJsonData())
         })
     }
@@ -170,21 +119,6 @@ export function importJsonDatabase(callback) {
 }
 
 
-/**
- * 移除动态加载的样式
- * @return {[type]} [description]
- */
-export function removeStyle() {
-    if(styleElements.length) {
-        for(let i = 0; i < styleElements.length; i++) {
-            if(styleElements[i]) {
-                document.head.removeChild(styleElements[i])
-            }
-            styleElements[i] = null
-        }
-        styleElements = []
-    }
-}
 
 /**
  * 删除挂载的flow数据

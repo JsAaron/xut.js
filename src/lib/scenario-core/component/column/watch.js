@@ -4,13 +4,17 @@
 const watchColumn = function(seasonsId, chapterId, count) {
     // console.log(count)
     setChpaterColumn(seasonsId, chapterId, count)
+    //触发页面改变
     Xut.Application.Notify('change:numberTotal')
+
+    //触发column分栏改变
+    Xut.Application.Notify('change:column')
 }
 
 /**
  * 检测分栏高度
  */
-const checkColumnHeight = function($seasons, columnCollection, checkCount, callback) {
+export function checkColumnHeight($seasons, columnCollection, checkCount, callback) {
 
     getColumnCount($seasons, (seasonsId, chapterId, count) => {
         // if(columnCollection[seasonsId][chapterId] !== count) {
@@ -31,4 +35,3 @@ const checkColumnHeight = function($seasons, columnCollection, checkCount, callb
 
     return
 }
-

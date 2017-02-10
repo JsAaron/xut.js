@@ -9,7 +9,7 @@
  *
  * *******************************************************************/
 
-import { loadFile, removeLoad } from './loader'
+import { fileLoad, removeFileLoad } from './loader'
 import { createData } from './data'
 import AdvSprite from './extend/adv.sprite'
 import ScrollArea from './extend/scroll.area'
@@ -72,7 +72,7 @@ export default class PageWidget {
             //If there is no
             if(typeof window[this.widgetName + "Widget"] != "function") {
                 this.hasload = true
-                loadFile(this._executive, this)
+                fileLoad(this._executive, this)
             } else {
                 this._executive()
             }
@@ -124,7 +124,7 @@ export default class PageWidget {
      * @return {[type]} [description]
      */
     destroy() {
-        this.hasload && removeLoad()
+        this.hasload && removeFileLoad()
         this.pageObj && this.pageObj.destroy && this.pageObj.destroy();
     }
 

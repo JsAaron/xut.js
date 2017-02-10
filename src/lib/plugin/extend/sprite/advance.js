@@ -7,7 +7,7 @@
  *   提供给普通转化高级使用
  */
 
-import { imgReady } from '../../../util/loader'
+import { loadFigure } from '../../../util/loader'
 import { config } from '../../../config/index'
 
 export default class {
@@ -212,10 +212,10 @@ export default class {
         let resourcePath = this.resourcePath
         if (this.isMask) {
             let filename = this._getFilename(imageList[index].name)
-            imgReady(resourcePath + filename + ".png", collect)
-            imgReady(resourcePath + filename + ".jpg", collect)
+            loadFigure(resourcePath + filename + ".png", collect)
+            loadFigure(resourcePath + filename + ".jpg", collect)
         } else {
-            imgReady(resourcePath + imageList[index].name, collect)
+            loadFigure(resourcePath + imageList[index].name, collect)
         }
     }
 

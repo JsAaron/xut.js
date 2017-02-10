@@ -16,7 +16,7 @@ import {
  */
 const getPageStyle = pageIndex => {
     let pageBase = Xut.Presentation.GetPageObj(pageIndex)
-    return pageBase && pageBase.getStyle
+    return pageBase && pageBase.getStyle || {}
 }
 
 const makeAccess = (action, direction, distance, pageStyles) => {

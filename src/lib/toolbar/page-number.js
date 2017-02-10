@@ -4,7 +4,7 @@ import {
     hasColumn,
     getBeforeCount,
     getCurrentBeforeCount
-} from '../scenario-core/component/column/get'
+} from '../scenario-core/component/column/depend'
 
 /**
  * 页码显示

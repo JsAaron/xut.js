@@ -313,6 +313,7 @@ export default class Controller {
             rightIndex
         })
 
+
         //视觉差页面滑动
         const chapterData = currObj.chapterData
         const nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined

@@ -3,15 +3,18 @@ import {
     setCache,
     getChpaterColumn,
     setChpaterColumn
-} from './get'
-import { nextTick } from '../../../util/nexttick'
-import { $$warn } from '../../../util/debug'
-import { defAccess } from '../../../util/index'
+} from './depend'
+import {
+    defAccess,
+    nextTick,
+    $$warn,
+    loadStyle
+} from '../../../util/index'
 import {
     getResults,
-    removeColumnData,
-    insertColumnStyle
+    removeColumnData
 } from '../../../database/result'
+
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -116,6 +119,7 @@ const resolveCount = ($content) => {
     for(let i = 0; i < theChildren.length; i++) {
         paraHeight += Math.max(theChildren[i].scrollHeight, theChildren[i].clientHeight)
     }
+    // $("#test123").append('<p>' + paraHeight + '</p>')
     return Math.ceil(paraHeight / newViewHight)
 }
 
@@ -140,6 +144,48 @@ const getColumnCount = function($seasons, callback) {
 
 
 /**
+ * 监听分栏高度变化后处理
+ */
+const watchColumn = function(seasonsId, chapterId, count) {
+    console.log('触发改变', seasonsId, chapterId, count)
+    setChpaterColumn(seasonsId, chapterId, count)
+    Xut.Application.Notify('change:number')
+    Xut.Application.Notify('change:column')
+}
+
+/**
+ * 检测分栏高度
+ */
+export function checkColumnHeight($seasons, columnCollection, checkCount, callback) {
+
+    getColumnCount($seasons, (seasonsId, chapterId, count) => {
+        if(checkCount > 10) {
+            count = 2
+        }
+
+        //假如高度改变
+        if(columnCollection[seasonsId][chapterId] !== count) {
+            columnCollection[seasonsId][chapterId] = count
+            watchColumn(seasonsId, chapterId, count)
+        }
+    })
+
+    --checkCount
+
+    if(checkCount) {
+        setTimeout(function() {
+            checkColumnHeight($seasons, columnCollection, checkCount, callback)
+        }, 500)
+    } else {
+        callback()
+    }
+
+    return
+}
+
+
+
+/**
  * 构建column页面代码结构
  * @return {[type]} [description]
  */
@@ -150,41 +196,47 @@ export default function initColumn(callback) {
         $container.remove()
     }
 
+    const setHeight = function($container, visualWidth, visualHeight) {
+        $container.css({
+            width: visualWidth,
+            height: visualHeight,
+            display: 'block'
+        })
+    }
 
     const init = function(visualWidth, visualHeight) {
-
-        //保证有子数据
         let $seasons = $container.children()
         if(!$seasons.length) {
             callback()
             return
         }
 
-        //分栏数
-        let columnCount = {}
-
-        $container.css({
-            width: visualWidth,
-            height: visualHeight,
-            display: 'block'
-        })
-
-        //插入分栏数据
+        let columnCount = {} //分栏记录
+        setHeight($container, visualWidth, visualHeight)
         eachColumn(columnCount, $seasons, visualWidth, visualHeight)
-
         $('body').append($container)
 
-        //获取真正的高度
-        nextTick(function() {
+        nextTick(() => {
 
-            //获取分栏数
-            getColumnCount($seasons, function(seasonsId, chapterId, count) {
+            //第一次获取分栏数
+            getColumnCount($seasons, (seasonsId, chapterId, count) => {
+                if(config.columnCheck){
+                    count = 2
+                }
                 columnCount[seasonsId][chapterId] = count
             })
 
             setCache(columnCount)
 
-            $container.hide()
+            //检测分栏数变化
+            if(config.columnCheck) {
+                checkColumnHeight($seasons, $.extend(true, {}, columnCount), 20, () => {
+                    $container.hide()
+                })
+            } else {
+                $container.hide()
+            }
+
 
             callback(Object.keys(columnCount).length)
         })
@@ -197,8 +249,8 @@ export default function initColumn(callback) {
         let visuals = resetVisualLayout(1)
         let visualHeight = newViewHight = visuals.height
 
-        //加载样式
-        insertColumnStyle(function() {
+        //加载flow样式
+        loadStyle('xxtflow', function() {
             $container = $(results.FlowData)
             removeColumnData() //删除flowdata，优化缓存
             init(visuals.width, visualHeight)

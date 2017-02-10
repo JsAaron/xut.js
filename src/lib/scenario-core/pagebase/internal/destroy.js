@@ -31,13 +31,13 @@ export default function(baseProto) {
 
         //流式布局对象
         //2016.9.10
-        const _flows = this._flows.get()
-        if (_flows.length) {
-            _flows.forEach(flowObj => {
+        const _columns = this._columns.get()
+        if (_columns.length) {
+            _columns.forEach(flowObj => {
                 flowObj.destroy()
                 flowObj = null
             })
-            this._flows = null
+            this._columns = null
         }
 
 

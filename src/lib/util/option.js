@@ -1,12 +1,22 @@
-import { request } from './loader'
+import { loadFile } from './loader'
 import { $$warn } from './debug'
 import { parseJSON } from './lang'
 import { config, resetVisualProportion } from '../config/index'
 
-
 const CEIL = Math.ceil
 const FLOOR = Math.floor
 
+/**
+ * 动态加载link
+ * @return {[type]} [description]
+ */
+export function loadStyle(fileName, callback) {
+    let path = config.launch ?
+        config.launch.resource + '/gallery/' + fileName + '.css' :
+        config.pathAddress + fileName + '.css'
+    let node = loadFile(path, callback)
+    node && node.setAttribute('data-type',fileName)
+}
 
 /**
  * 获取正确的图片文件名
@@ -278,8 +288,8 @@ export function readFile(path, callback, type) {
     /**
      * js脚本加载
      */
-    let jsRequest = (fileUrl, fileName) => {
-        request(randomUrl(fileUrl), function() {
+    let loadJs = (fileUrl, fileName) => {
+        loadFile(randomUrl(fileUrl), function() {
             data = window.HTMLCONFIG[fileName];
             if(data) {
                 callback(data)
@@ -299,7 +309,7 @@ export function readFile(path, callback, type) {
     if(type === "js") {
         paths = config.getSvgPath() + path;
         name = path.replace(".js", '')
-        jsRequest(paths, name)
+        loadJs(paths, name)
         return
     }
 
@@ -311,7 +321,7 @@ export function readFile(path, callback, type) {
         path = path.replace('.svg', '.js')
         name = path.replace(".js", '')
         svgUrl = config.getSvgPath() + path
-        jsRequest(svgUrl, name) //直接采用脚本加载
+        loadJs(svgUrl, name) //直接采用脚本加载
         return
     }
 
@@ -330,7 +340,7 @@ export function readFile(path, callback, type) {
         //文件名
         name = path.replace(".js", '');
         //加载脚本
-        request(randomUrl(paths), function() {
+        loadFile(randomUrl(paths), function() {
             data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
             if(data) {
                 callback(data)

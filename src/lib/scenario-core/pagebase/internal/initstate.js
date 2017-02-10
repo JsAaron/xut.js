@@ -34,7 +34,7 @@ export default function(baseProto) {
         this.isMultithread = this.multiplePages ? true : false;
 
         //母版处理
-        if (instance.pageType === 'master') {
+        if(instance.pageType === 'master') {
             this.isMaster = true;
         }
 
@@ -76,10 +76,10 @@ export default function(baseProto) {
 
         /**
          * 2016.9.7
-         * flow热点对象
+         * column热点对象
          * @type {Collection}
          */
-        this._flows = new Collection()
+        this._columns = new Collection()
 
         /**
          * 流式布局页面
@@ -87,7 +87,7 @@ export default function(baseProto) {
          * @param  {[type]} instance.pageType [description]
          * @return {[type]}                   [description]
          */
-        if (this.pageType === 'master' && this.isFlows) {
+        if(this.pageType === 'master' && this.isFlows) {
             this.isFlows = false
         }
 
@@ -98,7 +98,7 @@ export default function(baseProto) {
          * 2016.11.8
          * @type {Array}
          */
-        if (config.swipeDelegate) {
+        if(config.swipeDelegate) {
             this._swipeSequence = {
                 swipeleft: [],
                 swiperight: [],
@@ -108,6 +108,25 @@ export default function(baseProto) {
                 swiperightIndex: 0
             }
         }
+
+        /**
+         * 初始化任务完成钩子
+         * @return {[type]} [description]
+         */
+        this.initTasksCompleteHook = function() {
+            //注册_columns对象改变
+            if(config.columnCheck) {
+                const columnObj = this._columns.get()
+                if(columnObj && columnObj.length) {
+                    columnObj.forEach(obj => {
+                        Xut.Application.Watch('change:column', () => {
+                            obj.resetPageCount()
+                        })
+                    })
+                }
+            }
+        }
+
 
         /**
          * 浮动对象
@@ -167,10 +186,10 @@ export default function(baseProto) {
             contents(pid, id, contentScope) {
                 const scope = instance.baseGetContentObject[id]
                     //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
-                if (scope && scope.isBindEventHooks) {
+                if(scope && scope.isBindEventHooks) {
                     instance._contentsCollector[id] = contentScope;
                 }
-                if (!scope) {
+                if(!scope) {
                     instance._contentsCollector[id] = contentScope;
                 }
             },
@@ -186,9 +205,9 @@ export default function(baseProto) {
                 let contentObj
                 floatContents.PageContainer = data.container;
                 _.each(data.ids, function(id) {
-                    if (contentObj = instance.baseGetContentObject(id)) {
+                    if(contentObj = instance.baseGetContentObject(id)) {
                         //初始视察坐标
-                        if (contentObj.parallax) {
+                        if(contentObj.parallax) {
                             contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
                         }
                         floatContents.Page[id] = contentObj
@@ -215,20 +234,20 @@ export default function(baseProto) {
                 //浮动对象
                 _.each(data.ids, function(id) {
                     //转化成实际操作的浮动对象,保存
-                    if (contentObj = instance.baseGetContentObject(id)) {
+                    if(contentObj = instance.baseGetContentObject(id)) {
                         //初始视察坐标
-                        if (contentObj.parallax) {
+                        if(contentObj.parallax) {
                             contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
                         }
                         floatContents.Master[id] = contentObj
                     } else {
                         Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
                             //获取DOM节点
-                        if (contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
+                        if(contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
                             prefix = 'Content_' + instance.pid + "_"
                             _.each(contentsFragment, function(dom) {
                                 var makePrefix = prefix + id;
-                                if (dom.id == makePrefix) {
+                                if(dom.id == makePrefix) {
                                     contentNode = dom;
                                 }
                             })

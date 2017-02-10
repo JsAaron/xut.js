@@ -1,4 +1,4 @@
-import { loadfile } from '../../../../util/loader'
+import { loadFile } from '../../../../util/loader'
 import { config } from '../../../../config/index'
 
 /**
@@ -26,7 +26,7 @@ const add = function(path, callback) {
     if (toRepeat[path].length > 1) {
         return
     }
-    loadfile(path, function() {
+    loadFile(path, function() {
         _.each(toRepeat[path], function(fn) {
             fn && fn()
         })
@@ -35,7 +35,7 @@ const add = function(path, callback) {
     })
 }
 
-export function removeLoad() {
+export function removeFileLoad() {
     toRepeat = {}
 }
 
@@ -43,7 +43,7 @@ export function removeLoad() {
  * 加载js,css文件
  * @return {[type]} [description]
  */
-export function loadFile(callback, base) {
+export function fileLoad(callback, base) {
     var jsPath, cssPath, completeCount,
         widgetId = base.widgetId,
         //定义css,js的命名

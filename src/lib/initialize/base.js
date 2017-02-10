@@ -2,7 +2,7 @@ import { createCursor } from './depend/cursor'
 import { contentFilter } from '../scenario-core/component/activity/content/filter'
 import { importJsonDatabase } from '../database/result'
 
-import { loader, $$warn } from '../util/index'
+import { $$warn, loadStyle } from '../util/index'
 
 import {
     config,
@@ -11,19 +11,7 @@ import {
 } from '../config/index'
 
 import initTooBar from './toolbar'
-import initColumn from '../scenario-core/component/column/init'
-
-/**
- * 加载svg的css
- * @return {[type]} [description]
- */
-const loadStyle = (callback) => {
-    let svgsheet = config.launch ?
-        config.launch.resource + '/gallery/svgsheet.css' :
-        config.pathAddress + 'svgsheet.css'
-    loader.load([svgsheet], callback, null, true);
-}
-
+import initColumn from '../scenario-core/component/column/core-init'
 
 /**
  * 新增模式,用于记录浏览器退出记录
@@ -59,7 +47,7 @@ const setMode = function(data) {
 }
 
 const getMaxWidth = function() {
-    if(config.visualSize){
+    if(config.visualSize) {
         return config.visualSize.width
     }
     return window.screen.width > document.documentElement.clientWidth ?
@@ -101,8 +89,8 @@ export default function baseConfig(callback) {
 
     //mini杂志设置
     //如果是pad的情况下设置font为125%
-    if( config.platform ==='mini' && Xut.plat.isTablet){
-        $('body').css('font-size','125%')
+    if(config.platform === 'mini' && Xut.plat.isTablet) {
+        $('body').css('font-size', '125%')
     }
 
     //图片分辨了自适应
@@ -123,7 +111,7 @@ export default function baseConfig(callback) {
     }
 
     //导入JSON数据缓存
-    importJsonDatabase((hasSvgsheet) => {
+    importJsonDatabase(() => {
 
         //初始化工具栏
         //与数据库setting数据
@@ -154,26 +142,22 @@ export default function baseConfig(callback) {
             //初始资源地址
             initPathAddress()
 
-            /**
-             * 初始分栏排版
-             * 嵌入index分栏
-             * 默认有并且没有强制设置关闭的情况，打开缩放
-             */
-            initColumn(function(haColumnCounts) {
-                if(haColumnCounts) {
-                    //动画事件委托
-                    if(config.swipeDelegate !== false) {
-                        config.swipeDelegate = true
+            //全局样式
+            loadStyle('svgsheet', function() {
+                /**
+                 * 初始分栏排版
+                 * 嵌入index分栏
+                 * 默认有并且没有强制设置关闭的情况，打开缩放
+                 */
+                initColumn(function(haColumnCounts) {
+                    if(haColumnCounts) {
+                        //动画事件委托
+                        if(config.swipeDelegate !== false) {
+                            config.swipeDelegate = true
+                        }
                     }
-                }
-                //iframe要要Xut.config
-                //如果存在了Svgsheet就不需要动态加载了
-                if(hasSvgsheet) {
                     callback(novelData)
-                } else {
-                    loadStyle(() => callback(novelData))
-                }
-
+                })
             })
 
 

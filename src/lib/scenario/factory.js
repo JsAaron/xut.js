@@ -8,7 +8,7 @@ import Mediator from '../scenario-core/index'
 import {
     getColumnCount,
     getColumnChpaterCount
-} from '../scenario-core/component/column/get'
+} from '../scenario-core/component/column/depend'
 import {
     mainScene,
     deputyScene
@@ -217,9 +217,11 @@ export class SceneFactory {
             })
 
             //页面总数改变
-            // Xut.Application.Watch('change:numberTotal', () => {
-            //     this.numberToolbar.updateTotal(getColumnTotal(true))
-            // })
+            if(config.columnCheck) {
+                Xut.Application.Watch('change:number', () => {
+                    this.numberToolbar.updateTotal(getColumnTotal(true))
+                })
+            }
         }
 
 

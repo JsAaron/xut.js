@@ -3,7 +3,7 @@ import { clearAudio } from './scenario-core/component/audio/manager'
 import { clearVideo } from './scenario-core/component/video/manager'
 import { destroyFixAudio } from './scenario-core/component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
-import { config,destroyConfig } from './config/index'
+import { config, destroyConfig } from './config/index'
 import { $$resetUUID } from './util/stroage'
 import { offAndroid } from './initialize/depend/button'
 import { cleanCursor } from './initialize/depend/cursor'
@@ -24,8 +24,8 @@ export default function Destroy(action = 'exit') {
     //销毁只创建一次的对象
     //修复的音频对象
     //数据的结果集
-    if (action === 'destory') {
-        if (Xut.plat.isBrowser) {
+    if(action === 'destory') {
+        if(Xut.plat.isBrowser) {
             $('body').off() //默认事件
             $(document).off() //左右按钮
             $(window).off() //横竖切换
@@ -37,14 +37,14 @@ export default function Destroy(action = 'exit') {
 
     // refresh状态不删除结果集
     // 只处理destory与exit状态
-    if (action === 'destory' || action === 'exit') {
+    if(action === 'destory' || action === 'exit') {
 
         //删除结果集
         destroyResult()
 
         //删除流式布局的数据
         let $flowNode = $("#xut-stream-flow")
-        if ($flowNode.length) {
+        if($flowNode.length) {
             $flowNode.remove()
             $flowNode = null
         }
@@ -83,4 +83,12 @@ export default function Destroy(action = 'exit') {
 
     //启动配置文件去掉
     config.launch = null
+
+    //删除动态加载的两个css文件
+    $('link[data-type]').each(function(index, link) {
+        let type = link.getAttribute('data-type')
+        if(type === 'svgsheet' || type === 'xxtflow') {
+            link.parentNode.removeChild(link)
+        }
+    })
 }

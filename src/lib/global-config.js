@@ -52,6 +52,13 @@ export type Config = {
 const config: Config = {
 
     /**
+     * 是否启动分栏高度检测
+     * 变更依赖
+     * @type {Boolean}
+     */
+    columnCheck:true,
+
+    /**
      * 适配平台
      * mini //迷你杂志
      * @type {[type]}

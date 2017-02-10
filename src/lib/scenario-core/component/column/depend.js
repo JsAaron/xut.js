@@ -7,12 +7,14 @@ export function setCache(columnCount) {
     cacheColumns = columnCount
 }
 
+
 /**
  * 分页页面数
  */
 export function getChpaterColumn(seasonsId, chapterId) {
     return cacheColumns[seasonsId] ? cacheColumns[seasonsId][chapterId] : 0
 }
+
 
 export function setChpaterColumn(seasonsId, chapterId, value) {
     if(cacheColumns[seasonsId] && cacheColumns[seasonsId][chapterId]) {

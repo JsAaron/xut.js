@@ -8,6 +8,14 @@ import {
 export default function api(Swipe) {
 
     /**
+     * 设置页面总数
+     * @param {[type]} newVisualWidth [description]
+     */
+    Swipe.prototype.setTotal = function(total){
+       this.pagetotal = total
+    }
+
+    /**
      * 获取翻页over速率
      * @return {[type]} [description]
      */

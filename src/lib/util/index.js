@@ -5,4 +5,4 @@ export * from './stroage'
 export * from './option'
 export * from './buffer'
 export * from './debug'
-
+export * from './nexttick'

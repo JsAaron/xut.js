@@ -1,19 +1,18 @@
 import { config, resetVisualLayout } from '../../../config/index'
 import { translation } from '../../pagebase/move/translation'
-import { getColumnCount } from './get'
-import Swipe from '../../../swipe/index'
-import render from './render'
-
+import { getColumnCount } from './depend'
 import { getVisualDistance } from '../../../visual/visual-distance'
 import { Zoom } from '../../../plugin/extend/zoom/index'
 import { closeButton } from '../../../plugin/extend/close-button'
 import { analysisImageName, insertImageUrlSuffix } from '../../../util/option'
 
+import Swipe from '../../../swipe/index'
+
 /**
  * 2017.9.7
  * 流式排版
  */
-export default class Section {
+export default class ColumnClass {
 
     constructor({
         pptMaster, //母版ID
@@ -23,19 +22,20 @@ export default class Section {
         chapterId,
         successCallback
     }) {
-        let self = this
+        const $container = $($('#chapter-flow-' + chapterId).html())
         this.initIndex = pageIndex
         this.$pinchNode = $pinchNode
         this.pptMaster = pptMaster
         this.zoomObjs = {}
-        render({
-            $pinchNode,
-            dataNode: $('#chapter-flow-' + chapterId),
-            chapterId,
-            callback($container) {
-                self._init($container, seasonId, chapterId)
-                successCallback()
-            }
+        this.chapterId = chapterId
+        this.seasonId = seasonId
+
+        Xut.nextTick({
+            container: $pinchNode,
+            content: $container
+        }, () => {
+            this._init($container)
+            successCallback()
         })
     }
 
@@ -72,9 +72,9 @@ export default class Section {
         } else {
             //如果配置了高清后缀
             let hqSrc
-            //如果启动了高清图片
+                //如果启动了高清图片
             if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-                hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original,config.imageSuffix['1440'] )
+                hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
             }
             this.zoomObjs[imageOriginalName] = new Zoom({
                 element: $(node),
@@ -102,23 +102,40 @@ export default class Section {
     }
 
     /**
+     * 获取总页面数
+     * @return {[type]} [description]
+     */
+    _getPageCount() {
+        return getColumnCount(this.seasonId, this.chapterId)
+    }
+
+    /**
+     * 页面总数
+     */
+    resetPageCount() {
+        let total = this._getPageCount()
+        this.MAX = total - 1
+        this.swipe.setTotal(total)
+    }
+
+    /**
      * 初始化
      * @param  {[type]} $container [description]
      * @param  {[type]} $content   [description]
      * @return {[type]}            [description]
      */
-    _init($container, seasonId, chapterId) {
+    _init($container) {
 
-        const flowObject = this
-        const pagesCount = getColumnCount(seasonId, chapterId)
+        const coloumnObj = this
+        const pagesCount = this._getPageCount()
         const flowView = resetVisualLayout(1)
-
-        const MIN = 0
-        const MAX = pagesCount - 1
         const flipWidth = flowView.width
         const View = Xut.View
         const initIndex = this.initIndex
         const container = $container[0]
+
+        coloumnObj.MIN = 0
+        coloumnObj.MAX = pagesCount - 1
 
         let nodes
         if(this.pptMaster) {
@@ -132,11 +149,10 @@ export default class Section {
         const swipe = this.swipe = new Swipe({
             flipWidth: flipWidth,
             linear: true,
-            initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
+            initIndex: Xut.Presentation.GetPageIndex() > initIndex ? coloumnObj.MAX : coloumnObj.MIN,
             container,
             flipMode: 0,
             multiplePages: 1,
-            // preventDefault:,
             stopPropagation: true,
             pagetotal: pagesCount
         })
@@ -168,13 +184,12 @@ export default class Section {
             rightIndex,
             direction
         }) {
-
             /**
              * 首页边界
              * @param  {[type]} this._hindex [description]
              * @return {[type]}              [description]
              */
-            if(this._hindex === MIN && this.direction === 'prev') {
+            if(this._hindex === coloumnObj.MIN && this.direction === 'prev') {
                 if(action === 'flipOver') {
                     View.GotoPrevSlide()
                     this.simulationComplete()
@@ -188,7 +203,7 @@ export default class Section {
              * @param  {[type]} this._hindex [description]
              * @return {[type]}              [description]
              */
-            else if(this._hindex === MAX && this.direction === 'next') {
+            else if(this._hindex === coloumnObj.MAX && this.direction === 'next') {
                 if(action === 'flipOver') {
                     View.GotoNextSlide()
                     this.simulationComplete()
@@ -242,7 +257,7 @@ export default class Section {
 
                 //移动视觉差
                 let moveParallaxObject = () => {
-                    let masterObj = flowObject._getMasterObj()
+                    let masterObj = coloumnObj._getMasterObj()
                     if(masterObj) {
                         //处理当前页面内的视觉差对象效果
                         masterObj.moveParallax({

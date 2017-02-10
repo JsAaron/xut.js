@@ -21,8 +21,8 @@ export default function(baseProto) {
         //如果是快速翻页,立刻调用
         //构建container调用preforkComplete
         this.createRelated.preforkComplete = (() => {
-            return () => {
-                if (config.quickFlip) {
+            return() => {
+                if(config.quickFlip) {
                     //1 滑动允许打断创建
                     //
                     //swich
@@ -47,7 +47,7 @@ export default function(baseProto) {
      */
     baseProto.dispatchTasks = function() {
         let threadtasks
-        if (threadtasks = this.threadtasks[this.createRelated.nextRunTask]) {
+        if(threadtasks = this.threadtasks[this.createRelated.nextRunTask]) {
             threadtasks()
         }
     }
@@ -58,7 +58,7 @@ export default function(baseProto) {
      * @return {[type]} [description]
      */
     baseProto.destroyPageAction = function() {
-        if (this.stopLastPageAction) {
+        if(this.stopLastPageAction) {
             this.stopLastPageAction()
             this.stopLastPageAction = null
         }
@@ -71,7 +71,7 @@ export default function(baseProto) {
     baseProto.createPageAction = function() {
         //如果有最后一个动作触发
         //2016.10.13 给妙妙学增加watch('complete')
-        if (this.runLastPageAction) {
+        if(this.runLastPageAction) {
             //返回停止方法
             this.stopLastPageAction = this.runLastPageAction()
         }
@@ -133,7 +133,7 @@ export default function(baseProto) {
         var self = this;
         //2个预创建间隔太短
         //背景预创建还在进行中，先挂起来等待
-        if (this.createRelated.preCreateTasks) {
+        if(this.createRelated.preCreateTasks) {
             this.createRelated.tasksHang = function(callback) {
                 return function() {
                     self._checkTasksCreate(callback);
@@ -146,7 +146,7 @@ export default function(baseProto) {
          * 翻页完毕后
          * 预创建背景
          */
-        if (isPreCreate) {
+        if(isPreCreate) {
             this.createRelated.preCreateTasks = true;
         }
 
@@ -164,7 +164,7 @@ export default function(baseProto) {
     baseProto._checkTasksCreate = function(callback, context) {
 
         //如果任务全部完成
-        if (this.createRelated.nextRunTask === 'complete') {
+        if(this.createRelated.nextRunTask === 'complete') {
             return callback.call(context)
         }
 
@@ -174,7 +174,8 @@ export default function(baseProto) {
         this._cancelTaskSuspend();
 
         //完毕回调
-        this.createRelated.createTasksComplete = function() {
+        this.createRelated.createTasksComplete = () => {
+            this.initTasksCompleteHook && this.initTasksCompleteHook()
             callback.call(context)
         };
 
@@ -212,7 +213,7 @@ export default function(baseProto) {
     baseProto._multithreadCheck = function(callbacks, interrupt) {
 
         const check = () => {
-            if (this._checkTaskSuspend()) {
+            if(this._checkTaskSuspend()) {
                 this.tasksTimeOutId && clearTimeout(this.tasksTimeOutId)
                 callbacks.suspendCallback.call(this);
             } else {
@@ -227,9 +228,9 @@ export default function(baseProto) {
         }
 
         //自动运行页面构建
-        if (this.isAutoRun) {
+        if(this.isAutoRun) {
             //自动运行content中断检测 打断一次
-            if (interrupt) {
+            if(interrupt) {
                 next();
             } else {
                 check();
@@ -250,7 +251,7 @@ export default function(baseProto) {
     baseProto._asyTasks = function(callbacks, interrupt) {
 
         //如果关闭多线程,不检测任务调度
-        if (!this.isMultithread) {
+        if(!this.isMultithread) {
             return callbacks.nextTaskCallback.call(this);
         }
 
