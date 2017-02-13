@@ -29,14 +29,14 @@ export const getActionPointer = function(direction, leftIndex, rightIndex) {
  * 初始化首次范围
  * @return {[type]} [description]
  */
-export const initPointer = (init, pagetotal) => {
+export const initPointer = (init, pageTotal) => {
     var leftscope = 0,
         pagePointer = {};
 
     if (init === leftscope) { //首页
         pagePointer['currIndex'] = init;
         pagePointer['rightIndex'] = init + 1;
-    } else if (init === pagetotal - 1) { //首页
+    } else if (init === pageTotal - 1) { //首页
         pagePointer['currIndex'] = init;
         pagePointer['leftIndex'] = init - 1;
     } else { //中间页
@@ -64,7 +64,7 @@ export const compatibilityEvent = (e) => {
 /**
  * 计算当前已经创建的页面索引
  */
-export const calculationIndex = (currIndex, targetIndex, pagetotal) => {
+export const calculationIndex = (currIndex, targetIndex, pageTotal) => {
     var i = 0,
         existpage,
         createpage,
@@ -77,7 +77,7 @@ export const calculationIndex = (currIndex, targetIndex, pagetotal) => {
     //存在的页面
     if (currIndex === 0) {
         existpage = [currIndex, currIndex + 1];
-    } else if (currIndex === pagetotal - 1) {
+    } else if (currIndex === pageTotal - 1) {
         existpage = [currIndex - 1, currIndex];
     } else {
         existpage = [currIndex - 1, currIndex, currIndex + 1];
@@ -86,7 +86,7 @@ export const calculationIndex = (currIndex, targetIndex, pagetotal) => {
     //需要创建的新页面
     if (targetIndex === 0) {
         createpage = [targetIndex, targetIndex + 1];
-    } else if (targetIndex === pagetotal - 1) {
+    } else if (targetIndex === pageTotal - 1) {
         createpage = [targetIndex - 1, targetIndex];
     } else {
         createpage = [targetIndex - 1, targetIndex, targetIndex + 1];

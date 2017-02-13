@@ -17,7 +17,7 @@ const createExistIndex = ($globalEvent) => {
     return(pageIndex) => {
         //如果不存在
         if(pageIndex == undefined) {
-            pageIndex = $globalEvent.getHindex() //当前页面
+            pageIndex = $globalEvent.getVisualIndex() //当前页面
         }
         return pageIndex
     }
@@ -31,7 +31,7 @@ export function extendPresentation(access, $globalEvent) {
     /**
      * 获取当前页码
      */
-    Xut.Presentation.GetPageIndex = () => $globalEvent.getHindex()
+    Xut.Presentation.GetPageIndex = () => $globalEvent.getVisualIndex()
 
     /**
      *  四大数据接口

@@ -147,22 +147,21 @@ const getColumnCount = function($seasons, callback) {
  * 监听分栏高度变化后处理
  */
 const watchColumn = function(seasonsId, chapterId, count) {
-    console.log('触发改变', seasonsId, chapterId, count)
     setChpaterColumn(seasonsId, chapterId, count)
-    Xut.Application.Notify('change:number')
+    Xut.Application.Notify('change:number:visual')
+    Xut.Application.Notify('change:number:total')
     Xut.Application.Notify('change:column')
 }
 
 /**
  * 检测分栏高度
  */
+let timerId = null
 export function checkColumnHeight($seasons, columnCollection, checkCount, callback) {
-
     getColumnCount($seasons, (seasonsId, chapterId, count) => {
-        if(checkCount > 10) {
-            count = 2
+        if(checkCount > 13) {
+            count = 1
         }
-
         //假如高度改变
         if(columnCollection[seasonsId][chapterId] !== count) {
             columnCollection[seasonsId][chapterId] = count
@@ -173,23 +172,30 @@ export function checkColumnHeight($seasons, columnCollection, checkCount, callba
     --checkCount
 
     if(checkCount) {
-        setTimeout(function() {
+        timerId = setTimeout(function() {
             checkColumnHeight($seasons, columnCollection, checkCount, callback)
         }, 500)
     } else {
         callback()
     }
-
     return
 }
 
-
+/**
+ * 停止分栏高度探测
+ * @return {[type]} [description]
+ */
+export function stopDetection() {
+    Xut.Application.unWatch('change:number:total change:column')
+    clearTimeout(timerId)
+    timerId = null
+}
 
 /**
  * 构建column页面代码结构
  * @return {[type]} [description]
  */
-export default function initColumn(callback) {
+export function initColumn(callback) {
 
     let $container = $("#xut-stream-flow")
     if($container.length) {
@@ -220,8 +226,8 @@ export default function initColumn(callback) {
 
             //第一次获取分栏数
             getColumnCount($seasons, (seasonsId, chapterId, count) => {
-                if(config.columnCheck){
-                    count = 2
+                if(config.columnCheck) {
+                    count = 1
                 }
                 columnCount[seasonsId][chapterId] = count
             })
@@ -230,13 +236,12 @@ export default function initColumn(callback) {
 
             //检测分栏数变化
             if(config.columnCheck) {
-                checkColumnHeight($seasons, $.extend(true, {}, columnCount), 20, () => {
+                checkColumnHeight($seasons, $.extend(true, {}, columnCount), 25, () => {
                     $container.hide()
                 })
             } else {
                 $container.hide()
             }
-
 
             callback(Object.keys(columnCount).length)
         })

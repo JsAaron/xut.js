@@ -113,15 +113,19 @@ export default function(baseProto) {
          * 初始化任务完成钩子
          * @return {[type]} [description]
          */
-        this.initTasksCompleteHook = function() {
+        this.initTasksCompleteHook = () => {
             //注册_columns对象改变
             if(config.columnCheck) {
                 const columnObj = this._columns.get()
                 if(columnObj && columnObj.length) {
+                    if(!this.unWatchDep) {
+                        this.unWatchDep = []
+                    }
                     columnObj.forEach(obj => {
-                        Xut.Application.Watch('change:column', () => {
-                            obj.resetPageCount()
+                        let dep = Xut.Application.Watch('change:column', function() {
+                            obj.resetColumnDep(instance.chapterId < Xut.Presentation.GetPageId() ? 'next' : 'prev')
                         })
+                        this.unWatchDep.push(() => Xut.Application.unWatch('change:column', dep))
                     })
                 }
             }

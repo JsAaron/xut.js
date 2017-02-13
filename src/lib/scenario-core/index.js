@@ -294,7 +294,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  */
 defAccess(Mediator.prototype, '$curVmPage', {
     get: function() {
-        return this.$dispatcher.pageMgr.abstractGetPageObj(this.$globalEvent.getHindex());
+        return this.$dispatcher.pageMgr.abstractGetPageObj(this.$globalEvent.getVisualIndex());
     }
 });
 
@@ -349,7 +349,7 @@ defProtected(Mediator.prototype, '$init', function() {
 defProtected(Mediator.prototype, '$run', function() {
     var vm = this;
     vm.$dispatcher.pageMgr.activateAutoRuns(
-        vm.$globalEvent.getHindex(), Xut.Presentation.GetPageObj()
+        vm.$globalEvent.getVisualIndex(), Xut.Presentation.GetPageObj()
     )
 });
 
@@ -359,7 +359,7 @@ defProtected(Mediator.prototype, '$run', function() {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$reset', function() {
-    return this.$dispatcher.pageMgr.resetOriginal(this.$globalEvent.getHindex());
+    return this.$dispatcher.pageMgr.resetOriginal(this.$globalEvent.getVisualIndex());
 });
 
 

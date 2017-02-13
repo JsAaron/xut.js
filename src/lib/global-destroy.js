@@ -1,12 +1,14 @@
 import { sceneController } from './scenario/controller'
 import { clearAudio } from './scenario-core/component/audio/manager'
 import { clearVideo } from './scenario-core/component/video/manager'
+import { stopDetection } from './scenario-core/component/column/core-init'
 import { destroyFixAudio } from './scenario-core/component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
 import { config, destroyConfig } from './config/index'
 import { $$resetUUID } from './util/stroage'
 import { offAndroid } from './initialize/depend/button'
 import { cleanCursor } from './initialize/depend/cursor'
+
 
 /**
  * 销毁接口
@@ -91,4 +93,7 @@ export default function Destroy(action = 'exit') {
             link.parentNode.removeChild(link)
         }
     })
+
+    //停止分栏探测
+    stopDetection()
 }

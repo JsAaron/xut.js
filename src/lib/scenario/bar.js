@@ -52,16 +52,16 @@ export function pMainBar(scenarioId) {
     let sectionRang = Xut.data.query('sectionRelated', scenarioId)
 
     //场景工具栏配置信息
-    let toolbar = sectionRang.toolbar
-    let pagetotal = sectionRang.length
+    let toolBar = sectionRang.toolbar
+    let pageTotal = sectionRang.length
 
     //默认显示系统工具栏
     let toolType = [1]
 
     //默认2 允许滑动,带翻页按钮
-    let pageMode = pagetotal > 1 ? 2 : 0
+    let pageMode = pageTotal > 1 ? 2 : 0
 
-    return parseTooBar(toolbar, toolType, pageMode)
+    return parseTooBar(toolBar, toolType, pageMode)
 }
 
 
@@ -70,8 +70,8 @@ export function pMainBar(scenarioId) {
  * pageMode 是否支持滑动翻页  0禁止滑动 1允许滑动
  * toolType   工具栏显示的类型 [0-5]
  */
-export function pDeputyBar(toolbar, pagetotal) {
+export function pDeputyBar(toolBar, pageTotal) {
     let toolType = [0]
-    let pageMode = pagetotal > 1 ? 1 : 0
-    return parseTooBar(toolbar, toolType, pageMode)
+    let pageMode = pageTotal > 1 ? 1 : 0
+    return parseTooBar(toolBar, toolType, pageMode)
 }

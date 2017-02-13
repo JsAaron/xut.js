@@ -46,10 +46,10 @@ export function extendAssist(access, $globalEvent) {
                         }
                     }();
                     _.each(activityId, function(id) {
-                        manager.abstractAssistAppoint(id, $globalEvent.getHindex(), markComplete, apiName);
+                        manager.abstractAssistAppoint(id, $globalEvent.getVisualIndex(), markComplete, apiName);
                     })
                 } else {
-                    manager.abstractAssistAppoint(activityId, $globalEvent.getHindex(), outCallBack, apiName);
+                    manager.abstractAssistAppoint(activityId, $globalEvent.getVisualIndex(), outCallBack, apiName);
                 }
             }, pageType, activityId, outCallBack)
         }

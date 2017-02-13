@@ -73,12 +73,14 @@ export default class NumberBar {
     }
 
     /**
-     * 更新总页数
+     * 更新
+     *     当前页面数
+     *     总页数
      * @return {[type]} [description]
      */
-    updateTotal(updateIndex) {
+    updateTotal(newTotalIndex) {
         Xut.nextTick(() => {
-            this.$allNode.text(updateIndex)
+            this.$allNode.text(newTotalIndex)
         })
     }
 
@@ -99,6 +101,7 @@ export default class NumberBar {
         //从正索引开始
         ++parentIndex
 
+        //没有column
         if(!hasColumn()) {
             this._updateText(action, parentIndex)
             return

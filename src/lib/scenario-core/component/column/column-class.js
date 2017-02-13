@@ -64,19 +64,18 @@ export default class ColumnClass {
         }
 
         let analysisName = analysisImageName(src)
-        let imageOriginalName = analysisName.original
-
-        let zoomObj = this.zoomObjs[imageOriginalName]
+        let originalName = analysisName.original
+        let zoomObj = this.zoomObjs[originalName]
         if(zoomObj) {
             zoomObj.play()
         } else {
             //如果配置了高清后缀
             let hqSrc
-                //如果启动了高清图片
             if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
+                //如果启动了高清图片
                 hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
             }
-            this.zoomObjs[imageOriginalName] = new Zoom({
+            this.zoomObjs[originalName] = new Zoom({
                 element: $(node),
                 originalSrc: config.pathAddress + analysisName.suffix,
                 hdSrc: hqSrc
@@ -85,37 +84,52 @@ export default class ColumnClass {
     }
 
     //pagesCount = 5
-    // =>
     //   0.25
     //   0.5
     //   0.75
     //   1
     //   0
-    _makeNodes(count) {
-        let nodes = []
-        let ratio = 1 / (count - 1) //比值
-        for(let i = 1; i < count; i++) {
-            nodes.push(i * ratio)
+    _getNodes() {
+        if(this.pptMaster) {
+            let nodes = []
+            let ratio = 1 / (this.columnCount - 1) //比值
+            for(let i = 1; i < this.columnCount; i++) {
+                nodes.push(i * ratio)
+            }
+            return nodes.push(0)
         }
-        nodes.push(0)
-        return nodes
     }
 
     /**
-     * 获取总页面数
-     * @return {[type]} [description]
+     * 重新计算分栏依赖
      */
-    _getPageCount() {
-        return getColumnCount(this.seasonId, this.chapterId)
+    resetColumnDep(direction) {
+        let newColumnCount = getColumnCount(this.seasonId, this.chapterId)
+            //如果分栏页面总数不正确
+        if(this.columnCount !== newColumnCount) {
+            this.columnCount = newColumnCount
+            this.maxBorder = newColumnCount - 1
+
+            //column
+            this.swipe.setLinearTotal(newColumnCount, direction)
+
+            //页码
+            this._updataPageNumber(direction)
+
+            this.lastDistance = this.swipe.getInitDistance()
+        }
     }
 
     /**
-     * 页面总数
+     * 更新页码
      */
-    resetPageCount() {
-        let total = this._getPageCount()
-        this.MAX = total - 1
-        this.swipe.setTotal(total)
+    _updataPageNumber(direction) {
+        Xut.View.SetPageNumber({
+            parentIndex: this.initIndex,
+            sonIndex: this.swipe.getVisualIndex() + 1,
+            hasSon: true,
+            direction
+        })
     }
 
     /**
@@ -127,40 +141,38 @@ export default class ColumnClass {
     _init($container) {
 
         const coloumnObj = this
-        const pagesCount = this._getPageCount()
-        const flowView = resetVisualLayout(1)
-        const flipWidth = flowView.width
-        const View = Xut.View
-        const initIndex = this.initIndex
+        const columnWidth = resetVisualLayout(1).width
         const container = $container[0]
 
-        coloumnObj.MIN = 0
-        coloumnObj.MAX = pagesCount - 1
+        //分栏数
+        this.columnCount = getColumnCount(this.seasonId, this.chapterId)
 
-        let nodes
-        if(this.pptMaster) {
-            nodes = this._makeNodes(pagesCount)
-        }
+        //边界
+        coloumnObj.minBorder = 0
+        coloumnObj.maxBorder = this.columnCount - 1
+
+        let nodes = this._getNodes()
 
         /**
          * 分栏整体控制
          * @type {[type]}
          */
         const swipe = this.swipe = new Swipe({
-            flipWidth: flipWidth,
+            swipeWidth: columnWidth,
             linear: true,
-            initIndex: Xut.Presentation.GetPageIndex() > initIndex ? coloumnObj.MAX : coloumnObj.MIN,
+            initIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
             container,
             flipMode: 0,
             multiplePages: 1,
             stopPropagation: true,
-            pagetotal: pagesCount
+            pageTotal: this.columnCount
         })
 
         let moveDistance = 0
-        let lastDistance = swipe.getInitDistance()
 
-        swipe.$watch('onTap', (pageIndex, hookCallback, ev, duration) => {
+        coloumnObj.lastDistance = swipe.getInitDistance()
+
+        swipe.$watch('onTap', function(pageIndex, hookCallback, ev, duration) {
             //如果是长按，是针对默认的事件处理
             if(config.supportQR && duration && duration > 500) {
                 return
@@ -168,10 +180,10 @@ export default class ColumnClass {
             //图片缩放
             const node = ev.target
             if(node && node.nodeName.toLowerCase() === "img") {
-                this._zoomImage(node)
+                coloumnObj._zoomImage(node)
             }
             if(!Xut.Contents.Canvas.getIsTap()) {
-                View.Toolbar()
+                Xut.View.Toolbar()
             }
         });
 
@@ -186,37 +198,34 @@ export default class ColumnClass {
         }) {
             /**
              * 首页边界
-             * @param  {[type]} this._hindex [description]
-             * @return {[type]}              [description]
              */
-            if(this._hindex === coloumnObj.MIN && this.direction === 'prev') {
+            if(swipe.visualIndex === coloumnObj.minBorder && swipe.direction === 'prev') {
+                // console.log(1)
                 if(action === 'flipOver') {
-                    View.GotoPrevSlide()
-                    this.simulationComplete()
+                    Xut.View.GotoPrevSlide()
+                    swipe.simulationComplete()
                 } else {
                     //前边界前移反弹
-                    View.MovePage(distance, speed, this.direction, action)
+                    Xut.View.MovePage(distance, speed, swipe.direction, action)
                 }
             }
             /**
              * 尾页边界
-             * @param  {[type]} this._hindex [description]
-             * @return {[type]}              [description]
              */
-            else if(this._hindex === coloumnObj.MAX && this.direction === 'next') {
+            else if(swipe.visualIndex === coloumnObj.maxBorder && swipe.direction === 'next') {
                 if(action === 'flipOver') {
-                    View.GotoNextSlide()
-                    this.simulationComplete()
+                    Xut.View.GotoNextSlide()
+                    swipe.simulationComplete()
                 } else {
                     //后边界前移反弹
-                    View.MovePage(distance, speed, this.direction, action)
+                    Xut.View.MovePage(distance, speed, swipe.direction, action)
                 }
             }
             /**
              * 中间页面
              */
             else {
-
+                // console.log(3)
                 let viewBeHideDistance = getVisualDistance({
                     action,
                     distance,
@@ -227,10 +236,10 @@ export default class ColumnClass {
 
                 switch(direction) {
                     case 'next':
-                        moveDistance = moveDistance + lastDistance
+                        moveDistance = moveDistance + coloumnObj.lastDistance
                         break
                     case 'prev':
-                        moveDistance = moveDistance + lastDistance
+                        moveDistance = moveDistance + coloumnObj.lastDistance
                         break
                 }
 
@@ -238,21 +247,16 @@ export default class ColumnClass {
                 if(action === 'flipRebound') {
                     if(direction === 'next') {
                         //右翻页，左反弹
-                        moveDistance = (-flipWidth * this._hindex)
+                        moveDistance = (-columnWidth * swipe.visualIndex)
                     } else {
                         //左翻页，右反弹
-                        moveDistance = -(flipWidth * this._hindex)
+                        moveDistance = -(columnWidth * swipe.visualIndex)
                     }
                 }
 
                 //更新页码
                 if(action === 'flipOver') {
-                    Xut.View.PageUpdate({
-                        parentIndex: initIndex,
-                        sonIndex: swipe.getHindex() + 1,
-                        hasSon: true,
-                        direction
-                    })
+                    coloumnObj._updataPageNumber(direction)
                 }
 
                 //移动视觉差
@@ -263,10 +267,10 @@ export default class ColumnClass {
                         masterObj.moveParallax({
                             action,
                             direction,
-                            pageIndex: this._hindex + 1,
+                            pageIndex: swipe.visualIndex + 1,
                             moveDist: viewBeHideDistance,
                             speed: speed,
-                            nodes: direction === 'next' ? nodes[this._hindex] : ''
+                            nodes: direction === 'next' ? nodes[swipe.visualIndex] : ''
                         })
                     }
                 }
@@ -279,7 +283,7 @@ export default class ColumnClass {
 
 
         swipe.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
-            lastDistance = moveDistance
+            coloumnObj.lastDistance = moveDistance
             unfliplock()
         })
 

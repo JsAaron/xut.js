@@ -20,7 +20,7 @@ export function extendView(vm, access, $globalEvent) {
      *   parentIndex  父索引
      *   subIndex     子索引
      */
-    Xut.View.PageUpdate = function(...arg) {
+    Xut.View.SetPageNumber = function(...arg) {
         vm.$emit('change:pageUpdate', ...arg)
     }
 
@@ -183,7 +183,7 @@ export function extendView(vm, access, $globalEvent) {
         }
 
         const pagePointer = $globalEvent.getPointer()
-        const data = {
+        vm.$dispatcher.movePageBases({
             'distance': distance,
             'speed': speed,
             'direction': direction,
@@ -191,8 +191,7 @@ export function extendView(vm, access, $globalEvent) {
             'leftIndex': pagePointer.leftIndex,
             'pageIndex': pagePointer.currIndex,
             'rightIndex': pagePointer.rightIndex
-        }
-        vm.$dispatcher.movePageBases(data)
+        })
     };
 
 }

@@ -6,7 +6,7 @@
 
 import { config } from '../config/index'
 import globalDestroy from '../global-destroy'
-import { Observer }  from '../observer/index'
+import { Observer } from '../observer/index'
 import { $$get } from '../util/index'
 import {
     $$autoRun,
@@ -38,12 +38,19 @@ export function initApplication() {
      */
     let __app__ = new Observer()
     Xut.Application.Watch = function(event, callback) {
-        __app__.$watch(`app:${event}`, function() {
+        let fn = function() {
             callback.apply(__app__, arguments)
-        })
+        }
+        __app__.bind(event, fn)
+        return fn
     }
+
+    Xut.Application.unWatch = function(event, fn) {
+        __app__.unbind(event, fn)
+    }
+
     Xut.Application.Notify = function(event, options) {
-        __app__.$emit(`app:${event}`, options)
+        __app__.trigger(event, options)
     }
 
     /**
@@ -60,8 +67,8 @@ export function initApplication() {
      * 用于进来的时候激活Activate
      */
     Xut.Application.Original = function() {
-        backstage = 1
-            //传递一个完全关闭的参数
+        backstage = 1;
+        //传递一个完全关闭的参数
         $$suspend('', '', true);
         $$original();
     }

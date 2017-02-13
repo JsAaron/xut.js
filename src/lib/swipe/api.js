@@ -8,18 +8,39 @@ import {
 export default function api(Swipe) {
 
     /**
-     * 设置页面总数
+     * 设置新的页面总数
      * @param {[type]} newVisualWidth [description]
      */
-    Swipe.prototype.setTotal = function(total){
-       this.pagetotal = total
+    Swipe.prototype.setLinearTotal = function(total, direction) {
+        let borderIndex
+
+        //如果当前页面就是最后一页
+        if(this.visualIndex == (this.pageTotal - 1)) {
+            borderIndex = this.visualIndex
+        }
+
+        this.pageTotal = total
+
+        //如果是前面有页
+        if(direction === 'next') {
+            // this._setTransform(total-1)
+        }
+
+        //如果是最后一页，叠加新的页面
+        //需要重写一些数据
+        if(borderIndex !== undefined) {
+            this.setPointer(borderIndex - 1, total)
+            this._updateActionPointer()
+        }
+
+        this._setContainerWidth()
     }
 
     /**
      * 获取翻页over速率
      * @return {[type]} [description]
      */
-    Swipe.prototype.getFlipOverSpeed = function(newVisualWidth){
+    Swipe.prototype.getFlipOverSpeed = function(newVisualWidth) {
         return this._flipOverSpeed(newVisualWidth)
     }
 
@@ -27,7 +48,7 @@ export default function api(Swipe) {
      * 获取初始化距离值
      * @return {[type]} [description]
      */
-    Swipe.prototype.getInitDistance = function(){
+    Swipe.prototype.getInitDistance = function() {
         return this._initDistance
     }
 
@@ -67,7 +88,7 @@ export default function api(Swipe) {
      * @return {[type]} [description]
      */
     Swipe.prototype.closeSwipe = function() {
-        if (!this._isMoving) {
+        if(!this._isMoving) {
             this._off()
         }
     }
@@ -97,11 +118,11 @@ export default function api(Swipe) {
      * @return {[type]} [description]
      */
     Swipe.prototype.prev = function() {
-        if (!this._borderBounce(1)) {
+        if(!this._borderBounce(1)) {
             this._slideTo('prev');
         } else {
             //边界反弹
-            this._setRebound(this._hindex, 'next')
+            this._setRebound(this.visualIndex, 'next')
         }
     }
 
@@ -111,11 +132,11 @@ export default function api(Swipe) {
      * @return {Function} [description]
      */
     Swipe.prototype.next = function() {
-        if (!this._borderBounce(-1)) {
+        if(!this._borderBounce(-1)) {
             this._slideTo('next');
         } else {
             //边界反弹
-            this._setRebound(this._hindex, 'prev')
+            this._setRebound(this.visualIndex, 'prev')
         }
     }
 
@@ -124,8 +145,8 @@ export default function api(Swipe) {
      * 获取当前页码
      * @return {[type]} [description]
      */
-    Swipe.prototype.getHindex = function() {
-        return this._hindex
+    Swipe.prototype.getVisualIndex = function() {
+        return this.visualIndex
     }
 
 
@@ -134,8 +155,8 @@ export default function api(Swipe) {
      * 因为分栏的关系，内部修改外部
      * 页面需要拼接
      */
-    Swipe.prototype.setPointer = function(target, pagetotal) {
-        this.pagePointer = initPointer(target, pagetotal || this.pagetotal)
+    Swipe.prototype.setPointer = function(target, pageTotal) {
+        this.pagePointer = initPointer(target, pageTotal || this.pageTotal)
     }
 
 
@@ -158,34 +179,34 @@ export default function api(Swipe) {
     Swipe.prototype.scrollToPage = function(targetIndex) { //目标页面
 
         //如果还在翻页中
-        if (this._fliplock) return
+        if(this._fliplock) return
 
-        const currIndex = this._hindex //当前页面
+        const currIndex = this.visualIndex //当前页面
 
         //相邻页
-        switch (targetIndex) {
+        switch(targetIndex) {
             //前一页
-            case (currIndex - 1):
-                if (this.options.multiplePages) {
+            case(currIndex - 1):
+                if(this.options.multiplePages) {
                     return this.prev();
                 }
                 break
                 //首页
             case currIndex:
-                if (currIndex == 0) {
+                if(currIndex == 0) {
                     this.$emit('onDropApp');
                 }
                 return
                 //后一页
-            case (currIndex + 1):
-                if (this.options.multiplePages) {
+            case(currIndex + 1):
+                if(this.options.multiplePages) {
                     return this.next();
                 }
                 break
         }
 
         //算出是相关数据
-        const data = calculationIndex(currIndex, targetIndex, this.pagetotal)
+        const data = calculationIndex(currIndex, targetIndex, this.pageTotal)
 
         //更新页码索引
         this._updataPointer(data)
@@ -203,7 +224,7 @@ export default function api(Swipe) {
     Swipe.prototype.destroy = function() {
         this._off();
         this.$off();
-        if (this._bubbleNode) {
+        if(this._bubbleNode) {
             this._bubbleNode.page = null
             this._bubbleNode.master = null
         }
@@ -228,23 +249,23 @@ export default function api(Swipe) {
      */
     Swipe.prototype.findBubbleRootNode = function(point, pageType) {
         let liNode, map
-        let _hindex = this._hindex
+        let visualIndex = this.visualIndex
         let sectionRang = this.options.sectionRang
 
         //找到对应的li
         let childNodes = this._bubbleNode[pageType].childNodes
         let nodeTotal = childNodes.length
 
-        while (nodeTotal--) {
+        while(nodeTotal--) {
             liNode = childNodes[nodeTotal]
             map = liNode.getAttribute('data-map');
-            if (sectionRang) {
-                _hindex += sectionRang.start;
+            if(sectionRang) {
+                visualIndex += sectionRang.start;
             }
-            if (map == _hindex) {
+            if(map == visualIndex) {
                 return liNode
             }
-            _hindex = this._hindex;
+            visualIndex = this.visualIndex;
         }
     }
 

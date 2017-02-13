@@ -53,7 +53,7 @@ export default class Controller {
         let options = this.options
         //createPointer
         //initPointer
-        let pointer = initPointer(options.initIndex, options.pagetotal, options.multiplePages)
+        let pointer = initPointer(options.initIndex, options.pageTotal, options.multiplePages)
         this.pagePointer = pointer.initPointer
         this.createPageBases(pointer.createPointer, options.initIndex, 'init')
     }
@@ -523,7 +523,7 @@ export default class Controller {
             //不显示首尾对应的按钮
             if(currIndex == 0) {
                 vm.$emit('change:hidePrev');
-            } else if(currIndex == options.pagetotal - 1) {
+            } else if(currIndex == options.pageTotal - 1) {
                 vm.$emit('change:hideNext');
                 vm.$emit('change:showPrev');
             } else {
@@ -604,7 +604,7 @@ export default class Controller {
      * @return {[type]}             [description]
      */
     _advanceCreate(direction, pagePointer) {
-        let pagetotal = this.options.pagetotal
+        let pageTotal = this.options.pageTotal
         let vm = this.vm
         let createPointer = pagePointer.createPointer
 
@@ -622,7 +622,7 @@ export default class Controller {
             //首尾无须创建页面
             if(pagePointer.currIndex === 0) {
                 this._autoRun()
-                if(pagetotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+                if(pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
                     vm.$emit('change:showNext')
                 }
                 vm.$emit('change:hidePrev')
@@ -639,16 +639,16 @@ export default class Controller {
         //如果是右边翻页
         if(direction === 'next') {
             //首尾无须创建页面
-            if(pagePointer.currIndex === pagetotal - 1) {
+            if(pagePointer.currIndex === pageTotal - 1) {
                 this._autoRun()
-                if(pagetotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+                if(pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
                     vm.$emit('change:showPrev')
                 }
                 //多页处理
                 vm.$emit('change:hideNext')
                 return
             }
-            if(createPointer < pagetotal) { //创建的页面
+            if(createPointer < pageTotal) { //创建的页面
                 createNextPageBase(pagePointer.currIndex)
                 clearPointer()
                 vm.$emit('change:showPrev')

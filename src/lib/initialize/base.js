@@ -11,7 +11,7 @@ import {
 } from '../config/index'
 
 import initTooBar from './toolbar'
-import initColumn from '../scenario-core/component/column/core-init'
+import { initColumn } from '../scenario-core/component/column/core-init'
 
 /**
  * 新增模式,用于记录浏览器退出记录

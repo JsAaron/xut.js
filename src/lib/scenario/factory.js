@@ -218,7 +218,7 @@ export class SceneFactory {
 
             //页面总数改变
             if(config.columnCheck) {
-                Xut.Application.Watch('change:number', () => {
+                Xut.Application.Watch('change:number:total', () => {
                     this.numberToolbar.updateTotal(getColumnTotal(true))
                 })
             }
@@ -252,7 +252,7 @@ export class SceneFactory {
             'rootPage': scenarioPage,
             'rootMaster': scenarioMaster,
             'initIndex': pageIndex, //保存索引从0开始
-            'pagetotal': pageTotal,
+            'pageTotal': pageTotal,
             'sectionRang': this.sectionRang,
             'scenarioId': scenarioId,
             'chapterId': this.chapterId,

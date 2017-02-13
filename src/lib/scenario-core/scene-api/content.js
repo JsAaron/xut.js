@@ -179,7 +179,7 @@ export function extendContent(access, $globalEvent) {
             access(function(manager, pageType, nameList) {
                 if(typeCheck(nameList)) return;
                 var pageBaseObj;
-                if(!(pageBaseObj = manager.abstractAssistPocess($globalEvent.getHindex()))) {
+                if(!(pageBaseObj = manager.abstractAssistPocess($globalEvent.getVisualIndex()))) {
                     console.log('注入互斥接口数据错误！')
                     return;
                 }

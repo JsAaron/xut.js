@@ -51,11 +51,11 @@ const ABS = Math.abs
 export default class Swipe extends Observer {
 
     constructor({
-        flipWidth, //翻页的长度
+        swipeWidth, //翻页的长度
         initIndex, //初页
         container,
         flipMode, //翻页模式
-        pagetotal, //总数
+        pageTotal, //总数
         multiplePages, //多页面
         stopPropagation = false,
         preventDefault = true,
@@ -110,15 +110,16 @@ export default class Swipe extends Observer {
             sectionRang
         }
 
-        this._hindex = initIndex
-        this.pagetotal = pagetotal
+        this.visualIndex = initIndex
+        this.pageTotal = pageTotal
         this.container = container
+        this.extraGap = extraGap
 
         /**
          * 视图宽度
          * @type {[type]}
          */
-        this._visualWidth = flipWidth || config.visualSize.width
+        this._visualWidth = swipeWidth || config.visualSize.width
 
         /**
          * 翻页时间
@@ -142,17 +143,14 @@ export default class Swipe extends Observer {
          * 计算初始化页码
          * @type {[type]}
          */
-        this.pagePointer = initPointer(initIndex, pagetotal)
+        this.pagePointer = initPointer(initIndex, pageTotal)
 
         //初始化线性翻页
         //全局只创建一个翻页容器
         if(linear) {
             container.setAttribute(LINEARTAG, true)
-
-            //this._initDistance 提供给flow调用
-            this._initDistance = -this._hindex * (this._visualWidth + extraGap)
-            container.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
-            container.style.width = this._visualWidth * this.pagetotal + 'px'
+            this._setTransform()
+            this._setContainerWidth()
         } else {
             //用于查找跟元素
             //ul => page
@@ -168,6 +166,25 @@ export default class Swipe extends Observer {
         this._initEvents()
     }
 
+    /**
+     * 设置初始的
+     */
+    _setTransform(newIndex) {
+        let visualIndex = newIndex || this.visualIndex
+        this._initDistance = -visualIndex * (this._visualWidth + this.extraGap)
+        if(this.container) {
+            this.container.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
+        }
+    }
+
+    /**
+     * 设置容易溢出的宽度
+     */
+    _setContainerWidth() {
+        if(this.container) {
+            this.container.style.width = this._visualWidth * this.pageTotal + 'px'
+        }
+    }
 
     /**
      * 绑定事件
@@ -357,8 +374,8 @@ export default class Swipe extends Observer {
         //滑动方向
         //left => 负
         //rigth => 正
-        this._deltaX = deltaX / ((!this._hindex && deltaX > 0 // 在首页
-            || this._hindex == this.pagetotal - 1 // 尾页
+        this._deltaX = deltaX / ((!this.visualIndex && deltaX > 0 // 在首页
+            || this.visualIndex == this.pageTotal - 1 // 尾页
             && deltaX < 0 // 中间
         ) ? (absDeltaX / this._visualWidth + 1) : 1)
 
@@ -389,7 +406,7 @@ export default class Swipe extends Observer {
         }
 
         this._distributeMove({
-            pageIndex: this._hindex,
+            pageIndex: this.visualIndex,
             distance: this._deltaX + xWait,
             speed: 0,
             direction: this.direction,
@@ -425,7 +442,7 @@ export default class Swipe extends Observer {
         //点击
         if(!this._isRollX && !this._isRollY) {
             let isReturn = false
-            this.$emit('onTap', this._hindex, () => isReturn = true, e, duration)
+            this.$emit('onTap', this.visualIndex, () => isReturn = true, e, duration)
             if(isReturn) return
         }
 
@@ -437,7 +454,7 @@ export default class Swipe extends Observer {
             //如果是首尾
             //如果是liner模式排除
             let isPastBounds = this.options.linear ? false :
-                !this._hindex && this._deltaX > 0 || this._hindex == this.pagetotal - 1 && this._deltaX < 0
+                !this.visualIndex && this._deltaX > 0 || this.visualIndex == this.pageTotal - 1 && this._deltaX < 0
 
             //_slideTo的最低值要求
             //1 fast: time < 200 && x >30
@@ -452,7 +469,7 @@ export default class Swipe extends Observer {
                 let hasSwipe = duration < 200 && deltaX > this._visualWidth / 10
                 if(hasSwipe) {
                     this._distributeMove({
-                        pageIndex: this._hindex,
+                        pageIndex: this.visualIndex,
                         direction: this._deltaX > 0 ? 'prev' : 'next',
                         action: 'swipe'
                     })
@@ -466,7 +483,7 @@ export default class Swipe extends Observer {
                     this._slideTo(this._deltaX < 0 ? 'next' : 'prev')
                 } else {
                     //反弹
-                    this._setRebound(this._hindex, this._deltaX > 0 ? 'prev' : 'next')
+                    this._setRebound(this.visualIndex, this._deltaX > 0 ? 'prev' : 'next')
                 }
             }
         }
@@ -480,10 +497,10 @@ export default class Swipe extends Observer {
      */
     _borderBounce(deltaX) {
         //首页,并且是左滑动
-        if(this._hindex === 0 && deltaX > 0) {
+        if(this.visualIndex === 0 && deltaX > 0) {
             return true;
             //尾页
-        } else if(this._hindex === this.pagetotal - 1 && deltaX < 0) {
+        } else if(this.visualIndex === this.pageTotal - 1 && deltaX < 0) {
             return true;
         }
     }
@@ -533,7 +550,7 @@ export default class Swipe extends Observer {
                 overflow = (pointer.currIndex === 0 && fillength === 2) ? true : false;
                 break;
             case 'next': //后翻页
-                overflow = (pointer.currIndex === (this.pagetotal - 1) && fillength === 2) ? true : false;
+                overflow = (pointer.currIndex === (this.pageTotal - 1) && fillength === 2) ? true : false;
                 break;
         }
 
@@ -582,9 +599,10 @@ export default class Swipe extends Observer {
 
     /**
      * 修正页面索引
+     * 设置新的页面可视区索引
      */
-    _fixHindex(currIndex) {
-        this._hindex = currIndex; //翻页索引
+    _setVisualIndex(index) {
+        this.visualIndex = index
     }
 
 
@@ -603,7 +621,7 @@ export default class Swipe extends Observer {
         if(arguments.length === 1) {
             let data = leftIndex;
             let viewFlip = data.viewFlip
-            this._fixHindex(data.targetIndex)
+            this._setVisualIndex(data.targetIndex)
             if(viewFlip.length === 3) {
                 this._updataPointer(viewFlip[0], viewFlip[1], viewFlip[2]);
             }
@@ -626,17 +644,12 @@ export default class Swipe extends Observer {
      * 增加索引的动作
      * 修正页码指示
      */
-    _updateActionPointer(pointer) {
+    _updateActionPointer() {
+        const pointer = this.pagePointer
 
         //获取动作索引
-        // createPointer
-        // destroyPointer
         const actionPointer = getActionPointer(this.direction, pointer.leftIndex, pointer.rightIndex)
-
-        //需要创建的页面
         const createPointer = actionPointer.createPointer
-
-        //需要停止动作的页面索引
         const stopPointer = pointer.currIndex
 
         switch(this.direction) {
@@ -651,10 +664,10 @@ export default class Swipe extends Observer {
                 }
                 break;
             case 'next':
-                if(this.pagetotal > createPointer) {
+                if(this.pageTotal > createPointer) {
                     this._updataPointer(pointer.currIndex, pointer.rightIndex, createPointer);
                 }
-                if(this.pagetotal === createPointer) { //如果是尾页
+                if(this.pageTotal === createPointer) { //如果是尾页
                     this.pagePointer.leftIndex = pointer.currIndex;
                     this.pagePointer.currIndex = pointer.rightIndex;
                     delete this.pagePointer.rightIndex;
@@ -701,20 +714,24 @@ export default class Swipe extends Observer {
         this._quickTurn()
 
         this._distributeMove({
-            'pageIndex': this._hindex,
+            'pageIndex': this.visualIndex,
             'speed': this._flipOverSpeed(),
             'distance': 0,
             'direction': this.direction,
             'action': 'flipOver'
         })
 
+        if(this.pagePointer.createPointer) {
+            this.recordLastPoionter = $.extend(true, {}, this.pagePointer)
+        }
+
         setTimeout(() => {
             //更新this.pagePointer索引
             //增加处理标记
-            this._updateActionPointer(this.pagePointer)
+            this._updateActionPointer()
             this.$emit('onUpSlider', this.pagePointer)
-            this._fixHindex(this.pagePointer.currIndex)
-        })
+            this._setVisualIndex(this.pagePointer.currIndex)
+        }, 0)
     }
 
 
@@ -744,7 +761,7 @@ export default class Swipe extends Observer {
         if(!view) {
             if(!pageType) {
                 //只针对母板处理
-                this.$emit('onMasterMove', this._hindex, node);
+                this.$emit('onMasterMove', this.visualIndex, node);
             }
             return
         }
