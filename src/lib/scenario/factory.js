@@ -388,6 +388,10 @@ export class SceneFactory {
      */
     destroy() {
 
+        if(config.columnCheck) {
+            Xut.Application.unWatch('change:number:total')
+        }
+
         //销毁当前场景
         this.vm.$destroy();
 

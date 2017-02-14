@@ -1,8 +1,9 @@
 import { config } from '../../../config/index'
 import { create as _create } from '../depend/multievent'
 import Collection from '../depend/collection'
-import initTasks from '../threadtask/init-task'
+import initTasks from '../threadtask/task-hook/index'
 import Factory from '../depend/factory'
+import { watchColumn } from '../watch'
 
 export default function(baseProto) {
 
@@ -54,7 +55,6 @@ export default function(baseProto) {
          * 抽象activtiys合集,用于关联各自的content
          * 划分各自的子作用域
          * 1对多的关系
-         * @type {Collection}
          */
         this._abActivitys = new Collection();
 
@@ -63,40 +63,26 @@ export default function(baseProto) {
          * 只存在当前页面
          * 1 iframe零件
          * 2 页面零件
-         * @type {Collection}
          */
         this._components = new Collection();
 
         /**
          * 缓存所有的content对象引用
          * 1对1的关系
-         * @type {Object}
          */
         this._contentsCollector = {}
 
         /**
          * 2016.9.7
          * column热点对象
-         * @type {Collection}
          */
         this._columns = new Collection()
-
-        /**
-         * 流式布局页面
-         * 排除母版
-         * @param  {[type]} instance.pageType [description]
-         * @return {[type]}                   [description]
-         */
-        if(this.pageType === 'master' && this.isFlows) {
-            this.isFlows = false
-        }
 
         /**
          * 为mini杂志新功能
          * 动画的调用序列
          * 收集滑动委托对象，针对事件合集触发处理
          * 2016.11.8
-         * @type {Array}
          */
         if(config.swipeDelegate) {
             this._swipeSequence = {
@@ -108,29 +94,6 @@ export default function(baseProto) {
                 swiperightIndex: 0
             }
         }
-
-        /**
-         * 初始化任务完成钩子
-         * @return {[type]} [description]
-         */
-        this.initTasksCompleteHook = () => {
-            //注册_columns对象改变
-            if(config.columnCheck) {
-                const columnObj = this._columns.get()
-                if(columnObj && columnObj.length) {
-                    if(!this.unWatchDep) {
-                        this.unWatchDep = []
-                    }
-                    columnObj.forEach(obj => {
-                        let dep = Xut.Application.Watch('change:column', function() {
-                            obj.resetColumnDep(instance.chapterId < Xut.Presentation.GetPageId() ? 'next' : 'prev')
-                        })
-                        this.unWatchDep.push(() => Xut.Application.unWatch('change:column', dep))
-                    })
-                }
-            }
-        }
-
 
         /**
          * 浮动对象
@@ -172,12 +135,18 @@ export default function(baseProto) {
          * 对象的处理情况的内部钩子方法
          * @type {Object}
          */
-        this.listenerHooks = {
+        this.collectHooks = {
+
+            /**
+             * 多线程任务完成后
+             * 开始column观察器
+             */
+            threadtaskComplete(){
+                 watchColumn(instance, config)
+            },
 
             /**
              * 注册抽象Activity类content(大类,总content对象)
-             * @param  {[type]} contentsObjs [description]
-             * @return {[type]}              [description]
              */
             registerActivitys(contentsObjs) {
                 instance._abActivitys.register(contentsObjs);
@@ -271,8 +240,6 @@ export default function(baseProto) {
             /**
              * 多事件钩子
              * 执行多事件绑定
-             * @param  {[type]} eventRelated [description]
-             * @return {[type]}              [description]
              */
             eventBinding(eventRelated) {
                 _create(instance, eventRelated);
@@ -281,7 +248,6 @@ export default function(baseProto) {
             /**
              * 2016.11.8
              * 收集滑动委托对象，针对事件合集触发处理
-             * @return {[type]} [description]
              */
             swipeDelegateContents(eventName, fn) {
                 ++instance._swipeSequence[eventName + 'Total']

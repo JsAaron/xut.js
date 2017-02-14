@@ -1,4 +1,5 @@
 import { destroy as _destroy } from '../depend/multievent'
+import { unWatchColumn } from '../watch'
 
 export default function(baseProto) {
 
@@ -96,12 +97,7 @@ export default function(baseProto) {
             this.$pseudoElement = null;
         }
 
-        //如果有更新记录依赖
-        if(this.unWatchDep) {
-            this.unWatchDep.forEach(unDep => {
-                unDep()
-            })
-        }
+        unWatchColumn(this)
 
         //移除li容器节点节点
         this.$pageNode.remove();

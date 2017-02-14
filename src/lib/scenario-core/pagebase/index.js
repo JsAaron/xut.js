@@ -20,7 +20,7 @@
  *                                                         *
  **********************************************************************/
 
-import initstate from './internal/initstate'
+import initstate from './internal/init-state'
 import threadExternal from './internal/thread-api'
 import dataExternal from './internal/data-api'
 import destroy from './internal/destroy'

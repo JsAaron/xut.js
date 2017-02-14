@@ -731,7 +731,7 @@ export default class Swipe extends Observer {
             this._updateActionPointer()
             this.$emit('onUpSlider', this.pagePointer)
             this._setVisualIndex(this.pagePointer.currIndex)
-        }, 0)
+        })
     }
 
 

@@ -91,7 +91,7 @@ const combineEvents = function(pagebase, eventRelated) {
         })
 
         //暴露引用
-        pagebase.listenerHooks.registerEvents = eventRelated;
+        pagebase.collectHooks.registerEvents = eventRelated;
     })
 }
 
@@ -104,12 +104,12 @@ export function create(pagebase, eventRelated) {
 
 export function destroy(pagebase) {
     var registerEvents;
-    if (registerEvents = pagebase.listenerHooks.registerEvents) {
+    if (registerEvents = pagebase.collectHooks.registerEvents) {
         _.each(registerEvents, function(edata) {
             _.each(edata, function(obj) {
                 obj.destroy && obj.destroy();
             })
         })
     }
-    pagebase.listenerHooks.registerEvents = null;
+    pagebase.collectHooks.registerEvents = null;
 }

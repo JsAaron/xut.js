@@ -63,7 +63,10 @@ export default class NumberBar {
         }
     }
 
-    _updateText(action, updateIndex) {
+    /**
+     * 更新单页
+     */
+    _updateSingle(action, updateIndex) {
         Xut.nextTick(() => {
             this.$currtNode.text(updateIndex)
             if(action === 'init') {
@@ -73,10 +76,7 @@ export default class NumberBar {
     }
 
     /**
-     * 更新
-     *     当前页面数
-     *     总页数
-     * @return {[type]} [description]
+     * 更新总页数
      */
     updateTotal(newTotalIndex) {
         Xut.nextTick(() => {
@@ -86,12 +86,11 @@ export default class NumberBar {
 
     /**
      * 更新页码
-     * @return {[type]} [description]
      */
     updatePointer({
         action,
         direction,
-        parentIndex,
+        parentIndex, //chpater的pageIndex
         hasSon = false,
         sonIndex = 0
     }) {
@@ -103,7 +102,7 @@ export default class NumberBar {
 
         //没有column
         if(!hasColumn()) {
-            this._updateText(action, parentIndex)
+            this._updateSingle(action, parentIndex)
             return
         }
 
@@ -125,7 +124,7 @@ export default class NumberBar {
             }
         }
 
-        this._updateText(action, updateIndex)
+        this._updateSingle(action, updateIndex)
     }
 
 }

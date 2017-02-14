@@ -102,12 +102,14 @@ const initApp = () => baseConfig(initMain)
  * @return {[type]} [description]
  */
 const bindPlatEvent = () => {
-    //安卓上
-    if (Xut.plat.isAndroid) {
+
+    //安卓上并且不是浏览器打开的情况
+    if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
+
         //预加载处理视频
         //妙妙学不加载视频
         //读库不加载视频
-        if (!window.MMXCONFIG && !window.DUKUCONFIG) {
+        if (window.MMXCONFIG && !window.DUKUCONFIG) {
             plugVideo();
         }
 

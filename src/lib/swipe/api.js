@@ -8,29 +8,46 @@ import {
 export default function api(Swipe) {
 
     /**
-     * 设置新的页面总数
-     * @param {[type]} newVisualWidth [description]
+     * column的情况
+     * 动态设置新的页面总数
      */
-    Swipe.prototype.setLinearTotal = function(total, direction) {
-        let borderIndex
+    Swipe.prototype.setLinearTotal = function(total, location) {
 
-        //如果当前页面就是最后一页
-        if(this.visualIndex == (this.pageTotal - 1)) {
-            borderIndex = this.visualIndex
+        //如果当前是column
+        if(location === 'middle') {
+
+            let borderIndex
+            //必须是有2页以上并且当前页面就是最后一页
+            //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
+            if(this.pageTotal > 1 && this.visualIndex == this.pageTotal - 1) {
+                borderIndex = this.visualIndex
+            }
+
+            this.pageTotal = total
+
+            //如果是最后一页，叠加新的页面
+            //需要重写一些数据
+            if(borderIndex !== undefined) {
+                this.setPointer(borderIndex - 1, total)
+                this._updateActionPointer()
+            }
         }
 
-        this.pageTotal = total
-
-        //如果是前面有页
-        if(direction === 'next') {
-            // this._setTransform(total-1)
-        }
-
-        //如果是最后一页，叠加新的页面
-        //需要重写一些数据
-        if(borderIndex !== undefined) {
-            this.setPointer(borderIndex - 1, total)
+        //如果左边是column页面
+        //改变总页面数
+        //改变可视区页面为最后页
+        if(location === 'left') {
+            this.pageTotal = total
+            this.visualIndex = total - 1;
+            this.setPointer(this.visualIndex, total)
             this._updateActionPointer()
+            //设置Transform的偏移量，为最后一页
+            this._setTransform(this.visualIndex)
+        }
+
+        //如果是右边的column
+        if(location === 'right') {
+            this.pageTotal = total
         }
 
         this._setContainerWidth()

@@ -1,6 +1,6 @@
-import { config } from '../../../config/index'
-import assignedTasks from './assign-task'
-import initstate from './states'
+import { config } from '../../../../config/index'
+import assignedTasks from './assign'
+import initstate from './init-state'
 import Pinch from './pinch'
 
 const noop = function() {}

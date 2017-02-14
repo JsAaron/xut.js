@@ -54,6 +54,10 @@ function filterJsonData() {
     //需要把flow的给处理掉
     let remoteUrl = config.launch && config.launch.resource
     if(remoteUrl && result.FlowData) {
+
+        //启动检测
+        config.columnCheck = true
+
         //有基础后缀，需要补上所有的图片地址
         let baseSuffix = ''
         if(config.baseImageSuffix) {

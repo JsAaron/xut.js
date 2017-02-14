@@ -175,7 +175,7 @@ export default function(baseProto) {
 
         //完毕回调
         this.createRelated.createTasksComplete = () => {
-            this.initTasksCompleteHook && this.initTasksCompleteHook()
+            this.collectHooks && this.collectHooks.threadtaskComplete()
             callback.call(context)
         };
 

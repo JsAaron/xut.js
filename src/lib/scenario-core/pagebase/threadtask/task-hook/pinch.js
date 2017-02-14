@@ -1,4 +1,4 @@
-import { PinchPan } from '../../../plugin/extend/pinch-pan'
+import { PinchPan } from '../../../../plugin/extend/pinch-pan'
 
 const transform = Xut.style.transform
 const transitionDuration = Xut.style.transitionDuration

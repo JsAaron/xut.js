@@ -20,7 +20,7 @@ export function extendView(vm, access, $globalEvent) {
      *   parentIndex  父索引
      *   subIndex     子索引
      */
-    Xut.View.SetPageNumber = function(...arg) {
+    Xut.View.setPageNumber = function(...arg) {
         vm.$emit('change:pageUpdate', ...arg)
     }
 

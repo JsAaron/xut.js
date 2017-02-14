@@ -22,47 +22,37 @@ export default class ColumnClass {
         chapterId,
         successCallback
     }) {
-        const $container = $($('#chapter-flow-' + chapterId).html())
-        this.initIndex = pageIndex
-        this.$pinchNode = $pinchNode
-        this.pptMaster = pptMaster
         this.zoomObjs = {}
+        this.pptMaster = pptMaster
         this.chapterId = chapterId
         this.seasonId = seasonId
+        this.initIndex = pageIndex
+        this.$pinchNode = $pinchNode
+        this.$container = $($('#chapter-flow-' + chapterId).html())
+        this._layout(successCallback)
+    }
 
+    /**
+     * 布局显示
+     */
+    _layout(successCallback) {
         Xut.nextTick({
-            container: $pinchNode,
-            content: $container
+            container: this.$pinchNode,
+            content: this.$container
         }, () => {
-            this._init($container)
+            this._init()
             successCallback()
         })
     }
 
     /**
-     * 获取母版对象
-     * @return {[type]} [description]
-     */
-    _getMasterObj() {
-        if(this._masterObj) {
-            return this._masterObj
-        }
-        if(this.pptMaster) {
-            this._masterObj = Xut.Presentation.GetPageObj('master', this.initIndex)
-        }
-    }
-
-    /**
      * 缩放图片
-     * @return {[type]} [description]
      */
     _zoomImage(node) {
-
         let src = node.src
         if(!src) {
             return
         }
-
         let analysisName = analysisImageName(src)
         let originalName = analysisName.original
         let zoomObj = this.zoomObjs[originalName]
@@ -83,12 +73,10 @@ export default class ColumnClass {
         }
     }
 
-    //pagesCount = 5
-    //   0.25
-    //   0.5
-    //   0.75
-    //   1
-    //   0
+    /**
+     * pagesCount = 5
+     *   等分=> 0.25/0.5/0.75/1/0
+     */
     _getNodes() {
         if(this.pptMaster) {
             let nodes = []
@@ -101,48 +89,45 @@ export default class ColumnClass {
     }
 
     /**
-     * 重新计算分栏依赖
+     * 获取母版对象
      */
-    resetColumnDep(direction) {
-        let newColumnCount = getColumnCount(this.seasonId, this.chapterId)
-            //如果分栏页面总数不正确
-        if(this.columnCount !== newColumnCount) {
-            this.columnCount = newColumnCount
-            this.maxBorder = newColumnCount - 1
-
-            //column
-            this.swipe.setLinearTotal(newColumnCount, direction)
-
-            //页码
-            this._updataPageNumber(direction)
-
-            this.lastDistance = this.swipe.getInitDistance()
+    _getMasterObj() {
+        if(this._masterObj) {
+            return this._masterObj
+        }
+        if(this.pptMaster) {
+            this._masterObj = Xut.Presentation.GetPageObj('master', this.initIndex)
         }
     }
 
     /**
-     * 更新页码
+     * 移动视觉差
+     * 处理当前页面内的视觉差对象效果
      */
-    _updataPageNumber(direction) {
-        Xut.View.SetPageNumber({
-            parentIndex: this.initIndex,
-            sonIndex: this.swipe.getVisualIndex() + 1,
-            hasSon: true,
-            direction
-        })
+    _moveParallax(action, speed, nodes, visualIndex, direction, viewBeHideDistance) {
+        const masterObj = this._getMasterObj()
+        if(masterObj) {
+            masterObj.moveParallax({
+                speed,
+                action,
+                direction,
+                pageIndex: visualIndex + 1,
+                moveDist: viewBeHideDistance,
+                nodes: direction === 'next' ? nodes[visualIndex] : ''
+            })
+        }
     }
+
+
 
     /**
      * 初始化
-     * @param  {[type]} $container [description]
-     * @param  {[type]} $content   [description]
-     * @return {[type]}            [description]
      */
-    _init($container) {
+    _init() {
 
         const coloumnObj = this
         const columnWidth = resetVisualLayout(1).width
-        const container = $container[0]
+        const container = this.$container[0]
 
         //分栏数
         this.columnCount = getColumnCount(this.seasonId, this.chapterId)
@@ -196,6 +181,7 @@ export default class ColumnClass {
             rightIndex,
             direction
         }) {
+
             /**
              * 首页边界
              */
@@ -225,7 +211,7 @@ export default class ColumnClass {
              * 中间页面
              */
             else {
-                // console.log(3)
+
                 let viewBeHideDistance = getVisualDistance({
                     action,
                     distance,
@@ -259,24 +245,10 @@ export default class ColumnClass {
                     coloumnObj._updataPageNumber(direction)
                 }
 
-                //移动视觉差
-                let moveParallaxObject = () => {
-                    let masterObj = coloumnObj._getMasterObj()
-                    if(masterObj) {
-                        //处理当前页面内的视觉差对象效果
-                        masterObj.moveParallax({
-                            action,
-                            direction,
-                            pageIndex: swipe.visualIndex + 1,
-                            moveDist: viewBeHideDistance,
-                            speed: speed,
-                            nodes: direction === 'next' ? nodes[swipe.visualIndex] : ''
-                        })
-                    }
-                }
-
                 translation[action](container, moveDistance, speed)
-                moveParallaxObject()
+
+                //移动视觉差对象
+                coloumnObj._moveParallax(action, speed, nodes, swipe.visualIndex, direction, viewBeHideDistance)
             }
 
         })
@@ -289,6 +261,61 @@ export default class ColumnClass {
 
     }
 
+
+    /**
+     * 更新页码
+     */
+    _updataPageNumber(direction, location) {
+        let initIndex = this.initIndex
+        if(location) {
+            direction = location === 'right' ? 'prev' : 'next'
+            if(location === 'middle') {
+                //如果中间是分栏页
+                --initIndex
+            }
+        }
+        Xut.View.setPageNumber({
+            parentIndex: initIndex,
+            sonIndex: this.swipe.getVisualIndex() + 1,
+            hasSon: true,
+            direction: direction
+        })
+    }
+
+    /**
+     * 重新计算分栏依赖
+     */
+    resetColumnDep() {
+        let newColumnCount = getColumnCount(this.seasonId, this.chapterId)
+
+        //如果分栏页面总数不正确
+        if(this.columnCount !== newColumnCount) {
+
+            this.columnCount = newColumnCount
+            this.maxBorder = newColumnCount - 1
+
+            let visualPageId = Xut.Presentation.GetPageId()
+            let columnPageId = this.chapterId
+            let location
+
+            //区分控制column属于哪个页面对象
+            if(visualPageId > columnPageId) {
+                location = 'left'
+            } else if(visualPageId < columnPageId) {
+                location = 'right'
+            } else if(visualPageId === columnPageId) {
+                location = 'middle'
+            }
+
+            //设置column
+            this.swipe.setLinearTotal(newColumnCount, location)
+
+            this.lastDistance = this.swipe.getInitDistance()
+
+            //页码
+            this._updataPageNumber('', location)
+        }
+    }
 
     /**
      * 销毁

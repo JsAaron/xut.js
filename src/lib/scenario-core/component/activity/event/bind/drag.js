@@ -64,7 +64,8 @@ export default class {
                 var dropElement = self.dropElement,
                     isEnter = false; //是否进入目标
 
-                if (dropElement) {
+                //目标元素可见才可以拖拽成功
+                if (dropElement && dropElement[0].style.visibility != "hidden") {
                     //获取拖拽对象当前参数
                     var fromOffset = self.dragElement.offset();
                     var fromPoint = {

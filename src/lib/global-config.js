@@ -19,13 +19,13 @@ export type Config = {
         url: ? string
     };
     keepBaseImageZoom: boolean;
-    baseImageSuffix:string;
+    baseImageSuffix: string;
     imageSuffix: ? {
         750: ? string,
         1080: ? string,
         1440: ? string
     },
-    useHDImageZoom:boolean;
+    useHDImageZoom: boolean;
     visualMode: number;
     flipMode: number;
     orientateMode: boolean;
@@ -54,9 +54,9 @@ const config: Config = {
     /**
      * 是否启动分栏高度检测
      * 变更依赖
-     * @type {Boolean}
+     * 如果检测到有column数据，会自动启动
      */
-    columnCheck:true,
+    columnCheck: false,
 
     /**
      * 适配平台

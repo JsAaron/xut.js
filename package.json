@@ -9,6 +9,7 @@
     "copy": "node build/copy/index.js",
     "remote": "node build/remote/index.js",
     "lint": "eslint dist/xxtppt.dev.js",
+    "tp:iframe": "node build/template/iframe.js",
     "tp:www": "node build/template/www.js",
     "tp:column": "node build/template/column.js",
     "tp:test": "node build/template/test.js",

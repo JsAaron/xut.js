@@ -119,7 +119,7 @@ const resolveCount = ($content) => {
     for(let i = 0; i < theChildren.length; i++) {
         paraHeight += Math.max(theChildren[i].scrollHeight, theChildren[i].clientHeight)
     }
-    // $("#test123").append('<p>' + paraHeight + '</p>')
+    // $("#test123").append('<a>' + paraHeight + '</a>，')
     return Math.ceil(paraHeight / newViewHight)
 }
 
@@ -143,33 +143,57 @@ const getColumnCount = function($seasons, callback) {
 }
 
 
-/**
- * 监听分栏高度变化后处理
- */
-const watchColumn = function(seasonsId, chapterId, count) {
-    setChpaterColumn(seasonsId, chapterId, count)
-    Xut.Application.Notify('change:number:visual')
-    Xut.Application.Notify('change:number:total')
-    Xut.Application.Notify('change:column')
+
+const makeDelay = function(seasonsId, chapterId, count) {
+    return function() {
+        setChpaterColumn(seasonsId, chapterId, count)
+    }
 }
+
+const execDelay = function(tempDelay) {
+    if(tempDelay.length) {
+        let fn
+        while(fn = tempDelay.pop()) {
+            fn()
+        }
+        Xut.Application.Notify('change:number:total')
+        Xut.Application.Notify('change:column')
+    }
+}
+
+/**
+ * debug调试
+ */
+let debug = false
+let simulateCount = 2
+let simulateTimer = 13
 
 /**
  * 检测分栏高度
  */
 let timerId = null
+//基本检测次数 20*500 ~ 10秒范围
+let baseCount = 20
+
 export function checkColumnHeight($seasons, columnCollection, checkCount, callback) {
+
+    let tempDelay = []
+
     getColumnCount($seasons, (seasonsId, chapterId, count) => {
-        if(checkCount > 13) {
-            count = 1
+        if(debug && checkCount > simulateTimer) {
+            count = simulateCount
         }
         //假如高度改变
         if(columnCollection[seasonsId][chapterId] !== count) {
             columnCollection[seasonsId][chapterId] = count
-            watchColumn(seasonsId, chapterId, count)
+            tempDelay.push(makeDelay(seasonsId, chapterId, count))
         }
     })
 
     --checkCount
+
+    //执行监控改变
+    execDelay(tempDelay)
 
     if(checkCount) {
         timerId = setTimeout(function() {
@@ -222,12 +246,12 @@ export function initColumn(callback) {
         eachColumn(columnCount, $seasons, visualWidth, visualHeight)
         $('body').append($container)
 
-        nextTick(() => {
+        setTimeout(() => {
 
             //第一次获取分栏数
             getColumnCount($seasons, (seasonsId, chapterId, count) => {
-                if(config.columnCheck) {
-                    count = 1
+                if(debug && config.columnCheck) {
+                    count = simulateCount
                 }
                 columnCount[seasonsId][chapterId] = count
             })
@@ -236,7 +260,7 @@ export function initColumn(callback) {
 
             //检测分栏数变化
             if(config.columnCheck) {
-                checkColumnHeight($seasons, $.extend(true, {}, columnCount), 25, () => {
+                checkColumnHeight($seasons, $.extend(true, {}, columnCount), baseCount, () => {
                     $container.hide()
                 })
             } else {
@@ -244,7 +268,7 @@ export function initColumn(callback) {
             }
 
             callback(Object.keys(columnCount).length)
-        })
+        },100)
     }
 
     //如果存在json的flow数据
