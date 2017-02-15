@@ -507,9 +507,13 @@ export default class Swipe extends Observer {
 
     /**
      * 设置反弹
+     * isBoundary ##317
+     * 边界后反弹，最后一页刚好有是视觉差，反弹不归位
+     * 这里要强制处理
      */
-    _setRebound(pageIndex, direction) {
+    _setRebound(pageIndex, direction, isAppBoundary) {
         this._distributeMove({
+            isAppBoundary, //是边界后，反弹回来的
             'pageIndex': pageIndex,
             'direction': direction,
             'distance': 0,

@@ -43,12 +43,12 @@ function addOnload(node, callback, isCSS, url) {
         .replace(/.*AppleWebKit\/(\d+)\..*/, "$1") < 536
 
     // for Old WebKit and Old Firefox
-    if(isCSS) {
-        setTimeout(function() {
-                pollCss(node, callback)
-            }, 1) // Begin after node insertion
-        return
-    }
+    // if(isCSS) {
+    //     setTimeout(function() {
+    //             pollCss(node, callback)
+    //         }, 1) // Begin after node insertion
+    //     return
+    // }
 
     if(supportOnload) {
         node.onload = onload

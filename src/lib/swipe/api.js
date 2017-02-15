@@ -17,8 +17,8 @@ export default function api(Swipe) {
         if(location === 'middle') {
 
             let borderIndex
-            //必须是有2页以上并且当前页面就是最后一页
-            //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
+                //必须是有2页以上并且当前页面就是最后一页
+                //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
             if(this.pageTotal > 1 && this.visualIndex == this.pageTotal - 1) {
                 borderIndex = this.visualIndex
             }
@@ -41,7 +41,7 @@ export default function api(Swipe) {
             this.visualIndex = total - 1;
             this.setPointer(this.visualIndex, total)
             this._updateActionPointer()
-            //设置Transform的偏移量，为最后一页
+                //设置Transform的偏移量，为最后一页
             this._setTransform(this.visualIndex)
         }
 
@@ -153,7 +153,7 @@ export default function api(Swipe) {
             this._slideTo('next');
         } else {
             //边界反弹
-            this._setRebound(this.visualIndex, 'prev')
+            this._setRebound(this.visualIndex, 'prev', 'isAppBoundary')
         }
     }
 

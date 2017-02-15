@@ -154,7 +154,7 @@ export default class MasterMgr extends Abstract {
         currIndex,
         rightIndex,
         direction
-    }) {
+    }, isAppBoundary) {
 
         //是边界处理
         //边界外处理母版
@@ -162,7 +162,7 @@ export default class MasterMgr extends Abstract {
         let isBoundary = false
 
         //找到需要滑动的母版
-        let masterObjs = this._findMaster(leftIndex, currIndex, rightIndex, direction, action)
+        let masterObjs = this._findMaster(leftIndex, currIndex, rightIndex, direction, action, isAppBoundary)
         _.each(masterObjs, function(pageObj, index) {
             if(pageObj) {
                 isBoundary = true
@@ -321,8 +321,9 @@ export default class MasterMgr extends Abstract {
 
     /**
      * 找到当前页面的可以需要滑动是视觉页面对象
+     * isAppBoundary 是应用边界反弹，##317,最后一页带有视觉差反弹出错,视觉差不归位
      */
-    _findMaster(leftIndex, currIndex, rightIndex, direction, action) {
+    _findMaster(leftIndex, currIndex, rightIndex, direction, action, isAppBoundary) {
         let prevFlag, nextFlag,
             prevMasterId, nextMasterId,
             prevMasterObj, currMasterObj, nextMasterObj,
@@ -330,19 +331,23 @@ export default class MasterMgr extends Abstract {
 
         switch(direction) {
             case 'prev':
-                prevFlag = (currMasterId !== prevMasterId)
                 prevMasterId = this.converMasterId(leftIndex)
-                if(prevFlag) {
+                prevFlag = currMasterId !== prevMasterId
+
+                //如果2个页面不一样的视觉差
+                //或者是应用最后一页反弹的情况，2个页面同一个视觉差，也就是最后一页，往前面反弹
+                if(prevFlag || isAppBoundary) {
                     currMasterObj = this.abstractGetPageObj(currMasterId);
                 }
+
                 if(prevMasterId && prevFlag) {
                     action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
                     prevMasterObj = this.abstractGetPageObj(prevMasterId)
                 }
                 break;
             case 'next':
-                nextFlag = (currMasterId !== nextMasterId)
                 nextMasterId = this.converMasterId(rightIndex)
+                nextFlag = currMasterId !== nextMasterId
                 if(nextFlag) {
                     currMasterObj = this.abstractGetPageObj(currMasterId)
                 }

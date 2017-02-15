@@ -51,8 +51,8 @@ export default class Controller {
      */
     initCreate() {
         let options = this.options
-        //createPointer
-        //initPointer
+            //createPointer
+            //initPointer
         let pointer = initPointer(options.initIndex, options.pageTotal, options.multiplePages)
         this.pagePointer = pointer.initPointer
         this.createPageBases(pointer.createPointer, options.initIndex, 'init')
@@ -265,6 +265,7 @@ export default class Controller {
         pageIndex,
         rightIndex,
         direction,
+        isAppBoundary, //应用边界反弹
         setSwipeInvalid //设置翻页无效
     }) {
 
@@ -331,7 +332,7 @@ export default class Controller {
 
         this.pageMgr.move(data)
         this.masterContext(function() {
-            this.move(data)
+            this.move(data, isAppBoundary)
         })
 
         //更新页码

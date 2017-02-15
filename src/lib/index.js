@@ -9,7 +9,7 @@ import init from './initialize/index'
 
 initGlobalAPI()
 
-Xut.Version = 878.1
+Xut.Version = 878.3
 
 if(Xut.plat.isBrowser) {
 
@@ -35,6 +35,7 @@ if(Xut.plat.isBrowser) {
         }
     })
 }
+
 
 /**
  * 加载应用app
