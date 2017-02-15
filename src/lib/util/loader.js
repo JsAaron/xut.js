@@ -1,59 +1,10 @@
-function pollCss(node, callback) {
-    var sheet = node.sheet,
-        isLoaded;
-    var isOldWebKit = +navigator.userAgent
-        .replace(/.*AppleWebKit\/(\d+)\..*/, "$1") < 536
-
-    // for WebKit < 536
-    if(isOldWebKit) {
-        if(sheet) {
-            isLoaded = true
-        }
-    }
-    // for Firefox < 9.0
-    else if(sheet) {
-        try {
-            if(sheet.cssRules) {
-                isLoaded = true
-            }
-        } catch(ex) {
-            // The value of `ex.name` is changed from "NS_ERROR_DOM_SECURITY_ERR"
-            // to "SecurityError" since Firefox 13.0. But Firefox is less than 9.0
-            // in here, So it is ok to just rely on "NS_ERROR_DOM_SECURITY_ERR"
-            if(ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
-                isLoaded = true
-            }
-        }
-    }
-
-    setTimeout(function() {
-        if(isLoaded) {
-            // Place callback here to give time for style rendering
-            callback()
-        } else {
-            pollCss(node, callback)
-        }
-    }, 20)
-}
-
-
 function addOnload(node, callback, isCSS, url) {
     var supportOnload = "onload" in node;
-    var isOldWebKit = +navigator.userAgent
-        .replace(/.*AppleWebKit\/(\d+)\..*/, "$1") < 536
-
-    // for Old WebKit and Old Firefox
-    // if(isCSS) {
-    //     setTimeout(function() {
-    //             pollCss(node, callback)
-    //         }, 1) // Begin after node insertion
-    //     return
-    // }
 
     if(supportOnload) {
         node.onload = onload
         node.onerror = function() {
-            onload()
+            onload(true)
         }
     } else {
         node.onreadystatechange = function() {
@@ -63,17 +14,19 @@ function addOnload(node, callback, isCSS, url) {
         }
     }
 
-    function onload() {
+    function onload(error) {
         // Ensure only run once and handle memory leak in IE
         node.onload = node.onerror = node.onreadystatechange = null
-            // Remove the script to reduce memory leak
+
+        // Remove the script to reduce memory leak
         if(!isCSS) {
             var head = document.getElementsByTagName("head")[0] || document.documentElement;
             head.removeChild(node)
         }
         // Dereference the node
         node = null
-        callback()
+
+        callback(error)
     }
 }
 

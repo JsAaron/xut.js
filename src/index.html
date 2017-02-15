@@ -54,12 +54,12 @@ Xut.Application.setConfig = {
 };
 
 
-var appId = 318
+var appId = 317
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点
         launchAnim: false, //关闭启动动画
-        // convert: 'svg', //转化资源svg转化成js
+        convert: 'svg', //转化资源svg转化成js
         path: {
             resource: 'content/' + appId,
             database: 'content/' + appId + '/SQLResult.js'
