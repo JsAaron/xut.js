@@ -1,10 +1,5 @@
 import { config, resetVisualLayout } from '../../../config/index'
 import {
-    setCache,
-    getChpaterColumn,
-    setChpaterColumn
-} from './depend'
-import {
     defAccess,
     nextTick,
     $$warn,
@@ -15,6 +10,9 @@ import {
     removeColumnData
 } from '../../../database/result'
 
+//分栏探测
+import { startColumnDetect, simulateCount, debug } from './detect'
+import { setCache } from './depend'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -110,6 +108,7 @@ const eachColumn = function(columnCount, $seasons, visualWidth, visualHeight) {
     })
 }
 
+
 /**
  * 解析分栏高度
  */
@@ -123,10 +122,11 @@ const resolveCount = ($content) => {
     return Math.ceil(paraHeight / newViewHight)
 }
 
+
 /**
  * 获取分栏数量
  */
-const getColumnCount = function($seasons, callback) {
+export function resolveColumnCount($seasons, callback) {
     $seasons.each((index, node) => {
         let tag = node.id
         let seasonsId = tag.match(/\d/)[0]
@@ -143,81 +143,8 @@ const getColumnCount = function($seasons, callback) {
 }
 
 
-
-const makeDelay = function(seasonsId, chapterId, count) {
-    return function() {
-        setChpaterColumn(seasonsId, chapterId, count)
-    }
-}
-
-const execDelay = function(tempDelay) {
-    if(tempDelay.length) {
-        let fn
-        while(fn = tempDelay.pop()) {
-            fn()
-        }
-        Xut.Application.Notify('change:number:total')
-        Xut.Application.Notify('change:column')
-    }
-}
-
-/**
- * debug调试
- */
-let debug = false
-let simulateCount = 2
-let simulateTimer = 13
-
-/**
- * 检测分栏高度
- */
-let timerId = null
-//基本检测次数 20*500 ~ 10秒范围
-let baseCount = 20
-
-export function checkColumnHeight($seasons, columnCollection, checkCount, callback) {
-
-    let tempDelay = []
-
-    getColumnCount($seasons, (seasonsId, chapterId, count) => {
-        if(debug && checkCount > simulateTimer) {
-            count = simulateCount
-        }
-        //假如高度改变
-        if(columnCollection[seasonsId][chapterId] !== count) {
-            columnCollection[seasonsId][chapterId] = count
-            tempDelay.push(makeDelay(seasonsId, chapterId, count))
-        }
-    })
-
-    --checkCount
-
-    //执行监控改变
-    execDelay(tempDelay)
-
-    if(checkCount) {
-        timerId = setTimeout(function() {
-            checkColumnHeight($seasons, columnCollection, checkCount, callback)
-        }, 500)
-    } else {
-        callback()
-    }
-    return
-}
-
-/**
- * 停止分栏高度探测
- * @return {[type]} [description]
- */
-export function stopDetection() {
-    Xut.Application.unWatch('change:number:total change:column')
-    clearTimeout(timerId)
-    timerId = null
-}
-
 /**
  * 构建column页面代码结构
- * @return {[type]} [description]
  */
 export function initColumn(callback) {
 
@@ -249,7 +176,7 @@ export function initColumn(callback) {
         setTimeout(() => {
 
             //第一次获取分栏数
-            getColumnCount($seasons, (seasonsId, chapterId, count) => {
+            resolveColumnCount($seasons, (seasonsId, chapterId, count) => {
                 if(debug && config.columnCheck) {
                     count = simulateCount
                 }
@@ -260,7 +187,7 @@ export function initColumn(callback) {
 
             //检测分栏数变化
             if(config.columnCheck) {
-                checkColumnHeight($seasons, $.extend(true, {}, columnCount), baseCount, () => {
+                startColumnDetect($seasons, $.extend(true, {}, columnCount), () => {
                     $container.hide()
                 })
             } else {
@@ -268,7 +195,7 @@ export function initColumn(callback) {
             }
 
             callback(Object.keys(columnCount).length)
-        },100)
+        }, 100)
     }
 
     //如果存在json的flow数据

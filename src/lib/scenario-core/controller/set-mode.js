@@ -24,7 +24,7 @@ export function setVisualMode(chapterData) {
     //如果有独立的页面模式
     let parameter = chapterData.parameter
     if(parameter) {
-        let matchMode = parameter.match(/visualMode[":]+(\d)/)
+        let matchMode = parameter.match(/visualMode[":\s]*(\d)/)
         if(matchMode) {
             return Number(matchMode[1])
         }

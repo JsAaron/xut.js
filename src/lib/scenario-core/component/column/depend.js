@@ -8,14 +8,6 @@ export function setCache(columnCount) {
 }
 
 
-/**
- * 分页页面数
- */
-export function getChpaterColumn(seasonsId, chapterId) {
-    return cacheColumns[seasonsId] ? cacheColumns[seasonsId][chapterId] : 0
-}
-
-
 export function setChpaterColumn(seasonsId, chapterId, value) {
     if(cacheColumns[seasonsId] && cacheColumns[seasonsId][chapterId]) {
         cacheColumns[seasonsId][chapterId] = value
@@ -69,8 +61,6 @@ export function getBeforeCount(seasonId, chapterId) {
 
 /**
  * 获取chpater总数
- * @param  {[type]} seasonId [description]
- * @return {[type]}          [description]
  */
 export function getColumnChpaterCount(seasonId) {
     if(!cacheColumns) return
@@ -80,9 +70,6 @@ export function getColumnChpaterCount(seasonId) {
 /**
  * reutrn seasonIds
  * return chpaterIds
- * @param  {[type]} seasonId  [description]
- * @param  {[type]} chpaterId [description]
- * @return {[type]}           [description]
  */
 export function getColumnCount(seasonId, chapterId) {
     if(!cacheColumns) return

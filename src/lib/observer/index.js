@@ -11,11 +11,11 @@ const nativeIndexOf = ArrayProto.indexOf
 const slice = ArrayProto.slice
 const _indexOf = (array, needle) => {
     var i, l;
-    if (nativeIndexOf && array.indexOf === nativeIndexOf) {
+    if(nativeIndexOf && array.indexOf === nativeIndexOf) {
         return array.indexOf(needle);
     }
-    for (i = 0, l = array.length; i < l; i++) {
-        if (array[i] === needle) {
+    for(i = 0, l = array.length; i < l; i++) {
+        if(array[i] === needle) {
             return i;
         }
     }
@@ -44,9 +44,9 @@ export class Observer {
         var parts = event.split(/\s+/);
         var num = parts.length;
 
-        for (i = 0; i < num; i++) {
+        for(i = 0; i < num; i++) {
             events[(part = parts[i])] = events[part] || [];
-            if (_indexOf(events[part], fn) === -1) {
+            if(_indexOf(events[part], fn) === -1) {
                 events[part].push(fn);
             }
         }
@@ -54,7 +54,7 @@ export class Observer {
         //假如存在同步句柄
         //执行
         var data
-        if (data = this._handleName[event]) {
+        if(data = this._handleName[event]) {
             this.$emit(event, data[0])
         }
 
@@ -72,20 +72,36 @@ export class Observer {
         return this;
     }
 
+    //event = 'a b c' 空格分离多个事件名
+    //提供fn 指定在某个事件中删除某一个
+    //否则只提供事件名 ，全删除
     unbind(event, fn) {
+
         var eventName, i, index, num, parts;
         var events = this.events;
 
-        if (!events) return this;
+        if(!events) return this;
 
         //指定
-        if (arguments.length) {
+        if(arguments.length) {
             parts = event.split(/\s+/);
-            for (i = 0, num = parts.length; i < num; i++) {
-                if ((eventName = parts[i]) in events !== false) {
-                    index = (fn) ? _indexOf(events[eventName], fn) : -1;
-                    if (index !== -1) {
-                        events[eventName].splice(index, 1);
+            for(i = 0, num = parts.length; i < num; i++) {
+                if((eventName = parts[i]) in events !== false) {
+                    //如果提供函数引用
+                    //那么就是在数组中删除其中一个
+                    if(fn) {
+                        index = _indexOf(events[eventName], fn)
+                        if(index !== -1) {
+                            events[eventName].splice(index, 1);
+                        }
+                    } else {
+                        //如果只提供了名字，则全删除
+                        events[eventName] = null
+                    }
+
+                    //如果没有内容了
+                    if(!events[eventName] || !events[eventName].length) {
+                        delete events[eventName]
                     }
                 }
             }
@@ -105,7 +121,7 @@ export class Observer {
         //参数
         args = slice.call(arguments, 1);
 
-        if (!events || event in events === false) {
+        if(!events || event in events === false) {
             // console.log(event)
             //同步的情况
             //如果除非了事件，可能事件句柄还没有加载
@@ -114,12 +130,10 @@ export class Observer {
         }
 
         handlers = events[event];
-        for (i = 0; i < handlers.length; i++) {
+        for(i = 0; i < handlers.length; i++) {
             handlers[i].apply(this, args);
         }
         return this;
     }
 
 }
-
-

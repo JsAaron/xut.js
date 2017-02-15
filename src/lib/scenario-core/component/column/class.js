@@ -186,7 +186,6 @@ export default class ColumnClass {
              * 首页边界
              */
             if(swipe.visualIndex === coloumnObj.minBorder && swipe.direction === 'prev') {
-                // console.log(1)
                 if(action === 'flipOver') {
                     Xut.View.GotoPrevSlide()
                     swipe.simulationComplete()

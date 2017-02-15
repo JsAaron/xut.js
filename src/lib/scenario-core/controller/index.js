@@ -198,7 +198,7 @@ export default class Controller {
                             'pageIndex': pageIndex,
                             'multiplePages': multiplePages
                         }, pageIndex, masterFilter, function(shareMaster) {
-                            if(shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
+                            if(config.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                                 $$warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
                             }
                         })

@@ -321,21 +321,18 @@ export default class MasterMgr extends Abstract {
 
     /**
      * 找到当前页面的可以需要滑动是视觉页面对象
-     * @return {[type]}            [description]
      */
     _findMaster(leftIndex, currIndex, rightIndex, direction, action) {
-        var prevFlag,
-            nextFlag,
-            prevMasterObj,
-            currMasterObj,
-            nextMasterObj,
-            prevMasterId = this.converMasterId(leftIndex),
-            currMasterId = this.converMasterId(currIndex),
-            nextMasterId = this.converMasterId(rightIndex);
+        let prevFlag, nextFlag,
+            prevMasterId, nextMasterId,
+            prevMasterObj, currMasterObj, nextMasterObj,
+            currMasterId = this.converMasterId(currIndex)
 
         switch(direction) {
             case 'prev':
-                if(prevFlag = (currMasterId !== prevMasterId)) {
+                prevFlag = (currMasterId !== prevMasterId)
+                prevMasterId = this.converMasterId(leftIndex)
+                if(prevFlag) {
                     currMasterObj = this.abstractGetPageObj(currMasterId);
                 }
                 if(prevMasterId && prevFlag) {
@@ -344,8 +341,10 @@ export default class MasterMgr extends Abstract {
                 }
                 break;
             case 'next':
-                if(nextFlag = (currMasterId !== nextMasterId)) {
-                    currMasterObj = this.abstractGetPageObj(currMasterId);
+                nextFlag = (currMasterId !== nextMasterId)
+                nextMasterId = this.converMasterId(rightIndex)
+                if(nextFlag) {
+                    currMasterObj = this.abstractGetPageObj(currMasterId)
                 }
                 if(nextMasterId && nextFlag) {
                     action === 'flipOver' && this._checkClear([currMasterId, nextMasterId]); //边界清理

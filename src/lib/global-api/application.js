@@ -53,6 +53,7 @@ export function initApplication() {
         __app__.trigger(event, options)
     }
 
+
     /**
      * 后台运行
      * @type {Number}
