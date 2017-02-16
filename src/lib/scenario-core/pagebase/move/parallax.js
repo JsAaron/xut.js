@@ -4,7 +4,6 @@ import {
     flipRebound,
     cacheProperty,
     getStepProperty,
-    setFlipOverScale,
     setStyle
 } from '../../component/activity/content/parallax/depend'
 

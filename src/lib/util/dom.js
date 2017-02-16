@@ -1,4 +1,6 @@
-import { $$warn } from './debug'
+import {
+  $$warn
+} from './debug'
 
 /**
  * 2015.3.24
@@ -20,22 +22,22 @@ const mouseList = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitio
 
 //绑定事件名排序
 const orderName = {
-    start: 0,
-    move: 1,
-    end: 2,
-    cancel: 3,
-    transitionend: 4,
-    leave: 5
+  start: 0,
+  move: 1,
+  end: 2,
+  cancel: 3,
+  transitionend: 4,
+  leave: 5
 }
 
 const eventNames = (() => {
-    if (isMouseTouch) {
-        return {
-            touch: touchList,
-            mouse: mouseList
-        }
+  if (isMouseTouch) {
+    return {
+      touch: touchList,
+      mouse: mouseList
     }
-    return hasTouch ? touchList : mouseList
+  }
+  return hasTouch ? touchList : mouseList
 })()
 
 
@@ -53,44 +55,44 @@ let guid = 1
  * @param {[type]} handler   [description]
  */
 function addHandler(element, eventName, handler, capture) {
-    if (element.xutHandler) {
-        let uuid = element.xutHandler
-        let dataCache = eventDataCache[uuid]
-        if (dataCache) {
-            if (dataCache[eventName]) {
-                //如果是isMouseTouch支持同样的事件
-                //所以transitionend就比较特殊了，因为都是同一个事件名称
-                //所以只要一份，所以重复绑定就需要去掉
-                if (eventName !== 'transitionend') {
-                    $$warn(eventName + '：事件重复绑定添加')
-                }
-            } else {
-                dataCache[eventName] = [handler, capture]
-            }
+  if (element.xutHandler) {
+    let uuid = element.xutHandler
+    let dataCache = eventDataCache[uuid]
+    if (dataCache) {
+      if (dataCache[eventName]) {
+        //如果是isMouseTouch支持同样的事件
+        //所以transitionend就比较特殊了，因为都是同一个事件名称
+        //所以只要一份，所以重复绑定就需要去掉
+        if (eventName !== 'transitionend') {
+          $$warn(eventName + '：事件重复绑定添加')
         }
-    } else {
-        eventDataCache[guid] = {
-            [eventName]: [handler, capture]
-        }
-        element.xutHandler = guid++
+      } else {
+        dataCache[eventName] = [handler, capture]
+      }
     }
+  } else {
+    eventDataCache[guid] = {
+      [eventName]: [handler, capture]
+    }
+    element.xutHandler = guid++
+  }
 }
 
 const eachApply = (events, callbacks, processor, isRmove) => {
-    _.each(callbacks, function(handler, key) {
-        let eventName
-        if (isRmove) {
-            //如果是移除，callbacks是数组
-            //转化事件名
-            if (eventName = events[orderName[handler]]) {
-                processor(eventName)
-            }
-        } else {
-            eventName = events[orderName[key]];
-            //on的情况，需要传递handler
-            handler && eventName && processor(eventName, handler)
-        }
-    })
+  _.each(callbacks, function(handler, key) {
+    let eventName
+    if (isRmove) {
+      //如果是移除，callbacks是数组
+      //转化事件名
+      if (eventName = events[orderName[handler]]) {
+        processor(eventName)
+      }
+    } else {
+      eventName = events[orderName[key]];
+      //on的情况，需要传递handler
+      handler && eventName && processor(eventName, handler)
+    }
+  })
 }
 
 /**
@@ -100,12 +102,11 @@ const eachApply = (events, callbacks, processor, isRmove) => {
  * @return {[type]} [description]
  */
 const addEvent = (element, events, callbacks, capture) => {
-    eachApply(events, callbacks, function(eventName, handler) {
-        addHandler(element, eventName, handler, capture)
-        element.addEventListener(eventName, handler, capture)
-    })
+  eachApply(events, callbacks, function(eventName, handler) {
+    addHandler(element, eventName, handler, capture)
+    element.addEventListener(eventName, handler, capture)
+  })
 }
-
 
 /**
  * 移除所有事件
@@ -113,19 +114,19 @@ const addEvent = (element, events, callbacks, capture) => {
  * @return {[type]}         [description]
  */
 function removeAll(element) {
-    let uuid = element.xutHandler
-    let dataCache = eventDataCache[uuid]
-    if (!dataCache) {
-        $$warn('移除所有事件出错')
-        return
+  let uuid = element.xutHandler
+  let dataCache = eventDataCache[uuid]
+  if (!dataCache) {
+    $$warn('移除所有事件出错')
+    return
+  }
+  _.each(dataCache, function(data, eventName) {
+    if (data) {
+      element.removeEventListener(eventName, data[0], data[1])
+      dataCache[eventName] = null
     }
-    _.each(dataCache, function(data, eventName) {
-        if (data) {
-            element.removeEventListener(eventName, data[0], data[1])
-            dataCache[eventName] = null
-        }
-    })
-    delete eventDataCache[uuid]
+  })
+  delete eventDataCache[uuid]
 }
 
 /**
@@ -133,25 +134,25 @@ function removeAll(element) {
  * @return {[type]} [description]
  */
 function removeone(element, eventName) {
-    let uuid = element.xutHandler
-    let dataCache = eventDataCache[uuid]
-    if (!dataCache) {
-        $$warn('移除事件' + eventName + '出错')
-        return
-    }
-    let data = dataCache[eventName]
-    if (data) {
-        element.removeEventListener(eventName, data[0], data[1])
-        dataCache[eventName] = null
-        delete dataCache[eventName]
-    } else {
-        $$warn('移除事件' + eventName + '出错')
-    }
+  let uuid = element.xutHandler
+  let dataCache = eventDataCache[uuid]
+  if (!dataCache) {
+    $$warn('移除事件' + eventName + '出错')
+    return
+  }
+  let data = dataCache[eventName]
+  if (data) {
+    element.removeEventListener(eventName, data[0], data[1])
+    dataCache[eventName] = null
+    delete dataCache[eventName]
+  } else {
+    $$warn('移除事件' + eventName + '出错')
+  }
 
-    //如果没有数据
-    if (!Object.keys(dataCache).length) {
-        delete eventDataCache[uuid]
-    }
+  //如果没有数据
+  if (!Object.keys(dataCache).length) {
+    delete eventDataCache[uuid]
+  }
 }
 
 /**
@@ -161,9 +162,9 @@ function removeone(element, eventName) {
  * @return {[type]} [description]
  */
 const removeEvent = (element, events, callbacks) => {
-    eachApply(events, callbacks, function(eventName) {
-        removeone(element, eventName)
-    }, 'remove')
+  eachApply(events, callbacks, function(eventName) {
+    removeone(element, eventName)
+  }, 'remove')
 }
 
 
@@ -175,15 +176,15 @@ const removeEvent = (element, events, callbacks) => {
  * @return {[type]}                [description]
  */
 const compatibility = (controller, element, callbacks, capture) => {
-    //如果两者都支持
-    //鼠标与触摸
-    if (isMouseTouch) {
-        _.each(eventNames, events => {
-            controller(element, events, callbacks, capture)
-        })
-    } else {
-        controller(element, eventNames, callbacks, capture)
-    }
+  //如果两者都支持
+  //鼠标与触摸
+  if (isMouseTouch) {
+    _.each(eventNames, events => {
+      controller(element, events, callbacks, capture)
+    })
+  } else {
+    controller(element, eventNames, callbacks, capture)
+  }
 }
 
 /**
@@ -192,20 +193,20 @@ const compatibility = (controller, element, callbacks, capture) => {
  * @return {[type]}         [description]
  */
 function toNodeObj(element) {
-    if (element.length) {
-        element = element[0]
-    }
-    return element
+  if (element.length) {
+    element = element[0]
+  }
+  return element
 }
 
 /**
  * 检测end事件，默认要绑定cancel
  * @return {[type]} [description]
  */
-const checkBindCancel = function(callbacks){
-    if(callbacks && callbacks.end && !callbacks.cancel){
-        callbacks.cancel = callbacks.end
-    }
+const checkBindCancel = function(callbacks) {
+  if (callbacks && callbacks.end && !callbacks.cancel) {
+    callbacks.cancel = callbacks.end
+  }
 }
 
 /**
@@ -221,8 +222,8 @@ const checkBindCancel = function(callbacks){
  * @return {[type]} [description]
  */
 export function $$on(element, callbacks, capture = false) {
-    checkBindCancel(callbacks)
-    compatibility(addEvent, toNodeObj(element), callbacks, capture)
+  checkBindCancel(callbacks)
+  compatibility(addEvent, toNodeObj(element), callbacks, capture)
 }
 
 
@@ -234,26 +235,26 @@ export function $$on(element, callbacks, capture = false) {
  */
 export function $$off(element, callbacks) {
 
-    if (!element) {
-        $$warn('移除事件对象不存在')
-        return
-    }
+  if (!element) {
+    $$warn('移除事件对象不存在')
+    return
+  }
 
-    element = toNodeObj(element)
+  element = toNodeObj(element)
 
-    //全部移除
-    if (arguments.length === 1) {
-        removeAll(element)
-        return
-    }
+  //全部移除
+  if (arguments.length === 1) {
+    removeAll(element)
+    return
+  }
 
-    if (!_.isArray(callbacks)) {
-        $$warn('移除的事件句柄参数，必须是数组')
-        return
-    }
+  if (!_.isArray(callbacks)) {
+    $$warn('移除的事件句柄参数，必须是数组')
+    return
+  }
 
-    checkBindCancel(callbacks)
-    compatibility(removeEvent, element, callbacks)
+  checkBindCancel(callbacks)
+  compatibility(removeEvent, element, callbacks)
 }
 
 
@@ -266,36 +267,36 @@ export function $$off(element, callbacks) {
  * @return {[type]}           [description]
  */
 export function $$handle(callbacks, context, event) {
-    switch (event.type) {
-        case 'touchstart':
-        case 'mousedown':
-            callbacks.start && callbacks.start.call(context, event)
-            break;
-        case 'touchmove':
-        case 'mousemove':
-            callbacks.move && callbacks.move.call(context, event)
-            break;
-        case 'touchend':
-        case 'mouseup':
-        case 'mousecancel':
-        case 'touchcancel':
-        case 'mouseleave':
-            callbacks.end && callbacks.end.call(context, event)
-            break;
-        case transitionEnd:
-            callbacks.transitionend && callbacks.transitionend.call(context, event)
-            break;
-    }
+  switch (event.type) {
+    case 'touchstart':
+    case 'mousedown':
+      callbacks.start && callbacks.start.call(context, event)
+      break;
+    case 'touchmove':
+    case 'mousemove':
+      callbacks.move && callbacks.move.call(context, event)
+      break;
+    case 'touchend':
+    case 'mouseup':
+    case 'mousecancel':
+    case 'touchcancel':
+    case 'mouseleave':
+      callbacks.end && callbacks.end.call(context, event)
+      break;
+    case transitionEnd:
+      callbacks.transitionend && callbacks.transitionend.call(context, event)
+      break;
+  }
 }
 
 
 export function $$target(event, original) {
-    var currTouches = null;
-    if (hasTouch) {
-        currTouches = event.touches;
-        if (currTouches && currTouches.length > 0) {
-            event = currTouches[0];
-        }
+  var currTouches = null;
+  if (hasTouch) {
+    currTouches = event.touches;
+    if (currTouches && currTouches.length > 0) {
+      event = currTouches[0];
     }
-    return original ? event : event.target;
+  }
+  return original ? event : event.target;
 }

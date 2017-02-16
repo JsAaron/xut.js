@@ -6,22 +6,22 @@
 // 17 销毁
 // 20 创建
 export const getActionPointer = function(direction, leftIndex, rightIndex) {
-    let createPointer //创建的页
-    let destroyPointer //销毁的页
-    switch (direction) {
-        case 'prev': //前处理
-            createPointer = (leftIndex - 1);
-            destroyPointer = (rightIndex);
-            break;
-        case 'next': //后处理
-            createPointer = (rightIndex + 1);
-            destroyPointer = (leftIndex);
-            break;
-    }
-    return {
-        createPointer,
-        destroyPointer
-    }
+  let createPointer //创建的页
+  let destroyPointer //销毁的页
+  switch (direction) {
+    case 'prev': //前处理
+      createPointer = (leftIndex - 1);
+      destroyPointer = (rightIndex);
+      break;
+    case 'next': //后处理
+      createPointer = (rightIndex + 1);
+      destroyPointer = (leftIndex);
+      break;
+  }
+  return {
+    createPointer,
+    destroyPointer
+  }
 }
 
 
@@ -30,21 +30,21 @@ export const getActionPointer = function(direction, leftIndex, rightIndex) {
  * @return {[type]} [description]
  */
 export const initPointer = (init, pageTotal) => {
-    var leftscope = 0,
-        pagePointer = {};
+  var leftscope = 0,
+    pagePointer = {};
 
-    if (init === leftscope) { //首页
-        pagePointer['currIndex'] = init;
-        pagePointer['rightIndex'] = init + 1;
-    } else if (init === pageTotal - 1) { //首页
-        pagePointer['currIndex'] = init;
-        pagePointer['leftIndex'] = init - 1;
-    } else { //中间页
-        pagePointer['leftIndex'] = init - 1;
-        pagePointer['currIndex'] = init;
-        pagePointer['rightIndex'] = init + 1;
-    }
-    return pagePointer;
+  if (init === leftscope) { //首页
+    pagePointer['currIndex'] = init;
+    pagePointer['rightIndex'] = init + 1;
+  } else if (init === pageTotal - 1) { //首页
+    pagePointer['currIndex'] = init;
+    pagePointer['leftIndex'] = init - 1;
+  } else { //中间页
+    pagePointer['leftIndex'] = init - 1;
+    pagePointer['currIndex'] = init;
+    pagePointer['rightIndex'] = init + 1;
+  }
+  return pagePointer;
 }
 
 /**
@@ -52,74 +52,74 @@ export const initPointer = (init, pageTotal) => {
  * @return {[type]}   [description]
  */
 export const compatibilityEvent = (e) => {
-    var point;
-    if (e.touches && e.touches[0]) {
-        point = e.touches[0];
-    } else {
-        point = e;
-    }
-    return point
+  var point;
+  if (e.touches && e.touches[0]) {
+    point = e.touches[0];
+  } else {
+    point = e;
+  }
+  return point
 }
 
 /**
  * 计算当前已经创建的页面索引
  */
 export const calculationIndex = (currIndex, targetIndex, pageTotal) => {
-    var i = 0,
-        existpage,
-        createpage,
-        pageIndex,
-        ruleOut = [],
-        create = [],
-        destroy,
-        viewFlip;
+  var i = 0,
+    existpage,
+    createpage,
+    pageIndex,
+    ruleOut = [],
+    create = [],
+    destroy,
+    viewFlip;
 
-    //存在的页面
-    if (currIndex === 0) {
-        existpage = [currIndex, currIndex + 1];
-    } else if (currIndex === pageTotal - 1) {
-        existpage = [currIndex - 1, currIndex];
+  //存在的页面
+  if (currIndex === 0) {
+    existpage = [currIndex, currIndex + 1];
+  } else if (currIndex === pageTotal - 1) {
+    existpage = [currIndex - 1, currIndex];
+  } else {
+    existpage = [currIndex - 1, currIndex, currIndex + 1];
+  }
+
+  //需要创建的新页面
+  if (targetIndex === 0) {
+    createpage = [targetIndex, targetIndex + 1];
+  } else if (targetIndex === pageTotal - 1) {
+    createpage = [targetIndex - 1, targetIndex];
+  } else {
+    createpage = [targetIndex - 1, targetIndex, targetIndex + 1];
+  }
+
+  for (; i < createpage.length; i++) {
+    pageIndex = createpage[i];
+    //跳过存在的页面
+    if (-1 === existpage.indexOf(pageIndex)) {
+      //创建目标的页面
+      create.push(pageIndex);
     } else {
-        existpage = [currIndex - 1, currIndex, currIndex + 1];
+      //排除已存在的页面
+      ruleOut.push(pageIndex);
     }
+  }
 
-    //需要创建的新页面
-    if (targetIndex === 0) {
-        createpage = [targetIndex, targetIndex + 1];
-    } else if (targetIndex === pageTotal - 1) {
-        createpage = [targetIndex - 1, targetIndex];
-    } else {
-        createpage = [targetIndex - 1, targetIndex, targetIndex + 1];
-    }
+  _.each(ruleOut, function(ruleOutIndex) {
+    existpage.splice(existpage.indexOf(ruleOutIndex), 1)
+  });
 
-    for (; i < createpage.length; i++) {
-        pageIndex = createpage[i];
-        //跳过存在的页面
-        if (-1 === existpage.indexOf(pageIndex)) {
-            //创建目标的页面
-            create.push(pageIndex);
-        } else {
-            //排除已存在的页面
-            ruleOut.push(pageIndex);
-        }
-    }
+  destroy = existpage;
 
-    _.each(ruleOut, function(ruleOutIndex) {
-        existpage.splice(existpage.indexOf(ruleOutIndex), 1)
-    });
+  viewFlip = [].concat(create).concat(ruleOut).sort(function(a, b) {
+    return a - b
+  });
 
-    destroy = existpage;
-
-    viewFlip = [].concat(create).concat(ruleOut).sort(function(a, b) {
-        return a - b
-    });
-
-    return {
-        'create': create,
-        'ruleOut': ruleOut,
-        'destroy': destroy,
-        'viewFlip': viewFlip,
-        'targetIndex': targetIndex,
-        'currIndex': currIndex
-    }
+  return {
+    'create': create,
+    'ruleOut': ruleOut,
+    'destroy': destroy,
+    'viewFlip': viewFlip,
+    'targetIndex': targetIndex,
+    'currIndex': currIndex
+  }
 }

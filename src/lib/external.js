@@ -14,7 +14,6 @@ var cssName = [
 //'lib/plugin/library/video.js',
 
 var jsName = [
-    'content/SQLResult.js',
 
     'lib/external/device.js',
     'lib/external/environ.js',
