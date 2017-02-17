@@ -45,8 +45,7 @@ module.exports = {
          * @type {Object}
          */
         debug: {
-            launch: true,
-            cacheExternalJs: false, //默认缓存额外加载的script代码，只少变动
+            launch: false,
             //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
             //os:Users/mac/project/xcode/www/build
             dir: isWinPlat ?

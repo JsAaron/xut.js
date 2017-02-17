@@ -9,7 +9,7 @@ import init from './initialize/index'
 
 initGlobalAPI()
 
-Xut.Version = 878.5
+Xut.Version = 878.6
 
 if(Xut.plat.isBrowser) {
 
