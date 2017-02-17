@@ -30,7 +30,7 @@ Xut.style = {}
  * @param  {[type]} source [description]
  * @return {[type]}        [description]
  */
-Xut.extend = function(target, source) {
+Xut.mixin = function(target, source) {
     if (!source) {
         source = target
         target = this
@@ -43,7 +43,7 @@ Xut.extend = function(target, source) {
     return target
 }
 
-Xut.extend({
+Xut.mixin({
 
     /**
      * 生成32位UUID的方法

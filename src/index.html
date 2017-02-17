@@ -12,11 +12,11 @@
     <title>AppCarrier</title>
     <style type="text/css">
     button {
+        border: 1px solid red;
         position: absolute;
         z-index: 99999
     }
-
-    #closeMini {
+    #closeMini{
         left: 100px;
     }
     </style>
@@ -53,8 +53,7 @@ Xut.Application.setConfig = {
     useHDImageZoom: false
 };
 
-
-var appId = 2
+var appId = 311
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

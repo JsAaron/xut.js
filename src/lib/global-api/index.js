@@ -24,6 +24,7 @@ import { initView } from './view'
 import { initAsset } from './asset'
 import { initContents } from './content'
 import { initApplication } from './application'
+import { initExtend } from './extend'
 
 const assignInit = interName => {
     if(!Xut[interName]) {
@@ -44,6 +45,7 @@ export function initGlobalAPI() {
     //脚本接口
     window.XXTAPI = {}
 
+    initExtend()
     initAsset()
     initView()
     initContents()

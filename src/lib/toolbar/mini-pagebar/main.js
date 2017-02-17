@@ -1,14 +1,13 @@
-import { config } from '../config/index'
-
+/**
+ * 迷你杂志页面工具栏
+ */
+import { config } from '../../config/index'
 import {
     hasColumn,
     getBeforeCount,
     getCurrentBeforeCount
-} from '../scenario-core/component/column/depend'
+} from '../../scenario-core/component/column/depend'
 
-/**
- * 页码显示
- */
 export default class NumberBar {
 
     constructor({

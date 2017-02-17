@@ -64,7 +64,7 @@ const loadApp = (...arg) => {
  */
 const mixModeConfig = setConfig => {
     if(setConfig) {
-        Xut.extend(config, setConfig)
+        Xut.mixin(config, setConfig)
     }
 }
 

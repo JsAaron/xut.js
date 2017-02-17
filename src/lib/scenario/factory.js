@@ -2,7 +2,7 @@ import { config } from '../config/index'
 import MainBar from '../toolbar/main-sysbar/index'
 import DeputyBar from '../toolbar/deputy-fnbar'
 import BookBar from '../toolbar/word-bookbar/index'
-import NumberBar from '../toolbar/page-number'
+import NumberBar from '../toolbar/mini-pagebar/main'
 import { sceneController } from './controller'
 import Mediator from '../scenario-core/index'
 import {

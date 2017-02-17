@@ -38,7 +38,7 @@
   /**
    * 平台支持
    */
-  Xut.extend(Xut.plat, {
+  Xut.mixin(Xut.plat, {
     has3d: 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix(),
     isAndroid: isAndroid,
     isIphone: isIphone,
@@ -186,7 +186,7 @@
    * 样式style支持
    * @type {Object}
    */
-  Xut.extend(Xut.style, {
+  Xut.mixin(Xut.style, {
 
     reqAnimationFrame: reqAnimationFrame,
 
