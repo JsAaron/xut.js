@@ -96,9 +96,8 @@ export default class Swipe extends Observer {
 
       /**
        * flipMode
-       * 1 翻页没有直接效果，速度改为0
-       * 2 翻页后没有动画回调
-       * @type {[type]}
+       * allow 翻页没有直接效果，速度改为0
+       * ban  翻页后没有动画回调
        */
       flipMode,
 
@@ -129,7 +128,7 @@ export default class Swipe extends Observer {
      * 翻页时间
      * @type {[type]}
      */
-    this._pageTime = this.options.flipMode ? DEFAULTTIME.min : DEFAULTTIME.mix
+    this._pageTime = this.options.flipMode === 'ban' ? DEFAULTTIME.min : DEFAULTTIME.mix
 
     /**
      * 翻页速率
@@ -204,22 +203,16 @@ export default class Swipe extends Observer {
     }
 
     //flipMode启动，没有滑动处理
-    if (this.options.flipMode) {
+    if (this.options.flipMode === 'ban') {
       //不需要绑定transitionend，会设置手动会触发
     } else if (this.options.multiplePages) {
       callback.move = this
       callback.transitionend = this
     }
+
     $$on(this.container, callback)
   }
 
-  /**
-   * 停止默认的行为
-   * @return {[type]} [description]
-   */
-  _stopDefault(e) {
-    this.options.preventDefault && e.preventDefault()
-  }
 
   /**
    * 事件处理
@@ -229,6 +222,10 @@ export default class Swipe extends Observer {
   handleEvent(e) {
 
     this.options.stopPropagation && e.stopPropagation()
+
+    const stopDefault = this.options.preventDefault ? function(e) {
+      e.preventDefault && e.preventDefault()
+    } : function() {}
 
     //接受多事件的句柄
     $$handle({
@@ -244,21 +241,21 @@ export default class Swipe extends Observer {
           //如果是移动端的情况下 && 支持二维码 && 是图片 就不组织默认行为
         } else {
           //浏览器上就直接阻止
-          this._stopDefault(e)
+          stopDefault(e)
         }
 
         this._onStart(e)
       },
       move(e) {
-        this._stopDefault(e)
+        stopDefault(e)
         this._onMove(e)
       },
       end(e) {
-        this._stopDefault(e)
+        stopDefault(e)
         this._onEnd(e)
       },
       transitionend(e) {
-        this._stopDefault(e)
+        stopDefault(e)
         this._onAnimComplete(e)
       }
     }, this, e)

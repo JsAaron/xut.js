@@ -866,7 +866,7 @@ video {
     z-index: 1
 }
 .page-pinch > div:first-child {
-    overflow: hidden; 
+    overflow: hidden;
     z-index: 2
 }
 
@@ -923,7 +923,6 @@ video {
     display: none;
 }
 
-
 /******************
 *   flow页码样式
 * *******************/
@@ -960,7 +959,19 @@ video {
 .xut-page-number > div:last-child {
     font-weight: normal;
 }
-
+.xut-page-number .slider-pager-page {
+    display: inline-block;
+    margin: 0 3px;
+    width: 15px;
+    color: #000;
+    text-decoration: none;
+    opacity: 0.3;
+}
+.xut-page-number .slider-pager-page.active {
+    -webkit-transition:opacity 0.4s ease-in;
+    transition:opacity 0.4s ease-in;
+    opacity:1;
+}
 
 /******************
 *   文字效果要样式

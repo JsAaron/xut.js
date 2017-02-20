@@ -16,7 +16,8 @@
         position: absolute;
         z-index: 99999
     }
-    #closeMini{
+
+    #closeMini {
         left: 100px;
     }
     </style>
@@ -24,7 +25,7 @@
 </head>
 
 <body>
- <p id="test123" style="word-break:break-all;position: absolute;top:30px;left:0;z-index:99999999;color:red;font-weight:bold;"></p>
+    <p id="test123" style="word-break:break-all;position: absolute;top:30px;left:0;z-index:99999999;color:red;font-weight:bold;"></p>
     <button id="launchMini">加载新的图书</button>
     <button id="closeMini">关闭图书</button>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
@@ -32,11 +33,10 @@
 
 </html>
 <script type="text/javascript">
-
 Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
-    historyMode: false,
+    historyMode: true,
     visualMode: 2,
     cursor: {
         url: 'images/icons/busyicon.gif',
@@ -53,7 +53,7 @@ Xut.Application.setConfig = {
     useHDImageZoom: false
 };
 
-var appId = 311
+var appId = 313
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点
@@ -62,6 +62,10 @@ $("#launchMini").click(function() {
         path: {
             resource: 'content/' + appId,
             database: 'content/' + appId + '/SQLResult.js'
+        },
+        pageBar: {
+            type: 'circular',
+            mode: 1
         }
     });
 })
