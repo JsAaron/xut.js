@@ -48,12 +48,20 @@ Xut.Application.setConfig = {
     //     1080: 'mi',
     //     1440: 'hi'
     // },
+    pageBar: {
+        type: 'circular',
+        mode: 1,
+        position: {
+            top: '90%',
+            left: '20%'
+        }
+    },
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: false
 };
 
-var appId = 313
+var appId = 303
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点
@@ -62,10 +70,6 @@ $("#launchMini").click(function() {
         path: {
             resource: 'content/' + appId,
             database: 'content/' + appId + '/SQLResult.js'
-        },
-        pageBar: {
-            type: 'circular',
-            mode: 1
         }
     });
 })

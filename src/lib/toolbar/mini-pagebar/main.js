@@ -26,6 +26,11 @@ export default class NumberBar {
     $rootNode,
     pageTotal,
     visualIndex,
+    /**
+     * type
+     * mode
+     * position:top/bottom
+     */
     pageBar
   }) {
 
@@ -39,10 +44,33 @@ export default class NumberBar {
       //圆点模式样式
       this.dotStyle = Number(pageBar.mode) || 1;
       //样式
-      this.dotStyleClass = dotStyleClass[this.dotStyle - 1]
+      this.dotStyleClass = dotStyleClass[this.dotStyle - 1];
+      //位置
+      if (pageBar.position) {
+        let left = pageBar.position.left
+        let top = pageBar.position.top
+        let width = 'width:100%;'
+        if (_.isUndefined(left)) {
+          left = 'width:100%;text-align:center;'
+        } else {
+          width = `width:${100-parseInt(left)}%;`
+          left = `left:${left};`
+        }
+        if (_.isUndefined(top)) {
+          top = 'bottom:0;'
+        } else {
+          top = `top:${top};`
+        }
+        this.position = `${width}${left}${top}`
+      } else {
+        this.position = "width:100%;text-align:center;bottom:0;";
+      }
     }
 
-    this.$container = this._createDom(pageTotal)
+    //结构
+    const html = String.styleFormat(this._createDom(pageTotal))
+    this.$container = $(html)
+
     if (this.dotTrue === 'circular') {
       this.$currtNode = this.$container.find('span:first')
     } else {
@@ -54,38 +82,35 @@ export default class NumberBar {
     Xut.nextTick(() => {
       $rootNode.append(this.$container)
     })
+
   }
 
   _createDom(pageTotal) {
-    //存在模式3的情况，所以页码要处理溢出的情况。left值
-    let right = 0
-    if (config.visualSize.overflowWidth) {
-      right = Math.abs(config.visualSize.left * 2) + 'px'
-    }
     //圆点模式
     if (this.dotTrue === 'circular') {
-      var dotString =
-        `<span class = "slider-pager-page active">
-              <i class= ${this.dotStyleClass}></i>
-        </span>`;
-
-      for (var i = 0; i < pageTotal - 1; i++) {
-        dotString +=
-          `<span class = "slider-pager-page">
-                 <i class= ${this.dotStyleClass}></i>
-           </span>`;
+      let dotString = ''
+      let countPage = pageTotal
+      while (countPage--) {
+        dotString += `<span class="slider-pager-page"><i class= ${this.dotStyleClass}></i></span>`;
       }
-      return $(
-        `<div class="xut-page-number" style="width:100%;text-align:center">
-                 ${dotString}
-         </div>`)
-    } else {
-      return $(
-        `<div class="xut-page-number" style="right:${right};">
-                <div>1</div>
-                <strong>/</strong>
-                <div>${pageTotal}</div>
-        </div>`)
+      return `<div class="xut-page-number"
+                   style="${this.position};">
+                   ${dotString}
+              </div>`
+    }
+    //数字模式
+    else {
+      //存在模式3的情况，所以页码要处理溢出的情况。left值
+      let right = 0
+      if (config.visualSize.overflowWidth) {
+        right = Math.abs(config.visualSize.left * 2) + 'px'
+      }
+      return `<div class="xut-page-number"
+                   style="right:${right};bottom:0;">
+                   <div>1</div>
+                   <strong>/</strong>
+              <div>${pageTotal}</div>
+              </div>`
     }
   }
 
@@ -116,25 +141,12 @@ export default class NumberBar {
   /**
    * 更新单页
    */
-  _updateSingle(action, updateIndex, direction) {
+  _updateSingle(action, updateIndex) {
     Xut.nextTick(() => {
       //圆点模式
       if (this.dotTrue === 'circular') {
-        if (direction == 'prev') {
-          this.$currtNode.removeClass('active');
-          this.$currtNode.prev().addClass('active')
-        } else {
-          if (updateIndex > 1) {
-            if (action === 'init') {
-               this.$container.find('span.slider-pager-page.active').removeClass('active')
-              $(this.$container.find('span.slider-pager-page')[updateIndex-1]).addClass("active");
-            } else {
-              this.$currtNode.removeClass('active');
-              this.$currtNode.next().addClass('active')
-            }
-          }
-        }
-        this.$currtNode = this.$container.find('span.slider-pager-page.active')
+        this.$container.find('span.slider-pager-page.active').removeClass('active')
+        $(this.$container.find('span.slider-pager-page')[updateIndex - 1]).addClass("active");
       } else {
         this.$currtNode.text(updateIndex)
       }
@@ -218,7 +230,7 @@ export default class NumberBar {
       }
     }
 
-    this._updateSingle(action, updateIndex, direction)
+    this._updateSingle(action, updateIndex)
   }
 
 }
