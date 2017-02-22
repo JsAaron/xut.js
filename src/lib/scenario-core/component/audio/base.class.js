@@ -98,7 +98,7 @@ export default class Base {
     if (this.audio && !this.isFlash) {
       this.status = 'playing';
       //支持自动播放
-      if (Xut.plat.hasAutoPlayAudio) {
+      if (Xut.plat.hasAutoPlayAudio && window.WeixinJSBridge) {
         //微信上单独处理
         window.WeixinJSBridge.invoke('getNetworkType', {}, (e) => {
           this.audio.play();

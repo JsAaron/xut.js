@@ -930,8 +930,6 @@ video {
     position: absolute;
     z-index: 3;
     display: none;
-   /* bottom: 0;*/
-    padding-bottom: .3rem;
 }
 .xut-page-number strong {
     padding: 0 0.2rem;

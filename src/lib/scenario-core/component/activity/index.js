@@ -136,10 +136,9 @@ export default class Activity {
 
     this.eachAssistContents(function(scope) {
 
-      var context, id, isRreRun, parameter;
-
       //针对必须创建
-      if (!(context = scope.$contentNode)) {
+      let $contentNode;
+      if (!($contentNode = scope.$contentNode)) {
         console.log('$contentNode不存在')
         return
       }
@@ -150,34 +149,22 @@ export default class Activity {
         return;
       }
 
-      //如果是动画才处理
-      id = scope.id
-      isRreRun = scope.isRreRun
-      parameter = scope.getParameter();
-
-
-      //如果不是预生成,注册动画事件
-      if (isRreRun === undefined) {
-        //初始化动画
-        scope.init(id, context, $containsNode, pageId, parameter, pageType);
-      }
-
-      //绑定DOM一些属性
-      this._toRepeatBind(id, context, isRreRun, scope, collectorHooks);
+      //初始化动画
+      let id = scope.id
+      scope.init(id, $contentNode, $containsNode, pageId, scope.getParameter(), pageType);
+      this._toRepeatBind(id, $contentNode, scope, collectorHooks);
     });
 
   }
-
 
   /**
    * dom节点去重绑定
    * 在每一次构建activity对象中，不重复处理content一些特性
    * 1 翻页特性
    * 2 注册钩子
-   * 3 预显示
    * @return {[type]} [description]
    */
-  _toRepeatBind(id, context, isRreRun, scope, collectorHooks) {
+  _toRepeatBind(id, $contentNode, scope, collectorHooks) {
     let relatedData = this.relatedData
     let indexOf = relatedData.createContentIds.indexOf(id)
 
@@ -186,12 +173,7 @@ export default class Activity {
     if (-1 !== indexOf) {
       relatedData.createContentIds.splice(indexOf, 1); //删除,去重
       collectorHooks(scope.pid, id, scope); //收集每一个content注册
-      this._iscrollBind(scope, context); //增加翻页特性
-      if (isRreRun) { //直接复位状态,针对出现动画 show/hide
-        context.css({
-          'visibility': isRreRun
-        })
-      }
+      this._iscrollBind(scope, $contentNode); //增加翻页特性
     }
   }
 
@@ -236,7 +218,6 @@ export default class Activity {
             'opacity': 0,
             'visibility': 'visible'
           })
-          $parentNode.css()
           resetStyle = () => setStyle({
             'opacity': opacity,
             'visibility': visible
@@ -436,9 +417,6 @@ export default class Activity {
       return;
     }
 
-    //创建的无行为content
-    let partContentRelated = this.relatedData.partContentRelated
-
     //制作作用于内动画完成
     //等待动画完毕后执行动作or场景切换
     let captureAnimComplete = this.captureAnimComplete = function(counts) {
@@ -476,57 +454,15 @@ export default class Activity {
       }
     }(this.abstractContents.length);
 
-    /**
-     * 如果是preRun处理
-     * @return {Boolean} [description]
-     */
-    const isRreRunPocess = function(scope) {
-      //针对空跳过处理
-      if (partContentRelated && partContentRelated.length && (-1 !== partContentRelated.indexOf(scope.id))) {
-        captureAnimComplete()
-      } else {
-        //必须要修改
-        if (scope.$contentNode) {
-          if (scope.canvasMode) {
-            console.log('canvsa isRreRunPocess')
-              //直接改变元素状态
-              //scope.$contentNode.view.style.visible = scope.isRreRun === 'visible' ? true : false;
-          } else {
-            //因为执行的顺序问题，动画与页面零件
-            //isscroll标记控制
-            if (!scope.$contentNode.attr('data-iscroll')) {
-              let visibility = scope.$contentNode.css('visibility')
-                //必须是设定值与原始值不一致才修改
-                //苹果上闪屏问题
-              if (visibility != scope.isRreRun) {
-                scope.$contentNode.css({
-                  'visibility': scope.isRreRun
-                })
-              }
-            }
-          }
-        }
-        captureAnimComplete()
-      }
-    }
-
     //执行动画
     this.eachAssistContents(function(scope) {
-      if (scope.isRreRun) {
-        isRreRunPocess(scope);
-      } else {
-
-        //标记动画正在运行
-        scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
-          'animOffset': scope.$contentNode.offset()
-        })
-
-        //ppt动画
-        //ppt音频
-        scope.play(function() {
-          captureAnimComplete(scope);
-        });
-      }
+      //标记动画正在运行
+      scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
+        'animOffset': scope.$contentNode.offset()
+      })
+      scope.play(function() {
+        captureAnimComplete(scope);
+      });
     })
 
     this.runState = true;
@@ -541,9 +477,8 @@ export default class Activity {
     var pageId = this.relatedData.pageId;
     this.runState = false;
     this.eachAssistContents(function(scope) {
-      !scope.isRreRun && scope.stop && scope.stop(pageId);
+      scope.stop && scope.stop(pageId);
     })
-
   }
 
 
@@ -587,9 +522,8 @@ export default class Activity {
    */
   reset() {
     this.eachAssistContents(function(scope) {
-      !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
+      scope.reset && scope.reset(); //ppt动画
     })
-
     this._resetAloneAnim();
   }
 

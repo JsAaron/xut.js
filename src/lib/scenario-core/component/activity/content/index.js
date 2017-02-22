@@ -6,41 +6,11 @@
  */
 import Animation from './animation'
 import Parallax from './parallax/index'
+import pretreatment from './prep'
 
 //2016.7.15废弃
 //pixi暂时不使用
 // import { Context } from '../pixi/context'
-
-/**
- * 预运行动作
- * 自动 && 出现 && 无时间 && 无音乐
- *  && 不是精灵动画 && 没有脚本代码 && 并且不能是收费
- */
-const preRunAction = function(data, eventName) {
-  var parameter = data.getParameter()
-    //过滤预生成动画
-  if (parameter && parameter.length === 1) {
-    var category = data.contentDas.category
-    var para = parameter[0];
-    if (para.animationName === 'EffectAppear' //出现动画
-      && data.domMode //并且只有dom模式才可以，canvas排除
-      && eventName === 'auto' //自动运行
-      && !para.videoId //没有音频
-      && !para.delay //没有延时
-      && category !== 'Sprite' //不是精灵
-      && category !== 'AutoCompSprite' //不是自动精灵
-      && !para.preCode //动画前脚本
-      && !para.postCode //动画后脚本
-      && !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
-      /**
-       *针对预处理动作,并且没有卷滚的不注册
-       *满足是静态动画
-       *true是显示,false隐藏å
-       */
-      return data.isRreRun = /"exit":"False"/i.test(para.parameter) === true ? 'visible' : 'hidden';
-    }
-  }
-}
 
 
 /**
@@ -130,7 +100,6 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
 
   /**
    * 生成查询方法
-   * @return {[type]} [description]
    */
   data.getParameter = function() {
     //分区母版与页面的数据结构
@@ -144,25 +113,15 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
     }
   }();
 
-
-  /**
-   * 生成视觉差对象
-   * @type {[type]}
-   */
+  //生成视觉差对象
   if (data.processType === 'parallax') {
     return Parallax(data, base.relatedData, base.getStyle)
   }
 
-  /**
-   *  优化机制,预生成处理
-   *  过滤自动热点并且是出现动作，没有时间，用于提升体验
-   */
-  preRunAction(data, base.eventData.eventName)
+  //数据预处理
+  pretreatment(data, base.eventData.eventName)
 
-
-  /**
-   * 生成子作用域对象，用于抽象处理动画,行为
-   */
+  //生成子作用域对象，用于抽象处理动画,行为
   return new Animation(data, base.getStyle)
 }
 

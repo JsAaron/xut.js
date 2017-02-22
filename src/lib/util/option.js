@@ -1,7 +1,16 @@
-import { loadFile } from './loader'
-import { $$warn } from './debug'
-import { parseJSON } from './lang'
-import { config, resetVisualProportion } from '../config/index'
+import {
+  loadFile
+} from './loader'
+import {
+  $$warn
+} from './debug'
+import {
+  parseJSON
+} from './lang'
+import {
+  config,
+  resetVisualProportion
+} from '../config/index'
 const CEIL = Math.ceil
 const FLOOR = Math.floor
 
@@ -183,17 +192,34 @@ const converProportion = function({
   }
   //图片正比缩放，而且保持上下居中
   else if (proportionMode === 3) {
-    let originalHeight = CEIL(height * proportion.height) || 0
-    let proportionalHeight = CEIL(height * proportion.width) || 0
-    let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
-    top = CEIL(top * proportion.top) + proportionalTop
-    return {
-      width: CEIL(width * proportion.width) || 0,
-      height: proportionalHeight,
-      left: CEIL(left * proportion.left) || 0,
-      top: top,
-      padding: CEIL(padding * proportion.width) || 0
+    //高度为基本比值
+    if (proportion.width > proportion.height) {
+      let originalWidth = CEIL(width * proportion.width) || 0
+      let proportionalWidth = CEIL(width * proportion.height) || 0
+      let proportionalLeft = Math.abs(proportionalWidth - originalWidth) / 2
+      left = CEIL(left * proportion.left) + proportionalLeft
+      return {
+        width: proportionalWidth,
+        height: CEIL(height * proportion.height) || 0,
+        left: left,
+        top: CEIL(top * proportion.top) || 0,
+        padding: CEIL(padding * proportion.width) || 0
+      }
+    } else {
+      //宽度作为基本比值
+      let originalHeight = CEIL(height * proportion.height) || 0
+      let proportionalHeight = CEIL(height * proportion.width) || 0
+      let proportionalTop = Math.abs(proportionalHeight - originalHeight) / 2
+      top = CEIL(top * proportion.top) + proportionalTop
+      return {
+        width: CEIL(width * proportion.width) || 0,
+        height: proportionalHeight,
+        left: CEIL(left * proportion.left) || 0,
+        top: top,
+        padding: CEIL(padding * proportion.width) || 0
+      }
     }
+
   }
   //默认缩放比
   else {

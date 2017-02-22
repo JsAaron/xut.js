@@ -37,7 +37,7 @@ Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
     historyMode: true,
-    visualMode: 2,
+    visualMode: 1,
     cursor: {
         url: 'images/icons/busyicon.gif',
         delayTime: 300
@@ -50,18 +50,23 @@ Xut.Application.setConfig = {
     // },
     pageBar: {
         type: 'circular',
-        mode: 1,
-        position: {
-            top: '90%',
-            left: '20%'
-        }
+        mode: 1
+            // position: {
+            //     top: '90%',
+            //     left: '20%'
+            // }
     },
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: false
 };
 
-var appId = 303
+
+function openurl(){
+  window.location.href='http://www.kidreadcool.com/downloads.php?esp=mios'
+}
+
+var appId = 5
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

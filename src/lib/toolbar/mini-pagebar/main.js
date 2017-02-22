@@ -63,7 +63,7 @@ export default class NumberBar {
         }
         this.position = `${width}${left}${top}`
       } else {
-        this.position = "width:100%;text-align:center;bottom:0;";
+        this.position = "width:100%;text-align:center;bottom:0;margin-bottom:0.3rem";
       }
     }
 
@@ -93,10 +93,7 @@ export default class NumberBar {
       while (countPage--) {
         dotString += `<span class="slider-pager-page"><i class= ${this.dotStyleClass}></i></span>`;
       }
-      return `<div class="xut-page-number"
-                   style="${this.position};">
-                   ${dotString}
-              </div>`
+      return `<div class="xut-page-number"style="${this.position};">${dotString}</div>`
     }
     //数字模式
     else {
@@ -105,11 +102,10 @@ export default class NumberBar {
       if (config.visualSize.overflowWidth) {
         right = Math.abs(config.visualSize.left * 2) + 'px'
       }
-      return `<div class="xut-page-number"
-                   style="right:${right};bottom:0;">
-                   <div>1</div>
-                   <strong>/</strong>
-              <div>${pageTotal}</div>
+      return `<div class="xut-page-number"style="right:${right};bottom:0;">
+                  <div>1</div>
+                  <strong>/</strong>
+                  <div>${pageTotal}</div>
               </div>`
     }
   }
