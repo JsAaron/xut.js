@@ -81,6 +81,18 @@ export default class Animation {
   constructor(options, getStyle) {
     _.extend(this, options);
     this.getStyle = getStyle
+
+    /////////////////////////////
+    ///如果是被预处理截断，跳过动画创建
+    ///重写原事件的相关数据
+    ///改动脚本auto为click事件
+    /////////////////////////////
+    if (this.prepTruncation) {
+      this.base.eventData.originaName = this.base.eventData.eventName
+      this.base.eventData.eventName = 'click'
+      this.base.eventData.eventContentId = this.id
+      return
+    }
   }
 
 
@@ -216,20 +228,7 @@ export default class Animation {
       return
     }
 
-    //如果是被预处理截断，跳过动画创建
-    //直接给脚本数据绑定click事件
     if (this.prepTruncation) {
-
-      //增加一个特殊的标记
-      //用于全局swipe过滤默认行为
-      this.$contentNode.prop('prepTruncation', 'true')
-      this.$contentNode.click(() => {
-        try {
-          makeJsonPack(this.prepTruncation)()
-        } catch (err) {
-          console.log(`预处理截断执行脚本失败`)
-        }
-      })
       return
     }
 
@@ -252,8 +251,6 @@ export default class Animation {
   /**
    * 显示预处理
    * 直接越过动画
-   * @param  {[type]}  scope [description]
-   * @return {Boolean}       [description]
    */
   _hasPrepVisible(playComplete) {
     //创建的无行为content
@@ -292,7 +289,6 @@ export default class Animation {
    * @return {[type]}                 [description]
    */
   play(playComplete) {
-
     //处理显示动画
     if (this.prepVisible) {
       this._hasPrepVisible(playComplete)
@@ -300,11 +296,18 @@ export default class Animation {
     }
 
     //如果是被预处理截断
+    //执行脚本
     if (this.prepTruncation) {
+      try {
+        makeJsonPack(this.prepTruncation)()
+      } catch (err) {
+        console.log(`预处理截断执行脚本失败`)
+      }
+      playComplete()
       return
     }
 
-    var $contentNode = this.$contentNode
+    let $contentNode = this.$contentNode
 
     //canvas
     if ($contentNode && $contentNode.view) {
@@ -371,19 +374,12 @@ export default class Animation {
    */
   destroy() {
 
-    if (this.prepTruncation) {
-      this.$contentNode.off()
-      this.$contentNode = null
-      return
-    }
-
     access((key) => {
       this[key] && this[key].destroy && this[key].destroy()
     })
 
     //销毁renderer = new PIXI.WebGLRenderer
     if (this.canvasMode) {
-      //rederer.destroy()
       this.$contentNode.view && this.$contentNode.destroy()
     }
 
@@ -396,9 +392,8 @@ export default class Animation {
       this[key] = null
     })
 
-
+    this.$contentNode = null
     this.getParameter = null
-
   }
 
 }

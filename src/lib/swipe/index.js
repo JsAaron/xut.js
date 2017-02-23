@@ -224,13 +224,7 @@ export default class Swipe extends Observer {
     this.options.stopPropagation && e.stopPropagation()
 
     const stopDefault = this.options.preventDefault ? function(e) {
-      //这里因为是脚本截断
-      //所以要去掉默认行为
-      //鬼知道什么原因，乱七八糟
-      let $node = $(e.target).closest('div[data-behavior]')
-      if (!$node.closest('div[data-behavior]').prop('prepTruncation')) {
-        e.preventDefault && e.preventDefault()
-      }
+      e.preventDefault && e.preventDefault()
     } : function() {}
 
     //接受多事件的句柄

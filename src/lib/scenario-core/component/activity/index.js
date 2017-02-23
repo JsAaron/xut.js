@@ -26,7 +26,7 @@ import {
 } from './event/event'
 
 import createContent from './content/index'
-import createTask from './task'
+import createTask from './task-check'
 
 /**
  * 处理拖动对象
@@ -61,26 +61,27 @@ export default class Activity {
     this.nextTask = createTask(this.noticeComplete)
 
     /**
-     * 填充事件数据
+     * 初始化事件
+     * 需要先解析
+     * createContent需要依赖
      */
-    this._fillEventData();
+    this._initEvents()
 
     /**
      * 保存子对象content
-     * @type {Array}
      */
-    this.abstractContents = createContent(this);
+    this.abstractContents = createContent(this)
 
     /**
      * 处理html文本框
      * 2016.1.6
      */
-    this._htmlTextBox();
+    this._htmlTextBox()
 
     /**
      * 绑定事件
      */
-    this._bindEventBehavior()
+    this._bindEvents()
 
     /**
      * 初始化content行为
@@ -184,12 +185,9 @@ export default class Activity {
    */
   _iscrollBind(scope, $contentNode) {
 
-    var self = this,
-      contentDas = scope.contentDas;
+    let self = this
+    let contentDas = scope.contentDas
 
-    /**
-     * 给外部调用处理
-     */
     const linkFunction = function(scrollNode) {
 
       //滚动文本的互斥不显示做一个补丁处理

@@ -17,6 +17,7 @@
     "karma": "karma start karma.conf.js --log-level debug --single-run",
     "git": "bash build/shell/git.sh",
     "svn": "bash build/shell/svn.sh",
+    "upload": "node build/shell/upload.js",
     "update:package": "node build/ncu.package.js",
     "check": "flow; test $? -eq 0 -o $? -eq 2",
     "flow:check": "flow check"
@@ -62,11 +63,15 @@
     "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-flow": "^1.1.1",
     "rollup-plugin-replace": "^1.1.1",
+    "ssh2": "^0.5.4",
     "underscore": "^1.8.3",
     "webpack": "^1.13.3",
     "webpack-dev-middleware": "^1.8.4",
     "webpack-hot-middleware": "^2.13.1",
     "webpack-merge": "^0.15.0",
     "write-file-webpack-plugin": "^3.3.0"
+  },
+  "dependencies": {
+    "node-ssh": "^4.0.1"
   }
 }

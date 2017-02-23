@@ -134,16 +134,10 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
  * @return {[type]}           [description]
  */
 const createHandlers = function(base, parameter) {
-
-  //dom对象
-  var para = parameter[0],
-    contentId = para['contentId'], //可能有多个动画数据 [Object,Object,Object]
-    pid = base.pid,
-    actName = base.makePrefix('Content', pid, contentId)
-
-  /**
-   * 构建子作用域
-   */
+  let para = parameter[0]
+  let contentId = para['contentId'] //可能有多个动画数据 [Object,Object,Object]
+  let pid = base.pid
+  let actName = base.makePrefix('Content', pid, contentId)
   return createScope(base, contentId, pid, actName, parameter, para.masterId);
 }
 
