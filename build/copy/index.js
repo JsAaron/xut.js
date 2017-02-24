@@ -46,6 +46,7 @@ const ls = (src, dist) => {
         } else {
             if (!filterRE.test(rootPath)) {
                  fsextra.copySync(filename, dist + filename)
+            }else{
             }
         }
     }

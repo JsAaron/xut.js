@@ -15,7 +15,6 @@ const excludeKeywords = [
     '.svn',
     'epub',
     'node_modules',
-    'temp',
     // 'dist',
     'src/*.number',
     'src/content',
