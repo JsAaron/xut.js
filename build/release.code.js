@@ -190,15 +190,10 @@ function release() {
   })
 }
 
-//下载
 if (action === 'down') {
   actionDown()
-}
-//上传
-else if (action === 'up') {
+}else if (action === 'up') {
   actionUp()
-}
-//发布
-else {
+}else {
   release()
 }
