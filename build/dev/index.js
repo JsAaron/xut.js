@@ -12,7 +12,7 @@ const cp = require('child_process');
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
 const killOccupied = require('../kill.occupied')
-const convertSVG = require('../convert.svg')
+const convertSVG = require('../convert')
 const serialData = require('../serial.data')
 
 const app = express()
