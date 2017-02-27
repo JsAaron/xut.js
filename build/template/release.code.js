@@ -6,6 +6,7 @@ const exec = require('child_process').exec;
 const spawn = require('child_process').spawn;
 const _ = require("underscore")
 const fsextra = require('fs-extra')
+const utils = require('../utils')
 const appConfig = require('../../config')
 
 //动作
@@ -30,7 +31,7 @@ if (data) {
 
 const remotePath = '/var/www/mobileclouddata/exports/xxtppt/assets/www'
 const remoteDirectory = `${config.username}@${config.host}:${remotePath}`
-const localRoot = '/Users/mac/project/svn/www-dev'
+const localRoot = process.cwd()
 const localDirectory = `${localRoot}/template/release-code`
 
 const uploadDir = `${localDirectory}/upload`
@@ -42,25 +43,24 @@ const conn = new Client();
 function syncFiles() {
   fsextra.emptyDirSync(uploadDir)
   fsextra.copySync(originalDir, uploadDir)
-  console.log('服务器与本地文件同步完成')
+  utils.log('The server and the local file synchronization is complete')
 }
 
 function downloadFile() {
   return new Promise(function(resolve, reject) {
-    console.log('拉取服务器文件,同步到到本')
     fsextra.emptyDirSync(originalDir)
     const command = `scp -r ${remoteDirectory} ${originalDir}`
-    console.log('服务器路径:' + remotePath)
-    console.log('本地路径:' + originalDir)
+    utils.log('The server path:' + remotePath)
+    utils.log('The local path:' + originalDir)
     const child = exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         return;
       }
-      console.log(stdout, stderr)
+      utils.log(stdout, stderr)
     });
     child.on('exit', function(code) {
-      console.log('Completed with code: ' + code);
+      utils.log('Completed with code: ' + code);
       resolve()
     });
   })
@@ -96,40 +96,13 @@ function sshCommand(command, options) {
   })
 }
 
-function walk(dir, done) {
-  var results = [];
-  fs.readdir(dir, function(err, list) {
-    if (err) return done(err);
-    var i = 0;
-    (function next() {
-      var file = list[i++];
-      if (!file) return done(null, results);
-      if (/^\./.test(file)) {
-        next();
-        return
-      }
-      file = dir + '/' + file;
-      fs.stat(file, function(err, stat) {
-        if (stat && stat.isDirectory()) {
-          walk(file, function(err, res) {
-            results = results.concat(res);
-            next();
-          });
-        } else {
-          results.push(file);
-          next();
-        }
-      });
-    })();
-  });
-};
 
 function compareInfo() {
   return new Promise(function(resolve, reject) {
     sshCommand(`cd ${remotePath} && cat lib/version.js`).then(function(version) {
       return sshCommand(`cd ${remotePath} && ls -lR|grep "^-"|wc -l`, version)
     }).then(function(data) {
-      console.log(`服务器版本号:${data[1]} ,文件数量:${data[0]}`)
+      utils.log(`The server version number:${data[1]} ,The number of files:${data[0]}`)
       resolve()
     })
   })
@@ -137,7 +110,7 @@ function compareInfo() {
 
 function ssh() {
   return new Promise(function(resolve, reject) {
-    console.log('ssh 链接成功');
+    utils.log('SSH link success');
     conn.on('ready', resolve).connect(config);
   })
 }
@@ -147,15 +120,15 @@ function actionUp() {
   ssh().then(function() {
     return compareInfo()
   }).then(function() {
-    console.log('清理服务器目录')
+    utils.log('Clean up the server directory')
     return sshCommand(`rm -r ${remotePath}`)
   }).then(function() {
-    console.log('上传新的发布代码')
+    utils.log('Upload new release code')
     return uploadFile()
   }).then(function() {
     return compareInfo()
   }).then(function(data) {
-    console.log('更新完毕')
+    utils.log('Updated completely')
     conn.end()
   })
 }
@@ -173,7 +146,7 @@ function updateLocalFiles(options) {
       })
     })
     resolve()
-    console.log('基础包制作完毕')
+    utils.log('Basic package the finished')
   })
 }
 
@@ -190,10 +163,15 @@ function release() {
   })
 }
 
+//下载
 if (action === 'down') {
   actionDown()
-}else if (action === 'up') {
+}
+//上传
+else if (action === 'up') {
   actionUp()
-}else {
+}
+//发布
+else {
   release()
 }

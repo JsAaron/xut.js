@@ -1,16 +1,33 @@
-import { config } from './config/index'
-import { initGlobalAPI } from './global-api/index'
-import { AudioManager } from './scenario-core/component/audio/manager'
-import { VideoManager } from './scenario-core/component/video/manager'
-import { fixAudio } from './scenario-core/component/audio/fix'
-import { nextTick } from './util/nexttick'
-import { initNode } from './initialize/depend/node'
+import {
+  config
+} from './config/index'
+import {
+  initGlobalAPI
+} from './global-api/index'
+import {
+  AudioManager
+} from './scenario-core/component/audio/manager'
+import {
+  VideoManager
+} from './scenario-core/component/video/manager'
+import {
+  fixAudio
+} from './scenario-core/component/audio/fix'
+import {
+  nextTick
+} from './util/nexttick'
+import {
+  slashPostfix
+} from './util/option'
+import {
+  initNode
+} from './initialize/depend/node'
 import init from './initialize/index'
 
 //全局API初始化
 initGlobalAPI()
 
-Xut.Version = 879.3
+Xut.Version = 879.4
 
 if (Xut.plat.isBrowser) {
 
@@ -63,7 +80,7 @@ const loadApp = (...arg) => {
 /**
  * 提供全局配置文件
  */
-const mixModeConfig = setConfig => {
+const mixGolbalConfig = setConfig => {
   if (setConfig) {
     Xut.mixin(config, setConfig)
   }
@@ -109,48 +126,32 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
 
 /**
  * 新版本加载
+    style: path.style, //style样式文件
+    resource: slashPostfix(path.resource), //资源路径
+    database: path.database, //数据库
+    launchAnim: option.launchAnim, //启动动画
+    convert: option.convert, //资源转化svg=>js
+    pageBar: option.pageBar //mini页码显示模式
  */
-Xut.Application.Launch = ({
-  el,
-  path,
-  launchAnim,
-  cursor,
-  pageBar,
-  convert //'svg' 资源转化svg=>js，用来读取数据
-}) => {
+Xut.Application.Launch = option => {
   if (config.launch) {
     return
   }
   let setConfig = Xut.Application.setConfig
   if (setConfig && setConfig.lauchMode === 1) {
-    mixModeConfig(setConfig);
-    cacheOptions = [{
-      el,
-      path,
-      cursor
-    }]
-
-    //地址结尾是否包含了斜杠，如果包含了去掉
-    let resource = path.resource
-    if (/\/$/.test(resource)) {
-      resource = resource.substring(0, resource.length - 1)
+    mixGolbalConfig(setConfig);
+    cacheOptions = [option] //多次切换
+    config.launch = $.extend(true, {}, option)
+    if (option.path) {
+      _.each(option.path, function(value, key) {
+        config.launch[key] = key === 'resource' ? slashPostfix(value) : value
+      })
+      delete config.launch.path
     }
-
-    /**
-     * 应用启动配置
-     * @type {Object}
-     */
-    config.launch = { //外部配置文件
-      resource: resource, //资源路径
-      database: path.database, //数据库
-      style: path.style, //style样式文件
-      launchAnim, //启动动画
-      convert, //资源转化svg=>js
-      pageBar //mini页码显示模式
-    }
-    loadApp(el, cursor)
+    loadApp(option.el, option.cursor)
   }
 }
+
 
 /**
  * 老版本加载
@@ -158,7 +159,7 @@ Xut.Application.Launch = ({
 setTimeout(() => {
   let setConfig = Xut.Application.setConfig
   if (!setConfig || setConfig && !setConfig.lauchMode) {
-    mixModeConfig(setConfig)
+    mixGolbalConfig(setConfig)
     loadApp()
   }
 }, 100)

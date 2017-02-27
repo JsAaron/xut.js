@@ -14,6 +14,19 @@ import {
 const CEIL = Math.ceil
 const FLOOR = Math.floor
 
+const slashRE = /\/$/
+
+/**
+ * 去掉后缀的斜杠
+ * @return {[type]} [description]
+ */
+export function slashPostfix(resource) {
+  if (resource && slashRE.test(resource)) {
+    return resource.substring(0, resource.length - 1)
+  }
+  return resource
+}
+
 /**
  * 动态加载link
  * @return {[type]} [description]
