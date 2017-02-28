@@ -6,69 +6,67 @@ const SLASHES = new RegExp("/", "ig")
 const DIRNAME = new RegExp("(?!=\/)([*,.,**]\*[a-z]+)$", "i")
 const perfix = '.'
 const specialKey = {
-    '*.number': '[0-9]+'
+  '*.number': '[0-9]+'
 }
 
+///.apk\/content|.apk\/www|.\/.svn(\/[.\w\d]+)*|.\/epub(\/[.\w\d]+)*|.\/node_modules(\/[.\w\d]+)*|.\/temp(\/[.\w\d]+)*|.src\/[0-9]+|.src\/content|.src\/test/i
 const excludeKeywords = [
-    'apk/content',
-    'apk/www',
-    '.svn',
-    'epub',
-    'node_modules',
-    // 'dist',
-    'src/*.number',
-    'src/content',
-    'src/test'
+  'apk/content',
+  'apk/www',
+  '.svn',
+  'epub',
+  'node_modules',
+  'temp',
+  'template',
+  // 'dist',
+  'src/*.number',
+  'src/content',
+  'src/test'
 ]
 
 
 module.exports = () => {
 
-    var excludeGroup = []
+  let excludeGroup = []
 
-    /**
-     * { '0': { './': '.svn,epub,node_modules,temp,dist' },
-      '   1': {
-                 'scr/' : 'content,set',
-                'build/': 'test,image'
-              },
-      '   2': { 'scr/ima/': 'teb' },
-      '   4': { 'scr/content/image/test/': 'aaa' }
-      }
-     * @param  {[type]} var i             in excludeGroup [description]
-     * @return {[type]}     [description]
-     */
-    for (let key of excludeKeywords) {
-        let hierarchy, i, exp, match, dirname, pathdir, setGroup
-        hierarchy = key.match(SLASHES)
-
-        i = 0
-        exp = perfix
-
-        setGroup = (dirname) => {
-            excludeGroup.push(path.normalize(exp + path.sep) + (specialKey[dirname] || dirname))
-        }
-
-        if (hierarchy) {
-            i = hierarchy.length
-            match = DIRNAME.exec(key)
-            dirname = match[0]
-            pathdir = key.replace('/' + dirname, '')
-            exp += pathdir
-            setGroup(dirname)
-        } else {
-            ///.\/.svn(\/[.\w\d]+)*/ig
-            dirname = key + '(\/[.\\w\\d]+)*'
-            setGroup(dirname)
-        }
-
+  /**
+   * { '0': { './': '.svn,epub,node_modules,temp,dist' },
+    '   1': {
+               'scr/' : 'content,set',
+              'build/': 'test,image'
+            },
+    '   2': { 'scr/ima/': 'teb' },
+    '   4': { 'scr/content/image/test/': 'aaa' }
+    }
+   * @param  {[type]} var i             in excludeGroup [description]
+   * @return {[type]}     [description]
+   */
+  for (let key of excludeKeywords) {
+    let match, dirname, pathdir
+    let hasHierarchy = key.match(SLASHES)
+    let exp = perfix
+    let setGroup = (dirname) => {
+      excludeGroup.push(path.normalize(exp + path.sep) + (specialKey[dirname] || dirname))
     }
 
+    //matches only the  2
+    if (hasHierarchy) {
+      match = DIRNAME.exec(key)
+      dirname = match[0]
+      pathdir = key.replace('/' + dirname, '')
+      exp += pathdir
+      setGroup(dirname)
+    } else {
+      //Combined with boundary judgment
+      excludeGroup.push('^[.\/]*' + key)
+    }
 
-    /**
-     * Create a regular expression to replace their own string
-     * @param  {[type]}
-     * @return {[type]}     [description]
-     */
-    return new RegExp(excludeGroup.join(',').replace(/,/g, '|'), 'i')
+  }
+
+  /**
+   * Create a regular expression to replace their own string
+   * @param  {[type]}
+   * @return {[type]}     [description]
+   */
+  return new RegExp(excludeGroup.join(',').replace(/,/g, '|'), 'i')
 }

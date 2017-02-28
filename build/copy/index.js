@@ -7,8 +7,8 @@ const createRE = require('./filter')
 
 const src = '.'
 const dists = [
-    '/Users/mac/project/git/xut.js/'
-    // '/Users/mac/project/svn/server/magazine-develop/www/'
+  '/Users/mac/project/git/xut.js/'
+  // '/Users/mac/project/svn/server/magazine-develop/www/'
 ]
 
 const filterRE = createRE()
@@ -17,46 +17,45 @@ const filterRE = createRE()
 //./build/dev/test.js
 //build/dev/webpack.dev.conf.js
 const segmentation = new RegExp("[.]?\\w+([.]?\\w*)*", "ig")
-const excludeRE = new RegExp(".git|epub|.svn|node_modules|README.md|README|README.gif|安装说明.docx", "ig")
+const excludeRE = new RegExp(".git|epub|.svn|README.md|README|README.gif|安装说明.docx", "ig")
 
 console.log(
-    '【Regular filter】\n' +
-    filterRE +
-    '\n'
+  '【Regular filter】\n' +
+  filterRE +
+  '\n'
 )
 
 const del = (dist) => {
-    var files = fs.readdirSync(dist);
-    for (file of files) {
-        if (!excludeRE.test(file)) {
-            fsextra.removeSync(dist + file)
-        }
+  var files = fs.readdirSync(dist);
+  for (file of files) {
+    if (!excludeRE.test(file)) {
+      fsextra.removeSync(dist + file)
     }
-    console.log('del: ' + dist)
+  }
+  console.log('del: ' + dist)
 }
 
 const ls = (src, dist) => {
-    var files = fs.readdirSync(src);
-    for (fn in files) {
-        var rootPath = src + path.sep
-        var filename = rootPath + files[fn]
-        var stat = fs.lstatSync(filename);
-        if (stat.isDirectory() == true) {
-            ls(filename,dist)
-        } else {
-            if (!filterRE.test(rootPath)) {
-                 fsextra.copySync(filename, dist + filename)
-            }else{
-            }
-        }
+  var files = fs.readdirSync(src);
+  for (fn in files) {
+    var rootPath = src + path.sep
+    var filename = rootPath + files[fn]
+    var stat = fs.lstatSync(filename);
+    if (stat.isDirectory() == true) {
+      ls(filename, dist)
+    } else {
+      if (!filterRE.test(rootPath)) {
+        fsextra.copySync(filename, dist + filename)
+      } else {
+        // console.log(111,filename)
+      }
     }
+  }
 }
 
 
 dists.forEach((dist) => {
-    del(dist)
-    ls(src, dist)
-    console.log('copy: ' + dist)
+  del(dist)
+  ls(src, dist)
+  console.log('copy: ' + dist)
 })
-
-

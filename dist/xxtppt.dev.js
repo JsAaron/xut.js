@@ -513,7 +513,7 @@ Xut.style = {}
  * @param  {[type]} source [description]
  * @return {[type]}        [description]
  */
-Xut.extend = function(target, source) {
+Xut.mixin = function(target, source) {
     if (!source) {
         source = target
         target = this
@@ -526,7 +526,7 @@ Xut.extend = function(target, source) {
     return target
 }
 
-Xut.extend({
+Xut.mixin({
 
     /**
      * 生成32位UUID的方法
@@ -587,248 +587,250 @@ String.styleFormat = function(format) {
 ;
 (function() {
 
-    var location     = document.location.href
+  var location = document.location.href
     //在读酷pc端 navigator的值被改写过了!!
     //navigator.appVersion: "xxt 1.0.5260.29725"
-    var userAgent    = window.navigator.userAgent.toLowerCase()
-    var appVersion   = window.navigator.appVersion.toLowerCase()
+  var userAgent = window.navigator.userAgent.toLowerCase()
+  var appVersion = window.navigator.appVersion.toLowerCase()
 
-    var isAndroid    = device.android() || (/android/gi).test(appVersion)
-    var isDesktop    = device.desktop()
-    var isMacOS      = device.find('mac')
-    var isIphone     = device.iphone()
-    var isIpad       = device.ipad()
-    var isIOS        = device.ios()
-    var isWebKit     = device.find('applewebkit')//webkit内核
-    var isWeiXin     = device.find('micromessenger')//微信
-    var hasTouch     = ('ontouchstart' in window)//支持触屏
+  var isAndroid = device.android() || (/android/gi).test(appVersion)
+  var isDesktop = device.desktop()
+  var isMacOS = device.find('mac')
+  var isIphone = device.iphone()
+  var isIpad = device.ipad()
+  var isIOS = device.ios()
+  var isWebKit = device.find('applewebkit') //webkit内核
+  var isWeiXin = device.find('micromessenger') && window.WeixinJSBridge //微信
+  var hasTouch = ('ontouchstart' in window) //支持触屏
 
-    //针对win8的处理
-    var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
+  //针对win8的处理
+  var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
     //移动端仅仅只支持touch
-    var only_touch   = hasTouch && MOBILE_REGEX.test(userAgent)
+  var only_touch = hasTouch && MOBILE_REGEX.test(userAgent)
     //判断是否为浏览器
-    var boolBrowser  = location.indexOf('http') > -1 || location.indexOf('https') > -1
-    var isBrowser    = boolBrowser ? boolBrowser : !only_touch
+  var boolBrowser = location.indexOf('http') > -1 || location.indexOf('https') > -1
+  var isBrowser = boolBrowser ? boolBrowser : !only_touch
 
-    //有hasMutationObserverBug
-    //detecting iOS UIWebView by indexedDB
-    var iosVersionMatch = isIOS && userAgent.match(/os ([\d_]+)/)
-    var iosVersion      = iosVersionMatch && iosVersionMatch[1].split('_')
-    var hasMutationObserver = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
+  //有hasMutationObserverBug
+  //detecting iOS UIWebView by indexedDB
+  var iosVersionMatch = isIOS && userAgent.match(/os ([\d_]+)/)
+  var iosVersion = iosVersionMatch && iosVersionMatch[1].split('_')
+  var hasMutationObserver = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
+
+  /**
+   * 平台支持
+   */
+  Xut.mixin(Xut.plat, {
+    has3d: 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix(),
+    isAndroid: isAndroid,
+    isIphone: isIphone,
+    isIpad: isIpad,
+    isIOS: isIOS,
+    isMacOS: isMacOS,
 
     /**
-     * 平台支持
+     * 是平板设备
+     * ipad
+     * android Tablet
      */
-    Xut.extend(Xut.plat, {
-        has3d     :  'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix(),
-        isAndroid : isAndroid,
-        isIphone  : isIphone,
-        isIpad    : isIpad,
-        isIOS     : isIOS,
-        isMacOS   : isMacOS,
-
-        /**
-         * 是平板设备
-         * ipad
-         * android Tablet
-         */
-        isTablet: device.tablet(),
-
-        /**
-         * 是否在支持插件
-         * phonegap
-         * @type {Boolean}
-         */
-        hasPlugin: false,
-
-        /**
-         * 是否能自动播放媒体
-         * audio
-         * video
-         * @type {[type]}
-         * 浏览器端
-         * 不是微信
-         * 是webkit
-         * 是手机端浏览器
-         */
-        hasAutoPlayAudio: isWeiXin || isDesktop,
-
-        /**
-         * 支持触摸
-         */
-        hasTouch: only_touch,
-
-        /**
-         * 游览器平台 解决ios Android浏览器判断问题
-         * @type {Boolean}
-         */
-        isBrowser: isBrowser,
-
-        /**
-         * 2015.3.23
-         * 可以点击与触摸
-         * @type {Boolean}
-         */
-        isMouseTouch: hasTouch && ('onmousedown' in window) && !only_touch,
-
-        /**
-         * 是否桌面
-         * @type {Boolean}
-         */
-        isDesktop: isDesktop,
-
-        /**
-         * 是否支持Mutation
-         * @type {Boolean}
-         */
-        supportMutationObserver: !hasMutationObserver,
-    })
-
-
-    //私有前缀
-    var rdashAlpha = /-([a-z]|[0-9])/ig
-    var rmsPrefix = /^-ms-/
-    var fcamelCase = function(all, letter) {
-        return(letter + '').toUpperCase();
-    }
-    var camelCase = function(string) {
-        return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
-    }
-    var prefix = ['webkit', 'Moz', 'ms', 'o']
-    var elementStyle = document.createElement('div').style
-    var cache = Object.create(null)
-    var prefixStyle = function(attr) {
-        var name
-        //缓存中存在
-        if(cache[attr]) {
-            return cache[attr];
-        }
-        //不需要加前缀
-        if(attr in elementStyle) {
-            return cache[attr] = attr;
-        }
-        //需要加前缀
-        prefix.forEach(function(v) {
-            if(camelCase(v + '-' + attr) in elementStyle) {
-                name = '-' + v + '-' + attr;
-                return cache[attr] = name;
-            }
-        })
-        return name;
-    }
-
-    //css3 keyframes
-    var transitionEnd = 'transitionend'
-    var animationEnd = 'animationend'
-    var keyframes = '@keyframes '
-    var animation = prefixStyle('animation');
-    var adapterPrefix = function() {
-        var vendors = animation
-        var transitionName = {
-            "moz"    : "transitionend",
-            "webkit" : "webkitTransitionEnd",
-            "ms"     : "MSTransitionEnd",
-            "o"      : "oTransitionEnd"
-        }
-        var animationName = {
-            "moz"    : "animationend",
-            "webkit" : "webkitAnimationEnd",
-            "ms"     : "MSAnimationEnd",
-            "o"      : "oAnimationEnd"
-        }
-        if(!vendors) return;
-        vendors = vendors.split('-');
-        if(!vendors[1]) return;
-        transitionEnd = transitionName[vendors[1]];
-        animationEnd = animationName[vendors[1]];
-        keyframes = '@-' + vendors[1] + '-keyframes ';
-    }
-    adapterPrefix()
-
+    isTablet: device.tablet(),
 
     /**
-     * 支持转换效果
+     * 是否在支持插件
+     * phonegap
      * @type {Boolean}
      */
-    var hasPerspective = prefixStyle('perspective') in elementStyle
-    var translateZ = hasPerspective ? ' translateZ(0)' : ''
-    var maskBoxImage = prefixStyle('mask-box-image')
-
-    var reqAnimationFrame = window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function(callback) { window.setTimeout(callback, 1000 / 60); };
+    hasPlugin: false,
 
     /**
-     * 样式style支持
-     * @type {Object}
+     * 是否能自动播放媒体
+     * audio
+     * video
+     * @type {[type]}
+     * 浏览器端
+     * 不是微信
+     * 是webkit
+     * 是手机端浏览器
      */
-    Xut.extend(Xut.style, {
+    hasAutoPlayAudio: isWeiXin || isDesktop,
 
-        reqAnimationFrame: reqAnimationFrame,
+    /**
+     * 支持触摸
+     */
+    hasTouch: only_touch,
 
-        /**
-         * 不支持蒙版
-         * @type {[type]}
-         */
-        noMaskBoxImage: maskBoxImage == undefined,
+    /**
+     * 游览器平台 解决ios Android浏览器判断问题
+     * @type {Boolean}
+     */
+    isBrowser: isBrowser,
 
-        /**
-         * 前缀
-         * @type {[type]}
-         */
-        prefixStyle: prefixStyle,
+    /**
+     * 2015.3.23
+     * 可以点击与触摸
+     * @type {Boolean}
+     */
+    isMouseTouch: hasTouch && ('onmousedown' in window) && !only_touch,
 
-        /**
-         * transform
-         * @type {[type]}
-         */
-        transform: prefixStyle('transform'),
-        transition: prefixStyle('transition'),
-        transitionDuration: prefixStyle('transition-duration'),
-        transitionDelay: prefixStyle('transition-delay'),
-        transformOrigin: prefixStyle('transform-origin'),
-        transitionTimingFunction: prefixStyle('transition-timing-function'),
-        transitionEnd: transitionEnd,
+    /**
+     * 是否桌面
+     * @type {Boolean}
+     */
+    isDesktop: isDesktop,
 
-        /**
-         * css3 admination
-         * @type {[type]}
-         */
-        animation: animation,
-        animationDelay: prefixStyle('animation-delay'),
-        animationPlayState: prefixStyle('animation-play-state'),
-        animationEnd: animationEnd,
-        keyframes: keyframes,
+    /**
+     * 是否支持Mutation
+     * @type {Boolean}
+     */
+    supportMutationObserver: !hasMutationObserver,
+  })
 
-        /**
-         * 支持3d Z
-         * @type {[type]}
-         */
-        translateZ: translateZ,
-        setTranslateZ: function(zValue) {
-            return hasPerspective ? ' translateZ(' + zValue + ')' : ''
-        },
 
-        /**
-         * 额外样式
-         * @type {[type]}
-         */
-        filter: prefixStyle('filter'),
-        maskBoxImage: maskBoxImage,
-        borderRadius: prefixStyle('border-radius'),
-
-        /**
-         * css3分栏
-         * @type {[type]}
-         */
-        columnWidth: prefixStyle('column-width'),
-        columnGap: prefixStyle('column-gap')
-
+  //私有前缀
+  var rdashAlpha = /-([a-z]|[0-9])/ig
+  var rmsPrefix = /^-ms-/
+  var fcamelCase = function(all, letter) {
+    return (letter + '').toUpperCase();
+  }
+  var camelCase = function(string) {
+    return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
+  }
+  var prefix = ['webkit', 'Moz', 'ms', 'o']
+  var elementStyle = document.createElement('div').style
+  var cache = Object.create(null)
+  var prefixStyle = function(attr) {
+    var name
+      //缓存中存在
+    if (cache[attr]) {
+      return cache[attr];
+    }
+    //不需要加前缀
+    if (attr in elementStyle) {
+      return cache[attr] = attr;
+    }
+    //需要加前缀
+    prefix.forEach(function(v) {
+      if (camelCase(v + '-' + attr) in elementStyle) {
+        name = '-' + v + '-' + attr;
+        return cache[attr] = name;
+      }
     })
+    return name;
+  }
+
+  //css3 keyframes
+  var transitionEnd = 'transitionend'
+  var animationEnd = 'animationend'
+  var keyframes = '@keyframes '
+  var animation = prefixStyle('animation');
+  var adapterPrefix = function() {
+    var vendors = animation
+    var transitionName = {
+      "moz": "transitionend",
+      "webkit": "webkitTransitionEnd",
+      "ms": "MSTransitionEnd",
+      "o": "oTransitionEnd"
+    }
+    var animationName = {
+      "moz": "animationend",
+      "webkit": "webkitAnimationEnd",
+      "ms": "MSAnimationEnd",
+      "o": "oAnimationEnd"
+    }
+    if (!vendors) return;
+    vendors = vendors.split('-');
+    if (!vendors[1]) return;
+    transitionEnd = transitionName[vendors[1]];
+    animationEnd = animationName[vendors[1]];
+    keyframes = '@-' + vendors[1] + '-keyframes ';
+  }
+  adapterPrefix()
+
+
+  /**
+   * 支持转换效果
+   * @type {Boolean}
+   */
+  var hasPerspective = prefixStyle('perspective') in elementStyle
+  var translateZ = hasPerspective ? ' translateZ(0)' : ''
+  var maskBoxImage = prefixStyle('mask-box-image')
+
+  var reqAnimationFrame = window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function(callback) {
+      window.setTimeout(callback, 1000 / 60);
+    };
+
+  /**
+   * 样式style支持
+   * @type {Object}
+   */
+  Xut.mixin(Xut.style, {
+
+    reqAnimationFrame: reqAnimationFrame,
+
+    /**
+     * 不支持蒙版
+     * @type {[type]}
+     */
+    noMaskBoxImage: maskBoxImage == undefined,
+
+    /**
+     * 前缀
+     * @type {[type]}
+     */
+    prefixStyle: prefixStyle,
+
+    /**
+     * transform
+     * @type {[type]}
+     */
+    transform: prefixStyle('transform'),
+    transition: prefixStyle('transition'),
+    transitionDuration: prefixStyle('transition-duration'),
+    transitionDelay: prefixStyle('transition-delay'),
+    transformOrigin: prefixStyle('transform-origin'),
+    transitionTimingFunction: prefixStyle('transition-timing-function'),
+    transitionEnd: transitionEnd,
+
+    /**
+     * css3 admination
+     * @type {[type]}
+     */
+    animation: animation,
+    animationDelay: prefixStyle('animation-delay'),
+    animationPlayState: prefixStyle('animation-play-state'),
+    animationEnd: animationEnd,
+    keyframes: keyframes,
+
+    /**
+     * 支持3d Z
+     * @type {[type]}
+     */
+    translateZ: translateZ,
+    setTranslateZ: function(zValue) {
+      return hasPerspective ? ' translateZ(' + zValue + ')' : ''
+    },
+
+    /**
+     * 额外样式
+     * @type {[type]}
+     */
+    filter: prefixStyle('filter'),
+    maskBoxImage: maskBoxImage,
+    borderRadius: prefixStyle('border-radius'),
+
+    /**
+     * css3分栏
+     * @type {[type]}
+     */
+    columnWidth: prefixStyle('column-width'),
+    columnGap: prefixStyle('column-gap')
+
+  })
 
 })()
 
@@ -41077,6 +41079,16 @@ function getLayerMode(screenSize) {
     return screenSize.width > screenSize.height ? "horizontal" : "vertical";
 }
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
 var asyncGenerator = function () {
   function AwaitValue(value) {
     this.value = value;
@@ -41526,6 +41538,24 @@ var DEFAULT = undefined;
 var config$1 = {
 
   /**
+   * 是否启动分栏高度检测
+   * 变更依赖
+   * 如果检测到有column数据，会自动启动
+   */
+  columnCheck: false,
+
+  /**
+   * 迷你杂志页码显示配置
+   * 1 数字 digital (默认)
+   * 2 原点 circular 1/2/3/4/5/6
+   * @type {Object}
+   */
+  pageBar: {
+    type: 'digital',
+    mode: null
+  },
+
+  /**
    * 适配平台
    * mini //迷你杂志
    * @type {[type]}
@@ -41641,12 +41671,12 @@ var config$1 = {
    * novel表定义，数据库定义的翻页模式
    * 用来兼容客户端的制作模式
    * 妙妙学模式处理，多页面下翻页切换
-   *
-   * 0 通过滑动翻页
-   * 1 禁止滑动,直接快速切换页面(通过左右按键快速切换页面)
+   * pageflip
+   *   0 通过滑动翻页 => 'allow'
+   *   1 禁止滑动,直接快速切换页面(通过左右按键快速切换页面) => 'ban'
    * @type {Number}
    */
-  flipMode: 0, //默认0，待数据库填充
+  flipMode: 'allow', //默认0，待数据库填充
 
   /**
    * 应用的加载模式
@@ -42097,7 +42127,7 @@ function initPathAddress() {
  * 默认设置
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
  */
-var setProportion = function setProportion(pptWidth, pptHeight, setVisualMode, noModifyValue) {
+var resetProportion = function resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue) {
 
     //获取全屏比值，用来设定view的尺寸
     //根据分辨率与PPT排版的比值来确定
@@ -42145,7 +42175,7 @@ var setLayout = function setLayout(pptWidth, pptHeight, screenSize) {
  */
 var setConfig = function setConfig(pptWidth, pptHeight, screenSize, setVisualMode, noModifyValue) {
     setLayout(pptWidth, pptHeight, screenSize);
-    setProportion(pptWidth, pptHeight, setVisualMode, noModifyValue);
+    resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue);
 };
 
 /**
@@ -42186,11 +42216,11 @@ function initConfig(pptWidth, pptHeight) {
     //所以可能存在要修改尺寸
     if (config.pptHorizontal && config.screenHorizontal && config.visualMode === 3) {
         //可能会修改全局布局尺寸，所以采用3模式探测
-        setProportion(pptWidth, pptHeight, config.visualMode, true);
+        resetProportion(pptWidth, pptHeight, config.visualMode, true);
     } else {
         //强制检测是否是反向显示模式
         //模式3的情况下，用2检测
-        setProportion(pptWidth, pptHeight, config.visualMode === 3 ? 2 : config.visualMode);
+        resetProportion(pptWidth, pptHeight, config.visualMode === 3 ? 2 : config.visualMode);
     }
 
     //如果是PPT与设备反向显示
@@ -42650,22 +42680,22 @@ var mouseList = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionE
 
 //绑定事件名排序
 var orderName = {
-    start: 0,
-    move: 1,
-    end: 2,
-    cancel: 3,
-    transitionend: 4,
-    leave: 5
+  start: 0,
+  move: 1,
+  end: 2,
+  cancel: 3,
+  transitionend: 4,
+  leave: 5
 };
 
 var eventNames = function () {
-    if (isMouseTouch) {
-        return {
-            touch: touchList,
-            mouse: mouseList
-        };
-    }
-    return hasTouch ? touchList : mouseList;
+  if (isMouseTouch) {
+    return {
+      touch: touchList,
+      mouse: mouseList
+    };
+  }
+  return hasTouch ? touchList : mouseList;
 }();
 
 /**
@@ -42682,42 +42712,42 @@ var guid = 1;
  * @param {[type]} handler   [description]
  */
 function addHandler(element, eventName, handler, capture) {
-    if (element.xutHandler) {
-        var uuid = element.xutHandler;
-        var dataCache = eventDataCache[uuid];
-        if (dataCache) {
-            if (dataCache[eventName]) {
-                //如果是isMouseTouch支持同样的事件
-                //所以transitionend就比较特殊了，因为都是同一个事件名称
-                //所以只要一份，所以重复绑定就需要去掉
-                if (eventName !== 'transitionend') {
-                    $$warn(eventName + '：事件重复绑定添加');
-                }
-            } else {
-                dataCache[eventName] = [handler, capture];
-            }
+  if (element.xutHandler) {
+    var uuid = element.xutHandler;
+    var dataCache = eventDataCache[uuid];
+    if (dataCache) {
+      if (dataCache[eventName]) {
+        //如果是isMouseTouch支持同样的事件
+        //所以transitionend就比较特殊了，因为都是同一个事件名称
+        //所以只要一份，所以重复绑定就需要去掉
+        if (eventName !== 'transitionend') {
+          $$warn(eventName + '：事件重复绑定添加');
         }
-    } else {
-        eventDataCache[guid] = defineProperty({}, eventName, [handler, capture]);
-        element.xutHandler = guid++;
+      } else {
+        dataCache[eventName] = [handler, capture];
+      }
     }
+  } else {
+    eventDataCache[guid] = defineProperty({}, eventName, [handler, capture]);
+    element.xutHandler = guid++;
+  }
 }
 
 var eachApply = function eachApply(events, callbacks, processor, isRmove) {
-    _.each(callbacks, function (handler, key) {
-        var eventName = void 0;
-        if (isRmove) {
-            //如果是移除，callbacks是数组
-            //转化事件名
-            if (eventName = events[orderName[handler]]) {
-                processor(eventName);
-            }
-        } else {
-            eventName = events[orderName[key]];
-            //on的情况，需要传递handler
-            handler && eventName && processor(eventName, handler);
-        }
-    });
+  _.each(callbacks, function (handler, key) {
+    var eventName = void 0;
+    if (isRmove) {
+      //如果是移除，callbacks是数组
+      //转化事件名
+      if (eventName = events[orderName[handler]]) {
+        processor(eventName);
+      }
+    } else {
+      eventName = events[orderName[key]];
+      //on的情况，需要传递handler
+      handler && eventName && processor(eventName, handler);
+    }
+  });
 };
 
 /**
@@ -42727,10 +42757,10 @@ var eachApply = function eachApply(events, callbacks, processor, isRmove) {
  * @return {[type]} [description]
  */
 var addEvent = function addEvent(element, events, callbacks, capture) {
-    eachApply(events, callbacks, function (eventName, handler) {
-        addHandler(element, eventName, handler, capture);
-        element.addEventListener(eventName, handler, capture);
-    });
+  eachApply(events, callbacks, function (eventName, handler) {
+    addHandler(element, eventName, handler, capture);
+    element.addEventListener(eventName, handler, capture);
+  });
 };
 
 /**
@@ -42739,19 +42769,19 @@ var addEvent = function addEvent(element, events, callbacks, capture) {
  * @return {[type]}         [description]
  */
 function removeAll(element) {
-    var uuid = element.xutHandler;
-    var dataCache = eventDataCache[uuid];
-    if (!dataCache) {
-        $$warn('移除所有事件出错');
-        return;
+  var uuid = element.xutHandler;
+  var dataCache = eventDataCache[uuid];
+  if (!dataCache) {
+    $$warn('移除所有事件出错');
+    return;
+  }
+  _.each(dataCache, function (data, eventName) {
+    if (data) {
+      element.removeEventListener(eventName, data[0], data[1]);
+      dataCache[eventName] = null;
     }
-    _.each(dataCache, function (data, eventName) {
-        if (data) {
-            element.removeEventListener(eventName, data[0], data[1]);
-            dataCache[eventName] = null;
-        }
-    });
-    delete eventDataCache[uuid];
+  });
+  delete eventDataCache[uuid];
 }
 
 /**
@@ -42759,25 +42789,25 @@ function removeAll(element) {
  * @return {[type]} [description]
  */
 function removeone(element, eventName) {
-    var uuid = element.xutHandler;
-    var dataCache = eventDataCache[uuid];
-    if (!dataCache) {
-        $$warn('移除事件' + eventName + '出错');
-        return;
-    }
-    var data = dataCache[eventName];
-    if (data) {
-        element.removeEventListener(eventName, data[0], data[1]);
-        dataCache[eventName] = null;
-        delete dataCache[eventName];
-    } else {
-        $$warn('移除事件' + eventName + '出错');
-    }
+  var uuid = element.xutHandler;
+  var dataCache = eventDataCache[uuid];
+  if (!dataCache) {
+    $$warn('移除事件' + eventName + '出错');
+    return;
+  }
+  var data = dataCache[eventName];
+  if (data) {
+    element.removeEventListener(eventName, data[0], data[1]);
+    dataCache[eventName] = null;
+    delete dataCache[eventName];
+  } else {
+    $$warn('移除事件' + eventName + '出错');
+  }
 
-    //如果没有数据
-    if (!Object.keys(dataCache).length) {
-        delete eventDataCache[uuid];
-    }
+  //如果没有数据
+  if (!Object.keys(dataCache).length) {
+    delete eventDataCache[uuid];
+  }
 }
 
 /**
@@ -42787,9 +42817,9 @@ function removeone(element, eventName) {
  * @return {[type]} [description]
  */
 var removeEvent = function removeEvent(element, events, callbacks) {
-    eachApply(events, callbacks, function (eventName) {
-        removeone(element, eventName);
-    }, 'remove');
+  eachApply(events, callbacks, function (eventName) {
+    removeone(element, eventName);
+  }, 'remove');
 };
 
 /**
@@ -42800,15 +42830,15 @@ var removeEvent = function removeEvent(element, events, callbacks) {
  * @return {[type]}                [description]
  */
 var compatibility = function compatibility(controller, element, callbacks, capture) {
-    //如果两者都支持
-    //鼠标与触摸
-    if (isMouseTouch) {
-        _.each(eventNames, function (events) {
-            controller(element, events, callbacks, capture);
-        });
-    } else {
-        controller(element, eventNames, callbacks, capture);
-    }
+  //如果两者都支持
+  //鼠标与触摸
+  if (isMouseTouch) {
+    _.each(eventNames, function (events) {
+      controller(element, events, callbacks, capture);
+    });
+  } else {
+    controller(element, eventNames, callbacks, capture);
+  }
 };
 
 /**
@@ -42817,10 +42847,10 @@ var compatibility = function compatibility(controller, element, callbacks, captu
  * @return {[type]}         [description]
  */
 function toNodeObj(element) {
-    if (element.length) {
-        element = element[0];
-    }
-    return element;
+  if (element.length) {
+    element = element[0];
+  }
+  return element;
 }
 
 /**
@@ -42828,9 +42858,9 @@ function toNodeObj(element) {
  * @return {[type]} [description]
  */
 var checkBindCancel = function checkBindCancel(callbacks) {
-    if (callbacks && callbacks.end && !callbacks.cancel) {
-        callbacks.cancel = callbacks.end;
-    }
+  if (callbacks && callbacks.end && !callbacks.cancel) {
+    callbacks.cancel = callbacks.end;
+  }
 };
 
 /**
@@ -42846,10 +42876,10 @@ var checkBindCancel = function checkBindCancel(callbacks) {
  * @return {[type]} [description]
  */
 function $$on(element, callbacks) {
-    var capture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var capture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-    checkBindCancel(callbacks);
-    compatibility(addEvent, toNodeObj(element), callbacks, capture);
+  checkBindCancel(callbacks);
+  compatibility(addEvent, toNodeObj(element), callbacks, capture);
 }
 
 /**
@@ -42860,26 +42890,26 @@ function $$on(element, callbacks) {
  */
 function $$off(element, callbacks) {
 
-    if (!element) {
-        $$warn('移除事件对象不存在');
-        return;
-    }
+  if (!element) {
+    $$warn('移除事件对象不存在');
+    return;
+  }
 
-    element = toNodeObj(element);
+  element = toNodeObj(element);
 
-    //全部移除
-    if (arguments.length === 1) {
-        removeAll(element);
-        return;
-    }
+  //全部移除
+  if (arguments.length === 1) {
+    removeAll(element);
+    return;
+  }
 
-    if (!_.isArray(callbacks)) {
-        $$warn('移除的事件句柄参数，必须是数组');
-        return;
-    }
+  if (!_.isArray(callbacks)) {
+    $$warn('移除的事件句柄参数，必须是数组');
+    return;
+  }
 
-    checkBindCancel(callbacks);
-    compatibility(removeEvent, element, callbacks);
+  checkBindCancel(callbacks);
+  compatibility(removeEvent, element, callbacks);
 }
 
 /**
@@ -42891,309 +42921,230 @@ function $$off(element, callbacks) {
  * @return {[type]}           [description]
  */
 function $$handle(callbacks, context, event) {
-    switch (event.type) {
-        case 'touchstart':
-        case 'mousedown':
-            callbacks.start && callbacks.start.call(context, event);
-            break;
-        case 'touchmove':
-        case 'mousemove':
-            callbacks.move && callbacks.move.call(context, event);
-            break;
-        case 'touchend':
-        case 'mouseup':
-        case 'mousecancel':
-        case 'touchcancel':
-        case 'mouseleave':
-            callbacks.end && callbacks.end.call(context, event);
-            break;
-        case transitionEnd:
-            callbacks.transitionend && callbacks.transitionend.call(context, event);
-            break;
-    }
+  switch (event.type) {
+    case 'touchstart':
+    case 'mousedown':
+      callbacks.start && callbacks.start.call(context, event);
+      break;
+    case 'touchmove':
+    case 'mousemove':
+      callbacks.move && callbacks.move.call(context, event);
+      break;
+    case 'touchend':
+    case 'mouseup':
+    case 'mousecancel':
+    case 'touchcancel':
+    case 'mouseleave':
+      callbacks.end && callbacks.end.call(context, event);
+      break;
+    case transitionEnd:
+      callbacks.transitionend && callbacks.transitionend.call(context, event);
+      break;
+  }
 }
 
 function $$target(event, original) {
-    var currTouches = null;
-    if (hasTouch) {
-        currTouches = event.touches;
-        if (currTouches && currTouches.length > 0) {
-            event = currTouches[0];
-        }
+  var currTouches = null;
+  if (hasTouch) {
+    currTouches = event.touches;
+    if (currTouches && currTouches.length > 0) {
+      event = currTouches[0];
     }
-    return original ? event : event.target;
+  }
+  return original ? event : event.target;
 }
 
-/**
- * 资源加载
- * @return {[type]} [description]
- */
-var loader = function () {
-    return {
-        /**入口函数,动态脚本加载
-         * @param fileList:           需要动态加载的资源列表
-         * @param callback:           所有资源都加载完后调用的回调函数,通常是页面上需要onload就执行的函数
-         * @param scope:              作用范围
-         * @param preserveOrder:      是否保持脚本顺序
-         */
-        load: function load(fileList, callback, scope, preserveOrder) {
-            //过来数组元素
-            if (fileList.length && preserveOrder) {
-                var temp = [];
-                fileList.forEach(function (val, index) {
-                    if (val) {
-                        temp.push(val);
-                    }
-                });
-                fileList = temp.reverse();
-                temp = null;
-            }
-
-            var scope = scope || this,
-
-            //var scope =this,//默认作用范围是当前页面
-            head = document.getElementsByTagName("head")[0],
-                fragment = document.createDocumentFragment(),
-                numFiles = fileList.length,
-                loadedFiles = 0;
-
-            //加载一个特定的文件从fileList通过索引
-            var loadFileIndex = function loadFileIndex(index) {
-                head.appendChild(scope.buildScriptTag(fileList[index], onFileLoaded));
-            };
-
-            /**
-             * 调用回调函数,当所有文件都加载完后调用
-             */
-            var onFileLoaded = function onFileLoaded() {
-                loadedFiles++;
-                //如果当前文件是最后一个要加载的文件，则调用回调函数，否则加载下一个文件
-                if (numFiles == loadedFiles && typeof callback == 'function') {
-                    callback.call(scope);
-                } else {
-                    if (preserveOrder === true) {
-                        loadFileIndex(loadedFiles);
-                    }
-                }
-            };
-
-            if (preserveOrder === true) {
-                loadFileIndex.call(this, 0);
-            } else {
-                for (var i = 0, len = fileList.length; i < len; i++) {
-                    fragment.appendChild(this.buildScriptTag(fileList[i], onFileLoaded));
-                }
-                head.appendChild(fragment);
-            }
-        },
-
-        //构造javascript和link 标签
-        buildScriptTag: function buildScriptTag(filename, callback) {
-            var exten = filename.substr(filename.lastIndexOf('.') + 1);
-            if (exten == 'js') {
-                var script = document.createElement('script');
-                script.type = "text/javascript";
-                script.src = filename;
-                script.onload = callback;
-                return script;
-            }
-            if (exten == 'css') {
-                var style = document.createElement('link');
-                style.rel = 'stylesheet';
-                style.type = 'text/css';
-                style.href = filename;
-                callback();
-                return style;
-            }
-        }
-    };
-}();
+var isOldWebKit = +navigator.userAgent.replace(/.*AppleWebKit\/(\d+)\..*/, "$1") < 536;
 
 function pollCss(node, callback) {
-    var sheet = node.sheet,
-        isLoaded;
-    var isOldWebKit = +navigator.userAgent.replace(/.*AppleWebKit\/(\d+)\..*/, "$1") < 536;
-    // for WebKit < 536
-    if (isOldWebKit) {
-        if (sheet) {
-            isLoaded = true;
-        }
-    }
-    // for Firefox < 9.0
-    else if (sheet) {
-            try {
-                if (sheet.cssRules) {
-                    isLoaded = true;
-                }
-            } catch (ex) {
-                // The value of `ex.name` is changed from "NS_ERROR_DOM_SECURITY_ERR"
-                // to "SecurityError" since Firefox 13.0. But Firefox is less than 9.0
-                // in here, So it is ok to just rely on "NS_ERROR_DOM_SECURITY_ERR"
-                if (ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
-                    isLoaded = true;
-                }
-            }
-        }
+  var sheet = node.sheet,
+      isLoaded;
 
-    setTimeout(function () {
-        if (isLoaded) {
-            // Place callback here to give time for style rendering
-            callback();
-        } else {
-            pollCss(node, callback);
+  // for WebKit < 536
+  if (isOldWebKit) {
+    if (sheet) {
+      isLoaded = true;
+    }
+  }
+  // for Firefox < 9.0
+  else if (sheet) {
+      try {
+        if (sheet.cssRules) {
+          isLoaded = true;
         }
-    }, 20);
+      } catch (ex) {
+        // The value of `ex.name` is changed from "NS_ERROR_DOM_SECURITY_ERR"
+        // to "SecurityError" since Firefox 13.0. But Firefox is less than 9.0
+        // in here, So it is ok to just rely on "NS_ERROR_DOM_SECURITY_ERR"
+        if (ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
+          isLoaded = true;
+        }
+      }
+    }
+
+  setTimeout(function () {
+    if (isLoaded) {
+      // Place callback here to give time for style rendering
+      callback();
+    } else {
+      pollCss(node, callback);
+    }
+  }, 20);
 }
 
 function addOnload(node, callback, isCSS, url) {
-    var supportOnload = "onload" in node;
-    var isOldWebKit = +navigator.userAgent.replace(/.*AppleWebKit\/(\d+)\..*/, "$1") < 536;
-    // for Old WebKit and Old Firefox
-    if (isCSS) {
-        setTimeout(function () {
-            pollCss(node, callback);
-        }, 1); // Begin after node insertion
-        return;
-    }
+  var supportOnload = "onload" in node;
 
-    if (supportOnload) {
-        node.onload = onload;
-        node.onerror = function () {
-            onload();
-        };
-    } else {
-        node.onreadystatechange = function () {
-            if (/loaded|complete/.test(node.readyState)) {
-                onload();
-            }
-        };
-    }
+  if (isCSS && isOldWebKit) {
+    setTimeout(function () {
+      pollCss(node, callback);
+    }, 1); // Begin after node insertion
+    return;
+  }
 
-    function onload() {
-        // Ensure only run once and handle memory leak in IE
-        node.onload = node.onerror = node.onreadystatechange = null;
-        // Remove the script to reduce memory leak
-        if (!isCSS) {
-            var head = document.getElementsByTagName("head")[0] || document.documentElement;
-            head.removeChild(node);
-        }
-        // Dereference the node
-        node = null;
-        callback();
+  function onload(error) {
+
+    // Ensure only run once and handle memory leak in IE
+    node.onload = node.onerror = node.onreadystatechange = null;
+
+    // Remove the script to reduce memory leak
+    if (!isCSS) {
+      var head = document.getElementsByTagName("head")[0] || document.documentElement;
+      head.removeChild(node);
     }
+    // Dereference the node
+    node = null;
+    callback(error);
+  }
+
+  if (supportOnload) {
+    node.onload = onload;
+    node.onerror = function () {
+      onload(true);
+    };
+  } else {
+    node.onreadystatechange = function () {
+      if (/loaded|complete/.test(node.readyState)) {
+        onload();
+      }
+    };
+  }
 }
 
-function request(url, callback, charset) {
-    var IS_CSS_RE = /\.css(?:\?|$)/i,
-        isCSS = IS_CSS_RE.test(url),
-        node = document.createElement(isCSS ? "link" : "script");
+function loadFile(url, callback, charset) {
+  var IS_CSS_RE = /\.css(?:\?|$)/i,
+      isCSS = IS_CSS_RE.test(url),
+      node = document.createElement(isCSS ? "link" : "script");
 
-    if (charset) {
-        var cs = $.isFunction(charset) ? charset(url) : charset;
-        if (cs) {
-            node.charset = cs;
-        }
+  if (charset) {
+    var cs = $.isFunction(charset) ? charset(url) : charset;
+    if (cs) {
+      node.charset = cs;
     }
-    addOnload(node, callback, isCSS, url);
-    if (isCSS) {
-        node.rel = "stylesheet";
-        node.href = url;
-    } else {
-        node.async = true;
-        node.src = url;
-    }
-    // For some cache cases in IE 6-8, the script executes IMMEDIATELY after
-    // the end of the insert execution, so use `currentlyAddingScript` to
-    // hold current node, for deriving url in `define` call
-    //currentlyAddingScript = node
-    var head = document.getElementsByTagName("head")[0] || document.documentElement;
-    var baseElement = head.getElementsByTagName("base")[0];
-    // ref: #185 & http://dev.jquery.com/ticket/2709
-    baseElement ? head.insertBefore(node, baseElement) : head.appendChild(node);
-    //currentlyAddingScript = null
+  }
+
+  addOnload(node, callback, isCSS, url);
+
+  if (isCSS) {
+    node.rel = "stylesheet";
+    node.href = url;
+  } else {
+    node.async = true;
+    node.src = url;
+  }
+  // For some cache cases in IE 6-8, the script executes IMMEDIATELY after
+  // the end of the insert execution, so use `currentlyAddingScript` to
+  // hold current node, for deriving url in `define` call
+  //currentlyAddingScript = node
+  var head = document.getElementsByTagName("head")[0] || document.documentElement;
+  var baseElement = head.getElementsByTagName("base")[0];
+  // ref: #185 & http://dev.jquery.com/ticket/2709
+  baseElement ? head.insertBefore(node, baseElement) : head.appendChild(node);
+  //currentlyAddingScript = null
+
+  return node;
 }
 
-var imgReady = function () {
+/**
+ * 加载图片
+ */
+var loadFigure = function () {
 
-    var list = [],
-        intervalId = null,
+  var list = [];
+  var intervalId = null;
 
+  // 用来执行队列
+  var tick = function tick() {
+    var i = 0;
+    for (; i < list.length; i++) {
+      list[i].end ? list.splice(i--, 1) : list[i]();
+    }
+    !list.length && stop();
+  };
 
-    // 用来执行队列
-    tick = function tick() {
-        var i = 0;
-        for (; i < list.length; i++) {
-            list[i].end ? list.splice(i--, 1) : list[i]();
-        }
-        !list.length && stop();
-    },
+  // 停止所有定时器队列
+  var stop = function stop() {
+    clearInterval(intervalId);
+    intervalId = null;
+  };
 
+  return function (url, ready, load, error) {
+    var _onready,
+        width,
+        height,
+        newWidth,
+        newHeight,
+        img = new Image();
 
-    // 停止所有定时器队列
-    stop = function stop() {
-        clearInterval(intervalId);
-        intervalId = null;
+    img.src = url;
+
+    // 如果图片被缓存，则直接返回缓存数据
+    if (img.complete) {
+      ready && ready.call(img);
+      load && load.call(img);
+      return;
+    }
+
+    width = img.width;
+    height = img.height;
+
+    // 加载错误后的事件
+    img.onerror = function () {
+      error && error.call(img);
+      _onready.end = true;
+      img = img.onload = img.onerror = null;
     };
 
-    return function (url, ready, load, error) {
-        var _onready,
-            width,
-            height,
-            newWidth,
-            newHeight,
-            img = new Image();
-
-        img.src = url;
-
-        // 如果图片被缓存，则直接返回缓存数据
-        if (img.complete) {
-            ready && ready.call(img);
-            load && load.call(img);
-            return;
-        }
-
-        width = img.width;
-        height = img.height;
-
-        // 加载错误后的事件
-        img.onerror = function () {
-            error && error.call(img);
-            _onready.end = true;
-            img = img.onload = img.onerror = null;
-        };
-
-        // 图片尺寸就绪
-        _onready = function onready() {
-            newWidth = img.width;
-            newHeight = img.height;
-            if (newWidth !== width || newHeight !== height ||
-            // 如果图片已经在其他地方加载可使用面积检测
-            newWidth * newHeight > 1024) {
-                ready && ready.call(img);
-                _onready.end = true;
-            }
-        };
-        _onready();
-        // 完全加载完毕的事件
-        img.onload = function () {
-            // onload在定时器时间差范围内可能比onready快
-            // 这里进行检查并保证onready优先执行
-            !_onready.end && _onready();
-            load && load.call(img);
-            // IE gif动画会循环执行onload，置空onload即可
-            img = img.onload = img.onerror = null;
-        };
-
-        // 加入队列中定期执行
-        if (!_onready.end) {
-            list.push(_onready);
-            // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-            if (intervalId === null) intervalId = setInterval(tick, 40);
-        }
+    // 图片尺寸就绪
+    _onready = function onready() {
+      newWidth = img.width;
+      newHeight = img.height;
+      if (newWidth !== width || newHeight !== height ||
+      // 如果图片已经在其他地方加载可使用面积检测
+      newWidth * newHeight > 1024) {
+        ready && ready.call(img);
+        _onready.end = true;
+      }
     };
+    _onready();
+    // 完全加载完毕的事件
+    img.onload = function () {
+      // onload在定时器时间差范围内可能比onready快
+      // 这里进行检查并保证onready优先执行
+      !_onready.end && _onready();
+      load && load.call(img);
+      // IE gif动画会循环执行onload，置空onload即可
+      img = img.onload = img.onerror = null;
+    };
+
+    // 加入队列中定期执行
+    if (!_onready.end) {
+      list.push(_onready);
+      // 无论何时只允许出现一个定时器，减少浏览器性能损耗
+      if (intervalId === null) intervalId = setInterval(tick, 40);
+    }
+  };
 }();
-
-var loadfile = request;
 
 var onlyId = void 0;
 
@@ -43301,6 +43252,29 @@ function $$save(name, val) {
 }
 
 var CEIL$1 = Math.ceil;
+var slashRE = /\/$/;
+
+/**
+ * 去掉后缀的斜杠
+ * @return {[type]} [description]
+ */
+function slashPostfix(resource) {
+  if (resource && slashRE.test(resource)) {
+    return resource.substring(0, resource.length - 1);
+  }
+  return resource;
+}
+
+/**
+ * 动态加载link
+ * @return {[type]} [description]
+ */
+function loadStyle(fileName, callback) {
+  var path = config.launch ? config.launch.resource + '/gallery/' + fileName + '.css' : config.pathAddress + fileName + '.css';
+  var node = loadFile(path, callback);
+  node && node.setAttribute('data-type', fileName);
+}
+
 /**
  * 获取正确的图片文件名
  * 因为图片可能存在
@@ -43313,45 +43287,45 @@ var CEIL$1 = Math.ceil;
  */
 function analysisImageName(src) {
 
-    var suffix = src;
-    var original = src;
+  var suffix = src;
+  var original = src;
 
-    //有基础后缀
-    if (config.baseImageSuffix) {
-        var baseImageSuffix = '.' + config.baseImageSuffix + '.';
-        var exp = new RegExp('\\w+' + baseImageSuffix + '(jpg|png)', 'gi');
-        var result = src.match(exp);
-        if (result && result.length) {
-            suffix = result[0];
-            original = suffix.replace(baseImageSuffix, '.');
-        } else {
-            $$warn('analysisImageUrl解析出错,result：' + result);
-        }
+  //有基础后缀
+  if (config.baseImageSuffix) {
+    var baseImageSuffix = '.' + config.baseImageSuffix + '.';
+    var exp = new RegExp('\\w+' + baseImageSuffix + '(jpg|png)', 'gi');
+    var result = src.match(exp);
+    if (result && result.length) {
+      suffix = result[0];
+      original = suffix.replace(baseImageSuffix, '.');
+    } else {
+      $$warn('analysisImageUrl解析出错,result：' + result);
     }
-    //如果没有后缀
-    else {
-            var _result = src.match(/\w+.(jpg|png)/gi);
-            if (_result && _result.length) {
-                suffix = original = _result[0];
-            } else {
-                $$warn('analysisImageUrl解析出错,result：' + _result);
-            }
-        }
+  }
+  //如果没有后缀
+  else {
+      var _result = src.match(/\w+.(jpg|png)/gi);
+      if (_result && _result.length) {
+        suffix = original = _result[0];
+      } else {
+        $$warn('analysisImageUrl解析出错,result：' + _result);
+      }
+    }
 
-    return {
-        original: original, //原始版
-        suffix: suffix //带有后缀
-    };
+  return {
+    original: original, //原始版
+    suffix: suffix //带有后缀
+  };
 }
 
 /**
  * 给地址增加私有后缀
  */
 function insertImageUrlSuffix(originalUrl, suffix) {
-    if (originalUrl && suffix) {
-        return originalUrl.replace(/\w+\./ig, '$&' + suffix + '.');
-    }
-    return originalUrl;
+  if (originalUrl && suffix) {
+    return originalUrl.replace(/\w+\./ig, '$&' + suffix + '.');
+  }
+  return originalUrl;
 }
 
 /**
@@ -43360,27 +43334,27 @@ function insertImageUrlSuffix(originalUrl, suffix) {
  * @return {[type]}     [description]
  */
 function getResources(url) {
-    var option;
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false);
-    xhr.send(null);
-    option = parseJSON(xhr.responseText);
-    return option;
+  var option;
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, false);
+  xhr.send(null);
+  option = parseJSON(xhr.responseText);
+  return option;
 }
 
 /**
  * 执行脚本注入
  */
 function execScript(code, type) {
-    //过滤回车符号
-    var enterReplace$$1 = function enterReplace$$1(str) {
-        return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
-    };
-    try {
-        new Function(enterReplace$$1(code))();
-    } catch (e) {
-        $$warn('加载脚本错误', type);
-    }
+  //过滤回车符号
+  var enterReplace$$1 = function enterReplace$$1(str) {
+    return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
+  };
+  try {
+    new Function(enterReplace$$1(code))();
+  } catch (e) {
+    $$warn('加载脚本错误', type);
+  }
 }
 
 /**
@@ -43388,7 +43362,7 @@ function execScript(code, type) {
  * @return {[type]} [description]
  */
 function createRandomImg(url) {
-    return url + ('?' + Math.random());
+  return url + ('?' + Math.random());
 }
 
 /**
@@ -43398,13 +43372,13 @@ function createRandomImg(url) {
  * @return {[type]} [description]
  */
 function replacePath(svgstr) {
-    if (config.launch) {
-        //如果能找到对应的默认路径，则替换
-        if (-1 !== svgstr.indexOf('content/gallery/')) {
-            svgstr = svgstr.replace(/content\/gallery/ig, config.pathAddress);
-        }
+  if (config.launch) {
+    //如果能找到对应的默认路径，则替换
+    if (-1 !== svgstr.indexOf('content/gallery/')) {
+      svgstr = svgstr.replace(/content\/gallery/ig, config.pathAddress);
     }
-    return svgstr;
+  }
+  return svgstr;
 }
 
 /**
@@ -43416,79 +43390,95 @@ function replacePath(svgstr) {
  * @return {[type]}        [description]
  */
 var converProportion = function converProportion(_ref) {
-    var width = _ref.width,
-        height = _ref.height,
-        left = _ref.left,
-        top = _ref.top,
-        padding = _ref.padding,
-        proportion = _ref.proportion,
-        proportionMode = _ref.proportionMode,
-        getStyle = _ref.getStyle;
+  var width = _ref.width,
+      height = _ref.height,
+      left = _ref.left,
+      top = _ref.top,
+      padding = _ref.padding,
+      proportion = _ref.proportion,
+      proportionMode = _ref.proportionMode,
+      getStyle = _ref.getStyle;
 
 
-    if (!proportion) {
-        $$warn('没有传递缩放比');
-        proportion = config.proportion;
+  if (!proportion) {
+    $$warn('没有传递缩放比');
+    proportion = config.proportion;
+  }
+
+  //页眉，保持横纵比
+  //计算顶部显示中线位置
+  //如果溢出就溢出，高度设置为白边中线
+  if (proportionMode === 1) {
+    var visualTop = getStyle.visualTop;
+    var proportionalHeight = CEIL$1(height * proportion.width) || 0;
+    return {
+      width: CEIL$1(width * proportion.width) || 0,
+      height: proportionalHeight,
+      left: CEIL$1(left * proportion.left) || 0,
+      top: -visualTop / 2 - proportionalHeight / 2 || 0,
+      padding: CEIL$1(padding * proportion.width) || 0,
+      isHide: proportionalHeight > visualTop //正比高度大于显示高度，隐藏元素
+    };
+  }
+  //页脚，保持横纵比
+  //计算底部显示中线位置
+  //如果溢出就隐藏，高度设置为白边中线
+  else if (proportionMode === 2) {
+      var _visualTop = getStyle.visualTop;
+      var _proportionalHeight = CEIL$1(height * proportion.width) || 0;
+      return {
+        width: CEIL$1(width * proportion.width) || 0,
+        height: _proportionalHeight,
+        left: CEIL$1(left * proportion.left) || 0,
+        top: getStyle.visualHeight + _visualTop / 2 - _proportionalHeight / 2 || 0,
+        padding: CEIL$1(padding * proportion.width) || 0,
+        isHide: _proportionalHeight > _visualTop //正比高度大于显示高度，隐藏元素
+      };
     }
-
-    //页眉，保持横纵比
-    //计算顶部显示中线位置
-    //如果溢出就溢出，高度设置为白边中线
-    if (proportionMode === 1) {
-        var visualTop = getStyle.visualTop;
-        var proportionalHeight = CEIL$1(height * proportion.width) || 0;
-        return {
+    //图片正比缩放，而且保持上下居中
+    else if (proportionMode === 3) {
+        //高度为基本比值
+        if (proportion.width > proportion.height) {
+          var originalWidth = CEIL$1(width * proportion.width) || 0;
+          var proportionalWidth = CEIL$1(width * proportion.height) || 0;
+          var proportionalLeft = Math.abs(proportionalWidth - originalWidth) / 2;
+          left = CEIL$1(left * proportion.left) + proportionalLeft;
+          return {
+            width: proportionalWidth,
+            height: CEIL$1(height * proportion.height) || 0,
+            left: left,
+            top: CEIL$1(top * proportion.top) || 0,
+            padding: CEIL$1(padding * proportion.width) || 0
+          };
+        } else {
+          //宽度作为基本比值
+          var originalHeight = CEIL$1(height * proportion.height) || 0;
+          var _proportionalHeight2 = CEIL$1(height * proportion.width) || 0;
+          var proportionalTop = Math.abs(_proportionalHeight2 - originalHeight) / 2;
+          top = CEIL$1(top * proportion.top) + proportionalTop;
+          return {
             width: CEIL$1(width * proportion.width) || 0,
-            height: proportionalHeight,
+            height: _proportionalHeight2,
             left: CEIL$1(left * proportion.left) || 0,
-            top: -visualTop / 2 - proportionalHeight / 2 || 0,
-            padding: CEIL$1(padding * proportion.width) || 0,
-            isHide: proportionalHeight > visualTop //正比高度大于显示高度，隐藏元素
-        };
-    }
-    //页脚，保持横纵比
-    //计算底部显示中线位置
-    //如果溢出就隐藏，高度设置为白边中线
-    else if (proportionMode === 2) {
-            var _visualTop = getStyle.visualTop;
-            var _proportionalHeight = CEIL$1(height * proportion.width) || 0;
-            return {
-                width: CEIL$1(width * proportion.width) || 0,
-                height: _proportionalHeight,
-                left: CEIL$1(left * proportion.left) || 0,
-                top: getStyle.visualHeight + _visualTop / 2 - _proportionalHeight / 2 || 0,
-                padding: CEIL$1(padding * proportion.width) || 0,
-                isHide: _proportionalHeight > _visualTop //正比高度大于显示高度，隐藏元素
-            };
+            top: top,
+            padding: CEIL$1(padding * proportion.width) || 0
+          };
         }
-        //图片正比缩放，而且保持上下居中
-        else if (proportionMode === 3) {
-                var originalHeight = CEIL$1(height * proportion.height) || 0;
-                var _proportionalHeight2 = CEIL$1(height * proportion.width) || 0;
-                var proportionalTop = Math.abs(_proportionalHeight2 - originalHeight) / 2;
-                top = CEIL$1(top * proportion.top) + proportionalTop;
-                return {
-                    width: CEIL$1(width * proportion.width) || 0,
-                    height: _proportionalHeight2,
-                    left: CEIL$1(left * proportion.left) || 0,
-                    top: top,
-                    padding: CEIL$1(padding * proportion.width) || 0
-                };
-            }
-            //默认缩放比
-            else {
-                    return {
-                        width: CEIL$1(width * proportion.width) || 0,
-                        height: CEIL$1(height * proportion.height) || 0,
-                        left: CEIL$1(left * proportion.left) || 0,
-                        top: CEIL$1(top * proportion.top) || 0,
-                        padding: CEIL$1(padding * proportion.width) || 0
-                    };
-                }
+      }
+      //默认缩放比
+      else {
+          return {
+            width: CEIL$1(width * proportion.width) || 0,
+            height: CEIL$1(height * proportion.height) || 0,
+            left: CEIL$1(left * proportion.left) || 0,
+            top: CEIL$1(top * proportion.top) || 0,
+            padding: CEIL$1(padding * proportion.width) || 0
+          };
+        }
 };
 
-function setProportion$1() {
-    return converProportion.apply(undefined, arguments);
+function setProportion() {
+  return converProportion.apply(undefined, arguments);
 }
 
 /*
@@ -43496,49 +43486,49 @@ function setProportion$1() {
  * @type {[type]}
  */
 function reviseSize(_ref2) {
-    var results = _ref2.results,
-        proportion = _ref2.proportion,
-        proportionMode = _ref2.proportionMode,
-        getStyle = _ref2.getStyle;
+  var results = _ref2.results,
+      proportion = _ref2.proportion,
+      proportionMode = _ref2.proportionMode,
+      getStyle = _ref2.getStyle;
 
 
-    //不同设备下缩放比计算
-    var layerSize = converProportion({
-        proportion: proportion,
-        proportionMode: proportionMode,
-        getStyle: getStyle,
-        width: results.width,
-        height: results.height,
-        left: results.left,
-        top: results.top
-    });
+  //不同设备下缩放比计算
+  var layerSize = converProportion({
+    proportion: proportion,
+    proportionMode: proportionMode,
+    getStyle: getStyle,
+    width: results.width,
+    height: results.height,
+    left: results.left,
+    top: results.top
+  });
 
-    //新的背景图尺寸
-    var backSize = converProportion({
-        proportion: proportion,
-        proportionMode: proportionMode,
-        getStyle: getStyle,
-        width: results.backwidth,
-        height: results.backheight,
-        left: results.backleft,
-        top: results.backtop
-    });
+  //新的背景图尺寸
+  var backSize = converProportion({
+    proportion: proportion,
+    proportionMode: proportionMode,
+    getStyle: getStyle,
+    width: results.backwidth,
+    height: results.backheight,
+    left: results.backleft,
+    top: results.backtop
+  });
 
-    //赋值新的坐标
-    results.scaleWidth = layerSize.width;
-    results.scaleHeight = layerSize.height;
-    results.scaleLeft = layerSize.left;
-    results.scaleTop = layerSize.top;
-    //元素状态
-    results.isHide = layerSize.isHide;
+  //赋值新的坐标
+  results.scaleWidth = layerSize.width;
+  results.scaleHeight = layerSize.height;
+  results.scaleLeft = layerSize.left;
+  results.scaleTop = layerSize.top;
+  //元素状态
+  results.isHide = layerSize.isHide;
 
-    //背景坐标
-    results.scaleBackWidth = backSize.width;
-    results.scaleBackHeight = backSize.height;
-    results.scaleBackLeft = backSize.left;
-    results.scaleBackTop = backSize.top;
+  //背景坐标
+  results.scaleBackWidth = backSize.width;
+  results.scaleBackHeight = backSize.height;
+  results.scaleBackLeft = backSize.left;
+  results.scaleBackTop = backSize.top;
 
-    return results;
+  return results;
 }
 
 /**
@@ -43547,7 +43537,7 @@ function reviseSize(_ref2) {
  * @return {[type]}     [description]
  */
 function randomUrl(url) {
-    return url + '?r=' + new Date().getTime();
+  return url + '?r=' + new Date().getTime();
 }
 
 /**
@@ -43556,119 +43546,332 @@ function randomUrl(url) {
  */
 function readFile(path, callback, type) {
 
-    var paths = void 0;
-    var name = void 0;
-    var data = void 0;
-    var svgUrl = void 0;
+  var paths = void 0;
+  var name = void 0;
+  var data = void 0;
+  var svgUrl = void 0;
 
-    /**
-     * js脚本加载
-     */
-    var jsRequest = function jsRequest(fileUrl, fileName) {
-        request(randomUrl(fileUrl), function () {
-            data = window.HTMLCONFIG[fileName];
-            if (data) {
-                callback(data);
-                delete window.HTMLCONFIG[fileName];
-            } else {
-                $$warn('js文件加载失败，文件名:' + path);
-                callback('');
-            }
-        });
-    };
-
-    //con str
-    //externalFile使用
-    //如果是js动态文件
-    //content的html结构
-    if (type === "js") {
-        paths = config.getSvgPath() + path;
-        name = path.replace(".js", '');
-        jsRequest(paths, name);
-        return;
-    }
-
-    /**
-     * 如果配置了convert === 'svg'
-     * 那么所有的svg文件就强制转化成js读取
-     */
-    if (config.launch && config.launch.convert === 'svg') {
-        path = path.replace('.svg', '.js');
-        name = path.replace(".js", '');
-        svgUrl = config.getSvgPath() + path;
-        jsRequest(svgUrl, name); //直接采用脚本加载
-        return;
-    }
-
-    /**
-     * ibooks模式 单独处理svg转化策划给你js,加载js文件
-     */
-    if (Xut.IBooks.CONFIG) {
-        //如果是.svg结尾
-        //把svg替换成js
-        if (/.svg$/.test(path)) {
-            path = path.replace(".svg", '.js');
-        }
-        //全路径
-        paths = config.getSvgPath().replace("svg", 'js') + path;
-        //文件名
-        name = path.replace(".js", '');
-        //加载脚本
-        request(randomUrl(paths), function () {
-            data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name];
-            if (data) {
-                callback(data);
-                delete window.HTMLCONFIG[name];
-                delete window.IBOOKSCONFIG[name];
-            } else {
-                $$warn('编译:脚本加载失败，文件名:' + name);
-                callback('');
-            }
-        });
-        return;
-    }
-
-    //svg文件
-    //游览器模式 && 非强制插件模式
-    if (Xut.plat.isBrowser && !config.isPlugin) {
-        //默认的地址
-        svgUrl = config.getSvgPath().replace("www/", "") + path;
-
-        //mini杂志的情况，不处理目录的www
-        if (config.launch && config.launch.resource) {
-            svgUrl = config.getSvgPath() + path;
-        }
-
-        $.ajax({
-            type: 'get',
-            dataType: 'html',
-            url: randomUrl(svgUrl),
-            success: function success(svgContent) {
-                callback(svgContent);
-            },
-            error: function error(xhr, type) {
-                $$warn('svg文件解释出错，文件名:' + path);
-                callback('');
-            }
-        });
-        return;
-    }
-
-    /**
-     * 插件读取
-     * 手机客户端模式
-     */
-    Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function (svgContent) {
-        callback(svgContent);
-    }, function (err) {
+  /**
+   * js脚本加载
+   */
+  var loadJs = function loadJs(fileUrl, fileName) {
+    loadFile(randomUrl(fileUrl), function () {
+      data = window.HTMLCONFIG[fileName];
+      if (data) {
+        callback(data);
+        delete window.HTMLCONFIG[fileName];
+      } else {
+        $$warn('js文件加载失败，文件名:' + path);
         callback('');
+      }
     });
+  };
+
+  //con str
+  //externalFile使用
+  //如果是js动态文件
+  //content的html结构
+  if (type === "js") {
+    paths = config.getSvgPath() + path;
+    name = path.replace(".js", '');
+    loadJs(paths, name);
+    return;
+  }
+
+  /**
+   * 如果配置了convert === 'svg'
+   * 那么所有的svg文件就强制转化成js读取
+   */
+  if (config.launch && config.launch.convert === 'svg') {
+    path = path.replace('.svg', '.js');
+    name = path.replace(".js", '');
+    svgUrl = config.getSvgPath() + path;
+    loadJs(svgUrl, name); //直接采用脚本加载
+    return;
+  }
+
+  /**
+   * ibooks模式 单独处理svg转化策划给你js,加载js文件
+   */
+  if (Xut.IBooks.CONFIG) {
+    //如果是.svg结尾
+    //把svg替换成js
+    if (/.svg$/.test(path)) {
+      path = path.replace(".svg", '.js');
+    }
+    //全路径
+    paths = config.getSvgPath().replace("svg", 'js') + path;
+    //文件名
+    name = path.replace(".js", '');
+    //加载脚本
+    loadFile(randomUrl(paths), function () {
+      data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name];
+      if (data) {
+        callback(data);
+        delete window.HTMLCONFIG[name];
+        delete window.IBOOKSCONFIG[name];
+      } else {
+        $$warn('编译:脚本加载失败，文件名:' + name);
+        callback('');
+      }
+    });
+    return;
+  }
+
+  //svg文件
+  //游览器模式 && 非强制插件模式
+  if (Xut.plat.isBrowser && !config.isPlugin) {
+    //默认的地址
+    svgUrl = config.getSvgPath().replace("www/", "") + path;
+
+    //mini杂志的情况，不处理目录的www
+    if (config.launch && config.launch.resource) {
+      svgUrl = config.getSvgPath() + path;
+    }
+
+    $.ajax({
+      type: 'get',
+      dataType: 'html',
+      url: randomUrl(svgUrl),
+      success: function success(svgContent) {
+        callback(svgContent);
+      },
+      error: function error(xhr, type) {
+        $$warn('svg文件解释出错，文件名:' + path);
+        callback('');
+      }
+    });
+    return;
+  }
+
+  /**
+   * 插件读取
+   * 手机客户端模式
+   */
+  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function (svgContent) {
+    callback(svgContent);
+  }, function (err) {
+    callback('');
+  });
 }
 
 /**
  * 缓存池
  * @return {[type]} [description]
  */
+
+/**
+ * 当监听的节点内容发生变化时,触发指定的回调
+ * @param opts {
+ *   container:父容器,dom对象或jQuery对象
+ *   content  :要加入父容器的内容,字符串或jQuery对象
+ *   position :内容插入父容器的位置,'first' 表示在前加入,默认在末尾
+ *   delay    :延时,默认0
+ *   }
+ * @version  1.02
+ * @author [author] bjtqti
+ * @return {[type]} [description]
+ */
+
+var DOC = document;
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+
+var implementation = DOC.implementation.hasFeature("MutationEvents", "2.0");
+
+/**
+ * Defer a task to execute it asynchronously. Ideally this
+ * should be executed as a microtask, so we leverage
+ * MutationObserver if it's available, and fallback to
+ * setTimeout(0).
+ *
+ * @param {Function} cb
+ * @param {Object} ctx
+ */
+var _nextTick = function () {
+    var callbacks = [];
+    var pending = false;
+    var timerFunc;
+
+    function nextTickHandler() {
+        pending = false;
+        var copies = callbacks.slice(0);
+        callbacks = [];
+        for (var i = 0; i < copies.length; i++) {
+            copies[i]();
+        }
+    }
+
+    if (typeof MutationObserver !== 'undefined' && Xut.plat.supportMutationObserver) {
+        var counter = 1;
+        var observer = new MutationObserver(nextTickHandler);
+        var textNode = document.createTextNode(counter);
+        observer.observe(textNode, {
+            characterData: true
+        });
+        timerFunc = function timerFunc() {
+            counter = (counter + 1) % 2;
+            textNode.data = counter;
+        };
+    } else {
+        // webpack attempts to inject a shim for setImmediate
+        // if it is used as a global, so we have to work around that to
+        // avoid bundling unnecessary code.
+        var context = Xut.plat.isBrowser ? window : typeof global !== 'undefined' ? global : {};
+        timerFunc = context.setImmediate || setTimeout;
+    }
+    return function (cb, ctx) {
+        var func = ctx ? function () {
+            cb.call(ctx);
+        } : cb;
+        callbacks.push(func);
+        if (pending) return;
+        pending = true;
+        timerFunc(nextTickHandler, 0);
+    };
+}();
+
+var nextTick = function nextTick(_ref, callback, context) {
+    var container = _ref.container,
+        content = _ref.content,
+        position = _ref.position,
+        _ref$delay = _ref.delay,
+        delay = _ref$delay === undefined ? 0 : _ref$delay;
+
+
+    //如果只提供一个回到函数
+    if (arguments.length === 1 && typeof arguments[0] === 'function') {
+        callback = arguments[0];
+        if (typeof callback === 'function') {
+            return _nextTick(callback);
+        }
+        console.log('nextTick: 参数提供错误');
+        return;
+    }
+
+    if (!container || !content) {
+        return;
+    }
+
+    //检查容器---$(container) 转为dom对象
+    if (container instanceof $) {
+        container = container[0];
+    }
+
+    if (container.nodeType !== 1) {
+        console.log('nextTick: container must be HTMLLIElement ');
+        return;
+    }
+
+    var animatId = 'T' + (Math.random() * 10000 << 1);
+    var tick = DOC.createElement('input');
+
+    //标记任务
+    tick.setAttribute('value', animatId);
+
+    //检查内容
+    if (typeof content === 'string') {
+        var temp = $(content);
+        if (!temp[0]) {
+            //纯文本内容
+            temp = DOC.createTextNode(content);
+            temp = $(temp);
+        }
+        content = temp;
+        temp = null;
+    }
+
+    /**
+     * 完成任务后处理&Observer
+     * @return {[type]} [description]
+     */
+    var _completeTask = function _completeTask() {
+        container.removeChild(tick);
+        callback.call(context);
+        container = null;
+        tick = null;
+        context = null;
+    };
+
+    /**
+     * 将内容加入父容器
+     * @return {[type]} [description]
+     */
+    var _appendChild = function _appendChild() {
+        //拼接内容
+        var frag = DOC.createDocumentFragment();
+        var len = content.length;
+        for (var i = 0; i < len; i++) {
+            frag.appendChild(content[i]);
+        }
+        frag.appendChild(tick);
+
+        //判断插入的位置
+        if (position === 'first') {
+            container.insertBefore(frag, container.firstChild);
+        } else {
+            container.appendChild(frag);
+        }
+
+        frag = null;
+
+        //触发变动事件
+        tick.setAttribute('value', animatId);
+    };
+
+    if (MutationObserver) {
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (record) {
+                if (record.oldValue === animatId) {
+                    _completeTask();
+                    observer = null;
+                }
+            });
+        });
+
+        //设置要监听的属性
+        observer.observe(tick, {
+            attributes: true,
+            //childList: true,
+            attributeOldValue: true,
+            attributeFilter: ["value"] //只监听value属性,提高性能
+        });
+
+        _appendChild();
+    } else {
+
+        //检测是否支持DOM变动事件
+        if (implementation) {
+            (function () {
+
+                /**
+                 * 完成任务后处理&Event
+                 * @param  {[type]} event [description]
+                 * @return {[type]}       [description]
+                 */
+                var _finishTask = function _finishTask(event) {
+                    if (event.target.value === animatId) {
+                        //container.removeEventListener('DOMNodeRemoved',_finishTask,false);
+                        container.removeEventListener('DOMNodeInserted', _finishTask, false);
+                        callback.call(context);
+                    }
+                };
+
+                //container.addEventListener('DOMNodeRemoved',_finishTask,false);
+                container.addEventListener('DOMNodeInserted', _finishTask, false);
+                _appendChild();
+                container.removeChild(tick);
+            })();
+        } else {
+            //歉容Android2.xx处理
+            _appendChild();
+            setTimeout(function () {
+                _completeTask();
+            }, delay);
+        }
+    }
+};
+
+Xut.nextTick = nextTick;
 
 var isIOS$2 = Xut.plat.isIOS;
 var isBrowser$1 = Xut.plat.isBrowser;
@@ -46259,6 +46462,12 @@ function setCache(columnCount) {
     cacheColumns = columnCount;
 }
 
+function setChpaterColumn(seasonsId, chapterId, value) {
+    if (cacheColumns[seasonsId] && cacheColumns[seasonsId][chapterId]) {
+        cacheColumns[seasonsId][chapterId] = value;
+    }
+}
+
 /**
  * 是否有流式排版
  * 加快计算
@@ -46306,8 +46515,6 @@ function getBeforeCount(seasonId, chapterId) {
 
 /**
  * 获取chpater总数
- * @param  {[type]} seasonId [description]
- * @return {[type]}          [description]
  */
 function getColumnChpaterCount(seasonId) {
     if (!cacheColumns) return;
@@ -46317,9 +46524,6 @@ function getColumnChpaterCount(seasonId) {
 /**
  * reutrn seasonIds
  * return chpaterIds
- * @param  {[type]} seasonId  [description]
- * @param  {[type]} chpaterId [description]
- * @return {[type]}           [description]
  */
 function getColumnCount(seasonId, chapterId) {
     if (!cacheColumns) return;
@@ -46350,125 +46554,231 @@ function isColumnPage(seasonId, chapterId) {
 }
 
 /**
- * 页码显示
+ * 迷你杂志页面工具栏
  */
+//样式类型
+var dotStyleClass = ["dotIcon-brightness_1", "dotIcon-circle-full", "dotIcon-cd", "dotIcon-adjust", "dotIcon-stop", "dotIcon-record"];
 
 var NumberBar = function () {
-    function NumberBar(_ref) {
-        var _this = this;
+  function NumberBar(_ref) {
+    var _this = this;
 
-        var $rootNode = _ref.$rootNode,
-            pageTotal = _ref.pageTotal,
-            currentPage = _ref.currentPage;
-        classCallCheck(this, NumberBar);
+    var $rootNode = _ref.$rootNode,
+        pageTotal = _ref.pageTotal,
+        visualIndex = _ref.visualIndex,
+        pageBar = _ref.pageBar;
+    classCallCheck(this, NumberBar);
 
-        this.$container = this._createDom(pageTotal);
-        this.$currtNode = this.$container.find('div:first');
-        this.$allNode = this.$container.find('div:last');
-        this.toolBarStatus = true;
-        Xut.nextTick(function () {
-            $rootNode.append(_this.$container);
-        });
+
+    //数字模式模式
+    this.dotTrue = 'digital';
+
+    //圆形
+    if (pageBar.type === 'circular') {
+      //圆点模式
+      this.dotTrue = pageBar.type;
+      //圆点模式样式
+      this.dotStyle = Number(pageBar.mode) || 1;
+      //样式
+      this.dotStyleClass = dotStyleClass[this.dotStyle - 1];
+      //位置
+      if (pageBar.position) {
+        var left = pageBar.position.left;
+        var top = pageBar.position.top;
+        var width = 'width:100%;';
+        if (_.isUndefined(left)) {
+          left = 'width:100%;text-align:center;';
+        } else {
+          width = 'width:' + (100 - parseInt(left)) + '%;';
+          left = 'left:' + left + ';';
+        }
+        if (_.isUndefined(top)) {
+          top = 'bottom:0;';
+        } else {
+          top = 'top:' + top + ';';
+        }
+        this.position = '' + width + left + top;
+      } else {
+        this.position = "width:100%;text-align:center;bottom:0;margin-bottom:0.3rem";
+      }
     }
 
-    createClass(NumberBar, [{
-        key: '_createDom',
-        value: function _createDom(pageTotal) {
-            //存在模式3的情况，所以页码要处理溢出的情况。left值
-            var right = 0;
-            if (config.visualSize.overflowWidth) {
-                right = Math.abs(config.visualSize.left * 2) + 'px';
+    //结构
+    var html = String.styleFormat(this._createDom(pageTotal));
+    this.$container = $(html);
+
+    if (this.dotTrue === 'circular') {
+      this.$currtNode = this.$container.find('span:first');
+    } else {
+      this.$currtNode = this.$container.find('div:first');
+      this.$allNode = this.$container.find('div:last');
+    }
+
+    this.toolBarStatus = true;
+    Xut.nextTick(function () {
+      $rootNode.append(_this.$container);
+    });
+  }
+
+  createClass(NumberBar, [{
+    key: '_createDom',
+    value: function _createDom(pageTotal) {
+      //圆点模式
+      if (this.dotTrue === 'circular') {
+        var dotString = '';
+        var countPage = pageTotal;
+        while (countPage--) {
+          dotString += '<span class="slider-pager-page"><i class= ' + this.dotStyleClass + '></i></span>';
+        }
+        return '<div class="xut-page-number"style="' + this.position + ';">' + dotString + '</div>';
+      }
+      //数字模式
+      else {
+          //存在模式3的情况，所以页码要处理溢出的情况。left值
+          var right = 0;
+          if (config.visualSize.overflowWidth) {
+            right = Math.abs(config.visualSize.left * 2) + 'px';
+          }
+          return '<div class="xut-page-number"style="right:' + right + ';bottom:0;">\n                  <div>1</div>\n                  <strong>/</strong>\n                  <div>' + pageTotal + '</div>\n              </div>';
+        }
+    }
+  }, {
+    key: '_showToolBar',
+    value: function _showToolBar() {
+      this.$container.show();
+    }
+  }, {
+    key: '_hideToolBar',
+    value: function _hideToolBar() {
+      this.$container.hide();
+    }
+  }, {
+    key: 'toggle',
+    value: function toggle(state, pointer) {
+      if (pointer !== 'pageNumber') return;
+      switch (state) {
+        case 'show':
+          this._showToolBar();
+          break;
+        case 'hide':
+          this._hideToolBar();
+          break;
+        default:
+          //默认：工具栏显示隐藏互斥处理
+          this.toolBarStatus ? this._hideToolBar() : this._showToolBar();
+          break;
+      }
+    }
+
+    /**
+     * 更新单页
+     */
+
+  }, {
+    key: '_updateSingle',
+    value: function _updateSingle(action, updateIndex) {
+      var _this2 = this;
+
+      Xut.nextTick(function () {
+        //圆点模式
+        if (_this2.dotTrue === 'circular') {
+          _this2.$container.find('span.slider-pager-page.active').removeClass('active');
+          $(_this2.$container.find('span.slider-pager-page')[updateIndex - 1]).addClass("active");
+        } else {
+          _this2.$currtNode.text(updateIndex);
+        }
+        if (action === 'init') {
+          _this2.$container.show();
+        }
+      });
+    }
+
+    /**
+     * 更新总页数
+     */
+
+  }, {
+    key: 'updateTotal',
+    value: function updateTotal(newTotalIndex) {
+      var _this3 = this;
+
+      Xut.nextTick(function () {
+        //圆点模式
+        if (_this3.dotTrue === 'circular') {
+          var visualIndex = 0;
+          var span, iconi;
+          _.each(_this3.$container.find('span.slider-pager-page'), function (value, index) {
+            if (value.className != "slider-pager-page") {
+              visualIndex = index;
             }
-            return $('<div class="xut-page-number" style="right:' + right + ';">\n                <div>1</div>\n                <strong>/</strong>\n                <div>' + pageTotal + '</div>\n             </div>');
-        }
-    }, {
-        key: '_showToolBar',
-        value: function _showToolBar() {
-            this.$container.show();
-        }
-    }, {
-        key: '_hideToolBar',
-        value: function _hideToolBar() {
-            this.$container.hide();
-        }
-    }, {
-        key: 'toggle',
-        value: function toggle(state, pointer) {
-            if (pointer !== 'pageNumber') return;
-            switch (state) {
-                case 'show':
-                    this._showToolBar();
-                    break;
-                case 'hide':
-                    this._hideToolBar();
-                    break;
-                default:
-                    //默认：工具栏显示隐藏互斥处理
-                    this.toolBarStatus ? this._hideToolBar() : this._showToolBar();
-                    break;
+          });
+          _this3.$container.empty();
+          for (var i = 0; i < newTotalIndex; i++) {
+            span = document.createElement('span');
+            if (i == visualIndex) {
+              span.className = "slider-pager-page active";
+            } else {
+              span.className = "slider-pager-page";
             }
+            iconi = document.createElement('i');
+            iconi.className = _this3.dotStyleClass;
+            span.append(iconi);
+            _this3.$container.append(span);
+          }
+        } else {
+          _this3.$allNode.text(newTotalIndex);
         }
-    }, {
-        key: '_updateText',
-        value: function _updateText(action, updateIndex) {
-            var _this2 = this;
+      });
+    }
 
-            Xut.nextTick(function () {
-                _this2.$currtNode.text(updateIndex);
-                if (action === 'init') {
-                    _this2.$container.show();
-                }
-            });
+    /**
+     * 更新页码
+     */
+
+  }, {
+    key: 'updatePointer',
+    value: function updatePointer(_ref2) {
+      var action = _ref2.action,
+          direction = _ref2.direction,
+          parentIndex = _ref2.parentIndex,
+          _ref2$hasSon = _ref2.hasSon,
+          hasSon = _ref2$hasSon === undefined ? false : _ref2$hasSon,
+          _ref2$sonIndex = _ref2.sonIndex,
+          sonIndex = _ref2$sonIndex === undefined ? 0 : _ref2$sonIndex;
+
+
+      var chapterData = Xut.Presentation.GetPageData('page', parentIndex);
+
+      //从正索引开始
+      ++parentIndex;
+
+      //没有column
+      if (!hasColumn()) {
+        this._updateSingle(action, parentIndex);
+        return;
+      }
+
+      //默认，需要拿到前置的总和(出去当前)
+      var beforeCount = getBeforeCount(chapterData.seasonId, chapterData._id);
+      var updateIndex = parentIndex + beforeCount + sonIndex;
+
+      //前翻页，需要叠加flow的总和
+      if (direction === 'prev') {
+        //前翻页：内部翻页
+        if (hasSon) {
+          updateIndex = parentIndex + beforeCount + sonIndex - 2;
         }
+        //前翻页：外部往内部翻页，正好前一页是内部页，所以需要获取内部页总和
+        else {
+            //前翻页，需要拿到当期那到前置的总和
+            updateIndex = parentIndex + getCurrentBeforeCount(chapterData.seasonId, chapterData._id);
+          }
+      }
 
-        /**
-         * 更新页码
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'updatePointer',
-        value: function updatePointer(_ref2) {
-            var action = _ref2.action,
-                direction = _ref2.direction,
-                parentIndex = _ref2.parentIndex,
-                _ref2$hasSon = _ref2.hasSon,
-                hasSon = _ref2$hasSon === undefined ? false : _ref2$hasSon,
-                _ref2$sonIndex = _ref2.sonIndex,
-                sonIndex = _ref2$sonIndex === undefined ? 0 : _ref2$sonIndex;
-
-
-            var chapterData = Xut.Presentation.GetPageData('page', parentIndex);
-
-            //从正索引开始
-            ++parentIndex;
-
-            if (!hasColumn()) {
-                this._updateText(action, parentIndex);
-                return;
-            }
-
-            //默认，需要拿到前置的总和(出去当前)
-            var beforeCount = getBeforeCount(chapterData.seasonId, chapterData._id);
-            var updateIndex = parentIndex + beforeCount + sonIndex;
-
-            //前翻页，需要叠加flow的总和
-            if (direction === 'prev') {
-                //前翻页：内部翻页
-                if (hasSon) {
-                    updateIndex = parentIndex + beforeCount + sonIndex - 2;
-                }
-                //前翻页：外部往内部翻页，正好前一页是内部页，所以需要获取内部页总和
-                else {
-                        //前翻页，需要拿到当期那到前置的总和
-                        updateIndex = parentIndex + getCurrentBeforeCount(chapterData.seasonId, chapterData._id);
-                    }
-            }
-
-            this._updateText(action, updateIndex);
-        }
-    }]);
-    return NumberBar;
+      this._updateSingle(action, updateIndex);
+    }
+  }]);
+  return NumberBar;
 }();
 
 /**
@@ -46770,9 +47080,15 @@ var Observer = function () {
             this.bind(event, fnc);
             return this;
         }
+
+        //event = 'a b c' 空格分离多个事件名
+        //提供fn 指定在某个事件中删除某一个
+        //否则只提供事件名 ，全删除
+
     }, {
         key: "unbind",
         value: function unbind(event, fn) {
+
             var eventName, i, index, num, parts;
             var events = this.events;
 
@@ -46783,9 +47099,21 @@ var Observer = function () {
                 parts = event.split(/\s+/);
                 for (i = 0, num = parts.length; i < num; i++) {
                     if ((eventName = parts[i]) in events !== false) {
-                        index = fn ? _indexOf(events[eventName], fn) : -1;
-                        if (index !== -1) {
-                            events[eventName].splice(index, 1);
+                        //如果提供函数引用
+                        //那么就是在数组中删除其中一个
+                        if (fn) {
+                            index = _indexOf(events[eventName], fn);
+                            if (index !== -1) {
+                                events[eventName].splice(index, 1);
+                            }
+                        } else {
+                            //如果只提供了名字，则全删除
+                            events[eventName] = null;
+                        }
+
+                        //如果没有内容了
+                        if (!events[eventName] || !events[eventName].length) {
+                            delete events[eventName];
                         }
                     }
                 }
@@ -47068,7 +47396,8 @@ var _class = function () {
                     var dropElement = self.dropElement,
                         isEnter = false; //是否进入目标
 
-                    if (dropElement) {
+                    //目标元素可见才可以拖拽成功
+                    if (dropElement && dropElement[0].style.visibility != "hidden") {
                         //获取拖拽对象当前参数
                         var fromOffset = self.dragElement.offset();
                         var fromPoint = {
@@ -47180,6 +47509,10 @@ var _class = function () {
     return _class;
 }();
 
+/////////////////
+/// tap click
+/////////////////
+
 /**
  * ie10下面mouse事件怪异
  * @return {Boolean} [description]
@@ -47193,13 +47526,13 @@ var isIE10 = document.documentMode === 10;
  * 处理元素的全局事件
  */
 function setCanvasStart(supportSwipe) {
-    Xut.Contents.Canvas.Reset();
-    Xut.Contents.Canvas.SupportSwipe = supportSwipe;
-    Xut.Contents.Canvas.isTap = true;
+  Xut.Contents.Canvas.Reset();
+  Xut.Contents.Canvas.SupportSwipe = supportSwipe;
+  Xut.Contents.Canvas.isTap = true;
 }
 
 function setCanvasMove() {
-    Xut.Contents.Canvas.isSwipe = true;
+  Xut.Contents.Canvas.isSwipe = true;
 }
 
 /**
@@ -47207,81 +47540,85 @@ function setCanvasMove() {
  * @return {[type]}   [description]
  */
 function compatibilityEvent(e) {
-    var point;
-    if (e.touches && e.touches[0]) {
-        point = e.touches[0];
-    } else {
-        point = e;
-    }
-    return point;
+  var point;
+  if (e.touches && e.touches[0]) {
+    point = e.touches[0];
+  } else {
+    point = e;
+  }
+  return point;
 }
 
 /**
  * 如果是简单的点击事件
  */
-function simpleEvent(eventContext, eventHandle, supportSwipe) {
+function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) {
 
-    eventContext.isTap = false;
+  //仅仅只是单击处理
+  //IE10是不支持touch事件，直接绑定click事件
+  var onlyClick = isIE10 || eventName === 'click';
+  eventContext = eventContext[0];
 
-    //这里单独绑定事件有个问题,单击move被触发
-    //如果停止e.stopPropagation，那么默认行为就不会被触发
-    //你绑定单击的情况下可以翻页
-    //这里通过坐标的位置来判断
-    var start = function start(e) {
-        var point = compatibilityEvent(e);
-        //记录开始坐标
-        eventContext.pageX = point.pageX;
-        //是否是tap事件
-        eventContext.isTap = true;
-        setCanvasStart(supportSwipe);
-    };
+  //是否触发
+  var hasTap = false;
+  //开始坐标
+  var startPageX = void 0;
 
-    var move = function move(e) {
-        if (!eventContext.isTap) {
-            return;
-        }
-        var point = compatibilityEvent(e),
-            deltaX = point.pageX - eventContext.pageX;
-        //如果有move事件，则取消tap事件
-        if (Math.abs(deltaX)) {
-            eventContext.isTap = false;
-            setCanvasMove(supportSwipe);
-        }
-    };
+  hasTap = false;
 
-    var end = function end() {
-        //触发tap事件
-        eventContext.isTap && eventHandle();
-    };
+  //这里单独绑定事件有个问题,单击move被触发
+  //如果停止e.stopPropagation，那么默认行为就不会被触发
+  //你绑定单击的情况下可以翻页
+  //这里通过坐标的位置来判断
+  var start = function start(e) {
+    var point = compatibilityEvent(e);
+    //记录开始坐标
+    startPageX = point.pageX;
+    //是否是tap事件
+    hasTap = true;
+    setCanvasStart(supportSwipe);
+  };
 
-    eventContext = eventContext[0];
-
-    //IE10是不支持touch事件，直接绑定click事件
-    if (isIE10) {
-        eventContext.isTap = true;
-        eventContext.addEventListener('click', end, false);
-    } else {
-
-        $$on(eventContext, {
-            start: start,
-            move: move,
-            end: end,
-            cancel: end
-        });
+  var move = function move(e) {
+    if (!hasTap) {
+      return;
     }
+    var point = compatibilityEvent(e);
+    var deltaX = point.pageX - startPageX;
 
-    return {
-        off: function off() {
-            if (eventContext) {
-                if (isIE10) {
-                    eventContext.removeEventListener('click', end, false);
-                } else {
-                    $$off(eventContext);
-                }
-                eventContext = null;
-            }
-        }
-    };
+    //如果有move事件，则取消tap事件
+    if (Math.abs(deltaX)) {
+      hasTap = false;
+      setCanvasMove(supportSwipe);
+    }
+  };
+
+  var end = function end() {
+    hasTap && eventHandle();
+  };
+
+  if (eventName === 'tap') {
+    $$on(eventContext, {
+      start: start,
+      move: move,
+      end: end,
+      cancel: end
+    });
+  } else if (onlyClick) {
+    hasTap = true;
+    $$on(eventContext, {
+      end: end
+    });
+  }
+
+  return {
+    off: function off() {
+      if (eventContext) {
+        $$off(eventContext);
+        eventContext = null;
+      }
+    }
+  };
 }
 
 /**
@@ -47388,7 +47725,7 @@ var filterEvent = ['drag', 'dragTag', 'swipeleft', 'swiperight', 'swipeup', 'swi
  * @return {[type]}         [description]
  */
 var isfilter = function isfilter(eventName) {
-    return filterEvent.indexOf(eventName) === -1 ? true : false;
+  return filterEvent.indexOf(eventName) === -1 ? true : false;
 };
 
 /**
@@ -47401,30 +47738,30 @@ var isfilter = function isfilter(eventName) {
  * @return {[type]}         [description]
  */
 var setDefaultBehavior = function setDefaultBehavior(supportSwipe, $contentNode) {
-    if (supportSwipe) {
-        //静态事件，默认可以翻页，还可以切换工具栏
-        $contentNode.attr('data-behavior', 'swipe');
-    } else {
-        //如果事件存在
-        $contentNode.attr('data-behavior', 'disable');
-    }
+  if (supportSwipe) {
+    //静态事件，默认可以翻页，还可以切换工具栏
+    $contentNode.attr('data-behavior', 'swipe');
+  } else {
+    //如果事件存在
+    $contentNode.attr('data-behavior', 'disable');
+  }
 };
 
 /**
  * 针对软件培训的操作行为下光标状态需求
  */
 var addCursor = function addCursor(eventName, $contentNode) {
-    if ($contentNode) {
-        if (!$contentNode.prop('setCursor')) {
-            //只设置一次
-            if (eventName === ('drag' || 'dragTag')) {
-                $contentNode.css('cursor', 'Move');
-            } else {
-                $contentNode.css('cursor', 'Pointer');
-            }
-            $contentNode.prop('setCursor', 'true');
-        }
+  if ($contentNode) {
+    if (!$contentNode.prop('setCursor')) {
+      //只设置一次
+      if (eventName === ('drag' || 'dragTag')) {
+        $contentNode.css('cursor', 'Move');
+      } else {
+        $contentNode.css('cursor', 'Pointer');
+      }
+      $contentNode.prop('setCursor', 'true');
     }
+  }
 };
 
 /**
@@ -47433,38 +47770,41 @@ var addCursor = function addCursor(eventName, $contentNode) {
  * @param  {[type]} data      [description]
  * @return {[type]}           [description]
  */
-var bind$1 = function bind$1(eventDrop, data) {
-    var dragObj = void 0;
-    var handler = void 0;
-    var reference = void 0;
-    var eventContext = data.eventContext;
-    var eventName = data.eventName;
-    var supportSwipe = data.supportSwipe;
+var _bind = function _bind(eventDrop, data) {
+  var dragObj = void 0;
+  var handler = void 0;
+  var reference = void 0;
+  var eventContext = data.eventContext;
+  var eventName = data.eventName;
+  var supportSwipe = data.supportSwipe;
 
-    if (eventName === 'drag') {
-        //拖动
-        dragObj = new _class(eventContext, null, data.parameter, eventDrop.startRun, eventDrop.stopRun);
-    } else if (eventName === 'dragTag') {
-        //拖拽
-        dragObj = new _class(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
-    } else {
-        handler = function handler() {
-            data.eventRun.call(eventContext);
-        };
-        if (eventName === 'tap') {
-            //单机bind
-            reference = simpleEvent(eventContext, handler, supportSwipe);
-        } else {
-            //复杂用hammer
-            reference = complexEvent(eventContext, eventName, handler, supportSwipe);
-        }
-    }
-
-    return {
-        dragObj: dragObj,
-        reference: reference,
-        handler: handler
+  if (eventName === 'drag') {
+    //拖动
+    dragObj = new _class(eventContext, null, data.parameter, eventDrop.startRun, eventDrop.stopRun);
+  } else if (eventName === 'dragTag') {
+    //拖拽
+    dragObj = new _class(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
+  } else {
+    handler = function handler() {
+      data.eventRun.call(eventContext);
     };
+    /////////////////
+    /// tap click
+    /////////////////
+    if (eventName === 'tap' || eventName === 'click') {
+      reference = simpleEvent(eventName, eventContext, handler, supportSwipe);
+    }
+    //复杂用hammer
+    else {
+        reference = complexEvent(eventContext, eventName, handler, supportSwipe);
+      }
+  }
+
+  return {
+    dragObj: dragObj,
+    reference: reference,
+    handler: handler
+  };
 };
 
 /**
@@ -47475,22 +47815,22 @@ var bind$1 = function bind$1(eventDrop, data) {
  * 2: 对于拖拽dragTag， para表示目标对象的target
  */
 function distribute(data) {
-    //针对软件培训的操作行为下光标状态需求
-    Xut.plat.isBrowser && data.domMode && addCursor(data.eventName, data.eventContext);
+  //针对软件培训的操作行为下光标状态需求
+  Xut.plat.isBrowser && data.domMode && addCursor(data.eventName, data.eventContext);
 
-    //绑定事件
-    var eventDrop = data.eventDrop;
+  //绑定事件
+  var eventDrop = data.eventDrop;
 
-    //拖动,引用,回调
-    var eventObj = bind$1(eventDrop, data);
+  //拖动,引用,回调
+  var eventObj = _bind(eventDrop, data);
 
-    //拖动,拖拽对象处理
-    if (eventObj.dragObj && eventDrop.init) {
-        eventDrop.init(eventObj.dragObj);
-        return;
-    }
-    //其余事件
-    data.eventHandler(eventObj.reference, eventObj.handler);
+  //拖动,拖拽对象处理
+  if (eventObj.dragObj && eventDrop.init) {
+    eventDrop.init(eventObj.dragObj);
+    return;
+  }
+  //其余事件
+  data.eventHandler(eventObj.reference, eventObj.handler);
 }
 
 //数据库预定义14个事件接口
@@ -47499,7 +47839,7 @@ function distribute(data) {
 //https://github.com/EightMedia/hammer.js/wiki/Getting-Started
 //2014.3.18 新增assist 辅助对象事件
 function conversionEventType(eventType) {
-    return eventName[Number(eventType) - 1] || null;
+  return eventName[Number(eventType) - 1] || null;
 }
 
 /**
@@ -47519,24 +47859,24 @@ function conversionEventType(eventType) {
  *   callbackHook 回调函数 ,处理具体的事情
  */
 function bindContentEvent(data) {
-    //是否支持翻页
-    var supportSwipe = data.supportSwipe = isfilter(data.eventName);
-    //检测是否移除元素的默认行为,因为元素都具有翻页的特性
-    if (data.domMode) {
-        setDefaultBehavior(supportSwipe, data.eventContext);
-    }
-    distribute(data);
+  //是否支持翻页
+  var supportSwipe = data.supportSwipe = isfilter(data.eventName);
+  //检测是否移除元素的默认行为,因为元素都具有翻页的特性
+  if (data.domMode) {
+    setDefaultBehavior(supportSwipe, data.eventContext);
+  }
+  distribute(data);
 }
 
 /**
  * 销毁对象事件
  */
 function destroyContentEvent(eventData, eventName) {
-    if (eventData.eventReference) {
-        eventData.eventReference.off(eventName || eventData.eventName, eventData.eventHandler);
-        eventData.eventReference = null;
-        eventData.eventHandler = null;
-    }
+  if (eventData.eventReference) {
+    eventData.eventReference.off(eventName || eventData.eventName, eventData.eventHandler);
+    eventData.eventReference = null;
+    eventData.eventHandler = null;
+  }
 }
 
 /**
@@ -47622,7 +47962,7 @@ var combineEvents = function combineEvents(pagebase, eventRelated) {
         });
 
         //暴露引用
-        pagebase.listenerHooks.registerEvents = eventRelated;
+        pagebase.collectHooks.registerEvents = eventRelated;
     });
 };
 
@@ -47632,14 +47972,14 @@ function create$1(pagebase, eventRelated) {
 
 function destroy$1(pagebase) {
     var registerEvents;
-    if (registerEvents = pagebase.listenerHooks.registerEvents) {
+    if (registerEvents = pagebase.collectHooks.registerEvents) {
         _.each(registerEvents, function (edata) {
             _.each(edata, function (obj) {
                 obj.destroy && obj.destroy();
             });
         });
     }
-    pagebase.listenerHooks.registerEvents = null;
+    pagebase.collectHooks.registerEvents = null;
 }
 
 /**
@@ -48806,21 +49146,21 @@ function createCanvas(data, wrapObj) {
  * @return {[type]}             [description]
  */
 var makeWarpObj = function makeWarpObj(contentId, content, pageType, pid, virtualOffset) {
-    //唯一标示符
-    var prefix = "_" + pid + "_" + contentId;
-    return {
-        pageType: pageType,
-        contentId: contentId,
-        isJs: /.js$/i.test(content.md5), //html类型
-        isSvg: /.svg$/i.test(content.md5), //svg类型
-        data: content,
-        pid: pid,
-        virtualOffset: virtualOffset, //布局位置
-        containerName: 'Content' + prefix,
-        makeId: function makeId(name) {
-            return name + prefix;
-        }
-    };
+  //唯一标示符
+  var prefix = "_" + pid + "_" + contentId;
+  return {
+    pageType: pageType,
+    contentId: contentId,
+    isJs: /.js$/i.test(content.md5), //html类型
+    isSvg: /.svg$/i.test(content.md5), //svg类型
+    data: content,
+    pid: pid,
+    virtualOffset: virtualOffset, //布局位置
+    containerName: 'Content' + prefix,
+    makeId: function makeId(name) {
+      return name + prefix;
+    }
+  };
 };
 
 /**
@@ -48829,37 +49169,37 @@ var makeWarpObj = function makeWarpObj(contentId, content, pageType, pid, virtua
  */
 var analysisPath = function analysisPath(wrapObj, conData) {
 
-    var imgContent = conData.md5;
+  var imgContent = conData.md5;
 
-    //如果基础图被重新定义过
-    if (config.baseImageSuffix) {
-        imgContent = imgContent.replace(/\w+./, '$&' + config.baseImageSuffix + '.');
+  //如果基础图被重新定义过
+  if (config.baseImageSuffix) {
+    imgContent = imgContent.replace(/\w+./, '$&' + config.baseImageSuffix + '.');
+  }
+
+  var isGif = /.gif$/i.test(imgContent); //是gif格式
+  var originalPathImg = config.pathAddress + imgContent; //原始地址
+
+  //处理gif图片缓存+随机数
+  var pathImg = isGif ? createRandomImg(originalPathImg) : originalPathImg;
+
+  if (conData.category === "AutoCompSprite") {
+    try {
+      var resourcePath = config.pathAddress + imgContent + "/app.json";
+      var results = getResources(resourcePath);
+      var spiritList = results.spiritList[0];
+      var actListName = spiritList.params.actList;
+      var name = spiritList.params[actListName].ImageList[0].name;
+      pathImg += '/' + name;
+      conData.resource = results;
+      conData.containerName = wrapObj.containerName;
+    } catch (err) {
+      console.log('AutoCompSprite获取数据失败');
     }
+  }
 
-    var isGif = /.gif$/i.test(imgContent); //是gif格式
-    var originalPathImg = config.pathAddress + imgContent; //原始地址
-
-    //处理gif图片缓存+随机数
-    var pathImg = isGif ? createRandomImg(originalPathImg) : originalPathImg;
-
-    if (conData.category === "AutoCompSprite") {
-        try {
-            var resourcePath = config.pathAddress + imgContent + "/app.json";
-            var results = getResources(resourcePath);
-            var spiritList = results.spiritList[0];
-            var actListName = spiritList.params.actList;
-            var name = spiritList.params[actListName].ImageList[0].name;
-            pathImg += '/' + name;
-            conData.resource = results;
-            conData.containerName = wrapObj.containerName;
-        } catch (err) {
-            console.log('AutoCompSprite获取数据失败');
-        }
-    }
-
-    wrapObj.imgContent = imgContent;
-    wrapObj.isGif = isGif;
-    wrapObj.pathImg = pathImg;
+  wrapObj.imgContent = imgContent;
+  wrapObj.isGif = isGif;
+  wrapObj.pathImg = pathImg;
 };
 
 /**
@@ -48872,21 +49212,21 @@ var analysisPath = function analysisPath(wrapObj, conData) {
  * @return {[type]}             [description]
  */
 var externalFile = function externalFile(wrapObj, svgCallback) {
-    //svg零件不创建解析具体内容
-    if (wrapObj.isSvg) {
-        readFile(wrapObj.data.md5, function (svgdata) {
-            wrapObj.svgstr = svgdata;
-            svgCallback(wrapObj);
-        });
-    } else if (wrapObj.isJs) {
-        //如果是.js的svg文件
-        readFile(wrapObj.data.md5, function (htmldata) {
-            wrapObj.htmlstr = htmldata;
-            svgCallback(wrapObj);
-        }, "js");
-    } else {
-        svgCallback(wrapObj);
-    }
+  //svg零件不创建解析具体内容
+  if (wrapObj.isSvg) {
+    readFile(wrapObj.data.md5, function (svgdata) {
+      wrapObj.svgstr = svgdata;
+      svgCallback(wrapObj);
+    });
+  } else if (wrapObj.isJs) {
+    //如果是.js的svg文件
+    readFile(wrapObj.data.md5, function (htmldata) {
+      wrapObj.htmlstr = htmldata;
+      svgCallback(wrapObj);
+    }, "js");
+  } else {
+    svgCallback(wrapObj);
+  }
 };
 
 /**
@@ -48895,19 +49235,19 @@ var externalFile = function externalFile(wrapObj, svgCallback) {
  */
 var allotRatio = function allotRatio(fixRadio, headerFooterMode) {
 
-    if (fixRadio && headerFooterMode) {
-        config.devtools && $$warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式');
-    }
+  if (fixRadio && headerFooterMode) {
+    config.devtools && $$warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式');
+  }
 
-    //页眉页脚模式
-    if (headerFooterMode) {
-        return headerFooterMode;
-    }
+  //页眉页脚模式
+  if (headerFooterMode) {
+    return headerFooterMode;
+  }
 
-    //设置图片缩放模式1
-    if (fixRadio) {
-        return 3;
-    }
+  //设置图片缩放模式1
+  if (fixRadio) {
+    return 3;
+  }
 };
 
 //=====================================================
@@ -48921,285 +49261,286 @@ var allotRatio = function allotRatio(fixRadio, headerFooterMode) {
 //
 //=======================================================
 function contentStructure(callback, data, context) {
-    var content = void 0,
-        contentId = void 0,
-        wrapObj = void 0,
-        containerObj = void 0,
-        sizeResults = void 0,
-        contentCollection = void 0,
-        contentCount = void 0,
-        cloneContentCount = void 0,
-        pid = data.pid,
-        pageType = data.pageType,
-        containerRelated = data.containerRelated,
-        seasonRelated = data.seasonRelated,
-        isMaster = pageType === 'master',
+  var content = void 0,
+      contentId = void 0,
+      wrapObj = void 0,
+      containerObj = void 0,
+      sizeResults = void 0,
+      contentCollection = void 0,
+      contentCount = void 0,
+      cloneContentCount = void 0,
+      pid = data.pid,
+      pageType = data.pageType,
+      containerRelated = data.containerRelated,
+      seasonRelated = data.seasonRelated,
+      isMaster = pageType === 'master',
 
-    //容器li生成的位置
-    //left,right
-    virtualOffset = data.virtualOffset,
+  //容器li生成的位置
+  //left,right
+  virtualOffset = data.virtualOffset,
 
-    ////////////
-    //浮动处理 //
-    //1.浮动母版对象
-    //2.浮动页面对象
-    ////////////
-    floatMaters = data.floatMaters,
-        floatPages = data.floatPages,
+  ////////////
+  //浮动处理 //
+  //1.浮动母版对象
+  //2.浮动页面对象
+  ////////////
+  floatMaters = data.floatMaters,
+      floatPages = data.floatPages,
 
-    //文本框
-    //2016.1.7
-    contentHtmlBoxIds = [],
+  //文本框
+  //2016.1.7
+  contentHtmlBoxIds = [],
 
-    //所有content的id记录
-    //返回出去给ibooks预编译使用
-    idFix = [],
+  //所有content的id记录
+  //返回出去给ibooks预编译使用
+  idFix = [],
 
-    //文本效果
-    //2017.1.3
-    //收集对应的content数据
-    textFx = [],
+  //文本效果
+  //2017.1.3
+  //收集对应的content数据
+  textFx = [],
 
-    //缓存contentDas
-    contentDas = {},
+  //缓存contentDas
+  contentDas = {},
 
-    //缓存content结构
-    cachedContentStr = [],
+  //缓存content结构
+  cachedContentStr = [],
 
-    //页眉页脚对象合集
-    headerFooterMode = {},
+  //页眉页脚对象合集
+  headerFooterMode = {},
 
-    //自定义样式
-    getStyle = data.getStyle;
+  //自定义样式
+  getStyle = data.getStyle;
 
-    //容器结构创建
-    if (containerRelated && containerRelated.length) {
-        containerObj = createContainer$1(containerRelated, pid, getStyle);
-    }
+  //容器结构创建
+  if (containerRelated && containerRelated.length) {
+    containerObj = createContainer$1(containerRelated, pid, getStyle);
+  }
 
-    /**
-     * 解析出每一个content对应的动作
-     * 传递prefilter过滤器
-     * 1 浮动动作
-     * 2 canvas动作
-     * @type {[type]}
-     */
-    contentCollection = parseContentDas(data.createContentIds, prefilter);
-    contentCount = cloneContentCount = contentCollection.length;
+  /**
+   * 解析出每一个content对应的动作
+   * 传递prefilter过滤器
+   * 1 浮动动作
+   * 2 canvas动作
+   * @type {[type]}
+   */
+  contentCollection = parseContentDas(data.createContentIds, prefilter);
+  contentCount = cloneContentCount = contentCollection.length;
 
-    //如果是启动了特殊高精灵动画
-    //强制打开canvas模式设置
-    //这里可以排除掉其余的canvas动画
-    if (data.canvasRelated.onlyCompSprite) {
-        data.canvasRelated.enable = true;
-    }
+  //如果是启动了特殊高精灵动画
+  //强制打开canvas模式设置
+  //这里可以排除掉其余的canvas动画
+  if (data.canvasRelated.onlyCompSprite) {
+    data.canvasRelated.enable = true;
+  }
 
-    /**
-     * 转化canvas模式 contentMode 0/1
-     * 页面或者母板浮动对象
-     * 页面是最顶级的
-     */
-    function parseParameter(parameter, contentId, conData) {
-        var zIndex;
-        _.each(parameter, function (para) {
+  /**
+   * 转化canvas模式 contentMode 0/1
+   * 页面或者母板浮动对象
+   * 页面是最顶级的
+   */
+  function parseParameter(parameter, contentId, conData) {
+    var zIndex;
+    _.each(parameter, function (para) {
 
-            //有页眉页脚对象
-            //2017.1.18
-            if (para.HeaderOrFooter) {
-                if (headerFooterMode[contentId]) {
-                    $$warn('页眉页脚对象重复设置,cid:' + contentId);
-                }
-                headerFooterMode[contentId] = Number(para.HeaderOrFooter);
-            }
-
-            //保持图片正比缩放
-            //给mini使用
-            //2016.12.15
-            if (para.fixRadio) {
-                conData.fixRadio = true;
-            }
-
-            //针对母版content的topmost数据处理，找出浮动的对象Id
-            //排除数据topmost为0的处理
-            zIndex = para['topmost'];
-            if (zIndex && zIndex != 0) {
-                if (isMaster) {
-                    //收集浮动的母版对象id
-                    floatMaters.ids.push(contentId);
-                    floatMaters.zIndex[contentId] = zIndex;
-                } else {
-                    //浮动页面
-                    floatPages.ids.push(contentId);
-                    floatPages.zIndex[contentId] = zIndex;
-                }
-            }
-        });
-    }
-
-    /**
-     * 开始过滤参数
-     */
-    function prefilter(conData, contentId) {
-        var eventId, parameter;
-        var category = conData.category;
-
-        //如果是模板书签，强制为浮动对象
-        if (isMaster && (eventId = seasonRelated[contentId])) {
-            if (eventId['BookMarks']) {
-                floatMaters.ids.push(contentId);
-            }
+      //有页眉页脚对象
+      //2017.1.18
+      if (para.HeaderOrFooter) {
+        if (headerFooterMode[contentId]) {
+          $$warn('页眉页脚对象重复设置,cid:' + contentId);
         }
+        headerFooterMode[contentId] = Number(para.HeaderOrFooter);
+      }
 
-        //如果有parameter参数
-        //1 浮动对象
-        //2 canvas对象
-        if (conData) {
-            //匹配canvas对象数据
-            if (category) {
-                //解析canvas先关数据
-                parseCanvas(contentId, category, conData, data);
-            }
-            //如果有parameter
-            if (conData.parameter) {
-                if (parameter = parseJSON(conData.parameter)) {
-                    //parameter保持数组格式
-                    parseParameter(parameter.length ? parameter : [parameter], contentId, conData);
-                }
-            }
-        }
-    }
+      //保持图片正比缩放
+      //给mini使用
+      //2016.12.15
+      if (para.fixRadio) {
+        conData.fixRadio = true;
+      }
 
-    /**
-     * 创建content节点
-     */
-    function createRelated(contentId, wrapObj) {
-        externalFile(wrapObj, function (wrapObj) {
-            var uuid = void 0,
-                startStr = void 0,
-                contentStr = void 0;
-            var conData = wrapObj.data;
-
-            //拼接地址
-            analysisPath(wrapObj, conData);
-
-            //canvas节点
-            if (conData.canvasMode) {
-                contentStr = createCanvas(conData, wrapObj);
-            } else {
-                //dom节点
-                contentStr = createDom$1(conData, wrapObj);
-            }
-            //如果创建的是容器对象
-            if (containerObj && (uuid = containerObj[contentId])) {
-                startStr = containerObj[uuid];
-                startStr.start.push(contentStr);
-            } else {
-                //普通对象
-                cachedContentStr.unshift(contentStr);
-            }
-            //检测完毕
-            checkComplete();
-        });
-    }
-
-    /**
-     * 开始创建
-     */
-    function startCreate(wrapObj, content, contentId) {
-        contentDas[contentId] = content; //缓存数据
-        createRelated(contentId, wrapObj);
-    }
-
-    /**
-     * 清理剔除的content
-     * @param  {[type]} contentId [description]
-     * @return {[type]}           [description]
-     */
-    function clearContent(contentId) {
-        data.createContentIds.splice(data.createContentIds.indexOf(contentId), 1);
-        checkComplete();
-    }
-
-    /**
-     * 返回处理
-     * @return {[type]} [description]
-     */
-    function checkComplete() {
-        if (cloneContentCount === 1) {
-            var _data = {
-                contentDas: contentDas,
-                idFix: idFix,
-                textFx: textFx,
-                contentHtmlBoxIds: contentHtmlBoxIds,
-                headerFooterMode: headerFooterMode,
-                containerPrefix: ''
-            };
-
-            //针对容器处理
-            if (containerObj) {
-                var start, end, containerPrefix, containerStr;
-                containerStr = [];
-
-                //合并容器
-                containerObj.createUUID.forEach(function (uuid) {
-                    start = containerObj[uuid].start.join('');
-                    end = containerObj[uuid].end;
-                    containerStr.push(start.concat(end));
-                });
-                containerStr = containerStr.join('');
-                containerPrefix = containerObj.containerName;
-                containerObj = null;
-                _data.contentStr = cachedContentStr.join('').concat(containerStr);
-                _data.containerPrefix = containerPrefix;
-            } else {
-                _data.contentStr = cachedContentStr.join('');
-            }
-            callback.call(context, _data);
-        }
-        cloneContentCount--;
-    }
-
-    //开始生成所有的节点
-    //1:dom
-    //2:canvas
-    while (contentCount--) {
-        //根据数据创content结构
-        if (content = contentCollection[contentCount]) {
-            contentId = content['_id'];
-            //创建包装器,处理数据引用关系
-            wrapObj = makeWarpObj(contentId, content, pageType, pid, virtualOffset);
-            idFix.push(wrapObj.containerName);
-
-            //如果有文本效果标记
-            if (content.texteffect) {
-                content.texteffectId = wrapObj.containerName;
-                textFx.push(content);
-            }
-            //保存文本框content的Id
-            if (wrapObj.isJs) {
-                contentHtmlBoxIds.push(contentId);
-            }
-
-            //转换缩放比
-            sizeResults = reviseSize({
-                results: wrapObj.data,
-                getStyle: getStyle,
-                proportion: getStyle.pageProportion,
-                proportionMode: allotRatio(content.fixRadio, headerFooterMode[contentId])
-            });
-
-            //如果是隐藏的页面页脚，重写这个标记
-            if (sizeResults.isHide) {
-                headerFooterMode[contentId] = 'hide';
-            }
-
-            //正常模式下创建
-            startCreate(wrapObj, content, contentId);
+      //针对母版content的topmost数据处理，找出浮动的对象Id
+      //排除数据topmost为0的处理
+      zIndex = para['topmost'];
+      if (zIndex && zIndex != 0) {
+        if (isMaster) {
+          //收集浮动的母版对象id
+          floatMaters.ids.push(contentId);
+          floatMaters.zIndex[contentId] = zIndex;
         } else {
-            //或者数据出错
-            checkComplete();
+          //浮动页面
+          floatPages.ids.push(contentId);
+          floatPages.zIndex[contentId] = zIndex;
         }
+      }
+    });
+  }
+
+  /**
+   * 开始过滤参数
+   */
+  function prefilter(conData, contentId) {
+    var eventId, parameter;
+    var category = conData.category;
+
+    //如果是模板书签，强制为浮动对象
+    if (isMaster && (eventId = seasonRelated[contentId])) {
+      if (eventId['BookMarks']) {
+        floatMaters.ids.push(contentId);
+      }
     }
+
+    //如果有parameter参数
+    //1 浮动对象
+    //2 canvas对象
+    if (conData) {
+      //匹配canvas对象数据
+      if (category) {
+        //解析canvas先关数据
+        parseCanvas(contentId, category, conData, data);
+      }
+      //如果有parameter
+      if (conData.parameter) {
+        if (parameter = parseJSON(conData.parameter)) {
+          //parameter保持数组格式
+          parseParameter(parameter.length ? parameter : [parameter], contentId, conData);
+        }
+      }
+    }
+  }
+
+  /**
+   * 创建content节点
+   */
+  function createRelated(contentId, wrapObj) {
+    externalFile(wrapObj, function (wrapObj) {
+      var uuid = void 0,
+          startStr = void 0,
+          contentStr = void 0;
+      var conData = wrapObj.data;
+
+      //拼接地址
+      analysisPath(wrapObj, conData);
+
+      //canvas节点
+      if (conData.canvasMode) {
+        contentStr = createCanvas(conData, wrapObj);
+      } else {
+        //dom节点
+        contentStr = createDom$1(conData, wrapObj);
+      }
+      //如果创建的是容器对象
+      if (containerObj && (uuid = containerObj[contentId])) {
+        startStr = containerObj[uuid];
+        startStr.start.push(contentStr);
+      } else {
+        //普通对象
+        cachedContentStr.unshift(contentStr);
+      }
+      //检测完毕
+      checkComplete();
+    });
+  }
+
+  /**
+   * 开始创建
+   */
+  function startCreate(wrapObj, content, contentId) {
+    contentDas[contentId] = content; //缓存数据
+    createRelated(contentId, wrapObj);
+  }
+
+  /**
+   * 清理剔除的content
+   * @param  {[type]} contentId [description]
+   * @return {[type]}           [description]
+   */
+  function clearContent(contentId) {
+    data.createContentIds.splice(data.createContentIds.indexOf(contentId), 1);
+    checkComplete();
+  }
+
+  /**
+   * 返回处理
+   * @return {[type]} [description]
+   */
+  function checkComplete() {
+    if (cloneContentCount === 1) {
+      var _data = {
+        contentDas: contentDas,
+        idFix: idFix,
+        textFx: textFx,
+        contentHtmlBoxIds: contentHtmlBoxIds,
+        headerFooterMode: headerFooterMode,
+        containerPrefix: ''
+      };
+
+      //针对容器处理
+      if (containerObj) {
+        var start, end, containerPrefix, containerStr;
+        containerStr = [];
+
+        //合并容器
+        containerObj.createUUID.forEach(function (uuid) {
+          start = containerObj[uuid].start.join('');
+          end = containerObj[uuid].end;
+          containerStr.push(start.concat(end));
+        });
+        containerStr = containerStr.join('');
+        containerPrefix = containerObj.containerName;
+        containerObj = null;
+        _data.contentStr = cachedContentStr.join('').concat(containerStr);
+        _data.containerPrefix = containerPrefix;
+      } else {
+        _data.contentStr = cachedContentStr.join('');
+      }
+      callback.call(context, _data);
+    }
+    cloneContentCount--;
+  }
+
+  //开始生成所有的节点
+  //1:dom
+  //2:canvas
+  while (contentCount--) {
+    //根据数据创content结构
+    if (content = contentCollection[contentCount]) {
+      contentId = content['_id'];
+      //创建包装器,处理数据引用关系
+      wrapObj = makeWarpObj(contentId, content, pageType, pid, virtualOffset);
+      idFix.push(wrapObj.containerName);
+
+      //如果有文本效果标记
+      //content.texteffect = " "//数据库写错，多了一个空格
+      if (content.texteffect && content.texteffect.trim()) {
+        content.texteffectId = wrapObj.containerName;
+        textFx.push(content);
+      }
+      //保存文本框content的Id
+      if (wrapObj.isJs) {
+        contentHtmlBoxIds.push(contentId);
+      }
+
+      //转换缩放比
+      sizeResults = reviseSize({
+        results: wrapObj.data,
+        getStyle: getStyle,
+        proportion: getStyle.pageProportion,
+        proportionMode: allotRatio(content.fixRadio, headerFooterMode[contentId])
+      });
+
+      //如果是隐藏的页面页脚，重写这个标记
+      if (sizeResults.isHide) {
+        headerFooterMode[contentId] = 'hide';
+      }
+
+      //正常模式下创建
+      startCreate(wrapObj, content, contentId);
+    } else {
+      //或者数据出错
+      checkComplete();
+    }
+  }
 }
 
 /*****************
@@ -51031,219 +51372,6 @@ function contentParser(compileActivitys, data) {
     });
 }
 
-/**
- * 当监听的节点内容发生变化时,触发指定的回调
- * @param opts {
- *   container:父容器,dom对象或jQuery对象
- *   content  :要加入父容器的内容,字符串或jQuery对象
- *   position :内容插入父容器的位置,'first' 表示在前加入,默认在末尾
- *   delay    :延时,默认0
- *   }
- * @version  1.02
- * @author [author] bjtqti
- * @return {[type]} [description]
- */
-
-var DOC = document;
-var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-
-var implementation = DOC.implementation.hasFeature("MutationEvents", "2.0");
-
-/**
- * Defer a task to execute it asynchronously. Ideally this
- * should be executed as a microtask, so we leverage
- * MutationObserver if it's available, and fallback to
- * setTimeout(0).
- *
- * @param {Function} cb
- * @param {Object} ctx
- */
-var _nextTick = function () {
-    var callbacks = [];
-    var pending = false;
-    var timerFunc;
-
-    function nextTickHandler() {
-        pending = false;
-        var copies = callbacks.slice(0);
-        callbacks = [];
-        for (var i = 0; i < copies.length; i++) {
-            copies[i]();
-        }
-    }
-
-    if (typeof MutationObserver !== 'undefined' && Xut.plat.supportMutationObserver) {
-        var counter = 1;
-        var observer = new MutationObserver(nextTickHandler);
-        var textNode = document.createTextNode(counter);
-        observer.observe(textNode, {
-            characterData: true
-        });
-        timerFunc = function timerFunc() {
-            counter = (counter + 1) % 2;
-            textNode.data = counter;
-        };
-    } else {
-        // webpack attempts to inject a shim for setImmediate
-        // if it is used as a global, so we have to work around that to
-        // avoid bundling unnecessary code.
-        var context = Xut.plat.isBrowser ? window : typeof global !== 'undefined' ? global : {};
-        timerFunc = context.setImmediate || setTimeout;
-    }
-    return function (cb, ctx) {
-        var func = ctx ? function () {
-            cb.call(ctx);
-        } : cb;
-        callbacks.push(func);
-        if (pending) return;
-        pending = true;
-        timerFunc(nextTickHandler, 0);
-    };
-}();
-
-var nextTick = function nextTick(_ref, callback, context) {
-    var container = _ref.container,
-        content = _ref.content,
-        position = _ref.position,
-        _ref$delay = _ref.delay,
-        delay = _ref$delay === undefined ? 0 : _ref$delay;
-
-
-    //如果只提供一个回到函数
-    if (arguments.length === 1 && typeof arguments[0] === 'function') {
-        callback = arguments[0];
-        if (typeof callback === 'function') {
-            return _nextTick(callback);
-        }
-        console.log('nextTick: 参数提供错误');
-        return;
-    }
-
-    if (!container || !content) {
-        return;
-    }
-
-    //检查容器---$(container) 转为dom对象
-    if (container instanceof $) {
-        container = container[0];
-    }
-
-    if (container.nodeType !== 1) {
-        console.log('nextTick: container must be HTMLLIElement ');
-        return;
-    }
-
-    var animatId = 'T' + (Math.random() * 10000 << 1);
-    var tick = DOC.createElement('input');
-
-    //标记任务
-    tick.setAttribute('value', animatId);
-
-    //检查内容
-    if (typeof content === 'string') {
-        var temp = $(content);
-        if (!temp[0]) {
-            //纯文本内容
-            temp = DOC.createTextNode(content);
-            temp = $(temp);
-        }
-        content = temp;
-        temp = null;
-    }
-
-    /**
-     * 完成任务后处理&Observer
-     * @return {[type]} [description]
-     */
-    var _completeTask = function _completeTask() {
-        container.removeChild(tick);
-        callback.call(context);
-        container = null;
-        tick = null;
-        context = null;
-    };
-
-    /**
-     * 将内容加入父容器
-     * @return {[type]} [description]
-     */
-    var _appendChild = function _appendChild() {
-        //拼接内容
-        var frag = DOC.createDocumentFragment();
-        var len = content.length;
-        for (var i = 0; i < len; i++) {
-            frag.appendChild(content[i]);
-        }
-        frag.appendChild(tick);
-
-        //判断插入的位置
-        if (position === 'first') {
-            container.insertBefore(frag, container.firstChild);
-        } else {
-            container.appendChild(frag);
-        }
-
-        frag = null;
-
-        //触发变动事件
-        tick.setAttribute('value', animatId);
-    };
-
-    if (MutationObserver) {
-        var observer = new MutationObserver(function (mutations) {
-            mutations.forEach(function (record) {
-                if (record.oldValue === animatId) {
-                    _completeTask();
-                    observer = null;
-                }
-            });
-        });
-
-        //设置要监听的属性
-        observer.observe(tick, {
-            attributes: true,
-            //childList: true,
-            attributeOldValue: true,
-            attributeFilter: ["value"] //只监听value属性,提高性能
-        });
-
-        _appendChild();
-    } else {
-
-        //检测是否支持DOM变动事件
-        if (implementation) {
-            (function () {
-
-                /**
-                 * 完成任务后处理&Event
-                 * @param  {[type]} event [description]
-                 * @return {[type]}       [description]
-                 */
-                var _finishTask = function _finishTask(event) {
-                    if (event.target.value === animatId) {
-                        //container.removeEventListener('DOMNodeRemoved',_finishTask,false);
-                        container.removeEventListener('DOMNodeInserted', _finishTask, false);
-                        callback.call(context);
-                    }
-                };
-
-                //container.addEventListener('DOMNodeRemoved',_finishTask,false);
-                container.addEventListener('DOMNodeInserted', _finishTask, false);
-                _appendChild();
-                container.removeChild(tick);
-            })();
-        } else {
-            //歉容Android2.xx处理
-            _appendChild();
-            setTimeout(function () {
-                _completeTask();
-            }, delay);
-        }
-    }
-};
-
-Xut.nextTick = nextTick;
-
 var TRANSFORM = Xut.style.transform;
 
 /**
@@ -52484,7 +52612,7 @@ var Subtitle = function () {
              * 设置父容器div 字体颜色，大小，类型，位置，文本水平、垂直居中
              */
             function createDivStyle(parent, data) {
-                var value = setProportion$1({
+                var value = setProportion({
                     width: data.width,
                     height: data.height,
                     left: data.left,
@@ -52552,6 +52680,7 @@ var Subtitle = function () {
             _.each(this.cacheCreateDivs, function (node) {
                 node.parentNode.removeChild(node);
             });
+
             //恢复初始状态
             _.each(this.ancestors, function (node, id) {
                 var orgValue = self.orgAncestorVisibility[id];
@@ -52580,167 +52709,177 @@ var Subtitle = function () {
  */
 
 var Base = function () {
-    function Base() {
-        classCallCheck(this, Base);
+  function Base() {
+    classCallCheck(this, Base);
+  }
+
+  /**
+   * 构建之前关数据
+   * @param  {[type]} trackId [description]
+   * @param  {[type]} options [description]
+   * @return {[type]}         [description]
+   */
+
+
+  createClass(Base, [{
+    key: 'preRelated',
+    value: function preRelated(trackId, options) {
+      //完成end后 外部回调删除这个对象
+      //单独调用引用对象
+      //传递一个 options.complete
+      this.innerCallback = options.innerCallback;
+      //仅运行一次
+      //外部调用
+      this.outerCallback = trackId == 9999 ? options.complete : null;
     }
 
     /**
-     * 构建之前关数据
-     * @param  {[type]} trackId [description]
-     * @param  {[type]} options [description]
-     * @return {[type]}         [description]
+     * 构建之后关数据
+     * @param  {[type]} options     [description]
+     * @param  {[type]} controlDoms [description]
+     * @return {[type]}             [description]
      */
 
+  }, {
+    key: 'afterRelated',
+    value: function afterRelated(options, controlDoms) {
+      var _this = this;
 
-    createClass(Base, [{
-        key: 'preRelated',
-        value: function preRelated(trackId, options) {
-            //完成end后 外部回调删除这个对象
-            //单独调用引用对象
-            //传递一个 options.complete
-            this.innerCallback = options.innerCallback;
-            //仅运行一次
-            //外部调用
-            this.outerCallback = trackId == 9999 ? options.complete : null;
+      //音频重复播放次数
+      if (options.data && options.data.repeat) {
+        this.repeat = Number(options.data.repeat); //需要重复
+      }
+      //音频动作
+      if (options.action) {
+        this.acitonObj = Action(options);
+      }
+      //字幕对象
+      if (options.subtitles && options.subtitles.length > 0) {
+        //创建字幕对象
+        this.subtitleObject = new Subtitle(options, controlDoms, function (cb) {
+          return _this.getAudioTime(cb);
+        });
+      }
+
+      //如果有外部回调处理
+      if (this.outerCallback) {
+        this.outerCallback.call(this);
+      }
+    }
+
+    /**
+     * 运行成功失败后处理方法
+     * phoengap会调用callbackProcess
+     * @param  {[type]} sysCommand [description]
+     * @return {[type]}            [description]
+     */
+
+  }, {
+    key: 'callbackProcess',
+    value: function callbackProcess(sysCommand) {
+      if (this.outerCallback) {
+        //外部调用结束
+        this.end();
+      } else {
+        //安卓没有重复播放
+        //phonegap未处理
+        if (!Xut.plat.isAndroid && this.repeat) {
+          //如果需要重复
+          this.repeatProcess();
+        } else {
+          //外部清理对象
+          //audioManager中直接删当前对象
+          this.innerCallback && this.innerCallback(this);
         }
+      }
+    }
 
-        /**
-         * 构建之后关数据
-         * @param  {[type]} options     [description]
-         * @param  {[type]} controlDoms [description]
-         * @return {[type]}             [description]
-         */
+    /**
+     * 重复处理
+     * @return {[type]} [description]
+     */
 
-    }, {
-        key: 'afterRelated',
-        value: function afterRelated(options, controlDoms) {
-            var _this = this;
+  }, {
+    key: 'repeatProcess',
+    value: function repeatProcess() {
+      --this.repeat;
+      this.play();
+    }
 
-            //音频重复播放次数
-            if (options.data && options.data.repeat) {
-                this.repeat = Number(options.data.repeat); //需要重复
-            }
-            //音频动作
-            if (options.action) {
-                this.acitonObj = Action(options);
-            }
-            //字幕对象
-            if (options.subtitles && options.subtitles.length > 0) {
-                //创建字幕对象
-                this.subtitleObject = new Subtitle(options, controlDoms, function (cb) {
-                    return _this.getAudioTime(cb);
-                });
-            }
+    /**
+     * 播放
+     * @return {[type]} [description]
+     */
 
-            //如果有外部回调处理
-            if (this.outerCallback) {
-                this.outerCallback.call(this);
-            }
+  }, {
+    key: 'play',
+    value: function play() {
+      var _this2 = this;
+
+      //flash模式不执行
+      if (this.audio && !this.isFlash) {
+        this.status = 'playing';
+        //支持自动播放
+        if (Xut.plat.hasAutoPlayAudio && window.WeixinJSBridge) {
+          //微信上单独处理
+          window.WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
+            _this2.audio.play();
+          });
+        } else {
+          this.audio.play();
         }
+      }
+      this.acitonObj && this.acitonObj.play();
+    }
 
-        /**
-         * 运行成功失败后处理方法
-         * phoengap会调用callbackProcess
-         * @param  {[type]} sysCommand [description]
-         * @return {[type]}            [description]
-         */
+    /**
+     * 停止
+     * @return {[type]} [description]
+     */
 
-    }, {
-        key: 'callbackProcess',
-        value: function callbackProcess(sysCommand) {
-            if (this.outerCallback) {
-                //外部调用结束
-                this.end();
-            } else {
-                //安卓没有重复播放
-                //phonegap未处理
-                if (!Xut.plat.isAndroid && this.repeat) {
-                    //如果需要重复
-                    this.repeatProcess();
-                } else {
-                    //外部清理对象
-                    //audioManager中直接删当前对象
-                    this.innerCallback && this.innerCallback(this);
-                }
-            }
-        }
+  }, {
+    key: 'pause',
+    value: function pause() {
+      this.status = 'paused';
+      this.audio.pause();
+      this.acitonObj && this.acitonObj.pause();
+    }
 
-        /**
-         * 重复处理
-         * @return {[type]} [description]
-         */
+    /**
+     * 销毁
+     * @return {[type]} [description]
+     */
 
-    }, {
-        key: 'repeatProcess',
-        value: function repeatProcess() {
-            --this.repeat;
-            this.play();
-        }
+  }, {
+    key: 'end',
+    value: function end() {
+      this.status = 'ended';
+      this.audio.end();
+      this.audio = null;
+      this.acitonObj && this.acitonObj.destroy();
+    }
 
-        /**
-         * 播放
-         * @return {[type]} [description]
-         */
+    /**
+     * 相关
+     * @return {[type]} [description]
+     */
 
-    }, {
-        key: 'play',
-        value: function play() {
-            //flash模式不执行
-            if (this.audio && !this.isFlash) {
-                this.status = 'playing';
-                this.audio.play();
-            }
-            this.acitonObj && this.acitonObj.play();
-        }
-
-        /**
-         * 停止
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'pause',
-        value: function pause() {
-            this.status = 'paused';
-            this.audio.pause();
-            this.acitonObj && this.acitonObj.pause();
-        }
-
-        /**
-         * 销毁
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'end',
-        value: function end() {
-            this.status = 'ended';
-            this.audio.end();
-            this.audio = null;
-            this.acitonObj && this.acitonObj.destroy();
-        }
-
-        /**
-         * 相关
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'destroyRelated',
-        value: function destroyRelated() {
-            //销毁字幕
-            if (this.subtitleObject) {
-                this.subtitleObject.destroy();
-                this.subtitleObject = null;
-            }
-            //动作
-            if (this.acitonObj) {
-                this.acitonObj.destroy();
-                this.acitonObj = null;
-            }
-        }
-    }]);
-    return Base;
+  }, {
+    key: 'destroyRelated',
+    value: function destroyRelated() {
+      //销毁字幕
+      if (this.subtitleObject) {
+        this.subtitleObject.destroy();
+        this.subtitleObject = null;
+      }
+      //动作
+      if (this.acitonObj) {
+        this.acitonObj.destroy();
+        this.acitonObj = null;
+      }
+    }
+  }]);
+  return Base;
 }();
 
 /**
@@ -52806,20 +52945,20 @@ var audioPlayer = void 0;
 var plat$1 = Xut.plat;
 
 var UUIDcreatePart = function UUIDcreatePart(length) {
-    var uuidpart = "";
-    var uuidchar = void 0;
-    for (var i = 0; i < length; i++) {
-        uuidchar = parseInt(Math.random() * 256, 10).toString(16);
-        if (uuidchar.length == 1) {
-            uuidchar = "0" + uuidchar;
-        }
-        uuidpart += uuidchar;
+  var uuidpart = "";
+  var uuidchar = void 0;
+  for (var i = 0; i < length; i++) {
+    uuidchar = parseInt(Math.random() * 256, 10).toString(16);
+    if (uuidchar.length == 1) {
+      uuidchar = "0" + uuidchar;
     }
-    return uuidpart;
+    uuidpart += uuidchar;
+  }
+  return uuidpart;
 };
 
 var createUUID = function createUUID() {
-    return [4, 2, 2, 2, 6].map(UUIDcreatePart).join('-');
+  return [4, 2, 2, 2, 6].map(UUIDcreatePart).join('-');
 };
 
 /**
@@ -52828,70 +52967,70 @@ var createUUID = function createUUID() {
  */
 
 var _Flash = function (_BaseAudio) {
-    inherits(_Flash, _BaseAudio);
+  inherits(_Flash, _BaseAudio);
 
-    function _Flash(options, controlDoms) {
-        classCallCheck(this, _Flash);
+  function _Flash(options, controlDoms) {
+    classCallCheck(this, _Flash);
 
-        var _this = possibleConstructorReturn(this, (_Flash.__proto__ || Object.getPrototypeOf(_Flash)).call(this));
+    var _this = possibleConstructorReturn(this, (_Flash.__proto__ || Object.getPrototypeOf(_Flash)).call(this));
 
-        var trackId = options.trackId,
-            url = config.getAudioPath() + options.url,
-            self = _this,
-            audio;
+    var trackId = options.trackId,
+        url = config.getAudioPath() + options.url,
+        self = _this,
+        audio;
 
-        //构建之前处理
-        _this.preRelated(trackId, options);
+    //构建之前处理
+    _this.preRelated(trackId, options);
 
-        audio = new Audio5js({
-            swf_path: './lib/data/audio5js.swf',
-            throw_errors: true,
-            format_time: true,
-            ready: function ready(player) {
-                this.load(url);
-                //如果调用了播放
-                this.play();
-                self.status = "playing";
-            }
-        });
+    audio = new Audio5js({
+      swf_path: './lib/data/audio5js.swf',
+      throw_errors: true,
+      format_time: true,
+      ready: function ready(player) {
+        this.load(url);
+        //如果调用了播放
+        this.play();
+        self.status = "playing";
+      }
+    });
 
-        _this.audio = audio;
-        _this.trackId = trackId;
-        _this.status = 'playing';
-        _this.options = options;
+    _this.audio = audio;
+    _this.trackId = trackId;
+    _this.status = 'playing';
+    _this.options = options;
 
-        _this.isFlash = true;
+    _this.isFlash = true;
 
-        //相关数据
-        _this.afterRelated(options, controlDoms);
-        return _this;
+    //相关数据
+    _this.afterRelated(options, controlDoms);
+    return _this;
+  }
+
+  /**
+   * Compatible with asynchronous
+   * for subitile use
+   * get audio
+   * @return {[type]} [description]
+   */
+
+
+  createClass(_Flash, [{
+    key: 'getAudioTime',
+    value: function getAudioTime(callback) {
+      callback(Math.round(this.audio.audio.audio.currentTime * 1000));
     }
-
-    /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
-     * @return {[type]} [description]
-     */
-
-
-    createClass(_Flash, [{
-        key: 'getAudioTime',
-        value: function getAudioTime(callback) {
-            callback(Math.round(this.audio.audio.audio.currentTime * 1000));
-        }
-    }, {
-        key: 'end',
-        value: function end() {
-            if (this.audio) {
-                this.audio.destroy();
-                this.audio = null;
-            }
-            this.status = 'ended';
-            this.destroyRelated();
-        }
-    }]);
-    return _Flash;
+  }, {
+    key: 'end',
+    value: function end() {
+      if (this.audio) {
+        this.audio.destroy();
+        this.audio = null;
+      }
+      this.status = 'ended';
+      this.destroyRelated();
+    }
+  }]);
+  return _Flash;
 }(Base);
 
 /**
@@ -52901,65 +53040,65 @@ var _Flash = function (_BaseAudio) {
 
 
 var _Audio5js = function (_BaseAudio2) {
-    inherits(_Audio5js, _BaseAudio2);
+  inherits(_Audio5js, _BaseAudio2);
 
-    function _Audio5js(options, controlDoms) {
-        classCallCheck(this, _Audio5js);
+  function _Audio5js(options, controlDoms) {
+    classCallCheck(this, _Audio5js);
 
-        var _this2 = possibleConstructorReturn(this, (_Audio5js.__proto__ || Object.getPrototypeOf(_Audio5js)).call(this));
+    var _this2 = possibleConstructorReturn(this, (_Audio5js.__proto__ || Object.getPrototypeOf(_Audio5js)).call(this));
 
-        var trackId = options.trackId,
-            url = config.getAudioPath() + options.url,
-            self = _this2,
-            audio;
+    var trackId = options.trackId,
+        url = config.getAudioPath() + options.url,
+        self = _this2,
+        audio;
 
-        //构建之前处理
-        _this2.preRelated(trackId, options);
+    //构建之前处理
+    _this2.preRelated(trackId, options);
 
-        audio = new Audio5js({
-            ready: function ready(player) {
-                this.load(url);
-                //如果调用了播放
-                this.play();
-                self.status = "playing";
-            }
-        });
+    audio = new Audio5js({
+      ready: function ready(player) {
+        this.load(url);
+        //如果调用了播放
+        this.play();
+        self.status = "playing";
+      }
+    });
 
-        _this2.audio = audio;
-        _this2.trackId = trackId;
-        _this2.status = 'playing';
-        _this2.options = options;
+    _this2.audio = audio;
+    _this2.trackId = trackId;
+    _this2.status = 'playing';
+    _this2.options = options;
 
-        //相关数据
-        _this2.afterRelated(options, controlDoms);
-        return _this2;
+    //相关数据
+    _this2.afterRelated(options, controlDoms);
+    return _this2;
+  }
+
+  /**
+   * Compatible with asynchronous
+   * for subitile use
+   * get audio
+   * @return {[type]} [description]
+   */
+
+
+  createClass(_Audio5js, [{
+    key: 'getAudioTime',
+    value: function getAudioTime(callback) {
+      callback(Math.round(this.audio.audio.audio.currentTime * 1000));
     }
-
-    /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
-     * @return {[type]} [description]
-     */
-
-
-    createClass(_Audio5js, [{
-        key: 'getAudioTime',
-        value: function getAudioTime(callback) {
-            callback(Math.round(this.audio.audio.audio.currentTime * 1000));
-        }
-    }, {
-        key: 'end',
-        value: function end() {
-            if (this.audio) {
-                this.audio.destroy();
-                this.audio = null;
-            }
-            this.status = 'ended';
-            this.destroyRelated();
-        }
-    }]);
-    return _Audio5js;
+  }, {
+    key: 'end',
+    value: function end() {
+      if (this.audio) {
+        this.audio.destroy();
+        this.audio = null;
+      }
+      this.status = 'ended';
+      this.destroyRelated();
+    }
+  }]);
+  return _Audio5js;
 }(Base);
 
 /**
@@ -52970,88 +53109,88 @@ var _Audio5js = function (_BaseAudio2) {
 
 
 var _Media = function (_BaseAudio3) {
-    inherits(_Media, _BaseAudio3);
+  inherits(_Media, _BaseAudio3);
 
-    function _Media(options, controlDoms) {
-        classCallCheck(this, _Media);
+  function _Media(options, controlDoms) {
+    classCallCheck(this, _Media);
 
-        var _this3 = possibleConstructorReturn(this, (_Media.__proto__ || Object.getPrototypeOf(_Media)).call(this));
+    var _this3 = possibleConstructorReturn(this, (_Media.__proto__ || Object.getPrototypeOf(_Media)).call(this));
 
-        var url = config.getAudioPath() + options.url,
-            trackId = options.trackId,
-            self = _this3,
-            audio;
+    var url = config.getAudioPath() + options.url,
+        trackId = options.trackId,
+        self = _this3,
+        audio;
 
-        //构建之前处理
-        _this3.preRelated(trackId, options);
+    //构建之前处理
+    _this3.preRelated(trackId, options);
 
-        //音频成功与失败调用
-        audio = new window.GLOBALCONTEXT.Media(url, function () {
-            self.callbackProcess(true);
-        }, function () {
-            self.callbackProcess(true);
-        });
+    //音频成功与失败调用
+    audio = new window.GLOBALCONTEXT.Media(url, function () {
+      self.callbackProcess(true);
+    }, function () {
+      self.callbackProcess(true);
+    });
 
-        //autoplay
-        _this3.audio = audio;
-        _this3.trackId = trackId;
-        _this3.options = options;
+    //autoplay
+    _this3.audio = audio;
+    _this3.trackId = trackId;
+    _this3.options = options;
 
-        //相关数据
-        _this3.afterRelated(options, controlDoms);
+    //相关数据
+    _this3.afterRelated(options, controlDoms);
 
-        _this3.play();
-        return _this3;
+    _this3.play();
+    return _this3;
+  }
+
+  /**
+   * Compatible with asynchronous
+   * for subitile use
+   * get audio
+   * @return {[type]} [description]
+   */
+
+
+  createClass(_Media, [{
+    key: 'getAudioTime',
+    value: function getAudioTime(callback) {
+      var _this4 = this;
+
+      this.audio.getCurrentPosition(function (position) {
+        var audioTime = void 0;
+        position = position * 1000;
+        if (!_this4.changeValue) {
+          _this4.changeValue = position;
+        }
+        position -= _this4.changeValue;
+        if (position > -1) {
+          audioTime = Math.round(position);
+        }
+        callback(audioTime);
+      }, function (e) {
+        console.log("error:" + e);
+        //出错继续检测
+        callback();
+      });
     }
 
     /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
+     * 取反
      * @return {[type]} [description]
      */
 
-
-    createClass(_Media, [{
-        key: 'getAudioTime',
-        value: function getAudioTime(callback) {
-            var _this4 = this;
-
-            this.audio.getCurrentPosition(function (position) {
-                var audioTime = void 0;
-                position = position * 1000;
-                if (!_this4.changeValue) {
-                    _this4.changeValue = position;
-                }
-                position -= _this4.changeValue;
-                if (position > -1) {
-                    audioTime = Math.round(position);
-                }
-                callback(audioTime);
-            }, function (e) {
-                console.log("error:" + e);
-                //出错继续检测
-                callback();
-            });
-        }
-
-        /**
-         * 取反
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'end',
-        value: function end() {
-            if (this.audio) {
-                this.audio.release();
-                this.audio = null;
-            }
-            this.status = 'ended';
-            this.destroyRelated();
-        }
-    }]);
-    return _Media;
+  }, {
+    key: 'end',
+    value: function end() {
+      if (this.audio) {
+        this.audio.release();
+        this.audio = null;
+      }
+      this.status = 'ended';
+      this.destroyRelated();
+    }
+  }]);
+  return _Media;
 }(Base);
 
 /**
@@ -53062,487 +53201,501 @@ var _Media = function (_BaseAudio3) {
 
 
 var _cordovaMedia = function (_BaseAudio4) {
-    inherits(_cordovaMedia, _BaseAudio4);
+  inherits(_cordovaMedia, _BaseAudio4);
 
-    function _cordovaMedia(options, controlDoms) {
-        classCallCheck(this, _cordovaMedia);
+  function _cordovaMedia(options, controlDoms) {
+    classCallCheck(this, _cordovaMedia);
 
-        var _this5 = possibleConstructorReturn(this, (_cordovaMedia.__proto__ || Object.getPrototypeOf(_cordovaMedia)).call(this));
+    var _this5 = possibleConstructorReturn(this, (_cordovaMedia.__proto__ || Object.getPrototypeOf(_cordovaMedia)).call(this));
 
-        var url = config.getAudioPath() + options.url,
-            trackId = options.trackId,
-            self = _this5,
-            audio;
+    var url = config.getAudioPath() + options.url,
+        trackId = options.trackId,
+        self = _this5,
+        audio;
 
-        _this5.id = createUUID();
+    _this5.id = createUUID();
 
-        //构建之前处理
-        _this5.preRelated(trackId, options);
+    //构建之前处理
+    _this5.preRelated(trackId, options);
 
-        var audio = {
-            startPlayingAudio: function startPlayingAudio() {
-                window.audioHandler.startPlayingAudio(self.id, url);
-            },
-            pausePlayingAudio: function pausePlayingAudio() {
-                window.audioHandler.pausePlayingAudio(self.id);
-            },
-            release: function release() {
-                window.audioHandler.release(self.id);
-            },
-            /**
-             * 扩充，获取位置
-             * @return {[type]} [description]
-             */
-            expansionCurrentPosition: function expansionCurrentPosition() {
-                return window.getCurrentPosition(self.id);
-            }
-        };
+    var audio = {
+      startPlayingAudio: function startPlayingAudio() {
+        window.audioHandler.startPlayingAudio(self.id, url);
+      },
+      pausePlayingAudio: function pausePlayingAudio() {
+        window.audioHandler.pausePlayingAudio(self.id);
+      },
+      release: function release() {
+        window.audioHandler.release(self.id);
+      },
+      /**
+       * 扩充，获取位置
+       * @return {[type]} [description]
+       */
+      expansionCurrentPosition: function expansionCurrentPosition() {
+        return window.getCurrentPosition(self.id);
+      }
+    };
 
-        //autoplay
-        _this5.audio = audio;
-        _this5.trackId = trackId;
-        _this5.options = options;
+    //autoplay
+    _this5.audio = audio;
+    _this5.trackId = trackId;
+    _this5.options = options;
 
-        //相关数据
-        _this5.afterRelated(options, controlDoms);
+    //相关数据
+    _this5.afterRelated(options, controlDoms);
 
-        _this5.play();
-        return _this5;
+    _this5.play();
+    return _this5;
+  }
+
+  /**
+   * Compatible with asynchronous
+   * for subitile use
+   * get audio
+   * @return {[type]} [description]
+   */
+
+
+  createClass(_cordovaMedia, [{
+    key: 'getAudioTime',
+    value: function getAudioTime(callback) {
+      callback(Math.round(this.audio.expansionCurrentPosition() * 1000));
     }
 
-    /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
-     * @return {[type]} [description]
-     */
+    //播放
 
+  }, {
+    key: 'play',
+    value: function play() {
+      if (this.audio) {
+        this.status = 'playing';
+        this.audio.startPlayingAudio();
+      }
+      this.acitonObj && this.acitonObj.play();
+    }
 
-    createClass(_cordovaMedia, [{
-        key: 'getAudioTime',
-        value: function getAudioTime(callback) {
-            callback(Math.round(this.audio.expansionCurrentPosition() * 1000));
-        }
+    //停止
 
-        //播放
+  }, {
+    key: 'pause',
+    value: function pause() {
+      this.status = 'paused';
+      this.audio && this.audio.pausePlayingAudio();
+      this.acitonObj && this.acitonObj.pause();
+    }
 
-    }, {
-        key: 'play',
-        value: function play() {
-            if (this.audio) {
-                this.status = 'playing';
-                this.audio.startPlayingAudio();
-            }
-            this.acitonObj && this.acitonObj.play();
-        }
+    //结束
 
-        //停止
-
-    }, {
-        key: 'pause',
-        value: function pause() {
-            this.status = 'paused';
-            this.audio && this.audio.pausePlayingAudio();
-            this.acitonObj && this.acitonObj.pause();
-        }
-
-        //结束
-
-    }, {
-        key: 'end',
-        value: function end() {
-            if (this.audio) {
-                this.audio.release();
-                this.audio = null;
-            }
-            this.status = 'ended';
-            this.destroyRelated();
-        }
-    }]);
-    return _cordovaMedia;
+  }, {
+    key: 'end',
+    value: function end() {
+      if (this.audio) {
+        this.audio.release();
+        this.audio = null;
+      }
+      this.status = 'ended';
+      this.destroyRelated();
+    }
+  }]);
+  return _cordovaMedia;
 }(Base);
 
 /**
  * 使用html5的audio播放
  * @param  {string} url    音频路径
  * @param  {object} options 可选参数
- * @return {object}         [description]
+ * 1-支持audio的autoplay，大部分安卓机子的自带浏览器和微信，大部分的IOS微信（无需特殊解决）
+ * 2-不支持audio的autoplay，部分的IOS微信
+ * 3-不支持audio的autoplay，部分的安卓机子的自带浏览器（比如小米，开始模仿safari）和全部的ios safari（这种只能做用户触屏时就触发播放了）
  */
 
 
 var _nativeVideo = function (_BaseAudio5) {
-    inherits(_nativeVideo, _BaseAudio5);
+  inherits(_nativeVideo, _BaseAudio5);
 
-    function _nativeVideo(options, controlDoms) {
-        classCallCheck(this, _nativeVideo);
+  function _nativeVideo(options, controlDoms) {
+    classCallCheck(this, _nativeVideo);
 
-        var _this6 = possibleConstructorReturn(this, (_nativeVideo.__proto__ || Object.getPrototypeOf(_nativeVideo)).call(this));
+    var _this6 = possibleConstructorReturn(this, (_nativeVideo.__proto__ || Object.getPrototypeOf(_nativeVideo)).call(this));
 
-        var trackId = options.trackId;
-        var url = config.getAudioPath() + options.url;
-        var audio = void 0;
-        var self = _this6;
+    var trackId = options.trackId;
+    var url = config.getAudioPath() + options.url;
+    var audio = void 0;
+    var self = _this6;
 
-        var hasAudio = hasAudioes();
+    var hasAudio = hasAudioes();
 
-        //构建之前处理
-        _this6.preRelated(trackId, options);
+    //构建之前处理
+    _this6.preRelated(trackId, options);
 
-        if (instance[trackId]) {
-            audio = hasAudio ? getAudio() : instance[trackId];
-            audio.src = url;
-        } else {
-            if (hasAudio) {
-                audio = getAudio();
-                audio.src = url;
-            } else {
-                audio = new Audio(url);
-                //更新音轨
-                //妙妙学方式不要音轨处理
-                if (trackId) {
-                    instance[trackId] = audio;
-                }
-            }
+    if (instance[trackId]) {
+      audio = hasAudio ? getAudio() : instance[trackId];
+      audio.src = url;
+    } else {
+      if (hasAudio) {
+        audio = getAudio();
+        audio.src = url;
+      } else {
+        audio = new Audio(url);
+        //更新音轨
+        //妙妙学方式不要音轨处理
+        if (trackId) {
+          instance[trackId] = audio;
         }
-
-        _this6._callback = function () {
-            _this6.callbackProcess();
-        };
-
-        //自动播放，只处理一次
-        //手动调用的时候会调用play的时候会调用canplay
-        //导致重复播放，所以在第一次的去掉这个事件
-        _this6._canplayCallback = function () {
-            _this6.play();
-            _this6.audio && _this6.audio.removeEventListener('canplay', _this6._canplayCallback, false);
-        };
-
-        /**
-         * safari 自动播放
-         * 手机浏览器需要加
-         * 2016.8.26
-         * @type {Boolean}
-         */
-        audio.autoplay = true;
-
-        audio.addEventListener('canplay', _this6._canplayCallback, false);
-        audio.addEventListener('ended', _this6._callback, false);
-        audio.addEventListener('error', _this6._callback, false);
-
-        _this6.audio = audio;
-        _this6.trackId = trackId;
-        _this6.status = 'playing';
-        _this6.options = options;
-
-        //相关数据
-        _this6.afterRelated(options, controlDoms);
-        return _this6;
+      }
     }
 
+    _this6._callback = function () {
+      _this6.callbackProcess();
+    };
+
+    //自动播放，只处理一次
+    //手动调用的时候会调用play的时候会调用canplay
+    //导致重复播放，所以在第一次的去掉这个事件
+    _this6._canplayCallback = function () {
+      _this6.play();
+      _this6.audio && _this6.audio.removeEventListener('canplay', _this6._canplayCallback, false);
+    };
+
     /**
-     * Compatible with asynchronous
-     * for subitile use
-     * get audio
-     * @return {[type]} [description]
+     * safari 自动播放
+     * 手机浏览器需要加
+     * 2016.8.26
+     * @type {Boolean}
      */
+    audio.autoplay = true;
+
+    audio.addEventListener('canplay', _this6._canplayCallback, false);
+    audio.addEventListener('ended', _this6._callback, false);
+    audio.addEventListener('error', _this6._callback, false);
+
+    _this6.audio = audio;
+    _this6.trackId = trackId;
+    _this6.status = 'playing';
+    _this6.options = options;
+
+    //相关数据
+    _this6.afterRelated(options, controlDoms);
+    return _this6;
+  }
+
+  /**
+   * Compatible with asynchronous
+   * for subitile use
+   * get audio
+   * @return {[type]} [description]
+   */
 
 
-    createClass(_nativeVideo, [{
-        key: 'getAudioTime',
-        value: function getAudioTime(callback) {
-            callback(Math.round(this.audio.currentTime * 1000));
-        }
-    }, {
-        key: 'end',
-        value: function end() {
-            if (this.audio) {
-                this.audio.pause();
-                //快速切换，防止在播放中就移除，导致没有销毁
-                this.audio.removeEventListener('canplay', this._canplayCallback, false);
-                this.audio.removeEventListener('ended', this._callback, false);
-                this.audio.removeEventListener('error', this._callback, false);
-                this.audio = null;
-            }
-            this.status = 'ended';
-            this.destroyRelated();
-        }
-    }]);
-    return _nativeVideo;
+  createClass(_nativeVideo, [{
+    key: 'getAudioTime',
+    value: function getAudioTime(callback) {
+      callback(Math.round(this.audio.currentTime * 1000));
+    }
+  }, {
+    key: 'end',
+    value: function end() {
+      if (this.audio) {
+        this.audio.pause();
+        //快速切换，防止在播放中就移除，导致没有销毁
+        this.audio.removeEventListener('canplay', this._canplayCallback, false);
+        this.audio.removeEventListener('ended', this._callback, false);
+        this.audio.removeEventListener('error', this._callback, false);
+        this.audio = null;
+      }
+      this.status = 'ended';
+      this.destroyRelated();
+    }
+  }]);
+  return _nativeVideo;
 }(Base);
 
 //安卓客户端apk的情况下
 
 
 if (plat$1.isAndroid && !plat$1.isBrowser) {
-    audioPlayer = _Media;
+  audioPlayer = _Media;
 } else {
-    //妙妙学的 客户端浏览器模式
-    if (window.MMXCONFIG && window.audioHandler) {
-        audioPlayer = _cordovaMedia;
-    } else {
-        audioPlayer = _nativeVideo;
-    }
+  //妙妙学的 客户端浏览器模式
+  if (window.MMXCONFIG && window.audioHandler) {
+    audioPlayer = _cordovaMedia;
+  } else {
+    audioPlayer = _nativeVideo;
+  }
 }
 
 //音频
 //dom事件
 var eventMixin = function (activitProto) {
 
-    /**
-     * 构建事件体系
-     * @return {[type]} [description]
-     */
-    activitProto._fillEventData = function () {
+  /**
+   * 构建事件体系
+   */
+  activitProto._initEvents = function () {
+    //解析出事件类型
+    this.eventData.eventName = conversionEventType(this.eventData.eventType);
+  };
 
-        //配置事件节点
-        var eventId,
-            pid,
-            contentName,
+  /**
+   * 获取事件上下文
+   * @return {[type]} [description]
+   */
+  activitProto._parseEventContext = function () {
+    var _this = this;
 
-        //事件上下文对象
-        eventContext,
-            eventData = this.eventData;
+    //配置事件节点
+    var contentName = void 0;
 
-        pid = this.pid;
+    //事件上下文对象
+    var eventContext = void 0;
+    var eventData = this.eventData;
+    var pid = this.pid;
+    var eventId = eventData.eventContentId;
 
-        //如果存在imageIds才处理,单独绑定事件处理
-        if (eventId = eventData.eventContentId) {
+    //如果存在imageIds才处理,单独绑定事件处理
+    if (eventId) {
+      (function () {
 
-            //dom
-            //找到对应绑定事件的元素
-            var domEvent = function domEvent() {
-                contentName = this.makePrefix('Content', pid, this.id);
-                eventData.type = 'dom';
-                eventData.canvasMode = false;
-                eventData.domMode = true;
-            };
+        //被重写过的事件
+        //auto =>  click
+        var cid = eventData.originaName ? eventId : _this.id;
 
-            //canvas模式非常特别
-            //canvas容器+内部pixi对象
-            //所以事件绑定在最外面
-            var canvasEvent = function canvasEvent() {
-                contentName = this.makePrefix('canvas', pid, this.id);
-                eventData.type = 'canvas';
-                eventData.canvasMode = true;
-                eventData.domMode = false;
-            };
+        //dom
+        //找到对应绑定事件的元素
+        var parseDom = function parseDom() {
+          contentName = _this.makePrefix('Content', pid, cid);
+          eventData.type = 'dom';
+          eventData.canvasMode = false;
+          eventData.domMode = true;
+        };
 
-            //canvas事件
-            if (-1 !== this.canvasRelated.cid.indexOf(eventId)) {
-                canvasEvent.call(this);
-            } else {
-                //dom事件
-                domEvent.call(this);
-            }
+        //canvas模式非常特别
+        //canvas容器+内部pixi对象
+        //所以事件绑定在最外面
+        var parseCanavs = function parseCanavs() {
+          contentName = _this.makePrefix('canvas', pid, cid);
+          eventData.type = 'canvas';
+          eventData.canvasMode = true;
+          eventData.domMode = false;
+        };
 
-            eventContext = this.getContextNode(contentName);
-            eventData.eventContext = eventContext;
-
-            if (eventContext) {
-                /**
-                 * 绑定事件加入到content钩子
-                 */
-                this.relatedCallback.contentsHooks(pid, eventId, {
-                    $contentNode: eventContext,
-                    //增加外部判断
-                    isBindEventHooks: true,
-                    type: eventData.type
-                });
-            } else {
-                /**
-                 * 针对动态事件处理
-                 * 快捷方式引用到父对象
-                 * @type {[type]}
-                 */
-                eventData.parent = this;
-            }
+        //canvas事件
+        if (-1 !== _this.canvasRelated.cid.indexOf(eventId)) {
+          parseCanavs();
+        } else {
+          //dom事件
+          parseDom();
         }
 
-        /**
-         * 解析出事件类型
-         */
-        eventData.eventName = conversionEventType(eventData.eventType);
+        eventContext = _this.getContextNode(contentName);
+        eventData.eventContext = eventContext;
+
+        if (eventContext) {
+          //绑定事件加入到content钩子
+          _this.relatedCallback.contentsHooks(pid, eventId, {
+            $contentNode: eventContext,
+            //增加外部判断
+            isBindEventHooks: true,
+            type: eventData.type
+          });
+        } else {
+          /**
+           * 针对动态事件处理
+           * 快捷方式引用到父对象
+           */
+          eventData.parent = _this;
+        }
+      })();
+    }
+
+    return eventContext;
+  };
+
+  /**
+   * 绑定事件行为
+   * @return {[type]} [description]
+   */
+  activitProto._bindEvents = function (callback) {
+    var self = this;
+    var eventData = this.eventData;
+    var eventName = eventData.eventName;
+    var eventContext = this._parseEventContext();
+
+    /**
+     * 运行动画
+     * @return {[type]} [description]
+     */
+    var startRunAnim = function startRunAnim() {
+      //当前事件对象没有动画的时候才能触发关联动作
+      var animOffset = void 0;
+      var boundary = 5; //边界值
+
+      //脚本动画
+      if (eventData.originaName) {
+        self.runAnimation();
+        return;
+      }
+
+      if (eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
+        var originalLeft = animOffset.left;
+        var originalTop = animOffset.top;
+        var newOffset = eventContext.offset();
+        var newLeft = newOffset.left;
+        var newTop = newOffset.top;
+        //在合理的动画范围是允许点击的
+        //比如对象只是一个小范围的内的改变
+        //正负10px的移动是允许接受的
+        if (originalLeft > newLeft - boundary && originalLeft < newLeft + boundary || originalTop > newTop - boundary && originalTop < newTop + boundary) {
+          self.runAnimation();
+        }
+      } else {
+        self.runAnimation();
+      }
     };
 
     /**
-     * 绑定事件行为
+     * 设置按钮的行为
+     * 音频
+     * 反弹
+     */
+    var setBehavior = function setBehavior(feedbackBehavior) {
+
+      var behaviorSound = void 0;
+
+      //音频地址
+      if (behaviorSound = feedbackBehavior.behaviorSound) {
+        //妙妙学客户端强制删除
+        if (window.MMXCONFIG && window.audioHandler) {
+          self._fixAudio.push(new audioPlayer({
+            url: behaviorSound,
+            trackId: 9999,
+            complete: function complete() {
+              this.play();
+            }
+          }));
+        } else {
+          //其余平台,如果存在点击过的
+          //这里主要是防止重复点击创建
+          var audio = self._cacheBehaviorAudio[behaviorSound];
+          if (audio) {
+            audio.play();
+          } else {
+            //相同对象创建一次
+            //以后取缓存
+            audio = new audioPlayer({
+              url: behaviorSound
+            });
+            self._cacheBehaviorAudio[behaviorSound] = audio;
+          }
+        }
+      }
+
+      //反弹效果
+      if (feedbackBehavior.isButton) {
+        //div通过css实现反弹
+        if (eventData.domMode) {
+          eventContext.addClass('xut-behavior');
+          setTimeout(function () {
+            eventContext.removeClass('xut-behavior');
+            startRunAnim();
+          }, 500);
+        } else {
+          console.log('feedbackBehavior');
+        }
+      } else {
+        startRunAnim();
+      }
+    };
+
+    /**
+     * 事件引用钩子
+     * 用户注册与执行
+     * @type {Object}
+     */
+    var eventDrop = {
+      //保存引用,方便直接销毁
+      init: function init(drag) {
+        eventData.dragDrop = drag;
+      },
+      //拖拽开始的处理
+      startRun: function startRun() {},
+      //拖拽结束的处理
+      stopRun: function stopRun(isEnter) {
+        if (isEnter) {
+          //为true表示拖拽进入目标对象区域
+          self.runAnimation();
+        }
+      }
+    };
+
+    /**
+     * 正常动画执行
+     * 除去拖动拖住外的所有事件
+     * 点击,双击,滑动等等....
      * @return {[type]} [description]
      */
-    activitProto._bindEventBehavior = function (callback) {
-        var self = this;
-        var eventData = this.eventData;
-        var eventName = eventData.eventName;
-        var eventContext = eventData.eventContext;
-
-        /**
-         * 运行动画
-         * @return {[type]} [description]
-         */
-        var startRunAnim = function startRunAnim() {
-            //当前事件对象没有动画的时候才能触发关联动作
-            var animOffset,
-                boundary = 5; //边界值
-
-            if (eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
-                var originalLeft = animOffset.left;
-                var originalTop = animOffset.top;
-                var newOffset = eventContext.offset();
-                var newLeft = newOffset.left;
-                var newTop = newOffset.top;
-                //在合理的动画范围是允许点击的
-                //比如对象只是一个小范围的内的改变
-                //正负10px的移动是允许接受的
-                if (originalLeft > newLeft - boundary && originalLeft < newLeft + boundary || originalTop > newTop - boundary && originalTop < newTop + boundary) {
-                    self.runAnimation();
-                }
-            } else {
-                self.runAnimation();
-            }
-        };
-
-        /**
-         * 设置按钮的行为
-         * 音频
-         * 反弹
-         */
-        var setBehavior = function setBehavior(feedbackBehavior) {
-
-            var behaviorSound = void 0;
-
-            //音频地址
-            if (behaviorSound = feedbackBehavior.behaviorSound) {
-                //妙妙学客户端强制删除
-                if (window.MMXCONFIG && window.audioHandler) {
-                    self._fixAudio.push(new audioPlayer({
-                        url: behaviorSound,
-                        trackId: 9999,
-                        complete: function complete() {
-                            this.play();
-                        }
-                    }));
-                } else {
-                    //其余平台,如果存在点击过的
-                    //这里主要是防止重复点击创建
-                    var audio = self._cacheBehaviorAudio[behaviorSound];
-                    if (audio) {
-                        audio.play();
-                    } else {
-                        //相同对象创建一次
-                        //以后取缓存
-                        audio = new audioPlayer({
-                            url: behaviorSound
-                        });
-                        self._cacheBehaviorAudio[behaviorSound] = audio;
-                    }
-                }
-            }
-
-            //反弹效果
-            if (feedbackBehavior.isButton) {
-                //div通过css实现反弹
-                if (eventData.domMode) {
-                    eventContext.addClass('xut-behavior');
-                    setTimeout(function () {
-                        eventContext.removeClass('xut-behavior');
-                        startRunAnim();
-                    }, 500);
-                } else {
-                    console.log('feedbackBehavior');
-                }
-            } else {
-                startRunAnim();
-            }
-        };
-
-        /**
-         * 事件引用钩子
-         * 用户注册与执行
-         * @type {Object}
-         */
-        var eventDrop = {
-            //保存引用,方便直接销毁
-            init: function init(drag) {
-                eventData.dragDrop = drag;
-            },
-            //拖拽开始的处理
-            startRun: function startRun() {},
-            //拖拽结束的处理
-            stopRun: function stopRun(isEnter) {
-                if (isEnter) {
-                    //为true表示拖拽进入目标对象区域
-                    self.runAnimation();
-                }
-            }
-        };
-
-        /**
-         * 正常动画执行
-         * 除去拖动拖住外的所有事件
-         * 点击,双击,滑动等等....
-         * @return {[type]} [description]
-         */
-        var eventRun = function eventRun() {
-            //如果存在反馈动作
-            //优先于动画执行
-            var feedbackBehavior;
-            if (feedbackBehavior = eventData.feedbackBehavior[eventData.eventContentId]) {
-                setBehavior(feedbackBehavior);
-            } else {
-                startRunAnim();
-            }
-        };
-
-        /**
-         * 事件对象引用
-         * @return {[type]} [description]
-         */
-        var eventHandler = function eventHandler(eventReference, _eventHandler) {
-            eventData.eventReference = eventReference;
-            eventData.eventHandler = _eventHandler;
-        };
-
-        //绑定用户自定义事件
-        if (eventContext && eventName) {
-
-            //如果是翻页委托启动了
-            //这里处理swiperight与swipeleft
-            if (config.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
-                self.relatedCallback.swipeDelegateContents(eventName, function (callback) {
-                    self.runAnimation(callback);
-                });
-            }
-            //给独立对象绑定事件
-            else {
-
-                    var domName = void 0;
-                    var target = void 0;
-                    var dragdropPara = void 0;
-
-                    dragdropPara = eventData.dragdropPara;
-
-                    //获取拖拽目标对象
-                    if (eventName === 'dragTag') {
-                        domName = this.makePrefix('Content', this.pid, dragdropPara);
-                        target = this.getContextNode(domName);
-                    }
-
-                    //增加事件绑定标示
-                    //针对动态加载节点事件的行为过滤
-                    eventData.isBind = true;
-
-                    bindContentEvent({
-                        'eventDrop': eventDrop,
-                        'eventRun': eventRun,
-                        'eventHandler': eventHandler,
-                        'eventContext': eventContext,
-                        'eventName': eventName,
-                        'parameter': dragdropPara,
-                        'target': target,
-                        'domMode': eventData.domMode
-                    });
-                }
-        }
+    var eventRun = function eventRun() {
+      //如果存在反馈动作
+      //优先于动画执行
+      var feedbackBehavior = eventData.feedbackBehavior[eventData.eventContentId];
+      if (feedbackBehavior) {
+        setBehavior(feedbackBehavior);
+      } else {
+        startRunAnim();
+      }
     };
+
+    /**
+     * 事件对象引用
+     * @return {[type]} [description]
+     */
+    var eventHandler = function eventHandler(eventReference, _eventHandler) {
+      eventData.eventReference = eventReference;
+      eventData.eventHandler = _eventHandler;
+    };
+
+    //绑定用户自定义事件
+    if (eventContext && eventName) {
+      //如果是翻页委托启动了
+      //这里处理swiperight与swipeleft
+      if (config.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
+        self.relatedCallback.swipeDelegateContents(eventName, function (callback) {
+          self.runAnimation(callback);
+        });
+      }
+      //给独立对象绑定事件
+      else {
+
+          var domName = void 0;
+          var target = void 0;
+          var dragdropPara = void 0;
+
+          dragdropPara = eventData.dragdropPara;
+
+          //获取拖拽目标对象
+          if (eventName === 'dragTag') {
+            domName = this.makePrefix('Content', this.pid, dragdropPara);
+            target = this.getContextNode(domName);
+          }
+
+          //增加事件绑定标示
+          //针对动态加载节点事件的行为过滤
+          eventData.isBind = true;
+
+          bindContentEvent({
+            'eventDrop': eventDrop,
+            'eventRun': eventRun,
+            'eventHandler': eventHandler,
+            'eventContext': eventContext,
+            'eventName': eventName,
+            'parameter': dragdropPara,
+            'target': target,
+            'domMode': eventData.domMode
+          });
+        }
+    }
+  };
 };
 
 /**
@@ -53767,10 +53920,10 @@ var _class$1 = function () {
             var resourcePath = this.resourcePath;
             if (this.isMask) {
                 var filename = this._getFilename(imageList[index].name);
-                imgReady(resourcePath + filename + ".png", collect);
-                imgReady(resourcePath + filename + ".jpg", collect);
+                loadFigure(resourcePath + filename + ".png", collect);
+                loadFigure(resourcePath + filename + ".jpg", collect);
             } else {
-                imgReady(resourcePath + imageList[index].name, collect);
+                loadFigure(resourcePath + imageList[index].name, collect);
             }
         }
 
@@ -53950,98 +54103,100 @@ var spiritObjs = {};
  * @return {[type]}           [description]
  */
 var getData = function getData(inputPara, contents) {
-    var option = void 0;
-    var resourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', resourcePath + 'app.json', false);
-    xhr.send(null);
-    try {
-        option = parseJSON(xhr.responseText);
-    } catch (e) {
-        console.log("app.json get error:" + e);
-    }
-    return option;
+  var option = void 0;
+  var resourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', resourcePath + 'app.json', false);
+  xhr.send(null);
+  try {
+    option = parseJSON(xhr.responseText);
+  } catch (e) {
+    console.log("app.json get error:" + e);
+  }
+  return option;
 };
 
 var moveContent = function moveContent(contentPrefix, id, parentId) {
-    var obj = $("#" + contentPrefix + id);
-    var parentObj = $("#" + contentPrefix + parentId);
-    var $parent = $("#spirit_parent_" + parentId);
-    if ($parent.length == 0) {
-        parentObj.append("<div style='position:absolute; width:100%; height:100%'  id='spirit_parent_" + parentId + "'></div>");
-    }
-    $parent.append(obj);
+  var obj = $("#" + contentPrefix + id);
+  var parentObj = $("#" + contentPrefix + parentId);
+  var $parent = $("#spirit_parent_" + parentId);
+  if ($parent.length == 0) {
+    parentObj.append("<div style='position:absolute; width:100%; height:100%'  id='spirit_parent_" + parentId + "'></div>");
+  }
+  $parent.append(obj);
 };
 
 var getId = function getId(inputPara, contentPrefix) {
-    var id = '';
-    if (_.isObject(inputPara)) {
-        id = contentPrefix + inputPara.framId;
-    } else {
-        id = inputPara;
-    }
-    return id;
+  var id = '';
+  if (_.isObject(inputPara)) {
+    id = contentPrefix + inputPara.framId;
+  } else {
+    id = inputPara;
+  }
+  return id;
 };
 
 function updateAction(id, params) {
 
-    var loop = 1;
-    var obj = void 0;
-    if (params.playerType == "loop") {
-        loop = 0;
-    }
+  var loop = 1;
+  var obj = void 0;
+  if (params.playerType == "loop") {
+    loop = 0;
+  }
 
-    if (obj = spiritObjs[id]) {
-        obj.play(params.actList, loop);
-    } else {
-        console.log('error');
-    }
+  if (obj = spiritObjs[id]) {
+    obj.play(params.actList, loop);
+  } else {
+    console.log('error');
+  }
 }
 
 var AdvSprite = function (inputPara, contents) {
-    var option = getData(inputPara, contents);
-    var ResourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
-    var contentPrefix = inputPara.contentPrefix;
-    var ids = [];
-    var options = {};
-    options.contentPrefix = contentPrefix;
-    options.resourcePath = ResourcePath;
-    options.type = 'seniorSprite';
+  var option = getData(inputPara, contents);
+  var ResourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
+  var contentPrefix = inputPara.contentPrefix;
+  var ids = [];
+  var options = {};
+  options.contentPrefix = contentPrefix;
+  options.resourcePath = ResourcePath;
+  options.type = 'seniorSprite';
 
-    if (option.spiritList) {
-        for (var i = 0; i < option.spiritList.length; i++) {
-            var spiritList = option.spiritList[i];
-            var id = getId(spiritList, contentPrefix);
-            var framId = spiritList.framId;
-            var parentId = spiritList.parentId;
-            if (_.isObject(inputPara)) {
-                if (parentId != "0") {
-                    moveContent(contentPrefix, framId, parentId);
-                }
-                spiritObjs[id] = new _class$1(spiritList, options);
-                ids.push(id);
-            } else {
-                console.log("inputPara undefine Spirit");
-            }
+  if (option.spiritList) {
+    for (var i = 0; i < option.spiritList.length; i++) {
+      var spiritList = option.spiritList[i];
+      var id = getId(spiritList, contentPrefix);
+      var framId = spiritList.framId;
+      var parentId = spiritList.parentId;
+      if (_.isObject(inputPara)) {
+        if (parentId != "0") {
+          moveContent(contentPrefix, framId, parentId);
         }
-    } else {
-        console.log('没有高级精灵动画数据');
+        spiritObjs[id] = new _class$1(spiritList, options);
+        ids.push(id);
+      } else {
+        console.log("inputPara undefine Spirit");
+      }
     }
+  } else {
+    console.log('没有高级精灵动画数据');
+  }
 
-    return {
-        stop: function stop() {
-            ids.forEach(function (key) {
-                spiritObjs[key].stop();
-            });
-        },
-        destroy: function destroy() {
-            ids.forEach(function (key) {
-                spiritObjs[key].destroy();
-                spiritObjs[key] = null;
-                delete spiritObjs[key];
-            });
+  return {
+    stop: function stop() {
+      ids.forEach(function (key) {
+        spiritObjs[key].stop();
+      });
+    },
+    destroy: function destroy() {
+      ids.forEach(function (key) {
+        if (spiritObjs[key]) {
+          spiritObjs[key].destroy();
+          spiritObjs[key] = null;
+          delete spiritObjs[key];
         }
-    };
+      });
+    }
+  };
 };
 
 //检测是否支持HTML5的video播放
@@ -54498,7 +54653,7 @@ var deployVideo = function deployVideo(data, pageId, activityId) {
 
     var proportion = config.proportion;
 
-    var layerSize = setProportion$1({
+    var layerSize = setProportion({
         width: data.width || config.visualSize.width,
         height: data.height || config.visualSize.height,
         left: data.left,
@@ -59509,7 +59664,6 @@ var pixiSpecial = {};
 // import { Sprite as pixiSpirit } from '../pixi/sprite/index'
 // import { specialSprite as pixiSpecial } from '../pixi/special/index'
 
-
 /**
  * 销毁动画音频
  * @param  {[type]} videoIds  [description]
@@ -59517,18 +59671,18 @@ var pixiSpecial = {};
  * @return {[type]}           [description]
  */
 var destroyAudio = function destroyAudio(videoIds, chapterId) {
-    var isExist = false;
-    //如果有音频存在
-    videoIds && _.each(videoIds, function (data) {
-        //如果存在对象音频
-        if (data.videoId) {
-            isExist = true;
-            return 'breaker';
-        }
-    });
-    if (isExist) {
-        clearContentAudio(chapterId);
+  var isExist = false;
+  //如果有音频存在
+  videoIds && _.each(videoIds, function (data) {
+    //如果存在对象音频
+    if (data.videoId) {
+      isExist = true;
+      return 'breaker';
     }
+  });
+  if (isExist) {
+    clearContentAudio(chapterId);
+  }
 };
 
 /**
@@ -59543,9 +59697,9 @@ var OBJNAME = ['pptObj', 'pixiObj', 'comSpriteObj', 'autoSpriteObj'];
  * @return {[type]}            [description]
  */
 var access = function access(callback) {
-    OBJNAME.forEach(function (key) {
-        callback(key);
-    });
+  OBJNAME.forEach(function (key) {
+    callback(key);
+  });
 };
 
 /**
@@ -59554,268 +59708,354 @@ var access = function access(callback) {
  */
 
 var Animation = function () {
-    function Animation(options, getStyle) {
-        classCallCheck(this, Animation);
+  function Animation(options, getStyle) {
+    classCallCheck(this, Animation);
 
-        _.extend(this, options);
-        this.getStyle = getStyle;
+    _.extend(this, options);
+    this.getStyle = getStyle;
+
+    /////////////////////////////
+    ///如果是被预处理截断，跳过动画创建
+    ///重写原事件的相关数据
+    ///改动脚本auto为click事件
+    /////////////////////////////
+    if (this.prepTruncation) {
+      this.base.eventData.originaName = this.base.eventData.eventName;
+      this.base.eventData.eventName = 'click';
+      this.base.eventData.eventContentId = this.id;
+      return;
+    }
+  }
+
+  /**
+   * Build the canvas of animation
+   * 比较复杂
+   * 1 普通与ppt组合
+   * 2 高级与ppt组合
+   * 3 ppt独立
+   * 4 普通精灵动画
+   * 8  其中 高级精灵动画是widget创建，需要等待
+   * @return {[type]} [description]
+   */
+
+
+  createClass(Animation, [{
+    key: '_createCanvas',
+    value: function _createCanvas(id, parameter, category, callback) {
+      var _this = this;
+
+      var initstate = void 0;
+
+      //动作类型
+      //可能是组合动画
+      var actionTypes = this.contentDas.actionTypes;
+      var makeOpts = {
+        data: this.contentDas,
+        renderer: this.$contentNode,
+        pageIndex: this.pageIndex
+      };
+
+      //创建pixi上下文的ppt对象
+      var createPixiPPT = function createPixiPPT() {
+        //parameter存在就是ppt动画
+        if ((parameter || actionTypes.pptId) && _this.$contentNode.view) {
+          _this.pptObj = callback(Powepoint, $(_this.$contentNode.view));
+          _this.pptObj.contentId = id;
+        }
+      };
+
+      var $veiw = this.$contentNode.view;
+      if ($veiw) {
+        initstate = $veiw.getAttribute('data-init');
+      }
+
+      var setState = function setState() {
+        $veiw.setAttribute('data-init', true);
+      };
+
+      //多个canvas对应多个ppt
+      //容器不需要重复创建
+      //精灵动画
+      if (actionTypes.spiritId) {
+        if (initstate) {
+          createPixiPPT();
+        } else {
+          //加入任务队列
+          this.nextTask.context.add(id);
+          this.pixiObj = new pixiSpirit(makeOpts);
+          //防止多条一样的数据绑多个动画
+          //构建精灵动画完毕后
+          //构建ppt对象
+          this.pixiObj.$once('load', function () {
+            //ppt动画
+            createPixiPPT();
+
+            //任务完成
+            _this.nextTask.context.remove(id);
+          });
+          setState();
+        }
+      }
+
+      //特殊高级动画
+      //必须是ppt与pixi绑定的
+      if (actionTypes.compSpriteId) {
+        // console.log(this,this.id,this.contentDas.initpixi)
+        //这个dom已经创建了pixi了
+        if (initstate) {
+          createPixiPPT();
+        } else {
+          this.pixiObj = new pixiSpecial(makeOpts);
+          setState();
+
+          //ppt动画
+          createPixiPPT();
+        }
+      }
     }
 
     /**
-     * Build the canvas of animation
-     * 比较复杂
-     * 1 普通与ppt组合
-     * 2 高级与ppt组合
-     * 3 ppt独立
-     * 4 普通精灵动画
-     * 8  其中 高级精灵动画是widget创建，需要等待
+     * Build the dom of animation
      * @return {[type]} [description]
      */
 
+  }, {
+    key: '_createDom',
+    value: function _createDom(category, callback) {
 
-    createClass(Animation, [{
-        key: '_createCanvas',
-        value: function _createCanvas(id, parameter, category, callback) {
-            var _this = this;
-
-            var initstate = void 0;
-
-            //动作类型
-            //可能是组合动画
-            var actionTypes = this.contentDas.actionTypes;
-            var makeOpts = {
-                data: this.contentDas,
-                renderer: this.$contentNode,
-                pageIndex: this.pageIndex
-            };
-
-            //创建pixi上下文的ppt对象
-            var createPixiPPT = function createPixiPPT() {
-                //parameter存在就是ppt动画
-                if ((parameter || actionTypes.pptId) && _this.$contentNode.view) {
-                    _this.pptObj = callback(Powepoint, $(_this.$contentNode.view));
-                    _this.pptObj.contentId = id;
-                }
-            };
-
-            var $veiw = this.$contentNode.view;
-            if ($veiw) {
-                initstate = $veiw.getAttribute('data-init');
-            }
-
-            var setState = function setState() {
-                $veiw.setAttribute('data-init', true);
-            };
-
-            //多个canvas对应多个ppt
-            //容器不需要重复创建
-            //精灵动画
-            if (actionTypes.spiritId) {
-                if (initstate) {
-                    createPixiPPT();
-                } else {
-                    //加入任务队列
-                    this.nextTask.context.add(id);
-                    this.pixiObj = new pixiSpirit(makeOpts);
-                    //防止多条一样的数据绑多个动画
-                    //构建精灵动画完毕后
-                    //构建ppt对象
-                    this.pixiObj.$once('load', function () {
-                        //ppt动画
-                        createPixiPPT();
-
-                        //任务完成
-                        _this.nextTask.context.remove(id);
-                    });
-                    setState();
-                }
-            }
-
-            //特殊高级动画
-            //必须是ppt与pixi绑定的
-            if (actionTypes.compSpriteId) {
-                // console.log(this,this.id,this.contentDas.initpixi)
-                //这个dom已经创建了pixi了
-                if (initstate) {
-                    createPixiPPT();
-                } else {
-                    this.pixiObj = new pixiSpecial(makeOpts);
-                    setState();
-
-                    //ppt动画
-                    createPixiPPT();
-                }
-            }
+      if (category) {
+        var data = {
+          id: this.id,
+          data: this.contentDas,
+          $contentNode: this.$contentNode
+        };
+        switch (category) {
+          //普通精灵动画
+          case "Sprite":
+            this.comSpriteObj = ComSprite(data);
+            break;
+          //普通转复杂精灵动画
+          case "AutoCompSprite":
+            this.autoSpriteObj = new _class$2(data);
+            break;
         }
+      }
 
-        /**
-         * Build the dom of animation
-         * @return {[type]} [description]
-         */
+      //ppt动画
+      this.pptObj = callback(Powepoint);
+    }
 
-    }, {
-        key: '_createDom',
-        value: function _createDom(category, callback) {
+    /**
+     * 绑定动画
+     * 为了向上兼容API
+     *  1 dom动画
+     *  2 canvas动画
+     *
+     * 2 直接截断动画处理
+     *   直接执行脚本动画
+     */
 
-            if (category) {
-                var data = {
-                    id: this.id,
-                    data: this.contentDas,
-                    $contentNode: this.$contentNode
-                };
-                switch (category) {
-                    //普通精灵动画
-                    case "Sprite":
-                        this.comSpriteObj = ComSprite(data);
-                        break;
-                    //普通转复杂精灵动画
-                    case "AutoCompSprite":
-                        this.autoSpriteObj = new _class$2(data);
-                        break;
-                }
+  }, {
+    key: 'init',
+    value: function init(id, $contentNode, $containsNode, chapterId, parameter, pageType) {
+      var _this2 = this;
+
+      //预显示跳过动画创建
+      if (this.prepVisible) {
+        $contentNode.css({
+          'visibility': this.prepVisible
+        });
+        return;
+      }
+
+      if (this.prepTruncation) {
+        return;
+      }
+
+      //////////////////////////////
+      /// PPT动画库
+      //////////////////////////////
+      var category = this.contentDas.category;
+      var pageIndex = this.pageIndex;
+      var create = function create(constr, newContext) {
+        var element = newContext || $contentNode;
+        if (element.length) {
+          return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode, _this2.getStyle);
+        } else {
+          console.log('\u521B\u5EFA:' + constr + '\u5931\u8D25');
+        }
+      };
+      this.domMode ? this._createDom(category, create) : this._createCanvas(id, parameter, category, create);
+    }
+
+    /**
+     * 显示预处理
+     * 直接越过动画
+     */
+
+  }, {
+    key: '_hasPrepVisible',
+    value: function _hasPrepVisible(playComplete) {
+      //创建的无行为content
+      var partContentRelated = this.base.relatedData.partContentRelated;
+      //针对空跳过处理
+      if (partContentRelated && partContentRelated.length && -1 !== partContentRelated.indexOf(this.id)) {
+        playComplete();
+      } else {
+        //必须要修改
+        if (this.$contentNode) {
+          if (this.canvasMode) {
+            console.log('canvsa prepVisible');
+          } else {
+            //因为执行的顺序问题，动画与页面零件
+            //isscroll标记控制
+            if (!this.$contentNode.attr('data-iscroll')) {
+              var visibility = this.$contentNode.css('visibility');
+              //必须是设定值与原始值不一致才修改
+              //苹果上闪屏问题
+              if (visibility != this.prepVisible) {
+                this.$contentNode.css({
+                  'visibility': this.prepVisible
+                });
+              }
             }
-
-            //ppt动画
-            this.pptObj = callback(Powepoint);
+          }
         }
+        playComplete();
+      }
+    }
 
-        /**
-         * 绑定动画
-         * 为了向上兼容API
-         *  1 dom动画
-         *  2 canvas动画
-         */
+    /**
+     * 运行动画
+     * @param  {[type]} scopeComplete   [动画回调]
+     * @param  {[type]} canvasContainer [description]
+     * @return {[type]}                 [description]
+     */
 
-    }, {
-        key: 'init',
-        value: function init(id, context, $containsNode, chapterId, parameter, pageType) {
-            var _this2 = this;
+  }, {
+    key: 'play',
+    value: function play(playComplete) {
+      var _this3 = this;
 
-            var pageIndex = void 0,
-                create = void 0,
-                category = void 0;
-            category = this.contentDas.category;
-            pageIndex = this.pageIndex;
-            create = function create(constr, newContext) {
-                var element = newContext || context;
-                if (element.length) {
-                    return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode, _this2.getStyle);
-                } else {
-                    console.log('\u521B\u5EFA:' + constr + '\u5931\u8D25');
-                }
-            };
+      //处理显示动画
+      if (this.prepVisible) {
+        this._hasPrepVisible(playComplete);
+        return;
+      }
 
-            //build
-            //dom mode
-            //canvas mode
-            this.domMode ? this._createDom(category, create) : this._createCanvas(id, parameter, category, create);
+      //如果是被预处理截断
+      //执行脚本
+      if (this.prepTruncation) {
+        try {
+          makeJsonPack(this.prepTruncation)();
+        } catch (err) {
+          console.log('\u9884\u5904\u7406\u622A\u65AD\u6267\u884C\u811A\u672C\u5931\u8D25');
         }
+        playComplete();
+        return;
+      }
 
-        /**
-         * 运行动画
-         * @param  {[type]} scopeComplete   [动画回调]
-         * @param  {[type]} canvasContainer [description]
-         * @return {[type]}                 [description]
-         */
+      var $contentNode = this.$contentNode;
 
-    }, {
-        key: 'play',
-        value: function play(playComplete) {
-            var _this3 = this;
+      //canvas
+      if ($contentNode && $contentNode.view) {
+        $contentNode = this.$contentNode.view;
+      }
 
-            var $contentNode = this.$contentNode;
-
-            //canvas
-            if ($contentNode && $contentNode.view) {
-                $contentNode = this.$contentNode.view;
+      access(function (key) {
+        if (_this3[key]) {
+          if (key === 'pptObj') {
+            //优化处理,只针对互斥的情况下
+            //处理层级关系
+            if ($contentNode.prop && $contentNode.prop("mutex")) {
+              $contentNode.css({ //强制提升层级
+                'display': 'block'
+              });
             }
-
-            access(function (key) {
-                if (_this3[key]) {
-                    if (key === 'pptObj') {
-                        //优化处理,只针对互斥的情况下
-                        //处理层级关系
-                        if ($contentNode.prop && $contentNode.prop("mutex")) {
-                            $contentNode.css({ //强制提升层级
-                                'display': 'block'
-                            });
-                        }
-                    }
-                    _this3[key].play && _this3[key].play(playComplete);
-                }
-            });
+          }
+          _this3[key].play && _this3[key].play(playComplete);
         }
+      });
+    }
 
-        /**
-         * 停止动画
-         * @param  {[type]} chapterId [description]
-         * @return {[type]}           [description]
-         */
+    /**
+     * 停止动画
+     * @param  {[type]} chapterId [description]
+     * @return {[type]}           [description]
+     */
 
-    }, {
-        key: 'stop',
-        value: function stop(chapterId) {
-            var _this4 = this;
+  }, {
+    key: 'stop',
+    value: function stop(chapterId) {
+      var _this4 = this;
 
-            access(function (key) {
-                if (_this4[key]) {
-                    if (key === 'pptObj') {
-                        //销毁ppt音频
-                        destroyAudio(_this4[key].options, chapterId);
-                    }
-                    _this4[key].stop && _this4[key].stop();
-                }
-            });
+      //显示动画，处理截断
+      if (this.prepVisible || this.prepTruncation) {
+        return;
+      }
+      access(function (key) {
+        if (_this4[key]) {
+          if (key === 'pptObj') {
+            //销毁ppt音频
+            destroyAudio(_this4[key].options, chapterId);
+          }
+          _this4[key].stop && _this4[key].stop();
         }
+      });
+    }
 
-        /**
-         * 翻页结束，复位上一页动画
-         * @return {[type]} [description]
-         */
+    /**
+     * 翻页结束，复位上一页动画
+     * @return {[type]} [description]
+     */
 
-    }, {
-        key: 'reset',
-        value: function reset() {
-            var _this5 = this;
+  }, {
+    key: 'reset',
+    value: function reset() {
+      var _this5 = this;
 
-            access(function (key) {
-                _this5[key] && _this5[key].reset && _this5[key].reset();
-            });
-        }
+      //显示动画，处理截断
+      if (this.prepVisible || this.prepTruncation) {
+        return;
+      }
+      access(function (key) {
+        _this5[key] && _this5[key].reset && _this5[key].reset();
+      });
+    }
 
-        /**
-         * 销毁动画
-         * @return {[type]} [description]
-         */
+    /**
+     * 销毁动画
+     * @return {[type]} [description]
+     */
 
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            var _this6 = this;
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      var _this6 = this;
 
-            access(function (key) {
-                _this6[key] && _this6[key].destroy && _this6[key].destroy();
-            });
+      access(function (key) {
+        _this6[key] && _this6[key].destroy && _this6[key].destroy();
+      });
 
-            //销毁renderer = new PIXI.WebGLRenderer
-            if (this.canvasMode) {
-                //rederer.destroy()
-                this.$contentNode.view && this.$contentNode.destroy();
-            }
+      //销毁renderer = new PIXI.WebGLRenderer
+      if (this.canvasMode) {
+        this.$contentNode.view && this.$contentNode.destroy();
+      }
 
-            //销毁每一个数据上的canvas上下文引用
-            if (this.contentDas.$contentNode) {
-                this.contentDas.$contentNode = null;
-            }
+      //销毁每一个数据上的canvas上下文引用
+      if (this.contentDas.$contentNode) {
+        this.contentDas.$contentNode = null;
+      }
 
-            access(function (key) {
-                _this6[key] = null;
-            });
+      access(function (key) {
+        _this6[key] = null;
+      });
 
-            this.getParameter = null;
-        }
-    }]);
-    return Animation;
+      this.$contentNode = null;
+      this.getParameter = null;
+    }
+  }]);
+  return Animation;
 }();
 
 var transitionDuration$1 = Xut.style.transitionDuration;
@@ -60294,6 +60534,54 @@ function index$1(data, relatedData, getStyle) {
     return data;
 }
 
+/////////////////////////////////
+///  预处理
+///  1.动画直接改变显示隐藏状态
+///  2.动画直接执行脚本
+/////////////////////////////////
+
+function pretreatment(data, eventName) {
+  var parameter = data.getParameter();
+
+  //过滤预生成动画
+  if (parameter && parameter.length === 1) {
+    var _ret = function () {
+      var category = data.contentDas.category;
+      var para = parameter[0];
+
+      if (para.animationName === 'EffectAppear' //出现动画
+      && data.domMode //并且只有dom模式才可以，canvas排除
+      && eventName === 'auto' //自动运行
+      && !para.videoId //没有音频
+      && !para.delay //没有延时
+      && category !== 'Sprite' //不是精灵
+      && category !== 'AutoCompSprite' //不是自动精灵
+      && !/"inapp"/i.test(para.parameter)) {
+        //并且不能是收费处理
+
+        //针对预处理动作,并且没有卷滚的不注册，满足是静态动画，true是显示,false隐藏
+        if (!para.preCode && !para.postCode) {
+          return {
+            v: data.prepVisible = /"exit":"False"/i.test(para.parameter) === true ? 'visible' : 'hidden'
+          };
+        }
+
+        //如果有脚本，可能是针对迷你杂志跳转的数据
+        //需要通过onclick绑定，那么就截断这个数据
+        if (para.preCode) {
+          ['window.location.href', 'window.open'].forEach(function (url) {
+            if (-1 !== para.preCode.indexOf(url)) {
+              return data.prepTruncation = para.preCode;
+            }
+          });
+        }
+      }
+    }();
+
+    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+  }
+}
+
 /**
  * 创建执行对象
  * 1 动画作用域
@@ -60304,32 +60592,6 @@ function index$1(data, relatedData, getStyle) {
 //pixi暂时不使用
 // import { Context } from '../pixi/context'
 
-/**
- * 预运行动作
- * 自动 && 出现 && 无时间 && 无音乐
- *  && 不是精灵动画 && 没有脚本代码 && 并且不能是收费
- * @return {[type]}         [description]
- */
-var preRunAction = function preRunAction(data, eventName) {
-    var parameter = data.getParameter();
-    //过滤预生成动画
-    if (parameter && parameter.length === 1) {
-        var category = data.contentDas.category;
-        var para = parameter[0];
-        if (para.animationName === 'EffectAppear' && data.domMode //并且只有dom模式才可以，canvas排除
-        && eventName === 'auto' && !para.videoId && !para.delay && category !== 'Sprite' && category !== 'AutoCompSprite' && !para.preCode //动画前脚本
-        && !para.postCode //动画后脚本
-        && !/"inapp"/i.test(para.parameter)) {
-            //并且不能是收费处理
-            /**
-             *针对预处理动作,并且没有卷滚的不注册
-             *满足是静态动画
-             *true是显示,false隐藏å
-             */
-            return data.isRreRun = /"exit":"False"/i.test(para.parameter) === true ? 'visible' : 'hidden';
-        }
-    }
-};
 
 /**
  * 构建动画
@@ -60337,117 +60599,108 @@ var preRunAction = function preRunAction(data, eventName) {
  */
 var createScope = function createScope(base, contentId, pid, actName, parameter, hasParallax) {
 
-    //默认启动dom模式
-    var data = {
-        type: 'dom',
-        canvasMode: false,
-        domMode: true
+  //默认启动dom模式
+  var data = {
+    type: 'dom',
+    canvasMode: false,
+    domMode: true
+  };
+  var $contentNode;
+  var pageType = base.pageType;
+  var contentName;
+  var canvasDom;
+  var contentDas = base.relatedData.contentDas[contentId];
+
+  //如果启动了canvas模式
+  //改成作用域的一些数据
+  if (base.canvasRelated.enable) {
+    //如果找到对应的canvas对象
+    if (-1 !== base.canvasRelated.cid.indexOf(contentId)) {
+      contentName = "canvas_" + pid + "_" + contentId;
+      canvasDom = base.getContextNode(contentName)[0];
+
+      //创建上下文pixi
+      if (contentDas.$contentNode) {
+        $contentNode = contentDas.$contentNode;
+      } else {
+        // $contentNode = Context(contentDas, canvasDom, base.pageIndex)
+        //保存canvas pixi的上下文引用
+        // base.relatedData.contentDas[contentId].$contentNode = $contentNode
+      }
+      data.type = 'canvas';
+      data.canvasMode = true;
+      data.domMode = false;
+    }
+  }
+
+  //如果是dom模式
+  if (!$contentNode) {
+    /**
+     * 确保节点存在
+     * @type {[type]}
+     */
+    if (!($contentNode = base.getContextNode(actName))) {
+      return;
+    }
+  }
+
+  /**
+   * 制作公共数据
+   * @type {Object}
+   */
+  _.extend(data, {
+    base: base,
+    id: contentId,
+    pid: pid,
+    actName: actName,
+    contentDas: contentDas,
+    $contentNode: $contentNode,
+    pageType: pageType,
+    pageIndex: base.pageIndex,
+    canvasRelated: base.canvasRelated,
+    nextTask: base.nextTask,
+    canvasDom: canvasDom
+  });
+
+  /**
+   * 如果是母版层理,视觉差处理
+   * processType 三种情况
+   *          parallax
+   *          animation
+   *          both(parallax,animation)
+   * @type {[type]}
+   */
+  if (hasParallax && pageType === 'master') {
+    data.processType = 'parallax';
+  } else {
+    data.processType = 'animation';
+  }
+
+  /**
+   * 生成查询方法
+   */
+  data.getParameter = function () {
+    //分区母版与页面的数据结构
+    //parameter-master-parallax
+    //parameter-master-animation
+    //parameter-page-animation
+    var fix = 'parameter-' + pageType + '-' + data.processType;
+    data[fix] = parameter;
+    return function () {
+      return data[fix];
     };
-    var $contentNode;
-    var pageType = base.pageType;
-    var contentName;
-    var canvasDom;
-    var contentDas = base.relatedData.contentDas[contentId];
+  }();
 
-    //如果启动了canvas模式
-    //改成作用域的一些数据
-    if (base.canvasRelated.enable) {
-        //如果找到对应的canvas对象
-        if (-1 !== base.canvasRelated.cid.indexOf(contentId)) {
-            contentName = "canvas_" + pid + "_" + contentId;
-            canvasDom = base.getContextNode(contentName)[0];
+  //生成视觉差对象
+  if (data.processType === 'parallax') {
+    return index$1(data, base.relatedData, base.getStyle);
+  }
 
-            //创建上下文pixi
-            if (contentDas.$contentNode) {
-                $contentNode = contentDas.$contentNode;
-            } else {
-                // $contentNode = Context(contentDas, canvasDom, base.pageIndex)
-                //保存canvas pixi的上下文引用
-                // base.relatedData.contentDas[contentId].$contentNode = $contentNode
-            }
-            data.type = 'canvas';
-            data.canvasMode = true;
-            data.domMode = false;
-        }
-    }
+  //数据预处理
+  pretreatment(data, base.eventData.eventName);
 
-    //如果是dom模式
-    if (!$contentNode) {
-        /**
-         * 确保节点存在
-         * @type {[type]}
-         */
-        if (!($contentNode = base.getContextNode(actName))) {
-            return;
-        }
-    }
-
-    /**
-     * 制作公共数据
-     * @type {Object}
-     */
-    _.extend(data, {
-        base: base,
-        id: contentId,
-        pid: pid,
-        actName: actName,
-        contentDas: contentDas,
-        $contentNode: $contentNode,
-        pageType: pageType,
-        pageIndex: base.pageIndex,
-        canvasRelated: base.canvasRelated,
-        nextTask: base.nextTask,
-        canvasDom: canvasDom
-    });
-
-    /**
-     * 如果是母版层理,视觉差处理
-     * processType 三种情况
-     *          parallax
-     *          animation
-     *          both(parallax,animation)
-     * @type {[type]}
-     */
-    if (hasParallax && pageType === 'master') {
-        data.processType = 'parallax';
-    } else {
-        data.processType = 'animation';
-    }
-
-    /**
-     * 生成查询方法
-     * @return {[type]} [description]
-     */
-    data.getParameter = function () {
-        //分区母版与页面的数据结构
-        //parameter-master-parallax
-        //parameter-master-animation
-        //parameter-page-animation
-        var fix = 'parameter-' + pageType + '-' + data.processType;
-        data[fix] = parameter;
-        return function () {
-            return data[fix];
-        };
-    }();
-
-    /**
-     * 生成视觉差对象
-     * @type {[type]}
-     */
-    if (data.processType === 'parallax') {
-        return index$1(data, base.relatedData, base.getStyle);
-    }
-
-    /**
-     *  优化机制,预生成处理
-     *  过滤自动热点并且是出现动作，没有时间，用于提升体验
-     */
-    preRunAction(data, base.eventData.eventName);
-
-    /**
-     * 生成子作用域对象，用于抽象处理动画,行为
-     */
-    return new Animation(data, base.getStyle);
+  //生成子作用域对象，用于抽象处理动画,行为
+  return new Animation(data, base.getStyle);
 };
 
 /**
@@ -60458,18 +60711,11 @@ var createScope = function createScope(base, contentId, pid, actName, parameter,
  * @return {[type]}           [description]
  */
 var createHandlers = function createHandlers(base, parameter) {
-
-    //dom对象
-    var para = parameter[0],
-        contentId = para['contentId'],
-        //可能有多个动画数据 [Object,Object,Object]
-    pid = base.pid,
-        actName = base.makePrefix('Content', pid, contentId);
-
-    /**
-     * 构建子作用域
-     */
-    return createScope(base, contentId, pid, actName, parameter, para.masterId);
+  var para = parameter[0];
+  var contentId = para['contentId']; //可能有多个动画数据 [Object,Object,Object]
+  var pid = base.pid;
+  var actName = base.makePrefix('Content', pid, contentId);
+  return createScope(base, contentId, pid, actName, parameter, para.masterId);
 };
 
 /**
@@ -60477,97 +60723,97 @@ var createHandlers = function createHandlers(base, parameter) {
  * @return {[type]} [description]
  */
 var fnCreate = function fnCreate(base) {
-    return function (data, callback) {
-        var para, handlers;
-        if (data && data.length) {
-            //生成动画作用域对象
-            while (para = data.shift()) {
-                if (handlers = createHandlers(base, para)) {
-                    callback(handlers);
-                }
-            }
+  return function (data, callback) {
+    var para, handlers;
+    if (data && data.length) {
+      //生成动画作用域对象
+      while (para = data.shift()) {
+        if (handlers = createHandlers(base, para)) {
+          callback(handlers);
         }
-    };
+      }
+    }
+  };
 };
 
 /**
  * 源对象复制到目标对象
  */
 var innerExtend = function innerExtend(target, source) {
-    var property;
-    for (property in source) {
-        if (target[property] === undefined) {
-            target[property] = source[property];
-        }
+  var property;
+  for (property in source) {
+    if (target[property] === undefined) {
+      target[property] = source[property];
     }
+  }
 };
 
 //处理itemArray绑定的动画对象
 //注入动画
 //绑定用户事件
 var createContent = function (base) {
-    var animation = base.seed.animation,
-        parallax = base.seed.parallax,
+  var animation = base.seed.animation,
+      parallax = base.seed.parallax,
 
-    //抽出content对象
-    abstractContents = [],
+  //抽出content对象
+  abstractContents = [],
 
-    //创建引用
-    batcheCreate = fnCreate(base);
+  //创建引用
+  batcheCreate = fnCreate(base);
 
-    switch (base.pageType) {
-        case 'page':
-            batcheCreate(animation, function (handlers) {
-                abstractContents.push(handlers);
-            });
-            break;
-        case 'master':
-            //母版层的处理
-            var tempParallaxScope = {},
-                tempAnimationScope = {},
-                tempAssistContents = [];
-            //视觉差处理
-            batcheCreate(parallax, function (handlers) {
-                tempParallaxScope[handlers.id] = handlers;
-            });
+  switch (base.pageType) {
+    case 'page':
+      batcheCreate(animation, function (handlers) {
+        abstractContents.push(handlers);
+      });
+      break;
+    case 'master':
+      //母版层的处理
+      var tempParallaxScope = {},
+          tempAnimationScope = {},
+          tempAssistContents = [];
+      //视觉差处理
+      batcheCreate(parallax, function (handlers) {
+        tempParallaxScope[handlers.id] = handlers;
+      });
 
-            batcheCreate(animation, function (handlers) {
-                tempAnimationScope[handlers.id] = handlers;
-            });
+      batcheCreate(animation, function (handlers) {
+        tempAnimationScope[handlers.id] = handlers;
+      });
 
-            var hasParallax = _.keys(tempParallaxScope).length,
-                hasAnimation = _.keys(tempAnimationScope).length;
+      var hasParallax = _.keys(tempParallaxScope).length,
+          hasAnimation = _.keys(tempAnimationScope).length;
 
-            //动画为主
-            //合并，同一个对象可能具有动画+视觉差行为
-            if (hasParallax && hasAnimation) {
-                _.each(tempAnimationScope, function (target) {
-                    var id = target.id;
-                    var source = tempParallaxScope[id];
-                    if (source) {
-                        //如果能找到就需要合并
-                        innerExtend(target, source); //复制方法
-                        target.processType = 'both'; //标记新组合
-                        delete tempParallaxScope[id]; //删除引用
-                    }
-                });
-                //剩余的处理
-                if (_.keys(tempParallaxScope).length) {
-                    _.extend(tempAnimationScope, tempParallaxScope);
-                }
-                tempParallaxScope = null;
-            }
-            //转化成数组
-            _.each(hasAnimation ? tempAnimationScope : tempParallaxScope, function (target) {
-                tempAssistContents.push(target);
-            });
-            abstractContents = tempAssistContents;
-            break;
-    }
+      //动画为主
+      //合并，同一个对象可能具有动画+视觉差行为
+      if (hasParallax && hasAnimation) {
+        _.each(tempAnimationScope, function (target) {
+          var id = target.id;
+          var source = tempParallaxScope[id];
+          if (source) {
+            //如果能找到就需要合并
+            innerExtend(target, source); //复制方法
+            target.processType = 'both'; //标记新组合
+            delete tempParallaxScope[id]; //删除引用
+          }
+        });
+        //剩余的处理
+        if (_.keys(tempParallaxScope).length) {
+          _.extend(tempAnimationScope, tempParallaxScope);
+        }
+        tempParallaxScope = null;
+      }
+      //转化成数组
+      _.each(hasAnimation ? tempAnimationScope : tempParallaxScope, function (target) {
+        tempAssistContents.push(target);
+      });
+      abstractContents = tempAssistContents;
+      break;
+  }
 
-    batcheCreate = null;
+  batcheCreate = null;
 
-    return abstractContents;
+  return abstractContents;
 };
 
 /**
@@ -60681,691 +60927,626 @@ var createTask = function (callback) {
  * @return {[type]} [description]
  */
 function accessDrop(eventData, callback) {
-    if (eventData && eventData.dragDrop) {
-        callback(eventData.dragDrop);
-    }
+  if (eventData && eventData.dragDrop) {
+    callback(eventData.dragDrop);
+  }
 }
 
 var Activity = function () {
 
+  /**
+   * activity触发器类
+   * @param  {[type]} data [description]
+   * @return {[type]}      [description]
+   */
+  function Activity(data) {
+    classCallCheck(this, Activity);
+
+
+    _.extend(this, data);
+
     /**
-     * activity触发器类
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
+     * 2016.4.11
+     * 检测是所有的子任务必须完成
+     * 因为canvas模式导致
+     * 任务必须等待context上下创建
+     * context就是pixi的直接对象，精灵..都是异步的
      */
-    function Activity(data) {
-        classCallCheck(this, Activity);
+    this.nextTask = createTask(this.noticeComplete);
 
+    /**
+     * 初始化事件
+     * 需要先解析
+     * createContent需要依赖
+     */
+    this._initEvents();
 
-        _.extend(this, data);
+    /**
+     * 保存子对象content
+     */
+    this.abstractContents = createContent(this);
 
-        /**
-         * 2016.4.11
-         * 检测是所有的子任务必须完成
-         * 因为canvas模式导致
-         * 任务必须等待context上下创建
-         * context就是pixi的直接对象，精灵..都是异步的
-         */
-        this.nextTask = createTask(this.noticeComplete);
+    /**
+     * 处理html文本框
+     * 2016.1.6
+     */
+    this._htmlTextBox();
 
-        /**
-         * 填充事件数据
-         */
-        this._fillEventData();
-
-        /**
-         * 保存子对象content
-         * @type {Array}
-         */
-        this.abstractContents = createContent(this);
-
-        /**
-         * 处理html文本框
-         * 2016.1.6
-         */
-        this._htmlTextBox();
-
-        /**
-         * 绑定事件
-         */
-        this._bindEventBehavior();
-
-        /**
-         * 初始化content行为
-         */
-        this._initContents();
-
-        /**
-         * 2016.2.26
-         * 修复妙妙学
-         * 妙妙客户端处理
-         * 点击效果的音频处理
-         * @type {Array}
-         */
-        this._fixAudio = [];
-
-        /**
-         * 2016.11.2
-         * 缓存点击的音频对象
-         * 这样用于优化重复点击按钮的时候触发音频
-         * @type {Array}
-         */
-        this._cacheBehaviorAudio = {};
-
-        /**
-         * 如果存在content
-         * 等待创建执行
-         * @param  {[type]} this.nextTask.context.length()
-         * @return {[type]}
-         */
-        if (this.nextTask.context.length()) {
-            this.nextTask.context.wait = true;
-            return this;
-        }
-
-        /**
-         * 如果没有pixi的异步创建
-         * 同步代码直接完成
-         */
-        this.noticeComplete();
-    }
+    /**
+     * 绑定事件
+     */
+    this._bindEvents();
 
     /**
      * 初始化content行为
+     */
+    this._initContents();
+
+    /**
+     * 2016.2.26
+     * 修复妙妙学
+     * 妙妙客户端处理
+     * 点击效果的音频处理
+     * @type {Array}
+     */
+    this._fixAudio = [];
+
+    /**
+     * 2016.11.2
+     * 缓存点击的音频对象
+     * 这样用于优化重复点击按钮的时候触发音频
+     * @type {Array}
+     */
+    this._cacheBehaviorAudio = {};
+
+    /**
+     * 如果存在content
+     * 等待创建执行
+     * @param  {[type]} this.nextTask.context.length()
+     * @return {[type]}
+     */
+    if (this.nextTask.context.length()) {
+      this.nextTask.context.wait = true;
+      return this;
+    }
+
+    /**
+     * 如果没有pixi的异步创建
+     * 同步代码直接完成
+     */
+    this.noticeComplete();
+  }
+
+  /**
+   * 初始化content行为
+   * @return {[type]} [description]
+   */
+
+
+  createClass(Activity, [{
+    key: '_initContents',
+    value: function _initContents() {
+
+      var pageId = this.relatedData.pageId;
+      var $containsNode = this.$containsNode;
+      var collectorHooks = this.relatedCallback.contentsHooks;
+      var pageType = this.pageType;
+
+      this.eachAssistContents(function (scope) {
+
+        //针对必须创建
+        var $contentNode = void 0;
+        if (!($contentNode = scope.$contentNode)) {
+          console.log('$contentNode不存在');
+          return;
+        }
+
+        //如果是视觉差对象，也需要实现收集器
+        if (scope.processType === 'parallax') {
+          collectorHooks(scope.pid, scope.id, scope);
+          return;
+        }
+
+        //初始化动画
+        var id = scope.id;
+        scope.init(id, $contentNode, $containsNode, pageId, scope.getParameter(), pageType);
+        this._toRepeatBind(id, $contentNode, scope, collectorHooks);
+      });
+    }
+
+    /**
+     * dom节点去重绑定
+     * 在每一次构建activity对象中，不重复处理content一些特性
+     * 1 翻页特性
+     * 2 注册钩子
      * @return {[type]} [description]
      */
 
+  }, {
+    key: '_toRepeatBind',
+    value: function _toRepeatBind(id, $contentNode, scope, collectorHooks) {
+      var relatedData = this.relatedData;
+      var indexOf = relatedData.createContentIds.indexOf(id);
 
-    createClass(Activity, [{
-        key: '_initContents',
-        value: function _initContents() {
+      //过滤重复关系
+      //每个元素只绑定一次
+      if (-1 !== indexOf) {
+        relatedData.createContentIds.splice(indexOf, 1); //删除,去重
+        collectorHooks(scope.pid, id, scope); //收集每一个content注册
+        this._iscrollBind(scope, $contentNode); //增加翻页特性
+      }
+    }
 
-            var pageId = this.relatedData.pageId;
-            var $containsNode = this.$containsNode;
-            var collectorHooks = this.relatedCallback.contentsHooks;
-            var pageType = this.pageType;
+    /**
+     * 增加翻页特性
+     * 可能有多个引用关系
+     * @return {[type]}         [description]
+     */
 
-            this.eachAssistContents(function (scope) {
+  }, {
+    key: '_iscrollBind',
+    value: function _iscrollBind(scope, $contentNode) {
+      var _this = this;
 
-                var context, id, isRreRun, parameter;
+      var self = this;
+      var contentDas = scope.contentDas;
 
-                //针对必须创建
-                if (!(context = scope.$contentNode)) {
-                    console.log('$contentNode不存在');
-                    return;
-                }
+      var linkFunction = function linkFunction(scrollNode) {
 
-                //如果是视觉差对象，也需要实现收集器
-                if (scope.processType === 'parallax') {
-                    collectorHooks(scope.pid, scope.id, scope);
-                    return;
-                }
+        //滚动文本的互斥不显示做一个补丁处理
+        //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
+        //如果是显示的,则不需要处理,
+        var $parentNode = self.getContextNode(self.makePrefix('Content', scope.pid, scope.id));
+        var visible = $parentNode.css('visibility');
+        var resetStyle = function resetStyle() {};
 
-                //如果是动画才处理
-                id = scope.id;
-                isRreRun = scope.isRreRun;
-                parameter = scope.getParameter();
-
-                //如果不是预生成,注册动画事件
-                if (isRreRun === undefined) {
-                    //初始化动画
-                    scope.init(id, context, $containsNode, pageId, parameter, pageType);
-                }
-
-                //绑定DOM一些属性
-                this._toRepeatBind(id, context, isRreRun, scope, collectorHooks);
-            });
-        }
-
-        /**
-         * dom节点去重绑定
-         * 在每一次构建activity对象中，不重复处理content一些特性
-         * 1 翻页特性
-         * 2 注册钩子
-         * 3 预显示
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_toRepeatBind',
-        value: function _toRepeatBind(id, context, isRreRun, scope, collectorHooks) {
-            var indexOf, relatedData;
-
-            relatedData = this.relatedData;
-
-            //过滤重复关系
-            //每个元素只绑定一次
-            if (-1 !== (indexOf = relatedData.createContentIds.indexOf(id))) {
-                //删除,去重
-                relatedData.createContentIds.splice(indexOf, 1);
-                //收集每一个content注册
-                collectorHooks(scope.pid, id, scope);
-                //增加翻页特性
-                this._addIScroll(scope, context);
-                //直接复位状态,针对出现动画 show/hide
-                if (isRreRun) {
-                    //直接改变元素状态
-                    context.css({
-                        'visibility': isRreRun
-                    });
-                }
-            }
-        }
-
-        /**
-         * 增加翻页特性
-         * 可能有多个引用关系
-         * @return {[type]}         [description]
-         */
-
-    }, {
-        key: '_addIScroll',
-        value: function _addIScroll(scope, $contentNode) {
-            var _this = this;
-
-            var self = this,
-                contentDas = scope.contentDas;
-
-            /**
-             * 给外部调用处理
-             * @param  {[type]} contentNode [description]
-             * @return {[type]}             [description]
-             */
-            var makeBindLinkFunction = function makeBindLinkFunction(scrollNode) {
-
-                //滚动文本的互斥不显示做一个补丁处理
-                //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
-                //如果是显示的,则不需要处理,
-                var $parentNode = self.getContextNode(self.makePrefix('Content', scope.pid, scope.id));
-                var visible = $parentNode.css('visibility');
-                var resetStyle = function resetStyle() {};
-                var opacity = void 0;
-
-                if (visible == 'hidden') {
-                    opacity = $parentNode.css('opacity');
-                    //如果设置了不透明,则简单设为可见的
-                    //否则先设为不透明,再设为可见
-                    if (opacity == 0) {
-                        $parentNode.css({
-                            'visibility': 'visible'
-                        });
-                        resetStyle = function resetStyle() {
-                            $parentNode.css({
-                                'visibility': visible
-                            });
-                        };
-                    } else {
-                        $parentNode.css({
-                            'opacity': 0
-                        }).css({
-                            'visibility': 'visible'
-                        });
-                        resetStyle = function resetStyle() {
-                            $parentNode.css({
-                                'opacity': opacity
-                            }).css({
-                                'visibility': visible
-                            });
-                        };
-                    }
-                }
-
-                return function () {
-                    self.iscroll = new iScroll(scrollNode, {
-                        scrollbars: true,
-                        fadeScrollbars: true
-                    });
-
-                    //增加标记
-                    //在PPT动画中reset不还原
-                    scrollNode.setAttribute("data-iscroll", "true");
-
-                    resetStyle();
-                    resetStyle = null;
-                    $parentNode = null;
-                    scrollNode = null;
-                };
+        //元素隐藏状态下，绑定iScroll获取高度是有问题
+        //所以这里需要补丁方式修正一下
+        //让其不可见，但是可以获取高度
+        if (visible == 'hidden') {
+          (function () {
+            var opacity = $parentNode.css('opacity');
+            var setStyle = function setStyle(key, value) {
+              arguments.length > 1 ? $parentNode.css(key, value) : $parentNode.css(key);
             };
 
-            var bindIscroll = function bindIscroll() {
-                $contentNode.css('overflow', 'hidden'); //增加元素溢出隐藏处理
-                $contentNode.children().css('height', ''); //去掉子元素高度，因为有滚动文本框
-                _this.relatedCallback.iscrollHooks.push(makeBindLinkFunction($contentNode[0]));
-            };
-
-            //增加卷滚条标记
-            //但是svg如果没有内容除外
-            if (contentDas.isScroll) {
-                var hasSVG = $contentNode.find('svg');
-                if (hasSVG) {
-                    //必须保证svg有数据
-                    if (hasSVG.text()) {
-                        bindIscroll();
-                    }
-                }
-                //如果不是svg数据，直接绑定
-                else {
-                        bindIscroll();
-                    }
-            }
-
-            //如果是图片则补尝允许范围内的高度
-            if (!contentDas.mask || !contentDas.isGif) {
-                $contentNode.find && $contentNode.find('img').css({
-                    'height': contentDas.scaleHeight
-                });
-            }
-        }
-
-        /**
-         * 制作一个查找标示
-         * @return {[type]}
-         */
-
-    }, {
-        key: 'makePrefix',
-        value: function makePrefix(name, pid, id) {
-            return name + "_" + pid + "_" + id;
-        }
-
-        /**
-         * 从文档碎片中找到对应的dom节点
-         * 查找的范围
-         * 1 文档根节点
-         * 2 文档容器节点
-         * @param  {[type]} prefix [description]
-         * @return {[type]}        [description]
-         */
-
-    }, {
-        key: 'getContextNode',
-        value: function getContextNode(prefix, type) {
-            var node = void 0,
-                $node = void 0,
-                containerPrefix = void 0,
-                contentsFragment = void 0;
-
-            //dom模式
-            contentsFragment = this.relatedData.contentsFragment;
-            if (node = contentsFragment[prefix]) {
-                $node = $(node);
+            //如果设置了不透明,则简单设为可见的
+            //否则先设为不透明,再设为可见
+            if (opacity == 0) {
+              setStyle('visibility', 'visible');
+              resetStyle = function resetStyle() {
+                return setStyle('visibility', visible);
+              };
             } else {
-                //容器处理
-                if (containerPrefix = this.relatedData.containerPrefix) {
-                    _.each(containerPrefix, function (containerName) {
-                        node = contentsFragment[containerName];
-                        $node = $(node).find('#' + prefix);
-                        if ($node.length) {
-                            return;
-                        }
-                    });
-                }
-            }
-            return $node;
-        }
-
-        /**
-         * 复位独立动画
-         * 提供快速翻页复用
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_resetAloneAnim',
-        value: function _resetAloneAnim() {
-            //复位拖动对象
-            accessDrop(this.eventData, function (drop) {
-                drop.reset();
-            });
-        }
-
-        /**
-         * 动画运行之后
-         * 1 创建一个新场景
-         * 2 执行跳转到收费提示页面
-         * 3 触发搜索工具栏
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_relevantOperation',
-        value: function _relevantOperation() {
-
-            var scenarioInfo, eventContentId;
-
-            //触发事件的content id
-            if (this.eventData) {
-                eventContentId = this.eventData.eventContentId;
-            }
-
-            if (eventContentId) {
-
-                //查找出当前节的所有信息
-                if (scenarioInfo = this.relatedData.seasonRelated[eventContentId]) {
-
-                    //如果存在搜索栏触发
-                    if (scenarioInfo.SearchBar) {
-                        this.createSearchBar();
-                        return;
-                    }
-
-                    //如果存在书签
-                    if (scenarioInfo.BookMarks) {
-                        this.createBookMark();
-                        return;
-                    }
-
-                    //处理新的场景
-                    if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
-                        setTimeout(function () {
-                            Xut.View.LoadScenario({
-                                'scenarioId': scenarioInfo.seasonId,
-                                'chapterId': scenarioInfo.chapterId
-                            });
-                        }, hasAudioes() ? 1000 : 0);
-                        return;
-                    }
-
-                    // console.log('content跳转信息出错',scenarioInfo)
-                }
-            }
-        }
-
-        /**
-         * 保证正确遍历
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'eachAssistContents',
-        value: function eachAssistContents(callback) {
-            _.each(this.abstractContents, function (scope) {
-                callback.call(this, scope);
-            }, this);
-        }
-
-        /**
-         * 运行动画
-         * @param  {[type]} outComplete [动画回调]
-         * @return {[type]}             [description]
-         * evenyClick 每次都算有效点击
-         */
-
-    }, {
-        key: 'runAnimation',
-        value: function runAnimation(outComplete, evenyClick) {
-
-            var self = this;
-            var pageId = this.relatedData.pageId;
-
-            if (evenyClick) {
-                this.preventRepeat = false;
-            }
-
-            //防止重复点击
-            if (this.preventRepeat) {
-                return false;
-            }
-
-            this.preventRepeat = true;
-
-            //如果没有运行动画
-            if (!this.seed.animation) {
-                this.preventRepeat = false;
-                this._relevantOperation();
-                return;
-            }
-
-            //创建的无行为content
-            var partContentRelated = this.relatedData.partContentRelated;
-
-            //制作作用于内动画完成
-            //等待动画完毕后执行动作or场景切换
-            var captureAnimComplete = this.captureAnimComplete = function (counts) {
-                return function (scope) {
-                    //动画结束,删除这个hack
-                    scope && scope.$contentNode && scope.$contentNode.removeProp && scope.$contentNode.removeProp('animOffset');
-
-                    //如果快速翻页
-                    //运行动画的时候，发现不是可视页面
-                    //需要关闭这些动画
-                    var closeAnim = pageId != Xut.Presentation.GetPageId();
-
-                    if (closeAnim && scope) {
-                        scope.stop && scope.stop(pageId);
-                        scope.reset && scope.reset();
-                    }
-
-                    //捕获动画状态
-                    if (counts === 1) {
-                        if (closeAnim) {
-                            //复位动画
-                            self._resetAloneAnim();
-                        }
-                        self.preventRepeat = false;
-                        self._relevantOperation();
-                        outComplete && outComplete();
-                        self.captureAnimComplete = null;
-                    } else {
-                        --counts;
-                    }
-                };
-            }(this.abstractContents.length);
-
-            /**
-             * 如果是preRun处理
-             * @return {Boolean} [description]
-             */
-            var isRreRunPocess = function isRreRunPocess(scope) {
-                //针对空跳过处理
-                if (partContentRelated && partContentRelated.length && -1 !== partContentRelated.indexOf(scope.id)) {
-                    captureAnimComplete();
-                } else {
-                    //必须要修改
-                    if (scope.$contentNode) {
-                        if (scope.canvasMode) {
-                            console.log('canvsa isRreRunPocess');
-                            //直接改变元素状态
-                            //scope.$contentNode.view.style.visible = scope.isRreRun === 'visible' ? true : false;
-                        } else {
-                            //因为执行的顺序问题，动画与页面零件
-                            //isscroll标记控制
-                            if (!scope.$contentNode.attr('data-iscroll')) {
-                                scope.$contentNode.css({
-                                    'visibility': scope.isRreRun
-                                });
-                            }
-                        }
-                    }
-                    captureAnimComplete();
-                }
-            };
-
-            //执行动画
-            this.eachAssistContents(function (scope) {
-                if (scope.isRreRun) {
-                    isRreRunPocess(scope);
-                } else {
-
-                    //标记动画正在运行
-                    scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
-                        'animOffset': scope.$contentNode.offset()
-                    });
-
-                    //ppt动画
-                    //ppt音频
-                    scope.play(function () {
-                        captureAnimComplete(scope);
-                    });
-                }
-            });
-
-            this.runState = true;
-        }
-
-        /**
-         * 停止动画
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'stopAnimation',
-        value: function stopAnimation() {
-            var pageId = this.relatedData.pageId;
-            this.runState = false;
-            this.eachAssistContents(function (scope) {
-                !scope.isRreRun && scope.stop && scope.stop(pageId);
-            });
-        }
-
-        /**
-         * 销毁动画
-         * @param  {[type]} elementCallback [description]
-         * @return {[type]}                 [description]
-         */
-
-    }, {
-        key: '_destroyAnimation',
-        value: function _destroyAnimation(elementCallback) {
-            //销毁拖动对象
-            accessDrop(this.eventData, function (drop) {
-                drop.destroy();
-            });
-            this.eachAssistContents(function (scope) {
-                if (scope.destroy) {
-                    scope.destroy();
-                }
-                elementCallback && elementCallback(scope);
-            });
-        }
-
-        /**
-         * 自动运行
-         * @param  {[type]} outComplete [description]
-         * @return {[type]}             [description]
-         */
-
-    }, {
-        key: 'autoPlay',
-        value: function autoPlay(outComplete) {
-            var eventData = this.eventData;
-            if (eventData && eventData.eventName === 'auto') {
-                this.runAnimation(outComplete);
-            } else {
-                outComplete();
-            }
-        }
-
-        /**
-         * 复位状态
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'reset',
-        value: function reset() {
-            this.eachAssistContents(function (scope) {
-                !scope.isRreRun && scope.reset && scope.reset(); //ppt动画
-            });
-
-            this._resetAloneAnim();
-        }
-
-        /**
-         * 停止动作
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'stop',
-        value: function stop() {
-            if (this.runState) {
-                this.stopAnimation();
-            }
-            this.preventRepeat = false;
-
-            //复位盒子
-            if (this.htmlBoxInstance.length) {
-                _.each(this.htmlBoxInstance, function (instance) {
-                    instance.removeBox();
+              setStyle({
+                'opacity': 0,
+                'visibility': 'visible'
+              });
+              resetStyle = function resetStyle() {
+                return setStyle({
+                  'opacity': opacity,
+                  'visibility': visible
                 });
+              };
             }
-
-            //修复妙妙客户端
-            //没有点击音频结束的回调
-            //最多允许播放5秒
-            if (this._fixAudio.length) {
-                _.each(this._fixAudio, function (instance) {
-                    setTimeout(function () {
-                        instance.end();
-                    }, 5000);
-                });
-                this._fixAudio = [];
-            }
+          })();
         }
 
-        //销毁
-        //提供一个删除回调
-        //用于处理浮动对象的销毁
+        return function () {
+          self.iscroll = new iScroll(scrollNode, {
+            scrollbars: true,
+            fadeScrollbars: true
+          });
 
-    }, {
-        key: 'destroy',
-        value: function destroy(elementCallback) {
+          //增加标记
+          //在PPT动画中reset不还原
+          scrollNode.setAttribute("data-iscroll", "true");
 
-            //销毁绑定事件
-            if (this.eventData.eventContext) {
-                destroyContentEvent(this.eventData);
-                this.eventData.eventContext = null;
-            }
+          resetStyle();
+          resetStyle = null;
+          $parentNode = null;
+          scrollNode = null;
+        };
+      };
 
-            //2016.1.7
-            //如果有文本框事件
-            //一个activity允许有多个文本框
-            //所以是数组索引
-            if (this.htmlBoxInstance.length) {
-                _.each(this.htmlBoxInstance, function (instance) {
-                    instance.destroy();
-                });
-                this.htmlBoxInstance = null;
-            }
+      var bind = function bind() {
+        $contentNode.css('overflow', 'hidden'); //增加元素溢出隐藏处理
+        $contentNode.children().css('height', ''); //去掉子元素高度，因为有滚动文本框
+        _this.relatedCallback.iscrollHooks.push(linkFunction($contentNode[0]));
+      };
 
-            //销毁动画
-            this._destroyAnimation(elementCallback);
-            this.abstractContents = null;
+      //增加卷滚条标记
+      //但是svg如果没有内容除外
+      if (contentDas.isScroll) {
+        var hasSVG = $contentNode.find('svg');
 
-            //iscroll销毁
-            if (this.iscroll) {
-                this.iscroll.destroy();
-                this.iscroll = null;
-            }
-
-            //销毁搜索框
-            if (this.searchBar) {
-                this.searchBar.destroy();
-                this.searchBar = null;
-            }
-
-            //销毁书签
-            if (this.bookMark) {
-                this.bookMark.destroy();
-                this.bookMark = null;
-            }
-
-            //如果有点击音频
-            if (Object.keys(this._cacheBehaviorAudio).length) {
-                for (var key in this._cacheBehaviorAudio) {
-                    var audio = this._cacheBehaviorAudio[key];
-                    if (audio) {
-                        audio.end();
-                        this._cacheBehaviorAudio[key] = null;
-                    }
-                }
-            }
-
-            this.$containsNode = null;
+        if (hasSVG) {
+          //必须保证svg有数据
+          if (hasSVG.text()) {
+            bind();
+          }
+        } else {
+          //如果不是svg数据，直接绑定
+          bind();
         }
-    }]);
-    return Activity;
+      }
+
+      //如果是图片则补尝允许范围内的高度
+      if (!contentDas.mask || !contentDas.isGif) {
+        $contentNode.find && $contentNode.find('img').css({
+          'height': contentDas.scaleHeight
+        });
+      }
+    }
+
+    /**
+     * 制作一个查找标示
+     * @return {[type]}
+     */
+
+  }, {
+    key: 'makePrefix',
+    value: function makePrefix(name, pid, id) {
+      return name + "_" + pid + "_" + id;
+    }
+
+    /**
+     * 从文档碎片中找到对应的dom节点
+     * 查找的范围
+     * 1 文档根节点
+     * 2 文档容器节点
+     * @param  {[type]} prefix [description]
+     * @return {[type]}        [description]
+     */
+
+  }, {
+    key: 'getContextNode',
+    value: function getContextNode(prefix, type) {
+      var node = void 0,
+          $node = void 0,
+          containerPrefix = void 0,
+          contentsFragment = void 0;
+
+      //dom模式
+      contentsFragment = this.relatedData.contentsFragment;
+      if (node = contentsFragment[prefix]) {
+        $node = $(node);
+      } else {
+        //容器处理
+        if (containerPrefix = this.relatedData.containerPrefix) {
+          _.each(containerPrefix, function (containerName) {
+            node = contentsFragment[containerName];
+            $node = $(node).find('#' + prefix);
+            if ($node.length) {
+              return;
+            }
+          });
+        }
+      }
+      return $node;
+    }
+
+    /**
+     * 复位独立动画
+     * 提供快速翻页复用
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_resetAloneAnim',
+    value: function _resetAloneAnim() {
+      //复位拖动对象
+      accessDrop(this.eventData, function (drop) {
+        drop.reset();
+      });
+    }
+
+    /**
+     * 动画运行之后
+     * 1 创建一个新场景
+     * 2 执行跳转到收费提示页面
+     * 3 触发搜索工具栏
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_relevantOperation',
+    value: function _relevantOperation() {
+
+      var scenarioInfo, eventContentId;
+
+      //触发事件的content id
+      if (this.eventData) {
+        eventContentId = this.eventData.eventContentId;
+      }
+
+      if (eventContentId) {
+
+        //查找出当前节的所有信息
+        if (scenarioInfo = this.relatedData.seasonRelated[eventContentId]) {
+
+          //如果存在搜索栏触发
+          if (scenarioInfo.SearchBar) {
+            this.createSearchBar();
+            return;
+          }
+
+          //如果存在书签
+          if (scenarioInfo.BookMarks) {
+            this.createBookMark();
+            return;
+          }
+
+          //处理新的场景
+          if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
+            setTimeout(function () {
+              Xut.View.LoadScenario({
+                'scenarioId': scenarioInfo.seasonId,
+                'chapterId': scenarioInfo.chapterId
+              });
+            }, hasAudioes() ? 1000 : 0);
+            return;
+          }
+
+          // console.log('content跳转信息出错',scenarioInfo)
+        }
+      }
+    }
+
+    /**
+     * 保证正确遍历
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'eachAssistContents',
+    value: function eachAssistContents(callback) {
+      _.each(this.abstractContents, function (scope) {
+        callback.call(this, scope);
+      }, this);
+    }
+
+    /**
+     * 运行动画
+     * @param  {[type]} outComplete [动画回调]
+     * @return {[type]}             [description]
+     * evenyClick 每次都算有效点击
+     */
+
+  }, {
+    key: 'runAnimation',
+    value: function runAnimation(outComplete, evenyClick) {
+
+      var self = this;
+      var pageId = this.relatedData.pageId;
+
+      if (evenyClick) {
+        this.preventRepeat = false;
+      }
+
+      //防止重复点击
+      if (this.preventRepeat) {
+        return false;
+      }
+
+      this.preventRepeat = true;
+
+      //如果没有运行动画
+      if (!this.seed.animation) {
+        this.preventRepeat = false;
+        this._relevantOperation();
+        return;
+      }
+
+      //制作作用于内动画完成
+      //等待动画完毕后执行动作or场景切换
+      var captureAnimComplete = this.captureAnimComplete = function (counts) {
+        return function (scope) {
+          //动画结束,删除这个hack
+          scope && scope.$contentNode && scope.$contentNode.removeProp && scope.$contentNode.removeProp('animOffset');
+
+          //如果快速翻页
+          //运行动画的时候，发现不是可视页面
+          //需要关闭这些动画
+          var closeAnim = pageId != Xut.Presentation.GetPageId();
+
+          if (closeAnim && scope) {
+            scope.stop && scope.stop(pageId);
+            scope.reset && scope.reset();
+          }
+
+          //捕获动画状态
+          if (counts === 1) {
+            if (closeAnim) {
+              //复位动画
+              self._resetAloneAnim();
+            }
+            self.preventRepeat = false;
+            self._relevantOperation();
+            outComplete && outComplete();
+            self.captureAnimComplete = null;
+          } else {
+            --counts;
+          }
+        };
+      }(this.abstractContents.length);
+
+      //执行动画
+      this.eachAssistContents(function (scope) {
+        //标记动画正在运行
+        scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
+          'animOffset': scope.$contentNode.offset()
+        });
+        scope.play(function () {
+          captureAnimComplete(scope);
+        });
+      });
+
+      this.runState = true;
+    }
+
+    /**
+     * 停止动画
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'stopAnimation',
+    value: function stopAnimation() {
+      var pageId = this.relatedData.pageId;
+      this.runState = false;
+      this.eachAssistContents(function (scope) {
+        scope.stop && scope.stop(pageId);
+      });
+    }
+
+    /**
+     * 销毁动画
+     * @param  {[type]} elementCallback [description]
+     * @return {[type]}                 [description]
+     */
+
+  }, {
+    key: '_destroyAnimation',
+    value: function _destroyAnimation(elementCallback) {
+      //销毁拖动对象
+      accessDrop(this.eventData, function (drop) {
+        drop.destroy();
+      });
+      this.eachAssistContents(function (scope) {
+        if (scope.destroy) {
+          scope.destroy();
+        }
+        elementCallback && elementCallback(scope);
+      });
+    }
+
+    /**
+     * 自动运行
+     * @param  {[type]} outComplete [description]
+     * @return {[type]}             [description]
+     */
+
+  }, {
+    key: 'autoPlay',
+    value: function autoPlay(outComplete) {
+      var eventData = this.eventData;
+      if (eventData && eventData.eventName === 'auto') {
+        this.runAnimation(outComplete);
+      } else {
+        outComplete();
+      }
+    }
+
+    /**
+     * 复位状态
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'reset',
+    value: function reset() {
+      this.eachAssistContents(function (scope) {
+        scope.reset && scope.reset(); //ppt动画
+      });
+      this._resetAloneAnim();
+    }
+
+    /**
+     * 停止动作
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'stop',
+    value: function stop() {
+      if (this.runState) {
+        this.stopAnimation();
+      }
+      this.preventRepeat = false;
+
+      //复位盒子
+      if (this.htmlBoxInstance.length) {
+        _.each(this.htmlBoxInstance, function (instance) {
+          instance.removeBox();
+        });
+      }
+
+      //修复妙妙客户端
+      //没有点击音频结束的回调
+      //最多允许播放5秒
+      if (this._fixAudio.length) {
+        _.each(this._fixAudio, function (instance) {
+          setTimeout(function () {
+            instance.end();
+          }, 5000);
+        });
+        this._fixAudio = [];
+      }
+    }
+
+    //销毁
+    //提供一个删除回调
+    //用于处理浮动对象的销毁
+
+  }, {
+    key: 'destroy',
+    value: function destroy(elementCallback) {
+
+      //销毁绑定事件
+      if (this.eventData.eventContext) {
+        destroyContentEvent(this.eventData);
+        this.eventData.eventContext = null;
+      }
+
+      //2016.1.7
+      //如果有文本框事件
+      //一个activity允许有多个文本框
+      //所以是数组索引
+      if (this.htmlBoxInstance.length) {
+        _.each(this.htmlBoxInstance, function (instance) {
+          instance.destroy();
+        });
+        this.htmlBoxInstance = null;
+      }
+
+      //销毁动画
+      this._destroyAnimation(elementCallback);
+      this.abstractContents = null;
+
+      //iscroll销毁
+      if (this.iscroll) {
+        this.iscroll.destroy();
+        this.iscroll = null;
+      }
+
+      //销毁搜索框
+      if (this.searchBar) {
+        this.searchBar.destroy();
+        this.searchBar = null;
+      }
+
+      //销毁书签
+      if (this.bookMark) {
+        this.bookMark.destroy();
+        this.bookMark = null;
+      }
+
+      //如果有点击音频
+      if (Object.keys(this._cacheBehaviorAudio).length) {
+        for (var key in this._cacheBehaviorAudio) {
+          var audio = this._cacheBehaviorAudio[key];
+          if (audio) {
+            audio.end();
+            this._cacheBehaviorAudio[key] = null;
+          }
+        }
+      }
+
+      this.$containsNode = null;
+    }
+  }]);
+  return Activity;
 }();
 
 var activitProto = Activity.prototype;
@@ -61680,478 +61861,492 @@ function applyActivitys(data, contentDas, callback) {
  */
 
 var TaskContents = function () {
-    function TaskContents(activityData) {
-        classCallCheck(this, TaskContents);
+  function TaskContents(activityData) {
+    classCallCheck(this, TaskContents);
 
-        _.extend(this, activityData);
-        //只解析content有关的activityData
-        var compileActivitys = activityParser(activityData);
-        //如果有预执行动作
-        //Activity表数据存在
-        if (compileActivitys) {
-            //解析动画表数据结构
-            activityData = contentParser(compileActivitys, activityData);
+    _.extend(this, activityData);
+    //只解析content有关的activityData
+    var compileActivitys = activityParser(activityData);
+    //如果有预执行动作
+    //Activity表数据存在
+    if (compileActivitys) {
+      //解析动画表数据结构
+      activityData = contentParser(compileActivitys, activityData);
 
-            //如果有需要构建的content
-            //开始多线程处理
-            activityData.createContentIds.length ? this._dataAfterCheck(activityData) : this._loadComplete();
-        } else {
-            this._loadComplete();
-        }
+      //如果有需要构建的content
+      //开始多线程处理
+      activityData.createContentIds.length ? this._dataAfterCheck(activityData) : this._loadComplete();
+    } else {
+      this._loadComplete();
+    }
+  }
+
+  /**
+   * 中断一:构建数据之后
+   * @param  {[type]} data [description]
+   * @return {[type]}      [description]
+   */
+
+
+  createClass(TaskContents, [{
+    key: '_dataAfterCheck',
+    value: function _dataAfterCheck(data) {
+
+      this._assert('dataAfter', function () {
+        var _this = this;
+
+        //浮动模板
+        //用于实现模板上的事件
+        data.floatMaters = {
+          'ids': [], //浮动id
+          'container': {}, //浮动容器
+          'zIndex': {}
+        };
+
+        //浮动页面
+        //母板事件引起的层级遮挡问题
+        //用于提升最高
+        data.floatPages = {
+          'ids': [],
+          'zIndex': {}
+        };
+
+        //解析activitys.parameter中的数据里
+        //点击反馈
+        //点击缩放
+        parseBehavior(data);
+
+        //构建页面content类型结构
+        //contentDas, contentStr, containerPrefix, idFix, contentHtmlBoxIds
+        contentStructure(function (userData) {
+
+          data.contentHtmlBoxIds = userData.contentHtmlBoxIds;
+          data.contentsFragment = {};
+
+          //iboosk节点预编译
+          //在执行的时候节点已经存在
+          //不需要在创建
+          if (Xut.IBooks.runMode()) {
+            _.each(userData.idFix, function (id) {
+              data.contentsFragment[id] = data.$containsNode.find("#" + id)[0];
+            });
+          } else {
+            //构件快速查询节点对象
+            data.contentsFragment = toObject(userData.contentStr);
+            delete userData.contentStr;
+          }
+
+          //容器的前缀
+          data.containerPrefix = userData.containerPrefix;
+
+          /* eslint-disable */
+          //2015.5.6暴露到全局
+          //提供给音频字幕上下文
+          if (!Xut.Contents.contentsFragment[data.chapterId]) {
+            Xut.Contents.contentsFragment[data.chapterId];
+          }
+          Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment;
+          /* elist-enable */
+
+          //开始下一个任务
+          _this._dataStrCheck(data, userData);
+        }, data, this);
+      });
     }
 
     /**
-     * 中断一:构建数据之后
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
+     * 中断二:构建结构之后
+     * @param  {[type]} data       [description]
+     * @param  {[type]} contentDas [description]
+     * @return {[type]}            [description]
      */
 
+  }, {
+    key: '_dataStrCheck',
+    value: function _dataStrCheck(data, userData) {
+      this._assert('strAfter', function () {
+        var _this2 = this;
 
-    createClass(TaskContents, [{
-        key: '_dataAfterCheck',
-        value: function _dataAfterCheck(data) {
-            this._assert('dataAfter', function () {
-                var _this = this;
+        var contentDas = userData.contentDas;
 
-                //浮动模板
-                //用于实现模板上的事件
-                data.floatMaters = {
-                    'ids': [], //浮动id
-                    'container': {}, //浮动容器
-                    'zIndex': {}
-                };
-
-                //浮动页面
-                //母板事件引起的层级遮挡问题
-                //用于提升最高
-                data.floatPages = {
-                    'ids': [],
-                    'zIndex': {}
-                };
-
-                //解析activitys.parameter中的数据里
-                //点击反馈
-                //点击缩放
-                parseBehavior(data);
-
-                //构建页面content类型结构
-                //contentDas, contentStr, containerPrefix, idFix, contentHtmlBoxIds
-                contentStructure(function (userData) {
-
-                    data.contentHtmlBoxIds = userData.contentHtmlBoxIds;
-                    data.contentsFragment = {};
-
-                    //iboosk节点预编译
-                    //在执行的时候节点已经存在
-                    //不需要在创建
-                    if (Xut.IBooks.runMode()) {
-                        _.each(userData.idFix, function (id) {
-                            data.contentsFragment[id] = data.$containsNode.find("#" + id)[0];
-                        });
-                    } else {
-                        //构件快速查询节点对象
-                        data.contentsFragment = toObject(userData.contentStr);
-                        delete userData.contentStr;
-                    }
-
-                    //容器的前缀
-                    data.containerPrefix = userData.containerPrefix;
-
-                    /* eslint-disable */
-                    //2015.5.6暴露到全局
-                    //提供给音频字幕上下文
-                    if (!Xut.Contents.contentsFragment[data.chapterId]) {
-                        Xut.Contents.contentsFragment[data.chapterId];
-                    }
-                    Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment;
-                    /* elist-enable */
-
-                    //开始下一个任务
-                    _this._dataStrCheck(data, userData);
-                }, data, this);
-            });
+        //放大图片
+        if (Object.keys(data.zoomBehavior).length) {
+          this._zoomImage(data);
         }
 
-        /**
-         * 中断二:构建结构之后
-         * @param  {[type]} data       [description]
-         * @param  {[type]} contentDas [description]
-         * @return {[type]}            [description]
-         */
-
-    }, {
-        key: '_dataStrCheck',
-        value: function _dataStrCheck(data, userData) {
-            this._assert('strAfter', function () {
-                var _this2 = this;
-
-                var contentDas = userData.contentDas;
-
-                //放大图片
-                if (Object.keys(data.zoomBehavior).length) {
-                    this._zoomImage(data);
-                }
-
-                //文本特效
-                if (userData.textFx.length) {
-                    this._textFx(data, userData.textFx);
-                }
-
-                //保留场景的留信息
-                //用做软件制作单页预加载
-                sceneController.seasonRelated = data.seasonRelated;
-
-                //初始化content对象
-                applyActivitys(data, contentDas, function (delayHooks) {
-                    _this2._eventAfterCheck(data, delayHooks, userData.headerFooterMode);
-                });
-            });
+        //文本特效
+        if (userData.textFx.length) {
+          this._textFx(data, userData.textFx);
         }
 
+        //保留场景的留信息
+        //用做软件制作单页预加载
+        sceneController.seasonRelated = data.seasonRelated;
+
+        //初始化content对象
+        applyActivitys(data, contentDas, function (delayHooks) {
+          _this2._eventAfterCheck(data, delayHooks, userData.headerFooterMode);
+        });
+      });
+    }
+
+    /**
+     * 中断三:绑定事件事件之后
+     * @param  {[type]} iScrollHooks [description]
+     * @return {[type]}              [description]
+     */
+
+  }, {
+    key: '_eventAfterCheck',
+    value: function _eventAfterCheck(data, delayHooks, headerFooterMode) {
+
+      var self = this;
+
+      this._assert('eventAfter', function () {
+
+        data.count = 1; //计算回调的成功的次数
+
         /**
-         * 中断三:绑定事件事件之后
-         * @param  {[type]} iScrollHooks [description]
-         * @return {[type]}              [description]
+         * 完成钩子函数
+         * 1 content的卷滚条
+         * 2 canvas事件绑定
+         * @return {[type]} [description]
          */
+        var callHooks = function callHooks() {
+          var iscrollHooks = delayHooks.iscrollHooks;
+          var hook = void 0;
+          if (iscrollHooks.length) {
+            while (hook = iscrollHooks.shift()) {
+              hook();
+            }
+          }
+        };
 
-    }, {
-        key: '_eventAfterCheck',
-        value: function _eventAfterCheck(data, delayHooks, headerFooterMode) {
+        var nextTask = function nextTask() {
+          delayHooks && callHooks();
+          self._applyAfterCheck();
+        };
 
-            var self = this;
+        /**
+         * 1 页面浮动
+         * 2 母版浮动
+         * 3 正常对象
+         */
+        var complete = function (data) {
+          return function () {
+            if (data.count === 1) {
+              nextTask();
+              return;
+            }
+            data.count--;
+          };
+        }(data);
 
-            this._assert('eventAfter', function () {
+        //浮动页面对
+        //浮动对象比任何层级都都要高
+        //超过母版
+        if (data.floatPages.ids && data.floatPages.ids.length) {
+          createFloatPage(this, data, complete);
+        }
 
-                data.count = 1; //计算回调的成功的次数
+        //如果存在母版浮动节点
+        //在创建节点structure中过滤出来，根据参数的tipmost
+        if (data.floatMaters.ids && data.floatMaters.ids.length) {
+          createFloatMater(this, data, complete);
+        }
 
-                /**
-                 * 完成钩子函数
-                 * 1 content的卷滚条
-                 * 2 canvas事件绑定
-                 * @return {[type]} [description]
-                 */
-                var callHooks = function callHooks() {
-                    var iscrollHooks = delayHooks.iscrollHooks;
-                    var hook = void 0;
-                    if (iscrollHooks.length) {
-                        while (hook = iscrollHooks.shift()) {
-                            hook();
-                        }
-                    }
-                };
+        //iboosk节点预编译
+        //在执行的时候节点已经存在
+        //不需要在创建
+        if (Xut.IBooks.runMode()) {
+          complete();
+        } else {
+          var _ret = function () {
 
-                var nextTask = function nextTask() {
-                    delayHooks && callHooks();
-                    self._applyAfterCheck();
-                };
+            var fragment = toArray$1(data.contentsFragment, headerFooterMode);
+            var bodyContent = fragment.bodyContent;
+            var headerFooterContent = fragment.headerFooterContent;
 
-                /**
-                 * 1 页面浮动
-                 * 2 母版浮动
-                 * 3 正常对象
-                 */
-                var complete = function (data) {
-                    return function () {
-                        if (data.count === 1) {
-                            nextTask();
-                            return;
-                        }
-                        data.count--;
-                    };
-                }(data);
+            var watchCount = 0;
+            headerFooterContent.length && ++watchCount;
+            bodyContent.length && ++watchCount;
 
-                //浮动页面对
-                //浮动对象比任何层级都都要高
-                //超过母版
-                if (data.floatPages.ids && data.floatPages.ids.length) {
-                    createFloatPage(this, data, complete);
+            //如果bodyContent与headerFooterContent都没有
+            //直接返回回调
+            if (!watchCount) {
+              complete();
+              return {
+                v: void 0
+              };
+            }
+
+            var watchNextTick = function () {
+              return function () {
+                if (watchCount === 1) {
+                  complete();
+                  return;
+                }
+                --watchCount;
+              };
+            }();
+
+            //页眉页脚
+            if (headerFooterContent.length) {
+              nextTick({
+                'container': data.$headFootNode,
+                'content': fragment.headerFooterContent
+              }, watchNextTick);
+            }
+
+            //主体内容
+            if (bodyContent.length) {
+              nextTick({
+                'container': data.$containsNode,
+                'content': fragment.bodyContent
+              }, watchNextTick);
+            }
+          }();
+
+          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+        }
+      });
+    }
+
+    /**
+     * 中断四：渲染content
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_applyAfterCheck',
+    value: function _applyAfterCheck() {
+      this._assert('applyAfter', function () {
+        this._loadComplete(true);
+      });
+    }
+
+    /**
+     * 运行被阻断的线程任务
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'runSuspendTasks',
+    value: function runSuspendTasks() {
+      if (this.suspendQueues) {
+        var fn;
+        if (fn = this.suspendQueues.pop()) {
+          fn();
+        }
+        this.suspendQueues = null;
+      }
+    }
+
+    /**
+     * 点击放大图
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_zoomImage',
+    value: function _zoomImage(data) {
+      var self = this;
+      self.zoomObjs = {}; //保存缩放对象
+      _.each(data.contentsFragment, function (node) {
+        //需要单独绑定点击放大功能
+        var behaviorData = data.zoomBehavior[node.id];
+        var size = void 0;
+        var promptHtml = void 0;
+        if (behaviorData) {
+          (function () {
+            //缩放提示图片
+            if (behaviorData.prompt) {
+              size = config.screenSize.width > config.screenSize.height ? '2vw' : '2vh';
+              promptHtml = '<div class="icon-maximize"\n                             style="font-size:' + size + ';position:absolute;right:0;">\n                        </div>';
+              $(node).append(String.styleFormat(promptHtml));
+            }
+            var hasMove = false;
+            $$on(node, {
+              start: function start() {
+                hasMove = false;
+              },
+              move: function move() {
+                hasMove = true;
+              },
+              end: function end() {
+                if (hasMove) return;
+                var $node = $(node);
+                var $imgNode = $node.find('img');
+
+                if (!$imgNode.length) {
+                  return;
                 }
 
-                //如果存在母版浮动节点
-                //在创建节点structure中过滤出来，根据参数的tipmost
-                if (data.floatMaters.ids && data.floatMaters.ids.length) {
-                    createFloatMater(this, data, complete);
-                }
+                var src = $imgNode[0].src;
+                var zoomObj = self.zoomObjs[src];
 
-                //iboosk节点预编译
-                //在执行的时候节点已经存在
-                //不需要在创建
-                if (Xut.IBooks.runMode()) {
-                    complete();
+                if (zoomObj) {
+                  zoomObj.play();
                 } else {
-                    (function () {
-
-                        var fragment = toArray$1(data.contentsFragment, headerFooterMode);
-                        var bodyContent = fragment.bodyContent;
-                        var headerFooterContent = fragment.headerFooterContent;
-                        var watchNextTick = function () {
-                            var watchCount = 0;
-                            headerFooterContent.length && ++watchCount;
-                            bodyContent.length && ++watchCount;
-                            return function () {
-                                if (watchCount === 1) {
-                                    complete();
-                                    return;
-                                }
-                                --watchCount;
-                            };
-                        }();
-
-                        //页眉页脚
-                        if (headerFooterContent.length) {
-                            nextTick({
-                                'container': data.$headFootNode,
-                                'content': fragment.headerFooterContent
-                            }, watchNextTick);
-                        }
-
-                        //主体内容
-                        if (bodyContent.length) {
-                            nextTick({
-                                'container': data.$containsNode,
-                                'content': fragment.bodyContent
-                            }, watchNextTick);
-                        }
-                    })();
+                  var hqSrc = void 0;
+                  var analysisName = analysisImageName(src);
+                  //如果启动了高清图片
+                  if (config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
+                    hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440']);
+                  }
+                  self.zoomObjs[src] = new Zoom({
+                    element: $imgNode,
+                    originalSrc: config.pathAddress + analysisName.suffix,
+                    hdSrc: hqSrc
+                  });
                 }
+              }
             });
-        }
-
-        /**
-         * 中断四：渲染content
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_applyAfterCheck',
-        value: function _applyAfterCheck() {
-            this._assert('applyAfter', function () {
-                this._loadComplete(true);
-            });
-        }
-
-        /**
-         * 运行被阻断的线程任务
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'runSuspendTasks',
-        value: function runSuspendTasks() {
-            if (this.suspendQueues) {
-                var fn;
-                if (fn = this.suspendQueues.pop()) {
-                    fn();
-                }
-                this.suspendQueues = null;
-            }
-        }
-
-        /**
-         * 点击放大图
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_zoomImage',
-        value: function _zoomImage(data) {
-            var self = this;
-            self.zoomObjs = {}; //保存缩放对象
-            _.each(data.contentsFragment, function (node) {
-                //需要单独绑定点击放大功能
-                var behaviorData = data.zoomBehavior[node.id];
-                var size = void 0;
-                var promptHtml = void 0;
-                if (behaviorData) {
-                    (function () {
-                        //缩放提示图片
-                        if (behaviorData.prompt) {
-                            if (config.screenSize.width > config.screenSize.height) {
-                                size = '2vw'; //横屏
-                            } else {
-                                //竖屏
-                                size = '2vh';
-                            }
-                            promptHtml = '<div class="icon-maximize"\n                                            style="font-size:' + size + ';position:absolute;right:0;">\n                                      </div>';
-                            $(node).append(String.styleFormat(promptHtml));
-                        }
-                        var hasMove = false;
-                        $$on(node, {
-                            start: function start() {
-                                hasMove = false;
-                            },
-                            move: function move() {
-                                hasMove = true;
-                            },
-                            end: function end() {
-                                if (hasMove) return;
-                                var $node = $(node);
-                                var $imgNode = $node.find('img');
-                                //图片src必须存在
-                                if ($imgNode[0] && !$imgNode[0].src) {
-                                    return;
-                                }
-                                var analysisName = analysisImageName($imgNode[0].src);
-                                var originalSuffixUrl = config.pathAddress + analysisName.suffix;
-                                if (self.zoomObjs[originalSuffixUrl]) {
-                                    self.zoomObjs[originalSuffixUrl].play();
-                                } else {
-                                    var hqSrc = void 0;
-
-                                    //如果启动了高清图片
-                                    if (config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-                                        hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440']);
-                                    }
-                                    self.zoomObjs[src] = new Zoom({
-                                        element: $imgNode,
-                                        originalSrc: originalSuffixUrl,
-                                        hdSrc: hqSrc
-                                    });
-                                }
-                            }
-                        });
-                        behaviorData.off = function () {
-                            $$off(node);
-                            node = null;
-                        };
-                    })();
-                }
-            });
-            this.zoomBehavior = data.zoomBehavior;
-        }
-
-        /**
-         * 文本特效
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_textFx',
-        value: function _textFx(data, textFx) {
-
-            var uuid = 1;
-            var content = void 0;
-            var contentNode = void 0;
-            var parentNodes = []; //收集父节点做比对
-            var group = {};
-            var textfxNodes = void 0;
-            var parentNode = void 0;
-
-            //文本特效对象
-            var textFxObjs = {};
-
-            while (content = textFx.shift()) {
-                if (contentNode = data.contentsFragment[content.texteffectId]) {
-                    (function () {
-                        var contentId = content._id;
-
-                        //初始化文本对象
-                        textFxObjs[contentId] = new LetterEffect(contentId);
-                        textfxNodes = contentNode.querySelectorAll('a[data-textfx]');
-                        textfxNodes.forEach(function (node) {
-                            //如果是共享了父节点
-                            parentNode = node.parentNode;
-                            if (-1 != parentNodes.indexOf(parentNode)) {
-                                group[parentNode.textFxId].push(node);
-                            } else {
-                                parentNode.textFxId = uuid;
-                                group[uuid] = [];
-                                group[uuid++].push(node);
-                            }
-                            parentNodes.push(parentNode);
-                            textFxObjs[contentId].addQueue(node, node.getAttribute('data-textfx'));
-                        });
-                    })();
-                }
-            }
-
-            this.textFxObjs = textFxObjs;
-        }
-
-        /**
-         * 构建完毕
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_loadComplete',
-        value: function _loadComplete() {
-            this.pageBaseHooks.success();
-        }
-
-        /**
-         * 任务断言
-         */
-
-    }, {
-        key: '_assert',
-        value: function _assert(taskName, tasks) {
-
-            var self = this;
-
-            //中断方法
-            var suspendTasks = function suspendTasks() {
-                self.suspendQueues = [];
-                self.suspendQueues.push(function () {
-                    tasks.call(self);
-                });
+            behaviorData.off = function () {
+              $$off(node);
+              node = null;
             };
-
-            //完成方法
-            var nextTasks = function nextTasks() {
-                tasks.call(self);
-            };
-
-            self.pageBaseHooks.suspend(taskName, nextTasks, suspendTasks);
+          })();
         }
+      });
+      this.zoomBehavior = data.zoomBehavior;
+    }
 
-        /**
-         * 清理引用
-         * @return {[type]} [description]
-         */
+    /**
+     * 文本特效
+     * @return {[type]} [description]
+     */
 
-    }, {
-        key: 'clearReference',
-        value: function clearReference() {
+  }, {
+    key: '_textFx',
+    value: function _textFx(data, textFx) {
 
-            //文字动画
-            if (this.textFxObjs) {
-                _.each(this.textFxObjs, function (obj) {
-                    obj.destroy();
-                });
-                this.textFxObjs = null;
+      var uuid = 1;
+      var content = void 0;
+      var contentNode = void 0;
+      var parentNodes = []; //收集父节点做比对
+      var group = {};
+      var textfxNodes = void 0;
+      var parentNode = void 0;
+
+      //文本特效对象
+      var textFxObjs = {};
+
+      while (content = textFx.shift()) {
+        if (contentNode = data.contentsFragment[content.texteffectId]) {
+          (function () {
+            var contentId = content._id;
+
+            //初始化文本对象
+            textFxObjs[contentId] = new LetterEffect(contentId);
+            textfxNodes = contentNode.querySelectorAll('a[data-textfx]');
+
+            if (textfxNodes.length) {
+              textfxNodes.forEach(function (node) {
+                //如果是共享了父节点
+                parentNode = node.parentNode;
+                if (-1 != parentNodes.indexOf(parentNode)) {
+                  group[parentNode.textFxId].push(node);
+                } else {
+                  parentNode.textFxId = uuid;
+                  group[uuid] = [];
+                  group[uuid++].push(node);
+                }
+                parentNodes.push(parentNode);
+                textFxObjs[contentId].addQueue(node, node.getAttribute('data-textfx'));
+              });
             }
-
-            //删除字幕用的碎片文档
-            if (Xut.Contents.contentsFragment[this.chapterId]) {
-                delete Xut.Contents.contentsFragment[this.chapterId];
-            }
-
-            //清理放大图片功能
-            if (this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
-                //清理缩放绑定事件
-                _.each(this.zoomBehavior, function (zoomBehavior) {
-                    if (zoomBehavior.off) {
-                        zoomBehavior.off();
-                    }
-                });
-                this.zoomBehavior = null;
-
-                //清理缩放对象
-                _.each(this.zoomObjs, function (zoom) {
-                    zoom.destroy();
-                });
-                this.zoomObjs = null;
-            }
-
-            this.canvasRelated = null;
-            this.pageBaseHooks = null;
-            this.$containsNode = null;
-            this.rootNode = null;
-            this.contentsFragment = null;
+          })();
         }
-    }]);
-    return TaskContents;
+      }
+
+      this.textFxObjs = textFxObjs;
+    }
+
+    /**
+     * 构建完毕
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_loadComplete',
+    value: function _loadComplete() {
+      this.pageBaseHooks.success();
+    }
+
+    /**
+     * 任务断言
+     */
+
+  }, {
+    key: '_assert',
+    value: function _assert(taskName, tasks) {
+
+      var self = this;
+
+      //中断方法
+      var suspendTasks = function suspendTasks() {
+        self.suspendQueues = [];
+        self.suspendQueues.push(function () {
+          tasks.call(self);
+        });
+      };
+
+      //完成方法
+      var nextTasks = function nextTasks() {
+        tasks.call(self);
+      };
+
+      self.pageBaseHooks.suspend(taskName, nextTasks, suspendTasks);
+    }
+
+    /**
+     * 清理引用
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'clearReference',
+    value: function clearReference() {
+
+      //文字动画
+      if (this.textFxObjs) {
+        _.each(this.textFxObjs, function (obj) {
+          obj.destroy();
+        });
+        this.textFxObjs = null;
+      }
+
+      //删除字幕用的碎片文档
+      if (Xut.Contents.contentsFragment[this.chapterId]) {
+        delete Xut.Contents.contentsFragment[this.chapterId];
+      }
+
+      //清理放大图片功能
+      if (this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
+        //清理缩放绑定事件
+        _.each(this.zoomBehavior, function (zoomBehavior) {
+          if (zoomBehavior.off) {
+            zoomBehavior.off();
+          }
+        });
+        this.zoomBehavior = null;
+
+        //清理缩放对象
+        _.each(this.zoomObjs, function (zoom) {
+          zoom.destroy();
+        });
+        this.zoomObjs = null;
+      }
+
+      this.canvasRelated = null;
+      this.pageBaseHooks = null;
+      this.$containsNode = null;
+      this.rootNode = null;
+      this.contentsFragment = null;
+    }
+  }]);
+  return TaskContents;
 }();
 
 /**
@@ -62820,7 +63015,7 @@ var add$1 = function add$1(path, callback) {
     if (toRepeat$1[path].length > 1) {
         return;
     }
-    loadfile(path, function () {
+    loadFile(path, function () {
         _.each(toRepeat$1[path], function (fn) {
             fn && fn();
         });
@@ -62829,7 +63024,7 @@ var add$1 = function add$1(path, callback) {
     });
 };
 
-function removeLoad() {
+function removeFileLoad() {
     toRepeat$1 = {};
 }
 
@@ -62837,7 +63032,7 @@ function removeLoad() {
  * 加载js,css文件
  * @return {[type]} [description]
  */
-function loadFile(callback, base) {
+function fileLoad(callback, base) {
     var jsPath,
         cssPath,
         completeCount,
@@ -63493,7 +63688,7 @@ var PageWidget = function () {
                         //If there is no
                         if (typeof window[this.widgetName + "Widget"] != "function") {
                             this.hasload = true;
-                            loadFile(this._executive, this);
+                            fileLoad(this._executive, this);
                         } else {
                             this._executive();
                         }
@@ -63557,7 +63752,7 @@ var PageWidget = function () {
     }, {
         key: 'destroy',
         value: function destroy() {
-            this.hasload && removeLoad();
+            this.hasload && removeFileLoad();
             this.pageObj && this.pageObj.destroy && this.pageObj.destroy();
         }
     }]);
@@ -64571,1246 +64766,6 @@ function fix($node, action) {
     $node.css(transform$3, translate);
 }
 
-//转换页码索引
-//direction 方向
-//pointer 当前页码标示
-//[17 18 19]  pagePointer
-//[18 19 20]  转换后
-// 17 销毁
-// 20 创建
-var getActionPointer = function getActionPointer(direction, leftIndex, rightIndex) {
-    var createPointer = void 0; //创建的页
-    var destroyPointer = void 0; //销毁的页
-    switch (direction) {
-        case 'prev':
-            //前处理
-            createPointer = leftIndex - 1;
-            destroyPointer = rightIndex;
-            break;
-        case 'next':
-            //后处理
-            createPointer = rightIndex + 1;
-            destroyPointer = leftIndex;
-            break;
-    }
-    return {
-        createPointer: createPointer,
-        destroyPointer: destroyPointer
-    };
-};
-
-/**
- * 初始化首次范围
- * @return {[type]} [description]
- */
-var initPointer = function initPointer(init, pagetotal) {
-    var leftscope = 0,
-        pagePointer = {};
-
-    if (init === leftscope) {
-        //首页
-        pagePointer['currIndex'] = init;
-        pagePointer['rightIndex'] = init + 1;
-    } else if (init === pagetotal - 1) {
-        //首页
-        pagePointer['currIndex'] = init;
-        pagePointer['leftIndex'] = init - 1;
-    } else {
-        //中间页
-        pagePointer['leftIndex'] = init - 1;
-        pagePointer['currIndex'] = init;
-        pagePointer['rightIndex'] = init + 1;
-    }
-    return pagePointer;
-};
-
-/**
- * 兼容事件对象
- * @return {[type]}   [description]
- */
-var compatibilityEvent$1 = function compatibilityEvent$1(e) {
-    var point;
-    if (e.touches && e.touches[0]) {
-        point = e.touches[0];
-    } else {
-        point = e;
-    }
-    return point;
-};
-
-/**
- * 计算当前已经创建的页面索引
- */
-var calculationIndex = function calculationIndex(currIndex, targetIndex, pagetotal) {
-    var i = 0,
-        existpage,
-        createpage,
-        pageIndex,
-        ruleOut = [],
-        create = [],
-        destroy,
-        viewFlip;
-
-    //存在的页面
-    if (currIndex === 0) {
-        existpage = [currIndex, currIndex + 1];
-    } else if (currIndex === pagetotal - 1) {
-        existpage = [currIndex - 1, currIndex];
-    } else {
-        existpage = [currIndex - 1, currIndex, currIndex + 1];
-    }
-
-    //需要创建的新页面
-    if (targetIndex === 0) {
-        createpage = [targetIndex, targetIndex + 1];
-    } else if (targetIndex === pagetotal - 1) {
-        createpage = [targetIndex - 1, targetIndex];
-    } else {
-        createpage = [targetIndex - 1, targetIndex, targetIndex + 1];
-    }
-
-    for (; i < createpage.length; i++) {
-        pageIndex = createpage[i];
-        //跳过存在的页面
-        if (-1 === existpage.indexOf(pageIndex)) {
-            //创建目标的页面
-            create.push(pageIndex);
-        } else {
-            //排除已存在的页面
-            ruleOut.push(pageIndex);
-        }
-    }
-
-    _.each(ruleOut, function (ruleOutIndex) {
-        existpage.splice(existpage.indexOf(ruleOutIndex), 1);
-    });
-
-    destroy = existpage;
-
-    viewFlip = [].concat(create).concat(ruleOut).sort(function (a, b) {
-        return a - b;
-    });
-
-    return {
-        'create': create,
-        'ruleOut': ruleOut,
-        'destroy': destroy,
-        'viewFlip': viewFlip,
-        'targetIndex': targetIndex,
-        'currIndex': currIndex
-    };
-};
-
-function api(Swipe) {
-
-    /**
-     * 获取翻页over速率
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.getFlipOverSpeed = function (newVisualWidth) {
-        return this._flipOverSpeed(newVisualWidth);
-    };
-
-    /**
-     * 获取初始化距离值
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.getInitDistance = function () {
-        return this._initDistance;
-    };
-
-    /**
-     * 模拟完成状态调用
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.simulationComplete = function () {
-        var _this = this;
-
-        setTimeout(function () {
-            _this._restore();
-            _this._unlockSwipe();
-        });
-    };
-
-    //允许滑动
-    Swipe.prototype.allowliding = function () {
-        this._unlockSwipe();
-    };
-
-    //禁止滑动
-    Swipe.prototype.bansliding = function () {
-        this._lockSwipe();
-    };
-
-    /**
-     * 停止翻页
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.openSwipe = function () {
-        this._initOperation();
-    };
-
-    /**
-     * 启动翻页
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.closeSwipe = function () {
-        if (!this._isMoving) {
-            this._off();
-        }
-    };
-
-    /**
-     * 是否为边界
-     * @param  {[type]}  distance [description]
-     * @return {Boolean}          [description]
-     */
-    Swipe.prototype.isBorder = function () {
-        this._borderBounce.apply(this, arguments);
-    };
-
-    /**
-     * 检车是否还在移动中
-     * @return {Boolean} [description]
-     */
-    Swipe.prototype.isMoving = function () {
-        return this._isMoving;
-    };
-
-    /**
-     * 前翻页接口
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.prev = function () {
-        if (!this._borderBounce(1)) {
-            this._slideTo('prev');
-        } else {
-            //边界反弹
-            this._setRebound(this._hindex, 'next');
-        }
-    };
-
-    /**
-     * 后翻页接口
-     * @return {Function} [description]
-     */
-    Swipe.prototype.next = function () {
-        if (!this._borderBounce(-1)) {
-            this._slideTo('next');
-        } else {
-            //边界反弹
-            this._setRebound(this._hindex, 'prev');
-        }
-    };
-
-    /**
-     * 获取当前页码
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.getHindex = function () {
-        return this._hindex;
-    };
-
-    /**
-     * 主动设置页码编号
-     * 因为分栏的关系，内部修改外部
-     * 页面需要拼接
-     */
-    Swipe.prototype.setPointer = function (target, pagetotal) {
-        this.pagePointer = initPointer(target, pagetotal || this.pagetotal);
-    };
-
-    /**
-     * 获取页面Pointer
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.getPointer = function () {
-        return this.pagePointer;
-    };
-
-    /**
-     * 跳指定页面
-     * @param  {[type]} targetIndex [description]
-     * @param  {[type]} preMode     [description]
-     * @param  {[type]} complete    [description]
-     * @return {[type]}             [description]
-     */
-    Swipe.prototype.scrollToPage = function (targetIndex) {
-        //目标页面
-
-        //如果还在翻页中
-        if (this._fliplock) return;
-
-        var currIndex = this._hindex; //当前页面
-
-        //相邻页
-        switch (targetIndex) {
-            //前一页
-            case currIndex - 1:
-                if (this.options.multiplePages) {
-                    return this.prev();
-                }
-                break;
-            //首页
-            case currIndex:
-                if (currIndex == 0) {
-                    this.$emit('onDropApp');
-                }
-                return;
-            //后一页
-            case currIndex + 1:
-                if (this.options.multiplePages) {
-                    return this.next();
-                }
-                break;
-        }
-
-        //算出是相关数据
-        var data = calculationIndex(currIndex, targetIndex, this.pagetotal);
-
-        //更新页码索引
-        this._updataPointer(data);
-
-        data.pagePointer = this.pagePointer;
-
-        this.$emit('onJumpPage', data);
-    };
-
-    /**
-     * 销毁所有
-     * @return {[type]} [description]
-     */
-    Swipe.prototype.destroy = function () {
-        this._off();
-        this.$off();
-        if (this._bubbleNode) {
-            this._bubbleNode.page = null;
-            this._bubbleNode.master = null;
-        }
-        this.container = null;
-    };
-
-    /**
-     * 调用动画完成
-     * @param {[type]} element [description]
-     */
-    Swipe.prototype.setTransitionComplete = function () {
-        this._distributed.apply(this, arguments);
-    };
-
-    /**
-     * 目标元素
-     * 找到li元素
-     * @param  {Function} callback [description]
-     * @return {[type]}            [description]
-     */
-    Swipe.prototype.findBubbleRootNode = function (point, pageType) {
-        var liNode = void 0,
-            map = void 0;
-        var _hindex = this._hindex;
-        var sectionRang = this.options.sectionRang;
-
-        //找到对应的li
-        var childNodes = this._bubbleNode[pageType].childNodes;
-        var nodeTotal = childNodes.length;
-
-        while (nodeTotal--) {
-            liNode = childNodes[nodeTotal];
-            map = liNode.getAttribute('data-map');
-            if (sectionRang) {
-                _hindex += sectionRang.start;
-            }
-            if (map == _hindex) {
-                return liNode;
-            }
-            _hindex = this._hindex;
-        }
-    };
-}
-
-/**
- * 翻页速率
- * @type {Number}
- */
-var SPEED = 600;
-
-/**
- * 默认翻页时间
- * @type {Object}
- */
-var DEFAULTTIME = {
-    min: 0,
-    mix: 500
-};
-
-var getDate = function getDate() {
-    return +new Date();
-};
-var transitionDuration$3 = Xut.style.transitionDuration;
-var LINEARTAG = 'data-viewlinear';
-var ABS = Math.abs;
-
-/**
- * 自定义事件类型
- * onSwipeDown 触屏点击
- * onSwipeMove 触屏移动
- * onSwipeUp   触屏松手
- * onSwipeUpSlider触屏松手 滑动处理
- * onFlipSliding 松手动画（反弹）
- * onFlipRebound 执行反弹
- * _onAnimComplete 动画完成
- * onDropApp 退出应用
- */
-
-var Swipe = function (_Observer) {
-    inherits(Swipe, _Observer);
-
-    function Swipe(_ref) {
-        var flipWidth = _ref.flipWidth,
-            initIndex = _ref.initIndex,
-            container = _ref.container,
-            flipMode = _ref.flipMode,
-            pagetotal = _ref.pagetotal,
-            multiplePages = _ref.multiplePages,
-            _ref$stopPropagation = _ref.stopPropagation,
-            stopPropagation = _ref$stopPropagation === undefined ? false : _ref$stopPropagation,
-            _ref$preventDefault = _ref.preventDefault,
-            preventDefault = _ref$preventDefault === undefined ? true : _ref$preventDefault,
-            _ref$linear = _ref.linear,
-            linear = _ref$linear === undefined ? false : _ref$linear,
-            _ref$borderBounce = _ref.borderBounce,
-            borderBounce = _ref$borderBounce === undefined ? true : _ref$borderBounce,
-            _ref$extraGap = _ref.extraGap,
-            extraGap = _ref$extraGap === undefined ? 0 : _ref$extraGap,
-            sectionRang = _ref.sectionRang;
-        classCallCheck(this, Swipe);
-
-        var _this = possibleConstructorReturn(this, (Swipe.__proto__ || Object.getPrototypeOf(Swipe)).call(this));
-
-        _this.options = {
-
-            stopPropagation: stopPropagation,
-
-            /**
-             * 默认阻止所有行为
-             * @type {[type]}
-             */
-            preventDefault: preventDefault,
-
-            /**
-             * 是否分段处理
-             * 默认是
-             * @type {[type]}
-             */
-            linear: linear,
-
-            /**
-             * 启动边界反弹
-             * @type {[type]}
-             */
-            borderBounce: borderBounce,
-
-            /**
-             * flipMode
-             * 1 翻页没有直接效果，速度改为0
-             * 2 翻页后没有动画回调
-             * @type {[type]}
-             */
-            flipMode: flipMode,
-
-            /**
-             * 是否有多页面
-             */
-            multiplePages: multiplePages,
-
-            /**
-             * section分段拼接
-             * @type {[type]}
-             */
-            sectionRang: sectionRang
-        };
-
-        _this._hindex = initIndex;
-        _this.pagetotal = pagetotal;
-        _this.container = container;
-
-        /**
-         * 视图宽度
-         * @type {[type]}
-         */
-        _this._visualWidth = flipWidth || config.visualSize.width;
-
-        /**
-         * 翻页时间
-         * @type {[type]}
-         */
-        _this._pageTime = _this.options.flipMode ? DEFAULTTIME.min : DEFAULTTIME.mix;
-
-        /**
-         * 翻页速率
-         * @type {[type]}
-         */
-        _this._speedRate = _this._originalRate = _this._pageTime / _this._visualWidth;
-
-        /**
-         * 是否移动中
-         * @type {Boolean}
-         */
-        _this._isMoving = false;
-
-        /**
-         * 计算初始化页码
-         * @type {[type]}
-         */
-        _this.pagePointer = initPointer(initIndex, pagetotal);
-
-        //初始化线性翻页
-        //全局只创建一个翻页容器
-        if (linear) {
-            container.setAttribute(LINEARTAG, true);
-
-            //this._initDistance 提供给flow调用
-            _this._initDistance = -_this._hindex * (_this._visualWidth + extraGap);
-            container.style[Xut.style.transform] = 'translate(' + _this._initDistance + 'px,0px)' + Xut.style.translateZ;
-            container.style.width = _this._visualWidth * _this.pagetotal + 'px';
-        } else {
-            //用于查找跟元素
-            //ul => page
-            //ul => master
-            var ul = container.querySelectorAll('ul');
-            _this._bubbleNode = {
-                page: ul[0],
-                master: ul[1]
-            };
-        }
-
-        //绑定行为
-        _this._initEvents();
-        return _this;
-    }
-
-    /**
-     * 绑定事件
-     * @return {[type]} [description]
-     */
-
-
-    createClass(Swipe, [{
-        key: '_initEvents',
-        value: function _initEvents() {
-
-            var callback = {
-                start: this,
-                end: this,
-                cancel: this,
-                leave: this
-            };
-
-            //flipMode启动，没有滑动处理
-            if (this.options.flipMode) {
-                //不需要绑定transitionend，会设置手动会触发
-            } else if (this.options.multiplePages) {
-                callback.move = this;
-                callback.transitionend = this;
-            }
-            $$on(this.container, callback);
-        }
-
-        /**
-         * 停止默认的行为
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_stopDefault',
-        value: function _stopDefault(e) {
-            this.options.preventDefault && e.preventDefault();
-        }
-
-        /**
-         * 事件处理
-         * @param  {[type]} e [description]
-         * @return {[type]}   [description]
-         */
-
-    }, {
-        key: 'handleEvent',
-        value: function handleEvent(e) {
-
-            this.options.stopPropagation && e.stopPropagation();
-
-            //接受多事件的句柄
-            $$handle({
-                start: function start(e) {
-
-                    //禁止鼠标右键
-                    if (e.button && e.button == 2) {
-                        return;
-                    }
-
-                    //这样是为了触发二维码
-                    if (Xut.plat.hasTouch && config.supportQR && e.target.nodeName.toLowerCase() === "img") {
-                        //如果是移动端的情况下 && 支持二维码 && 是图片 就不组织默认行为
-                    } else {
-                        //浏览器上就直接阻止
-                        this._stopDefault(e);
-                    }
-
-                    this._onStart(e);
-                },
-                move: function move(e) {
-                    this._stopDefault(e);
-                    this._onMove(e);
-                },
-                end: function end(e) {
-                    this._stopDefault(e);
-                    this._onEnd(e);
-                },
-                transitionend: function transitionend(e) {
-                    this._stopDefault(e);
-                    this._onAnimComplete(e);
-                }
-            }, this, e);
-        }
-
-        /**
-         * 是否多点触发
-         * @return {Boolean} [description]
-         */
-
-    }, {
-        key: '_hasMultipleTouches',
-        value: function _hasMultipleTouches(e) {
-            return e.touches && e.touches.length > 1;
-        }
-
-        /**
-         * 触发
-         * @param  {[type]} e [description]
-         * @return {[type]}   [description]
-         */
-
-    }, {
-        key: '_onStart',
-        value: function _onStart(e) {
-
-            //如果停止滑动
-            //或者多点触发
-            if (this._fliplock || this._hasMultipleTouches(e)) {
-                return;
-            }
-
-            //判断双击速度
-            //必须要大于350
-            var currtTime = getDate();
-            if (this._clickTime) {
-                if (currtTime - this._clickTime < 350) {
-                    return;
-                }
-            }
-            this._clickTime = currtTime;
-
-            var interrupt = void 0;
-            var point = compatibilityEvent$1(e);
-
-            if (!point) {
-                return interrupt = this._preventSwipe = true;
-            }
-
-            /**
-             * 获取观察对象
-             * 钩子函数
-             * point 事件对象
-             * @return {[type]} [description]
-             */
-            this.$emit('onFilter', function () {
-                interrupt = true;
-            }, point, e);
-
-            //打断动作
-            if (interrupt) return;
-
-            this._deltaX = 0;
-            this._deltaY = 0;
-
-            this._preventSwipe = false; //是否滑动事件受限
-            this._isBounce = false; //是否反弹
-            this._isRollX = false; //是否为X轴滑动
-            this._isRollY = false; //是否为Y轴滑动
-            this._isTap = true; //点击了屏幕
-            this._isInvalid = false; //无效的触发
-
-            this._start = {
-                pageX: point.pageX,
-                pageY: point.pageY,
-                time: getDate()
-            };
-        }
-
-        /**
-         * 移动
-         * @param  {[type]} e [description]
-         * @return {[type]}   [description]
-         */
-
-    }, {
-        key: '_onMove',
-        value: function _onMove(e) {
-            var _this2 = this;
-
-            //如果停止翻页
-            //或者没有点击
-            //或是Y轴滑动
-            //或者是阻止滑动
-            if (this._fliplock || !this._isTap || this._isRollY || this._preventSwipe) return;
-
-            this._isMoving = true;
-
-            var point = compatibilityEvent$1(e);
-            var deltaX = point.pageX - this._start.pageX;
-            var deltaY = point.pageY - this._start.pageY;
-            var absDeltaX = ABS(deltaX);
-            var absDeltaY = ABS(deltaY);
-
-            //=========Y轴滑动=========
-            if (!this._isRollY) {
-                //Y>X => 为Y轴滑动
-                if (absDeltaY > absDeltaX) {
-                    this._isRollY = true;
-                    return;
-                }
-            }
-
-            //=========X轴滑动=========
-
-            //前尾是否允许反弹
-            if (!this.options.borderBounce) {
-                if (this._isBounce = this._borderBounce(deltaX)) return;
-            }
-
-            //滑动方向
-            //left => 负
-            //rigth => 正
-            this._deltaX = deltaX / (!this._hindex && deltaX > 0 // 在首页
-            || this._hindex == this.pagetotal - 1 // 尾页
-            && deltaX < 0 // 中间
-            ? absDeltaX / this._visualWidth + 1 : 1);
-
-            if (!this._isRollX && this._deltaX) {
-                this._isRollX = true;
-            }
-
-            this.direction = this._deltaX > 0 ? 'prev' : 'next';
-
-            //减少抖动
-            //算一次有效的滑动
-            //移动距离必须20px才开始移动
-            var xWait = 20;
-            if (absDeltaX <= xWait) return;
-
-            //需要叠加排除值
-            if (this._deltaX > 0) {
-                xWait = -xWait;
-            }
-
-            //是否无效函数
-            //如果无效，end方法抛弃掉
-            //必须是同步方法：
-            //动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
-            var setSwipeInvalid = function setSwipeInvalid() {
-                _this2._isInvalid = true;
-            };
-
-            this._distributeMove({
-                pageIndex: this._hindex,
-                distance: this._deltaX + xWait,
-                speed: 0,
-                direction: this.direction,
-                action: 'flipMove',
-                setSwipeInvalid: setSwipeInvalid
-            });
-        }
-
-        /**
-         * 松手
-         * @param  {[type]} e [description]
-         * @return {[type]}   [description]
-         */
-
-    }, {
-        key: '_onEnd',
-        value: function _onEnd(e) {
-
-            //停止滑动
-            //或者多点触发
-            //或者是边界
-            //或者是停止翻页
-            if (this._fliplock || this._isBounce || this._preventSwipe || this._hasMultipleTouches(e)) {
-                return;
-            }
-
-            this._isTap = this._isMoving = false;
-
-            var duration = void 0;
-            //可能没有点击页面，没有触发start事件
-            if (this._start) {
-                duration = getDate() - this._start.time;
-            }
-
-            //点击
-            if (!this._isRollX && !this._isRollY) {
-                var isReturn = false;
-                this.$emit('onTap', this._hindex, function () {
-                    return isReturn = true;
-                }, e, duration);
-                if (isReturn) return;
-            }
-
-            //如果是左右滑动
-            if (this._isRollX) {
-
-                var deltaX = ABS(this._deltaX);
-
-                //如果是首尾
-                //如果是liner模式排除
-                var isPastBounds = this.options.linear ? false : !this._hindex && this._deltaX > 0 || this._hindex == this.pagetotal - 1 && this._deltaX < 0;
-
-                //_slideTo的最低值要求
-                //1 fast: time < 200 && x >30
-                //2 common: x > veiwWidth/6
-                var isValidSlide = duration < 200 && deltaX > 30 || deltaX > this._visualWidth / 6;
-
-                //如果是无效的动作，则不相应
-                //还原默认设置
-                //move的情况会引起
-                //mini功能，合并翻页时事件
-                if (this._isInvalid) {
-                    var hasSwipe = duration < 200 && deltaX > this._visualWidth / 10;
-                    if (hasSwipe) {
-                        this._distributeMove({
-                            pageIndex: this._hindex,
-                            direction: this._deltaX > 0 ? 'prev' : 'next',
-                            action: 'swipe'
-                        });
-                    }
-                    this._restore();
-                    return;
-                } else {
-                    //跟随移动
-                    if (isValidSlide && !isPastBounds) {
-                        //true:right, false:left
-                        this._slideTo(this._deltaX < 0 ? 'next' : 'prev');
-                    } else {
-                        //反弹
-                        this._setRebound(this._hindex, this._deltaX > 0 ? 'prev' : 'next');
-                    }
-                }
-            }
-        }
-
-        /**
-         * 前尾边界反弹判断
-         * @param  {[type]} deltaX [description]
-         * @return {[type]}        [description]
-         */
-
-    }, {
-        key: '_borderBounce',
-        value: function _borderBounce(deltaX) {
-            //首页,并且是左滑动
-            if (this._hindex === 0 && deltaX > 0) {
-                return true;
-                //尾页
-            } else if (this._hindex === this.pagetotal - 1 && deltaX < 0) {
-                return true;
-            }
-        }
-
-        /**
-         * 设置反弹
-         */
-
-    }, {
-        key: '_setRebound',
-        value: function _setRebound(pageIndex, direction) {
-            this._distributeMove({
-                'pageIndex': pageIndex,
-                'direction': direction,
-                'distance': 0,
-                'speed': 300,
-                'action': 'flipRebound'
-            });
-        }
-
-        /**
-         * 处理松手后滑动
-         * pageIndex 页面
-         * distance  移动距离
-         * speed     时间
-         * viewTag   可使区标记
-         * follow    是否为跟随滑动
-         * @return {[type]} [description]
-         * pageIndex: 0, distance: -2, speed: 0, direction: "next", action: "flipMove"
-         */
-
-    }, {
-        key: '_distributeMove',
-        value: function _distributeMove(data) {
-            var pointer = this.pagePointer;
-            data.leftIndex = pointer.leftIndex;
-            data.rightIndex = pointer.rightIndex;
-            this.$emit('onMove', data);
-        }
-
-        /**
-         * 边界控制
-         * @param  {[type]} direction [description]
-         * @return {[type]}           [description]
-         */
-
-    }, {
-        key: '_isBorder',
-        value: function _isBorder(direction) {
-            var overflow = void 0;
-            var pointer = this.pagePointer;
-            var fillength = Object.keys(pointer).length;
-
-            switch (direction) {
-                case 'prev':
-                    //前翻页
-                    overflow = pointer.currIndex === 0 && fillength === 2 ? true : false;
-                    break;
-                case 'next':
-                    //后翻页
-                    overflow = pointer.currIndex === this.pagetotal - 1 && fillength === 2 ? true : false;
-                    break;
-            }
-
-            return overflow;
-        }
-
-        /**
-         * 复位速率
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_resetRate',
-        value: function _resetRate() {
-            this._speedRate = this._originalRate;
-            this._isQuickTurn = false;
-        }
-
-        /**
-         * 快速翻页时间计算
-         */
-
-    }, {
-        key: '_setRate',
-        value: function _setRate() {
-            this._speedRate = 50 / this._visualWidth;
-            this._isQuickTurn = true;
-        }
-
-        /**
-         * 判断是否快速翻页
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_quickTurn',
-        value: function _quickTurn() {
-            var startDate = getDate();
-            if (this._preTapTime) {
-                if (startDate - this._preTapTime < SPEED) {
-                    this._setRate();
-                }
-            }
-            this._preTapTime = getDate();
-        }
-
-        /**
-         * 翻页加锁
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_lockSwipe',
-        value: function _lockSwipe() {
-            this._fliplock = true;
-        }
-
-        /**
-         * 修正页面索引
-         */
-
-    }, {
-        key: '_fixHindex',
-        value: function _fixHindex(currIndex) {
-            this._hindex = currIndex; //翻页索引
-        }
-
-        /**
-         * 更新页码标示
-         */
-
-    }, {
-        key: '_updataPointer',
-        value: function _updataPointer(leftIndex, currIndex, rightIndex) {
-            if (arguments.length === 3) {
-                this.pagePointer = {
-                    'leftIndex': leftIndex,
-                    'currIndex': currIndex,
-                    'rightIndex': rightIndex
-                };
-                return;
-            }
-            if (arguments.length === 1) {
-                var data = leftIndex;
-                var viewFlip = data.viewFlip;
-                this._fixHindex(data.targetIndex);
-                if (viewFlip.length === 3) {
-                    this._updataPointer(viewFlip[0], viewFlip[1], viewFlip[2]);
-                }
-                if (viewFlip.length === 2) {
-                    if (viewFlip[0] === 0) {
-                        //首页
-                        this.pagePointer.rightIndex = viewFlip[1];
-                        this.pagePointer.currIndex = viewFlip[0];
-                        delete this.pagePointer.leftIndex;
-                    } else {
-                        //尾页
-                        this.pagePointer.leftIndex = viewFlip[0];
-                        this.pagePointer.currIndex = viewFlip[1];
-                        delete this.pagePointer.rightIndex;
-                    }
-                }
-                return;
-            }
-        }
-
-        /**
-         * 增加索引的动作
-         * 修正页码指示
-         */
-
-    }, {
-        key: '_updateActionPointer',
-        value: function _updateActionPointer(pointer) {
-
-            //获取动作索引
-            // createPointer
-            // destroyPointer
-            var actionPointer = getActionPointer(this.direction, pointer.leftIndex, pointer.rightIndex);
-
-            //需要创建的页面
-            var createPointer = actionPointer.createPointer;
-
-            //需要停止动作的页面索引
-            var stopPointer = pointer.currIndex;
-
-            switch (this.direction) {
-                case 'prev':
-                    if (-1 < createPointer) {
-                        //首页情况
-                        this._updataPointer(createPointer, pointer.leftIndex, pointer.currIndex);
-                    }
-                    if (-1 === createPointer) {
-                        this.pagePointer.rightIndex = pointer.currIndex;
-                        this.pagePointer.currIndex = pointer.leftIndex;
-                        delete this.pagePointer.leftIndex;
-                    }
-                    break;
-                case 'next':
-                    if (this.pagetotal > createPointer) {
-                        this._updataPointer(pointer.currIndex, pointer.rightIndex, createPointer);
-                    }
-                    if (this.pagetotal === createPointer) {
-                        //如果是尾页
-                        this.pagePointer.leftIndex = pointer.currIndex;
-                        this.pagePointer.currIndex = pointer.rightIndex;
-                        delete this.pagePointer.rightIndex;
-                    }
-                    break;
-            }
-
-            //更新页面索引标识
-            this.pagePointer.createPointer = createPointer;
-            this.pagePointer.destroyPointer = actionPointer.destroyPointer;
-            this.pagePointer.stopPointer = stopPointer;
-        }
-
-        /**
-         * 获取翻页结束的speed的速率
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_flipOverSpeed',
-        value: function _flipOverSpeed(visualWidth) {
-            visualWidth = visualWidth || this._visualWidth;
-            var spped = (visualWidth - ABS(this._deltaX)) * this._speedRate || this._pageTime;
-            return ABS(spped);
-        }
-
-        /**
-         * 滑动到上下页面
-         * direction
-         *     "perv" / "next"
-         * @param  {[type]} direction [description]
-         * @return {[type]}           [description]
-         */
-
-    }, {
-        key: '_slideTo',
-        value: function _slideTo(direction) {
-            var _this3 = this;
-
-            //如果在忙碌状态,如果翻页还没完毕
-            if (this._fliplock) {
-                return;
-            }
-
-            //前后边界
-            if (!this.options.linear) {
-                if (this._isBorder(direction)) return;
-            }
-
-            this._lockSwipe();
-            this.direction = direction;
-            this._quickTurn();
-
-            this._distributeMove({
-                'pageIndex': this._hindex,
-                'speed': this._flipOverSpeed(),
-                'distance': 0,
-                'direction': this.direction,
-                'action': 'flipOver'
-            });
-
-            setTimeout(function () {
-                //更新this.pagePointer索引
-                //增加处理标记
-                _this3._updateActionPointer(_this3.pagePointer);
-                _this3.$emit('onUpSlider', _this3.pagePointer);
-                _this3._fixHindex(_this3.pagePointer.currIndex);
-            });
-        }
-
-        /**
-         * 动画结束后处理
-         * @param  {[type]} e [description]
-         * @return {[type]}   [description]
-         */
-
-    }, {
-        key: '_onAnimComplete',
-        value: function _onAnimComplete(e) {
-            var node = e.target;
-            var pageType = node.getAttribute('data-pageType');
-            var view = node.getAttribute('data-view'); //操作的可视窗口
-            var linearView = node.getAttribute(LINEARTAG); //流式布局
-
-            //去掉动画时间
-            if (node) {
-                node.style[transitionDuration$3] = '';
-            }
-
-            //流式布局处理
-            if (linearView && !view) {
-                this._distributed(node, view);
-                return;
-            }
-
-            //反弹效果,未翻页
-            if (!view) {
-                if (!pageType) {
-                    //只针对母板处理
-                    this.$emit('onMasterMove', this._hindex, node);
-                }
-                return;
-            }
-
-            this._distributed(node, view);
-        }
-    }, {
-        key: '_distributed',
-        value: function _distributed() {
-            var _this4 = this;
-
-            this._restore.apply(this, arguments);
-
-            //延长获取更pagePointer的更新值
-            setTimeout(function () {
-                _this4.$emit('onComplete', _this4.direction, _this4.pagePointer, _this4._unlockSwipe.bind(_this4), _this4._isQuickTurn);
-            }, 50);
-        }
-
-        /**
-         * 还原设置
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_restore',
-        value: function _restore(node, view) {
-
-            this._isMoving = false;
-
-            //针对拖拽翻页阻止
-            this._preventSwipe = true;
-            this._isTap = false;
-            //恢复速率
-            this._resetRate();
-            view && node.removeAttribute('data-view', 'false');
-        }
-
-        /**
-         * 解锁翻页
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_unlockSwipe',
-        value: function _unlockSwipe() {
-            this._fliplock = false;
-        }
-
-        /**
-         * 销毁事件
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_off',
-        value: function _off() {
-            $$off(this.container);
-        }
-    }]);
-    return Swipe;
-}(Observer);
-
-api(Swipe);
-
-/**
- * dom...
- */
-function render() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        $pinchNode = _ref.$pinchNode,
-        dataNode = _ref.dataNode,
-        chapterId = _ref.chapterId,
-        callback = _ref.callback;
-
-    var $container = $(dataNode.html());
-    Xut.nextTick({
-        container: $pinchNode,
-        content: $container
-    }, function () {
-        return callback($container);
-    });
-}
-
 /************************
  * 左边页面钩子
  *     distance 正数，1-2-3-4 -> N 变化
@@ -66045,7 +65000,7 @@ var rightPageHook = {
  */
 var getPageStyle = function getPageStyle(pageIndex) {
     var pageBase = Xut.Presentation.GetPageObj(pageIndex);
-    return pageBase && pageBase.getStyle;
+    return pageBase && pageBase.getStyle || {};
 };
 
 var makeAccess = function makeAccess(action, direction, distance, pageStyles) {
@@ -66104,305 +65059,1646 @@ function getVisualDistance(_ref) {
     return [left, middle, right, view];
 }
 
+//转换页码索引
+//direction 方向
+//pointer 当前页码标示
+//[17 18 19]  pagePointer
+//[18 19 20]  转换后
+// 17 销毁
+// 20 创建
+var getActionPointer = function getActionPointer(direction, leftIndex, rightIndex) {
+  var createPointer = void 0; //创建的页
+  var destroyPointer = void 0; //销毁的页
+  switch (direction) {
+    case 'prev':
+      //前处理
+      createPointer = leftIndex - 1;
+      destroyPointer = rightIndex;
+      break;
+    case 'next':
+      //后处理
+      createPointer = rightIndex + 1;
+      destroyPointer = leftIndex;
+      break;
+  }
+  return {
+    createPointer: createPointer,
+    destroyPointer: destroyPointer
+  };
+};
+
+/**
+ * 初始化首次范围
+ * @return {[type]} [description]
+ */
+var initPointer = function initPointer(init, pageTotal) {
+  var leftscope = 0,
+      pagePointer = {};
+
+  if (init === leftscope) {
+    //首页
+    pagePointer['currIndex'] = init;
+    pagePointer['rightIndex'] = init + 1;
+  } else if (init === pageTotal - 1) {
+    //首页
+    pagePointer['currIndex'] = init;
+    pagePointer['leftIndex'] = init - 1;
+  } else {
+    //中间页
+    pagePointer['leftIndex'] = init - 1;
+    pagePointer['currIndex'] = init;
+    pagePointer['rightIndex'] = init + 1;
+  }
+  return pagePointer;
+};
+
+/**
+ * 兼容事件对象
+ * @return {[type]}   [description]
+ */
+var compatibilityEvent$1 = function compatibilityEvent$1(e) {
+  var point;
+  if (e.touches && e.touches[0]) {
+    point = e.touches[0];
+  } else {
+    point = e;
+  }
+  return point;
+};
+
+/**
+ * 计算当前已经创建的页面索引
+ */
+var calculationIndex = function calculationIndex(currIndex, targetIndex, pageTotal) {
+  var i = 0,
+      existpage,
+      createpage,
+      pageIndex,
+      ruleOut = [],
+      create = [],
+      destroy,
+      viewFlip;
+
+  //存在的页面
+  if (currIndex === 0) {
+    existpage = [currIndex, currIndex + 1];
+  } else if (currIndex === pageTotal - 1) {
+    existpage = [currIndex - 1, currIndex];
+  } else {
+    existpage = [currIndex - 1, currIndex, currIndex + 1];
+  }
+
+  //需要创建的新页面
+  if (targetIndex === 0) {
+    createpage = [targetIndex, targetIndex + 1];
+  } else if (targetIndex === pageTotal - 1) {
+    createpage = [targetIndex - 1, targetIndex];
+  } else {
+    createpage = [targetIndex - 1, targetIndex, targetIndex + 1];
+  }
+
+  for (; i < createpage.length; i++) {
+    pageIndex = createpage[i];
+    //跳过存在的页面
+    if (-1 === existpage.indexOf(pageIndex)) {
+      //创建目标的页面
+      create.push(pageIndex);
+    } else {
+      //排除已存在的页面
+      ruleOut.push(pageIndex);
+    }
+  }
+
+  _.each(ruleOut, function (ruleOutIndex) {
+    existpage.splice(existpage.indexOf(ruleOutIndex), 1);
+  });
+
+  destroy = existpage;
+
+  viewFlip = [].concat(create).concat(ruleOut).sort(function (a, b) {
+    return a - b;
+  });
+
+  return {
+    'create': create,
+    'ruleOut': ruleOut,
+    'destroy': destroy,
+    'viewFlip': viewFlip,
+    'targetIndex': targetIndex,
+    'currIndex': currIndex
+  };
+};
+
+function api(Swipe) {
+
+  /**
+   * column的情况
+   * 动态设置新的页面总数
+   */
+  Swipe.prototype.setLinearTotal = function (total, location) {
+
+    //如果当前是column
+    if (location === 'middle') {
+
+      var borderIndex = void 0;
+      //必须是有2页以上并且当前页面就是最后一页
+      //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
+      if (this.pageTotal > 1 && this.visualIndex == this.pageTotal - 1) {
+        borderIndex = this.visualIndex;
+      }
+
+      this.pageTotal = total;
+
+      //如果是最后一页，叠加新的页面
+      //需要重写一些数据
+      if (borderIndex !== undefined) {
+        this.setPointer(borderIndex - 1, total);
+        this._updateActionPointer();
+      }
+    }
+
+    //如果左边是column页面
+    //改变总页面数
+    //改变可视区页面为最后页
+    if (location === 'left') {
+      this.pageTotal = total;
+      this.visualIndex = total - 1;
+      this.setPointer(this.visualIndex, total);
+      this._updateActionPointer();
+      //设置Transform的偏移量，为最后一页
+      this._setTransform(this.visualIndex);
+    }
+
+    //如果是右边的column
+    if (location === 'right') {
+      this.pageTotal = total;
+    }
+
+    this._setContainerWidth();
+  };
+
+  /**
+   * 获取翻页over速率
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.getFlipOverSpeed = function (newVisualWidth) {
+    return this._flipOverSpeed(newVisualWidth);
+  };
+
+  /**
+   * 获取初始化距离值
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.getInitDistance = function () {
+    return this._initDistance;
+  };
+
+  /**
+   * 模拟完成状态调用
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.simulationComplete = function () {
+    var _this = this;
+
+    setTimeout(function () {
+      _this._restore();
+      _this._unlockSwipe();
+    });
+  };
+
+  //允许滑动
+  Swipe.prototype.allowliding = function () {
+    this._unlockSwipe();
+  };
+
+  //禁止滑动
+  Swipe.prototype.bansliding = function () {
+    this._lockSwipe();
+  };
+
+  /**
+   * 停止翻页
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.openSwipe = function () {
+    this._initOperation();
+  };
+
+  /**
+   * 启动翻页
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.closeSwipe = function () {
+    if (!this._isMoving) {
+      this._off();
+    }
+  };
+
+  /**
+   * 是否为边界
+   * @param  {[type]}  distance [description]
+   * @return {Boolean}          [description]
+   */
+  Swipe.prototype.isBorder = function () {
+    this._borderBounce.apply(this, arguments);
+  };
+
+  /**
+   * 检车是否还在移动中
+   * @return {Boolean} [description]
+   */
+  Swipe.prototype.isMoving = function () {
+    return this._isMoving;
+  };
+
+  /**
+   * 前翻页接口
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.prev = function () {
+    if (!this._borderBounce(1)) {
+      this._slideTo('prev');
+    } else {
+      //边界反弹
+      this._setRebound(this.visualIndex, 'next');
+    }
+  };
+
+  /**
+   * 后翻页接口
+   * @return {Function} [description]
+   */
+  Swipe.prototype.next = function () {
+    if (!this._borderBounce(-1)) {
+      this._slideTo('next');
+    } else {
+      //边界反弹
+      this._setRebound(this.visualIndex, 'prev', 'isAppBoundary');
+    }
+  };
+
+  /**
+   * 获取当前页码
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.getVisualIndex = function () {
+    return this.visualIndex;
+  };
+
+  /**
+   * 主动设置页码编号
+   * 因为分栏的关系，内部修改外部
+   * 页面需要拼接
+   */
+  Swipe.prototype.setPointer = function (target, pageTotal) {
+    this.pagePointer = initPointer(target, pageTotal || this.pageTotal);
+  };
+
+  /**
+   * 获取页面Pointer
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.getPointer = function () {
+    return this.pagePointer;
+  };
+
+  /**
+   * 跳指定页面
+   * @param  {[type]} targetIndex [description]
+   * @param  {[type]} preMode     [description]
+   * @param  {[type]} complete    [description]
+   * @return {[type]}             [description]
+   */
+  Swipe.prototype.scrollToPage = function (targetIndex) {
+    //目标页面
+
+    //如果还在翻页中
+    if (this._fliplock) return;
+
+    var currIndex = this.visualIndex; //当前页面
+
+    //相邻页
+    switch (targetIndex) {
+      //前一页
+      case currIndex - 1:
+        if (this.options.multiplePages) {
+          return this.prev();
+        }
+        break;
+      //首页
+      case currIndex:
+        if (currIndex == 0) {
+          this.$emit('onDropApp');
+        }
+        return;
+      //后一页
+      case currIndex + 1:
+        if (this.options.multiplePages) {
+          return this.next();
+        }
+        break;
+    }
+
+    //算出是相关数据
+    var data = calculationIndex(currIndex, targetIndex, this.pageTotal);
+
+    //更新页码索引
+    this._updataPointer(data);
+
+    data.pagePointer = this.pagePointer;
+
+    this.$emit('onJumpPage', data);
+  };
+
+  /**
+   * 销毁所有
+   * @return {[type]} [description]
+   */
+  Swipe.prototype.destroy = function () {
+    this._off();
+    this.$off();
+    if (this._bubbleNode) {
+      this._bubbleNode.page = null;
+      this._bubbleNode.master = null;
+    }
+    this.container = null;
+  };
+
+  /**
+   * 调用动画完成
+   * @param {[type]} element [description]
+   */
+  Swipe.prototype.setTransitionComplete = function () {
+    this._distributed.apply(this, arguments);
+  };
+
+  /**
+   * 目标元素
+   * 找到li元素
+   * @param  {Function} callback [description]
+   * @return {[type]}            [description]
+   */
+  Swipe.prototype.findBubbleRootNode = function (point, pageType) {
+    var liNode = void 0,
+        map = void 0;
+    var visualIndex = this.visualIndex;
+    var sectionRang = this.options.sectionRang;
+
+    //找到对应的li
+    var childNodes = this._bubbleNode[pageType].childNodes;
+    var nodeTotal = childNodes.length;
+
+    while (nodeTotal--) {
+      liNode = childNodes[nodeTotal];
+      map = liNode.getAttribute('data-map');
+      if (sectionRang) {
+        visualIndex += sectionRang.start;
+      }
+      if (map == visualIndex) {
+        return liNode;
+      }
+      visualIndex = this.visualIndex;
+    }
+  };
+}
+
+/**
+ * 翻页速率
+ * @type {Number}
+ */
+var SPEED = 600;
+
+/**
+ * 默认翻页时间
+ * @type {Object}
+ */
+var DEFAULTTIME = {
+  min: 0,
+  mix: 500
+};
+
+var getDate = function getDate() {
+  return +new Date();
+};
+var transitionDuration$3 = Xut.style.transitionDuration;
+var LINEARTAG = 'data-viewlinear';
+var ABS = Math.abs;
+
+/**
+ * 自定义事件类型
+ * onSwipeDown 触屏点击
+ * onSwipeMove 触屏移动
+ * onSwipeUp   触屏松手
+ * onSwipeUpSlider触屏松手 滑动处理
+ * onFlipSliding 松手动画（反弹）
+ * onFlipRebound 执行反弹
+ * _onAnimComplete 动画完成
+ * onDropApp 退出应用
+ */
+
+var Swipe = function (_Observer) {
+  inherits(Swipe, _Observer);
+
+  function Swipe(_ref) {
+    var swipeWidth = _ref.swipeWidth,
+        initIndex = _ref.initIndex,
+        container = _ref.container,
+        flipMode = _ref.flipMode,
+        pageTotal = _ref.pageTotal,
+        multiplePages = _ref.multiplePages,
+        _ref$stopPropagation = _ref.stopPropagation,
+        stopPropagation = _ref$stopPropagation === undefined ? false : _ref$stopPropagation,
+        _ref$preventDefault = _ref.preventDefault,
+        preventDefault = _ref$preventDefault === undefined ? true : _ref$preventDefault,
+        _ref$linear = _ref.linear,
+        linear = _ref$linear === undefined ? false : _ref$linear,
+        _ref$borderBounce = _ref.borderBounce,
+        borderBounce = _ref$borderBounce === undefined ? true : _ref$borderBounce,
+        _ref$extraGap = _ref.extraGap,
+        extraGap = _ref$extraGap === undefined ? 0 : _ref$extraGap,
+        sectionRang = _ref.sectionRang;
+    classCallCheck(this, Swipe);
+
+    var _this = possibleConstructorReturn(this, (Swipe.__proto__ || Object.getPrototypeOf(Swipe)).call(this));
+
+    _this.options = {
+
+      stopPropagation: stopPropagation,
+
+      /**
+       * 默认阻止所有行为
+       * @type {[type]}
+       */
+      preventDefault: preventDefault,
+
+      /**
+       * 是否分段处理
+       * 默认是
+       * @type {[type]}
+       */
+      linear: linear,
+
+      /**
+       * 启动边界反弹
+       * @type {[type]}
+       */
+      borderBounce: borderBounce,
+
+      /**
+       * flipMode
+       * allow 翻页没有直接效果，速度改为0
+       * ban  翻页后没有动画回调
+       */
+      flipMode: flipMode,
+
+      /**
+       * 是否有多页面
+       */
+      multiplePages: multiplePages,
+
+      /**
+       * section分段拼接
+       * @type {[type]}
+       */
+      sectionRang: sectionRang
+    };
+
+    _this.visualIndex = initIndex;
+    _this.pageTotal = pageTotal;
+    _this.container = container;
+    _this.extraGap = extraGap;
+
+    /**
+     * 视图宽度
+     * @type {[type]}
+     */
+    _this._visualWidth = swipeWidth || config.visualSize.width;
+
+    /**
+     * 翻页时间
+     * @type {[type]}
+     */
+    _this._pageTime = _this.options.flipMode === 'ban' ? DEFAULTTIME.min : DEFAULTTIME.mix;
+
+    /**
+     * 翻页速率
+     * @type {[type]}
+     */
+    _this._speedRate = _this._originalRate = _this._pageTime / _this._visualWidth;
+
+    /**
+     * 是否移动中
+     * @type {Boolean}
+     */
+    _this._isMoving = false;
+
+    /**
+     * 计算初始化页码
+     * @type {[type]}
+     */
+    _this.pagePointer = initPointer(initIndex, pageTotal);
+
+    //初始化线性翻页
+    //全局只创建一个翻页容器
+    if (linear) {
+      container.setAttribute(LINEARTAG, true);
+      _this._setTransform();
+      _this._setContainerWidth();
+    } else {
+      //用于查找跟元素
+      //ul => page
+      //ul => master
+      var ul = container.querySelectorAll('ul');
+      _this._bubbleNode = {
+        page: ul[0],
+        master: ul[1]
+      };
+    }
+
+    //绑定行为
+    _this._initEvents();
+    return _this;
+  }
+
+  /**
+   * 设置初始的
+   */
+
+
+  createClass(Swipe, [{
+    key: '_setTransform',
+    value: function _setTransform(newIndex) {
+      var visualIndex = newIndex || this.visualIndex;
+      this._initDistance = -visualIndex * (this._visualWidth + this.extraGap);
+      if (this.container) {
+        this.container.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ;
+      }
+    }
+
+    /**
+     * 设置容易溢出的宽度
+     */
+
+  }, {
+    key: '_setContainerWidth',
+    value: function _setContainerWidth() {
+      if (this.container) {
+        this.container.style.width = this._visualWidth * this.pageTotal + 'px';
+      }
+    }
+
+    /**
+     * 绑定事件
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_initEvents',
+    value: function _initEvents() {
+
+      var callback = {
+        start: this,
+        end: this,
+        cancel: this,
+        leave: this
+      };
+
+      //flipMode启动，没有滑动处理
+      if (this.options.flipMode === 'ban') {
+        //不需要绑定transitionend，会设置手动会触发
+      } else if (this.options.multiplePages) {
+        callback.move = this;
+        callback.transitionend = this;
+      }
+
+      $$on(this.container, callback);
+    }
+
+    /**
+     * 事件处理
+     * @param  {[type]} e [description]
+     * @return {[type]}   [description]
+     */
+
+  }, {
+    key: 'handleEvent',
+    value: function handleEvent(e) {
+
+      this.options.stopPropagation && e.stopPropagation();
+
+      var stopDefault = this.options.preventDefault ? function (e) {
+        e.preventDefault && e.preventDefault();
+      } : function () {};
+
+      //接受多事件的句柄
+      $$handle({
+        start: function start(e) {
+
+          //禁止鼠标右键
+          if (e.button && e.button == 2) {
+            return;
+          }
+
+          //这样是为了触发二维码
+          if (Xut.plat.hasTouch && config.supportQR && e.target.nodeName.toLowerCase() === "img") {
+            //如果是移动端的情况下 && 支持二维码 && 是图片 就不组织默认行为
+          } else {
+            //浏览器上就直接阻止
+            stopDefault(e);
+          }
+
+          this._onStart(e);
+        },
+        move: function move(e) {
+          stopDefault(e);
+          this._onMove(e);
+        },
+        end: function end(e) {
+          stopDefault(e);
+          this._onEnd(e);
+        },
+        transitionend: function transitionend(e) {
+          stopDefault(e);
+          this._onAnimComplete(e);
+        }
+      }, this, e);
+    }
+
+    /**
+     * 是否多点触发
+     * @return {Boolean} [description]
+     */
+
+  }, {
+    key: '_hasMultipleTouches',
+    value: function _hasMultipleTouches(e) {
+      return e.touches && e.touches.length > 1;
+    }
+
+    /**
+     * 触发
+     * @param  {[type]} e [description]
+     * @return {[type]}   [description]
+     */
+
+  }, {
+    key: '_onStart',
+    value: function _onStart(e) {
+
+      //如果停止滑动
+      //或者多点触发
+      if (this._fliplock || this._hasMultipleTouches(e)) {
+        return;
+      }
+
+      //判断双击速度
+      //必须要大于350
+      var currtTime = getDate();
+      if (this._clickTime) {
+        if (currtTime - this._clickTime < 350) {
+          return;
+        }
+      }
+      this._clickTime = currtTime;
+
+      var interrupt = void 0;
+      var point = compatibilityEvent$1(e);
+
+      if (!point) {
+        return interrupt = this._preventSwipe = true;
+      }
+
+      /**
+       * 获取观察对象
+       * 钩子函数
+       * point 事件对象
+       * @return {[type]} [description]
+       */
+      this.$emit('onFilter', function () {
+        interrupt = true;
+      }, point, e);
+
+      //打断动作
+      if (interrupt) return;
+
+      this._deltaX = 0;
+      this._deltaY = 0;
+
+      this._preventSwipe = false; //是否滑动事件受限
+      this._isBounce = false; //是否反弹
+      this._isRollX = false; //是否为X轴滑动
+      this._isRollY = false; //是否为Y轴滑动
+      this._isTap = true; //点击了屏幕
+      this._isInvalid = false; //无效的触发
+
+      this._start = {
+        pageX: point.pageX,
+        pageY: point.pageY,
+        time: getDate()
+      };
+    }
+
+    /**
+     * 移动
+     * @param  {[type]} e [description]
+     * @return {[type]}   [description]
+     */
+
+  }, {
+    key: '_onMove',
+    value: function _onMove(e) {
+      var _this2 = this;
+
+      //如果停止翻页
+      //或者没有点击
+      //或是Y轴滑动
+      //或者是阻止滑动
+      if (this._fliplock || !this._isTap || this._isRollY || this._preventSwipe) return;
+
+      this._isMoving = true;
+
+      var point = compatibilityEvent$1(e);
+      var deltaX = point.pageX - this._start.pageX;
+      var deltaY = point.pageY - this._start.pageY;
+      var absDeltaX = ABS(deltaX);
+      var absDeltaY = ABS(deltaY);
+
+      //=========Y轴滑动=========
+      if (!this._isRollY) {
+        //Y>X => 为Y轴滑动
+        if (absDeltaY > absDeltaX) {
+          this._isRollY = true;
+          return;
+        }
+      }
+
+      //=========X轴滑动=========
+
+      //前尾是否允许反弹
+      if (!this.options.borderBounce) {
+        if (this._isBounce = this._borderBounce(deltaX)) return;
+      }
+
+      //滑动方向
+      //left => 负
+      //rigth => 正
+      this._deltaX = deltaX / (!this.visualIndex && deltaX > 0 // 在首页
+      || this.visualIndex == this.pageTotal - 1 // 尾页
+      && deltaX < 0 // 中间
+      ? absDeltaX / this._visualWidth + 1 : 1);
+
+      if (!this._isRollX && this._deltaX) {
+        this._isRollX = true;
+      }
+
+      this.direction = this._deltaX > 0 ? 'prev' : 'next';
+
+      //减少抖动
+      //算一次有效的滑动
+      //移动距离必须20px才开始移动
+      var xWait = 20;
+      if (absDeltaX <= xWait) return;
+
+      //需要叠加排除值
+      if (this._deltaX > 0) {
+        xWait = -xWait;
+      }
+
+      //是否无效函数
+      //如果无效，end方法抛弃掉
+      //必须是同步方法：
+      //动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
+      var setSwipeInvalid = function setSwipeInvalid() {
+        _this2._isInvalid = true;
+      };
+
+      this._distributeMove({
+        pageIndex: this.visualIndex,
+        distance: this._deltaX + xWait,
+        speed: 0,
+        direction: this.direction,
+        action: 'flipMove',
+        setSwipeInvalid: setSwipeInvalid
+      });
+    }
+
+    /**
+     * 松手
+     * @param  {[type]} e [description]
+     * @return {[type]}   [description]
+     */
+
+  }, {
+    key: '_onEnd',
+    value: function _onEnd(e) {
+
+      //停止滑动
+      //或者多点触发
+      //或者是边界
+      //或者是停止翻页
+      if (this._fliplock || this._isBounce || this._preventSwipe || this._hasMultipleTouches(e)) {
+        return;
+      }
+
+      this._isTap = this._isMoving = false;
+
+      var duration = void 0;
+      //可能没有点击页面，没有触发start事件
+      if (this._start) {
+        duration = getDate() - this._start.time;
+      }
+
+      //点击
+      if (!this._isRollX && !this._isRollY) {
+        var isReturn = false;
+        this.$emit('onTap', this.visualIndex, function () {
+          return isReturn = true;
+        }, e, duration);
+        if (isReturn) return;
+      }
+
+      //如果是左右滑动
+      if (this._isRollX) {
+
+        var deltaX = ABS(this._deltaX);
+
+        //如果是首尾
+        //如果是liner模式排除
+        var isPastBounds = this.options.linear ? false : !this.visualIndex && this._deltaX > 0 || this.visualIndex == this.pageTotal - 1 && this._deltaX < 0;
+
+        //_slideTo的最低值要求
+        //1 fast: time < 200 && x >30
+        //2 common: x > veiwWidth/6
+        var isValidSlide = duration < 200 && deltaX > 30 || deltaX > this._visualWidth / 6;
+
+        //如果是无效的动作，则不相应
+        //还原默认设置
+        //move的情况会引起
+        //mini功能，合并翻页时事件
+        if (this._isInvalid) {
+          var hasSwipe = duration < 200 && deltaX > this._visualWidth / 10;
+          if (hasSwipe) {
+            this._distributeMove({
+              pageIndex: this.visualIndex,
+              direction: this._deltaX > 0 ? 'prev' : 'next',
+              action: 'swipe'
+            });
+          }
+          this._restore();
+          return;
+        } else {
+          //跟随移动
+          if (isValidSlide && !isPastBounds) {
+            //true:right, false:left
+            this._slideTo(this._deltaX < 0 ? 'next' : 'prev');
+          } else {
+            //反弹
+            this._setRebound(this.visualIndex, this._deltaX > 0 ? 'prev' : 'next');
+          }
+        }
+      }
+    }
+
+    /**
+     * 前尾边界反弹判断
+     * @param  {[type]} deltaX [description]
+     * @return {[type]}        [description]
+     */
+
+  }, {
+    key: '_borderBounce',
+    value: function _borderBounce(deltaX) {
+      //首页,并且是左滑动
+      if (this.visualIndex === 0 && deltaX > 0) {
+        return true;
+        //尾页
+      } else if (this.visualIndex === this.pageTotal - 1 && deltaX < 0) {
+        return true;
+      }
+    }
+
+    /**
+     * 设置反弹
+     * isBoundary ##317
+     * 边界后反弹，最后一页刚好有是视觉差，反弹不归位
+     * 这里要强制处理
+     */
+
+  }, {
+    key: '_setRebound',
+    value: function _setRebound(pageIndex, direction, isAppBoundary) {
+      this._distributeMove({
+        isAppBoundary: isAppBoundary, //是边界后，反弹回来的
+        'pageIndex': pageIndex,
+        'direction': direction,
+        'distance': 0,
+        'speed': 300,
+        'action': 'flipRebound'
+      });
+    }
+
+    /**
+     * 处理松手后滑动
+     * pageIndex 页面
+     * distance  移动距离
+     * speed     时间
+     * viewTag   可使区标记
+     * follow    是否为跟随滑动
+     * @return {[type]} [description]
+     * pageIndex: 0, distance: -2, speed: 0, direction: "next", action: "flipMove"
+     */
+
+  }, {
+    key: '_distributeMove',
+    value: function _distributeMove(data) {
+      var pointer = this.pagePointer;
+      data.leftIndex = pointer.leftIndex;
+      data.rightIndex = pointer.rightIndex;
+      this.$emit('onMove', data);
+    }
+
+    /**
+     * 边界控制
+     * @param  {[type]} direction [description]
+     * @return {[type]}           [description]
+     */
+
+  }, {
+    key: '_isBorder',
+    value: function _isBorder(direction) {
+      var overflow = void 0;
+      var pointer = this.pagePointer;
+      var fillength = Object.keys(pointer).length;
+
+      switch (direction) {
+        case 'prev':
+          //前翻页
+          overflow = pointer.currIndex === 0 && fillength === 2 ? true : false;
+          break;
+        case 'next':
+          //后翻页
+          overflow = pointer.currIndex === this.pageTotal - 1 && fillength === 2 ? true : false;
+          break;
+      }
+
+      return overflow;
+    }
+
+    /**
+     * 复位速率
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_resetRate',
+    value: function _resetRate() {
+      this._speedRate = this._originalRate;
+      this._isQuickTurn = false;
+    }
+
+    /**
+     * 快速翻页时间计算
+     */
+
+  }, {
+    key: '_setRate',
+    value: function _setRate() {
+      this._speedRate = 50 / this._visualWidth;
+      this._isQuickTurn = true;
+    }
+
+    /**
+     * 判断是否快速翻页
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_quickTurn',
+    value: function _quickTurn() {
+      var startDate = getDate();
+      if (this._preTapTime) {
+        if (startDate - this._preTapTime < SPEED) {
+          this._setRate();
+        }
+      }
+      this._preTapTime = getDate();
+    }
+
+    /**
+     * 翻页加锁
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_lockSwipe',
+    value: function _lockSwipe() {
+      this._fliplock = true;
+    }
+
+    /**
+     * 修正页面索引
+     * 设置新的页面可视区索引
+     */
+
+  }, {
+    key: '_setVisualIndex',
+    value: function _setVisualIndex(index) {
+      this.visualIndex = index;
+    }
+
+    /**
+     * 更新页码标示
+     */
+
+  }, {
+    key: '_updataPointer',
+    value: function _updataPointer(leftIndex, currIndex, rightIndex) {
+      if (arguments.length === 3) {
+        this.pagePointer = {
+          'leftIndex': leftIndex,
+          'currIndex': currIndex,
+          'rightIndex': rightIndex
+        };
+        return;
+      }
+      if (arguments.length === 1) {
+        var data = leftIndex;
+        var viewFlip = data.viewFlip;
+        this._setVisualIndex(data.targetIndex);
+        if (viewFlip.length === 3) {
+          this._updataPointer(viewFlip[0], viewFlip[1], viewFlip[2]);
+        }
+        if (viewFlip.length === 2) {
+          if (viewFlip[0] === 0) {
+            //首页
+            this.pagePointer.rightIndex = viewFlip[1];
+            this.pagePointer.currIndex = viewFlip[0];
+            delete this.pagePointer.leftIndex;
+          } else {
+            //尾页
+            this.pagePointer.leftIndex = viewFlip[0];
+            this.pagePointer.currIndex = viewFlip[1];
+            delete this.pagePointer.rightIndex;
+          }
+        }
+        return;
+      }
+    }
+
+    /**
+     * 增加索引的动作
+     * 修正页码指示
+     */
+
+  }, {
+    key: '_updateActionPointer',
+    value: function _updateActionPointer() {
+      var pointer = this.pagePointer;
+
+      //获取动作索引
+      var actionPointer = getActionPointer(this.direction, pointer.leftIndex, pointer.rightIndex);
+      var createPointer = actionPointer.createPointer;
+      var stopPointer = pointer.currIndex;
+
+      switch (this.direction) {
+        case 'prev':
+          if (-1 < createPointer) {
+            //首页情况
+            this._updataPointer(createPointer, pointer.leftIndex, pointer.currIndex);
+          }
+          if (-1 === createPointer) {
+            this.pagePointer.rightIndex = pointer.currIndex;
+            this.pagePointer.currIndex = pointer.leftIndex;
+            delete this.pagePointer.leftIndex;
+          }
+          break;
+        case 'next':
+          if (this.pageTotal > createPointer) {
+            this._updataPointer(pointer.currIndex, pointer.rightIndex, createPointer);
+          }
+          if (this.pageTotal === createPointer) {
+            //如果是尾页
+            this.pagePointer.leftIndex = pointer.currIndex;
+            this.pagePointer.currIndex = pointer.rightIndex;
+            delete this.pagePointer.rightIndex;
+          }
+          break;
+      }
+
+      //更新页面索引标识
+      this.pagePointer.createPointer = createPointer;
+      this.pagePointer.destroyPointer = actionPointer.destroyPointer;
+      this.pagePointer.stopPointer = stopPointer;
+    }
+
+    /**
+     * 获取翻页结束的speed的速率
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_flipOverSpeed',
+    value: function _flipOverSpeed(visualWidth) {
+      visualWidth = visualWidth || this._visualWidth;
+      var spped = (visualWidth - ABS(this._deltaX)) * this._speedRate || this._pageTime;
+      return ABS(spped);
+    }
+
+    /**
+     * 滑动到上下页面
+     * direction
+     *     "perv" / "next"
+     * @param  {[type]} direction [description]
+     * @return {[type]}           [description]
+     */
+
+  }, {
+    key: '_slideTo',
+    value: function _slideTo(direction) {
+      var _this3 = this;
+
+      //如果在忙碌状态,如果翻页还没完毕
+      if (this._fliplock) {
+        return;
+      }
+
+      //前后边界
+      if (!this.options.linear) {
+        if (this._isBorder(direction)) return;
+      }
+
+      this._lockSwipe();
+      this.direction = direction;
+      this._quickTurn();
+
+      this._distributeMove({
+        'pageIndex': this.visualIndex,
+        'speed': this._flipOverSpeed(),
+        'distance': 0,
+        'direction': this.direction,
+        'action': 'flipOver'
+      });
+
+      if (this.pagePointer.createPointer) {
+        this.recordLastPoionter = $.extend(true, {}, this.pagePointer);
+      }
+
+      setTimeout(function () {
+        //更新this.pagePointer索引
+        //增加处理标记
+        _this3._updateActionPointer();
+        _this3.$emit('onUpSlider', _this3.pagePointer);
+        _this3._setVisualIndex(_this3.pagePointer.currIndex);
+      });
+    }
+
+    /**
+     * 动画结束后处理
+     * @param  {[type]} e [description]
+     * @return {[type]}   [description]
+     */
+
+  }, {
+    key: '_onAnimComplete',
+    value: function _onAnimComplete(e) {
+      var node = e.target;
+      var pageType = node.getAttribute('data-pageType');
+      var view = node.getAttribute('data-view'); //操作的可视窗口
+      var linearView = node.getAttribute(LINEARTAG); //流式布局
+
+      //去掉动画时间
+      if (node) {
+        node.style[transitionDuration$3] = '';
+      }
+
+      //流式布局处理
+      if (linearView && !view) {
+        this._distributed(node, view);
+        return;
+      }
+
+      //反弹效果,未翻页
+      if (!view) {
+        if (!pageType) {
+          //只针对母板处理
+          this.$emit('onMasterMove', this.visualIndex, node);
+        }
+        return;
+      }
+
+      this._distributed(node, view);
+    }
+  }, {
+    key: '_distributed',
+    value: function _distributed() {
+      var _this4 = this;
+
+      this._restore.apply(this, arguments);
+
+      //延长获取更pagePointer的更新值
+      setTimeout(function () {
+        _this4.$emit('onComplete', _this4.direction, _this4.pagePointer, _this4._unlockSwipe.bind(_this4), _this4._isQuickTurn);
+      }, 50);
+    }
+
+    /**
+     * 还原设置
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_restore',
+    value: function _restore(node, view) {
+
+      this._isMoving = false;
+
+      //针对拖拽翻页阻止
+      this._preventSwipe = true;
+      this._isTap = false;
+      //恢复速率
+      this._resetRate();
+      view && node.removeAttribute('data-view', 'false');
+    }
+
+    /**
+     * 解锁翻页
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_unlockSwipe',
+    value: function _unlockSwipe() {
+      this._fliplock = false;
+    }
+
+    /**
+     * 销毁事件
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_off',
+    value: function _off() {
+      $$off(this.container);
+    }
+  }]);
+  return Swipe;
+}(Observer);
+
+api(Swipe);
+
 /**
  * 2017.9.7
  * 流式排版
  */
 
-var Section$2 = function () {
-    function Section(_ref) {
-        var pptMaster = _ref.pptMaster,
-            pageIndex = _ref.pageIndex,
-            $pinchNode = _ref.$pinchNode,
-            seasonId = _ref.seasonId,
-            chapterId = _ref.chapterId,
-            successCallback = _ref.successCallback;
-        classCallCheck(this, Section);
+var ColumnClass = function () {
+  function ColumnClass(_ref) {
+    var pptMaster = _ref.pptMaster,
+        pageIndex = _ref.pageIndex,
+        $pinchNode = _ref.$pinchNode,
+        seasonId = _ref.seasonId,
+        chapterId = _ref.chapterId,
+        successCallback = _ref.successCallback;
+    classCallCheck(this, ColumnClass);
 
-        var self = this;
-        this.initIndex = pageIndex;
-        this.$pinchNode = $pinchNode;
-        this.pptMaster = pptMaster;
-        this.zoomObjs = {};
-        render({
-            $pinchNode: $pinchNode,
-            dataNode: $('#chapter-flow-' + chapterId),
-            chapterId: chapterId,
-            callback: function callback($container) {
-                self._init($container, seasonId, chapterId);
-                successCallback();
-            }
+    this.zoomObjs = {};
+    this.pptMaster = pptMaster;
+    this.chapterId = chapterId;
+    this.seasonId = seasonId;
+    this.initIndex = pageIndex;
+    this.$pinchNode = $pinchNode;
+    this.$container = $($('#chapter-flow-' + chapterId).html());
+    this._layout(successCallback);
+  }
+
+  /**
+   * 布局显示
+   */
+
+
+  createClass(ColumnClass, [{
+    key: '_layout',
+    value: function _layout(successCallback) {
+      var _this = this;
+
+      Xut.nextTick({
+        container: this.$pinchNode,
+        content: this.$container
+      }, function () {
+        _this._init();
+        successCallback();
+      });
+    }
+
+    /**
+     * 缩放图片
+     */
+
+  }, {
+    key: '_zoomImage',
+    value: function _zoomImage(node) {
+      var src = node.src;
+      if (!src) {
+        return;
+      }
+      var analysisName = analysisImageName(src);
+      var originalName = analysisName.original;
+      var zoomObj = this.zoomObjs[originalName];
+      if (zoomObj) {
+        zoomObj.play();
+      } else {
+        //如果配置了高清后缀
+        var hqSrc = void 0;
+        if (config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
+          //如果启动了高清图片
+          hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440']);
+        }
+        this.zoomObjs[originalName] = new Zoom({
+          element: $(node),
+          originalSrc: config.pathAddress + analysisName.suffix,
+          hdSrc: hqSrc
         });
+      }
+    }
+
+    /**
+     * pagesCount = 5
+     *   等分=> 0.25/0.5/0.75/1/0
+     */
+
+  }, {
+    key: '_getNodes',
+    value: function _getNodes() {
+      if (this.pptMaster) {
+        var nodes = [];
+        var ratio = 1 / (this.columnCount - 1); //比值
+        for (var i = 1; i < this.columnCount; i++) {
+          nodes.push(i * ratio);
+        }
+        return nodes.push(0);
+      }
     }
 
     /**
      * 获取母版对象
+     */
+
+  }, {
+    key: '_getMasterObj',
+    value: function _getMasterObj() {
+      if (this._masterObj) {
+        return this._masterObj;
+      }
+      if (this.pptMaster) {
+        this._masterObj = Xut.Presentation.GetPageObj('master', this.initIndex);
+      }
+    }
+
+    /**
+     * 移动视觉差
+     * 处理当前页面内的视觉差对象效果
+     */
+
+  }, {
+    key: '_moveParallax',
+    value: function _moveParallax(action, speed, nodes, visualIndex, direction, viewBeHideDistance) {
+      var masterObj = this._getMasterObj();
+      if (masterObj) {
+        masterObj.moveParallax({
+          speed: speed,
+          action: action,
+          direction: direction,
+          pageIndex: visualIndex + 1,
+          moveDist: viewBeHideDistance,
+          nodes: direction === 'next' ? nodes[visualIndex] : ''
+        });
+      }
+    }
+
+    /**
+     * 初始化
+     */
+
+  }, {
+    key: '_init',
+    value: function _init() {
+
+      var coloumnObj = this;
+      var columnWidth = resetVisualLayout(1).width;
+      var container = this.$container[0];
+
+      //分栏数
+      this.columnCount = getColumnCount(this.seasonId, this.chapterId);
+
+      //边界
+      coloumnObj.minBorder = 0;
+      coloumnObj.maxBorder = this.columnCount - 1;
+
+      var nodes = this._getNodes();
+
+      /**
+       * 分栏整体控制
+       * @type {[type]}
+       */
+      var swipe = this.swipe = new Swipe({
+        swipeWidth: columnWidth,
+        linear: true,
+        initIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
+        container: container,
+        flipMode: 'allow',
+        multiplePages: 1,
+        stopPropagation: true,
+        pageTotal: this.columnCount
+      });
+
+      var moveDistance = 0;
+
+      coloumnObj.lastDistance = swipe.getInitDistance();
+
+      swipe.$watch('onTap', function (pageIndex, hookCallback, ev, duration) {
+        //如果是长按，是针对默认的事件处理
+        if (config.supportQR && duration && duration > 500) {
+          return;
+        }
+        //图片缩放
+        var node = ev.target;
+        if (node && node.nodeName.toLowerCase() === "img") {
+          coloumnObj._zoomImage(node);
+        }
+        if (!Xut.Contents.Canvas.getIsTap()) {
+          Xut.View.Toolbar();
+        }
+      });
+
+      swipe.$watch('onMove', function (_ref2) {
+        var action = _ref2.action,
+            speed = _ref2.speed,
+            distance = _ref2.distance,
+            leftIndex = _ref2.leftIndex,
+            pageIndex = _ref2.pageIndex,
+            rightIndex = _ref2.rightIndex,
+            direction = _ref2.direction;
+
+
+        /**
+         * 首页边界
+         */
+        if (swipe.visualIndex === coloumnObj.minBorder && swipe.direction === 'prev') {
+          if (action === 'flipOver') {
+            Xut.View.GotoPrevSlide();
+            swipe.simulationComplete();
+          } else {
+            //前边界前移反弹
+            Xut.View.MovePage(distance, speed, swipe.direction, action);
+          }
+        }
+        /**
+         * 尾页边界
+         */
+        else if (swipe.visualIndex === coloumnObj.maxBorder && swipe.direction === 'next') {
+            if (action === 'flipOver') {
+              Xut.View.GotoNextSlide();
+              swipe.simulationComplete();
+            } else {
+              //后边界前移反弹
+              Xut.View.MovePage(distance, speed, swipe.direction, action);
+            }
+          }
+          /**
+           * 中间页面
+           */
+          else {
+
+              var viewBeHideDistance = getVisualDistance({
+                action: action,
+                distance: distance,
+                direction: direction
+              })[1];
+
+              moveDistance = viewBeHideDistance;
+
+              switch (direction) {
+                case 'next':
+                  moveDistance = moveDistance + coloumnObj.lastDistance;
+                  break;
+                case 'prev':
+                  moveDistance = moveDistance + coloumnObj.lastDistance;
+                  break;
+              }
+
+              //反弹
+              if (action === 'flipRebound') {
+                if (direction === 'next') {
+                  //右翻页，左反弹
+                  moveDistance = -columnWidth * swipe.visualIndex;
+                } else {
+                  //左翻页，右反弹
+                  moveDistance = -(columnWidth * swipe.visualIndex);
+                }
+              }
+
+              //更新页码
+              if (action === 'flipOver') {
+                coloumnObj._updataPageNumber(direction);
+              }
+
+              translation[action](container, moveDistance, speed);
+
+              //移动视觉差对象
+              coloumnObj._moveParallax(action, speed, nodes, swipe.visualIndex, direction, viewBeHideDistance);
+            }
+      });
+
+      swipe.$watch('onComplete', function (direction, pagePointer, unfliplock, isQuickTurn) {
+        coloumnObj.lastDistance = moveDistance;
+        unfliplock();
+      });
+    }
+
+    /**
+     * 更新页码
+     */
+
+  }, {
+    key: '_updataPageNumber',
+    value: function _updataPageNumber(direction, location) {
+      var initIndex = this.initIndex;
+      if (location) {
+        direction = location === 'right' ? 'prev' : 'next';
+        if (location === 'middle') {
+          //如果中间是分栏页
+          --initIndex;
+        }
+      }
+      Xut.View.setPageNumber({
+        parentIndex: initIndex,
+        sonIndex: this.swipe.getVisualIndex() + 1,
+        hasSon: true,
+        direction: direction
+      });
+    }
+
+    /**
+     * 重新计算分栏依赖
+     */
+
+  }, {
+    key: 'resetColumnDep',
+    value: function resetColumnDep() {
+      var newColumnCount = getColumnCount(this.seasonId, this.chapterId);
+
+      //如果分栏页面总数不正确
+      if (this.columnCount !== newColumnCount) {
+
+        this.columnCount = newColumnCount;
+        this.maxBorder = newColumnCount - 1;
+
+        var visualPageId = Xut.Presentation.GetPageId();
+        var columnPageId = this.chapterId;
+        var location = void 0;
+
+        //区分控制column属于哪个页面对象
+        if (visualPageId > columnPageId) {
+          location = 'left';
+        } else if (visualPageId < columnPageId) {
+          location = 'right';
+        } else if (visualPageId === columnPageId) {
+          location = 'middle';
+        }
+
+        //设置column
+        this.swipe.setLinearTotal(newColumnCount, location);
+
+        this.lastDistance = this.swipe.getInitDistance();
+
+        //页码
+        this._updataPageNumber('', location);
+      }
+    }
+
+    /**
+     * 销毁
      * @return {[type]} [description]
      */
 
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      var _this2 = this;
 
-    createClass(Section, [{
-        key: '_getMasterObj',
-        value: function _getMasterObj() {
-            if (this._masterObj) {
-                return this._masterObj;
-            }
-            if (this.pptMaster) {
-                this._masterObj = Xut.Presentation.GetPageObj('master', this.initIndex);
-            }
-        }
+      //销毁缩放图片
+      if (Object.keys(this.zoomObjs).length) {
+        _.each(this.zoomObjs, function (obj, key) {
+          obj.destroy();
+          _this2.zoomObjs[key] = null;
+        });
+      }
 
-        /**
-         * 缩放图片
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: '_zoomImage',
-        value: function _zoomImage(node) {
-
-            if (!node.src) {
-                return;
-            }
-
-            var analysisName = analysisImageName(node.src);
-
-            //图片地址
-            var originalSuffixUrl = config.pathAddress + analysisName.suffix;
-            if (this.zoomObjs[originalSuffixUrl]) {
-                //重复调用
-                this.zoomObjs[originalSuffixUrl].play();
-            } else {
-                //如果配置了高清后缀
-                var hqSrc = void 0;
-                //如果启动了高清图片
-                if (config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-                    hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440']);
-                }
-                this.zoomObjs[originalSuffixUrl] = new Zoom({
-                    element: $(node),
-                    originalSrc: originalSuffixUrl,
-                    hdSrc: hqSrc
-                });
-            }
-        }
-
-        //pagesCount = 5
-        // =>
-        //   0.25
-        //   0.5
-        //   0.75
-        //   1
-        //   0
-
-    }, {
-        key: '_makeNodes',
-        value: function _makeNodes(count) {
-            var nodes = [];
-            var ratio = 1 / (count - 1); //比值
-            for (var i = 1; i < count; i++) {
-                nodes.push(i * ratio);
-            }
-            nodes.push(0);
-            return nodes;
-        }
-
-        /**
-         * 初始化
-         * @param  {[type]} $container [description]
-         * @param  {[type]} $content   [description]
-         * @return {[type]}            [description]
-         */
-
-    }, {
-        key: '_init',
-        value: function _init($container, seasonId, chapterId) {
-            var _this = this;
-
-            var flowObject = this;
-            var pagesCount = getColumnCount(seasonId, chapterId);
-            var flowView = resetVisualLayout(1);
-
-            var MIN = 0;
-            var MAX = pagesCount - 1;
-            var flipWidth = flowView.width;
-            var View = Xut.View;
-            var initIndex = this.initIndex;
-            var container = $container[0];
-
-            var nodes = void 0;
-            if (this.pptMaster) {
-                nodes = this._makeNodes(pagesCount);
-            }
-
-            /**
-             * 分栏整体控制
-             * @type {[type]}
-             */
-            var swipe = this.swipe = new Swipe({
-                flipWidth: flipWidth,
-                linear: true,
-                initIndex: Xut.Presentation.GetPageIndex() > initIndex ? MAX : MIN,
-                container: container,
-                flipMode: 0,
-                multiplePages: 1,
-                // preventDefault:,
-                stopPropagation: true,
-                pagetotal: pagesCount
-            });
-
-            var moveDistance = 0;
-            var lastDistance = swipe.getInitDistance();
-
-            swipe.$watch('onTap', function (pageIndex, hookCallback, ev, duration) {
-                //如果是长按，是针对默认的事件处理
-                if (config.supportQR && duration && duration > 500) {
-                    return;
-                }
-                //图片缩放
-                var node = ev.target;
-                if (node && node.nodeName.toLowerCase() === "img") {
-                    _this._zoomImage(node);
-                }
-                if (!Xut.Contents.Canvas.getIsTap()) {
-                    View.Toolbar();
-                }
-            });
-
-            swipe.$watch('onMove', function (_ref2) {
-                var _this2 = this;
-
-                var action = _ref2.action,
-                    speed = _ref2.speed,
-                    distance = _ref2.distance,
-                    leftIndex = _ref2.leftIndex,
-                    pageIndex = _ref2.pageIndex,
-                    rightIndex = _ref2.rightIndex,
-                    direction = _ref2.direction;
-
-
-                /**
-                 * 首页边界
-                 * @param  {[type]} this._hindex [description]
-                 * @return {[type]}              [description]
-                 */
-                if (this._hindex === MIN && this.direction === 'prev') {
-                    if (action === 'flipOver') {
-                        View.GotoPrevSlide();
-                        this.simulationComplete();
-                    } else {
-                        //前边界前移反弹
-                        View.MovePage(distance, speed, this.direction, action);
-                    }
-                }
-                /**
-                 * 尾页边界
-                 * @param  {[type]} this._hindex [description]
-                 * @return {[type]}              [description]
-                 */
-                else if (this._hindex === MAX && this.direction === 'next') {
-                        if (action === 'flipOver') {
-                            View.GotoNextSlide();
-                            this.simulationComplete();
-                        } else {
-                            //后边界前移反弹
-                            View.MovePage(distance, speed, this.direction, action);
-                        }
-                    }
-                    /**
-                     * 中间页面
-                     */
-                    else {
-                            (function () {
-
-                                var viewBeHideDistance = getVisualDistance({
-                                    action: action,
-                                    distance: distance,
-                                    direction: direction
-                                })[1];
-
-                                moveDistance = viewBeHideDistance;
-
-                                switch (direction) {
-                                    case 'next':
-                                        moveDistance = moveDistance + lastDistance;
-                                        break;
-                                    case 'prev':
-                                        moveDistance = moveDistance + lastDistance;
-                                        break;
-                                }
-
-                                //反弹
-                                if (action === 'flipRebound') {
-                                    if (direction === 'next') {
-                                        //右翻页，左反弹
-                                        moveDistance = -flipWidth * _this2._hindex;
-                                    } else {
-                                        //左翻页，右反弹
-                                        moveDistance = -(flipWidth * _this2._hindex);
-                                    }
-                                }
-
-                                //更新页码
-                                if (action === 'flipOver') {
-                                    Xut.View.PageUpdate({
-                                        parentIndex: initIndex,
-                                        sonIndex: swipe.getHindex() + 1,
-                                        hasSon: true,
-                                        direction: direction
-                                    });
-                                }
-
-                                //移动视觉差
-                                var moveParallaxObject = function moveParallaxObject() {
-                                    var masterObj = flowObject._getMasterObj();
-                                    if (masterObj) {
-                                        //处理当前页面内的视觉差对象效果
-                                        masterObj.moveParallax({
-                                            action: action,
-                                            direction: direction,
-                                            pageIndex: _this2._hindex + 1,
-                                            moveDist: viewBeHideDistance,
-                                            speed: speed,
-                                            nodes: direction === 'next' ? nodes[_this2._hindex] : ''
-                                        });
-                                    }
-                                };
-
-                                translation[action](container, moveDistance, speed);
-                                moveParallaxObject();
-                            })();
-                        }
-            });
-
-            swipe.$watch('onComplete', function (direction, pagePointer, unfliplock, isQuickTurn) {
-                lastDistance = moveDistance;
-                unfliplock();
-            });
-        }
-
-        /**
-         * 销毁
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            var _this3 = this;
-
-            //销毁缩放图片
-            if (Object.keys(this.zoomObjs).length) {
-                _.each(this.zoomObjs, function (obj, key) {
-                    obj.destroy();
-                    _this3.zoomObjs[key] = null;
-                });
-            }
-
-            this.swipe && this.swipe.destroy();
-        }
-    }]);
-    return Section;
+      this.swipe && this.swipe.destroy();
+    }
+  }]);
+  return ColumnClass;
 }();
 
 /**
@@ -66413,7 +66709,7 @@ var TaskColumns = function (base, successCallback) {
     var chapterData = base.chapterData;
     //只有页面类型支持flow && chpater页存在flow数据
     if (base.pageType === "page" && isColumnPage(chapterData.seasonId, base.chapterId)) {
-        base._flows.register(new Section$2({
+        base._columns.register(new ColumnClass({
             pptMaster: base.chapterData.pptMaster, //母版ID
             pageIndex: base.pageIndex,
             $pinchNode: base.getContainsNode(),
@@ -66654,7 +66950,7 @@ var assignedTasks = {
             success: function success() {
                 taskCallback();
             }
-        }, base.listenerHooks);
+        }, base.collectHooks);
 
         base.createRelated.cacheTasks['contents'] = new TaskContents({
             'canvasRelated': base.canvasRelated,
@@ -67027,6 +67323,48 @@ var Factory = function (_Observer) {
   return Factory;
 }(Observer);
 
+/****************************
+ *
+ *	监控_columns内容是否需要补全
+ *
+ *****************************/
+
+function watchColumn(instance, config) {
+    //注册_columns对象改变
+    if (config.columnCheck) {
+        var columnObj = instance._columns.get();
+        if (columnObj && columnObj.length) {
+            if (!instance.unWatchDep) {
+                instance.unWatchDep = [];
+            }
+            columnObj.forEach(function (obj) {
+                var dep = Xut.Application.Watch('change:column', function () {
+                    obj.resetColumnDep();
+                });
+                //保存监控引用
+                instance.unWatchDep.push(function () {
+                    return Xut.Application.unWatch('change:column', dep);
+                });
+            });
+        }
+    }
+}
+
+/**
+ * 移除监控
+ * @param  {[type]} instance [description]
+ * @return {[type]}          [description]
+ */
+function unWatchColumn(instance) {
+    //如果有更新记录依赖
+    if (instance.unWatchDep) {
+        instance.unWatchDep.forEach(function (unDep) {
+            unDep();
+        });
+        instance.unWatchDep = null;
+    }
+}
+
 var initstate = function (baseProto) {
 
     /**
@@ -67077,7 +67415,6 @@ var initstate = function (baseProto) {
          * 抽象activtiys合集,用于关联各自的content
          * 划分各自的子作用域
          * 1对多的关系
-         * @type {Collection}
          */
         this._abActivitys = new Collection();
 
@@ -67086,40 +67423,26 @@ var initstate = function (baseProto) {
          * 只存在当前页面
          * 1 iframe零件
          * 2 页面零件
-         * @type {Collection}
          */
         this._components = new Collection();
 
         /**
          * 缓存所有的content对象引用
          * 1对1的关系
-         * @type {Object}
          */
         this._contentsCollector = {};
 
         /**
          * 2016.9.7
-         * flow热点对象
-         * @type {Collection}
+         * column热点对象
          */
-        this._flows = new Collection();
-
-        /**
-         * 流式布局页面
-         * 排除母版
-         * @param  {[type]} instance.pageType [description]
-         * @return {[type]}                   [description]
-         */
-        if (this.pageType === 'master' && this.isFlows) {
-            this.isFlows = false;
-        }
+        this._columns = new Collection();
 
         /**
          * 为mini杂志新功能
          * 动画的调用序列
          * 收集滑动委托对象，针对事件合集触发处理
          * 2016.11.8
-         * @type {Array}
          */
         if (config.swipeDelegate) {
             this._swipeSequence = {
@@ -67172,12 +67495,19 @@ var initstate = function (baseProto) {
          * 对象的处理情况的内部钩子方法
          * @type {Object}
          */
-        this.listenerHooks = {
+        this.collectHooks = {
+
+            /**
+             * 多线程任务完成后
+             * 开始column观察器
+             */
+            threadtaskComplete: function threadtaskComplete() {
+                watchColumn(instance, config);
+            },
+
 
             /**
              * 注册抽象Activity类content(大类,总content对象)
-             * @param  {[type]} contentsObjs [description]
-             * @return {[type]}              [description]
              */
             registerActivitys: function registerActivitys(contentsObjs) {
                 instance._abActivitys.register(contentsObjs);
@@ -67275,8 +67605,6 @@ var initstate = function (baseProto) {
             /**
              * 多事件钩子
              * 执行多事件绑定
-             * @param  {[type]} eventRelated [description]
-             * @return {[type]}              [description]
              */
             eventBinding: function eventBinding(eventRelated) {
                 create$1(instance, eventRelated);
@@ -67286,7 +67614,6 @@ var initstate = function (baseProto) {
             /**
              * 2016.11.8
              * 收集滑动委托对象，针对事件合集触发处理
-             * @return {[type]} [description]
              */
             swipeDelegateContents: function swipeDelegateContents(eventName, fn) {
                 ++instance._swipeSequence[eventName + 'Total'];
@@ -67461,6 +67788,7 @@ var threadExternal = function (baseProto) {
      * currtask 是否为当前任务，加速创建
      */
     baseProto._checkTasksCreate = function (callback, context) {
+        var _this3 = this;
 
         //如果任务全部完成
         if (this.createRelated.nextRunTask === 'complete') {
@@ -67474,6 +67802,7 @@ var threadExternal = function (baseProto) {
 
         //完毕回调
         this.createRelated.createTasksComplete = function () {
+            _this3.collectHooks && _this3.collectHooks.threadtaskComplete();
             callback.call(context);
         };
 
@@ -67506,21 +67835,21 @@ var threadExternal = function (baseProto) {
      * @return {[type]} [description]
      */
     baseProto._multithreadCheck = function (callbacks, interrupt) {
-        var _this3 = this;
+        var _this4 = this;
 
         var check = function check() {
-            if (_this3._checkTaskSuspend()) {
-                _this3.tasksTimeOutId && clearTimeout(_this3.tasksTimeOutId);
-                callbacks.suspendCallback.call(_this3);
+            if (_this4._checkTaskSuspend()) {
+                _this4.tasksTimeOutId && clearTimeout(_this4.tasksTimeOutId);
+                callbacks.suspendCallback.call(_this4);
             } else {
-                callbacks.nextTaskCallback.call(_this3);
+                callbacks.nextTaskCallback.call(_this4);
             }
         };
 
         var next = function next() {
-            _this3.tasksTimeOutId = setTimeout(function () {
+            _this4.tasksTimeOutId = setTimeout(function () {
                 check();
-            }, _this3.canvasRelated.tasksTimer);
+            }, _this4.canvasRelated.tasksTimer);
         };
 
         //自动运行页面构建
@@ -67793,7 +68122,7 @@ var destroy$2 = function (baseProto) {
      * @return {[type]} [description]
      */
     baseProto.baseDestroy = function () {
-
+        // console.log(this)
         // //清理图片缓存
         // //读库快速退出模式下报错修正
         // try {
@@ -67817,13 +68146,13 @@ var destroy$2 = function (baseProto) {
 
         //流式布局对象
         //2016.9.10
-        var _flows = this._flows.get();
-        if (_flows.length) {
-            _flows.forEach(function (flowObj) {
+        var _columns = this._columns.get();
+        if (_columns.length) {
+            _columns.forEach(function (flowObj) {
                 flowObj.destroy();
                 flowObj = null;
             });
-            this._flows = null;
+            this._columns = null;
         }
 
         //清理线程任务块
@@ -67883,6 +68212,8 @@ var destroy$2 = function (baseProto) {
             this.$pseudoElement = null;
         }
 
+        unWatchColumn(this);
+
         //移除li容器节点节点
         this.$pageNode.remove();
         this.rootNode = null;
@@ -67897,62 +68228,62 @@ var destroy$2 = function (baseProto) {
  */
 var moveContainer = function (baseProto) {
 
-    /**
-     * 页面移动
-     * @return {[type]} [description]
-     */
-    baseProto.moveContainer = function (action, distance, speed, viewOffset, direction) {
+  /**
+   * 页面移动
+   * @return {[type]} [description]
+   */
+  baseProto.moveContainer = function (action, distance, speed, viewOffset, direction) {
 
-        var pageNode = this.$pageNode[0];
+    var pageNode = this.$pageNode[0];
 
-        //浮动页面
-        if (this.pageType === 'page') {
-            //移动浮动页面容器
-            var $floatElement = this.floatContents.PageContainer;
-            if ($floatElement) {
-                translation[action]($floatElement[0], distance, speed);
-            }
-        }
+    //浮动页面
+    if (this.pageType === 'page') {
+      //移动浮动页面容器
+      var $floatElement = this.floatContents.PageContainer;
+      if ($floatElement) {
+        translation[action]($floatElement[0], distance, speed);
+      }
+    }
 
-        //浮动母版
-        if (this.pageType === 'master') {
-            //母版交接判断
-            //用户事件的触发
-            this.onceMaster = false;
+    //浮动母版
+    if (this.pageType === 'master') {
+      //母版交接判断
+      //用户事件的触发
+      this.onceMaster = false;
 
-            //移动浮动容器
-            var $masterElement = this.floatContents.MasterContainer;
-            if ($masterElement) {
-                translation[action]($masterElement[0], distance, speed);
-            }
-        }
+      //移动浮动容器
+      var $masterElement = this.floatContents.MasterContainer;
+      if ($masterElement) {
+        translation[action]($masterElement[0], distance, speed);
+      }
+    }
 
-        //过滤多个动画回调，
-        //保证指向始终是当前页面
-        //翻页 && 是母版页 && 是当前页面
-        var isVisual = false; // 是可视页面
-        if (action === 'flipOver') {
-            if (this.pageType === 'page' && distance === viewOffset) {
-                //增加可视页面标记
-                pageNode.setAttribute('data-view', true);
-                isVisual = true;
-            }
-        }
+    //过滤多个动画回调，
+    //保证指向始终是当前页面
+    //翻页 && 是母版页 && 是当前页面
+    var isVisual = false; // 是可视页面
+    if (action === 'flipOver') {
+      if (this.pageType === 'page' && distance === viewOffset) {
+        //增加可视页面标记
+        pageNode.setAttribute('data-view', true);
+        isVisual = true;
+      }
+    }
 
-        //当前页面
-        translation[action](pageNode, distance, speed, function () {
-            //修正flipMode切换页面的处理
-            //没有翻页效果
-            //强制给动画结束触发
-            //可视区页面
-            //排除母版的情况
-            if (config.flipMode && isVisual) {
-                //设置动画完成
-                Xut.Application.SetTransitionComplete(pageNode, pageNode.getAttribute('data-view'));
-                return true;
-            }
-        });
-    };
+    //当前页面
+    translation[action](pageNode, distance, speed, function () {
+      //修正flipMode切换页面的处理
+      //没有翻页效果
+      //强制给动画结束触发
+      //可视区页面
+      //排除母版的情况
+      if (config.flipMode === 'allow' && isVisual) {
+        //设置动画完成
+        Xut.Application.SetTransitionComplete(pageNode, pageNode.getAttribute('data-view'));
+        return true;
+      }
+    });
+  };
 };
 
 /**
@@ -68702,7 +69033,7 @@ var MasterMgr = function (_Abstract) {
 
     }, {
         key: 'move',
-        value: function move(_ref) {
+        value: function move(_ref, isAppBoundary) {
             var _this2 = this;
 
             var nodes = _ref.nodes,
@@ -68721,7 +69052,7 @@ var MasterMgr = function (_Abstract) {
             var isBoundary = false;
 
             //找到需要滑动的母版
-            var masterObjs = this._findMaster(leftIndex, currIndex, rightIndex, direction, action);
+            var masterObjs = this._findMaster(leftIndex, currIndex, rightIndex, direction, action, isAppBoundary);
             _.each(masterObjs, function (pageObj, index) {
                 if (pageObj) {
                     isBoundary = true;
@@ -68891,33 +69222,41 @@ var MasterMgr = function (_Abstract) {
 
         /**
          * 找到当前页面的可以需要滑动是视觉页面对象
-         * @return {[type]}            [description]
+         * isAppBoundary 是应用边界反弹，##317,最后一页带有视觉差反弹出错,视觉差不归位
          */
 
     }, {
         key: '_findMaster',
-        value: function _findMaster(leftIndex, currIndex, rightIndex, direction, action) {
-            var prevFlag,
-                nextFlag,
-                prevMasterObj,
-                currMasterObj,
-                nextMasterObj,
-                prevMasterId = this.converMasterId(leftIndex),
-                currMasterId = this.converMasterId(currIndex),
-                nextMasterId = this.converMasterId(rightIndex);
+        value: function _findMaster(leftIndex, currIndex, rightIndex, direction, action, isAppBoundary) {
+            var prevFlag = void 0,
+                nextFlag = void 0,
+                prevMasterId = void 0,
+                nextMasterId = void 0,
+                prevMasterObj = void 0,
+                currMasterObj = void 0,
+                nextMasterObj = void 0,
+                currMasterId = this.converMasterId(currIndex);
 
             switch (direction) {
                 case 'prev':
-                    if (prevFlag = currMasterId !== prevMasterId) {
+                    prevMasterId = this.converMasterId(leftIndex);
+                    prevFlag = currMasterId !== prevMasterId;
+
+                    //如果2个页面不一样的视觉差
+                    //或者是应用最后一页反弹的情况，2个页面同一个视觉差，也就是最后一页，往前面反弹
+                    if (prevFlag || isAppBoundary) {
                         currMasterObj = this.abstractGetPageObj(currMasterId);
                     }
+
                     if (prevMasterId && prevFlag) {
                         action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
                         prevMasterObj = this.abstractGetPageObj(prevMasterId);
                     }
                     break;
                 case 'next':
-                    if (nextFlag = currMasterId !== nextMasterId) {
+                    nextMasterId = this.converMasterId(rightIndex);
+                    nextFlag = currMasterId !== nextMasterId;
+                    if (nextFlag) {
                         currMasterObj = this.abstractGetPageObj(currMasterId);
                     }
                     if (nextMasterId && nextFlag) {
@@ -69834,38 +70173,44 @@ var transformSectionRelated = function transformSectionRelated(dataCache) {
     return container;
 };
 
+//替换url
+//1. 路径
+//2. 基础后缀
+var urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(?=\.[png|jpg]+)/ig;
+
+//替换style中的vw,vh单位尺寸
+//width\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
+//height\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
+// const sizeRE = /([width|height]+)\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/ig
+
+//中文符号
+// const symbols = {
+//     "，": ",",
+//     "。": ".",
+//     "：": ":",
+//     "；": ";",
+//     "！": "!",
+//     "？": "?",
+//     "（": "(",
+//     "）": ")",
+//     "【": "[",
+//     "】": "]"
+// }
+// const symbolRE = new RegExp(Object.keys(symbols).join("|"), "ig")
+
+
 /**
  * 数据库缓存结果集
  */
 var result = void 0;
 
 /**
- * 动态样式元素合集
- * @type {Array}
- */
-var styleElements = [];
-
-/**
- * [ description]动态插入一条样式规则
- * @param  {[type]} rule [样式规则]
- * @return {[type]}      [description]
- */
-function insertStyle(rule, attribute, value) {
-    var styleElement = document.createElement("style");
-    styleElement.type = 'text/css';
-    styleElement.innerHTML = rule;
-    styleElement.setAttribute(attribute, value);
-    document.head.appendChild(styleElement);
-    styleElements.push(styleElement);
-}
-
-/**
- * flow数据过滤
+ * json数据过滤
  * 1 flow数据
  * 2 flow样式
  * 3 svgsheet
  */
-function flowJsonFilter() {
+function filterJsonData() {
     result = window.SQLResult;
 
     if (!result) {
@@ -69875,36 +70220,47 @@ function flowJsonFilter() {
 
     //配置了远程地址
     //需要把flow的给处理掉
-    if (config.launch && config.launch.resource && result.FlowData) {
-        var remoteUrl = config.launch.resource;
-        //有基础后缀，需要替换所有的图片地址
-        if (config.baseImageSuffix) {
-            result.FlowData = result.FlowData.replace(/gallery\/[\w]+\./ig, '$&' + config.baseImageSuffix + '.');
-        }
-        //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
-        //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-        result.FlowData = result.FlowData.replace(/<img\s*src=\"[\w\/]+gallery/ig, '<img src=\"' + remoteUrl + '/gallery');
-        result.FlowData = result.FlowData.replace(/xlink:href=\"[\w\/]+gallery/ig, 'xlink:href=\"' + remoteUrl + '/gallery');
-    }
+    var remoteUrl = config.launch && config.launch.resource;
+    if (remoteUrl && result.FlowData) {
+        (function () {
 
-    //全局svg样式
-    var hasSvgsheet = void 0;
-    if (result.svgsheet) {
-        hasSvgsheet = true;
-        insertStyle(result.svgsheet, 'data-svg', 'true');
-        result.svgsheet = null;
-    }
+            //启动检测
+            config.columnCheck = true;
 
-    //全局flow样式
-    if (result.FlowStyle) {
-        insertStyle(result.FlowStyle, 'data-flow', 'true');
-        result.FlowStyle = null;
+            //有基础后缀，需要补上所有的图片地址
+            var baseSuffix = '';
+            if (config.baseImageSuffix) {
+                baseSuffix = '.' + config.baseImageSuffix;
+            }
+
+            //xlink:href
+            //<img src
+            //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
+            //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
+            //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
+            result.FlowData = result.FlowData.replace(urlRE, function (a, prefix, fileName) {
+                return prefix + '="' + remoteUrl + '/gallery/' + fileName + baseSuffix;
+            });
+        })();
     }
 
     window.SQLResult = null;
-
-    return hasSvgsheet;
 }
+
+/**
+ * style width,height替换值
+ * height:42vw
+ * height:42.48vw
+ * height : 42.48vw
+ * height:  66.99vw
+ * height:42.48 vw
+ */
+// function replaceSize(str, prop) {
+//     return str.replace(sizeRE, function(a, key, value) {
+//         return `${key}:${value * prop}`
+//     })
+// }
+
 
 /**
  * 设置数据缓存
@@ -69921,39 +70277,23 @@ function importJsonDatabase(callback) {
     if (path) {
         //防止外部链接影响
         window.SQLResult = null;
-        request(path, function () {
-            callback(flowJsonFilter());
+        loadFile(path, function () {
+            callback(filterJsonData());
         });
     }
     //如果外联index.html路径json数据
     else if (window.SQLResult) {
-            callback(flowJsonFilter());
+            callback(filterJsonData());
         } else {
             callback();
         }
 }
 
 /**
- * 移除动态加载的样式
- * @return {[type]} [description]
- */
-function removeStyle() {
-    if (styleElements.length) {
-        for (var i = 0; i < styleElements.length; i++) {
-            if (styleElements[i]) {
-                document.head.removeChild(styleElements[i]);
-            }
-            styleElements[i] = null;
-        }
-        styleElements = [];
-    }
-}
-
-/**
  * 删除挂载的flow数据
  * @return {[type]} [description]
  */
-function removeFlowData() {
+function removeColumnData() {
     result['FlowData'] = null;
 }
 
@@ -70602,7 +70942,7 @@ function setVisualMode(chapterData) {
     //如果有独立的页面模式
     var parameter = chapterData.parameter;
     if (parameter) {
-        var matchMode = parameter.match(/visualMode[":]+(\d)/);
+        var matchMode = parameter.match(/visualMode[":\s]*(\d)/);
         if (matchMode) {
             return Number(matchMode[1]);
         }
@@ -70621,747 +70961,748 @@ function setVisualMode(chapterData) {
  **********************************************************************/
 
 var Controller = function () {
-    function Controller(vm) {
-        classCallCheck(this, Controller);
+  function Controller(vm) {
+    classCallCheck(this, Controller);
 
-        this.vm = vm;
-        this.options = vm.options;
+    this.vm = vm;
+    this.options = vm.options;
 
-        //创建前景页面管理模块
-        this.pageMgr = new PageMgr(vm);
+    //创建前景页面管理模块
+    this.pageMgr = new PageMgr(vm);
 
-        // 检测是否需要创母版模块
-        if (hasMaster()) {
-            this.masterMgr = new MasterMgr(vm);
-        }
+    // 检测是否需要创母版模块
+    if (hasMaster()) {
+      this.masterMgr = new MasterMgr(vm);
+    }
+  }
+
+  /**
+   * 初始化页面创建
+   * 因为多个页面的问题，所以不是创建调用
+   * 统一回调
+   * @return {[type]} [description]
+   */
+
+
+  createClass(Controller, [{
+    key: 'initCreate',
+    value: function initCreate() {
+      var options = this.options;
+      //createPointer
+      //initPointer
+      var pointer = initPointer$1(options.initIndex, options.pageTotal, options.multiplePages);
+      this.pagePointer = pointer.initPointer;
+      this.createPageBases(pointer.createPointer, options.initIndex, 'init');
     }
 
     /**
-     * 初始化页面创建
-     * 因为多个页面的问题，所以不是创建调用
-     * 统一回调
+     *  创建普通页面
+     *  创建母版页面
+     *  createPointer     需要创建的页面索引
+     *  visiblePageIndex  当前可视区页面索引
+     *  action            创建的动作：toPage/init/flipOver
+     *  toPageCallback    跳转页面支持回调通知
+     *  userStyle         规定创建的style属性
+     **/
+
+  }, {
+    key: 'createPageBases',
+    value: function createPageBases(createPageIndex, visiblePageIndex, action, toPageCallback, userStyle) {
+
+      //2016.1.20
+      //修正苗苗学问题 确保createPage不是undefined
+      if (createPageIndex[0] === undefined) {
+        return;
+      }
+
+      var self = this;
+      var multiplePages = this.options.multiplePages; //是否线性
+      var createTotal = createPageIndex.length; //需要创建的总页面
+      var toPageAction = action === 'toPage'; //如果是跳转
+      var filpOverAction = action === 'flipOver'; //如果是翻页
+
+      //将页码pageIndex转化成对应的chapter && 使用第一个是分解可见页面
+      //不同场景会自动转化chapter的下标
+      //createChapterIndexs
+      //  创建的页码ID合集
+      //  代表数据库chpaterID的索引
+      var createChapterIndexs = indexConverChapterId.call(this, createPageIndex, visiblePageIndex);
+
+      //收集创建的页面对象
+      //用于处理2个页面在切换的时候闪屏问题
+      //主要是传递createStyle自定义样式的处理
+      var collectPageBase = [];
+
+      //是否触发母版的自动时间
+      //因为页面每次翻页都会驱动auto事件
+      //但是母版可能是共享的
+      var createMaster = false;
+
+      //收集完成回调
+      var collectCallback = function () {
+        //收集创建页码的数量
+        var createContent = 0;
+        return function (callback) {
+          ++createContent;
+          if (createContent === createTotal) {
+            callback();
+          }
+        };
+      }();
+
+      //构建执行代码
+      var callbackAction = {
+        //初始化
+        init: function init() {
+          collectCallback(function () {
+            self._loadPage('init');
+          });
+        },
+
+        //翻页
+        flipOver: function flipOver() {
+          collectCallback(function () {
+            self._autoRun({ //翻页
+              'createPointer': createChapterIndexs,
+              'createMaster': createMaster
+            });
+          });
+        },
+
+        //跳转
+        toPage: function toPage() {
+          collectCallback(function () {
+            toPageCallback(collectPageBase);
+          });
+        }
+      };
+
+      //chapter页码，转化成页面chapter数据集合
+      var chpaterResults = indexConverChapterData(createChapterIndexs);
+
+      /**
+       * 预编译
+       * 因为要需要对多个页面进行预处理
+       * 需要同步多个页面数据判断
+       * 这样需要预编译出数据，做了中间处理后再执行后续动作
+       * @type {Array}
+       */
+      var compile = new Stack();
+
+      //收集有用的数据
+      var useStyleData = hash();
+      _.each(chpaterResults, function (chapterData, index) {
+        compile.push(function () {
+
+          //创建的页面索引
+          var createChapterIndex = createChapterIndexs[index];
+
+          //转化可视区页码对应的chapter的索引号
+          //获取出实际的pageIndex号
+          var conversion = converVisiblePid.call(self, createChapterIndex, visiblePageIndex);
+          var visibleChapterIndex = conversion.visiblePid;
+          var pageIndex = conversion.pageIndex;
+
+          if (createTotal === 1) {
+            self.options.chapterId = chapterData._id;
+          }
+
+          //跳转的时候，创建新页面可以自动样式信息
+          //优化设置，只是改变当前页面即可
+          if (toPageAction && visibleChapterIndex !== createChapterIndex) {
+            userStyle = undefined;
+          }
+
+          //收集页面之间可配置数据
+          useStyleData[createChapterIndex] = {
+            pid: createChapterIndex,
+            visiblePid: visibleChapterIndex,
+            userStyle: userStyle,
+            direction: getDirection(createChapterIndex, visibleChapterIndex),
+            //新的页面模式
+            pageVisualMode: setVisualMode(chapterData)
+          };
+
+          //延迟创建,先处理style规则
+          return function (pageStyle) {
+            //创建新的页面管理，masterFilter 母板过滤器回调函数
+            var _createPageBase = function _createPageBase(masterFilter) {
+              //初始化构建页面对象
+              //1:page，2:master
+              var currentStyle = pageStyle[createChapterIndex];
+              var pageBase = this.create({
+                'pid': createChapterIndex,
+                'visiblePid': visibleChapterIndex,
+                'chapterData': chapterData,
+                'getStyle': currentStyle,
+                'pageIndex': pageIndex,
+                'multiplePages': multiplePages
+              }, pageIndex, masterFilter, function (shareMaster) {
+                if (config.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
+                  $$warn('\u6BCD\u7248\u4E0E\u9875\u9762VisualMode\u4E0D\u4E00\u81F4,\u9519\u8BEF\u9875\u7801:' + (pageIndex + 1) + ',\u6BCD\u7248visualMode:' + shareMaster.getStyle.pageVisualMode + ',\u9875\u9762visualMode:' + currentStyle.pageVisualMode);
+                }
+              });
+
+              //判断pageBase是因为母版不需要重复创建
+              //母版是共享多个paga
+              if (pageBase) {
+                //开始线程任务，如果是翻页模式,支持快速创建
+                pageBase.startThreadTask(filpOverAction, function () {
+                  callbackAction[action]();
+                });
+
+                //收集自定义样式的页面对象
+                if (userStyle) {
+                  collectPageBase.push(pageBase);
+                }
+              }
+            };
+
+            //创建母版层
+            if (chapterData.pptMaster && self.masterMgr) {
+              _createPageBase.call(self.masterMgr, function () {
+                //母版是否创建等待通知
+                //母版是共享的所以不一定每次翻页都会创建
+                //如果需要创建,则叠加总数
+                ++createTotal;
+                createMaster = true;
+              });
+            }
+
+            //创建页面层
+            _createPageBase.call(self.pageMgr);
+          };
+        }());
+      });
+
+      /**
+       * 创建页面的样式与翻页的布局
+       * 存在存在flows页面处理
+       * 这里创建处理的Transfrom
+       */
+      var pageStyle = setVisualStyle({
+        action: action,
+        useStyleData: useStyleData
+      });
+
+      compile.shiftAll(pageStyle).destroy();
+    }
+
+    /**
+     * 滑动处理
+     *  1 滑动
+     *  2 反弹
+     *  3 翻页
+     */
+
+  }, {
+    key: 'movePageBases',
+    value: function movePageBases(_ref) {
+      var _this = this;
+
+      var action = _ref.action,
+          speed = _ref.speed,
+          distance = _ref.distance,
+          leftIndex = _ref.leftIndex,
+          pageIndex = _ref.pageIndex,
+          rightIndex = _ref.rightIndex,
+          direction = _ref.direction,
+          isAppBoundary = _ref.isAppBoundary,
+          setSwipeInvalid = _ref.setSwipeInvalid;
+
+
+      //用户强制直接切换模式
+      //禁止页面跟随滑动
+      if (this.options.flipMode === 'ban' && action == 'flipMove') {
+        return;
+      }
+
+      var currIndex = pageIndex;
+      var currObj = this.pageMgr.abstractGetPageObj(currIndex);
+
+      //2016.11.8
+      //mini杂志功能
+      //一次是拦截
+      //一次是触发动作
+      if (config.swipeDelegate) {
+
+        //如果是swipe就全局处理
+        if (action === 'swipe') {
+          //执行动画序列
+          currObj.callSwipeSequence(direction);
+          return;
+        }
+
+        //2016.11.8
+        //mini杂志功能
+        //如果有动画序列
+        //拦截翻页动作
+        //执行序列动作
+        //拦截
+        if (currObj.hasSwipeSequence(direction)) {
+          //设置为无效翻页
+          setSwipeInvalid && setSwipeInvalid();
+          return;
+        }
+      }
+
+      //移动的距离
+      var moveDist = getVisualDistance({
+        action: action,
+        distance: distance,
+        direction: direction,
+        leftIndex: leftIndex,
+        middleIndex: pageIndex,
+        rightIndex: rightIndex
+      });
+
+      //视觉差页面滑动
+      var chapterData = currObj.chapterData;
+      var nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined;
+
+      var data = {
+        nodes: nodes,
+        speed: speed,
+        action: action,
+        moveDist: moveDist,
+        leftIndex: leftIndex,
+        currIndex: currIndex,
+        rightIndex: rightIndex,
+        direction: direction
+      };
+
+      this.pageMgr.move(data);
+      this.masterContext(function () {
+        this.move(data, isAppBoundary);
+      });
+
+      //更新页码
+      if (action === 'flipOver') {
+        Xut.nextTick(function () {
+          _this.vm.$emit('change:pageUpdate', {
+            action: action,
+            parentIndex: direction === 'next' ? rightIndex : leftIndex,
+            direction: direction
+          });
+        });
+      }
+    }
+
+    /**
+     * 翻页松手后
+     * 暂停页面的各种活动动作
+     * @param  {[type]} pointers [description]
+     * @return {[type]}          [description]
+     */
+
+  }, {
+    key: 'suspendPageBases',
+    value: function suspendPageBases(pointers) {
+      //关闭层事件
+      this.pageMgr.suspend(pointers);
+      this.masterContext(function () {
+        this.suspend(pointers);
+      });
+
+      //复位工具栏
+      this.vm.$emit('change:resetToolbar');
+    }
+
+    /**
+     * 翻页动画完毕后
+     * @return {[type]}              [description]
+     */
+
+  }, {
+    key: 'completePageBases',
+    value: function completePageBases(direction, pagePointer, unfliplock, isQuickTurn) {
+      //方向
+      this.direction = direction;
+      //是否快速翻页
+      this.isQuickTurn = isQuickTurn || false;
+      //解锁
+      this.unfliplock = unfliplock;
+      //清理上一个页面
+      this._clearPage(pagePointer.destroyPointer);
+      this._updatePointer(pagePointer);
+      //预创建下一页
+      this._advanceCreate(direction, pagePointer);
+    }
+
+    /**
+     * 页面跳转
+     * @param  {[type]} data [description]
+     * @return {[type]}      [description]
+     */
+
+  }, {
+    key: 'gotoPageBases',
+    value: function gotoPageBases(data) {
+
+      Xut.View.ShowBusy();
+
+      //如果是非线性,创建页面修改
+      if (!this.options.multiplePages) {
+        data.create = [data.targetIndex];
+        data.destroy = [data.currIndex];
+        data.ruleOut = [data.targetIndex];
+        data.pagePointer = {
+          currIndex: data.targetIndex
+        };
+      }
+
+      //执行页面切换
+      goToPage(this, data, function (data) {
+        this._updatePointer(data.pagePointer);
+        this._autoRun({
+          'action': 'toPage',
+          'createPointer': data['create']
+        });
+        Xut.View.HideBusy();
+      });
+    }
+
+    /**
+     * 调用母版管理器
      * @return {[type]} [description]
      */
 
+  }, {
+    key: 'masterContext',
+    value: function masterContext(callback) {
+      if (this.masterMgr) {
+        callback.call(this.masterMgr);
+      }
+    }
 
-    createClass(Controller, [{
-        key: 'initCreate',
-        value: function initCreate() {
-            var options = this.options;
-            //createPointer
-            //initPointer
-            var pointer = initPointer$1(options.initIndex, options.pagetotal, options.multiplePages);
-            this.pagePointer = pointer.initPointer;
-            this.createPageBases(pointer.createPointer, options.initIndex, 'init');
-        }
+    /**
+     * 销毁接口
+     * 对应多场景操作
+     * @return {[type]} [description]
+     */
 
-        /**
-         *  创建普通页面
-         *  创建母版页面
-         *  createPointer     需要创建的页面索引
-         *  visiblePageIndex  当前可视区页面索引
-         *  action            创建的动作：toPage/init/flipOver
-         *  toPageCallback    跳转页面支持回调通知
-         *  userStyle         规定创建的style属性
-         **/
+  }, {
+    key: 'destroyPageBases',
+    value: function destroyPageBases() {
+      this.pageMgr.destroy();
+      this.masterContext(function () {
+        this.destroy();
+      });
+    }
 
-    }, {
-        key: 'createPageBases',
-        value: function createPageBases(createPageIndex, visiblePageIndex, action, toPageCallback, userStyle) {
+    /**
+     * 自动运行处理
+     *  流程四:执行自动触发动作
+     *   1.初始化创建页面完毕
+     *   2.翻页完毕
+     */
 
-            //2016.1.20
-            //修正苗苗学问题 确保createPage不是undefined
-            if (createPageIndex[0] === undefined) {
-                return;
+  }, {
+    key: '_autoRun',
+    value: function _autoRun(para) {
+      var options = this.options;
+      var pagePointer = this.pagePointer;
+      var prevIndex = pagePointer.leftIndex;
+      var currIndex = pagePointer.currIndex;
+      var nextIndex = pagePointer.rightIndex;
+      var action = para ? para.action : '';
+      var createPointer = para ? para.createPointer : '';
+      var direction = this.direction;
+
+      //暂停的页面索引autorun
+      var suspendIndex = action === 'init' ? '' : direction === 'next' ? prevIndex : nextIndex;
+
+      /**
+       * 存在2中模式的情况下
+       * 转化页码标记
+       */
+      if (createPointer) {
+        createPointer = converVisiblePid.call(this, createPointer);
+      }
+
+      var data = {
+        'prevIndex': prevIndex,
+        'currIndex': currIndex,
+        'nextIndex': nextIndex,
+        'suspendIndex': suspendIndex,
+        'createPointer': createPointer,
+        'direction': direction,
+        'isQuickTurn': this.isQuickTurn,
+        //中断通知
+        'suspendCallback': options.suspendAutoCallback,
+        //构建完毕通知
+        'buildComplete': function buildComplete(scenarioId) {
+          /**
+           * 构建完成通知,用于处理历史缓存记录
+           * 如果是调试模式 && 不是收费提示页面 && 多场景应用
+           */
+          if (config.historyMode && !options.isInApp && options.multiScenario) {
+            var history;
+            if (history = sceneController.sequence(scenarioId, currIndex)) {
+              set$2("history", history);
             }
+          }
+        },
 
-            var self = this;
-            var multiplePages = this.options.multiplePages; //是否线性
-            var createTotal = createPageIndex.length; //需要创建的总页面
-            var toPageAction = action === 'toPage'; //如果是跳转
-            var filpOverAction = action === 'flipOver'; //如果是翻页
+        //流程结束通知
+        //包括动画都已经结束了
+        'processComplete': function processComplete() {}
+      };
 
-            //将页码pageIndex转化成对应的chapter && 使用第一个是分解可见页面
-            //不同场景会自动转化chapter的下标
-            //createChapterIndexs
-            //  创建的页码ID合集
-            //  代表数据库chpaterID的索引
-            var createChapterIndexs = indexConverChapterId.call(this, createPageIndex, visiblePageIndex);
+      //页面自动运行
+      this.pageMgr.autoRun(data);
 
-            //收集创建的页面对象
-            //用于处理2个页面在切换的时候闪屏问题
-            //主要是传递createStyle自定义样式的处理
-            var collectPageBase = [];
+      //模板自动运行
+      this.masterContext(function () {
+        //如果动作是初始化，或者触发了母版自动运行
+        //如果是越界处理
+        //console.log(action,this.isBoundary,para.createMaster)
+        if (action || this.isBoundary) {
+          this.autoRun(data);
+        }
+      });
 
-            //是否触发母版的自动时间
-            //因为页面每次翻页都会驱动auto事件
-            //但是母版可能是共享的
-            var createMaster = false;
+      /**
+       * 触发自动通知
+       * @type {[type]}
+       */
+      var vm = this.vm;
 
-            //收集完成回调
-            var collectCallback = function () {
-                //收集创建页码的数量
-                var createContent = 0;
-                return function (callback) {
-                    ++createContent;
-                    if (createContent === createTotal) {
-                        callback();
-                    }
-                };
-            }();
+      /**
+       * 初始化与跳转针对翻页案例的设置逻辑
+       * @return {[type]} [description]
+       */
+      var setToolbar = function setToolbar() {
+        //不显示首尾对应的按钮
+        if (currIndex == 0) {
+          vm.$emit('change:hidePrev');
+        } else if (currIndex == options.pageTotal - 1) {
+          vm.$emit('change:hideNext');
+          vm.$emit('change:showPrev');
+        } else {
+          vm.$emit('change:showNext');
+          vm.$emit('change:showPrev');
+        }
+      };
 
-            //构建执行代码
-            var callbackAction = {
-                //初始化
-                init: function init() {
-                    collectCallback(function () {
-                        self._loadPage('init');
-                    });
-                },
+      switch (action) {
+        case 'init':
+          //更新页码标示
+          vm.$emit('change:pageUpdate', {
+            action: action,
+            parentIndex: currIndex,
+            direction: direction
+          });
+          setToolbar.call(this);
+          break;
+        case 'toPage':
+          //更新页码标示
+          vm.$emit('change:pageUpdate', {
+            action: action,
+            parentIndex: currIndex,
+            direction: direction
+          });
+          setToolbar.call(this);
+          break;
+      }
 
-                //翻页
-                flipOver: function flipOver() {
-                    collectCallback(function () {
-                        self._autoRun({ //翻页
-                            'createPointer': createChapterIndexs,
-                            'createMaster': createMaster
-                        });
-                    });
-                },
+      /**
+       * 线性结构
+       * 保存目录索引
+       */
+      if (!options.multiScenario) {
+        set$2("pageIndex", currIndex);
+      }
 
-                //跳转
-                toPage: function toPage() {
-                    collectCallback(function () {
-                        toPageCallback(collectPageBase);
-                    });
-                }
-            };
+      /**
+       * 解锁翻页
+       * 允许继续执行下一个翻页作用
+       */
+      if (this.unfliplock) {
+        this.unfliplock();
+        this.unfliplock = null;
+      }
 
-            //chapter页码，转化成页面chapter数据集合
-            var chpaterResults = indexConverChapterData(createChapterIndexs);
+      //关闭快速翻页
+      this.isQuickTurn = false;
+    }
 
-            /**
-             * 预编译
-             * 因为要需要对多个页面进行预处理
-             * 需要同步多个页面数据判断
-             * 这样需要预编译出数据，做了中间处理后再执行后续动作
-             * @type {Array}
-             */
-            var compile = new Stack();
+    /**
+     * 清理页面结构
+     * @param  {[type]} clearPageIndex [description]
+     * @return {[type]}                [description]
+     */
 
-            //收集有用的数据
-            var useStyleData = hash();
-            _.each(chpaterResults, function (chapterData, index) {
-                compile.push(function () {
+  }, {
+    key: '_clearPage',
+    value: function _clearPage(clearPageIndex) {
+      this.pageMgr.clearPage(clearPageIndex);
+    }
 
-                    //创建的页面索引
-                    var createChapterIndex = createChapterIndexs[index];
+    /**
+     * 更新页码索引标示
+     * @param  {[type]} pagePointer [description]
+     * @return {[type]}             [description]
+     */
 
-                    //转化可视区页码对应的chapter的索引号
-                    //获取出实际的pageIndex号
-                    var conversion = converVisiblePid.call(self, createChapterIndex, visiblePageIndex);
-                    var visibleChapterIndex = conversion.visiblePid;
-                    var pageIndex = conversion.pageIndex;
+  }, {
+    key: '_updatePointer',
+    value: function _updatePointer(pagePointer) {
+      this.pagePointer = pagePointer;
+    }
 
-                    if (createTotal === 1) {
-                        self.options.chapterId = chapterData._id;
-                    }
+    /**
+     * 预创建新页面
+     * @param  {[type]} direction   [description]
+     * @param  {[type]} pagePointer [description]
+     * @return {[type]}             [description]
+     */
 
-                    //跳转的时候，创建新页面可以自动样式信息
-                    //优化设置，只是改变当前页面即可
-                    if (toPageAction && visibleChapterIndex !== createChapterIndex) {
-                        userStyle = undefined;
-                    }
+  }, {
+    key: '_advanceCreate',
+    value: function _advanceCreate(direction, pagePointer) {
+      var _this2 = this;
 
-                    //收集页面之间可配置数据
-                    useStyleData[createChapterIndex] = {
-                        pid: createChapterIndex,
-                        visiblePid: visibleChapterIndex,
-                        userStyle: userStyle,
-                        direction: getDirection(createChapterIndex, visibleChapterIndex),
-                        //新的页面模式
-                        pageVisualMode: setVisualMode(chapterData)
-                    };
+      var pageTotal = this.options.pageTotal;
+      var vm = this.vm;
+      var createPointer = pagePointer.createPointer;
 
-                    //延迟创建,先处理style规则
-                    return function (pageStyle) {
-                        //创建新的页面管理，masterFilter 母板过滤器回调函数
-                        var _createPageBase = function _createPageBase(masterFilter) {
-                            //初始化构建页面对象
-                            //1:page，2:master
-                            var currentStyle = pageStyle[createChapterIndex];
-                            var pageBase = this.create({
-                                'pid': createChapterIndex,
-                                'visiblePid': visibleChapterIndex,
-                                'chapterData': chapterData,
-                                'getStyle': currentStyle,
-                                'pageIndex': pageIndex,
-                                'multiplePages': multiplePages
-                            }, pageIndex, masterFilter, function (shareMaster) {
-                                if (shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
-                                    $$warn('\u6BCD\u7248\u4E0E\u9875\u9762VisualMode\u4E0D\u4E00\u81F4,\u9519\u8BEF\u9875\u7801:' + (pageIndex + 1) + ',\u6BCD\u7248visualMode:' + shareMaster.getStyle.pageVisualMode + ',\u9875\u9762visualMode:' + currentStyle.pageVisualMode);
-                                }
-                            });
+      //清理页码
+      var clearPointer = function clearPointer() {
+        delete pagePointer.createPointer;
+        delete pagePointer.destroyPointer;
+      };
 
-                            //判断pageBase是因为母版不需要重复创建
-                            //母版是共享多个paga
-                            if (pageBase) {
-                                //开始线程任务，如果是翻页模式,支持快速创建
-                                pageBase.startThreadTask(filpOverAction, function () {
-                                    callbackAction[action]();
-                                });
+      //创建新的页面对象
+      var createNextPageBase = function createNextPageBase(currIndex) {
+        return _this2.createPageBases([createPointer], currIndex, 'flipOver');
+      };
 
-                                //收集自定义样式的页面对象
-                                if (userStyle) {
-                                    collectPageBase.push(pageBase);
-                                }
-                            }
-                        };
+      //如果是左边翻页
+      if (direction === 'prev') {
+        //首尾无须创建页面
+        if (pagePointer.currIndex === 0) {
+          this._autoRun();
+          if (pageTotal == 2) {
+            //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+            vm.$emit('change:showNext');
+          }
+          vm.$emit('change:hidePrev');
+          return;
+        }
+        if (pagePointer.currIndex > -1) {
+          //创建的页面
+          createNextPageBase(pagePointer.currIndex);
+          clearPointer();
+          vm.$emit('change:showNext');
+          return;
+        }
+      }
 
-                        //创建母版层
-                        if (chapterData.pptMaster && self.masterMgr) {
-                            _createPageBase.call(self.masterMgr, function () {
-                                //母版是否创建等待通知
-                                //母版是共享的所以不一定每次翻页都会创建
-                                //如果需要创建,则叠加总数
-                                ++createTotal;
-                                createMaster = true;
-                            });
-                        }
+      //如果是右边翻页
+      if (direction === 'next') {
+        //首尾无须创建页面
+        if (pagePointer.currIndex === pageTotal - 1) {
+          this._autoRun();
+          if (pageTotal == 2) {
+            //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+            vm.$emit('change:showPrev');
+          }
+          //多页处理
+          vm.$emit('change:hideNext');
+          return;
+        }
+        if (createPointer < pageTotal) {
+          //创建的页面
+          createNextPageBase(pagePointer.currIndex);
+          clearPointer();
+          vm.$emit('change:showPrev');
+          return;
+        }
+      }
 
-                        //创建页面层
-                        _createPageBase.call(self.pageMgr);
-                    };
-                }());
+      clearPointer();
+
+      return;
+    }
+
+    /**
+     * 加载页面事件与动作
+     * @param  {[type]} action [description]
+     * @return {[type]}        [description]
+     */
+
+  }, {
+    key: '_loadPage',
+    value: function _loadPage(action) {
+      var _this3 = this;
+
+      var autoRun = function autoRun() {
+        _this3._autoRun({
+          'action': action
+        });
+      };
+
+      //触发自动任务
+      var triggerAuto = function triggerAuto() {
+        //第一次进入，处理背景
+        var $cover = $(".xut-cover");
+        if ($cover.length) {
+          //主动探测,只检查一次
+          var complete = function complete() {
+            $cover && $cover.remove();
+            $cover = null;
+            autoRun();
+          };
+
+          //是否配置启动动画关闭
+          if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.launchAnim == false) {
+            complete();
+          } else {
+            //有动画
+            $cover.transition({
+              opacity: 0,
+              duration: 1000,
+              easing: 'in',
+              complete: complete
             });
-
-            /**
-             * 创建页面的样式与翻页的布局
-             * 存在存在flows页面处理
-             * 这里创建处理的Transfrom
-             */
-            var pageStyle = setVisualStyle({
-                action: action,
-                useStyleData: useStyleData
-            });
-
-            compile.shiftAll(pageStyle).destroy();
+          }
         }
+        //第二次
+        else {
+            $cover = null;
+            autoRun();
+          }
+      };
 
-        /**
-         * 滑动处理
-         *  1 滑动
-         *  2 反弹
-         *  3 翻页
-         */
-
-    }, {
-        key: 'movePageBases',
-        value: function movePageBases(_ref) {
-            var _this = this;
-
-            var action = _ref.action,
-                speed = _ref.speed,
-                distance = _ref.distance,
-                leftIndex = _ref.leftIndex,
-                pageIndex = _ref.pageIndex,
-                rightIndex = _ref.rightIndex,
-                direction = _ref.direction,
-                setSwipeInvalid = _ref.setSwipeInvalid;
-
-
-            //用户强制直接切换模式
-            //禁止页面跟随滑动
-            if (this.options.flipMode && action == 'flipMove') {
-                return;
+      //创建完成回调
+      this.vm.$emit('change:createComplete', function () {
+        if (_this3.options.multiScenario) {
+          triggerAuto();
+        }
+        //第一次加载
+        //进入应用
+        else {
+            if (window.GLOBALIFRAME) {
+              triggerAuto();
+              return;
             }
-
-            var currIndex = pageIndex;
-            var currObj = this.pageMgr.abstractGetPageObj(currIndex);
-
-            //2016.11.8
-            //mini杂志功能
-            //一次是拦截
-            //一次是触发动作
-            if (config.swipeDelegate) {
-
-                //如果是swipe就全局处理
-                if (action === 'swipe') {
-                    //执行动画序列
-                    currObj.callSwipeSequence(direction);
-                    return;
-                }
-
-                //2016.11.8
-                //mini杂志功能
-                //如果有动画序列
-                //拦截翻页动作
-                //执行序列动作
-                //拦截
-                if (currObj.hasSwipeSequence(direction)) {
-                    //设置为无效翻页
-                    setSwipeInvalid && setSwipeInvalid();
-                    return;
-                }
+            //获取应用的状态
+            if (Xut.Application.getAppState()) {
+              //保留启动方法
+              var pre = Xut.Application.LaunchApp;
+              Xut.Application.LaunchApp = function () {
+                pre();
+                triggerAuto();
+              };
+            } else {
+              triggerAuto();
             }
-
-            //移动的距离
-            var moveDist = getVisualDistance({
-                action: action,
-                distance: distance,
-                direction: direction,
-                leftIndex: leftIndex,
-                middleIndex: pageIndex,
-                rightIndex: rightIndex
-            });
-
-            //视觉差页面滑动
-            var chapterData = currObj.chapterData;
-            var nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined;
-
-            var data = {
-                nodes: nodes,
-                speed: speed,
-                action: action,
-                moveDist: moveDist,
-                leftIndex: leftIndex,
-                currIndex: currIndex,
-                rightIndex: rightIndex,
-                direction: direction
-            };
-
-            this.pageMgr.move(data);
-            this.masterContext(function () {
-                this.move(data);
-            });
-
-            //更新页码
-            if (action === 'flipOver') {
-                Xut.nextTick(function () {
-                    _this.vm.$emit('change:pageUpdate', {
-                        action: action,
-                        parentIndex: direction === 'next' ? rightIndex : leftIndex,
-                        direction: direction
-                    });
-                });
-            }
-        }
-
-        /**
-         * 翻页松手后
-         * 暂停页面的各种活动动作
-         * @param  {[type]} pointers [description]
-         * @return {[type]}          [description]
-         */
-
-    }, {
-        key: 'suspendPageBases',
-        value: function suspendPageBases(pointers) {
-            //关闭层事件
-            this.pageMgr.suspend(pointers);
-            this.masterContext(function () {
-                this.suspend(pointers);
-            });
-
-            //复位工具栏
-            this.vm.$emit('change:resetToolbar');
-        }
-
-        /**
-         * 翻页动画完毕后
-         * @return {[type]}              [description]
-         */
-
-    }, {
-        key: 'completePageBases',
-        value: function completePageBases(direction, pagePointer, unfliplock, isQuickTurn) {
-            //方向
-            this.direction = direction;
-            //是否快速翻页
-            this.isQuickTurn = isQuickTurn || false;
-            //解锁
-            this.unfliplock = unfliplock;
-            //清理上一个页面
-            this._clearPage(pagePointer.destroyPointer);
-            this._updatePointer(pagePointer);
-            //预创建下一页
-            this._advanceCreate(direction, pagePointer);
-        }
-
-        /**
-         * 页面跳转
-         * @param  {[type]} data [description]
-         * @return {[type]}      [description]
-         */
-
-    }, {
-        key: 'gotoPageBases',
-        value: function gotoPageBases(data) {
-
-            Xut.View.ShowBusy();
-
-            //如果是非线性,创建页面修改
-            if (!this.options.multiplePages) {
-                data.create = [data.targetIndex];
-                data.destroy = [data.currIndex];
-                data.ruleOut = [data.targetIndex];
-                data.pagePointer = {
-                    currIndex: data.targetIndex
-                };
-            }
-
-            //执行页面切换
-            goToPage(this, data, function (data) {
-                this._updatePointer(data.pagePointer);
-                this._autoRun({
-                    'action': 'toPage',
-                    'createPointer': data['create']
-                });
-                Xut.View.HideBusy();
-            });
-        }
-
-        /**
-         * 调用母版管理器
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'masterContext',
-        value: function masterContext(callback) {
-            if (this.masterMgr) {
-                callback.call(this.masterMgr);
-            }
-        }
-
-        /**
-         * 销毁接口
-         * 对应多场景操作
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'destroyPageBases',
-        value: function destroyPageBases() {
-            this.pageMgr.destroy();
-            this.masterContext(function () {
-                this.destroy();
-            });
-        }
-
-        /**
-         * 自动运行处理
-         *  流程四:执行自动触发动作
-         *   1.初始化创建页面完毕
-         *   2.翻页完毕
-         */
-
-    }, {
-        key: '_autoRun',
-        value: function _autoRun(para) {
-            var options = this.options;
-            var pagePointer = this.pagePointer;
-            var prevIndex = pagePointer.leftIndex;
-            var currIndex = pagePointer.currIndex;
-            var nextIndex = pagePointer.rightIndex;
-            var action = para ? para.action : '';
-            var createPointer = para ? para.createPointer : '';
-            var direction = this.direction;
-
-            //暂停的页面索引autorun
-            var suspendIndex = action === 'init' ? '' : direction === 'next' ? prevIndex : nextIndex;
-
-            /**
-             * 存在2中模式的情况下
-             * 转化页码标记
-             */
-            if (createPointer) {
-                createPointer = converVisiblePid.call(this, createPointer);
-            }
-
-            var data = {
-                'prevIndex': prevIndex,
-                'currIndex': currIndex,
-                'nextIndex': nextIndex,
-                'suspendIndex': suspendIndex,
-                'createPointer': createPointer,
-                'direction': direction,
-                'isQuickTurn': this.isQuickTurn,
-                //中断通知
-                'suspendCallback': options.suspendAutoCallback,
-                //构建完毕通知
-                'buildComplete': function buildComplete(scenarioId) {
-                    /**
-                     * 构建完成通知,用于处理历史缓存记录
-                     * 如果是调试模式 && 不是收费提示页面 && 多场景应用
-                     */
-                    if (config.historyMode && !options.isInApp && options.multiScenario) {
-                        var history;
-                        if (history = sceneController.sequence(scenarioId, currIndex)) {
-                            set$2("history", history);
-                        }
-                    }
-                },
-
-                //流程结束通知
-                //包括动画都已经结束了
-                'processComplete': function processComplete() {}
-            };
-
-            //页面自动运行
-            this.pageMgr.autoRun(data);
-
-            //模板自动运行
-            this.masterContext(function () {
-                //如果动作是初始化，或者触发了母版自动运行
-                //如果是越界处理
-                //console.log(action,this.isBoundary,para.createMaster)
-                if (action || this.isBoundary) {
-                    this.autoRun(data);
-                }
-            });
-
-            /**
-             * 触发自动通知
-             * @type {[type]}
-             */
-            var vm = this.vm;
-
-            /**
-             * 初始化与跳转针对翻页案例的设置逻辑
-             * @return {[type]} [description]
-             */
-            var setToolbar = function setToolbar() {
-                //不显示首尾对应的按钮
-                if (currIndex == 0) {
-                    vm.$emit('change:hidePrev');
-                } else if (currIndex == options.pagetotal - 1) {
-                    vm.$emit('change:hideNext');
-                    vm.$emit('change:showPrev');
-                } else {
-                    vm.$emit('change:showNext');
-                    vm.$emit('change:showPrev');
-                }
-            };
-
-            switch (action) {
-                case 'init':
-                    //更新页码标示
-                    vm.$emit('change:pageUpdate', {
-                        action: action,
-                        parentIndex: currIndex,
-                        direction: direction
-                    });
-                    setToolbar.call(this);
-                    break;
-                case 'toPage':
-                    //更新页码标示
-                    vm.$emit('change:pageUpdate', {
-                        action: action,
-                        parentIndex: currIndex,
-                        direction: direction
-                    });
-                    setToolbar.call(this);
-                    break;
-            }
-
-            /**
-             * 线性结构
-             * 保存目录索引
-             */
-            if (!options.multiScenario) {
-                set$2("pageIndex", currIndex);
-            }
-
-            /**
-             * 解锁翻页
-             * 允许继续执行下一个翻页作用
-             */
-            if (this.unfliplock) {
-                this.unfliplock();
-                this.unfliplock = null;
-            }
-
-            //关闭快速翻页
-            this.isQuickTurn = false;
-        }
-
-        /**
-         * 清理页面结构
-         * @param  {[type]} clearPageIndex [description]
-         * @return {[type]}                [description]
-         */
-
-    }, {
-        key: '_clearPage',
-        value: function _clearPage(clearPageIndex) {
-            this.pageMgr.clearPage(clearPageIndex);
-        }
-
-        /**
-         * 更新页码索引标示
-         * @param  {[type]} pagePointer [description]
-         * @return {[type]}             [description]
-         */
-
-    }, {
-        key: '_updatePointer',
-        value: function _updatePointer(pagePointer) {
-            this.pagePointer = pagePointer;
-        }
-
-        /**
-         * 预创建新页面
-         * @param  {[type]} direction   [description]
-         * @param  {[type]} pagePointer [description]
-         * @return {[type]}             [description]
-         */
-
-    }, {
-        key: '_advanceCreate',
-        value: function _advanceCreate(direction, pagePointer) {
-            var _this2 = this;
-
-            var pagetotal = this.options.pagetotal;
-            var vm = this.vm;
-            var createPointer = pagePointer.createPointer;
-
-            //清理页码
-            var clearPointer = function clearPointer() {
-                delete pagePointer.createPointer;
-                delete pagePointer.destroyPointer;
-            };
-
-            //创建新的页面对象
-            var createNextPageBase = function createNextPageBase(currIndex) {
-                return _this2.createPageBases([createPointer], currIndex, 'flipOver');
-            };
-
-            //如果是左边翻页
-            if (direction === 'prev') {
-                //首尾无须创建页面
-                if (pagePointer.currIndex === 0) {
-                    this._autoRun();
-                    if (pagetotal == 2) {
-                        //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-                        vm.$emit('change:showNext');
-                    }
-                    vm.$emit('change:hidePrev');
-                    return;
-                }
-                if (pagePointer.currIndex > -1) {
-                    //创建的页面
-                    createNextPageBase(pagePointer.currIndex);
-                    clearPointer();
-                    vm.$emit('change:showNext');
-                    return;
-                }
-            }
-
-            //如果是右边翻页
-            if (direction === 'next') {
-                //首尾无须创建页面
-                if (pagePointer.currIndex === pagetotal - 1) {
-                    this._autoRun();
-                    if (pagetotal == 2) {
-                        //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-                        vm.$emit('change:showPrev');
-                    }
-                    //多页处理
-                    vm.$emit('change:hideNext');
-                    return;
-                }
-                if (createPointer < pagetotal) {
-                    //创建的页面
-                    createNextPageBase(pagePointer.currIndex);
-                    clearPointer();
-                    vm.$emit('change:showPrev');
-                    return;
-                }
-            }
-
-            clearPointer();
-
-            return;
-        }
-
-        /**
-         * 加载页面事件与动作
-         * @param  {[type]} action [description]
-         * @return {[type]}        [description]
-         */
-
-    }, {
-        key: '_loadPage',
-        value: function _loadPage(action) {
-            var _this3 = this;
-
-            var autoRun = function autoRun() {
-                _this3._autoRun({
-                    'action': action
-                });
-            };
-
-            //触发自动任务
-            var triggerAuto = function triggerAuto() {
-                //第一次进入，处理背景
-                var $cover = $(".xut-cover");
-                if ($cover.length) {
-                    //主动探测,只检查一次
-                    var complete = function complete() {
-                        $cover && $cover.remove();
-                        $cover = null;
-                        autoRun();
-                    };
-
-                    //是否配置启动动画关闭
-                    if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.launchAnim == false) {
-                        complete();
-                    } else {
-                        //有动画
-                        $cover.transition({
-                            opacity: 0,
-                            duration: 1000,
-                            easing: 'in',
-                            complete: complete
-                        });
-                    }
-                }
-                //第二次
-                else {
-                        $cover = null;
-                        autoRun();
-                    }
-            };
-
-            //创建完成回调
-            this.vm.$emit('change:createComplete', function () {
-                if (_this3.options.multiScenario) {
-                    triggerAuto();
-                }
-                //第一次加载
-                //进入应用
-                else {
-                        if (window.GLOBALIFRAME) {
-                            triggerAuto();
-                            return;
-                        }
-                        //获取应用的状态
-                        if (Xut.Application.getAppState()) {
-                            //保留启动方法
-                            var pre = Xut.Application.LaunchApp;
-                            Xut.Application.LaunchApp = function () {
-                                pre();
-                                triggerAuto();
-                            };
-                        } else {
-                            triggerAuto();
-                        }
-                    }
-            });
-        }
-    }]);
-    return Controller;
+          }
+      });
+    }
+  }]);
+  return Controller;
 }();
 
 //调度器
@@ -71486,7 +71827,7 @@ var createExistIndex = function createExistIndex($globalEvent) {
     return function (pageIndex) {
         //如果不存在
         if (pageIndex == undefined) {
-            pageIndex = $globalEvent.getHindex(); //当前页面
+            pageIndex = $globalEvent.getVisualIndex(); //当前页面
         }
         return pageIndex;
     };
@@ -71500,7 +71841,7 @@ function extendPresentation(access, $globalEvent) {
      * 获取当前页码
      */
     Xut.Presentation.GetPageIndex = function () {
-        return $globalEvent.getHindex();
+        return $globalEvent.getVisualIndex();
     };
 
     /**
@@ -71625,7 +71966,7 @@ function extendView(vm, access, $globalEvent) {
      *   parentIndex  父索引
      *   subIndex     子索引
      */
-    Xut.View.PageUpdate = function () {
+    Xut.View.setPageNumber = function () {
         for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
             arg[_key] = arguments[_key];
         }
@@ -71788,7 +72129,7 @@ function extendView(vm, access, $globalEvent) {
         }
 
         var pagePointer = $globalEvent.getPointer();
-        var data = {
+        vm.$dispatcher.movePageBases({
             'distance': distance,
             'speed': speed,
             'direction': direction,
@@ -71796,8 +72137,7 @@ function extendView(vm, access, $globalEvent) {
             'leftIndex': pagePointer.leftIndex,
             'pageIndex': pagePointer.currIndex,
             'rightIndex': pagePointer.rightIndex
-        };
-        vm.$dispatcher.movePageBases(data);
+        });
     };
 }
 
@@ -71846,10 +72186,10 @@ function extendAssist(access, $globalEvent) {
                         };
                     }();
                     _.each(activityId, function (id) {
-                        manager.abstractAssistAppoint(id, $globalEvent.getHindex(), markComplete, apiName);
+                        manager.abstractAssistAppoint(id, $globalEvent.getVisualIndex(), markComplete, apiName);
                     });
                 } else {
-                    manager.abstractAssistAppoint(activityId, $globalEvent.getHindex(), outCallBack, apiName);
+                    manager.abstractAssistAppoint(activityId, $globalEvent.getVisualIndex(), outCallBack, apiName);
                 }
             }, pageType, activityId, outCallBack);
         };
@@ -72031,7 +72371,7 @@ function extendContent(access, $globalEvent) {
             access(function (manager, pageType, nameList) {
                 if (typeCheck(nameList)) return;
                 var pageBaseObj;
-                if (!(pageBaseObj = manager.abstractAssistPocess($globalEvent.getHindex()))) {
+                if (!(pageBaseObj = manager.abstractAssistPocess($globalEvent.getVisualIndex()))) {
                     console.log('注入互斥接口数据错误！');
                     return;
                 }
@@ -72187,15 +72527,34 @@ function initSceneApi(vm) {
  * @return {[type]} [description]
  */
 var configMultiple = function configMultiple(options) {
-    //如果是epub,强制转换为单页面
-    if (Xut.IBooks.Enabled) {
+  //如果是epub,强制转换为单页面
+  if (Xut.IBooks.Enabled) {
+    options.multiplePages = false;
+  } else {
+
+    ////////////////////////////////
+    /// flipMode全局定义翻页模式  ////
+    /// pageMode当前页面定义模式  ////
+    ////////////////////////////////
+    var pageMode = Number(options.pageMode);
+    //判断多页面情况
+    if (options.flipMode === 'allow') {
+      options.multiplePages = true;
+      if (pageMode === 0) {
+        //如果工具栏强制禁止滑动
         options.multiplePages = false;
-    } else {
-        //判断多页面情况
-        //1 数据库定义
-        //2 系统优化
-        options.multiplePages = options.flipMode ? options.flipMode : options.pageMode ? true : false;
+      }
     }
+
+    //如果是禁止翻页，然后还要看是不是有pageMode的设置
+    if (options.flipMode === 'ban') {
+      options.multiplePages = false;
+      if (pageMode > 0) {
+        //如果工具栏单独设置了页面模式，那么多页面强制改成true
+        options.multiplePages = true;
+      }
+    }
+  }
 };
 
 /**
@@ -72208,11 +72567,11 @@ var configMultiple = function configMultiple(options) {
  * @return {Boolean} [description]
  */
 var isBelong = function isBelong(target) {
-    var pageType = 'page';
-    if (target.dataset && target.dataset.belong) {
-        pageType = target.dataset.belong;
-    }
-    return pageType;
+  var pageType = 'page';
+  if (target.dataset && target.dataset.belong) {
+    pageType = target.dataset.belong;
+  }
+  return pageType;
 };
 
 /**
@@ -72228,202 +72587,203 @@ var isBelong = function isBelong(target) {
  * 读库强制PC模式了
  */
 var preventDefault = function preventDefault(evtObj, target) {
-    if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
-        if (config.supportQR && evtObj.target.nodeName.toLowerCase() === "img") {} else {
-            evtObj.preventDefault && evtObj.preventDefault();
-        }
+  if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
+    if (config.supportQR && evtObj.target.nodeName.toLowerCase() === "img") {} else {
+      evtObj.preventDefault && evtObj.preventDefault();
     }
+  }
 };
 
 var Mediator = function (_Observer) {
-    inherits(Mediator, _Observer);
+  inherits(Mediator, _Observer);
 
-    function Mediator(parameter) {
-        classCallCheck(this, Mediator);
+  function Mediator(parameter) {
+    classCallCheck(this, Mediator);
 
-        var _this = possibleConstructorReturn(this, (Mediator.__proto__ || Object.getPrototypeOf(Mediator)).call(this));
+    var _this = possibleConstructorReturn(this, (Mediator.__proto__ || Object.getPrototypeOf(Mediator)).call(this));
 
-        var vm = _this;
+    var vm = _this;
 
-        //配置文件
-        var options = vm.options = _.extend({
-            //是否多场景加载
-            //单页场景 false
-            //多场景   true
-            'multiScenario': false,
-            //是否为连续页面
-            //通过pageMode的参数定义
-            'multiplePages': false
-        }, parameter, {
-            flipMode: Xut.config.flipMode
-        });
+    //配置文件
+    var options = vm.options = _.extend({
+      //是否多场景加载
+      //单页场景 false
+      //多场景   true
+      'multiScenario': false,
+      //是否为连续页面
+      //通过pageMode的参数定义
+      'multiplePages': false
+    }, parameter, {
+      //翻页模式
+      flipMode: config.flipMode
+    });
 
-        //配置多页面参数
-        configMultiple(options);
+    //配置多页面参数
+    configMultiple(options);
 
-        var $globalEvent = vm.$globalEvent = new Swipe(options);
-        var $dispatcher = vm.$dispatcher = new Controller(vm);
+    var $globalEvent = vm.$globalEvent = new Swipe(options);
+    var $dispatcher = vm.$dispatcher = new Controller(vm);
 
-        //如果是主场景,才能切换系统工具栏
-        if (options.multiplePages) {
-            _this.addTools(vm);
-        }
-
-        //事件句柄对象
-        var handlerObj = null;
-
-        /**
-         * 过滤器.全局控制函数
-         * return true 阻止页面滑动
-         */
-        $globalEvent.$watch('onFilter', function (hookCallback, point, evtObj) {
-            var target = point.target;
-            //阻止默认行为
-            preventDefault(evtObj, target);
-            //页面类型
-            var pageType = isBelong(target);
-            //冒泡的ul根节点
-            var parentNode = $globalEvent.findBubbleRootNode(point, pageType);
-            //执行过滤处理
-            handlerObj = closestProcessor.call(parentNode, point, pageType);
-
-            //如果找到是空节点
-            //并且是虚拟模式2的话
-            //默认允许滑动
-            if (!handlerObj && config.visualMode == 2) {
-                return;
-            }
-            //停止翻页,针对content对象可以拖动,滑动的情况处理
-            if (!handlerObj || handlerObj.attribute === 'disable') {
-                hookCallback();
-            }
-        });
-
-        /**
-         * 触屏滑动,通知pageMgr处理页面移动
-         * @return {[type]} [description]
-         */
-        $globalEvent.$watch('onMove', function (data) {
-            $dispatcher.movePageBases(data);
-        });
-
-        /**
-         * 触屏松手点击
-         * 无滑动
-         */
-        $globalEvent.$watch('onTap', function (pageIndex, hookCallback) {
-            if (handlerObj) {
-                if (handlerObj.handlers) {
-                    handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex);
-                } else {
-                    if (!Xut.Contents.Canvas.getIsTap()) {
-                        vm.$emit('change:toggleToolbar');
-                    }
-                }
-                handlerObj = null;
-                hookCallback();
-            }
-        });
-
-        /**
-         * 触屏滑动,通知ProcessMgr关闭所有激活的热点
-         * @return {[type]}          [description]
-         */
-        $globalEvent.$watch('onUpSlider', function (pointers) {
-            $dispatcher.suspendPageBases(pointers);
-        });
-
-        /**
-         * 翻页动画完成回调
-         * @return {[type]}              [description]
-         */
-        $globalEvent.$watch('onComplete', function () {
-            $dispatcher.completePageBases.apply($dispatcher, arguments);
-        });
-
-        /**
-         * 切换页面
-         * @return {[type]}      [description]
-         */
-        $globalEvent.$watch('onJumpPage', function (data) {
-            $dispatcher.gotoPageBases(data);
-        });
-
-        /**
-         * 退出应用
-         * @return {[type]}      [description]
-         */
-        $globalEvent.$watch('onDropApp', function (data) {
-            window.GLOBALIFRAME && Xut.publish('magazine:dropApp');
-        });
-
-        /**
-         * 母板移动反馈
-         * 只有存在data-parallaxProcessed
-         * 才需要重新激活对象
-         * 删除parallaxProcessed
-         */
-        $globalEvent.$watch('onMasterMove', function (hindex, target) {
-            if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
-                $dispatcher.masterMgr && $dispatcher.masterMgr.reactivation(target);
-            }
-        });
-
-        /**
-         * 销毁接口api
-         * @type {[type]}
-         */
-        _this.destorySceneApi = initSceneApi(_this);
-        return _this;
+    //如果是主场景,才能切换系统工具栏
+    if (options.multiplePages) {
+      _this.addTools(vm);
     }
 
+    //事件句柄对象
+    var handlerObj = null;
+
     /**
-     * 系统工具栏
+     * 过滤器.全局控制函数
+     * return true 阻止页面滑动
      */
+    $globalEvent.$watch('onFilter', function (hookCallback, point, evtObj) {
+      var target = point.target;
+      //阻止默认行为
+      preventDefault(evtObj, target);
+      //页面类型
+      var pageType = isBelong(target);
+      //冒泡的ul根节点
+      var parentNode = $globalEvent.findBubbleRootNode(point, pageType);
+      //执行过滤处理
+      handlerObj = closestProcessor.call(parentNode, point, pageType);
 
+      //如果找到是空节点
+      //并且是虚拟模式2的话
+      //默认允许滑动
+      if (!handlerObj && config.visualMode == 2) {
+        return;
+      }
+      //停止翻页,针对content对象可以拖动,滑动的情况处理
+      if (!handlerObj || handlerObj.attribute === 'disable') {
+        hookCallback();
+      }
+    });
 
-    createClass(Mediator, [{
-        key: 'addTools',
-        value: function addTools(vm) {
+    /**
+     * 触屏滑动,通知pageMgr处理页面移动
+     * @return {[type]} [description]
+     */
+    $globalEvent.$watch('onMove', function (data) {
+      $dispatcher.movePageBases(data);
+    });
 
-            _.extend(delegateHooks, {
-
-                /**
-                 * li节点,多线程创建的时候处理滑动
-                 */
-                'data-container': function dataContainer() {
-                    vm.$emit('change:toggleToolbar');
-                },
-
-
-                /**
-                 * 是背景层
-                 */
-                'data-multilayer': function dataMultilayer() {
-                    //改变工具条状态
-                    vm.$emit('change:toggleToolbar');
-                },
-
-
-                /**
-                 * 默认content元素可以翻页
-                 */
-                'data-behavior': function dataBehavior(target, attribute, rootNode, pageIndex) {
-                    //没有事件的元素,即可翻页又可点击切换工具栏
-                    if (attribute == 'click-swipe') {
-                        vm.$emit('change:toggleToolbar');
-                    }
-                }
-            });
+    /**
+     * 触屏松手点击
+     * 无滑动
+     */
+    $globalEvent.$watch('onTap', function (pageIndex, hookCallback) {
+      if (handlerObj) {
+        if (handlerObj.handlers) {
+          handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex);
+        } else {
+          if (!Xut.Contents.Canvas.getIsTap()) {
+            vm.$emit('change:toggleToolbar');
+          }
         }
-    }]);
-    return Mediator;
+        handlerObj = null;
+        hookCallback();
+      }
+    });
+
+    /**
+     * 触屏滑动,通知ProcessMgr关闭所有激活的热点
+     * @return {[type]}          [description]
+     */
+    $globalEvent.$watch('onUpSlider', function (pointers) {
+      $dispatcher.suspendPageBases(pointers);
+    });
+
+    /**
+     * 翻页动画完成回调
+     * @return {[type]}              [description]
+     */
+    $globalEvent.$watch('onComplete', function () {
+      $dispatcher.completePageBases.apply($dispatcher, arguments);
+    });
+
+    /**
+     * 切换页面
+     * @return {[type]}      [description]
+     */
+    $globalEvent.$watch('onJumpPage', function (data) {
+      $dispatcher.gotoPageBases(data);
+    });
+
+    /**
+     * 退出应用
+     * @return {[type]}      [description]
+     */
+    $globalEvent.$watch('onDropApp', function (data) {
+      window.GLOBALIFRAME && Xut.publish('magazine:dropApp');
+    });
+
+    /**
+     * 母板移动反馈
+     * 只有存在data-parallaxProcessed
+     * 才需要重新激活对象
+     * 删除parallaxProcessed
+     */
+    $globalEvent.$watch('onMasterMove', function (hindex, target) {
+      if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
+        $dispatcher.masterMgr && $dispatcher.masterMgr.reactivation(target);
+      }
+    });
+
+    /**
+     * 销毁接口api
+     * @type {[type]}
+     */
+    _this.destorySceneApi = initSceneApi(_this);
+    return _this;
+  }
+
+  /**
+   * 系统工具栏
+   */
+
+
+  createClass(Mediator, [{
+    key: 'addTools',
+    value: function addTools(vm) {
+
+      _.extend(delegateHooks, {
+
+        /**
+         * li节点,多线程创建的时候处理滑动
+         */
+        'data-container': function dataContainer() {
+          vm.$emit('change:toggleToolbar');
+        },
+
+
+        /**
+         * 是背景层
+         */
+        'data-multilayer': function dataMultilayer() {
+          //改变工具条状态
+          vm.$emit('change:toggleToolbar');
+        },
+
+
+        /**
+         * 默认content元素可以翻页
+         */
+        'data-behavior': function dataBehavior(target, attribute, rootNode, pageIndex) {
+          //没有事件的元素,即可翻页又可点击切换工具栏
+          if (attribute == 'click-swipe') {
+            vm.$emit('change:toggleToolbar');
+          }
+        }
+      });
+    }
+  }]);
+  return Mediator;
 }(Observer);
 
 defAccess(Mediator.prototype, '$multiScenario', {
-    get: function get() {
-        return this.options.multiScenario;
-    }
+  get: function get() {
+    return this.options.multiScenario;
+  }
 });
 
 /**
@@ -72435,16 +72795,16 @@ defAccess(Mediator.prototype, '$multiScenario', {
  *  这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
  */
 defAccess(Mediator.prototype, '$injectionComponent', {
-    set: function set(regData) {
-        var injection;
-        if (injection = this.$dispatcher[regData.pageType + 'Mgr']) {
-            injection.abstractAssistPocess(regData.pageIndex, function (pageObj) {
-                pageObj.baseRegisterComponent.call(pageObj, regData.widget);
-            });
-        } else {
-            console.log('注册injection失败,regData=' + regData);
-        }
+  set: function set(regData) {
+    var injection;
+    if (injection = this.$dispatcher[regData.pageType + 'Mgr']) {
+      injection.abstractAssistPocess(regData.pageIndex, function (pageObj) {
+        pageObj.baseRegisterComponent.call(pageObj, regData.widget);
+      });
+    } else {
+      console.log('注册injection失败,regData=' + regData);
     }
+  }
 });
 
 /**
@@ -72452,9 +72812,9 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  * @return {[type]}   [description]
  */
 defAccess(Mediator.prototype, '$curVmPage', {
-    get: function get() {
-        return this.$dispatcher.pageMgr.abstractGetPageObj(this.$globalEvent.getHindex());
-    }
+  get: function get() {
+    return this.$dispatcher.pageMgr.abstractGetPageObj(this.$globalEvent.getVisualIndex());
+  }
 });
 
 /**
@@ -72484,10 +72844,10 @@ defAccess(Mediator.prototype, '$curVmPage', {
  *
  */
 defProtected(Mediator.prototype, '$bind', function (key, callback) {
-    var vm = this;
-    vm.$watch('change:' + key, function () {
-        callback.apply(vm, arguments);
-    });
+  var vm = this;
+  vm.$watch('change:' + key, function () {
+    callback.apply(vm, arguments);
+  });
 });
 
 /**
@@ -72495,7 +72855,7 @@ defProtected(Mediator.prototype, '$bind', function (key, callback) {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$init', function () {
-    this.$dispatcher.initCreate();
+  this.$dispatcher.initCreate();
 });
 
 /**
@@ -72503,8 +72863,8 @@ defProtected(Mediator.prototype, '$init', function () {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$run', function () {
-    var vm = this;
-    vm.$dispatcher.pageMgr.activateAutoRuns(vm.$globalEvent.getHindex(), Xut.Presentation.GetPageObj());
+  var vm = this;
+  vm.$dispatcher.pageMgr.activateAutoRuns(vm.$globalEvent.getVisualIndex(), Xut.Presentation.GetPageObj());
 });
 
 /**
@@ -72512,7 +72872,7 @@ defProtected(Mediator.prototype, '$run', function () {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$reset', function () {
-    return this.$dispatcher.pageMgr.resetOriginal(this.$globalEvent.getHindex());
+  return this.$dispatcher.pageMgr.resetOriginal(this.$globalEvent.getVisualIndex());
 });
 
 /**
@@ -72520,9 +72880,9 @@ defProtected(Mediator.prototype, '$reset', function () {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$suspend', function () {
-    Xut.Application.Suspend({
-        skipAudio: true //跨页面不处理
-    });
+  Xut.Application.Suspend({
+    skipAudio: true //跨页面不处理
+  });
 });
 
 /**
@@ -72530,12 +72890,12 @@ defProtected(Mediator.prototype, '$suspend', function () {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$destroy', function () {
-    this.$off(); //观察事件
-    this.$globalEvent.destroy(); //全局事件
-    this.$dispatcher.destroyPageBases(); //派发器
-    this.$dispatcher = null;
-    this.$globalEvent = null;
-    this.destorySceneApi(); //动态api
+  this.$off(); //观察事件
+  this.$globalEvent.destroy(); //全局事件
+  this.$dispatcher.destroyPageBases(); //派发器
+  this.$dispatcher = null;
+  this.$globalEvent = null;
+  this.destorySceneApi(); //动态api
 });
 
 /**
@@ -72646,16 +73006,16 @@ function pMainBar(scenarioId) {
     var sectionRang = Xut.data.query('sectionRelated', scenarioId);
 
     //场景工具栏配置信息
-    var toolbar = sectionRang.toolbar;
-    var pagetotal = sectionRang.length;
+    var toolBar = sectionRang.toolbar;
+    var pageTotal = sectionRang.length;
 
     //默认显示系统工具栏
     var toolType = [1];
 
     //默认2 允许滑动,带翻页按钮
-    var pageMode = pagetotal > 1 ? 2 : 0;
+    var pageMode = pageTotal > 1 ? 2 : 0;
 
-    return parseTooBar(toolbar, toolType, pageMode);
+    return parseTooBar(toolBar, toolType, pageMode);
 }
 
 /**
@@ -72663,10 +73023,10 @@ function pMainBar(scenarioId) {
  * pageMode 是否支持滑动翻页  0禁止滑动 1允许滑动
  * toolType   工具栏显示的类型 [0-5]
  */
-function pDeputyBar(toolbar, pagetotal) {
+function pDeputyBar(toolBar, pageTotal) {
     var toolType = [0];
-    var pageMode = pagetotal > 1 ? 1 : 0;
-    return parseTooBar(toolbar, toolType, pageMode);
+    var pageMode = pageTotal > 1 ? 1 : 0;
+    return parseTooBar(toolBar, toolType, pageMode);
 }
 
 /**
@@ -72674,15 +73034,15 @@ function pDeputyBar(toolbar, pagetotal) {
  * @return {[type]}            [description]
  */
 var findContainer = function findContainer($rootNode, scenarioId, isMain) {
-    return function (pane, parallax) {
-        var node;
-        if (isMain) {
-            node = '#' + pane;
-        } else {
-            node = '#' + parallax + scenarioId;
-        }
-        return $rootNode.find(node)[0];
-    };
+  return function (pane, parallax) {
+    var node;
+    if (isMain) {
+      node = '#' + pane;
+    } else {
+      node = '#' + parallax + scenarioId;
+    }
+    return $rootNode.find(node)[0];
+  };
 };
 
 /**
@@ -72692,27 +73052,27 @@ var findContainer = function findContainer($rootNode, scenarioId, isMain) {
  */
 var checkHistory = function checkHistory(history) {
 
-    //直接启用快捷调试模式
-    if (config.deBugHistory) {
-        Xut.View.LoadScenario(config.deBugHistory);
-        return true;
-    }
+  //直接启用快捷调试模式
+  if (config.deBugHistory) {
+    Xut.View.LoadScenario(config.deBugHistory);
+    return true;
+  }
 
-    //如果有历史记录
-    if (history) {
-        var scenarioInfo = sceneController.seqReverse(history);
-        if (scenarioInfo) {
-            scenarioInfo = scenarioInfo.split('-');
-            Xut.View.LoadScenario({
-                'scenarioId': scenarioInfo[0],
-                'chapterId': scenarioInfo[1],
-                'pageIndex': scenarioInfo[2]
-            });
-            return true;
-        } else {
-            return false;
-        }
+  //如果有历史记录
+  if (history) {
+    var scenarioInfo = sceneController.seqReverse(history);
+    if (scenarioInfo) {
+      scenarioInfo = scenarioInfo.split('-');
+      Xut.View.LoadScenario({
+        'scenarioId': scenarioInfo[0],
+        'chapterId': scenarioInfo[1],
+        'pageIndex': scenarioInfo[2]
+      });
+      return true;
+    } else {
+      return false;
     }
+  }
 };
 
 /**
@@ -72725,329 +73085,355 @@ var checkHistory = function checkHistory(history) {
  * @return {[type]}                        [description]
  */
 var SceneFactory = function () {
-    function SceneFactory(data) {
-        var _this = this;
+  function SceneFactory(data) {
+    var _this = this;
 
-        classCallCheck(this, SceneFactory);
+    classCallCheck(this, SceneFactory);
 
-        var seasonId = data.seasonId;
-        var chapterId = data.chapterId;
-        var options = _.extend(this, data, {
-            'scenarioId': seasonId,
-            'chapterId': chapterId,
-            '$container': $('.xut-scene-container')
-        });
-        //创建主场景
-        this._createHTML(options, function () {
-            if (!Xut.IBooks.Enabled) {
-                _.extend(_this, _this._initToolBar());
-            }
-            _this._createMediator();
-            sceneController.add(seasonId, chapterId, _this);
-        });
+    var seasonId = data.seasonId;
+    var chapterId = data.chapterId;
+    var options = _.extend(this, data, {
+      'scenarioId': seasonId,
+      'chapterId': chapterId,
+      '$container': $('.xut-scene-container')
+    });
+    //创建主场景
+    this._createHTML(options, function () {
+      if (!Xut.IBooks.Enabled) {
+        _.extend(_this, _this._initToolBar());
+      }
+      _this._createMediator();
+      sceneController.add(seasonId, chapterId, _this);
+    });
+  }
+
+  /**
+   * 创建场景
+   * @return {[type]} [description]
+   */
+
+
+  createClass(SceneFactory, [{
+    key: '_createHTML',
+    value: function _createHTML(options, callback) {
+
+      //如果是静态文件执行期
+      //支持Xut.IBooks模式
+      //都不需要创建节点
+      if (Xut.IBooks.runMode()) {
+        this.$rootNode = $('#xut-main-scene');
+        callback();
+        return;
+      }
+
+      var layout = void 0;
+
+      if (options.isMain) {
+        layout = mainScene();
+      } else {
+        layout = deputyScene(this.scenarioId);
+      }
+
+      this.$rootNode = $(layout);
+
+      Xut.nextTick({
+        'container': this.$container,
+        'content': this.$rootNode
+      }, callback);
     }
 
     /**
-     * 创建场景
+     * 初始化工具栏
+     * 1 主场景，系统工具栏
+     * 2 副场景，函数工具栏
+     * 3 全场景，页码显示（右下角）
      * @return {[type]} [description]
      */
 
+  }, {
+    key: '_initToolBar',
+    value: function _initToolBar() {
+      var _this2 = this;
 
-    createClass(SceneFactory, [{
-        key: '_createHTML',
-        value: function _createHTML(options, callback) {
+      var scenarioId = this.scenarioId;
+      var pageTotal = this.pageTotal;
+      var pageIndex = this.pageIndex;
+      var $rootNode = this.$rootNode;
+      var findControlBar = function findControlBar() {
+        return $rootNode.find('.xut-control-bar');
+      };
 
-            //如果是静态文件执行期
-            //支持Xut.IBooks模式
-            //都不需要创建节点
-            if (Xut.IBooks.runMode()) {
-                this.$rootNode = $('#xut-main-scene');
-                callback();
-                return;
-            }
+      //配置文件
+      var barConfig = {};
 
-            var layout = void 0;
+      //主场景工具栏设置
+      if (this.isMain) {
+        barConfig = pMainBar(scenarioId, pageTotal);
+        if (config.visualMode === 4) {}
+        //word模式,自动启动工具条
+        // this.mainToolbar = new BookBar({
+        //     sceneNode: $rootNode,
+        //     controlNode: findControlBar(),
+        //     pageMode: barConfig.pageMode
+        // })
 
-            if (options.isMain) {
-                layout = mainScene();
-            } else {
-                layout = deputyScene(this.scenarioId);
-            }
-
-            this.$rootNode = $(layout);
-
-            Xut.nextTick({
-                'container': this.$container,
-                'content': this.$rootNode
-            }, callback);
+        //如果工具拦提供可配置
+        //或者config.pageMode 带翻页按钮
+        else if (_.some(barConfig.toolType)) {
+            //普通模式
+            this.mainToolbar = new sysBar({
+              sceneNode: $rootNode,
+              controlNode: findControlBar(),
+              pageTotal: pageTotal,
+              currentPage: pageIndex + 1,
+              pageMode: barConfig.pageMode,
+              toolType: barConfig.toolType
+            });
+          }
+      }
+      //副场景
+      else {
+          //副场工具栏配置
+          barConfig = pDeputyBar(this.barInfo, pageTotal);
+          if (_.some(barConfig.toolType)) {
+            this.deputyToolbar = new fnBar({
+              sceneNode: $rootNode,
+              toolType: barConfig.toolType,
+              pageTotal: pageTotal,
+              currentPage: pageIndex,
+              pageMode: barConfig.pageMode
+            });
+          }
         }
 
-        /**
-         * 初始化工具栏
-         * 1 主场景，系统工具栏
-         * 2 副场景，函数工具栏
-         * 3 全场景，页码显示（右下角）
-         * @return {[type]} [description]
-         */
+      //2016.9.29
+      //新增页码显示
+      //如果有分栏
+      var columnCounts = getColumnCount(this.seasonId);
 
-    }, {
-        key: '_initToolBar',
-        value: function _initToolBar() {
-            var scenarioId = this.scenarioId;
-            var pageTotal = this.pageTotal;
-            var pageIndex = this.pageIndex;
-            var $rootNode = this.$rootNode;
-            var findControlBar = function findControlBar() {
-                return $rootNode.find('.xut-control-bar');
-            };
+      //如果是min平台强制启动
+      if (Xut.config.platform === 'mini' || config.toolType.number !== false && columnCounts) {
+        (function () {
 
-            //配置文件
-            var barConfig = {};
-
-            //主场景工具栏设置
-            if (this.isMain) {
-                barConfig = pMainBar(scenarioId, pageTotal);
-                if (config.visualMode === 4) {}
-                //word模式,自动启动工具条
-                // this.mainToolbar = new BookBar({
-                //     sceneNode: $rootNode,
-                //     controlNode: findControlBar(),
-                //     pageMode: barConfig.pageMode
-                // })
-
-                //如果工具拦提供可配置
-                //或者config.pageMode 带翻页按钮
-                else if (_.some(barConfig.toolType)) {
-                        //普通模式
-                        this.mainToolbar = new sysBar({
-                            sceneNode: $rootNode,
-                            controlNode: findControlBar(),
-                            pageTotal: pageTotal,
-                            currentPage: pageIndex + 1,
-                            pageMode: barConfig.pageMode,
-                            toolType: barConfig.toolType
-                        });
-                    }
+          var getColumnTotal = function getColumnTotal(needGet) {
+            if (needGet) {
+              //高度变化后，重新获取
+              columnCounts = getColumnCount(_this2.seasonId);
             }
-            //副场景
-            else {
-                    //副场工具栏配置
-                    barConfig = pDeputyBar(this.barInfo, pageTotal);
-                    if (_.some(barConfig.toolType)) {
-                        this.deputyToolbar = new fnBar({
-                            sceneNode: $rootNode,
-                            toolType: barConfig.toolType,
-                            pageTotal: pageTotal,
-                            currentPage: pageIndex,
-                            pageMode: barConfig.pageMode
-                        });
-                    }
-                }
-
-            //2016.9.29
-            //新增页码显示
-            //如果有分栏
-            var columnCounts = getColumnCount(this.seasonId);
-
-            //如果是min平台强制启动
-            if (Xut.config.platform === 'mini' || config.toolType.number !== false && columnCounts) {
-                var columnChpterCount = 0;
-                if (columnCounts) {
-                    columnChpterCount = getColumnChpaterCount(this.seasonId);
-                }
-                this.numberToolbar = new NumberBar({
-                    $rootNode: $rootNode,
-                    currentPage: pageIndex,
-                    //如果有flowCounts则用
-                    //否则就用页面的总数
-                    pageTotal: columnCounts ? pageTotal + columnCounts - columnChpterCount : pageTotal
-                });
+            var columnChpterCount = 0;
+            if (columnCounts) {
+              columnChpterCount = getColumnChpaterCount(_this2.seasonId);
             }
+            return columnCounts ? pageTotal + columnCounts - columnChpterCount : pageTotal;
+          };
 
-            return barConfig;
+          _this2.numberToolbar = new NumberBar({
+            $rootNode: $rootNode,
+            visualIndex: pageIndex,
+            //如果有flowCounts则用
+            //否则就用页面的总数
+            pageTotal: getColumnTotal(),
+            //单独优先级大于全局优先级
+            pageBar: config.launch.pageBar ? config.launch.pageBar : config.pageBar
+          });
+
+          //页面总数改变
+          if (config.columnCheck) {
+            Xut.Application.Watch('change:number:total', function () {
+              _this2.numberToolbar.updateTotal(getColumnTotal(true));
+            });
+          }
+        })();
+      }
+
+      return barConfig;
+    }
+
+    /**
+     * 构建创建对象
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_createMediator',
+    value: function _createMediator() {
+      var _this3 = this;
+
+      var self = this;
+      var scenarioId = this.scenarioId;
+      var pageTotal = this.pageTotal;
+      var pageIndex = this.pageIndex;
+      var $rootNode = this.$rootNode;
+      var isMain = this.isMain;
+      var tempfind = findContainer($rootNode, scenarioId, isMain);
+      var scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
+      var scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
+
+      //场景容器对象
+      var vm = this.vm = new Mediator({
+        'pageMode': this.pageMode,
+        'container': this.$rootNode[0],
+        'multiScenario': !isMain,
+        'rootPage': scenarioPage,
+        'rootMaster': scenarioMaster,
+        'initIndex': pageIndex, //保存索引从0开始
+        'pageTotal': pageTotal,
+        'sectionRang': this.sectionRang,
+        'scenarioId': scenarioId,
+        'chapterId': this.chapterId,
+        'isInApp': this.isInApp //提示页面
+      });
+
+      /**
+       * 配置选项
+       * @type {[type]}
+       */
+      var isToolbar = this.isToolbar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
+
+      /**
+       * 监听翻页
+       * 用于更新页码
+       *   parentIndex  父索引
+       *   subIndex     子索引
+       * @return {[type]} [description]
+       */
+      vm.$bind('pageUpdate', function () {
+        isToolbar && isToolbar.updatePointer.apply(isToolbar, arguments);
+        if (_this3.numberToolbar) {
+          var _numberToolbar;
+
+          _this3.numberToolbar && (_numberToolbar = _this3.numberToolbar).updatePointer.apply(_numberToolbar, arguments);
         }
+      });
 
-        /**
-         * 构建创建对象
-         * @return {[type]} [description]
-         */
+      /**
+       * 显示下一页按钮
+       * @return {[type]} [description]
+       */
+      vm.$bind('showNext', function () {
+        isToolbar && isToolbar.showNext();
+      });
 
-    }, {
-        key: '_createMediator',
-        value: function _createMediator() {
-            var _this2 = this;
+      /**
+       * 隐藏下一页按钮
+       * @return {[type]} [description]
+       */
+      vm.$bind('hideNext', function () {
+        isToolbar && isToolbar.hideNext();
+      });
 
-            var self = this;
-            var scenarioId = this.scenarioId;
-            var pageTotal = this.pageTotal;
-            var pageIndex = this.pageIndex;
-            var $rootNode = this.$rootNode;
-            var isMain = this.isMain;
-            var tempfind = findContainer($rootNode, scenarioId, isMain);
-            var scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
-            var scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
+      /**
+       * 显示上一页按钮
+       * @return {[type]} [description]
+       */
+      vm.$bind('showPrev', function () {
+        isToolbar && isToolbar.showPrev();
+      });
 
-            //场景容器对象
-            var vm = this.vm = new Mediator({
-                'pageMode': this.pageMode,
-                'container': this.$rootNode[0],
-                'multiScenario': !isMain,
-                'rootPage': scenarioPage,
-                'rootMaster': scenarioMaster,
-                'initIndex': pageIndex, //保存索引从0开始
-                'pagetotal': pageTotal,
-                'sectionRang': this.sectionRang,
-                'scenarioId': scenarioId,
-                'chapterId': this.chapterId,
-                'isInApp': this.isInApp //提示页面
-            });
+      /**
+       * 隐藏上一页按钮
+       * @return {[type]} [description]
+       */
+      vm.$bind('hidePrev', function () {
+        isToolbar && isToolbar.hidePrev();
+      });
 
-            /**
-             * 配置选项
-             * @type {[type]}
-             */
-            var isToolbar = this.isToolbar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
+      /**
+       * 切换工具栏
+       * state, pointer
+       * @return {[type]} [description]
+       */
+      vm.$bind('toggleToolbar', function () {
+        isToolbar && isToolbar.toggle.apply(isToolbar, arguments);
+        if (_this3.numberToolbar) {
+          var _numberToolbar2;
 
-            /**
-             * 监听翻页
-             * 用于更新页码
-             *   parentIndex  父索引
-             *   subIndex     子索引
-             * @return {[type]} [description]
-             */
-            vm.$bind('pageUpdate', function () {
-                isToolbar && isToolbar.updatePointer.apply(isToolbar, arguments);
-                if (_this2.numberToolbar) {
-                    var _numberToolbar;
-
-                    _this2.numberToolbar && (_numberToolbar = _this2.numberToolbar).updatePointer.apply(_numberToolbar, arguments);
-                }
-            });
-
-            /**
-             * 显示下一页按钮
-             * @return {[type]} [description]
-             */
-            vm.$bind('showNext', function () {
-                isToolbar && isToolbar.showNext();
-            });
-
-            /**
-             * 隐藏下一页按钮
-             * @return {[type]} [description]
-             */
-            vm.$bind('hideNext', function () {
-                isToolbar && isToolbar.hideNext();
-            });
-
-            /**
-             * 显示上一页按钮
-             * @return {[type]} [description]
-             */
-            vm.$bind('showPrev', function () {
-                isToolbar && isToolbar.showPrev();
-            });
-
-            /**
-             * 隐藏上一页按钮
-             * @return {[type]} [description]
-             */
-            vm.$bind('hidePrev', function () {
-                isToolbar && isToolbar.hidePrev();
-            });
-
-            /**
-             * 切换工具栏
-             * state, pointer
-             * @return {[type]} [description]
-             */
-            vm.$bind('toggleToolbar', function () {
-                isToolbar && isToolbar.toggle.apply(isToolbar, arguments);
-                if (_this2.numberToolbar) {
-                    var _numberToolbar2;
-
-                    _this2.numberToolbar && (_numberToolbar2 = _this2.numberToolbar).toggle.apply(_numberToolbar2, arguments);
-                }
-            });
-
-            /**
-             * 复位工具栏
-             * @return {[type]} [description]
-             */
-            vm.$bind('resetToolbar', function () {
-                if (_this2.mainToolbar) {
-                    _this2.mainToolbar.resetArrow(); //左右翻页按钮
-                    _this2.mainToolbar.hideNavbar(); //导航栏
-                }
-            });
-
-            /**
-             * 监听创建完成
-             * @return {[type]} [description]
-             */
-            vm.$bind('createComplete', function (nextAction) {
-                self.complete && setTimeout(function () {
-                    if (isMain) {
-                        self.complete(function () {
-                            Xut.View.HideBusy();
-                            //检测是不是有缓存加载
-                            if (!checkHistory(self.history)) {
-                                //指定自动运行的动作
-                                nextAction && nextAction();
-                            }
-                            //全局接口,应用加载完毕
-                            Xut.Application.AddEventListener();
-                        });
-                    } else {
-                        self.complete(nextAction);
-                    }
-                }, 200);
-            });
-
-            //如果是读酷端加载
-            if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
-                window.DUKUCONFIG.success();
-                vm.$init();
-                //如果是客户端加载
-            } else if (window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
-                window.CLIENTCONFIGT.success();
-                vm.$init();
-            } else {
-                //正常加载
-                vm.$init();
-            }
+          _this3.numberToolbar && (_numberToolbar2 = _this3.numberToolbar).toggle.apply(_numberToolbar2, arguments);
         }
+      });
 
-        /**
-         * 销毁场景对象
-         * @return {[type]} [description]
-         */
-
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-
-            //销毁当前场景
-            this.vm.$destroy();
-
-            //销毁工具栏
-            if (this.isToolbar) {
-                this.isToolbar.destroy();
-                this.isToolbar = null;
-            }
-
-            this.$container = null;
-
-            //销毁节点
-            this.$rootNode.off();
-            this.$rootNode.remove();
-            this.$rootNode = null;
-
-            //销毁引用
-            sceneController.remove(this.scenarioId);
+      /**
+       * 复位工具栏
+       * @return {[type]} [description]
+       */
+      vm.$bind('resetToolbar', function () {
+        if (_this3.mainToolbar) {
+          _this3.mainToolbar.resetArrow(); //左右翻页按钮
+          _this3.mainToolbar.hideNavbar(); //导航栏
         }
-    }]);
-    return SceneFactory;
+      });
+
+      /**
+       * 监听创建完成
+       * @return {[type]} [description]
+       */
+      vm.$bind('createComplete', function (nextAction) {
+        self.complete && setTimeout(function () {
+          if (isMain) {
+            self.complete(function () {
+              Xut.View.HideBusy();
+              //检测是不是有缓存加载
+              if (!checkHistory(self.history)) {
+                //指定自动运行的动作
+                nextAction && nextAction();
+              }
+              //全局接口,应用加载完毕
+              Xut.Application.AddEventListener();
+            });
+          } else {
+            self.complete(nextAction);
+          }
+        }, 200);
+      });
+
+      //如果是读酷端加载
+      if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
+        window.DUKUCONFIG.success();
+        vm.$init();
+        //如果是客户端加载
+      } else if (window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
+        window.CLIENTCONFIGT.success();
+        vm.$init();
+      } else {
+        //正常加载
+        vm.$init();
+      }
+    }
+
+    /**
+     * 销毁场景对象
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+
+      if (config.columnCheck) {
+        Xut.Application.unWatch('change:number:total');
+      }
+
+      //销毁当前场景
+      this.vm.$destroy();
+
+      //销毁工具栏
+      if (this.isToolbar) {
+        this.isToolbar.destroy();
+        this.isToolbar = null;
+      }
+
+      this.$container = null;
+
+      //销毁节点
+      this.$rootNode.off();
+      this.$rootNode.remove();
+      this.$rootNode = null;
+
+      //销毁引用
+      sceneController.remove(this.scenarioId);
+    }
+  }]);
+  return SceneFactory;
 }();
 
 function initView() {
@@ -73451,12 +73837,300 @@ function initContents() {
     };
 }
 
+//分栏探测
+var COLUMNWIDTH = Xut.style.columnWidth;
+var COLUMNTAP = Xut.style.columnGap;
+
+/**
+ * 高度marginTop - marginBottom处理了
+ * 不一定等于设备高度
+ * @type {Number}
+ */
+var newViewHight = 0;
+
+/**
+ * create dom...
+ */
+var createStr = function createStr(chapterId, data, visualWidth, visualHeight, margin) {
+
+  var percentageTop = Number(margin[0]);
+  var percentageLeft = Number(margin[1]);
+  var percentageBottom = Number(margin[2]);
+  var percentageRight = Number(margin[3]);
+
+  //减去的宽度值
+  var negativeWidth = visualWidth / 100 * (percentageLeft + percentageRight);
+
+  //减去的高度值
+  var negativeHeight = visualHeight / 100 * (percentageTop + percentageBottom);
+
+  //容器宽度 = 宽度 - 左右距离比值
+  var containerWidth = visualWidth - negativeWidth;
+
+  //容器高度值 = 宽度 - 上下距离比值
+  var containerHeight = visualHeight - negativeHeight;
+
+  //容器左边偏移量
+  var containerLeft = negativeWidth / 2;
+
+  //容器上偏移量
+  var containerTop = visualHeight / 100 * percentageTop;
+
+  //重复加载杂志
+  //不刷新的情况处理
+  if (/section-transform/.test(data)) {
+    data = $(data).find("#columns-content").html();
+  }
+
+  var columnGap = COLUMNTAP + ':' + negativeWidth + 'px';
+  var columnWidth = COLUMNWIDTH + ':' + containerWidth + 'px';
+  var container = '\n            <section class="section-transform" data-flow="true">\n                <div class="page-flow-pinch" data-role="margin" style="width:' + containerWidth + 'px;height:' + containerHeight + 'px;margin-top:' + containerTop + 'px;margin-left:' + containerLeft + 'px;">\n                    <div data-role="column" id="columns-content" style="' + columnWidth + ';height:100%;' + columnGap + '">\n                        ' + data + '\n                    </div>\n                </div>\n            </section>';
+
+  newViewHight = containerHeight;
+
+  return String.styleFormat(container);
+};
+
+var insertColumn = function insertColumn(seasonNode, seasonsId, visualWidth, visualHeight, columnCount) {
+  for (var i = 0; i < seasonNode.childNodes.length; i++) {
+    var chapterNode = seasonNode.childNodes[i];
+    if (chapterNode.nodeType == 1) {
+      var tag = chapterNode.id;
+      if (tag) {
+        var id = /\d+/.exec(tag)[0];
+        if (id) {
+          var margin = chapterNode.getAttribute('data-margin');
+          if (margin) {
+            margin = margin.split(",");
+          } else {
+            margin = [0, 0, 0, 0];
+          }
+          chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin);
+          columnCount[seasonsId][id] = 0;
+        } else {
+          $$warn('node tag is null on insertColumn');
+        }
+      } else {
+        $$warn('node tag is null on insertColumn');
+      }
+    }
+  }
+};
+
+var eachColumn = function eachColumn(columnCount, $seasons, visualWidth, visualHeight) {
+  $seasons.each(function (index, node) {
+    var tag = node.id;
+    var seasonsId = tag.match(/\d/)[0];
+    var $chapters = $seasons.children();
+    columnCount[seasonsId] = {};
+    insertColumn(node, seasonsId, visualWidth, visualHeight, columnCount);
+  });
+};
+
+/**
+ * 解析分栏高度
+ */
+var resolveCount = function resolveCount($content) {
+  var theChildren = $content.find('#columns-content').children();
+  var paraHeight = 0;
+  for (var i = 0; i < theChildren.length; i++) {
+    paraHeight += Math.max(theChildren[i].scrollHeight, theChildren[i].clientHeight);
+  }
+  // $("#test123").append('<a>' + paraHeight + '</a>，')
+  return Math.ceil(paraHeight / newViewHight);
+};
+
+/**
+ * 获取分栏数量
+ */
+function resolveColumnCount($seasons, callback) {
+  $seasons.each(function (index, node) {
+    var tag = node.id;
+    var seasonsId = tag.match(/\d/)[0];
+    var $chapters = $seasons.children();
+    $chapters.each(function (index, node) {
+      var tag = node.id;
+      if (tag) {
+        var chapterId = tag.match(/\d+/)[0];
+        var count = resolveCount($(node));
+        callback(seasonsId, chapterId, Number(count));
+      }
+    });
+  });
+}
+
+/**
+ * 构建column页面代码结构
+ */
+function initColumn(callback) {
+
+  var $container = $("#xut-stream-flow");
+  if ($container.length) {
+    $container.remove();
+  }
+
+  var setHeight = function setHeight($container, visualWidth, visualHeight) {
+    $container.css({
+      width: visualWidth,
+      height: visualHeight,
+      display: 'block'
+    });
+  };
+
+  var init = function init(visualWidth, visualHeight) {
+    var $seasons = $container.children();
+    if (!$seasons.length) {
+      callback();
+      return;
+    }
+
+    var columnCount = {}; //分栏记录
+    setHeight($container, visualWidth, visualHeight);
+    eachColumn(columnCount, $seasons, visualWidth, visualHeight);
+    $('body').append($container);
+
+    setTimeout(function () {
+
+      //第一次获取分栏数
+      resolveColumnCount($seasons, function (seasonsId, chapterId, count) {
+        if (debug && config.columnCheck) {
+          count = simulateCount;
+        }
+        columnCount[seasonsId][chapterId] = count;
+      });
+
+      setCache(columnCount);
+
+      //检测分栏数变化
+      if (config.columnCheck) {
+        startColumnDetect($seasons, $.extend(true, {}, columnCount), function () {
+          $container.hide();
+        });
+      } else {
+        $container.hide();
+      }
+
+      callback(Object.keys(columnCount).length);
+    }, 100);
+  };
+
+  //如果存在json的flow数据
+  var results = getResults();
+  if (results && results.FlowData) {
+    (function () {
+      //容器尺寸设置
+      var visuals = resetVisualLayout(1);
+      var visualHeight = newViewHight = visuals.height;
+
+      //加载flow样式
+      loadStyle('xxtflow', function () {
+        $container = $(results.FlowData);
+        removeColumnData(); //删除flowdata，优化缓存
+        init(visuals.width, visualHeight);
+      });
+    })();
+  } else {
+    //没有任何flow
+    callback();
+  }
+}
+
+/**
+ * 分栏探测
+ */
+var makeDelay = function makeDelay(seasonsId, chapterId, count) {
+    return function () {
+        setChpaterColumn(seasonsId, chapterId, count);
+    };
+};
+
+var execDelay = function execDelay(tempDelay) {
+    if (tempDelay.length) {
+        var fn = void 0;
+        while (fn = tempDelay.pop()) {
+            fn();
+        }
+        Xut.Application.Notify('change:number:total');
+        Xut.Application.Notify('change:column');
+    }
+};
+
+/**
+ * debug调试
+ */
+var debug = false;
+var simulateCount = 2;
+
+/**
+ * 模拟检测次数
+ */
+var simulateTimer = 13;
+
+/**
+ * 检测引用
+ */
+var timerId = null;
+
+/**
+ * 基本检测次数 20*500 ~ 10秒范围
+ */
+var baseCheckCount = 20;
+
+/**
+ * 检测分栏数
+ */
+function detectColumn($seasons, columnCollection, callback, checkCount) {
+    var tempDelay = [];
+
+    resolveColumnCount($seasons, function (seasonsId, chapterId, count) {
+        if (debug && checkCount > simulateTimer) {
+            count = simulateCount;
+        }
+        //假如高度改变
+        if (columnCollection[seasonsId][chapterId] !== count) {
+            columnCollection[seasonsId][chapterId] = count;
+            tempDelay.push(makeDelay(seasonsId, chapterId, count));
+        }
+    });
+
+    --checkCount;
+
+    //执行监控改变
+    execDelay(tempDelay);
+
+    if (checkCount) {
+        timerId = setTimeout(function () {
+            detectColumn($seasons, columnCollection, callback, checkCount);
+        }, 500);
+    } else {
+        //如果探测完毕就强制关闭检测了
+        config.columnCheck = false;
+        stopColumnDetection();
+        callback();
+    }
+}
+
+/**
+ * 开始分栏探测
+ */
+function startColumnDetect($seasons, columnCollection, callback) {
+    detectColumn($seasons, columnCollection, callback, baseCheckCount);
+}
+
+/**
+ * 停止分栏高度探测
+ */
+function stopColumnDetection() {
+    Xut.Application.unWatch('change:number:total change:column');
+    clearTimeout(timerId);
+    timerId = null;
+}
+
 /**
  * 销毁缓存
  */
 function destroyCache(isRefresh) {
   removeCache(); //userCache
-  removeStyle();
 }
 
 /**
@@ -73711,6 +74385,17 @@ function Destroy() {
 
     //启动配置文件去掉
     config.launch = null;
+
+    //删除动态加载的两个css文件
+    $('link[data-type]').each(function (index, link) {
+        var type = link.getAttribute('data-type');
+        if (type === 'svgsheet' || type === 'xxtflow') {
+            link.parentNode.removeChild(link);
+        }
+    });
+
+    //停止分栏探测
+    stopColumnDetection();
 }
 
 /****************************************************
@@ -73742,12 +74427,19 @@ function initApplication() {
      */
     var __app__ = new Observer();
     Xut.Application.Watch = function (event, callback) {
-        __app__.$watch('app:' + event, function () {
+        var fn = function fn() {
             callback.apply(__app__, arguments);
-        });
+        };
+        __app__.bind(event, fn);
+        return fn;
     };
+
+    Xut.Application.unWatch = function (event, fn) {
+        __app__.unbind(event, fn);
+    };
+
     Xut.Application.Notify = function (event, options) {
-        __app__.$emit('app:' + event, options);
+        __app__.trigger(event, options);
     };
 
     /**
@@ -73936,6 +74628,26 @@ function initApplication() {
 }
 
 /**
+ * 通过全局方法 Xut.extend() 使用插件:
+ */
+function initExtend() {
+  Xut.extend = function (plugin) {
+    //   if (plugin.installed) {
+    //     return
+    //   }
+    //   const args = _.toArray(arguments, 1)
+    //   args.unshift(this)
+    //   if (typeof plugin.install === 'function') {
+    //     plugin.install.apply(plugin, args)
+    //   } else {
+    //     plugin.apply(null, args)
+    //   }
+    //   plugin.installed = true
+    //   return this
+  };
+}
+
+/**
  *
  * 杂志全局API
  *
@@ -73976,6 +74688,7 @@ function initGlobalAPI() {
     //脚本接口
     window.XXTAPI = {};
 
+    initExtend();
     initAsset();
     initView();
     initContents();
@@ -74277,173 +74990,6 @@ var initTooBar = function (callback) {
     });
 };
 
-var COLUMNWIDTH = Xut.style.columnWidth;
-var COLUMNTAP = Xut.style.columnGap;
-
-/**
- * 高度marginTop - marginBottom处理了
- * 不一定等于设备高度
- * @type {Number}
- */
-var newViewHight = 0;
-
-/**
- * create dom...
- */
-var createStr = function createStr(chapterId, data, visualWidth, visualHeight, margin) {
-
-    var percentageTop = Number(margin[0]);
-    var percentageLeft = Number(margin[1]);
-    var percentageBottom = Number(margin[2]);
-    var percentageRight = Number(margin[3]);
-
-    //减去的宽度值
-    var negativeWidth = visualWidth / 100 * (percentageLeft + percentageRight);
-
-    //减去的高度值
-    var negativeHeight = visualHeight / 100 * (percentageTop + percentageBottom);
-
-    //容器宽度 = 宽度 - 左右距离比值
-    var containerWidth = visualWidth - negativeWidth;
-
-    //容器高度值 = 宽度 - 上下距离比值
-    var containerHeight = visualHeight - negativeHeight;
-
-    //容器左边偏移量
-    var containerLeft = negativeWidth / 2;
-
-    //容器上偏移量
-    var containerTop = visualHeight / 100 * percentageTop;
-
-    //重复加载杂志
-    //不刷新的情况处理
-    if (/section-transform/.test(data)) {
-        data = $(data).find("#columns-content").html();
-    }
-
-    var columnGap = COLUMNTAP + ':' + negativeWidth + 'px';
-    var columnWidth = COLUMNWIDTH + ':' + containerWidth + 'px';
-    var container = '\n            <section class="section-transform" data-flow="true">\n                <div class="page-flow-pinch" data-role="margin" style="width:' + containerWidth + 'px;height:' + containerHeight + 'px;margin-top:' + containerTop + 'px;margin-left:' + containerLeft + 'px;">\n                    <div data-role="column" id="columns-content" style="' + columnWidth + ';height:100%;' + columnGap + '">\n                        ' + data + '\n                    </div>\n                </div>\n            </section>';
-
-    newViewHight = containerHeight;
-
-    return String.styleFormat(container);
-};
-
-var resolveCount = function resolveCount($content) {
-    var theChildren = $content.find('#columns-content').children();
-    var paraHeight = 0;
-    for (var i = 0; i < theChildren.length; i++) {
-        paraHeight += $(theChildren[i]).height();
-    }
-    return Math.ceil(paraHeight / newViewHight);
-};
-
-var insertColumn = function insertColumn(seasonNode, seasonsId, visualWidth, visualHeight, columnCount) {
-    for (var i = 0; i < seasonNode.childNodes.length; i++) {
-        var chapterNode = seasonNode.childNodes[i];
-        if (chapterNode.nodeType == 1) {
-            var tag = chapterNode.id;
-            var id = tag.match(/\d/)[0];
-
-            //传递的数据
-            var margin = chapterNode.getAttribute('data-margin');
-            if (margin) {
-                margin = margin.split(",");
-            } else {
-                margin = [0, 0, 0, 0];
-            }
-            chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin);
-            columnCount[seasonsId][id] = 0;
-        }
-    }
-};
-
-/**
- * 构建column页面代码结构
- * @return {[type]} [description]
- */
-function initColumn(callback) {
-
-    var $container = $("#xut-stream-flow");
-    var _initColumn = function _initColumn() {
-
-        //保证有子数据
-        var $seasons = $container.children();
-        if (!$seasons.length) {
-            callback();
-            return;
-        }
-
-        //分栏数
-        var columnCount = {};
-
-        //容器尺寸设置
-        var flowView = resetVisualLayout(1);
-        var visualWidth = flowView.width;
-        var visualHeight = newViewHight = flowView.height;
-
-        $container.css({
-            width: visualWidth,
-            height: visualHeight,
-            display: 'block'
-        });
-
-        $seasons.each(function (index, node) {
-            var tag = node.id;
-            var seasonsId = tag.match(/\d/)[0];
-            var $chapters = $seasons.children();
-            columnCount[seasonsId] = {};
-            insertColumn(node, seasonsId, visualWidth, visualHeight, columnCount);
-        });
-
-        $('body').append($container);
-
-        //必须延时获取真正的高度
-        setTimeout(function () {
-            $seasons.each(function (index, node) {
-                var tag = node.id;
-                var seasonsId = tag.match(/\d/)[0];
-                var $chapters = $seasons.children();
-                $chapters.each(function (index, node) {
-                    var tag = node.id;
-                    var chapterId = tag.match(/\d+/)[0];
-                    var count = resolveCount($(node));
-                    columnCount[seasonsId][chapterId] = Number(count);
-                });
-            });
-            $container.hide();
-            setCache(columnCount);
-            callback(Object.keys(columnCount).length);
-        }, 500);
-    };
-
-    //删除存在的节点
-    if ($container.length) {
-        $container.remove();
-    }
-
-    //如果存在json的flow数据
-    var results = getResults();
-    if (results && results.FlowData) {
-        $container = $(results.FlowData);
-        removeFlowData(); //删除flowdata，优化缓存
-        _initColumn();
-    } else {
-        //没有任何flow
-        callback();
-    }
-}
-
-/**
- * 加载svg的css
- * @return {[type]} [description]
- */
-var loadStyle = function loadStyle(callback) {
-    var svgsheet = config.launch ? config.launch.resource + '/gallery/svgsheet.css' : config.pathAddress + 'svgsheet.css';
-    loader.load([svgsheet], callback, null, true);
-};
-
 /**
  * 新增模式,用于记录浏览器退出记录
  * 默认启动
@@ -74538,12 +75084,11 @@ function baseConfig(callback) {
     }
 
     //导入JSON数据缓存
-    importJsonDatabase(function (hasSvgsheet) {
+    importJsonDatabase(function () {
 
         //初始化工具栏
         //与数据库setting数据
         initTooBar(function (novelData, tempSettingData) {
-
             //创建过滤器
             Xut.CreateFilter = contentFilter('createFilter');
             Xut.TransformFilter = contentFilter('transformFilter');
@@ -74569,27 +75114,22 @@ function baseConfig(callback) {
             //初始资源地址
             initPathAddress();
 
-            /**
-             * 初始分栏排版
-             * 嵌入index分栏
-             * 默认有并且没有强制设置关闭的情况，打开缩放
-             */
-            initColumn(function (haColumnCounts) {
-                if (haColumnCounts) {
-                    //动画事件委托
-                    if (config.swipeDelegate !== false) {
-                        config.swipeDelegate = true;
+            //全局样式
+            loadStyle('svgsheet', function () {
+                /**
+                 * 初始分栏排版
+                 * 嵌入index分栏
+                 * 默认有并且没有强制设置关闭的情况，打开缩放
+                 */
+                initColumn(function (haColumnCounts) {
+                    if (haColumnCounts) {
+                        //动画事件委托
+                        if (config.swipeDelegate !== false) {
+                            config.swipeDelegate = true;
+                        }
                     }
-                }
-                //iframe要要Xut.config
-                //如果存在了Svgsheet就不需要动态加载了
-                if (hasSvgsheet) {
                     callback(novelData);
-                } else {
-                    loadStyle(function () {
-                        return callback(novelData);
-                    });
-                }
+                });
             });
         });
     });
@@ -74664,80 +75204,75 @@ var loadScene = function (options) {
 };
 
 var getCache = function getCache(name) {
-    return parseInt(get$2(name));
+  return get$2(name);
 };
 
 /**
  * 进入主页面
- * @return {[type]} [description]
  */
 var initMain = function initMain(novelData) {
 
-    var novelId = void 0;
-    var parameter = void 0;
-    var pageIndex = getCache('pageIndex');
-    var flipMode = getCache('flipMode') || 0;
-
-    /**
-     * IBOOS模式
-     */
-    if (Xut.IBooks.Enabled) {
-        //删除背景图
-        $(".xut-cover").remove();
-        loadScene({
-            "pageIndex": Xut.IBooks.CONFIG.pageIndex
-        });
-        return;
-    }
-
-    /**
-     * 多模式判断
-     * 全局翻页模式
-     * 0 滑动翻页
-     * 1 直接换
-     * 所以pageFlip只有在左面的情况下
-     */
-    if (parameter = novelData.parameter) {
-        parameter = parseJSON(parameter);
-
-        //配置全局翻页模式
-        //flipMode可以为0
-        //兼容flipMode错误,强制转化成数字类型
-        if (parameter.pageflip !== undefined) {
-            flipMode = Number(parameter.pageflip);
-            set$2({ 'flipMode': flipMode });
-        }
-    }
-
-    /**
-     * 设置全局翻页模式
-     * @return {[type]} [description]
-     */
-    if (flipMode) {
-        config.flipMode = Number(flipMode);
-    }
-
-    /**
-     * 缓存加载
-     * 如果启动recordHistory记录
-     */
-    if (config.historyMode && pageIndex !== undefined) {
-        //加强判断
-        if (novelId = getCache("novelId")) {
-            return loadScene({
-                "novelId": novelId,
-                "pageIndex": pageIndex,
-                'history': get$2('history')
-            });
-        }
-    }
-
-    //第一次加载
-    //没有缓存
+  /**
+   * IBOOS模式
+   */
+  if (Xut.IBooks.Enabled) {
+    //删除背景图
+    $(".xut-cover").remove();
     loadScene({
-        "novelId": novelData._id,
-        "pageIndex": 0
+      "pageIndex": Xut.IBooks.CONFIG.pageIndex
     });
+    return;
+  }
+
+  /**
+   * 多模式判断
+   * 如果
+   *   缓存存在
+   *   否则数据库解析
+         全局翻页模式
+         0 滑动翻页 =》allow
+         1 直接换  =》ban
+   * 所以pageFlip只有在左面的情况下
+   */
+  var __flipMode = getCache('flipMode');
+  if (!__flipMode && novelData.paramete) {
+    var parameter = parseJSON(novelData.paramete);
+    if (parameter.pageflip !== undefined) {
+      __flipMode = Number(parameter.pageflip);
+      if (__flipMode === 0) {
+        config.flipMode = 'allow'; //允许翻页
+      } else if (__flipMode === 1) {
+        config.flipMode = 'ban'; //禁止翻页
+      }
+      //缓存
+      set$2({
+        'flipMode': config.flipMode
+      });
+    }
+  }
+
+  /**
+   * 缓存加载
+   * 如果启动recordHistory记录
+   */
+  var pageIndex = Number(getCache('pageIndex'));
+  if (config.historyMode && pageIndex !== undefined) {
+    var novelId = parseInt(getCache("novelId"));
+    if (novelId) {
+      return loadScene({
+        "novelId": novelId,
+        "pageIndex": pageIndex,
+        'history': get$2('history')
+      });
+    }
+  }
+
+  //第一次加载
+  //没有缓存
+  loadScene({
+    "novelId": novelData._id,
+    "pageIndex": 0
+  });
 };
 
 /**
@@ -74746,7 +75281,7 @@ var initMain = function initMain(novelData) {
  * @return {[type]}        [description]
  */
 var initApp = function initApp() {
-    return baseConfig(initMain);
+  return baseConfig(initMain);
 };
 
 /**
@@ -74755,91 +75290,94 @@ var initApp = function initApp() {
  * @return {[type]} [description]
  */
 var bindPlatEvent = function bindPlatEvent() {
-    //安卓上
-    if (Xut.plat.isAndroid) {
-        //预加载处理视频
-        //妙妙学不加载视频
-        //读库不加载视频
-        if (!window.MMXCONFIG && !window.DUKUCONFIG) {
-            plugVideo();
-        }
 
-        //不是子文档指定绑定按键
-        if (!window.SUbCONFIGT) {
-            Xut.Application.AddEventListener = function () {
-                bindAndroid();
-            };
-        }
+  //安卓上并且不是浏览器打开的情况
+  if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
+
+    //预加载处理视频
+    //妙妙学不加载视频
+    //读库不加载视频
+    if (window.MMXCONFIG && !window.DUKUCONFIG) {
+      plugVideo();
     }
 
-    if (window.DUKUCONFIG) {
-        PMS.bind("MagazineExit", function () {
-            PMS.unbind();
-            Xut.Application.DropApp();
-        }, "*");
+    //不是子文档指定绑定按键
+    if (!window.SUbCONFIGT) {
+      Xut.Application.AddEventListener = function () {
+        bindAndroid();
+      };
     }
-    initApp();
+  }
+
+  if (window.DUKUCONFIG) {
+    PMS.bind("MagazineExit", function () {
+      PMS.unbind();
+      Xut.Application.DropApp();
+    }, "*");
+  }
+  initApp();
 };
 
 function init$1() {
 
-    //如果不是读库模式
-    //播放HTML5视频
-    //在IOS
-    // if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
-    //     html5Video()
-    // }
+  //如果不是读库模式
+  //播放HTML5视频
+  //在IOS
+  // if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
+  //     html5Video()
+  // }
 
-    //Ifarme嵌套处理
-    //1 新阅读
-    //2 子文档
-    //3 pc
-    //4 ios/android
-    if (window.GLOBALIFRAME) {
-        bindPlatEvent();
+  //Ifarme嵌套处理
+  //1 新阅读
+  //2 子文档
+  //3 pc
+  //4 ios/android
+  if (window.GLOBALIFRAME) {
+    bindPlatEvent();
+  } else {
+
+    //brower
+    if (config.isBrowser) {
+      initApp();
     } else {
-
-        //brower
-        if (config.isBrowser) {
-            initApp();
-        } else {
-            //mobile(apk or ipa)
-            window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
-            document.addEventListener("deviceready", function () {
-                Xut.plat.hasPlugin = true; //支持插件
-                Xut.Plugin.XXTEbookInit.startup(config.dbName, bindPlatEvent, function () {});
-            }, false);
-        }
+      //mobile(apk or ipa)
+      window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
+      document.addEventListener("deviceready", function () {
+        Xut.plat.hasPlugin = true; //支持插件
+        Xut.Plugin.XXTEbookInit.startup(config.dbName, bindPlatEvent, function () {});
+      }, false);
     }
+  }
 }
 
+//全局API初始化
 initGlobalAPI();
 
-Xut.Version = 876.5;
+Xut.Version = 879.4;
 
 if (Xut.plat.isBrowser) {
 
-    //禁止全局的缩放处理
-    $('body').on('touchmove', function (e) {
-        e.preventDefault && e.preventDefault();
-    });
+  //禁止全局的缩放处理
+  $('body').on('touchmove', function (e) {
+    e.preventDefault && e.preventDefault();
+  });
 
-    //修复H5音频自动播放bug
-    if (!Xut.plat.hasAutoPlayAudio) {
-        fixAudio();
+  //修复H5音频自动播放bug
+  if (!Xut.plat.hasAutoPlayAudio) {
+    fixAudio();
+  }
+
+  //桌面鼠标控制翻页
+  $(document).keyup(function (event) {
+    switch (event.keyCode) {
+      case 37:
+        Xut.View.GotoPrevSlide();
+        break;
+      case 39:
+        Xut.View.GotoNextSlide();
+        break;
     }
-
-    //桌面鼠标控制翻页
-    $(document).keyup(function (event) {
-        switch (event.keyCode) {
-            case 37:
-                Xut.View.GotoPrevSlide();
-                break;
-            case 39:
-                Xut.View.GotoNextSlide();
-                break;
-        }
-    });
+  });
 }
 
 /**
@@ -74848,28 +75386,28 @@ if (Xut.plat.isBrowser) {
  * @return {[type]} [description]
  */
 var loadApp = function loadApp() {
-    var node = initNode.apply(undefined, arguments);
-    Xut.Application.$$removeNode = function () {
-        node.$contentNode.remove();
-        node.$contentNode = null;
-        node.$rootNode = null;
-        node = null;
-        Xut.Application.$$removeNode = null;
-    };
+  var node = initNode.apply(undefined, arguments);
+  Xut.Application.$$removeNode = function () {
+    node.$contentNode.remove();
+    node.$contentNode = null;
+    node.$rootNode = null;
+    node = null;
+    Xut.Application.$$removeNode = null;
+  };
 
-    nextTick({
-        container: node.$rootNode,
-        content: node.$contentNode
-    }, init$1);
+  nextTick({
+    container: node.$rootNode,
+    content: node.$contentNode
+  }, init$1);
 };
 
 /**
  * 提供全局配置文件
  */
-var mixModeConfig = function mixModeConfig(setConfig) {
-    if (setConfig) {
-        Xut.extend(config, setConfig);
-    }
+var mixGolbalConfig = function mixGolbalConfig(setConfig) {
+  if (setConfig) {
+    Xut.mixin(config, setConfig);
+  }
 };
 
 /**
@@ -74884,83 +75422,69 @@ var cacheOptions = void 0;
  */
 Xut.plat.isBrowser && $(window).on('orientationchange', function () {
 
-    //安卓设备上,对横竖切换的处理反映很慢
-    //所以这里需要延时加载获取设备新的分辨率
-    //2016.11.8
-    var delay = function delay(fn) {
-        setTimeout(fn, 500);
-    };
+  //安卓设备上,对横竖切换的处理反映很慢
+  //所以这里需要延时加载获取设备新的分辨率
+  //2016.11.8
+  var delay = function delay(fn) {
+    setTimeout(fn, 500);
+  };
 
-    //如果启动了这个模式
-    if (config.orientateMode) {
-        (function () {
-            var temp = cacheOptions;
-            Xut.Application.Refresh();
-            if (temp && temp.length) {
-                delay(function () {
-                    Xut.Application.Launch(temp.pop());
-                    temp = null;
-                });
-            } else {
-                delay(function () {
-                    loadApp();
-                });
-            }
-        })();
-    }
+  //如果启动了这个模式
+  if (config.orientateMode) {
+    (function () {
+      var temp = cacheOptions;
+      Xut.Application.Refresh();
+      if (temp && temp.length) {
+        delay(function () {
+          Xut.Application.Launch(temp.pop());
+          temp = null;
+        });
+      } else {
+        delay(function () {
+          loadApp();
+        });
+      }
+    })();
+  }
 });
 
 /**
  * 新版本加载
+    style: path.style, //style样式文件
+    resource: slashPostfix(path.resource), //资源路径
+    database: path.database, //数据库
+    launchAnim: option.launchAnim, //启动动画
+    convert: option.convert, //资源转化svg=>js
+    pageBar: option.pageBar //mini页码显示模式
  */
-Xut.Application.Launch = function (_ref) {
-    var el = _ref.el,
-        path = _ref.path,
-        launchAnim = _ref.launchAnim,
-        cursor = _ref.cursor,
-        convert = _ref.convert;
-
-    if (config.launch) {
-        return;
+Xut.Application.Launch = function (option) {
+  if (config.launch) {
+    return;
+  }
+  var setConfig = Xut.Application.setConfig;
+  if (setConfig && setConfig.lauchMode === 1) {
+    mixGolbalConfig(setConfig);
+    cacheOptions = [option]; //多次切换
+    config.launch = $.extend(true, {}, option);
+    if (option.path) {
+      _.each(option.path, function (value, key) {
+        config.launch[key] = key === 'resource' ? slashPostfix(value) : value;
+      });
+      delete config.launch.path;
     }
-    var setConfig = Xut.Application.setConfig;
-    if (setConfig && setConfig.lauchMode === 1) {
-        mixModeConfig(setConfig);
-        cacheOptions = [{
-            el: el,
-            path: path,
-            cursor: cursor
-        }];
-
-        //地址结尾是否包含了斜杠，如果包含了去掉
-        var resource = path.resource;
-        if (/\/$/.test(resource)) {
-            resource = resource.substring(0, resource.length - 1);
-        }
-
-        /**
-         * 应用启动配置
-         * @type {Object}
-         */
-        config.launch = { //外部配置文件
-            resource: resource, //资源路径
-            database: path.database, //数据库
-            launchAnim: launchAnim, //启动动画
-            convert: convert //资源转化svg=>js
-        };
-        loadApp(el, cursor);
-    }
+    loadApp(option.el, option.cursor);
+  }
 };
 
 /**
  * 老版本加载
  */
 setTimeout(function () {
-    var setConfig = Xut.Application.setConfig;
-    if (!setConfig || setConfig && !setConfig.lauchMode) {
-        mixModeConfig(setConfig);
-        loadApp();
-    }
+  var setConfig = Xut.Application.setConfig;
+  if (!setConfig || setConfig && !setConfig.lauchMode) {
+    mixGolbalConfig(setConfig);
+    loadApp();
+  }
 }, 100);
 
 })));
