@@ -3,8 +3,6 @@ import {
   initPointer
 } from './depend'
 
-
-
 export default function api(Swipe) {
 
   /**

@@ -14,6 +14,7 @@ import Dispatcher from './controller/index'
 import delegateHooks from './delegate/hooks'
 import closestProcessor from './delegate/closest'
 import GlobalEvent from '../swipe/index.js'
+import swipeHooks from '../swipe/hook.js'
 import {
   initSceneApi
 } from './scene-api/index'
@@ -73,27 +74,6 @@ const isBelong = (target) => {
 }
 
 
-/**
- * 阻止元素的默认行为
- * 在火狐下面image带有href的行为
- * 会自动触发另存为
- * @return {[type]} [description]
- *
- * 2016.3.18
- * 妙妙学 滚动插件默认行为被阻止
- *
- * 2016.7.26
- * 读库强制PC模式了
- */
-const preventDefault = (evtObj, target) => {
-  if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
-    if (config.supportQR && evtObj.target.nodeName.toLowerCase() === "img") {} else {
-      evtObj.preventDefault && evtObj.preventDefault();
-    }
-  }
-}
-
-
 export default class Mediator extends Observer {
 
   constructor(parameter) {
@@ -119,6 +99,9 @@ export default class Mediator extends Observer {
     //配置多页面参数
     configMultiple(options)
 
+    //配置外部钩子
+    options.hasHooks = true
+
     const $globalEvent = vm.$globalEvent = new GlobalEvent(options)
     const $dispatcher = vm.$dispatcher = new Dispatcher(vm)
 
@@ -135,16 +118,13 @@ export default class Mediator extends Observer {
      * return true 阻止页面滑动
      */
     $globalEvent.$watch('onFilter', (hookCallback, point, evtObj) => {
-      let target = point.target;
-      //阻止默认行为
-      preventDefault(evtObj, target);
+      swipeHooks(evtObj)
       //页面类型
-      let pageType = isBelong(target);
+      let pageType = isBelong(point.target);
       //冒泡的ul根节点
       let parentNode = $globalEvent.findBubbleRootNode(point, pageType);
       //执行过滤处理
       handlerObj = closestProcessor.call(parentNode, point, pageType);
-
       //如果找到是空节点
       //并且是虚拟模式2的话
       //默认允许滑动

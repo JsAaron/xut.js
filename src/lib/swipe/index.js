@@ -55,6 +55,7 @@ const ABS = Math.abs
 export default class Swipe extends Observer {
 
   constructor({
+    hasHooks = false,
     swipeWidth, //翻页的长度
     initIndex, //初页
     container,
@@ -167,6 +168,12 @@ export default class Swipe extends Observer {
 
     //绑定行为
     this._initEvents()
+
+    //默认行为
+    this.hasHooks = hasHooks
+    this._stopDefault = this.options.preventDefault ? function(e) {
+      e.preventDefault && e.preventDefault()
+    } : function() {}
   }
 
   /**
@@ -214,6 +221,7 @@ export default class Swipe extends Observer {
   }
 
 
+
   /**
    * 事件处理
    * @param  {[type]} e [description]
@@ -223,39 +231,25 @@ export default class Swipe extends Observer {
 
     this.options.stopPropagation && e.stopPropagation()
 
-    const stopDefault = this.options.preventDefault ? function(e) {
-      e.preventDefault && e.preventDefault()
-    } : function() {}
-
     //接受多事件的句柄
     $$handle({
       start(e) {
-
-        //禁止鼠标右键
-        if (e.button && e.button == 2) {
-          return
+        //如果没有配置外部钩子
+        if (!this.hasHooks) {
+          this._stopDefault(e)
         }
-
-        //这样是为了触发二维码
-        if (Xut.plat.hasTouch && config.supportQR && e.target.nodeName.toLowerCase() === "img") {
-          //如果是移动端的情况下 && 支持二维码 && 是图片 就不组织默认行为
-        } else {
-          //浏览器上就直接阻止
-          stopDefault(e)
-        }
-
         this._onStart(e)
       },
       move(e) {
-        stopDefault(e)
+        this._stopDefault(e)
         this._onMove(e)
       },
       end(e) {
-        stopDefault(e)
+        this._stopDefault(e)
         this._onEnd(e)
       },
       transitionend(e) {
-        stopDefault(e)
+        this._stopDefault(e)
         this._onAnimComplete(e)
       }
     }, this, e)
