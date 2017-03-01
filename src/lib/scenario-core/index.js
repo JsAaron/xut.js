@@ -65,10 +65,10 @@ const configMultiple = (options) => {
  * 因为冒泡的元素，可能是页面层，也可能是母板上的
  * @return {Boolean} [description]
  */
-const isBelong = (target) => {
+const isBelong = (node) => {
   var pageType = 'page';
-  if (target.dataset && target.dataset.belong) {
-    pageType = target.dataset.belong;
+  if (node.dataset && node.dataset.belong) {
+    pageType = node.dataset.belong;
   }
   return pageType
 }
@@ -99,10 +99,15 @@ export default class Mediator extends Observer {
     //配置多页面参数
     configMultiple(options)
 
-    //配置外部钩子
-    options.hasHooks = true
-
-    const $globalEvent = vm.$globalEvent = new GlobalEvent(options)
+    const $globalEvent = vm.$globalEvent = new GlobalEvent({
+      hasHooks: true,
+      initIndex: options.initIndex,
+      container: options.container,
+      flipMode: options.flipMode, //翻页模式
+      pageTotal: options.pageTotal, //总数
+      multiplePages: options.multiplePages, //多页面
+      sectionRang: options.sectionRang //分段值
+    })
     const $dispatcher = vm.$dispatcher = new Dispatcher(vm)
 
     //如果是主场景,才能切换系统工具栏
@@ -118,9 +123,10 @@ export default class Mediator extends Observer {
      * return true 阻止页面滑动
      */
     $globalEvent.$watch('onFilter', (hookCallback, point, evtObj) => {
-      swipeHooks(evtObj)
-      //页面类型
-      let pageType = isBelong(point.target);
+      let node = point.target
+      swipeHooks(evtObj, node)
+        //页面类型
+      let pageType = isBelong(node);
       //冒泡的ul根节点
       let parentNode = $globalEvent.findBubbleRootNode(point, pageType);
       //执行过滤处理

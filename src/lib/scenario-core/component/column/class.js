@@ -23,6 +23,7 @@ import {
 } from '../../../util/option'
 
 import Swipe from '../../../swipe/index'
+import swipeHooks from '../../../swipe/hook.js'
 
 /**
  * 2017.9.7
@@ -159,6 +160,7 @@ export default class ColumnClass {
      * @type {[type]}
      */
     const swipe = this.swipe = new Swipe({
+      hasHooks: true,
       swipeWidth: columnWidth,
       linear: true,
       initIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
@@ -173,18 +175,25 @@ export default class ColumnClass {
 
     coloumnObj.lastDistance = swipe.getInitDistance()
 
+    //判断二维码，去掉默认行为
+    let hasQrcode
+    swipe.$watch('onFilter', (hookCallback, point, evtObj) => {
+      hasQrcode = false
+      if (swipeHooks(evtObj, point.target) === 'qrcode') {
+        hasQrcode = true
+      }
+    });
+
     swipe.$watch('onTap', function(pageIndex, hookCallback, ev, duration) {
-      //如果是长按，是针对默认的事件处理
-      if (config.supportQR && duration && duration > 500) {
-        return
-      }
       //图片缩放
-      const node = ev.target
-      if (node && node.nodeName.toLowerCase() === "img") {
-        coloumnObj._zoomImage(node)
-      }
-      if (!Xut.Contents.Canvas.getIsTap()) {
-        Xut.View.Toolbar()
+      if (!hasQrcode) {
+        const node = ev.target
+        if (node && node.nodeName.toLowerCase() === "img") {
+          coloumnObj._zoomImage(node)
+        }
+        if (!Xut.Contents.Canvas.getIsTap()) {
+          Xut.View.Toolbar()
+        }
       }
     });
 

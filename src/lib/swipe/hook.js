@@ -18,15 +18,18 @@ import {
  * 2016.7.26
  * 读库强制PC模式了
  */
-export default function eventHooks(e) {
+export default function eventHooks(e, node) {
 
   //禁止鼠标右键
   if (e.button && e.button == 2) {
     return
   }
 
-  ////如果是移动端的情况下 && 支持二维码 && 是图片 就不组织默认行为
-  if (Xut.plat.hasTouch && config.supportQR && e.target.nodeName.toLowerCase() === "img") {} else {
+  //如果是移动端的情况下 && 支持二维码 && 是图片 && 是二维码标记
+  if (config.supportQR && Xut.plat.hasTouch && node.nodeName.toLowerCase() === "img" && node.getAttribute('data-type') === 'qrcode') {
+    return 'qrcode'
+  } else {
+    //并且是浏览器的情况
     if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
       e.preventDefault && e.preventDefault();
     }

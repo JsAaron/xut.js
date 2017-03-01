@@ -55,32 +55,34 @@ const ABS = Math.abs
 export default class Swipe extends Observer {
 
   constructor({
-    hasHooks = false,
     swipeWidth, //翻页的长度
     initIndex, //初页
     container,
     flipMode, //翻页模式
     pageTotal, //总数
     multiplePages, //多页面
+    sectionRang, //分段值
+
+    hasHooks = false,
     stopPropagation = false,
     preventDefault = true,
     linear = false, //线性模式
     borderBounce = true, //边界反弹
-    extraGap = 0, //间隔,flow处理
-    sectionRang //分段值
+    extraGap = 0 //间隔,flow处理
   }) {
+
 
     super()
 
     this.options = {
-
       stopPropagation,
+      preventDefault,
 
       /**
-       * 默认阻止所有行为
-       * @type {[type]}
+       * 是否存在钩子处理
+       * 这个是事件行为的处理给外部hook.js
        */
-      preventDefault,
+      hasHooks,
 
       /**
        * 是否分段处理
@@ -170,7 +172,6 @@ export default class Swipe extends Observer {
     this._initEvents()
 
     //默认行为
-    this.hasHooks = hasHooks
     this._stopDefault = this.options.preventDefault ? function(e) {
       e.preventDefault && e.preventDefault()
     } : function() {}
@@ -235,7 +236,7 @@ export default class Swipe extends Observer {
     $$handle({
       start(e) {
         //如果没有配置外部钩子
-        if (!this.hasHooks) {
+        if (!this.options.hasHooks) {
           this._stopDefault(e)
         }
         this._onStart(e)

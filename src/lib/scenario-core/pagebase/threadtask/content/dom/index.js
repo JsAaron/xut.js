@@ -234,6 +234,12 @@ export function contentStructure(callback, data, context) {
     var zIndex;
     _.each(parameter, (para) => {
 
+      //如果有二维码标记
+      //2017.3.1
+      if (para.qrCode) {
+        conData.qrCode = true
+      }
+
       //有页眉页脚对象
       //2017.1.18
       if (para.HeaderOrFooter) {
