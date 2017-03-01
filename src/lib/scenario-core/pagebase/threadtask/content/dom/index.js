@@ -426,7 +426,7 @@ export function contentStructure(callback, data, context) {
       })
 
       //如果是隐藏的页面页脚，重写这个标记
-      if (sizeResults.isHide) {
+      if (sizeResults.isHide && headerFooterMode[contentId]) {
         headerFooterMode[contentId] = 'hide'
       }
 

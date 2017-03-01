@@ -290,8 +290,11 @@ export function reviseSize({
   results.scaleHeight = layerSize.height
   results.scaleLeft = layerSize.left
   results.scaleTop = layerSize.top
-    //元素状态
-  results.isHide = layerSize.isHide
+
+  //元素状态
+  if (layerSize.isHide) {
+    results.isHide = layerSize.isHide
+  }
 
   //背景坐标
   results.scaleBackWidth = backSize.width
