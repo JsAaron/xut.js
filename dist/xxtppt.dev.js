@@ -43519,8 +43519,11 @@ function reviseSize(_ref2) {
   results.scaleHeight = layerSize.height;
   results.scaleLeft = layerSize.left;
   results.scaleTop = layerSize.top;
+
   //元素状态
-  results.isHide = layerSize.isHide;
+  if (layerSize.isHide) {
+    results.isHide = layerSize.isHide;
+  }
 
   //背景坐标
   results.scaleBackWidth = backSize.width;
@@ -48878,51 +48881,47 @@ var FLOOR$2 = Math.floor;
 
 /**
  * 蒙版动画
- * @param  {[type]} data    [description]
- * @param  {[type]} wrapObj [description]
- * @return {[type]}         [description]
  */
 var maskContent = function maskContent(data, wrapObj) {
 
-    var restr = "";
+  //如果有蒙版图
+  var isMaskImg = data.mask ? maskBoxImage$1 + ":url(" + Xut.config.pathAddress + data.mask + ");" : "";
+  var pathImg = wrapObj.pathImg;
+  var restr = "";
 
-    //如果有蒙版图
-    var isMaskImg = data.mask ? maskBoxImage$1 + ":url(" + Xut.config.pathAddress + data.mask + ");" : "";
-    var pathImg = wrapObj.pathImg;
-
-    //蒙板图
-    if (data.mask || wrapObj['isGif']) {
-        //蒙版图
-        if (maskBoxImage$1 != undefined) {
-            restr += String.styleFormat("<img data-type=\"mask-images\"\n                      class=\"inherit-size fullscreen-background edges\"\n                      src=\"" + pathImg + "\"\n                      style=\"" + isMaskImg + "\"/>");
-        } else {
-            //canvas
-            restr += String.styleFormat("<canvas class=\"inherit-size fullscreen-background edges\"\n                         src=\"" + pathImg + "\"\n                         mask=\"" + isMaskImg + "\"\n                         width=\"" + data.scaleWidth + "\"\n                         height=\"" + data.scaleHeight + "\"\n                         style=\"opacity:0;" + (Xut.config.pathAddress.replace(/\//g, "\/") + data.mask) + "\"/>");
-        }
-
-        //精灵图
-    } else if (data.category == 'Sprite') {
-
-        var matrixX = 100 * data.thecount;
-        var matrixY = 100;
-
-        //如果有参数
-        //精灵图是矩阵图
-        if (data.parameter) {
-            var parameter = parseJSON(data.parameter);
-            if (parameter && parameter.matrix) {
-                var matrix = parameter.matrix.split("-");
-                matrixX = 100 * Number(matrix[0]);
-                matrixY = 100 * Number(matrix[1]);
-            }
-        }
-        restr += String.styleFormat("<div data-type=\"sprite-images\"\n                  class=\"sprite\"\n                  style=\"height:" + data.scaleHeight + "px;\n                         background-image:url(" + wrapObj['pathImg'] + ");\n                         background-size:" + matrixX + "% " + matrixY + "%;\">\n            </div>");
+  //蒙板图
+  if (data.mask || wrapObj['isGif']) {
+    //蒙版图
+    if (maskBoxImage$1 != undefined) {
+      restr += String.styleFormat("<img data-type=\"" + (data.qrCode ? 'qrcode' : 'mask') + "\"\n              class=\"inherit-size fullscreen-background edges\"\n              src=\"" + pathImg + "\"\n              style=\"" + isMaskImg + "\"/>");
     } else {
-        //普通图片
-        restr += String.styleFormat("<img data-type=\"ordinary-images\"\n                  class=\"inherit-size fullscreen-background fix-miaomiaoxue-img\"\n                  src=\"" + pathImg + "\"\n                  style=\"" + isMaskImg + "\"/>");
+      //canvas
+      restr += String.styleFormat("<canvas class=\"inherit-size fullscreen-background edges\"\n                 src=\"" + pathImg + "\"\n                 mask=\"" + isMaskImg + "\"\n                 width=\"" + data.scaleWidth + "\"\n                 height=\"" + data.scaleHeight + "\"\n                 style=\"opacity:0;" + (Xut.config.pathAddress.replace(/\//g, "\/") + data.mask) + "\"/>");
     }
 
-    return restr;
+    //精灵图
+  } else if (data.category == 'Sprite') {
+
+    var matrixX = 100 * data.thecount;
+    var matrixY = 100;
+
+    //如果有参数
+    //精灵图是矩阵图
+    if (data.parameter) {
+      var parameter = parseJSON(data.parameter);
+      if (parameter && parameter.matrix) {
+        var matrix = parameter.matrix.split("-");
+        matrixX = 100 * Number(matrix[0]);
+        matrixY = 100 * Number(matrix[1]);
+      }
+    }
+    restr += String.styleFormat("<div data-type=\"sprite-images\"\n            class=\"sprite\"\n            style=\"height:" + data.scaleHeight + "px;\n                   background-image:url(" + wrapObj['pathImg'] + ");\n                   background-size:" + matrixX + "% " + matrixY + "%;\">\n      </div>");
+  } else {
+    //普通图片
+    restr += String.styleFormat("<img data-type=\"" + (data.qrCode ? 'qrcode' : 'ordinary') + "\"\n            class=\"inherit-size fullscreen-background fix-miaomiaoxue-img\"\n            src=\"" + pathImg + "\"\n            style=\"" + isMaskImg + "\"/>");
+  }
+
+  return restr;
 };
 
 /**
@@ -48931,7 +48930,7 @@ var maskContent = function maskContent(data, wrapObj) {
  * @return {[type]}      [description]
  */
 var textContent = function textContent(data) {
-    return String.styleFormat("<div id = \"" + data['_id'] + "\" style=\"background-size:100% 100%;height:auto\">\n              " + data.content + "\n         </div>");
+  return String.styleFormat("<div id=\"" + data['_id'] + "\"\n          style=\"background-size:100% 100%;height:auto\">\n          " + data.content + "\n    </div>");
 };
 
 /**
@@ -48942,7 +48941,7 @@ var textContent = function textContent(data) {
  * @return {[type]}         [description]
  */
 var jsContent = function jsContent(data, wrapObj) {
-    return replacePath(wrapObj.htmlstr);
+  return replacePath(wrapObj.htmlstr);
 };
 
 /**
@@ -48952,45 +48951,45 @@ var jsContent = function jsContent(data, wrapObj) {
  * @return {[type]}         [description]
  */
 var svgContent = function svgContent(data, wrapObj) {
-    var restr = "";
-    var svgstr = wrapObj.svgstr;
-    var scaleWidth = data.scaleWidth;
+  var restr = "";
+  var svgstr = wrapObj.svgstr;
+  var scaleWidth = data.scaleWidth;
 
-    //从SVG文件中，读取Viewport的值
-    if (svgstr != undefined) {
+  //从SVG文件中，读取Viewport的值
+  if (svgstr != undefined) {
 
-        //替换svg内部读取文件地址
-        svgstr = replacePath(svgstr);
+    //替换svg内部读取文件地址
+    svgstr = replacePath(svgstr);
 
-        var startPos = svgstr.search('viewBox="');
-        var searchTmp = svgstr.substring(startPos, startPos + 64).replace('viewBox="', '').replace('0 0 ', '');
-        var endPos = searchTmp.search('"');
-        var temp = searchTmp.substring(0, endPos);
-        var sptArray = temp.split(" ");
-        var svgwidth = sptArray[0];
-        var svgheight = sptArray[1];
+    var startPos = svgstr.search('viewBox="');
+    var searchTmp = svgstr.substring(startPos, startPos + 64).replace('viewBox="', '').replace('0 0 ', '');
+    var endPos = searchTmp.search('"');
+    var temp = searchTmp.substring(0, endPos);
+    var sptArray = temp.split(" ");
+    var svgwidth = sptArray[0];
+    var svgheight = sptArray[1];
 
-        //svg内容宽度:svg内容高度 = viewBox宽:viewBox高
-        //svg内容高度 = svg内容宽度 * viewBox高 / viewBox宽
-        var svgRealHeight = FLOOR$2(scaleWidth * svgheight / svgwidth);
-        //如果svg内容高度大于布局高度则添加滚动条
-        if (svgRealHeight > data.scaleHeight + 1) {
-            var svgRealWidth = FLOOR$2(scaleWidth);
-            //if there do need scrollbar, then restore text to its original prop
-            //布局位置
-            var marginleft = wrapObj.backMode ? data.scaleLeft - data.scaleBackLeft : 0;
-            var margintop = wrapObj.backMode ? data.scaleTop - data.scaleBackTop : 0;
+    //svg内容宽度:svg内容高度 = viewBox宽:viewBox高
+    //svg内容高度 = svg内容宽度 * viewBox高 / viewBox宽
+    var svgRealHeight = FLOOR$2(scaleWidth * svgheight / svgwidth);
+    //如果svg内容高度大于布局高度则添加滚动条
+    if (svgRealHeight > data.scaleHeight + 1) {
+      var svgRealWidth = FLOOR$2(scaleWidth);
+      //if there do need scrollbar, then restore text to its original prop
+      //布局位置
+      var marginleft = wrapObj.backMode ? data.scaleLeft - data.scaleBackLeft : 0;
+      var margintop = wrapObj.backMode ? data.scaleTop - data.scaleBackTop : 0;
 
-            if (data.isScroll) {
-                restr = String.styleFormat("<div data-type=\"svg\"\n                          style=\"width:" + svgRealWidth + "px;\n                                 height:" + svgRealHeight + "px;\n                                 margin-left:" + marginleft + "px;\n                                 margin-top:" + margintop + "px;\">\n                        " + svgstr + "\n                     </div>");
-            } else {
-                restr = String.styleFormat("<div data-type=\"svg\"\n                          class=\"inherit-size\"\n                          style=\"margin-left:" + marginleft + "px;\n                                 margin-top:" + margintop + "px;\">\n                        " + svgstr + "\n                    </div>");
-            }
-        } else {
-            restr += svgstr;
-        }
+      if (data.isScroll) {
+        restr = String.styleFormat("<div data-type=\"svg\"\n                style=\"width:" + svgRealWidth + "px;\n                       height:" + svgRealHeight + "px;\n                       margin-left:" + marginleft + "px;\n                       margin-top:" + margintop + "px;\">\n                " + svgstr + "\n          </div>");
+      } else {
+        restr = String.styleFormat("<div data-type=\"svg\"\n                class=\"inherit-size\"\n                style=\"margin-left:" + marginleft + "px;\n                       margin-top:" + margintop + "px;\">\n              " + svgstr + "\n          </div>");
+      }
+    } else {
+      restr += svgstr;
     }
-    return restr;
+  }
+  return restr;
 };
 
 /**
@@ -49000,28 +48999,28 @@ var svgContent = function svgContent(data, wrapObj) {
  * @return {[type]}         [description]
  */
 var fillContent = function fillContent(data, wrapObj) {
-    var restr = '';
-    //如果内容是图片
-    //如果是svg或者html
-    if (wrapObj.imgContent) {
-        //如果是SVG
-        if (wrapObj.isSvg) {
-            restr += svgContent(data, wrapObj);
-        }
-        //如果是.js结构的html文件
-        else if (wrapObj.isJs) {
-                restr += jsContent(data, wrapObj);
-            }
-            //如果是蒙板，或者是gif类型的动画，给高度
-            else {
-                    restr += maskContent(data, wrapObj);
-                }
+  var restr = '';
+  //如果内容是图片
+  //如果是svg或者html
+  if (wrapObj.imgContent) {
+    //如果是SVG
+    if (wrapObj.isSvg) {
+      restr += svgContent(data, wrapObj);
     }
-    //纯文本文字
-    else {
-            restr += textContent(data, wrapObj);
+    //如果是.js结构的html文件
+    else if (wrapObj.isJs) {
+        restr += jsContent(data, wrapObj);
+      }
+      //如果是蒙板，或者是gif类型的动画，给高度
+      else {
+          restr += maskContent(data, wrapObj);
         }
-    return restr;
+  }
+  //纯文本文字
+  else {
+      restr += textContent(data, wrapObj);
+    }
+  return restr;
 };
 
 /**
@@ -49031,60 +49030,60 @@ var fillContent = function fillContent(data, wrapObj) {
  * @return {[type]}         [description]
  */
 var createContainer$2 = function createContainer$2(data, wrapObj) {
-    var wapper = void 0;
-    var backwidth = void 0,
-        backheight = void 0,
-        backleft = void 0,
-        backtop = void 0;
-    var zIndex = data.zIndex;
-    var id = data._id;
+  var wapper = void 0;
+  var backwidth = void 0,
+      backheight = void 0,
+      backleft = void 0,
+      backtop = void 0;
+  var zIndex = data.zIndex;
+  var id = data._id;
 
-    //Content_23_37
-    //Content_23_38
-    //Content_23_39
-    var containerName = wrapObj.containerName;
-    var pid = wrapObj.pid;
-    var makeId = wrapObj.makeId;
-    var background = data.background ? 'background-image: url(' + Xut.config.pathAddress + data.background + ');' : '';
+  //Content_23_37
+  //Content_23_38
+  //Content_23_39
+  var containerName = wrapObj.containerName;
+  var pid = wrapObj.pid;
+  var makeId = wrapObj.makeId;
+  var background = data.background ? 'background-image: url(' + Xut.config.pathAddress + data.background + ');' : '';
 
-    //背景尺寸优先
-    if (data.scaleBackWidth && data.scaleBackHeight) {
-        backwidth = data.scaleBackWidth;
-        backheight = data.scaleBackHeight;
-        backleft = data.scaleBackLeft;
-        backtop = data.scaleBackTop;
-        wrapObj.backMode = true; //背景图模式
-    } else {
-        backwidth = data.scaleWidth;
-        backheight = data.scaleHeight;
-        backleft = data.scaleLeft;
-        backtop = data.scaleTop;
-    }
+  //背景尺寸优先
+  if (data.scaleBackWidth && data.scaleBackHeight) {
+    backwidth = data.scaleBackWidth;
+    backheight = data.scaleBackHeight;
+    backleft = data.scaleBackLeft;
+    backtop = data.scaleBackTop;
+    wrapObj.backMode = true; //背景图模式
+  } else {
+    backwidth = data.scaleWidth;
+    backheight = data.scaleHeight;
+    backleft = data.scaleLeft;
+    backtop = data.scaleTop;
+  }
 
-    //content默认是显示的数据的
-    //content.visible = 0
-    //如果为1 就隐藏改成hidden
-    //05.1.14
-    var visibility = 'visible';
-    if (data.visible) {
-        visibility = 'hidden';
-    }
+  //content默认是显示的数据的
+  //content.visible = 0
+  //如果为1 就隐藏改成hidden
+  //05.1.14
+  var visibility = 'visible';
+  if (data.visible) {
+    visibility = 'hidden';
+  }
 
-    // var isHtml = "";
-    //2015.12.29
-    //如果是html内容
-    if (wrapObj.isJs) {
-        wapper = "<div id=\"" + containerName + "\"\n                       data-behavior=\"click-swipe\"\n                       class=\"fullscreen-background \"\n                       style=\"width:" + backwidth + "px;\n                              height:" + backheight + "px;\n                              top:" + backtop + "px;\n                              left:" + backleft + "px;\n                              position:absolute;\n                              z-index:" + zIndex + ";\n                              visibility:" + visibility + ";\n                              {10}\">\n                 <div data-type=\"scroller\"\n                      style=\"width:" + backwidth + "px;\n                             position:absolute;\">";
-        return String.styleFormat(wapper);
-    }
-
-    //scroller:=> absolute 因为别的元素有依赖
-
-    //正常content类型
-    //如果是scroller需要绝对的尺寸，所以替换100% 不可以
-    wapper = "<div id=\"" + containerName + "\"\n                   data-behavior=\"click-swipe\"\n                   style=\"width:" + backwidth + "px;\n                          height:" + backheight + "px;\n                          top:" + backtop + "px;\n                          left:" + backleft + "px;\n                          position:absolute;\n                          z-index:" + zIndex + ";\n                          visibility:" + visibility + "\">\n              <div data-type=\"scroller\"\n                   class=\"fullscreen-background \"\n                   style=\"width:" + backwidth + "px;\n                          height:" + backheight + "px;\n                          position:absolute;\n                          " + background + "\">";
-
+  // var isHtml = "";
+  //2015.12.29
+  //如果是html内容
+  if (wrapObj.isJs) {
+    wapper = "<div id=\"" + containerName + "\"\n                       data-behavior=\"click-swipe\"\n                       class=\"fullscreen-background \"\n                       style=\"width:" + backwidth + "px;\n                              height:" + backheight + "px;\n                              top:" + backtop + "px;\n                              left:" + backleft + "px;\n                              position:absolute;\n                              z-index:" + zIndex + ";\n                              visibility:" + visibility + ";\n                              {10}\">\n                 <div data-type=\"scroller\"\n                      style=\"width:" + backwidth + "px;\n                             position:absolute;\">";
     return String.styleFormat(wapper);
+  }
+
+  //scroller:=> absolute 因为别的元素有依赖
+
+  //正常content类型
+  //如果是scroller需要绝对的尺寸，所以替换100% 不可以
+  wapper = "<div id=\"" + containerName + "\"\n                   data-behavior=\"click-swipe\"\n                   style=\"width:" + backwidth + "px;\n                          height:" + backheight + "px;\n                          top:" + backtop + "px;\n                          left:" + backleft + "px;\n                          position:absolute;\n                          z-index:" + zIndex + ";\n                          visibility:" + visibility + "\">\n              <div data-type=\"scroller\"\n                   class=\"fullscreen-background \"\n                   style=\"width:" + backwidth + "px;\n                          height:" + backheight + "px;\n                          position:absolute;\n                          " + background + "\">";
+
+  return String.styleFormat(wapper);
 };
 
 /**
@@ -49093,16 +49092,16 @@ var createContainer$2 = function createContainer$2(data, wrapObj) {
  * @return {[type]}          [description]
  */
 function createDom$1(data, wrapObj) {
-    var restr = '';
+  var restr = '';
 
-    //创建包装容器content节点
-    restr += createContainer$2(data, wrapObj);
+  //创建包装容器content节点
+  restr += createContainer$2(data, wrapObj);
 
-    //创建内容
-    restr += fillContent(data, wrapObj);
-    restr += "</div></div>";
+  //创建内容
+  restr += fillContent(data, wrapObj);
+  restr += "</div></div>";
 
-    return restr;
+  return restr;
 }
 
 /**
@@ -49343,6 +49342,12 @@ function contentStructure(callback, data, context) {
     var zIndex;
     _.each(parameter, function (para) {
 
+      //如果有二维码标记
+      //2017.3.1
+      if (para.qrCode) {
+        conData.qrCode = true;
+      }
+
       //有页眉页脚对象
       //2017.1.18
       if (para.HeaderOrFooter) {
@@ -49530,7 +49535,7 @@ function contentStructure(callback, data, context) {
       });
 
       //如果是隐藏的页面页脚，重写这个标记
-      if (sizeResults.isHide) {
+      if (sizeResults.isHide && headerFooterMode[contentId]) {
         headerFooterMode[contentId] = 'hide';
       }
 
@@ -51380,62 +51385,62 @@ var TRANSFORM = Xut.style.transform;
  */
 function crateFloat(callback, floatName, dasFloat, data, base) {
 
-    var $containsNodes = [];
-    var prefix = 'Content_' + data.pid + "_";
+  var $containsNodes = [];
+  var prefix = 'Content_' + data.pid + "_";
 
-    //去重复
-    dasFloat.ids = arrayUnique(dasFloat.ids);
+  //去重复
+  dasFloat.ids = arrayUnique(dasFloat.ids);
 
-    var makePrefix,
-        fragment,
-        zIndex,
-        zIndexs = dasFloat.zIndex;
+  var makePrefix,
+      fragment,
+      zIndex,
+      zIndexs = dasFloat.zIndex;
 
-    data.count++;
+  data.count++;
 
-    //分离出浮动节点
-    _.each(dasFloat.ids, function (id) {
-        makePrefix = prefix + id;
-        if (fragment = data.contentsFragment[makePrefix]) {
-            zIndex = zIndexs[id];
-            //保证层级关系
-            // fragment.style.zIndex = (Number(zIndex) + Number(fragment.style.zIndex))
-            $containsNodes.push(fragment);
-            delete data.contentsFragment[makePrefix];
-        }
-    });
-
-    //floatPages模式下面
-    //如果是当前页面
-    //因为会产生三页面并联
-    //所以中间去最高层级
-    if (floatName === 'floatPages' && data.getStyle.offset === 0) {
-        zIndex = 2001;
-    } else {
-        zIndex = 2000;
+  //分离出浮动节点
+  _.each(dasFloat.ids, function (id) {
+    makePrefix = prefix + id;
+    if (fragment = data.contentsFragment[makePrefix]) {
+      zIndex = zIndexs[id];
+      //保证层级关系
+      // fragment.style.zIndex = (Number(zIndex) + Number(fragment.style.zIndex))
+      $containsNodes.push(fragment);
+      delete data.contentsFragment[makePrefix];
     }
+  });
 
-    //浮动根节点
-    //floatPages设置的content溢出后处理
-    //在非视区增加overflow:hidden
-    //可视区域overflow:''
-    var overflow = 'overflow:hidden;';
+  //floatPages模式下面
+  //如果是当前页面
+  //因为会产生三页面并联
+  //所以中间去最高层级
+  if (floatName === 'floatPages' && data.getStyle.offset === 0) {
+    zIndex = 2001;
+  } else {
+    zIndex = 2000;
+  }
 
-    //如果是母板,排除
-    if (floatName === 'floatMaters') {
-        overflow = '';
-    }
+  //浮动根节点
+  //floatPages设置的content溢出后处理
+  //在非视区增加overflow:hidden
+  //可视区域overflow:''
+  var overflow = 'overflow:hidden;';
 
-    var getStyle = base.getStyle;
+  //如果是母板,排除
+  if (floatName === 'floatMaters') {
+    overflow = '';
+  }
 
-    var flowHtml = '<div id="' + floatName + '-li-' + data.pid + '"\n                     class="xut-float"\n                     style="left:' + getStyle.visualLeft + 'px;\n                            top:' + getStyle.visualTop + 'px;\n                            ' + TRANSFORM + ':' + data.getStyle.translate + ';z-index:' + zIndex + ';' + overflow + '"></div>';
+  var getStyle = base.getStyle;
 
-    var container = $(String.styleFormat(flowHtml));
+  var flowHtml = '<div id="' + floatName + '-li-' + data.pid + '"\n                     class="xut-float"\n                     style="left:' + getStyle.visualLeft + 'px;\n                            top:' + getStyle.visualTop + 'px;\n                            ' + TRANSFORM + ':' + data.getStyle.translate + ';z-index:' + zIndex + ';' + overflow + '">\n                  </div>';
 
-    //增加浮动容器
-    $(data.rootNode).after(container);
+  var container = $(String.styleFormat(flowHtml));
 
-    callback($containsNodes, container);
+  //增加浮动容器
+  $(data.rootNode).after(container);
+
+  callback($containsNodes, container);
 }
 
 /**
@@ -51443,39 +51448,39 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
  * @return {[type]} [description]
  */
 function createFloatMater(base, data, complete) {
-    //创建浮动对象
-    crateFloat(function ($containsNodes, container) {
-        //浮动容器
-        data.floatMaters.container = container;
+  //创建浮动对象
+  crateFloat(function ($containsNodes, container) {
+    //浮动容器
+    data.floatMaters.container = container;
 
-        nextTick({
-            'container': container,
-            'content': $containsNodes
-        }, function () {
-            //收集浮动母版对象标识
-            base.pageBaseHooks.floatMaters(data.floatMaters);
-            complete(data);
-        });
-    }, 'floatMaters', data.floatMaters, data, base);
+    nextTick({
+      'container': container,
+      'content': $containsNodes
+    }, function () {
+      //收集浮动母版对象标识
+      base.pageBaseHooks.floatMaters(data.floatMaters);
+      complete(data);
+    });
+  }, 'floatMaters', data.floatMaters, data, base);
 }
 
 /**
  * 创建浮动的页面对象
  */
 function createFloatPage(base, data, complete) {
-    //创建浮动对象
-    crateFloat(function ($containsNodes, container) {
-        //浮动容器
-        data.floatPages.container = container;
-        nextTick({
-            'container': container,
-            'content': $containsNodes
-        }, function () {
-            //收集浮动母版对象标识
-            base.pageBaseHooks.floatPages(data.floatPages);
-            complete(data);
-        });
-    }, 'floatPages', data.floatPages, data, base);
+  //创建浮动对象
+  crateFloat(function ($containsNodes, container) {
+    //浮动容器
+    data.floatPages.container = container;
+    nextTick({
+      'container': container,
+      'content': $containsNodes
+    }, function () {
+      //收集浮动母版对象标识
+      base.pageBaseHooks.floatPages(data.floatPages);
+      complete(data);
+    });
+  }, 'floatPages', data.floatPages, data, base);
 }
 
 /**
@@ -65506,6 +65511,9 @@ var Swipe = function (_Observer) {
         flipMode = _ref.flipMode,
         pageTotal = _ref.pageTotal,
         multiplePages = _ref.multiplePages,
+        sectionRang = _ref.sectionRang,
+        _ref$hasHooks = _ref.hasHooks,
+        hasHooks = _ref$hasHooks === undefined ? false : _ref$hasHooks,
         _ref$stopPropagation = _ref.stopPropagation,
         stopPropagation = _ref$stopPropagation === undefined ? false : _ref$stopPropagation,
         _ref$preventDefault = _ref.preventDefault,
@@ -65515,21 +65523,20 @@ var Swipe = function (_Observer) {
         _ref$borderBounce = _ref.borderBounce,
         borderBounce = _ref$borderBounce === undefined ? true : _ref$borderBounce,
         _ref$extraGap = _ref.extraGap,
-        extraGap = _ref$extraGap === undefined ? 0 : _ref$extraGap,
-        sectionRang = _ref.sectionRang;
+        extraGap = _ref$extraGap === undefined ? 0 : _ref$extraGap;
     classCallCheck(this, Swipe);
 
     var _this = possibleConstructorReturn(this, (Swipe.__proto__ || Object.getPrototypeOf(Swipe)).call(this));
 
     _this.options = {
-
       stopPropagation: stopPropagation,
+      preventDefault: preventDefault,
 
       /**
-       * 默认阻止所有行为
-       * @type {[type]}
+       * 是否存在钩子处理
+       * 这个是事件行为的处理给外部hook.js
        */
-      preventDefault: preventDefault,
+      hasHooks: hasHooks,
 
       /**
        * 是否分段处理
@@ -65617,6 +65624,11 @@ var Swipe = function (_Observer) {
 
     //绑定行为
     _this._initEvents();
+
+    //默认行为
+    _this._stopDefault = _this.options.preventDefault ? function (e) {
+      e.preventDefault && e.preventDefault();
+    } : function () {};
     return _this;
   }
 
@@ -65686,39 +65698,25 @@ var Swipe = function (_Observer) {
 
       this.options.stopPropagation && e.stopPropagation();
 
-      var stopDefault = this.options.preventDefault ? function (e) {
-        e.preventDefault && e.preventDefault();
-      } : function () {};
-
       //接受多事件的句柄
       $$handle({
         start: function start(e) {
-
-          //禁止鼠标右键
-          if (e.button && e.button == 2) {
-            return;
+          //如果没有配置外部钩子
+          if (!this.options.hasHooks) {
+            this._stopDefault(e);
           }
-
-          //这样是为了触发二维码
-          if (Xut.plat.hasTouch && config.supportQR && e.target.nodeName.toLowerCase() === "img") {
-            //如果是移动端的情况下 && 支持二维码 && 是图片 就不组织默认行为
-          } else {
-            //浏览器上就直接阻止
-            stopDefault(e);
-          }
-
           this._onStart(e);
         },
         move: function move(e) {
-          stopDefault(e);
+          this._stopDefault(e);
           this._onMove(e);
         },
         end: function end(e) {
-          stopDefault(e);
+          this._stopDefault(e);
           this._onEnd(e);
         },
         transitionend: function transitionend(e) {
-          stopDefault(e);
+          this._stopDefault(e);
           this._onAnimComplete(e);
         }
       }, this, e);
@@ -66347,6 +66345,40 @@ var Swipe = function (_Observer) {
 
 api(Swipe);
 
+////////////////////////
+/// 全局钩子
+////////////////////////
+
+/**
+ * 阻止元素的默认行为
+ * 在火狐下面image带有href的行为
+ * 会自动触发另存为
+ * @return {[type]} [description]
+ *
+ * 2016.3.18
+ * 妙妙学 滚动插件默认行为被阻止
+ *
+ * 2016.7.26
+ * 读库强制PC模式了
+ */
+function eventHooks(e, node) {
+
+  //禁止鼠标右键
+  if (e.button && e.button == 2) {
+    return;
+  }
+
+  //如果是移动端的情况下 && 支持二维码 && 是图片 && 是二维码标记
+  if (config.supportQR && Xut.plat.hasTouch && node.nodeName.toLowerCase() === "img" && node.getAttribute('data-type') === 'qrcode') {
+    return 'qrcode';
+  } else {
+    //并且是浏览器的情况
+    if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
+      e.preventDefault && e.preventDefault();
+    }
+  }
+}
+
 /**
  * 2017.9.7
  * 流式排版
@@ -66502,6 +66534,7 @@ var ColumnClass = function () {
        * @type {[type]}
        */
       var swipe = this.swipe = new Swipe({
+        hasHooks: true,
         swipeWidth: columnWidth,
         linear: true,
         initIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
@@ -66516,18 +66549,25 @@ var ColumnClass = function () {
 
       coloumnObj.lastDistance = swipe.getInitDistance();
 
+      //判断二维码，去掉默认行为
+      var hasQrcode = void 0;
+      swipe.$watch('onFilter', function (hookCallback, point, evtObj) {
+        hasQrcode = false;
+        if (eventHooks(evtObj, point.target) === 'qrcode') {
+          hasQrcode = true;
+        }
+      });
+
       swipe.$watch('onTap', function (pageIndex, hookCallback, ev, duration) {
-        //如果是长按，是针对默认的事件处理
-        if (config.supportQR && duration && duration > 500) {
-          return;
-        }
         //图片缩放
-        var node = ev.target;
-        if (node && node.nodeName.toLowerCase() === "img") {
-          coloumnObj._zoomImage(node);
-        }
-        if (!Xut.Contents.Canvas.getIsTap()) {
-          Xut.View.Toolbar();
+        if (!hasQrcode) {
+          var node = ev.target;
+          if (node && node.nodeName.toLowerCase() === "img") {
+            coloumnObj._zoomImage(node);
+          }
+          if (!Xut.Contents.Canvas.getIsTap()) {
+            Xut.View.Toolbar();
+          }
         }
       });
 
@@ -72566,32 +72606,12 @@ var configMultiple = function configMultiple(options) {
  * 因为冒泡的元素，可能是页面层，也可能是母板上的
  * @return {Boolean} [description]
  */
-var isBelong = function isBelong(target) {
+var isBelong = function isBelong(node) {
   var pageType = 'page';
-  if (target.dataset && target.dataset.belong) {
-    pageType = target.dataset.belong;
+  if (node.dataset && node.dataset.belong) {
+    pageType = node.dataset.belong;
   }
   return pageType;
-};
-
-/**
- * 阻止元素的默认行为
- * 在火狐下面image带有href的行为
- * 会自动触发另存为
- * @return {[type]} [description]
- *
- * 2016.3.18
- * 妙妙学 滚动插件默认行为被阻止
- *
- * 2016.7.26
- * 读库强制PC模式了
- */
-var preventDefault = function preventDefault(evtObj, target) {
-  if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG) {
-    if (config.supportQR && evtObj.target.nodeName.toLowerCase() === "img") {} else {
-      evtObj.preventDefault && evtObj.preventDefault();
-    }
-  }
 };
 
 var Mediator = function (_Observer) {
@@ -72621,7 +72641,15 @@ var Mediator = function (_Observer) {
     //配置多页面参数
     configMultiple(options);
 
-    var $globalEvent = vm.$globalEvent = new Swipe(options);
+    var $globalEvent = vm.$globalEvent = new Swipe({
+      hasHooks: true,
+      initIndex: options.initIndex,
+      container: options.container,
+      flipMode: options.flipMode, //翻页模式
+      pageTotal: options.pageTotal, //总数
+      multiplePages: options.multiplePages, //多页面
+      sectionRang: options.sectionRang //分段值
+    });
     var $dispatcher = vm.$dispatcher = new Controller(vm);
 
     //如果是主场景,才能切换系统工具栏
@@ -72637,16 +72665,14 @@ var Mediator = function (_Observer) {
      * return true 阻止页面滑动
      */
     $globalEvent.$watch('onFilter', function (hookCallback, point, evtObj) {
-      var target = point.target;
-      //阻止默认行为
-      preventDefault(evtObj, target);
+      var node = point.target;
+      eventHooks(evtObj, node);
       //页面类型
-      var pageType = isBelong(target);
+      var pageType = isBelong(node);
       //冒泡的ul根节点
       var parentNode = $globalEvent.findBubbleRootNode(point, pageType);
       //执行过滤处理
       handlerObj = closestProcessor.call(parentNode, point, pageType);
-
       //如果找到是空节点
       //并且是虚拟模式2的话
       //默认允许滑动
@@ -75353,7 +75379,7 @@ function init$1() {
 //全局API初始化
 initGlobalAPI();
 
-Xut.Version = 879.4;
+Xut.Version = 879.5;
 
 if (Xut.plat.isBrowser) {
 

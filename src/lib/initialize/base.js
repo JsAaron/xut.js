@@ -1,5 +1,5 @@
 import { createCursor } from './depend/cursor'
-import { contentFilter } from '../scenario-core/component/activity/content/filter'
+import { contentFilter } from '../component/activity/content/filter'
 import { importJsonDatabase } from '../database/result'
 
 import { $$warn, loadStyle } from '../util/index'
@@ -11,7 +11,7 @@ import {
 } from '../config/index'
 
 import initTooBar from './toolbar'
-import { initColumn } from '../scenario-core/component/column/core-init'
+import { initColumn } from '../component/column/core-init'
 
 /**
  * 新增模式,用于记录浏览器退出记录

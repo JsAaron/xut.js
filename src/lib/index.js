@@ -6,13 +6,13 @@ import {
 } from './global-api/index'
 import {
   AudioManager
-} from './scenario-core/component/audio/manager'
+} from './component/audio/manager'
 import {
   VideoManager
-} from './scenario-core/component/video/manager'
+} from './component/video/manager'
 import {
   fixAudio
-} from './scenario-core/component/audio/fix'
+} from './component/audio/fix'
 import {
   nextTick
 } from './util/nexttick'

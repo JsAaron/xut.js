@@ -16,7 +16,7 @@ import {
     getFinalImgConfig
 } from './util'
 
-import { sceneController } from '../../../scenario/controller'
+import { sceneController } from '../../../scenario/scene-control'
 
 /**
  * 图片缩放功能

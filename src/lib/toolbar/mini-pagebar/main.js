@@ -8,7 +8,7 @@ import {
   hasColumn,
   getBeforeCount,
   getCurrentBeforeCount
-} from '../../scenario-core/component/column/depend'
+} from '../../component/column/depend'
 
 //样式类型
 const dotStyleClass = [
