@@ -3,32 +3,32 @@
  * @return {[type]} [description]
  */
 export function getSize() {
-    //如果是IBooks模式处理
-    if (Xut.IBooks.Enabled) {
-        let screen = Xut.IBooks.CONFIG.screenSize;
-        if (screen) {
-            return {
-                "width": screen.width,
-                "height": screen.height
-            }
-        }
+  //如果是IBooks模式处理
+  if (Xut.IBooks.Enabled) {
+    let screen = Xut.IBooks.CONFIG.screenSize;
+    if (screen) {
+      return {
+        "width": screen.width,
+        "height": screen.height
+      }
     }
+  }
 
-    let clientWidth = document.documentElement.clientWidth || $(window).width()
-    let clientHeight = document.documentElement.clientHeight || $(window).height()
+  let clientWidth = document.documentElement.clientWidth || $(window).width()
+  let clientHeight = document.documentElement.clientHeight || $(window).height()
 
 
-    //配置可视区窗口
-    //用户在外部指定了可视区域
-    if (Xut.config.visualHeight) {
-        Xut.config.visualTop = clientHeight - Xut.config.visualHeight
-        clientHeight = Xut.config.visualHeight
-    }
+  //配置可视区窗口
+  //用户在外部指定了可视区域
+  if (Xut.config.visualHeight) {
+    Xut.config.visualTop = clientHeight - Xut.config.visualHeight
+    clientHeight = Xut.config.visualHeight
+  }
 
-    return {
-        "width": clientWidth,
-        "height": clientHeight
-    }
+  return {
+    "width": clientWidth,
+    "height": clientHeight
+  }
 }
 
 
@@ -37,5 +37,5 @@ export function getSize() {
  * @return {[type]} [description]
  */
 export function getLayerMode(screenSize) {
-    return screenSize.width > screenSize.height ? "horizontal" : "vertical"
+  return screenSize.width > screenSize.height ? "horizontal" : "vertical"
 }

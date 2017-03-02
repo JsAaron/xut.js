@@ -11,12 +11,14 @@
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
     <style type="text/css">
+    * {
+        touch-action: none;
+    }
     button {
         border: 1px solid red;
         position: absolute;
         z-index: 99999
     }
-
     #closeMini {
         left: 100px;
     }
@@ -25,7 +27,6 @@
 </head>
 
 <body>
-    <p id="test123" style="word-break:break-all;position: absolute;top:30px;left:0;z-index:99999999;color:red;font-weight:bold;"></p>
     <button id="launchMini">加载新的图书</button>
     <button id="closeMini">关闭图书</button>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
@@ -62,8 +63,8 @@ Xut.Application.setConfig = {
 };
 
 
-function openurl(){
-  window.location.href='http://www.kidreadcool.com/downloads.php?esp=mios'
+function openurl() {
+    window.location.href = 'http://www.kidreadcool.com/downloads.php?esp=mios'
 }
 
 var appId = 101
