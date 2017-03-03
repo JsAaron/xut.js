@@ -29,11 +29,30 @@ export default function pretreatment(data, eventName) {
       //如果有脚本，可能是针对迷你杂志跳转的数据
       //需要通过onclick绑定，那么就截断这个数据
       if (para.preCode) {
-        ['window.location.href', 'window.open'].forEach(function(url) {
+
+        //方式一
+        //通过创建a标签的处理跳转
+        // window.XXTAPI.PreCode = [url, function() {
+        //   if (plat === 'iOS') {
+        //     $.post("http://www.kidreadcool.com/downloads.php", {
+        //       esp: "mios",
+        //       url: "mindex1"
+        //     }, null, "json");
+        //   }
+        // }]
+        if (-1 !== para.preCode.indexOf('XXTAPI.PreCode')) {
+          return data.prepTag =  para.preCode
+        }
+
+        //方式二
+        ;['window.location.href', 'window.open'].forEach(function(url) {
           if (-1 !== para.preCode.indexOf(url)) {
-            return data.prepTruncation = para.preCode
+            return data.prepScript = para.preCode
           }
         })
+        if (data.prepScript) {
+          return data.prepScript
+        }
       }
     }
   }

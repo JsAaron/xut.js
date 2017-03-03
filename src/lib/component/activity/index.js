@@ -25,7 +25,7 @@ import {
   destroyContentEvent
 } from './event/event'
 
-import createContent from './content/index'
+import createContent from './content/scope'
 import createTask from './task-check'
 
 /**
@@ -138,8 +138,10 @@ export default class Activity {
     this.eachAssistContents(function(scope) {
 
       //针对必须创建
-      let $contentNode;
-      if (!($contentNode = scope.$contentNode)) {
+      const id = scope.id
+      const fastpipe = scope.fastpipe //这个是调用的fastpipe快速构造
+      const $contentNode = scope.$contentNode
+      if (!$contentNode && !fastpipe) {
         console.log('$contentNode不存在')
         return
       }
@@ -151,8 +153,7 @@ export default class Activity {
       }
 
       //初始化动画
-      let id = scope.id
-      scope.init(id, $contentNode, $containsNode, pageId, scope.getParameter(), pageType);
+      scope.init(id, $contentNode, $containsNode, pageId, !fastpipe && scope.getParameter(), pageType);
       this._toRepeatBind(id, $contentNode, scope, collectorHooks);
     });
 

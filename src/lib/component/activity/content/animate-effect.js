@@ -78,23 +78,9 @@ const access = (callback) => {
  */
 export default class Animation {
 
-  constructor(options, getStyle) {
+  constructor(options) {
     _.extend(this, options);
-    this.getStyle = getStyle
-
-    /////////////////////////////
-    ///如果是被预处理截断，跳过动画创建
-    ///重写原事件的相关数据
-    ///改动脚本auto为click事件
-    /////////////////////////////
-    if (this.prepTruncation) {
-      this.base.eventData.originaName = this.base.eventData.eventName
-      this.base.eventData.eventName = 'click'
-      this.base.eventData.eventContentId = this.id
-      return
-    }
   }
-
 
   /**
    * Build the canvas of animation
@@ -214,27 +200,8 @@ export default class Animation {
    * 为了向上兼容API
    *  1 dom动画
    *  2 canvas动画
-   *
-   * 2 直接截断动画处理
-   *   直接执行脚本动画
    */
   init(id, $contentNode, $containsNode, chapterId, parameter, pageType) {
-
-    //预显示跳过动画创建
-    if (this.prepVisible) {
-      $contentNode.css({
-        'visibility': this.prepVisible
-      })
-      return
-    }
-
-    if (this.prepTruncation) {
-      return
-    }
-
-    //////////////////////////////
-    /// PPT动画库
-    //////////////////////////////
     let category = this.contentDas.category
     let pageIndex = this.pageIndex
     let create = (constr, newContext) => {
@@ -248,39 +215,6 @@ export default class Animation {
     this.domMode ? this._createDom(category, create) : this._createCanvas(id, parameter, category, create)
   }
 
-  /**
-   * 显示预处理
-   * 直接越过动画
-   */
-  _hasPrepVisible(playComplete) {
-    //创建的无行为content
-    let partContentRelated = this.base.relatedData.partContentRelated
-      //针对空跳过处理
-    if (partContentRelated && partContentRelated.length && (-1 !== partContentRelated.indexOf(this.id))) {
-      playComplete()
-    } else {
-      //必须要修改
-      if (this.$contentNode) {
-        if (this.canvasMode) {
-          console.log('canvsa prepVisible')
-        } else {
-          //因为执行的顺序问题，动画与页面零件
-          //isscroll标记控制
-          if (!this.$contentNode.attr('data-iscroll')) {
-            let visibility = this.$contentNode.css('visibility')
-              //必须是设定值与原始值不一致才修改
-              //苹果上闪屏问题
-            if (visibility != this.prepVisible) {
-              this.$contentNode.css({
-                'visibility': this.prepVisible
-              })
-            }
-          }
-        }
-      }
-      playComplete()
-    }
-  }
 
   /**
    * 运行动画
@@ -289,31 +223,12 @@ export default class Animation {
    * @return {[type]}                 [description]
    */
   play(playComplete) {
-    //处理显示动画
-    if (this.prepVisible) {
-      this._hasPrepVisible(playComplete)
-      return
-    }
-
-    //如果是被预处理截断
-    //执行脚本
-    if (this.prepTruncation) {
-      try {
-        makeJsonPack(this.prepTruncation)()
-      } catch (err) {
-        console.log(`预处理截断执行脚本失败`)
-      }
-      playComplete()
-      return
-    }
-
     let $contentNode = this.$contentNode
 
     //canvas
     if ($contentNode && $contentNode.view) {
       $contentNode = this.$contentNode.view
     }
-
     access((key) => {
       if (this[key]) {
         if (key === 'pptObj') {
@@ -337,10 +252,6 @@ export default class Animation {
    * @return {[type]}           [description]
    */
   stop(chapterId) {
-    //显示动画，处理截断
-    if (this.prepVisible || this.prepTruncation) {
-      return
-    }
     access((key) => {
       if (this[key]) {
         if (key === 'pptObj') {
@@ -358,10 +269,6 @@ export default class Animation {
    * @return {[type]} [description]
    */
   reset() {
-    //显示动画，处理截断
-    if (this.prepVisible || this.prepTruncation) {
-      return
-    }
     access((key) => {
       this[key] && this[key].reset && this[key].reset()
     })

@@ -4,7 +4,8 @@
  * 2 视觉差作用域
  * @type {Array}
  */
-import Animation from './animation'
+import Animation from './animate-effect'
+import FastPipe from './fast-pipe'
 import Parallax from './parallax/index'
 import pretreatment from './prep'
 
@@ -119,10 +120,14 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
   }
 
   //数据预处理
-  pretreatment(data, base.eventData.eventName)
-
-  //生成子作用域对象，用于抽象处理动画,行为
-  return new Animation(data, base.getStyle)
+  let hasPipe = pretreatment(data, base.eventData.eventName)
+  if (hasPipe) {
+    return FastPipe(data, base)
+  } else {
+    //生成子作用域对象，用于抽象处理动画,行为
+    data.getStyle = base.getStyle
+    return new Animation(data)
+  }
 }
 
 

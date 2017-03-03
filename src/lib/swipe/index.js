@@ -246,7 +246,9 @@ export default class Swipe extends Observer {
         this._onMove(e)
       },
       end(e) {
-        this._stopDefault(e)
+        if (!this.options.hasHooks) {
+          this._stopDefault(e) //超链接有影响
+        }
         this._onEnd(e)
       },
       transitionend(e) {

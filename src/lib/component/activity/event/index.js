@@ -16,66 +16,72 @@ export default function(activitProto) {
 
   /**
    * 构建事件体系
+   * 解析出事件类型
    */
   activitProto._initEvents = function() {
-    //解析出事件类型
     this.eventData.eventName = conversionEventType(this.eventData.eventType);
   }
+
+  /**
+   * 找到事件上下文
+   * @return {[type]} [description]
+   */
+  activitProto._findContentName = function(pid, cid, eventId) {
+    let contentName
+    let eventData = this.eventData
+
+    //dom
+    //找到对应绑定事件的元素
+    const parseDom = () => {
+      contentName = this.makePrefix('Content', pid, cid)
+      eventData.type = 'dom';
+      eventData.canvasMode = false;
+      eventData.domMode = true;
+    }
+
+    //canvas模式非常特别
+    //canvas容器+内部pixi对象
+    //所以事件绑定在最外面
+    const parseCanavs = () => {
+      contentName = this.makePrefix('canvas', pid, cid)
+      eventData.type = 'canvas';
+      eventData.canvasMode = true;
+      eventData.domMode = false;
+    }
+
+    //canvas事件
+    if (eventId && -1 !== this.canvasRelated.cid.indexOf(eventId)) {
+      parseCanavs()
+    } else {
+      //dom事件
+      parseDom()
+    }
+
+    return contentName
+  }
+
 
   /**
    * 获取事件上下文
    * @return {[type]} [description]
    */
   activitProto._parseEventContext = function() {
-    //配置事件节点
-    let contentName
-
     //事件上下文对象
-    let eventContext
     let eventData = this.eventData
-    let pid = this.pid
     let eventId = eventData.eventContentId
+    let eventContext = eventData.eventContext
 
-    //如果存在imageIds才处理,单独绑定事件处理
     if (eventId) {
-
-      //被重写过的事件
-      //auto =>  click
-      let cid = eventData.originaName ? eventId : this.id
-
-      //dom
-      //找到对应绑定事件的元素
-      const parseDom = () => {
-        contentName = this.makePrefix('Content', pid, cid)
-        eventData.type = 'dom';
-        eventData.canvasMode = false;
-        eventData.domMode = true;
+      if (!eventContext) {
+        //被重写过的事件
+        let cid = eventData.rewrite ? eventId : this.id
+        let contentName = this._findContentName(this.pid, cid, eventId)
+        eventContext = this.getContextNode(contentName)
+        eventData.eventContext = eventContext;
       }
-
-      //canvas模式非常特别
-      //canvas容器+内部pixi对象
-      //所以事件绑定在最外面
-      const parseCanavs = () => {
-        contentName = this.makePrefix('canvas', pid, cid)
-        eventData.type = 'canvas';
-        eventData.canvasMode = true;
-        eventData.domMode = false;
-      }
-
-      //canvas事件
-      if (-1 !== this.canvasRelated.cid.indexOf(eventId)) {
-        parseCanavs()
-      } else {
-        //dom事件
-        parseDom()
-      }
-
-      eventContext = this.getContextNode(contentName)
-      eventData.eventContext = eventContext;
-
       if (eventContext) {
         //绑定事件加入到content钩子
-        this.relatedCallback.contentsHooks(pid, eventId, {
+        this.relatedCallback.contentsHooks(this.pid, eventId, {
           $contentNode: eventContext,
           //增加外部判断
           isBindEventHooks: true,
@@ -107,17 +113,10 @@ export default function(activitProto) {
      * 运行动画
      * @return {[type]} [description]
      */
-    let startRunAnim = function() {
+    const startRunAnim = function() {
       //当前事件对象没有动画的时候才能触发关联动作
       let animOffset
       let boundary = 5 //边界值
-
-      //脚本动画
-      if (eventData.originaName) {
-        self.runAnimation()
-        return
-      }
-
       if (eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
         let originalLeft = animOffset.left;
         let originalTop = animOffset.top;
@@ -142,11 +141,9 @@ export default function(activitProto) {
      * 音频
      * 反弹
      */
-    let setBehavior = function(feedbackBehavior) {
-
+    const setBehavior = function(feedbackBehavior) {
       let behaviorSound
-
-      //音频地址
+        //音频地址
       if (behaviorSound = feedbackBehavior.behaviorSound) {
         //妙妙学客户端强制删除
         if (window.MMXCONFIG && window.audioHandler) {
@@ -194,9 +191,8 @@ export default function(activitProto) {
     /**
      * 事件引用钩子
      * 用户注册与执行
-     * @type {Object}
      */
-    let eventDrop = {
+    const eventDrop = {
       //保存引用,方便直接销毁
       init: function(drag) {
         eventData.dragDrop = drag;
@@ -217,12 +213,16 @@ export default function(activitProto) {
      * 正常动画执行
      * 除去拖动拖住外的所有事件
      * 点击,双击,滑动等等....
-     * @return {[type]} [description]
      */
-    let eventRun = function() {
+    const eventRun = function() {
+      //脚本动画
+      if (eventData.rewrite) {
+        self.runAnimation()
+        return
+      }
       //如果存在反馈动作
       //优先于动画执行
-      let feedbackBehavior = eventData.feedbackBehavior[eventData.eventContentId]
+      const feedbackBehavior = eventData.feedbackBehavior[eventData.eventContentId]
       if (feedbackBehavior) {
         setBehavior(feedbackBehavior)
       } else {
@@ -233,9 +233,8 @@ export default function(activitProto) {
 
     /**
      * 事件对象引用
-     * @return {[type]} [description]
      */
-    let eventHandler = function(eventReference, eventHandler) {
+    const eventHandler = function(eventReference, eventHandler) {
       eventData.eventReference = eventReference;
       eventData.eventHandler = eventHandler;
     }
@@ -270,13 +269,13 @@ export default function(activitProto) {
         eventData.isBind = true;
 
         bindContentEvent({
-          'eventDrop': eventDrop,
-          'eventRun': eventRun,
-          'eventHandler': eventHandler,
-          'eventContext': eventContext,
-          'eventName': eventName,
+          target,
+          eventName,
+          eventRun,
+          eventDrop,
+          eventHandler,
+          eventContext,
           'parameter': dragdropPara,
-          'target': target,
           'domMode': eventData.domMode
         })
       }

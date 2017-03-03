@@ -27,7 +27,7 @@ import init from './initialize/index'
 //全局API初始化
 initGlobalAPI()
 
-Xut.Version = 879.5
+Xut.Version = 879.6
 
 if (Xut.plat.isBrowser) {
 
