@@ -37,32 +37,49 @@ export default function FastPipe(options, base) {
   /////////////////////////////
   //创建a标签跳转
   /////////////////////////////
+  let preCode
   if (prepTag) {
     try {
       makeJsonPack(prepTag)()
     } catch (err) {
       console.log(`预处理截断执行脚本失败`)
     }
-    prepTag = window.XXTAPI.PreCode
-    if (prepTag && prepTag.length) {
+    preCode = window.XXTAPI.PreCode
+
+    if (preCode) {
       let contentNode = base.getContextNode(base._findContentName(base.pid, id))
       let imgContext = contentNode.find('img')
       if (imgContext.length) {
+        let href
+        if (_.isString(preCode)) {
+          //如果只有一个参数并且是字符串，那么就是URL
+          href = preCode
+        } else if (_.isArray(preCode)) {
+          //数组
+          href = preCode[0]
+        }
         //替换img为div>a
         imgContext.replaceWith(String.styleFormat(
           `<div class="inherit-size fullscreen-background fix-miaomiaoxue-img"
                 style="background-image:url(${imgContext.attr('src')});">
               <a data-type="hyperlink"
-                  href="${prepTag[0]}"
+                  href="${href}"
                   class="inherit-size"
                   style="display:block;"/>
               </a>
           </div>`))
         window.XXTAPI.PreCode = null
-        base.eventData.eventContext = contentNode.find('a')
-        base.eventData.rewrite = true
-        base.eventData.eventName = 'tap'
-        base.eventData.eventContentId = id
+
+        //如果有回调，就绑定事件
+        if (preCode[1] && _.isFunction(preCode[1])) {
+          base.eventData.eventContext = contentNode.find('a')
+          base.eventData.rewrite = true
+          base.eventData.eventName = 'tap'
+          base.eventData.eventContentId = id
+        } else {
+          //清空auto动作
+          base.eventData.eventName = ''
+        }
       }
     }
   }
@@ -112,9 +129,9 @@ export default function FastPipe(options, base) {
       }
 
       //a标签附带的脚本函数
-      if (prepTag && prepTag[1]) {
+      if (preCode && preCode[1]) {
         try {
-          prepTag[1]()
+          preCode[1]()
         } catch (err) {
           console.log(`快速处理脚本函数执行失败`)
         }

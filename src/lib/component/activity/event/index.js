@@ -239,7 +239,6 @@ export default function(activitProto) {
       eventData.eventHandler = eventHandler;
     }
 
-
     //绑定用户自定义事件
     if (eventContext && eventName) {
       //如果是翻页委托启动了
