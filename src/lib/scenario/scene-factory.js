@@ -54,7 +54,7 @@ const checkHistory = (history) => {
 
   //如果有历史记录
   if (history) {
-    var scenarioInfo = sceneController.seqReverse(history)
+    let scenarioInfo = sceneController.seqReverse(history)
     if (scenarioInfo) {
       scenarioInfo = scenarioInfo.split('-');
       Xut.View.LoadScenario({
@@ -82,9 +82,11 @@ const checkHistory = (history) => {
 export class SceneFactory {
 
   constructor(data) {
-    let seasonId = data.seasonId;
-    let chapterId = data.chapterId;
-    let options = _.extend(this, data, {
+    const {
+      seasonId,
+      chapterId
+    } = data
+    const options = _.extend(this, data, {
       'scenarioId': seasonId,
       'chapterId': chapterId,
       '$container': $('.xut-scene-container')
@@ -113,17 +115,7 @@ export class SceneFactory {
       callback()
       return;
     }
-
-    let layout
-
-    if (options.isMain) {
-      layout = mainScene()
-    } else {
-      layout = deputyScene(this.scenarioId)
-    }
-
-    this.$rootNode = $(layout)
-
+    this.$rootNode = $(options.isMain ? mainScene() : deputyScene(this.scenarioId))
     Xut.nextTick({
       'container': this.$container,
       'content': this.$rootNode
@@ -139,10 +131,13 @@ export class SceneFactory {
    * @return {[type]} [description]
    */
   _initToolBar() {
-    const scenarioId = this.scenarioId
-    const pageTotal = this.pageTotal
-    const pageIndex = this.pageIndex
-    const $rootNode = this.$rootNode
+    const {
+      scenarioId,
+      pageTotal,
+      pageIndex,
+      $rootNode
+    } = this
+
     const findControlBar = function() {
       return $rootNode.find('.xut-control-bar')
     }
@@ -199,7 +194,7 @@ export class SceneFactory {
     //如果是min平台强制启动
     if (Xut.config.platform === 'mini' || (config.toolType.number !== false && columnCounts)) {
 
-      let getColumnTotal = (needGet) => {
+      const getColumnTotal = needGet => {
         if (needGet) {
           //高度变化后，重新获取
           columnCounts = getColumnCount(this.seasonId)
@@ -239,18 +234,20 @@ export class SceneFactory {
    */
   _createMediator() {
 
-    var self = this;
-    var scenarioId = this.scenarioId;
-    var pageTotal = this.pageTotal;
-    var pageIndex = this.pageIndex;
-    var $rootNode = this.$rootNode;
-    var isMain = this.isMain;
-    var tempfind = findContainer($rootNode, scenarioId, isMain);
-    var scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
-    var scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
+    const {
+      isMain,
+      $rootNode,
+      scenarioId,
+      pageTotal,
+      pageIndex
+    } = this
+
+    const tempfind = findContainer($rootNode, scenarioId, isMain);
+    const scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
+    const scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
 
     //场景容器对象
-    var vm = this.vm = new Mediator({
+    const vm = this.vm = new Mediator({
       'pageMode': this.pageMode,
       'container': this.$rootNode[0],
       'multiScenario': !isMain,
@@ -269,7 +266,7 @@ export class SceneFactory {
      * 配置选项
      * @type {[type]}
      */
-    var isToolbar = this.isToolbar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
+    const isToolbar = this.isToolbar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
 
 
     /**
@@ -353,12 +350,12 @@ export class SceneFactory {
      * @return {[type]} [description]
      */
     vm.$bind('createComplete', (nextAction) => {
-      self.complete && setTimeout(() => {
+      this.complete && setTimeout(() => {
         if (isMain) {
-          self.complete(() => {
+          this.complete(() => {
             Xut.View.HideBusy()
               //检测是不是有缓存加载
-            if (!checkHistory(self.history)) {
+            if (!checkHistory(this.history)) {
               //指定自动运行的动作
               nextAction && nextAction();
             }
@@ -366,7 +363,7 @@ export class SceneFactory {
             Xut.Application.AddEventListener();
           })
         } else {
-          self.complete(nextAction)
+          this.complete(nextAction)
         }
       }, 200);
     })
