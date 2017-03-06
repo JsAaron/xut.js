@@ -13,7 +13,7 @@
     "karma": "karma start karma.conf.js --log-level debug --single-run",
     "git": "bash build/shell/git.sh",
     "svn": "bash build/shell/svn.sh",
-    "test": "node build/template//test.js",
+    "test": "node build/template/test.js",
     "release": "node build/template/release.code.js",
     "ncu": "node build/ncu.package.js",
     "check": "flow; test $? -eq 0 -o $? -eq 2",

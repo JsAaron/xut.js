@@ -293,7 +293,7 @@ export default class ColumnClass {
     let initIndex = this.initIndex
     if (location) {
       direction = location === 'right' ? 'prev' : 'next'
-      if (location === 'middle') {
+      if (location === 'middle' && initIndex > 0) {
         //如果中间是分栏页
         --initIndex
       }

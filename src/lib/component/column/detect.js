@@ -63,7 +63,7 @@ function detectColumn($seasons, columnCollection, callback, checkCount) {
     --checkCount
 
     //执行监控改变
-    execDelay(tempDelay)
+    tempDelay.length && execDelay(tempDelay)
 
     if(checkCount) {
         timerId = setTimeout(function() {

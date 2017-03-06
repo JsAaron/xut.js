@@ -3,7 +3,6 @@ const getScript = require('../external.script')
 const compilerCSS = require('./compiler.css')
 const compilerJs = require('./compiler.js')
 const version = require('./version')
-const webServer = require('./test.server')
 const _ = require("underscore");
 const config = require('../../config')
 
@@ -25,7 +24,4 @@ rollup(conf)
     })
     .then(() => {
         return compilerCSS(conf)
-    })
-    .then(() => {
-        // webServer(conf)
     })
