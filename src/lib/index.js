@@ -1,59 +1,17 @@
-import {
-  config
-} from './config/index'
-import {
-  initGlobalAPI
-} from './global-api/index'
-import {
-  AudioManager
-} from './component/audio/manager'
-import {
-  VideoManager
-} from './component/video/manager'
-import {
-  fixAudio
-} from './component/audio/fix'
-import {
-  nextTick
-} from './util/nexttick'
-import {
-  slashPostfix
-} from './util/option'
-import {
-  initNode
-} from './initialize/depend/node'
+import { config } from './config/index'
+import { initGlobalAPI } from './global-api/index'
+import { AudioManager } from './component/audio/manager'
+import { VideoManager } from './component/video/manager'
+import { nextTick } from './util/nexttick'
+import { slashPostfix } from './util/option'
+import { initNode } from './initialize/depend/node'
+import { initDefalut } from './initialize/depend/default'
 import init from './initialize/index'
 
 //全局API初始化
 initGlobalAPI()
 
-Xut.Version = 879.6
-
-if (Xut.plat.isBrowser) {
-
-  //禁止全局的缩放处理
-  $('body').on('touchmove', e => {
-    e.preventDefault && e.preventDefault()
-  })
-
-  //修复H5音频自动播放bug
-  if (!Xut.plat.hasAutoPlayAudio) {
-    fixAudio()
-  }
-
-  //桌面鼠标控制翻页
-  $(document).keyup(event => {
-    switch (event.keyCode) {
-      case 37:
-        Xut.View.GotoPrevSlide()
-        break;
-      case 39:
-        Xut.View.GotoNextSlide()
-        break;
-    }
-  })
-}
-
+Xut.Version = 879.7
 
 /**
  * 加载应用app
@@ -61,6 +19,7 @@ if (Xut.plat.isBrowser) {
  * @return {[type]} [description]
  */
 const loadApp = (...arg) => {
+  initDefalut()
   let node = initNode(...arg)
   Xut.Application.$$removeNode = () => {
     node.$contentNode.remove()
@@ -69,7 +28,6 @@ const loadApp = (...arg) => {
     node = null
     Xut.Application.$$removeNode = null
   }
-
   nextTick({
     container: node.$rootNode,
     content: node.$contentNode

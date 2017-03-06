@@ -1,14 +1,38 @@
-import { sceneController } from './scenario/scene-control'
-import { clearAudio } from './component/audio/manager'
-import { clearVideo } from './component/video/manager'
-import { stopColumnDetection } from './component/column/detect'
-import { destroyFixAudio } from './component/audio/fix'
-import { destroyCache, destroyResult } from './database/destroy'
-import { config, destroyConfig } from './config/index'
-import { $$resetUUID } from './util/stroage'
-import { offAndroid } from './initialize/depend/button'
-import { cleanCursor } from './initialize/depend/cursor'
-
+import {
+  sceneController
+} from './scenario/scene-control'
+import {
+  clearAudio
+} from './component/audio/manager'
+import {
+  clearVideo
+} from './component/video/manager'
+import {
+  stopColumnDetection
+} from './component/column/detect'
+import {
+  destroyFixAudio
+} from './component/audio/fix'
+import {
+  destroyCache,
+  destroyResult
+} from './database/destroy'
+import {
+  config,
+  destroyConfig
+} from './config/index'
+import {
+  $$resetUUID
+} from './util/stroage'
+import {
+  offAndroid
+} from './initialize/depend/button'
+import {
+  cleanCursor
+} from './initialize/depend/cursor'
+import {
+  cleanDefalut
+} from './initialize/depend/default'
 
 /**
  * 销毁接口
@@ -20,80 +44,75 @@ import { cleanCursor } from './initialize/depend/cursor'
  */
 export default function Destroy(action = 'exit') {
 
-    //销毁所有场景
-    sceneController.destroyAllScene()
+  //销毁所有场景
+  sceneController.destroyAllScene()
 
-    //销毁只创建一次的对象
+  //销毁只创建一次的对象
+  //修复的音频对象
+  //数据的结果集
+  if (action === 'destory') {
     //修复的音频对象
-    //数据的结果集
-    if(action === 'destory') {
-        if(Xut.plat.isBrowser) {
-            $('body').off() //默认事件
-            $(document).off() //左右按钮
-            $(window).off() //横竖切换
-        }
+    destroyFixAudio()
+  }
 
-        //修复的音频对象
-        destroyFixAudio()
+  // refresh状态不删除结果集
+  // 只处理destory与exit状态
+  if (action === 'destory' || action === 'exit') {
+    //删除结果集
+    destroyResult()
+
+    //删除流式布局的数据
+    let $flowNode = $("#xut-stream-flow")
+    if ($flowNode.length) {
+      $flowNode.remove()
+      $flowNode = null
     }
+    //默认全局事件
+    cleanDefalut()
+  }
 
-    // refresh状态不删除结果集
-    // 只处理destory与exit状态
-    if(action === 'destory' || action === 'exit') {
+  //config路径缓存
+  destroyConfig()
 
-        //删除结果集
-        destroyResult()
+  //删除数据匹配缓存
+  destroyCache()
 
-        //删除流式布局的数据
-        let $flowNode = $("#xut-stream-flow")
-        if($flowNode.length) {
-            $flowNode.remove()
-            $flowNode = null
-        }
+  //音视频
+  clearAudio()
+
+  //音频
+  clearVideo()
+
+  //销毁独立APK的键盘事件
+  offAndroid()
+
+  //忙了光标设置
+  cleanCursor()
+
+  /**
+   * 重设缓存的UUID
+   * 为了只计算一次
+   * @return {[type]} [description]
+   */
+  $$resetUUID()
+
+  Xut.TransformFilter = null
+  Xut.CreateFilter = null
+
+  //销毁节点
+  Xut.Application.$$removeNode && Xut.Application.$$removeNode()
+
+  //启动配置文件去掉
+  config.launch = null
+
+  //删除动态加载的两个css文件
+  $('link[data-type]').each(function(index, link) {
+    let type = link.getAttribute('data-type')
+    if (type === 'svgsheet' || type === 'xxtflow') {
+      link.parentNode.removeChild(link)
     }
+  })
 
-    //config路径缓存
-    destroyConfig()
-
-    //删除数据匹配缓存
-    destroyCache()
-
-    //音视频
-    clearAudio()
-
-    //音频
-    clearVideo()
-
-    //销毁独立APK的键盘事件
-    offAndroid()
-
-    //忙了光标设置
-    cleanCursor()
-
-    /**
-     * 重设缓存的UUID
-     * 为了只计算一次
-     * @return {[type]} [description]
-     */
-    $$resetUUID()
-
-    Xut.TransformFilter = null
-    Xut.CreateFilter = null
-
-    //销毁节点
-    Xut.Application.$$removeNode && Xut.Application.$$removeNode()
-
-    //启动配置文件去掉
-    config.launch = null
-
-    //删除动态加载的两个css文件
-    $('link[data-type]').each(function(index, link) {
-        let type = link.getAttribute('data-type')
-        if(type === 'svgsheet' || type === 'xxtflow') {
-            link.parentNode.removeChild(link)
-        }
-    })
-
-    //停止分栏探测
-    stopColumnDetection()
+  //停止分栏探测
+  stopColumnDetection()
 }
