@@ -23,17 +23,17 @@ const CEIL = Math.ceil
  * @return {[type]}         [description]
  */
 const injectionComponent = function(regData) {
-    var sceneObj = sceneController.containerObj('current')
-    sceneObj.vm.$injectionComponent = regData
+  var sceneObj = sceneController.containerObj('current')
+  sceneObj.vm.$injectionComponent = regData
 }
 
 
 const load = (type, data, constructor) => {
-    injectionComponent({
-        'pageType': data.pageType, //标记类型区分
-        'pageIndex': data.pageIndex,
-        'widget': new constructor(data)
-    })
+  injectionComponent({
+    'pageType': data.pageType, //标记类型区分
+    'pageIndex': data.pageIndex,
+    'widget': new constructor(data)
+  })
 }
 
 /**
@@ -47,39 +47,39 @@ const load = (type, data, constructor) => {
  */
 const adapterType = {
 
-    /**
-     * iframe零件类型
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
-     */
-    'iframe' (data) {
-        load('widget', data, iframeWidget);
-    },
+  /**
+   * iframe零件类型
+   * @param  {[type]} data [description]
+   * @return {[type]}      [description]
+   */
+  'iframe' (data) {
+    load('widget', data, iframeWidget);
+  },
 
-    'widget' (data) {
-        load('widget', data, iframeWidget);
-    },
+  'widget' (data) {
+    load('widget', data, iframeWidget);
+  },
 
-    /**
-     * js零件类型处理
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
-     */
-    'js' (data) {
-        load('js', data, pageWidget);
-    },
-    'page' (data) {
-        load('page', data, pageWidget);
-    },
-    'svg' (data) {
-        load('svg', data, pageWidget);
-    },
-    'canvas' (data) {
-        load('canvas', data, pageWidget);
-    },
-    'webgL' (data) {
-        load('webgL', data, pageWidget);
-    }
+  /**
+   * js零件类型处理
+   * @param  {[type]} data [description]
+   * @return {[type]}      [description]
+   */
+  'js' (data) {
+    load('js', data, pageWidget);
+  },
+  'page' (data) {
+    load('page', data, pageWidget);
+  },
+  'svg' (data) {
+    load('svg', data, pageWidget);
+  },
+  'canvas' (data) {
+    load('canvas', data, pageWidget);
+  },
+  'webgL' (data) {
+    load('webgL', data, pageWidget);
+  }
 }
 
 
@@ -88,14 +88,14 @@ const adapterType = {
  * @return {[type]} [description]
  */
 const filterData = (data) => {
-    //直接通过id查询数据
-    if(data.widgetId) {
-        _.extend(data, Xut.data.query('Widget', data.widgetId))
-    } else {
-        //直接通过activityId查询数据
-        _.extend(data, Xut.data.query('Widget', data.activityId, 'activityId'));
-    }
-    return data;
+  //直接通过id查询数据
+  if(data.widgetId) {
+    _.extend(data, Xut.data.query('Widget', data.widgetId))
+  } else {
+    //直接通过activityId查询数据
+    _.extend(data, Xut.data.query('Widget', data.activityId, 'activityId'));
+  }
+  return data;
 }
 
 
@@ -105,13 +105,13 @@ const filterData = (data) => {
  * @return {[type]}      [description]
  */
 const calculateElement = (data) => {
-    var data = _.extend({}, data)
-    const proportion = config.proportion
-    data.width = CEIL(data.width * proportion.width);
-    data.height = CEIL(data.height * proportion.height);
-    data.top = FLOOR(data.top * proportion.top);
-    data.left = FLOOR(data.left * proportion.left);
-    return data;
+  var data = _.extend({}, data)
+  const proportion = config.proportion
+  data.width = CEIL(data.width * proportion.width);
+  data.height = CEIL(data.height * proportion.height);
+  data.top = FLOOR(data.top * proportion.top);
+  data.left = FLOOR(data.left * proportion.left);
+  return data;
 }
 
 /**
@@ -119,8 +119,8 @@ const calculateElement = (data) => {
  * @return {[type]} [description]
  */
 const filtrateDas = (data) => {
-    data = filterData(data);
-    return calculateElement(data)
+  data = filterData(data);
+  return calculateElement(data)
 }
 
 
@@ -130,61 +130,61 @@ const filtrateDas = (data) => {
  * @return {[type]} [description]
  */
 const parsePara = (data) => {
-    var inputPara, //输入数据
-        outputPara; //输出数据
-    if(inputPara = data.inputPara) {
-        outputPara = parseJSON(inputPara)
-    }
-    return outputPara;
+  var inputPara, //输入数据
+    outputPara; //输出数据
+  if(inputPara = data.inputPara) {
+    outputPara = parseJSON(inputPara)
+  }
+  return outputPara;
 }
 
 
 
 export function Adapter(para) {
 
-    //获取数据
-    let data = filtrateDas(para)
+  //获取数据
+  let data = filtrateDas(para)
 
-    data.id = data.activityId
+  data.id = data.activityId
 
-    //解析数据
-    data.inputPara = parsePara(data)
+  //解析数据
+  data.inputPara = parsePara(data)
 
-    if(!data.inputPara) {
-        data.inputPara = {}
+  if(!data.inputPara) {
+    data.inputPara = {}
+  }
+
+  //增加属性参数
+  if(data.widgetType === 'page') {
+    data.inputPara.container = data.rootNode
+  }
+
+  //重新定义页面的布局参数
+  let pageVisualSize
+  let pageStyle = Xut.Presentation.GetPageStyle(para.pageIndex)
+  if(pageStyle && pageStyle.visualWidth) {
+    pageVisualSize = {
+      width: pageStyle.visualWidth,
+      height: pageStyle.visualHeight,
+      left: pageStyle.visualLeft,
+      top: pageStyle.visualTop
     }
+    data.pageProportion = pageStyle.pageProportion
+  } else {
+    pageVisualSize = config.visualSize
+    data.pageProportion = config.proportion
+  }
 
-    //增加属性参数
-    if(data.widgetType === 'page') {
-        data.inputPara.container = data.rootNode
-    }
+  data.inputPara.uuid = config.appId + '-' + data.activityId; //唯一ID标示
+  data.inputPara.id = data.activityId;
+  data.inputPara.screenSize = pageVisualSize
+  //content的命名前缀
+  data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType)
 
-    //重新定义页面的布局参数
-    let pageVisualSize
-    let pageStyle = Xut.Presentation.GetPageStyle(para.pageIndex)
-    if(pageStyle && pageStyle.visualWidth) {
-        pageVisualSize = {
-            width: pageStyle.visualWidth,
-            height: pageStyle.visualHeight,
-            left: pageStyle.visualLeft,
-            top: pageStyle.visualTop
-        }
-        data.pageProportion = pageStyle.pageProportion
-    } else {
-        pageVisualSize = config.visualSize
-        data.pageProportion = config.proportion
-    }
+  //画轴模式
+  data.scrollPaintingMode = config.visualMode === 4;
+  data.calculate = pageVisualSize
 
-    data.inputPara.uuid = config.appId + '-' + data.activityId; //唯一ID标示
-    data.inputPara.id = data.activityId;
-    data.inputPara.screenSize = pageVisualSize
-    //content的命名前缀
-    data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType)
-
-    //画轴模式
-    data.scrollPaintingMode = config.visualMode === 4;
-    data.calculate = pageVisualSize
-
-    //执行类构建
-    adapterType[(data.widgetType || 'widget').toLowerCase()](data);
+  //执行类构建
+  adapterType[(data.widgetType || 'widget').toLowerCase()](data);
 }

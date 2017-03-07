@@ -9,8 +9,8 @@ let pageBox
 let playBox
 
 let initBox = () => {
-    pageBox = {} //当前页面包含的视频数据
-    playBox = {} //播放过的视频数据 （播放集合)
+  pageBox = {} //当前页面包含的视频数据
+  playBox = {} //播放过的视频数据 （播放集合)
 }
 
 initBox()
@@ -25,37 +25,37 @@ initBox()
  */
 let deployVideo = (data, pageId, activityId) => {
 
-    let proportion = config.proportion
+  let proportion = config.proportion
 
-    let layerSize = setProportion({
-        width: data.width || config.visualSize.width,
-        height: data.height || config.visualSize.height,
-        left: data.left,
-        top: data.top,
-        padding: data.padding
-    })
+  let layerSize = setProportion({
+    width: data.width || config.visualSize.width,
+    height: data.height || config.visualSize.height,
+    left: data.left,
+    top: data.top,
+    padding: data.padding
+  })
 
-    let videoInfo = {
-        'pageId': pageId,
-        'videoId': activityId,
-        'url': data.md5,
-        'pageUrl': data.url,
-        'left': layerSize.left,
-        'top': layerSize.top,
-        'width': layerSize.width,
-        'height': layerSize.height,
-        'padding': layerSize.padding,
-        'zIndex': data.zIndex || 2147483647,
-        'background': data.background,
-        'category': data.category,
-        'hyperlink': data.hyperlink
-    };
+  let videoInfo = {
+    'pageId': pageId,
+    'videoId': activityId,
+    'url': data.md5,
+    'pageUrl': data.url,
+    'left': layerSize.left,
+    'top': layerSize.top,
+    'width': layerSize.width,
+    'height': layerSize.height,
+    'padding': layerSize.padding,
+    'zIndex': data.zIndex || 2147483647,
+    'background': data.background,
+    'category': data.category,
+    'hyperlink': data.hyperlink
+  };
 
-    if (!_.isObject(pageBox[pageId])) {
-        pageBox[pageId] = {};
-    }
+  if(!_.isObject(pageBox[pageId])) {
+    pageBox[pageId] = {};
+  }
 
-    pageBox[pageId][activityId] = videoInfo;
+  pageBox[pageId][activityId] = videoInfo;
 }
 
 
@@ -68,12 +68,12 @@ let deployVideo = (data, pageId, activityId) => {
  * @return {[type]}            [description]
  */
 let checkRepeat = (pageId, activityId) => {
-    var chapterData = pageBox[pageId];
-    //如果能在pageBox找到对应的数据
-    if (chapterData && chapterData[activityId]) {
-        return true;
-    }
-    return false;
+  var chapterData = pageBox[pageId];
+  //如果能在pageBox找到对应的数据
+  if(chapterData && chapterData[activityId]) {
+    return true;
+  }
+  return false;
 }
 
 
@@ -82,13 +82,13 @@ let checkRepeat = (pageId, activityId) => {
 // 1:pageBox能找到对应的 videoId
 // 2:重新查询数据
 let parseVideo = (pageId, activityId) => {
-    //复重
-    if (checkRepeat(pageId, activityId)) {
-        return
-    }
-    //新的查询
-    let data = Xut.data.query('Video', activityId)
-    deployVideo(data, pageId, activityId)
+  //复重
+  if(checkRepeat(pageId, activityId)) {
+    return
+  }
+  //新的查询
+  let data = Xut.data.query('Video', activityId)
+  deployVideo(data, pageId, activityId)
 }
 
 
@@ -101,20 +101,20 @@ let parseVideo = (pageId, activityId) => {
  * @return {[type]}            [description]
  */
 let loadVideo = (pageId, activityId, container) => {
-    let data = pageBox[pageId][activityId]
+  let data = pageBox[pageId][activityId]
 
-    //search video cache
-    if (playBox[pageId] && playBox[pageId][activityId]) {
-        //console.log('*********cache*********');
-        playBox[pageId][activityId].play()
-    } else {
-        //console.log('=========new=============');
-        if (!_.isObject(playBox[pageId])) {
-            playBox[pageId] = {};
-        }
-        //cache video object
-        playBox[pageId][activityId] = new VideoClass(data, container)
+  //search video cache
+  if(playBox[pageId] && playBox[pageId][activityId]) {
+    //console.log('*********cache*********');
+    playBox[pageId][activityId].play()
+  } else {
+    //console.log('=========new=============');
+    if(!_.isObject(playBox[pageId])) {
+      playBox[pageId] = {};
     }
+    //cache video object
+    playBox[pageId][activityId] = new VideoClass(data, container)
+  }
 }
 
 
@@ -126,10 +126,10 @@ let loadVideo = (pageId, activityId, container) => {
  * @return {[type]}            [description]
  */
 let initVideo = (pageId, activityId, container) => {
-    //解析数据
-    parseVideo(pageId, activityId);
-    //调用播放
-    loadVideo(pageId, activityId, container);
+  //解析数据
+  parseVideo(pageId, activityId);
+  //调用播放
+  loadVideo(pageId, activityId, container);
 }
 
 
@@ -138,9 +138,9 @@ let initVideo = (pageId, activityId, container) => {
  * @return {Boolean} [description]
  */
 export function hasVideoObj(pageId, activityId) {
-    if (playBox[pageId]) {
-        return playBox[pageId][activityId]
-    }
+  if(playBox[pageId]) {
+    return playBox[pageId][activityId]
+  }
 }
 
 /**
@@ -151,7 +151,7 @@ export function hasVideoObj(pageId, activityId) {
  * @return {[type]}            [description]
  */
 export function autoVideo(pageId, activityId, container) {
-    initVideo(pageId, activityId, container)
+  initVideo(pageId, activityId, container)
 }
 
 
@@ -163,7 +163,7 @@ export function autoVideo(pageId, activityId, container) {
  * @return {[type]}            [description]
  */
 export function triggerVideo(pageId, activityId, container) {
-    initVideo(pageId, activityId, container)
+  initVideo(pageId, activityId, container)
 }
 
 
@@ -173,17 +173,17 @@ export function triggerVideo(pageId, activityId, container) {
  * @return {[type]}        [description]
  */
 export function removeVideo(pageId) {
-    //清理视频
-    if (playBox && playBox[pageId]) {
-        for (let activityId in playBox[pageId]) {
-            playBox[pageId][activityId].close();
-        }
-        delete playBox[pageId]
+  //清理视频
+  if(playBox && playBox[pageId]) {
+    for(let activityId in playBox[pageId]) {
+      playBox[pageId][activityId].close();
     }
-    //清理数据
-    if (pageBox && pageBox[pageId]) {
-        delete pageBox[pageId]
-    }
+    delete playBox[pageId]
+  }
+  //清理数据
+  if(pageBox && pageBox[pageId]) {
+    delete pageBox[pageId]
+  }
 }
 
 
@@ -192,15 +192,15 @@ export function removeVideo(pageId) {
  * @return {[type]} [description]
  */
 export function clearVideo() {
-    let flag = false //记录是否处理过销毁状态
-    for (let pageId in playBox) {
-        for (let activityId in playBox[pageId]) {
-            playBox[pageId][activityId].close();
-            flag = true;
-        }
+  let flag = false //记录是否处理过销毁状态
+  for(let pageId in playBox) {
+    for(let activityId in playBox[pageId]) {
+      playBox[pageId][activityId].close();
+      flag = true;
     }
-    initBox()
-    return flag;
+  }
+  initBox()
+  return flag;
 }
 
 
@@ -210,9 +210,9 @@ export function clearVideo() {
  * @return {[type]}        [description]
  */
 export function hangUpVideo(pageId) {
-    for (let pageId in playBox) {
-        for (let activityId in playBox[pageId]) {
-            playBox[pageId][activityId].stop();
-        }
+  for(let pageId in playBox) {
+    for(let activityId in playBox[pageId]) {
+      playBox[pageId][activityId].stop();
     }
+  }
 }

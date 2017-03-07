@@ -6,7 +6,7 @@
  */
 export default function warning(message) {
   /* eslint-disable no-console */
-  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+  if(typeof console !== 'undefined' && typeof console.error === 'function') {
     console.error(message)
   }
   /* eslint-enable no-console */
@@ -15,7 +15,7 @@ export default function warning(message) {
     // "break on all exceptions" in your console,
     // it would pause the execution at this line.
     throw new Error(message)
-  /* eslint-disable no-empty */
-  } catch (e) { }
+    /* eslint-disable no-empty */
+  } catch(e) {}
   /* eslint-enable no-empty */
 }

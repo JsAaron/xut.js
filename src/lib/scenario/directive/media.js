@@ -28,7 +28,7 @@ const mediaIconSize = 74
  */
 const onlyCreateOnce = (id) => {
   let data = tempData[id]
-  if (data) {
+  if(data) {
     delete tempData[id]
     return data;
   }
@@ -54,30 +54,30 @@ export default {
     let startImage = ''
 
     //如果没有宽高则不创建绑定节点
-    if (!scaleWidth || !scaleHeight) return ''
+    if(!scaleWidth || !scaleHeight) return ''
 
     //解析音乐动作
     //冒泡动作靠节点传递数据
-    if (itemArray) {
+    if(itemArray) {
       itemArray = parseJSON(itemArray);
       let start = itemArray[0];
       let stop = itemArray[1];
       tempData[_id] = {};
-      if (start) {
-        if (start.startImg) {
+      if(start) {
+        if(start.startImg) {
           startImage = start.startImg;
           tempData[_id]['startImg'] = startImage;
           startImage = 'background-image:url(' + config.pathAddress + startImage + ');';
         }
-        if (start.script) {
+        if(start.script) {
           tempData[_id]['startScript'] = start.script;
         }
       }
-      if (stop) {
-        if (stop.stopImg) {
+      if(stop) {
+        if(stop.stopImg) {
           tempData[_id]['stopImg'] = stop.stopImg;
         }
-        if (stop.script) {
+        if(stop.script) {
           tempData[_id]['stopScript'] = stop.script
         }
       }
@@ -85,7 +85,7 @@ export default {
 
     //只针对网页插件增加单独的点击界面
     //如果有视频图标
-    if (category == 'webpage' &&
+    if(category == 'webpage' &&
       (scaleWidth > 200) &&
       (scaleHeight > 100) &&
       (scaleWidth <= config.visualSize.width) &&
@@ -130,15 +130,16 @@ export default {
    * @param  {[type]} data [description]
    * @return {[type]}      [description]
    */
-  , autoPlay({
+  ,
+  autoPlay({
     id,
     category,
     rootNode,
     pageIndex,
     chapterId
   }) {
-    if (!category) return
-    if (category == 'audio') {
+    if(!category) return
+    if(category == 'audio') {
       autoAudio(chapterId, id, onlyCreateOnce(id));
     } else {
       autoVideo(chapterId, id, rootNode);
@@ -150,7 +151,8 @@ export default {
    * touchEnd 全局派发的点击事件
    * 如果stopGlobalEvent == ture 事件由全局派发
    */
-  , trigger({
+  ,
+  trigger({
     id,
     target,
     rootNode,
@@ -158,7 +160,7 @@ export default {
     activityId
   }) {
     const category = target.getAttribute('data-delegate')
-    if (category) {
+    if(category) {
       const chapterId = Xut.Presentation.GetPageId(pageIndex);
       /**
        * 传入chapterId 页面ID
@@ -166,11 +168,11 @@ export default {
        * eleName       节点名  //切换控制
        * 根节点
        */
-      if (category == 'audio') {
+      if(category == 'audio') {
         triggerAudio(chapterId, activityId, onlyCreateOnce(id))
       } else {
         let videoObj = hasVideoObj(chapterId, activityId)
-        if (videoObj) {
+        if(videoObj) {
           videoObj.play()
         } else {
           triggerVideo(chapterId, activityId, rootNode)

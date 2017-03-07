@@ -69,7 +69,7 @@ const analysisPath = (wrapObj, conData) => {
   let imgContent = conData.md5
 
   //如果基础图被重新定义过
-  if (config.baseImageSuffix) {
+  if(config.baseImageSuffix) {
     imgContent = imgContent.replace(/\w+./, '$&' + config.baseImageSuffix + '.')
   }
 
@@ -79,7 +79,7 @@ const analysisPath = (wrapObj, conData) => {
   //处理gif图片缓存+随机数
   let pathImg = isGif ? createRandomImg(originalPathImg) : originalPathImg
 
-  if (conData.category === "AutoCompSprite") {
+  if(conData.category === "AutoCompSprite") {
     try {
       let resourcePath = config.pathAddress + imgContent + "/app.json";
       let results = getResources(resourcePath)
@@ -89,7 +89,7 @@ const analysisPath = (wrapObj, conData) => {
       pathImg += '/' + name
       conData.resource = results
       conData.containerName = wrapObj.containerName
-    } catch (err) {
+    } catch(err) {
       console.log('AutoCompSprite获取数据失败')
     }
   }
@@ -111,12 +111,12 @@ const analysisPath = (wrapObj, conData) => {
  */
 const externalFile = (wrapObj, svgCallback) => {
   //svg零件不创建解析具体内容
-  if (wrapObj.isSvg) {
+  if(wrapObj.isSvg) {
     readFile(wrapObj.data.md5, (svgdata) => {
       wrapObj.svgstr = svgdata
       svgCallback(wrapObj)
     });
-  } else if (wrapObj.isJs) {
+  } else if(wrapObj.isJs) {
     //如果是.js的svg文件
     readFile(wrapObj.data.md5, (htmldata) => {
       wrapObj.htmlstr = htmldata
@@ -134,17 +134,17 @@ const externalFile = (wrapObj, svgCallback) => {
  */
 const allotRatio = (fixRadio, headerFooterMode) => {
 
-  if (fixRadio && headerFooterMode) {
+  if(fixRadio && headerFooterMode) {
     config.devtools && $$warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式')
   }
 
   //页眉页脚模式
-  if (headerFooterMode) {
+  if(headerFooterMode) {
     return headerFooterMode
   }
 
   //设置图片缩放模式1
-  if (fixRadio) {
+  if(fixRadio) {
     return 3
   }
 }
@@ -204,7 +204,7 @@ export function contentStructure(callback, data, context) {
 
 
   //容器结构创建
-  if (containerRelated && containerRelated.length) {
+  if(containerRelated && containerRelated.length) {
     containerObj = createContainer(containerRelated, pid, getStyle);
   }
 
@@ -221,7 +221,7 @@ export function contentStructure(callback, data, context) {
   //如果是启动了特殊高精灵动画
   //强制打开canvas模式设置
   //这里可以排除掉其余的canvas动画
-  if (data.canvasRelated.onlyCompSprite) {
+  if(data.canvasRelated.onlyCompSprite) {
     data.canvasRelated.enable = true
   }
 
@@ -236,14 +236,14 @@ export function contentStructure(callback, data, context) {
 
       //如果有二维码标记
       //2017.3.1
-      if (para.qrCode) {
+      if(para.qrCode) {
         conData.qrCode = true
       }
 
       //有页眉页脚对象
       //2017.1.18
-      if (para.HeaderOrFooter) {
-        if (headerFooterMode[contentId]) {
+      if(para.HeaderOrFooter) {
+        if(headerFooterMode[contentId]) {
           $$warn('页眉页脚对象重复设置,cid:' + contentId)
         }
         headerFooterMode[contentId] = Number(para.HeaderOrFooter)
@@ -252,15 +252,15 @@ export function contentStructure(callback, data, context) {
       //保持图片正比缩放
       //给mini使用
       //2016.12.15
-      if (para.fixRadio) {
+      if(para.fixRadio) {
         conData.fixRadio = true
       }
 
       //针对母版content的topmost数据处理，找出浮动的对象Id
       //排除数据topmost为0的处理
       zIndex = para['topmost']
-      if (zIndex && zIndex != 0) {
-        if (isMaster) {
+      if(zIndex && zIndex != 0) {
+        if(isMaster) {
           //收集浮动的母版对象id
           floatMaters.ids.push(contentId)
           floatMaters.zIndex[contentId] = zIndex
@@ -281,8 +281,8 @@ export function contentStructure(callback, data, context) {
     var category = conData.category;
 
     //如果是模板书签，强制为浮动对象
-    if (isMaster && (eventId = seasonRelated[contentId])) {
-      if (eventId['BookMarks']) {
+    if(isMaster && (eventId = seasonRelated[contentId])) {
+      if(eventId['BookMarks']) {
         floatMaters.ids.push(contentId)
       }
     }
@@ -290,15 +290,15 @@ export function contentStructure(callback, data, context) {
     //如果有parameter参数
     //1 浮动对象
     //2 canvas对象
-    if (conData) {
+    if(conData) {
       //匹配canvas对象数据
-      if (category) {
+      if(category) {
         //解析canvas先关数据
         parseCanvas(contentId, category, conData, data)
       }
       //如果有parameter
-      if (conData.parameter) {
-        if (parameter = parseJSON(conData.parameter)) {
+      if(conData.parameter) {
+        if(parameter = parseJSON(conData.parameter)) {
           //parameter保持数组格式
           parseParameter(parameter.length ? parameter : [parameter], contentId, conData)
         }
@@ -318,14 +318,14 @@ export function contentStructure(callback, data, context) {
       analysisPath(wrapObj, conData)
 
       //canvas节点
-      if (conData.canvasMode) {
+      if(conData.canvasMode) {
         contentStr = createCanvas(conData, wrapObj)
       } else {
         //dom节点
         contentStr = createDom(conData, wrapObj)
       }
       //如果创建的是容器对象
-      if (containerObj && (uuid = containerObj[contentId])) {
+      if(containerObj && (uuid = containerObj[contentId])) {
         startStr = containerObj[uuid];
         startStr.start.push(contentStr)
       } else {
@@ -360,7 +360,7 @@ export function contentStructure(callback, data, context) {
    * @return {[type]} [description]
    */
   function checkComplete() {
-    if (cloneContentCount === 1) {
+    if(cloneContentCount === 1) {
       let data = {
         contentDas,
         idFix,
@@ -371,7 +371,7 @@ export function contentStructure(callback, data, context) {
       }
 
       //针对容器处理
-      if (containerObj) {
+      if(containerObj) {
         var start, end, containerPrefix, containerStr
         containerStr = []
 
@@ -398,9 +398,9 @@ export function contentStructure(callback, data, context) {
   //开始生成所有的节点
   //1:dom
   //2:canvas
-  while (contentCount--) {
+  while(contentCount--) {
     //根据数据创content结构
-    if (content = contentCollection[contentCount]) {
+    if(content = contentCollection[contentCount]) {
       contentId = content['_id'];
       //创建包装器,处理数据引用关系
       wrapObj = makeWarpObj(contentId, content, pageType, pid, virtualOffset);
@@ -408,12 +408,12 @@ export function contentStructure(callback, data, context) {
 
       //如果有文本效果标记
       //content.texteffect = " "//数据库写错，多了一个空格
-      if (content.texteffect && content.texteffect.trim()) {
+      if(content.texteffect && content.texteffect.trim()) {
         content.texteffectId = wrapObj.containerName
         textFx.push(content)
       }
       //保存文本框content的Id
-      if (wrapObj.isJs) {
+      if(wrapObj.isJs) {
         contentHtmlBoxIds.push(contentId)
       }
 
@@ -426,7 +426,7 @@ export function contentStructure(callback, data, context) {
       })
 
       //如果是隐藏的页面页脚，重写这个标记
-      if (sizeResults.isHide && headerFooterMode[contentId]) {
+      if(sizeResults.isHide && headerFooterMode[contentId]) {
         headerFooterMode[contentId] = 'hide'
       }
 

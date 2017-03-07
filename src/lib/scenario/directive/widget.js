@@ -21,7 +21,7 @@ export default {
     scaleLeft
   }, chpaterData, chapterId, pageIndex, zIndex, pageType) {
     //如果是自动播放,则不创建结构
-    if (autoPlay) {
+    if(autoPlay) {
       return ''
     }
     return String.styleFormat(
@@ -46,7 +46,8 @@ export default {
    * @param  {[type]} data [description]
    * @return {[type]}      [description]
    */
-  , autoPlay({
+  ,
+  autoPlay({
     id,
     rootNode,
     pageType,
@@ -68,7 +69,8 @@ export default {
    * @param  {[type]} data [description]
    * @return {[type]}      [description]
    */
-  , trigger(data) {
+  ,
+  trigger(data) {
     return Adapter(data)
   }
 

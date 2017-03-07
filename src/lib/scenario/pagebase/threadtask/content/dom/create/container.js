@@ -10,14 +10,14 @@ import { parseContentDas } from '../parse/content'
  */
 const createContainerWrap = (containerName, contentId, pid, getStyle) => {
 
-    const contentDas = parseContentDas([contentId])
-    const data = reviseSize({
-        results: contentDas[0],
-        proportion: getStyle.pageProportion
-    })
+  const contentDas = parseContentDas([contentId])
+  const data = reviseSize({
+    results: contentDas[0],
+    proportion: getStyle.pageProportion
+  })
 
-    const wapper =
-        `<div  id="${containerName}"
+  const wapper =
+    `<div  id="${containerName}"
                data-behavior="click-swipe"
                style="width:${data.scaleWidth}px;
                       height:${data.scaleHeight}px;
@@ -26,33 +26,33 @@ const createContainerWrap = (containerName, contentId, pid, getStyle) => {
                       position:absolute;
                       z-index:${data.zIndex};">`
 
-    return String.styleFormat(wapper)
+  return String.styleFormat(wapper)
 }
 
 
 export function createContainer(containerRelated, pid, getStyle) {
-    var itemIds,
-        uuid,
-        contentId,
-        containerName,
-        containerObj = {
-            createUUID: [],
-            containerName: []
-        };
+  var itemIds,
+    uuid,
+    contentId,
+    containerName,
+    containerObj = {
+      createUUID: [],
+      containerName: []
+    };
 
-    containerRelated.forEach((data, index) => {
-        contentId = data.imageIds;
-        containerName = "Container_" + pid + "_" + contentId
-        uuid = "aaron" + Math.random()
-        containerObj[uuid] = {
-            'start': [createContainerWrap(containerName, contentId, pid, getStyle)],
-            'end': '</div>'
-        };
-        containerObj.createUUID.push(uuid);
-        containerObj.containerName.push(containerName);
-        data.itemIds.forEach(function(id) {
-            containerObj[id] = uuid;
-        })
+  containerRelated.forEach((data, index) => {
+    contentId = data.imageIds;
+    containerName = "Container_" + pid + "_" + contentId
+    uuid = "aaron" + Math.random()
+    containerObj[uuid] = {
+      'start': [createContainerWrap(containerName, contentId, pid, getStyle)],
+      'end': '</div>'
+    };
+    containerObj.createUUID.push(uuid);
+    containerObj.containerName.push(containerName);
+    data.itemIds.forEach(function(id) {
+      containerObj[id] = uuid;
     })
-    return containerObj;
+  })
+  return containerObj;
 }

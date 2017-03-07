@@ -37,7 +37,7 @@ export function initView() {
    * 关闭场景
    */
   Xut.View.CloseScenario = function() {
-    if (repeatClick) return;
+    if(repeatClick) return;
     repeatClick = true;
     var serial = sceneController.takeOutPrevChainId();
     Xut.View.LoadScenario({
@@ -69,7 +69,7 @@ export function initView() {
 
     //ibooks模式下的跳转
     //全部转化成超链接
-    if (!options.main && Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
+    if(!options.main && Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
       location.href = chapterId + ".xhtml";
       return
     }
@@ -81,10 +81,10 @@ export function initView() {
 
     //获取到当前的页面对象
     //用于跳转去重复
-    if (current && current.vm) {
+    if(current && current.vm) {
       var curVmPage;
-      if (curVmPage = current.vm.$curVmPage) {
-        if (curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
+      if(curVmPage = current.vm.$curVmPage) {
+        if(curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
           $$warn(`重复触发页面加载:seasonId:${seasonId},chapterId:${chapterId}`)
           return
         }
@@ -97,7 +97,7 @@ export function initView() {
      * 用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
      * @return {[type]}            [description]
      */
-    if (userAssign && current && current.scenarioId === seasonId) {
+    if(userAssign && current && current.scenarioId === seasonId) {
       Xut.View.GotoSlide(seasonId, chapterId)
       return
     }
@@ -110,7 +110,7 @@ export function initView() {
     current && current.vm.$suspend();
 
     //通过内部关闭按钮加载新场景处理
-    if (current && userAssign) {
+    if(current && userAssign) {
       //检测是不是往回跳转,重复处理
       sceneController.checkToRepeat(seasonId);
     }
@@ -121,7 +121,7 @@ export function initView() {
      */
 
     //读酷启动时不需要忙碌光标
-    if (window.DUKUCONFIG && options.main) {
+    if(window.DUKUCONFIG && options.main) {
       Xut.View.HideBusy();
     } else {
       Xut.View.ShowBusy();
@@ -138,7 +138,7 @@ export function initView() {
      * 如果当前是从主场景加载副场景
      * 关闭系统工具栏
      */
-    if (current && !current.vm.$multiScenario) {
+    if(current && !current.vm.$multiScenario) {
       Xut.View.HideToolBar();
     }
 
@@ -148,7 +148,7 @@ export function initView() {
      * 用于记录场景最后记录
      */
     var pageId;
-    if (current && (pageId = Xut.Presentation.GetPageId())) {
+    if(current && (pageId = Xut.Presentation.GetPageId())) {
       sceneController.rewrite(current.scenarioId, pageId);
     }
 
@@ -173,7 +173,7 @@ export function initView() {
     var parseInitIndex = () => {
       return chapterId ? (() => {
         //如果节点内部跳转方式加载,无需转化页码
-        if (createMode === 'GotoSlide') {
+        if(createMode === 'GotoSlide') {
           return chapterId;
         }
         //初始页从0开始，减去下标1
@@ -207,7 +207,7 @@ export function initView() {
       complete(nextBack) {
         //销毁多余场景
         current && current.destroy()
-          //下一个任务存在,执行切换回调后,在执行页面任务
+        //下一个任务存在,执行切换回调后,在执行页面任务
         nextBack && nextBack();
         //去掉忙碌
         Xut.View.HideBusy();
@@ -217,7 +217,7 @@ export function initView() {
     }
 
     //主场景判断（第一个节,因为工具栏的配置不同）
-    if (options.main || sceneController.mianId === seasonId) {
+    if(options.main || sceneController.mianId === seasonId) {
       //清理缓存
       $$remove("history");
       //确定主场景

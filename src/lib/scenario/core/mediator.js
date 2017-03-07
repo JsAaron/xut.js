@@ -4,24 +4,15 @@
  *          2 翻页全局事件
  *
  **********************************************************************/
-import {
-  config
-} from '../../config/index'
-import {
-  Observer
-} from '../../observer/index'
+import { config } from '../../config/index'
+import { Observer } from '../../observer/index'
 import Dispatcher from './dispatch/index'
 import delegateHooks from './hooks'
 import closestProcessor from './closest'
 import GlobalEvent from '../../swipe/index.js'
 import swipeHooks from '../../swipe/hook.js'
-import {
-  initSceneApi
-} from '../scene-api/index'
-import {
-  defProtected,
-  defAccess
-} from '../../util/index'
+import { initSceneApi } from '../scene-api/index'
+import { defProtected, defAccess } from '../../util/index'
 
 /**
  * 配置多页面参数
@@ -29,7 +20,7 @@ import {
  */
 const configMultiple = (options) => {
   //如果是epub,强制转换为单页面
-  if (Xut.IBooks.Enabled) {
+  if(Xut.IBooks.Enabled) {
     options.multiplePages = false
   } else {
 
@@ -38,18 +29,18 @@ const configMultiple = (options) => {
     /// pageMode当前页面定义模式  ////
     ////////////////////////////////
     let pageMode = Number(options.pageMode)
-      //判断多页面情况
-    if (options.flipMode === 'allow') {
+    //判断多页面情况
+    if(options.flipMode === 'allow') {
       options.multiplePages = true
-      if (pageMode === 0) { //如果工具栏强制禁止滑动
+      if(pageMode === 0) { //如果工具栏强制禁止滑动
         options.multiplePages = false
       }
     }
 
     //如果是禁止翻页，然后还要看是不是有pageMode的设置
-    if (options.flipMode === 'ban') {
+    if(options.flipMode === 'ban') {
       options.multiplePages = false
-      if (pageMode > 0) { //如果工具栏单独设置了页面模式，那么多页面强制改成true
+      if(pageMode > 0) { //如果工具栏单独设置了页面模式，那么多页面强制改成true
         options.multiplePages = true
       }
     }
@@ -67,7 +58,7 @@ const configMultiple = (options) => {
  */
 const isBelong = (node) => {
   var pageType = 'page';
-  if (node.dataset && node.dataset.belong) {
+  if(node.dataset && node.dataset.belong) {
     pageType = node.dataset.belong;
   }
   return pageType
@@ -111,7 +102,7 @@ export default class Mediator extends Observer {
     const $dispatcher = vm.$dispatcher = new Dispatcher(vm)
 
     //如果是主场景,才能切换系统工具栏
-    if (options.multiplePages) {
+    if(options.multiplePages) {
       this.addTools(vm)
     }
 
@@ -125,7 +116,7 @@ export default class Mediator extends Observer {
     $globalEvent.$watch('onFilter', (hookCallback, point, evtObj) => {
       let node = point.target
       swipeHooks(evtObj, node)
-        //页面类型
+      //页面类型
       let pageType = isBelong(node);
       //冒泡的ul根节点
       let parentNode = $globalEvent.findBubbleRootNode(point, pageType);
@@ -134,11 +125,11 @@ export default class Mediator extends Observer {
       //如果找到是空节点
       //并且是虚拟模式2的话
       //默认允许滑动
-      if (!handlerObj && config.visualMode == 2) {
+      if(!handlerObj && config.visualMode == 2) {
         return
       }
       //停止翻页,针对content对象可以拖动,滑动的情况处理
-      if (!handlerObj || handlerObj.attribute === 'disable') {
+      if(!handlerObj || handlerObj.attribute === 'disable') {
         hookCallback();
       }
     });
@@ -158,11 +149,11 @@ export default class Mediator extends Observer {
      * 无滑动
      */
     $globalEvent.$watch('onTap', (pageIndex, hookCallback) => {
-      if (handlerObj) {
-        if (handlerObj.handlers) {
+      if(handlerObj) {
+        if(handlerObj.handlers) {
           handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex)
         } else {
-          if (!Xut.Contents.Canvas.getIsTap()) {
+          if(!Xut.Contents.Canvas.getIsTap()) {
             vm.$emit('change:toggleToolbar')
           }
         }
@@ -215,7 +206,7 @@ export default class Mediator extends Observer {
      * 删除parallaxProcessed
      */
     $globalEvent.$watch('onMasterMove', (hindex, target) => {
-      if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
+      if(/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
         $dispatcher.masterMgr && $dispatcher.masterMgr.reactivation(target);
       }
     });
@@ -255,7 +246,7 @@ export default class Mediator extends Observer {
        */
       'data-behavior' (target, attribute, rootNode, pageIndex) {
         //没有事件的元素,即可翻页又可点击切换工具栏
-        if (attribute == 'click-swipe') {
+        if(attribute == 'click-swipe') {
           vm.$emit('change:toggleToolbar')
         }
       }
@@ -287,7 +278,7 @@ defAccess(Mediator.prototype, '$multiScenario', {
 defAccess(Mediator.prototype, '$injectionComponent', {
   set: function(regData) {
     var injection;
-    if (injection = this.$dispatcher[regData.pageType + 'Mgr']) {
+    if(injection = this.$dispatcher[regData.pageType + 'Mgr']) {
       injection.abstractAssistPocess(regData.pageIndex, function(pageObj) {
         pageObj.baseRegisterComponent.call(pageObj, regData.widget);
       })

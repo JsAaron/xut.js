@@ -6,11 +6,11 @@
  * 	appInfo  1:hide ; 0:show
  */
 Xut.Plugin.statusbarPlugin = {
-	setStatus: function(successfullCallback, failedCallback, appInfo) {
-		if (GLOBALIFRAME) {
-			return GLOBALCONTEXT.XXT.plugins.statusbarPlugin.setStatus(successfullCallback, failedCallback, appInfo);
-		} else {
-			return cordova.exec(successfullCallback, failedCallback, 'statusbarSet', 'set', [appInfo]);
-		}
-	}
+  setStatus: function(successfullCallback, failedCallback, appInfo) {
+    if(GLOBALIFRAME) {
+      return GLOBALCONTEXT.XXT.plugins.statusbarPlugin.setStatus(successfullCallback, failedCallback, appInfo);
+    } else {
+      return cordova.exec(successfullCallback, failedCallback, 'statusbarSet', 'set', [appInfo]);
+    }
+  }
 };

@@ -14,7 +14,7 @@
   $.support.touch = 'ontouchend' in document;
 
   // Ignore browsers without touch support
-  if (!$.support.touch) {
+  if(!$.support.touch) {
     return;
   }
 
@@ -31,7 +31,7 @@
   function simulateMouseEvent(event, simulatedType) {
 
     // Ignore multi-touch events
-    if (event.originalEvent.touches.length > 1) {
+    if(event.originalEvent.touches.length > 1) {
       return;
     }
 
@@ -72,7 +72,7 @@
     var self = this;
 
     // Ignore the event if another widget is already being handled
-    if (touchHandled || !self._mouseCapture(event.originalEvent.changedTouches[0])) {
+    if(touchHandled || !self._mouseCapture(event.originalEvent.changedTouches[0])) {
       return;
     }
 
@@ -99,7 +99,7 @@
   mouseProto._touchMove = function(event) {
 
     // Ignore event if not handled
-    if (!touchHandled) {
+    if(!touchHandled) {
       return;
     }
 
@@ -117,7 +117,7 @@
   mouseProto._touchEnd = function(event) {
 
     // Ignore event if not handled
-    if (!touchHandled) {
+    if(!touchHandled) {
       return;
     }
 
@@ -128,7 +128,7 @@
     simulateMouseEvent(event, 'mouseout');
 
     // If the touch interaction did not move, it should trigger a click
-    if (!this._touchMoved) {
+    if(!this._touchMoved) {
 
       // Simulate the click event
       simulateMouseEvent(event, 'click');

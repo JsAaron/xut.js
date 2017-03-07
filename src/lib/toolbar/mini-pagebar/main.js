@@ -38,7 +38,7 @@ export default class NumberBar {
     this.dotTrue = 'digital';
 
     //圆形
-    if (pageBar.type === 'circular') {
+    if(pageBar.type === 'circular') {
       //圆点模式
       this.dotTrue = pageBar.type;
       //圆点模式样式
@@ -46,17 +46,17 @@ export default class NumberBar {
       //样式
       this.dotStyleClass = dotStyleClass[this.dotStyle - 1];
       //位置
-      if (pageBar.position) {
+      if(pageBar.position) {
         let left = pageBar.position.left
         let top = pageBar.position.top
         let width = 'width:100%;'
-        if (_.isUndefined(left)) {
+        if(_.isUndefined(left)) {
           left = 'width:100%;text-align:center;'
         } else {
           width = `width:${100-parseInt(left)}%;`
           left = `left:${left};`
         }
-        if (_.isUndefined(top)) {
+        if(_.isUndefined(top)) {
           top = 'bottom:0;'
         } else {
           top = `top:${top};`
@@ -71,7 +71,7 @@ export default class NumberBar {
     const html = String.styleFormat(this._createDom(pageTotal))
     this.$container = $(html)
 
-    if (this.dotTrue === 'circular') {
+    if(this.dotTrue === 'circular') {
       this.$currtNode = this.$container.find('span:first')
     } else {
       this.$currtNode = this.$container.find('div:first')
@@ -87,10 +87,10 @@ export default class NumberBar {
 
   _createDom(pageTotal) {
     //圆点模式
-    if (this.dotTrue === 'circular') {
+    if(this.dotTrue === 'circular') {
       let dotString = ''
       let countPage = pageTotal
-      while (countPage--) {
+      while(countPage--) {
         dotString += `<span class="slider-pager-page"><i class= ${this.dotStyleClass}></i></span>`;
       }
       return `<div class="xut-page-number"style="${this.position};">${dotString}</div>`
@@ -99,7 +99,7 @@ export default class NumberBar {
     else {
       //存在模式3的情况，所以页码要处理溢出的情况。left值
       let right = 0
-      if (config.visualSize.overflowWidth) {
+      if(config.visualSize.overflowWidth) {
         right = Math.abs(config.visualSize.left * 2) + 'px'
       }
       return `<div class="xut-page-number"style="right:${right};bottom:0;">
@@ -119,8 +119,8 @@ export default class NumberBar {
   }
 
   toggle(state, pointer) {
-    if (pointer !== 'pageNumber') return
-    switch (state) {
+    if(pointer !== 'pageNumber') return
+    switch(state) {
       case 'show':
         this._showToolBar();
         break;
@@ -140,13 +140,13 @@ export default class NumberBar {
   _updateSingle(action, updateIndex) {
     Xut.nextTick(() => {
       //圆点模式
-      if (this.dotTrue === 'circular') {
+      if(this.dotTrue === 'circular') {
         this.$container.find('span.slider-pager-page.active').removeClass('active')
         $(this.$container.find('span.slider-pager-page')[updateIndex - 1]).addClass("active");
       } else {
         this.$currtNode.text(updateIndex)
       }
-      if (action === 'init') {
+      if(action === 'init') {
         this.$container.show()
       }
     })
@@ -158,18 +158,18 @@ export default class NumberBar {
   updateTotal(newTotalIndex) {
     Xut.nextTick(() => {
       //圆点模式
-      if (this.dotTrue === 'circular') {
+      if(this.dotTrue === 'circular') {
         var visualIndex = 0;
         var span, iconi;
         _.each(this.$container.find('span.slider-pager-page'), function(value, index) {
-          if (value.className != "slider-pager-page") {
+          if(value.className != "slider-pager-page") {
             visualIndex = index;
           }
         })
         this.$container.empty();
-        for (var i = 0; i < newTotalIndex; i++) {
+        for(var i = 0; i < newTotalIndex; i++) {
           span = document.createElement('span')
-          if (i == visualIndex) {
+          if(i == visualIndex) {
             span.className = "slider-pager-page active";
           } else {
             span.className = "slider-pager-page";
@@ -199,11 +199,11 @@ export default class NumberBar {
 
     let chapterData = Xut.Presentation.GetPageData('page', parentIndex)
 
-    //从正索引开始
-    ++parentIndex
+      //从正索引开始
+      ++parentIndex
 
     //没有column
-    if (!hasColumn()) {
+    if(!hasColumn()) {
       this._updateSingle(action, parentIndex)
       return
     }
@@ -214,9 +214,9 @@ export default class NumberBar {
 
 
     //前翻页，需要叠加flow的总和
-    if (direction === 'prev') {
+    if(direction === 'prev') {
       //前翻页：内部翻页
-      if (hasSon) {
+      if(hasSon) {
         updateIndex = parentIndex + beforeCount + sonIndex - 2
       }
       //前翻页：外部往内部翻页，正好前一页是内部页，所以需要获取内部页总和

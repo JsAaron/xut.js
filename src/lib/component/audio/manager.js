@@ -48,10 +48,10 @@ let SEASON = 'season' //节音频
 var pageBox, playBox
 
 let initBox = () => {
-    pageBox = hash()
+  pageBox = hash()
 
-    //[type][pageId][queryId]
-    playBox = hash()
+  //[type][pageId][queryId]
+  playBox = hash()
 }
 
 initBox()
@@ -64,19 +64,19 @@ initBox()
  * @return {[type]}         [description]
  */
 let parseData = (type, queryId) => {
-    var data;
-    switch (type) {
-        case ANIMATE:
-            data = Xut.data.query('Video', queryId, true);
-            break;
-        case SEASON:
-            data = Xut.data.query('Video', queryId, true);
-            break;
-        default:
-            data = Xut.data.query('Video', queryId);
-            break;
-    }
-    return data;
+  var data;
+  switch(type) {
+    case ANIMATE:
+      data = Xut.data.query('Video', queryId, true);
+      break;
+    case SEASON:
+      data = Xut.data.query('Video', queryId, true);
+      break;
+    default:
+      data = Xut.data.query('Video', queryId);
+      break;
+  }
+  return data;
 }
 
 /**
@@ -84,44 +84,44 @@ let parseData = (type, queryId) => {
  * @return {[type]} [description]
  */
 let getParentDom = (subtitles, pageId, queryId) => {
-    //字幕数据
-    var parentDoms = hash();
-    var ancestorDoms = hash();
-    var contentsFragment;
-    var dom;
-    var pageIndex = (pageId - 1);
-    if (subtitles) {
-        //获取文档节点
-        contentsFragment = Xut.Contents.contentsFragment[pageId];
+  //字幕数据
+  var parentDoms = hash();
+  var ancestorDoms = hash();
+  var contentsFragment;
+  var dom;
+  var pageIndex = (pageId - 1);
+  if(subtitles) {
+    //获取文档节点
+    contentsFragment = Xut.Contents.contentsFragment[pageId];
 
-        //如果maskId大于9000默认为处理
-        var isMask = pageId > 9000;
-        if (isMask) {
-            //指定页码编号
-            pageIndex = Xut.Presentation.GetPageIndex();
-        }
-
-        //找到对应的节点
-        _.each(subtitles, function(data) {
-            //'Content_0_1' 规则 类型_页码（0开始）_id
-            if (!parentDoms[data.id]) {
-                dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
-                ancestorDoms[data.id] = dom;
-                var $dom = $(dom);
-                if ($dom.length) {
-                    var _div = $dom.find('div').last();
-                    if (_div.length) {
-                        parentDoms[data.id] = _div[0]
-                    }
-                }
-            }
-        })
+    //如果maskId大于9000默认为处理
+    var isMask = pageId > 9000;
+    if(isMask) {
+      //指定页码编号
+      pageIndex = Xut.Presentation.GetPageIndex();
     }
 
-    return {
-        parents: parentDoms,
-        ancestors: ancestorDoms
-    };
+    //找到对应的节点
+    _.each(subtitles, function(data) {
+      //'Content_0_1' 规则 类型_页码（0开始）_id
+      if(!parentDoms[data.id]) {
+        dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
+        ancestorDoms[data.id] = dom;
+        var $dom = $(dom);
+        if($dom.length) {
+          var _div = $dom.find('div').last();
+          if(_div.length) {
+            parentDoms[data.id] = _div[0]
+          }
+        }
+      }
+    })
+  }
+
+  return {
+    parents: parentDoms,
+    ancestors: ancestorDoms
+  };
 }
 
 /**
@@ -129,11 +129,11 @@ let getParentDom = (subtitles, pageId, queryId) => {
  * @return {[type]}         [description]
  */
 let checkRepeat = (pageId, queryId, type) => {
-    var pBox = pageBox[type];
-    if (pBox && pBox[pageId] && pBox[pageId][queryId]) {
-        return true;
-    }
-    return false;
+  var pBox = pageBox[type];
+  if(pBox && pBox[pageId] && pBox[pageId][queryId]) {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -143,25 +143,25 @@ let checkRepeat = (pageId, queryId, type) => {
  * @return {[type]}         [description]
  */
 let combination = (data, pageId, queryId, type, eleName) => {
-    var tempDoms;
-    if (!pageBox[type]) {
-        pageBox[type] = hash();
-    }
-    if (!pageBox[type][pageId]) {
-        pageBox[type][pageId] = hash();
-    }
-    //有字幕处理
-    if (data.theTitle) {
-        var subtitles = parseJSON(data.theTitle);
-    }
-    //配置音频结构
-    return pageBox[type][pageId][queryId] = {
-        'trackId': data.track, //音轨
-        'url': data.md5, //音频名字
-        'subtitles': subtitles,
-        'audioId': queryId,
-        'data': data
-    }
+  var tempDoms;
+  if(!pageBox[type]) {
+    pageBox[type] = hash();
+  }
+  if(!pageBox[type][pageId]) {
+    pageBox[type][pageId] = hash();
+  }
+  //有字幕处理
+  if(data.theTitle) {
+    var subtitles = parseJSON(data.theTitle);
+  }
+  //配置音频结构
+  return pageBox[type][pageId][queryId] = {
+    'trackId': data.track, //音轨
+    'url': data.md5, //音频名字
+    'subtitles': subtitles,
+    'audioId': queryId,
+    'data': data
+  }
 }
 
 
@@ -172,26 +172,26 @@ let combination = (data, pageId, queryId, type, eleName) => {
  * @param  {string} type   音频来源类型[动画音频,节音频,热点音频]
  */
 let deployAudio = (pageId, queryId, type, actionData) => {
-    //避免复重查询
-    if (checkRepeat(pageId, queryId, type)) {
-        return false;
+  //避免复重查询
+  if(checkRepeat(pageId, queryId, type)) {
+    return false;
+  }
+  //解析合集数据
+  var data = parseData(type, queryId);
+  //存在音频文件
+  if(data && data.md5) {
+    //新的查询
+    var ret = combination(data, pageId, queryId, type, actionData);
+    //混入新的动作数据
+    //2015.9.24
+    //音频替换图片
+    //触发动画
+    if(actionData) {
+      _.extend(ret, actionData, {
+        action: true //快速判断存在动作数据
+      })
     }
-    //解析合集数据
-    var data = parseData(type, queryId);
-    //存在音频文件
-    if (data && data.md5) {
-        //新的查询
-        var ret = combination(data, pageId, queryId, type, actionData);
-        //混入新的动作数据
-        //2015.9.24
-        //音频替换图片
-        //触发动画
-        if (actionData) {
-            _.extend(ret, actionData, {
-                action: true //快速判断存在动作数据
-            })
-        }
-    }
+  }
 }
 
 
@@ -205,22 +205,22 @@ let deployAudio = (pageId, queryId, type, actionData) => {
  * @return {boolen}         不打断返回true,否则返回false
  */
 let checkBreakAudio = (type, pageId, queryId, pageBox) => {
-    var playObj = playBox[type][pageId][queryId],
-        trackId = pageBox.trackId,
-        _trackId = playObj.trackId;
+  var playObj = playBox[type][pageId][queryId],
+    trackId = pageBox.trackId,
+    _trackId = playObj.trackId;
 
-    //如果是节音频，且地址相同，则不打断
-    if (type == SEASON && playObj.url == pageBox.url) {
-        return true;
-    }
+  //如果是节音频，且地址相同，则不打断
+  if(type == SEASON && playObj.url == pageBox.url) {
+    return true;
+  }
 
-    //如果要用零音轨||零音轨有音乐在播||两音轨相同
-    //则打断
-    if (trackId == 0 || _trackId == 0 || trackId == _trackId) {
-        playObj.end();
-        delete playBox[type][pageId][queryId];
-    }
-    return false;
+  //如果要用零音轨||零音轨有音乐在播||两音轨相同
+  //则打断
+  if(trackId == 0 || _trackId == 0 || trackId == _trackId) {
+    playObj.end();
+    delete playBox[type][pageId][queryId];
+  }
+  return false;
 }
 
 
@@ -232,19 +232,19 @@ let checkBreakAudio = (type, pageId, queryId, pageBox) => {
  * @return {object}         音频对象/不存在为null
  */
 let preCheck = (pageId, queryId, type) => {
-    var t, p, q,
-        playObj = pageBox[type][pageId][queryId],
-        seasonAudio = null;
-    for (t in playBox) {
-        for (p in playBox[t]) {
-            for (q in playBox[t][p]) {
-                if (checkBreakAudio(t, p, q, playObj)) {
-                    seasonAudio = playBox[t][p][q];
-                }
-            }
+  var t, p, q,
+    playObj = pageBox[type][pageId][queryId],
+    seasonAudio = null;
+  for(t in playBox) {
+    for(p in playBox[t]) {
+      for(q in playBox[t][p]) {
+        if(checkBreakAudio(t, p, q, playObj)) {
+          seasonAudio = playBox[t][p][q];
         }
+      }
     }
-    return seasonAudio;
+  }
+  return seasonAudio;
 }
 
 
@@ -254,38 +254,38 @@ let preCheck = (pageId, queryId, type) => {
  */
 let loadAudio = (pageId, queryId, type) => {
 
-    //找到页面对应的音频
-    //类型=》页面=》指定音频Id
-    var pageObj = pageBox[type][pageId][queryId];
-    //检测
-    var seAudio = preCheck(pageId, queryId, type);
+  //找到页面对应的音频
+  //类型=》页面=》指定音频Id
+  var pageObj = pageBox[type][pageId][queryId];
+  //检测
+  var seAudio = preCheck(pageId, queryId, type);
 
-    //播放音频时关掉视频
-    // clearVideo()
+  //播放音频时关掉视频
+  // clearVideo()
 
-    //构建播放列表
-    if (!playBox[type]) {
-        playBox[type] = hash();
-    }
-    if (!playBox[type][pageId]) {
-        playBox[type][pageId] = hash();
-    }
-    //假如有字幕信息
-    //找到对应的文档对象
-    if (pageObj.subtitles) {
-        var tempDoms = getParentDom(pageObj.subtitles, pageId, queryId);
-    }
+  //构建播放列表
+  if(!playBox[type]) {
+    playBox[type] = hash();
+  }
+  if(!playBox[type][pageId]) {
+    playBox[type][pageId] = hash();
+  }
+  //假如有字幕信息
+  //找到对应的文档对象
+  if(pageObj.subtitles) {
+    var tempDoms = getParentDom(pageObj.subtitles, pageId, queryId);
+  }
 
-    //播放完成处理
-    pageObj.innerCallback = (audio) => {
-        if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
-            audio.end();
-            delete playBox[type][pageId][queryId];
-        }
+  //播放完成处理
+  pageObj.innerCallback = (audio) => {
+    if(playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
+      audio.end();
+      delete playBox[type][pageId][queryId];
     }
+  }
 
-    //存入播放对象池
-    playBox[type][pageId][queryId] = seAudio || new audioPlayer(pageObj, tempDoms)
+  //存入播放对象池
+  playBox[type][pageId][queryId] = seAudio || new audioPlayer(pageObj, tempDoms)
 }
 
 
@@ -297,22 +297,22 @@ let loadAudio = (pageId, queryId, type) => {
  * @return {[type]}         [description]
  */
 let loadTiggerAudio = (pageId, queryId, type) => {
-    var playObj, status;
-    if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
-        playObj = playBox[type][pageId][queryId];
-        status = playObj.audio ? playObj.status : null;
-    }
-    switch (status) {
-        case 'playing':
-            playObj.pause();
-            break;
-        case 'paused':
-            playObj.play();
-            break;
-        default:
-            loadAudio(pageId, queryId, type);
-            break;
-    }
+  var playObj, status;
+  if(playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
+    playObj = playBox[type][pageId][queryId];
+    status = playObj.audio ? playObj.status : null;
+  }
+  switch(status) {
+    case 'playing':
+      playObj.pause();
+      break;
+    case 'paused':
+      playObj.play();
+      break;
+    default:
+      loadAudio(pageId, queryId, type);
+      break;
+  }
 }
 
 
@@ -321,15 +321,15 @@ let loadTiggerAudio = (pageId, queryId, type) => {
  * @return {[type]} [description]
  */
 let removeAudio = () => {
-    var t, p, a;
-    for (t in playBox) {
-        for (p in playBox[t]) {
-            for (a in playBox[t][p]) {
-                playBox[t][p][a].end();
-            }
-        }
+  var t, p, a;
+  for(t in playBox) {
+    for(p in playBox[t]) {
+      for(a in playBox[t][p]) {
+        playBox[t][p][a].end();
+      }
     }
-    initBox()
+  }
+  initBox()
 }
 
 
@@ -347,8 +347,8 @@ let removeAudio = () => {
  * @return {[type]}            [description]
  */
 export function autoAudio(pageId, activityId, actionData) {
-    deployAudio(pageId, activityId, ACTIVIT, actionData);
-    loadAudio(pageId, activityId, ACTIVIT);
+  deployAudio(pageId, activityId, ACTIVIT, actionData);
+  loadAudio(pageId, activityId, ACTIVIT);
 }
 
 
@@ -360,8 +360,8 @@ export function autoAudio(pageId, activityId, actionData) {
  * @return {[type]}            [description]
  */
 export function triggerAudio(pageId, activityId, actionData) {
-    deployAudio(pageId, activityId, ACTIVIT, actionData);
-    loadTiggerAudio(pageId, activityId, ACTIVIT);
+  deployAudio(pageId, activityId, ACTIVIT, actionData);
+  loadTiggerAudio(pageId, activityId, ACTIVIT);
 }
 
 
@@ -373,8 +373,8 @@ export function triggerAudio(pageId, activityId, actionData) {
  * @return {[type]}               [description]
  */
 export function seasonAudio(seasonAudioId, audioId) {
-    deployAudio(seasonAudioId, audioId, SEASON);
-    loadAudio(seasonAudioId, audioId, SEASON);
+  deployAudio(seasonAudioId, audioId, SEASON);
+  loadAudio(seasonAudioId, audioId, SEASON);
 }
 
 
@@ -383,14 +383,14 @@ export function seasonAudio(seasonAudioId, audioId) {
  * @return {[type]} [description]
  */
 export function hangUpAudio() {
-    var t, p, a;
-    for (t in playBox) {
-        for (p in playBox[t]) {
-            for (a in playBox[t][p]) {
-                playBox[t][p][a].pause();
-            }
-        }
+  var t, p, a;
+  for(t in playBox) {
+    for(p in playBox[t]) {
+      for(a in playBox[t][p]) {
+        playBox[t][p][a].pause();
+      }
     }
+  }
 }
 
 
@@ -401,8 +401,8 @@ export function hangUpAudio() {
  * @return {[type]}         [description]
  */
 export function createContentAudio(pageId, audioId) {
-    deployAudio(pageId, audioId, ANIMATE);
-    loadAudio(pageId, audioId, ANIMATE);
+  deployAudio(pageId, audioId, ANIMATE);
+  loadAudio(pageId, audioId, ANIMATE);
 }
 
 
@@ -412,16 +412,16 @@ export function createContentAudio(pageId, audioId) {
  * @return {[type]}        [description]
  */
 export function clearContentAudio(pageId) {
-    if (!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
-        return false;
+  if(!playBox[ANIMATE] || !playBox[ANIMATE][pageId]) {
+    return false;
+  }
+  var playObj = playBox[ANIMATE][pageId];
+  if(playObj) {
+    for(var i in playObj) {
+      playObj[i].end();
+      delete playBox[ANIMATE][pageId][i];
     }
-    var playObj = playBox[ANIMATE][pageId];
-    if (playObj) {
-        for (var i in playObj) {
-            playObj[i].end();
-            delete playBox[ANIMATE][pageId][i];
-        }
-    }
+  }
 }
 
 /**
@@ -430,10 +430,9 @@ export function clearContentAudio(pageId) {
  * @return {[type]}        [description]
  */
 export function clearAudio(pageId) {
-    if (pageId) { //如果只跳槽关闭动画音频
-        clearContentAudio(pageId)
-    } else {
-        removeAudio() //多场景模式,不处理跨页面
-    }
+  if(pageId) { //如果只跳槽关闭动画音频
+    clearContentAudio(pageId)
+  } else {
+    removeAudio() //多场景模式,不处理跨页面
+  }
 }
-

@@ -3,8 +3,8 @@ import app from './modules/app'
 
 
 const reducer = window.Redux.combineReducers({
-    todo,
-    app
+  todo,
+  app
 })
 
 export default window.Redux.createStore(reducer)

@@ -17,43 +17,43 @@ import TaskColumns from '../column/index'
  * @return {[type]} [description]
  */
 const parseMode = function(pageData, base) {
-    let parameter = pageData.parameter
-    if (parameter) {
-        try {
-            parameter = JSON.parse(parameter)
-            if (parameter) {
-                if (parameter.contentMode && parameter.contentMode == 1) {
-                    //非强制dom模式
-                    if (!Xut.config.onlyDomMode) {
-                        //启动dom模式
-                        base.canvasRelated.enable = true;
-                    }
-                }
-                //如果是最后一页处理
-                if (parameter.lastPage && base.pageType === 'page') {
-                    //运行应用运行时间
-                    base.runLastPageAction = function() {
-                        const runTime = Number(Xut.config.delayTime)
-                        let timeout
-                        if (runTime) {
-                            timeout = setTimeout(() => {
-                                    Xut.Application.Notify('complete')
-                                }, runTime * 1000) //转成秒
-                        }
-                        return function() { //返回停止方法
-                            if (timeout) {
-                                clearTimeout(timeout)
-                                timeout = null
-                            }
-                        }
-                    }
-
-                }
-            }
-        } catch (e) {
-            console.log('JSON错误,chpterId为', base.chapterId, parameter)
+  let parameter = pageData.parameter
+  if(parameter) {
+    try {
+      parameter = JSON.parse(parameter)
+      if(parameter) {
+        if(parameter.contentMode && parameter.contentMode == 1) {
+          //非强制dom模式
+          if(!Xut.config.onlyDomMode) {
+            //启动dom模式
+            base.canvasRelated.enable = true;
+          }
         }
+        //如果是最后一页处理
+        if(parameter.lastPage && base.pageType === 'page') {
+          //运行应用运行时间
+          base.runLastPageAction = function() {
+            const runTime = Number(Xut.config.delayTime)
+            let timeout
+            if(runTime) {
+              timeout = setTimeout(() => {
+                Xut.Application.Notify('complete')
+              }, runTime * 1000) //转成秒
+            }
+            return function() { //返回停止方法
+              if(timeout) {
+                clearTimeout(timeout)
+                timeout = null
+              }
+            }
+          }
+
+        }
+      }
+    } catch(e) {
+      console.log('JSON错误,chpterId为', base.chapterId, parameter)
     }
+  }
 }
 
 /**
@@ -66,193 +66,193 @@ const parseMode = function(pageData, base) {
  */
 export default {
 
-    /**
-     * 主容器
-     */
-    'Container' (taskCallback, base) {
-        //同步数据
-        updataCache.call(base, [base.pid], () => {
-            const pageData = base.baseData()
-            //contentMode模式
-            parseMode(pageData, base)
-            TaskContainer(base, pageData, taskCallback)
-        })
-    },
+  /**
+   * 主容器
+   */
+  'Container' (taskCallback, base) {
+    //同步数据
+    updataCache.call(base, [base.pid], () => {
+      const pageData = base.baseData()
+      //contentMode模式
+      parseMode(pageData, base)
+      TaskContainer(base, pageData, taskCallback)
+    })
+  },
 
 
-    /**
-     * 流式排版
-     */
-    'Column' (taskCallback, base) {
-        TaskColumns(base, taskCallback)
-    },
+  /**
+   * 流式排版
+   */
+  'Column' (taskCallback, base) {
+    TaskColumns(base, taskCallback)
+  },
 
 
-    /**
-     *  分配背景构建任务
-     *    1 构建数据与结构,执行中断检测
-     *    2 绘制结构,执行回调
-     *
-     *  提供2组回调
-     *    1 构建数据结构 suspendCallback
-     *    2 执行innerhtml构建完毕 successCallback
-     */
-    'Background' (taskCallback, base) {
+  /**
+   *  分配背景构建任务
+   *    1 构建数据与结构,执行中断检测
+   *    2 绘制结构,执行回调
+   *
+   *  提供2组回调
+   *    1 构建数据结构 suspendCallback
+   *    2 执行innerhtml构建完毕 successCallback
+   */
+  'Background' (taskCallback, base) {
 
-        if (base.checkInstanceTasks('background')) {
-            return;
-        }
-
-        const data = base.baseData(base.pid)
-
-        /**
-         * 构建中断回调
-         */
-        const suspendCallback = (innerNextTasks, innerSuspendTasks) => {
-            base.nextTasks({
-                'taskName': '内部background',
-                'outSuspendTasks': innerSuspendTasks,
-                'outNextTasks': innerNextTasks
-            });
-        }
-
-        /**
-         * 获取数据成功回调
-         * @return {[type]} [description]
-         */
-        const successCallback = () => {
-            taskCallback();
-        }
-
-        base.createRelated.cacheTasks['background'] = new TaskBackground({
-            data,
-            $containsNode: base.getContainsNode(),
-            suspendCallback,
-            successCallback
-        })
-
-    },
-
-
-    /**
-     * 分配Components构建任务
-     * @return {[type]} [description]
-     */
-    'Components' (taskCallback, base) {
-
-        if (base.checkInstanceTasks('components')) {
-            return;
-        }
-
-        const chapterData = base.chapterData
-        const baseData = base.baseData()
-
-        /**
-         * 构建中断回调
-         * @param  {[type]} innerNextTasks    [description]
-         * @param  {[type]} innerSuspendTasks [description]
-         * @return {[type]}                   [description]
-         */
-        const suspendCallback = (innerNextTasks, innerSuspendTasks) => {
-            base.nextTasks({
-                'taskName': '内部widgets',
-                'outSuspendTasks': innerSuspendTasks,
-                'outNextTasks': innerNextTasks
-            });
-        }
-
-        /**
-         * 获取数据成功回调
-         * @return {[type]} [description]
-         */
-        const successCallback = () => {
-            taskCallback();
-        }
-
-        base.createRelated.cacheTasks['components'] = new TaskComponents({
-            '$containsNode': base.getContainsNode(),
-            'nodes': chapterData['nodes'],
-            'pageOffset': chapterData['pageOffset'],
-            'activitys': base.baseActivits(),
-            'chpaterData': baseData,
-            'chapterId': baseData['_id'],
-            'pid': base.pid,
-            'pageType': base.pageType,
-            'virtualOffset': base.virtualOffset,
-            'getStyle': base.getStyle
-        }, suspendCallback, successCallback);
-    },
-
-
-    /**
-     * 分配contetns构建任务
-     * @return {[type]} [description]
-     */
-    'Contents' (taskCallback, base) {
-
-        //通过content数据库为空处理
-        if (Xut.data.preventContent) {
-            return taskCallback();
-        }
-
-        if (base.checkInstanceTasks('contents')) {
-            return;
-        }
-
-        const chapterData = base.chapterData
-        const baseData = base.baseData()
-        const chapterId = baseData['_id']
-        const activitys = base.baseActivits()
-
-        /**
-         * 生成钩子
-         */
-        const pageBaseHooks = _.extend({}, {
-            /**
-             * 构建中断回调
-             * @return {[type]}                   [description]
-             */
-            suspend(taskName, innerNextTasks, innerSuspendTasks) {
-                //如果是当前页面构建,允许打断一次
-                var interrupt
-                if (base.isAutoRun && taskName === 'strAfter') {
-                    interrupt = true;
-                }
-                base.nextTasks({
-                    'interrupt': interrupt,
-                    'taskName': '内部contents',
-                    'outSuspendTasks': innerSuspendTasks,
-                    'outNextTasks': innerNextTasks
-                });
-            },
-
-            /**
-             * 获取数据成功回调
-             * @return {[type]} [description]
-             */
-            success() {
-                taskCallback();
-            }
-
-        }, base.collectHooks)
-
-
-        base.createRelated.cacheTasks['contents'] = new TaskContents({
-            'canvasRelated': base.canvasRelated,
-            'rootNode': base.rootNode,
-            '$containsNode': base.getContainsNode(),
-            '$headFootNode':base.getHeadFootNode(),
-            'pageType': base.pageType,
-            'nodes': chapterData['nodes'],
-            'pageOffset': chapterData['pageOffset'],
-            'activitys': activitys,
-            'chpaterData': baseData,
-            'chapterId': chapterId,
-            'pageIndex': base.pageIndex,
-            'pid': base.pid,
-            'pageBaseHooks': pageBaseHooks,
-            'virtualOffset': base.virtualOffset,
-            'getStyle': base.getStyle
-        });
+    if(base.checkInstanceTasks('background')) {
+      return;
     }
+
+    const data = base.baseData(base.pid)
+
+    /**
+     * 构建中断回调
+     */
+    const suspendCallback = (innerNextTasks, innerSuspendTasks) => {
+      base.nextTasks({
+        'taskName': '内部background',
+        'outSuspendTasks': innerSuspendTasks,
+        'outNextTasks': innerNextTasks
+      });
+    }
+
+    /**
+     * 获取数据成功回调
+     * @return {[type]} [description]
+     */
+    const successCallback = () => {
+      taskCallback();
+    }
+
+    base.createRelated.cacheTasks['background'] = new TaskBackground({
+      data,
+      $containsNode: base.getContainsNode(),
+      suspendCallback,
+      successCallback
+    })
+
+  },
+
+
+  /**
+   * 分配Components构建任务
+   * @return {[type]} [description]
+   */
+  'Components' (taskCallback, base) {
+
+    if(base.checkInstanceTasks('components')) {
+      return;
+    }
+
+    const chapterData = base.chapterData
+    const baseData = base.baseData()
+
+    /**
+     * 构建中断回调
+     * @param  {[type]} innerNextTasks    [description]
+     * @param  {[type]} innerSuspendTasks [description]
+     * @return {[type]}                   [description]
+     */
+    const suspendCallback = (innerNextTasks, innerSuspendTasks) => {
+      base.nextTasks({
+        'taskName': '内部widgets',
+        'outSuspendTasks': innerSuspendTasks,
+        'outNextTasks': innerNextTasks
+      });
+    }
+
+    /**
+     * 获取数据成功回调
+     * @return {[type]} [description]
+     */
+    const successCallback = () => {
+      taskCallback();
+    }
+
+    base.createRelated.cacheTasks['components'] = new TaskComponents({
+      '$containsNode': base.getContainsNode(),
+      'nodes': chapterData['nodes'],
+      'pageOffset': chapterData['pageOffset'],
+      'activitys': base.baseActivits(),
+      'chpaterData': baseData,
+      'chapterId': baseData['_id'],
+      'pid': base.pid,
+      'pageType': base.pageType,
+      'virtualOffset': base.virtualOffset,
+      'getStyle': base.getStyle
+    }, suspendCallback, successCallback);
+  },
+
+
+  /**
+   * 分配contetns构建任务
+   * @return {[type]} [description]
+   */
+  'Contents' (taskCallback, base) {
+
+    //通过content数据库为空处理
+    if(Xut.data.preventContent) {
+      return taskCallback();
+    }
+
+    if(base.checkInstanceTasks('contents')) {
+      return;
+    }
+
+    const chapterData = base.chapterData
+    const baseData = base.baseData()
+    const chapterId = baseData['_id']
+    const activitys = base.baseActivits()
+
+    /**
+     * 生成钩子
+     */
+    const pageBaseHooks = _.extend({}, {
+      /**
+       * 构建中断回调
+       * @return {[type]}                   [description]
+       */
+      suspend(taskName, innerNextTasks, innerSuspendTasks) {
+        //如果是当前页面构建,允许打断一次
+        var interrupt
+        if(base.isAutoRun && taskName === 'strAfter') {
+          interrupt = true;
+        }
+        base.nextTasks({
+          'interrupt': interrupt,
+          'taskName': '内部contents',
+          'outSuspendTasks': innerSuspendTasks,
+          'outNextTasks': innerNextTasks
+        });
+      },
+
+      /**
+       * 获取数据成功回调
+       * @return {[type]} [description]
+       */
+      success() {
+        taskCallback();
+      }
+
+    }, base.collectHooks)
+
+
+    base.createRelated.cacheTasks['contents'] = new TaskContents({
+      'canvasRelated': base.canvasRelated,
+      'rootNode': base.rootNode,
+      '$containsNode': base.getContainsNode(),
+      '$headFootNode': base.getHeadFootNode(),
+      'pageType': base.pageType,
+      'nodes': chapterData['nodes'],
+      'pageOffset': chapterData['pageOffset'],
+      'activitys': activitys,
+      'chpaterData': baseData,
+      'chapterId': chapterId,
+      'pageIndex': base.pageIndex,
+      'pid': base.pid,
+      'pageBaseHooks': pageBaseHooks,
+      'virtualOffset': base.virtualOffset,
+      'getStyle': base.getStyle
+    });
+  }
 }

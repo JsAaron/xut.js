@@ -1,26 +1,13 @@
-import {
-  config
-} from '../config/index'
+import { config } from '../config/index'
 import MainBar from '../toolbar/main-sysbar/index'
 import DeputyBar from '../toolbar/deputy-fnbar'
 import BookBar from '../toolbar/word-bookbar/index'
 import NumberBar from '../toolbar/mini-pagebar/main'
-import {
-  sceneController
-} from './scene-control'
+import { sceneController } from './scene-control'
 import Mediator from './core/mediator'
-import {
-  getColumnCount,
-  getColumnChpaterCount
-} from '../component/column/depend'
-import {
-  mainScene,
-  deputyScene
-} from './root-layout'
-import {
-  pMainBar,
-  pDeputyBar
-} from './parse-bar'
+import { getColumnCount, getColumnChpaterCount } from '../component/column/depend'
+import { mainScene, deputyScene } from './root-layout'
+import { pMainBar, pDeputyBar } from './parse-bar'
 
 /**
  * 找到对应容器
@@ -29,7 +16,7 @@ import {
 const findContainer = ($rootNode, scenarioId, isMain) => {
   return function(pane, parallax) {
     var node;
-    if (isMain) {
+    if(isMain) {
       node = '#' + pane;
     } else {
       node = '#' + parallax + scenarioId;
@@ -47,15 +34,15 @@ const findContainer = ($rootNode, scenarioId, isMain) => {
 const checkHistory = (history) => {
 
   //直接启用快捷调试模式
-  if (config.deBugHistory) {
+  if(config.deBugHistory) {
     Xut.View.LoadScenario(config.deBugHistory)
     return true;
   }
 
   //如果有历史记录
-  if (history) {
+  if(history) {
     let scenarioInfo = sceneController.seqReverse(history)
-    if (scenarioInfo) {
+    if(scenarioInfo) {
       scenarioInfo = scenarioInfo.split('-');
       Xut.View.LoadScenario({
         'scenarioId': scenarioInfo[0],
@@ -93,7 +80,7 @@ export class SceneFactory {
     });
     //创建主场景
     this._createHTML(options, () => {
-      if (!Xut.IBooks.Enabled) {
+      if(!Xut.IBooks.Enabled) {
         _.extend(this, this._initToolBar())
       }
       this._createMediator();
@@ -110,7 +97,7 @@ export class SceneFactory {
     //如果是静态文件执行期
     //支持Xut.IBooks模式
     //都不需要创建节点
-    if (Xut.IBooks.runMode()) {
+    if(Xut.IBooks.runMode()) {
       this.$rootNode = $('#xut-main-scene')
       callback()
       return;
@@ -146,9 +133,9 @@ export class SceneFactory {
     let barConfig = {}
 
     //主场景工具栏设置
-    if (this.isMain) {
+    if(this.isMain) {
       barConfig = pMainBar(scenarioId, pageTotal)
-      if (config.visualMode === 4) {
+      if(config.visualMode === 4) {
         //word模式,自动启动工具条
         // this.mainToolbar = new BookBar({
         //     sceneNode: $rootNode,
@@ -158,7 +145,7 @@ export class SceneFactory {
       }
       //如果工具拦提供可配置
       //或者config.pageMode 带翻页按钮
-      else if (_.some(barConfig.toolType)) {
+      else if(_.some(barConfig.toolType)) {
         //普通模式
         this.mainToolbar = new MainBar({
           sceneNode: $rootNode,
@@ -174,7 +161,7 @@ export class SceneFactory {
     else {
       //副场工具栏配置
       barConfig = pDeputyBar(this.barInfo, pageTotal)
-      if (_.some(barConfig.toolType)) {
+      if(_.some(barConfig.toolType)) {
         this.deputyToolbar = new DeputyBar({
           sceneNode: $rootNode,
           toolType: barConfig.toolType,
@@ -192,15 +179,15 @@ export class SceneFactory {
     let columnCounts = getColumnCount(this.seasonId)
 
     //如果是min平台强制启动
-    if (Xut.config.platform === 'mini' || (config.toolType.number !== false && columnCounts)) {
+    if(Xut.config.platform === 'mini' || (config.toolType.number !== false && columnCounts)) {
 
       const getColumnTotal = needGet => {
-        if (needGet) {
+        if(needGet) {
           //高度变化后，重新获取
           columnCounts = getColumnCount(this.seasonId)
         }
         let columnChpterCount = 0
-        if (columnCounts) {
+        if(columnCounts) {
           columnChpterCount = getColumnChpaterCount(this.seasonId)
         }
         return columnCounts ? (pageTotal + columnCounts - columnChpterCount) : pageTotal
@@ -217,7 +204,7 @@ export class SceneFactory {
       })
 
       //页面总数改变
-      if (config.columnCheck) {
+      if(config.columnCheck) {
         Xut.Application.Watch('change:number:total', () => {
           this.numberToolbar.updateTotal(getColumnTotal(true))
         })
@@ -278,7 +265,7 @@ export class SceneFactory {
      */
     vm.$bind('pageUpdate', (...arg) => {
       isToolbar && isToolbar.updatePointer(...arg)
-      if (this.numberToolbar) {
+      if(this.numberToolbar) {
         this.numberToolbar && this.numberToolbar.updatePointer(...arg)
       }
     })
@@ -327,7 +314,7 @@ export class SceneFactory {
      */
     vm.$bind('toggleToolbar', (...arg) => {
       isToolbar && isToolbar.toggle(...arg)
-      if (this.numberToolbar) {
+      if(this.numberToolbar) {
         this.numberToolbar && this.numberToolbar.toggle(...arg)
       }
     })
@@ -338,7 +325,7 @@ export class SceneFactory {
      * @return {[type]} [description]
      */
     vm.$bind('resetToolbar', () => {
-      if (this.mainToolbar) {
+      if(this.mainToolbar) {
         this.mainToolbar.resetArrow() //左右翻页按钮
         this.mainToolbar.hideNavbar() //导航栏
       }
@@ -351,11 +338,11 @@ export class SceneFactory {
      */
     vm.$bind('createComplete', (nextAction) => {
       this.complete && setTimeout(() => {
-        if (isMain) {
+        if(isMain) {
           this.complete(() => {
             Xut.View.HideBusy()
-              //检测是不是有缓存加载
-            if (!checkHistory(this.history)) {
+            //检测是不是有缓存加载
+            if(!checkHistory(this.history)) {
               //指定自动运行的动作
               nextAction && nextAction();
             }
@@ -370,11 +357,11 @@ export class SceneFactory {
 
 
     //如果是读酷端加载
-    if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
+    if(window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
       window.DUKUCONFIG.success();
       vm.$init();
       //如果是客户端加载
-    } else if (window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
+    } else if(window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
       window.CLIENTCONFIGT.success();
       vm.$init();
     } else {
@@ -390,7 +377,7 @@ export class SceneFactory {
    */
   destroy() {
 
-    if (config.columnCheck) {
+    if(config.columnCheck) {
       Xut.Application.unWatch('change:number:total')
     }
 
@@ -398,7 +385,7 @@ export class SceneFactory {
     this.vm.$destroy();
 
     //销毁工具栏
-    if (this.isToolbar) {
+    if(this.isToolbar) {
       this.isToolbar.destroy()
       this.isToolbar = null
     }

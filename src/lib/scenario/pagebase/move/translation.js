@@ -15,11 +15,11 @@ const translateZ = Xut.style.translateZ
  * 保证只是pageType === page才捕获动作
  */
 const toTranslate3d = (node, distance, speed, callback) => {
-    node && Xut.nextTick(function() {
-        node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
-        node.style[transitionDuration] = speed + 'ms'
-        callback && callback()
-    })
+  node && Xut.nextTick(function() {
+    node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
+    node.style[transitionDuration] = speed + 'ms'
+    callback && callback()
+  })
 }
 
 /**
@@ -28,9 +28,9 @@ const toTranslate3d = (node, distance, speed, callback) => {
  * @return {[type]}      [description]
  */
 const set = (node, x) => {
-    if (node) {
-        node.style[transform] = `translate(${x}px,0px) ${translateZ}`
-    }
+  if(node) {
+    node.style[transform] = `translate(${x}px,0px) ${translateZ}`
+  }
 }
 
 /**
@@ -38,10 +38,10 @@ const set = (node, x) => {
  * @return {[type]} [description]
  */
 const reset = (node) => {
-    if (node) {
-        node.style[transform] = `translate(0px,0px) ${translateZ}`
-        node.style[transitionDuration] = ''
-    }
+  if(node) {
+    node.style[transform] = `translate(0px,0px) ${translateZ}`
+    node.style[transitionDuration] = ''
+  }
 }
 
 /**
@@ -49,7 +49,7 @@ const reset = (node) => {
  * @return {[type]} [description]
  */
 const flipMove = (...arg) => {
-    toTranslate3d(...arg)
+  toTranslate3d(...arg)
 }
 
 /**
@@ -57,7 +57,7 @@ const flipMove = (...arg) => {
  * @return {[type]} [description]
  */
 const flipRebound = (...arg) => {
-    toTranslate3d(...arg)
+  toTranslate3d(...arg)
 }
 
 /**
@@ -65,7 +65,7 @@ const flipRebound = (...arg) => {
  * @return {[type]} [description]
  */
 const flipOver = (...arg) => {
-    toTranslate3d(...arg)
+  toTranslate3d(...arg)
 }
 
 /**
@@ -73,11 +73,11 @@ const flipOver = (...arg) => {
  * @type {Object}
  */
 export const translation = {
-    set: set,
-    reset: reset,
-    flipMove: flipMove,
-    flipRebound: flipRebound,
-    flipOver: flipOver
+  set: set,
+  reset: reset,
+  flipMove: flipMove,
+  flipRebound: flipRebound,
+  flipOver: flipOver
 }
 
 
@@ -87,7 +87,7 @@ export const translation = {
  * @return {[type]}        [description]
  */
 const createTranslate = (offset) => {
-    return 'translate(' + offset + 'px,0px)' + translateZ
+  return 'translate(' + offset + 'px,0px)' + translateZ
 }
 
 /**
@@ -95,7 +95,7 @@ const createTranslate = (offset) => {
  * @return {[type]} [description]
  */
 export function fix($node, action) {
-    const visualWidth = config.visualSize.width
-    const translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth)
-    $node.css(transform, translate)
+  const visualWidth = config.visualSize.width
+  const translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth)
+  $node.css(transform, translate)
 }

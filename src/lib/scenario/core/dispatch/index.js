@@ -6,27 +6,20 @@
  *                2. MasterMgr 模块                                                          *
  **********************************************************************/
 
-import {
-  config
-} from '../../../config/index'
+import { config } from '../../../config/index'
 import PageMgr from '../manage/page'
 import MasterMgr from '../manage/master'
 import goToPage from './topage'
-import {
-  sceneController
-} from '../../scene-control'
-import {
-  getVisualDistance
-} from '../../../visual/visual-distance'
-import {
-  setVisualStyle
-} from '../../../visual/visual-style'
+import { sceneController } from '../../scene-control'
+import { getVisualDistance } from '../../../visual/visual-distance'
+import { setVisualStyle } from '../../../visual/visual-style'
+import Stack from '../../../util/stack'
 import {
   $$set,
   hash,
   $$warn
 } from '../../../util/index'
-import Stack from '../../../util/stack'
+
 
 import {
   initPointer,
@@ -52,7 +45,7 @@ export default class Dispatcher {
     this.pageMgr = new PageMgr(vm)
 
     // 检测是否需要创母版模块
-    if (hasMaster()) {
+    if(hasMaster()) {
       this.masterMgr = new MasterMgr(vm);
     }
   }
@@ -65,8 +58,8 @@ export default class Dispatcher {
    */
   initCreate() {
     let options = this.options
-      //createPointer
-      //initPointer
+    //createPointer
+    //initPointer
     let pointer = initPointer(options.initIndex, options.pageTotal, options.multiplePages)
     this.pagePointer = pointer.initPointer
     this.createPageBases(pointer.createPointer, options.initIndex, 'init')
@@ -86,7 +79,7 @@ export default class Dispatcher {
 
     //2016.1.20
     //修正苗苗学问题 确保createPage不是undefined
-    if (createPageIndex[0] === undefined) {
+    if(createPageIndex[0] === undefined) {
       return;
     }
 
@@ -119,7 +112,7 @@ export default class Dispatcher {
       let createContent = 0;
       return callback => {
         ++createContent
-        if (createContent === createTotal) {
+        if(createContent === createTotal) {
           callback();
         }
       }
@@ -177,13 +170,13 @@ export default class Dispatcher {
         let visibleChapterIndex = conversion.visiblePid
         let pageIndex = conversion.pageIndex
 
-        if (createTotal === 1) {
+        if(createTotal === 1) {
           self.options.chapterId = chapterData._id
         }
 
         //跳转的时候，创建新页面可以自动样式信息
         //优化设置，只是改变当前页面即可
-        if (toPageAction && visibleChapterIndex !== createChapterIndex) {
+        if(toPageAction && visibleChapterIndex !== createChapterIndex) {
           userStyle = undefined
         }
 
@@ -212,28 +205,28 @@ export default class Dispatcher {
               'pageIndex': pageIndex,
               'multiplePages': multiplePages
             }, pageIndex, masterFilter, function(shareMaster) {
-              if (config.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
+              if(config.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                 $$warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
               }
             })
 
             //判断pageBase是因为母版不需要重复创建
             //母版是共享多个paga
-            if (pageBase) {
+            if(pageBase) {
               //开始线程任务，如果是翻页模式,支持快速创建
               pageBase.startThreadTask(filpOverAction, () => {
                 callbackAction[action]()
               })
 
               //收集自定义样式的页面对象
-              if (userStyle) {
+              if(userStyle) {
                 collectPageBase.push(pageBase)
               }
             }
           }
 
           //创建母版层
-          if (chapterData.pptMaster && self.masterMgr) {
+          if(chapterData.pptMaster && self.masterMgr) {
             _createPageBase.call(self.masterMgr, () => {
               //母版是否创建等待通知
               //母版是共享的所以不一定每次翻页都会创建
@@ -285,7 +278,7 @@ export default class Dispatcher {
 
     //用户强制直接切换模式
     //禁止页面跟随滑动
-    if (this.options.flipMode === 'ban' && action == 'flipMove') {
+    if(this.options.flipMode === 'ban' && action == 'flipMove') {
       return
     }
 
@@ -296,10 +289,10 @@ export default class Dispatcher {
     //mini杂志功能
     //一次是拦截
     //一次是触发动作
-    if (config.swipeDelegate) {
+    if(config.swipeDelegate) {
 
       //如果是swipe就全局处理
-      if (action === 'swipe') {
+      if(action === 'swipe') {
         //执行动画序列
         currObj.callSwipeSequence(direction)
         return
@@ -311,7 +304,7 @@ export default class Dispatcher {
       //拦截翻页动作
       //执行序列动作
       //拦截
-      if (currObj.hasSwipeSequence(direction)) {
+      if(currObj.hasSwipeSequence(direction)) {
         //设置为无效翻页
         setSwipeInvalid && setSwipeInvalid()
         return
@@ -350,7 +343,7 @@ export default class Dispatcher {
     })
 
     //更新页码
-    if (action === 'flipOver') {
+    if(action === 'flipOver') {
       Xut.nextTick(() => {
         this.vm.$emit('change:pageUpdate', {
           action,
@@ -409,7 +402,7 @@ export default class Dispatcher {
     Xut.View.ShowBusy()
 
     //如果是非线性,创建页面修改
-    if (!this.options.multiplePages) {
+    if(!this.options.multiplePages) {
       data.create = [data.targetIndex];
       data.destroy = [data.currIndex];
       data.ruleOut = [data.targetIndex];
@@ -435,7 +428,7 @@ export default class Dispatcher {
    * @return {[type]} [description]
    */
   masterContext(callback) {
-    if (this.masterMgr) {
+    if(this.masterMgr) {
       callback.call(this.masterMgr)
     }
   }
@@ -478,7 +471,7 @@ export default class Dispatcher {
      * 存在2中模式的情况下
      * 转化页码标记
      */
-    if (createPointer) {
+    if(createPointer) {
       createPointer = converVisiblePid.call(this, createPointer)
     }
 
@@ -498,9 +491,9 @@ export default class Dispatcher {
          * 构建完成通知,用于处理历史缓存记录
          * 如果是调试模式 && 不是收费提示页面 && 多场景应用
          */
-        if (config.historyMode && !options.isInApp && options.multiScenario) {
+        if(config.historyMode && !options.isInApp && options.multiScenario) {
           var history;
-          if (history = sceneController.sequence(scenarioId, currIndex)) {
+          if(history = sceneController.sequence(scenarioId, currIndex)) {
             $$set("history", history)
           }
         }
@@ -519,7 +512,7 @@ export default class Dispatcher {
       //如果动作是初始化，或者触发了母版自动运行
       //如果是越界处理
       //console.log(action,this.isBoundary,para.createMaster)
-      if (action || this.isBoundary) {
+      if(action || this.isBoundary) {
         this.autoRun(data);
       }
     })
@@ -536,9 +529,9 @@ export default class Dispatcher {
      */
     const setToolbar = () => {
       //不显示首尾对应的按钮
-      if (currIndex == 0) {
+      if(currIndex == 0) {
         vm.$emit('change:hidePrev');
-      } else if (currIndex == options.pageTotal - 1) {
+      } else if(currIndex == options.pageTotal - 1) {
         vm.$emit('change:hideNext');
         vm.$emit('change:showPrev');
       } else {
@@ -547,7 +540,7 @@ export default class Dispatcher {
       }
     }
 
-    switch (action) {
+    switch(action) {
       case 'init':
         //更新页码标示
         vm.$emit('change:pageUpdate', {
@@ -572,7 +565,7 @@ export default class Dispatcher {
      * 线性结构
      * 保存目录索引
      */
-    if (!options.multiScenario) {
+    if(!options.multiScenario) {
       $$set("pageIndex", currIndex);
     }
 
@@ -580,7 +573,7 @@ export default class Dispatcher {
      * 解锁翻页
      * 允许继续执行下一个翻页作用
      */
-    if (this.unfliplock) {
+    if(this.unfliplock) {
       this.unfliplock();
       this.unfliplock = null;
     }
@@ -633,17 +626,17 @@ export default class Dispatcher {
     let createNextPageBase = currIndex => this.createPageBases([createPointer], currIndex, 'flipOver')
 
     //如果是左边翻页
-    if (direction === 'prev') {
+    if(direction === 'prev') {
       //首尾无须创建页面
-      if (pagePointer.currIndex === 0) {
+      if(pagePointer.currIndex === 0) {
         this._autoRun()
-        if (pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+        if(pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
           vm.$emit('change:showNext')
         }
         vm.$emit('change:hidePrev')
         return
       }
-      if (pagePointer.currIndex > -1) { //创建的页面
+      if(pagePointer.currIndex > -1) { //创建的页面
         createNextPageBase(pagePointer.currIndex)
         clearPointer()
         vm.$emit('change:showNext')
@@ -652,18 +645,18 @@ export default class Dispatcher {
     }
 
     //如果是右边翻页
-    if (direction === 'next') {
+    if(direction === 'next') {
       //首尾无须创建页面
-      if (pagePointer.currIndex === pageTotal - 1) {
+      if(pagePointer.currIndex === pageTotal - 1) {
         this._autoRun()
-        if (pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
+        if(pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
           vm.$emit('change:showPrev')
         }
         //多页处理
         vm.$emit('change:hideNext')
         return
       }
-      if (createPointer < pageTotal) { //创建的页面
+      if(createPointer < pageTotal) { //创建的页面
         createNextPageBase(pagePointer.currIndex)
         clearPointer()
         vm.$emit('change:showPrev')
@@ -694,7 +687,7 @@ export default class Dispatcher {
     let triggerAuto = () => {
       //第一次进入，处理背景
       let $cover = $(".xut-cover")
-      if ($cover.length) { //主动探测,只检查一次
+      if($cover.length) { //主动探测,只检查一次
         let complete = function() {
           $cover && $cover.remove()
           $cover = null
@@ -702,7 +695,7 @@ export default class Dispatcher {
         }
 
         //是否配置启动动画关闭
-        if (window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.launchAnim == false) {
+        if(window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.launchAnim == false) {
           complete()
         } else {
           //有动画
@@ -723,18 +716,18 @@ export default class Dispatcher {
 
     //创建完成回调
     this.vm.$emit('change:createComplete', () => {
-      if (this.options.multiScenario) {
+      if(this.options.multiScenario) {
         triggerAuto()
       }
       //第一次加载
       //进入应用
       else {
-        if (window.GLOBALIFRAME) {
+        if(window.GLOBALIFRAME) {
           triggerAuto()
           return
         }
         //获取应用的状态
-        if (Xut.Application.getAppState()) {
+        if(Xut.Application.getAppState()) {
           //保留启动方法
           var pre = Xut.Application.LaunchApp;
           Xut.Application.LaunchApp = function() {

@@ -7,7 +7,7 @@
 Xut.Plugin.Tablet = {
 
   paintPath: function(successCallback, failureCallback) {
-    if (GLOBALIFRAME) {
+    if(GLOBALIFRAME) {
       return GLOBALCONTEXT.Tablet.paintPath(successCallback, failureCallback);
     } else {
       return cordova.exec(
@@ -19,7 +19,7 @@ Xut.Plugin.Tablet = {
   },
 
   openAction: function(path, filename, BitmapWidth, BitmapHeight, left, top, height, weight, successCallback, failureCallback) {
-    if (GLOBALIFRAME) {
+    if(GLOBALIFRAME) {
       return GLOBALCONTEXT.Tablet.openAction(path, filename, BitmapWidth, BitmapHeight, left, top, height, weight, successCallback, failureCallback);
     } else {
       return cordova.exec(successCallback,
@@ -30,7 +30,7 @@ Xut.Plugin.Tablet = {
   },
 
   closeAction: function(successCallback, failureCallback) {
-    if (GLOBALIFRAME) {
+    if(GLOBALIFRAME) {
       return GLOBALCONTEXT.Tablet.closeAction(successCallback, failureCallback);
     } else {
       return cordova.exec(successCallback,

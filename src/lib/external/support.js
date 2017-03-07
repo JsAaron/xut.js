@@ -6,8 +6,8 @@
 (function() {
 
   var location = document.location.href
-    //在读酷pc端 navigator的值被改写过了!!
-    //navigator.appVersion: "xxt 1.0.5260.29725"
+  //在读酷pc端 navigator的值被改写过了!!
+  //navigator.appVersion: "xxt 1.0.5260.29725"
   var userAgent = window.navigator.userAgent.toLowerCase()
   var appVersion = window.navigator.appVersion.toLowerCase()
 
@@ -23,9 +23,9 @@
 
   //针对win8的处理
   var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
-    //移动端仅仅只支持touch
+  //移动端仅仅只支持touch
   var only_touch = hasTouch && MOBILE_REGEX.test(userAgent)
-    //判断是否为浏览器
+  //判断是否为浏览器
   var boolBrowser = location.indexOf('http') > -1 || location.indexOf('https') > -1
   var isBrowser = boolBrowser ? boolBrowser : !only_touch
 
@@ -108,7 +108,7 @@
   var rdashAlpha = /-([a-z]|[0-9])/ig
   var rmsPrefix = /^-ms-/
   var fcamelCase = function(all, letter) {
-    return (letter + '').toUpperCase();
+    return(letter + '').toUpperCase();
   }
   var camelCase = function(string) {
     return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
@@ -118,17 +118,17 @@
   var cache = Object.create(null)
   var prefixStyle = function(attr) {
     var name
-      //缓存中存在
-    if (cache[attr]) {
+    //缓存中存在
+    if(cache[attr]) {
       return cache[attr];
     }
     //不需要加前缀
-    if (attr in elementStyle) {
+    if(attr in elementStyle) {
       return cache[attr] = attr;
     }
     //需要加前缀
     prefix.forEach(function(v) {
-      if (camelCase(v + '-' + attr) in elementStyle) {
+      if(camelCase(v + '-' + attr) in elementStyle) {
         name = '-' + v + '-' + attr;
         return cache[attr] = name;
       }
@@ -155,9 +155,9 @@
       "ms": "MSAnimationEnd",
       "o": "oAnimationEnd"
     }
-    if (!vendors) return;
+    if(!vendors) return;
     vendors = vendors.split('-');
-    if (!vendors[1]) return;
+    if(!vendors[1]) return;
     transitionEnd = transitionName[vendors[1]];
     animationEnd = animationName[vendors[1]];
     keyframes = '@-' + vendors[1] + '-keyframes ';

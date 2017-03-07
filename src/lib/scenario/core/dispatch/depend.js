@@ -7,7 +7,7 @@ import { query } from '../../../database/query'
  * @return {[type]}     [description]
  */
 export function offsetPage(num) {
-    return ((num % 2 == 0) ? 'left' : 'right');
+  return((num % 2 == 0) ? 'left' : 'right');
 }
 
 
@@ -18,21 +18,21 @@ export function offsetPage(num) {
  * @return {[type]}             [description]
  */
 export function getDirection(createIndex, currIndex) {
-    let direction
-    if (createIndex < currIndex) {
-        direction = 'before'
-    } else if (createIndex > currIndex) {
-        direction = 'after'
-    } else if (currIndex == createIndex) {
-        direction = 'middle'
-    }
-    return direction
+  let direction
+  if(createIndex < currIndex) {
+    direction = 'before'
+  } else if(createIndex > currIndex) {
+    direction = 'after'
+  } else if(currIndex == createIndex) {
+    direction = 'middle'
+  }
+  return direction
 }
 
 const mixRang = function(pageIndex, start) {
-    return pageIndex.map(oldPageIndex => {
-        return oldPageIndex - start
-    })
+  return pageIndex.map(oldPageIndex => {
+    return oldPageIndex - start
+  })
 }
 
 
@@ -43,26 +43,26 @@ const mixRang = function(pageIndex, start) {
  * visiblePid 可见页面chpaterId
  */
 export function converVisiblePid(pageIndex, visiblePid) {
-    //转化可视区域值viewPageIndex
-    if (this.options.multiScenario) {
-        let sectionRang = this.options.sectionRang;
-        //如果传入的是数组数据
-        if (!visiblePid && _.isArray(pageIndex)) {
-            return mixRang(pageIndex, sectionRang.start)
-        }
-        pageIndex -= sectionRang.start
-        visiblePid += sectionRang.start
-    } else {
-        //pageIndex是数组，并且realPage为空
-        if (_.isArray(pageIndex)) {
-            return pageIndex
-        }
+  //转化可视区域值viewPageIndex
+  if(this.options.multiScenario) {
+    let sectionRang = this.options.sectionRang;
+    //如果传入的是数组数据
+    if(!visiblePid && _.isArray(pageIndex)) {
+      return mixRang(pageIndex, sectionRang.start)
     }
+    pageIndex -= sectionRang.start
+    visiblePid += sectionRang.start
+  } else {
+    //pageIndex是数组，并且realPage为空
+    if(_.isArray(pageIndex)) {
+      return pageIndex
+    }
+  }
 
-    return {
-        pageIndex,
-        visiblePid
-    }
+  return {
+    pageIndex,
+    visiblePid
+  }
 }
 
 
@@ -72,56 +72,56 @@ export function converVisiblePid(pageIndex, visiblePid) {
  */
 export function initPointer(targetIndex, pageTotal, multiplePages) {
 
-    var leftscope = 0,
-        initPointer = {},
-        createPointer = [];
+  var leftscope = 0,
+    initPointer = {},
+    createPointer = [];
 
-    function setValue(index) {
-        if (index.leftIndex !== undefined) {
-            initPointer.leftIndex = index.leftIndex;
-            createPointer.push(index.leftIndex)
-        }
-        if (index.currIndex !== undefined) {
-            initPointer.currIndex = index.currIndex;
-            createPointer.push(index.currIndex)
-        }
-        if (index.rightIndex !== undefined) {
-            initPointer.rightIndex = index.rightIndex;
-            createPointer.push(index.rightIndex)
-        }
+  function setValue(index) {
+    if(index.leftIndex !== undefined) {
+      initPointer.leftIndex = index.leftIndex;
+      createPointer.push(index.leftIndex)
     }
-
-    //如果只有一页 or  非线性,只创建一个页面
-    if (pageTotal === 1 || !multiplePages) {
-        setValue({
-            'currIndex': targetIndex
-        })
-    } else {
-        //多页情况
-        if (targetIndex === leftscope) { //首页
-            setValue({
-                'currIndex': targetIndex,
-                'rightIndex': targetIndex + 1
-            })
-        } else if (targetIndex === pageTotal - 1) { //尾页
-            setValue({
-                'currIndex': targetIndex,
-                'leftIndex': targetIndex - 1
-            })
-        } else { //中间页
-            setValue({
-                'currIndex': targetIndex,
-                'leftIndex': targetIndex - 1,
-                'rightIndex': targetIndex + 1
-            })
-        }
+    if(index.currIndex !== undefined) {
+      initPointer.currIndex = index.currIndex;
+      createPointer.push(index.currIndex)
     }
-
-
-    return {
-        createPointer,
-        initPointer
+    if(index.rightIndex !== undefined) {
+      initPointer.rightIndex = index.rightIndex;
+      createPointer.push(index.rightIndex)
     }
+  }
+
+  //如果只有一页 or  非线性,只创建一个页面
+  if(pageTotal === 1 || !multiplePages) {
+    setValue({
+      'currIndex': targetIndex
+    })
+  } else {
+    //多页情况
+    if(targetIndex === leftscope) { //首页
+      setValue({
+        'currIndex': targetIndex,
+        'rightIndex': targetIndex + 1
+      })
+    } else if(targetIndex === pageTotal - 1) { //尾页
+      setValue({
+        'currIndex': targetIndex,
+        'leftIndex': targetIndex - 1
+      })
+    } else { //中间页
+      setValue({
+        'currIndex': targetIndex,
+        'leftIndex': targetIndex - 1,
+        'rightIndex': targetIndex + 1
+      })
+    }
+  }
+
+
+  return {
+    createPointer,
+    initPointer
+  }
 }
 
 
@@ -138,30 +138,30 @@ export function initPointer(targetIndex, pageTotal, multiplePages) {
  */
 export function indexConverChapterId(createPage, visualPage) {
 
-    //如果第一个不是可视区域
-    //切换位置
-    //加快创建速度
-    if (createPage[0] !== visualPage) {
-        const indexOf = createPage.indexOf(visualPage)
-        const less = createPage.splice(indexOf, 1)
-        createPage = less.concat(createPage)
-    }
+  //如果第一个不是可视区域
+  //切换位置
+  //加快创建速度
+  if(createPage[0] !== visualPage) {
+    const indexOf = createPage.indexOf(visualPage)
+    const less = createPage.splice(indexOf, 1)
+    createPage = less.concat(createPage)
+  }
 
-    //场景加载模式,计算正确的chapter顺序
-    //多场景的模式chpater分段后
-    //叠加起始段落
-    if (this.options.multiScenario) {
-        //需要提前解析数据库的排列方式
-        //chpater的开始位置
-        const start = this.options.sectionRang.start
-            //拼接位置
-        createPage.forEach(function(page, index) {
-            createPage.splice(index, 1, page + start)
-        })
-    }
+  //场景加载模式,计算正确的chapter顺序
+  //多场景的模式chpater分段后
+  //叠加起始段落
+  if(this.options.multiScenario) {
+    //需要提前解析数据库的排列方式
+    //chpater的开始位置
+    const start = this.options.sectionRang.start
+    //拼接位置
+    createPage.forEach(function(page, index) {
+      createPage.splice(index, 1, page + start)
+    })
+  }
 
-    // [0,1,2] => [73,74,75]
-    return createPage;
+  // [0,1,2] => [73,74,75]
+  return createPage;
 }
 
 
@@ -171,7 +171,7 @@ export function indexConverChapterId(createPage, visualPage) {
  * @return {[type]}            [description]
  */
 export function indexConverChapterData(createPage) {
-    return query('chapter', createPage);
+  return query('chapter', createPage);
 }
 
 
@@ -180,10 +180,10 @@ export function indexConverChapterData(createPage) {
  * @return {[type]} [description]
  */
 export function hasMaster() {
-    var table = errorTable()
-        //如果没有Master数据,直接过滤
-    if (-1 !== table.indexOf('Master') || !Xut.data['Master'] || !Xut.data['Master'].length) {
-        return false;
-    }
-    return true;
+  var table = errorTable()
+  //如果没有Master数据,直接过滤
+  if(-1 !== table.indexOf('Master') || !Xut.data['Master'] || !Xut.data['Master'].length) {
+    return false;
+  }
+  return true;
 }

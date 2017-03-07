@@ -3,21 +3,21 @@
  * @return {[type]} [description]
  */
 export function goHomePage() {
-    if (window.DUKUCONFIG) {
-        Xut.Application.Suspend({
-            processed: function() {
-                Xut.Application.DropApp() //退出应用
-            }
-        });
-        return;
-    }
-    //动作处理
-    //如果有动作则关闭，否则直接跳转
+  if(window.DUKUCONFIG) {
     Xut.Application.Suspend({
-        processed: function() {
-            Xut.View.GotoSlide(1)
-        }
-    })
+      processed: function() {
+        Xut.Application.DropApp() //退出应用
+      }
+    });
+    return;
+  }
+  //动作处理
+  //如果有动作则关闭，否则直接跳转
+  Xut.Application.Suspend({
+    processed: function() {
+      Xut.View.GotoSlide(1)
+    }
+  })
 }
 
 /**
@@ -26,7 +26,7 @@ export function goHomePage() {
  * @return {[type]}     [description]
  */
 export function createHomeIcon(height) {
-    return `<div class="xut-control-backhome"
+  return `<div class="xut-control-backhome"
                  style="float:left;text-indent:0.25em;height:${height}px;line-height:${height}px;color:#007aff">
                 主页
             </div>`
@@ -38,7 +38,7 @@ export function createHomeIcon(height) {
  * @return {[type]}     [description]
  */
 export function createDirIcon(height) {
-    return `<div class="xut-control-navbar"
+  return `<div class="xut-control-navbar"
                  style="float:left;margin-left:4px;width:${height}px;height:${height}px;background-size:cover">
             </div>`
 }
@@ -51,7 +51,7 @@ export function createDirIcon(height) {
  * @return {[type]}     [description]
  */
 export function createTitle(height, appName) {
-    return `<div class="xut-control-title"
+  return `<div class="xut-control-title"
                  style="z-index:-99;width:100%;position:absolute;line-height:${height}px;pointer-events:none">
                 ${appName}
             </div>`
@@ -63,9 +63,9 @@ export function createTitle(height, appName) {
  * @return {[type]}     [description]
  */
 export function createPageNumber(height, currentPage, pageTotal) {
-    const marginTop = height * 0.25
-    const iconH = height * 0.5
-    return `<div class="xut-control-pageIndex"
+  const marginTop = height * 0.25
+  const iconH = height * 0.5
+  return `<div class="xut-control-pageIndex"
                  style="float:right;
                         margin:${marginTop}px 4px;
                         padding:0 0.25em;
@@ -82,7 +82,7 @@ export function createPageNumber(height, currentPage, pageTotal) {
  * @return {[type]}     [description]
  */
 export function createHideToolbar(height) {
-    return `<div class="xut-control-hidebar"
+  return `<div class="xut-control-hidebar"
                  style="float:right;width:${height}px;height:${height}px;background-size:cover">
             </div>`
 }
@@ -94,7 +94,7 @@ export function createHideToolbar(height) {
  * @return {[type]}        [description]
  */
 export function createCloseIcon(height) {
-    return `<div class="si-icon icon-close2"
+  return `<div class="si-icon icon-close2"
                  style="float:right;margin-right:4px;width:${height}px;height:${height}px">
             </div>`
 

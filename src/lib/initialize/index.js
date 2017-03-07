@@ -29,7 +29,7 @@ const initMain = (novelData) => {
   /**
    * IBOOS模式
    */
-  if (Xut.IBooks.Enabled) {
+  if(Xut.IBooks.Enabled) {
     //删除背景图
     $(".xut-cover").remove()
     loadScene({
@@ -49,13 +49,13 @@ const initMain = (novelData) => {
    * 所以pageFlip只有在左面的情况下
    */
   let __flipMode = getCache('flipMode')
-  if (!__flipMode && novelData.paramete) {
+  if(!__flipMode && novelData.paramete) {
     let parameter = parseJSON(novelData.paramete)
-    if (parameter.pageflip !== undefined) {
+    if(parameter.pageflip !== undefined) {
       __flipMode = Number(parameter.pageflip)
-      if (__flipMode === 0) {
+      if(__flipMode === 0) {
         config.flipMode = 'allow' //允许翻页
-      } else if (__flipMode === 1) {
+      } else if(__flipMode === 1) {
         config.flipMode = 'ban' //禁止翻页
       }
       //缓存
@@ -71,9 +71,9 @@ const initMain = (novelData) => {
    * 如果启动recordHistory记录
    */
   let pageIndex = Number(getCache('pageIndex'))
-  if (config.historyMode && pageIndex !== undefined) {
+  if(config.historyMode && pageIndex !== undefined) {
     let novelId = parseInt(getCache("novelId"))
-    if (novelId) {
+    if(novelId) {
       return loadScene({
         "novelId": novelId,
         "pageIndex": pageIndex,
@@ -107,24 +107,24 @@ const initApp = () => baseConfig(initMain)
 const bindPlatEvent = () => {
 
   //安卓上并且不是浏览器打开的情况
-  if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
+  if(Xut.plat.isAndroid && !Xut.plat.isBrowser) {
 
     //预加载处理视频
     //妙妙学不加载视频
     //读库不加载视频
-    if (window.MMXCONFIG && !window.DUKUCONFIG) {
+    if(window.MMXCONFIG && !window.DUKUCONFIG) {
       plugVideo();
     }
 
     //不是子文档指定绑定按键
-    if (!window.SUbCONFIGT) {
+    if(!window.SUbCONFIGT) {
       Xut.Application.AddEventListener = () => {
         bindAndroid()
       }
     }
   }
 
-  if (window.DUKUCONFIG) {
+  if(window.DUKUCONFIG) {
     PMS.bind("MagazineExit", () => {
       PMS.unbind();
       Xut.Application.DropApp();
@@ -148,12 +148,12 @@ export default function init() {
   //2 子文档
   //3 pc
   //4 ios/android
-  if (window.GLOBALIFRAME) {
+  if(window.GLOBALIFRAME) {
     bindPlatEvent()
   } else {
 
     //brower
-    if (config.isBrowser) {
+    if(config.isBrowser) {
       initApp()
     } else {
       //mobile(apk or ipa)

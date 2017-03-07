@@ -21,7 +21,7 @@ const slashRE = /\/$/
  * @return {[type]} [description]
  */
 export function slashPostfix(resource) {
-  if (resource && slashRE.test(resource)) {
+  if(resource && slashRE.test(resource)) {
     return resource.substring(0, resource.length - 1)
   }
   return resource
@@ -55,11 +55,11 @@ export function analysisImageName(src) {
   let original = src
 
   //有基础后缀
-  if (config.baseImageSuffix) {
+  if(config.baseImageSuffix) {
     let baseImageSuffix = `.${config.baseImageSuffix}.`
     let exp = new RegExp('\\w+' + baseImageSuffix + '(jpg|png)', 'gi')
     let result = src.match(exp)
-    if (result && result.length) {
+    if(result && result.length) {
       suffix = result[0]
       original = suffix.replace(baseImageSuffix, '.')
     } else {
@@ -69,7 +69,7 @@ export function analysisImageName(src) {
   //如果没有后缀
   else {
     let result = src.match(/\w+.(jpg|png)/gi)
-    if (result && result.length) {
+    if(result && result.length) {
       suffix = original = result[0]
     } else {
       $$warn('analysisImageUrl解析出错,result：' + result)
@@ -87,7 +87,7 @@ export function analysisImageName(src) {
  * 给地址增加私有后缀
  */
 export function insertImageUrlSuffix(originalUrl, suffix) {
-  if (originalUrl && suffix) {
+  if(originalUrl && suffix) {
     return originalUrl.replace(/\w+\./ig, '$&' + suffix + '.')
   }
   return originalUrl
@@ -119,7 +119,7 @@ export function execScript(code, type) {
   }
   try {
     new Function(enterReplace(code))()
-  } catch (e) {
+  } catch(e) {
     $$warn('加载脚本错误', type)
   }
 }
@@ -139,9 +139,9 @@ export function createRandomImg(url) {
  * @return {[type]} [description]
  */
 export function replacePath(svgstr) {
-  if (config.launch) {
+  if(config.launch) {
     //如果能找到对应的默认路径，则替换
-    if (-1 !== svgstr.indexOf('content/gallery/')) {
+    if(-1 !== svgstr.indexOf('content/gallery/')) {
       svgstr = svgstr.replace(/content\/gallery/ig, config.pathAddress)
     }
   }
@@ -167,7 +167,7 @@ const converProportion = function({
   getStyle
 }) {
 
-  if (!proportion) {
+  if(!proportion) {
     $$warn('没有传递缩放比')
     proportion = config.proportion
   }
@@ -175,7 +175,7 @@ const converProportion = function({
   //页眉，保持横纵比
   //计算顶部显示中线位置
   //如果溢出就溢出，高度设置为白边中线
-  if (proportionMode === 1) {
+  if(proportionMode === 1) {
     let visualTop = getStyle.visualTop
     let proportionalHeight = CEIL(height * proportion.width) || 0;
     return {
@@ -191,7 +191,7 @@ const converProportion = function({
   //页脚，保持横纵比
   //计算底部显示中线位置
   //如果溢出就隐藏，高度设置为白边中线
-  else if (proportionMode === 2) {
+  else if(proportionMode === 2) {
     let visualTop = getStyle.visualTop
     let proportionalHeight = CEIL(height * proportion.width) || 0;
     return {
@@ -204,9 +204,9 @@ const converProportion = function({
     }
   }
   //图片正比缩放，而且保持上下居中
-  else if (proportionMode === 3) {
+  else if(proportionMode === 3) {
     //高度为基本比值
-    if (proportion.width > proportion.height) {
+    if(proportion.width > proportion.height) {
       let originalWidth = CEIL(width * proportion.width) || 0
       let proportionalWidth = CEIL(width * proportion.height) || 0
       let proportionalLeft = Math.abs(proportionalWidth - originalWidth) / 2
@@ -292,7 +292,7 @@ export function reviseSize({
   results.scaleTop = layerSize.top
 
   //元素状态
-  if (layerSize.isHide) {
+  if(layerSize.isHide) {
     results.isHide = layerSize.isHide
   }
 
@@ -332,7 +332,7 @@ export function readFile(path, callback, type) {
   let loadJs = (fileUrl, fileName) => {
     loadFile(randomUrl(fileUrl), function() {
       data = window.HTMLCONFIG[fileName];
-      if (data) {
+      if(data) {
         callback(data)
         delete window.HTMLCONFIG[fileName];
       } else {
@@ -347,7 +347,7 @@ export function readFile(path, callback, type) {
   //externalFile使用
   //如果是js动态文件
   //content的html结构
-  if (type === "js") {
+  if(type === "js") {
     paths = config.getSvgPath() + path;
     name = path.replace(".js", '')
     loadJs(paths, name)
@@ -358,7 +358,7 @@ export function readFile(path, callback, type) {
    * 如果配置了convert === 'svg'
    * 那么所有的svg文件就强制转化成js读取
    */
-  if (config.launch && config.launch.convert === 'svg') {
+  if(config.launch && config.launch.convert === 'svg') {
     path = path.replace('.svg', '.js')
     name = path.replace(".js", '')
     svgUrl = config.getSvgPath() + path
@@ -370,10 +370,10 @@ export function readFile(path, callback, type) {
   /**
    * ibooks模式 单独处理svg转化策划给你js,加载js文件
    */
-  if (Xut.IBooks.CONFIG) {
+  if(Xut.IBooks.CONFIG) {
     //如果是.svg结尾
     //把svg替换成js
-    if (/.svg$/.test(path)) {
+    if(/.svg$/.test(path)) {
       path = path.replace(".svg", '.js')
     }
     //全路径
@@ -383,7 +383,7 @@ export function readFile(path, callback, type) {
     //加载脚本
     loadFile(randomUrl(paths), function() {
       data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
-      if (data) {
+      if(data) {
         callback(data)
         delete window.HTMLCONFIG[name];
         delete window.IBOOKSCONFIG[name]
@@ -398,12 +398,12 @@ export function readFile(path, callback, type) {
 
   //svg文件
   //游览器模式 && 非强制插件模式
-  if (Xut.plat.isBrowser && !config.isPlugin) {
+  if(Xut.plat.isBrowser && !config.isPlugin) {
     //默认的地址
     svgUrl = config.getSvgPath().replace("www/", "") + path
 
     //mini杂志的情况，不处理目录的www
-    if (config.launch && config.launch.resource) {
+    if(config.launch && config.launch.resource) {
       svgUrl = config.getSvgPath() + path
     }
 

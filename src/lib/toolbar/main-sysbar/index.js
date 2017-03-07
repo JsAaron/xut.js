@@ -77,12 +77,12 @@ export default class sysBar extends Bar {
     let html = ''
 
     //首页按钮
-    if (setting.HomeBut) {
+    if(setting.HomeBut) {
       html += createHomeIcon(iconHeight)
     }
 
     //目录按钮
-    if (setting.ContentBut) {
+    if(setting.ContentBut) {
       html += createDirIcon(iconHeight)
     }
 
@@ -93,12 +93,12 @@ export default class sysBar extends Bar {
     html += createHideToolbar(iconHeight)
 
     //关闭子文档
-    if (setting.CloseBut) {
+    if(setting.CloseBut) {
       html += createCloseIcon(iconHeight);
     }
 
     //页码数
-    if (setting.PageBut) {
+    if(setting.PageBut) {
       html += createPageNumber(iconHeight, this.currentPage, this.pageTotal)
     }
 
@@ -122,7 +122,7 @@ export default class sysBar extends Bar {
   handleEvent(e) {
     $$handle({
       start(e) {
-        switch ($$target(e).className) {
+        switch($$target(e).className) {
           //跳主页
           case "xut-control-backhome":
             goHomePage();
@@ -152,7 +152,7 @@ export default class sysBar extends Bar {
    */
   _toolbarPostion($controlNode, position) {
     const height = this.super_iconHeight
-    if (position == 1) { //在底部
+    if(position == 1) { //在底部
       $controlNode.css({
         bottom: 0,
         height: height + 'px'
@@ -172,7 +172,7 @@ export default class sysBar extends Bar {
    */
   _toggleNavBar() {
     const pageIndex = Xut.Presentation.GetPageIndex()
-    if (this.navbarObj) {
+    if(this.navbarObj) {
       this.navbarObj.toggle(pageIndex)
     } else {
       this.navbarObj = new Navbar(pageIndex)
@@ -205,7 +205,7 @@ export default class sysBar extends Bar {
   showTopBar() {
     var self = this;
 
-    if (this.toolBarStatus) {
+    if(this.toolBarStatus) {
       this.Lock = false;
       return;
     }
@@ -231,7 +231,7 @@ export default class sysBar extends Bar {
   hideTopBar() {
     var self = this;
 
-    if (!this.toolBarStatus) {
+    if(!this.toolBarStatus) {
       this.Lock = false;
       return;
     }

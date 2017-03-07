@@ -3,15 +3,9 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import {
-  config
-} from '../../../config/index'
-import {
-  Abstract
-} from './abstract'
-import {
-  Pagebase
-} from '../../pagebase/index'
+import { config } from '../../../config/index'
+import { Abstract } from './abstract'
+import { Pagebase } from '../../pagebase/index'
 import {
   $$suspend,
   $$original,
@@ -31,8 +25,8 @@ import {
  */
 const toArray = (filter) => {
   var arr = [];
-  if (!filter.length) {
-    for (var key in filter) {
+  if(!filter.length) {
+    for(var key in filter) {
       arr.push(filter[key]);
     }
     filter = arr;
@@ -94,7 +88,7 @@ export default class MasterMgr extends Abstract {
    */
   register(pageIndex, type, hotspotObj) {
     var parallaxObj = this.abstractGetPageObj(this.converMasterId(pageIndex))
-    if (parallaxObj) {
+    if(parallaxObj) {
       parallaxObj.registerCotents.apply(parallaxObj, arguments);
     }
   }
@@ -111,15 +105,15 @@ export default class MasterMgr extends Abstract {
     let reuseMasterId = pageOffset && pageOffset.split(rword);
 
     //组合下标
-    if (reuseMasterId && reuseMasterId.length === 3) {
+    if(reuseMasterId && reuseMasterId.length === 3) {
       reuseMasterKey = pptMaster + rword + reuseMasterId[2];
     } else {
       reuseMasterKey = pptMaster;
     }
 
     //检测母版已经创建
-    if (this._hasMaster(reuseMasterKey, pageOffset, pageIndex)) {
-      if (config.devtools) {
+    if(this._hasMaster(reuseMasterKey, pageOffset, pageIndex)) {
+      if(config.devtools) {
         //重复的母版对象
         //用于检测页面模式是否一致
         let currMasterObj = this.abstractGetPageObj(reuseMasterKey);
@@ -170,7 +164,7 @@ export default class MasterMgr extends Abstract {
     //找到需要滑动的母版
     let masterObjs = this._findMaster(leftIndex, currIndex, rightIndex, direction, action, isAppBoundary)
     _.each(masterObjs, function(pageObj, index) {
-      if (pageObj) {
+      if(pageObj) {
         isBoundary = true
         pageObj.moveContainer(action, moveDist[index], speed, moveDist[3], direction)
       }
@@ -178,7 +172,7 @@ export default class MasterMgr extends Abstract {
 
     //越界不需要处理内部视察对象
     this.isBoundary = isBoundary;
-    if (isBoundary) {
+    if(isBoundary) {
       return
     }
 
@@ -189,7 +183,7 @@ export default class MasterMgr extends Abstract {
     const moveParallaxObject = (nodes) => {
       let getMasterId = this.converMasterId(currIndex)
       let currParallaxObj = this.abstractGetPageObj(getMasterId)
-      if (currParallaxObj) {
+      if(currParallaxObj) {
         //处理当前页面内的视觉差对象效果
         currParallaxObj.moveParallax({
           action,
@@ -203,7 +197,7 @@ export default class MasterMgr extends Abstract {
     }
 
     //移动视察对象
-    switch (direction) {
+    switch(direction) {
       case 'prev':
         moveParallaxObject();
         break;
@@ -220,10 +214,10 @@ export default class MasterMgr extends Abstract {
    */
   suspend(pointers) {
     //如果未越界不需要处理行为
-    if (!this.isBoundary) return;
+    if(!this.isBoundary) return;
     var masterObj,
       stopPointer = pointers.stopPointer;
-    if (masterObj = this.abstractGetPageObj(stopPointer)) {
+    if(masterObj = this.abstractGetPageObj(stopPointer)) {
       var pageId = masterObj.baseGetPageId(stopPointer);
       //停止活动对象活动
       $$suspend(masterObj, pageId);
@@ -237,7 +231,7 @@ export default class MasterMgr extends Abstract {
    */
   resetOriginal(pageIndex) {
     var originalPageObj;
-    if (originalPageObj = this.abstractGetPageObj(pageIndex)) {
+    if(originalPageObj = this.abstractGetPageObj(pageIndex)) {
       $$original(originalPageObj);
     }
   }
@@ -248,7 +242,7 @@ export default class MasterMgr extends Abstract {
    */
   autoRun(data) {
     var masterObj
-    if (masterObj = this.abstractGetPageObj(data.currIndex)) {
+    if(masterObj = this.abstractGetPageObj(data.currIndex)) {
       //热点状态复位
       this.resetOriginal(data.suspendIndex)
       $$autoRun(masterObj, data.currIndex);
@@ -266,10 +260,10 @@ export default class MasterMgr extends Abstract {
    * @return {[type]} [description]
    */
   reactivation(target) {
-    if (this.parallaxProcessedContetns) {
+    if(this.parallaxProcessedContetns) {
       var actName = target.id;
       var contentObj = this.parallaxProcessedContetns[actName];
-      if (contentObj) {
+      if(contentObj) {
         contentObj.runAnimations();
         //视觉差处理一次,停止过动画
         contentObj.parallaxProcessed = false;
@@ -335,18 +329,18 @@ export default class MasterMgr extends Abstract {
       prevMasterObj, currMasterObj, nextMasterObj,
       currMasterId = this.converMasterId(currIndex)
 
-    switch (direction) {
+    switch(direction) {
       case 'prev':
         prevMasterId = this.converMasterId(leftIndex)
         prevFlag = currMasterId !== prevMasterId
 
         //如果2个页面不一样的视觉差
         //或者是应用最后一页反弹的情况，2个页面同一个视觉差，也就是最后一页，往前面反弹
-        if (prevFlag || isAppBoundary) {
+        if(prevFlag || isAppBoundary) {
           currMasterObj = this.abstractGetPageObj(currMasterId);
         }
 
-        if (prevMasterId && prevFlag) {
+        if(prevMasterId && prevFlag) {
           action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
           prevMasterObj = this.abstractGetPageObj(prevMasterId)
         }
@@ -354,10 +348,10 @@ export default class MasterMgr extends Abstract {
       case 'next':
         nextMasterId = this.converMasterId(rightIndex)
         nextFlag = currMasterId !== nextMasterId
-        if (nextFlag) {
+        if(nextFlag) {
           currMasterObj = this.abstractGetPageObj(currMasterId)
         }
-        if (nextMasterId && nextFlag) {
+        if(nextMasterId && nextFlag) {
           action === 'flipOver' && this._checkClear([currMasterId, nextMasterId]); //边界清理
           nextMasterObj = this.abstractGetPageObj(nextMasterId)
         }
@@ -377,9 +371,9 @@ export default class MasterMgr extends Abstract {
       prevKey, nextKey;
 
     //往前
-    while (i--) {
+    while(i--) {
       prevKey = this.converMasterId(i);
-      if (prevKey && prevKey !== currkey) {
+      if(prevKey && prevKey !== currkey) {
         filter['prev'] = prevKey;
         break;
       }
@@ -389,13 +383,13 @@ export default class MasterMgr extends Abstract {
     nextKey = this.converMasterId(currPage + 1);
 
     //如果有下一条记录
-    if (nextKey && nextKey !== currkey) {
+    if(nextKey && nextKey !== currkey) {
       //如果不是当期页面满足范围要求
       filter['next'] = nextKey;
     }
 
     //当前页面
-    if (currKey) {
+    if(currKey) {
       filter['curr'] = currKey;
     }
     return filter;
@@ -418,23 +412,23 @@ export default class MasterMgr extends Abstract {
        */
       const _fixToMove = function(distance, speed) {
         var $pageNode = parallaxObj.$pageNode;
-        if ($pageNode) {
+        if($pageNode) {
           $pageNode.css(transitionDuration, speed + 'ms');
           $pageNode.css(transform, 'translate(' + distance + 'px,0px)' + translateZ)
         }
       }
 
-      if (position === 'prev') {
+      if(position === 'prev') {
         _fixToMove(-self.visualWidth);
-      } else if (position === 'next') {
+      } else if(position === 'next') {
         _fixToMove(self.visualWidth);
-      } else if (position === 'curr') {
+      } else if(position === 'curr') {
         _fixToMove(0);
       }
     }
 
-    for (var key in filter) {
-      switch (key) {
+    for(var key in filter) {
+      switch(key) {
         case 'prev':
           setPosition(this.abstractGetPageObj(filter[key]), 'prev')
           break;
@@ -452,7 +446,7 @@ export default class MasterMgr extends Abstract {
   _checkParallaxPox(currPageIndex, targetIndex) {
     var key, pageObj,
       pageCollection = this.abstractGetCollection();
-    for (key in pageCollection) {
+    for(key in pageCollection) {
       pageObj = pageCollection[key];
       //跳跃过的视觉容器处理
       this._fixParallaxPox(pageObj, currPageIndex, targetIndex)
@@ -468,7 +462,7 @@ export default class MasterMgr extends Abstract {
    */
   _toRepeat(reuseMasterKey, pageIndex) {
     var temp;
-    if (temp = this.recordMasterRange[reuseMasterKey]) {
+    if(temp = this.recordMasterRange[reuseMasterKey]) {
       return temp;
     }
     return false;
@@ -482,8 +476,8 @@ export default class MasterMgr extends Abstract {
   //}
   _updataMasterscope(reuseMasterKey, pageIndex) {
     var scope;
-    if (scope = this.recordMasterRange[reuseMasterKey]) {
-      if (-1 === scope.indexOf(pageIndex)) {
+    if(scope = this.recordMasterRange[reuseMasterKey]) {
+      if(-1 === scope.indexOf(pageIndex)) {
         scope.push(pageIndex);
       }
     } else {
@@ -531,14 +525,14 @@ export default class MasterMgr extends Abstract {
       let rangePage = parallax.calculateRangePage()
       let lastProperty = parallax.lastProperty
 
-      if (targetIndex > currPageIndex) {
+      if(targetIndex > currPageIndex) {
         //next
-        if (targetIndex > rangePage['end']) {
+        if(targetIndex > rangePage['end']) {
           nodes = 1
         }
       } else {
         //prev
-        if (targetIndex < rangePage['start']) {
+        if(targetIndex < rangePage['start']) {
           nodes = 0
         }
       }
@@ -562,12 +556,12 @@ export default class MasterMgr extends Abstract {
     }
 
 
-    if (contentObjs = parallaxObj.baseGetContent()) {
+    if(contentObjs = parallaxObj.baseGetContent()) {
       //获取到页面nodes
       nodes = Xut.Presentation.GetPageNode(targetIndex - 1);
       contentObjs.forEach(function(contentObj) {
         contentObj.eachAssistContents(function(scope) {
-          if (scope.parallax) {
+          if(scope.parallax) {
             repairNodes(scope.parallax)
           }
         })
@@ -585,14 +579,14 @@ export default class MasterMgr extends Abstract {
       removeMasterId = _.keys(this.abstractGetCollection());
 
     // 如果有2个以上的母板对象,就需要清理
-    if (removeMasterId.length > 2 || toPage) { //或者是跳转页面
+    if(removeMasterId.length > 2 || toPage) { //或者是跳转页面
       //解析对象
       filter = toArray(filter);
       //过滤
       _.each(filter, function(masterId) {
-        if (masterId !== undefined) {
+        if(masterId !== undefined) {
           indexOf = removeMasterId.indexOf(masterId.toString());
-          if (-1 !== indexOf) {
+          if(-1 !== indexOf) {
             //过滤需要删除的对象
             removeMasterId.splice(indexOf, 1);
           }
@@ -613,7 +607,7 @@ export default class MasterMgr extends Abstract {
     var pageObj, self = this;
     _.each(removeMasterId, function(removekey) {
       //销毁页面对象事件
-      if (pageObj = self.abstractGetPageObj(removekey)) {
+      if(pageObj = self.abstractGetPageObj(removekey)) {
         //移除事件
         pageObj.baseDestroy();
         //移除列表

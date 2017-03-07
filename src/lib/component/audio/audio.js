@@ -23,9 +23,9 @@ const plat = Xut.plat
 let UUIDcreatePart = (length) => {
   let uuidpart = ""
   let uuidchar
-  for (let i = 0; i < length; i++) {
+  for(let i = 0; i < length; i++) {
     uuidchar = parseInt((Math.random() * 256), 10).toString(16);
-    if (uuidchar.length == 1) {
+    if(uuidchar.length == 1) {
       uuidchar = "0" + uuidchar;
     }
     uuidpart += uuidchar;
@@ -87,7 +87,7 @@ class _Flash extends BaseAudio {
   }
 
   end() {
-    if (this.audio) {
+    if(this.audio) {
       this.audio.destroy();
       this.audio = null;
     }
@@ -142,7 +142,7 @@ class _Audio5js extends BaseAudio {
   }
 
   end() {
-    if (this.audio) {
+    if(this.audio) {
       this.audio.destroy();
       this.audio = null;
     }
@@ -198,11 +198,11 @@ class _Media extends BaseAudio {
     this.audio.getCurrentPosition((position) => {
       let audioTime
       position = position * 1000;
-      if (!this.changeValue) {
+      if(!this.changeValue) {
         this.changeValue = position
       }
       position -= this.changeValue;
-      if (position > -1) {
+      if(position > -1) {
         audioTime = Math.round(position);
       }
       callback(audioTime)
@@ -218,7 +218,7 @@ class _Media extends BaseAudio {
    * @return {[type]} [description]
    */
   end() {
-    if (this.audio) {
+    if(this.audio) {
       this.audio.release();
       this.audio = null;
     }
@@ -290,7 +290,7 @@ class _cordovaMedia extends BaseAudio {
 
   //播放
   play() {
-    if (this.audio) {
+    if(this.audio) {
       this.status = 'playing';
       this.audio.startPlayingAudio();
     }
@@ -307,7 +307,7 @@ class _cordovaMedia extends BaseAudio {
 
   //结束
   end() {
-    if (this.audio) {
+    if(this.audio) {
       this.audio.release();
       this.audio = null;
     }
@@ -341,18 +341,18 @@ class _nativeVideo extends BaseAudio {
     //构建之前处理
     this.preRelated(trackId, options);
 
-    if (instance[trackId]) {
+    if(instance[trackId]) {
       audio = hasAudio ? getAudio() : instance[trackId]
       audio.src = url
     } else {
-      if (hasAudio) {
+      if(hasAudio) {
         audio = getAudio()
         audio.src = url
       } else {
         audio = new Audio(url)
-          //更新音轨
-          //妙妙学方式不要音轨处理
-        if (trackId) {
+        //更新音轨
+        //妙妙学方式不要音轨处理
+        if(trackId) {
           instance[trackId] = audio
         }
       }
@@ -402,7 +402,7 @@ class _nativeVideo extends BaseAudio {
   }
 
   end() {
-    if (this.audio) {
+    if(this.audio) {
       this.audio.pause();
       //快速切换，防止在播放中就移除，导致没有销毁
       this.audio.removeEventListener('canplay', this._canplayCallback, false)
@@ -418,11 +418,11 @@ class _nativeVideo extends BaseAudio {
 
 
 //安卓客户端apk的情况下
-if (plat.isAndroid && !plat.isBrowser) {
+if(plat.isAndroid && !plat.isBrowser) {
   audioPlayer = _Media
 } else {
   //妙妙学的 客户端浏览器模式
-  if (window.MMXCONFIG && window.audioHandler) {
+  if(window.MMXCONFIG && window.audioHandler) {
     audioPlayer = _cordovaMedia
   } else {
     audioPlayer = _nativeVideo

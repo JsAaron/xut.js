@@ -7,25 +7,25 @@
  */
 
 Xut.Plugin.WebView = {
-	open: function(url, left, top, height, width, mode) {
-		if (GLOBALIFRAME) {
-			return GLOBALCONTEXT.WebView.open(url, left, top, height, width, mode);
-		} else {
-			return cordova.exec(null, null, "WebView", "open", [url, left, top, height, width, mode]);
-		}
-	},
-	close: function() {
-		if (GLOBALIFRAME) {
-			return GLOBALCONTEXT.WebView.close();
-		} else {
-			return cordova.exec(null, null, "WebView", "close", []);
-		}
-	},
-	flag: function(successCallback) {
-		if (GLOBALIFRAME) {
-			return GLOBALCONTEXT.WebView.flag(successCallback);
-		} else {
-			return cordova.exec(successCallback, null, "WebView", "flag", []);
-		}
-	}
+  open: function(url, left, top, height, width, mode) {
+    if(GLOBALIFRAME) {
+      return GLOBALCONTEXT.WebView.open(url, left, top, height, width, mode);
+    } else {
+      return cordova.exec(null, null, "WebView", "open", [url, left, top, height, width, mode]);
+    }
+  },
+  close: function() {
+    if(GLOBALIFRAME) {
+      return GLOBALCONTEXT.WebView.close();
+    } else {
+      return cordova.exec(null, null, "WebView", "close", []);
+    }
+  },
+  flag: function(successCallback) {
+    if(GLOBALIFRAME) {
+      return GLOBALCONTEXT.WebView.flag(successCallback);
+    } else {
+      return cordova.exec(successCallback, null, "WebView", "flag", []);
+    }
+  }
 };

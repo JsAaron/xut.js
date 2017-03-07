@@ -19,19 +19,19 @@
 
 Xut.Plugin.DownloadPlugin = {
 
-     download: function(successfullCallback, failedCallback, json) {
-          return cordova.exec(successfullCallback, failedCallback, 'DownloadPlugin', 'download', [json]);
-     },
+  download: function(successfullCallback, failedCallback, json) {
+    return cordova.exec(successfullCallback, failedCallback, 'DownloadPlugin', 'download', [json]);
+  },
 
-     pause: function(successfullCallback, failedCallback, url) {
-          return cordova.exec(successfullCallback, failedCallback, 'DownloadPlugin', 'pause', [url]);
-     },
+  pause: function(successfullCallback, failedCallback, url) {
+    return cordova.exec(successfullCallback, failedCallback, 'DownloadPlugin', 'pause', [url]);
+  },
 
-     downloadContinue: function(successfullCallback, failedCallback, json) {
-          return cordova.exec(successfullCallback, failedCallback, 'DownloadPlugin', 'downloadContinue', [json]);
-     },
+  downloadContinue: function(successfullCallback, failedCallback, json) {
+    return cordova.exec(successfullCallback, failedCallback, 'DownloadPlugin', 'downloadContinue', [json]);
+  },
 
-     back: function(successfullCallback, failedCallback) {
-          return cordova.exec(successfullCallback, failedCallback, 'DownloadPlugin', 'back', []);
-     }
+  back: function(successfullCallback, failedCallback) {
+    return cordova.exec(successfullCallback, failedCallback, 'DownloadPlugin', 'back', []);
+  }
 }

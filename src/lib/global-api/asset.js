@@ -25,7 +25,7 @@ export function initAsset() {
    */
   window.XXTAPI.ReadVar = function(variable, defaultValue) {
     var temp;
-    if (temp = $$get(variable)) {
+    if(temp = $$get(variable)) {
       return temp;
     } else {
       $$set(variable, defaultValue);

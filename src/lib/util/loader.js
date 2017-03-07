@@ -7,29 +7,29 @@ function pollCss(node, callback) {
     isLoaded;
 
   // for WebKit < 536
-  if (isOldWebKit) {
-    if (sheet) {
+  if(isOldWebKit) {
+    if(sheet) {
       isLoaded = true
     }
   }
   // for Firefox < 9.0
-  else if (sheet) {
+  else if(sheet) {
     try {
-      if (sheet.cssRules) {
+      if(sheet.cssRules) {
         isLoaded = true
       }
-    } catch (ex) {
+    } catch(ex) {
       // The value of `ex.name` is changed from "NS_ERROR_DOM_SECURITY_ERR"
       // to "SecurityError" since Firefox 13.0. But Firefox is less than 9.0
       // in here, So it is ok to just rely on "NS_ERROR_DOM_SECURITY_ERR"
-      if (ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
+      if(ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
         isLoaded = true
       }
     }
   }
 
   setTimeout(function() {
-    if (isLoaded) {
+    if(isLoaded) {
       // Place callback here to give time for style rendering
       callback()
     } else {
@@ -42,10 +42,10 @@ function pollCss(node, callback) {
 function addOnload(node, callback, isCSS, url) {
   var supportOnload = "onload" in node;
 
-  if (isCSS && isOldWebKit) {
+  if(isCSS && isOldWebKit) {
     setTimeout(function() {
-        pollCss(node, callback)
-      }, 1) // Begin after node insertion
+      pollCss(node, callback)
+    }, 1) // Begin after node insertion
     return
   }
 
@@ -55,7 +55,7 @@ function addOnload(node, callback, isCSS, url) {
     node.onload = node.onerror = node.onreadystatechange = null
 
     // Remove the script to reduce memory leak
-    if (!isCSS) {
+    if(!isCSS) {
       var head = document.getElementsByTagName("head")[0] || document.documentElement;
       head.removeChild(node)
     }
@@ -65,14 +65,14 @@ function addOnload(node, callback, isCSS, url) {
   }
 
 
-  if (supportOnload) {
+  if(supportOnload) {
     node.onload = onload
     node.onerror = function() {
       onload(true)
     }
   } else {
     node.onreadystatechange = function() {
-      if (/loaded|complete/.test(node.readyState)) {
+      if(/loaded|complete/.test(node.readyState)) {
         onload()
       }
     }
@@ -84,16 +84,16 @@ function loadFile(url, callback, charset) {
     isCSS = IS_CSS_RE.test(url),
     node = document.createElement(isCSS ? "link" : "script");
 
-  if (charset) {
+  if(charset) {
     var cs = $.isFunction(charset) ? charset(url) : charset
-    if (cs) {
+    if(cs) {
       node.charset = cs
     }
   }
 
   addOnload(node, callback, isCSS, url)
 
-  if (isCSS) {
+  if(isCSS) {
     node.rel = "stylesheet"
     node.href = url
   } else {
@@ -110,7 +110,7 @@ function loadFile(url, callback, charset) {
   baseElement ?
     head.insertBefore(node, baseElement) :
     head.appendChild(node)
-    //currentlyAddingScript = null
+  //currentlyAddingScript = null
 
   return node
 }
@@ -126,7 +126,7 @@ const loadFigure = (function() {
   // 用来执行队列
   let tick = function() {
     var i = 0;
-    for (; i < list.length; i++) {
+    for(; i < list.length; i++) {
       list[i].end ? list.splice(i--, 1) : list[i]();
     };
     !list.length && stop();
@@ -145,7 +145,7 @@ const loadFigure = (function() {
     img.src = url;
 
     // 如果图片被缓存，则直接返回缓存数据
-    if (img.complete) {
+    if(img.complete) {
       ready && ready.call(img);
       load && load.call(img);
       return;
@@ -165,7 +165,7 @@ const loadFigure = (function() {
     onready = function() {
       newWidth = img.width;
       newHeight = img.height;
-      if (newWidth !== width || newHeight !== height ||
+      if(newWidth !== width || newHeight !== height ||
         // 如果图片已经在其他地方加载可使用面积检测
         newWidth * newHeight > 1024
       ) {
@@ -185,10 +185,10 @@ const loadFigure = (function() {
     };
 
     // 加入队列中定期执行
-    if (!onready.end) {
+    if(!onready.end) {
       list.push(onready);
       // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-      if (intervalId === null) intervalId = setInterval(tick, 40);
+      if(intervalId === null) intervalId = setInterval(tick, 40);
     };
   };
 })();

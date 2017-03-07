@@ -6,20 +6,20 @@ import { resolveColumnCount } from './core-init'
  * 分栏探测
  */
 const makeDelay = function(seasonsId, chapterId, count) {
-    return function() {
-        setChpaterColumn(seasonsId, chapterId, count)
-    }
+  return function() {
+    setChpaterColumn(seasonsId, chapterId, count)
+  }
 }
 
 const execDelay = function(tempDelay) {
-    if(tempDelay.length) {
-        let fn
-        while(fn = tempDelay.pop()) {
-            fn()
-        }
-        Xut.Application.Notify('change:number:total')
-        Xut.Application.Notify('change:column')
+  if(tempDelay.length) {
+    let fn
+    while(fn = tempDelay.pop()) {
+      fn()
     }
+    Xut.Application.Notify('change:number:total')
+    Xut.Application.Notify('change:column')
+  }
 }
 
 /**
@@ -47,34 +47,34 @@ let baseCheckCount = 20
  * 检测分栏数
  */
 function detectColumn($seasons, columnCollection, callback, checkCount) {
-    let tempDelay = []
+  let tempDelay = []
 
-    resolveColumnCount($seasons, (seasonsId, chapterId, count) => {
-        if(debug && checkCount > simulateTimer) {
-            count = simulateCount
-        }
-        //假如高度改变
-        if(columnCollection[seasonsId][chapterId] !== count) {
-            columnCollection[seasonsId][chapterId] = count
-            tempDelay.push(makeDelay(seasonsId, chapterId, count))
-        }
+  resolveColumnCount($seasons, (seasonsId, chapterId, count) => {
+      if(debug && checkCount > simulateTimer) {
+        count = simulateCount
+      }
+      //假如高度改变
+      if(columnCollection[seasonsId][chapterId] !== count) {
+        columnCollection[seasonsId][chapterId] = count
+        tempDelay.push(makeDelay(seasonsId, chapterId, count))
+      }
     })
 
     --checkCount
 
-    //执行监控改变
-    tempDelay.length && execDelay(tempDelay)
+  //执行监控改变
+  tempDelay.length && execDelay(tempDelay)
 
-    if(checkCount) {
-        timerId = setTimeout(function() {
-            detectColumn($seasons, columnCollection, callback, checkCount)
-        }, 500)
-    } else {
-        //如果探测完毕就强制关闭检测了
-        config.columnCheck = false
-        stopColumnDetection()
-        callback()
-    }
+  if(checkCount) {
+    timerId = setTimeout(function() {
+      detectColumn($seasons, columnCollection, callback, checkCount)
+    }, 500)
+  } else {
+    //如果探测完毕就强制关闭检测了
+    config.columnCheck = false
+    stopColumnDetection()
+    callback()
+  }
 }
 
 
@@ -82,7 +82,7 @@ function detectColumn($seasons, columnCollection, callback, checkCount) {
  * 开始分栏探测
  */
 export function startColumnDetect($seasons, columnCollection, callback) {
-    detectColumn($seasons, columnCollection, callback, baseCheckCount)
+  detectColumn($seasons, columnCollection, callback, baseCheckCount)
 }
 
 
@@ -90,7 +90,7 @@ export function startColumnDetect($seasons, columnCollection, callback) {
  * 停止分栏高度探测
  */
 export function stopColumnDetection() {
-    Xut.Application.unWatch('change:number:total change:column')
-    clearTimeout(timerId)
-    timerId = null
+  Xut.Application.unWatch('change:number:total change:column')
+  clearTimeout(timerId)
+  timerId = null
 }

@@ -21,22 +21,22 @@ import {
 export default function eventHooks(e, node) {
 
   //禁止鼠标右键
-  if (e.button && e.button == 2) {
+  if(e.button && e.button == 2) {
     return
   }
 
   //如果是移动端的情况下 && 支持二维码 && 是图片 && 是二维码标记
-  if (config.supportQR
-    && Xut.plat.hasTouch
-    && node.nodeName.toLowerCase() === "img"
-    && node.getAttribute('data-type') === 'qrcode') {
+  if(config.supportQR &&
+    Xut.plat.hasTouch &&
+    node.nodeName.toLowerCase() === "img" &&
+    node.getAttribute('data-type') === 'qrcode') {
     return 'qrcode'
   } else {
-    if (Xut.plat.isBrowser
-      && !Xut.IBooks.Enabled
-      && !window.MMXCONFIG
-      && !window.DUKUCONFIG
-      && node.getAttribute('data-type') !=='hyperlink') { //超链接不阻止
+    if(Xut.plat.isBrowser &&
+      !Xut.IBooks.Enabled &&
+      !window.MMXCONFIG &&
+      !window.DUKUCONFIG &&
+      node.getAttribute('data-type') !== 'hyperlink') { //超链接不阻止
       e.preventDefault && e.preventDefault();
     }
   }

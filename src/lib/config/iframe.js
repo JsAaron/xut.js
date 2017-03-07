@@ -14,7 +14,7 @@ const SUbCONFIGT = window.SUbCONFIGT
  * @param  {[type]} DUKUCONFIG [description]
  * @return {[type]}                   [description]
  */
-if (DUKUCONFIG) {
+if(DUKUCONFIG) {
   DUKUCONFIG.path = DUKUCONFIG.path.replace('//', '/')
 }
 
@@ -24,9 +24,9 @@ if (DUKUCONFIG) {
  * @return {[type]}     [description]
  */
 const rtrim = function(str) {
-  if (typeof str != 'string') return str;
+  if(typeof str != 'string') return str;
   var lastIndex = str.length - 1;
-  if (str.charAt(lastIndex) === '/') {
+  if(str.charAt(lastIndex) === '/') {
     return str.substr(0, lastIndex)
   } else {
     return str;
@@ -39,7 +39,7 @@ const rtrim = function(str) {
 //     MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
 // }
 let MMXCONFIGPath = location.href.replace(/^file:\/\/\/?/i, '/').replace(/[^\/]*$/, '');
-if (MMXCONFIG && MMXCONFIG.path) {
+if(MMXCONFIG && MMXCONFIG.path) {
   MMXCONFIGPath = rtrim(MMXCONFIG.path)
 }
 
@@ -52,25 +52,25 @@ if (MMXCONFIG && MMXCONFIG.path) {
  */
 const iframeMode = (() => {
   let mode;
-  if (SUbCONFIGT && DUKUCONFIG) {
+  if(SUbCONFIGT && DUKUCONFIG) {
     //通过读酷客户端开打子文档方式
     mode = 'iframeDuKuSubDoc'
   } else {
     //子文档加载
-    if (SUbCONFIGT) {
+    if(SUbCONFIGT) {
       mode = 'iframeSubDoc'
     }
     //读酷客户端加载
-    if (DUKUCONFIG) {
+    if(DUKUCONFIG) {
       mode = 'iframeDuKu'
     }
     //客户端模式
     //通过零件加载
-    if (CLIENTCONFIGT) {
+    if(CLIENTCONFIGT) {
       mode = 'iframeClient'
     }
     //秒秒学客户端加载
-    if (MMXCONFIG) {
+    if(MMXCONFIG) {
       mode = 'iframeMiaomiaoxue'
     }
   }
@@ -90,156 +90,156 @@ export default {
    * @return {[type]} [description]
    */
   resources() {
-      if (isIOS) {
-        switch (iframeMode) {
-          case 'iframeDuKu':
-            return DUKUCONFIG.path;
-          case 'iframeSubDoc':
-            return getSourcePath();
-          case 'iframeDuKuSubDoc':
-            return getSourcePath();
-          case 'iframeClient':
-            return CLIENTCONFIGT.path;
-          case 'iframeMiaomiaoxue':
-            return MMXCONFIGPath + '/content/gallery/';
-        }
+    if(isIOS) {
+      switch(iframeMode) {
+        case 'iframeDuKu':
+          return DUKUCONFIG.path;
+        case 'iframeSubDoc':
+          return getSourcePath();
+        case 'iframeDuKuSubDoc':
+          return getSourcePath();
+        case 'iframeClient':
+          return CLIENTCONFIGT.path;
+        case 'iframeMiaomiaoxue':
+          return MMXCONFIGPath + '/content/gallery/';
       }
-
-      if (isAndroid) {
-        switch (iframeMode) {
-          case 'iframeDuKu':
-            return DUKUCONFIG.path;
-          case 'iframeSubDoc':
-            return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeDuKuSubDoc':
-            return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeClient':
-            return CLIENTCONFIGT.path;
-          case 'iframeMiaomiaoxue':
-            return MMXCONFIGPath + '/content/gallery/';
-        }
-      }
-    },
-
-
-    /**
-     * 视频路径
-     * @return {[type]} [description]
-     */
-    video() {
-      if (isIOS) {
-        switch (iframeMode) {
-          case 'iframeDuKu':
-            return DUKUCONFIG.path;
-          case 'iframeSubDoc':
-            return getSourcePath()
-          case 'iframeDuKuSubDoc':
-            return getSourcePath();
-          case 'iframeClient':
-            return CLIENTCONFIGT.path;
-          case 'iframeMiaomiaoxue':
-            return MMXCONFIGPath + '/content/gallery/';
-        }
-      }
-
-      if (isAndroid) {
-        switch (iframeMode) {
-          case 'iframeDuKu':
-            return DUKUCONFIG.path;
-          case 'iframeSubDoc':
-            return 'android.resource://#packagename#/raw/';
-          case 'iframeDuKuSubDoc':
-            return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeClient':
-            return CLIENTCONFIGT.path;
-          case 'iframeMiaomiaoxue':
-            return MMXCONFIGPath + '/content/gallery/';
-        }
-      }
-    },
-
-
-    /**
-     * 音频路径
-     * @return {[type]} [description]
-     */
-    audio() {
-      if (isIOS) {
-        switch (iframeMode) {
-          case 'iframeDuKu':
-            return DUKUCONFIG.path;
-          case 'iframeSubDoc':
-            return getSourcePath();
-          case 'iframeDuKuSubDoc':
-            return getSourcePath();
-          case 'iframeClient':
-            return CLIENTCONFIGT.path;
-          case 'iframeMiaomiaoxue':
-            return MMXCONFIGPath + '/content/gallery/';
-        }
-      }
-      if (isAndroid) {
-        switch (iframeMode) {
-          case 'iframeDuKu':
-            return DUKUCONFIG.path;
-          case 'iframeSubDoc':
-            return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeDuKuSubDoc':
-            return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeClient':
-            return CLIENTCONFIGT.path;
-          case 'iframeMiaomiaoxue':
-            return MMXCONFIGPath + '/content/gallery/';
-        }
-      }
-    },
-
-
-    /**
-     * 调用插件处理
-     * @return {[type]} [description]
-     */
-    svg() {
-      if (isIOS) {
-        switch (iframeMode) {
-          case 'iframeDuKu':
-            return DUKUCONFIG.path;
-          case 'iframeSubDoc':
-            //www/content/subdoc/00c83e668a6b6bad7eda8eedbd2110ad/content/gallery/
-            return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeDuKuSubDoc':
-            return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeClient':
-            return CLIENTCONFIGT.path;
-          case 'iframeMiaomiaoxue':
-            return MMXCONFIGPath + '/content/gallery/';
-        }
-      }
-
-      if (isAndroid) {
-        switch (iframeMode) {
-          case 'iframeDuKu':
-            return DUKUCONFIG.path;
-          case 'iframeSubDoc':
-            return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeDuKuSubDoc':
-            return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
-          case 'iframeClient':
-            return CLIENTCONFIGT.path;
-          case 'iframeMiaomiaoxue':
-            return MMXCONFIGPath + '/content/gallery/';
-        }
-      }
-    },
-
-
-    /**
-     * js零件
-     * 2016.8.3 喵喵学
-     * @return {[type]} [description]
-     */
-    jsWidget() {
-      return MMXCONFIGPath + '/content/widget/'
     }
+
+    if(isAndroid) {
+      switch(iframeMode) {
+        case 'iframeDuKu':
+          return DUKUCONFIG.path;
+        case 'iframeSubDoc':
+          return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeDuKuSubDoc':
+          return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeClient':
+          return CLIENTCONFIGT.path;
+        case 'iframeMiaomiaoxue':
+          return MMXCONFIGPath + '/content/gallery/';
+      }
+    }
+  },
+
+
+  /**
+   * 视频路径
+   * @return {[type]} [description]
+   */
+  video() {
+    if(isIOS) {
+      switch(iframeMode) {
+        case 'iframeDuKu':
+          return DUKUCONFIG.path;
+        case 'iframeSubDoc':
+          return getSourcePath()
+        case 'iframeDuKuSubDoc':
+          return getSourcePath();
+        case 'iframeClient':
+          return CLIENTCONFIGT.path;
+        case 'iframeMiaomiaoxue':
+          return MMXCONFIGPath + '/content/gallery/';
+      }
+    }
+
+    if(isAndroid) {
+      switch(iframeMode) {
+        case 'iframeDuKu':
+          return DUKUCONFIG.path;
+        case 'iframeSubDoc':
+          return 'android.resource://#packagename#/raw/';
+        case 'iframeDuKuSubDoc':
+          return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeClient':
+          return CLIENTCONFIGT.path;
+        case 'iframeMiaomiaoxue':
+          return MMXCONFIGPath + '/content/gallery/';
+      }
+    }
+  },
+
+
+  /**
+   * 音频路径
+   * @return {[type]} [description]
+   */
+  audio() {
+    if(isIOS) {
+      switch(iframeMode) {
+        case 'iframeDuKu':
+          return DUKUCONFIG.path;
+        case 'iframeSubDoc':
+          return getSourcePath();
+        case 'iframeDuKuSubDoc':
+          return getSourcePath();
+        case 'iframeClient':
+          return CLIENTCONFIGT.path;
+        case 'iframeMiaomiaoxue':
+          return MMXCONFIGPath + '/content/gallery/';
+      }
+    }
+    if(isAndroid) {
+      switch(iframeMode) {
+        case 'iframeDuKu':
+          return DUKUCONFIG.path;
+        case 'iframeSubDoc':
+          return '/android_asset/www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeDuKuSubDoc':
+          return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeClient':
+          return CLIENTCONFIGT.path;
+        case 'iframeMiaomiaoxue':
+          return MMXCONFIGPath + '/content/gallery/';
+      }
+    }
+  },
+
+
+  /**
+   * 调用插件处理
+   * @return {[type]} [description]
+   */
+  svg() {
+    if(isIOS) {
+      switch(iframeMode) {
+        case 'iframeDuKu':
+          return DUKUCONFIG.path;
+        case 'iframeSubDoc':
+          //www/content/subdoc/00c83e668a6b6bad7eda8eedbd2110ad/content/gallery/
+          return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeDuKuSubDoc':
+          return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeClient':
+          return CLIENTCONFIGT.path;
+        case 'iframeMiaomiaoxue':
+          return MMXCONFIGPath + '/content/gallery/';
+      }
+    }
+
+    if(isAndroid) {
+      switch(iframeMode) {
+        case 'iframeDuKu':
+          return DUKUCONFIG.path;
+        case 'iframeSubDoc':
+          return 'www/content/subdoc/' + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeDuKuSubDoc':
+          return DUKUCONFIG.path.replace('gallery', 'subdoc') + SUbCONFIGT.path + '/content/gallery/';
+        case 'iframeClient':
+          return CLIENTCONFIGT.path;
+        case 'iframeMiaomiaoxue':
+          return MMXCONFIGPath + '/content/gallery/';
+      }
+    }
+  },
+
+
+  /**
+   * js零件
+   * 2016.8.3 喵喵学
+   * @return {[type]} [description]
+   */
+  jsWidget() {
+    return MMXCONFIGPath + '/content/widget/'
+  }
 
 }

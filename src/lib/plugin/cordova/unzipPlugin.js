@@ -6,7 +6,7 @@
  */
 
 Xut.Plugin.UnzipPlugin = {
-	storageAction: function(json, successCallback, failureCallback) {
-		return cordova.exec(successCallback, failureCallback, 'UnzipPlugin', 'storageAction', [json]);
-	}
+  storageAction: function(json, successCallback, failureCallback) {
+    return cordova.exec(successCallback, failureCallback, 'UnzipPlugin', 'storageAction', [json]);
+  }
 }

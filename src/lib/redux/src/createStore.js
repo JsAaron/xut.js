@@ -37,20 +37,20 @@ export var ActionTypes = {
  * and subscribe to changes.
  */
 export default function createStore(reducer, preloadedState, enhancer) {
-  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
+  if(typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
     enhancer = preloadedState
     preloadedState = undefined
   }
 
-  if (typeof enhancer !== 'undefined') {
-    if (typeof enhancer !== 'function') {
+  if(typeof enhancer !== 'undefined') {
+    if(typeof enhancer !== 'function') {
       throw new Error('Expected the enhancer to be a function.')
     }
 
     return enhancer(createStore)(reducer, preloadedState)
   }
 
-  if (typeof reducer !== 'function') {
+  if(typeof reducer !== 'function') {
     throw new Error('Expected the reducer to be a function.')
   }
 
@@ -61,7 +61,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
   var isDispatching = false
 
   function ensureCanMutateNextListeners() {
-    if (nextListeners === currentListeners) {
+    if(nextListeners === currentListeners) {
       nextListeners = currentListeners.slice()
     }
   }
@@ -99,7 +99,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * @returns {Function} A function to remove this change listener.
    */
   function subscribe(listener) {
-    if (typeof listener !== 'function') {
+    if(typeof listener !== 'function') {
       throw new Error('Expected listener to be a function.')
     }
 
@@ -109,7 +109,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
     nextListeners.push(listener)
 
     return function unsubscribe() {
-      if (!isSubscribed) {
+      if(!isSubscribed) {
         return
       }
 
@@ -147,21 +147,21 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * return something else (for example, a Promise you can await).
    */
   function dispatch(action) {
-    if (!isPlainObject(action)) {
+    if(!isPlainObject(action)) {
       throw new Error(
         'Actions must be plain objects. ' +
         'Use custom middleware for async actions.'
       )
     }
 
-    if (typeof action.type === 'undefined') {
+    if(typeof action.type === 'undefined') {
       throw new Error(
         'Actions may not have an undefined "type" property. ' +
         'Have you misspelled a constant?'
       )
     }
 
-    if (isDispatching) {
+    if(isDispatching) {
       throw new Error('Reducers may not dispatch actions.')
     }
 
@@ -173,7 +173,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
     }
 
     var listeners = currentListeners = nextListeners
-    for (var i = 0; i < listeners.length; i++) {
+    for(var i = 0; i < listeners.length; i++) {
       listeners[i]()
     }
 
@@ -191,7 +191,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * @returns {void}
    */
   function replaceReducer(nextReducer) {
-    if (typeof nextReducer !== 'function') {
+    if(typeof nextReducer !== 'function') {
       throw new Error('Expected the nextReducer to be a function.')
     }
 
@@ -217,12 +217,12 @@ export default function createStore(reducer, preloadedState, enhancer) {
        * emission of values from the observable.
        */
       subscribe(observer) {
-        if (typeof observer !== 'object') {
+        if(typeof observer !== 'object') {
           throw new TypeError('Expected the observer to be an object.')
         }
 
         function observeState() {
-          if (observer.next) {
+          if(observer.next) {
             observer.next(getState())
           }
         }

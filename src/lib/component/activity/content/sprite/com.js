@@ -11,7 +11,7 @@ const animationPlayState = Xut.style.animationPlayState
  * @param {[type]} options [description]
  */
 export default function(options) {
-    //timer,css
-    var mode = options.mode || 'css';
-    return mode === 'css' && animationPlayState ? css3(options) : keyframe(options)
+  //timer,css
+  var mode = options.mode || 'css';
+  return mode === 'css' && animationPlayState ? css3(options) : keyframe(options)
 }

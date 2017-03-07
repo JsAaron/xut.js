@@ -10,26 +10,26 @@ import { config } from '../../../config/index'
  */
 export function setVisualMode(chapterData) {
 
-    //反向模式设置
-    //如果是全局模式1，并且是竖向横显示
-    if(config.visualMode === 1 && config.verticalToHorizontalVisual) {
-        return 1
-    }
+  //反向模式设置
+  //如果是全局模式1，并且是竖向横显示
+  if(config.visualMode === 1 && config.verticalToHorizontalVisual) {
+    return 1
+  }
 
-    //flow页面返回1
-    if(chapterData.note === 'flow') {
-        return 1
-    }
+  //flow页面返回1
+  if(chapterData.note === 'flow') {
+    return 1
+  }
 
-    //如果有独立的页面模式
-    let parameter = chapterData.parameter
-    if(parameter) {
-        let matchMode = parameter.match(/visualMode[":\s]*(\d)/)
-        if(matchMode) {
-            return Number(matchMode[1])
-        }
+  //如果有独立的页面模式
+  let parameter = chapterData.parameter
+  if(parameter) {
+    let matchMode = parameter.match(/visualMode[":\s]*(\d)/)
+    if(matchMode) {
+      return Number(matchMode[1])
     }
+  }
 
-    //返回全局页面模式
-    return config.visualMode || 1
+  //返回全局页面模式
+  return config.visualMode || 1
 }

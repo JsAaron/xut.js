@@ -3,7 +3,7 @@ import execute from './execute'
 let statement = {}
 
 'Setting,Parallax,Master,Activity,Content,Video,Image,Action,Animation,Widget,Novel,Season,Chapter'.replace(/[^, ]+/g, function(name) {
-    statement[name] = 'select * FROM ' + (name) + ' order by _id ASC';
+  statement[name] = 'select * FROM ' + (name) + ' order by _id ASC';
 })
 
 
@@ -12,9 +12,9 @@ let statement = {}
  * @return {[type]} [description]
  */
 export function oneQuery(tableName, callback) {
-    execute('select * FROM ' + tableName + ' order by _id ASC', function(successRet, collectError) {
-        callback(successRet, collectError);
-    })
+  execute('select * FROM ' + tableName + ' order by _id ASC', function(successRet, collectError) {
+    callback(successRet, collectError);
+  })
 }
 
 
@@ -22,15 +22,15 @@ export function oneQuery(tableName, callback) {
  * 查询总数据
  */
 export function dataQuery(callback) {
-    //ibook模式，数据库外部注入的
-    if (Xut.IBooks.CONFIG) {
-        callback(Xut.IBooks.CONFIG.data);
-    } else {
-        //查询所有数据
-        execute(statement, function(successRet, collectError) {
-            callback(successRet, collectError);
-        })
-    }
+  //ibook模式，数据库外部注入的
+  if(Xut.IBooks.CONFIG) {
+    callback(Xut.IBooks.CONFIG.data);
+  } else {
+    //查询所有数据
+    execute(statement, function(successRet, collectError) {
+      callback(successRet, collectError);
+    })
+  }
 
 }
 
@@ -40,13 +40,13 @@ export function dataQuery(callback) {
  * @type {[type]}
  */
 export function dataRemove(tableName, id, success, fail) {
-    var sql = 'delete from ' + tableName + ' where _id = ' + id;
-    //查询所有数据
-    execute(sql, function(success, failure) {
-        if (success) { //成功回调
-            success();
-        } else if (failure) { //失败回调
-            fail();
-        }
-    })
+  var sql = 'delete from ' + tableName + ' where _id = ' + id;
+  //查询所有数据
+  execute(sql, function(success, failure) {
+    if(success) { //成功回调
+      success();
+    } else if(failure) { //失败回调
+      fail();
+    }
+  })
 }

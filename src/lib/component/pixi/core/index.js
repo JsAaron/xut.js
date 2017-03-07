@@ -5,9 +5,9 @@
  *                                      *
  ******************************************/
 import {
-    addQueue,
-    removeQueue,
-    destroyQueue
+  addQueue,
+  removeQueue,
+  destroyQueue
 }
 from './queue'
 
@@ -26,14 +26,14 @@ const makeGuid = () => Xut.guid('rAF')
  * @return {[type]} [description]
  */
 export function addRenderer(pageIndex, callback, mark) {
-    let uuid = makeGuid()
-    if (mark) {
-        uuid = uuid + '-' + mark
-    }
-    addQueue(pageIndex, uuid, function play() {
-        callback && callback()
-    });
-    return uuid;
+  let uuid = makeGuid()
+  if(mark) {
+    uuid = uuid + '-' + mark
+  }
+  addQueue(pageIndex, uuid, function play() {
+    callback && callback()
+  });
+  return uuid;
 }
 
 /**
@@ -41,7 +41,7 @@ export function addRenderer(pageIndex, callback, mark) {
  * @return {[type]} [description]
  */
 export function stopRenderer(pageIndex, uuid) {
-    removeQueue(pageIndex, uuid);
+  removeQueue(pageIndex, uuid);
 }
 
 
@@ -50,5 +50,5 @@ export function stopRenderer(pageIndex, uuid) {
  * @return {[type]} [description]
  */
 export function destroyRenderer(pageIndex, uuid) {
-    destroyQueue(pageIndex, uuid);
+  destroyQueue(pageIndex, uuid);
 }

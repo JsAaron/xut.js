@@ -15,28 +15,28 @@ const PPTHEIGHT = 768
  * @return {[type]}           [description]
  */
 export function getFullProportion(config, pptWidth, pptHeight) {
-    //设备分辨率
-    let screenWidth = config.screenSize.width
-    let screenHeight = config.screenSize.height
+  //设备分辨率
+  let screenWidth = config.screenSize.width
+  let screenHeight = config.screenSize.height
 
-    let screenHorizontal = config.screenHorizontal
+  let screenHorizontal = config.screenHorizontal
 
-    //默认ppt尺寸
-    let designWidth = pptWidth ? pptWidth : screenHorizontal ? PPTWIDTH : PPTHEIGHT
-    let designHeight = pptHeight ? pptHeight : screenHorizontal ? PPTHEIGHT : PPTWIDTH
+  //默认ppt尺寸
+  let designWidth = pptWidth ? pptWidth : screenHorizontal ? PPTWIDTH : PPTHEIGHT
+  let designHeight = pptHeight ? pptHeight : screenHorizontal ? PPTHEIGHT : PPTWIDTH
 
-    //当前屏幕的尺寸与数据库设计的尺寸，比例
-    let widthProp = screenWidth / designWidth
-    let heightProp = screenHeight / designHeight
+  //当前屏幕的尺寸与数据库设计的尺寸，比例
+  let widthProp = screenWidth / designWidth
+  let heightProp = screenHeight / designHeight
 
-    return {
-        width: widthProp,
-        height: heightProp,
-        left: widthProp,
-        top: heightProp,
-        pptWidth: designWidth,
-        pptHeight: designHeight
-    }
+  return {
+    width: widthProp,
+    height: heightProp,
+    left: widthProp,
+    top: heightProp,
+    pptWidth: designWidth,
+    pptHeight: designHeight
+  }
 }
 
 
@@ -48,19 +48,19 @@ export function getFullProportion(config, pptWidth, pptHeight) {
  * @return {[type]}           [description]
  */
 export function getRealProportion(config, visualSize, fullProportion) {
-    let widthProp = visualSize.width / fullProportion.pptWidth
-    let heightProp = visualSize.height / fullProportion.pptHeight
+  let widthProp = visualSize.width / fullProportion.pptWidth
+  let heightProp = visualSize.height / fullProportion.pptHeight
 
-    //布局的偏移量，可能是采用了画轴模式，一个可视区可以容纳3个页面
-    let offsetTop = 0
-    let offsetLeft = 0
+  //布局的偏移量，可能是采用了画轴模式，一个可视区可以容纳3个页面
+  let offsetTop = 0
+  let offsetLeft = 0
 
-    return {
-        width: widthProp,
-        height: heightProp,
-        left: widthProp,
-        top: heightProp,
-        offsetTop: offsetTop,
-        offsetLeft: offsetLeft
-    }
+  return {
+    width: widthProp,
+    height: heightProp,
+    left: widthProp,
+    top: heightProp,
+    offsetTop: offsetTop,
+    offsetLeft: offsetLeft
+  }
 }

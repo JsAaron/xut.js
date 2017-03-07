@@ -4,10 +4,10 @@ import Widget from './widget'
 import ShowNote from './note'
 
 export default {
-    'Video': Media,
-    'Audio': Media,
-    'Webpage': Media,
-    Action,
-    Widget,
-    ShowNote
+  'Video': Media,
+  'Audio': Media,
+  'Webpage': Media,
+  Action,
+  Widget,
+  ShowNote
 }

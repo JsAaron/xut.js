@@ -5,11 +5,11 @@
  * @return {[type]}              [description]
  */
 export function parseContentDas(contentIds, callback) {
-    var data, temp = [];
-    contentIds.forEach(function (contentId, index) {
-        data = Xut.data.query('Content', contentId)
-        temp.unshift(data)
-        callback && callback(data, contentId);
-    })
-    return temp;
+  var data, temp = [];
+  contentIds.forEach(function(contentId, index) {
+    data = Xut.data.query('Content', contentId)
+    temp.unshift(data)
+    callback && callback(data, contentId);
+  })
+  return temp;
 }

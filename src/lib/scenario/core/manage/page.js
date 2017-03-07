@@ -3,21 +3,11 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import {
-  Abstract
-} from './abstract'
-import {
-  Pagebase
-} from '../../pagebase/index'
-import {
-  removeVideo
-} from '../../../component/video/manager'
-import {
-  execScript
-} from '../../../util/index'
-import {
-  addEdges
-} from '../../../util/edge'
+import { Abstract } from './abstract'
+import { Pagebase } from '../../pagebase/index'
+import { removeVideo } from '../../../component/video/manager'
+import { execScript } from '../../../util/index'
+import { addEdges } from '../../../util/edge'
 import {
   $$suspend,
   $$original,
@@ -31,7 +21,7 @@ import {
  */
 const runScript = (pageObject, type) => {
   const code = pageObject.chapterData[type]
-  if (code) {
+  if(code) {
     execScript(code, type)
   }
 }
@@ -58,12 +48,12 @@ export default class PageMgr extends Abstract {
   create(dataOpts, pageIndex) {
     //生成指定页面对象
     const pageObjs = new Pagebase(
-        _.extend(dataOpts, {
-          'pageType': this.pageType, //创建页面的类型
-          'rootNode': this.pagesNode //根元素
-        })
-      )
-      //增加页面管理
+      _.extend(dataOpts, {
+        'pageType': this.pageType, //创建页面的类型
+        'rootNode': this.pagesNode //根元素
+      })
+    )
+    //增加页面管理
     this.abstractAddCollection(pageIndex, pageObjs);
     return pageObjs;
   }
@@ -88,7 +78,7 @@ export default class PageMgr extends Abstract {
       this.abstractGetPageObj(currIndex),
       this.abstractGetPageObj(rightIndex)
     ], function(pageObj, index) {
-      if (pageObj) {
+      if(pageObj) {
         pageObj.moveContainer(action, moveDist[index], speed, moveDist[3], direction)
       }
     })
@@ -123,8 +113,8 @@ export default class PageMgr extends Abstract {
    */
   resetOriginal(pageIndex) {
     var originalPageObj, floatNode;
-    if (originalPageObj = this.abstractGetPageObj(pageIndex)) {
-      if (floatNode = originalPageObj.floatContents.PageContainer) {
+    if(originalPageObj = this.abstractGetPageObj(pageIndex)) {
+      if(floatNode = originalPageObj.floatContents.PageContainer) {
         //floatPages设置的content溢出后处理
         //在非视区增加overflow:hidden
         //可视区域overflow:''
@@ -160,7 +150,7 @@ export default class PageMgr extends Abstract {
      */
     const preCreate = function(preCreateTask) {
       var resumePointer;
-      if (data.isQuickTurn || !data.direction) {
+      if(data.isQuickTurn || !data.direction) {
         resumePointer = [data.prevIndex, data.nextIndex];
       } else {
         resumePointer = data.createPointer || data.nextIndex || data.prevIndex
@@ -180,7 +170,7 @@ export default class PageMgr extends Abstract {
 
       //如果页面容器存在,才处理自动运行
       var currpagesNode = currPageObj.getContainsNode()
-      if (!currpagesNode) {
+      if(!currpagesNode) {
         return complete()
       }
 
@@ -190,7 +180,7 @@ export default class PageMgr extends Abstract {
       }
 
       //运行如果被中断,则等待
-      if (data.suspendCallback) {
+      if(data.suspendCallback) {
         data.suspendCallback(startRun)
       } else {
         startRun();
@@ -206,7 +196,7 @@ export default class PageMgr extends Abstract {
       //提升当前页面浮动对象的层级
       //因为浮动对象可以是并联的
       var floatNode;
-      if (floatNode = currPageObj.floatContents.PageContainer) {
+      if(floatNode = currPageObj.floatContents.PageContainer) {
         floatNode.css({
           'zIndex': 2001,
           'overflow': ''
@@ -214,7 +204,7 @@ export default class PageMgr extends Abstract {
       }
 
       //IE上不支持蒙版效果的处理
-      if (Xut.style.noMaskBoxImage) {
+      if(Xut.style.noMaskBoxImage) {
         addEdges();
       }
 
@@ -244,8 +234,8 @@ export default class PageMgr extends Abstract {
    */
   clearPage(clearPageIndex) {
     const pageObj = this.abstractGetPageObj(clearPageIndex)
-      //销毁页面对象事件
-    if (pageObj) {
+    //销毁页面对象事件
+    if(pageObj) {
       //移除事件
       pageObj.baseDestroy();
       //移除列表
@@ -280,7 +270,7 @@ export default class PageMgr extends Abstract {
     var pageObj,
       self = this;
     [pointers.leftIndex, pointers.currIndex, pointers.rightIndex].forEach(function(pointer) {
-      if (pageObj = self.abstractGetPageObj(pointer)) {
+      if(pageObj = self.abstractGetPageObj(pointer)) {
         pageObj.setTaskSuspend();
       }
     })
@@ -294,7 +284,7 @@ export default class PageMgr extends Abstract {
     var currPageObj,
       self = this;
     // console.log('激活活动任务',currIndex)
-    if (currPageObj = self.abstractGetPageObj(currIndex)) {
+    if(currPageObj = self.abstractGetPageObj(currIndex)) {
       currPageObj.checkThreadTask(function() {
         // console.log('11111111111当前页面创建完毕',currIndex+1)
         callback(currPageObj)
@@ -308,12 +298,12 @@ export default class PageMgr extends Abstract {
    */
   _checkPreforkTasks(resumePointer, preCreateTask) {
     var resumeObj, resumeCount;
-    if (!resumePointer.length) {
+    if(!resumePointer.length) {
       resumePointer = [resumePointer];
     }
     resumeCount = resumePointer.length;
-    while (resumeCount--) {
-      if (resumeObj = this.abstractGetPageObj(resumePointer[resumeCount])) {
+    while(resumeCount--) {
+      if(resumeObj = this.abstractGetPageObj(resumePointer[resumeCount])) {
         resumeObj.createPreforkTasks(function() {
           // console.log('后台处理完毕')
         }, preCreateTask)

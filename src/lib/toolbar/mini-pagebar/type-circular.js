@@ -3,21 +3,21 @@
  * 圆形显示
  */
 export function miniPagebar() {
-    return {
+  return {
 
-        //数字显示类型
-        type: 'digital',
+    //数字显示类型
+    type: 'digital',
 
-        init: function() {
+    init: function() {
 
-        },
+    },
 
-        update: function() {
+    update: function() {
 
-        },
+    },
 
-        destory: function() {
+    destory: function() {
 
-        }
     }
+  }
 }

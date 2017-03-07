@@ -1,7 +1,7 @@
 import { config } from '../config/index'
 import {
-    $$warn,
-    loadFile
+  $$warn,
+  loadFile
 } from '../util/index'
 
 //替换url
@@ -43,38 +43,38 @@ let result
  * 3 svgsheet
  */
 function filterJsonData() {
-    result = window.SQLResult
+  result = window.SQLResult
 
-    if(!result) {
-        $$warn('json数据库加载出错')
-        return
+  if(!result) {
+    $$warn('json数据库加载出错')
+    return
+  }
+
+  //配置了远程地址
+  //需要把flow的给处理掉
+  let remoteUrl = config.launch && config.launch.resource
+  if(remoteUrl && result.FlowData) {
+
+    //启动检测
+    config.columnCheck = true
+
+    //有基础后缀，需要补上所有的图片地址
+    let baseSuffix = ''
+    if(config.baseImageSuffix) {
+      baseSuffix = `.${config.baseImageSuffix}`
     }
 
-    //配置了远程地址
-    //需要把flow的给处理掉
-    let remoteUrl = config.launch && config.launch.resource
-    if(remoteUrl && result.FlowData) {
+    //xlink:href
+    //<img src
+    //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
+    //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
+    //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
+    result.FlowData = result.FlowData.replace(urlRE, function(a, prefix, fileName) {
+      return `${prefix}="${remoteUrl}/gallery/${fileName}${baseSuffix}`
+    })
+  }
 
-        //启动检测
-        config.columnCheck = true
-
-        //有基础后缀，需要补上所有的图片地址
-        let baseSuffix = ''
-        if(config.baseImageSuffix) {
-            baseSuffix = `.${config.baseImageSuffix}`
-        }
-
-        //xlink:href
-        //<img src
-        //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
-        //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
-        //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-        result.FlowData = result.FlowData.replace(urlRE, function(a, prefix, fileName) {
-            return `${prefix}="${remoteUrl}/gallery/${fileName}${baseSuffix}`
-        })
-    }
-
-    window.SQLResult = null;
+  window.SQLResult = null;
 }
 
 
@@ -105,21 +105,21 @@ function filterJsonData() {
  */
 export function importJsonDatabase(callback) {
 
-    //如果外联指定路径json数据
-    let path = config.launch && config.launch.database;
-    if(path) {
-        //防止外部链接影响
-        window.SQLResult = null
-        loadFile(path, function() {
-            callback(filterJsonData())
-        })
-    }
-    //如果外联index.html路径json数据
-    else if(window.SQLResult) {
-        callback(filterJsonData())
-    } else {
-        callback()
-    }
+  //如果外联指定路径json数据
+  let path = config.launch && config.launch.database;
+  if(path) {
+    //防止外部链接影响
+    window.SQLResult = null
+    loadFile(path, function() {
+      callback(filterJsonData())
+    })
+  }
+  //如果外联index.html路径json数据
+  else if(window.SQLResult) {
+    callback(filterJsonData())
+  } else {
+    callback()
+  }
 }
 
 
@@ -129,7 +129,7 @@ export function importJsonDatabase(callback) {
  * @return {[type]} [description]
  */
 export function removeColumnData() {
-    result['FlowData'] = null
+  result['FlowData'] = null
 }
 
 /**
@@ -137,7 +137,7 @@ export function removeColumnData() {
  * @return {[type]} [description]
  */
 export function getResults() {
-    return result
+  return result
 }
 
 
@@ -146,5 +146,5 @@ export function getResults() {
  * @return {[type]} [description]
  */
 export function removeResults() {
-    result = null
+  result = null
 }

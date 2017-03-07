@@ -37,7 +37,7 @@ function setCanvasMove() {
  */
 function compatibilityEvent(e) {
   var point;
-  if (e.touches && e.touches[0]) {
+  if(e.touches && e.touches[0]) {
     point = e.touches[0];
   } else {
     point = e;
@@ -58,7 +58,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
 
   //是否触发
   let hasTap = false
-    //开始坐标
+  //开始坐标
   let startPageX
 
   hasTap = false;
@@ -77,14 +77,14 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
   }
 
   const move = function(e) {
-    if (!hasTap) {
+    if(!hasTap) {
       return
     }
     let point = compatibilityEvent(e)
     let deltaX = point.pageX - startPageX
 
     //如果有move事件，则取消tap事件
-    if (Math.abs(deltaX)) {
+    if(Math.abs(deltaX)) {
       hasTap = false;
       setCanvasMove(supportSwipe);
     }
@@ -94,14 +94,14 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
     hasTap && eventHandle();
   }
 
-  if (eventName === 'tap') {
+  if(eventName === 'tap') {
     $$on(eventContext, {
       start: start,
       move: move,
       end: end,
       cancel: end
     })
-  } else if (onlyClick) {
+  } else if(onlyClick) {
     hasTap = true;
     $$on(eventContext, {
       end: end
@@ -110,7 +110,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
 
   return {
     off: function() {
-      if (eventContext) {
+      if(eventContext) {
         $$off(eventContext)
         eventContext = null;
       }

@@ -8,12 +8,12 @@ var def = Object.defineProperty;
  * 重写属性
  */
 export function defProtected(obj, key, val, enumerable, writable) {
-    def(obj, key, {
-        value: val,
-        enumerable: enumerable,
-        writable: writable,
-        configurable: true
-    })
+  def(obj, key, {
+    value: val,
+    enumerable: enumerable,
+    writable: writable,
+    configurable: true
+  })
 }
 
 /**
@@ -21,10 +21,10 @@ export function defProtected(obj, key, val, enumerable, writable) {
  * @return {[type]} [description]
  */
 export function defAccess(obj, key, access) {
-    def(obj, key, {
-        get: access.get,
-        set: access.set
-    })
+  def(obj, key, {
+    get: access.get,
+    set: access.set
+  })
 }
 
 
@@ -34,7 +34,7 @@ export function defAccess(obj, key, access) {
  * @return {[type]}   [description]
  */
 export function toNumber(o) {
-    return Number(o) || null;
+  return Number(o) || null;
 };
 
 
@@ -42,7 +42,7 @@ export function toNumber(o) {
  * 创建一个纯存的hash对象
  */
 export function hash() {
-    return Object.create(null)
+  return Object.create(null)
 }
 
 /**
@@ -50,20 +50,20 @@ export function hash() {
  * 只有值不为undefined
  */
 export function hasValue(value) {
-    return value != undefined
+  return value != undefined
 }
 
 
 export function $$extend(object, config) {
-    for (var i in config) {
-        if (i) {
-            if (object[i]) {
-                $$warn('接口方法重复', 'Key->' + i, 'Value->' + object[i])
-            } else {
-                object[i] = config[i];
-            }
-        }
+  for(var i in config) {
+    if(i) {
+      if(object[i]) {
+        $$warn('接口方法重复', 'Key->' + i, 'Value->' + object[i])
+      } else {
+        object[i] = config[i];
+      }
     }
+  }
 }
 
 
@@ -72,15 +72,15 @@ export function $$extend(object, config) {
  * @return {[type]}           [description]
  */
 export function parseJSON(parameter) {
-    if (!parameter) return
-    let json
-    try {
-        json = JSON.parse(parameter)
-    } catch (error) {
-        $$warn(`parseJSON失败:${parameter}`)
-        return false
-    }
-    return json
+  if(!parameter) return
+  let json
+  try {
+    json = JSON.parse(parameter)
+  } catch(error) {
+    $$warn(`parseJSON失败:${parameter}`)
+    return false
+  }
+  return json
 }
 
 
@@ -88,7 +88,7 @@ export function parseJSON(parameter) {
  * 回车符处理
  */
 export function enterReplace(str) {
-    return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
+  return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
 }
 
 
@@ -99,12 +99,12 @@ export function enterReplace(str) {
  * execJson("(function(){" + enterReplace(data.postCode) + "})");
  */
 export function makeJsonPack(code) {
-    try {
-        let post = "(function(){" + enterReplace(code) + "})"
-        return (new Function("return " + post))();
-    } catch (error) {
-        $$warn('解析json出错' + code)
-    }
+  try {
+    let post = "(function(){" + enterReplace(code) + "})"
+    return(new Function("return " + post))();
+  } catch(error) {
+    $$warn('解析json出错' + code)
+  }
 }
 
 
@@ -114,18 +114,18 @@ export function makeJsonPack(code) {
  * @return {[type]}     [description]
  */
 export function arrayUnique(arr) { //去重
-    if (arr && arr.length) {
-        var length = arr.length;
-        while (--length) {
-            //如果在前面已经出现，则将该位置的元素删除
-            if (arr.lastIndexOf(arr[length], length - 1) > -1) {
-                arr.splice(length, 1);
-            }
-        }
-        return arr;
-    } else {
-        return arr
+  if(arr && arr.length) {
+    var length = arr.length;
+    while(--length) {
+      //如果在前面已经出现，则将该位置的元素删除
+      if(arr.lastIndexOf(arr[length], length - 1) > -1) {
+        arr.splice(length, 1);
+      }
     }
+    return arr;
+  } else {
+    return arr
+  }
 }
 
 
@@ -135,40 +135,40 @@ export function arrayUnique(arr) { //去重
  * @return {[type]}      [description]
  */
 function normalize(path) {
-    // 利用帮助函数获取文件路径的信息
-    var result = statPath(path),
-        // 盘符
-        device = result.device,
-        // 是否为windows的UNC路径
-        isUnc = result.isUnc,
-        // 是否为绝对路径
-        isAbsolute = result.isAbsolute,
-        // 文件路径结尾
-        tail = result.tail,
-        // 尾部是否为'\' 或者 '/' 结尾。
-        trailingSlash = /[\\\/]$/.test(tail);
+  // 利用帮助函数获取文件路径的信息
+  var result = statPath(path),
+    // 盘符
+    device = result.device,
+    // 是否为windows的UNC路径
+    isUnc = result.isUnc,
+    // 是否为绝对路径
+    isAbsolute = result.isAbsolute,
+    // 文件路径结尾
+    tail = result.tail,
+    // 尾部是否为'\' 或者 '/' 结尾。
+    trailingSlash = /[\\\/]$/.test(tail);
 
-    // Normalize the tail path
-    //标准化tail路径，处理掉'.' '..' 以 '\' 连接 
-    tail = normalizeArray(tail.split(/[\\\/]+/), !isAbsolute).join('\\');
-    // 处理tail为空的情况
-    if (!tail && !isAbsolute) {
-        tail = '.';
-    }
-    // 当原始路径中有slash时候，需要加上
-    if (tail && trailingSlash) {
-        tail += '\\';
-    }
+  // Normalize the tail path
+  //标准化tail路径，处理掉'.' '..' 以 '\' 连接 
+  tail = normalizeArray(tail.split(/[\\\/]+/), !isAbsolute).join('\\');
+  // 处理tail为空的情况
+  if(!tail && !isAbsolute) {
+    tail = '.';
+  }
+  // 当原始路径中有slash时候，需要加上
+  if(tail && trailingSlash) {
+    tail += '\\';
+  }
 
-    // Convert slashes to backslashes when `device` points to an UNC root.
-    // Also squash multiple slashes into a single one where appropriate.
-    // 处理windows UNC的情况。
-    if (isUnc) {
-        // 获取具体的路径，如果是UNC的情况
-        device = normalizeUNCRoot(device);
-    }
-    // 返回具体的路径
-    return device + (isAbsolute ? '\\' : '') + tail;
+  // Convert slashes to backslashes when `device` points to an UNC root.
+  // Also squash multiple slashes into a single one where appropriate.
+  // 处理windows UNC的情况。
+  if(isUnc) {
+    // 获取具体的路径，如果是UNC的情况
+    device = normalizeUNCRoot(device);
+  }
+  // 返回具体的路径
+  return device + (isAbsolute ? '\\' : '') + tail;
 }
 
 
@@ -178,20 +178,20 @@ function normalize(path) {
  * @return {[type]}      [description]
  */
 function statPath(path) {
-    var splitDeviceRe =
-        /^([a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?([\\\/])?([\s\S]*?)$/;
-    // 和上述的函数一样，解析路径中的信息。
-    var result = splitDeviceRe.exec(path),
-        device = result[1] || '',
-        // 判断是否 为UNC path
-        isUnc = !!device && device[1] !== ':';
-    // 返回具体的对象，盘符，是否为统一路径，绝对路径， 以及结尾
-    return {
-        device: device,
-        isUnc: isUnc,
-        isAbsolute: isUnc || !!result[2], // UNC paths are always absolute
-        tail: result[3]
-    };
+  var splitDeviceRe =
+    /^([a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?([\\\/])?([\s\S]*?)$/;
+  // 和上述的函数一样，解析路径中的信息。
+  var result = splitDeviceRe.exec(path),
+    device = result[1] || '',
+    // 判断是否 为UNC path
+    isUnc = !!device && device[1] !== ':';
+  // 返回具体的对象，盘符，是否为统一路径，绝对路径， 以及结尾
+  return {
+    device: device,
+    isUnc: isUnc,
+    isAbsolute: isUnc || !!result[2], // UNC paths are always absolute
+    tail: result[3]
+  };
 }
 
 
@@ -203,33 +203,33 @@ function statPath(path) {
                                    ['/test'， '/re'， '..']将会返回 ['/test']
  */
 function normalizeArray(parts, allowAboveRoot) {
-    // 返回值
-    var res = [];
-    // 遍历数组，处理数组中的相对路径字符 '.' 或者'..'
-    for (var i = 0; i < parts.length; i++) {
-        // 取得当前的数组的字符
-        var p = parts[i];
+  // 返回值
+  var res = [];
+  // 遍历数组，处理数组中的相对路径字符 '.' 或者'..'
+  for(var i = 0; i < parts.length; i++) {
+    // 取得当前的数组的字符
+    var p = parts[i];
 
-        // ignore empty parts
-        // 对空或者'.'不处理
-        if (!p || p === '.')
-            continue;
-        // 处理相对路径中的'..'
-        if (p === '..') {
-            if (res.length && res[res.length - 1] !== '..') {
-                // 直接弹出返回队列，当没有到达根目录时
-                res.pop();
-            } else if (allowAboveRoot) {
-                //allowAboveRoot 为真时，插入'..'
-                res.push('..');
-            }
-        } else {
-            // 非 '.' 和'..'直接插入返回队列。 
-            res.push(p);
-        }
+    // ignore empty parts
+    // 对空或者'.'不处理
+    if(!p || p === '.')
+      continue;
+    // 处理相对路径中的'..'
+    if(p === '..') {
+      if(res.length && res[res.length - 1] !== '..') {
+        // 直接弹出返回队列，当没有到达根目录时
+        res.pop();
+      } else if(allowAboveRoot) {
+        //allowAboveRoot 为真时，插入'..'
+        res.push('..');
+      }
+    } else {
+      // 非 '.' 和'..'直接插入返回队列。 
+      res.push(p);
     }
-    // 返回路径数组
-    return res;
+  }
+  // 返回路径数组
+  return res;
 }
 
 
@@ -240,7 +240,7 @@ function normalizeArray(parts, allowAboveRoot) {
  * @return {[type]}        [description]
  */
 function normalizeUNCRoot(device) {
-    return '\\\\' + device.replace(/^[\\\/]+/, '').replace(/[\\\/]+/g, '\\');
+  return '\\\\' + device.replace(/^[\\\/]+/, '').replace(/[\\\/]+/g, '\\');
 }
 
 
@@ -250,30 +250,30 @@ function normalizeUNCRoot(device) {
  * @return {[type]} [description]
  */
 export function joinPaths() {
-    var paths = [];
-    for (var i = 0; i < arguments.length; i++) {
-        var arg = arguments[i];
-        // 确保函数参数为字符串
-        try {
-            if (Object.prototype.toString.call(arg) != "[object String]") {
-                throw new Error('Arguments to path.join must be strings');
-            }
-            if (arg) {
-                // 放入参数数组
-                paths.push(arg);
-            }
-        } catch (e) {
-            $$warn(e);
-        }
-
+  var paths = [];
+  for(var i = 0; i < arguments.length; i++) {
+    var arg = arguments[i];
+    // 确保函数参数为字符串
+    try {
+      if(Object.prototype.toString.call(arg) != "[object String]") {
+        throw new Error('Arguments to path.join must be strings');
+      }
+      if(arg) {
+        // 放入参数数组
+        paths.push(arg);
+      }
+    } catch(e) {
+      $$warn(e);
     }
 
-    var joined = paths.join("/");
+  }
+
+  var joined = paths.join("/");
 
 
-    if (!/^[\\\/]{2}[^\\\/]/.test(paths[0])) {
-        joined = joined.replace(/^[\\\/]{2,}/, '\\');
-    }
-    // 利用标准化接口 获取具体的文件路径
-    return normalize(joined);
+  if(!/^[\\\/]{2}[^\\\/]/.test(paths[0])) {
+    joined = joined.replace(/^[\\\/]{2,}/, '\\');
+  }
+  // 利用标准化接口 获取具体的文件路径
+  return normalize(joined);
 }

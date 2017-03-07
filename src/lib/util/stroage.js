@@ -5,67 +5,67 @@ const storage = window.localStorage
 
 //如果数据库为写入appid ,则创建
 const createAppid = function() {
-    //添加UUID
-    var appId = 'aaron-' + new Date().getDate();
-    //写入数据库
-    Xut.config.db && Xut.config.db.transaction(function(tx) {
-        tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function() {}, function() {});
-    }, function() {
-        //  callback && callback();
-    }, function() {
-        //  callback && callback();
-    });
-    return appId;
+  //添加UUID
+  var appId = 'aaron-' + new Date().getDate();
+  //写入数据库
+  Xut.config.db && Xut.config.db.transaction(function(tx) {
+    tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function() {}, function() {});
+  }, function() {
+    //  callback && callback();
+  }, function() {
+    //  callback && callback();
+  });
+  return appId;
 }
 
 //过滤
 const filter = function(key) {
-    //添加头部标示
-    if (onlyId) {
-        return key + onlyId;
-    } else {
-        if (!Xut.config.appUUID) {
-            Xut.config.appUUID = createAppid();
-        }
-        //子文档标记
-        if (window.SUbCONFIGT && window.SUbCONFIGT.dbId) {
-            onlyId = "-" + Xut.config.appUUID + "-" + window.SUbCONFIGT.dbId;
-        } else {
-            onlyId = "-" + Xut.config.appUUID;
-        }
-    }
+  //添加头部标示
+  if(onlyId) {
     return key + onlyId;
+  } else {
+    if(!Xut.config.appUUID) {
+      Xut.config.appUUID = createAppid();
+    }
+    //子文档标记
+    if(window.SUbCONFIGT && window.SUbCONFIGT.dbId) {
+      onlyId = "-" + Xut.config.appUUID + "-" + window.SUbCONFIGT.dbId;
+    } else {
+      onlyId = "-" + Xut.config.appUUID;
+    }
+  }
+  return key + onlyId;
 };
 
 
 const set = function name(key, val) {
-    var setkey;
+  var setkey;
 
-    //ipad ios8.3setItem出问题
-    function setItem(key, val) {
-        try {
-            storage.setItem(key, val);
-        } catch (e) {
-            console.log('storage.setItem(setkey, key[i]);')
-        }
+  //ipad ios8.3setItem出问题
+  function setItem(key, val) {
+    try {
+      storage.setItem(key, val);
+    } catch(e) {
+      console.log('storage.setItem(setkey, key[i]);')
     }
+  }
 
-    if (_.isObject(key)) {
-        for (var i in key) {
-            if (key.hasOwnProperty(i)) {
-                setkey = filter(i);
-                setItem(setkey, key[i])
-            }
-        }
-    } else {
-        key = filter(key);
-        setItem(key, val);
+  if(_.isObject(key)) {
+    for(var i in key) {
+      if(key.hasOwnProperty(i)) {
+        setkey = filter(i);
+        setItem(setkey, key[i])
+      }
     }
+  } else {
+    key = filter(key);
+    setItem(key, val);
+  }
 }
 
 const get = function(key) {
-    key = filter(key);
-    return storage.getItem(key) || undefined
+  key = filter(key);
+  return storage.getItem(key) || undefined
 }
 
 
@@ -75,7 +75,7 @@ const get = function(key) {
  * @return {[type]}       [description]
  */
 export function _key(index) { //本地方法
-    return storage.key(index);
+  return storage.key(index);
 }
 
 
@@ -84,14 +84,14 @@ export function _key(index) { //本地方法
  * @param {[type]} key [description]
  * @param {[type]} val [description]
  */
-export {set as $$set }
+export { set as $$set }
 
 /**
  * 获取localstorage中的值
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export {get as $$get }
+export { get as $$get }
 
 /**
  * 删除localStorage中指定项
@@ -99,8 +99,8 @@ export {get as $$get }
  * @return {[type]}     [description]
  */
 export function $$remove(key) {
-    key = filter(key);
-    storage.removeItem(key);
+  key = filter(key);
+  storage.removeItem(key);
 }
 
 /**
@@ -109,7 +109,7 @@ export function $$remove(key) {
  * @return {[type]} [description]
  */
 export function $$resetUUID() {
-    onlyId = null
+  onlyId = null
 }
 
 /**
@@ -117,10 +117,10 @@ export function $$resetUUID() {
  * @return {[type]} [description]
  */
 export function $$fetch() {
-    return JSON.parse(get(name || TAG) || '[]');
+  return JSON.parse(get(name || TAG) || '[]');
 }
 
 
 export function $$save(name, val) {
-    set(name || TAG, JSON.stringify(val));
+  set(name || TAG, JSON.stringify(val));
 }

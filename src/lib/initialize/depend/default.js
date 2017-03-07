@@ -7,7 +7,7 @@ import {
 } from '../../component/audio/fix'
 
 //修复H5音频自动播放bug
-if (Xut.plat.isBrowser && !Xut.plat.hasAutoPlayAudio) {
+if(Xut.plat.isBrowser && !Xut.plat.hasAutoPlayAudio) {
   fixAudio()
 }
 
@@ -16,7 +16,7 @@ if (Xut.plat.isBrowser && !Xut.plat.hasAutoPlayAudio) {
 let hasDefault = false
 
 export function initDefalut() {
-  if (Xut.plat.isBrowser && !hasDefault) {
+  if(Xut.plat.isBrowser && !hasDefault) {
 
     hasDefault = true
 
@@ -27,7 +27,7 @@ export function initDefalut() {
 
     //桌面鼠标控制翻页
     $(document).keyup(event => {
-      switch (event.keyCode) {
+      switch(event.keyCode) {
         case 37:
           Xut.View.GotoPrevSlide()
           break;
@@ -41,7 +41,7 @@ export function initDefalut() {
 
 
 export function cleanDefalut() {
-  if (hasDefault) {
+  if(hasDefault) {
     $('body').off() //默认事件
     $(document).off() //左右按钮
     $(window).off() //横竖切换

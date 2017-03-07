@@ -5,14 +5,14 @@ import { config, resetVisualProportion } from '../../config/index'
  * @return {[type]} [description]
  */
 export function styleProportion(data) {
-    if(data.needRecalculate) {
-        return resetVisualProportion({
-            width: data.visualWidth,
-            height: data.visualHeight,
-            top: data.visualTop,
-            left: data.visualLeft
-        })
-    } else {
-        return config.proportion
-    }
+  if(data.needRecalculate) {
+    return resetVisualProportion({
+      width: data.visualWidth,
+      height: data.visualHeight,
+      top: data.visualTop,
+      left: data.visualLeft
+    })
+  } else {
+    return config.proportion
+  }
 }

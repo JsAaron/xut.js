@@ -25,20 +25,20 @@ import { parseJSON } from '../util/index'
  * @return {[type]}          [description]
  */
 const parseTooBar = (toolbar, toolType, pageMode) => {
-    if (toolbar = parseJSON(toolbar)) {
-        //兼容数据库中未指定的情况
-        var n = Number(toolbar.pageMode)
-        pageMode = _.isFinite(n) ? n : pageMode;
-        if (_.isString(toolbar.tbType)) {
-            toolType = _.map(toolbar.tbType.split(','), (num) => {
-                return Number(num);
-            })
-        }
+  if(toolbar = parseJSON(toolbar)) {
+    //兼容数据库中未指定的情况
+    var n = Number(toolbar.pageMode)
+    pageMode = _.isFinite(n) ? n : pageMode;
+    if(_.isString(toolbar.tbType)) {
+      toolType = _.map(toolbar.tbType.split(','), (num) => {
+        return Number(num);
+      })
     }
-    return {
-        'toolType': toolType,
-        'pageMode': pageMode
-    }
+  }
+  return {
+    'toolType': toolType,
+    'pageMode': pageMode
+  }
 }
 
 
@@ -49,19 +49,19 @@ const parseTooBar = (toolbar, toolType, pageMode) => {
  * @return {[type]}            [description]
  */
 export function pMainBar(scenarioId) {
-    let sectionRang = Xut.data.query('sectionRelated', scenarioId)
+  let sectionRang = Xut.data.query('sectionRelated', scenarioId)
 
-    //场景工具栏配置信息
-    let toolBar = sectionRang.toolbar
-    let pageTotal = sectionRang.length
+  //场景工具栏配置信息
+  let toolBar = sectionRang.toolbar
+  let pageTotal = sectionRang.length
 
-    //默认显示系统工具栏
-    let toolType = [1]
+  //默认显示系统工具栏
+  let toolType = [1]
 
-    //默认2 允许滑动,带翻页按钮
-    let pageMode = pageTotal > 1 ? 2 : 0
+  //默认2 允许滑动,带翻页按钮
+  let pageMode = pageTotal > 1 ? 2 : 0
 
-    return parseTooBar(toolBar, toolType, pageMode)
+  return parseTooBar(toolBar, toolType, pageMode)
 }
 
 
@@ -71,7 +71,7 @@ export function pMainBar(scenarioId) {
  * toolType   工具栏显示的类型 [0-5]
  */
 export function pDeputyBar(toolBar, pageTotal) {
-    let toolType = [0]
-    let pageMode = pageTotal > 1 ? 1 : 0
-    return parseTooBar(toolBar, toolType, pageMode)
+  let toolType = [0]
+  let pageMode = pageTotal > 1 ? 1 : 0
+  return parseTooBar(toolBar, toolType, pageMode)
 }

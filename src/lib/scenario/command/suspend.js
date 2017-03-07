@@ -21,35 +21,35 @@ import { removeVideo, hangUpVideo } from '../../component/video/manager'
  */
 export function $$suspend(pageObj, pageId, allHandle) {
 
-    //零件对象翻页就直接销毁了
-    //无需暂时
-    //这里只处理音频 + content类型
-    access(pageObj, (pageObj, contentObjs) => {
+  //零件对象翻页就直接销毁了
+  //无需暂时
+  //这里只处理音频 + content类型
+  access(pageObj, (pageObj, contentObjs) => {
 
-        //多媒体处理
-        if (pageId !== undefined) {
-            //离开页面销毁视频
-            removeVideo(pageId);
-            //翻页停止母板音频
-            if (pageObj.pageType === 'master') {
-                hangUpAudio()
-            }
-        }
+    //多媒体处理
+    if(pageId !== undefined) {
+      //离开页面销毁视频
+      removeVideo(pageId);
+      //翻页停止母板音频
+      if(pageObj.pageType === 'master') {
+        hangUpAudio()
+      }
+    }
 
-        //content类型
-        contentObjs && _.each(contentObjs, (obj) => {
-            obj.stop && obj.stop();
-        })
-
-
-        //如果是外部调用接口
-        //销毁视频
-        //销毁所有的音频
-        if (allHandle) {
-            hangUpVideo()
-            hangUpAudio()
-        }
-
+    //content类型
+    contentObjs && _.each(contentObjs, (obj) => {
+      obj.stop && obj.stop();
     })
+
+
+    //如果是外部调用接口
+    //销毁视频
+    //销毁所有的音频
+    if(allHandle) {
+      hangUpVideo()
+      hangUpAudio()
+    }
+
+  })
 
 }

@@ -28,9 +28,9 @@ import moveContainer from './move/container'
 import moveParallax from './move/parallax'
 
 export class Pagebase {
-    constructor(options) {
-        this.initState(options)
-    }
+  constructor(options) {
+    this.initState(options)
+  }
 }
 
 const baseProto = Pagebase.prototype

@@ -1,6 +1,6 @@
 import {
-    getPlugVideoState,
-    closePlugVideo
+  getPlugVideoState,
+  closePlugVideo
 } from './video'
 
 /**
@@ -9,38 +9,38 @@ import {
  * @return {[type]}       [description]
  */
 const controller = (state) => {
-    //如果是子文档处理
-    if (Xut.isRunSubDoc) {
-        //通过Action动作激活的,需要到Action类中处理
-        Xut.publish('subdoc:dropApp');
-        return;
-    }
+  //如果是子文档处理
+  if(Xut.isRunSubDoc) {
+    //通过Action动作激活的,需要到Action类中处理
+    Xut.publish('subdoc:dropApp');
+    return;
+  }
 
-    //home
-    if (state === 'pause') {
-        Xut.Application.Original()
-    }
+  //home
+  if(state === 'pause') {
+    Xut.Application.Original()
+  }
 
-    //恢复
-    if (state === 'resume') {
-        Xut.Application.Activate()
-    }
+  //恢复
+  if(state === 'resume') {
+    Xut.Application.Activate()
+  }
 
-    //退出
-    if (state === 'back') {
-        window.GLOBALCONTEXT.navigator.notification.confirm('您确认要退出吗？',
-            function(button) {
-                if (1 == button) {
-                    Xut.Application.Suspend({
-                        processed() {
-                            window.GLOBALCONTEXT.navigator.app.exitApp()
-                        }
-                    })
-                }
-            },
-            '退出', '确定,取消'
-        )
-    }
+  //退出
+  if(state === 'back') {
+    window.GLOBALCONTEXT.navigator.notification.confirm('您确认要退出吗？',
+      function(button) {
+        if(1 == button) {
+          Xut.Application.Suspend({
+            processed() {
+              window.GLOBALCONTEXT.navigator.app.exitApp()
+            }
+          })
+        }
+      },
+      '退出', '确定,取消'
+    )
+  }
 }
 
 /**
@@ -49,12 +49,12 @@ const controller = (state) => {
  * @return {[type]} [description]
  */
 function bindAndroidBack() {
-    //如果是预加载视频
-    if (getPlugVideoState()) {
-        closePlugVideo()
-    } else {
-        controller('back');
-    }
+  //如果是预加载视频
+  if(getPlugVideoState()) {
+    closePlugVideo()
+  } else {
+    controller('back');
+  }
 }
 
 /**
@@ -63,7 +63,7 @@ function bindAndroidBack() {
  * @return {[type]} [description]
  */
 function bindAndroidPause() {
-    controller('pause');
+  controller('pause');
 }
 
 
@@ -72,7 +72,7 @@ function bindAndroidPause() {
  * @return {[type]} [description]
  */
 function bindAndroidResume() {
-    controller('resume');
+  controller('resume');
 }
 
 /**
@@ -80,11 +80,11 @@ function bindAndroidResume() {
  * @return {[type]} [description]
  */
 export function bindAndroid() {
-    if (Xut.plat.hasPlugin) {
-        document.addEventListener("backbutton", bindAndroidBack, false);
-        document.addEventListener("pause", bindAndroidPause, false);
-        document.addEventListener("resume", bindAndroidResume, false);
-    }
+  if(Xut.plat.hasPlugin) {
+    document.addEventListener("backbutton", bindAndroidBack, false);
+    document.addEventListener("pause", bindAndroidPause, false);
+    document.addEventListener("resume", bindAndroidResume, false);
+  }
 }
 
 /**
@@ -92,9 +92,9 @@ export function bindAndroid() {
  * @return {[type]} [description]
  */
 export function offAndroid() {
-    if (Xut.plat.hasPlugin) {
-        document.removeEventListener("backbutton", bindAndroidBack, false);
-        document.removeEventListener("pause", bindAndroidPause, false);
-        document.removeEventListener("resume", bindAndroidResume, false);
-    }
+  if(Xut.plat.hasPlugin) {
+    document.removeEventListener("backbutton", bindAndroidBack, false);
+    document.removeEventListener("pause", bindAndroidPause, false);
+    document.removeEventListener("resume", bindAndroidResume, false);
+  }
 }

@@ -16,6 +16,7 @@
     "test": "node build/template/test.js",
     "release": "node build/template/release.code.js",
     "ncu": "node build/ncu.package.js",
+    "format": "node build/format.js",
     "check": "flow; test $? -eq 0 -o $? -eq 2",
     "flow:check": "flow check"
   },

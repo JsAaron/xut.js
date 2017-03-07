@@ -50,7 +50,7 @@ export default function(activitProto) {
     }
 
     //canvas事件
-    if (eventId && -1 !== this.canvasRelated.cid.indexOf(eventId)) {
+    if(eventId && -1 !== this.canvasRelated.cid.indexOf(eventId)) {
       parseCanavs()
     } else {
       //dom事件
@@ -71,15 +71,15 @@ export default function(activitProto) {
     let eventId = eventData.eventContentId
     let eventContext = eventData.eventContext
 
-    if (eventId) {
-      if (!eventContext) {
+    if(eventId) {
+      if(!eventContext) {
         //被重写过的事件
         let cid = eventData.rewrite ? eventId : this.id
         let contentName = this._findContentName(this.pid, cid, eventId)
         eventContext = this.getContextNode(contentName)
         eventData.eventContext = eventContext;
       }
-      if (eventContext) {
+      if(eventContext) {
         //绑定事件加入到content钩子
         this.relatedCallback.contentsHooks(this.pid, eventId, {
           $contentNode: eventContext,
@@ -117,7 +117,7 @@ export default function(activitProto) {
       //当前事件对象没有动画的时候才能触发关联动作
       let animOffset
       let boundary = 5 //边界值
-      if (eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
+      if(eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
         let originalLeft = animOffset.left;
         let originalTop = animOffset.top;
         let newOffset = eventContext.offset();
@@ -126,7 +126,7 @@ export default function(activitProto) {
         //在合理的动画范围是允许点击的
         //比如对象只是一个小范围的内的改变
         //正负10px的移动是允许接受的
-        if (originalLeft > (newLeft - boundary) &&
+        if(originalLeft > (newLeft - boundary) &&
           originalLeft < (newLeft + boundary) || originalTop > (newTop - boundary) &&
           originalTop < (newTop + boundary)) {
           self.runAnimation()
@@ -143,10 +143,10 @@ export default function(activitProto) {
      */
     const setBehavior = function(feedbackBehavior) {
       let behaviorSound
-        //音频地址
-      if (behaviorSound = feedbackBehavior.behaviorSound) {
+      //音频地址
+      if(behaviorSound = feedbackBehavior.behaviorSound) {
         //妙妙学客户端强制删除
-        if (window.MMXCONFIG && window.audioHandler) {
+        if(window.MMXCONFIG && window.audioHandler) {
           self._fixAudio.push(new audioPlayer({
             url: behaviorSound,
             trackId: 9999,
@@ -158,7 +158,7 @@ export default function(activitProto) {
           //其余平台,如果存在点击过的
           //这里主要是防止重复点击创建
           let audio = self._cacheBehaviorAudio[behaviorSound]
-          if (audio) {
+          if(audio) {
             audio.play()
           } else {
             //相同对象创建一次
@@ -172,9 +172,9 @@ export default function(activitProto) {
       }
 
       //反弹效果
-      if (feedbackBehavior.isButton) {
+      if(feedbackBehavior.isButton) {
         //div通过css实现反弹
-        if (eventData.domMode) {
+        if(eventData.domMode) {
           eventContext.addClass('xut-behavior');
           setTimeout(function() {
             eventContext.removeClass('xut-behavior');
@@ -203,7 +203,7 @@ export default function(activitProto) {
       },
       //拖拽结束的处理
       stopRun: function(isEnter) {
-        if (isEnter) { //为true表示拖拽进入目标对象区域
+        if(isEnter) { //为true表示拖拽进入目标对象区域
           self.runAnimation();
         }
       }
@@ -216,14 +216,14 @@ export default function(activitProto) {
      */
     const eventRun = function() {
       //脚本动画
-      if (eventData.rewrite) {
+      if(eventData.rewrite) {
         self.runAnimation()
         return
       }
       //如果存在反馈动作
       //优先于动画执行
       const feedbackBehavior = eventData.feedbackBehavior[eventData.eventContentId]
-      if (feedbackBehavior) {
+      if(feedbackBehavior) {
         setBehavior(feedbackBehavior)
       } else {
         startRunAnim();
@@ -240,10 +240,10 @@ export default function(activitProto) {
     }
 
     //绑定用户自定义事件
-    if (eventContext && eventName) {
+    if(eventContext && eventName) {
       //如果是翻页委托启动了
       //这里处理swiperight与swipeleft
-      if (config.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
+      if(config.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
         self.relatedCallback.swipeDelegateContents(eventName, (callback) => {
           self.runAnimation(callback)
         })
@@ -258,7 +258,7 @@ export default function(activitProto) {
         dragdropPara = eventData.dragdropPara;
 
         //获取拖拽目标对象
-        if (eventName === 'dragTag') {
+        if(eventName === 'dragTag') {
           domName = this.makePrefix('Content', this.pid, dragdropPara);
           target = this.getContextNode(domName);
         }

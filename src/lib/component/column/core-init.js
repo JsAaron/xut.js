@@ -63,7 +63,7 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
 
   //重复加载杂志
   //不刷新的情况处理
-  if (/section-transform/.test(data)) {
+  if(/section-transform/.test(data)) {
     data = $(data).find("#columns-content").html()
   }
 
@@ -85,22 +85,22 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
 
 
 const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnCount) => {
-  for (let i = 0; i < seasonNode.childNodes.length; i++) {
+  for(let i = 0; i < seasonNode.childNodes.length; i++) {
     let chapterNode = seasonNode.childNodes[i]
-    if (chapterNode.nodeType == 1) {
+    if(chapterNode.nodeType == 1) {
       let tag = chapterNode.id
-      if (tag) {
+      if(tag) {
         let id = /\d+/.exec(tag)[0]
-        if (id) {
+        if(id) {
           let margin = chapterNode.getAttribute('data-margin')
-          if (margin) {
+          if(margin) {
             margin = margin.split(",")
           } else {
             margin = [0, 0, 0, 0]
           }
           chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin)
           columnCount[seasonsId][id] = 0
-        }else{
+        } else {
           $$warn('node tag is null on insertColumn')
         }
       } else {
@@ -128,7 +128,7 @@ const eachColumn = function(columnCount, $seasons, visualWidth, visualHeight) {
 const resolveCount = ($content) => {
   let theChildren = $content.find('#columns-content').children()
   let paraHeight = 0
-  for (let i = 0; i < theChildren.length; i++) {
+  for(let i = 0; i < theChildren.length; i++) {
     paraHeight += Math.max(theChildren[i].scrollHeight, theChildren[i].clientHeight)
   }
   // $("#test123").append('<a>' + paraHeight + '</a>，')
@@ -146,7 +146,7 @@ export function resolveColumnCount($seasons, callback) {
     let $chapters = $seasons.children()
     $chapters.each(function(index, node) {
       let tag = node.id
-      if (tag) {
+      if(tag) {
         let chapterId = tag.match(/\d+/)[0]
         let count = resolveCount($(node))
         callback(seasonsId, chapterId, Number(count))
@@ -162,7 +162,7 @@ export function resolveColumnCount($seasons, callback) {
 export function initColumn(callback) {
 
   let $container = $("#xut-stream-flow")
-  if ($container.length) {
+  if($container.length) {
     $container.remove()
   }
 
@@ -176,7 +176,7 @@ export function initColumn(callback) {
 
   const init = function(visualWidth, visualHeight) {
     let $seasons = $container.children()
-    if (!$seasons.length) {
+    if(!$seasons.length) {
       callback()
       return
     }
@@ -190,7 +190,7 @@ export function initColumn(callback) {
 
       //第一次获取分栏数
       resolveColumnCount($seasons, (seasonsId, chapterId, count) => {
-        if (debug && config.columnCheck) {
+        if(debug && config.columnCheck) {
           count = simulateCount
         }
         columnCount[seasonsId][chapterId] = count
@@ -199,7 +199,7 @@ export function initColumn(callback) {
       setCache(columnCount)
 
       //检测分栏数变化
-      if (config.columnCheck) {
+      if(config.columnCheck) {
         startColumnDetect($seasons, $.extend(true, {}, columnCount), () => {
           $container.hide()
         })
@@ -213,7 +213,7 @@ export function initColumn(callback) {
 
   //如果存在json的flow数据
   const results = getResults()
-  if (results && results.FlowData) {
+  if(results && results.FlowData) {
     //容器尺寸设置
     let visuals = resetVisualLayout(1)
     let visualHeight = newViewHight = visuals.height

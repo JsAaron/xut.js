@@ -3,9 +3,9 @@
  * @return {[type]} [description]
  */
 const scenarioChapter = function(chapterId) {
-    var chapterSection = Xut.data.chapterSection;
-    var rang = chapterSection['seasonId->' + chapterId];
-    return rang;
+  var chapterSection = Xut.data.chapterSection;
+  var rang = chapterSection['seasonId->' + chapterId];
+  return rang;
 }
 
 
@@ -16,20 +16,20 @@ const scenarioChapter = function(chapterId) {
  * waitCreatePointer     需要分解的页面
  */
 const parseChapter = function(waitCreatePointer) {
-    var chapters = [],
-        chapter,
-        dataChpater = Xut.data.Chapter,
-        points = waitCreatePointer.length,
-        key;
+  var chapters = [],
+    chapter,
+    dataChpater = Xut.data.Chapter,
+    points = waitCreatePointer.length,
+    key;
 
-    while (points--) {
-        key = waitCreatePointer[points];
-        if (chapter = dataChpater.item(key)) {
-            chapters.unshift(chapter);
-        }
+  while(points--) {
+    key = waitCreatePointer[points];
+    if(chapter = dataChpater.item(key)) {
+      chapters.unshift(chapter);
     }
+  }
 
-    return chapters;
+  return chapters;
 };
 
 
@@ -40,11 +40,11 @@ const parseChapter = function(waitCreatePointer) {
  * @return {[type]}            [description]
  */
 const getMasterData = function(data, callback) {
-    var pptMaster = data['pptMaster'];
-    var masterData = Xut.data.query('Master', pptMaster)
-    makeActivitys(masterData, function(activitys, autoData) {
-        callback(masterData, activitys, autoData);
-    })
+  var pptMaster = data['pptMaster'];
+  var masterData = Xut.data.query('Master', pptMaster)
+  makeActivitys(masterData, function(activitys, autoData) {
+    callback(masterData, activitys, autoData);
+  })
 }
 
 
@@ -57,30 +57,30 @@ const getMasterData = function(data, callback) {
  */
 const makeAuto = function(activityData) {
 
-    if (!activityData || !activityData.length) return
+  if(!activityData || !activityData.length) return
 
-    let sub;
-    //自动热点
-    const collectAutoBuffers = []
+  let sub;
+  //自动热点
+  const collectAutoBuffers = []
 
-    activityData.forEach((target, b) => {
-        //如果是自动播放,并且满足自定义条件
-        //并且不是content类型
-        if (target.autoPlay && target.actType !== 'Content') {
-            //增加note提示信息数据
-            // id = target._id
-            // key = target.actType ? target.actType + "_" + id : 'showNote_' + id
-            sub = {
-                'id'       : target._id,
-                'actType'  : target.actType,
-                'category' : target.category,
-                'autoPlay' : target.autoPlay
-            }
-            collectAutoBuffers.push(sub);
-        }
-    })
+  activityData.forEach((target, b) => {
+    //如果是自动播放,并且满足自定义条件
+    //并且不是content类型
+    if(target.autoPlay && target.actType !== 'Content') {
+      //增加note提示信息数据
+      // id = target._id
+      // key = target.actType ? target.actType + "_" + id : 'showNote_' + id
+      sub = {
+        'id': target._id,
+        'actType': target.actType,
+        'category': target.category,
+        'autoPlay': target.autoPlay
+      }
+      collectAutoBuffers.push(sub);
+    }
+  })
 
-    return collectAutoBuffers.length && collectAutoBuffers
+  return collectAutoBuffers.length && collectAutoBuffers
 }
 
 
@@ -91,9 +91,9 @@ const makeAuto = function(activityData) {
  * @return {[type]} [description]
  */
 const mixShowNote = function(oneChapter, activityData) {
-    if (oneChapter.note) {
-        activityData.push(oneChapter);
-    }
+  if(oneChapter.note) {
+    activityData.push(oneChapter);
+  }
 }
 
 
@@ -106,23 +106,23 @@ const mixShowNote = function(oneChapter, activityData) {
  *  }
  **/
 const makeActivitys = function(chapterData, callback) {
-    if (!chapterData) callback()
+  if(!chapterData) callback()
 
-    const activitys = []
-    const chapterId = chapterData._id
+  const activitys = []
+  const chapterId = chapterData._id
 
-    Xut.data.query('Activity', chapterId, 'chapterId', function(item) {
-        activitys.push(item)
-    })
+  Xut.data.query('Activity', chapterId, 'chapterId', function(item) {
+    activitys.push(item)
+  })
 
-    //混入文本提示框
-    mixShowNote(chapterData, activitys)
+  //混入文本提示框
+  mixShowNote(chapterData, activitys)
 
-    //自动运行的数据
-    //解析出每一页自动运行的 Widget,Action,Video数据
-    const autoData = makeAuto(activitys);
+  //自动运行的数据
+  //解析出每一页自动运行的 Widget,Action,Video数据
+  const autoData = makeAuto(activitys);
 
-    callback(activitys, autoData);
+  callback(activitys, autoData);
 }
 
 
@@ -134,9 +134,9 @@ const makeActivitys = function(chapterData, callback) {
  * @return {[type]}            [description]
  */
 const getActivitys = function(chapterData, callback) {
-    makeActivitys(chapterData, function(activitys, autoData) {
-        callback(chapterData, activitys, autoData);
-    })
+  makeActivitys(chapterData, function(activitys, autoData) {
+    callback(chapterData, activitys, autoData);
+  })
 }
 
 
@@ -149,17 +149,17 @@ const getActivitys = function(chapterData, callback) {
  * @return {[type]}            [description]
  */
 const getPageData = function(data, callback) {
-    let parsePointer = data.pageIndex
-    let chapterData = data.pageData
-    if (chapterData) {
-        getActivitys(chapterData, callback);
-    } else {
-        //解析章节数据
-        parseChapter(parsePointer, function(chapter) {
-            //生成chapter数据
-            getActivitys(chapter.length ? chapter[0] : chapter, callback)
-        })
-    }
+  let parsePointer = data.pageIndex
+  let chapterData = data.pageData
+  if(chapterData) {
+    getActivitys(chapterData, callback);
+  } else {
+    //解析章节数据
+    parseChapter(parsePointer, function(chapter) {
+      //生成chapter数据
+      getActivitys(chapter.length ? chapter[0] : chapter, callback)
+    })
+  }
 };
 
 /**
@@ -170,17 +170,17 @@ const getPageData = function(data, callback) {
  * @return {[type]}             [description]
  */
 export function query(tableName, options, callback) {
-    switch (tableName) {
-        case 'page':
-            //得到页面关联的数据
-            return getPageData(options, callback);
-        case 'master':
-            //得到母版关联的数据
-            return getMasterData(options, callback);
-        case 'chapter':
-            //得到chapter表数据
-            return parseChapter(options)
-        case 'scenarioChapter':
-            return scenarioChapter(options);
-    }
+  switch(tableName) {
+    case 'page':
+      //得到页面关联的数据
+      return getPageData(options, callback);
+    case 'master':
+      //得到母版关联的数据
+      return getMasterData(options, callback);
+    case 'chapter':
+      //得到chapter表数据
+      return parseChapter(options)
+    case 'scenarioChapter':
+      return scenarioChapter(options);
+  }
 }

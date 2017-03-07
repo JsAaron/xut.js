@@ -3,22 +3,23 @@
  * https://github.com/zohararad/audio5js
  * License MIT (c) Zohar Arad 2013
  */
-;(function ($win, ns, factory) {
+;
+(function($win, ns, factory) {
   "use strict";
   /*global define */
   /*global swfobject */
 
-  if (typeof (module) !== 'undefined' && module.exports) { // CommonJS
+  if(typeof(module) !== 'undefined' && module.exports) { // CommonJS
     module.exports = factory(ns, $win);
-  } else if (typeof (define) === 'function' && define.amd) { // AMD
-    define(function () {
+  } else if(typeof(define) === 'function' && define.amd) { // AMD
+    define(function() {
       return factory(ns, $win);
     });
   } else { // <script>
     $win[ns] = factory(ns, $win);
   }
 
-}(window, 'Audio5js', function (ns, $win) {
+}(window, 'Audio5js', function(ns, $win) {
 
   "use strict";
 
@@ -41,9 +42,10 @@
    * @return {Object} cloned object
    */
   function cloneObject(obj) {
-    var clone = {}, i;
-    for (i in obj) {
-      if (typeof (obj[i]) === "object") {
+    var clone = {},
+      i;
+    for(i in obj) {
+      if(typeof(obj[i]) === "object") {
         clone[i] = cloneObject(obj[i]);
       } else {
         clone[i] = obj[i];
@@ -58,10 +60,10 @@
    * @param {Object} mixin object to mix into target
    * @return {*} extended object
    */
-  var extend = function (target, mixin) {
+  var extend = function(target, mixin) {
     var name, m = cloneObject(mixin);
-    for (name in m) {
-      if (m.hasOwnProperty(name)) {
+    for(name in m) {
+      if(m.hasOwnProperty(name)) {
         target[name] = m[name];
       }
     }
@@ -74,7 +76,7 @@
    * @param {Object} mixin object to mix into target
    * @return {*} extended object
    */
-  var include = function (target, mixin) {
+  var include = function(target, mixin) {
     return extend(target.prototype, mixin);
   };
 
@@ -85,7 +87,7 @@
      * @param {Function} fn the callback to execute on message publishing
      * @param {Object} ctx the context in which the callback should be executed
      */
-    on: function (evt, fn, ctx) {
+    on: function(evt, fn, ctx) {
       this.subscribe(evt, fn, ctx, false);
     },
     /**
@@ -102,12 +104,12 @@
      * @param {String} evt name of channel / event to unsubscribe
      * @param {Function} fn the callback used when subscribing to the event
      */
-    off: function (evt, fn) {
-      if (this.channels[evt] === undefined) { return; }
+    off: function(evt, fn) {
+      if(this.channels[evt] === undefined) { return; }
       var i, l;
-      for (i = 0, l = this.channels[evt].length; i  < l; i++) {
+      for(i = 0, l = this.channels[evt].length; i < l; i++) {
         var sub = this.channels[evt][i].fn;
-        if (sub === fn) {
+        if(sub === fn) {
           this.channels[evt].splice(i, 1);
           break;
         }
@@ -120,27 +122,27 @@
      * @param {Object} ctx the context in which the callback should be executed
      * @param {Boolean} once indicate if event should be triggered once or not
      */
-    subscribe: function (evt, fn, ctx, once) {
-      if (this.channels === undefined) {
+    subscribe: function(evt, fn, ctx, once) {
+      if(this.channels === undefined) {
         this.channels = {};
       }
       this.channels[evt] = this.channels[evt] || [];
-      this.channels[evt].push({fn: fn, ctx: ctx, once: (once || false)});
+      this.channels[evt].push({ fn: fn, ctx: ctx, once: (once || false) });
     },
     /**
      * Publish a message on a channel. Accepts **args** after event name
      * @param {String} evt name of channel / event to trigger
      */
-    trigger: function (evt) {
-      if (this.channels && this.channels.hasOwnProperty(evt)) {
+    trigger: function(evt) {
+      if(this.channels && this.channels.hasOwnProperty(evt)) {
         var args = Array.prototype.slice.call(arguments, 1);
         var a = [];
         while(this.channels[evt].length > 0) {
           var sub = this.channels[evt].shift();
-          if (typeof (sub.fn) === 'function') {
+          if(typeof(sub.fn) === 'function') {
             sub.fn.apply(sub.ctx, args);
           }
-          if ( !sub.once ){
+          if(!sub.once) {
             a.push(sub);
           }
         }
@@ -153,13 +155,13 @@
     /**
      * Flash embed code string with cross-browser support.
      */
-  flash_embed_code: function (id, swf_location, ts) {
+    flash_embed_code: function(id, swf_location, ts) {
       var prefix;
       var s = '<param name="movie" value="' + swf_location + '?playerInstance=window.' + ns + '_flash.instances[\'' + id + '\']&datetime=' + ts + '"/>' +
         '<param name="wmode" value="transparent"/>' +
         '<param name="allowscriptaccess" value="always" />' +
         '</object>';
-      if (ActiveXObject) {
+      if(ActiveXObject) {
         prefix = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="1" height="1" id="' + id + '">';
       } else {
         prefix = '<object type="application/x-shockwave-flash" data="' + swf_location + '?playerInstance=window.' + ns + '_flash.instances[\'' + id + '\']&datetime=' + ts + '" width="1" height="1" id="' + id + '" >';
@@ -171,10 +173,10 @@
      * @param {String} mime_type audio mime type to check
      * @return {Boolean} whether browser supports passed audio mime type
      */
-    can_play: function (mime_type) {
+    can_play: function(mime_type) {
       var a = document.createElement('audio');
       var mime_str;
-      switch (mime_type) {
+      switch(mime_type) {
         case 'mp3':
           mime_str = 'audio/mpeg;';
           break;
@@ -194,13 +196,13 @@
           mime_str = 'audio/wav; codecs="1"';
           break;
       }
-      if (mime_str !== undefined) {
-        if (mime_type === 'mp3' && navigator.userAgent.match(/Android/i) && navigator.userAgent.match(/Firefox/i)) {
+      if(mime_str !== undefined) {
+        if(mime_type === 'mp3' && navigator.userAgent.match(/Android/i) && navigator.userAgent.match(/Firefox/i)) {
           return true;
         }
         try {
           return !!a.canPlayType && a.canPlayType(mime_str) !== '';
-        } catch (e) {
+        } catch(e) {
           return false;
         }
       }
@@ -209,18 +211,18 @@
     /**
      * Boolean flag indicating whether the browser has Flash installed or not
      */
-    has_flash: (function () {
+    has_flash: (function() {
       var r = false;
-      if (navigator.plugins && navigator.plugins.length && navigator.plugins['Shockwave Flash']) {
+      if(navigator.plugins && navigator.plugins.length && navigator.plugins['Shockwave Flash']) {
         r = true;
-      } else if (navigator.mimeTypes && navigator.mimeTypes.length) {
+      } else if(navigator.mimeTypes && navigator.mimeTypes.length) {
         var mimeType = navigator.mimeTypes['application/x-shockwave-flash'];
         r = mimeType && mimeType.enabledPlugin;
       } else {
         try {
           var ax = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
-          r = typeof (ax) === 'object';
-        } catch (e) {}
+          r = typeof(ax) === 'object';
+        } catch(e) {}
       }
       return r;
     }()),
@@ -229,23 +231,23 @@
      * @param {String} swf_location location of MP3 player SWF
      * @param {String} id swf unique ID used for resolving callbacks from ExternalInterface to Javascript
      */
-    embedFlash: function (swf_location, id) {
+    embedFlash: function(swf_location, id) {
       var d = document.createElement('div');
       d.style.position = 'absolute';
       d.style.width = '1px';
       d.style.height = '1px';
       d.style.top = '1px';
       document.body.appendChild(d);
-      if(typeof($win.swfobject) === 'object'){
+      if(typeof($win.swfobject) === 'object') {
         var fv = {
-          playerInstance: 'window.'+ ns + '_flash.instances[\''+id+'\']'
+          playerInstance: 'window.' + ns + '_flash.instances[\'' + id + '\']'
         };
         var params = {
           allowscriptaccess: 'always',
           wmode: 'transparent'
         };
-        d.innerHTML = '<div id="'+id+'"></div>';
-        swfobject.embedSWF(swf_location + '?ts='+(new Date().getTime() + Math.random()), id, "1", "1", "9.0.0", null, fv, params);
+        d.innerHTML = '<div id="' + id + '"></div>';
+        swfobject.embedSWF(swf_location + '?ts=' + (new Date().getTime() + Math.random()), id, "1", "1", "9.0.0", null, fv, params);
       } else {
         var ts = new Date().getTime() + Math.random(); // Ensure swf is not pulled from cache
         d.innerHTML = this.flash_embed_code(id, swf_location, ts);
@@ -257,12 +259,12 @@
      * @param {Number} seconds seconds to format as string
      * @return {String} formatted time string
      */
-    formatTime: function (seconds) {
+    formatTime: function(seconds) {
       var hours = parseInt(seconds / 3600, 10) % 24;
       var minutes = parseInt(seconds / 60, 10) % 60;
       var secs = parseInt(seconds % 60, 10);
-      var result, fragment = (minutes < 10 ? "0" + minutes : minutes) + ":" + (secs  < 10 ? "0" + secs : secs);
-      if (hours > 0) {
+      var result, fragment = (minutes < 10 ? "0" + minutes : minutes) + ":" + (secs < 10 ? "0" + secs : secs);
+      if(hours > 0) {
         result = (hours < 10 ? "0" + hours : hours) + ":" + fragment;
       } else {
         result = fragment;
@@ -280,12 +282,18 @@
    * @type {Object}
    */
   var AudioAttributes = {
-    playing: false, /** {Boolean} player playback state  */
-    vol: 1, /** {Float} audio volume */
-    duration: 0, /** {Float} audio duration (sec) */
-    position: 0, /** {Float} audio position (sec) */
-    load_percent: 0, /** {Float} audio file load percent (%) */
-    seekable: false, /** {Boolean} is loaded audio seekable */
+    playing: false,
+    /** {Boolean} player playback state  */
+    vol: 1,
+    /** {Float} audio volume */
+    duration: 0,
+    /** {Float} audio duration (sec) */
+    position: 0,
+    /** {Float} audio position (sec) */
+    load_percent: 0,
+    /** {Float} audio file load percent (%) */
+    seekable: false,
+    /** {Boolean} is loaded audio seekable */
     ready: null /** {Boolean} is loaded audio seekable */
   };
 
@@ -295,7 +303,8 @@
    * @type {Object}
    */
   var globalAudio5Flash = $win[ns + '_flash'] = $win[ns + '_flash'] || {
-    instances: { }, /** FlashAudioPlayer instance hash */
+    instances: {},
+    /** FlashAudioPlayer instance hash */
     count: 0 /** FlashAudioPlayer instance count */
   };
 
@@ -303,8 +312,8 @@
    * Flash MP3 Audio Player Class
    * @constructor
    */
-  FlashAudioPlayer = function () {
-    if (util.use_flash && !util.has_flash) {
+  FlashAudioPlayer = function() {
+    if(util.use_flash && !util.has_flash) {
       throw new Error('Flash Plugin Missing');
     }
   };
@@ -314,7 +323,7 @@
      * Initialize the player
      * @param {String} swf_src path to audio player SWF file
      */
-    init: function (swf_src) {
+    init: function(swf_src) {
       globalAudio5Flash.count += 1;
       this.id = ns + globalAudio5Flash.count;
       globalAudio5Flash.instances[this.id] = this;
@@ -324,32 +333,32 @@
      * Embed audio player SWF in page and assign reference to audio instance variable
      * @param {String} swf_src path to audio player SWF file
      */
-    embed: function (swf_src) {
+    embed: function(swf_src) {
       util.embedFlash(swf_src, this.id);
     },
     /**
      * ExternalInterface callback indicating SWF is ready
      */
-    eiReady: function () {
+    eiReady: function() {
       this.audio = document.getElementById(this.id);
       this.trigger('ready');
     },
     /**
      * ExternalInterface audio load started callback. Fires when audio starts loading.
      */
-    eiLoadStart: function(){
+    eiLoadStart: function() {
       this.trigger('loadstart');
     },
     /**
      * ExternalInterface audio metadata loaded callback. Fires when audio ID3 tags have been loaded.
      */
-    eiLoadedMetadata: function(){
+    eiLoadedMetadata: function() {
       this.trigger('loadedmetadata');
     },
     /**
      * ExternalInterface audio can play callback. Fires when audio can be played.
      */
-    eiCanPlay: function () {
+    eiCanPlay: function() {
       this.trigger('canplay');
     },
     /**
@@ -358,7 +367,7 @@
      * @param {Float} duration audio total duration (sec)
      * @param {Boolean} seekable is audio seekable or not (download or streaming)
      */
-    eiTimeUpdate: function (position, duration, seekable) {
+    eiTimeUpdate: function(position, duration, seekable) {
       this.position = position;
       this.duration = duration;
       this.seekable = seekable;
@@ -370,7 +379,7 @@
      * @param {Float} duration audio total duration (sec)
      * * @param {Boolean} seekable is audio seekable or not (download or streaming)
      */
-    eiProgress: function (percent, duration, seekable) {
+    eiProgress: function(percent, duration, seekable) {
       this.load_percent = percent;
       this.duration = duration;
       this.seekable = seekable;
@@ -380,13 +389,13 @@
      * ExternalInterface audio load error callback.
      * @param {String} msg error message
      */
-    eiLoadError: function (msg) {
+    eiLoadError: function(msg) {
       this.trigger('error', msg);
     },
     /**
      * ExternalInterface audio play callback. Fires when audio starts playing.
      */
-    eiPlay: function () {
+    eiPlay: function() {
       this.playing = true;
       this.trigger('play');
       this.trigger('playing');
@@ -394,33 +403,33 @@
     /**
      * ExternalInterface audio pause callback. Fires when audio is paused.
      */
-    eiPause: function () {
+    eiPause: function() {
       this.playing = false;
       this.trigger('pause');
     },
     /**
      * ExternalInterface audio ended callback. Fires when audio playback ended.
      */
-    eiEnded: function () {
+    eiEnded: function() {
       this.pause();
       this.trigger('ended');
     },
     /**
      * ExternalInterface audio seeking callback. Fires when audio is being seeked.
      */
-    eiSeeking: function(){
+    eiSeeking: function() {
       this.trigger('seeking');
     },
     /**
      * ExternalInterface audio seeked callback. Fires when audio has been seeked.
      */
-    eiSeeked: function(){
+    eiSeeked: function() {
       this.trigger('seeked');
     },
     /**
      * Resets audio position and parameters. Invoked once audio is loaded.
      */
-    reset: function () {
+    reset: function() {
       this.seekable = false;
       this.duration = 0;
       this.position = 0;
@@ -430,20 +439,20 @@
      * Load audio from url.
      * @param {String} url URL of audio to load
      */
-    load: function (url) {
+    load: function(url) {
       this.reset();
       this.audio.load(url);
     },
     /**
      * Play audio
      */
-    play: function () {
+    play: function() {
       this.audio.pplay();
     },
     /**
      * Pause audio
      */
-    pause: function () {
+    pause: function() {
       this.audio.ppause();
     },
     /**
@@ -451,8 +460,8 @@
      * @param {Float} v audio volume to set between 0 - 1.
      * @return {Float} current audio volume
      */
-    volume: function (v) {
-      if (v !== undefined && !isNaN(parseInt(v, 10))) {
+    volume: function(v) {
+      if(v !== undefined && !isNaN(parseInt(v, 10))) {
         this.audio.setVolume(v);
         this.vol = v;
       } else {
@@ -463,17 +472,17 @@
      * Seek audio to position
      * @param {Float} position audio position in seconds to seek to.
      */
-    seek: function (position) {
+    seek: function(position) {
       try {
         this.audio.seekTo(position);
         this.position = position;
-      } catch (e) {}
+      } catch(e) {}
     },
     /**
      * Destroy audio object and remove from DOM
      */
     destroyAudio: function() {
-      if(this.audio){
+      if(this.audio) {
         this.pause();
         this.audio.parentNode.removeChild(this.audio);
         delete globalAudio5Flash.instances[this.id];
@@ -489,19 +498,19 @@
    * HTML5 Audio Player
    * @constructor
    */
-  HTML5AudioPlayer = function () {};
+  HTML5AudioPlayer = function() {};
 
   HTML5AudioPlayer.prototype = {
     /**
      * Initialize the player instance
      */
-    init: function () {
+    init: function() {
       this.trigger('ready');
     },
     /**
      * Create new audio instance
      */
-    createAudio: function(){
+    createAudio: function() {
       this.audio = new Audio();
       this.audio.autoplay = false;
       this.audio.preload = 'auto';
@@ -511,8 +520,8 @@
     /**
      * Destroy current audio instance
      */
-    destroyAudio: function(){
-      if(this.audio){
+    destroyAudio: function() {
+      if(this.audio) {
         this.pause();
         this.unbindEvents();
         try {
@@ -526,7 +535,7 @@
      * Sets up audio event listeners once so adding / removing event listeners is always done
      * on the same callbacks.
      */
-    setupEventListeners: function(){
+    setupEventListeners: function() {
       this.listeners = {
         loadstart: this.onLoadStart.bind(this),
         canplay: this.onLoad.bind(this),
@@ -545,7 +554,7 @@
      * Bind DOM events to Audio object
      */
     bindEvents: function() {
-      if(this.listeners === undefined){
+      if(this.listeners === undefined) {
         this.setupEventListeners();
       }
       this.audio.addEventListener('loadstart', this.listeners.loadstart, false);
@@ -579,19 +588,19 @@
     /**
      * Audio load start event handler. Triggered when audio starts loading
      */
-    onLoadStart: function(){
+    onLoadStart: function() {
       this.trigger('loadstart');
     },
     /**
      * Audio canplay event handler. Triggered when audio is loaded and can be played.
      * Resets player parameters and starts audio download progress timer.
      */
-    onLoad: function () {
-      if(!this.audio){
+    onLoad: function() {
+      if(!this.audio) {
         return setTimeout(this.onLoad.bind(this), 100);
       }
       this.seekable = this.audio.seekable && this.audio.seekable.length > 0;
-      if (this.seekable) {
+      if(this.seekable) {
         this.timer = setInterval(this.onProgress.bind(this), 250);
       }
       this.trigger('canplay');
@@ -599,46 +608,46 @@
     /**
      * Audio ID3 load event handler. Triggered when ID3 metadata is loaded.
      */
-    onLoadedMetadata: function(){
+    onLoadedMetadata: function() {
       this.trigger('loadedmetadata');
     },
     /**
      * Audio play event handler. Triggered when audio starts playing.
      */
-    onPlay: function () {
+    onPlay: function() {
       this.playing = true;
       this.trigger('play');
     },
     /**
      * Audio play event handler. Triggered when audio starts playing.
      */
-    onPlaying: function () {
+    onPlaying: function() {
       this.playing = true;
       this.trigger('playing');
     },
     /**
      * Audio pause event handler. Triggered when audio is paused.
      */
-    onPause: function () {
+    onPause: function() {
       this.playing = false;
       this.trigger('pause');
     },
     /**
      * Audio ended event handler. Triggered when audio playback has ended.
      */
-    onEnded: function () {
+    onEnded: function() {
       this.playing = false;
       this.trigger('ended');
     },
     /**
      * Audio timeupdate event handler. Triggered as long as playhead position is updated (audio is being played).
      */
-    onTimeUpdate: function () {
-      if (this.audio && this.playing) {
-        try{
+    onTimeUpdate: function() {
+      if(this.audio && this.playing) {
+        try {
           this.position = this.audio.currentTime;
           this.duration = this.audio.duration === Infinity ? null : this.audio.duration;
-        } catch (e){}
+        } catch(e) {}
         this.trigger('timeupdate', this.position, this.duration);
       }
     },
@@ -647,12 +656,12 @@
      * Called periodically as soon as the audio loads and can be played.
      * Cancelled when audio has fully download or when a new audio file has been loaded to the player.
      */
-    onProgress: function () {
-      if (this.audio && this.audio.buffered !== null && this.audio.buffered.length) {
+    onProgress: function() {
+      if(this.audio && this.audio.buffered !== null && this.audio.buffered.length) {
         this.duration = this.audio.duration === Infinity ? null : this.audio.duration;
         this.load_percent = parseInt(((this.audio.buffered.end(this.audio.buffered.length - 1) / this.duration) * 100), 10);
         this.trigger('progress', this.load_percent);
-        if (this.load_percent >= 100) {
+        if(this.load_percent >= 100) {
           this.clearLoadProgress();
         }
       }
@@ -661,26 +670,26 @@
      * Audio error event handler
      * @param e error event
      */
-    onError: function (e) {
+    onError: function(e) {
       this.trigger('error', e);
     },
     /**
      * Audio seeking event handler. Triggered when audio seek starts.
      */
-    onSeeking: function(){
+    onSeeking: function() {
       this.trigger('seeking');
     },
     /**
      * Audio seeked event handler. Triggered when audio has been seeked.
      */
-    onSeeked: function(){
+    onSeeked: function() {
       this.trigger('seeked');
     },
     /**
      * Clears periodical audio download progress callback.
      */
-    clearLoadProgress: function () {
-      if (this.timer !== undefined) {
+    clearLoadProgress: function() {
+      if(this.timer !== undefined) {
         clearInterval(this.timer);
         delete this.timer;
       }
@@ -688,7 +697,7 @@
     /**
      * Resets audio position and parameters.
      */
-    reset: function () {
+    reset: function() {
       this.clearLoadProgress();
       this.seekable = false;
       this.duration = 0;
@@ -699,11 +708,11 @@
      * Load audio from url.
      * @param {String} url URL of audio to load
      */
-    load: function (url) {
+    load: function(url) {
       this.reset();
       this.trigger('pause');
       //this.destroyAudio();
-      if(this.audio === undefined){
+      if(this.audio === undefined) {
         this.createAudio();
       }
       this.audio.setAttribute('src', url);
@@ -712,7 +721,7 @@
     /**
      * Play audio
      */
-    play: function () {
+    play: function() {
       if(this.audio) {
         this.audio.play();
       }
@@ -720,7 +729,7 @@
     /**
      * Pause audio
      */
-    pause: function () {
+    pause: function() {
       if(this.audio) {
         this.audio.pause();
       }
@@ -730,8 +739,8 @@
      * @param {Float} v audio volume to set between 0 - 1.
      * @return {Float} current audio volume
      */
-    volume: function (v) {
-      if (v !== undefined && !isNaN(parseInt(v, 10))) {
+    volume: function(v) {
+      if(v !== undefined && !isNaN(parseInt(v, 10))) {
         var vol = v < 0 ? 0 : Math.min(1, v);
         this.audio.volume = vol;
         this.vol = vol;
@@ -743,14 +752,14 @@
      * Seek audio to position
      * @param {Float} position audio position in seconds to seek to.
      */
-    seek: function (position) {
+    seek: function(position) {
       var playing = this.playing;
       this.position = position;
       this.audio.currentTime = position;
-      if (playing) {
+      if(playing) {
         this.play();
       } else {
-        if (this.audio.buffered !== null && this.audio.buffered.length) {
+        if(this.audio.buffered !== null && this.audio.buffered.length) {
           this.trigger('timeupdate', this.position, this.duration);
         }
       }
@@ -788,11 +797,11 @@
    * @param {Object} s player settings object
    * @constructor
    */
-  Audio5js = function (s) {
+  Audio5js = function(s) {
     s = s || {};
     var k;
-    for (k in settings) {
-      if (settings.hasOwnProperty(k) && !s.hasOwnProperty(k)) {
+    for(k in settings) {
+      if(settings.hasOwnProperty(k) && !s.hasOwnProperty(k)) {
         s[k] = settings[k];
       }
     }
@@ -804,7 +813,7 @@
    * @param {String} mime_type audio mime type to check.
    * @return {Boolean} is audio mime type supported by browser or not
    */
-  Audio5js.can_play = function (mime_type) {
+  Audio5js.can_play = function(mime_type) {
     return util.can_play(mime_type);
   };
 
@@ -813,12 +822,12 @@
      * Initialize player instance.
      * @param {Object} s player settings object
      */
-    init: function (s) {
+    init: function(s) {
       this.ready = false;
       this.settings = s;
       this.audio = this.getPlayer();
       this.bindAudioEvents();
-      if (this.settings.use_flash) {
+      if(this.settings.use_flash) {
         this.audio.init(s.swf_path);
       } else {
         this.audio.init();
@@ -829,18 +838,18 @@
      * Defaults to MP3 player either HTML or Flash based.
      * @return {FlashAudioPlayer,HTML5AudioPlayer} audio player instance
      */
-    getPlayer: function () {
+    getPlayer: function() {
       var i, l, player, codec;
-      if(this.settings.use_flash){
+      if(this.settings.use_flash) {
         player = new FlashAudioPlayer();
         this.settings.player = {
           engine: 'flash',
           codec: 'mp3'
         };
       } else {
-        for (i = 0, l = this.settings.codecs.length; i < l; i++) {
+        for(i = 0, l = this.settings.codecs.length; i < l; i++) {
           codec = this.settings.codecs[i];
-          if (Audio5js.can_play(codec)) {
+          if(Audio5js.can_play(codec)) {
             player = new HTML5AudioPlayer();
             this.settings.use_flash = false;
             this.settings.player = {
@@ -850,7 +859,7 @@
             break;
           }
         }
-        if (player === undefined) {
+        if(player === undefined) {
           // here we double check for mp3 support instead of defaulting to Flash in case user overrode the settings.codecs array with an empty array.
           this.settings.use_flash = !Audio5js.can_play('mp3');
           player = this.settings.use_flash ? new FlashAudioPlayer() : new HTML5AudioPlayer();
@@ -865,7 +874,7 @@
     /**
      * Bind events from audio object to internal callbacks
      */
-    bindAudioEvents: function () {
+    bindAudioEvents: function() {
       this.audio.on('ready', this.onReady, this);
       this.audio.on('loadstart', this.onLoadStart, this);
       this.audio.on('loadedmetadata', this.onLoadedMetadata, this);
@@ -882,7 +891,7 @@
     /**
      * Bind events from audio object to internal callbacks
      */
-    unbindAudioEvents: function () {
+    unbindAudioEvents: function() {
       this.audio.off('ready', this.onReady);
       this.audio.off('loadstart', this.onLoadStart);
       this.audio.off('loadedmetadata', this.onLoadedMetadata);
@@ -900,14 +909,14 @@
      * Load audio from URL
      * @param {String} url URL of audio to load
      */
-    load: function (url) {
+    load: function(url) {
       var that = this,
-          f = function(u){
-            that.audio.load(u);
-            that.trigger('load');
-          };
+        f = function(u) {
+          that.audio.load(u);
+          that.trigger('load');
+        };
 
-      if(this.ready){
+      if(this.ready) {
         f(url);
       } else {
         this.on('ready', f);
@@ -916,23 +925,23 @@
     /**
      * Play audio
      */
-    play: function () {
-      if(!this.playing){
+    play: function() {
+      if(!this.playing) {
         this.audio.play();
       }
     },
     /**
      * Pause audio
      */
-    pause: function () {
-      if(this.playing){
+    pause: function() {
+      if(this.playing) {
         this.audio.pause();
       }
     },
     /**
      * Toggle audio play / pause
      */
-    playPause: function () {
+    playPause: function() {
       this[this.playing ? 'pause' : 'play']();
     },
     /**
@@ -940,8 +949,8 @@
      * @param {Float} v audio volume to set between 0 - 1.
      * @return {Float} current audio volume
      */
-    volume: function (v) {
-      if (v !== undefined && !isNaN(parseInt(v, 10))) {
+    volume: function(v) {
+      if(v !== undefined && !isNaN(parseInt(v, 10))) {
         this.audio.volume(v);
         this.vol = v;
       } else {
@@ -952,7 +961,7 @@
      * Seek audio to position
      * @param {Float} position audio position in seconds to seek to.
      */
-    seek: function (position) {
+    seek: function(position) {
       this.audio.seek(position);
       this.position = position;
     },
@@ -967,9 +976,9 @@
      * Callback for audio ready event. Indicates audio is ready for playback.
      * Looks for ready callback in settings object and invokes it in the context of player instance
      */
-    onReady: function () {
+    onReady: function() {
       this.ready = true;
-      if (typeof (this.settings.ready) === 'function') {
+      if(typeof(this.settings.ready) === 'function') {
         this.settings.ready.call(this, this.settings.player);
       }
       this.trigger('ready');
@@ -977,42 +986,42 @@
     /**
      * Audio load start event handler
      */
-    onLoadStart: function(){
+    onLoadStart: function() {
       this.trigger('loadstart');
     },
     /**
      * Audio metadata loaded event handler
      */
-    onLoadedMetadata: function(){
+    onLoadedMetadata: function() {
       this.trigger('loadedmetadata');
     },
     /**
      * Audio play event handler
      */
-    onPlay: function () {
+    onPlay: function() {
       this.playing = true;
       this.trigger('play');
     },
     /**
      * Audio pause event handler
      */
-    onPause: function () {
+    onPause: function() {
       this.playing = false;
       this.trigger('pause');
     },
     /**
      * Playback end event handler
      */
-    onEnded: function () {
+    onEnded: function() {
       this.playing = false;
       this.trigger('ended');
     },
     /**
      * Audio error event handler
      */
-    onError: function () {
+    onError: function() {
       var error = new AudioError('Audio Error. Failed to Load Audio');
-      if (this.settings.throw_errors) {
+      if(this.settings.throw_errors) {
         throw error;
       } else {
         this.trigger('error', error);
@@ -1021,19 +1030,19 @@
     /**
      * Audio canplay event handler. Triggered when enough audio has been loaded to by played.
      */
-    onCanPlay: function () {
+    onCanPlay: function() {
       this.trigger('canplay');
     },
     /**
      * Audio seeking event handler
      */
-    onSeeking: function(){
+    onSeeking: function() {
       this.trigger('seeking');
     },
     /**
      * Audio seeked event handler
      */
-    onSeeked: function(){
+    onSeeked: function() {
       this.trigger('seeked');
     },
     /**
@@ -1041,9 +1050,9 @@
      * @param {Float} position play head position (sec)
      * @param {Float} duration audio duration (sec)
      */
-    onTimeUpdate: function (position, duration) {
+    onTimeUpdate: function(position, duration) {
       this.position = this.settings.format_time ? util.formatTime(position) : position;
-      if (this.duration !== duration) {
+      if(this.duration !== duration) {
         this.duration = this.settings.format_time && duration !== null ? util.formatTime(duration) : duration;
       }
       this.trigger('timeupdate', this.position, this.duration);
@@ -1052,7 +1061,7 @@
      * Audio download progress event handler
      * @param {Float} loaded audio download percent
      */
-    onProgress: function (loaded) {
+    onProgress: function(loaded) {
       this.duration = this.audio.duration;
       this.load_percent = loaded;
       this.trigger('progress', loaded);

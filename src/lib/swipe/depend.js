@@ -8,7 +8,7 @@
 export const getActionPointer = function(direction, leftIndex, rightIndex) {
   let createPointer //创建的页
   let destroyPointer //销毁的页
-  switch (direction) {
+  switch(direction) {
     case 'prev': //前处理
       createPointer = (leftIndex - 1);
       destroyPointer = (rightIndex);
@@ -33,10 +33,10 @@ export const initPointer = (init, pageTotal) => {
   var leftscope = 0,
     pagePointer = {};
 
-  if (init === leftscope) { //首页
+  if(init === leftscope) { //首页
     pagePointer['currIndex'] = init;
     pagePointer['rightIndex'] = init + 1;
-  } else if (init === pageTotal - 1) { //首页
+  } else if(init === pageTotal - 1) { //首页
     pagePointer['currIndex'] = init;
     pagePointer['leftIndex'] = init - 1;
   } else { //中间页
@@ -53,7 +53,7 @@ export const initPointer = (init, pageTotal) => {
  */
 export const compatibilityEvent = (e) => {
   var point;
-  if (e.touches && e.touches[0]) {
+  if(e.touches && e.touches[0]) {
     point = e.touches[0];
   } else {
     point = e;
@@ -75,27 +75,27 @@ export const calculationIndex = (currIndex, targetIndex, pageTotal) => {
     viewFlip;
 
   //存在的页面
-  if (currIndex === 0) {
+  if(currIndex === 0) {
     existpage = [currIndex, currIndex + 1];
-  } else if (currIndex === pageTotal - 1) {
+  } else if(currIndex === pageTotal - 1) {
     existpage = [currIndex - 1, currIndex];
   } else {
     existpage = [currIndex - 1, currIndex, currIndex + 1];
   }
 
   //需要创建的新页面
-  if (targetIndex === 0) {
+  if(targetIndex === 0) {
     createpage = [targetIndex, targetIndex + 1];
-  } else if (targetIndex === pageTotal - 1) {
+  } else if(targetIndex === pageTotal - 1) {
     createpage = [targetIndex - 1, targetIndex];
   } else {
     createpage = [targetIndex - 1, targetIndex, targetIndex + 1];
   }
 
-  for (; i < createpage.length; i++) {
+  for(; i < createpage.length; i++) {
     pageIndex = createpage[i];
     //跳过存在的页面
-    if (-1 === existpage.indexOf(pageIndex)) {
+    if(-1 === existpage.indexOf(pageIndex)) {
       //创建目标的页面
       create.push(pageIndex);
     } else {

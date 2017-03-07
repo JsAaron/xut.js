@@ -58,11 +58,11 @@ export default class TaskContents {
 
   constructor(activityData) {
     _.extend(this, activityData)
-      //只解析content有关的activityData
+    //只解析content有关的activityData
     let compileActivitys = activityParser(activityData)
-      //如果有预执行动作
-      //Activity表数据存在
-    if (compileActivitys) {
+    //如果有预执行动作
+    //Activity表数据存在
+    if(compileActivitys) {
       //解析动画表数据结构
       activityData = contentParser(compileActivitys, activityData)
 
@@ -113,7 +113,7 @@ export default class TaskContents {
         //iboosk节点预编译
         //在执行的时候节点已经存在
         //不需要在创建
-        if (Xut.IBooks.runMode()) {
+        if(Xut.IBooks.runMode()) {
           _.each(userData.idFix, function(id) {
             data.contentsFragment[id] = data.$containsNode.find("#" + id)[0]
           })
@@ -129,11 +129,11 @@ export default class TaskContents {
         /* eslint-disable */
         //2015.5.6暴露到全局
         //提供给音频字幕上下文
-        if (!Xut.Contents.contentsFragment[data.chapterId]) {
+        if(!Xut.Contents.contentsFragment[data.chapterId]) {
           Xut.Contents.contentsFragment[data.chapterId];
         }
         Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment
-          /* elist-enable */
+        /* elist-enable */
 
         //开始下一个任务
         this._dataStrCheck(data, userData);
@@ -154,12 +154,12 @@ export default class TaskContents {
       let contentDas = userData.contentDas
 
       //放大图片
-      if (Object.keys(data.zoomBehavior).length) {
+      if(Object.keys(data.zoomBehavior).length) {
         this._zoomImage(data)
       }
 
       //文本特效
-      if (userData.textFx.length) {
+      if(userData.textFx.length) {
         this._textFx(data, userData.textFx)
       }
 
@@ -196,8 +196,8 @@ export default class TaskContents {
       const callHooks = function() {
         let iscrollHooks = delayHooks.iscrollHooks
         let hook
-        if (iscrollHooks.length) {
-          while (hook = iscrollHooks.shift()) {
+        if(iscrollHooks.length) {
+          while(hook = iscrollHooks.shift()) {
             hook()
           }
         }
@@ -215,7 +215,7 @@ export default class TaskContents {
        */
       const complete = function(data) {
         return function() {
-          if (data.count === 1) {
+          if(data.count === 1) {
             nextTask()
             return
           }
@@ -226,20 +226,20 @@ export default class TaskContents {
       //浮动页面对
       //浮动对象比任何层级都都要高
       //超过母版
-      if (data.floatPages.ids && data.floatPages.ids.length) {
+      if(data.floatPages.ids && data.floatPages.ids.length) {
         createFloatPage(this, data, complete)
       }
 
       //如果存在母版浮动节点
       //在创建节点structure中过滤出来，根据参数的tipmost
-      if (data.floatMaters.ids && data.floatMaters.ids.length) {
+      if(data.floatMaters.ids && data.floatMaters.ids.length) {
         createFloatMater(this, data, complete)
       }
 
       //iboosk节点预编译
       //在执行的时候节点已经存在
       //不需要在创建
-      if (Xut.IBooks.runMode()) {
+      if(Xut.IBooks.runMode()) {
         complete();
       } else {
 
@@ -253,14 +253,14 @@ export default class TaskContents {
 
         //如果bodyContent与headerFooterContent都没有
         //直接返回回调
-        if (!watchCount) {
+        if(!watchCount) {
           complete()
           return
         }
 
         let watchNextTick = function() {
-          return () => {
-            if (watchCount === 1) {
+          return() => {
+            if(watchCount === 1) {
               complete()
               return
             }
@@ -269,7 +269,7 @@ export default class TaskContents {
         }()
 
         //页眉页脚
-        if (headerFooterContent.length) {
+        if(headerFooterContent.length) {
           nextTick({
             'container': data.$headFootNode,
             'content': fragment.headerFooterContent
@@ -277,7 +277,7 @@ export default class TaskContents {
         }
 
         //主体内容
-        if (bodyContent.length) {
+        if(bodyContent.length) {
           nextTick({
             'container': data.$containsNode,
             'content': fragment.bodyContent
@@ -302,9 +302,9 @@ export default class TaskContents {
    * @return {[type]} [description]
    */
   runSuspendTasks() {
-    if (this.suspendQueues) {
+    if(this.suspendQueues) {
       var fn;
-      if (fn = this.suspendQueues.pop()) {
+      if(fn = this.suspendQueues.pop()) {
         fn();
       }
       this.suspendQueues = null;
@@ -324,9 +324,9 @@ export default class TaskContents {
       let behaviorData = data.zoomBehavior[node.id]
       let size
       let promptHtml
-      if (behaviorData) {
+      if(behaviorData) {
         //缩放提示图片
-        if (behaviorData.prompt) {
+        if(behaviorData.prompt) {
           size = config.screenSize.width > config.screenSize.height ? '2vw' : '2vh'
           promptHtml = `<div class="icon-maximize"
                              style="font-size:${size};position:absolute;right:0;">
@@ -342,24 +342,24 @@ export default class TaskContents {
             hasMove = true
           },
           end() {
-            if (hasMove) return
+            if(hasMove) return
             let $node = $(node)
             let $imgNode = $node.find('img')
 
-            if (!$imgNode.length) {
+            if(!$imgNode.length) {
               return
             }
 
             let src = $imgNode[0].src
             let zoomObj = self.zoomObjs[src]
 
-            if (zoomObj) {
+            if(zoomObj) {
               zoomObj.play()
             } else {
               let hqSrc
               let analysisName = analysisImageName(src)
-                //如果启动了高清图片
-              if (config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
+              //如果启动了高清图片
+              if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
                 hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
               }
               self.zoomObjs[src] = new Zoom({
@@ -396,19 +396,19 @@ export default class TaskContents {
     //文本特效对象
     let textFxObjs = {}
 
-    while (content = textFx.shift()) {
-      if (contentNode = data.contentsFragment[content.texteffectId]) {
+    while(content = textFx.shift()) {
+      if(contentNode = data.contentsFragment[content.texteffectId]) {
         let contentId = content._id
 
         //初始化文本对象
         textFxObjs[contentId] = new LetterEffect(contentId)
         textfxNodes = contentNode.querySelectorAll('a[data-textfx]')
 
-        if (textfxNodes.length) {
+        if(textfxNodes.length) {
           textfxNodes.forEach(function(node) {
             //如果是共享了父节点
             parentNode = node.parentNode
-            if (-1 != parentNodes.indexOf(parentNode)) {
+            if(-1 != parentNodes.indexOf(parentNode)) {
               group[parentNode.textFxId].push(node)
             } else {
               parentNode.textFxId = uuid
@@ -465,7 +465,7 @@ export default class TaskContents {
   clearReference() {
 
     //文字动画
-    if (this.textFxObjs) {
+    if(this.textFxObjs) {
       _.each(this.textFxObjs, function(obj) {
         obj.destroy()
       })
@@ -473,15 +473,15 @@ export default class TaskContents {
     }
 
     //删除字幕用的碎片文档
-    if (Xut.Contents.contentsFragment[this.chapterId]) {
+    if(Xut.Contents.contentsFragment[this.chapterId]) {
       delete Xut.Contents.contentsFragment[this.chapterId]
     }
 
     //清理放大图片功能
-    if (this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
+    if(this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
       //清理缩放绑定事件
       _.each(this.zoomBehavior, function(zoomBehavior) {
-        if (zoomBehavior.off) {
+        if(zoomBehavior.off) {
           zoomBehavior.off()
         }
       })

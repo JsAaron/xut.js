@@ -30,33 +30,33 @@ import { clearVideo } from '../../component/video/manager'
  */
 export function $$stop() {
 
-    //清理音频
-    clearAudio()
+  //清理音频
+  clearAudio()
 
-    //清理视频
-    clearVideo()
+  //清理视频
+  clearVideo()
 
-    //停止热点
-    return access(function(pageObj, contentObjs, componentObjs) {
+  //停止热点
+  return access(function(pageObj, contentObjs, componentObjs) {
 
-        //如果返回值是false,则是算热点处理行为
-        let falg = false
+    //如果返回值是false,则是算热点处理行为
+    let falg = false
 
-        //content类型
-        contentObjs && _.each(contentObjs, function(obj) {
-            if (obj.stop && obj.stop()) {
-                falg = true
-            }
-        })
-
-
-        //零件类型
-        componentObjs && _.each(componentObjs, function(obj) {
-            if (obj.stop && obj.stop()) {
-                falg = true
-            }
-        })
-
-        return falg;
+    //content类型
+    contentObjs && _.each(contentObjs, function(obj) {
+      if(obj.stop && obj.stop()) {
+        falg = true
+      }
     })
+
+
+    //零件类型
+    componentObjs && _.each(componentObjs, function(obj) {
+      if(obj.stop && obj.stop()) {
+        falg = true
+      }
+    })
+
+    return falg;
+  })
 }

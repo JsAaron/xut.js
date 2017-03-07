@@ -14,30 +14,30 @@ import {
 const getContentHTML = newCursor => {
   //忙碌可配置
   let busyIcon = '<div class="xut-busy-icon xut-fullscreen"></div>'
-  if (newCursor == false) {
+  if(newCursor == false) {
     disable(true)
     busyIcon = ''
   }
 
   //全局设置
-  if (config.cursor && config.cursor.time) {
+  if(config.cursor && config.cursor.time) {
     setDelay(config.cursor.time)
   }
 
   //单独重设忙了光标
-  if (newCursor && newCursor.url) {
+  if(newCursor && newCursor.url) {
     resetCursor(newCursor)
   }
 
   let coverStyle = ''
 
   //mini平台不要背景图
-  if (Xut.config.platform === 'mini') {} else {
+  if(Xut.config.platform === 'mini') {} else {
     //默认背景图
     let coverUrl = './content/gallery/cover.jpg'
 
     //重写背景图
-    if (config.launch && config.launch.resource) {
+    if(config.launch && config.launch.resource) {
       coverUrl = config.launch.resource + '/gallery/cover.jpg'
     }
     //背景样式
@@ -55,10 +55,10 @@ const getContentHTML = newCursor => {
  */
 export function initNode(nodeName = '#xxtppt-app-container', cursor) {
   let $rootNode
-  if (nodeName) {
+  if(nodeName) {
     $rootNode = $(nodeName)
   }
-  if (!$rootNode.length) {
+  if(!$rootNode.length) {
     //如果没有传递节点名，直接放到body下面
     nodeName = ''
     $rootNode = $('body')
@@ -67,7 +67,7 @@ export function initNode(nodeName = '#xxtppt-app-container', cursor) {
   let contentHtml = getContentHTML(cursor)
 
   //如果根节点不存在,配置根节点
-  if (!nodeName) {
+  if(!nodeName) {
     contentHtml = `<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden">${contentHtml}</div>`
   }
   return {

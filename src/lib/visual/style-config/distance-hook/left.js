@@ -4,71 +4,71 @@
  *     pageStyles：3个页面的style配置
  *************************/
 export const leftPageHook = {
-    flipMove: {
-        prev(distance, pageStyles) {
-            let middlePageStyle = pageStyles.middle
-            let leftPageStyle = pageStyles.left
+  flipMove: {
+    prev(distance, pageStyles) {
+      let middlePageStyle = pageStyles.middle
+      let leftPageStyle = pageStyles.left
 
-            //中间：溢出
-            if (middlePageStyle && middlePageStyle.visualLeftInteger) {
-                //左边：溢出
-                if (leftPageStyle && leftPageStyle.visualLeftInteger) {
-                    return -leftPageStyle.visualWidth + distance
-                }
-                //左边：正常
-                else {
-                    return distance - leftPageStyle.visualWidth - middlePageStyle.visualLeftInteger
-                }
-            }
-            //中间：正常
-            else {
-                //左边：溢出
-                if (leftPageStyle && leftPageStyle.visualLeftInteger) {
-                    return distance - leftPageStyle.visualWidth + leftPageStyle.visualLeftInteger
-                }
-                //左边：正常
-                else {
-                    return distance - leftPageStyle.visualWidth
-                }
-            }
-        },
-        next() {}
+      //中间：溢出
+      if(middlePageStyle && middlePageStyle.visualLeftInteger) {
+        //左边：溢出
+        if(leftPageStyle && leftPageStyle.visualLeftInteger) {
+          return -leftPageStyle.visualWidth + distance
+        }
+        //左边：正常
+        else {
+          return distance - leftPageStyle.visualWidth - middlePageStyle.visualLeftInteger
+        }
+      }
+      //中间：正常
+      else {
+        //左边：溢出
+        if(leftPageStyle && leftPageStyle.visualLeftInteger) {
+          return distance - leftPageStyle.visualWidth + leftPageStyle.visualLeftInteger
+        }
+        //左边：正常
+        else {
+          return distance - leftPageStyle.visualWidth
+        }
+      }
     },
-    flipRebound: {
-        prev(distance, pageStyles) {
-            let middlePageStyle = pageStyles.middle
-            let leftPageStyle = pageStyles.left
+    next() {}
+  },
+  flipRebound: {
+    prev(distance, pageStyles) {
+      let middlePageStyle = pageStyles.middle
+      let leftPageStyle = pageStyles.left
 
-            //中间：溢出
-            if (middlePageStyle && middlePageStyle.visualLeftInteger) {
-                //左边：溢出
-                if (leftPageStyle && leftPageStyle.visualLeftInteger) {
-                    return -leftPageStyle.visualWidth
-                }
-                //左边：正常
-                else {
-                    return -(leftPageStyle.visualWidth + middlePageStyle.visualLeftInteger)
-                }
-            }
-            //中间：正常
-            else {
-                //左边：溢出
-                if (leftPageStyle && leftPageStyle.visualLeftInteger) {
-                    return -(leftPageStyle.visualWidth - leftPageStyle.visualLeftInteger)
-                }
-                //左边：正常
-                else {
-                    return -leftPageStyle.visualWidth
-                }
-            }
+      //中间：溢出
+      if(middlePageStyle && middlePageStyle.visualLeftInteger) {
+        //左边：溢出
+        if(leftPageStyle && leftPageStyle.visualLeftInteger) {
+          return -leftPageStyle.visualWidth
+        }
+        //左边：正常
+        else {
+          return -(leftPageStyle.visualWidth + middlePageStyle.visualLeftInteger)
+        }
+      }
+      //中间：正常
+      else {
+        //左边：溢出
+        if(leftPageStyle && leftPageStyle.visualLeftInteger) {
+          return -(leftPageStyle.visualWidth - leftPageStyle.visualLeftInteger)
+        }
+        //左边：正常
+        else {
+          return -leftPageStyle.visualWidth
+        }
+      }
 
-        },
-        next() {}
     },
-    flipOver: {
-        prev() {
-            return 0
-        },
-        next() {}
-    }
+    next() {}
+  },
+  flipOver: {
+    prev() {
+      return 0
+    },
+    next() {}
+  }
 }

@@ -10,7 +10,7 @@ const translateZ = Xut.style.translateZ
  * @return {[type]}        [description]
  */
 const createTranslate = (offset) => {
-    return `translate(${offset}px,0) ${translateZ}`
+  return `translate(${offset}px,0) ${translateZ}`
 }
 
 /**
@@ -21,34 +21,34 @@ const createTranslate = (offset) => {
  * @return {[type]}               [description]
  */
 export function styleTranslate({
-    createIndex,
-    currIndex,
-    direction,
-    useStyleData
+  createIndex,
+  currIndex,
+  direction,
+  useStyleData
 }) {
 
-    let translate
-    let offset
-    let offsetLeft
-    let offsetMiddle
-    let offsetRight
+  let translate
+  let offset
+  let offsetLeft
+  let offsetMiddle
+  let offsetRight
 
-    if(direction === 'before') {
-        offsetLeft = leftTranslate(useStyleData)
-        translate = createTranslate(offsetLeft)
-        offset = offsetLeft
-    } else if(direction === 'middle') {
-        offsetMiddle = 0
-        translate = createTranslate(offsetMiddle)
-        offset = offsetMiddle
-    } else if(direction === 'after') {
-        offsetRight = rightTranslate(useStyleData)
-        translate = createTranslate(offsetRight)
-        offset = offsetRight
-    }
+  if(direction === 'before') {
+    offsetLeft = leftTranslate(useStyleData)
+    translate = createTranslate(offsetLeft)
+    offset = offsetLeft
+  } else if(direction === 'middle') {
+    offsetMiddle = 0
+    translate = createTranslate(offsetMiddle)
+    offset = offsetMiddle
+  } else if(direction === 'after') {
+    offsetRight = rightTranslate(useStyleData)
+    translate = createTranslate(offsetRight)
+    offset = offsetRight
+  }
 
-    return {
-        translate,
-        offset
-    }
+  return {
+    translate,
+    offset
+  }
 }

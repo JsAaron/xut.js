@@ -30,7 +30,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
   //分离出浮动节点
   _.each(dasFloat.ids, function(id) {
     makePrefix = prefix + id;
-    if (fragment = data.contentsFragment[makePrefix]) {
+    if(fragment = data.contentsFragment[makePrefix]) {
       zIndex = zIndexs[id];
       //保证层级关系
       // fragment.style.zIndex = (Number(zIndex) + Number(fragment.style.zIndex))
@@ -43,7 +43,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
   //如果是当前页面
   //因为会产生三页面并联
   //所以中间去最高层级
-  if (floatName === 'floatPages' && data.getStyle.offset === 0) {
+  if(floatName === 'floatPages' && data.getStyle.offset === 0) {
     zIndex = 2001
   } else {
     zIndex = 2000
@@ -56,7 +56,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
   var overflow = 'overflow:hidden;'
 
   //如果是母板,排除
-  if (floatName === 'floatMaters') {
+  if(floatName === 'floatMaters') {
     overflow = ''
   }
 

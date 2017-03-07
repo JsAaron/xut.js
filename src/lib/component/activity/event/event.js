@@ -68,7 +68,7 @@ const isfilter = eventName => {
  * @return {[type]}         [description]
  */
 const setDefaultBehavior = function(supportSwipe, $contentNode) {
-  if (supportSwipe) {
+  if(supportSwipe) {
     //静态事件，默认可以翻页，还可以切换工具栏
     $contentNode.attr('data-behavior', 'swipe');
   } else {
@@ -82,9 +82,9 @@ const setDefaultBehavior = function(supportSwipe, $contentNode) {
  * 针对软件培训的操作行为下光标状态需求
  */
 const addCursor = function(eventName, $contentNode) {
-  if ($contentNode) {
-    if (!$contentNode.prop('setCursor')) { //只设置一次
-      if (eventName === ('drag' || 'dragTag')) {
+  if($contentNode) {
+    if(!$contentNode.prop('setCursor')) { //只设置一次
+      if(eventName === ('drag' || 'dragTag')) {
         $contentNode.css('cursor', 'Move')
       } else {
         $contentNode.css('cursor', 'Pointer')
@@ -109,18 +109,18 @@ const _bind = function(eventDrop, data) {
   let eventName = data.eventName
   let supportSwipe = data.supportSwipe
 
-  if (eventName === 'drag') { //拖动
+  if(eventName === 'drag') { //拖动
     dragObj = new DragDrop(eventContext, null, data.parameter, eventDrop.startRun, eventDrop.stopRun);
-  } else if (eventName === 'dragTag') { //拖拽
+  } else if(eventName === 'dragTag') { //拖拽
     dragObj = new DragDrop(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
   } else {
     handler = function() {
-        data.eventRun.call(eventContext)
-      }
-      /////////////////
-      /// tap click
-      /////////////////
-    if (eventName === 'tap' || eventName === 'click') {
+      data.eventRun.call(eventContext)
+    }
+    /////////////////
+    /// tap click
+    /////////////////
+    if(eventName === 'tap' || eventName === 'click') {
       reference = simpleEvent(eventName, eventContext, handler, supportSwipe)
     }
     //复杂用hammer
@@ -156,7 +156,7 @@ function distribute(data) {
   let eventObj = _bind(eventDrop, data)
 
   //拖动,拖拽对象处理
-  if (eventObj.dragObj && eventDrop.init) {
+  if(eventObj.dragObj && eventDrop.init) {
     eventDrop.init(eventObj.dragObj)
     return
   }
@@ -198,7 +198,7 @@ export function bindContentEvent(data) {
   //是否支持翻页
   let supportSwipe = data.supportSwipe = isfilter(data.eventName);
   //检测是否移除元素的默认行为,因为元素都具有翻页的特性
-  if (data.domMode) {
+  if(data.domMode) {
     setDefaultBehavior(supportSwipe, data.eventContext);
   }
   distribute(data)
@@ -209,7 +209,7 @@ export function bindContentEvent(data) {
  * 销毁对象事件
  */
 export function destroyContentEvent(eventData, eventName) {
-  if (eventData.eventReference) {
+  if(eventData.eventReference) {
     eventData.eventReference.off(eventName || eventData.eventName, eventData.eventHandler)
     eventData.eventReference = null;
     eventData.eventHandler = null

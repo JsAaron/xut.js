@@ -6,16 +6,16 @@
  */
 Xut.Plugin.OpenApp = {
 
-	openAppAction: function(appName, successCallback, failureCallback) {
-		if (GLOBALIFRAME) {
-			return GLOBALCONTEXT.OpenApp.openAppAction(appName, successCallback, failureCallback);
-		} else {
-			return cordova.exec(
-				successCallback,
-				failureCallback,
-				'OpenApp',
-				'openAppAction', [appName]);
-		}
-	}
+  openAppAction: function(appName, successCallback, failureCallback) {
+    if(GLOBALIFRAME) {
+      return GLOBALCONTEXT.OpenApp.openAppAction(appName, successCallback, failureCallback);
+    } else {
+      return cordova.exec(
+        successCallback,
+        failureCallback,
+        'OpenApp',
+        'openAppAction', [appName]);
+    }
+  }
 
 };

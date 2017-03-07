@@ -5,12 +5,8 @@
  * @param  {[type]} config [description]
  * @return {[type]}        [description]
  */
-import {
-  config
-} from '../config/index'
-import {
-  sceneController
-} from './scene-control'
+import { config } from '../config/index'
+import { sceneController } from './scene-control'
 
 const round = Math.round
 const ratio = 6

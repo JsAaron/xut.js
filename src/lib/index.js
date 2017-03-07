@@ -39,7 +39,7 @@ const loadApp = (...arg) => {
  * 提供全局配置文件
  */
 const mixGolbalConfig = setConfig => {
-  if (setConfig) {
+  if(setConfig) {
     Xut.mixin(config, setConfig)
   }
 }
@@ -65,10 +65,10 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
   }
 
   //如果启动了这个模式
-  if (config.orientateMode) {
+  if(config.orientateMode) {
     let temp = cacheOptions
     Xut.Application.Refresh()
-    if (temp && temp.length) {
+    if(temp && temp.length) {
       delay(() => {
         Xut.Application.Launch(temp.pop())
         temp = null
@@ -92,15 +92,15 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
     pageBar: option.pageBar //mini页码显示模式
  */
 Xut.Application.Launch = option => {
-  if (config.launch) {
+  if(config.launch) {
     return
   }
   let setConfig = Xut.Application.setConfig
-  if (setConfig && setConfig.lauchMode === 1) {
+  if(setConfig && setConfig.lauchMode === 1) {
     mixGolbalConfig(setConfig);
     cacheOptions = [option] //多次切换
     config.launch = $.extend(true, {}, option)
-    if (option.path) {
+    if(option.path) {
       _.each(option.path, function(value, key) {
         config.launch[key] = key === 'resource' ? slashPostfix(value) : value
       })
@@ -116,7 +116,7 @@ Xut.Application.Launch = option => {
  */
 setTimeout(() => {
   let setConfig = Xut.Application.setConfig
-  if (!setConfig || setConfig && !setConfig.lauchMode) {
+  if(!setConfig || setConfig && !setConfig.lauchMode) {
     mixGolbalConfig(setConfig)
     loadApp()
   }

@@ -1,6 +1,6 @@
 import {
-    $$on,
-    $$off
+  $$on,
+  $$off
 } from '../../util/dom'
 
 /**
@@ -19,16 +19,16 @@ let audioes = []
  * @return {[type]}        [description]
  */
 export function fixAudio(obj, key, access) {
-    let start = () => {
-        let audio, i
-        for (i = 0; i < loop; i++) {
-            audio = new Audio()
-            audio.play()
-            audioes.push(audio)
-        }
-        $$off(document)
+  let start = () => {
+    let audio, i
+    for(i = 0; i < loop; i++) {
+      audio = new Audio()
+      audio.play()
+      audioes.push(audio)
     }
-    $$on(document, { start })
+    $$off(document)
+  }
+  $$on(document, { start })
 }
 
 /**
@@ -36,22 +36,22 @@ export function fixAudio(obj, key, access) {
  * @return {[type]} [description]
  */
 export function destroyFixAudio() {
-    for (let i = 0; i < audioes.length; i++) {
-        audioes[i] = null
-    }
-    audioes = null
+  for(let i = 0; i < audioes.length; i++) {
+    audioes[i] = null
+  }
+  audioes = null
 }
 
 export function hasAudioes() {
-    return audioes.length
+  return audioes.length
 }
 
 
 export function getAudio() {
-    var audio = audioes[index++]
-    if (!audio) {
-        index = 0
-        return getAudio()
-    }
-    return audio
+  var audio = audioes[index++]
+  if(!audio) {
+    index = 0
+    return getAudio()
+  }
+  return audio
 }

@@ -41,7 +41,7 @@ export class Abstract {
    */
   abstractDestroyCollection() {
     var k, Collections = this.Collections;
-    for (k in Collections) {
+    for(k in Collections) {
       Collections[k].baseDestroy()
     }
     this.Collections = null;
@@ -56,9 +56,9 @@ export class Abstract {
   abstractGetPageObj(pageIndex, pageType) {
     pageType = pageType || this.pageType;
     //模板传递的可能不是页码
-    if (pageType === 'master') {
+    if(pageType === 'master') {
       //如果不是母版ID，只是页码
-      if (!/-/.test(pageIndex)) {
+      if(!/-/.test(pageIndex)) {
         //转化成母版id
         pageIndex = this.converMasterId(pageIndex)
       }
@@ -72,8 +72,8 @@ export class Abstract {
    */
   abstractAssistPocess(pageIndex, callback) {
     var pageObj;
-    if (pageObj = this.abstractGetPageObj(pageIndex, this.pageType)) {
-      if (callback) {
+    if(pageObj = this.abstractGetPageObj(pageIndex, this.pageType)) {
+      if(callback) {
         callback(pageObj)
       } else {
         return pageObj;
@@ -98,11 +98,11 @@ export class Abstract {
   abstractGetPageData(pageIndex, key, pageType) {
     var pageObj;
     //如果传递key是 pageType
-    if (!pageType && key == 'page' || key == 'master') {
+    if(!pageType && key == 'page' || key == 'master') {
       pageType = key;
       key = null;
     }
-    if (pageObj = this.abstractGetPageObj(pageIndex, pageType)) {
+    if(pageObj = this.abstractGetPageObj(pageIndex, pageType)) {
       return key ? pageObj.chapterData[key] : pageObj.chapterData;
     }
   }
@@ -126,7 +126,7 @@ export class Abstract {
    */
   abstractAssistAppoint(activityId, currIndex, outCallBack, actionName) {
     var pageObj;
-    if (pageObj = this.abstractGetPageObj(currIndex)) {
+    if(pageObj = this.abstractGetPageObj(currIndex)) {
       return pageObj.baseAssistRun(activityId, outCallBack, actionName);
     }
   }

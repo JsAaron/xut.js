@@ -56,7 +56,7 @@ export const sceneController = {
    */
   takeOutPrevChainId() {
     var pre = sceneCollection.scenarioChain.pop();
-    if (sceneCollection.scenarioChain.length > 1) {
+    if(sceneCollection.scenarioChain.length > 1) {
       return sceneCollection.scenarioChain.pop()
     } else {
       return sceneCollection.scenarioChain[0];
@@ -72,19 +72,19 @@ export const sceneController = {
   checkToRepeat(seasonId) {
     var last,
       len = sceneCollection.scenarioChain.length;
-    if (len > 1) {
+    if(len > 1) {
       last = sceneCollection.scenarioChain[len - 2];
     } else {
       last = sceneCollection.scenarioChain[len - 1];
     }
 
     //往回跳一级
-    if (last['scenarioId'] == seasonId) {
+    if(last['scenarioId'] == seasonId) {
       this.takeOutPrevChainId();
     }
 
     //直接会跳到主场景
-    if (sceneCollection.scenarioStack[0] == seasonId) {
+    if(sceneCollection.scenarioStack[0] == seasonId) {
       var scenarioChain = sceneCollection.scenarioChain.shift();
       sceneCollection.scenarioChain.length = 0
       sceneCollection.scenarioChain.push(scenarioChain);
@@ -97,7 +97,7 @@ export const sceneController = {
    * @return {[type]} [description]
    */
   containerObj(scenarioId) {
-    if (scenarioId === 'current') {
+    if(scenarioId === 'current') {
       var scenarioStack = sceneCollection.scenarioStack;
       scenarioId = scenarioStack[scenarioStack.length - 1];
     }
@@ -151,7 +151,7 @@ export const sceneController = {
    */
   rewrite(scenarioId, chapterId) {
     _.each(sceneCollection.scenarioChain, function(scenarioChain) {
-      if (scenarioChain.scenarioId == scenarioId) {
+      if(scenarioChain.scenarioId == scenarioId) {
         scenarioChain.chapterId = chapterId;
       }
     });
@@ -176,11 +176,11 @@ export const sceneController = {
   sequence(scenarioId, currPageIndex) {
     var chains = sceneCollection.scenarioChain;
     //有多个场景关系,需要记录
-    if (chains.length > 1) {
+    if(chains.length > 1) {
       var history = [];
       //只刷新当前场景的页面
       _.each(chains, function(chain) {
-        if (chain.scenarioId == scenarioId) {
+        if(chain.scenarioId == scenarioId) {
           history.push(chain.scenarioId + '-' + chain.chapterId + '-' + currPageIndex)
         } else {
           history.push(chain.scenarioId + '-' + chain.chapterId)
@@ -200,12 +200,12 @@ export const sceneController = {
     var chains = chains.split(",")
     var chainsNum = chains.length;
 
-    if (chainsNum === 1) {
+    if(chainsNum === 1) {
       return false;
     }
 
     //如果只有2层
-    if (chainsNum === 2) {
+    if(chainsNum === 2) {
       return chains[1];
     }
 
@@ -213,7 +213,7 @@ export const sceneController = {
     //排除首页(已存在)
     //尾页(新创建)
     _.each(chains, function(chain, index) {
-      if (index >= 1 && (index < chainsNum - 1)) { //从1开始吸入,排除最后一个
+      if(index >= 1 && (index < chainsNum - 1)) { //从1开始吸入,排除最后一个
         var chain = chain.split('-')
         sceneCollection.scenarioChain.push({
           'scenarioId': chain[0],

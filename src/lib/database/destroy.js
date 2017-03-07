@@ -6,7 +6,7 @@ import { removeCache } from './cache'
  * 销毁缓存
  */
 export function destroyCache(isRefresh) {
-    removeCache() //userCache
+  removeCache() //userCache
 }
 
 /**
@@ -15,5 +15,5 @@ export function destroyCache(isRefresh) {
  * @return {[type]}            [description]
  */
 export function destroyResult(isRefresh) {
-    removeResults() //json database
+  removeResults() //json database
 }

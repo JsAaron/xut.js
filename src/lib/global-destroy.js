@@ -1,38 +1,14 @@
-import {
-  sceneController
-} from './scenario/scene-control'
-import {
-  clearAudio
-} from './component/audio/manager'
-import {
-  clearVideo
-} from './component/video/manager'
-import {
-  stopColumnDetection
-} from './component/column/detect'
-import {
-  destroyFixAudio
-} from './component/audio/fix'
-import {
-  destroyCache,
-  destroyResult
-} from './database/destroy'
-import {
-  config,
-  destroyConfig
-} from './config/index'
-import {
-  $$resetUUID
-} from './util/stroage'
-import {
-  offAndroid
-} from './initialize/depend/button'
-import {
-  cleanCursor
-} from './initialize/depend/cursor'
-import {
-  cleanDefalut
-} from './initialize/depend/default'
+import { sceneController } from './scenario/scene-control'
+import { clearAudio } from './component/audio/manager'
+import { clearVideo } from './component/video/manager'
+import { stopColumnDetection } from './component/column/detect'
+import { destroyFixAudio } from './component/audio/fix'
+import { destroyCache, destroyResult } from './database/destroy'
+import { config, destroyConfig } from './config/index'
+import { $$resetUUID } from './util/stroage'
+import { offAndroid } from './initialize/depend/button'
+import { cleanCursor } from './initialize/depend/cursor'
+import { cleanDefalut } from './initialize/depend/default'
 
 /**
  * 销毁接口
@@ -50,20 +26,20 @@ export default function Destroy(action = 'exit') {
   //销毁只创建一次的对象
   //修复的音频对象
   //数据的结果集
-  if (action === 'destory') {
+  if(action === 'destory') {
     //修复的音频对象
     destroyFixAudio()
   }
 
   // refresh状态不删除结果集
   // 只处理destory与exit状态
-  if (action === 'destory' || action === 'exit') {
+  if(action === 'destory' || action === 'exit') {
     //删除结果集
     destroyResult()
 
     //删除流式布局的数据
     let $flowNode = $("#xut-stream-flow")
-    if ($flowNode.length) {
+    if($flowNode.length) {
       $flowNode.remove()
       $flowNode = null
     }
@@ -108,7 +84,7 @@ export default function Destroy(action = 'exit') {
   //删除动态加载的两个css文件
   $('link[data-type]').each(function(index, link) {
     let type = link.getAttribute('data-type')
-    if (type === 'svgsheet' || type === 'xxtflow') {
+    if(type === 'svgsheet' || type === 'xxtflow') {
       link.parentNode.removeChild(link)
     }
   })

@@ -35,7 +35,8 @@ export default {
    * touchEnd 全局派发的点击事件
    * 如果stopGlobalEvent == ture 事件由全局派发
    */
-  , trigger(data) {
+  ,
+  trigger(data) {
     Action(data)
   }
 }

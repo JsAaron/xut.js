@@ -5,15 +5,15 @@
  * @return {[type]} [description]
  */
 const allowNext = () => {
-    if (window.MMXCONFIG) {
-        return () => {
-            return !(window.MMXCONFIG.back || Xut.Application.IsBackStage())
-        }
-    } else {
-        return () => {
-            return !false
-        }
+  if(window.MMXCONFIG) {
+    return() => {
+      return !(window.MMXCONFIG.back || Xut.Application.IsBackStage())
     }
+  } else {
+    return() => {
+      return !false
+    }
+  }
 }
 
 export default allowNext()

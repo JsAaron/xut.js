@@ -16,7 +16,7 @@ const defaultWidgetPath = "content/widget/"
  * @type {String}
  */
 export const getSourcePath = function() {
-  if (config.launch) {
+  if(config.launch) {
     return config.launch.resource + '/gallery/'
   } else {
     return defaultSourcePath
@@ -29,7 +29,7 @@ export const getSourcePath = function() {
  * @return {[type]}          [description]
  */
 export const getWidgetPath = function() {
-  if (config.launch) {
+  if(config.launch) {
     return config.launch.resource + '/widget/'
   } else {
     return defaultWidgetPath

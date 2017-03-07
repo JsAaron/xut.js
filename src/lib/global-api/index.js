@@ -27,27 +27,27 @@ import { initApplication } from './application'
 import { initExtend } from './extend'
 
 const assignInit = interName => {
-    if(!Xut[interName]) {
-        Xut[interName] = {}
-    }
+  if(!Xut[interName]) {
+    Xut[interName] = {}
+  }
 }
 
 export function initGlobalAPI() {
 
-    //初始化接口
-    assignInit('U3d')
-    assignInit('View')
-    assignInit('Assist')
-    assignInit('Contents')
-    assignInit('Application')
-    assignInit('Presentation')
+  //初始化接口
+  assignInit('U3d')
+  assignInit('View')
+  assignInit('Assist')
+  assignInit('Contents')
+  assignInit('Application')
+  assignInit('Presentation')
 
-    //脚本接口
-    window.XXTAPI = {}
+  //脚本接口
+  window.XXTAPI = {}
 
-    initExtend()
-    initAsset()
-    initView()
-    initContents()
-    initApplication()
+  initExtend()
+  initAsset()
+  initView()
+  initContents()
+  initApplication()
 }

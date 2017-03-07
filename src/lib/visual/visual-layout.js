@@ -11,123 +11,123 @@ const CEIL = Math.ceil
  */
 export function getVisualLayout(config, fullProportion, setVisualMode, noModifyValue) {
 
-    let screenWidth = config.screenSize.width
-    let screenHeight = config.screenSize.height
+  let screenWidth = config.screenSize.width
+  let screenHeight = config.screenSize.height
 
-    let newWidth = screenWidth
-    let newHeight = screenHeight
-    let newTop = 0
-    let newLeft = 0
+  let newWidth = screenWidth
+  let newHeight = screenHeight
+  let newTop = 0
+  let newLeft = 0
 
-    if(!setVisualMode) {
-        $$warn('getVisualLayout没有提供setVisualMode')
+  if(!setVisualMode) {
+    $$warn('getVisualLayout没有提供setVisualMode')
+  }
+
+  /**
+   * 模式2：
+   * 宽度100%，正比缩放高度
+   */
+  if(setVisualMode === 2) {
+
+    //竖版PPT
+    if(config.pptVertical) {
+      //竖版显示：正常
+      if(config.screenVertical) {
+        newHeight = fullProportion.pptHeight * fullProportion.width
+        newTop = (screenHeight - newHeight) / 2
+      }
+      //横版显示：反向
+      if(config.screenHorizontal) {
+        newWidth = fullProportion.pptWidth * fullProportion.height
+        newLeft = (screenWidth - newWidth) / 2
+      }
     }
 
-    /**
-     * 模式2：
-     * 宽度100%，正比缩放高度
-     */
-    if(setVisualMode === 2) {
-
-        //竖版PPT
-        if(config.pptVertical) {
-            //竖版显示：正常
-            if(config.screenVertical) {
-                newHeight = fullProportion.pptHeight * fullProportion.width
-                newTop = (screenHeight - newHeight) / 2
-            }
-            //横版显示：反向
-            if(config.screenHorizontal) {
-                newWidth = fullProportion.pptWidth * fullProportion.height
-                newLeft = (screenWidth - newWidth) / 2
-            }
-        }
-
-        //横版PPT
-        if(config.pptHorizontal) {
-            //横版显示：正常
-            if(config.screenHorizontal) {
-                newHeight = fullProportion.pptHeight * fullProportion.width
-                newTop = (screenHeight - newHeight) / 2
-            }
-            //竖版显示：反向
-            if(config.screenVertical) {
-                newHeight = fullProportion.pptHeight * fullProportion.width
-                newTop = (screenHeight - newHeight) / 2
-            }
-        }
-
-        //保证模式2高度不能溢出分辨率最大距离
-        if(newHeight > screenHeight) {
-            newHeight = screenHeight
-            newTop = 0
-        }
+    //横版PPT
+    if(config.pptHorizontal) {
+      //横版显示：正常
+      if(config.screenHorizontal) {
+        newHeight = fullProportion.pptHeight * fullProportion.width
+        newTop = (screenHeight - newHeight) / 2
+      }
+      //竖版显示：反向
+      if(config.screenVertical) {
+        newHeight = fullProportion.pptHeight * fullProportion.width
+        newTop = (screenHeight - newHeight) / 2
+      }
     }
 
-    /**
-     * 模式3：
-     * 高度100%,宽度溢出可视区隐藏
-     */
-    if(setVisualMode === 3) {
+    //保证模式2高度不能溢出分辨率最大距离
+    if(newHeight > screenHeight) {
+      newHeight = screenHeight
+      newTop = 0
+    }
+  }
 
-        //竖版：PPT
-        if(config.pptVertical) {
-            //竖版显示：正常
-            if(config.screenVertical) {
-                //宽度溢出的情况
-                newWidth = fullProportion.pptWidth * fullProportion.height
-                newLeft = (screenWidth - newWidth) / 2
+  /**
+   * 模式3：
+   * 高度100%,宽度溢出可视区隐藏
+   */
+  if(setVisualMode === 3) {
 
-                //宽度没办法溢出
-                //要强制宽度100%
-                if(newWidth < screenWidth) {
-                    newWidth = screenWidth
-                    newLeft = 0
-                }
-            }
-            //横版显示：反向
-            if(config.screenHorizontal) {
-                newWidth = fullProportion.pptWidth * fullProportion.height
-                newLeft = (screenWidth - newWidth) / 2
-            }
+    //竖版：PPT
+    if(config.pptVertical) {
+      //竖版显示：正常
+      if(config.screenVertical) {
+        //宽度溢出的情况
+        newWidth = fullProportion.pptWidth * fullProportion.height
+        newLeft = (screenWidth - newWidth) / 2
+
+        //宽度没办法溢出
+        //要强制宽度100%
+        if(newWidth < screenWidth) {
+          newWidth = screenWidth
+          newLeft = 0
         }
-
-        //横版：PPT
-        if(config.pptHorizontal) {
-
-            //横版显示:正常
-            if(config.screenHorizontal) {
-                newWidth = fullProportion.pptWidth * fullProportion.height
-                newLeft = (screenWidth - newWidth) / 2
-
-                //宽度没办法溢出
-                //要强制宽度100%
-                if(!noModifyValue && newWidth < screenWidth) {
-                    newWidth = screenWidth
-                    newLeft = 0
-                }
-            }
-
-            //竖版显示：反向
-            if(config.screenVertical) {
-                newHeight = fullProportion.pptHeight * fullProportion.width
-                newTop = (screenHeight - newHeight) / 2
-            }
-        }
-
+      }
+      //横版显示：反向
+      if(config.screenHorizontal) {
+        newWidth = fullProportion.pptWidth * fullProportion.height
+        newLeft = (screenWidth - newWidth) / 2
+      }
     }
 
+    //横版：PPT
+    if(config.pptHorizontal) {
 
-    /**
-     * 模式2.3.4
-     * config.visualMode === 1
-     * @return {[type]}
-     */
-    return {
-        width: CEIL(newWidth),
-        height: CEIL(newHeight),
-        left: CEIL(newLeft),
-        top: CEIL(newTop)
+      //横版显示:正常
+      if(config.screenHorizontal) {
+        newWidth = fullProportion.pptWidth * fullProportion.height
+        newLeft = (screenWidth - newWidth) / 2
+
+        //宽度没办法溢出
+        //要强制宽度100%
+        if(!noModifyValue && newWidth < screenWidth) {
+          newWidth = screenWidth
+          newLeft = 0
+        }
+      }
+
+      //竖版显示：反向
+      if(config.screenVertical) {
+        newHeight = fullProportion.pptHeight * fullProportion.width
+        newTop = (screenHeight - newHeight) / 2
+      }
     }
+
+  }
+
+
+  /**
+   * 模式2.3.4
+   * config.visualMode === 1
+   * @return {[type]}
+   */
+  return {
+    width: CEIL(newWidth),
+    height: CEIL(newHeight),
+    left: CEIL(newLeft),
+    top: CEIL(newTop)
+  }
 
 }

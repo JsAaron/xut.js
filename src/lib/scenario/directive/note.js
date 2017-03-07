@@ -40,7 +40,8 @@ export default {
    * touchEnd 全局派发的点击事件
    * 如果stopGlobalEvent == ture 事件由全局派发
    */
-  , trigger(options) {
+  ,
+  trigger(options) {
     options.data = Xut.Presentation.GetPageData(options.pageIndex);
     new ShowNoteClass(options)
   }
@@ -50,7 +51,8 @@ export default {
    * @param  {[type]} opts [description]
    * @return {[type]}      [description]
    */
-  , autoPlay() {}
+  ,
+  autoPlay() {}
 
   /**
    * 销毁页面hotspot事件与Action或widget事件
@@ -59,7 +61,8 @@ export default {
    * @param  {[type]} rootEle      [根元素]
    * @return {[type]}              [description]
    */
-  , destroy(opts) {
+  ,
+  destroy(opts) {
     this && this.destroy();
   }
 
