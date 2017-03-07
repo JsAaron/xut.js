@@ -1,30 +1,17 @@
-import {
-  config
-} from '../config/index'
-import {
-  plugVideo,
-  html5Video
-} from './depend/video'
+import { config } from '../config/index'
+import { plugVideo, html5Video } from './depend/video'
 import baseConfig from './base'
-import {
-  bindAndroid
-} from './depend/button'
+import { bindAndroid } from './depend/button'
 import loadScene from './scenario'
-
 import {
   $$set,
   $$get,
   parseJSON
-}
-from '../util/index'
+} from '../util/index'
 
+const getCache = name => $$get(name)
 
-const getCache = (name) => $$get(name)
-
-/**
- * 进入主页面
- */
-const initMain = (novelData) => {
+const initMain = novelData => {
 
   /**
    * IBOOS模式

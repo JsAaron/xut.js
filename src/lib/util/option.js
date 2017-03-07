@@ -1,19 +1,10 @@
-import {
-  loadFile
-} from './loader'
-import {
-  $$warn
-} from './debug'
-import {
-  parseJSON
-} from './lang'
-import {
-  config,
-  resetVisualProportion
-} from '../config/index'
+import { loadFile } from './loader'
+import { $$warn } from './debug'
+import { parseJSON } from './lang'
+import { config, resetVisualProportion } from '../config/index'
+
 const CEIL = Math.ceil
 const FLOOR = Math.floor
-
 const slashRE = /\/$/
 
 /**

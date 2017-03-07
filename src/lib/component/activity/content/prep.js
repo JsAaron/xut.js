@@ -12,20 +12,14 @@ export default function pretreatment(data, eventName) {
     let category = data.contentDas.category
     let para = parameter[0];
 
-    if(para.animationName === 'EffectAppear' //出现动画
-      &&
-      data.domMode //并且只有dom模式才可以，canvas排除
-      &&
-      eventName === 'auto' //自动运行
-      &&
-      !para.videoId //没有音频
-      &&
-      !para.delay //没有延时
-      &&
-      category !== 'Sprite' //不是精灵
-      &&
-      category !== 'AutoCompSprite' //不是自动精灵
-      &&
+    //出现动画
+    if(para.animationName === 'EffectAppear' &&
+      data.domMode && //并且只有dom模式才可以，canvas排除
+      eventName === 'auto' && //自动运行
+      !para.videoId && //没有音频
+      !para.delay && //没有延时
+      category !== 'Sprite' && //不是精灵
+      category !== 'AutoCompSprite' && //不是自动精灵
       !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
 
       //针对预处理动作,并且没有卷滚的不注册，满足是静态动画，true是显示,false隐藏

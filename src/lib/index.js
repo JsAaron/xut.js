@@ -60,9 +60,7 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
   //安卓设备上,对横竖切换的处理反映很慢
   //所以这里需要延时加载获取设备新的分辨率
   //2016.11.8
-  let delay = function(fn) {
-    setTimeout(fn, 500)
-  }
+  const delay = fn => setTimeout(fn, 500)
 
   //如果启动了这个模式
   if(config.orientateMode) {
@@ -101,7 +99,7 @@ Xut.Application.Launch = option => {
     cacheOptions = [option] //多次切换
     config.launch = $.extend(true, {}, option)
     if(option.path) {
-      _.each(option.path, function(value, key) {
+      _.each(option.path, (value, key) => {
         config.launch[key] = key === 'resource' ? slashPostfix(value) : value
       })
       delete config.launch.path
