@@ -8,16 +8,10 @@
  */
 import { config } from '../../config/index'
 import { removeVideo } from './manager'
-import {
-  supportVideo,
-  supportFlash
-} from './support'
+import { supportVideo, supportFlash } from './support'
 
 const pixelRatio = window.devicePixelRatio
 const resolution = window.screen
-
-let VideoPlayer = null
-
 
 /**
  * 获取容器
@@ -47,7 +41,7 @@ const _WebPage = options => {
   if(options.hyperlink == 2) {
     //跳转到app市场
     window.open(pageUrl)
-    //数据统计
+      //数据统计
     $.get('http://www.appcarrier.cn/index.php/adplugin/recordads?aid=16&esbId=ios')
   } else {
 
@@ -108,31 +102,30 @@ const _WebPage = options => {
  * @return {[type]}         [description]
  */
 const webView = options => {
-  var width = options.width,
-    height = options.height,
-    pageUrl = options.pageUrl,
-    left = options.left,
-    top = options.top;
 
-  function play() {
+  const { width, height, pageUrl, left, top } = options
+
+  const play = () => {
     //打开一个网页的时候，需要关闭其他已经打开过的网页
     Xut.Plugin.WebView.close();
     Xut.openWebView = false;
-    setTimeout(function() {
+    setTimeout(() => {
       Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
       Xut.openWebView = true;
     }, 500);
   }
 
+  const close = () => {
+    Xut.Plugin.WebView.close();
+    Xut.openWebView = false;
+  }
+
   play()
 
   return {
-    play: play,
-    stop: close,
-    close() {
-      Xut.Plugin.WebView.close();
-      Xut.openWebView = false;
-    }
+    play,
+    close,
+    stop: close
   }
 }
 
@@ -148,13 +141,11 @@ const _Media = options => {
   let height
   let left
   let top
-  let url
 
   //如果是读库或者妙妙学
-  url = (window.MMXCONFIG || window.DUKUCONFIG) ? options.url
+  let url = (window.MMXCONFIG || window.DUKUCONFIG) ? options.url
     //如果是纯apk模式
-    :
-    options.url.substring(0, options.url.lastIndexOf('.'))
+    : options.url.substring(0, options.url.lastIndexOf('.'))
 
   //如果是安卓平台，视频插件去的分辨率
   //所以这里要把 可以区尺寸，转成分辨率
@@ -173,51 +164,38 @@ const _Media = options => {
     top = options.top * pixelRatio || 0
   }
 
-
-  let play = () => {
-    Xut.Plugin.VideoPlayer.play(() => {
-      //成功回调
-    }, () => {
-      //失败回调
-    }, config.getVideoPath() + url, 1, left, top, height, width);
+  const play = () => {
+    Xut.Plugin.VideoPlayer.play(() => {}, () => {}, config.getVideoPath() + url, 1, left, top, height, width);
   }
 
-  let close = () => {
+  const close = () => {
     Xut.Plugin.VideoPlayer.close();
   }
 
   play()
 
   return {
-    play: play,
-    stop: close,
-    close: close
+    play,
+    close,
+    stop: close
   }
 }
 
 /**
  * 创建视频容器
  */
-const createVideoWrap = function({
-  type,
-  width,
-  height,
-  zIndex,
-  top,
-  left
-}) {
-  let wrap =
+const createVideoWrap = (type, options) => {
+  const { width, height, zIndex, top, left } = options
+  return $(String.styleFormat(
     `<div data-type="${type}"
-              style="width:${width}px;
-                     height:${height}px;
-                     position:absolute;
-                     visibility:hidden;
-                     z-index:${zIndex};
-                     top:${top}px;
-                     left:${left}px;">
-         </div>`
-
-  return $(String.styleFormat(wrap))
+          style="width:${width}px;
+                 height:${height}px;
+                 position:absolute;
+                 visibility:hidden;
+                 z-index:${zIndex};
+                 top:${top}px;
+                 left:${left}px;">
+     </div>`))
 }
 
 /**
@@ -232,19 +210,18 @@ const createVideoWrap = function({
  */
 const _Video5 = options => {
 
+  let { width, height, top, left, zIndex } = options
   let container = getContainer(options.container)
   let url = config.getVideoPath() + options.url
-  let width = options.width
-  let height = options.height
 
-  let $videoWrap = createVideoWrap({
-    type: 'video-h5',
+  let $videoWrap = createVideoWrap('video-h5', {
     width,
     height,
-    top: options.top,
-    left: options.left,
-    zIndex: options.zIndex
+    top,
+    left,
+    zIndex
   })
+
   let video = document.createElement('video')
   let $videoNode = $(video).css({
     width: width,
@@ -281,7 +258,7 @@ const _Video5 = options => {
    */
   function stop() {
     video.pause()
-    //妙妙学只需要停止
+      //妙妙学只需要停止
     if(!window.MMXCONFIG) {
       //复位视频
       if(video.duration) {
@@ -320,7 +297,6 @@ const _Video5 = options => {
     video.removeEventListener('ended', clear, false)
     video.removeEventListener('error', error, false)
     video.removeEventListener('canplay', start, false)
-    video.removeEventListener('webkitendfullscreen', stop, false)
     $videoWrap.remove()
     $videoNode = null
     $videoWrap = null
@@ -330,7 +306,6 @@ const _Video5 = options => {
   video.addEventListener('ended', clear, false)
   video.addEventListener('error', error, false)
   video.addEventListener('canplay', start, false)
-  video.addEventListener('webkitendfullscreen', stop, false)
 
   //////////////////////////
   ///2016.6.23
@@ -359,16 +334,14 @@ const _Video5 = options => {
 const _FlareVideo = function(options) {
   let container = getContainer(options.container)
   let url = config.getVideoPath() + options.url
-  let width = options.width
-  let height = options.height
+  let { width, height, top, left, zIndex } = options
 
-  let $videoWrap = createVideoWrap({
-    type: 'video-flare',
+  let $videoWrap = createVideoWrap('video-flare', {
     width,
     height,
-    top: options.top,
-    left: options.left,
-    zIndex: options.zIndex
+    top,
+    left,
+    zIndex
   })
 
   let fv = $videoWrap.flareVideo({
@@ -398,6 +371,7 @@ const _FlareVideo = function(options) {
   }
 }
 
+let VideoPlayer = null
 
 //浏览器平台
 if(Xut.plat.isBrowser) {
@@ -432,7 +406,6 @@ if(Xut.plat.isBrowser) {
     }
   }
 }
-
 
 class VideoClass {
 
