@@ -422,7 +422,7 @@ export function contentStructure(callback, data, context) {
         results: wrapObj.data,
         getStyle: getStyle,
         proportion: getStyle.pageProportion,
-        proportionMode: allotRatio(content.fixRadio, headerFooterMode[contentId])
+        zoomMode: allotRatio(content.fixRadio, headerFooterMode[contentId])
       })
 
       //如果是隐藏的页面页脚，重写这个标记

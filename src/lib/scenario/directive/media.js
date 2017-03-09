@@ -1,18 +1,7 @@
-import {
-  parseJSON
-} from '../../util/index'
-import {
-  config
-} from '../../config/index'
-import {
-  triggerAudio,
-  autoAudio
-} from '../../component/audio/manager'
-import {
-  triggerVideo,
-  autoVideo,
-  hasVideoObj
-} from '../../component/video/manager'
+import { parseJSON } from '../../util/index'
+import { config } from '../../config/index'
+import { triggerAudio, autoAudio } from '../../component/audio/manager'
+import { triggerVideo, autoVideo, hasVideoObj } from '../../component/video/manager'
 
 //临时音频动作数据
 const tempData = {}
@@ -142,7 +131,7 @@ export default {
     if(category == 'audio') {
       autoAudio(chapterId, id, onlyCreateOnce(id));
     } else {
-      autoVideo(chapterId, id, rootNode);
+      autoVideo(chapterId, id, rootNode, pageIndex)
     }
   }
 
@@ -161,13 +150,13 @@ export default {
   }) {
     const category = target.getAttribute('data-delegate')
     if(category) {
-      const chapterId = Xut.Presentation.GetPageId(pageIndex);
       /**
        * 传入chapterId 页面ID
        * activityId    视频ID
        * eleName       节点名  //切换控制
        * 根节点
        */
+      const chapterId = Xut.Presentation.GetPageId(pageIndex);
       if(category == 'audio') {
         triggerAudio(chapterId, activityId, onlyCreateOnce(id))
       } else {
@@ -175,7 +164,7 @@ export default {
         if(videoObj) {
           videoObj.play()
         } else {
-          triggerVideo(chapterId, activityId, rootNode)
+          triggerVideo(chapterId, activityId, rootNode, pageIndex)
         }
       }
     }

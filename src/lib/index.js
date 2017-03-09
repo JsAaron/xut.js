@@ -11,7 +11,7 @@ import init from './initialize/index'
 //全局API初始化
 initGlobalAPI()
 
-Xut.Version = 879.9
+Xut.Version = 880
 
 /**
  * 加载应用app

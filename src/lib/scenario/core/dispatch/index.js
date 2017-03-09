@@ -10,16 +10,13 @@ import { config } from '../../../config/index'
 import PageMgr from '../manage/page'
 import MasterMgr from '../manage/master'
 import goToPage from './topage'
+import Stack from '../../../util/stack'
+
 import { sceneController } from '../../scene-control'
 import { getVisualDistance } from '../../../visual/visual-distance'
 import { setVisualStyle } from '../../../visual/visual-style'
-import Stack from '../../../util/stack'
-import {
-  $$set,
-  hash,
-  $$warn
-} from '../../../util/index'
-
+import { setVisualMode } from './set-mode'
+import { $$set, hash, $$warn } from '../../../util/index'
 
 import {
   initPointer,
@@ -30,9 +27,6 @@ import {
   hasMaster
 } from './depend'
 
-import {
-  setVisualMode
-} from './set-mode'
 
 
 export default class Dispatcher {
@@ -58,8 +52,8 @@ export default class Dispatcher {
    */
   initCreate() {
     let options = this.options
-    //createPointer
-    //initPointer
+      //createPointer
+      //initPointer
     let pointer = initPointer(options.initIndex, options.pageTotal, options.multiplePages)
     this.pagePointer = pointer.initPointer
     this.createPageBases(pointer.createPointer, options.initIndex, 'init')

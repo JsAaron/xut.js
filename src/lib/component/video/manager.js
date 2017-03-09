@@ -15,7 +15,6 @@ let initBox = () => {
 
 initBox()
 
-
 /**
  * 配置视频结构
  * @param  {[type]} data       [description]
@@ -23,11 +22,12 @@ initBox()
  * @param  {[type]} activityId [description]
  * @return {[type]}            [description]
  */
-let deployVideo = (data, pageId, activityId) => {
+const deployVideo = (data, pageId, activityId, pageIndex) => {
 
-  let proportion = config.proportion
-
-  let layerSize = setProportion({
+  const getStyle = Xut.Presentation.GetPageStyle(pageIndex)
+  const layerSize = setProportion({
+    getStyle: getStyle,
+    proportion: getStyle.pageProportion,
     width: data.width || config.visualSize.width,
     height: data.height || config.visualSize.height,
     left: data.left,
@@ -35,21 +35,16 @@ let deployVideo = (data, pageId, activityId) => {
     padding: data.padding
   })
 
-  let videoInfo = {
+  const videoInfo = _.extend(layerSize, {
     'pageId': pageId,
     'videoId': activityId,
     'url': data.md5,
     'pageUrl': data.url,
-    'left': layerSize.left,
-    'top': layerSize.top,
-    'width': layerSize.width,
-    'height': layerSize.height,
-    'padding': layerSize.padding,
     'zIndex': data.zIndex || 2147483647,
     'background': data.background,
     'category': data.category,
     'hyperlink': data.hyperlink
-  };
+  })
 
   if(!_.isObject(pageBox[pageId])) {
     pageBox[pageId] = {};
@@ -58,16 +53,13 @@ let deployVideo = (data, pageId, activityId) => {
   pageBox[pageId][activityId] = videoInfo;
 }
 
-
-
-
 /**
  * 检测数据是否存在
  * @param  {[type]} pageId     [description]
  * @param  {[type]} activityId [description]
  * @return {[type]}            [description]
  */
-let checkRepeat = (pageId, activityId) => {
+const checkRepeat = (pageId, activityId) => {
   var chapterData = pageBox[pageId];
   //如果能在pageBox找到对应的数据
   if(chapterData && chapterData[activityId]) {
@@ -76,22 +68,18 @@ let checkRepeat = (pageId, activityId) => {
   return false;
 }
 
-
-
 //处理重复数据
 // 1:pageBox能找到对应的 videoId
 // 2:重新查询数据
-let parseVideo = (pageId, activityId) => {
+const parseVideo = (pageId, activityId, pageIndex) => {
   //复重
   if(checkRepeat(pageId, activityId)) {
     return
   }
   //新的查询
   let data = Xut.data.query('Video', activityId)
-  deployVideo(data, pageId, activityId)
+  deployVideo(data, pageId, activityId, pageIndex)
 }
-
-
 
 /**
  * 加载视频
@@ -100,7 +88,7 @@ let parseVideo = (pageId, activityId) => {
  * @param  {[type]} container  [description]
  * @return {[type]}            [description]
  */
-let loadVideo = (pageId, activityId, container) => {
+const loadVideo = (pageId, activityId, container) => {
   let data = pageBox[pageId][activityId]
 
   //search video cache
@@ -117,7 +105,6 @@ let loadVideo = (pageId, activityId, container) => {
   }
 }
 
-
 /**
  * 触发视频
  * @param  {[type]} pageId     [description]
@@ -125,9 +112,9 @@ let loadVideo = (pageId, activityId, container) => {
  * @param  {[type]} container  [description]
  * @return {[type]}            [description]
  */
-let initVideo = (pageId, activityId, container) => {
+const initVideo = (pageId, activityId, container, pageIndex) => {
   //解析数据
-  parseVideo(pageId, activityId);
+  parseVideo(pageId, activityId, pageIndex);
   //调用播放
   loadVideo(pageId, activityId, container);
 }
@@ -150,20 +137,17 @@ export function hasVideoObj(pageId, activityId) {
  * @param  {[type]} container  [description]
  * @return {[type]}            [description]
  */
-export function autoVideo(pageId, activityId, container) {
-  initVideo(pageId, activityId, container)
+export function autoVideo(...arg) {
+  initVideo(...arg)
 }
 
 
 /**
  * 手动播放
- * @param  {[type]} pageId     [description]
- * @param  {[type]} activityId [description]
- * @param  {[type]} container  [description]
- * @return {[type]}            [description]
+ * pageId, activityId, container,pageIndex
  */
-export function triggerVideo(pageId, activityId, container) {
-  initVideo(pageId, activityId, container)
+export function triggerVideo(...arg) {
+  initVideo(...arg)
 }
 
 

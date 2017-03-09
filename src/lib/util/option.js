@@ -154,19 +154,19 @@ const converProportion = function({
   top,
   padding,
   proportion,
-  proportionMode, //缩放比模式
+  zoomMode, //缩放比模式
   getStyle
 }) {
 
   if(!proportion) {
-    $$warn('没有传递缩放比')
+    $$warn('没有传递缩放比,取全局config')
     proportion = config.proportion
   }
 
   //页眉，保持横纵比
   //计算顶部显示中线位置
   //如果溢出就溢出，高度设置为白边中线
-  if(proportionMode === 1) {
+  if(zoomMode === 1) {
     let visualTop = getStyle.visualTop
     let proportionalHeight = CEIL(height * proportion.width) || 0;
     return {
@@ -182,7 +182,7 @@ const converProportion = function({
   //页脚，保持横纵比
   //计算底部显示中线位置
   //如果溢出就隐藏，高度设置为白边中线
-  else if(proportionMode === 2) {
+  else if(zoomMode === 2) {
     let visualTop = getStyle.visualTop
     let proportionalHeight = CEIL(height * proportion.width) || 0;
     return {
@@ -195,7 +195,7 @@ const converProportion = function({
     }
   }
   //图片正比缩放，而且保持上下居中
-  else if(proportionMode === 3) {
+  else if(zoomMode === 3) {
     //高度为基本比值
     if(proportion.width > proportion.height) {
       let originalWidth = CEIL(width * proportion.width) || 0
@@ -250,14 +250,14 @@ export function setProportion(...arg) {
 export function reviseSize({
   results,
   proportion,
-  proportionMode,
+  zoomMode,
   getStyle
 }) {
 
   //不同设备下缩放比计算
   let layerSize = converProportion({
     proportion,
-    proportionMode,
+    zoomMode,
     getStyle,
     width: results.width,
     height: results.height,
@@ -268,7 +268,7 @@ export function reviseSize({
   //新的背景图尺寸
   let backSize = converProportion({
     proportion,
-    proportionMode,
+    zoomMode,
     getStyle,
     width: results.backwidth,
     height: results.backheight,

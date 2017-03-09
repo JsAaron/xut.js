@@ -210,9 +210,9 @@ const createVideoWrap = (type, options) => {
  */
 const _Video5 = options => {
 
-  let { width, height, top, left, zIndex } = options
+  let { width, height, top, left, zIndex, url } = options
   let container = getContainer(options.container)
-  let url = config.getVideoPath() + options.url
+  let src = config.getVideoPath() + url
 
   let $videoWrap = createVideoWrap('video-h5', {
     width,
@@ -223,11 +223,8 @@ const _Video5 = options => {
   })
 
   let video = document.createElement('video')
-  let $videoNode = $(video).css({
-    width: width,
-    height: height
-  }).attr({
-    'src': url,
+  let $videoNode = $(video).css({ width, height }).attr({
+    src,
     'controls': 'controls',
     'autoplay': 'autoplay'
   })
@@ -315,6 +312,7 @@ const _Video5 = options => {
   if(Xut.plat.isIOS || Xut.plat.isAndroid) {
     play()
   }
+
 
   container.append($videoWrap);
 

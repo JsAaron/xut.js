@@ -4,42 +4,16 @@
  *      结构合并创建类    Structure
  *      行为动画绑定类     Content
  * ***************************************************/
-import {
-  config
-} from '../../../../config/index'
-import {
-  contentStructure
-} from './dom/index'
-import {
-  LetterEffect
-} from '../../../../component/activity/content/letter-effect'
-import {
-  Zoom
-} from '../../../../plugin/extend/zoom/index'
-import {
-  contentParser,
-  activityParser
-} from './data'
-import {
-  createFloatMater,
-  createFloatPage
-} from './float'
-import {
-  sceneController
-} from '../../../../scenario/scene-control'
-
-import {
-  nextTick
-} from '../../../../util/nexttick'
-import {
-  $$on,
-  $$off
-} from '../../../../util/dom'
-import {
-  analysisImageName,
-  insertImageUrlSuffix
-} from '../../../../util/option'
-
+import { config } from '../../../../config/index'
+import { contentStructure } from './dom/index'
+import { LetterEffect } from '../../../../component/activity/content/letter-effect'
+import { Zoom } from '../../../../plugin/extend/zoom/index'
+import { contentParser, activityParser } from './data'
+import { createFloatMater, createFloatPage } from './float'
+import { sceneController } from '../../../../scenario/scene-control'
+import { nextTick } from '../../../../util/nexttick'
+import { $$on, $$off } from '../../../../util/dom'
+import { analysisImageName, insertImageUrlSuffix } from '../../../../util/option'
 import {
   createFn,
   toArray,
@@ -50,7 +24,6 @@ import {
 } from './depend'
 
 
-
 /**
  * content任务类
  */
@@ -58,10 +31,10 @@ export default class TaskContents {
 
   constructor(activityData) {
     _.extend(this, activityData)
-    //只解析content有关的activityData
+      //只解析content有关的activityData
     let compileActivitys = activityParser(activityData)
-    //如果有预执行动作
-    //Activity表数据存在
+      //如果有预执行动作
+      //Activity表数据存在
     if(compileActivitys) {
       //解析动画表数据结构
       activityData = contentParser(compileActivitys, activityData)
@@ -133,7 +106,7 @@ export default class TaskContents {
           Xut.Contents.contentsFragment[data.chapterId];
         }
         Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment
-        /* elist-enable */
+          /* elist-enable */
 
         //开始下一个任务
         this._dataStrCheck(data, userData);
@@ -358,7 +331,7 @@ export default class TaskContents {
             } else {
               let hqSrc
               let analysisName = analysisImageName(src)
-              //如果启动了高清图片
+                //如果启动了高清图片
               if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
                 hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
               }
