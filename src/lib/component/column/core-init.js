@@ -1,27 +1,8 @@
-import {
-  config,
-  resetVisualLayout
-} from '../../config/index'
-import {
-  defAccess,
-  nextTick,
-  $$warn,
-  loadStyle
-} from '../../util/index'
-import {
-  getResults,
-  removeColumnData
-} from '../../database/result'
-
-//分栏探测
-import {
-  startColumnDetect,
-  simulateCount,
-  debug
-} from './detect'
-import {
-  setCache
-} from './depend'
+import { config, resetVisualLayout } from '../../config/index'
+import { defAccess, nextTick, $$warn, loadStyle } from '../../util/index'
+import { getResults, removeColumnData } from '../../database/result'
+import { startColumnDetect, simulateCount, debug } from './detect'
+import { setCache } from './depend'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap

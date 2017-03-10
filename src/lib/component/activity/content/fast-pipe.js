@@ -1,11 +1,5 @@
-import {
-  makeJsonPack
-} from '../../../util/lang'
-
-import {
-  simpleEvent
-} from '../event/bind/simple'
-
+import { makeJsonPack } from '../../../util/lang'
+import { simpleEvent } from '../event/bind/simple'
 
 
 /**
@@ -13,7 +7,7 @@ import {
  * 1 动画直接显示与隐藏设置
  * 2 动画脚本与处理（跳转）
  */
-export default function FastPipe(options, base) {
+export default function FastPipe(data, base) {
   let {
     id,
     canvasMode,
@@ -21,7 +15,7 @@ export default function FastPipe(options, base) {
     prepTag, //标签形式，通过a标签处理
     prepVisible, //预显示动画
     prepScript //预跳转脚本
-  } = options
+  } = data
 
   /////////////////////////////
   ///如果是被预处理截断，跳过动画创建
@@ -90,7 +84,7 @@ export default function FastPipe(options, base) {
   const setPrepVisible = () => {
     //创建的无行为content
     const partContentRelated = base.relatedData.partContentRelated
-    //针对空跳过处理
+      //针对空跳过处理
     if(partContentRelated && partContentRelated.length && (-1 !== partContentRelated.indexOf(id))) {} else {
       if(canvasMode) {
         console.log('canvsa prepVisible')
@@ -109,16 +103,11 @@ export default function FastPipe(options, base) {
   }
 
 
-  return {
-    fastpipe: true, //特殊标记，用于外部过滤
+  return _.extend(data, {
 
     init() {
       //预显示跳过动画创建
-      if(prepVisible) {
-        $contentNode.css({
-          'visibility': prepVisible
-        })
-      }
+      prepVisible && $contentNode.css({ 'visibility': prepVisible })
     },
 
     play(callback) {
@@ -151,8 +140,10 @@ export default function FastPipe(options, base) {
     },
 
     destroy() {
+      preCode = null
       $contentNode = null
       prepTag = null
     }
-  }
+  })
+
 }

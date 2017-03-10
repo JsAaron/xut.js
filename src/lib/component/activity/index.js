@@ -135,16 +135,10 @@ export default class Activity {
     const collectorHooks = this.relatedCallback.contentsHooks
     const pageType = this.pageType
 
-    this.eachAssistContents(function(scope) {
-
+    this.eachAssistContents(scope => {
       //针对必须创建
       const id = scope.id
-      const fastpipe = scope.fastpipe //这个是调用的fastpipe快速构造
       const $contentNode = scope.$contentNode
-      if(!$contentNode && !fastpipe) {
-        console.log('$contentNode不存在')
-        return
-      }
 
       //如果是视觉差对象，也需要实现收集器
       if(scope.processType === 'parallax') {
@@ -153,7 +147,7 @@ export default class Activity {
       }
 
       //初始化动画
-      scope.init(id, $contentNode, $containsNode, pageId, !fastpipe && scope.getParameter(), pageType);
+      scope.init(id, $contentNode, $containsNode, pageId, scope.getParameter(), pageType);
       this._toRepeatBind(id, $contentNode, scope, collectorHooks);
     });
 
@@ -251,7 +245,6 @@ export default class Activity {
     //但是svg如果没有内容除外
     if(contentDas.isScroll) {
       const hasSVG = $contentNode.find('svg')
-
       if(hasSVG) {
         //必须保证svg有数据
         if(hasSVG.text()) {
@@ -492,9 +485,7 @@ export default class Activity {
       drop.destroy();
     })
     this.eachAssistContents(function(scope) {
-      if(scope.destroy) {
-        scope.destroy();
-      }
+      scope.destroy && scope.destroy()
       elementCallback && elementCallback(scope)
     })
   }

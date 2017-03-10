@@ -1,27 +1,10 @@
-import {
-  config,
-  resetVisualLayout
-} from '../../config/index'
-import {
-  translation
-} from '../../scenario/pagebase/move/translation'
-import {
-  getColumnCount
-} from './depend'
-import {
-  getVisualDistance
-} from '../../visual/visual-distance'
-import {
-  Zoom
-} from '../../plugin/extend/zoom/index'
-import {
-  closeButton
-} from '../../plugin/extend/close-button'
-import {
-  analysisImageName,
-  insertImageUrlSuffix
-} from '../../util/option'
-
+import { config, resetVisualLayout } from '../../config/index'
+import { translation } from '../../scenario/pagebase/move/translation'
+import { getColumnCount } from './depend'
+import { getVisualDistance } from '../../visual/visual-distance'
+import { Zoom } from '../../plugin/extend/zoom/index'
+import { closeButton } from '../../plugin/extend/close-button'
+import { analysisImageName, insertImageUrlSuffix } from '../../util/option'
 import Swipe from '../../swipe/index'
 import swipeHooks from '../../swipe/hook.js'
 

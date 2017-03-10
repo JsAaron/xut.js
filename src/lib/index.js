@@ -11,7 +11,7 @@ import init from './initialize/index'
 //全局API初始化
 initGlobalAPI()
 
-Xut.Version = 880
+Xut.Version = 880.1
 
 /**
  * 加载应用app
@@ -55,15 +55,12 @@ let cacheOptions
 /**
  * 横竖切换
  */
-Xut.plat.isBrowser && $(window).on('orientationchange', () => {
-
-  //安卓设备上,对横竖切换的处理反映很慢
-  //所以这里需要延时加载获取设备新的分辨率
-  //2016.11.8
-  const delay = fn => setTimeout(fn, 500)
-
-  //如果启动了这个模式
-  if(config.orientateMode) {
+const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function() {
+  $(window).on('orientationchange', () => {
+    //安卓设备上,对横竖切换的处理反映很慢
+    //所以这里需要延时加载获取设备新的分辨率
+    //2016.11.8
+    const delay = fn => setTimeout(fn, 500)
     let temp = cacheOptions
     Xut.Application.Refresh()
     if(temp && temp.length) {
@@ -76,8 +73,8 @@ Xut.plat.isBrowser && $(window).on('orientationchange', () => {
         loadApp()
       })
     }
-  }
-})
+  })
+} : function() {}
 
 
 /**
@@ -104,6 +101,7 @@ Xut.Application.Launch = option => {
       })
       delete config.launch.path
     }
+    bindOrientateMode()
     loadApp(option.el, option.cursor)
   }
 }
