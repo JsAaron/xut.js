@@ -1,4 +1,14 @@
-##Xut.js what is it?
+##What can a front-end developer do?
+Front-end can not only write pages, but also to do web applications, mobile, and even desktop programs
+#####I developed the platform
+* Web pages with shell: [miaomiaoxue](http://www.miaomiaoxue.com/)
+* Mobile software: [appone](http://www.appone.cn/)
+* Desktop tools: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
+* Mini magazine: [Only testing](http://www.docooldigest.com)
+* Support more platforms......
+
+
+##What is xut.js?
 This is a template program, used to batch production of app, using the front end of the technology to achieve the simulation of the original app effect. Through the combination of various modules, integrated into a customized app applications
 
 ##Preview
@@ -15,15 +25,6 @@ This is a template program, used to batch production of app, using the front end
 
 ##Notice
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
-
-##The front-end developer can do
-Front end not just write page, also can do the app, and even desktop client application
-#####My work
-* Web pages with shell: [miaomiaoxue](http://www.miaomiaoxue.com/)
-* Mobile software: [appone](http://www.appone.cn/)
-* Desktop tools: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
-* Mini magazine: [Only testing](http://www.docooldigest.com)
-* Support more platforms......
 
 
 ##The support of the Xut.js
