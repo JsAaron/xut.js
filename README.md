@@ -1,9 +1,9 @@
 ##What can a front-end developer do?
 Front-end can not only write pages, but also to do web applications, mobile, and even desktop programs
 #####I developed the platform
-* Web pages with shell: [miaomiaoxue](http://www.miaomiaoxue.com/)
-* Mobile software: [appone](http://www.appone.cn/)
-* Desktop tools: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
+* Web page and shell program: [miaomiaoxue](http://www.miaomiaoxue.com/)
+* Mobile application: [appone](http://www.appone.cn/)
+* Desktop program: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
 * Mini magazine: [Only testing](http://www.docooldigest.com)
 * Support more platforms......
 
