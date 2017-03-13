@@ -15,7 +15,7 @@ if(Xut.plat.isBrowser && !Xut.plat.hasAutoPlayAudio) {
 //横竖切换要判断
 let hasDefault = false
 
-export function initDefalut() {
+export function initGlobalEvent() {
   if(Xut.plat.isBrowser && !hasDefault) {
 
     hasDefault = true
@@ -40,7 +40,7 @@ export function initDefalut() {
 }
 
 
-export function cleanDefalut() {
+export function cleanGlobalEvent() {
   if(hasDefault) {
     $('body').off() //默认事件
     $(document).off() //左右按钮

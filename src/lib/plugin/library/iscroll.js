@@ -31,7 +31,8 @@
       return _vendor + style.charAt(0).toUpperCase() + style.substr(1);
     }
 
-    me.getTime = Date.now || function getTime() { return new Date().getTime(); };
+    me.getTime = Date.now || function getTime() {
+      return new Date().getTime(); };
 
     me.extend = function(target, obj) {
       for(var i in obj) {
@@ -200,8 +201,10 @@
           var f = 0.22,
             e = 0.4;
 
-          if(k === 0) { return 0; }
-          if(k == 1) { return 1; }
+          if(k === 0) {
+            return 0; }
+          if(k == 1) {
+            return 1; }
 
           return(e * Math.pow(2, -10 * k) * Math.sin((k - f / 4) * (2 * Math.PI) / f) + 1);
         }
@@ -976,8 +979,10 @@
 
       // TODO: check if we can use array.map (wide compatibility and performance issues)
       function _indicatorsMap(fn) {
-        for(var i = that.indicators.length; i--;) {
-          fn.call(that.indicators[i]);
+        if(that.indicators) {
+          for(var i = that.indicators.length; i--;) {
+            fn.call(that.indicators[i]);
+          }
         }
       }
 

@@ -4,33 +4,26 @@ import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { nextTick } from './util/nexttick'
 import { slashPostfix } from './util/option'
-import { initNode } from './initialize/depend/node'
-import { initDefalut } from './initialize/depend/default'
+import { initRootNode } from './initialize/depend/node'
+import { initGlobalEvent } from './initialize/depend/default'
 import init from './initialize/index'
 
 //全局API初始化
 initGlobalAPI()
 
-Xut.Version = 880.1
+Xut.Version = 880.2
 
 /**
  * 加载应用app
  * arg : el / cursor
  * @return {[type]} [description]
  */
-const loadApp = (...arg) => {
-  initDefalut()
-  let node = initNode(...arg)
-  Xut.Application.$$removeNode = () => {
-    node.$contentNode.remove()
-    node.$contentNode = null
-    node.$rootNode = null
-    node = null
-    Xut.Application.$$removeNode = null
-  }
+const initApp = (...arg) => {
+  initGlobalEvent()
+  const { $rootNode, $contentNode } = initRootNode(...arg)
   nextTick({
-    container: node.$rootNode,
-    content: node.$contentNode
+    container: $rootNode,
+    content: $contentNode
   }, init)
 }
 
@@ -70,7 +63,7 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function(
       })
     } else {
       delay(() => {
-        loadApp()
+        initApp()
       })
     }
   })
@@ -102,7 +95,7 @@ Xut.Application.Launch = option => {
       delete config.launch.path
     }
     bindOrientateMode()
-    loadApp(option.el, option.cursor)
+    initApp(option.el, option.cursor)
   }
 }
 
@@ -114,6 +107,6 @@ setTimeout(() => {
   let setConfig = Xut.Application.setConfig
   if(!setConfig || setConfig && !setConfig.lauchMode) {
     mixGolbalConfig(setConfig)
-    loadApp()
+    initApp()
   }
 }, 100)

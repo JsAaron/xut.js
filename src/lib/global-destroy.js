@@ -8,7 +8,8 @@ import { config, destroyConfig } from './config/index'
 import { $$resetUUID } from './util/stroage'
 import { offAndroid } from './initialize/depend/button'
 import { cleanCursor } from './initialize/depend/cursor'
-import { cleanDefalut } from './initialize/depend/default'
+import { cleanGlobalEvent } from './initialize/depend/default'
+import { removeRootNode } from './initialize/depend/node'
 
 /**
  * 销毁接口
@@ -44,7 +45,7 @@ export default function Destroy(action = 'exit') {
       $flowNode = null
     }
     //默认全局事件
-    cleanDefalut()
+    cleanGlobalEvent()
   }
 
   //config路径缓存
@@ -76,7 +77,7 @@ export default function Destroy(action = 'exit') {
   Xut.CreateFilter = null
 
   //销毁节点
-  Xut.Application.$$removeNode && Xut.Application.$$removeNode()
+  removeRootNode()
 
   //启动配置文件去掉
   config.launch = null

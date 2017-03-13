@@ -1,16 +1,9 @@
-import {
-  config
-} from '../../config/index'
-import {
-  setDelay,
-  disable,
-  resetCursor
-} from './cursor'
+import { config } from '../../config/index'
+import { setDelay, disable, resetCursor } from './cursor'
 
 /**
  * 初始化根节点
  */
-
 const getContentHTML = newCursor => {
   //忙碌可配置
   let busyIcon = '<div class="xut-busy-icon xut-fullscreen"></div>'
@@ -50,11 +43,13 @@ const getContentHTML = newCursor => {
             <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
 }
 
+
 /**
  * 根节点
  */
-export function initNode(nodeName = '#xxtppt-app-container', cursor) {
-  let $rootNode
+let $rootNode
+let $contentNode
+export function initRootNode(nodeName = '#xxtppt-app-container', cursor) {
   if(nodeName) {
     $rootNode = $(nodeName)
   }
@@ -70,8 +65,14 @@ export function initNode(nodeName = '#xxtppt-app-container', cursor) {
   if(!nodeName) {
     contentHtml = `<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden">${contentHtml}</div>`
   }
-  return {
-    $rootNode,
-    $contentNode: $(String.styleFormat(contentHtml))
+  $contentNode = $(String.styleFormat(contentHtml))
+  return { $rootNode, $contentNode }
+}
+
+export function removeRootNode() {
+  if($contentNode) {
+    $contentNode.remove()
+    $contentNode = null
   }
+  $rootNode = null
 }

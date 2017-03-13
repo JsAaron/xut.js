@@ -17,14 +17,8 @@ import textBoxMixin from './textbox/index'
 import bookMarkMixin from './bookmark/index'
 import searchBarMixin from './searchbar/index'
 import eventMixin from './event/index'
-
-import {
-  hasAudioes
-} from '../audio/fix'
-import {
-  destroyContentEvent
-} from './event/event'
-
+import { hasAudioes } from '../audio/fix'
+import { destroyContentEvent } from './event/event'
 import createContent from './content/scope'
 import createTask from './task-check'
 
@@ -221,7 +215,7 @@ export default class Activity {
       return function() {
         self.iscroll = new iScroll(scrollNode, {
           scrollbars: true,
-          fadeScrollbars: true
+          fadeScrollbars: false
         })
 
         //增加标记

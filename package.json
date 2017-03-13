@@ -12,7 +12,7 @@
     "unit": "karma start test/unit/karma.conf.js",
     "karma": "karma start karma.conf.js --log-level debug --single-run",
     "git": "bash build/shell/git.sh",
-    "svn": "bash build/shell/svn.sh",
+    "svn": "node build/shell/svn.js",
     "test": "node build/template/test.js",
     "release": "node build/template/release.code.js",
     "ncu": "node build/ncu.package.js",
