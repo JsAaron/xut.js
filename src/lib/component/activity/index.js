@@ -19,7 +19,7 @@ import searchBarMixin from './searchbar/index'
 import eventMixin from './event/index'
 import { hasAudioes } from '../audio/fix'
 import { destroyContentEvent } from './event/event'
-import createContent from './content/scope'
+import createContent from './content/content-scope'
 import createTask from './task-check'
 
 /**
@@ -214,7 +214,7 @@ export default class Activity {
 
       return function() {
         self.iscroll = new iScroll(scrollNode, {
-          scrollbars: true,
+          scrollbars: 'custom',
           fadeScrollbars: false
         })
 

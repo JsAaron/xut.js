@@ -1,7 +1,4 @@
-import {
-  getPlugVideoState,
-  closePlugVideo
-} from './video'
+import { getPlugVideoState, closePlugVideo } from './video'
 
 /**
  * 回退按钮状态控制器

@@ -7,7 +7,7 @@
 import Animation from './animate-effect'
 import FastPipe from './fast-pipe'
 import Parallax from './parallax/index'
-import pretreatment from './prep'
+import pretreatment from './per-process'
 
 //2016.7.15废弃
 //pixi暂时不使用

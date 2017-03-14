@@ -1,13 +1,9 @@
-import { config } from '../config/index'
-import { plugVideo, html5Video } from './depend/video'
-import baseConfig from './base'
-import { bindAndroid } from './depend/button'
+import baseConfig from './base-config'
 import loadScene from './scenario'
-import {
-  $$set,
-  $$get,
-  parseJSON
-} from '../util/index'
+import { config } from '../config/index'
+import { bindAndroid } from '../initial/button'
+import { plugVideo, html5Video } from '../initial/video'
+import { $$set, $$get, parseJSON } from '../util/index'
 
 const getCache = name => $$get(name)
 
@@ -35,20 +31,17 @@ const initMain = novelData => {
          1 直接换  =》ban
    * 所以pageFlip只有在左面的情况下
    */
-  let __flipMode = getCache('flipMode')
-  if(!__flipMode && novelData.paramete) {
-    let parameter = parseJSON(novelData.paramete)
+  if(novelData.parameter) {
+    const parameter = parseJSON(novelData.parameter)
     if(parameter.pageflip !== undefined) {
-      __flipMode = Number(parameter.pageflip)
-      if(__flipMode === 0) {
-        config.flipMode = 'allow' //允许翻页
-      } else if(__flipMode === 1) {
-        config.flipMode = 'ban' //禁止翻页
+      switch(Number(parameter.pageflip)) {
+        case 0: //允许翻页
+          config.flipMode = 'allow';
+          break;
+        case 1: //禁止翻页
+          config.flipMode = 'ban';
+          break
       }
-      //缓存
-      $$set({
-        'flipMode': config.flipMode
-      })
     }
   }
 
@@ -71,10 +64,7 @@ const initMain = novelData => {
 
   //第一次加载
   //没有缓存
-  loadScene({
-    "novelId": novelData._id,
-    "pageIndex": 0
-  })
+  loadScene({ "novelId": novelData._id, "pageIndex": 0 })
 }
 
 
@@ -92,17 +82,14 @@ const initApp = () => baseConfig(initMain)
  * @return {[type]} [description]
  */
 const bindPlatEvent = () => {
-
   //安卓上并且不是浏览器打开的情况
   if(Xut.plat.isAndroid && !Xut.plat.isBrowser) {
-
     //预加载处理视频
     //妙妙学不加载视频
     //读库不加载视频
     if(window.MMXCONFIG && !window.DUKUCONFIG) {
       plugVideo();
     }
-
     //不是子文档指定绑定按键
     if(!window.SUbCONFIGT) {
       Xut.Application.AddEventListener = () => {
@@ -110,7 +97,6 @@ const bindPlatEvent = () => {
       }
     }
   }
-
   if(window.DUKUCONFIG) {
     PMS.bind("MagazineExit", () => {
       PMS.unbind();
@@ -121,24 +107,23 @@ const bindPlatEvent = () => {
 }
 
 
-export default function init() {
-
-  //如果不是读库模式
-  //播放HTML5视频
-  //在IOS
-  // if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
-  //     html5Video()
-  // }
-
-  //Ifarme嵌套处理
-  //1 新阅读
-  //2 子文档
-  //3 pc
-  //4 ios/android
+/*
+  如果不是读库模式
+  播放HTML5视频
+  在IOS
+  if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
+      html5Video()
+  }
+  Ifarme嵌套处理
+  1 新阅读
+  2 子文档
+  3 pc
+  4 ios/android
+ */
+export default function main() {
   if(window.GLOBALIFRAME) {
     bindPlatEvent()
   } else {
-
     //brower
     if(config.isBrowser) {
       initApp()
@@ -151,5 +136,4 @@ export default function init() {
       }, false)
     }
   }
-
 }

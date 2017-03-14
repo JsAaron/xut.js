@@ -257,7 +257,7 @@ const config: Config = {
    * 2 false 关闭缓存
    * @type {[type]}
    */
-  historyMode: DEFAULT, //默认不配置，这里需要数据库填充， 如果指定了false，跳过数据库填充
+  historyMode: DEFAULT, //不处理，因为有调试的方式
 
   /**
    * 滑动事件委托

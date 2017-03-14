@@ -559,7 +559,7 @@ export default class Dispatcher {
      * 线性结构
      * 保存目录索引
      */
-    if(!options.multiScenario) {
+    if(config.historyMode && !options.multiScenario) {
       $$set("pageIndex", currIndex);
     }
 

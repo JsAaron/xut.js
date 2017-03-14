@@ -1,17 +1,17 @@
+import init from './main/index'
 import { config } from './config/index'
-import { initGlobalAPI } from './global-api/index'
-import { AudioManager } from './component/audio/manager'
-import { VideoManager } from './component/video/manager'
 import { nextTick } from './util/nexttick'
 import { slashPostfix } from './util/option'
-import { initRootNode } from './initialize/depend/node'
-import { initGlobalEvent } from './initialize/depend/default'
-import init from './initialize/index'
+import { AudioManager } from './component/audio/manager'
+import { VideoManager } from './component/video/manager'
+import { initRootNode } from './initial/node'
+import { initGlobalEvent } from './initial/default'
+import { initGlobalAPI } from './global-api/index'
 
 //全局API初始化
 initGlobalAPI()
 
-Xut.Version = 880.2
+Xut.Version = 880.6
 
 /**
  * 加载应用app
@@ -21,22 +21,13 @@ Xut.Version = 880.2
 const initApp = (...arg) => {
   initGlobalEvent()
   const { $rootNode, $contentNode } = initRootNode(...arg)
-  nextTick({
-    container: $rootNode,
-    content: $contentNode
-  }, init)
+  nextTick({ container: $rootNode, content: $contentNode }, init)
 }
-
 
 /**
  * 提供全局配置文件
  */
-const mixGolbalConfig = setConfig => {
-  if(setConfig) {
-    Xut.mixin(config, setConfig)
-  }
-}
-
+const mixGolbalConfig = setConfig => { setConfig && Xut.mixin(config, setConfig) }
 
 /**
  * 接口接在参数

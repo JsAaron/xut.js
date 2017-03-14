@@ -30,7 +30,7 @@ export class ShowNote {
     this.show();
 
     this.iscroll = new iScroll(this._dom.find('.content')[0], {
-      scrollbars: true,
+      scrollbars: 'custom',
       fadeScrollbars: true
     })
     return true;

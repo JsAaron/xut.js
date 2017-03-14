@@ -49,12 +49,7 @@ const initDefaults = (setData) => {
 
   //应用的唯一标识符
   //生成时间+appid
-  config.appUUID = data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.adUpdateTime;
-
-  //缓存应用ID
-  $$set({
-    'appId': data.appId
-  });
+  config.appId = data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.appId;
 
   //广告Id
   //2014.9.2

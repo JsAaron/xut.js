@@ -164,12 +164,14 @@ export default class ScrollArea {
       return new iScroll(wrapper, {
         scrollX: hasScrollX ? true : false,
         scrollY: hasScrollY ? true : false,
-        snap: ".contentsContainer" + cid
+        snap: ".contentsContainer" + cid,
+        scrollbars:'custom'
       })
     } else {
       return new iScroll(wrapper, {
         scrollX: hasScrollX ? true : false,
-        scrollY: hasScrollY ? true : false
+        scrollY: hasScrollY ? true : false,
+        scrollbars:'custom'
       })
     }
 

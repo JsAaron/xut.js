@@ -36,7 +36,7 @@ export default function fly(animproto) {
       });
       switch(direction) {
         case "DirectionDown":
-          y = objInfo.offsetBottom + objInfo.height;
+          y = Math.abs(objInfo.offsetBottom + objInfo.height);
           t1.from(object, duration, {
             y: y,
             ease: easeString,
@@ -44,7 +44,7 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionLeft":
-          x = 0 - (objInfo.offsetLeft + objInfo.width);
+          x =  - Math.abs(objInfo.offsetLeft + objInfo.width);
           t1.from(object, duration, {
             x: x,
             ease: easeString,
@@ -52,7 +52,7 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionUp":
-          y = 0 - (objInfo.offsetTop + objInfo.height);
+          y = - Math.abs(objInfo.offsetTop + objInfo.height);
           t1.from(object, duration, {
             y: y,
             ease: easeString,
@@ -60,7 +60,7 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionRight":
-          x = objInfo.offsetRight + objInfo.width;
+          x = Math.abs(objInfo.offsetRight + objInfo.width);
           t1.from(object, duration, {
             x: x,
             ease: easeString,
@@ -68,7 +68,7 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionDownLeft":
-          x = 0 - (objInfo.offsetLeft + objInfo.width);
+          x = - Math.abs(objInfo.offsetLeft + objInfo.width);
           y = objInfo.offsetBottom + objInfo.height;
           t1.from(object, duration, {
             x: x,
@@ -78,8 +78,8 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionDownRight":
-          x = objInfo.offsetRight + objInfo.width;
-          y = objInfo.offsetBottom + objInfo.height;
+          x = Math.abs(objInfo.offsetRight + objInfo.width);
+          y = Math.abs(objInfo.offsetBottom + objInfo.height);
           t1.from(object, duration, {
             x: x,
             y: y,
@@ -88,8 +88,8 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionUpLeft":
-          x = 0 - (objInfo.offsetLeft + objInfo.width);
-          y = 0 - (objInfo.offsetTop + objInfo.height);
+          x =  - Math.abs(objInfo.offsetLeft + objInfo.width);
+          y =  - Math.abs(objInfo.offsetTop + objInfo.height);
           t1.from(object, duration, {
             x: x,
             y: y,
@@ -98,8 +98,8 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionUpRight":
-          x = objInfo.offsetRight + objInfo.width;
-          y = 0 - (objInfo.offsetTop + objInfo.height);
+          x = Math.abs(objInfo.offsetRight + objInfo.width);
+          y = - Math.abs(objInfo.offsetTop + objInfo.height);
           t1.from(object, duration, {
             x: x,
             y: y,
@@ -126,7 +126,7 @@ export default function fly(animproto) {
       });
       switch(direction) {
         case "DirectionDown":
-          y = objInfo.offsetBottom + objInfo.height;
+          y = Math.abs(objInfo.offsetBottom + objInfo.height);
           t1.to(object, duration, {
             y: y,
             //clearProps: "y",
@@ -134,7 +134,7 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionLeft":
-          x = 0 - (objInfo.offsetLeft + objInfo.width);
+          x =  - Math.abs(objInfo.offsetLeft + objInfo.width);
           t1.to(object, duration, {
             x: x,
             //clearProps: "x",
@@ -142,7 +142,7 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionUp":
-          y = 0 - (objInfo.offsetTop + objInfo.height);
+          y =  - Math.abs(objInfo.offsetTop + objInfo.height);
           t1.to(object, duration, {
             y: y,
             //clearProps: "y",
@@ -150,7 +150,7 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionRight":
-          x = objInfo.offsetRight + objInfo.width;
+          x = Math.abs(objInfo.offsetRight + objInfo.width);
           t1.to(object, duration, {
             x: x,
             //clearProps: "x",
@@ -158,7 +158,7 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionDownLeft":
-          x = 0 - (objInfo.offsetLeft + objInfo.width);
+          x = - Math.abs(objInfo.offsetLeft + objInfo.width);
           y = objInfo.offsetBottom + objInfo.height;
           t1.to(object, duration, {
             x: x,
@@ -168,8 +168,8 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionDownRight":
-          x = objInfo.offsetRight + objInfo.width;
-          y = objInfo.offsetBottom + objInfo.height;
+          x = Math.abs(objInfo.offsetRight + objInfo.width);
+          y = Math.abs(objInfo.offsetBottom + objInfo.height);
           t1.to(object, duration, {
             x: x,
             y: y,
@@ -178,8 +178,8 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionUpLeft":
-          x = 0 - (objInfo.offsetLeft + objInfo.width);
-          y = 0 - (objInfo.offsetTop + objInfo.height);
+          x =  - Math.abs(objInfo.offsetLeft + objInfo.width);
+          y =  - Math.abs(objInfo.offsetTop + objInfo.height);
           t1.to(object, duration, {
             x: x,
             y: y,
@@ -188,8 +188,8 @@ export default function fly(animproto) {
           });
           break;
         case "DirectionUpRight":
-          x = objInfo.offsetRight + objInfo.width;
-          y = 0 - (objInfo.offsetTop + objInfo.height);
+          x = Math.abs(objInfo.offsetRight + objInfo.width);
+          y =  - Math.abs(objInfo.offsetTop + objInfo.height);
           t1.to(object, duration, {
             x: x,
             y: y,

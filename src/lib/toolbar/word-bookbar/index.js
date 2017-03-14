@@ -267,7 +267,7 @@ export default class BookBar extends Bar {
     //添加滚动条
     //url : http://iscrolljs.com/
     this.iscroll = new iScroll(wrap, {
-      scrollbars: true,
+      scrollbars: 'custom',
       fadeScrollbars: true,
       scrollX: false
     });

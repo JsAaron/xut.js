@@ -1,23 +1,8 @@
-import {
-  ShowBusy,
-  HideBusy,
-  ShowTextBusy
-} from '../initialize/depend/cursor'
+import { SceneFactory } from '../scenario/scene-factory'
+import { sceneController } from '../scenario/scene-control'
+import { ShowBusy, HideBusy, ShowTextBusy } from '../initial/cursor'
+import { toNumber, $$remove, $$extend, $$warn } from '../util/index'
 
-import {
-  toNumber,
-  $$remove,
-  $$extend,
-  $$warn
-}
-from '../util/index'
-
-import {
-  SceneFactory
-} from '../scenario/scene-factory'
-import {
-  sceneController
-} from '../scenario/scene-control'
 
 export function initView() {
 
@@ -207,7 +192,7 @@ export function initView() {
       complete(nextBack) {
         //销毁多余场景
         current && current.destroy()
-        //下一个任务存在,执行切换回调后,在执行页面任务
+          //下一个任务存在,执行切换回调后,在执行页面任务
         nextBack && nextBack();
         //去掉忙碌
         Xut.View.HideBusy();

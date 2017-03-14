@@ -1,26 +1,20 @@
 import { config } from '../config/index'
+import { $$set, $$get, $$remove, execScript } from '../util/index'
 
-import {
-  $$set,
-  $$get,
-  execScript
+
+/*设置缓存，必须要可设置*/
+const saveData = () => {
+  if(config.historyMode) {
+    $$set({ 'appId': config.appId, "pageIndex": config.pageIndex, "novelId": config.novelId })
+  } else {
+    //清理
+    if($$get('appId')) {
+      $$remove('appId')
+      $$remove('pageIndex')
+      $$remove('novelId')
+    }
+  }
 }
-from '../util/index'
-
-
-/**
- * 设置缓存
- * @param {[type]} parameter [description]
- */
-const setDataToStorage = (parameter) => {
-  config.pageIndex = parameter.pageIndex;
-  config.novelId = parameter.novelId;
-  $$set({
-    "pageIndex": parameter.pageIndex,
-    "novelId": parameter.novelId
-  });
-};
-
 
 /**
  * 初始化值
@@ -40,19 +34,21 @@ const initDefaultValues = (options) => {
  * @return {[type]} [description]
  */
 const runScript = () => {
-  var preCode, novels = Xut.data.query('Novel');
+  let preCode, novels = Xut.data.query('Novel')
   if(preCode = novels.preCode) {
     execScript(preCode, 'novelpre脚本')
   }
 }
 
-
 export default function(options) {
 
   options = initDefaultValues(options || {});
 
+  config.novelId = options.novelId;
+  config.pageIndex = options.pageIndex;
+
   //设置缓存
-  setDataToStorage(options)
+  saveData()
 
   //应用脚本注入
   runScript();
@@ -60,7 +56,7 @@ export default function(options) {
   //检测下scenarioId的正确性
   //scenarioId = 1 找不到chapter数据
   //通过sectionRelated递归检测下一条数据
-  var scenarioId, seasondata, i;
+  let scenarioId, seasondata, i;
   for(i = 0; i < Xut.data.Season.length; i++) {
     seasondata = Xut.data.Season.item(i)
     if(Xut.data.query('sectionRelated', seasondata._id)) {
@@ -75,6 +71,5 @@ export default function(options) {
     'scenarioId': scenarioId,
     'pageIndex': options.pageIndex,
     'history': options.history
-  });
-
+  })
 }

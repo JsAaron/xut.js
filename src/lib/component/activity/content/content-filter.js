@@ -1,12 +1,4 @@
-import {
-  $$set,
-  $$get,
-  $$remove,
-  $$save,
-  parseJSON,
-  hash
-}
-from '../../../util/index'
+import { $$get, $$remove, $$save, parseJSON, hash } from '../../../util/index'
 
 /**
  * content对象的创建过滤器

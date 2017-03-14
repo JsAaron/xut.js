@@ -1,7 +1,4 @@
-import {
-  $$set,
-  $$get
-} from '../util/index'
+import { $$set, $$get } from '../util/index'
 
 export function initAsset() {
 

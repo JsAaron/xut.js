@@ -989,12 +989,40 @@ video {
     flex-wrap: wrap
 }
 
+/******************
+*   滚动条样式增加 
+*   纵向滚动条
+*   横向滚动条
+*   2017.3.13
+* *******************/
+.iScrollVerticalScrollbar {
+    position: absolute;
+    z-index: 9999;
+    width: 0.1rem;
+    bottom: 2px;
+    top: 2px;
+    right: 0;
+    overflow: hidden;
+    background: #ddd;
+    opacity: 0.6;
+}
 
+.iScrollHorizontalScrollbar {
+    position: absolute;
+    z-index: 9999;
+    height: 0.2rem;
+    left: 2px;
+    right: 2px;
+    bottom: 0;
+    overflow: hidden;
+    background: #ddd;
+    opacity: 0.6;
+}
 
-
-
-
-
-
-
-
+.iScrollIndicator {
+    position: absolute;
+    width: 0.08rem;
+    height: 0.3rem;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 0.1rem;
+}

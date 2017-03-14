@@ -2,9 +2,7 @@
 /// 初始化页面默认行为
 /////////////////////////////
 
-import {
-  fixAudio
-} from '../../component/audio/fix'
+import { fixAudio } from '../component/audio/fix'
 
 //修复H5音频自动播放bug
 if(Xut.plat.isBrowser && !Xut.plat.hasAutoPlayAudio) {

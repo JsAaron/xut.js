@@ -1,5 +1,5 @@
 import { config } from '../config/index'
-import { setDelay, disable, resetCursor } from '../initialize/busy.cursor'
+import { setDelay, disable, resetCursor } from '../main/busy.cursor'
 
 /**
  * 初始化根节点

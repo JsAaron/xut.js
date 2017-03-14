@@ -7,33 +7,13 @@
  * @return {[type]} [description]
  */
 
-import {
-  config
-} from '../../../../../config/index'
-import {
-  parseCanvas
-} from './parse/canvas'
-import {
-  createContainer
-} from './create/container'
-import {
-  createDom
-} from './create/dom'
-import {
-  createCanvas
-} from './create/canvas'
-import {
-  parseContentDas
-} from './parse/content'
-import {
-  $$warn,
-  parseJSON,
-  reviseSize,
-  readFile,
-  getResources,
-  createRandomImg
-} from '../../../../../util/index'
-
+import { config } from '../../../../../config/index'
+import { createDom } from './create/dom'
+import { parseCanvas } from './parse/canvas'
+import { createCanvas } from './create/canvas'
+import { createContainer } from './create/container'
+import { parseContentDas } from './parse/content'
+import { $$warn, parseJSON, reviseSize, readFile, getResources, createRandomImg } from '../../../../../util/index'
 
 /**
  * 制作包装对象
@@ -234,6 +214,11 @@ export function contentStructure(callback, data, context) {
     var zIndex;
     _.each(parameter, (para) => {
 
+      /*在模式2与3模式下元素可能会溢出,保证不溢出处理*/
+      if(para.fixedPosition) {
+        conData.fixedPosition = Number(para.fixedPosition)
+      }
+
       //如果有二维码标记
       //2017.3.1
       if(para.qrCode) {
@@ -417,13 +402,67 @@ export function contentStructure(callback, data, context) {
         contentHtmlBoxIds.push(contentId)
       }
 
-      //转换缩放比
-      sizeResults = reviseSize({
-        results: wrapObj.data,
-        getStyle: getStyle,
-        proportion: getStyle.pageProportion,
-        zoomMode: allotRatio(content.fixRadio, headerFooterMode[contentId])
-      })
+      /*转换缩放比*/
+      const setRatio = function(proportion = getStyle.pageProportion) {
+        sizeResults = reviseSize({
+          results: wrapObj.data,
+          getStyle: getStyle,
+          proportion,
+          zoomMode: allotRatio(content.fixRadio, headerFooterMode[contentId])
+        })
+      }
+      setRatio()
+
+      /*设置页面缩放比*/
+      const setPageProportion = function(baseRatio) {
+        let pageProportion = {}
+        _.each(getStyle.pageProportion, function(prop, key) {
+          pageProportion[key] = prop * baseRatio
+        })
+        return pageProportion
+      }
+
+      /*溢出模式才计算，保证元素不溢出，继续修正缩放比*/
+      if(content.fixedPosition && getStyle.pageVisualMode === 3) {
+        let originalTop = sizeResults.scaleTop
+        let originalHeight = sizeResults.scaleHeight
+        let visualLeftInteger = getStyle.visualLeftInteger
+        let layerWidth = sizeResults.scaleWidth + sizeResults.scaleLeft
+        let overflowMode = ''
+
+        //左边溢出
+        if(visualLeftInteger > sizeResults.scaleLeft) {
+          overflowMode = 'left'
+        }
+
+        //右边溢出
+        let rightVisual = getStyle.visualWidth - visualLeftInteger
+        if(layerWidth > rightVisual) {
+          if(overflowMode === 'left') {
+            overflowMode = 'all' //全溢出
+          } else {
+            overflowMode = 'right'
+          }
+        }
+
+        if(overflowMode === 'left') {
+          let baseRatio = (sizeResults.scaleWidth - visualLeftInteger) / sizeResults.scaleWidth
+          setRatio(setPageProportion(baseRatio))
+          let ratioWidth = (layerWidth - sizeResults.scaleWidth - visualLeftInteger) / 2
+          sizeResults.scaleLeft = visualLeftInteger + ratioWidth
+          sizeResults.scaleTop = originalTop + ((originalHeight - sizeResults.scaleHeight) / 2)
+        } else if(overflowMode === 'right') {
+          let baseRatio = rightVisual / layerWidth
+          setRatio(setPageProportion(baseRatio))
+          sizeResults.scaleTop = originalTop + ((originalHeight - sizeResults.scaleHeight) / 2)
+        } else if(overflowMode === 'all') { //左右都溢出
+          //强制全屏
+          let baseRatio = config.screenSize.width / sizeResults.scaleWidth
+          setRatio(setPageProportion(baseRatio))
+          sizeResults.scaleLeft = visualLeftInteger
+          sizeResults.scaleTop = originalTop + ((originalHeight - sizeResults.scaleHeight) / 2)
+        }
+      }
 
       //如果是隐藏的页面页脚，重写这个标记
       if(sizeResults.isHide && headerFooterMode[contentId]) {

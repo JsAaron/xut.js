@@ -6,18 +6,9 @@
 
 import { config } from '../../../config/index'
 import { bindContentEvent } from '../event/event'
-
-import {
-  $$on,
-  $$off,
-  $$set,
-  $$get
-} from '../../../util/index'
-
-
+import { $$on, $$off, $$set, $$get } from '../../../util/index'
 
 const docElement = document.documentElement
-
 
 //默认字体
 let defaultFontSize
@@ -331,7 +322,7 @@ export default class HtmlBox {
     //溢出，增加卷滚
     if(parseInt(ulHeight) > parseInt(htmlboxHeight)) {
       this.iscroll = new iScroll("." + iscrollName, {
-        scrollbars: true,
+        scrollbars: 'custom',
         fadeScrollbars: true
       })
     }

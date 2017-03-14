@@ -32,7 +32,7 @@ export default class Section {
         tap: true,
         scrollX: isHorizontal,
         scrollY: !isHorizontal,
-        scrollbars: true,
+        scrollbars: 'custom',
         fadeScrollbars: true,
         stopPropagation: true
       });

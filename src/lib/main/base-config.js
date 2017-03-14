@@ -1,17 +1,10 @@
-import { createCursor } from './depend/cursor'
-import { contentFilter } from '../component/activity/content/filter'
-import { importJsonDatabase } from '../database/result'
-
-import { $$warn, loadStyle } from '../util/index'
-
-import {
-  config,
-  initConfig,
-  initPathAddress
-} from '../config/index'
-
 import initTooBar from './toolbar'
+import { $$warn, loadStyle } from '../util/index'
+import { createCursor } from '../initial/cursor'
 import { initColumn } from '../component/column/core-init'
+import { contentFilter } from '../component/activity/content/content-filter'
+import { importJsonDatabase } from '../database/result'
+import { config, initConfig, initPathAddress } from '../config/index'
 
 /**
  * 新增模式,用于记录浏览器退出记录
@@ -20,32 +13,31 @@ import { initColumn } from '../component/column/core-init'
  * set表中写一个recordHistory
  * 是   1
  * 否   0
- * [description]
- * @param  {[type]} data [description]
- * @return {[type]}      [description]
  */
 const setHistory = (data) => {
-  let historyMode = 1; //默认启动
-  if(data.recordHistory !== undefined) {
-    historyMode = Number(data.recordHistory);
+  //Launch接口定义
+  if(config.historyMode !== undefined) {
+    return
   }
-
-  //如果启动桌面调试模式
-  //自动打开缓存加载
-  if(!historyMode && config.isBrowser) {
-    historyMode = 1;
+  //数据库定义 && == 1
+  if(data.recordHistory !== undefined && Number(data.recordHistory)) {
+    config.historyMode = true
+    return
   }
-
-  config.historyMode = historyMode
+  //调试模式，默认启动缓存
+  if(config.devtools) {
+    config.historyMode = true
+  }
 }
 
-const setMode = function(data) {
-  //如果没有config配置，默认数据库
+/*画轴模式*/
+const setPaintingMode = function(data) {
   if(!config.visualMode && Number(data.scrollPaintingMode)) {
     config.visualMode = 4
   }
 }
 
+/*最大屏屏幕尺寸*/
 const getMaxWidth = function() {
   if(config.visualSize) {
     return config.visualSize.width
@@ -82,9 +74,6 @@ const setDefaultSuffix = function() {
 }
 
 
-/**
- * 动态代码变动区域
- */
 export default function baseConfig(callback) {
 
   //mini杂志设置
@@ -125,13 +114,11 @@ export default function baseConfig(callback) {
 
       //新增模式,用于记录浏览器退出记录
       //如果强制配置文件recordHistory = false则跳过数据库的给值
-      if(config.historyMode !== false) {
-        setHistory(tempSettingData)
-      }
+      setHistory(tempSettingData)
 
       //2015.2.26
       //启动画轴模式
-      setMode(tempSettingData)
+      setPaintingMode(tempSettingData)
 
       //创建忙碌光标
       if(!Xut.IBooks.Enabled) {
@@ -142,13 +129,13 @@ export default function baseConfig(callback) {
       initPathAddress()
 
       //全局样式
-      loadStyle('svgsheet', function() {
+      loadStyle('svgsheet', () => {
         /**
          * 初始分栏排版
          * 嵌入index分栏
          * 默认有并且没有强制设置关闭的情况，打开缩放
          */
-        initColumn(function(haColumnCounts) {
+        initColumn(haColumnCounts => {
           if(haColumnCounts) {
             //动画事件委托
             if(config.swipeDelegate !== false) {
@@ -158,8 +145,6 @@ export default function baseConfig(callback) {
           callback(novelData)
         })
       })
-
-
     })
   })
 }

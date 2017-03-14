@@ -1,14 +1,18 @@
+import { config } from '../config/index'
+
 let onlyId
 
 const TAG = 'aaron'
 const storage = window.localStorage
 
-//如果数据库为写入appid ,则创建
-const createAppid = function() {
+/*
+如果数据库为写入appid ,则创建
+ */
+const createAppId = function() {
   //添加UUID
   var appId = 'aaron-' + new Date().getDate();
   //写入数据库
-  Xut.config.db && Xut.config.db.transaction(function(tx) {
+  config.db && config.db.transaction(function(tx) {
     tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function() {}, function() {});
   }, function() {
     //  callback && callback();
@@ -18,27 +22,26 @@ const createAppid = function() {
   return appId;
 }
 
-//过滤
-const filter = function(key) {
+/*
+过滤
+ */
+const filter = (key) => {
   //添加头部标示
   if(onlyId) {
-    return key + onlyId;
+    return key + onlyId
   } else {
-    if(!Xut.config.appUUID) {
-      Xut.config.appUUID = createAppid();
+    if(!config.appId) {
+      config.appId = createAppId()
     }
     //子文档标记
-    if(window.SUbCONFIGT && window.SUbCONFIGT.dbId) {
-      onlyId = "-" + Xut.config.appUUID + "-" + window.SUbCONFIGT.dbId;
-    } else {
-      onlyId = "-" + Xut.config.appUUID;
-    }
+    const sub = window.SUbCONFIGT && window.SUbCONFIGT.dbId ? "-" + window.SUbCONFIGT.dbId : ''
+    onlyId = "-" + config.appId + sub
   }
   return key + onlyId;
-};
+}
 
 
-const set = function name(key, val) {
+const set = (key, val) => {
   var setkey;
 
   //ipad ios8.3setItem出问题
@@ -63,7 +66,7 @@ const set = function name(key, val) {
   }
 }
 
-const get = function(key) {
+const get = (key) => {
   key = filter(key);
   return storage.getItem(key) || undefined
 }
@@ -84,14 +87,14 @@ export function _key(index) { //本地方法
  * @param {[type]} key [description]
  * @param {[type]} val [description]
  */
-export { set as $$set }
+export {set as $$set }
 
 /**
  * 获取localstorage中的值
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export { get as $$get }
+export {get as $$get }
 
 /**
  * 删除localStorage中指定项

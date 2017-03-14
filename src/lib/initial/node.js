@@ -1,4 +1,4 @@
-import { config } from '../../config/index'
+import { config } from '../config/index'
 import { setDelay, disable, resetCursor } from './cursor'
 
 /**
