@@ -100,6 +100,14 @@ export function getResources(url) {
 }
 
 
+export function createFn(obj, id, callback) {
+  var cObj = obj[id];
+  if(!cObj) {
+    cObj = obj[id] = {};
+  }
+  callback.call(cObj);
+}
+
 /**
  * 执行脚本注入
  */

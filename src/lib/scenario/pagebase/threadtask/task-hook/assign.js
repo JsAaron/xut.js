@@ -178,7 +178,6 @@ export default {
       'chapterId': baseData['_id'],
       'pid': base.pid,
       'pageType': base.pageType,
-      'virtualOffset': base.virtualOffset,
       'getStyle': base.getStyle
     }, suspendCallback, successCallback);
   },
@@ -251,7 +250,6 @@ export default {
       'pageIndex': base.pageIndex,
       'pid': base.pid,
       'pageBaseHooks': pageBaseHooks,
-      'virtualOffset': base.virtualOffset,
       'getStyle': base.getStyle
     });
   }

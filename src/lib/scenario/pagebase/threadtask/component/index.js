@@ -45,7 +45,6 @@ TaskComponents.prototype = {
       chpaterData = data.chpaterData,
       chapterId = data.chapterId,
       pid = data.pid,
-      virtualOffset = data.virtualOffset,
       widgetRetStr = [];
 
     //创建

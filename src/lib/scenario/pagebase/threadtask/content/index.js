@@ -5,24 +5,57 @@
  *      行为动画绑定类     Content
  * ***************************************************/
 import { config } from '../../../../config/index'
-import { contentStructure } from './dom/index'
-import { LetterEffect } from '../../../../component/activity/content/letter-effect'
-import { Zoom } from '../../../../plugin/extend/zoom/index'
-import { contentParser, activityParser } from './data'
-import { createFloatMater, createFloatPage } from './float'
-import { sceneController } from '../../../../scenario/scene-control'
 import { nextTick } from '../../../../util/nexttick'
 import { $$on, $$off } from '../../../../util/dom'
+import { Zoom } from '../../../../plugin/extend/zoom/index'
+import { bindActivity } from './bind-activity'
+import { parseBehavior } from './parse-behavior'
+import { contentStructure } from './dom/index'
+import { contentParser, activityParser } from './parse-data'
+import { createFloatMater, createFloatPage } from './float'
+import { sceneController } from '../../../../scenario/scene-control'
 import { analysisImageName, insertImageUrlSuffix } from '../../../../util/option'
-import {
-  createFn,
-  toArray,
-  toObject,
-  parseBehavior,
-  autoUUID,
-  applyActivitys
-} from './depend'
+import { LetterEffect } from '../../../../component/activity/content/letter-effect'
 
+/**
+ * 构建快速查询节点对象
+ * 转成哈希方式
+ * @return {[type]} [description]
+ */
+function toObject(cachedContentStr) {
+  var tempFragmentHash = {};
+  _.each($(cachedContentStr), function(ele, index) {
+    tempFragmentHash[ele.id] = ele;
+  })
+  return tempFragmentHash;
+}
+
+
+/**
+ * 转成数组格式
+ * 分组
+ *     主体部分内容
+ *     页眉页脚内容
+ */
+function toArray(contentsFragment, headerFooterMode) {
+  let bodyContent = []
+  let headerFooterContent = []
+  _.each(contentsFragment, function($node, key) {
+    let id = key.split('_').pop()
+    let state
+    if(headerFooterMode && (state = headerFooterMode[id])) {
+      if(state !== 'hide') { //隐藏抛弃的元素，不需要显示了
+        headerFooterContent.push($node)
+      }
+    } else {
+      bodyContent.push($node)
+    }
+  })
+  return {
+    bodyContent,
+    headerFooterContent
+  }
+}
 
 /**
  * content任务类
@@ -38,9 +71,7 @@ export default class TaskContents {
     if(compileActivitys) {
       //解析动画表数据结构
       activityData = contentParser(compileActivitys, activityData)
-
-      //如果有需要构建的content
-      //开始多线程处理
+        /*开始多线程处理*/
       activityData.createContentIds.length ? this._dataAfterCheck(activityData) : this._loadComplete();
     } else {
       this._loadComplete();
@@ -141,7 +172,7 @@ export default class TaskContents {
       sceneController.seasonRelated = data.seasonRelated;
 
       //初始化content对象
-      applyActivitys(data, contentDas, delayHooks => {
+      bindActivity(data, contentDas, delayHooks => {
         this._eventAfterCheck(data, delayHooks, userData.headerFooterMode)
       })
     })

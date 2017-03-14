@@ -1,55 +1,4 @@
-import { parseJSON } from '../../../../util/index'
-
-
-export function createFn(obj, id, callback) {
-  var cObj = obj[id];
-  if(!cObj) {
-    cObj = obj[id] = {};
-  }
-  callback.call(cObj);
-}
-
-/**
- * 转成数组格式
- * 分组
- *     主体部分内容
- *     页眉页脚内容
- * @param  {[type]} contentsFragment [description]
- * @return {[type]}                  [description]
- */
-export function toArray(contentsFragment, headerFooterMode) {
-  let bodyContent = []
-  let headerFooterContent = []
-  _.each(contentsFragment, function($node, key) {
-    let id = key.split('_').pop()
-    let state
-    if(headerFooterMode && (state = headerFooterMode[id])) {
-      if(state !== 'hide') { //隐藏抛弃的元素，不需要显示了
-        headerFooterContent.push($node)
-      }
-    } else {
-      bodyContent.push($node)
-    }
-  })
-
-  return {
-    bodyContent,
-    headerFooterContent
-  }
-}
-
-/**
- * 构建快速查询节点对象
- * 转成哈希方式
- * @return {[type]} [description]
- */
-export function toObject(cachedContentStr) {
-  var tempFragmentHash = {};
-  _.each($(cachedContentStr), function(ele, index) {
-    tempFragmentHash[ele.id] = ele;
-  })
-  return tempFragmentHash;
-}
+import { createFn, parseJSON } from '../../../../util/index'
 
 /**
  * 行为反馈
@@ -114,13 +63,3 @@ export function parseBehavior(data) {
   })
 
 }
-
-
-/** 配置ID
- * @return {[type]} [description]
- */
-export function autoUUID() {
-  return 'autoRun-' + Math.random().toString(36).substring(2, 15)
-}
-
-

@@ -8,10 +8,10 @@
  */
 
 import { config } from '../../../../../config/index'
-import { createDom } from './create/dom'
+import { createDom } from './str-dom'
+import { createCanvas } from './str-canvas'
+import { createContainer } from './str-container'
 import { parseCanvas } from './parse/canvas'
-import { createCanvas } from './create/canvas'
-import { createContainer } from './create/container'
 import { parseContentDas } from './parse/content'
 import { $$warn, parseJSON, reviseSize, readFile, getResources, createRandomImg } from '../../../../../util/index'
 
@@ -21,7 +21,7 @@ import { $$warn, parseJSON, reviseSize, readFile, getResources, createRandomImg 
  * 导致重复数据被修正的问题
  * @return {[type]}             [description]
  */
-const makeWarpObj = (contentId, content, pageType, pid, virtualOffset) => {
+const makeWarpObj = (contentId, content, pageType, pid) => {
   //唯一标示符
   let prefix = "_" + pid + "_" + contentId;
   return {
@@ -31,7 +31,6 @@ const makeWarpObj = (contentId, content, pageType, pid, virtualOffset) => {
     isSvg: /.svg$/i.test(content.md5), //svg类型
     data: content,
     pid: pid,
-    virtualOffset: virtualOffset, //布局位置
     containerName: 'Content' + prefix,
     makeId(name) {
       return name + prefix;
@@ -153,9 +152,6 @@ export function contentStructure(callback, data, context) {
     containerRelated = data.containerRelated,
     seasonRelated = data.seasonRelated,
     isMaster = pageType === 'master',
-    //容器li生成的位置
-    //left,right
-    virtualOffset = data.virtualOffset,
     ////////////
     //浮动处理 //
     //1.浮动母版对象
@@ -388,7 +384,7 @@ export function contentStructure(callback, data, context) {
     if(content = contentCollection[contentCount]) {
       contentId = content['_id'];
       //创建包装器,处理数据引用关系
-      wrapObj = makeWarpObj(contentId, content, pageType, pid, virtualOffset);
+      wrapObj = makeWarpObj(contentId, content, pageType, pid);
       idFix.push(wrapObj.containerName)
 
       //如果有文本效果标记

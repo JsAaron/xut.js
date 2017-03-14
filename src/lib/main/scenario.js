@@ -5,11 +5,10 @@ import { $$set, $$get, $$remove, execScript } from '../util/index'
 /*设置缓存，必须要可设置*/
 const saveData = () => {
   if(config.historyMode) {
-    $$set({ 'appId': config.appId, "pageIndex": config.pageIndex, "novelId": config.novelId })
+    $$set({ "pageIndex": config.pageIndex, "novelId": config.novelId })
   } else {
     //清理
-    if($$get('appId')) {
-      $$remove('appId')
+    if($$get('novelId')) {
       $$remove('pageIndex')
       $$remove('novelId')
     }

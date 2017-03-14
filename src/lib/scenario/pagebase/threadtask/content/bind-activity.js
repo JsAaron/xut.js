@@ -1,5 +1,12 @@
 import ActivityClass from '../../../../component/activity/index'
-import { autoUUID } from './dep'
+
+
+/** 配置ID
+ * @return {[type]} [description]
+ */
+export function autoUUID() {
+  return 'autoRun-' + Math.random().toString(36).substring(2, 15)
+}
 
 /**
  * 给所有content节点绑定对应的事件与动画
@@ -10,7 +17,7 @@ import { autoUUID } from './dep'
  * 5 canvas动画
  * @return {[type]} [description]
  */
-export default function bindActivity(data, contentDas, callback) {
+export function bindActivity(data, contentDas, callback) {
   var compiler,
     $containsNode = data.$containsNode,
     eventRelated = data.eventRelated, //合集事件
