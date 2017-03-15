@@ -1,11 +1,11 @@
 import { config } from '../../../../config/index'
-import assignedTasks from './assign'
+import assignedTasks from './assign-task'
 import initstate from './init-state'
 import Pinch from './pinch'
 
 const noop = function() {}
 
-export default function(instance) {
+export default function schedulerTask(instance) {
 
   /**
    * 创建相关的信息

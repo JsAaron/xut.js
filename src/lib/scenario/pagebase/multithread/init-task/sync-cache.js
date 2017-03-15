@@ -1,4 +1,4 @@
-import { query } from '../../../database/query'
+import { query } from '../../../../database/query'
 
 /**
  * 更新数据缓存
@@ -7,32 +7,32 @@ import { query } from '../../../database/query'
  * @return {[type]}            [description]
  */
 export default function(pid, callback) {
-  let fn, base = this,
-    pageType = base.pageType;
 
-  //缓存数据
+  let pageType = this.pageType
+
+  /*缓存数据*/
   const addCacheDas = (namespace, data) => {
     let key;
-    if(!base._dataCache[namespace]) {
-      base._dataCache[namespace] = data;
+    if(!this._dataCache[namespace]) {
+      this._dataCache[namespace] = data;
     } else {
       for(key in data) {
-        base._dataCache[namespace][key] = data[key];
+        this._dataCache[namespace][key] = data[key];
       }
     }
   }
 
-  //增加数据缓存
+  /*增加数据缓存*/
   const addCache = (data, activitys, autoData) => {
-    addCacheDas(base.pageType, data); //挂载页面容器数据
+    addCacheDas(pageType, data); //挂载页面容器数据
     addCacheDas('activitys', activitys); //挂载activitys数据
     addCacheDas('auto', autoData); //挂载自动运行数据
   }
 
   query(pageType, {
     'pageIndex': pid,
-    'pageData': base.chapterData,
-    'pptMaster': base.pptMaster
+    'pageData': this.chapterData,
+    'pptMaster': this.pptMaster
   }, function(data, activitys, autoData) {
     addCache.apply(addCache, arguments)
     callback(data);

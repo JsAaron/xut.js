@@ -1,4 +1,4 @@
-import updataCache from '../cache'
+import updataCache from './sync-cache'
 import TaskContainer from '../container/index'
 import TaskBackground from '../background/index'
 import TaskContents from '../content/index'
