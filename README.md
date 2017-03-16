@@ -6,7 +6,7 @@ Front-end can not only write pages, but also to do web applications, mobile, and
 * Desktop program: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
 * Packer application：[duku](http://www.kidreadcool.com/loadclient/)
 * Mini magazine: [Only testing](http://www.docooldigest.com)
-* Support more platforms......
+* Support more platforms........
 
 
 ##What is xut.js?
