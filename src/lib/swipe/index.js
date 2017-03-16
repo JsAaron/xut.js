@@ -1,45 +1,25 @@
-import {
-  Observer
-} from '../observer/index'
-import {
-  config
-} from '../config/index'
 import api from './api'
+import { Observer } from '../observer/index'
+import { config } from '../config/index'
+import { initPointer, getActionPointer } from './pointer'
+import { $$on, $$off, $$handle, $$event } from '../util/dom'
 
-import {
-  $$on,
-  $$off,
-  $$handle
-} from '../util/dom'
+const transitionDuration = Xut.style.transitionDuration
+const LINEARTAG = 'data-viewlinear'
+const ABS = Math.abs
 
-import {
-  initPointer,
-  getActionPointer,
-  compatibilityEvent
-} from './depend'
-
-/**
- * 翻页速率
- * @type {Number}
- */
+/*翻页速率*/
 const SPEED = 600
 
-/**
- * 默认翻页时间
- * @type {Object}
- */
+/*默认翻页时间*/
 const DEFAULTTIME = {
   min: 0,
   mix: 500
 }
 
-
 const getDate = () => {
   return +new Date
 }
-const transitionDuration = Xut.style.transitionDuration
-const LINEARTAG = 'data-viewlinear'
-const ABS = Math.abs
 
 /**
  * 自定义事件类型
@@ -292,7 +272,7 @@ export default class Swipe extends Observer {
 
 
     let interrupt
-    let point = compatibilityEvent(e)
+    let point = $$event(e)
 
     if(!point) {
       return interrupt = this._preventSwipe = true;
@@ -345,7 +325,7 @@ export default class Swipe extends Observer {
 
     this._isMoving = true
 
-    let point = compatibilityEvent(e)
+    let point = $$event(e)
     let deltaX = point.pageX - this._start.pageX
     let deltaY = point.pageY - this._start.pageY
     let absDeltaX = ABS(deltaX)
@@ -434,7 +414,7 @@ export default class Swipe extends Observer {
     this._isTap = this._isMoving = false
 
     let duration
-    //可能没有点击页面，没有触发start事件
+      //可能没有点击页面，没有触发start事件
     if(this._start) {
       duration = getDate() - this._start.time
     }

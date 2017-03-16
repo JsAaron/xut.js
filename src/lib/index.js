@@ -8,37 +8,25 @@ import { initRootNode } from './initial/node'
 import { initGlobalEvent } from './initial/default'
 import { initGlobalAPI } from './global-api/index'
 
-//全局API初始化
+/*全局API初始化*/
 initGlobalAPI()
 
 Xut.Version = 880.6
 
-/**
- * 加载应用app
- * arg : el / cursor
- * @return {[type]} [description]
- */
+/*加载应用app*/
 const initApp = (...arg) => {
   initGlobalEvent()
   const { $rootNode, $contentNode } = initRootNode(...arg)
   nextTick({ container: $rootNode, content: $contentNode }, init)
 }
 
-/**
- * 提供全局配置文件
- */
+/*提供全局配置文件*/
 const mixGolbalConfig = setConfig => { setConfig && Xut.mixin(config, setConfig) }
 
-/**
- * 接口接在参数
- * 用户横竖切换刷新
- * @type {Array}
- */
+/*接口接在参数,用户横竖切换刷新*/
 let cacheOptions
 
-/**
- * 横竖切换
- */
+/*横竖切换*/
 const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function() {
   $(window).on('orientationchange', () => {
     //安卓设备上,对横竖切换的处理反映很慢
@@ -91,9 +79,7 @@ Xut.Application.Launch = option => {
 }
 
 
-/**
- * 老版本加载
- */
+/*老版本加载*/
 setTimeout(() => {
   let setConfig = Xut.Application.setConfig
   if(!setConfig || setConfig && !setConfig.lauchMode) {

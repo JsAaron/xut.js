@@ -2,9 +2,7 @@
 /// 全局钩子
 ////////////////////////
 
-import {
-  config
-} from '../config/index'
+import { config } from '../config/index'
 
 /**
  * 阻止元素的默认行为
@@ -18,7 +16,7 @@ import {
  * 2016.7.26
  * 读库强制PC模式了
  */
-export default function eventHooks(e, node) {
+export default function siwpeHook(e, node) {
 
   //禁止鼠标右键
   if(e.button && e.button == 2) {

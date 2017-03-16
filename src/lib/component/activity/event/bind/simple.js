@@ -1,11 +1,7 @@
 /////////////////
 /// tap click
 /////////////////
-
-import {
-  $$on,
-  $$off
-} from '../../../../util/dom'
+import { $$on, $$off, $$event } from '../../../../util/dom'
 
 /**
  * ie10下面mouse事件怪异
@@ -32,21 +28,6 @@ function setCanvasMove() {
 
 
 /**
- * 兼容事件对象
- * @return {[type]}   [description]
- */
-function compatibilityEvent(e) {
-  var point;
-  if(e.touches && e.touches[0]) {
-    point = e.touches[0];
-  } else {
-    point = e;
-  }
-  return point
-}
-
-
-/**
  * 如果是简单的点击事件
  */
 export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) {
@@ -58,7 +39,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
 
   //是否触发
   let hasTap = false
-  //开始坐标
+    //开始坐标
   let startPageX
 
   hasTap = false;
@@ -68,7 +49,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
   //你绑定单击的情况下可以翻页
   //这里通过坐标的位置来判断
   const start = function(e) {
-    let point = compatibilityEvent(e);
+    let point = $$event(e);
     //记录开始坐标
     startPageX = point.pageX;
     //是否是tap事件
@@ -80,7 +61,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
     if(!hasTap) {
       return
     }
-    let point = compatibilityEvent(e)
+    let point = $$event(e)
     let deltaX = point.pageX - startPageX
 
     //如果有move事件，则取消tap事件

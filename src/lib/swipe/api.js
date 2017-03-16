@@ -1,7 +1,65 @@
-import {
-  calculationIndex,
-  initPointer
-} from './depend'
+import { initPointer } from './pointer'
+
+/* 计算当前已经创建的页面索引*/
+const calculationIndex = (currIndex, targetIndex, pageTotal) => {
+  var i = 0,
+    existpage,
+    createpage,
+    pageIndex,
+    ruleOut = [],
+    create = [],
+    destroy,
+    viewFlip;
+
+  //存在的页面
+  if(currIndex === 0) {
+    existpage = [currIndex, currIndex + 1];
+  } else if(currIndex === pageTotal - 1) {
+    existpage = [currIndex - 1, currIndex];
+  } else {
+    existpage = [currIndex - 1, currIndex, currIndex + 1];
+  }
+
+  //需要创建的新页面
+  if(targetIndex === 0) {
+    createpage = [targetIndex, targetIndex + 1];
+  } else if(targetIndex === pageTotal - 1) {
+    createpage = [targetIndex - 1, targetIndex];
+  } else {
+    createpage = [targetIndex - 1, targetIndex, targetIndex + 1];
+  }
+
+  for(; i < createpage.length; i++) {
+    pageIndex = createpage[i];
+    //跳过存在的页面
+    if(-1 === existpage.indexOf(pageIndex)) {
+      //创建目标的页面
+      create.push(pageIndex);
+    } else {
+      //排除已存在的页面
+      ruleOut.push(pageIndex);
+    }
+  }
+
+  _.each(ruleOut, function(ruleOutIndex) {
+    existpage.splice(existpage.indexOf(ruleOutIndex), 1)
+  });
+
+  destroy = existpage;
+
+  viewFlip = [].concat(create).concat(ruleOut).sort(function(a, b) {
+    return a - b
+  });
+
+  return {
+    'create': create,
+    'ruleOut': ruleOut,
+    'destroy': destroy,
+    'viewFlip': viewFlip,
+    'targetIndex': targetIndex,
+    'currIndex': currIndex
+  }
+}
 
 export default function api(Swipe) {
 
@@ -15,8 +73,8 @@ export default function api(Swipe) {
     if(location === 'middle') {
 
       let borderIndex
-      //必须是有2页以上并且当前页面就是最后一页
-      //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
+        //必须是有2页以上并且当前页面就是最后一页
+        //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
       if(this.pageTotal > 1 && this.visualIndex == this.pageTotal - 1) {
         borderIndex = this.visualIndex
       }
@@ -39,7 +97,7 @@ export default function api(Swipe) {
       this.visualIndex = total - 1;
       this.setPointer(this.visualIndex, total)
       this._updateActionPointer()
-      //设置Transform的偏移量，为最后一页
+        //设置Transform的偏移量，为最后一页
       this._setTransform(this.visualIndex)
     }
 

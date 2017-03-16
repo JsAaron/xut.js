@@ -300,3 +300,12 @@ export function $$target(event, original) {
   }
   return original ? event : event.target;
 }
+
+
+/**
+ * 兼容事件对象
+ * @return {[type]}   [description]
+ */
+export function $$event(e) {
+  return e.touches && e.touches[0] ? e.touches[0] : e
+}
