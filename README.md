@@ -43,7 +43,7 @@ The support of the Xut.js
 
 Technology
 -----------------------------------
-#####Integration of the latest technology point node/es6/gulp/webpack/rollup/eslint/karma and so on
+Integration of the latest technology point node/es6/gulp/webpack/rollup/eslint/karma and so on
 * development: Based on ES6
 * test: Based on the webpack+express+rollup+gulp build, there is a hot replacement function
 * release: Based on gulp+rollup single file package
