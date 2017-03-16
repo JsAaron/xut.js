@@ -1,4 +1,4 @@
-##What can a front-end developer do?
+What can a front-end developer do?
 -----------------------------------
 Front-end can not only write pages, but also to do web applications, mobile, and even desktop programs
 #####Here, I use the front-end implementation of the project core
@@ -10,10 +10,12 @@ Front-end can not only write pages, but also to do web applications, mobile, and
 * Support more platforms........
 
 
-##What is xut.js?
+What is xut.js?
+-----------------------------------
 This is a template program, used to batch production of app, using the front end of the technology to achieve the simulation of the original app effect. Through the combination of various modules, integrated into a customized app applications
 
-##Preview
+Preview
+-----------------------------------
 * Cross-platform. There is the platform based on webkit, including PC/ios/android/wp
 * Through templates, easily implement the application
 
