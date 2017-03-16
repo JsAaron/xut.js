@@ -21,29 +21,34 @@ Preview
 
 ![](https://github.com/JsAaron/res/blob/master/horizontal.gif)
 
-##Integrated Right into Your PowerPoint
+Integrated Right into Your PowerPoint
+-----------------------------------
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt1.jpg)
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt2.jpg)
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt4.jpg)
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt3.jpg)
 
-##Notice
+Notice
+-----------------------------------
 It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
 
 
-##The support of the Xut.js
+The support of the Xut.js
+-----------------------------------
 * can be mass production of apk/ipa/epub/pc and other cross platform application software
 * using hybrid technology SPA, based on the cordova+h5+css3+webgl architecture
 * code more than 100 thousand lines, simulation of a variety of native applications, to achieve a hundred kinds of animation effects and 14 events, but also to achieve some of the webgl adaptation
 * specific introduction can refer to the blog link introduced App [Hybrid application production and cross platform solutions (http://www.cnblogs.com/aaronjs/p/4255232.html)
 
 
-##Technology
+Technology
+-----------------------------------
 #####Integration of the latest technology point node/es6/gulp/webpack/rollup/eslint/karma and so on
 * development: Based on ES6
 * test: Based on the webpack+express+rollup+gulp build, there is a hot replacement function
 * release: Based on gulp+rollup single file package
 * test: Based on karma+mocha+chai
 
-##Blog
+Blog
+-----------------------------------
 * http://www.cnblogs.com/aaronjs
