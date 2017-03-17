@@ -105,6 +105,15 @@ export default function baseConfig(callback) {
     //初始化工具栏
     //与数据库setting数据
     initTooBar((novelData, tempSettingData) => {
+
+      /*如果启动了代码追踪，配置基本信息*/
+      if(config.trackCode) {
+        config.trackCode = {
+          appId: config.appId,
+          appName: config.shortName
+        }
+      }
+
       //创建过滤器
       Xut.CreateFilter = contentFilter('createFilter');
       Xut.TransformFilter = contentFilter('transformFilter');

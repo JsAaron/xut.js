@@ -7,7 +7,7 @@
  *
  * *******************************************************************/
 import { sceneController } from '../../scenario/scene-control'
-import { parseJSON } from '../../util/lang'
+import { parseJSON, reviseSize } from '../../util/index'
 import { config } from '../../config/index'
 import pageWidget from './page/index'
 import iframeWidget from './iframe/index'
@@ -82,12 +82,8 @@ const adapterType = {
   }
 }
 
-
-/**
- * 过滤出数据
- * @return {[type]} [description]
- */
-const filterData = (data) => {
+/*过滤出数据*/
+const getWidgetData = (data) => {
   //直接通过id查询数据
   if(data.widgetId) {
     _.extend(data, Xut.data.query('Widget', data.widgetId))
@@ -98,86 +94,56 @@ const filterData = (data) => {
   return data;
 }
 
-
-/**
- * 计算元素的缩放比
- * @param  {[type]} data [description]
- * @return {[type]}      [description]
- */
-const calculateElement = (data) => {
-  var data = _.extend({}, data)
-  const proportion = config.proportion
-  data.width = CEIL(data.width * proportion.width);
-  data.height = CEIL(data.height * proportion.height);
-  data.top = FLOOR(data.top * proportion.top);
-  data.left = FLOOR(data.left * proportion.left);
+/*计算元素的缩放比*/
+const calculateSize = (data, pageStyle) => {
+  let sizeResults = reviseSize({
+    results: data,
+    getStyle: pageStyle,
+    proportion: pageStyle.pageProportion
+  })
+  data.width = data.scaleWidth
+  data.height = data.scaleHeight
+  data.top = data.scaleTop
+  data.left = data.scaleLeft
   return data;
 }
 
-/**
- * 获取widget数据
- * @return {[type]} [description]
- */
-const filtrateDas = (data) => {
-  data = filterData(data);
-  return calculateElement(data)
-}
-
-
-
-/**
- * ifarme内部，请求返回数据
- * @return {[type]} [description]
- */
+/*ifarme内部，请求返回数据*/
 const parsePara = (data) => {
-  var inputPara, //输入数据
-    outputPara; //输出数据
+  let inputPara
   if(inputPara = data.inputPara) {
-    outputPara = parseJSON(inputPara)
+    return parseJSON(inputPara)
   }
-  return outputPara;
+  return {}
 }
-
-
 
 export function Adapter(para) {
-
   //获取数据
-  let data = filtrateDas(para)
+  let data = getWidgetData(_.extend({}, para))
 
   data.id = data.activityId
-
-  //解析数据
   data.inputPara = parsePara(data)
 
-  if(!data.inputPara) {
-    data.inputPara = {}
-  }
+  /*增加属性参数*/
+  if(data.widgetType === 'page') { data.inputPara.container = data.rootNode }
 
-  //增加属性参数
-  if(data.widgetType === 'page') {
-    data.inputPara.container = data.rootNode
-  }
-
-  //重新定义页面的布局参数
-  let pageVisualSize
+  /*重新定义页面的布局参数*/
   let pageStyle = Xut.Presentation.GetPageStyle(para.pageIndex)
-  if(pageStyle && pageStyle.visualWidth) {
-    pageVisualSize = {
-      width: pageStyle.visualWidth,
-      height: pageStyle.visualHeight,
-      left: pageStyle.visualLeft,
-      top: pageStyle.visualTop
-    }
-    data.pageProportion = pageStyle.pageProportion
-  } else {
-    pageVisualSize = config.visualSize
-    data.pageProportion = config.proportion
+  let pageVisualSize = {
+    width: pageStyle.visualWidth,
+    height: pageStyle.visualHeight,
+    left: pageStyle.visualLeft,
+    top: pageStyle.visualTop
   }
+  data.pageProportion = pageStyle.pageProportion
+
+  /*缩放比值*/
+  data = calculateSize(data, pageStyle)
 
   data.inputPara.uuid = config.appId + '-' + data.activityId; //唯一ID标示
   data.inputPara.id = data.activityId;
   data.inputPara.screenSize = pageVisualSize
+
   //content的命名前缀
   data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType)
 

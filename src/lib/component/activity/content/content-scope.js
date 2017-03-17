@@ -83,7 +83,6 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
     canvasDom: canvasDom
   })
 
-
   /**
    * 如果是母版层理,视觉差处理
    * processType 三种情况
@@ -183,8 +182,9 @@ const innerExtend = function(target, source) {
 //注入动画
 //绑定用户事件
 export default function(base) {
-  var animation = base.seed.animation,
-    parallax = base.seed.parallax,
+
+  var animation = base.dataset.animation,
+    parallax = base.dataset.parallax,
     //抽出content对象
     abstractContents = [],
     //创建引用

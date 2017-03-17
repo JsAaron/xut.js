@@ -44,8 +44,8 @@ export function initApplication() {
     __app__.unbind(event, fn)
   }
 
-  Xut.Application.Notify = function(event, options) {
-    __app__.trigger(event, options)
+  Xut.Application.Notify = function(...arg) {
+    __app__.trigger(...arg)
   }
 
 

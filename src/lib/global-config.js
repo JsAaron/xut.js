@@ -52,6 +52,9 @@ export type Config = {
 
 const config: Config = {
 
+  /*是否启动跟踪状态*/
+  trackAction: false,
+
   /**
   * 图片模式webp
   * 0：旧版本,浏览器模式

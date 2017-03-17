@@ -34,6 +34,7 @@ export function initView() {
     })
   }
 
+
   /**
    * 加载一个新的场景
    * 1 节与节跳
@@ -43,14 +44,12 @@ export function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  Xut.View.LoadScenario = function(options, useUnlockCallBack) {
+  Xut.View.LoadScenario = function(options) {
 
-    var seasonId = toNumber(options.scenarioId),
-      chapterId = toNumber(options.chapterId),
-      pageIndex = toNumber(options.pageIndex),
-      createMode = options.createMode,
-      isInApp = options.isInApp;
-
+    let seasonId = toNumber(options.scenarioId)
+    let chapterId = toNumber(options.chapterId)
+    let pageIndex = toNumber(options.pageIndex)
+    let createMode = options.createMode
 
     //ibooks模式下的跳转
     //全部转化成超链接
@@ -59,22 +58,18 @@ export function initView() {
       return
     }
 
-    //用户指定的跳转入口，而不是通过内部关闭按钮处理的
-    var userAssign = createMode === 'sysClose' ? false : true,
-      //当前活动场景容器对象
-      current = sceneController.containerObj('current');
+    //当前活动场景容器对象
+    const current = sceneController.containerObj('current')
 
-    //获取到当前的页面对象
-    //用于跳转去重复
-    if(current && current.vm) {
-      var curVmPage;
-      if(curVmPage = current.vm.$curVmPage) {
-        if(curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
-          $$warn(`重复触发页面加载:seasonId:${seasonId},chapterId:${chapterId}`)
-          return
-        }
-      }
+    /*获取到当前的页面对象,用于跳转去重复*/
+    const curVmPage = current && current.vm && current.vm.$curVmPage
+    if(curVmPage && curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
+      $$warn(`重复触发页面加载:seasonId:${seasonId},chapterId:${chapterId}`)
+      return
     }
+
+    /*用户指定的跳转入口，而不是通过内部关闭按钮处理的*/
+    const userAssign = createMode === 'sysClose' ? false : true
 
     /**
      * 场景内部跳转
@@ -87,31 +82,27 @@ export function initView() {
       return
     }
 
-    /**
-     * 场景外部跳转
-     * 节与节的跳转,需要对场景的处理
-     */
-    //清理热点动作
-    current && current.vm.$suspend();
 
-    //通过内部关闭按钮加载新场景处理
+    //////////////////////////////////////
+    ///
+    ///  以下代码是加载一个新场景处理
+    ///
+    /////////////////////////////////////
+
+    /*清理热点动作,场景外部跳转,需要对场景的处理*/
+    current && current.vm.$suspend()
+
+    /*通过内部关闭按钮加载新场景处理，检测是不是往回跳转,重复处理*/
     if(current && userAssign) {
-      //检测是不是往回跳转,重复处理
-      sceneController.checkToRepeat(seasonId);
+      sceneController.checkToRepeat(seasonId)
     }
 
-
-    /**
-     * 加载新的场景
-     */
-
-    //读酷启动时不需要忙碌光标
-    if(window.DUKUCONFIG && options.main) {
-      Xut.View.HideBusy();
+    /*读酷启动时不需要忙碌光标*/
+    if(options.main && window.DUKUCONFIG) {
+      Xut.View.HideBusy()
     } else {
-      Xut.View.ShowBusy();
+      Xut.View.ShowBusy()
     }
-
 
     /**
      * 跳出去
@@ -124,27 +115,17 @@ export function initView() {
      * 关闭系统工具栏
      */
     if(current && !current.vm.$multiScenario) {
-      Xut.View.HideToolBar();
+      Xut.View.HideToolBar()
     }
 
-
-    /**
-     * 重写场景的顺序编号
-     * 用于记录场景最后记录
-     */
-    var pageId;
+    /*重写场景的顺序编号,用于记录场景最后记录*/
+    let pageId;
     if(current && (pageId = Xut.Presentation.GetPageId())) {
       sceneController.rewrite(current.scenarioId, pageId);
     }
 
-
-    /**
-     * 场景信息
-     * @type {[type]}
-     */
-    var sectionRang = Xut.data.query('sectionRelated', seasonId)
-    var barInfo = sectionRang.toolbar //场景工具栏配置信息
-    var pageTotal = sectionRang.length
+    /*场景信息*/
+    const sectionRang = Xut.data.query('sectionRelated', seasonId)
 
     /**
      * 通过chapterId转化为实际页码指标
@@ -155,7 +136,7 @@ export function initView() {
      * [description]
      * @return {[type]} [description]
      */
-    var parseInitIndex = () => {
+    const getInitIndex = () => {
       return chapterId ? (() => {
         //如果节点内部跳转方式加载,无需转化页码
         if(createMode === 'GotoSlide') {
@@ -166,38 +147,23 @@ export function initView() {
       })() : 0;
     }
 
-    /**
-     * 传递的参数
-     * seasonId    节ID
-     * chapterId   页面ID
-     * pageIndex   指定页码
-     * isInApp     是否跳到收费提示页
-     * pageTotal   页面总数
-     * barInfo     工具栏配置文件
-     * history     历史记录
-     * sectionRang 节信息
-     * complete    构件完毕回调
-     * @type {Object}
-     */
-    var data = {
-      seasonId: seasonId,
-      chapterId: chapterId,
-      pageIndex: pageIndex || parseInitIndex(),
-      isInApp: isInApp,
-      pageTotal: pageTotal,
-      barInfo: barInfo,
-      history: options.history,
-      sectionRang: sectionRang,
-      //制作场景切换后处理
-      complete(nextBack) {
-        //销毁多余场景
+    /*传递的参数*/
+    const data = {
+      seasonId, //节ID
+      chapterId, //页面ID
+      sectionRang, //节信息
+      isInApp: options.isInApp, //是否跳到收费提示页
+      history: options.history, // 历史记录
+      barInfo: sectionRang.toolbar, //工具栏配置文件
+      pageIndex: pageIndex || getInitIndex(), //指定页码
+      pageTotal: sectionRang.length, //页面总数
+      complete(nextBack) { //构件完毕回调
+        //销毁旧场景
         current && current.destroy()
           //下一个任务存在,执行切换回调后,在执行页面任务
         nextBack && nextBack();
         //去掉忙碌
         Xut.View.HideBusy();
-        //解锁回调
-        useUnlockCallBack && useUnlockCallBack();
       }
     }
 

@@ -2,6 +2,8 @@
 /// 初始化页面默认行为
 /////////////////////////////
 
+import { $$set } from '../util/stroage'
+import { config } from '../config/index'
 import { fixAudio } from '../component/audio/fix'
 
 //修复H5音频自动播放bug
@@ -15,7 +17,6 @@ let hasDefault = false
 
 export function initGlobalEvent() {
   if(Xut.plat.isBrowser && !hasDefault) {
-
     hasDefault = true
 
     //禁止全局的缩放处理
@@ -34,6 +35,17 @@ export function initGlobalEvent() {
           break;
       }
     })
+
+    /*启动代码用户操作跟踪*/
+    if(config.trackCode) {
+      const startupTime = +new Date
+        /*离开页面*/
+      $(window).on('unload', function() {
+        Xut.Application.Notify('trackCode', 'appTime', _.extend({
+          time: (+new Date) - startupTime
+        }, config.trackCode))
+      })
+    }
   }
 }
 

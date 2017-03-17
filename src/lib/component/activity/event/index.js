@@ -143,7 +143,7 @@ export default function(activitProto) {
      */
     const setBehavior = function(feedbackBehavior) {
       let behaviorSound
-      //音频地址
+        //音频地址
       if(behaviorSound = feedbackBehavior.behaviorSound) {
         //妙妙学客户端强制删除
         if(window.MMXCONFIG && window.audioHandler) {
@@ -215,6 +215,15 @@ export default function(activitProto) {
      * 点击,双击,滑动等等....
      */
     const eventRun = function() {
+
+      /*跟踪点击动作*/
+      if(config.trackCode) {
+        Xut.Application.Notify('trackCode', 'action', _.extend({
+          pageId: self.pageId,
+          eventName: eventData.eventName
+        }, config.trackCode))
+      }
+
       //脚本动画
       if(eventData.rewrite) {
         self.runAnimation()

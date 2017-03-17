@@ -44,18 +44,11 @@ export function bindActivity(data, contentDas, callback) {
   }(data.floatMaters.ids, data.getStyle.offset);
 
   //相关回调
-  var relatedCallback = {
-
-    /**
-     * 绑定卷滚条钩子
-     */
+  const relatedCallback = {
+    /*绑定卷滚条钩子*/
     'iscrollHooks': [],
-
-    /**
-     * contetn钩子回调
-     */
+    /*contetn钩子回调*/
     'contentsHooks': pageBaseHooks.contents,
-
     /**
      * 收集滑动事件
      * 针对mini
@@ -65,7 +58,7 @@ export function bindActivity(data, contentDas, callback) {
   }
 
   //相关数据
-  var relatedData = {
+  const relatedData = {
     'floatMaters': data.floatMaters,
     'seasonId': data.chpaterData.seasonId,
     'pageId': pageId,
@@ -86,7 +79,7 @@ export function bindActivity(data, contentDas, callback) {
    * 继续下一个任务
    * @return {[type]} [description]
    */
-  var nextTask = function() {
+  const nextTask = function() {
     //多事件合集处理pagebase
     if(eventRelated) {
       pageBaseHooks.eventBinding && pageBaseHooks.eventBinding(eventRelated)
@@ -101,11 +94,11 @@ export function bindActivity(data, contentDas, callback) {
    * 生成activty控制对象
    * @type {[type]}
    */
-  var makeActivitys = function(compiler) {
+  const makeActivitys = function(compiler) {
     return function(callback) {
       var filters;
-      var imageId = compiler['imageIds']; //父id
-      var activity = compiler['activity'];
+      var imageId = compiler.imageIds; //父id
+      var activity = compiler.activity;
       var eventType = activity.eventType;
       var dragdropPara = activity.para1;
       var eventContentId = imageId;
@@ -129,14 +122,9 @@ export function bindActivity(data, contentDas, callback) {
       }
 
       //需要绑定事件的数据
-      var eventData = {
-        'eventContentId': eventContentId,
-        'eventType': eventType,
-        'dragdropPara': dragdropPara,
-        'feedbackBehavior': feedbackBehavior
-      }
+      const eventData = { eventContentId, eventType, dragdropPara, feedbackBehavior }
 
-      var actdata = {
+      const actdata = {
         'noticeComplete': callback, //监听完成
         'pageIndex': data.pageIndex,
         'canvasRelated': data.canvasRelated, //父类引用
@@ -146,8 +134,8 @@ export function bindActivity(data, contentDas, callback) {
         'getStyle': data.getStyle,
         'activityId': activity._id,
         '$containsNode': $containsNode,
-        'pageType': compiler['pageType'], //构建类型 page/master
-        'seed': compiler['seed'], //动画表数据 or 视觉差表数据
+        'pageType': compiler.pageType, //构建类型 page/master
+        'dataset': compiler.dataset, //动画表数据 or 视觉差表数据
         "pid": pid, //页码
         'eventData': eventData, //事件数据
         'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享

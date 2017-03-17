@@ -397,7 +397,7 @@ export default class Activity {
     this.preventRepeat = true;
 
     //如果没有运行动画
-    if(!this.seed.animation) {
+    if(!this.dataset.animation) {
       this.preventRepeat = false;
       this._relevantOperation();
       return;

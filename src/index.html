@@ -14,11 +14,13 @@
     * {
         touch-action: none;
     }
+
     button {
         border: 1px solid red;
         position: absolute;
         z-index: 99999
     }
+
     #closeMini {
         left: 100px;
     }
@@ -38,7 +40,7 @@ Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
     historyMode: true,
-    visualMode: 3,
+    visualMode: 2,
     cursor: {
         url: 'images/icons/busyicon.gif',
         delayTime: 300
@@ -52,11 +54,12 @@ Xut.Application.setConfig = {
     pageBar: {
         // type: 'circular',
         // mode: 1
-            // position: {
-            //     top: '90%',
-            //     left: '20%'
-            // }
+        // position: {
+        //     top: '90%',
+        //     left: '20%'
+        // }
     },
+    trackCode: true,
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: false
@@ -66,7 +69,37 @@ function openurl() {
     window.location.href = 'http://www.kidreadcool.com/downloads.php?esp=mios'
 }
 
-var appId = 324
+
+/**
+ * 监听代码追踪
+ * type:
+ *   appTime //app运行总时间
+ *   pageTime //每个页面运行时间
+ *   action // 页面每个动作
+ *
+ *  options
+ *    appId  应用的id
+ *    appName 应用标题
+ *    pageId 页面的id,对应数据库chapter ID
+ *    eventName 事件名
+ *    time  时间
+ *    type  触发的类型
+ */
+Xut.Application.Watch('trackCode', function(type, options) {
+    switch (type) {
+        case 'appTime':
+            break;
+        case 'pageTime':
+            break;
+        case 'action':
+        // console.log(options.pageId,options.eventName,options.type)
+            break;
+    }
+})
+
+
+
+var appId = 101
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

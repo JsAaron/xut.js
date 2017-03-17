@@ -7,6 +7,7 @@ import { Abstract } from './abstract'
 import { Pagebase } from '../../pagebase/index'
 import { removeVideo } from '../../../component/video/manager'
 import { execScript } from '../../../util/index'
+import { config } from '../../../config/index'
 import { addEdges } from '../../../util/edge'
 import {
   $$suspend,
@@ -48,12 +49,12 @@ export default class PageMgr extends Abstract {
   create(dataOpts, pageIndex) {
     //生成指定页面对象
     const pageObjs = new Pagebase(
-      _.extend(dataOpts, {
-        'pageType': this.pageType, //创建页面的类型
-        'rootNode': this.pagesNode //根元素
-      })
-    )
-    //增加页面管理
+        _.extend(dataOpts, {
+          'pageType': this.pageType, //创建页面的类型
+          'rootNode': this.pagesNode //根元素
+        })
+      )
+      //增加页面管理
     this.abstractAddCollection(pageIndex, pageObjs);
     return pageObjs;
   }
@@ -95,6 +96,14 @@ export default class PageMgr extends Abstract {
     const stopPointer = pointers.stopPointer
     const suspendPageObj = this.abstractGetPageObj(stopPointer)
     const prveChpterId = suspendPageObj.baseGetPageId(stopPointer)
+
+    /*如果有代码跟踪*/
+    if(config.trackCode && suspendPageObj.startupTime) {
+      Xut.Application.Notify('trackCode', 'pageTime', _.extend({
+        pageId: suspendPageObj.chapterId,
+        time: (+new Date) - suspendPageObj.startupTime
+      }, config.trackCode))
+    }
 
     //翻页结束脚本
     runScript(suspendPageObj, 'postCode');
@@ -191,6 +200,11 @@ export default class PageMgr extends Abstract {
     //如果任务没有完成，则等待任务完成
     this._checkTaskCompleted(data.currIndex, function(currPageObj) {
 
+      /*跟踪，每个页面的停留时间，开始*/
+      if(config.trackCode) {
+        currPageObj.startupTime = +new Date
+      }
+
       currPageObj.createPageAction()
 
       //提升当前页面浮动对象的层级
@@ -234,7 +248,7 @@ export default class PageMgr extends Abstract {
    */
   clearPage(clearPageIndex) {
     const pageObj = this.abstractGetPageObj(clearPageIndex)
-    //销毁页面对象事件
+      //销毁页面对象事件
     if(pageObj) {
       //移除事件
       pageObj.baseDestroy();

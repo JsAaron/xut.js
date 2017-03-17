@@ -16,10 +16,7 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
   //去重复
   dasFloat.ids = arrayUnique(dasFloat.ids)
 
-  var makePrefix,
-    fragment,
-    zIndex,
-    zIndexs = dasFloat.zIndex;
+  var makePrefix, fragment, zIndex, zIndexs = dasFloat.zIndex;
 
   data.count++;
 
@@ -58,19 +55,16 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
 
   let getStyle = base.getStyle
 
-  let flowHtml = `<div id="${floatName}-li-${data.pid}"
-                     class="xut-float"
-                     style="left:${getStyle.visualLeft}px;
-                            top:${getStyle.visualTop}px;
-                            ${TRANSFORM}:${data.getStyle.translate};z-index:${zIndex};${overflow}">
-                  </div>`
+  let flowHtml =
+    `<div id="${floatName}-li-${data.pid}"
+           class="xut-float"
+           style="left:${getStyle.visualLeft}px;
+                  top:${getStyle.visualTop}px;
+                  ${TRANSFORM}:${data.getStyle.translate};z-index:${zIndex};${overflow}">
+    </div>`
 
-
-  let container = $(String.styleFormat(flowHtml))
-
-  //增加浮动容器
+  const container = $(String.styleFormat(flowHtml))
   $(data.rootNode).after(container)
-
   callback($containsNodes, container)
 }
 
@@ -79,11 +73,9 @@ function crateFloat(callback, floatName, dasFloat, data, base) {
  * @return {[type]} [description]
  */
 export function createFloatMater(base, data, complete) {
-  //创建浮动对象
   crateFloat(function($containsNodes, container) {
     //浮动容器
     data.floatMaters.container = container;
-
     nextTick({
       'container': container,
       'content': $containsNodes
@@ -99,9 +91,7 @@ export function createFloatMater(base, data, complete) {
  * 创建浮动的页面对象
  */
 export function createFloatPage(base, data, complete) {
-  //创建浮动对象
   crateFloat(function($containsNodes, container) {
-    //浮动容器
     data.floatPages.container = container;
     nextTick({
       'container': container,

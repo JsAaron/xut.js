@@ -6,16 +6,15 @@
  * ***************************************************/
 import { config } from '../../../../config/index'
 import { nextTick } from '../../../../util/nexttick'
-import { $$on, $$off } from '../../../../util/dom'
-import { Zoom } from '../../../../plugin/extend/zoom/index'
 import { bindActivity } from './bind-activity'
 import { parseBehavior } from './parse-behavior'
-import { contentStructure } from './dom/index'
-import { contentParser, activityParser } from './parse-data'
+import { zoomImage } from './zoom-image'
+import { textFx } from './text-fx'
+import { contentStructure } from './structure/index'
+import { contentParser, activityParser } from './data-parser'
 import { createFloatMater, createFloatPage } from './float'
 import { sceneController } from '../../../../scenario/scene-control'
-import { analysisImageName, insertImageUrlSuffix } from '../../../../util/option'
-import { LetterEffect } from '../../../../component/activity/content/letter-effect'
+
 
 /**
  * 构建快速查询节点对象
@@ -62,118 +61,104 @@ function toArray(contentsFragment, headerFooterMode) {
  */
 export default class TaskContents {
 
-  constructor(activityData) {
-    _.extend(this, activityData)
-      //只解析content有关的activityData
-    let compileActivitys = activityParser(activityData)
-      //如果有预执行动作
-      //Activity表数据存在
-    if(compileActivitys) {
-      //解析动画表数据结构
-      activityData = contentParser(compileActivitys, activityData)
-        /*开始多线程处理*/
-      activityData.createContentIds.length ? this._dataAfterCheck(activityData) : this._loadComplete();
+  /*管道参数，贯通*/
+  constructor(pipeData) {
+    _.extend(this, pipeData)
+      /*chapter => activity*/
+    let activitys
+    if(activitys = activityParser(pipeData)) {
+      pipeData = contentParser(activitys, pipeData)
+      pipeData.createContentIds.length ? this._dataAfterCheck(pipeData) : this._loadComplete();
     } else {
       this._loadComplete();
     }
   }
 
+  /*
+  初始化浮动页面参数
+   */
+  _initFloat(pipeData) {
+    //浮动模板
+    //用于实现模板上的事件
+    pipeData.floatMaters = {
+      'ids': [], //浮动id
+      'container': {}, //浮动容器
+      'zIndex': {}
+    }
+
+    //浮动页面
+    //母板事件引起的层级遮挡问题
+    //用于提升最高
+    pipeData.floatPages = {
+      'ids': [],
+      'zIndex': {}
+    }
+  }
+
   /**
    * 中断一:构建数据之后
-   * @param  {[type]} data [description]
-   * @return {[type]}      [description]
+   * 构建结构
    */
-  _dataAfterCheck(data) {
-
+  _dataAfterCheck(pipeData) {
     this._assert('dataAfter', function() {
-      //浮动模板
-      //用于实现模板上的事件
-      data.floatMaters = {
-        'ids': [], //浮动id
-        'container': {}, //浮动容器
-        'zIndex': {}
-      }
-
-      //浮动页面
-      //母板事件引起的层级遮挡问题
-      //用于提升最高
-      data.floatPages = {
-        'ids': [],
-        'zIndex': {}
-      }
-
-      //解析activitys.parameter中的数据里
-      //点击反馈
-      //点击缩放
-      parseBehavior(data)
-
-      //构建页面content类型结构
-      //contentDas, contentStr, containerPrefix, idFix, contentHtmlBoxIds
+      /*初始化浮动*/
+      this._initFloat(pipeData)
+        /*解析点击反馈，点击缩放*/
+      parseBehavior(pipeData)
+        /*构建页面content类型结构*/
       contentStructure(userData => {
-
-        data.contentHtmlBoxIds = userData.contentHtmlBoxIds
-        data.contentsFragment = {}
-
-        //iboosk节点预编译
-        //在执行的时候节点已经存在
-        //不需要在创建
+        pipeData.contentHtmlBoxIds = userData.contentHtmlBoxIds
+        pipeData.contentsFragment = {}
+          //iboosk节点预编译
+          //在执行的时候节点已经存在
+          //不需要在创建
         if(Xut.IBooks.runMode()) {
-          _.each(userData.idFix, function(id) {
-            data.contentsFragment[id] = data.$containsNode.find("#" + id)[0]
+          _.each(userData.idFix, (id) => {
+            pipeData.contentsFragment[id] = pipeData.$containsNode.find("#" + id)[0]
           })
         } else {
           //构件快速查询节点对象
-          data.contentsFragment = toObject(userData.contentStr)
+          pipeData.contentsFragment = toObject(userData.contentStr)
           delete userData.contentStr
         }
-
         //容器的前缀
-        data.containerPrefix = userData.containerPrefix
-
-        /* eslint-disable */
-        //2015.5.6暴露到全局
-        //提供给音频字幕上下文
-        if(!Xut.Contents.contentsFragment[data.chapterId]) {
-          Xut.Contents.contentsFragment[data.chapterId];
+        pipeData.containerPrefix = userData.containerPrefix
+          /* eslint-disable */
+          //2015.5.6暴露到全局
+          //提供给音频字幕上下文
+        if(!Xut.Contents.contentsFragment[pipeData.chapterId]) {
+          Xut.Contents.contentsFragment[pipeData.chapterId];
         }
-        Xut.Contents.contentsFragment[data.chapterId] = data.contentsFragment
+        Xut.Contents.contentsFragment[pipeData.chapterId] = pipeData.contentsFragment
           /* elist-enable */
-
-        //开始下一个任务
-        this._dataStrCheck(data, userData);
-
-      }, data, this)
+        this._dataStrCheck(pipeData, userData);
+      }, pipeData, this)
 
     })
   }
 
   /**
    * 中断二:构建结构之后
-   * @param  {[type]} data       [description]
-   * @param  {[type]} contentDas [description]
-   * @return {[type]}            [description]
+   * 绑定事件
    */
-  _dataStrCheck(data, userData) {
+  _dataStrCheck(pipeData, userData) {
     this._assert('strAfter', function() {
       let contentDas = userData.contentDas
-
-      //放大图片
-      if(Object.keys(data.zoomBehavior).length) {
-        this._zoomImage(data)
+        /*缩放图片*/
+      if(Object.keys(pipeData.zoomBehavior).length) {
+        this.zoomObjs = zoomImage(pipeData)
+        this.zoomBehavior = pipeData.zoomBehavior
       }
-
       //文本特效
       if(userData.textFx.length) {
-        this._textFx(data, userData.textFx)
+        this.textFxObjs = textFx(pipeData, userData.textFx)
       }
-
       //保留场景的留信息
       //用做软件制作单页预加载
-      sceneController.seasonRelated = data.seasonRelated;
-
+      sceneController.seasonRelated = pipeData.seasonRelated;
       //初始化content对象
-      bindActivity(data, contentDas, delayHooks => {
-        this._eventAfterCheck(data, delayHooks, userData.headerFooterMode)
+      bindActivity(pipeData, contentDas, delayHooks => {
+        this._eventAfterCheck(pipeData, delayHooks, userData.headerFooterMode)
       })
     })
   }
@@ -314,121 +299,6 @@ export default class TaskContents {
       this.suspendQueues = null;
     }
   }
-
-
-  /**
-   * 点击放大图
-   * @return {[type]} [description]
-   */
-  _zoomImage(data) {
-    let self = this
-    self.zoomObjs = {} //保存缩放对象
-    _.each(data.contentsFragment, function(node) {
-      //需要单独绑定点击放大功能
-      let behaviorData = data.zoomBehavior[node.id]
-      let size
-      let promptHtml
-      if(behaviorData) {
-        //缩放提示图片
-        if(behaviorData.prompt) {
-          size = config.screenSize.width > config.screenSize.height ? '2vw' : '2vh'
-          promptHtml = `<div class="icon-maximize"
-                             style="font-size:${size};position:absolute;right:0;">
-                        </div>`
-          $(node).append(String.styleFormat(promptHtml))
-        }
-        let hasMove = false
-        $$on(node, {
-          start() {
-            hasMove = false
-          },
-          move() {
-            hasMove = true
-          },
-          end() {
-            if(hasMove) return
-            let $node = $(node)
-            let $imgNode = $node.find('img')
-
-            if(!$imgNode.length) {
-              return
-            }
-
-            let src = $imgNode[0].src
-            let zoomObj = self.zoomObjs[src]
-
-            if(zoomObj) {
-              zoomObj.play()
-            } else {
-              let hqSrc
-              let analysisName = analysisImageName(src)
-                //如果启动了高清图片
-              if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-                hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
-              }
-              self.zoomObjs[src] = new Zoom({
-                element: $imgNode,
-                originalSrc: config.pathAddress + analysisName.suffix,
-                hdSrc: hqSrc
-              })
-            }
-          }
-        })
-        behaviorData.off = function() {
-          $$off(node)
-          node = null
-        }
-      }
-    })
-    this.zoomBehavior = data.zoomBehavior
-  }
-
-  /**
-   * 文本特效
-   * @return {[type]} [description]
-   */
-  _textFx(data, textFx) {
-
-    let uuid = 1
-    let content
-    let contentNode
-    let parentNodes = [] //收集父节点做比对
-    let group = {}
-    let textfxNodes
-    let parentNode
-
-    //文本特效对象
-    let textFxObjs = {}
-
-    while(content = textFx.shift()) {
-      if(contentNode = data.contentsFragment[content.texteffectId]) {
-        let contentId = content._id
-
-        //初始化文本对象
-        textFxObjs[contentId] = new LetterEffect(contentId)
-        textfxNodes = contentNode.querySelectorAll('a[data-textfx]')
-
-        if(textfxNodes.length) {
-          textfxNodes.forEach(function(node) {
-            //如果是共享了父节点
-            parentNode = node.parentNode
-            if(-1 != parentNodes.indexOf(parentNode)) {
-              group[parentNode.textFxId].push(node)
-            } else {
-              parentNode.textFxId = uuid
-              group[uuid] = []
-              group[uuid++].push(node)
-            }
-            parentNodes.push(parentNode)
-            textFxObjs[contentId].addQueue(node, node.getAttribute('data-textfx'))
-          })
-        }
-      }
-    }
-
-    this.textFxObjs = textFxObjs
-  }
-
 
   /**
    * 构建完毕

@@ -1,9 +1,10 @@
-/**
- * 手动触发控制
- * @return {[type]} [description]
- */
+import { config } from '../../config/index'
 import directives from '../directive/index'
 
+/**
+ * 全局事件
+ * 手动触发控制
+ */
 export function $$trigger(target, attribute, rootNode, pageIndex) {
 
   const key = target.id
@@ -12,34 +13,28 @@ export function $$trigger(target, attribute, rootNode, pageIndex) {
     const tag = key.split('_');
     const type = tag[0];
     const id = tag[1];
-    const dir = directives[type];
+    const directive = directives[type];
 
-    if(dir && dir.trigger) {
+    if(directive && directive.trigger) {
 
-      //获取页面类型
-      const pageType = function() {
-        if(rootNode && rootNode.id) {
-          return /page/.test(rootNode.id) ? 'page' : 'master';
-        } else {
-          return 'page';
-        }
-      }();
+      /*获取页面类型,page或master*/
+      const pageType = rootNode && rootNode.id ?
+        /page/.test(rootNode.id) ? 'page' : 'master' :
+        'page';
 
-      const data = {
-        "id": id,
-        "activityId": id,
-        "key": key,
-        "type": type,
-        "rootNode": rootNode,
-        "target": target,
-        "pageIndex": pageIndex,
-        'pageType': pageType
+      const data = { id, key, type, rootNode, target, pageIndex, pageType, "activityId": id, }
+
+      /*如果有代码跟踪*/
+      if(config.trackCode) {
+        Xut.Application.Notify('trackCode', 'action', _.extend({
+          pageId: Xut.Presentation.GetPageId(pageType, pageIndex),
+          eventName: 'tap'
+        }, config.trackCode))
       }
 
-      //如果是重复点击
-      //比如widget零件
-      let instance
-      if(instance = Xut.Application.GetSpecifiedObject(pageType, data)) {
+      /*如果是重复点击,比如widget零件*/
+      const instance = Xut.Application.GetSpecifiedObject(pageType, data)
+      if(instance) {
         if(instance.toggle) {
           //如果有对应的处理方法
           return instance.toggle()
@@ -47,7 +42,7 @@ export function $$trigger(target, attribute, rootNode, pageIndex) {
       }
 
       //委派新的任务
-      dir.trigger(data)
+      directive.trigger(data)
     }
   }
 }
