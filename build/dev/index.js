@@ -31,23 +31,23 @@ fsextra.mkdirSync(conf.assetsRoot);
 
 const webpackConfig = require('./webpack.dev.conf')
 
-/**
- * eslint
- * @param  {[type]} config.dev.eslint.launch [description]
- * @return {[type]}                          [description]
- */
-if (config.dev.eslint.launch) {
-  webpackConfig.module.preLoaders = [{
-    test: /\.js$/,
-    loader: 'eslint',
-    include: config.dev.eslint.dir,
-    exclude: /node_modules/
-  }]
 
-  // community formatter
-  webpackConfig.eslint = {
-    formatter: require("eslint-friendly-formatter")
-  }
+/*eslint
+  https://segmentfault.com/a/1190000008575829?utm_source=itdadao&utm_medium=referral
+*/
+if(config.dev.eslint.launch) {
+  webpackConfig.module.rules.push({
+    test: /\.js$/,
+    enforce: "pre",//在babel-loader对源码进行编译前进行lint的检查
+    include: config.dev.eslint.dir,
+    exclude: /node_modules/,
+    use: [{
+      loader: "eslint-loader",
+      options: {
+        formatter: require("eslint-friendly-formatter")
+      }
+    }]
+  })
 }
 
 const compiler = webpack(webpackConfig)
@@ -100,16 +100,16 @@ app.use('/content', express.static('src/content'));
 let first = true
 let preChildRun = null
 watch(conf.assetsRoot + '/app.js', () => {
-  if (first) {
+  if(first) {
     open("http://localhost:" + port)
     first = false
   }
-  if (config.dev.debug.launch) {
+  if(config.dev.debug.launch) {
     console.log(
       '\n' +
       'debug mode : to regenerate the file'
     )
-    if (preChildRun) {
+    if(preChildRun) {
       preChildRun.kill()
       preChildRun = null
     }
@@ -124,7 +124,7 @@ watch(conf.assetsRoot + '/app.js', () => {
 
 killOccupied(port, () => {
   app.listen(port, (err) => {
-    if (err) {
+    if(err) {
       console.log(err)
       return
     }

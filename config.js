@@ -57,7 +57,7 @@ module.exports = {
          * @type {Object}
          */
         eslint: {
-            launch: true,
+            launch:false,
             //必须绝对路径
             dir: path.resolve(__dirname, 'src/lib'),
         },
