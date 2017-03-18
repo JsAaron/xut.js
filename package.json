@@ -1,7 +1,7 @@
 {
-  "name": "es6-magazine",
+  "name": "Xut.js",
   "version": "1.0.0-csp",
-  "description": "A es6-magazine project",
+  "description": "H5 Hybrid application generator ",
   "scripts": {
     "dev": "node build/dev/index.js",
     "build": "node build/build/index.js",
