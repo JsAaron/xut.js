@@ -1,6 +1,6 @@
 {
   "name": "Xut.js",
-  "version": "1.0.0-csp",
+  "version": "1.0",
   "description": "H5 Hybrid application generator ",
   "scripts": {
     "dev": "node build/dev/index.js",
