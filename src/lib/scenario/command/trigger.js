@@ -27,6 +27,8 @@ export function $$trigger(target, attribute, rootNode, pageIndex) {
       /*如果有代码跟踪*/
       if(config.trackCode) {
         Xut.Application.Notify('trackCode', 'action', _.extend({
+          id,
+          type,
           pageId: Xut.Presentation.GetPageId(pageType, pageIndex),
           eventName: 'tap'
         }, config.trackCode))

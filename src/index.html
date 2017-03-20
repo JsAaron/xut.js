@@ -72,27 +72,34 @@ function openurl() {
 
 /**
  * 监听代码追踪
- * type:
- *   appTime //app运行总时间
- *   pageTime //每个页面运行时间
- *   action // 页面每个动作
+ * type:类型
+ *   keepAppTime //应用运行时间
+ *   keepPageTime //每个页面运行时间
+ *   action => (包含，content的事件，action,audio,video,widget零件触发的事件)
  *
- *  options
- *    appId  应用的id
- *    appName 应用标题
- *    pageId 页面的id,对应数据库chapter ID
- *    eventName 事件名
- *    time  时间
- *    type  触发的类型
+ *  options:参数
+ *    keepAppTime => time 运行时间
+ *    keepPageTime => time 运行时间
+ *
+ *    action => {
+ *      appId  应用的id
+ *      appName 应用标题
+ *      id 元素的id
+ *      type  触发的类型
+ *      pageId 页面的id,对应数据库chapter ID
+ *      eventName 事件名
+ *    }
+ *
  */
 Xut.Application.Watch('trackCode', function(type, options) {
     switch (type) {
-        case 'appTime':
+        case 'keepAppTime':
             break;
-        case 'pageTime':
+        case 'keepPageTime':
+        // console.log(type,options)
             break;
         case 'action':
-        // console.log(options.pageId,options.eventName,options.type)
+        console.log(type,options)
             break;
     }
 })

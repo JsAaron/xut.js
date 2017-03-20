@@ -11,12 +11,8 @@
 import Powepoint from '../../../plugin/extend/powerpoint/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
-import {
-  clearContentAudio
-} from '../../audio/manager'
-import {
-  makeJsonPack
-} from '../../../util/lang'
+import { clearContentAudio } from '../../audio/manager'
+import { makeJsonPack } from '../../../util/lang'
 
 //2016.7.15废弃
 //pixi暂时不使用
@@ -98,9 +94,9 @@ export default class Animation {
 
     //动作类型
     //可能是组合动画
-    const actionTypes = this.contentDas.actionTypes
+    const actionTypes = this.contentData.actionTypes
     const makeOpts = {
-      data: this.contentDas,
+      data: this.contentData,
       renderer: this.$contentNode,
       pageIndex: this.pageIndex
     }
@@ -150,7 +146,7 @@ export default class Animation {
     //特殊高级动画
     //必须是ppt与pixi绑定的
     if(actionTypes.compSpriteId) {
-      // console.log(this,this.id,this.contentDas.initpixi)
+      // console.log(this,this.id,this.contentData.initpixi)
       //这个dom已经创建了pixi了
       if(initstate) {
         createPixiPPT()
@@ -175,7 +171,7 @@ export default class Animation {
     if(category) {
       const data = {
         id: this.id,
-        data: this.contentDas,
+        data: this.contentData,
         $contentNode: this.$contentNode
       }
       switch(category) {
@@ -202,7 +198,7 @@ export default class Animation {
    *  2 canvas动画
    */
   init(id, $contentNode, $containsNode, chapterId, parameter, pageType) {
-    let category = this.contentDas.category
+    let category = this.contentData.category
     let pageIndex = this.pageIndex
     let create = (constr, newContext) => {
       let element = newContext || $contentNode
@@ -291,8 +287,8 @@ export default class Animation {
     }
 
     //销毁每一个数据上的canvas上下文引用
-    if(this.contentDas.$contentNode) {
-      this.contentDas.$contentNode = null;
+    if(this.contentData.$contentNode) {
+      this.contentData.$contentNode = null;
     }
 
     access((key) => {

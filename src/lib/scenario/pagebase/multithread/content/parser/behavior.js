@@ -1,4 +1,4 @@
-import { createFn, parseJSON } from '../../../../util/index'
+import { createFn, parseJSON } from '../../../../../util/index'
 
 /**
  * 行为反馈
@@ -9,19 +9,19 @@ import { createFn, parseJSON } from '../../../../util/index'
  *  2016.12.6
  *     增加，点击放大 zoom
  */
-export function parseBehavior(data) {
+export function parseBehavior(pipeData) {
   let parameter
   let soundSrc
   let contentId
   let isButton
-  let feedbackBehavior = data.feedbackBehavior = {} //点击行为
-  let zoomBehavior = data.zoomBehavior = {} //缩放行为
+  let feedbackBehavior = pipeData.feedbackBehavior = {} //点击行为
+  let zoomBehavior = pipeData.zoomBehavior = {} //缩放行为
   let hasZoom
-  let pid = data.pid
+  let pid = pipeData.pid
   let prefix
   let id
 
-  _.each(data.activitys, function(activitys) {
+  _.each(pipeData.activitys, function(activitys) {
     if(activitys.parameter && (parameter = parseJSON(activitys.parameter))) {
       contentId = activitys.imageId;
 

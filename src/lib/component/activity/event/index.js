@@ -1,16 +1,6 @@
-import {
-  config
-} from '../../../config/index'
-//音频
-import {
-  audioPlayer
-} from '../../audio/audio'
-//dom事件
-import {
-  conversionEventType,
-  bindContentEvent
-}
-from './event'
+import { config } from '../../../config/index'
+import { audioPlayer } from '../../audio/audio'
+import { conversionEventType, bindContentEvent } from './event'
 
 export default function(activitProto) {
 
@@ -59,7 +49,6 @@ export default function(activitProto) {
 
     return contentName
   }
-
 
   /**
    * 获取事件上下文
@@ -218,10 +207,16 @@ export default function(activitProto) {
 
       /*跟踪点击动作*/
       if(config.trackCode) {
-        Xut.Application.Notify('trackCode', 'action', _.extend({
-          pageId: self.pageId,
-          eventName: eventData.eventName
-        }, config.trackCode))
+        /*如果有标记才处理*/
+        const contentData = self.relatedData.contentDataset[self.id]
+        if(contentData && contentData.trackCode) {
+          Xut.Application.Notify('trackCode', 'action', _.extend({
+            pageId: self.pageId,
+            id: self.id,
+            type: self.type,
+            eventName: eventData.eventName
+          }, config.trackCode))
+        }
       }
 
       //脚本动画

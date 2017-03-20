@@ -1,5 +1,5 @@
-import { reviseSize } from '../../../../../util/option'
-import { parseContentDas } from './parse/content'
+import { reviseSize } from '../../../../../../util/option'
+import { parseContentData } from '../../parser/dataset'
 
 /**
  * 针对容器类型的处理
@@ -9,13 +9,11 @@ import { parseContentDas } from './parse/content'
  * @return {[type]}               [description]
  */
 const createContainerWrap = (containerName, contentId, pid, getStyle) => {
-
-  const contentDas = parseContentDas([contentId])
+  const contentResult = parseContentData([contentId])
   const data = reviseSize({
-    results: contentDas[0],
+    results: contentResult[0],
     proportion: getStyle.pageProportion
   })
-
   const wapper =
     `<div  id="${containerName}"
                data-behavior="click-swipe"

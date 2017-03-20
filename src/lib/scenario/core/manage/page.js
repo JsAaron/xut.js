@@ -99,7 +99,7 @@ export default class PageMgr extends Abstract {
 
     /*如果有代码跟踪*/
     if(config.trackCode && suspendPageObj.startupTime) {
-      Xut.Application.Notify('trackCode', 'pageTime', _.extend({
+      Xut.Application.Notify('trackCode', 'keepPageTime', _.extend({
         pageId: suspendPageObj.chapterId,
         time: (+new Date) - suspendPageObj.startupTime
       }, config.trackCode))

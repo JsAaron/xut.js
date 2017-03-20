@@ -67,7 +67,6 @@ export function extendContent(access, $globalEvent) {
     }, pageType, contentIds, eachContext)
   }
 
-
   /**
    * 得到指定页面零件的数据
    * 获取指定的content数据
@@ -92,27 +91,27 @@ export function extendContent(access, $globalEvent) {
       contentId = [contentId];
     }
 
-    var contentDas, contents = [];
+    var contentData, contents = [];
 
     Xut.Contents.Get(pageType, contentId, function(cid, content) {
       //是内部对象
-      if(content && (contentDas = content.contentDas)) { //通过内部管理获取对象
+      if(content && (contentData = content.contentData)) { //通过内部管理获取对象
         contents.push({
           'id': content.id,
           'idName': content.actName,
           'element': content.$contentNode,
-          'theTitle': contentDas.theTitle,
-          'scaleHeight': contentDas.scaleHeight,
-          'scaleLeft': contentDas.scaleLeft,
-          'scaleTop': contentDas.scaleTop,
-          'scaleWidth': contentDas.scaleWidth,
-          'contentData': contentDas,
+          'theTitle': contentData.theTitle,
+          'scaleHeight': contentData.scaleHeight,
+          'scaleLeft': contentData.scaleLeft,
+          'scaleTop': contentData.scaleTop,
+          'scaleWidth': contentData.scaleWidth,
+          'contentData': contentData,
           'source': 'innerObjet' //获取方式内部对象
         });
       } else {
         //如果通过内部找不到对象的content数据,则直接查找数据库
         //可能是一个事件的钩子对象
-        if(contentDas = seekQuery(cid, pageProportion)) {
+        if(contentData = seekQuery(cid, pageProportion)) {
           var actName = Xut.Presentation.GetContentName(cid);
           var element;
           //如果对象是事件钩子或者是浮动对象
@@ -126,12 +125,12 @@ export function extendContent(access, $globalEvent) {
             'id': cid,
             'idName': actName,
             'element': element,
-            'theTitle': contentDas.theTitle,
-            'scaleHeight': contentDas.scaleHeight,
-            'scaleLeft': contentDas.scaleLeft,
-            'scaleTop': contentDas.scaleTop,
-            'scaleWidth': contentDas.scaleWidth,
-            'contentData': contentDas,
+            'theTitle': contentData.theTitle,
+            'scaleHeight': contentData.scaleHeight,
+            'scaleLeft': contentData.scaleLeft,
+            'scaleTop': contentData.scaleTop,
+            'scaleWidth': contentData.scaleWidth,
+            'contentData': contentData,
             'source': 'dataBase'
           });
         } else {
@@ -152,7 +151,6 @@ export function extendContent(access, $globalEvent) {
       })
     }
   }
-
 
   /**
    * 互斥接口

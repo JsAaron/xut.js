@@ -41,7 +41,7 @@ export function initGlobalEvent() {
       const startupTime = +new Date
         /*离开页面*/
       $(window).on('unload', function() {
-        Xut.Application.Notify('trackCode', 'appTime', _.extend({
+        Xut.Application.Notify('trackCode', 'keepAppTime', _.extend({
           time: (+new Date) - startupTime
         }, config.trackCode))
       })

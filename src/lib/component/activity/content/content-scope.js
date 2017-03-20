@@ -30,7 +30,7 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
   var pageType = base.pageType
   var contentName
   var canvasDom
-  var contentDas = base.relatedData.contentDas[contentId]
+  var contentData = base.relatedData.contentDataset[contentId]
 
   //如果启动了canvas模式
   //改成作用域的一些数据
@@ -41,12 +41,12 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
       canvasDom = base.getContextNode(contentName)[0]
 
       //创建上下文pixi
-      if(contentDas.$contentNode) {
-        $contentNode = contentDas.$contentNode
+      if(contentData.$contentNode) {
+        $contentNode = contentData.$contentNode
       } else {
-        // $contentNode = Context(contentDas, canvasDom, base.pageIndex)
+        // $contentNode = Context(contentData, canvasDom, base.pageIndex)
         //保存canvas pixi的上下文引用
-        // base.relatedData.contentDas[contentId].$contentNode = $contentNode
+        // base.relatedData.contentDataset[contentId].$contentNode = $contentNode
       }
       data.type = 'canvas';
       data.canvasMode = true;
@@ -74,13 +74,13 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
     id: contentId,
     pid: pid,
     actName: actName,
-    contentDas: contentDas,
-    $contentNode: $contentNode,
-    pageType: pageType,
+    contentData,
+    $contentNode,
+    pageType,
+    canvasDom,
     pageIndex: base.pageIndex,
     canvasRelated: base.canvasRelated,
     nextTask: base.nextTask,
-    canvasDom: canvasDom
   })
 
   /**
@@ -217,15 +217,15 @@ export default function(base) {
       //合并，同一个对象可能具有动画+视觉差行为
       if(hasParallax && hasAnimation) {
         _.each(tempAnimationScope, function(target) {
-          var id = target.id
-          var source = tempParallaxScope[id]
-          if(source) { //如果能找到就需要合并
-            innerExtend(target, source); //复制方法
-            target.processType = 'both'; //标记新组合
-            delete tempParallaxScope[id]; //删除引用
-          }
-        })
-        //剩余的处理
+            var id = target.id
+            var source = tempParallaxScope[id]
+            if(source) { //如果能找到就需要合并
+              innerExtend(target, source); //复制方法
+              target.processType = 'both'; //标记新组合
+              delete tempParallaxScope[id]; //删除引用
+            }
+          })
+          //剩余的处理
         if(_.keys(tempParallaxScope).length) {
           _.extend(tempAnimationScope, tempParallaxScope);
         }

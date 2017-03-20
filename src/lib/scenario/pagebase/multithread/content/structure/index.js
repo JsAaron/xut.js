@@ -8,11 +8,11 @@
  */
 
 import { config } from '../../../../../config/index'
-import { createDom } from './str-dom'
-import { createCanvas } from './str-canvas'
-import { createContainer } from './str-container'
-import { parseCanvas } from './parse/canvas'
-import { parseContentDas } from './parse/content'
+import { createDom } from './render/dom'
+import { createCanvas } from './render/canvas'
+import { createContainer } from './render/container'
+import { parseCanvas } from '../parser/canvas'
+import { parseContentData } from '../parser/dataset'
 import { $$warn, parseJSON, reviseSize, readFile, getResources, createRandomImg } from '../../../../../util/index'
 
 /**
@@ -44,20 +44,15 @@ const makeWarpObj = (contentId, content, pageType, pid) => {
  * @return {[type]}         [description]
  */
 const analysisPath = (wrapObj, conData) => {
-
   let imgContent = conData.md5
-
-  //如果基础图被重新定义过
+    //如果基础图被重新定义过
   if(config.baseImageSuffix) {
     imgContent = imgContent.replace(/\w+./, '$&' + config.baseImageSuffix + '.')
   }
-
   let isGif = /.gif$/i.test(imgContent) //是gif格式
   let originalPathImg = config.pathAddress + imgContent //原始地址
-
-  //处理gif图片缓存+随机数
+    //处理gif图片缓存+随机数
   let pathImg = isGif ? createRandomImg(originalPathImg) : originalPathImg
-
   if(conData.category === "AutoCompSprite") {
     try {
       let resourcePath = config.pathAddress + imgContent + "/app.json";
@@ -72,7 +67,6 @@ const analysisPath = (wrapObj, conData) => {
       console.log('AutoCompSprite获取数据失败')
     }
   }
-
   wrapObj.imgContent = imgContent;
   wrapObj.isGif = isGif;
   wrapObj.pathImg = pathImg;
@@ -112,16 +106,13 @@ const externalFile = (wrapObj, svgCallback) => {
  * @return {[type]} [description]
  */
 const allotRatio = (fixRadio, headerFooterMode) => {
-
   if(fixRadio && headerFooterMode) {
     config.devtools && $$warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式')
   }
-
   //页眉页脚模式
   if(headerFooterMode) {
     return headerFooterMode
   }
-
   //设置图片缩放模式1
   if(fixRadio) {
     return 3
@@ -169,8 +160,8 @@ export function contentStructure(callback, data, context) {
     //2017.1.3
     //收集对应的content数据
     textFx = [],
-    //缓存contentDas
-    contentDas = {},
+    //缓存contentDataset
+    contentDataset = {},
     //缓存content结构
     cachedContentStr = [],
     //页眉页脚对象合集
@@ -178,27 +169,9 @@ export function contentStructure(callback, data, context) {
     //自定义样式
     getStyle = data.getStyle;
 
-
-  //容器结构创建
+  /*开始过滤参数*/
   if(containerRelated && containerRelated.length) {
     containerObj = createContainer(containerRelated, pid, getStyle);
-  }
-
-  /**
-   * 解析出每一个content对应的动作
-   * 传递prefilter过滤器
-   * 1 浮动动作
-   * 2 canvas动作
-   * @type {[type]}
-   */
-  contentCollection = parseContentDas(data.createContentIds, prefilter);
-  contentCount = cloneContentCount = contentCollection.length;
-
-  //如果是启动了特殊高精灵动画
-  //强制打开canvas模式设置
-  //这里可以排除掉其余的canvas动画
-  if(data.canvasRelated.onlyCompSprite) {
-    data.canvasRelated.enable = true
   }
 
   /**
@@ -209,18 +182,19 @@ export function contentStructure(callback, data, context) {
   function parseParameter(parameter, contentId, conData) {
     var zIndex;
     _.each(parameter, (para) => {
-
+      /*是否启动代码追踪*/
+      if(para.trackCode) {
+        conData.trackCode = true
+      }
       /*在模式2与3模式下元素可能会溢出,保证不溢出处理*/
       if(para.fixedPosition) {
         conData.fixedPosition = Number(para.fixedPosition)
       }
-
       //如果有二维码标记
       //2017.3.1
       if(para.qrCode) {
         conData.qrCode = true
       }
-
       //有页眉页脚对象
       //2017.1.18
       if(para.HeaderOrFooter) {
@@ -229,14 +203,12 @@ export function contentStructure(callback, data, context) {
         }
         headerFooterMode[contentId] = Number(para.HeaderOrFooter)
       }
-
       //保持图片正比缩放
       //给mini使用
       //2016.12.15
       if(para.fixRadio) {
         conData.fixRadio = true
       }
-
       //针对母版content的topmost数据处理，找出浮动的对象Id
       //排除数据topmost为0的处理
       zIndex = para['topmost']
@@ -254,14 +226,10 @@ export function contentStructure(callback, data, context) {
     })
   }
 
-  /**
-   * 开始过滤参数
-   */
+  /*开始过滤参数*/
   function prefilter(conData, contentId) {
-    var eventId, parameter;
-    var category = conData.category;
-
     //如果是模板书签，强制为浮动对象
+    let eventId;
     if(isMaster && (eventId = seasonRelated[contentId])) {
       if(eventId['BookMarks']) {
         floatMaters.ids.push(contentId)
@@ -272,32 +240,42 @@ export function contentStructure(callback, data, context) {
     //1 浮动对象
     //2 canvas对象
     if(conData) {
-      //匹配canvas对象数据
-      if(category) {
-        //解析canvas先关数据
-        parseCanvas(contentId, category, conData, data)
-      }
-      //如果有parameter
-      if(conData.parameter) {
-        if(parameter = parseJSON(conData.parameter)) {
-          //parameter保持数组格式
-          parseParameter(parameter.length ? parameter : [parameter], contentId, conData)
-        }
+      /*匹配canvas对象数据*/
+      conData.category && parseCanvas(contentId, conData.category, conData, data)
+
+      /*如果有parameter,保持数据格式，方便解析*/
+      let parameter
+      if(parameter = conData.parameter && parseJSON(conData.parameter)) {
+        parseParameter(parameter.length ? parameter : [parameter], contentId, conData)
       }
     }
   }
 
   /**
-   * 创建content节点
+   * 解析出每一个content对应的动作
+   * 传递prefilter过滤器
+   * 1 浮动动作
+   * 2 canvas动作
+   * @type {[type]}
    */
+  contentCollection = parseContentData(data.createContentIds, prefilter);
+  contentCount = cloneContentCount = contentCollection.length;
+
+
+  //如果是启动了特殊高精灵动画
+  //强制打开canvas模式设置
+  //这里可以排除掉其余的canvas动画
+  if(data.canvasRelated.onlyCompSprite) {
+    data.canvasRelated.enable = true
+  }
+
+  /*创建content节点*/
   function createRelated(contentId, wrapObj) {
     externalFile(wrapObj, function(wrapObj) {
       let uuid, startStr, contentStr
       let conData = wrapObj.data
-
       //拼接地址
       analysisPath(wrapObj, conData)
-
       //canvas节点
       if(conData.canvasMode) {
         contentStr = createCanvas(conData, wrapObj)
@@ -318,32 +296,23 @@ export function contentStructure(callback, data, context) {
     });
   }
 
-  /**
-   * 开始创建
-   */
+  /*开始创建*/
   function startCreate(wrapObj, content, contentId) {
-    contentDas[contentId] = content; //缓存数据
+    contentDataset[contentId] = content; //缓存数据
     createRelated(contentId, wrapObj)
   }
 
-  /**
-   * 清理剔除的content
-   * @param  {[type]} contentId [description]
-   * @return {[type]}           [description]
-   */
+  /*清理剔除的content*/
   function clearContent(contentId) {
     data.createContentIds.splice(data.createContentIds.indexOf(contentId), 1);
     checkComplete();
   }
 
-  /**
-   * 返回处理
-   * @return {[type]} [description]
-   */
+  /*返回处理*/
   function checkComplete() {
     if(cloneContentCount === 1) {
       let data = {
-        contentDas,
+        contentDataset,
         idFix,
         textFx,
         contentHtmlBoxIds,
@@ -374,7 +343,6 @@ export function contentStructure(callback, data, context) {
     }
     cloneContentCount--;
   }
-
 
   //开始生成所有的节点
   //1:dom

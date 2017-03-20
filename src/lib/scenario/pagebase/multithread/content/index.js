@@ -6,13 +6,14 @@
  * ***************************************************/
 import { config } from '../../../../config/index'
 import { nextTick } from '../../../../util/nexttick'
-import { bindActivity } from './bind-activity'
-import { parseBehavior } from './parse-behavior'
-import { zoomImage } from './zoom-image'
-import { textFx } from './text-fx'
+import { bindActivity } from './bind-Activity'
+import { zoomImage } from './zoomImage'
+import { textFx } from './textFx'
+import { contentParser } from './parser/content'
+import { parseBehavior } from './parser/behavior'
+import { activityParser } from './parser/activity'
 import { contentStructure } from './structure/index'
-import { contentParser, activityParser } from './data-parser'
-import { createFloatMater, createFloatPage } from './float'
+import { createFloatMater, createFloatPage } from './structure/float'
 import { sceneController } from '../../../../scenario/scene-control'
 
 
@@ -142,9 +143,9 @@ export default class TaskContents {
    * 绑定事件
    */
   _dataStrCheck(pipeData, userData) {
+
     this._assert('strAfter', function() {
-      let contentDas = userData.contentDas
-        /*缩放图片*/
+      /*缩放图片*/
       if(Object.keys(pipeData.zoomBehavior).length) {
         this.zoomObjs = zoomImage(pipeData)
         this.zoomBehavior = pipeData.zoomBehavior
@@ -157,7 +158,7 @@ export default class TaskContents {
       //用做软件制作单页预加载
       sceneController.seasonRelated = pipeData.seasonRelated;
       //初始化content对象
-      bindActivity(pipeData, contentDas, delayHooks => {
+      bindActivity(pipeData, userData.contentDataset, delayHooks => {
         this._eventAfterCheck(pipeData, delayHooks, userData.headerFooterMode)
       })
     })
@@ -168,21 +169,19 @@ export default class TaskContents {
    * @param  {[type]} iScrollHooks [description]
    * @return {[type]}              [description]
    */
-  _eventAfterCheck(data, delayHooks, headerFooterMode) {
-
+  _eventAfterCheck(pipeData, delayHooks, headerFooterMode) {
     const self = this;
-
     this._assert('eventAfter', function() {
 
-      data.count = 1; //计算回调的成功的次数
+      /*计算回调的成功的次数*/
+      pipeData.taskCount = 1
 
       /**
        * 完成钩子函数
        * 1 content的卷滚条
        * 2 canvas事件绑定
-       * @return {[type]} [description]
        */
-      const callHooks = function() {
+      const hookfns = function() {
         let iscrollHooks = delayHooks.iscrollHooks
         let hook
         if(iscrollHooks.length) {
@@ -192,62 +191,53 @@ export default class TaskContents {
         }
       }
 
-      const nextTask = function() {
-        delayHooks && callHooks()
-        self._applyAfterCheck()
-      }
-
       /**
        * 1 页面浮动
        * 2 母版浮动
        * 3 正常对象
+       * 4 页眉页脚
        */
-      const complete = function(data) {
+      const complete = function() {
         return function() {
-          if(data.count === 1) {
-            nextTask()
+          if(pipeData.taskCount === 1) {
+            delayHooks && hookfns()
+            self._applyAfterCheck()
             return
           }
-          data.count--;
+          pipeData.taskCount;
         }
-      }(data);
+      }()
 
-      //浮动页面对
-      //浮动对象比任何层级都都要高
-      //超过母版
-      if(data.floatPages.ids && data.floatPages.ids.length) {
-        createFloatPage(this, data, complete)
+      /*浮动页面对,浮动对象比任何层级都都要高,超过母版*/
+      if(pipeData.floatPages.ids && pipeData.floatPages.ids.length) {
+        createFloatPage(this, pipeData, complete)
       }
 
-      //如果存在母版浮动节点
-      //在创建节点structure中过滤出来，根据参数的tipmost
-      if(data.floatMaters.ids && data.floatMaters.ids.length) {
-        createFloatMater(this, data, complete)
+      /*如果存在母版浮动节点,在创建节点structure中过滤出来，根据参数的tipmost*/
+      if(pipeData.floatMaters.ids && pipeData.floatMaters.ids.length) {
+        createFloatMater(this, pipeData, complete)
       }
 
-      //iboosk节点预编译
-      //在执行的时候节点已经存在
-      //不需要在创建
+      /*iboosk节点预编译,在执行的时候节点已经存在,不需要在创建*/
       if(Xut.IBooks.runMode()) {
         complete();
       } else {
-
-        let fragment = toArray(data.contentsFragment, headerFooterMode)
+        let fragment = toArray(pipeData.contentsFragment, headerFooterMode)
         let bodyContent = fragment.bodyContent
         let headerFooterContent = fragment.headerFooterContent
-
         let watchCount = 0
+
+        /*页面页脚需要叠加计算*/
         headerFooterContent.length && ++watchCount
         bodyContent.length && ++watchCount
 
-        //如果bodyContent与headerFooterContent都没有
-        //直接返回回调
+        /*没有渲染数据*/
         if(!watchCount) {
           complete()
           return
         }
 
-        let watchNextTick = function() {
+        const watchNextTick = function() {
           return() => {
             if(watchCount === 1) {
               complete()
@@ -257,18 +247,18 @@ export default class TaskContents {
           }
         }()
 
-        //页眉页脚
+        /*页眉页脚*/
         if(headerFooterContent.length) {
           nextTick({
-            'container': data.$headFootNode,
+            'container': pipeData.$headFootNode,
             'content': fragment.headerFooterContent
           }, watchNextTick);
         }
 
-        //主体内容
+        /*主体内容*/
         if(bodyContent.length) {
           nextTick({
-            'container': data.$containsNode,
+            'container': pipeData.$containsNode,
             'content': fragment.bodyContent
           }, watchNextTick);
         }

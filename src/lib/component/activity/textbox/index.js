@@ -21,10 +21,10 @@ export default function(activitProto) {
     this.htmlBoxInstance = [];
 
     //创建文本框对象
-    if(contentHtmlBoxIds.length && relatedData.contentDas) {
-      _.each(relatedData.contentDas, function(cds) {
-        if(~contentHtmlBoxIds.indexOf(cds._id)) {
-          contentId = cds._id;
+    if(contentHtmlBoxIds.length && relatedData.contentDataset) {
+      _.each(relatedData.contentDataset, function(data) {
+        if(~contentHtmlBoxIds.indexOf(data._id)) {
+          contentId = data._id;
           contentName = self.makePrefix('Content', self.pid, contentId);
           //找到对应绑定事件的元素
           $contentNode = self.getContextNode(contentName)

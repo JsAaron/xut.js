@@ -17,15 +17,15 @@ export function autoUUID() {
  * 5 canvas动画
  * @return {[type]} [description]
  */
-export function bindActivity(data, contentDas, callback) {
+export function bindActivity(pipeData, contentDataset, callback) {
   var compiler,
-    $containsNode = data.$containsNode,
-    eventRelated = data.eventRelated, //合集事件
-    pid = data.pid,
-    createActivitys = data.createActivitys,
-    feedbackBehavior = data.feedbackBehavior, //反馈数据,跟事件相关
-    pageBaseHooks = data.pageBaseHooks,
-    pageId = data.chapterId;
+    $containsNode = pipeData.$containsNode,
+    eventRelated = pipeData.eventRelated, //合集事件
+    pid = pipeData.pid,
+    createActivitys = pipeData.createActivitys,
+    feedbackBehavior = pipeData.feedbackBehavior, //反馈数据,跟事件相关
+    pageBaseHooks = pipeData.pageBaseHooks,
+    pageId = pipeData.chapterId;
 
   //如果有浮动对象,才需要计算偏移量
   //母版里面可能存在浮动或者不浮动的对象
@@ -41,7 +41,7 @@ export function bindActivity(data, contentDas, callback) {
       }
       return 0
     }
-  }(data.floatMaters.ids, data.getStyle.offset);
+  }(pipeData.floatMaters.ids, pipeData.getStyle.offset);
 
   //相关回调
   const relatedCallback = {
@@ -59,20 +59,20 @@ export function bindActivity(data, contentDas, callback) {
 
   //相关数据
   const relatedData = {
-    'floatMaters': data.floatMaters,
-    'seasonId': data.chpaterData.seasonId,
+    'floatMaters': pipeData.floatMaters,
+    'seasonId': pipeData.chpaterData.seasonId,
     'pageId': pageId,
-    'contentDas': contentDas, //所有的content数据合集
-    'container': data.liRootNode,
-    'seasonRelated': data.seasonRelated,
-    'containerPrefix': data.containerPrefix,
-    'nodes': data.nodes,
-    'pageOffset': data.pageOffset,
-    'createContentIds': data.createContentIds,
-    'partContentRelated': data.partContentRelated,
+    'contentDataset': contentDataset, //所有的content数据合集
+    'container': pipeData.liRootNode,
+    'seasonRelated': pipeData.seasonRelated,
+    'containerPrefix': pipeData.containerPrefix,
+    'nodes': pipeData.nodes,
+    'pageOffset': pipeData.pageOffset,
+    'createContentIds': pipeData.createContentIds,
+    'partContentRelated': pipeData.partContentRelated,
     'getTransformOffset': getTransformOffset,
-    'contentsFragment': data.contentsFragment,
-    'contentHtmlBoxIds': data.contentHtmlBoxIds
+    'contentsFragment': pipeData.contentsFragment,
+    'contentHtmlBoxIds': pipeData.contentHtmlBoxIds
   }
 
   /**
@@ -126,12 +126,12 @@ export function bindActivity(data, contentDas, callback) {
 
       const actdata = {
         'noticeComplete': callback, //监听完成
-        'pageIndex': data.pageIndex,
-        'canvasRelated': data.canvasRelated, //父类引用
+        'pageIndex': pipeData.pageIndex,
+        'canvasRelated': pipeData.canvasRelated, //父类引用
         'id': imageId || autoUUID(),
         "type": 'Content',
         'pageId': pageId,
-        'getStyle': data.getStyle,
+        'getStyle': pipeData.getStyle,
         'activityId': activity._id,
         '$containsNode': $containsNode,
         'pageType': compiler.pageType, //构建类型 page/master

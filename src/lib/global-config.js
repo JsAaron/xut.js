@@ -53,6 +53,35 @@ export type Config = {
 const config: Config = {
 
   /*是否启动跟踪状态*/
+
+  /**
+   * 监听代码追踪
+   * type:类型
+   *   keepAppTime //应用运行时间
+   *   keepPageTime //每个页面运行时间
+   *   action => (包含，content的事件，action,audio,video,widget零件触发的事件)
+   *
+   *  options:参数
+   *    keepAppTime => time 运行时间
+   *    keepPageTime => time 运行时间
+   *
+   *    action => {
+   *      appId  应用的id
+   *      appName 应用标题
+   *      id 元素的id
+   *      type  触发的类型
+   *      pageId 页面的id,对应数据库chapter ID
+   *      eventName 事件名
+   *    }
+   *
+    Xut.Application.Watch('trackCode', function(type, options) {
+        switch (type) {
+            case 'keepAppTime':break;
+            case 'keepPageTime': break;
+            case 'action': break;
+        }
+    })
+   */
   trackAction: false,
 
   /**

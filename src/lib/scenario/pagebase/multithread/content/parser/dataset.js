@@ -4,7 +4,7 @@
  * @param  {Function} callback   [description]
  * @return {[type]}              [description]
  */
-export function parseContentDas(contentIds, callback) {
+export function parseContentData(contentIds, callback) {
   var data, temp = [];
   contentIds.forEach(function(contentId, index) {
     data = Xut.data.query('Content', contentId)

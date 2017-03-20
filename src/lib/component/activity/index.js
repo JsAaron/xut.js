@@ -174,8 +174,8 @@ export default class Activity {
    */
   _iscrollBind(scope, $contentNode) {
 
-    let self = this
-    let contentDas = scope.contentDas
+    const self = this
+    const contentData = scope.contentData
 
     const linkFunction = function(scrollNode) {
 
@@ -237,7 +237,7 @@ export default class Activity {
 
     //增加卷滚条标记
     //但是svg如果没有内容除外
-    if(contentDas.isScroll) {
+    if(contentData.isScroll) {
       const hasSVG = $contentNode.find('svg')
       if(hasSVG) {
         //必须保证svg有数据
@@ -251,9 +251,9 @@ export default class Activity {
     }
 
     //如果是图片则补尝允许范围内的高度
-    if(!contentDas.mask || !contentDas.isGif) {
+    if(!contentData.mask || !contentData.isGif) {
       $contentNode.find && $contentNode.find('img').css({
-        'height': contentDas.scaleHeight
+        'height': contentData.scaleHeight
       });
     }
   }

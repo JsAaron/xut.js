@@ -1,7 +1,7 @@
 import {
   parseJSON,
   replacePath
-} from '../../../../../util/index'
+} from '../../../../../../util/index'
 
 const maskBoxImage = Xut.style.maskBoxImage
 const FLOOR = Math.floor

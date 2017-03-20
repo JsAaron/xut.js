@@ -9,7 +9,7 @@ export default function pretreatment(data, eventName) {
 
   //过滤预生成动画
   if(parameter && parameter.length === 1) {
-    let category = data.contentDas.category
+    let category = data.contentData.category
     let para = parameter[0];
 
     //出现动画

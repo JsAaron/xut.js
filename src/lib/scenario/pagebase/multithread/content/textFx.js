@@ -4,7 +4,7 @@
 
 import { LetterEffect } from '../../../../component/activity/content/letter-effect'
 
-export function textFx(data, textFx) {
+export function textFx(pipeData, textFx) {
 
   let uuid = 1
   let content
@@ -18,7 +18,7 @@ export function textFx(data, textFx) {
   let textFxObjs = {}
 
   while(content = textFx.shift()) {
-    if(contentNode = data.contentsFragment[content.texteffectId]) {
+    if(contentNode = pipeData.contentsFragment[content.texteffectId]) {
       let contentId = content._id
 
       //初始化文本对象

@@ -20,12 +20,12 @@ function checkHD(analysisName) {
   return ''
 }
 
-export function zoomImage(data) {
+export function zoomImage(pipeData) {
   let zoomObjs = {}
   let behaviorData
-  _.each(data.contentsFragment, function(node) {
+  _.each(pipeData.contentsFragment, function(node) {
     let behaviorData
-    if(behaviorData = data.zoomBehavior[node.id]) {
+    if(behaviorData = pipeData.zoomBehavior[node.id]) {
       /*缩放提示图片*/
       behaviorData.prompt && $(node).append(createHTML())
 
