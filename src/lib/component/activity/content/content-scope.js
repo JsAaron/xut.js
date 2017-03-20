@@ -4,10 +4,10 @@
  * 2 视觉差作用域
  * @type {Array}
  */
-import Animation from './animate-effect'
+import PPTAnimation from './ppt-animate'
 import FastPipe from './fast-pipe'
 import Parallax from './parallax/index'
-import pretreatment from './per-process'
+import pretreatment from './pre-process'
 
 //2016.7.15废弃
 //pixi暂时不使用
@@ -125,7 +125,7 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
   } else {
     //生成子作用域对象，用于抽象处理动画,行为
     data.getStyle = base.getStyle
-    return new Animation(data)
+    return new PPTAnimation(data)
   }
 }
 

@@ -81,8 +81,9 @@ const config: Config = {
             case 'action': break;
         }
     })
+    ['app','page','action','hot']
    */
-  trackAction: false,
+  trackCode:null,
 
   /**
   * 图片模式webp

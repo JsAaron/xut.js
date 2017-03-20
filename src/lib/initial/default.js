@@ -37,13 +37,13 @@ export function initGlobalEvent() {
     })
 
     /*启动代码用户操作跟踪*/
-    if(config.trackCode) {
+    if(config.launch && config.launch.trackCode && config.launch.trackCode['app']) {
       const startupTime = +new Date
         /*离开页面*/
       $(window).on('unload', function() {
         Xut.Application.Notify('trackCode', 'keepAppTime', _.extend({
           time: (+new Date) - startupTime
-        }, config.trackCode))
+        }, config.launch.trackCode.dataset))
       })
     }
   }

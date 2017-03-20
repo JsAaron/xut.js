@@ -11,7 +11,7 @@ import { initGlobalAPI } from './global-api/index'
 /*全局API初始化*/
 initGlobalAPI()
 
-Xut.Version = 880.6
+Xut.Version = 880.7
 
 /*加载应用app*/
 const initApp = (...arg) => {

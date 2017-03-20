@@ -25,13 +25,13 @@ export function $$trigger(target, attribute, rootNode, pageIndex) {
       const data = { id, key, type, rootNode, target, pageIndex, pageType, "activityId": id, }
 
       /*如果有代码跟踪*/
-      if(config.trackCode) {
-        Xut.Application.Notify('trackCode', 'action', _.extend({
+      if(config.launch && config.launch.trackCode && config.launch.trackCode['hot']) {
+        Xut.Application.Notify('trackCode', 'hot', _.extend({
           id,
           type,
           pageId: Xut.Presentation.GetPageId(pageType, pageIndex),
           eventName: 'tap'
-        }, config.trackCode))
+        }, config.launch.trackCode.dataset))
       }
 
       /*如果是重复点击,比如widget零件*/

@@ -5,27 +5,12 @@
 import nativeConf from './native'
 import iframeConf from './iframe'
 
-import {
-  getWidgetPath,
-  getSourcePath
-} from './depend/path'
-
-import {
-  getSize,
-  getLayerMode
-}
-from './depend/size'
-
+import { getWidgetPath, getSourcePath } from './depend/path'
+import { getSize, getLayerMode } from './depend/size'
 import { getVisualLayout } from '../visual/visual-layout'
+import { getFullProportion, getRealProportion } from '../visual/visual-proportion'
 
-import {
-  getFullProportion,
-  getRealProportion
-} from '../visual/visual-proportion'
-
-/**
- * 默认配置与模式
- */
+/*默认配置与模式*/
 import improtConfig from '../global-config'
 import improtDefault from './depend/default'
 
@@ -41,22 +26,16 @@ let layoutMode
 let proportion
 let fullProportion
 
-/**
- * 层级关系
- * @return {[type]} [description]
- */
+/*层级关系*/
 Xut.zIndexlevel = () => {
   return ++config.zIndexlevel
 }
-
 
 //通过新学堂加载
 //用于处理iframe窗口去全屏
 if(/xinxuetang/.test(window.location.href)) {
   config.iframeFullScreen = true;
 }
-
-
 
 /**
  * 是否启动缓存机制

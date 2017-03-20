@@ -5,7 +5,7 @@ import { initColumn } from '../component/column/core-init'
 import { contentFilter } from '../component/activity/content/content-filter'
 import { importJsonDatabase } from '../database/result'
 import { config, initConfig, initPathAddress } from '../config/index'
-
+import { priorityConfig } from '../config/priority-config'
 /**
  * 新增模式,用于记录浏览器退出记录
  * 默认启动
@@ -106,13 +106,8 @@ export default function baseConfig(callback) {
     //与数据库setting数据
     initTooBar((novelData, tempSettingData) => {
 
-      /*如果启动了代码追踪，配置基本信息*/
-      if(config.trackCode) {
-        config.trackCode = {
-          appId: config.appId,
-          appName: config.shortName
-        }
-      }
+      /*配置优先级*/
+      priorityConfig()
 
       //创建过滤器
       Xut.CreateFilter = contentFilter('createFilter');

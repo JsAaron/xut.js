@@ -206,7 +206,7 @@ export default function(activitProto) {
     const eventRun = function() {
 
       /*跟踪点击动作*/
-      if(config.trackCode) {
+      if(config.launch && config.launch.trackCode && config.launch.trackCode['action']) {
         /*如果有标记才处理*/
         const contentData = self.relatedData.contentDataset[self.id]
         if(contentData && contentData.trackCode) {
@@ -215,7 +215,7 @@ export default function(activitProto) {
             id: self.id,
             type: self.type,
             eventName: eventData.eventName
-          }, config.trackCode))
+          }, config.launch.trackCode.dataset))
         }
       }
 

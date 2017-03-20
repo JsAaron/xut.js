@@ -59,7 +59,7 @@ Xut.Application.setConfig = {
         //     left: '20%'
         // }
     },
-    trackCode: true,
+    trackCode: ['app'],
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: false
@@ -96,10 +96,10 @@ Xut.Application.Watch('trackCode', function(type, options) {
         case 'keepAppTime':
             break;
         case 'keepPageTime':
-        // console.log(type,options)
+         console.log(type, options)
             break;
         case 'action':
-        console.log(type,options)
+            console.log(type, options)
             break;
     }
 })
@@ -115,7 +115,8 @@ $("#launchMini").click(function() {
         path: {
             resource: 'content/' + appId,
             database: 'content/' + appId + '/SQLResult.js'
-        }
+        },
+        // trackCode: []
     });
 })
 $("#launchMini").trigger('click')
