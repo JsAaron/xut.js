@@ -84,6 +84,10 @@ export function initApplication() {
    */
   Xut.Application.Exit = function() {
     if(config.launch) {
+      /*启动代码用户操作跟踪*/
+      config.hasTrackCode('app', function(notify) {
+        notify({ time: (+new Date) - config.launch.launchTime })
+      })
       globalDestroy('exit')
     }
   }

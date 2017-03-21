@@ -99,10 +99,12 @@ export default class PageMgr extends Abstract {
 
     /*如果有代码跟踪*/
     if(suspendPageObj.startupTime) {
-      Xut.Application.Notify('trackCode', 'keepPageTime', _.extend({
-        pageId: suspendPageObj.chapterId,
-        time: (+new Date) - suspendPageObj.startupTime
-      }, config.launch.trackCode.dataset))
+      config.hasTrackCode('page', function(notify) {
+        notify({
+          pageId: suspendPageObj.chapterId,
+          time: (+new Date) - suspendPageObj.startupTime
+        })
+      })
     }
 
     //翻页结束脚本
@@ -201,7 +203,7 @@ export default class PageMgr extends Abstract {
     this._checkTaskCompleted(data.currIndex, function(currPageObj) {
 
       /*跟踪，每个页面的停留时间，开始*/
-      if(config.launch && config.launch.trackCode && config.launch.trackCode['page']) {
+      if(config.hasTrackCode('page')) {
         currPageObj.startupTime = +new Date
       }
 

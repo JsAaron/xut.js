@@ -5,7 +5,7 @@ import { initColumn } from '../component/column/core-init'
 import { contentFilter } from '../component/activity/content/content-filter'
 import { importJsonDatabase } from '../database/result'
 import { config, initConfig, initPathAddress } from '../config/index'
-import { priorityConfig } from '../config/priority-config'
+
 /**
  * 新增模式,用于记录浏览器退出记录
  * 默认启动
@@ -105,9 +105,6 @@ export default function baseConfig(callback) {
     //初始化工具栏
     //与数据库setting数据
     initTooBar((novelData, tempSettingData) => {
-
-      /*配置优先级*/
-      priorityConfig()
 
       //创建过滤器
       Xut.CreateFilter = contentFilter('createFilter');

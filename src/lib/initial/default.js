@@ -37,15 +37,14 @@ export function initGlobalEvent() {
     })
 
     /*启动代码用户操作跟踪*/
-    if(config.launch && config.launch.trackCode && config.launch.trackCode['app']) {
+    config.hasTrackCode('app', function(dataset) {
       const startupTime = +new Date
         /*离开页面*/
-      $(window).on('unload', function() {
-        Xut.Application.Notify('trackCode', 'keepAppTime', _.extend({
-          time: (+new Date) - startupTime
-        }, config.launch.trackCode.dataset))
+      $(window).on('unload', function(notify) {
+        notify({ time: (+new Date) - startupTime })
       })
-    }
+    })
+
   }
 }
 

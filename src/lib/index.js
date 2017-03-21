@@ -7,6 +7,7 @@ import { VideoManager } from './component/video/manager'
 import { initRootNode } from './initial/node'
 import { initGlobalEvent } from './initial/default'
 import { initGlobalAPI } from './global-api/index'
+import { priorityConfig } from './config/priority-config'
 
 /*全局API初始化*/
 initGlobalAPI()
@@ -15,6 +16,9 @@ Xut.Version = 880.7
 
 /*加载应用app*/
 const initApp = (...arg) => {
+  /*配置优先级*/
+  priorityConfig()
+    /*全局的一些事件处理*/
   initGlobalEvent()
   const { $rootNode, $contentNode } = initRootNode(...arg)
   nextTick({ container: $rootNode, content: $contentNode }, init)
@@ -66,7 +70,9 @@ Xut.Application.Launch = option => {
   if(setConfig && setConfig.lauchMode === 1) {
     mixGolbalConfig(setConfig);
     cacheOptions = [option] //多次切换
-    config.launch = $.extend(true, {}, option)
+    config.launch = $.extend(true, {
+      launchTime: (+new Date)
+    }, option)
     if(option.path) {
       _.each(option.path, (value, key) => {
         config.launch[key] = key === 'resource' ? slashPostfix(value) : value

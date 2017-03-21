@@ -206,18 +206,18 @@ export default function(activitProto) {
     const eventRun = function() {
 
       /*跟踪点击动作*/
-      if(config.launch && config.launch.trackCode && config.launch.trackCode['action']) {
+      config.hasTrackCode('action', function(notify) {
         /*如果有标记才处理*/
         const contentData = self.relatedData.contentDataset[self.id]
         if(contentData && contentData.trackCode) {
-          Xut.Application.Notify('trackCode', 'action', _.extend({
+          notify({
             pageId: self.pageId,
             id: self.id,
             type: self.type,
             eventName: eventData.eventName
-          }, config.launch.trackCode.dataset))
+          })
         }
-      }
+      })
 
       //脚本动画
       if(eventData.rewrite) {

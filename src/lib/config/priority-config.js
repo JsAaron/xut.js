@@ -9,15 +9,28 @@ import { config } from './index'
 
 /*获取真实的配置文件 priority*/
 export function priorityConfig() {
+
   /*如果启动了代码追踪，配置基本信息*/
-  let trackTypes = config.launch && config.launch.trackCode || config.trackCode
-  if(trackTypes) {
-    trackTypes.forEach(function(type) {
-      config.launch.trackCode[type] = true
-    })
-    config.launch.trackCode.dataset = {
-      appId: config.appId,
-      appName: config.shortName
+  const launch = config.launch
+  const trackTypes = launch && launch.trackCode || config.trackCode
+
+  /*快速检测*/
+  config.hasTrackCode = function() {}
+
+  if(trackTypes && _.isArray(trackTypes) && trackTypes.length) {
+    if(!launch.trackCode) { launch.trackCode = {} }
+    trackTypes.forEach(type => { launch.trackCode[type] = true })
+    config.hasTrackCode = (type, callback) => {
+      if(launch && launch.trackCode && launch.trackCode[type]) {
+        callback && callback(option => {
+          Xut.Application.Notify('trackCode', type, _.extend(option, {
+            appId: config.appId,
+            appName: config.shortName
+          }))
+        })
+        return true
+      }
     }
   }
+
 }
