@@ -75,12 +75,18 @@ const config: Config = {
    *    }
    *
     Xut.Application.Watch('trackCode', function(type, options) {
+        console.log(type, options)
         switch (type) {
-            case 'keepAppTime':break;
-            case 'keepPageTime': break;
-            case 'action': break;
+            case 'app':
+                break;
+            case 'page':
+                break;
+            case 'aciton':
+                break;
+            case 'hot':
+                break;
         }
-    })
+    }
     ['app','page','action','hot']
    */
   trackCode:null,
