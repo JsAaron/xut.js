@@ -13,7 +13,15 @@ import { createCanvas } from './render/canvas'
 import { createContainer } from './render/container'
 import { parseCanvas } from '../parser/canvas'
 import { parseContentData } from '../parser/dataset'
-import { $$warn, parseJSON, reviseSize, readFile, getResources, createRandomImg } from '../../../../../util/index'
+import {
+  $$warn,
+  parseJSON,
+  reviseSize,
+  readFile,
+  getResources,
+  createRandomImg,
+  getFileFullPath
+} from '../../../../../util/index'
 
 /**
  * 制作包装对象
@@ -44,32 +52,39 @@ const makeWarpObj = (contentId, content, pageType, pid) => {
  * @return {[type]}         [description]
  */
 const analysisPath = (wrapObj, conData) => {
-  let imgContent = conData.md5
-    //如果基础图被重新定义过
+  let fileName = conData.md5
+
+  //如果基础图被重新定义过
   if(config.baseImageSuffix) {
-    imgContent = imgContent.replace(/\w+./, '$&' + config.baseImageSuffix + '.')
+    fileName = fileName.replace(/\w+./, '$&' + config.baseImageSuffix + '.')
   }
-  let isGif = /.gif$/i.test(imgContent) //是gif格式
-  let originalPathImg = config.pathAddress + imgContent //原始地址
-    //处理gif图片缓存+随机数
-  let pathImg = isGif ? createRandomImg(originalPathImg) : originalPathImg
+
+  /*gif格式*/
+  let isGif = /.gif$/i.test(fileName)
+
+  let fileFullPath = getFileFullPath(fileName)
+
+  //处理gif图片缓存+随机数
+  let imgPath = isGif ? createRandomImg(fileFullPath) : fileFullPath
+
+  /*是自动精灵动画*/
   if(conData.category === "AutoCompSprite") {
     try {
-      let resourcePath = config.pathAddress + imgContent + "/app.json";
+      let resourcePath = config.pathAddress + fileName + "/app.json";
       let results = getResources(resourcePath)
       let spiritList = results.spiritList[0]
       let actListName = spiritList.params.actList
       let name = spiritList.params[actListName].ImageList[0].name
-      pathImg += '/' + name
+      imgPath += '/' + name
       conData.resource = results
       conData.containerName = wrapObj.containerName
     } catch(err) {
       console.log('AutoCompSprite获取数据失败')
     }
   }
-  wrapObj.imgContent = imgContent;
+  wrapObj.fileName = fileName;
   wrapObj.isGif = isGif;
-  wrapObj.pathImg = pathImg;
+  wrapObj.imgPath = imgPath;
 }
 
 
@@ -274,8 +289,10 @@ export function contentStructure(callback, data, context) {
     externalFile(wrapObj, function(wrapObj) {
       let uuid, startStr, contentStr
       let conData = wrapObj.data
-      //拼接地址
+
+      /*分析图片地址*/
       analysisPath(wrapObj, conData)
+
       //canvas节点
       if(conData.canvasMode) {
         contentStr = createCanvas(conData, wrapObj)

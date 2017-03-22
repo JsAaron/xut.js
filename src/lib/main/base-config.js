@@ -60,7 +60,6 @@ const setDefaultSuffix = function() {
   if(config.screenVertical) {
     let ratio = window.devicePixelRatio || 1
     let maxWidth = getMaxWidth() * ratio
-
     if(maxWidth > 1080 && maxWidth < 1439) {
       config.baseImageSuffix = config.imageSuffix['1080']
     }
@@ -73,6 +72,24 @@ const setDefaultSuffix = function() {
   }
 }
 
+/*
+自适应图片
+ */
+const adaptiveImage = function() {
+  let $adaptiveImageNode = $('.xut-adaptive-image')
+  if($adaptiveImageNode.length) {
+    let baseImageType = $adaptiveImageNode.width()
+    let type = config.imageSuffix[baseImageType]
+    if(type) {
+      //定义基础的图片后缀
+      config.baseImageSuffix = type
+    } else {
+      setDefaultSuffix()
+    }
+  } else {
+    setDefaultSuffix()
+  }
+}
 
 export default function baseConfig(callback) {
 
@@ -82,24 +99,11 @@ export default function baseConfig(callback) {
     $('body').css('font-size', '125%')
   }
 
-  //图片分辨了自适应
+  /*图片分辨了自适应*/
   if(config.imageSuffix) {
-    let $adaptiveImageNode = $('.xut-adaptive-image')
-    if($adaptiveImageNode.length) {
-      let baseImageType = $adaptiveImageNode.width()
-      let type = config.imageSuffix[baseImageType]
-      if(type) {
-        //定义基础的图片后缀
-        config.baseImageSuffix = type
-      } else {
-        setDefaultSuffix()
-      }
-    } else {
-      setDefaultSuffix()
-    }
+    adaptiveImage()
   }
 
-  //导入JSON数据缓存
   importJsonDatabase(() => {
 
     //初始化工具栏

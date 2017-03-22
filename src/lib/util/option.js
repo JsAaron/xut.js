@@ -85,6 +85,31 @@ export function insertImageUrlSuffix(originalUrl, suffix) {
 }
 
 
+/*获取文件的全路径*/
+export function getFileFullPath(fileName) {
+  /*启动图片模式*/
+  if(config.launch && config.launch.brModel === 1) {
+    /*去掉后缀*/
+    const noSuffix = fileName.replace(/\.[a-z]+/, '')
+      /*在线*/
+    if(Xut.plat.isBrowser) {
+      if(Xut.plat.isIOS) {
+        return `${config.pathAddress + noSuffix}_i`
+      } else if(Xut.plat.isAndroid) {
+        return `${config.pathAddress + noSuffix}_a`
+      }
+      //纯PC
+      return config.pathAddress + fileName
+    }
+    /*本地*/
+    else {
+      return config.pathAddress + fileName
+    }
+  }
+  return config.pathAddress + fileName
+}
+
+
 /**
  * 获取资源
  * @param  {[type]} url [description]

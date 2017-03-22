@@ -10,27 +10,15 @@
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
-    <style type="text/css">
-    * {
-        touch-action: none;
-    }
-
-    button {
-        border: 1px solid red;
-        position: absolute;
-        z-index: 99999
-    }
-
-    #closeMini {
-        left: 100px;
-    }
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/dev.css">
     <script type="text/javascript" src="lib/external.js"></script>
 </head>
 
 <body>
-    <button id="launchMini">加载新的图书</button>
-    <button id="closeMini">关闭图书</button>
+    <button id="launchMini">进入</button>
+    <button id="closeMini">退出</button>
+    <button id="home">home</button>
+    <button id="activate">激活</button>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
@@ -59,7 +47,8 @@ Xut.Application.setConfig = {
         //     left: '20%'
         // }
     },
-    trackCode: ['app', 'page', 'action', 'hot'],
+    brModel:0,
+    // trackCode: ['app', 'page', 'action', 'hot'],
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: false
@@ -95,9 +84,11 @@ function openurl() {
  *
  */
 Xut.Application.Watch('trackCode', function(type, options) {
-    console.log(type, options)
+
     switch (type) {
         case 'app':
+            // console.log(type, options)
+            // localStorage.setItem('aaaa', options.time);
             break;
         case 'page':
             break;
@@ -108,9 +99,15 @@ Xut.Application.Watch('trackCode', function(type, options) {
     }
 })
 
+$("#home").click(function() {
+    Xut.Application.Original()
+})
 
+$("#activate").click(function() {
+    Xut.Application.Activate()
+})
 
-var appId = 101
+var appId = 320
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

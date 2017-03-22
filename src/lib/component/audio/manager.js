@@ -231,14 +231,12 @@ let checkBreakAudio = (type, pageId, queryId, pageBox) => {
  * @param  {string} type    决定video表按哪个字段查询
  * @return {object}         音频对象/不存在为null
  */
-let preCheck = (pageId, queryId, type) => {
-  var t, p, q,
-    playObj = pageBox[type][pageId][queryId],
-    seasonAudio = null;
+let preCheck = (options) => {
+  var t, p, q, seasonAudio = null;
   for(t in playBox) {
     for(p in playBox[t]) {
       for(q in playBox[t][p]) {
-        if(checkBreakAudio(t, p, q, playObj)) {
+        if(checkBreakAudio(t, p, q, options)) {
           seasonAudio = playBox[t][p][q];
         }
       }
@@ -256,9 +254,9 @@ let loadAudio = (pageId, queryId, type) => {
 
   //找到页面对应的音频
   //类型=》页面=》指定音频Id
-  var pageObj = pageBox[type][pageId][queryId];
+  var options = pageBox[type][pageId][queryId];
   //检测
-  var seAudio = preCheck(pageId, queryId, type);
+  var seAudio = preCheck(options);
 
   //播放音频时关掉视频
   // clearVideo()
@@ -272,12 +270,12 @@ let loadAudio = (pageId, queryId, type) => {
   }
   //假如有字幕信息
   //找到对应的文档对象
-  if(pageObj.subtitles) {
-    var tempDoms = getParentDom(pageObj.subtitles, pageId, queryId);
+  if(options.subtitles) {
+    var tempDoms = getParentDom(options.subtitles, pageId, queryId);
   }
 
   //播放完成处理
-  pageObj.innerCallback = (audio) => {
+  options.innerCallback = (audio) => {
     if(playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
       audio.end();
       delete playBox[type][pageId][queryId];
@@ -285,7 +283,7 @@ let loadAudio = (pageId, queryId, type) => {
   }
 
   //存入播放对象池
-  playBox[type][pageId][queryId] = seAudio || new audioPlayer(pageObj, tempDoms)
+  playBox[type][pageId][queryId] = seAudio || new audioPlayer(options, tempDoms)
 }
 
 

@@ -66,19 +66,18 @@ export class Sprite {
    */
 
   analysisPath() {
-    var pathImg,
-      imgContent = this.data.md5,
+    var imgPath, fileName = this.data.md5,
       //是gif格式
-      isGif = /.gif$/i.test(imgContent),
+      isGif = /.gif$/i.test(fileName),
       //原始地址
-      originalPathImg = Xut.config.pathAddress + imgContent;
+      originalPathImg = Xut.config.pathAddress + fileName;
     if(isGif) {
       //处理gif图片缓存+随机数
-      // pathImg = Xut.createRandomImg(originalPathImg)
+      // imgPath = Xut.createRandomImg(originalPathImg)
     } else {
-      pathImg = originalPathImg;
+      imgPath = originalPathImg;
     }
-    return pathImg;
+    return imgPath;
   }
 
 

@@ -1,0 +1,21 @@
+    * {
+        touch-action: none;
+    }
+
+    button {
+        border: 1px solid red;
+        position: absolute;
+        z-index: 99999
+    }
+
+    #home {
+        right: 45px;
+    }
+
+    #activate {
+        right: 0px;
+    }
+
+    #closeMini {
+        left: 45px;
+    }

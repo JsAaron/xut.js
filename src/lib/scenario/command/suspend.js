@@ -3,8 +3,8 @@
  * @return {[type]} [description]
  */
 import access from './access'
-import { hangUpAudio } from '../../component/audio/manager'
-import { removeVideo, hangUpVideo } from '../../component/video/manager'
+import { hangUpAudio, clearAudio } from '../../component/audio/manager'
+import { removeVideo, clearVideo } from '../../component/video/manager'
 
 
 /**
@@ -41,13 +41,12 @@ export function $$suspend(pageObj, pageId, allHandle) {
       obj.stop && obj.stop();
     })
 
-
     //如果是外部调用接口
     //销毁视频
     //销毁所有的音频
     if(allHandle) {
-      hangUpVideo()
-      hangUpAudio()
+      clearVideo()
+      clearAudio()
     }
 
   })

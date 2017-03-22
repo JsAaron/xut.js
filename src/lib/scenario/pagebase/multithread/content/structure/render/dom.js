@@ -13,7 +13,7 @@ const maskContent = (data, wrapObj) => {
 
   //如果有蒙版图
   let isMaskImg = data.mask ? maskBoxImage + ":url(" + Xut.config.pathAddress + data.mask + ");" : ""
-  let pathImg = wrapObj.pathImg
+  let imgPath = wrapObj.imgPath
   let restr = ""
 
   //蒙板图
@@ -23,14 +23,14 @@ const maskContent = (data, wrapObj) => {
       restr += String.styleFormat(
         `<img data-type="${data.qrCode ? 'qrcode' : 'mask'}"
               class="inherit-size fullscreen-background edges"
-              src="${pathImg}"
+              src="${imgPath}"
               style="${isMaskImg}"/>`
       )
     } else {
       //canvas
       restr += String.styleFormat(
         `<canvas class="inherit-size fullscreen-background edges"
-                 src="${pathImg}"
+                 src="${imgPath}"
                  mask="${isMaskImg}"
                  width="${data.scaleWidth}"
                  height="${data.scaleHeight}"
@@ -58,7 +58,7 @@ const maskContent = (data, wrapObj) => {
       `<div data-type="sprite-images"
             class="sprite"
             style="height:${data.scaleHeight}px;
-                   background-image:url(${wrapObj['pathImg']});
+                   background-image:url(${imgPath});
                    background-size:${matrixX}% ${matrixY}%;">
       </div>`
     )
@@ -67,7 +67,7 @@ const maskContent = (data, wrapObj) => {
     restr += String.styleFormat(
       `<img data-type="${data.qrCode ? 'qrcode' : 'ordinary'}"
             class="inherit-size fullscreen-background fix-miaomiaoxue-img"
-            src="${pathImg}"
+            src="${imgPath}"
             style="${isMaskImg}"/>`
     )
   }
@@ -170,7 +170,7 @@ const fillContent = (data, wrapObj) => {
   let restr = '';
   //如果内容是图片
   //如果是svg或者html
-  if(wrapObj.imgContent) {
+  if(wrapObj.fileName) {
     //如果是SVG
     if(wrapObj.isSvg) {
       restr += svgContent(data, wrapObj);

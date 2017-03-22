@@ -94,20 +94,20 @@ const config: Config = {
   /**
   * 图片模式webp
   * 0：旧版本,浏览器模式
-  * 1：Ios
-  * 2：Android
+  * 1：新版模式 webp
   *
-    λ brModel为0，则什么都不变
-    λ brModel不为0，当前是在线版：
-    ν   brModel为ios或android，获取了数据库的文件名之后，去掉扩展名。
-    ν   如果是ios，则文件名之后加上_i，Android，则文件名之后，加上_a。
+     brModel === 0，则什么都不变
+     brModel === 1，
+       在线版：
+         brModel为ios或android，获取了数据库的文件名之后，去掉扩展名。
+         如果是ios，则文件名之后加上_i，Android，则文件名之后，加上_a。
 
-    λ brModel不为0，本地版：
-    ν   brModel为ios或android，获取了数据库的文件名之后，去掉扩展名
+       本地版：
+         brModel为ios或android，获取了数据库的文件名之后，去掉扩展名
 
-    λ brModel不为0，如果图像带有蒙板
-    ν   首先，忽略蒙板设置
-        然后按照上面的规则，合成新的文件名即
+       图像带有蒙板
+         首先，忽略蒙板设置
+         然后按照上面的规则，合成新的文件名即
   */
   brModel: 0,
 

@@ -13,10 +13,7 @@ export function priorityConfig() {
   /*如果启动了代码追踪，配置基本信息*/
   const launch = config.launch
   const trackTypes = launch && launch.trackCode || config.trackCode
-
-  /*快速检测*/
   config.hasTrackCode = function() {}
-
   if(trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if(!launch.trackCode) { launch.trackCode = {} }
     trackTypes.forEach(type => { launch.trackCode[type] = true })
@@ -33,4 +30,8 @@ export function priorityConfig() {
     }
   }
 
+  /*图片模式webp*/
+  if(launch && !launch.brModel && config.brModel) {
+    launch.brModel = config.brModel
+  }
 }

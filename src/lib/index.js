@@ -5,7 +5,7 @@ import { slashPostfix } from './util/option'
 import { AudioManager } from './component/audio/manager'
 import { VideoManager } from './component/video/manager'
 import { initRootNode } from './initial/node'
-import { initGlobalEvent } from './initial/default'
+import { initGlobalEvent } from './initial/event'
 import { initGlobalAPI } from './global-api/index'
 import { priorityConfig } from './config/priority-config'
 

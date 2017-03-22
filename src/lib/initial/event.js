@@ -37,11 +37,9 @@ export function initGlobalEvent() {
     })
 
     /*启动代码用户操作跟踪*/
-    config.hasTrackCode('app', function(dataset) {
-      const startupTime = +new Date
-        /*离开页面*/
-      $(window).on('unload', function(notify) {
-        notify({ time: (+new Date) - startupTime })
+    config.hasTrackCode('app', function(notify) {
+      $(window).on('unload', function() {
+        notify({ time: (+new Date) - config.launch.launchTime })
       })
     })
 

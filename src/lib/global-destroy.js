@@ -8,7 +8,7 @@ import { config, destroyConfig } from './config/index'
 import { $$resetUUID } from './util/stroage'
 import { offAndroid } from './initial/button'
 import { cleanCursor } from './initial/cursor'
-import { cleanGlobalEvent } from './initial/default'
+import { cleanGlobalEvent } from './initial/event'
 import { removeRootNode } from './initial/node'
 
 /**

@@ -72,15 +72,9 @@ export default function createBackground(svgContent, data) {
    * @return {[type]}          [description]
    */
   if(backText && !masterData && !pptMaster && !imageLayerData) {
-    if(svgContent) {
-      return String.styleFormat(
-        `<div data-multilayer ="true"
-                      class="multilayer">
-                    ${svgContent}
-                </div>`)
-    } else {
-      return ''
-    }
+    return svgContent ?
+      String.styleFormat(`<div data-multilayer ="true"class="multilayer"> ${svgContent} </div>`) :
+      ''
   }
 
 
@@ -103,11 +97,7 @@ export default function createBackground(svgContent, data) {
    */
   let masterHTML = ''
   if(masterData && !pptMaster) {
-    const masterImage = data.path + masterData
-    masterHTML =
-      `<div class="multilayer-master"
-                  style="background-image:url(${masterImage})">
-             </div>`
+    masterHTML = `<div class="multilayer-master"style="background-image:url(${data.path + masterData})"></div>`
   }
 
   /**
@@ -121,12 +111,12 @@ export default function createBackground(svgContent, data) {
     const maskImage = data.path + imageLayerData
     maskHTML =
       `<div class="multilayer-imageLayer"
-                  style="width:${data.imageWidth}px;
-                         height:${data.imageHeight}px;
-                         top:${data.imageTop}px;
-                         left:${data.imageLeft}px;
-                         background-image:url(${maskImage});${maskLayer}">
-            </div>`
+            style="width:${data.imageWidth}px;
+                   height:${data.imageHeight}px;
+                   top:${data.imageTop}px;
+                   left:${data.imageLeft}px;
+                   background-image:url(${maskImage});${maskLayer}">
+       </div>`
   }
 
   /**
@@ -146,58 +136,46 @@ export default function createBackground(svgContent, data) {
       if(maskBoxImage != undefined) {
         backImageHTML =
           `<div class="multilayer-backImage"
-                          style="width:${newWidth};
-                                 background-image:url(${newBackImage});
-                                 ${maskBoxImage}:url(${newBackMask});
-                                 ${ backImagePosition }">
-                    </div>`
+                style="width:${newWidth};
+                       background-image:url(${newBackImage});
+                       ${maskBoxImage}:url(${newBackMask});
+                       ${ backImagePosition }">
+           </div>`
       } else {
         //无蒙版
         backImageHTML =
           `<canvas class="multilayer-backImage edges"
-                             height=${document.body.clientHeight}
-                             width=${document.body.clientWidth}
-                             src=${newBackImage}
-                             mask=${newBackMask}
-                             style="width:${newWidth};
-                                    opacity:0;
-                                    ${maskBoxImage}:url(${newBackImage});
-                                    ${ backImagePosition }">
-                    </canvas>`
+                   height=${document.body.clientHeight}
+                   width=${document.body.clientWidth}
+                   src=${newBackImage}
+                   mask=${newBackMask}
+                   style="width:${newWidth};
+                          opacity:0;
+                          ${maskBoxImage}:url(${newBackImage});
+                          ${ backImagePosition }">
+           </canvas>`
       }
     } else {
       //图片层
       backImageHTML = `<div class="multilayer-backImage"
-                                  style="width:${newWidth};
-                                         background-image:url(${newBackImage});
-                                         ${ backImagePosition }">
-                            </div>`
+                            style="width:${newWidth};
+                                   background-image:url(${newBackImage});
+                                   ${ backImagePosition }">
+                       </div>`
     }
   }
 
-  /**
-   * 存在svg文字
-   * @return {[type]}
-   */
-  let backTextHTML = ''
-  if(backText) {
-    backTextHTML = `<div class="multilayer-word">
-                            ${svgContent}
-                        </div>`
-  }
+  /*存在svg文字*/
+  const backTextHTML = backText ? `<div class="multilayer-word"> ${svgContent} </div>` : ''
 
-
-  /**
-   * 组层背景图开始
-   * @type {String}
-   */
+  /*组层背景图开始*/
   return String.styleFormat(
     `<div data-multilayer ="true"
-              class="multilayer">
-            ${masterHTML}
-            ${maskHTML}
-            ${backImageHTML}
-            ${backTextHTML}
-        </div>`
+          class="multilayer">
+        ${masterHTML}
+        ${maskHTML}
+        ${backImageHTML}
+        ${backTextHTML}
+    </div>`
   )
 }
