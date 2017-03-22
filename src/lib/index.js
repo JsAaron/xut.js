@@ -18,7 +18,8 @@ Xut.Version = 880.7
 const initApp = (...arg) => {
   /*配置优先级*/
   priorityConfig()
-    /*全局的一些事件处理*/
+
+  /*全局的一些事件处理*/
   initGlobalEvent()
   const { $rootNode, $contentNode } = initRootNode(...arg)
   nextTick({ container: $rootNode, content: $contentNode }, init)

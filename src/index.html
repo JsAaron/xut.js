@@ -48,54 +48,21 @@ Xut.Application.setConfig = {
         // }
     },
     brModel:0,
-    // trackCode: ['app', 'page', 'action', 'hot'],
+    // trackCode: ['launch','app', 'page', 'action', 'hot'],
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: false
 };
 
-function openurl() {
-    window.location.href = 'http://www.kidreadcool.com/downloads.php?esp=mios'
-}
 
-
-/**
- * 监听代码追踪
- * type:类型
- *   app //应用运行时间
- *   page //每个页面运行时间
- *   action => (content的事件)
- *   hot => (包含除去content后的所有热点，例如：action,audio,video,widget零件触发的事件)
- *
- *  options:参数
- *    app => time 应用运行时间
- *    page => time 页面运行时间
- *
- *    action
- *    hot
- *      => {
- *        appId  应用的id
- *        appName 应用标题
- *        id 元素的id
- *        type  触发的类型
- *        pageId 页面的id,对应数据库chapter ID
- *        eventName 事件名
- *      }
- *
- */
 Xut.Application.Watch('trackCode', function(type, options) {
-
+  console.log(type,options)
     switch (type) {
-        case 'app':
-            // console.log(type, options)
-            // localStorage.setItem('aaaa', options.time);
-            break;
-        case 'page':
-            break;
-        case 'aciton':
-            break;
-        case 'hot':
-            break;
+        case 'launch':break;
+        case 'app': break;
+        case 'page': break;
+        case 'aciton': break;
+        case 'hot': break;
     }
 })
 

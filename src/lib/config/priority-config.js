@@ -13,14 +13,14 @@ export function priorityConfig() {
   /*如果启动了代码追踪，配置基本信息*/
   const launch = config.launch
   const trackTypes = launch && launch.trackCode || config.trackCode
-  config.hasTrackCode = function() {}
+  config.hasTrackCode = () => {}
   if(trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if(!launch.trackCode) { launch.trackCode = {} }
     trackTypes.forEach(type => { launch.trackCode[type] = true })
     config.hasTrackCode = (type, callback) => {
       if(launch && launch.trackCode && launch.trackCode[type]) {
         callback && callback(option => {
-          Xut.Application.Notify('trackCode', type, _.extend(option, {
+          Xut.Application.Notify('trackCode', type, _.extend(option || {}, {
             appId: config.appId,
             appName: config.shortName
           }))

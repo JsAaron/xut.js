@@ -110,6 +110,9 @@ export default function baseConfig(callback) {
     //与数据库setting数据
     initTooBar((novelData, tempSettingData) => {
 
+      /*启动代码用户操作跟踪:启动*/
+      config.hasTrackCode('launch', notify => notify())
+
       //创建过滤器
       Xut.CreateFilter = contentFilter('createFilter');
       Xut.TransformFilter = contentFilter('transformFilter');
