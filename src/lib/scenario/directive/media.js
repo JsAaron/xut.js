@@ -1,4 +1,4 @@
-import { parseJSON } from '../../util/index'
+import { parseJSON, getFileFullPath } from '../../util/index'
 import { config } from '../../config/index'
 import { triggerAudio, autoAudio } from '../../component/audio/manager'
 import { triggerVideo, autoVideo, hasVideoObj } from '../../component/video/manager'
@@ -56,7 +56,7 @@ export default {
         if(start.startImg) {
           startImage = start.startImg;
           tempData[_id]['startImg'] = startImage;
-          startImage = 'background-image:url(' + config.pathAddress + startImage + ');';
+          startImage = 'background-image:url(' + getFileFullPath(startImage,'hot-media') + ');';
         }
         if(start.script) {
           tempData[_id]['startScript'] = start.script;

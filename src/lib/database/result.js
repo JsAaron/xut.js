@@ -1,13 +1,10 @@
 import { config } from '../config/index'
-import {
-  $$warn,
-  loadFile
-} from '../util/index'
+import { $$warn, loadFile } from '../util/index'
 
 //替换url
 //1. 路径
 //2. 基础后缀
-const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(?=\.[png|jpg]+)/ig
+const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(\.[png|jpg|gif]+)/ig
 
 //替换style中的vw,vh单位尺寸
 //width\s*:\s*(\d+[.\d]*)\s*(?=[vw|vh])/gi
@@ -35,6 +32,21 @@ const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(?=\.[png|jpg]+)/ig
  */
 let result
 
+/*
+fileName + brModelType + baseSuffix + type
+ */
+function parseFileName(fileName, baseSuffix, type) {
+  //如果启动了模式
+  if(config.launch && config.launch.brModelType) {
+    if(config.launch.brModelType === 'delete') {
+      return `${fileName}${baseSuffix}` //增加后缀，去掉类型
+    } else {
+      return `${fileName}${config.launch.brModelType}${baseSuffix}` //增加brModelType，增加后缀，去掉类型
+    }
+  }
+  //如果只加了baseSuffix模式处理
+  return `${fileName}${baseSuffix}${type}`
+}
 
 /**
  * json数据过滤
@@ -59,18 +71,15 @@ function filterJsonData() {
     config.columnCheck = true
 
     //有基础后缀，需要补上所有的图片地址
-    let baseSuffix = ''
-    if(config.baseImageSuffix) {
-      baseSuffix = `.${config.baseImageSuffix}`
-    }
+    const baseSuffix = config.baseImageSuffix ? `.${config.baseImageSuffix}` : ''
 
     //xlink:href
     //<img src
     //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-    result.FlowData = result.FlowData.replace(urlRE, function(a, prefix, fileName) {
-      return `${prefix}="${remoteUrl}/gallery/${fileName}${baseSuffix}`
+    result.FlowData = result.FlowData.replace(urlRE, function(a, prefix, fileName, type) {
+      return `${prefix}="${remoteUrl}/gallery/${parseFileName(fileName,baseSuffix,type)}`
     })
   }
 

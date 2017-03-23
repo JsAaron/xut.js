@@ -1,3 +1,6 @@
+
+import { getFileFullPath } from '../util/option'
+
 /**
  * 普通精灵动画
  */
@@ -70,7 +73,7 @@ export class Sprite {
       //是gif格式
       isGif = /.gif$/i.test(fileName),
       //原始地址
-      originalPathImg = Xut.config.pathAddress + fileName;
+      originalPathImg = getFileFullPath(fileName,'pixi-sprite')
     if(isGif) {
       //处理gif图片缓存+随机数
       // imgPath = Xut.createRandomImg(originalPathImg)

@@ -1,9 +1,5 @@
-import {
-  Action
-} from './action'
-import {
-  Subtitle
-} from './subtitle'
+import { Action } from './action'
+import { Subtitle } from './subtitle'
 
 /**
  * 音频工厂类

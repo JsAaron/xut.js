@@ -1,6 +1,5 @@
-import {
-  Adapter
-} from '../../component/widget/index'
+import { Adapter } from '../../component/widget/index'
+import { getFileFullPath } from '../../util/option'
 
 export default {
 
@@ -36,7 +35,7 @@ export default {
                    left:${scaleLeft}px;
                    top:${scaleTop}px;
                    z-index:${zIndex};
-            ${md5 ? "background-image: url(" + Xut.config.pathAddress + md5 + ");" : ''}">
+            ${md5 ? "background-image: url(" + getFileFullPath(md5,'hot-widget')  + ");" : ''}">
       </div>`)
   }
 

@@ -18,6 +18,7 @@ import {
   parseJSON,
   reviseSize,
   readFile,
+  hasImages,
   getResources,
   createRandomImg,
   getFileFullPath
@@ -52,39 +53,38 @@ const makeWarpObj = (contentId, content, pageType, pid) => {
  * @return {[type]}         [description]
  */
 const analysisPath = (wrapObj, conData) => {
+  let isGif
+  let resourcePath //资源路径,png/jpg/svg..
   let fileName = conData.md5
 
-  //如果基础图被重新定义过
-  if(config.baseImageSuffix) {
+  /*如果基础图被重新定义过,只可能是图片文件文件*/
+  if(config.baseImageSuffix && hasImages(fileName)) {
     fileName = fileName.replace(/\w+./, '$&' + config.baseImageSuffix + '.')
   }
-
-  /*gif格式*/
-  let isGif = /.gif$/i.test(fileName)
-
-  let fileFullPath = getFileFullPath(fileName)
-
-  //处理gif图片缓存+随机数
-  let imgPath = isGif ? createRandomImg(fileFullPath) : fileFullPath
 
   /*是自动精灵动画*/
   if(conData.category === "AutoCompSprite") {
     try {
-      let resourcePath = config.pathAddress + fileName + "/app.json";
+      resourcePath = getFileFullPath(fileName,'content-autoCompSprite') + "/app.json";
       let results = getResources(resourcePath)
       let spiritList = results.spiritList[0]
       let actListName = spiritList.params.actList
       let name = spiritList.params[actListName].ImageList[0].name
-      imgPath += '/' + name
+      resourcePath += '/' + name
       conData.resource = results
       conData.containerName = wrapObj.containerName
     } catch(err) {
       console.log('AutoCompSprite获取数据失败')
     }
+  } else {
+    let isGif = /.gif$/i.test(fileName)
+    let fileFullPath = getFileFullPath(fileName,'content')
+    resourcePath = isGif ? createRandomImg(fileFullPath) : fileFullPath
   }
+
   wrapObj.fileName = fileName;
   wrapObj.isGif = isGif;
-  wrapObj.imgPath = imgPath;
+  wrapObj.resourcePath = resourcePath;
 }
 
 

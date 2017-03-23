@@ -4,6 +4,8 @@
  * @return {[type]}        [description]
  */
 
+import { getFileFullPath } from '../../util/option'
+
 //音频动作
 //替换背景图
 //指定动画
@@ -15,8 +17,10 @@ export function Action(options) {
   var pageType = audioNode.getAttribute('data-belong')
 
   //切换背景
-  function toggle(linker) {
-    audioNode.style.backgroundImage = 'url(' + Xut.config.pathAddress + linker + ')'
+  function toggle(fileName) {
+    if(fileName) {
+      audioNode.style.backgroundImage = `url(${ getFileFullPath(fileName,'audio-action')})`
+    }
   }
 
   function run(ids) {

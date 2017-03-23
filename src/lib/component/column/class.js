@@ -1,10 +1,11 @@
 import { config, resetVisualLayout } from '../../config/index'
+import { getFileFullPath } from '../../util/option'
 import { translation } from '../../scenario/pagebase/move/translation'
 import { getColumnCount } from './depend'
 import { getVisualDistance } from '../../visual/visual-distance'
 import { Zoom } from '../../plugin/extend/zoom/index'
 import { closeButton } from '../../plugin/extend/close-button'
-import { analysisImageName, insertImageUrlSuffix } from '../../util/option'
+import { analysisImageName, getHDFilePath } from '../../util/option'
 import Swipe from '../../swipe/index'
 import swipeHooks from '../../swipe/hook.js'
 
@@ -22,6 +23,7 @@ export default class ColumnClass {
     chapterId,
     successCallback
   }) {
+    /*存放缩放对象*/
     this.zoomObjs = {}
     this.pptMaster = pptMaster
     this.chapterId = chapterId
@@ -32,9 +34,7 @@ export default class ColumnClass {
     this._layout(successCallback)
   }
 
-  /**
-   * 布局显示
-   */
+  /*布局显示*/
   _layout(successCallback) {
     Xut.nextTick({
       container: this.$pinchNode,
@@ -45,30 +45,22 @@ export default class ColumnClass {
     })
   }
 
-  /**
-   * 缩放图片
-   */
+  /*缩放图片*/
   _zoomImage(node) {
-    let src = node.src
+    const src = node.src
     if(!src) {
       return
     }
-    let analysisName = analysisImageName(src)
-    let originalName = analysisName.original
-    let zoomObj = this.zoomObjs[originalName]
+    const analysisName = analysisImageName(src)
+    const originalName = analysisName.original
+    const zoomObj = this.zoomObjs[originalName]
     if(zoomObj) {
       zoomObj.play()
     } else {
-      //如果配置了高清后缀
-      let hqSrc
-      if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-        //如果启动了高清图片
-        hqSrc = config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
-      }
       this.zoomObjs[originalName] = new Zoom({
         element: $(node),
-        originalSrc: config.pathAddress + analysisName.suffix,
-        hdSrc: hqSrc
+        originalSrc: getFileFullPath(analysisName.suffix,'column-zoom'),
+        hdSrc: getHDFilePath(originalName)
       })
     }
   }
@@ -88,9 +80,7 @@ export default class ColumnClass {
     }
   }
 
-  /**
-   * 获取母版对象
-   */
+  /*获取母版对象*/
   _getMasterObj() {
     if(this._masterObj) {
       return this._masterObj
@@ -118,11 +108,7 @@ export default class ColumnClass {
     }
   }
 
-
-
-  /**
-   * 初始化
-   */
+  /*初始化*/
   _init() {
 
     const coloumnObj = this
@@ -268,10 +254,7 @@ export default class ColumnClass {
 
   }
 
-
-  /**
-   * 更新页码
-   */
+  /*更新页码*/
   _updataPageNumber(direction, location) {
     let initIndex = this.initIndex
     if(location) {
@@ -289,9 +272,7 @@ export default class ColumnClass {
     })
   }
 
-  /**
-   * 重新计算分栏依赖
-   */
+  /*重新计算分栏依赖*/
   resetColumnDep() {
     let newColumnCount = getColumnCount(this.seasonId, this.chapterId)
 
@@ -324,10 +305,7 @@ export default class ColumnClass {
     }
   }
 
-  /**
-   * 销毁
-   * @return {[type]} [description]
-   */
+  /*销毁*/
   destroy() {
 
     //销毁缩放图片
@@ -340,6 +318,5 @@ export default class ColumnClass {
 
     this.swipe && this.swipe.destroy()
   }
-
 
 }

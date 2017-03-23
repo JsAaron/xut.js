@@ -1,4 +1,5 @@
 import { config } from '../../../../config/index'
+import { getFileFullPath } from '../../../../util/option'
 
 const maskBoxImage = Xut.style.maskBoxImage
 
@@ -9,9 +10,6 @@ const maskBoxImage = Xut.style.maskBoxImage
 const setDataSize = function(data) {
   //缩放比
   const proportion = config.proportion
-
-  //路径
-  data.path = config.pathAddress
 
   if(data.imageWidth) {
     data.imageWidth = data.imageWidth * proportion.width
@@ -97,7 +95,7 @@ export default function createBackground(svgContent, data) {
    */
   let masterHTML = ''
   if(masterData && !pptMaster) {
-    masterHTML = `<div class="multilayer-master"style="background-image:url(${data.path + masterData})"></div>`
+    masterHTML = `<div class="multilayer-master" style="background-image:url(${getFileFullPath(masterData,'multilayer-master')})"></div>`
   }
 
   /**
@@ -107,8 +105,8 @@ export default function createBackground(svgContent, data) {
   let maskHTML = ''
   if(imageLayerData) {
     //蒙版图（与背景图是组合关系）
-    const maskLayer = data.imageMask ? maskBoxImage + ":url(" + data.path + data.imageMask + ");" : "";
-    const maskImage = data.path + imageLayerData
+    const maskLayer = data.imageMask ? maskBoxImage + ":url(" + getFileFullPath(data.imageMask,'multilayer-maskLayer') + ");" : "";
+    const maskImage = getFileFullPath(imageLayerData,'multilayer-maskImage')
     maskHTML =
       `<div class="multilayer-imageLayer"
             style="width:${data.imageWidth}px;
@@ -129,8 +127,8 @@ export default function createBackground(svgContent, data) {
     const backImageOffset = getOffset(data.pageSide)
     const backImagePosition = backImageOffset ? backImageOffset : ''
     const newWidth = backImageOffset ? '200%' : '100%'
-    const newBackImage = data.path + backImageData
-    const newBackMask = data.path + backMaskData
+    const newBackImage = getFileFullPath(backImageData,'multilayer-backImage')
+    const newBackMask = getFileFullPath(backMaskData,'multilayer-backMask')
     if(backMaskData) {
       //带蒙版
       if(maskBoxImage != undefined) {

@@ -6,18 +6,16 @@
  * 2.复杂精灵动画
  *   提供给普通转化高级使用
  */
-
 import { loadFigure } from '../../../util/loader'
+import { getFileFullPath } from '../../../util/option'
 import { config } from '../../../config/index'
 
 export default class {
 
   constructor(data, options) {
-    this.data = data
-
+    this.data = data;
     //精灵动画类型 默认为高级精灵动画true 简单转复杂为false
     this.animationType = true;
-
     //高级精灵动画
     if(options.type == 'seniorSprite') {
       this.contentPrefix = options.contentPrefix;
@@ -29,7 +27,7 @@ export default class {
       this.animationType = false;
       this.contentId = options.contentId;
       this.obj = $(options.ele);
-      this.resourcePath = config.pathAddress + options.resourcePath + "/";
+      this.resourcePath = getFileFullPath(options.resourcePath,'autoSprite') + "/";
     }
 
     //是否有蒙版图

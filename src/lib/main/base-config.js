@@ -81,14 +81,11 @@ const adaptiveImage = function() {
     let baseImageType = $adaptiveImageNode.width()
     let type = config.imageSuffix[baseImageType]
     if(type) {
-      //定义基础的图片后缀
       config.baseImageSuffix = type
-    } else {
-      setDefaultSuffix()
+      return
     }
-  } else {
-    setDefaultSuffix()
   }
+  setDefaultSuffix()
 }
 
 export default function baseConfig(callback) {

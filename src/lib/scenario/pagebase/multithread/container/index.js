@@ -8,6 +8,7 @@
  */
 import { config } from '../../../../config/index'
 import { hasValue } from '../../../../util/lang'
+import { getFileFullPath } from '../../../../util/option'
 
 const TANSFROM = Xut.style.transform
 
@@ -60,7 +61,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
 
   //chpater有背景，不是svg格式
   if(!/.svg$/i.test(pageData.md5)) {
-    background = 'background-image:url(' + config.pathAddress + pageData.md5 + ');'
+    background = 'background-image:url(' + getFileFullPath(pageData.md5,'container-bg') + ');'
   }
 
   /**

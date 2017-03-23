@@ -109,9 +109,9 @@ video {
  * 因为与overflow冲突，文字会模糊
  */
 .section-transform{
-    backface-visibility: hidden;
+    /*backface-visibility: hidden;*/
     transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
+    /*-webkit-backface-visibility: hidden;*/
     -webkit-transform-style: preserve-3d;
 }
 
@@ -990,7 +990,7 @@ video {
 }
 
 /******************
-*   滚动条样式增加 
+*   滚动条样式增加
 *   纵向滚动条
 *   横向滚动条
 *   2017.3.13

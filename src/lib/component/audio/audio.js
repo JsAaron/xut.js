@@ -3,10 +3,8 @@
  * @param  {[type]} global [description]
  * @return {[type]}        [description]
  */
-import {
-  config
-} from '../../config/index'
-import BaseAudio from './base.class'
+import {config } from '../../config/index'
+import BaseAudio from './base'
 import {
   hasAudioes,
   getAudio

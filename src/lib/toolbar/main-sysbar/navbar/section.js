@@ -1,4 +1,5 @@
 import { config } from '../../../config/index'
+import { getFileFullPath } from '../../../util/option'
 
 /**
  * 下拉章节列表
@@ -74,8 +75,7 @@ export default class Section {
       createBak = this.createBak || [], //已创建的页码索引
       createNew = [], //新建的页码索引
       pageData = this._pagedata,
-      maxLen = pageData.length,
-      path = config.pathAddress;
+      maxLen = pageData.length
 
     //确保不会溢出
     count = count > maxLen ? maxLen : count;
@@ -96,11 +96,11 @@ export default class Section {
       //如果是分层母板了,此时用icon代替
       if(page.iconImage) {
         this._$list.eq(j).css({
-          'background-image': 'url(' + path + page.iconImage + ')'
+          'background-image': 'url(' + getFileFullPath(page.iconImage,'navbar-bg') + ')'
         });
       } else {
         this._$list.eq(j).css({
-          'background-image': 'url(' + path + page.md5 + ')',
+          'background-image': 'url(' + getFileFullPath(page.md5,'navbar-bg') + ')',
           'background-color': 'white'
         });
       }

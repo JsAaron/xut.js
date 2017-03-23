@@ -7,6 +7,34 @@
 
 import { config } from './index'
 
+
+/*预先判断br的基础类型*/
+// 1 在线模式 返回增加后缀
+// 2 手机模式 返回删除后缀
+// 3 PC模式，不修改
+function getBrType(launch) {
+  //ios
+  if(launch.brModel === 1) {
+    if(Xut.plat.isBrowser) { //浏览器访问
+      return '_i'
+    } else {
+      //app访问
+      return 'delete'
+    }
+  }
+  //android
+  if(launch.brModel === 2) {
+    if(Xut.plat.isBrowser) { //浏览器访问
+      return '_a'
+    } else {
+      //app访问
+      return 'delete'
+    }
+  }
+  //模式 brModel==0
+  return ''
+}
+
 /*获取真实的配置文件 priority*/
 export function priorityConfig() {
 
@@ -34,4 +62,14 @@ export function priorityConfig() {
   if(launch && !launch.brModel && config.brModel) {
     launch.brModel = config.brModel
   }
+
+  /*预先判断出基础类型*/
+  if(launch.brModel) {
+    launch.brModelType = getBrType(launch)
+  }
+
+
+
+
+
 }

@@ -1,6 +1,7 @@
 import {
   parseJSON,
-  replacePath
+  replacePath,
+  getFileFullPath
 } from '../../../../../../util/index'
 
 const maskBoxImage = Xut.style.maskBoxImage
@@ -12,8 +13,8 @@ const FLOOR = Math.floor
 const maskContent = (data, wrapObj) => {
 
   //如果有蒙版图
-  let isMaskImg = data.mask ? maskBoxImage + ":url(" + Xut.config.pathAddress + data.mask + ");" : ""
-  let imgPath = wrapObj.imgPath
+  let isMaskImg = data.mask ? maskBoxImage + ":url(" + getFileFullPath(data.mask, 'content-mask') + ");" : ""
+  let resourcePath = wrapObj.resourcePath
   let restr = ""
 
   //蒙板图
@@ -23,14 +24,14 @@ const maskContent = (data, wrapObj) => {
       restr += String.styleFormat(
         `<img data-type="${data.qrCode ? 'qrcode' : 'mask'}"
               class="inherit-size fullscreen-background edges"
-              src="${imgPath}"
+              src="${resourcePath}"
               style="${isMaskImg}"/>`
       )
     } else {
       //canvas
       restr += String.styleFormat(
         `<canvas class="inherit-size fullscreen-background edges"
-                 src="${imgPath}"
+                 src="${resourcePath}"
                  mask="${isMaskImg}"
                  width="${data.scaleWidth}"
                  height="${data.scaleHeight}"
@@ -58,7 +59,7 @@ const maskContent = (data, wrapObj) => {
       `<div data-type="sprite-images"
             class="sprite"
             style="height:${data.scaleHeight}px;
-                   background-image:url(${imgPath});
+                   background-image:url(${resourcePath});
                    background-size:${matrixX}% ${matrixY}%;">
       </div>`
     )
@@ -67,7 +68,7 @@ const maskContent = (data, wrapObj) => {
     restr += String.styleFormat(
       `<img data-type="${data.qrCode ? 'qrcode' : 'ordinary'}"
             class="inherit-size fullscreen-background fix-miaomiaoxue-img"
-            src="${imgPath}"
+            src="${resourcePath}"
             style="${isMaskImg}"/>`
     )
   }
@@ -209,9 +210,6 @@ const createContainer = (data, wrapObj) => {
   //Content_23_38
   //Content_23_39
   let containerName = wrapObj.containerName
-  let pid = wrapObj.pid
-  let makeId = wrapObj.makeId
-  let background = data.background ? 'background-image: url(' + Xut.config.pathAddress + data.background + ');' : ''
 
   //背景尺寸优先
   if(data.scaleBackWidth && data.scaleBackHeight) {
@@ -255,13 +253,13 @@ const createContainer = (data, wrapObj) => {
                       style="width:${backwidth}px;
                              position:absolute;">`
     return String.styleFormat(wapper)
-  }
+  } else {
+    //scroller:=> absolute 因为别的元素有依赖
+    let background = data.background ? 'background-image: url(' + getFileFullPath(data.background, 'content-container') + ');' : ''
 
-  //scroller:=> absolute 因为别的元素有依赖
-
-  //正常content类型
-  //如果是scroller需要绝对的尺寸，所以替换100% 不可以
-  wapper = `<div id="${containerName}"
+    //正常content类型
+    //如果是scroller需要绝对的尺寸，所以替换100% 不可以
+    wapper = `<div id="${containerName}"
                    data-behavior="click-swipe"
                    style="width:${backwidth}px;
                           height:${backheight}px;
@@ -277,7 +275,9 @@ const createContainer = (data, wrapObj) => {
                           position:absolute;
                           ${background}">`
 
-  return String.styleFormat(wapper)
+    return String.styleFormat(wapper)
+  }
+
 }
 
 

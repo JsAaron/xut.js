@@ -35,10 +35,10 @@ Xut.Application.setConfig = {
     },
     salePicture: true,
     salePictureMultiples: 3,
-    // imageSuffix: {
-    //     1080: 'mi',
-    //     1440: 'hi'
-    // },
+    imageSuffix: {
+        1080: 'mi',
+        1440: 'hi'
+    },
     pageBar: {
         // type: 'circular',
         // mode: 1
@@ -47,11 +47,11 @@ Xut.Application.setConfig = {
         //     left: '20%'
         // }
     },
-    brModel:0,
+    brModel:1,
     // trackCode: ['launch','app', 'page', 'action', 'hot'],
     supportQR: true,
     swipeDelegate: true,
-    useHDImageZoom: false
+    useHDImageZoom: true
 };
 
 
@@ -74,7 +74,7 @@ $("#activate").click(function() {
     Xut.Application.Activate()
 })
 
-var appId = 320
+var appId = 13 //311
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

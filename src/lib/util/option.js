@@ -38,77 +38,121 @@ export function loadStyle(fileName, callback) {
  * .hi.jpg
  * .hi.php
  * 等等这样的地址
- * @return {[type]} [description]
+ * @return
+    original: "1d7949a5585942ed.jpg"
+    suffix  : "1d7949a5585942ed.mi.jpg"
  */
 export function analysisImageName(src) {
-
   let suffix = src
   let original = src
 
+  //如果存在brModelType
+  if(config.launch && config.launch.brModelType && config.launch.brModelType !== 'delete') {
+    const baseImageSuffix = config.baseImageSuffix ? `.${config.baseImageSuffix}` : ''
+    let exp = new RegExp('\\w+[' + config.launch.brModelType + ']' + baseImageSuffix, 'gi')
+    let result = src.match(exp)
+    if(result && result.length) {
+      suffix = result[0]
+      original = suffix.replace(baseImageSuffix, '')
+    } else {
+      $$warn('zoom-image-brModelType解析出错,result：' + result)
+    }
+  }
   //有基础后缀
-  if(config.baseImageSuffix) {
+  else if(config.baseImageSuffix) {
     let baseImageSuffix = `.${config.baseImageSuffix}.`
-    let exp = new RegExp('\\w+' + baseImageSuffix + '(jpg|png)', 'gi')
+    let exp = new RegExp('\\w+' + baseImageSuffix + '(jpg|png|gif)', 'gi')
     let result = src.match(exp)
     if(result && result.length) {
       suffix = result[0]
       original = suffix.replace(baseImageSuffix, '.')
     } else {
-      $$warn('analysisImageUrl解析出错,result：' + result)
+      $$warn('zoom-image-suffix解析出错,result：' + result)
     }
   }
   //如果没有后缀
   else {
-    let result = src.match(/\w+.(jpg|png)/gi)
+    let result = src.match(/\w+.(jpg|png|gif)/gi)
     if(result && result.length) {
       suffix = original = result[0]
     } else {
-      $$warn('analysisImageUrl解析出错,result：' + result)
+      $$warn('zoom-image解析出错,result：' + result)
     }
   }
-
   return {
     original, //原始版
     suffix //带有后缀
   }
-
 }
 
-/**
- * 给地址增加私有后缀
- */
-export function insertImageUrlSuffix(originalUrl, suffix) {
+/*给地址增加私有后缀*/
+function insertImageUrlSuffix(originalUrl, suffix) {
   if(originalUrl && suffix) {
+    //brModelType 没有类型后缀
+    if(config.launch && config.launch.brModelType && config.launch.brModelType !== 'delete') {
+      return originalUrl.replace(/\w+/ig, '$&' + '.' + suffix)
+    }
+    //带后缀
     return originalUrl.replace(/\w+\./ig, '$&' + suffix + '.')
   }
   return originalUrl
 }
 
-
-/*获取文件的全路径*/
-export function getFileFullPath(fileName) {
-  /*启动图片模式*/
-  if(config.launch && config.launch.brModel === 1) {
-    /*去掉后缀*/
-    const noSuffix = fileName.replace(/\.[a-z]+/, '')
-      /*在线*/
-    if(Xut.plat.isBrowser) {
-      if(Xut.plat.isIOS) {
-        return `${config.pathAddress + noSuffix}_i`
-      } else if(Xut.plat.isAndroid) {
-        return `${config.pathAddress + noSuffix}_a`
-      }
-      //纯PC
-      return config.pathAddress + fileName
-    }
-    /*本地*/
-    else {
-      return config.pathAddress + fileName
-    }
+/*获取高清图文件*/
+export function getHDFilePath(originalUrl) {
+  if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
+    return getFileFullPath(insertImageUrlSuffix(originalUrl, config.imageSuffix['1440']), 'getHDFilePath')
   }
-  return config.pathAddress + fileName
+  return ''
 }
 
+/*文件是图片格式*/
+export function hasImages(fileName) {
+  //如果匹配到了已经增加了后缀
+  //跳过
+  if(/\_[i|a]+\./i.test(fileName)) {
+    return false
+  }
+  return /\.[jpg|png|gif]+/i.test(fileName)
+}
+
+
+/*获取文件的全路径*/
+export function getFileFullPath(fileName, type) {
+
+  /*启动webp图片模式*/
+  const launch = config.launch
+  if(launch) {
+    //ios android
+    if(launch.brModel && hasImages(fileName)) {
+      if(Xut.plat.isBrowser) { //手机浏览器访问
+        let fileMatch = fileName.match(/\w+([.]?[\w]*)\1/ig)
+        let name
+        let suffix = ''
+        if(fileMatch.length === 3) {
+          name = fileMatch[0]
+          suffix = '.' + fileMatch[1]
+        } else {
+          name = fileMatch[0]
+        }
+
+        //在线版增加后缀
+        //ios _i
+        //android _a
+        const platSuffix = launch.brModel === 1 ? '_i' : '_a'
+
+        //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
+        return `${config.pathAddress + name}${platSuffix}${suffix}`
+      } else {
+        //手机app访问
+        //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a.mi
+        return `${config.pathAddress + name}${suffix}`
+      }
+    }
+  }
+
+  return config.pathAddress + fileName
+}
 
 /**
  * 获取资源
@@ -123,7 +167,6 @@ export function getResources(url) {
   option = parseJSON(xhr.responseText);
   return option;
 }
-
 
 export function createFn(obj, id, callback) {
   var cObj = obj[id];

@@ -93,9 +93,10 @@ const config: Config = {
 
   /**
   * 图片模式webp
-  * 0：旧版本,浏览器模式
-  * 1：新版模式 webp
-  *
+     0：旧版本
+     1：Ios
+     2：Android
+、
      brModel === 0，则什么都不变
      brModel === 1，
        在线版：
@@ -183,7 +184,7 @@ const config: Config = {
   },
 
   /**
-   * 自适应图片分辨率
+   * 启动自适应图片分辨率
    * iphone的750*1334，android的720*1280及以下的设备，用标准的
    * iphone plus的1080*1920，android的1080*1920，用mi后缀的
    * android的1440*2560用hi后缀的
@@ -196,6 +197,7 @@ const config: Config = {
   imageSuffix: null,
 
   /**
+   * @私有方法
    * 基础图片后缀
    * content类型
    * flow类型

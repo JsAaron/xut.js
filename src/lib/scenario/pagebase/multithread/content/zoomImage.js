@@ -2,22 +2,14 @@
 ///    缩放提示图片
 //////////////////////////
 
-import { $$on, $$off } from '../../../../util/dom'
+import { $$on, $$off, getFileFullPath } from '../../../../util/index'
 import { Zoom } from '../../../../plugin/extend/zoom/index'
-import { analysisImageName, insertImageUrlSuffix } from '../../../../util/option'
+import { analysisImageName, getHDFilePath } from '../../../../util/option'
 
 /*图片*/
 function createHTML() {
   const size = config.screenSize.width > config.screenSize.height ? '2vw' : '2vh'
   return `<div class="icon-maximize"style="font-size:${size};position:absolute;right:0;"></div>`
-}
-
-/*检测高清图*/
-function checkHD(analysisName) {
-  if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-    return config.pathAddress + insertImageUrlSuffix(analysisName.original, config.imageSuffix['1440'])
-  }
-  return ''
 }
 
 export function zoomImage(pipeData) {
@@ -47,8 +39,8 @@ export function zoomImage(pipeData) {
             const analysisName = analysisImageName(src)
             zoomObjs[src] = new Zoom({
               element: $imgNode,
-              originalSrc: config.pathAddress + analysisName.suffix,
-              hdSrc: checkHD(analysisName)
+              originalSrc: getFileFullPath(analysisName.suffix,'pagebase-zoom'),
+              hdSrc: getHDFilePath(analysisName.original)
             })
           }
         }

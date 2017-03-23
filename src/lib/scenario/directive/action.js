@@ -4,6 +4,7 @@
  * 2. 打开系统应用程序
  */
 import Action from '../../component/action/index'
+import { getFileFullPath } from '../../util/option'
 
 export default {
   createDom({
@@ -27,7 +28,7 @@ export default {
                    background-size:100% 100%;
                    position:absolute;
                    z-index:${zIndex};
-            ${ md5 ? "background-image: url(" + Xut.config.pathAddress + md5 + ");" : '' }">
+            ${ md5 ? "background-image: url(" + getFileFullPath(md5,'hot-action') + ");" : '' }">
       </div>`)
   }
 

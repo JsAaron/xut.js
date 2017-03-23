@@ -6,7 +6,7 @@
  * ***************************************************/
 import { config } from '../../../../config/index'
 import { nextTick } from '../../../../util/nexttick'
-import { bindActivity } from './bind-Activity'
+import { bindActivity } from './bindActivity'
 import { zoomImage } from './zoomImage'
 import { textFx } from './textFx'
 import { contentParser } from './parser/content'
