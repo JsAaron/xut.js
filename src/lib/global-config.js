@@ -94,11 +94,12 @@ const config: Config = {
   /**
   * 图片模式webp
      0：旧版本
-     1：Ios
-     2：Android
+     1：自适应
+     2：Ios
+     3：Android
 、
      brModel === 0，则什么都不变
-     brModel === 1，
+     brModel === 1/2/3，
        在线版：
          brModel为ios或android，获取了数据库的文件名之后，去掉扩展名。
          如果是ios，则文件名之后加上_i，Android，则文件名之后，加上_a。

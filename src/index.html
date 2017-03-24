@@ -35,10 +35,10 @@ Xut.Application.setConfig = {
     },
     salePicture: true,
     salePictureMultiples: 3,
-    imageSuffix: {
-        1080: 'mi',
-        1440: 'hi'
-    },
+    // imageSuffix: {
+    //     1080: 'mi',
+    //     1440: 'hi'
+    // },
     pageBar: {
         // type: 'circular',
         // mode: 1
@@ -47,7 +47,7 @@ Xut.Application.setConfig = {
         //     left: '20%'
         // }
     },
-    brModel:1,
+    // brModel:1,
     // trackCode: ['launch','app', 'page', 'action', 'hot'],
     supportQR: true,
     swipeDelegate: true,
@@ -56,7 +56,6 @@ Xut.Application.setConfig = {
 
 
 Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type,options)
     switch (type) {
         case 'launch':break;
         case 'app': break;

@@ -1,5 +1,5 @@
 import initTooBar from './toolbar'
-import { $$warn, loadStyle } from '../util/index'
+import { $$warn, loadStyle, setFastAnalysisRE } from '../util/index'
 import { createCursor } from '../initial/cursor'
 import { initColumn } from '../component/column/core-init'
 import { contentFilter } from '../component/activity/content/content-filter'
@@ -56,25 +56,26 @@ const getMaxWidth = function() {
  * 1440: 'hi' //1440->
  */
 const setDefaultSuffix = function() {
+  let doc = document.documentElement
+
   //竖版的情况才调整
-  if(config.screenVertical) {
+  if(doc.clientHeight > doc.clientWidth) {
     let ratio = window.devicePixelRatio || 1
     let maxWidth = getMaxWidth() * ratio
-    if(maxWidth > 1080 && maxWidth < 1439) {
+    if(maxWidth >= 1080 && maxWidth < 1439) {
       config.baseImageSuffix = config.imageSuffix['1080']
     }
-    if(maxWidth > 1440) {
+    if(maxWidth >= 1440) {
       config.baseImageSuffix = config.imageSuffix['1440']
     }
+
     if(config.devtools && config.baseImageSuffix) {
-      $$warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix =' + config.baseImageSuffix)
+      $$warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix = ' + config.baseImageSuffix)
     }
   }
 }
 
-/*
-自适应图片
- */
+/*自适应图片*/
 const adaptiveImage = function() {
   let $adaptiveImageNode = $('.xut-adaptive-image')
   if($adaptiveImageNode.length) {
@@ -97,9 +98,10 @@ export default function baseConfig(callback) {
   }
 
   /*图片分辨了自适应*/
-  if(config.imageSuffix) {
-    adaptiveImage()
-  }
+  config.imageSuffix && adaptiveImage()
+
+  /*建议快速正则，提高计算*/
+  setFastAnalysisRE()
 
   importJsonDatabase(() => {
 

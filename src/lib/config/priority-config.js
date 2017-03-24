@@ -12,9 +12,20 @@ import { config } from './index'
 // 1 在线模式 返回增加后缀
 // 2 手机模式 返回删除后缀
 // 3 PC模式，不修改
-function getBrType(launch) {
+function getBrType(mode) {
+
+  //自适应平台
+  if(mode === 1) {
+    if(Xut.plat.isIOS) {
+      return getBrType(2)
+    }
+    if(Xut.plat.isAndroid) {
+      return getBrType(3)
+    }
+  }
+
   //ios
-  if(launch.brModel === 1) {
+  if(mode === 2) {
     if(Xut.plat.isBrowser) { //浏览器访问
       return '_i'
     } else {
@@ -23,7 +34,7 @@ function getBrType(launch) {
     }
   }
   //android
-  if(launch.brModel === 2) {
+  if(mode === 3) {
     if(Xut.plat.isBrowser) { //浏览器访问
       return '_a'
     } else {
@@ -65,11 +76,7 @@ export function priorityConfig() {
 
   /*预先判断出基础类型*/
   if(launch.brModel) {
-    launch.brModelType = getBrType(launch)
+    launch.brModelType = getBrType(launch.brModel)
   }
-
-
-
-
 
 }
