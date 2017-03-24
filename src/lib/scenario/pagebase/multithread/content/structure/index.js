@@ -18,7 +18,6 @@ import {
   parseJSON,
   reviseSize,
   readFile,
-  hasImages,
   getResources,
   createRandomImg,
   getFileFullPath
@@ -56,11 +55,6 @@ const analysisPath = (wrapObj, conData) => {
   let isGif
   let resourcePath //资源路径,png/jpg/svg..
   let fileName = conData.md5
-
-  /*如果基础图被重新定义过,只可能是图片文件文件*/
-  if(config.baseImageSuffix && hasImages(fileName)) {
-    fileName = fileName.replace(/\w+./, '$&' + config.baseImageSuffix + '.')
-  }
 
   /*是自动精灵动画*/
   if(conData.category === "AutoCompSprite") {

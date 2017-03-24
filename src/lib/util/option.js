@@ -134,14 +134,8 @@ export function getHDFilePath(originalUrl) {
 
 /*文件是图片格式*/
 export function hasImages(fileName) {
-  //跳过,如果匹配到了已经增加了后缀
-  //flow的内容，已经增加了后缀
-  if(/\_[i|a]+\./i.test(fileName)) {
-    return false
-  }
   return /\.[jpg|png|gif]+/i.test(fileName)
 }
-
 
 /*获取文件的全路径*/
 export function getFileFullPath(fileName, type) {
@@ -171,8 +165,13 @@ export function getFileFullPath(fileName, type) {
       fileName = `${fileMatch[1]}.${config.baseImageSuffix}.${fileMatch[2]}`
     }
 
-    /*支持webp图*/
-    if(launch.brModel && hasImages(fileName)) {
+    /*
+      支持webp图
+      1 如果启动brModelType
+      2 并且是图片
+      3 并且没有被修改过
+    */
+    if(launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
       if(Xut.plat.isBrowser) { //手机浏览器访问
         let fileMatch = fileName.match(/\w+([.]?[\w]*)\1/ig)
         let name
@@ -258,11 +257,6 @@ export function replacePath(svgstr) {
 
 /**
  * 转化缩放比
- * @param  {[type]} width  [description]
- * @param  {[type]} height [description]
- * @param  {[type]} left   [description]
- * @param  {[type]} top    [description]
- * @return {[type]}        [description]
  */
 const converProportion = function({
   width,
