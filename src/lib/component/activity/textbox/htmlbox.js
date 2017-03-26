@@ -131,7 +131,7 @@ export default class HtmlBox {
     var iscrollName = "htmlbox-iscroll-" + contentId;
 
     //缓存名
-    this.storageName = iscrollName + config.appId;
+    this.storageName = iscrollName + config.data.appId;
 
     const fontSize = getFontSize()
 

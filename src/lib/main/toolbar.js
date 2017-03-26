@@ -37,19 +37,19 @@ const initDefaults = (setData) => {
 
   _.defaults(data, defaults);
 
-  for(let i in defaults) {
+  for (let i in defaults) {
     setConfig[i] = Number(data[i]);
   }
 
-  config.settings = setConfig;
-  config.appId = data.appId; //应用配置唯一标示符
-  config.shortName = data.shortName;
-  config.Inapp = data.Inapp; //是否为应用内购买
-  config.delayTime = data.delayTime
-
-  //应用的唯一标识符
-  //生成时间+appid
-  config.appId = data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.appId;
+  _.extend(config.data, {
+    //应用的唯一标识符
+    //生成时间+appid
+    appId: data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.appId,
+    settings: setConfig,
+    delayTime: data.delayTime,
+    Inapp: data.Inapp,
+    shortName: data.shortName
+  })
 
   //广告Id
   //2014.9.2
@@ -76,21 +76,22 @@ const setStore = (callback) => {
  * @return {[type]} [description]
  */
 const supportTransaction = (callback) => {
-  if(window.openDatabase) {
+  if (window.openDatabase) {
     try {
       //数据库链接对象
-      Xut.config.db = window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
-    } catch(err) {
+      config.data.db = window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
+    } catch (err) {
       console.log('window.openDatabase出错')
     }
   }
+
   //如果读不出数据
-  if(Xut.config.db) {
-    Xut.config.db.transaction(function(tx) {
+  if (config.data.db) {
+    config.data.db.transaction(function(tx) {
       tx.executeSql('SELECT * FROM Novel', [], function(tx, rs) {
         callback()
       }, function() {
-        Xut.config.db = null
+        config.data.db = null
         callback()
       })
     })

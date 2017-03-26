@@ -60,8 +60,8 @@ export function priorityConfig() {
       if(launch && launch.trackCode && launch.trackCode[type]) {
         callback && callback(option => {
           Xut.Application.Notify('trackCode', type, _.extend(option || {}, {
-            appId: config.appId,
-            appName: config.shortName
+            appId: config.data.appId,
+            appName: config.data.shortName
           }))
         })
         return true

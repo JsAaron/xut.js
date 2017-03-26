@@ -52,6 +52,16 @@ export type Config = {
 
 const config: Config = {
 
+  /**
+   * 双页面模式，竖版ppt在横版显示
+   * 一个view中，显示2个page
+   * 一个页面宽度50%，拼接2个页面100%
+   * 默认禁止：
+   * 1 true 启动
+   * 2 false 禁止
+   */
+  doublePageMode: false,
+
   /*是否启动跟踪状态*/
 
   /**
@@ -348,17 +358,6 @@ const config: Config = {
     deputy: DEFAULT, //副场景，函数工具栏
     number: DEFAULT //独立配置，默认会启动页面，针对分栏处理
   },
-
-  /**
-   * 双页面模式，竖版ppt在横版显示
-   * 一个view中，显示2个page
-   * 一个页面宽度50%，拼接2个页面100%
-   * 高度正比，这样高度不溢出，中间布局留空白
-   * 默认禁止：
-   * 1 true 启动
-   * 2 false 禁止
-   */
-  doublePageMode: false,
 
   /**
    * 独立canvas模式处理

@@ -13,20 +13,22 @@ const isBrowser = Xut.plat.isBrowser
  */
 const getArrowStyle = function() {
   let height = config.iconHeight
-  let settings = config.settings
   let styleText = `height:${height}px;width:${height}px`
-  switch(settings.NavbarPos) {
-    case 0:
-      styleText += ';top:0';
-      break; //顶部
-    case 1:
-      styleText += ';margin-top:' + (-height / 2) + 'px';
-      break; //中间
-    case 2:
-      styleText += ';top:auto;bottom:0';
-      break; //底部
-    default:
-      break;
+  let settings = config.data.settings
+  if (settings) {
+    switch (settings.NavbarPos) {
+      case 0:
+        styleText += ';top:0';
+        break; //顶部
+      case 1:
+        styleText += ';margin-top:' + (-height / 2) + 'px';
+        break; //中间
+      case 2:
+        styleText += ';top:auto;bottom:0';
+        break; //底部
+      default:
+        break;
+    }
   }
   return styleText;
 }
@@ -66,10 +68,10 @@ export default class Bar {
     this.super_iconHeight = isIOS ? iconHeight : Math.round(this.super_propHeight * iconHeight)
 
     //应用标题
-    this.appName = config.shortName
+    this.appName = config.data.shortName
 
     //应用默认配置
-    this.settings = config.settings
+    this.settings = config.data.settings
   }
 
   /**
@@ -92,7 +94,7 @@ export default class Bar {
 
     //动态图标，数据库定义的翻页图标
     //font字体画翻页图标
-    if(isCustom) {
+    if (isCustom) {
       $str = $(String.styleFormat(this._createIcon()))
     } else {
       $str = $(String.styleFormat(this._createArrow()))
@@ -162,8 +164,8 @@ export default class Bar {
     let state = this.toolBarStatus ? '' : 'hide'
 
     //默认图标路径
-    let leftStyle = `${style};background-image:url(images/icons/pageforward_${config.appId}.svg);background-size:cover`
-    let rightStyle = `${style};background-image:url(images/icons/pageback_${config.appId}.svg);background-size:cover`
+    let leftStyle = `${style};background-image:url(images/icons/pageforward_${config.data.appId}.svg);background-size:cover`
+    let rightStyle = `${style};background-image:url(images/icons/pageback_${config.data.appId}.svg);background-size:cover`
 
     return `<div name="prevArrow"
                      class="xut-flip-control xut-flip-control-left ${state}"
@@ -183,13 +185,13 @@ export default class Bar {
    * @return {[type]}       [description]
    */
   _toggleArrow(dir, status) {
-    if(!this.arrows) return
+    if (!this.arrows) return
     var arrow = this.arrows[dir];
     //如果没有创建翻页按钮,则不处理
-    if(!arrow) return;
+    if (!arrow) return;
     arrow.able = status;
     //如果人为隐藏了工具栏,则不显示翻页按钮
-    if(this.hasTopBar && !this.toolBarStatus && status) {
+    if (this.hasTopBar && !this.toolBarStatus && status) {
       return;
     }
     arrow.el[status ? 'show' : 'hide']();
@@ -201,7 +203,7 @@ export default class Bar {
    */
   _showArrow() {
     var arrows = this.arrows;
-    for(var dir in arrows) {
+    for (var dir in arrows) {
       var arrow = arrows[dir];
       arrow.able && arrow.el.show();
     }
@@ -214,7 +216,7 @@ export default class Bar {
    */
   _hideArrow() {
     var arrows = this.arrows;
-    for(var dir in arrows) {
+    for (var dir in arrows) {
       arrows[dir].el.hide();
     }
   }
@@ -242,7 +244,7 @@ export default class Bar {
    * @return {[type]} [description]
    */
   super_destory() {
-    if(this.arrows) {
+    if (this.arrows) {
       this.arrows.prev.off();
       this.arrows.next.off();
       this.arrows = null
@@ -292,7 +294,7 @@ export default class Bar {
    * @return {[type]}         [description]
    */
   _showToolBar(pointer) {
-    switch(pointer) {
+    switch (pointer) {
       case 'controlBar':
         this.showTopBar()
         break;
@@ -312,7 +314,7 @@ export default class Bar {
    * @return {[type]}         [description]
    */
   _hideToolBar(pointer) {
-    switch(pointer) {
+    switch (pointer) {
       case 'controlBar':
         this.hideTopBar()
         break;
@@ -335,9 +337,9 @@ export default class Bar {
    * @return {[type]}         [description]
    */
   toggle(state, pointer) {
-    if(this.Lock) return
+    if (this.Lock) return
     this.Lock = true;
-    switch(state) {
+    switch (state) {
       case 'show':
         this._showToolBar(pointer);
         break;

@@ -12,7 +12,7 @@ const createAppId = function() {
   //添加UUID
   var appId = 'aaron-' + new Date().getDate();
   //写入数据库
-  config.db && config.db.transaction(function(tx) {
+  config.data.db && config.data.db.transaction(function(tx) {
     tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function() {}, function() {});
   }, function() {
     //  callback && callback();
@@ -30,12 +30,12 @@ const filter = (key) => {
   if(onlyId) {
     return key + onlyId
   } else {
-    if(!config.appId) {
-      config.appId = createAppId()
+    if(!config.data.appId) {
+      config.data.appId = createAppId()
     }
     //子文档标记
     const sub = window.SUbCONFIGT && window.SUbCONFIGT.dbId ? "-" + window.SUbCONFIGT.dbId : ''
-    onlyId = "-" + config.appId + sub
+    onlyId = "-" + config.data.appId + sub
   }
   return key + onlyId;
 }

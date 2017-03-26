@@ -28,8 +28,7 @@ export function mainScene() {
     originalVisualSize
   } = config
 
-  const sWidth = visualSize.width
-  const sHeight = visualSize.height
+  const { sWidth, sHeight } = visualSize
   const isHorizontal = layoutMode == 'horizontal'
 
   proportion = isHorizontal ? proportion.width : proportion.height

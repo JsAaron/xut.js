@@ -129,10 +129,10 @@ export default function main() {
       initApp()
     } else {
       //mobile(apk or ipa)
-      window.openDatabase(config.dbName, "1.0", "Xxtebook Database", config.dbSize);
+      window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
       document.addEventListener("deviceready", () => {
         Xut.plat.hasPlugin = true //支持插件
-        Xut.Plugin.XXTEbookInit.startup(config.dbName, bindPlatEvent, function() {});
+        Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function() {});
       }, false)
     }
   }

@@ -1,3 +1,4 @@
+import { config } from '../../../../config/index'
 import updataCache from './sync-cache'
 import TaskContainer from '../container/index'
 import TaskBackground from '../background/index'
@@ -18,30 +19,30 @@ import TaskColumns from '../column/index'
  */
 const parseMode = function(pageData, base) {
   let parameter = pageData.parameter
-  if(parameter) {
+  if (parameter) {
     try {
       parameter = JSON.parse(parameter)
-      if(parameter) {
-        if(parameter.contentMode && parameter.contentMode == 1) {
+      if (parameter) {
+        if (parameter.contentMode && parameter.contentMode == 1) {
           //非强制dom模式
-          if(!Xut.config.onlyDomMode) {
+          if (!config.onlyDomMode) {
             //启动dom模式
             base.canvasRelated.enable = true;
           }
         }
         //如果是最后一页处理
-        if(parameter.lastPage && base.pageType === 'page') {
+        if (parameter.lastPage && base.pageType === 'page') {
           //运行应用运行时间
           base.runLastPageAction = function() {
-            const runTime = Number(Xut.config.delayTime)
+            const runTime = Number(config.data.delayTime)
             let timeout
-            if(runTime) {
+            if (runTime) {
               timeout = setTimeout(() => {
-                Xut.Application.Notify('complete')
-              }, runTime * 1000) //转成秒
+                  Xut.Application.Notify('complete')
+                }, runTime * 1000) //转成秒
             }
             return function() { //返回停止方法
-              if(timeout) {
+              if (timeout) {
                 clearTimeout(timeout)
                 timeout = null
               }
@@ -50,7 +51,7 @@ const parseMode = function(pageData, base) {
 
         }
       }
-    } catch(e) {
+    } catch (e) {
       console.log('JSON错误,chpterId为', base.chapterId, parameter)
     }
   }
@@ -73,7 +74,7 @@ export default {
     //同步数据
     updataCache.call(base, [base.pid], () => {
       const pageData = base.baseData()
-      //contentMode模式
+        //contentMode模式
       parseMode(pageData, base)
       TaskContainer(base, pageData, taskCallback)
     })
@@ -99,7 +100,7 @@ export default {
    */
   'Background' (taskCallback, base) {
 
-    if(base.checkInstanceTasks('background')) {
+    if (base.checkInstanceTasks('background')) {
       return;
     }
 
@@ -140,7 +141,7 @@ export default {
    */
   'Components' (taskCallback, base) {
 
-    if(base.checkInstanceTasks('components')) {
+    if (base.checkInstanceTasks('components')) {
       return;
     }
 
@@ -190,11 +191,11 @@ export default {
   'Contents' (taskCallback, base) {
 
     //通过content数据库为空处理
-    if(Xut.data.preventContent) {
+    if (Xut.data.preventContent) {
       return taskCallback();
     }
 
-    if(base.checkInstanceTasks('contents')) {
+    if (base.checkInstanceTasks('contents')) {
       return;
     }
 
@@ -214,7 +215,7 @@ export default {
       suspend(taskName, innerNextTasks, innerSuspendTasks) {
         //如果是当前页面构建,允许打断一次
         var interrupt
-        if(base.isAutoRun && taskName === 'strAfter') {
+        if (base.isAutoRun && taskName === 'strAfter') {
           interrupt = true;
         }
         base.nextTasks({

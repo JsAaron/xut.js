@@ -21,7 +21,7 @@ export default {
     if(isAndroid) {
       if(parseInt(config.storageMode)) {
         //sd卡加载资源数据
-        return "/sdcard/appcarrier/magazine/" + config.appId + "/" + getSourcePath();
+        return "/sdcard/appcarrier/magazine/" + config.data.appId + "/" + getSourcePath();
       } else {
         //android_asset缓存加载资源
         return "/android_asset/www/" + getSourcePath();

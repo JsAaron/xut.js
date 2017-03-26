@@ -140,7 +140,7 @@ export function Adapter(para) {
   /*缩放比值*/
   data = calculateSize(data, pageStyle)
 
-  data.inputPara.uuid = config.appId + '-' + data.activityId; //唯一ID标示
+  data.inputPara.uuid = config.data.appId + '-' + data.activityId; //唯一ID标示
   data.inputPara.id = data.activityId;
   data.inputPara.screenSize = pageVisualSize
 

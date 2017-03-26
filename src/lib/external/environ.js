@@ -14,7 +14,7 @@
  *提供给iframe内的配置文件
  *
  *  window.XXTIFRAME = {
- *       path: "sdcard/" + config.appId + "/content/gallery/",
+ *       path: "sdcard/" + config.data.appId + "/content/gallery/",
  *       iframeDrop: function () {
  *            //iframe退出的处理方法
  *       }

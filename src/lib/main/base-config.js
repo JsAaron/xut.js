@@ -37,6 +37,7 @@ const setPaintingMode = function(data) {
   }
 }
 
+
 /*最大屏屏幕尺寸*/
 const getMaxWidth = function() {
   if(config.visualSize) {

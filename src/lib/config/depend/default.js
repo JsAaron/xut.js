@@ -3,12 +3,30 @@
  */
 export default {
 
-  /**
-   * 支持电子在在线阅读,向服务端取数据
-   * 自定义配置地址即可'
-   * @type {String}
-   */
-  onlineModeUrl: 'lib/data/database.php',
+  data: {
+    /**
+     * 数据库尺寸
+     */
+    dbSize: 1,
+
+    /**
+     * 应用路径唯一标示
+     */
+    appId: null,
+
+    /**
+     * 数据库名
+     */
+    dbName: window.xxtmagzinedbname || 'magazine',
+
+    /**
+     * 支持电子在在线阅读,向服务端取数据
+     * 自定义配置地址即可'
+     * @type {String}
+     */
+    onlineModeUrl: 'lib/data/database.php',
+  },
+
 
   /**
    * 2016.7.26
@@ -19,23 +37,12 @@ export default {
   isPlugin: window.DUKUCONFIG && Xut.plat.isIOS,
 
   /**
-   * 数据库名
-   * @type {[type]}
-   */
-  dbName: window.xxtmagzinedbname || 'magazine',
-
-  /**
    * 存储模式
    * 0 APK应用本身
    * 1 外置SD卡
    */
   storageMode: 0,
 
-  /**
-   * 应用路径唯一标示
-   * @type {[type]}
-   */
-  appId: null,
 
   /**
    * 资源路径

@@ -45,7 +45,7 @@ function executeDB(sql, callback, errorCB, tName) {
   //否则直接ajax php
   else {
     $.ajax({
-      url: config.onlineModeUrl,
+      url: config.data.onlineModeUrl,
       dataType: 'json',
       data: {
         xxtsql: sql
@@ -68,7 +68,7 @@ function executeDB(sql, callback, errorCB, tName) {
 //建立sql查询
 export default function execute(selectSql, callback) {
 
-  var database = config.db,
+  var database = config.data.db,
     tableName, //表名
     successResults = {}, //成功的数据
     tempClosure = [], //临时收集器
