@@ -1,3 +1,4 @@
+import { config } from '../../../../../../config/index'
 import {
   parseJSON,
   replacePath,
@@ -18,9 +19,9 @@ const maskContent = (data, wrapObj) => {
   let restr = ""
 
   //蒙板图
-  if(data.mask || wrapObj['isGif']) {
+  if (data.mask || wrapObj['isGif']) {
     //蒙版图
-    if(maskBoxImage != undefined) {
+    if (maskBoxImage != undefined) {
       restr += String.styleFormat(
         `<img data-type="${data.qrCode ? 'qrcode' : 'mask'}"
               class="inherit-size fullscreen-background edges"
@@ -35,21 +36,21 @@ const maskContent = (data, wrapObj) => {
                  mask="${isMaskImg}"
                  width="${data.scaleWidth}"
                  height="${data.scaleHeight}"
-                 style="opacity:0;${Xut.config.pathAddress.replace(/\//g, "\/") + data.mask}"/>`
+                 style="opacity:0;${config.data.pathAddress.replace(/\//g, "\/") + data.mask}"/>`
       )
     }
 
     //精灵图
-  } else if(data.category == 'Sprite') {
+  } else if (data.category == 'Sprite') {
 
     let matrixX = 100 * data.thecount;
     let matrixY = 100;
 
     //如果有参数
     //精灵图是矩阵图
-    if(data.parameter) {
+    if (data.parameter) {
       let parameter = parseJSON(data.parameter);
-      if(parameter && parameter.matrix) {
+      if (parameter && parameter.matrix) {
         let matrix = parameter.matrix.split("-")
         matrixX = 100 * Number(matrix[0])
         matrixY = 100 * Number(matrix[1])
@@ -110,7 +111,7 @@ const svgContent = (data, wrapObj) => {
   let scaleWidth = data.scaleWidth
 
   //从SVG文件中，读取Viewport的值
-  if(svgstr != undefined) {
+  if (svgstr != undefined) {
 
     //替换svg内部读取文件地址
     svgstr = replacePath(svgstr)
@@ -127,14 +128,14 @@ const svgContent = (data, wrapObj) => {
     //svg内容高度 = svg内容宽度 * viewBox高 / viewBox宽
     let svgRealHeight = FLOOR(scaleWidth * svgheight / svgwidth);
     //如果svg内容高度大于布局高度则添加滚动条
-    if(svgRealHeight > (data.scaleHeight + 1)) {
+    if (svgRealHeight > (data.scaleHeight + 1)) {
       let svgRealWidth = FLOOR(scaleWidth);
       //if there do need scrollbar, then restore text to its original prop
       //布局位置
       let marginleft = wrapObj.backMode ? data.scaleLeft - data.scaleBackLeft : 0;
       let margintop = wrapObj.backMode ? data.scaleTop - data.scaleBackTop : 0;
 
-      if(data.isScroll) {
+      if (data.isScroll) {
         restr = String.styleFormat(
           `<div data-type="svg"
                 style="width:${svgRealWidth}px;
@@ -171,13 +172,13 @@ const fillContent = (data, wrapObj) => {
   let restr = '';
   //如果内容是图片
   //如果是svg或者html
-  if(wrapObj.fileName) {
+  if (wrapObj.fileName) {
     //如果是SVG
-    if(wrapObj.isSvg) {
+    if (wrapObj.isSvg) {
       restr += svgContent(data, wrapObj);
     }
     //如果是.js结构的html文件
-    else if(wrapObj.isJs) {
+    else if (wrapObj.isJs) {
       restr += jsContent(data, wrapObj)
     }
     //如果是蒙板，或者是gif类型的动画，给高度
@@ -212,7 +213,7 @@ const createContainer = (data, wrapObj) => {
   let containerName = wrapObj.containerName
 
   //背景尺寸优先
-  if(data.scaleBackWidth && data.scaleBackHeight) {
+  if (data.scaleBackWidth && data.scaleBackHeight) {
     backwidth = data.scaleBackWidth;
     backheight = data.scaleBackHeight;
     backleft = data.scaleBackLeft;
@@ -230,14 +231,14 @@ const createContainer = (data, wrapObj) => {
   //如果为1 就隐藏改成hidden
   //05.1.14
   let visibility = 'visible'
-  if(data.visible) {
+  if (data.visible) {
     visibility = 'hidden';
   }
 
   // var isHtml = "";
   //2015.12.29
   //如果是html内容
-  if(wrapObj.isJs) {
+  if (wrapObj.isJs) {
     wapper = `<div id="${containerName}"
                        data-behavior="click-swipe"
                        class="fullscreen-background "

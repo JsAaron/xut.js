@@ -25,8 +25,13 @@ export default {
      * @type {String}
      */
     onlineModeUrl: 'lib/data/database.php',
-  },
 
+    /**
+     * 资源路径
+     * @type {[type]}
+     */
+    pathAddress: null
+  },
 
   /**
    * 2016.7.26
@@ -34,20 +39,5 @@ export default {
    * [isPlugin description]
    * @type {Boolean}
    */
-  isPlugin: window.DUKUCONFIG && Xut.plat.isIOS,
-
-  /**
-   * 存储模式
-   * 0 APK应用本身
-   * 1 外置SD卡
-   */
-  storageMode: 0,
-
-
-  /**
-   * 资源路径
-   * @type {[type]}
-   */
-  pathAddress: null
-
+  isPlugin: window.DUKUCONFIG && Xut.plat.isIOS
 }

@@ -372,6 +372,13 @@ const config: Config = {
   onlyDomMode: false,
 
   /**
+   * 存储模式
+   * 0 APK应用本身
+   * 1 外置SD卡
+   */
+  storageMode: 0,
+
+  /**
    * 直接通过数据库的历史记录定位到指定的页面
    * Xut.View.LoadScenario({
    *     'scenarioId' : scenarioInfo[0],

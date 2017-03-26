@@ -282,9 +282,9 @@ export function initPathAddress() {
   isCacheSvgPath = false
   isCacheJsWidgetPath = false
   /*资源路径*/
-  config.pathAddress = _rsourcesPath()
+  config.data.pathAddress = _rsourcesPath()
   /*根路径*/
-  config.rootPath = config.pathAddress.replace('/gallery/', '')
+  config.data.rootPath = config.data.pathAddress.replace('/gallery/', '')
 }
 
 /**

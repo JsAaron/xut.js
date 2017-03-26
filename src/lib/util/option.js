@@ -26,7 +26,7 @@ export function slashPostfix(resource) {
 export function loadStyle(fileName, callback) {
   let path = config.launch ?
     config.launch.resource + '/gallery/' + fileName + '.css' :
-    config.pathAddress + fileName + '.css'
+    config.data.pathAddress + fileName + '.css'
   let node = loadFile(path, callback)
   node && node.setAttribute('data-type', fileName)
 }
@@ -183,15 +183,15 @@ export function getFileFullPath(fileName, type) {
           name = fileMatch[0]
         }
         //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
-        return `${config.pathAddress + name}${config.launch.brModelType}${suffix}`
+        return `${config.data.pathAddress + name}${config.launch.brModelType}${suffix}`
       } else {
         //手机app访问
         //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a.mi
-        return `${config.pathAddress + name}${suffix}`
+        return `${config.data.pathAddress + name}${suffix}`
       }
     }
   }
-  return config.pathAddress + fileName
+  return config.data.pathAddress + fileName
 }
 
 /**
@@ -249,7 +249,7 @@ export function replacePath(svgstr) {
   if(config.launch) {
     //如果能找到对应的默认路径，则替换
     if(-1 !== svgstr.indexOf('content/gallery/')) {
-      svgstr = svgstr.replace(/content\/gallery/ig, config.pathAddress)
+      svgstr = svgstr.replace(/content\/gallery/ig, config.data.pathAddress)
     }
   }
   return svgstr

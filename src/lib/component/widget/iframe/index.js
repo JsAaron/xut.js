@@ -34,7 +34,7 @@ export default class iframeWidget {
 
   _createIframe() {
     const ifr = document.createElement('iframe')
-    const path = `${config.rootPath}/widget/${this.widgetId}/index.html?xxtParaIn=${this.key}`
+    const path = `${config.data.rootPath}/widget/${this.widgetId}/index.html?xxtParaIn=${this.key}`
     ifr.id = 'iframe_' + this.id
     ifr.src = path
     ifr.style.width = '100%'
