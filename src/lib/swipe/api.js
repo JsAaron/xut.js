@@ -321,7 +321,7 @@ export default function api(Swipe) {
    * @return {[type]}            [description]
    */
   Swipe.prototype.findBubbleRootNode = function(point, pageType) {
-    let liNode, map
+    let liNode, pid
     let visualIndex = this.visualIndex
     let sectionRang = this.options.sectionRang
 
@@ -331,11 +331,11 @@ export default function api(Swipe) {
 
     while(nodeTotal--) {
       liNode = childNodes[nodeTotal]
-      map = liNode.getAttribute('data-map');
+      pid = liNode.getAttribute('data-pid');
       if(sectionRang) {
         visualIndex += sectionRang.start;
       }
-      if(map == visualIndex) {
+      if(pid == visualIndex) {
         return liNode
       }
       visualIndex = this.visualIndex;

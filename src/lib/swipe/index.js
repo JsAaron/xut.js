@@ -726,7 +726,7 @@ export default class Swipe extends Observer {
    */
   _onAnimComplete(e) {
     const node = e.target
-    const pageType = node.getAttribute('data-pageType')
+    const pageType = node.getAttribute('data-type')
     const view = node.getAttribute('data-view') //操作的可视窗口
     const linearView = node.getAttribute(LINEARTAG) //流式布局
 

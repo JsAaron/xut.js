@@ -22,8 +22,8 @@ import {
   initPointer,
   getDirection,
   converVisiblePid,
-  indexConverChapterId,
-  indexConverChapterData,
+  converPageIndex,
+  converChapterDataset,
   hasMaster
 } from './depend'
 
@@ -51,44 +51,52 @@ export default class Dispatcher {
    * @return {[type]} [description]
    */
   initCreate() {
-    let options = this.options
-      //createPointer
-      //initPointer
-    let pointer = initPointer(options.initIndex, options.pageTotal, options.multiplePages)
+    const options = this.options
+    const pointer = initPointer(options.initIndex, options.pageTotal, options.multiplePages)
     this.pagePointer = pointer.initPointer
-    this.createPageBases(pointer.createPointer, options.initIndex, 'init')
+    this.createPageBases(pointer.createPointer, options.initIndex, 'init', '', '', pointer.createDoublePage)
   }
 
 
   /**
    *  创建普通页面
    *  创建母版页面
-   *  createPointer     需要创建的页面索引
+   *  createSinglePage  需要创建的单页面索引
    *  visiblePageIndex  当前可视区页面索引
    *  action            创建的动作：toPage/init/flipOver
    *  toPageCallback    跳转页面支持回调通知
    *  userStyle         规定创建的style属性
+   *
+   * 2017.3.27增加createDoublePage
+   *   创建双页的页面记录
+   *   createPageIndex中对应的createDoublePage如果有子索引值
    **/
-  createPageBases(createPageIndex, visiblePageIndex, action, toPageCallback, userStyle) {
+  createPageBases(createSinglePage, visiblePageIndex, action, toPageCallback, userStyle, createDoublePage = {}) {
 
     //2016.1.20
     //修正苗苗学问题 确保createPage不是undefined
-    if(createPageIndex[0] === undefined) {
+    if(createSinglePage[0] === undefined) {
       return;
     }
 
     let self = this
     let multiplePages = this.options.multiplePages //是否线性
-    let createTotal = createPageIndex.length //需要创建的总页面
+
+    /*
+      需要创建的总页面
+      如果有双页面创建模式，那么这里的创建总数应该是双页面的
+      否则就用单页面
+     */
+    let createTotal = createDoublePage.total || createSinglePage.length
     let toPageAction = action === 'toPage' //如果是跳转
     let filpOverAction = action === 'flipOver' //如果是翻页
 
     //将页码pageIndex转化成对应的chapter && 使用第一个是分解可见页面
     //不同场景会自动转化chapter的下标
-    //createChapterIndexs
+    //createPageIndexCollection
     //  创建的页码ID合集
     //  代表数据库chpaterID的索引
-    let createChapterIndexs = indexConverChapterId.call(this, createPageIndex, visiblePageIndex)
+    let createPageIndexCollection = converPageIndex.call(this, createSinglePage, visiblePageIndex, createDoublePage)
 
     //收集创建的页面对象
     //用于处理2个页面在切换的时候闪屏问题
@@ -124,7 +132,7 @@ export default class Dispatcher {
       flipOver() {
         collectCallback(() => {
           self._autoRun({ //翻页
-            'createPointer': createChapterIndexs,
+            'createPointer': createPageIndexCollection,
             'createMaster': createMaster
           });
         })
@@ -137,9 +145,8 @@ export default class Dispatcher {
       }
     }
 
-    //chapter页码，转化成页面chapter数据集合
-    let chpaterResults = indexConverChapterData(createChapterIndexs);
-
+    //索引页面，转化成页面chapter数据集合
+    let chpaterDataset = converChapterDataset(createPageIndexCollection)
 
     /**
      * 预编译
@@ -152,11 +159,11 @@ export default class Dispatcher {
 
     //收集有用的数据
     let useStyleData = hash()
-    _.each(chpaterResults, (chapterData, index) => {
+    _.each(chpaterDataset, (chapterData, index) => {
       compile.push((() => {
 
         //创建的页面索引
-        let createChapterIndex = createChapterIndexs[index]
+        let createChapterIndex = createPageIndexCollection[index]
 
         //转化可视区页码对应的chapter的索引号
         //获取出实际的pageIndex号

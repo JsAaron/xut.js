@@ -54,9 +54,14 @@ export function mainScene() {
                  overflow:${navBaroOverflow};">
     </div>`
 
+
+  //如果启动了双页模式
+  //那么可视区的宽度是就是全屏的宽度了，因为有2个页面拼接
+  const width = config.doublePageMode ? config.screenSize.width : visualSize.width
+
   return String.styleFormat(
     `<div id="xut-main-scene"
-          style="width:${visualSize.width}px;
+          style="width:${width}px;
                  height:${screenSize.height}px;
                  top:0;
                  left:${originalVisualSize.left}px;

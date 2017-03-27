@@ -4,9 +4,7 @@
  * widget 是零件资源文件
  * @type {String}
  */
-import {
-  config
-} from '../index'
+import { config } from '../index'
 
 const defaultSourcePath = "content/gallery/"
 const defaultWidgetPath = "content/widget/"

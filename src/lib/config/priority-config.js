@@ -70,13 +70,15 @@ export function priorityConfig() {
   }
 
   /*图片模式webp*/
-  if(launch && !launch.brModel && config.brModel) {
-    launch.brModel = config.brModel
+  if(launch) {
+    if(!launch.brModel && config.brModel) {
+      launch.brModel = config.brModel
+    }
+    /*预先判断出基础类型*/
+    if(launch.brModel) {
+      launch.brModelType = getBrType(launch.brModel)
+    }
   }
 
-  /*预先判断出基础类型*/
-  if(launch.brModel) {
-    launch.brModelType = getBrType(launch.brModel)
-  }
 
 }

@@ -28,17 +28,17 @@ Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
     historyMode: true,
-    visualMode: 2,
+    visualMode: 1,
     cursor: {
         url: 'images/icons/busyicon.gif',
         delayTime: 300
     },
     salePicture: true,
     salePictureMultiples: 3,
-    imageSuffix: {
-        1080: 'mi',
-        1440: 'hi'
-    },
+    // imageSuffix: {
+    //     1080: 'mi',
+    //     1440: 'hi'
+    // },
     pageBar: {
         // type: 'circular',
         // mode: 1
@@ -47,22 +47,28 @@ Xut.Application.setConfig = {
         //     left: '20%'
         // }
     },
-    brModel:1,
+    // brModel:1,
     // trackCode: ['launch','app', 'page', 'action', 'hot'],
     supportQR: true,
     swipeDelegate: true,
-    useHDImageZoom: true
+    useHDImageZoom: true,
+    // doublePageMode: true //双页模式
 };
 
 
 Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type)
+    console.log(type)
     switch (type) {
-        case 'launch':break;
-        case 'app': break;
-        case 'page': break;
-        case 'aciton': break;
-        case 'hot': break;
+        case 'launch':
+            break;
+        case 'app':
+            break;
+        case 'page':
+            break;
+        case 'aciton':
+            break;
+        case 'hot':
+            break;
     }
 })
 
@@ -74,7 +80,7 @@ $("#activate").click(function() {
     Xut.Application.Activate()
 })
 
-var appId = 13 //311
+var appId = 101 //311
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

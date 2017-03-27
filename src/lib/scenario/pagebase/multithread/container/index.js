@@ -30,9 +30,9 @@ const createli = function({
   //增加一个header-footer放溢出的页眉页脚
   html =
     `<li id="${prefix}"
-            data-id="${pageData._id}"
-            data-map="${base.pid}"
-            data-pageType="${base.pageType}"
+            data-cid="${pageData._id}"
+            data-pid="${base.pid}"
+            data-type="${base.pageType}"
             data-container="true"
             class="xut-flip preserve-3d"
             style="width:${getStyle.visualWidth}px;

@@ -117,6 +117,13 @@ export function getVisualLayout(config, fullProportion, setVisualMode, noModifyV
 
   }
 
+  /**
+   * 模式1
+   * 如果启动了双页模式
+   */
+  if(config.doublePageMode && setVisualMode === 1) {
+    newWidth = newWidth / 2
+  }
 
   /**
    * 模式2.3.4

@@ -1,5 +1,6 @@
 import { errorTable } from '../../../database/cache'
 import { query } from '../../../database/query'
+import { config } from '../../../config/index'
 
 /**
  * 判断是否能整除2
@@ -118,9 +119,37 @@ export function initPointer(targetIndex, pageTotal, multiplePages) {
   }
 
 
+  /////////////////////////////////////
+  ///
+  ///启动了双页模式
+  ///创建的页面需要修改了索引处理
+  ///创建索引0
+  /// 变化成 0-1
+  ///以此类推
+  /////////////////////////////////////
+  let createDoublePage = {
+    total: 0 //记录总数
+  }
+  if(config.doublePageMode) {
+    let base, left, right
+    createPointer.forEach(function(index) {
+      if(index === 0) {
+        createDoublePage[index] = [0, 1]
+        createDoublePage.total += 2
+      } else {
+        base = index * 2
+        left = base
+        right = base + 1
+        createDoublePage.total += 2;
+        (createDoublePage[index] = []).push(left, right)
+      }
+    })
+  }
+
   return {
     createPointer,
-    initPointer
+    initPointer,
+    createDoublePage
   }
 }
 
@@ -136,16 +165,34 @@ export function initPointer(targetIndex, pageTotal, multiplePages) {
  * @param  {[type]} visualPage [description]
  * @return {[type]}            [description]
  */
-export function indexConverChapterId(createPage, visualPage) {
+export function converPageIndex(createPage, visualPage, createDoublePage) {
 
-  //如果第一个不是可视区域
-  //切换位置
-  //加快创建速度
+
+  //保证可视区优先创建
+  //如果第一个不是可视区域,切换位置加快创建速度
   if(createPage[0] !== visualPage) {
     const indexOf = createPage.indexOf(visualPage)
     const less = createPage.splice(indexOf, 1)
     createPage = less.concat(createPage)
   }
+
+  //如果有双页面，那么转化是页面就是这个了
+  //而不是传递的createPage单页面
+  //[1,0,2] => [2,3,1,2,4,5]
+  if(createDoublePage.total) {
+    let newCreatePage = []
+    createPage.forEach(function(pageIndex) {
+      let doublePage = createDoublePage[pageIndex]
+      if(doublePage.length) {
+        newCreatePage.push(doublePage[0])
+        if(doublePage[1]) {
+          newCreatePage.push(doublePage[1])
+        }
+      }
+    })
+    createPage = newCreatePage
+  }
+
 
   //场景加载模式,计算正确的chapter顺序
   //多场景的模式chpater分段后
@@ -154,7 +201,6 @@ export function indexConverChapterId(createPage, visualPage) {
     //需要提前解析数据库的排列方式
     //chpater的开始位置
     const start = this.options.sectionRang.start
-    //拼接位置
     createPage.forEach(function(page, index) {
       createPage.splice(index, 1, page + start)
     })
@@ -170,7 +216,7 @@ export function indexConverChapterId(createPage, visualPage) {
  * @param  {[type]} createPage [description]
  * @return {[type]}            [description]
  */
-export function indexConverChapterData(createPage) {
+export function converChapterDataset(createPage) {
   return query('chapter', createPage);
 }
 
@@ -181,7 +227,7 @@ export function indexConverChapterData(createPage) {
  */
 export function hasMaster() {
   var table = errorTable()
-  //如果没有Master数据,直接过滤
+    //如果没有Master数据,直接过滤
   if(-1 !== table.indexOf('Master') || !Xut.data['Master'] || !Xut.data['Master'].length) {
     return false;
   }

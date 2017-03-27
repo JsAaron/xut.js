@@ -17,7 +17,6 @@ export function getSize() {
   let clientWidth = document.documentElement.clientWidth || $(window).width()
   let clientHeight = document.documentElement.clientHeight || $(window).height()
 
-
   //配置可视区窗口
   //用户在外部指定了可视区域
   if(Xut.config.visualHeight) {
