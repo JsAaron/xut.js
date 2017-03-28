@@ -38,7 +38,7 @@ export function initGlobalEvent() {
 
     /*启动代码用户操作跟踪*/
     config.hasTrackCode('app', function(notify) {
-      $(window).on('unload', function() {
+      $(window).on('beforeunload', function() {
         notify({ time: (+new Date) - config.launch.launchTime })
       })
     })
