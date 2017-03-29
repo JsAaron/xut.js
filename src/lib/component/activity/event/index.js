@@ -16,14 +16,14 @@ export default function(activitProto) {
    * 找到事件上下文
    * @return {[type]} [description]
    */
-  activitProto._findContentName = function(pid, cid, eventId) {
+  activitProto._findContentName = function(chapterIndex, contentId, eventId) {
     let contentName
     let eventData = this.eventData
 
     //dom
     //找到对应绑定事件的元素
     const parseDom = () => {
-      contentName = this.makePrefix('Content', pid, cid)
+      contentName = this.makePrefix('Content', chapterIndex, contentId)
       eventData.type = 'dom';
       eventData.canvasMode = false;
       eventData.domMode = true;
@@ -33,14 +33,14 @@ export default function(activitProto) {
     //canvas容器+内部pixi对象
     //所以事件绑定在最外面
     const parseCanavs = () => {
-      contentName = this.makePrefix('canvas', pid, cid)
+      contentName = this.makePrefix('canvas', chapterIndex, contentId)
       eventData.type = 'canvas';
       eventData.canvasMode = true;
       eventData.domMode = false;
     }
 
     //canvas事件
-    if(eventId && -1 !== this.canvasRelated.cid.indexOf(eventId)) {
+    if(eventId && -1 !== this.canvasRelated.contentIdset.indexOf(eventId)) {
       parseCanavs()
     } else {
       //dom事件
@@ -63,14 +63,14 @@ export default function(activitProto) {
     if(eventId) {
       if(!eventContext) {
         //被重写过的事件
-        let cid = eventData.rewrite ? eventId : this.id
-        let contentName = this._findContentName(this.pid, cid, eventId)
+        let contentId = eventData.rewrite ? eventId : this.id
+        let contentName = this._findContentName(this.chapterIndex, contentId, eventId)
         eventContext = this.getContextNode(contentName)
         eventData.eventContext = eventContext;
       }
       if(eventContext) {
         //绑定事件加入到content钩子
-        this.relatedCallback.contentsHooks(this.pid, eventId, {
+        this.relatedCallback.contentsHooks(this.chapterIndex, eventId, {
           $contentNode: eventContext,
           //增加外部判断
           isBindEventHooks: true,
@@ -263,7 +263,7 @@ export default function(activitProto) {
 
         //获取拖拽目标对象
         if(eventName === 'dragTag') {
-          domName = this.makePrefix('Content', this.pid, dragdropPara);
+          domName = this.makePrefix('Content', this.chapterIndex, dragdropPara);
           target = this.getContextNode(domName);
         }
 

@@ -119,7 +119,7 @@ export function extendPresentation(access, $globalEvent) {
    */
   Xut.Presentation.GetPagePrefix = (pageType, pageIndex) => {
     let pageObj = Xut.Presentation.GetPageObj(pageType, pageIndex);
-    return pageObj.pid;
+    return pageObj.chapterIndex;
   }
 
   /**

@@ -41,7 +41,7 @@ export default function FastPipe(data, base) {
     preCode = window.XXTAPI.PreCode
 
     if(preCode) {
-      let contentNode = base.getContextNode(base._findContentName(base.pid, id))
+      let contentNode = base.getContextNode(base._findContentName(base.chapterIndex, id))
       let imgContext = contentNode.find('img')
       if(imgContext.length) {
         let href

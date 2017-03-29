@@ -18,7 +18,7 @@ import pretreatment from './pre-process'
  * 构建动画
  * @return {[type]} [description]
  */
-const createScope = function(base, contentId, pid, actName, parameter, hasParallax) {
+const createScope = function(base, contentId, chapterIndex, actName, parameter, hasParallax) {
 
   //默认启动dom模式
   var data = {
@@ -36,8 +36,8 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
   //改成作用域的一些数据
   if(base.canvasRelated.enable) {
     //如果找到对应的canvas对象
-    if(-1 !== base.canvasRelated.cid.indexOf(contentId)) {
-      contentName = "canvas_" + pid + "_" + contentId
+    if(-1 !== base.canvasRelated.contentIdset.indexOf(contentId)) {
+      contentName = "canvas_" + chapterIndex + "_" + contentId
       canvasDom = base.getContextNode(contentName)[0]
 
       //创建上下文pixi
@@ -72,12 +72,12 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
   _.extend(data, {
     base: base,
     id: contentId,
-    pid: pid,
     actName: actName,
     contentData,
     $contentNode,
     pageType,
     canvasDom,
+    chapterIndex,
     pageIndex: base.pageIndex,
     canvasRelated: base.canvasRelated,
     nextTask: base.nextTask,
@@ -140,9 +140,9 @@ const createScope = function(base, contentId, pid, actName, parameter, hasParall
 const createHandlers = function(base, parameter) {
   let para = parameter[0]
   let contentId = para['contentId'] //可能有多个动画数据 [Object,Object,Object]
-  let pid = base.pid
-  let actName = base.makePrefix('Content', pid, contentId)
-  return createScope(base, contentId, pid, actName, parameter, para.masterId);
+  let chapterIndex = base.chapterIndex
+  let actName = base.makePrefix('Content', chapterIndex, contentId)
+  return createScope(base, contentId, chapterIndex, actName, parameter, para.masterId);
 }
 
 

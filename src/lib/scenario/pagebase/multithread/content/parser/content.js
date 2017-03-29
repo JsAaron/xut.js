@@ -179,7 +179,7 @@ function parseItems(itemArray) {
  *  2: Parallax表
  *  3: seed种子合集 就是解析1：Animation表，Parallax表得到的数据
  */
-function coreParser(callback, activity, pageType, pid) {
+function coreParser(callback, activity, pageType, chapterIndex) {
   var contentIdset,
     parallaxContentIdset,
     seedParallaxs,
@@ -383,7 +383,7 @@ export function contentParser(compileActivitys, pipeData) {
   let activity, hookType, //结果合集
     i = compileActivitys.length,
     pageType = pipeData.pageType,
-    pid = pipeData.pid,
+    chapterIndex = pipeData.chapterIndex,
 
     /*相关数据合集*/
     activityRelated = [], //Activit合集相关数据信息
@@ -401,7 +401,7 @@ export function contentParser(compileActivitys, pipeData) {
   const createResolve = (callback) => {
     return coreParser((tokens) => {
       return callback(tokens);
-    }, activity, pageType, pid)
+    }, activity, pageType, chapterIndex)
   }
 
   /*类型处理器，除去动画的其余处理类型*/

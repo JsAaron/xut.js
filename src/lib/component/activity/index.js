@@ -136,7 +136,7 @@ export default class Activity {
 
       //如果是视觉差对象，也需要实现收集器
       if(scope.processType === 'parallax') {
-        collectorHooks(scope.pid, scope.id, scope);
+        collectorHooks(scope.chapterIndex, scope.id, scope);
         return;
       }
 
@@ -162,7 +162,7 @@ export default class Activity {
     //每个元素只绑定一次
     if(-1 !== indexOf) {
       relatedData.createContentIds.splice(indexOf, 1); //删除,去重
-      collectorHooks(scope.pid, id, scope); //收集每一个content注册
+      collectorHooks(scope.chapterIndex, id, scope); //收集每一个content注册
       this._iscrollBind(scope, $contentNode); //增加翻页特性
     }
   }
@@ -182,7 +182,7 @@ export default class Activity {
       //滚动文本的互斥不显示做一个补丁处理
       //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
       //如果是显示的,则不需要处理,
-      let $parentNode = self.getContextNode(self.makePrefix('Content', scope.pid, scope.id))
+      let $parentNode = self.getContextNode(self.makePrefix('Content', scope.chapterIndex, scope.id))
       let visible = $parentNode.css('visibility')
       let resetStyle = function() {}
 
@@ -263,8 +263,8 @@ export default class Activity {
    * 制作一个查找标示
    * @return {[type]}
    */
-  makePrefix(name, pid, id) {
-    return name + "_" + pid + "_" + id;
+  makePrefix(name, index, id) {
+    return name + "_" + index + "_" + id;
   }
 
 

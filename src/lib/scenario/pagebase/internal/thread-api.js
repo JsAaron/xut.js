@@ -85,9 +85,9 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.checkThreadTask = function(actTasksCallback) {
-    this.isAutoRun = true;
+    this.hasAutoRun = true;
     this._checkTasksCreate(() => {
-      this.isAutoRun = false
+      this.hasAutoRun = false
       actTasksCallback()
     })
   }
@@ -117,7 +117,7 @@ export default function(baseProto) {
    * 设置任务中断
    */
   baseProto.setTaskSuspend = function() {
-    this.isAutoRun = false;
+    this.hasAutoRun = false;
     this.canvasRelated.isTaskSuspend = true;
     this.createRelated.preCreateTasks = false;
     this.createRelated.tasksHang = null;
@@ -228,7 +228,7 @@ export default function(baseProto) {
     }
 
     //自动运行页面构建
-    if(this.isAutoRun) {
+    if(this.hasAutoRun) {
       //自动运行content中断检测 打断一次
       if(interrupt) {
         next();
@@ -251,7 +251,7 @@ export default function(baseProto) {
   baseProto._asyTasks = function(callbacks, interrupt) {
 
     //如果关闭多线程,不检测任务调度
-    if(!this.isMultithread) {
+    if(!this.hasMultithread) {
       return callbacks.nextTaskCallback.call(this);
     }
 

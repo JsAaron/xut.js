@@ -36,8 +36,8 @@ export default class Factory extends Observer {
      */
     this.failCid = []
 
-    //所有contentId
-    this.cid = []
+    //所有contentId合集
+    this.contentIdset = []
 
     //开启了contentMode的节点
     //对应的content转化成canvas模式

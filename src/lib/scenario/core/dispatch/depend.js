@@ -41,28 +41,27 @@ const mixRang = function(pageIndex, start) {
  * 如果是场景加载，转化页码数
  * 转化按0开始
  * pageIndex 页码
- * visiblePid 可见页面chpaterId
+ * visualPageIndex 可见页面chpaterId
  */
-export function converVisiblePid(pageIndex, visiblePid) {
+export function converVisualPid(options, chapterIndex, visualPageIndex) {
   //转化可视区域值viewPageIndex
-  if(this.options.multiScenario) {
-    let sectionRang = this.options.sectionRang;
+  if(options.multiScenario) {
+    let sectionRang = options.sectionRang;
     //如果传入的是数组数据
-    if(!visiblePid && _.isArray(pageIndex)) {
-      return mixRang(pageIndex, sectionRang.start)
+    if(!visualPageIndex && _.isArray(chapterIndex)) {
+      return mixRang(chapterIndex, sectionRang.start)
     }
-    pageIndex -= sectionRang.start
-    visiblePid += sectionRang.start
+    chapterIndex -= sectionRang.start
+    visualPageIndex += sectionRang.start
   } else {
     //pageIndex是数组，并且realPage为空
-    if(_.isArray(pageIndex)) {
-      return pageIndex
+    if(_.isArray(chapterIndex)) {
+      return chapterIndex
     }
   }
-
   return {
-    pageIndex,
-    visiblePid
+    pageIndex: chapterIndex,
+    visualChapterIndex: visualPageIndex
   }
 }
 
@@ -156,24 +155,30 @@ export function initPointer(targetIndex, pageTotal, multiplePages) {
 
 
 /**
- * 索引转化成chapter ID
- * 确保解析的正确排序
- * 保证可视页面第一个分解
- * createPage 需要创建的页面 [0,1,2]
- * visualPage 可视区页面       [1]
- * @param  {[type]} createPage [description]
- * @param  {[type]} visualPage [description]
- * @return {[type]}            [description]
+  1 加快页面解析，可视区页面最开始创建
+  2 双页面页码解析
+  3 场景加载模式,计算正确的chapter顺序
+  进入 [0,1,2]
+  出来
+      1 单页面 [1,0,2]
+      2 多页面 [2, 3, 0, 1, 4, 5]
+ * createSinglePage 需要创建的页面
+ * visualPageIndex 可视区页面
+ * createDoublePage 多页面索引
  */
-export function converPageIndex(createPage, visualPage, createDoublePage) {
+export function converChapterIndex(options, createSinglePage, createDoublePage, visualPageIndex) {
 
+  let cloneCreateSinglePage = _.extend([], createSinglePage)
 
-  //保证可视区优先创建
-  //如果第一个不是可视区域,切换位置加快创建速度
-  if(createPage[0] !== visualPage) {
-    const indexOf = createPage.indexOf(visualPage)
-    const less = createPage.splice(indexOf, 1)
-    createPage = less.concat(createPage)
+  /*
+    保证可视区优先创建
+    如果最先创建的的页面不是可视区页面
+    就需要切换对应的
+   */
+  if(cloneCreateSinglePage[0] !== `visualPageIndex`) {
+    const indexOf = cloneCreateSinglePage.indexOf(visualPageIndex)
+    const less = cloneCreateSinglePage.splice(indexOf, 1)
+    cloneCreateSinglePage = less.concat(cloneCreateSinglePage)
   }
 
   //如果有双页面，那么转化是页面就是这个了
@@ -181,7 +186,7 @@ export function converPageIndex(createPage, visualPage, createDoublePage) {
   //[1,0,2] => [2,3,1,2,4,5]
   if(createDoublePage.total) {
     let newCreatePage = []
-    createPage.forEach(function(pageIndex) {
+    cloneCreateSinglePage.forEach(function(pageIndex) {
       let doublePage = createDoublePage[pageIndex]
       if(doublePage.length) {
         newCreatePage.push(doublePage[0])
@@ -190,24 +195,24 @@ export function converPageIndex(createPage, visualPage, createDoublePage) {
         }
       }
     })
-    createPage = newCreatePage
+    cloneCreateSinglePage = newCreatePage
   }
 
 
   //场景加载模式,计算正确的chapter顺序
   //多场景的模式chpater分段后
   //叠加起始段落
-  if(this.options.multiScenario) {
+  if(options.multiScenario) {
     //需要提前解析数据库的排列方式
     //chpater的开始位置
-    const start = this.options.sectionRang.start
-    createPage.forEach(function(page, index) {
-      createPage.splice(index, 1, page + start)
+    const start = options.sectionRang.start
+    cloneCreateSinglePage.forEach(function(page, index) {
+      cloneCreateSinglePage.splice(index, 1, page + start)
     })
   }
 
   // [0,1,2] => [73,74,75]
-  return createPage;
+  return cloneCreateSinglePage;
 }
 
 
@@ -216,7 +221,7 @@ export function converPageIndex(createPage, visualPage, createDoublePage) {
  * @param  {[type]} createPage [description]
  * @return {[type]}            [description]
  */
-export function converChapterDataset(createPage) {
+export function converChapterData(createPage) {
   return query('chapter', createPage);
 }
 

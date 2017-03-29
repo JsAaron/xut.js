@@ -25,7 +25,7 @@ export default function(activitProto) {
       _.each(relatedData.contentDataset, function(data) {
         if(~contentHtmlBoxIds.indexOf(data._id)) {
           contentId = data._id;
-          contentName = self.makePrefix('Content', self.pid, contentId);
+          contentName = self.makePrefix('Content', self.chapterIndex, contentId);
           //找到对应绑定事件的元素
           $contentNode = self.getContextNode(contentName)
           if(!$contentNode.attr("data-htmlbox")) {

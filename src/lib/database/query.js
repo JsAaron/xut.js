@@ -15,21 +15,27 @@ const scenarioChapter = function(chapterId) {
  * chpater直接对应页面的ID编码，直接去下标即可
  * waitCreatePointer     需要分解的页面
  */
-const parseChapter = function(waitCreatePointer) {
-  var chapters = [],
-    chapter,
-    dataChpater = Xut.data.Chapter,
-    points = waitCreatePointer.length,
-    key;
+const parseChapter = function(createPointer) {
 
-  while(points--) {
-    key = waitCreatePointer[points];
-    if(chapter = dataChpater.item(key)) {
-      chapters.unshift(chapter);
+  let points = createPointer.length
+  let chapter, key
+  let dataChpater = Xut.data.Chapter
+
+  //如果是合集
+  if(points) {
+    let chapterDataset = []
+    while(points--) {
+      key = createPointer[points];
+      if(chapter = dataChpater.item(key)) {
+        chapterDataset.unshift(chapter);
+      }
     }
+    return chapterDataset
+  } else {
+    //独立的索引号
+    return dataChpater.item(createPointer)
   }
 
-  return chapters;
 };
 
 

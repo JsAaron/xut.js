@@ -31,7 +31,7 @@ export function setVisualStyle({
     //容器内部元素的缩放比
     data.pageProportion = styleProportion(data)
     //提供快速索引
-    useStyleData['_' + data.direction] = data.pid
+    useStyleData['_' + data.direction] = data.chapterIndex
   })
 
   /**
@@ -46,10 +46,10 @@ export function setVisualStyle({
     if(!pageStyle && pageName === 'middle') {
       let standbyStyle = this.getPageStyle(standbyName)
       if(standbyName === 'before') {
-        return getPageStyle(standbyStyle.pid + 1)
+        return getPageStyle(standbyStyle.chapterIndex + 1)
       }
       if(standbyName === 'after') {
-        return getPageStyle(standbyStyle.pid - 1)
+        return getPageStyle(standbyStyle.chapterIndex - 1)
       }
     }
     return this[this['_' + pageName]]
@@ -65,8 +65,8 @@ export function setVisualStyle({
     //容器的初始translate值
     _.extend(data, styleTranslate({
       useStyleData,
-      createIndex: data.pid,
-      currIndex: data.visiblePid,
+      createIndex: data.chapterIndex,
+      currIndex: data.visualChapterIndex,
       direction: data.direction
     }))
   })

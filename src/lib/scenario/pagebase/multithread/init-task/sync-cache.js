@@ -1,12 +1,7 @@
 import { query } from '../../../../database/query'
 
-/**
- * 更新数据缓存
- * @param  {[type]}   pid      [description]
- * @param  {Function} callback [description]
- * @return {[type]}            [description]
- */
-export default function(pid, callback) {
+/*更新数据缓存*/
+export default function(chapterIndex, callback) {
 
   let pageType = this.pageType
 
@@ -30,7 +25,7 @@ export default function(pid, callback) {
   }
 
   query(pageType, {
-    'pageIndex': pid,
+    'pageIndex': chapterIndex,
     'pageData': this.chapterData,
     'pptMaster': this.pptMaster
   }, function(data, activitys, autoData) {

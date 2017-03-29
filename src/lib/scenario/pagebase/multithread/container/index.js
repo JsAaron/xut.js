@@ -23,32 +23,29 @@ const createli = function({
   pageData,
   background
 }) {
-  let getStyle = base.getStyle
-  let html = ''
+  const getStyle = base.getStyle
 
   //增加一个main-content放body内容
   //增加一个header-footer放溢出的页眉页脚
-  html =
+  return String.styleFormat(
     `<li id="${prefix}"
-            data-cid="${pageData._id}"
-            data-pid="${base.pid}"
-            data-type="${base.pageType}"
-            data-container="true"
-            class="xut-flip preserve-3d"
-            style="width:${getStyle.visualWidth}px;
-                   height:${getStyle.visualHeight}px;
-                   left:${getStyle.visualLeft}px;
-                   top:${getStyle.visualTop}px;
-                   ${TANSFROM}:${translate};
-                   ${background}
-                   ${customStyle}">
-            <div class="page-pinch">
-                <div data-type="main-content"></div>
-                <div data-type="header-footer"></div>
-            </div>
-        </li>`
-
-  return String.styleFormat(html)
+         data-chapter-index="${base.chapterIndex}"
+         data-chapter-id="${pageData._id}"
+         data-type="${base.pageType}"
+         data-container="true"
+         class="xut-flip preserve-3d"
+         style="width:${getStyle.visualWidth}px;
+                height:${getStyle.visualHeight}px;
+                left:${getStyle.visualLeft}px;
+                top:${getStyle.visualTop}px;
+                ${TANSFROM}:${translate};
+                ${background}
+                ${customStyle}">
+        <div class="page-pinch">
+            <div data-type="main-content"></div>
+            <div data-type="header-footer"></div>
+        </div>
+    </li>`)
 }
 
 
@@ -61,7 +58,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
 
   //chpater有背景，不是svg格式
   if(!/.svg$/i.test(pageData.md5)) {
-    background = 'background-image:url(' + getFileFullPath(pageData.md5,'container-bg') + ');'
+    background = 'background-image:url(' + getFileFullPath(pageData.md5, 'container-bg') + ');'
   }
 
   /**

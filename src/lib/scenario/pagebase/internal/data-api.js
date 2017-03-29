@@ -118,11 +118,10 @@ export default function(baseProto) {
 
   /**
    * 获取chapterid
-   * @param  {[type]} pid [description]
    * @return {[type]}     [description]
    */
-  baseProto.baseGetPageId = function(pid) {
-    return this.baseData(pid)['_id'];
+  baseProto.baseGetPageId = function(index) {
+    return this.baseData(index)['_id'];
   }
 
 

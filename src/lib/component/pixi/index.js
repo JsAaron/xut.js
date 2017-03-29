@@ -42,9 +42,9 @@ class Rule extends Observer {
      * @return {[type]}           [description]
      */
     this.failCallback = function() {
-      //删掉对应的cid记录
-      // var index =  canvasRelated.cid.indexOf(contentId)
-      // canvasRelated.cid.splice(index,1);
+      //删掉对应的contentId记录
+      // var index =  canvasRelated.contentIdset.indexOf(contentId)
+      // canvasRelated.contentIdset.splice(index,1);
       console.log('failCallback')
     }
   }

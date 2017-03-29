@@ -29,16 +29,16 @@ import {
  * 导致重复数据被修正的问题
  * @return {[type]}             [description]
  */
-const makeWarpObj = (contentId, content, pageType, pid) => {
+const makeWarpObj = (contentId, content, pageType, chapterIndex) => {
   //唯一标示符
-  let prefix = "_" + pid + "_" + contentId;
+  let prefix = "_" + chapterIndex + "_" + contentId;
   return {
     pageType: pageType,
     contentId: contentId,
     isJs: /.js$/i.test(content.md5), //html类型
     isSvg: /.svg$/i.test(content.md5), //svg类型
     data: content,
-    pid: pid,
+    chapterIndex: chapterIndex,
     containerName: 'Content' + prefix,
     makeId(name) {
       return name + prefix;
@@ -59,7 +59,7 @@ const analysisPath = (wrapObj, conData) => {
   /*是自动精灵动画*/
   if(conData.category === "AutoCompSprite") {
     try {
-      resourcePath = getFileFullPath(fileName,'content-autoCompSprite') + "/app.json";
+      resourcePath = getFileFullPath(fileName, 'content-autoCompSprite') + "/app.json";
       let results = getResources(resourcePath)
       let spiritList = results.spiritList[0]
       let actListName = spiritList.params.actList
@@ -72,7 +72,7 @@ const analysisPath = (wrapObj, conData) => {
     }
   } else {
     let isGif = /.gif$/i.test(fileName)
-    let fileFullPath = getFileFullPath(fileName,'content')
+    let fileFullPath = getFileFullPath(fileName, 'content')
     resourcePath = isGif ? createRandomImg(fileFullPath) : fileFullPath
   }
 
@@ -133,7 +133,6 @@ const allotRatio = (fixRadio, headerFooterMode) => {
 //  构建content的序列tokens
 //  createImageIds,
 //  createContentIds
-//  pid,
 //  pageType,
 //  dydCreate //重要判断,动态创建
 //
@@ -147,7 +146,7 @@ export function contentStructure(callback, data, context) {
     contentCollection,
     contentCount,
     cloneContentCount,
-    pid = data.pid,
+    chapterIndex = data.chapterIndex,
     pageType = data.pageType,
     containerRelated = data.containerRelated,
     seasonRelated = data.seasonRelated,
@@ -180,7 +179,7 @@ export function contentStructure(callback, data, context) {
 
   /*开始过滤参数*/
   if(containerRelated && containerRelated.length) {
-    containerObj = createContainer(containerRelated, pid, getStyle);
+    containerObj = createContainer(containerRelated, chapterIndex, getStyle);
   }
 
   /**
@@ -208,7 +207,7 @@ export function contentStructure(callback, data, context) {
       //2017.1.18
       if(para.HeaderOrFooter) {
         if(headerFooterMode[contentId]) {
-          $$warn('页眉页脚对象重复设置,cid:' + contentId)
+          $$warn('页眉页脚对象重复设置,contentId:' + contentId)
         }
         headerFooterMode[contentId] = Number(para.HeaderOrFooter)
       }
@@ -363,7 +362,7 @@ export function contentStructure(callback, data, context) {
     if(content = contentCollection[contentCount]) {
       contentId = content['_id'];
       //创建包装器,处理数据引用关系
-      wrapObj = makeWarpObj(contentId, content, pageType, pid);
+      wrapObj = makeWarpObj(contentId, content, pageType, chapterIndex);
       idFix.push(wrapObj.containerName)
 
       //如果有文本效果标记

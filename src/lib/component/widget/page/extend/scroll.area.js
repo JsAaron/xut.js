@@ -39,8 +39,8 @@ export default class ScrollArea {
 
   _create(content, prefix) {
 
-    let cid = content.id
-    let contentName = prefix + cid
+    let contentId = content.id
+    let contentName = prefix + contentId
 
     let theTitle = parseJSON(content.theTitle)
 
@@ -53,7 +53,7 @@ export default class ScrollArea {
 
     let contentPanle = $("#" + contentName)
     if(contentPanle.length == 0) {
-      console.log(cid + "not find obj");
+      console.log(contentId + "not find obj");
       return;
     }
 
@@ -77,7 +77,7 @@ export default class ScrollArea {
       //需要滚动条
       if(hasIscroll === 'visible') {
         $wrapper = contentPanle.children('div[data-type="area-wrapper"]')
-        return this._bindIscroll($wrapper[0], scrollX, scrollY, cid)
+        return this._bindIscroll($wrapper[0], scrollX, scrollY, contentId)
       }
       //hidden
       return
@@ -113,7 +113,7 @@ export default class ScrollArea {
     const colsObj = this._resetContents(obj, prefix, contentSize, scrollX, scrollY, min);
 
     //创建snap容器
-    let snapContainer = this._createSnapContainer(colsObj, $scroller, cid, scrollX, scrollY)
+    let snapContainer = this._createSnapContainer(colsObj, $scroller, contentId, scrollX, scrollY)
 
     //将content添加到snap容器中
     if(scrollX) {
@@ -152,19 +152,19 @@ export default class ScrollArea {
       if(snapContainer.length == 1) {
         return this._bindIscroll($wrapper[0], scrollX, scrollY)
       }
-      return this._bindIscroll($wrapper[0], scrollX, scrollY, cid)
+      return this._bindIscroll($wrapper[0], scrollX, scrollY, contentId)
     } else {
       contentPanle.attr("data-iscroll", "hidden");
     }
 
   }
 
-  _bindIscroll(wrapper, hasScrollX, hasScrollY, cid) {
-    if(cid) {
+  _bindIscroll(wrapper, hasScrollX, hasScrollY, contentId) {
+    if(contentId) {
       return new iScroll(wrapper, {
         scrollX: hasScrollX ? true : false,
         scrollY: hasScrollY ? true : false,
-        snap: ".contentsContainer" + cid,
+        snap: ".contentsContainer" + contentId,
         scrollbars:'custom'
       })
     } else {
@@ -447,10 +447,10 @@ export default class ScrollArea {
    * 创建snapContainer并添加到scroller中
    * @param  {[type]} colsObj   [description]
    * @param  {[type]} $scroller [description]
-   * @param  {[type]} cid       [description]
+   * @param  {[type]} contentId [description]
    * @return {[type]}           [description]
    */
-  _createSnapContainer(colsObj, $scroller, cid, scrollX, scrollY) {
+  _createSnapContainer(colsObj, $scroller, contentId, scrollX, scrollY) {
     let snapContainer = '';
 
     if(scrollX) {
@@ -466,7 +466,7 @@ export default class ScrollArea {
         } else {
           containerWidth = snapContainerWidth
         }
-        snapContainer += `<li class="contentsContainer${cid}"
+        snapContainer += `<li class="contentsContainer${contentId}"
                                       style='width:${containerWidth}px;height:100%;float:left;'>
                                   </li>`
       }
@@ -478,7 +478,7 @@ export default class ScrollArea {
       const snapContainerHeight = colsObj.snapContainerHeight
       const lastSnapContainerHeight = scrollerHeight - (snapYCount - 1) * snapContainerHeight;
       for(var i = 0; i < colsObj.snapYCount; i++) {
-        snapContainer += `<li class="contentsContainer${cid}"
+        snapContainer += `<li class="contentsContainer${contentId}"
                                       style='height:${snapContainerHeight}px;width:100%;float:left;'>
                                   </li>`
       }

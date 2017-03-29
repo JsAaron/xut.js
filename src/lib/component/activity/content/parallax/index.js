@@ -69,7 +69,7 @@ export default function index(data, relatedData, getStyle) {
 
   targetProperty = converProperty(targetProperty)
 
-  let pid = data.pid
+  let chapterIndex = data.chapterIndex
 
   //首位分割点
   let currPageOffset
@@ -140,8 +140,8 @@ export default function index(data, relatedData, getStyle) {
      */
     calculateRangePage() {
       return {
-        'start': pid - currPageOffset + 1,
-        'end': pageRange - currPageOffset + pid
+        'start': chapterIndex - currPageOffset + 1,
+        'end': pageRange - currPageOffset + chapterIndex
       }
     },
     /**

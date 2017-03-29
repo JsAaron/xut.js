@@ -21,7 +21,7 @@ export function bindActivity(pipeData, contentDataset, callback) {
   var compiler,
     $containsNode = pipeData.$containsNode,
     eventRelated = pipeData.eventRelated, //合集事件
-    pid = pipeData.pid,
+    chapterIndex = pipeData.chapterIndex,
     createActivitys = pipeData.createActivitys,
     feedbackBehavior = pipeData.feedbackBehavior, //反馈数据,跟事件相关
     pageBaseHooks = pipeData.pageBaseHooks,
@@ -136,7 +136,7 @@ export function bindActivity(pipeData, contentDataset, callback) {
         '$containsNode': $containsNode,
         'pageType': compiler.pageType, //构建类型 page/master
         'dataset': compiler.dataset, //动画表数据 or 视觉差表数据
-        "pid": pid, //页码
+        "chapterIndex": chapterIndex, //页码
         'eventData': eventData, //事件数据
         'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
         'relatedCallback': relatedCallback //相关回调

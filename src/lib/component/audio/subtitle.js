@@ -42,10 +42,10 @@ export class Subtitle {
 
     //保存原始的属性
     orgAncestorVisibility = this.orgAncestorVisibility = {}
-    _.each(this.ancestors, (node, cid) => {
+    _.each(this.ancestors, (node, contentId) => {
       visibility = getStyles(node, 'visibility');
       if(visibility) {
-        orgAncestorVisibility[cid] = visibility;
+        orgAncestorVisibility[contentId] = visibility;
       }
     })
 
@@ -110,10 +110,10 @@ export class Subtitle {
     var proportionWidth = proportion.width;
     var proportionHeight = proportion.height;
 
-    var cid = data.id;
-    var parentNode = this.parents[cid];
-    var ancestorNode = this.ancestors[cid];
-    var preDiv = this.cacheCreateDivs[cid];
+    var contentId = data.id;
+    var parentNode = this.parents[contentId];
+    var ancestorNode = this.ancestors[contentId];
+    var preDiv = this.cacheCreateDivs[contentId];
     var preP = preDiv && preDiv.children[0];
 
     //转换行高
@@ -182,7 +182,7 @@ export class Subtitle {
       createContent(createDiv, createP, data);
       createDiv.appendChild(createP) //添加到指定的父元素
       parentNode.appendChild(createDiv);
-      this.cacheCreateDivs[cid] = createDiv; //保存引用
+      this.cacheCreateDivs[contentId] = createDiv; //保存引用
     }
 
     //操作最外层的content节点

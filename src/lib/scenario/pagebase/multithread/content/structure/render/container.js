@@ -5,10 +5,10 @@ import { parseContentData } from '../../parser/dataset'
  * 针对容器类型的处理
  * @param  {[type]} containerName [description]
  * @param  {[type]} contentId     [description]
- * @param  {[type]} pid     [description]
+ * @param  {[type]} chapterIndex     [description]
  * @return {[type]}               [description]
  */
-const createContainerWrap = (containerName, contentId, pid, getStyle) => {
+const createContainerWrap = (containerName, contentId, chapterIndex, getStyle) => {
   const contentResult = parseContentData([contentId])
   const data = reviseSize({
     results: contentResult[0],
@@ -28,7 +28,7 @@ const createContainerWrap = (containerName, contentId, pid, getStyle) => {
 }
 
 
-export function createContainer(containerRelated, pid, getStyle) {
+export function createContainer(containerRelated, chapterIndex, getStyle) {
   var itemIds,
     uuid,
     contentId,
@@ -40,10 +40,10 @@ export function createContainer(containerRelated, pid, getStyle) {
 
   containerRelated.forEach((data, index) => {
     contentId = data.imageIds;
-    containerName = "Container_" + pid + "_" + contentId
+    containerName = "Container_" + chapterIndex + "_" + contentId
     uuid = "aaron" + Math.random()
     containerObj[uuid] = {
-      'start': [createContainerWrap(containerName, contentId, pid, getStyle)],
+      'start': [createContainerWrap(containerName, contentId, chapterIndex, getStyle)],
       'end': '</div>'
     };
     containerObj.createUUID.push(uuid);

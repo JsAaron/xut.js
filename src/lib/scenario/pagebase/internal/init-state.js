@@ -32,7 +32,7 @@ export default function(baseProto) {
      * 关闭 false
      * @type {[type]}
      */
-    this.isMultithread = this.multiplePages ? true : false;
+    this.hasMultithread = this.multiplePages ? true : false;
 
     //母版处理
     if(instance.pageType === 'master') {
@@ -156,9 +156,9 @@ export default function(baseProto) {
        * 搜集所有的content(每一个content对象)
        * 因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
        */
-      contents(pid, id, contentScope) {
+      contents(chapterIndex, id, contentScope) {
         const scope = instance.baseGetContentObject[id]
-        //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
+          //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
         if(scope && scope.isBindEventHooks) {
           instance._contentsCollector[id] = contentScope;
         }
@@ -215,9 +215,9 @@ export default function(baseProto) {
             floatContents.Master[id] = contentObj
           } else {
             Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
-            //获取DOM节点
+              //获取DOM节点
             if(contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
-              prefix = 'Content_' + instance.pid + "_"
+              prefix = 'Content_' + instance.chapterIndex + "_"
               _.each(contentsFragment, function(dom) {
                 var makePrefix = prefix + id;
                 if(dom.id == makePrefix) {
@@ -229,7 +229,7 @@ export default function(baseProto) {
             //作为零件类型的空content处理
             floatContents.Master[id] = {
               id: id,
-              pid: instance.pid,
+              chapterIndex: instance.chapterIndex,
               $contentNode: $(contentNode),
               'empty': true //空类型
             }

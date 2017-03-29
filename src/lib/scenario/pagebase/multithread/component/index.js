@@ -44,7 +44,7 @@ TaskComponents.prototype = {
       createWidgets = data.activitys,
       chpaterData = data.chpaterData,
       chapterId = data.chapterId,
-      pid = data.pid,
+      chapterIndex = data.chapterIndex,
       widgetRetStr = [];
 
     //创建
@@ -52,7 +52,7 @@ TaskComponents.prototype = {
       //创建DOM元素结构
       //返回是拼接字符串
       widgetRetStr.push(directives[actType]['createDom'](
-        activityData, chpaterData, chapterId, pid, Xut.zIndexlevel(), pageType
+        activityData, chpaterData, chapterId, chapterIndex, Xut.zIndexlevel(), pageType
       ));
     }
 

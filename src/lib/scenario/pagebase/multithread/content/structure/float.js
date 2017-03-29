@@ -8,7 +8,7 @@ import { arrayUnique } from '../../../../../util/index'
 function crateFloat(callback, floatName, dasFloat, pipeData, base) {
 
   var $containsNodes = [];
-  var prefix = 'Content_' + pipeData.pid + "_";
+  var prefix = 'Content_' + pipeData.chapterIndex + "_";
 
   //去重复
   dasFloat.ids = arrayUnique(dasFloat.ids)
@@ -52,7 +52,7 @@ function crateFloat(callback, floatName, dasFloat, pipeData, base) {
 
   let getStyle = base.getStyle
   let flowHtml =
-    `<div id="${floatName}-li-${pipeData.pid}"
+    `<div id="${floatName}-li-${pipeData.chapterIndex}"
            class="xut-float"
            style="left:${getStyle.visualLeft}px;
                   top:${getStyle.visualTop}px;

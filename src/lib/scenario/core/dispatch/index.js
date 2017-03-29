@@ -21,12 +21,11 @@ import { $$set, hash, $$warn } from '../../../util/index'
 import {
   initPointer,
   getDirection,
-  converVisiblePid,
-  converPageIndex,
-  converChapterDataset,
+  converVisualPid,
+  converChapterData,
+  converChapterIndex,
   hasMaster
 } from './depend'
-
 
 
 export default class Dispatcher {
@@ -62,7 +61,7 @@ export default class Dispatcher {
    *  创建普通页面
    *  创建母版页面
    *  createSinglePage  需要创建的单页面索引
-   *  visiblePageIndex  当前可视区页面索引
+   *  visualPageIndex   当前可视区页面索引
    *  action            创建的动作：toPage/init/flipOver
    *  toPageCallback    跳转页面支持回调通知
    *  userStyle         规定创建的style属性
@@ -71,7 +70,7 @@ export default class Dispatcher {
    *   创建双页的页面记录
    *   createPageIndex中对应的createDoublePage如果有子索引值
    **/
-  createPageBases(createSinglePage, visiblePageIndex, action, toPageCallback, userStyle, createDoublePage = {}) {
+  createPageBases(createSinglePage, visualPageIndex, action, toPageCallback, userStyle, createDoublePage = {}) {
 
     //2016.1.20
     //修正苗苗学问题 确保createPage不是undefined
@@ -79,33 +78,35 @@ export default class Dispatcher {
       return;
     }
 
-    let self = this
-    let multiplePages = this.options.multiplePages //是否线性
+    const self = this
+    const options = this.options
+    const multiplePages = options.multiplePages //是否线性
+    const toPageAction = action === 'toPage' //如果是跳转
+    const filpOverAction = action === 'flipOver' //如果是翻页
+
+    /* 需要创建的总页面，双页面或者单页面*/
+    let createTotal = createDoublePage.total || createSinglePage.length
 
     /*
-      需要创建的总页面
-      如果有双页面创建模式，那么这里的创建总数应该是双页面的
-      否则就用单页面
-     */
-    let createTotal = createDoublePage.total || createSinglePage.length
-    let toPageAction = action === 'toPage' //如果是跳转
-    let filpOverAction = action === 'flipOver' //如果是翻页
+    转化页面合集，自然索引index => chapter Index
+    传递的页面的索引永远只是从0,1,2....这样的自然排序
+    1.最后需要把最先展示的页面提取到第一位解析，加快页面展示
+    2.如果是非线性的多场景应用，那么这样的自然排序，需要转化成对应的chapter的索引(为了直接获取chapter的数据)
+    */
+    let createChpaterIndexGroup = converChapterIndex(options, createSinglePage, createDoublePage, visualPageIndex)
 
-    //将页码pageIndex转化成对应的chapter && 使用第一个是分解可见页面
-    //不同场景会自动转化chapter的下标
-    //createPageIndexCollection
-    //  创建的页码ID合集
-    //  代表数据库chpaterID的索引
-    let createPageIndexCollection = converPageIndex.call(this, createSinglePage, visiblePageIndex, createDoublePage)
-
-    //收集创建的页面对象
-    //用于处理2个页面在切换的时候闪屏问题
-    //主要是传递createStyle自定义样式的处理
+    /*
+     收集创建的页面对象
+     1.用于处理2个页面在切换的时候闪屏问题
+     2.主要是传递createStyle自定义样式的处理
+      */
     let collectPageBase = []
 
-    //是否触发母版的自动时间
-    //因为页面每次翻页都会驱动auto事件
-    //但是母版可能是共享的
+    /*
+    是否触发母版的自动时间
+    因为页面每次翻页都会驱动auto事件
+    但是母版可能是共享的
+     */
     let createMaster = false
 
     //收集完成回调
@@ -132,7 +133,7 @@ export default class Dispatcher {
       flipOver() {
         collectCallback(() => {
           self._autoRun({ //翻页
-            'createPointer': createPageIndexCollection,
+            'createPointer': createChpaterIndexGroup,
             'createMaster': createMaster
           });
         })
@@ -145,9 +146,6 @@ export default class Dispatcher {
       }
     }
 
-    //索引页面，转化成页面chapter数据集合
-    let chpaterDataset = converChapterDataset(createPageIndexCollection)
-
     /**
      * 预编译
      * 因为要需要对多个页面进行预处理
@@ -155,39 +153,48 @@ export default class Dispatcher {
      * 这样需要预编译出数据，做了中间处理后再执行后续动作
      * @type {Array}
      */
-    let compile = new Stack()
+    const compile = new Stack()
 
-    //收集有用的数据
-    let useStyleData = hash()
-    _.each(chpaterDataset, (chapterData, index) => {
+    /*收集有用的数据*/
+    const useStyleData = hash()
+
+    /*
+      1.pageIndex：页面自然索引号
+      2.visualPageIndex：页面自然索引号，可见编号
+
+      3.chapterIndex： 页面chpater的索引号
+      4.visualChapterIndex:  可见页面的的chpater索引号
+     */
+    _.each(createChpaterIndexGroup, chapterIndex => {
+
       compile.push((() => {
 
-        //创建的页面索引
-        let createChapterIndex = createPageIndexCollection[index]
+        const chapterData = converChapterData(chapterIndex)
 
-        //转化可视区页码对应的chapter的索引号
-        //获取出实际的pageIndex号
-        let conversion = converVisiblePid.call(self, createChapterIndex, visiblePageIndex)
-        let visibleChapterIndex = conversion.visiblePid
-        let pageIndex = conversion.pageIndex
+        /*
+        1.转化可视区页码对应的chapter的索引号
+        2.获取出实际的pageIndex自然索引号
+        */
+        const { visualChapterIndex, pageIndex } = converVisualPid(options, chapterIndex, visualPageIndex)
 
         if(createTotal === 1) {
-          self.options.chapterId = chapterData._id
+          options.chapterId = chapterData._id
         }
 
-        //跳转的时候，创建新页面可以自动样式信息
-        //优化设置，只是改变当前页面即可
-        if(toPageAction && visibleChapterIndex !== createChapterIndex) {
+        /*
+        优化设置，只是改变当前页面即可
+        跳转的时候，创建新页面可以自动样式信息
+        */
+        if(toPageAction && visualChapterIndex !== chapterIndex) {
           userStyle = undefined
         }
 
         //收集页面之间可配置数据
-        useStyleData[createChapterIndex] = {
-          pid: createChapterIndex,
-          visiblePid: visibleChapterIndex,
-          userStyle: userStyle,
-          direction: getDirection(createChapterIndex, visibleChapterIndex),
-          //新的页面模式
+        useStyleData[chapterIndex] = {
+          userStyle,
+          chapterIndex,
+          visualChapterIndex,
+          direction: getDirection(chapterIndex, visualChapterIndex),
           pageVisualMode: setVisualMode(chapterData)
         }
 
@@ -195,16 +202,16 @@ export default class Dispatcher {
         return pageStyle => {
           //创建新的页面管理，masterFilter 母板过滤器回调函数
           const _createPageBase = function(masterFilter) {
+
             //初始化构建页面对象
             //1:page，2:master
-            let currentStyle = pageStyle[createChapterIndex]
+            let currentStyle = pageStyle[chapterIndex]
             let pageBase = this.create({
-              'pid': createChapterIndex,
-              'visiblePid': visibleChapterIndex,
-              'chapterData': chapterData,
-              'getStyle': currentStyle,
-              'pageIndex': pageIndex,
-              'multiplePages': multiplePages
+              pageIndex,
+              chapterData,
+              chapterIndex,
+              multiplePages,
+              'getStyle': currentStyle
             }, pageIndex, masterFilter, function(shareMaster) {
               if(config.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                 $$warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
@@ -243,7 +250,6 @@ export default class Dispatcher {
 
       })())
     })
-
 
     /**
      * 创建页面的样式与翻页的布局
@@ -473,7 +479,7 @@ export default class Dispatcher {
      * 转化页码标记
      */
     if(createPointer) {
-      createPointer = converVisiblePid.call(this, createPointer)
+      createPointer = converVisualPid(this.options, createPointer)
     }
 
     const data = {

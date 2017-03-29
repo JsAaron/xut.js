@@ -15,8 +15,8 @@ var createCanvasData = function(type, opts) {
     conData.actionTypes[type] = true;
   }
 
-  if(data.canvasRelated.cid.indexOf(contentId) == -1) {
-    data.canvasRelated.cid.push(contentId);
+  if(data.canvasRelated.contentIdset.indexOf(contentId) == -1) {
+    data.canvasRelated.contentIdset.push(contentId);
   }
 
   //给content数据增加直接判断标示

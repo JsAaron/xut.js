@@ -15,10 +15,12 @@
 </head>
 
 <body>
-    <button id="launchMini">进入</button>
-    <button id="closeMini">退出</button>
-    <button id="home">home</button>
-    <button id="activate">激活</button>
+    <div id="testButton">
+        <button id="launchMini">进入</button>
+        <button id="closeMini">退出</button>
+        <button id="home">home</button>
+        <button id="activate">激活</button>
+    </div>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
@@ -35,10 +37,10 @@ Xut.Application.setConfig = {
     },
     salePicture: true,
     salePictureMultiples: 3,
-    imageSuffix: {
-        1080: 'mi',
-        1440: 'hi'
-    },
+    // imageSuffix: {
+    //     1080: 'mi',
+    //     1440: 'hi'
+    // },
     pageBar: {
         // type: 'circular',
         // mode: 1
@@ -51,7 +53,7 @@ Xut.Application.setConfig = {
     // trackCode: ['launch','app', 'page', 'action', 'hot'],
     supportQR: true,
     swipeDelegate: true,
-    useHDImageZoom: true
+    useHDImageZoom: true,
     // doublePageMode: true //双页模式
 };
 
@@ -72,15 +74,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     }
 })
 
-$("#home").click(function() {
-    Xut.Application.Original()
-})
-
-$("#activate").click(function() {
-    Xut.Application.Activate()
-})
-
-var appId = 311 //311
+var appId = 101 //311
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点
@@ -93,6 +87,15 @@ $("#launchMini").click(function() {
     });
 })
 $("#launchMini").trigger('click')
+
+
+$("#home").click(function() {
+    Xut.Application.Original()
+})
+
+$("#activate").click(function() {
+    Xut.Application.Activate()
+})
 
 $("#closeMini").click(function() {
     Xut.Application.Exit()

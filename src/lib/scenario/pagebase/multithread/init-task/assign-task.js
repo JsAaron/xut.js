@@ -72,7 +72,7 @@ export default {
    */
   'Container' (taskCallback, base) {
     //同步数据
-    updataCache.call(base, [base.pid], () => {
+    updataCache.call(base, [base.chapterIndex], () => {
       const pageData = base.baseData()
         //contentMode模式
       parseMode(pageData, base)
@@ -104,7 +104,7 @@ export default {
       return;
     }
 
-    const data = base.baseData(base.pid)
+    const data = base.baseData(base.chapterIndex)
 
     /**
      * 构建中断回调
@@ -177,7 +177,7 @@ export default {
       'activitys': base.baseActivits(),
       'chpaterData': baseData,
       'chapterId': baseData['_id'],
-      'pid': base.pid,
+      'chapterIndex': base.chapterIndex,
       'pageType': base.pageType,
       'getStyle': base.getStyle
     }, suspendCallback, successCallback);
@@ -215,7 +215,7 @@ export default {
       suspend(taskName, innerNextTasks, innerSuspendTasks) {
         //如果是当前页面构建,允许打断一次
         var interrupt
-        if (base.isAutoRun && taskName === 'strAfter') {
+        if (base.hasAutoRun && taskName === 'strAfter') {
           interrupt = true;
         }
         base.nextTasks({
@@ -249,7 +249,7 @@ export default {
       'chpaterData': baseData,
       'chapterId': chapterId,
       'pageIndex': base.pageIndex,
-      'pid': base.pid,
+      'chapterIndex': base.chapterIndex,
       'pageBaseHooks': pageBaseHooks,
       'getStyle': base.getStyle
     });

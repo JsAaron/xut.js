@@ -17,7 +17,7 @@ export function parseBehavior(pipeData) {
   let feedbackBehavior = pipeData.feedbackBehavior = {} //点击行为
   let zoomBehavior = pipeData.zoomBehavior = {} //缩放行为
   let hasZoom
-  let pid = pipeData.pid
+  let chapterIndex = pipeData.chapterIndex
   let prefix
   let id
 
@@ -50,7 +50,7 @@ export function parseBehavior(pipeData) {
             id = zoomData.content
             if(id) {
               //保存于节点node命名一致，方便快速查找
-              prefix = "Content_" + pid + "_" + id
+              prefix = "Content_" + chapterIndex + "_" + id
               createFn(zoomBehavior, prefix, function() {
                 //缩放提示图片
                 this['prompt'] = zoomData.prompt ? true : false
