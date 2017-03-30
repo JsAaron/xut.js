@@ -7,8 +7,8 @@ import iframeConf from './iframe'
 
 import { getWidgetPath, getSourcePath } from './depend/path'
 import { getSize, getLayerMode } from './depend/size'
-import { getVisualLayout } from '../visual/visual-layout'
-import { getFullProportion, getRealProportion } from '../visual/visual-proportion'
+import { getVisualSize } from './v-size'
+import { getFullProportion, getRealProportion } from './v-proportion'
 
 /*默认配置与模式*/
 import improtConfig from '../global-config'
@@ -295,7 +295,7 @@ const resetProportion = function(pptWidth, pptHeight, setVisualMode, noModifyVal
   //获取全屏比值，用来设定view的尺寸
   //根据分辨率与PPT排版的比值来确定
   fullProportion = getFullProportion(config, pptWidth, pptHeight)
-  const visualSize = config.visualSize = getVisualLayout(config, fullProportion, setVisualMode, noModifyValue)
+  const visualSize = config.visualSize = getVisualSize(config, fullProportion, setVisualMode, noModifyValue)
 
 
   //溢出宽度
@@ -429,7 +429,7 @@ export function initConfig(pptWidth, pptHeight) {
  * 每个页面可以重写页面的view
  */
 export function resetVisualLayout(setVisualMode) {
-  return getVisualLayout(config, fullProportion, setVisualMode)
+  return getVisualSize(config, fullProportion, setVisualMode)
 }
 
 /**

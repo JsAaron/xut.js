@@ -9,7 +9,7 @@ const CEIL = Math.ceil
  *
  * noModifyValue 是否强制修改值，主要用来第一次进应用探测是否有全局宽度溢出的情况
  */
-export function getVisualLayout(config, fullProportion, setVisualMode, noModifyValue) {
+export function getVisualSize(config, fullProportion, setVisualMode, noModifyValue) {
 
   let screenWidth = config.screenSize.width
   let screenHeight = config.screenSize.height
@@ -20,7 +20,7 @@ export function getVisualLayout(config, fullProportion, setVisualMode, noModifyV
   let newLeft = 0
 
   if(!setVisualMode) {
-    $$warn('getVisualLayout没有提供setVisualMode')
+    $$warn('getVisualSize没有提供setVisualMode')
   }
 
   /**

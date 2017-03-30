@@ -2,9 +2,9 @@
  * 左边页面Translate钩子
  ************************/
 
-export function leftTranslate(useStyleData) {
-  let middlePageStyle = useStyleData.getPageStyle('middle', 'before')
-  let leftPageStyle = useStyleData.getPageStyle('before')
+export function leftTranslate(styleDataset) {
+  let middlePageStyle = styleDataset.getPageStyle('middle', 'left')
+  let leftPageStyle = styleDataset.getPageStyle('left')
 
   //中间：溢出
   if(middlePageStyle && middlePageStyle.visualLeftInteger) {
@@ -30,3 +30,4 @@ export function leftTranslate(useStyleData) {
   }
 
 }
+

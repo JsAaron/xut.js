@@ -18,8 +18,8 @@
     <div id="testButton">
         <button id="launchMini">进入</button>
         <button id="closeMini">退出</button>
-        <button id="home">home</button>
-        <button id="activate">激活</button>
+<!--         <button id="home">home</button>
+        <button id="activate">激活</button> -->
     </div>
     <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
@@ -30,11 +30,11 @@ Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
     historyMode: true,
-    visualMode: 1,
-    cursor: {
-        url: 'images/icons/busyicon.gif',
-        delayTime: 300
-    },
+    visualMode: 3,
+    // cursor: {
+    //     url: 'images/icons/busyicon.gif',
+    //     delayTime: 300
+    // },
     salePicture: true,
     salePictureMultiples: 3,
     // imageSuffix: {
@@ -74,7 +74,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     }
 })
 
-var appId = 101 //311
+var appId = 306 //311
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点
@@ -98,6 +98,7 @@ $("#activate").click(function() {
 })
 
 $("#closeMini").click(function() {
+  console.log(111)
     Xut.Application.Exit()
 })
 </script>

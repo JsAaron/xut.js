@@ -4,9 +4,9 @@ import DeputyBar from '../toolbar/deputy-fnbar'
 import BookBar from '../toolbar/word-bookbar/index'
 import NumberBar from '../toolbar/mini-pagebar/main'
 import { sceneController } from './scene-control'
-import Mediator from './core/mediator'
+import Mediator from './mediator/index'
 import { getColumnCount, getColumnChpaterCount } from '../component/column/depend'
-import { mainScene, deputyScene } from './root-layout'
+import { mainScene, deputyScene } from './scene-layout'
 import { pMainBar, pDeputyBar } from './parse-bar'
 
 /**

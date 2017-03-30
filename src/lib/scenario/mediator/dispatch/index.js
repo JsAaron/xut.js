@@ -13,8 +13,8 @@ import goToPage from './topage'
 import Stack from '../../../util/stack'
 
 import { sceneController } from '../../scene-control'
-import { getVisualDistance } from '../../../visual/visual-distance'
-import { setVisualStyle } from '../../../visual/visual-style'
+import { getVisualDistance } from '../../v-distance/index'
+import { setCustomStyle } from '../../v-style/index'
 import { setVisualMode } from './set-mode'
 import { $$set, hash, $$warn } from '../../../util/index'
 
@@ -69,6 +69,15 @@ export default class Dispatcher {
    * 2017.3.27增加createDoublePage
    *   创建双页的页面记录
    *   createPageIndex中对应的createDoublePage如果有子索引值
+   *
+   * 流程：
+   * 1：传递页面索引createSinglePage  [0]/[0,1]/[0,1,2]
+   * 2: 转化索引为chpaterInder的排序，把索引提出当期显示页面最先解析， 如果是非线性，需要转化对应的chpaterIndex ,[1,0,2]
+   * 3：通过编译chpaterInder的合集，获取到每一个chapter页面的数据
+   * 4：由于非线性存在， 每一个新的场景，可包含有多个chpater，pageIndex都是从0开始的. chapterIndex，不一定是从0开始的
+   * 5: 解析出pageIndex，visualChapterIndex的数值
+   * 6：自定义每一个页面的样式styleDataset
+   * 7：调用page/master管理器，创建pagebase
    **/
   createPageBases(createSinglePage, visualPageIndex, action, toPageCallback, userStyle, createDoublePage = {}) {
 
@@ -156,7 +165,7 @@ export default class Dispatcher {
     const compile = new Stack()
 
     /*收集有用的数据*/
-    const useStyleData = hash()
+    const styleDataset = hash()
 
     /*
       1.pageIndex：页面自然索引号
@@ -174,6 +183,10 @@ export default class Dispatcher {
         /*
         1.转化可视区页码对应的chapter的索引号
         2.获取出实际的pageIndex自然索引号
+        因为多场景的情况下
+        chapterIndex != pageIndex
+        每一个新的场景，可包含有多个chpater，pageIndex都是从0开始的
+        chapterIndex，不一定是从0开始的
         */
         const { visualChapterIndex, pageIndex } = converVisualPid(options, chapterIndex, visualPageIndex)
 
@@ -182,15 +195,15 @@ export default class Dispatcher {
         }
 
         /*
-        优化设置，只是改变当前页面即可
         跳转的时候，创建新页面可以自动样式信息
+        优化设置，只是改变当前页面即可
         */
         if(toPageAction && visualChapterIndex !== chapterIndex) {
           userStyle = undefined
         }
 
-        //收集页面之间可配置数据
-        useStyleData[chapterIndex] = {
+        /*自定义页面的style属性*/
+        styleDataset[chapterIndex] = {
           userStyle,
           chapterIndex,
           visualChapterIndex,
@@ -198,7 +211,9 @@ export default class Dispatcher {
           pageVisualMode: setVisualMode(chapterData)
         }
 
-        //延迟创建,先处理style规则
+        ///////////////////////////
+        /// 延迟创建,先处理style规则
+        ///////////////////////////
         return pageStyle => {
           //创建新的页面管理，masterFilter 母板过滤器回调函数
           const _createPageBase = function(masterFilter) {
@@ -256,12 +271,7 @@ export default class Dispatcher {
      * 存在存在flows页面处理
      * 这里创建处理的Transfrom
      */
-    const pageStyle = setVisualStyle({
-      action,
-      useStyleData
-    })
-
-    compile.shiftAll(pageStyle).destroy()
+    compile.shiftAll(setCustomStyle(styleDataset)).destroy()
   }
 
 

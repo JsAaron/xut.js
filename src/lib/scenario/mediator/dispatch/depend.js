@@ -14,17 +14,16 @@ export function offsetPage(num) {
 
 /**
  * 页面之间关系
- * @param  {[type]} createIndex [description]
- * @param  {[type]} currIndex   [description]
- * @return {[type]}             [description]
+ * createIndex 创建的页面
+ * visualIndex 可视区页面
  */
-export function getDirection(createIndex, currIndex) {
+export function getDirection(createIndex, visualIndex) {
   let direction
-  if(createIndex < currIndex) {
-    direction = 'before'
-  } else if(createIndex > currIndex) {
-    direction = 'after'
-  } else if(currIndex == createIndex) {
+  if(createIndex < visualIndex) {
+    direction = 'left'
+  } else if(createIndex > visualIndex) {
+    direction = 'right'
+  } else if(visualIndex == createIndex) {
     direction = 'middle'
   }
   return direction

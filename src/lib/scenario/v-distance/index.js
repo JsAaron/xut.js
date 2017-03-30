@@ -1,12 +1,9 @@
-import { config } from '../config/index'
-import { leftPageHook } from './style-config/distance-hook/left'
-import { middlePageHook } from './style-config/distance-hook/middle'
-import { rightPageHook } from './style-config/distance-hook/right'
+import { config } from '../../config/index'
+import { hasValue, hash } from '../../util/lang'
 
-import {
-  hasValue,
-  hash
-} from '../util/lang'
+import { leftPageHook } from './hook/left'
+import { middlePageHook } from './hook/middle'
+import { rightPageHook } from './hook/right'
 
 
 /**

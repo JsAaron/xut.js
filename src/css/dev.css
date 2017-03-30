@@ -4,25 +4,18 @@
 
 #testButton {
     position: relative;
-    width: 32%;
+    width: 20%;
     height: auto;
-    margin: 0 auto;
+    margin: 0 auto
 }
 
-button {
+#testButton button {
     border: 1px solid red;
     position: absolute;
-    z-index: 99999
-}
-
-#home {
-    right: 45px;
-}
-
-#activate {
-    right: 0px;
+    z-index: 99999;
+    transform: scale(.8);
 }
 
 #closeMini {
-    left: 45px;
+    right: 0px;
 }

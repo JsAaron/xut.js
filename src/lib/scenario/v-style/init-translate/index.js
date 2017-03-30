@@ -1,6 +1,6 @@
-import { config } from '../../config/index'
-import { leftTranslate } from './translate-hook/left'
-import { rightTranslate } from './translate-hook/right'
+import { config } from '../../../config/index'
+import { leftTranslate } from './hook/left'
+import { rightTranslate } from './hook/right'
 
 const translateZ = Xut.style.translateZ
 
@@ -20,35 +20,32 @@ const createTranslate = (offset) => {
  * @param  {Object} currIndex                     } [description]
  * @return {[type]}               [description]
  */
-export function styleTranslate({
-  createIndex,
-  currIndex,
+export function initTranslate({
   direction,
-  useStyleData
+  styleDataset
 }) {
 
   let translate
   let offset
-  let offsetLeft
-  let offsetMiddle
-  let offsetRight
 
-  if(direction === 'before') {
-    offsetLeft = leftTranslate(useStyleData)
+  if(direction === 'left') {
+    const offsetLeft = leftTranslate(styleDataset)
     translate = createTranslate(offsetLeft)
     offset = offsetLeft
   } else if(direction === 'middle') {
-    offsetMiddle = 0
+    const offsetMiddle = 0
     translate = createTranslate(offsetMiddle)
     offset = offsetMiddle
-  } else if(direction === 'after') {
-    offsetRight = rightTranslate(useStyleData)
+  } else if(direction === 'right') {
+    const offsetRight = rightTranslate(styleDataset)
     translate = createTranslate(offsetRight)
     offset = offsetRight
   }
 
   return {
+    //translate样式
     translate,
+    //偏移量
     offset
   }
 }
