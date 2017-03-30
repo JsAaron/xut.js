@@ -15,11 +15,11 @@ const translateZ = Xut.style.translateZ
  * 保证只是pageType === page才捕获动作
  */
 const toTranslate3d = (node, distance, speed, callback) => {
-  node && Xut.nextTick(function() {
+  if(node) {
     node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
     node.style[transitionDuration] = speed + 'ms'
     callback && callback()
-  })
+  }
 }
 
 /**

@@ -46,12 +46,12 @@ export default function(baseProto) {
     //保证指向始终是当前页面
     //翻页 && 是母版页 && 是当前页面
     let isVisual = false // 是可视页面
-    if(action === 'flipOver') {
-      if(this.pageType === 'page' && distance === viewOffset) {
-        //增加可视页面标记
-        pageNode.setAttribute('data-view', true)
-        isVisual = true
-      }
+    if(action === 'flipOver' &&
+      this.pageType === 'page' &&
+      distance === viewOffset) {
+      //增加可视页面标记
+      pageNode.setAttribute('data-view', true)
+      isVisual = true
     }
 
     //当前页面
@@ -61,9 +61,9 @@ export default function(baseProto) {
       //强制给动画结束触发
       //可视区页面
       //排除母版的情况
-      if(config.flipMode === 'allow' && isVisual) {
-        //设置动画完成
-        Xut.Application.SetTransitionComplete(pageNode, pageNode.getAttribute('data-view'))
+      if(config.flipMode === 'ban' && isVisual) {
+        //手动设置动画完成
+        Xut.Application.tiggerFilpComplete(pageNode, pageNode.getAttribute('data-view'))
         return true
       }
     })

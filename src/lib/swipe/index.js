@@ -14,7 +14,7 @@ const SPEED = 600
 /*默认翻页时间*/
 const DEFAULTTIME = {
   min: 0,
-  mix: 500
+  mix: 700
 }
 
 const getDate = () => {
@@ -29,7 +29,7 @@ const getDate = () => {
  * onSwipeUpSlider触屏松手 滑动处理
  * onFlipSliding 松手动画（反弹）
  * onFlipRebound 执行反弹
- * _onAnimComplete 动画完成
+ * _onFlipComplete 动画完成
  * onDropApp 退出应用
  */
 export default class Swipe extends Observer {
@@ -233,7 +233,7 @@ export default class Swipe extends Observer {
       },
       transitionend(e) {
         this._stopDefault(e)
-        this._onAnimComplete(e)
+        this._onFlipComplete(e)
       }
     }, this, e)
   }
@@ -720,11 +720,9 @@ export default class Swipe extends Observer {
 
 
   /**
-   * 动画结束后处理
-   * @param  {[type]} e [description]
-   * @return {[type]}   [description]
+   * 翻页结束
    */
-  _onAnimComplete(e) {
+  _onFlipComplete(e) {
     const node = e.target
     const pageType = node.getAttribute('data-type')
     const view = node.getAttribute('data-view') //操作的可视窗口
