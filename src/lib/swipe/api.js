@@ -1,7 +1,7 @@
 import { initPointer } from './pointer'
 
 /* 计算当前已经创建的页面索引*/
-const calculationIndex = (currIndex, targetIndex, pageTotal) => {
+const calculationIndex = (currIndex, targetIndex, totalIndex) => {
   var i = 0,
     existpage,
     createpage,
@@ -14,7 +14,7 @@ const calculationIndex = (currIndex, targetIndex, pageTotal) => {
   //存在的页面
   if(currIndex === 0) {
     existpage = [currIndex, currIndex + 1];
-  } else if(currIndex === pageTotal - 1) {
+  } else if(currIndex === totalIndex - 1) {
     existpage = [currIndex - 1, currIndex];
   } else {
     existpage = [currIndex - 1, currIndex, currIndex + 1];
@@ -23,7 +23,7 @@ const calculationIndex = (currIndex, targetIndex, pageTotal) => {
   //需要创建的新页面
   if(targetIndex === 0) {
     createpage = [targetIndex, targetIndex + 1];
-  } else if(targetIndex === pageTotal - 1) {
+  } else if(targetIndex === totalIndex - 1) {
     createpage = [targetIndex - 1, targetIndex];
   } else {
     createpage = [targetIndex - 1, targetIndex, targetIndex + 1];
@@ -75,11 +75,11 @@ export default function api(Swipe) {
       let borderIndex
         //必须是有2页以上并且当前页面就是最后一页
         //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
-      if(this.pageTotal > 1 && this.visualIndex == this.pageTotal - 1) {
+      if(this.totalIndex > 1 && this.visualIndex == this.totalIndex - 1) {
         borderIndex = this.visualIndex
       }
 
-      this.pageTotal = total
+      this.totalIndex = total
 
       //如果是最后一页，叠加新的页面
       //需要重写一些数据
@@ -93,7 +93,7 @@ export default function api(Swipe) {
     //改变总页面数
     //改变可视区页面为最后页
     if(location === 'left') {
-      this.pageTotal = total
+      this.totalIndex = total
       this.visualIndex = total - 1;
       this.setPointer(this.visualIndex, total)
       this._updateActionPointer()
@@ -103,7 +103,7 @@ export default function api(Swipe) {
 
     //如果是右边的column
     if(location === 'right') {
-      this.pageTotal = total
+      this.totalIndex = total
     }
 
     this._setContainerWidth()
@@ -228,8 +228,8 @@ export default function api(Swipe) {
    * 因为分栏的关系，内部修改外部
    * 页面需要拼接
    */
-  Swipe.prototype.setPointer = function(target, pageTotal) {
-    this.pagePointer = initPointer(target, pageTotal || this.pageTotal)
+  Swipe.prototype.setPointer = function(target, totalIndex) {
+    this.pagePointer = initPointer(target, totalIndex || this.totalIndex)
   }
 
 
@@ -279,7 +279,7 @@ export default function api(Swipe) {
     }
 
     //算出是相关数据
-    const data = calculationIndex(currIndex, targetIndex, this.pageTotal)
+    const data = calculationIndex(currIndex, targetIndex, this.totalIndex)
 
     //更新页码索引
     this._updataPointer(data)

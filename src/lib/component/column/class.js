@@ -129,7 +129,7 @@ export default class ColumnClass {
      * @type {[type]}
      */
     const swipe = this.swipe = new Swipe({
-      hasHooks: true,
+      hasHook: true,
       swipeWidth: columnWidth,
       linear: true,
       initIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
@@ -137,7 +137,7 @@ export default class ColumnClass {
       flipMode: 'allow',
       multiplePages: 1,
       stopPropagation: true,
-      pageTotal: this.columnCount
+      totalIndex: this.columnCount
     })
 
     let moveDistance = 0

@@ -1,4 +1,4 @@
-import { config } from '../../../config/index'
+import { config } from '../../config/index'
 
 /**
  * 获取母版页面的visualMode设置

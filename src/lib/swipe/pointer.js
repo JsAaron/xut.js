@@ -2,12 +2,12 @@
  * 初始化首次范围
  * @return {[type]} [description]
  */
-export function initPointer(init, pageTotal) {
+export function initPointer(init, totalIndex) {
   const pointer = {}
   if(init === 0) { //首页
     pointer['currIndex'] = init;
     pointer['rightIndex'] = init + 1;
-  } else if(init === pageTotal - 1) { //尾页
+  } else if(init === totalIndex - 1) { //尾页
     pointer['currIndex'] = init;
     pointer['leftIndex'] = init - 1;
   } else { //中间页

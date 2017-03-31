@@ -4,16 +4,16 @@
  * @return {[type]}
  */
 import { Abstract } from './abstract'
-import { Pagebase } from '../../pagebase/index'
-import { removeVideo } from '../../../component/video/manager'
-import { execScript } from '../../../util/index'
-import { config } from '../../../config/index'
-import { addEdges } from '../../../util/edge'
+import { Pagebase } from '../pagebase/index'
+import { removeVideo } from '../../component/video/manager'
+import { execScript } from '../../util/index'
+import { config } from '../../config/index'
+import { addEdges } from '../../util/edge'
 import {
   $$suspend,
   $$original,
   $$autoRun
-} from '../../command/index'
+} from '../command/index'
 
 
 /**
@@ -30,11 +30,10 @@ const runScript = (pageObject, type) => {
 
 export default class PageMgr extends Abstract {
 
-  constructor(vm) {
+  constructor(rootNode) {
     super()
+    this.rootNode = rootNode
     this.pageType = 'page';
-    //页面根节点
-    this.pagesNode = vm.options.rootPage;
     //创建合集容器
     this.abstractCreateCollection();
   }
@@ -49,12 +48,13 @@ export default class PageMgr extends Abstract {
   create(dataOpts, pageIndex) {
     //生成指定页面对象
     const pageObjs = new Pagebase(
-        _.extend(dataOpts, {
-          'pageType': this.pageType, //创建页面的类型
-          'rootNode': this.pagesNode //根元素
-        })
-      )
-      //增加页面管理
+      _.extend(dataOpts, {
+        'pageType': this.pageType, //创建页面的类型
+        'rootNode': this.rootNode //根元素
+      })
+    )
+
+    //增加页面管理
     this.abstractAddCollection(pageIndex, pageObjs);
     return pageObjs;
   }
@@ -180,8 +180,8 @@ export default class PageMgr extends Abstract {
       }
 
       //如果页面容器存在,才处理自动运行
-      var currpagesNode = currPageObj.getContainsNode()
-      if(!currpagesNode) {
+      var currpageNode = currPageObj.getContainsNode()
+      if(!currpageNode) {
         return complete()
       }
 
@@ -273,7 +273,7 @@ export default class PageMgr extends Abstract {
     //清理对象
     this.abstractDestroyCollection();
     //清理节点
-    this.pagesNode = null;
+    this.rootNode = null;
   }
 
 

@@ -6,7 +6,7 @@
  **********************************************************************/
 import { config } from '../../config/index'
 import { Observer } from '../../observer/index'
-import Dispatcher from './dispatch/index'
+import Dispatcher from '../dispatch/index'
 import delegateHooks from './hooks'
 import closestProcessor from './closest'
 import GlobalEvent from '../../swipe/index.js'
@@ -91,11 +91,11 @@ export default class Mediator extends Observer {
     configMultiple(options)
 
     const $globalEvent = vm.$globalEvent = new GlobalEvent({
-      hasHooks: true,
+      hasHook: true,
       initIndex: options.initIndex,
       container: options.container,
       flipMode: options.flipMode, //翻页模式
-      pageTotal: options.pageTotal, //总数
+      totalIndex: options.pageTotal, //总数
       multiplePages: options.multiplePages, //多页面
       sectionRang: options.sectionRang //分段值
     })

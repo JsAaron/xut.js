@@ -9,14 +9,14 @@ export class Abstract {
    * @return {[type]} [description]
    */
   abstractCreateCollection() {
-    this.Collections = {}
+    this._collection = {}
   }
 
   /**
    * 增加合集管理
    */
   abstractAddCollection(pageIndex, pageObj) {
-    this.Collections[pageIndex] = pageObj;
+    this._collection[pageIndex] = pageObj;
   }
 
   /**
@@ -24,7 +24,7 @@ export class Abstract {
    * @return {[type]} [description]
    */
   abstractGetCollection() {
-    return this.Collections;
+    return this._collection;
   }
 
   /**
@@ -32,7 +32,7 @@ export class Abstract {
    * @return {[type]} [description]
    */
   abstractRemoveCollection(pageIndex) {
-    delete this.Collections[pageIndex];
+    delete this._collection[pageIndex];
   }
 
   /**
@@ -40,11 +40,11 @@ export class Abstract {
    * @return {[type]} [description]
    */
   abstractDestroyCollection() {
-    var k, Collections = this.Collections;
-    for(k in Collections) {
-      Collections[k].baseDestroy()
+    var k, _collection = this._collection;
+    for(k in _collection) {
+      _collection[k].baseDestroy()
     }
-    this.Collections = null;
+    this._collection = null;
   }
 
   /**
@@ -63,7 +63,7 @@ export class Abstract {
         pageIndex = this.converMasterId(pageIndex)
       }
     }
-    return this.Collections && this.Collections[pageIndex]
+    return this._collection && this._collection[pageIndex]
   }
 
   /**

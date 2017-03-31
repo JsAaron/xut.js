@@ -6,17 +6,17 @@
  *                2. MasterMgr 模块                                                          *
  **********************************************************************/
 
-import { config } from '../../../config/index'
+import { config } from '../../config/index'
 import PageMgr from '../manage/page'
 import MasterMgr from '../manage/master'
 import goToPage from './topage'
-import Stack from '../../../util/stack'
+import Stack from '../../util/stack'
 
-import { sceneController } from '../../scene-control'
-import { getVisualDistance } from '../../v-distance/index'
-import { setCustomStyle } from '../../v-style/index'
+import { sceneController } from '../scene-control'
+import { getVisualDistance } from '../v-distance/index'
+import { setCustomStyle } from '../v-style/index'
 import { setVisualMode } from './set-mode'
-import { $$set, hash, $$warn } from '../../../util/index'
+import { $$set, hash, $$warn } from '../../util/index'
 
 import {
   initPointer,
@@ -35,11 +35,11 @@ export default class Dispatcher {
     this.options = vm.options;
 
     //创建前景页面管理模块
-    this.pageMgr = new PageMgr(vm)
+    this.pageMgr = new PageMgr(vm.options.rootPage)
 
     // 检测是否需要创母版模块
     if(hasMaster()) {
-      this.masterMgr = new MasterMgr(vm);
+      this.masterMgr = new MasterMgr(vm.options.rootMaster);
     }
   }
 

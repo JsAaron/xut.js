@@ -30,7 +30,7 @@ Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
     historyMode: true,
-    visualMode: 1,
+    visualMode: 3,
     // cursor: {
     //     url: 'images/icons/busyicon.gif',
     //     delayTime: 300
@@ -74,7 +74,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     }
 })
 
-var appId = 306 //311
+var appId = 306 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

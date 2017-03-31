@@ -3,19 +3,19 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import { config } from '../../../config/index'
+import { config } from '../../config/index'
 import { Abstract } from './abstract'
-import { Pagebase } from '../../pagebase/index'
+import { Pagebase } from '../pagebase/index'
 import {
   $$suspend,
   $$original,
   $$autoRun
-} from '../../command/index'
+} from '../command/index'
 import {
   cacheProperty,
   getStepProperty,
   setStyle
-} from '../../../component/activity/content/parallax/depend'
+} from '../../component/activity/content/parallax/depend'
 
 
 /**
@@ -57,7 +57,7 @@ const translateZ = Xut.style.translateZ
  */
 export default class MasterMgr extends Abstract {
 
-  constructor(vm) {
+  constructor(rootNode) {
     super()
 
     this.visualWidth = config.visualSize.width
@@ -65,7 +65,7 @@ export default class MasterMgr extends Abstract {
 
     this.pageType = 'master';
 
-    this.rootNode = vm.options.rootMaster;
+    this.rootNode = rootNode;
     this.recordMasterRange = {}; //记录master区域范围
     this.recordMasterId = {}; //记录页面与母板对应的编号
     this.currMasterId = null; //可视区母板编号
@@ -127,9 +127,9 @@ export default class MasterMgr extends Abstract {
 
     let masterObj = new Pagebase(
       _.extend(dataOpts, {
+        pptMaster, //ppt母板ID
         'pageType': this.pageType, //创建页面的类型
         'rootNode': this.rootNode, //根元素
-        'pptMaster': pptMaster //ppt母板ID
       })
     );
 
