@@ -8,7 +8,6 @@ import { config } from '../../../config/index'
 const reqAnimationFrame = Xut.style.reqAnimationFrame
 const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
-const translateZ = Xut.style.translateZ
 
 /**
  * 切换坐标
@@ -16,7 +15,7 @@ const translateZ = Xut.style.translateZ
  */
 const toTranslate3d = (node, distance, speed, callback) => {
   if(node) {
-    node.style[transform] = `translate(${distance}px,0px) ${translateZ}`
+    node.style[transform] = `translate3d(${distance}px,0px,0px)`
     node.style[transitionDuration] = speed + 'ms'
     callback && callback()
   }
@@ -29,7 +28,7 @@ const toTranslate3d = (node, distance, speed, callback) => {
  */
 const set = (node, x) => {
   if(node) {
-    node.style[transform] = `translate(${x}px,0px) ${translateZ}`
+    node.style[transform] = `translate3d(${x}px,0p,0px)`
   }
 }
 
@@ -39,7 +38,7 @@ const set = (node, x) => {
  */
 const reset = (node) => {
   if(node) {
-    node.style[transform] = `translate(0px,0px) ${translateZ}`
+    node.style[transform] = `translate3d(0px,0px,0px)`
     node.style[transitionDuration] = ''
   }
 }
@@ -87,7 +86,7 @@ export const translation = {
  * @return {[type]}        [description]
  */
 const createTranslate = (offset) => {
-  return 'translate(' + offset + 'px,0px)' + translateZ
+  return 'translate3d(' + offset + 'px,0px,0px)'
 }
 
 /**

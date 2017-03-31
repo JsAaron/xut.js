@@ -12,7 +12,7 @@ export default function zoom(animproto) {
     var direction = parameter.direction; //方向(放大:DirectionIn、屏幕中心放大:DirectionInCenter、轻微放大:DirectionInSlightly、缩小:DirectionOut、屏幕底部缩小:DirectionOutBottom、轻微缩小:DirectionOutSlightly)
     var t1 = null;
     var result
-    object.css("-webkit-transform-origin", "center"); //设置缩放基点(默认是正中心点)
+    object.css(Xut.style.transformOrigin, "center"); //设置缩放基点(默认是正中心点)
     if(isExit == false) {
       t1 = new TimelineMax({
         delay: delay,
@@ -134,9 +134,9 @@ export default function zoom(animproto) {
   animproto.getEffectFadedZoom = function(parameter, object, isExit, duration, delay, repeat) {
     var direction = parameter.direction; //方向(对象中心DirectionIn、幻灯片中心DirectionInCenter)
     var t1 = null;
-    object.css("-webkit-transform-origin", "center"); //设置缩放基点(默认是正中心点)
+    object.css(Xut.style.transformOrigin, "center"); //设置缩放基点(默认是正中心点)
     var svgElement = object.find("svg"); //获取SVG对象
-    if(svgElement) svgElement.css('-webkit-transform', 'translate3d(0px, 0px, 0px)'); //解决SVG文字错乱问题
+    if(svgElement) svgElement.css(Xut.style.transform, 'translate3d(0px, 0px, 0px)'); //解决SVG文字错乱问题
 
     var keepRatio = (parameter.keepRatio == 0) ? false : true; //保持长宽比
     var fullScreen = (parameter.fullScreen == 1) ? true : false; //缩放到全屏

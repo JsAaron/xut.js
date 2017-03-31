@@ -56,10 +56,12 @@ export function priorityConfig() {
   if(trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if(!launch.trackCode) { launch.trackCode = {} }
     trackTypes.forEach(type => { launch.trackCode[type] = true })
+    const uuid = new Date().getTime();
     config.hasTrackCode = (type, callback) => {
       if(launch && launch.trackCode && launch.trackCode[type]) {
         callback && callback(option => {
           Xut.Application.Notify('trackCode', type, _.extend(option || {}, {
+            uuid,
             appId: config.data.appId,
             appName: config.data.shortName
           }))

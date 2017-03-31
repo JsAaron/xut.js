@@ -1,6 +1,4 @@
-import {
-  $$warn
-} from './debug'
+import { $$warn } from './debug'
 
 /**
  * 2015.3.24

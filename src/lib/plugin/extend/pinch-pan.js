@@ -3,8 +3,6 @@ import { config } from '../../config/index'
 
 const transform = Xut.style.transform
 const transitionDuration = Xut.style.transitionDuration
-const translateZ = Xut.style.translateZ
-
 
 const START_X = 0
 const START_Y = 0
@@ -286,10 +284,7 @@ export class PinchPan {
     if(!this.ticking) {
       Xut.nextTick(() => {
         const data = this.data
-        const styleText =
-          `translate(${data.translate.x}px,${data.translate.y}px) ${translateZ}
-            scale(${data.scale},${data.scale})`
-
+        const styleText = `translate3d(${data.translate.x}px,${data.translate.y}px,0px) scale(${data.scale},${data.scale})`
         this.pinchNode.style[transform] = styleText
         this.pinchNode.style[transitionDuration] = speed + 'ms'
         this.update && this.update(styleText, speed)
@@ -366,7 +361,7 @@ export class PinchPan {
       this.$buttonNode = null
     }
     this.hammer.destroy()
-    //关闭按钮
+      //关闭按钮
     this.$buttonNode && this.$buttonNode.off()
   }
 }

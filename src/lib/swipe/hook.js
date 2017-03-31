@@ -23,18 +23,37 @@ export default function siwpeHook(e, node) {
     return
   }
 
+  const dataType = node.getAttribute('data-type')
+
+  //代码跟踪
+  //如果是点击的超链接页面
+  //这个是fast-pipe功能
+  let hasTyperlink = false
+  if(dataType === 'hyperlink') {
+    hasTyperlink = true
+    config.hasTrackCode('hot', function(notify) {
+      notify({
+        id: node.getAttribute('data-id'),
+        pageId: node.getAttribute('data-page-id'),
+        type: 'hyperlink',
+        eventName: 'tap'
+      })
+    })
+  }
+
+
   //如果是移动端的情况下 && 支持二维码 && 是图片 && 是二维码标记
   if(config.supportQR &&
     Xut.plat.hasTouch &&
     node.nodeName.toLowerCase() === "img" &&
-    node.getAttribute('data-type') === 'qrcode') {
+    dataType === 'qrcode') {
     return 'qrcode'
   } else {
     if(Xut.plat.isBrowser &&
       !Xut.IBooks.Enabled &&
       !window.MMXCONFIG &&
       !window.DUKUCONFIG &&
-      node.getAttribute('data-type') !== 'hyperlink') { //超链接不阻止
+      !hasTyperlink) { //超链接不阻止
       e.preventDefault && e.preventDefault();
     }
   }

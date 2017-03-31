@@ -52,11 +52,14 @@ export default function FastPipe(data, base) {
           //数组
           href = preCode[0]
         }
+
         //替换img为div>a
         imgContext.replaceWith(String.styleFormat(
           `<div class="inherit-size fullscreen-background fix-miaomiaoxue-img"
                 style="background-image:url(${imgContext.attr('src')});">
-              <a data-type="hyperlink"
+              <a  data-id="${id}"
+                  data-page-id="${base.pageId}"
+                  data-type="hyperlink"
                   href="${href}"
                   class="inherit-size"
                   style="display:block;"/>

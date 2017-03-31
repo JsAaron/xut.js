@@ -50,7 +50,7 @@ Xut.Application.setConfig = {
         // }
     },
     // brModel:1,
-    // trackCode: ['launch','app', 'page', 'action', 'hot'],
+    trackCode: ['launch','app', 'page', 'action', 'hot'],
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: true,
@@ -59,7 +59,7 @@ Xut.Application.setConfig = {
 
 
 Xut.Application.Watch('trackCode', function(type, options) {
-    console.log(type)
+    console.log(type,options)
     switch (type) {
         case 'launch':
             break;
@@ -74,7 +74,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     }
 })
 
-var appId = 306 //306
+var appId = 44 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

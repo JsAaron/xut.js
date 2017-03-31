@@ -84,7 +84,7 @@ export default class Mark {
     const height = sLineHeiht * 3 // menu的高为3em
     const sHeight = this.sHeight
     const box =
-      `<div class="xut-bookmark-menu" 
+      `<div class="xut-bookmark-menu"
                style="width:100%;height:${height}px;left:0;top:${sHeight}px;">
               <div class="xut-bookmark-wrap">
                 <div class="xut-bookmark-add">加入书签</div>
@@ -345,7 +345,7 @@ export default class Mark {
    */
   closeBookMark(target) {
     this.bookMarkMenu.css({
-      transform: 'translate3d(0,0,0)',
+      transform: 'translate3d(0px,0px,0px)',
       'transition-duration': '1s'
     })
   }
@@ -356,7 +356,7 @@ export default class Mark {
    */
   restore() {
     this.bookMarkMenu.css({
-      transform: 'translate3d(0,-' + this.markHeight + 'px,0)',
+      transform: 'translate3d(0px,-' + this.markHeight + 'px,0px)',
       'transition-duration': '1s'
     })
   }

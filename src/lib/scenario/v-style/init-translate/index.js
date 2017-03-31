@@ -2,15 +2,13 @@ import { config } from '../../../config/index'
 import { leftTranslate } from './hook/left'
 import { rightTranslate } from './hook/right'
 
-const translateZ = Xut.style.translateZ
-
 /**
  * 创建translate初始值
  * @param  {[type]} offset [description]
  * @return {[type]}        [description]
  */
 const createTranslate = (offset) => {
-  return `translate(${offset}px,0) ${translateZ}`
+  return `translate3d(${offset}px,0px,0px)`
 }
 
 /**

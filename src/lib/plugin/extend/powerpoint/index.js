@@ -10,10 +10,7 @@ import special from './extend/special'
 import zoom from './extend/zoom'
 import shape from './extend/shape'
 
-import {
-  parseJSON,
-  makeJsonPack
-} from '../../../util/lang'
+import { parseJSON, makeJsonPack } from '../../../util/lang'
 
 const ROUND = Math.round
 const CEIL = Math.ceil
@@ -633,14 +630,14 @@ export default class Powepoint {
   reset() {
     this.animation && this.stop();
     if(this.elementStyle && this.elementStyle.length) {
-      const origin = this.element.css("-webkit-transform-origin");
+      const origin = this.element.css(Xut.style.transformOrigin);
       //卷滚区域里的对象不需要还原
       if(this.element.attr("data-iscroll") == null) {
         this.element[0].style.cssText = this.elementStyle;
       }
-      this.element.css("-webkit-transform-origin", origin);
+      this.element.css(Xut.style.transformOrigin, origin);
       this.element.css("visibility", this.elementVisibility);
-      this.element.css("-webkit-transform", "none");
+      this.element.css(Xut.style.transform, "none");
       this.element[0]["_gsTransform"] = null; //清理对象上绑定的动画属性
     }
     this.isCompleted = false;

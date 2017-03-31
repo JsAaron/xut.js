@@ -163,7 +163,7 @@ export default class Swipe extends Observer {
     let visualIndex = newIndex || this.visualIndex
     this._initDistance = -visualIndex * (this._visualWidth + this.extraGap)
     if(this.container) {
-      this.container.style[Xut.style.transform] = 'translate(' + this._initDistance + 'px,0px)' + Xut.style.translateZ
+      this.container.style[Xut.style.transform] = 'translate3d(' + this._initDistance + 'px,0px,0px)'
     }
   }
 

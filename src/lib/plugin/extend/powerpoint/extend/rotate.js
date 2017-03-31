@@ -1,3 +1,5 @@
+const transformOrigin = Xut.style.transformOrigin
+
 /**
  * 旋转类动画
  * @param  {[type]} animproto [description]
@@ -76,34 +78,35 @@ export default function rotate(animproto) {
     var degree = parameter.amount ? parameter.amount : 360; //陀螺旋转角度
     if(Math.abs(parameter.degree) > 0) degree = parameter.degree;
     if(parameter.clockWise == 0) degree = 0 - degree; //逆时针旋转
+
     switch(parameter.centerPos) {
       case 1: //左上角
-        object.css("-webkit-transform-origin", "left top");
+        object.css(transformOrigin, "left top");
         break;
       case 2: //上边中心
-        object.css("-webkit-transform-origin", "center top");
+        object.css(transformOrigin, "center top");
         break;
       case 3: //右上角
-        object.css("-webkit-transform-origin", "right top");
+        object.css(transformOrigin, "right top");
         break;
       case 4: //左边中心
-        object.css("-webkit-transform-origin", "left cneter");
+        object.css(transformOrigin, "left cneter");
         break;
       case 5: //右边中心
-        object.css("-webkit-transform-origin", "right center");
+        object.css(transformOrigin, "right center");
         break;
       case 6: //左下角
-        object.css("-webkit-transform-origin", "left bottom");
+        object.css(transformOrigin, "left bottom");
         break;
       case 7: //下边中心
-        object.css("-webkit-transform-origin", "center bottom");
+        object.css(transformOrigin, "center bottom");
         break;
       case 8: //右下角
-        object.css("-webkit-transform-origin", "right bottom");
+        object.css(transformOrigin, "right bottom");
         break;
       case 0:
       default: //默认中心0
-        object.css("-webkit-transform-origin", "center");
+        object.css(transformOrigin, "center");
         break;
     }
 
@@ -320,32 +323,32 @@ export default function rotate(animproto) {
     if(parameter.clockWise == 0) degree = 0 - degree; //逆时针旋转
     switch(parameter.centerPos) {
       case 1: //左上角
-        object.css("-webkit-transform-origin", "left top");
+        object.css(transformOrigin, "left top");
         break;
       case 2: //上边中心
-        object.css("-webkit-transform-origin", "center top");
+        object.css(transformOrigin, "center top");
         break;
       case 3: //右上角
-        object.css("-webkit-transform-origin", "right top");
+        object.css(transformOrigin, "right top");
         break;
       case 4: //左边中心
-        object.css("-webkit-transform-origin", "left cneter");
+        object.css(transformOrigin, "left cneter");
         break;
       case 5: //右边中心
-        object.css("-webkit-transform-origin", "right center");
+        object.css(transformOrigin, "right center");
         break;
       case 6: //左下角
-        object.css("-webkit-transform-origin", "left bottom");
+        object.css(transformOrigin, "left bottom");
         break;
       case 7: //下边中心
-        object.css("-webkit-transform-origin", "center bottom");
+        object.css(transformOrigin, "center bottom");
         break;
       case 8: //右下角
-        object.css("-webkit-transform-origin", "right bottom");
+        object.css(transformOrigin, "right bottom");
         break;
       case 0:
       default: //默认中心0
-        object.css("-webkit-transform-origin", "center");
+        object.css(transformOrigin, "center");
         break;
     }
     if(parameter.tweenEase && parameter.tweenEase.length > 0) easeString = parameter.tweenEase;

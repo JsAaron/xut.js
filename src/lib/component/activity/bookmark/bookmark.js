@@ -299,7 +299,7 @@ BookMark.prototype.handleEvent = function(evt) {
  */
 BookMark.prototype.closeBookMark = function() {
   this.bookMarkMenu.css({
-    transform: 'translate3d(0,0,0)',
+    transform: 'translate3d(0px,0px,0px)',
     'transition-duration': '1s'
   })
 }
@@ -309,7 +309,7 @@ BookMark.prototype.closeBookMark = function() {
  */
 BookMark.prototype.restore = function() {
   this.bookMarkMenu.css({
-    transform: 'translate3d(0,-' + this.markHeight + 'px,0)',
+    transform: 'translate3d(0px,-' + this.markHeight + 'px,0px)',
     'transition-duration': '1s'
   })
 }

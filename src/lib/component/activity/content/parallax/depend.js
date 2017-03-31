@@ -2,7 +2,6 @@ import { config } from '../../../../config/index'
 
 const transitionDuration = Xut.style.transitionDuration
 const transform = Xut.style.transform
-const translateZ = Xut.style.translateZ
 const setTranslateZ = Xut.style.setTranslateZ
 const round = Math.round
 
