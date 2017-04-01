@@ -6,7 +6,7 @@
 import { Abstract } from './abstract'
 import { Pagebase } from '../pagebase/index'
 import { removeVideo } from '../../component/video/manager'
-import { execScript } from '../../util/index'
+import { execScript, $$on, $$off } from '../../util/index'
 import { config } from '../../config/index'
 import { addEdges } from '../../util/edge'
 import {
@@ -36,6 +36,18 @@ export default class PageMgr extends Abstract {
     this.pageType = 'page';
     //创建合集容器
     this.abstractCreateCollection();
+
+    /*
+    双页模式，给父节点绑定一个翻页监听事件
+    如果翻页完成，手动触发翻页事件
+    */
+    if(config.doublePageMode) {
+      $$on(rootNode, {
+        transitionend: function() {
+          Xut.Application.tiggerFilpComplete()
+        }
+      })
+    }
   }
 
 
@@ -59,6 +71,17 @@ export default class PageMgr extends Abstract {
     return pageObjs;
   }
 
+  /*
+  页面容器滑动
+   */
+  _containerMove(action, moveDist, speed) {
+    let distance = moveDist[1]
+    if(action === 'flipOver') {
+      // distance = distance * 2
+    }
+    this.rootNode.style[Xut.style.transform] = `translate3d(${distance}px,0px,0px)`
+    this.rootNode.style[Xut.style.transitionDuration] = speed + 'ms'
+  }
 
   /**
    * 移动页面
@@ -74,15 +97,20 @@ export default class PageMgr extends Abstract {
     rightIndex,
     direction
   }) {
-    _.each([
-      this.abstractGetPageObj(leftIndex),
-      this.abstractGetPageObj(currIndex),
-      this.abstractGetPageObj(rightIndex)
-    ], function(pageObj, index) {
-      if(pageObj) {
-        pageObj.moveContainer(action, moveDist[index], speed, moveDist[3], direction)
-      }
-    })
+
+    if(config.doublePageMode) {
+      this._containerMove(action, moveDist, speed)
+    } else {
+      _.each([
+        this.abstractGetPageObj(leftIndex),
+        this.abstractGetPageObj(currIndex),
+        this.abstractGetPageObj(rightIndex)
+      ], function(pageObj, index) {
+        if(pageObj) {
+          pageObj.moveContainer(action, moveDist[index], speed, moveDist[3], direction)
+        }
+      })
+    }
   }
 
 
@@ -272,6 +300,12 @@ export default class PageMgr extends Abstract {
 
     //清理对象
     this.abstractDestroyCollection();
+
+    //销毁事件
+    if(config.doublePageMode) {
+      $$off(this.rootNode)
+    }
+
     //清理节点
     this.rootNode = null;
   }

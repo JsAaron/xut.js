@@ -3,6 +3,7 @@
  ************************/
 
 export function leftTranslate(styleDataset) {
+
   let middlePageStyle = styleDataset.getPageStyle('middle', 'left')
   let leftPageStyle = styleDataset.getPageStyle('left')
 

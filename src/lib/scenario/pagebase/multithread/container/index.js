@@ -15,7 +15,7 @@ const TANSFROM = Xut.style.transform
 /**
  * 创建页面容器li
  */
-const createli = function({
+const createHTML = function({
   base,
   prefix,
   translate,
@@ -24,6 +24,10 @@ const createli = function({
   background
 }) {
   const getStyle = base.getStyle
+
+  //设置滑动的偏移量
+  //双页面只有布局偏移量，没有滑动偏移量
+  const translate3d = translate ? `${ TANSFROM }:${ translate }` : ''
 
   //增加一个main-content放body内容
   //增加一个header-footer放溢出的页眉页脚
@@ -38,7 +42,7 @@ const createli = function({
                 height:${getStyle.visualHeight}px;
                 left:${getStyle.visualLeft}px;
                 top:${getStyle.visualTop}px;
-                ${TANSFROM}:${translate};
+                ${translate3d};
                 ${background}
                 ${customStyle}">
         <div class="page-pinch">
@@ -74,7 +78,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
     })
   }
 
-  return $(createli({
+  return $(createHTML({
     base,
     prefix,
     translate: getStyle.translate,
@@ -108,7 +112,7 @@ export default function(base, pageData, taskCallback) {
   Xut.nextTick({
     container: base.rootNode,
     content: $pageNode,
-    position: getStyle.direction === 'before' ? 'first' : 'last'
+    position: getStyle.direction === 'left' ? 'first' : 'last'
   }, () => {
     taskCallback($pageNode, $pseudoElement)
   });

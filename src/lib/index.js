@@ -71,9 +71,7 @@ Xut.Application.Launch = option => {
   if(setConfig && setConfig.lauchMode === 1) {
     mixGolbalConfig(setConfig);
     cacheOptions = [option] //多次切换
-    config.launch = $.extend(true, {
-      launchTime: (+new Date)
-    }, option)
+    config.launch = $.extend(true, { launchTime: (+new Date) }, option)
     if(option.path) {
       _.each(option.path, (value, key) => {
         config.launch[key] = key === 'resource' ? slashPostfix(value) : value

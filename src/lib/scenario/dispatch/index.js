@@ -28,6 +28,33 @@ import {
 } from './depend'
 
 
+/*
+获取双页参数
+1:从属的主索引
+2:摆放位置
+ */
+const getDoubleOption = function(chapterIndex, doublePage) {
+  if(doublePage.total) {
+    for(let key in doublePage) {
+      if(key !== 'total') {
+        let doubleData = doublePage[key]
+        let index = doubleData.indexOf(chapterIndex)
+        if(~index) {
+          return {
+            doubleMainIndex: Number(key),
+            doublePosition: index == 0 ? 'left' : 'right'
+          }
+        }
+      }
+    }
+  }
+  return {
+    doubleMainIndex: undefined,
+    doublePosition: undefined
+  }
+}
+
+
 export default class Dispatcher {
 
   constructor(vm) {
@@ -178,6 +205,17 @@ export default class Dispatcher {
 
       compile.push((() => {
 
+        /*
+        双页模式
+        1:子页面从属主页面，一左一右从属
+          比如子页面   chapterIndex：  [2,3,0,1,4,5]
+          从属的主页面 belongMainIndex:[1,1,0,0,2,2]
+
+        2:计算页面是左右摆放位置
+          position: left/right
+         */
+        const { doubleMainIndex, doublePosition } = getDoubleOption(chapterIndex, createDoublePage)
+
         const chapterData = converChapterData(chapterIndex)
 
         /*
@@ -207,7 +245,9 @@ export default class Dispatcher {
           userStyle,
           chapterIndex,
           visualChapterIndex,
-          direction: getDirection(chapterIndex, visualChapterIndex),
+          doublePosition, //双页面位置
+          doubleMainIndex, //从属主页面，双页模式
+          direction: getDirection(doubleMainIndex !== undefined ? doubleMainIndex : chapterIndex, visualChapterIndex),
           pageVisualMode: setVisualMode(chapterData)
         }
 
