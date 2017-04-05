@@ -116,6 +116,24 @@ export function initPointer(targetIndex, pageTotal, multiplePages) {
     }
   }
 
+  return {
+    createPointer,
+    initPointer
+  }
+}
+
+/*
+页面页面，转化双页面
+///启动了双页模式
+///创建的页面需要修改了索引处理
+///创建索引0
+/// 变化成 0-1
+///以此类推
+needTotal 为true 就是返回带total的合集
+1 返回带needTotal的合集
+2 返回单页转化的双页数组
+ */
+export function converDoublePage(createPointer, needTotal) {
 
   /////////////////////////////////////
   ///
@@ -125,32 +143,43 @@ export function initPointer(targetIndex, pageTotal, multiplePages) {
   /// 变化成 0-1
   ///以此类推
   /////////////////////////////////////
-  let createDoublePage = {
-    total: 0 //记录总数
+  let createDoublePage = {}
+
+  /*记录总数*/
+  let total = 0
+
+  if(createPointer == undefined) {
+    return createDoublePage
   }
+
   if(config.doublePageMode) {
     let base, left, right
+    if(!createPointer.length) {
+      createPointer = [createPointer]
+    }
     createPointer.forEach(function(index) {
       if(index === 0) {
         createDoublePage[index] = [0, 1]
-        createDoublePage.total += 2
+        total += 2
       } else {
         base = index * 2
         left = base
         right = base + 1
-        createDoublePage.total += 2;
+        total += 2;
         (createDoublePage[index] = []).push(left, right)
       }
     })
   }
 
-  return {
-    createPointer,
-    initPointer,
-    createDoublePage
+  if(needTotal) {
+    createDoublePage.total = total
+    return createDoublePage
   }
-}
 
+  /*createPointer => [0]
+    createDoublePage => [0,1]*/
+  return createDoublePage[createPointer[0]]
+}
 
 
 /**

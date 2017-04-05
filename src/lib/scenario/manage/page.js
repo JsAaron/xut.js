@@ -50,6 +50,12 @@ export default class PageMgr extends Abstract {
     }
   }
 
+  /*设置页面的初始化的translate值*/
+  setInitTranslate(pageIndex) {
+    if(config.doublePageMode) {
+      this.rootNode.style[Xut.style.transform] = `translate3d(-${config.screenSize.width*pageIndex}px,0px,0px)`
+    }
+  }
 
   /**
    * 创建页新的页面
@@ -72,13 +78,9 @@ export default class PageMgr extends Abstract {
   }
 
   /*
-  页面容器滑动
+  滑动页面容器
    */
-  _containerMove(action, moveDist, speed) {
-    let distance = moveDist[1]
-    if(action === 'flipOver') {
-      // distance = distance * 2
-    }
+  _moveContainer(distance, speed) {
     this.rootNode.style[Xut.style.transform] = `translate3d(${distance}px,0px,0px)`
     this.rootNode.style[Xut.style.transitionDuration] = speed + 'ms'
   }
@@ -88,26 +90,26 @@ export default class PageMgr extends Abstract {
    * @return {[type]}
    */
   move({
-    nodes,
     speed,
     action,
-    moveDist,
+    moveDistance,
     leftIndex,
     currIndex,
     rightIndex,
     direction
   }) {
-
+    /*双页模式，移动父容器*/
     if(config.doublePageMode) {
-      this._containerMove(action, moveDist, speed)
+      this._moveContainer(moveDistance[1], speed)
     } else {
+      /*单页模式，移动每个独立的页面*/
       _.each([
         this.abstractGetPageObj(leftIndex),
         this.abstractGetPageObj(currIndex),
         this.abstractGetPageObj(rightIndex)
       ], function(pageObj, index) {
         if(pageObj) {
-          pageObj.moveContainer(action, moveDist[index], speed, moveDist[3], direction)
+          pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], direction)
         }
       })
     }
@@ -120,8 +122,8 @@ export default class PageMgr extends Abstract {
    * 2 停止热点对象运行
    *     停止动画,视频音频等等
    */
-  suspend(pointers) {
-    const stopPointer = pointers.stopPointer
+  suspend(leftIndex, currIndex, rightIndex, stopPointer) {
+
     const suspendPageObj = this.abstractGetPageObj(stopPointer)
     const prveChpterId = suspendPageObj.baseGetPageId(stopPointer)
 
@@ -138,7 +140,7 @@ export default class PageMgr extends Abstract {
     //翻页结束脚本
     runScript(suspendPageObj, 'postCode');
     //中断节点创建任务
-    this.$$suspendInnerCreateTasks(pointers);
+    this._suspendInnerCreateTasks(leftIndex, currIndex, rightIndex);
     //停止活动对象活动
     suspendPageObj.destroyPageAction()
     suspendPageObj.resetSwipeSequence()
@@ -179,7 +181,7 @@ export default class PageMgr extends Abstract {
    */
   autoRun(data) {
 
-    var self = this;
+    const self = this;
 
     /**
      * 预执行背景创建
@@ -187,7 +189,7 @@ export default class PageMgr extends Abstract {
      * 1 初始化,或者快速翻页补全前后页面
      * 2 正常翻页创建前后
      */
-    const preCreate = function(preCreateTask) {
+    const preCreateTask = function(preCreateTask) {
       var resumePointer;
       if(data.isQuickTurn || !data.direction) {
         resumePointer = [data.prevIndex, data.nextIndex];
@@ -198,13 +200,13 @@ export default class PageMgr extends Abstract {
     };
 
 
-    //激活自动运行对象
-    const startAutoRun = function(currPageObj, data) {
+    /*激活自动运行对象*/
+    const activateAutoRun = function(currPageObj, data) {
 
       //结束通知
       function complete() {
         data.processComplete();
-        preCreate();
+        preCreateTask();
       }
 
       //如果页面容器存在,才处理自动运行
@@ -262,10 +264,10 @@ export default class PageMgr extends Abstract {
       self.resetOriginal(data.suspendIndex)
 
       //预构建背景
-      preCreate('background');
+      preCreateTask('background');
 
       //等待动画结束后构建
-      startAutoRun(currPageObj, data);
+      activateAutoRun(currPageObj, data);
     })
 
   }
@@ -278,7 +280,8 @@ export default class PageMgr extends Abstract {
    */
   clearPage(clearPageIndex) {
     const pageObj = this.abstractGetPageObj(clearPageIndex)
-      //销毁页面对象事件
+
+    //销毁页面对象事件
     if(pageObj) {
       //移除事件
       pageObj.baseDestroy();
@@ -316,14 +319,29 @@ export default class PageMgr extends Abstract {
    * @param {[type]}   currIndex [description]
    * @param {Function} callback  [description]
    */
-  $$suspendInnerCreateTasks(pointers) {
-    var pageObj,
-      self = this;
-    [pointers.leftIndex, pointers.currIndex, pointers.rightIndex].forEach(function(pointer) {
-      if(pageObj = self.abstractGetPageObj(pointer)) {
-        pageObj.setTaskSuspend();
+  _suspendInnerCreateTasks(leftIndex, currIndex, rightIndex) {
+    let self = this;
+
+    /*设置中断任务
+    1.如果没有参数返回
+    2.保证数组格式遍历*/
+    const suspendTask = function(pageIndex) {
+      if(pageIndex !== undefined) {
+        if(!pageIndex.length) {
+          pageIndex = [pageIndex]
+        }
+        let pageObj;
+        pageIndex.forEach(function(pointer) {
+          if(pageObj = self.abstractGetPageObj(pointer)) {
+            pageObj.setTaskSuspend();
+          }
+        })
       }
-    })
+    }
+
+    suspendTask(leftIndex)
+    suspendTask(currIndex)
+    suspendTask(rightIndex)
   }
 
   /**

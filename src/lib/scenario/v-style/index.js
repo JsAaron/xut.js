@@ -29,7 +29,9 @@ export function setCustomStyle(styleDataset) {
   3.提供快速索引
    */
   _.each(styleDataset, (data, index) => {
+
     _.extend(data, getVisualSize(data))
+
     data.pageProportion = getPageProportion(data)
 
     /*数组形式，因为有双页面的情况*/

@@ -1,4 +1,5 @@
 import { config, resetVisualLayout } from '../../config/index'
+import { converDoublePage } from '../dispatch/depend'
 
 /**
  * 创建li的translate起始坐标信息
@@ -29,32 +30,14 @@ export function getVisualSize(styleDataset) {
   }
 
   /*
-  双页模式，重新定义页面尺寸与布局
+  双页模式，重新定义页面尺寸与布局,从0页面开始叠加每个页面的距离
    */
-  if(doubleMainIndex !== undefined && doublePosition) {
-    //定义每个页面的组合
-    switch(direction) {
-      case 'left':
-        if(doublePosition === 'left') {
-          visualSize.left = -visualSize.width * 2
-        } else {
-          visualSize.left = -visualSize.width
-        }
-        break;
-      case 'middle':
-        if(doublePosition === 'left') {
-          visualSize.left = 0
-        } else {
-          visualSize.left = visualSize.width
-        }
-        break;
-      case 'right':
-        if(doublePosition === 'left') {
-          visualSize.left = visualSize.width * 2
-        } else {
-          visualSize.left = visualSize.width * 3
-        }
-        break;
+  if(doublePosition && doubleMainIndex !== undefined) {
+    const doubleIds = converDoublePage(doubleMainIndex)
+    if(doublePosition === 'left') {
+      visualSize.left = doubleIds[0] * visualSize.width
+    } else {
+      visualSize.left = doubleIds[1] * visualSize.width
     }
   }
 

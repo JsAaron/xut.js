@@ -16,7 +16,7 @@ export default function(baseProto) {
    * 页面移动
    * @return {[type]} [description]
    */
-  baseProto.moveContainer = function(action, distance, speed, viewOffset, direction) {
+  baseProto.movePage = function(action, distance, speed, viewOffset, direction) {
 
     const pageNode = this.$pageNode[0]
 

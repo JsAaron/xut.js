@@ -109,7 +109,7 @@ export default function(baseProto) {
   baseProto.moveParallax = function({
     action,
     direction,
-    moveDist,
+    moveDistance,
     pageIndex,
     speed,
     nodes,
@@ -127,7 +127,7 @@ export default function(baseProto) {
     let isColumn = base.getStyle.pageVisualMode === 1
 
     //移动距离
-    let distance = moveDist.length ? moveDist[1] : moveDist
+    let distance = moveDistance.length ? moveDistance[1] : moveDistance
 
     //遍历所有活动对象
     _.each(baseContents, content => {

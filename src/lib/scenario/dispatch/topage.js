@@ -13,7 +13,7 @@ const improveIndex = (complier, { currIndex } = {}) => {
   })
 
   //提高mater层级
-  complier.masterContext(function() {
+  complier.getMasterContext(function() {
     this.abstractAssistPocess(currIndex, pageObj => {
       pageObj.$pageNode.css({
         'z-index': 1
@@ -44,7 +44,7 @@ const calculateFlip = (complier, data, createCallback) => {
     collectContainers.push(function(targetIndex, pageIndex) {
       return function(callback) {
         //创建新结构
-        complier.createPageBases([pageIndex], targetIndex, 'toPage', callback, {
+        complier.createPageBase([pageIndex], targetIndex, 'toPage', callback, {
           'opacity': 0 //同页面切换,规定切换的样式
         })
       }
@@ -130,7 +130,7 @@ const createContainerView = (complier, data) => {
   let jumpPocesss
 
   //母版
-  complier.masterContext(function() {
+  complier.getMasterContext(function() {
     jumpPocesss = this.makeJumpPocesss(data)
     jumpPocesss.pre();
   })

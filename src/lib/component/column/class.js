@@ -102,7 +102,7 @@ export default class ColumnClass {
         action,
         direction,
         pageIndex: visualIndex + 1,
-        moveDist: viewBeHideDistance,
+        moveDistance: viewBeHideDistance,
         nodes: direction === 'next' ? nodes[visualIndex] : ''
       })
     }

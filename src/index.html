@@ -29,7 +29,7 @@
 Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
-    historyMode: false,
+    historyMode: true,
     visualMode: 1,
     // cursor: {
     //     url: 'images/icons/busyicon.gif',
@@ -41,20 +41,20 @@ Xut.Application.setConfig = {
     //     1080: 'mi',
     //     1440: 'hi'
     // },
-    pageBar: {
-        // type: 'circular',
-        // mode: 1
-        // position: {
-        //     top: '90%',
-        //     left: '20%'
-        // }
-    },
+    // pageBar: {
+    //     type: 'circular',
+    //     mode: 1
+    //     position: {
+    //         top: '90%',
+    //         left: '20%'
+    //     }
+    // },
     // brModel:1,
     // trackCode: ['launch','app', 'page', 'action', 'hot'],
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: true,
-    // doublePageMode: true //双页模式
+    doublePageMode: true //双页模式
 };
 
 
@@ -98,7 +98,6 @@ $("#activate").click(function() {
 })
 
 $("#closeMini").click(function() {
-  console.log(111)
     Xut.Application.Exit()
 })
 </script>

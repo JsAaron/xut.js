@@ -24,7 +24,7 @@ import initstate from './internal/init-state'
 import threadExternal from './internal/thread-api'
 import dataExternal from './internal/data-api'
 import destroy from './internal/destroy'
-import moveContainer from './move/container'
+import movePage from './move/page'
 import moveParallax from './move/parallax'
 
 export class Pagebase {
@@ -38,6 +38,6 @@ const baseProto = Pagebase.prototype
 initstate(baseProto)
 threadExternal(baseProto)
 dataExternal(baseProto)
-moveContainer(baseProto)
+movePage(baseProto)
 moveParallax(baseProto)
 destroy(baseProto)

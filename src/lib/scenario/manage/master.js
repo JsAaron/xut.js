@@ -148,7 +148,7 @@ export default class MasterMgr extends Abstract {
     nodes,
     speed,
     action,
-    moveDist,
+    moveDistance,
     leftIndex,
     currIndex,
     rightIndex,
@@ -165,7 +165,7 @@ export default class MasterMgr extends Abstract {
     _.each(masterObjs, function(pageObj, index) {
       if(pageObj) {
         isBoundary = true
-        pageObj.moveContainer(action, moveDist[index], speed, moveDist[3], direction)
+        pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], direction)
       }
     })
 
@@ -187,9 +187,9 @@ export default class MasterMgr extends Abstract {
         currParallaxObj.moveParallax({
           action,
           direction,
-          moveDist,
           speed,
           nodes,
+          moveDistance,
           parallaxProcessedContetns: this.parallaxProcessedContetns
         })
       }
@@ -211,13 +211,12 @@ export default class MasterMgr extends Abstract {
    * 停止行为
    * @return {[type]} [description]
    */
-  suspend(pointers) {
+  suspend(stopPointer) {
     //如果未越界不需要处理行为
     if(!this.isBoundary) return;
-    var masterObj,
-      stopPointer = pointers.stopPointer;
+    let masterObj
     if(masterObj = this.abstractGetPageObj(stopPointer)) {
-      var pageId = masterObj.baseGetPageId(stopPointer);
+      let pageId = masterObj.baseGetPageId(stopPointer);
       //停止活动对象活动
       $$suspend(masterObj, pageId);
     }
