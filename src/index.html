@@ -30,7 +30,7 @@ Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
     historyMode: true,
-    visualMode: 1,
+    visualMode: 2,
     // cursor: {
     //     url: 'images/icons/busyicon.gif',
     //     delayTime: 300
@@ -54,7 +54,7 @@ Xut.Application.setConfig = {
     supportQR: true,
     swipeDelegate: true,
     useHDImageZoom: true,
-    doublePageMode: true //双页模式
+    // doublePageMode: true //双页模式
 };
 
 
@@ -74,7 +74,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     }
 })
 
-var appId = 101 //306
+var appId = 301 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

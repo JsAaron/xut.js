@@ -1,5 +1,5 @@
-import { config } from '../../../../config/index'
-import { getFileFullPath } from '../../../../util/option'
+import { config } from '../../../../../config/index'
+import { getFileFullPath } from '../../../../../util/option'
 
 const maskBoxImage = Xut.style.maskBoxImage
 

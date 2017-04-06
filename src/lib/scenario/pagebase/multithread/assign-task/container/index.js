@@ -6,9 +6,9 @@
  *      2 创建完毕
  *      3 创建失败
  */
-import { config } from '../../../../config/index'
-import { hasValue } from '../../../../util/lang'
-import { getFileFullPath } from '../../../../util/option'
+import { config } from '../../../../../config/index'
+import { hasValue } from '../../../../../util/lang'
+import { getFileFullPath } from '../../../../../util/option'
 
 const TANSFROM = Xut.style.transform
 

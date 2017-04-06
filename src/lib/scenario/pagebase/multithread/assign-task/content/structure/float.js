@@ -1,5 +1,5 @@
-import { nextTick } from '../../../../../util/nexttick'
-import { arrayUnique } from '../../../../../util/index'
+import { nextTick } from '../../../../../../util/nexttick'
+import { arrayUnique } from '../../../../../../util/index'
 
 /**
  *创建浮动相关的信息

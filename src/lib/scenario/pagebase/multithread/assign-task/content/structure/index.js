@@ -7,7 +7,7 @@
  * @return {[type]} [description]
  */
 
-import { config } from '../../../../../config/index'
+import { config } from '../../../../../../config/index'
 import { createDom } from './render/dom'
 import { createCanvas } from './render/canvas'
 import { createContainer } from './render/container'
@@ -21,7 +21,7 @@ import {
   getResources,
   createRandomImg,
   getFileFullPath
-} from '../../../../../util/index'
+} from '../../../../../../util/index'
 
 /**
  * 制作包装对象

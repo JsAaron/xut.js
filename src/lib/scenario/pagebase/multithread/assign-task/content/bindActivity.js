@@ -1,4 +1,4 @@
-import ActivityClass from '../../../../component/activity/index'
+import ActivityClass from '../../../../../component/activity/index'
 
 
 /** 配置ID

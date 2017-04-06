@@ -1,5 +1,5 @@
 import { config } from '../../../../config/index'
-import assignedTasks from './assign-task'
+import assignedTasks from '../assign-task/index'
 import initstate from './init-state'
 import Pinch from './pinch'
 
@@ -38,6 +38,7 @@ export default function schedulerTask(instance) {
     container() {
 
       callContextTasks('Container', function($pageNode, $pseudoElement) {
+
         //////////////
         //li,li-div //
         //////////////
@@ -86,9 +87,10 @@ export default function schedulerTask(instance) {
      * @return {[type]} [description]
      */
     background() {
+
       callContextTasks('Background', function() {
         createRelated.preCreateTasks = false;
-        setNextRunTask('Column')
+        setNextRunTask('column')
 
         //针对当前页面的检测
         if(!createRelated.tasksHang || instance.isMaster) {
@@ -113,7 +115,7 @@ export default function schedulerTask(instance) {
      * 是否为流式排版
      * @return {[type]} [description]
      */
-    Column() {
+    column() {
 
       //如果是页面类型
       let isPageType = instance.pageType === 'page'
@@ -156,7 +158,6 @@ export default function schedulerTask(instance) {
 
     /**
      * 组件
-     * @return {[type]} [description]
      */
     components() {
       //构件零件类型任务
@@ -173,10 +174,10 @@ export default function schedulerTask(instance) {
 
     /**
      * content
-     * @return {[type]} [description]
      */
     contents() {
       callContextTasks('Contents', function() {
+        //设置任务完成
         setNextRunTask('complete')
         createRelated.createTasksComplete();
       })

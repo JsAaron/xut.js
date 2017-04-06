@@ -1,6 +1,7 @@
 import { errorTable } from '../../database/cache'
 import { query } from '../../database/query'
 import { config } from '../../config/index'
+import { $$warn } from '../../util/debug'
 
 /**
  * 判断是否能整除2
@@ -182,6 +183,31 @@ export function converDoublePage(createPointer, needTotal) {
 }
 
 
+/*
+获取页面处理的合集，保持接口处理一致，判断逻辑封装
+1.双页
+2.单页
+return []
+ */
+export function getRealPage(pageIndex, type) {
+
+  if(pageIndex === undefined) {
+    // $$warn(`${type}调用getRealPage传递pageIndex为空`)
+    return []
+  }
+
+  if(config.doublePageMode) {
+    /*转化后的页面合集*/
+    const pageIds = converDoublePage(pageIndex)
+      /*双页*/
+    if(pageIds.length) {
+      return pageIds
+    }
+  }
+
+  return [pageIndex]
+}
+
 /**
   1 加快页面解析，可视区页面最开始创建
   2 双页面页码解析
@@ -203,7 +229,7 @@ export function converChapterIndex(options, createSinglePage, createDoublePage, 
     如果最先创建的的页面不是可视区页面
     就需要切换对应的
    */
-  if(cloneCreateSinglePage[0] !== `visualPageIndex`) {
+  if(cloneCreateSinglePage[0] !== visualPageIndex) {
     const indexOf = cloneCreateSinglePage.indexOf(visualPageIndex)
     const less = cloneCreateSinglePage.splice(indexOf, 1)
     cloneCreateSinglePage = less.concat(cloneCreateSinglePage)

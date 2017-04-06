@@ -1,4 +1,4 @@
-import { reviseSize } from '../../../../../../util/option'
+import { reviseSize } from '../../../../../../../util/option'
 import { parseContentData } from '../../parser/dataset'
 
 /**

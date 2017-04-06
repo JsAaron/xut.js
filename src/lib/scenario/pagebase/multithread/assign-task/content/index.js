@@ -4,8 +4,8 @@
  *      结构合并创建类    Structure
  *      行为动画绑定类     Content
  * ***************************************************/
-import { config } from '../../../../config/index'
-import { nextTick } from '../../../../util/nexttick'
+import { config } from '../../../../../config/index'
+import { nextTick } from '../../../../../util/nexttick'
 import { bindActivity } from './bindActivity'
 import { zoomImage } from './zoomImage'
 import { textFx } from './textFx'
@@ -14,7 +14,7 @@ import { parseBehavior } from './parser/behavior'
 import { activityParser } from './parser/activity'
 import { contentStructure } from './structure/index'
 import { createFloatMater, createFloatPage } from './structure/float'
-import { sceneController } from '../../../../scenario/scene-control'
+import { sceneController } from '../../../../../scenario/scene-control'
 
 
 /**
@@ -143,7 +143,6 @@ export default class TaskContents {
    * 绑定事件
    */
   _dataStrCheck(pipeData, userData) {
-
     this._assert('strAfter', function() {
       /*缩放图片*/
       if(Object.keys(pipeData.zoomBehavior).length) {
@@ -170,6 +169,7 @@ export default class TaskContents {
    * @return {[type]}              [description]
    */
   _eventAfterCheck(pipeData, delayHooks, headerFooterMode) {
+
     const self = this;
     this._assert('eventAfter', function() {
 
@@ -204,7 +204,7 @@ export default class TaskContents {
             self._applyAfterCheck()
             return
           }
-          pipeData.taskCount;
+          --pipeData.taskCount;
         }
       }()
 

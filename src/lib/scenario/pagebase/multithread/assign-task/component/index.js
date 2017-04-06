@@ -6,8 +6,8 @@
  *      2 创建完毕
  *      3 创建失败
  */
-import directives from '../../../directive/index'
-import { reviseSize } from '../../../../util/option'
+import directives from '../../../../directive/index'
+import { reviseSize } from '../../../../../util/option'
 
 export default function TaskComponents(data, suspendCallback, successCallback) {
 

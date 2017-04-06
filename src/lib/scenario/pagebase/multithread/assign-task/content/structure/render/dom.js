@@ -1,9 +1,9 @@
-import { config } from '../../../../../../config/index'
+import { config } from '../../../../../../../config/index'
 import {
   parseJSON,
   replacePath,
   getFileFullPath
-} from '../../../../../../util/index'
+} from '../../../../../../../util/index'
 
 const maskBoxImage = Xut.style.maskBoxImage
 const FLOOR = Math.floor

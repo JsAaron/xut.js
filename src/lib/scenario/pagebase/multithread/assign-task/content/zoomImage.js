@@ -1,10 +1,16 @@
 ///////////////////////////
 ///    缩放提示图片
 //////////////////////////
+import { config } from '../../../../../config/index'
+import { Zoom } from '../../../../../plugin/extend/zoom/index'
+import {
+  $$on,
+  $$off,
+  getFileFullPath,
+  analysisImageName,
+  getHDFilePath
+} from '../../../../../util/index'
 
-import { $$on, $$off, getFileFullPath } from '../../../../util/index'
-import { Zoom } from '../../../../plugin/extend/zoom/index'
-import { analysisImageName, getHDFilePath } from '../../../../util/option'
 
 /*图片*/
 function createHTML() {
@@ -39,7 +45,7 @@ export function zoomImage(pipeData) {
             const analysisName = analysisImageName(src)
             zoomObjs[src] = new Zoom({
               element: $imgNode,
-              originalSrc: getFileFullPath(analysisName.suffix,'pagebase-zoom'),
+              originalSrc: getFileFullPath(analysisName.suffix, 'pagebase-zoom'),
               hdSrc: getHDFilePath(analysisName.original)
             })
           }

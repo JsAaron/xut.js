@@ -1,5 +1,5 @@
-import ColumnClass from '../../../../component/column/class'
-import { isColumnPage } from '../../../../component/column/depend'
+import ColumnClass from '../../../../../component/column/class'
+import { isColumnPage } from '../../../../../component/column/depend'
 /**
  * 2017.9.7
  * 流式排版

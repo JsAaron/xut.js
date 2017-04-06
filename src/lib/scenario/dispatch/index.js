@@ -9,7 +9,7 @@
 import { config } from '../../config/index'
 import PageMgr from '../manage/page'
 import MasterMgr from '../manage/master'
-import goToPage from './topage'
+import goToPage from './jump-page'
 import Stack from '../../util/stack'
 
 import { sceneController } from '../scene-control'
@@ -21,6 +21,7 @@ import { $$set, hash, $$warn } from '../../util/index'
 import {
   initPointer,
   getDirection,
+  getRealPage,
   converVisualPid,
   converDoublePage,
   converChapterData,
@@ -65,7 +66,7 @@ export default class Dispatcher {
     //创建前景页面管理模块
     this.pageMgr = new PageMgr(vm.options.rootPage)
 
-    // 检测是否需要创母版模块
+    //检测是否需要创母版模块
     if(hasMaster()) {
       this.masterMgr = new MasterMgr(vm.options.rootMaster);
     }
@@ -74,8 +75,7 @@ export default class Dispatcher {
   /**
    * 初始化页面创建
    * 因为多个页面的问题，所以不是创建调用
-   * 统一回调
-   * @return {[type]} [description]
+   * 提供外部接口启动创建
    */
   initCreate() {
     const options = this.options
@@ -118,8 +118,8 @@ export default class Dispatcher {
     const self = this
     const options = this.options
     const multiplePages = options.multiplePages //是否线性
-    const toPageAction = action === 'toPage' //如果是跳转
-    const filpOverAction = action === 'flipOver' //如果是翻页
+    const isToPageAction = action === 'toPage' //如果是跳转
+    const isFlipAction = action === 'flipOver' //如果是翻页
 
     /*启动了双页模式，单页转化双页*/
     const createDoublePage = converDoublePage(createSinglePage, true)
@@ -163,22 +163,22 @@ export default class Dispatcher {
 
     //构建执行代码
     const callbackAction = {
-      //初始化
+      /*初始化完毕*/
       init() {
         collectCallback(() => {
-          self._loadPage('init');
+          self._initPage('init');
         })
       },
-      //翻页
+      /*翻页完毕，运行自动*/
       flipOver() {
         collectCallback(() => {
-          self._runPageBase({ //翻页
+          self._runPageBase({
             'createPointer': createChpaterIndexGroup,
             'createMaster': createMaster
           });
         })
       },
-      //跳转
+      /*跳转处理*/
       toPage() {
         collectCallback(() => {
           toPageCallback(collectPageBase);
@@ -246,7 +246,7 @@ export default class Dispatcher {
         跳转的时候，创建新页面可以自动样式信息
         优化设置，只是改变当前页面即可
         */
-        if(toPageAction && visualChapterIndex !== chapterIndex) {
+        if(isToPageAction && visualChapterIndex !== chapterIndex) {
           userStyle = undefined
         }
 
@@ -286,10 +286,11 @@ export default class Dispatcher {
             //判断pageBase是因为母版不需要重复创建
             //母版是共享多个paga
             if(pageBase) {
+
               //开始线程任务，如果是翻页模式,支持快速创建
-              pageBase.startThreadTask(filpOverAction, () => {
+              pageBase.startThreadTask(isFlipAction, () => {
                 callbackAction[action]()
-              })
+              }, isToPageAction)
 
               //收集自定义样式的页面对象
               if(userStyle) {
@@ -323,7 +324,6 @@ export default class Dispatcher {
      */
     compile.shiftAll(setCustomStyle(styleDataset)).destroy()
   }
-
 
   /**
    * 滑动处理
@@ -423,12 +423,9 @@ export default class Dispatcher {
     }
   }
 
-
   /**
    * 翻页松手后
    * 暂停页面的各种活动动作
-   * @param  {[type]} pointers [description]
-   * @return {[type]}          [description]
    */
   suspendPageBases(pointers) {
 
@@ -445,7 +442,7 @@ export default class Dispatcher {
     /*多页面,停止每个页面的动作
     1.停止的可能是多页面
     2.转化对应的页面数据，用于停止页面任务创建*/
-    if(stopPageIndexs.length) {
+    if(stopPageIndexs) {
       const leftIds = converDoublePage(leftIndex)
       const currIds = converDoublePage(currIndex)
       const rightIds = converDoublePage(rightIndex)
@@ -470,90 +467,16 @@ export default class Dispatcher {
     this.vm.$emit('change:resetToolbar')
   }
 
-
-  /**
-   * 翻页动画完毕后
-   * @return {[type]}              [description]
-   */
-  completePageBases(direction, pagePointer, unfliplock, isQuickTurn) {
-    /*方向*/
-    this.direction = direction;
-    /*是否快速翻页*/
-    this.isQuickTurn = isQuickTurn || false;
-    /*翻页解锁*/
-    this.unfliplock = unfliplock;
-    /*清理上一个页面*/
-    this._clearPage(pagePointer.destroyPointer)
-      /*更新索引*/
-    this._updatePointer(pagePointer);
-    //预创建下一页
-    this._createNextPage(direction, pagePointer);
-  }
-
-
-  /**
-   * 页面跳转
-   * @param  {[type]} data [description]
-   * @return {[type]}      [description]
-   */
-  gotoPageBases(data) {
-
-    Xut.View.ShowBusy()
-
-    //如果是非线性,创建页面修改
-    if(!this.options.multiplePages) {
-      data.create = [data.targetIndex];
-      data.destroy = [data.currIndex];
-      data.ruleOut = [data.targetIndex];
-      data.pagePointer = {
-        currIndex: data.targetIndex
-      }
-    }
-
-    //执行页面切换
-    goToPage(this, data, function(data) {
-      this._updatePointer(data.pagePointer);
-      this._runPageBase({
-        'action': 'toPage',
-        'createPointer': data['create']
-      });
-      Xut.View.HideBusy();
-    })
-  }
-
-
-  /**
-   * 调用母版管理器
-   * @return {[type]} [description]
-   */
-  getMasterContext(callback) {
-    if(this.masterMgr) {
-      callback.call(this.masterMgr)
-    }
-  }
-
-
-  /**
-   * 销毁接口
-   * 对应多场景操作
-   * @return {[type]} [description]
-   */
-  destroyPageBases() {
-    this.pageMgr.destroy()
-    this.getMasterContext(function() {
-      this.destroy()
-    })
-  }
-
-
   /**
    * 自动运行处理
    *  流程四:执行自动触发动作
    *   1.初始化创建页面完毕
    *   2.翻页完毕
+   *   3.跳转后
    */
   _runPageBase(para) {
 
+    let vm = this.vm
     let options = this.options
     let pagePointer = this.pagePointer
     let prevIndex = pagePointer.leftIndex
@@ -566,12 +489,10 @@ export default class Dispatcher {
     /*暂停的页面索引autorun*/
     let suspendIndex = action === 'init' ? '' : direction === 'next' ? prevIndex : nextIndex
 
-    /*存在2中模式的情况下,转化页码标记*/
+    /*跳转与翻页的情况下，转化页码标记*/
     if(createPointer) {
       createPointer = converVisualPid(this.options, createPointer)
     }
-
-    let doubleMainIndex = currIndex
 
     const data = {
       prevIndex,
@@ -583,6 +504,9 @@ export default class Dispatcher {
       'isQuickTurn': this.isQuickTurn,
       //中断通知
       'suspendCallback': options.suspendAutoCallback,
+      //流程结束通知
+      //包括动画都已经结束了
+      'processComplete': function() {},
       //构建完毕通知
       'buildComplete': function(scenarioId) {
         /**
@@ -590,16 +514,10 @@ export default class Dispatcher {
          * 如果是调试模式 && 不是收费提示页面 && 多场景应用
          */
         if(config.historyMode && !options.isInApp && options.multiScenario) {
-          var history;
-          if(history = sceneController.sequence(scenarioId, currIndex)) {
-            $$set("history", history)
-          }
+          const history = sceneController.sequence(scenarioId, currIndex)
+          if(history) { $$set("history", history) }
         }
-      },
-
-      //流程结束通知
-      //包括动画都已经结束了
-      'processComplete': function() {}
+      }
     }
 
     //页面自动运行
@@ -615,16 +533,7 @@ export default class Dispatcher {
       }
     })
 
-    /**
-     * 触发自动通知
-     * @type {[type]}
-     */
-    var vm = this.vm
-
-    /**
-     * 初始化与跳转针对翻页案例的设置逻辑
-     * @return {[type]} [description]
-     */
+    /*初始化与跳转针对翻页案例的设置逻辑*/
     const setToolbar = () => {
       //不显示首尾对应的按钮
       if(currIndex == 0) {
@@ -678,56 +587,32 @@ export default class Dispatcher {
 
     //关闭快速翻页
     this.isQuickTurn = false;
-
   }
 
-
-  /**
-   * 清理页面结构
-   * @param  {[type]} clearPageIndex [description]
-   * @return {[type]}                [description]
-   */
+  /*清理页面结构,双页与单页*/
   _clearPage(clearPageIndex) {
-    const clearPageIds = converDoublePage(clearPageIndex)
-    if(clearPageIds.length) {
-      clearPageIds.forEach(pageIndex => {
-        this.pageMgr.clearPage(pageIndex)
-      })
-    } else {
-      this.pageMgr.clearPage(clearPageIndex)
-    }
+    getRealPage(clearPageIndex, 'clearPage').forEach(clearIndex => {
+      this.pageMgr.clearPage(clearIndex)
+    })
   }
 
+  /*更新页码索引标示*/
+  _updatePointer(pointer) { this.pagePointer = pointer }
 
-  /**
-   * 更新页码索引标示
-   * @param  {[type]} pagePointer [description]
-   * @return {[type]}             [description]
-   */
-  _updatePointer(pagePointer) {
-    this.pagePointer = pagePointer
-  }
-
-
-  /**
-   * 预创建新页面
-   * @param  {[type]} direction   [description]
-   * @param  {[type]} pagePointer [description]
-   * @return {[type]}             [description]
-   */
+  /*预创建新页面*/
   _createNextPage(direction, pagePointer) {
-    let pageTotal = this.options.pageTotal
-    let vm = this.vm
-    let createPointer = pagePointer.createPointer
 
-    //清理页码
-    let clearPointer = function() {
-      delete pagePointer.createPointer;
-      delete pagePointer.destroyPointer;
+    const pageTotal = this.options.pageTotal
+    const createPointer = pagePointer.createPointer
+
+    /*清理页码*/
+    const clearPointer = function() {
+      pagePointer.createPointer = null
+      pagePointer.destroyPointer = null
     }
 
-    //创建新的页面对象
-    let createNextPageBase = currIndex => this.createPageBase([createPointer], currIndex, 'flipOver')
+    /*创建新的页面对象*/
+    const createNextPageBase = currIndex => this.createPageBase([createPointer], currIndex, 'flipOver')
 
     //如果是左边翻页
     if(direction === 'prev') {
@@ -735,15 +620,15 @@ export default class Dispatcher {
       if(pagePointer.currIndex === 0) {
         this._runPageBase()
         if(pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-          vm.$emit('change:showNext')
+          this.vm.$emit('change:showNext')
         }
-        vm.$emit('change:hidePrev')
+        this.vm.$emit('change:hidePrev')
         return
       }
       if(pagePointer.currIndex > -1) { //创建的页面
         createNextPageBase(pagePointer.currIndex)
         clearPointer()
-        vm.$emit('change:showNext')
+        this.vm.$emit('change:showNext')
         return;
       }
     }
@@ -754,16 +639,16 @@ export default class Dispatcher {
       if(pagePointer.currIndex === pageTotal - 1) {
         this._runPageBase()
         if(pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-          vm.$emit('change:showPrev')
+          this.vm.$emit('change:showPrev')
         }
         //多页处理
-        vm.$emit('change:hideNext')
+        this.vm.$emit('change:hideNext')
         return
       }
       if(createPointer < pageTotal) { //创建的页面
         createNextPageBase(pagePointer.currIndex)
         clearPointer()
-        vm.$emit('change:showPrev')
+        this.vm.$emit('change:showPrev')
         return
       }
     }
@@ -773,22 +658,70 @@ export default class Dispatcher {
     return
   }
 
+  /*翻页动画完毕后*/
+  completePageBases(direction, pagePointer, unfliplock, isQuickTurn) {
+    /*方向*/
+    this.direction = direction;
+    /*是否快速翻页*/
+    this.isQuickTurn = isQuickTurn || false;
+    /*翻页解锁*/
+    this.unfliplock = unfliplock;
+    /*清理上一个页面*/
+    this._clearPage(pagePointer.destroyPointer);
+    /*更新索引*/
+    this._updatePointer(pagePointer);
+    //预创建下一页
+    this._createNextPage(direction, pagePointer);
+  }
 
-  /**
-   * 加载页面事件与动作
-   * @param  {[type]} action [description]
-   * @return {[type]}        [description]
-   */
-  _loadPage(action) {
+  /*页面跳转*/
+  gotoPageBases(data) {
 
-    let autoRun = () => {
-      this._runPageBase({
-        'action': action
-      })
+    Xut.View.ShowBusy()
+
+    //如果是非线性,创建页面修改
+    if(!this.options.multiplePages) {
+      data.create = [data.targetIndex];
+      data.destroy = [data.currIndex];
+      data.ruleOut = [data.targetIndex];
+      data.pagePointer = {
+        currIndex: data.targetIndex
+      }
     }
 
+    //执行页面切换
+    goToPage(this, data, function(data) {
+      this._updatePointer(data.pagePointer);
+      this._runPageBase({
+        'action': 'toPage',
+        'createPointer': data.create
+      });
+      Xut.View.HideBusy();
+    })
+  }
+
+  /*调用母版管理器*/
+  getMasterContext(callback) {
+    if(this.masterMgr) {
+      callback.call(this.masterMgr)
+    }
+  }
+
+  /*销毁接口,对应多场景操作*/
+  destroyPageBases() {
+    this.pageMgr.destroy()
+    this.getMasterContext(function() {
+      this.destroy()
+    })
+  }
+
+  /*加载页面事件与动作*/
+  _initPage(action) {
+
+    const autoRun = () => this._runPageBase({ 'action': action })
+
     //触发自动任务
-    let triggerAuto = () => {
+    const triggerAuto = () => {
       //第一次进入，处理背景
       let $cover = $(".xut-cover")
       if($cover.length) { //主动探测,只检查一次
@@ -844,6 +777,5 @@ export default class Dispatcher {
       }
     })
   }
-
 
 }

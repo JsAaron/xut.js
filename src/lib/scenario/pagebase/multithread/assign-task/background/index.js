@@ -1,7 +1,7 @@
 import {
   readFile,
   replacePath
-} from '../../../../util/option'
+} from '../../../../../util/option'
 
 import createBackground from './layout'
 

@@ -5,7 +5,7 @@
  **
  *********************************************************/
 
-import { parseJSON, arrayUnique, $$warn } from '../../../../../util/index'
+import { parseJSON, arrayUnique, $$warn } from '../../../../../../util/index'
 
 
 //零件类型,快速判断

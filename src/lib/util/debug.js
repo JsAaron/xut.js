@@ -2,14 +2,21 @@ import { config } from '../config/index'
 
 let $$warn = function() {}
 
+/*
+  $$warn('hello');
+  $$warn('信息','info');
+  $$warn('错误','error');
+  $$warn('警告','warn');
+ */
 if(process.env.NODE_ENV !== 'production') {
   const hasConsole = typeof console !== 'undefined'
-  $$warn = (msg) => {
+  $$warn = (msg, level) => {
     if(hasConsole && config.silent) {
+      const command = console[level] || console.error
       if(typeof msg == 'object') {
-        console.error(`[Xut warn]:`, msg)
+        command(`[Xut warn]:`, msg)
       } else {
-        console.error(`[Xut warn]: ${msg}`)
+        command(`[Xut warn]: ${msg}`)
       }
     }
   }

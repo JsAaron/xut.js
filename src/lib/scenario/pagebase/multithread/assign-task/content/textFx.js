@@ -2,7 +2,7 @@
 ///    文本特效
 //////////////////////////
 
-import { LetterEffect } from '../../../../component/activity/content/letter-effect'
+import { LetterEffect } from '../../../../../component/activity/content/letter-effect'
 
 export function textFx(pipeData, textFx) {
 

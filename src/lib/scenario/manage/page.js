@@ -15,6 +15,8 @@ import {
   $$autoRun
 } from '../command/index'
 
+import { getRealPage } from '../dispatch/depend'
+
 
 /**
  * 检测脚本注入
@@ -150,26 +152,29 @@ export default class PageMgr extends Abstract {
 
   /**
    * 复位初始状态
+   * 转化：双页
    * @return {[type]} [description]
    */
   resetOriginal(pageIndex) {
-    var originalPageObj, floatNode;
-    if(originalPageObj = this.abstractGetPageObj(pageIndex)) {
-      if(floatNode = originalPageObj.floatContents.PageContainer) {
-        //floatPages设置的content溢出后处理
-        //在非视区增加overflow:hidden
-        //可视区域overflow:''
-        floatNode.css({
-          'zIndex': 2000,
-          'overflow': 'hidden'
-        })
+    const originalIds = getRealPage(pageIndex,'resetOriginal')
+    originalIds.forEach(originaIndex => {
+      let originalPageObj = this.abstractGetPageObj(originaIndex)
+      if(originalPageObj) {
+        let floatNode = originalPageObj.floatContents.PageContainer
+        if(floatNode) {
+          //floatPages设置的content溢出后处理
+          //在非视区增加overflow:hidden
+          //可视区域overflow:''
+          floatNode.css({ 'zIndex': 2000, 'overflow': 'hidden' })
+        }
+        $$original(originalPageObj)
       }
-      $$original(originalPageObj);
-    }
+    })
   }
 
   /**
    * 触屏翻页完成
+   * 转化：双页
    * 1 停止热点动作
    * 2 触发新的页面动作
    * @param  {[type]} prevPageIndex [上一页面]
@@ -181,7 +186,11 @@ export default class PageMgr extends Abstract {
    */
   autoRun(data) {
 
-    const self = this;
+    const self = this
+
+    /*转化多页面合集，可能存在多个页面处理*/
+    const createPageset = getRealPage(data.currIndex,'autoRun')
+    const activateLenght = createPageset.length
 
     /**
      * 预执行背景创建
@@ -189,19 +198,23 @@ export default class PageMgr extends Abstract {
      * 1 初始化,或者快速翻页补全前后页面
      * 2 正常翻页创建前后
      */
-    const preCreateTask = function(preCreateTask) {
-      var resumePointer;
+    const preCreateTask = function(taskName) {
+      let resumePointer
+
+      /*init*/
       if(data.isQuickTurn || !data.direction) {
         resumePointer = [data.prevIndex, data.nextIndex];
       } else {
+        /*flip*/
         resumePointer = data.createPointer || data.nextIndex || data.prevIndex
       }
-      self._checkPreforkTasks(resumePointer, preCreateTask);
-    };
+
+      self._checkPreforkTasks(resumePointer, taskName);
+    }
 
 
     /*激活自动运行对象*/
-    const activateAutoRun = function(currPageObj, data) {
+    const activateAutoRun = function(pageObj, data) {
 
       //结束通知
       function complete() {
@@ -210,14 +223,14 @@ export default class PageMgr extends Abstract {
       }
 
       //如果页面容器存在,才处理自动运行
-      var currpageNode = currPageObj.getContainsNode()
+      var currpageNode = pageObj.getContainsNode()
       if(!currpageNode) {
         return complete()
       }
 
       //运行动作
       function startRun() {
-        $$autoRun(currPageObj, data.currIndex, complete);
+        $$autoRun(pageObj, data.currIndex, complete);
       }
 
       //运行如果被中断,则等待
@@ -228,47 +241,45 @@ export default class PageMgr extends Abstract {
       }
     }
 
-    //检测当前页面构建任务的情况
-    //如果任务没有完成，则等待任务完成
-    this._checkTaskCompleted(data.currIndex, function(currPageObj) {
+    /*多页，只允许运行一次的动作*/
+    let onlyonce = false
+    createPageset.forEach(activateIndex => {
+      /*检测页面是否已经完全创建完毕，并且返回页面对象*/
+      this._checkTaskCompleted(activateIndex, function(activatePageObj) {
 
-      /*跟踪，每个页面的停留时间，开始*/
-      if(config.hasTrackCode('page')) {
-        currPageObj.startupTime = +new Date
-      }
+        /*跟踪，每个页面的停留时间，开始*/
+        if(config.hasTrackCode('page')) {
+          activatePageObj.startupTime = +new Date
+        }
 
-      currPageObj.createPageAction()
+        /*watch('complete')方法调用*/
+        activatePageObj.createPageAction()
 
-      //提升当前页面浮动对象的层级
-      //因为浮动对象可以是并联的
-      var floatNode;
-      if(floatNode = currPageObj.floatContents.PageContainer) {
-        floatNode.css({
-          'zIndex': 2001,
-          'overflow': ''
-        })
-      }
+        /*提升当前页面浮动对象的层级,因为浮动对象可以是并联的*/
+        const floatNode = activatePageObj.floatContents.PageContainer
+        if(floatNode) { floatNode.css({ 'zIndex': 2001, 'overflow': '' }) }
 
-      //IE上不支持蒙版效果的处理
-      if(Xut.style.noMaskBoxImage) {
-        addEdges();
-      }
+        /*IE上不支持蒙版效果的处理*/
+        if(Xut.style.noMaskBoxImage) { addEdges() }
 
-      //构件完成通知
-      data.buildComplete(currPageObj.scenarioId);
+        /*执行自动动作之前的脚本*/
+        runScript(activatePageObj, 'preCode');
 
-      //执行自动动作之前的脚本
-      runScript(currPageObj, 'preCode');
+        if(!onlyonce) {
+          onlyonce = true;
+          /*构件完成通知*/
+          data.buildComplete(activatePageObj.scenarioId);
+          /*热点状态复位,多页也只运行一次*/
+          self.resetOriginal(data.suspendIndex);
+          /*预构建背景*/
+          preCreateTask('background')
+        }
 
-      //热点状态复位
-      self.resetOriginal(data.suspendIndex)
-
-      //预构建背景
-      preCreateTask('background');
-
-      //等待动画结束后构建
-      activateAutoRun(currPageObj, data);
+        //等待动画结束后构建
+        activateAutoRun(activatePageObj, data);
+      })
     })
+
 
   }
 
@@ -280,8 +291,6 @@ export default class PageMgr extends Abstract {
    */
   clearPage(clearPageIndex) {
     const pageObj = this.abstractGetPageObj(clearPageIndex)
-
-    //销毁页面对象事件
     if(pageObj) {
       //移除事件
       pageObj.baseDestroy();
@@ -344,15 +353,10 @@ export default class PageMgr extends Abstract {
     suspendTask(rightIndex)
   }
 
-  /**
-   * 检测活动窗口任务
-   * @return {[type]} [description]
-   */
+  /*检测活动窗口任务*/
   _checkTaskCompleted(currIndex, callback) {
-    var currPageObj,
-      self = this;
-    // console.log('激活活动任务',currIndex)
-    if(currPageObj = self.abstractGetPageObj(currIndex)) {
+    const currPageObj = this.abstractGetPageObj(currIndex)
+    if(currPageObj) {
       currPageObj.checkThreadTask(function() {
         // console.log('11111111111当前页面创建完毕',currIndex+1)
         callback(currPageObj)

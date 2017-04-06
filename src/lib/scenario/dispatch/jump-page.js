@@ -31,12 +31,13 @@ const improveIndex = (complier, { currIndex } = {}) => {
  * @return {[type]}                [description]
  */
 const calculateFlip = (complier, data, createCallback) => {
+
   //缓存当前页面索引用于销毁
-  var pageIndex,
-    i = 0,
-    collectContainers = [],
-    create = data.create,
-    targetIndex = data.targetIndex;
+  let pageIndex
+  let i = 0
+  let collectContainers = []
+  let create = data.create
+  let targetIndex = data.targetIndex
 
   //需要创建的页面闭包器
   for(; i < create.length; i++) {
@@ -44,11 +45,11 @@ const calculateFlip = (complier, data, createCallback) => {
     collectContainers.push(function(targetIndex, pageIndex) {
       return function(callback) {
         //创建新结构
-        complier.createPageBase([pageIndex], targetIndex, 'toPage', callback, {
+        this.createPageBase([pageIndex], targetIndex, 'toPage', callback, {
           'opacity': 0 //同页面切换,规定切换的样式
         })
       }
-    }(targetIndex, pageIndex));
+    }(targetIndex, pageIndex))
   }
 
 
@@ -60,19 +61,18 @@ const calculateFlip = (complier, data, createCallback) => {
    */
   data.pageBaseCollect = [];
 
-  var i = 0,
-    collectLength, count,
-    count = collectLength = collectContainers.length;
+  let count, collectLength
+  let j = 0
+
+  count = collectLength = collectContainers.length;
 
   if(collectContainers && collectLength) {
-    for(; i < collectLength; i++) {
+    for(; j < collectLength; j++) {
       //收集创建的根节点,异步等待容器的创建
-      collectContainers[i].call(complier, callbackPageBase => {
+      collectContainers[j].call(complier, callbackPageBase => {
         if(count === 1) {
           collectContainers = null;
-          setTimeout(() => {
-            createCallback(data);
-          }, 100)
+          setTimeout(() => { createCallback(data) }, 100)
         }
         //接受创建后返回的页面对象
         data.pageBaseCollect.push(callbackPageBase);

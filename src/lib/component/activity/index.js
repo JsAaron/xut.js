@@ -353,11 +353,9 @@ export default class Activity {
               'scenarioId': scenarioInfo.seasonId,
               'chapterId': scenarioInfo.chapterId
             })
-          }, hasAudioes() ? 1000 : 0)
+          }, hasAudioes() ? 500 : 0)
           return
         }
-
-        // console.log('content跳转信息出错',scenarioInfo)
       }
     }
   }

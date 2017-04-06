@@ -15,23 +15,23 @@ export default function(baseProto) {
    * dispatch=>index=>create=>startThreadTask
    * @return {[type]} [description]
    */
-  baseProto.startThreadTask = function(flipOver, callback) {
+  baseProto.startThreadTask = function(isFlipAction, callback, isToPageAction) {
 
-    //制作回调
-    //如果是快速翻页,立刻调用
-    //构建container调用preforkComplete
+    this.isToPageAction = isToPageAction
+
+    /*
+    构建container任务完成后的一次调用
+    用于处理快速翻页
+     */
     this.createRelated.preforkComplete = (() => {
       return() => {
-        if(config.quickFlip) {
-          //1 滑动允许打断创建
-          //
-          //swich
-          //2 所有继续分解任务
-          flipOver ? callback() : this._checkTasksCreate(callback, this)
+        /*当创建完容器后，就允许快速翻页了
+        如果此时是快速打开，并且是翻页的动作*/
+        if(config.quickFlip && isFlipAction) {
+          callback()
         } else {
-          //如果不允许快速翻页
-          //必须等待页面创建完毕
-          this._checkTasksCreate(callback, this)
+          /*如果不是快速翻页，那么就继续往下分解任务*/
+          this._checkNextTaskCreate(callback)
         }
       }
     })()
@@ -46,8 +46,8 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.dispatchTasks = function() {
-    let threadtasks
-    if(threadtasks = this.threadtasks[this.createRelated.nextRunTask]) {
+    const threadtasks = this.threadtasks[this.createRelated.nextRunTask]
+    if(threadtasks) {
       threadtasks()
     }
   }
@@ -86,7 +86,7 @@ export default function(baseProto) {
    */
   baseProto.checkThreadTask = function(actTasksCallback) {
     this.hasAutoRun = true;
-    this._checkTasksCreate(() => {
+    this._checkNextTaskCreate(() => {
       this.hasAutoRun = false
       actTasksCallback()
     })
@@ -136,7 +136,7 @@ export default function(baseProto) {
     if(this.createRelated.preCreateTasks) {
       this.createRelated.tasksHang = function(callback) {
         return function() {
-          self._checkTasksCreate(callback);
+          self._checkNextTaskCreate(callback);
         }
       }(callback);
       return;
@@ -150,7 +150,7 @@ export default function(baseProto) {
       this.createRelated.preCreateTasks = true;
     }
 
-    this._checkTasksCreate(callback);
+    this._checkNextTaskCreate(callback);
   }
 
 
@@ -161,22 +161,22 @@ export default function(baseProto) {
    * 3 如果任务未中断,还在继续创建
    * currtask 是否为当前任务，加速创建
    */
-  baseProto._checkTasksCreate = function(callback, context) {
+  baseProto._checkNextTaskCreate = function(callback) {
 
     //如果任务全部完成
     if(this.createRelated.nextRunTask === 'complete') {
-      return callback.call(context)
+      return callback()
     }
 
-    var self = this;
+    const self = this
 
     //开始构未完成的任务
-    this._cancelTaskSuspend();
+    this._cancelTaskSuspend()
 
     //完毕回调
     this.createRelated.createTasksComplete = () => {
       this.collectHooks && this.collectHooks.threadtaskComplete()
-      callback.call(context)
+      callback()
     };
 
     //派发任务

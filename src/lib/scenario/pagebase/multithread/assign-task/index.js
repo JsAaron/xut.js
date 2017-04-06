@@ -1,10 +1,10 @@
 import { config } from '../../../../config/index'
 import updataCache from './sync-cache'
-import TaskContainer from '../container/index'
-import TaskBackground from '../background/index'
-import TaskContents from '../content/index'
-import TaskComponents from '../component/index'
-import TaskColumns from '../column/index'
+import TaskContainer from './container/index'
+import TaskBackground from './background/index'
+import TaskContents from './content/index'
+import TaskComponents from './component/index'
+import TaskColumns from './column/index'
 
 /**
  * 解析canvas配置

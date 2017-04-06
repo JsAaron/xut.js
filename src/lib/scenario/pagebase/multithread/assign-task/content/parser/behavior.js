@@ -1,4 +1,4 @@
-import { createFn, parseJSON } from '../../../../../util/index'
+import { createFn, parseJSON } from '../../../../../../util/index'
 
 /**
  * 行为反馈
