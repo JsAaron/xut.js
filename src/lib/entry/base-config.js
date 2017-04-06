@@ -1,6 +1,6 @@
 import initTooBar from './toolbar'
 import { $$warn, loadStyle, setFastAnalysisRE } from '../util/index'
-import { createCursor } from '../initial/cursor'
+import { createCursor } from '../initialize/cursor'
 import { initColumn } from '../component/column/core-init'
 import { contentFilter } from '../component/activity/content/content-filter'
 import { importJsonDatabase } from '../database/result'

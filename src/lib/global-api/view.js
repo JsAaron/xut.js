@@ -1,6 +1,6 @@
 import { SceneFactory } from '../scenario/scene-factory'
 import { sceneController } from '../scenario/scene-control'
-import { ShowBusy, HideBusy, ShowTextBusy } from '../initial/cursor'
+import { ShowBusy, HideBusy, ShowTextBusy } from '../initialize/cursor'
 import { toNumber, $$remove, $$extend, $$warn } from '../util/index'
 
 

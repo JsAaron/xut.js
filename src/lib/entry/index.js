@@ -1,8 +1,8 @@
 import baseConfig from './base-config'
 import loadScene from './scenario'
 import { config } from '../config/index'
-import { bindAndroid } from '../initial/button'
-import { plugVideo, html5Video } from '../initial/video'
+import { bindAndroid } from '../initialize/button'
+import { plugVideo, html5Video } from '../initialize/video'
 import { $$set, $$get, parseJSON } from '../util/index'
 
 const getCache = name => $$get(name)

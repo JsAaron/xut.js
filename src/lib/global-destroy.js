@@ -6,10 +6,10 @@ import { destroyFixAudio } from './component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
 import { config, destroyConfig } from './config/index'
 import { $$resetUUID } from './util/stroage'
-import { offAndroid } from './initial/button'
-import { cleanCursor } from './initial/cursor'
-import { cleanGlobalEvent } from './initial/event'
-import { removeRootNode } from './initial/node'
+import { offAndroid } from './initialize/button'
+import { cleanCursor } from './initialize/cursor'
+import { cleanGlobalEvent } from './initialize/event'
+import { removeRootNode } from './initialize/node'
 
 /**
  * 销毁接口
