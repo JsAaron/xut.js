@@ -3,7 +3,7 @@ import { getFileFullPath } from '../../util/option'
 import { translation } from '../../scenario/pagebase/move/translation'
 import { getColumnCount } from './depend'
 import { getVisualDistance } from '../../scenario/v-distance/index'
-import { Zoom } from '../../plugin/extend/zoom/index'
+import { ScalePicture } from '../../plugin/extend/scale-picture/index'
 import { closeButton } from '../../plugin/extend/close-button'
 import { analysisImageName, getHDFilePath } from '../../util/option'
 import Swipe from '../../swipe/index'
@@ -16,53 +16,54 @@ import swipeHooks from '../../swipe/hook.js'
 export default class ColumnClass {
 
   constructor({
+    rootNode,
     pptMaster, //母版ID
     pageIndex,
-    $pinchNode,
     seasonId,
     chapterId,
-    successCallback
+    callback
   }) {
     /*存放缩放对象*/
-    this.zoomObjs = {}
+    this._scaleObjs = {}
     this.pptMaster = pptMaster
     this.chapterId = chapterId
     this.seasonId = seasonId
     this.initIndex = pageIndex
-    this.$pinchNode = $pinchNode
     this.$container = $($('#chapter-flow-' + chapterId).html())
-    this._layout(successCallback)
-  }
 
-  /*布局显示*/
-  _layout(successCallback) {
+    /*布局显示*/
     Xut.nextTick({
-      container: this.$pinchNode,
+      container: rootNode,
       content: this.$container
     }, () => {
       this._init()
-      successCallback()
+      callback()
     })
+
   }
 
   /*缩放图片*/
-  _zoomImage(node) {
+  _zoomPicture(node) {
     const src = node.src
     if(!src) {
       return
     }
     const analysisName = analysisImageName(src)
     const originalName = analysisName.original
-    const zoomObj = this.zoomObjs[originalName]
+
+    /*存在*/
+    const zoomObj = this._scaleObjs[originalName]
     if(zoomObj) {
-      zoomObj.play()
-    } else {
-      this.zoomObjs[originalName] = new Zoom({
-        element: $(node),
-        originalSrc: getFileFullPath(analysisName.suffix,'column-zoom'),
-        hdSrc: getHDFilePath(originalName)
-      })
+      return zoomObj.play()
     }
+
+    /*创建*/
+    this._scaleObjs[originalName] = new ScalePicture({
+      element: $(node),
+      originalSrc: getFileFullPath(analysisName.suffix, 'column-zoom'),
+      hdSrc: getHDFilePath(originalName)
+    })
+
   }
 
   /**
@@ -158,7 +159,7 @@ export default class ColumnClass {
       if(!hasQrcode) {
         const node = ev.target
         if(node && node.nodeName.toLowerCase() === "img") {
-          coloumnObj._zoomImage(node)
+          coloumnObj._zoomPicture(node)
         }
         if(!Xut.Contents.Canvas.getIsTap()) {
           Xut.View.Toolbar()
@@ -309,10 +310,10 @@ export default class ColumnClass {
   destroy() {
 
     //销毁缩放图片
-    if(Object.keys(this.zoomObjs).length) {
-      _.each(this.zoomObjs, (obj, key) => {
+    if(Object.keys(this._scaleObjs).length) {
+      _.each(this._scaleObjs, (obj, key) => {
         obj.destroy()
-        this.zoomObjs[key] = null
+        this._scaleObjs[key] = null
       })
     }
 

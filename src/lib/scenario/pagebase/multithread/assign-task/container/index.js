@@ -45,7 +45,7 @@ const createHTML = function({
                 ${translate3d};
                 ${background}
                 ${customStyle}">
-        <div class="page-pinch">
+        <div class="page-scale">
             <div data-type="main-content"></div>
             <div data-type="header-footer"></div>
         </div>

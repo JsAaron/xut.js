@@ -10,10 +10,10 @@ const START_Y = 0
 /**
  * 缩放、平移操作
  */
-export class PinchPan {
+export class ScalePan {
 
   constructor({
-    $pagePinch,
+    rootNode,
     hasButton = true,
     update,
     tapClose = false, //支持单击关闭
@@ -25,12 +25,9 @@ export class PinchPan {
     this.tapClose = tapClose
     this.tapCallabck = tapCallabck
 
-    //缩放根节点
-    this.$pinchNode = $pagePinch
-    this.pinchNode = $pagePinch[0]
-
-    this._offsetWidth = this.pinchNode.offsetWidth
-    this._offsetHeight = this.pinchNode.offsetHeight
+    this.rootNode = rootNode instanceof jQuery ? rootNode[0] : $rootNode
+    this._offsetWidth = this.rootNode.offsetWidth
+    this._offsetHeight = this.rootNode.offsetHeight
 
     //初始化状态
     this._initState()
@@ -103,7 +100,7 @@ export class PinchPan {
    * @return {[type]} [description]
    */
   _initEvent() {
-    this.hammer = new Hammer.Manager(this.pinchNode)
+    this.hammer = new Hammer.Manager(this.rootNode)
     this.hammer.add(new Hammer.Pan({ threshold: 0, pointers: 0, enable: false }))
     this.hammer.add(new Hammer.Pinch({ threshold: 0 })).recognizeWith(this.hammer.get('pan'))
 
@@ -285,8 +282,8 @@ export class PinchPan {
       Xut.nextTick(() => {
         const data = this.data
         const styleText = `translate3d(${data.translate.x}px,${data.translate.y}px,0px) scale(${data.scale},${data.scale})`
-        this.pinchNode.style[transform] = styleText
-        this.pinchNode.style[transitionDuration] = speed + 'ms'
+        this.rootNode.style[transform] = styleText
+        this.rootNode.style[transitionDuration] = speed + 'ms'
         this.update && this.update(styleText, speed)
         this.ticking = false
       })
@@ -314,7 +311,7 @@ export class PinchPan {
     const $node = closeButton(() => {
       this.reset()
     }, left, top)
-    this.$pinchNode.after($node)
+    $(this.rootNode).after($node)
     return $node
   }
 
@@ -361,7 +358,7 @@ export class PinchPan {
       this.$buttonNode = null
     }
     this.hammer.destroy()
-      //关闭按钮
     this.$buttonNode && this.$buttonNode.off()
+    this.rootNode = null
   }
 }

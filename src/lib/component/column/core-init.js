@@ -52,7 +52,7 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
   const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
   const container = `
             <section class="section-transform" data-flow="true">
-                <div class="page-flow-pinch" data-role="margin" style="width:${containerWidth}px;height:${containerHeight}px;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
+                <div class="page-flow-scale" data-role="margin" style="width:${containerWidth}px;height:${containerHeight}px;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
                     <div data-role="column" id="columns-content" style="${columnWidth};height:100%;${columnGap}">
                         ${data}
                     </div>

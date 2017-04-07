@@ -6,9 +6,9 @@
  * ***************************************************/
 import { config } from '../../../../../config/index'
 import { nextTick } from '../../../../../util/nexttick'
-import { bindActivity } from './bindActivity'
-import { zoomImage } from './zoomImage'
-import { textFx } from './textFx'
+import { textFx } from './text-fx'
+import { compileActivity } from './compile-activity'
+import { zoomPicture } from './zoom-picture'
 import { contentParser } from './parser/content'
 import { parseBehavior } from './parser/behavior'
 import { activityParser } from './parser/activity'
@@ -60,7 +60,7 @@ function toArray(contentsFragment, headerFooterMode) {
 /**
  * content任务类
  */
-export default class TaskContents {
+export default class TaskActivitys {
 
   /*管道参数，贯通*/
   constructor(pipeData) {
@@ -146,7 +146,7 @@ export default class TaskContents {
     this._assert('strAfter', function() {
       /*缩放图片*/
       if(Object.keys(pipeData.zoomBehavior).length) {
-        this.zoomObjs = zoomImage(pipeData)
+        this.zoomObjs = zoomPicture(pipeData)
         this.zoomBehavior = pipeData.zoomBehavior
       }
       //文本特效
@@ -157,7 +157,7 @@ export default class TaskContents {
       //用做软件制作单页预加载
       sceneController.seasonRelated = pipeData.seasonRelated;
       //初始化content对象
-      bindActivity(pipeData, userData.contentDataset, delayHooks => {
+      compileActivity(pipeData, userData.contentDataset, delayHooks => {
         this._eventAfterCheck(pipeData, delayHooks, userData.headerFooterMode)
       })
     })
@@ -295,7 +295,7 @@ export default class TaskContents {
    * @return {[type]} [description]
    */
   _loadComplete() {
-    this.pageBaseHooks.success();
+    this.pageBaseHooks && this.pageBaseHooks.success();
   }
 
   /**
@@ -318,7 +318,7 @@ export default class TaskContents {
       tasks.call(self);
     }
 
-    self.pageBaseHooks.suspend(taskName, nextTasks, suspendTasks);
+    self.pageBaseHooks && self.pageBaseHooks.suspend(taskName, nextTasks, suspendTasks);
   }
 
 

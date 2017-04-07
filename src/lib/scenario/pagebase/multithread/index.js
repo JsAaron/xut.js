@@ -1,7 +1,7 @@
-import { config } from '../../../../config/index'
-import assignedTasks from '../assign-task/index'
-import initstate from './init-state'
-import Pinch from './pinch'
+import { config } from '../../../config/index'
+import assignedTasks from './assign-task/index'
+import initTask from './init-task'
+import PageScale from './page-scale'
 
 const noop = function() {}
 
@@ -11,7 +11,7 @@ export default function schedulerTask(instance) {
    * 创建相关的信息
    * @type {Object}
    */
-  const createRelated = instance.createRelated = initstate(instance)
+  const createRelated = instance.createRelated = initTask(instance)
 
   /**
    * 设置下一个标记
@@ -50,17 +50,17 @@ export default function schedulerTask(instance) {
          * 获取包含容器
          * @return {[type]} [description]
          */
-        const $containsElement = $pageNode.find('.page-pinch > div:first-child')
+        const $containsElement = $pageNode.find('.page-scale > div:first-child')
         instance.getContainsNode = function() {
-          return $pseudoElement ? $pseudoElement : $containsElement
-        }
-        //页眉页脚
+            return $pseudoElement ? $pseudoElement : $containsElement
+          }
+          //页眉页脚
         instance.getHeadFootNode = function() {
-          return $pageNode.find('.page-pinch > div:last-child')
-        }
-        //缩放根节点
-        instance.getPinchNode = function() {
-          return $pseudoElement ? $pseudoElement : $pageNode.find('.page-pinch')
+            return $pageNode.find('.page-scale > div:last-child')
+          }
+          //缩放根节点
+        instance.getScaleNode = function() {
+          return $pseudoElement ? $pseudoElement : $pageNode.find('.page-scale')
         }
 
 
@@ -118,39 +118,32 @@ export default function schedulerTask(instance) {
     column() {
 
       //如果是页面类型
-      let isPageType = instance.pageType === 'page'
+      const isPageType = instance.pageType === 'page'
 
-      /**
-       * 创建页面缩放缩放
-       * flow页面不允许缩放
-       * page页面可以配置缩放
-       * @param  {[type]} flow [description]
-       * @return {[type]}      [description]
+      /*
+      创建页面缩放缩放
+      1.page页面可以配置缩放
+      2.flow页面不允许缩放
        */
-      let createPinch = function(flow) {
-        //页面类型
-        //如果启用了页面缩放
-        //获取开启了全部缩放
-        if(isPageType && (config.salePageType === 'page' || config.salePageType === 'all')) {
-          let $pagePinch = instance.getPinchNode()
-          instance._pinchObj = new Pinch(
-            $pagePinch,
-            instance.pageIndex
-          )
+      const createScale = () => {
+        const salePageType = config.salePageType
+        if(isPageType && (salePageType === 'page' || salePageType === 'all')) {
+          instance._pinchObj = new PageScale(instance.getScaleNode(), instance.pageIndex)
         }
       }
 
-      //chapter=>note == 'flow'
-      //因为设计chapter只有一个flow效果，所以直接跳过别的创建
-      //只处理页面类型
-      //母版跳过
+      /*
+      chapter=>note == 'flow'
+      设计上chapter只有一个flow效果，所以直接跳过别的创建
+      只处理页面类型，母版跳过
+       */
       if(isPageType && instance.chapterData.note == 'flow') {
         callContextTasks('Column', function() {
           setNextRunTask('complete')
           createRelated.createTasksComplete()
         })
       } else {
-        createPinch()
+        createScale()
         setNextRunTask('components')
         instance.dispatchTasks()
       }

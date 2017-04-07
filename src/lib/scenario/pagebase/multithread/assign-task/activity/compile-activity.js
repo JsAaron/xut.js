@@ -17,7 +17,7 @@ export function autoUUID() {
  * 5 canvas动画
  * @return {[type]} [description]
  */
-export function bindActivity(pipeData, contentDataset, callback) {
+export function compileActivity(pipeData, contentDataset, callback) {
   var compiler,
     $containsNode = pipeData.$containsNode,
     eventRelated = pipeData.eventRelated, //合集事件

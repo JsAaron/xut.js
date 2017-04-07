@@ -1,8 +1,8 @@
-import { config } from '../../../../config/index'
+ import { config } from '../../../../config/index'
 import updataCache from './sync-cache'
 import TaskContainer from './container/index'
 import TaskBackground from './background/index'
-import TaskContents from './content/index'
+import TaskActivitys from './activity/index'
 import TaskComponents from './component/index'
 import TaskColumns from './column/index'
 
@@ -237,7 +237,7 @@ export default {
     }, base.collectHooks)
 
 
-    base.createRelated.cacheTasks['contents'] = new TaskContents({
+    base.createRelated.cacheTasks['contents'] = new TaskActivitys({
       'canvasRelated': base.canvasRelated,
       'rootNode': base.rootNode,
       '$containsNode': base.getContainsNode(),

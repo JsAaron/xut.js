@@ -1,12 +1,8 @@
 import { config } from '../../../config/index'
-import { PinchPan } from '../pinch-pan'
-import {
-  $$on,
-  $$off
-} from '../../../util/dom'
-
 import { $$warn } from '../../../util/debug'
-
+import { ScalePan } from '../scale-pan'
+import { $$on, $$off } from '../../../util/dom'
+import { sceneController } from '../../../scenario/scene-control'
 import {
   createUnpeatableNumbers,
   createContainerView,
@@ -16,13 +12,11 @@ import {
   getFinalImgConfig
 } from './util'
 
-import { sceneController } from '../../../scenario/scene-control'
-
 /**
  * 图片缩放功能
  * 2016.12.5
  */
-export class Zoom {
+export class ScalePicture {
 
   constructor({
     element, //img node
@@ -238,12 +232,13 @@ export class Zoom {
     img.src = src
   }
 
+  /*绑定滑动*/
   _bindPan($imgNode) {
     if(!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
       let tapCallabck = () => this._closeSingleView()
-      this.slideObj = new PinchPan({
+      this.slideObj = new ScalePan({
         hasButton: false,
-        $pagePinch: $imgNode,
+        rootNode: $imgNode,
         tapClose: true,
         tapCallabck
       })

@@ -2,7 +2,7 @@
 ///    缩放提示图片
 //////////////////////////
 import { config } from '../../../../../config/index'
-import { Zoom } from '../../../../../plugin/extend/zoom/index'
+import { ScalePicture } from '../../../../../plugin/extend/scale-picture/index'
 import {
   $$on,
   $$off,
@@ -18,7 +18,7 @@ function createHTML() {
   return `<div class="icon-maximize"style="font-size:${size};position:absolute;right:0;"></div>`
 }
 
-export function zoomImage(pipeData) {
+export function zoomPicture(pipeData) {
   let zoomObjs = {}
   let behaviorData
   _.each(pipeData.contentsFragment, function(node) {
@@ -33,22 +33,26 @@ export function zoomImage(pipeData) {
         move() { hasMove = true },
         end() {
           if(hasMove) return
-          let $node = $(node)
-          let $imgNode = $node.find('img')
+          const $node = $(node)
+          const $imgNode = $node.find('img')
           if(!$imgNode.length) {
             return
           }
-          let src = $imgNode[0].src
+
+          /*存在*/
+          const src = $imgNode[0].src
           if(zoomObjs[src]) {
-            zoomObjs[src].play()
-          } else {
-            const analysisName = analysisImageName(src)
-            zoomObjs[src] = new Zoom({
-              element: $imgNode,
-              originalSrc: getFileFullPath(analysisName.suffix, 'pagebase-zoom'),
-              hdSrc: getHDFilePath(analysisName.original)
-            })
+            return zoomObjs[src].play()
           }
+
+          /*创建*/
+          const analysisName = analysisImageName(src)
+          zoomObjs[src] = new ScalePicture({
+            element: $imgNode,
+            originalSrc: getFileFullPath(analysisName.suffix, 'pagebase-zoom'),
+            hdSrc: getHDFilePath(analysisName.original)
+          })
+
         }
       })
 

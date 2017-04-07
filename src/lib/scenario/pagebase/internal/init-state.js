@@ -1,7 +1,7 @@
 import { config } from '../../../config/index'
 import { create as _create } from '../depend/multievent'
 import Collection from '../depend/collection'
-import initTasks from '../multithread/init-task/thread-task'
+import initTasks from '../multithread/index'
 import Factory from '../depend/factory'
 import { watchColumn } from '../watch'
 

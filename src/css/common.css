@@ -843,11 +843,11 @@ video {
 /******************
 *   页面放大
 * *******************/
-.page-pinch {
+.page-scale {
     width: 100%;
     height: 100%;
 }
-.page-pinch-image {
+.page-scale-image {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -855,17 +855,17 @@ video {
     left: 0;
     background-color: white;
 }
-.page-pinch-image >div:first-child {
+.page-scale-image >div:first-child {
     position: absolute;
     background-size: 100% 100%;
 }
-.page-pinch > div {
+.page-scale > div {
     position: absolute;
     width: 100%;
     height: 100%;
     z-index: 1
 }
-.page-pinch > div:first-child {
+.page-scale > div:first-child {
     overflow: hidden;
     z-index: 2
 }
