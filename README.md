@@ -6,8 +6,8 @@ Here, I use the front-end implementation of the project core
 * Web page: [miaomiaoxue](http://www.miaomiaoxue.com/)
 * Mobile application: [appone](http://www.appone.cn/)
 * Desktop program: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
-* Packer application：[duku](http://www.kidreadcool.com/loadclient/)
-* Mini magazine: [Only testing](http://www.docooldigest.com)
+* Packer application：[kidreadcool](http://www.kidreadcool.com/)
+* Mini magazine: [test app](http://www.docooldigest.com)
 * Support more platforms........
 
 
