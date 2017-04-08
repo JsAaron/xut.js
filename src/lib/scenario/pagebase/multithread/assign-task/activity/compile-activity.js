@@ -122,24 +122,26 @@ export function compileActivity(pipeData, contentDataset, callback) {
       }
 
       //注册引用
-      pageBaseHooks.cacheActivity(new ActivityClass({
-        'noticeComplete': callback, //监听完成
-        'pageIndex': pipeData.pageIndex,
-        'canvasRelated': pipeData.canvasRelated, //父类引用
-        'id': imageId || autoUUID(),
-        "type": 'Content',
-        'pageId': pageId,
-        'getStyle': pipeData.getStyle,
-        'activityId': activity._id,
-        '$containsNode': $containsNode,
-        'pageType': compiler.pageType, //构建类型 page/master
-        'dataset': compiler.dataset, //动画表数据 or 视觉差表数据
-        "chapterIndex": chapterIndex, //页码
-        /*需要绑定事件的数据*/
-        'eventData': { eventContentId, eventType, dragdropPara, feedbackBehavior },
-        'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
-        'relatedCallback': relatedCallback //相关回调
-      }))
+      pageBaseHooks.cacheActivity(
+        new ActivityClass({
+          'noticeComplete': callback, //监听完成
+          'pageIndex': pipeData.pageIndex,
+          'canvasRelated': pipeData.canvasRelated, //父类引用
+          'id': imageId || autoUUID(),
+          "type": 'Content',
+          'pageId': pageId,
+          'getStyle': pipeData.getStyle,
+          'activityId': activity._id,
+          '$containsNode': $containsNode,
+          'pageType': compiler.pageType, //构建类型 page/master
+          'dataset': compiler.dataset, //动画表数据 or 视觉差表数据
+          "chapterIndex": chapterIndex, //页码
+          /*需要绑定事件的数据*/
+          'eventData': { eventContentId, eventType, dragdropPara, feedbackBehavior },
+          'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
+          'relatedCallback': relatedCallback //相关回调
+        })
+      )
     }
   }
 

@@ -138,7 +138,7 @@ export default function(baseProto) {
     }
 
     //查找浮动母版
-    return this.floatContents.Master[contentId];
+    return this.floatContentGroup.masterGroup[contentId];
 
   }
 

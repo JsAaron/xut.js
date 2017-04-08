@@ -99,39 +99,35 @@ export default function(baseProto) {
     }
 
     /**
-     * 浮动对象
-     * 1 母版中
-     * 2 页面中
      * 页面中是最高的
-     * @type {Object}
+     * 浮动对象分组
+     * 1 母版
+     * 2 页面
      */
-    const floatContents = this.floatContents = {
+    const floatContentGroup = this.floatContentGroup = {
 
       /**
        * 页面浮动对象容器
-       * @type {[type]}
        */
-      PageContainer: null,
+      pageContainer: null,
 
       /**
        * 浮动页面对象
-       * @type {Object}
        */
-      Page: {},
+      pageGroup: {},
 
       /**
        * 浮动母版容器
        */
-      MasterContainer: null,
+      masterContainer: null,
 
       /**
        * 浮动母版的content对象
        * 用于边界切换,自动加上移动
-       * @type {Object}
        *     1：Object {}      //空对象,零件
        *     2: PPTeffect  {}  //行为对象
        */
-      Master: {}
+      masterGroup: {}
     }
 
     /**
@@ -179,14 +175,14 @@ export default function(baseProto) {
       floatPages(data) {
         //浮动页面对象容器
         let contentObj
-        floatContents.PageContainer = data.container;
+        floatContentGroup.pageContainer = data.container;
         _.each(data.ids, function(id) {
           if (contentObj = instance.baseGetContentObject(id)) {
             //初始视察坐标
             if (contentObj.parallax) {
               contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
             }
-            floatContents.Page[id] = contentObj
+            floatContentGroup.pageGroup[id] = contentObj
           } else {
             console.log('页面浮动对象找不到')
           }
@@ -206,7 +202,7 @@ export default function(baseProto) {
         let contentsFragment
 
         //浮动容器
-        floatContents.MasterContainer = data.container;
+        floatContentGroup.masterContainer = data.container;
         //浮动对象
         _.each(data.ids, function(id) {
           //转化成实际操作的浮动对象,保存
@@ -215,7 +211,7 @@ export default function(baseProto) {
             if (contentObj.parallax) {
               contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
             }
-            floatContents.Master[id] = contentObj
+            floatContentGroup.masterGroup[id] = contentObj
           } else {
             Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
               //获取DOM节点
@@ -230,7 +226,7 @@ export default function(baseProto) {
             }
             //制作一个伪数据
             //作为零件类型的空content处理
-            floatContents.Master[id] = {
+            floatContentGroup.masterGroup[id] = {
               id: id,
               chapterIndex: instance.chapterIndex,
               $contentNode: $(contentNode),

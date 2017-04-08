@@ -23,7 +23,7 @@ export default function(baseProto) {
     //浮动页面
     if(this.pageType === 'page') {
       //移动浮动页面容器
-      const $floatElement = this.floatContents.PageContainer
+      const $floatElement = this.floatContentGroup.pageContainer
       if($floatElement) {
         translation[action]($floatElement[0], distance, speed)
       }
@@ -34,9 +34,8 @@ export default function(baseProto) {
       //母版交接判断
       //用户事件的触发
       this.onceMaster = false
-
       //移动浮动容器
-      const $masterElement = this.floatContents.MasterContainer
+      const $masterElement = this.floatContentGroup.masterContainer
       if($masterElement) {
         translation[action]($masterElement[0], distance, speed)
       }

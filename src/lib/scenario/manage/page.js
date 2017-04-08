@@ -160,7 +160,7 @@ export default class PageMgr extends Abstract {
     originalIds.forEach(originaIndex => {
       let originalPageObj = this.abstractGetPageObj(originaIndex)
       if(originalPageObj) {
-        let floatNode = originalPageObj.floatContents.PageContainer
+        let floatNode = originalPageObj.floatContentGroup.pageContainer
         if(floatNode) {
           //floatPages设置的content溢出后处理
           //在非视区增加overflow:hidden
@@ -256,7 +256,7 @@ export default class PageMgr extends Abstract {
         activatePageObj.createPageAction()
 
         /*提升当前页面浮动对象的层级,因为浮动对象可以是并联的*/
-        const floatNode = activatePageObj.floatContents.PageContainer
+        const floatNode = activatePageObj.floatContentGroup.pageContainer
         if(floatNode) { floatNode.css({ 'zIndex': 2001, 'overflow': '' }) }
 
         /*IE上不支持蒙版效果的处理*/
