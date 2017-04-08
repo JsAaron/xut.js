@@ -6,7 +6,7 @@ import { ScalePan } from '../../../plugin/extend/scale-pan'
 const noop = function() {}
 
 /*页面缩放*/
-const createPageScale = function(rootNode, pageIndex) {
+const createPageScale = (rootNode, pageIndex) => {
   let relatedMasterObj = Xut.Presentation.GetPageObj('master', pageIndex)
   let pageMasterNode
   if (relatedMasterObj) {
@@ -26,22 +26,40 @@ const createPageScale = function(rootNode, pageIndex) {
 }
 
 
+/**
+ * 缓存构建中断回调
+ * 构建分2步骤
+ * 1 构建数据与结构（执行中断处理）
+ * 2 构建绘制页面
+ * @type {Object}
+ */
+const registerCacheTask = (threadtasks) => {
+  /*设置缓存的任务名*/
+  const cache = {};
+  Object.keys(threadtasks).forEach(function(taskName) {
+    cache[taskName] = false
+  })
+  return cache
+}
+
 export default function initThreadtasks(instance) {
 
   /**
    * 创建相关的信息
+   * threadTaskRelated
    */
-  const createRelated = instance.createRelated = initThreadState(instance)
+  const threadTaskRelated = instance.threadTaskRelated = initThreadState(instance)
 
   /**
-   * 设置下一个标记
+   * 设置下一个任务名
    * 用于标记完成度
    */
-  const setNextRunTask = (taskName) => {
-    createRelated.nextRunTask = taskName;
+  const setNextTaskName = (taskName) => {
+    threadTaskRelated.nextTaskName = taskName;
   }
 
-  const callContextTasks = (taskName, fn) => {
+  /* 创建新任务*/
+  const createNewTask = (taskName, fn) => {
     return assignedTasks[taskName](fn, instance)
   }
 
@@ -53,11 +71,10 @@ export default function initThreadtasks(instance) {
 
     /**
      * li容器
-     * @return {[type]} [description]
      */
     container() {
 
-      callContextTasks('Container', function($pageNode, $pseudoElement) {
+      createNewTask('assign-container', function($pageNode, $pseudoElement) {
 
         //////////////
         //li,li-div //
@@ -68,27 +85,28 @@ export default function initThreadtasks(instance) {
         /**
          * 获取根节点
          * 获取包含容器
-         * @return {[type]} [description]
          */
         const $containsElement = $pageNode.find('.page-scale > div:first-child')
         instance.getContainsNode = function() {
-            return $pseudoElement ? $pseudoElement : $containsElement
-          }
-          //页眉页脚
+          return $pseudoElement ? $pseudoElement : $containsElement
+        }
+
+        //页眉页脚
         instance.getHeadFootNode = function() {
-            return $pageNode.find('.page-scale > div:last-child')
-          }
-          //缩放根节点
+          return $pageNode.find('.page-scale > div:last-child')
+        }
+
+        //缩放根节点
         instance.getScaleNode = function() {
           return $pseudoElement ? $pseudoElement : $pageNode.find('.page-scale')
         }
 
 
-        setNextRunTask('background')
+        setNextTaskName('background')
 
         //构建主容器li完毕,可以提前执行翻页动作
         //必须是启动了快速翻页
-        createRelated.preforkComplete()
+        threadTaskRelated.preforkComplete()
 
         //视觉差不管
         if (instance.isMaster) {
@@ -104,16 +122,15 @@ export default function initThreadtasks(instance) {
 
     /**
      * 背景
-     * @return {[type]} [description]
      */
     background() {
 
-      callContextTasks('Background', function() {
-        createRelated.preCreateTasks = false;
-        setNextRunTask('column')
+      createNewTask('assign-background', function() {
+        threadTaskRelated.preCreateTasks = false;
+        setNextTaskName('column')
 
         //针对当前页面的检测
-        if (!createRelated.tasksHang || instance.isMaster) {
+        if (!threadTaskRelated.tasksHang || instance.isMaster) {
           instance.detectorTask({
             'taskName': '外部widgets',
             nextTask: function() {
@@ -123,8 +140,8 @@ export default function initThreadtasks(instance) {
         }
 
         //如果有挂起任务，则继续执行
-        if (createRelated.tasksHang) {
-          createRelated.tasksHang();
+        if (threadTaskRelated.tasksHang) {
+          threadTaskRelated.tasksHang();
         }
       })
     },
@@ -158,13 +175,13 @@ export default function initThreadtasks(instance) {
       只处理页面类型，母版跳过
        */
       if (isPageType && instance.chapterData.note == 'flow') {
-        callContextTasks('Column', function() {
-          setNextRunTask('complete')
-          createRelated.createTasksComplete()
+        createNewTask('assign-column', function() {
+          setNextTaskName('complete')
+          threadTaskRelated.createTasksComplete()
         })
       } else {
         createScale()
-        setNextRunTask('components')
+        setNextTaskName('component')
         instance.dispatchTasks()
       }
     },
@@ -173,9 +190,9 @@ export default function initThreadtasks(instance) {
      * 组件
      * 构件零件类型任务
      */
-    components() {
-      callContextTasks('Components', function() {
-        setNextRunTask('contents')
+    component() {
+      createNewTask('assign-component', function() {
+        setNextTaskName('contents')
         instance.detectorTask({
           'taskName': '外部contents',
           nextTask: function() {
@@ -189,12 +206,14 @@ export default function initThreadtasks(instance) {
      * content类型
      */
     contents() {
-      callContextTasks('Contents', function() {
-        setNextRunTask('complete')
-        createRelated.createTasksComplete();
+      createNewTask('assgin-activity', function() {
+        setNextTaskName('complete')
+        threadTaskRelated.createTasksComplete();
       })
     }
   }
 
-
+  /*注册缓存任务名*/
+  threadTaskRelated.cacheTasks = registerCacheTask(assignedTasks)
+  threadTaskRelated.nextTaskName = 'container'
 }

@@ -41,10 +41,10 @@ export default function(baseProto) {
 
 
     //清理多线程任务块
-    const cacheTask = this.createRelated.cacheTasks
-    if (cacheTask) {
-      for (let key in cacheTask) {
-        let task = cacheTask[key]
+    const cacheTasks = this.threadTaskRelated.cacheTasks
+    if (cacheTasks) {
+      for (let key in cacheTasks) {
+        let task = cacheTasks[key]
         if (task) {
           task.destroy && task.destroy()
         }

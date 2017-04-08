@@ -13,9 +13,9 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.getLetterObjs = function(contentId) {
-    let contents = this.createRelated.cacheTasks['contents']
-    if (contents && contents.textFxObjs) {
-      return contents.textFxObjs[contentId]
+    let activity = this.threadTaskRelated.cacheTasks['assgin-activity']
+    if (activity && activity.textFxObjs) {
+      return activity.textFxObjs[contentId]
     }
   }
 
@@ -81,7 +81,7 @@ export default function(baseProto) {
    */
   baseProto.checkInstanceTasks = function(taskName) {
     var tasksObj
-    if (tasksObj = this.createRelated.cacheTasks[taskName]) {
+    if (tasksObj = this.threadTaskRelated.cacheTasks[taskName]) {
       tasksObj.$$rerunTask && tasksObj.$$rerunTask()
       return true;
     }

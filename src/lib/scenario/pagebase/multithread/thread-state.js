@@ -27,30 +27,16 @@ export default function initThreadState(instance) {
      */
     preCreateTasks: false,
 
+    /*
+    缓存的任务名
+    动态注册
+     */
+    cacheTasks:null,
 
     /**
      * 下一个将要运行的任务标示
-     * 1 主容器任务
-     * 2 背景任务
-     * 3 widget热点任务
-     * 4 content对象任务
      */
-    nextRunTask: 'container',
-
-    /**
-     * 缓存构建中断回调
-     * 构建分2步骤
-     * 1 构建数据与结构（执行中断处理）
-     * 2 构建绘制页面
-     * @type {Object}
-     */
-    cacheTasks: function() {
-      const cacheTasks = {};
-      _.each(["Column", "background", "components", "contents"], function(taskName) {
-        cacheTasks[taskName] = false;
-      })
-      return cacheTasks;
-    }(),
+    nextTaskName: '',
 
     /**
      * 预创建

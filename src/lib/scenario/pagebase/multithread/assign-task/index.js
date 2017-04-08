@@ -70,7 +70,7 @@
    /**
     * 主容器
     */
-   'Container' (success, base) {
+   'assign-container' (success, base) {
      //同步数据
      activeCache(base, function() {
        const pageData = base.baseData()
@@ -78,14 +78,6 @@
        parseMode(pageData, base)
        TaskContainer(base, pageData, success)
      })
-   },
-
-
-   /**
-    * 流式排版
-    */
-   'Column' (success, base) {
-     TaskColumns(base, success)
    },
 
 
@@ -98,13 +90,13 @@
     *    1 构建数据结构 suspendCallback
     *    2 执行innerhtml构建完毕 successCallback
     */
-   'Background' (success, base) {
-     if (base.checkInstanceTasks('background')) {
+   'assign-background' (success, base) {
+     if (base.checkInstanceTasks('assign-background')) {
        return;
      }
      const data = base.baseData(base.chapterIndex)
      const $containsNode = base.getContainsNode()
-     base.createRelated.cacheTasks['background'] = new TaskBackground(
+     base.threadTaskRelated.cacheTasks['assign-background'] = new TaskBackground(
        data,
        $containsNode,
        success,
@@ -116,18 +108,24 @@
 
 
    /**
+    * 流式排版
+    */
+   'assign-column' (success, base) {
+     TaskColumns(base, success)
+   },
+
+
+   /**
     * 分配Components构建任务
     * @return {[type]} [description]
     */
-   'Components' (success, base) {
-
-     if (base.checkInstanceTasks('components')) {
+   'assign-component' (success, base) {
+     if (base.checkInstanceTasks('assign-component')) {
        return;
      }
-
      const chapterData = base.chapterData
      const baseData = base.baseData()
-     base.createRelated.cacheTasks['components'] = new TaskComponents({
+     base.threadTaskRelated.cacheTasks['assign-component'] = new TaskComponents({
        '$containsNode': base.getContainsNode(),
        'nodes': chapterData['nodes'],
        'pageOffset': chapterData['pageOffset'],
@@ -144,17 +142,17 @@
 
 
    /**
-    * 分配contetns构建任务
+    * 分配Activity构建任务
     * @return {[type]} [description]
     */
-   'Contents' (success, base) {
+   'assgin-activity' (success, base) {
 
      //通过content数据库为空处理
      if (Xut.data.preventContent) {
        return success();
      }
 
-     if (base.checkInstanceTasks('contents')) {
+     if (base.checkInstanceTasks('assgin-activity')) {
        return;
      }
 
@@ -163,7 +161,7 @@
      const chapterId = baseData._id
      const activitys = base.baseActivits()
 
-     base.createRelated.cacheTasks['contents'] = new TaskActivitys({
+     base.threadTaskRelated.cacheTasks['assgin-activity'] = new TaskActivitys({
        base,
        'canvasRelated': base.canvasRelated,
        'rootNode': base.rootNode,

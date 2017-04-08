@@ -197,10 +197,9 @@ export default function(baseProto) {
        *  所以需要制造一个空的容器，用于母版交界动
        */
       floatMaters(data) {
-        let prefix
+
         let contentObj
         let contentNode
-        let contentsFragment
 
         //浮动容器
         floatContentGroup.masterContainer = data.container;
@@ -215,11 +214,15 @@ export default function(baseProto) {
             floatContentGroup.masterGroup[id] = contentObj
           } else {
             Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
-              //获取DOM节点
-            if (contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
-              prefix = 'Content_' + instance.chapterIndex + "_"
+
+            const activity = instance.threadTaskRelated['assgin-activity']
+            const contentsFragment = activity.contentsFragment
+
+            //获取DOM节点
+            if (contentsFragment) {
+              const prefix = 'Content_' + instance.chapterIndex + "_"
               _.each(contentsFragment, function(dom) {
-                var makePrefix = prefix + id;
+                let makePrefix = prefix + id;
                 if (dom.id == makePrefix) {
                   contentNode = dom;
                 }

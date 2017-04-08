@@ -23,7 +23,7 @@ export default function(baseProto) {
     构建container任务完成后的一次调用
     用于处理快速翻页
      */
-    this.createRelated.preforkComplete = (() => {
+    this.threadTaskRelated.preforkComplete = (() => {
       return () => {
         /*当创建完容器后，就允许快速翻页了
         如果此时是快速打开，并且是翻页的动作*/
@@ -46,7 +46,7 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.dispatchTasks = function() {
-    const threadtasks = this.threadtasks[this.createRelated.nextRunTask]
+    const threadtasks = this.threadtasks[this.threadTaskRelated.nextTaskName]
     if (threadtasks) {
       threadtasks()
     }
@@ -168,8 +168,8 @@ export default function(baseProto) {
   baseProto.setTaskSuspend = function() {
     this.hasAutoRun = false;
     this.canvasRelated.isTaskSuspend = true;
-    this.createRelated.preCreateTasks = false;
-    this.createRelated.tasksHang = null;
+    this.threadTaskRelated.preCreateTasks = false;
+    this.threadTaskRelated.tasksHang = null;
   }
 
 
@@ -182,8 +182,8 @@ export default function(baseProto) {
     var self = this;
     //2个预创建间隔太短
     //背景预创建还在进行中，先挂起来等待
-    if (this.createRelated.preCreateTasks) {
-      this.createRelated.tasksHang = function(callback) {
+    if (this.threadTaskRelated.preCreateTasks) {
+      this.threadTaskRelated.tasksHang = function(callback) {
         return function() {
           self._checkNextTaskCreate(callback);
         }
@@ -196,7 +196,7 @@ export default function(baseProto) {
      * 预创建背景
      */
     if (isPreCreate) {
-      this.createRelated.preCreateTasks = true;
+      this.threadTaskRelated.preCreateTasks = true;
     }
 
     this._checkNextTaskCreate(callback);
@@ -213,7 +213,7 @@ export default function(baseProto) {
   baseProto._checkNextTaskCreate = function(callback) {
 
     //如果任务全部完成
-    if (this.createRelated.nextRunTask === 'complete') {
+    if (this.threadTaskRelated.nextTaskName === 'complete') {
       return callback()
     }
 
@@ -223,7 +223,7 @@ export default function(baseProto) {
     this._cancelTaskSuspend()
 
     //完毕回调
-    this.createRelated.createTasksComplete = () => {
+    this.threadTaskRelated.createTasksComplete = () => {
       this.collectHooks && this.collectHooks.threadtaskComplete()
       callback()
     };

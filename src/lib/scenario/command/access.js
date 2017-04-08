@@ -4,7 +4,6 @@
  * @return {[type]} [description]
  */
 export default function access(pageObj, callback) {
-  let flag, contents, components, pageType
 
   //如果只提供回调函数
   if(arguments.length === 1 && _.isFunction(pageObj)) {
@@ -15,10 +14,10 @@ export default function access(pageObj, callback) {
   }
 
   if(pageObj) {
-    contents = pageObj.baseGetContent();
-    components = pageObj.baseGetComponent();
-    pageType = pageObj.pageType || 'page';
-    flag = callback(pageObj, contents.length && contents, components.length && components, pageType)
+    const contents = pageObj.baseGetContent();
+    const components = pageObj.baseGetComponent();
+    const pageType = pageObj.pageType || 'page';
+    const flag = callback(pageObj, contents.length && contents, components.length && components, pageType)
+    return flag
   }
-  return flag;
 }
