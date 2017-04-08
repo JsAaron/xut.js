@@ -96,9 +96,14 @@ export default class TaskComponents extends TaskSuper {
       container: this.$containsNode,
       content: $(str)
     }, () => {
-      this.$$destroy()
+      this.destroy()
       this.success()
     });
+  }
+
+  destroy() {
+    this.$containsNode = null;
+    this.$$destroy()
   }
 
 }

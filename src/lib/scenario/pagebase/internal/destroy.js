@@ -40,12 +40,13 @@ export default function(baseProto) {
     }
 
 
-    //清理线程任务块
-    let cacheTasks, key, tasks;
-    if (cacheTasks = this.createRelated.cacheTasks) {
-      for (key in cacheTasks) {
-        if (tasks = cacheTasks[key]) {
-          tasks.clearReference && tasks.clearReference();
+    //清理多线程任务块
+    const cacheTask = this.createRelated.cacheTasks
+    if (cacheTask) {
+      for (let key in cacheTask) {
+        let task = cacheTask[key]
+        if (task) {
+          task.destroy && task.destroy()
         }
       }
     }

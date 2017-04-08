@@ -81,6 +81,22 @@ export default class TaskActivitys extends TaskSuper {
     }
   }
 
+
+  /**
+   * 检测下个任务创建
+   */
+  _checkNextTask(taskName, nextTask) {
+    //如果是当前页面构建,允许打断一次
+    let interrupt
+    if (this.base.hasAutoRun && taskName === 'strAfter') {
+      interrupt = true;
+    }
+    this.$$checkNextTask('内部contents', () => {
+      nextTask()
+    }, interrupt)
+  }
+
+
   /*
   初始化浮动页面参数
    */
@@ -107,7 +123,7 @@ export default class TaskActivitys extends TaskSuper {
    * 构建结构
    */
   _dataAfterCheck(pipeData) {
-    this._assert('dataAfter', () => {
+    this._checkNextTask('dataAfter', () => {
       /*初始化浮动*/
       this._initFloat(pipeData)
         /*解析点击反馈，点击缩放*/
@@ -149,7 +165,7 @@ export default class TaskActivitys extends TaskSuper {
    * 绑定事件
    */
   _dataStrCheck(pipeData, userData) {
-    this._assert('strAfter', () => {
+    this._checkNextTask('strAfter', () => {
       /*缩放图片*/
       if (Object.keys(pipeData.zoomBehavior).length) {
         this.zoomObjs = zoomPicture(pipeData)
@@ -177,7 +193,7 @@ export default class TaskActivitys extends TaskSuper {
   _eventAfterCheck(pipeData, delayHooks, headerFooterMode) {
 
     const self = this;
-    this._assert('eventAfter', () => {
+    this._checkNextTask('eventAfter', () => {
 
       /*计算回调的成功的次数*/
       pipeData.taskCount = 1
@@ -277,7 +293,7 @@ export default class TaskActivitys extends TaskSuper {
    * @return {[type]} [description]
    */
   _applyAfterCheck() {
-    this._assert('applyAfter', () => {
+    this._checkNextTask('applyAfter', () => {
       this._loadComplete(true)
     })
   }
@@ -291,26 +307,14 @@ export default class TaskActivitys extends TaskSuper {
     this.success && this.success();
   }
 
-  /**
-   * 任务断言
-   */
-  _assert(taskName, nextTasks) {
-    //如果是当前页面构建,允许打断一次
-    let interrupt
-    if (this.base.hasAutoRun && taskName === 'strAfter') {
-      interrupt = true;
-    }
-    this.$$checkNextTask('内部contents', () => {
-      nextTasks()
-    }, interrupt)
-  }
-
 
   /**
    * 清理引用
    * @return {[type]} [description]
    */
-  clearReference() {
+  destroy() {
+
+    this.$$destroy()
 
     //文字动画
     if (this.textFxObjs) {

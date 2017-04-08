@@ -1,18 +1,23 @@
 import { query } from '../../../../database/query'
 
-/*更新数据缓存*/
-export default function(chapterIndex, callback) {
+/*
+更新数据缓存
+1 activitys
+2 auto
+3 activitys
+ */
+export default function activeCache(base, callback) {
 
-  let pageType = this.pageType
+  const pageType = base.pageType
 
   /*缓存数据*/
   const addCacheGruop = (namespace, data) => {
     let key;
-    if(!this.dataActionGroup[namespace]) {
-      this.dataActionGroup[namespace] = data;
+    if(!base.dataActionGroup[namespace]) {
+      base.dataActionGroup[namespace] = data;
     } else {
       for(key in data) {
-        this.dataActionGroup[namespace][key] = data[key];
+        base.dataActionGroup[namespace][key] = data[key];
       }
     }
   }
@@ -25,9 +30,9 @@ export default function(chapterIndex, callback) {
   }
 
   query(pageType, {
-    'pageIndex': chapterIndex,
-    'pageData': this.chapterData,
-    'pptMaster': this.pptMaster
+    'pageIndex': base.chapterIndex,
+    'pageData': base.chapterData,
+    'pptMaster': base.pptMaster
   }, function(data, activitys, autoData) {
     addCache.apply(addCache, arguments)
     callback(data);

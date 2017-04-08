@@ -45,11 +45,6 @@ export default function initThreadtasks(instance) {
     return assignedTasks[taskName](fn, instance)
   }
 
-  /**
-   * 任务探测器
-   * 解决nextTasks上下文的问题
-   */
-  instance.detectorTask = instance.nextTasks.bind(instance)
 
   /**
    * 任务钩子
@@ -97,9 +92,9 @@ export default function initThreadtasks(instance) {
 
         //视觉差不管
         if (instance.isMaster) {
-          instance.nextTasks({
+          instance.detectorTask({
             'taskName': '外部Background',
-            'outNextTasks': function() {
+            'nextTask': function() {
               instance.dispatchTasks();
             }
           });
@@ -119,9 +114,9 @@ export default function initThreadtasks(instance) {
 
         //针对当前页面的检测
         if (!createRelated.tasksHang || instance.isMaster) {
-          instance.nextTasks({
+          instance.detectorTask({
             'taskName': '外部widgets',
-            outNextTasks: function() {
+            nextTask: function() {
               instance.dispatchTasks();
             }
           })
@@ -181,9 +176,9 @@ export default function initThreadtasks(instance) {
     components() {
       callContextTasks('Components', function() {
         setNextRunTask('contents')
-        instance.nextTasks({
+        instance.detectorTask({
           'taskName': '外部contents',
-          outNextTasks: function() {
+          nextTask: function() {
             instance.dispatchTasks();
           }
         });

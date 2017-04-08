@@ -17,20 +17,22 @@ export default class TaskSuper {
   1 通过base.detectorTask做的监听，这里的this是pagebase的this
   2 如果检测可以运行直接运行nextTask
   3 如果检测不能运行就会运行suspend 断点
+  interrupt 给content使用
    */
   $$checkNextTask(taskName, nextTask, interrupt) {
     //构建中断方法
-    const suspend = () => {
+    const suspendTask = () => {
       self.$$suspendQueues.push(function() {
         nextTask()
       })
     }
+
     //外部检测
     this.$$detector({
-    	interrupt,
-      taskName,
-      'outSuspendTasks': suspend,
-      'outNextTasks': nextTask
+      suspendTask,
+      nextTask,
+      interrupt,
+      taskName
     });
   }
 
@@ -54,7 +56,6 @@ export default class TaskSuper {
   $$destroy() {
     this.$$detector = null
     this.$$suspendQueues = null
-    this.$containsNode = null;
   }
 
 }

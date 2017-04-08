@@ -1,5 +1,5 @@
  import { config } from '../../../../config/index'
- import updataCache from './sync-cache'
+ import activeCache from './active-cache'
  import TaskContainer from './container/index'
  import TaskBackground from './background/index'
  import TaskActivitys from './activity/index'
@@ -70,13 +70,13 @@
    /**
     * 主容器
     */
-   'Container' (taskCallback, base) {
+   'Container' (success, base) {
      //同步数据
-     updataCache.call(base, [base.chapterIndex], () => {
+     activeCache(base, function() {
        const pageData = base.baseData()
          //contentMode模式
        parseMode(pageData, base)
-       TaskContainer(base, pageData, taskCallback)
+       TaskContainer(base, pageData, success)
      })
    },
 
@@ -84,8 +84,8 @@
    /**
     * 流式排版
     */
-   'Column' (taskCallback, base) {
-     TaskColumns(base, taskCallback)
+   'Column' (success, base) {
+     TaskColumns(base, success)
    },
 
 
@@ -108,7 +108,9 @@
        data,
        $containsNode,
        success,
-       base.detectorTask
+       function(...arg) {
+         base.detectorTask(...arg)
+       }
      )
    },
 
@@ -135,7 +137,9 @@
        'chapterIndex': base.chapterIndex,
        'pageType': base.pageType,
        'getStyle': base.getStyle
-     }, success, base.detectorTask);
+     }, success, function(...arg) {
+       base.detectorTask(...arg)
+     });
    },
 
 
@@ -159,7 +163,6 @@
      const chapterId = baseData._id
      const activitys = base.baseActivits()
 
-
      base.createRelated.cacheTasks['contents'] = new TaskActivitys({
        base,
        'canvasRelated': base.canvasRelated,
@@ -176,6 +179,8 @@
        'chapterIndex': base.chapterIndex,
        'pageBaseHooks': base.collectHooks,
        'getStyle': base.getStyle
-     }, success, base.detectorTask)
+     }, success, function(...arg) {
+       base.detectorTask(...arg)
+     })
    }
  }

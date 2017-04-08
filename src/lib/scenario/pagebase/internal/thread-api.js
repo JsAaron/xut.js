@@ -24,10 +24,10 @@ export default function(baseProto) {
     用于处理快速翻页
      */
     this.createRelated.preforkComplete = (() => {
-      return() => {
+      return () => {
         /*当创建完容器后，就允许快速翻页了
         如果此时是快速打开，并且是翻页的动作*/
-        if(config.quickFlip && isFlipAction) {
+        if (config.quickFlip && isFlipAction) {
           callback()
         } else {
           /*如果不是快速翻页，那么就继续往下分解任务*/
@@ -47,7 +47,7 @@ export default function(baseProto) {
    */
   baseProto.dispatchTasks = function() {
     const threadtasks = this.threadtasks[this.createRelated.nextRunTask]
-    if(threadtasks) {
+    if (threadtasks) {
       threadtasks()
     }
   }
@@ -58,7 +58,7 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.destroyPageAction = function() {
-    if(this.stopLastPageAction) {
+    if (this.stopLastPageAction) {
       this.stopLastPageAction()
       this.stopLastPageAction = null
     }
@@ -71,7 +71,7 @@ export default function(baseProto) {
   baseProto.createPageAction = function() {
     //如果有最后一个动作触发
     //2016.10.13 给妙妙学增加watch('complete')
-    if(this.runLastPageAction) {
+    if (this.runLastPageAction) {
       //返回停止方法
       this.stopLastPageAction = this.runLastPageAction()
     }
@@ -79,36 +79,86 @@ export default function(baseProto) {
 
   /**
    * 检测任务是否完成
-   * page => autoRun中需要保证任务完成后才能执行
+   * page => autoRun中需要保证任务完成后才能执行自动运行任务
    * 快速翻页中遇到
    * actTasksCallback 活动任务完成
    * @return {[type]} [description]
    */
-  baseProto.checkThreadTask = function(actTasksCallback) {
+  baseProto.checkThreadTask = function(completeCallback) {
     this.hasAutoRun = true;
     this._checkNextTaskCreate(() => {
       this.hasAutoRun = false
-      actTasksCallback()
+      completeCallback()
     })
   }
 
 
   /**
-   * 开始执行下一个线程任务,检测是否中断
-   * outSuspendTasks,
-   * outNextTasks
-   * taskName
+   * 多线程检测
    * @return {[type]} [description]
    */
-  baseProto.nextTasks = function(callback) {
+  baseProto._multithreadCheck = function(callbacks, interrupt) {
+    const check = () => {
+      if (this._checkTaskSuspend()) {
+        this.tasksTimeOutId && clearTimeout(this.tasksTimeOutId)
+        callbacks.suspendCallback.call(this);
+      } else {
+        callbacks.nextTaskCallback.call(this);
+      }
+    }
+    const next = () => {
+      this.tasksTimeOutId = setTimeout(() => {
+        check();
+      }, this.canvasRelated.tasksTimer);
+    }
+
+    //自动运行页面构建
+    if (this.hasAutoRun) {
+      //自动运行content中断检测 打断一次
+      if (interrupt) {
+        next()
+      } else {
+        check()
+      }
+    } else {
+      //后台构建
+      next()
+    }
+  }
+
+
+  /**
+   * 任务队列挂起
+   * nextTaskCallback 成功回调
+   * suspendCallback  中断回调
+   * @return {[type]} [description]
+   */
+  baseProto._asyTasks = function(callbacks, interrupt) {
+    //如果关闭多线程,不检测任务调度
+    if (!this.hasMultithread) {
+      return callbacks.nextTaskCallback.call(this);
+    }
+    //多线程检测
+    this._multithreadCheck(callbacks, interrupt)
+  }
+
+  /**
+   * 开始执行下一个线程任务,检测是否中断
+      suspendTask,
+      nextTask,
+      interrupt,
+      taskName
+   * @return {[type]} [description]
+   */
+  baseProto.detectorTask = function(options) {
     this._asyTasks({
       suspendCallback() {
-        callback.outSuspendTasks && callback.outSuspendTasks()
+        options.suspendTask && options.suspendTask()
       },
       nextTaskCallback() {
-        callback.outNextTasks && callback.outNextTasks()
+        options.nextTask && options.nextTask()
       }
-    }, callback.interrupt)
+    }, options.interrupt)
   }
 
 
@@ -132,7 +182,7 @@ export default function(baseProto) {
     var self = this;
     //2个预创建间隔太短
     //背景预创建还在进行中，先挂起来等待
-    if(this.createRelated.preCreateTasks) {
+    if (this.createRelated.preCreateTasks) {
       this.createRelated.tasksHang = function(callback) {
         return function() {
           self._checkNextTaskCreate(callback);
@@ -145,7 +195,7 @@ export default function(baseProto) {
      * 翻页完毕后
      * 预创建背景
      */
-    if(isPreCreate) {
+    if (isPreCreate) {
       this.createRelated.preCreateTasks = true;
     }
 
@@ -163,7 +213,7 @@ export default function(baseProto) {
   baseProto._checkNextTaskCreate = function(callback) {
 
     //如果任务全部完成
-    if(this.createRelated.nextRunTask === 'complete') {
+    if (this.createRelated.nextRunTask === 'complete') {
       return callback()
     }
 
@@ -179,8 +229,8 @@ export default function(baseProto) {
     };
 
     //派发任务
-    this.nextTasks({
-      outNextTasks() {
+    this.detectorTask({
+      nextTask() {
         self.dispatchTasks();
       }
     });
@@ -205,57 +255,7 @@ export default function(baseProto) {
   }
 
 
-  /**
-   * 多线程检测
-   * @return {[type]} [description]
-   */
-  baseProto._multithreadCheck = function(callbacks, interrupt) {
-
-    const check = () => {
-      if(this._checkTaskSuspend()) {
-        this.tasksTimeOutId && clearTimeout(this.tasksTimeOutId)
-        callbacks.suspendCallback.call(this);
-      } else {
-        callbacks.nextTaskCallback.call(this);
-      }
-    }
-
-    const next = () => {
-      this.tasksTimeOutId = setTimeout(() => {
-        check();
-      }, this.canvasRelated.tasksTimer);
-    }
-
-    //自动运行页面构建
-    if(this.hasAutoRun) {
-      //自动运行content中断检测 打断一次
-      if(interrupt) {
-        next();
-      } else {
-        check();
-      }
-    } else {
-      //后台构建
-      next();
-    }
-  }
 
 
-  /**
-   * 任务队列挂起
-   * nextTaskCallback 成功回调
-   * suspendCallback  中断回调
-   * @return {[type]} [description]
-   */
-  baseProto._asyTasks = function(callbacks, interrupt) {
-
-    //如果关闭多线程,不检测任务调度
-    if(!this.hasMultithread) {
-      return callbacks.nextTaskCallback.call(this);
-    }
-
-    //多线程检测
-    this._multithreadCheck(callbacks, interrupt)
-  }
 
 }

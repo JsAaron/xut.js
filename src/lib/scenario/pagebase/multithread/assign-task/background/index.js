@@ -69,9 +69,13 @@ export default class TaskBackground extends TaskSuper {
   /*渲染页面*/
   _render(content, container) {
     Xut.nextTick({ content, container, }, () => {
-      this.$$destroy()
+      this.destroy()
       this.success()
     });
+  }
+
+  destroy() {
+    this.$$destroy()
   }
 
 }
