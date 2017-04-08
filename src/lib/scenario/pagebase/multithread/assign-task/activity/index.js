@@ -4,6 +4,7 @@
  *      结构合并创建类    Structure
  *      行为动画绑定类     Content
  * ***************************************************/
+import TaskSuper from '../task-super'
 import { config } from '../../../../../config/index'
 import { nextTick } from '../../../../../util/nexttick'
 import { textFx } from './text-fx'
@@ -60,13 +61,14 @@ function toArray(contentsFragment, headerFooterMode) {
 /**
  * content任务类
  */
-export default class TaskActivitys {
+export default class TaskActivitys extends TaskSuper {
 
   /*管道参数，贯通*/
-  constructor(pipeData, suspend, success) {
+  constructor(pipeData, success, detector) {
+
+    super(detector)
 
     _.extend(this, pipeData)
-    this.suspend = suspend
     this.success = success
 
     /*chapter => activity*/
@@ -105,7 +107,7 @@ export default class TaskActivitys {
    * 构建结构
    */
   _dataAfterCheck(pipeData) {
-    this._assert('dataAfter', function() {
+    this._assert('dataAfter', () => {
       /*初始化浮动*/
       this._initFloat(pipeData)
         /*解析点击反馈，点击缩放*/
@@ -147,7 +149,7 @@ export default class TaskActivitys {
    * 绑定事件
    */
   _dataStrCheck(pipeData, userData) {
-    this._assert('strAfter', function() {
+    this._assert('strAfter', () => {
       /*缩放图片*/
       if (Object.keys(pipeData.zoomBehavior).length) {
         this.zoomObjs = zoomPicture(pipeData)
@@ -175,7 +177,7 @@ export default class TaskActivitys {
   _eventAfterCheck(pipeData, delayHooks, headerFooterMode) {
 
     const self = this;
-    this._assert('eventAfter', function() {
+    this._assert('eventAfter', () => {
 
       /*计算回调的成功的次数*/
       pipeData.taskCount = 1
@@ -275,24 +277,11 @@ export default class TaskActivitys {
    * @return {[type]} [description]
    */
   _applyAfterCheck() {
-    this._assert('applyAfter', function() {
+    this._assert('applyAfter', () => {
       this._loadComplete(true)
     })
   }
 
-  /**
-   * 运行被阻断的线程任务
-   * @return {[type]} [description]
-   */
-  runSuspendTasks() {
-    if (this.suspendQueues) {
-      var fn;
-      if (fn = this.suspendQueues.pop()) {
-        fn();
-      }
-      this.suspendQueues = null;
-    }
-  }
 
   /**
    * 构建完毕
@@ -305,24 +294,15 @@ export default class TaskActivitys {
   /**
    * 任务断言
    */
-  _assert(taskName, tasks) {
-
-    var self = this;
-
-    //中断方法
-    var suspendTasks = function() {
-      self.suspendQueues = [];
-      self.suspendQueues.push(function() {
-        tasks.call(self);
-      })
+  _assert(taskName, nextTasks) {
+    //如果是当前页面构建,允许打断一次
+    let interrupt
+    if (this.base.hasAutoRun && taskName === 'strAfter') {
+      interrupt = true;
     }
-
-    //完成方法
-    var nextTasks = function() {
-      tasks.call(self);
-    }
-
-    self.suspend && self.suspend(taskName, nextTasks, suspendTasks);
+    this.$$checkNextTask('内部contents', () => {
+      nextTasks()
+    }, interrupt)
   }
 
 

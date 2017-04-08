@@ -112,7 +112,6 @@ export default function(baseProto) {
   }
 
 
-
   /**
    * 设置任务中断
    */

@@ -255,6 +255,7 @@ export default function(baseProto) {
       }
     }
 
+
     /**
      * 初始化任务
      * 等待状态初始化，比如_isFlows

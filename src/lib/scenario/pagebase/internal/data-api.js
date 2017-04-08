@@ -77,12 +77,12 @@ export default function(baseProto) {
 
   /**
    * 对象实例内部构建
-   * @return {[type]} [description]
+   * 重新运行任务
    */
   baseProto.checkInstanceTasks = function(taskName) {
     var tasksObj
     if (tasksObj = this.createRelated.cacheTasks[taskName]) {
-      tasksObj.runSuspendTasks()
+      tasksObj.$$rerunTask && tasksObj.$$rerunTask()
       return true;
     }
   }

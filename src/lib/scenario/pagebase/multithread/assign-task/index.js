@@ -99,32 +99,17 @@
     *    2 执行innerhtml构建完毕 successCallback
     */
    'Background' (success, base) {
-
      if (base.checkInstanceTasks('background')) {
        return;
      }
-
-     /**
-      * 构建中断回调
-      */
-     const suspend = (innerNextTasks, innerSuspendTasks) => {
-       base.nextTasks({
-         'taskName': '内部background',
-         'outSuspendTasks': innerSuspendTasks,
-         'outNextTasks': innerNextTasks
-       });
-     }
-
      const data = base.baseData(base.chapterIndex)
      const $containsNode = base.getContainsNode()
-
      base.createRelated.cacheTasks['background'] = new TaskBackground(
        data,
        $containsNode,
-       suspend,
-       success
+       success,
+       base.detectorTask
      )
-
    },
 
 
@@ -140,21 +125,6 @@
 
      const chapterData = base.chapterData
      const baseData = base.baseData()
-
-     /**
-      * 构建中断回调
-      * @param  {[type]} innerNextTasks    [description]
-      * @param  {[type]} innerSuspendTasks [description]
-      * @return {[type]}                   [description]
-      */
-     const suspend = (innerNextTasks, innerSuspendTasks) => {
-       base.nextTasks({
-         'taskName': '内部widgets',
-         'outSuspendTasks': innerSuspendTasks,
-         'outNextTasks': innerNextTasks
-       });
-     }
-
      base.createRelated.cacheTasks['components'] = new TaskComponents({
        '$containsNode': base.getContainsNode(),
        'nodes': chapterData['nodes'],
@@ -165,7 +135,7 @@
        'chapterIndex': base.chapterIndex,
        'pageType': base.pageType,
        'getStyle': base.getStyle
-     }, suspend, success);
+     }, success, base.detectorTask);
    },
 
 
@@ -189,22 +159,9 @@
      const chapterId = baseData._id
      const activitys = base.baseActivits()
 
-     /*构建中断回调*/
-     const suspend = function(taskName, innerNextTasks, innerSuspendTasks) {
-       //如果是当前页面构建,允许打断一次
-       let interrupt
-       if (base.hasAutoRun && taskName === 'strAfter') {
-         interrupt = true;
-       }
-       base.nextTasks({
-         'interrupt': interrupt,
-         'taskName': '内部contents',
-         'outSuspendTasks': innerSuspendTasks,
-         'outNextTasks': innerNextTasks
-       });
-     }
 
      base.createRelated.cacheTasks['contents'] = new TaskActivitys({
+       base,
        'canvasRelated': base.canvasRelated,
        'rootNode': base.rootNode,
        '$containsNode': base.getContainsNode(),
@@ -219,6 +176,6 @@
        'chapterIndex': base.chapterIndex,
        'pageBaseHooks': base.collectHooks,
        'getStyle': base.getStyle
-     }, suspend, success)
+     }, success, base.detectorTask)
    }
  }

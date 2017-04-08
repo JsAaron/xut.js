@@ -46,6 +46,12 @@ export default function initThreadtasks(instance) {
   }
 
   /**
+   * 任务探测器
+   * 解决nextTasks上下文的问题
+   */
+  instance.detectorTask = instance.nextTasks.bind(instance)
+
+  /**
    * 任务钩子
    */
   instance.threadtasks = {

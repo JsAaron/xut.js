@@ -45,7 +45,7 @@ export default function(baseProto) {
     if (cacheTasks = this.createRelated.cacheTasks) {
       for (key in cacheTasks) {
         if (tasks = cacheTasks[key]) {
-          tasks.clearReference();
+          tasks.clearReference && tasks.clearReference();
         }
       }
     }

@@ -12,9 +12,9 @@ import { reviseSize } from '../../../../../util/option'
 
 export default class TaskComponents extends TaskSuper {
 
-  constructor(data, suspend, success) {
+  constructor(data, success, detector) {
 
-    super()
+    super(detector)
 
     //预编译模式跳过创建
     if (Xut.IBooks.runMode()) {
@@ -23,33 +23,14 @@ export default class TaskComponents extends TaskSuper {
     }
 
     if (data.activitys && data.activitys.length) {
-      this.suspend = suspend
       this.success = success
-      this.$containsNode = data['$containsNode'];
-      this._suspendCompile(this._create(data));
+      this.$containsNode = data.$containsNode
+      this._checkNextTask(this._create(data));
     } else {
       success();
     }
   }
 
-
-  clearReference() {
-    this.$containsNode = null;
-  }
-
-
-  /**
-   * 运行被阻断的线程任务
-   */
-  runSuspendTasks() {
-    if (this.suspendQueues) {
-      var fn;
-      if (fn = this.suspendQueues.pop()) {
-        fn();
-      }
-      this.suspendQueues = null;
-    }
-  }
 
   _create(data) {
     var actType,
@@ -100,32 +81,24 @@ export default class TaskComponents extends TaskSuper {
   }
 
   /**
-   * 编译中断函数
+   * 检测下个任务是否中断运行
    */
-  _suspendCompile(str) {
+  _checkNextTask(str) {
+    this.$$checkNextTask('内部Component', () => {
+      this._render(str)
+    })
+  }
 
-    const self = this;
 
-    //继续执行
-    const nextTasks = function() {
-      Xut.nextTick({
-        container: self.$containsNode,
-        content: $(str)
-      }, function() {
-        self.clearReference();
-        self.success();
-      });
-    }
-
-    //中断方法
-    const suspendTasks = function() {
-      self.suspendQueues = [];
-      self.suspendQueues.push(function() {
-        nextTasks()
-      })
-    }
-
-    self.suspend(nextTasks, suspendTasks);
+  /*渲染页面*/
+  _render(str) {
+    Xut.nextTick({
+      container: this.$containsNode,
+      content: $(str)
+    }, () => {
+      this.$$destroy()
+      this.success()
+    });
   }
 
 }

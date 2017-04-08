@@ -25,14 +25,13 @@ const parseContent = function(content, callback) {
  */
 export default class TaskBackground extends TaskSuper {
 
-  constructor(data, $containsNode, suspend, success) {
+  constructor(data, $containsNode, success, detector) {
 
-    super()
+    super(detector)
 
     const self = this
     const content = data.md5
 
-    this.suspend = suspend
     this.success = success
 
     //iboosk节点预编译
@@ -51,61 +50,28 @@ export default class TaskBackground extends TaskSuper {
       const htmlstr = createBackground(svgContent, data)
       if (htmlstr) {
         svgContent = null
-        self._suspendCompile($(htmlstr), $containsNode)
+        self._checkNextTask($(htmlstr), $containsNode)
       } else {
         success()
       }
     })
-
-  }
-
-
-  clearReference() {}
-
-
-  /**
-   * 构建中断函数
-   * @param  {[type]} $background [description]
-   * @return {[type]}             [description]
-   */
-  _suspendCompile($background, $containsNode) {
-
-    const self = this;
-
-    //继续执行
-    const nextTasks = function() {
-      Xut.nextTick({
-        'container': $containsNode,
-        'content': $background
-      }, function() {
-        self.clearReference()
-        self.success()
-      });
-    }
-
-    //中断方法
-    const suspendTasks = function() {
-      self.suspendQueues = [];
-      self.suspendQueues.push(function() {
-        nextTasks()
-      })
-    }
-
-    self.suspend(nextTasks, suspendTasks);
   }
 
   /**
-   * 运行被阻断的线程任务
-   * @return {[type]} [description]
+   * 检测下一个任务
    */
-  runSuspendTasks() {
-    if (this.suspendQueues) {
-      var fn;
-      if (fn = this.suspendQueues.pop()) {
-        fn();
-      }
-      this.suspendQueues = null;
-    }
+  _checkNextTask($background, $containsNode) {
+    this.$$checkNextTask('内部background', () => {
+      this._render($background, $containsNode)
+    })
+  }
+
+  /*渲染页面*/
+  _render(content, container) {
+    Xut.nextTick({ content, container, }, () => {
+      this.$$destroy()
+      this.success()
+    });
   }
 
 }
