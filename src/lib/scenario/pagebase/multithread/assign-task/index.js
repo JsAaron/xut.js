@@ -98,18 +98,16 @@
     *    1 构建数据结构 suspendCallback
     *    2 执行innerhtml构建完毕 successCallback
     */
-   'Background' (taskCallback, base) {
+   'Background' (success, base) {
 
      if (base.checkInstanceTasks('background')) {
        return;
      }
 
-     const data = base.baseData(base.chapterIndex)
-
      /**
       * 构建中断回调
       */
-     const suspendCallback = (innerNextTasks, innerSuspendTasks) => {
+     const suspend = (innerNextTasks, innerSuspendTasks) => {
        base.nextTasks({
          'taskName': '内部background',
          'outSuspendTasks': innerSuspendTasks,
@@ -117,20 +115,15 @@
        });
      }
 
-     /**
-      * 获取数据成功回调
-      * @return {[type]} [description]
-      */
-     const successCallback = () => {
-       taskCallback();
-     }
+     const data = base.baseData(base.chapterIndex)
+     const $containsNode = base.getContainsNode()
 
-     base.createRelated.cacheTasks['background'] = new TaskBackground({
+     base.createRelated.cacheTasks['background'] = new TaskBackground(
        data,
-       $containsNode: base.getContainsNode(),
-       suspendCallback,
-       successCallback
-     })
+       $containsNode,
+       suspend,
+       success
+     )
 
    },
 
@@ -139,7 +132,7 @@
     * 分配Components构建任务
     * @return {[type]} [description]
     */
-   'Components' (taskCallback, base) {
+   'Components' (success, base) {
 
      if (base.checkInstanceTasks('components')) {
        return;
@@ -154,20 +147,12 @@
       * @param  {[type]} innerSuspendTasks [description]
       * @return {[type]}                   [description]
       */
-     const suspendCallback = (innerNextTasks, innerSuspendTasks) => {
+     const suspend = (innerNextTasks, innerSuspendTasks) => {
        base.nextTasks({
          'taskName': '内部widgets',
          'outSuspendTasks': innerSuspendTasks,
          'outNextTasks': innerNextTasks
        });
-     }
-
-     /**
-      * 获取数据成功回调
-      * @return {[type]} [description]
-      */
-     const successCallback = () => {
-       taskCallback();
      }
 
      base.createRelated.cacheTasks['components'] = new TaskComponents({
@@ -180,7 +165,7 @@
        'chapterIndex': base.chapterIndex,
        'pageType': base.pageType,
        'getStyle': base.getStyle
-     }, suspendCallback, successCallback);
+     }, suspend, success);
    },
 
 
@@ -188,11 +173,11 @@
     * 分配contetns构建任务
     * @return {[type]} [description]
     */
-   'Contents' (taskCallback, base) {
+   'Contents' (success, base) {
 
      //通过content数据库为空处理
      if (Xut.data.preventContent) {
-       return taskCallback();
+       return success();
      }
 
      if (base.checkInstanceTasks('contents')) {
@@ -204,28 +189,20 @@
      const chapterId = baseData._id
      const activitys = base.baseActivits()
 
-     /*生成钩子*/
-     const pageBaseHooks = _.extend({}, {
-       /*构建中断回调*/
-       suspend(taskName, innerNextTasks, innerSuspendTasks) {
-         //如果是当前页面构建,允许打断一次
-         let interrupt
-         if (base.hasAutoRun && taskName === 'strAfter') {
-           interrupt = true;
-         }
-         base.nextTasks({
-           'interrupt': interrupt,
-           'taskName': '内部contents',
-           'outSuspendTasks': innerSuspendTasks,
-           'outNextTasks': innerNextTasks
-         });
-       },
-       /*获取数据成功回调*/
-       success() {
-         taskCallback();
+     /*构建中断回调*/
+     const suspend = function(taskName, innerNextTasks, innerSuspendTasks) {
+       //如果是当前页面构建,允许打断一次
+       let interrupt
+       if (base.hasAutoRun && taskName === 'strAfter') {
+         interrupt = true;
        }
-     }, base.collectHooks)
-
+       base.nextTasks({
+         'interrupt': interrupt,
+         'taskName': '内部contents',
+         'outSuspendTasks': innerSuspendTasks,
+         'outNextTasks': innerNextTasks
+       });
+     }
 
      base.createRelated.cacheTasks['contents'] = new TaskActivitys({
        'canvasRelated': base.canvasRelated,
@@ -240,8 +217,8 @@
        'chapterId': chapterId,
        'pageIndex': base.pageIndex,
        'chapterIndex': base.chapterIndex,
-       'pageBaseHooks': pageBaseHooks,
+       'pageBaseHooks': base.collectHooks,
        'getStyle': base.getStyle
-     });
+     }, suspend, success)
    }
  }

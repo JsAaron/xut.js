@@ -43,8 +43,8 @@ function toArray(contentsFragment, headerFooterMode) {
   _.each(contentsFragment, function($node, key) {
     let id = key.split('_').pop()
     let state
-    if(headerFooterMode && (state = headerFooterMode[id])) {
-      if(state !== 'hide') { //隐藏抛弃的元素，不需要显示了
+    if (headerFooterMode && (state = headerFooterMode[id])) {
+      if (state !== 'hide') { //隐藏抛弃的元素，不需要显示了
         headerFooterContent.push($node)
       }
     } else {
@@ -63,11 +63,15 @@ function toArray(contentsFragment, headerFooterMode) {
 export default class TaskActivitys {
 
   /*管道参数，贯通*/
-  constructor(pipeData) {
+  constructor(pipeData, suspend, success) {
+
     _.extend(this, pipeData)
-      /*chapter => activity*/
-    let activitys
-    if(activitys = activityParser(pipeData)) {
+    this.suspend = suspend
+    this.success = success
+
+    /*chapter => activity*/
+    const activitys = activityParser(pipeData)
+    if (activitys) {
       pipeData = contentParser(activitys, pipeData)
       pipeData.createContentIds.length ? this._dataAfterCheck(pipeData) : this._loadComplete();
     } else {
@@ -113,7 +117,7 @@ export default class TaskActivitys {
           //iboosk节点预编译
           //在执行的时候节点已经存在
           //不需要在创建
-        if(Xut.IBooks.runMode()) {
+        if (Xut.IBooks.runMode()) {
           _.each(userData.idFix, (id) => {
             pipeData.contentsFragment[id] = pipeData.$containsNode.find("#" + id)[0]
           })
@@ -127,7 +131,7 @@ export default class TaskActivitys {
           /* eslint-disable */
           //2015.5.6暴露到全局
           //提供给音频字幕上下文
-        if(!Xut.Contents.contentsFragment[pipeData.chapterId]) {
+        if (!Xut.Contents.contentsFragment[pipeData.chapterId]) {
           Xut.Contents.contentsFragment[pipeData.chapterId];
         }
         Xut.Contents.contentsFragment[pipeData.chapterId] = pipeData.contentsFragment
@@ -145,12 +149,12 @@ export default class TaskActivitys {
   _dataStrCheck(pipeData, userData) {
     this._assert('strAfter', function() {
       /*缩放图片*/
-      if(Object.keys(pipeData.zoomBehavior).length) {
+      if (Object.keys(pipeData.zoomBehavior).length) {
         this.zoomObjs = zoomPicture(pipeData)
         this.zoomBehavior = pipeData.zoomBehavior
       }
       //文本特效
-      if(userData.textFx.length) {
+      if (userData.textFx.length) {
         this.textFxObjs = textFx(pipeData, userData.textFx)
       }
       //保留场景的留信息
@@ -184,8 +188,8 @@ export default class TaskActivitys {
       const hookfns = function() {
         let iscrollHooks = delayHooks.iscrollHooks
         let hook
-        if(iscrollHooks.length) {
-          while(hook = iscrollHooks.shift()) {
+        if (iscrollHooks.length) {
+          while (hook = iscrollHooks.shift()) {
             hook()
           }
         }
@@ -199,7 +203,7 @@ export default class TaskActivitys {
        */
       const complete = function() {
         return function() {
-          if(pipeData.taskCount === 1) {
+          if (pipeData.taskCount === 1) {
             delayHooks && hookfns()
             self._applyAfterCheck()
             return
@@ -209,17 +213,17 @@ export default class TaskActivitys {
       }()
 
       /*浮动页面对,浮动对象比任何层级都都要高,超过母版*/
-      if(pipeData.floatPages.ids && pipeData.floatPages.ids.length) {
+      if (pipeData.floatPages.ids && pipeData.floatPages.ids.length) {
         createFloatPage(this, pipeData, complete)
       }
 
       /*如果存在母版浮动节点,在创建节点structure中过滤出来，根据参数的tipmost*/
-      if(pipeData.floatMaters.ids && pipeData.floatMaters.ids.length) {
+      if (pipeData.floatMaters.ids && pipeData.floatMaters.ids.length) {
         createFloatMater(this, pipeData, complete)
       }
 
       /*iboosk节点预编译,在执行的时候节点已经存在,不需要在创建*/
-      if(Xut.IBooks.runMode()) {
+      if (Xut.IBooks.runMode()) {
         complete();
       } else {
         let fragment = toArray(pipeData.contentsFragment, headerFooterMode)
@@ -232,14 +236,14 @@ export default class TaskActivitys {
         bodyContent.length && ++watchCount
 
         /*没有渲染数据*/
-        if(!watchCount) {
+        if (!watchCount) {
           complete()
           return
         }
 
         const watchNextTick = function() {
-          return() => {
-            if(watchCount === 1) {
+          return () => {
+            if (watchCount === 1) {
               complete()
               return
             }
@@ -248,7 +252,7 @@ export default class TaskActivitys {
         }()
 
         /*页眉页脚*/
-        if(headerFooterContent.length) {
+        if (headerFooterContent.length) {
           nextTick({
             'container': pipeData.$headFootNode,
             'content': fragment.headerFooterContent
@@ -256,7 +260,7 @@ export default class TaskActivitys {
         }
 
         /*主体内容*/
-        if(bodyContent.length) {
+        if (bodyContent.length) {
           nextTick({
             'container': pipeData.$containsNode,
             'content': fragment.bodyContent
@@ -281,9 +285,9 @@ export default class TaskActivitys {
    * @return {[type]} [description]
    */
   runSuspendTasks() {
-    if(this.suspendQueues) {
+    if (this.suspendQueues) {
       var fn;
-      if(fn = this.suspendQueues.pop()) {
+      if (fn = this.suspendQueues.pop()) {
         fn();
       }
       this.suspendQueues = null;
@@ -295,7 +299,7 @@ export default class TaskActivitys {
    * @return {[type]} [description]
    */
   _loadComplete() {
-    this.pageBaseHooks && this.pageBaseHooks.success();
+    this.success && this.success();
   }
 
   /**
@@ -318,7 +322,7 @@ export default class TaskActivitys {
       tasks.call(self);
     }
 
-    self.pageBaseHooks && self.pageBaseHooks.suspend(taskName, nextTasks, suspendTasks);
+    self.suspend && self.suspend(taskName, nextTasks, suspendTasks);
   }
 
 
@@ -329,7 +333,7 @@ export default class TaskActivitys {
   clearReference() {
 
     //文字动画
-    if(this.textFxObjs) {
+    if (this.textFxObjs) {
       _.each(this.textFxObjs, function(obj) {
         obj.destroy()
       })
@@ -337,15 +341,15 @@ export default class TaskActivitys {
     }
 
     //删除字幕用的碎片文档
-    if(Xut.Contents.contentsFragment[this.chapterId]) {
+    if (Xut.Contents.contentsFragment[this.chapterId]) {
       delete Xut.Contents.contentsFragment[this.chapterId]
     }
 
     //清理放大图片功能
-    if(this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
+    if (this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
       //清理缩放绑定事件
       _.each(this.zoomBehavior, function(zoomBehavior) {
-        if(zoomBehavior.off) {
+        if (zoomBehavior.off) {
           zoomBehavior.off()
         }
       })

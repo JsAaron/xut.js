@@ -17,9 +17,9 @@ from '../../../component/activity/event/event'
  */
 const getActivity = function(activityId, callback) {
   var activity;
-  if(activity = this.activityGroup) {
+  if (activity = this.activityGroup) {
     _.each(activity.get(), function(contentObj, index) {
-      if(activityId == contentObj.activityId) {
+      if (activityId == contentObj.activityId) {
         callback(contentObj)
         return;
       }
@@ -59,7 +59,7 @@ const combineEvents = function(pagebase, eventRelated) {
   _.each(eventRelated, function(edata) {
     _.each(edata, function(scope) {
       contentObj = pagebase.baseGetContentObject(scope.eventContentId)
-      if(!contentObj) {
+      if (!contentObj) {
         // console.log('error', 'pagebase.js第' + pagebase.pageIndex + '页多事件处理出错!!!!')
         return
       }
@@ -91,7 +91,7 @@ const combineEvents = function(pagebase, eventRelated) {
     })
 
     //暴露引用
-    pagebase.collectHooks.registerEvents = eventRelated;
+    pagebase.collectHooks.registerEvent = eventRelated;
   })
 }
 
@@ -103,13 +103,13 @@ export function create(pagebase, eventRelated) {
 
 
 export function destroy(pagebase) {
-  var registerEvents;
-  if(registerEvents = pagebase.collectHooks.registerEvents) {
-    _.each(registerEvents, function(edata) {
+  const registerEvent = pagebase.collectHooks.registerEvent
+  if (registerEvent) {
+    _.each(registerEvent, function(edata) {
       _.each(edata, function(obj) {
         obj.destroy && obj.destroy();
       })
     })
+    pagebase.collectHooks.registerEvent = null;
   }
-  pagebase.collectHooks.registerEvents = null;
 }

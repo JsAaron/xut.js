@@ -138,14 +138,15 @@ export default function(baseProto) {
 
       /**
        * 多线程任务完成后
+       * createTasksComplete方法中
        * 开始column观察器
        */
       threadtaskComplete() {
         watchColumn(instance, config)
       },
 
-      /*
-      保存Activity类实例
+      /**
+       * 保存Activity类实例
        */
       cacheActivity(activityInstance) {
         instance.activityGroup.add(activityInstance)

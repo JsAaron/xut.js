@@ -6,39 +6,52 @@
  *      2 创建完毕
  *      3 创建失败
  */
+import TaskSuper from '../task-super'
 import directives from '../../../../directive/index'
 import { reviseSize } from '../../../../../util/option'
 
-export default function TaskComponents(data, suspendCallback, successCallback) {
+export default class TaskComponents extends TaskSuper {
 
-  //预编译模式跳过创建
-  if(Xut.IBooks.runMode()) {
-    successCallback();
-    return;
-  }
+  constructor(data, suspend, success) {
 
-  if(data['activitys'].length) {
-    var str;
-    this.$containsNode = data['$containsNode'];
-    this.callback = {
-      'suspendCallback': suspendCallback,
-      'successCallback': successCallback
+    super()
+
+    //预编译模式跳过创建
+    if (Xut.IBooks.runMode()) {
+      success();
+      return;
     }
-    str = this.create(data);
-    this.compileSuspend(str);
-  } else {
-    successCallback();
+
+    if (data.activitys && data.activitys.length) {
+      this.suspend = suspend
+      this.success = success
+      this.$containsNode = data['$containsNode'];
+      this._suspendCompile(this._create(data));
+    } else {
+      success();
+    }
   }
-}
 
 
-TaskComponents.prototype = {
-
-  clearReference: function() {
+  clearReference() {
     this.$containsNode = null;
-  },
+  }
 
-  create: function(data) {
+
+  /**
+   * 运行被阻断的线程任务
+   */
+  runSuspendTasks() {
+    if (this.suspendQueues) {
+      var fn;
+      if (fn = this.suspendQueues.pop()) {
+        fn();
+      }
+      this.suspendQueues = null;
+    }
+  }
+
+  _create(data) {
     var actType,
       pageType = data.pageType,
       createWidgets = data.activitys,
@@ -63,11 +76,11 @@ TaskComponents.prototype = {
       actType = activityData.actType || activityData.animation;
 
       //特殊类型 showNote
-      if(!actType && activityData.note) {
+      if (!actType && activityData.note) {
         activityData['actType'] = actType = "ShowNote";
       }
 
-      switch(actType) {
+      switch (actType) {
         case 'ShowNote':
         case 'Action':
         case 'Widget':
@@ -84,47 +97,35 @@ TaskComponents.prototype = {
     })
 
     return widgetRetStr.join("");
-  },
+  }
 
   /**
    * 编译中断函数
-   * @return {[type]} [description]
    */
-  compileSuspend: function(str) {
+  _suspendCompile(str) {
 
-    var nextTasks, suspendTasks,
-      self = this;
+    const self = this;
 
     //继续执行
-    nextTasks = function() {
+    const nextTasks = function() {
       Xut.nextTick({
         container: self.$containsNode,
         content: $(str)
       }, function() {
         self.clearReference();
-        self.callback.successCallback();
+        self.success();
       });
     }
 
     //中断方法
-    suspendTasks = function() {
+    const suspendTasks = function() {
       self.suspendQueues = [];
       self.suspendQueues.push(function() {
         nextTasks()
       })
     }
 
-    self.callback.suspendCallback(nextTasks, suspendTasks);
-  },
-
-  //运行被阻断的线程任务
-  runSuspendTasks: function() {
-    if(this.suspendQueues) {
-      var fn;
-      if(fn = this.suspendQueues.pop()) {
-        fn();
-      }
-      this.suspendQueues = null;
-    }
+    self.suspend(nextTasks, suspendTasks);
   }
+
 }
