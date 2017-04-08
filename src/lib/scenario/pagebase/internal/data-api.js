@@ -14,7 +14,7 @@ export default function(baseProto) {
    */
   baseProto.getLetterObjs = function(contentId) {
     let contents = this.createRelated.cacheTasks['contents']
-    if(contents && contents.textFxObjs) {
+    if (contents && contents.textFxObjs) {
       return contents.textFxObjs[contentId]
     }
   }
@@ -34,10 +34,10 @@ export default function(baseProto) {
    */
   baseProto.hasSwipeSequence = function(direction) {
     let eventName = this._converSequenceName(direction)
-    let swipeSequence = this._swipeSequence
+    let swipeSequence = this.swipeSequence
 
     //如果执行完毕了
-    if(swipeSequence[eventName + 'Index'] === swipeSequence[eventName + 'Total']) {
+    if (swipeSequence[eventName + 'Index'] === swipeSequence[eventName + 'Total']) {
       return false
     }
     return swipeSequence[eventName].length
@@ -48,14 +48,14 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.callSwipeSequence = function(direction) {
-    if(!this._swipeSequence) {
+    if (!this.swipeSequence) {
       return
     }
     let eventName = this._converSequenceName(direction)
-    let sequence = this._swipeSequence[eventName]
-    let callAnimSequence = sequence[this._swipeSequence[eventName + 'Index']]
-    if(callAnimSequence) {
-      ++this._swipeSequence[eventName + 'Index']
+    let sequence = this.swipeSequence[eventName]
+    let callAnimSequence = sequence[this.swipeSequence[eventName + 'Index']]
+    if (callAnimSequence) {
+      ++this.swipeSequence[eventName + 'Index']
       callAnimSequence() //动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
     }
   }
@@ -67,11 +67,11 @@ export default function(baseProto) {
    * @return {[type]}           [description]
    */
   baseProto.resetSwipeSequence = function() {
-    if(!this._swipeSequence) {
+    if (!this.swipeSequence) {
       return
     }
-    this._swipeSequence.swipeleftIndex = 0
-    this._swipeSequence.swiperightIndex = 0
+    this.swipeSequence.swipeleftIndex = 0
+    this.swipeSequence.swiperightIndex = 0
   }
 
 
@@ -81,7 +81,7 @@ export default function(baseProto) {
    */
   baseProto.checkInstanceTasks = function(taskName) {
     var tasksObj
-    if(tasksObj = this.createRelated.cacheTasks[taskName]) {
+    if (tasksObj = this.createRelated.cacheTasks[taskName]) {
       tasksObj.runSuspendTasks()
       return true;
     }
@@ -93,7 +93,7 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.baseData = function() {
-    return this._dataCache[this.pageType]
+    return this.dataActionGroup[this.pageType]
   }
 
 
@@ -102,7 +102,7 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.baseActivits = function() {
-    return this._dataCache['activitys']
+    return this.dataActionGroup['activitys']
   }
 
 
@@ -111,7 +111,7 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.baseAutoRun = function() {
-    const data = this._dataCache['auto']
+    const data = this.dataActionGroup['auto']
     return data && data;
   }
 
@@ -132,13 +132,14 @@ export default function(baseProto) {
    * @return {[type]}             [description]
    */
   baseProto.baseGetContentObject = function(contentId) {
-    var contentsObj;
-    if(contentsObj = this._contentsCollector[contentId]) {
-      return contentsObj;
-    } else {
-      //查找浮动母版
-      return this.floatContents.Master[contentId];
+    const contentsObj = this.contentGroup[contentId]
+    if (contentsObj) {
+      return contentsObj
     }
+
+    //查找浮动母版
+    return this.floatContents.Master[contentId];
+
   }
 
 
@@ -150,14 +151,14 @@ export default function(baseProto) {
    */
   baseProto.baseContentMutex = function(contentId, type) {
     let contentObj
-    if(contentObj = this.baseGetContentObject(contentId)) {
+    if (contentObj = this.baseGetContentObject(contentId)) {
       const $contentElement = contentObj.$contentNode.view ?
         contentObj.$contentNode.view :
         contentObj.$contentNode
 
       const handle = {
         'Show' () {
-          if(contentObj.type === 'dom') {
+          if (contentObj.type === 'dom') {
             $contentElement.css({
               'display': 'blcok',
               'visibility': 'visible'
@@ -167,7 +168,7 @@ export default function(baseProto) {
           }
         },
         'Hide' () {
-          if(contentObj.type === 'dom') {
+          if (contentObj.type === 'dom') {
             $contentElement.css({
               'display': 'none',
               'visibility': 'hidden'
@@ -191,11 +192,11 @@ export default function(baseProto) {
     "Specified"
   ], function(type) {
     baseProto['base' + type + 'Content'] = function(data) {
-      switch(type) {
+      switch (type) {
         case 'Get':
-          return this._abActivitys.get();
+          return this.activityGroup.get();
         case 'Specified':
-          return this._abActivitys.specified(data);
+          return this.activityGroup.specified(data);
       }
     }
   })
@@ -203,24 +204,24 @@ export default function(baseProto) {
   //components零件类型处理
   //baseGetComponent
   //baseRemoveComponent
-  //baseRegisterComponent
+  //baseAddComponent
   //baseSpecifiedComponent
   _.each([
     "Get",
     "Remove",
-    "Register",
+    "Add",
     "Specified"
   ], function(type) {
     baseProto['base' + type + 'Component'] = function(data) {
-      switch(type) {
-        case 'Register':
-          return this._components.register(data);
+      switch (type) {
+        case 'add':
+          return this.componentGroup.add(data);
         case 'Get':
-          return this._components.get();
+          return this.componentGroup.get();
         case 'Specified':
-          return this._components.specified(data);
+          return this.componentGroup.specified(data);
         case 'Remove':
-          return this._components.remove();
+          return this.componentGroup.remove();
       }
     }
   })
@@ -235,13 +236,13 @@ export default function(baseProto) {
    */
   baseProto.baseAssistRun = function(activityId, outCallBack, actionName) {
     var activity;
-    if(activity = this._abActivitys) {
+    if (activity = this.activityGroup) {
       _.each(activity.get(), function(contentObj, index) {
-        if(activityId == contentObj.activityId) {
-          if(actionName == 'Run') {
+        if (activityId == contentObj.activityId) {
+          if (actionName == 'Run') {
             contentObj.runAnimation(outCallBack, true);
           }
-          if(actionName == 'Stop') {
+          if (actionName == 'Stop') {
             contentObj.stopAnimation(outCallBack);
           }
         }

@@ -1,5 +1,5 @@
 import { config } from '../../../config/index'
-import { create as _create } from '../depend/multievent'
+import { create } from '../depend/multievent'
 import Collection from '../depend/collection'
 import initTasks from '../multithread/index'
 import Factory from '../depend/factory'
@@ -9,9 +9,8 @@ export default function(baseProto) {
 
   /**
    * 初始化多线程任务
-   * @return {[type]} [description]
    */
-  baseProto.initState = function(options) {
+  baseProto.init = function(options) {
 
     const instance = this
 
@@ -21,7 +20,7 @@ export default function(baseProto) {
      * 数据缓存容器
      * @type {Object}
      */
-    this._dataCache = {}
+    this.dataActionGroup = {}
     this.scenarioId = this.chapterData.seasonId
     this.chapterId = this.chapterData._id
 
@@ -35,28 +34,37 @@ export default function(baseProto) {
     this.hasMultithread = this.multiplePages ? true : false;
 
     //母版处理
-    if(instance.pageType === 'master') {
+    if (instance.pageType === 'master') {
       this.isMaster = true;
     }
 
     //canvas模式
     this.canvasRelated = new Factory();
 
+
+    ///////////////////////////////////////
+    ///
+    /// 内部钩子相关
+    /// 监听状态的钩子
+    /// 注册所有content对象管理
+    /// 收集所有content对象
+    /// 构建li主结构后,即可翻页
+    /// 构建所有对象完毕后处理
+    ///
+    ////////////////////////////////////////
+
     /**
-     * 内部钩子相关
-     * 监听状态的钩子
-     * 注册所有content对象管理
-     * 收集所有content对象
-     * 构建li主结构后,即可翻页
-     * 构建所有对象完毕后处理
+     * 缓存所有的content对象引用
+     * 1对1的关系
      */
+    this.contentGroup = {}
 
     /**
      * 抽象activtiys合集,用于关联各自的content
      * 划分各自的子作用域
      * 1对多的关系
      */
-    this._abActivitys = new Collection();
+    this.activityGroup = new Collection();
 
     /**
      * widget热点处理类
@@ -64,19 +72,14 @@ export default function(baseProto) {
      * 1 iframe零件
      * 2 页面零件
      */
-    this._components = new Collection();
+    this.componentGroup = new Collection();
 
-    /**
-     * 缓存所有的content对象引用
-     * 1对1的关系
-     */
-    this._contentsCollector = {}
 
     /**
      * 2016.9.7
      * column热点对象
      */
-    this._columns = new Collection()
+    this.columnGroup = new Collection()
 
     /**
      * 为mini杂志新功能
@@ -84,8 +87,8 @@ export default function(baseProto) {
      * 收集滑动委托对象，针对事件合集触发处理
      * 2016.11.8
      */
-    if(config.swipeDelegate) {
-      this._swipeSequence = {
+    if (config.swipeDelegate) {
+      this.swipeSequence = {
         swipeleft: [],
         swiperight: [],
         swipeleftTotal: 0,
@@ -133,7 +136,7 @@ export default function(baseProto) {
 
     /**
      * 对象的处理情况的内部钩子方法
-     * @type {Object}
+     * 收集内部的一些状态与对象
      */
     this.collectHooks = {
 
@@ -145,11 +148,11 @@ export default function(baseProto) {
         watchColumn(instance, config)
       },
 
-      /**
-       * 注册抽象Activity类content(大类,总content对象)
+      /*
+      保存Activity类实例
        */
-      registerActivitys(contentsObjs) {
-        instance._abActivitys.register(contentsObjs);
+      cacheActivity(activityInstance) {
+        instance.activityGroup.add(activityInstance)
       },
 
       /**
@@ -157,13 +160,13 @@ export default function(baseProto) {
        * 因为content多页面共享的,所以content的合集需要保存在pageMgr中（特殊处理）
        */
       contents(chapterIndex, id, contentScope) {
-        const scope = instance.baseGetContentObject[id]
-          //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
-        if(scope && scope.isBindEventHooks) {
-          instance._contentsCollector[id] = contentScope;
+        const scope = instance.baseGetContentObject[id];
+        //特殊处理,如果注册了事件ID,上面还有动画,需要覆盖
+        if (scope && scope.isBindEventHooks) {
+          instance.contentGroup[id] = contentScope;
         }
-        if(!scope) {
-          instance._contentsCollector[id] = contentScope;
+        if (!scope) {
+          instance.contentGroup[id] = contentScope;
         }
       },
 
@@ -178,9 +181,9 @@ export default function(baseProto) {
         let contentObj
         floatContents.PageContainer = data.container;
         _.each(data.ids, function(id) {
-          if(contentObj = instance.baseGetContentObject(id)) {
+          if (contentObj = instance.baseGetContentObject(id)) {
             //初始视察坐标
-            if(contentObj.parallax) {
+            if (contentObj.parallax) {
               contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
             }
             floatContents.Page[id] = contentObj
@@ -207,20 +210,20 @@ export default function(baseProto) {
         //浮动对象
         _.each(data.ids, function(id) {
           //转化成实际操作的浮动对象,保存
-          if(contentObj = instance.baseGetContentObject(id)) {
+          if (contentObj = instance.baseGetContentObject(id)) {
             //初始视察坐标
-            if(contentObj.parallax) {
+            if (contentObj.parallax) {
               contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
             }
             floatContents.Master[id] = contentObj
           } else {
             Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
               //获取DOM节点
-            if(contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
+            if (contentsFragment = instance.createRelated.cacheTasks.contents.contentsFragment) {
               prefix = 'Content_' + instance.chapterIndex + "_"
               _.each(contentsFragment, function(dom) {
                 var makePrefix = prefix + id;
-                if(dom.id == makePrefix) {
+                if (dom.id == makePrefix) {
                   contentNode = dom;
                 }
               })
@@ -242,7 +245,7 @@ export default function(baseProto) {
        * 执行多事件绑定
        */
       eventBinding(eventRelated) {
-        _create(instance, eventRelated);
+        create(instance, eventRelated);
       },
 
       /**
@@ -250,8 +253,8 @@ export default function(baseProto) {
        * 收集滑动委托对象，针对事件合集触发处理
        */
       swipeDelegateContents(eventName, fn) {
-        ++instance._swipeSequence[eventName + 'Total']
-        instance._swipeSequence[eventName].push(fn)
+        ++instance.swipeSequence[eventName + 'Total']
+        instance.swipeSequence[eventName].push(fn)
       }
     }
 

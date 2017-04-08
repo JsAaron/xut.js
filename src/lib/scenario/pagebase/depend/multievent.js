@@ -17,7 +17,7 @@ from '../../../component/activity/event/event'
  */
 const getActivity = function(activityId, callback) {
   var activity;
-  if(activity = this._abActivitys) {
+  if(activity = this.activityGroup) {
     _.each(activity.get(), function(contentObj, index) {
       if(activityId == contentObj.activityId) {
         callback(contentObj)

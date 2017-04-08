@@ -1,6 +1,6 @@
 const noop = function() {}
 
-export default function initstate(instance) {
+export default function initThreadState(instance) {
 
   return {
     /**

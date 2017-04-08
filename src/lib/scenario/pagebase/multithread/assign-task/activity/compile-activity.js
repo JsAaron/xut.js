@@ -35,7 +35,7 @@ export function compileActivity(pipeData, contentDataset, callback) {
   var getTransformOffset = function(ids, initTransformOffset) {
     return function(id) {
       //匹配是不是属于浮动对象
-      if(ids.length && ids[id]) {
+      if (ids.length && ids[id]) {
         //初始化容器布局的坐标
         return initTransformOffset
       }
@@ -81,7 +81,7 @@ export function compileActivity(pipeData, contentDataset, callback) {
    */
   const nextTask = function() {
     //多事件合集处理pagebase
-    if(eventRelated) {
+    if (eventRelated) {
       pageBaseHooks.eventBinding && pageBaseHooks.eventBinding(eventRelated)
     }
     //删除钩子
@@ -94,7 +94,7 @@ export function compileActivity(pipeData, contentDataset, callback) {
    * 生成activty控制对象
    * @type {[type]}
    */
-  const makeActivitys = function(compiler) {
+  const makeActivity = function(compiler) {
     return function(callback) {
       var filters;
       var imageId = compiler.imageIds; //父id
@@ -110,21 +110,19 @@ export function compileActivity(pipeData, contentDataset, callback) {
        * 则默认的事件去掉
        * @type {[type]}
        */
-      if(filters = eventRelated['eventContentId->' + imageId]) {
+      if (filters = eventRelated['eventContentId->' + imageId]) {
         _.each(filters, function(edata) {
           //id不需要
           //eventContentId = void 0;
-          if(edata.eventType == activity.eventType) {
+          if (edata.eventType == activity.eventType) {
             //写入的是伪数据,此行为让多事件抽象接管
             eventType = dragdropPara = undefined
           }
         })
       }
 
-      //需要绑定事件的数据
-      const eventData = { eventContentId, eventType, dragdropPara, feedbackBehavior }
-
-      const actdata = {
+      //注册引用
+      pageBaseHooks.cacheActivity(new ActivityClass({
         'noticeComplete': callback, //监听完成
         'pageIndex': pipeData.pageIndex,
         'canvasRelated': pipeData.canvasRelated, //父类引用
@@ -137,25 +135,23 @@ export function compileActivity(pipeData, contentDataset, callback) {
         'pageType': compiler.pageType, //构建类型 page/master
         'dataset': compiler.dataset, //动画表数据 or 视觉差表数据
         "chapterIndex": chapterIndex, //页码
-        'eventData': eventData, //事件数据
+        /*需要绑定事件的数据*/
+        'eventData': { eventContentId, eventType, dragdropPara, feedbackBehavior },
         'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
         'relatedCallback': relatedCallback //相关回调
-      }
-
-      //注册引用
-      pageBaseHooks.registerActivitys(new ActivityClass(actdata))
+      }))
     }
   }
 
   //制作curry Activity闭包
   var fnsActivity = []
-  while(compiler = createActivitys.shift()) {
-    fnsActivity.push(makeActivitys(compiler))
+  while (compiler = createActivitys.shift()) {
+    fnsActivity.push(makeActivity(compiler))
   }
 
   // 递归解析 activitys
   var recursiveParse = function() {
-    if(!fnsActivity.length) {
+    if (!fnsActivity.length) {
       nextTask()
       return
     }

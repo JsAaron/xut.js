@@ -357,8 +357,14 @@ export class ScalePan {
       this.$buttonNode.off()
       this.$buttonNode = null
     }
-    this.hammer.destroy()
-    this.$buttonNode && this.$buttonNode.off()
+    if(this.hammer){
+      this.hammer.destroy()
+      this.hammer = null
+    }
+    if(this.$buttonNode){
+      this.$buttonNode.off()
+    }
+    this.update = null
     this.rootNode = null
   }
 }

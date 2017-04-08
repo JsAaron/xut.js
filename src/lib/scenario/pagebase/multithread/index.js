@@ -1,17 +1,37 @@
 import { config } from '../../../config/index'
 import assignedTasks from './assign-task/index'
-import initTask from './init-task'
-import PageScale from './page-scale'
+import initThreadState from './thread-state'
+import { ScalePan } from '../../../plugin/extend/scale-pan'
 
 const noop = function() {}
 
-export default function schedulerTask(instance) {
+/*页面缩放*/
+const createPageScale = function(rootNode, pageIndex) {
+  let relatedMasterObj = Xut.Presentation.GetPageObj('master', pageIndex)
+  let pageMasterNode
+  if (relatedMasterObj) {
+    pageMasterNode = relatedMasterObj.getContainsNode()[0]
+  }
+  return new ScalePan({
+    rootNode,
+    hasButton: false,
+    tapClose: true,
+    update(styleText, speed) {
+      if (pageMasterNode && styleText) {
+        pageMasterNode.style[Xut.style.transform] = styleText
+        pageMasterNode.style[Xut.style.transitionDuration] = speed + 'ms'
+      }
+    }
+  })
+}
+
+
+export default function initThreadtasks(instance) {
 
   /**
    * 创建相关的信息
-   * @type {Object}
    */
-  const createRelated = instance.createRelated = initTask(instance)
+  const createRelated = instance.createRelated = initThreadState(instance)
 
   /**
    * 设置下一个标记
@@ -27,7 +47,6 @@ export default function schedulerTask(instance) {
 
   /**
    * 任务钩子
-   * @type {Object}
    */
   instance.threadtasks = {
 
@@ -71,7 +90,7 @@ export default function schedulerTask(instance) {
         createRelated.preforkComplete()
 
         //视觉差不管
-        if(instance.isMaster) {
+        if (instance.isMaster) {
           instance.nextTasks({
             'taskName': '外部Background',
             'outNextTasks': function() {
@@ -93,7 +112,7 @@ export default function schedulerTask(instance) {
         setNextRunTask('column')
 
         //针对当前页面的检测
-        if(!createRelated.tasksHang || instance.isMaster) {
+        if (!createRelated.tasksHang || instance.isMaster) {
           instance.nextTasks({
             'taskName': '外部widgets',
             outNextTasks: function() {
@@ -103,7 +122,7 @@ export default function schedulerTask(instance) {
         }
 
         //如果有挂起任务，则继续执行
-        if(createRelated.tasksHang) {
+        if (createRelated.tasksHang) {
           createRelated.tasksHang();
         }
       })
@@ -127,8 +146,8 @@ export default function schedulerTask(instance) {
        */
       const createScale = () => {
         const salePageType = config.salePageType
-        if(isPageType && (salePageType === 'page' || salePageType === 'all')) {
-          instance._pinchObj = new PageScale(instance.getScaleNode(), instance.pageIndex)
+        if (isPageType && (salePageType === 'page' || salePageType === 'all')) {
+          instance._pageScaleObj = createPageScale(instance.getScaleNode(), instance.pageIndex)
         }
       }
 
@@ -137,7 +156,7 @@ export default function schedulerTask(instance) {
       设计上chapter只有一个flow效果，所以直接跳过别的创建
       只处理页面类型，母版跳过
        */
-      if(isPageType && instance.chapterData.note == 'flow') {
+      if (isPageType && instance.chapterData.note == 'flow') {
         callContextTasks('Column', function() {
           setNextRunTask('complete')
           createRelated.createTasksComplete()
@@ -151,9 +170,9 @@ export default function schedulerTask(instance) {
 
     /**
      * 组件
+     * 构件零件类型任务
      */
     components() {
-      //构件零件类型任务
       callContextTasks('Components', function() {
         setNextRunTask('contents')
         instance.nextTasks({
@@ -166,11 +185,10 @@ export default function schedulerTask(instance) {
     },
 
     /**
-     * content
+     * content类型
      */
     contents() {
       callContextTasks('Contents', function() {
-        //设置任务完成
         setNextRunTask('complete')
         createRelated.createTasksComplete();
       })

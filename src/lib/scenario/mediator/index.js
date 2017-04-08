@@ -280,7 +280,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
     var injection;
     if(injection = this.$dispatcher[regData.pageType + 'Mgr']) {
       injection.abstractAssistPocess(regData.pageIndex, function(pageObj) {
-        pageObj.baseRegisterComponent.call(pageObj, regData.widget);
+        pageObj.baseAddComponent.call(pageObj, regData.widget);
       })
     } else {
       console.log('注册injection失败,regData=' + regData)

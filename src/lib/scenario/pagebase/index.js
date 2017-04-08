@@ -20,7 +20,7 @@
  *                                                         *
  **********************************************************************/
 
-import initstate from './internal/init-state'
+import initstate from './internal/init'
 import threadExternal from './internal/thread-api'
 import dataExternal from './internal/data-api'
 import destroy from './internal/destroy'
@@ -29,7 +29,7 @@ import moveParallax from './move/parallax'
 
 export class Pagebase {
   constructor(options) {
-    this.initState(options)
+    this.init(options)
   }
 }
 

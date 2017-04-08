@@ -1,49 +1,44 @@
 /**
- * [ description]
- * @return {[type]} [description]
- */
-
-/**
  * 处理合集
  */
 export default function Collection() {
   this.remove()
 }
 
+
 Collection.prototype = {
 
-  register(contentObj) {
-    if(!this.list) {
-      this.list = [contentObj]
+  /*加入合集*/
+  add(obj) {
+    if (!this._group) {
+      this._group = [obj]
     } else {
-      this.list.push(contentObj)
+      this._group.push(obj)
     }
   },
 
+  /*得到合集*/
   get() {
-    return this.list
+    return this._group
   },
 
   /**
    * 是否存在
-   * @return {Boolean} [description]
    */
   isExist: function() {
-    return this.list.length
+    return this._group.length
   },
 
   /**
    * 得到一个指定的实例
-   * @param  {[type]} data [description]
-   * @return {[type]}      [description]
    */
   specified(data) {
-    var instance;
-    var listLength = this.list.length;
-    while(listLength) {
-      listLength--;
-      if(instance = this.list[listLength]) {
-        if(instance.type === data.type && instance.id === data.id) {
+    let instance;
+    let length = this._group.length;
+    while (length) {
+      length--;
+      if (instance = this._group[length]) {
+        if (instance.type === data.type && instance.id === data.id) {
           return instance;
         }
       }
@@ -51,7 +46,7 @@ Collection.prototype = {
   },
 
   remove() {
-    this.list = []
+    this._group = []
   },
 
   reset() {

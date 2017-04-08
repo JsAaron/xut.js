@@ -6,22 +6,22 @@ export default function(chapterIndex, callback) {
   let pageType = this.pageType
 
   /*缓存数据*/
-  const addCacheDas = (namespace, data) => {
+  const addCacheGruop = (namespace, data) => {
     let key;
-    if(!this._dataCache[namespace]) {
-      this._dataCache[namespace] = data;
+    if(!this.dataActionGroup[namespace]) {
+      this.dataActionGroup[namespace] = data;
     } else {
       for(key in data) {
-        this._dataCache[namespace][key] = data[key];
+        this.dataActionGroup[namespace][key] = data[key];
       }
     }
   }
 
   /*增加数据缓存*/
   const addCache = (data, activitys, autoData) => {
-    addCacheDas(pageType, data); //挂载页面容器数据
-    addCacheDas('activitys', activitys); //挂载activitys数据
-    addCacheDas('auto', autoData); //挂载自动运行数据
+    addCacheGruop(pageType, data); //挂载页面容器数据
+    addCacheGruop('activitys', activitys); //挂载activitys数据
+    addCacheGruop('auto', autoData); //挂载自动运行数据
   }
 
   query(pageType, {

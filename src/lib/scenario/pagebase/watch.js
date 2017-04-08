@@ -1,13 +1,13 @@
 /****************************
  *
- *	监控_columns内容是否需要补全
+ *	监控columns内容是否需要补全
  *
  *****************************/
 
 export function watchColumn(instance, config) {
   //注册_columns对象改变
   if(config.columnCheck) {
-    const columnObj = instance._columns.get()
+    const columnObj = instance.columnGroup.get()
     if(columnObj && columnObj.length) {
       if(!instance.unWatchDep) {
         instance.unWatchDep = []

@@ -24,29 +24,27 @@ export default function(baseProto) {
     this.destroyPageAction()
 
     //2016/9/30
-    //for flow
-    //销毁缩放动作
-    if(this._pinchObj) {
-      this._pinchObj.destroy()
+    //页面缩放对象
+    if (this._pageScaleObj) {
+      this._pageScaleObj.destroy()
+      this._pageScaleObj = null
     }
 
     //流式布局对象
     //2016.9.10
-    const _columns = this._columns.get()
-    if(_columns.length) {
-      _columns.forEach(flowObj => {
+    const columns = this.columnGroup.get()
+    if (columns && columns.length) {
+      columns.forEach(flowObj => {
         flowObj.destroy()
-        flowObj = null
       })
-      this._columns = null
     }
 
 
     //清理线程任务块
     let cacheTasks, key, tasks;
-    if(cacheTasks = this.createRelated.cacheTasks) {
-      for(key in cacheTasks) {
-        if(tasks = cacheTasks[key]) {
+    if (cacheTasks = this.createRelated.cacheTasks) {
+      for (key in cacheTasks) {
+        if (tasks = cacheTasks[key]) {
           tasks.clearReference();
         }
       }
@@ -59,12 +57,12 @@ export default function(baseProto) {
     const hasFloatMater = !_.isEmpty(floatMaterContents);
 
     //清理content类型对象
-    let contents
-    if(contents = this._abActivitys.get()) {
+    const contents = this.activityGroup.get()
+    if (contents && contents.length) {
       contents.forEach(contentObj => {
         contentObj.destroy(destroyObj => {
           //如果不是浮动对象,清理元素引用
-          if(!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
+          if (!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
             destroyObj.$contentNode = null;
           }
         });
@@ -72,20 +70,20 @@ export default function(baseProto) {
     }
 
     //清除母版浮动容器
-    if(hasFloatMater && this.floatContents.MasterContainer) {
+    if (hasFloatMater && this.floatContents.MasterContainer) {
       this.floatContents.MasterContainer.remove();
     }
 
     //清除浮动页面对象
-    if(this.floatContents.Page && this.floatContents.PageContainer) {
+    if (this.floatContents.Page && this.floatContents.PageContainer) {
       this.floatContents.PageContainer.remove();
     }
 
     //清理零件类型对象
-    let _components;
-    if((_components = this.baseGetComponent())) {
-      _components.length && _components.forEach(componentObj => {
-        componentObj.destroy && componentObj.destroy();
+    const components = this.baseGetComponent()
+    if (components && components.length) {
+      components.forEach(obj => {
+        obj.destroy && obj.destroy();
       })
     }
 
@@ -93,7 +91,7 @@ export default function(baseProto) {
     _destroy(this);
 
     //伪li节点
-    if(this.$pseudoElement) {
+    if (this.$pseudoElement) {
       this.$pseudoElement = null;
     }
 
