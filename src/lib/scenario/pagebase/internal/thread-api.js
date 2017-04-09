@@ -13,15 +13,14 @@ export default function(baseProto) {
   /**
    * 开始调用任务
    * dispatch=>index=>create=>startThreadTask
-   * @return {[type]} [description]
+   * 如果是快速翻页，创建container就提前返回callback
    */
-  baseProto.startThreadTask = function(isFlipAction, callback, isToPageAction) {
-
-    this.isToPageAction = isToPageAction
+  baseProto.startThreadTask = function(isFlipAction, callback) {
 
     /*
     构建container任务完成后的一次调用
-    用于处理快速翻页
+    1 如果是快速翻頁，並且是翻頁動作
+    2 否則則繼續創建剩下的任務
      */
     this.threadTaskRelated.preforkComplete = (() => {
       return () => {
@@ -36,55 +35,18 @@ export default function(baseProto) {
       }
     })()
 
-    //继续构建任务
+    //开始构建任务
     this.dispatchTasks()
   }
 
 
   /**
-   * 任务调度
-   * @return {[type]} [description]
-   */
-  baseProto.dispatchTasks = function() {
-    const threadtasks = this.threadtasks[this.threadTaskRelated.nextTaskName]
-    if (threadtasks) {
-      threadtasks()
-    }
-  }
-
-  /**
-   * 处理最后一页动作
-   * [destroyPageAction description]
-   * @return {[type]} [description]
-   */
-  baseProto.destroyPageAction = function() {
-    if (this.stopLastPageAction) {
-      this.stopLastPageAction()
-      this.stopLastPageAction = null
-    }
-  }
-
-  /**
-   * 创建最后一次页面动作
-   * @return {[type]} [description]
-   */
-  baseProto.createPageAction = function() {
-    //如果有最后一个动作触发
-    //2016.10.13 给妙妙学增加watch('complete')
-    if (this.runLastPageAction) {
-      //返回停止方法
-      this.stopLastPageAction = this.runLastPageAction()
-    }
-  }
-
-  /**
-   * 检测任务是否完成
+   * 主动调用
+   * 检测任务是否完成,自动运行的时候需要检测
    * page => autoRun中需要保证任务完成后才能执行自动运行任务
-   * 快速翻页中遇到
-   * actTasksCallback 活动任务完成
-   * @return {[type]} [description]
+   * src\lib\scenario\manage\page.js
    */
-  baseProto.checkThreadTask = function(completeCallback) {
+  baseProto.checkThreadTaskComplete = function(completeCallback) {
     this.hasAutoRun = true;
     this._checkNextTaskCreate(() => {
       this.hasAutoRun = false
@@ -94,76 +56,10 @@ export default function(baseProto) {
 
 
   /**
-   * 多线程检测
-   * @return {[type]} [description]
-   */
-  baseProto._multithreadCheck = function(callbacks, interrupt) {
-    const check = () => {
-      if (this._checkTaskSuspend()) {
-        this.tasksTimeOutId && clearTimeout(this.tasksTimeOutId)
-        callbacks.suspendCallback.call(this);
-      } else {
-        callbacks.nextTaskCallback.call(this);
-      }
-    }
-    const next = () => {
-      this.tasksTimeOutId = setTimeout(() => {
-        check();
-      }, this.canvasRelated.tasksTimer);
-    }
-
-    //自动运行页面构建
-    if (this.hasAutoRun) {
-      //自动运行content中断检测 打断一次
-      if (interrupt) {
-        next()
-      } else {
-        check()
-      }
-    } else {
-      //后台构建
-      next()
-    }
-  }
-
-
-  /**
-   * 任务队列挂起
-   * nextTaskCallback 成功回调
-   * suspendCallback  中断回调
-   * @return {[type]} [description]
-   */
-  baseProto._asyTasks = function(callbacks, interrupt) {
-    //如果关闭多线程,不检测任务调度
-    if (!this.hasMultithread) {
-      return callbacks.nextTaskCallback.call(this);
-    }
-    //多线程检测
-    this._multithreadCheck(callbacks, interrupt)
-  }
-
-  /**
-   * 开始执行下一个线程任务,检测是否中断
-      suspendTask,
-      nextTask,
-      interrupt,
-      taskName
-   * @return {[type]} [description]
-   */
-  baseProto.detectorTask = function(options) {
-    this._asyTasks({
-      suspendCallback() {
-        options.suspendTask && options.suspendTask()
-      },
-      nextTaskCallback() {
-        options.nextTask && options.nextTask()
-      }
-    }, options.interrupt)
-  }
-
-
-  /**
-   * 设置任务中断
+   * 主动调用
+   * 翻页的时候要设置任务中断
+   * left middle right 默认三个页面
+   * src\lib\scenario\manage\page.js
    */
   baseProto.setTaskSuspend = function() {
     this.hasAutoRun = false;
@@ -174,11 +70,13 @@ export default function(baseProto) {
 
 
   /**
+   * 主动调用
    * 后台预创建任务
-   * @param  {[type]} tasksTimer [时间间隔]
-   * @return {[type]}            [description]
+   * 自动运行任务完成后，需要开始预创建其他页面任务没有创建完毕的的处理
+   * 断点续传
+   * \src\lib\scenario\manage\page.js:
    */
-  baseProto.createPreforkTasks = function(callback, isPreCreate) {
+  baseProto.createPreforkTask = function(callback, isPreCreate) {
     var self = this;
     //2个预创建间隔太短
     //背景预创建还在进行中，先挂起来等待
@@ -204,58 +102,33 @@ export default function(baseProto) {
 
 
   /**
-   * 自动运行：检测是否需要开始创建任务
-   * 1 如果任务全部完成了毕
-   * 2 如果有中断任务,就需要继续创建未完成的任务
-   * 3 如果任务未中断,还在继续创建
-   * currtask 是否为当前任务，加速创建
+   * 主动调用
+   * 2016.10.13 给妙妙学增加watch('complete')
+   * 如果有最后一个动作触发，创建最后一次页面动作
+   *
+   * 只有最后一页的时候才会存在runLastPageAction方法
+   * this.runLastPageAction在parseMode中定义
+   * \lib\scenario\pagebase\multithread\assign-task\index.js:
    */
-  baseProto._checkNextTaskCreate = function(callback) {
-
-    //如果任务全部完成
-    if (this.threadTaskRelated.nextTaskName === 'complete') {
-      return callback()
+  baseProto.createPageAction = function() {
+    if (this.runLastPageAction) {
+      //返回停止方法
+      this.stopLastPageAction = this.runLastPageAction()
     }
-
-    const self = this
-
-    //开始构未完成的任务
-    this._cancelTaskSuspend()
-
-    //完毕回调
-    this.threadTaskRelated.createTasksComplete = () => {
-      this.collectHooks && this.collectHooks.threadtaskComplete()
-      callback()
-    };
-
-    //派发任务
-    this.detectorTask({
-      nextTask() {
-        self.dispatchTasks();
-      }
-    });
   }
 
 
   /**
-   * 取消任务中断
-   * @return {[type]} [description]
+   * 销毁动作触发
+   * 处理最后一页动作
+   * \src\lib\scenario\manage\page.j
    */
-  baseProto._cancelTaskSuspend = function() {
-    this.canvasRelated.isTaskSuspend = false
+  baseProto.destroyPageAction = function() {
+    if (this.stopLastPageAction) {
+      this.stopLastPageAction()
+      this.stopLastPageAction = null
+    }
   }
-
-
-  /**
-   * 检测任务是否需要中断
-   * @return {[type]} [description]
-   */
-  baseProto._checkTaskSuspend = function() {
-    return this.canvasRelated.isTaskSuspend;
-  }
-
-
-
 
 
 }

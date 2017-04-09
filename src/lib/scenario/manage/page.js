@@ -357,7 +357,7 @@ export default class PageMgr extends Abstract {
   _checkTaskCompleted(currIndex, callback) {
     const currPageObj = this.abstractGetPageObj(currIndex)
     if(currPageObj) {
-      currPageObj.checkThreadTask(function() {
+      currPageObj.checkThreadTaskComplete(function() {
         // console.log('11111111111当前页面创建完毕',currIndex+1)
         callback(currPageObj)
       })
@@ -376,7 +376,7 @@ export default class PageMgr extends Abstract {
     resumeCount = resumePointer.length;
     while(resumeCount--) {
       if(resumeObj = this.abstractGetPageObj(resumePointer[resumeCount])) {
-        resumeObj.createPreforkTasks(function() {
+        resumeObj.createPreforkTask(function() {
           // console.log('后台处理完毕')
         }, preCreateTask)
       }

@@ -108,7 +108,7 @@ export default function initThreadtasks(instance) {
         //必须是启动了快速翻页
         threadTaskRelated.preforkComplete()
 
-        //视觉差不管
+        //模板上继续创建，不处理创建问题
         if (instance.isMaster) {
           instance.detectorTask({
             'taskName': '外部Background',
@@ -192,7 +192,7 @@ export default function initThreadtasks(instance) {
      */
     component() {
       createNewTask('assign-component', function() {
-        setNextTaskName('contents')
+        setNextTaskName('activity')
         instance.detectorTask({
           'taskName': '外部contents',
           nextTask: function() {
@@ -203,9 +203,9 @@ export default function initThreadtasks(instance) {
     },
 
     /**
-     * content类型
+     * activity类型
      */
-    contents() {
+    activity() {
       createNewTask('assgin-activity', function() {
         setNextTaskName('complete')
         threadTaskRelated.createTasksComplete();
@@ -214,6 +214,6 @@ export default function initThreadtasks(instance) {
   }
 
   /*注册缓存任务名*/
-  threadTaskRelated.cacheTasks = registerCacheTask(assignedTasks)
+  threadTaskRelated.assignTaskGroup = registerCacheTask(assignedTasks)
   threadTaskRelated.nextTaskName = 'container'
 }

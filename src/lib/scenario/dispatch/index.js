@@ -290,7 +290,7 @@ export default class Dispatcher {
               //开始线程任务，如果是翻页模式,支持快速创建
               pageBase.startThreadTask(isFlipAction, () => {
                 callbackAction[action]()
-              }, isToPageAction)
+              })
 
               //收集自定义样式的页面对象
               if(userStyle) {

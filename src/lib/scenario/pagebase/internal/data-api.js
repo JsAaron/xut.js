@@ -13,7 +13,7 @@ export default function(baseProto) {
    * @return {[type]} [description]
    */
   baseProto.getLetterObjs = function(contentId) {
-    let activity = this.threadTaskRelated.cacheTasks['assgin-activity']
+    let activity = this.threadTaskRelated.assignTaskGroup['assgin-activity']
     if (activity && activity.textFxObjs) {
       return activity.textFxObjs[contentId]
     }
@@ -77,11 +77,11 @@ export default function(baseProto) {
 
   /**
    * 对象实例内部构建
-   * 重新运行任务
+   * 重新实例运行任务
    */
-  baseProto.checkInstanceTasks = function(taskName) {
+  baseProto.rerunInstanceTask = function(taskName) {
     var tasksObj
-    if (tasksObj = this.threadTaskRelated.cacheTasks[taskName]) {
+    if (tasksObj = this.threadTaskRelated.assignTaskGroup[taskName]) {
       tasksObj.$$rerunTask && tasksObj.$$rerunTask()
       return true;
     }

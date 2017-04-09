@@ -31,7 +31,7 @@ export default function initThreadState(instance) {
     缓存的任务名
     动态注册
      */
-    cacheTasks:null,
+    assignTaskGroup:null,
 
     /**
      * 下一个将要运行的任务标示

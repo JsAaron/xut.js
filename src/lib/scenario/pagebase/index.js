@@ -21,6 +21,7 @@
  **********************************************************************/
 
 import initstate from './internal/init'
+import threadCheck from './internal/thread'
 import threadExternal from './internal/thread-api'
 import dataExternal from './internal/data-api'
 import destroy from './internal/destroy'
@@ -36,6 +37,7 @@ export class Pagebase {
 const baseProto = Pagebase.prototype
 
 initstate(baseProto)
+threadCheck(baseProto)
 threadExternal(baseProto)
 dataExternal(baseProto)
 movePage(baseProto)

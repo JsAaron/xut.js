@@ -91,12 +91,12 @@
     *    2 执行innerhtml构建完毕 successCallback
     */
    'assign-background' (success, base) {
-     if (base.checkInstanceTasks('assign-background')) {
+     if (base.rerunInstanceTask('assign-background')) {
        return;
      }
      const data = base.baseData(base.chapterIndex)
      const $containsNode = base.getContainsNode()
-     base.threadTaskRelated.cacheTasks['assign-background'] = new TaskBackground(
+     base.threadTaskRelated.assignTaskGroup['assign-background'] = new TaskBackground(
        data,
        $containsNode,
        success,
@@ -120,12 +120,12 @@
     * @return {[type]} [description]
     */
    'assign-component' (success, base) {
-     if (base.checkInstanceTasks('assign-component')) {
+     if (base.rerunInstanceTask('assign-component')) {
        return;
      }
      const chapterData = base.chapterData
      const baseData = base.baseData()
-     base.threadTaskRelated.cacheTasks['assign-component'] = new TaskComponents({
+     base.threadTaskRelated.assignTaskGroup['assign-component'] = new TaskComponents({
        '$containsNode': base.getContainsNode(),
        'nodes': chapterData['nodes'],
        'pageOffset': chapterData['pageOffset'],
@@ -152,7 +152,7 @@
        return success();
      }
 
-     if (base.checkInstanceTasks('assgin-activity')) {
+     if (base.rerunInstanceTask('assgin-activity')) {
        return;
      }
 
@@ -161,7 +161,7 @@
      const chapterId = baseData._id
      const activitys = base.baseActivits()
 
-     base.threadTaskRelated.cacheTasks['assgin-activity'] = new TaskActivitys({
+     base.threadTaskRelated.assignTaskGroup['assgin-activity'] = new TaskActivitys({
        base,
        'canvasRelated': base.canvasRelated,
        'rootNode': base.rootNode,

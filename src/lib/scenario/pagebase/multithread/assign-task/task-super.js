@@ -22,7 +22,7 @@ export default class TaskSuper {
   $$checkNextTask(taskName, nextTask, interrupt) {
     //构建中断方法
     const suspendTask = () => {
-      self.$$suspendQueues.push(function() {
+      this.$$suspendQueues.push(function() {
         nextTask()
       })
     }

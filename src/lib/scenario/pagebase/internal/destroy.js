@@ -41,10 +41,10 @@ export default function(baseProto) {
 
 
     //清理多线程任务块
-    const cacheTasks = this.threadTaskRelated.cacheTasks
-    if (cacheTasks) {
-      for (let key in cacheTasks) {
-        let task = cacheTasks[key]
+    const taskGroup = this.threadTaskRelated.assignTaskGroup
+    if (taskGroup) {
+      for (let key in taskGroup) {
+        let task = taskGroup[key]
         if (task) {
           task.destroy && task.destroy()
         }
@@ -57,11 +57,11 @@ export default function(baseProto) {
     //是否有浮动对象
     const hasFloatMater = !_.isEmpty(floatMaterContents);
 
-    //清理content类型对象
-    const contents = this.activityGroup.get()
-    if (contents && contents.length) {
-      contents.forEach(contentObj => {
-        contentObj.destroy(destroyObj => {
+    //清理activity类型对象
+    const activitys = this.activityGroup.get()
+    if (activitys && activitys.length) {
+      activitys.forEach(activityObj => {
+        activityObj.destroy(destroyObj => {
           //如果不是浮动对象,清理元素引用
           if (!hasFloatMater || destroyObj && !floatMaterContents[destroyObj.id]) {
             destroyObj.$contentNode = null;
