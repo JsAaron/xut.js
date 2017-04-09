@@ -64,8 +64,8 @@ export default function(baseProto) {
   baseProto.setTaskSuspend = function() {
     this.hasAutoRun = false;
     this.canvasRelated.isTaskSuspend = true;
-    this.threadTaskRelated.preCreateTasks = false;
-    this.threadTaskRelated.tasksHang = null;
+    this.threadTaskRelated.isPreCreateBackground = false;
+    this.threadTaskRelated.taskHangFn = null;
   }
 
 
@@ -77,11 +77,11 @@ export default function(baseProto) {
    * \src\lib\scenario\manage\page.js:
    */
   baseProto.createPreforkTask = function(callback, isPreCreate) {
-    var self = this;
+    const self = this;
     //2个预创建间隔太短
     //背景预创建还在进行中，先挂起来等待
-    if (this.threadTaskRelated.preCreateTasks) {
-      this.threadTaskRelated.tasksHang = function(callback) {
+    if (this.threadTaskRelated.isPreCreateBackground) {
+      this.threadTaskRelated.taskHangFn = function(callback) {
         return function() {
           self._checkNextTaskCreate(callback);
         }
@@ -94,7 +94,7 @@ export default function(baseProto) {
      * 预创建背景
      */
     if (isPreCreate) {
-      this.threadTaskRelated.preCreateTasks = true;
+      this.threadTaskRelated.isPreCreateBackground = true;
     }
 
     this._checkNextTaskCreate(callback);

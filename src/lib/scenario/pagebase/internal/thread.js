@@ -86,7 +86,6 @@ export default function threadCheck(baseProto) {
   }
 
 
-
   /**
    * 多线程检测
    * @return {[type]} [description]

@@ -59,7 +59,7 @@ export default function initThreadtasks(instance) {
   }
 
   /* 创建新任务*/
-  const createNewTask = (taskName, fn) => {
+  const createAssignTask = (taskName, fn) => {
     return assignedTasks[taskName](fn, instance)
   }
 
@@ -74,7 +74,7 @@ export default function initThreadtasks(instance) {
      */
     container() {
 
-      createNewTask('assign-container', function($pageNode, $pseudoElement) {
+      createAssignTask('assign-container', function($pageNode, $pseudoElement) {
 
         //////////////
         //li,li-div //
@@ -125,12 +125,13 @@ export default function initThreadtasks(instance) {
      */
     background() {
 
-      createNewTask('assign-background', function() {
-        threadTaskRelated.preCreateTasks = false;
+      createAssignTask('assign-background', function() {
+        threadTaskRelated.isPreCreateBackground = false;
         setNextTaskName('column')
 
         //针对当前页面的检测
-        if (!threadTaskRelated.tasksHang || instance.isMaster) {
+        //没有背景挂起，或者是母版继续往下创建
+        if (!threadTaskRelated.taskHangFn || instance.isMaster) {
           instance.detectorTask({
             'taskName': '外部widgets',
             nextTask: function() {
@@ -140,8 +141,8 @@ export default function initThreadtasks(instance) {
         }
 
         //如果有挂起任务，则继续执行
-        if (threadTaskRelated.tasksHang) {
-          threadTaskRelated.tasksHang();
+        if (threadTaskRelated.taskHangFn) {
+          threadTaskRelated.taskHangFn();
         }
       })
     },
@@ -175,7 +176,7 @@ export default function initThreadtasks(instance) {
       只处理页面类型，母版跳过
        */
       if (isPageType && instance.chapterData.note == 'flow') {
-        createNewTask('assign-column', function() {
+        createAssignTask('assign-column', function() {
           setNextTaskName('complete')
           threadTaskRelated.createTasksComplete()
         })
@@ -191,7 +192,7 @@ export default function initThreadtasks(instance) {
      * 构件零件类型任务
      */
     component() {
-      createNewTask('assign-component', function() {
+      createAssignTask('assign-component', function() {
         setNextTaskName('activity')
         instance.detectorTask({
           'taskName': '外部contents',
@@ -206,7 +207,7 @@ export default function initThreadtasks(instance) {
      * activity类型
      */
     activity() {
-      createNewTask('assgin-activity', function() {
+      createAssignTask('assgin-activity', function() {
         setNextTaskName('complete')
         threadTaskRelated.createTasksComplete();
       })

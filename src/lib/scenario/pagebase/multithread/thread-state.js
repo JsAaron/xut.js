@@ -6,7 +6,7 @@ export default function initThreadState(instance) {
     /**
      * 主线任务等待
      */
-    tasksHang: null,
+    taskHangFn: null,
 
     /**
      * 创建相关的信息
@@ -25,7 +25,7 @@ export default function initThreadState(instance) {
     /**
      * 是否预创建背景中
      */
-    preCreateTasks: false,
+    isPreCreateBackground:false,
 
     /*
     缓存的任务名
