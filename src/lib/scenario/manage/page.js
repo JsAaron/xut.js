@@ -217,27 +217,27 @@ export default class PageMgr extends Abstract {
     const activateAutoRun = function(pageObj, data) {
 
       //结束通知
-      function complete() {
-        data.processComplete();
-        preCreateTask();
-      }
-
-      //如果页面容器存在,才处理自动运行
-      var currpageNode = pageObj.getContainsNode()
-      if (!currpageNode) {
-        return complete()
+      const _complete = function() {
+        data.processComplete()
+        preCreateTask()
       }
 
       //运行动作
-      function startRun() {
-        $$autoRun(pageObj, data.currIndex, complete);
+      const _startRun = function() {
+        $$autoRun(pageObj, data.currIndex, _complete);
+      }
+
+      //如果页面容器存在,才处理自动运行
+      const currpageNode = pageObj.getContainsNode()
+      if (!currpageNode) {
+        return _complete()
       }
 
       //运行如果被中断,则等待
       if (data.suspendCallback) {
-        data.suspendCallback(startRun)
+        data.suspendCallback(_startRun)
       } else {
-        startRun();
+        _startRun();
       }
     }
 
