@@ -1,3 +1,4 @@
+
 /**
  * 抽象管理接口
  * @return {[type]} [description]
