@@ -350,7 +350,7 @@ export default class Dispatcher {
     }
 
     let currIndex = pageIndex
-    let currObj = this.pageMgr.abstractGetPageObj(currIndex)
+    let currObj = this.pageMgr.$$getPageObj(currIndex)
 
     //2016.11.8
     //mini杂志功能

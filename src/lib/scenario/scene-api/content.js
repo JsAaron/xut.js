@@ -24,7 +24,7 @@ export function extendContent(access, $globalEvent) {
 
       function findContent(currIndex, contentId) {
         var pageObj;
-        if(pageObj = manager.abstractGetPageObj(currIndex)) {
+        if(pageObj = manager.$$getPageObj(currIndex)) {
           return pageObj.baseGetContentObject(contentId);
         }
       }
@@ -177,7 +177,7 @@ export function extendContent(access, $globalEvent) {
       access(function(manager, pageType, nameList) {
         if(typeCheck(nameList)) return;
         var pageBaseObj;
-        if(!(pageBaseObj = manager.abstractAssistPocess($globalEvent.getVisualIndex()))) {
+        if(!(pageBaseObj = manager.$$assistPocess($globalEvent.getVisualIndex()))) {
           console.log('注入互斥接口数据错误！')
           return;
         }

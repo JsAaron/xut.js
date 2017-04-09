@@ -64,7 +64,7 @@ export default class Activity {
     /**
      * 保存子对象content
      */
-    this.abstractContents = createContent(this)
+    this._contentGroup = createContent(this)
 
     /**
      * 处理html文本框
@@ -366,7 +366,7 @@ export default class Activity {
    * @return {[type]} [description]
    */
   eachAssistContents(callback) {
-    _.each(this.abstractContents, function(scope) {
+    _.each(this._contentGroup, function(scope) {
       callback.call(this, scope)
     }, this)
   }
@@ -436,7 +436,7 @@ export default class Activity {
         }
 
       }
-    }(this.abstractContents.length);
+    }(this._contentGroup.length);
 
     //执行动画
     this.eachAssistContents(function(scope) {
@@ -565,7 +565,7 @@ export default class Activity {
 
     //销毁动画
     this._destroyAnimation(elementCallback);
-    this.abstractContents = null
+    this._contentGroup = null
 
     //iscroll销毁
     if(this.iscroll) {

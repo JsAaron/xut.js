@@ -14,9 +14,9 @@ const prefix = 'Content_';
  * 如果不存在默认取当前页面
  */
 const createExistIndex = ($globalEvent) => {
-  return(pageIndex) => {
+  return (pageIndex) => {
     //如果不存在
-    if(pageIndex == undefined) {
+    if (pageIndex == undefined) {
       pageIndex = $globalEvent.getVisualIndex() //当前页面
     }
     return pageIndex
@@ -50,7 +50,8 @@ export function extendPresentation(access, $globalEvent) {
     Xut.Presentation[apiName] = (pageType, pageIndex) => {
       return access((manager, pageType, pageIndex) => {
         pageIndex = isExistIndex(pageIndex)
-        return manager["abstract" + apiName](pageIndex, pageType)
+        /*$$-manage-super接口*/
+        return manager["$$" + apiName](pageIndex, pageType)
       }, pageType, pageIndex)
     }
   })
@@ -70,7 +71,7 @@ export function extendPresentation(access, $globalEvent) {
         temp = [],
         cps = Xut.data.query('app' + apiName),
         cpsLength = cps.length;
-      for(i; i < cpsLength; i++) {
+      for (i; i < cpsLength; i++) {
         temp.push(cps.item(i))
       }
       return temp;
@@ -102,7 +103,7 @@ export function extendPresentation(access, $globalEvent) {
    */
   Xut.Presentation.GetPageStyle = (pageIndex) => {
     let pageBase = Xut.Presentation.GetPageObj(pageIndex)
-    if(pageBase && pageBase.getStyle) {
+    if (pageBase && pageBase.getStyle) {
       return pageBase.getStyle
     } else {
       $$warn('页面Style配置文件获取失败,pageIndex:' + pageIndex)
@@ -133,7 +134,7 @@ export function extendPresentation(access, $globalEvent) {
    * 获取命名规则
    */
   Xut.Presentation.GetContentName = function(id) {
-    if(id) {
+    if (id) {
       return prefix + Xut.Presentation.GetPagePrefix() + "_" + id;
     } else {
       return prefix + Xut.Presentation.GetPagePrefix()

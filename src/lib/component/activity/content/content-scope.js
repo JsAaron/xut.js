@@ -186,14 +186,14 @@ export default function(base) {
   var animation = base.dataset.animation,
     parallax = base.dataset.parallax,
     //抽出content对象
-    abstractContents = [],
+    contentGroup = [],
     //创建引用
     batcheCreate = fnCreate(base);
 
   switch(base.pageType) {
     case 'page':
       batcheCreate(animation, function(handlers) {
-        abstractContents.push(handlers)
+        contentGroup.push(handlers)
       });
       break;
     case 'master':
@@ -235,11 +235,11 @@ export default function(base) {
       _.each(hasAnimation ? tempAnimationScope : tempParallaxScope, function(target) {
         tempAssistContents.push(target);
       })
-      abstractContents = tempAssistContents;
+      contentGroup = tempAssistContents;
       break
   }
 
   batcheCreate = null;
 
-  return abstractContents;
+  return contentGroup;
 }

@@ -6,7 +6,7 @@ import { fix as _fix } from '../pagebase/move/translation'
  */
 const improveIndex = (complier, { currIndex } = {}) => {
   //提高page层级
-  complier.pageMgr.abstractAssistPocess(currIndex, pageObj => {
+  complier.pageMgr.$$assistPocess(currIndex, pageObj => {
     pageObj.$pageNode.css({
       'z-index': 9997
     });
@@ -14,7 +14,7 @@ const improveIndex = (complier, { currIndex } = {}) => {
 
   //提高mater层级
   complier.getMasterContext(function() {
-    this.abstractAssistPocess(currIndex, pageObj => {
+    this.$$assistPocess(currIndex, pageObj => {
       pageObj.$pageNode.css({
         'z-index': 1
       });
@@ -115,12 +115,12 @@ const createContainerView = (complier, data) => {
   //修正翻页2页的页面坐标值
   _.each(data['ruleOut'], function(pageIndex) {
     if(pageIndex > data['targetIndex']) {
-      pageMgr.abstractAssistAppoint(pageIndex, function(pageObj) {
+      pageMgr.$assistAppoint(pageIndex, function(pageObj) {
         _fix(pageObj.$pageNode, 'nextEffect')
       })
     }
     if(pageIndex < data['targetIndex']) {
-      pageMgr.abstractAssistAppoint(pageIndex, function(pageObj) {
+      pageMgr.$assistAppoint(pageIndex, function(pageObj) {
         _fix(pageObj.$pageNode, 'prevEffect')
       })
     }

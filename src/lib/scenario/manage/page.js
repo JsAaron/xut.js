@@ -3,7 +3,7 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import { Abstract } from './abstract'
+import { ManageSuper } from './manage-super'
 import { Pagebase } from '../pagebase/index'
 import { removeVideo } from '../../component/video/manager'
 import { execScript, $$on, $$off } from '../../util/index'
@@ -30,14 +30,12 @@ const runScript = (pageObject, type) => {
 }
 
 
-export default class PageMgr extends Abstract {
+export default class PageMgr extends ManageSuper {
 
   constructor(rootNode) {
     super()
     this.rootNode = rootNode
     this.pageType = 'page';
-    //创建合集容器
-    this.abstractCreateCollection();
 
     /*
     双页模式，给父节点绑定一个翻页监听事件
@@ -75,7 +73,7 @@ export default class PageMgr extends Abstract {
     )
 
     //增加页面管理
-    this.abstractAddCollection(pageIndex, pageObjs);
+    this.$$addGroup(pageIndex, pageObjs);
     return pageObjs;
   }
 
@@ -106,9 +104,9 @@ export default class PageMgr extends Abstract {
     } else {
       /*单页模式，移动每个独立的页面*/
       _.each([
-        this.abstractGetPageObj(leftIndex),
-        this.abstractGetPageObj(currIndex),
-        this.abstractGetPageObj(rightIndex)
+        this.$$getPageObj(leftIndex),
+        this.$$getPageObj(currIndex),
+        this.$$getPageObj(rightIndex)
       ], function(pageObj, index) {
         if (pageObj) {
           pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], direction)
@@ -126,7 +124,7 @@ export default class PageMgr extends Abstract {
    */
   suspend(leftIndex, currIndex, rightIndex, stopPointer) {
 
-    const suspendPageObj = this.abstractGetPageObj(stopPointer)
+    const suspendPageObj = this.$$getPageObj(stopPointer)
     const prveChpterId = suspendPageObj.baseGetPageId(stopPointer)
 
     /*如果有代码跟踪*/
@@ -158,7 +156,7 @@ export default class PageMgr extends Abstract {
   resetOriginal(pageIndex) {
     const originalIds = getRealPage(pageIndex, 'resetOriginal')
     originalIds.forEach(originaIndex => {
-      let originalPageObj = this.abstractGetPageObj(originaIndex)
+      let originalPageObj = this.$$getPageObj(originaIndex)
       if (originalPageObj) {
         let floatNode = originalPageObj.floatContentGroup.pageContainer
         if (floatNode) {
@@ -286,12 +284,12 @@ export default class PageMgr extends Abstract {
    * @return {[type]}                [description]
    */
   clearPage(clearPageIndex) {
-    const pageObj = this.abstractGetPageObj(clearPageIndex)
+    const pageObj = this.$$getPageObj(clearPageIndex)
     if (pageObj) {
       //移除事件
       pageObj.baseDestroy();
       //移除列表
-      this.abstractRemoveCollection(clearPageIndex);
+      this.$$removeGroup(clearPageIndex);
     }
   }
 
@@ -307,7 +305,7 @@ export default class PageMgr extends Abstract {
     removeVideo(pageId)
 
     //清理对象
-    this.abstractDestroyCollection();
+    this.$$destroyGroup();
 
     //销毁事件
     if (config.doublePageMode) {
@@ -337,7 +335,7 @@ export default class PageMgr extends Abstract {
         }
         let pageObj;
         pageIndex.forEach(function(pointer) {
-          if (pageObj = self.abstractGetPageObj(pointer)) {
+          if (pageObj = self.$$getPageObj(pointer)) {
             pageObj.setTaskSuspend();
           }
         })
@@ -351,7 +349,7 @@ export default class PageMgr extends Abstract {
 
   /*检测活动窗口任务*/
   _checkTaskCompleted(currIndex, callback) {
-    const currPageObj = this.abstractGetPageObj(currIndex)
+    const currPageObj = this.$$getPageObj(currIndex)
     if (currPageObj) {
       currPageObj.checkThreadTaskComplete(function() {
         // console.log('11111111111当前页面创建完毕',currIndex+1)
@@ -371,7 +369,7 @@ export default class PageMgr extends Abstract {
     }
     resumeCount = resumePointer.length;
     while (resumeCount--) {
-      if (resumeObj = this.abstractGetPageObj(resumePointer[resumeCount])) {
+      if (resumeObj = this.$$getPageObj(resumePointer[resumeCount])) {
         resumeObj.createPreforkTask(function() {
           // console.log('后台处理完毕')
         }, preCreateTask)

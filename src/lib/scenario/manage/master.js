@@ -4,7 +4,7 @@
  * @return {[type]}
  */
 import { config } from '../../config/index'
-import { Abstract } from './abstract'
+import { ManageSuper } from './manage-super'
 import { Pagebase } from '../pagebase/index'
 import {
   $$suspend,
@@ -54,7 +54,7 @@ const transform = Xut.style.transform
  *
  *  currMasterId: 9001 //实际的可使区
  */
-export default class MasterMgr extends Abstract {
+export default class MasterMgr extends ManageSuper {
 
   constructor(rootNode) {
     super()
@@ -74,19 +74,13 @@ export default class MasterMgr extends Abstract {
      * @type {Object}
      */
     this.parallaxProcessedContetns = {};
-
-    /**
-     * 抽象方法
-     * 创建视觉差容器
-     */
-    this.abstractCreateCollection();
   }
 
   /**
    * 注册状态管理
    */
   register(pageIndex, type, hotspotObj) {
-    var parallaxObj = this.abstractGetPageObj(this.converMasterId(pageIndex))
+    var parallaxObj = this.$$getPageObj(this.converMasterId(pageIndex))
     if(parallaxObj) {
       parallaxObj.registerCotents.apply(parallaxObj, arguments);
     }
@@ -115,7 +109,7 @@ export default class MasterMgr extends Abstract {
       if(config.devtools) {
         //重复的母版对象
         //用于检测页面模式是否一致
-        let currMasterObj = this.abstractGetPageObj(reuseMasterKey);
+        let currMasterObj = this.$$getPageObj(reuseMasterKey);
         currMasterObj && repeatCallBack(currMasterObj)
       }
       return
@@ -133,7 +127,7 @@ export default class MasterMgr extends Abstract {
     );
 
     //增加页面管理
-    this.abstractAddCollection(reuseMasterKey, masterObj);
+    this.$$addGroup(reuseMasterKey, masterObj);
 
     return masterObj;
   }
@@ -181,7 +175,7 @@ export default class MasterMgr extends Abstract {
      */
     const moveParallaxObject = (nodes) => {
       let getMasterId = this.converMasterId(currIndex)
-      let currParallaxObj = this.abstractGetPageObj(getMasterId)
+      let currParallaxObj = this.$$getPageObj(getMasterId)
       if(currParallaxObj) {
         //处理当前页面内的视觉差对象效果
         currParallaxObj.moveParallax({
@@ -215,7 +209,7 @@ export default class MasterMgr extends Abstract {
     //如果未越界不需要处理行为
     if(!this.isBoundary) return;
     let masterObj
-    if(masterObj = this.abstractGetPageObj(stopPointer)) {
+    if(masterObj = this.$$getPageObj(stopPointer)) {
       let pageId = masterObj.baseGetPageId(stopPointer);
       //停止活动对象活动
       $$suspend(masterObj, pageId);
@@ -229,7 +223,7 @@ export default class MasterMgr extends Abstract {
    */
   resetOriginal(pageIndex) {
     var originalPageObj;
-    if(originalPageObj = this.abstractGetPageObj(pageIndex)) {
+    if(originalPageObj = this.$$getPageObj(pageIndex)) {
       $$original(originalPageObj);
     }
   }
@@ -240,7 +234,7 @@ export default class MasterMgr extends Abstract {
    */
   autoRun(data) {
     var masterObj
-    if(masterObj = this.abstractGetPageObj(data.currIndex)) {
+    if(masterObj = this.$$getPageObj(data.currIndex)) {
       //热点状态复位
       this.resetOriginal(data.suspendIndex)
       $$autoRun(masterObj, data.currIndex);
@@ -313,7 +307,7 @@ export default class MasterMgr extends Abstract {
   destroy() {
     this.rootNode = null;
     //销毁对象
-    this.abstractDestroyCollection();
+    this.$$destroyGroup();
   }
 
 
@@ -335,23 +329,23 @@ export default class MasterMgr extends Abstract {
         //如果2个页面不一样的视觉差
         //或者是应用最后一页反弹的情况，2个页面同一个视觉差，也就是最后一页，往前面反弹
         if(prevFlag || isAppBoundary) {
-          currMasterObj = this.abstractGetPageObj(currMasterId);
+          currMasterObj = this.$$getPageObj(currMasterId);
         }
 
         if(prevMasterId && prevFlag) {
           action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
-          prevMasterObj = this.abstractGetPageObj(prevMasterId)
+          prevMasterObj = this.$$getPageObj(prevMasterId)
         }
         break;
       case 'next':
         nextMasterId = this.converMasterId(rightIndex)
         nextFlag = currMasterId !== nextMasterId
         if(nextFlag) {
-          currMasterObj = this.abstractGetPageObj(currMasterId)
+          currMasterObj = this.$$getPageObj(currMasterId)
         }
         if(nextMasterId && nextFlag) {
           action === 'flipOver' && this._checkClear([currMasterId, nextMasterId]); //边界清理
-          nextMasterObj = this.abstractGetPageObj(nextMasterId)
+          nextMasterObj = this.$$getPageObj(nextMasterId)
         }
         break;
     }
@@ -428,13 +422,13 @@ export default class MasterMgr extends Abstract {
     for(var key in filter) {
       switch(key) {
         case 'prev':
-          setPosition(this.abstractGetPageObj(filter[key]), 'prev')
+          setPosition(this.$$getPageObj(filter[key]), 'prev')
           break;
         case 'curr':
-          setPosition(this.abstractGetPageObj(filter[key]), 'curr')
+          setPosition(this.$$getPageObj(filter[key]), 'curr')
           break;
         case 'next':
-          setPosition(this.abstractGetPageObj(filter[key]), 'next')
+          setPosition(this.$$getPageObj(filter[key]), 'next')
           break;
       }
     }
@@ -443,7 +437,7 @@ export default class MasterMgr extends Abstract {
 
   _checkParallaxPox(currPageIndex, targetIndex) {
     var key, pageObj,
-      pageCollection = this.abstractGetCollection();
+      pageCollection = this.$$getGroup();
     for(key in pageCollection) {
       pageObj = pageCollection[key];
       //跳跃过的视觉容器处理
@@ -574,7 +568,7 @@ export default class MasterMgr extends Abstract {
   // 2 跳转页面清理  【对象过滤条件】
   _checkClear(filter, toPage) {
     var key, indexOf,
-      removeMasterId = _.keys(this.abstractGetCollection());
+      removeMasterId = _.keys(this.$$getGroup());
 
     // 如果有2个以上的母板对象,就需要清理
     if(removeMasterId.length > 2 || toPage) { //或者是跳转页面
@@ -605,11 +599,11 @@ export default class MasterMgr extends Abstract {
     var pageObj, self = this;
     _.each(removeMasterId, function(removekey) {
       //销毁页面对象事件
-      if(pageObj = self.abstractGetPageObj(removekey)) {
+      if(pageObj = self.$$getPageObj(removekey)) {
         //移除事件
         pageObj.baseDestroy();
         //移除列表
-        self.abstractRemoveCollection(removekey)
+        self.$$removeGroup(removekey)
         self._removeRecordMasterRange(removekey)
       }
       //清理作用域缓存

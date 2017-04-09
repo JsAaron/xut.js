@@ -279,7 +279,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
   set: function(regData) {
     var injection;
     if(injection = this.$dispatcher[regData.pageType + 'Mgr']) {
-      injection.abstractAssistPocess(regData.pageIndex, function(pageObj) {
+      injection.$$assistPocess(regData.pageIndex, function(pageObj) {
         pageObj.baseAddComponent.call(pageObj, regData.widget);
       })
     } else {
@@ -294,7 +294,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  */
 defAccess(Mediator.prototype, '$curVmPage', {
   get: function() {
-    return this.$dispatcher.pageMgr.abstractGetPageObj(this.$globalEvent.getVisualIndex());
+    return this.$dispatcher.pageMgr.$$getPageObj(this.$globalEvent.getVisualIndex());
   }
 });
 
