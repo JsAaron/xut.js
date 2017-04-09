@@ -2,7 +2,7 @@
  * 函数工具栏
  */
 
-import Bar from './base/bar'
+import BarSuper from './super'
 import { config } from '../config/index'
 
 const isIOS = Xut.plat.isIOS
@@ -11,7 +11,7 @@ const closeScenario = function() {
   Xut.View.CloseScenario()
 }
 
-export default class fnBar extends Bar {
+export default class fnBar extends BarSuper {
 
   constructor({
     pageMode,
@@ -138,16 +138,16 @@ export default class fnBar extends Bar {
 
     for(var i = 1; i <= chapters; i++) {
       content +=
-        `<li class="xut-scenario-dark" 
-                      style="float:left;width:${width}px;height:${height}px;" 
+        `<li class="xut-scenario-dark"
+                      style="float:left;width:${width}px;height:${height}px;"
                       data-index="${i}">
-                    <div class="xut-scenario-radius" 
+                    <div class="xut-scenario-radius"
                           style="width:${size}px;height:${size}px;margin:${top}px auto">
                     </div>
                 </li>`
     }
 
-    html = `<ul class="xut-scenario-tips"  
+    html = `<ul class="xut-scenario-tips"
                     style="top:${this.top}px;left:${left}px;width:${tipsWidth}px;opacity:0.6">
                     ${content}
                 </ul>`
@@ -220,7 +220,7 @@ export default class fnBar extends Bar {
   _createCloseIcon() {
     const height = this.super_iconHeight;
     const html = $(
-      `<div class="si-icon xut-scenario-close icon-close2" 
+      `<div class="si-icon xut-scenario-close icon-close2"
                 style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;text-align:center;font-size:3vh;">
             </div>`);
 
@@ -237,7 +237,7 @@ export default class fnBar extends Bar {
   _createBackIcon() {
     const height = this.super_iconHeight;
     const html = $(
-      `<div class="si-icon xut-scenario-back icon-arrow-left" 
+      `<div class="si-icon xut-scenario-back icon-arrow-left"
                   style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;">
             </div>`);
 
@@ -260,7 +260,7 @@ export default class fnBar extends Bar {
       style, html;
 
     html =
-      `<div class="xut-control-pageindex" 
+      `<div class="xut-control-pageindex"
                   style="position:absolute;
                          right:4px;
                          top:${height * 0.25 + TOP}px;

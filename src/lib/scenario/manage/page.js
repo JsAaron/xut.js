@@ -3,7 +3,7 @@
  * @param  {[type]}
  * @return {[type]}
  */
-import { ManageSuper } from './manage-super'
+import { ManageSuper } from './super'
 import { Pagebase } from '../pagebase/index'
 import { removeVideo } from '../../component/video/manager'
 import { execScript, $$on, $$off } from '../../util/index'

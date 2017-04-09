@@ -6,7 +6,7 @@
  *      2 创建完毕
  *      3 创建失败
  */
-import TaskSuper from '../task-super'
+import TaskSuper from '../super'
 import directives from '../../../../directive/index'
 import { reviseSize } from '../../../../../util/option'
 

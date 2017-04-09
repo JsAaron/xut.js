@@ -5,7 +5,7 @@ import { Subtitle } from './subtitle'
  * 音频工厂类
  * @param {[type]} options [description]
  */
-export default class Base {
+export default class AudioSuper {
 
   constructor() {}
 

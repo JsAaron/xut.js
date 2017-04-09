@@ -1,4 +1,4 @@
-import TaskSuper from '../task-super'
+import TaskSuper from '../super'
 import { readFile, replacePath } from '../../../../../util/option'
 import createBackground from './layout'
 

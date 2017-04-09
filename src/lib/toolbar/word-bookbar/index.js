@@ -1,14 +1,14 @@
 import BookMark from './mark'
 import { parseJSON } from '../../util/index'
 import { $$on, $$off, $$handle, $$target } from '../../util/dom'
-import Bar from '../base/bar'
+import BarSuper from '../super'
 /**
  * 阅读模式工具栏
  * @param options object
  * @demo {$sceneNode:页面容器,$controlNode:工具栏容器,...}
  * @desc 继承自Toolbar.js
  */
-export default class BookBar extends Bar {
+export default class BookBar extends BarSuper {
 
   constructor({
     pageMode,

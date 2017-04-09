@@ -4,7 +4,7 @@
  * @return {[type]}        [description]
  */
 import {config } from '../../config/index'
-import BaseAudio from './base'
+import AudioSuper from './super'
 import {
   hasAudioes,
   getAudio
@@ -39,7 +39,7 @@ let createUUID = () => [4, 2, 2, 2, 6].map(UUIDcreatePart).join('-')
  * 采用Falsh播放
  * @type {[type]}
  */
-class _Flash extends BaseAudio {
+class _Flash extends AudioSuper {
 
   constructor(options, controlDoms) {
     super()
@@ -99,7 +99,7 @@ class _Flash extends BaseAudio {
  * 采用_Audio5js播放
  * @type {[type]}
  */
-class _Audio5js extends BaseAudio {
+class _Audio5js extends AudioSuper {
 
   constructor(options, controlDoms) {
     super()
@@ -155,7 +155,7 @@ class _Audio5js extends BaseAudio {
  * @param  {string} url 路径
  * @return {[type]}      [description]
  */
-class _Media extends BaseAudio {
+class _Media extends AudioSuper {
 
   constructor(options, controlDoms) {
     super()
@@ -231,7 +231,7 @@ class _Media extends BaseAudio {
  * @param  {string} url 路径
  * @return {[type]}      [description]
  */
-class _cordovaMedia extends BaseAudio {
+class _cordovaMedia extends AudioSuper {
 
   constructor(options, controlDoms) {
     super()
@@ -323,7 +323,7 @@ class _cordovaMedia extends BaseAudio {
  * 2-不支持audio的autoplay，部分的IOS微信
  * 3-不支持audio的autoplay，部分的安卓机子的自带浏览器（比如小米，开始模仿safari）和全部的ios safari（这种只能做用户触屏时就触发播放了）
  */
-class _nativeVideo extends BaseAudio {
+class _nativeVideo extends AudioSuper {
 
   constructor(options, controlDoms) {
 

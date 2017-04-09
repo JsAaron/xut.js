@@ -2,7 +2,7 @@
  * 系统工具栏
  * 主场景工具栏
  */
-import Bar from '../base/bar'
+import BarSuper from '../super'
 import Navbar from './navbar/index'
 
 import {
@@ -24,7 +24,7 @@ import {
 } from '../../util/index'
 
 
-export default class sysBar extends Bar {
+export default class sysBar extends BarSuper {
 
   constructor({
     controlNode,

@@ -4,7 +4,7 @@
  *      结构合并创建类    Structure
  *      行为动画绑定类     Content
  * ***************************************************/
-import TaskSuper from '../task-super'
+import TaskSuper from '../super'
 import { config } from '../../../../../config/index'
 import { nextTick } from '../../../../../util/nexttick'
 import { textFx } from './text-fx'

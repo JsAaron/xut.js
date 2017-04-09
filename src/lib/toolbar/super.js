@@ -1,8 +1,5 @@
-import { config } from '../../config/index'
-
-import {
-  hash
-} from '../../util/index'
+import { config } from '../config/index'
+import { hash } from '../util/index'
 
 const isIOS = Xut.plat.isIOS
 const isBrowser = Xut.plat.isBrowser

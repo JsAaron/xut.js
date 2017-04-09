@@ -4,7 +4,7 @@
  * @return {[type]}
  */
 import { config } from '../../config/index'
-import { ManageSuper } from './manage-super'
+import { ManageSuper } from './super'
 import { Pagebase } from '../pagebase/index'
 import {
   $$suspend,
