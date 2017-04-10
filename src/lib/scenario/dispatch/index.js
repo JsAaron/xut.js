@@ -334,6 +334,7 @@ export default class Dispatcher {
   movePageBases({
     action,
     speed,
+    outerCallFlip,
     distance,
     leftIndex,
     pageIndex,
@@ -400,6 +401,7 @@ export default class Dispatcher {
       nodes,
       speed,
       action,
+      outerCallFlip,
       moveDistance,
       leftIndex,
       currIndex,

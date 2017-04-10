@@ -1061,7 +1061,6 @@ from.getLetterObjs	scenario/pagebase/internal/data-api.js	/^import { config } fr
 from.hide	component/activity/bookmark/bookmark.js	/^var icons = {$/;"	p
 from.init	scenario/pagebase/internal/init.js	/^import { watchColumn } from '..\/watch'$/;"	c
 from.init.this.swipeSequence.swipeleft	scenario/pagebase/internal/init.js	/^      this.swipeSequence = {$/;"	p
-from.movePage	scenario/pagebase/move/page.js	/^} from '.\/translation'$/;"	f
 from.path	initialize/video.js	/^  state: false,$/;"	p
 from.search	component/activity/searchbar/searchbar.js	/^var icons = {$/;"	p
 from.state	initialize/video.js	/^const preloadVideo = {$/;"	p

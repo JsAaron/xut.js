@@ -1465,7 +1465,6 @@ this.threadTaskRelated	scenario/pagebase/internal/thread-api.js	/^      this.thr
 baseProto	scenario/pagebase/internal/thread.js	/^  }$/;"	m
 baseProto.baseProto	scenario/pagebase/internal/thread.js	/^  }$/;"	m
 baseProto.dispatchTasks	scenario/pagebase/internal/thread.js	/^  }$/;"	f
-from.movePage	scenario/pagebase/move/page.js	/^} from '.\/translation'$/;"	f
 export.moveParallax	scenario/pagebase/move/parallax.js	/^}$/;"	f
 export.flipMove	scenario/pagebase/move/translation.js	/^  reset: reset,$/;"	p
 export.flipOver	scenario/pagebase/move/translation.js	/^  flipRebound: flipRebound,$/;"	p

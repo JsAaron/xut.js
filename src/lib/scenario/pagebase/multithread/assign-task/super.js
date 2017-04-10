@@ -28,7 +28,7 @@ export default class TaskSuper {
     }
 
     //外部检测
-    this.$$detector({
+    this.$$detector && this.$$detector({
       suspendTask,
       nextTask,
       interrupt,

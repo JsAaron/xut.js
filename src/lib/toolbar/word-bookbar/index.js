@@ -32,7 +32,7 @@ export default class BookBar extends BarSuper {
     this.delay = 50
 
     //图书工具栏高度
-    this.topBarHeight = this.super_iconHeight * 1.25
+    this.topBarHeight = this.$$iconHeight * 1.25
 
     this.initTool();
   }
@@ -56,7 +56,7 @@ export default class BookBar extends BarSuper {
 
     //翻页按钮
     if(this.pageMode == 2) {
-      this.super_createArrows();
+      this.$$createArrows();
     }
 
     //监听事件
@@ -77,7 +77,7 @@ export default class BookBar extends BarSuper {
     this.$controlNode.css({
       top: 0,
       height: height + 'px',
-      paddingTop: this.super_barHeight + 'px', //系统工具栏占用的高度
+      paddingTop: this.$$barHeight + 'px', //系统工具栏占用的高度
       backgroundColor: 'rgba(0, 0, 0, 0.2)', //transparent
       fontSize: '0.625em',
       color: 'white'
@@ -114,7 +114,7 @@ export default class BookBar extends BarSuper {
     icon.style.color = "#fff";
     icon.className = 'icon-th-list2';
     icon.style.position = "absolute";
-    icon.style.bottom = this.super_iconHeight * 0.5 + 'px';
+    icon.style.bottom = this.$$iconHeight * 0.5 + 'px';
 
     iconText.innerHTML = '目录';
     iconText.className = "xut-book-dirFont"
@@ -148,7 +148,7 @@ export default class BookBar extends BarSuper {
     icon.style.fontSize = "2.5vh";
     icon.style.color = "#fff";
     icon.style.position = "absolute";
-    icon.style.bottom = this.super_iconHeight * 0.5 + 'px';
+    icon.style.bottom = this.$$iconHeight * 0.5 + 'px';
     icon.className = 'icon-bookmark2';
 
     iconText.innerHTML = '书签';
@@ -170,7 +170,7 @@ export default class BookBar extends BarSuper {
   createStarIcon(bar) {
     var icon = document.createElement('div');
     icon.innerHTML = '评分';
-    icon.style.width = this.super_iconHeight + 'px';
+    icon.style.width = this.$$iconHeight + 'px';
     icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
     icon.className = 'xut-book-bar-star';
     this.$controlNode.append(icon)
@@ -214,7 +214,7 @@ export default class BookBar extends BarSuper {
       that.$controlNode.transition({
         'opacity': 1
       }, that.delay, 'linear', function() {
-        that.super_showSystemBar();
+        that.$$showSystemBar();
         that.barStatus = true;
         that.Lock = false;
       });
@@ -238,7 +238,7 @@ export default class BookBar extends BarSuper {
       'opacity': 0
     }, that.delay, 'linear', function() {
       that.$controlNode.hide();
-      that.super_hideSystemBar();
+      that.$$hideSystemBar();
       that.barStatus = false;
       that.Lock = false;
     });
@@ -503,7 +503,7 @@ export default class BookBar extends BarSuper {
     this.menu = null;
     this.page = null;
     //销毁超类
-    this.super_destory()
+    this.$$destory()
   }
 
 }

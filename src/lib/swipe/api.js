@@ -114,7 +114,7 @@ export default function api(Swipe) {
    * @return {[type]} [description]
    */
   Swipe.prototype.getFlipOverSpeed = function(newVisualWidth) {
-    return this._flipOverSpeed(newVisualWidth)
+    return this._getFlipOverSpeed(newVisualWidth)
   }
 
   /**
@@ -132,18 +132,18 @@ export default function api(Swipe) {
   Swipe.prototype.simulationComplete = function() {
     setTimeout(() => {
       this._restore()
-      this._unlockSwipe()
+      this._removeFlipLock()
     })
   }
 
   //允许滑动
   Swipe.prototype.allowliding = function() {
-    this._unlockSwipe()
+    this._removeFlipLock()
   }
 
   //禁止滑动
   Swipe.prototype.bansliding = function() {
-    this._lockSwipe()
+    this._addFlipLock()
   }
 
 
@@ -187,12 +187,13 @@ export default function api(Swipe) {
 
 
   /**
+   * 外部直接调用
    * 前翻页接口
    * @return {[type]} [description]
    */
   Swipe.prototype.prev = function() {
     if(!this._borderBounce(1)) {
-      this._slideTo('prev');
+      this._slideTo('prev', 'outer');
     } else {
       //边界反弹
       this._setRebound(this.visualIndex, 'next')
@@ -201,12 +202,13 @@ export default function api(Swipe) {
 
 
   /**
+   * 外部直接调用
    * 后翻页接口
    * @return {Function} [description]
    */
   Swipe.prototype.next = function() {
     if(!this._borderBounce(-1)) {
-      this._slideTo('next');
+      this._slideTo('next', 'outer');
     } else {
       //边界反弹
       this._setRebound(this.visualIndex, 'prev', 'isAppBoundary')
@@ -252,7 +254,7 @@ export default function api(Swipe) {
   Swipe.prototype.scrollToPage = function(targetIndex) { //目标页面
 
     //如果还在翻页中
-    if(this._fliplock) return
+    if(this._lockFlip) return
 
     const currIndex = this.visualIndex //当前页面
 

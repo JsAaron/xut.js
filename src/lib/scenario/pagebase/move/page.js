@@ -16,7 +16,7 @@ export default function(baseProto) {
    * 页面移动
    * @return {[type]} [description]
    */
-  baseProto.movePage = function(action, distance, speed, viewOffset, direction) {
+  baseProto.movePage = function(action, distance, speed, viewOffset, direction, outerCallFlip) {
 
     const pageNode = this.$pageNode[0]
 
@@ -54,19 +54,19 @@ export default function(baseProto) {
     }
 
     /*
-      修复一个bug,超快速翻页的时候(speed<20)，动画结束事件会丢失页面
+      如果outerCall存在，就是外部调用翻页的的情况下处理
+      修复一个bug,超快速翻页的时候(speed<300)，动画结束事件会丢失页面
       所以针对这种情况，强制改speed改成0，这样动画完全屏蔽
       手动调用tiggerFilpComplete事件处理
       这里扩大下speed的范围
     */
     let initiative = false
-    if(action === 'flipOver') {
-      if(speed < 50) {
+    if(outerCallFlip && action === 'flipOver') {
+      if(speed < 200) {
         speed = 0
         initiative = true
       }
     }
-
 
     translation[action](pageNode, distance, speed, () => {
       /*
@@ -74,7 +74,7 @@ export default function(baseProto) {
       1.flipMode === 'ban'，关闭了翻页效果，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if(initiative && isVisual || config.flipMode === 'ban' && isVisual) {
+      if(isVisual && (initiative || config.flipMode === 'ban')) {
         Xut.Application.tiggerFilpComplete(pageNode, true)
         return true
       }

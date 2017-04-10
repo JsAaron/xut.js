@@ -53,7 +53,7 @@ export default class sysBar extends BarSuper {
     _.some(toolType) && this._initToolbar()
 
     //翻页按钮
-    pageMode == 2 && this.super_createArrows()
+    pageMode == 2 && this.$$createArrows()
   }
 
 
@@ -65,7 +65,7 @@ export default class sysBar extends BarSuper {
 
     const $controlNode = this.$controlNode
     const setting = this.settings
-    const iconHeight = this.super_iconHeight
+    const iconHeight = this.$$iconHeight
 
     //工具栏的显示状态
     this.toolBarStatus = ($controlNode.css('display') === 'none') ? false : true
@@ -151,7 +151,7 @@ export default class sysBar extends BarSuper {
    * @return {[type]}          [description]
    */
   _toolbarPostion($controlNode, position) {
-    const height = this.super_iconHeight
+    const height = this.$$iconHeight
     if(position == 1) { //在底部
       $controlNode.css({
         bottom: 0,
@@ -161,7 +161,7 @@ export default class sysBar extends BarSuper {
       $controlNode.css({
         top: 0,
         height: height + 'px',
-        paddingTop: this.super_barHeight + 'px'
+        paddingTop: this.$$barHeight + 'px'
       })
     }
   }
@@ -218,7 +218,7 @@ export default class sysBar extends BarSuper {
       'opacity': 1
     }, self.delay, 'in', function() {
       self.hideNavbar()
-      self.super_showSystemBar()
+      self.$$showSystemBar()
       self.toolBarStatus = true
       self.Lock = false
     });
@@ -241,7 +241,7 @@ export default class sysBar extends BarSuper {
     }, self.delay, 'in', function() {
       self.hideNavbar()
       self.$controlNode.hide();
-      self.super_hideSystemBar();
+      self.$$hideSystemBar();
       self.toolBarStatus = false;
       self.Lock = false;
     });
@@ -260,7 +260,7 @@ export default class sysBar extends BarSuper {
     $off(this.eventElement)
 
     //销毁超类
-    this.super_destory()
+    this.$$destory()
 
     this.curTips = null;
     this.toolBarStatus = false

@@ -51,18 +51,18 @@ export default class Bar {
      * 在ios浏览器中状态栏高度为0
      * @type {[type]}
      */
-    this.super_barHeight = isIOS && !isBrowser ? 20 : 0
+    this.$$barHeight = isIOS && !isBrowser ? 20 : 0
 
     const prop = config.proportion;
     const iconHeight = config.iconHeight;
 
     //获取高度缩放比
     //自动选择缩放比例
-    this.super_propHeight = config.layoutMode == "horizontal" ? prop.width : prop.height;
+    this.$$propHeight = config.layoutMode == "horizontal" ? prop.width : prop.height;
 
     //获取图标高度
     //工具栏图标高度
-    this.super_iconHeight = isIOS ? iconHeight : Math.round(this.super_propHeight * iconHeight)
+    this.$$iconHeight = isIOS ? iconHeight : Math.round(this.$$propHeight * iconHeight)
 
     //应用标题
     this.appName = config.data.shortName
@@ -75,7 +75,7 @@ export default class Bar {
    * 创建翻页按钮
    * @return {[type]} [description]
    */
-  super_createArrows() {
+  $$createArrows() {
 
     /**
      * 存放左右翻页按钮
@@ -223,7 +223,7 @@ export default class Bar {
    *  iOS状态栏0=show,1=hide
    * @return {[type]} [description]
    */
-  super_showSystemBar() {
+  $$showSystemBar() {
     isIOS && Xut.plat.hasPlugin && Xut.Plugin.statusbarPlugin.setStatus(null, null, 0);
   }
 
@@ -232,7 +232,7 @@ export default class Bar {
    * 隐藏IOS系统工具栏
    * @return {[type]} [description]
    */
-  super_hideSystemBar() {
+  $$hideSystemBar() {
     isIOS && Xut.plat.hasPlugin && Xut.Plugin.statusbarPlugin.setStatus(null, null, 1);
   }
 
@@ -240,7 +240,7 @@ export default class Bar {
    * 超类销毁
    * @return {[type]} [description]
    */
-  super_destory() {
+  $$destory() {
     if (this.arrows) {
       this.arrows.prev.off();
       this.arrows.next.off();

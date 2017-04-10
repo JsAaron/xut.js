@@ -115,6 +115,12 @@ export default class Swipe extends Observer {
     /*计算初始化页码*/
     this.pagePointer = initPointer(initIndex, totalIndex)
 
+    /*标记上一个翻页动作*/
+    this.preTick = {
+      ation: null,
+      time: null
+    }
+
     this._init()
   }
 
@@ -253,7 +259,7 @@ export default class Swipe extends Observer {
 
     //如果停止滑动
     //或者多点触发
-    if(this._fliplock || this._hasMultipleTouches(e)) {
+    if(this._lockFlip || this._hasMultipleTouches(e)) {
       return
     }
 
@@ -318,7 +324,7 @@ export default class Swipe extends Observer {
     //或者没有点击
     //或是Y轴滑动
     //或者是阻止滑动
-    if(this._fliplock || !this._isTap || this._isRollY || this._preventSwipe) return
+    if(this._lockFlip || !this._isTap || this._isRollY || this._preventSwipe) return
 
     this._isMoving = true
 
@@ -404,7 +410,7 @@ export default class Swipe extends Observer {
     //或者多点触发
     //或者是边界
     //或者是停止翻页
-    if(this._fliplock || this._isBounce || this._preventSwipe || this._hasMultipleTouches(e)) {
+    if(this._lockFlip || this._isBounce || this._preventSwipe || this._hasMultipleTouches(e)) {
       return
     }
 
@@ -457,7 +463,7 @@ export default class Swipe extends Observer {
         //跟随移动
         if(isValidSlide && !isPastBounds) {
           //true:right, false:left
-          this._slideTo(this._deltaX < 0 ? 'next' : 'prev')
+          this._slideTo(this._deltaX < 0 ? 'next' : 'prev', 'inner')
         } else {
           //反弹
           this._setRebound(this.visualIndex, this._deltaX > 0 ? 'prev' : 'next')
@@ -560,7 +566,7 @@ export default class Swipe extends Observer {
    * 判断是否快速翻页
    * @return {[type]} [description]
    */
-  _quickTurn() {
+  _isQuickFlip() {
     const startDate = getDate()
     if(this._preTapTime) {
       if(startDate - this._preTapTime < FLIPSPEED) {
@@ -568,14 +574,6 @@ export default class Swipe extends Observer {
       }
     }
     this._preTapTime = getDate();
-  }
-
-  /**
-   * 翻页加锁
-   * @return {[type]} [description]
-   */
-  _lockSwipe() {
-    this._fliplock = true;
   }
 
   /**
@@ -666,22 +664,56 @@ export default class Swipe extends Observer {
    * 获取翻页结束的speed的速率
    * @return {[type]} [description]
    */
-  _flipOverSpeed(visualWidth) {
+  _getFlipOverSpeed(visualWidth) {
     visualWidth = visualWidth || this._visualWidth
-    let spped = (visualWidth - (ABS(this._deltaX))) * this._speedRate || this._flipTime;
+    const spped = (visualWidth - (ABS(this._deltaX))) * this._speedRate || this._flipTime;
     return ABS(spped)
   }
+
 
   /**
    * 滑动到上下页面
    * direction
    *     "perv" / "next"
-   * @param  {[type]} direction [description]
-   * @return {[type]}           [description]
+   * action
+   * 1. inner 用户直接翻页滑动触发，提供hasTouch
+   * 2. outer 通过接口调用翻页
    */
-  _slideTo(direction) {
+  _slideTo(direction, action) {
+
+    /*是外部调用触发接口,提供给翻页滑动使用*/
+    let outerCallFlip = false
+
+    /*
+    如果行为一致,并且是外部接口调用，
+    需要手动计算出滑动的speed
+    inner 用户内部滑动
+    outer 外部接口调用
+    */
+    let outerSpeed
+
+    /*外部调用*/
+    if(action === 'outer') {
+      /*如果是第二次开始同一个点击动作*/
+      if(action === this.preTick.action) {
+        /*最大的点击间隔时间不超过默认的_flipTime时间，最小的取间隔时间*/
+        const time = +new Date() - this.preTick.time
+        if(time <= this._flipTime) {
+          outerSpeed = time
+        } else {
+          outerSpeed = this._flipTime
+        }
+        outerCallFlip = true
+      }
+      /*保存点击数据*/
+      this.preTick = {
+        action,
+        time: +new Date()
+      }
+    }
+
     //如果在忙碌状态,如果翻页还没完毕
-    if(this._fliplock) {
+    if(this._lockFlip) {
       return
     }
 
@@ -690,13 +722,15 @@ export default class Swipe extends Observer {
       if(this._isBorder(direction)) return;
     }
 
-    this._lockSwipe()
+
+    this._addFlipLock()
+    this._isQuickFlip()
     this.direction = direction
-    this._quickTurn()
 
     this._distributeMove({
+      outerCallFlip,
+      'speed': outerSpeed || this._getFlipOverSpeed(),
       'pageIndex': this.visualIndex,
-      'speed': this._flipOverSpeed(),
       'distance': 0,
       'direction': this.direction,
       'action': 'flipOver'
@@ -754,7 +788,7 @@ export default class Swipe extends Observer {
 
     //延长获取更pagePointer的更新值
     setTimeout(() => {
-      this.$emit('onComplete', this.direction, this.pagePointer, this._unlockSwipe.bind(this), this._isQuickTurn)
+      this.$emit('onComplete', this.direction, this.pagePointer, this._removeFlipLock.bind(this), this._isQuickTurn)
     }, 50)
   }
 
@@ -764,10 +798,8 @@ export default class Swipe extends Observer {
    * @return {[type]} [description]
    */
   _restore(node, view) {
-
     this._isMoving = false
-
-    //针对拖拽翻页阻止
+      //针对拖拽翻页阻止
     this._preventSwipe = true
     this._isTap = false;
     //恢复速率
@@ -777,11 +809,19 @@ export default class Swipe extends Observer {
 
 
   /**
+   * 翻页加锁
+   * @return {[type]} [description]
+   */
+  _addFlipLock() {
+    this._lockFlip = true;
+  }
+
+  /**
    * 解锁翻页
    * @return {[type]} [description]
    */
-  _unlockSwipe() {
-    this._fliplock = false
+  _removeFlipLock() {
+    this._lockFlip = false
   }
 
 

@@ -24,7 +24,7 @@ export default class fnBar extends BarSuper {
     this.pageTips = null;
     this.currTip = null;
     this.tipsMode = 0;
-    this.top = this.super_barHeight;
+    this.top = this.$$barHeight;
     this.Lock = false;
     this.delay = 50;
     this.hasTopBar = false;
@@ -87,7 +87,7 @@ export default class fnBar extends BarSuper {
 
     //创建翻页按钮
     if(this.pageMode === 2) {
-      this.super_createArrows();
+      this.$$createArrows();
     }
 
     $sceneNode.show();
@@ -100,10 +100,10 @@ export default class fnBar extends BarSuper {
    */
   _createSystemBar() {
     let html = `<div class="xut-control-bar"
-                         style="top:0;height:${this.super_iconHeight}px;padding-top:${this.top}px">
+                         style="top:0;height:${this.$$iconHeight}px;padding-top:${this.top}px">
                     </div>`
     html = $(String.styleFormat(html))
-    this.super_showSystemBar();
+    this.$$showSystemBar();
     this._createBackIcon(html)
     this._createTitle(html)
     this._createPageNum(html)
@@ -117,7 +117,7 @@ export default class fnBar extends BarSuper {
    */
   _createPageTips() {
     let chapters = this.pageTotal
-    let height = this.super_iconHeight
+    let height = this.$$iconHeight
     let html = ''
 
     //li内容
@@ -129,7 +129,7 @@ export default class fnBar extends BarSuper {
     }
 
     //圆点尺寸
-    const size = isIOS ? 7 : Math.max(8, Math.round(this.super_propHeight * 8))
+    const size = isIOS ? 7 : Math.max(8, Math.round(this.$$propHeight * 8))
     const width = 2.5 * size //圆点间距
     const tipsWidth = chapters * width //圆点总宽度
     const top = (height - size) / 2 //保持圆点垂直居中
@@ -218,7 +218,7 @@ export default class fnBar extends BarSuper {
    * @return {[type]} [description]
    */
   _createCloseIcon() {
-    const height = this.super_iconHeight;
+    const height = this.$$iconHeight;
     const html = $(
       `<div class="si-icon xut-scenario-close icon-close2"
                 style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;text-align:center;font-size:3vh;">
@@ -235,7 +235,7 @@ export default class fnBar extends BarSuper {
    * @return {[type]} [description]
    */
   _createBackIcon() {
-    const height = this.super_iconHeight;
+    const height = this.$$iconHeight;
     const html = $(
       `<div class="si-icon xut-scenario-back icon-arrow-left"
                   style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;">
@@ -255,7 +255,7 @@ export default class fnBar extends BarSuper {
   _createPageNum($sceneNode) {
     var pageTotal = this.pageTotal,
       TOP = this.top,
-      height = this.super_iconHeight,
+      height = this.$$iconHeight,
       currentPage = this.currentPage,
       style, html;
 
@@ -285,7 +285,7 @@ export default class fnBar extends BarSuper {
   _createTitle($sceneNode) {
     const html =
       `<div class="xut-control-title"
-                  style="line-height:${this.super_iconHeight}px">
+                  style="line-height:${this.$$iconHeight}px">
                 ${this.appName}
             </div>`
     $sceneNode.append(String.styleFormat(html))
@@ -386,7 +386,7 @@ export default class fnBar extends BarSuper {
     }
 
     //销毁超类
-    this.super_destory()
+    this.$$destory()
   }
 
 }

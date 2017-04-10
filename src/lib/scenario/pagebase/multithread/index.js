@@ -50,6 +50,10 @@ export default function initThreadtasks(instance) {
    */
   const threadTaskRelated = instance.threadTaskRelated = initThreadState(instance)
 
+  /*注册缓存任务名*/
+  threadTaskRelated.assignTaskGroup = registerCacheTask(assignedTasks)
+  threadTaskRelated.nextTaskName = 'container'
+
   /**
    * 设置下一个任务名
    * 用于标记完成度
@@ -214,7 +218,5 @@ export default function initThreadtasks(instance) {
     }
   }
 
-  /*注册缓存任务名*/
-  threadTaskRelated.assignTaskGroup = registerCacheTask(assignedTasks)
-  threadTaskRelated.nextTaskName = 'container'
+
 }

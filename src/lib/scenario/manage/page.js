@@ -24,7 +24,7 @@ import { getRealPage } from '../dispatch/depend'
  */
 const runScript = (pageObject, type) => {
   const code = pageObject.chapterData[type]
-  if (code) {
+  if(code) {
     execScript(code, type)
   }
 }
@@ -41,7 +41,7 @@ export default class PageMgr extends ManageSuper {
     双页模式，给父节点绑定一个翻页监听事件
     如果翻页完成，手动触发翻页事件
     */
-    if (config.doublePageMode) {
+    if(config.doublePageMode) {
       $on(rootNode, {
         transitionend: function() {
           Xut.Application.tiggerFilpComplete()
@@ -52,7 +52,7 @@ export default class PageMgr extends ManageSuper {
 
   /*设置页面的初始化的translate值*/
   setInitTranslate(pageIndex) {
-    if (config.doublePageMode) {
+    if(config.doublePageMode) {
       this.rootNode.style[Xut.style.transform] = `translate3d(-${config.screenSize.width*pageIndex}px,0px,0px)`
     }
   }
@@ -92,6 +92,7 @@ export default class PageMgr extends ManageSuper {
   move({
     speed,
     action,
+    outerCallFlip,
     moveDistance,
     leftIndex,
     currIndex,
@@ -99,7 +100,7 @@ export default class PageMgr extends ManageSuper {
     direction
   }) {
     /*双页模式，移动父容器*/
-    if (config.doublePageMode) {
+    if(config.doublePageMode) {
       this._moveContainer(moveDistance[1], speed)
     } else {
       /*单页模式，移动每个独立的页面*/
@@ -108,8 +109,8 @@ export default class PageMgr extends ManageSuper {
         this.$$getPageObj(currIndex),
         this.$$getPageObj(rightIndex)
       ], function(pageObj, index) {
-        if (pageObj) {
-          pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], direction)
+        if(pageObj) {
+          pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], direction, outerCallFlip)
         }
       })
     }
@@ -128,7 +129,7 @@ export default class PageMgr extends ManageSuper {
     const prveChpterId = suspendPageObj.baseGetPageId(stopPointer)
 
     /*如果有代码跟踪*/
-    if (suspendPageObj.startupTime) {
+    if(suspendPageObj.startupTime) {
       config.hasTrackCode('page', function(notify) {
         notify({
           pageId: suspendPageObj.chapterId,
@@ -157,9 +158,9 @@ export default class PageMgr extends ManageSuper {
     const originalIds = getRealPage(pageIndex, 'resetOriginal')
     originalIds.forEach(originaIndex => {
       let originalPageObj = this.$$getPageObj(originaIndex)
-      if (originalPageObj) {
+      if(originalPageObj) {
         let floatNode = originalPageObj.floatContentGroup.pageContainer
-        if (floatNode) {
+        if(floatNode) {
           //floatPages设置的content溢出后处理
           //在非视区增加overflow:hidden
           //可视区域overflow:''
@@ -200,7 +201,7 @@ export default class PageMgr extends ManageSuper {
       let resumePointer
 
       /*init*/
-      if (data.isQuickTurn || !data.direction) {
+      if(data.isQuickTurn || !data.direction) {
         resumePointer = [data.prevIndex, data.nextIndex];
       } else {
         /*flip*/
@@ -227,12 +228,12 @@ export default class PageMgr extends ManageSuper {
 
       //如果页面容器存在,才处理自动运行
       const currpageNode = pageObj.getContainsNode()
-      if (!currpageNode) {
+      if(!currpageNode) {
         return _complete()
       }
 
       //运行如果被中断,则等待
-      if (data.suspendCallback) {
+      if(data.suspendCallback) {
         data.suspendCallback(_startRun)
       } else {
         _startRun();
@@ -243,7 +244,7 @@ export default class PageMgr extends ManageSuper {
     this._checkTaskCompleted(data.currIndex, function(activatePageObj) {
 
       /*跟踪，每个页面的停留时间，开始*/
-      if (config.hasTrackCode('page')) {
+      if(config.hasTrackCode('page')) {
         activatePageObj.startupTime = +new Date
       }
 
@@ -252,10 +253,10 @@ export default class PageMgr extends ManageSuper {
 
       /*提升当前页面浮动对象的层级,因为浮动对象可以是并联的*/
       const floatNode = activatePageObj.floatContentGroup.pageContainer
-      if (floatNode) { floatNode.css({ 'zIndex': 2001, 'overflow': '' }) }
+      if(floatNode) { floatNode.css({ 'zIndex': 2001, 'overflow': '' }) }
 
       /*IE上不支持蒙版效果的处理*/
-      if (Xut.style.noMaskBoxImage) { addEdges() }
+      if(Xut.style.noMaskBoxImage) { addEdges() }
 
       /*构建完成通知*/
       data.buildComplete(activatePageObj.scenarioId);
@@ -285,7 +286,7 @@ export default class PageMgr extends ManageSuper {
    */
   clearPage(clearPageIndex) {
     const pageObj = this.$$getPageObj(clearPageIndex)
-    if (pageObj) {
+    if(pageObj) {
       //移除事件
       pageObj.baseDestroy();
       //移除列表
@@ -308,7 +309,7 @@ export default class PageMgr extends ManageSuper {
     this.$$destroyGroup();
 
     //销毁事件
-    if (config.doublePageMode) {
+    if(config.doublePageMode) {
       $off(this.rootNode)
     }
 
@@ -329,13 +330,13 @@ export default class PageMgr extends ManageSuper {
     1.如果没有参数返回
     2.保证数组格式遍历*/
     const suspendTask = function(pageIndex) {
-      if (pageIndex !== undefined) {
-        if (!pageIndex.length) {
+      if(pageIndex !== undefined) {
+        if(!pageIndex.length) {
           pageIndex = [pageIndex]
         }
         let pageObj;
         pageIndex.forEach(function(pointer) {
-          if (pageObj = self.$$getPageObj(pointer)) {
+          if(pageObj = self.$$getPageObj(pointer)) {
             pageObj.setTaskSuspend();
           }
         })
@@ -350,7 +351,7 @@ export default class PageMgr extends ManageSuper {
   /*检测活动窗口任务*/
   _checkTaskCompleted(currIndex, callback) {
     const currPageObj = this.$$getPageObj(currIndex)
-    if (currPageObj) {
+    if(currPageObj) {
       currPageObj.checkThreadTaskComplete(function() {
         // console.log('11111111111当前页面创建完毕',currIndex+1)
         callback(currPageObj)
@@ -364,12 +365,12 @@ export default class PageMgr extends ManageSuper {
    */
   _checkPreforkTasks(resumePointer, preCreateTask) {
     var resumeObj, resumeCount;
-    if (!resumePointer.length) {
+    if(!resumePointer.length) {
       resumePointer = [resumePointer];
     }
     resumeCount = resumePointer.length;
-    while (resumeCount--) {
-      if (resumeObj = this.$$getPageObj(resumePointer[resumeCount])) {
+    while(resumeCount--) {
+      if(resumeObj = this.$$getPageObj(resumePointer[resumeCount])) {
         resumeObj.createPreforkTask(function() {
           // console.log('后台处理完毕')
         }, preCreateTask)
