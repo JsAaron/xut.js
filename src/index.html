@@ -30,26 +30,25 @@ Xut.Application.setConfig = {
     lauchMode: 1,
     platform: 'mini',
     historyMode: true,
-    visualMode: 2,
+    visualMode: 1,
     // cursor: {
     //     url: 'images/icons/busyicon.gif',
     //     delayTime: 300
     // },
-    salePageType:'all',
     salePicture: true,
     salePictureMultiples: 3,
     // imageSuffix: {
     //     1080: 'mi',
     //     1440: 'hi'
     // },
-    // pageBar: {
-    //     type: 'circular',
-    //     mode: 1
-    //     position: {
-    //         top: '90%',
-    //         left: '20%'
-    //     }
-    // },
+    pageBar: {
+        // type: 'circular',
+        // mode: 1
+        // position: {
+        //     top: '90%',
+        //     left: '20%'
+        // }
+    },
     // brModel:1,
     // trackCode: ['launch','app', 'page', 'action', 'hot'],
     supportQR: true,
@@ -60,7 +59,7 @@ Xut.Application.setConfig = {
 
 
 Xut.Application.Watch('trackCode', function(type, options) {
-    console.log(type,options)
+    // console.log(type,options)
     switch (type) {
         case 'launch':
             break;
@@ -75,7 +74,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     }
 })
 
-var appId = 301 //306
+var appId = 101 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点
@@ -99,6 +98,7 @@ $("#activate").click(function() {
 })
 
 $("#closeMini").click(function() {
+  console.log(111)
     Xut.Application.Exit()
 })
 </script>

@@ -2,11 +2,7 @@
 
 const hasTouch = Xut.plat.hasTouch
 
-import {
-  $$on,
-  $$off,
-  $$handle
-} from '../../../util/dom'
+import { $on, $off, $handle } from '../../../util/event'
 
 
 export default class MoveMent {
@@ -33,7 +29,7 @@ export default class MoveMent {
       this.scroller["bindMoveMent"].destroy()
     }
 
-    $$on(this.scroller, {
+    $on(this.scroller, {
       start: this
     })
 
@@ -41,7 +37,7 @@ export default class MoveMent {
   }
 
   handleEvent(e) {
-    $$handle({
+    $handle({
       start(e) {
         this._start(e)
       },
@@ -60,7 +56,7 @@ export default class MoveMent {
   _start(e) {
     e.preventDefault();
     if(typeof(this.startCallback) == "function") this.startCallback(e);
-    $$on(this.scroller, {
+    $on(this.scroller, {
       move: this,
       end: this,
       cancel: this
@@ -72,12 +68,12 @@ export default class MoveMent {
   }
 
   _end(e) {
-    $$off(this.scroller)
+    $off(this.scroller)
     if(typeof(this.endCallback) == "function") this.endCallback(e);
   }
 
   destroy(type, el, bubble) {
-    $$off(this.scroller)
+    $off(this.scroller)
     this.scroller = null
   }
 

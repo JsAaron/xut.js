@@ -1,5 +1,5 @@
 export * from './lang'
-export * from './dom'
+export * from './event'
 export * from './loader'
 export * from './stroage'
 export * from './option'

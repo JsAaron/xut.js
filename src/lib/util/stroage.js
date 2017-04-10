@@ -87,21 +87,21 @@ export function _key(index) { //本地方法
  * @param {[type]} key [description]
  * @param {[type]} val [description]
  */
-export {set as $$set }
+export {set as $set }
 
 /**
  * 获取localstorage中的值
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export {get as $$get }
+export {get as $get }
 
 /**
  * 删除localStorage中指定项
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-export function $$remove(key) {
+export function $remove(key) {
   key = filter(key);
   storage.removeItem(key);
 }
@@ -111,7 +111,7 @@ export function $$remove(key) {
  * 为了只计算一次
  * @return {[type]} [description]
  */
-export function $$resetUUID() {
+export function $resetUUID() {
   onlyId = null
 }
 
@@ -119,11 +119,11 @@ export function $$resetUUID() {
  * 序列化
  * @return {[type]} [description]
  */
-export function $$fetch() {
+export function $fetch() {
   return JSON.parse(get(name || TAG) || '[]');
 }
 
 
-export function $$save(name, val) {
+export function $save(name, val) {
   set(name || TAG, JSON.stringify(val));
 }

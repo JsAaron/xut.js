@@ -1,5 +1,5 @@
 import { config } from '../config/index'
-import { $$warn, loadFile } from '../util/index'
+import { $warn, loadFile } from '../util/index'
 
 //替换url
 //1. 路径
@@ -58,7 +58,7 @@ function filterJsonData() {
   result = window.SQLResult
 
   if(!result) {
-    $$warn('json数据库加载出错')
+    $warn('json数据库加载出错')
     return
   }
 

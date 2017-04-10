@@ -1,4 +1,4 @@
-import { $$warn } from '../util/debug'
+import { $warn } from '../util/debug'
 
 const FLOOR = Math.floor
 const CEIL = Math.ceil
@@ -20,7 +20,7 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
   let newLeft = 0
 
   if(!setVisualMode) {
-    $$warn('getVisualSize没有提供setVisualMode')
+    $warn('getVisualSize没有提供setVisualMode')
   }
 
   /**

@@ -2,8 +2,7 @@ import api from './api'
 import { Observer } from '../observer/index'
 import { config } from '../config/index'
 import { initPointer, getActionPointer } from './pointer'
-import { $$on, $$off, $$handle, $$event } from '../util/dom'
-import { $$warn } from '../util/debug'
+import { $on, $off, $handle, $event, $warn } from '../util/index'
 
 const transitionDuration = Xut.style.transitionDuration
 const LINEARTAG = 'data-viewlinear'
@@ -139,7 +138,7 @@ export default class Swipe extends Observer {
       //ul => master
       const ul = this.container.querySelectorAll('ul')
       if(!ul.length) {
-        $$warn(" ul element don't found !")
+        $warn(" ul element don't found !")
       } else {
         this._bubbleNode = {
           page: ul[0],
@@ -196,7 +195,7 @@ export default class Swipe extends Observer {
       callback.transitionend = this
     }
 
-    $$on(this.container, callback)
+    $on(this.container, callback)
   }
 
 
@@ -211,7 +210,7 @@ export default class Swipe extends Observer {
     this.options.stopPropagation && e.stopPropagation()
 
     //接受多事件的句柄
-    $$handle({
+    $handle({
       start(e) {
         //如果没有配置外部钩子
         if(!this.options.hasHook) {
@@ -270,7 +269,7 @@ export default class Swipe extends Observer {
 
 
     let interrupt
-    let point = $$event(e)
+    let point = $event(e)
 
     if(!point) {
       return interrupt = this._preventSwipe = true;
@@ -323,7 +322,7 @@ export default class Swipe extends Observer {
 
     this._isMoving = true
 
-    let point = $$event(e)
+    let point = $event(e)
     let deltaX = point.pageX - this._start.pageX
     let deltaY = point.pageY - this._start.pageY
     let absDeltaX = ABS(deltaX)
@@ -791,7 +790,7 @@ export default class Swipe extends Observer {
    * @return {[type]} [description]
    */
   _off() {
-    $$off(this.container)
+    $off(this.container)
   }
 
 

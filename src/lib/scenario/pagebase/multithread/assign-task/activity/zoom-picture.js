@@ -4,8 +4,8 @@
 import { config } from '../../../../../config/index'
 import { ScalePicture } from '../../../../../plugin/extend/scale-picture/index'
 import {
-  $$on,
-  $$off,
+  $on,
+  $off,
   getFileFullPath,
   analysisImageName,
   getHDFilePath
@@ -28,7 +28,7 @@ export function zoomPicture(pipeData) {
       behaviorData.prompt && $(node).append(createHTML())
 
       let hasMove = false
-      $$on(node, {
+      $on(node, {
         start() { hasMove = false },
         move() { hasMove = true },
         end() {
@@ -58,7 +58,7 @@ export function zoomPicture(pipeData) {
 
       /*销毁*/
       behaviorData.off = function() {
-        $$off(node)
+        $off(node)
         node = null
       }
     }

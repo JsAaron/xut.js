@@ -1,6 +1,6 @@
 import BookMark from './mark'
 import { parseJSON } from '../../util/index'
-import { $$on, $$off, $$handle, $$target } from '../../util/dom'
+import { $on, $off, $handle, $target } from '../../util/event'
 import BarSuper from '../super'
 /**
  * 阅读模式工具栏
@@ -60,7 +60,7 @@ export default class BookBar extends BarSuper {
     }
 
     //监听事件
-    $$on(this.$sceneNode, {
+    $on(this.$sceneNode, {
       end: this,
       cancel: this
     })
@@ -456,9 +456,9 @@ export default class BookBar extends BarSuper {
    */
   handleEvent(e) {
     var target = e.target || e.srcElement;
-    $$handle({
+    $handle({
       end(e) {
-        switch($$target(e).className) {
+        switch($target(e).className) {
           case 'icon-angle-left icon-book-bar':
             this.goBack();
             //返回
@@ -498,7 +498,7 @@ export default class BookBar extends BarSuper {
   destroy() {
     this.iscroll && this.iscroll.destroy();
     this.bookMark && this.bookMark.destroy();
-    $$off(this.$sceneNode)
+    $off(this.$sceneNode)
     this.iscroll = null;
     this.menu = null;
     this.page = null;

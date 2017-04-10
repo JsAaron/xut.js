@@ -7,9 +7,9 @@ import { config } from '../../config/index'
 import { ManageSuper } from './super'
 import { Pagebase } from '../pagebase/index'
 import {
-  $$suspend,
-  $$original,
-  $$autoRun
+  $suspend,
+  $original,
+  $autoRun
 } from '../command/index'
 import {
   cacheProperty,
@@ -212,7 +212,7 @@ export default class MasterMgr extends ManageSuper {
     if(masterObj = this.$$getPageObj(stopPointer)) {
       let pageId = masterObj.baseGetPageId(stopPointer);
       //停止活动对象活动
-      $$suspend(masterObj, pageId);
+      $suspend(masterObj, pageId);
     }
   }
 
@@ -224,7 +224,7 @@ export default class MasterMgr extends ManageSuper {
   resetOriginal(pageIndex) {
     var originalPageObj;
     if(originalPageObj = this.$$getPageObj(pageIndex)) {
-      $$original(originalPageObj);
+      $original(originalPageObj);
     }
   }
 
@@ -237,7 +237,7 @@ export default class MasterMgr extends ManageSuper {
     if(masterObj = this.$$getPageObj(data.currIndex)) {
       //热点状态复位
       this.resetOriginal(data.suspendIndex)
-      $$autoRun(masterObj, data.currIndex);
+      $autoRun(masterObj, data.currIndex);
     }
   }
 

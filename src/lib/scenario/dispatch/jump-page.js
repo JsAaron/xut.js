@@ -115,12 +115,12 @@ const createContainerView = (complier, data) => {
   //修正翻页2页的页面坐标值
   _.each(data['ruleOut'], function(pageIndex) {
     if(pageIndex > data['targetIndex']) {
-      pageMgr.$assistAppoint(pageIndex, function(pageObj) {
+      pageMgr.$$assistAppoint(pageIndex, function(pageObj) {
         _fix(pageObj.$pageNode, 'nextEffect')
       })
     }
     if(pageIndex < data['targetIndex']) {
-      pageMgr.$assistAppoint(pageIndex, function(pageObj) {
+      pageMgr.$$assistAppoint(pageIndex, function(pageObj) {
         _fix(pageObj.$pageNode, 'prevEffect')
       })
     }

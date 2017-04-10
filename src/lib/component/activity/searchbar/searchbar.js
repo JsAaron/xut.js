@@ -4,7 +4,7 @@
  *
  */
 
-import { $$on, $$off } from '../../../util/dom'
+import { $on, $off } from '../../../util/event'
 
 //图标
 var icons = {
@@ -36,7 +36,7 @@ SearchBar.prototype.init = function() {
   this.searchBtn = $box.find('.xut-search-btn');
 
   //用户操作事件邦定
-  $$on(dom, {
+  $on(dom, {
     end: this,
     cancel: this
   })
@@ -194,7 +194,7 @@ SearchBar.prototype.restore = function() {
 SearchBar.prototype.destroy = function() {
   var dom = this.parent[0];
 
-  $$off(dom)
+  $off(dom)
   dom.removeEventListener('keyup', this, false);
 
   this.searchBox.remove();

@@ -4,14 +4,7 @@
  * @param options object
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
-import {
-  $$on,
-  $$off,
-  $$set,
-  $$get,
-  $$remove
-}
-from '../../../util/index'
+import { $on, $off, $set, $get, $remove } from '../../../util/index'
 
 var icons = {
     hide: 'images/icons/arrowDown.svg'
@@ -46,7 +39,7 @@ BookMark.prototype.init = function() {
   BOOKCACHE = this.getHistory();
 
   //邦定用户事件
-  $$on(this.parent, {
+  $on(this.parent, {
     end: this,
     cancel: this
   })
@@ -115,7 +108,7 @@ BookMark.prototype.getMarkId = function(seasonId, pageId) {
  * @return {[type]} [description]
  */
 BookMark.prototype.getHistory = function() {
-  var mark = $$get('bookMark');
+  var mark = $get('bookMark');
   if(mark) {
     return mark.split(',');
   }
@@ -137,7 +130,7 @@ BookMark.prototype.addBookMark = function() {
     return;
   }
   BOOKCACHE.push(key)
-  $$set('bookMark', BOOKCACHE);
+  $set('bookMark', BOOKCACHE);
 }
 
 /**
@@ -162,10 +155,10 @@ BookMark.prototype.delBookMark = function(target) {
     index = BOOKCACHE.indexOf(key);
 
   BOOKCACHE.splice(index, 1);
-  $$set('bookMark', BOOKCACHE);
+  $set('bookMark', BOOKCACHE);
 
   if(BOOKCACHE.length == 0) {
-    $$remove('bookMark');
+    $remove('bookMark');
   }
 
   //移除该行
@@ -320,7 +313,7 @@ BookMark.prototype.restore = function() {
  */
 BookMark.prototype.destroy = function() {
 
-  $$off(this.parent)
+  $off(this.parent)
 
   //菜单部分
   if(this.bookMarkMenu) {

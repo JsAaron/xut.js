@@ -6,7 +6,7 @@
 
 import { config } from '../../../config/index'
 import { bindContentEvent } from '../event/event'
-import { $$on, $$off, $$set, $$get } from '../../../util/index'
+import { $on, $off, $set, $get } from '../../../util/index'
 
 const docElement = document.documentElement
 
@@ -141,7 +141,7 @@ export default class HtmlBox {
     const closeTop = Math.floor(boxHeight / 2);
 
     //获取保存的字体值
-    const initValue = $$get(this.storageName)
+    const initValue = $get(this.storageName)
     if(initValue) {
       this._adjustSize(initValue)
     } else {
@@ -213,7 +213,7 @@ export default class HtmlBox {
       }
     }
 
-    $$on(this.eventContext, {
+    $on(this.eventContext, {
       start: function(e) {
         var className = e.target.className;
         process[className] && process[className]();
@@ -249,7 +249,7 @@ export default class HtmlBox {
   _adjustSize(value, save) {
     value = parseInt(value);
     docElement.style.fontSize = value + 'px'
-    save && $$set(this.storageName, value)
+    save && $set(this.storageName, value)
   }
 
 
@@ -334,7 +334,7 @@ export default class HtmlBox {
    */
   removeBox() {
     if(this.eventContext) {
-      $$off(this.eventContext)
+      $off(this.eventContext)
       this.eventContext = null
     }
     this.$htmlbox && this.$htmlbox.remove()

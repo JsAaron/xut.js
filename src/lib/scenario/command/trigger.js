@@ -5,7 +5,7 @@ import directives from '../directive/index'
  * 全局事件
  * 手动触发控制
  */
-export function $$trigger(target, attribute, rootNode, pageIndex) {
+export function $trigger(target, attribute, rootNode, pageIndex) {
 
   const key = target.id
 

@@ -5,7 +5,7 @@ import { stopColumnDetection } from './component/column/detect'
 import { destroyFixAudio } from './component/audio/fix'
 import { destroyCache, destroyResult } from './database/destroy'
 import { config, destroyConfig } from './config/index'
-import { $$resetUUID } from './util/stroage'
+import { $resetUUID } from './util/stroage'
 import { offAndroid } from './initialize/button'
 import { cleanCursor } from './initialize/cursor'
 import { cleanGlobalEvent } from './initialize/event'
@@ -71,7 +71,7 @@ export default function Destroy(action = 'exit') {
    * 为了只计算一次
    * @return {[type]} [description]
    */
-  $$resetUUID()
+  $resetUUID()
 
   Xut.TransformFilter = null
   Xut.CreateFilter = null

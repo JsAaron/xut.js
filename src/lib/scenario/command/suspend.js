@@ -19,7 +19,7 @@ import { removeVideo, clearVideo } from '../../component/video/manager'
  * @param  {[type]} all     [description]
  * @return {[type]}         [description]
  */
-export function $$suspend(pageObj, pageId, allHandle) {
+export function $suspend(pageObj, pageId, allHandle) {
 
   //零件对象翻页就直接销毁了
   //无需暂时

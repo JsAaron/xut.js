@@ -28,7 +28,7 @@ import { clearVideo } from '../../component/video/manager'
  * @param  {[type]} pageObj [description]
  * @return {[type]}         [description]
  */
-export function $$stop() {
+export function $stop() {
 
   //清理音频
   clearAudio()

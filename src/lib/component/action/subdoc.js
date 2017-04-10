@@ -1,4 +1,4 @@
-import { $$stop } from '../../scenario/command/index'
+import { $stop } from '../../scenario/command/index'
 import { config } from '../../config/index'
 
 /**
@@ -82,14 +82,14 @@ export default function(Action) {
 
       if(iframe) {
         //子文档操作
-        if($$stop()) {
+        if($stop()) {
 
         } else {
           clear();
         }
       } else {
         //父级操作
-        $$stop()
+        $stop()
       }
 
     } catch(err) {

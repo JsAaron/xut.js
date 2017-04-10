@@ -16,7 +16,7 @@ import { sceneController } from '../scene-control'
 import { getVisualDistance } from '../v-distance/index'
 import { setCustomStyle } from '../v-style/index'
 import { setVisualMode } from './set-mode'
-import { $$set, hash, $$warn } from '../../util/index'
+import { $set, hash, $warn } from '../../util/index'
 
 import {
   initPointer,
@@ -279,7 +279,7 @@ export default class Dispatcher {
               'getStyle': currentStyle
             }, pageIndex, masterFilter, function(shareMaster) {
               if(config.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
-                $$warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
+                $warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
               }
             })
 
@@ -515,7 +515,7 @@ export default class Dispatcher {
          */
         if(config.historyMode && !options.isInApp && options.multiScenario) {
           const history = sceneController.sequence(scenarioId, currIndex)
-          if(history) { $$set("history", history) }
+          if(history) { $set("history", history) }
         }
       }
     }
@@ -573,7 +573,7 @@ export default class Dispatcher {
      * 保存目录索引
      */
     if(config.historyMode && !options.multiScenario) {
-      $$set("pageIndex", currIndex);
+      $set("pageIndex", currIndex);
     }
 
     /**

@@ -1,4 +1,4 @@
-import { $$get, $$remove, $$save, parseJSON, hash } from '../../../util/index'
+import { $get, $remove, $save, parseJSON, hash } from '../../../util/index'
 
 /**
  * content对象的创建过滤器
@@ -20,11 +20,11 @@ export function contentFilter(filterName) {
   }();
 
   function setCache(listFilters) {
-    $$save(filterName, listFilters)
+    $save(filterName, listFilters)
   }
 
   function getCache() {
-    var jsonStr = $$get(filterName);
+    var jsonStr = $get(filterName);
     return parseJSON(jsonStr);
   }
 
@@ -96,7 +96,7 @@ export function contentFilter(filterName) {
     },
 
     empty() {
-      $$remove(filterName);
+      $remove(filterName);
       listFilters = {};
     }
   }

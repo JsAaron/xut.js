@@ -1,5 +1,5 @@
 import { config, resetVisualLayout } from '../../config/index'
-import { defAccess, nextTick, $$warn, loadStyle } from '../../util/index'
+import { defAccess, nextTick, $warn, loadStyle } from '../../util/index'
 import { getResults, removeColumnData } from '../../database/result'
 import { startColumnDetect, simulateCount, debug } from './detect'
 import { setCache } from './depend'
@@ -82,10 +82,10 @@ const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnCo
           chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin)
           columnCount[seasonsId][id] = 0
         } else {
-          $$warn('node tag is null on insertColumn')
+          $warn('node tag is null on insertColumn')
         }
       } else {
-        $$warn('node tag is null on insertColumn')
+        $warn('node tag is null on insertColumn')
       }
     }
   }

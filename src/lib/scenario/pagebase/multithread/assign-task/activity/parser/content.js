@@ -5,7 +5,7 @@
  **
  *********************************************************/
 
-import { parseJSON, arrayUnique, $$warn } from '../../../../../../util/index'
+import { parseJSON, arrayUnique, $warn } from '../../../../../../util/index'
 
 
 //零件类型,快速判断
@@ -126,7 +126,7 @@ function parseBaseTokens(tableName, tokenIds) {
   _.each(tableName, function(name) {
     if(tokenId = tokenIds[name]) {
       if(result[name]) {
-        $$warn('未处理解析同一个表')
+        $warn('未处理解析同一个表')
       } else {
         result[name] = tokenGroup(name, tokenId);
       }

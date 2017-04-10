@@ -1,5 +1,5 @@
 import initTooBar from './toolbar'
-import { $$warn, loadStyle, setFastAnalysisRE } from '../util/index'
+import { $warn, loadStyle, setFastAnalysisRE } from '../util/index'
 import { createCursor } from '../initialize/cursor'
 import { initColumn } from '../component/column/core-init'
 import { contentFilter } from '../component/activity/content/content-filter'
@@ -71,7 +71,7 @@ const setDefaultSuffix = function() {
     }
 
     if(config.devtools && config.baseImageSuffix) {
-      $$warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix = ' + config.baseImageSuffix)
+      $warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix = ' + config.baseImageSuffix)
     }
   }
 }

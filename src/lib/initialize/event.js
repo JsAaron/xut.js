@@ -2,7 +2,6 @@
 /// 初始化页面默认行为
 /////////////////////////////
 
-import { $$set } from '../util/stroage'
 import { config } from '../config/index'
 import { fixAudio } from '../component/audio/fix'
 

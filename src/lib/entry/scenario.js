@@ -1,16 +1,16 @@
 import { config } from '../config/index'
-import { $$set, $$get, $$remove, execScript } from '../util/index'
+import { $set, $get, $remove, execScript } from '../util/index'
 
 
 /*设置缓存，必须要可设置*/
 const saveData = () => {
   if(config.historyMode) {
-    $$set({ "pageIndex": config.pageIndex, "novelId": config.novelId })
+    $set({ "pageIndex": config.pageIndex, "novelId": config.novelId })
   } else {
     //清理
-    if($$get('novelId')) {
-      $$remove('pageIndex')
-      $$remove('novelId')
+    if($get('novelId')) {
+      $remove('pageIndex')
+      $remove('novelId')
     }
   }
 }

@@ -2,7 +2,7 @@
  * 场景API
  * 数据接口。和电子杂志的数据相关的接口，都在这里。
  ********************************************/
-import { $$warn } from '../../util/debug'
+import { $warn } from '../../util/debug'
 /**
  * 命名前缀
  * @type {String}
@@ -106,7 +106,7 @@ export function extendPresentation(access, $globalEvent) {
     if (pageBase && pageBase.getStyle) {
       return pageBase.getStyle
     } else {
-      $$warn('页面Style配置文件获取失败,pageIndex:' + pageIndex)
+      $warn('页面Style配置文件获取失败,pageIndex:' + pageIndex)
     }
   }
 

@@ -1,5 +1,5 @@
 import { loadFile } from './loader'
-import { $$warn } from './debug'
+import { $warn } from './debug'
 import { parseJSON } from './lang'
 import { config, resetVisualProportion } from '../config/index'
 
@@ -71,7 +71,7 @@ export function analysisImageName(src) {
       suffix = result[0]
       original = result[1]
     } else {
-      $$warn('zoom-image-brModelType解析出错,result：' + result)
+      $warn('zoom-image-brModelType解析出错,result：' + result)
     }
   }
   //有基础后缀
@@ -89,7 +89,7 @@ export function analysisImageName(src) {
       suffix = result[0]
       original = result[1] + result[3]
     } else {
-      $$warn('zoom-image-suffix解析出错,result：' + result)
+      $warn('zoom-image-suffix解析出错,result：' + result)
     }
   }
   //如果没有后缀
@@ -99,7 +99,7 @@ export function analysisImageName(src) {
     if(result && result.length) {
       suffix = original = result[0]
     } else {
-      $$warn('zoom-image解析出错,result：' + result)
+      $warn('zoom-image解析出错,result：' + result)
     }
   }
   return {
@@ -227,7 +227,7 @@ export function execScript(code, type) {
   try {
     new Function(enterReplace(code))()
   } catch(e) {
-    $$warn('加载脚本错误', type)
+    $warn('加载脚本错误', type)
   }
 }
 
@@ -270,7 +270,7 @@ const converProportion = function({
 }) {
 
   if(!proportion) {
-    $$warn('没有传递缩放比,取全局config')
+    $warn('没有传递缩放比,取全局config')
     proportion = config.proportion
   }
 
@@ -438,7 +438,7 @@ export function readFile(path, callback, type) {
         callback(data)
         delete window.HTMLCONFIG[fileName];
       } else {
-        $$warn('js文件加载失败，文件名:' + path);
+        $warn('js文件加载失败，文件名:' + path);
         callback('')
       }
     })
@@ -490,7 +490,7 @@ export function readFile(path, callback, type) {
         delete window.HTMLCONFIG[name];
         delete window.IBOOKSCONFIG[name]
       } else {
-        $$warn('编译:脚本加载失败，文件名:' + name)
+        $warn('编译:脚本加载失败，文件名:' + name)
         callback('');
       }
     })
@@ -517,7 +517,7 @@ export function readFile(path, callback, type) {
         callback(svgContent);
       },
       error: function(xhr, type) {
-        $$warn('svg文件解释出错，文件名:' + path);
+        $warn('svg文件解释出错，文件名:' + path);
         callback('');
       }
     })

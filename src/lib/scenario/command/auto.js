@@ -79,7 +79,7 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
  * @param  {[type]} taskAnimCallback [description]
  * @return {[type]}                  [description]
  */
-export function $$autoRun(pageObj, pageIndex, taskAnimCallback) {
+export function $autoRun(pageObj, pageIndex, taskAnimCallback) {
 
   /**
    * 编译IBOOKSCONFIG的时候过滤自动运行的调用

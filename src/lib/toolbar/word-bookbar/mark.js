@@ -6,13 +6,13 @@
  */
 import { config } from '../../config/index'
 import {
-  $$on,
-  $$off,
-  $$handle,
-  $$target,
-  $$set,
-  $$get,
-  $$remove
+  $on,
+  $off,
+  $handle,
+  $target,
+  $set,
+  $get,
+  $remove
 }
 from '../../util/index'
 
@@ -69,7 +69,7 @@ export default class Mark {
     BOOKCACHE = this.getHistory();
 
     //邦定用户事件
-    $$on(dom, {
+    $on(dom, {
       end: this
     })
   }
@@ -146,7 +146,7 @@ export default class Mark {
    * @return {[type]} [description]
    */
   getHistory() {
-    var mark = $$get('bookMark');
+    var mark = $get('bookMark');
     if(mark) {
       return mark.split(',');
     }
@@ -169,7 +169,7 @@ export default class Mark {
       return;
     }
     BOOKCACHE.push(key)
-    $$set('bookMark', BOOKCACHE);
+    $set('bookMark', BOOKCACHE);
   }
 
 
@@ -196,10 +196,10 @@ export default class Mark {
       index = BOOKCACHE.indexOf(key);
 
     BOOKCACHE.splice(index, 1);
-    $$set('bookMark', BOOKCACHE);
+    $set('bookMark', BOOKCACHE);
 
     if(BOOKCACHE.length == 0) {
-      $$remove('bookMark');
+      $remove('bookMark');
     }
 
     //移除该行
@@ -299,9 +299,9 @@ export default class Mark {
    */
   handleEvent(e) {
     var target = e.target;
-    $$handle({
+    $handle({
       end(e) {
-        switch($$target(e).className) {
+        switch($target(e).className) {
           //加入书签
           case 'xut-bookmark-add':
             this.addBookMark();
@@ -368,7 +368,7 @@ export default class Mark {
    */
   destroy() {
 
-    $$off(this.parent)
+    $off(this.parent)
 
     //菜单部分
     if(this.bookMarkMenu) {

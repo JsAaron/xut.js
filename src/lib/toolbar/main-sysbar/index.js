@@ -17,10 +17,10 @@ import {
 
 import {
   hash,
-  $$on,
-  $$off,
-  $$handle,
-  $$target
+  $on,
+  $off,
+  $handle,
+  $target
 } from '../../util/index'
 
 
@@ -109,7 +109,7 @@ export default class sysBar extends BarSuper {
     this.curTips = $controlNode.find('.control-current-page')
 
     //事件
-    $$on(this.eventElement, {
+    $on(this.eventElement, {
       start: this
     })
   }
@@ -120,9 +120,9 @@ export default class sysBar extends BarSuper {
    * @return {[type]}   [description]
    */
   handleEvent(e) {
-    $$handle({
+    $handle({
       start(e) {
-        switch($$target(e).className) {
+        switch($target(e).className) {
           //跳主页
           case "xut-control-backhome":
             goHomePage();
@@ -257,7 +257,7 @@ export default class sysBar extends BarSuper {
     this.navbarObj && this.navbarObj.destroy()
 
     //解除事件
-    $$off(this.eventElement)
+    $off(this.eventElement)
 
     //销毁超类
     this.super_destory()

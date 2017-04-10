@@ -1,4 +1,4 @@
-import { $$warn } from './debug'
+import { $warn } from './debug'
 
 //定义属性
 var def = Object.defineProperty;
@@ -54,11 +54,11 @@ export function hasValue(value) {
 }
 
 
-export function $$extend(object, config) {
+export function $extend(object, config) {
   for(var i in config) {
     if(i) {
       if(object[i]) {
-        $$warn('接口方法重复', 'Key->' + i, 'Value->' + object[i])
+        $warn('接口方法重复', 'Key->' + i, 'Value->' + object[i])
       } else {
         object[i] = config[i];
       }
@@ -77,7 +77,7 @@ export function parseJSON(parameter) {
   try {
     json = JSON.parse(parameter)
   } catch(error) {
-    $$warn(`parseJSON失败:${parameter}`)
+    $warn(`parseJSON失败:${parameter}`)
     return false
   }
   return json
@@ -103,7 +103,7 @@ export function makeJsonPack(code) {
     let post = "(function(){" + enterReplace(code) + "})"
     return(new Function("return " + post))();
   } catch(error) {
-    $$warn('解析json出错' + code)
+    $warn('解析json出错' + code)
   }
 }
 
@@ -149,7 +149,7 @@ function normalize(path) {
     trailingSlash = /[\\\/]$/.test(tail);
 
   // Normalize the tail path
-  //标准化tail路径，处理掉'.' '..' 以 '\' 连接 
+  //标准化tail路径，处理掉'.' '..' 以 '\' 连接
   tail = normalizeArray(tail.split(/[\\\/]+/), !isAbsolute).join('\\');
   // 处理tail为空的情况
   if(!tail && !isAbsolute) {
@@ -199,7 +199,7 @@ function statPath(path) {
  * 解决文件目录中的相对路径
  * @param  {[type]} parts          文件目录数组，从0- 高位分别代表一级目录
  * @param  {[type]} allowAboveRoot 布尔值，代表是否可以超过根目录
- * @return {[type]}                解决掉相对路径后的数组，比如说数组 
+ * @return {[type]}                解决掉相对路径后的数组，比如说数组
                                    ['/test'， '/re'， '..']将会返回 ['/test']
  */
 function normalizeArray(parts, allowAboveRoot) {
@@ -224,7 +224,7 @@ function normalizeArray(parts, allowAboveRoot) {
         res.push('..');
       }
     } else {
-      // 非 '.' 和'..'直接插入返回队列。 
+      // 非 '.' 和'..'直接插入返回队列。
       res.push(p);
     }
   }
@@ -263,7 +263,7 @@ export function joinPaths() {
         paths.push(arg);
       }
     } catch(e) {
-      $$warn(e);
+      $warn(e);
     }
 
   }

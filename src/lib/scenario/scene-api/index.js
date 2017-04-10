@@ -3,7 +3,7 @@
  * 此模块的所有方法都是动态修正上下文，自动切换场景
  * @return {[type]} [description]
  ********************************************/
-import { $$warn } from '../../util/debug'
+import { $warn } from '../../util/debug'
 import { typeFilter } from './type-filter'
 import { extendPresentation } from './presentation'
 import { extendView } from './view'
@@ -38,7 +38,7 @@ const createaAccess = mgr => {
     if(mgr[pageType]) {
       return callback(mgr[pageType], pageType, args, eachContext)
     } else {
-      // $$warn('传递到access的pageType错误,pageType='+ pageType)
+      // $warn('传递到access的pageType错误,pageType='+ pageType)
     }
   }
 }

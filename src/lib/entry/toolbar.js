@@ -1,7 +1,5 @@
 import { createStore } from '../database/index'
 import { config } from '../config/index'
-import { $$set } from '../util/index'
-
 
 /**
  * 默认工具栏配置

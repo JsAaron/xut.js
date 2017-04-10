@@ -6,13 +6,13 @@
 import { ManageSuper } from './super'
 import { Pagebase } from '../pagebase/index'
 import { removeVideo } from '../../component/video/manager'
-import { execScript, $$on, $$off } from '../../util/index'
+import { execScript, $on, $off } from '../../util/index'
 import { config } from '../../config/index'
 import { addEdges } from '../../util/edge'
 import {
-  $$suspend,
-  $$original,
-  $$autoRun
+  $suspend,
+  $original,
+  $autoRun
 } from '../command/index'
 
 import { getRealPage } from '../dispatch/depend'
@@ -42,7 +42,7 @@ export default class PageMgr extends ManageSuper {
     如果翻页完成，手动触发翻页事件
     */
     if (config.doublePageMode) {
-      $$on(rootNode, {
+      $on(rootNode, {
         transitionend: function() {
           Xut.Application.tiggerFilpComplete()
         }
@@ -144,7 +144,7 @@ export default class PageMgr extends ManageSuper {
     //停止活动对象活动
     suspendPageObj.destroyPageAction()
     suspendPageObj.resetSwipeSequence()
-    $$suspend(suspendPageObj, prveChpterId);
+    $suspend(suspendPageObj, prveChpterId);
   }
 
 
@@ -165,7 +165,7 @@ export default class PageMgr extends ManageSuper {
           //可视区域overflow:''
           floatNode.css({ 'zIndex': 2000, 'overflow': 'hidden' })
         }
-        $$original(originalPageObj)
+        $original(originalPageObj)
       }
     })
   }
@@ -222,7 +222,7 @@ export default class PageMgr extends ManageSuper {
 
       //运行动作
       const _startRun = function() {
-        $$autoRun(pageObj, data.currIndex, _complete);
+        $autoRun(pageObj, data.currIndex, _complete);
       }
 
       //如果页面容器存在,才处理自动运行
@@ -309,7 +309,7 @@ export default class PageMgr extends ManageSuper {
 
     //销毁事件
     if (config.doublePageMode) {
-      $$off(this.rootNode)
+      $off(this.rootNode)
     }
 
     //清理节点

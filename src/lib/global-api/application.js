@@ -5,10 +5,10 @@
  * **************************************************/
 
 import { config } from '../config/index'
-import { $$get } from '../util/index'
+import { $get } from '../util/index'
 import { Observer } from '../observer/index'
 import globalDestroy from '../global-destroy'
-import { $$autoRun, $$original, $$suspend, $$stop } from '../scenario/command/index'
+import { $autoRun, $original, $suspend, $stop } from '../scenario/command/index'
 
 export function initApplication() {
 
@@ -65,8 +65,8 @@ export function initApplication() {
   Xut.Application.Original = function() {
     backstage = 1;
     //传递一个完全关闭的参数
-    $$suspend('', '', true);
-    $$original();
+    $suspend('', '', true);
+    $original();
   }
 
   /**
@@ -76,7 +76,7 @@ export function initApplication() {
    */
   Xut.Application.Activate = function() {
     backstage = 0
-    $$autoRun()
+    $autoRun()
   }
 
   /**
@@ -138,7 +138,7 @@ export function initApplication() {
     if(window.DUKUCONFIG) {
       //外部回调通知
       if(window.DUKUCONFIG.iframeDrop) {
-        var appId = $$get('appId');
+        var appId = $get('appId');
         window.DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
       }
       window.DUKUCONFIG = null;
@@ -180,7 +180,7 @@ export function initApplication() {
     dispose,
     processed
   }) {
-    $$stop(skipAudio)
+    $stop(skipAudio)
     processed && processed()
   }
 

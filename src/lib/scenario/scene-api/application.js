@@ -62,8 +62,8 @@ export function extendApplication(access, $globalEvent) {
   /**
    * 设置翻页完成
    */
-  Xut.Application.tiggerFilpComplete = function() {
-    $globalEvent.setTransitionComplete()
+  Xut.Application.tiggerFilpComplete = function(...arg) {
+    $globalEvent.setTransitionComplete(...arg)
   }
 
   _.each([

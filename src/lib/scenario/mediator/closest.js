@@ -31,7 +31,7 @@ export default function closestProcessor(event, pageType) {
           }
         }
         //如果是dom节点
-        attributes = cur['attributes'];
+        attributes = cur['attributes']
         for(k in delegateHooks) {
           if(attribute = attributes[k]) {
             value = attribute['value' || 'nodeValue']

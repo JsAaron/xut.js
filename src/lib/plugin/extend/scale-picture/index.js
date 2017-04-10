@@ -1,7 +1,7 @@
 import { config } from '../../../config/index'
-import { $$warn } from '../../../util/debug'
+import { $warn } from '../../../util/debug'
 import { ScalePan } from '../scale-pan'
-import { $$on, $$off } from '../../../util/dom'
+import { $on, $off } from '../../../util/event'
 import { sceneController } from '../../../scenario/scene-control'
 import {
   createUnpeatableNumbers,
@@ -30,7 +30,7 @@ export class ScalePicture {
       this.$container = current.$rootNode
     }
     if(!this.$container.length) {
-      $$warn('图片缩放依赖的容器不存在')
+      $warn('图片缩放依赖的容器不存在')
       return
     }
 
@@ -100,7 +100,7 @@ export class ScalePicture {
       this.callbackEnd = () => {
         this._closeSingleView()
       }
-      $$on(this.$closeButton, {
+      $on(this.$closeButton, {
         end: this.callbackEnd,
         cancel: this.callbackEnd
       })
@@ -302,7 +302,7 @@ export class ScalePicture {
     /********************************
      * 设置全局容器捕获处理
      ********************************/
-    $$on(this.$singleView, {
+    $on(this.$singleView, {
       start,
       move,
       end,
@@ -444,11 +444,11 @@ export class ScalePicture {
 
     this._destroyRelated()
 
-    $$off(this.$singleView)
+    $off(this.$singleView)
 
     //关闭按钮
     if(this.hasButton) {
-      $$off(this.$closeButton)
+      $off(this.$closeButton)
       this.$closeButton = null
     }
 

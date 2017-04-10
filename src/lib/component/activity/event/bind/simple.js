@@ -1,7 +1,7 @@
 /////////////////
 /// tap click
 /////////////////
-import { $$on, $$off, $$event } from '../../../../util/dom'
+import { $on, $off, $event } from '../../../../util/event'
 
 /**
  * ie10下面mouse事件怪异
@@ -49,7 +49,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
   //你绑定单击的情况下可以翻页
   //这里通过坐标的位置来判断
   const start = function(e) {
-    let point = $$event(e);
+    let point = $event(e);
     //记录开始坐标
     startPageX = point.pageX;
     //是否是tap事件
@@ -61,7 +61,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
     if(!hasTap) {
       return
     }
-    let point = $$event(e)
+    let point = $event(e)
     let deltaX = point.pageX - startPageX
 
     //如果有move事件，则取消tap事件
@@ -76,7 +76,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
   }
 
   if(eventName === 'tap') {
-    $$on(eventContext, {
+    $on(eventContext, {
       start: start,
       move: move,
       end: end,
@@ -84,7 +84,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
     })
   } else if(onlyClick) {
     hasTap = true;
-    $$on(eventContext, {
+    $on(eventContext, {
       end: end
     })
   }
@@ -92,7 +92,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
   return {
     off: function() {
       if(eventContext) {
-        $$off(eventContext)
+        $off(eventContext)
         eventContext = null;
       }
     }

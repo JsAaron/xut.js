@@ -1,4 +1,4 @@
-import { $$warn } from './debug'
+import { $warn } from './debug'
 
 /**
  * 2015.3.24
@@ -62,7 +62,7 @@ function addHandler(element, eventName, handler, capture) {
         //所以transitionend就比较特殊了，因为都是同一个事件名称
         //所以只要一份，所以重复绑定就需要去掉
         if(eventName !== 'transitionend') {
-          $$warn(eventName + '：事件重复绑定添加')
+          $warn(eventName + '：事件重复绑定添加')
         }
       } else {
         dataCache[eventName] = [handler, capture]
@@ -115,7 +115,7 @@ function removeAll(element) {
   let uuid = element.xutHandler
   let dataCache = eventDataCache[uuid]
   if(!dataCache) {
-    $$warn('移除所有事件出错')
+    $warn('移除所有事件出错')
     return
   }
   _.each(dataCache, function(data, eventName) {
@@ -135,7 +135,7 @@ function removeone(element, eventName) {
   let uuid = element.xutHandler
   let dataCache = eventDataCache[uuid]
   if(!dataCache) {
-    $$warn('移除事件' + eventName + '出错')
+    $warn('移除事件' + eventName + '出错')
     return
   }
   let data = dataCache[eventName]
@@ -144,7 +144,7 @@ function removeone(element, eventName) {
     dataCache[eventName] = null
     delete dataCache[eventName]
   } else {
-    $$warn('移除事件' + eventName + '出错')
+    $warn('移除事件' + eventName + '出错')
   }
 
   //如果没有数据
@@ -219,7 +219,7 @@ const checkBindCancel = function(callbacks) {
  * capture 默认是冒泡，提供捕获处理
  * @return {[type]} [description]
  */
-export function $$on(element, callbacks, capture = false) {
+export function $on(element, callbacks, capture = false) {
   checkBindCancel(callbacks)
   compatibility(addEvent, toNodeObj(element), callbacks, capture)
 }
@@ -231,10 +231,10 @@ export function $$on(element, callbacks, capture = false) {
  * @param  {[type]} opts    [description]
  * @return {[type]}         [description]
  */
-export function $$off(element, callbacks) {
+export function $off(element, callbacks) {
 
   if(!element) {
-    $$warn('移除事件对象不存在')
+    $warn('移除事件对象不存在')
     return
   }
 
@@ -247,7 +247,7 @@ export function $$off(element, callbacks) {
   }
 
   if(!_.isArray(callbacks)) {
-    $$warn('移除的事件句柄参数，必须是数组')
+    $warn('移除的事件句柄参数，必须是数组')
     return
   }
 
@@ -257,14 +257,14 @@ export function $$off(element, callbacks) {
 
 
 /**
- * 如果是$$on绑定的，那么获取事件就可能是多点的
- * 所以需要$$hanle方法
+ * 如果是$on绑定的，那么获取事件就可能是多点的
+ * 所以需要$hanle方法
  * @param  {[type]} callbacks [description]
  * @param  {[type]} context   [description]
  * @param  {[type]} event     [description]
  * @return {[type]}           [description]
  */
-export function $$handle(callbacks, context, event) {
+export function $handle(callbacks, context, event) {
   switch(event.type) {
     case 'touchstart':
     case 'mousedown':
@@ -288,7 +288,7 @@ export function $$handle(callbacks, context, event) {
 }
 
 
-export function $$target(event, original) {
+export function $target(event, original) {
   var currTouches = null;
   if(hasTouch) {
     currTouches = event.touches;
@@ -304,6 +304,6 @@ export function $$target(event, original) {
  * 兼容事件对象
  * @return {[type]}   [description]
  */
-export function $$event(e) {
+export function $event(e) {
   return e.touches && e.touches[0] ? e.touches[0] : e
 }

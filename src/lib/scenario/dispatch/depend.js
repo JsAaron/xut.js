@@ -1,7 +1,7 @@
 import { errorTable } from '../../database/cache'
 import { query } from '../../database/query'
 import { config } from '../../config/index'
-import { $$warn } from '../../util/debug'
+import { $warn } from '../../util/debug'
 
 /**
  * 判断是否能整除2
@@ -192,7 +192,7 @@ return []
 export function getRealPage(pageIndex, type) {
 
   if(pageIndex === undefined) {
-    // $$warn(`${type}调用getRealPage传递pageIndex为空`)
+    // $warn(`${type}调用getRealPage传递pageIndex为空`)
     return []
   }
 

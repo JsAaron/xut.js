@@ -1,5 +1,5 @@
  //调度器
- import { $$trigger } from '../command/index'
+ import { $trigger } from '../command/index'
 
 
  //委托事件处理钩子
@@ -28,7 +28,7 @@
     *   target, attribute, rootNode, pageIndex
     */
    'data-delegate' (target, attribute, rootNode, pageIndex) {
-     $$trigger.apply(null, arguments);
+     $trigger.apply(null, arguments);
    },
 
 

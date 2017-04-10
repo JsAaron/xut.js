@@ -25,7 +25,7 @@ let hasOptimize = (fn) => {
  * @param  {[type]} pageObj [description]
  * @return {[type]}         [description]
  */
-export function $$original(pageObj) {
+export function $original(pageObj) {
 
   access(pageObj, (pageObj, contentObjs, componentObjs) => {
 
