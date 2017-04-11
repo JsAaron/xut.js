@@ -131,7 +131,7 @@ export default function api(Swipe) {
    */
   Swipe.prototype.simulationComplete = function() {
     setTimeout(() => {
-      this._restore()
+      this._setRestore()
       this._removeFlipLock()
     })
   }
@@ -312,7 +312,7 @@ export default function api(Swipe) {
    * @param {[type]} element [description]
    */
   Swipe.prototype.setTransitionComplete = function(...arg) {
-    this._distributed(...arg)
+    this._distributeComplete(...arg)
   }
 
 

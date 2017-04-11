@@ -19,8 +19,8 @@ export function initGlobalEvent() {
     hasDefault = true
 
     //禁止全局的缩放处理
-    $('body').on('touchmove', e => {
-      e.preventDefault && e.preventDefault()
+    $('body').on('touchmove', event => {
+      event.preventDefault && event.preventDefault()
     })
 
     //桌面鼠标控制翻页
@@ -32,6 +32,19 @@ export function initGlobalEvent() {
         case 39:
           Xut.View.GotoNextSlide()
           break;
+      }
+    })
+
+    /*Home键音频动作处理*/
+    $(document).on('visibilitychange', event => {
+      /*home 后台*/
+      if(document.visibilityState === 'hidden') {
+        Xut.Application.Original()
+      } else {
+        /*如果不是嵌套iframe，激活*/
+        if(!window.GLOBALIFRAME) {
+          Xut.Application.Activate()
+        }
       }
     })
 
@@ -48,9 +61,9 @@ export function initGlobalEvent() {
 
 export function cleanGlobalEvent() {
   if(hasDefault) {
-    $('body').off() //默认事件
-    $(document).off() //左右按钮
-    $(window).off() //横竖切换
+    $('body').off() //touchmove 禁止全局的缩放处理
+    $(document).off() //keyup 左右按钮
+    $(window).off() //beforeunload,orientationchange
     hasDefault = false
   }
 }

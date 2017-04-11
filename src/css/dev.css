@@ -3,19 +3,17 @@
 }
 
 #testButton {
-    position: relative;
-    width: 20%;
+    position: absolute;
+    width: 50%;
     height: auto;
-    margin: 0 auto
+    left:25%;
+    z-index: 9999999;
 }
 
 #testButton button {
+    width: 20%;
+    display: inline-block;
     border: 1px solid red;
-    position: absolute;
-    z-index: 99999;
     transform: scale(.8);
 }
 
-#closeMini {
-    right: 0px;
-}

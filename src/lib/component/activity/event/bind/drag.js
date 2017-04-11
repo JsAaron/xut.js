@@ -95,7 +95,6 @@ export default class {
             isEnter = true;
             dragObject.disable();
           }
-          self.dragElement.css("z-index", self.dragElement.attr("data-defaultindex"));
           //拖拽成功
           if(isEnter == true) {
             //结束后恢复层级关系
@@ -127,6 +126,8 @@ export default class {
             top: self.defaultPoint.top
           }
         });
+        //不管是否存在拖拽目标元素 拖拽成功与否最后还原成原来的z-index
+        self.dragElement.css("z-index", self.dragElement.attr("data-defaultindex"));
         //调用结束事件
         if(self.dropCallback) self.dropCallback(isEnter);
       }

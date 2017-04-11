@@ -182,6 +182,7 @@
       window.setTimeout(callback, 1000 / 60);
     };
 
+
   /**
    * 样式style支持
    * @type {Object}
