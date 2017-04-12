@@ -1,4 +1,5 @@
 import { parseJSON } from '../../../../util/lang'
+import IScroll from '../../../../plugin/extend/iscroll'
 
 /**
  * 眷顾区域扩展
@@ -161,14 +162,14 @@ export default class ScrollArea {
 
   _bindIscroll(wrapper, hasScrollX, hasScrollY, contentId) {
     if(contentId) {
-      return new iScroll(wrapper, {
+      return IScroll(wrapper, {
         scrollX: hasScrollX ? true : false,
         scrollY: hasScrollY ? true : false,
         snap: ".contentsContainer" + contentId,
         scrollbars:'custom'
       })
     } else {
-      return new iScroll(wrapper, {
+      return IScroll(wrapper, {
         scrollX: hasScrollX ? true : false,
         scrollY: hasScrollY ? true : false,
         scrollbars:'custom'

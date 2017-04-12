@@ -346,8 +346,8 @@ export class SceneFactory {
               //指定自动运行的动作
               nextAction && nextAction();
             }
-            //全局接口,应用加载完毕
-            Xut.Application.AddEventListener();
+            //应用加载完毕
+            Xut.Application.Notify('app:initComplete')
           })
         } else {
           this.complete(nextAction)

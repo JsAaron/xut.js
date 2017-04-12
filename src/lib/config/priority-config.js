@@ -52,21 +52,28 @@ export function priorityConfig() {
   /*如果启动了代码追踪，配置基本信息*/
   const launch = config.launch
   const trackTypes = launch && launch.trackCode || config.trackCode
+  config.sendTrackCode = () => {}
   config.hasTrackCode = () => {}
   if(trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if(!launch.trackCode) { launch.trackCode = {} }
     trackTypes.forEach(type => { launch.trackCode[type] = true })
-    const uuid = new Date().getTime();
-    config.hasTrackCode = (type, callback) => {
+    const uuid = Xut.guid('track-')
+
+    /*检测是否有代码追踪*/
+    config.hasTrackCode = (type) => {
       if(launch && launch.trackCode && launch.trackCode[type]) {
-        callback && callback(option => {
-          Xut.Application.Notify('trackCode', type, _.extend(option || {}, {
-            uuid,
-            appId: config.data.appId,
-            appName: config.data.shortName
-          }))
-        })
         return true
+      }
+    }
+
+    /*发送代码追踪数据*/
+    config.sendTrackCode = (type, options = {}) => {
+      if(config.hasTrackCode(type)) {
+        Xut.Application.Notify('trackCode', type, _.extend(options || {}, {
+          uuid,
+          appId: config.data.appId,
+          appName: config.data.shortName
+        }))
       }
     }
   }

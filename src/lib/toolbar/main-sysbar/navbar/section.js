@@ -1,5 +1,6 @@
 import { config } from '../../../config/index'
 import { getFileFullPath } from '../../../util/option'
+import IScroll from '../../../plugin/extend/iscroll'
 
 /**
  * 下拉章节列表
@@ -28,7 +29,7 @@ export default class Section {
         this.hBox.goToPage(0, pageIndex, 0);
       }
     } else {
-      this.hBox = new iScroll('#xut-nav-wrapper', {
+      this.hBox = IScroll('#xut-nav-wrapper', {
         snap: 'li',
         tap: true,
         scrollX: isHorizontal,
@@ -96,11 +97,11 @@ export default class Section {
       //如果是分层母板了,此时用icon代替
       if(page.iconImage) {
         this._$list.eq(j).css({
-          'background-image': 'url(' + getFileFullPath(page.iconImage,'navbar-bg') + ')'
+          'background-image': 'url(' + getFileFullPath(page.iconImage, 'navbar-bg') + ')'
         });
       } else {
         this._$list.eq(j).css({
-          'background-image': 'url(' + getFileFullPath(page.md5,'navbar-bg') + ')',
+          'background-image': 'url(' + getFileFullPath(page.md5, 'navbar-bg') + ')',
           'background-color': 'white'
         });
       }

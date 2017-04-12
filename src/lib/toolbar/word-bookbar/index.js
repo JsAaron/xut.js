@@ -1,6 +1,7 @@
 import BookMark from './mark'
 import { parseJSON } from '../../util/index'
 import { $on, $off, $handle, $target } from '../../util/event'
+import IScroll from '../../plugin/extend/iscroll'
 import BarSuper from '../super'
 /**
  * 阅读模式工具栏
@@ -266,7 +267,7 @@ export default class BookBar extends BarSuper {
 
     //添加滚动条
     //url : http://iscrolljs.com/
-    this.iscroll = new iScroll(wrap, {
+    this.iscroll = IScroll(wrap, {
       scrollbars: 'custom',
       fadeScrollbars: true,
       scrollX: false

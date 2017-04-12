@@ -50,6 +50,7 @@ export type Config = {
   brModel: number;
 }
 
+
 const config: Config = {
 
   /**
@@ -87,17 +88,26 @@ const config: Config = {
     Xut.Application.Watch('trackCode', function(type, options) {
         console.log(type, options)
         switch (type) {
-            case 'app':
+            case 'launch':
                 break;
-            case 'page':
+            case 'init':
                 break;
-            case 'aciton':
+            case 'exit':
                 break;
-            case 'hot':
-                break;
+            ...........
         }
     }
-    ['app','page','action','hot']
+    launch    应用启动后触发
+    init      初始化加载完毕，能显示正常页面后触发
+    exit      应用关闭触发
+    flip      翻页触发
+    content   点击有事件对象触发(content类型)
+    hot       点击没有绑定事件,但是又能触发的对象(除了content的其余对象)
+    swipe     垂直滑动触发
+
+    ['launch', 'init', 'exit', 'flip', 'content', 'hot'，'vertical-swipe']
+
+
    */
   trackCode:null,
 

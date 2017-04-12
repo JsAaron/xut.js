@@ -7,6 +7,7 @@
 import { config } from '../../../config/index'
 import { bindContentEvent } from '../event/event'
 import { $on, $off, $set, $get } from '../../../util/index'
+import IScroll from '../../../plugin/extend/iscroll'
 
 const docElement = document.documentElement
 
@@ -321,7 +322,7 @@ export default class HtmlBox {
 
     //溢出，增加卷滚
     if(parseInt(ulHeight) > parseInt(htmlboxHeight)) {
-      this.iscroll = new iScroll("." + iscrollName, {
+      this.iscroll = IScroll("." + iscrollName, {
         scrollbars: 'custom',
         fadeScrollbars: true
       })

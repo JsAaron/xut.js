@@ -21,6 +21,7 @@ import { hasAudioes } from '../audio/fix'
 import { destroyContentEvent } from './event/event'
 import createContent from './content/content-scope'
 import createTask from './task-check'
+import IScroll from '../../plugin/extend/iscroll'
 
 /**
  * 处理拖动对象
@@ -213,7 +214,7 @@ export default class Activity {
       }
 
       return function() {
-        self.iscroll = new iScroll(scrollNode, {
+        self.iscroll = IScroll(scrollNode, {
           scrollbars: 'custom',
           fadeScrollbars: false
         })

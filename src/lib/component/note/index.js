@@ -1,3 +1,5 @@
+import IScroll from '../../plugin/extend/iscroll'
+
 /**
  * 提示框
  */
@@ -29,7 +31,7 @@ export class ShowNote {
 
     this.show();
 
-    this.iscroll = new iScroll(this._dom.find('.content')[0], {
+    this.iscroll = IScroll(this._dom.find('.content')[0], {
       scrollbars: 'custom',
       fadeScrollbars: true
     })

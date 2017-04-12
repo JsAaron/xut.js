@@ -4,6 +4,7 @@
 
 import { config } from '../config/index'
 import { fixAudio } from '../component/audio/fix'
+import { $set, $get } from '../util/index'
 
 //修复H5音频自动播放bug
 if(Xut.plat.isBrowser && !Xut.plat.hasAutoPlayAudio) {
@@ -48,11 +49,15 @@ export function initGlobalEvent() {
       }
     })
 
-    /*启动代码用户操作跟踪*/
-    config.hasTrackCode('app', function(notify) {
-      $(window).on('beforeunload', function() {
-        notify({ time: (+new Date) - config.launch.launchTime })
-      })
+
+    /*
+    启动代码用户操作跟踪
+    1、先不判断，一律按关闭提交（要有延迟）。
+    2、如果是刷新，取消之前的延迟，提交刷新提示。
+    */
+
+    $(window).on('beforeunload', function() {
+      config.sendTrackCode('exit', { time: (+new Date) - config.launch.launchTime })
     })
 
   }

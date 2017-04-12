@@ -401,6 +401,15 @@ export default class Swipe extends Observer {
     })
   }
 
+  /*
+  判断是不是首位页面，直接反弹
+  如果是首尾
+  如果是liner模式排除
+  */
+  _isBeginEnd() {
+    return this.options.linear ? false :
+      !this.visualIndex && this._deltaX > 0 || this.visualIndex == this.totalIndex - 1 && this._deltaX < 0
+  }
 
   /**
    * 松手
@@ -420,7 +429,8 @@ export default class Swipe extends Observer {
     this._isTap = this._isMoving = false
 
     let duration
-      //可能没有点击页面，没有触发start事件
+
+    //可能没有点击页面，没有触发start事件
     if(this._start) {
       duration = getDate() - this._start.time
     }
@@ -432,27 +442,23 @@ export default class Swipe extends Observer {
       if(isReturn) return
     }
 
+
     //如果是左右滑动
     if(this._isRollX) {
 
-      let deltaX = ABS(this._deltaX)
-
-      //如果是首尾
-      //如果是liner模式排除
-      let isPastBounds = this.options.linear ? false :
-        !this.visualIndex && this._deltaX > 0 || this.visualIndex == this.totalIndex - 1 && this._deltaX < 0
+      const deltaX = ABS(this._deltaX)
 
       //_slideTo的最低值要求
       //1 fast: time < 200 && x >30
       //2 common: x > veiwWidth/6
-      let isValidSlide = duration < 200 && deltaX > 30 || deltaX > this._visualWidth / 6
+      const isValidSlide = duration < 200 && deltaX > 30 || deltaX > this._visualWidth / 6
 
       //如果是无效的动作，则不相应
       //还原默认设置
       //move的情况会引起
       //mini功能，合并翻页时事件
       if(this._isInvalid) {
-        let hasSwipe = duration < 200 && deltaX > this._visualWidth / 10
+        const hasSwipe = duration < 200 && deltaX > this._visualWidth / 10
         if(hasSwipe) {
           this._distributeMove({
             pageIndex: this.visualIndex,
@@ -464,7 +470,7 @@ export default class Swipe extends Observer {
         return
       } else {
         //跟随移动
-        if(isValidSlide && !isPastBounds) {
+        if(isValidSlide && !this._isBeginEnd()) {
           //true:right, false:left
           this._slideTo(this._deltaX < 0 ? 'next' : 'prev', 'inner')
         } else {
@@ -472,6 +478,15 @@ export default class Swipe extends Observer {
           this._setRebound(this.visualIndex, this._deltaX > 0 ? 'prev' : 'next')
         }
       }
+    }
+
+
+    /*如果是Y轴移动，发送请求*/
+    if(this._isRollY) {
+      config.sendTrackCode('swipe', {
+        'direction': 'vertical',
+        'pageId': this.visualIndex + 1
+      })
     }
 
   }
@@ -507,7 +522,6 @@ export default class Swipe extends Observer {
       'action': 'flipRebound'
     })
   }
-
 
 
   /**

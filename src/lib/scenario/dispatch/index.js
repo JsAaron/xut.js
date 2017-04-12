@@ -717,10 +717,13 @@ export default class Dispatcher {
     })
   }
 
-  /*加载页面事件与动作*/
+  /*
+  加载页面事件与动作
+  每次初始化一个新的场景都会触发
+   */
   _initPage(action) {
 
-    const autoRun = () => this._runPageBase({ 'action': action })
+    const autoRun = () => this._runPageBase({ action })
 
     //触发自动任务
     const triggerAuto = () => {

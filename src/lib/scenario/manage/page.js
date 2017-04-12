@@ -130,11 +130,9 @@ export default class PageMgr extends ManageSuper {
 
     /*如果有代码跟踪*/
     if(suspendPageObj.startupTime) {
-      config.hasTrackCode('page', function(notify) {
-        notify({
-          pageId: suspendPageObj.chapterId,
-          time: (+new Date) - suspendPageObj.startupTime
-        })
+      config.sendTrackCode('flip', {
+        pageId: suspendPageObj.chapterId,
+        time: (+new Date) - suspendPageObj.startupTime
       })
     }
 
@@ -244,7 +242,7 @@ export default class PageMgr extends ManageSuper {
     this._checkTaskCompleted(data.currIndex, function(activatePageObj) {
 
       /*跟踪，每个页面的停留时间，开始*/
-      if(config.hasTrackCode('page')) {
+      if(config.hasTrackCode('flip')) {
         activatePageObj.startupTime = +new Date
       }
 

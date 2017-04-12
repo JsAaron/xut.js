@@ -31,13 +31,11 @@ export default function siwpeHook(e, node) {
   let hasTyperlink = false
   if(dataType === 'hyperlink') {
     hasTyperlink = true
-    config.hasTrackCode('hot', function(notify) {
-      notify({
-        id: node.getAttribute('data-id'),
-        pageId: node.getAttribute('data-page-id'),
-        type: 'hyperlink',
-        eventName: 'tap'
-      })
+    config.sendTrackCode('hot', {
+      id: node.getAttribute('data-id'),
+      pageId: node.getAttribute('data-page-id'),
+      type: 'hyperlink',
+      eventName: 'tap'
     })
   }
 

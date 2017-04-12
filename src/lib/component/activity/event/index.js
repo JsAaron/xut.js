@@ -205,19 +205,21 @@ export default function(activitProto) {
      */
     const eventRun = function() {
 
-      /*跟踪点击动作*/
-      config.hasTrackCode('action', function(notify) {
-        /*如果有标记才处理*/
-        const contentData = self.relatedData.contentDataset[self.id]
-        if(contentData && contentData.trackCode) {
-          notify({
-            pageId: self.pageId,
-            id: self.id,
-            type: self.type,
-            eventName: eventData.eventName
-          })
-        }
-      })
+      /*
+      跟踪点击动作
+      1. 必须配置config
+      2. 而且content要有标记
+      */
+      const contentData = self.relatedData.contentDataset[self.id]
+      if(contentData && contentData.trackCode) {
+        config.sendTrackCode('content', {
+          pageId: self.pageId,
+          id: self.id,
+          type: self.type,
+          eventName: eventData.eventName
+        })
+      }
+
 
       //脚本动画
       if(eventData.rewrite) {

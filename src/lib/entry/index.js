@@ -92,9 +92,10 @@ const bindPlatEvent = () => {
     }
     //不是子文档指定绑定按键
     if(!window.SUbCONFIGT) {
-      Xut.Application.AddEventListener = () => {
+      /*app初始化完毕*/
+      Xut.Application.Watch('app:initComplete', function() {
         bindAndroid()
-      }
+      })
     }
   }
   if(window.DUKUCONFIG) {

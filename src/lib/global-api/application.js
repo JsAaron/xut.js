@@ -28,8 +28,8 @@ export function initApplication() {
 
   /**
    * 应用事件监听
-   * 1 完成
-   * Xut.Application.Watch('complete',fn)
+   * 1.Xut.Application.Watch('complete',fn)
+   * 2.app:initComplete
    */
   let __app__ = new Observer()
   Xut.Application.Watch = function(event, callback) {
@@ -44,6 +44,9 @@ export function initApplication() {
     __app__.unbind(event, fn)
   }
 
+  /*
+  Xut.Application.Notify('app:initComplete')
+   */
   Xut.Application.Notify = function(...arg) {
     __app__.trigger(...arg)
   }
@@ -85,9 +88,7 @@ export function initApplication() {
   Xut.Application.Exit = function() {
     if(config.launch) {
       /*启动代码用户操作跟踪*/
-      config.hasTrackCode('app', function(notify) {
-        notify({ time: (+new Date) - config.launch.launchTime })
-      })
+      config.sendTrackCode('exit', { time: (+new Date) - config.launch.launchTime })
       globalDestroy('exit')
     }
   }
@@ -232,11 +233,6 @@ export function initApplication() {
   Xut.Application.LaunchApp = function() {
     Xut.Application.delAppState();
   }
-
-  /**
-   * 应用加载完毕
-   */
-  Xut.Application.AddEventListener = function() {}
 
 
 }
