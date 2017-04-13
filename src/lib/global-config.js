@@ -105,7 +105,7 @@ const config: Config = {
     hot       点击没有绑定事件,但是又能触发的对象(除了content的其余对象)
     swipe     垂直滑动触发
 
-    ['launch', 'init', 'exit', 'flip', 'content', 'hot'，'vertical-swipe']
+    ['launch', 'init', 'exit', 'flip', 'content', 'hot'，'swipe']
 
 
    */
