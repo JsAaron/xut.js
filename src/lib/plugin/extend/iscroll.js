@@ -14,7 +14,6 @@ export default function IScroll(node, options) {
 
   return new iScroll(node, options)
 
-
   /*启动事件反馈*/
   options.probeType = 2
 

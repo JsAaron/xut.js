@@ -329,7 +329,7 @@ export default class Swipe extends Observer {
     //或者没有点击
     //或是Y轴滑动
     //或者是阻止滑动
-    if(this._lockFlip || !this._isTap || this._isRollY || this._stopSwipe) return
+    if(this._lockFlip || !this._isTap || this._stopSwipe) return
 
     this._isMoving = true
 
@@ -339,12 +339,23 @@ export default class Swipe extends Observer {
     let absDeltaX = ABS(deltaX)
     let absDeltaY = ABS(deltaY)
 
+    /*如果继续保持了Y轴移动，记录下最大偏移量算不算上下翻页动作，提供给sendTrackCode使用*/
+    if(this._isRollY) {
+      /*猜测用户的意图，滑动轨迹小于80,想翻页*/
+      if(absDeltaX > 80) {
+        this._isRollY = 'swipe'
+      } else {
+        this._isRollY = 'wantFlip'
+      }
+      return
+    }
 
-    //=========Y轴滑动=========
+
     if(!this._isRollY) {
       //Y>X => 为Y轴滑动
       if(absDeltaY > absDeltaX) {
-        this._isRollY = true
+        /*默认用户只想滑动*/
+        this._isRollY = 'swipe'
         return;
       }
     }
@@ -413,15 +424,15 @@ export default class Swipe extends Observer {
 
   /**
    * 松手
-   * @param  {[type]} e [description]
-   * @return {[type]}   [description]
+      end: this,
+      cancel: this,
+      leave: this
    */
   _onEnd(e) {
 
-    //停止滑动
-    //或者多点触发
-    //或者是边界
-    //或者是停止翻页
+    /*
+    停止滑动，或者多点触发，或者是边界，或者是停止翻页
+     */
     if(this._lockFlip || this._isBounce || this._stopSwipe || this._hasMultipleTouches(e)) {
       return
     }
@@ -430,20 +441,19 @@ export default class Swipe extends Observer {
 
     let duration
 
-    //可能没有点击页面，没有触发start事件
+    /*可能没有点击页面，没有触发start事件*/
     if(this._start) {
       duration = getDate() - this._start.time
     }
 
-    //点击
+    /*点击*/
     if(!this._isRollX && !this._isRollY) {
       let isReturn = false
       this.$emit('onTap', this.visualIndex, () => isReturn = true, e, duration)
       if(isReturn) return
     }
 
-
-    //如果是左右滑动
+    /*如果是左右滑动*/
     if(this._isRollX) {
 
       const deltaX = ABS(this._deltaX)
@@ -480,9 +490,9 @@ export default class Swipe extends Observer {
       }
     }
 
-
-    /*如果是Y轴移动，发送请求*/
-    if(this._isRollY) {
+    /*如果是Y轴移动，发送请求,并且不是mouseleave事件，在PC上mouseleave离开非可视区重复触发*/
+    if(this._isRollY === 'wantFlip' && event.type !== 'mouseleave') {
+      this._isRollY = false //需要复位，否则与iscroll上下滑动重复触发
       config.sendTrackCode('swipe', {
         'direction': 'vertical',
         'pageId': this.visualIndex + 1

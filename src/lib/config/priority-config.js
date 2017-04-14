@@ -54,6 +54,7 @@ export function priorityConfig() {
   const trackTypes = launch && launch.trackCode || config.trackCode
   config.sendTrackCode = () => {}
   config.hasTrackCode = () => {}
+  /*'launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe']*/
   if(trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if(!launch.trackCode) { launch.trackCode = {} }
     trackTypes.forEach(type => { launch.trackCode[type] = true })
@@ -66,10 +67,19 @@ export function priorityConfig() {
       }
     }
 
+    /*合并命令，动作类型归类为action*/
+    const modifyName = ['content', 'hot']
+    const getTrackName = (type) => {
+      if(~modifyName.indexOf(type)) {
+        return 'action'
+      }
+      return type
+    }
+
     /*发送代码追踪数据*/
     config.sendTrackCode = (type, options = {}) => {
       if(config.hasTrackCode(type)) {
-        Xut.Application.Notify('trackCode', type, _.extend(options || {}, {
+        Xut.Application.Notify('trackCode', getTrackName(type), _.extend(options || {}, {
           uuid,
           appId: config.data.appId,
           appName: config.data.shortName

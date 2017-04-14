@@ -107,6 +107,8 @@ const config: Config = {
 
     ['launch', 'init', 'exit', 'flip', 'content', 'hot'，'swipe']
 
+    特别注意，配置中有'content' 'hot'
+    但是实际返回的数据中改成了统一接口 action然后type带类型
 
    */
   trackCode:null,
