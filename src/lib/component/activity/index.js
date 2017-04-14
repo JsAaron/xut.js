@@ -217,7 +217,7 @@ export default class Activity {
         self.iscroll = IScroll(scrollNode, {
           scrollbars: 'custom',
           fadeScrollbars: false
-        })
+        }, 'delegate')
 
         //增加标记
         //在PPT动画中reset不还原
