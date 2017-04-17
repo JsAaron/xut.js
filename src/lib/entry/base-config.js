@@ -1,9 +1,10 @@
-import initTooBar from './toolbar'
+import initDB from './db'
+import initDefaults from './defaults'
+import { importJsonDatabase } from '../database/result'
 import { $warn, loadStyle, setFastAnalysisRE } from '../util/index'
 import { createCursor } from '../initialize/cursor'
 import { initColumn } from '../component/column/core-init'
 import { contentFilter } from '../component/activity/content/content-filter'
-import { importJsonDatabase } from '../database/result'
 import { config, initConfig, initPathAddress } from '../config/index'
 
 /**
@@ -90,6 +91,56 @@ const adaptiveImage = function() {
   setDefaultSuffix()
 }
 
+/*
+  配置初始化
+ */
+const configInit = function(novelData, tempSettingData) {
+
+  /*启动代码用户操作跟踪:启动*/
+  config.sendTrackCode('launch')
+
+  //创建过滤器
+  Xut.CreateFilter = contentFilter('createFilter');
+  Xut.TransformFilter = contentFilter('transformFilter');
+
+  //初始化配置一些信息
+  initConfig(novelData.pptWidth, novelData.pptHeight)
+
+  //新增模式,用于记录浏览器退出记录
+  //如果强制配置文件recordHistory = false则跳过数据库的给值
+  setHistory(tempSettingData)
+
+  //2015.2.26
+  //启动画轴模式
+  setPaintingMode(tempSettingData)
+
+  //创建忙碌光标
+  if(!Xut.IBooks.Enabled) {
+    createCursor()
+  }
+
+  //初始资源地址
+  initPathAddress()
+}
+
+/**
+ * 初始分栏排版
+ * 嵌入index分栏
+ * 默认有并且没有强制设置关闭的情况，打开缩放
+ */
+const configColumn = function(novelData, callback) {
+  initColumn(haColumnCounts => {
+    if(haColumnCounts) {
+      //动画事件委托
+      if(config.swipeDelegate !== false) {
+        config.swipeDelegate = true
+      }
+    }
+    callback(novelData)
+  })
+}
+
+
 export default function baseConfig(callback) {
 
   //mini杂志设置
@@ -104,55 +155,12 @@ export default function baseConfig(callback) {
   /*建议快速正则，提高计算*/
   setFastAnalysisRE()
 
-  importJsonDatabase(() => {
-
-    //初始化工具栏
-    //与数据库setting数据
-    initTooBar((novelData, tempSettingData) => {
-
-      /*启动代码用户操作跟踪:启动*/
-      config.sendTrackCode('launch')
-
-      //创建过滤器
-      Xut.CreateFilter = contentFilter('createFilter');
-      Xut.TransformFilter = contentFilter('transformFilter');
-
-      //初始化配置一些信息
-      initConfig(novelData.pptWidth, novelData.pptHeight)
-
-      //新增模式,用于记录浏览器退出记录
-      //如果强制配置文件recordHistory = false则跳过数据库的给值
-      setHistory(tempSettingData)
-
-      //2015.2.26
-      //启动画轴模式
-      setPaintingMode(tempSettingData)
-
-      //创建忙碌光标
-      if(!Xut.IBooks.Enabled) {
-        createCursor()
-      }
-
-      //初始资源地址
-      initPathAddress()
-
-      //全局样式
-      loadStyle('svgsheet', () => {
-        /**
-         * 初始分栏排版
-         * 嵌入index分栏
-         * 默认有并且没有强制设置关闭的情况，打开缩放
-         */
-        initColumn(haColumnCounts => {
-          if(haColumnCounts) {
-            //动画事件委托
-            if(config.swipeDelegate !== false) {
-              config.swipeDelegate = true
-            }
-          }
-          callback(novelData)
-        })
-      })
+  importJsonDatabase((hasResults) => {
+    initDB(hasResults, function(dataRet) {
+      const novelData = dataRet.Novel.item(0)
+      const tempSettingData = initDefaults(dataRet.Setting)
+      configInit(novelData, tempSettingData)
+      loadStyle('svgsheet', () => configColumn(novelData, callback))
     })
   })
 }

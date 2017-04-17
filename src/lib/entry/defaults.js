@@ -1,4 +1,3 @@
-import { createStore } from '../database/index'
 import { config } from '../config/index'
 
 /**
@@ -22,7 +21,7 @@ const defaults = {
  * 配置默认数据
  * @return {[type]} [description]
  */
-const initDefaults = (setData) => {
+export default function initDefaults(setData) {
 
   let rs
   const data = {}
@@ -35,7 +34,7 @@ const initDefaults = (setData) => {
 
   _.defaults(data, defaults);
 
-  for (let i in defaults) {
+  for(let i in defaults) {
     setConfig[i] = Number(data[i]);
   }
 
@@ -54,55 +53,4 @@ const initDefaults = (setData) => {
   Xut.Presentation.AdsId = data.adsId;
 
   return data
-}
-
-
-/**
- * 根据set表初始化数据
- * @return {[type]} [description]
- */
-const setStore = (callback) => {
-  createStore((dataRet) => {
-    let novelData = dataRet.Novel.item(0)
-    callback(novelData, initDefaults(dataRet.Setting))
-  })
-}
-
-
-/**
- * 数据库支持
- * @return {[type]} [description]
- */
-const supportTransaction = (callback) => {
-  if (window.openDatabase) {
-    try {
-      //数据库链接对象
-      config.data.db = window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
-    } catch (err) {
-      console.log('window.openDatabase出错')
-    }
-  }
-
-  //如果读不出数据
-  if (config.data.db) {
-    config.data.db.transaction(function(tx) {
-      tx.executeSql('SELECT * FROM Novel', [], function(tx, rs) {
-        callback()
-      }, function() {
-        config.data.db = null
-        callback()
-      })
-    })
-  } else {
-    callback()
-  }
-}
-
-
-/**
- * 初始化
- * 数据结构
- */
-export default function(callback) {
-  supportTransaction(() => setStore(callback))
 }

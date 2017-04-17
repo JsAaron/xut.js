@@ -57,7 +57,8 @@ function parseFileName(fileName, baseSuffix, type) {
 function filterJsonData() {
   result = window.SQLResult
 
-  if(!result) {
+  /*必须保证数据存在*/
+  if(!result && !result.Setting) {
     $warn('json数据库加载出错')
     return
   }
@@ -84,6 +85,8 @@ function filterJsonData() {
   }
 
   window.SQLResult = null;
+
+  return result
 }
 
 
