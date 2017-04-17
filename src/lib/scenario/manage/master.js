@@ -122,7 +122,7 @@ export default class MasterMgr extends ManageSuper {
       _.extend(dataOpts, {
         pptMaster, //ppt母板ID
         'pageType': this.pageType, //创建页面的类型
-        'rootNode': this.rootNode, //根元素
+        'rootNode': this.rootNode //根元素
       })
     );
 
@@ -138,16 +138,18 @@ export default class MasterMgr extends ManageSuper {
    * 1 母版之间的切换
    * 2 浮动对象的切换
    */
-  move({
-    nodes,
-    speed,
-    action,
-    moveDistance,
-    leftIndex,
-    currIndex,
-    rightIndex,
-    direction
-  }, isAppBoundary) {
+  move(options, isAppBoundary) {
+
+    const {
+      nodes,
+      speed,
+      action,
+      moveDistance,
+      leftIndex,
+      currIndex,
+      rightIndex,
+      direction
+    } = options
 
     //是边界处理
     //边界外处理母版
@@ -159,7 +161,7 @@ export default class MasterMgr extends ManageSuper {
     _.each(masterObjs, function(pageObj, index) {
       if(pageObj) {
         isBoundary = true
-        pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], direction)
+        pageObj.movePage(action, moveDistance[index], speed, moveDistance[3])
       }
     })
 

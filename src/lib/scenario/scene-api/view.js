@@ -61,13 +61,24 @@ export function extendView(vm, access, $globalEvent) {
 
   /**
    * 跳转到上一个页面
+   * options = obj || fn
    */
-  Xut.View.GotoPrevSlide = function(seasonId, chapterId) {
+  Xut.View.GotoPrevSlide = function(data) {
+    let seasonId, chapterId, callback
+    if(data) {
+      if(_.isFunction) { //回调
+        callback = data
+      } else {
+        seasonId = data.seasonId
+        chapterId = data.chapterId
+      }
+    }
+
     if(seasonId && chapterId) {
       Xut.View.LoadScenario({
         'scenarioId': seasonId,
         'chapterId': chapterId
-      })
+      }, callback)
       return;
     }
 
@@ -75,21 +86,33 @@ export function extendView(vm, access, $globalEvent) {
     //全部转化成超链接
     if(Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
       location.href = (Xut.IBooks.pageIndex - 1) + ".xhtml";
+      callback && callback()
       return
     }
 
-    options.multiplePages && $globalEvent.prev()
+    options.multiplePages && $globalEvent.prev(callback)
   };
 
   /**
    * 跳转到下一个页面
    */
-  Xut.View.GotoNextSlide = function(seasonId, chapterId) {
+  Xut.View.GotoNextSlide = function(data) {
+
+    let seasonId, chapterId, callback
+    if(data) {
+      if(_.isFunction) { //回调
+        callback = data
+      } else {
+        seasonId = data.seasonId
+        chapterId = data.chapterId
+      }
+    }
+
     if(seasonId && chapterId) {
       Xut.View.LoadScenario({
         'scenarioId': seasonId,
         'chapterId': chapterId
-      })
+      }, callback)
       return;
     }
 
@@ -97,10 +120,11 @@ export function extendView(vm, access, $globalEvent) {
     //全部转化成超链接
     if(Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
       location.href = (Xut.IBooks.pageIndex + 1) + ".xhtml";
+      callback && callback()
       return
     }
 
-    options.multiplePages && $globalEvent.next();
+    options.multiplePages && $globalEvent.next(callback);
   };
 
   /**
@@ -161,19 +185,19 @@ export function extendView(vm, access, $globalEvent) {
    * 是否为翻页的边界
    * @return {Boolean} [description]
    */
-  Xut.View.isFlipBorderBounce = function(distance) {
+  Xut.View.GetFlipBorderBounce = function(distance) {
     return $globalEvent.isBorder(distance)
   }
 
 
   /**
    * 页面滑动
-   * @param {[type]} distance  [description]
-   * @param {[type]} speed     [description]
-   * @param {[type]} direction [description]
-   * @param {[type]} action    [description]
+   * action 动作
+   * direction 方向
+   * distance 移动距离
+   * speed 速度
    */
-  Xut.View.MovePage = function(distance, speed, direction, action) {
+  Xut.View.MovePage = function(action, direction, distance, speed) {
 
     //如果禁止翻页模式 || 如果是滑动,不是边界
     if(!options.multiplePages ||

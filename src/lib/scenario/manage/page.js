@@ -89,16 +89,19 @@ export default class PageMgr extends ManageSuper {
    * 移动页面
    * @return {[type]}
    */
-  move({
-    speed,
-    action,
-    outerCallFlip,
-    moveDistance,
-    leftIndex,
-    currIndex,
-    rightIndex,
-    direction
-  }) {
+  move(options) {
+
+    const {
+      speed,
+      action,
+      outerCallFlip,
+      moveDistance,
+      leftIndex,
+      currIndex,
+      rightIndex,
+      direction
+    } = options
+
     /*双页模式，移动父容器*/
     if(config.doublePageMode) {
       this._moveContainer(moveDistance[1], speed)
@@ -110,7 +113,7 @@ export default class PageMgr extends ManageSuper {
         this.$$getPageObj(rightIndex)
       ], function(pageObj, index) {
         if(pageObj) {
-          pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], direction, outerCallFlip)
+          pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], outerCallFlip)
         }
       })
     }

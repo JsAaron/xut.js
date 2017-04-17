@@ -250,7 +250,7 @@ _.extend(config, {
   /**
    * 默认图标高度
    */
-  iconHeight: isIphone ? 32 : 44,
+  iconHeight: isIphone ? 32 : 44
 
 
 }, improtConfig, improtData)

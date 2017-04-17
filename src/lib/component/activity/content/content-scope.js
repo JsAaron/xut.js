@@ -80,7 +80,7 @@ const createScope = function(base, contentId, chapterIndex, actName, parameter, 
     chapterIndex,
     pageIndex: base.pageIndex,
     canvasRelated: base.canvasRelated,
-    nextTask: base.nextTask,
+    nextTask: base.nextTask
   })
 
   /**

@@ -44,7 +44,7 @@ export function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  Xut.View.LoadScenario = function(options) {
+  Xut.View.LoadScenario = function(options, callback) {
 
     let seasonId = toNumber(options.scenarioId)
     let chapterId = toNumber(options.chapterId)
@@ -158,6 +158,10 @@ export function initView() {
       pageIndex: pageIndex || getInitIndex(), //指定页码
       pageTotal: sectionRang.length, //页面总数
       complete(nextBack) { //构件完毕回调
+
+        /*第一次加载的外部回调*/
+        callback && callback()
+
         //销毁旧场景
         current && current.destroy()
           //下一个任务存在,执行切换回调后,在执行页面任务

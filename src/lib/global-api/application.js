@@ -44,9 +44,6 @@ export function initApplication() {
     __app__.unbind(event, fn)
   }
 
-  /*
-  Xut.Application.Notify('app:initComplete')
-   */
   Xut.Application.Notify = function(...arg) {
     __app__.trigger(...arg)
   }

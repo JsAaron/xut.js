@@ -58,7 +58,7 @@ export function priorityConfig() {
   if(trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if(!launch.trackCode) { launch.trackCode = {} }
     trackTypes.forEach(type => { launch.trackCode[type] = true })
-    const uuid = Xut.guid('track-')
+    const uuid = Xut.guid()
 
     /*检测是否有代码追踪*/
     config.hasTrackCode = (type) => {

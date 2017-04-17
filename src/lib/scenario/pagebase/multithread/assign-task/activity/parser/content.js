@@ -55,11 +55,12 @@ function relatedTokens(relateds, activitys, tokens) {
 
   itemTokens.forEach(function(type) {
     let values = tokens[type];
+    let chapterId
     if(values !== undefined) {
       createEventContainer(); //创建容器
       switch(type) {
         case 'seasonId': //跳转新场景信息
-          let chapterId = tokens['chapterId'] || tokens['chapter'];
+          chapterId = tokens['chapterId'] || tokens['chapter'];
           relateds.seasonRelated[eventId] = {
             seasonId: values[0],
             chapterId: chapterId ? chapterId[0] : ''
@@ -529,6 +530,3 @@ export function contentParser(compileActivitys, pipeData) {
     'createActivitys': activityRelated
   })
 }
-
-
-

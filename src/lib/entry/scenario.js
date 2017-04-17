@@ -70,5 +70,10 @@ export default function(options) {
     'scenarioId': scenarioId,
     'pageIndex': options.pageIndex,
     'history': options.history
+  }, function() {
+    //应用加载完毕
+    Xut.Application.Notify('appInit')
+      /*发送初始化完毕代码跟踪*/
+    config.sendTrackCode('init')
   })
 }

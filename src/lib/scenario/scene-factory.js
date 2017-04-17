@@ -341,13 +341,11 @@ export class SceneFactory {
         if(isMain) {
           this.complete(() => {
             Xut.View.HideBusy()
-            //检测是不是有缓存加载
+              //检测是不是有缓存加载
             if(!checkHistory(this.history)) {
               //指定自动运行的动作
               nextAction && nextAction();
             }
-            //应用加载完毕
-            Xut.Application.Notify('app:initComplete')
           })
         } else {
           this.complete(nextAction)

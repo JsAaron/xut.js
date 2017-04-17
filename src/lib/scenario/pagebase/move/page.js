@@ -13,7 +13,7 @@ export default function(baseProto) {
    * 页面移动
    * @return {[type]} [description]
    */
-  baseProto.movePage = function(action, distance, speed, viewOffset, direction, outerCallFlip) {
+  baseProto.movePage = function(action, distance, speed, viewOffset, outerCallFlip) {
 
     const pageNode = this.$pageNode[0]
 

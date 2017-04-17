@@ -112,10 +112,6 @@ export default function baseConfig(callback) {
 
       /*启动代码用户操作跟踪:启动*/
       config.sendTrackCode('launch')
-      /*应用加载完毕*/
-      Xut.Application.Watch('app:initComplete', function() {
-        config.sendTrackCode('init')
-      })
 
       //创建过滤器
       Xut.CreateFilter = contentFilter('createFilter');

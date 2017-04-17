@@ -22,7 +22,7 @@ export function $trigger(target, attribute, rootNode, pageIndex) {
         /page/.test(rootNode.id) ? 'page' : 'master' :
         'page';
 
-      const data = { id, key, type, rootNode, target, pageIndex, pageType, "activityId": id, }
+      const data = { id, key, type, rootNode, target, pageIndex, pageType, "activityId": id }
 
       /*如果有代码跟踪*/
       config.sendTrackCode('hot', {

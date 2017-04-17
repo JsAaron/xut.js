@@ -29,6 +29,15 @@ export function extendApplication(access, $globalEvent) {
    * @return {[type]}
    */
 
+
+  /**
+   * 是否锁定页面
+   * @return {[type]} [description]
+   */
+  Xut.Application.HasLockFlip = function() {
+    return $globalEvent.hasLockFlip()
+  }
+
   /**
    * 是否翻页中
    * @return {Boolean} [description]

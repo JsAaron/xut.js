@@ -12,7 +12,7 @@ import { priorityConfig } from './config/priority-config'
 /*全局API初始化*/
 initGlobalAPI()
 
-Xut.Version = 881.5
+Xut.Version = 881.6
 
 /*加载应用app*/
 const initApp = (...arg) => {

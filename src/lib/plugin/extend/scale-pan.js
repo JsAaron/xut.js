@@ -25,7 +25,7 @@ export class ScalePan {
     this.tapClose = tapClose
     this.tapCallabck = tapCallabck
 
-    this.rootNode = rootNode instanceof jQuery ? rootNode[0] : $rootNode
+    this.rootNode = rootNode instanceof $ ? rootNode[0] : rootNode
     this._offsetWidth = this.rootNode.offsetWidth
     this._offsetHeight = this.rootNode.offsetHeight
 

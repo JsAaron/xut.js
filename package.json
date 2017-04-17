@@ -54,7 +54,7 @@
     "gulp-clean-css": "^2.0.13",
     "gulp-concat": "^2.6.0",
     "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^2.0.0",
+    "gulp-uglify": "^2.1.2",
     "gulp-watch": "^4.3.10",
     "html-webpack-plugin": "^2.28.0",
     "node-ssh": "^4.0.1",

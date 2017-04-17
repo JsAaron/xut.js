@@ -125,15 +125,23 @@ export default function api(Swipe) {
     return this._isMoving
   }
 
+  /**
+   * 是否锁定
+   * @return {Boolean} [description]
+   */
+  Swipe.prototype.hasLockFlip = function() {
+    return this._lockFlip
+  }
+
 
   /**
    * 外部直接调用
    * 前翻页接口
-   * @return {[type]} [description]
+   * callback 翻页完成
    */
-  Swipe.prototype.prev = function() {
+  Swipe.prototype.prev = function(callback) {
     if(!this._borderBounce(1)) {
-      this._slideTo('prev', 'outer');
+      this._slideTo('prev', 'outer', callback);
     } else {
       //边界反弹
       this._setRebound(this.visualIndex, 'next')
@@ -144,11 +152,12 @@ export default function api(Swipe) {
   /**
    * 外部直接调用
    * 后翻页接口
-   * @return {Function} [description]
+   * Xut.View.GotoNextSlide
+   * callback 翻页完成
    */
-  Swipe.prototype.next = function() {
+  Swipe.prototype.next = function(callback) {
     if(!this._borderBounce(-1)) {
-      this._slideTo('next', 'outer');
+      this._slideTo('next', 'outer', callback);
     } else {
       //边界反弹
       this._setRebound(this.visualIndex, 'prev', 'isAppBoundary')

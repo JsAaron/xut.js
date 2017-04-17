@@ -339,6 +339,9 @@ export default class Swipe extends Observer {
     let absDeltaX = ABS(deltaX)
     let absDeltaY = ABS(deltaY)
 
+
+    //=========Y轴滑动=========
+
     /*如果继续保持了Y轴移动，记录下最大偏移量算不算上下翻页动作，提供给sendTrackCode使用*/
     if(this._isRollY) {
       /*猜测用户的意图，滑动轨迹小于80,想翻页*/
@@ -350,7 +353,7 @@ export default class Swipe extends Observer {
       return
     }
 
-
+    /*检测用户是否上下滑动了*/
     if(!this._isRollY) {
       //Y>X => 为Y轴滑动
       if(absDeltaY > absDeltaX) {
@@ -417,7 +420,7 @@ export default class Swipe extends Observer {
   如果是首尾
   如果是liner模式排除
   */
-  _isBeginEnd() {
+  _isFirstEnd() {
     return this.options.linear ? false :
       !this.visualIndex && this._deltaX > 0 || this.visualIndex == this.totalIndex - 1 && this._deltaX < 0
   }
@@ -480,7 +483,7 @@ export default class Swipe extends Observer {
         return
       } else {
         //跟随移动
-        if(isValidSlide && !this._isBeginEnd()) {
+        if(isValidSlide && !this._isFirstEnd()) {
           //true:right, false:left
           this._slideTo(this._deltaX < 0 ? 'next' : 'prev', 'inner')
         } else {
@@ -695,7 +698,7 @@ export default class Swipe extends Observer {
    *   1. inner 用户直接翻页滑动触发，提供hasTouch
    *   2. outer 通过接口调用翻页
    */
-  _slideTo(direction, action) {
+  _slideTo(direction, action, callback) {
 
     /*是外部调用触发接口,提供给翻页滑动使用*/
     let outerCallFlip = false
@@ -705,6 +708,7 @@ export default class Swipe extends Observer {
     需要手动计算出滑动的speed
     inner 用户内部滑动
     outer 外部接口调用
+    _slideTo => Swipe.prototype.next => Xut.View.GotoNextSlide
     */
     let outerSpeed
 
@@ -743,6 +747,11 @@ export default class Swipe extends Observer {
     this._isQuickFlip()
     this.direction = direction
 
+    if(callback) {
+      /*监听内部翻页，通过接口调用，需要翻页结束后触发外部通知，绑定一次*/
+      this.$once('innerFlipOver', callback)
+    }
+
     this._distributeMove({
       outerCallFlip,
       'speed': outerSpeed || this._getFlipOverSpeed(),
@@ -751,6 +760,7 @@ export default class Swipe extends Observer {
       'direction': this.direction,
       'action': 'flipOver'
     })
+
 
     if(this.pagePointer.createPointer) {
       this.recordLastPoionter = $.extend(true, {}, this.pagePointer)
@@ -826,26 +836,31 @@ export default class Swipe extends Observer {
 
   /*
   翻页结束后，派发动作完成事件
+  1 还原动作参数
+  2 触发翻页的内部事件监听
+  3 延长获取更pagePointer的更新值，并且解锁
    */
   _distributeComplete(...arg) {
     this._setRestore(...arg)
-      //延长获取更pagePointer的更新值
+    this.$emit('innerFlipOver')
+    const callback = () => this._removeFlipLock()
     setTimeout(() => {
-      this.$emit('onComplete', this.direction, this.pagePointer, this._removeFlipLock.bind(this), this._isQuickTurn)
+      this.$emit('onComplete', this.direction, this.pagePointer, callback, this._isQuickTurn)
     }, 50)
   }
 
 
   /**
    * 还原设置
+   * 1 针对拖拽翻页阻止
+   * 2 恢复速率
+   * 3 去掉页面指示
    */
   _setRestore(node, isVisual) {
     this._isMoving = false
-      //针对拖拽翻页阻止
     this._stopSwipe = true
-    this._isTap = false;
-    //恢复速率
-    this._resetRate();
+    this._isTap = false
+    this._resetRate()
     if(isVisual && node) {
       node.removeAttribute('data-visual');
     }

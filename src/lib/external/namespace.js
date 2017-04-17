@@ -64,8 +64,9 @@ Xut.mixin({
    * @param  {[type]} pre [description]
    * @return {[type]}     [description]
    */
-  guid: function(pre) {
-    return(pre || 'Xut_') + (+new Date()) + (Math.random() + '').slice(-8);
+  guid: function(mark) {
+    var id = (+new Date()) + (Math.random() + '').slice(-8);
+    return mark ? (mark + id) : id
   },
 
   /**
