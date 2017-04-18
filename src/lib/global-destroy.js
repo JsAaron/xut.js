@@ -8,8 +8,8 @@ import { config, destroyConfig } from './config/index'
 import { $resetUUID } from './util/stroage'
 import { offAndroid } from './initialize/button'
 import { cleanCursor } from './initialize/cursor'
-import { cleanGlobalEvent } from './initialize/event'
-import { removeRootNode } from './initialize/node'
+import { cleanGlobalEvent } from './initialize/golbal-event'
+import { removeRootNode } from './initialize/root-node'
 
 /**
  * 销毁接口
