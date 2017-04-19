@@ -84,7 +84,7 @@ export default class Mediator extends Observer {
       'multiplePages': false
     }, parameter, {
       //翻页模式
-      flipMode: config.flipMode
+      flipMode: config.launch.flipMode
     })
 
     //配置多页面参数
@@ -125,7 +125,7 @@ export default class Mediator extends Observer {
       //如果找到是空节点
       //并且是虚拟模式2的话
       //默认允许滑动
-      if(!handlerObj && config.visualMode == 2) {
+      if(!handlerObj && config.launch.visualMode == 2) {
         return
       }
       //停止翻页,针对content对象可以拖动,滑动的情况处理

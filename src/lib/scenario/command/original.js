@@ -1,3 +1,5 @@
+import { config } from '../../config/index'
+
 /**
  * 复位到初始化的状态
  * @return {[type]} [description]
@@ -11,7 +13,7 @@ import access from './access'
  * @return {[type]}      [description]
  */
 let hasOptimize = (fn) => {
-  if(!Xut.config.visualMode !== 4) {
+  if (!config.launch.visualMode !== 4) {
     fn && fn()
   }
 }
@@ -30,11 +32,11 @@ export function $original(pageObj) {
   access(pageObj, (pageObj, contentObjs, componentObjs) => {
 
     //母版对象不还原
-    if(pageObj.pageType === 'master') return;
+    if (pageObj.pageType === 'master') return;
 
     var $containsNode
 
-    if($containsNode = pageObj.getContainsNode()) {
+    if ($containsNode = pageObj.getContainsNode()) {
 
       //隐藏根节点
       //display:none下刷新
@@ -44,13 +46,13 @@ export function $original(pageObj) {
 
       //content类型复位
       contentObjs && _.each(contentObjs, (obj) => {
-        if(!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+        if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
           obj.reset && obj.reset();
         }
       })
 
       //销毁所有widget类型的节点
-      if(componentObjs) {
+      if (componentObjs) {
         _.each(componentObjs, (obj) => {
           obj && obj.destroy();
         });

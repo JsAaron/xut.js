@@ -12,7 +12,7 @@ const slashRE = /\/$/
  * @return {[type]} [description]
  */
 export function slashPostfix(resource) {
-  if(resource && slashRE.test(resource)) {
+  if (resource && slashRE.test(resource)) {
     return resource.substring(0, resource.length - 1)
   }
   return resource
@@ -23,11 +23,13 @@ export function slashPostfix(resource) {
  * 动态加载link
  * @return {[type]} [description]
  */
-export function loadStyle(fileName, callback) {
-  let path = config.launch ?
+export function loadGolbalStyle(fileName, callback) {
+
+  const path = config.launch.resource ?
     config.launch.resource + '/gallery/' + fileName + '.css' :
     config.data.pathAddress + fileName + '.css'
-  let node = loadFile(path, callback)
+
+  const node = loadFile(path, callback)
   node && node.setAttribute('data-type', fileName)
 }
 
@@ -41,9 +43,9 @@ let brModelRE = null
 export function setFastAnalysisRE() {
   brModelRE = null
     //如果存在brModelType
-  if(config.launch && config.launch.brModelType && config.launch.brModelType !== 'delete') {
+  if (config.launch.brModelType && config.launch.brModelType !== 'delete') {
     //(\w+[_a|_i]?)([.hi|.mi]*)$/i
-    brModelRE = new RegExp(`(\\w+[${config.launch.brModelType}]?)([.${config.baseImageSuffix}]*)$`, 'i')
+    brModelRE = new RegExp(`(\\w+[${config.launch.brModelType}]?)([.${config.launch.baseImageSuffix}]*)$`, 'i')
   }
 }
 
@@ -65,9 +67,9 @@ export function analysisImageName(src) {
   let result
 
   //如果存在brModelType
-  if(brModelRE) {
+  if (brModelRE) {
     result = src.match(brModelRE)
-    if(result && result.length) {
+    if (result && result.length) {
       suffix = result[0]
       original = result[1]
     } else {
@@ -77,7 +79,7 @@ export function analysisImageName(src) {
   //有基础后缀
   //suffix: 1d7949a5585942ed.mi.jpg
   //original: 1d7949a5585942ed.jpg
-  else if(config.baseImageSuffix) {
+  else if (config.launch.baseImageSuffix) {
     /*
         0 1d7949a5585942ed.mi.jpg"
         1 "1d7949a5585942ed"
@@ -85,7 +87,7 @@ export function analysisImageName(src) {
         3: ".jpg"
      */
     result = src.match(/(\w+)(\.\w+)(\.\w+)$/)
-    if(result && result.length) {
+    if (result && result.length) {
       suffix = result[0]
       original = result[1] + result[3]
     } else {
@@ -96,7 +98,7 @@ export function analysisImageName(src) {
   else {
     //"1d7949a5585942ed.jpg"
     result = src.match(/\w+\.\w+$/)
-    if(result && result.length) {
+    if (result && result.length) {
       suffix = original = result[0]
     } else {
       $warn('zoom-image解析出错,result：' + result)
@@ -111,9 +113,9 @@ export function analysisImageName(src) {
 
 /*给地址增加私有后缀*/
 function insertImageUrlSuffix(originalUrl, suffix) {
-  if(originalUrl && suffix) {
+  if (originalUrl && suffix) {
     //brModelType 没有类型后缀
-    if(config.launch && config.launch.brModelType && config.launch.brModelType !== 'delete') {
+    if (config.launch.brModelType && config.launch.brModelType !== 'delete') {
       return originalUrl.replace(/\w+/ig, '$&' + '.' + suffix)
     }
     //带后缀
@@ -125,8 +127,8 @@ function insertImageUrlSuffix(originalUrl, suffix) {
 
 /*获取高清图文件*/
 export function getHDFilePath(originalUrl) {
-  if(config.useHDImageZoom && config.imageSuffix && config.imageSuffix['1440']) {
-    return getFileFullPath(insertImageUrlSuffix(originalUrl, config.imageSuffix['1440']), 'getHDFilePath')
+  if (config.launch.useHDImageZoom && config.launch.imageSuffix && config.launch.imageSuffix['1440']) {
+    return getFileFullPath(insertImageUrlSuffix(originalUrl, config.launch.imageSuffix['1440']), 'getHDFilePath')
   }
   return ''
 }
@@ -140,21 +142,21 @@ export function hasImages(fileName) {
 /*获取文件的全路径*/
 export function getFileFullPath(fileName, type) {
 
-  if(!fileName) {
+  if (!fileName) {
     return ''
   }
 
   const launch = config.launch
-  if(launch) {
+  if (launch) {
 
     /*
     如果启动了基础图匹配,替换全部
     并且要是图片
     并且没有私有后缀
     */
-    if(config.baseImageSuffix &&
+    if (config.launch.baseImageSuffix &&
       hasImages(fileName) &&
-      -1 === fileName.indexOf(`.${config.baseImageSuffix}.`)) {
+      -1 === fileName.indexOf(`.${config.launch.baseImageSuffix}.`)) {
       /*"50f110321f467d25474b9dba9b342f0a.png"
         1 : "50f110321f467d25474b9dba9b342f0a"
         2 : "png"
@@ -162,7 +164,7 @@ export function getFileFullPath(fileName, type) {
       let fileMatch = fileName.match(/(\w+)\.(\w+)$/)
       let name = fileMatch[1]
       let type = fileMatch[2]
-      fileName = `${fileMatch[1]}.${config.baseImageSuffix}.${fileMatch[2]}`
+      fileName = `${fileMatch[1]}.${config.launch.baseImageSuffix}.${fileMatch[2]}`
     }
 
     /*
@@ -171,12 +173,12 @@ export function getFileFullPath(fileName, type) {
       2 并且是图片
       3 并且没有被修改过
     */
-    if(launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
+    if (launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
       let suffix = ''
       let name
-      if(Xut.plat.isBrowser) { //手机浏览器访问
+      if (Xut.plat.isBrowser) { //手机浏览器访问
         let fileMatch = fileName.match(/\w+([.]?[\w]*)\1/ig)
-        if(fileMatch.length === 3) {
+        if (fileMatch.length === 3) {
           name = fileMatch[0]
           suffix = '.' + fileMatch[1]
         } else {
@@ -210,7 +212,7 @@ export function getResources(url) {
 
 export function createFn(obj, id, callback) {
   var cObj = obj[id];
-  if(!cObj) {
+  if (!cObj) {
     cObj = obj[id] = {};
   }
   callback.call(cObj);
@@ -221,12 +223,12 @@ export function createFn(obj, id, callback) {
  */
 export function execScript(code, type) {
   //过滤回车符号
-  var enterReplace = function(str) {
+  var enterReplace = function (str) {
     return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
   }
   try {
     new Function(enterReplace(code))()
-  } catch(e) {
+  } catch (e) {
     $warn('加载脚本错误', type)
   }
 }
@@ -246,9 +248,9 @@ export function createRandomImg(url) {
  * @return {[type]} [description]
  */
 export function replacePath(svgstr) {
-  if(config.launch) {
+  if (config.launch.lauchMode === 1) {
     //如果能找到对应的默认路径，则替换
-    if(-1 !== svgstr.indexOf('content/gallery/')) {
+    if (-1 !== svgstr.indexOf('content/gallery/')) {
       svgstr = svgstr.replace(/content\/gallery/ig, config.data.pathAddress)
     }
   }
@@ -258,7 +260,7 @@ export function replacePath(svgstr) {
 /**
  * 转化缩放比
  */
-const converProportion = function({
+const converProportion = function ({
   width,
   height,
   left,
@@ -269,7 +271,7 @@ const converProportion = function({
   getStyle
 }) {
 
-  if(!proportion) {
+  if (!proportion) {
     $warn('没有传递缩放比,取全局config')
     proportion = config.proportion
   }
@@ -277,7 +279,7 @@ const converProportion = function({
   //页眉，保持横纵比
   //计算顶部显示中线位置
   //如果溢出就溢出，高度设置为白边中线
-  if(zoomMode === 1) {
+  if (zoomMode === 1) {
     let visualTop = getStyle.visualTop
     let proportionalHeight = CEIL(height * proportion.width) || 0;
     return {
@@ -293,7 +295,7 @@ const converProportion = function({
   //页脚，保持横纵比
   //计算底部显示中线位置
   //如果溢出就隐藏，高度设置为白边中线
-  else if(zoomMode === 2) {
+  else if (zoomMode === 2) {
     let visualTop = getStyle.visualTop
     let proportionalHeight = CEIL(height * proportion.width) || 0;
     return {
@@ -306,9 +308,9 @@ const converProportion = function({
     }
   }
   //图片正比缩放，而且保持上下居中
-  else if(zoomMode === 3) {
+  else if (zoomMode === 3) {
     //高度为基本比值
-    if(proportion.width > proportion.height) {
+    if (proportion.width > proportion.height) {
       let originalWidth = CEIL(width * proportion.width) || 0
       let proportionalWidth = CEIL(width * proportion.height) || 0
       let proportionalLeft = Math.abs(proportionalWidth - originalWidth) / 2
@@ -394,7 +396,7 @@ export function reviseSize({
   results.scaleTop = layerSize.top
 
   //元素状态
-  if(layerSize.isHide) {
+  if (layerSize.isHide) {
     results.isHide = layerSize.isHide
   }
 
@@ -432,9 +434,9 @@ export function readFile(path, callback, type) {
    * js脚本加载
    */
   let loadJs = (fileUrl, fileName) => {
-    loadFile(randomUrl(fileUrl), function() {
+    loadFile(randomUrl(fileUrl), function () {
       data = window.HTMLCONFIG[fileName];
-      if(data) {
+      if (data) {
         callback(data)
         delete window.HTMLCONFIG[fileName];
       } else {
@@ -449,7 +451,7 @@ export function readFile(path, callback, type) {
   //externalFile使用
   //如果是js动态文件
   //content的html结构
-  if(type === "js") {
+  if (type === "js") {
     paths = config.getSvgPath() + path;
     name = path.replace(".js", '')
     loadJs(paths, name)
@@ -460,7 +462,7 @@ export function readFile(path, callback, type) {
    * 如果配置了convert === 'svg'
    * 那么所有的svg文件就强制转化成js读取
    */
-  if(config.launch && config.launch.convert === 'svg') {
+  if (config.launch.convert === 'svg') {
     path = path.replace('.svg', '.js')
     name = path.replace(".js", '')
     svgUrl = config.getSvgPath() + path
@@ -472,10 +474,10 @@ export function readFile(path, callback, type) {
   /**
    * ibooks模式 单独处理svg转化策划给你js,加载js文件
    */
-  if(Xut.IBooks.CONFIG) {
+  if (Xut.IBooks.CONFIG) {
     //如果是.svg结尾
     //把svg替换成js
-    if(/.svg$/.test(path)) {
+    if (/.svg$/.test(path)) {
       path = path.replace(".svg", '.js')
     }
     //全路径
@@ -483,9 +485,9 @@ export function readFile(path, callback, type) {
     //文件名
     name = path.replace(".js", '');
     //加载脚本
-    loadFile(randomUrl(paths), function() {
+    loadFile(randomUrl(paths), function () {
       data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
-      if(data) {
+      if (data) {
         callback(data)
         delete window.HTMLCONFIG[name];
         delete window.IBOOKSCONFIG[name]
@@ -500,12 +502,12 @@ export function readFile(path, callback, type) {
 
   //svg文件
   //游览器模式 && 非强制插件模式
-  if(Xut.plat.isBrowser && !config.isPlugin) {
+  if (Xut.plat.isBrowser && !config.isPlugin) {
     //默认的地址
     svgUrl = config.getSvgPath().replace("www/", "") + path
 
     //mini杂志的情况，不处理目录的www
-    if(config.launch && config.launch.resource) {
+    if (config.launch.resource) {
       svgUrl = config.getSvgPath() + path
     }
 
@@ -513,10 +515,10 @@ export function readFile(path, callback, type) {
       type: 'get',
       dataType: 'html',
       url: randomUrl(svgUrl),
-      success: function(svgContent) {
+      success: function (svgContent) {
         callback(svgContent);
       },
-      error: function(xhr, type) {
+      error: function (xhr, type) {
         $warn('svg文件解释出错，文件名:' + path);
         callback('');
       }
@@ -529,9 +531,9 @@ export function readFile(path, callback, type) {
    * 插件读取
    * 手机客户端模式
    */
-  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function(svgContent) {
+  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function (svgContent) {
     callback(svgContent);
-  }, function(err) {
+  }, function (err) {
     callback('')
   });
 

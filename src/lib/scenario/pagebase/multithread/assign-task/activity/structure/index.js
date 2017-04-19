@@ -116,7 +116,7 @@ const externalFile = (wrapObj, svgCallback) => {
  */
 const allotRatio = (fixRadio, headerFooterMode) => {
   if(fixRadio && headerFooterMode) {
-    config.devtools && $warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式')
+    config.debug.devtools && $warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式')
   }
   //页眉页脚模式
   if(headerFooterMode) {

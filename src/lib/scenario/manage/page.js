@@ -41,7 +41,7 @@ export default class PageMgr extends ManageSuper {
     双页模式，给父节点绑定一个翻页监听事件
     如果翻页完成，手动触发翻页事件
     */
-    if(config.doublePageMode) {
+    if(config.launch.doublePageMode) {
       $on(rootNode, {
         transitionend: function() {
           Xut.Application.tiggerFilpComplete()
@@ -52,7 +52,7 @@ export default class PageMgr extends ManageSuper {
 
   /*设置页面的初始化的translate值*/
   setInitTranslate(pageIndex) {
-    if(config.doublePageMode) {
+    if(config.launch.doublePageMode) {
       this.rootNode.style[Xut.style.transform] = `translate3d(-${config.screenSize.width*pageIndex}px,0px,0px)`
     }
   }
@@ -103,7 +103,7 @@ export default class PageMgr extends ManageSuper {
     } = options
 
     /*双页模式，移动父容器*/
-    if(config.doublePageMode) {
+    if(config.launch.doublePageMode) {
       this._moveContainer(moveDistance[1], speed)
     } else {
       /*单页模式，移动每个独立的页面*/
@@ -310,7 +310,7 @@ export default class PageMgr extends ManageSuper {
     this.$$destroyGroup();
 
     //销毁事件
-    if(config.doublePageMode) {
+    if(config.launch.doublePageMode) {
       $off(this.rootNode)
     }
 

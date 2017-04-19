@@ -16,7 +16,7 @@ export function getVisualSize(styleDataset) {
     visualChapterIndex
   } = styleDataset
 
-  //默认的config.visualMode
+  //默认的config.launch.visualMode
   let visualSize = config.visualSize
   let hasRecalculate = false
 
@@ -24,7 +24,7 @@ export function getVisualSize(styleDataset) {
   如果页面模式不跟页面保持一致或者是模式3的情况的
   就需要重新计算
   */
-  if(pageVisualMode && pageVisualMode !== config.visualMode || pageVisualMode === 3) {
+  if(pageVisualMode && pageVisualMode !== config.launch.visualMode || pageVisualMode === 3) {
     visualSize = resetVisualLayout(pageVisualMode)
     hasRecalculate = true
   }

@@ -19,7 +19,7 @@ export default {
       return getSourcePath()
     }
     if(isAndroid) {
-      if(parseInt(config.storageMode)) {
+      if(parseInt(config.launch.storageMode)) {
         //sd卡加载资源数据
         return "/sdcard/appcarrier/magazine/" + config.data.appId + "/" + getSourcePath();
       } else {

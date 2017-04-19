@@ -114,5 +114,5 @@ const getDouble = function({
  * @return {[type]} [description]
  */
 export function getVisualDistance(options) {
-  return config.doublePageMode ? getDouble(options) : getSingle(options)
+  return config.launch.doublePageMode ? getDouble(options) : getSingle(options)
 }

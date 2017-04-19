@@ -6,7 +6,7 @@
 
 export function watchColumn(instance, config) {
   //注册_columns对象改变
-  if(config.columnCheck) {
+  if(config.launch.columnCheck) {
     const columnObj = instance.columnGroup.get()
     if(columnObj && columnObj.length) {
       if(!instance.unWatchDep) {

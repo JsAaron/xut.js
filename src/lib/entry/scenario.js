@@ -4,7 +4,7 @@ import { $set, $get, $remove, execScript } from '../util/index'
 
 /*设置缓存，必须要可设置*/
 const saveData = () => {
-  if(config.historyMode) {
+  if(config.launch.historyMode) {
     $set({ "pageIndex": config.pageIndex, "novelId": config.novelId })
   } else {
     //清理

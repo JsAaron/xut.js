@@ -106,7 +106,7 @@ export default function(baseProto) {
       1.flipMode === 'ban'，关闭了翻页效果，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if(isVisual && (fixQuickFlip || config.flipMode === 'ban')) {
+      if(isVisual && (fixQuickFlip || config.launch.flipMode === 'ban')) {
         Xut.Application.tiggerFilpComplete(pageNode, true)
         return true
       }

@@ -55,7 +55,7 @@ export class ScalePicture {
 
     let offset = element.offset()
     this.originImgLeft = offset.left - containerLeft
-    this.originImgTop = offset.top - containerTop - Xut.config.visualTop
+    this.originImgTop = offset.top - containerTop - config.launch.visualTop
 
     //关闭动画中执行中
     this.isCloseAniming = false
@@ -127,7 +127,7 @@ export class ScalePicture {
     }
 
     //虚拟模拟3下，宽度可能溢出，所以需要取屏幕宽度
-    if(config.visualMode === 3) {
+    if(config.launch.visualMode === 3) {
       view = config.screenSize
       overflowLeft = config.visualSize.left
     }
@@ -234,7 +234,7 @@ export class ScalePicture {
 
   /*绑定滑动*/
   _bindPan($imgNode) {
-    if(!this.slideObj && Xut.plat.hasTouch && config.salePicture) {
+    if(!this.slideObj && Xut.plat.hasTouch && config.launch.salePicture) {
       let tapCallabck = () => this._closeSingleView()
       this.slideObj = new ScalePan({
         hasButton: false,

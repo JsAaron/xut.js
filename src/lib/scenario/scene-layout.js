@@ -57,7 +57,7 @@ export function mainScene() {
 
   //如果启动了双页模式
   //那么可视区的宽度是就是全屏的宽度了，因为有2个页面拼接
-  const width = config.doublePageMode ? config.screenSize.width : visualSize.width
+  const width = config.launch.doublePageMode ? config.screenSize.width : visualSize.width
 
   return String.styleFormat(
     `<div id="xut-main-scene"

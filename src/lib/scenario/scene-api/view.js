@@ -59,12 +59,17 @@ export function extendView(vm, access, $globalEvent) {
     vm.$emit('change:toggleToolbar', cfg)
   };
 
-  /**
-   * 跳转到上一个页面
-   * options = obj || fn
+  /*
+  跳转页面
+   options
+     obj / fn
+   direction
+     prev
+     next
    */
-  Xut.View.GotoPrevSlide = function(data) {
+  const gotoPage = function(data, direction) {
     let seasonId, chapterId, callback
+
     if(data) {
       if(_.isFunction) { //回调
         callback = data
@@ -85,47 +90,30 @@ export function extendView(vm, access, $globalEvent) {
     //ibooks模式下的跳转
     //全部转化成超链接
     if(Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
-      location.href = (Xut.IBooks.pageIndex - 1) + ".xhtml";
+      const pageIndex = direction === 'prev' ?
+        Xut.IBooks.pageIndex - 1 :
+        Xut.IBooks.pageIndex + 1
+      location.href = pageIndex + ".xhtml";
       callback && callback()
       return
     }
 
-    options.multiplePages && $globalEvent.prev(callback)
-  };
+    options.multiplePages && $globalEvent[direction](callback)
+  }
+
+  /**
+   * 跳转到上一个页面
+   */
+  Xut.View.GotoPrevSlide = function(data) {
+    gotoPage(data, 'prev')
+  }
 
   /**
    * 跳转到下一个页面
    */
   Xut.View.GotoNextSlide = function(data) {
-
-    let seasonId, chapterId, callback
-    if(data) {
-      if(_.isFunction) { //回调
-        callback = data
-      } else {
-        seasonId = data.seasonId
-        chapterId = data.chapterId
-      }
-    }
-
-    if(seasonId && chapterId) {
-      Xut.View.LoadScenario({
-        'scenarioId': seasonId,
-        'chapterId': chapterId
-      }, callback)
-      return;
-    }
-
-    //ibooks模式下的跳转
-    //全部转化成超链接
-    if(Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
-      location.href = (Xut.IBooks.pageIndex + 1) + ".xhtml";
-      callback && callback()
-      return
-    }
-
-    options.multiplePages && $globalEvent.next(callback);
-  };
+    gotoPage(data, 'next')
+  }
 
   /**
    * 跳转页面

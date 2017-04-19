@@ -11,6 +11,7 @@
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>AppCarrier</title>
     <link rel="stylesheet" type="text/css" href="css/dev.css">
+    <script type="text/javascript" src="content/101/SQLResult.js"></script>
     <script type="text/javascript" src="lib/external.js"></script>
 </head>
 
@@ -27,34 +28,46 @@
 </html>
 <script type="text/javascript">
 Xut.Application.setConfig = {
-    lauchMode: 1,
-    platform: 'mini',
-    historyMode: true,
-    visualMode: 2,
+
+    lauchMode: 1, //是否启动
+    visualMode: 3, //页面模式
+    platform: 'mini', //平台
+
+    // brModel:1, //图片模式
+    // columnCheck:false, //分栏检测
+    // doublePageMode: false //双页模式
+    // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
+    // pageBar: {
+    //     type: 'circular',
+    //     mode: 1,
+    //     position: {
+    //         top: '90%',
+    //         left: '20%'
+    //     }
+    // },
+
+    // quickFlip:true,//是否支持快速翻页
+    // supportQR: true, //是否启动二维码
+    // visualHeight: DEFAULT,
+    // visualTop: 0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
     // cursor: {
     //     url: 'images/icons/busyicon.gif',
     //     delayTime: 300
     // },
-    salePicture: true,
-    salePictureMultiples: 3,
     // imageSuffix: {
     //     1080: 'mi',
     //     1440: 'hi'
     // },
-    pageBar: {
-        // type: 'circular',
-        // mode: 1
-        // position: {
-        //     top: '90%',
-        //     left: '20%'
-        // }
-    },
-    // brModel:1,
-    trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'],
-    supportQR: true,
-    swipeDelegate: true,
-    useHDImageZoom: true,
-    // doublePageMode: true //双页模式
+
+    // salePicture: true,
+    // salePictureMultiples: 3,
+    // salePageType:'page',
+
+    // historyMode: true,
+
+    // swipeDelegate: true,
+    // useHDImageZoom: true,
+
 };
 
 
@@ -62,7 +75,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)
 })
 
-var appId = 101 //306
+var appId = 311 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

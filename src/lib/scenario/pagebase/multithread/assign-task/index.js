@@ -25,7 +25,7 @@
        if (parameter) {
          if (parameter.contentMode && parameter.contentMode == 1) {
            //非强制dom模式
-           if (!config.onlyDomMode) {
+           if (!config.debug.onlyDomMode) {
              //启动dom模式
              base.canvasRelated.enable = true;
            }

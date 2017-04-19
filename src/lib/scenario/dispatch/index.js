@@ -278,7 +278,7 @@ export default class Dispatcher {
               multiplePages,
               'getStyle': currentStyle
             }, pageIndex, masterFilter, function(shareMaster) {
-              if(config.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
+              if(config.debug.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                 $warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
               }
             })
@@ -357,7 +357,7 @@ export default class Dispatcher {
     //mini杂志功能
     //一次是拦截
     //一次是触发动作
-    if(config.swipeDelegate && currObj) {
+    if(config.launch.swipeDelegate && currObj) {
 
       //如果是swipe就全局处理
       if(action === 'swipe') {
@@ -515,7 +515,7 @@ export default class Dispatcher {
          * 构建完成通知,用于处理历史缓存记录
          * 如果是调试模式 && 不是收费提示页面 && 多场景应用
          */
-        if(config.historyMode && !options.isInApp && options.multiScenario) {
+        if(config.launch.historyMode && !options.isInApp && options.multiScenario) {
           const history = sceneController.sequence(scenarioId, currIndex)
           if(history) { $set("history", history) }
         }
@@ -574,7 +574,7 @@ export default class Dispatcher {
      * 线性结构
      * 保存目录索引
      */
-    if(config.historyMode && !options.multiScenario) {
+    if(config.launch && config.launch.historyMode && !options.multiScenario) {
       $set("pageIndex", currIndex);
     }
 

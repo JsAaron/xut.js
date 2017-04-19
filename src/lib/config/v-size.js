@@ -121,13 +121,13 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
    * 模式1
    * 如果启动了双页模式
    */
-  if(config.doublePageMode && setVisualMode === 1) {
+  if(config.launch.doublePageMode && setVisualMode === 1) {
     newWidth = newWidth / 2
   }
 
   /**
    * 模式2.3.4
-   * config.visualMode === 1
+   * config.launch.visualMode === 1
    * @return {[type]}
    */
   return {

@@ -11,7 +11,7 @@ let $warn = function() {}
 if(process.env.NODE_ENV !== 'production') {
   const hasConsole = typeof console !== 'undefined'
   $warn = (msg, level) => {
-    if(hasConsole && config.silent) {
+    if(hasConsole && config.debug.silent) {
       const command = console[level] || console.error
       if(typeof msg == 'object') {
         command(`[Xut warn]:`, msg)

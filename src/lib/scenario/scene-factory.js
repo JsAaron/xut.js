@@ -34,8 +34,8 @@ const findContainer = ($rootNode, scenarioId, isMain) => {
 const checkHistory = (history) => {
 
   //直接启用快捷调试模式
-  if(config.deBugHistory) {
-    Xut.View.LoadScenario(config.deBugHistory)
+  if(config.debug.deBugHistory) {
+    Xut.View.LoadScenario(config.debug.deBugHistory)
     return true;
   }
 
@@ -135,7 +135,7 @@ export class SceneFactory {
     //主场景工具栏设置
     if(this.isMain) {
       barConfig = pMainBar(scenarioId, pageTotal)
-      if(config.visualMode === 4) {
+      if(config.launch.visualMode === 4) {
         //word模式,自动启动工具条
         // this.mainToolbar = new BookBar({
         //     sceneNode: $rootNode,
@@ -179,7 +179,7 @@ export class SceneFactory {
     let columnCounts = getColumnCount(this.seasonId)
 
     //如果是min平台强制启动
-    if(Xut.config.platform === 'mini' || (config.toolType.number !== false && columnCounts)) {
+    if(config.launch.platform === 'mini' || (config.debug.toolType.number !== false && columnCounts)) {
 
       const getColumnTotal = needGet => {
         if(needGet) {
@@ -200,11 +200,11 @@ export class SceneFactory {
         //否则就用页面的总数
         pageTotal: getColumnTotal(),
         //单独优先级大于全局优先级
-        pageBar: config.launch.pageBar ? config.launch.pageBar : config.pageBar
+        pageBar: config.launch.pageBar
       })
 
       //页面总数改变
-      if(config.columnCheck) {
+      if(config.launch.columnCheck) {
         Xut.Application.Watch('change:number:total', () => {
           this.numberToolbar.updateTotal(getColumnTotal(true))
         })
@@ -375,7 +375,7 @@ export class SceneFactory {
    */
   destroy() {
 
-    if(config.columnCheck) {
+    if(config.launch.columnCheck) {
       Xut.Application.unWatch('change:number:total')
     }
 

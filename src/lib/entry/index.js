@@ -36,10 +36,10 @@ const initMain = novelData => {
     if(parameter.pageflip !== undefined) {
       switch(Number(parameter.pageflip)) {
         case 0: //允许翻页
-          config.flipMode = 'allow';
+          config.launch.flipMode = 'allow';
           break;
         case 1: //禁止翻页
-          config.flipMode = 'ban';
+          config.launch.flipMode = 'ban';
           break
       }
     }
@@ -51,7 +51,7 @@ const initMain = novelData => {
    * 如果启动recordHistory记录
    */
   let pageIndex = Number(getCache('pageIndex'))
-  if(config.historyMode && pageIndex !== undefined) {
+  if(config.launch.historyMode && pageIndex !== undefined) {
     let novelId = parseInt(getCache("novelId"))
     if(novelId) {
       return loadScene({

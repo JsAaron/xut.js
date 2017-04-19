@@ -126,7 +126,7 @@ export function parseCanvas(contentId, category, conData, data) {
 
   //类型转化
   //双数据类型转行单个类型
-  if(Xut.config.onlyDomMode) {
+  if(Xut.config.debug.onlyDomMode) {
     if(category) {
       var cat
       var cats = category.split(",")

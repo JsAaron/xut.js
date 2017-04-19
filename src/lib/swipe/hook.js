@@ -39,9 +39,8 @@ export default function siwpeHook(e, node) {
     })
   }
 
-
   //如果是移动端的情况下 && 支持二维码 && 是图片 && 是二维码标记
-  if(config.supportQR &&
+  if(config.launch.supportQR &&
     Xut.plat.hasTouch &&
     node.nodeName.toLowerCase() === "img" &&
     dataType === 'qrcode') {

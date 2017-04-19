@@ -148,7 +148,7 @@ export function Adapter(para) {
   data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType)
 
   //画轴模式
-  data.scrollPaintingMode = config.visualMode === 4;
+  data.scrollPaintingMode = config.launch.visualMode === 4;
   data.calculate = pageVisualSize
 
   //执行类构建

@@ -1,5 +1,5 @@
 import { config, resetVisualLayout } from '../../config/index'
-import { defAccess, nextTick, $warn, loadStyle } from '../../util/index'
+import { defAccess, nextTick, $warn, loadGolbalStyle } from '../../util/index'
 import { getResults, removeColumnData } from '../../database/result'
 import { startColumnDetect, simulateCount, debug } from './detect'
 import { setCache } from './depend'
@@ -171,7 +171,7 @@ export function initColumn(callback) {
 
       //第一次获取分栏数
       resolveColumnCount($seasons, (seasonsId, chapterId, count) => {
-        if(debug && config.columnCheck) {
+        if(debug && config.launch.columnCheck) {
           count = simulateCount
         }
         columnCount[seasonsId][chapterId] = count
@@ -180,7 +180,7 @@ export function initColumn(callback) {
       setCache(columnCount)
 
       //检测分栏数变化
-      if(config.columnCheck) {
+      if(config.launch.columnCheck) {
         startColumnDetect($seasons, $.extend(true, {}, columnCount), () => {
           $container.hide()
         })
@@ -200,7 +200,7 @@ export function initColumn(callback) {
     let visualHeight = newViewHight = visuals.height
 
     //加载flow样式
-    loadStyle('xxtflow', function() {
+    loadGolbalStyle('xxtflow', function() {
       $container = $(results.FlowData)
       removeColumnData() //删除flowdata，优化缓存
       init(visuals.width, visualHeight)

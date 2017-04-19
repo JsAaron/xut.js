@@ -249,7 +249,7 @@ export default function(activitProto) {
     if(eventContext && eventName) {
       //如果是翻页委托启动了
       //这里处理swiperight与swipeleft
-      if(config.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
+      if(config.launch.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
         self.relatedCallback.swipeDelegateContents(eventName, (callback) => {
           self.runAnimation(callback)
         })

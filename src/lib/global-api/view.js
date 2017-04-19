@@ -1,6 +1,6 @@
 import { SceneFactory } from '../scenario/scene-factory'
 import { sceneController } from '../scenario/scene-control'
-import { ShowBusy, HideBusy, ShowTextBusy } from '../initialize/cursor'
+import { showBusy, hideBusy, showTextBusy } from '../initialize/cursor'
 import { toNumber, $remove, $extend, $warn } from '../util/index'
 
 
@@ -13,16 +13,16 @@ export function initView() {
    * 忙碌光标
    * */
   $extend(Xut.View, {
-    ShowBusy,
-    HideBusy,
-    ShowTextBusy
+    'ShowBusy': showBusy,
+    'HideBusy': hideBusy,
+    'ShowTextBusy': showTextBusy
   })
 
   /**
    * 关闭场景
    */
-  Xut.View.CloseScenario = function() {
-    if(repeatClick) return;
+  Xut.View.CloseScenario = function () {
+    if (repeatClick) return;
     repeatClick = true;
     var serial = sceneController.takeOutPrevChainId();
     Xut.View.LoadScenario({
@@ -44,7 +44,7 @@ export function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  Xut.View.LoadScenario = function(options, callback) {
+  Xut.View.LoadScenario = function (options, callback) {
 
     let seasonId = toNumber(options.scenarioId)
     let chapterId = toNumber(options.chapterId)
@@ -53,7 +53,7 @@ export function initView() {
 
     //ibooks模式下的跳转
     //全部转化成超链接
-    if(!options.main && Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
+    if (!options.main && Xut.IBooks.Enabled && Xut.IBooks.runMode()) {
       location.href = chapterId + ".xhtml";
       return
     }
@@ -63,7 +63,7 @@ export function initView() {
 
     /*获取到当前的页面对象,用于跳转去重复*/
     const curVmPage = current && current.vm && current.vm.$curVmPage
-    if(curVmPage && curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
+    if (curVmPage && curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
       $warn(`重复触发页面加载:seasonId:${seasonId},chapterId:${chapterId}`, 'warn')
       return
     }
@@ -77,7 +77,7 @@ export function initView() {
      * 用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
      * @return {[type]}            [description]
      */
-    if(userAssign && current && current.scenarioId === seasonId) {
+    if (userAssign && current && current.scenarioId === seasonId) {
       Xut.View.GotoSlide(seasonId, chapterId)
       return
     }
@@ -93,12 +93,12 @@ export function initView() {
     current && current.vm.$suspend()
 
     /*通过内部关闭按钮加载新场景处理，检测是不是往回跳转,重复处理*/
-    if(current && userAssign) {
+    if (current && userAssign) {
       sceneController.checkToRepeat(seasonId)
     }
 
     /*读酷启动时不需要忙碌光标*/
-    if(options.main && window.DUKUCONFIG) {
+    if (options.main && window.DUKUCONFIG) {
       Xut.View.HideBusy()
     } else {
       Xut.View.ShowBusy()
@@ -114,13 +114,13 @@ export function initView() {
      * 如果当前是从主场景加载副场景
      * 关闭系统工具栏
      */
-    if(current && !current.vm.$multiScenario) {
+    if (current && !current.vm.$multiScenario) {
       Xut.View.HideToolBar()
     }
 
     /*重写场景的顺序编号,用于记录场景最后记录*/
     let pageId;
-    if(current && (pageId = Xut.Presentation.GetPageId())) {
+    if (current && (pageId = Xut.Presentation.GetPageId())) {
       sceneController.rewrite(current.scenarioId, pageId);
     }
 
@@ -139,7 +139,7 @@ export function initView() {
     const getInitIndex = () => {
       return chapterId ? (() => {
         //如果节点内部跳转方式加载,无需转化页码
-        if(createMode === 'GotoSlide') {
+        if (createMode === 'GotoSlide') {
           return chapterId;
         }
         //初始页从0开始，减去下标1
@@ -172,7 +172,7 @@ export function initView() {
     }
 
     //主场景判断（第一个节,因为工具栏的配置不同）
-    if(options.main || sceneController.mianId === seasonId) {
+    if (options.main || sceneController.mianId === seasonId) {
       //清理缓存
       $remove("history");
       //确定主场景
@@ -187,14 +187,14 @@ export function initView() {
   /**
    * 通过插件打开一个新view窗口
    */
-  Xut.View.Open = function(pageUrl, width, height, left, top) {
+  Xut.View.Open = function (pageUrl, width, height, left, top) {
     Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
   }
 
   /**
    * 关闭view窗口
    */
-  Xut.View.Close = function() {
+  Xut.View.Close = function () {
     Xut.Plugin.WebView.close();
   }
 

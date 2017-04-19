@@ -1,7 +1,7 @@
 import initDB from './db'
 import initDefaults from './defaults'
 import { importJsonDatabase } from '../database/result'
-import { $warn, loadStyle, setFastAnalysisRE } from '../util/index'
+import { $warn, loadGolbalStyle, setFastAnalysisRE } from '../util/index'
 import { createCursor } from '../initialize/cursor'
 import { initColumn } from '../component/column/core-init'
 import { contentFilter } from '../component/activity/content/content-filter'
@@ -17,24 +17,24 @@ import { config, initConfig, initPathAddress } from '../config/index'
  */
 const setHistory = (data) => {
   //Launch接口定义
-  if(config.historyMode !== undefined) {
+  if(config.launch.historyMode !== undefined) {
     return
   }
   //数据库定义 && == 1
   if(data.recordHistory !== undefined && Number(data.recordHistory)) {
-    config.historyMode = true
+    config.launch.historyMode = true
     return
   }
   //调试模式，默认启动缓存
-  if(config.devtools) {
-    config.historyMode = true
+  if(config.debug.devtools) {
+    config.launch.historyMode = true
   }
 }
 
 /*画轴模式*/
 const setPaintingMode = function(data) {
-  if(!config.visualMode && Number(data.scrollPaintingMode)) {
-    config.visualMode = 4
+  if(!config.launch.visualMode && Number(data.scrollPaintingMode)) {
+    config.launch.visualMode = 4
   }
 }
 
@@ -59,20 +59,19 @@ const getMaxWidth = function() {
  */
 const setDefaultSuffix = function() {
   let doc = document.documentElement
-
   //竖版的情况才调整
   if(doc.clientHeight > doc.clientWidth) {
     let ratio = window.devicePixelRatio || 1
     let maxWidth = getMaxWidth() * ratio
     if(maxWidth >= 1080 && maxWidth < 1439) {
-      config.baseImageSuffix = config.imageSuffix['1080']
+      config.launch.baseImageSuffix = config.launch.imageSuffix['1080']
     }
     if(maxWidth >= 1440) {
-      config.baseImageSuffix = config.imageSuffix['1440']
+      config.launch.baseImageSuffix = config.launch.imageSuffix['1440']
     }
 
-    if(config.devtools && config.baseImageSuffix) {
-      $warn('css media匹配suffix失败，采用js采用计算. config.baseImageSuffix = ' + config.baseImageSuffix)
+    if(config.debug.devtools && config.launch.baseImageSuffix) {
+      $warn('css media匹配suffix失败，采用js采用计算. config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix)
     }
   }
 }
@@ -82,9 +81,9 @@ const adaptiveImage = function() {
   let $adaptiveImageNode = $('.xut-adaptive-image')
   if($adaptiveImageNode.length) {
     let baseImageType = $adaptiveImageNode.width()
-    let type = config.imageSuffix[baseImageType]
+    let type = config.launch.imageSuffix[baseImageType]
     if(type) {
-      config.baseImageSuffix = type
+      config.launch.baseImageSuffix = type
       return
     }
   }
@@ -132,8 +131,8 @@ const configColumn = function(novelData, callback) {
   initColumn(haColumnCounts => {
     if(haColumnCounts) {
       //动画事件委托
-      if(config.swipeDelegate !== false) {
-        config.swipeDelegate = true
+      if(config.launch.swipeDelegate !== false) {
+        config.launch.swipeDelegate = true
       }
     }
     callback(novelData)
@@ -145,12 +144,12 @@ export default function baseConfig(callback) {
 
   //mini杂志设置
   //如果是pad的情况下设置font为125%
-  if(config.platform === 'mini' && Xut.plat.isTablet) {
+  if(config.launch.platform === 'mini' && Xut.plat.isTablet) {
     $('body').css('font-size', '125%')
   }
 
   /*图片分辨了自适应*/
-  config.imageSuffix && adaptiveImage()
+  config.launch.imageSuffix && adaptiveImage()
 
   /*建议快速正则，提高计算*/
   setFastAnalysisRE()
@@ -160,7 +159,7 @@ export default function baseConfig(callback) {
       const novelData = dataRet.Novel.item(0)
       const tempSettingData = initDefaults(dataRet.Setting)
       configInit(novelData, tempSettingData)
-      loadStyle('svgsheet', () => configColumn(novelData, callback))
+      loadGolbalStyle('svgsheet', () => configColumn(novelData, callback))
     })
   })
 }

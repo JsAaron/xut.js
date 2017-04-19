@@ -12,7 +12,7 @@ export function setVisualMode(chapterData) {
 
   //反向模式设置
   //如果是全局模式1，并且是竖向横显示
-  if(config.visualMode === 1 && config.verticalToHorizontalVisual) {
+  if(config.launch.visualMode === 1 && config.verticalToHorizontalVisual) {
     return 1
   }
 
@@ -31,5 +31,5 @@ export function setVisualMode(chapterData) {
   }
 
   //返回全局页面模式
-  return config.visualMode || 1
+  return config.launch.visualMode || 1
 }

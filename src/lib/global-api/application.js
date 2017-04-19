@@ -32,19 +32,19 @@ export function initApplication() {
    * 2.app:initComplete
    */
   let __app__ = new Observer()
-  Xut.Application.Watch = function(event, callback) {
-    let fn = function() {
+  Xut.Application.Watch = function (event, callback) {
+    let fn = function () {
       callback.apply(__app__, arguments)
     }
     __app__.bind(event, fn)
     return fn
   }
 
-  Xut.Application.unWatch = function(event, fn) {
+  Xut.Application.unWatch = function (event, fn) {
     __app__.unbind(event, fn)
   }
 
-  Xut.Application.Notify = function(...arg) {
+  Xut.Application.Notify = function (...arg) {
     __app__.trigger(...arg)
   }
 
@@ -53,7 +53,7 @@ export function initApplication() {
    * 后台运行
    * @type {Number}
    */
-  Xut.Application.IsBackStage = function() {
+  Xut.Application.IsBackStage = function () {
     return backstage
   }
 
@@ -62,7 +62,7 @@ export function initApplication() {
    * 后台运行的时候,恢复到初始化状态
    * 用于进来的时候激活Activate
    */
-  Xut.Application.Original = function() {
+  Xut.Application.Original = function () {
     backstage = 1;
     //传递一个完全关闭的参数
     $suspend('', '', true);
@@ -74,7 +74,7 @@ export function initApplication() {
    * 后台弹回来
    * 激活应用行为
    */
-  Xut.Application.Activate = function() {
+  Xut.Application.Activate = function () {
     backstage = 0
     $autoRun()
   }
@@ -82,12 +82,10 @@ export function initApplication() {
   /**
    * 退出应用
    */
-  Xut.Application.Exit = function() {
-    if(config.launch) {
-      /*启动代码用户操作跟踪*/
-      config.sendTrackCode('exit', { time: (+new Date) - config.launch.launchTime })
-      globalDestroy('exit')
-    }
+  Xut.Application.Exit = function () {
+    /*启动代码用户操作跟踪*/
+    config.sendTrackCode('exit', { time: (+new Date) - config.launch.launchTime })
+    globalDestroy('exit')
   }
 
   /**
@@ -96,14 +94,14 @@ export function initApplication() {
    * 这个与销毁有点区别
    * 比如外联的数据，不需要删除
    */
-  Xut.Application.Refresh = function() {
+  Xut.Application.Refresh = function () {
     globalDestroy('refresh')
   }
 
   /**
    * 销毁应用
    */
-  Xut.Application.Destroy = function() {
+  Xut.Application.Destroy = function () {
     Xut.Application.DropApp()
   }
 
@@ -112,7 +110,7 @@ export function initApplication() {
    * 退出app
    * 提供给iframe方式加载后退出app处理接口
    */
-  Xut.Application.DropApp = function() {
+  Xut.Application.DropApp = function () {
 
     /**
      * iframe模式,退出处理
@@ -125,17 +123,17 @@ export function initApplication() {
     }
 
     /**
-     * 动态配置
+     * 通过launch启动动态配置
      */
-    if(config.launch) {
+    if (config.launch.lauchMode === 1) {
       destroy()
       return
     }
 
     //如果读酷
-    if(window.DUKUCONFIG) {
+    if (window.DUKUCONFIG) {
       //外部回调通知
-      if(window.DUKUCONFIG.iframeDrop) {
+      if (window.DUKUCONFIG.iframeDrop) {
         var appId = $get('appId');
         window.DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
       }
@@ -145,9 +143,9 @@ export function initApplication() {
     }
 
     //客户端模式
-    if(window.CLIENTCONFIGT) {
+    if (window.CLIENTCONFIGT) {
       //外部回调通知
-      if(window.CLIENTCONFIGT.iframeDrop) {
+      if (window.CLIENTCONFIGT.iframeDrop) {
         window.CLIENTCONFIGT.iframeDrop();
       }
       window.CLIENTCONFIGT = null;
@@ -156,9 +154,9 @@ export function initApplication() {
     }
 
     //妙妙学客户端
-    if(window.MMXCONFIG) {
+    if (window.MMXCONFIG) {
       //外部回调通知
-      if(window.MMXCONFIG.iframeDrop) {
+      if (window.MMXCONFIG.iframeDrop) {
         window.MMXCONFIG.iframeDrop();
       }
       window.MMXCONFIG = null;
@@ -173,7 +171,7 @@ export function initApplication() {
    * dispose   成功处理回调
    * processed 处理完毕回调
    */
-  Xut.Application.Suspend = function({
+  Xut.Application.Suspend = function ({
     skipAudio,
     dispose,
     processed
@@ -186,12 +184,12 @@ export function initApplication() {
   /**
    * 启动应用
    */
-  Xut.Application.Launch = function() {}
+  Xut.Application.Launch = function () {}
 
   /**
    * 设置应用状态
    */
-  Xut.Application.setAppState = function() {
+  Xut.Application.setAppState = function () {
     appState = true;
   }
 
@@ -199,7 +197,7 @@ export function initApplication() {
    * 删除应用状态
    * @return {[type]} [description]
    */
-  Xut.Application.delAppState = function() {
+  Xut.Application.delAppState = function () {
     appState = false;
   }
 
@@ -207,7 +205,7 @@ export function initApplication() {
    * 获取应用加载状态
    * @return {[type]} [description]
    */
-  Xut.Application.getAppState = function() {
+  Xut.Application.getAppState = function () {
     return appState;
   }
 
@@ -216,7 +214,7 @@ export function initApplication() {
    * 一般是在等待视频先加载完毕
    * @return {[type]} [description]
    */
-  Xut.Application.delayAppRun = function() {
+  Xut.Application.delayAppRun = function () {
     Xut.Application.setAppState();
   }
 
@@ -227,7 +225,7 @@ export function initApplication() {
    * 否则被启动方法重载
    * @type {[type]}
    */
-  Xut.Application.LaunchApp = function() {
+  Xut.Application.LaunchApp = function () {
     Xut.Application.delAppState();
   }
 

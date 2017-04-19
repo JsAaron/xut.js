@@ -153,7 +153,7 @@ export function converDoublePage(createPointer, needTotal) {
     return createDoublePage
   }
 
-  if(config.doublePageMode) {
+  if(config.launch.doublePageMode) {
     let base, left, right
     if(!createPointer.length) {
       createPointer = [createPointer]
@@ -196,7 +196,7 @@ export function getRealPage(pageIndex, type) {
     return []
   }
 
-  if(config.doublePageMode) {
+  if(config.launch.doublePageMode) {
     /*转化后的页面合集*/
     const pageIds = converDoublePage(pageIndex)
       /*双页*/

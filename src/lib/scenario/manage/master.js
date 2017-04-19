@@ -106,7 +106,7 @@ export default class MasterMgr extends ManageSuper {
 
     //检测母版已经创建
     if(this._hasMaster(reuseMasterKey, pageOffset, pageIndex)) {
-      if(config.devtools) {
+      if(config.debug.devtools) {
         //重复的母版对象
         //用于检测页面模式是否一致
         let currMasterObj = this.$$getPageObj(reuseMasterKey);

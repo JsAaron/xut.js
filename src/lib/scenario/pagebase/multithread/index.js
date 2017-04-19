@@ -168,7 +168,7 @@ export default function initThreadtasks(instance) {
       2.flow页面不允许缩放
        */
       const createScale = () => {
-        const salePageType = config.salePageType
+        const salePageType = config.launch.salePageType
         if (isPageType && (salePageType === 'page' || salePageType === 'all')) {
           instance._pageScaleObj = createPageScale(instance.getScaleNode(), instance.pageIndex)
         }

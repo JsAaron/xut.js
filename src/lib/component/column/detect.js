@@ -71,7 +71,7 @@ function detectColumn($seasons, columnCollection, callback, checkCount) {
     }, 500)
   } else {
     //如果探测完毕就强制关闭检测了
-    config.columnCheck = false
+    config.launch.columnCheck = false
     stopColumnDetection()
     callback()
   }

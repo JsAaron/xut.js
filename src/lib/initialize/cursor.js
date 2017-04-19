@@ -11,7 +11,7 @@ const animationDelay = Xut.style.animationDelay
  * 延时加载
  * @type {Number}
  */
-let delay = 500
+let delayTime = 500
 
 /**
  * 光标对象
@@ -39,16 +39,16 @@ let isCallHide = false
 let timer = null
 
 /**
- * 单独重设的数据
+ * 设置忙碌光标的图片地址
  */
-let newCursor
+let path
 
 /**
  * create
  * @return {[type]} [description]
  */
 export function createCursor() {
-  if(isDisable) return
+  if (isDisable) return
   const sWidth = config.visualSize.width
   const sHeight = config.visualSize.height
   const width = Math.min(sWidth, sHeight) / 4
@@ -57,35 +57,31 @@ export function createCursor() {
   const deg = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
 
   let count = 12
-  let html = ''
   let container = ''
 
-  //忙碌光标自定义
-  if(config.cursor && config.cursor.url || newCursor) {
-    let newUrl = newCursor ? newCursor.url : config.cursor.url
+  /*自定义*/
+  if (path) {
     container += `<div class="xut-busy-middle fullscreen-background"
-                           style="background-image: url(${newUrl});">
-                      </div>`
+                       style="background-image: url(${path});">
+                  </div>`
   } else {
-    while(count--) {
+    /*自带*/
+    while (count--) {
       container +=
         `<div class="xut-busy-spinner"
-                      style="${transform}:rotate(${deg[count]}deg) translate(0,-142%);${animationDelay}:-${delay[count]}s">
-                 </div>`
+              style="${transform}:rotate(${deg[count]}deg) translate(0,-142%);${animationDelay}:-${delay[count]}s">
+         </div>`
     }
     container = `<div class="xut-busy-middle">${container}</div>`
   }
 
-
-
-  html =
+  node = $('.xut-busy-icon').html(String.styleFormat(
     `<div style="width:${width}px;height:${width}px;margin:${space}px auto;margin-top:${config.visualSize.top+space}px;">
-            <div style="height:30%;"></div>
-            ${container}
-            <div class="xut-busy-text"></div>
-        </div>`
-
-  node = $('.xut-busy-icon').html(String.styleFormat(html));
+        <div style="height:30%;"></div>
+          ${container}
+        <div class="xut-busy-text"></div>
+     </div>`
+  ))
 }
 
 
@@ -97,46 +93,26 @@ const clear = () => {
 /**
  * 显示光标
  */
-export const ShowBusy = () => {
-  if(isDisable || Xut.IBooks.Enabled || timer) return
+export const showBusy = () => {
+  if (isDisable || Xut.IBooks.Enabled || timer) return
   timer = setTimeout(() => {
     node.show()
     clear()
-    if(isCallHide) {
-      HideBusy()
+    if (isCallHide) {
+      hideBusy()
       isCallHide = false
     }
-  }, newCursor ? newCursor.delayTime : delay)
-}
-
-
-/**
- * 通过lanuch重设接口
- * @param  {[type]} newCursor [description]
- * @return {[type]}           [description]
- */
-export const resetCursor = (data) => {
-  newCursor = data
-}
-
-
-/**
- * 清理忙了光标数据
- * @param  {[type]} data [description]
- * @return {[type]}      [description]
- */
-export const cleanCursor = (data) => {
-  newCursor = null
+  }, delayTime)
 }
 
 
 /**
  * 隐藏光标
  */
-export const HideBusy = () => {
+export const hideBusy = () => {
   //显示忙碌加锁，用于不处理hideBusy
-  if(isDisable || Xut.IBooks.Enabled || ShowBusy.lock) return;
-  if(!timer) {
+  if (isDisable || Xut.IBooks.Enabled || showBusy.lock) return;
+  if (!timer) {
     node.hide();
   } else {
     isCallHide = true
@@ -148,26 +124,49 @@ export const HideBusy = () => {
  * 显示光标
  * @param {[type]} txt [description]
  */
-export const ShowTextBusy = (txt) => {
-  if(isDisable || Xut.IBooks.Enabled) return;
+export const showTextBusy = (txt) => {
+  if (isDisable || Xut.IBooks.Enabled) return;
   node.css('pointer-events', 'none').find('.xut-busy-text').html(txt);
-  ShowBusy();
+  showBusy();
+}
+
+
+/**
+ * 重置忙碌光标
+ * 因为设置被覆盖了
+ */
+export const resetCursor = (data) => {
+  path = null
+  delayTime = 500
+}
+
+
+/**
+ * 通过lanuch重设接口
+ */
+export const setPath = (url) => {
+  path = url
 }
 
 /**
- * 设置时间
- * @param  {[type]} time [description]
- * @return {[type]}      [description]
+ * 设置时间显示的时间间隔
  */
 export const setDelay = (time) => {
-  delay = time
+  delayTime = time
 }
 
 /**
- * 禁用光标
+ * 设置禁用光标
  * isDisable 是否禁用
  * @return {[type]} [description]
  */
-export const disable = (state) => {
-  isDisable = state
+export const setDisable = () => {
+  isDisable = true
+}
+
+/*
+是否禁止了
+ */
+export const hasDisable = () => {
+  return isDisable
 }

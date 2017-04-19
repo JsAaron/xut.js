@@ -87,7 +87,7 @@ export default function(baseProto) {
      * 收集滑动委托对象，针对事件合集触发处理
      * 2016.11.8
      */
-    if (config.swipeDelegate) {
+    if (config.launch.swipeDelegate) {
       this.swipeSequence = {
         swipeleft: [],
         swiperight: [],

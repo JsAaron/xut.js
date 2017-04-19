@@ -26,7 +26,7 @@ export default function(baseProto) {
       return () => {
         /*当创建完容器后，就允许快速翻页了
         如果此时是快速打开，并且是翻页的动作*/
-        if (config.quickFlip && isFlipAction) {
+        if (config.launch.quickFlip && isFlipAction) {
           callback()
         } else {
           /*如果不是快速翻页，那么就继续往下分解任务*/

@@ -37,8 +37,8 @@ fileName + brModelType + baseSuffix + type
  */
 function parseFileName(fileName, baseSuffix, type) {
   //如果启动了模式
-  if(config.launch && config.launch.brModelType) {
-    if(config.launch.brModelType === 'delete') {
+  if (config.launch.brModelType) {
+    if (config.launch.brModelType === 'delete') {
       return `${fileName}${baseSuffix}` //增加后缀，去掉类型
     } else {
       return `${fileName}${config.launch.brModelType}${baseSuffix}` //增加brModelType，增加后缀，去掉类型
@@ -58,29 +58,28 @@ function filterJsonData() {
   result = window.SQLResult
 
   /*必须保证数据存在*/
-  if(!result && !result.Setting) {
+  if (!result && !result.Setting) {
     $warn('json数据库加载出错')
     return
   }
 
   //配置了远程地址
   //需要把flow的给处理掉
-  let remoteUrl = config.launch && config.launch.resource
-  if(remoteUrl && result.FlowData) {
+  if (config.launch.resource && result.FlowData) {
 
     //启动检测
-    config.columnCheck = true
+    config.launch.columnCheck = true
 
     //有基础后缀，需要补上所有的图片地址
-    const baseSuffix = config.baseImageSuffix ? `.${config.baseImageSuffix}` : ''
+    const baseSuffix = config.launch.baseImageSuffix ? `.${config.launch.baseImageSuffix}` : ''
 
     //xlink:href
     //<img src
     //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-    result.FlowData = result.FlowData.replace(urlRE, function(a, prefix, fileName, type) {
-      return `${prefix}="${remoteUrl}/gallery/${parseFileName(fileName,baseSuffix,type)}`
+    result.FlowData = result.FlowData.replace(urlRE, function (a, prefix, fileName, type) {
+      return `${prefix}="${config.launch.resource}/gallery/${parseFileName(fileName,baseSuffix,type)}`
     })
   }
 
@@ -116,18 +115,17 @@ function filterJsonData() {
  * 2 缓存
  */
 export function importJsonDatabase(callback) {
-
+  let path = config.launch.database;
   //如果外联指定路径json数据
-  let path = config.launch && config.launch.database;
-  if(path) {
+  if (path) {
     //防止外部链接影响
     window.SQLResult = null
-    loadFile(path, function() {
+    loadFile(path, function () {
       callback(filterJsonData())
     })
   }
   //如果外联index.html路径json数据
-  else if(window.SQLResult) {
+  else if (window.SQLResult) {
     callback(filterJsonData())
   } else {
     callback()

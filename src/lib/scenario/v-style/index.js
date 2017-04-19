@@ -41,7 +41,7 @@ export function setCustomStyle(styleDataset) {
     styleDataset['_' + data.direction].push(data.chapterIndex)
   })
 
-  if(!config.doublePageMode) {
+  if(!config.launch.doublePageMode) {
 
     /**
      * 获取指定页面样式

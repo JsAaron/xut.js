@@ -44,7 +44,7 @@ export class ScalePan {
      * 最大缩放值
      * @type {Number}
      */
-    this.maxScale = config.salePictureMultiples || 4
+    this.maxScale = config.launch.salePictureMultiples || 4
 
     /**
      * 允许溢出值

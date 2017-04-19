@@ -7,7 +7,6 @@ import { destroyCache, destroyResult } from './database/destroy'
 import { config, destroyConfig } from './config/index'
 import { $resetUUID } from './util/stroage'
 import { offAndroid } from './initialize/button'
-import { cleanCursor } from './initialize/cursor'
 import { cleanGlobalEvent } from './initialize/golbal-event'
 import { removeRootNode } from './initialize/root-node'
 
@@ -27,20 +26,20 @@ export default function Destroy(action = 'exit') {
   //销毁只创建一次的对象
   //修复的音频对象
   //数据的结果集
-  if(action === 'destory') {
+  if (action === 'destory') {
     //修复的音频对象
     destroyFixAudio()
   }
 
   // refresh状态不删除结果集
   // 只处理destory与exit状态
-  if(action === 'destory' || action === 'exit') {
+  if (action === 'destory' || action === 'exit') {
     //删除结果集
     destroyResult()
 
     //删除流式布局的数据
     let $flowNode = $("#xut-stream-flow")
-    if($flowNode.length) {
+    if ($flowNode.length) {
       $flowNode.remove()
       $flowNode = null
     }
@@ -63,9 +62,6 @@ export default function Destroy(action = 'exit') {
   //销毁独立APK的键盘事件
   offAndroid()
 
-  //忙了光标设置
-  cleanCursor()
-
   /**
    * 重设缓存的UUID
    * 为了只计算一次
@@ -79,17 +75,17 @@ export default function Destroy(action = 'exit') {
   //销毁节点
   removeRootNode()
 
-  //启动配置文件去掉
-  config.launch = null
-
   //删除动态加载的两个css文件
-  $('link[data-type]').each(function(index, link) {
+  $('link[data-type]').each(function (index, link) {
     let type = link.getAttribute('data-type')
-    if(type === 'svgsheet' || type === 'xxtflow') {
+    if (type === 'svgsheet' || type === 'xxtflow') {
       link.parentNode.removeChild(link)
     }
   })
 
   //停止分栏探测
   stopColumnDetection()
+
+  //启动配置文件去掉
+  config.launch = null
 }
