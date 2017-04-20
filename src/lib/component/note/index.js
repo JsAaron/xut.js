@@ -1,4 +1,5 @@
 import IScroll from '../../plugin/extend/iscroll'
+import { config } from '../../config/index'
 
 /**
  * 提示框
@@ -16,15 +17,16 @@ export class ShowNote {
     var that = this,
       note = this.data.note,
       prop = Xut.config.proportion,
-      width = Math.round((prop.width + prop.height) / 2 * Xut.config.iconHeight),
+      width = Math.round((prop.width + prop.height) / 2 * config.data.iconHeight),
       space = Math.round(width / 2);
+
     var retStr = '<div class="xut-shownote-box" style="z-index:' + Xut.zIndexlevel() + '">' +
       '<div class="close" style="width:' + width + 'px;height:' + width + 'px;top:-' + space + 'px;right:-' + space + 'px"></div>' +
       '<div class="content">' + note + '</div>' +
       '</div>';
 
     this._dom = $(retStr);
-    this._dom.find('.close').on("touchend mouseup", function() {
+    this._dom.find('.close').on("touchend mouseup", function () {
       that.toggle();
     });
     $(this.rootNode).append(this._dom);
@@ -41,13 +43,13 @@ export class ShowNote {
   //外部调用接口
   toggle() {
     //自动热点 取消关闭
-    if(this.isAutoPlay) return;
+    if (this.isAutoPlay) return;
     //当前对象状态
     this.state ? this.hide() : this.show();
   }
 
   stop() {
-    if(this.state) {
+    if (this.state) {
       this.toggle();
       return true;
     }
@@ -68,13 +70,13 @@ export class ShowNote {
   }
 
   destroy() {
-    if(this._dom) {
+    if (this._dom) {
       this._dom.find('.close').off();
       this._dom && this._dom.hide().remove();
     }
 
     //iscroll销毁
-    if(this.iscroll) {
+    if (this.iscroll) {
       this.iscroll.destroy();
       this.iscroll = null;
     }

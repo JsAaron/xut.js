@@ -7,7 +7,7 @@ const TOP = isIOS ? 20 : 0
 
 const getNavOptions = () => {
 
-  let iconHeight = config.iconHeight
+  let iconHeight = config.data.iconHeight
   let proportion = config.proportion
   let visualSize = config.visualSize
 

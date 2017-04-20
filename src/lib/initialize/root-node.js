@@ -57,7 +57,7 @@ export function initRootNode(nodeName = '#xxtppt-app-container', cursor) {
   return { $rootNode, $contentNode }
 }
 
-export function removeRootNode() {
+export function clearRootNode() {
   if ($contentNode) {
     $contentNode.remove()
     $contentNode = null

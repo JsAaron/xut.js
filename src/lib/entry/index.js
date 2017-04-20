@@ -126,7 +126,7 @@ export default function main() {
     bindPlatEvent()
   } else {
     //brower
-    if(config.isBrowser) {
+    if(Xut.plat.isBrowser) {
       initApp()
     } else {
       //mobile(apk or ipa)

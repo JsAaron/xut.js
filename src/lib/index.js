@@ -60,7 +60,6 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function 
 
 /**
  * 新版本加载
-    style: path.style, //style样式文件
     resource: slashPostfix(path.resource), //资源路径
     database: path.database, //数据库
     launchAnim: option.launchAnim, //启动动画
@@ -71,7 +70,7 @@ Xut.Application.Launch = option => {
   if (config.launch) {
     return
   }
-  let setConfig = Xut.Application.setConfig
+  const setConfig = Xut.Application.setConfig
   if (setConfig && setConfig.lauchMode === 1) {
     mixGolbalConfig(setConfig);
     /*当前的launch配置文件，用于横竖切换处理*/
@@ -91,14 +90,12 @@ Xut.Application.Launch = option => {
 
 /*老版本加载*/
 setTimeout(() => {
-  let setConfig = Xut.Application.setConfig
-  if (!setConfig || setConfig && !setConfig.lauchMode) {
-
+  const setConfig = Xut.Application.setConfig
+  if (!setConfig || setConfig && setConfig.lauchMode !== 1) {
     mixGolbalConfig(setConfig)
 
     /*保证兼容，不需要判断launch存在，初始空对象*/
     config.launch = {}
-
     initApp()
   }
 }, 100)

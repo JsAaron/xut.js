@@ -2,12 +2,12 @@
  * 配置文件
  * @return {[type]}         [description]
  */
-import nativeConf from './native'
-import iframeConf from './iframe'
+import nativeConfig from './path-config/native'
+import iframeConfig from './path-config/iframe'
+import { getWidgetPath, getSourcePath } from './path-config/browser'
 
-import { getWidgetPath, getSourcePath } from './depend/path'
-import { getSize, getLayerMode } from './depend/size'
-import { getVisualSize } from './v-size'
+import { getVisualSize } from './v-visual'
+import { getSize, getLayerMode } from './v-screen'
 import { getFullProportion, getRealProportion } from './v-proportion'
 
 /*
@@ -18,10 +18,9 @@ import { getFullProportion, getRealProportion } from './v-proportion'
  */
 import improtGolbalConfig from '../global-config'
 import improtDebugConfig from './debug-config'
-import improtData from './depend/data'
+import improtDataConfig from './data-config'
 
 const plat = Xut.plat
-const isIphone = Xut.plat.isIphone
 const isBrowser = Xut.plat.isBrowser
 const GLOBALIFRAME = window.GLOBALIFRAME
 const CLIENTCONFIGT = window.CLIENTCONFIGT
@@ -34,8 +33,9 @@ let proportion
 let fullProportion
 
 /*层级关系*/
+let _zIndex = 1000
 Xut.zIndexlevel = () => {
-  return ++config.zIndexlevel
+  return ++_zIndex
 }
 
 //通过新学堂加载
@@ -122,8 +122,8 @@ const _rsourcesPath = () => {
   return isBrowser ?
     desktopPlat() :
     GLOBALIFRAME ?
-    iframeConf.resources(config) :
-    nativeConf.resources(config)
+    iframeConfig.resources(config) :
+    nativeConfig.resources(config)
 }
 
 
@@ -138,8 +138,8 @@ const _videoPath = () => {
   return runMode ?
     desktopPlat() :
     GLOBALIFRAME ?
-    iframeConf.video() :
-    nativeConf.video()
+    iframeConfig.video() :
+    nativeConfig.video()
 }
 
 
@@ -151,8 +151,8 @@ const _audioPath = () => {
   return runMode ?
     desktopPlat() :
     GLOBALIFRAME ?
-    iframeConf.audio() :
-    nativeConf.audio()
+    iframeConfig.audio() :
+    nativeConfig.audio()
 }
 
 
@@ -164,8 +164,8 @@ const _svgPath = () => {
   return isBrowser ?
     desktopPlat() :
     GLOBALIFRAME ?
-    iframeConf.svg() :
-    nativeConf.svg()
+    iframeConfig.svg() :
+    nativeConfig.svg()
 }
 
 
@@ -177,7 +177,7 @@ const _svgPath = () => {
  */
 const _jsWidgetPath = () => {
   return isBrowser ? getWidgetPath() :
-    GLOBALIFRAME ? iframeConf.jsWidget() : nativeConf.jsWidget()
+    GLOBALIFRAME ? iframeConfig.jsWidget() : nativeConfig.jsWidget()
 }
 
 
@@ -245,42 +245,24 @@ _.extend(config, {
   },
 
   /**
-   * 排版模式
+   * 2016.7.26
+   * 读酷增加强制插件模式
    */
+  isPlugin: window.DUKUCONFIG && Xut.plat.isIOS,
+  /*排版模式*/
   layoutMode: layoutMode,
-
-  /**
-   * 缩放比例
-   */
+  /*缩放比例*/
   proportion: proportion,
-
-  /**
-   * 是浏览器
-   */
-  isBrowser: isBrowser,
-
-  /**
-   * 全局层级初始值
-   */
-  zIndexlevel: 1000,
-
-  /**
-   * 默认图标高度
-   */
-  iconHeight: isIphone ? 32 : 44
-
-
-}, improtDebugConfig, improtData)
-
-/*全局debug配置*/
-config.debug = {}
-Xut.mixin(config.debug, improtDebugConfig)
-
-/*默认全局配置*/
-config.golbal = {}
-Xut.mixin(config.golbal, improtGolbalConfig)
+  /*全局数据配置*/
+  data: improtDataConfig,
+  /*全局debug配置*/
+  debug: improtDebugConfig,
+  /*默认全局配置*/
+  golbal: improtGolbalConfig
+})
 
 Xut.config = config
+
 
 export { config }
 
@@ -288,7 +270,7 @@ export { config }
 /**
  * 销毁配置
  */
-export function destroyConfig() {
+export function clearConfig() {
   cacheVideoPath = null
   cacheAudioPath = null
   cacheSvgPath = null

@@ -88,7 +88,7 @@ export function bindAndroid() {
  * 销毁安卓按钮
  * @return {[type]} [description]
  */
-export function offAndroid() {
+export function clearAndroid() {
   if(Xut.plat.hasPlugin) {
     document.removeEventListener("backbutton", bindAndroidBack, false);
     document.removeEventListener("pause", bindAndroidPause, false);

@@ -4,11 +4,12 @@ import { $set, $get, $remove, execScript } from '../util/index'
 
 /*设置缓存，必须要可设置*/
 const saveData = () => {
-  if(config.launch.historyMode) {
-    $set({ "pageIndex": config.pageIndex, "novelId": config.novelId })
+  if (config.launch.historyMode) {
+    const data = config.data
+    $set({ "pageIndex": data.pageIndex, "novelId": data.novelId })
   } else {
     //清理
-    if($get('novelId')) {
+    if ($get('novelId')) {
       $remove('pageIndex')
       $remove('novelId')
     }
@@ -34,17 +35,17 @@ const initDefaultValues = (options) => {
  */
 const runScript = () => {
   let preCode, novels = Xut.data.query('Novel')
-  if(preCode = novels.preCode) {
+  if (preCode = novels.preCode) {
     execScript(preCode, 'novelpre脚本')
   }
 }
 
-export default function(options) {
+export default function (options) {
 
   options = initDefaultValues(options || {});
 
-  config.novelId = options.novelId;
-  config.pageIndex = options.pageIndex;
+  config.data.novelId = options.novelId;
+  config.data.pageIndex = options.pageIndex;
 
   //设置缓存
   saveData()
@@ -56,9 +57,9 @@ export default function(options) {
   //scenarioId = 1 找不到chapter数据
   //通过sectionRelated递归检测下一条数据
   let scenarioId, seasondata, i;
-  for(i = 0; i < Xut.data.Season.length; i++) {
+  for (i = 0; i < Xut.data.Season.length; i++) {
     seasondata = Xut.data.Season.item(i)
-    if(Xut.data.query('sectionRelated', seasondata._id)) {
+    if (Xut.data.query('sectionRelated', seasondata._id)) {
       scenarioId = seasondata._id
       break;
     }
@@ -70,7 +71,7 @@ export default function(options) {
     'scenarioId': scenarioId,
     'pageIndex': options.pageIndex,
     'history': options.history
-  }, function() {
+  }, function () {
     //应用加载完毕
     Xut.Application.Notify('appInit')
       /*发送初始化完毕代码跟踪*/

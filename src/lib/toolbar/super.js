@@ -9,7 +9,7 @@ const isBrowser = Xut.plat.isBrowser
  * @return {[type]} [description]
  */
 const getArrowStyle = function() {
-  let height = config.iconHeight
+  let height = config.data.iconHeight
   let styleText = `height:${height}px;width:${height}px`
   let settings = config.data.settings
   if (settings) {
@@ -54,7 +54,7 @@ export default class Bar {
     this.$$barHeight = isIOS && !isBrowser ? 20 : 0
 
     const prop = config.proportion;
-    const iconHeight = config.iconHeight;
+    const iconHeight = config.data.iconHeight;
 
     //获取高度缩放比
     //自动选择缩放比例
@@ -129,7 +129,7 @@ export default class Bar {
   _getArrowOption() {
     const style = getArrowStyle()
     const state = this.barStatus ? '' : 'hide'
-    const height = config.iconHeight
+    const height = config.data.iconHeight
     return {
       style,
       state,

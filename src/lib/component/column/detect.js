@@ -72,7 +72,7 @@ function detectColumn($seasons, columnCollection, callback, checkCount) {
   } else {
     //如果探测完毕就强制关闭检测了
     config.launch.columnCheck = false
-    stopColumnDetection()
+    clearColumnDetection()
     callback()
   }
 }
@@ -89,7 +89,7 @@ export function startColumnDetect($seasons, columnCollection, callback) {
 /**
  * 停止分栏高度探测
  */
-export function stopColumnDetection() {
+export function clearColumnDetection() {
   Xut.Application.unWatch('change:number:total change:column')
   clearTimeout(timerId)
   timerId = null

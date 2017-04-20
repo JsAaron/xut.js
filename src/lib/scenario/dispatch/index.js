@@ -737,7 +737,7 @@ export default class Dispatcher {
         }
 
         //是否配置启动动画关闭
-        if(window.DYNAMICCONFIGT && window.DYNAMICCONFIGT.launchAnim == false) {
+        if(config.launch.launchAnim === false) {
           complete()
         } else {
           //有动画

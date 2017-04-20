@@ -1,7 +1,7 @@
 /*
 内部调试配置
  */
-const DEFAULT: void = undefined
+const DEFAULT = undefined
 
 export default {
 
@@ -79,6 +79,6 @@ export default {
    *  主场景工具栏配置：默认2
    *  副场景工具栏配置：默认 0
    */
-  pageMode: DEFAULT//默认不设置，待数据库填充。如设置,数据库设置忽略
+  pageMode: DEFAULT //默认不设置，待数据库填充。如设置,数据库设置忽略
 
 }

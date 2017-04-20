@@ -25,7 +25,7 @@ export default {
     scaleTop,
     scaleLeft
   }, chpaterData, chapterId, pageIndex, zIndex, pageType) {
-    const newWidth = (scaleWidth + scaleHeight) / 2 * config.iconHeight
+    const newWidth = (scaleWidth + scaleHeight) / 2 * config.data.iconHeight
     return String.styleFormat(
       `<div id="ShowNote_${_id}"
             class="xut-showNote"

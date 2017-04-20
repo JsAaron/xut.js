@@ -1,14 +1,14 @@
 import { sceneController } from './scenario/scene-control'
 import { clearAudio } from './component/audio/manager'
 import { clearVideo } from './component/video/manager'
-import { stopColumnDetection } from './component/column/detect'
-import { destroyFixAudio } from './component/audio/fix'
-import { destroyCache, destroyResult } from './database/destroy'
-import { config, destroyConfig } from './config/index'
-import { $resetUUID } from './util/stroage'
-import { offAndroid } from './initialize/button'
-import { cleanGlobalEvent } from './initialize/golbal-event'
-import { removeRootNode } from './initialize/root-node'
+import { clearColumnDetection } from './component/column/detect'
+import { clearFixAudio } from './component/audio/fix'
+import { clearCache, clearResult } from './database/destroy'
+import { config, clearConfig } from './config/index'
+import { clearId } from './util/stroage'
+import { clearAndroid } from './initialize/button'
+import { clearGlobalEvent } from './initialize/golbal-event'
+import { clearRootNode } from './initialize/root-node'
 
 /**
  * 销毁接口
@@ -28,14 +28,14 @@ export default function Destroy(action = 'exit') {
   //数据的结果集
   if (action === 'destory') {
     //修复的音频对象
-    destroyFixAudio()
+    clearFixAudio()
   }
 
   // refresh状态不删除结果集
   // 只处理destory与exit状态
   if (action === 'destory' || action === 'exit') {
     //删除结果集
-    destroyResult()
+    clearResult()
 
     //删除流式布局的数据
     let $flowNode = $("#xut-stream-flow")
@@ -43,15 +43,16 @@ export default function Destroy(action = 'exit') {
       $flowNode.remove()
       $flowNode = null
     }
-    //默认全局事件
-    cleanGlobalEvent()
   }
 
+  //默认全局事件
+  clearGlobalEvent()
+
   //config路径缓存
-  destroyConfig()
+  clearConfig()
 
   //删除数据匹配缓存
-  destroyCache()
+  clearCache()
 
   //音视频
   clearAudio()
@@ -60,20 +61,20 @@ export default function Destroy(action = 'exit') {
   clearVideo()
 
   //销毁独立APK的键盘事件
-  offAndroid()
+  clearAndroid()
 
   /**
    * 重设缓存的UUID
    * 为了只计算一次
    * @return {[type]} [description]
    */
-  $resetUUID()
+  clearId()
 
   Xut.TransformFilter = null
   Xut.CreateFilter = null
 
   //销毁节点
-  removeRootNode()
+  clearRootNode()
 
   //删除动态加载的两个css文件
   $('link[data-type]').each(function (index, link) {
@@ -84,7 +85,7 @@ export default function Destroy(action = 'exit') {
   })
 
   //停止分栏探测
-  stopColumnDetection()
+  clearColumnDetection()
 
   //启动配置文件去掉
   config.launch = null

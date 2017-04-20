@@ -41,6 +41,30 @@ export type Config = {
 const config: Config = {
 
   /**
+   * 应用的加载模式
+   * 0： 应用自行启动
+   * 1： 应用通过接口启动
+   *     Xut.Application.Launch
+   *     提供全局可配置参数
+   * @type {Number}
+   */
+  lauchMode: 0,
+
+  /*
+  资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问
+  比如，mini客户端
+  所以svg的资源会强制转化成js
+  这里要填写'svg'
+   */
+  convert: '', //默认不处理svg转化  参数 'svg'
+
+  /**
+   * 是否关闭启动动画，默认是true启动，false为关闭
+   * 加快进入的速度
+   */
+  launchAnim: true,
+
+  /**
    * 双页面模式，竖版ppt在横版显示
    * 一个view中，显示2个page
    * 一个页面宽度50%，拼接2个页面100%
@@ -50,7 +74,6 @@ const config: Config = {
    */
   doublePageMode: false,
 
-  /*是否启动跟踪状态*/
 
   /**
    * 监听代码追踪
@@ -98,7 +121,7 @@ const config: Config = {
     但是实际返回的数据中改成了统一接口 action然后type带类型
 
    */
-  trackCode:null,
+  trackCode: null,
 
   /**
   * 图片模式webp
@@ -255,17 +278,6 @@ const config: Config = {
    * @type {Number}
    */
   flipMode: 'allow', //默认0，待数据库填充
-
-  /**
-   * 应用的加载模式
-   * 0： 应用自行启动
-   * 1： 应用通过接口启动
-   *     Xut.Application.Launch
-   *     提供全局可配置参数
-   * @type {Number}
-   */
-  lauchMode: 0,
-
 
   /**
    * 是否允许图片缩放

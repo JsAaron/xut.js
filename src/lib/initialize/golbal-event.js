@@ -16,7 +16,8 @@ if (Xut.plat.isBrowser && !Xut.plat.hasAutoPlayAudio) {
 let onceBind = false
 
 export function initGlobalEvent() {
-  if (Xut.plat.isBrowser && onceBind) {
+
+  if (Xut.plat.isBrowser && !onceBind) {
 
     onceBind = true
 
@@ -65,7 +66,7 @@ export function initGlobalEvent() {
 /*
 移除全局绑定
  */
-export function cleanGlobalEvent() {
+export function clearGlobalEvent() {
   if (onceBind) {
     $('body').off() //touchmove 禁止全局的缩放处理
     $(document).off() //keyup 左右按钮

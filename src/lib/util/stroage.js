@@ -111,7 +111,7 @@ export function $remove(key) {
  * 为了只计算一次
  * @return {[type]} [description]
  */
-export function $resetUUID() {
+export function clearId() {
   onlyId = null
 }
 

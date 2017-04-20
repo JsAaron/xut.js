@@ -29,10 +29,17 @@
 <script type="text/javascript">
 Xut.Application.setConfig = {
 
-    lauchMode: 1, //是否启动
-    visualMode: 3, //页面模式
-    platform: 'mini', //平台
+    lauchMode: 1,
+    visualMode: 3,
+    platform: 'mini',
+    historyMode: false,
+    launchAnim: false,
+    convert: 'svg'
 
+    // launchAnim:false,是否关闭启动动画
+    // convert: 'svg', //转化资源svg转化成js
+    // platform 平台
+    // visualMode:1,2,3,4 页面模式
     // brModel:1, //图片模式
     // columnCheck:false, //分栏检测
     // doublePageMode: false //双页模式
@@ -45,29 +52,25 @@ Xut.Application.setConfig = {
     //         left: '20%'
     //     }
     // },
-
     // quickFlip:true,//是否支持快速翻页
     // supportQR: true, //是否启动二维码
     // visualHeight: DEFAULT,
     // visualTop: 0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
-    // cursor: {
+    // cursor: {  //定义忙碌光标
     //     url: 'images/icons/busyicon.gif',
     //     delayTime: 300
     // },
-    // imageSuffix: {
+    // imageSuffix: { //定义基础图片取值
     //     1080: 'mi',
     //     1440: 'hi'
     // },
-
-    // salePicture: true,
-    // salePictureMultiples: 3,
-    // salePageType:'page',
-
-    // historyMode: true,
-
-    // swipeDelegate: true,
-    // useHDImageZoom: true,
-
+    // salePicture: true, //默认图片支持缩放
+    // salePictureMultiples: 3, 缩放倍数
+    // salePageType:'page', //页面缩放
+    // historyMode: true, //历史记录模式
+    // swipeDelegate: true, //滑动事件猥琐
+    // useHDImageZoom: true, //是否启动图片要高清图
+    // convert: 'svg', //转化资源svg转化成js
 };
 
 
@@ -75,12 +78,10 @@ Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)
 })
 
-var appId = 311 //306
+var appId = 312 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点
-        launchAnim: false, //关闭启动动画
-        convert: 'svg', //转化资源svg转化成js
         path: {
             resource: 'content/' + appId,
             database: 'content/' + appId + '/SQLResult.js'

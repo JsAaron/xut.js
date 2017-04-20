@@ -32,7 +32,7 @@ export function fixAudio(obj, key, access) {
  * 销毁创建的video对象
  * @return {[type]} [description]
  */
-export function destroyFixAudio() {
+export function clearFixAudio() {
   for(let i = 0; i < audioes.length; i++) {
     audioes[i] = null
   }

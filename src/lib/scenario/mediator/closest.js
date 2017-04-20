@@ -46,7 +46,7 @@ export default function closestProcessor(event, pageType) {
         }
       }
     } catch(err) {
-      // config.isBrowser && console.log('默认事件跟踪', err)
+      // Xut.plat.isBrowser && console.log('默认事件跟踪', err)
     }
 
   }
