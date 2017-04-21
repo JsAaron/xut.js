@@ -30,11 +30,12 @@
 Xut.Application.setConfig = {
 
     lauchMode: 1,
-    visualMode: 3,
+    visualMode: 1,
     platform: 'mini',
-    historyMode: false,
+    historyMode: true,
     launchAnim: false,
-    convert: 'svg'
+    convert: 'svg',
+    doublePageMode: false
 
     // launchAnim:false,是否关闭启动动画
     // convert: 'svg', //转化资源svg转化成js
@@ -78,7 +79,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)
 })
 
-var appId = 312 //306
+var appId = 2 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

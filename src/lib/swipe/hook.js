@@ -19,7 +19,7 @@ import { config } from '../config/index'
 export default function siwpeHook(e, node) {
 
   //禁止鼠标右键
-  if(e.button && e.button == 2) {
+  if (e.button && e.button == 2) {
     return
   }
 
@@ -29,7 +29,7 @@ export default function siwpeHook(e, node) {
   //如果是点击的超链接页面
   //这个是fast-pipe功能
   let hasTyperlink = false
-  if(dataType === 'hyperlink') {
+  if (dataType === 'hyperlink') {
     hasTyperlink = true
     config.sendTrackCode('hot', {
       id: node.getAttribute('data-id'),
@@ -39,17 +39,20 @@ export default function siwpeHook(e, node) {
     })
   }
 
+  const nodeName = node.nodeName.toLowerCase()
+
   //如果是移动端的情况下 && 支持二维码 && 是图片 && 是二维码标记
-  if(config.launch.supportQR &&
+  if (config.launch.supportQR &&
     Xut.plat.hasTouch &&
-    node.nodeName.toLowerCase() === "img" &&
+    nodeName === "img" &&
     dataType === 'qrcode') {
     return 'qrcode'
   } else {
-    if(Xut.plat.isBrowser &&
+    if (Xut.plat.isBrowser &&
       !Xut.IBooks.Enabled &&
       !window.MMXCONFIG &&
       !window.DUKUCONFIG &&
+      !nodeName === 'a' && //并且不是a标签(在cloumn中有a标签，需要跳转)
       !hasTyperlink) { //超链接不阻止
       e.preventDefault && e.preventDefault();
     }
