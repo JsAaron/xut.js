@@ -140,59 +140,58 @@ export function hasImages(fileName) {
 }
 
 /*获取文件的全路径*/
-export function getFileFullPath(fileName, type) {
+export function getFileFullPath(fileName, debugType) {
 
   if (!fileName) {
     return ''
   }
 
   const launch = config.launch
-  if (launch) {
 
-    /*
-    如果启动了基础图匹配,替换全部
-    并且要是图片
-    并且没有私有后缀
+  /*
+  如果启动了基础图匹配,替换全部
+  并且要是图片
+  并且没有私有后缀
+  */
+  if (launch.baseImageSuffix &&
+    hasImages(fileName) &&
+    -1 === fileName.indexOf(`.${launch.baseImageSuffix}.`)) {
+    /*"50f110321f467d25474b9dba9b342f0a.png"
+      1 : "50f110321f467d25474b9dba9b342f0a"
+      2 : "png"
     */
-    if (config.launch.baseImageSuffix &&
-      hasImages(fileName) &&
-      -1 === fileName.indexOf(`.${config.launch.baseImageSuffix}.`)) {
-      /*"50f110321f467d25474b9dba9b342f0a.png"
-        1 : "50f110321f467d25474b9dba9b342f0a"
-        2 : "png"
-      */
-      let fileMatch = fileName.match(/(\w+)\.(\w+)$/)
-      let name = fileMatch[1]
-      let type = fileMatch[2]
-      fileName = `${fileMatch[1]}.${config.launch.baseImageSuffix}.${fileMatch[2]}`
-    }
+    let fileMatch = fileName.match(/(\w+)\.(\w+)$/)
+    let name = fileMatch[1]
+    let type = fileMatch[2]
+    fileName = `${fileMatch[1]}.${launch.baseImageSuffix}.${fileMatch[2]}`
+  }
 
-    /*
-      支持webp图
-      1 如果启动brModelType
-      2 并且是图片
-      3 并且没有被修改过
-    */
-    if (launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
-      let suffix = ''
-      let name
-      if (Xut.plat.isBrowser) { //手机浏览器访问
-        let fileMatch = fileName.match(/\w+([.]?[\w]*)\1/ig)
-        if (fileMatch.length === 3) {
-          name = fileMatch[0]
-          suffix = '.' + fileMatch[1]
-        } else {
-          name = fileMatch[0]
-        }
-        //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
-        return `${config.data.pathAddress + name}${config.launch.brModelType}${suffix}`
+  /*
+    支持webp图
+    1 如果启动brModelType
+    2 并且是图片
+    3 并且没有被修改过
+  */
+  if (launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
+    let suffix = ''
+    let name
+    if (Xut.plat.isBrowser) { //手机浏览器访问
+      let fileMatch = fileName.match(/\w+([.]?[\w]*)\1/ig)
+      if (fileMatch.length === 3) {
+        name = fileMatch[0]
+        suffix = '.' + fileMatch[1]
       } else {
-        //手机app访问
-        //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a.mi
-        return `${config.data.pathAddress + name}${suffix}`
+        name = fileMatch[0]
       }
+      //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
+      return `${config.data.pathAddress + name}${launch.brModelType}${suffix}`
+    } else {
+      //手机app访问
+      //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a.mi
+      return `${config.data.pathAddress + name}${suffix}`
     }
   }
+
   return config.data.pathAddress + fileName
 }
 

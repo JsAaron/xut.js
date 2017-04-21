@@ -173,6 +173,7 @@ export default class Powepoint {
       if(animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
         this.element.css("visibility", "visible");
       } else {
+
         switch(animationName) {
           //强调动画默认显示
           case "EffectFlashBulb": //脉冲
