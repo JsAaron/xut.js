@@ -129,7 +129,7 @@ export default class TaskActivitys extends TaskSuper {
         /*解析点击反馈，点击缩放*/
       parseBehavior(pipeData)
         /*构建页面content类型结构*/
-      contentStructure(userData => {
+      contentStructure(pipeData, userData => {
         pipeData.contentHtmlBoxIds = userData.contentHtmlBoxIds
         pipeData.contentsFragment = {}
           //iboosk节点预编译
@@ -155,7 +155,7 @@ export default class TaskActivitys extends TaskSuper {
         Xut.Contents.contentsFragment[pipeData.chapterId] = pipeData.contentsFragment
           /* elist-enable */
         this._dataStrCheck(pipeData, userData);
-      }, pipeData, this)
+      })
 
     })
   }

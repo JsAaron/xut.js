@@ -37,7 +37,7 @@ const makeWarpObj = (contentId, content, pageType, chapterIndex) => {
     contentId: contentId,
     isJs: /.js$/i.test(content.md5), //html类型
     isSvg: /.svg$/i.test(content.md5), //svg类型
-    data: content,
+    contentData: content,
     chapterIndex: chapterIndex,
     containerName: 'Content' + prefix,
     makeId(name) {
@@ -94,13 +94,13 @@ const analysisPath = (wrapObj, conData) => {
 const externalFile = (wrapObj, svgCallback) => {
   //svg零件不创建解析具体内容
   if (wrapObj.isSvg) {
-    readFile(wrapObj.data.md5, (svgdata) => {
+    readFile(wrapObj.contentData.md5, (svgdata) => {
       wrapObj.svgstr = svgdata
       svgCallback(wrapObj)
     });
   } else if (wrapObj.isJs) {
     //如果是.js的svg文件
-    readFile(wrapObj.data.md5, (htmldata) => {
+    readFile(wrapObj.contentData.md5, (htmldata) => {
       wrapObj.htmlstr = htmldata
       svgCallback(wrapObj)
     }, "js")
@@ -137,7 +137,7 @@ const allotRatio = (fixRadio, headerFooterMode) => {
 //  dydCreate //重要判断,动态创建
 //
 //=======================================================
-export function contentStructure(callback, data, context) {
+export function contentStructure(pipeData, callback) {
   let content,
     contentId,
     wrapObj,
@@ -146,18 +146,18 @@ export function contentStructure(callback, data, context) {
     contentCollection,
     contentCount,
     cloneContentCount,
-    chapterIndex = data.chapterIndex,
-    pageType = data.pageType,
-    containerRelated = data.containerRelated,
-    seasonRelated = data.seasonRelated,
+    chapterIndex = pipeData.chapterIndex,
+    pageType = pipeData.pageType,
+    containerRelated = pipeData.containerRelated,
+    seasonRelated = pipeData.seasonRelated,
     isMaster = pageType === 'master',
     ////////////
     //浮动处理 //
     //1.浮动母版对象
     //2.浮动页面对象
     ////////////
-    floatMaters = data.floatMaters,
-    floatPages = data.floatPages,
+    floatMaters = pipeData.floatMaters,
+    floatPages = pipeData.floatPages,
     //文本框
     //2016.1.7
     contentHtmlBoxIds = [],
@@ -175,7 +175,7 @@ export function contentStructure(callback, data, context) {
     //页眉页脚对象合集
     headerFooterMode = {},
     //自定义样式
-    getStyle = data.getStyle;
+    getStyle = pipeData.getStyle;
 
   /*开始过滤参数*/
   if (containerRelated && containerRelated.length) {
@@ -188,7 +188,6 @@ export function contentStructure(callback, data, context) {
    * 页面是最顶级的
    */
   function parseParameter(parameter, contentId, conData) {
-    var zIndex;
     _.each(parameter, (para) => {
       /*是否启动代码追踪*/
       if (para.trackCode) {
@@ -219,7 +218,7 @@ export function contentStructure(callback, data, context) {
       }
       //针对母版content的topmost数据处理，找出浮动的对象Id
       //排除数据topmost为0的处理
-      zIndex = para['topmost']
+      let zIndex = para['topmost']
       if (zIndex && zIndex != 0) {
         if (isMaster) {
           //收集浮动的母版对象id
@@ -249,7 +248,7 @@ export function contentStructure(callback, data, context) {
     //2 canvas对象
     if (conData) {
       /*匹配canvas对象数据*/
-      conData.category && parseCanvas(contentId, conData.category, conData, data)
+      conData.category && parseCanvas(contentId, conData.category, conData, pipeData)
 
       /*如果有parameter,保持数据格式，方便解析*/
       let parameter
@@ -266,22 +265,22 @@ export function contentStructure(callback, data, context) {
    * 2 canvas动作
    * @type {[type]}
    */
-  contentCollection = parseContentData(data.createContentIds, prefilter);
+  contentCollection = parseContentData(pipeData.createContentIds, prefilter);
   contentCount = cloneContentCount = contentCollection.length;
 
 
   //如果是启动了特殊高精灵动画
   //强制打开canvas模式设置
   //这里可以排除掉其余的canvas动画
-  if (data.canvasRelated.onlyCompSprite) {
-    data.canvasRelated.enable = true
+  if (pipeData.canvasRelated.onlyCompSprite) {
+    pipeData.canvasRelated.enable = true
   }
 
   /*创建content节点*/
   function createRelated(contentId, wrapObj) {
-    externalFile(wrapObj, function (wrapObj) {
+    externalFile(wrapObj, function(wrapObj) {
       let uuid, startStr, contentStr
-      let conData = wrapObj.data
+      let conData = wrapObj.contentData
 
       /*分析图片地址*/
       analysisPath(wrapObj, conData)
@@ -314,14 +313,14 @@ export function contentStructure(callback, data, context) {
 
   /*清理剔除的content*/
   function clearContent(contentId) {
-    data.createContentIds.splice(data.createContentIds.indexOf(contentId), 1);
+    pipeData.createContentIds.splice(pipeData.createContentIds.indexOf(contentId), 1);
     checkComplete();
   }
 
   /*返回处理*/
   function checkComplete() {
     if (cloneContentCount === 1) {
-      let data = {
+      const userData = {
         contentDataset,
         idFix,
         textFx,
@@ -336,7 +335,7 @@ export function contentStructure(callback, data, context) {
         containerStr = []
 
         //合并容器
-        containerObj.createUUID.forEach(function (uuid) {
+        containerObj.createUUID.forEach(function(uuid) {
           start = containerObj[uuid].start.join('');
           end = containerObj[uuid].end;
           containerStr.push(start.concat(end));
@@ -344,12 +343,12 @@ export function contentStructure(callback, data, context) {
         containerStr = containerStr.join('');
         containerPrefix = containerObj.containerName;
         containerObj = null;
-        data.contentStr = cachedContentStr.join('').concat(containerStr)
-        data.containerPrefix = containerPrefix
+        userData.contentStr = cachedContentStr.join('').concat(containerStr)
+        userData.containerPrefix = containerPrefix
       } else {
-        data.contentStr = cachedContentStr.join('')
+        userData.contentStr = cachedContentStr.join('')
       }
-      callback.call(context, data)
+      callback(userData)
     }
     cloneContentCount--;
   }
@@ -377,9 +376,9 @@ export function contentStructure(callback, data, context) {
       }
 
       /*转换缩放比*/
-      const setRatio = function (proportion = getStyle.pageProportion) {
+      const setRatio = function(proportion = getStyle.pageProportion) {
         sizeResults = reviseSize({
-          results: wrapObj.data,
+          results: wrapObj.contentData,
           getStyle: getStyle,
           proportion,
           zoomMode: allotRatio(content.fixRadio, headerFooterMode[contentId])
@@ -388,9 +387,9 @@ export function contentStructure(callback, data, context) {
       setRatio()
 
       /*设置页面缩放比*/
-      const setPageProportion = function (baseRatio) {
+      const setPageProportion = function(baseRatio) {
         let pageProportion = {}
-        _.each(getStyle.pageProportion, function (prop, key) {
+        _.each(getStyle.pageProportion, function(prop, key) {
           pageProportion[key] = prop * baseRatio
         })
         return pageProportion
