@@ -1,7 +1,9 @@
 import { crateFloat } from './float'
 
 /**
- * 多线程任务基类
+ * 任务基类
+ * 1 任务检测
+ * 2 浮动层处理
  */
 
 export default class TaskSuper {
