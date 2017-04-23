@@ -27,7 +27,7 @@ export default function threadCheck(baseProto) {
 
     //任务创建完毕回调
     this.threadTaskRelated.createTasksComplete = () => {
-      this.collectHooks && this.collectHooks.threadtaskComplete()
+      this.divertorHooks && this.divertorHooks.threadtaskComplete()
       callback()
     };
 

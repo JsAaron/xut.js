@@ -134,7 +134,7 @@ export default function(baseProto) {
      * 对象的处理情况的内部钩子方法
      * 收集内部的一些状态与对象
      */
-    this.collectHooks = {
+    this.divertorHooks = {
 
       /**
        * 多线程任务完成后
@@ -199,7 +199,7 @@ export default function(baseProto) {
       floatMasters(divertor) {
         let contentObj
         let contentNode
-        //浮动容器
+          //浮动容器
         floatGroup.masterContainer = divertor.container;
         //浮动对象
         _.each(divertor.ids, function(id) {

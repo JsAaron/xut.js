@@ -173,7 +173,7 @@
        'chapterId': baseData._id,
        'pageIndex': base.pageIndex,
        'chapterIndex': base.chapterIndex,
-       'pageBaseHooks': base.collectHooks,
+       'pageBaseHooks': base.divertorHooks,
        'getStyle': base.getStyle
      }, success, function(...arg) {
        base.detectorTask(...arg)
