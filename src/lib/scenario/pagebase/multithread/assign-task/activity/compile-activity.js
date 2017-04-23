@@ -17,7 +17,7 @@ export function autoUUID() {
  * 5 canvas动画
  * @return {[type]} [description]
  */
-export function compileActivity(pipeData, contentDataset, callback) {
+export function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
   var compiler,
     $containsNode = pipeData.$containsNode,
     eventRelated = pipeData.eventRelated, //合集事件
@@ -26,6 +26,9 @@ export function compileActivity(pipeData, contentDataset, callback) {
     feedbackBehavior = pipeData.feedbackBehavior, //反馈数据,跟事件相关
     pageBaseHooks = pipeData.pageBaseHooks,
     pageId = pipeData.chapterId;
+
+
+  const floatMasterDivertor = $$floatDivertor.master
 
   //如果有浮动对象,才需要计算偏移量
   //母版里面可能存在浮动或者不浮动的对象
@@ -41,7 +44,7 @@ export function compileActivity(pipeData, contentDataset, callback) {
       }
       return 0
     }
-  }(pipeData.floatMaters.ids, pipeData.getStyle.offset);
+  }(floatMasterDivertor.ids, pipeData.getStyle.offset);
 
   //相关回调
   const relatedCallback = {
@@ -59,7 +62,7 @@ export function compileActivity(pipeData, contentDataset, callback) {
 
   //相关数据
   const relatedData = {
-    'floatMaters': pipeData.floatMaters,
+    floatMasterDivertor,
     'seasonId': pipeData.chpaterData.seasonId,
     'pageId': pageId,
     'contentDataset': contentDataset, //所有的content数据合集

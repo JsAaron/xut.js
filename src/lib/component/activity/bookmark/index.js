@@ -12,7 +12,7 @@ export default function(activitProto) {
     if(this.pageType === 'master') {
       //模板取对应的页面上的数据
       pageData = Xut.Presentation.GetPageData();
-      node = this.relatedData.floatMaters.container;
+      node = this.relatedData.floatMasterDivertor.container;
       pageId = pageData._id;
       seasonId = pageData.seasonId;
     } else {

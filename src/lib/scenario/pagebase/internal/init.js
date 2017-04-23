@@ -196,7 +196,7 @@ export default function(baseProto) {
        * 2 浮动的对象是用于零件类型,这边只提供创建
        *  所以需要制造一个空的容器，用于母版交界动
        */
-      floatMaters(data) {
+      floatMasters(data) {
 
         let contentObj
         let contentNode

@@ -145,7 +145,7 @@
     * 分配Activity构建任务
     * @return {[type]} [description]
     */
-   'assgin-activity' (success, base, componentFlostDivertor) {
+   'assgin-activity' (success, base) {
 
      //通过content数据库为空处理
      if (Xut.data.preventContent) {
@@ -174,8 +174,7 @@
        'pageIndex': base.pageIndex,
        'chapterIndex': base.chapterIndex,
        'pageBaseHooks': base.collectHooks,
-       'getStyle': base.getStyle,
-       componentFlostDivertor
+       'getStyle': base.getStyle
      }, success, function(...arg) {
        base.detectorTask(...arg)
      })

@@ -6,7 +6,7 @@
  *      2 创建完毕
  *      3 创建失败
  */
-import TaskSuper from '../super'
+import TaskSuper from '../super/index'
 import directives from '../../../../directive/index'
 import { reviseSize } from '../../../../../util/option'
 
@@ -128,7 +128,7 @@ export default class TaskComponents extends TaskSuper {
   _render(result) {
     if (!result.html) {
       this.destroy()
-      this.success(result.flostDivertor)
+      this.success()
       return
     }
     Xut.nextTick({
@@ -136,7 +136,7 @@ export default class TaskComponents extends TaskSuper {
       content: $(result.html)
     }, () => {
       this.destroy()
-      this.success(result.flostDivertor)
+      this.success()
     });
   }
 

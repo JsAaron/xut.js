@@ -4,7 +4,7 @@
  *      结构合并创建类    Structure
  *      行为动画绑定类     Content
  * ***************************************************/
-import TaskSuper from '../super'
+import TaskSuper from '../super/index'
 import { config } from '../../../../../config/index'
 import { nextTick } from '../../../../../util/nexttick'
 import { textFx } from './text-fx'
@@ -14,7 +14,6 @@ import { contentParser } from './parser/content'
 import { parseBehavior } from './parser/behavior'
 import { activityParser } from './parser/activity'
 import { contentStructure } from './structure/index'
-import { createFloatMater, createFloatPage } from './structure/float'
 import { sceneController } from '../../../../../scenario/scene-control'
 
 
@@ -97,39 +96,20 @@ export default class TaskActivitys extends TaskSuper {
   }
 
 
-  /*
-  初始化浮动页面参数
-   */
-  _initFloat(pipeData) {
-    //浮动模板
-    //用于实现模板上的事件
-    pipeData.floatMaters = {
-      'ids': [], //浮动id
-      'container': {}, //浮动容器
-      'zIndex': {}
-    }
-
-    //浮动页面
-    //母板事件引起的层级遮挡问题
-    //用于提升最高
-    pipeData.floatPages = {
-      'ids': [],
-      'zIndex': {}
-    }
-  }
-
   /**
    * 中断一:构建数据之后
    * 构建结构
    */
   _dataAfterCheck(pipeData) {
     this._checkNextTask('dataAfter', () => {
-      /*初始化浮动*/
-      this._initFloat(pipeData)
-        /*解析点击反馈，点击缩放*/
+      /*初始化浮动,this.$$floatDivertor*/
+      this.$$initFloat(pipeData)
+
+      /*解析点击反馈，点击缩放*/
       parseBehavior(pipeData)
-        /*构建页面content类型结构*/
-      contentStructure(pipeData, userData => {
+
+      /*构建页面content类型结构*/
+      contentStructure(pipeData, this.$$floatDivertor, userData => {
         pipeData.contentHtmlBoxIds = userData.contentHtmlBoxIds
         pipeData.contentsFragment = {}
           //iboosk节点预编译
@@ -179,9 +159,9 @@ export default class TaskActivitys extends TaskSuper {
       //用做软件制作单页预加载
       sceneController.seasonRelated = pipeData.seasonRelated;
       //初始化content对象
-      compileActivity(pipeData, userData.contentDataset, delayHooks => {
+      compileActivity(delayHooks => {
         this._eventAfterCheck(pipeData, delayHooks, userData.headerFooterMode)
-      })
+      }, pipeData, userData.contentDataset, this.$$floatDivertor)
     })
   }
 
@@ -192,10 +172,15 @@ export default class TaskActivitys extends TaskSuper {
    */
   _eventAfterCheck(pipeData, delayHooks, headerFooterMode) {
 
-    const self = this;
+
     this._checkNextTask('eventAfter', () => {
 
-      /*计算回调的成功的次数*/
+      /*
+      计算回调的成功的次数
+      1 正常节点创建
+      2 浮动节点创建
+      3 页眉页脚创建
+       */
       pipeData.taskCount = 1
 
       /**
@@ -219,27 +204,19 @@ export default class TaskActivitys extends TaskSuper {
        * 3 正常对象
        * 4 页眉页脚
        */
-      const complete = function() {
-        return function() {
+      const complete = (() => {
+        return () => {
           if (pipeData.taskCount === 1) {
             delayHooks && hookfns()
-            self._applyAfterCheck()
+            this._applyAfterCheck()
             return
           }
           --pipeData.taskCount;
         }
-      }()
+      })()
 
-
-      /*浮动页面对,浮动对象比任何层级都都要高,超过母版*/
-      if (pipeData.floatPages.ids && pipeData.floatPages.ids.length) {
-        createFloatPage(this, pipeData, complete)
-      }
-
-      /*如果存在母版浮动节点,在创建节点structure中过滤出来，根据参数的tipmost*/
-      if (pipeData.floatMaters.ids && pipeData.floatMaters.ids.length) {
-        createFloatMater(this, pipeData, complete)
-      }
+      /*创建浮动层*/
+      this.$$createFloatLayer(pipeData, complete)
 
       /*iboosk节点预编译,在执行的时候节点已经存在,不需要在创建*/
       if (Xut.IBooks.runMode()) {

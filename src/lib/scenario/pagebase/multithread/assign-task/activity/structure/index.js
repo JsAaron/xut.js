@@ -137,7 +137,8 @@ const allotRatio = (fixRadio, headerFooterMode) => {
 //  dydCreate //重要判断,动态创建
 //
 //=======================================================
-export function contentStructure(pipeData, callback) {
+export function contentStructure(pipeData, $$floatDivertor, callback) {
+
   let content,
     contentId,
     wrapObj,
@@ -151,13 +152,6 @@ export function contentStructure(pipeData, callback) {
     containerRelated = pipeData.containerRelated,
     seasonRelated = pipeData.seasonRelated,
     isMaster = pageType === 'master',
-    ////////////
-    //浮动处理 //
-    //1.浮动母版对象
-    //2.浮动页面对象
-    ////////////
-    floatMaters = pipeData.floatMaters,
-    floatPages = pipeData.floatPages,
     //文本框
     //2016.1.7
     contentHtmlBoxIds = [],
@@ -222,12 +216,12 @@ export function contentStructure(pipeData, callback) {
       if (zIndex && zIndex != 0) {
         if (isMaster) {
           //收集浮动的母版对象id
-          floatMaters.ids.push(contentId)
-          floatMaters.zIndex[contentId] = zIndex
+          $$floatDivertor.master.ids.push(contentId)
+          $$floatDivertor.master.zIndex[contentId] = zIndex
         } else {
           //浮动页面
-          floatPages.ids.push(contentId)
-          floatPages.zIndex[contentId] = zIndex
+          $$floatDivertor.page.ids.push(contentId)
+          $$floatDivertor.page.zIndex[contentId] = zIndex
         }
       }
     })
@@ -239,7 +233,7 @@ export function contentStructure(pipeData, callback) {
     let eventId;
     if (isMaster && (eventId = seasonRelated[contentId])) {
       if (eventId['BookMarks']) {
-        floatMaters.ids.push(contentId)
+        $$floatDivertor.master.ids.push(contentId)
       }
     }
 
