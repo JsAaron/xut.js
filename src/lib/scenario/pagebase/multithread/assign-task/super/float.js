@@ -3,37 +3,48 @@ import { nextTick } from '../../../../../util/nexttick'
 
 /**
  *创建浮动相关的信息
- * @return {[type]} [description]
+ *1 activity
+ *2 component
  */
-export function crateFloat(floatName, pipeData, dasFloat, baseGetStyle, complete) {
+export function crateFloat(floatName, pipeData, divertor, complete) {
 
-  var content = [];
-  var prefix = 'Content_' + pipeData.chapterIndex + "_";
-
-  //去重复
-  dasFloat.ids = arrayUnique(dasFloat.ids)
-
-  var makePrefix, fragment, zIndex, zIndexs = dasFloat.zIndex;
-
+  /*增加回调次数计算*/
   pipeData.taskCount++;
 
-  //分离出浮动节点
-  _.each(dasFloat.ids, function(id) {
-    makePrefix = prefix + id;
-    if (fragment = pipeData.contentsFragment[makePrefix]) {
-      zIndex = zIndexs[id];
-      //保证层级关系
-      // fragment.style.zIndex = (Number(zIndex) + Number(fragment.style.zIndex))
-      content.push(fragment);
-      delete pipeData.contentsFragment[makePrefix]
-    }
-  })
+  let content = [];
+  let getStyle = pipeData.getStyle
+
+  /*activity类型处理*/
+  let makePrefix, fragment, zIndex
+  if (divertor.ids.length) {
+    const zIndexs = divertor.zIndex;
+    const prefix = 'Content_' + pipeData.chapterIndex + "_";
+    //去重复
+    divertor.ids = arrayUnique(divertor.ids)
+    _.each(divertor.ids, function(id) {
+      makePrefix = prefix + id;
+      fragment = pipeData.contentsFragment[makePrefix]
+      if (fragment) {
+        zIndex = zIndexs[id];
+        //保证层级关系
+        // fragment.style.zIndex = (Number(zIndex) + Number(fragment.style.zIndex))
+        content.push(fragment);
+        delete pipeData.contentsFragment[makePrefix]
+      }
+    })
+  }
+
+  /*component类型处理*/
+  if (divertor.html.length) {
+    content = $(divertor.html.join(""))
+  }
+
 
   //floatPage模式下面
   //如果是当前页面
   //因为会产生三页面并联
   //所以中间去最高层级
-  if (floatName === 'floatPage' && pipeData.getStyle.offset === 0) {
+  if (floatName === 'floatPage' && getStyle.offset === 0) {
     zIndex = 2001
   } else {
     zIndex = 2000
@@ -43,23 +54,30 @@ export function crateFloat(floatName, pipeData, dasFloat, baseGetStyle, complete
   //floatPage设置的content溢出后处理
   //在非视区增加overflow:hidden
   //可视区域overflow:''
-  var overflow = 'overflow:hidden;'
+  let overflow = 'overflow:hidden;'
 
   //如果是母板,排除
   if (floatName === 'floatMaster') {
     overflow = ''
   }
 
-  let flowHtml =
-    `<ul id="${floatName}-li-${pipeData.chapterIndex}"
+  /*浮动容器*/
+  let id = `${floatName}-li-${pipeData.chapterIndex}`
+  let container = $("#" + id)
+
+  /*有可能在competent中已经创建,在content不需要重复创建*/
+  if (!container.length) {
+    container = $(String.styleFormat(
+      `<ul id="${id}"
          class="xut-float"
-         style="left:${baseGetStyle.visualLeft}px;
-                top:${baseGetStyle.visualTop}px;
-                ${Xut.style.transform}:${pipeData.getStyle.translate};
+         style="left:${getStyle.visualLeft}px;
+                top:${getStyle.visualTop}px;
+                ${Xut.style.transform}:${getStyle.translate};
                 z-index:${zIndex};${overflow}">
-    </ul>`
-  const container = $(String.styleFormat(flowHtml))
-  $(pipeData.rootNode).after(container)
+       </ul>`
+    ))
+    $(pipeData.rootNode).after(container)
+  }
 
   /*绘制节点到页面*/
   nextTick({ container, content }, () => {

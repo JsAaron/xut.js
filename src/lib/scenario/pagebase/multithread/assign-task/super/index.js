@@ -28,7 +28,8 @@ export default class TaskSuper {
     this.$$floatDivertor = {}
     _.each(['page', 'master'], type => {
       this.$$floatDivertor[type] = {
-        'ids': [], //保存合集
+        'ids': [], //content保存合集
+        'html': [], //component组件触发点字符串
         'zIndex': {}, //保存索引
         'container': null //浮动容器
       }
@@ -46,29 +47,27 @@ export default class TaskSuper {
     const masterDivertor = this.$$floatDivertor.master
 
     /*浮动页面对,浮动对象比任何层级都都要高,超过母版*/
-    if (pageDivertor.ids.length) {
+    if (pageDivertor.ids.length || pageDivertor.html.length) {
       crateFloat('floatPage',
         pipeData,
         pageDivertor,
-        this.getStyle,
         container => {
           pageDivertor.container = container;
           this.pageBaseHooks.floatPages(pageDivertor);
-          complete(pipeData);
+          complete()
         }
       )
     }
 
     /*如果存在母版浮动节点,在创建节点structure中过滤出来，根据参数的tipmost*/
-    if (masterDivertor.ids.length) {
+    if (masterDivertor.ids.length || masterDivertor.html.length) {
       crateFloat('floatMaster',
         pipeData,
         masterDivertor,
-        this.getStyle,
         container => {
           masterDivertor.container = container;
           this.pageBaseHooks.floatMasters(masterDivertor);
-          complete(pipeData);
+          complete()
         }
       )
     }

@@ -126,6 +126,7 @@
      const chapterData = base.chapterData
      const baseData = base.baseData()
      base.threadTaskRelated.assignTaskGroup['assign-component'] = new TaskComponents({
+       'rootNode': base.rootNode,
        '$containsNode': base.getContainsNode(),
        'nodes': chapterData['nodes'],
        'pageOffset': chapterData['pageOffset'],
@@ -134,6 +135,7 @@
        'chapterId': baseData['_id'],
        'chapterIndex': base.chapterIndex,
        'pageType': base.pageType,
+       'pageBaseHooks': base.divertorHooks,
        'getStyle': base.getStyle
      }, success, function(...arg) {
        base.detectorTask(...arg)

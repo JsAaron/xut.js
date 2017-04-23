@@ -25,6 +25,8 @@ export default class TaskComponents extends TaskSuper {
     if (pipeData.activitys && pipeData.activitys.length) {
       this.success = success
       this.$containsNode = pipeData.$containsNode
+      this.pageBaseHooks = pipeData.pageBaseHooks
+      this.pipeData = pipeData
       this._checkNextTask(this._create(pipeData));
     } else {
       success();
@@ -32,18 +34,8 @@ export default class TaskComponents extends TaskSuper {
   }
 
 
-  /*
-  初始化浮动页面参数
-   */
-  _initFloat() {
-    return {
-      'page': [],
-      'master': []
-    }
-  }
-
   /*创建dom节点，但是浮动类型例外*/
-  _create(pipeData) {
+  _create() {
 
     const {
       pageType,
@@ -51,11 +43,11 @@ export default class TaskComponents extends TaskSuper {
       chpaterData,
       chapterId,
       chapterIndex
-    } = pipeData
+    } = this.pipeData
 
     let resultHTML = [];
 
-    let flostDivertor = this._initFloat()
+    this.$$initFloat()
 
     /*
       创建DOM元素结构,返回是拼接字符串
@@ -63,10 +55,10 @@ export default class TaskComponents extends TaskSuper {
       1 纯html
       2 对象（浮动音频处理）
     */
-    const createDom = function(actType, activityData) {
+    const createDom = (actType, activityData) => {
       activityData = reviseSize({
         results: activityData,
-        proportion: pipeData.getStyle.pageProportion
+        proportion: this.pipeData.getStyle.pageProportion
       })
       const result = directives[actType]['createDom'](
         activityData,
@@ -79,12 +71,11 @@ export default class TaskComponents extends TaskSuper {
       if (_.isString(result)) {
         resultHTML.push(result)
       } else {
-        resultHTML.push(result.html)
+        /*如果有浮动类型，保存*/
         if (result.hasFloat) {
-          /*这个参数要传递到content中*/
-          // flostDivertor[pageType].push(result.html)
+          this.$$floatDivertor[pageType].html.push(result.html)
         } else {
-          // resultHTML.push(result.html)
+          resultHTML.push(result.html)
         }
       }
     }
@@ -108,36 +99,60 @@ export default class TaskComponents extends TaskSuper {
       }
     })
 
-    return {
-      html: resultHTML.join(""),
-      flostDivertor
-    }
+    return resultHTML.join("")
   }
 
   /**
    * 检测下个任务是否中断运行
    */
-  _checkNextTask(result) {
+  _checkNextTask(htmlString) {
     this.$$checkNextTask('内部Component', () => {
-      this._render(result)
+      this._float(() => {
+        this._render(htmlString)
+      })
     })
   }
 
+  /*浮动处理*/
+  _float(callback) {
+
+    /*制作浮点回调*/
+    this.pipeData.taskCount = 0
+
+    let complete = (() => {
+      return () => {
+        if (this.pipeData.taskCount === 1) {
+          callback()
+          return
+        }
+        --this.pipeData.taskCount;
+      }
+    })()
+
+    this.$$createFloatLayer(this.pipeData, complete)
+
+    /*如果不存在浮动*/
+    if (this.pipeData.taskCount === 0) {
+      complete = null
+      callback()
+    }
+  }
 
   /*渲染页面*/
-  _render(result) {
-    if (!result.html) {
+  _render(htmlString) {
+    /*正常component*/
+    if (htmlString) {
+      Xut.nextTick({
+        container: this.$containsNode,
+        content: $(htmlString)
+      }, () => {
+        this.destroy()
+        this.success()
+      })
+    } else {
       this.destroy()
       this.success()
-      return
     }
-    Xut.nextTick({
-      container: this.$containsNode,
-      content: $(result.html)
-    }, () => {
-      this.destroy()
-      this.success()
-    });
   }
 
   destroy() {

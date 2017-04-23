@@ -286,7 +286,6 @@ export default class Dispatcher {
             //判断pageBase是因为母版不需要重复创建
             //母版是共享多个paga
             if(pageBase) {
-
               //开始线程任务，如果是翻页模式,支持快速创建
               pageBase.startThreadTask(isFlipAction, () => {
                 callbackAction[action]()

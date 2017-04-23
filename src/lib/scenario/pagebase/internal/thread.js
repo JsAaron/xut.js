@@ -20,8 +20,6 @@ export default function threadCheck(baseProto) {
       return callback()
     }
 
-    const self = this
-
     //开始构未完成的任务
     this._cancelTaskSuspend()
 
@@ -34,7 +32,7 @@ export default function threadCheck(baseProto) {
     //派发任务
     this.detectorTask({
       nextTask() {
-        self.dispatchTasks();
+        this.dispatchTasks();
       }
     });
   }
@@ -61,10 +59,10 @@ export default function threadCheck(baseProto) {
   baseProto.detectorTask = function(options) {
     this._asyTasks({
       suspendCallback() {
-        options.suspendTask && options.suspendTask()
+        options.suspendTask && options.suspendTask.call(this)
       },
       nextTaskCallback() {
-        options.nextTask && options.nextTask()
+        options.nextTask && options.nextTask.call(this)
       }
     }, options.interrupt)
   }

@@ -175,19 +175,22 @@ export default function(baseProto) {
        */
       floatPages(divertor) {
         //浮动页面对象容器
-        let contentObj
         floatGroup.pageContainer = divertor.container;
-        _.each(divertor.ids, function(id) {
-          if (contentObj = instance.baseGetContentObject(id)) {
-            //初始视察坐标
-            if (contentObj.parallax) {
-              contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
+
+        if (divertor.ids.length) {
+          let contentObj
+          _.each(divertor.ids, function(id) {
+            if (contentObj = instance.baseGetContentObject(id)) {
+              //初始视察坐标
+              if (contentObj.parallax) {
+                contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
+              }
+              floatGroup.pageGroup[id] = contentObj
+            } else {
+              console.log('页面浮动对象找不到')
             }
-            floatGroup.pageGroup[id] = contentObj
-          } else {
-            console.log('页面浮动对象找不到')
-          }
-        })
+          })
+        }
       },
 
       /**
@@ -197,45 +200,48 @@ export default function(baseProto) {
        *  所以需要制造一个空的容器，用于母版交界动
        */
       floatMasters(divertor) {
-        let contentObj
-        let contentNode
-          //浮动容器
+        //浮动容器
         floatGroup.masterContainer = divertor.container;
-        //浮动对象
-        _.each(divertor.ids, function(id) {
-          //转化成实际操作的浮动对象,保存
-          if (contentObj = instance.baseGetContentObject(id)) {
-            //初始视察坐标
-            if (contentObj.parallax) {
-              contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
-            }
-            floatGroup.masterGroup[id] = contentObj
-          } else {
-            Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
 
-            const activity = instance.threadTaskRelated['assgin-activity']
-            const contentsFragment = activity.contentsFragment
+        if (divertor.ids.length) {
+          let contentObj
+          let contentNode
+            //浮动对象
+          _.each(divertor.ids, function(id) {
+            //转化成实际操作的浮动对象,保存
+            if (contentObj = instance.baseGetContentObject(id)) {
+              //初始视察坐标
+              if (contentObj.parallax) {
+                contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
+              }
+              floatGroup.masterGroup[id] = contentObj
+            } else {
+              Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
 
-            //获取DOM节点
-            if (contentsFragment) {
-              const prefix = 'Content_' + instance.chapterIndex + "_"
-              _.each(contentsFragment, function(dom) {
-                let makePrefix = prefix + id;
-                if (dom.id == makePrefix) {
-                  contentNode = dom;
-                }
-              })
+              const activity = instance.threadTaskRelated['assgin-activity']
+              const contentsFragment = activity.contentsFragment
+
+              //获取DOM节点
+              if (contentsFragment) {
+                const prefix = 'Content_' + instance.chapterIndex + "_"
+                _.each(contentsFragment, function(dom) {
+                  let makePrefix = prefix + id;
+                  if (dom.id == makePrefix) {
+                    contentNode = dom;
+                  }
+                })
+              }
+              //制作一个伪数据
+              //作为零件类型的空content处理
+              floatGroup.masterGroup[id] = {
+                id: id,
+                chapterIndex: instance.chapterIndex,
+                $contentNode: $(contentNode),
+                'empty': true //空类型
+              }
             }
-            //制作一个伪数据
-            //作为零件类型的空content处理
-            floatGroup.masterGroup[id] = {
-              id: id,
-              chapterIndex: instance.chapterIndex,
-              $contentNode: $(contentNode),
-              'empty': true //空类型
-            }
-          }
-        })
+          })
+        }
       },
 
       /**

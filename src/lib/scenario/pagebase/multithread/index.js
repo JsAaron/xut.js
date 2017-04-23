@@ -63,8 +63,8 @@ export default function initThreadtasks(instance) {
   }
 
   /* 创建新任务*/
-  const createAssignTask = (taskName, fn, option) => {
-    return assignedTasks[taskName](fn, instance, option)
+  const createAssignTask = (taskName, fn) => {
+    return assignedTasks[taskName](fn, instance)
   }
 
 
@@ -104,7 +104,6 @@ export default function initThreadtasks(instance) {
         instance.getScaleNode = function() {
           return $pseudoElement ? $pseudoElement : $pageNode.find('.page-scale')
         }
-
 
         setNextTaskName('background')
 
@@ -179,7 +178,7 @@ export default function initThreadtasks(instance) {
       设计上chapter只有一个flow效果，所以直接跳过别的创建
       只处理页面类型，母版跳过
        */
-      if (isPageType && instance.chapterData.note == 'flow') {
+      if (isPageType && instance.chapterData.note === 'flow') {
         createAssignTask('assign-column', function() {
           setNextTaskName('complete')
           threadTaskRelated.createTasksComplete()
@@ -196,12 +195,12 @@ export default function initThreadtasks(instance) {
      * 构件零件类型任务
      */
     component() {
-      createAssignTask('assign-component', function(flostDivertor) {
+      createAssignTask('assign-component', function() {
         setNextTaskName('activity')
         instance.detectorTask({
           'taskName': '外部contents',
           nextTask: function() {
-            instance.dispatchTasks(flostDivertor);
+            instance.dispatchTasks();
           }
         });
       })
@@ -210,11 +209,11 @@ export default function initThreadtasks(instance) {
     /**
      * activity类型
      */
-    activity(componentFlostDivertor) {
+    activity() {
       createAssignTask('assgin-activity', function() {
         setNextTaskName('complete')
         threadTaskRelated.createTasksComplete();
-      }, componentFlostDivertor)
+      })
     }
   }
 
