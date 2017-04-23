@@ -1,4 +1,4 @@
-import { createFloatPage, createFloatMaster } from './float'
+import { crateFloat } from './float'
 
 /**
  * 多线程任务基类
@@ -49,8 +49,8 @@ export default class TaskSuper {
     const masterDivertor = this.$$floatDivertor.master
 
     /*浮动页面对,浮动对象比任何层级都都要高,超过母版*/
-    if (pageDivertor.ids && pageDivertor.ids.length) {
-      createFloatPage(
+    if (pageDivertor.ids.length) {
+      crateFloat('floatPage',
         pipeData,
         pageDivertor,
         this.getStyle,
@@ -58,12 +58,13 @@ export default class TaskSuper {
           pageDivertor.container = container;
           this.pageBaseHooks.floatPages(pageDivertor);
           complete(pipeData);
-        })
+        }
+      )
     }
 
     /*如果存在母版浮动节点,在创建节点structure中过滤出来，根据参数的tipmost*/
-    if (masterDivertor.ids && masterDivertor.ids.length) {
-      createFloatMaster(
+    if (masterDivertor.ids.length) {
+      crateFloat('floatMaster',
         pipeData,
         masterDivertor,
         this.getStyle,
@@ -71,7 +72,8 @@ export default class TaskSuper {
           masterDivertor.container = container;
           this.pageBaseHooks.floatMasters(masterDivertor);
           complete(pipeData);
-        })
+        }
+      )
     }
   }
 

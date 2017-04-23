@@ -5,7 +5,7 @@ import { nextTick } from '../../../../../util/nexttick'
  *创建浮动相关的信息
  * @return {[type]} [description]
  */
-function crateFloat(floatName, dasFloat, pipeData, baseGetStyle, complete) {
+export function crateFloat(floatName, pipeData, dasFloat, baseGetStyle, complete) {
 
   var content = [];
   var prefix = 'Content_' + pipeData.chapterIndex + "_";
@@ -65,30 +65,4 @@ function crateFloat(floatName, dasFloat, pipeData, baseGetStyle, complete) {
   nextTick({ container, content }, () => {
     complete(container)
   });
-}
-
-
-
-/**
- * 创建浮动的页面对象
- */
-export function createFloatPage(pipeData, pageDivertor, baseGetStyle, complete) {
-  crateFloat('floatPage',
-    pageDivertor,
-    pipeData,
-    baseGetStyle,
-    complete
-  )
-}
-
-/**
- * 创建浮动母版对象
- */
-export function createFloatMaster(pipeData, masterDivertor, baseGetStyle, complete) {
-  crateFloat('floatMaster',
-    masterDivertor,
-    pipeData,
-    baseGetStyle,
-    complete
-  )
 }
