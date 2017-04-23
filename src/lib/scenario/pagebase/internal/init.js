@@ -104,7 +104,7 @@ export default function(baseProto) {
      * 1 母版
      * 2 页面
      */
-    const floatContentGroup = this.floatContentGroup = {
+    const floatGroup = this.floatGroup = {
 
       /**
        * 页面浮动对象容器
@@ -173,17 +173,17 @@ export default function(baseProto) {
        * 用于是最顶层的，比母版浮动对象还要高
        * 所以这个浮动对象需要跟随页面动
        */
-      floatPages(data) {
+      floatPages(divertor) {
         //浮动页面对象容器
         let contentObj
-        floatContentGroup.pageContainer = data.container;
-        _.each(data.ids, function(id) {
+        floatGroup.pageContainer = divertor.container;
+        _.each(divertor.ids, function(id) {
           if (contentObj = instance.baseGetContentObject(id)) {
             //初始视察坐标
             if (contentObj.parallax) {
               contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
             }
-            floatContentGroup.pageGroup[id] = contentObj
+            floatGroup.pageGroup[id] = contentObj
           } else {
             console.log('页面浮动对象找不到')
           }
@@ -196,22 +196,20 @@ export default function(baseProto) {
        * 2 浮动的对象是用于零件类型,这边只提供创建
        *  所以需要制造一个空的容器，用于母版交界动
        */
-      floatMasters(data) {
-
+      floatMasters(divertor) {
         let contentObj
         let contentNode
-
         //浮动容器
-        floatContentGroup.masterContainer = data.container;
+        floatGroup.masterContainer = divertor.container;
         //浮动对象
-        _.each(data.ids, function(id) {
+        _.each(divertor.ids, function(id) {
           //转化成实际操作的浮动对象,保存
           if (contentObj = instance.baseGetContentObject(id)) {
             //初始视察坐标
             if (contentObj.parallax) {
               contentObj.parallaxOffset = contentObj.parallax.parallaxOffset;
             }
-            floatContentGroup.masterGroup[id] = contentObj
+            floatGroup.masterGroup[id] = contentObj
           } else {
             Xut.plat.isBrowser && console.log('浮动母版对象数据不存在原始对象,制作伪对象母版移动', id)
 
@@ -230,7 +228,7 @@ export default function(baseProto) {
             }
             //制作一个伪数据
             //作为零件类型的空content处理
-            floatContentGroup.masterGroup[id] = {
+            floatGroup.masterGroup[id] = {
               id: id,
               chapterIndex: instance.chapterIndex,
               $contentNode: $(contentNode),

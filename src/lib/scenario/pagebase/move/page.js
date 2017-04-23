@@ -18,23 +18,21 @@ export default function(baseProto) {
     const pageNode = this.$pageNode[0]
 
     //浮动页面
-    if(this.pageType === 'page') {
-      //移动浮动页面容器
-      const $floatElement = this.floatContentGroup.pageContainer
-      if($floatElement) {
-        translation[action]($floatElement[0], distance, speed)
+    if (this.pageType === 'page') {
+      const floatPageContainer = this.floatGroup.pageContainer
+      if (floatPageContainer) {
+        translation[action](floatPageContainer[0], distance, speed)
       }
     }
 
     //浮动母版
-    if(this.pageType === 'master') {
+    if (this.pageType === 'master') {
       //母版交接判断
       //用户事件的触发
       this.onceMaster = false
-        //移动浮动容器
-      const $masterElement = this.floatContentGroup.masterContainer
-      if($masterElement) {
-        translation[action]($masterElement[0], distance, speed)
+      const floatMasterContainer = this.floatGroup.masterContainer
+      if (floatMasterContainer) {
+        translation[action](floatMasterContainer[0], distance, speed)
       }
     }
 
@@ -52,7 +50,7 @@ export default function(baseProto) {
     1 增加页面标记
     2 处理页面回调
      */
-    if(action === 'flipOver') {
+    if (action === 'flipOver') {
       /*
          如果outerCall存在，就是外部调用翻页的的情况下处理
          修复一个bug,超快速翻页的时候(speed<300)，动画结束事件会丢失页面
@@ -60,8 +58,8 @@ export default function(baseProto) {
          通过回调中手动调用tiggerFilpComplete事件处理
          这里扩大下speed的范围
        */
-      if(outerCallFlip) {
-        if(speed < 100) {
+      if (outerCallFlip) {
+        if (speed < 100) {
           speed = 0
           fixQuickFlip = true
         }
@@ -72,7 +70,7 @@ export default function(baseProto) {
         保证指向始终是当前页面
         翻页 && 是母版页 && 是当前页面
        */
-      if(this.pageType === 'page' &&
+      if (this.pageType === 'page' &&
         distance === viewOffset) {
         /*标记可视区页面*/
         isVisual = true
@@ -89,7 +87,7 @@ export default function(baseProto) {
         timer = setTimeout(function() {
           clearTimeout(timer)
           timer = null
-          if(pageNode.getAttribute('data-visual')) {
+          if (pageNode.getAttribute('data-visual')) {
             $warn('translate3d丢失了，通过定时器手动调用')
             toTranslateCB = null
             Xut.Application.tiggerFilpComplete(pageNode, true)
@@ -106,7 +104,7 @@ export default function(baseProto) {
       1.flipMode === 'ban'，关闭了翻页效果，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if(isVisual && (fixQuickFlip || config.launch.flipMode === 'ban')) {
+      if (isVisual && (fixQuickFlip || config.launch.flipMode === 'ban')) {
         Xut.Application.tiggerFilpComplete(pageNode, true)
         return true
       }

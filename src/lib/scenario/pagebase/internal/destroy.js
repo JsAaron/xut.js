@@ -52,7 +52,7 @@ export default function(baseProto) {
     }
 
     //浮动对象
-    const floatMaterContents = this.floatContentGroup.masterGroup
+    const floatMaterContents = this.floatGroup.masterGroup
 
     //是否有浮动对象
     const hasFloatMater = !_.isEmpty(floatMaterContents);
@@ -71,13 +71,13 @@ export default function(baseProto) {
     }
 
     //清除母版浮动容器
-    if (hasFloatMater && this.floatContentGroup.masterContainer) {
-      this.floatContentGroup.masterContainer.remove();
+    if (hasFloatMater && this.floatGroup.masterContainer) {
+      this.floatGroup.masterContainer.remove();
     }
 
     //清除浮动页面对象
-    if (this.floatContentGroup.pageGroup && this.floatContentGroup.pageContainer) {
-      this.floatContentGroup.pageContainer.remove();
+    if (this.floatGroup.pageGroup && this.floatGroup.pageContainer) {
+      this.floatGroup.pageContainer.remove();
     }
 
     //清理零件类型对象

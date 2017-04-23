@@ -21,23 +21,18 @@ export default class TaskSuper {
   私有方法
    */
   $$initFloat() {
-    this.$$floatDivertor = {
-      //浮动页面
-      //母板事件引起的层级遮挡问题
-      //用于提升最高
-      page: {
-        'ids': [],
-        'zIndex': {},
-        'container': {} //浮动容器
-      },
-      //浮动模板
-      //用于实现模板上的事件
-      master: {
-        'ids': [], //浮动id
-        'container': {}, //浮动容器
-        'zIndex': {}
+    /*
+     1.浮动页面,母板事件引起的层级遮挡问题,用于提升最高
+     2.浮动模板,用于实现模板上的事件
+     */
+    this.$$floatDivertor = {}
+    _.each(['page', 'master'], type => {
+      this.$$floatDivertor[type] = {
+        'ids': [], //保存合集
+        'zIndex': {}, //保存索引
+        'container': null //浮动容器
       }
-    }
+    })
   }
 
   /*
@@ -56,7 +51,7 @@ export default class TaskSuper {
         pipeData,
         pageDivertor,
         this.getStyle,
-        (container) => {
+        container => {
           pageDivertor.container = container;
           this.pageBaseHooks.floatPages(pageDivertor);
           complete(pipeData);
@@ -70,7 +65,7 @@ export default class TaskSuper {
         pipeData,
         masterDivertor,
         this.getStyle,
-        (container) => {
+        container => {
           masterDivertor.container = container;
           this.pageBaseHooks.floatMasters(masterDivertor);
           complete(pipeData);
