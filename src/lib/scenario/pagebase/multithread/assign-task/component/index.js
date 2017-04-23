@@ -12,7 +12,7 @@ import { reviseSize } from '../../../../../util/option'
 
 export default class TaskComponents extends TaskSuper {
 
-  constructor(data, success, detector) {
+  constructor(pipeData, success, detector) {
 
     super(detector)
 
@@ -22,82 +22,121 @@ export default class TaskComponents extends TaskSuper {
       return;
     }
 
-    if (data.activitys && data.activitys.length) {
+    if (pipeData.activitys && pipeData.activitys.length) {
       this.success = success
-      this.$containsNode = data.$containsNode
-      this._checkNextTask(this._create(data));
+      this.$containsNode = pipeData.$containsNode
+      this._checkNextTask(this._create(pipeData));
     } else {
       success();
     }
   }
 
 
-  _create(data) {
-    var actType,
-      pageType = data.pageType,
-      createWidgets = data.activitys,
-      chpaterData = data.chpaterData,
-      chapterId = data.chapterId,
-      chapterIndex = data.chapterIndex,
-      widgetRetStr = [];
+  /*
+  初始化浮动页面参数
+   */
+  _initFloat() {
+    return {
+      'page': [],
+      'master': []
+    }
+  }
 
-    //创建
-    function startCreate(actType, activityData) {
-      //创建DOM元素结构
-      //返回是拼接字符串
-      widgetRetStr.push(directives[actType]['createDom'](
-        activityData, chpaterData, chapterId, chapterIndex, Xut.zIndexlevel(), pageType
-      ));
+  /*创建dom节点，但是浮动类型例外*/
+  _create(pipeData) {
+
+    const {
+      pageType,
+      activitys,
+      chpaterData,
+      chapterId,
+      chapterIndex
+    } = pipeData
+
+    let resultHTML = [];
+
+    let flostDivertor = this._initFloat()
+
+    /*
+      创建DOM元素结构,返回是拼接字符串
+      判断返回值
+      1 纯html
+      2 对象（浮动音频处理）
+    */
+    const createDom = function(actType, activityData) {
+      activityData = reviseSize({
+        results: activityData,
+        proportion: pipeData.getStyle.pageProportion
+      })
+      const result = directives[actType]['createDom'](
+        activityData,
+        chpaterData,
+        chapterId,
+        chapterIndex,
+        Xut.zIndexlevel(),
+        pageType
+      )
+      if (_.isString(result)) {
+        resultHTML.push(result)
+      } else {
+        resultHTML.push(result.html)
+        if (result.hasFloat) {
+          /*这个参数要传递到content中*/
+          // flostDivertor[pageType].push(result.html)
+        } else {
+          // resultHTML.push(result.html)
+        }
+      }
     }
 
     //需要创建的数据结构
-    createWidgets.forEach(function(activityData, index) {
-
+    activitys.forEach(function(activityData, index) {
       //创建类型
-      actType = activityData.actType || activityData.animation;
-
+      let actType = activityData.actType || activityData.animation;
       //特殊类型 showNote
       if (!actType && activityData.note) {
         activityData['actType'] = actType = "ShowNote";
       }
-
       switch (actType) {
         case 'ShowNote':
         case 'Action':
         case 'Widget':
         case 'Audio':
         case 'Video':
-          //缩放比
-          activityData = reviseSize({
-            results: activityData,
-            proportion: data.getStyle.pageProportion
-          });
-          startCreate(actType, activityData)
+          createDom(actType, activityData)
           break;
       }
     })
 
-    return widgetRetStr.join("");
+    return {
+      html: resultHTML.join(""),
+      flostDivertor
+    }
   }
 
   /**
    * 检测下个任务是否中断运行
    */
-  _checkNextTask(str) {
+  _checkNextTask(result) {
     this.$$checkNextTask('内部Component', () => {
-      this._render(str)
+      this._render(result)
     })
   }
 
 
   /*渲染页面*/
-  _render(str) {
+  _render(result) {
+    if (!result.html) {
+      this.destroy()
+      this.success(result.flostDivertor)
+      return
+    }
     Xut.nextTick({
       container: this.$containsNode,
-      content: $(str)
+      content: $(result.html)
     }, () => {
       this.destroy()
-      this.success()
+      this.success(result.flostDivertor)
     });
   }
 

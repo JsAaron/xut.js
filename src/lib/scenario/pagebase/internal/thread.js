@@ -42,10 +42,10 @@ export default function threadCheck(baseProto) {
   /**
    * 任务调度，自动创建下个任务
    */
-  baseProto.dispatchTasks = function() {
+  baseProto.dispatchTasks = function(...arg) {
     const threadtasks = this.threadtasks[this.threadTaskRelated.nextTaskName]
     if (threadtasks) {
-      threadtasks()
+      threadtasks(...arg)
     }
   }
 

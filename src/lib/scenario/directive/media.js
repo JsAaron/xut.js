@@ -1,6 +1,6 @@
 import { parseJSON, getFileFullPath } from '../../util/index'
 import { config } from '../../config/index'
-import { triggerAudio, autoAudio } from '../../component/audio/manager'
+import { triggerAudio, autoAudio, getAudioData } from '../../component/audio/manager'
 import { triggerVideo, autoVideo, hasVideoObj } from '../../component/video/manager'
 
 //临时音频动作数据
@@ -17,7 +17,7 @@ const mediaIconSize = 74
  */
 const onlyCreateOnce = (id) => {
   let data = tempData[id]
-  if(data) {
+  if (data) {
     delete tempData[id]
     return data;
   }
@@ -38,35 +38,34 @@ export default {
     scaleLeft
   }, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
-    let html
     let mediaIcon = ''
     let startImage = ''
 
     //如果没有宽高则不创建绑定节点
-    if(!scaleWidth || !scaleHeight) return ''
+    if (!scaleWidth || !scaleHeight) return ''
 
     //解析音乐动作
     //冒泡动作靠节点传递数据
-    if(itemArray) {
+    if (itemArray) {
       itemArray = parseJSON(itemArray);
       let start = itemArray[0];
       let stop = itemArray[1];
       tempData[_id] = {};
-      if(start) {
-        if(start.startImg) {
+      if (start) {
+        if (start.startImg) {
           startImage = start.startImg;
           tempData[_id]['startImg'] = startImage;
-          startImage = 'background-image:url(' + getFileFullPath(startImage,'hot-media') + ');';
+          startImage = 'background-image:url(' + getFileFullPath(startImage, 'hot-media') + ');';
         }
-        if(start.script) {
+        if (start.script) {
           tempData[_id]['startScript'] = start.script;
         }
       }
-      if(stop) {
-        if(stop.stopImg) {
+      if (stop) {
+        if (stop.stopImg) {
           tempData[_id]['stopImg'] = stop.stopImg;
         }
-        if(stop.script) {
+        if (stop.script) {
           tempData[_id]['stopScript'] = stop.script
         }
       }
@@ -74,7 +73,7 @@ export default {
 
     //只针对网页插件增加单独的点击界面
     //如果有视频图标
-    if(category == 'webpage' &&
+    if (category == 'webpage' &&
       (scaleWidth > 200) &&
       (scaleHeight > 100) &&
       (scaleWidth <= config.visualSize.width) &&
@@ -93,11 +92,23 @@ export default {
     //首字母大写
     const mediaType = category.replace(/(\w)/, v => v.toUpperCase())
 
+    /*
+    查找音频是否被浮动到页面,这个很特殊的处理
+    需要把节点合并到content种一起处理浮动对象
+     */
+    let hasFloat = false
+    if (mediaType === 'Audio') {
+      const audioData = getAudioData(mediaType, _id)
+      if (audioData && audioData.isfloat) {
+        hasFloat = true
+      }
+    }
+
     //创建音频对象
     //Webpage_1
     //Audio_1
     //Video_1
-    return String.styleFormat(
+    const html = String.styleFormat(
       `<div id="${mediaType + "_" + _id}"
             data-belong="${pageType}"
             data-delegate="${category}"
@@ -112,6 +123,11 @@ export default {
             ${mediaIcon}
        </div>`
     )
+
+    return {
+      html,
+      hasFloat
+    }
   }
 
   /**
@@ -127,8 +143,8 @@ export default {
     pageIndex,
     chapterId
   }) {
-    if(!category) return
-    if(category == 'audio') {
+    if (!category) return
+    if (category == 'audio') {
       autoAudio(chapterId, id, onlyCreateOnce(id));
     } else {
       autoVideo(chapterId, id, rootNode, pageIndex)
@@ -149,7 +165,7 @@ export default {
     activityId
   }) {
     const category = target.getAttribute('data-delegate')
-    if(category) {
+    if (category) {
       /**
        * 传入chapterId 页面ID
        * activityId    视频ID
@@ -157,11 +173,11 @@ export default {
        * 根节点
        */
       const chapterId = Xut.Presentation.GetPageId(pageIndex);
-      if(category == 'audio') {
+      if (category == 'audio') {
         triggerAudio(chapterId, activityId, onlyCreateOnce(id))
       } else {
         let videoObj = hasVideoObj(chapterId, activityId)
-        if(videoObj) {
+        if (videoObj) {
           videoObj.play()
         } else {
           triggerVideo(chapterId, activityId, rootNode, pageIndex)

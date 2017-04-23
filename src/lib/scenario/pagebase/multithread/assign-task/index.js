@@ -145,7 +145,7 @@
     * 分配Activity构建任务
     * @return {[type]} [description]
     */
-   'assgin-activity' (success, base) {
+   'assgin-activity' (success, base, componentFlostDivertor) {
 
      //通过content数据库为空处理
      if (Xut.data.preventContent) {
@@ -158,8 +158,6 @@
 
      const chapterData = base.chapterData
      const baseData = base.baseData()
-     const chapterId = baseData._id
-     const activitys = base.baseActivits()
 
      base.threadTaskRelated.assignTaskGroup['assgin-activity'] = new TaskActivitys({
        base,
@@ -170,13 +168,14 @@
        'pageType': base.pageType,
        'nodes': chapterData['nodes'],
        'pageOffset': chapterData['pageOffset'],
-       'activitys': activitys,
+       'activitys': base.baseActivits(),
        'chpaterData': baseData,
-       'chapterId': chapterId,
+       'chapterId': baseData._id,
        'pageIndex': base.pageIndex,
        'chapterIndex': base.chapterIndex,
        'pageBaseHooks': base.collectHooks,
-       'getStyle': base.getStyle
+       'getStyle': base.getStyle,
+       componentFlostDivertor
      }, success, function(...arg) {
        base.detectorTask(...arg)
      })

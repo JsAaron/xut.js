@@ -230,6 +230,7 @@ export default class TaskActivitys extends TaskSuper {
         }
       }()
 
+
       /*浮动页面对,浮动对象比任何层级都都要高,超过母版*/
       if (pipeData.floatPages.ids && pipeData.floatPages.ids.length) {
         createFloatPage(this, pipeData, complete)

@@ -63,8 +63,8 @@ export default function initThreadtasks(instance) {
   }
 
   /* 创建新任务*/
-  const createAssignTask = (taskName, fn) => {
-    return assignedTasks[taskName](fn, instance)
+  const createAssignTask = (taskName, fn, option) => {
+    return assignedTasks[taskName](fn, instance, option)
   }
 
 
@@ -196,12 +196,12 @@ export default function initThreadtasks(instance) {
      * 构件零件类型任务
      */
     component() {
-      createAssignTask('assign-component', function() {
+      createAssignTask('assign-component', function(flostDivertor) {
         setNextTaskName('activity')
         instance.detectorTask({
           'taskName': '外部contents',
           nextTask: function() {
-            instance.dispatchTasks();
+            instance.dispatchTasks(flostDivertor);
           }
         });
       })
@@ -210,11 +210,11 @@ export default function initThreadtasks(instance) {
     /**
      * activity类型
      */
-    activity() {
+    activity(componentFlostDivertor) {
       createAssignTask('assgin-activity', function() {
         setNextTaskName('complete')
         threadTaskRelated.createTasksComplete();
-      })
+      }, componentFlostDivertor)
     }
   }
 
