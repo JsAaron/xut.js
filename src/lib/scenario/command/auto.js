@@ -63,19 +63,19 @@ const autoContents = (contentObjs, taskAnimCallback) => {
  */
 const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
 
-  let chapterId = pageObj.baseGetPageId(pageIndex)
-  let dir
-
   if (pageIndex === undefined) {
     pageIndex = Xut.Presentation.GetPageIndex()
   }
 
+  let chapterId = pageObj.baseGetPageId(pageIndex)
+  let directive
+
   _.each(autoData, (data, index) => {
-    dir = directives[data.actType]
-      //零件类型的接口调用不一致
-      //这里需要转接口处理
-    if (dir && dir.autoPlay) {
-      dir.autoPlay({
+    directive = directives[data.actType]
+    //零件类型的接口调用不一致
+    //这里需要转接口处理
+    if (directive && directive.autoPlay) {
+      directive.autoPlay({
         'id': data.id,
         'pageType': pageType,
         'rootNode': pageObj.getContainsNode(),

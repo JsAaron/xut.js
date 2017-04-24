@@ -15,7 +15,7 @@ export default class AudioSuper {
    * @param  {[type]} options [description]
    * @return {[type]}         [description]
    */
-  preRelated(trackId, options) {
+  $$preRelated(trackId, options) {
     //完成end后 外部回调删除这个对象
     //单独调用引用对象
     //传递一个 options.complete
@@ -31,23 +31,23 @@ export default class AudioSuper {
    * @param  {[type]} controlDoms [description]
    * @return {[type]}             [description]
    */
-  afterRelated(options, controlDoms) {
+  $$afterRelated(options, controlDoms) {
     //音频重复播放次数
-    if(options.data && options.data.repeat) {
+    if (options.data && options.data.repeat) {
       this.repeat = Number(options.data.repeat); //需要重复
     }
     //音频动作
-    if(options.action) {
+    if (options.action) {
       this.acitonObj = Action(options);
     }
     //字幕对象
-    if(options.subtitles && options.subtitles.length > 0) {
+    if (options.subtitles && options.subtitles.length > 0) {
       //创建字幕对象
       this.subtitleObject = new Subtitle(options, controlDoms, (cb) => this.getAudioTime(cb))
     }
 
     //如果有外部回调处理
-    if(this.outerCallback) {
+    if (this.outerCallback) {
       this.outerCallback.call(this);
     }
 
@@ -59,15 +59,16 @@ export default class AudioSuper {
    * @param  {[type]} sysCommand [description]
    * @return {[type]}            [description]
    */
-  callbackProcess(sysCommand) {
-    if(this.outerCallback) { //外部调用结束
+  $$callbackProcess(sysCommand) {
+    if (this.outerCallback) { //外部调用结束
       this.end()
     } else {
       //安卓没有重复播放
       //phonegap未处理
-      if(!Xut.plat.isAndroid && this.repeat) {
+      if (!Xut.plat.isAndroid && this.repeat) {
         //如果需要重复
-        this.repeatProcess()
+        --this.repeat;
+        this.play()
       } else {
         //外部清理对象
         //audioManager中直接删当前对象
@@ -76,31 +77,23 @@ export default class AudioSuper {
     }
   }
 
-  /**
-   * 重复处理
-   * @return {[type]} [description]
-   */
-  repeatProcess() {
-    --this.repeat;
-    this.play()
-  }
 
   /**
    * 播放
    * @return {[type]} [description]
    */
-  play() {
+  $$play() {
     //flash模式不执行
-    if(this.audio && !this.isFlash) {
+    if (this.audio && !this.isFlash) {
       this.status = 'playing';
       //支持自动播放
-      if(Xut.plat.hasAutoPlayAudio && window.WeixinJSBridge) {
+      if (Xut.plat.hasAutoPlayAudio && window.WeixinJSBridge) {
         //微信上单独处理
         window.WeixinJSBridge.invoke('getNetworkType', {}, (e) => {
           this.audio.play();
         });
       } else {
-        this.audio.play();
+        this.audio.play && this.audio.play();
       }
     }
     this.acitonObj && this.acitonObj.play();
@@ -110,9 +103,9 @@ export default class AudioSuper {
    * 停止
    * @return {[type]} [description]
    */
-  pause() {
+  $$pause() {
     this.status = 'paused';
-    this.audio.pause();
+    this.audio && this.audio.pause && this.audio.pause();
     this.acitonObj && this.acitonObj.pause();
   }
 
@@ -120,25 +113,23 @@ export default class AudioSuper {
    * 销毁
    * @return {[type]} [description]
    */
-  end() {
+  $$destroy() {
     this.status = 'ended';
-    this.audio.end();
-    this.audio = null;
+    this._$$destroyRelated();
     this.acitonObj && this.acitonObj.destroy();
   }
 
   /**
-   * 相关
-   * @return {[type]} [description]
+   * 销毁相关
    */
-  destroyRelated() {
+  _$$destroyRelated() {
     //销毁字幕
-    if(this.subtitleObject) {
+    if (this.subtitleObject) {
       this.subtitleObject.destroy()
       this.subtitleObject = null;
     }
     //动作
-    if(this.acitonObj) {
+    if (this.acitonObj) {
       this.acitonObj.destroy();
       this.acitonObj = null;
     }

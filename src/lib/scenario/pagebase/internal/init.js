@@ -176,12 +176,12 @@ export default function (baseProto) {
        */
       floatPages(divertor) {
 
-        if (divertor && floatGroup.masterContainer) {
-          $warn('设置floatPages重复masterContainer')
+        /*component与activity共享了一个Container，所以只能处理一次*/
+        if (divertor && floatGroup.pageContainer) {
+          $warn('floatPages重复pageContainer', 'info')
+        } else {
+          floatGroup.pageContainer = divertor.container;
         }
-
-        //浮动页面对象容器
-        floatGroup.pageContainer = divertor.container;
 
         if (divertor.ids.length) {
           let contentObj
@@ -207,12 +207,12 @@ export default function (baseProto) {
        */
       floatMasters(divertor) {
 
+        /*component与activity共享了一个Container，所以只能处理一次*/
         if (divertor && floatGroup.masterContainer) {
-          $warn('设置floatMasters重复masterContainer')
+          $warn('floatMasters重复masterContainer', 'info')
+        } else {
+          floatGroup.masterContainer = divertor.container;
         }
-
-        //浮动容器
-        floatGroup.masterContainer = divertor.container;
 
         if (divertor.ids.length) {
           let contentObj

@@ -15,11 +15,21 @@ const resolution = window.screen
 
 /**
  * 获取容器
+ * 1 浮动视频单独处理
+ * 2 没有浮动视频
  * @return {[type]} [description]
  */
-const getContainer = container => {
+const getContainer = options => {
+
+  /*视频已经浮动,找到浮动容器的根节点floatGroup*/
+  if (options.isfloat) {
+    return Xut.Presentation.GetFloatContainer(options.pageType)
+  }
+
+  const container = options.container
+
   //jquery对象
-  if(container.length) {
+  if (container.length) {
     return container.children()
   }
   //dom
@@ -33,12 +43,12 @@ const getContainer = container => {
 const _WebPage = options => {
 
   let pageUrl = options.pageUrl;
-  let container = getContainer(options.container)
+  let container = getContainer(options)
 
   //跳转app市场
   //普通网页是1
   //跳转app市场就是2
-  if(options.hyperlink == 2) {
+  if (options.hyperlink == 2) {
     //跳转到app市场
     window.open(pageUrl)
       //数据统计
@@ -53,7 +63,7 @@ const _WebPage = options => {
       top = options.top,
       $videoNode, eleWidth, eleHeight;
 
-    if(padding) {
+    if (padding) {
       eleWidth = width - 2 * padding;
       eleHeight = height - 2 * padding;
     } else {
@@ -86,7 +96,7 @@ const _WebPage = options => {
       $videoNode && $videoNode.hide();
     },
     close() {
-      if($videoNode) {
+      if ($videoNode) {
         $videoNode.remove();
         $videoNode = null;
       }
@@ -150,7 +160,7 @@ const _Media = options => {
   //如果是安卓平台，视频插件去的分辨率
   //所以这里要把 可以区尺寸，转成分辨率
   //读库强制全屏
-  if(window.DUKUCONFIG) {
+  if (window.DUKUCONFIG) {
     width = resolution.width
     height = resolution.height
     top = 0
@@ -208,10 +218,10 @@ const createVideoWrap = (type, options) => {
  *  var video = new Video({url:'1.mp4',width:'320',...});
  *  video.play();
  */
-const _Video5 = options => {
+const _nativeVideo = options => {
 
   let { width, height, top, left, zIndex, url } = options
-  let container = getContainer(options.container)
+  let container = getContainer(options)
   let src = config.getVideoPath() + url
 
   let $videoWrap = createVideoWrap('video-h5', {
@@ -256,14 +266,14 @@ const _Video5 = options => {
   function stop() {
     video.pause()
       //妙妙学只需要停止
-    if(!window.MMXCONFIG) {
+    if (!window.MMXCONFIG) {
       //复位视频
-      if(video.duration) {
+      if (video.duration) {
         video.currentTime = 0.01;
       }
       $videoWrap.hide();
       //用于启动视频
-      if(options.startBoot) {
+      if (options.startBoot) {
         options.startBoot();
         destroy();
       }
@@ -276,15 +286,15 @@ const _Video5 = options => {
    * @return {[type]} [description]
    */
   function error() {
-    if(options.startBoot) {
+    if (options.startBoot) {
       options.startBoot();
     }
-    removeVideo(options.pageId);
+    removeVideo(options.chapterId);
   }
 
   function clear() {
     stop()
-    removeVideo(options.pageId);
+    removeVideo(options.chapterId);
   }
 
   /**
@@ -309,10 +319,9 @@ const _Video5 = options => {
   //安卓ios需要直接调用play开始
   //移动端必须触发2次play
   ////////////////////////
-  if(Xut.plat.isIOS || Xut.plat.isAndroid) {
+  if (Xut.plat.isIOS || Xut.plat.isAndroid) {
     play()
   }
-
 
   container.append($videoWrap);
 
@@ -329,8 +338,8 @@ const _Video5 = options => {
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-const _FlareVideo = function(options) {
-  let container = getContainer(options.container)
+const _FlareVideo = function (options) {
+  let container = getContainer(options)
   let url = config.getVideoPath() + options.url
   let { width, height, top, left, zIndex } = options
 
@@ -355,13 +364,13 @@ const _FlareVideo = function(options) {
   container.append($videoWrap)
 
   return {
-    play: function() {
+    play: function () {
       fv.play()
     },
-    stop: function() {
+    stop: function () {
       fv.pause()
     },
-    close: function() {
+    close: function () {
       fv.remove()
       fv = null
       container = null
@@ -369,31 +378,35 @@ const _FlareVideo = function(options) {
   }
 }
 
+
+
+
+
 let VideoPlayer = null
 
 //浏览器平台
-if(Xut.plat.isBrowser) {
+if (Xut.plat.isBrowser) {
   // 安卓妙妙学强制走h5
   // 由于原生H5控制条不显示的问题
   // 这里用插件播放ch
-  if(Xut.plat.isAndroid) {
+  if (Xut.plat.isAndroid) {
     VideoPlayer = _FlareVideo
   } else {
     //pc ios 浏览器打开方式
-    VideoPlayer = _Video5
+    VideoPlayer = _nativeVideo
   }
 } else {
   //apk ipa
-  if(Xut.plat.isIOS || top.EduStoreClient) {
+  if (Xut.plat.isIOS || top.EduStoreClient) {
     //如果是ibooks模式
-    if(Xut.IBooks.Enabled) {
+    if (Xut.IBooks.Enabled) {
       VideoPlayer = _FlareVideo
     } else {
       //如果是ios或读酷pc版则使用html5播放
-      VideoPlayer = _Video5
+      VideoPlayer = _nativeVideo
     }
-  } else if(Xut.plat.isAndroid) {
-    if(window.MMXCONFIG) {
+  } else if (Xut.plat.isAndroid) {
+    if (window.MMXCONFIG) {
       // 安卓妙妙学强制走h5
       // 由于原生H5控制条不显示的问题
       // 这里用插件播放
@@ -410,9 +423,9 @@ class VideoClass {
   constructor(options, container) {
 
     options.container = container;
-    if('video' == options.category) {
+    if ('video' == options.category) {
       this.video = VideoPlayer(options)
-    } else if('webpage' == options.category) {
+    } else if ('webpage' == options.category) {
       this.video = _WebPage(options);
     } else {
       console.log('options.category must be video or webPage ')
@@ -440,6 +453,6 @@ class VideoClass {
 
 
 export {
-  _Video5 as Video5,
+  _nativeVideo as Video5,
   VideoClass
 }

@@ -61,7 +61,7 @@ initBox()
  * 获取父容器
  * @return {[type]} [description]
  */
-let getParentDom = (subtitles, pageId, queryId) => {
+const getParentDom = (subtitles, pageId, queryId) => {
   //字幕数据
   var parentDoms = hash();
   var ancestorDoms = hash();
@@ -80,7 +80,7 @@ let getParentDom = (subtitles, pageId, queryId) => {
     }
 
     //找到对应的节点
-    _.each(subtitles, function(data) {
+    _.each(subtitles, function (data) {
       //'Content_0_1' 规则 类型_页码（0开始）_id
       if (!parentDoms[data.id]) {
         dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
@@ -102,17 +102,6 @@ let getParentDom = (subtitles, pageId, queryId) => {
   };
 }
 
-/**
- * 检测数据是否存在
- * @return {[type]}         [description]
- */
-let checkRepeat = (pageId, queryId, type) => {
-  var pBox = pageBox[type];
-  if (pBox && pBox[pageId] && pBox[pageId][queryId]) {
-    return true;
-  }
-  return false;
-}
 
 /**
  * 组合热点音频数据结构
@@ -120,7 +109,7 @@ let checkRepeat = (pageId, queryId, type) => {
  * 数据，页码编号，videoId, 查询的类型
  * @return {[type]}         [description]
  */
-let combination = (data, pageId, queryId, type, eleName) => {
+const combination = (data, pageId, queryId, type, eleName) => {
   var tempDoms;
   if (!pageBox[type]) {
     pageBox[type] = hash();
@@ -143,32 +132,50 @@ let combination = (data, pageId, queryId, type, eleName) => {
 }
 
 
+const deployAudio = (data, pageId, queryId, type, actionData) => {
+  //新的查询
+  const ret = combination(data, pageId, queryId, type, actionData);
+  //混入新的动作数据
+  //2015.9.24
+  //音频替换图片
+  //触发动画
+  if (actionData) {
+    _.extend(ret, actionData, {
+      action: true //快速判断存在动作数据
+    })
+  }
+}
+
+
+/**
+ * 检测数据是否已经装配过
+ * 缓存
+ */
+const hasAssembly = (pageId, queryId, type) => {
+  var pBox = pageBox[type];
+  if (pBox && pBox[pageId] && pBox[pageId][queryId]) {
+    return true;
+  }
+  return false;
+}
+
+
 /**
  * 装配音频数据
  * @param  {int} pageId    页面id或节的分组id
  * @param  {int} queryId   查询id,支持activityId,audioId
  * @param  {string} type   音频来源类型[动画音频,节音频,热点音频]
  */
-let deployAudio = (pageId, queryId, type, actionData) => {
+let assemblyData = (pageId, queryId, type, actionData) => {
   //避免复重查询
-  if (checkRepeat(pageId, queryId, type)) {
+  if (hasAssembly(pageId, queryId, type)) {
     return false;
   }
   //解析合集数据
-  var data = getAudioData(type, queryId);
+  var data = getMediaData(type, queryId);
   //存在音频文件
   if (data && data.md5) {
-    //新的查询
-    var ret = combination(data, pageId, queryId, type, actionData);
-    //混入新的动作数据
-    //2015.9.24
-    //音频替换图片
-    //触发动画
-    if (actionData) {
-      _.extend(ret, actionData, {
-        action: true //快速判断存在动作数据
-      })
-    }
+    deployAudio(data, pageId, queryId, type, actionData)
   }
 }
 
@@ -236,9 +243,6 @@ let loadAudio = (pageId, queryId, type) => {
   //检测
   var seAudio = preCheck(options);
 
-  //播放音频时关掉视频
-  // clearVideo()
-
   //构建播放列表
   if (!playBox[type]) {
     playBox[type] = hash();
@@ -267,17 +271,15 @@ let loadAudio = (pageId, queryId, type) => {
 
 /**
  * 交互点击
- * @param  {int} pageId     [description]
- * @param  {int} queryId    [description]
- * @param  {string} type    ACTIVIT
- * @return {[type]}         [description]
  */
 let loadTiggerAudio = (pageId, queryId, type) => {
   var playObj, status;
+
   if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
     playObj = playBox[type][pageId][queryId];
     status = playObj.audio ? playObj.status : null;
   }
+
   switch (status) {
     case 'playing':
       playObj.pause();
@@ -296,7 +298,7 @@ let loadTiggerAudio = (pageId, queryId, type) => {
  * 清理全部音频
  * @return {[type]} [description]
  */
-let removeAudio = () => {
+const removeAudio = () => {
   var t, p, a;
   for (t in playBox) {
     for (p in playBox[t]) {
@@ -309,53 +311,52 @@ let removeAudio = () => {
 }
 
 
-
 ///////////////////
 //1 独立音频处理, 音轨/跨页面 //
 //2 动画音频,跟动画一起播放与销毁
 ///////////////////
 
+/*
+ 音频在创建dom的时候需要查下，这个hot对象是否已经被创建过
+ 如果创建过，那么图标状态需要处理
+*/
+export function hasHotAudioPlay(pageId, queryId) {
+  if (playBox[ACTIVIT] && playBox[ACTIVIT][pageId]) {
+    const audioObj = playBox[ACTIVIT][pageId][queryId]
+    if (audioObj && audioObj.status === 'playing') {
+      return true
+    }
+  }
+}
+
 /**
- * 获取音频数据
- * @param  {[type]} type    [description]
- * @param  {[type]} queryId [description]
- * @return {[type]}         [description]
+ * 自动播放触发接口
  */
-export function getAudioData(type, queryId) {
+export function autoAudio(chapterId, activityId, actionData) {
+  assemblyData(chapterId, activityId, ACTIVIT, actionData);
+  loadAudio(chapterId, activityId, ACTIVIT);
+}
+
+
+/**
+ * 手动触发
+ */
+export function triggerAudio(chapterId, activityId, actionData) {
+  assemblyData(chapterId, activityId, ACTIVIT, actionData);
+  loadTiggerAudio(chapterId, activityId, ACTIVIT);
+}
+
+
+/**
+ * 获取媒体数据，视频音频
+ */
+export function getMediaData(type, queryId) {
   if (type === 'ANIMATE' || type === 'SEASON') {
     return Xut.data.query('Video', queryId, true);
   } else {
     return Xut.data.query('Video', queryId);
   }
 }
-
-
-/**
- * 自动播放触发接口
- * @param  {[type]} pageId     [description]
- * @param  {[type]} activityId [description]
- * @param  {[type]} actionData [description]
- * @return {[type]}            [description]
- */
-export function autoAudio(pageId, activityId, actionData) {
-  deployAudio(pageId, activityId, ACTIVIT, actionData);
-  loadAudio(pageId, activityId, ACTIVIT);
-}
-
-
-/**
- * 手动触发
- * @param  {[type]} pageId     [description]
- * @param  {[type]} activityId [description]
- * @param  {[type]} actionData [description]
- * @return {[type]}            [description]
- */
-export function triggerAudio(pageId, activityId, actionData) {
-  deployAudio(pageId, activityId, ACTIVIT, actionData);
-  loadTiggerAudio(pageId, activityId, ACTIVIT);
-}
-
-
 
 /**
  * 节音频触发接口
@@ -364,7 +365,7 @@ export function triggerAudio(pageId, activityId, actionData) {
  * @return {[type]}               [description]
  */
 export function seasonAudio(seasonAudioId, audioId) {
-  deployAudio(seasonAudioId, audioId, SEASON);
+  assemblyData(seasonAudioId, audioId, SEASON);
   loadAudio(seasonAudioId, audioId, SEASON);
 }
 
@@ -392,7 +393,7 @@ export function hangUpAudio() {
  * @return {[type]}         [description]
  */
 export function createContentAudio(pageId, audioId) {
-  deployAudio(pageId, audioId, ANIMATE);
+  assemblyData(pageId, audioId, ANIMATE);
   loadAudio(pageId, audioId, ANIMATE);
 }
 

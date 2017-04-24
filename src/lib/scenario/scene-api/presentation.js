@@ -50,11 +50,26 @@ export function extendPresentation(access, $globalEvent) {
     Xut.Presentation[apiName] = (pageType, pageIndex) => {
       return access((manager, pageType, pageIndex) => {
         pageIndex = isExistIndex(pageIndex)
-        /*$$-manage-super接口*/
+          /*$$-manage-super接口*/
         return manager["$$" + apiName](pageIndex, pageType)
       }, pageType, pageIndex)
     }
   })
+
+  /*
+  获取浮动元素的根节点
+  1 page
+  2 master
+   */
+  Xut.Presentation.GetFloatContainer = function (pageType) {
+    const pageObj = Xut.Presentation.GetPageObj(pageType)
+    const containerName = pageType === 'page' ? 'pageContainer' : 'masterContainer'
+    if (pageObj.floatGroup[containerName].length) {
+      return pageObj.floatGroup[containerName]
+    } else {
+      $warn(pageType + ',浮动根节点没有找到')
+    }
+  }
 
   /**
    * 获取页面的总数据
@@ -126,14 +141,14 @@ export function extendPresentation(access, $globalEvent) {
   /**
    * 创建一个content的命名规则
    */
-  Xut.Presentation.MakeContentPrefix = function(pageIndex) {
+  Xut.Presentation.MakeContentPrefix = function (pageIndex) {
     return prefix + Xut.Presentation.GetPagePrefix(pageIndex) + "_";
   }
 
   /**
    * 获取命名规则
    */
-  Xut.Presentation.GetContentName = function(id) {
+  Xut.Presentation.GetContentName = function (id) {
     if (id) {
       return prefix + Xut.Presentation.GetPagePrefix() + "_" + id;
     } else {

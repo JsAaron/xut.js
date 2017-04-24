@@ -11,37 +11,46 @@ import { getFileFullPath } from '../../util/option'
 //指定动画
 export function Action(options) {
 
-  var audioNode = document.querySelector('#Audio_' + options.audioId)
+  let audioNode, pageType
 
-  //页面从属
-  var pageType = audioNode.getAttribute('data-belong')
+  /*这里需要注意，浮动音频的情况，翻页DOM被重新创建，所以这里要每次要重新获取最新的*/
+  const getNode = function () {
+    audioNode = document.querySelector('#Audio_' + options.audioId)
+  }
 
   //切换背景
-  function toggle(fileName) {
-    if(fileName) {
+  const toggleImage = function (fileName) {
+    getNode() //每次都重新获取新的节点
+    if (audioNode) {
       audioNode.style.backgroundImage = `url(${ getFileFullPath(fileName,'audio-action')})`
     }
   }
 
-  function run(ids) {
+  const runAssist = function (ids) {
     ids = ids.split(',');
     Xut.Assist.Run(pageType, ids)
   }
 
-  function stop(ids) {
+  const stopAssist = function (ids) {
     ids = ids.split(',');
     Xut.Assist.Stop(pageType, ids)
   }
+
+  getNode()
+
+  pageType = audioNode.getAttribute('data-belong')
+
   return {
-    play: function() {
-      options.startImg && toggle(options.startImg)
-      options.startScript && run(options.startScript);
+    play: function () {
+      options.startImg && toggleImage(options.startImg)
+      options.startScript && runAssist(options.startScript);
     },
-    pause: function() {
-      options.stopImg && toggle(options.stopImg)
-      options.stopScript && stop(options.startScript);
+    pause: function () {
+      options.stopImg && toggleImage(options.stopImg)
+      options.stopScript && stopAssist(options.startScript);
     },
-    destroy: function() {
+    destroy: function () {
+      this.pause()
       audioNode = null;
     }
   }

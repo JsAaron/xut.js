@@ -1,7 +1,7 @@
 import { parseJSON, getFileFullPath } from '../../util/index'
 import { config } from '../../config/index'
-import { triggerAudio, autoAudio, getAudioData } from '../../component/audio/manager'
-import { triggerVideo, autoVideo, hasVideoObj } from '../../component/video/manager'
+import { triggerAudio, autoAudio, getMediaData, hasHotAudioPlay } from '../../component/audio/manager'
+import { triggerVideo, autoVideo } from '../../component/video/manager'
 
 //临时音频动作数据
 const tempData = {}
@@ -40,6 +40,7 @@ export default {
 
     let mediaIcon = ''
     let startImage = ''
+    let pauseImage = ''
 
     //如果没有宽高则不创建绑定节点
     if (!scaleWidth || !scaleHeight) return ''
@@ -64,6 +65,7 @@ export default {
       if (stop) {
         if (stop.stopImg) {
           tempData[_id]['stopImg'] = stop.stopImg;
+          pauseImage = 'background-image:url(' + getFileFullPath(stop.stopImg, 'hot-media') + ');';
         }
         if (stop.script) {
           tempData[_id]['stopScript'] = stop.script
@@ -92,16 +94,23 @@ export default {
     //首字母大写
     const mediaType = category.replace(/(\w)/, v => v.toUpperCase())
 
+    /*默认状态*/
+    let imageBackground = pauseImage || startImage
+
+    /* 音频在创建dom的时候需要查下，这个hot对象是否已经被创建过
+       如果创建过，那么图标状态需要处理*/
+    if (hasHotAudioPlay(chapterId, _id)) {
+      imageBackground = startImage
+    }
+
     /*
-    查找音频是否被浮动到页面,这个很特殊的处理
+    查找视频音频是否被浮动到页面,这个很特殊的处理
     需要把节点合并到content种一起处理浮动对象
      */
     let hasFloat = false
-    if (mediaType === 'Audio') {
-      const audioData = getAudioData(mediaType, _id)
-      if (audioData && audioData.isfloat) {
-        hasFloat = true
-      }
+    const mediaData = getMediaData(mediaType, _id)
+    if (mediaData && mediaData.isfloat) {
+      hasFloat = true
     }
 
     //创建音频对象
@@ -117,7 +126,7 @@ export default {
                    left:${scaleLeft}px;
                    top:${scaleTop}px;
                    z-index:${zIndex};
-                   ${startImage}
+                   ${imageBackground}
                    background-size:100% 100%;
                    position:absolute;">
             ${mediaIcon}
@@ -138,6 +147,7 @@ export default {
   ,
   autoPlay({
     id,
+    pageType,
     category,
     rootNode,
     pageIndex,
@@ -147,10 +157,15 @@ export default {
     if (category == 'audio') {
       autoAudio(chapterId, id, onlyCreateOnce(id));
     } else {
-      autoVideo(chapterId, id, rootNode, pageIndex)
+      autoVideo({
+        pageType,
+        rootNode,
+        chapterId,
+        pageIndex,
+        'activityId': id
+      })
     }
   }
-
 
   /**
    * touchEnd 全局派发的点击事件
@@ -166,22 +181,19 @@ export default {
   }) {
     const category = target.getAttribute('data-delegate')
     if (category) {
-      /**
-       * 传入chapterId 页面ID
-       * activityId    视频ID
-       * eleName       节点名  //切换控制
-       * 根节点
-       */
-      const chapterId = Xut.Presentation.GetPageId(pageIndex);
+      /*音频点击可以是浮动母版了，所以这里必须要明确查找chapter属于的类型页面*/
+      const pageType = target.getAttribute('data-belong')
+      const chapterId = Xut.Presentation.GetPageId(pageType, pageIndex);
       if (category == 'audio') {
         triggerAudio(chapterId, activityId, onlyCreateOnce(id))
       } else {
-        let videoObj = hasVideoObj(chapterId, activityId)
-        if (videoObj) {
-          videoObj.play()
-        } else {
-          triggerVideo(chapterId, activityId, rootNode, pageIndex)
-        }
+        triggerVideo({
+          chapterId,
+          activityId,
+          rootNode,
+          pageIndex,
+          pageType
+        })
       }
     }
   }

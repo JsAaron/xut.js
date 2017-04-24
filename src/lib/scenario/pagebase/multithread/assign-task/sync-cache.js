@@ -11,30 +11,25 @@ export default function syncCache(base, callback) {
   const pageType = base.pageType
 
   /*缓存数据*/
-  const addCacheGruop = (namespace, data) => {
+  const cacheGruop = (namespace, data) => {
     let key;
-    if(!base.dataActionGroup[namespace]) {
+    if (!base.dataActionGroup[namespace]) {
       base.dataActionGroup[namespace] = data;
     } else {
-      for(key in data) {
+      for (key in data) {
         base.dataActionGroup[namespace][key] = data[key];
       }
     }
-  }
-
-  /*增加数据缓存*/
-  const addCache = (data, activitys, autoData) => {
-    addCacheGruop(pageType, data); //挂载页面容器数据
-    addCacheGruop('activitys', activitys); //挂载activitys数据
-    addCacheGruop('auto', autoData); //挂载自动运行数据
   }
 
   query(pageType, {
     'pageIndex': base.chapterIndex,
     'pageData': base.chapterData,
     'pptMaster': base.pptMaster
-  }, function(data, activitys, autoData) {
-    addCache.apply(addCache, arguments)
+  }, function (data, activitys, autoData) {
+    cacheGruop(pageType, data); //挂载页面容器数据
+    cacheGruop('activitys', activitys); //挂载activitys数据
+    cacheGruop('auto', autoData); //挂载自动运行数据
     callback(data);
   })
 }
