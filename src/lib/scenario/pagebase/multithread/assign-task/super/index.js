@@ -40,20 +40,39 @@ export default class TaskSuper {
   创建浮动
   1 页面浮动层
   2 母版浮动层
+  baseFloatGroup: pagebase中的基础，用来处理是否容器已经创建
    */
-  $$createFloatLayer(pipeData, complete) {
+  $$createFloatLayer(complete, pipeData, baseFloatGroup) {
 
     const pageDivertor = this.$$floatDivertor.page
     const masterDivertor = this.$$floatDivertor.master
 
+    /*结束后清理，因为componnet中的条件会影响activity中的条件判断*/
+    const clearDivertor =  (divertor) =>{
+      if (divertor.html.length) {
+        divertor.html = null
+      }
+    }
+
+    //=====================================
+    //  ids 是content的id
+    //  html 是component的html字符
+    //  2个中有一个存在就需要处理浮动
+    //  但是需要注意component在content之前
+    //  所以component处理完毕后，要清理html
+    //  否则会影响content的判断
+    //=====================================
+
     /*浮动页面对,浮动对象比任何层级都都要高,超过母版*/
     if (pageDivertor.ids.length || pageDivertor.html.length) {
-      crateFloat('floatPage',
+      crateFloat('page',
         pipeData,
         pageDivertor,
+        baseFloatGroup,
         container => {
           pageDivertor.container = container;
           this.pageBaseHooks.floatPages(pageDivertor);
+          clearDivertor(pageDivertor)
           complete()
         }
       )
@@ -61,12 +80,14 @@ export default class TaskSuper {
 
     /*如果存在母版浮动节点,在创建节点structure中过滤出来，根据参数的tipmost*/
     if (masterDivertor.ids.length || masterDivertor.html.length) {
-      crateFloat('floatMaster',
+      crateFloat('master',
         pipeData,
         masterDivertor,
+        baseFloatGroup,
         container => {
           masterDivertor.container = container;
           this.pageBaseHooks.floatMasters(masterDivertor);
+          clearDivertor(masterDivertor)
           complete()
         }
       )
@@ -84,7 +105,7 @@ export default class TaskSuper {
   $$checkNextTask(taskName, nextTask, interrupt) {
     //构建中断方法
     const suspendTask = () => {
-      this.$$suspendQueues.push(function() {
+      this.$$suspendQueues.push(function () {
         nextTask()
       })
     }

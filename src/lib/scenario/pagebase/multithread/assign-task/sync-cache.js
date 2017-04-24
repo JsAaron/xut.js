@@ -6,7 +6,7 @@ import { query } from '../../../../database/query'
 2 auto
 3 activitys
  */
-export default function activeCache(base, callback) {
+export default function syncCache(base, callback) {
 
   const pageType = base.pageType
 

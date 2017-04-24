@@ -6,7 +6,7 @@ import { nextTick } from '../../../../../util/nexttick'
  *1 activity
  *2 component
  */
-export function crateFloat(floatName, pipeData, divertor, complete) {
+export function crateFloat(pageType, pipeData, divertor, baseFloatGroup, complete) {
 
   /*增加回调次数计算*/
   pipeData.taskCount++;
@@ -21,7 +21,7 @@ export function crateFloat(floatName, pipeData, divertor, complete) {
     const prefix = 'Content_' + pipeData.chapterIndex + "_";
     //去重复
     divertor.ids = arrayUnique(divertor.ids)
-    _.each(divertor.ids, function(id) {
+    _.each(divertor.ids, function (id) {
       makePrefix = prefix + id;
       fragment = pipeData.contentsFragment[makePrefix]
       if (fragment) {
@@ -44,7 +44,7 @@ export function crateFloat(floatName, pipeData, divertor, complete) {
   //如果是当前页面
   //因为会产生三页面并联
   //所以中间去最高层级
-  if (floatName === 'floatPage' && getStyle.offset === 0) {
+  if (pageType === 'page' && getStyle.offset === 0) {
     zIndex = 2001
   } else {
     zIndex = 2000
@@ -57,16 +57,23 @@ export function crateFloat(floatName, pipeData, divertor, complete) {
   let overflow = 'overflow:hidden;'
 
   //如果是母板,排除
-  if (floatName === 'floatMaster') {
+  if (pageType === 'master') {
     overflow = ''
   }
 
   /*浮动容器*/
-  let id = `${floatName}-li-${pipeData.chapterIndex}`
-  let container = $("#" + id)
+  let container
+  if (baseFloatGroup) {
+    /*
+    在基础的baseFloatGroup中查找是否已经创建过
+    容器存在，存在component，在component中已经创建了容器，所以需要复用
+    */
+    container = baseFloatGroup[pageType + 'Container']
+  }
 
   /*有可能在competent中已经创建,在content不需要重复创建*/
-  if (!container.length) {
+  if (!container) {
+    const id = `float-${pageType}-li-${pipeData.chapterIndex}`
     container = $(String.styleFormat(
       `<ul id="${id}"
          class="xut-float"

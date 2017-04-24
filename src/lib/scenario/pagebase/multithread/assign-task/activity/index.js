@@ -24,7 +24,7 @@ import { sceneController } from '../../../../../scenario/scene-control'
  */
 function toObject(cachedContentStr) {
   var tempFragmentHash = {};
-  _.each($(cachedContentStr), function(ele, index) {
+  _.each($(cachedContentStr), function (ele, index) {
     tempFragmentHash[ele.id] = ele;
   })
   return tempFragmentHash;
@@ -40,7 +40,7 @@ function toObject(cachedContentStr) {
 function toArray(contentsFragment, headerFooterMode) {
   let bodyContent = []
   let headerFooterContent = []
-  _.each(contentsFragment, function($node, key) {
+  _.each(contentsFragment, function ($node, key) {
     let id = key.split('_').pop()
     let state
     if (headerFooterMode && (state = headerFooterMode[id])) {
@@ -188,7 +188,7 @@ export default class TaskActivitys extends TaskSuper {
        * 1 content的卷滚条
        * 2 canvas事件绑定
        */
-      const hookfns = function() {
+      const hookfns = function () {
         let iscrollHooks = delayHooks.iscrollHooks
         let hook
         if (iscrollHooks.length) {
@@ -216,7 +216,7 @@ export default class TaskActivitys extends TaskSuper {
       })()
 
       /*创建浮动层*/
-      this.$$createFloatLayer(pipeData, complete)
+      this.$$createFloatLayer(complete, pipeData, this.base.floatGroup)
 
       /*iboosk节点预编译,在执行的时候节点已经存在,不需要在创建*/
       if (Xut.IBooks.runMode()) {
@@ -237,7 +237,7 @@ export default class TaskActivitys extends TaskSuper {
           return
         }
 
-        const watchNextTick = function() {
+        const watchNextTick = function () {
           return () => {
             if (watchCount === 1) {
               complete()
@@ -296,7 +296,7 @@ export default class TaskActivitys extends TaskSuper {
 
     //文字动画
     if (this.textFxObjs) {
-      _.each(this.textFxObjs, function(obj) {
+      _.each(this.textFxObjs, function (obj) {
         obj.destroy()
       })
       this.textFxObjs = null
@@ -310,7 +310,7 @@ export default class TaskActivitys extends TaskSuper {
     //清理放大图片功能
     if (this.zoomBehavior && Object.keys(this.zoomBehavior).length) {
       //清理缩放绑定事件
-      _.each(this.zoomBehavior, function(zoomBehavior) {
+      _.each(this.zoomBehavior, function (zoomBehavior) {
         if (zoomBehavior.off) {
           zoomBehavior.off()
         }
@@ -318,7 +318,7 @@ export default class TaskActivitys extends TaskSuper {
       this.zoomBehavior = null
 
       //清理缩放对象
-      _.each(this.zoomObjs, function(zoom) {
+      _.each(this.zoomObjs, function (zoom) {
         zoom.destroy()
       })
       this.zoomObjs = null

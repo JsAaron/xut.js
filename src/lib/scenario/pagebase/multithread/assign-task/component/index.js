@@ -81,7 +81,7 @@ export default class TaskComponents extends TaskSuper {
     }
 
     //需要创建的数据结构
-    activitys.forEach(function(activityData, index) {
+    activitys.forEach(function (activityData, index) {
       //创建类型
       let actType = activityData.actType || activityData.animation;
       //特殊类型 showNote
@@ -129,7 +129,7 @@ export default class TaskComponents extends TaskSuper {
       }
     })()
 
-    this.$$createFloatLayer(this.pipeData, complete)
+    this.$$createFloatLayer(complete, this.pipeData)
 
     /*如果不存在浮动*/
     if (this.pipeData.taskCount === 0) {
