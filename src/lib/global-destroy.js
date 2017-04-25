@@ -1,6 +1,6 @@
 import { sceneController } from './scenario/scene-control'
-import { clearAudio } from './component/audio/manager'
-import { clearVideo } from './component/video/manager'
+import { clearAudio } from './component/audio/api'
+import { clearVideo } from './component/video/api'
 import { clearColumnDetection } from './component/column/detect'
 import { clearFixAudio } from './component/audio/fix'
 import { clearCache, clearResult } from './database/destroy'

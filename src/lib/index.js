@@ -2,17 +2,19 @@ import entry from './entry/index'
 import { config } from './config/index'
 import { nextTick } from './util/nexttick'
 import { slashPostfix } from './util/option'
-import { AudioManager } from './component/audio/manager'
-import { VideoManager } from './component/video/manager'
+import { initAudio } from './component/audio/api'
+import { initVideo } from './component/video/api'
 import { initRootNode } from './initialize/root-node'
 import { initGlobalEvent } from './initialize/golbal-event'
 import { initGlobalAPI } from './global-api/index'
 import { priorityConfig } from './config/priority-config'
 
-/*全局API初始化*/
+/*代码初始化*/
+initAudio()
+initVideo()
 initGlobalAPI()
 
-Xut.Version = 882.1
+Xut.Version = 882.4
 
 /*加载应用app*/
 const initApp = (...arg) => {

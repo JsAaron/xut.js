@@ -1,6 +1,6 @@
 import { config } from '../../../config/index'
 import { updateAction } from '../../../component/widget/page/extend/adv.sprite'
-import { createContentAudio } from '../../../component/audio/manager'
+import { createContentAudio } from '../../../component/audio/api'
 
 import fade from './extend/fade'
 import fly from './extend/fly'

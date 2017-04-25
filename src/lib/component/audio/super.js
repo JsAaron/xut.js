@@ -50,7 +50,6 @@ export default class AudioSuper {
     if (this.outerCallback) {
       this.outerCallback.call(this);
     }
-
   }
 
   /**
@@ -111,18 +110,9 @@ export default class AudioSuper {
 
   /**
    * 销毁
-   * @return {[type]} [description]
    */
   $$destroy() {
     this.status = 'ended';
-    this._$$destroyRelated();
-    this.acitonObj && this.acitonObj.destroy();
-  }
-
-  /**
-   * 销毁相关
-   */
-  _$$destroyRelated() {
     //销毁字幕
     if (this.subtitleObject) {
       this.subtitleObject.destroy()
@@ -134,4 +124,5 @@ export default class AudioSuper {
       this.acitonObj = null;
     }
   }
+
 }

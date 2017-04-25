@@ -6,8 +6,8 @@
  */
 import access from './access'
 
-import { clearAudio } from '../../component/audio/manager'
-import { clearVideo } from '../../component/video/manager'
+import { clearAudio } from '../../component/audio/api'
+import { clearVideo } from '../../component/video/api'
 
 /**
  * 停止所有热点动作,并返回状态

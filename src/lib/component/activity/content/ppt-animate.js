@@ -11,7 +11,7 @@
 import Powepoint from '../../../plugin/extend/powerpoint/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
-import { clearContentAudio } from '../../audio/manager'
+import { clearContentAudio } from '../../audio/api'
 import { makeJsonPack } from '../../../util/lang'
 
 //2016.7.15废弃
@@ -225,7 +225,10 @@ export default class Animation {
     if($contentNode && $contentNode.view) {
       $contentNode = this.$contentNode.view
     }
+
+
     access((key) => {
+
       if(this[key]) {
         if(key === 'pptObj') {
           //优化处理,只针对互斥的情况下

@@ -5,20 +5,12 @@
  */
 import { config } from '../../config/index'
 import AudioSuper from './super'
-import {
-  hasAudioes,
-  getAudio
-} from './fix'
+import { hasAudioes, getAudio } from './fix'
 
-
-let Player = null
-const noop = function () {}
 let instance = {} //存放不同音轨的一个实例
 let audioPlayer
-const plat = Xut.plat
 
-
-let UUIDcreatePart = (length) => {
+const createPart = (length) => {
   let uuidpart = ""
   let uuidchar
   for (let i = 0; i < length; i++) {
@@ -31,31 +23,33 @@ let UUIDcreatePart = (length) => {
   return uuidpart;
 }
 
+const createUUID = () => [4, 2, 2, 2, 6].map(createPart).join('-')
 
-let createUUID = () => [4, 2, 2, 2, 6].map(UUIDcreatePart).join('-')
+/*获取音频文件路径*/
+const getAudioPath = function (url) {
+  return config.getAudioPath() + url
+}
 
 
 /**
  * 采用Falsh播放
- * @type {[type]}
  */
 class _Flash extends AudioSuper {
 
   constructor(options, controlDoms) {
     super()
-    var trackId = options.trackId,
-      url = config.getAudioPath() + options.url,
-      self = this,
-      audio;
+
+    let url = getAudioPath(options.url)
+    let self = this
 
     //构建之前处理
-    this.$$preRelated(trackId, options);
+    this.$$preRelated(options.trackId, options);
 
-    audio = new Audio5js({
+    let audio = new Audio5js({
       swf_path: './lib/data/audio5js.swf',
       throw_errors: true,
       format_time: true,
-      ready: function (player) {
+      ready: function () {
         this.load(url);
         //如果调用了播放
         this.play()
@@ -64,7 +58,7 @@ class _Flash extends AudioSuper {
     });
 
     this.audio = audio;
-    this.trackId = trackId;
+    this.trackId = options.trackId;
     this.status = 'playing';
     this.options = options;
 
@@ -104,21 +98,19 @@ class _Flash extends AudioSuper {
 
 /**
  * 采用_Audio5js播放
- * @type {[type]}
  */
 class _Audio5js extends AudioSuper {
 
   constructor(options, controlDoms) {
     super()
-    var trackId = options.trackId,
-      url = config.getAudioPath() + options.url,
-      self = this,
-      audio;
+
+    let url = getAudioPath(options.url)
+    let self = this
 
     //构建之前处理
-    this.$$preRelated(trackId, options);
+    this.$$preRelated(options.trackId, options);
 
-    audio = new Audio5js({
+    let audio = new Audio5js({
       ready: function (player) {
         this.load(url);
         //如果调用了播放
@@ -128,7 +120,7 @@ class _Audio5js extends AudioSuper {
     });
 
     this.audio = audio;
-    this.trackId = trackId;
+    this.trackId = options.trackId;
     this.status = 'playing';
     this.options = options;
 
@@ -166,24 +158,20 @@ class _Audio5js extends AudioSuper {
 
 /**
  * 使用PhoneGap的Media播放
- * @param  {string} url 路径
- * @return {[type]}      [description]
  */
 class _Media extends AudioSuper {
 
   constructor(options, controlDoms) {
     super()
 
-    var url = config.getAudioPath() + options.url,
-      trackId = options.trackId,
-      self = this,
-      audio;
+    let url = getAudioPath(options.url)
+    let self = this
 
     //构建之前处理
-    this.$$preRelated(trackId, options);
+    this.$$preRelated(options.trackId, options);
 
     //音频成功与失败调用
-    audio = new window.GLOBALCONTEXT.Media(url, () => {
+    let audio = new window.GLOBALCONTEXT.Media(url, () => {
       self.$$callbackProcess(true);
     }, () => {
       self.$$callbackProcess(true);
@@ -191,7 +179,7 @@ class _Media extends AudioSuper {
 
     //autoplay
     this.audio = audio;
-    this.trackId = trackId;
+    this.trackId = options.trackId;
     this.options = options;
 
     //相关数据
@@ -249,24 +237,21 @@ class _Media extends AudioSuper {
 
 /**
  * 使用PhoneGap的 js直接调用 cordova Media播放
- * @param  {string} url 路径
- * @return {[type]}      [description]
  */
 class _cordovaMedia extends AudioSuper {
 
   constructor(options, controlDoms) {
     super()
-    var url = config.getAudioPath() + options.url,
-      trackId = options.trackId,
-      self = this,
-      audio;
+
+    let url = getAudioPath(options.url)
+    let self = this
 
     this.id = createUUID();
 
     //构建之前处理
-    this.$$preRelated(trackId, options);
+    this.$$preRelated(options.trackId, options);
 
-    var audio = {
+    let audio = {
       startPlayingAudio: function () {
         window.audioHandler.startPlayingAudio(self.id, url)
       },
@@ -287,7 +272,7 @@ class _cordovaMedia extends AudioSuper {
 
     //autoplay
     this.audio = audio;
-    this.trackId = trackId;
+    this.trackId = options.trackId;
     this.options = options;
 
     //相关数据
@@ -336,8 +321,6 @@ class _cordovaMedia extends AudioSuper {
 
 /**
  * 使用html5的audio播放
- * @param  {string} url    音频路径
- * @param  {object} options 可选参数
  * 1-支持audio的autoplay，大部分安卓机子的自带浏览器和微信，大部分的IOS微信（无需特殊解决）
  * 2-不支持audio的autoplay，部分的IOS微信
  * 3-不支持audio的autoplay，部分的安卓机子的自带浏览器（比如小米，开始模仿safari）和全部的ios safari（这种只能做用户触屏时就触发播放了）
@@ -348,12 +331,12 @@ class _nativeVideo extends AudioSuper {
 
     super()
 
-    let trackId = options.trackId
-    let url = config.getAudioPath() + options.url
     let audio
     let self = this
+    let trackId = options.trackId
 
     let hasAudio = hasAudioes()
+    let url = getAudioPath(options.url)
 
     //构建之前处理
     this.$$preRelated(trackId, options);
@@ -441,19 +424,18 @@ class _nativeVideo extends AudioSuper {
 
 
 
-//安卓客户端apk的情况下
-if (plat.isAndroid && !plat.isBrowser) {
+/*安卓客户端apk的情况下*/
+if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
   audioPlayer = _Media
 } else {
-  //妙妙学的 客户端浏览器模式
+  /*妙妙学的 客户端浏览器模式*/
   if (window.MMXCONFIG && window.audioHandler) {
     audioPlayer = _cordovaMedia
   } else {
+    /*其余所有情况都用原声的H5播放器*/
     audioPlayer = _nativeVideo
   }
 }
 
 
-export {
-  audioPlayer
-}
+export { audioPlayer }

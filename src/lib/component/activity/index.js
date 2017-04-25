@@ -441,6 +441,7 @@ export default class Activity {
 
     //执行动画
     this.eachAssistContents(function(scope) {
+
       //标记动画正在运行
       scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
         'animOffset': scope.$contentNode.offset()

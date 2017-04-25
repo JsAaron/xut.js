@@ -1,5 +1,5 @@
 import { config } from '../../../config/index'
-import { audioPlayer } from '../../audio/audio'
+import { audioPlayer } from '../../audio/player'
 import { conversionEventType, bindContentEvent } from './event'
 
 export default function(activitProto) {

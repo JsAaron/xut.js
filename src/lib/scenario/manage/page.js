@@ -5,7 +5,7 @@
  */
 import { ManageSuper } from './super'
 import { Pagebase } from '../pagebase/index'
-import { removeVideo } from '../../component/video/manager'
+import { removeVideo } from '../../component/video/api'
 import { execScript, $on, $off } from '../../util/index'
 import { config } from '../../config/index'
 import { addEdges } from '../../util/edge'

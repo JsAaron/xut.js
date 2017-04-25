@@ -1,4 +1,4 @@
-import { clearVideo } from '../../video/manager'
+import { clearVideo } from '../../video/api'
 import { config } from '../../../config/index'
 import mixData from './mix-data'
 

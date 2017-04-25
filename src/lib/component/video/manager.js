@@ -3,17 +3,21 @@
 */
 import { VideoClass } from './video'
 import { config } from '../../config/index'
-import { setProportion } from '../../util/option'
+import { setProportion, hash } from '../../util/index'
 
-let pageBox
+let dataBox
 let playBox
 
-let initBox = () => {
-  pageBox = {} //当前页面包含的视频数据
-  playBox = {} //播放过的视频数据 （播放集合)
+/*
+初始化盒子
+1 当前页面包含的视频数据
+2 播放过的视频数据 （播放集合)
+ */
+const initBox = () => {
+  dataBox = hash()
+  playBox = hash()
 }
 
-initBox()
 
 /**
  * 配置视频结构
@@ -46,11 +50,11 @@ const deployVideo = (videoData, options) => {
     'hyperlink': videoData.hyperlink
   })
 
-  if (!_.isObject(pageBox[chapterId])) {
-    pageBox[chapterId] = {};
+  if (!_.isObject(dataBox[chapterId])) {
+    dataBox[chapterId] = {};
   }
 
-  pageBox[chapterId][activityId] = videoInfo;
+  dataBox[chapterId][activityId] = videoInfo;
 }
 
 /**
@@ -58,8 +62,8 @@ const deployVideo = (videoData, options) => {
  * 缓存
  */
 const hasAssembly = (chapterId, activityId) => {
-  const chapterData = pageBox[chapterId];
-  //如果能在pageBox找到对应的数据
+  const chapterData = dataBox[chapterId];
+  //如果能在dataBox找到对应的数据
   if (chapterData && chapterData[activityId]) {
     return true;
   }
@@ -84,11 +88,11 @@ const assemblyData = (options) => {
 /**
  * 加载视频
  */
-const loadVideo = (options) => {
+const createVideo = (options) => {
   const { chapterId, activityId, rootNode } = options
   /*创建数据*/
-  const createData = pageBox[chapterId][activityId]
-  /*如果已经存在，直接调用播放*/
+  const createData = dataBox[chapterId][activityId]
+    /*如果已经存在，直接调用播放*/
   if (playBox[chapterId] && playBox[chapterId][activityId]) {
     playBox[chapterId][activityId].play()
   } else {
@@ -107,7 +111,7 @@ const initVideo = (options) => {
   //解析数据
   assemblyData(options);
   //调用播放
-  loadVideo(options);
+  createVideo(options);
 }
 
 
@@ -135,54 +139,17 @@ function playVideo(options) {
   }
 }
 
-/**
- * 自动播放
- */
-export function autoVideo(...arg) {
-  playVideo(...arg)
+function getDataBox() {
+  return dataBox
 }
 
-
-/**
- * 手动播放
- */
-export function triggerVideo(...arg) {
-  playVideo(...arg)
+function getPlayBox() {
+  return playBox
 }
 
-
-/**
- * 清理移除页的视频
- */
-export function removeVideo(chapterId) {
-  let activityId
-    //清理视频
-  if (playBox && playBox[chapterId]) {
-    for (activityId in playBox[chapterId]) {
-      playBox[chapterId][activityId].close();
-    }
-    delete playBox[chapterId]
-  }
-  //清理数据
-  if (pageBox && pageBox[chapterId]) {
-    delete pageBox[chapterId]
-  }
-}
-
-
-/**
- * 清理全部视频
- * @return {[type]} [description]
- */
-export function clearVideo() {
-  let flag = false //记录是否处理过销毁状态
-  let chapterId, activityId
-  for (chapterId in playBox) {
-    for (activityId in playBox[chapterId]) {
-      playBox[chapterId][activityId].close();
-      flag = true;
-    }
-  }
-  initBox()
-  return flag;
+export {
+  initBox,
+  playVideo,
+  getPlayBox,
+  getDataBox
 }

@@ -3,8 +3,9 @@
  * @return {[type]} [description]
  */
 import access from './access'
-import { hangUpAudio, clearAudio } from '../../component/audio/manager'
-import { removeVideo, clearVideo } from '../../component/video/manager'
+import { $stopAutoTimer } from './auto'
+import { hangUpAudio, clearAudio } from '../../component/audio/api'
+import { removeVideo, clearVideo } from '../../component/video/api'
 
 
 /**
@@ -26,12 +27,15 @@ export function $suspend(pageObj, pageId, allHandle) {
   //这里只处理音频 + content类型
   access(pageObj, (pageObj, contentObjs) => {
 
+    /*这个必须要，翻页停止AUTO的自动延时延时器，否则音频会乱套*/
+    $stopAutoTimer()
+
     //多媒体处理
-    if(pageId !== undefined) {
+    if (pageId !== undefined) {
       //离开页面销毁视频
       removeVideo(pageId);
       //翻页停止母板音频
-      if(pageObj.pageType === 'master') {
+      if (pageObj.pageType === 'master') {
         hangUpAudio()
       }
     }
@@ -44,7 +48,7 @@ export function $suspend(pageObj, pageId, allHandle) {
     //如果是外部调用接口
     //销毁视频
     //销毁所有的音频
-    if(allHandle) {
+    if (allHandle) {
       clearVideo()
       clearAudio()
     }

@@ -18,14 +18,13 @@ const clearContent = function () {
   }
 }
 
+
 /**
  * 运行自动的content对象
  * 延时500毫秒执行
  * @return {[type]} [description]
  */
 const autoContents = (contentObjs, taskAnimCallback) => {
-
-  clearContent()
 
   /*自动动画延长500毫秒执行*/
   contentTimeour = setTimeout(function () {
@@ -72,8 +71,8 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
 
   _.each(autoData, (data, index) => {
     directive = directives[data.actType]
-    //零件类型的接口调用不一致
-    //这里需要转接口处理
+      //零件类型的接口调用不一致
+      //这里需要转接口处理
     if (directive && directive.autoPlay) {
       directive.autoPlay({
         'id': data.id,
@@ -88,6 +87,14 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
   });
 }
 
+
+/*翻页停止，
+翻页速度大于定会器的延时，
+那么这个任务就会被重复叠加触发，
+所以每次翻页必须停止*/
+export function $stopAutoTimer() {
+  clearContent()
+}
 
 /**
  * 自动动作

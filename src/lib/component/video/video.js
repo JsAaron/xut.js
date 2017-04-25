@@ -7,7 +7,7 @@
  *    4: 用于插入一个网页的webview
  */
 import { config } from '../../config/index'
-import { removeVideo } from './manager'
+import { removeVideo } from './api'
 import { supportVideo, supportFlash } from './support'
 
 const pixelRatio = window.devicePixelRatio

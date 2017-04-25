@@ -1,7 +1,7 @@
 import { parseJSON, getFileFullPath } from '../../util/index'
 import { config } from '../../config/index'
-import { triggerAudio, autoAudio, getMediaData, hasHotAudioPlay } from '../../component/audio/manager'
-import { triggerVideo, autoVideo } from '../../component/video/manager'
+import { triggerAudio, autoAudio, getMediaData, hasHotAudioPlay } from '../../component/audio/api'
+import { triggerVideo, autoVideo } from '../../component/video/api'
 
 //临时音频动作数据
 const tempData = {}
