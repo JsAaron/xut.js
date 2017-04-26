@@ -3,7 +3,7 @@
  * @return {[type]} [description]
  */
 import access from './access'
-import { $stopAutoTimer } from './auto'
+import { $stopAutoWatch } from './auto'
 import { hangUpAudio, clearAudio } from '../../component/audio/api'
 import { removeVideo, clearVideo } from '../../component/video/api'
 
@@ -27,8 +27,8 @@ export function $suspend(pageObj, pageId, allHandle) {
   //这里只处理音频 + content类型
   access(pageObj, (pageObj, contentObjs) => {
 
-    /*这个必须要，翻页停止AUTO的自动延时延时器，否则音频会乱套*/
-    $stopAutoTimer()
+    /*这个必须要，翻页停止AUTO的自动延时延时器，否则任务会乱套,e.g. 跨页面音频*/
+    $stopAutoWatch()
 
     //多媒体处理
     if (pageId !== undefined) {

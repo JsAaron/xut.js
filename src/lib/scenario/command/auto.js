@@ -6,18 +6,9 @@
 import access from './access'
 import allowNext from './allow-next'
 import directives from '../directive/index'
+import { pushWatcher, clearWatcher } from '../../observer/batcher'
 
 const noop = function () {}
-
-let contentTimeour
-
-const clearContent = function () {
-  if (contentTimeour) {
-    clearTimeout(contentTimeour)
-    contentTimeour = null
-  }
-}
-
 
 /**
  * 运行自动的content对象
@@ -25,34 +16,26 @@ const clearContent = function () {
  * @return {[type]} [description]
  */
 const autoContents = (contentObjs, taskAnimCallback) => {
-
-  /*自动动画延长500毫秒执行*/
-  contentTimeour = setTimeout(function () {
-
-    clearContent()
-
-    let markComplete = (() => {
-      let completeStatistics = contentObjs.length; //动画完成统计
-      return () => {
-        if (completeStatistics === 1) {
-          taskAnimCallback && taskAnimCallback();
-          markComplete = null;
-        }
-        completeStatistics--;
+  let markComplete = (() => {
+    let completeStatistics = contentObjs.length; //动画完成统计
+    return () => {
+      if (completeStatistics === 1) {
+        taskAnimCallback && taskAnimCallback();
+        markComplete = null;
       }
-    })()
+      completeStatistics--;
+    }
+  })()
 
-    _.each(contentObjs, (obj, index) => {
-      if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
-        //同一个对象类型
-        //直接调用对象接口
-        obj.autoPlay(markComplete)
-      } else {
-        markComplete();
-      }
-    })
-  }, 500)
-
+  _.each(contentObjs, (obj, index) => {
+    if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+      //同一个对象类型
+      //直接调用对象接口
+      obj.autoPlay(markComplete)
+    } else {
+      markComplete();
+    }
+  })
 }
 
 
@@ -92,8 +75,8 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
 翻页速度大于定会器的延时，
 那么这个任务就会被重复叠加触发，
 所以每次翻页必须停止*/
-export function $stopAutoTimer() {
-  clearContent()
+export function $stopAutoWatch() {
+  clearWatcher()
 }
 
 /**
@@ -125,7 +108,6 @@ export function $autoRun(pageObj, pageIndex, taskAnimCallback) {
     return
   }
 
-
   //pageType
   //用于区别触发类型
   //页面还是母版
@@ -141,18 +123,23 @@ export function $autoRun(pageObj, pageIndex, taskAnimCallback) {
 
     taskAnimCallback = taskAnimCallback || noop
 
+    /*自动组件*/
     let autoData = pageObj.baseAutoRun()
     if (autoData) {
-      autoComponents(pageObj, pageIndex, autoData, pageType)
+      pushWatcher('component', function () {
+        autoComponents(pageObj, pageIndex, autoData, pageType)
+      })
     }
 
+    /*自动content*/
     if (contentObjs) {
-      autoContents(contentObjs, taskAnimCallback)
+      pushWatcher('content', function () {
+        autoContents(contentObjs, taskAnimCallback)
+      })
     } else {
       taskAnimCallback(); //无动画
     }
 
-    // console.log('debug', pageType + '层，第' + (pageIndex + 1) + '页开始,本页面Id为' + pageObj.chapterId)
   })
 
 }
