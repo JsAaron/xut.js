@@ -52,7 +52,7 @@ export default function siwpeHook(e, node) {
       !Xut.IBooks.Enabled &&
       !window.MMXCONFIG &&
       !window.DUKUCONFIG &&
-      !nodeName === 'a' && //并且不是a标签(在cloumn中有a标签，需要跳转)
+      nodeName !== 'a' && //并且不是a标签(在cloumn中有a标签，需要跳转)
       !hasTyperlink) { //超链接不阻止
       e.preventDefault && e.preventDefault();
     }
