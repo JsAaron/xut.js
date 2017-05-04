@@ -176,7 +176,7 @@ export default class NumberBar {
           }
           iconi = document.createElement('i');
           iconi.className = this.dotStyleClass;
-          span.append(iconi);
+          span.appendChild(iconi);
           this.$container.append(span)
         }
 

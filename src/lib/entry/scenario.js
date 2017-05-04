@@ -73,7 +73,7 @@ export default function (options) {
     'history': options.history
   }, function () {
     //应用加载完毕
-    Xut.Application.Notify('appInit')
+    Xut.Application.Notify('initComplete')
       /*发送初始化完毕代码跟踪*/
     config.sendTrackCode('init')
   })

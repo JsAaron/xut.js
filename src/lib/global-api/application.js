@@ -29,7 +29,7 @@ export function initApplication() {
   /**
    * 应用事件监听
    * 1.Xut.Application.Watch('complete',fn)
-   * 2.app:initComplete
+   * 2.initComplete
    */
   let __app__ = new Observer()
   Xut.Application.Watch = function (event, callback) {

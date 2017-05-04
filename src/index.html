@@ -74,6 +74,10 @@ Xut.Application.setConfig = {
     // convert: 'svg', //转化资源svg转化成js
 };
 
+Xut.Application.Watch('initComplete', function() {
+    console.log(1)
+})
+
 
 Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)

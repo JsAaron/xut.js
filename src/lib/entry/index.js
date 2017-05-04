@@ -93,7 +93,7 @@ const bindPlatEvent = () => {
     //不是子文档指定绑定按键
     if(!window.SUbCONFIGT) {
       /*app初始化完毕*/
-      Xut.Application.Watch('appInit', function() {
+      Xut.Application.Watch('initComplete', function() {
         bindAndroid()
       })
     }
