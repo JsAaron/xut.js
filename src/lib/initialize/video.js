@@ -1,4 +1,4 @@
-import { Video5 } from '../component/video/video'
+import { h5Player } from '../component/video/video'
 
 
 const preloadVideo = {
@@ -78,7 +78,7 @@ export function plugVideo() {
 export function html5Video() {
   //延时应用开始
   Xut.Application.delayAppRun()
-  Video5({
+  h5Player({
     url: 'duku.mp4',
     startBoot: function() {
       Xut.Application.LaunchApp();

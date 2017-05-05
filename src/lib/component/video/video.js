@@ -36,11 +36,46 @@ const getContainer = options => {
   return container.children ? $(container.children) : $('body')
 }
 
+
+/**
+ * webView弹出框
+ * @param  {[type]} options [description]
+ * @return {[type]}         [description]
+ */
+const webView = options => {
+
+  const { width, height, pageUrl, left, top } = options
+
+  const play = () => {
+    //打开一个网页的时候，需要关闭其他已经打开过的网页
+    Xut.Plugin.WebView.close();
+    Xut.openWebView = false;
+    setTimeout(() => {
+      Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
+      Xut.openWebView = true;
+    }, 500);
+  }
+
+  const close = () => {
+    Xut.Plugin.WebView.close();
+    Xut.openWebView = false;
+  }
+
+  play()
+
+  return {
+    play,
+    close,
+    stop: close
+  }
+}
+
+
 /**
  * 网页
  * @param {[type]} options [description]
  */
-const _WebPage = options => {
+const _webPage = options => {
 
   let pageUrl = options.pageUrl;
   let container = getContainer(options)
@@ -107,45 +142,11 @@ const _WebPage = options => {
 
 
 /**
- * webView弹出框
- * @param  {[type]} options [description]
- * @return {[type]}         [description]
- */
-const webView = options => {
-
-  const { width, height, pageUrl, left, top } = options
-
-  const play = () => {
-    //打开一个网页的时候，需要关闭其他已经打开过的网页
-    Xut.Plugin.WebView.close();
-    Xut.openWebView = false;
-    setTimeout(() => {
-      Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
-      Xut.openWebView = true;
-    }, 500);
-  }
-
-  const close = () => {
-    Xut.Plugin.WebView.close();
-    Xut.openWebView = false;
-  }
-
-  play()
-
-  return {
-    play,
-    close,
-    stop: close
-  }
-}
-
-
-/**
  * 安卓phonegap播放器
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-const _Media = options => {
+const _mediaPlayer = options => {
 
   let width
   let height
@@ -175,11 +176,11 @@ const _Media = options => {
   }
 
   const play = () => {
-    Xut.Plugin.VideoPlayer.play(() => {}, () => {}, config.getVideoPath() + url, 1, left, top, height, width);
+    Xut.Plugin.videoPlayer.play(() => {}, () => {}, config.getVideoPath() + url, 1, left, top, height, width);
   }
 
   const close = () => {
-    Xut.Plugin.VideoPlayer.close();
+    Xut.Plugin.videoPlayer.close();
   }
 
   play()
@@ -218,7 +219,7 @@ const createVideoWrap = (type, options) => {
  *  var video = new Video({url:'1.mp4',width:'320',...});
  *  video.play();
  */
-const _nativeVideo = options => {
+const _html5Player = options => {
 
   let { width, height, top, left, zIndex, url } = options
   let container = getContainer(options)
@@ -236,7 +237,8 @@ const _nativeVideo = options => {
   let $videoNode = $(video).css({ width, height }).attr({
     src,
     'controls': 'controls',
-    'autoplay': 'autoplay'
+    'autoplay': 'autoplay',
+    'playsinline': 'playsinline'
   })
 
   //父容器
@@ -310,6 +312,7 @@ const _nativeVideo = options => {
     container = null
   }
 
+
   video.addEventListener('ended', clear, false)
   video.addEventListener('error', error, false)
   video.addEventListener('canplay', start, false)
@@ -338,7 +341,7 @@ const _nativeVideo = options => {
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-const _FlareVideo = function (options) {
+const _flarePlayer = function (options) {
   let container = getContainer(options)
   let url = config.getVideoPath() + options.url
   let { width, height, top, left, zIndex } = options
@@ -356,12 +359,15 @@ const _FlareVideo = function (options) {
     height,
     autoplay: true
   })
+
   fv.load([{
     src: url,
     type: 'video/mp4'
   }])
 
   container.append($videoWrap)
+
+  fv.video.setAttribute('playsinline', 'playsinline')
 
   return {
     play: function () {
@@ -380,79 +386,90 @@ const _FlareVideo = function (options) {
 
 
 
+let h5Player = _html5Player
 
-
-let VideoPlayer = null
-
-//浏览器平台
-if (Xut.plat.isBrowser) {
-  // 安卓妙妙学强制走h5
-  // 由于原生H5控制条不显示的问题
-  // 这里用插件播放ch
-  if (Xut.plat.isAndroid) {
-    VideoPlayer = _FlareVideo
-  } else {
-    //pc ios 浏览器打开方式
-    VideoPlayer = _nativeVideo
-  }
-} else {
-  //apk ipa
-  if (Xut.plat.isIOS || top.EduStoreClient) {
-    //如果是ibooks模式
-    if (Xut.IBooks.Enabled) {
-      VideoPlayer = _FlareVideo
-    } else {
-      //如果是ios或读酷pc版则使用html5播放
-      VideoPlayer = _nativeVideo
-    }
-  } else if (Xut.plat.isAndroid) {
-    if (window.MMXCONFIG) {
-      // 安卓妙妙学强制走h5
-      // 由于原生H5控制条不显示的问题
-      // 这里用插件播放
-      VideoPlayer = _FlareVideo
-    } else {
-      //android平台
-      VideoPlayer = _Media
-    }
-  }
+/*
+ 增强判断
+ ios上支持行内播放，不能用默认的H5控制条，拖动失效，必须要加进度条
+ ios低于10的情况下，用原生播放,而且不能是平板，只能是手机，touch
+ */
+if (Xut.plat.supportPlayInline && !Xut.plat.isTablet) {
+  h5Player = _flarePlayer
 }
 
-class VideoClass {
-
-  constructor(options, container) {
-
-    options.container = container;
-    if ('video' == options.category) {
-      this.video = VideoPlayer(options)
-    } else if ('webpage' == options.category) {
-      this.video = _WebPage(options);
+/*
+匹配视屏播放器
+ */
+const videoPlayer = (function () {
+  let player = null
+    //浏览器平台
+  if (Xut.plat.isBrowser) {
+    // 由于原生H5控制条不显示的问题
+    if (Xut.plat.isAndroid) {
+      player = _flarePlayer
     } else {
-      console.log('options.category must be video or webPage ')
+      player = h5Player
+    }
+  } else {
+    //apk ipa
+    if (Xut.plat.isIOS || top.EduStoreClient) {
+      //如果是ibooks模式
+      if (Xut.IBooks.Enabled) {
+        player = _flarePlayer
+      } else {
+        //如果是ios或读酷pc版则使用html5播放
+        player = h5Player
+      }
+    } else if (Xut.plat.isAndroid) {
+      if (window.MMXCONFIG) {
+        // 安卓妙妙学强制走h5
+        // 由于原生H5控制条不显示的问题
+        // 这里用插件播放
+        player = _flarePlayer
+      } else {
+        //android平台
+        player = _mediaPlayer
+      }
+    }
+  }
+  return player
+})()
+
+
+/*
+视频接口
+ */
+class VideoClass {
+  constructor(options, container) {
+    options.container = container;
+    switch (options.category) {
+      case 'video':
+        this.video = videoPlayer(options)
+        break;
+      case 'webpage':
+        this.video = _webPage(options);
+        break;
+      default:
+        console.log('options.category must be video or webPage ')
+        break
     }
     Xut.View.Toolbar("hide")
   }
-
   play() {
-    //隐藏工具栏
     Xut.View.Toolbar("hide")
     this.video.play()
   }
-
   stop() {
-    //显示工具栏
     Xut.View.Toolbar("show")
     this.video.stop()
   }
-
   close() {
     this.video.close()
   }
-
 }
 
 
 export {
-  _nativeVideo as Video5,
+  h5Player,
   VideoClass
 }

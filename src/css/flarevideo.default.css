@@ -1,7 +1,7 @@
 .flareVideo .controls {
     position: absolute;
     bottom: 5%;
-    height: 57px;
+    height: 65px;
     min-width: 80%;
     left: 10%;
     border: 1px solid #1A1A1A;
@@ -116,8 +116,8 @@
 
 .flareVideo .controls .pause,
 .flareVideo .controls .play {
-    width: 23px;
-    height: 23px;
+    width: 30%;
+    height: 40%;
     text-indent: -5000px;
 }
 
@@ -145,14 +145,14 @@
 
 .flareVideo .controls .fullScreen {
     position: absolute;
-    right: 13px;
-    top: 10px;
+    right: 5%;
+    top: 10%;
 }
 
 .flareVideo .controls .play,
 .flareVideo .controls .pause {
     position: absolute;
-    left: 50%;
+    left: 35%;
     top: 6px;
 }
 

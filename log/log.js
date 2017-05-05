@@ -12,6 +12,7 @@
 
 /*
 *
+* v882.8 2017.5.6   在ios10上，增加视频的行业播放
 * v882.7 2017.5.4   增加Xut.Application.Watch('initComplete'
 * v882.6 2017.5.2   修正阻止图片的默认行为，判断错误
 * v882.5 2017.4.26  增加bathcer.js，pushWatcher方法为自动动画增加延后推迟处理

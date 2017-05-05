@@ -3,11 +3,11 @@
  * @return {[type]} [description]
  */
 ;
-(function() {
+(function () {
 
   var location = document.location.href
-  //在读酷pc端 navigator的值被改写过了!!
-  //navigator.appVersion: "xxt 1.0.5260.29725"
+    //在读酷pc端 navigator的值被改写过了!!
+    //navigator.appVersion: "xxt 1.0.5260.29725"
   var userAgent = window.navigator.userAgent.toLowerCase()
   var appVersion = window.navigator.appVersion.toLowerCase()
 
@@ -23,9 +23,9 @@
 
   //针对win8的处理
   var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
-  //移动端仅仅只支持touch
+    //移动端仅仅只支持touch
   var only_touch = hasTouch && MOBILE_REGEX.test(userAgent)
-  //判断是否为浏览器
+    //判断是否为浏览器
   var boolBrowser = location.indexOf('http') > -1 || location.indexOf('https') > -1
   var isBrowser = boolBrowser ? boolBrowser : !only_touch
 
@@ -33,7 +33,14 @@
   //detecting iOS UIWebView by indexedDB
   var iosVersionMatch = isIOS && userAgent.match(/os ([\d_]+)/)
   var iosVersion = iosVersionMatch && iosVersionMatch[1].split('_')
-  var hasMutationObserver = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
+
+  var hasMutationObserver = false
+  var iosMainVersion = null
+  if (iosVersion) {
+    iosMainVersion = Number(iosVersion[0])
+    hasMutationObserver = iosMainVersion >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
+  }
+
 
   /**
    * 平台支持
@@ -59,6 +66,11 @@
      * @type {Boolean}
      */
     hasPlugin: false,
+
+    /*
+    ios的版本>=10 支持视频行内播放
+     */
+    supportPlayInline: iosMainVersion >= 10,
 
     /**
      * 是否能自动播放媒体
@@ -100,35 +112,35 @@
      * 是否支持Mutation
      * @type {Boolean}
      */
-    supportMutationObserver: !hasMutationObserver,
+    supportMutationObserver: !hasMutationObserver
   })
 
 
   //私有前缀
   var rdashAlpha = /-([a-z]|[0-9])/ig
   var rmsPrefix = /^-ms-/
-  var fcamelCase = function(all, letter) {
-    return(letter + '').toUpperCase();
+  var fcamelCase = function (all, letter) {
+    return (letter + '').toUpperCase();
   }
-  var camelCase = function(string) {
+  var camelCase = function (string) {
     return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
   }
   var prefix = ['webkit', 'Moz', 'ms', 'o']
   var elementStyle = document.createElement('div').style
   var cache = Object.create(null)
-  var prefixStyle = function(attr) {
+  var prefixStyle = function (attr) {
     var name
-    //缓存中存在
-    if(cache[attr]) {
+      //缓存中存在
+    if (cache[attr]) {
       return cache[attr];
     }
     //不需要加前缀
-    if(attr in elementStyle) {
+    if (attr in elementStyle) {
       return cache[attr] = attr;
     }
     //需要加前缀
-    prefix.forEach(function(v) {
-      if(camelCase(v + '-' + attr) in elementStyle) {
+    prefix.forEach(function (v) {
+      if (camelCase(v + '-' + attr) in elementStyle) {
         name = '-' + v + '-' + attr;
         return cache[attr] = name;
       }
@@ -141,7 +153,7 @@
   var animationEnd = 'animationend'
   var keyframes = '@keyframes '
   var animation = prefixStyle('animation');
-  var adapterPrefix = function() {
+  var adapterPrefix = function () {
     var vendors = animation
     var transitionName = {
       "moz": "transitionend",
@@ -155,9 +167,9 @@
       "ms": "MSAnimationEnd",
       "o": "oAnimationEnd"
     }
-    if(!vendors) return;
+    if (!vendors) return;
     vendors = vendors.split('-');
-    if(!vendors[1]) return;
+    if (!vendors[1]) return;
     transitionEnd = transitionName[vendors[1]];
     animationEnd = animationName[vendors[1]];
     keyframes = '@-' + vendors[1] + '-keyframes ';
@@ -178,7 +190,7 @@
     window.mozRequestAnimationFrame ||
     window.oRequestAnimationFrame ||
     window.msRequestAnimationFrame ||
-    function(callback) {
+    function (callback) {
       window.setTimeout(callback, 1000 / 60);
     };
 
@@ -230,7 +242,7 @@
      * @type {[type]}
      */
     translateZ: translateZ,
-    setTranslateZ: function(zValue) {
+    setTranslateZ: function (zValue) {
       return hasPerspective ? ' translateZ(' + zValue + ')' : ''
     },
 
