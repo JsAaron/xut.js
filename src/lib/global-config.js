@@ -1,44 +1,14 @@
-/* @flow */
-
 /**
- * 默认值，未定义
+ * 全局配置文件
+ * 2种使用方式
+ *   1：Xut.Application.setConfig
+ *   2：Xut.Application.Launch
  * @type {[type]}
  */
-const DEFAULT: void = undefined
 
-export type Config = {
-  platform: ? string;
-  quickFlip: boolean;
-  supportQR: boolean;
-  visualHeight: ? number;
-  visualTop: ? number;
-  cursor: {
-    delayTime: ? number,
-    url: ? string
-  };
-  keepBaseImageZoom: boolean;
-  baseImageSuffix: string;
-  imageSuffix: ? {
-    750: ? string,
-    1080: ? string,
-    1440: ? string
-  },
-  useHDImageZoom: boolean;
-  visualMode: number;
-  flipMode: boolean;
-  orientateMode: boolean;
-  salePicture: boolean;
-  salePictureMultiples: number;
-  salePageType: ? string;
-  historyMode: ? boolean;
-  swipeDelegate: ? boolean;
-  pageMode: ? Object;
-  doublePageMode: ? boolean;
-  brModel: number;
-}
+const DEFAULT = undefined
 
-
-const config: Config = {
+export default {
 
   /**
    * 应用的加载模式
@@ -49,6 +19,48 @@ const config: Config = {
    * @type {Number}
    */
   lauchMode: 0,
+
+  /**
+   * 页面可视模式
+   * 2016.9.19
+   * 4种分辨率显示模式:
+   * 默认全屏缩放
+   * 1：永远100%屏幕尺寸自适应
+   * 2：宽度100% 正比自适应高度
+   *     横版PPT：
+   *        1：横板显示(充满全屏。第1种模式)
+   *        2：竖版显示(宽度100%。上下自适应，显示居中小块)
+   *     竖版PPT:
+   *        1: 竖版显示(宽度100%。上下空白，显示居中，整体缩短, 整理变化不大)
+   *        2: 在横版显示(高度100%，缩放宽度，左右留边)
+   *
+   * 3: 高度100%,宽度溢出可视区隐藏
+   * 4：高度100% 正比自适应宽度
+   *     横版：
+   *        1：横板显示(充满全屏。第1种模式)
+   *        2：竖版显示(宽度100%。上下自适应，显示居中小块)
+   *     竖版:
+   *        1: 竖版ppt竖版显示(高度100%。宽度溢出，只显示中间部分，整体拉长)
+   *        2: 竖版ppt在横版显示(高度100%，显示居中，左右空白，整体缩短)
+   *
+   *
+   * @type {Number}
+   */
+  visualMode: 1,
+
+  /**
+   * 全局翻页模式
+   * 给妙妙单独开的一个模式
+   * 一个novel对应多个season表 所以这里其实不能算全局设置，可以存在多个novel
+   * novel表定义，数据库定义的翻页模式
+   * 用来兼容客户端的制作模式
+   * 妙妙学模式处理，多页面下翻页切换
+   * pageflip
+   *   0 通过滑动翻页 => 'allow'
+   *   1 禁止滑动,直接快速切换页面(通过左右按键快速切换页面) => 'ban'
+   * @type {Number}
+   */
+  flipMode: 'allow', //默认0，待数据库填充
 
   /*
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问
@@ -73,7 +85,6 @@ const config: Config = {
    * 2 false 禁止
    */
   doublePageMode: false,
-
 
   /**
    * 监听代码追踪
@@ -176,7 +187,6 @@ const config: Config = {
    */
   quickFlip: true, //默认是支持
 
-
   /**
    * 支持二维码图片
    * 如果有二维码针对img元素放开默认行为的阻止
@@ -238,48 +248,6 @@ const config: Config = {
   useHDImageZoom: true,
 
   /**
-   * 页面可视模式
-   * 2016.9.19
-   * 4种分辨率显示模式:
-   * 默认全屏缩放
-   * 1：永远100%屏幕尺寸自适应
-   * 2：宽度100% 正比自适应高度
-   *     横版PPT：
-   *        1：横板显示(充满全屏。第1种模式)
-   *        2：竖版显示(宽度100%。上下自适应，显示居中小块)
-   *     竖版PPT:
-   *        1: 竖版显示(宽度100%。上下空白，显示居中，整体缩短, 整理变化不大)
-   *        2: 在横版显示(高度100%，缩放宽度，左右留边)
-   *
-   * 3: 高度100%,宽度溢出可视区隐藏
-   * 4：高度100% 正比自适应宽度
-   *     横版：
-   *        1：横板显示(充满全屏。第1种模式)
-   *        2：竖版显示(宽度100%。上下自适应，显示居中小块)
-   *     竖版:
-   *        1: 竖版ppt竖版显示(高度100%。宽度溢出，只显示中间部分，整体拉长)
-   *        2: 竖版ppt在横版显示(高度100%，显示居中，左右空白，整体缩短)
-   *
-   *
-   * @type {Number}
-   */
-  visualMode: 1,
-
-  /**
-   * 全局翻页模式
-   * 给妙妙单独开的一个模式
-   * 一个novel对应多个season表 所以这里其实不能算全局设置，可以存在多个novel
-   * novel表定义，数据库定义的翻页模式
-   * 用来兼容客户端的制作模式
-   * 妙妙学模式处理，多页面下翻页切换
-   * pageflip
-   *   0 通过滑动翻页 => 'allow'
-   *   1 禁止滑动,直接快速切换页面(通过左右按键快速切换页面) => 'ban'
-   * @type {Number}
-   */
-  flipMode: 'allow', //默认0，待数据库填充
-
-  /**
    * 是否允许图片缩放
    */
   salePicture: true, //默认启动图片缩放的
@@ -323,5 +291,3 @@ const config: Config = {
    */
   storageMode: 0
 }
-
-export default config
