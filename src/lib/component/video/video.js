@@ -28,10 +28,16 @@ const getContainer = options => {
 
   const container = options.container
 
+  /*如果是isColumn的使用，直接用触发节点*/
+  if (options.isColumn) {
+    return $(container)
+  }
+
   //jquery对象
   if (container.length) {
     return container.children()
   }
+
   //dom
   return container.children ? $(container.children) : $('body')
 }
@@ -224,18 +230,13 @@ const _html5Player = options => {
   let { width, height, top, left, zIndex, url } = options
   let container = getContainer(options)
   let src = config.getVideoPath() + url
+  let poster = options.poster ? (config.getVideoPath() + options.poster) : ''
 
-  let $videoWrap = createVideoWrap('video-h5', {
-    width,
-    height,
-    top,
-    left,
-    zIndex
-  })
-
+  let $videoWrap = createVideoWrap('video-h5', { width, height, top, left, zIndex })
   let video = document.createElement('video')
   let $videoNode = $(video).css({ width, height }).attr({
     src,
+    'poster': poster,
     'controls': 'controls',
     'autoplay': 'autoplay',
     'playsinline': 'playsinline'
@@ -266,8 +267,8 @@ const _html5Player = options => {
    * @return {[type]} [description]
    */
   function stop() {
-    video.pause()
-      //妙妙学只需要停止
+    video.pause();
+    //妙妙学只需要停止
     if (!window.MMXCONFIG) {
       //复位视频
       if (video.duration) {
@@ -281,7 +282,6 @@ const _html5Player = options => {
       }
     }
   }
-
 
   /**
    * 错误
@@ -385,47 +385,39 @@ const _flarePlayer = function (options) {
 }
 
 
-
-let h5Player = _html5Player
-
 /*
  增强判断
  ios上支持行内播放，不能用默认的H5控制条，拖动失效，必须要加进度条
  ios低于10的情况下，用原生播放,而且不能是平板，只能是手机，touch
  */
-if (Xut.plat.supportPlayInline && !Xut.plat.isTablet) {
-  h5Player = _flarePlayer
-}
+// if (Xut.plat.supportPlayInline && !Xut.plat.isTablet) {
+//   h5Player = _flarePlayer
+// }
 
 /*
 匹配视屏播放器
+2017.5.5 去掉_flarePlayer的匹配，因为默认行为处理了
  */
 const videoPlayer = (function () {
   let player = null
     //浏览器平台
   if (Xut.plat.isBrowser) {
-    // 由于原生H5控制条不显示的问题
-    if (Xut.plat.isAndroid) {
-      player = _flarePlayer
-    } else {
-      player = h5Player
-    }
+    player = _html5Player
   } else {
     //apk ipa
     if (Xut.plat.isIOS || top.EduStoreClient) {
       //如果是ibooks模式
       if (Xut.IBooks.Enabled) {
-        player = _flarePlayer
+        player = _html5Player
       } else {
         //如果是ios或读酷pc版则使用html5播放
-        player = h5Player
+        player = _html5Player
       }
     } else if (Xut.plat.isAndroid) {
       if (window.MMXCONFIG) {
         // 安卓妙妙学强制走h5
         // 由于原生H5控制条不显示的问题
-        // 这里用插件播放
-        player = _flarePlayer
+        player = _html5Player
       } else {
         //android平台
         player = _mediaPlayer
@@ -440,8 +432,7 @@ const videoPlayer = (function () {
 视频接口
  */
 class VideoClass {
-  constructor(options, container) {
-    options.container = container;
+  constructor(options) {
     switch (options.category) {
       case 'video':
         this.video = videoPlayer(options)
@@ -470,6 +461,6 @@ class VideoClass {
 
 
 export {
-  h5Player,
-  VideoClass
+  VideoClass,
+  _html5Player as h5Player
 }

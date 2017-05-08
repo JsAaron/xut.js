@@ -3,15 +3,22 @@ var cssName = [
   'css/common.css',
   'css/horizontal.css',
   'css/vertical.css',
-  'css/adaptive-image.css',
-  'css/flarevideo.css',
-  'css/flarevideo.default.css'
+  'css/adaptive-image.css'
 ]
 
 //2016.11.14 去掉代码区域
 //'css/video-js.css',
 //'lib/plugin/library/redux.js',
 //'lib/plugin/library/video.js',
+
+//2017.5.5去掉视频flarevideo
+// 'css/flarevideo.css',
+// 'css/flarevideo.default.css'
+//
+// 'lib/plugin/library/video/jquery.hammer.js',
+// 'lib/plugin/library/video/jquery.ui.slider.js',
+// 'lib/plugin/library/video/jquery.ui.touch-punch.js',
+// 'lib/plugin/library/video/flarevideo.js',
 
 var jsName = [
 
@@ -34,11 +41,7 @@ var jsName = [
   'lib/plugin/library/textfx/textfx.js',
 
 
-  // 视频插件
-  'lib/plugin/library/video/jquery.hammer.js',
-  'lib/plugin/library/video/jquery.ui.slider.js',
-  'lib/plugin/library/video/jquery.ui.touch-punch.js',
-  'lib/plugin/library/video/flarevideo.js',
+  // 视频插件 已去除
 
   'lib/plugin/cordova/cordova.js',
   'lib/plugin/cordova/readAssetsFilePlugin.js',

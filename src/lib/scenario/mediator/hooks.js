@@ -12,12 +12,12 @@
    'data-xxtlink' (target, attribute, rootNode, pageIndex) {
      try {
        var para = attribute.split('-');
-       if(para.length > 1) { //如果有多个就是多场景的组合
+       if (para.length > 1) { //如果有多个就是多场景的组合
          Xut.View.GotoSlide(para[0], para[1])
        } else {
          Xut.View.GotoSlide(para[0])
        }
-     } catch(err) {
+     } catch (err) {
        console.log('跳转错误')
      }
    },
@@ -28,7 +28,12 @@
     *   target, attribute, rootNode, pageIndex
     */
    'data-delegate' (target, attribute, rootNode, pageIndex) {
-     $trigger.apply(null, arguments);
+     $trigger({
+       target,
+       attribute,
+       rootNode,
+       pageIndex
+     })
    },
 
 

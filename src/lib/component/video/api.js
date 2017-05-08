@@ -1,4 +1,4 @@
-import { initBox, playVideo, getPlayBox, getDataBox } from './manager'
+import { initBox, playVideo, getPlayBox } from './manager'
 
 /*
 初始化视频
@@ -28,18 +28,12 @@ export function triggerVideo(...arg) {
  */
 export function removeVideo(chapterId) {
   const playBox = getPlayBox()
-  const dataBox = getDataBox()
-
   //清理视频
   if (playBox && playBox[chapterId]) {
     for (let activityId in playBox[chapterId]) {
       playBox[chapterId][activityId].close();
     }
     delete playBox[chapterId]
-  }
-  //清理数据
-  if (dataBox && dataBox[chapterId]) {
-    delete dataBox[chapterId]
   }
 }
 

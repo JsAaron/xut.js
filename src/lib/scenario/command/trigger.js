@@ -5,24 +5,34 @@ import directives from '../directive/index'
  * 全局事件
  * 手动触发控制
  */
-export function $trigger(target, attribute, rootNode, pageIndex) {
-
-  const key = target.id
-
-  if(key) {
+export function $trigger({
+  /*ppt数据*/
+  target,
+  attribute,
+  rootNode,
+  pageIndex
+}, columnData) {
+  let id, type
+  let key = target.id
+  if (columnData) {
+    type = columnData.type
+    id = columnData.id
+  } else if (key) {
     const tag = key.split('_');
-    const type = tag[0];
-    const id = tag[1];
-    const directive = directives[type];
+    type = tag[0];
+    id = tag[1];
+  }
 
-    if(directive && directive.trigger) {
+  if (type && id) {
+    const directive = directives[type];
+    if (directive && directive.trigger) {
 
       /*获取页面类型,page或master*/
       const pageType = rootNode && rootNode.id ?
         /page/.test(rootNode.id) ? 'page' : 'master' :
         'page';
 
-      const data = { id, key, type, rootNode, target, pageIndex, pageType, "activityId": id }
+      const data = { id, key, type, rootNode, target, pageIndex, pageType, "activityId": id, columnData }
 
       /*如果有代码跟踪*/
       config.sendTrackCode('hot', {
@@ -34,8 +44,8 @@ export function $trigger(target, attribute, rootNode, pageIndex) {
 
       /*如果是重复点击,比如widget零件*/
       const instance = Xut.Application.GetSpecifiedObject(pageType, data)
-      if(instance) {
-        if(instance.toggle) {
+      if (instance) {
+        if (instance.toggle) {
           //如果有对应的处理方法
           return instance.toggle()
         }

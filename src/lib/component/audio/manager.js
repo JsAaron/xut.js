@@ -35,17 +35,13 @@ import { SEASON } from './audio-type'
 import { getMediaData } from './api'
 import { audioPlayer } from './player'
 
-
 /**
  * 容器合集
- * 1 dataBox 当前待播放的热点音频
  * 2 playBox 播放中的热点音频集合
  */
-//[type][pageId][queryId]
-let dataBox, playBox
+let playBox
 
 const initBox = () => {
-  dataBox = hash()
   playBox = hash()
 }
 
@@ -96,60 +92,44 @@ const getParentNode = (subtitles, pageId, queryId) => {
 
 
 
-/**
- * 检测数据是否已经装配过
- * 缓存
- */
-const hasAssembly = (pageId, queryId, type) => {
-  var pBox = dataBox[type];
-  if (pBox && pBox[pageId] && pBox[pageId][queryId]) {
-    return true;
-  }
-  return false;
-}
-
-
-/**
- * 组合热点音频数据结构
- * data, pageId, queryId, type
- * 数据，页码编号，videoId, 查询的类型
- * @return {[type]}         [description]
- */
-const combination = (data, pageId, queryId, type, eleName) => {
-  let subtitles
-  if (!dataBox[type]) {
-    dataBox[type] = hash();
-  }
-  if (!dataBox[type][pageId]) {
-    dataBox[type][pageId] = hash();
-  }
-  //有字幕处理
-  if (data.theTitle) {
-    subtitles = parseJSON(data.theTitle);
-  }
-  //配置音频结构
-  return dataBox[type][pageId][queryId] = {
-    'trackId': data.track, //音轨
-    'url': data.md5, //音频名字
-    'subtitles': subtitles,
-    'audioId': queryId,
-    'data': data
-  }
-}
-
-
-const deployAudio = (data, pageId, queryId, type, actionData) => {
+const deployAudio = (sqlData, pageId, queryId, type, actionData, columnData) => {
   //新的查询
-  const ret = combination(data, pageId, queryId, type, actionData);
-  //混入新的动作数据
-  //2015.9.24
-  //音频替换图片
-  //触发动画
-  if (actionData) {
-    _.extend(ret, actionData, {
-      action: true //快速判断存在动作数据
+  let videoData = {}
+
+  /*************
+  组成数据
+  1 column
+  2 ppt
+  *************/
+  if (columnData && columnData.isColumn) {
+    _.extend(videoData, {
+      'trackId': columnData.track, //音轨
+      'url': columnData.fileName, //音频名字
+      'audioId': queryId,
+      'data': sqlData
     })
+  } else {
+    //有字幕处理
+    const subtitles = sqlData.theTitle ? parseJSON(sqlData.theTitle) : null
+    _.extend(videoData, {
+      'trackId': sqlData.track, //音轨
+      'url': sqlData.md5, //音频名字
+      'subtitles': subtitles,
+      'audioId': queryId,
+      'data': sqlData
+    })
+
+    //混入新的动作数据
+    //2015.9.24
+    //音频替换图片
+    //触发动画
+    if (actionData) {
+      _.extend(videoData, actionData, {
+        action: true //快速判断存在动作数据
+      })
+    }
   }
+  return videoData
 }
 
 
@@ -159,17 +139,21 @@ const deployAudio = (data, pageId, queryId, type, actionData) => {
  * @param  {int} queryId   查询id,支持activityId,audioId
  * @param  {string} type   音频来源类型[动画音频,节音频,热点音频]
  */
-const assemblyData = (pageId, queryId, type, actionData) => {
-  //避免复重查询
-  if (hasAssembly(pageId, queryId, type)) {
-    return false;
-  }
-  //解析合集数据
-  const data = getMediaData(type, queryId);
+const assemblyData = (pageId, queryId, type, actionData, columnData) => {
 
-  //存在音频文件
+  /************
+    column数据组成
+  ************/
+  if (columnData.isColumn) {
+    return deployAudio({}, pageId, queryId, type, null, columnData)
+  }
+
+  /************
+    PPT数据组成
+  ************/
+  const data = getMediaData(type, queryId);
   if (data && data.md5) {
-    deployAudio(data, pageId, queryId, type, actionData)
+    return deployAudio(data, pageId, queryId, type, actionData)
   }
 }
 
@@ -230,12 +214,9 @@ const fillBox = function (pageId, type) {
 }
 
 /*创建音频*/
-const playAudio = (pageId, queryId, type) => {
+const playAudio = (pageId, queryId, type, audioData) => {
   let subtitleNode
 
-  //找到页面对应的音频
-  //类型=》页面=》指定音频Id
-  let audioData = dataBox[type][pageId][queryId];
   //检测
   let seasonAudio = preCheck(audioData);
 
@@ -262,13 +243,12 @@ const playAudio = (pageId, queryId, type) => {
 
 
 /*交互点击*/
-const tiggerAudio = (pageId, queryId, type) => {
+const tiggerAudio = (pageId, queryId, type, audioData) => {
   let playObj, status;
   if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
     playObj = playBox[type][pageId][queryId];
     status = playObj.audio ? playObj.status : null;
   }
-
   switch (status) {
     case 'playing':
       playObj.pause()
@@ -277,7 +257,7 @@ const tiggerAudio = (pageId, queryId, type) => {
       playObj.play()
       break;
     default:
-      playAudio(pageId, queryId, type)
+      playAudio(pageId, queryId, type, audioData)
       break;
   }
 }
@@ -291,20 +271,23 @@ const loadAudio = ({
   queryId,
   type,
   action,
-  data
+  data,
+  columnData = {}
 }) => {
 
-  pageId = Number(pageId)
-  queryId = Number(queryId)
+  /*column的参数是字符串类型*/
+  if (!columnData.isColumn) {
+    pageId = Number(pageId)
+    queryId = Number(queryId)
+  }
 
-  /*缓存数据*/
-  assemblyData(pageId, queryId, type, data);
+  const audioData = assemblyData(pageId, queryId, type, data, columnData);
 
   /*手动触发的热点,这种比较特别，手动点击可以切换状态*/
   if (type === 'hot' && action == 'trigger') {
-    tiggerAudio(pageId, queryId, type);
+    tiggerAudio(pageId, queryId, type, audioData);
   } else {
-    playAudio(pageId, queryId, type)
+    playAudio(pageId, queryId, type, audioData)
   }
 }
 
@@ -328,6 +311,7 @@ const removeAudio = () => {
 function getPlayBox() {
   return playBox
 }
+
 
 export {
   initBox,

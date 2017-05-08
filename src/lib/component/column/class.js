@@ -6,8 +6,13 @@ import { getVisualDistance } from '../../scenario/v-distance/index'
 import { ScalePicture } from '../../plugin/extend/scale-picture/index'
 import { closeButton } from '../../plugin/extend/close-button'
 import { analysisImageName, getHDFilePath } from '../../util/option'
+
 import Swipe from '../../swipe/index'
+import { closestMedia } from '../../scenario/mediator/closest'
 import swipeHooks from '../../swipe/hook.js'
+
+import { clearColumnAudio } from '../audio/api'
+import { clearVideo } from '../video/api'
 
 /**
  * 2017.9.7
@@ -45,7 +50,7 @@ export default class ColumnClass {
   /*缩放图片*/
   _zoomPicture(node) {
     const src = node.src
-    if(!src) {
+    if (!src) {
       return
     }
     const analysisName = analysisImageName(src)
@@ -53,7 +58,7 @@ export default class ColumnClass {
 
     /*存在*/
     const zoomObj = this._scaleObjs[originalName]
-    if(zoomObj) {
+    if (zoomObj) {
       return zoomObj.play()
     }
 
@@ -71,10 +76,10 @@ export default class ColumnClass {
    *   等分=> 0.25/0.5/0.75/1/0
    */
   _getNodes() {
-    if(this.pptMaster) {
+    if (this.pptMaster) {
       let nodes = []
       let ratio = 1 / (this.columnCount - 1) //比值
-      for(let i = 1; i < this.columnCount; i++) {
+      for (let i = 1; i < this.columnCount; i++) {
         nodes.push(i * ratio)
       }
       return nodes.push(0)
@@ -83,10 +88,10 @@ export default class ColumnClass {
 
   /*获取母版对象*/
   _getMasterObj() {
-    if(this._masterObj) {
+    if (this._masterObj) {
       return this._masterObj
     }
-    if(this.pptMaster) {
+    if (this.pptMaster) {
       this._masterObj = Xut.Presentation.GetPageObj('master', this.initIndex)
     }
   }
@@ -97,7 +102,7 @@ export default class ColumnClass {
    */
   _moveParallax(action, speed, nodes, visualIndex, direction, viewBeHideDistance) {
     const masterObj = this._getMasterObj()
-    if(masterObj) {
+    if (masterObj) {
       masterObj.moveParallax({
         speed,
         action,
@@ -145,29 +150,31 @@ export default class ColumnClass {
 
     coloumnObj.lastDistance = swipe.getInitDistance()
 
-    //判断二维码，去掉默认行为
     let hasQrcode
     swipe.$watch('onFilter', (hookCallback, point, evtObj) => {
+      /*二维码*/
       hasQrcode = false
-      if(swipeHooks(evtObj, point.target) === 'qrcode') {
+      if (swipeHooks(evtObj, point.target) === 'qrcode') {
         hasQrcode = true
       }
     });
 
-    swipe.$watch('onTap', function(pageIndex, hookCallback, ev, duration) {
-      if(!hasQrcode) {
-        const node = ev.target;
-        //图片缩放
-        if(node && node.nodeName.toLowerCase() === "img") {
+    swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
+      const node = point.target;
+      /*图片缩放*/
+      if (!hasQrcode) {
+        if (node && node.nodeName.toLowerCase() === "img") {
           coloumnObj._zoomPicture(node)
         }
-        if(!Xut.Contents.Canvas.getIsTap()) {
+        if (!Xut.Contents.Canvas.getIsTap()) {
           Xut.View.Toolbar()
         }
       }
-    });
+      /*媒体*/
+      closestMedia(node, coloumnObj.chapterId, swipe.visualIndex)
+    })
 
-    swipe.$watch('onMove', function({
+    swipe.$watch('onMove', function ({
       action,
       speed,
       distance,
@@ -180,8 +187,10 @@ export default class ColumnClass {
       /**
        * 首页边界
        */
-      if(swipe.visualIndex === coloumnObj.minBorder && swipe.direction === 'prev') {
-        if(action === 'flipOver') {
+      if (swipe.visualIndex === coloumnObj.minBorder && swipe.direction === 'prev') {
+        if (action === 'flipOver') {
+          clearColumnAudio()
+          clearVideo()
           Xut.View.GotoPrevSlide()
           swipe.simulationComplete()
         } else {
@@ -192,8 +201,10 @@ export default class ColumnClass {
       /**
        * 尾页边界
        */
-      else if(swipe.visualIndex === coloumnObj.maxBorder && swipe.direction === 'next') {
-        if(action === 'flipOver') {
+      else if (swipe.visualIndex === coloumnObj.maxBorder && swipe.direction === 'next') {
+        if (action === 'flipOver') {
+          clearColumnAudio()
+          clearVideo()
           Xut.View.GotoNextSlide()
           swipe.simulationComplete()
         } else {
@@ -214,7 +225,7 @@ export default class ColumnClass {
 
         moveDistance = viewBeHideDistance
 
-        switch(direction) {
+        switch (direction) {
           case 'next':
             moveDistance = moveDistance + coloumnObj.lastDistance
             break
@@ -224,8 +235,8 @@ export default class ColumnClass {
         }
 
         //反弹
-        if(action === 'flipRebound') {
-          if(direction === 'next') {
+        if (action === 'flipRebound') {
+          if (direction === 'next') {
             //右翻页，左反弹
             moveDistance = (-columnWidth * swipe.visualIndex)
           } else {
@@ -235,7 +246,9 @@ export default class ColumnClass {
         }
 
         //更新页码
-        if(action === 'flipOver') {
+        if (action === 'flipOver') {
+          clearColumnAudio()
+          clearVideo()
           coloumnObj._updataPageNumber(direction)
         }
 
@@ -258,9 +271,9 @@ export default class ColumnClass {
   /*更新页码*/
   _updataPageNumber(direction, location) {
     let initIndex = this.initIndex
-    if(location) {
+    if (location) {
       direction = location === 'right' ? 'prev' : 'next'
-      if(location === 'middle' && initIndex > 0) {
+      if (location === 'middle' && initIndex > 0) {
         //如果中间是分栏页
         --initIndex
       }
@@ -278,7 +291,7 @@ export default class ColumnClass {
     let newColumnCount = getColumnCount(this.seasonId, this.chapterId)
 
     //如果分栏页面总数不正确
-    if(this.columnCount !== newColumnCount) {
+    if (this.columnCount !== newColumnCount) {
 
       this.columnCount = newColumnCount
       this.maxBorder = newColumnCount - 1
@@ -288,11 +301,11 @@ export default class ColumnClass {
       let location
 
       //区分控制column属于哪个页面对象
-      if(visualPageId > columnPageId) {
+      if (visualPageId > columnPageId) {
         location = 'left'
-      } else if(visualPageId < columnPageId) {
+      } else if (visualPageId < columnPageId) {
         location = 'right'
-      } else if(visualPageId === columnPageId) {
+      } else if (visualPageId === columnPageId) {
         location = 'middle'
       }
 
@@ -310,7 +323,7 @@ export default class ColumnClass {
   destroy() {
 
     //销毁缩放图片
-    if(Object.keys(this._scaleObjs).length) {
+    if (Object.keys(this._scaleObjs).length) {
       _.each(this._scaleObjs, (obj, key) => {
         obj.destroy()
         this._scaleObjs[key] = null

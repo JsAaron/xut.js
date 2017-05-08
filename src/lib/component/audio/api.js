@@ -1,4 +1,4 @@
-import { HOT, CONTENT, SEASON } from './audio-type'
+import { HOT, CONTENT, SEASON, COLUMN } from './audio-type'
 import {
   initBox,
   loadAudio,
@@ -48,13 +48,19 @@ export function autoAudio(chapterId, activityId, data) {
 /**
  * 手动触发
  */
-export function triggerAudio(chapterId, activityId, data) {
+export function triggerAudio({
+  data,
+  columnData,
+  activityId,
+  chapterId
+}) {
   loadAudio({
+    data,
+    columnData,
     pageId: chapterId,
     queryId: activityId,
     type: HOT,
-    action: 'trigger',
-    data: data
+    action: 'trigger'
   })
 }
 
@@ -90,12 +96,31 @@ export function clearContentAudio(pageId) {
   if (!playBox[CONTENT] || !playBox[CONTENT][pageId]) {
     return false;
   }
-  var playObj = playBox[CONTENT][pageId];
+  const playObj = playBox[CONTENT][pageId];
   if (playObj) {
-    for (var i in playObj) {
+    for (let i in playObj) {
       playObj[i].end();
+      playObj[i] = null
       delete playBox[CONTENT][pageId][i];
     }
+  }
+}
+
+/*
+2017.5.8新增
+每个column页面支持音频，所以翻页就删除
+这里不需要页码区分，因为全删
+ */
+export function clearColumnAudio() {
+  const playBox = getPlayBox();
+  /*清理视频*/
+  if (playBox && playBox[HOT] && playBox[HOT][COLUMN]) {
+    const playObjs = playBox[HOT][COLUMN]
+    for (let player in playObjs) {
+      playObjs[player].end();
+      playObjs[player] = null
+    }
+    delete playBox[HOT][COLUMN]
   }
 }
 

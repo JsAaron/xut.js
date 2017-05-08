@@ -170,6 +170,7 @@ export default {
   /**
    * touchEnd 全局派发的点击事件
    * 如果stopGlobalEvent == ture 事件由全局派发
+   * isColumn 流式排版触发的媒体
    */
   ,
   trigger({
@@ -177,15 +178,47 @@ export default {
     target,
     rootNode,
     pageIndex,
-    activityId
+    activityId,
+    columnData = {}
   }) {
+
+    /*************
+      流式布局处理
+    **************/
+    if (columnData.isColumn) {
+      if (columnData.type === 'Audio') {
+        triggerAudio({
+          activityId,
+          columnData,
+          chapterId: columnData.chapterId,
+          data: onlyCreateOnce(id)
+        })
+      } else {
+        triggerVideo({
+          chapterId: columnData.chapterId,
+          columnData,
+          activityId,
+          rootNode,
+          pageIndex
+        })
+      }
+      return
+    }
+
+    /*************
+      PPT页面处理
+    **************/
     const category = target.getAttribute('data-delegate')
     if (category) {
       /*音频点击可以是浮动母版了，所以这里必须要明确查找chapter属于的类型页面*/
       const pageType = target.getAttribute('data-belong')
       const chapterId = Xut.Presentation.GetPageId(pageType, pageIndex);
       if (category == 'audio') {
-        triggerAudio(chapterId, activityId, onlyCreateOnce(id))
+        triggerAudio({
+          chapterId,
+          activityId,
+          data: onlyCreateOnce(id)
+        })
       } else {
         triggerVideo({
           chapterId,

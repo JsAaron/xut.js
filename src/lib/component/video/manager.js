@@ -5,7 +5,6 @@ import { VideoClass } from './video'
 import { config } from '../../config/index'
 import { setProportion, hash } from '../../util/index'
 
-let dataBox
 let playBox
 
 /*
@@ -14,7 +13,6 @@ let playBox
 2 播放过的视频数据 （播放集合)
  */
 const initBox = () => {
-  dataBox = hash()
   playBox = hash()
 }
 
@@ -22,85 +20,86 @@ const initBox = () => {
 /**
  * 配置视频结构
  */
-const deployVideo = (videoData, options) => {
-
+const deployVideo = (videoData, options, columnData) => {
+  const palyData = {}
   const { chapterId, activityId, pageIndex, pageType } = options
 
-  const getStyle = Xut.Presentation.GetPageStyle(pageIndex)
-  const layerSize = setProportion({
-    getStyle: getStyle,
-    proportion: getStyle.pageProportion,
-    width: videoData.width || config.visualSize.width,
-    height: videoData.height || config.visualSize.height,
-    left: videoData.left,
-    top: videoData.top,
-    padding: videoData.padding
-  })
+  if (columnData) {
+    /*width, height, top, left, zIndex, url*/
+    _.extend(palyData, {
+      width: '100%',
+      height: '100%',
+      top: '100%',
+      left: '100%',
+      zIndex: 0,
+      poster:columnData.poster,
+      chapterId,
+      container: columnData.container,
+      url: columnData.fileName,
+      isColumn: columnData.isColumn,
+      category: 'video'
+    })
 
-  const videoInfo = _.extend(layerSize, {
-    pageType,
-    chapterId,
-    isfloat: videoData.isfloat, //是否浮动
-    'videoId': activityId,
-    'url': videoData.md5,
-    'pageUrl': videoData.url,
-    'zIndex': videoData.zIndex || 2147483647,
-    'background': videoData.background,
-    'category': videoData.category,
-    'hyperlink': videoData.hyperlink
-  })
-
-  if (!_.isObject(dataBox[chapterId])) {
-    dataBox[chapterId] = {};
+  } else {
+    const getStyle = Xut.Presentation.GetPageStyle(pageIndex)
+    const layerSize = setProportion({
+      getStyle: getStyle,
+      proportion: getStyle.pageProportion,
+      width: videoData.width || config.visualSize.width,
+      height: videoData.height || config.visualSize.height,
+      left: videoData.left,
+      top: videoData.top,
+      padding: videoData.padding
+    })
+    _.extend(palyData, layerSize, {
+      pageType,
+      chapterId,
+      isfloat: videoData.isfloat, //是否浮动
+      'videoId': activityId,
+      'url': videoData.md5,
+      'pageUrl': videoData.url,
+      'zIndex': videoData.zIndex || 2147483647,
+      'background': videoData.background,
+      'category': videoData.category,
+      'hyperlink': videoData.hyperlink
+    })
   }
 
-  dataBox[chapterId][activityId] = videoInfo;
+  return palyData
 }
 
-/**
- * 检测数据是否已经装配过
- * 缓存
- */
-const hasAssembly = (chapterId, activityId) => {
-  const chapterData = dataBox[chapterId];
-  //如果能在dataBox找到对应的数据
-  if (chapterData && chapterData[activityId]) {
-    return true;
-  }
-  return false;
-}
 
 /*
 装配数据
-1 去重复
-2 组合新数据
  */
 const assemblyData = (options) => {
-  //复重
-  if (hasAssembly(options.chapterId, options.activityId)) {
-    return
+  /*column处理*/
+  if (options.columnData && options.columnData.isColumn) {
+    return deployVideo({}, options, options.columnData)
+  } else {
+    //新的查询
+    const videoData = Xut.data.query('Video', options.activityId)
+    return deployVideo(videoData, options)
   }
-  //新的查询
-  const data = Xut.data.query('Video', options.activityId)
-  deployVideo(data, options)
 }
 
 /**
  * 加载视频
  */
-const createVideo = (options) => {
+const createVideo = (options, videoData) => {
   const { chapterId, activityId, rootNode } = options
-  /*创建数据*/
-  const createData = dataBox[chapterId][activityId]
-    /*如果已经存在，直接调用播放*/
+
+  /*如果已经存在，直接调用播放*/
   if (playBox[chapterId] && playBox[chapterId][activityId]) {
     playBox[chapterId][activityId].play()
   } else {
-    /*创建新的*/
     if (!_.isObject(playBox[chapterId])) {
       playBox[chapterId] = {}
     }
-    playBox[chapterId][activityId] = new VideoClass(createData, rootNode)
+    if (rootNode) {
+      videoData.container = rootNode
+    }
+    playBox[chapterId][activityId] = new VideoClass(videoData)
   }
 }
 
@@ -109,9 +108,9 @@ const createVideo = (options) => {
  */
 const initVideo = (options) => {
   //解析数据
-  assemblyData(options);
+  const videoData = assemblyData(options);
   //调用播放
-  createVideo(options);
+  createVideo(options, videoData);
 }
 
 
@@ -139,9 +138,6 @@ function playVideo(options) {
   }
 }
 
-function getDataBox() {
-  return dataBox
-}
 
 function getPlayBox() {
   return playBox
@@ -150,6 +146,5 @@ function getPlayBox() {
 export {
   initBox,
   playVideo,
-  getPlayBox,
-  getDataBox
+  getPlayBox
 }
