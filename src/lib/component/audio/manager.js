@@ -229,7 +229,7 @@ const playAudio = (pageId, queryId, type, audioData) => {
     subtitleNode = getParentNode(audioData.subtitles, pageId, queryId);
   }
 
-  //播放完成处理
+  //播放一次的处理
   audioData.innerCallback = (audio) => {
     if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
       audio.end();

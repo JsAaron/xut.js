@@ -32,7 +32,6 @@ const deployVideo = (videoData, options, columnData) => {
       top: '100%',
       left: '100%',
       zIndex: 0,
-      poster:columnData.poster,
       chapterId,
       container: columnData.container,
       url: columnData.fileName,

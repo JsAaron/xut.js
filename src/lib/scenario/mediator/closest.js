@@ -60,6 +60,20 @@ export function closestProcessor(event, pageType) {
  */
 export function closestMedia(target, chapterId, pageIndex) {
   if (target) {
+
+    const hasPoster = target.getAttribute('data-type')
+
+    /*
+      如果是column视频的poster层
+      1 保存视频的嵌套容器
+      2 修正target的目标为父容器Video
+    */
+    let container
+    if (hasPoster === 'poster' && !key) {
+      container = target
+      target = target.parentNode
+    }
+
     const key = target.getAttribute('id')
     const matchType = key && key.match(/(Audio|Video)_(\w+)/)
     if (matchType) {
@@ -68,18 +82,13 @@ export function closestMedia(target, chapterId, pageIndex) {
         const type = matchType[1]
         const id = matchType[2]
         if (fileName) {
-          let poster
-          if (type === 'Video') {
-            poster = target.getAttribute('data-poster')
-          }
           $trigger({
             target,
             pageIndex
           }, {
             id,
             type,
-            poster, //视频预览图
-            container: target,
+            container: container || target,
             track: 8888, //播放就删除
             chapterId: 'column',
             isColumn: true,

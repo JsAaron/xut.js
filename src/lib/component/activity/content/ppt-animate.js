@@ -167,7 +167,6 @@ export default class Animation {
    * @return {[type]} [description]
    */
   _createDom(category, callback) {
-
     if(category) {
       const data = {
         id: this.id,

@@ -234,10 +234,13 @@ export function execScript(code, type) {
 
 /**
  * 创建gif随机数
- * @return {[type]} [description]
+ * 用数字代码，不能用0.在有些电脑上不显示
  */
 export function createRandomImg(url) {
-  return url + `?${Math.random()}`
+  let s = Math.random().toString()
+  s = s.replace(/\b(0+)(\.+)/gi, "")
+  s = parseInt(s)
+  return url + `?${s}`
 }
 
 /**

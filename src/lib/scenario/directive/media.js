@@ -51,6 +51,33 @@ export default {
       itemArray = parseJSON(itemArray);
       let start = itemArray[0];
       let stop = itemArray[1];
+
+      const itemLength = itemArray.length
+
+      /*如果只有一个参数，并且还有zIndex*/
+      if (itemLength === 1 && (1 !== start.indexOf('zIndex'))) {
+        const option = parseJSON(start)
+        if (option) {
+          zIndex = option.zIndex
+          start = null
+        }
+      }
+      /*如果二个参数，并且还有zIndex*/
+      else if (itemLength === 2 && (1 !== stop.indexOf('zIndex'))) {
+        const option = parseJSON(stop)
+        if (option) {
+          zIndex = option.zIndex
+          stop = null
+        }
+      }
+      /*如果只有三个参数，并且还有zIndex*/
+      else if (itemLength === 3 && (1 !== itemArray.indexOf('zIndex'))) {
+        const option = parseJSON(itemArray[2])
+        if (option) {
+          zIndex = option.zIndex
+        }
+      }
+
       tempData[_id] = {};
       if (start) {
         if (start.startImg) {
@@ -71,6 +98,7 @@ export default {
           tempData[_id]['stopScript'] = stop.script
         }
       }
+
     }
 
     //只针对网页插件增加单独的点击界面

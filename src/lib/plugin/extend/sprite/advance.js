@@ -10,24 +10,30 @@ import { loadFigure } from '../../../util/loader'
 import { getFileFullPath } from '../../../util/option'
 import { config } from '../../../config/index'
 
+/*
+1 高级精灵动画 =>  替换一张张图片
+2 简单精灵强制转换复杂精灵动画
+options.type
+  1 seniorSprite
+  2 autoSprite
+ */
 export default class {
 
   constructor(data, options) {
     this.data = data;
-    //精灵动画类型 默认为高级精灵动画true 简单转复杂为false
-    this.animationType = true;
+
     //高级精灵动画
-    if(options.type == 'seniorSprite') {
+    if (options.type == 'seniorSprite') {
       this.contentPrefix = options.contentPrefix;
       this.obj = $("#" + this.contentPrefix + this.data.framId);
       this.resourcePath = options.resourcePath;
     }
+
     //简单精灵强制转换复杂精灵动画
-    else {
-      this.animationType = false;
+    if (options.type === 'autoSprite') {
       this.contentId = options.contentId;
       this.obj = $(options.ele);
-      this.resourcePath = getFileFullPath(options.resourcePath,'autoSprite') + "/";
+      this.resourcePath = getFileFullPath(options.resourcePath, 'autoSprite') + "/";
     }
 
     //是否有蒙版图
@@ -35,6 +41,8 @@ export default class {
     this.isMask = false
 
     this.curFPS = 0
+
+    /*默认值循环一次*/
     this.loop = 1
     this.resetCount = 0
 
@@ -52,8 +60,12 @@ export default class {
     this._imgArray = []
     this.sprObj = null
 
-    if(this.playerType == "loop") {
-      this.loop = 0;
+    /*
+      默认值播放一次
+      如果设置了循环就直接循环处理
+     */
+    if (this.playerType == "loop") {
+      this.loop = 'loop';
     }
 
     this._init()
@@ -69,7 +81,7 @@ export default class {
     this._initImage()
 
     //判断是否运动状态
-    if(this.isSports) {
+    if (this.isSports) {
       //初始化位置信息
       this._initPosition();
     }
@@ -84,7 +96,7 @@ export default class {
    * @return {[type]} [description]
    */
   _checkNextAction(task) {
-    if(this._initImageState) {
+    if (this._initImageState) {
       task()
     } else {
       this._waitTask = []
@@ -102,10 +114,10 @@ export default class {
     let qualified = 10
     let count = this.qualified = this.totalFPS >= qualified ? qualified : this.totalFPS
     let collect = (() => {
-      return() => {
-        if(count == 1) {
+      return () => {
+        if (count == 1) {
           this._initImageState = true
-          if(this._waitTask && this._waitTask.length) {
+          if (this._waitTask && this._waitTask.length) {
             this._waitTask.pop()()
           }
         } else {
@@ -114,7 +126,7 @@ export default class {
       }
     })()
 
-    for(i; i < this.qualified; i++) {
+    for (i; i < this.qualified; i++) {
       this._preloadImage(i, collect)
     }
   }
@@ -150,15 +162,7 @@ export default class {
     let framId;
     let resourcePath = this.resourcePath
     let html = ''
-
-    // if (this.animationType) {
-    //     framId = this.data.framId
-    // } else {
-    //     let contentId = this.contentId;
-    //     framId = contentId + '_' + this.data.framId
-    // }
-
-    if(this.isMask) {
+    if (this.isMask) {
       const filename = this._getFilename(this.originalImageList[0].name)
       const maskUrl = resourcePath + filename
       html =
@@ -197,18 +201,18 @@ export default class {
    * @return {[type]} [description]
    */
   _preloadImage(index, callback) {
-    if(index >= this.totalFPS) {
+    if (index >= this.totalFPS) {
       return
     }
     let self = this
-    let collect = function() {
+    let collect = function () {
       self._imgArray && self._imgArray.push(this)
       callback && callback()
     }
 
     let imageList = this.originalImageList
     let resourcePath = this.resourcePath
-    if(this.isMask) {
+    if (this.isMask) {
       let filename = this._getFilename(imageList[index].name)
       loadFigure(resourcePath + filename + ".png", collect)
       loadFigure(resourcePath + filename + ".jpg", collect)
@@ -228,11 +232,11 @@ export default class {
     let resourcePath = this.resourcePath;
 
     //第一次循环才加载图片
-    if(this.resetCount === 0) {
+    if (this.resetCount === 0) {
       this._preloadImage(this.curFPS + this.qualified)
     }
 
-    if(this.isMask) {
+    if (this.isMask) {
       let filename = this._getFilename(curFPS.name);
       this.sprObj.css("background-image", "url(" + resourcePath + filename + ".jpg)");
       this.sprObj.css("-webkit-mask-image", "url(" + resourcePath + filename + ".png)");
@@ -265,7 +269,7 @@ export default class {
    */
   _change() {
     this._changeImageUrl()
-    if(this.isSports) {
+    if (this.isSports) {
       this._changePosition()
     }
   }
@@ -289,17 +293,16 @@ export default class {
    */
   _set() {
     //循环复位
-    if(this.curFPS >= this.totalFPS) {
+    if (this.curFPS >= this.totalFPS) {
       this.curFPS = 0
       this.resetCount++
     }
 
-    //指定次数
-    if(this.loop && this.loop == this.resetCount) {
+    if (this.loop !== 'loop' && this.loop == this.resetCount) {
       this._stop()
       return
-
     }
+
     this._checkNextAction(() => {
       this._time()
     })
@@ -307,7 +310,7 @@ export default class {
 
 
   _stop() {
-    if(this.timer) {
+    if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null
     }
@@ -318,17 +321,19 @@ export default class {
 
   /**
    * 开始运行动画
-   * @param  {[type]} action [description]
-   * @param  {[type]} loop   [description]
-   * @return {[type]}        [description]
+   * loop
+   *   1 零件高级动画 loop => N / loop
+   *   1 普通转高级动画 loop => N / loop
    */
   play(action, loop) {
     this.action = action;
-    if(!this.data.params[action]) {
+    if (!this.data.params[action]) {
       console.log(" Function changeSwitchAni  parameters " + action + " error");
       return;
     }
-    this.loop = loop
+    if (loop) {
+      this.loop = loop
+    }
     this._stop()
     this._set()
   }
@@ -353,7 +358,7 @@ export default class {
     this.sprObj = null
     this.data.params = null
     this.data = null
-    this._imgArray.forEach(function(img) {
+    this._imgArray.forEach(function (img) {
       img = null
     })
     this.originalImageList = null

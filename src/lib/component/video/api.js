@@ -31,7 +31,7 @@ export function removeVideo(chapterId) {
   //清理视频
   if (playBox && playBox[chapterId]) {
     for (let activityId in playBox[chapterId]) {
-      playBox[chapterId][activityId].close();
+      playBox[chapterId][activityId].destroy();
     }
     delete playBox[chapterId]
   }
@@ -46,7 +46,7 @@ export function clearVideo() {
   let flag = false //记录是否处理过销毁状态
   for (let chapterId in playBox) {
     for (let activityId in playBox[chapterId]) {
-      playBox[chapterId][activityId].close();
+      playBox[chapterId][activityId].destroy();
       flag = true;
     }
   }

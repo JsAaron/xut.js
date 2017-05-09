@@ -6,7 +6,7 @@
 import AutoSprite from '../../../../plugin/extend/sprite/advance'
 
 
-let moveContent = (contentPrefix, id, parentId) => {
+const moveContent = (contentPrefix, id, parentId) => {
   let obj = $("#" + contentPrefix + id);
   let parentObj = $("#" + contentPrefix + parentId)
   let $parent = $("#spirit_parent_" + parentId)
@@ -24,7 +24,6 @@ export default class {
     this.ids = []
   }
 
-
   play() {
 
     const data = this.options.data;
@@ -37,7 +36,17 @@ export default class {
     option.contentId = this.options.id;
     option.ele = this.options.$contentNode;
     option.resourcePath = data.md5;
-    option.type = "advSprite";
+    option.type = "autoSprite";
+
+    /*
+      data.loop
+       循环 1
+       不循环 0
+     */
+    let hasLoop = 0
+    if (data.loop) {
+      hasLoop = 'loop'
+    }
 
     for (let i = 0; i < resource.spiritList.length; i++) {
       spiritList = resource.spiritList[i];
@@ -53,8 +62,9 @@ export default class {
       this.spiritObjs[id] = new AutoSprite(spiritList, option)
       params = spiritList.params
       action = params["actList"].split(",")[0]
+
       //0 循环播放 1播放一次
-      this.spiritObjs[id].play(action, data.loop)
+      this.spiritObjs[id].play(action, hasLoop)
     }
 
   }
@@ -81,7 +91,6 @@ export default class {
     this.options.$contentNode = null;
     this.options = null;
     this.ids = null;
-
   }
 
 }

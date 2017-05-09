@@ -1,5 +1,7 @@
-import { Action } from './action'
-import { Subtitle } from './subtitle'
+import { config } from '../../../config/index'
+import { Action } from '../action'
+import { Subtitle } from '../subtitle'
+
 
 /**
  * 音频工厂类
@@ -11,18 +13,23 @@ export default class AudioSuper {
 
   /**
    * 构建之前关数据
-   * @param  {[type]} trackId [description]
-   * @param  {[type]} options [description]
-   * @return {[type]}         [description]
+   * 2个回调处理
+   *  1 内部manage
+   *  2 外部content的行为音频
+   *  二者只会同时存在一个
    */
   $$preRelated(trackId, options) {
-    //完成end后 外部回调删除这个对象
-    //单独调用引用对象
-    //传递一个 options.complete
+
+    /*匹配URL地址*/
+    this.$$url = config.getAudioPath() + options.url
+
+    //在manager中附加，播放一次后删除这个对象
     this.innerCallback = options.innerCallback;
-    //仅运行一次
-    //外部调用
-    this.outerCallback = trackId == 9999 ? options.complete : null;
+
+    /*按钮的反弹点击触发，设置按钮的行为*/
+    if (trackId == 9999 && options.complete) {
+      this.outerCallback = options.complete
+    }
   }
 
   /**
@@ -34,7 +41,7 @@ export default class AudioSuper {
   $$afterRelated(options, controlDoms) {
     //音频重复播放次数
     if (options.data && options.data.repeat) {
-      this.repeat = Number(options.data.repeat); //需要重复
+      this.repeatNumber = Number(options.data.repeat)
     }
     //音频动作
     if (options.action) {
@@ -42,10 +49,8 @@ export default class AudioSuper {
     }
     //字幕对象
     if (options.subtitles && options.subtitles.length > 0) {
-      //创建字幕对象
       this.subtitleObject = new Subtitle(options, controlDoms, (cb) => this.getAudioTime(cb))
     }
-
     //如果有外部回调处理
     if (this.outerCallback) {
       this.outerCallback.call(this);
@@ -55,25 +60,38 @@ export default class AudioSuper {
   /**
    * 运行成功失败后处理方法
    * phoengap会调用callbackProcess
-   * @param  {[type]} sysCommand [description]
-   * @return {[type]}            [description]
+   * state
+   *   true 成功回调
+   *   false 失败回调
    */
-  $$callbackProcess(sysCommand) {
-    if (this.outerCallback) { //外部调用结束
+  $$callbackProcess(state) {
+
+    /**************************
+        处理content的反馈回调
+    ***************************/
+    if (this.outerCallback) {
       this.end()
     } else {
-      //安卓没有重复播放
-      //phonegap未处理
-      if (!Xut.plat.isAndroid && this.repeat) {
-        //如果需要重复
-        --this.repeat;
+
+      /**************************
+       内部播放的回调，manage的处理
+      ***************************/
+      /*播放失败*/
+      if (!state) {
+        this.innerCallback && this.innerCallback(this);
+        return
+      }
+
+      /*如果有需要重复的音频*/
+      if (this.repeatNumber) {
+        --this.repeatNumber
         this.play()
       } else {
-        //外部清理对象
-        //audioManager中直接删当前对象
+        /*如果不存在重复，那么播放完毕后，直接清理这个对象*/
         this.innerCallback && this.innerCallback(this);
       }
     }
+
   }
 
 
@@ -85,12 +103,11 @@ export default class AudioSuper {
     //flash模式不执行
     if (this.audio && !this.isFlash) {
       this.status = 'playing';
-      //支持自动播放
+      //支持自动播放,微信上单独处理
       if (Xut.plat.hasAutoPlayAudio && window.WeixinJSBridge) {
-        //微信上单独处理
         window.WeixinJSBridge.invoke('getNetworkType', {}, (e) => {
           this.audio.play();
-        });
+        })
       } else {
         this.audio.play && this.audio.play();
       }

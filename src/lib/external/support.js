@@ -22,18 +22,18 @@
   var hasTouch = ('ontouchstart' in window) //支持触屏
 
   //针对win8的处理
-  var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i
-    //移动端仅仅只支持touch
-  var only_touch = hasTouch && MOBILE_REGEX.test(userAgent)
-    //判断是否为浏览器
+  var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i;
+  //移动端仅仅只支持touch
+  var only_touch = hasTouch && MOBILE_REGEX.test(userAgent);
+  //判断是否为浏览器
   var boolBrowser = location.indexOf('http') > -1 || location.indexOf('https') > -1
   var isBrowser = boolBrowser ? boolBrowser : !only_touch
 
-  //有hasMutationObserverBug
-  //detecting iOS UIWebView by indexedDB
+  /*ios版本*/
   var iosVersionMatch = isIOS && userAgent.match(/os ([\d_]+)/)
   var iosVersion = iosVersionMatch && iosVersionMatch[1].split('_')
 
+  /*是否支持hasMutationObserverBug*/
   var hasMutationObserver = false
   var iosMainVersion = null
   if (iosVersion) {
@@ -41,6 +41,9 @@
     hasMutationObserver = iosMainVersion >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB
   }
 
+  /*安卓版本*/
+  var androidVersionMatch = isAndroid && userAgent.match(/android ([\d_]+)/)
+  var androidVersion = androidVersionMatch && androidVersionMatch[1].split('_')
 
   /**
    * 平台支持
@@ -52,6 +55,8 @@
     isIpad: isIpad,
     isIOS: isIOS,
     isMacOS: isMacOS,
+
+    androidVersion: androidVersion,
 
     /**
      * 是平板设备
