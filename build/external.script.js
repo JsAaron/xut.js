@@ -4,10 +4,7 @@ const external = require('../src/lib/external.js')
 
 const index = './src/index.html'
 
-module.exports = (conf) => {
-  let srcDir, exclude
-  srcDir = conf.srcDir
-  exclude = conf.exclude
+module.exports = (srcDir, exclude) => {
   return new Promise((resolve, reject) => {
     /**
      * 文件定义
@@ -26,7 +23,7 @@ module.exports = (conf) => {
           paths.push(srcDir + path)
         }
       })
-      utils.log(`【external file：${paths.length}】`, 'debug')
+      utils.log(`external file：${paths.length}`, 'debug')
 
       resolve(paths)
     } else {

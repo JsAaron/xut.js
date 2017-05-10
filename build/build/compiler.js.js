@@ -16,7 +16,7 @@ module.exports = (conf, scriptUrl) => {
         this.end();
       })
       //dev
-      .pipe(gulp.dest(conf.tarDir))
+      .pipe(gulp.dest(conf.distDir))
       //min
       .pipe(uglify())
       .on('error', (err) => {
@@ -24,7 +24,7 @@ module.exports = (conf, scriptUrl) => {
         console.log(err)
       })
       .pipe(rename(conf.distName))
-      .pipe(gulp.dest(conf.tarDir))
+      .pipe(gulp.dest(conf.distDir))
       .on('end', (err) => {
         utils.log(`【${conf.devName}、${conf.distName}】compile complete`, 'debug')
         fs.unlinkSync(conf.rollup)

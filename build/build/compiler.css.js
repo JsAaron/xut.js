@@ -31,10 +31,10 @@ const createFile = function(fileName, path, conf, resolve, reject) {
             remove: true //是否去掉不必要的前缀 默认：true
         }))
         .pipe(concat(fileName + '.dev.css'))
-        .pipe(gulp.dest(conf.tarDir))
+        .pipe(gulp.dest(conf.distDir))
         .pipe(cleanCSS({ compatibility: 'ie8' }))
         .pipe(rename(fileName + '.css'))
-        .pipe(gulp.dest(conf.tarDir))
+        .pipe(gulp.dest(conf.distDir))
         .on('error', (err) => {
             utils.log('【css】compile complete error', 'debug')
             reject()

@@ -8,6 +8,8 @@ const path = require('path')
 const _ = require("underscore");
 const fsextra = require('fs-extra')
 const cp = require('child_process');
+const utils = require('../utils')
+
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
@@ -19,15 +21,15 @@ const app = express()
 const config = require('../../config')
 const port = process.env.PORT || config.dev.port
 
-const conf = _.extend(config.dev.conf, {
-  rollup: config.dev.conf.tarDir + 'rollup.js'
+const devConfig = _.extend(config.dev.conf, {
+  rollup: config.dev.conf.distDir + 'rollup.js'
 })
 
-convertSVG(conf.srcDir)
-serialData(conf.srcDir)
+convertSVG(devConfig.srcDir)
+serialData(devConfig.srcDir)
 
-fsextra.removeSync(conf.assetsRoot)
-fsextra.mkdirSync(conf.assetsRoot);
+fsextra.removeSync(devConfig.assetsRoot)
+fsextra.mkdirSync(devConfig.assetsRoot);
 
 const webpackConfig = require('./webpack.dev.conf')
 
@@ -35,11 +37,11 @@ const webpackConfig = require('./webpack.dev.conf')
 /*eslint
   https://segmentfault.com/a/1190000008575829?utm_source=itdadao&utm_medium=referral
 */
-if(config.dev.eslint.launch) {
+if (config.dev.eslint.launch) {
   webpackConfig.module.rules.push({
     test: /\.js$/,
-    enforce: "pre",//在babel-loader对源码进行编译前进行lint的检查
-    include: config.dev.eslint.dir,
+    enforce: "pre", //在babel-loader对源码进行编译前进行lint的检查
+    include: config.dev.eslint.includePath,
     exclude: /node_modules/,
     use: [{
       loader: "eslint-loader",
@@ -99,24 +101,38 @@ app.use('/content', express.static('src/content'));
 
 let first = true
 let preChildRun = null
-watch(conf.assetsRoot + '/app.js', () => {
-  if(first) {
+
+/*
+如果packMode模式是rollup
+那么优化第一次采用all的方式,必须先生成一次External文件
+之后全用rollup
+ */
+let packMode = config.debug.packMode
+if (config.debug.launch && config.debug.packMode === 'rollup') {
+  packMode = 'all'
+}
+
+watch(devConfig.assetsRoot + '/app.js', () => {
+  if (config.dev.openBrowser && first) {
     open("http://localhost:" + port)
     first = false
   }
-  if(config.dev.debug.launch) {
-    console.log(
-      '\n' +
-      'debug mode : to regenerate the file'
-    )
-    if(preChildRun) {
+  if (config.debug.launch) {
+    utils.log("\nDebug Mode: Packed File", 'red')
+    if (preChildRun) {
       preChildRun.kill()
       preChildRun = null
     }
-    let child = cp.spawn('node', ['build/dev/debug.js', ['debug=' + config.dev.debug.dir]]);
-    child.stdout.on('data', (data) => console.log('\n' + data))
-    child.stderr.on('data', (data) => console.log('fail out：\n' + data));
-    child.on('close', (code) => console.log('complete：' + code));
+    let child = cp.spawn('node', [
+      'build/debug/index.js', [config.debug.path, packMode, config.debug.uglify]
+    ])
+    const start = (new Date().getSeconds())
+    child.stdout.on('data', (data) => utils.log('\n' + data))
+    child.stderr.on('data', (data) => utils.log('fail out：\n' + data));
+    child.on('close', (code) => {
+      packMode = config.debug.packMode
+      utils.log(`Completion time：${(new Date().getSeconds()) - start}s`)
+    });
     preChildRun = child
   }
 })
@@ -124,10 +140,10 @@ watch(conf.assetsRoot + '/app.js', () => {
 
 killOccupied(port, () => {
   app.listen(port, (err) => {
-    if(err) {
-      console.log(err)
+    if (err) {
+      utils.log(err)
       return
     }
-    console.log('Listening at http://localhost:' + port + '\n')
+    utils.log('Listening at http://localhost:' + port + '\n')
   })
 })

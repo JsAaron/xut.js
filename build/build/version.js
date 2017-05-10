@@ -16,8 +16,8 @@ const writeFile = (filename, content) => {
 
 module.exports = (conf) => {
     return new Promise((resolve, reject) => {
-        let rpath = conf.tarDir + conf.devName
-        let wpath = conf.tarDir + 'version.js'
+        let rpath = conf.distDir + conf.devName
+        let wpath = conf.distDir + 'version.js'
         let data = readFile(rpath)
         let vs = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
         utils.log(`【create Xut.Version = ${vs}】`, 'debug')

@@ -6,22 +6,22 @@ const version = require('./version')
 const _ = require("underscore");
 const config = require('../../config')
 
-const conf = _.extend(config.build.conf, {
-    rollup: config.build.conf.tarDir + 'rollup.js',
-    exclude: config.build.exclude,
-    server: config.build.server
+const buildConfig = _.extend(config.build.conf, {
+  rollup: config.build.conf.distDir + 'rollup.dev.js',
+  exclude: config.build.exclude,
+  server: config.build.server
 })
 
-rollup(conf)
-    .then(() => {
-        return getScript(conf)
-    })
-    .then((scriptUrl) => {
-        return compilerJs(conf, scriptUrl)
-    })
-    .then(() => {
-        return version(conf)
-    })
-    .then(() => {
-        return compilerCSS(conf)
-    })
+rollup(buildConfig)
+  .then(() => {
+    return getScript(buildConfig.srcDir, buildConfig.exclude)
+  })
+  .then((scriptUrl) => {
+    return compilerJs(buildConfig, scriptUrl)
+  })
+  .then(() => {
+    return version(buildConfig)
+  })
+  .then(() => {
+    return compilerCSS(buildConfig)
+  })

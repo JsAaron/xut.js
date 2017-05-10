@@ -17,18 +17,14 @@ const del = (dist) => {
   console.log('del: ' + dist)
 }
 
-module.exports = (conf, skipClean) => {
-
+module.exports = (conf, skipCleanDir) => {
   //跳过清理
-  if (!skipClean) {
-    fsextra.emptyDirSync(conf.tarDir)
-    utils.log(`delete the directory : ${conf.tarDir}`, 'prompt')
+  if (!skipCleanDir) {
+    fsextra.emptyDirSync(conf.distDir)
+    utils.log(`delete the directory : ${conf.distDir}`, 'prompt')
   }
-
   return new Promise((resolve, reject) => {
-
-    utils.log('【compile rollup】', 'debug')
-
+    utils.log('Compiling Rollup Pack', 'debug')
     rollup.rollup({
         entry: conf.entry,
         plugins: [
@@ -53,12 +49,11 @@ module.exports = (conf, skipClean) => {
           })
         ]
       }).then((bundle) => {
-        var code
-        if (!fs.existsSync(conf.tarDir)) {
-          fs.mkdirSync(conf.tarDir);
-          utils.log(conf.tarDir + '目录创建成功', 'info');
+        if (!fs.existsSync(conf.distDir)) {
+          fs.mkdirSync(conf.distDir);
+          utils.log(conf.distDir + '目录创建成功', 'info');
         }
-        code = bundle.generate({
+        const code = bundle.generate({
           format: 'umd',
           moduleName: 'Aaron'
         }).code
