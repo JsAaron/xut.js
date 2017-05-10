@@ -7,7 +7,7 @@ const resolution = window.screen
 /**
  * 安卓phonegap播放器
  */
-export default class MediaPlayer {
+export default class PhoneGapMedia {
 
   constructor(options) {
 

@@ -12,7 +12,7 @@
     <title>AppCarrier</title>
     <link rel="stylesheet" type="text/css" href="css/dev.css">
     <script type="text/javascript" src="content/101/SQLResult.js"></script>
-    <script type="text/javascript" src="lib/external.js"></script>
+    <script type="text/javascript" src="lib/external.js" data-plat="mini"></script>
 </head>
 
 <body>
@@ -27,6 +27,7 @@
 
 </html>
 <script type="text/javascript">
+
 Xut.Application.setConfig = {
 
     lauchMode: 1,
@@ -83,7 +84,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)
 })
 
-var appId = 8 //306
+var appId = 317 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         el: '#xxtppt-app-container', //根节点

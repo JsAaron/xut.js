@@ -1,4 +1,4 @@
-import { PhoneGapMedia } from './player/phone-gap'
+import { PhoneGapMedia } from './player/phonegap'
 import { CordovaMedia } from './player/cordova'
 import { NativeVideo } from './player/native'
 

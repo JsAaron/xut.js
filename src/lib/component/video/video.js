@@ -1,5 +1,5 @@
 import h5Player from './player/native'
-import MediaPlayer from './player/phone-gap'
+import PhoneGapMedia from './player/phonegap'
 import WebPage from './player/web'
 
 let VideoPlayer
@@ -24,7 +24,7 @@ if (Xut.plat.isBrowser) {
       VideoPlayer = h5Player
     } else {
       //android平台
-      VideoPlayer = MediaPlayer
+      VideoPlayer = PhoneGapMedia
     }
   }
 }

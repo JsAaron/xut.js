@@ -38,18 +38,21 @@ export function initGlobalEvent() {
       }
     })
 
-    /*Home键音频动作处理*/
-    $(document).on('visibilitychange', event => {
-      /*home 后台*/
-      if (document.visibilityState === 'hidden') {
-        Xut.Application.Original()
-      } else {
-        /*如果不是嵌套iframe，激活*/
-        if (!window.GLOBALIFRAME) {
-          Xut.Application.Activate()
+    /*防止快速刷新，会触发Original时间*/
+    setTimeout(function () {
+      /*Home键音频动作处理*/
+      $(document).on('visibilitychange', event => {
+        /*home 后台*/
+        if (document.visibilityState === 'hidden') {
+          Xut.Application.Original()
+        } else {
+          /*如果不是嵌套iframe，激活*/
+          if (!window.GLOBALIFRAME) {
+            Xut.Application.Activate()
+          }
         }
-      }
-    })
+      })
+    }, 1000)
 
     /*
     启动代码用户操作跟踪

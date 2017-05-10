@@ -14,7 +14,7 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
-Xut.Version = 883.1
+Xut.Version = 883.3
 
 /*加载应用app*/
 const initApp = (...arg) => {
@@ -90,13 +90,27 @@ Xut.Application.Launch = option => {
 }
 
 
+/*判断是否script有data-plat属性*/
+const hasLaunch = function () {
+  const scripts = document.querySelectorAll('script')
+  for (let i = 0; i < scripts.length; i++) {
+    let node = scripts[i]
+    if (node.getAttribute('data-plat') === 'mini') {
+      return true
+    }
+  }
+}
+
+
 /*老版本加载*/
 setTimeout(() => {
   const setConfig = Xut.Application.setConfig
   if (!setConfig || setConfig && setConfig.lauchMode !== 1) {
+    if (hasLaunch()) {
+      return
+    }
     mixGolbalConfig(setConfig)
-
-    /*保证兼容，不需要判断launch存在，初始空对象*/
+      /*保证兼容，不需要判断launch存在，初始空对象*/
     config.launch = {}
     initApp()
   }
