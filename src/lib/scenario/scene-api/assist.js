@@ -6,13 +6,38 @@
 export function extendAssist(access, $globalEvent) {
 
   /**
+   * 针对HOT的显示与隐藏
+   * @param {[type]} activityId    [activity中的Id]
+   * @param {[type]} start         [显示与隐藏]
+   *     Xut.Assist.TriggerPoint(activityId, 'show')
+         Xut.Assist.TriggerPoint(activityId, 'hide')
+   */
+  Xut.Assist.TriggerPoint = function (activityId, state) {
+    const data = Xut.data.query('Activity', activityId);
+    if (data) {
+      const $dom = $(`#${data.actType}_${data._id}`)
+      if ($dom.length) {
+        if (state === 'show') {
+          Xut.nextTick(() => {
+            $dom.css('visibility', 'visible')
+          })
+        }
+        if (state === 'hide') {
+          $dom.css('visibility', 'hidden')
+        }
+      }
+    }
+  }
+
+
+  /**
    * 文字动画
    * @param {[type]} contentId [description]
    */
-  Xut.Assist.TextFx = function(contentId) {
-    let pageObj = Xut.Presentation.GetPageObj()
-    let fxObj = pageObj.getLetterObjs(contentId)
-    if(fxObj) {
+  Xut.Assist.TextFx = function (contentId) {
+    const pageObj = Xut.Presentation.GetPageObj()
+    const fxObj = pageObj.getLetterObjs(contentId)
+    if (fxObj) {
       fxObj.play()
     }
   }
@@ -29,23 +54,23 @@ export function extendAssist(access, $globalEvent) {
   _.each([
     "Run",
     "Stop"
-  ], function(apiName) {
-    Xut.Assist[apiName] = function(pageType, activityId, outCallBack) {
-      access(function(manager, pageType, activityId, outCallBack) {
+  ], function (apiName) {
+    Xut.Assist[apiName] = function (pageType, activityId, outCallBack) {
+      access(function (manager, pageType, activityId, outCallBack) {
         //数组
-        if(_.isArray(activityId)) {
+        if (_.isArray(activityId)) {
           //完成通知
-          var markComplete = function() {
+          var markComplete = function () {
             var completeStatistics = activityId.length; //动画完成统计
-            return function() {
-              if(completeStatistics === 1) {
+            return function () {
+              if (completeStatistics === 1) {
                 outCallBack && outCallBack();
                 markComplete = null;
               }
               completeStatistics--;
             }
           }();
-          _.each(activityId, function(id) {
+          _.each(activityId, function (id) {
             manager.$$assistAppoint(id, $globalEvent.getVisualIndex(), markComplete, apiName);
           })
         } else {
@@ -54,7 +79,6 @@ export function extendAssist(access, $globalEvent) {
       }, pageType, activityId, outCallBack)
     }
   })
-
 
 
 }

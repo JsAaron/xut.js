@@ -12,6 +12,8 @@
 
 /*
 *
+* v883.5 2017.5.11  1. 增加对热点媒体对象是参数兼容处理
+*                   2. 增加热点对象的状态控制接口Xut.Assist.TriggerPoint(activityId, 'show')
 * v883.3 2017.5.10  1. 增加script脚本平台的判断
 *                   2. 对visibilitychange增加延时，这样快速刷新不报错
 *                   3. 重写build/debug模式

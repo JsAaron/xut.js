@@ -38,67 +38,75 @@ export default {
     scaleLeft
   }, chpaterData, chapterId, pageIndex, zIndex, pageType) {
 
-    let mediaIcon = ''
-    let startImage = ''
-    let pauseImage = ''
-
     //如果没有宽高则不创建绑定节点
     if (!scaleWidth || !scaleHeight) return ''
 
+    let display
+    let startImage
+    let startScript
+    let stopImage
+    let stopScript
+    let mediaIcon = ''
+
     //解析音乐动作
-    //冒泡动作靠节点传递数据
     if (itemArray) {
+
       itemArray = parseJSON(itemArray);
-      let start = itemArray[0];
-      let stop = itemArray[1];
 
-      const itemLength = itemArray.length
+      /**
+       * 老模式
+       *      "itemArray": "[\r\n  {\r\n    \"startImg\": \"027c3803a38237ad567484bbe42385df.png\"\r\n  },\r\n  {\r\n    \"stopImg\": \"676183f05ef671b9ba3609ec762f9e5e.png\"\r\n  }"
+       *
+       *  */
+      if (itemArray.length) {
+        const start = itemArray[0];
+        const stop = itemArray[1];
+        /*音频Action参数*/
+        if (start) {
+          startImage = start.startImg ? start.startImg : ''
+          startScript = start.script ? start.script : ''
+        }
+        if (stop) {
+          stopImage = start.stopImg ? start.stopImg : ''
+          stopScript = stop.script ? start.script : ''
+        }
 
-      /*如果只有一个参数，并且还有zIndex*/
-      if (itemLength === 1 && (1 !== start.indexOf('zIndex'))) {
-        const option = parseJSON(start)
-        if (option) {
-          zIndex = option.zIndex
-          start = null
-        }
-      }
-      /*如果二个参数，并且还有zIndex*/
-      else if (itemLength === 2 && (1 !== stop.indexOf('zIndex'))) {
-        const option = parseJSON(stop)
-        if (option) {
-          zIndex = option.zIndex
-          stop = null
-        }
-      }
-      /*如果只有三个参数，并且还有zIndex*/
-      else if (itemLength === 3 && (1 !== itemArray.indexOf('zIndex'))) {
-        const option = parseJSON(itemArray[2])
-        if (option) {
-          zIndex = option.zIndex
-        }
+      } else {
+        /*
+        新模式
+         itemArray:{
+           startImage:'027c3803a38237ad567484bbe42385df.png',
+           stopImage:'676183f05ef671b9ba3609ec762f9e5e.png',
+           startScript:'',
+           stopScript:'',
+           zIndex:12,
+           display:'hidden'
+         }
+        */
+        zIndex = itemArray.zIndex
+        display = itemArray.display
+        startImage = itemArray.startImage
+        startScript = itemArray.startScript
+        stopImage = itemArray.stopImage
+        stopScript = itemArray.stopScript
       }
 
+      /*音频Action动作数据*/
       tempData[_id] = {};
-      if (start) {
-        if (start.startImg) {
-          startImage = start.startImg;
-          tempData[_id]['startImg'] = startImage;
-          startImage = 'background-image:url(' + getFileFullPath(startImage, 'hot-media') + ');';
-        }
-        if (start.script) {
-          tempData[_id]['startScript'] = start.script;
-        }
+      if (startImage) {
+        tempData[_id]['startImage'] = startImage;
+        startImage = 'background-image:url(' + getFileFullPath(startImage, 'hot-media') + ');';
       }
-      if (stop) {
-        if (stop.stopImg) {
-          tempData[_id]['stopImg'] = stop.stopImg;
-          pauseImage = 'background-image:url(' + getFileFullPath(stop.stopImg, 'hot-media') + ');';
-        }
-        if (stop.script) {
-          tempData[_id]['stopScript'] = stop.script
-        }
+      if (startScript) {
+        tempData[_id]['startScript'] = startScript
       }
-
+      if (stopImage) {
+        tempData[_id]['stopImage'] = stopImage
+        stopImage = 'background-image:url(' + getFileFullPath(stopImage, 'hot-media') + ');';
+      }
+      if (stopScript) {
+        tempData[_id]['stopScript'] = stopScript
+      }
     }
 
     //只针对网页插件增加单独的点击界面
@@ -123,10 +131,13 @@ export default {
     const mediaType = category.replace(/(\w)/, v => v.toUpperCase())
 
     /*默认状态*/
-    let imageBackground = pauseImage || startImage
+    let imageBackground = stopImage || startImage
 
-    /* 音频在创建dom的时候需要查下，这个hot对象是否已经被创建过
-       如果创建过，那么图标状态需要处理*/
+    /*
+    音频在创建dom的时候需要查下
+    这个hot对象是否已经被创建过
+    如果创建过，那么图标状态需要处理
+    */
     if (hasHotAudioPlay(chapterId, _id)) {
       imageBackground = startImage
     }
@@ -141,6 +152,9 @@ export default {
       hasFloat = true
     }
 
+    /*是否隐藏,如果隐藏通过脚本调用*/
+    const visibility = display === 'hidden' ? "visibility:hidden" : ''
+
     //创建音频对象
     //Webpage_1
     //Audio_1
@@ -154,6 +168,7 @@ export default {
                    left:${scaleLeft}px;
                    top:${scaleTop}px;
                    z-index:${zIndex};
+                   ${visibility};
                    ${imageBackground}
                    background-size:100% 100%;
                    position:absolute;">

@@ -1,4 +1,4 @@
-import entry from './entry/index'
+import main from './main/index'
 import { config } from './config/index'
 import { nextTick } from './util/nexttick'
 import { slashPostfix } from './util/option'
@@ -14,7 +14,7 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
-Xut.Version = 883.3
+Xut.Version = 883.5
 
 /*加载应用app*/
 const initApp = (...arg) => {
@@ -24,7 +24,7 @@ const initApp = (...arg) => {
   /*全局的一些事件处理*/
   initGlobalEvent()
   const { $rootNode, $contentNode } = initRootNode(...arg)
-  nextTick({ container: $rootNode, content: $contentNode }, entry)
+  nextTick({ container: $rootNode, content: $contentNode }, main)
 }
 
 /*提供全局配置文件*/
