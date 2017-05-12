@@ -56,7 +56,8 @@ export default class h5Player {
   _initWrap(width, height, top, left, zIndex, src) {
     this.$videoWrap = createVideoWrap('video-h5', { width, height, top, left, zIndex })
     this.video = document.createElement('video')
-    this.$videoNode = $(this.video).css({ width, height }).attr({
+
+    this.$videoNode = $(this.video).css({ width, height, display: 'block' }).attr({
       src,
       'controls': 'controls',
       'autoplay': 'autoplay',
@@ -82,8 +83,8 @@ export default class h5Player {
     this._clear = () => {
       if (options.startBoot) {
         options.startBoot();
-        removeVideo(options.chapterId);
       }
+      removeVideo(options.chapterId);
     }
 
     /*提示该视频已准备好开始播放：*/

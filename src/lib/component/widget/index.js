@@ -145,7 +145,7 @@ export function Adapter(para) {
   data.inputPara.screenSize = pageVisualSize
 
   //content的命名前缀
-  data.inputPara.contentPrefix = Xut.Presentation.MakeContentPrefix(data.pageIndex, data.pageType)
+  data.inputPara.contentPrefix = Xut.Presentation.GetContentPrefix(data.pageIndex, data.pageType)
 
   //画轴模式
   data.scrollPaintingMode = config.launch.visualMode === 4;

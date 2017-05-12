@@ -67,6 +67,9 @@ export function closestMedia(target, chapterId, pageIndex) {
       如果是column视频的poster层
       1 保存视频的嵌套容器
       2 修正target的目标为父容器Video
+      视频播放节点与图片Poster是平行的
+      poster 层级index -1
+      video  层级index 0
     */
     let container
     if (hasPoster === 'poster' && !key) {

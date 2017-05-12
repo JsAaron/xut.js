@@ -35,7 +35,7 @@ export function extendAssist(access, $globalEvent) {
    * @param {[type]} contentId [description]
    */
   Xut.Assist.TextFx = function (contentId) {
-    const pageObj = Xut.Presentation.GetPageObj()
+    const pageObj = Xut.Presentation.GetPageBase()
     const fxObj = pageObj.getLetterObjs(contentId)
     if (fxObj) {
       fxObj.play()

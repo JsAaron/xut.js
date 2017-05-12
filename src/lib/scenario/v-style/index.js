@@ -10,7 +10,7 @@ import { initTranslate } from './init-translate/index'
  * @return {[type]}           [description]
  */
 const getPageStyle = function(pageIndex) {
-  let pageBase = Xut.Presentation.GetPageObj(pageIndex)
+  let pageBase = Xut.Presentation.GetPageBase(pageIndex)
   return pageBase && pageBase.getStyle
 }
 

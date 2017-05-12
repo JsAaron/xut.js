@@ -80,7 +80,7 @@ export default class MasterMgr extends ManageSuper {
    * 注册状态管理
    */
   register(pageIndex, type, hotspotObj) {
-    var parallaxObj = this.$$getPageObj(this.converMasterId(pageIndex))
+    var parallaxObj = this.$$getPageBase(this.converMasterId(pageIndex))
     if(parallaxObj) {
       parallaxObj.registerCotents.apply(parallaxObj, arguments);
     }
@@ -109,7 +109,7 @@ export default class MasterMgr extends ManageSuper {
       if(config.debug.devtools) {
         //重复的母版对象
         //用于检测页面模式是否一致
-        let currMasterObj = this.$$getPageObj(reuseMasterKey);
+        let currMasterObj = this.$$getPageBase(reuseMasterKey);
         currMasterObj && repeatCallBack(currMasterObj)
       }
       return
@@ -127,7 +127,7 @@ export default class MasterMgr extends ManageSuper {
     );
 
     //增加页面管理
-    this.$$addGroup(reuseMasterKey, masterObj);
+    this.$$addBaseGroup(reuseMasterKey, masterObj);
 
     return masterObj;
   }
@@ -177,7 +177,7 @@ export default class MasterMgr extends ManageSuper {
      */
     const moveParallaxObject = (nodes) => {
       let getMasterId = this.converMasterId(currIndex)
-      let currParallaxObj = this.$$getPageObj(getMasterId)
+      let currParallaxObj = this.$$getPageBase(getMasterId)
       if(currParallaxObj) {
         //处理当前页面内的视觉差对象效果
         currParallaxObj.moveParallax({
@@ -211,7 +211,7 @@ export default class MasterMgr extends ManageSuper {
     //如果未越界不需要处理行为
     if(!this.isBoundary) return;
     let masterObj
-    if(masterObj = this.$$getPageObj(stopPointer)) {
+    if(masterObj = this.$$getPageBase(stopPointer)) {
       let pageId = masterObj.baseGetPageId(stopPointer);
       //停止活动对象活动
       $suspend(masterObj, pageId);
@@ -225,7 +225,7 @@ export default class MasterMgr extends ManageSuper {
    */
   resetOriginal(pageIndex) {
     var originalPageObj;
-    if(originalPageObj = this.$$getPageObj(pageIndex)) {
+    if(originalPageObj = this.$$getPageBase(pageIndex)) {
       $original(originalPageObj);
     }
   }
@@ -236,7 +236,7 @@ export default class MasterMgr extends ManageSuper {
    */
   autoRun(data) {
     var masterObj
-    if(masterObj = this.$$getPageObj(data.currIndex)) {
+    if(masterObj = this.$$getPageBase(data.currIndex)) {
       //热点状态复位
       this.resetOriginal(data.suspendIndex)
       $autoRun(masterObj, data.currIndex);
@@ -303,13 +303,14 @@ export default class MasterMgr extends ManageSuper {
 
 
   /**
-   * 销毁整个页面对象
+   * 销毁整页面管理对象
+   * 退出应用处理
    * @return {[type]} [description]
    */
-  destroy() {
+  destroyManage() {
     this.rootNode = null;
     //销毁对象
-    this.$$destroyGroup();
+    this.$$destroyBaseGroup();
   }
 
 
@@ -331,23 +332,23 @@ export default class MasterMgr extends ManageSuper {
         //如果2个页面不一样的视觉差
         //或者是应用最后一页反弹的情况，2个页面同一个视觉差，也就是最后一页，往前面反弹
         if(prevFlag || isAppBoundary) {
-          currMasterObj = this.$$getPageObj(currMasterId);
+          currMasterObj = this.$$getPageBase(currMasterId);
         }
 
         if(prevMasterId && prevFlag) {
           action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
-          prevMasterObj = this.$$getPageObj(prevMasterId)
+          prevMasterObj = this.$$getPageBase(prevMasterId)
         }
         break;
       case 'next':
         nextMasterId = this.converMasterId(rightIndex)
         nextFlag = currMasterId !== nextMasterId
         if(nextFlag) {
-          currMasterObj = this.$$getPageObj(currMasterId)
+          currMasterObj = this.$$getPageBase(currMasterId)
         }
         if(nextMasterId && nextFlag) {
           action === 'flipOver' && this._checkClear([currMasterId, nextMasterId]); //边界清理
-          nextMasterObj = this.$$getPageObj(nextMasterId)
+          nextMasterObj = this.$$getPageBase(nextMasterId)
         }
         break;
     }
@@ -424,13 +425,13 @@ export default class MasterMgr extends ManageSuper {
     for(var key in filter) {
       switch(key) {
         case 'prev':
-          setPosition(this.$$getPageObj(filter[key]), 'prev')
+          setPosition(this.$$getPageBase(filter[key]), 'prev')
           break;
         case 'curr':
-          setPosition(this.$$getPageObj(filter[key]), 'curr')
+          setPosition(this.$$getPageBase(filter[key]), 'curr')
           break;
         case 'next':
-          setPosition(this.$$getPageObj(filter[key]), 'next')
+          setPosition(this.$$getPageBase(filter[key]), 'next')
           break;
       }
     }
@@ -439,7 +440,7 @@ export default class MasterMgr extends ManageSuper {
 
   _checkParallaxPox(currPageIndex, targetIndex) {
     var key, pageObj,
-      pageCollection = this.$$getGroup();
+      pageCollection = this.$$getBaseGroup();
     for(key in pageCollection) {
       pageObj = pageCollection[key];
       //跳跃过的视觉容器处理
@@ -570,7 +571,7 @@ export default class MasterMgr extends ManageSuper {
   // 2 跳转页面清理  【对象过滤条件】
   _checkClear(filter, toPage) {
     var key, indexOf,
-      removeMasterId = _.keys(this.$$getGroup());
+      removeMasterId = _.keys(this.$$getBaseGroup());
 
     // 如果有2个以上的母板对象,就需要清理
     if(removeMasterId.length > 2 || toPage) { //或者是跳转页面
@@ -601,11 +602,11 @@ export default class MasterMgr extends ManageSuper {
     var pageObj, self = this;
     _.each(removeMasterId, function(removekey) {
       //销毁页面对象事件
-      if(pageObj = self.$$getPageObj(removekey)) {
+      if(pageObj = self.$$getPageBase(removekey)) {
         //移除事件
         pageObj.baseDestroy();
         //移除列表
-        self.$$removeGroup(removekey)
+        self.$$removeBaseGroup(removekey)
         self._removeRecordMasterRange(removekey)
       }
       //清理作用域缓存

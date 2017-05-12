@@ -12,7 +12,7 @@ import { rightPageHook } from './single-hook/right'
  * @return {[type]}           [description]
  */
 const getPageStyle = pageIndex => {
-  let pageBase = Xut.Presentation.GetPageObj(pageIndex)
+  let pageBase = Xut.Presentation.GetPageBase(pageIndex)
   return pageBase && pageBase.getStyle || {}
 }
 

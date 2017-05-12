@@ -28,10 +28,11 @@ export function triggerVideo(...arg) {
  */
 export function removeVideo(chapterId) {
   const playBox = getPlayBox()
-  //清理视频
+    //清理视频
   if (playBox && playBox[chapterId]) {
     for (let activityId in playBox[chapterId]) {
       playBox[chapterId][activityId].destroy();
+      playBox[chapterId][activityId] = null
     }
     delete playBox[chapterId]
   }

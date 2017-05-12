@@ -2,7 +2,7 @@
  * 场景API
  * 针对page页面的content类型操作接口
  ********************************************/
-import { typeFilter } from './type-filter'
+import { typeFilter } from './page-type'
 import { reviseSize } from '../../util/option'
 
 export function extendContent(access, $globalEvent) {
@@ -24,7 +24,7 @@ export function extendContent(access, $globalEvent) {
 
       function findContent(currIndex, contentId) {
         var pageObj;
-        if(pageObj = manager.$$getPageObj(currIndex)) {
+        if(pageObj = manager.$$getPageBase(currIndex)) {
           return pageObj.baseGetContentObject(contentId);
         }
       }

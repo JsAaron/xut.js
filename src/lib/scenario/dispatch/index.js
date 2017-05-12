@@ -350,7 +350,7 @@ export default class Dispatcher {
     }
 
     let currIndex = pageIndex
-    let currObj = this.pageMgr.$$getPageObj(currIndex)
+    let currObj = this.pageMgr.$$getPageBase(currIndex)
 
     //2016.11.8
     //mini杂志功能
@@ -708,11 +708,15 @@ export default class Dispatcher {
     }
   }
 
-  /*销毁接口,对应多场景操作*/
-  destroyPageBases() {
-    this.pageMgr.destroy()
+  /**
+   * 销毁接口
+   * 销毁页面的所有的管理
+   * 一般是退出处理
+   */
+  destroyManage() {
+    this.pageMgr.destroyManage()
     this.getMasterContext(function() {
-      this.destroy()
+      this.destroyManage()
     })
   }
 

@@ -50,7 +50,7 @@ const converProperty = function(property) {
  * @return {[type]} [description]
  */
 const getFlowFange = function(pageIndex) {
-  var relyPageObj = Xut.Presentation.GetPageObj('page', pageIndex)
+  var relyPageObj = Xut.Presentation.GetPageBase('page', pageIndex)
   if(relyPageObj && relyPageObj.chapterData.note === 'flow') {
     let seasonId = relyPageObj.chapterData.seasonId
     let chapterId = relyPageObj.chapterId

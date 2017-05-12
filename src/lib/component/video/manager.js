@@ -29,13 +29,14 @@ const deployVideo = (videoData, options, columnData) => {
     _.extend(palyData, {
       width: '100%',
       height: '100%',
-      top: '100%',
-      left: '100%',
-      zIndex: 0,
+      top: 0,
+      left: 0,
+      zIndex: 1,
       chapterId,
       container: columnData.container,
       url: columnData.fileName,
       isColumn: columnData.isColumn,
+      position: columnData.position,
       category: 'video'
     })
 

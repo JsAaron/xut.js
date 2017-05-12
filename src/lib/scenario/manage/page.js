@@ -73,7 +73,7 @@ export default class PageMgr extends ManageSuper {
     )
 
     //增加页面管理
-    this.$$addGroup(pageIndex, pageObjs);
+    this.$$addBaseGroup(pageIndex, pageObjs);
     return pageObjs;
   }
 
@@ -108,9 +108,9 @@ export default class PageMgr extends ManageSuper {
     } else {
       /*单页模式，移动每个独立的页面*/
       _.each([
-        this.$$getPageObj(leftIndex),
-        this.$$getPageObj(currIndex),
-        this.$$getPageObj(rightIndex)
+        this.$$getPageBase(leftIndex),
+        this.$$getPageBase(currIndex),
+        this.$$getPageBase(rightIndex)
       ], function(pageObj, index) {
         if (pageObj) {
           pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], outerCallFlip)
@@ -128,7 +128,7 @@ export default class PageMgr extends ManageSuper {
    */
   suspend(leftIndex, currIndex, rightIndex, stopPointer) {
 
-    const suspendPageObj = this.$$getPageObj(stopPointer)
+    const suspendPageObj = this.$$getPageBase(stopPointer)
     const prveChpterId = suspendPageObj.baseGetPageId(stopPointer)
 
     /*如果有代码跟踪*/
@@ -158,7 +158,7 @@ export default class PageMgr extends ManageSuper {
   resetOriginal(pageIndex) {
     const originalIds = getRealPage(pageIndex, 'resetOriginal')
     originalIds.forEach(originaIndex => {
-      const originalPageObj = this.$$getPageObj(originaIndex)
+      const originalPageObj = this.$$getPageBase(originaIndex)
       if (originalPageObj) {
         const floatPageContainer = originalPageObj.floatGroup.pageContainer
         if (floatPageContainer) {
@@ -277,35 +277,33 @@ export default class PageMgr extends ManageSuper {
 
   }
 
-
   /**
-   * 销毁整个页面管理对象
-   * @param  {[type]} clearPageIndex [description]
-   * @return {[type]}                [description]
+   * 销毁单个页面的对象
+   * 这里不包含管理对象
+   * 移除页面对象
    */
   clearPage(clearPageIndex) {
-    const pageObj = this.$$getPageObj(clearPageIndex)
+    const pageObj = this.$$getPageBase(clearPageIndex)
     if (pageObj) {
-      //移除事件
       pageObj.baseDestroy();
-      //移除列表
-      this.$$removeGroup(clearPageIndex);
+      this.$$removeBaseGroup(clearPageIndex);
     }
   }
 
-
   /**
+   * 一般退出页面处理
    * 销毁整个页面管理对象
+   * 包含所有页面与管理对象
    * @return {[type]} [description]
    */
-  destroy() {
+  destroyManage() {
     //清理视频
     var pageId = Xut.Presentation.GetPageId(Xut.Presentation.GetPageIndex())
 
     removeVideo(pageId)
 
     //清理对象
-    this.$$destroyGroup();
+    this.$$destroyBaseGroup();
 
     //销毁事件
     if (config.launch.doublePageMode) {
@@ -315,7 +313,6 @@ export default class PageMgr extends ManageSuper {
     //清理节点
     this.rootNode = null;
   }
-
 
   /**
    * 设置中断正在创建的页面对象任务
@@ -335,7 +332,7 @@ export default class PageMgr extends ManageSuper {
         }
         let pageObj;
         pageIndex.forEach(function(pointer) {
-          if (pageObj = self.$$getPageObj(pointer)) {
+          if (pageObj = self.$$getPageBase(pointer)) {
             pageObj.setTaskSuspend();
           }
         })
@@ -349,7 +346,7 @@ export default class PageMgr extends ManageSuper {
 
   /*检测活动窗口任务*/
   _checkTaskCompleted(currIndex, callback) {
-    const currPageObj = this.$$getPageObj(currIndex)
+    const currPageObj = this.$$getPageBase(currIndex)
     if (currPageObj) {
       currPageObj.checkThreadTaskComplete(function() {
         // console.log('11111111111当前页面创建完毕',currIndex+1)
@@ -369,7 +366,7 @@ export default class PageMgr extends ManageSuper {
     }
     resumeCount = resumePointer.length;
     while (resumeCount--) {
-      if (resumeObj = this.$$getPageObj(resumePointer[resumeCount])) {
+      if (resumeObj = this.$$getPageBase(resumePointer[resumeCount])) {
         resumeObj.createPreforkTask(function() {
           // console.log('后台处理完毕')
         }, preCreateTask)

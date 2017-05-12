@@ -92,7 +92,7 @@ export default class ColumnClass {
       return this._masterObj
     }
     if (this.pptMaster) {
-      this._masterObj = Xut.Presentation.GetPageObj('master', this.initIndex)
+      this._masterObj = Xut.Presentation.GetPageBase('master', this.initIndex)
     }
   }
 

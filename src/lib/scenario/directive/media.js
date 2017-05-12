@@ -273,4 +273,10 @@ export default {
       }
     }
   }
+
+  /*销毁数据*/
+  ,
+  destory() {
+
+  }
 }

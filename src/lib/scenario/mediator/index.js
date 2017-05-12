@@ -294,7 +294,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  */
 defAccess(Mediator.prototype, '$curVmPage', {
   get: function () {
-    return this.$dispatcher.pageMgr.$$getPageObj(this.$globalEvent.getVisualIndex());
+    return this.$dispatcher.pageMgr.$$getPageBase(this.$globalEvent.getVisualIndex());
   }
 });
 
@@ -349,7 +349,7 @@ defProtected(Mediator.prototype, '$init', function () {
 defProtected(Mediator.prototype, '$run', function () {
   var vm = this;
   vm.$dispatcher.pageMgr.activateAutoRuns(
-    vm.$globalEvent.getVisualIndex(), Xut.Presentation.GetPageObj()
+    vm.$globalEvent.getVisualIndex(), Xut.Presentation.GetPageBase()
   )
 });
 
@@ -380,7 +380,7 @@ defProtected(Mediator.prototype, '$suspend', function () {
 defProtected(Mediator.prototype, '$destroy', function () {
   this.$off(); //观察事件
   this.$globalEvent.destroy(); //全局事件
-  this.$dispatcher.destroyPageBases(); //派发器
+  this.$dispatcher.destroyManage(); //派发器
   this.$dispatcher = null;
   this.$globalEvent = null;
   this.destorySceneApi() //动态api

@@ -8,9 +8,9 @@ export default function access(pageObj, callback) {
   //如果只提供回调函数
   if(arguments.length === 1 && _.isFunction(pageObj)) {
     callback = pageObj
-    pageObj = Xut.Presentation.GetPageObj()
+    pageObj = Xut.Presentation.GetPageBase()
   } else {
-    pageObj = pageObj || Xut.Presentation.GetPageObj()
+    pageObj = pageObj || Xut.Presentation.GetPageBase()
   }
 
   if(pageObj) {

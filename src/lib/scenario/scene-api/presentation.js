@@ -3,30 +3,15 @@
  * 数据接口。和电子杂志的数据相关的接口，都在这里。
  ********************************************/
 import { $warn } from '../../util/debug'
+
 /**
  * 命名前缀
  * @type {String}
  */
-const prefix = 'Content_';
-
-/**
- * 判断是否存在页码索引
- * 如果不存在默认取当前页面
- */
-const createExistIndex = ($globalEvent) => {
-  return (pageIndex) => {
-    //如果不存在
-    if (pageIndex == undefined) {
-      pageIndex = $globalEvent.getVisualIndex() //当前页面
-    }
-    return pageIndex
-  }
-}
-
+const CONTENTPREFIX = 'Content_';
 
 export function extendPresentation(access, $globalEvent) {
 
-  let isExistIndex = createExistIndex($globalEvent);
 
   /**
    * 获取当前页码
@@ -45,31 +30,19 @@ export function extendPresentation(access, $globalEvent) {
     "GetPageId",
     "GetPageNode",
     "GetPageData",
-    "GetPageObj"
+    "GetPageBase"
   ], (apiName) => {
     Xut.Presentation[apiName] = (pageType, pageIndex) => {
       return access((manager, pageType, pageIndex) => {
-        pageIndex = isExistIndex(pageIndex)
-          /*$$-manage-super接口*/
+        if (pageIndex === undefined) {
+          pageIndex = $globalEvent.getVisualIndex() //当前页面
+        }
+        /*$$-manage-super接口*/
         return manager["$$" + apiName](pageIndex, pageType)
       }, pageType, pageIndex)
     }
   })
 
-  /*
-  获取浮动元素的根节点
-  1 page
-  2 master
-   */
-  Xut.Presentation.GetFloatContainer = function (pageType) {
-    const pageObj = Xut.Presentation.GetPageObj(pageType)
-    const containerName = pageType === 'page' ? 'pageContainer' : 'masterContainer'
-    if (pageObj.floatGroup[containerName].length) {
-      return pageObj.floatGroup[containerName]
-    } else {
-      $warn(pageType + ',浮动根节点没有找到')
-    }
-  }
 
   /**
    * 获取页面的总数据
@@ -77,10 +50,7 @@ export function extendPresentation(access, $globalEvent) {
    * 2 section数据
    * @return {[type]}
    */
-  _.each([
-    "Section",
-    "Page"
-  ], (apiName) => {
+  _.each(["Section", "Page"], (apiName) => {
     Xut.Presentation['GetApp' + apiName + 'Data'] = callback => {
       var i = 0,
         temp = [],
@@ -92,6 +62,22 @@ export function extendPresentation(access, $globalEvent) {
       return temp;
     }
   })
+
+
+  /*
+  获取浮动元素的根节点
+  1 page
+  2 master
+   */
+  Xut.Presentation.GetFloatContainer = function (pageType) {
+    const pageObj = Xut.Presentation.GetPageBase(pageType)
+    const containerName = pageType === 'page' ? 'pageContainer' : 'masterContainer'
+    if (pageObj.floatGroup[containerName].length) {
+      return pageObj.floatGroup[containerName]
+    } else {
+      $warn(pageType + ',浮动根节点没有找到')
+    }
+  }
 
   /**
    * 获取首页的pageId
@@ -108,7 +94,7 @@ export function extendPresentation(access, $globalEvent) {
    * li节点
    */
   Xut.Presentation.GetPageElement = () => {
-    var obj = Xut.Presentation.GetPageObj()
+    var obj = Xut.Presentation.GetPageBase()
     return obj.$pageNode
   }
 
@@ -117,7 +103,7 @@ export function extendPresentation(access, $globalEvent) {
    * @return {[type]} [description]
    */
   Xut.Presentation.GetPageStyle = (pageIndex) => {
-    let pageBase = Xut.Presentation.GetPageObj(pageIndex)
+    let pageBase = Xut.Presentation.GetPageBase(pageIndex)
     if (pageBase && pageBase.getStyle) {
       return pageBase.getStyle
     } else {
@@ -134,15 +120,15 @@ export function extendPresentation(access, $globalEvent) {
    * 区分pageIndex
    */
   Xut.Presentation.GetPagePrefix = (pageType, pageIndex) => {
-    let pageObj = Xut.Presentation.GetPageObj(pageType, pageIndex);
+    let pageObj = Xut.Presentation.GetPageBase(pageType, pageIndex);
     return pageObj.chapterIndex;
   }
 
   /**
-   * 创建一个content的命名规则
+   * 得到content的命名规则
    */
-  Xut.Presentation.MakeContentPrefix = function (pageIndex) {
-    return prefix + Xut.Presentation.GetPagePrefix(pageIndex) + "_";
+  Xut.Presentation.GetContentPrefix = function (pageIndex) {
+    return CONTENTPREFIX + Xut.Presentation.GetPagePrefix(pageIndex) + "_";
   }
 
   /**
@@ -150,11 +136,10 @@ export function extendPresentation(access, $globalEvent) {
    */
   Xut.Presentation.GetContentName = function (id) {
     if (id) {
-      return prefix + Xut.Presentation.GetPagePrefix() + "_" + id;
+      return CONTENTPREFIX + Xut.Presentation.GetPagePrefix() + "_" + id;
     } else {
-      return prefix + Xut.Presentation.GetPagePrefix()
+      return CONTENTPREFIX + Xut.Presentation.GetPagePrefix()
     }
   }
-
 
 }

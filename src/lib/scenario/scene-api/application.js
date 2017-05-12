@@ -13,7 +13,7 @@ export function extendApplication(access, $globalEvent) {
   Xut.Application.GetSpecifiedObject = function(pageType, data) {
     return access(function(manager, pageType) {
       var pageObj;
-      if(pageObj = manager.$$getPageObj(data.pageIndex)) {
+      if(pageObj = manager.$$getPageBase(data.pageIndex)) {
         if(data.type === 'Content') {
           return pageObj.baseSpecifiedContent(data);
         } else {

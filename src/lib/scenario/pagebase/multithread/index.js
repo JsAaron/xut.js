@@ -7,7 +7,7 @@ const noop = function() {}
 
 /*页面缩放*/
 const createPageScale = (rootNode, pageIndex) => {
-  let relatedMasterObj = Xut.Presentation.GetPageObj('master', pageIndex)
+  let relatedMasterObj = Xut.Presentation.GetPageBase('master', pageIndex)
   let pageMasterNode
   if (relatedMasterObj) {
     pageMasterNode = relatedMasterObj.getContainsNode()[0]

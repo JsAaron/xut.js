@@ -12,27 +12,27 @@ export class ManageSuper {
     this.$$GetPageId = this.$$getPageId
     this.$$GetPageNode = this.$$getPageNode
     this.$$GetPageData = this.$$getPageData
-    this.$$GetPageObj = this.$$getPageObj
+    this.$$GetPageBase = this.$$getPageBase
   }
 
   /**
    * 增加合集管理
    */
-  $$addGroup(pageIndex, pageObj) {
+  $$addBaseGroup(pageIndex, pageObj) {
     this._group[pageIndex] = pageObj
   }
 
   /**
    * 得到页面合集
    */
-  $$getGroup() {
+  $$getBaseGroup() {
     return this._group
   }
 
   /**
    * 删除合集管理
    */
-  $$removeGroup(pageIndex) {
+  $$removeBaseGroup(pageIndex) {
     delete this._group[pageIndex]
   }
 
@@ -40,7 +40,7 @@ export class ManageSuper {
   /**
    * 销毁合集
    */
-  $$destroyGroup() {
+  $$destroyBaseGroup() {
     let k, _group = this._group
     for (k in _group) {
       _group[k].baseDestroy()
@@ -54,7 +54,7 @@ export class ManageSuper {
    */
   $$assistPocess(pageIndex, callback) {
     var pageObj;
-    if (pageObj = this.$$getPageObj(pageIndex, this.pageType)) {
+    if (pageObj = this.$$getPageBase(pageIndex, this.pageType)) {
       if (callback) {
         callback(pageObj)
       } else {
@@ -68,7 +68,7 @@ export class ManageSuper {
    */
   $$assistAppoint(activityId, currIndex, outCallBack, actionName) {
     var pageObj;
-    if (pageObj = this.$$getPageObj(currIndex)) {
+    if (pageObj = this.$$getPageBase(currIndex)) {
       return pageObj.baseAssistRun(activityId, outCallBack, actionName);
     }
   }
@@ -78,7 +78,7 @@ export class ManageSuper {
   //  "GetPageId",
   //  "GetPageNode",
   //  "GetPageData",
-  //  "GetPageObj"
+  //  "GetPageBase"
   //////////////////////////////////
 
   /**
@@ -105,7 +105,7 @@ export class ManageSuper {
    * 2.母版通过母版Id索引
    * @return {[type]} [description]
    */
-  $$getPageObj(pageIndex, pageType) {
+  $$getPageBase(pageIndex, pageType) {
     pageType = pageType || this.pageType;
     //模板传递的可能不是页码
     if (pageType === 'master') {
@@ -129,7 +129,7 @@ export class ManageSuper {
       pageType = key;
       key = null;
     }
-    if (pageObj = this.$$getPageObj(pageIndex, pageType)) {
+    if (pageObj = this.$$getPageBase(pageIndex, pageType)) {
       return key ? pageObj.chapterData[key] : pageObj.chapterData;
     }
   }
