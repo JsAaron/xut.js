@@ -3,7 +3,8 @@ var cssName = [
   'css/common.css',
   'css/horizontal.css',
   'css/vertical.css',
-  'css/adaptive-image.css'
+  'css/adaptive-image.css',
+  'css/css3-filters.css'
 ]
 
 //2016.11.14 去掉代码区域

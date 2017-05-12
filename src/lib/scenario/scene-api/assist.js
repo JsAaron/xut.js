@@ -6,6 +6,28 @@
 export function extendAssist(access, $globalEvent) {
 
   /**
+   * 滤镜渐变动画
+   * content id
+   * 滤镜样式名
+   * 1  ".filter-blur-a2"
+   * 优先查找page层，后查找master层
+   */
+  Xut.Assist.FilterGradient = function (contentId, filterClassName) {
+    if (contentId && filterClassName) {
+      let contentObj = Xut.Contents.Get('page', contentId)
+      if (!contentObj) {
+        contentObj = Xut.Contents.Get('master', contentId)
+        if (contentObj) return
+      }
+      if (filterClassName.length) {
+        filterClassName = filterClassName.join(' ')
+      }
+      contentObj.$contentNode.addClass(filterClassName)
+    }
+  }
+
+
+  /**
    * 针对HOT的显示与隐藏
    * @param {[type]} activityId    [activity中的Id]
    * @param {[type]} start         [显示与隐藏]

@@ -235,13 +235,16 @@ const createContainer = (data, wrapObj) => {
     visibility = 'hidden';
   }
 
+  /*css3 滤镜效果 2017.5.12支持,filterNames数组形式*/
+  const filterName = data.filterNames ? data.filterNames.join(' ') : ''
+
   // var isHtml = "";
   //2015.12.29
   //如果是html内容
   if (wrapObj.isJs) {
     wapper = `<div id="${containerName}"
                        data-behavior="click-swipe"
-                       class="fullscreen-background "
+                       class="fullscreen-background ${filterName}"
                        style="width:${backwidth}px;
                               height:${backheight}px;
                               top:${backtop}px;
@@ -262,6 +265,7 @@ const createContainer = (data, wrapObj) => {
     //如果是scroller需要绝对的尺寸，所以替换100% 不可以
     wapper = `<div id="${containerName}"
                    data-behavior="click-swipe"
+                   class="${filterName}"
                    style="width:${backwidth}px;
                           height:${backheight}px;
                           top:${backtop}px;

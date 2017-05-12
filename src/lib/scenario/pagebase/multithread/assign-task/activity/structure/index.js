@@ -181,8 +181,12 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
    * 页面或者母板浮动对象
    * 页面是最顶级的
    */
-  function parseParameter(parameter, contentId, conData) {
+  function parseContentParameter(parameter, contentId, conData) {
     _.each(parameter, (para) => {
+      /*如果有css3的滤镜效果*/
+      if(para.filter && para.filter.length){
+        conData.filterNames = para.filter
+      }
       /*是否启动代码追踪*/
       if (para.trackCode) {
         conData.trackCode = true
@@ -247,7 +251,7 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
       /*如果有parameter,保持数据格式，方便解析*/
       let parameter
       if (parameter = conData.parameter && parseJSON(conData.parameter)) {
-        parseParameter(parameter.length ? parameter : [parameter], contentId, conData)
+        parseContentParameter(parameter.length ? parameter : [parameter], contentId, conData)
       }
     }
   }
