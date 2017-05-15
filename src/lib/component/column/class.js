@@ -140,7 +140,7 @@ export default class ColumnClass {
       linear: true,
       initIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
       container,
-      flipMode: 'allow',
+      flipMode: 'horizontal',
       multiplePages: 1,
       stopPropagation: true,
       totalIndex: this.columnCount
@@ -174,15 +174,14 @@ export default class ColumnClass {
       closestMedia(node, coloumnObj.chapterId, swipe.visualIndex)
     })
 
-    swipe.$watch('onMove', function ({
-      action,
-      speed,
-      distance,
-      leftIndex,
-      pageIndex,
-      rightIndex,
-      direction
-    }) {
+    swipe.$watch('onMove', function (options) {
+
+      const {
+        action,
+        speed,
+        distance,
+        direction
+      } = options
 
       /**
        * 首页边界
@@ -261,9 +260,9 @@ export default class ColumnClass {
     })
 
 
-    swipe.$watch('onComplete', (direction, pagePointer, unfliplock, isQuickTurn) => {
+    swipe.$watch('onComplete', ({ unlock }) => {
       coloumnObj.lastDistance = moveDistance
-      unfliplock()
+      unlock()
     })
 
   }

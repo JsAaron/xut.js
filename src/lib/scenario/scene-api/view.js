@@ -195,14 +195,16 @@ export function extendView(vm, access, $globalEvent) {
     }
 
     const pagePointer = $globalEvent.getPointer()
+
     vm.$dispatcher.movePageBases({
       'distance': distance,
       'speed': speed,
       'direction': direction,
       'action': action,
-      'leftIndex': pagePointer.leftIndex,
-      'pageIndex': pagePointer.currIndex,
-      'rightIndex': pagePointer.rightIndex
+
+      'frontIndex': pagePointer.frontIndex,
+      'middleIndex': pagePointer.middleIndex,
+      'backIndex': pagePointer.backIndex
     })
   };
 

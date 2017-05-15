@@ -12,7 +12,7 @@ const initMain = novelData => {
   /**
    * IBOOS模式
    */
-  if(Xut.IBooks.Enabled) {
+  if (Xut.IBooks.Enabled) {
     //删除背景图
     $(".xut-cover").remove()
     loadScene({
@@ -31,15 +31,15 @@ const initMain = novelData => {
          1 直接换  =》ban
    * 所以pageFlip只有在左面的情况下
    */
-  if(novelData.parameter) {
+  if (novelData.parameter) {
     const parameter = parseJSON(novelData.parameter)
-    if(parameter.pageflip !== undefined) {
-      switch(Number(parameter.pageflip)) {
+    if (parameter.pageflip !== undefined) {
+      switch (Number(parameter.pageflip)) {
         case 0: //允许翻页
-          config.launch.flipMode = 'allow';
+          config.launch.flipMode = 'horizontal';
           break;
         case 1: //禁止翻页
-          config.launch.flipMode = 'ban';
+          config.launch.flipMode = 'horizontal-ban';
           break
       }
     }
@@ -51,9 +51,9 @@ const initMain = novelData => {
    * 如果启动recordHistory记录
    */
   let pageIndex = Number(getCache('pageIndex'))
-  if(config.launch.historyMode && pageIndex !== undefined) {
+  if (config.launch.historyMode && pageIndex !== undefined) {
     let novelId = parseInt(getCache("novelId"))
-    if(novelId) {
+    if (novelId) {
       return loadScene({
         "novelId": novelId,
         "pageIndex": pageIndex,
@@ -83,22 +83,22 @@ const initApp = () => baseConfig(initMain)
  */
 const bindPlatEvent = () => {
   //安卓上并且不是浏览器打开的情况
-  if(Xut.plat.isAndroid && !Xut.plat.isBrowser) {
+  if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     //预加载处理视频
     //妙妙学不加载视频
     //读库不加载视频
-    if(window.MMXCONFIG && !window.DUKUCONFIG) {
+    if (window.MMXCONFIG && !window.DUKUCONFIG) {
       plugVideo();
     }
     //不是子文档指定绑定按键
-    if(!window.SUbCONFIGT) {
+    if (!window.SUbCONFIGT) {
       /*app初始化完毕*/
-      Xut.Application.Watch('initComplete', function() {
+      Xut.Application.Watch('initComplete', function () {
         bindAndroid()
       })
     }
   }
-  if(window.DUKUCONFIG) {
+  if (window.DUKUCONFIG) {
     PMS.bind("MagazineExit", () => {
       PMS.unbind();
       Xut.Application.DropApp();
@@ -122,18 +122,18 @@ const bindPlatEvent = () => {
   4 ios/android
  */
 export default function main() {
-  if(window.GLOBALIFRAME) {
+  if (window.GLOBALIFRAME) {
     bindPlatEvent()
   } else {
     //brower
-    if(Xut.plat.isBrowser) {
+    if (Xut.plat.isBrowser) {
       initApp()
     } else {
       //mobile(apk or ipa)
       window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
       document.addEventListener("deviceready", () => {
         Xut.plat.hasPlugin = true //支持插件
-        Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function() {});
+        Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function () {});
       }, false)
     }
   }

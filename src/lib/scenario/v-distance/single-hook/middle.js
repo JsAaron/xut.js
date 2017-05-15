@@ -3,14 +3,14 @@
  *************************/
 export const middlePageHook = {
   flipMove: {
-    prev() {},
-    next() {}
+    left() {},
+    right() {}
   },
   flipOver: {
     /**
      * 左翻页结束
      */
-    prev(distance, pageStyles) {
+    left(distance, pageStyles) {
       let middlePageStyle = pageStyles.middle
       let leftPageStyle = pageStyles.left
 
@@ -40,7 +40,7 @@ export const middlePageHook = {
     /**
      * 右翻页结束
      */
-    next(distance, pageStyles) {
+    right(distance, pageStyles) {
       let middlePageStyle = pageStyles.middle
       let rightPageStyle = pageStyles.right
 

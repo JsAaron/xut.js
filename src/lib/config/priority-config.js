@@ -139,7 +139,6 @@ export function priorityConfig() {
     }
   }
 
-
   //////////////////////////////////
   ///golbal混入到launch中
   //////////////////////////////////
@@ -148,5 +147,13 @@ export function priorityConfig() {
       launch[key] = golbal[key]
     }
   }
+
+  //////////////////////////////////
+  ///竖版的情况下，页面模式都强制为1
+  //////////////////////////////////
+  if (launch.flipMode === 'vertical') {
+    launch.visualMode = 1
+  }
+
 
 }

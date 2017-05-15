@@ -9,7 +9,7 @@ import { initTranslate } from './init-translate/index'
  * @param  {[type]} pageIndex [description]
  * @return {[type]}           [description]
  */
-const getPageStyle = function(pageIndex) {
+const getPageStyle = function (pageIndex) {
   let pageBase = Xut.Presentation.GetPageBase(pageIndex)
   return pageBase && pageBase.getStyle
 }
@@ -35,13 +35,13 @@ export function setCustomStyle(styleDataset) {
     data.pageProportion = getPageProportion(data)
 
     /*数组形式，因为有双页面的情况*/
-    if(!styleDataset['_' + data.direction]) {
-      styleDataset['_' + data.direction] = []
+    if (!styleDataset['_' + data.position]) {
+      styleDataset['_' + data.position] = []
     }
-    styleDataset['_' + data.direction].push(data.chapterIndex)
+    styleDataset['_' + data.position].push(data.chapterIndex)
   })
 
-  if(!config.launch.doublePageMode) {
+  if (!config.launch.doublePageMode) {
 
     /**
      * 获取指定页面样式
@@ -51,16 +51,16 @@ export function setCustomStyle(styleDataset) {
      * 但是在翻页的时候，由于只动态创建了一个页，所以在获取其他页面的时候，必须通过辅助参数
      * 跨页面对象获取数据
      */
-    styleDataset.getPageStyle = function(pageName, assistName) {
+    styleDataset.getPageStyle = function (pageName, assistName) {
       let pageStyle = this[this['_' + pageName]]
-      //翻页动态创建的时候，只能索取到一页，因为只动态创建了一页
-      //所以这里需要动态获取关联的中间页面对象
-      if(!pageStyle && pageName === 'middle') {
+        //翻页动态创建的时候，只能索取到一页，因为只动态创建了一页
+        //所以这里需要动态获取关联的中间页面对象
+      if (!pageStyle && pageName === 'middle') {
         let standbyStyle = this.getPageStyle(assistName)
-        if(assistName === 'left') {
+        if (assistName === 'left') {
           return getPageStyle(standbyStyle.chapterIndex + 1)
         }
-        if(assistName === 'right') {
+        if (assistName === 'right') {
           return getPageStyle(standbyStyle.chapterIndex - 1)
         }
       }
@@ -68,12 +68,12 @@ export function setCustomStyle(styleDataset) {
     }
 
 
-    _.each(styleDataset, function(data, index) {
+    _.each(styleDataset, function (data, index) {
       //容器的初始translate值
-      if(data.direction) {
+      if (data.position) {
         _.extend(data, initTranslate({
           styleDataset,
-          direction: data.direction
+          position: data.position
         }))
       }
     })

@@ -5,7 +5,7 @@
  *************************/
 export const leftPageHook = {
   flipMove: {
-    prev(distance, pageStyles) {
+    left(distance, pageStyles) {
       let middlePageStyle = pageStyles.middle
       let leftPageStyle = pageStyles.left
 
@@ -32,10 +32,10 @@ export const leftPageHook = {
         }
       }
     },
-    next() {}
+    right() {}
   },
   flipRebound: {
-    prev(distance, pageStyles) {
+    left(distance, pageStyles) {
       let middlePageStyle = pageStyles.middle
       let leftPageStyle = pageStyles.left
 
@@ -63,12 +63,12 @@ export const leftPageHook = {
       }
 
     },
-    next() {}
+    right() {}
   },
   flipOver: {
-    prev() {
+    left() {
       return 0
     },
-    next() {}
+    right() {}
   }
 }

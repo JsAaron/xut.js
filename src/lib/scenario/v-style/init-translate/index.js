@@ -1,43 +1,41 @@
 import { config } from '../../../config/index'
-import { leftTranslate } from './hook/left'
-import { rightTranslate } from './hook/right'
+import { getOffset } from './hook/index'
 
 /**
  * 创建translate初始值
  * @param  {[type]} offset [description]
  * @return {[type]}        [description]
  */
-const createTranslate = (offset) => {
-  return `translate3d(${offset}px,0px,0px)`
+const setTranslate = (x = 0, y = 0) => {
+  return `translate3d(${x}px,${y}px,0px)`
 }
 
 /**
  * 默认样式
- * @param  {Object} options.hooks [description]
- * @param  {[type]} createIndex   [description]
- * @param  {Object} currIndex                     } [description]
- * @return {[type]}               [description]
  */
 export function initTranslate({
-  direction,
+  position,
   styleDataset
 }) {
 
   let translate
   let offset
 
-  if(direction === 'left') {
-    const offsetLeft = leftTranslate(styleDataset)
-    translate = createTranslate(offsetLeft)
-    offset = offsetLeft
-  } else if(direction === 'middle') {
-    const offsetMiddle = 0
-    translate = createTranslate(offsetMiddle)
-    offset = offsetMiddle
-  } else if(direction === 'right') {
-    const offsetRight = rightTranslate(styleDataset)
-    translate = createTranslate(offsetRight)
-    offset = offsetRight
+  switch (position) {
+    case 'left':
+    case 'right':
+      offset = getOffset(position, styleDataset)
+      translate = setTranslate(offset)
+      break;
+    case 'top':
+    case 'bottom':
+      offset = getOffset(position, styleDataset)
+      translate = setTranslate(0, offset)
+      break;
+    case 'middle':
+      translate = setTranslate()
+      offset = 0
+      break;
   }
 
   return {

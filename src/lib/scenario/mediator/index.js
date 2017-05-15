@@ -6,7 +6,7 @@
  **********************************************************************/
 import { config } from '../../config/index'
 import { Observer } from '../../observer/index'
-import Dispatcher from '../dispatch/index'
+import Scheduler from '../scheduler/index'
 import delegateHooks from './hooks'
 import { closestProcessor } from './closest'
 import GlobalEvent from '../../swipe/index.js'
@@ -29,8 +29,9 @@ const configMultiple = (options) => {
     /// pageMode当前页面定义模式  ////
     ////////////////////////////////
     let pageMode = Number(options.pageMode)
-      //判断多页面情况
-    if (options.flipMode === 'allow') {
+
+    //判断多页面情况
+    if (options.flipMode === 'horizontal' || options.flipMode === 'vertical') {
       options.multiplePages = true
       if (pageMode === 0) { //如果工具栏强制禁止滑动
         options.multiplePages = false
@@ -38,7 +39,7 @@ const configMultiple = (options) => {
     }
 
     //如果是禁止翻页，然后还要看是不是有pageMode的设置
-    if (options.flipMode === 'ban') {
+    if (options.flipMode === 'horizontal-ban' || options.flipMode === 'vertical-ban') {
       options.multiplePages = false
       if (pageMode > 0) { //如果工具栏单独设置了页面模式，那么多页面强制改成true
         options.multiplePages = true
@@ -99,7 +100,7 @@ export default class Mediator extends Observer {
       multiplePages: options.multiplePages, //多页面
       sectionRang: options.sectionRang //分段值
     })
-    const $dispatcher = vm.$dispatcher = new Dispatcher(vm)
+    const $dispatcher = vm.$dispatcher = new Scheduler(vm)
 
     //如果是主场景,才能切换系统工具栏
     if (options.multiplePages) {

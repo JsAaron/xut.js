@@ -5,14 +5,23 @@ import { config } from '../../../config/index'
  * taskCallback 每个模块任务完毕后的回调
  * 用于继续往下个任务构建
  */
-export default function(baseProto) {
+export default function (baseProto) {
+
+  /**
+   * 设置页面容器层级
+   * 页面跳转使用接口
+   * @return {[type]} [description]
+   */
+  baseProto.setPageContainerHierarchy = function (style) {
+    this.$pageNode.css(style)
+  }
 
   /**
    * 获取文字动画对象
    * 2017.1.6
    * @return {[type]} [description]
    */
-  baseProto.getLetterObjs = function(contentId) {
+  baseProto.getLetterObjs = function (contentId) {
     let activity = this.threadTaskRelated.assignTaskGroup['assgin-activity']
     if (activity && activity.textFxObjs) {
       return activity.textFxObjs[contentId]
@@ -24,7 +33,7 @@ export default function(baseProto) {
    * 转化序列名
    * @return {[type]} [description]
    */
-  baseProto._converSequenceName = function(direction) {
+  baseProto._converSequenceName = function (direction) {
     return direction === 'next' ? 'swipeleft' : 'swiperight'
   }
 
@@ -32,7 +41,7 @@ export default function(baseProto) {
   /**
    * 是否有动画序列
    */
-  baseProto.hasSwipeSequence = function(direction) {
+  baseProto.hasSwipeSequence = function (direction) {
     let eventName = this._converSequenceName(direction)
     let swipeSequence = this.swipeSequence
 
@@ -47,7 +56,7 @@ export default function(baseProto) {
    * 执行动画序列
    * @return {[type]} [description]
    */
-  baseProto.callSwipeSequence = function(direction) {
+  baseProto.callSwipeSequence = function (direction) {
     if (!this.swipeSequence) {
       return
     }
@@ -66,7 +75,7 @@ export default function(baseProto) {
    * @param  {[type]} direction [description]
    * @return {[type]}           [description]
    */
-  baseProto.resetSwipeSequence = function() {
+  baseProto.resetSwipeSequence = function () {
     if (!this.swipeSequence) {
       return
     }
@@ -79,7 +88,7 @@ export default function(baseProto) {
    * 对象实例内部构建
    * 重新实例运行任务
    */
-  baseProto.rerunInstanceTask = function(taskName) {
+  baseProto.rerunInstanceTask = function (taskName) {
     var tasksObj
     if (tasksObj = this.threadTaskRelated.assignTaskGroup[taskName]) {
       tasksObj.$$rerunTask && tasksObj.$$rerunTask()
@@ -92,7 +101,7 @@ export default function(baseProto) {
    * 获取页面数据
    * @return {[type]} [description]
    */
-  baseProto.baseData = function() {
+  baseProto.baseData = function () {
     return this.dataActionGroup[this.pageType]
   }
 
@@ -101,7 +110,7 @@ export default function(baseProto) {
    * 获取热点数据信息
    * @return {[type]} [description]
    */
-  baseProto.baseActivits = function() {
+  baseProto.baseActivits = function () {
     return this.dataActionGroup['activitys']
   }
 
@@ -110,7 +119,7 @@ export default function(baseProto) {
    * 获取自动运行数据
    * @return {[type]} [description]
    */
-  baseProto.baseAutoRun = function() {
+  baseProto.baseAutoRun = function () {
     const data = this.dataActionGroup['auto']
     return data && data;
   }
@@ -120,7 +129,7 @@ export default function(baseProto) {
    * 获取chapterid
    * @return {[type]}     [description]
    */
-  baseProto.baseGetPageId = function(index) {
+  baseProto.baseGetPageId = function (index) {
     return this.baseData(index)['_id'];
   }
 
@@ -131,7 +140,7 @@ export default function(baseProto) {
    * @param  {Function} callback  [description]
    * @return {[type]}             [description]
    */
-  baseProto.baseGetContentObject = function(contentId) {
+  baseProto.baseGetContentObject = function (contentId) {
     const contentsObj = this.contentGroup[contentId]
     if (contentsObj) {
       return contentsObj
@@ -148,7 +157,7 @@ export default function(baseProto) {
    * @param  {[type]} name [description]
    * @return {[type]}      [description]
    */
-  baseProto.baseContentMutex = function(contentId, type) {
+  baseProto.baseContentMutex = function (contentId, type) {
     let contentObj
     if (contentObj = this.baseGetContentObject(contentId)) {
       const $contentElement = contentObj.$contentNode.view ?
@@ -189,8 +198,8 @@ export default function(baseProto) {
   _.each([
     "Get",
     "Specified"
-  ], function(type) {
-    baseProto['base' + type + 'Content'] = function(data) {
+  ], function (type) {
+    baseProto['base' + type + 'Content'] = function (data) {
       switch (type) {
         case 'Get':
           return this.activityGroup.get();
@@ -210,8 +219,8 @@ export default function(baseProto) {
     "Remove",
     "Add",
     "Specified"
-  ], function(type) {
-    baseProto['base' + type + 'Component'] = function(data) {
+  ], function (type) {
+    baseProto['base' + type + 'Component'] = function (data) {
       switch (type) {
         case 'add':
           return this.componentGroup.add(data);
@@ -233,10 +242,10 @@ export default function(baseProto) {
    * @param  {[type]} actionName  [description]
    * @return {[type]}             [description]
    */
-  baseProto.baseAssistRun = function(activityId, outCallBack, actionName) {
+  baseProto.baseAssistRun = function (activityId, outCallBack, actionName) {
     var activity;
     if (activity = this.activityGroup) {
-      _.each(activity.get(), function(contentObj, index) {
+      _.each(activity.get(), function (contentObj, index) {
         if (activityId == contentObj.activityId) {
           if (actionName == 'Run') {
             contentObj.runAnimation(outCallBack, true);

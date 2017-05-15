@@ -1,7 +1,7 @@
 /*
 计算当前已经创建的页面索引
  */
-export function calculationIndex(currIndex, targetIndex, totalIndex) {
+export function calculationIndex(visualIndex, targetIndex, totalIndex) {
   var i = 0,
     existpage,
     createpage,
@@ -12,27 +12,27 @@ export function calculationIndex(currIndex, targetIndex, totalIndex) {
     viewFlip;
 
   //存在的页面
-  if(currIndex === 0) {
-    existpage = [currIndex, currIndex + 1];
-  } else if(currIndex === totalIndex - 1) {
-    existpage = [currIndex - 1, currIndex];
+  if (visualIndex === 0) {
+    existpage = [visualIndex, visualIndex + 1];
+  } else if (visualIndex === totalIndex - 1) {
+    existpage = [visualIndex - 1, visualIndex];
   } else {
-    existpage = [currIndex - 1, currIndex, currIndex + 1];
+    existpage = [visualIndex - 1, visualIndex, visualIndex + 1];
   }
 
   //需要创建的新页面
-  if(targetIndex === 0) {
+  if (targetIndex === 0) {
     createpage = [targetIndex, targetIndex + 1];
-  } else if(targetIndex === totalIndex - 1) {
+  } else if (targetIndex === totalIndex - 1) {
     createpage = [targetIndex - 1, targetIndex];
   } else {
     createpage = [targetIndex - 1, targetIndex, targetIndex + 1];
   }
 
-  for(; i < createpage.length; i++) {
+  for (; i < createpage.length; i++) {
     pageIndex = createpage[i];
     //跳过存在的页面
-    if(-1 === existpage.indexOf(pageIndex)) {
+    if (-1 === existpage.indexOf(pageIndex)) {
       //创建目标的页面
       create.push(pageIndex);
     } else {
@@ -41,43 +41,48 @@ export function calculationIndex(currIndex, targetIndex, totalIndex) {
     }
   }
 
-  _.each(ruleOut, function(ruleOutIndex) {
+  _.each(ruleOut, function (ruleOutIndex) {
     existpage.splice(existpage.indexOf(ruleOutIndex), 1)
   });
 
   destroy = existpage;
 
-  viewFlip = [].concat(create).concat(ruleOut).sort(function(a, b) {
+  viewFlip = [].concat(create).concat(ruleOut).sort(function (a, b) {
     return a - b
   });
 
   return {
-    'create': create,
-    'ruleOut': ruleOut,
-    'destroy': destroy,
+    'create': create, //创建的页面
+    'ruleOut': ruleOut, //排除已存在的页面
+    'destroy': destroy, //销毁的页面
     'viewFlip': viewFlip,
     'targetIndex': targetIndex,
-    'currIndex': currIndex
+    'visualIndex': visualIndex
   }
 }
 
 
 /**
  * 初始化首次范围
+ * 动态分页一共有3页
+ * 横版
+ *   左中右 front middle back
+ * 竖版
+ *   上中下 front middle back
  * @return {[type]} [description]
  */
 export function initPointer(init, totalIndex) {
   const pointer = {}
-  if(init === 0) { //首页
-    pointer['currIndex'] = init;
-    pointer['rightIndex'] = init + 1;
-  } else if(init === totalIndex - 1) { //尾页
-    pointer['currIndex'] = init;
-    pointer['leftIndex'] = init - 1;
+  if (init === 0) { //首页
+    pointer['middleIndex'] = init;
+    pointer['backIndex'] = init + 1;
+  } else if (init === totalIndex - 1) { //尾页
+    pointer['middleIndex'] = init;
+    pointer['frontIndex'] = init - 1;
   } else { //中间页
-    pointer['leftIndex'] = init - 1;
-    pointer['currIndex'] = init;
-    pointer['rightIndex'] = init + 1;
+    pointer['frontIndex'] = init - 1;
+    pointer['middleIndex'] = init;
+    pointer['backIndex'] = init + 1;
   }
   return pointer
 }
@@ -92,21 +97,21 @@ export function initPointer(init, totalIndex) {
   17 销毁
   20 创建
  */
-export function getActionPointer(direction, leftIndex, rightIndex) {
-  let createPointer //创建的页
-  let destroyPointer //销毁的页
-  switch(direction) {
+export function getActionPointer(direction, frontIndex, backIndex) {
+  let createIndex //创建的页
+  let destroyIndex //销毁的页
+  switch (direction) {
     case 'prev': //前处理
-      createPointer = (leftIndex - 1);
-      destroyPointer = (rightIndex);
+      createIndex = (frontIndex - 1);
+      destroyIndex = (backIndex);
       break;
     case 'next': //后处理
-      createPointer = (rightIndex + 1);
-      destroyPointer = (leftIndex);
+      createIndex = (backIndex + 1);
+      destroyIndex = (frontIndex);
       break;
   }
   return {
-    createPointer,
-    destroyPointer
+    createIndex,
+    destroyIndex
   }
 }

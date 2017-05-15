@@ -59,8 +59,17 @@ export default {
    *   0 通过滑动翻页 => 'allow'
    *   1 禁止滑动,直接快速切换页面(通过左右按键快速切换页面) => 'ban'
    * @type {Number}
+   *
+   * 后期增加竖版模式修正接口
+   *
+   * pageflip
+   *   横版翻页 horizontal
+   *   横版锁定 horizontal-ban
+   *
+   *   竖版翻页 vertical
+   *   竖版锁定 vertical-ban
    */
-  flipMode: 'allow', //默认0，待数据库填充
+  flipMode: 'horizontal', //默认允许横向翻页
 
   /*
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问

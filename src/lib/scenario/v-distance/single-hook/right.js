@@ -4,12 +4,12 @@
  *************************/
 export const rightPageHook = {
   flipMove: {
-    prev() {},
+    left() {},
     /**
      * 右滑动
      * distance -1 -> -N 递减
      */
-    next(distance, pageStyles) {
+    right(distance, pageStyles) {
 
       let middlePageStyle = pageStyles.middle
       let rightPageStyle = pageStyles.right
@@ -39,8 +39,8 @@ export const rightPageHook = {
     }
   },
   flipRebound: {
-    prev() {},
-    next(distance, pageStyles) {
+    left() {},
+    right(distance, pageStyles) {
 
       let middlePageStyle = pageStyles.middle
       let rightPageStyle = pageStyles.right
@@ -70,8 +70,8 @@ export const rightPageHook = {
     }
   },
   flipOver: {
-    prev() {},
-    next() {
+    left() {},
+    right() {
       return 0
     }
   }

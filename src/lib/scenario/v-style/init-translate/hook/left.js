@@ -2,7 +2,7 @@
  * 左边页面Translate钩子
  ************************/
 
-export function leftTranslate(styleDataset) {
+export default function leftTranslate(styleDataset) {
 
   let middlePageStyle = styleDataset.getPageStyle('middle', 'left')
   let leftPageStyle = styleDataset.getPageStyle('left')

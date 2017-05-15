@@ -14,8 +14,12 @@ const transform = Xut.style.transform
  * 保证只是pageType === page才捕获动作
  */
 const toTranslate3d = (node, distance, speed, callback) => {
-  if(node) {
-    node.style[transform] = `translate3d(${distance}px,0px,0px)`
+  if (node) {
+    if (config.launch.flipMode === 'vertical') {
+      node.style[transform] = `translate3d(0px,${distance}px,0px)`
+    } else {
+      node.style[transform] = `translate3d(${distance}px,0px,0px)`
+    }
     node.style[transitionDuration] = speed + 'ms'
     callback && callback()
   }
@@ -26,9 +30,13 @@ const toTranslate3d = (node, distance, speed, callback) => {
  * @param  {[type]} node [description]
  * @return {[type]}      [description]
  */
-const set = (node, x) => {
-  if(node) {
-    node.style[transform] = `translate3d(${x}px,0p,0px)`
+const set = (node, value) => {
+  if (node) {
+    if (config.launch.flipMode === 'vertical') {
+      node.style[transform] = `translate3d(0px,${value}px,0px)`
+    } else {
+      node.style[transform] = `translate3d(${value}px,0px,0px)`
+    }
   }
 }
 
@@ -37,7 +45,7 @@ const set = (node, x) => {
  * @return {[type]} [description]
  */
 const reset = (node) => {
-  if(node) {
+  if (node) {
     node.style[transform] = `translate3d(0px,0px,0px)`
     node.style[transitionDuration] = ''
   }
@@ -85,16 +93,27 @@ export const translation = {
  * @param  {[type]} offset [description]
  * @return {[type]}        [description]
  */
-const createTranslate = (offset) => {
-  return 'translate3d(' + offset + 'px,0px,0px)'
+const createTranslate = (value) => {
+  if (config.launch.flipMode === 'vertical') {
+    return `translate3d(0px,${value}px,0px)`
+  }
+  return `translate3d(${value}px,0px,0px)`
 }
+
 
 /**
  * 修正坐标
+ * 跳转使用
  * @return {[type]} [description]
  */
 export function fix($node, action) {
-  const visualWidth = config.visualSize.width
-  const translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth)
+  let translate
+  if (config.launch.flipMode === 'vertical') {
+    const visualHight = config.visualSize.height
+    translate = action === 'prevEffect' ? createTranslate(-visualHight) : createTranslate(visualHight)
+  } else {
+    const visualWidth = config.visualSize.width
+    translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth)
+  }
   $node.css(transform, translate)
 }

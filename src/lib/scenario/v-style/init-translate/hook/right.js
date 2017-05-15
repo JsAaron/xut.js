@@ -2,7 +2,7 @@
  * 右边页面Translate钩子
  ************************/
 
-export function rightTranslate(styleDataset) {
+export default function rightTranslate(styleDataset) {
 
   let middlePageStyle = styleDataset.getPageStyle('middle', 'right')
   let rightPageStyle = styleDataset.getPageStyle('right')
@@ -29,7 +29,5 @@ export function rightTranslate(styleDataset) {
       return rightPageStyle.visualWidth + rightPageStyle.visualLeftInteger
     }
   }
-
-
 
 }
