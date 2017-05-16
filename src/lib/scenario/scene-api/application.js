@@ -10,11 +10,11 @@ export function extendApplication(access, $globalEvent) {
    * 区分不同层级page/master
    * 不同类型    content/widget
    */
-  Xut.Application.GetSpecifiedObject = function(pageType, data) {
-    return access(function(manager, pageType) {
+  Xut.Application.GetSpecifiedObject = function (pageType, data) {
+    return access(function (manager, pageType) {
       var pageObj;
-      if(pageObj = manager.$$getPageBase(data.pageIndex)) {
-        if(data.type === 'Content') {
+      if (pageObj = manager.$$getPageBase(data.pageIndex)) {
+        if (data.type === 'Content') {
           return pageObj.baseSpecifiedContent(data);
         } else {
           return pageObj.baseSpecifiedComponent(data);
@@ -31,55 +31,55 @@ export function extendApplication(access, $globalEvent) {
 
 
   /**
-   * 是否锁定页面
+   * 是否启动
    * @return {[type]} [description]
    */
-  Xut.Application.HasLockFlip = function() {
-    return $globalEvent.hasLockFlip()
+  Xut.Application.hasEnabled = function () {
+    return $globalEvent.hasEnabled()
   }
 
   /**
    * 是否翻页中
    * @return {Boolean} [description]
    */
-  Xut.Application.Swiping = function() {
-    return $globalEvent.isMoving()
+  Xut.Application.Swiping = function () {
+    return $globalEvent.moving()
   }
 
   /**
    * 禁止滑动
    */
-  Xut.Application.Bansliding = function() {
-    $globalEvent.bansliding();
+  Xut.Application.SwipeBan = function () {
+    $globalEvent.swipeBan();
   }
 
   /**
    * 允许滑动
    */
-  Xut.Application.Allowliding = function() {
-    $globalEvent.allowliding();
+  Xut.Application.SwipeEnable = function () {
+    $globalEvent.swipeEnable();
   }
 
   /**
    * 获取翻页速率
    * @return {[type]} [description]
    */
-  Xut.Application.getFlipOverSpeed = function(...arg) {
+  Xut.Application.getFlipOverSpeed = function (...arg) {
     return $globalEvent.getFlipOverSpeed(...arg)
   }
 
   /**
    * 设置翻页完成
    */
-  Xut.Application.tiggerFilpComplete = function(...arg) {
+  Xut.Application.tiggerFilpComplete = function (...arg) {
     $globalEvent.setTransitionComplete(...arg)
   }
 
   _.each([
     "closeSwipe",
     "openSwipe"
-  ], function(operate) {
-    Xut.Application[operate] = function() {
+  ], function (operate) {
+    Xut.Application[operate] = function () {
       $globalEvent[operate]();
     }
   })

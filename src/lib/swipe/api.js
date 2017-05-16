@@ -72,18 +72,18 @@ export default function api(Swipe) {
   Swipe.prototype.simulationComplete = function () {
     setTimeout(() => {
       this._setRestore()
-      this._removeFlipLock()
+      this.enable()
     })
   }
 
   //允许滑动
-  Swipe.prototype.allowliding = function () {
-    this._removeFlipLock()
+  Swipe.prototype.swipeEnable = function () {
+    this.enable()
   }
 
   //禁止滑动
-  Swipe.prototype.bansliding = function () {
-    this._addFlipLock()
+  Swipe.prototype.swipeBan = function () {
+    this.disable()
   }
 
 
@@ -101,7 +101,7 @@ export default function api(Swipe) {
    * @return {[type]} [description]
    */
   Swipe.prototype.closeSwipe = function () {
-    if (!this._isMoving) {
+    if (!this._moved) {
       this._off()
     }
   }
@@ -121,16 +121,16 @@ export default function api(Swipe) {
    * 检车是否还在移动中
    * @return {Boolean} [description]
    */
-  Swipe.prototype.isMoving = function () {
-    return this._isMoving
+  Swipe.prototype.moving = function () {
+    return this._moved
   }
 
   /**
    * 是否锁定
    * @return {Boolean} [description]
    */
-  Swipe.prototype.hasLockFlip = function () {
-    return this._lockFlip
+  Swipe.prototype.hasEnabled = function () {
+    return this.enabled
   }
 
 
@@ -144,7 +144,7 @@ export default function api(Swipe) {
       this._slideTo('prev', 'outer', callback);
     } else {
       //边界反弹
-      this._setRebound(this.visualIndex, 'next')
+      this._setRebound('next')
     }
   }
 
@@ -160,7 +160,7 @@ export default function api(Swipe) {
       this._slideTo('next', 'outer', callback);
     } else {
       //边界反弹
-      this._setRebound(this.visualIndex, 'prev', 'isAppBoundary')
+      this._setRebound('prev', 'isAppBoundary')
     }
   }
 
@@ -231,8 +231,8 @@ export default function api(Swipe) {
 
     //算出是相关数据
     const data = calculationIndex(visualIndex, targetIndex, this.totalIndex)
-    //更新页码索引
-    this._updataPointer(data)
+      //更新页码索引
+    this._updatePointer(data)
     data.pagePointer = this.pagePointer
     this.$emit('onJumpPage', data)
   }

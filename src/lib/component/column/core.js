@@ -130,6 +130,9 @@ export default class ColumnClass {
 
     let nodes = this._getNodes()
 
+    /*页面可视区*/
+    const appVisualIndex = Xut.Presentation.GetPageIndex()
+
     /**
      * 分栏整体控制
      * @type {[type]}
@@ -138,7 +141,7 @@ export default class ColumnClass {
       hasHook: true,
       swipeWidth: columnWidth,
       linear: true,
-      initIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
+      initIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
       container,
       flipMode: 'horizontal',
       multiplePages: 1,
@@ -219,16 +222,19 @@ export default class ColumnClass {
         let viewBeHideDistance = getVisualDistance({
           action,
           distance,
-          direction
+          direction,
+          frontIndex: appVisualIndex,
+          middleIndex: appVisualIndex,
+          backIndex: appVisualIndex
         })[1]
 
         moveDistance = viewBeHideDistance
 
         switch (direction) {
-          case 'next':
+          case 'prev':
             moveDistance = moveDistance + coloumnObj.lastDistance
             break
-          case 'prev':
+          case 'next':
             moveDistance = moveDistance + coloumnObj.lastDistance
             break
         }
@@ -258,7 +264,6 @@ export default class ColumnClass {
       }
 
     })
-
 
     swipe.$watch('onComplete', ({ unlock }) => {
       coloumnObj.lastDistance = moveDistance

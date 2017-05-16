@@ -100,7 +100,7 @@ export default class Mediator extends Observer {
       multiplePages: options.multiplePages, //多页面
       sectionRang: options.sectionRang //分段值
     })
-    const $dispatcher = vm.$dispatcher = new Scheduler(vm)
+    const $scheduler = vm.$scheduler = new Scheduler(vm)
 
     //如果是主场景,才能切换系统工具栏
     if (options.multiplePages) {
@@ -137,17 +137,7 @@ export default class Mediator extends Observer {
 
 
     /**
-     * 触屏滑动,通知pageMgr处理页面移动
-     * @return {[type]} [description]
-     */
-    $globalEvent.$watch('onMove', (data) => {
-      $dispatcher.movePageBases(data)
-    });
-
-
-    /**
-     * 触屏松手点击
-     * 无滑动
+     * 触屏松手点击，无滑动，判断为点击
      */
     $globalEvent.$watch('onTap', (pageIndex, hookCallback) => {
       if (handlerObj) {
@@ -165,11 +155,19 @@ export default class Mediator extends Observer {
 
 
     /**
-     * 触屏滑动,通知ProcessMgr关闭所有激活的热点
-     * @return {[type]}          [description]
+     * 触屏滑动,通知pageMgr处理页面移动
+     * @return {[type]} [description]
      */
-    $globalEvent.$watch('onUpSlider', (pointers) => {
-      $dispatcher.suspendPageBases(pointers)
+    $globalEvent.$watch('onMove', (data) => {
+      $scheduler.movePageBases(data)
+    });
+
+
+    /**
+     * 触屏滑动,通知ProcessMgr关闭所有激活的热点
+     */
+    $globalEvent.$watch('onEnd', (pointers) => {
+      $scheduler.suspendPageBases(pointers)
     });
 
 
@@ -178,7 +176,7 @@ export default class Mediator extends Observer {
      * @return {[type]}              [description]
      */
     $globalEvent.$watch('onComplete', (...arg) => {
-      $dispatcher.completePageBases(...arg)
+      $scheduler.completePageBases(...arg)
     });
 
 
@@ -187,7 +185,7 @@ export default class Mediator extends Observer {
      * @return {[type]}      [description]
      */
     $globalEvent.$watch('onJumpPage', (data) => {
-      $dispatcher.gotoPageBases(data);
+      $scheduler.gotoPageBases(data);
     });
 
 
@@ -208,7 +206,7 @@ export default class Mediator extends Observer {
      */
     $globalEvent.$watch('onMasterMove', (hindex, target) => {
       if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
-        $dispatcher.masterMgr && $dispatcher.masterMgr.reactivation(target);
+        $scheduler.masterMgr && $scheduler.masterMgr.reactivation(target);
       }
     });
 
@@ -279,7 +277,7 @@ defAccess(Mediator.prototype, '$multiScenario', {
 defAccess(Mediator.prototype, '$injectionComponent', {
   set: function (regData) {
     var injection;
-    if (injection = this.$dispatcher[regData.pageType + 'Mgr']) {
+    if (injection = this.$scheduler[regData.pageType + 'Mgr']) {
       injection.$$assistPocess(regData.pageIndex, function (pageObj) {
         pageObj.baseAddComponent.call(pageObj, regData.widget);
       })
@@ -295,7 +293,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  */
 defAccess(Mediator.prototype, '$curVmPage', {
   get: function () {
-    return this.$dispatcher.pageMgr.$$getPageBase(this.$globalEvent.getVisualIndex());
+    return this.$scheduler.pageMgr.$$getPageBase(this.$globalEvent.getVisualIndex());
   }
 });
 
@@ -339,7 +337,7 @@ defProtected(Mediator.prototype, '$bind', function (key, callback) {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$init', function () {
-  this.$dispatcher.initCreate();
+  this.$scheduler.initCreate();
 });
 
 
@@ -349,7 +347,7 @@ defProtected(Mediator.prototype, '$init', function () {
  */
 defProtected(Mediator.prototype, '$run', function () {
   var vm = this;
-  vm.$dispatcher.pageMgr.activateAutoRuns(
+  vm.$scheduler.pageMgr.activateAutoRuns(
     vm.$globalEvent.getVisualIndex(), Xut.Presentation.GetPageBase()
   )
 });
@@ -360,7 +358,7 @@ defProtected(Mediator.prototype, '$run', function () {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$reset', function () {
-  return this.$dispatcher.pageMgr.resetOriginal(this.$globalEvent.getVisualIndex());
+  return this.$scheduler.pageMgr.resetOriginal(this.$globalEvent.getVisualIndex());
 });
 
 
@@ -381,8 +379,8 @@ defProtected(Mediator.prototype, '$suspend', function () {
 defProtected(Mediator.prototype, '$destroy', function () {
   this.$off(); //观察事件
   this.$globalEvent.destroy(); //全局事件
-  this.$dispatcher.destroyManage(); //派发器
-  this.$dispatcher = null;
+  this.$scheduler.destroyManage(); //派发器
+  this.$scheduler = null;
   this.$globalEvent = null;
   this.destorySceneApi() //动态api
 })

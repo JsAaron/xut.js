@@ -81,7 +81,7 @@ export default function slide(Swipe) {
     this.preTick.action = action
 
     //如果在忙碌状态,如果翻页还没完毕
-    if (this._lockFlip) {
+    if (!this.enabled) {
       return
     }
 
@@ -90,7 +90,7 @@ export default function slide(Swipe) {
       if (this._isBorder(direction)) return;
     }
 
-    this._addFlipLock()
+    this.disable()
     this._isQuickFlip()
     this.direction = direction
 
@@ -107,17 +107,11 @@ export default function slide(Swipe) {
       'action': 'flipOver'
     })
 
-
-    if (this.pagePointer.createPointer) {
-      this.recordLastPoionter = $.extend(true, {}, this.pagePointer)
-    }
-
     setTimeout(() => {
-      //更新this.pagePointer索引
-      //增加处理标记
-      this._updatePointer()
-      this.$emit('onUpSlider', this.pagePointer)
-      this._setVisualIndex(this.pagePointer.middleIndex)
+      this._updateActionPointer()
+        /*手指移开屏幕*/
+      this.$emit('onEnd', this.pagePointer)
+      this._updateVisualIndex(this.pagePointer.middleIndex)
     })
   }
 
@@ -126,19 +120,20 @@ export default function slide(Swipe) {
    * 增加索引的动作
    * 修正页码指示
    */
-  Swipe.prototype._updatePointer = function () {
+  Swipe.prototype._updateActionPointer = function () {
 
     const pointer = this.pagePointer
 
     //获取动作索引
     const actionPointer = getActionPointer(this.direction, pointer.frontIndex, pointer.backIndex)
+
     const createIndex = actionPointer.createIndex
     const stopIndex = pointer.middleIndex
 
     switch (this.direction) {
       case 'prev':
         if (-1 < createIndex) { //首页情况
-          this._updataPointer(createIndex, pointer.frontIndex, pointer.middleIndex);
+          this._updatePointer(createIndex, pointer.frontIndex, pointer.middleIndex);
         }
         if (-1 === createIndex) {
           this.pagePointer.backIndex = pointer.middleIndex;
@@ -148,7 +143,7 @@ export default function slide(Swipe) {
         break;
       case 'next':
         if (this.totalIndex > createIndex) {
-          this._updataPointer(pointer.middleIndex, pointer.backIndex, createIndex);
+          this._updatePointer(pointer.middleIndex, pointer.backIndex, createIndex);
         }
         if (this.totalIndex === createIndex) { //如果是尾页
           this.pagePointer.frontIndex = pointer.middleIndex;
@@ -171,7 +166,7 @@ export default function slide(Swipe) {
    */
   Swipe.prototype._getFlipOverSpeed = function (visualWidth) {
     visualWidth = visualWidth || this._visualWidth
-    const spped = (visualWidth - (ABS(this._deltaX))) * this._speedRate || this._flipTime;
+    const spped = (visualWidth - (ABS(this._distX))) * this._speedRate || this._flipTime;
     return ABS(spped)
   }
 

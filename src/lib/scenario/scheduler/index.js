@@ -203,7 +203,6 @@ export default class Scheduler {
       this.pageMgr.setInitTranslate(visualPageIndex)
     }
 
-
     /*
       1.pageIndex：页面自然索引号
       2.visualPageIndex：页面自然索引号，可见编号
@@ -343,6 +342,7 @@ export default class Scheduler {
       middleIndex,
       backIndex,
       direction,
+      orientation,
       isAppBoundary, //应用边界反弹
       setSwipeInvalid //设置翻页无效
     } = options
@@ -396,7 +396,8 @@ export default class Scheduler {
       direction,
       frontIndex,
       middleIndex,
-      backIndex
+      backIndex,
+      orientation
     })
 
     const data = {
@@ -711,8 +712,9 @@ export default class Scheduler {
       data.create = [data.targetIndex]; //创建
       data.destroy = [data.visualIndex]; //销毁
       data.ruleOut = [data.targetIndex]; //排除已存在
+      /*更新索引值*/
       data.pagePointer = {
-        currIndex: data.targetIndex
+        middleIndex: data.targetIndex
       }
     }
 

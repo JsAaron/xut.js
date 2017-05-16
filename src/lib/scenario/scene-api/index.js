@@ -17,8 +17,8 @@ export function initSceneApi(vm) {
 
   //页面与母版的管理器
   let access = createaAccess({
-    page: vm.$dispatcher.pageMgr,
-    master: vm.$dispatcher.masterMgr
+    page: vm.$scheduler.pageMgr,
+    master: vm.$scheduler.masterMgr
   })
 
   extendPresentation(access, $globalEvent) //数据接口

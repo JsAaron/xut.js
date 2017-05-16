@@ -12,11 +12,15 @@ export default function distribute(Swipe) {
    * @return {[type]} [description]
    */
   Swipe.prototype._distributeMove = function (data) {
+    data.direction = this.direction
+    data.orientation = this.orientation
+
+    /*页码索引标识*/
     let pointer = this.pagePointer
-      /*页码索引标识*/
     data.frontIndex = pointer.frontIndex
     data.backIndex = pointer.backIndex
     data.middleIndex = this.visualIndex
+
     this.$emit('onMove', data)
   }
 
@@ -29,7 +33,7 @@ export default function distribute(Swipe) {
   Swipe.prototype._distributeComplete = function (...arg) {
     this._setRestore(...arg)
     this.$emit('innerFlipOver')
-    const callback = () => this._removeFlipLock()
+    const callback = () => this.enable()
     setTimeout(() => {
       this.$emit('onComplete', {
         unlock: callback,

@@ -3,7 +3,7 @@ import initDefaults from './defaults'
 import { importJsonDatabase } from '../database/result'
 import { $warn, loadGolbalStyle, setFastAnalysisRE } from '../util/index'
 import { createCursor } from '../initialize/cursor'
-import { initColumn } from '../component/column/core-init'
+import { initColumn } from '../component/column/init'
 import { contentFilter } from '../component/activity/content/content-filter'
 import { config, initConfig, initPathAddress } from '../config/index'
 

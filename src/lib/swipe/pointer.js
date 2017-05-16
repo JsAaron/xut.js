@@ -110,8 +110,5 @@ export function getActionPointer(direction, frontIndex, backIndex) {
       destroyIndex = (frontIndex);
       break;
   }
-  return {
-    createIndex,
-    destroyIndex
-  }
+  return { createIndex, destroyIndex }
 }

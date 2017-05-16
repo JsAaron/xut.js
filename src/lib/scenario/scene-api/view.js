@@ -189,14 +189,14 @@ export function extendView(vm, access, $globalEvent) {
 
     //如果禁止翻页模式 || 如果是滑动,不是边界
     if(!options.multiplePages ||
-      $globalEvent.isMoving() ||
+      $globalEvent.moving() ||
       action === 'flipMove' && $globalEvent.isBorder(distance)) {
       return
     }
 
     const pagePointer = $globalEvent.getPointer()
 
-    vm.$dispatcher.movePageBases({
+    vm.$scheduler.movePageBases({
       'distance': distance,
       'speed': speed,
       'direction': direction,

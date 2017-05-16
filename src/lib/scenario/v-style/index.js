@@ -29,11 +29,8 @@ export function setCustomStyle(styleDataset) {
   3.提供快速索引
    */
   _.each(styleDataset, (data, index) => {
-
     _.extend(data, getVisualSize(data))
-
-    data.pageProportion = getPageProportion(data)
-
+    data.pageProportion = getPageProportion(data);
     /*数组形式，因为有双页面的情况*/
     if (!styleDataset['_' + data.position]) {
       styleDataset['_' + data.position] = []
@@ -67,7 +64,6 @@ export function setCustomStyle(styleDataset) {
       return this[this['_' + pageName]]
     }
 
-
     _.each(styleDataset, function (data, index) {
       //容器的初始translate值
       if (data.position) {
@@ -78,7 +74,6 @@ export function setCustomStyle(styleDataset) {
       }
     })
   }
-
 
 
   return styleDataset

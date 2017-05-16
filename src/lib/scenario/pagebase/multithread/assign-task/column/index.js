@@ -1,4 +1,4 @@
-import ColumnClass from '../../../../../component/column/class'
+import ColumnClass from '../../../../../component/column/core'
 import { isColumnPage } from '../../../../../component/column/depend'
 /**
  * 2017.9.7

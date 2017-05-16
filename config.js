@@ -36,7 +36,7 @@ module.exports = {
     /**
      * 是否自动打开浏览器
      */
-    openBrowser: false,
+    openBrowser: true,
 
     /**
      * eslint配置

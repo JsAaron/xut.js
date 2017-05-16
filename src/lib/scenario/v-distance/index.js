@@ -1,11 +1,12 @@
 import { config } from '../../config/index'
-import { hasValue, hash } from '../../util/lang'
+import { hasValue, hash, hasIndexOf } from '../../util/lang'
 
 import { leftPageHook } from './single-hook/left'
-import { middlePageHook } from './single-hook/middle'
+import { hMiddlePageHook } from './single-hook/middle-h'
 import { rightPageHook } from './single-hook/right'
 
 import { topPageHook } from './single-hook/top'
+import { vMiddlePageHook } from './single-hook/middle-v'
 import { bottomPageHook } from './single-hook/bottom'
 
 /**
@@ -13,7 +14,7 @@ import { bottomPageHook } from './single-hook/bottom'
  * @param  {[type]} pageIndex [description]
  * @return {[type]}           [description]
  */
-const getPageStyle = pageIndex => {
+const _getPageStyle = pageIndex => {
   if (pageIndex === undefined) {
     return {}
   }
@@ -21,16 +22,22 @@ const getPageStyle = pageIndex => {
   return pageBase && pageBase.getStyle || {}
 }
 
-const makeAccess = (action, direction, distance, pageStyles) => {
+
+const makeAccess = (action, direction, distance, getStyle) => {
   return (hooks) => {
-    return hooks && hooks[action][direction](distance, pageStyles)
+    return hooks &&
+      hooks[action] &&
+      hooks[action][direction] &&
+      hooks[action][direction](getStyle, distance)
   }
 }
 
 
-/*
-单页模式
-计算每个页面的移动距离
+/**
+ * 单页模式
+ * 计算每个页面的移动距离
+ * direction  = prev/next
+ * orientation  = v/h
  */
 const getSingle = function ({
   action,
@@ -38,43 +45,67 @@ const getSingle = function ({
   direction,
   frontIndex,
   middleIndex,
-  backIndex
+  backIndex,
+  orientation
 }) {
 
-  let left = 0
+  let front = 0
   let middle = 0
-  let right = 0
+  let back = 0
 
   //当前视图页面
   //用来处理页面回调
-  let view = undefined
+  let visualPage = undefined
 
-  let pageStyles = {
-    left: getPageStyle(frontIndex),
-    middle: getPageStyle(middleIndex),
-    right: getPageStyle(backIndex)
-  }
-
-  const access = makeAccess(action, direction, distance, pageStyles)
-
-  if (action === 'flipMove' || action === 'flipRebound') {
-    left = access(leftPageHook)
-    middle = distance
-    right = access(rightPageHook)
-  }
-
-  if (action === 'flipOver') {
-    left = access(leftPageHook)
-    middle = access(middlePageHook)
-    right = access(rightPageHook)
-    if (direction === 'left') {
-      view = left
-    } else {
-      view = right
+  /*根据后去的定位，获取页面的样式*/
+  const getStyle = position => {
+    let style, pageIndex
+    switch (position) {
+      case 'left':
+      case 'top':
+        pageIndex = frontIndex
+        break;
+      case 'right':
+      case 'bottom':
+        pageIndex = backIndex
+        break;
+      case 'middle':
+        pageIndex = middleIndex
+        break;
     }
+    return _getPageStyle(pageIndex)
   }
 
-  return [left, middle, right, view]
+  /*获取页面样式*/
+  const access = makeAccess(action, direction, distance, getStyle)
+
+  /*滑动与反弹*/
+  if (hasIndexOf(action, ['flipMove', 'flipRebound'])) {
+    if (orientation === 'h') {
+      front = access(leftPageHook)
+      back = access(rightPageHook)
+    } else {
+      front = access(topPageHook)
+      back = access(bottomPageHook)
+    }
+    middle = distance
+  }
+
+  /*翻页*/
+  if (action === 'flipOver') {
+    if (orientation === 'h') {
+      front = access(leftPageHook)
+      middle = access(hMiddlePageHook)
+      back = access(rightPageHook)
+    } else {
+      front = access(topPageHook)
+      middle = access(vMiddlePageHook)
+      back = access(bottomPageHook)
+    }
+    visualPage = direction === 'prev' ? front : back
+  }
+
+  return [front, middle, back, visualPage]
 }
 
 
@@ -96,7 +127,6 @@ const getDouble = function ({
   let view = middleIndex
   const screenWidth = config.screenSize.width
   if (direction === 'next') {
-
     /*滑动,反弹，需要叠加当期之前之前所有页面的距离综合，
     因为索引从0开始，所以middleIndex就是之前的总和页面数*/
     if (action === 'flipMove' || action === 'flipRebound') {
@@ -107,12 +137,9 @@ const getDouble = function ({
     if (action === 'flipOver') {
       middle = -(screenWidth * backIndex)
     }
-
   }
-
   return [left, middle, right, view]
 }
-
 
 /**
  * 动态计算翻页距离

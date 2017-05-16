@@ -15,7 +15,7 @@ const TANSFROM = Xut.style.transform
 /**
  * 创建页面容器li
  */
-const createHTML = function({
+const createHTML = function ({
   base,
   prefix,
   translate,
@@ -61,7 +61,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
   let background = ''
 
   //chpater有背景，不是svg格式
-  if(!/.svg$/i.test(pageData.md5)) {
+  if (!/.svg$/i.test(pageData.md5)) {
     background = 'background-image:url(' + getFileFullPath(pageData.md5, 'container-bg') + ');'
   }
 
@@ -71,7 +71,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
    */
   let customStyle = ''
   let userStyle = getStyle.userStyle
-  if(userStyle !== undefined) {
+  if (userStyle !== undefined) {
     //解析自定义规则
     _.each(userStyle, (value, key) => {
       customStyle += key + ':' + value + ';'
@@ -89,7 +89,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
 }
 
 
-export default function(base, pageData, taskCallback) {
+export default function (base, pageData, taskCallback) {
 
   let $pageNode
   let $pseudoElement
@@ -100,7 +100,7 @@ export default function(base, pageData, taskCallback) {
   //iboosk编译
   //在执行的时候节点已经存在
   //不需要在创建
-  if(Xut.IBooks.runMode()) {
+  if (Xut.IBooks.runMode()) {
     $pageNode = $("#" + prefix)
     taskCallback($pageNode, $pseudoElement)
     return
@@ -112,7 +112,7 @@ export default function(base, pageData, taskCallback) {
   Xut.nextTick({
     container: base.rootNode,
     content: $pageNode,
-    position: getStyle.direction === 'left' ? 'first' : 'last'
+    position: (getStyle.position === 'left' || getStyle.position === 'top') ? 'first' : 'last'
   }, () => {
     taskCallback($pageNode, $pseudoElement)
   });

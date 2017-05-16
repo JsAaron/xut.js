@@ -9,7 +9,7 @@ const raiseHierarchy = (complier, visualIndex) => {
     pageObj.setPageContainerHierarchy({ 'z-index': 9997 })
   })
   complier.getMasterContext(() => {
-    this.$$assistPocess(visualIndex, pageObj => {
+    complier.masterMgr.$$assistPocess(visualIndex, pageObj => {
       pageObj.setPageContainerHierarchy({ 'z-index': 1 })
     })
   })

@@ -1,5 +1,5 @@
 import { config } from '../../../config/index'
-import { getOffset } from './hook/index'
+import { getOffset } from './layout-hook/index'
 
 /**
  * 创建translate初始值
@@ -24,11 +24,13 @@ export function initTranslate({
   switch (position) {
     case 'left':
     case 'right':
+      /*设置X轴*/
       offset = getOffset(position, styleDataset)
       translate = setTranslate(offset)
       break;
     case 'top':
     case 'bottom':
+      /*设置Y轴*/
       offset = getOffset(position, styleDataset)
       translate = setTranslate(0, offset)
       break;

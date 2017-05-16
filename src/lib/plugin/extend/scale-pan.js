@@ -333,7 +333,7 @@ export class ScalePan {
           this.$buttonNode = this._createPinchButton()
         }
       }
-      Xut.Application.Bansliding() //禁止全局滑动
+      Xut.Application.SwipeBan() //禁止全局滑动
       this._isRunning = true
       this.hammer.get('pan').set({ enable: true })
     }
@@ -347,7 +347,7 @@ export class ScalePan {
     if(!this._isRunning) return
     this.hasButton && this.$buttonNode.hide()
     this._isRunning = false
-    Xut.Application.Allowliding() //全局滑动
+    Xut.Application.SwipeEnable() //全局滑动
     this.hammer.get('pan').set({ enable: false })
   }
 

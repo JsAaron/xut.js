@@ -110,8 +110,9 @@ export default class PageMgr extends ManageSuper {
         this.$$getPageBase(middleIndex),
         this.$$getPageBase(backIndex)
       ], function (pageObj, index) {
-        if (pageObj) {
-          pageObj.movePage(action, moveDistance[index], speed, moveDistance[3], outerCallFlip)
+        const dist = moveDistance[index]
+        if (pageObj && dist !== undefined) {
+          pageObj.movePage(action, dist, speed, moveDistance[3], outerCallFlip)
         }
       })
     }
@@ -175,12 +176,6 @@ export default class PageMgr extends ManageSuper {
    * 转化：双页
    * 1 停止热点动作
    * 2 触发新的页面动作
-   * @param  {[type]} prevPageIndex [上一页面]
-   * @param  {[type]} currPageIndex [当前页码]
-   * @param  {[type]} nextPageIndex [下一页页码]
-   * @param  {[type]} suspendIndex  [停止动作的页码]因为要区分滑动的方向
-   * @param  {[type]} createPointer [正在创建的页面]
-   * @param  {[type]} direction     [滑动方向]
    */
   autoRun(data) {
 

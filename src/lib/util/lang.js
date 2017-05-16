@@ -27,6 +27,25 @@ export function defAccess(obj, key, access) {
   })
 }
 
+/**
+ * 判断存在
+ */
+export function hasIndexOf(para, value) {
+  if (para && value) {
+    /*数组形式*/
+    if (value.length) {
+      if (~value.indexOf(para)) {
+        return true
+      }
+    }
+    /*字符串*/
+    if (typeof value === 'string') {
+      if (para === value) {
+        return true
+      }
+    }
+  }
+}
 
 /**
  * 转化数组
@@ -55,9 +74,9 @@ export function hasValue(value) {
 
 
 export function $extend(object, config) {
-  for(var i in config) {
-    if(i) {
-      if(object[i]) {
+  for (var i in config) {
+    if (i) {
+      if (object[i]) {
         $warn('接口方法重复', 'Key->' + i, 'Value->' + object[i])
       } else {
         object[i] = config[i];
@@ -72,11 +91,11 @@ export function $extend(object, config) {
  * @return {[type]}           [description]
  */
 export function parseJSON(parameter) {
-  if(!parameter) return
+  if (!parameter) return
   let json
   try {
     json = JSON.parse(parameter)
-  } catch(error) {
+  } catch (error) {
     $warn(`parseJSON失败:${parameter}`)
     return false
   }
@@ -101,8 +120,8 @@ export function enterReplace(str) {
 export function makeJsonPack(code) {
   try {
     let post = "(function(){" + enterReplace(code) + "})"
-    return(new Function("return " + post))();
-  } catch(error) {
+    return (new Function("return " + post))();
+  } catch (error) {
     $warn('解析json出错' + code)
   }
 }
@@ -114,11 +133,11 @@ export function makeJsonPack(code) {
  * @return {[type]}     [description]
  */
 export function arrayUnique(arr) { //去重
-  if(arr && arr.length) {
+  if (arr && arr.length) {
     var length = arr.length;
-    while(--length) {
+    while (--length) {
       //如果在前面已经出现，则将该位置的元素删除
-      if(arr.lastIndexOf(arr[length], length - 1) > -1) {
+      if (arr.lastIndexOf(arr[length], length - 1) > -1) {
         arr.splice(length, 1);
       }
     }
@@ -152,18 +171,18 @@ function normalize(path) {
   //标准化tail路径，处理掉'.' '..' 以 '\' 连接
   tail = normalizeArray(tail.split(/[\\\/]+/), !isAbsolute).join('\\');
   // 处理tail为空的情况
-  if(!tail && !isAbsolute) {
+  if (!tail && !isAbsolute) {
     tail = '.';
   }
   // 当原始路径中有slash时候，需要加上
-  if(tail && trailingSlash) {
+  if (tail && trailingSlash) {
     tail += '\\';
   }
 
   // Convert slashes to backslashes when `device` points to an UNC root.
   // Also squash multiple slashes into a single one where appropriate.
   // 处理windows UNC的情况。
-  if(isUnc) {
+  if (isUnc) {
     // 获取具体的路径，如果是UNC的情况
     device = normalizeUNCRoot(device);
   }
@@ -206,20 +225,20 @@ function normalizeArray(parts, allowAboveRoot) {
   // 返回值
   var res = [];
   // 遍历数组，处理数组中的相对路径字符 '.' 或者'..'
-  for(var i = 0; i < parts.length; i++) {
+  for (var i = 0; i < parts.length; i++) {
     // 取得当前的数组的字符
     var p = parts[i];
 
     // ignore empty parts
     // 对空或者'.'不处理
-    if(!p || p === '.')
+    if (!p || p === '.')
       continue;
     // 处理相对路径中的'..'
-    if(p === '..') {
-      if(res.length && res[res.length - 1] !== '..') {
+    if (p === '..') {
+      if (res.length && res[res.length - 1] !== '..') {
         // 直接弹出返回队列，当没有到达根目录时
         res.pop();
-      } else if(allowAboveRoot) {
+      } else if (allowAboveRoot) {
         //allowAboveRoot 为真时，插入'..'
         res.push('..');
       }
@@ -251,18 +270,18 @@ function normalizeUNCRoot(device) {
  */
 export function joinPaths() {
   var paths = [];
-  for(var i = 0; i < arguments.length; i++) {
+  for (var i = 0; i < arguments.length; i++) {
     var arg = arguments[i];
     // 确保函数参数为字符串
     try {
-      if(Object.prototype.toString.call(arg) != "[object String]") {
+      if (Object.prototype.toString.call(arg) != "[object String]") {
         throw new Error('Arguments to path.join must be strings');
       }
-      if(arg) {
+      if (arg) {
         // 放入参数数组
         paths.push(arg);
       }
-    } catch(e) {
+    } catch (e) {
       $warn(e);
     }
 
@@ -271,7 +290,7 @@ export function joinPaths() {
   var joined = paths.join("/");
 
 
-  if(!/^[\\\/]{2}[^\\\/]/.test(paths[0])) {
+  if (!/^[\\\/]{2}[^\\\/]/.test(paths[0])) {
     joined = joined.replace(/^[\\\/]{2,}/, '\\');
   }
   // 利用标准化接口 获取具体的文件路径

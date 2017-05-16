@@ -3,24 +3,22 @@
  *************************/
 export const bottomPageHook = {
   flipMove: {
-    top() {},
-    /*从底部往上动画，正数的布局需要递减*/
-    bottom(distance, pageStyles) {
-      let bottomPageStyle = pageStyles.bottom
+    /*从底部往中间移动*/
+    next(getStyle, distance) {
+      const bottomPageStyle = getStyle('bottom')
       return distance + bottomPageStyle.visualHeight
     }
   },
   flipRebound: {
-    top() {},
-    /*底部页面反弹，就设置页面高度*/
-    bottom(distance, pageStyles) {
-      return pageStyles.bottom.visualHeight
+    /*底部往中间反弹*/
+    next(getStyle) {
+      const topPageStyle = getStyle('bottom')
+      return topPageStyle.visualHeight
     }
   },
   flipOver: {
-    top() {},
     /*底部页面，翻页结束后，目标变为当前可是页面*/
-    bottom(distance, pageStyles) {
+    next() {
       return 0
     }
   }

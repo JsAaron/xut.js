@@ -1,18 +1,18 @@
 /************************
  * 左边页面钩子
  *     distance 正数，1-2-3-4 -> N 变化
- *     pageStyles：3个页面的style配置
+ *     pageStyle：3个页面的style配置
  *************************/
 export const leftPageHook = {
   flipMove: {
-    left(distance, pageStyles) {
-      let middlePageStyle = pageStyles.middle
-      let leftPageStyle = pageStyles.left
+    prev(getStyle, distance) {
+      let middlePageStyle = getStyle('middle')
+      let leftPageStyle = getStyle('left')
 
       //中间：溢出
-      if(middlePageStyle && middlePageStyle.visualLeftInteger) {
+      if (middlePageStyle && middlePageStyle.visualLeftInteger) {
         //左边：溢出
-        if(leftPageStyle && leftPageStyle.visualLeftInteger) {
+        if (leftPageStyle && leftPageStyle.visualLeftInteger) {
           return -leftPageStyle.visualWidth + distance
         }
         //左边：正常
@@ -23,7 +23,7 @@ export const leftPageHook = {
       //中间：正常
       else {
         //左边：溢出
-        if(leftPageStyle && leftPageStyle.visualLeftInteger) {
+        if (leftPageStyle && leftPageStyle.visualLeftInteger) {
           return distance - leftPageStyle.visualWidth + leftPageStyle.visualLeftInteger
         }
         //左边：正常
@@ -32,17 +32,17 @@ export const leftPageHook = {
         }
       }
     },
-    right() {}
+    next() {}
   },
   flipRebound: {
-    left(distance, pageStyles) {
-      let middlePageStyle = pageStyles.middle
-      let leftPageStyle = pageStyles.left
+    prev(getStyle) {
+      let middlePageStyle = getStyle('middle')
+      let leftPageStyle = getStyle('left')
 
       //中间：溢出
-      if(middlePageStyle && middlePageStyle.visualLeftInteger) {
+      if (middlePageStyle && middlePageStyle.visualLeftInteger) {
         //左边：溢出
-        if(leftPageStyle && leftPageStyle.visualLeftInteger) {
+        if (leftPageStyle && leftPageStyle.visualLeftInteger) {
           return -leftPageStyle.visualWidth
         }
         //左边：正常
@@ -53,7 +53,7 @@ export const leftPageHook = {
       //中间：正常
       else {
         //左边：溢出
-        if(leftPageStyle && leftPageStyle.visualLeftInteger) {
+        if (leftPageStyle && leftPageStyle.visualLeftInteger) {
           return -(leftPageStyle.visualWidth - leftPageStyle.visualLeftInteger)
         }
         //左边：正常
@@ -63,12 +63,12 @@ export const leftPageHook = {
       }
 
     },
-    right() {}
+    next() {}
   },
   flipOver: {
-    left() {
+    prev() {
       return 0
     },
-    right() {}
+    next() {}
   }
 }

@@ -1,6 +1,6 @@
 import { config } from '../../config/index'
 import { setChpaterColumn } from './depend'
-import { resolveColumnCount } from './core-init'
+import { resolveColumnCount } from './init'
 
 /**
  * 分栏探测
