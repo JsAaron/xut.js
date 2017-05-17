@@ -13,7 +13,7 @@ import { extendApplication } from './application'
 import { createaAccess } from './access'
 
 export function initSceneApi(vm) {
-  let $globalEvent = vm.$globalEvent
+  let $globalSwiper = vm.$globalSwiper
 
   //页面与母版的管理器
   let access = createaAccess({
@@ -21,14 +21,14 @@ export function initSceneApi(vm) {
     master: vm.$scheduler.masterMgr
   })
 
-  extendPresentation(access, $globalEvent) //数据接口
-  extendView(vm, access, $globalEvent) //视图接口
-  extendAssist(access, $globalEvent) // 辅助对象
-  extendContent(access, $globalEvent) //content对象
-  extendApplication(access, $globalEvent) //app应用接口
+  extendPresentation(access, $globalSwiper) //数据接口
+  extendView(vm, access, $globalSwiper) //视图接口
+  extendAssist(access, $globalSwiper) // 辅助对象
+  extendContent(access, $globalSwiper) //content对象
+  extendApplication(access, $globalSwiper) //app应用接口
 
   return function () {
-    $globalEvent = null
+    $globalSwiper = null
     access = null
     vm = null
   }

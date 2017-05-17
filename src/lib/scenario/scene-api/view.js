@@ -5,7 +5,7 @@ import { config } from '../../config/index'
  * 场景API
  * 视图接口。视图是窗口的展示方式，和页面相关的接口，都在这里。
  ********************************************/
-export function extendView(vm, access, $globalEvent) {
+export function extendView(vm, access, $globalSwiper) {
 
   let options = vm.options
 
@@ -14,7 +14,7 @@ export function extendView(vm, access, $globalEvent) {
    * 为分栏修改
    */
   Xut.View.setPointer = function (pageIndex) {
-    $globalEvent.setPointer(pageIndex)
+    $globalSwiper.setPointer(pageIndex)
   }
 
   /**
@@ -101,7 +101,7 @@ export function extendView(vm, access, $globalEvent) {
       return
     }
 
-    options.multiplePages && $globalEvent[direction](callback)
+    options.multiplePages && $globalSwiper[direction](callback)
   }
 
   /**
@@ -152,7 +152,7 @@ export function extendView(vm, access, $globalEvent) {
     if (arguments.length === 1) {
       //复位翻页按钮
       vm.$emit('change:showNext')
-      return $globalEvent.scrollToPage(fixParameter(seasonId))
+      return $globalSwiper.scrollToPage(fixParameter(seasonId))
     }
 
     //场景模式内部跳转
@@ -161,7 +161,7 @@ export function extendView(vm, access, $globalEvent) {
       var sectionRang = Xut.data.query('sectionRelated', seasonId)
       var pageIndex = chapterId - sectionRang.start
       vm.$emit('change:showNext')
-      return $globalEvent.scrollToPage(fixParameter(pageIndex))
+      return $globalSwiper.scrollToPage(fixParameter(pageIndex))
     }
 
     //场景与场景的跳转
@@ -177,7 +177,7 @@ export function extendView(vm, access, $globalEvent) {
    * @return {Boolean} [description]
    */
   Xut.View.GetFlipBorderBounce = function (distance) {
-    return $globalEvent.isBorder(distance)
+    return $globalSwiper.isBorder(distance)
   }
 
 
@@ -192,12 +192,12 @@ export function extendView(vm, access, $globalEvent) {
 
     //如果禁止翻页模式 || 如果是滑动,不是边界
     if (!options.multiplePages ||
-      $globalEvent.moving() ||
-      action === 'flipMove' && $globalEvent.isBorder(distance)) {
+      $globalSwiper.moving() ||
+      action === 'flipMove' && $globalSwiper.isBorder(distance)) {
       return
     }
 
-    const pagePointer = $globalEvent.getPointer()
+    const pagePointer = $globalSwiper.getPointer()
 
     vm.$scheduler.movePageBases({
       'distance': distance,

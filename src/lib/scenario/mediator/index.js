@@ -9,8 +9,8 @@ import { Observer } from '../../observer/index'
 import Scheduler from '../scheduler/index'
 import delegateHooks from './hooks'
 import { closestProcessor } from './closest'
-import GlobalEvent from '../../swipe/index.js'
-import swipeHooks from '../../swipe/hook.js'
+import Swiper from '../../swiper/index.js'
+import swiperHook from '../../swiper/hook.js'
 import { initSceneApi } from '../scene-api/index'
 import { defProtected, defAccess } from '../../util/index'
 
@@ -91,15 +91,42 @@ export default class Mediator extends Observer {
     //配置多页面参数
     configMultiple(options)
 
-    const $globalEvent = vm.$globalEvent = new GlobalEvent({
+
+    /**
+     *翻页模式参数解析
+     * flipMode horizontal-ban
+     * 分解为 horizontal + ban
+     * moveBan 禁止移动
+     */
+    let modeMatch = options.flipMode.split('-');
+    let moveBan = false
+    let flipDirection = ''
+    if (modeMatch.length === 2) {
+      flipDirection = modeMatch[0]
+      moveBan = true
+    } else {
+      flipDirection = options.flipMode
+    }
+
+    const $globalSwiper = vm.$globalSwiper = new Swiper({
+      scope: 'page', //translate
+      moveBan, //是否禁止移动
+      snap: true, //分段
       hasHook: true,
-      initIndex: options.initIndex,
-      container: options.container,
-      flipMode: options.flipMode, //翻页模式
-      totalIndex: options.pageTotal, //总数
+      orientation: flipDirection, //运动的方向
+
       multiplePages: options.multiplePages, //多页面
-      sectionRang: options.sectionRang //分段值
+      sectionRang: options.sectionRang, //分段值
+
+      data: {
+        visualIndex: options.initIndex,
+        totalIndex: options.pageTotal,
+        visualWidth: config.visualSize.width,
+        visualHeight: config.visualSize.height,
+        container: options.container
+      }
     })
+
     const $scheduler = vm.$scheduler = new Scheduler(vm)
 
     //如果是主场景,才能切换系统工具栏
@@ -114,13 +141,13 @@ export default class Mediator extends Observer {
      * 过滤器.全局控制函数
      * return true 阻止页面滑动
      */
-    $globalEvent.$watch('onFilter', (hookCallback, point, evtObj) => {
+    $globalSwiper.$watch('onFilter', (hookCallback, point, evtObj) => {
       let node = point.target
-      swipeHooks(evtObj, node)
+      swiperHook(evtObj, node)
         //页面类型
       let pageType = isBelong(node);
       //冒泡的ul根节点
-      let parentNode = $globalEvent.findBubbleRootNode(point, pageType);
+      let parentNode = $globalSwiper.findBubbleRootNode(point, pageType);
       //执行过滤处理
       handlerObj = closestProcessor.call(parentNode, point, pageType);
       //如果找到是空节点
@@ -139,7 +166,7 @@ export default class Mediator extends Observer {
     /**
      * 触屏松手点击，无滑动，判断为点击
      */
-    $globalEvent.$watch('onTap', (pageIndex, hookCallback) => {
+    $globalSwiper.$watch('onTap', (pageIndex, hookCallback) => {
       if (handlerObj) {
         if (handlerObj.handlers) {
           handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex)
@@ -158,7 +185,7 @@ export default class Mediator extends Observer {
      * 触屏滑动,通知pageMgr处理页面移动
      * @return {[type]} [description]
      */
-    $globalEvent.$watch('onMove', (data) => {
+    $globalSwiper.$watch('onMove', (data) => {
       $scheduler.movePageBases(data)
     });
 
@@ -166,7 +193,7 @@ export default class Mediator extends Observer {
     /**
      * 触屏滑动,通知ProcessMgr关闭所有激活的热点
      */
-    $globalEvent.$watch('onEnd', (pointers) => {
+    $globalSwiper.$watch('onEnd', (pointers) => {
       $scheduler.suspendPageBases(pointers)
     });
 
@@ -175,7 +202,7 @@ export default class Mediator extends Observer {
      * 翻页动画完成回调
      * @return {[type]}              [description]
      */
-    $globalEvent.$watch('onComplete', (...arg) => {
+    $globalSwiper.$watch('onComplete', (...arg) => {
       $scheduler.completePageBases(...arg)
     });
 
@@ -184,7 +211,7 @@ export default class Mediator extends Observer {
      * 切换页面
      * @return {[type]}      [description]
      */
-    $globalEvent.$watch('onJumpPage', (data) => {
+    $globalSwiper.$watch('onJumpPage', (data) => {
       $scheduler.gotoPageBases(data);
     });
 
@@ -193,7 +220,7 @@ export default class Mediator extends Observer {
      * 退出应用
      * @return {[type]}      [description]
      */
-    $globalEvent.$watch('onDropApp', (data) => {
+    $globalSwiper.$watch('onDropApp', (data) => {
       window.GLOBALIFRAME && Xut.publish('magazine:dropApp');
     });
 
@@ -204,7 +231,7 @@ export default class Mediator extends Observer {
      * 才需要重新激活对象
      * 删除parallaxProcessed
      */
-    $globalEvent.$watch('onMasterMove', (hindex, target) => {
+    $globalSwiper.$watch('onMasterMove', (hindex, target) => {
       if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
         $scheduler.masterMgr && $scheduler.masterMgr.reactivation(target);
       }
@@ -260,7 +287,7 @@ export default class Mediator extends Observer {
  * 是否多场景模式
  */
 defAccess(Mediator.prototype, '$multiScenario', {
-  get: function () {
+  get: function() {
     return this.options.multiScenario
   }
 })
@@ -275,10 +302,10 @@ defAccess(Mediator.prototype, '$multiScenario', {
  *  这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
  */
 defAccess(Mediator.prototype, '$injectionComponent', {
-  set: function (regData) {
+  set: function(regData) {
     var injection;
     if (injection = this.$scheduler[regData.pageType + 'Mgr']) {
-      injection.$$assistPocess(regData.pageIndex, function (pageObj) {
+      injection.$$assistPocess(regData.pageIndex, function(pageObj) {
         pageObj.baseAddComponent.call(pageObj, regData.widget);
       })
     } else {
@@ -292,8 +319,8 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  * @return {[type]}   [description]
  */
 defAccess(Mediator.prototype, '$curVmPage', {
-  get: function () {
-    return this.$scheduler.pageMgr.$$getPageBase(this.$globalEvent.getVisualIndex());
+  get: function() {
+    return this.$scheduler.pageMgr.$$getPageBase(this.$globalSwiper.getVisualIndex());
   }
 });
 
@@ -324,9 +351,9 @@ defAccess(Mediator.prototype, '$curVmPage', {
  *          'suspendAutoCallback': null
  *
  */
-defProtected(Mediator.prototype, '$bind', function (key, callback) {
+defProtected(Mediator.prototype, '$bind', function(key, callback) {
   var vm = this
-  vm.$watch('change:' + key, function () {
+  vm.$watch('change:' + key, function() {
     callback.apply(vm, arguments)
   })
 })
@@ -336,7 +363,7 @@ defProtected(Mediator.prototype, '$bind', function (key, callback) {
  * 创建页面
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$init', function () {
+defProtected(Mediator.prototype, '$init', function() {
   this.$scheduler.initCreate();
 });
 
@@ -345,10 +372,10 @@ defProtected(Mediator.prototype, '$init', function () {
  * 运动动画
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$run', function () {
+defProtected(Mediator.prototype, '$run', function() {
   var vm = this;
   vm.$scheduler.pageMgr.activateAutoRuns(
-    vm.$globalEvent.getVisualIndex(), Xut.Presentation.GetPageBase()
+    vm.$globalSwiper.getVisualIndex(), Xut.Presentation.GetPageBase()
   )
 });
 
@@ -357,8 +384,8 @@ defProtected(Mediator.prototype, '$run', function () {
  * 复位对象
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$reset', function () {
-  return this.$scheduler.pageMgr.resetOriginal(this.$globalEvent.getVisualIndex());
+defProtected(Mediator.prototype, '$reset', function() {
+  return this.$scheduler.pageMgr.resetOriginal(this.$globalSwiper.getVisualIndex());
 });
 
 
@@ -366,7 +393,7 @@ defProtected(Mediator.prototype, '$reset', function () {
  * 停止所有任务
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$suspend', function () {
+defProtected(Mediator.prototype, '$suspend', function() {
   Xut.Application.Suspend({
     skipAudio: true //跨页面不处理
   })
@@ -376,11 +403,11 @@ defProtected(Mediator.prototype, '$suspend', function () {
  * 销毁场景内部对象
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$destroy', function () {
+defProtected(Mediator.prototype, '$destroy', function() {
   this.$off(); //观察事件
-  this.$globalEvent.destroy(); //全局事件
+  this.$globalSwiper.destroy(); //全局事件
   this.$scheduler.destroyManage(); //派发器
   this.$scheduler = null;
-  this.$globalEvent = null;
+  this.$globalSwiper = null;
   this.destorySceneApi() //动态api
 })

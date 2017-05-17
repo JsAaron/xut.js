@@ -7,9 +7,10 @@ import { ScalePicture } from '../../plugin/extend/scale-picture/index'
 import { closeButton } from '../../plugin/extend/close-button'
 import { analysisImageName, getHDFilePath } from '../../util/option'
 
-import Swipe from '../../swipe/index'
+import Swiper from '../../swiper/index'
+import swiperHook from '../../swiper/hook.js'
 import { closestMedia } from '../../scenario/mediator/closest'
-import swipeHooks from '../../swipe/hook.js'
+
 
 import { clearColumnAudio } from '../audio/api'
 import { clearVideo } from '../video/api'
@@ -138,28 +139,33 @@ export default class ColumnClass {
     const appVisualIndex = Xut.Presentation.GetPageIndex()
 
     const setOptions = {
-      container,
+      scope: 'parent', //父容器滑动
+      snap: false, //不分段
+      moveBan: false, //不限制动画
+      orientation: config.launch.flipMode, //运动的方向
+
       hasHook: true,
-      visualWidth: columnWidth,
-      snap: false, //不是分段模式
-      initIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
-      flipMode: 'horizontal',
       multiplePages: true,
       stopPropagation: true,
-      totalIndex: this.columnCount
+
+      data: {
+        container,
+        visualIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
+        totalIndex: this.columnCount,
+        visualWidth: columnWidth
+      }
     }
 
     /*竖版设置*/
     if (config.launch.flipMode === 'vertical') {
-      setOptions.visualHeight = getColumnHeight(this.seasonId, this.chapterId)
-      setOptions.flipMode = 'vertical'
+      setOptions.data.visualHeight = getColumnHeight(this.seasonId, this.chapterId)
     }
 
     /**
      * 分栏整体控制
      * @type {[type]}
      */
-    const swipe = this.swipe = new Swipe(setOptions)
+    const swipe = this.swipe = new Swiper(setOptions)
 
     let moveDistance = 0
 
@@ -169,12 +175,12 @@ export default class ColumnClass {
     swipe.$watch('onFilter', (hookCallback, point, evtObj) => {
       /*二维码*/
       hasQrcode = false
-      if (swipeHooks(evtObj, point.target) === 'qrcode') {
+      if (swiperHook(evtObj, point.target) === 'qrcode') {
         hasQrcode = true
       }
     });
 
-    swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
+    swipe.$watch('onTap', function(pageIndex, hookCallback, point, duration) {
       const node = point.target;
       /*图片缩放*/
       if (!hasQrcode) {
@@ -189,7 +195,7 @@ export default class ColumnClass {
       closestMedia(node, coloumnObj.chapterId, swipe.visualIndex)
     })
 
-    swipe.$watch('onMove', function (options) {
+    swipe.$watch('onMove', function(options) {
 
       const {
         action,

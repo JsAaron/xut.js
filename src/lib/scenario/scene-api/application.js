@@ -3,7 +3,7 @@
  * app应用接口
  ********************************************/
 
-export function extendApplication(access, $globalEvent) {
+export function extendApplication(access, $globalSwiper) {
 
   /**
    * 获取一个存在的实例对象
@@ -35,7 +35,7 @@ export function extendApplication(access, $globalEvent) {
    * @return {[type]} [description]
    */
   Xut.Application.hasEnabled = function () {
-    return $globalEvent.hasEnabled()
+    return $globalSwiper.hasEnabled()
   }
 
   /**
@@ -43,28 +43,28 @@ export function extendApplication(access, $globalEvent) {
    * @return {Boolean} [description]
    */
   Xut.Application.Swiping = function () {
-    return $globalEvent.moving()
+    return $globalSwiper.moving()
   }
 
   /**
    * 禁止滑动
    */
   Xut.Application.SwipeBan = function () {
-    $globalEvent.swipeBan();
+    $globalSwiper.swipeBan();
   }
 
   /**
    * 允许滑动
    */
   Xut.Application.SwipeEnable = function () {
-    $globalEvent.swipeEnable();
+    $globalSwiper.swipeEnable();
   }
 
   /**
    * 设置翻页完成
    */
   Xut.Application.tiggerFilpComplete = function (...arg) {
-    $globalEvent.setTransitionComplete(...arg)
+    $globalSwiper.setTransitionComplete(...arg)
   }
 
   _.each([
@@ -72,7 +72,7 @@ export function extendApplication(access, $globalEvent) {
     "openSwipe"
   ], function (operate) {
     Xut.Application[operate] = function () {
-      $globalEvent[operate]();
+      $globalSwiper[operate]();
     }
   })
 
