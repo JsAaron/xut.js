@@ -3,7 +3,6 @@ import { getActionPointer } from './pointer'
 /*翻页速率*/
 const FLIPSPEED = 600
 
-
 const ABS = Math.abs
 const getDate = () => {
   return +new Date
@@ -11,20 +10,32 @@ const getDate = () => {
 
 export default function slide(Swipe) {
 
-
   /**
    * 快速翻页时间计算
    */
   Swipe.prototype._setRate = function () {
-    this._speedRate = 50 / this._visualWidth;
+    if (this.orientation === 'h') {
+      this._speedRate = 50 / this._visualWidth;
+    } else {
+      this._speedRate = 50 / this._visualHeight;
+    }
     this._isQuickTurn = true;
   }
 
   /**
-   * 判断是否快速翻页
-   * @return {[type]} [description]
+   * 复位速率
    */
-  Swipe.prototype._isQuickFlip = function () {
+  Swipe.prototype._resetRate = function () {
+    this._speedRate = this._originalRate;
+    this._isQuickTurn = false;
+  }
+
+  /**
+   * 判断是否快速翻页
+   * 如果是快速翻页
+   * 重设置_setRate
+   */
+  Swipe.prototype._setQuick = function () {
     const startDate = getDate()
     if (this._preTapTime) {
       if (startDate - this._preTapTime < FLIPSPEED) {
@@ -32,6 +43,37 @@ export default function slide(Swipe) {
       }
     }
     this._preTapTime = getDate();
+  }
+
+  /**
+   * 边界控制
+   */
+  Swipe.prototype._isBorder = function (direction) {
+    let overflow
+    let pointer = this.pagePointer
+    let fillength = Object.keys(pointer).length
+    switch (direction) {
+      case 'prev': //前翻页
+        overflow = (pointer.middleIndex === 0 && fillength === 2) ? true : false;
+        break;
+      case 'next': //后翻页
+        overflow = (pointer.middleIndex === (this.totalIndex - 1) && fillength === 2) ? true : false;
+        break;
+    }
+    return overflow
+  }
+
+  /**
+   * 获取翻页结束的speed的速率
+   */
+  Swipe.prototype._getFlipOverSpeed = function () {
+    let spped
+    if (this.orientation === 'h') {
+      spped = (this._visualWidth - (ABS(this._distX))) * this._speedRate || this._flipTime;
+    } else {
+      spped = (this._visualHeight - (ABS(this._distY))) * this._speedRate || this._flipTime;
+    }
+    return ABS(spped)
   }
 
   /**
@@ -46,9 +88,22 @@ export default function slide(Swipe) {
    *   1. inner 用户直接翻页滑动触发，提供hasTouch
    *   2. outer 通过接口调用翻页
    */
-  Swipe.prototype._slideTo = function (direction, action, callback) {
+  Swipe.prototype._slideTo = function ({
+    action,
+    direction,
+    callback
+  }) {
 
-    /*是外部调用触发接口,提供给翻页滑动使用*/
+    /*外部调用，direction需要更新
+    内部调用赋予direction*/
+    if (direction) {
+      this.direction = direction
+    } else {
+      direction = this.direction
+    }
+
+    /*是外部调用触发接口
+    提供给翻页滑动使用*/
     let outerCallFlip = false
 
     /**
@@ -60,12 +115,12 @@ export default function slide(Swipe) {
      */
     let outerSpeed
 
-    /*外部调用*/
+    /*外部调用，比如左右点击案例，需要判断点击的速度*/
     if (action === 'outer') {
       /*如果是第二次开始同一个点击动作*/
-      if (action === this.preTick.action) {
+      if (action === this._recordRreTick.action) {
         /*最大的点击间隔时间不超过默认的_flipTime时间，最小的取间隔时间*/
-        const time = getDate() - this.preTick.time
+        const time = getDate() - this._recordRreTick.time
         if (time <= this._flipTime) {
           outerSpeed = time
         } else {
@@ -74,11 +129,11 @@ export default function slide(Swipe) {
         outerCallFlip = true
       }
       /*点击时间啊*/
-      this.preTick.time = getDate()
+      this._recordRreTick.time = getDate()
     }
 
     /*保存每次点击动作*/
-    this.preTick.action = action
+    this._recordRreTick.action = action
 
     //如果在忙碌状态,如果翻页还没完毕
     if (!this.enabled) {
@@ -86,33 +141,36 @@ export default function slide(Swipe) {
     }
 
     //前后边界
-    if (!this.options.linear) {
+    if (this.options.snap) {
       if (this._isBorder(direction)) return;
     }
 
     this.disable()
-    this._isQuickFlip()
-    this.direction = direction
+    this._setQuick()
 
-    /*监听内部翻页，通过接口调用，需要翻页结束后触发外部通知，绑定一次*/
+    /**
+     * 监听内部翻页，通过接口调用
+     * 需要翻页结束后触发外部通知，绑定一次
+     */
     if (callback) {
       this.$once('innerFlipOver', callback)
     }
 
     this._distributeMove({
-      outerCallFlip,
       'speed': outerSpeed || this._getFlipOverSpeed(),
       'distance': 0,
-      'direction': this.direction,
-      'action': 'flipOver'
+      'action': 'flipOver',
+      direction,
+      outerCallFlip
     })
 
+    /*更新数据，触发停止动作*/
     setTimeout(() => {
-      this._updateActionPointer()
-        /*手指移开屏幕*/
+      this._updateActionPointer();
+      /*手指移开屏幕*/
       this.$emit('onEnd', this.pagePointer)
       this._updateVisualIndex(this.pagePointer.middleIndex)
-    })
+    }, 0)
   }
 
 
@@ -160,15 +218,6 @@ export default function slide(Swipe) {
   }
 
 
-  /**
-   * 获取翻页结束的speed的速率
-   * @return {[type]} [description]
-   */
-  Swipe.prototype._getFlipOverSpeed = function (visualWidth) {
-    visualWidth = visualWidth || this._visualWidth
-    const spped = (visualWidth - (ABS(this._distX))) * this._speedRate || this._flipTime;
-    return ABS(spped)
-  }
 
 
 }

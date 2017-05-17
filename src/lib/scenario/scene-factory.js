@@ -5,7 +5,7 @@ import BookBar from '../toolbar/word-bookbar/index'
 import NumberBar from '../toolbar/mini-pagebar/main'
 import { sceneController } from './scene-control'
 import Mediator from './mediator/index'
-import { getColumnCount, getColumnChpaterCount } from '../component/column/depend'
+import { getColumnCount, getColumnChapterCount } from '../component/column/api'
 import { mainScene, deputyScene } from './scene-layout'
 import { pMainBar, pDeputyBar } from './parse-bar'
 
@@ -188,7 +188,7 @@ export class SceneFactory {
         }
         let columnChpterCount = 0
         if(columnCounts) {
-          columnChpterCount = getColumnChpaterCount(this.seasonId)
+          columnChpterCount = getColumnChapterCount(this.seasonId)
         }
         return columnCounts ? (pageTotal + columnCounts - columnChpterCount) : pageTotal
       }

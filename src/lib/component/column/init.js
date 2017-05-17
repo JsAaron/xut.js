@@ -2,7 +2,7 @@ import { config, resetVisualLayout } from '../../config/index'
 import { defAccess, nextTick, $warn, loadGolbalStyle } from '../../util/index'
 import { getResults, removeColumnData } from '../../database/result'
 import { startColumnDetect, simulateCount, debug } from './detect'
-import { setCache } from './depend'
+import { setCache } from './api'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -44,13 +44,26 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
 
   //重复加载杂志
   //不刷新的情况处理
-  if(/section-transform/.test(data)) {
+  if (/section-transform/.test(data)) {
     data = $(data).find("#columns-content").html()
   }
 
-  const columnGap = `${COLUMNTAP}:${negativeWidth}px`
-  const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
-  const container = `
+  if (config.launch.flipMode === 'vertical') {
+    const columnGap = `${COLUMNTAP}:${negativeWidth}px`
+    const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
+    const container = `
+            <section class="section-transform" data-flow="true">
+                <div class="page-flow-scale" data-role="margin" style="width:${containerWidth}px;height:auto;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
+                    <div data-role="column" id="columns-content" style="width:${containerWidth}px;height:100%;">
+                        ${data}
+                    </div>
+                </div>
+            </section>`
+    return String.styleFormat(container)
+  } else {
+    const columnGap = `${COLUMNTAP}:${negativeWidth}px`
+    const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
+    const container = `
             <section class="section-transform" data-flow="true">
                 <div class="page-flow-scale" data-role="margin" style="width:${containerWidth}px;height:${containerHeight}px;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
                     <div data-role="column" id="columns-content" style="${columnWidth};height:100%;${columnGap}">
@@ -58,29 +71,28 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
                     </div>
                 </div>
             </section>`
-
-  newViewHight = containerHeight
-
-  return String.styleFormat(container)
+    newViewHight = containerHeight
+    return String.styleFormat(container)
+  }
 }
 
 
-const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnCount) => {
-  for(let i = 0; i < seasonNode.childNodes.length; i++) {
+const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnData) => {
+  for (let i = 0; i < seasonNode.childNodes.length; i++) {
     let chapterNode = seasonNode.childNodes[i]
-    if(chapterNode.nodeType == 1) {
+    if (chapterNode.nodeType == 1) {
       let tag = chapterNode.id
-      if(tag) {
+      if (tag) {
         let id = /\d+/.exec(tag)[0]
-        if(id) {
+        if (id) {
           let margin = chapterNode.getAttribute('data-margin')
-          if(margin) {
+          if (margin) {
             margin = margin.split(",")
           } else {
             margin = [0, 0, 0, 0]
           }
           chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin)
-          columnCount[seasonsId][id] = 0
+          columnData[seasonsId][id] = 0
         } else {
           $warn('node tag is null on insertColumn')
         }
@@ -92,45 +104,56 @@ const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnCo
 }
 
 
-const eachColumn = function(columnCount, $seasons, visualWidth, visualHeight) {
+const eachColumn = function (columnData, $seasons, visualWidth, visualHeight) {
   $seasons.each((index, node) => {
     let tag = node.id
     let seasonsId = tag.match(/\d/)[0]
     let $chapters = $seasons.children()
-    columnCount[seasonsId] = {}
-    insertColumn(node, seasonsId, visualWidth, visualHeight, columnCount)
+    columnData[seasonsId] = {}
+    insertColumn(node, seasonsId, visualWidth, visualHeight, columnData)
   })
 }
 
-
 /**
- * 解析分栏高度
+ * 获取内容高度
+ * @return {[type]} [description]
  */
-const resolveCount = ($content) => {
-  let theChildren = $content.find('#columns-content').children()
+const getContentHight = function (content) {
+  let theChildren = content.find('#columns-content').children()
   let paraHeight = 0
-  for(let i = 0; i < theChildren.length; i++) {
+  for (let i = 0; i < theChildren.length; i++) {
     paraHeight += Math.max(theChildren[i].scrollHeight, theChildren[i].clientHeight)
   }
-  // $("#test123").append('<a>' + paraHeight + '</a>，')
-  return Math.ceil(paraHeight / newViewHight)
+  return paraHeight
 }
 
+/**
+ * 解析分栏数
+ */
+const resolveCount = (content) => {
+  return Math.ceil(getContentHight(content) / newViewHight)
+}
 
 /**
- * 获取分栏数量
+ * 获取分栏的数量与高度
+ * 1 横版，数量
+ * 2 竖版，高度
  */
-export function resolveColumnCount($seasons, callback) {
+export function resolveColumn($seasons, callback) {
   $seasons.each((index, node) => {
     let tag = node.id
     let seasonsId = tag.match(/\d/)[0]
     let $chapters = $seasons.children()
-    $chapters.each(function(index, node) {
+    $chapters.each(function (index, node) {
       let tag = node.id
-      if(tag) {
+      if (tag) {
         let chapterId = tag.match(/\d+/)[0]
-        let count = resolveCount($(node))
-        callback(seasonsId, chapterId, Number(count))
+        if (config.launch.flipMode === 'vertical') {
+          callback(seasonsId, chapterId, 1, getContentHight($(node)))
+        } else {
+          let count = resolveCount($(node))
+          callback(seasonsId, chapterId, Number(count))
+        }
       }
     })
   })
@@ -143,11 +166,11 @@ export function resolveColumnCount($seasons, callback) {
 export function initColumn(callback) {
 
   let $container = $("#xut-stream-flow")
-  if($container.length) {
+  if ($container.length) {
     $container.remove()
   }
 
-  const setHeight = function($container, visualWidth, visualHeight) {
+  const setHeight = function ($container, visualWidth, visualHeight) {
     $container.css({
       width: visualWidth,
       height: visualHeight,
@@ -155,55 +178,70 @@ export function initColumn(callback) {
     })
   }
 
-  const init = function(visualWidth, visualHeight) {
+  const setInit = function (visualWidth, visualHeight) {
     let $seasons = $container.children()
-    if(!$seasons.length) {
+    if (!$seasons.length) {
       callback()
       return
     }
 
-    let columnCount = {} //分栏记录
+    /**
+     * 记录分栏数据
+     * columnData[seasonsId][chapterId] = {
+     *     count,
+     *     height
+     * }
+     * @type {Object}
+     */
+    let columnData = {}
     setHeight($container, visualWidth, visualHeight)
-    eachColumn(columnCount, $seasons, visualWidth, visualHeight)
-    $('body').append($container)
+    eachColumn(columnData, $seasons, visualWidth, visualHeight)
 
+    /**
+     * 得到分栏的数据
+     * 1 数量
+     * 2 高度
+     * 3 检测是否有丢失
+     */
     setTimeout(() => {
 
-      //第一次获取分栏数
-      resolveColumnCount($seasons, (seasonsId, chapterId, count) => {
-        if(debug && config.launch.columnCheck) {
+      //第一次获取分栏数与高度
+      resolveColumn($seasons, (seasonsId, chapterId, count, height) => {
+        if (debug && config.launch.columnCheck) {
           count = simulateCount
         }
-        columnCount[seasonsId][chapterId] = count
+        columnData[seasonsId][chapterId] = { count, height }
       })
 
-      setCache(columnCount)
+      setCache(columnData);
 
       //检测分栏数变化
-      if(config.launch.columnCheck) {
-        startColumnDetect($seasons, $.extend(true, {}, columnCount), () => {
+      if (config.launch.columnCheck) {
+        startColumnDetect($seasons, $.extend(true, {}, columnData), () => {
           $container.hide()
         })
       } else {
         $container.hide()
       }
 
-      callback(Object.keys(columnCount).length)
+      callback(Object.keys(columnData).length)
     }, 100)
+
+    $('body').append($container)
   }
 
   //如果存在json的flow数据
   const results = getResults()
-  if(results && results.FlowData) {
+  if (results && results.FlowData) {
     //容器尺寸设置
     let visuals = resetVisualLayout(1)
     let visualHeight = newViewHight = visuals.height
 
     //加载flow样式
-    loadGolbalStyle('xxtflow', function() {
+    loadGolbalStyle('xxtflow', function () {
       $container = $(results.FlowData)
       removeColumnData() //删除flowdata，优化缓存
-      init(visuals.width, visualHeight)
+      setInit(visuals.width, visualHeight)
     })
 
   } else {

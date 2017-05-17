@@ -1,15 +1,17 @@
 import api from './api'
+import init from './init'
 import slide from './slide'
 import distribute from './distribute'
 import { Observer } from '../observer/index'
 import { config } from '../config/index'
 import { initPointer } from './pointer'
-import { $on, $off, $handle, $event, $warn } from '../util/index'
+import { $off, $handle, $event } from '../util/index'
+
+import { LINEARTAG } from './type'
 
 const transitionDuration = Xut.style.transitionDuration
-const LINEARTAG = 'data-linearVisual'
-const ABS = Math.abs
 
+const ABS = Math.abs
 
 /**
  * 是否多点触发
@@ -39,17 +41,19 @@ const getDate = () => {
  * onSwipeUpSlider触屏松手 滑动处理
  * onFlipSliding 松手动画（反弹）
  * onFlipRebound 执行反弹
- * _onFlipComplete 动画完成
+ * _onComplete 动画完成
  * onDropApp 退出应用
  */
 export default class Swipe extends Observer {
 
   constructor({
     visualWidth, //可视区的宽度，给flow使用
+    visualHeight, //可视区的高度，给flow使用
+
     initIndex, //初页
     totalIndex, //总数
     container,
-    flipMode, //翻页模式
+    flipMode = 'horizontal', //翻页模式
 
     /*
     1.支持分段处理，就是动态翻页
@@ -58,21 +62,44 @@ export default class Swipe extends Observer {
      */
     snap = true,
 
+    /*鼠标滚轮*/
+    mouseWheel = false,
+
+    /*卷滚条*/
+    scrollbar = false,
+
     multiplePages, //多页面
     sectionRang, //分段值
 
     hasHook = false,
     stopPropagation = false,
     preventDefault = true,
-    linear = false, //线性模式
     borderBounce = true, //边界反弹
     extraGap = 0 //间隔,flow处理
   }) {
 
-
     super()
 
+    /**
+     *翻页模式参数解析
+     * flipMode horizontal-ban
+     * 分解为 horizontal + ban
+     */
+    let modeMatch = flipMode.split('-');
+    let flipBan = false
+    if (modeMatch.length === 2) {
+      flipMode = modeMatch[0]
+      flipBan = true
+    }
+
+    /*竖版模式下默认启动鼠标滚轮*/
+    if (flipMode === 'vertical') {
+      // mouseWheel = true
+    }
+
     this.options = {
+      snap,
+      mouseWheel,
       stopPropagation,
       preventDefault,
 
@@ -82,24 +109,18 @@ export default class Swipe extends Observer {
        */
       hasHook,
 
-      /*
-      2种模式，默认是分段处理，如果linear存在，就是线性处理
-       */
-      linear,
-
       /**
        * 启动边界反弹
        */
       borderBounce,
 
       /**
-       * pageflip
+       * 翻页模式
        *   横版翻页 horizontal
-       *   横版锁定 horizontal-ban
-       *
        *   竖版翻页 vertical
-       *   竖版锁定 vertical-ban
+       * 翻页禁止  true/false
        */
+      flipBan,
       flipMode,
 
       /**
@@ -130,106 +151,30 @@ export default class Swipe extends Observer {
 
     /*视图尺寸*/
     this._visualWidth = visualWidth || config.visualSize.width
-    this._visualHeight = config.visualSize.height
+    this._visualHeight = visualHeight || config.visualSize.height
 
     /*翻页时间*/
-    this._flipTime = this.options.flipMode === 'horizontal-ban' ? FLIPTIMEMIN : FLIPTIMEMAX
+    this._flipTime = flipBan ? FLIPTIMEMIN : FLIPTIMEMAX
 
-    /* 翻页速率*/
-    this._speedRate = this._originalRate = this._flipTime / this._visualWidth
+    /*翻页速率*/
+    this._speedRate = this._originalRate =
+      this._flipTime / (flipMode === 'horizontal' ? this._visualWidth : this._visualHeight)
 
     /*计算初始化页码*/
     this.pagePointer = initPointer(initIndex, totalIndex)
 
     /*标记上一个翻页动作*/
-    this.preTick = { ation: null, time: null }
+    this._recordRreTick = { ation: null, time: null }
 
     this._init()
   }
 
-  _init() {
-    this._initMode()
-    this._initEvents()
-    this._initPrevent()
-  }
-
-  /*基本模式设置*/
-  _initMode() {
-    //初始化线性翻页
-    //全局只创建一个翻页容器
-    if (this.options.linear) {
-      this.container.setAttribute(LINEARTAG, true)
-      this._setTransform()
-      this._setContainerWidth()
-    } else {
-      //用于查找跟元素
-      //ul => page
-      //ul => master
-      const ul = this.container.querySelectorAll('ul')
-      if (!ul.length) {
-        $warn(" ul element don't found !")
-      } else {
-        this._bubbleNode = {
-          page: ul[0],
-          master: ul[1]
-        }
-      }
-    }
-  }
-
-  /*默认行为*/
-  _initPrevent() {
-    this._stopDefault = this.options.preventDefault ? function (e) {
-      e.preventDefault && e.preventDefault()
-    } : function () {}
-  }
-
-  /**
-   * 设置初始的
-   */
-  _setTransform(newIndex) {
-    let visualIndex = newIndex || this.visualIndex
-    this._initDistance = -visualIndex * (this._visualWidth + this.extraGap)
-    if (this.container) {
-      this.container.style[Xut.style.transform] = 'translate3d(' + this._initDistance + 'px,0px,0px)'
-    }
-  }
-
-  /**
-   * 设置容易溢出的宽度
-   */
-  _setContainerWidth() {
-    if (this.container) {
-      this.container.style.width = this._visualWidth * this.totalIndex + 'px'
-    }
-  }
-
-  /**
-   * 绑定事件
-   */
-  _initEvents() {
-    const callback = {
-        start: this,
-        end: this,
-        cancel: this,
-        leave: this
-      }
-      //flipMode启动，没有滑动处理
-    if (this.options.flipMode === 'horizontal-ban') {
-      //不需要绑定transitionend，会设置手动会触发
-    } else if (this.options.multiplePages) {
-      callback.move = this
-      callback.transitionend = this
-    }
-    $on(this.container, callback)
-  }
 
   /**
    * 事件处理
    */
   handleEvent(e) {
     this.options.stopPropagation && e.stopPropagation()
-      //接受多事件的句柄
     $handle({
       start(e) {
         //如果没有配置外部钩子
@@ -250,10 +195,11 @@ export default class Swipe extends Observer {
       },
       transitionend(e) {
         this._stopDefault(e)
-        this._onFlipComplete(e)
+        this._onComplete(e)
       }
     }, this, e)
   }
+
 
   /**
    * 触发页面
@@ -307,12 +253,14 @@ export default class Swipe extends Observer {
     是否滑动事件受限
      */
     this._stopped = false //如果页面停止了动作，触发
-    this._isBounce = false //是否反弹
-    this._isRollX = false //是否为X轴滑动
-    this._isRollY = false //是否为Y轴滑动
+    this._hasBounce = false //是否有反弹
     this._hasTap = true //点击了屏幕
     this._isInvalid = false //无效的触发
     this._moved = false /*是否移动中*/
+    this._behavior = 'swipe' //用户行为
+
+    /*锁定滑动相反方向*/
+    this._directionBan = false
 
     this._start = {
       pageX: event.pageX,
@@ -321,16 +269,6 @@ export default class Swipe extends Observer {
     }
   }
 
-  /**
-   * 获取移动距离
-   * @return {[type]} [description]
-   */
-  _getDist(value, absDelta) {
-    return value / ((!this.visualIndex && value > 0 || // 在首页
-      this.visualIndex == this.totalIndex - 1 && // 尾页
-      value < 0 // 中间
-    ) ? (absDelta / this._visualWidth + 1) : 1)
-  }
 
   /**
    * 移动
@@ -364,60 +302,46 @@ export default class Swipe extends Observer {
       $absDelta = absDeltaY
     }
 
-    /*判断用户行为*/
-    if (this.options.flipMode === 'vertical') {
-      /*竖版模式下横版滑动抛弃*/
-      if (this.orientation === 'h') {
-        return
+    /**
+     * 1.相反方向禁止滑动
+     * 2.提供给sendTrackCode使用
+     *     猜测用户的意图，滑动轨迹小于80,想翻页
+     *     猜测用户相反的方向意向
+     *     比如横屏的时候，用户想竖屏上下滑动翻页
+     *     竖屏的时候，用户想横屏左右翻页
+     *     如果继续保持了Y轴移动，记录下最大偏移量算不算上下翻页动作
+     */
+    if (this.options.flipMode === 'horizontal' && this.orientation === 'v') {
+      //左右翻页，猜测上下翻页
+      if ($absDelta > 80) {
+        this._behavior = 'reverse'
       }
-
-      /*等填充*/
-    } else {
-      /**
-       * 提供给sendTrackCode使用
-       * 如果继续保持了Y轴移动，记录下最大偏移量算不算上下翻页动作
-       */
-      if (this._isRollY) {
-        /*猜测用户的意图，滑动轨迹小于80,想翻页*/
-        if (absDeltaX > 80) {
-          this._isRollY = 'swipe'
-        } else {
-          this._isRollY = 'wantFlip'
-        }
-        return
+      this._directionBan = 'v'
+    } else if (this.options.flipMode === 'vertical' && this.orientation === 'h') {
+      //上下翻页，猜测左右翻页
+      if ($absDelta > 80) {
+        this._behavior = 'reverse'
       }
-
-      /*检测用户是否上下滑动了*/
-      if (!this._isRollY) {
-        //Y>X => 为Y轴滑动
-        if (absDeltaY > absDeltaX) {
-          //默认用户只想滑动
-          this._isRollY = 'swipe'
-          return;
-        }
-      }
+      this._directionBan = 'h'
     }
 
     /*前尾是否允许反弹*/
     if (!this.options.borderBounce) {
-      if (this._isBounce = this._borderBounce($delta)) return;
+      if (this._hasBounce = this._borderBounce($delta)) return;
     }
 
     /*滑动距离*/
     if (this.orientation === 'h') {
       $dist = this._distX = this._getDist(deltaX, absDeltaX)
-      if (!this._isRollX && this._distX) {
-        this._isRollX = true
-      }
     } else if (this.orientation === 'v') {
       $dist = this._distY = this._getDist(deltaY, absDeltaY)
-      if (!this._isRollY && this._distY) {
-        this._isRollY = true
-      }
     }
 
     /*设置方向*/
     this._setDirection($dist)
+
+    /*锁定*/
+    if (this._directionBan) return;
 
     /*
      * 减少抖动
@@ -441,7 +365,6 @@ export default class Swipe extends Observer {
     this._distributeMove({
       distance: $dist + deltaDist,
       speed: 0,
-      direction: this.direction,
       action: 'flipMove',
       setSwipeInvalid
     })
@@ -454,7 +377,7 @@ export default class Swipe extends Observer {
   _onEnd(e) {
 
     /*停止滑动，或者多点触发，或者是边界，或者是停止翻页*/
-    if (!this.enabled || this._isBounce || this._stopped || hasMultipleTouches(e)) {
+    if (!this.enabled || this._hasBounce || this._stopped || hasMultipleTouches(e)) {
       return
     }
 
@@ -467,105 +390,140 @@ export default class Swipe extends Observer {
       duration = getDate() - this._start.time
     }
 
+    /*滑动距离、滑动方向*/
+    const distX = ABS(this._distX)
+    const distY = ABS(this._distY)
+    const orientation = this.orientation
+
     /*如果没有滚动页面，判断为点击*/
-    if (!this._isRollX && !this._isRollY) {
+    if (!distX && !distY) {
       let isReturn = false
       this.$emit('onTap', this.visualIndex, () => isReturn = true, e, duration)
       if (isReturn) return
     }
 
-    //==============================
-    //          竖版模式
-    //==============================
-    if (this.options.flipMode === 'vertical' && this._isRollY) {
-
-      const deltaY = ABS(this._distY)
-
-      //_slideTo的最低值要求
-      //1 fast: time < 200 && x >30
-      //2 common: x > veiwWidth/6
-      const isValidSlide = duration < 200 && deltaY > 30 || deltaY > this._visualHeight / 6
-
-      //如果是无效的动作，则不相应
-      //还原默认设置
-      //move的情况会引起
-      //mini功能，合并翻页时事件
-      if (this._isInvalid) {
-        const hasSwipe = duration < 200 && deltaY > this._visualHeight / 10
-        if (hasSwipe) {
-          this._distributeMove({ action: 'swipe' })
-        }
-        this._setRestore()
-        return
-      } else {
-        //跟随移动
-        if (isValidSlide && !this._isFirstEnd()) {
-          this._slideTo(this.direction, 'inner')
-        } else {
-          //反弹
-          this._setRebound()
-        }
-      }
-
-      return
-    }
-
-
-    //==============================
-    //          横版模式
-    //==============================
-
-    if (this._isRollX) {
-
-      const deltaX = ABS(this._distX)
-
-      //_slideTo的最低值要求
-      //1 fast: time < 200 && x >30
-      //2 common: x > veiwWidth/6
-      const isValidSlide = duration < 200 && deltaX > 30 || deltaX > this._visualWidth / 6
-
-      this.direction = this._distX > 0 ? 'prev' : 'next'
-
-      //如果是无效的动作，则不相应
-      //还原默认设置
-      //move的情况会引起
-      //mini功能，合并翻页时事件
-      if (this._isInvalid) {
-        const hasSwipe = duration < 200 && deltaX > this._visualWidth / 10
-        if (hasSwipe) {
-          this._distributeMove({
-            direction: this.direction,
-            action: 'swipe'
-          })
-        }
-        this._setRestore()
-        return
-      } else {
-        //跟随移动
-        if (isValidSlide && !this._isFirstEnd()) {
-          this._slideTo(this.direction, 'inner')
-        } else {
-          //反弹
-          this._setRebound()
-        }
-      }
-    }
-
     /*如果是Y轴移动，发送请求,并且不是mouseleave事件，在PC上mouseleave离开非可视区重复触发*/
-    if (this._isRollY === 'wantFlip' && event.type !== 'mouseleave') {
-      this._isRollY = false //需要复位，否则与iscroll上下滑动重复触发
+    if (this._behavior === 'reverse' && event.type !== 'mouseleave') {
       config.sendTrackCode('swipe', {
-        'direction': 'vertical',
+        'direction': this.orientation,
         'pageId': this.visualIndex + 1
       })
     }
+
+    /**
+     * 锁定滑动
+     * 1 横版模式下，如果有Y滑动，但是如果没有X的的变量，就判断无效
+     * 1 竖版模式下，如果有X滑动，但是如果没有Y的的变量，就判断无效
+     */
+    if (this._directionBan === 'v' && !this._distX) {
+      return
+    } else if (this._directionBan === 'h' && !this._distY) {
+      return
+    }
+
+    /**
+     * mini功能，合并翻页时事件
+     * move的情况会引起
+     * 如果是无效的动作，则不相应
+     * 还原默认设置
+     */
+    if (this._isInvalid) {
+      let hasSwipe
+      if (orientation === 'h') {
+        hasSwipe = duration < 200 && distX > this._visualWidth / 10
+      } else if (orientation === 'v') {
+        hasSwipe = duration < 200 && distY > this._visualHeight / 10
+      }
+      if (hasSwipe) {
+        this._distributeMove({ action: 'swipe' })
+      }
+      this._setRestore()
+      return
+    }
+
+    /**
+     * slideTo的最低值要求
+     * 1 fast: time < 200 && x >30
+     * 2 common: x > veiwWidth/6
+     */
+    let isValidSlide
+    if (orientation === 'h') {
+      isValidSlide = duration < 200 && distX > 30 || distX > this._visualWidth / 6
+    } else if (orientation === 'v') {
+      isValidSlide = duration < 200 && distY > 30 || distY > this._visualHeight / 6
+    }
+
+    /**
+     * 开始翻页或者反弹
+     * 翻页滑动，要排除首位的情况，首尾页面只要反弹
+     */
+    if (isValidSlide && !this._isFirstOrEnd()) {
+      this._slideTo({ action: 'inner' })
+    } else {
+      this._setRebound()
+    }
+
+  }
+
+  /**
+   * 鼠标滚动
+   * @return {[type]} [description]
+   */
+  _onWheel(e) {
+    if (!this.enabled || this._wheeled) return
+
+    this._wheeled = true
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    let wheelDeltaX, wheelDeltaY
+
+    if ('deltaX' in e) {
+      wheelDeltaX = -e.deltaX;
+      wheelDeltaY = -e.deltaY;
+    } else if ('wheelDeltaX' in e) {
+      wheelDeltaX = e.wheelDeltaX
+      wheelDeltaY = e.wheelDeltaY
+    } else if ('wheelDelta' in e) {
+      wheelDeltaX = wheelDeltaY = e.wheelDelta
+    } else if ('detail' in e) {
+      wheelDeltaX = wheelDeltaY = -e.detail
+    } else {
+      return;
+    }
+
+    if (this.options.snap) {
+      /*鼠标wheel会有一个惯性的响应，所以会造成多次翻页
+      这里采用一个最大延时处理*/
+      clearTimeout(this.wheelTimeout);
+      this.wheelTimeout = setTimeout(() => {
+        this._wheeled = false
+      }, 1200)
+
+      /*强制修复滑动的方向是上下
+      因为在页面中左右滑动一下，这个值被修改
+      后续就会报错*/
+      this.orientation = 'v'
+
+      /*向上滚动*/
+      if (wheelDeltaY > 0) {
+        this.prev()
+      } else {
+        /*向下滚动*/
+        this.next()
+      }
+      return
+    }
+
+    this._wheeled = false
 
   }
 
   /**
    * 翻页结束
    */
-  _onFlipComplete(e) {
+  _onComplete(e) {
     const node = e.target;
     /*page与master*/
     const pageType = node.getAttribute('data-type');
@@ -596,14 +554,32 @@ export default class Swipe extends Observer {
   }
 
 
+  /**
+   * 获取移动距离
+   */
+  _getDist(value, absDist) {
+    return value / ((!this.visualIndex && value > 0 || // 在首页
+      this.visualIndex == this.totalIndex - 1 && // 尾页
+      value < 0 // 中间
+    ) ? (absDist / this._visualWidth + 1) : 1)
+  }
+
   /*
   判断是不是首位页面，直接反弹
   如果是首尾
   如果是liner模式排除
   */
-  _isFirstEnd() {
-    return this.options.linear ? false :
-      !this.visualIndex && this._distX > 0 || this.visualIndex == this.totalIndex - 1 && this._distX < 0
+  _isFirstOrEnd() {
+    if (this.options.snap) {
+      if (this.orientation === 'h') {
+        return !this.visualIndex && this._distX > 0 || this.visualIndex == this.totalIndex - 1 && this._distX < 0
+      }
+      if (this.orientation === 'v') {
+        return !this.visualIndex && this._distY > 0 || this.visualIndex == this.totalIndex - 1 && this._distY < 0
+      }
+    } else {
+      return false
+    }
   }
 
 
@@ -638,27 +614,6 @@ export default class Swipe extends Observer {
   }
 
 
-  /**
-   * 边界控制
-   * @param  {[type]} direction [description]
-   * @return {[type]}           [description]
-   */
-  _isBorder(direction) {
-    let overflow
-    let pointer = this.pagePointer
-    let fillength = Object.keys(pointer).length
-    switch (direction) {
-      case 'prev': //前翻页
-        overflow = (pointer.middleIndex === 0 && fillength === 2) ? true : false;
-        break;
-      case 'next': //后翻页
-        overflow = (pointer.middleIndex === (this.totalIndex - 1) && fillength === 2) ? true : false;
-        break;
-    }
-    return overflow
-  }
-
-
   /*去掉动画时间*/
   _removeDuration(node) {
     if (node) {
@@ -666,14 +621,6 @@ export default class Swipe extends Observer {
     }
   }
 
-
-  /**
-   * 复位速率
-   */
-  _resetRate() {
-    this._speedRate = this._originalRate;
-    this._isQuickTurn = false;
-  }
 
   /**
    * 还原设置
@@ -760,5 +707,6 @@ export default class Swipe extends Observer {
 }
 
 api(Swipe)
+init(Swipe)
 slide(Swipe)
 distribute(Swipe)

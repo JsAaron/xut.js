@@ -69,7 +69,7 @@ export default {
    *   竖版翻页 vertical
    *   竖版锁定 vertical-ban
    */
-  flipMode: 'horizontal', //默认允许横向翻页
+  flipMode: '',//全局设置，或者数据库填充
 
   /*
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问

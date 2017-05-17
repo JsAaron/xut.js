@@ -1,14 +1,8 @@
 /**
  * 迷你杂志页面工具栏
  */
-import {
-  config
-} from '../../config/index'
-import {
-  hasColumn,
-  getBeforeCount,
-  getCurrentBeforeCount
-} from '../../component/column/depend'
+import { config } from '../../config/index'
+import { hasColumn, getBeforeCount, getCurrentBeforeCount } from '../../component/column/api'
 
 //样式类型
 const dotStyleClass = [
@@ -211,7 +205,6 @@ export default class NumberBar {
     //默认，需要拿到前置的总和(出去当前)
     let beforeCount = getBeforeCount(chapterData.seasonId, chapterData._id)
     let updateIndex = parentIndex + beforeCount + sonIndex
-
 
     //前翻页，需要叠加flow的总和
     if (direction === 'prev') {

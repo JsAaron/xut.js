@@ -1,7 +1,7 @@
 import { config, resetVisualLayout } from '../../config/index'
 import { getFileFullPath } from '../../util/option'
 import { translation } from '../../scenario/pagebase/move/translation'
-import { getColumnCount } from './depend'
+import { getColumnCount, getColumnHeight } from './api'
 import { getVisualDistance } from '../../scenario/v-distance/index'
 import { ScalePicture } from '../../plugin/extend/scale-picture/index'
 import { closeButton } from '../../plugin/extend/close-button'
@@ -47,7 +47,9 @@ export default class ColumnClass {
 
   }
 
-  /*缩放图片*/
+  /**
+   * 缩放图片
+   */
   _zoomPicture(node) {
     const src = node.src
     if (!src) {
@@ -86,7 +88,9 @@ export default class ColumnClass {
     }
   }
 
-  /*获取母版对象*/
+  /**
+   * 获取母版对象
+   */
   _getMasterObj() {
     if (this._masterObj) {
       return this._masterObj
@@ -133,21 +137,29 @@ export default class ColumnClass {
     /*页面可视区*/
     const appVisualIndex = Xut.Presentation.GetPageIndex()
 
+    const setOptions = {
+      container,
+      hasHook: true,
+      visualWidth: columnWidth,
+      snap: false, //不是分段模式
+      initIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
+      flipMode: 'horizontal',
+      multiplePages: true,
+      stopPropagation: true,
+      totalIndex: this.columnCount
+    }
+
+    /*竖版设置*/
+    if (config.launch.flipMode === 'vertical') {
+      setOptions.visualHeight = getColumnHeight(this.seasonId, this.chapterId)
+      setOptions.flipMode = 'vertical'
+    }
+
     /**
      * 分栏整体控制
      * @type {[type]}
      */
-    const swipe = this.swipe = new Swipe({
-      hasHook: true,
-      swipeWidth: columnWidth,
-      linear: true,
-      initIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
-      container,
-      flipMode: 'horizontal',
-      multiplePages: 1,
-      stopPropagation: true,
-      totalIndex: this.columnCount
-    })
+    const swipe = this.swipe = new Swipe(setOptions)
 
     let moveDistance = 0
 

@@ -61,14 +61,6 @@ export function extendApplication(access, $globalEvent) {
   }
 
   /**
-   * 获取翻页速率
-   * @return {[type]} [description]
-   */
-  Xut.Application.getFlipOverSpeed = function (...arg) {
-    return $globalEvent.getFlipOverSpeed(...arg)
-  }
-
-  /**
    * 设置翻页完成
    */
   Xut.Application.tiggerFilpComplete = function (...arg) {

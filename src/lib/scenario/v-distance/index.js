@@ -49,6 +49,12 @@ const getSingle = function ({
   orientation
 }) {
 
+  /*如果没有传递布方向，就取页面
+  flow中没有定义，这个在全局接口中处理*/
+  if (orientation === undefined) {
+    orientation = config.launch.flipMode === 'horizontal' ? 'h' : 'v'
+  }
+
   let front = 0
   let middle = 0
   let back = 0

@@ -1,13 +1,13 @@
 import { config } from '../../config/index'
-import { setChpaterColumn } from './depend'
-import { resolveColumnCount } from './init'
+import { resetColumnCount } from './api'
+import { resolveColumn } from './init'
 
 /**
  * 分栏探测
  */
 const makeDelay = function(seasonsId, chapterId, count) {
   return function() {
-    setChpaterColumn(seasonsId, chapterId, count)
+    resetColumnCount(seasonsId, chapterId, count)
   }
 }
 
@@ -49,7 +49,7 @@ let baseCheckCount = 20
 function detectColumn($seasons, columnCollection, callback, checkCount) {
   let tempDelay = []
 
-  resolveColumnCount($seasons, (seasonsId, chapterId, count) => {
+  resolveColumn($seasons, (seasonsId, chapterId, count) => {
       if(debug && checkCount > simulateTimer) {
         count = simulateCount
       }

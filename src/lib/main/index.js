@@ -33,7 +33,7 @@ const initMain = novelData => {
    */
   if (novelData.parameter) {
     const parameter = parseJSON(novelData.parameter)
-    if (parameter.pageflip !== undefined) {
+    if (!config.launch.flipMode && parameter.pageflip !== undefined) {
       switch (Number(parameter.pageflip)) {
         case 0: //允许翻页
           config.launch.flipMode = 'horizontal';
@@ -43,6 +43,11 @@ const initMain = novelData => {
           break
       }
     }
+  }
+
+  /*如果都没有设置，就默认横屏*/
+  if (!config.launch.flipMode) {
+    config.launch.flipMode = 'horizontal'
   }
 
 

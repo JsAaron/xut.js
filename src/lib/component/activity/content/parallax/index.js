@@ -11,7 +11,7 @@ import {
 import {
   hasColumn,
   getColumnCount
-} from '../../../column/depend'
+} from '../../../column/api'
 
 /**
  * 变化节点的css3transform属性

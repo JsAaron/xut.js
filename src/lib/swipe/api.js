@@ -49,13 +49,6 @@ export default function api(Swipe) {
     this._setContainerWidth()
   }
 
-  /**
-   * 获取翻页over速率
-   * @return {[type]} [description]
-   */
-  Swipe.prototype.getFlipOverSpeed = function (newVisualWidth) {
-    return this._getFlipOverSpeed(newVisualWidth)
-  }
 
   /**
    * 获取初始化距离值
@@ -141,7 +134,11 @@ export default function api(Swipe) {
    */
   Swipe.prototype.prev = function (callback) {
     if (!this._borderBounce(1)) {
-      this._slideTo('prev', 'outer', callback);
+      this._slideTo({
+        direction: 'prev',
+        action: 'outer',
+        callback
+      });
     } else {
       //边界反弹
       this._setRebound('next')
@@ -157,7 +154,11 @@ export default function api(Swipe) {
    */
   Swipe.prototype.next = function (callback) {
     if (!this._borderBounce(-1)) {
-      this._slideTo('next', 'outer', callback);
+      this._slideTo({
+        direction: 'next',
+        action: 'outer',
+        callback
+      })
     } else {
       //边界反弹
       this._setRebound('prev', 'isAppBoundary')
@@ -248,6 +249,11 @@ export default function api(Swipe) {
     if (this._bubbleNode) {
       this._bubbleNode.page = null
       this._bubbleNode.master = null
+    }
+    if (this.options.mouseWheel) {
+      this.container.removeEventListener('wheel', this._onWheel, false);
+      this.container.removeEventListener('mousewheel', this._onWheel, false);
+      this.container.removeEventListener('DOMMouseScroll', this._onWheel, false);
     }
     this.container = null
   }

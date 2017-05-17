@@ -37,7 +37,7 @@ Xut.Application.setConfig = {
     convert: 'svg',
     doublePageMode: false,
 
-    flipMode:'vertical'
+    flipMode: 'vertical'
 
     // launchAnim:false,是否关闭启动动画
     // convert: 'svg', //转化资源svg转化成js
@@ -85,9 +85,10 @@ Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)
 })
 
-var appId = 101 //306
+var appId = 302 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
+        // trackCode: ['swipe'], //代码跟踪
         el: '#xxtppt-app-container', //根节点
         path: {
             resource: 'content/' + appId,

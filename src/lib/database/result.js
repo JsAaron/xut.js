@@ -77,7 +77,9 @@ function filterJsonData() {
   if (config.launch.resource && result.FlowData) {
 
     //启动检测
-    config.launch.columnCheck = true
+    if (config.launch.flipMode !== 'vertical') {
+      config.launch.columnCheck = true
+    }
 
     //有基础后缀，需要补上所有的图片地址
     const baseSuffix = config.launch.baseImageSuffix ? `.${config.launch.baseImageSuffix}` : ''
