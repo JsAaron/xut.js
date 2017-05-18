@@ -52,6 +52,29 @@ const initMain = novelData => {
 
 
   /**
+   *翻页模式参数解析
+   * flipMode horizontal-ban
+   * 分解为    horizontal + ban
+   * moveBan 禁止移动
+   */
+  const modeMatch = config.launch.flipMode.split('-');
+  const flipDirection = modeMatch[0]
+  const moveBan = modeMatch.length === 2 ? true : false
+  let scrollX = true
+  let scrollY = false
+  if (flipDirection === 'vertical') {
+    scrollX = false
+    scrollY = true
+  }
+
+  /*提供swiperConfig快速配置文件,关键配置*/
+  config.launch.swiperConfig = {
+    scrollY,
+    scrollX,
+    moveBan
+  }
+
+  /**
    * 缓存加载
    * 如果启动recordHistory记录
    */

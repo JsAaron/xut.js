@@ -1,5 +1,5 @@
 import { initPointer, calculationIndex } from './pointer'
-
+import { ease } from './ease'
 
 export default function api(Swiper) {
 
@@ -38,7 +38,7 @@ export default function api(Swiper) {
       this.setPointer(this.visualIndex, total)
       this._updatePointer()
         //设置Transform的偏移量，为最后一页
-      this._setTransform(this.visualIndex)
+      this._setTransform()
     }
 
     //如果是右边的column
@@ -46,7 +46,7 @@ export default function api(Swiper) {
       this.totalIndex = total
     }
 
-    this._setContainerWidth()
+    this._setContainerValue()
   }
 
 
@@ -193,6 +193,24 @@ export default function api(Swiper) {
     return this.pagePointer
   }
 
+  /**
+   * 滑动到指定的坐标
+   * @return {[type]} [description]
+   */
+  Swiper.prototype.scrollTo = function (y, time, easing) {
+    easing = easing || ease.circular;
+    this.isInTransition = time > 0;
+    const transitionType = easing.style;
+    if (!time || transitionType) {
+      if (transitionType) {
+        this._transitionTimingFunction(easing.style);
+        this._transitionTime(time);
+      }
+      this._translate(0, y);
+    } else {
+      console.log('scrollTo出错')
+    }
+  }
 
   /**
    * 跳指定页面
@@ -246,9 +264,9 @@ export default function api(Swiper) {
   Swiper.prototype.destroy = function () {
     this._off();
     this.$off();
-    if (this._bubbleNode) {
-      this._bubbleNode.page = null
-      this._bubbleNode.master = null
+    if (this._childNodes) {
+      this._childNodes.page = null
+      this._childNodes.master = null
     }
     if (this.options.mouseWheel) {
       this.container.removeEventListener('wheel', this._onWheel, false);
@@ -280,7 +298,7 @@ export default function api(Swiper) {
     let sectionRang = this.options.sectionRang
 
     //找到对应的li
-    let childNodes = this._bubbleNode[pageType].childNodes
+    let childNodes = this._childNodes[pageType].childNodes
     let nodeTotal = childNodes.length
 
     while (nodeTotal--) {

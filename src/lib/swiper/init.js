@@ -4,7 +4,7 @@ import { LINEARTAG } from './type'
 export default function init(Swiper) {
 
 
-  Swiper.prototype._init = function() {
+  Swiper.prototype._init = function () {
     this._initMode()
     this._initEvents()
     this._initPrevent()
@@ -15,7 +15,7 @@ export default function init(Swiper) {
 
 
   /*基本模式设置*/
-  Swiper.prototype._initMode = function() {
+  Swiper.prototype._initMode = function () {
     /*分段模式*/
     if (this.options.snap) {
       //用于查找跟元素
@@ -25,7 +25,7 @@ export default function init(Swiper) {
       if (!ul.length) {
         $warn(" ul element don't found !")
       } else {
-        this._bubbleNode = {
+        this._childNodes = {
           page: ul[0],
           master: ul[1]
         }
@@ -34,39 +34,49 @@ export default function init(Swiper) {
 
     /*父容器滑动模式*/
     if (this.options.scope === 'parent') {
-      this.container.setAttribute(LINEARTAG, true)
-      this._setTransform()
-      this._setContainerWidth()
+      if (this.options.scrollX) {
+        this.container.setAttribute(LINEARTAG, true)
+        this._setTransform()
+        this._setContainerValue()
+      } else if (this.options.scrollY) {
+        /*竖版处理,滚动容器*/
+        this.scroller = this.container.children[0];
+        this.scrollerStyle = this.scroller.style;
+        /*最大溢出高度*/
+        this.wrapperHeight = this.container.clientHeight
+        this.maxScrollY = this.wrapperHeight - this.scroller.offsetHeight;
+        this._setTransform(this.scroller)
+        this._setContainerValue(this.scroller)
+      }
     }
   }
 
   /*默认行为*/
-  Swiper.prototype._initPrevent = function() {
-    this._stopDefault = this.options.preventDefault ? function(e) {
+  Swiper.prototype._initPrevent = function () {
+    this._stopDefault = this.options.preventDefault ? function (e) {
       e.preventDefault && e.preventDefault()
-    } : function() {}
+    } : function () {}
   }
 
   /**
    * 设置初始的
    */
-  Swiper.prototype._setTransform = function(newIndex) {
-    if (this.options.orientation === 'horizontal') {
-      let visualIndex = newIndex || this.visualIndex
-      this._initDistance = -visualIndex * (this.visualWidth)
-      if (this.container) {
-        this.container.style[Xut.style.transform] = 'translate3d(' + this._initDistance + 'px,0px,0px)'
-      }
-    } else if (this.options.orientation === 'vertical') {
-
+  Swiper.prototype._setTransform = function (element) {
+    this._initDistance = (-this.visualIndex * this._getRollVisual())
+    if (element) {
+      element.style[Xut.style.transform] = `translate3d(0px,${this._initDistance}px,0px)`
+    } else {
+      this.container.style[Xut.style.transform] = `translate3d(${this._initDistance}px,0px,0px)`
     }
   }
 
   /**
-   * 设置容易溢出的宽度
+   * 设置容易溢出的尺寸
    */
-  Swiper.prototype._setContainerWidth = function() {
-    if (this.container) {
+  Swiper.prototype._setContainerValue = function (element) {
+    if (element) {
+      element.style.height = this.visualHeight * this.totalIndex + 'px'
+    } else {
       this.container.style.width = this.visualWidth * this.totalIndex + 'px'
     }
   }
@@ -74,7 +84,7 @@ export default function init(Swiper) {
   /**
    * 绑定事件
    */
-  Swiper.prototype._initEvents = function() {
+  Swiper.prototype._initEvents = function () {
     const callback = {
       start: this,
       end: this,
@@ -93,7 +103,7 @@ export default function init(Swiper) {
   }
 
   /*滚轮*/
-  Swiper.prototype._initWheel = function() {
+  Swiper.prototype._initWheel = function () {
     this.container.addEventListener('wheel', this._onWheel.bind(this), false);
     this.container.addEventListener('mousewheel', this._onWheel.bind(this), false);
     this.container.addEventListener('DOMMouseScroll', this._onWheel.bind(this), false);

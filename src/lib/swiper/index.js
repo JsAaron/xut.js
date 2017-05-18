@@ -5,6 +5,8 @@ import distribute from './distribute'
 import { Observer } from '../observer/index'
 import { config } from '../config/index'
 import { initPointer } from './pointer'
+import { momentum } from './momentum'
+import { ease } from './ease'
 import { $off, $handle, $event } from '../util/index'
 
 import { LINEARTAG } from './type'
@@ -17,12 +19,16 @@ const ABS = Math.abs
  * 是否多点触发
  * @return {Boolean} [description]
  */
-const hasMultipleTouches = function(e) {
+const hasMultipleTouches = function (e) {
   return e.touches && e.touches.length > 1
 }
 
-const FLIPTIMEMIN = 0
-const FLIPTIMEMAX = 800
+const mixProperty = function (target, src) {
+  for (let key in src) {
+    target[key] = src[key]
+  }
+}
+
 
 const getDate = () => {
   return +new Date
@@ -46,7 +52,7 @@ export default class Swiper extends Observer {
     /**
      *
     A：translate运动的作用域
-      1. "page" 作用在每个page独立的页面上swiper本身不处理
+      1. "child" 作用在每个page独立的页面上swiper本身不处理
       2. "parent" 作用在swiper内部，这个是可以做线性的处理
 
     B：snap 是否分段独立页面
@@ -59,12 +65,12 @@ export default class Swiper extends Observer {
 
     D：scope,snap,moveBan 组合四中模式使用
       1. 页面分段，独立页面滑动(横版/竖版，默认处理)
-          scope='page'
+          scope='child'
           snap = true
           moveBan = false
 
       2. 页面分段，独立页面滑动，但是禁止触摸滑动，只能通过接口跳转页面(秒秒学模式)
-          scope='page'
+          scope='child'
           snap = true
           moveBan = true
 
@@ -73,52 +79,32 @@ export default class Swiper extends Observer {
           snap = true
           moveBan = false
 
-      4. 不分段，swiper内部滑动(竖版)
+      4. 不分段，无分页，swiper内部滑动(竖版)
           scope='parent'
           snap = false
           moveBan = false
 
     */
-    scope = 'page',
+    scope = 'child',
     snap = true,
+    snapSpeed = 800,
     moveBan = false,
+
+    /*滑动惯性*/
+    momentum = true,
 
     /**
      * 运动的方向
-     *  horizontal
-     *  vertical
+     * 默认X轴运动
      */
-    orientation = 'horizontal',
-
-    /*基本数据设定*/
-    data = {
-      /*容器节点*/
-      container: null,
-      /*开始索引*/
-      visualIndex: null,
-      /*总索引*/
-      totalIndex: null,
-      /*容器宽度*/
-      visualWidth: null,
-      /*容器高度*/
-      visualHeight: null
-    },
+    scrollX = true,
+    scrollY = false,
 
     /*鼠标滚轮*/
     mouseWheel = false,
 
     /*卷滚条*/
     scrollbar = false,
-
-    /**
-     * 是否有多页面
-     */
-    multiplePages, //多页面
-
-    /**
-     * section分段拼接
-     */
-    sectionRang, //分段值
 
     /**
      * 是否存在钩子处理
@@ -134,28 +120,57 @@ export default class Swiper extends Observer {
     borderBounce = true,
 
     stopPropagation = false,
-    preventDefault = true
+    preventDefault = true,
+
+    /**
+     * 基本数据设定
+     */
+    /*容器节点*/
+    container,
+    /*开始索引*/
+    visualIndex,
+    /*总索引*/
+    totalIndex,
+    /*容器宽度*/
+    visualWidth,
+    /*容器高度*/
+    visualHeight,
+    /*是否有多页面*/
+    multiplePages,
+    /*section分段拼接*/
+    sectionRang
   }) {
 
     super()
 
+    mixProperty(this, {
+      container,
+      visualIndex,
+      totalIndex,
+      visualWidth,
+      visualHeight
+    })
+
     this.options = {
-      snap,
       scope,
+      snap,
       moveBan,
+      scrollX,
+      scrollY,
+      momentum,
       mouseWheel,
-      orientation,
-      stopPropagation,
-      preventDefault,
+      scrollbar,
       hasHook,
       borderBounce,
+      stopPropagation,
+      preventDefault,
       multiplePages,
       sectionRang
     }
 
-    for (let key in data) {
-      this[key] = data[key]
-    }
+    /*一些默认参数设置*/
+    this.x = 0;
+    this.y = 0;
 
     /**
      * 滑动的方向
@@ -168,15 +183,15 @@ export default class Swiper extends Observer {
     this.enabled = true
 
     /*翻页时间*/
-    this._flipTime = moveBan ? FLIPTIMEMIN : FLIPTIMEMAX
+    this._defaultFlipTime = moveBan ? 0 : snapSpeed
 
     /*翻页速率*/
     this._speedRate =
       this._originalRate =
-      this._flipTime / (orientation === 'horizontal' ? this.visualWidth : this.visualHeight)
+      this._defaultFlipTime / (scrollX ? visualWidth : visualHeight)
 
     /*计算初始化页码*/
-    this.pagePointer = initPointer(this.visualIndex, this.totalIndex)
+    this.pagePointer = initPointer(visualIndex, totalIndex)
 
     /*标记上一个翻页动作*/
     this._recordRreTick = { ation: null, time: null }
@@ -239,34 +254,38 @@ export default class Swiper extends Observer {
 
 
     let interrupt
-    let event = $event(e)
+    let point = $event(e)
 
     /*如果没有事件对象*/
-    if (!event) {
+    if (!point) {
       this._stopped = true;
       return
+    }
+
+    /*如果有惯性运动，停止*/
+    if (this.isInTransition) {
+      this.isInTransition = false;
+      this._transitionTime()
+      const pos = this.getComputedPosition();
+      /*固定新的坐标，并且更新新的xy坐标*/
+      this._translate(Math.round(pos.x), Math.round(pos.y));
     }
 
     /**
      * 获取观察对象
      * 钩子函数
-     * event 事件对象
+     * point 事件对象
      * @return {[type]} [description]
      */
-    this.$emit('onFilter', function() {
+    this.$emit('onFilter', function () {
       interrupt = true;
-    }, event, e)
+    }, point, e)
 
     /*打断动作*/
     if (interrupt) return;
 
-    this._distX = 0;
-    this._distY = 0;
 
-    /*
-    针对拖拽翻页阻止
-    是否滑动事件受限
-     */
+    /*针对拖拽翻页阻止是否滑动事件受限*/
     this._stopped = false //如果页面停止了动作，触发
     this._hasBounce = false //是否有反弹
     this._hasTap = true //点击了屏幕
@@ -277,11 +296,17 @@ export default class Swiper extends Observer {
     /*锁定滑动相反方向*/
     this._directionBan = false
 
-    this._start = {
-      pageX: event.pageX,
-      pageY: event.pageY,
-      time: getDate()
-    }
+    this.distX = 0;
+    this.distY = 0;
+
+    /*_translate更细后，重新赋值*/
+    this.startX = this.x;
+    this.startY = this.y;
+
+    this.pointX = point.pageX;
+    this.pointY = point.pageY;
+
+    this.startTime = getDate()
   }
 
 
@@ -298,23 +323,23 @@ export default class Swiper extends Observer {
 
     this._moved = true
 
-    const event = $event(e)
-    const deltaX = event.pageX - this._start.pageX
-    const deltaY = event.pageY - this._start.pageY
-    const absDeltaX = ABS(deltaX)
-    const absDeltaY = ABS(deltaY)
+    let point = $event(e)
+    let deltaX = point.pageX - this.pointX
+    let deltaY = point.pageY - this.pointY
+    let absDistX = ABS(deltaX)
+    let absDistY = ABS(deltaY)
 
     let $delta, $absDelta, $dist
 
     /*判断锁定横竖版滑动*/
-    if (absDeltaX > absDeltaY) {
+    if (absDistX > absDistY) {
       this.orientation = 'h'; // lock horizontally
       $delta = deltaX
-      $absDelta = absDeltaX
-    } else if (absDeltaY >= absDeltaX) {
+      $absDelta = absDistX
+    } else if (absDistY >= absDistX) {
       this.orientation = 'v'; // lock vertically
       $delta = deltaY
-      $absDelta = absDeltaY
+      $absDelta = absDistY
     }
 
     /**
@@ -326,13 +351,13 @@ export default class Swiper extends Observer {
      *     竖屏的时候，用户想横屏左右翻页
      *     如果继续保持了Y轴移动，记录下最大偏移量算不算上下翻页动作
      */
-    if (this.options.orientation === 'horizontal' && this.orientation === 'v') {
+    if (this.options.scrollX && this.orientation === 'v') {
       //左右翻页，猜测上下翻页
       if ($absDelta > 80) {
         this._behavior = 'reverse'
       }
       this._directionBan = 'v'
-    } else if (this.options.orientation === 'vertical' && this.orientation === 'h') {
+    } else if (this.options.scrollY && this.orientation === 'h') {
       //上下翻页，猜测左右翻页
       if ($absDelta > 80) {
         this._behavior = 'reverse'
@@ -347,9 +372,9 @@ export default class Swiper extends Observer {
 
     /*滑动距离*/
     if (this.orientation === 'h') {
-      $dist = this._distX = this._getDist(deltaX, absDeltaX)
+      $dist = this.distX = this._getDist(deltaX, absDistX)
     } else if (this.orientation === 'v') {
-      $dist = this._distY = this._getDist(deltaY, absDeltaY)
+      $dist = this.distY = this._getDist(deltaY, absDistY)
     }
 
     /*设置方向*/
@@ -368,6 +393,9 @@ export default class Swiper extends Observer {
     if ($dist > 0) {
       deltaDist = (-deltaDist)
     }
+
+    /*滚动页面*/
+    this._translate(this.distX, this.distY)
 
     //是否无效函数
     //如果无效，end方法抛弃掉
@@ -401,13 +429,13 @@ export default class Swiper extends Observer {
     let duration
 
     /*可能没有点击页面，没有触发start事件*/
-    if (this._start) {
-      duration = getDate() - this._start.time
+    if (this.startTime) {
+      duration = getDate() - this.startTime
     }
 
     /*滑动距离、滑动方向*/
-    const distX = ABS(this._distX)
-    const distY = ABS(this._distY)
+    const distX = ABS(this.distX)
+    const distY = ABS(this.distY)
     const orientation = this.orientation
 
     /*如果没有滚动页面，判断为点击*/
@@ -418,9 +446,9 @@ export default class Swiper extends Observer {
     }
 
     /*如果是Y轴移动，发送请求,并且不是mouseleave事件，在PC上mouseleave离开非可视区重复触发*/
-    if (this._behavior === 'reverse' && event.type !== 'mouseleave') {
+    if (this._behavior === 'reverse' && e.type !== 'mouseleave') {
       config.sendTrackCode('swipe', {
-        'direction': this.orientation,
+        'direction': orientation,
         'pageId': this.visualIndex + 1
       })
     }
@@ -430,9 +458,9 @@ export default class Swiper extends Observer {
      * 1 横版模式下，如果有Y滑动，但是如果没有X的的变量，就判断无效
      * 1 竖版模式下，如果有X滑动，但是如果没有Y的的变量，就判断无效
      */
-    if (this._directionBan === 'v' && !this._distX) {
+    if (this._directionBan === 'v' && !this.distX) {
       return
-    } else if (this._directionBan === 'h' && !this._distY) {
+    } else if (this._directionBan === 'h' && !this.distY) {
       return
     }
 
@@ -466,6 +494,29 @@ export default class Swiper extends Observer {
       isValidSlide = duration < 200 && distX > 30 || distX > this.visualWidth / 6
     } else if (orientation === 'v') {
       isValidSlide = duration < 200 && distY > 30 || distY > this.visualHeight / 6
+    }
+
+    this.isInTransition = 0;
+
+    /**
+     * 竖版情况下，是滚动页面
+     * 启动滑动滚性,必须有300以上的触碰时间*
+     */
+    if (this.options.scrollY && !this.options.snap && this.options.momentum && duration < 300) {
+      let momentumY = momentum(this.distY, 0, duration, this.maxScrollY, this.wrapperHeight)
+      console.log(momentumY)
+      this.isInTransition = 1; //标记惯性正在滑动
+      let newY = momentumY.destination;
+      let easing
+      if (newY != this.distY) {
+        // 当上卷超出界限,改变宽松的功能
+        if (newY > 0 || newY < this.maxScrollY) {
+          console.log(1111111)
+          easing = ease.quadratic;
+        }
+        this.scrollTo(newY, momentumY.duration, easing);
+        return;
+      }
     }
 
     /**
@@ -587,10 +638,10 @@ export default class Swiper extends Observer {
   _isFirstOrEnd() {
     if (this.options.snap) {
       if (this.orientation === 'h') {
-        return !this.visualIndex && this._distX > 0 || this.visualIndex == this.totalIndex - 1 && this._distX < 0
+        return !this.visualIndex && this.distX > 0 || this.visualIndex == this.totalIndex - 1 && this.distX < 0
       }
       if (this.orientation === 'v') {
-        return !this.visualIndex && this._distY > 0 || this.visualIndex == this.totalIndex - 1 && this._distY < 0
+        return !this.visualIndex && this.distY > 0 || this.visualIndex == this.totalIndex - 1 && this.distY < 0
       }
     } else {
       return false

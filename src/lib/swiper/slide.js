@@ -3,29 +3,108 @@ import { getActionPointer } from './pointer'
 /*翻页速率*/
 const FLIPSPEED = 600
 
-const ABS = Math.abs
 const getDate = () => {
   return +new Date
 }
 
 export default function slide(Swiper) {
 
+
+  Swiper.prototype.getComputedPosition = function () {
+    let matrix = window.getComputedStyle(this.scroller, null)
+    matrix = matrix[Xut.style.transform].split(')')[0].split(', ');
+    let x = +(matrix[12] || matrix[4]);
+    let y = +(matrix[13] || matrix[5]);
+    return { x, y };
+  }
+
+  Swiper.prototype._transitionTime = function (time) {
+    time = time || 0;
+    var durationProp = Xut.style.transitionDuration;
+    if (!durationProp) {
+      return;
+    }
+    this.scrollerStyle[durationProp] = time + 'ms';
+  }
+
+  Swiper.prototype._transitionTimingFunction = function (easing) {
+    this.scrollerStyle[Xut.style.transitionTimingFunction] = easing;
+  }
+
+  /**
+   * 滑动内部页面
+   */
+  Swiper.prototype._translate = function (x, y) {
+    /*父容器滑动模式*/
+    if (this.options.scope === 'parent') {
+      if (this.options.scrollY) {
+        this.scroller.style[Xut.style.transform] = `translate3d(0px,${y}px,0px)`
+      }
+    }
+    /*更新坐标*/
+    this.x = x;
+    this.y = y;
+  }
+
+  /**
+   * 获取滚动的尺寸
+   */
+  Swiper.prototype._getRollVisual = function () {
+    let orientation = this.orientation
+    if (orientation) {
+      return this.orientation === 'h' ? this.visualWidth : this.visualHeight
+    }
+    //在flow初始化时候，在边界往PPT滑动，是没有值的，所以需要通过全局参数判断
+    return this.options.scrollX ? this.visualWidth : this.visualHeight
+  }
+
+  /**
+   * 获取滚动的距离值
+   * 获取用户在页面滑动的距离
+   * flow页面
+   * 修复2个问题
+   *  1 交界处，没有生成全局翻页的dist的值
+   *  2 flow内部，滑动鼠标溢出了浏览器，会卡死
+   */
+  Swiper.prototype._getRollDist = function () {
+    let dist = this.orientation === 'h' ? this.distX : this.distY
+    let visualSize = this._getRollVisual()
+
+    /*这是一个bug,临时修复
+    如果一开始布局的页面在flow的首位交界的位置，那么往前后翻页
+    在全局中还没有产生dist的值，所以这里强制用一个基本值处理*/
+    if (dist === undefined) {
+      return visualSize / 1.2
+    }
+
+    dist = Math.abs(dist)
+
+    /**
+     * 同样在flow中间页，快速用鼠标滑动到app页面外面部分
+     * 会产生dist 大于可视区宽度是情况
+     * 浏览器调试模式下会出现
+     * 会导致动画回到不触发卡死
+     * 因为flow的情况下，没有做定时器修复，所以这里强制给一个时间
+     */
+    if (dist > visualSize) {
+      dist = visualSize / 2
+    }
+
+    return Math.abs(dist)
+  }
+
   /**
    * 快速翻页时间计算
    */
-  Swiper.prototype._setRate = function() {
-    if (this.orientation === 'h') {
-      this._speedRate = 50 / this.visualWidth;
-    } else {
-      this._speedRate = 50 / this.visualHeight;
-    }
+  Swiper.prototype._setRate = function () {
+    this._speedRate = 50 / this._getRollVisual()
     this._isQuickTurn = true;
   }
 
   /**
    * 复位速率
    */
-  Swiper.prototype._resetRate = function() {
+  Swiper.prototype._resetRate = function () {
     this._speedRate = this._originalRate;
     this._isQuickTurn = false;
   }
@@ -35,7 +114,7 @@ export default function slide(Swiper) {
    * 如果是快速翻页
    * 重设置_setRate
    */
-  Swiper.prototype._setQuick = function() {
+  Swiper.prototype._setQuick = function () {
     const startDate = getDate()
     if (this._preTapTime) {
       if (startDate - this._preTapTime < FLIPSPEED) {
@@ -48,7 +127,7 @@ export default function slide(Swiper) {
   /**
    * 边界控制
    */
-  Swiper.prototype._isBorder = function(direction) {
+  Swiper.prototype._isBorder = function (direction) {
     let overflow
     let pointer = this.pagePointer
     let fillength = Object.keys(pointer).length
@@ -66,14 +145,12 @@ export default function slide(Swiper) {
   /**
    * 获取翻页结束的speed的速率
    */
-  Swiper.prototype._getFlipOverSpeed = function() {
-    let spped
-    if (this.orientation === 'h') {
-      spped = (this.visualWidth - (ABS(this._distX))) * this._speedRate || this._flipTime;
-    } else {
-      spped = (this.visualHeight - (ABS(this._distY))) * this._speedRate || this._flipTime;
+  Swiper.prototype._getFlipOverSpeed = function () {
+    let speed = (this._getRollVisual() - this._getRollDist()) * this._speedRate
+    if (speed === undefined) {
+      speed = this._defaultFlipTime
     }
-    return ABS(spped)
+    return speed
   }
 
   /**
@@ -88,7 +165,7 @@ export default function slide(Swiper) {
    *   1. inner 用户直接翻页滑动触发，提供hasTouch
    *   2. outer 通过接口调用翻页
    */
-  Swiper.prototype._slideTo = function({
+  Swiper.prototype._slideTo = function ({
     action,
     direction,
     callback
@@ -119,12 +196,12 @@ export default function slide(Swiper) {
     if (action === 'outer') {
       /*如果是第二次开始同一个点击动作*/
       if (action === this._recordRreTick.action) {
-        /*最大的点击间隔时间不超过默认的_flipTime时间，最小的取间隔时间*/
+        /*最大的点击间隔时间不超过默认的_defaultFlipTime时间，最小的取间隔时间*/
         const time = getDate() - this._recordRreTick.time
-        if (time <= this._flipTime) {
+        if (time <= this._defaultFlipTime) {
           outerSpeed = time
         } else {
-          outerSpeed = this._flipTime
+          outerSpeed = this._defaultFlipTime
         }
         outerCallFlip = true
       }
@@ -177,7 +254,7 @@ export default function slide(Swiper) {
    * 增加索引的动作
    * 修正页码指示
    */
-  Swiper.prototype._updateActionPointer = function() {
+  Swiper.prototype._updateActionPointer = function () {
 
     const pointer = this.pagePointer
 

@@ -49,18 +49,18 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
   }
 
   if (config.launch.flipMode === 'vertical') {
+    /*竖版的情况下，不需要分栏了，直接处理*/
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
     const container = `
-            <section class="section-transform" data-flow="true">
-                <div class="page-flow-scale" data-role="margin" style="width:${containerWidth}px;height:auto;margin-top:${containerTop}px;margin-left:${containerLeft}px;">
-                    <div data-role="column" id="columns-content" style="width:${containerWidth}px;height:100%;">
-                        ${data}
-                    </div>
+            <section id="wrapper-section" class="section-transform" data-flow="true" style="width:${visualWidth}px;height:${visualHeight}px;top:${containerTop}px;left:${containerLeft}px;">
+                <div  id="scroller-section" class="page-flow-scale" data-role="margin" style="width:${containerWidth}px;height:auto;">
+                      ${data}
                 </div>
             </section>`
     return String.styleFormat(container)
   } else {
+    /*配置分栏*/
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
     const container = `

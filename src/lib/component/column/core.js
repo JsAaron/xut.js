@@ -139,26 +139,22 @@ export default class ColumnClass {
     const appVisualIndex = Xut.Presentation.GetPageIndex()
 
     const setOptions = {
+      container,
       scope: 'parent', //父容器滑动
       snap: false, //不分段
-      moveBan: false, //不限制动画
-      orientation: config.launch.flipMode, //运动的方向
-
       hasHook: true,
       multiplePages: true,
       stopPropagation: true,
-
-      data: {
-        container,
-        visualIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
-        totalIndex: this.columnCount,
-        visualWidth: columnWidth
-      }
+      visualIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
+      totalIndex: this.columnCount,
+      visualWidth: columnWidth
     }
+
+    _.extend(setOptions, config.launch.swiperConfig)
 
     /*竖版设置*/
     if (config.launch.flipMode === 'vertical') {
-      setOptions.data.visualHeight = getColumnHeight(this.seasonId, this.chapterId)
+      setOptions.visualHeight = getColumnHeight(this.seasonId, this.chapterId)
     }
 
     /**
@@ -180,7 +176,7 @@ export default class ColumnClass {
       }
     });
 
-    swipe.$watch('onTap', function(pageIndex, hookCallback, point, duration) {
+    swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
       const node = point.target;
       /*图片缩放*/
       if (!hasQrcode) {
@@ -191,102 +187,112 @@ export default class ColumnClass {
           Xut.View.Toolbar()
         }
       }
-      /*媒体*/
+      /*点击媒体，视频音频*/
       closestMedia(node, coloumnObj.chapterId, swipe.visualIndex)
     })
 
-    swipe.$watch('onMove', function(options) {
 
-      const {
-        action,
-        speed,
-        distance,
-        direction
-      } = options
+    /**************************************
+     *
+     *     横版模式下的分栏处理
+     *
+     * ************************************/
+    if (config.launch.swiperConfig.scrollX) {
 
-      /**
-       * 首页边界
-       */
-      if (swipe.visualIndex === coloumnObj.minBorder && swipe.direction === 'prev') {
-        if (action === 'flipOver') {
-          clearColumnAudio()
-          clearVideo()
-          Xut.View.GotoPrevSlide()
-          swipe.simulationComplete()
-        } else {
-          //前边界前移反弹
-          Xut.View.MovePage(action, swipe.direction, distance, speed)
-        }
-      }
-      /**
-       * 尾页边界
-       */
-      else if (swipe.visualIndex === coloumnObj.maxBorder && swipe.direction === 'next') {
-        if (action === 'flipOver') {
-          clearColumnAudio()
-          clearVideo()
-          Xut.View.GotoNextSlide()
-          swipe.simulationComplete()
-        } else {
-          //后边界前移反弹
-          Xut.View.MovePage(action, swipe.direction, distance, speed)
-        }
-      }
-      /**
-       * 中间页面
-       */
-      else {
+      swipe.$watch('onMove', function (options) {
 
-        let viewBeHideDistance = getVisualDistance({
+        const {
           action,
+          speed,
           distance,
-          direction,
-          frontIndex: appVisualIndex,
-          middleIndex: appVisualIndex,
-          backIndex: appVisualIndex
-        })[1]
+          direction
+        } = options
 
-        moveDistance = viewBeHideDistance
-
-        switch (direction) {
-          case 'prev':
-            moveDistance = moveDistance + coloumnObj.lastDistance
-            break
-          case 'next':
-            moveDistance = moveDistance + coloumnObj.lastDistance
-            break
-        }
-
-        //反弹
-        if (action === 'flipRebound') {
-          if (direction === 'next') {
-            //右翻页，左反弹
-            moveDistance = (-columnWidth * swipe.visualIndex)
+        /**
+         * 首页边界
+         */
+        if (swipe.visualIndex === coloumnObj.minBorder && swipe.direction === 'prev') {
+          if (action === 'flipOver') {
+            clearColumnAudio()
+            clearVideo()
+            Xut.View.GotoPrevSlide()
+            swipe.simulationComplete()
           } else {
-            //左翻页，右反弹
-            moveDistance = -(columnWidth * swipe.visualIndex)
+            //前边界前移反弹
+            Xut.View.MovePage(action, swipe.direction, distance, speed)
           }
         }
+        /**
+         * 尾页边界
+         */
+        else if (swipe.visualIndex === coloumnObj.maxBorder && swipe.direction === 'next') {
+          if (action === 'flipOver') {
+            clearColumnAudio()
+            clearVideo()
+            Xut.View.GotoNextSlide()
+            swipe.simulationComplete()
+          } else {
+            //后边界前移反弹
+            Xut.View.MovePage(action, swipe.direction, distance, speed)
+          }
+        }
+        /**
+         * 中间页面
+         */
+        else {
 
-        //更新页码
-        if (action === 'flipOver') {
-          clearColumnAudio()
-          clearVideo()
-          coloumnObj._updataPageNumber(direction)
+          let viewBeHideDistance = getVisualDistance({
+            action,
+            distance,
+            direction,
+            frontIndex: appVisualIndex,
+            middleIndex: appVisualIndex,
+            backIndex: appVisualIndex
+          })[1]
+
+          moveDistance = viewBeHideDistance
+
+          switch (direction) {
+            case 'prev':
+              moveDistance = moveDistance + coloumnObj.lastDistance
+              break
+            case 'next':
+              moveDistance = moveDistance + coloumnObj.lastDistance
+              break
+          }
+
+          //反弹
+          if (action === 'flipRebound') {
+            if (direction === 'next') {
+              //右翻页，左反弹
+              moveDistance = (-columnWidth * swipe.visualIndex)
+            } else {
+              //左翻页，右反弹
+              moveDistance = -(columnWidth * swipe.visualIndex)
+            }
+          }
+
+          //更新页码
+          if (action === 'flipOver') {
+            clearColumnAudio()
+            clearVideo()
+            coloumnObj._updataPageNumber(direction)
+          }
+
+          translation[action](container, moveDistance, speed)
+
+          //移动视觉差对象
+          coloumnObj._moveParallax(action, speed, nodes, swipe.visualIndex, direction, viewBeHideDistance)
         }
 
-        translation[action](container, moveDistance, speed)
+      })
 
-        //移动视觉差对象
-        coloumnObj._moveParallax(action, speed, nodes, swipe.visualIndex, direction, viewBeHideDistance)
-      }
+      swipe.$watch('onComplete', ({ unlock }) => {
+        coloumnObj.lastDistance = moveDistance
+        unlock()
+      })
+    }
 
-    })
-
-    swipe.$watch('onComplete', ({ unlock }) => {
-      coloumnObj.lastDistance = moveDistance
-      unlock()
-    })
 
   }
 

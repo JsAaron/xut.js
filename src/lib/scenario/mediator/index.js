@@ -91,42 +91,23 @@ export default class Mediator extends Observer {
     //配置多页面参数
     configMultiple(options)
 
-
-    /**
-     *翻页模式参数解析
-     * flipMode horizontal-ban
-     * 分解为 horizontal + ban
-     * moveBan 禁止移动
-     */
-    let modeMatch = options.flipMode.split('-');
-    let moveBan = false
-    let flipDirection = ''
-    if (modeMatch.length === 2) {
-      flipDirection = modeMatch[0]
-      moveBan = true
-    } else {
-      flipDirection = options.flipMode
-    }
-
-    const $globalSwiper = vm.$globalSwiper = new Swiper({
-      scope: 'page', //translate
-      moveBan, //是否禁止移动
+    const setOptions = {
+      scope: 'child', //translate
       snap: true, //分段
       hasHook: true,
-      orientation: flipDirection, //运动的方向
-
+      visualIndex: options.initIndex,
+      totalIndex: options.pageTotal,
+      visualWidth: config.visualSize.width,
+      visualHeight: config.visualSize.height,
+      container: options.container,
       multiplePages: options.multiplePages, //多页面
-      sectionRang: options.sectionRang, //分段值
+      sectionRang: options.sectionRang //分段值
+    }
 
-      data: {
-        visualIndex: options.initIndex,
-        totalIndex: options.pageTotal,
-        visualWidth: config.visualSize.width,
-        visualHeight: config.visualSize.height,
-        container: options.container
-      }
-    })
+    /*快速配置了*/
+    _.extend(setOptions, config.launch.swiperConfig)
 
+    const $globalSwiper = vm.$globalSwiper = new Swiper(setOptions)
     const $scheduler = vm.$scheduler = new Scheduler(vm)
 
     //如果是主场景,才能切换系统工具栏
@@ -287,7 +268,7 @@ export default class Mediator extends Observer {
  * 是否多场景模式
  */
 defAccess(Mediator.prototype, '$multiScenario', {
-  get: function() {
+  get: function () {
     return this.options.multiScenario
   }
 })
@@ -302,10 +283,10 @@ defAccess(Mediator.prototype, '$multiScenario', {
  *  这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
  */
 defAccess(Mediator.prototype, '$injectionComponent', {
-  set: function(regData) {
+  set: function (regData) {
     var injection;
     if (injection = this.$scheduler[regData.pageType + 'Mgr']) {
-      injection.$$assistPocess(regData.pageIndex, function(pageObj) {
+      injection.$$assistPocess(regData.pageIndex, function (pageObj) {
         pageObj.baseAddComponent.call(pageObj, regData.widget);
       })
     } else {
@@ -319,7 +300,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  * @return {[type]}   [description]
  */
 defAccess(Mediator.prototype, '$curVmPage', {
-  get: function() {
+  get: function () {
     return this.$scheduler.pageMgr.$$getPageBase(this.$globalSwiper.getVisualIndex());
   }
 });
@@ -351,9 +332,9 @@ defAccess(Mediator.prototype, '$curVmPage', {
  *          'suspendAutoCallback': null
  *
  */
-defProtected(Mediator.prototype, '$bind', function(key, callback) {
+defProtected(Mediator.prototype, '$bind', function (key, callback) {
   var vm = this
-  vm.$watch('change:' + key, function() {
+  vm.$watch('change:' + key, function () {
     callback.apply(vm, arguments)
   })
 })
@@ -363,7 +344,7 @@ defProtected(Mediator.prototype, '$bind', function(key, callback) {
  * 创建页面
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$init', function() {
+defProtected(Mediator.prototype, '$init', function () {
   this.$scheduler.initCreate();
 });
 
@@ -372,7 +353,7 @@ defProtected(Mediator.prototype, '$init', function() {
  * 运动动画
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$run', function() {
+defProtected(Mediator.prototype, '$run', function () {
   var vm = this;
   vm.$scheduler.pageMgr.activateAutoRuns(
     vm.$globalSwiper.getVisualIndex(), Xut.Presentation.GetPageBase()
@@ -384,7 +365,7 @@ defProtected(Mediator.prototype, '$run', function() {
  * 复位对象
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$reset', function() {
+defProtected(Mediator.prototype, '$reset', function () {
   return this.$scheduler.pageMgr.resetOriginal(this.$globalSwiper.getVisualIndex());
 });
 
@@ -393,7 +374,7 @@ defProtected(Mediator.prototype, '$reset', function() {
  * 停止所有任务
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$suspend', function() {
+defProtected(Mediator.prototype, '$suspend', function () {
   Xut.Application.Suspend({
     skipAudio: true //跨页面不处理
   })
@@ -403,7 +384,7 @@ defProtected(Mediator.prototype, '$suspend', function() {
  * 销毁场景内部对象
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$destroy', function() {
+defProtected(Mediator.prototype, '$destroy', function () {
   this.$off(); //观察事件
   this.$globalSwiper.destroy(); //全局事件
   this.$scheduler.destroyManage(); //派发器

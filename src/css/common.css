@@ -104,16 +104,6 @@ video {
     -webkit-perspective: 1000;
 }
 
-/**
- * section 流式布局下面去掉perspective
- * 因为与overflow冲突，文字会模糊
- */
-.section-transform{
-    /*backface-visibility: hidden;*/
-    transform-style: preserve-3d;
-    /*-webkit-backface-visibility: hidden;*/
-    -webkit-transform-style: preserve-3d;
-}
 
 /**继承父容器尺寸 **/
 .inherit-size {
@@ -131,6 +121,42 @@ video {
     -webkit-box-sizing: border-box;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+}
+
+
+
+/***************************
+*    flow section样式
+***************************/
+
+/**
+ * section 流式布局下面去掉perspective
+ * 因为与overflow冲突，文字会模糊
+ */
+.section-transform{
+    /*backface-visibility: hidden;*/
+    transform-style: preserve-3d;
+    /*-webkit-backface-visibility: hidden;*/
+    -webkit-transform-style: preserve-3d;
+}
+
+/*竖版flow布局*/
+#wrapper-section{
+  position: relative;
+  overflow: hidden;
+}
+
+/*竖版flow布局*/
+#scroller-section{
+  position: absolute;
+  /* Prevent elements to be highlighted on tap */
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  /* Put the scroller into the HW Compositing layer right from the start */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 

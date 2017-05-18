@@ -7,13 +7,13 @@ import { translation } from './translation'
  * @param  {[type]} baseProto [description]
  * @return {[type]}           [description]
  */
-export default function(baseProto) {
+export default function (baseProto) {
 
   /**
    * 页面移动
    * @return {[type]} [description]
    */
-  baseProto.movePage = function(action, distance, speed, viewOffset, outerCallFlip) {
+  baseProto.movePage = function (action, distance, speed, viewOffset, outerCallFlip) {
 
     const pageNode = this.$pageNode[0]
 
@@ -84,11 +84,11 @@ export default function(baseProto) {
          只处理Visual页面
          这里必须监控data-visual是否被移除了，才能正确处理
          */
-        timer = setTimeout(function() {
+        timer = setTimeout(function () {
           clearTimeout(timer)
           timer = null
           if (pageNode.getAttribute('data-visual')) {
-            $warn('translate3d丢失了，通过定时器手动调用')
+            $warn('翻页translate回调丢失了，通过定时器手动调用修复')
             toTranslateCB = null
             Xut.Application.tiggerFilpComplete(pageNode, true)
           }
