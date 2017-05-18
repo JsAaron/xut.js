@@ -53,7 +53,7 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
     const container = `
-            <section id="wrapper-section" class="section-transform" data-flow="true" style="width:${visualWidth}px;height:${visualHeight}px;top:${containerTop}px;left:${containerLeft}px;">
+            <section id="wrapper-section" class="section-transform" data-flow="true" style="width:${visualWidth-containerLeft}px;height:${visualHeight-containerTop}px;top:${containerTop}px;left:${containerLeft}px;">
                 <div  id="scroller-section" class="page-flow-scale" data-role="margin" style="width:${containerWidth}px;height:auto;">
                       ${data}
                 </div>

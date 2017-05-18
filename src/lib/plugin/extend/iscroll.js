@@ -64,11 +64,6 @@ export default function IScroll(node, options, delegate) {
 
   }
 
-  /*竖版模式下禁止事件冒泡*/
-  if (config.launch.flipMode === "vertical") {
-    options.stopPropagation = true
-  }
-
   return new iScroll(node, options)
 
 }

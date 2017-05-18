@@ -39,6 +39,8 @@ export default function init(Swiper) {
         this._setTransform()
         this._setContainerValue()
       } else if (this.options.scrollY) {
+        this.options.scrollerMode = true
+
         /*竖版处理,滚动容器*/
         this.scroller = this.container.children[0];
         this.scrollerStyle = this.scroller.style;

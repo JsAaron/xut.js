@@ -122,82 +122,105 @@ export default class ColumnClass {
   /*初始化*/
   _init() {
 
-    const coloumnObj = this
-    const columnWidth = resetVisualLayout(1).width
     const container = this.$container[0]
 
-    //分栏数
-    this.columnCount = getColumnCount(this.seasonId, this.chapterId)
+    /**************************************
+     *     竖版模式下的分栏处理
+     * ************************************/
+    if (config.launch.swiperConfig.scrollY) {
+      const iscroll = new iScroll(container, {
+        stopPropagation: true,
+        mouseWheel: true,
+        scrollbars: true,
+        probeType: 2
+      })
 
-    //边界
-    coloumnObj.minBorder = 0
-    coloumnObj.maxBorder = this.columnCount - 1
-
-    let nodes = this._getNodes()
-
-    /*页面可视区*/
-    const appVisualIndex = Xut.Presentation.GetPageIndex()
-
-    const setOptions = {
-      container,
-      scope: 'parent', //父容器滑动
-      snap: false, //不分段
-      hasHook: true,
-      multiplePages: true,
-      stopPropagation: true,
-      visualIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
-      totalIndex: this.columnCount,
-      visualWidth: columnWidth
-    }
-
-    _.extend(setOptions, config.launch.swiperConfig)
-
-    /*竖版设置*/
-    if (config.launch.flipMode === 'vertical') {
-      setOptions.visualHeight = getColumnHeight(this.seasonId, this.chapterId)
-    }
-
-    /**
-     * 分栏整体控制
-     * @type {[type]}
-     */
-    const swipe = this.swipe = new Swiper(setOptions)
-
-    let moveDistance = 0
-
-    coloumnObj.lastDistance = swipe.getInitDistance()
-
-    let hasQrcode
-    swipe.$watch('onFilter', (hookCallback, point, evtObj) => {
-      /*二维码*/
-      hasQrcode = false
-      if (swiperHook(evtObj, point.target) === 'qrcode') {
-        hasQrcode = true
-      }
-    });
-
-    swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
-      const node = point.target;
-      /*图片缩放*/
-      if (!hasQrcode) {
-        if (node && node.nodeName.toLowerCase() === "img") {
-          coloumnObj._zoomPicture(node)
+      iscroll.on('scroll', function (e) {
+        if (iscroll.directionY == 1 && Math.abs(iscroll.y) > Math.abs(iscroll.maxScrollY)) {
+          Xut.View.MovePage('flipMove', 'next', this.distY + 10, 0)
         }
-        if (!Xut.Contents.Canvas.getIsTap()) {
-          Xut.View.Toolbar()
-        }
-      }
-      /*点击媒体，视频音频*/
-      closestMedia(node, coloumnObj.chapterId, swipe.visualIndex)
-    })
+      })
+
+      iscroll.on('scrollEnd', function (e) {
+        // if (iscroll.directionY == -1 && iscroll.y === 0) {
+        //   Xut.View.GotoPrevSlide()
+        // }
+        // if (iscroll.directionY == 1 && iscroll.y === iscroll.maxScrollY) {
+        //   Xut.View.GotoNextSlide()
+        // }
+      })
+    }
 
 
     /**************************************
-     *
      *     横版模式下的分栏处理
-     *
      * ************************************/
     if (config.launch.swiperConfig.scrollX) {
+
+      const coloumnObj = this
+      const columnWidth = resetVisualLayout(1).width
+
+      //分栏数
+      this.columnCount = getColumnCount(this.seasonId, this.chapterId)
+
+      //边界
+      coloumnObj.minBorder = 0
+      coloumnObj.maxBorder = this.columnCount - 1
+
+      let nodes = this._getNodes()
+
+      /*页面可视区*/
+      const appVisualIndex = Xut.Presentation.GetPageIndex()
+
+      const setOptions = {
+        container,
+        scope: 'parent', //父容器滑动
+        snap: false, //不分段
+        hasHook: true,
+        multiplePages: true,
+        stopPropagation: true,
+        visualIndex: appVisualIndex > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
+        totalIndex: this.columnCount,
+        visualWidth: columnWidth
+      }
+
+      _.extend(setOptions, config.launch.swiperConfig)
+
+      /**
+       * 分栏整体控制
+       * @type {[type]}
+       */
+      const swipe = this.swipe = new Swiper(setOptions)
+
+      let moveDistance = 0
+
+      coloumnObj.lastDistance = swipe.getInitDistance()
+
+      let hasQrcode
+      swipe.$watch('onFilter', (hookCallback, point, evtObj) => {
+        /*二维码*/
+        hasQrcode = false
+        if (swiperHook(evtObj, point.target) === 'qrcode') {
+          hasQrcode = true
+        }
+      });
+
+      swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
+        const node = point.target;
+        /*图片缩放*/
+        if (!hasQrcode) {
+          if (node && node.nodeName.toLowerCase() === "img") {
+            coloumnObj._zoomPicture(node)
+          }
+          if (!Xut.Contents.Canvas.getIsTap()) {
+            Xut.View.Toolbar()
+          }
+        }
+        /*点击媒体，视频音频*/
+        closestMedia(node, coloumnObj.chapterId, swipe.visualIndex)
+      })
+
+
 
       swipe.$watch('onMove', function (options) {
 

@@ -394,8 +394,10 @@ export default class Swiper extends Observer {
       deltaDist = (-deltaDist)
     }
 
-    /*滚动页面*/
-    this._translate(this.distX, this.distY)
+    if (this.options.scrollerMode) {
+      /*滚动页面*/
+      this._translate(0, this.distY)
+    }
 
     //是否无效函数
     //如果无效，end方法抛弃掉
@@ -502,7 +504,7 @@ export default class Swiper extends Observer {
      * 竖版情况下，是滚动页面
      * 启动滑动滚性,必须有300以上的触碰时间*
      */
-    if (this.options.scrollY && !this.options.snap && this.options.momentum && duration < 300) {
+    if (this.options.scrollerMode && this.options.momentum && duration < 300) {
       let momentumY = momentum(this.distY, 0, duration, this.maxScrollY, this.wrapperHeight)
       console.log(momentumY)
       this.isInTransition = 1; //标记惯性正在滑动
@@ -511,7 +513,6 @@ export default class Swiper extends Observer {
       if (newY != this.distY) {
         // 当上卷超出界限,改变宽松的功能
         if (newY > 0 || newY < this.maxScrollY) {
-          console.log(1111111)
           easing = ease.quadratic;
         }
         this.scrollTo(newY, momentumY.duration, easing);
