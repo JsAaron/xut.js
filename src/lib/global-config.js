@@ -176,13 +176,17 @@ export default {
   /**
    * 迷你杂志页码显示配置
    * 1 数字 digital (默认)
-   * 2 原点 circular 1/2/3/4/5/6
+   * 2 原点 circular {
+   *            mode: 1/2/3/4/5/6
+   *            position:
+   *        }
    * 3 滚动工具栏 scrollbar
    * @type {Object}
    */
   pageBar: {
     type: 'digital',
-    mode: null
+    mode: DEFAULT,
+    position: DEFAULT
   },
 
   /**

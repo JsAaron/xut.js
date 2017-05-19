@@ -60,14 +60,7 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function 
 } : function () {}
 
 
-/**
- * 新版本加载
-    resource: slashPostfix(path.resource), //资源路径
-    database: path.database, //数据库
-    launchAnim: option.launchAnim, //启动动画
-    convert: option.convert, //资源转化svg=>js
-    pageBar: option.pageBar //mini页码显示模式
- */
+/*新版本加载*/
 Xut.Application.Launch = option => {
   if (config.launch) {
     return
