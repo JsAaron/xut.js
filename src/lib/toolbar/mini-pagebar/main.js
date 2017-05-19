@@ -191,6 +191,7 @@ export default class NumberBar {
     sonIndex = 0
   }) {
 
+
     let chapterData = Xut.Presentation.GetPageData('page', parentIndex)
 
     //从正索引开始

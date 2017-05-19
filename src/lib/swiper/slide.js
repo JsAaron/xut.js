@@ -3,9 +3,6 @@ import { getActionPointer } from './pointer'
 /*翻页速率*/
 const FLIPSPEED = 600
 
-const getDate = () => {
-  return +new Date
-}
 
 export default function slide(Swiper) {
 
@@ -115,13 +112,13 @@ export default function slide(Swiper) {
    * 重设置_setRate
    */
   Swiper.prototype._setQuick = function () {
-    const startDate = getDate()
+    const startDate = Swiper.getDate()
     if (this._preTapTime) {
       if (startDate - this._preTapTime < FLIPSPEED) {
         this._setRate();
       }
     }
-    this._preTapTime = getDate();
+    this._preTapTime = Swiper.getDate();
   }
 
   /**
@@ -197,7 +194,7 @@ export default function slide(Swiper) {
       /*如果是第二次开始同一个点击动作*/
       if (action === this._recordRreTick.action) {
         /*最大的点击间隔时间不超过默认的_defaultFlipTime时间，最小的取间隔时间*/
-        const time = getDate() - this._recordRreTick.time
+        const time = Swiper.getDate() - this._recordRreTick.time
         if (time <= this._defaultFlipTime) {
           outerSpeed = time
         } else {
@@ -206,7 +203,7 @@ export default function slide(Swiper) {
         outerCallFlip = true
       }
       /*点击时间啊*/
-      this._recordRreTick.time = getDate()
+      this._recordRreTick.time = Swiper.getDate()
     }
 
     /*保存每次点击动作*/

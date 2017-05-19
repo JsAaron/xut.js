@@ -55,21 +55,22 @@ export default {
    * novel表定义，数据库定义的翻页模式
    * 用来兼容客户端的制作模式
    * 妙妙学模式处理，多页面下翻页切换
-   * pageflip
-   *   0 通过滑动翻页 => 'allow'
-   *   1 禁止滑动,直接快速切换页面(通过左右按键快速切换页面) => 'ban'
-   * @type {Number}
    *
    * 后期增加竖版模式修正接口
    *
-   * pageflip
-   *   横版翻页 horizontal
-   *   横版锁定 horizontal-ban
-   *
-   *   竖版翻页 vertical
-   *   竖版锁定 vertical-ban
+   * displayMode
+   *   横版翻页 horizontal  h
+   *   竖版翻页 vertical    v
    */
-  flipMode: '',//全局设置，或者数据库填充
+  displayMode: 'h',
+
+  /**
+   * 是否锁定页面移动
+   * false 不锁定，可以移动
+   * true 锁定，不能移动
+   * @type {Boolean}
+   */
+  banMove: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
 
   /*
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问
@@ -77,7 +78,7 @@ export default {
   所以svg的资源会强制转化成js
   这里要填写'svg'
    */
-  convert: '', //默认不处理svg转化  参数 'svg'
+  convert: DEFAULT, //默认不处理svg转化  参数 'svg'
 
   /**
    * 是否关闭启动动画，默认是true启动，false为关闭

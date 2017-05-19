@@ -76,11 +76,6 @@ function filterJsonData() {
   //需要把flow的给处理掉
   if (config.launch.resource && result.FlowData) {
 
-    //启动检测
-    if (config.launch.flipMode !== 'vertical') {
-      config.launch.columnCheck = true
-    }
-
     //有基础后缀，需要补上所有的图片地址
     const baseSuffix = config.launch.baseImageSuffix ? `.${config.launch.baseImageSuffix}` : ''
 

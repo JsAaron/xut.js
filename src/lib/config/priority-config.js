@@ -151,7 +151,7 @@ export function priorityConfig() {
   //////////////////////////////////
   ///竖版的情况下，页面模式都强制为1
   //////////////////////////////////
-  if (launch.flipMode === 'vertical') {
+  if (launch.displayMode === 'v') {
     launch.visualMode = 1
   }
 

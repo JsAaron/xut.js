@@ -15,7 +15,7 @@ const transform = Xut.style.transform
  */
 const toTranslate3d = (node, distance, speed, callback) => {
   if (node) {
-    if (config.launch.flipMode === 'vertical') {
+    if (config.launch.displayMode === 'v') {
       node.style[transform] = `translate3d(0px,${distance}px,0px)`
     } else {
       node.style[transform] = `translate3d(${distance}px,0px,0px)`
@@ -32,7 +32,7 @@ const toTranslate3d = (node, distance, speed, callback) => {
  */
 const set = (node, value) => {
   if (node) {
-    if (config.launch.flipMode === 'vertical') {
+    if (config.launch.displayMode === 'v') {
       node.style[transform] = `translate3d(0px,${value}px,0px)`
     } else {
       node.style[transform] = `translate3d(${value}px,0px,0px)`
@@ -94,7 +94,7 @@ export const translation = {
  * @return {[type]}        [description]
  */
 const createTranslate = (value) => {
-  if (config.launch.flipMode === 'vertical') {
+  if (config.launch.displayMode === 'v') {
     return `translate3d(0px,${value}px,0px)`
   }
   return `translate3d(${value}px,0px,0px)`
@@ -108,7 +108,7 @@ const createTranslate = (value) => {
  */
 export function fix($node, action) {
   let translate
-  if (config.launch.flipMode === 'vertical') {
+  if (config.launch.displayMode === 'v') {
     const visualHight = config.visualSize.height
     translate = action === 'prevEffect' ? createTranslate(-visualHight) : createTranslate(visualHight)
   } else {

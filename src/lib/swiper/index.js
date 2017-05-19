@@ -23,16 +23,6 @@ const hasMultipleTouches = function (e) {
   return e.touches && e.touches.length > 1
 }
 
-const mixProperty = function (target, src) {
-  for (let key in src) {
-    target[key] = src[key]
-  }
-}
-
-
-const getDate = () => {
-  return +new Date
-}
 
 /**
  * 自定义事件类型
@@ -47,6 +37,36 @@ const getDate = () => {
  */
 export default class Swiper extends Observer {
 
+  static mixProperty(target, src) {
+    for (let key in src) {
+      target[key] = src[key]
+    }
+  }
+
+
+  static getDate() {
+    return +new Date
+  }
+
+  /**
+   * 静态方法，获取基本配置
+   * @return {[type]} [description]
+   */
+  static getConfig() {
+    /*提供swiperConfig快速配置文件,关键配置*/
+    let scrollX = true
+    let scrollY = false
+    if (config.launch.displayMode === 'v') {
+      scrollX = false
+      scrollY = true
+    }
+    return {
+      scrollY,
+      scrollX,
+      banMove: config.launch.banMove
+    }
+  }
+
   constructor({
 
     /**
@@ -59,36 +79,36 @@ export default class Swiper extends Observer {
       1. true  默认分段
       2. false 不分段，变成整体一段数据
 
-    C：moveBan 是否锁定页面滑动，只能通过接口翻页，没有滑动效果
+    C：banMove 是否锁定页面滑动，只能通过接口翻页，没有滑动效果
       1. false 不锁定，可以移动页面
       2. true 锁定，不能移动页面
 
-    D：scope,snap,moveBan 组合四中模式使用
+    D：scope,snap,banMove 组合四中模式使用
       1. 页面分段，独立页面滑动(横版/竖版，默认处理)
           scope='child'
           snap = true
-          moveBan = false
+          banMove = false
 
       2. 页面分段，独立页面滑动，但是禁止触摸滑动，只能通过接口跳转页面(秒秒学模式)
           scope='child'
           snap = true
-          moveBan = true
+          banMove = true
 
       3. 页面分段，swiper内部滑动(横版,column)
           scope='parent'
           snap = true
-          moveBan = false
+          banMove = false
 
       4. 不分段，无分页，swiper内部滑动(竖版)
           scope='parent'
           snap = false
-          moveBan = false
+          banMove = false
 
     */
     scope = 'child',
     snap = true,
     snapSpeed = 800,
-    moveBan = false,
+    banMove = false,
 
     /*滑动惯性*/
     momentum = true,
@@ -143,7 +163,7 @@ export default class Swiper extends Observer {
 
     super()
 
-    mixProperty(this, {
+    Swiper.mixProperty(this, {
       container,
       visualIndex,
       totalIndex,
@@ -154,7 +174,7 @@ export default class Swiper extends Observer {
     this.options = {
       scope,
       snap,
-      moveBan,
+      banMove,
       scrollX,
       scrollY,
       momentum,
@@ -183,7 +203,7 @@ export default class Swiper extends Observer {
     this.enabled = true
 
     /*翻页时间*/
-    this._defaultFlipTime = moveBan ? 0 : snapSpeed
+    this._defaultFlipTime = banMove ? 0 : snapSpeed
 
     /*翻页速率*/
     this._speedRate =
@@ -244,7 +264,7 @@ export default class Swiper extends Observer {
 
     //判断双击速度
     //必须要大于350
-    const currtTime = getDate()
+    const currtTime = Swiper.getDate()
     if (this._clickTime) {
       if (currtTime - this._clickTime < 350) {
         return
@@ -306,7 +326,7 @@ export default class Swiper extends Observer {
     this.pointX = point.pageX;
     this.pointY = point.pageY;
 
-    this.startTime = getDate()
+    this.startTime = Swiper.getDate()
   }
 
 
@@ -432,7 +452,7 @@ export default class Swiper extends Observer {
 
     /*可能没有点击页面，没有触发start事件*/
     if (this.startTime) {
-      duration = getDate() - this.startTime
+      duration = Swiper.getDate() - this.startTime
     }
 
     /*滑动距离、滑动方向*/
@@ -486,19 +506,6 @@ export default class Swiper extends Observer {
       return
     }
 
-    /**
-     * slideTo的最低值要求
-     * 1 fast: time < 200 && x >30
-     * 2 common: x > veiwWidth/6
-     */
-    let isValidSlide
-    if (orientation === 'h') {
-      isValidSlide = duration < 200 && distX > 30 || distX > this.visualWidth / 6
-    } else if (orientation === 'v') {
-      isValidSlide = duration < 200 && distY > 30 || distY > this.visualHeight / 6
-    }
-
-    this.isInTransition = 0;
 
     /**
      * 竖版情况下，是滚动页面
@@ -524,9 +531,16 @@ export default class Swiper extends Observer {
      * 开始翻页或者反弹
      * 翻页滑动，要排除首位的情况，首尾页面只要反弹
      */
-    if (isValidSlide && !this._isFirstOrEnd()) {
+    const actionType = this.getActionType(distX, distY, duration)
+
+    /*如果是首位页面，直接反弹*/
+    if (this._isFirstOrEnd()) {
+      this._setRebound()
+    } else if (actionType === 'flipOver') {
+      /*如果是翻页动作*/
       this._slideTo({ action: 'inner' })
-    } else {
+    } else if (actionType === 'flipRebound') {
+      /*反弹动作*/
       this._setRebound()
     }
 
@@ -709,16 +723,6 @@ export default class Swiper extends Observer {
    */
   _setDirection(value) {
     this.direction = value > 0 ? 'prev' : 'next'
-  }
-
-  /*关闭滑动*/
-  disable() {
-    this.enabled = false;
-  }
-
-  /*启动滑动*/
-  enable() {
-    this.enabled = true;
   }
 
   /**

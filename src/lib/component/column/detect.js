@@ -1,20 +1,20 @@
 import { config } from '../../config/index'
 import { resetColumnCount } from './api'
-import { resolveColumn } from './init'
+import { getColumnData } from './init'
 
 /**
  * 分栏探测
  */
-const makeDelay = function(seasonsId, chapterId, count) {
-  return function() {
+const makeDelay = function (seasonsId, chapterId, count) {
+  return function () {
     resetColumnCount(seasonsId, chapterId, count)
   }
 }
 
-const execDelay = function(tempDelay) {
-  if(tempDelay.length) {
+const execDelay = function (tempDelay) {
+  if (tempDelay.length) {
     let fn
-    while(fn = tempDelay.pop()) {
+    while (fn = tempDelay.pop()) {
       fn()
     }
     Xut.Application.Notify('change:number:total')
@@ -49,24 +49,24 @@ let baseCheckCount = 20
 function detectColumn($seasons, columnCollection, callback, checkCount) {
   let tempDelay = []
 
-  resolveColumn($seasons, (seasonsId, chapterId, count) => {
-      if(debug && checkCount > simulateTimer) {
-        count = simulateCount
-      }
-      //假如高度改变
-      if(columnCollection[seasonsId][chapterId] !== count) {
-        columnCollection[seasonsId][chapterId] = count
-        tempDelay.push(makeDelay(seasonsId, chapterId, count))
-      }
-    })
+  getColumnData($seasons, (seasonsId, chapterId, count) => {
+    if (debug && checkCount > simulateTimer) {
+      count = simulateCount
+    }
+    //假如高度改变
+    if (columnCollection[seasonsId][chapterId] !== count) {
+      columnCollection[seasonsId][chapterId] = count
+      tempDelay.push(makeDelay(seasonsId, chapterId, count))
+    }
+  })
 
-    --checkCount
+  --checkCount
 
   //执行监控改变
   tempDelay.length && execDelay(tempDelay)
 
-  if(checkCount) {
-    timerId = setTimeout(function() {
+  if (checkCount) {
+    timerId = setTimeout(function () {
       detectColumn($seasons, columnCollection, callback, checkCount)
     }, 500)
   } else {

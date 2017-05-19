@@ -41,7 +41,12 @@ export default function IScroll(node, options, delegate) {
           xWait = (-xWait)
         }
 
-        Xut.View.MovePage("flipMove", this.distX > 0 ? 'prev' : 'next', this.distX + xWait, 0)
+        Xut.View.SetSwiperMove({
+          action: 'flipMove',
+          direction: this.distX > 0 ? 'prev' : 'next',
+          distance: this.distX + xWait,
+          speed: 0
+        })
       }
     })
 
@@ -51,11 +56,16 @@ export default function IScroll(node, options, delegate) {
         const deltaX = Math.abs(this.distX)
         const isValidSlide = duration < 200 && deltaX > 30 || deltaX > config.visualSize.width / 6
           /*判断是翻页，并且不是首位边界页面*/
-        if (isValidSlide && !Xut.View.GetFlipBorderBounce(this.distX)) {
+        if (isValidSlide && !Xut.View.GetSwpierBorderBounce(this.distX)) {
           this.distX > 0 ? Xut.View.GotoPrevSlide() : Xut.View.GotoNextSlide()
         } else {
           /*反弹*/
-          Xut.View.MovePage("flipRebound", this.distX > 0 ? 'prev' : 'next', 0, 300)
+          Xut.View.SetSwiperMove({
+            action: 'flipRebound',
+            direction: this.distX > 0 ? 'prev' : 'next',
+            distance: 0,
+            speed: 300
+          })
         }
       }
     })

@@ -41,6 +41,7 @@ export const hMiddlePageHook =  {
      * 右翻页结束
      */
     next(getStyle) {
+
       let middlePageStyle = getStyle('middle')
       let rightPageStyle = getStyle('right')
 

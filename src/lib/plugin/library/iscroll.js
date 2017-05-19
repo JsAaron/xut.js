@@ -1,4 +1,10 @@
-/*! iScroll v5.1.1 ~ (c) 2008-2014 Matteo Spinelli ~ http://cubiq.org/license */ ;
+/*! iScroll v5.1.1 ~ (c) 2008-2014 Matteo Spinelli ~ http://cubiq.org/license
+
+代码修改
+431 this._execEvent('beforeScrollStart',point); 增加point传递
+578 this._execEvent('scrollCancel',point);
+
+*/ ;
 (function(window, document, Math) {
   var rAF = window.requestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
@@ -422,7 +428,7 @@
       this.pointX = point.pageX;
       this.pointY = point.pageY;
 
-      this._execEvent('beforeScrollStart');
+      this._execEvent('beforeScrollStart',point);
     },
 
     _move: function(e) {
@@ -569,7 +575,7 @@
           utils.click(e);
         }
 
-        this._execEvent('scrollCancel');
+        this._execEvent('scrollCancel',point);
         return;
       }
 
@@ -612,7 +618,6 @@
         if(newX > 0 || newX < this.maxScrollX || newY > 0 || newY < this.maxScrollY) {
           easing = utils.ease.quadratic;
         }
-
         this.scrollTo(newX, newY, time, easing);
         return;
       }

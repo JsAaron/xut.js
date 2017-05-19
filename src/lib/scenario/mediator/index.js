@@ -25,24 +25,22 @@ const configMultiple = (options) => {
   } else {
 
     ////////////////////////////////
-    /// flipMode全局定义翻页模式  ////
+    /// displayMode全局定义翻页模式  ////
     /// pageMode当前页面定义模式  ////
     ////////////////////////////////
     let pageMode = Number(options.pageMode)
 
-    //判断多页面情况
-    if (options.flipMode === 'horizontal' || options.flipMode === 'vertical') {
-      options.multiplePages = true
-      if (pageMode === 0) { //如果工具栏强制禁止滑动
-        options.multiplePages = false
-      }
-    }
-
     //如果是禁止翻页，然后还要看是不是有pageMode的设置
-    if (options.flipMode === 'horizontal-ban' || options.flipMode === 'vertical-ban') {
+    if (config.launch.banMove) {
       options.multiplePages = false
       if (pageMode > 0) { //如果工具栏单独设置了页面模式，那么多页面强制改成true
         options.multiplePages = true
+      }
+    } else {
+      //判断多页面情况
+      options.multiplePages = true
+      if (pageMode === 0) { //如果工具栏强制禁止滑动
+        options.multiplePages = false
       }
     }
   }
@@ -83,10 +81,7 @@ export default class Mediator extends Observer {
       //是否为连续页面
       //通过pageMode的参数定义
       'multiplePages': false
-    }, parameter, {
-      //翻页模式
-      flipMode: config.launch.flipMode
-    })
+    }, parameter)
 
     //配置多页面参数
     configMultiple(options)
@@ -105,7 +100,7 @@ export default class Mediator extends Observer {
     }
 
     /*快速配置了*/
-    _.extend(setOptions, config.launch.swiperConfig)
+    _.extend(setOptions, Swiper.getConfig())
 
     const $globalSwiper = vm.$globalSwiper = new Swiper(setOptions)
     const $scheduler = vm.$scheduler = new Scheduler(vm)

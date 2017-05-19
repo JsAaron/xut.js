@@ -4,6 +4,22 @@ import { ease } from './ease'
 export default function api(Swiper) {
 
   /**
+   * 获取动作
+   * 是翻页还是反弹
+   * @return {[type]} [description]
+   */
+  Swiper.prototype.getActionType = function (distX, distY, duration, orientation) {
+    orientation = orientation || this.orientation
+    if (orientation === 'h') {
+      distX = Math.abs(distX)
+      return duration < 200 && distX > 30 || distX > this.visualWidth / 6 ? 'flipOver' : 'flipRebound'
+    } else if (orientation === 'v') {
+      distY = Math.abs(distY)
+      return duration < 200 && distY > 30 || distY > this.visualHeight / 6 ? 'flipOver' : 'flipRebound'
+    }
+  }
+
+  /**
    * column的情况
    * 动态设置新的页面总数
    */
@@ -69,34 +85,23 @@ export default function api(Swiper) {
     })
   }
 
-  //允许滑动
-  Swiper.prototype.swipeEnable = function () {
-    this.enable()
+
+  /*启动滑动*/
+  Swiper.prototype.enable = function () {
+    this.enabled = true;
   }
 
   //禁止滑动
-  Swiper.prototype.swipeBan = function () {
-    this.disable()
+  Swiper.prototype.disable = function () {
+    this.enabled = false;
   }
 
-
   /**
-   * 停止翻页
-   * @return {[type]} [description]
+   * 是否锁定
+   * @return {Boolean} [description]
    */
-  Swiper.prototype.openSwipe = function () {
-    this._initOperation();
-  }
-
-
-  /**
-   * 启动翻页
-   * @return {[type]} [description]
-   */
-  Swiper.prototype.closeSwipe = function () {
-    if (!this._moved) {
-      this._off()
-    }
+  Swiper.prototype.hasEnabled = function () {
+    return this.enabled
   }
 
 
@@ -111,19 +116,11 @@ export default function api(Swiper) {
 
 
   /**
-   * 检车是否还在移动中
+   * 获取移动状态
    * @return {Boolean} [description]
    */
-  Swiper.prototype.moving = function () {
+  Swiper.prototype.getMoved = function () {
     return this._moved
-  }
-
-  /**
-   * 是否锁定
-   * @return {Boolean} [description]
-   */
-  Swiper.prototype.hasEnabled = function () {
-    return this.enabled
   }
 
 

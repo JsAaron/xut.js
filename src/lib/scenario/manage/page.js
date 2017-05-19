@@ -44,7 +44,7 @@ export default class PageMgr extends ManageSuper {
     if (config.launch.doublePageMode) {
       $on(rootNode, {
         transitionend: function () {
-          Xut.Application.tiggerFilpComplete()
+          Xut.View.SetSwiperFilpComplete()
         }
       })
     }

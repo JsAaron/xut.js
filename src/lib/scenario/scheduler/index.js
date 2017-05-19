@@ -15,7 +15,7 @@ import Stack from '../../util/stack'
 import { sceneController } from '../scene-control'
 import { getVisualDistance } from '../v-distance/index'
 import { setCustomStyle } from '../v-style/index'
-import { setVisualMode } from './set-mode'
+import { getVisualMode } from './mode'
 import { $set, hash, $warn } from '../../util/index'
 
 import {
@@ -258,7 +258,7 @@ export default class Scheduler {
           doubleMainIndex, //从属主页面，双页模式
           /*页面的布局位置*/
           position: getPosition(doubleMainIndex !== undefined ? doubleMainIndex : chapterIndex, visualChapterIndex),
-          pageVisualMode: setVisualMode(chapterData)
+          pageVisualMode: getVisualMode(chapterData)
         }
 
         ///////////////////////////
@@ -349,7 +349,7 @@ export default class Scheduler {
 
     //用户强制直接切换模式
     //禁止页面跟随滑动
-    if (this.options.flipMode === 'horizontal-ban' && action == 'flipMove') {
+    if (config.launch.banMove && action == 'flipMove') {
       return
     }
 

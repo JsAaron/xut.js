@@ -48,7 +48,7 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
     data = $(data).find("#columns-content").html()
   }
 
-  if (config.launch.flipMode === 'vertical') {
+  if (config.launch.displayMode === 'v') {
     /*竖版的情况下，不需要分栏了，直接处理*/
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
@@ -58,6 +58,7 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
                       ${data}
                 </div>
             </section>`
+    newViewHight = visualHeight - containerTop
     return String.styleFormat(container)
   } else {
     /*配置分栏*/
@@ -114,32 +115,26 @@ const eachColumn = function (columnData, $seasons, visualWidth, visualHeight) {
   })
 }
 
+
 /**
- * 获取内容高度
- * @return {[type]} [description]
+ * 获取分栏数
  */
-const getContentHight = function (content) {
-  let theChildren = content.find('#columns-content').children()
+const getColumnCount = (content, id) => {
+  let theChildren = $(content).find(id).children()
   let paraHeight = 0
   for (let i = 0; i < theChildren.length; i++) {
     paraHeight += Math.max(theChildren[i].scrollHeight, theChildren[i].clientHeight)
   }
-  return paraHeight
+  return Math.ceil(paraHeight / newViewHight)
 }
 
-/**
- * 解析分栏数
- */
-const resolveCount = (content) => {
-  return Math.ceil(getContentHight(content) / newViewHight)
-}
 
 /**
  * 获取分栏的数量与高度
  * 1 横版，数量
  * 2 竖版，高度
  */
-export function resolveColumn($seasons, callback) {
+export function getColumnData($seasons, callback) {
   $seasons.each((index, node) => {
     let tag = node.id
     let seasonsId = tag.match(/\d/)[0]
@@ -148,12 +143,13 @@ export function resolveColumn($seasons, callback) {
       let tag = node.id
       if (tag) {
         let chapterId = tag.match(/\d+/)[0]
-        if (config.launch.flipMode === 'vertical') {
-          callback(seasonsId, chapterId, 1, getContentHight($(node)))
-        } else {
-          let count = resolveCount($(node))
-          callback(seasonsId, chapterId, Number(count))
+        let count
+        if (config.launch.displayMode === 'h') {
+          count = getColumnCount(node, '#columns-content')
+        } else if (config.launch.displayMode === 'v') {
+          count = getColumnCount(node, '#scroller-section')
         }
+        callback(seasonsId, chapterId, count)
       }
     })
   })
@@ -205,8 +201,8 @@ export function initColumn(callback) {
      */
     setTimeout(() => {
 
-      //第一次获取分栏数与高度
-      resolveColumn($seasons, (seasonsId, chapterId, count, height) => {
+      //第一次获取分栏数与高度 analysis
+      getColumnData($seasons, (seasonsId, chapterId, count, height) => {
         if (debug && config.launch.columnCheck) {
           count = simulateCount
         }

@@ -1,4 +1,3 @@
-
 import { config } from '../../config/index'
 
 /********************************************
@@ -7,15 +6,7 @@ import { config } from '../../config/index'
  ********************************************/
 export function extendView(vm, access, $globalSwiper) {
 
-  let options = vm.options
-
-  /**
-   * 设置页面的potion编码
-   * 为分栏修改
-   */
-  Xut.View.setPointer = function (pageIndex) {
-    $globalSwiper.setPointer(pageIndex)
-  }
+  const options = vm.options
 
   /**
    * 更新页码
@@ -23,7 +14,7 @@ export function extendView(vm, access, $globalSwiper) {
    *   parentIndex  父索引
    *   subIndex     子索引
    */
-  Xut.View.setPageNumber = function (...arg) {
+  Xut.View.SetPageNumber = function (...arg) {
     vm.$emit('change:pageUpdate', ...arg)
   }
 
@@ -118,6 +109,55 @@ export function extendView(vm, access, $globalSwiper) {
     gotoPage(data, 'next')
   }
 
+
+  /**
+   * 是否启动
+   * @return {[type]} [description]
+   */
+  Xut.View.GetSwiperEnabled = function () {
+    return $globalSwiper.hasEnabled()
+  }
+
+  /**
+   * 禁止滑动
+   */
+  Xut.View.SetSwiperDisable = function () {
+    $globalSwiper.disable();
+  }
+
+  /**
+   * 允许滑动
+   */
+  Xut.View.SetSwiperEnable = function () {
+    $globalSwiper.enable();
+  }
+
+  /**
+   * 设置翻页完成
+   */
+  Xut.View.SetSwiperFilpComplete = function (...arg) {
+    $globalSwiper.setTransitionComplete(...arg)
+  }
+
+  /**
+   * 获取全局swiper的动作选择
+   * 1.翻页
+   * 2.反弹
+   * distX, distY, duration
+   */
+  Xut.View.GetSwiperActionType = function (...arg) {
+    return $globalSwiper.getActionType(...arg)
+  }
+
+  /**
+   * 是否为翻页的边界
+   * @return {Boolean} [description]
+   */
+  Xut.View.GetSwpierBorderBounce = function (distance) {
+    return $globalSwiper.isBorder(distance)
+  }
+
+
   /**
    * 跳转页面
    * 场景内部切换
@@ -173,44 +213,53 @@ export function extendView(vm, access, $globalSwiper) {
 
 
   /**
-   * 是否为翻页的边界
-   * @return {Boolean} [description]
-   */
-  Xut.View.GetFlipBorderBounce = function (distance) {
-    return $globalSwiper.isBorder(distance)
-  }
-
-
-  /**
    * 页面滑动
    * action 动作
    * direction 方向
    * distance 移动距离
    * speed 速度
+   *
+      action: "flipRebound"
+      backIndex : 4
+      direction : "prev"
+      distance : 0
+      frontIndex : 2
+      middleIndex: 3
+      orientation : "h"
+      speed : 300
+   *
    */
-  Xut.View.MovePage = function (action, direction, distance, speed) {
+  Xut.View.SetSwiperMove = function ({
+    action,
+    direction,
+    distance,
+    speed,
+    orientation
+  }) {
 
     //如果禁止翻页模式 || 如果是滑动,不是边界
     if (!options.multiplePages ||
-      $globalSwiper.moving() ||
+      $globalSwiper.getMoved() ||
       action === 'flipMove' && $globalSwiper.isBorder(distance)) {
       return
     }
 
     const pagePointer = $globalSwiper.getPointer()
 
-    vm.$scheduler.movePageBases({
-      'distance': distance,
-      'speed': speed,
-      'direction': direction,
-      'action': action,
+    /*如果没有传递布方向，就取页面，这个在全局接口中处理*/
+    orientation = orientation || config.launch.displayMode
 
-      /*如果没有传递布方向，就取页面，这个在全局接口中处理*/
-      'orientation': config.launch.flipMode === 'horizontal' ? 'h' : 'v',
+    vm.$scheduler.movePageBases({
+      action,
+      direction,
+      distance,
+      speed,
+      orientation,
       'frontIndex': pagePointer.frontIndex,
       'middleIndex': pagePointer.middleIndex,
       'backIndex': pagePointer.backIndex
     })
-  };
+  }
+
 
 }

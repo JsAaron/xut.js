@@ -33,45 +33,22 @@ const initMain = novelData => {
    */
   if (novelData.parameter) {
     const parameter = parseJSON(novelData.parameter)
-    if (!config.launch.flipMode && parameter.pageflip !== undefined) {
+      /*全局优先设置覆盖*/
+    if (config.launch.banMove === undefined && parameter.pageflip !== undefined) {
       switch (Number(parameter.pageflip)) {
         case 0: //允许翻页
-          config.launch.flipMode = 'horizontal';
+          config.launch.banMove = false
           break;
         case 1: //禁止翻页
-          config.launch.flipMode = 'horizontal-ban';
+          config.launch.banMove = true
           break
       }
     }
   }
 
-  /*如果都没有设置，就默认横屏*/
-  if (!config.launch.flipMode) {
-    config.launch.flipMode = 'horizontal'
-  }
-
-
-  /**
-   *翻页模式参数解析
-   * flipMode horizontal-ban
-   * 分解为    horizontal + ban
-   * moveBan 禁止移动
-   */
-  const modeMatch = config.launch.flipMode.split('-');
-  const flipDirection = modeMatch[0]
-  const moveBan = modeMatch.length === 2 ? true : false
-  let scrollX = true
-  let scrollY = false
-  if (flipDirection === 'vertical') {
-    scrollX = false
-    scrollY = true
-  }
-
-  /*提供swiperConfig快速配置文件,关键配置*/
-  config.launch.swiperConfig = {
-    scrollY,
-    scrollX,
-    moveBan
+  /*默认不锁定页面*/
+  if (config.launch.banMove === undefined) {
+    config.launch.banMove = false
   }
 
   /**

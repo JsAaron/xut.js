@@ -18,10 +18,10 @@ export function offsetPage(num) {
  * createIndex 创建的页面
  * visualIndex 可视区页面
  * 有横竖布局
- *   所以根据全局的flipMode参数而定
+ *   所以根据全局的displayMode参数而定
  */
 export function getPosition(createIndex, visualIndex) {
-  const isVertical = config.launch.flipMode === 'vertical'
+  const isVertical = config.launch.displayMode === 'v'
   let direction
   if (createIndex < visualIndex) {
     direction = isVertical ? 'top' : 'left'

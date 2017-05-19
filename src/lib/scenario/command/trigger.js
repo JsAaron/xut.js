@@ -43,7 +43,7 @@ export function $trigger({
       })
 
       /*如果是重复点击,比如widget零件*/
-      const instance = Xut.Application.GetSpecifiedObject(pageType, data)
+      const instance = Xut.Application.GetExistObject(pageType, data)
       if (instance) {
         if (instance.toggle) {
           //如果有对应的处理方法

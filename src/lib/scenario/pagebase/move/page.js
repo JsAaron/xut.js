@@ -55,7 +55,7 @@ export default function (baseProto) {
          如果outerCall存在，就是外部调用翻页的的情况下处理
          修复一个bug,超快速翻页的时候(speed<300)，动画结束事件会丢失页面
          所以针对这种情况，强制改speed改成0，这样动画事件完全屏蔽
-         通过回调中手动调用tiggerFilpComplete事件处理
+         通过回调中手动调用SetSwiperFilpComplete事件处理
          这里扩大下speed的范围
        */
       if (outerCallFlip) {
@@ -90,7 +90,7 @@ export default function (baseProto) {
           if (pageNode.getAttribute('data-visual')) {
             $warn('翻页translate回调丢失了，通过定时器手动调用修复')
             toTranslateCB = null
-            Xut.Application.tiggerFilpComplete(pageNode, true)
+            Xut.View.SetSwiperFilpComplete(pageNode, true)
           }
         }, speed + 500)
       }
@@ -101,11 +101,11 @@ export default function (baseProto) {
     toTranslateCB = () => {
       /*
       2种情况下会主动触发翻页结束回调
-      1.flipMode === 'horizontal-ban'，关闭了翻页效果，并且是可视区页面
+      1.banMove，关闭了翻页效果，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if (isVisual && (fixQuickFlip || config.launch.flipMode === 'horizontal-ban')) {
-        Xut.Application.tiggerFilpComplete(pageNode, true)
+      if (isVisual && (fixQuickFlip || config.launch.banMove)) {
+        Xut.View.SetSwiperFilpComplete(pageNode, true)
         return true
       }
     }
