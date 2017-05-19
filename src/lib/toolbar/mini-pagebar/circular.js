@@ -12,7 +12,7 @@ const dotStyleClass = [
 
 /**
  * 迷你杂志页面工具栏扩展
- * 圆形显示
+ * 圆形类型
  */
 export default class Circular extends MiniSuper {
 

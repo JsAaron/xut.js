@@ -3,7 +3,7 @@ import { config } from '../../config/index'
 
 /**
  * 迷你杂志页面工具栏扩展
- * 数字显示
+ * 数字类型
  */
 export default class Digital extends MiniSuper {
   constructor(pageBar, options) {
