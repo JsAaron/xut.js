@@ -9,8 +9,8 @@ export function extendApplication(access) {
    * 区分不同层级page/master
    * 不同类型    content/widget
    */
-  Xut.Application.GetExistObject = function (pageType, data) {
-    return access(function (manager, pageType) {
+  Xut.Application.GetExistObject = function(pageType, data) {
+    return access(function(manager, pageType) {
       var pageObj;
       if (pageObj = manager.$$getPageBase(data.pageIndex)) {
         if (data.type === 'Content') {
@@ -21,4 +21,6 @@ export function extendApplication(access) {
       }
     }, pageType)
   }
+
+
 }
