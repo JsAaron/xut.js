@@ -1,8 +1,5 @@
 import MiniSuper from './super'
-
 import { config } from '../../config/index'
-import { hasColumn, getBeforeCount, getCurrentBeforeCount } from '../../component/column/api'
-
 
 /**
  * 迷你杂志页面工具栏扩展
