@@ -184,13 +184,13 @@ export default class NumberBar {
    * 更新页码
    */
   updatePointer({
+    time,
     action,
     direction,
     parentIndex, //chpater的pageIndex
     hasSon = false,
     sonIndex = 0
   }) {
-
 
     let chapterData = Xut.Presentation.GetPageData('page', parentIndex)
 

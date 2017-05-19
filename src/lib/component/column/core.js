@@ -178,7 +178,7 @@ export default class ColumnClass {
       }
     });
 
-    swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
+    swipe.$watch('onTap', function(pageIndex, hookCallback, point, duration) {
       const node = point.target;
       /*图片缩放*/
       if (!hasQrcode) {
@@ -194,7 +194,7 @@ export default class ColumnClass {
     })
 
 
-    swipe.$watch('onMove', function (options) {
+    swipe.$watch('onMove', function(options) {
 
       const {
         action,
@@ -422,18 +422,12 @@ export default class ColumnClass {
             speed: 0
           })
         } else {
-          pageIndex = this._getRollIndex(iscroll.startY, rangeY)
-
-          /*只有页码不一致的时候才更新，并且只更新一次*/
-          if (this.visualIndex !== pageIndex) {
-            this._updataScrollbars(pageIndex, iscroll.directionY)
-            this.visualIndex = pageIndex
-          }
+          this._scrollToPage(iscroll.startY, iscroll.directionY, rangeY)
         }
       }
     })
 
-    iscroll.on('scrollEnd', function (e) {
+    iscroll.on('scrollEnd', function(e) {
       if (hasBorderRun) {
         const typeAction = Xut.View.GetSwiperActionType(0, iscroll.distY, iscroll.endTime - iscroll.startTime, 'v')
         if (typeAction === 'flipOver') {
@@ -465,14 +459,36 @@ export default class ColumnClass {
         }
       }
     })
+
+    /**
+     * 松手后的惯性滑动
+     */
+    iscroll.on('momentum', (newY, time, easing) => {
+      this._scrollToPage(newY, iscroll.directionY, rangeY, time)
+    })
+
+  }
+
+  /**
+   * 滚动指定的页面
+   * @return {[type]} [description]
+   */
+  _scrollToPage(distY, directionY, rangeY, time) {
+    const pageIndex = this._getRollIndex(distY, rangeY);
+    /*只有页码不一致的时候才更新，并且只更新一次*/
+    if (this.visualIndex !== pageIndex) {
+      this._updataScrollbars(pageIndex, directionY, time)
+      this.visualIndex = pageIndex
+    }
   }
 
   /**
    * 更新页面滚动条
    * direction = 1 下滑动
    */
-  _updataScrollbars(pageIndex, direction) {
+  _updataScrollbars(pageIndex, direction, time) {
     Xut.View.SetPageNumber({
+      time,
       parentIndex: this.initIndex,
       sonIndex: direction === 1 ? pageIndex : pageIndex + 2,
       hasSon: true,
