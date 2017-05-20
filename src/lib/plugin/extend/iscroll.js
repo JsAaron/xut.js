@@ -7,6 +7,11 @@ import { config } from '../../config/index'
 */
 export default function IScroll(node, options, delegate) {
 
+  /*竖版禁止上下滑动的冒泡,并且不是强制的横屏滑动模式*/
+  if (config.launch.displayMode === 'v' && !options.scrollX) {
+    options.stopPropagation = true
+  }
+
   ///////////////////////////////
   /// 启动委托
   /// 启动代码追踪swipe的情况下
@@ -22,7 +27,7 @@ export default function IScroll(node, options, delegate) {
     const iscroll = new iScroll(node, options)
 
 
-    iscroll.on('scroll', function (e) {
+    iscroll.on('scroll', function(e) {
 
       /*
       只有横向移动的时候,并且总页面是没有被锁定的，
@@ -50,7 +55,7 @@ export default function IScroll(node, options, delegate) {
       }
     })
 
-    iscroll.on('scrollEnd', function (e) {
+    iscroll.on('scrollEnd', function(e) {
       if (this.directionLocked === 'h' && this.moved && !Xut.Application.hasEnabled()) {
         const duration = new Date().getTime() - this.startTime
         const deltaX = Math.abs(this.distX)
