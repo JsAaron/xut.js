@@ -3,7 +3,7 @@
  * 辅助对象
  ********************************************/
 
-export function extendAssist(access, $globalSwiper) {
+export function extendAssist(access, $$globalSwiper) {
 
   /**
    * 滤镜渐变动画
@@ -93,10 +93,10 @@ export function extendAssist(access, $globalSwiper) {
             }
           }();
           _.each(activityId, function (id) {
-            manager.$$assistAppoint(id, $globalSwiper.getVisualIndex(), markComplete, apiName);
+            manager.$$assistAppoint(id, $$globalSwiper.getVisualIndex(), markComplete, apiName);
           })
         } else {
-          manager.$$assistAppoint(activityId, $globalSwiper.getVisualIndex(), outCallBack, apiName);
+          manager.$$assistAppoint(activityId, $$globalSwiper.getVisualIndex(), outCallBack, apiName);
         }
       }, pageType, activityId, outCallBack)
     }

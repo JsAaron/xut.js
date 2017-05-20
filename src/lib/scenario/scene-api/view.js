@@ -4,9 +4,9 @@ import { config } from '../../config/index'
  * 场景API
  * 视图接口。视图是窗口的展示方式，和页面相关的接口，都在这里。
  ********************************************/
-export function extendView(vm, access, $globalSwiper) {
+export function extendView($$mediator, access, $$globalSwiper) {
 
-  const options = vm.options
+  const options = $$mediator.options
 
   /**
    * 更新页码
@@ -15,7 +15,7 @@ export function extendView(vm, access, $globalSwiper) {
    *   subIndex     子索引
    */
   Xut.View.SetPageNumber = function (...arg) {
-    vm.$emit('change:pageUpdate', ...arg)
+    $$mediator.$emit('change:pageUpdate', ...arg)
   }
 
   /**
@@ -24,7 +24,7 @@ export function extendView(vm, access, $globalSwiper) {
    * 有参数单独显示指定的
    */
   Xut.View.ShowToolBar = function (point) {
-    vm.$emit('change:toggleToolbar', 'show', point)
+    $$mediator.$emit('change:toggleToolbar', 'show', point)
   }
 
   /**
@@ -33,7 +33,7 @@ export function extendView(vm, access, $globalSwiper) {
    * 有参数单独隐藏指定
    */
   Xut.View.HideToolBar = function (point) {
-    vm.$emit('change:toggleToolbar', 'hide', point)
+    $$mediator.$emit('change:toggleToolbar', 'hide', point)
   }
 
   /**
@@ -50,7 +50,7 @@ export function extendView(vm, access, $globalSwiper) {
    * @return {[type]} [description]
    */
   Xut.View.Toolbar = function (cfg) {
-    vm.$emit('change:toggleToolbar', cfg)
+    $$mediator.$emit('change:toggleToolbar', cfg)
   };
 
   /*
@@ -92,7 +92,7 @@ export function extendView(vm, access, $globalSwiper) {
       return
     }
 
-    options.hasMultiPage && $globalSwiper[direction](callback)
+    options.hasMultiPage && $$globalSwiper[direction](callback)
   }
 
   /**
@@ -115,28 +115,28 @@ export function extendView(vm, access, $globalSwiper) {
    * @return {[type]} [description]
    */
   Xut.View.GetSwiperEnabled = function () {
-    return $globalSwiper.hasEnabled()
+    return $$globalSwiper.hasEnabled()
   }
 
   /**
    * 禁止滑动
    */
   Xut.View.SetSwiperDisable = function () {
-    $globalSwiper.disable();
+    $$globalSwiper.disable();
   }
 
   /**
    * 允许滑动
    */
   Xut.View.SetSwiperEnable = function () {
-    $globalSwiper.enable();
+    $$globalSwiper.enable();
   }
 
   /**
    * 设置翻页完成
    */
   Xut.View.SetSwiperFilpComplete = function (...arg) {
-    $globalSwiper.setTransitionComplete(...arg)
+    $$globalSwiper.setTransitionComplete(...arg)
   }
 
   /**
@@ -146,7 +146,7 @@ export function extendView(vm, access, $globalSwiper) {
    * distX, distY, duration
    */
   Xut.View.GetSwiperActionType = function (...arg) {
-    return $globalSwiper.getActionType(...arg)
+    return $$globalSwiper.getActionType(...arg)
   }
 
   /**
@@ -154,7 +154,7 @@ export function extendView(vm, access, $globalSwiper) {
    * @return {Boolean} [description]
    */
   Xut.View.GetSwpierBorderBounce = function (distance) {
-    return $globalSwiper.isBorder(distance)
+    return $$globalSwiper.isBorder(distance)
   }
 
 
@@ -191,8 +191,8 @@ export function extendView(vm, access, $globalSwiper) {
     //如果是一个参数是传递页码数,则为内部跳转
     if (arguments.length === 1) {
       //复位翻页按钮
-      vm.$emit('change:showNext')
-      return $globalSwiper.scrollToPage(fixParameter(seasonId))
+      $$mediator.$emit('change:showNext')
+      return $$globalSwiper.scrollToPage(fixParameter(seasonId))
     }
 
     //场景模式内部跳转
@@ -200,8 +200,8 @@ export function extendView(vm, access, $globalSwiper) {
       //chpaterId 转化成实际页码
       var sectionRang = Xut.data.query('sectionRelated', seasonId)
       var pageIndex = chapterId - sectionRang.start
-      vm.$emit('change:showNext')
-      return $globalSwiper.scrollToPage(fixParameter(pageIndex))
+      $$mediator.$emit('change:showNext')
+      return $$globalSwiper.scrollToPage(fixParameter(pageIndex))
     }
 
     //场景与场景的跳转
@@ -239,17 +239,17 @@ export function extendView(vm, access, $globalSwiper) {
 
     //如果禁止翻页模式 || 如果是滑动,不是边界
     if (!options.hasMultiPage ||
-      $globalSwiper.getMoved() ||
-      action === 'flipMove' && $globalSwiper.isBorder(distance)) {
+      $$globalSwiper.getMoved() ||
+      action === 'flipMove' && $$globalSwiper.isBorder(distance)) {
       return
     }
 
-    const pagePointer = $globalSwiper.getPointer()
+    const pagePointer = $$globalSwiper.getPointer()
 
     /*如果没有传递布方向，就取页面，这个在全局接口中处理*/
     orientation = orientation || config.launch.displayMode
 
-    vm.$scheduler.movePageBases({
+    $$mediator.$$scheduler.movePageBases({
       action,
       direction,
       distance,

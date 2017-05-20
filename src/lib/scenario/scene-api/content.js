@@ -5,7 +5,7 @@
 import { typeFilter } from './page-type'
 import { reviseSize } from '../../util/option'
 
-export function extendContent(access, $globalSwiper) {
+export function extendContent(access, $$globalSwiper) {
 
   /**
    * 获取指定的对象
@@ -177,7 +177,7 @@ export function extendContent(access, $globalSwiper) {
       access(function(manager, pageType, nameList) {
         if(typeCheck(nameList)) return;
         var pageBaseObj;
-        if(!(pageBaseObj = manager.$$assistPocess($globalSwiper.getVisualIndex()))) {
+        if(!(pageBaseObj = manager.$$assistPocess($$globalSwiper.getVisualIndex()))) {
           console.log('注入互斥接口数据错误！')
           return;
         }

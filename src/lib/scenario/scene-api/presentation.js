@@ -10,13 +10,13 @@ import { $warn } from '../../util/debug'
  */
 const CONTENTPREFIX = 'Content_';
 
-export function extendPresentation(access, $globalSwiper) {
+export function extendPresentation(access, $$globalSwiper) {
 
 
   /**
    * 获取当前页码
    */
-  Xut.Presentation.GetPageIndex = () => $globalSwiper.getVisualIndex()
+  Xut.Presentation.GetPageIndex = () => $$globalSwiper.getVisualIndex()
 
   /**
    *  四大数据接口
@@ -35,7 +35,7 @@ export function extendPresentation(access, $globalSwiper) {
     Xut.Presentation[apiName] = (pageType, pageIndex) => {
       return access((manager, pageType, pageIndex) => {
         if (pageIndex === undefined) {
-          pageIndex = $globalSwiper.getVisualIndex() //当前页面
+          pageIndex = $$globalSwiper.getVisualIndex() //当前页面
         }
         /*$$-manage-super接口*/
         return manager["$$" + apiName](pageIndex, pageType)

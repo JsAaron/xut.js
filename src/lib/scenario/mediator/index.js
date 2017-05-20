@@ -71,10 +71,10 @@ export default class Mediator extends Observer {
 
     super()
 
-    const vm = this
+    const $$mediator = this
 
     //配置文件
-    const options = vm.options = _.extend({
+    const options = $$mediator.options = _.extend({
       //是否多场景加载
       //单页场景 false
       //多场景   true
@@ -87,15 +87,16 @@ export default class Mediator extends Observer {
     //配置多页面参数
     configMultiple(options)
 
+
     const setOptions = {
       scope: 'child', //translate
       snap: true, //分段
       hasHook: true,
+      container: options.sceneNode,
       visualIndex: options.initIndex,
       totalIndex: options.pageTotal,
       visualWidth: config.visualSize.width,
       visualHeight: config.visualSize.height,
-      container: options.container,
       hasMultiPage: options.hasMultiPage, //多页面
       sectionRang: options.sectionRang //分段值
     }
@@ -103,12 +104,12 @@ export default class Mediator extends Observer {
     /*快速配置了*/
     _.extend(setOptions, Swiper.getConfig())
 
-    const $globalSwiper = vm.$globalSwiper = new Swiper(setOptions)
-    const $scheduler = vm.$scheduler = new Scheduler(vm)
+    const $$globalSwiper = $$mediator.$$globalSwiper = new Swiper(setOptions)
+    const $$scheduler = $$mediator.$$scheduler = new Scheduler($$mediator)
 
     //如果是主场景,才能切换系统工具栏
     if (options.hasMultiPage) {
-      this.addTools(vm)
+      this.addTools($$mediator)
     }
 
     //事件句柄对象
@@ -118,13 +119,13 @@ export default class Mediator extends Observer {
      * 过滤器.全局控制函数
      * return true 阻止页面滑动
      */
-    $globalSwiper.$watch('onFilter', (hookCallback, point, evtObj) => {
+    $$globalSwiper.$watch('onFilter', (hookCallback, point, evtObj) => {
       let node = point.target
       swiperHook(evtObj, node)
         //页面类型
       let pageType = isBelong(node);
       //冒泡的ul根节点
-      let parentNode = $globalSwiper.findBubbleRootNode(point, pageType);
+      let parentNode = $$globalSwiper.findBubbleRootNode(point, pageType);
       //执行过滤处理
       handlerObj = closestProcessor.call(parentNode, point, pageType);
       //如果找到是空节点
@@ -143,13 +144,13 @@ export default class Mediator extends Observer {
     /**
      * 触屏松手点击，无滑动，判断为点击
      */
-    $globalSwiper.$watch('onTap', (pageIndex, hookCallback) => {
+    $$globalSwiper.$watch('onTap', (pageIndex, hookCallback) => {
       if (handlerObj) {
         if (handlerObj.handlers) {
           handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex)
         } else {
           if (!Xut.Contents.Canvas.getIsTap()) {
-            vm.$emit('change:toggleToolbar')
+            $$mediator.$emit('change:toggleToolbar')
           }
         }
         handlerObj = null;
@@ -162,16 +163,16 @@ export default class Mediator extends Observer {
      * 触屏滑动,通知pageMgr处理页面移动
      * @return {[type]} [description]
      */
-    $globalSwiper.$watch('onMove', (data) => {
-      $scheduler.movePageBases(data)
+    $$globalSwiper.$watch('onMove', (data) => {
+      $$scheduler.movePageBases(data)
     });
 
 
     /**
      * 触屏滑动,通知ProcessMgr关闭所有激活的热点
      */
-    $globalSwiper.$watch('onEnd', (pointers) => {
-      $scheduler.suspendPageBases(pointers)
+    $$globalSwiper.$watch('onEnd', (pointers) => {
+      $$scheduler.suspendPageBases(pointers)
     });
 
 
@@ -179,8 +180,8 @@ export default class Mediator extends Observer {
      * 翻页动画完成回调
      * @return {[type]}              [description]
      */
-    $globalSwiper.$watch('onComplete', (...arg) => {
-      $scheduler.completePageBases(...arg)
+    $$globalSwiper.$watch('onComplete', (...arg) => {
+      $$scheduler.completePageBases(...arg)
     });
 
 
@@ -188,8 +189,8 @@ export default class Mediator extends Observer {
      * 切换页面
      * @return {[type]}      [description]
      */
-    $globalSwiper.$watch('onJumpPage', (data) => {
-      $scheduler.gotoPageBases(data);
+    $$globalSwiper.$watch('onJumpPage', (data) => {
+      $$scheduler.gotoPageBases(data);
     });
 
 
@@ -197,7 +198,7 @@ export default class Mediator extends Observer {
      * 退出应用
      * @return {[type]}      [description]
      */
-    $globalSwiper.$watch('onDropApp', (data) => {
+    $$globalSwiper.$watch('onDropApp', (data) => {
       window.GLOBALIFRAME && Xut.publish('magazine:dropApp');
     });
 
@@ -208,9 +209,9 @@ export default class Mediator extends Observer {
      * 才需要重新激活对象
      * 删除parallaxProcessed
      */
-    $globalSwiper.$watch('onMasterMove', (hindex, target) => {
+    $$globalSwiper.$watch('onMasterMove', (hindex, target) => {
       if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
-        $scheduler.masterMgr && $scheduler.masterMgr.reactivation(target);
+        $$scheduler.masterMgr && $$scheduler.masterMgr.reactivation(target);
       }
     });
 
@@ -225,7 +226,7 @@ export default class Mediator extends Observer {
   /**
    * 系统工具栏
    */
-  addTools(vm) {
+  addTools($$mediator) {
 
     _.extend(delegateHooks, {
 
@@ -233,7 +234,7 @@ export default class Mediator extends Observer {
        * li节点,多线程创建的时候处理滑动
        */
       'data-container' () {
-        vm.$emit('change:toggleToolbar')
+        $$mediator.$emit('change:toggleToolbar')
       },
 
       /**
@@ -241,7 +242,7 @@ export default class Mediator extends Observer {
        */
       'data-multilayer' () {
         //改变工具条状态
-        vm.$emit('change:toggleToolbar')
+        $$mediator.$emit('change:toggleToolbar')
       },
 
       /**
@@ -250,7 +251,7 @@ export default class Mediator extends Observer {
       'data-behavior' (target, attribute, rootNode, pageIndex) {
         //没有事件的元素,即可翻页又可点击切换工具栏
         if (attribute == 'click-swipe') {
-          vm.$emit('change:toggleToolbar')
+          $$mediator.$emit('change:toggleToolbar')
         }
       }
     })
@@ -281,7 +282,7 @@ defAccess(Mediator.prototype, '$hasMultiScene', {
 defAccess(Mediator.prototype, '$injectionComponent', {
   set: function(regData) {
     var injection;
-    if (injection = this.$scheduler[regData.pageType + 'Mgr']) {
+    if (injection = this.$$scheduler[regData.pageType + 'Mgr']) {
       injection.$$assistPocess(regData.pageIndex, function(pageObj) {
         pageObj.baseAddComponent.call(pageObj, regData.widget);
       })
@@ -297,7 +298,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  */
 defAccess(Mediator.prototype, '$curVmPage', {
   get: function() {
-    return this.$scheduler.pageMgr.$$getPageBase(this.$globalSwiper.getVisualIndex());
+    return this.$$scheduler.pageMgr.$$getPageBase(this.$$globalSwiper.getVisualIndex());
   }
 });
 
@@ -329,9 +330,9 @@ defAccess(Mediator.prototype, '$curVmPage', {
  *
  */
 defProtected(Mediator.prototype, '$bind', function(key, callback) {
-  var vm = this
-  vm.$watch('change:' + key, function() {
-    callback.apply(vm, arguments)
+  const $$mediator = this
+  $$mediator.$watch('change:' + key, function() {
+    callback.apply($$mediator, arguments)
   })
 })
 
@@ -341,7 +342,7 @@ defProtected(Mediator.prototype, '$bind', function(key, callback) {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$init', function() {
-  this.$scheduler.initCreate();
+  this.$$scheduler.initCreate();
 });
 
 
@@ -350,11 +351,11 @@ defProtected(Mediator.prototype, '$init', function() {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$run', function() {
-  var vm = this;
-  vm.$scheduler.pageMgr.activateAutoRuns(
-    vm.$globalSwiper.getVisualIndex(), Xut.Presentation.GetPageBase()
+  const $$mediator = this;
+  $$mediator.$$scheduler.pageMgr.activateAutoRuns(
+    $$mediator.$$globalSwiper.getVisualIndex(), Xut.Presentation.GetPageBase()
   )
-});
+})
 
 
 /**
@@ -362,8 +363,8 @@ defProtected(Mediator.prototype, '$run', function() {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$reset', function() {
-  return this.$scheduler.pageMgr.resetOriginal(this.$globalSwiper.getVisualIndex());
-});
+  return this.$$scheduler.pageMgr.resetOriginal(this.$$globalSwiper.getVisualIndex());
+})
 
 
 /**
@@ -382,9 +383,9 @@ defProtected(Mediator.prototype, '$suspend', function() {
  */
 defProtected(Mediator.prototype, '$destroy', function() {
   this.$off(); //观察事件
-  this.$globalSwiper.destroy(); //全局事件
-  this.$scheduler.destroyManage(); //派发器
-  this.$scheduler = null;
-  this.$globalSwiper = null;
+  this.$$globalSwiper.destroy(); //全局事件
+  this.$$scheduler.destroyManage(); //派发器
+  this.$$scheduler = null;
+  this.$$globalSwiper = null;
   this.destorySceneApi() //动态api
 })

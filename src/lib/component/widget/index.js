@@ -24,7 +24,7 @@ const CEIL = Math.ceil
  */
 const injectionComponent = function(regData) {
   var sceneObj = sceneController.containerObj('current')
-  sceneObj.vm.$injectionComponent = regData
+  sceneObj.$$mediator.$injectionComponent = regData
 }
 
 

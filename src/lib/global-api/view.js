@@ -62,7 +62,7 @@ export function initView() {
     const current = sceneController.containerObj('current')
 
     /*获取到当前的页面对象,用于跳转去重复*/
-    const curVmPage = current && current.vm && current.vm.$curVmPage
+    const curVmPage = current && current.$$mediator && current.$$mediator.$curVmPage
     if (curVmPage && curVmPage.seasonId == seasonId && curVmPage.chapterId == chapterId) {
       $warn(`重复触发页面加载:seasonId:${seasonId},chapterId:${chapterId}`, 'warn')
       return
@@ -90,7 +90,7 @@ export function initView() {
     /////////////////////////////////////
 
     /*清理热点动作,场景外部跳转,需要对场景的处理*/
-    current && current.vm.$suspend()
+    current && current.$$mediator.$suspend()
 
     /*通过内部关闭按钮加载新场景处理，检测是不是往回跳转,重复处理*/
     if (current && userAssign) {
@@ -114,7 +114,7 @@ export function initView() {
      * 如果当前是从主场景加载副场景
      * 关闭系统工具栏
      */
-    if (current && !current.vm.$hasMultiScene) {
+    if (current && !current.mediator.$hasMultiScene) {
       Xut.View.HideToolBar()
     }
 

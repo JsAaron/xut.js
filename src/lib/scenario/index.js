@@ -247,9 +247,9 @@ export class SceneFactory {
     const scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
 
     //场景容器对象
-    const vm = this.vm = new Mediator({
+    const $$mediator = this.$$mediator = new Mediator({
       'pageMode': this.pageMode,
-      'container': this.$sceneNode[0],
+      'sceneNode': this.$sceneNode[0],
       'hasMultiScene': !isMain,
       'rootPage': scenarioPage,
       'rootMaster': scenarioMaster,
@@ -276,7 +276,7 @@ export class SceneFactory {
      *   subIndex     子索引
      * @return {[type]} [description]
      */
-    vm.$bind('pageUpdate', (...arg) => {
+    $$mediator.$bind('pageUpdate', (...arg) => {
       isToolbar && isToolbar.updatePointer(...arg)
       if (this.miniBar) {
         this.miniBar && this.miniBar.updatePointer(...arg)
@@ -288,7 +288,7 @@ export class SceneFactory {
      * 显示下一页按钮
      * @return {[type]} [description]
      */
-    vm.$bind('showNext', () => {
+    $$mediator.$bind('showNext', () => {
       isToolbar && isToolbar.showNext();
     })
 
@@ -297,7 +297,7 @@ export class SceneFactory {
      * 隐藏下一页按钮
      * @return {[type]} [description]
      */
-    vm.$bind('hideNext', () => {
+    $$mediator.$bind('hideNext', () => {
       isToolbar && isToolbar.hideNext();
     })
 
@@ -306,7 +306,7 @@ export class SceneFactory {
      * 显示上一页按钮
      * @return {[type]} [description]
      */
-    vm.$bind('showPrev', () => {
+    $$mediator.$bind('showPrev', () => {
       isToolbar && isToolbar.showPrev();
     })
 
@@ -315,7 +315,7 @@ export class SceneFactory {
      * 隐藏上一页按钮
      * @return {[type]} [description]
      */
-    vm.$bind('hidePrev', () => {
+    $$mediator.$bind('hidePrev', () => {
       isToolbar && isToolbar.hidePrev();
     })
 
@@ -325,7 +325,7 @@ export class SceneFactory {
      * state, pointer
      * @return {[type]} [description]
      */
-    vm.$bind('toggleToolbar', (...arg) => {
+    $$mediator.$bind('toggleToolbar', (...arg) => {
       isToolbar && isToolbar.toggle(...arg)
       if (this.miniBar) {
         this.miniBar && this.miniBar.toggle(...arg)
@@ -337,7 +337,7 @@ export class SceneFactory {
      * 复位工具栏
      * @return {[type]} [description]
      */
-    vm.$bind('resetToolbar', () => {
+    $$mediator.$bind('resetToolbar', () => {
       if (this.mainToolbar) {
         this.mainToolbar.resetArrow() //左右翻页按钮
         this.mainToolbar.hideNavbar() //导航栏
@@ -349,7 +349,7 @@ export class SceneFactory {
      * 监听创建完成
      * @return {[type]} [description]
      */
-    vm.$bind('createComplete', (nextAction) => {
+    $$mediator.$bind('createComplete', (nextAction) => {
       this.complete && setTimeout(() => {
         if (isMain) {
           this.complete(() => {
@@ -370,14 +370,14 @@ export class SceneFactory {
     //如果是读酷端加载
     if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
       window.DUKUCONFIG.success();
-      vm.$init();
+      $$mediator.$init();
       //如果是客户端加载
     } else if (window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
       window.CLIENTCONFIGT.success();
-      vm.$init();
+      $$mediator.$init();
     } else {
       //正常加载
-      vm.$init();
+      $$mediator.$init();
     }
   }
 
@@ -393,7 +393,7 @@ export class SceneFactory {
     }
 
     //销毁当前场景
-    this.vm.$destroy();
+    this.$$mediator.$destroy();
 
     //销毁工具栏
     if (this.isToolbar) {
