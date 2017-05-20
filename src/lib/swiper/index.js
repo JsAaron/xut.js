@@ -67,6 +67,12 @@ export default class Swiper extends Observer {
     }
   }
 
+  /**
+   * 2种大模式
+   * 1 分段，分变化
+   * 2 分段，不分变化
+   * @type {String}
+   */
   constructor({
 
     /**
@@ -83,25 +89,26 @@ export default class Swiper extends Observer {
       1. false 不锁定，可以移动页面
       2. true 锁定，不能移动页面
 
-    D：scope,snap,banMove 组合四中模式使用
-      1. 页面分段，独立页面滑动(横版/竖版，默认处理)
+    D：scope,snap,banMove 组合4种模式使用
+
+      1. 页面分段，滑动设置分布到每个独立的页面(横版/竖版，默认处理)
           scope='child'
           snap = true
           banMove = false
 
-      2. 页面分段，独立页面滑动，但是禁止触摸滑动，只能通过接口跳转页面(秒秒学模式)
+      2. 同模式1，区别的就是页面不能滑动了，被锁定
           scope='child'
           snap = true
           banMove = true
 
-      3. 页面分段，swiper内部滑动(横版,column)
+      3. 页面分段，滑动集成在swiper中了，统一滑动的坐标处理(用于横版,column)
           scope='parent'
           snap = true
           banMove = false
 
-      4. 不分段，无分页，swiper内部滑动(竖版)
+      4. 同模式3，区别的就是页面不能滑动了，被锁定
           scope='parent'
-          snap = false
+          snap = true
           banMove = false
 
     */
