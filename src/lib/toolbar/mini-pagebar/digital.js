@@ -30,7 +30,7 @@ export default class Digital extends MiniSuper {
   }
 
   _render() {
-    this.$rootNode.append(this.$container)
+    this.$sceneNode.append(this.$container)
   }
 
   toggle(state, pointer) {

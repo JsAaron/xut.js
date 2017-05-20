@@ -67,7 +67,7 @@ export default class Circular extends MiniSuper {
   }
 
   _render() {
-    this.$rootNode.append(this.$container)
+    this.$sceneNode.append(this.$container)
   }
 
 

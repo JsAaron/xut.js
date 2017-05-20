@@ -15,7 +15,7 @@ import { sceneController } from './factory/control'
  * 找到对应容器
  * @return {[type]}            [description]
  */
-const findContainer = ($rootNode, id, isMain) => {
+const findContainer = ($context, id, isMain) => {
   return function(pane, parallax) {
     var node;
     if (isMain) {
@@ -23,7 +23,7 @@ const findContainer = ($rootNode, id, isMain) => {
     } else {
       node = '#' + parallax + id;
     }
-    return $rootNode.find(node)[0];
+    return $context.find(node)[0];
   }
 }
 
@@ -65,16 +65,8 @@ const checkHistory = (history) => {
 export class SceneFactory {
 
   constructor(data) {
-    const {
-      seasonId,
-      chapterId
-    } = data
 
-    const options = _.extend(this, data, {
-      'seasonId': seasonId,
-      'chapterId': chapterId,
-      '$container': $('.xut-scene-container')
-    })
+    const options = _.extend(this, data)
 
     //创建主场景
     this._createHTML(options, () => {
@@ -82,7 +74,7 @@ export class SceneFactory {
         this._initToolBar()
       }
       this._createMediator();
-      sceneController.add(seasonId, chapterId, this);
+      sceneController.add(data.seasonId, data.chapterId, this);
     })
   }
 
@@ -96,14 +88,16 @@ export class SceneFactory {
     //支持Xut.IBooks模式
     //都不需要创建节点
     if (Xut.IBooks.runMode()) {
-      this.$rootNode = $('#xut-main-scene')
+      this.$sceneNode = $('#xut-main-scene')
       callback()
       return;
     }
-    this.$rootNode = $(options.isMain ? mainScene() : deputyScene(this.seasonId))
+
+    this.$sceneNode = $(options.isMain ? mainScene() : deputyScene(this.seasonId))
+
     Xut.nextTick({
-      'container': this.$container,
-      'content': this.$rootNode
+      'container': $('.xut-scene-container'),
+      'content': this.$sceneNode
     }, callback)
   }
 
@@ -117,15 +111,15 @@ export class SceneFactory {
       seasonId,
       pageTotal,
       pageIndex,
-      $rootNode
+      $sceneNode
     } = this
 
     _.extend(
       this,
-      this._initDefaultBar(pageIndex, pageTotal, $rootNode, seasonId)
+      this._initDefaultBar(pageIndex, pageTotal, $sceneNode, seasonId)
     )
 
-    this._initMiniBar(pageIndex, pageTotal, $rootNode)
+    this._initMiniBar(pageIndex, pageTotal, $sceneNode)
   }
 
 
@@ -135,10 +129,10 @@ export class SceneFactory {
    * 2 副场景，函数工具栏
    * @return {[type]} [description]
    */
-  _initDefaultBar(pageIndex, pageTotal, $rootNode, seasonId) {
+  _initDefaultBar(pageIndex, pageTotal, $sceneNode, seasonId) {
 
     const findControlBar = function() {
-      return $rootNode.find('.xut-control-bar')
+      return $sceneNode.find('.xut-control-bar')
     }
 
     //配置文件
@@ -150,7 +144,7 @@ export class SceneFactory {
       if (config.launch.visualMode === 4) {
         //word模式,自动启动工具条
         // this.mainToolbar = new BookBar({
-        //     sceneNode: $rootNode,
+        //     sceneNode: $sceneNode,
         //     controlNode: findControlBar(),
         //     pageMode: barConfig.pageMode
         // })
@@ -160,7 +154,7 @@ export class SceneFactory {
       else if (_.some(barConfig.toolType)) {
         //普通模式
         this.mainToolbar = new MainBar({
-          sceneNode: $rootNode,
+          sceneNode: $sceneNode,
           controlNode: findControlBar(),
           pageTotal: pageTotal,
           currentPage: pageIndex + 1,
@@ -175,7 +169,7 @@ export class SceneFactory {
       barConfig = pDeputyBar(this.barInfo, pageTotal)
       if (_.some(barConfig.toolType)) {
         this.deputyToolbar = new DeputyBar({
-          sceneNode: $rootNode,
+          sceneNode: $sceneNode,
           toolType: barConfig.toolType,
           pageTotal: pageTotal,
           currentPage: pageIndex,
@@ -195,7 +189,7 @@ export class SceneFactory {
    * 3 滚动条
    * @return {[type]} [description]
    */
-  _initMiniBar(pageIndex, pageTotal, $rootNode) {
+  _initMiniBar(pageIndex, pageTotal, $sceneNode) {
 
     //2016.9.29
     //新增页码显示
@@ -219,7 +213,7 @@ export class SceneFactory {
       }
 
       this.miniBar = MiniBar(config.launch.pageBar, {
-        $rootNode: $rootNode,
+        $sceneNode: $sceneNode,
         visualIndex: pageIndex,
         pageTotal: getPageTotal()
       })
@@ -242,20 +236,20 @@ export class SceneFactory {
 
     const {
       isMain,
-      $rootNode,
+      $sceneNode,
       seasonId,
       pageTotal,
       pageIndex
     } = this
 
-    const tempfind = findContainer($rootNode, seasonId, isMain);
+    const tempfind = findContainer($sceneNode, seasonId, isMain);
     const scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
     const scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
 
     //场景容器对象
     const vm = this.vm = new Mediator({
       'pageMode': this.pageMode,
-      'container': this.$rootNode[0],
+      'container': this.$sceneNode[0],
       'hasMultiScene': !isMain,
       'rootPage': scenarioPage,
       'rootMaster': scenarioMaster,
@@ -407,12 +401,10 @@ export class SceneFactory {
       this.isToolbar = null
     }
 
-    this.$container = null
-
     //销毁节点
-    this.$rootNode.off()
-    this.$rootNode.remove()
-    this.$rootNode = null
+    this.$sceneNode.off()
+    this.$sceneNode.remove()
+    this.$sceneNode = null
 
     //销毁引用
     sceneController.remove(this.seasonId)
