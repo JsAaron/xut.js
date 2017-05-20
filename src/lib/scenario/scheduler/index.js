@@ -64,11 +64,11 @@ export default class Scheduler {
     this.$$mediator = $$mediator;
 
     //创建前景页面管理模块
-    this.pageMgr = new PageMgr($$mediator.options.rootPage)
+    this.pageMgr = new PageMgr($$mediator.options.scenePageNode)
 
     //检测是否需要创母版模块
     if (hasMaster()) {
-      this.masterMgr = new MasterMgr($$mediator.options.rootMaster);
+      this.masterMgr = new MasterMgr($$mediator.options.sceneMasterNode);
     }
   }
 

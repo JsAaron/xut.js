@@ -243,16 +243,16 @@ export class SceneFactory {
     } = this
 
     const tempfind = findContainer($sceneNode, seasonId, isMain);
-    const scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
-    const scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
+    const scenePageNode = tempfind('xut-page-container', 'scenarioPage-');
+    const sceneMasterNode = tempfind('xut-master-container', 'scenarioMaster-');
 
     //场景容器对象
     const $$mediator = this.$$mediator = new Mediator({
+      scenePageNode,
+      sceneMasterNode,
       'pageMode': this.pageMode,
       'sceneNode': this.$sceneNode[0],
       'hasMultiScene': !isMain,
-      'rootPage': scenarioPage,
-      'rootMaster': scenarioMaster,
       'initIndex': pageIndex, //保存索引从0开始
       'pageTotal': pageTotal,
       'sectionRang': this.sectionRang,

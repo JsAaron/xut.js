@@ -114,7 +114,7 @@ export function initView() {
      * 如果当前是从主场景加载副场景
      * 关闭系统工具栏
      */
-    if (current && !current.mediator.$hasMultiScene) {
+    if (current && !current.$$mediator.$hasMultiScene) {
       Xut.View.HideToolBar()
     }
 
