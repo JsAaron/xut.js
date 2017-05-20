@@ -32,7 +32,7 @@ export default function (baseProto) {
      * 关闭 false
      * @type {[type]}
      */
-    this.hasMultithread = this.multiplePages ? true : false;
+    this.hasMultithread = this.hasMultiPage ? true : false;
 
     //母版处理
     if (instance.pageType === 'master') {

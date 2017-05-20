@@ -1,5 +1,5 @@
-import { SceneFactory } from '../scenario/scene-factory'
-import { sceneController } from '../scenario/scene-control'
+import { SceneFactory } from '../scenario/index'
+import { sceneController } from '../scenario/factory/control'
 import { showBusy, hideBusy, showTextBusy } from '../initialize/cursor'
 import { toNumber, $remove, $extend, $warn } from '../util/index'
 
@@ -106,15 +106,15 @@ export function initView() {
 
     /**
      * 跳出去
-     * $multiScenario
+     * $hasMultiScene
      * 场景模式
-     * $multiScenario
+     * $hasMultiScene
      *      true  多场景
      *      false 单场景模式
      * 如果当前是从主场景加载副场景
      * 关闭系统工具栏
      */
-    if (current && !current.vm.$multiScenario) {
+    if (current && !current.vm.$hasMultiScene) {
       Xut.View.HideToolBar()
     }
 

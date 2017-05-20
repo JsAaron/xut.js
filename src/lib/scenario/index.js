@@ -1,13 +1,15 @@
 import { config } from '../config/index'
+import Mediator from './mediator/index'
+import { getColumnCount, getColumnChapterCount } from '../component/column/api'
+
 import MainBar from '../toolbar/main-sysbar/index'
 import DeputyBar from '../toolbar/deputy-fnbar'
 import BookBar from '../toolbar/word-bookbar/index'
 import MiniBar from '../toolbar/mini-pagebar/index'
-import { sceneController } from './scene-control'
-import Mediator from './mediator/index'
-import { getColumnCount, getColumnChapterCount } from '../component/column/api'
-import { mainScene, deputyScene } from './scene-layout'
-import { pMainBar, pDeputyBar } from './parse-bar'
+
+import { mainScene, deputyScene } from './factory/layout'
+import { pMainBar, pDeputyBar } from './factory/parse-bar'
+import { sceneController } from './factory/control'
 
 /**
  * 找到对应容器
@@ -59,12 +61,6 @@ const checkHistory = (history) => {
 
 /**
  * 场景创建类
- * @param  {[type]} seasonId               [description]
- * @param  {[type]} chapterId              [description]
- * @param  {[type]} createCompleteCallback [创建完毕通知回调]
- * @param  {[type]} createMode             [创建模式]
- * @param  {[type]} sceneChainId           [场景ID链,用于后退按钮加载前一个场景]
- * @return {[type]}                        [description]
  */
 export class SceneFactory {
 
@@ -73,11 +69,13 @@ export class SceneFactory {
       seasonId,
       chapterId
     } = data
+
     const options = _.extend(this, data, {
       'scenarioId': seasonId,
       'chapterId': chapterId,
       '$container': $('.xut-scene-container')
-    });
+    })
+
     //创建主场景
     this._createHTML(options, () => {
       if (!Xut.IBooks.Enabled) {
@@ -124,7 +122,7 @@ export class SceneFactory {
 
     _.extend(
       this,
-      this._initPageBar(pageIndex, pageTotal, $rootNode, scenarioId)
+      this._initDefaultBar(pageIndex, pageTotal, $rootNode, scenarioId)
     )
 
     this._initMiniBar(pageIndex, pageTotal, $rootNode)
@@ -137,7 +135,7 @@ export class SceneFactory {
    * 2 副场景，函数工具栏
    * @return {[type]} [description]
    */
-  _initPageBar(pageIndex, pageTotal, $rootNode, scenarioId) {
+  _initDefaultBar(pageIndex, pageTotal, $rootNode, scenarioId) {
 
     const findControlBar = function() {
       return $rootNode.find('.xut-control-bar')
@@ -258,7 +256,7 @@ export class SceneFactory {
     const vm = this.vm = new Mediator({
       'pageMode': this.pageMode,
       'container': this.$rootNode[0],
-      'multiScenario': !isMain,
+      'hasMultiScene': !isMain,
       'rootPage': scenarioPage,
       'rootMaster': scenarioMaster,
       'initIndex': pageIndex, //保存索引从0开始

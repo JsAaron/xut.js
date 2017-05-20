@@ -47,8 +47,9 @@ const mixRang = function (pageIndex, start) {
  * visualPageIndex 可见页面chpaterId
  */
 export function converVisualPid(options, chapterIndex, visualPageIndex) {
+
   //转化可视区域值viewPageIndex
-  if (options.multiScenario) {
+  if (options.hasMultiScene) {
     let sectionRang = options.sectionRang;
     //如果传入的是数组数据
     if (!visualPageIndex && _.isArray(chapterIndex)) {
@@ -73,7 +74,7 @@ export function converVisualPid(options, chapterIndex, visualPageIndex) {
 /**
  * 计算初始化页码
  */
-export function initPointer(targetIndex, pageTotal, multiplePages) {
+export function initPointer(targetIndex, pageTotal, hasMultiPage) {
 
   var leftscope = 0,
     initPointer = {},
@@ -95,7 +96,7 @@ export function initPointer(targetIndex, pageTotal, multiplePages) {
   }
 
   //如果只有一页 or  非线性,只创建一个页面
-  if (pageTotal === 1 || !multiplePages) {
+  if (pageTotal === 1 || !hasMultiPage) {
     setValue({
       'middleIndex': targetIndex
     })
@@ -259,7 +260,7 @@ export function converChapterIndex(options, createSinglePage, createDoublePage, 
   //场景加载模式,计算正确的chapter顺序
   //多场景的模式chpater分段后
   //叠加起始段落
-  if (options.multiScenario) {
+  if (options.hasMultiScene) {
     //需要提前解析数据库的排列方式
     //chpater的开始位置
     const start = options.sectionRang.start

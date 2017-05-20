@@ -150,7 +150,7 @@ export default class ColumnClass {
       scope: 'parent', //父容器滑动
       snap: false, //不分段
       hasHook: true,
-      multiplePages: true,
+      hasMultiPage: true,
       stopPropagation: true,
       visualIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
       totalIndex: this.columnCount,

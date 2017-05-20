@@ -6,7 +6,7 @@
  *              构件5种类型
  *
  * *******************************************************************/
-import { sceneController } from '../../scenario/scene-control'
+import { sceneController } from '../../scenario/factory/control'
 import { parseJSON, reviseSize } from '../../util/index'
 import { config } from '../../config/index'
 import pageWidget from './page/index'

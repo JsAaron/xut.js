@@ -92,7 +92,7 @@ export function extendView(vm, access, $globalSwiper) {
       return
     }
 
-    options.multiplePages && $globalSwiper[direction](callback)
+    options.hasMultiPage && $globalSwiper[direction](callback)
   }
 
   /**
@@ -238,7 +238,7 @@ export function extendView(vm, access, $globalSwiper) {
   }) {
 
     //如果禁止翻页模式 || 如果是滑动,不是边界
-    if (!options.multiplePages ||
+    if (!options.hasMultiPage ||
       $globalSwiper.getMoved() ||
       action === 'flipMove' && $globalSwiper.isBorder(distance)) {
       return

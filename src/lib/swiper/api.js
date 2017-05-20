@@ -227,7 +227,7 @@ export default function api(Swiper) {
     switch (targetIndex) {
       //前一页
       case (visualIndex - 1):
-        if (this.options.multiplePages) {
+        if (this.options.hasMultiPage) {
           return this.prev();
         }
         break
@@ -239,7 +239,7 @@ export default function api(Swiper) {
         return
         //后一页
       case (visualIndex + 1):
-        if (this.options.multiplePages) {
+        if (this.options.hasMultiPage) {
           return this.next();
         }
         break

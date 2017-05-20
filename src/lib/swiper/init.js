@@ -97,7 +97,7 @@ export default function init(Swiper) {
     //移动被锁定，不绑定滑动事件
     if (this.options.banMove) {
       //不需要绑定transitionend，会设置手动会触发
-    } else if (this.options.multiplePages) {
+    } else if (this.options.hasMultiPage) {
       callback.move = this
       callback.transitionend = this
     }

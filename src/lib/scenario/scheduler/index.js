@@ -12,7 +12,7 @@ import MasterMgr from '../manage/master'
 import goToPage from './jump-page'
 import Stack from '../../util/stack'
 
-import { sceneController } from '../scene-control'
+import { sceneController } from '../factory/control'
 import { getVisualDistance } from '../v-distance/index'
 import { setCustomStyle } from '../v-style/index'
 import { getVisualMode } from './mode'
@@ -79,7 +79,7 @@ export default class Scheduler {
    */
   initCreate() {
     const options = this.options
-    const pointer = initPointer(options.initIndex, options.pageTotal, options.multiplePages)
+    const pointer = initPointer(options.initIndex, options.pageTotal, options.hasMultiPage)
     this.pagePointer = pointer.initPointer
     this.createPageBase(pointer.createPointer, options.initIndex, 'init', '', '')
   }
@@ -117,7 +117,7 @@ export default class Scheduler {
 
     const self = this
     const options = this.options
-    const multiplePages = options.multiplePages //是否线性
+    const hasMultiPage = options.hasMultiPage //是否线性
     const isToPageAction = action === 'toPage' //如果是跳转
     const isFlipAction = action === 'flipOver' //如果是翻页
 
@@ -275,7 +275,7 @@ export default class Scheduler {
               pageIndex,
               chapterData,
               chapterIndex,
-              multiplePages,
+              hasMultiPage,
               'getStyle': currentStyle
             }, pageIndex, masterFilter, function (shareMaster) {
               if (config.debug.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
@@ -544,7 +544,7 @@ export default class Scheduler {
          * 构建完成通知,用于处理历史缓存记录
          * 如果是调试模式 && 不是收费提示页面 && 多场景应用
          */
-        if (config.launch.historyMode && !options.isInApp && options.multiScenario) {
+        if (config.launch.historyMode && !options.isInApp && options.hasMultiScene) {
           const history = sceneController.sequence(scenarioId, middleIndex)
           if (history) { $set("history", history) }
         }
@@ -603,7 +603,7 @@ export default class Scheduler {
      * 线性结构
      * 保存目录索引
      */
-    if (config.launch && config.launch.historyMode && !options.multiScenario) {
+    if (config.launch && config.launch.historyMode && !options.hasMultiScene) {
       $set("pageIndex", middleIndex);
     }
 
@@ -708,7 +708,7 @@ export default class Scheduler {
     Xut.View.ShowBusy()
 
     //如果是非线性,创建页面修改
-    if (!this.options.multiplePages) {
+    if (!this.options.hasMultiPage) {
       data.create = [data.targetIndex]; //创建
       data.destroy = [data.visualIndex]; //销毁
       data.ruleOut = [data.targetIndex]; //排除已存在
@@ -793,7 +793,7 @@ export default class Scheduler {
 
     //创建完成回调
     this.vm.$emit('change:createComplete', () => {
-      if (this.options.multiScenario) {
+      if (this.options.hasMultiScene) {
         triggerAuto()
       }
       //第一次加载

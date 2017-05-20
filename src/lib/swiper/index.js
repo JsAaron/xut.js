@@ -156,7 +156,7 @@ export default class Swiper extends Observer {
     /*容器高度*/
     visualHeight,
     /*是否有多页面*/
-    multiplePages,
+    hasMultiPage,
     /*section分段拼接*/
     sectionRang
   }) {
@@ -184,7 +184,7 @@ export default class Swiper extends Observer {
       borderBounce,
       stopPropagation,
       preventDefault,
-      multiplePages,
+      hasMultiPage,
       sectionRang
     }
 

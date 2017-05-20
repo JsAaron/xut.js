@@ -1,4 +1,4 @@
-import { sceneController } from './scenario/scene-control'
+import { sceneController } from './scenario/factory/control'
 import { clearAudio } from './component/audio/api'
 import { clearVideo } from './component/video/api'
 import { clearColumnDetection } from './component/column/detect'

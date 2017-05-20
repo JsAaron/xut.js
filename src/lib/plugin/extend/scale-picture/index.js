@@ -2,7 +2,7 @@ import { config } from '../../../config/index'
 import { $warn } from '../../../util/debug'
 import { ScalePan } from '../scale-pan'
 import { $on, $off } from '../../../util/event'
-import { sceneController } from '../../../scenario/scene-control'
+import { sceneController } from '../../../scenario/factory/control'
 import {
   createUnpeatableNumbers,
   createContainerView,
