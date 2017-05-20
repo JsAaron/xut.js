@@ -110,7 +110,6 @@ const getSingle = function ({
     }
     visualPage = direction === 'prev' ? front : back
   }
-
   return [front, middle, back, visualPage]
 }
 

@@ -1,12 +1,80 @@
 import { config } from '../../config/index'
 
+/**
+ * 横版委托
+ * 横版状态下，如果iscroll是Y轴滚动
+ */
+export function delegateScrollX(node, options) {
+
+  _.extend(options, {
+    stopPropagation: true,
+    probeType: 2
+  })
+
+  const iscroll = new iScroll(node, options)
+
+  iscroll.on('scroll', function(e) {
+    /*如果横版滑动了，并且页面允许翻页*/
+    if (iscroll.directionLocked === 'h' && Xut.View.GetSwiperEnabled()) {
+      if (iscroll.distX > 0) {
+        /*prev*/
+        Xut.View.SetSwiperMove({
+          action: 'flipMove',
+          direction: 'prev',
+          distance: iscroll.distX - 10,
+          speed: 0
+        })
+      } else {
+        /*next*/
+        Xut.View.SetSwiperMove({
+          action: 'flipMove',
+          direction: 'next',
+          distance: iscroll.distX + 10,
+          speed: 0
+        })
+      }
+    }
+  })
+
+  iscroll.on('scrollEnd', function(e) {
+    const typeAction = Xut.View.GetSwiperActionType(iscroll.distX, 0, iscroll.endTime - iscroll.startTime, 'h')
+    if (typeAction === 'flipOver') {
+      if (iscroll.distX > 0) {
+        Xut.View.GotoPrevSlide()
+      } else {
+        Xut.View.GotoNextSlide()
+      }
+    } else if (typeAction === 'flipRebound') {
+      if (iscroll.distX > 0) {
+        /*left*/
+        Xut.View.SetSwiperMove({
+          action: 'flipRebound',
+          direction: 'prev',
+          distance: 0,
+          speed: 300
+        })
+      } else {
+        /*right*/
+        Xut.View.SetSwiperMove({
+          action: 'flipRebound',
+          direction: 'next',
+          distance: 0,
+          speed: 300
+        })
+      }
+    }
+  })
+
+  return iscroll
+}
+
 
 /**
  * 竖版委托
  * 上下滑动的时候，可以翻页
  * @return {[type]} [description]
  */
-export function vDelegate(node, options) {
+export function delegateScrollY(node, options) {
 
   _.extend(options, {
     stopPropagation: true,
@@ -34,6 +102,7 @@ export function vDelegate(node, options) {
     if (Xut.View.GetSwiperEnabled()) {
       if (iscroll.directionY === -1 && iscroll.startY === 0) {
         hasBorderRun = true
+          /*top*/
         Xut.View.SetSwiperMove({
           action: 'flipMove',
           direction: 'prev',
@@ -41,6 +110,7 @@ export function vDelegate(node, options) {
           speed: 0
         })
       } else if (iscroll.directionY === 1 && iscroll.startY === iscroll.maxScrollY) {
+        /*down*/
         hasBorderRun = true
         Xut.View.SetSwiperMove({
           action: 'flipMove',
@@ -48,6 +118,12 @@ export function vDelegate(node, options) {
           distance: iscroll.distY + 10,
           speed: 0
         })
+      } else {
+        /**
+         * 新增的接口
+         * 触发边界滑动
+         */
+        iscroll._execEvent('borderMode', e);
       }
     }
   })
@@ -82,86 +158,26 @@ export function vDelegate(node, options) {
   })
 
 
-  return iscroll
-}
-
-
-/**
- * 横版委托
- * @return {[type]} [description]
- */
-export function hDelegate(node, options) {
-
-  _.extend(options, {
-    stopPropagation: true,
-    probeType: 2
-  })
-
-  const iscroll = new iScroll(node, options)
-
-  iscroll.on('scroll', function(e) {
-
-    /*
-    只有横向移动的时候,并且总页面是没有被锁定的，
-    因为多个页面都可能iscoll，每个页面的iscoll都能控制翻页，所以这里要排除
-    */
-    if (this.directionLocked === 'h' && !Xut.Application.hasEnabled()) {
-
-      //减少抖动
-      //算一次有效的滑动
-      //移动距离必须20px才开始移动
-      let xWait = 20
-      if (Math.abs(this.distX) <= xWait) return;
-
-      //需要叠加排除值
-      if (this.distX > 0) {
-        xWait = (-xWait)
-      }
-
-      Xut.View.SetSwiperMove({
-        action: 'flipMove',
-        direction: this.distX > 0 ? 'prev' : 'next',
-        distance: this.distX + xWait,
-        speed: 0
-      })
-    }
-  })
-
-  iscroll.on('scrollEnd', function(e) {
-    if (this.directionLocked === 'h' && this.moved && !Xut.Application.hasEnabled()) {
-      const duration = new Date().getTime() - this.startTime
-      const deltaX = Math.abs(this.distX)
-      const isValidSlide = duration < 200 && deltaX > 30 || deltaX > config.visualSize.width / 6
-        /*判断是翻页，并且不是首位边界页面*/
-      if (isValidSlide && !Xut.View.GetSwpierBorderBounce(this.distX)) {
-        this.distX > 0 ? Xut.View.GotoPrevSlide() : Xut.View.GotoNextSlide()
-      } else {
-        /*反弹*/
-        Xut.View.SetSwiperMove({
-          action: 'flipRebound',
-          direction: this.distX > 0 ? 'prev' : 'next',
-          distance: 0,
-          speed: 300
-        })
-      }
-    }
-  })
 
   return iscroll
 }
+
 
 /*
  封装插件iScroll,代理委托页面滑动处理了
- 1 如果锁住了事件冒泡，那么全局翻页不会触发，这里可能需要处理
- 2 跟踪代码上下滑动会冲突
+ 1 横版模式下，竖版滑动iscroll 不处理，(上下滑动，左右全局翻页)
+ 2 竖版模式下，竖版滑动iscroll 需要处理，竖版边界要翻页
 */
 export function IScroll(node, options, delegate) {
 
   ///////////////////////////////
   /// 竖版禁止上下滑动的冒泡，并且不是强制的横屏滑动模式
   ///////////////////////////////
-  if (delegate && config.launch.displayMode === 'v' && !options.scrollX) {
-    return new vDelegate(node, options)
+  if (delegate && config.launch.displayMode === 'v') {
+    /*如果是竖版滑动，那么就需要代理下，竖版滑动后，上下翻页*/
+    if (!options.scrollX || options.scrollY) {
+      return new delegateScrollY(node, options)
+    }
   }
 
   ///////////////////////////////
@@ -169,9 +185,18 @@ export function IScroll(node, options, delegate) {
   /// 启动代码追踪swipe的情况下
   /// 那么停掉事件冒泡，否则滑动会触发
   ///////////////////////////////
-  if (delegate && config.launch.displayMode === 'h' && config.hasTrackCode('swipe')) {
-    return new hDelegate(node, options)
-  }
+  // if (delegate && config.launch.displayMode === 'h') {
+  /*默认参数：横版，上下滑动, 代理左右*/
+  // if (options.scrollX === undefined && options.scrollY === undefined || options.scrollY === true) {
+  // return new delegateScrollX(node, options)
+  // }
+  // }
+
+  // if (config.hasTrackCode('swipe')) {
+  //   /*启动事件追踪，需要禁止左右默认的左右翻页*/
+  //   options.stopPropagation = true
+  //   return new iScroll(node, options)
+  // }
 
   return new iScroll(node, options)
 

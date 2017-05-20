@@ -3,6 +3,8 @@
 代码修改
 431 this._execEvent('beforeScrollStart',point); 增加point传递
 578 this._execEvent('scrollCancel',point);
+632 增加代码接口
+    this._execEvent('momentum', newY, time, easing);
 
 */
 ;

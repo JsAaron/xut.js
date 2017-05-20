@@ -5,6 +5,9 @@ import { getColumnCount } from './api'
 import { getVisualDistance } from '../../scenario/v-distance/index'
 import { ScalePicture } from '../../plugin/extend/scale-picture/index'
 import { closeButton } from '../../plugin/extend/close-button'
+
+import { delegateScrollY } from '../../plugin/extend/iscroll'
+
 import { analysisImageName, getHDFilePath } from '../../util/option'
 
 import Swiper from '../../swiper/index'
@@ -304,7 +307,7 @@ export default class ColumnClass {
    * 获取卷滚的索引
    * @return {[type]} [description]
    */
-  _getRollIndex(distY, rangeY) {
+  _getScrollYIndex(distY, rangeY) {
     let key, value, pageIndex
     let startY = Math.abs(distY)
     for (let key in rangeY) {
@@ -317,36 +320,15 @@ export default class ColumnClass {
     return Number(pageIndex)
   }
 
+
   /**
-   * 竖版模式下，整体数据滑动
+   * 获取滚动Y轴的坐标分组
+   * 计算出通过坐标模拟分段是区间
    * @return {[type]} [description]
    */
-  _initY() {
-
-    /**************************************
-     *     竖版模式下的分栏处理
-     * ************************************/
-
-    const container = this.$container[0]
-
-    this.columnCount = getColumnCount(this.seasonId, this.chapterId)
-
-    const iscroll = this.iscroll = new iScroll(container, {
-      stopPropagation: true,
-      preventDefault: false,
-      mouseWheel: true,
-      scrollbars: true,
-      bounce: false,
-      probeType: 2
-    })
-
-    /**
-     * 计算出通过坐标模拟分段是区间
-     */
-    const baseY = Math.abs(iscroll.maxScrollY / this.columnCount)
-    let count = this.columnCount
-
-    let pageIndex = 0
+  _getScrollYRang(maxScrollY, columnCount) {
+    const baseY = Math.abs(maxScrollY / columnCount)
+    let count = columnCount
 
     /*获取对比的数据区间值，快速比较*/
     const rangeY = {}
@@ -356,9 +338,32 @@ export default class ColumnClass {
         max: Math.abs((count + 1) * baseY)
       }
     }
+    return rangeY
+  }
 
-    /*从下往上滑动*/
+  /**
+   * 竖版模式下，整体数据滑动
+   * @return {[type]} [description]
+   */
+  _initY() {
+
+    const container = this.$container[0]
+
+    this.columnCount = getColumnCount(this.seasonId, this.chapterId)
+
+    const iscroll = this.iscroll = delegateScrollY(container, {
+      stopPropagation: true,
+      preventDefault: false,
+      mouseWheel: true,
+      scrollbars: true,
+      bounce: false,
+      probeType: 2
+    })
+
+    const rangeY = this._getScrollYRang(iscroll.maxScrollY, this.columnCount)
+
     if (Xut.Presentation.GetPageIndex() > this.initIndex) {
+      /*从下往上滑动,滚动页面设为最大值*/
       iscroll.scrollTo(0, iscroll.maxScrollY)
       this.visualIndex = this.columnCount - 1
     } else {
@@ -366,25 +371,20 @@ export default class ColumnClass {
       this.visualIndex = 0
     }
 
-
-    /*如果是边界翻页*/
-    let hasBorderRun = false
     let hasQrcode
-
     iscroll.on('beforeScrollStart', e => {
-      pageIndex = this._getRollIndex(iscroll.startY, rangeY)
-      hasBorderRun = false
-        /*二维码*/
       hasQrcode = false
       if (swiperHook(e, e.target) === 'qrcode') {
         hasQrcode = true
       }
     })
 
-    /*点击动作*/
+    /*点击动作
+      1. 图片缩放
+      2. 点击媒体，视频音频
+    */
     iscroll.on('scrollCancel', e => {
       const node = e.target;
-      /*图片缩放*/
       if (!hasQrcode) {
         if (node && node.nodeName.toLowerCase() === "img") {
           this._zoomPicture(node)
@@ -393,71 +393,15 @@ export default class ColumnClass {
           Xut.View.Toolbar()
         }
       }
-      /*点击媒体，视频音频*/
       closestMedia(node, this.chapterId, 0)
     })
 
     /**
-     * directionY
-     *   1 向后
-     *   -1 向前
+     * 如果是边界交界处移动
+     * 扩展的API
      */
-    iscroll.on('scroll', e => {
-      /*探测下全局是否可以滑动了*/
-      if (Xut.View.GetSwiperEnabled()) {
-        if (iscroll.directionY === -1 && iscroll.startY === 0) {
-          hasBorderRun = true
-          Xut.View.SetSwiperMove({
-            action: 'flipMove',
-            direction: 'prev',
-            distance: iscroll.distY - 10,
-            speed: 0
-          })
-        } else if (iscroll.directionY === 1 && iscroll.startY === iscroll.maxScrollY) {
-          hasBorderRun = true
-          Xut.View.SetSwiperMove({
-            action: 'flipMove',
-            direction: 'next',
-            distance: iscroll.distY + 10,
-            speed: 0
-          })
-        } else {
-          this._scrollToPage(iscroll.startY, iscroll.directionY, rangeY)
-        }
-      }
-    })
-
-    iscroll.on('scrollEnd', function(e) {
-      if (hasBorderRun) {
-        const typeAction = Xut.View.GetSwiperActionType(0, iscroll.distY, iscroll.endTime - iscroll.startTime, 'v')
-        if (typeAction === 'flipOver') {
-          if (iscroll.directionY === 1) {
-            clearColumnAudio()
-            clearVideo()
-            Xut.View.GotoNextSlide()
-          } else if (iscroll.directionY === -1) {
-            clearColumnAudio()
-            clearVideo()
-            Xut.View.GotoPrevSlide()
-          }
-        } else if (typeAction === 'flipRebound') {
-          if (iscroll.directionY === 1) {
-            Xut.View.SetSwiperMove({
-              action: 'flipRebound',
-              direction: 'next',
-              distance: 0,
-              speed: 300
-            })
-          } else if (iscroll.directionY === -1) {
-            Xut.View.SetSwiperMove({
-              action: 'flipRebound',
-              direction: 'prev',
-              distance: 0,
-              speed: 300
-            })
-          }
-        }
-      }
+    iscroll.on('borderMode', e => {
+      this._scrollToPage(iscroll.startY, iscroll.directionY, rangeY)
     })
 
     /**
@@ -474,7 +418,7 @@ export default class ColumnClass {
    * @return {[type]} [description]
    */
   _scrollToPage(distY, directionY, rangeY, time) {
-    const pageIndex = this._getRollIndex(distY, rangeY);
+    const pageIndex = this._getScrollYIndex(distY, rangeY);
     /*只有页码不一致的时候才更新，并且只更新一次*/
     if (this.visualIndex !== pageIndex) {
       this._updataScrollbars(pageIndex, directionY, time)

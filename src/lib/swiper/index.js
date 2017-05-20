@@ -19,7 +19,7 @@ const ABS = Math.abs
  * 是否多点触发
  * @return {Boolean} [description]
  */
-const hasMultipleTouches = function (e) {
+const hasMultipleTouches = function(e) {
   return e.touches && e.touches.length > 1
 }
 
@@ -297,7 +297,7 @@ export default class Swiper extends Observer {
      * point 事件对象
      * @return {[type]} [description]
      */
-    this.$emit('onFilter', function () {
+    this.$emit('onFilter', function() {
       interrupt = true;
     }, point, e)
 
@@ -315,6 +315,9 @@ export default class Swiper extends Observer {
 
     /*锁定滑动相反方向*/
     this._directionBan = false
+
+    /*滑动方向*/
+    this.orientation = ''
 
     this.distX = 0;
     this.distY = 0;
@@ -353,11 +356,19 @@ export default class Swiper extends Observer {
 
     /*判断锁定横竖版滑动*/
     if (absDistX > absDistY) {
-      this.orientation = 'h'; // lock horizontally
+      /*因为在滑动过程中，
+      用户的手指会偏移方向，
+      所以一次滑动值去一次值
+      比如开始是h滑动，在中途换成v了，但是还是锁定h*/
+      if (!this.orientation) {
+        this.orientation = 'h'
+      }
       $delta = deltaX
       $absDelta = absDistX
     } else if (absDistY >= absDistX) {
-      this.orientation = 'v'; // lock vertically
+      if (!this.orientation) {
+        this.orientation = 'v'
+      }
       $delta = deltaY
       $absDelta = absDistY
     }
