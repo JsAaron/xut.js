@@ -7,14 +7,6 @@ const FLIPSPEED = 600
 export default function slide(Swiper) {
 
 
-  Swiper.prototype.getComputedPosition = function () {
-    let matrix = window.getComputedStyle(this.scroller, null)
-    matrix = matrix[Xut.style.transform].split(')')[0].split(', ');
-    let x = +(matrix[12] || matrix[4]);
-    let y = +(matrix[13] || matrix[5]);
-    return { x, y };
-  }
-
   Swiper.prototype._transitionTime = function (time) {
     time = time || 0;
     var durationProp = Xut.style.transitionDuration;

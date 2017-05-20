@@ -188,10 +188,6 @@ export default class Swiper extends Observer {
       sectionRang
     }
 
-    /*一些默认参数设置*/
-    this.x = 0;
-    this.y = 0;
-
     /**
      * 滑动的方向
      * 横版：prev next (left/right)
@@ -282,14 +278,6 @@ export default class Swiper extends Observer {
       return
     }
 
-    /*如果有惯性运动，停止*/
-    if (this.isInTransition) {
-      this.isInTransition = false;
-      this._transitionTime()
-      const pos = this.getComputedPosition();
-      /*固定新的坐标，并且更新新的xy坐标*/
-      this._translate(Math.round(pos.x), Math.round(pos.y));
-    }
 
     /**
      * 获取观察对象
@@ -321,10 +309,6 @@ export default class Swiper extends Observer {
 
     this.distX = 0;
     this.distY = 0;
-
-    /*_translate更细后，重新赋值*/
-    this.startX = this.x;
-    this.startY = this.y;
 
     this.pointX = point.pageX;
     this.pointY = point.pageY;
@@ -425,10 +409,6 @@ export default class Swiper extends Observer {
       deltaDist = (-deltaDist)
     }
 
-    if (this.options.scrollerMode) {
-      /*滚动页面*/
-      this._translate(0, this.distY)
-    }
 
     //是否无效函数
     //如果无效，end方法抛弃掉
@@ -515,27 +495,6 @@ export default class Swiper extends Observer {
       }
       this._setRestore()
       return
-    }
-
-
-    /**
-     * 竖版情况下，是滚动页面
-     * 启动滑动滚性,必须有300以上的触碰时间*
-     */
-    if (this.options.scrollerMode && this.options.momentum && duration < 300) {
-      let momentumY = momentum(this.distY, 0, duration, this.maxScrollY, this.wrapperHeight)
-      console.log(momentumY)
-      this.isInTransition = 1; //标记惯性正在滑动
-      let newY = momentumY.destination;
-      let easing
-      if (newY != this.distY) {
-        // 当上卷超出界限,改变宽松的功能
-        if (newY > 0 || newY < this.maxScrollY) {
-          easing = ease.quadratic;
-        }
-        this.scrollTo(newY, momentumY.duration, easing);
-        return;
-      }
     }
 
     /**
