@@ -7,7 +7,10 @@ export default class MiniSuper {
 
   constructor(pageBar, options) {
     /*$rootNode, pageTotal, visualIndex*/
-    _.extend(this, pageBar, options)
+    this.pageBar = pageBar
+    for (let key in options) {
+      this[key] = options[key]
+    }
   }
 
   /**
@@ -16,12 +19,15 @@ export default class MiniSuper {
    */
   $$template() {
     this._parseBar && this._parseBar()
-    this.$container = $(String.styleFormat(this._createDom()))
-    this._getNode()
-    this.status = true
-    Xut.nextTick(() => {
-      this.$rootNode.append(this.$container)
-    })
+    const html = this._createHTML()
+    if (html) {
+      this.$container = $(String.styleFormat(html))
+      this._getContextNode()
+      this.status = true
+      Xut.nextTick(() => {
+        this._render()
+      })
+    }
   }
 
   _$$showlBar() {

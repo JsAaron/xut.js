@@ -11,11 +11,11 @@ export default class Scrollbar extends MiniSuper {
     this.$$template()
   }
 
-  _getNode() {
+  _getContextNode() {
 
   }
 
-  _createDom() {
+  _createHTML() {
 
   }
 

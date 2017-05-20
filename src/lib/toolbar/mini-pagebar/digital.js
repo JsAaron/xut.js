@@ -7,16 +7,11 @@ import { config } from '../../config/index'
  */
 export default class Digital extends MiniSuper {
   constructor(pageBar, options) {
-    super(pageBar,options)
+    super(pageBar, options)
     this.$$template()
   }
 
-  _getNode() {
-    this.$currtNode = this.$container.find('div:first')
-    this.$allNode = this.$container.find('div:last')
-  }
-
-  _createDom() {
+  _createHTML() {
     //存在模式3的情况，所以页码要处理溢出的情况。left值
     let right = 0
     if (config.visualSize.overflowWidth) {
@@ -27,6 +22,15 @@ export default class Digital extends MiniSuper {
                   <strong>/</strong>
                   <div>${this.pageTotal}</div>
             </div>`
+  }
+
+  _getContextNode() {
+    this.$currtNode = this.$container.find('div:first')
+    this.$allNode = this.$container.find('div:last')
+  }
+
+  _render() {
+    this.$rootNode.append(this.$container)
   }
 
   toggle(state, pointer) {
@@ -57,7 +61,7 @@ export default class Digital extends MiniSuper {
   /**
    * 更新页码
    */
-  updatePointer(...arg){
+  updatePointer(...arg) {
     this.$$updatePointer(...arg)
   }
 

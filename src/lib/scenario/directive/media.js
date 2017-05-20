@@ -1,4 +1,4 @@
-import { parseJSON, getFileFullPath } from '../../util/index'
+import { parseJSON, getFileFullPath,titleCase } from '../../util/index'
 import { config } from '../../config/index'
 import { triggerAudio, autoAudio, getMediaData, hasHotAudioPlay } from '../../component/audio/api'
 import { triggerVideo, autoVideo } from '../../component/video/api'
@@ -128,7 +128,7 @@ export default {
     }
 
     //首字母大写
-    const mediaType = category.replace(/(\w)/, v => v.toUpperCase())
+    const mediaType = titleCase(category)
 
     /*默认状态*/
     let imageBackground = stopImage || startImage

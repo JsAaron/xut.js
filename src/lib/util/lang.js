@@ -28,6 +28,16 @@ export function defAccess(obj, key, access) {
 }
 
 /**
+ * 首字母大写
+ * @return {[type]} [description]
+ *  string.charAt(0).toUpperCase() + string.slice(1);
+ */
+export function titleCase(category) {
+  return category.replace(/(\w)/, v => v.toUpperCase())
+}
+
+
+/**
  * 判断存在
  */
 export function hasIndexOf(para, value) {

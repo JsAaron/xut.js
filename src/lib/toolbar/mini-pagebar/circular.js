@@ -27,8 +27,6 @@ export default class Circular extends MiniSuper {
    */
   _parseBar() {
     const pageBar = this.pageBar;
-    //圆点模式
-    this.dotTrue = pageBar.type;
     //圆点模式样式
     this.dotStyle = Number(pageBar.mode) || 1;
     //样式
@@ -55,11 +53,7 @@ export default class Circular extends MiniSuper {
     }
   }
 
-  _getNode() {
-    this.$currtNode = this.$container.find('span:first')
-  }
-
-  _createDom() {
+  _createHTML() {
     let dotString = ''
     let countPage = this.pageTotal
     while (countPage--) {
@@ -67,6 +61,15 @@ export default class Circular extends MiniSuper {
     }
     return `<div class="xut-page-number"style="${this.position};">${dotString}</div>`
   }
+
+  _getContextNode() {
+    this.$currtNode = this.$container.find('span:first')
+  }
+
+  _render() {
+    this.$rootNode.append(this.$container)
+  }
+
 
   toggle(state, pointer) {
     this.$$toggle()
