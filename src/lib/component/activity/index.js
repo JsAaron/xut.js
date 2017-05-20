@@ -21,14 +21,14 @@ import { hasAudioes } from '../audio/fix'
 import { destroyContentEvent } from './event/event'
 import createContent from './content/content-scope'
 import createTask from './task-check'
-import IScroll from '../../plugin/extend/iscroll'
+import { IScroll } from '../../plugin/extend/iscroll'
 
 /**
  * 处理拖动对象
  * @return {[type]} [description]
  */
 function accessDrop(eventData, callback) {
-  if(eventData && eventData.dragDrop) {
+  if (eventData && eventData.dragDrop) {
     callback(eventData.dragDrop)
   }
 }
@@ -106,7 +106,7 @@ export default class Activity {
      * @param  {[type]} this.nextTask.context.length()
      * @return {[type]}
      */
-    if(this.nextTask.context.length()) {
+    if (this.nextTask.context.length()) {
       this.nextTask.context.wait = true;
       return this;
     }
@@ -136,7 +136,7 @@ export default class Activity {
       const $contentNode = scope.$contentNode
 
       //如果是视觉差对象，也需要实现收集器
-      if(scope.processType === 'parallax') {
+      if (scope.processType === 'parallax') {
         collectorHooks(scope.chapterIndex, scope.id, scope);
         return;
       }
@@ -161,7 +161,7 @@ export default class Activity {
 
     //过滤重复关系
     //每个元素只绑定一次
-    if(-1 !== indexOf) {
+    if (-1 !== indexOf) {
       relatedData.createContentIds.splice(indexOf, 1); //删除,去重
       collectorHooks(scope.chapterIndex, id, scope); //收集每一个content注册
       this._iscrollBind(scope, $contentNode); //增加翻页特性
@@ -190,7 +190,7 @@ export default class Activity {
       //元素隐藏状态下，绑定iScroll获取高度是有问题
       //所以这里需要补丁方式修正一下
       //让其不可见，但是可以获取高度
-      if(visible == 'hidden') {
+      if (visible == 'hidden') {
         let opacity = $parentNode.css('opacity')
         let setStyle = function(key, value) {
           arguments.length > 1 ? $parentNode.css(key, value) : $parentNode.css(key)
@@ -198,7 +198,7 @@ export default class Activity {
 
         //如果设置了不透明,则简单设为可见的
         //否则先设为不透明,再设为可见
-        if(opacity == 0) {
+        if (opacity == 0) {
           setStyle('visibility', 'visible')
           resetStyle = () => setStyle('visibility', visible)
         } else {
@@ -238,11 +238,11 @@ export default class Activity {
 
     //增加卷滚条标记
     //但是svg如果没有内容除外
-    if(contentData.isScroll) {
+    if (contentData.isScroll) {
       const hasSVG = $contentNode.find('svg')
-      if(hasSVG) {
+      if (hasSVG) {
         //必须保证svg有数据
-        if(hasSVG.text()) {
+        if (hasSVG.text()) {
           bind()
         }
       } else {
@@ -252,7 +252,7 @@ export default class Activity {
     }
 
     //如果是图片则补尝允许范围内的高度
-    if(!contentData.mask || !contentData.isGif) {
+    if (!contentData.mask || !contentData.isGif) {
       $contentNode.find && $contentNode.find('img').css({
         'height': contentData.scaleHeight
       });
@@ -282,15 +282,15 @@ export default class Activity {
 
     //dom模式
     contentsFragment = this.relatedData.contentsFragment;
-    if(node = (contentsFragment[prefix])) {
+    if (node = (contentsFragment[prefix])) {
       $node = $(node)
     } else {
       //容器处理
-      if(containerPrefix = this.relatedData.containerPrefix) {
+      if (containerPrefix = this.relatedData.containerPrefix) {
         _.each(containerPrefix, function(containerName) {
           node = contentsFragment[containerName];
           $node = $(node).find('#' + prefix);
-          if($node.length) {
+          if ($node.length) {
             return
           }
         })
@@ -326,29 +326,29 @@ export default class Activity {
     var scenarioInfo, eventContentId
 
     //触发事件的content id
-    if(this.eventData) {
+    if (this.eventData) {
       eventContentId = this.eventData.eventContentId;
     }
 
-    if(eventContentId) {
+    if (eventContentId) {
 
       //查找出当前节的所有信息
-      if(scenarioInfo = this.relatedData.seasonRelated[eventContentId]) {
+      if (scenarioInfo = this.relatedData.seasonRelated[eventContentId]) {
 
         //如果存在搜索栏触发
-        if(scenarioInfo.SearchBar) {
+        if (scenarioInfo.SearchBar) {
           this.createSearchBar();
           return;
         }
 
         //如果存在书签
-        if(scenarioInfo.BookMarks) {
+        if (scenarioInfo.BookMarks) {
           this.createBookMark();
           return;
         }
 
         //处理新的场景
-        if(scenarioInfo.seasonId || scenarioInfo.chapterId) {
+        if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
           setTimeout(function() {
             Xut.View.LoadScenario({
               'seasonId': scenarioInfo.seasonId,
@@ -384,19 +384,19 @@ export default class Activity {
     let self = this
     let pageId = this.relatedData.pageId
 
-    if(evenyClick) {
+    if (evenyClick) {
       this.preventRepeat = false;
     }
 
     //防止重复点击
-    if(this.preventRepeat) {
+    if (this.preventRepeat) {
       return false;
     }
 
     this.preventRepeat = true;
 
     //如果没有运行动画
-    if(!this.dataset.animation) {
+    if (!this.dataset.animation) {
       this.preventRepeat = false;
       this._relevantOperation();
       return;
@@ -417,14 +417,14 @@ export default class Activity {
         //需要关闭这些动画
         let closeAnim = (pageId != Xut.Presentation.GetPageId());
 
-        if(closeAnim && scope) {
+        if (closeAnim && scope) {
           scope.stop && scope.stop(pageId);
           scope.reset && scope.reset();
         }
 
         //捕获动画状态
-        if(counts === 1) {
-          if(closeAnim) {
+        if (counts === 1) {
+          if (closeAnim) {
             //复位动画
             self._resetAloneAnim();
           }
@@ -492,7 +492,7 @@ export default class Activity {
    */
   autoPlay(outComplete) {
     var eventData = this.eventData;
-    if(eventData && eventData.eventName === 'auto') {
+    if (eventData && eventData.eventName === 'auto') {
       this.runAnimation(outComplete);
     } else {
       outComplete();
@@ -517,13 +517,13 @@ export default class Activity {
    * @return {[type]} [description]
    */
   stop() {
-    if(this.runState) {
+    if (this.runState) {
       this.stopAnimation();
     }
     this.preventRepeat = false
 
     //复位盒子
-    if(this.htmlBoxInstance.length) {
+    if (this.htmlBoxInstance.length) {
       _.each(this.htmlBoxInstance, function(instance) {
         instance.removeBox();
       })
@@ -532,7 +532,7 @@ export default class Activity {
     //修复妙妙客户端
     //没有点击音频结束的回调
     //最多允许播放5秒
-    if(this._fixAudio.length) {
+    if (this._fixAudio.length) {
       _.each(this._fixAudio, function(instance) {
         setTimeout(function() {
           instance.end();
@@ -549,7 +549,7 @@ export default class Activity {
   destroy(elementCallback) {
 
     //销毁绑定事件
-    if(this.eventData.eventContext) {
+    if (this.eventData.eventContext) {
       destroyContentEvent(this.eventData);
       this.eventData.eventContext = null;
     }
@@ -558,7 +558,7 @@ export default class Activity {
     //如果有文本框事件
     //一个activity允许有多个文本框
     //所以是数组索引
-    if(this.htmlBoxInstance.length) {
+    if (this.htmlBoxInstance.length) {
       _.each(this.htmlBoxInstance, function(instance) {
         instance.destroy();
       })
@@ -570,28 +570,28 @@ export default class Activity {
     this._contentGroup = null
 
     //iscroll销毁
-    if(this.iscroll) {
+    if (this.iscroll) {
       this.iscroll.destroy();
       this.iscroll = null;
     }
 
     //销毁搜索框
-    if(this.searchBar) {
+    if (this.searchBar) {
       this.searchBar.destroy();
       this.searchBar = null;
     }
 
     //销毁书签
-    if(this.bookMark) {
+    if (this.bookMark) {
       this.bookMark.destroy();
       this.bookMark = null;
     }
 
     //如果有点击音频
-    if(Object.keys(this._cacheBehaviorAudio).length) {
-      for(let key in this._cacheBehaviorAudio) {
+    if (Object.keys(this._cacheBehaviorAudio).length) {
+      for (let key in this._cacheBehaviorAudio) {
         let audio = this._cacheBehaviorAudio[key]
-        if(audio) {
+        if (audio) {
           audio.end()
           this._cacheBehaviorAudio[key] = null
         }

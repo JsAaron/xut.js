@@ -1,16 +1,106 @@
 import { config } from '../../config/index'
 
+
+/**
+ * 竖版委托
+ * 上下滑动的时候，可以翻页
+ * @return {[type]} [description]
+ */
+export function vDelegate(node, options) {
+
+  _.extend(options, {
+    stopPropagation: true,
+    preventDefault: false,
+    scrollbars: true,
+    bounce: false,
+    probeType: 2
+  })
+
+  const iscroll = new iScroll(node, options)
+
+  /*如果是边界翻页*/
+  let hasBorderRun = false
+  iscroll.on('beforeScrollStart', e => {
+    hasBorderRun = false
+  })
+
+  /**
+   * directionY
+   *   1 向后
+   *   -1 向前
+   */
+  iscroll.on('scroll', e => {
+    /*探测下全局是否可以滑动了*/
+    if (Xut.View.GetSwiperEnabled()) {
+      if (iscroll.directionY === -1 && iscroll.startY === 0) {
+        hasBorderRun = true
+        Xut.View.SetSwiperMove({
+          action: 'flipMove',
+          direction: 'prev',
+          distance: iscroll.distY - 10,
+          speed: 0
+        })
+      } else if (iscroll.directionY === 1 && iscroll.startY === iscroll.maxScrollY) {
+        hasBorderRun = true
+        Xut.View.SetSwiperMove({
+          action: 'flipMove',
+          direction: 'next',
+          distance: iscroll.distY + 10,
+          speed: 0
+        })
+      }
+    }
+  })
+
+  iscroll.on('scrollEnd', function(e) {
+    if (hasBorderRun) {
+      const typeAction = Xut.View.GetSwiperActionType(0, iscroll.distY, iscroll.endTime - iscroll.startTime, 'v')
+      if (typeAction === 'flipOver') {
+        if (iscroll.directionY === 1) {
+          Xut.View.GotoNextSlide()
+        } else if (iscroll.directionY === -1) {
+          Xut.View.GotoPrevSlide()
+        }
+      } else if (typeAction === 'flipRebound') {
+        if (iscroll.directionY === 1) {
+          Xut.View.SetSwiperMove({
+            action: 'flipRebound',
+            direction: 'next',
+            distance: 0,
+            speed: 300
+          })
+        } else if (iscroll.directionY === -1) {
+          Xut.View.SetSwiperMove({
+            action: 'flipRebound',
+            direction: 'prev',
+            distance: 0,
+            speed: 300
+          })
+        }
+      }
+    }
+  })
+
+
+  return iscroll
+}
+
+
 /*
  封装插件iScroll,代理委托页面滑动处理了
  1 如果锁住了事件冒泡，那么全局翻页不会触发，这里可能需要处理
  2 跟踪代码上下滑动会冲突
 */
-export default function IScroll(node, options, delegate) {
+export function IScroll(node, options, delegate) {
 
-  /*竖版禁止上下滑动的冒泡,并且不是强制的横屏滑动模式*/
-  if (config.launch.displayMode === 'v' && !options.scrollX) {
+  ///////////////////////////////
+  /// 竖版禁止上下滑动的冒泡，并且不是强制的横屏滑动模式
+  ///////////////////////////////
+  if (config.launch.displayMode === 'v' && !options.scrollX && delegate) {
     options.stopPropagation = true
+    return new vDelegate(node, options)
   }
+
 
   ///////////////////////////////
   /// 启动委托

@@ -1,7 +1,7 @@
 import BookMark from './mark'
 import { parseJSON } from '../../util/index'
 import { $on, $off, $handle, $target } from '../../util/event'
-import IScroll from '../../plugin/extend/iscroll'
+import { IScroll } from '../../plugin/extend/iscroll'
 import BarSuper from '../super'
 /**
  * 阅读模式工具栏

@@ -410,7 +410,7 @@ export default class ColumnClass {
           Xut.View.SetSwiperMove({
             action: 'flipMove',
             direction: 'prev',
-            distance: this.distY - 10,
+            distance: iscroll.distY - 10,
             speed: 0
           })
         } else if (iscroll.directionY === 1 && iscroll.startY === iscroll.maxScrollY) {
@@ -418,7 +418,7 @@ export default class ColumnClass {
           Xut.View.SetSwiperMove({
             action: 'flipMove',
             direction: 'next',
-            distance: this.distY + 10,
+            distance: iscroll.distY + 10,
             speed: 0
           })
         } else {

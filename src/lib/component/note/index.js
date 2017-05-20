@@ -1,4 +1,4 @@
-import IScroll from '../../plugin/extend/iscroll'
+import { IScroll } from '../../plugin/extend/iscroll'
 import { config } from '../../config/index'
 
 /**
