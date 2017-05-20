@@ -75,7 +75,7 @@ export function extendView(vm, access, $globalSwiper) {
 
     if (seasonId && chapterId) {
       Xut.View.LoadScenario({
-        'scenarioId': seasonId,
+        'seasonId': seasonId,
         'chapterId': chapterId
       }, callback)
       return;
@@ -196,7 +196,7 @@ export function extendView(vm, access, $globalSwiper) {
     }
 
     //场景模式内部跳转
-    if (options.scenarioId == seasonId) {
+    if (options.seasonId == seasonId) {
       //chpaterId 转化成实际页码
       var sectionRang = Xut.data.query('sectionRelated', seasonId)
       var pageIndex = chapterId - sectionRang.start
@@ -206,7 +206,7 @@ export function extendView(vm, access, $globalSwiper) {
 
     //场景与场景的跳转
     return Xut.View.LoadScenario({
-      'scenarioId': seasonId,
+      'seasonId': seasonId,
       'chapterId': chapterId
     })
   }

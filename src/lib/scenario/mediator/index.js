@@ -37,10 +37,11 @@ const configMultiple = (options) => {
         options.hasMultiPage = true
       }
     } else {
-      //判断多页面情况
-      options.hasMultiPage = true
       if (pageMode === 0) { //如果工具栏强制禁止滑动
         options.hasMultiPage = false
+      } else {
+        /*判断多页面情况*/
+        options.hasMultiPage = true
       }
     }
   }

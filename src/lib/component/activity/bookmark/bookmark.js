@@ -231,7 +231,7 @@ BookMark.prototype.goBookMark = function(target) {
   }
 
   Xut.View.LoadScenario({
-    'scenarioId': seasonId,
+    'seasonId': seasonId,
     'chapterId': pageId
   })
 

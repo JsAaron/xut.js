@@ -53,14 +53,14 @@ export default function (options) {
   //应用脚本注入
   runScript();
 
-  //检测下scenarioId的正确性
-  //scenarioId = 1 找不到chapter数据
+  //检测下seasonId的正确性
+  //seasonId = 1 找不到chapter数据
   //通过sectionRelated递归检测下一条数据
-  let scenarioId, seasondata, i;
+  let seasonId, seasondata, i;
   for (i = 0; i < Xut.data.Season.length; i++) {
     seasondata = Xut.data.Season.item(i)
     if (Xut.data.query('sectionRelated', seasondata._id)) {
-      scenarioId = seasondata._id
+      seasonId = seasondata._id
       break;
     }
   }
@@ -68,7 +68,7 @@ export default function (options) {
   //加载新的场景
   Xut.View.LoadScenario({
     'main': true, //主场景入口
-    'scenarioId': scenarioId,
+    'seasonId': seasonId,
     'pageIndex': options.pageIndex,
     'history': options.history
   }, function () {

@@ -276,7 +276,7 @@ export default class Mark {
     }
 
     Xut.View.LoadScenario({
-      'scenarioId': seasonId,
+      'seasonId': seasonId,
       'chapterId': pageId
     })
 

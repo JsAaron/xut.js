@@ -257,7 +257,7 @@ export default class PageMgr extends ManageSuper {
       if (Xut.style.noMaskBoxImage) { addEdges() }
 
       /*构建完成通知*/
-      data.buildComplete(activatePageObj.scenarioId);
+      data.buildComplete(activatePageObj.seasonId);
 
       /*执行自动动作之前的脚本*/
       runScript(activatePageObj, 'preCode');

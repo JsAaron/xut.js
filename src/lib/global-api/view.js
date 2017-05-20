@@ -21,12 +21,12 @@ export function initView() {
   /**
    * 关闭场景
    */
-  Xut.View.CloseScenario = function () {
+  Xut.View.CloseScenario = function() {
     if (repeatClick) return;
     repeatClick = true;
     var serial = sceneController.takeOutPrevChainId();
     Xut.View.LoadScenario({
-      'scenarioId': serial.scenarioId,
+      'seasonId': serial.seasonId,
       'chapterId': serial.chapterId,
       'createMode': 'sysClose'
     }, () => {
@@ -44,9 +44,9 @@ export function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  Xut.View.LoadScenario = function (options, callback) {
+  Xut.View.LoadScenario = function(options, callback) {
 
-    let seasonId = toNumber(options.scenarioId)
+    let seasonId = toNumber(options.seasonId)
     let chapterId = toNumber(options.chapterId)
     let pageIndex = toNumber(options.pageIndex)
     let createMode = options.createMode
@@ -63,7 +63,7 @@ export function initView() {
 
     /*获取到当前的页面对象,用于跳转去重复*/
     const curVmPage = current && current.vm && current.vm.$curVmPage
-    if (curVmPage && curVmPage.scenarioId == seasonId && curVmPage.chapterId == chapterId) {
+    if (curVmPage && curVmPage.seasonId == seasonId && curVmPage.chapterId == chapterId) {
       $warn(`重复触发页面加载:seasonId:${seasonId},chapterId:${chapterId}`, 'warn')
       return
     }
@@ -77,7 +77,7 @@ export function initView() {
      * 用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
      * @return {[type]}            [description]
      */
-    if (userAssign && current && current.scenarioId === seasonId) {
+    if (userAssign && current && current.seasonId === seasonId) {
       Xut.View.GotoSlide(seasonId, chapterId)
       return
     }
@@ -121,7 +121,7 @@ export function initView() {
     /*重写场景的顺序编号,用于记录场景最后记录*/
     let pageId;
     if (current && (pageId = Xut.Presentation.GetPageId())) {
-      sceneController.rewrite(current.scenarioId, pageId);
+      sceneController.rewrite(current.seasonId, pageId);
     }
 
     /*场景信息*/
@@ -187,14 +187,14 @@ export function initView() {
   /**
    * 通过插件打开一个新view窗口
    */
-  Xut.View.Open = function (pageUrl, width, height, left, top) {
+  Xut.View.Open = function(pageUrl, width, height, left, top) {
     Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
   }
 
   /**
    * 关闭view窗口
    */
-  Xut.View.Close = function () {
+  Xut.View.Close = function() {
     Xut.Plugin.WebView.close();
   }
 

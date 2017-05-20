@@ -413,7 +413,7 @@ export default class BookBar extends BarSuper {
     if(data) {
       data = data.split('-');
       Xut.View.LoadScenario({
-        'scenarioId': data[0],
+        'seasonId': data[0],
         'chapterId': data[1]
       })
     }

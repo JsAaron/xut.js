@@ -45,11 +45,11 @@ const parseTooBar = (toolbar, toolType, pageMode) => {
 /**
  * 主场景工具栏配置
  * pageMode:默认2 允许滑动,带翻页按钮
- * @param  {[type]} scenarioId [description]
+ * @param  {[type]} seasonId [description]
  * @return {[type]}            [description]
  */
-export function pMainBar(scenarioId) {
-  let sectionRang = Xut.data.query('sectionRelated', scenarioId)
+export function pMainBar(seasonId) {
+  let sectionRang = Xut.data.query('sectionRelated', seasonId)
 
   //场景工具栏配置信息
   let toolBar = sectionRang.toolbar

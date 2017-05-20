@@ -15,13 +15,13 @@ import { sceneController } from './factory/control'
  * 找到对应容器
  * @return {[type]}            [description]
  */
-const findContainer = ($rootNode, scenarioId, isMain) => {
+const findContainer = ($rootNode, id, isMain) => {
   return function(pane, parallax) {
     var node;
     if (isMain) {
       node = '#' + pane;
     } else {
-      node = '#' + parallax + scenarioId;
+      node = '#' + parallax + id;
     }
     return $rootNode.find(node)[0];
   }
@@ -47,7 +47,7 @@ const checkHistory = (history) => {
     if (scenarioInfo) {
       scenarioInfo = scenarioInfo.split('-');
       Xut.View.LoadScenario({
-        'scenarioId': scenarioInfo[0],
+        'seasonId': scenarioInfo[0],
         'chapterId': scenarioInfo[1],
         'pageIndex': scenarioInfo[2]
       })
@@ -71,7 +71,7 @@ export class SceneFactory {
     } = data
 
     const options = _.extend(this, data, {
-      'scenarioId': seasonId,
+      'seasonId': seasonId,
       'chapterId': chapterId,
       '$container': $('.xut-scene-container')
     })
@@ -100,7 +100,7 @@ export class SceneFactory {
       callback()
       return;
     }
-    this.$rootNode = $(options.isMain ? mainScene() : deputyScene(this.scenarioId))
+    this.$rootNode = $(options.isMain ? mainScene() : deputyScene(this.seasonId))
     Xut.nextTick({
       'container': this.$container,
       'content': this.$rootNode
@@ -114,7 +114,7 @@ export class SceneFactory {
    */
   _initToolBar() {
     const {
-      scenarioId,
+      seasonId,
       pageTotal,
       pageIndex,
       $rootNode
@@ -122,7 +122,7 @@ export class SceneFactory {
 
     _.extend(
       this,
-      this._initDefaultBar(pageIndex, pageTotal, $rootNode, scenarioId)
+      this._initDefaultBar(pageIndex, pageTotal, $rootNode, seasonId)
     )
 
     this._initMiniBar(pageIndex, pageTotal, $rootNode)
@@ -135,7 +135,7 @@ export class SceneFactory {
    * 2 副场景，函数工具栏
    * @return {[type]} [description]
    */
-  _initDefaultBar(pageIndex, pageTotal, $rootNode, scenarioId) {
+  _initDefaultBar(pageIndex, pageTotal, $rootNode, seasonId) {
 
     const findControlBar = function() {
       return $rootNode.find('.xut-control-bar')
@@ -146,7 +146,7 @@ export class SceneFactory {
 
     //主场景工具栏设置
     if (this.isMain) {
-      barConfig = pMainBar(scenarioId, pageTotal)
+      barConfig = pMainBar(seasonId, pageTotal)
       if (config.launch.visualMode === 4) {
         //word模式,自动启动工具条
         // this.mainToolbar = new BookBar({
@@ -243,12 +243,12 @@ export class SceneFactory {
     const {
       isMain,
       $rootNode,
-      scenarioId,
+      seasonId,
       pageTotal,
       pageIndex
     } = this
 
-    const tempfind = findContainer($rootNode, scenarioId, isMain);
+    const tempfind = findContainer($rootNode, seasonId, isMain);
     const scenarioPage = tempfind('xut-page-container', 'scenarioPage-');
     const scenarioMaster = tempfind('xut-master-container', 'scenarioMaster-');
 
@@ -262,7 +262,7 @@ export class SceneFactory {
       'initIndex': pageIndex, //保存索引从0开始
       'pageTotal': pageTotal,
       'sectionRang': this.sectionRang,
-      'scenarioId': scenarioId,
+      'seasonId': seasonId,
       'chapterId': this.chapterId,
       'isInApp': this.isInApp //提示页面
     });
@@ -415,6 +415,6 @@ export class SceneFactory {
     this.$rootNode = null
 
     //销毁引用
-    sceneController.remove(this.scenarioId)
+    sceneController.remove(this.seasonId)
   }
 }

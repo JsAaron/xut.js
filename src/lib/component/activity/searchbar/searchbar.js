@@ -130,7 +130,7 @@ SearchBar.prototype.searchLink = function(target) {
     pageId = mark[1];
 
   Xut.View.LoadScenario({
-    'scenarioId': seasonId,
+    'seasonId': seasonId,
     'chapterId': pageId
   })
 }

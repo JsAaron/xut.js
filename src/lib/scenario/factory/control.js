@@ -34,16 +34,16 @@ export const sceneController = {
 
   /**
    * 设置一个新场景
-   * @param {[type]} scenarioId [description]
+   * @param {[type]} seasonId [description]
    * @param {[type]} relevant   [description]
    * @param {[type]} sceneObj   [description]
    */
-  add(scenarioId, relevant, sceneObj) {
-    sceneCollection.scenarioStack.push(scenarioId);
-    sceneCollection['scenarioId->' + scenarioId] = sceneObj;
+  add(seasonId, relevant, sceneObj) {
+    sceneCollection.scenarioStack.push(seasonId);
+    sceneCollection['seasonId->' + seasonId] = sceneObj;
     //场景链表,拥挤记录场景的加载上一页
     sceneCollection.scenarioChain.push({
-      'scenarioId': scenarioId,
+      'seasonId': seasonId,
       'chapterId': relevant
     })
     return sceneObj;
@@ -79,7 +79,7 @@ export const sceneController = {
     }
 
     //往回跳一级
-    if(last['scenarioId'] == seasonId) {
+    if(last['seasonId'] == seasonId) {
       this.takeOutPrevChainId();
     }
 
@@ -96,38 +96,38 @@ export const sceneController = {
    * 返回活动对象
    * @return {[type]} [description]
    */
-  containerObj(scenarioId) {
-    if(scenarioId === 'current') {
+  containerObj(seasonId) {
+    if(seasonId === 'current') {
       var scenarioStack = sceneCollection.scenarioStack;
-      scenarioId = scenarioStack[scenarioStack.length - 1];
+      seasonId = scenarioStack[scenarioStack.length - 1];
     }
-    return sceneCollection['scenarioId->' + scenarioId];
+    return sceneCollection['seasonId->' + seasonId];
   },
 
 
   /**
    * 找到索引位置的Id
-   * @param  {[type]} scenarioId [description]
+   * @param  {[type]} seasonId [description]
    * @return {[type]}            [description]
    */
-  findIndexOfId(scenarioId) {
-    return sceneCollection.scenarioStack.lastIndexOf(scenarioId);
+  findIndexOfId(seasonId) {
+    return sceneCollection.scenarioStack.lastIndexOf(seasonId);
   },
 
 
   /**
    * 删除指定场景引用
-   * @param  {[type]} scenarioId [description]
+   * @param  {[type]} seasonId [description]
    * @return {[type]}            [description]
    */
-  remove(scenarioId) {
-    var indexOf = this.findIndexOfId(scenarioId)
+  remove(seasonId) {
+    var indexOf = this.findIndexOfId(seasonId)
 
     //删除索引
     sceneCollection.scenarioStack.splice(indexOf, 1)
 
     //删除场景对象区域
-    delete sceneCollection['scenarioId->' + scenarioId];
+    delete sceneCollection['seasonId->' + seasonId];
   },
 
 
@@ -137,8 +137,8 @@ export const sceneController = {
    */
   destroyAllScene() {
     var cache = _.clone(sceneCollection.scenarioStack);
-    _.each(cache, function(scenarioId) {
-      sceneCollection['scenarioId->' + scenarioId].destroy();
+    _.each(cache, function(seasonId) {
+      sceneCollection['seasonId->' + seasonId].destroy();
     });
     sceneCollection.scenarioChain = []
   },
@@ -149,9 +149,9 @@ export const sceneController = {
    * 用于记录最后一次跳转的问题
    * @return {[type]} [description]
    */
-  rewrite(scenarioId, chapterId) {
+  rewrite(seasonId, chapterId) {
     _.each(sceneCollection.scenarioChain, function(scenarioChain) {
-      if(scenarioChain.scenarioId == scenarioId) {
+      if(scenarioChain.seasonId == seasonId) {
         scenarioChain.chapterId = chapterId;
       }
     });
@@ -169,21 +169,21 @@ export const sceneController = {
 
   /**
    * 解析序列
-   * @param  {[type]} scenarioId    [description]
+   * @param  {[type]} seasonId    [description]
    * @param  {[type]} currPageIndex [description]
    * @return {[type]}               [description]
    */
-  sequence(scenarioId, currPageIndex) {
+  sequence(seasonId, currPageIndex) {
     var chains = sceneCollection.scenarioChain;
     //有多个场景关系,需要记录
     if(chains.length > 1) {
       var history = [];
       //只刷新当前场景的页面
       _.each(chains, function(chain) {
-        if(chain.scenarioId == scenarioId) {
-          history.push(chain.scenarioId + '-' + chain.chapterId + '-' + currPageIndex)
+        if(chain.seasonId == seasonId) {
+          history.push(chain.seasonId + '-' + chain.chapterId + '-' + currPageIndex)
         } else {
-          history.push(chain.scenarioId + '-' + chain.chapterId)
+          history.push(chain.seasonId + '-' + chain.chapterId)
         }
       })
       return history;
@@ -216,7 +216,7 @@ export const sceneController = {
       if(index >= 1 && (index < chainsNum - 1)) { //从1开始吸入,排除最后一个
         var chain = chain.split('-')
         sceneCollection.scenarioChain.push({
-          'scenarioId': chain[0],
+          'seasonId': chain[0],
           'chapterId': chain[1],
           'pageIndex': chain[2]
         })

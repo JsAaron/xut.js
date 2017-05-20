@@ -351,7 +351,7 @@ export default class Activity {
         if(scenarioInfo.seasonId || scenarioInfo.chapterId) {
           setTimeout(function() {
             Xut.View.LoadScenario({
-              'scenarioId': scenarioInfo.seasonId,
+              'seasonId': scenarioInfo.seasonId,
               'chapterId': scenarioInfo.chapterId
             })
           }, hasAudioes() ? 500 : 0)

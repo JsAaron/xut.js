@@ -539,13 +539,13 @@ export default class Scheduler {
       //包括动画都已经结束了
       'processComplete': function () {},
       //构建完毕通知
-      'buildComplete': function (scenarioId) {
+      'buildComplete': function (seasonId) {
         /**
          * 构建完成通知,用于处理历史缓存记录
          * 如果是调试模式 && 不是收费提示页面 && 多场景应用
          */
         if (config.launch.historyMode && !options.isInApp && options.hasMultiScene) {
-          const history = sceneController.sequence(scenarioId, middleIndex)
+          const history = sceneController.sequence(seasonId, middleIndex)
           if (history) { $set("history", history) }
         }
       }

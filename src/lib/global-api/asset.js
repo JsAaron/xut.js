@@ -9,7 +9,7 @@ export function initAsset() {
    */
   Xut.U3d.View = function(seasonId, chapterId) {
     Xut.View.LoadScenario({
-      'scenarioId': seasonId,
+      'seasonId': seasonId,
       'chapterId': chapterId
     })
   }
