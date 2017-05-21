@@ -57,7 +57,7 @@ export default class MiniSuper {
   }
 
   _$$update(action, index) {
-    /*避免重复更新*/
+    /*避免滚动页面重复更新*/
     if (this._visualIndex != index) {
       this._updateSingle(action, index)
     }
