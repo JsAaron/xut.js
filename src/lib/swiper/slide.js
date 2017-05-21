@@ -191,17 +191,17 @@ export default function slide(Swiper) {
     callback
   }) {
 
+   //如果在忙碌状态,如果翻页还没完毕
+    if(!this.enabled) {
+      return
+    }
+
     /*外部调用，direction需要更新
     内部调用赋予direction*/
     if(direction) {
       this.direction = direction
     } else {
       direction = this.direction
-    }
-
-    //如果在忙碌状态,如果翻页还没完毕
-    if(!this.enabled) {
-      return
     }
 
     /**
