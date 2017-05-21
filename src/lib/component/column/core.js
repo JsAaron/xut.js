@@ -362,6 +362,16 @@ export default class ColumnClass {
 
     const rangeY = ColumnClass.getScrollYRange(iscroll.maxScrollY, this.columnCount)
 
+    /*初始化Y轴的定位位置*/
+    if (Xut.Presentation.GetPageIndex() > this.initIndex) {
+      /*从下往上滑动,滚动页面设为最大值*/
+      iscroll.scrollTo(0, iscroll.maxScrollY)
+      this.visualIndex = this.columnCount - 1
+    } else {
+      /*从上往下滑动*/
+      this.visualIndex = 0
+    }
+
     let hasQrcode
     iscroll.on('beforeScrollStart', e => {
       hasQrcode = false

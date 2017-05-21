@@ -4,7 +4,6 @@ import { getColumnCount, getColumnChapterCount } from '../component/column/api'
 
 import MainBar from '../toolbar/main-sysbar/index'
 import DeputyBar from '../toolbar/deputy-fnbar'
-import BookBar from '../toolbar/word-bookbar/index'
 import MiniBar from '../toolbar/mini-pagebar/index'
 
 import { mainScene, deputyScene } from './factory/layout'
@@ -65,10 +64,8 @@ const checkHistory = (history) => {
 export class SceneFactory {
 
   constructor(data) {
-
     const options = _.extend(this, data)
-
-    //创建主场景
+      //创建主场景
     this._createHTML(options, () => {
       if (!Xut.IBooks.Enabled) {
         this._initToolBar()
@@ -127,7 +124,6 @@ export class SceneFactory {
    * 初始化传统工具栏
    * 1 主场景，系统工具栏
    * 2 副场景，函数工具栏
-   * @return {[type]} [description]
    */
   _initDefaultBar(pageIndex, pageTotal, $sceneNode, seasonId) {
 
@@ -141,17 +137,9 @@ export class SceneFactory {
     //主场景工具栏设置
     if (this.isMain) {
       barConfig = pMainBar(seasonId, pageTotal)
-      if (config.launch.visualMode === 4) {
-        //word模式,自动启动工具条
-        // this.mainToolbar = new BookBar({
-        //     sceneNode: $sceneNode,
-        //     controlNode: findControlBar(),
-        //     pageMode: barConfig.pageMode
-        // })
-      }
-      //如果工具拦提供可配置
+
       //或者config.pageMode 带翻页按钮
-      else if (_.some(barConfig.toolType)) {
+      if (_.some(barConfig.toolType)) {
         //普通模式
         this.mainToolbar = new MainBar({
           sceneNode: $sceneNode,

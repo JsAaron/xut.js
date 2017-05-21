@@ -283,12 +283,8 @@ export default class Bar {
   }
 
 
-
-
   /**
    * [ 显示工具栏]
-   * @param  {[type]} pointer [description]
-   * @return {[type]}         [description]
    */
   _showToolBar(pointer) {
     switch (pointer) {
@@ -329,9 +325,6 @@ export default class Bar {
 
   /**
    * 切换状态
-   * @param  {[type]} state   [description]
-   * @param  {[type]} pointer [description]
-   * @return {[type]}         [description]
    */
   toggle(state, pointer) {
     if (this.Lock) return
@@ -358,7 +351,6 @@ export default class Bar {
   resetArrow() {
     this.toolBarStatus ? this._showArrow() : this._hideArrow();
   }
-
 
 
 }

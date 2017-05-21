@@ -22,14 +22,13 @@ import { parseJSON } from '../../util/index'
 
 /**
  * 分解工具栏配置文件
- * @return {[type]}          [description]
  */
 const parseTooBar = (toolbar, toolType, pageMode) => {
-  if(toolbar = parseJSON(toolbar)) {
+  if (toolbar = parseJSON(toolbar)) {
     //兼容数据库中未指定的情况
     var n = Number(toolbar.pageMode)
     pageMode = _.isFinite(n) ? n : pageMode;
-    if(_.isString(toolbar.tbType)) {
+    if (_.isString(toolbar.tbType)) {
       toolType = _.map(toolbar.tbType.split(','), (num) => {
         return Number(num);
       })
@@ -45,23 +44,23 @@ const parseTooBar = (toolbar, toolType, pageMode) => {
 /**
  * 主场景工具栏配置
  * pageMode:默认2 允许滑动,带翻页按钮
- * @param  {[type]} seasonId [description]
- * @return {[type]}            [description]
  */
 export function pMainBar(seasonId) {
-  let sectionRang = Xut.data.query('sectionRelated', seasonId)
+  const related = Xut.data.query('sectionRelated', seasonId)
 
   //场景工具栏配置信息
-  let toolBar = sectionRang.toolbar
-  let pageTotal = sectionRang.length
+  const totalCount = related.length
 
   //默认显示系统工具栏
-  let toolType = [1]
+  const toolType = [1]
 
-  //默认2 允许滑动,带翻页按钮
-  let pageMode = pageTotal > 1 ? 2 : 0
+  /*
+  如果有多页面，就允许滑动，带翻页按钮
+  如果没有多页面，0禁止滑动
+   */
+  const pageMode = totalCount > 1 ? 2 : 0
 
-  return parseTooBar(toolBar, toolType, pageMode)
+  return parseTooBar(related.toolBar, toolType, pageMode)
 }
 
 
@@ -70,8 +69,13 @@ export function pMainBar(seasonId) {
  * pageMode 是否支持滑动翻页  0禁止滑动 1允许滑动
  * toolType   工具栏显示的类型 [0-5]
  */
-export function pDeputyBar(toolBar, pageTotal) {
-  let toolType = [0]
-  let pageMode = pageTotal > 1 ? 1 : 0
+export function pDeputyBar(toolBar, totalCount) {
+  const toolType = [0]
+
+  /*
+  如果有多页面，就允许滑动，但是不带翻页按钮
+  如果没有多页面，0禁止滑动
+   */
+  const pageMode = totalCount > 1 ? 1 : 0
   return parseTooBar(toolBar, toolType, pageMode)
 }

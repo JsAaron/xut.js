@@ -93,15 +93,15 @@ video {
  * 隐藏转换的元素的背面
  * 使被转换的元素的子元素保留其 3D 转换
  * 开启GPU硬件加速模式，使用GPU代替CPU渲染动画（在安卓系统中有时会有莫名其妙的BUG，建议慎重）
- * perspective 文字会模糊
+ * perspective  flow中文字会模糊
  */
 .preserve-3d {
     backface-visibility: hidden;
     transform-style: preserve-3d;
-    perspective: 1000;
+    /*perspective: 1000;*/
     -webkit-backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
-    -webkit-perspective: 1000;
+    /*-webkit-perspective: 1000;*/
 }
 
 
@@ -434,10 +434,10 @@ video {
     /*pointer-events:none;*/
     transform-style: preserve-3d;
     backface-visibility: hidden;
-    perspective: 1000;
+    /*perspective: 1000;*/
     -webkit-transform-style: preserve-3d;
     -webkit-backface-visibility: hidden;
-    -webkit-perspective: 1000;
+    /*-webkit-perspective: 1000;*/
 }
 
 
