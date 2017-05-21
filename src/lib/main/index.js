@@ -31,9 +31,10 @@ const initMain = novelData => {
          1 直接换  =》ban
    * 所以pageFlip只有在左面的情况下
    */
+
   if (novelData.parameter) {
     const parameter = parseJSON(novelData.parameter)
-      /*全局优先设置覆盖*/
+    /*全局优先设置覆盖*/
     if (config.launch.banMove === undefined && parameter.pageflip !== undefined) {
       switch (Number(parameter.pageflip)) {
         case 0: //允许翻页
@@ -98,7 +99,7 @@ const bindPlatEvent = () => {
     //不是子文档指定绑定按键
     if (!window.SUbCONFIGT) {
       /*app初始化完毕*/
-      Xut.Application.Watch('initComplete', function () {
+      Xut.Application.Watch('initComplete', function() {
         bindAndroid()
       })
     }
@@ -138,7 +139,7 @@ export default function main() {
       window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
       document.addEventListener("deviceready", () => {
         Xut.plat.hasPlugin = true //支持插件
-        Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function () {});
+        Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function() {});
       }, false)
     }
   }

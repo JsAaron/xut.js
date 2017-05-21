@@ -12,12 +12,8 @@
  * 此接口函数有作用域隔离
  */
 import DragDrop from './bind/drag'
-import {
-  simpleEvent
-} from './bind/simple'
-import {
-  complexEvent
-} from './bind/complex'
+import { simpleEvent } from './bind/simple'
+import { complexEvent } from './bind/complex'
 
 
 /**
@@ -67,7 +63,7 @@ const isfilter = eventName => {
  * @param  {[type]} evtName [事件名]
  * @return {[type]}         [description]
  */
-const setDefaultBehavior = function(supportSwipe, $contentNode) {
+const setDefaultBehavior = function (supportSwipe, $contentNode) {
   if(supportSwipe) {
     //静态事件，默认可以翻页，还可以切换工具栏
     $contentNode.attr('data-behavior', 'swipe');
@@ -81,7 +77,7 @@ const setDefaultBehavior = function(supportSwipe, $contentNode) {
 /**
  * 针对软件培训的操作行为下光标状态需求
  */
-const addCursor = function(eventName, $contentNode) {
+const addCursor = function (eventName, $contentNode) {
   if($contentNode) {
     if(!$contentNode.prop('setCursor')) { //只设置一次
       if(eventName === ('drag' || 'dragTag')) {
@@ -101,7 +97,7 @@ const addCursor = function(eventName, $contentNode) {
  * @param  {[type]} data      [description]
  * @return {[type]}           [description]
  */
-const _bind = function(eventDrop, data) {
+const _bind = function (eventDrop, data) {
   let dragObj
   let handler
   let reference
@@ -114,12 +110,12 @@ const _bind = function(eventDrop, data) {
   } else if(eventName === 'dragTag') { //拖拽
     dragObj = new DragDrop(eventContext, data.target, 1, eventDrop.startRun, eventDrop.stopRun);
   } else {
-    handler = function() {
-      data.eventRun.call(eventContext)
-    }
-    /////////////////
-    /// tap click
-    /////////////////
+    handler = function () {
+        data.eventRun.call(eventContext)
+      }
+      /////////////////
+      /// tap click
+      /////////////////
     if(eventName === 'tap' || eventName === 'click') {
       reference = simpleEvent(eventName, eventContext, handler, supportSwipe)
     }

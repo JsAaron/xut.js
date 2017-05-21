@@ -2,13 +2,13 @@ import { config } from '../../../config/index'
 import { audioPlayer } from '../../audio/player'
 import { conversionEventType, bindContentEvent } from './event'
 
-export default function(activitProto) {
+export default function (activitProto) {
 
   /**
    * 构建事件体系
    * 解析出事件类型
    */
-  activitProto._initEvents = function() {
+  activitProto._initEvents = function () {
     this.eventData.eventName = conversionEventType(this.eventData.eventType);
   }
 
@@ -16,7 +16,7 @@ export default function(activitProto) {
    * 找到事件上下文
    * @return {[type]} [description]
    */
-  activitProto._findContentName = function(chapterIndex, contentId, eventId) {
+  activitProto._findContentName = function (chapterIndex, contentId, eventId) {
     let contentName
     let eventData = this.eventData
 
@@ -54,7 +54,7 @@ export default function(activitProto) {
    * 获取事件上下文
    * @return {[type]} [description]
    */
-  activitProto._parseEventContext = function() {
+  activitProto._parseEventContext = function () {
     //事件上下文对象
     let eventData = this.eventData
     let eventId = eventData.eventContentId
@@ -92,7 +92,7 @@ export default function(activitProto) {
    * 绑定事件行为
    * @return {[type]} [description]
    */
-  activitProto._bindEvents = function(callback) {
+  activitProto._bindEvents = function (callback) {
     let self = this
     let eventData = this.eventData
     let eventName = eventData.eventName
@@ -102,7 +102,7 @@ export default function(activitProto) {
      * 运行动画
      * @return {[type]} [description]
      */
-    const startRunAnim = function() {
+    const startRunAnim = function () {
       //当前事件对象没有动画的时候才能触发关联动作
       let animOffset
       let boundary = 5 //边界值
@@ -130,7 +130,7 @@ export default function(activitProto) {
      * 音频
      * 反弹
      */
-    const setBehavior = function(feedbackBehavior) {
+    const setBehavior = function (feedbackBehavior) {
       let behaviorSound
         //音频地址
       if(behaviorSound = feedbackBehavior.behaviorSound) {
@@ -139,7 +139,7 @@ export default function(activitProto) {
           self._fixAudio.push(new audioPlayer({
             url: behaviorSound,
             trackId: 9999,
-            complete: function() {
+            complete: function () {
               this.play()
             }
           }))
@@ -165,7 +165,7 @@ export default function(activitProto) {
         //div通过css实现反弹
         if(eventData.domMode) {
           eventContext.addClass('xut-behavior');
-          setTimeout(function() {
+          setTimeout(function () {
             eventContext.removeClass('xut-behavior');
             startRunAnim();
           }, 500)
@@ -183,15 +183,15 @@ export default function(activitProto) {
      */
     const eventDrop = {
       //保存引用,方便直接销毁
-      init: function(drag) {
+      init: function (drag) {
         eventData.dragDrop = drag;
       },
       //拖拽开始的处理
-      startRun: function() {
+      startRun: function () {
 
       },
       //拖拽结束的处理
-      stopRun: function(isEnter) {
+      stopRun: function (isEnter) {
         if(isEnter) { //为true表示拖拽进入目标对象区域
           self.runAnimation();
         }
@@ -203,7 +203,7 @@ export default function(activitProto) {
      * 除去拖动拖住外的所有事件
      * 点击,双击,滑动等等....
      */
-    const eventRun = function() {
+    const eventRun = function () {
 
       /*
       跟踪点击动作
@@ -240,7 +240,7 @@ export default function(activitProto) {
     /**
      * 事件对象引用
      */
-    const eventHandler = function(eventReference, eventHandler) {
+    const eventHandler = function (eventReference, eventHandler) {
       eventData.eventReference = eventReference;
       eventData.eventHandler = eventHandler;
     }

@@ -10,10 +10,10 @@ export default function api(Swiper) {
    */
   Swiper.prototype.getActionType = function (distX, distY, duration, orientation) {
     orientation = orientation || this.orientation
-    if (orientation === 'h') {
+    if(orientation === 'h') {
       distX = Math.abs(distX)
       return duration < 200 && distX > 30 || distX > this.visualWidth / 6 ? 'flipOver' : 'flipRebound'
-    } else if (orientation === 'v') {
+    } else if(orientation === 'v') {
       distY = Math.abs(distY)
       return duration < 200 && distY > 30 || distY > this.visualHeight / 6 ? 'flipOver' : 'flipRebound'
     }
@@ -26,12 +26,12 @@ export default function api(Swiper) {
   Swiper.prototype.setLinearTotal = function (total, location) {
 
     //如果当前是column
-    if (location === 'middle') {
+    if(location === 'middle') {
 
       let borderIndex
         //必须是有2页以上并且当前页面就是最后一页
         //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
-      if (this.totalIndex > 1 && this.visualIndex == this.totalIndex - 1) {
+      if(this.totalIndex > 1 && this.visualIndex == this.totalIndex - 1) {
         borderIndex = this.visualIndex
       }
 
@@ -39,7 +39,7 @@ export default function api(Swiper) {
 
       //如果是最后一页，叠加新的页面
       //需要重写一些数据
-      if (borderIndex !== undefined) {
+      if(borderIndex !== undefined) {
         this.setPointer(borderIndex - 1, total)
         this._updatePointer()
       }
@@ -48,7 +48,7 @@ export default function api(Swiper) {
     //如果左边是column页面
     //改变总页面数
     //改变可视区页面为最后页
-    if (location === 'left') {
+    if(location === 'left') {
       this.totalIndex = total
       this.visualIndex = total - 1;
       this.setPointer(this.visualIndex, total)
@@ -58,7 +58,7 @@ export default function api(Swiper) {
     }
 
     //如果是右边的column
-    if (location === 'right') {
+    if(location === 'right') {
       this.totalIndex = total
     }
 
@@ -130,7 +130,7 @@ export default function api(Swiper) {
    * callback 翻页完成
    */
   Swiper.prototype.prev = function (callback) {
-    if (!this._borderBounce(1)) {
+    if(!this._borderBounce(1)) {
       this._slideTo({
         direction: 'prev',
         action: 'outer',
@@ -150,7 +150,7 @@ export default function api(Swiper) {
    * callback 翻页完成
    */
   Swiper.prototype.next = function (callback) {
-    if (!this._borderBounce(-1)) {
+    if(!this._borderBounce(-1)) {
       this._slideTo({
         direction: 'next',
         action: 'outer',
@@ -190,24 +190,6 @@ export default function api(Swiper) {
     return this.pagePointer
   }
 
-  /**
-   * 滑动到指定的坐标
-   * @return {[type]} [description]
-   */
-  Swiper.prototype.scrollTo = function (y, time, easing) {
-    easing = easing || ease.circular;
-    this.isInTransition = time > 0;
-    const transitionType = easing.style;
-    if (!time || transitionType) {
-      if (transitionType) {
-        this._transitionTimingFunction(easing.style);
-        this._transitionTime(time);
-      }
-      this._translate(0, y);
-    } else {
-      console.log('scrollTo出错')
-    }
-  }
 
   /**
    * 跳指定页面
@@ -219,27 +201,27 @@ export default function api(Swiper) {
   Swiper.prototype.scrollToPage = function (targetIndex) { //目标页面
 
     //如果还在翻页中
-    if (this._lockFlip) return
+    if(!this.enabled) return
 
     const visualIndex = this.visualIndex //当前页面
 
     //相邻页
-    switch (targetIndex) {
+    switch(targetIndex) {
       //前一页
-      case (visualIndex - 1):
-        if (this.options.hasMultiPage) {
+      case(visualIndex - 1):
+        if(this.options.hasMultiPage) {
           return this.prev();
         }
         break
         //首页
       case visualIndex:
-        if (visualIndex == 0) {
+        if(visualIndex == 0) {
           this.$emit('onDropApp');
         }
         return
         //后一页
-      case (visualIndex + 1):
-        if (this.options.hasMultiPage) {
+      case(visualIndex + 1):
+        if(this.options.hasMultiPage) {
           return this.next();
         }
         break
@@ -247,9 +229,11 @@ export default function api(Swiper) {
 
     //算出是相关数据
     const data = calculationIndex(visualIndex, targetIndex, this.totalIndex)
-      //更新页码索引
+
+    //更新页码索引
     this._updatePointer(data)
     data.pagePointer = this.pagePointer
+
     this.$emit('onJumpPage', data)
   }
 
@@ -261,11 +245,11 @@ export default function api(Swiper) {
   Swiper.prototype.destroy = function () {
     this._off();
     this.$off();
-    if (this._childNodes) {
+    if(this._childNodes) {
       this._childNodes.page = null
       this._childNodes.master = null
     }
-    if (this.options.mouseWheel) {
+    if(this.options.mouseWheel) {
       this.container.removeEventListener('wheel', this._onWheel, false);
       this.container.removeEventListener('mousewheel', this._onWheel, false);
       this.container.removeEventListener('DOMMouseScroll', this._onWheel, false);
@@ -298,13 +282,13 @@ export default function api(Swiper) {
     let childNodes = this._childNodes[pageType].childNodes
     let nodeTotal = childNodes.length
 
-    while (nodeTotal--) {
+    while(nodeTotal--) {
       liNode = childNodes[nodeTotal]
       pageChpaterIndex = liNode.getAttribute('data-chapter-index');
-      if (sectionRang) {
+      if(sectionRang) {
         visualIndex += sectionRang.start;
       }
-      if (pageChpaterIndex == visualIndex) {
+      if(pageChpaterIndex == visualIndex) {
         return liNode
       }
       visualIndex = this.visualIndex;

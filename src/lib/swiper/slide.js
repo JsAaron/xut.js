@@ -10,7 +10,7 @@ export default function slide(Swiper) {
   Swiper.prototype._transitionTime = function (time) {
     time = time || 0;
     var durationProp = Xut.style.transitionDuration;
-    if (!durationProp) {
+    if(!durationProp) {
       return;
     }
     this.scrollerStyle[durationProp] = time + 'ms';
@@ -25,8 +25,8 @@ export default function slide(Swiper) {
    */
   Swiper.prototype._translate = function (x, y) {
     /*父容器滑动模式*/
-    if (this.options.scope === 'parent') {
-      if (this.options.scrollY) {
+    if(this.options.scope === 'parent') {
+      if(this.options.scrollY) {
         this.scroller.style[Xut.style.transform] = `translate3d(0px,${y}px,0px)`
       }
     }
@@ -40,7 +40,7 @@ export default function slide(Swiper) {
    */
   Swiper.prototype._getRollVisual = function () {
     let orientation = this.orientation
-    if (orientation) {
+    if(orientation) {
       return this.orientation === 'h' ? this.visualWidth : this.visualHeight
     }
     //在flow初始化时候，在边界往PPT滑动，是没有值的，所以需要通过全局参数判断
@@ -62,7 +62,7 @@ export default function slide(Swiper) {
     /*这是一个bug,临时修复
     如果一开始布局的页面在flow的首位交界的位置，那么往前后翻页
     在全局中还没有产生dist的值，所以这里强制用一个基本值处理*/
-    if (dist === undefined) {
+    if(dist === undefined) {
       return visualSize / 1.2
     }
 
@@ -75,7 +75,7 @@ export default function slide(Swiper) {
      * 会导致动画回到不触发卡死
      * 因为flow的情况下，没有做定时器修复，所以这里强制给一个时间
      */
-    if (dist > visualSize) {
+    if(dist > visualSize) {
       dist = visualSize / 2
     }
 
@@ -105,8 +105,8 @@ export default function slide(Swiper) {
    */
   Swiper.prototype._setQuick = function () {
     const startDate = Swiper.getDate()
-    if (this._preTapTime) {
-      if (startDate - this._preTapTime < FLIPSPEED) {
+    if(this._preTapTime) {
+      if(startDate - this._preTapTime < FLIPSPEED) {
         this._setRate();
       }
     }
@@ -120,7 +120,7 @@ export default function slide(Swiper) {
     let overflow
     let pointer = this.pagePointer
     let fillength = Object.keys(pointer).length
-    switch (direction) {
+    switch(direction) {
       case 'prev': //前翻页
         overflow = (pointer.middleIndex === 0 && fillength === 2) ? true : false;
         break;
@@ -136,9 +136,40 @@ export default function slide(Swiper) {
    */
   Swiper.prototype._getFlipOverSpeed = function () {
     let speed = (this._getRollVisual() - this._getRollDist()) * this._speedRate
-    if (speed === undefined) {
+    if(speed === undefined) {
       speed = this._defaultFlipTime
     }
+    return speed
+  }
+
+  /**
+   * 如果是通过接口翻页的
+   * 就需要计算出2次翻页的点击速率
+   * 可能是快速翻页
+   * @return {[type]} [description]
+   */
+  Swiper.prototype._getOuterSpeed = function (action) {
+    let speed = undefined
+
+    /*外部调用，比如左右点击案例，需要判断点击的速度*/
+    if(action === 'outer') {
+      /*如果是第二次开始同一个点击动作*/
+      if(action === this._recordRreTick.action) {
+        /*最大的点击间隔时间不超过默认的_defaultFlipTime时间，最小的取间隔时间*/
+        const time = Swiper.getDate() - this._recordRreTick.time
+        if(time <= this._defaultFlipTime) {
+          speed = time
+        } else {
+          speed = this._defaultFlipTime
+        }
+      }
+      /*点击时间啊*/
+      this._recordRreTick.time = Swiper.getDate()
+    }
+
+    /*保存每次点击动作*/
+    this._recordRreTick.action = action
+
     return speed
   }
 
@@ -162,15 +193,16 @@ export default function slide(Swiper) {
 
     /*外部调用，direction需要更新
     内部调用赋予direction*/
-    if (direction) {
+    if(direction) {
       this.direction = direction
     } else {
       direction = this.direction
     }
 
-    /*是外部调用触发接口
-    提供给翻页滑动使用*/
-    let outerCallFlip = false
+    //如果在忙碌状态,如果翻页还没完毕
+    if(!this.enabled) {
+      return
+    }
 
     /**
      * _slideTo => Swipe.prototype.next => Xut.View.GotoNextSlide
@@ -179,37 +211,14 @@ export default function slide(Swiper) {
      *  inner 用户内部滑动
      *  outer 外部接口调用
      */
-    let outerSpeed
+    let outerSpeed = this._getOuterSpeed(action)
 
-    /*外部调用，比如左右点击案例，需要判断点击的速度*/
-    if (action === 'outer') {
-      /*如果是第二次开始同一个点击动作*/
-      if (action === this._recordRreTick.action) {
-        /*最大的点击间隔时间不超过默认的_defaultFlipTime时间，最小的取间隔时间*/
-        const time = Swiper.getDate() - this._recordRreTick.time
-        if (time <= this._defaultFlipTime) {
-          outerSpeed = time
-        } else {
-          outerSpeed = this._defaultFlipTime
-        }
-        outerCallFlip = true
-      }
-      /*点击时间啊*/
-      this._recordRreTick.time = Swiper.getDate()
-    }
-
-    /*保存每次点击动作*/
-    this._recordRreTick.action = action
-
-    //如果在忙碌状态,如果翻页还没完毕
-    if (!this.enabled) {
-      return
-    }
+    /*是外部调用触发接口
+    提供给翻页滑动使用*/
+    let outerCallFlip = outerSpeed === undefined ? false : true
 
     //前后边界
-    if (this.options.snap) {
-      if (this._isBorder(direction)) return;
-    }
+    if(this.options.snap && this._isBorder(direction)) return;
 
     this.disable()
     this._setQuick()
@@ -218,7 +227,7 @@ export default function slide(Swiper) {
      * 监听内部翻页，通过接口调用
      * 需要翻页结束后触发外部通知，绑定一次
      */
-    if (callback) {
+    if(callback) {
       this.$once('innerFlipOver', callback)
     }
 
@@ -253,22 +262,22 @@ export default function slide(Swiper) {
     const createIndex = actionPointer.createIndex
     const stopIndex = pointer.middleIndex
 
-    switch (this.direction) {
+    switch(this.direction) {
       case 'prev':
-        if (-1 < createIndex) { //首页情况
+        if(-1 < createIndex) { //首页情况
           this._updatePointer(createIndex, pointer.frontIndex, pointer.middleIndex);
         }
-        if (-1 === createIndex) {
+        if(-1 === createIndex) {
           this.pagePointer.backIndex = pointer.middleIndex;
           this.pagePointer.middleIndex = pointer.frontIndex;
           delete this.pagePointer.frontIndex;
         }
         break;
       case 'next':
-        if (this.totalIndex > createIndex) {
+        if(this.totalIndex > createIndex) {
           this._updatePointer(pointer.middleIndex, pointer.backIndex, createIndex);
         }
-        if (this.totalIndex === createIndex) { //如果是尾页
+        if(this.totalIndex === createIndex) { //如果是尾页
           this.pagePointer.frontIndex = pointer.middleIndex;
           this.pagePointer.middleIndex = pointer.backIndex;
           delete this.pagePointer.backIndex;
