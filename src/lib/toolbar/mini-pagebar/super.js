@@ -56,6 +56,14 @@ export default class MiniSuper {
     }
   }
 
+  _$$update(action, index) {
+    /*避免重复更新*/
+    if (this._visualIndex != index) {
+      this._updateSingle(action, index)
+    }
+    this._visualIndex = index
+  }
+
   /**
    * 更新页码
    */
@@ -75,7 +83,7 @@ export default class MiniSuper {
 
     //没有column
     if (!hasColumn()) {
-      this._updateSingle(action, parentIndex)
+      this._$$update(action, parentIndex)
       return
     }
 
@@ -96,7 +104,7 @@ export default class MiniSuper {
       }
     }
 
-    this._updateSingle(action, updateIndex)
+    this._$$update(action, updateIndex)
   }
 
 

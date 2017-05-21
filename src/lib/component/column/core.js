@@ -307,7 +307,7 @@ export default class ColumnClass {
    * 获取卷滚的索引
    * @return {[type]} [description]
    */
-  _getScrollYIndex(distY, rangeY) {
+  static getScrollYIndex(distY, rangeY) {
     let key, value, pageIndex
     let startY = Math.abs(distY)
     for (let key in rangeY) {
@@ -326,7 +326,7 @@ export default class ColumnClass {
    * 计算出通过坐标模拟分段是区间
    * @return {[type]} [description]
    */
-  _getScrollYRang(maxScrollY, columnCount) {
+  static getScrollYRange(maxScrollY, columnCount) {
     const baseY = Math.abs(maxScrollY / columnCount)
     let count = columnCount
 
@@ -360,16 +360,7 @@ export default class ColumnClass {
       probeType: 2
     })
 
-    const rangeY = this._getScrollYRang(iscroll.maxScrollY, this.columnCount)
-
-    if (Xut.Presentation.GetPageIndex() > this.initIndex) {
-      /*从下往上滑动,滚动页面设为最大值*/
-      iscroll.scrollTo(0, iscroll.maxScrollY)
-      this.visualIndex = this.columnCount - 1
-    } else {
-      /*从上往下滑动*/
-      this.visualIndex = 0
-    }
+    const rangeY = ColumnClass.getScrollYRange(iscroll.maxScrollY, this.columnCount)
 
     let hasQrcode
     iscroll.on('beforeScrollStart', e => {
@@ -418,7 +409,7 @@ export default class ColumnClass {
    * @return {[type]} [description]
    */
   _scrollToPage(distY, directionY, rangeY, time) {
-    const pageIndex = this._getScrollYIndex(distY, rangeY);
+    const pageIndex = ColumnClass.getScrollYIndex(distY, rangeY);
     /*只有页码不一致的时候才更新，并且只更新一次*/
     if (this.visualIndex !== pageIndex) {
       this._updataScrollbars(pageIndex, directionY, time)
