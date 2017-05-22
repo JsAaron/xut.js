@@ -6,12 +6,11 @@ import AudioSuper from './super'
 export class PhoneGapMedia extends AudioSuper {
 
   constructor(options, controlDoms) {
-    super()
+    super(options, controlDoms)
+  }
 
+  _init() {
     const self = this
-
-    //构建之前处理
-    this.$$preRelated(options.trackId, options);
 
     //音频成功与失败调用
     const audio = new window.GLOBALCONTEXT.Media(self.$$url, () => {
@@ -22,12 +21,6 @@ export class PhoneGapMedia extends AudioSuper {
 
     //autoplay
     this.audio = audio;
-    this.trackId = options.trackId;
-    this.options = options;
-
-    //相关数据
-    this.$$afterRelated(options, controlDoms)
-
     this.play()
   }
 
@@ -37,7 +30,7 @@ export class PhoneGapMedia extends AudioSuper {
    * get audio
    * @return {[type]} [description]
    */
-  getAudioTime(callback) {
+  _getAudioTime(callback) {
     this.audio.getCurrentPosition((position) => {
       let audioTime
       position = position * 1000;
@@ -56,23 +49,14 @@ export class PhoneGapMedia extends AudioSuper {
     })
   }
 
-  play() {
-    this.$$play()
-  }
-
-  pause() {
-    this.$$pause()
-  }
 
   /**
-   * 取反
-   * @return {[type]} [description]
+   * 销毁
    */
-  end() {
+  _destroy() {
     if (this.audio) {
       this.audio.release();
       this.audio = null;
     }
-    this.$$destroy()
   }
 }

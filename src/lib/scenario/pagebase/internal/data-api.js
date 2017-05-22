@@ -91,7 +91,7 @@ export default function (baseProto) {
   baseProto.rerunInstanceTask = function (taskName) {
     var tasksObj
     if (tasksObj = this.threadTaskRelated.assignTaskGroup[taskName]) {
-      tasksObj.$$rerunTask && tasksObj.$$rerunTask()
+      tasksObj.rerunTask && tasksObj.rerunTask()
       return true;
     }
   }

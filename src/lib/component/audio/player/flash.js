@@ -6,13 +6,11 @@ import AudioSuper from './super'
 class _Flash extends AudioSuper {
 
   constructor(options, controlDoms) {
-    super()
+    super(options, controlDoms)
+  }
 
+  _init() {
     const self = this
-
-    //构建之前处理
-    this.$$preRelated(options.trackId, options);
-
     const audio = new Audio5js({
       swf_path: './lib/data/audio5js.swf',
       throw_errors: true,
@@ -26,14 +24,8 @@ class _Flash extends AudioSuper {
     });
 
     this.audio = audio;
-    this.trackId = options.trackId;
     this.status = 'playing';
-    this.options = options;
-
     this.isFlash = true;
-
-    //相关数据
-    this.$$afterRelated(options, controlDoms);
   }
 
   /**
@@ -42,23 +34,15 @@ class _Flash extends AudioSuper {
    * get audio
    * @return {[type]} [description]
    */
-  getAudioTime(callback) {
+  _getAudioTime(callback) {
     callback(Math.round(this.audio.audio.audio.currentTime * 1000))
   }
 
-  play() {
-    this.$$play()
-  }
 
-  pause() {
-    this.$$pause()
-  }
-
-  end() {
+  _destroy() {
     if (this.audio) {
       this.audio.destroy();
       this.audio = null;
     }
-    this.$$destroy()
   }
 }

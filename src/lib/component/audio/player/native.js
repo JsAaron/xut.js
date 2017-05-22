@@ -12,17 +12,18 @@ let instance = {} //存放不同音轨的一个实例
 export class NativeVideo extends AudioSuper {
 
   constructor(options, controlDoms) {
+    super(options, controlDoms)
+  }
 
-    super()
-
+  /**
+   * 初始化
+   * @return {[type]} [description]
+   */
+  _init() {
     let audio
     let self = this
-    let trackId = options.trackId
-
+    let trackId = this.options.trackId
     let hasAudio = hasAudioes()
-
-    //构建之前处理
-    this.$$preRelated(trackId, options);
 
     if (instance[trackId]) {
       audio = hasAudio ? getAudio() : instance[trackId]
@@ -50,11 +51,11 @@ export class NativeVideo extends AudioSuper {
     }
 
     this._endCallBack = () => {
-      this.$$callbackProcess(true)
+      this._$$callbackProcess(true)
     }
 
     this._errorCallBack = () => {
-      this.$$callbackProcess(false)
+      this._$$callbackProcess(false)
     }
 
     /**
@@ -72,11 +73,8 @@ export class NativeVideo extends AudioSuper {
     this.audio = audio;
     this.trackId = trackId;
     this.status = 'playing';
-    this.options = options;
-
-    //相关数据
-    this.$$afterRelated(options, controlDoms)
   }
+
 
   /**
    * Compatible with asynchronous
@@ -84,19 +82,16 @@ export class NativeVideo extends AudioSuper {
    * get audio
    * @return {[type]} [description]
    */
-  getAudioTime(callback) {
+  _getAudioTime(callback) {
     callback(Math.round(this.audio.currentTime * 1000))
   }
 
-  play() {
-    this.$$play()
-  }
 
-  pause() {
-    this.$$pause()
-  }
-
-  end() {
+  /**
+   * 销毁方法
+   * @return {[type]} [description]
+   */
+  _destroy() {
     if (this.audio) {
       this.audio.pause();
       //快速切换，防止在播放中就移除，导致没有销毁
@@ -105,6 +100,5 @@ export class NativeVideo extends AudioSuper {
       this.audio.removeEventListener('error', this._errorCallBack, false)
       this.audio = null;
     }
-    this.$$destroy()
   }
 }

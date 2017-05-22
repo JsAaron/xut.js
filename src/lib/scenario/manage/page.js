@@ -73,7 +73,7 @@ export default class PageMgr extends ManageSuper {
     )
 
     //增加页面管理
-    this.$$addBaseGroup(pageIndex, pageObjs);
+    this._$$addBaseGroup(pageIndex, pageObjs);
     return pageObjs;
   }
 
@@ -283,7 +283,7 @@ export default class PageMgr extends ManageSuper {
     const pageObj = this.$$getPageBase(clearPageIndex)
     if (pageObj) {
       pageObj.baseDestroy();
-      this.$$removeBaseGroup(clearPageIndex);
+      this._$$removeBaseGroup(clearPageIndex);
     }
   }
 
@@ -300,7 +300,7 @@ export default class PageMgr extends ManageSuper {
     removeVideo(pageId)
 
     //清理对象
-    this.$$destroyBaseGroup();
+    this._$$destroyBaseGroup();
 
     //销毁事件
     if (config.launch.doublePageMode) {

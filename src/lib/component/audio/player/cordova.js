@@ -21,15 +21,13 @@ const createUUID = () => [4, 2, 2, 2, 6].map(createPart).join('-')
 export class CordovaMedia extends AudioSuper {
 
   constructor(options, controlDoms) {
-    super()
+    super(options, controlDoms)
+  }
 
+
+  _init() {
     const self = this
-
     this.id = createUUID();
-
-    //构建之前处理
-    this.$$preRelated(options.trackId, options);
-
     const audio = {
       startPlayingAudio: function () {
         window.audioHandler.startPlayingAudio(self.id, self.$$url)
@@ -51,12 +49,6 @@ export class CordovaMedia extends AudioSuper {
 
     //autoplay
     this.audio = audio;
-    this.trackId = options.trackId;
-    this.options = options;
-
-    //相关数据
-    this.$$afterRelated(options, controlDoms)
-
     this.play()
   }
 
@@ -67,32 +59,28 @@ export class CordovaMedia extends AudioSuper {
    * get audio
    * @return {[type]} [description]
    */
-  getAudioTime(callback) {
+  _getAudioTime(callback) {
     callback(Math.round(this.audio.expansionCurrentPosition() * 1000))
   }
 
 
   //播放
-  play() {
+  _play() {
     if (this.audio) {
       this.audio.startPlayingAudio();
     }
-    this.$$play()
   }
 
   //停止
-  pause() {
+  _pause() {
     this.audio && this.audio.pausePlayingAudio();
-    this.$$pause()
   }
 
-
   //结束
-  end() {
+  _destroy() {
     if (this.audio) {
       this.audio.release();
       this.audio = null;
     }
-    this.$$destroy()
   }
 }

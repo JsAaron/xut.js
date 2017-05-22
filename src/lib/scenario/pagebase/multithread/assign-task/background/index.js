@@ -61,7 +61,7 @@ export default class TaskBackground extends TaskSuper {
    * 检测下一个任务
    */
   _checkNextTask($background, $containsNode) {
-    this.$$checkNextTask('内部background', () => {
+    this._$$checkNextTask('内部background', () => {
       this._render($background, $containsNode)
     })
   }
@@ -74,8 +74,5 @@ export default class TaskBackground extends TaskSuper {
     });
   }
 
-  destroy() {
-    this.$$destroy()
-  }
 
 }

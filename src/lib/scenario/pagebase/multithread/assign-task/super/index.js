@@ -13,6 +13,8 @@ export default class TaskSuper {
     this.$$detector = detector;
     /*中断队列*/
     this.$$suspendQueues = [];
+    /*初始化浮动*/
+    this._$$initFloat()
   }
 
 
@@ -20,7 +22,7 @@ export default class TaskSuper {
   初始化浮动页面参数
   私有方法
    */
-  $$initFloat() {
+  _$$initFloat() {
     /*
      1.浮动页面,母板事件引起的层级遮挡问题,用于提升最高
      2.浮动模板,用于实现模板上的事件
@@ -42,13 +44,13 @@ export default class TaskSuper {
   2 母版浮动层
   baseFloatGroup: pagebase中的基础，用来处理是否容器已经创建
    */
-  $$createFloatLayer(complete, pipeData, baseFloatGroup) {
+  _$$createFloatLayer(complete, pipeData, baseFloatGroup) {
 
     const pageDivertor = this.$$floatDivertor.page
     const masterDivertor = this.$$floatDivertor.master
 
     /*结束后清理，因为componnet中的条件会影响activity中的条件判断*/
-    const clearDivertor =  (divertor) =>{
+    const clearDivertor = (divertor) => {
       if (divertor.html.length) {
         divertor.html = null
       }
@@ -102,7 +104,7 @@ export default class TaskSuper {
   3 如果检测不能运行就会运行suspend 断点
   interrupt 给content使用
    */
-  $$checkNextTask(taskName, nextTask, interrupt) {
+  _$$checkNextTask(taskName, nextTask, interrupt) {
     //构建中断方法
     const suspendTask = () => {
       this.$$suspendQueues.push(function () {
@@ -120,10 +122,14 @@ export default class TaskSuper {
   }
 
 
+  //============================
+  //      外部接口
+  //============================
+
   /**
    * 重新运行被阻断的线程任务
    */
-  $$rerunTask() {
+  rerunTask() {
     if (this.$$suspendQueues && this.$$suspendQueues.length) {
       let task;
       if (task = this.$$suspendQueues.pop()) {
@@ -136,7 +142,10 @@ export default class TaskSuper {
   /*
   销毁任务
    */
-  $$destroy() {
+  destroy() {
+    if(this._destroy){
+      this._destroy()
+    }
     this.$$detector = null
     this.$$suspendQueues = null
   }

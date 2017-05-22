@@ -15,32 +15,36 @@ export class ManageSuper {
     this.$$GetPageBase = this.$$getPageBase
   }
 
+
+  //===============================
+  //    提供给子子类使用的私有方法
+  //===============================
+
   /**
    * 增加合集管理
    */
-  $$addBaseGroup(pageIndex, pageObj) {
+  _$$addBaseGroup(pageIndex, pageObj) {
     this._group[pageIndex] = pageObj
   }
 
   /**
    * 得到页面合集
    */
-  $$getBaseGroup() {
+  _$$getBaseGroup() {
     return this._group
   }
 
   /**
    * 删除合集管理
    */
-  $$removeBaseGroup(pageIndex) {
+  _$$removeBaseGroup(pageIndex) {
     delete this._group[pageIndex]
   }
-
 
   /**
    * 销毁合集
    */
-  $$destroyBaseGroup() {
+  _$$destroyBaseGroup() {
     let k, _group = this._group
     for (k in _group) {
       _group[k].baseDestroy()
@@ -49,10 +53,14 @@ export class ManageSuper {
   }
 
 
+  //===============================
+  //    提供外部调用方法
+  //===============================
+
   /**
    * 合并处理
    */
-  $$assistPocess(pageIndex, callback) {
+  assistPocess(pageIndex, callback) {
     var pageObj;
     if (pageObj = this.$$getPageBase(pageIndex, this.pageType)) {
       if (callback) {
@@ -66,13 +74,19 @@ export class ManageSuper {
   /**
    * 执行辅助对象事件
    */
-  $$assistAppoint(activityId, currIndex, outCallBack, actionName) {
+  assistAppoint(activityId, currIndex, outCallBack, actionName) {
     var pageObj;
     if (pageObj = this.$$getPageBase(currIndex)) {
       return pageObj.baseAssistRun(activityId, outCallBack, actionName);
     }
   }
 
+
+
+
+  //===============================
+  //    提供外部调用与子类使用
+  //===============================
 
   /////////////////////////////////
   //  "GetPageId",

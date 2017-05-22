@@ -127,7 +127,7 @@ export default class MasterMgr extends ManageSuper {
     );
 
     //增加页面管理
-    this.$$addBaseGroup(reuseMasterKey, masterObj);
+    this._$$addBaseGroup(reuseMasterKey, masterObj);
 
     return masterObj;
   }
@@ -313,7 +313,7 @@ export default class MasterMgr extends ManageSuper {
   destroyManage() {
     this.rootNode = null;
     //销毁对象
-    this.$$destroyBaseGroup();
+    this._$$destroyBaseGroup();
   }
 
 
@@ -443,7 +443,7 @@ export default class MasterMgr extends ManageSuper {
 
   _checkParallaxPox(currPageIndex, targetIndex) {
     var key, pageObj,
-      pageCollection = this.$$getBaseGroup();
+      pageCollection = this._$$getBaseGroup();
     for (key in pageCollection) {
       pageObj = pageCollection[key];
       //跳跃过的视觉容器处理
@@ -574,7 +574,7 @@ export default class MasterMgr extends ManageSuper {
   // 2 跳转页面清理  【对象过滤条件】
   _checkClear(filter, toPage) {
     var key, indexOf,
-      removeMasterId = _.keys(this.$$getBaseGroup());
+      removeMasterId = _.keys(this._$$getBaseGroup());
 
     // 如果有2个以上的母板对象,就需要清理
     if (removeMasterId.length > 2 || toPage) { //或者是跳转页面
@@ -609,7 +609,7 @@ export default class MasterMgr extends ManageSuper {
         //移除事件
         pageObj.baseDestroy();
         //移除列表
-        self.$$removeBaseGroup(removekey)
+        self._$$removeBaseGroup(removekey)
         self._removeRecordMasterRange(removekey)
       }
       //清理作用域缓存

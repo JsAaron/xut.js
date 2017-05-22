@@ -99,7 +99,7 @@ export function clearContentAudio(pageId) {
   const playObj = playBox[CONTENT][pageId];
   if (playObj) {
     for (let i in playObj) {
-      playObj[i].end();
+      playObj[i].destroy();
       playObj[i] = null
       delete playBox[CONTENT][pageId][i];
     }
@@ -117,7 +117,7 @@ export function clearColumnAudio() {
   if (playBox && playBox[HOT] && playBox[HOT][COLUMN]) {
     const playObjs = playBox[HOT][COLUMN]
     for (let player in playObjs) {
-      playObjs[player].end();
+      playObjs[player].destroy();
       playObjs[player] = null
     }
     delete playBox[HOT][COLUMN]

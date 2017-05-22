@@ -535,7 +535,7 @@ export default class Activity {
     if (this._fixAudio.length) {
       _.each(this._fixAudio, function(instance) {
         setTimeout(function() {
-          instance.end();
+          instance.destroy();
         }, 5000)
       })
       this._fixAudio = [];
@@ -592,7 +592,7 @@ export default class Activity {
       for (let key in this._cacheBehaviorAudio) {
         let audio = this._cacheBehaviorAudio[key]
         if (audio) {
-          audio.end()
+          audio.destroy()
           this._cacheBehaviorAudio[key] = null
         }
       }

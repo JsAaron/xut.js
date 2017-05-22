@@ -175,7 +175,7 @@ const checkBreakAudio = (type, pageId, queryId, auidoData) => {
   //如果要用零音轨||零音轨有音乐在播||两音轨相同
   //则打断
   if (trackId == 0 || _trackId == 0 || trackId == _trackId) {
-    playObj.end();
+    playObj.destroy();
     delete playBox[type][pageId][queryId];
   }
   return false;
@@ -232,7 +232,7 @@ const playAudio = (pageId, queryId, type, audioData) => {
   //播放一次的处理
   audioData.innerCallback = (audio) => {
     if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
-      audio.end();
+      audio.destroy();
       delete playBox[type][pageId][queryId];
     }
   }
@@ -300,7 +300,7 @@ const removeAudio = () => {
   for (t in playBox) {
     for (p in playBox[t]) {
       for (a in playBox[t][p]) {
-        playBox[t][p][a].end();
+        playBox[t][p][a].destroy();
       }
     }
   }

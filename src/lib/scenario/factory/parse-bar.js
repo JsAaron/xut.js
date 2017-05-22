@@ -45,22 +45,16 @@ const parseTooBar = (toolbar, toolType, pageMode) => {
  * 主场景工具栏配置
  * pageMode:默认2 允许滑动,带翻页按钮
  */
-export function pMainBar(seasonId) {
+export function getMainBar(seasonId) {
   const related = Xut.data.query('sectionRelated', seasonId)
-
-  //场景工具栏配置信息
-  const totalCount = related.length
 
   //默认显示系统工具栏
   const toolType = [1]
 
-  /*
-  如果有多页面，就允许滑动，带翻页按钮
-  如果没有多页面，0禁止滑动
-   */
-  const pageMode = totalCount > 1 ? 2 : 0
-
-  return parseTooBar(related.toolBar, toolType, pageMode)
+  /*如果有多页面，就允许滑动，带翻页按钮
+    如果没有多页面，0禁止滑动*/
+  const pageMode = related.length > 1 ? 2 : 0
+  return parseTooBar(related.toolbar, toolType, pageMode)
 }
 
 
@@ -69,13 +63,11 @@ export function pMainBar(seasonId) {
  * pageMode 是否支持滑动翻页  0禁止滑动 1允许滑动
  * toolType   工具栏显示的类型 [0-5]
  */
-export function pDeputyBar(toolBar, totalCount) {
+export function getDeputyBar(toolbar, totalCount) {
   const toolType = [0]
 
-  /*
-  如果有多页面，就允许滑动，但是不带翻页按钮
-  如果没有多页面，0禁止滑动
-   */
+  /*如果有多页面，就允许滑动，但是不带翻页按钮
+    如果没有多页面，0禁止滑动*/
   const pageMode = totalCount > 1 ? 1 : 0
-  return parseTooBar(toolBar, toolType, pageMode)
+  return parseTooBar(toolbar, toolType, pageMode)
 }

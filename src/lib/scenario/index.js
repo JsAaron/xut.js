@@ -2,12 +2,12 @@ import { config } from '../config/index'
 import Mediator from './mediator/index'
 import { getColumnCount, getColumnChapterCount } from '../component/column/api'
 
-import MainBar from '../toolbar/main-sysbar/index'
-import DeputyBar from '../toolbar/deputy-fnbar'
-import MiniBar from '../toolbar/mini-pagebar/index'
+import MainBar from '../toolbar/ppt/main-iosbar/index'
+import DeputyBar from '../toolbar/ppt/deputy-fnbar'
+import MiniBar from '../toolbar/mini/index'
 
 import { mainScene, deputyScene } from './factory/layout'
-import { pMainBar, pDeputyBar } from './factory/parse-bar'
+import { getMainBar, getDeputyBar } from './factory/parse-bar'
 import { sceneController } from './factory/control'
 
 /**
@@ -15,7 +15,7 @@ import { sceneController } from './factory/control'
  * @return {[type]}            [description]
  */
 const findContainer = ($context, id, isMain) => {
-  return function(pane, parallax) {
+  return function (pane, parallax) {
     var node;
     if (isMain) {
       node = '#' + pane;
@@ -127,41 +127,31 @@ export class SceneFactory {
    */
   _initDefaultBar(pageIndex, pageTotal, $sceneNode, seasonId) {
 
-    const findControlBar = function() {
-      return $sceneNode.find('.xut-control-bar')
-    }
-
     //配置文件
     let barConfig = {}
 
     //主场景工具栏设置
     if (this.isMain) {
-      barConfig = pMainBar(seasonId, pageTotal)
-
-      //或者config.pageMode 带翻页按钮
+      barConfig = getMainBar(seasonId, pageTotal)
       if (_.some(barConfig.toolType)) {
-        //普通模式
         this.mainToolbar = new MainBar({
-          sceneNode: $sceneNode,
-          controlNode: findControlBar(),
+          $sceneNode: $sceneNode,
           pageTotal: pageTotal,
           currentPage: pageIndex + 1,
-          pageMode: barConfig.pageMode,
-          toolType: barConfig.toolType
+          toolType: barConfig.toolType,
+          arrowButton: barConfig.pageMode === 2
         })
       }
-    }
-    //副场景
-    else {
+    } else {
       //副场工具栏配置
-      barConfig = pDeputyBar(this.barInfo, pageTotal)
+      barConfig = getDeputyBar(this.barInfo, pageTotal)
       if (_.some(barConfig.toolType)) {
         this.deputyToolbar = new DeputyBar({
-          sceneNode: $sceneNode,
+          $sceneNode: $sceneNode,
           toolType: barConfig.toolType,
           pageTotal: pageTotal,
           currentPage: pageIndex,
-          pageMode: barConfig.pageMode
+          arrowButton: barConfig.pageMode === 2
         })
       }
     }
@@ -252,9 +242,8 @@ export class SceneFactory {
 
     /**
      * 配置选项
-     * @type {[type]}
      */
-    const isToolbar = this.isToolbar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
+    const pptBar = this.pptBar = this.deputyToolbar ? this.deputyToolbar : this.mainToolbar;
 
 
     /**
@@ -265,65 +254,53 @@ export class SceneFactory {
      * @return {[type]} [description]
      */
     $$mediator.$bind('pageUpdate', (...arg) => {
-      isToolbar && isToolbar.updatePointer(...arg)
+      pptBar && pptBar.updatePointer(...arg)
       if (this.miniBar) {
         this.miniBar && this.miniBar.updatePointer(...arg)
       }
     })
 
-
     /**
      * 显示下一页按钮
-     * @return {[type]} [description]
      */
     $$mediator.$bind('showNext', () => {
-      isToolbar && isToolbar.showNext();
+      pptBar && pptBar.showNext();
     })
-
 
     /**
      * 隐藏下一页按钮
-     * @return {[type]} [description]
      */
     $$mediator.$bind('hideNext', () => {
-      isToolbar && isToolbar.hideNext();
+      pptBar && pptBar.hideNext();
     })
-
 
     /**
      * 显示上一页按钮
-     * @return {[type]} [description]
      */
     $$mediator.$bind('showPrev', () => {
-      isToolbar && isToolbar.showPrev();
+      pptBar && pptBar.showPrev();
     })
-
 
     /**
      * 隐藏上一页按钮
-     * @return {[type]} [description]
      */
     $$mediator.$bind('hidePrev', () => {
-      isToolbar && isToolbar.hidePrev();
+      pptBar && pptBar.hidePrev();
     })
-
 
     /**
      * 切换工具栏
      * state, pointer
-     * @return {[type]} [description]
      */
     $$mediator.$bind('toggleToolbar', (...arg) => {
-      isToolbar && isToolbar.toggle(...arg)
+      pptBar && pptBar.toggle(...arg)
       if (this.miniBar) {
         this.miniBar && this.miniBar.toggle(...arg)
       }
     })
 
-
     /**
      * 复位工具栏
-     * @return {[type]} [description]
      */
     $$mediator.$bind('resetToolbar', () => {
       if (this.mainToolbar) {
@@ -331,7 +308,6 @@ export class SceneFactory {
         this.mainToolbar.hideNavbar() //导航栏
       }
     })
-
 
     /**
      * 监听创建完成
@@ -384,9 +360,9 @@ export class SceneFactory {
     this.$$mediator.$destroy();
 
     //销毁工具栏
-    if (this.isToolbar) {
-      this.isToolbar.destroy()
-      this.isToolbar = null
+    if (this.pptBar) {
+      this.pptBar.destroy()
+      this.pptBar = null
     }
 
     //销毁节点

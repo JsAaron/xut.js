@@ -5,11 +5,11 @@ import { fix } from '../pagebase/move/translation'
  * 提高当前页面的层级，方便别的页面切换不产生视觉影响
  */
 const raiseHierarchy = (complier, visualIndex) => {
-  complier.pageMgr.$$assistPocess(visualIndex, pageObj => {
+  complier.pageMgr.assistPocess(visualIndex, pageObj => {
     pageObj.setPageContainerHierarchy({ 'z-index': 9997 })
   })
   complier.getMasterContext(() => {
-    complier.masterMgr.$$assistPocess(visualIndex, pageObj => {
+    complier.masterMgr.assistPocess(visualIndex, pageObj => {
       pageObj.setPageContainerHierarchy({ 'z-index': 1 })
     })
   })
@@ -98,12 +98,12 @@ const creationLogic = (complier, data) => {
   /*修正翻页2页的页面坐标值*/
   _.each(data.ruleOut, function (pageIndex) {
     if (pageIndex > targetIndex) {
-      pageMgr.$$assistAppoint(pageIndex, function (pageObj) {
+      pageMgr.assistAppoint(pageIndex, function (pageObj) {
         fix(pageObj.$pageNode, 'nextEffect')
       })
     }
     if (pageIndex < targetIndex) {
-      pageMgr.$$assistAppoint(pageIndex, function (pageObj) {
+      pageMgr.assistAppoint(pageIndex, function (pageObj) {
         fix(pageObj.$pageNode, 'prevEffect')
       })
     }

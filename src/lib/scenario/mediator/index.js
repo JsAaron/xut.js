@@ -283,7 +283,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
   set: function(regData) {
     var injection;
     if (injection = this.$$scheduler[regData.pageType + 'Mgr']) {
-      injection.$$assistPocess(regData.pageIndex, function(pageObj) {
+      injection.assistPocess(regData.pageIndex, function(pageObj) {
         pageObj.baseAddComponent.call(pageObj, regData.widget);
       })
     } else {

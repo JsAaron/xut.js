@@ -90,7 +90,7 @@ export default class TaskActivitys extends TaskSuper {
     if (this.base.hasAutoRun && taskName === 'strAfter') {
       interrupt = true;
     }
-    this.$$checkNextTask('内部contents', () => {
+    this._$$checkNextTask('内部contents', () => {
       nextTask()
     }, interrupt)
   }
@@ -102,8 +102,6 @@ export default class TaskActivitys extends TaskSuper {
    */
   _dataAfterCheck(pipeData) {
     this._checkNextTask('dataAfter', () => {
-      /*初始化浮动,this.$$floatDivertor*/
-      this.$$initFloat(pipeData)
 
       /*解析点击反馈，点击缩放*/
       parseBehavior(pipeData)
@@ -216,7 +214,7 @@ export default class TaskActivitys extends TaskSuper {
       })()
 
       /*创建浮动层*/
-      this.$$createFloatLayer(complete, pipeData, this.base.floatGroup)
+      this._$$createFloatLayer(complete, pipeData, this.base.floatGroup)
 
       /*iboosk节点预编译,在执行的时候节点已经存在,不需要在创建*/
       if (Xut.IBooks.runMode()) {
@@ -286,13 +284,15 @@ export default class TaskActivitys extends TaskSuper {
   }
 
 
+  //============================
+  //      super方法
+  //============================
+
   /**
    * 清理引用
    * @return {[type]} [description]
    */
-  destroy() {
-
-    this.$$destroy()
+  _destroy() {
 
     //文字动画
     if (this.textFxObjs) {

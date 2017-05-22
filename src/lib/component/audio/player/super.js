@@ -9,7 +9,20 @@ import { Subtitle } from '../subtitle'
  */
 export default class AudioSuper {
 
-  constructor() {}
+  constructor(options, controlDoms) {
+    this.options = options
+    this.controlDoms = controlDoms;
+    /*构建之前处理*/
+    this._$$preRelated(options.trackId, options);
+    /*初始化数据*/
+    this._init();
+    //相关数据
+    this._$$afterRelated(options)
+  }
+
+  //=============================
+  //    私有方法
+  //=============================
 
   /**
    * 构建之前关数据
@@ -18,7 +31,7 @@ export default class AudioSuper {
    *  2 外部content的行为音频
    *  二者只会同时存在一个
    */
-  $$preRelated(trackId, options) {
+  _$$preRelated(trackId, options) {
 
     /*匹配URL地址*/
     this.$$url = config.getAudioPath() + options.url
@@ -34,11 +47,8 @@ export default class AudioSuper {
 
   /**
    * 构建之后关数据
-   * @param  {[type]} options     [description]
-   * @param  {[type]} controlDoms [description]
-   * @return {[type]}             [description]
    */
-  $$afterRelated(options, controlDoms) {
+  _$$afterRelated(options) {
     //音频重复播放次数
     if (options.data && options.data.repeat) {
       this.repeatNumber = Number(options.data.repeat)
@@ -49,13 +59,19 @@ export default class AudioSuper {
     }
     //字幕对象
     if (options.subtitles && options.subtitles.length > 0) {
-      this.subtitleObject = new Subtitle(options, controlDoms, (cb) => this.getAudioTime(cb))
+      this.subtitleObject = new Subtitle(options, this.controlDoms, (cb) => this._getAudioTime(cb))
     }
     //如果有外部回调处理
     if (this.outerCallback) {
       this.outerCallback.call(this);
     }
   }
+
+
+  //=============================
+  //    提供给子类方法
+  //=============================
+
 
   /**
    * 运行成功失败后处理方法
@@ -64,13 +80,13 @@ export default class AudioSuper {
    *   true 成功回调
    *   false 失败回调
    */
-  $$callbackProcess(state) {
+  _$$callbackProcess(state) {
 
     /**************************
         处理content的反馈回调
     ***************************/
     if (this.outerCallback) {
-      this.end()
+      this.destroy()
     } else {
 
       /**************************
@@ -95,11 +111,23 @@ export default class AudioSuper {
   }
 
 
+
+  //=============================
+  //    提供外部接口，向上转型
+  //=============================
+
+
   /**
    * 播放
    * @return {[type]} [description]
    */
-  $$play() {
+  play() {
+
+    /*子类提供了播放*/
+    if (this._play) {
+      this._play()
+    }
+
     //flash模式不执行
     if (this.audio && !this.isFlash) {
       this.status = 'playing';
@@ -119,7 +147,13 @@ export default class AudioSuper {
    * 停止
    * @return {[type]} [description]
    */
-  $$pause() {
+  pause() {
+
+    /*子类提供了暂停*/
+    if (this._pause) {
+      this._pause()
+    }
+
     this.status = 'paused';
     this.audio && this.audio.pause && this.audio.pause();
     this.acitonObj && this.acitonObj.pause();
@@ -128,7 +162,13 @@ export default class AudioSuper {
   /**
    * 销毁
    */
-  $$destroy() {
+  destroy() {
+
+    /*子类提供了销毁*/
+    if (this._destroy) {
+      this._destroy()
+    }
+
     this.status = 'ended';
     //销毁字幕
     if (this.subtitleObject) {

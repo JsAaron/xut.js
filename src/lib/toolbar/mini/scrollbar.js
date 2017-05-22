@@ -24,18 +24,18 @@ export default class Scrollbar extends MiniSuper {
   }
 
   /**
-   * 更新总页数
+   * 更新单页
    */
-  updateTotal(newTotalIndex) {
+  _updateSingle(action, updateIndex) {
     Xut.nextTick(() => {
 
     })
   }
 
   /**
-   * 更新单页
+   * 更新总页数
    */
-  _updateSingle(action, updateIndex) {
+  updateTotal(newTotalIndex) {
     Xut.nextTick(() => {
 
     })

@@ -332,7 +332,6 @@ export default class Powepoint {
    * @return {[type]}           [description]
    */
   _completeHandler(parameter, object, params) {
-    //if(parameter.pptAudio) parameter.pptAudio.end(); //声音存在延时问题，马上结束可导制无法听到声音
     for(var item in params) {
       switch(item) {
         case "x":

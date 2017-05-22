@@ -33,8 +33,9 @@ export default class TaskComponents extends TaskSuper {
     }
   }
 
-
-  /*创建dom节点，但是浮动类型例外*/
+  /**
+   * 创建dom节点，但是浮动类型例外
+   */
   _create() {
 
     const {
@@ -46,8 +47,6 @@ export default class TaskComponents extends TaskSuper {
     } = this.pipeData
 
     let resultHTML = [];
-
-    this.$$initFloat()
 
     /*
       创建DOM元素结构,返回是拼接字符串
@@ -106,14 +105,18 @@ export default class TaskComponents extends TaskSuper {
    * 检测下个任务是否中断运行
    */
   _checkNextTask(htmlString) {
-    this.$$checkNextTask('内部Component', () => {
+    this._$$checkNextTask('内部Component', () => {
       this._float(() => {
         this._render(htmlString)
       })
     })
   }
 
-  /*浮动处理*/
+  /**
+   * 浮动处理
+   * @param  {Function} callback [description]
+   * @return {[type]}            [description]
+   */
   _float(callback) {
 
     /*制作浮点回调*/
@@ -129,7 +132,7 @@ export default class TaskComponents extends TaskSuper {
       }
     })()
 
-    this.$$createFloatLayer(complete, this.pipeData)
+    this._$$createFloatLayer(complete, this.pipeData)
 
     /*如果不存在浮动*/
     if (this.pipeData.taskCount === 0) {
@@ -138,7 +141,11 @@ export default class TaskComponents extends TaskSuper {
     }
   }
 
-  /*渲染页面*/
+  /**
+   * 渲染页面*
+   * @param  {[type]} htmlString [description]
+   * @return {[type]}            [description]
+   */
   _render(htmlString) {
     /*正常component*/
     if (htmlString) {
@@ -146,18 +153,21 @@ export default class TaskComponents extends TaskSuper {
         container: this.$containsNode,
         content: $(htmlString)
       }, () => {
-        this.destroy()
+        this._destroy()
         this.success()
       })
     } else {
-      this.destroy()
+      this._destroy()
       this.success()
     }
   }
 
-  destroy() {
+  //============================
+  //      super方法
+  //============================
+
+  _destroy() {
     this.$containsNode = null;
-    this.$$destroy()
   }
 
 }

@@ -6,13 +6,14 @@ import AudioSuper from './super'
 class _Audio5js extends AudioSuper {
 
   constructor(options, controlDoms) {
-    super()
+    super(options, controlDoms)
+  }
 
+  /**
+   * 初始化
+   */
+  _init() {
     let self = this
-
-    //构建之前处理
-    this.$$preRelated(options.trackId, options);
-
     let audio = new Audio5js({
       ready: function (player) {
         this.load(self.$$url);
@@ -21,14 +22,8 @@ class _Audio5js extends AudioSuper {
         self.status = "playing"
       }
     });
-
     this.audio = audio;
-    this.trackId = options.trackId;
     this.status = 'playing';
-    this.options = options;
-
-    //相关数据
-    this.$$afterRelated(options, controlDoms);
   }
 
   /**
@@ -37,23 +32,14 @@ class _Audio5js extends AudioSuper {
    * get audio
    * @return {[type]} [description]
    */
-  getAudioTime(callback) {
+  _getAudioTime(callback) {
     callback(Math.round(this.audio.audio.audio.currentTime * 1000))
   }
 
-  play() {
-    this.$$play()
-  }
-
-  pause() {
-    this.$$pause()
-  }
-
-  end() {
+  _destroy() {
     if (this.audio) {
       this.audio.destroy();
       this.audio = null;
     }
-    this.$$destroy()
   }
 }
