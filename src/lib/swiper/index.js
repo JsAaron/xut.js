@@ -566,6 +566,7 @@ export default class Swiper extends Observer {
       因为在页面中左右滑动一下，这个值被修改
       后续就会报错*/
       this.orientation = 'v'
+
       this.$emit('onWheel', wheelDeltaY)
       return
     }

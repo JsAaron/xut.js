@@ -349,7 +349,6 @@ export default class ColumnClass {
   _initY() {
 
     const container = this.$container[0]
-
     this.columnCount = getColumnCount(this.seasonId, this.chapterId)
 
     const iscroll = this.iscroll = delegateScrollY(container, {
@@ -400,19 +399,18 @@ export default class ColumnClass {
      * 2 滚动中触发点击强制停止
      */
     iscroll.on('scrollEnd', e => {
-      this.scrollToPage({
+      this._toScrollbar({
         pageIndex: ColumnClass.getScrollYIndex(iscroll.y, rangeY),
         direction: iscroll.directionY
       })
     })
-
 
     /**
      * 如果是边界交界处移动
      * 扩展的API
      */
     iscroll.on('borderMode', e => {
-      this.scrollToPage({
+      this._toScrollbar({
         pageIndex: ColumnClass.getScrollYIndex(iscroll.startY, rangeY),
         direction: iscroll.directionY
       })
@@ -422,7 +420,7 @@ export default class ColumnClass {
      * 松手后的惯性滑动
      */
     iscroll.on('momentum', (newY, time, easing) => {
-      this.scrollToPage({
+      this._toScrollbar({
         pageIndex: ColumnClass.getScrollYIndex(newY, rangeY),
         direction: iscroll.directionY,
         time
@@ -432,10 +430,26 @@ export default class ColumnClass {
   }
 
   /**
-   * 滚动指定的页面
+   * 滚动指定页面
+   */
+  scrollToPage(direction) {
+    if (direction === 'prev') {
+      const y = this.rangeY[this.visualIndex + 1].min
+      this.iscroll.scrollTo(0, -y, 600)
+      --this.visualIndex
+    }
+    if (direction === 'next') {
+      const y = this.rangeY[this.visualIndex + 1].min
+      this.iscroll.scrollTo(0, -y, 600)
+      ++this.visualIndex
+    }
+  }
+
+  /**
+   * 滚动指定的卷滚条页面
    * @return {[type]} [description]
    */
-  scrollToPage({
+  _toScrollbar({
     direction,
     pageIndex,
     time

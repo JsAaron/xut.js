@@ -126,7 +126,7 @@ export default class Mediator extends Observer {
     $$globalSwiper.$watch('onFilter', (hookCallback, point, evtObj) => {
       let node = point.target
       swiperHook(evtObj, node)
-        //页面类型
+      //页面类型
       let pageType = isBelong(node);
       //冒泡的ul根节点
       let parentNode = $$globalSwiper.findBubbleRootNode(point, pageType);
@@ -165,7 +165,6 @@ export default class Mediator extends Observer {
 
     /**
      * 触屏滑动,通知pageMgr处理页面移动
-     * @return {[type]} [description]
      */
     $$globalSwiper.$watch('onMove', (data) => {
       $$scheduler.movePageBases(data)
@@ -182,7 +181,6 @@ export default class Mediator extends Observer {
 
     /**
      * 翻页动画完成回调
-     * @return {[type]}              [description]
      */
     $$globalSwiper.$watch('onComplete', (...arg) => {
       $$scheduler.completePageBases(...arg)
@@ -191,34 +189,36 @@ export default class Mediator extends Observer {
 
     /**
      * 鼠标滚轮
-     * @return {[type]}              [description]
      */
     $$globalSwiper.$watch('onWheel', (wheelDeltaY) => {
-      // const currPageBase = Xut.Presentation.GetPageBase($$globalSwiper.visualIndex)
-      //   /*如果当前是流式页面*/
-      // if (currPageBase && currPageBase.hasColumnData) {
-      //   const columnObj = currPageBase.columnGroup.get()[0]
-      //   if (wheelDeltaY > 0) {
-      //     columnObj.scrollToPage({
-      //       pageIndex: $$globalSwiper.visualIndex - 1,
-      //       direction: 'prev'
-      //     })
-      //   } else {
-      //     columnObj.scrollToPage({
-      //       pageIndex: 3,
-      //       direction: 'next'
-      //     })
-      //   }
-      // } else {
+      const currPageBase = Xut.Presentation.GetPageBase($$globalSwiper.visualIndex)
+      /*如果当前是流式页面*/
+      if (currPageBase && currPageBase.hasColumnData) {
+        const columnObj = currPageBase.columnGroup.get()[0]
+        if (wheelDeltaY < 0) {
+          if (columnObj.visualIndex === 0) {
+            $$globalSwiper.prev()
+          } else {
+            columnObj.scrollToPage('prev')
+          }
+        } else {
+          /**尾部边界翻页 */
+          if (columnObj.visualIndex === columnObj.columnCount - 1) {
+            $$globalSwiper.next()
+          } else {
+            columnObj.scrollToPage('next')
+          }
+        }
+      } else {
         /*ppt页面*/
         /*向上滚动*/
-        if (wheelDeltaY > 0) {
+        if (wheelDeltaY < 0) {
           $$globalSwiper.prev()
         } else {
           /*向下滚动*/
           $$globalSwiper.next()
         }
-      // }
+      }
     })
 
 
@@ -270,14 +270,14 @@ export default class Mediator extends Observer {
       /**
        * li节点,多线程创建的时候处理滑动
        */
-      'data-container' () {
+      'data-container'() {
         $$mediator.$emit('change:toggleToolbar')
       },
 
       /**
        * 是背景层
        */
-      'data-multilayer' () {
+      'data-multilayer'() {
         //改变工具条状态
         $$mediator.$emit('change:toggleToolbar')
       },
@@ -285,7 +285,7 @@ export default class Mediator extends Observer {
       /**
        * 默认content元素可以翻页
        */
-      'data-behavior' (target, attribute, rootNode, pageIndex) {
+      'data-behavior'(target, attribute, rootNode, pageIndex) {
         //没有事件的元素,即可翻页又可点击切换工具栏
         if (attribute == 'click-swipe') {
           $$mediator.$emit('change:toggleToolbar')
