@@ -400,10 +400,10 @@ export default class ColumnClass {
      * 2 滚动中触发点击强制停止
      */
     iscroll.on('scrollEnd', e => {
-      // this.scrollToPage({
-      //   pageIndex: ColumnClass.getScrollYIndex(iscroll.startY, rangeY),
-      //   direction: iscroll.directionY
-      // })
+      this.scrollToPage({
+        pageIndex: ColumnClass.getScrollYIndex(iscroll.y, rangeY),
+        direction: iscroll.directionY
+      })
     })
 
 

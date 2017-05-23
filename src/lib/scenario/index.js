@@ -65,7 +65,7 @@ export class SceneFactory {
 
   constructor(data) {
     const options = _.extend(this, data)
-      //创建主场景
+    //创建主场景
     this._createHTML(options, () => {
       if (!Xut.IBooks.Enabled) {
         this._initToolBar()
@@ -199,12 +199,29 @@ export class SceneFactory {
       /*页面总数改变*/
       if (config.launch.columnCheck) {
         Xut.Application.Watch('change:number:total', () => {
-          this.miniBar.updateTotal(getPageTotal(true))
+          this._eachMiniBar(function () {
+            this.updateTotal(getPageTotal(true))
+          })
         })
       }
     }
   }
 
+  /**
+   * minibar可能是一个合集对象
+   * 可以同时存在的可能
+   */
+  _eachMiniBar(callback) {
+    if (this.miniBar) {
+      if (this.miniBar.length > 1) {
+        this.miniBar.forEach((bar) => {
+          callback.call(bar)
+        })
+      } else {
+        callback.call(this.miniBar)
+      }
+    }
+  }
 
   /**
    * 构建创建对象
@@ -255,9 +272,9 @@ export class SceneFactory {
      */
     $$mediator.$bind('pageUpdate', (...arg) => {
       pptBar && pptBar.updatePointer(...arg)
-      if (this.miniBar) {
-        this.miniBar && this.miniBar.updatePointer(...arg)
-      }
+      this._eachMiniBar(function () {
+        this.updatePointer(...arg)
+      })
     })
 
     /**
@@ -294,9 +311,9 @@ export class SceneFactory {
      */
     $$mediator.$bind('toggleToolbar', (...arg) => {
       pptBar && pptBar.toggle(...arg)
-      if (this.miniBar) {
-        this.miniBar && this.miniBar.toggle(...arg)
-      }
+      this._eachMiniBar(function () {
+        this.toggle(...arg)
+      })
     })
 
     /**
@@ -318,7 +335,7 @@ export class SceneFactory {
         if (isMain) {
           this.complete(() => {
             Xut.View.HideBusy()
-              //检测是不是有缓存加载
+            //检测是不是有缓存加载
             if (!checkHistory(this.history)) {
               //指定自动运行的动作
               nextAction && nextAction();

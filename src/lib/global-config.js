@@ -183,6 +183,8 @@ export default {
    *        }
    * 3 滚动工具栏 scrollbar
    *             direction 滚动方向 'v' / 'h'
+   * 
+   * 组合模式['digital','circular','scrollbar']
    * @type {Object}
    */
   pageBar: {
