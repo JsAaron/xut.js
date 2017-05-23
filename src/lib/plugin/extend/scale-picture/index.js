@@ -26,8 +26,8 @@ export class ScalePicture {
   }) {
 
     let current = sceneController.containerObj('current')
-    if(current && current.$rootNode) {
-      this.$container = current.$rootNode
+    if(current){
+      this.$container = current.getSceneNode()
     }
     if(!this.$container.length) {
       $warn('图片缩放依赖的容器不存在')

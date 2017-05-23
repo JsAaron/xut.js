@@ -30,7 +30,8 @@ export default function distribute(Swiper) {
    */
   Swiper.prototype._distributeComplete = function (...arg) {
     this._setRestore(...arg)
-    this.$emit('innerFlipOver')
+    /*触发翻页结束，通过slideTo绑定*/
+    this.$emit('_slideFlipOver')
     const callback = () => this.enable()
     setTimeout(() => {
       this.$emit('onComplete', {

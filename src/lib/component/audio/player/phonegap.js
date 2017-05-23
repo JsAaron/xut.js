@@ -14,9 +14,9 @@ export class PhoneGapMedia extends AudioSuper {
 
     //音频成功与失败调用
     const audio = new window.GLOBALCONTEXT.Media(self.$$url, () => {
-      self.$$callbackProcess(true);
+      self._$$callbackProcess(true);
     }, () => {
-      self.$$callbackProcess(false);
+      self._$$callbackProcess(false);
     })
 
     //autoplay

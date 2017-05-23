@@ -18,7 +18,6 @@ export default class Circular extends MiniSuper {
 
   constructor(pageBar, options) {
     super(pageBar, options)
-    this.$$template()
   }
 
   /**
@@ -71,9 +70,23 @@ export default class Circular extends MiniSuper {
   }
 
 
-  toggle(state, pointer) {
-    this.$$toggle()
+  /**
+   * 更新单页
+   */
+  _updateSingle(action, updateIndex) {
+    Xut.nextTick(() => {
+      this.$container.find('span.slider-pager-page.active').removeClass('active')
+      $(this.$container.find('span.slider-pager-page')[updateIndex - 1]).addClass("active");
+      if (action === 'init') {
+        this.$container.show()
+      }
+    })
   }
+
+
+  //==========================
+  //        对外接口
+  //==========================
 
   /**
    * 更新总页数
@@ -82,7 +95,7 @@ export default class Circular extends MiniSuper {
     Xut.nextTick(() => {
       var visualIndex = 0;
       var span, iconi;
-      _.each(this.$container.find('span.slider-pager-page'), function(value, index) {
+      _.each(this.$container.find('span.slider-pager-page'), function (value, index) {
         if (value.className != "slider-pager-page") {
           visualIndex = index;
         }
@@ -102,26 +115,5 @@ export default class Circular extends MiniSuper {
       }
     })
   }
-
-  /**
-   * 更新单页
-   */
-  _updateSingle(action, updateIndex) {
-    Xut.nextTick(() => {
-      this.$container.find('span.slider-pager-page.active').removeClass('active')
-      $(this.$container.find('span.slider-pager-page')[updateIndex - 1]).addClass("active");
-      if (action === 'init') {
-        this.$container.show()
-      }
-    })
-  }
-
-  /**
-   * 更新页码
-   */
-  updatePointer(...arg) {
-    this.$$updatePointer(...arg)
-  }
-
 
 }

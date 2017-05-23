@@ -37,7 +37,9 @@ Xut.Application.setConfig = {
     convert: 'svg',
     doublePageMode: false,
 
-    displayMode: 'v'
+    scrollMode: 'v',
+
+    //
     // banMove:true
 
     // launchAnim:false,是否关闭启动动画
@@ -48,14 +50,15 @@ Xut.Application.setConfig = {
     // columnCheck:false, //分栏检测
     // doublePageMode: false //双页模式
     // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
-    // pageBar: {
-    //     type: 'circular',
-    //     mode: 1,
-    //     position: {
-    //         top: '90%',
-    //         left: '20%'
-    //     }
-    // },
+    pageBar: {
+        type: 'scrollbar'
+        // direction:'h'
+            // mode: 1,
+            // position: {
+            //     top: '90%',
+            //     left: '20%'
+            // }
+    },
     // quickFlip:true,//是否支持快速翻页
     // supportQR: true, //是否启动二维码
     // visualHeight: DEFAULT,
@@ -86,7 +89,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)
 })
 
-var appId = 101 //306
+var appId = 317 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         // trackCode: ['swipe'], //代码跟踪

@@ -79,7 +79,6 @@ export function delegateScrollY(node, options) {
   _.extend(options, {
     stopPropagation: true,
     preventDefault: false,
-    scrollbars: true,
     bounce: false,
     probeType: 2
   })
@@ -173,7 +172,7 @@ export function IScroll(node, options, delegate) {
   ///////////////////////////////
   /// 竖版禁止上下滑动的冒泡，并且不是强制的横屏滑动模式
   ///////////////////////////////
-  if (delegate && config.launch.displayMode === 'v') {
+  if (delegate && config.launch.scrollMode === 'v') {
     /*如果是竖版滑动，那么就需要代理下，竖版滑动后，上下翻页*/
     if (!options.scrollX || options.scrollY) {
       return new delegateScrollY(node, options)
@@ -185,7 +184,7 @@ export function IScroll(node, options, delegate) {
   /// 启动代码追踪swipe的情况下
   /// 那么停掉事件冒泡，否则滑动会触发
   ///////////////////////////////
-  // if (delegate && config.launch.displayMode === 'h') {
+  // if (delegate && config.launch.scrollMode === 'h') {
   /*默认参数：横版，上下滑动, 代理左右*/
   // if (options.scrollX === undefined && options.scrollY === undefined || options.scrollY === true) {
   // return new delegateScrollX(node, options)

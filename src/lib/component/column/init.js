@@ -48,7 +48,7 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
     data = $(data).find("#columns-content").html()
   }
 
-  if (config.launch.displayMode === 'v') {
+  if (config.launch.scrollMode === 'v') {
     /*竖版的情况下，不需要分栏了，直接处理*/
     const columnGap = `${COLUMNTAP}:${negativeWidth}px`
     const columnWidth = `${COLUMNWIDTH}:${containerWidth}px`
@@ -144,9 +144,9 @@ export function getColumnData($seasons, callback) {
       if (tag) {
         let chapterId = tag.match(/\d+/)[0]
         let count
-        if (config.launch.displayMode === 'h') {
+        if (config.launch.scrollMode === 'h') {
           count = getColumnCount(node, '#columns-content')
-        } else if (config.launch.displayMode === 'v') {
+        } else if (config.launch.scrollMode === 'v') {
           count = getColumnCount(node, '#scroller-section')
         }
         callback(seasonsId, chapterId, count)

@@ -165,6 +165,11 @@ export default function slide(Swiper) {
       }
       /*点击时间啊*/
       this._recordRreTick.time = Swiper.getDate()
+
+      /*外部调用，第一次没有速度，就用默认的*/
+      if (speed === undefined) {
+        speed = this._defaultFlipTime
+      }
     }
 
     /*保存每次点击动作*/
@@ -230,7 +235,7 @@ export default function slide(Swiper) {
      * 需要翻页结束后触发外部通知，绑定一次
      */
     if (callback) {
-      this.$once('innerFlipOver', callback)
+      this.$once('_slideFlipOver', callback)
     }
 
     this._distributeMove({

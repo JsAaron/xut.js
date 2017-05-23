@@ -7,6 +7,24 @@
  */
 import { config } from '../../../config/index'
 
+/**
+ * 创建视频容器
+ */
+export function createVideoWrap(type, options) {
+  const { width, height, zIndex, top, left } = options
+  return $(String.styleFormat(
+    `<div data-type="${type}"
+          style="width:${width}px;
+                 height:${height}px;
+                 position:absolute;
+                 visibility:hidden;
+                 z-index:${zIndex};
+                 top:${top}px;
+                 left:${left}px;">
+     </div>`))
+}
+
+
 /*获取视频文件路径*/
 export function getFilePath(url) {
   return config.getVideoPath() + url

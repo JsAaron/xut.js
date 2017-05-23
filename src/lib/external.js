@@ -4,7 +4,9 @@ var cssName = [
   'css/horizontal.css',
   'css/vertical.css',
   'css/adaptive-image.css',
-  'css/css3-filters.css'
+  'css/css3-filters.css',
+  'css/flarevideo.css',
+  'css/flarevideo.default.css'
 ]
 
 //2016.11.14 去掉代码区域
@@ -42,7 +44,12 @@ var jsName = [
   'lib/plugin/library/textfx/textfx.js',
 
 
-  // 视频插件 已去除
+  // 视频插件
+  'lib/plugin/library/video/jquery.hammer.js',
+  'lib/plugin/library/video/jquery.ui.slider.js',
+  'lib/plugin/library/video/jquery.ui.touch-punch.js',
+  'lib/plugin/library/video/flarevideo.js',
+
 
   'lib/plugin/cordova/cordova.js',
   'lib/plugin/cordova/readAssetsFilePlugin.js',
@@ -67,22 +74,22 @@ var jsName = [
 
 function load(fileList, temp) {
   var list = ''
-  fileList.forEach(function(name) {
+  fileList.forEach(function (name) {
     list += temp(name)
   })
   document.write(list)
 }
 
 //for build
-if(typeof exports === "object" && typeof module !== "undefined") {
+if (typeof exports === "object" && typeof module !== "undefined") {
   exports.cssName = cssName
   exports.jsName = jsName
 } else {
   //for index.html
-  load(cssName.concat(footName), function(name) {
+  load(cssName.concat(footName), function (name) {
     return '<link type="text/css" rel="stylesheet" href="' + name + '?random=' + Math.random() + '">'
   })
-  load(jsName, function(name) {
+  load(jsName, function (name) {
     return '<script type="text/javascript" src="' + name + '?random=' + Math.random() + '"><\/script>'
   })
 }

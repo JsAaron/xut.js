@@ -14,7 +14,7 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
-Xut.Version = 883.6
+Xut.Version = 883.9
 
 /*加载应用app*/
 const initApp = (...arg) => {
@@ -39,7 +39,17 @@ let cacheOptions
 
 /*横竖切换*/
 const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function () {
-  $(window).on('orientationchange', () => {
+  $(window).on('orientationchange', (e) => {
+
+    /**
+     * 2017.5.23
+     * 安卓手机播放视频，全屏的情况下，会强制横版
+     * 导致了触发横竖切换关闭应用
+     */
+    if (Xut.Application.PlayHTML5Video) {
+      return
+    }
+
     //安卓设备上,对横竖切换的处理反映很慢
     //所以这里需要延时加载获取设备新的分辨率
     //2016.11.8

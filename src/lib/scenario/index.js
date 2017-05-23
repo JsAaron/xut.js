@@ -345,6 +345,13 @@ export class SceneFactory {
     }
   }
 
+  /**
+   * 获取场景根节点
+   * @return {[type]} [description]
+   */
+  getSceneNode() {
+    return this.$sceneNode
+  }
 
   /**
    * 销毁场景对象

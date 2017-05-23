@@ -6,12 +6,12 @@ import initTasks from '../multithread/index'
 import Factory from '../depend/factory'
 import { watchColumn } from '../watch'
 
-export default function(baseProto) {
+export default function (baseProto) {
 
   /**
    * 初始化多线程任务
    */
-  baseProto.init = function(options) {
+  baseProto.init = function (options) {
 
     const instance = this
 
@@ -42,6 +42,10 @@ export default function(baseProto) {
     //canvas模式
     this.canvasRelated = new Factory();
 
+    /*有流式排版数据*/
+    if (instance.chapterData.note === 'flow') {
+      this.hasColumnData = true
+    }
 
     ///////////////////////////////////////
     ///
@@ -185,7 +189,7 @@ export default function(baseProto) {
 
         if (divertor.ids.length) {
           let contentObj
-          _.each(divertor.ids, function(id) {
+          _.each(divertor.ids, function (id) {
             if (contentObj = instance.baseGetContentObject(id)) {
               //初始视察坐标
               if (contentObj.parallax) {
@@ -218,7 +222,7 @@ export default function(baseProto) {
           let contentObj
           let contentNode
             //浮动对象
-          _.each(divertor.ids, function(id) {
+          _.each(divertor.ids, function (id) {
             //转化成实际操作的浮动对象,保存
             if (contentObj = instance.baseGetContentObject(id)) {
               //初始视察坐标
@@ -235,7 +239,7 @@ export default function(baseProto) {
               //获取DOM节点
               if (contentsFragment) {
                 const prefix = 'Content_' + instance.chapterIndex + "_"
-                _.each(contentsFragment, function(dom) {
+                _.each(contentsFragment, function (dom) {
                   let makePrefix = prefix + id;
                   if (dom.id == makePrefix) {
                     contentNode = dom;

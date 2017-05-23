@@ -58,11 +58,12 @@ export default {
    *
    * 后期增加竖版模式修正接口
    *
-   * displayMode
+   * scrollMode
    *   横版翻页 horizontal  h
    *   竖版翻页 vertical    v
+   *
    */
-  displayMode: 'h',
+  scrollMode: 'h',
 
   /**
    * 是否锁定页面移动
@@ -181,6 +182,7 @@ export default {
    *            position:
    *        }
    * 3 滚动工具栏 scrollbar
+   *             direction 滚动方向 'v' / 'h'
    * @type {Object}
    */
   pageBar: {

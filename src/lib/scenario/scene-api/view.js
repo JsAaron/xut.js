@@ -247,7 +247,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
     const pagePointer = $$globalSwiper.getPointer()
 
     /*如果没有传递布方向，就取页面，这个在全局接口中处理*/
-    orientation = orientation || config.launch.displayMode
+    orientation = orientation || config.launch.scrollMode
 
     $$mediator.$$scheduler.movePageBases({
       action,

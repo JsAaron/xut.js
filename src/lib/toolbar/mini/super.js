@@ -2,22 +2,26 @@ import { hasColumn, getBeforeCount, getCurrentBeforeCount } from '../../componen
 
 /**
  * 迷你工具栏超类
+ *$sceneNode: $sceneNode,
+  visualIndex: pageIndex,
+  pageTotal: getPageTotal()
  */
 export default class MiniSuper {
 
   constructor(pageBar, options) {
-    /*$rootNode, pageTotal, visualIndex*/
     this.pageBar = pageBar
     for (let key in options) {
       this[key] = options[key]
     }
+    this._$$template()
   }
 
   /**
    * 模板初始化
    * @return {[type]} [description]
    */
-  $$template() {
+  _$$template() {
+    this._init && this._init()
     this._parseBar && this._parseBar()
     const html = this._createHTML()
     if (html) {
@@ -40,7 +44,21 @@ export default class MiniSuper {
     this.$container.hide()
   }
 
-  $$toggle(state, pointer) {
+
+  _$$update(action, index, time) {
+    /*避免滚动页面重复更新*/
+    if (this._visualIndex != index) {
+      this._updateSingle(action, index, time)
+    }
+    this._visualIndex = index
+  }
+
+
+  //==========================
+  //        对外接口
+  //==========================
+
+  toggle(state, pointer) {
     if (pointer !== 'pageNumber') return
     switch (state) {
       case 'show':
@@ -56,19 +74,12 @@ export default class MiniSuper {
     }
   }
 
-  _$$update(action, index) {
-    /*避免滚动页面重复更新*/
-    if (this._visualIndex != index) {
-      this._updateSingle(action, index)
-    }
-    this._visualIndex = index
-  }
 
   /**
    * 更新页码
    */
-  $$updatePointer({
-    time,
+  updatePointer({
+    time = 600,
     action,
     direction,
     parentIndex, //chpater的pageIndex
@@ -83,7 +94,7 @@ export default class MiniSuper {
 
     //没有column
     if (!hasColumn()) {
-      this._$$update(action, parentIndex)
+      this._$$update(action, parentIndex, time)
       return
     }
 
@@ -104,7 +115,7 @@ export default class MiniSuper {
       }
     }
 
-    this._$$update(action, updateIndex)
+    this._$$update(action, updateIndex, time)
   }
 
 

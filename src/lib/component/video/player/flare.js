@@ -12,50 +12,58 @@
 2017.5.5 去掉_flarePlayer的匹配，因为默认行为处理了
  */
 
+import { getFilePath, getContainer, createVideoWrap } from './util'
+
 /**
  * html5 and flash player
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-const _flarePlayer = function (options) {
-  let container = getContainer(options)
-  let url = config.getVideoPath() + options.url
-  let { width, height, top, left, zIndex } = options
+export default class flarePlayer {
 
-  let $videoWrap = createVideoWrap('video-flare', {
-    width,
-    height,
-    top,
-    left,
-    zIndex
-  })
+  constructor(options) {
 
-  let fv = $videoWrap.flareVideo({
-    width,
-    height,
-    autoplay: true
-  })
+    let url = getFilePath(options.url)
+    let { width, height, top, left, zIndex } = options
 
-  fv.load([{
-    src: url,
-    type: 'video/mp4'
-  }])
+    this.container = getContainer(options)
 
-  container.append($videoWrap)
+    let $videoWrap = createVideoWrap('video-flare', {
+      width,
+      height,
+      top,
+      left,
+      zIndex
+    })
 
-  fv.video.setAttribute('playsinline', 'playsinline')
+    let fv = this.fv = $videoWrap.flareVideo({
+      width,
+      height,
+      autoplay: true
+    })
 
-  return {
-    play: function () {
-      fv.play()
-    },
-    stop: function () {
-      fv.pause()
-    },
-    close: function () {
-      fv.remove()
-      fv = null
-      container = null
-    }
+    fv.load([{
+      src: url,
+      type: 'video/mp4'
+    }])
+
+    this.container.append($videoWrap)
+
+    fv.video.setAttribute('playsinline', 'playsinline')
   }
+
+  play() {
+    this.fv.play()
+  }
+
+  stop() {
+    this.fv.pause()
+  }
+
+  destroy() {
+    this.fv.remove()
+    this.fv = null
+    this.container = null
+  }
+
 }

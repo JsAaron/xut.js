@@ -19,7 +19,7 @@ const ABS = Math.abs
  * 是否多点触发
  * @return {Boolean} [description]
  */
-const hasMultipleTouches = function(e) {
+const hasMultipleTouches = function (e) {
   return e.touches && e.touches.length > 1
 }
 
@@ -56,7 +56,7 @@ export default class Swiper extends Observer {
     /*提供swiperConfig快速配置文件,关键配置*/
     let scrollX = true
     let scrollY = false
-    if (config.launch.displayMode === 'v') {
+    if (config.launch.scrollMode === 'v') {
       scrollX = false
       scrollY = true
     }
@@ -292,7 +292,7 @@ export default class Swiper extends Observer {
      * point 事件对象
      * @return {[type]} [description]
      */
-    this.$emit('onFilter', function() {
+    this.$emit('onFilter', function () {
       interrupt = true;
     }, point, e)
 
@@ -525,12 +525,13 @@ export default class Swiper extends Observer {
 
   /**
    * 鼠标滚动
+   * win 平台鼠标每次滑动一次产生一次变化
+   * mac 平台带有惯性
    * @return {[type]} [description]
    */
   _onWheel(e) {
-    if (!this.enabled || this._wheeled) return
 
-    this._wheeled = true
+    if (!this.enabled || this._wheeled) return
 
     e.preventDefault();
     e.stopPropagation();
@@ -552,30 +553,22 @@ export default class Swiper extends Observer {
     }
 
     if (this.options.snap) {
-      /*鼠标wheel会有一个惯性的响应，所以会造成多次翻页
+      /*mac上鼠标wheel会有一个惯性的响应，所以会造成多次翻页
       这里采用一个最大延时处理*/
-      clearTimeout(this.wheelTimeout);
-      this.wheelTimeout = setTimeout(() => {
-        this._wheeled = false
-      }, 1200)
-
+      if (Xut.plat.isMacOS) {
+        this._wheeled = true
+        clearTimeout(this.wheelTimeout);
+        this.wheelTimeout = setTimeout(() => {
+          this._wheeled = false
+        }, 1200)
+      }
       /*强制修复滑动的方向是上下
       因为在页面中左右滑动一下，这个值被修改
       后续就会报错*/
       this.orientation = 'v'
-
-      /*向上滚动*/
-      if (wheelDeltaY > 0) {
-        this.prev()
-      } else {
-        /*向下滚动*/
-        this.next()
-      }
+      this.$emit('onWheel', wheelDeltaY)
       return
     }
-
-    this._wheeled = false
-
   }
 
   /**

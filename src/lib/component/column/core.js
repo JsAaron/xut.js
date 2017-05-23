@@ -45,9 +45,9 @@ export default class ColumnClass {
       container: rootNode,
       content: this.$container
     }, () => {
-      if (config.launch.displayMode === 'h') {
+      if (config.launch.scrollMode === 'h') {
         this._initX()
-      } else if (config.launch.displayMode === 'v') {
+      } else if (config.launch.scrollMode === 'v') {
         this._initY()
       }
       callback()
@@ -181,7 +181,7 @@ export default class ColumnClass {
       }
     });
 
-    swipe.$watch('onTap', function(pageIndex, hookCallback, point, duration) {
+    swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
       const node = point.target;
       /*图片缩放*/
       if (!hasQrcode) {
@@ -197,7 +197,7 @@ export default class ColumnClass {
     })
 
 
-    swipe.$watch('onMove', function(options) {
+    swipe.$watch('onMove', function (options) {
 
       const {
         action,
@@ -341,6 +341,7 @@ export default class ColumnClass {
     return rangeY
   }
 
+
   /**
    * 竖版模式下，整体数据滑动
    * @return {[type]} [description]
@@ -352,15 +353,11 @@ export default class ColumnClass {
     this.columnCount = getColumnCount(this.seasonId, this.chapterId)
 
     const iscroll = this.iscroll = delegateScrollY(container, {
-      stopPropagation: true,
-      preventDefault: false,
-      mouseWheel: true,
-      scrollbars: true,
-      bounce: false,
-      probeType: 2
+      // mouseWheel: true,
+      // scrollbars: true
     })
 
-    const rangeY = ColumnClass.getScrollYRange(iscroll.maxScrollY, this.columnCount)
+    const rangeY = this.rangeY = ColumnClass.getScrollYRange(iscroll.maxScrollY, this.columnCount)
 
     /*初始化Y轴的定位位置*/
     if (Xut.Presentation.GetPageIndex() > this.initIndex) {
@@ -398,18 +395,38 @@ export default class ColumnClass {
     })
 
     /**
+     * 滚动结束
+     * 1 正常结束
+     * 2 滚动中触发点击强制停止
+     */
+    iscroll.on('scrollEnd', e => {
+      // this.scrollToPage({
+      //   pageIndex: ColumnClass.getScrollYIndex(iscroll.startY, rangeY),
+      //   direction: iscroll.directionY
+      // })
+    })
+
+
+    /**
      * 如果是边界交界处移动
      * 扩展的API
      */
     iscroll.on('borderMode', e => {
-      this._scrollToPage(iscroll.startY, iscroll.directionY, rangeY)
+      this.scrollToPage({
+        pageIndex: ColumnClass.getScrollYIndex(iscroll.startY, rangeY),
+        direction: iscroll.directionY
+      })
     })
 
     /**
      * 松手后的惯性滑动
      */
     iscroll.on('momentum', (newY, time, easing) => {
-      this._scrollToPage(newY, iscroll.directionY, rangeY, time)
+      this.scrollToPage({
+        pageIndex: ColumnClass.getScrollYIndex(newY, rangeY),
+        direction: iscroll.directionY,
+        time
+      })
     })
 
   }
@@ -418,11 +435,14 @@ export default class ColumnClass {
    * 滚动指定的页面
    * @return {[type]} [description]
    */
-  _scrollToPage(distY, directionY, rangeY, time) {
-    const pageIndex = ColumnClass.getScrollYIndex(distY, rangeY);
+  scrollToPage({
+    direction,
+    pageIndex,
+    time
+  }) {
     /*只有页码不一致的时候才更新，并且只更新一次*/
     if (this.visualIndex !== pageIndex) {
-      this._updataScrollbars(pageIndex, directionY, time)
+      this._updataScrollbars(pageIndex, direction, time)
       this.visualIndex = pageIndex
     }
   }

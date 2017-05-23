@@ -1,12 +1,18 @@
 import h5Player from './player/native'
 import PhoneGapMedia from './player/phonegap'
 import WebPage from './player/web'
+import flarePlayer from './player/flare'
 
 let VideoPlayer
 
 //浏览器平台
 if (Xut.plat.isBrowser) {
-  VideoPlayer = h5Player
+  if (Xut.plat.isAndroid) {
+    // 安卓手机浏览器全屏问题太多,默认全屏回去的时候会顶出来
+    VideoPlayer = flarePlayer
+  } else {
+    VideoPlayer = h5Player
+  }
 } else {
   //apk ipa
   if (Xut.plat.isIOS || top.EduStoreClient) {

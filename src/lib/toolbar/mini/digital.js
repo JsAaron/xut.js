@@ -8,7 +8,6 @@ import { config } from '../../config/index'
 export default class Digital extends MiniSuper {
   constructor(pageBar, options) {
     super(pageBar, options)
-    this.$$template()
   }
 
   _createHTML() {
@@ -33,18 +32,6 @@ export default class Digital extends MiniSuper {
     this.$sceneNode.append(this.$container)
   }
 
-  toggle(state, pointer) {
-    this.$$toggle()
-  }
-
-  /**
-   * 更新总页数
-   */
-  updateTotal(newTotalIndex) {
-    Xut.nextTick(() => {
-      this.$allNode.text(newTotalIndex)
-    })
-  }
 
   /**
    * 更新单页
@@ -58,11 +45,20 @@ export default class Digital extends MiniSuper {
     })
   }
 
+
+  //==========================
+  //        对外接口
+  //==========================
+
+
   /**
-   * 更新页码
+   * 更新总页数
    */
-  updatePointer(...arg) {
-    this.$$updatePointer(...arg)
+  updateTotal(newTotalIndex) {
+    Xut.nextTick(() => {
+      this.$allNode.text(newTotalIndex)
+    })
   }
+
 
 }

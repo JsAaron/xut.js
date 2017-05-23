@@ -143,7 +143,6 @@ video {
 /*竖版flow布局*/
 #wrapper-section{
   position: relative;
-  overflow: hidden;
 }
 
 /*竖版flow布局*/

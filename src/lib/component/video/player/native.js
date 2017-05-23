@@ -1,23 +1,6 @@
-import { getFilePath, getContainer } from './util'
+import { getFilePath, getContainer, createVideoWrap } from './util'
 import { removeVideo } from '../api'
 import { config } from '../../../config/index'
-
-/**
- * 创建视频容器
- */
-const createVideoWrap = (type, options) => {
-  const { width, height, zIndex, top, left } = options
-  return $(String.styleFormat(
-    `<div data-type="${type}"
-          style="width:${width}px;
-                 height:${height}px;
-                 position:absolute;
-                 visibility:hidden;
-                 z-index:${zIndex};
-                 top:${top}px;
-                 left:${left}px;">
-     </div>`))
-}
 
 
 /**
@@ -42,6 +25,7 @@ export default class h5Player {
     this._initWrap(width, height, top, left, zIndex, getFilePath(url))
     this._initEvent(options)
 
+
     //////////////////////////
     ///2016.6.23
     //移动端必须触发2次play
@@ -50,6 +34,14 @@ export default class h5Player {
     if (Xut.plat.isIOS || Xut.plat.isAndroid) {
       this.play()
     }
+
+    /**
+     * 2017.5.23
+     * 安卓手机播放视频，全屏的情况下，会强制横版
+     * 导致了触发横竖切换关闭应用
+     * @type {Boolean}
+     */
+    Xut.Application.PlayHTML5Video = true
   }
 
   /*初始化容器*/
@@ -124,5 +116,10 @@ export default class h5Player {
     this.$container = null
     this.options.container = null
     this.video = null
+
+    /*延时1000后改变，因为视频关闭后复位，会引发浏览器翻转事件*/
+    setTimeout(function () {
+      Xut.Application.PlayHTML5Video = false
+    }, 1000)
   }
 }
