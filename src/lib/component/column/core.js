@@ -411,6 +411,10 @@ export default class ColumnClass {
 
     /**滚动时候变化*/
     iscroll.on('scroll', e => {
+
+      /*强制显示滚动工具栏*/
+      Xut.View.ShowScrollBar()
+
       this._goToScrollbar({
         pageIndex: ColumnClass.getScrollYIndex(iscroll.y, rangeY),
         direction: iscroll.directionY

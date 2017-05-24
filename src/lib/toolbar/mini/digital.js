@@ -45,6 +45,11 @@ export default class Digital extends MiniSuper {
     })
   }
 
+  _destroy() {
+    this.$currtNode = null
+    this.$allNode = null
+  }
+
 
   //==========================
   //        对外接口

@@ -297,6 +297,17 @@ export class SceneFactory {
       pptBar && pptBar.hidePrev();
     })
 
+
+    /**
+     * 设置显示滚动工具栏]
+     */
+    $$mediator.$bind('showScrollBar', () => {
+      this._eachMiniBar(function () {
+        this.showBar && this.showBar()
+      })
+    })
+
+
     /**
      * 切换工具栏
      * state, pointer
@@ -381,6 +392,10 @@ export class SceneFactory {
       this.pptBar.destroy()
       this.pptBar = null
     }
+
+    this._eachMiniBar(function () {
+      this.destroy()
+    })
 
     //销毁节点
     this.$sceneNode.off()

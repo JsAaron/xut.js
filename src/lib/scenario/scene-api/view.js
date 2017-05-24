@@ -13,6 +13,13 @@ export function extendView($$mediator, access, $$globalSwiper) {
   //========================
 
   /**
+   * 设置显示滚动工具栏
+   */
+  Xut.View.ShowScrollBar = function () {
+    $$mediator.$emit('change:showScrollBar')
+  }
+
+  /**
    * 更新页码
    * @param {[type]} point [description]
    *   parentIndex  父索引

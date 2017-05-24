@@ -24,11 +24,11 @@ export default class Scrollbar extends MiniSuper {
     if (this.direction == "h") {
       const width = this.visualWidth / this.pageTotal;
       return `<div class="iScrollHorizontalScrollbar iScrollLoneScrollbar"
-                   style="position: absolute; z-index: 9999; height: 7px;
+                   style="position: absolute; z-index: 9999; height: .3rem;
                    left: 2px; right: 2px; bottom: 1px; overflow: hidden;
                    pointer-events: none;display:none;">
                 <div class="iScrollIndicator"
-                   style="box-sizing: border-box; position: absolute;
+                   style="box-sizing: border-box; position: absolute;opacity:0.5;
                    background: rgba(0, 0, 0, 0.498039)
                    border: 1px solid rgba(255, 255, 255, 0.901961);
                    border-radius: 3px; height: 100%;;
@@ -37,13 +37,13 @@ export default class Scrollbar extends MiniSuper {
                 </div>
              </div>`
     } else {
-      const height = this.visualHeight / this.pageTotal;
+      const height = this.visualHeight / this.pageTotal
       return `<div class="iScrollVerticalScrollbar iScrollLoneScrollbar"
-                   style="position: absolute; z-index: 9999; width: 7px;
+                   style="position: absolute; z-index: 9999; width: .3rem;
                    bottom: 2px; top: 2px; right: 1px; overflow: hidden;
                    pointer-events: none;display:none;">
                 <div class="iScrollIndicator"
-                   style="box-sizing: border-box; position: absolute;
+                   style="box-sizing: border-box; position: absolute;opacity:0.5;
                    background: rgba(0, 0, 0, 0.498039)
                    border: 1px solid rgba(255, 255, 255, 0.901961);
                    border-radius: 3px; width: 100%;;
@@ -56,7 +56,8 @@ export default class Scrollbar extends MiniSuper {
 
 
   _getContextNode() {
-    this.currentNode = this.$container.find('div:first')[0];
+    this.$currentNode = this.$container.find('div:first')
+    this.currentNode = this.$currentNode[0]
   }
 
   _render() {
@@ -80,10 +81,28 @@ export default class Scrollbar extends MiniSuper {
     }
   }
 
+  _clearTimer() {
+    if (this.timer) {
+      clearTimeout(this.timer)
+      this.timer = null
+    }
+  }
+
   /**
    * 更新单页
    */
   _updateSingle(action, updateIndex, speed) {
+
+    this._clearTimer()
+
+    if (this.barState === 'hide') {
+      this.showBar()
+    }
+
+    this.timer = setTimeout(() => {
+      this.hideBar()
+    }, 1500)
+
     if (action === 'init') {
       this._setTranslate(updateIndex, 0)
       this.$container.show()
@@ -93,10 +112,34 @@ export default class Scrollbar extends MiniSuper {
   }
 
 
+  _destroy() {
+    this._clearTimer()
+    this.$currentNode = null
+    this.currentNode = null
+  }
+
   //==========================
   //        对外接口
   //==========================
 
+  /*显示滚动条*/
+  showBar() {
+    if (this.barState === 'hide') {
+      this.$currentNode.css('opacity', '0.5')
+      this.barState = 'show'
+    }
+  }
+
+  /*隐藏滚动条*/
+  hideBar() {
+    this.barState = 'hide'
+    this.$currentNode.transition({
+      opacity: 0,
+      duration: 1500,
+      easing: 'in'
+    });
+    this._clearTimer()
+  }
 
   /**
    * 更新总页数

@@ -83,6 +83,9 @@ export default class Circular extends MiniSuper {
     })
   }
 
+ _destroy() {
+    this.$currtNode = null
+  }
 
   //==========================
   //        对外接口

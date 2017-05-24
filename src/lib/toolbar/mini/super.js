@@ -58,6 +58,16 @@ export default class MiniSuper {
   //        对外接口
   //==========================
 
+
+  destroy() {
+    if (this._destroy) {
+      this._destroy()
+    }
+    this.$sceneNode = null
+    this.$container = null
+  }
+
+
   toggle(state, pointer) {
     if (pointer !== 'pageNumber') return
     switch (state) {
