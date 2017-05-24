@@ -76,6 +76,7 @@ export default class Scrollbar extends MiniSuper {
         distance = this.visualHeight * (updateIndex - 1) / this.pageTotal;
         translate = `translate3d(0px,${distance}px,0px)`
       }
+      this.distance = distance
       this.currentNode.style[Xut.style.transitionDuration] = speed + 'ms'
       this.currentNode.style[Xut.style.transform] = translate
     }
@@ -100,7 +101,7 @@ export default class Scrollbar extends MiniSuper {
     }
 
     this.timer = setTimeout(() => {
-      this.hideBar()
+      // this.hideBar()
     }, 1500)
 
     if (action === 'init') {
@@ -121,6 +122,23 @@ export default class Scrollbar extends MiniSuper {
   //==========================
   //        对外接口
   //==========================
+
+  /**
+   * 更新坐标
+   */
+  updatePosition({
+    y,
+    wrapperHeight,
+    maxScrollY,
+    count
+   }) {
+    const maxPosY = wrapperHeight - this.distance - 43
+    const sizeRatioY = maxPosY / maxScrollY
+    y = Math.round(sizeRatioY * y) || 0;
+    const distance = this.distance + y
+    this.currentNode.style[Xut.style.transitionDuration] = 0
+    this.currentNode.style[Xut.style.transform] = `translate3d(0px,${distance}px,0px)`
+  }
 
   /*显示滚动条*/
   showBar() {

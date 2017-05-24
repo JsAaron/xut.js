@@ -307,6 +307,15 @@ export class SceneFactory {
       })
     })
 
+    /**
+     * 更新滚动条坐标
+     */
+    $$mediator.$bind('updateScrollPosition', (...arg) => {
+      this._eachMiniBar(function () {
+        this.updatePosition && this.updatePosition(...arg)
+      })
+    })
+
 
     /**
      * 切换工具栏

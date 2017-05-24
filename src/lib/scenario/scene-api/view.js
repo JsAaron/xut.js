@@ -12,6 +12,12 @@ export function extendView($$mediator, access, $$globalSwiper) {
   //  页面工具栏按钮
   //========================
 
+
+  Xut.View.UpdateScrollPosition = function (...arg) {
+    $$mediator.$emit('change:updateScrollPosition', ...arg)
+  }
+
+
   /**
    * 设置显示滚动工具栏
    */

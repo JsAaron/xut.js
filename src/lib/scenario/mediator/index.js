@@ -102,7 +102,7 @@ export default class Mediator extends Observer {
     }
 
     if (config.launch.scrollMode === 'v') {
-      setOptions.mouseWheel = true
+      // setOptions.mouseWheel = true
     }
 
     /*快速配置了*/

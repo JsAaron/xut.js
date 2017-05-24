@@ -119,10 +119,9 @@ export function delegateScrollY(node, options) {
         })
       } else {
         /**
-         * 新增的接口
-         * 触发边界滑动
+         * 内部滑动
          */
-        iscroll._execEvent('borderMode', e);
+        iscroll._execEvent('scrollContent', e);
       }
     }
   })

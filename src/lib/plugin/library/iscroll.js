@@ -1764,6 +1764,7 @@
     },
 
     _move: function(e) {
+
       var point = e.touches ? e.touches[0] : e,
         deltaX, deltaY,
         newX, newY,
@@ -1930,6 +1931,7 @@
         }
 
         this.maxPosY = this.wrapperHeight - this.indicatorHeight;
+
         this.sizeRatioY = this.options.speedRatioY || (this.scroller.maxScrollY && (this.maxPosY / this.scroller.maxScrollY));
       }
 

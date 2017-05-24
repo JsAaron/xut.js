@@ -354,7 +354,7 @@ export default class ColumnClass {
     this.columnCount = getColumnCount(this.seasonId, this.chapterId)
 
     const iscroll = this.iscroll = delegateScrollY(container, {
-      // mouseWheel: true
+      // mouseWheel: true,
       // scrollbars: true
     })
 
@@ -411,25 +411,16 @@ export default class ColumnClass {
 
     /**滚动时候变化*/
     iscroll.on('scroll', e => {
-
       /*强制显示滚动工具栏*/
       Xut.View.ShowScrollBar()
-
-      this._goToScrollbar({
-        pageIndex: ColumnClass.getScrollYIndex(iscroll.y, rangeY),
-        direction: iscroll.directionY
-      })
     })
 
     /**
-     * 如果是边界交界处移动
      * 扩展的API
+     * 如果是滚动的内容部分
      */
-    iscroll.on('borderMode', e => {
-      this._goToScrollbar({
-        pageIndex: ColumnClass.getScrollYIndex(iscroll.startY, rangeY),
-        direction: iscroll.directionY
-      })
+    iscroll.on('scrollContent', e => {
+      this.updatePosition()
     })
 
     /**
@@ -442,8 +433,16 @@ export default class ColumnClass {
         time
       })
     })
+  }
 
 
+  updatePosition() {
+    Xut.View.UpdateScrollPosition({
+      y: this.iscroll.y,
+      wrapperHeight: this.iscroll.wrapperHeight,
+      maxScrollY: this.iscroll.maxScrollY,
+      count: this.columnCount
+    })
   }
 
   /**
