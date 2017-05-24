@@ -3,14 +3,6 @@
  ios上支持行内播放，不能用默认的H5控制条，拖动失效，必须要加进度条
  ios低于10的情况下，用原生播放,而且不能是平板，只能是手机，touch
  */
-// if (Xut.plat.supportPlayInline && !Xut.plat.isTablet) {
-//   h5Player = _flarePlayer
-// }
-
-/*
-匹配视屏播放器
-2017.5.5 去掉_flarePlayer的匹配，因为默认行为处理了
- */
 
 import { getFilePath, getContainer, createVideoWrap } from './util'
 
@@ -47,9 +39,10 @@ export default class flarePlayer {
       type: 'video/mp4'
     }])
 
-    this.container.append($videoWrap)
-
+    /*窗口化*/
     fv.video.setAttribute('playsinline', 'playsinline')
+
+    this.container.append($videoWrap)
   }
 
   play() {

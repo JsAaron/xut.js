@@ -67,15 +67,16 @@ export default class Scrollbar extends MiniSuper {
   _setTranslate(updateIndex, speed) {
     if (this.currentNode) {
       let distance;
-      //横向翻页
+      let translate
       if (this.direction == "h") {
         distance = this.visualWidth * (updateIndex - 1) / this.pageTotal;
-        this.currentNode.style[Xut.style.transform] = `translate3d(${distance}px,0px,0px)`
+        translate = `translate3d(${distance}px,0px,0px)`
       } else {
         distance = this.visualHeight * (updateIndex - 1) / this.pageTotal;
-        this.currentNode.style[Xut.style.transform] = `translate3d(0px,${distance}px,0px)`
+        translate = `translate3d(0px,${distance}px,0px)`
       }
       this.currentNode.style[Xut.style.transitionDuration] = speed + 'ms'
+      this.currentNode.style[Xut.style.transform] = translate
     }
   }
 
@@ -95,6 +96,7 @@ export default class Scrollbar extends MiniSuper {
   //==========================
   //        对外接口
   //==========================
+
 
   /**
    * 更新总页数

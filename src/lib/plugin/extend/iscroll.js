@@ -15,7 +15,7 @@ export function delegateScrollX(node, options) {
 
   iscroll.on('scroll', function(e) {
     /*如果横版滑动了，并且页面允许翻页*/
-    if (iscroll.directionLocked === 'h' && Xut.View.GetSwiperEnabled()) {
+    if (iscroll.directionLocked === 'h' && Xut.View.HasEnabledSwiper()) {
       if (iscroll.distX > 0) {
         /*prev*/
         Xut.View.SetSwiperMove({
@@ -98,7 +98,7 @@ export function delegateScrollY(node, options) {
    */
   iscroll.on('scroll', e => {
     /*探测下全局是否可以滑动了*/
-    if (Xut.View.GetSwiperEnabled()) {
+    if (Xut.View.HasEnabledSwiper()) {
       if (iscroll.directionY === -1 && iscroll.startY === 0) {
         hasBorderRun = true
           /*top*/
@@ -131,6 +131,7 @@ export function delegateScrollY(node, options) {
     if (hasBorderRun) {
       const typeAction = Xut.View.GetSwiperActionType(0, iscroll.distY, iscroll.endTime - iscroll.startTime, 'v')
       if (typeAction === 'flipOver') {
+        iscroll.offWheel && iscroll.offWheel()
         if (iscroll.directionY === 1) {
           Xut.View.GotoNextSlide()
         } else if (iscroll.directionY === -1) {

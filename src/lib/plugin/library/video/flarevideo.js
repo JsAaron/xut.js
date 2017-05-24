@@ -421,6 +421,7 @@
 
     var self = this
 
+    /*点击播放停止按钮*/
     play.on(clickName, function(e) {
       if(!self.canPlay) return;
       self.play();

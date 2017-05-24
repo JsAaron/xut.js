@@ -126,7 +126,7 @@ export default class Mediator extends Observer {
     $$globalSwiper.$watch('onFilter', (hookCallback, point, evtObj) => {
       let node = point.target
       swiperHook(evtObj, node)
-      //页面类型
+        //页面类型
       let pageType = isBelong(node);
       //冒泡的ul根节点
       let parentNode = $$globalSwiper.findBubbleRootNode(point, pageType);
@@ -154,7 +154,7 @@ export default class Mediator extends Observer {
           handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex)
         } else {
           if (!Xut.Contents.Canvas.getIsTap()) {
-            $$mediator.$emit('change:toggleToolbar')
+            Xut.View.ToggleToolbar()
           }
         }
         handlerObj = null;
@@ -192,27 +192,33 @@ export default class Mediator extends Observer {
      */
     $$globalSwiper.$watch('onWheel', (wheelDeltaY) => {
       const currPageBase = Xut.Presentation.GetPageBase($$globalSwiper.visualIndex)
-      /*如果当前是流式页面*/
+        /*如果当前是流式页面*/
       if (currPageBase && currPageBase.hasColumnData) {
         const columnObj = currPageBase.columnGroup.get()[0]
-        if (wheelDeltaY < 0) {
+        if (wheelDeltaY > 0) {
           if (columnObj.visualIndex === 0) {
+            /*翻页卸载速鼠标事件*/
+            columnObj.offWheel()
             $$globalSwiper.prev()
           } else {
-            columnObj.scrollToPage('prev')
+            /*flow内部滑动，绑定鼠标事件*/
+            columnObj.bindWheel()
           }
         } else {
           /**尾部边界翻页 */
           if (columnObj.visualIndex === columnObj.columnCount - 1) {
+            /*翻页卸载速鼠标事件*/
+            columnObj.offWheel()
             $$globalSwiper.next()
           } else {
-            columnObj.scrollToPage('next')
+            /*flow内部滑动，绑定鼠标事件*/
+            columnObj.bindWheel()
           }
         }
       } else {
         /*ppt页面*/
         /*向上滚动*/
-        if (wheelDeltaY < 0) {
+        if (wheelDeltaY > 0) {
           $$globalSwiper.prev()
         } else {
           /*向下滚动*/
@@ -270,25 +276,25 @@ export default class Mediator extends Observer {
       /**
        * li节点,多线程创建的时候处理滑动
        */
-      'data-container'() {
-        $$mediator.$emit('change:toggleToolbar')
+      'data-container' () {
+        Xut.View.ToggleToolbar()
       },
 
       /**
        * 是背景层
        */
-      'data-multilayer'() {
+      'data-multilayer' () {
         //改变工具条状态
-        $$mediator.$emit('change:toggleToolbar')
+        Xut.View.ToggleToolbar()
       },
 
       /**
        * 默认content元素可以翻页
        */
-      'data-behavior'(target, attribute, rootNode, pageIndex) {
+      'data-behavior' (target, attribute, rootNode, pageIndex) {
         //没有事件的元素,即可翻页又可点击切换工具栏
         if (attribute == 'click-swipe') {
-          $$mediator.$emit('change:toggleToolbar')
+          Xut.View.ToggleToolbar()
         }
       }
     })

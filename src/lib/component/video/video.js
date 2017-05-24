@@ -7,8 +7,9 @@ let VideoPlayer
 
 //浏览器平台
 if (Xut.plat.isBrowser) {
-  if (Xut.plat.isAndroid) {
-    // 安卓手机浏览器全屏问题太多,默认全屏回去的时候会顶出来
+  // 安卓手机浏览器全屏问题太多,默认全屏回去的时候会顶出来
+  // 苹果手机初始化有一个白色的圆，控制条丢失
+  if (Xut.plat.isIOS || Xut.plat.isAndroid) {
     VideoPlayer = flarePlayer
   } else {
     VideoPlayer = h5Player
@@ -64,7 +65,4 @@ class VideoClass {
 }
 
 
-export {
-  h5Player,
-  VideoClass
-}
+export { VideoClass }

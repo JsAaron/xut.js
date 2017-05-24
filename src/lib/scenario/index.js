@@ -33,7 +33,6 @@ const findContainer = ($context, id, isMain) => {
  * @return {[type]} [description]
  */
 const checkHistory = (history) => {
-
   //直接启用快捷调试模式
   if (config.debug.deBugHistory) {
     Xut.View.LoadScenario(config.debug.deBugHistory)
@@ -65,7 +64,7 @@ export class SceneFactory {
 
   constructor(data) {
     const options = _.extend(this, data)
-    //创建主场景
+      //创建主场景
     this._createHTML(options, () => {
       if (!Xut.IBooks.Enabled) {
         this._initToolBar()
@@ -80,7 +79,6 @@ export class SceneFactory {
    * @return {[type]} [description]
    */
   _createHTML(options, callback) {
-
     //如果是静态文件执行期
     //支持Xut.IBooks模式
     //都不需要创建节点
@@ -89,9 +87,7 @@ export class SceneFactory {
       callback()
       return;
     }
-
     this.$sceneNode = $(options.isMain ? mainScene() : deputyScene(this.seasonId))
-
     Xut.nextTick({
       'container': $('.xut-scene-container'),
       'content': this.$sceneNode
@@ -213,13 +209,9 @@ export class SceneFactory {
    */
   _eachMiniBar(callback) {
     if (this.miniBar) {
-      if (this.miniBar.length > 1) {
-        this.miniBar.forEach((bar) => {
-          callback.call(bar)
-        })
-      } else {
-        callback.call(this.miniBar)
-      }
+      this.miniBar.forEach((bar) => {
+        callback.call(bar)
+      })
     }
   }
 
@@ -270,7 +262,7 @@ export class SceneFactory {
      *   subIndex     子索引
      * @return {[type]} [description]
      */
-    $$mediator.$bind('pageUpdate', (...arg) => {
+    $$mediator.$bind('updatePage', (...arg) => {
       pptBar && pptBar.updatePointer(...arg)
       this._eachMiniBar(function () {
         this.updatePointer(...arg)
@@ -326,6 +318,7 @@ export class SceneFactory {
       }
     })
 
+
     /**
      * 监听创建完成
      * @return {[type]} [description]
@@ -335,7 +328,7 @@ export class SceneFactory {
         if (isMain) {
           this.complete(() => {
             Xut.View.HideBusy()
-            //检测是不是有缓存加载
+              //检测是不是有缓存加载
             if (!checkHistory(this.history)) {
               //指定自动运行的动作
               nextAction && nextAction();

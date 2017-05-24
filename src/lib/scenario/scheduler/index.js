@@ -35,7 +35,7 @@ import {
 1:从属的主索引
 2:摆放位置
  */
-const getDoubleOption = function(chapterIndex, doublePage) {
+const getDoubleOption = function (chapterIndex, doublePage) {
   if (doublePage.total) {
     for (let key in doublePage) {
       if (key !== 'total') {
@@ -266,7 +266,7 @@ export default class Scheduler {
         ///////////////////////////
         return pageStyle => {
           //创建新的页面管理，masterFilter 母板过滤器回调函数
-          const _createPageBase = function(masterFilter) {
+          const _createPageBase = function (masterFilter) {
 
             //初始化构建页面对象
             //1:page，2:master
@@ -277,7 +277,7 @@ export default class Scheduler {
               chapterIndex,
               hasMultiPage,
               'getStyle': currentStyle
-            }, pageIndex, masterFilter, function(shareMaster) {
+            }, pageIndex, masterFilter, function (shareMaster) {
               if (config.debug.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                 $warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
               }
@@ -414,12 +414,12 @@ export default class Scheduler {
 
     /*移动页面*/
     this.pageMgr.move(data)
-    this.getMasterContext(function() { this.move(data, isAppBoundary) })
+    this.getMasterContext(function () { this.move(data, isAppBoundary) })
 
     //更新页码
     if (action === 'flipOver') {
       Xut.nextTick(() => {
-        this.$$mediator.$emit('change:pageUpdate', {
+        Xut.View.UpdatePage({
           action,
           parentIndex: direction === 'next' ? backIndex : frontIndex,
           direction
@@ -440,7 +440,7 @@ export default class Scheduler {
     /*暂停*/
     const suspendAction = (front, middle, back, stop) => {
       this.pageMgr.suspend(front, middle, back, stop)
-      this.getMasterContext(function() { this.suspend(stop) })
+      this.getMasterContext(function () { this.suspend(stop) })
     }
 
     const stopPageIndexs = converDoublePage(stopIndex)
@@ -473,7 +473,7 @@ export default class Scheduler {
     }
 
     //复位工具栏
-    this.$$mediator.$emit('change:resetToolbar')
+    Xut.View.ResetToolbar()
   }
 
 
@@ -537,9 +537,9 @@ export default class Scheduler {
       'suspendCallback': options.suspendAutoCallback,
       //流程结束通知
       //包括动画都已经结束了
-      'processComplete': function() {},
+      'processComplete': function () {},
       //构建完毕通知
-      'buildComplete': function(seasonId) {
+      'buildComplete': function (seasonId) {
         /**
          * 构建完成通知,用于处理历史缓存记录
          * 如果是调试模式 && 不是收费提示页面 && 多场景应用
@@ -555,7 +555,7 @@ export default class Scheduler {
     this.pageMgr.autoRun(data);
 
     //模板自动运行
-    this.getMasterContext(function() {
+    this.getMasterContext(function () {
       //如果动作是初始化，或者触发了母版自动运行
       //如果是越界处理
       //console.log(action,this.isBoundary,para.createMaster)
@@ -568,20 +568,20 @@ export default class Scheduler {
     const setToolbar = () => {
       //不显示首尾对应的按钮
       if (middleIndex == 0) {
-        $$mediator.$emit('change:hidePrev');
+        Xut.View.HidePrevBar();
       } else if (middleIndex == options.pageTotal - 1) {
-        $$mediator.$emit('change:hideNext');
-        $$mediator.$emit('change:showPrev');
+        Xut.View.HideNextBar();
+        Xut.View.ShowNextBar()
       } else {
-        $$mediator.$emit('change:showNext');
-        $$mediator.$emit('change:showPrev');
+        Xut.View.ShowNextBar()
+        Xut.View.ShowPrevBar();
       }
     }
 
     switch (action) {
       case 'init':
         //更新页码标示
-        $$mediator.$emit('change:pageUpdate', {
+        Xut.View.UpdatePage({
           action,
           parentIndex: middleIndex,
           direction
@@ -590,7 +590,7 @@ export default class Scheduler {
         break;
       case 'toPage':
         //更新页码标示
-        $$mediator.$emit('change:pageUpdate', {
+        Xut.View.UpdatePage({
           action,
           parentIndex: middleIndex,
           direction
@@ -647,7 +647,7 @@ export default class Scheduler {
     const middleIndex = pagePointer.middleIndex
 
     /*清理页码*/
-    const clearPointer = function() {
+    const clearPointer = function () {
       pagePointer.createIndex = null
       pagePointer.destroyIndex = null
     }
@@ -661,15 +661,15 @@ export default class Scheduler {
       if (middleIndex === 0) {
         this._runPageBase()
         if (pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-          this.$$mediator.$emit('change:showNext')
+          Xut.View.ShowNextBar()
         }
-        this.$$mediator.$emit('change:hidePrev')
+        Xut.View.HidePrevBar()
         return
       }
       if (middleIndex > -1) { //创建的页面
         createNextPageBase()
         clearPointer()
-        this.$$mediator.$emit('change:showNext')
+        Xut.View.ShowNextBar()
         return;
       }
     }
@@ -680,16 +680,16 @@ export default class Scheduler {
       if (middleIndex === pageTotal - 1) {
         this._runPageBase()
         if (pageTotal == 2) { //如果总数只有2页，那么首页的按钮是关闭的，需要显示
-          this.$$mediator.$emit('change:showPrev')
+          Xut.View.ShowPrevBar()
         }
         //多页处理
-        this.$$mediator.$emit('change:hideNext')
+        Xut.View.HideNextBar()
         return
       }
       if (createIndex < pageTotal) { //创建的页面
         createNextPageBase()
         clearPointer()
-        this.$$mediator.$emit('change:showPrev')
+        Xut.View.ShowPrevBar()
         return
       }
     }
@@ -719,7 +719,7 @@ export default class Scheduler {
     }
 
     //执行页面切换
-    goToPage(this, data, function(data) {
+    goToPage(this, data, function (data) {
       this._updatePointer(data.pagePointer);
       this._runPageBase({
         'action': 'toPage',
@@ -746,7 +746,7 @@ export default class Scheduler {
    */
   destroyManage() {
     this.pageMgr.destroyManage()
-    this.getMasterContext(function() {
+    this.getMasterContext(function () {
       this.destroyManage()
     })
   }
@@ -765,7 +765,7 @@ export default class Scheduler {
       //第一次进入，处理背景
       let $cover = $(".xut-cover")
       if ($cover.length) { //主动探测,只检查一次
-        let complete = function() {
+        let complete = function () {
           $cover && $cover.remove()
           $cover = null
           autoRun()
@@ -807,7 +807,7 @@ export default class Scheduler {
         if (Xut.Application.getAppState()) {
           //保留启动方法
           var pre = Xut.Application.LaunchApp;
-          Xut.Application.LaunchApp = function() {
+          Xut.Application.LaunchApp = function () {
             pre()
             triggerAuto()
           };

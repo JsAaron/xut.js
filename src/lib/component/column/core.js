@@ -297,7 +297,9 @@ export default class ColumnClass {
 
     })
 
-    swipe.$watch('onComplete', ({ unlock }) => {
+    swipe.$watch('onComplete', ({
+      unlock
+    }) => {
       coloumnObj.lastDistance = moveDistance
       unlock()
     })
@@ -352,7 +354,7 @@ export default class ColumnClass {
     this.columnCount = getColumnCount(this.seasonId, this.chapterId)
 
     const iscroll = this.iscroll = delegateScrollY(container, {
-      // mouseWheel: true,
+      // mouseWheel: true
       // scrollbars: true
     })
 
@@ -399,7 +401,17 @@ export default class ColumnClass {
      * 2 滚动中触发点击强制停止
      */
     iscroll.on('scrollEnd', e => {
-      this._toScrollbar({
+      this._goToScrollbar({
+        pageIndex: ColumnClass.getScrollYIndex(iscroll.y, rangeY),
+        direction: iscroll.directionY,
+        time: 0
+      })
+    })
+
+
+    /**滚动时候变化*/
+    iscroll.on('scroll', e => {
+      this._goToScrollbar({
         pageIndex: ColumnClass.getScrollYIndex(iscroll.y, rangeY),
         direction: iscroll.directionY
       })
@@ -410,7 +422,7 @@ export default class ColumnClass {
      * 扩展的API
      */
     iscroll.on('borderMode', e => {
-      this._toScrollbar({
+      this._goToScrollbar({
         pageIndex: ColumnClass.getScrollYIndex(iscroll.startY, rangeY),
         direction: iscroll.directionY
       })
@@ -420,60 +432,107 @@ export default class ColumnClass {
      * 松手后的惯性滑动
      */
     iscroll.on('momentum', (newY, time, easing) => {
-      this._toScrollbar({
+      this._goToScrollbar({
         pageIndex: ColumnClass.getScrollYIndex(newY, rangeY),
         direction: iscroll.directionY,
         time
       })
     })
 
+
   }
 
   /**
-   * 滚动指定页面
+   * 需要动态绑定
+   * 翻页到当前页面执行滑动的时候才绑定
+   * 在mac上滚动有惯性，所以直接在iscroll中绑定
+   * 会因为惯性影响到了页面
+   * @return {[type]} [description]
    */
-  scrollToPage(direction) {
-    if (direction === 'prev') {
-      const y = this.rangeY[this.visualIndex + 1].min
-      this.iscroll.scrollTo(0, -y, 600)
-      --this.visualIndex
+  bindWheel() {
+
+    if (this._bindWheeled) {
+      return
     }
-    if (direction === 'next') {
-      const y = this.rangeY[this.visualIndex + 1].min
-      this.iscroll.scrollTo(0, -y, 600)
-      ++this.visualIndex
+    this._bindWheeled = true
+
+    const onWheel = e => {
+      let wheelDeltaY = -e.deltaY;
+      if (wheelDeltaY === undefined) {
+        return
+      }
+
+      /**首页往上滑动，翻页*/
+      if (this.visualIndex === 0 && wheelDeltaY > 0 && this.iscroll.y >= 0) {
+        this.offWheel()
+        Xut.View.GotoPrevSlide()
+        return
+      }
+
+      /*如果是往下滑，翻页*/
+      if (this.visualIndex === this.columnCount - 1 && wheelDeltaY < 0 && this.iscroll.y === this.iscroll.maxScrollY) {
+        this.offWheel()
+        Xut.View.GotoNextSlide()
+        return
+      }
+
+      /*内部滑动*/
+      this.iscroll._wheel(e)
+    }
+
+    this.iscroll.wrapper.addEventListener('wheel', onWheel, false);
+    this.iscroll.wrapper.addEventListener('mousewheel', onWheel, false);
+    this.iscroll.wrapper.addEventListener('DOMMouseScroll', onWheel, false);
+
+    /**
+     * 清理绑定
+     * 这要绑定要
+     * iscroll的内部
+     * 因为在delegateScrollY代理中需要处理
+     */
+    this.iscroll.offWheel = () => {
+      if (this._bindWheeled) {
+        this._bindWheeled = false
+        this.iscroll.wrapper.removeEventListener('wheel', onWheel, false);
+        this.iscroll.wrapper.removeEventListener('mousewheel', onWheel, false);
+        this.iscroll.wrapper.removeEventListener('DOMMouseScroll', onWheel, false);
+      }
     }
   }
+
+  /**
+   * 翻页卸载鼠标事件
+   * @return {[type]} [description]
+   */
+  offWheel() {
+    if (this.iscroll && this.iscroll.offWheel) {
+      this.iscroll.offWheel()
+    }
+  }
+
 
   /**
    * 滚动指定的卷滚条页面
    * @return {[type]} [description]
    */
-  _toScrollbar({
+  _goToScrollbar({
     direction,
     pageIndex,
     time
   }) {
     /*只有页码不一致的时候才更新，并且只更新一次*/
     if (this.visualIndex !== pageIndex) {
-      this._updataScrollbars(pageIndex, direction, time)
+      Xut.View.UpdatePage({
+        time,
+        parentIndex: this.initIndex,
+        sonIndex: direction === 1 ? pageIndex : pageIndex + 2,
+        hasSon: true,
+        direction: direction === 1 ? 'next' : 'prev'
+      })
       this.visualIndex = pageIndex
     }
   }
 
-  /**
-   * 更新页面滚动条
-   * direction = 1 下滑动
-   */
-  _updataScrollbars(pageIndex, direction, time) {
-    Xut.View.SetPageNumber({
-      time,
-      parentIndex: this.initIndex,
-      sonIndex: direction === 1 ? pageIndex : pageIndex + 2,
-      hasSon: true,
-      direction: direction === 1 ? 'next' : 'prev'
-    })
-  }
 
   /**
    * 更新页码
@@ -487,7 +546,7 @@ export default class ColumnClass {
         --initIndex
       }
     }
-    Xut.View.SetPageNumber({
+    Xut.View.UpdatePage({
       parentIndex: initIndex,
       sonIndex: this.swipe.getVisualIndex() + 1,
       hasSon: true,

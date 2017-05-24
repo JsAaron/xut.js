@@ -1,4 +1,4 @@
-import { h5Player } from '../component/video/video'
+import flarePlayer from '../component/video/player/flare'
 
 
 const preloadVideo = {
@@ -23,9 +23,9 @@ const preloadVideo = {
   play() {
     //延时应用加载
     Xut.Application.delayAppRun();
-    Xut.Plugin.VideoPlayer.play(function() {
+    Xut.Plugin.VideoPlayer.play(function () {
       preloadVideo.launchApp();
-    }, function() {
+    }, function () {
       //捕获出错,下次不进入了,,暂无ID号
       // window.localStorage.setItem("videoPlayer", "error")
       preloadVideo.launchApp();
@@ -34,7 +34,7 @@ const preloadVideo = {
 
   //清理视频
   closeVideo() {
-    Xut.Plugin.VideoPlayer.close(function() {
+    Xut.Plugin.VideoPlayer.close(function () {
       preloadVideo.launchApp();
     });
   },
@@ -78,9 +78,9 @@ export function plugVideo() {
 export function html5Video() {
   //延时应用开始
   Xut.Application.delayAppRun()
-  h5Player({
+  flarePlayer({
     url: 'duku.mp4',
-    startBoot: function() {
+    startBoot: function () {
       Xut.Application.LaunchApp();
     }
   })

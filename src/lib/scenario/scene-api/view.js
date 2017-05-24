@@ -8,14 +8,59 @@ export function extendView($$mediator, access, $$globalSwiper) {
 
   const options = $$mediator.options
 
+  //========================
+  //  页面工具栏按钮
+  //========================
+
   /**
    * 更新页码
    * @param {[type]} point [description]
    *   parentIndex  父索引
    *   subIndex     子索引
    */
-  Xut.View.SetPageNumber = function (...arg) {
-    $$mediator.$emit('change:pageUpdate', ...arg)
+  Xut.View.UpdatePage = function (...arg) {
+    $$mediator.$emit('change:updatePage', ...arg)
+  }
+
+
+  /**
+   * 显示上一页按钮
+   * @param {...[type]} arg [description]
+   */
+  Xut.View.ShowPrevBar = function (...arg) {
+    $$mediator.$emit('change:showPrev', ...arg)
+  }
+
+  /**
+   * 隐藏上一页按钮
+   * @param {...[type]} arg [description]
+   */
+  Xut.View.HidePrevBar = function (...arg) {
+    $$mediator.$emit('change:hidePrev', ...arg)
+  }
+
+
+  /**
+   * 显示下一页按钮
+   * @param {...[type]} arg [description]
+   */
+  Xut.View.ShowNextBar = function (...arg) {
+    $$mediator.$emit('change:showNext', ...arg)
+  }
+
+  /**
+   * 隐藏下一页按钮
+   * @param {...[type]} arg [description]
+   */
+  Xut.View.HideNextBar = function (...arg) {
+    $$mediator.$emit('change:hideNext', ...arg)
+  }
+
+  /**
+   * state, pointer
+   */
+  Xut.View.ToggleToolbar = function (...arg) {
+    $$mediator.$emit('change:toggleToolbar', ...arg)
   }
 
   /**
@@ -24,7 +69,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 有参数单独显示指定的
    */
   Xut.View.ShowToolBar = function (point) {
-    $$mediator.$emit('change:toggleToolbar', 'show', point)
+    Xut.View.ToggleToolbar('show', point)
   }
 
   /**
@@ -33,8 +78,16 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 有参数单独隐藏指定
    */
   Xut.View.HideToolBar = function (point) {
-    $$mediator.$emit('change:toggleToolbar', 'hide', point)
+    Xut.View.ToggleToolbar('hide', point)
   }
+
+  /**
+   * 复位工具栏
+   */
+  Xut.View.ResetToolbar = function () {
+    $$mediator.$emit('change:resetToolbar')
+  }
+
 
   /**
    * 指定特定的显示与隐藏
@@ -47,10 +100,9 @@ export function extendView($$mediator, access, $$globalSwiper) {
    *  Xut.View.Toolbar('show')
    *  Xut.View.Toolbar('hide')
    *
-   * @return {[type]} [description]
    */
   Xut.View.Toolbar = function (cfg) {
-    $$mediator.$emit('change:toggleToolbar', cfg)
+    Xut.View.ToggleToolbar(cfg)
   };
 
   /*
@@ -114,7 +166,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 是否启动
    * @return {[type]} [description]
    */
-  Xut.View.GetSwiperEnabled = function () {
+  Xut.View.HasEnabledSwiper = function () {
     return $$globalSwiper.hasEnabled()
   }
 
@@ -191,7 +243,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
     //如果是一个参数是传递页码数,则为内部跳转
     if (arguments.length === 1) {
       //复位翻页按钮
-      $$mediator.$emit('change:showNext')
+      Xut.View.ShowNextBar()
       return $$globalSwiper.scrollToPage(fixParameter(seasonId))
     }
 
@@ -200,7 +252,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
       //chpaterId 转化成实际页码
       var sectionRang = Xut.data.query('sectionRelated', seasonId)
       var pageIndex = chapterId - sectionRang.start
-      $$mediator.$emit('change:showNext')
+      Xut.View.ShowNextBar()
       return $$globalSwiper.scrollToPage(fixParameter(pageIndex))
     }
 
