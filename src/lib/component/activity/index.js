@@ -12,7 +12,7 @@
  *                  B 处理同步音频
  *                                      *
  ******************************************/
-
+import { config } from '../../config/index'
 import textBoxMixin from './textbox/index'
 import bookMarkMixin from './bookmark/index'
 import searchBarMixin from './searchbar/index'
@@ -178,21 +178,21 @@ export default class Activity {
     const self = this
     const contentData = scope.contentData
 
-    const linkFunction = function(scrollNode) {
+    const linkFunction = function (scrollNode) {
 
       //滚动文本的互斥不显示做一个补丁处理
       //如果是隐藏的,需要强制显示,待邦定滚动之后再还原
       //如果是显示的,则不需要处理,
       let $parentNode = self.getContextNode(self.makePrefix('Content', scope.chapterIndex, scope.id))
       let visible = $parentNode.css('visibility')
-      let resetStyle = function() {}
+      let resetStyle = function () {}
 
       //元素隐藏状态下，绑定iScroll获取高度是有问题
       //所以这里需要补丁方式修正一下
       //让其不可见，但是可以获取高度
       if (visible == 'hidden') {
         let opacity = $parentNode.css('opacity')
-        let setStyle = function(key, value) {
+        let setStyle = function (key, value) {
           arguments.length > 1 ? $parentNode.css(key, value) : $parentNode.css(key)
         }
 
@@ -213,11 +213,19 @@ export default class Activity {
         }
       }
 
-      return function() {
-        self.iscroll = IScroll(scrollNode, {
+      return function () {
+
+        const option = {
           scrollbars: 'custom',
-          fadeScrollbars: false
-        }, 'delegate')
+          fadeScrollbars: true
+        }
+
+        /*迷你平台，工具栏不消失*/
+        if (config.launch.platform === 'mini') {
+          option.fadeScrollbars = false
+        }
+
+        self.iscroll = IScroll(scrollNode, option, 'delegate')
 
         //增加标记
         //在PPT动画中reset不还原
@@ -287,7 +295,7 @@ export default class Activity {
     } else {
       //容器处理
       if (containerPrefix = this.relatedData.containerPrefix) {
-        _.each(containerPrefix, function(containerName) {
+        _.each(containerPrefix, function (containerName) {
           node = contentsFragment[containerName];
           $node = $(node).find('#' + prefix);
           if ($node.length) {
@@ -308,7 +316,7 @@ export default class Activity {
    */
   _resetAloneAnim() {
     //复位拖动对象
-    accessDrop(this.eventData, function(drop) {
+    accessDrop(this.eventData, function (drop) {
       drop.reset();
     })
   }
@@ -349,7 +357,7 @@ export default class Activity {
 
         //处理新的场景
         if (scenarioInfo.seasonId || scenarioInfo.chapterId) {
-          setTimeout(function() {
+          setTimeout(function () {
             Xut.View.LoadScenario({
               'seasonId': scenarioInfo.seasonId,
               'chapterId': scenarioInfo.chapterId
@@ -367,7 +375,7 @@ export default class Activity {
    * @return {[type]} [description]
    */
   eachAssistContents(callback) {
-    _.each(this._contentGroup, function(scope) {
+    _.each(this._contentGroup, function (scope) {
       callback.call(this, scope)
     }, this)
   }
@@ -404,8 +412,8 @@ export default class Activity {
 
     //制作作用于内动画完成
     //等待动画完毕后执行动作or场景切换
-    let captureAnimComplete = this.captureAnimComplete = function(counts) {
-      return function(scope) {
+    let captureAnimComplete = this.captureAnimComplete = function (counts) {
+      return function (scope) {
         //动画结束,删除这个hack
         scope &&
           scope.$contentNode &&
@@ -440,13 +448,13 @@ export default class Activity {
     }(this._contentGroup.length);
 
     //执行动画
-    this.eachAssistContents(function(scope) {
+    this.eachAssistContents(function (scope) {
 
       //标记动画正在运行
       scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
         'animOffset': scope.$contentNode.offset()
       })
-      scope.play(function() {
+      scope.play(function () {
         captureAnimComplete(scope);
       });
     })
@@ -462,7 +470,7 @@ export default class Activity {
   stopAnimation() {
     var pageId = this.relatedData.pageId;
     this.runState = false;
-    this.eachAssistContents(function(scope) {
+    this.eachAssistContents(function (scope) {
       scope.stop && scope.stop(pageId);
     })
   }
@@ -475,10 +483,10 @@ export default class Activity {
    */
   _destroyAnimation(elementCallback) {
     //销毁拖动对象
-    accessDrop(this.eventData, function(drop) {
+    accessDrop(this.eventData, function (drop) {
       drop.destroy();
     })
-    this.eachAssistContents(function(scope) {
+    this.eachAssistContents(function (scope) {
       scope.destroy && scope.destroy()
       elementCallback && elementCallback(scope)
     })
@@ -505,7 +513,7 @@ export default class Activity {
    * @return {[type]} [description]
    */
   reset() {
-    this.eachAssistContents(function(scope) {
+    this.eachAssistContents(function (scope) {
       scope.reset && scope.reset(); //ppt动画
     })
     this._resetAloneAnim();
@@ -524,7 +532,7 @@ export default class Activity {
 
     //复位盒子
     if (this.htmlBoxInstance.length) {
-      _.each(this.htmlBoxInstance, function(instance) {
+      _.each(this.htmlBoxInstance, function (instance) {
         instance.removeBox();
       })
     }
@@ -533,8 +541,8 @@ export default class Activity {
     //没有点击音频结束的回调
     //最多允许播放5秒
     if (this._fixAudio.length) {
-      _.each(this._fixAudio, function(instance) {
-        setTimeout(function() {
+      _.each(this._fixAudio, function (instance) {
+        setTimeout(function () {
           instance.destroy();
         }, 5000)
       })
@@ -559,7 +567,7 @@ export default class Activity {
     //一个activity允许有多个文本框
     //所以是数组索引
     if (this.htmlBoxInstance.length) {
-      _.each(this.htmlBoxInstance, function(instance) {
+      _.each(this.htmlBoxInstance, function (instance) {
         instance.destroy();
       })
       this.htmlBoxInstance = null;
