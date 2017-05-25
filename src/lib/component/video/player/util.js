@@ -12,10 +12,27 @@ import { config } from '../../../config/index'
  */
 export function createVideoWrap(type, options) {
   const { width, height, zIndex, top, left } = options
+
+  /*数据可能为100%，或者纯数字*/
+  let setWidth = `width:${width}px`
+  let setHeight = `height:${height}px`
+
+  if (typeof width === 'string') {
+    if (~width.indexOf('%')) {
+      setWidth = `width:${width}`
+    }
+  }
+
+  if (typeof height === 'string') {
+    if (~height.indexOf('%')) {
+      setHeight = `height:${height}`
+    }
+  }
+
   return $(String.styleFormat(
     `<div data-type="${type}"
-          style="width:${width}px;
-                 height:${height}px;
+          style="${setWidth};
+                 ${setHeight};
                  position:absolute;
                  visibility:hidden;
                  z-index:${zIndex};

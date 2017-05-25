@@ -248,6 +248,7 @@ export class SceneFactory {
       'isInApp': this.isInApp //提示页面
     });
 
+    $$mediator.miniBar = this.miniBar
 
     /**
      * 配置选项
@@ -299,25 +300,6 @@ export class SceneFactory {
 
 
     /**
-     * 设置显示滚动工具栏]
-     */
-    $$mediator.$bind('showScrollBar', () => {
-      this._eachMiniBar(function () {
-        this.showBar && this.showBar()
-      })
-    })
-
-    /**
-     * 更新滚动条坐标
-     */
-    $$mediator.$bind('updateScrollPosition', (...arg) => {
-      this._eachMiniBar(function () {
-        this.updatePosition && this.updatePosition(...arg)
-      })
-    })
-
-
-    /**
      * 切换工具栏
      * state, pointer
      */
@@ -361,6 +343,14 @@ export class SceneFactory {
     })
 
 
+    /**
+     * 获取滚动条对象
+     */
+    $$mediator.$bind('getMiniBar', () => {
+      return this.miniBar
+    })
+
+
     //如果是读酷端加载
     if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
       window.DUKUCONFIG.success();
@@ -393,18 +383,18 @@ export class SceneFactory {
       Xut.Application.unWatch('change:number:total')
     }
 
-    //销毁当前场景
-    this.$$mediator.$destroy();
-
     //销毁工具栏
     if (this.pptBar) {
       this.pptBar.destroy()
       this.pptBar = null
     }
-
     this._eachMiniBar(function () {
       this.destroy()
     })
+    this.$$mediator.miniBar = null
+
+    //销毁当前场景
+    this.$$mediator.$destroy();
 
     //销毁节点
     this.$sceneNode.off()

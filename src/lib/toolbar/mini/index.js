@@ -12,6 +12,7 @@ const matchBar = {
 
 const create = function (type, pageBar, options) {
   type = titleCase(type)
+  options.type = type
   //digital
   //circular
   //scrollbar

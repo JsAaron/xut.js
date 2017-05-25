@@ -101,8 +101,11 @@ export default class Mediator extends Observer {
       sectionRang: options.sectionRang //分段值
     }
 
-    if (config.launch.scrollMode === 'v') {
-      // setOptions.mouseWheel = true
+    /**
+     * 如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式
+     */
+    if (config.launch.mouseWheel !== false && config.launch.scrollMode === 'v') {
+      setOptions.mouseWheel = true
     }
 
     /*快速配置了*/
@@ -186,45 +189,73 @@ export default class Mediator extends Observer {
       $$scheduler.completePageBases(...arg)
     });
 
+    function getAverage(elements, number) {
+      var sum = 0;
+
+      //taking `number` elements from the end to make the average, if there are not enought, 1
+      var lastElements = elements.slice(Math.max(elements.length - number, 1));
+
+      for (var i = 0; i < lastElements.length; i++) {
+        sum = sum + lastElements[i];
+      }
+
+      return Math.ceil(sum / number);
+    }
+
+
 
     /**
      * 鼠标滚轮
      */
-    $$globalSwiper.$watch('onWheel', (wheelDeltaY) => {
+    let scrollings = []
+    let prevTime = new Date().getTime();
+    $$globalSwiper.$watch('onWheel', (e, wheelDeltaY) => {
+
       const currPageBase = Xut.Presentation.GetPageBase($$globalSwiper.visualIndex)
-        /*如果当前是流式页面*/
+
+      /*如果当前是流式页面*/
       if (currPageBase && currPageBase.hasColumnData) {
         const columnObj = currPageBase.columnGroup.get()[0]
-        if (wheelDeltaY > 0) {
-          if (columnObj.visualIndex === 0) {
-            /*翻页卸载速鼠标事件*/
-            columnObj.offWheel()
-            $$globalSwiper.prev()
-          } else {
-            /*flow内部滑动，绑定鼠标事件*/
-            columnObj.bindWheel()
-          }
-        } else {
-          /**尾部边界翻页 */
-          if (columnObj.visualIndex === columnObj.columnCount - 1) {
-            /*翻页卸载速鼠标事件*/
-            columnObj.offWheel()
-            $$globalSwiper.next()
-          } else {
-            /*flow内部滑动，绑定鼠标事件*/
-            columnObj.bindWheel()
-          }
-        }
+        columnObj && columnObj.onWheel(e, wheelDeltaY)
       } else {
-        /*ppt页面*/
+
+        // let curTime = new Date().getTime();
+
+        // if (scrollings.length > 149) {
+        //   scrollings.shift();
+        // }
+
+        // scrollings.push(Math.abs(wheelDeltaY));
+
+        // var timeDiff = curTime - prevTime;
+        // prevTime = curTime;
+
+        // if (timeDiff > 200) {
+        //   scrollings = []
+        // }
+
+        // console.log(scrollings,wheelDeltaY)
+
+        ///////////////////
+        /// PPT页面滚动
+        /// 1 mac上鼠标有惯性
+        /// 2 win上鼠标每次滑动一点，就是100的值
+        ///////////////////
+
         /*向上滚动*/
         if (wheelDeltaY > 0) {
-          $$globalSwiper.prev()
+          $$globalSwiper.prev({
+            speed: Xut.plat.isMacOS ? 600 : 300
+          })
         } else {
           /*向下滚动*/
-          $$globalSwiper.next()
+          $$globalSwiper.next({
+            speed: Xut.plat.isMacOS ? 600 : 300
+          })
         }
+
       }
+
     })
 
 

@@ -183,7 +183,7 @@ export default {
    *        }
    * 3 滚动工具栏 scrollbar
    *             direction 滚动方向 'v' / 'h'
-   * 
+   *
    * 组合模式['digital','circular','scrollbar']
    * @type {Object}
    */
@@ -192,6 +192,13 @@ export default {
     mode: DEFAULT,
     position: DEFAULT
   },
+
+  /**
+   * 是否支持鼠标滑动
+   * @type {Boolean}
+   * false 关闭
+   */
+  mouseWheel:DEFAULT, //默认根据横竖屏幕自定义
 
   /**
    * 适配平台

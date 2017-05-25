@@ -36,6 +36,7 @@ if (Xut.plat.isBrowser) {
   }
 }
 
+
 class VideoClass {
   constructor(options) {
     switch (options.category) {

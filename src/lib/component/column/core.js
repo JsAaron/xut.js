@@ -124,6 +124,27 @@ export default class ColumnClass {
     }
   }
 
+  /**
+   * 横版处理
+   * 更新页码
+   */
+  _updataPageNumber(direction, location) {
+    let initIndex = this.initIndex
+    if (location) {
+      direction = location === 'right' ? 'prev' : 'next'
+      if (location === 'middle' && initIndex > 0) {
+        //如果中间是分栏页
+        --initIndex
+      }
+    }
+    Xut.View.UpdatePage({
+      parentIndex: initIndex,
+      sonIndex: this.swipe.getVisualIndex() + 1,
+      hasSon: true,
+      direction: direction
+    })
+  }
+
 
   /**
    * 横版模式下，页面是通过分栏处理的
@@ -358,16 +379,33 @@ export default class ColumnClass {
       // scrollbars: true
     })
 
-    const rangeY = this.rangeY = ColumnClass.getScrollYRange(iscroll.maxScrollY, this.columnCount)
+    /*全局的卷滚条对象*/
+    this.scrollBar = Xut.Application.GetScrollBarObject()
+
+    /*全局不止一个迷你bar对象，所以需要不同的更新机制*/
+    // if (this.scrollBar && Xut.Application.GetMiniBars() > 1) {
+    //   this.multiToolbar = true
+    //   this.rangeY = ColumnClass.getScrollYRange(iscroll.maxScrollY, this.columnCount)
+    // }
+
+    /*flow页面进来的方向，一般都是上下滑动进来的
+    如果是向上滑动进来取down
+    entryDirection 这个值很重要
+    1 根据进来的方向设置是是上下翻页的Y取值
+    2 因为在滚动条中，有base的值的设定，需要根据这个方向处理
+    */
+    this.entryDirection = 'up'
 
     /*初始化Y轴的定位位置*/
     if (Xut.Presentation.GetPageIndex() > this.initIndex) {
       /*从下往上滑动,滚动页面设为最大值*/
       iscroll.scrollTo(0, iscroll.maxScrollY)
       this.visualIndex = this.columnCount - 1
+      this.entryDirection = 'down'
     } else {
       /*从上往下滑动*/
       this.visualIndex = 0
+      this.entryDirection = 'up'
     }
 
     let hasQrcode
@@ -377,6 +415,7 @@ export default class ColumnClass {
         hasQrcode = true
       }
     })
+
 
     /*点击动作
       1. 图片缩放
@@ -395,170 +434,116 @@ export default class ColumnClass {
       closestMedia(node, this.chapterId, 0)
     })
 
+
     /**
-     * 滚动结束
-     * 1 正常结束
-     * 2 滚动中触发点击强制停止
+     * 滚动时候变化
+     * 强制显示滚动工具栏
      */
-    iscroll.on('scrollEnd', e => {
-      this._goToScrollbar({
-        pageIndex: ColumnClass.getScrollYIndex(iscroll.y, rangeY),
-        direction: iscroll.directionY,
-        time: 0
-      })
-    })
-
-
-    /**滚动时候变化*/
     iscroll.on('scroll', e => {
-      /*强制显示滚动工具栏*/
-      Xut.View.ShowScrollBar()
+      this.scrollBar.showBar()
     })
+
+
+    /**
+     * 如果是突然中断
+     * 停止滚动
+     */
+    iscroll.on('intermit', y => {
+      this._updatePosition(y)
+    })
+
 
     /**
      * 扩展的API
      * 如果是滚动的内容部分
      */
     iscroll.on('scrollContent', e => {
-      this.updatePosition()
+      this._updatePosition(this.iscroll.y)
     })
+
 
     /**
      * 松手后的惯性滑动
      */
-    iscroll.on('momentum', (newY, time, easing) => {
-      this._goToScrollbar({
-        pageIndex: ColumnClass.getScrollYIndex(newY, rangeY),
-        direction: iscroll.directionY,
-        time
-      })
+    iscroll.on('momentum', (newY, time) => {
+      this._updatePosition(newY, time)
     })
+
+
+    /**
+     * 判断应用进来出去的方向
+     */
+    iscroll.on('outDirection', (direction) => {
+      this.entryDirection = direction
+    })
+
+
+    /*滑动的平均概率值*/
+    this.sizeRatioY = (this.scrollBar.ratio * (this.columnCount - 1)) / this.iscroll.maxScrollY
   }
 
 
-  updatePosition() {
-    Xut.View.UpdateScrollPosition({
-      y: this.iscroll.y,
-      wrapperHeight: this.iscroll.wrapperHeight,
-      maxScrollY: this.iscroll.maxScrollY,
-      count: this.columnCount
-    })
-  }
+
+  ////////////////////
+  /// 竖版操作
+  ///////////////////
 
   /**
-   * 需要动态绑定
-   * 翻页到当前页面执行滑动的时候才绑定
-   * 在mac上滚动有惯性，所以直接在iscroll中绑定
-   * 会因为惯性影响到了页面
-   * @return {[type]} [description]
+   * 更新滚动坐标
    */
-  bindWheel() {
-
-    if (this._bindWheeled) {
+  _updatePosition(y, time, directionY) {
+    if (this.entryDirection === 'up') {
+      y = Math.round(this.sizeRatioY * y) || 0;
+      this.scrollBar.updatePosition(y, time, 'down')
       return
     }
-    this._bindWheeled = true
 
-    const onWheel = e => {
-      let wheelDeltaY = -e.deltaY;
-      if (wheelDeltaY === undefined) {
-        return
-      }
+    if (this.entryDirection === 'down') {
+      y = Math.round((this.iscroll.maxScrollY - y) * this.sizeRatioY)
+      this.scrollBar.updatePosition(y, time, 'up')
+      return
+    }
+  }
 
-      /**首页往上滑动，翻页*/
-      if (this.visualIndex === 0 && wheelDeltaY > 0 && this.iscroll.y >= 0) {
-        this.offWheel()
-        Xut.View.GotoPrevSlide()
-        return
-      }
+  ////////////////////
+  /// 鼠标滚动操作
+  ///////////////////
+  onWheel(e, wheelDeltaY) {
 
-      /*如果是往下滑，翻页*/
-      if (this.visualIndex === this.columnCount - 1 && wheelDeltaY < 0 && this.iscroll.y === this.iscroll.maxScrollY) {
-        this.offWheel()
+    if (wheelDeltaY === undefined) {
+      return
+    }
+
+    /*向下*/
+    if (wheelDeltaY < 0) {
+      /*到底翻页*/
+      if (this.iscroll.y === this.iscroll.maxScrollY) {
         Xut.View.GotoNextSlide()
         return
       }
-
-      /*内部滑动*/
-      this.iscroll._wheel(e)
-    }
-
-    this.iscroll.wrapper.addEventListener('wheel', onWheel, false);
-    this.iscroll.wrapper.addEventListener('mousewheel', onWheel, false);
-    this.iscroll.wrapper.addEventListener('DOMMouseScroll', onWheel, false);
-
-    /**
-     * 清理绑定
-     * 这要绑定要
-     * iscroll的内部
-     * 因为在delegateScrollY代理中需要处理
-     */
-    this.iscroll.offWheel = () => {
-      if (this._bindWheeled) {
-        this._bindWheeled = false
-        this.iscroll.wrapper.removeEventListener('wheel', onWheel, false);
-        this.iscroll.wrapper.removeEventListener('mousewheel', onWheel, false);
-        this.iscroll.wrapper.removeEventListener('DOMMouseScroll', onWheel, false);
+    } else if (wheelDeltaY > 0) {
+      /*上下滚动,到顶翻页*/
+      if (this.iscroll.y === 0) {
+        Xut.View.GotoPrevSlide()
+        return
       }
     }
+
+    /*内部滑动*/
+    this.iscroll._wheel(e)
   }
 
+
+  ////////////////////
+  /// 横版分栏刷新接口
+  ///////////////////
+
   /**
-   * 翻页卸载鼠标事件
+   * 重新计算分栏依赖
    * @return {[type]} [description]
    */
-  offWheel() {
-    if (this.iscroll && this.iscroll.offWheel) {
-      this.iscroll.offWheel()
-    }
-  }
-
-
-  /**
-   * 滚动指定的卷滚条页面
-   * @return {[type]} [description]
-   */
-  _goToScrollbar({
-    direction,
-    pageIndex,
-    time
-  }) {
-    /*只有页码不一致的时候才更新，并且只更新一次*/
-    if (this.visualIndex !== pageIndex) {
-      Xut.View.UpdatePage({
-        time,
-        parentIndex: this.initIndex,
-        sonIndex: direction === 1 ? pageIndex : pageIndex + 2,
-        hasSon: true,
-        direction: direction === 1 ? 'next' : 'prev'
-      })
-      this.visualIndex = pageIndex
-    }
-  }
-
-
-  /**
-   * 更新页码
-   */
-  _updataPageNumber(direction, location) {
-    let initIndex = this.initIndex
-    if (location) {
-      direction = location === 'right' ? 'prev' : 'next'
-      if (location === 'middle' && initIndex > 0) {
-        //如果中间是分栏页
-        --initIndex
-      }
-    }
-    Xut.View.UpdatePage({
-      parentIndex: initIndex,
-      sonIndex: this.swipe.getVisualIndex() + 1,
-      hasSon: true,
-      direction: direction
-    })
-  }
-
-  /*重新计算分栏依赖*/
   resetColumnDep() {
+
     let newColumnCount = getColumnCount(this.seasonId, this.chapterId)
 
     //如果分栏页面总数不正确

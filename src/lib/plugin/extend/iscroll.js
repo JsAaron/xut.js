@@ -13,7 +13,7 @@ export function delegateScrollX(node, options) {
 
   const iscroll = new iScroll(node, options)
 
-  iscroll.on('scroll', function(e) {
+  iscroll.on('scroll', function (e) {
     /*如果横版滑动了，并且页面允许翻页*/
     if (iscroll.directionLocked === 'h' && Xut.View.HasEnabledSwiper()) {
       if (iscroll.distX > 0) {
@@ -36,7 +36,7 @@ export function delegateScrollX(node, options) {
     }
   })
 
-  iscroll.on('scrollEnd', function(e) {
+  iscroll.on('scrollEnd', function (e) {
     const typeAction = Xut.View.GetSwiperActionType(iscroll.distX, 0, iscroll.endTime - iscroll.startTime, 'h')
     if (typeAction === 'flipOver') {
       if (iscroll.distX > 0) {
@@ -126,14 +126,15 @@ export function delegateScrollY(node, options) {
     }
   })
 
-  iscroll.on('scrollEnd', function(e) {
+  iscroll.on('scrollEnd', function (e) {
     if (hasBorderRun) {
       const typeAction = Xut.View.GetSwiperActionType(0, iscroll.distY, iscroll.endTime - iscroll.startTime, 'v')
       if (typeAction === 'flipOver') {
-        iscroll.offWheel && iscroll.offWheel()
         if (iscroll.directionY === 1) {
+          iscroll._execEvent('outDirection', 'down');
           Xut.View.GotoNextSlide()
         } else if (iscroll.directionY === -1) {
+          iscroll._execEvent('outDirection', 'up');
           Xut.View.GotoPrevSlide()
         }
       } else if (typeAction === 'flipRebound') {

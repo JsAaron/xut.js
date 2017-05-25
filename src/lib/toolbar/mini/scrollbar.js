@@ -22,42 +22,26 @@ export default class Scrollbar extends MiniSuper {
   _createHTML() {
     //横向翻页
     if (this.direction == "h") {
-      const width = this.visualWidth / this.pageTotal;
-      return `<div class="iScrollHorizontalScrollbar iScrollLoneScrollbar"
-                   style="position: absolute; z-index: 9999; height: .3rem;
-                   left: 2px; right: 2px; bottom: 1px; overflow: hidden;
-                   pointer-events: none;display:none;">
-                <div class="iScrollIndicator"
-                   style="box-sizing: border-box; position: absolute;opacity:0.5;
-                   background: rgba(0, 0, 0, 0.498039)
-                   border: 1px solid rgba(255, 255, 255, 0.901961);
-                   border-radius: 3px; height: 100%;;
-                   display: block; width: ${width}px;
-                   transition-timing-function: cubic-bezier(0.1, 0.57, 0.1, 1);">
-                </div>
+      this.ratio = this.visualWidth / this.pageTotal;
+      return `<div class="xut-iscroll-bar"
+                   style="height:.3rem;left: 2px; right: 2px; bottom: 1px; overflow: hidden;">
+                <div class="xut-iscroll-indicator" style="height: 100%;width: ${this.ratio}px; "></div>
              </div>`
     } else {
-      const height = this.visualHeight / this.pageTotal
-      return `<div class="iScrollVerticalScrollbar iScrollLoneScrollbar"
-                   style="position: absolute; z-index: 9999; width: .3rem;
-                   bottom: 2px; top: 2px; right: 1px; overflow: hidden;
-                   pointer-events: none;display:none;">
-                <div class="iScrollIndicator"
-                   style="box-sizing: border-box; position: absolute;opacity:0.5;
-                   background: rgba(0, 0, 0, 0.498039)
-                   border: 1px solid rgba(255, 255, 255, 0.901961);
-                   border-radius: 3px; width: 100%;;
-                   display: block; height: ${height}px;
-                   transition-timing-function: cubic-bezier(0.1, 0.57, 0.1, 1);">
-                </div>
+      this.ratio = this.visualHeight / this.pageTotal
+      return `<div class="xut-iscroll-bar"
+                   style="width:.3rem;bottom: 2px; top: 2px; right: 1px; overflow: hidden;">
+                <div class="xut-iscroll-indicator" style="width: 100%;height: ${this.ratio}px;"></div>
              </div>`
     }
   }
 
-
+  /**
+   * 获取卷滚条对象
+   */
   _getContextNode() {
-    this.$currentNode = this.$container.find('div:first')
-    this.currentNode = this.$currentNode[0]
+    this.$indicatorNode = this.$container.find('div:first')
+    this.indicatorNode = this.$indicatorNode[0]
   }
 
   _render() {
@@ -66,7 +50,7 @@ export default class Scrollbar extends MiniSuper {
 
 
   _setTranslate(updateIndex, speed) {
-    if (this.currentNode) {
+    if (this.indicatorNode) {
       let distance;
       let translate
       if (this.direction == "h") {
@@ -76,9 +60,9 @@ export default class Scrollbar extends MiniSuper {
         distance = this.visualHeight * (updateIndex - 1) / this.pageTotal;
         translate = `translate3d(0px,${distance}px,0px)`
       }
-      this.distance = distance
-      this.currentNode.style[Xut.style.transitionDuration] = speed + 'ms'
-      this.currentNode.style[Xut.style.transform] = translate
+      this.indicatorNode.style[Xut.style.transitionDuration] = speed + 'ms'
+      this.indicatorNode.style[Xut.style.transform] = translate
+      this.baesTranslateY = this.initTranslateY = distance
     }
   }
 
@@ -104,10 +88,12 @@ export default class Scrollbar extends MiniSuper {
       // this.hideBar()
     }, 1500)
 
+    /*初始化处理*/
     if (action === 'init') {
       this._setTranslate(updateIndex, 0)
       this.$container.show()
     } else {
+      /*边界处翻页处理*/
       this._setTranslate(updateIndex, speed)
     }
   }
@@ -115,35 +101,45 @@ export default class Scrollbar extends MiniSuper {
 
   _destroy() {
     this._clearTimer()
-    this.$currentNode = null
-    this.currentNode = null
+    this.$indicatorNode = null
+    this.indicatorNode = null
   }
 
   //==========================
   //        对外接口
   //==========================
 
+
   /**
+   * 内部滑动页面操作
    * 更新坐标
    */
-  updatePosition({
-    y,
-    wrapperHeight,
-    maxScrollY,
-    count
-   }) {
-    const maxPosY = wrapperHeight - this.distance - 43
-    const sizeRatioY = maxPosY / maxScrollY
-    y = Math.round(sizeRatioY * y) || 0;
-    const distance = this.distance + y
-    this.currentNode.style[Xut.style.transitionDuration] = 0
-    this.currentNode.style[Xut.style.transform] = `translate3d(0px,${distance}px,0px)`
+  updatePosition(scrollY, time = 0, action) {
+    let distance
+      /*向下*/
+    if (action === 'down') {
+      distance = scrollY + this.initTranslateY
+      this.preTranslateY = distance
+        /*清楚上滑动的参考基础值*/
+      this.baesTranslateY = null
+    }
+    /*向上*/
+    if (action === 'up') {
+      /*preTranslateY的值是一直在变化的，但是每次改变其实只要拿到最后一次值，当做基础值设置*/
+      if (!this.baesTranslateY) {
+        this.baesTranslateY = this.preTranslateY
+      }
+      distance = this.baesTranslateY - scrollY
+      this.preTranslateY = distance
+    }
+    this.indicatorNode.style[Xut.style.transitionDuration] = time + 'ms'
+    this.indicatorNode.style[Xut.style.transform] = `translate3d(0px,${distance}px,0px)`
   }
 
   /*显示滚动条*/
   showBar() {
     if (this.barState === 'hide') {
-      this.$currentNode.css('opacity', '0.5')
+      this.$indicatorNode.css('opacity', '0.5')
       this.barState = 'show'
     }
   }
@@ -151,7 +147,7 @@ export default class Scrollbar extends MiniSuper {
   /*隐藏滚动条*/
   hideBar() {
     this.barState = 'hide'
-    this.$currentNode.transition({
+    this.$indicatorNode.transition({
       opacity: 0,
       duration: 1500,
       easing: 'in'

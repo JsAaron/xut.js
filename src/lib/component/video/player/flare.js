@@ -31,13 +31,9 @@ export default class flarePlayer {
     let fv = this.fv = $videoWrap.flareVideo({
       width,
       height,
-      autoplay: true
+      autoplay: true,
+      srcs: url
     })
-
-    fv.load([{
-      src: url,
-      type: 'video/mp4'
-    }])
 
     /*窗口化*/
     fv.video.setAttribute('playsinline', 'playsinline')

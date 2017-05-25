@@ -1020,7 +1020,7 @@ video {
 *   横向滚动条
 *   2017.3.13
 * *******************/
-.iScrollVerticalScrollbar {
+.xut-iscroll-bar{
     position: absolute;
     z-index: 9999;
     width: 0.1rem;
@@ -1028,26 +1028,18 @@ video {
     top: 2px;
     right: 0;
     overflow: hidden;
-    /*background: #ddd;*/
-    opacity: 0.6;
+    pointer-events: none;
+    display:none;
 }
 
-.iScrollHorizontalScrollbar {
-    position: absolute;
-    z-index: 9999;
-    height: 0.2rem;
-    left: 2px;
-    right: 2px;
-    bottom: 0;
-    overflow: hidden;
-    /*background: #ddd;*/
-    opacity: 0.6;
-}
 
-.iScrollIndicator {
-    position: absolute;
+.xut-iscroll-indicator {
     width: 0.08rem;
     height: 0.3rem;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 0.1rem;
+    position: absolute;
+    border-radius: 3px;
+    background-color: #999;
+    box-sizing: border-box;
+    transition-timing-function: cubic-bezier(0.1, 0.57, 0.1, 1);
 }
+

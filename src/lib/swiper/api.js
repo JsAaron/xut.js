@@ -129,12 +129,16 @@ export default function api(Swiper) {
    * 前翻页接口
    * callback 翻页完成
    */
-  Swiper.prototype.prev = function (callback) {
+  Swiper.prototype.prev = function ({
+    speed,
+    callback
+  }) {
     if (!this._borderBounce(1)) {
       this._slideTo({
+        speed,
+        callback,
         direction: 'prev',
-        action: 'outer',
-        callback
+        action: 'outer'
       });
     } else {
       //边界反弹
@@ -149,12 +153,16 @@ export default function api(Swiper) {
    * Xut.View.GotoNextSlide
    * callback 翻页完成
    */
-  Swiper.prototype.next = function (callback) {
+  Swiper.prototype.next = function ({
+    speed,
+    callback
+  }) {
     if (!this._borderBounce(-1)) {
       this._slideTo({
+        speed,
+        callback,
         direction: 'next',
-        action: 'outer',
-        callback
+        action: 'outer'
       })
     } else {
       //边界反弹

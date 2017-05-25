@@ -12,19 +12,6 @@ export function extendView($$mediator, access, $$globalSwiper) {
   //  页面工具栏按钮
   //========================
 
-
-  Xut.View.UpdateScrollPosition = function (...arg) {
-    $$mediator.$emit('change:updateScrollPosition', ...arg)
-  }
-
-
-  /**
-   * 设置显示滚动工具栏
-   */
-  Xut.View.ShowScrollBar = function () {
-    $$mediator.$emit('change:showScrollBar')
-  }
-
   /**
    * 更新页码
    * @param {[type]} point [description]
@@ -157,7 +144,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
       return
     }
 
-    options.hasMultiPage && $$globalSwiper[direction](callback)
+    options.hasMultiPage && $$globalSwiper[direction]({ callback })
   }
 
   /**

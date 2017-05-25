@@ -191,11 +191,11 @@ export default function slide(Swiper) {
    *   2. outer 通过接口调用翻页
    */
   Swiper.prototype._slideTo = function ({
+    speed, //速率
     action,
     direction,
     callback
   }) {
-
 
     /*外部调用，direction需要更新
     内部调用赋予direction*/
@@ -212,7 +212,7 @@ export default function slide(Swiper) {
      *  inner 用户内部滑动
      *  outer 外部接口调用
      */
-    let outerSpeed = this._getOuterSpeed(action)
+    let outerSpeed = speed || this._getOuterSpeed(action)
 
     /*是外部调用触发接口
     提供给翻页滑动使用*/

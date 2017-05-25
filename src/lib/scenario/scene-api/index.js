@@ -25,7 +25,7 @@ export function initSceneApi($$mediator) {
   extendView($$mediator, access, $$globalSwiper) //视图接口
   extendAssist(access, $$globalSwiper) // 辅助对象
   extendContent(access, $$globalSwiper) //content对象
-  extendApplication(access, $$globalSwiper) //app应用接口
+  extendApplication(access, $$mediator, $$globalSwiper) //app应用接口
 
   return function () {
     $$globalSwiper = null

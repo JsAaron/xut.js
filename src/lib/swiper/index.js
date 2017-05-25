@@ -531,8 +531,6 @@ export default class Swiper extends Observer {
    */
   _onWheel(e) {
 
-    if (!this.enabled || this._wheeled) return
-
     e.preventDefault();
     e.stopPropagation();
 
@@ -552,30 +550,21 @@ export default class Swiper extends Observer {
       return;
     }
 
-    if (this.options.snap) {
-      /*mac上鼠标wheel会有一个惯性的响应，所以会造成多次翻页
-      这里采用一个最大延时处理*/
-      if (Xut.plat.isMacOS) {
-        this._wheeled = true
-        clearTimeout(this.wheelTimeout);
-        this.wheelTimeout = setTimeout(() => {
-          this._wheeled = false
-        }, 1200)
-      }
-      /*强制修复滑动的方向是上下
-      因为在页面中左右滑动一下，这个值被修改
-      后续就会报错*/
-      this.orientation = 'v'
+    /*强制修复滑动的方向是上下
+    因为在页面中左右滑动一下，这个值被修改
+    后续就会报错*/
+    this.orientation = 'v'
 
-      this.$emit('onWheel', wheelDeltaY)
-      return
-    }
+    this.$emit('onWheel', e, wheelDeltaY)
+
+    return
   }
 
   /**
    * 翻页结束
    */
   _onComplete(e) {
+
     const node = e.target;
     /*page与master*/
     const pageType = node.getAttribute('data-type');

@@ -5,22 +5,25 @@
 578 this._execEvent('scrollCancel',point);
 632 增加代码接口
     this._execEvent('momentum', newY, time, easing);
+428 增加代码
+    中断
+    this._execEvent('intermit', e);
 
 */
 ;
-(function(window, document, Math) {
+(function (window, document, Math) {
   var rAF = window.requestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
     window.mozRequestAnimationFrame ||
     window.oRequestAnimationFrame ||
     window.msRequestAnimationFrame ||
-    function(callback) { window.setTimeout(callback, 1000 / 60); };
+    function (callback) { window.setTimeout(callback, 1000 / 60); };
 
-  var utils = (function() {
+  var utils = (function () {
     var me = {};
 
     var _elementStyle = document.createElement('div').style;
-    var _vendor = (function() {
+    var _vendor = (function () {
       var vendors = ['t', 'webkitT', 'MozT', 'msT', 'OT'],
         transform,
         i = 0,
@@ -44,21 +47,21 @@
       return new Date().getTime();
     };
 
-    me.extend = function(target, obj) {
+    me.extend = function (target, obj) {
       for (var i in obj) {
         target[i] = obj[i];
       }
     };
 
-    me.addEvent = function(el, type, fn, capture) {
+    me.addEvent = function (el, type, fn, capture) {
       el.addEventListener(type, fn, !!capture);
     };
 
-    me.removeEvent = function(el, type, fn, capture) {
+    me.removeEvent = function (el, type, fn, capture) {
       el.removeEventListener(type, fn, !!capture);
     };
 
-    me.momentum = function(current, start, time, lowerMargin, wrapperSize, deceleration) {
+    me.momentum = function (current, start, time, lowerMargin, wrapperSize, deceleration) {
       var distance = current - start,
         speed = Math.abs(distance) / time,
         destination,
@@ -106,12 +109,12 @@
       transformOrigin: _prefixStyle('transformOrigin')
     });
 
-    me.hasClass = function(e, c) {
+    me.hasClass = function (e, c) {
       var re = new RegExp("(^|\\s)" + c + "(\\s|$)");
       return re.test(e.className);
     };
 
-    me.addClass = function(e, c) {
+    me.addClass = function (e, c) {
       if (me.hasClass(e, c)) {
         return;
       }
@@ -121,7 +124,7 @@
       e.className = newclass.join(' ');
     };
 
-    me.removeClass = function(e, c) {
+    me.removeClass = function (e, c) {
       if (!me.hasClass(e, c)) {
         return;
       }
@@ -130,7 +133,7 @@
       e.className = e.className.replace(re, ' ');
     };
 
-    me.offset = function(el) {
+    me.offset = function (el) {
       var left = -el.offsetLeft,
         top = -el.offsetTop;
 
@@ -147,7 +150,7 @@
       };
     };
 
-    me.preventDefaultException = function(el, exceptions) {
+    me.preventDefaultException = function (el, exceptions) {
       for (var i in exceptions) {
         if (exceptions[i].test(el[i])) {
           return true;
@@ -174,26 +177,26 @@
     me.extend(me.ease = {}, {
       quadratic: {
         style: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        fn: function(k) {
+        fn: function (k) {
           return k * (2 - k);
         }
       },
       circular: {
         style: 'cubic-bezier(0.1, 0.57, 0.1, 1)', // Not properly "circular" but this looks better, it should be (0.075, 0.82, 0.165, 1)
-        fn: function(k) {
+        fn: function (k) {
           return Math.sqrt(1 - (--k * k));
         }
       },
       back: {
         style: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-        fn: function(k) {
+        fn: function (k) {
           var b = 4;
           return (k = k - 1) * k * ((b + 1) * k + b) + 1;
         }
       },
       bounce: {
         style: '',
-        fn: function(k) {
+        fn: function (k) {
           if ((k /= 1) < (1 / 2.75)) {
             return 7.5625 * k * k;
           } else if (k < (2 / 2.75)) {
@@ -207,7 +210,7 @@
       },
       elastic: {
         style: '',
-        fn: function(k) {
+        fn: function (k) {
           var f = 0.22,
             e = 0.4;
 
@@ -223,7 +226,7 @@
       }
     });
 
-    me.tap = function(e, eventName) {
+    me.tap = function (e, eventName) {
       var ev = document.createEvent('Event');
       ev.initEvent(eventName, true, true);
       ev.pageX = e.pageX;
@@ -231,7 +234,7 @@
       e.target.dispatchEvent(ev);
     };
 
-    me.click = function(e) {
+    me.click = function (e) {
       var target = e.target,
         ev;
 
@@ -343,7 +346,7 @@
   IScroll.prototype = {
     version: '5.1.1',
 
-    _init: function() {
+    _init: function () {
       this._initEvents();
 
       if (this.options.scrollbars || this.options.indicators) {
@@ -366,13 +369,13 @@
 
     },
 
-    destroy: function() {
+    destroy: function () {
       this._initEvents(true);
 
       this._execEvent('destroy');
     },
 
-    _transitionEnd: function(e) {
+    _transitionEnd: function (e) {
       if (e.target != this.scroller || !this.isInTransition) {
         return;
       }
@@ -384,7 +387,7 @@
       }
     },
 
-    _start: function(e) {
+    _start: function (e) {
       // React to left mouse button only
       if (utils.eventType[e.type] != 1) {
         if (e.button !== 0) {
@@ -423,6 +426,7 @@
       if (this.options.useTransition && this.isInTransition) {
         this.isInTransition = false;
         pos = this.getComputedPosition();
+        this._execEvent('intermit', Math.round(pos.y));
         this._translate(Math.round(pos.x), Math.round(pos.y));
         this._execEvent('scrollEnd', e);
       } else if (!this.options.useTransition && this.isAnimating) {
@@ -440,7 +444,7 @@
       this._execEvent('beforeScrollStart', point);
     },
 
-    _move: function(e) {
+    _move: function (e) {
       if (!this.enabled || utils.eventType[e.type] !== this.initiated) {
         return;
       }
@@ -543,7 +547,7 @@
 
     },
 
-    _end: function(e) {
+    _end: function (e) {
       if (!this.enabled || utils.eventType[e.type] !== this.initiated) {
         return;
       }
@@ -638,17 +642,17 @@
       this._execEvent('scrollEnd', e);
     },
 
-    _resize: function() {
+    _resize: function () {
       var that = this;
 
       clearTimeout(this.resizeTimeout);
 
-      this.resizeTimeout = setTimeout(function() {
+      this.resizeTimeout = setTimeout(function () {
         that.refresh();
       }, this.options.resizePolling);
     },
 
-    resetPosition: function(time) {
+    resetPosition: function (time) {
       var x = this.x,
         y = this.y;
 
@@ -675,15 +679,15 @@
       return true;
     },
 
-    disable: function() {
+    disable: function () {
       this.enabled = false;
     },
 
-    enable: function() {
+    enable: function () {
       this.enabled = true;
     },
 
-    refresh: function() {
+    refresh: function () {
       var rf = this.wrapper.offsetHeight; // Force reflow
 
       this.wrapperWidth = this.wrapper.clientWidth;
@@ -726,7 +730,7 @@
 
     },
 
-    on: function(type, fn) {
+    on: function (type, fn) {
       if (!this._events[type]) {
         this._events[type] = [];
       }
@@ -734,7 +738,7 @@
       this._events[type].push(fn);
     },
 
-    off: function(type, fn) {
+    off: function (type, fn) {
       if (!this._events[type]) {
         return;
       }
@@ -746,7 +750,7 @@
       }
     },
 
-    _execEvent: function(type, e) {
+    _execEvent: function (type, e) {
       if (!this._events[type]) {
         return;
       }
@@ -763,7 +767,7 @@
       }
     },
 
-    scrollBy: function(x, y, time, easing) {
+    scrollBy: function (x, y, time, easing) {
       x = this.x + x;
       y = this.y + y;
       time = time || 0;
@@ -771,7 +775,7 @@
       this.scrollTo(x, y, time, easing);
     },
 
-    scrollTo: function(x, y, time, easing) {
+    scrollTo: function (x, y, time, easing) {
       easing = easing || utils.ease.circular;
 
       this.isInTransition = this.options.useTransition && time > 0;
@@ -785,7 +789,7 @@
       }
     },
 
-    scrollToElement: function(el, time, offsetX, offsetY, easing) {
+    scrollToElement: function (el, time, offsetX, offsetY, easing) {
       el = el.nodeType ? el : this.scroller.querySelector(el);
 
       if (!el) {
@@ -816,7 +820,7 @@
       this.scrollTo(pos.left, pos.top, time, easing);
     },
 
-    _transitionTime: function(time) {
+    _transitionTime: function (time) {
       time = time || 0;
 
       this.scrollerStyle[utils.style.transitionDuration] = time + 'ms';
@@ -837,7 +841,7 @@
 
     },
 
-    _transitionTimingFunction: function(easing) {
+    _transitionTimingFunction: function (easing) {
       this.scrollerStyle[utils.style.transitionTimingFunction] = easing;
 
 
@@ -852,7 +856,7 @@
 
     },
 
-    _translate: function(x, y) {
+    _translate: function (x, y) {
       if (this.options.useTransform) {
 
         /* REPLACE START: _translate */
@@ -882,7 +886,7 @@
 
     },
 
-    _initEvents: function(remove) {
+    _initEvents: function (remove) {
       var eventType = remove ? utils.removeEvent : utils.addEvent,
         target = this.options.bindToWrapper ? this.wrapper : window;
 
@@ -920,7 +924,7 @@
       eventType(this.scroller, 'MSTransitionEnd', this);
     },
 
-    getComputedPosition: function() {
+    getComputedPosition: function () {
       var matrix = window.getComputedStyle(this.scroller, null),
         x, y;
 
@@ -936,7 +940,7 @@
       return { x: x, y: y };
     },
 
-    _initIndicators: function() {
+    _initIndicators: function () {
       var interactive = this.options.interactiveScrollbars,
         customStyle = typeof this.options.scrollbars != 'string',
         indicators = [],
@@ -999,40 +1003,40 @@
       }
 
       if (this.options.fadeScrollbars) {
-        this.on('scrollEnd', function() {
-          _indicatorsMap(function() {
+        this.on('scrollEnd', function () {
+          _indicatorsMap(function () {
             this.fade();
           });
         });
 
-        this.on('scrollCancel', function() {
-          _indicatorsMap(function() {
+        this.on('scrollCancel', function () {
+          _indicatorsMap(function () {
             this.fade();
           });
         });
 
-        this.on('scrollStart', function() {
-          _indicatorsMap(function() {
+        this.on('scrollStart', function () {
+          _indicatorsMap(function () {
             this.fade(1);
           });
         });
 
-        this.on('beforeScrollStart', function() {
-          _indicatorsMap(function() {
+        this.on('beforeScrollStart', function () {
+          _indicatorsMap(function () {
             this.fade(1, true);
           });
         });
       }
 
 
-      this.on('refresh', function() {
-        _indicatorsMap(function() {
+      this.on('refresh', function () {
+        _indicatorsMap(function () {
           this.refresh();
         });
       });
 
-      this.on('destroy', function() {
-        _indicatorsMap(function() {
+      this.on('destroy', function () {
+        _indicatorsMap(function () {
           this.destroy();
         });
 
@@ -1040,19 +1044,19 @@
       });
     },
 
-    _initWheel: function() {
+    _initWheel: function () {
       utils.addEvent(this.wrapper, 'wheel', this);
       utils.addEvent(this.wrapper, 'mousewheel', this);
       utils.addEvent(this.wrapper, 'DOMMouseScroll', this);
 
-      this.on('destroy', function() {
+      this.on('destroy', function () {
         utils.removeEvent(this.wrapper, 'wheel', this);
         utils.removeEvent(this.wrapper, 'mousewheel', this);
         utils.removeEvent(this.wrapper, 'DOMMouseScroll', this);
       });
     },
 
-    _wheel: function(e) {
+    _wheel: function (e) {
       if (!this.enabled) {
         return;
       }
@@ -1070,7 +1074,7 @@
 
       // Execute the scrollEnd event after 400ms the wheel stopped scrolling
       clearTimeout(this.wheelTimeout);
-      this.wheelTimeout = setTimeout(function() {
+      this.wheelTimeout = setTimeout(function () {
         that._execEvent('scrollEnd', e);
         that.wheelTimeout = undefined;
       }, 400);
@@ -1142,14 +1146,14 @@
       // INSERT POINT: _wheel
     },
 
-    _initSnap: function() {
+    _initSnap: function () {
       this.currentPage = {};
 
       if (typeof this.options.snap == 'string') {
         this.options.snap = this.scroller.querySelectorAll(this.options.snap);
       }
 
-      this.on('refresh', function() {
+      this.on('refresh', function () {
         var i = 0,
           l,
           m = 0,
@@ -1240,7 +1244,7 @@
         }
       });
 
-      this.on('flick', function() {
+      this.on('flick', function () {
         var time = this.options.snapSpeed || Math.max(
           Math.max(
             Math.min(Math.abs(this.x - this.startX), 1000),
@@ -1255,7 +1259,7 @@
       });
     },
 
-    _nearestSnap: function(x, y) {
+    _nearestSnap: function (x, y) {
       if (!this.pages.length) {
         return { x: 0, y: 0, pageX: 0, pageY: 0 };
       }
@@ -1330,7 +1334,7 @@
       };
     },
 
-    goToPage: function(x, y, time, easing) {
+    goToPage: function (x, y, time, easing) {
       easing = easing || this.options.bounceEasing;
 
       if (x >= this.pages.length) {
@@ -1364,7 +1368,7 @@
       this.scrollTo(posX, posY, time, easing);
     },
 
-    next: function(time, easing) {
+    next: function (time, easing) {
       var x = this.currentPage.pageX,
         y = this.currentPage.pageY;
 
@@ -1378,7 +1382,7 @@
       this.goToPage(x, y, time, easing);
     },
 
-    prev: function(time, easing) {
+    prev: function (time, easing) {
       var x = this.currentPage.pageX,
         y = this.currentPage.pageY;
 
@@ -1392,7 +1396,7 @@
       this.goToPage(x, y, time, easing);
     },
 
-    _initKeys: function(e) {
+    _initKeys: function (e) {
       // default key bindings
       var keys = {
         pageUp: 33,
@@ -1423,12 +1427,12 @@
 
       utils.addEvent(window, 'keydown', this);
 
-      this.on('destroy', function() {
+      this.on('destroy', function () {
         utils.removeEvent(window, 'keydown', this);
       });
     },
 
-    _key: function(e) {
+    _key: function (e) {
       if (!this.enabled) {
         return;
       }
@@ -1515,7 +1519,7 @@
       this.keyTime = now;
     },
 
-    _animate: function(destX, destY, duration, easingFn) {
+    _animate: function (destX, destY, duration, easingFn) {
       var that = this,
         startX = this.x,
         startY = this.y,
@@ -1557,7 +1561,7 @@
       step();
     },
 
-    handleEvent: function(e) {
+    handleEvent: function (e) {
       switch (e.type) {
         case 'touchstart':
         case 'MSPointerDown':
@@ -1692,7 +1696,7 @@
   }
 
   Indicator.prototype = {
-    handleEvent: function(e) {
+    handleEvent: function (e) {
       switch (e.type) {
         case 'touchstart':
         case 'MSPointerDown':
@@ -1715,7 +1719,7 @@
       }
     },
 
-    destroy: function() {
+    destroy: function () {
       if (this.options.interactive) {
         utils.removeEvent(this.indicator, 'touchstart', this);
         utils.removeEvent(this.indicator, 'MSPointerDown', this);
@@ -1735,7 +1739,7 @@
       }
     },
 
-    _start: function(e) {
+    _start: function (e) {
       var point = e.touches ? e.touches[0] : e;
 
       e.preventDefault();
@@ -1763,7 +1767,7 @@
       this.scroller._execEvent('beforeScrollStart');
     },
 
-    _move: function(e) {
+    _move: function (e) {
 
       var point = e.touches ? e.touches[0] : e,
         deltaX, deltaY,
@@ -1803,7 +1807,7 @@
       e.stopPropagation();
     },
 
-    _end: function(e) {
+    _end: function (e) {
       if (!this.initiated) {
         return;
       }
@@ -1839,7 +1843,7 @@
       }
     },
 
-    transitionTime: function(time) {
+    transitionTime: function (time) {
       time = time || 0;
       this.indicatorStyle[utils.style.transitionDuration] = time + 'ms';
 
@@ -1848,11 +1852,11 @@
       }
     },
 
-    transitionTimingFunction: function(easing) {
+    transitionTimingFunction: function (easing) {
       this.indicatorStyle[utils.style.transitionTimingFunction] = easing;
     },
 
-    refresh: function() {
+    refresh: function () {
       this.transitionTime();
 
       if (this.options.listenX && !this.options.listenY) {
@@ -1938,7 +1942,7 @@
       this.updatePosition();
     },
 
-    updatePosition: function() {
+    updatePosition: function () {
       var x = this.options.listenX && Math.round(this.sizeRatioX * this.scroller.x) || 0,
         y = this.options.listenY && Math.round(this.sizeRatioY * this.scroller.y) || 0;
 
@@ -1993,7 +1997,7 @@
       }
     },
 
-    _pos: function(x, y) {
+    _pos: function (x, y) {
       if (x < 0) {
         x = 0;
       } else if (x > this.maxPosX) {
@@ -2012,7 +2016,7 @@
       this.scroller.scrollTo(x, y);
     },
 
-    fade: function(val, hold) {
+    fade: function (val, hold) {
       if (hold && !this.visible) {
         return;
       }
@@ -2027,7 +2031,7 @@
 
       this.wrapperStyle[utils.style.transitionDuration] = time + 'ms';
 
-      this.fadeTimeout = setTimeout((function(val) {
+      this.fadeTimeout = setTimeout((function (val) {
         this.wrapperStyle.opacity = val;
         this.visible = +val;
       }).bind(this, val), delay);
