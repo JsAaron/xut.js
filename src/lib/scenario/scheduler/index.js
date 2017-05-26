@@ -109,9 +109,11 @@ export default class Scheduler {
    **/
   createPageBase(createSinglePage, visualPageIndex, action, toPageCallback, userStyle) {
 
+    const firstValue = createSinglePage[0]
+
     //2016.1.20
-    //修正苗苗学问题 确保createPage不是undefined
-    if (createSinglePage[0] === undefined) {
+    //确保createPage不是undefined
+    if (firstValue === undefined) {
       return;
     }
 
@@ -226,6 +228,11 @@ export default class Scheduler {
         const { doubleMainIndex, doublePosition } = getDoubleOption(chapterIndex, createDoublePage)
 
         const chapterData = converChapterData(chapterIndex)
+
+        if (chapterData === undefined) {
+          $warn(`创建页面出错,chapterIndex:${chapterIndex}`)
+          return
+        }
 
         /*
         1.转化可视区页码对应的chapter的索引号
@@ -655,7 +662,7 @@ export default class Scheduler {
     /*创建新的页面对象*/
     const createNextPageBase = () => this.createPageBase([createIndex], middleIndex, 'flipOver')
 
-    //如果是左边翻页
+    //如果是前翻页
     if (direction === 'prev') {
       //首尾无须创建页面
       if (middleIndex === 0) {
@@ -674,7 +681,7 @@ export default class Scheduler {
       }
     }
 
-    //如果是右边翻页
+    //如果是后翻页
     if (direction === 'next') {
       //首尾无须创建页面
       if (middleIndex === pageTotal - 1) {

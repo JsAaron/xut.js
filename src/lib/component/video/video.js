@@ -19,16 +19,16 @@ if (Xut.plat.isBrowser) {
   if (Xut.plat.isIOS || top.EduStoreClient) {
     //如果是ibooks模式
     if (Xut.IBooks.Enabled) {
-      VideoPlayer = h5Player
+      VideoPlayer = flarePlayer
     } else {
       //如果是ios或读酷pc版则使用html5播放
-      VideoPlayer = h5Player
+      VideoPlayer = flarePlayer
     }
   } else if (Xut.plat.isAndroid) {
     if (window.MMXCONFIG) {
       // 安卓妙妙学强制走h5
       // 由于原生H5控制条不显示的问题
-      VideoPlayer = h5Player
+      VideoPlayer = flarePlayer
     } else {
       //android平台
       VideoPlayer = PhoneGapMedia

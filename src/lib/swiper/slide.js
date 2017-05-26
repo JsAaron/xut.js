@@ -197,6 +197,11 @@ export default function slide(Swiper) {
     callback
   }) {
 
+    //如果在忙碌状态,如果翻页还没完毕
+    if (!this.enabled) {
+      return
+    }
+
     /*外部调用，direction需要更新
     内部调用赋予direction*/
     if (direction) {
@@ -218,11 +223,6 @@ export default function slide(Swiper) {
     提供给翻页滑动使用*/
     let outerCallFlip = outerSpeed === undefined ? false : true
 
-
-    //如果在忙碌状态,如果翻页还没完毕
-    if (!this.enabled) {
-      return
-    }
 
     //前后边界
     if (this.options.snap && this._isBorder(direction)) return;

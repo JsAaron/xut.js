@@ -131,11 +131,11 @@ export function delegateScrollY(node, options) {
       const typeAction = Xut.View.GetSwiperActionType(0, iscroll.distY, iscroll.endTime - iscroll.startTime, 'v')
       if (typeAction === 'flipOver') {
         if (iscroll.directionY === 1) {
-          iscroll._execEvent('outDirection', 'down');
           Xut.View.GotoNextSlide()
+          iscroll._execEvent('scrollExit', 'down');
         } else if (iscroll.directionY === -1) {
-          iscroll._execEvent('outDirection', 'up');
           Xut.View.GotoPrevSlide()
+          iscroll._execEvent('scrollExit', 'up');
         }
       } else if (typeAction === 'flipRebound') {
         if (iscroll.directionY === 1) {

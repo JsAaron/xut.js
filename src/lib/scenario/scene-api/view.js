@@ -114,7 +114,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
      next
    */
   const gotoPage = function (data, direction) {
-    let seasonId, chapterId, callback
+    let seasonId, chapterId, callback, speed
 
     if (data) {
       if (_.isFunction) { //回调
@@ -122,6 +122,8 @@ export function extendView($$mediator, access, $$globalSwiper) {
       } else {
         seasonId = data.seasonId
         chapterId = data.chapterId
+        callback = data.callback
+        speed = data.callback
       }
     }
 
@@ -144,7 +146,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
       return
     }
 
-    options.hasMultiPage && $$globalSwiper[direction]({ callback })
+    options.hasMultiPage && $$globalSwiper[direction]({ callback, speed })
   }
 
   /**

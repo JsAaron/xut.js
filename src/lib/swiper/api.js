@@ -128,21 +128,23 @@ export default function api(Swiper) {
    * 外部直接调用
    * 前翻页接口
    * callback 翻页完成
-   */
-  Swiper.prototype.prev = function ({
+   * {
     speed,
     callback
-  }) {
+  }
+   */
+  Swiper.prototype.prev = function (options = {}) {
     if (!this._borderBounce(1)) {
       this._slideTo({
-        speed,
-        callback,
+        speed: options.speed,
+        callback: options.callback,
         direction: 'prev',
         action: 'outer'
       });
     } else {
       //边界反弹
       this._setRebound('next')
+      options.callback && options.callback()
     }
   }
 
@@ -153,20 +155,18 @@ export default function api(Swiper) {
    * Xut.View.GotoNextSlide
    * callback 翻页完成
    */
-  Swiper.prototype.next = function ({
-    speed,
-    callback
-  }) {
+  Swiper.prototype.next = function (options = {}) {
     if (!this._borderBounce(-1)) {
       this._slideTo({
-        speed,
-        callback,
+        speed: options.speed,
+        callback: options.callback,
         direction: 'next',
         action: 'outer'
       })
     } else {
       //边界反弹
       this._setRebound('prev', 'isAppBoundary')
+      options.callback && options.callback()
     }
   }
 

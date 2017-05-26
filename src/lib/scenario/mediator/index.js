@@ -189,26 +189,11 @@ export default class Mediator extends Observer {
       $$scheduler.completePageBases(...arg)
     });
 
-    function getAverage(elements, number) {
-      var sum = 0;
-
-      //taking `number` elements from the end to make the average, if there are not enought, 1
-      var lastElements = elements.slice(Math.max(elements.length - number, 1));
-
-      for (var i = 0; i < lastElements.length; i++) {
-        sum = sum + lastElements[i];
-      }
-
-      return Math.ceil(sum / number);
-    }
-
-
 
     /**
      * 鼠标滚轮
      */
-    let scrollings = []
-    let prevTime = new Date().getTime();
+    let wheellook = false //如果首页向上滑动，那么锁定马上可以向下滑动
     $$globalSwiper.$watch('onWheel', (e, wheelDeltaY) => {
 
       const currPageBase = Xut.Presentation.GetPageBase($$globalSwiper.visualIndex)
@@ -216,25 +201,19 @@ export default class Mediator extends Observer {
       /*如果当前是流式页面*/
       if (currPageBase && currPageBase.hasColumnData) {
         const columnObj = currPageBase.columnGroup.get()[0]
-        columnObj && columnObj.onWheel(e, wheelDeltaY)
+        if (columnObj) {
+          /*如果flow的进去是touch的方式，那么这里不需要控制了*/
+          if (columnObj.getEntry() === 'touch') {
+            wheellook = false
+          }
+          /*等待翻页结束后才可以委托到columnObj内部的onWheel滚动
+          避免在翻页的时候重复触发*/
+          if (!wheellook) {
+            const direction = wheelDeltaY > 0 ? 'up' : 'down'
+            columnObj && columnObj.onWheel(e, wheelDeltaY, direction)
+          }
+        }
       } else {
-
-        // let curTime = new Date().getTime();
-
-        // if (scrollings.length > 149) {
-        //   scrollings.shift();
-        // }
-
-        // scrollings.push(Math.abs(wheelDeltaY));
-
-        // var timeDiff = curTime - prevTime;
-        // prevTime = curTime;
-
-        // if (timeDiff > 200) {
-        //   scrollings = []
-        // }
-
-        // console.log(scrollings,wheelDeltaY)
 
         ///////////////////
         /// PPT页面滚动
@@ -242,18 +221,24 @@ export default class Mediator extends Observer {
         /// 2 win上鼠标每次滑动一点，就是100的值
         ///////////////////
 
+        wheellook = true
+
         /*向上滚动*/
         if (wheelDeltaY > 0) {
           $$globalSwiper.prev({
-            speed: Xut.plat.isMacOS ? 600 : 300
+            speed: Xut.plat.isMacOS ? 600 : 300,
+            callback: function () {
+              wheellook = false
+            }
           })
         } else {
-          /*向下滚动*/
           $$globalSwiper.next({
-            speed: Xut.plat.isMacOS ? 600 : 300
+            speed: Xut.plat.isMacOS ? 600 : 300,
+            callback: function () {
+              wheellook = false
+            }
           })
         }
-
       }
 
     })

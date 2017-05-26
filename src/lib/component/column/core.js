@@ -367,7 +367,10 @@ export default class ColumnClass {
 
   /**
    * 竖版模式下，整体数据滑动
-   * @return {[type]} [description]
+   * 1 需要判断2个方式，3个方向，3个值
+   * 初始化、通过touch的方式滑动，通过鼠标滑动
+   * 根据3种行为区分了3种方式，分别要标明，进来进来的方向
+   * 通过这个方向值处理内部的滑动
    */
   _initY() {
 
@@ -388,24 +391,40 @@ export default class ColumnClass {
     //   this.rangeY = ColumnClass.getScrollYRange(iscroll.maxScrollY, this.columnCount)
     // }
 
-    /*flow页面进来的方向，一般都是上下滑动进来的
-    如果是向上滑动进来取down
-    entryDirection 这个值很重要
-    1 根据进来的方向设置是是上下翻页的Y取值
-    2 因为在滚动条中，有base的值的设定，需要根据这个方向处理
-    */
-    this.entryDirection = 'up'
+    this.wheelEntryDirection = '' //鼠标滚动进来的方向
+    this.touchEntryDirection = '' //触摸进来的方向
+    this.initEntryDirection = '' //初始化进来的方向
+
+    /**
+     * 进来flow的方式
+     * init / touch / wheel
+     * @type {String}
+     */
+    this.entryWay = ''
+
+    /*如果flow初始化是可视区，那么需要开始就设定wheelEntryDirection的值*/
+    let setDirection = false
+    if (this.initIndex === Xut.Presentation.GetPageIndex()) {
+      setDirection = true
+      this.entryWay = 'init'
+    }
 
     /*初始化Y轴的定位位置*/
     if (Xut.Presentation.GetPageIndex() > this.initIndex) {
       /*从下往上滑动,滚动页面设为最大值*/
       iscroll.scrollTo(0, iscroll.maxScrollY)
       this.visualIndex = this.columnCount - 1
-      this.entryDirection = 'down'
+      this.touchEntryDirection = 'up'
+      if (setDirection) {
+        this.initEntryDirection = 'up'
+      }
     } else {
       /*从上往下滑动*/
       this.visualIndex = 0
-      this.entryDirection = 'up'
+      this.touchEntryDirection = 'down'
+      if (setDirection) {
+        this.initEntryDirection = 'down'
+      }
     }
 
     let hasQrcode
@@ -458,6 +477,9 @@ export default class ColumnClass {
      * 如果是滚动的内容部分
      */
     iscroll.on('scrollContent', e => {
+      if (!this.entryWay) {
+        this.entryWay = 'touch'
+      }
       this._updatePosition(this.iscroll.y)
     })
 
@@ -471,17 +493,36 @@ export default class ColumnClass {
 
 
     /**
-     * 判断应用进来出去的方向
+     * 扩展API 滚动翻页
      */
-    iscroll.on('outDirection', (direction) => {
-      this.entryDirection = direction
+    iscroll.on('scrollExit', (direction) => {
+      this._leave(direction)
     })
 
 
     /*滑动的平均概率值*/
     this.sizeRatioY = (this.scrollBar.ratio * (this.columnCount - 1)) / this.iscroll.maxScrollY
+
+    /*在翻页的时候，禁止滚动页面*/
+    this.wheellook = false
   }
 
+
+  /*离开页面：
+  touchEntryDirection标记的是进来的方向,
+  触摸动作需要取反，因为这个是代表出去的方向*/
+  _leave(direction) {
+    if (direction === 'down') {
+      this.touchEntryDirection = 'up'
+    } else if (direction === 'up') {
+      this.touchEntryDirection = 'down'
+    }
+    this.wheelEntryDirection = ''
+    this.entryWay = ''
+
+    clearColumnAudio()
+    clearVideo()
+  }
 
 
   ////////////////////
@@ -492,46 +533,91 @@ export default class ColumnClass {
    * 更新滚动坐标
    */
   _updatePosition(y, time, directionY) {
-    if (this.entryDirection === 'up') {
-      y = Math.round(this.sizeRatioY * y) || 0;
-      this.scrollBar.updatePosition(y, time, 'down')
-      return
+
+    let direction = ''
+
+    if (this.entryWay === 'init') {
+      direction = this.initEntryDirection
+    } else if (this.entryWay === 'touch') {
+      direction = this.touchEntryDirection
+    } else if (this.entryWay === 'wheel') {
+      direction = this.wheelEntryDirection
     }
 
-    if (this.entryDirection === 'down') {
+    /*如果是下往上进来的*/
+    if (direction === 'up') {
       y = Math.round((this.iscroll.maxScrollY - y) * this.sizeRatioY)
       this.scrollBar.updatePosition(y, time, 'up')
       return
     }
+
+    /*如果是从上往下进来的*/
+    if (direction === 'down') {
+      y = Math.round(this.sizeRatioY * y) || 0;
+      this.scrollBar.updatePosition(y, time, 'down')
+    }
+
   }
 
   ////////////////////
   /// 鼠标滚动操作
   ///////////////////
-  onWheel(e, wheelDeltaY) {
+  onWheel(e, wheelDeltaY, direction) {
 
     if (wheelDeltaY === undefined) {
       return
     }
 
-    /*向下*/
-    if (wheelDeltaY < 0) {
-      /*到底翻页*/
-      if (this.iscroll.y === this.iscroll.maxScrollY) {
-        Xut.View.GotoNextSlide()
-        return
-      }
-    } else if (wheelDeltaY > 0) {
-      /*上下滚动,到顶翻页*/
-      if (this.iscroll.y === 0) {
-        Xut.View.GotoPrevSlide()
-        return
-      }
+    if (!this.entryWay) {
+      this.entryWay = 'wheel'
     }
 
-    /*内部滑动*/
-    this.iscroll._wheel(e)
+    /*进来的方向，每次flow页面运行只标记一次*/
+    if (!this.wheelEntryDirection) {
+      this.wheelEntryDirection = direction
+    }
+
+
+    /*离开页面，鼠标快速滑动，禁止内部滑动*/
+    if (!this.wheellook) {
+
+      /*向上移动，离开flow页面*/
+      if (this.iscroll.y === 0 && direction === 'up') {
+        this.wheellook = true
+        Xut.View.GotoPrevSlide(() => {
+          /*向下翻页，滚动条设置0*/
+          this.iscroll.scrollTo(0, 0)
+          this.wheellook = false
+          this._leave('up')
+        })
+        return
+      }
+
+      /*向下移动，离开flow页面*/
+      if (this.iscroll.y === this.iscroll.maxScrollY && direction === 'down') {
+        this.wheellook = true
+        Xut.View.GotoNextSlide(() => {
+          /*向下翻页，滚动条设置最大值*/
+          this.iscroll.scrollTo(0, this.iscroll.maxScrollY)
+          this.wheellook = false
+          this._leave('down')
+        })
+        return
+      }
+
+      this.iscroll._wheel(e)
+    }
   }
+
+
+  /**
+   * 获取进入方向
+   * @return {[type]} [description]
+   */
+  getEntry() {
+    return this.entryWay
+  }
+
 
 
   ////////////////////
