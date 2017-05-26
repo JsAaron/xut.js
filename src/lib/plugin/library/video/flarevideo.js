@@ -14,9 +14,8 @@
    * @param  {[type]} options [description]
    * @return {[type]}         [description]
    */
-  $.fn.idleTimer = function (options) {
+  $.fn.idleTimer = function () {
 
-    options = options || {};
     var element = $(this);
 
     var idle = false;
@@ -111,9 +110,7 @@
       this.change("initial");
       this.load();
 
-      this.element.idleTimer({
-        action: 'init'
-      });
+      this.element.idleTimer();
       this.element.bind("idle", $.proxy(this.idle, this));
       this.element.bind("state.fv", $.proxy(function () {
         this.element.trigger("reset.idle");
@@ -556,12 +553,15 @@
           if (flashType) {
             this.fallbackToFlash();
           } else {
+            this.change("error");
             console.error("Format not supported");
           }
         } else {
+          this.change("error");
           console.error("Error - " + this.video.error);
         }
       } else {
+        this.change("error");
         console.error("Flash error");
       }
     }, this));

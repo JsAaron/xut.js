@@ -234,7 +234,7 @@ export default class ColumnClass {
         if (action === 'flipOver') {
           clearColumnAudio()
           clearVideo()
-          Xut.View.GotoPrevSlide()
+          Xut.View.GotoPrevSlide({ speed })
           swipe.simulationComplete()
         } else {
           //前边界前移反弹
@@ -253,7 +253,7 @@ export default class ColumnClass {
         if (action === 'flipOver') {
           clearColumnAudio()
           clearVideo()
-          Xut.View.GotoNextSlide()
+          Xut.View.GotoNextSlide({ speed })
           swipe.simulationComplete()
         } else {
           //后边界前移反弹

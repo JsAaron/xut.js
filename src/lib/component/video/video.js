@@ -2,6 +2,7 @@ import h5Player from './player/native'
 import PhoneGapMedia from './player/phonegap'
 import WebPage from './player/web'
 import flarePlayer from './player/flare'
+import { removeVideo } from './api'
 
 let VideoPlayer
 
@@ -41,10 +42,10 @@ class VideoClass {
   constructor(options) {
     switch (options.category) {
       case 'video':
-        this.video = new VideoPlayer(options)
+        this.video = new VideoPlayer(options, removeVideo)
         break;
       case 'webpage':
-        this.video = new WebPage(options);
+        this.video = new WebPage(options, removeVideo);
         break;
       default:
         console.log('options.category must be video or webPage ')

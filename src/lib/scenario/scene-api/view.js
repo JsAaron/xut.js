@@ -116,16 +116,22 @@ export function extendView($$mediator, access, $$globalSwiper) {
   const gotoPage = function (data, direction) {
     let seasonId, chapterId, callback, speed
 
+    /**
+     * data 可以传，可以不传递
+     * 1 传递回调函数
+     * 2 传递对象
+     */
     if (data) {
-      if (_.isFunction) { //回调
+      if (_.isFunction(data)) { //回调
         callback = data
       } else {
         seasonId = data.seasonId
         chapterId = data.chapterId
         callback = data.callback
-        speed = data.callback
+        speed = data.speed
       }
     }
+
 
     if (seasonId && chapterId) {
       Xut.View.LoadScenario({
