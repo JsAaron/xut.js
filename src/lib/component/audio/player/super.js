@@ -11,9 +11,12 @@ export default class AudioSuper {
 
   constructor(options, controlDoms) {
     this.options = options
+
+    this.trackId = options.trackId
     this.controlDoms = controlDoms;
+
     /*构建之前处理*/
-    this._$$preRelated(options.trackId, options);
+    this._$$preRelated(options);
     /*初始化数据*/
     this._init();
     //相关数据
@@ -31,7 +34,7 @@ export default class AudioSuper {
    *  2 外部content的行为音频
    *  二者只会同时存在一个
    */
-  _$$preRelated(trackId, options) {
+  _$$preRelated(options) {
 
     /*匹配URL地址*/
     this.$$url = config.getAudioPath() + options.url
@@ -40,7 +43,7 @@ export default class AudioSuper {
     this.innerCallback = options.innerCallback;
 
     /*按钮的反弹点击触发，设置按钮的行为*/
-    if (trackId == 9999 && options.complete) {
+    if (this.trackId == 9999 && options.complete) {
       this.outerCallback = options.complete
     }
   }
@@ -116,6 +119,9 @@ export default class AudioSuper {
   //    提供外部接口，向上转型
   //=============================
 
+  getTrackId() {
+    return this.trackId
+  }
 
   /**
    * 播放

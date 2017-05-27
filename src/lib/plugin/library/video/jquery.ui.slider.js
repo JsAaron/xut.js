@@ -1221,6 +1221,7 @@
     },
 
     _mouseDrag: function(event) {
+
       var position = { x: event.pageX, y: event.pageY },
         normValue = this._normValueFromMouse(position);
 

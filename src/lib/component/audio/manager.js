@@ -162,20 +162,26 @@ const assemblyData = (pageId, queryId, type, actionData, columnData) => {
  * 检查要打断的音频
  * 不打断返回true,否则返回false
  */
-const checkBreakAudio = (type, pageId, queryId, auidoData) => {
-  const playObj = playBox[type][pageId][queryId]
-  const trackId = auidoData.trackId
-  const _trackId = playObj.trackId
+const checkBreakAudio = (type, pageId, queryId, newAuidoData) => {
+
+  const oldPlayObj = playBox[type][pageId][queryId]
+  const oldTrackId = oldPlayObj.getTrackId()
+
+  const newTrackId = newAuidoData.trackId
+
 
   //如果是节音频，且地址相同，则不打断
-  if (type == SEASON && playObj.url == auidoData.url) {
+  if (type == SEASON && oldPlayObj.url == newAuidoData.url) {
     return true;
   }
 
-  //如果要用零音轨||零音轨有音乐在播||两音轨相同
-  //则打断
-  if (trackId == 0 || _trackId == 0 || trackId == _trackId) {
-    playObj.destroy();
+  /**
+   * 打断音频
+   * 条件
+   *   如果要用零音轨||零音轨有音乐在播||两音轨相同
+   */
+  if (newTrackId == 0 || oldTrackId == 0 || newTrackId == oldTrackId) {
+    oldPlayObj.destroy();
     delete playBox[type][pageId][queryId];
   }
   return false;

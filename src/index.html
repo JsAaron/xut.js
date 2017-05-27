@@ -26,6 +26,7 @@
 </body>
 
 </html>
+
 <script type="text/javascript">
 Xut.Application.setConfig = {
 
@@ -36,6 +37,8 @@ Xut.Application.setConfig = {
     launchAnim: false,
     convert: 'svg',
     doublePageMode: false,
+
+    columnCheck:true,
 
     // scrollMode: 'v',
 
@@ -89,7 +92,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)
 })
 
-var appId = 17 //306
+var appId = 317 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         // trackCode: ['swipe'], //代码跟踪

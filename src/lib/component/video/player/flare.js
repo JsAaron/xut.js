@@ -49,6 +49,7 @@ export default class flarePlayer {
       }
     })
 
+    /*播放出错*/
     fv.bind('error', function () {
       if (options.startBoot) {
         options.startBoot();
@@ -56,8 +57,13 @@ export default class flarePlayer {
       removeVideo(options.chapterId);
     })
 
-
     this.container.append($videoWrap)
+
+    /*触发了关闭按钮*/
+    fv.bind('close', function () {
+      removeVideo(options.chapterId);
+    })
+
   }
 
   play() {

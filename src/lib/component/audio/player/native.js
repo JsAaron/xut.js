@@ -22,7 +22,7 @@ export class NativeVideo extends AudioSuper {
   _init() {
     let audio
     let self = this
-    let trackId = this.options.trackId
+    let trackId = this.trackId
     let hasAudio = hasAudioes()
 
     if (instance[trackId]) {
@@ -71,7 +71,6 @@ export class NativeVideo extends AudioSuper {
     audio.addEventListener('error', this._errorCallBack, false)
 
     this.audio = audio;
-    this.trackId = trackId;
     this.status = 'playing';
   }
 
