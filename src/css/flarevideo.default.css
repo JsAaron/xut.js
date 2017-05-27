@@ -10,13 +10,14 @@
     font-style: normal;
 }
 
-
 .flareVideo .controls {
     position: absolute;
     bottom: 0;
     height: 20%;
     width: 100%;
     background: #fff;
+    text-align: center;
+    display: table;
 }
 .flareVideo .controls .close:before {
     font-family: 'flareicon' !important;
@@ -35,11 +36,6 @@
     font-size: 1.5em;
 }
 
-.flareVideo .controls .close {
-    position: absolute;
-    top:25%;
-    right:4%;
-}
 .flareVideo .controls .fullScreen:before {
     font-family: 'flareicon' !important;
     speak: none;
@@ -53,15 +49,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
-    content: '\e901';
-    font-size: 1.5em;
+    content: '\e905';
+    font-size: 1em;
     //background: url(../images/flarevideo/full-screen.png) no-repeat center center;
-}
-
-.flareVideo .controls .fullScreen {
-    position: absolute;
-    top:25%;
-    right:15%;
 }
 
 .flareVideo .controls .play:before {
@@ -138,66 +128,41 @@
     width: 100%;
 }
 
-
 .flareVideo .controls .volume {
     width: 90px;
 }
-
 
 .flareVideo .controls .volume .volRange {
     width: 50px;
 }
 
-
 .flareVideo .controls .timeMin,
 .flareVideo .controls .timeMax {
     font-family: Apex, "Helvetica Neue", "HelveticaNeue", helvetica, sans-serif;
     font-size: 13px;
-    color: #C2C2C2;
+    color: #5c5c5c;
     font-weight: bold;
     //text-shadow: 0 1px 1px #000;
-}
-
-.flareVideo .controls .pause {
-    display: none;
-}
-
-.flareVideo.playing .controls .play {
-    display: none;
-}
-
-.flareVideo.playing .controls .pause {
-    display: block;
 }
 
 .flareVideo.idle .controls {
     opacity: 0;
 }
 
-.flareVideo .controls .play,
-.flareVideo .controls .pause {
-    position: absolute;
-    left: 5%;
-    top: 30%;
+.flareVideo .controls .timeMax {
+    right: 80%;
 }
 
 .flareVideo .controls .seek {
-    position: absolute;
-    top: 50%;
-    left: 15%;
-    right: 45%;
+    left: -11%;
 }
 
-.flareVideo .controls .timeMin {
-    position: absolute;
-    bottom: 8px;
-    left: 20px;
+.flareVideo .controls .fullScreen {
+    left: 69%;
 }
 
-.flareVideo .controls .timeMax {
-    position: absolute;
-    top: 33%;
-    right: 28%;
+.flareVideo .controls .close {
+    left: 68%;
 }
 
 .flareVideo .controls .volume {
@@ -219,4 +184,43 @@
 .flareVideo .controls .volume .volRange {
     position: absolute;
     left: 16px;
+}
+
+.flareVideo .controls .timeMin {
+    position: absolute;
+    bottom: 8px;
+    left: 20px;
+}
+
+.flareVideo .controls .play,
+.flareVideo .controls .pause,
+.flareVideo .controls .close,
+.flareVideo .controls .fullScreen,
+.flareVideo .controls .timeMax {
+    width: 10%;
+    height: 100%;
+}
+
+.flareVideo .controls .play,
+.flareVideo.playing .controls .pause,
+.flareVideo .controls .close,
+.flareVideo .controls .fullScreen,
+.flareVideo .controls .timeMax,
+.flareVideo .controls .seek {
+    display: table-cell;
+    position: relative;
+    vertical-align: middle;
+}
+
+.flareVideo .controls .seek {
+    width: 50%;
+    height: 100%;
+}
+
+.flareVideo .controls .pause {
+    display: none;
+}
+
+.flareVideo.playing .controls .play {
+    display: none;
 }
