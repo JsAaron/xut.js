@@ -427,6 +427,8 @@ export default class ColumnClass {
       }
     }
 
+          iscroll.scrollTo(0, iscroll.maxScrollY)
+
     let hasQrcode
     iscroll.on('beforeScrollStart', e => {
       hasQrcode = false

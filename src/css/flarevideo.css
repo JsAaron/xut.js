@@ -17,10 +17,6 @@
     overflow: hidden;
 }
 
-.flareVideo .controls .disabled {
-    display: none;
-}
-
 .flareVideo video,
 .flareVideo .video {
     display: block;
@@ -33,14 +29,6 @@
     z-index: 100;
 }
 
-.flareVideo .controls {
-    z-index: 200;
-}
-
-.flareVideo .controls input[type="range"] {
-    margin: 0;
-    padding: 0;
-}
 
 
 /* jQuery UI Slider
@@ -54,8 +42,6 @@
 .flareVideo .ui-slider .ui-slider-handle {
     position: absolute;
     z-index: 2;
-    // width: 1.2em;
-    // height: 1.2em;
     cursor: default;
     top: -0.8em;
 }
@@ -70,8 +56,230 @@
 }
 
 
-/*.flareVideo .ui-slider-horizontal { padding-left: 10px; }*/
 
-.flareVideo .ui-slider-horizontal .ui-slider-handle {
-    margin-left: -5px;
+/******************
+*   flare视频播放器图标
+* *******************/
+
+@font-face {
+    font-family: "flareicon";
+    src: url("../images/fonts/flareicon.eot");
+    src: url("../images/fonts/flareicon.eot?#iefix") format("embedded-opentype"), url("../images/fonts/flareicon.woff") format("woff"), url("../images/fonts/flareicon.ttf") format("truetype"), url("../images/fonts/flareicon.svg#flaticon") format("svg");
+    font-weight: normal;
+    font-style: normal;
 }
+
+
+
+
+/************
+* 控制工具栏
+*************/
+
+.flareVideo .controls {
+    position: relative;
+    bottom: 20%;
+    height: 20%;
+    width: 100%;
+    background: #fff;
+    z-index: 200;
+}
+.flareVideo .controls input[type="range"] {
+    margin: 0;
+    padding: 0;
+}
+.flareVideo .controls .disabled {
+    display: none;
+}
+
+.flareVideo.idle .controls {
+    opacity: 0;
+}
+
+
+.flareVideo .controls .play,
+.flareVideo.playing .controls .pause,
+.flareVideo .controls .close,
+.flareVideo .controls .fullScreen,
+.flareVideo .controls .timeMax,
+.flareVideo .controls .seek {
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+
+.flareVideo .controls .play,
+.flareVideo .controls .pause,
+.flareVideo .controls .close,
+.flareVideo .controls .fullScreen,
+.flareVideo .controls .timeMax {
+    width: 10%;
+}
+
+
+/**播放按钮***/
+.flareVideo.playing .controls .play {
+    display: none;
+}
+.flareVideo .controls .play:before {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'flareicon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    color: #5c5c5c;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: pointer;
+    content: "\e903";
+    font-size: 1.5em;
+}
+
+
+/**暂停按钮***/
+.flareVideo .controls .pause {
+    display: none;
+}
+.flareVideo.playing .controls .pause {
+    display: block;
+}
+.flareVideo .controls .pause:before {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'flareicon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    color: #5c5c5c;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: pointer;
+    content: "\e900";
+    font-size: 1.5em;
+}
+
+
+
+/**显示时间**/
+.flareVideo .controls .timeMax {
+    left: 11%;
+    top:56%;
+}
+.flareVideo .controls .timeMin,
+.flareVideo .controls .timeMax {
+    font-family: Apex, "Helvetica Neue", "HelveticaNeue", helvetica, sans-serif;
+    font-size: 12px;
+    color: #5c5c5c;
+    font-weight: bold;
+}
+.flareVideo .controls .timeMin {
+    position: absolute;
+    bottom: 8px;
+    left: 20px;
+}
+
+
+
+/**拖动条***/
+.flareVideo .controls .seek {
+    width: 40%;
+    left: 30%;
+    top:55%;
+}
+.flareVideo .controls .seek .seekRange {
+    width: 100%;
+}
+.flareVideo .ui-slider-horizontal .ui-slider-handle {
+    outline: none; /*去掉默认的黄色边框*/
+    margin-left: -10px;
+}
+.flareVideo .controls .seek .seekRange .ui-slider-handle:before {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'flareicon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    color: #4d7eff;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: block;
+    width: 8px;
+    height: 8px;
+    content: "\e902";
+    font-size: 1.5em;
+}
+.flareVideo .controls input[type="range"],
+.flareVideo .controls .ui-slider {
+    -khtml-appearance: none;
+    border: 1px solid #1B1B1B;
+    border-top-color: #060606;
+    border-bottom-color: #202020;
+    background: #0E0E0E;
+    background: -moz-linear-gradient(top, #0E0E0E, #141414);
+    background: -webkit-gradient(linear, left top, left bottom, from(#0E0E0E), to(#141414));
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+}
+
+
+/**全屏按钮*/
+.flareVideo .controls .fullScreen {
+    right: 12%;
+    top:56%;
+}
+.flareVideo .controls .fullScreen:before {
+    font-family: 'flareicon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    color: #5c5c5c;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: pointer;
+    content: '\e905';
+    font-size: 1em;
+}
+
+
+/**关闭按钮**/
+.flareVideo .controls .close {
+    right: 2%;
+}
+.flareVideo .controls .close:before {
+    font-family: 'flareicon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    color: #5c5c5c;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: pointer;
+    content: '\e904';
+    font-size: 1.5em;
+}
+
+
+
+
+
+

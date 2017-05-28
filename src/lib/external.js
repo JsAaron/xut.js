@@ -5,8 +5,7 @@ var cssName = [
   'css/vertical.css',
   'css/adaptive-image.css',
   'css/css3-filters.css',
-  'css/flarevideo.css',
-  'css/flarevideo.default.css'
+  'css/flarevideo.css'
 ]
 
 //2016.11.14 去掉代码区域

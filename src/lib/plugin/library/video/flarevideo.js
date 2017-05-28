@@ -84,7 +84,7 @@
 
     /*绑定监控工具条的显示隐藏控制*/
     if (this.options.controls) {
-      this.idleTimer();
+      // this.idleTimer();
     }
   };
 
@@ -375,8 +375,9 @@
     this.setupSeek();
     this.setupTiming()
 
+
     /*开始隐藏*/
-    this.element.addClass("idle");
+    // this.element.addClass("idle");
 
     this.element.append(this.controls);
   };
@@ -427,6 +428,7 @@
     close.addClass("close");
     close.on(clickName, function () {
       self.trigger("close")
+      return false
     });
 
     this.controls.append(close);
@@ -494,7 +496,6 @@
         banChange = false
       }
     });
-
 
     var currentValue = 0;
     result.getValue = function () {
