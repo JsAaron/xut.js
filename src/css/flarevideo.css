@@ -43,7 +43,7 @@
     position: absolute;
     z-index: 2;
     cursor: default;
-    top: -0.8em;
+    top: -0.75em;
 }
 
 .flareVideo .ui-slider .ui-slider-range {
@@ -83,6 +83,7 @@
     width: 100%;
     background: #fff;
     z-index: 200;
+    display: table;
 }
 .flareVideo .controls input[type="range"] {
     margin: 0;
@@ -103,9 +104,8 @@
 .flareVideo .controls .fullScreen,
 .flareVideo .controls .timeMax,
 .flareVideo .controls .seek {
-    position: absolute;
-    top: 50%;
-    transform: translate(0, -50%);
+    display: table-cell;
+    vertical-align: middle;
 }
 
 
@@ -120,6 +120,7 @@
 
 /**播放按钮***/
 .flareVideo.playing .controls .play {
+     padding-left:2%;
     display: none;
 }
 .flareVideo .controls .play:before {
@@ -145,9 +146,7 @@
 .flareVideo .controls .pause {
     display: none;
 }
-.flareVideo.playing .controls .pause {
-    display: block;
-}
+
 .flareVideo .controls .pause:before {
     /* use !important to prevent issues with browser extensions that change fonts */
     font-family: 'flareicon' !important;
@@ -169,10 +168,6 @@
 
 
 /**显示时间**/
-.flareVideo .controls .timeMax {
-    left: 11%;
-    top:56%;
-}
 .flareVideo .controls .timeMin,
 .flareVideo .controls .timeMax {
     font-family: Apex, "Helvetica Neue", "HelveticaNeue", helvetica, sans-serif;
@@ -185,14 +180,17 @@
     bottom: 8px;
     left: 20px;
 }
+.flareVideo .controls .timeMax{
+    transform:scale(0.9);
+    padding-right: 2%;
+}
+
 
 
 
 /**拖动条***/
 .flareVideo .controls .seek {
     width: 40%;
-    left: 30%;
-    top:55%;
 }
 .flareVideo .controls .seek .seekRange {
     width: 100%;
@@ -236,8 +234,7 @@
 
 /**全屏按钮*/
 .flareVideo .controls .fullScreen {
-    right: 12%;
-    top:56%;
+    padding-left: 2%;
 }
 .flareVideo .controls .fullScreen:before {
     font-family: 'flareicon' !important;
@@ -259,7 +256,7 @@
 
 /**关闭按钮**/
 .flareVideo .controls .close {
-    right: 2%;
+    padding-right:2%;
 }
 .flareVideo .controls .close:before {
     font-family: 'flareicon' !important;

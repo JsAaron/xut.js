@@ -84,7 +84,7 @@
 
     /*绑定监控工具条的显示隐藏控制*/
     if (this.options.controls) {
-      // this.idleTimer();
+      this.idleTimer();
     }
   };
 
@@ -371,13 +371,13 @@
     this.controls.addClass("controls");
     this.controls.addClass("disabled");
 
-    this.setupButtons();
-    this.setupSeek();
+    this.setupBeforeButtons();
     this.setupTiming()
-
+    this.setupSeek();
+    this.setupAfterButtons();
 
     /*开始隐藏*/
-    // this.element.addClass("idle");
+    this.element.addClass("idle");
 
     this.element.append(this.controls);
   };
@@ -386,7 +386,7 @@
    * 创建控制条按钮
    * @return {[type]} [description]
    */
-  FlareVideo.fn.setupButtons = function () {
+  FlareVideo.fn.setupBeforeButtons = function () {
     var play = $("<div />");
     play.addClass("play");
     //play.text("Play");
@@ -410,7 +410,10 @@
       return false
     });
     this.controls.append(pause);
+  };
 
+  FlareVideo.fn.setupAfterButtons = function () {
+    var self = this
     var fullScreen = $("<div />");
     fullScreen.addClass("fullScreen");
     //fullScreen.text("Full Screen");
@@ -433,6 +436,8 @@
 
     this.controls.append(close);
   };
+
+
 
   /**
    * 创建拖动条
