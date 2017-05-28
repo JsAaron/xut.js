@@ -80,7 +80,8 @@
     position: relative;
     bottom: 20%;
     height: 20%;
-    width: 101%;/*修差*/
+    width: 102%;/*table修差*/
+    left:-1%;
     background: #fff;
     z-index: 200;
     display: table;
