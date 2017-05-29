@@ -71,17 +71,6 @@
 }
 
 
-.flareVideo .controls .fullScreen:before{
-    font-size: 1em;
-}
-.flareVideo .controls .close:before,
-.flareVideo .controls .seek .seekRange .ui-slider-handle:before,
-.flareVideo .controls .pause:before,
-.flareVideo .controls .play:before{
-    font-size: 1.5em;
-}
-
-
 /************
 * 控制工具栏
 *************/
@@ -281,6 +270,17 @@
     content: '\e904';
 }
 
+
+/**设置图标的尺寸**/
+.flareVideo .controls .fullScreen:before{
+    font-size: 1em;
+}
+.flareVideo .controls .close:before,
+.flareVideo .controls .seek .seekRange .ui-slider-handle:before,
+.flareVideo .controls .pause:before,
+.flareVideo .controls .play:before{
+    font-size: 1.5em;
+}
 
 /* 判断ipad，重设图片的相对尺寸em的值 */
 @media only screen
