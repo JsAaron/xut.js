@@ -1,3 +1,4 @@
+
 .flareVideo {
     position: relative;
     padding: 0;
@@ -70,6 +71,15 @@
 }
 
 
+.flareVideo .controls .fullScreen:before{
+    font-size: 1em;
+}
+.flareVideo .controls .close:before,
+.flareVideo .controls .seek .seekRange .ui-slider-handle:before,
+.flareVideo .controls .pause:before,
+.flareVideo .controls .play:before{
+    font-size: 1.5em;
+}
 
 
 /************
@@ -78,7 +88,7 @@
 
 .flareVideo .controls {
     position: relative;
-    bottom: 20%;
+    bottom: 18%;
     height: 20%;
     width: 102%;/*table修差*/
     left:-1%;
@@ -139,7 +149,6 @@
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     content: "\e903";
-    font-size: 1.5em;
 }
 
 
@@ -163,7 +172,6 @@
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     content: "\e900";
-    font-size: 1.5em;
 }
 
 
@@ -217,7 +225,6 @@
     width: 8px;
     height: 8px;
     content: "\e902";
-    font-size: 1.5em;
 }
 .flareVideo .controls input[type="range"],
 .flareVideo .controls .ui-slider {
@@ -251,7 +258,6 @@
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     content: '\e905';
-    font-size: 1em;
 }
 
 
@@ -273,9 +279,20 @@
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     content: '\e904';
-    font-size: 1.5em;
 }
 
+
+/* 判断ipad，重设图片的相对尺寸em的值 */
+@media only screen
+and (min-device-width : 768px)
+and (max-device-width : 1024px){
+    .flareVideo .controls{
+        font-size: 1.5em;
+    }
+    .flareVideo .controls .timeMax{
+        font-size: 1em;
+    }
+}
 
 
 
