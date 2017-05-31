@@ -60,9 +60,11 @@ export default class Digital extends MiniSuper {
    * 更新总页数
    */
   updateTotal(newTotalIndex) {
-    Xut.nextTick(() => {
+    /*更新数必须大于当前数*/
+    if (newTotalIndex > this.pageTotal) {
+      this.pageTotal = newTotalIndex
       this.$allNode.text(newTotalIndex)
-    })
+    }
   }
 
 

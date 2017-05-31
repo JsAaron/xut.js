@@ -427,7 +427,6 @@ export default class ColumnClass {
       }
     }
 
-          iscroll.scrollTo(0, iscroll.maxScrollY)
 
     let hasQrcode
     iscroll.on('beforeScrollStart', e => {
@@ -627,39 +626,60 @@ export default class ColumnClass {
   ///////////////////
 
   /**
+   * 横版分栏更新
+   * @param  {[type]} newColumnCount [description]
+   * @return {[type]}                [description]
+   */
+  _resetX(newColumnCount) {
+    this.columnCount = newColumnCount
+    this.maxBorder = newColumnCount - 1
+
+    let visualPageId = Xut.Presentation.GetPageId()
+    let columnPageId = this.chapterId
+    let location
+
+    //区分控制column属于哪个页面对象
+    if (visualPageId > columnPageId) {
+      location = 'left'
+    } else if (visualPageId < columnPageId) {
+      location = 'right'
+    } else if (visualPageId === columnPageId) {
+      location = 'middle'
+    }
+
+    //设置column
+    this.swipe.setLinearTotal(newColumnCount, location)
+    this.lastDistance = this.swipe.getInitDistance()
+
+    //页码
+    this._updataPageNumber('', location)
+  }
+
+
+  /**
+   * 竖版分栏更新
+   * @param  {[type]} newColumnCount [description]
+   * @return {[type]}                [description]
+   */
+  _resetY(newColumnCount) {
+    // this.iscroll.refresh()
+    // console.log(this.iscroll.maxScrollY)
+    // this._updatePosition(this.iscroll.y)
+  }
+
+  /**
    * 重新计算分栏依赖
    * @return {[type]} [description]
    */
   resetColumnDep() {
-
     let newColumnCount = getColumnCount(this.seasonId, this.chapterId)
-
-    //如果分栏页面总数不正确
-    if (this.columnCount !== newColumnCount) {
-
-      this.columnCount = newColumnCount
-      this.maxBorder = newColumnCount - 1
-
-      let visualPageId = Xut.Presentation.GetPageId()
-      let columnPageId = this.chapterId
-      let location
-
-      //区分控制column属于哪个页面对象
-      if (visualPageId > columnPageId) {
-        location = 'left'
-      } else if (visualPageId < columnPageId) {
-        location = 'right'
-      } else if (visualPageId === columnPageId) {
-        location = 'middle'
+      /*假如分栏数有变化*/
+    if (newColumnCount > this.columnCount) {
+      if (config.launch.scrollMode === 'h') {
+        this._resetX(newColumnCount)
+      } else if (config.launch.scrollMode === 'v') {
+        this._resetY(newColumnCount)
       }
-
-      //设置column
-      this.swipe.setLinearTotal(newColumnCount, location)
-
-      this.lastDistance = this.swipe.getInitDistance()
-
-      //页码
-      this._updataPageNumber('', location)
     }
   }
 

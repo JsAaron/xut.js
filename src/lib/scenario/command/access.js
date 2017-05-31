@@ -6,14 +6,14 @@
 export default function access(pageObj, callback) {
 
   //如果只提供回调函数
-  if(arguments.length === 1 && _.isFunction(pageObj)) {
+  if (arguments.length === 1 && _.isFunction(pageObj)) {
     callback = pageObj
-    pageObj = Xut.Presentation.GetPageBase()
+    pageObj = Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase()
   } else {
-    pageObj = pageObj || Xut.Presentation.GetPageBase()
+    pageObj = pageObj || (Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase())
   }
 
-  if(pageObj) {
+  if (pageObj) {
     const contents = pageObj.baseGetContent();
     const components = pageObj.baseGetComponent();
     const pageType = pageObj.pageType || 'page';

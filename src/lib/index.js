@@ -36,6 +36,7 @@ const mixGolbalConfig = setConfig => {
 
 /*接口接在参数,用户横竖切换刷新*/
 let cacheOptions
+let delayTimer = null
 
 /*横竖切换*/
 const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function () {
@@ -53,9 +54,18 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function 
     //安卓设备上,对横竖切换的处理反映很慢
     //所以这里需要延时加载获取设备新的分辨率
     //2016.11.8
-    const delay = fn => setTimeout(fn, 500)
+    function delay(fn) {
+      if (!delayTimer) {
+        delayTimer = setTimeout(function () {
+          Xut.Application.Refresh()
+          clearTimeout(delayTimer)
+          delayTimer = null
+          fn()
+        }, 1000)
+      }
+    }
+
     let temp = cacheOptions
-    Xut.Application.Refresh()
     if (temp && temp.length) {
       delay(() => {
         Xut.Application.Launch(temp.pop())

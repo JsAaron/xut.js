@@ -184,8 +184,8 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
   function parseContentParameter(parameter, contentId, conData) {
     _.each(parameter, (para) => {
       /*如果有css3的滤镜效果*/
-      if(para.filter && para.filter.length){
-        conData.filterNames = para.filter
+      if (para.filter && para.filter.length) {
+        conData.filterNames = parseJSON(para.filter)
       }
       /*是否启动代码追踪*/
       if (para.trackCode) {
@@ -276,7 +276,7 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
 
   /*创建content节点*/
   function createRelated(contentId, wrapObj) {
-    externalFile(wrapObj, function(wrapObj) {
+    externalFile(wrapObj, function (wrapObj) {
       let uuid, startStr, contentStr
       let conData = wrapObj.contentData
 
@@ -333,7 +333,7 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
         containerStr = []
 
         //合并容器
-        containerObj.createUUID.forEach(function(uuid) {
+        containerObj.createUUID.forEach(function (uuid) {
           start = containerObj[uuid].start.join('');
           end = containerObj[uuid].end;
           containerStr.push(start.concat(end));
@@ -374,7 +374,7 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
       }
 
       /*转换缩放比*/
-      const setRatio = function(proportion = getStyle.pageProportion) {
+      const setRatio = function (proportion = getStyle.pageProportion) {
         sizeResults = reviseSize({
           results: wrapObj.contentData,
           getStyle: getStyle,
@@ -385,9 +385,9 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
       setRatio()
 
       /*设置页面缩放比*/
-      const setPageProportion = function(baseRatio) {
+      const setPageProportion = function (baseRatio) {
         let pageProportion = {}
-        _.each(getStyle.pageProportion, function(prop, key) {
+        _.each(getStyle.pageProportion, function (prop, key) {
           pageProportion[key] = prop * baseRatio
         })
         return pageProportion

@@ -2,6 +2,29 @@ import { config } from '../../config/index'
 import { resetColumnCount } from './api'
 import { getColumnData } from './init'
 
+
+/**
+ * debug调试
+ */
+export let debug = true
+export let simulateCount = 2
+
+/**
+ * 模拟检测次数
+ */
+const simulateTimer = 13
+
+/**
+ * 检测引用
+ */
+let timerId = null
+
+/**
+ * 基本检测次数 20*500 ~ 10秒范围
+ */
+let baseCheckCount = 20
+
+
 /**
  * 分栏探测
  */
@@ -22,26 +45,6 @@ const execDelay = function (tempDelay) {
   }
 }
 
-/**
- * debug调试
- */
-export let debug = false
-export let simulateCount = 2
-
-/**
- * 模拟检测次数
- */
-const simulateTimer = 13
-
-/**
- * 检测引用
- */
-let timerId = null
-
-/**
- * 基本检测次数 20*500 ~ 10秒范围
- */
-let baseCheckCount = 20
 
 /**
  * 检测分栏数

@@ -238,6 +238,7 @@ const createContainer = (data, wrapObj) => {
   /*css3 滤镜效果 2017.5.12支持,filterNames数组形式*/
   const filterName = data.filterNames ? data.filterNames.join(' ') : ''
 
+
   // var isHtml = "";
   //2015.12.29
   //如果是html内容

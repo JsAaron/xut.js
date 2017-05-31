@@ -172,7 +172,7 @@ export default {
    * 变更依赖
    * 如果检测到有column数据，会自动启动
    */
-  columnCheck: false,
+  columnCheck: DEFAULT, //如果强制false了就是永远关闭，如果DEFAULT就让其默认处理
 
   /**
    * 迷你杂志页码显示配置

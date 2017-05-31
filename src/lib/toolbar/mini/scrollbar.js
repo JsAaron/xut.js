@@ -75,15 +75,14 @@ export default class Scrollbar extends MiniSuper {
 
   /**
    * 更新单页
+   * PPT页面更新
    */
   _updateSingle(action, updateIndex, speed) {
-
-    this._clearTimer()
-
     if (this.barState === 'hide') {
       this.showBar()
     }
 
+    this._clearTimer()
     this.timer = setTimeout(() => {
       // this.hideBar()
     }, 1500)
@@ -111,6 +110,7 @@ export default class Scrollbar extends MiniSuper {
 
 
   /**
+   * Flow内部滚动
    * 内部滑动页面操作
    * 更新坐标
    */
@@ -157,12 +157,21 @@ export default class Scrollbar extends MiniSuper {
 
   /**
    * 更新总页数
+   * flow数据开始不完全，动态补全后重新处理
    */
   updateTotal(newTotalIndex) {
-    Xut.nextTick(() => {
-      this._setTranslate()
-      this._setTranslate(this.visualHeight / newTotalIndex, 0)
-    })
+    /*更新数必须大于当前数*/
+    if (newTotalIndex > this.pageTotal) {
+      this.pageTotal = newTotalIndex
+        /*更新基数*/
+      if (this.direction == "h") {
+        this.ratio = this.visualWidth / this.pageTotal;
+        this.$indicatorNode.css('width', this.ratio)
+      } else {
+        this.ratio = this.visualHeight / this.pageTotal
+        this.$indicatorNode.css('height', this.ratio)
+      }
+    }
   }
 
 }

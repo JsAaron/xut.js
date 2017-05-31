@@ -83,7 +83,7 @@ export default class Circular extends MiniSuper {
     })
   }
 
- _destroy() {
+  _destroy() {
     this.$currtNode = null
   }
 
@@ -95,7 +95,7 @@ export default class Circular extends MiniSuper {
    * 更新总页数
    */
   updateTotal(newTotalIndex) {
-    Xut.nextTick(() => {
+    if (newTotalIndex > this.pageTotal) {
       var visualIndex = 0;
       var span, iconi;
       _.each(this.$container.find('span.slider-pager-page'), function (value, index) {
@@ -116,7 +116,7 @@ export default class Circular extends MiniSuper {
         span.appendChild(iconi);
         this.$container.append(span)
       }
-    })
+    }
   }
 
 }

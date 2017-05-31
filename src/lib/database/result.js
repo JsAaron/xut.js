@@ -76,6 +76,11 @@ function filterJsonData() {
   //需要把flow的给处理掉
   if (config.launch.resource && result.FlowData) {
 
+    /*如果没有强制关闭，并且有flow数据，那么就默认启动*/
+    if (config.launch.columnCheck !== false) {
+      config.launch.columnCheck = true
+    }
+
     //有基础后缀，需要补上所有的图片地址
     const baseSuffix = config.launch.baseImageSuffix ? `.${config.launch.baseImageSuffix}` : ''
 

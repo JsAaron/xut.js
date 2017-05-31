@@ -2,7 +2,7 @@ import { config, resetVisualLayout } from '../../config/index'
 import { defAccess, nextTick, $warn, loadGolbalStyle } from '../../util/index'
 import { getResults, removeColumnData } from '../../database/result'
 import { startColumnDetect, simulateCount, debug } from './detect'
-import { setCache } from './api'
+import { addCache } from './api'
 
 const COLUMNWIDTH = Xut.style.columnWidth
 const COLUMNTAP = Xut.style.columnGap
@@ -202,16 +202,16 @@ export function initColumn(callback) {
     setTimeout(() => {
 
       //第一次获取分栏数与高度 analysis
-      getColumnData($seasons, (seasonsId, chapterId, count, height) => {
+      getColumnData($seasons, (seasonsId, chapterId, count) => {
         if (debug && config.launch.columnCheck) {
           count = simulateCount
         }
-        columnData[seasonsId][chapterId] = { count, height }
+        columnData[seasonsId][chapterId] = count
       })
 
-      setCache(columnData);
+      addCache(columnData);
 
-      //检测分栏数变化
+      //检测分栏是否丢失，补充
       if (config.launch.columnCheck) {
         startColumnDetect($seasons, $.extend(true, {}, columnData), () => {
           $container.hide()

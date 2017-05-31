@@ -377,7 +377,7 @@
     this.setupAfterButtons();
 
     /*开始隐藏*/
-    this.element.addClass("idle");
+    // this.element.addClass("idle");
 
     this.element.append(this.controls);
   };
@@ -389,7 +389,6 @@
   FlareVideo.fn.setupBeforeButtons = function () {
     var play = $("<div />");
     play.addClass("play");
-    //play.text("Play");
 
     var self = this
 
@@ -403,7 +402,7 @@
 
     var pause = $("<div />");
     pause.addClass("pause");
-    //pause.text("Pause");
+
     pause.on(clickName, function () {
       if (!self.canPlay) return;
       self.pause();
@@ -532,12 +531,24 @@
    * @return {[type]} [description]
    */
   FlareVideo.fn.setupTiming = function () {
-    //var timeToGo = $("<div />");
-    var timeLeft = $("<div />");
 
-    // timeToGo.addClass("timeMin");
-    timeLeft.addClass("timeMax");
+    var scheduleTime = $(`<div>`);
+    scheduleTime.addClass('scheduleTime')
 
+    var timeChange = $("<div />");
+    timeChange.addClass("timeChange");
+    scheduleTime.append(timeChange);
+
+    var timeUn = $("<div>/</div>");
+    timeUn.addClass("timeUn");
+    scheduleTime.append(timeUn);
+
+    var timeMax = $("<div />");
+    timeMax.addClass("timeMax");
+    scheduleTime.append(timeMax);
+
+
+    // // timeToGo.addClass("timeMin");
     var pad = function (num) {
       if (num < 10)
         return "0" + num;
@@ -546,33 +557,32 @@
 
     var secondsFormat = function (sec) {
       var result = [];
-
       var minutes = Math.floor(sec / 60);
       var hours = Math.floor(sec / 3600);
       var seconds = (sec == 0) ? 0 : (sec % 60)
       seconds = Math.round(seconds);
-
-      if (hours > 0)
+      if (hours > 0) {
         result.push(pad(hours));
-
+      }
       result.push(pad(minutes));
       result.push(pad(seconds));
-
       return result.join(":");
     };
 
+
     this.ontimeupdate($.proxy(function () {
       //timeToGo.text(secondsFormat(this.video.getCurrentTime()));
-      timeLeft.text(secondsFormat(this.video.getEndTime() - this.video.getCurrentTime()))
+      timeChange.text(secondsFormat(this.video.getCurrentTime()))
     }, this));
 
     /*视频准备好后出发一次，更新总时间*/
     this.videoElement.one("canplay", $.proxy(function () {
+      timeMax.text(secondsFormat(this.video.getEndTime() - this.video.getCurrentTime()))
       this.videoElement.trigger("timeupdate");
     }, this));
 
     //this.controls.append(timeToGo);
-    this.controls.append(timeLeft);
+    this.controls.append(scheduleTime);
   };
 
 

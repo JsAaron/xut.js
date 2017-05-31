@@ -11,7 +11,7 @@ let columnData
 /**
  * 缓存流式布局对象
  */
-export function setCache(data) {
+export function addCache(data) {
   columnData = data
 }
 
@@ -20,7 +20,7 @@ export function setCache(data) {
  */
 export function resetColumnCount(seasonsId, chapterId, value) {
   if (columnData[seasonsId] && columnData[seasonsId][chapterId]) {
-    columnData[seasonsId][chapterId]['count'] = value
+    columnData[seasonsId][chapterId] = value
   }
 }
 
@@ -44,7 +44,7 @@ export function getCurrentBeforeCount(seasonId, chapterId) {
   let count = 0
   for (let key in seasonIds) {
     if (key <= chapterId) {
-      count += seasonIds[key]['count'];
+      count += seasonIds[key];
       --count
     }
   }
@@ -61,7 +61,7 @@ export function getBeforeCount(seasonId, chapterId) {
     let count = 0
     for (let key in seasonIds) {
       if (key < chapterId) {
-        count += seasonIds[key]['count'];
+        count += seasonIds[key];
         --count
       }
     }
@@ -86,14 +86,12 @@ export function getColumnCount(seasonId, chapterId) {
   if (!columnData) return
   if (seasonId) {
     if (chapterId) {
-      return columnData[seasonId] &&
-        columnData[seasonId][chapterId] &&
-        columnData[seasonId][chapterId]['count']
+      return columnData[seasonId] && columnData[seasonId][chapterId]
     } else {
       let seasonIds = columnData[seasonId]
       let count = 0
       for (let key in seasonIds) {
-        count += seasonIds[key]['count']
+        count += seasonIds[key]
       }
       return count
     }
@@ -102,15 +100,6 @@ export function getColumnCount(seasonId, chapterId) {
   }
 }
 
-/**
- * 获取分栏页面的高度
- * @return {[type]} [description]
- */
-export function getColumnHeight(seasonId, chapterId) {
-  if (columnData && seasonId && chapterId) {
-    return columnData[seasonId][chapterId]['height']
-  }
-}
 
 /**
  * 判断是否为分栏布局页面
