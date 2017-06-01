@@ -49,19 +49,22 @@ export default class Scrollbar extends MiniSuper {
   }
 
 
-  _setTranslate(updateIndex, speed) {
+  _setTranslate(x = 0, y = 0, speed = 0) {
+    this.indicatorNode.style[Xut.style.transitionDuration] = speed + 'ms'
+    this.indicatorNode.style[Xut.style.transform] = `translate3d(${x}px,${y}px,0px)`
+  }
+
+
+  _updateTranslate(updateIndex, speed) {
     if (this.indicatorNode) {
       let distance;
-      let translate
       if (this.direction == "h") {
         distance = this.visualWidth * (updateIndex - 1) / this.pageTotal;
-        translate = `translate3d(${distance}px,0px,0px)`
+        this._setTranslate(distance, 0, speed)
       } else {
         distance = this.visualHeight * (updateIndex - 1) / this.pageTotal;
-        translate = `translate3d(0px,${distance}px,0px)`
+        this._setTranslate(0, distance, speed)
       }
-      this.indicatorNode.style[Xut.style.transitionDuration] = speed + 'ms'
-      this.indicatorNode.style[Xut.style.transform] = translate
       this.baesTranslateY = this.initTranslateY = distance
     }
   }
@@ -82,18 +85,19 @@ export default class Scrollbar extends MiniSuper {
       this.showBar()
     }
 
-    this._clearTimer()
-    this.timer = setTimeout(() => {
-      // this.hideBar()
-    }, 1500)
+    if (!this.timer) {
+      this.timer = setTimeout(() => {
+        this.hideBar()
+      }, 1500)
+    }
 
     /*初始化处理*/
     if (action === 'init') {
-      this._setTranslate(updateIndex, 0)
+      this._updateTranslate(updateIndex, 0)
       this.$container.show()
     } else {
       /*边界处翻页处理*/
-      this._setTranslate(updateIndex, speed)
+      this._updateTranslate(updateIndex, speed)
     }
   }
 
@@ -132,14 +136,13 @@ export default class Scrollbar extends MiniSuper {
       distance = this.baesTranslateY - scrollY
       this.preTranslateY = distance
     }
-    this.indicatorNode.style[Xut.style.transitionDuration] = time + 'ms'
-    this.indicatorNode.style[Xut.style.transform] = `translate3d(0px,${distance}px,0px)`
+    this._setTranslate(0, distance, time)
   }
 
   /*显示滚动条*/
   showBar() {
     if (this.barState === 'hide') {
-      this.$indicatorNode.css('opacity', '0.5')
+      this.$indicatorNode.css('opacity', 1)
       this.barState = 'show'
     }
   }

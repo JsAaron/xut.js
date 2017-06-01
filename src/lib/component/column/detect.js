@@ -6,7 +6,7 @@ import { getColumnData } from './init'
 /**
  * debug调试
  */
-export let debug = true
+export let debug = false
 export let simulateCount = 2
 
 /**

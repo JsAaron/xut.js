@@ -662,8 +662,9 @@ export default class ColumnClass {
    * @return {[type]}                [description]
    */
   _resetY(newColumnCount) {
+    console.log('竖版数据丢失，需要添加功能，补全')
+    // console.log(this.columnCount,newColumnCount)
     // this.iscroll.refresh()
-    // console.log(this.iscroll.maxScrollY)
     // this._updatePosition(this.iscroll.y)
   }
 
