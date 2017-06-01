@@ -41,10 +41,10 @@ export default function slide(Swiper) {
   Swiper.prototype._getRollVisual = function () {
     let orientation = this.orientation
     if (orientation) {
-      return this.orientation === 'h' ? this.visualWidth : this.visualHeight
+      return this.orientation === 'h' ? this.actualWidth : this.actualHeight
     }
     //在flow初始化时候，在边界往PPT滑动，是没有值的，所以需要通过全局参数判断
-    return this.options.scrollX ? this.visualWidth : this.visualHeight
+    return this.options.scrollX ? this.actualWidth : this.actualHeight
   }
 
   /**

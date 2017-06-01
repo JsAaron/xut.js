@@ -126,6 +126,13 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
   }
 
   /**
+   * 模式5
+   */
+  if(setVisualMode === 5){
+    newWidth = screenWidth * 2
+  }
+
+  /**
    * 模式2.3.4
    * config.launch.visualMode === 1
    * @return {[type]}

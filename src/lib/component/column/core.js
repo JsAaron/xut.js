@@ -178,7 +178,7 @@ export default class ColumnClass {
       stopPropagation: true,
       visualIndex: Xut.Presentation.GetPageIndex() > coloumnObj.initIndex ? coloumnObj.maxBorder : coloumnObj.minBorder,
       totalIndex: this.columnCount,
-      visualWidth: columnWidth
+      actualWidth: columnWidth
     }
 
     _.extend(setOptions, Swiper.getConfig())

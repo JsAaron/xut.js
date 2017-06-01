@@ -130,9 +130,6 @@ export default class Swiper extends Observer {
     /*鼠标滚轮*/
     mouseWheel = false,
 
-    /*卷滚条*/
-    scrollbar = false,
-
     /**
      * 是否存在钩子处理
      * 这个是事件行为的处理给外部hook.js
@@ -151,21 +148,34 @@ export default class Swiper extends Observer {
 
     /**
      * 基本数据设定
+     * actualWidth / visualWidth
+     * 一个是可见区域的尺寸
+     * 一个是实际容器的尺寸
+     * 在模式5下，容器可以在可见区域中滑动
      */
+
+    /*内部滚动
+    当visualMode===5的时候
+    内容宽度溢出了可见区宽度
+    那么需要支持内部滚动模式*/
+    insideScroll = false,
+
     /*容器节点*/
     container,
     /*开始索引*/
     visualIndex,
     /*总索引*/
     totalIndex,
-    /*容器宽度*/
-    visualWidth,
-    /*容器高度*/
-    visualHeight,
+    /*实际容器宽度*/
+    actualWidth,
+    /*实际容器高度*/
+    actualHeight,
     /*是否有多页面*/
     hasMultiPage,
     /*section分段拼接*/
-    sectionRang
+    sectionRang,
+    /*可视区域的尺寸 */
+    visualWidth
   }) {
 
     super()
@@ -174,8 +184,9 @@ export default class Swiper extends Observer {
       container,
       visualIndex,
       totalIndex,
-      visualWidth,
-      visualHeight
+      actualWidth,
+      actualHeight,
+      visualWidth
     })
 
     this.options = {
@@ -186,7 +197,7 @@ export default class Swiper extends Observer {
       scrollY,
       momentum,
       mouseWheel,
-      scrollbar,
+      insideScroll,
       hasHook,
       borderBounce,
       stopPropagation,
@@ -211,7 +222,7 @@ export default class Swiper extends Observer {
     /*翻页速率*/
     this._speedRate =
       this._originalRate =
-      this._defaultFlipTime / (scrollX ? visualWidth : visualHeight)
+      this._defaultFlipTime / (scrollX ? actualWidth : actualHeight)
 
     /*计算初始化页码*/
     this.pagePointer = initPointer(visualIndex, totalIndex)
@@ -493,9 +504,9 @@ export default class Swiper extends Observer {
     if (this._isInvalid) {
       let hasSwipe
       if (orientation === 'h') {
-        hasSwipe = duration < 200 && distX > this.visualWidth / 10
+        hasSwipe = duration < 200 && distX > this.actualWidth / 10
       } else if (orientation === 'v') {
-        hasSwipe = duration < 200 && distY > this.visualHeight / 10
+        hasSwipe = duration < 200 && distY > this.actualHeight / 10
       }
       if (hasSwipe) {
         this._distributeMove({ action: 'swipe' })
@@ -602,7 +613,7 @@ export default class Swiper extends Observer {
     return value / ((!this.visualIndex && value > 0 || // 在首页
       this.visualIndex == this.totalIndex - 1 && // 尾页
       value < 0 // 中间
-    ) ? (absDist / this.visualWidth + 1) : 1)
+    ) ? (absDist / this.actualWidth + 1) : 1)
   }
 
   /*

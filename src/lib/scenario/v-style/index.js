@@ -75,6 +75,5 @@ export function setCustomStyle(styleDataset) {
     })
   }
 
-
   return styleDataset
 }

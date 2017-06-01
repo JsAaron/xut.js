@@ -77,9 +77,9 @@ export default function init(Swiper) {
    */
   Swiper.prototype._setContainerValue = function (element) {
     if (element) {
-      element.style.height = this.visualHeight * this.totalIndex + 'px'
+      element.style.height = this.actualHeight * this.totalIndex + 'px'
     } else {
-      this.container.style.width = this.visualWidth * this.totalIndex + 'px'
+      this.container.style.width = this.actualWidth * this.totalIndex + 'px'
     }
   }
 

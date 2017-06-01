@@ -12,10 +12,18 @@ export default function api(Swiper) {
     orientation = orientation || this.orientation
     if (orientation === 'h') {
       distX = Math.abs(distX)
-      return duration < 200 && distX > 30 || distX > this.visualWidth / 6 ? 'flipOver' : 'flipRebound'
+      /**启动了内部滑动 */
+      if(this.options.insideScroll){
+        //如果移动的距离小于页面宽度
+        if(Math.abs(this.distX) <  this.visualWidth){
+          return 'flipMove'
+        }
+      }
+
+      return duration < 200 && distX > 30 || distX > this.actualWidth / 6 ? 'flipOver' : 'flipRebound'
     } else if (orientation === 'v') {
       distY = Math.abs(distY)
-      return duration < 200 && distY > 30 || distY > this.visualHeight / 6 ? 'flipOver' : 'flipRebound'
+      return duration < 200 && distY > 30 || distY > this.actualHeight / 6 ? 'flipOver' : 'flipRebound'
     }
   }
 
