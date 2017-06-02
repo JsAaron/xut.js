@@ -1,7 +1,7 @@
 /************************
  * 中间页面钩子
  *************************/
-export const hMiddlePageHook =  {
+export const hMiddlePageHook = {
   flipMove: {
     prev() {},
     next() {}
@@ -10,9 +10,10 @@ export const hMiddlePageHook =  {
     /**
      * 左翻页结束
      */
-    prev(getStyle) {
+    prev(getStyle, distance) {
       let middlePageStyle = getStyle('middle')
       let leftPageStyle = getStyle('left')
+
 
       //中间：溢出
       if (middlePageStyle && middlePageStyle.visualLeftInteger) {

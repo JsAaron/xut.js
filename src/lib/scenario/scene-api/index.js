@@ -10,7 +10,9 @@ import { extendView } from './view'
 import { extendAssist } from './assist'
 import { extendContent } from './content'
 import { extendApplication } from './application'
+import { extendCamera } from './camera'
 import { createaAccess } from './access'
+
 
 export function initSceneApi($$mediator) {
   let $$globalSwiper = $$mediator.$$globalSwiper
@@ -21,6 +23,7 @@ export function initSceneApi($$mediator) {
     master: $$mediator.$$scheduler.masterMgr
   })
 
+  extendCamera(access, $$globalSwiper)
   extendPresentation(access, $$globalSwiper) //数据接口
   extendView($$mediator, access, $$globalSwiper) //视图接口
   extendAssist(access, $$globalSwiper) // 辅助对象

@@ -7,7 +7,7 @@ import { config } from '../config/index'
 import { initPointer } from './pointer'
 import { momentum } from './momentum'
 import { ease } from './ease'
-import { $off, $handle, $event } from '../util/index'
+import { $off, $handle, $event, $warn } from '../util/index'
 
 import { LINEARTAG } from './type'
 
@@ -180,6 +180,14 @@ export default class Swiper extends Observer {
 
     super()
 
+    /*加强判断，如果*/
+    if (insideScroll) {
+      if (!visualWidth || visualWidth && (actualWidth < visualWidth)) {
+        insideScroll = false
+        $warn('启动了insideScroll，但是条件还不成立')
+      }
+    }
+
     Swiper.mixProperty(this, {
       container,
       visualIndex,
@@ -231,6 +239,10 @@ export default class Swiper extends Observer {
     this._recordRreTick = { ation: null, time: null }
 
     this._init()
+
+    /*保存上次滑动值*/
+    this.keepDistX = 0
+    this.keepDistY = 0
   }
 
 
@@ -286,7 +298,6 @@ export default class Swiper extends Observer {
     }
     this._clickTime = currtTime
 
-
     let interrupt
     let point = $event(e)
 
@@ -295,7 +306,6 @@ export default class Swiper extends Observer {
       this._stopped = true;
       return
     }
-
 
     /**
      * 获取观察对象
@@ -309,7 +319,6 @@ export default class Swiper extends Observer {
 
     /*打断动作*/
     if (interrupt) return;
-
 
     /*针对拖拽翻页阻止是否滑动事件受限*/
     this._stopped = false //如果页面停止了动作，触发
@@ -325,8 +334,12 @@ export default class Swiper extends Observer {
     /*滑动方向*/
     this.orientation = ''
 
-    this.distX = 0;
-    this.distY = 0;
+    this.distX = 0
+    this.distY = 0
+
+    /*手指触碰屏幕移动的距离，这个用于反弹判断*/
+    this.touchX = 0
+    this.touchY = 0
 
     this.pointX = point.pageX;
     this.pointY = point.pageY;
@@ -349,19 +362,22 @@ export default class Swiper extends Observer {
     this._moved = true
 
     let point = $event(e)
+
+    /*每次滑动的距离*/
     let deltaX = point.pageX - this.pointX
     let deltaY = point.pageY - this.pointY
     let absDistX = ABS(deltaX)
     let absDistY = ABS(deltaY)
 
-    let $delta, $absDelta, $dist
-
-    /*判断锁定横竖版滑动*/
+    /**
+     * 判断锁定横竖版滑动
+     * 只锁定一次
+     * 因为在滑动过程中，
+     * 用户的手指会偏移方向，
+     * 比如开始是h滑动，在中途换成v了，但是还是锁定h
+     */
+    let $delta, $absDelta
     if (absDistX > absDistY) {
-      /*因为在滑动过程中，
-      用户的手指会偏移方向，
-      所以一次滑动值去一次值
-      比如开始是h滑动，在中途换成v了，但是还是锁定h*/
       if (!this.orientation) {
         this.orientation = 'h'
       }
@@ -403,15 +419,19 @@ export default class Swiper extends Observer {
       if (this._hasBounce = this._borderBounce($delta)) return;
     }
 
+
     /*滑动距离*/
+    let $dist
     if (this.orientation === 'h') {
-      $dist = this.distX = this._getDist(deltaX, absDistX)
+      this.touchX = this._getDist(deltaX, absDistX);
+      $dist = this.distX = this.touchX + this.keepDistX
+      this._setDirection(deltaX)
     } else if (this.orientation === 'v') {
-      $dist = this.distY = this._getDist(deltaY, absDistY)
+      this.touchY = this._getDist(deltaY, absDistY)
+      $dist = this.distY = this.touchY + this.keepDistY
+      this._setDirection(deltaY)
     }
 
-    /*设置方向*/
-    this._setDirection($dist)
 
     /*锁定*/
     if (this._directionBan) return;
@@ -421,26 +441,36 @@ export default class Swiper extends Observer {
      * 算一次有效的滑动
      * 移动距离必须20px才开始移动
      */
-    let deltaDist = 20
-    if ($absDelta <= deltaDist) return;
-    if ($dist > 0) {
-      deltaDist = (-deltaDist)
+    let delayDist = 20
+    let distance = $dist
+    if ($absDelta <= delayDist) return;
+
+    /**
+     * 因为抖动优化的关系，需要重新计算distX distY的值
+     */
+    if (this.direction === 'prev') {
+      //正值递增
+      distance = this.distX = this.distY = $dist - delayDist
+    } else if (this.direction === 'next') {
+      //负值递增
+      distance = this.distX = this.distY = $dist + delayDist
     }
 
 
-    //是否无效函数
-    //如果无效，end方法抛弃掉
-    //必须是同步方法：
-    //动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
-    const setSwipeInvalid = () => {
-      this._isInvalid = true
-    }
-
+    const self = this
     this._distributeMove({
-      distance: $dist + deltaDist,
+      distance,
       speed: 0,
       action: 'flipMove',
-      setSwipeInvalid
+      /**
+       * 是否无效函数
+       * 如果无效，end方法抛弃掉
+       * 必须是同步方法：
+       * 动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
+       */
+      setSwipeInvalid: function () {
+        self._isInvalid = true
+      }
     })
   }
 
@@ -519,19 +549,41 @@ export default class Swiper extends Observer {
      * 开始翻页或者反弹
      * 翻页滑动，要排除首位的情况，首尾页面只要反弹
      */
-    const actionType = this.getActionType(distX, distY, duration)
+    const actionType = this.getActionType(this.touchX, this.touchY, duration)
 
     /*如果是首位页面，直接反弹*/
     if (this._isFirstOrEnd()) {
+      this._setKeepDist()
       this._setRebound()
     } else if (actionType === 'flipOver') {
       /*如果是翻页动作*/
+      this._setKeepDist()
       this._slideTo({ action: 'inner' })
     } else if (actionType === 'flipRebound') {
-      /*反弹动作*/
-      this._setRebound()
+      /*如果启动了insideScroll，并且是后往回方向反弹，那么反弹的距离只有一半*/
+      if (this.options.insideScroll && this.direction === 'next') {
+        /*设置反弹的位置*/
+        const distance = (-(this.actualWidth / 2))
+        this._setRebound({ distance })
+        this._setKeepDist(distance)
+      } else {
+        /*反弹动作*/
+        this._setRebound()
+      }
+    } else if (actionType === 'flipMove') {
+      /*如果还是内部移动*/
+      this._setKeepDist(this.distX, this.distY)
     }
 
+  }
+
+  /**
+   * 设置Keep
+   * @return {[type]} [description]
+   */
+  _setKeepDist(x = 0, y = 0) {
+    this.keepDistX = x
+    this.keepDistY = y
   }
 
   /**
@@ -655,11 +707,15 @@ export default class Swiper extends Observer {
    * 这里要强制处理
    * 外部接口可以设置参数
    */
-  _setRebound(direction, isAppBoundary) {
+  _setRebound({
+    distance = 0,
+    direction,
+    isAppBoundary
+  } = {}) {
     this._distributeMove({
       direction: direction || this.direction, //方向
+      distance, //反弹的位置
       isAppBoundary, //是边界后，反弹回来的
-      'distance': 0,
       'speed': 300,
       'action': 'flipRebound'
     })

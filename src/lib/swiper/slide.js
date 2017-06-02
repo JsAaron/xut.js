@@ -238,9 +238,16 @@ export default function slide(Swiper) {
       this.$once('_slideFlipOver', callback)
     }
 
+    let distance = 0
+
+    /*如果启动了内部模式滑动，然后往前翻页，就应该是一半的尺寸，而不是0*/
+    if (this.options.insideScroll && this.direction === 'prev') {
+      distance = -(this.actualWidth / 2)
+    }
+
     this._distributeMove({
+      distance,
       'speed': outerSpeed || this._getFlipOverSpeed(),
-      'distance': 0,
       'action': 'flipOver',
       direction,
       outerCallFlip

@@ -42,6 +42,10 @@ export function initGlobalAPI() {
   assignInit('Application')
   assignInit('Presentation')
 
+  /*新增虚拟摄像机运行的接口
+  2017.6.2*/
+  assignInit('Camera')
+
   //脚本接口
   window.XXTAPI = {}
 

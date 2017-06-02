@@ -66,7 +66,7 @@ export const leftPageHook = {
     next() {}
   },
   flipOver: {
-    prev() {
+    prev(getStyle, distance) {
       return 0
     },
     next() {}

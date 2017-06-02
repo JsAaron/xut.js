@@ -8,22 +8,25 @@ export default function api(Swiper) {
    * 是翻页还是反弹
    * @return {[type]} [description]
    */
-  Swiper.prototype.getActionType = function (distX, distY, duration, orientation) {
+  Swiper.prototype.getActionType = function (touchX, touchY, duration, orientation) {
     orientation = orientation || this.orientation
     if (orientation === 'h') {
-      distX = Math.abs(distX)
       /**启动了内部滑动 */
-      if(this.options.insideScroll){
-        //如果移动的距离小于页面宽度
-        if(Math.abs(this.distX) <  this.visualWidth){
+      if (this.options.insideScroll) {
+        /*left/up* 并且不是前边界*/
+        if (this.direction === 'prev' && this.distX < 0) {
+          return 'flipMove'
+        }
+        /*right/down ,如果移动的距离小于页面宽度*/
+        if (this.direction === 'next' && Math.abs(this.distX) < this.visualWidth) {
           return 'flipMove'
         }
       }
-
-      return duration < 200 && distX > 30 || distX > this.actualWidth / 6 ? 'flipOver' : 'flipRebound'
+      touchX = Math.abs(touchX)
+      return duration < 200 && touchX > 30 || touchX > this.actualWidth / 6 ? 'flipOver' : 'flipRebound'
     } else if (orientation === 'v') {
-      distY = Math.abs(distY)
-      return duration < 200 && distY > 30 || distY > this.actualHeight / 6 ? 'flipOver' : 'flipRebound'
+      touchY = Math.abs(touchY)
+      return duration < 200 && touchY > 30 || touchY > this.actualHeight / 6 ? 'flipOver' : 'flipRebound'
     }
   }
 
@@ -151,7 +154,9 @@ export default function api(Swiper) {
       });
     } else {
       //边界反弹
-      this._setRebound('next')
+      this._setRebound({
+        direction: 'next'
+      })
       options.callback && options.callback()
     }
   }
@@ -173,7 +178,10 @@ export default function api(Swiper) {
       })
     } else {
       //边界反弹
-      this._setRebound('prev', 'isAppBoundary')
+      this._setRebound({
+        direction: 'prev',
+        isAppBoundary: true
+      })
       options.callback && options.callback()
     }
   }
@@ -251,6 +259,41 @@ export default function api(Swiper) {
     data.pagePointer = this.pagePointer
 
     this.$emit('onJumpPage', data)
+  }
+
+
+  /**
+   * 移动指定的距离
+   */
+  Swiper.prototype.scrollToPosition = function (position, speed = 300) {
+
+    let distance = (this.actualWidth * (position / 100)) / 2
+
+    /*必须有效*/
+    if (distance == 0) {
+      return
+    }
+
+    this.distX = this.distY = -distance
+    this._setKeepDist(this.distX, this.distY)
+
+    const self = this
+    this._distributeMove({
+      distance: this.distX,
+      speed: speed,
+      action: 'flipMove',
+      /**
+       * 是否无效函数
+       * 如果无效，end方法抛弃掉
+       * 必须是同步方法：
+       * 动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
+       */
+      setSwipeInvalid: function () {
+        self._isInvalid = true
+      }
+    })
+
+
   }
 
 

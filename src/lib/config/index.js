@@ -305,7 +305,6 @@ const resetProportion = function (pptWidth, pptHeight, setVisualMode, noModifyVa
   fullProportion = getFullProportion(config, pptWidth, pptHeight)
   const visualSize = config.visualSize = getVisualSize(config, fullProportion, setVisualMode, noModifyValue)
 
-
   //溢出宽度
   visualSize.overflowWidth = false
   if (visualSize.left < 0) {
@@ -353,6 +352,17 @@ export function initConfig(pptWidth, pptHeight) {
   //第一次探测实际的PPT与屏幕尺寸
   getBasicSize(pptWidth, pptHeight)
 
+
+  ////////////////////////////////////
+  /// 横版PPT，竖版显示，强制为竖版双页面
+  ////////////////////////////////////
+  if (config.launch.visualMode === 5) {
+    resetProportion(pptWidth, pptHeight, config.launch.visualMode)
+    config.originalVisualSize = config.visualSize
+    return
+  }
+
+
   ////////////////////////////////////
   /// 竖版PPT，横版显示，并启动了双页模式
   ////////////////////////////////////
@@ -361,6 +371,7 @@ export function initConfig(pptWidth, pptHeight) {
     config.originalVisualSize = config.visualSize
     return
   }
+
 
   //////////////////////////////////////////////////////////
   /// 反向设置的情况下
