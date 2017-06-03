@@ -66,18 +66,6 @@ export function triggerAudio({
 
 
 /**
- * 节音频触发接口
- */
-export function seasonAudio(seasonAudioId, audioId) {
-  loadAudio({
-    pageId: seasonAudioId,
-    queryId: audioId,
-    type: SEASON
-  })
-}
-
-
-/**
  * 预加载音频
  */
 export function preloadContentAudio(pageId, audioId) {

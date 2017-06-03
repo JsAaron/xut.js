@@ -43,7 +43,6 @@ export function hasAudioes() {
   return audioes.length
 }
 
-
 export function getAudio() {
   var audio = audioes[index++]
   if(!audio) {

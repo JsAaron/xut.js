@@ -441,7 +441,7 @@ export default class Swiper extends Observer {
      * 算一次有效的滑动
      * 移动距离必须20px才开始移动
      */
-    let delayDist = 20
+    let delayDist = 10
     let distance = $dist
     if ($absDelta <= delayDist) return;
 

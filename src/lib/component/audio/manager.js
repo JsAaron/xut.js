@@ -31,13 +31,12 @@
  */
 
 import { parseJSON, hash } from '../../util/index'
-import { SEASON } from './audio-type'
 import { getMediaData } from './api'
 import { audioPlayer } from './player'
 
 /**
  * 容器合集
- * 2 playBox 播放中的热点音频集合
+ * playBox 播放中的热点音频集合
  */
 let playBox
 
@@ -68,7 +67,7 @@ const getParentNode = (subtitles, pageId, queryId) => {
     }
 
     //找到对应的节点
-    _.each(subtitles, function (data) {
+    _.each(subtitles, function(data) {
       //'Content_0_1' 规则 类型_页码（0开始）_id
       if (!parentDoms[data.id]) {
         dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
@@ -170,19 +169,11 @@ const checkBreakAudio = (type, pageId, queryId, newAuidoData) => {
   const oldTrackId = oldPlayObj.getTrackId()
   const newTrackId = newAuidoData.trackId
 
-
-  //如果是节音频，且地址相同，则不打断
-  if (type == SEASON && oldPlayObj.url == newAuidoData.url) {
-    return true;
-  }
-
   /**
-   * 打断音频
-   * 条件
-   *   如果要用零音轨||零音轨有音乐在播||两音轨相同
+   * 打断音频,条件
+   * 如果要用零音轨||零音轨有音乐在播||两音轨相同
    */
   if (newTrackId == 0 || oldTrackId == 0 || newTrackId == oldTrackId) {
-
     if (newAuidoData.stetObj && newAuidoData.stetObj === oldPlayObj) {
       // 预加载检测打断，因为当前对象在预加载种已经被加载过了
       // 所以在打断时候要剔除这个对象
@@ -201,24 +192,27 @@ const checkBreakAudio = (type, pageId, queryId, newAuidoData) => {
  * @param  {int} pageId    [description]
  * @param  {int} queryId    查询id
  * @param  {string} type    决定video表按哪个字段查询
- * @return {object}         音频对象/不存在为null
+ * @return {object}         音频对象/不存在为nul
+ * pageId, queryId, type
  */
 const preCheck = (auidoData) => {
-  var t, p, q, seasonAudio = null;
-  for (t in playBox) {
-    for (p in playBox[t]) {
-      for (q in playBox[t][p]) {
-        if (checkBreakAudio(t, p, q, auidoData)) {
-          seasonAudio = playBox[t][p][q];
-        }
+  let types, pageId, queryId
+  for (types in playBox) {
+    for (pageId in playBox[types]) {
+      for (queryId in playBox[types][pageId]) {
+        checkBreakAudio(types, pageId, queryId, auidoData)
       }
     }
   }
-  return seasonAudio;
 }
 
-/*填充box,构建播放列表*/
-const fillBox = function (pageId, type) {
+/**
+ * 填充box,构建播放列表
+ * @param  {[type]} pageId [description]
+ * @param  {[type]} type   [description]
+ * @return {[type]}        [description]
+ */
+const fillBox = function(pageId, type) {
   if (!playBox[type]) {
     playBox[type] = hash();
   }
@@ -227,14 +221,21 @@ const fillBox = function (pageId, type) {
   }
 }
 
-/*创建音频*/
+
+/**
+ * 创建音频
+ * @param  {[type]} pageId    [description]
+ * @param  {[type]} queryId   [description]
+ * @param  {[type]} type      [description]
+ * @param  {[type]} audioData [description]
+ * @return {[type]}           [description]
+ */
 const createAudio = (pageId, queryId, type, audioData) => {
 
   //检测是否打断
   //如果不是预加载模式才检测
-  let seasonAudio
   if (!audioData.preload) {
-    seasonAudio = preCheck(audioData);
+    preCheck(audioData);
   }
 
   //构建播放列表
@@ -255,11 +256,18 @@ const createAudio = (pageId, queryId, type, audioData) => {
     }
   }
 
-  playBox[type][pageId][queryId] = seasonAudio || new audioPlayer(audioData, subtitleNode)
+  playBox[type][pageId][queryId] = new audioPlayer(audioData, subtitleNode)
 }
 
 
-/*交互点击*/
+/**
+ * 交互点击
+ * @param  {[type]} pageId    [description]
+ * @param  {[type]} queryId   [description]
+ * @param  {[type]} type      [description]
+ * @param  {[type]} audioData [description]
+ * @return {[type]}           [description]
+ */
 const tiggerAudio = (pageId, queryId, type, audioData) => {
   let playObj, status;
   if (playBox[type] && playBox[type][pageId] && playBox[type][pageId][queryId]) {
@@ -289,25 +297,31 @@ const loadAudio = ({
   type,
   action,
   data,
-  preload,//加载状态，是否为预加载模式
+  preload = false, //加载状态，是否为预加载模式
   columnData = {}
 }) => {
 
-  ////////////////////////
-  //  预加载对象处理
-  ////////////////////////
+  //////////////////////////
+  /// 播放处理
+  //  预加载对象已存在处理
+  //////////////////////////
   if (!preload) {
     const $type = playBox[type]
     if ($type && $type[pageId]) {
       const playObj = $type[pageId][queryId]
+
       /**只有本地对象才有hasPreLoad方法，必须保证是预加载的对象 */
       if (playObj && playObj.hasPreload && playObj.hasPreload()) {
+
         //音频打断处理
         preCheck({
           stetObj: playObj, //保留当前对象
           url: playObj.$$url,
           trackId: playObj.trackId
         });
+
+        console.log(playObj, queryId)
+
         //这里不是play而是requestPlay
         //需要在内部判断状态是否正确
         // playObj.requestPlay()
@@ -316,7 +330,12 @@ const loadAudio = ({
     }
   }
 
- 
+  // console.log(preload,type,pageId,queryId)
+
+  ///////////////////////
+  //  1.初始化预加载
+  //  2.直接加载播放对象
+  ////////////////////////
 
   /*column的参数是字符串类型*/
   if (!columnData.isColumn) {

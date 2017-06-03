@@ -514,7 +514,7 @@ export default class Powepoint {
         return new TimelineMax();
       case "EffectFlashOnce": //闪烁(一次)
         return this.getEffectFlashOnce(parameter, object, duration, delay, repeat);
-      //进入退出动画
+        //进入退出动画
       default:
       case "EffectAppear": //出现/消失
         return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
@@ -534,7 +534,7 @@ export default class Powepoint {
      * 整个动画完成事件(动画不需继续执行视为执行完成)
      * @return {[type]} [description]
      */
-    let completeAction = function () {
+    let completeAction = function() {
       if (completeEvent && _.isFunction(completeEvent)) {
         completeEvent()
       }

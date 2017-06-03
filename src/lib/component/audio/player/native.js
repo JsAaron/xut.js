@@ -1,8 +1,6 @@
 import AudioSuper from './super'
 import { hasAudioes, getAudio } from '../fix'
 
-let instance = {} //存放不同音轨的一个实例
-
 /**
  * 使用html5的audio播放
  * 1-支持audio的autoplay，大部分安卓机子的自带浏览器和微信，大部分的IOS微信（无需特殊解决）
@@ -12,13 +10,11 @@ let instance = {} //存放不同音轨的一个实例
 export class NativeVideo extends AudioSuper {
 
   constructor(options, controlDoms) {
-    super(options, controlDoms)
-
+    super(options, controlDoms);
     /**标记是否为预加载模式 */
     if (options.preload && this instanceof NativeVideo) {
       this.status = 'preload';
     }
-
   }
 
   /**
@@ -26,31 +22,17 @@ export class NativeVideo extends AudioSuper {
    * @return {[type]} [description]
    */
   _init() {
-
     let audio
     let self = this
     let trackId = this.trackId
     let hasAudio = hasAudioes()
-
-    if (instance[trackId]) {
-      audio = hasAudio ? getAudio() : instance[trackId]
+    if (hasAudio) {
+      audio = getAudio()
       audio.src = this.$$url
     } else {
-      if (hasAudio) {
-        audio = getAudio()
-        audio.src = this.$$url
-      } else {
-        audio = new Audio(this.$$url)
-        //更新音轨
-        //妙妙学方式不要音轨处理
-        if (trackId) {
-          instance[trackId] = audio
-        }
-      }
+      audio = new Audio(this.$$url)
     }
-
     this.audio = audio;
-
     this._watchAudio()
   }
 
