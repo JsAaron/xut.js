@@ -11,7 +11,7 @@
 import Powepoint from '../../../plugin/extend/powerpoint/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
-import { clearContentAudio } from '../../audio/api'
+import { resetContentAudio, clearContentAudio } from '../../audio/api'
 import { makeJsonPack } from '../../../util/lang'
 
 //2016.7.15废弃
@@ -23,24 +23,16 @@ let pixiSpecial = {}
 // import { specialSprite as pixiSpecial } from '../pixi/special/index'
 
 /**
- * 销毁动画音频
- * @param  {[type]} videoIds  [description]
- * @param  {[type]} chapterId [description]
- * @return {[type]}           [description]
+ * 1.复位音频
+ * 2.销毁音频
  */
-const destroyAudio = (videoIds, chapterId) => {
-  let isExist = false;
-  //如果有音频存在
-  videoIds && _.each(videoIds, (data) => {
+const audioHandle = (context, options, chapterId) => {
+  options && _.each(options, (data) => {
     //如果存在对象音频
-    if(data.videoId) {
-      isExist = true;
-      return 'breaker'
+    if (data.videoId) {
+      context(chapterId, data.videoId)
     }
   })
-  if(isExist) {
-    clearContentAudio(chapterId)
-  }
 }
 
 
@@ -104,14 +96,14 @@ export default class Animation {
     //创建pixi上下文的ppt对象
     const createPixiPPT = () => {
       //parameter存在就是ppt动画
-      if((parameter || actionTypes.pptId) && this.$contentNode.view) {
+      if ((parameter || actionTypes.pptId) && this.$contentNode.view) {
         this.pptObj = callback(Powepoint, $(this.$contentNode.view));
         this.pptObj.contentId = id
       }
     }
 
     const $veiw = this.$contentNode.view
-    if($veiw) {
+    if ($veiw) {
       initstate = $veiw.getAttribute('data-init')
     }
 
@@ -122,8 +114,8 @@ export default class Animation {
     //多个canvas对应多个ppt
     //容器不需要重复创建
     //精灵动画
-    if(actionTypes.spiritId) {
-      if(initstate) {
+    if (actionTypes.spiritId) {
+      if (initstate) {
         createPixiPPT()
       } else {
         //加入任务队列
@@ -145,10 +137,10 @@ export default class Animation {
 
     //特殊高级动画
     //必须是ppt与pixi绑定的
-    if(actionTypes.compSpriteId) {
+    if (actionTypes.compSpriteId) {
       // console.log(this,this.id,this.contentData.initpixi)
       //这个dom已经创建了pixi了
-      if(initstate) {
+      if (initstate) {
         createPixiPPT()
       } else {
         this.pixiObj = new pixiSpecial(makeOpts);
@@ -167,13 +159,13 @@ export default class Animation {
    * @return {[type]} [description]
    */
   _createDom(category, callback) {
-    if(category) {
+    if (category) {
       const data = {
         id: this.id,
         data: this.contentData,
         $contentNode: this.$contentNode
       }
-      switch(category) {
+      switch (category) {
         //普通精灵动画
         case "Sprite":
           this.comSpriteObj = ComSprite(data)
@@ -201,7 +193,7 @@ export default class Animation {
     let pageIndex = this.pageIndex
     let create = (constr, newContext) => {
       let element = newContext || $contentNode
-      if(element.length) {
+      if (element.length) {
         return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode, this.getStyle);
       } else {
         console.log(`创建:${constr}失败`)
@@ -221,18 +213,16 @@ export default class Animation {
     let $contentNode = this.$contentNode
 
     //canvas
-    if($contentNode && $contentNode.view) {
+    if ($contentNode && $contentNode.view) {
       $contentNode = this.$contentNode.view
     }
 
-
     access((key) => {
-
-      if(this[key]) {
-        if(key === 'pptObj') {
+      if (this[key]) {
+        if (key === 'pptObj') {
           //优化处理,只针对互斥的情况下
           //处理层级关系
-          if($contentNode.prop && $contentNode.prop("mutex")) {
+          if ($contentNode.prop && $contentNode.prop("mutex")) {
             $contentNode.css({ //强制提升层级
               'display': 'block'
             })
@@ -251,10 +241,10 @@ export default class Animation {
    */
   stop(chapterId) {
     access((key) => {
-      if(this[key]) {
-        if(key === 'pptObj') {
+      if (this[key]) {
+        if (key === 'pptObj') {
           //销毁ppt音频
-          destroyAudio(this[key].options, chapterId);
+          audioHandle(resetContentAudio, this[key].options, chapterId);
         }
         this[key].stop && this[key].stop()
       }
@@ -277,19 +267,23 @@ export default class Animation {
    * 销毁动画
    * @return {[type]} [description]
    */
-  destroy() {
+  destroy(chapterId) {
 
     access((key) => {
+      if (key === 'pptObj') {
+        //销毁ppt音频
+        audioHandle(clearContentAudio, this[key].options, chapterId);
+      }
       this[key] && this[key].destroy && this[key].destroy()
     })
 
     //销毁renderer = new PIXI.WebGLRenderer
-    if(this.canvasMode) {
+    if (this.canvasMode) {
       this.$contentNode.view && this.$contentNode.destroy()
     }
 
     //销毁每一个数据上的canvas上下文引用
-    if(this.contentData.$contentNode) {
+    if (this.contentData.$contentNode) {
       this.contentData.$contentNode = null;
     }
 

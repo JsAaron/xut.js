@@ -24,6 +24,16 @@ export class PhoneGapMedia extends AudioSuper {
     this.play()
   }
 
+
+  /**
+   * 复位接口
+   */
+  _reset() {
+    this.audio.pause();
+    this.audio.seekTo(0)
+  }
+
+
   /**
    * Compatible with asynchronous
    * for subitile use

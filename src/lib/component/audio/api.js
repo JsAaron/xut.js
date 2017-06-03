@@ -17,6 +17,13 @@ export function initAudio() {
   initBox()
 }
 
+////////////////////////
+/// PPT 动画音频接口
+/// 1 自动音频
+/// 2 手动音频
+///////////////////////
+
+
 /*
  音频在创建dom的时候需要查下，这个hot对象是否已经被创建过
  如果创建过，那么图标状态需要处理
@@ -65,6 +72,14 @@ export function triggerAudio({
 }
 
 
+////////////////////////
+/// 动画音频接口
+/// 1 预加载
+/// 2 直接播放
+/// 3 复位
+/// 4 销毁
+///////////////////////
+
 /**
  * 预加载音频
  */
@@ -89,24 +104,49 @@ export function createContentAudio(pageId, audioId) {
   })
 }
 
-
-/**
- * 销毁动画音频
- */
-export function clearContentAudio(pageId) {
+const accessAudio = function(pageId, queryId, callback) {
   const playBox = getPlayBox()
-  if (!playBox[CONTENT] || !playBox[CONTENT][pageId]) {
-    return false;
-  }
-  const playObj = playBox[CONTENT][pageId];
-  if (playObj) {
-    for (let i in playObj) {
-      playObj[i].destroy();
-      playObj[i] = null
-      delete playBox[CONTENT][pageId][i];
+  if (playBox[CONTENT]) {
+    const pagePlayObj = playBox[CONTENT][pageId];
+    if (pagePlayObj) {
+      const playObj = pagePlayObj[queryId]
+      if (playObj) {
+        callback(playObj, playBox)
+      }
     }
   }
 }
+
+/**
+ * 复位动画音频
+ * 必须要存在content音频对象
+ */
+export function resetContentAudio(pageId, queryId) {
+  accessAudio(pageId, queryId, function(playObj) {
+    playObj.reset()
+  })
+}
+
+
+/**
+ * 销毁动画音频
+ * 1 清理页面中的content
+ * 2 清理playBox中的content对象
+ */
+export function clearContentAudio(pageId, queryId) {
+  accessAudio(pageId, queryId, function(playObj, playBox) {
+    playObj.destroy()
+    delete playBox[CONTENT][pageId][queryId];
+    if (!Object.keys(playBox[CONTENT][pageId]).length) {
+      delete playBox[CONTENT][pageId]
+    }
+  })
+}
+
+
+////////////////////////
+/// Column音频接口
+///////////////////////
 
 /*
 2017.5.8新增

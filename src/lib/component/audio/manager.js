@@ -324,7 +324,7 @@ const loadAudio = ({
 
         //这里不是play而是requestPlay
         //需要在内部判断状态是否正确
-        // playObj.requestPlay()
+        playObj.requestPlay()
         return
       }
     }

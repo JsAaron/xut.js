@@ -92,6 +92,13 @@ export class NativeVideo extends AudioSuper {
     callback(Math.round(this.audio.currentTime * 1000))
   }
 
+  /**
+   * 复位接口
+   */
+  _reset() {
+    this.audio.pause();
+    this.audio.currentTime = 0
+  }
 
   /**
    * 销毁方法

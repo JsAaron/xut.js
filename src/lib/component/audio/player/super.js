@@ -167,6 +167,20 @@ export default class AudioSuper {
     this.acitonObj && this.acitonObj.pause();
   }
 
+
+  /**
+   * 复位接口
+   * @return {[type]} [description]
+   */
+  reset() {
+    /*子类提供了复位*/
+    if (this._reset) {
+      this._reset()
+    }
+    this.status = 'reseted';
+  }
+
+
   /**
    * 销毁
    */
@@ -178,11 +192,13 @@ export default class AudioSuper {
     }
 
     this.status = 'ended';
+
     //销毁字幕
     if (this.subtitleObject) {
       this.subtitleObject.destroy()
       this.subtitleObject = null;
     }
+
     //动作
     if (this.acitonObj) {
       this.acitonObj.destroy();
