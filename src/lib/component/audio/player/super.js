@@ -21,6 +21,8 @@ export default class AudioSuper {
     this._init();
     //相关数据
     this._$$afterRelated(options)
+
+
   }
 
   //=============================

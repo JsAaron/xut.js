@@ -13,6 +13,12 @@ export class NativeVideo extends AudioSuper {
 
   constructor(options, controlDoms) {
     super(options, controlDoms)
+
+    /**标记是否为预加载模式 */
+    if (options.preload && this instanceof NativeVideo) {
+      this.status = 'preload';
+    }
+
   }
 
   /**
@@ -20,6 +26,7 @@ export class NativeVideo extends AudioSuper {
    * @return {[type]} [description]
    */
   _init() {
+
     let audio
     let self = this
     let trackId = this.trackId
@@ -34,46 +41,64 @@ export class NativeVideo extends AudioSuper {
         audio.src = this.$$url
       } else {
         audio = new Audio(this.$$url)
-          //更新音轨
-          //妙妙学方式不要音轨处理
+        //更新音轨
+        //妙妙学方式不要音轨处理
         if (trackId) {
           instance[trackId] = audio
         }
       }
     }
 
+    this.audio = audio;
+
+    this._watchAudio()
+  }
+
+  /**
+   * 监听音频播放
+   */
+  _watchAudio() {
+
     //自动播放，只处理一次
     //手动调用的时候会调用play的时候会调用canplay
     //导致重复播放，所以在第一次的去掉这个事件
     this._canplayCallBack = () => {
-      this.play()
-      this.audio && this.audio.removeEventListener('canplay', this._canplayCallBack, false)
+      if (this.status === 'preload') {
+        this.audio.preload = 'metadata'
+        this.status = 'canplay' //可以准备播放
+      } else {
+        /**没有预加载，自动播放 */
+        this._startPlay()
+      }
+      this.audio.removeEventListener('canplay', this._canplayCallBack, false)
     }
 
     this._endCallBack = () => {
       this._$$callbackProcess(true)
     }
-
     this._errorCallBack = () => {
       this._$$callbackProcess(false)
     }
 
+    this.audio.addEventListener('canplay', this._canplayCallBack, false)
+    this.audio.addEventListener('ended', this._endCallBack, false)
+    this.audio.addEventListener('error', this._errorCallBack, false)
+  }
+
+  /**
+   * 开始播放音频
+   */
+  _startPlay() {
     /**
      * safari 自动播放
      * 手机浏览器需要加
      * 2016.8.26
      * @type {Boolean}
      */
-    audio.autoplay = true
-
-    audio.addEventListener('canplay', this._canplayCallBack, false)
-    audio.addEventListener('ended', this._endCallBack, false)
-    audio.addEventListener('error', this._errorCallBack, false)
-
-    this.audio = audio;
+    this.audio.autoplay = true
     this.status = 'playing';
+    this.play()
   }
-
 
   /**
    * Compatible with asynchronous
@@ -98,6 +123,35 @@ export class NativeVideo extends AudioSuper {
       this.audio.removeEventListener('ended', this._endCallBack, false)
       this.audio.removeEventListener('error', this._errorCallBack, false)
       this.audio = null;
+    }
+  }
+
+  ///////////////////////////
+  //  对外接口
+  //////////////////////////
+
+  /**
+   * 预处理接口
+   * 请求播放
+   * 这个接口是因为预处理的关系
+   * 预处理还在加载中
+   * 必须先等待加载完毕才能继续
+   */
+  requestPlay() {
+    if (this.status === 'canplay') {
+      this._startPlay()
+    } else {
+      console.log('音频没有准备完毕')
+    }
+  }
+
+  /**
+   * 预处理接口
+   * 是否有预加载
+   */
+  hasPreload() {
+    if (this.status === 'preload' || this.status === 'canplay') {
+      return true
     }
   }
 }

@@ -91,7 +91,9 @@ const getParentNode = (subtitles, pageId, queryId) => {
 }
 
 
-
+/**
+ * 组合数据结构 
+ */
 const deployAudio = (sqlData, pageId, queryId, type, actionData, columnData) => {
   //新的查询
   let videoData = {}
@@ -166,7 +168,6 @@ const checkBreakAudio = (type, pageId, queryId, newAuidoData) => {
 
   const oldPlayObj = playBox[type][pageId][queryId]
   const oldTrackId = oldPlayObj.getTrackId()
-
   const newTrackId = newAuidoData.trackId
 
 
@@ -181,8 +182,15 @@ const checkBreakAudio = (type, pageId, queryId, newAuidoData) => {
    *   如果要用零音轨||零音轨有音乐在播||两音轨相同
    */
   if (newTrackId == 0 || oldTrackId == 0 || newTrackId == oldTrackId) {
-    oldPlayObj.destroy();
-    delete playBox[type][pageId][queryId];
+
+    if (newAuidoData.stetObj && newAuidoData.stetObj === oldPlayObj) {
+      // 预加载检测打断，因为当前对象在预加载种已经被加载过了
+      // 所以在打断时候要剔除这个对象
+      // 保留这个对象不删除
+    } else {
+      oldPlayObj.destroy();
+      delete playBox[type][pageId][queryId];
+    }
   }
   return false;
 }
@@ -220,17 +228,21 @@ const fillBox = function (pageId, type) {
 }
 
 /*创建音频*/
-const playAudio = (pageId, queryId, type, audioData) => {
-  let subtitleNode
+const createAudio = (pageId, queryId, type, audioData) => {
 
-  //检测
-  let seasonAudio = preCheck(audioData);
+  //检测是否打断
+  //如果不是预加载模式才检测
+  let seasonAudio
+  if (!audioData.preload) {
+    seasonAudio = preCheck(audioData);
+  }
 
   //构建播放列表
   fillBox(pageId, type)
 
   //假如有字幕信息
   //找到对应的文档对象
+  let subtitleNode
   if (audioData.subtitles) {
     subtitleNode = getParentNode(audioData.subtitles, pageId, queryId);
   }
@@ -244,7 +256,6 @@ const playAudio = (pageId, queryId, type, audioData) => {
   }
 
   playBox[type][pageId][queryId] = seasonAudio || new audioPlayer(audioData, subtitleNode)
-
 }
 
 
@@ -263,7 +274,7 @@ const tiggerAudio = (pageId, queryId, type, audioData) => {
       playObj.play()
       break;
     default:
-      playAudio(pageId, queryId, type, audioData)
+      createAudio(pageId, queryId, type, audioData)
       break;
   }
 }
@@ -278,8 +289,34 @@ const loadAudio = ({
   type,
   action,
   data,
+  preload,//加载状态，是否为预加载模式
   columnData = {}
 }) => {
+
+  ////////////////////////
+  //  预加载对象处理
+  ////////////////////////
+  if (!preload) {
+    const $type = playBox[type]
+    if ($type && $type[pageId]) {
+      const playObj = $type[pageId][queryId]
+      /**只有本地对象才有hasPreLoad方法，必须保证是预加载的对象 */
+      if (playObj && playObj.hasPreload && playObj.hasPreload()) {
+        //音频打断处理
+        preCheck({
+          stetObj: playObj, //保留当前对象
+          url: playObj.$$url,
+          trackId: playObj.trackId
+        });
+        //这里不是play而是requestPlay
+        //需要在内部判断状态是否正确
+        // playObj.requestPlay()
+        return
+      }
+    }
+  }
+
+ 
 
   /*column的参数是字符串类型*/
   if (!columnData.isColumn) {
@@ -289,11 +326,14 @@ const loadAudio = ({
 
   const audioData = assemblyData(pageId, queryId, type, data, columnData);
 
+  /**加载状态，是否为预加载模式 */
+  audioData.preload = preload
+
   /*手动触发的热点,这种比较特别，手动点击可以切换状态*/
   if (type === 'hot' && action == 'trigger') {
     tiggerAudio(pageId, queryId, type, audioData);
   } else {
-    playAudio(pageId, queryId, type, audioData)
+    createAudio(pageId, queryId, type, audioData)
   }
 }
 

@@ -78,6 +78,19 @@ export function seasonAudio(seasonAudioId, audioId) {
 
 
 /**
+ * 预加载音频
+ */
+export function preloadContentAudio(pageId, audioId) {
+  loadAudio({
+    pageId: pageId,
+    queryId: audioId,
+    type: CONTENT,
+    preload: true
+  })
+}
+
+
+/**
  * 动画音频触发接口
  */
 export function createContentAudio(pageId, audioId) {
@@ -87,6 +100,7 @@ export function createContentAudio(pageId, audioId) {
     type: CONTENT
   })
 }
+
 
 /**
  * 销毁动画音频
@@ -131,6 +145,7 @@ export function getMediaData(type, queryId) {
   if (type === CONTENT || type === SEASON) {
     return Xut.data.query('Video', queryId, true);
   } else {
+    //如果普通音频数据
     return Xut.data.query('Video', queryId);
   }
 }
