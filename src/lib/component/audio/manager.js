@@ -357,30 +357,12 @@ const loadAudio = ({
 }
 
 
-/**
- * 清理全部音频
- */
-const removeAudio = () => {
-  var t, p, a;
-  for (t in playBox) {
-    for (p in playBox[t]) {
-      for (a in playBox[t][p]) {
-        playBox[t][p][a].destroy();
-      }
-    }
-  }
-  initBox()
-}
-
-
 function getPlayBox() {
   return playBox
 }
 
-
 export {
   initBox,
   getPlayBox,
-  loadAudio,
-  removeAudio
+  loadAudio
 }

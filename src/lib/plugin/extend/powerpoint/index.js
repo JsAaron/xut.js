@@ -111,7 +111,7 @@ export default class Powepoint {
     this._initElement();
 
     /**预加载音频 */
-    this._preloadAudio()
+    // this._preloadAudio()
   }
 
   /**

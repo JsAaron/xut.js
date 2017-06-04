@@ -2,8 +2,7 @@ import { HOT, CONTENT, SEASON, COLUMN } from './audio-type'
 import {
   initBox,
   loadAudio,
-  getPlayBox,
-  removeAudio
+  getPlayBox
 } from './manager'
 
 
@@ -82,6 +81,7 @@ export function triggerAudio({
 
 /**
  * 预加载音频
+ * 待用
  */
 export function preloadContentAudio(pageId, audioId) {
   loadAudio({
@@ -104,6 +104,7 @@ export function createContentAudio(pageId, audioId) {
   })
 }
 
+
 const accessAudio = function(pageId, queryId, callback) {
   const playBox = getPlayBox()
   if (playBox[CONTENT]) {
@@ -120,6 +121,7 @@ const accessAudio = function(pageId, queryId, callback) {
 /**
  * 复位动画音频
  * 必须要存在content音频对象
+ * 待用
  */
 export function resetContentAudio(pageId, queryId) {
   accessAudio(pageId, queryId, function(playObj) {
@@ -133,9 +135,18 @@ export function resetContentAudio(pageId, queryId) {
  * 1 清理页面中的content
  * 2 清理playBox中的content对象
  */
-export function clearContentAudio(pageId, queryId) {
+export function destroyContentAudio(pageId, queryId) {
+
+  /*如果只有pageId没有queryId就是全部清理*/
+  if (pageId && queryId === undefined) {
+    console.log(123)
+    return
+  }
+
+  /*单独清理*/
   accessAudio(pageId, queryId, function(playObj, playBox) {
     playObj.destroy()
+      /*清理保存容器*/
     delete playBox[CONTENT][pageId][queryId];
     if (!Object.keys(playBox[CONTENT][pageId]).length) {
       delete playBox[CONTENT][pageId]
@@ -194,13 +205,27 @@ export function hangUpAudio() {
 }
 
 
+
+
+///////////////////////////////
+/// 
+///   清理全部音频
+///
+///////////////////////////////
+
+
 /**
- * 清理音频
+ * 清理所有音频
  */
-export function clearAudio(pageId) {
-  if (pageId) { //如果只跳槽关闭动画音频
-    clearContentAudio(pageId)
-  } else {
-    removeAudio() //多场景模式,不处理跨页面
+export function clearAudio() {
+  const playBox = getPlayBox()
+  var t, p, a;
+  for (t in playBox) {
+    for (p in playBox[t]) {
+      for (a in playBox[t][p]) {
+        playBox[t][p][a].destroy();
+      }
+    }
   }
+  initBox()
 }

@@ -46,6 +46,7 @@ export function $suspend(pageObj, pageId, allHandle) {
     })
 
     //如果是外部调用接口
+    //Xut.Application.Original
     //销毁视频
     //销毁所有的音频
     if (allHandle) {

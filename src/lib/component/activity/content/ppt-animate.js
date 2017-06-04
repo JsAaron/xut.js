@@ -11,7 +11,7 @@
 import Powepoint from '../../../plugin/extend/powerpoint/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
-import { resetContentAudio, clearContentAudio } from '../../audio/api'
+import { resetContentAudio, destroyContentAudio } from '../../audio/api'
 import { makeJsonPack } from '../../../util/lang'
 
 //2016.7.15废弃
@@ -243,8 +243,7 @@ export default class Animation {
     access((key) => {
       if (this[key]) {
         if (key === 'pptObj') {
-          //销毁ppt音频
-          audioHandle(resetContentAudio, this[key].options, chapterId);
+          audioHandle(destroyContentAudio, this[key].options, chapterId);
         }
         this[key].stop && this[key].stop()
       }
@@ -272,7 +271,7 @@ export default class Animation {
     access((key) => {
       if (key === 'pptObj') {
         //销毁ppt音频
-        audioHandle(clearContentAudio, this[key].options, chapterId);
+        // audioHandle(clearContentAudio, this[key].options, chapterId);
       }
       this[key] && this[key].destroy && this[key].destroy()
     })

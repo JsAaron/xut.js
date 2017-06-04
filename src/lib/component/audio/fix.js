@@ -18,7 +18,7 @@ let audioes = []
 export function fixAudio(obj, key, access) {
   let start = () => {
     let audio, i
-    for(i = 0; i < loop; i++) {
+    for (i = 0; i < loop; i++) {
       audio = new Audio()
       audio.play()
       audioes.push(audio)
@@ -33,7 +33,7 @@ export function fixAudio(obj, key, access) {
  * @return {[type]} [description]
  */
 export function clearFixAudio() {
-  for(let i = 0; i < audioes.length; i++) {
+  for (let i = 0; i < audioes.length; i++) {
     audioes[i] = null
   }
   audioes = null
@@ -45,7 +45,7 @@ export function hasAudioes() {
 
 export function getAudio() {
   var audio = audioes[index++]
-  if(!audio) {
+  if (!audio) {
     index = 0
     return getAudio()
   }
