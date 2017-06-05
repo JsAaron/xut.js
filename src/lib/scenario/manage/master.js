@@ -158,6 +158,7 @@ export default class MasterMgr extends ManageSuper {
 
     //找到需要滑动的母版
     let masterObjs = this._findMaster(frontIndex, middleIndex, backIndex, direction, action, isAppBoundary)
+
     _.each(masterObjs, function (pageObj, index) {
       if (pageObj) {
         isBoundary = true
@@ -342,6 +343,7 @@ export default class MasterMgr extends ManageSuper {
           action === 'flipOver' && this._checkClear([currMasterId, prevMasterId]); //边界清理
           prevMasterObj = this.$$getPageBase(prevMasterId)
         }
+
         break;
       case 'next':
         nextMasterId = this.converMasterId(backIndex)

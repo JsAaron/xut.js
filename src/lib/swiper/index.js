@@ -425,11 +425,11 @@ export default class Swiper extends Observer {
     if (this.orientation === 'h') {
       this.touchX = this._getDist(deltaX, absDistX);
       $dist = this.distX = this.touchX + this.keepDistX
-      this._setDirection(deltaX)
+      this.setDirection(deltaX)
     } else if (this.orientation === 'v') {
       this.touchY = this._getDist(deltaY, absDistY)
       $dist = this.distY = this.touchY + this.keepDistY
-      this._setDirection(deltaY)
+      this.setDirection(deltaY)
     }
 
 
@@ -525,6 +525,7 @@ export default class Swiper extends Observer {
       return
     }
 
+
     /**
      * mini功能，合并翻页时事件
      * move的情况会引起
@@ -546,13 +547,34 @@ export default class Swiper extends Observer {
     }
 
     /**
-     * 开始翻页或者反弹
-     * 翻页滑动，要排除首位的情况，首尾页面只要反弹
+     * 动作推测
+     * 1 翻页或者反弹，或者移动
+     * 2 这里要区分PPT之间，与PPT内部滑动
      */
     const actionType = this.getActionType(this.touchX, this.touchY, duration)
 
     /*如果是首位页面，直接反弹*/
     if (this._isFirstOrEnd()) {
+      /*如果是是内部滚动模式，而且还是最后一页*/
+      if (this.options.insideScroll) {
+        if (this.direction === 'next') {
+          if (actionType === 'flipMove') {
+            /*如果是向后移动，更新distX*/
+            this._setKeepDist(this.distX, this.distY)
+          } else if (actionType === 'flipOver' || actionType === 'flipRebound') {
+            /*如果是向后移动反弹*/
+            const distance = (-(this.actualWidth / 2))
+            this._setRebound({ distance })
+            this._setKeepDist(distance)
+          }
+        } else if (this.direction === 'prev') {
+          /*向前翻页，反弹或者翻页，都强制设置反弹*/
+          const distance = 0
+          this._setRebound({ distance })
+          this._setKeepDist(distance)
+        }
+        return
+      }
       this._setKeepDist()
       this._setRebound()
     } else if (actionType === 'flipOver') {
@@ -560,14 +582,21 @@ export default class Swiper extends Observer {
       this._setKeepDist()
       this._slideTo({ action: 'inner' })
     } else if (actionType === 'flipRebound') {
-      /*如果启动了insideScroll，并且是后往回方向反弹，那么反弹的距离只有一半*/
-      if (this.options.insideScroll && this.direction === 'next') {
-        /*设置反弹的位置*/
-        const distance = (-(this.actualWidth / 2))
-        this._setRebound({ distance })
-        this._setKeepDist(distance)
+      /*如果启动了insideScroll*/
+      if (this.options.insideScroll) {
+        /*并且是后往回方向反弹，那么反弹的距离只有一半*/
+        if (this.direction === 'next') {
+          const distance = (-(this.actualWidth / 2))
+          this._setRebound({ distance })
+          this._setKeepDist(distance)
+        } else if (this.direction === 'prev') {
+          /*前反弹，设置为开始值*/
+          const distance = 0
+          this._setRebound({ distance })
+          this._setKeepDist(distance)
+        }
       } else {
-        /*反弹动作*/
+        /*正常单页PPT的反弹*/
         this._setRebound()
       }
     } else if (actionType === 'flipMove') {
@@ -584,6 +613,24 @@ export default class Swiper extends Observer {
   _setKeepDist(x = 0, y = 0) {
     this.keepDistX = x
     this.keepDistY = y
+  }
+
+  /*
+  判断是不是首位页面，直接反弹
+  如果是首尾
+  如果是liner模式排除
+  */
+  _isFirstOrEnd(actionType) {
+    if (this.options.snap) {
+      if (this.orientation === 'h') {
+        return !this.visualIndex && this.distX > 0 || this.visualIndex == this.totalIndex - 1 && this.distX < 0
+      }
+      if (this.orientation === 'v') {
+        return !this.visualIndex && this.distY > 0 || this.visualIndex == this.totalIndex - 1 && this.distY < 0
+      }
+    } else {
+      return false
+    }
   }
 
   /**
@@ -668,24 +715,6 @@ export default class Swiper extends Observer {
     ) ? (absDist / this.actualWidth + 1) : 1)
   }
 
-  /*
-  判断是不是首位页面，直接反弹
-  如果是首尾
-  如果是liner模式排除
-  */
-  _isFirstOrEnd() {
-    if (this.options.snap) {
-      if (this.orientation === 'h') {
-        return !this.visualIndex && this.distX > 0 || this.visualIndex == this.totalIndex - 1 && this.distX < 0
-      }
-      if (this.orientation === 'v') {
-        return !this.visualIndex && this.distY > 0 || this.visualIndex == this.totalIndex - 1 && this.distY < 0
-      }
-    } else {
-      return false
-    }
-  }
-
 
   /**
    * 前尾边界反弹判断
@@ -743,13 +772,6 @@ export default class Swiper extends Observer {
     if (isVisual && node) {
       node.removeAttribute('data-visual');
     }
-  }
-
-  /**
-   * 操作方向
-   */
-  _setDirection(value) {
-    this.direction = value > 0 ? 'prev' : 'next'
   }
 
   /**

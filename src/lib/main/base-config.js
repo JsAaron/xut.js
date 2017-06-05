@@ -17,31 +17,31 @@ import { config, initConfig, initPathAddress } from '../config/index'
  */
 const setHistory = (data) => {
   //Launch接口定义
-  if(config.launch.historyMode !== undefined) {
+  if (config.launch.historyMode !== undefined) {
     return
   }
   //数据库定义 && == 1
-  if(data.recordHistory !== undefined && Number(data.recordHistory)) {
+  if (data.recordHistory !== undefined && Number(data.recordHistory)) {
     config.launch.historyMode = true
     return
   }
   //调试模式，默认启动缓存
-  if(config.debug.devtools) {
+  if (config.debug.devtools) {
     config.launch.historyMode = true
   }
 }
 
 /*画轴模式*/
-const setPaintingMode = function(data) {
-  if(!config.launch.visualMode && Number(data.scrollPaintingMode)) {
+const setPaintingMode = function (data) {
+  if (!config.launch.visualMode && Number(data.scrollPaintingMode)) {
     config.launch.visualMode = 4
   }
 }
 
 
 /*最大屏屏幕尺寸*/
-const getMaxWidth = function() {
-  if(config.visualSize) {
+const getMaxWidth = function () {
+  if (config.visualSize) {
     return config.visualSize.width
   }
   return window.screen.width > document.documentElement.clientWidth ?
@@ -57,32 +57,32 @@ const getMaxWidth = function() {
  * 1080: 'mi', //1080-1439
  * 1440: 'hi' //1440->
  */
-const setDefaultSuffix = function() {
+const setDefaultSuffix = function () {
   let doc = document.documentElement
-  //竖版的情况才调整
-  if(doc.clientHeight > doc.clientWidth) {
+    //竖版的情况才调整
+  if (doc.clientHeight > doc.clientWidth) {
     let ratio = window.devicePixelRatio || 1
     let maxWidth = getMaxWidth() * ratio
-    if(maxWidth >= 1080 && maxWidth < 1439) {
+    if (maxWidth >= 1080 && maxWidth < 1439) {
       config.launch.baseImageSuffix = config.launch.imageSuffix['1080']
     }
-    if(maxWidth >= 1440) {
+    if (maxWidth >= 1440) {
       config.launch.baseImageSuffix = config.launch.imageSuffix['1440']
     }
 
-    if(config.debug.devtools && config.launch.baseImageSuffix) {
+    if (config.debug.devtools && config.launch.baseImageSuffix) {
       $warn('css media匹配suffix失败，采用js采用计算. config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix)
     }
   }
 }
 
 /*自适应图片*/
-const adaptiveImage = function() {
+const adaptiveImage = function () {
   let $adaptiveImageNode = $('.xut-adaptive-image')
-  if($adaptiveImageNode.length) {
+  if ($adaptiveImageNode.length) {
     let baseImageType = $adaptiveImageNode.width()
     let type = config.launch.imageSuffix[baseImageType]
-    if(type) {
+    if (type) {
       config.launch.baseImageSuffix = type
       return
     }
@@ -93,7 +93,7 @@ const adaptiveImage = function() {
 /*
   配置初始化
  */
-const configInit = function(novelData, tempSettingData) {
+const configInit = function (novelData, tempSettingData) {
 
   /*启动代码用户操作跟踪:启动*/
   config.sendTrackCode('launch')
@@ -114,7 +114,7 @@ const configInit = function(novelData, tempSettingData) {
   setPaintingMode(tempSettingData)
 
   //创建忙碌光标
-  if(!Xut.IBooks.Enabled) {
+  if (!Xut.IBooks.Enabled) {
     createCursor()
   }
 
@@ -127,11 +127,11 @@ const configInit = function(novelData, tempSettingData) {
  * 嵌入index分栏
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
-const configColumn = function(novelData, callback) {
+const configColumn = function (novelData, callback) {
   initColumn(haColumnCounts => {
-    if(haColumnCounts) {
+    if (haColumnCounts) {
       //动画事件委托
-      if(config.launch.swipeDelegate !== false) {
+      if (config.launch.swipeDelegate !== false) {
         config.launch.swipeDelegate = true
       }
     }
@@ -144,7 +144,7 @@ export default function baseConfig(callback) {
 
   //mini杂志设置
   //如果是pad的情况下设置font为125%
-  if(config.launch.platform === 'mini' && Xut.plat.isTablet) {
+  if (config.launch.platform === 'mini' && Xut.plat.isTablet) {
     $('body').css('font-size', '125%')
   }
 
@@ -155,9 +155,22 @@ export default function baseConfig(callback) {
   setFastAnalysisRE()
 
   importJsonDatabase((hasResults) => {
-    initDB(hasResults, function(dataRet) {
+    initDB(hasResults, function (dataRet) {
       const novelData = dataRet.Novel.item(0)
       const tempSettingData = initDefaults(dataRet.Setting)
+
+      /**
+       * 重设全局的页面模式
+       * 默认页面模式选择
+       * 1 全局用户接口
+       * 2 PPT的数据接口
+       * 3 默认1
+       * @type {[type]}
+       */
+      if (config.launch.visualMode === undefined) {
+        config.launch.visualMode = config.data.visualMode || 1
+      }
+
       configInit(novelData, tempSettingData)
       loadGolbalStyle('svgsheet', () => configColumn(novelData, callback))
     })

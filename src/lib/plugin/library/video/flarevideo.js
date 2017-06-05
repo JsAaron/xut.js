@@ -532,7 +532,7 @@
    */
   FlareVideo.fn.setupTiming = function () {
 
-    var scheduleTime = $(`<div>`);
+    var scheduleTime = $("<div />");
     scheduleTime.addClass('scheduleTime')
 
     var timeChange = $("<div />");

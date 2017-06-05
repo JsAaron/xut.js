@@ -45,8 +45,10 @@ export default function initDefaults(setData) {
     settings: setConfig,
     delayTime: data.delayTime,
     Inapp: data.Inapp,
-    shortName: data.shortName
+    shortName: data.shortName,
+    visualMode:data.visualMode
   })
+
 
   //广告Id
   //2014.9.2

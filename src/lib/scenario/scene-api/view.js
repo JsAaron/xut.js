@@ -306,6 +306,12 @@ export function extendView($$mediator, access, $$globalSwiper) {
 
     const pagePointer = $$globalSwiper.getPointer()
 
+    /**
+     * 在column中滑动的时候，会丢失Direction
+     * 具体就是flow在首页，而且chpater只有一个flow的情况下
+     */
+    $$globalSwiper.setDirection(distance)
+
     /*如果没有传递布方向，就取页面，这个在全局接口中处理*/
     orientation = orientation || config.launch.scrollMode
 

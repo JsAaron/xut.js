@@ -94,7 +94,7 @@ export default class Mediator extends Observer {
     }
 
     const setOptions = {
-      insideScroll,//内部滚动
+      insideScroll, //内部滚动
       scope: 'child', //translate
       snap: true, //分段
       hasHook: true,
@@ -103,7 +103,7 @@ export default class Mediator extends Observer {
       totalIndex: options.pageTotal,
       actualWidth: config.visualSize.width,
       actualHeight: config.visualSize.height,
-      visualWidth: config.screenSize.width,//可视区的宽度
+      visualWidth: config.screenSize.width, //可视区的宽度
       hasMultiPage: options.hasMultiPage, //多页面
       sectionRang: options.sectionRang //分段值
     }
@@ -136,18 +136,24 @@ export default class Mediator extends Observer {
     $$globalSwiper.$watch('onFilter', (hookCallback, point, evtObj) => {
       let node = point.target
       swiperHook(evtObj, node)
-      //页面类型
+        //页面类型
       let pageType = isBelong(node);
       //冒泡的ul根节点
       let parentNode = $$globalSwiper.findBubbleRootNode(point, pageType);
       //执行过滤处理
       handlerObj = closestProcessor.call(parentNode, point, pageType);
+
       //如果找到是空节点
       //并且是虚拟模式2的话
       //默认允许滑动
-      if (!handlerObj && config.launch.visualMode == 2) {
-        return
+      if (!handlerObj) {
+        if (config.launch.visualMode === 2) {
+          return
+        } else if (config.launch.visualMode === 5) {
+          return
+        }
       }
+
       //停止翻页,针对content对象可以拖动,滑动的情况处理
       if (!handlerObj || handlerObj.attribute === 'disable') {
         hookCallback();
@@ -299,14 +305,14 @@ export default class Mediator extends Observer {
       /**
        * li节点,多线程创建的时候处理滑动
        */
-      'data-container'() {
+      'data-container' () {
         Xut.View.ToggleToolbar()
       },
 
       /**
        * 是背景层
        */
-      'data-multilayer'() {
+      'data-multilayer' () {
         //改变工具条状态
         Xut.View.ToggleToolbar()
       },
@@ -314,7 +320,7 @@ export default class Mediator extends Observer {
       /**
        * 默认content元素可以翻页
        */
-      'data-behavior'(target, attribute, rootNode, pageIndex) {
+      'data-behavior' (target, attribute, rootNode, pageIndex) {
         //没有事件的元素,即可翻页又可点击切换工具栏
         if (attribute == 'click-swipe') {
           Xut.View.ToggleToolbar()

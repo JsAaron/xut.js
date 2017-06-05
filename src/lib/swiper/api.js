@@ -4,6 +4,16 @@ import { ease } from './ease'
 export default function api(Swiper) {
 
   /**
+   * 在column中滑动的时候，会丢失Direction
+   * 具体就是flow在首页，而且chpater只有一个flow的情况下
+   */
+  Swiper.prototype.setDirection = function (value) {
+    if (value !== undefined) {
+      this.direction = value > 0 ? 'prev' : 'next'
+    }
+  }
+
+  /**
    * 获取动作
    * 是翻页还是反弹
    * @return {[type]} [description]
@@ -11,8 +21,11 @@ export default function api(Swiper) {
   Swiper.prototype.getActionType = function (touchX, touchY, duration, orientation) {
     orientation = orientation || this.orientation
     if (orientation === 'h') {
-      /**启动了内部滑动 */
+      /**单独PPT页面内部滑动 */
       if (this.options.insideScroll) {
+        //////////////////
+        /// 判断是内部滑动
+        //////////////////
         /*left/up* 并且不是前边界*/
         if (this.direction === 'prev' && this.distX < 0) {
           return 'flipMove'
@@ -21,7 +34,15 @@ export default function api(Swiper) {
         if (this.direction === 'next' && Math.abs(this.distX) < this.visualWidth) {
           return 'flipMove'
         }
+        ///////////////////////////////
+        /// 判断是单页面，强制打开了滑动
+        /// 翻页强制改为反弹
+        ///////////////////////////////
+        if (!this.options.hasMultiPage) {
+          return 'flipRebound'
+        }
       }
+      /*PPT页面之间的处理*/
       touchX = Math.abs(touchX)
       return duration < 200 && touchX > 30 || touchX > this.actualWidth / 6 ? 'flipOver' : 'flipRebound'
     } else if (orientation === 'v') {
@@ -229,6 +250,9 @@ export default function api(Swiper) {
 
     const visualIndex = this.visualIndex //当前页面
 
+    /*跳转页面复位上一个页面的初始化坐标值*/
+    this._setKeepDist(0, 0)
+
     //相邻页
     switch (targetIndex) {
       //前一页
@@ -263,10 +287,9 @@ export default function api(Swiper) {
 
 
   /**
-   * 移动指定的距离
+   * 设置页面移动
    */
-  Swiper.prototype.scrollToPosition = function (position, speed = 300) {
-
+  Swiper.prototype._setPageMove = function (position, speed) {
     let distance = (this.actualWidth * (position / 100)) / 2
 
     /*必须有效*/
@@ -292,8 +315,40 @@ export default function api(Swiper) {
         self._isInvalid = true
       }
     })
+  }
 
+  /**
+   * 清理延时运行
+   * @return {[type]} [description]
+   */
+  Swiper.prototype.clearDelayTimer = function () {
+    if (this.delayTimer) {
+      clearTimeout(this.delayTimer)
+      this.delayTimer = null
+    }
+  }
 
+  /**
+   * 移动指定的距离
+   * position 默认最右边
+   * speed 默认3秒
+   * delay 默认没有延时
+   */
+
+  Swiper.prototype.scrollToPosition = function (position = 100, speed = 5000, delay = 0) {
+    /*清理上一个延时*/
+    this.clearDelayTimer()
+
+    /*如果有延时运行*/
+    /*这里没用动画的时间延时，因为运动中延时有问题*/
+    if (delay) {
+      this.delayTimer = setTimeout(() => {
+        this.clearDelayTimer()
+        this._setPageMove(position, speed)
+      }, delay)
+      return
+    }
+    this._setPageMove(position, speed)
   }
 
 
@@ -304,6 +359,7 @@ export default function api(Swiper) {
   Swiper.prototype.destroy = function () {
     this._off();
     this.$off();
+    this.clearDelayTimer()
     if (this._childNodes) {
       this._childNodes.page = null
       this._childNodes.master = null

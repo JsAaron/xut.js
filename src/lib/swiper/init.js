@@ -94,13 +94,19 @@ export default function init(Swiper) {
       leave: this
     }
 
-    //移动被锁定，不绑定滑动事件
     if (this.options.banMove) {
-      //不需要绑定transitionend，会设置手动会触发
+      //移动被锁定，不绑定滑动事件
     } else if (this.options.hasMultiPage) {
+      //不需要绑定transitionend，会设置手动会触发
       callback.move = this
       callback.transitionend = this
     }
+
+    /*如果内部滚动模式打开了，必须强制绑定move*/
+    if (!callback.move && this.options.insideScroll) {
+      callback.move = this
+    }
+
     $on(this.container, callback)
   }
 

@@ -10,8 +10,9 @@ export function extendCamera(access, $$globalSwiper) {
      λ  position=0，代表DOM页面的最左边，
      λ  position=50，代表DOM页面的中间，
      λ  position=100，代表DOM页面的最右边
+     delay 延时执行时间
    */
-  Xut.Camera.MoveX = function (position, speed) {
-    $$globalSwiper.scrollToPosition(position, speed)
+  Xut.Camera.MoveX = function (position, speed, delay) {
+    $$globalSwiper.scrollToPosition(position, speed, delay)
   }
 }

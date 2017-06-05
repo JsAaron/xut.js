@@ -14,6 +14,7 @@ export default function distribute(Swiper) {
   Swiper.prototype._distributeMove = function (data) {
     data.direction = this.direction
     data.orientation = this.orientation
+
     /*页码索引标识*/
     let pointer = this.pagePointer
     data.frontIndex = pointer.frontIndex
