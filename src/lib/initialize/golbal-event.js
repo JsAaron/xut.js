@@ -7,7 +7,7 @@ import { fixAudio } from '../component/audio/fix'
 import { $set, $get } from '../util/index'
 
 //修复H5音频自动播放bug
-if (Xut.plat.isBrowser && !Xut.plat.hasAutoPlayAudio) {
+if (!Xut.plat.hasAutoPlayAudio) {
   fixAudio()
 }
 

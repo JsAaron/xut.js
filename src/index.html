@@ -27,11 +27,6 @@
 
 </html>
 
-<!-- 杂志永远会创建2-3页，因为会来回左右翻页，所以必须要存在2-3页才可以无缝对接
-1.
-1超快速翻页时，当创建完页面的必要的根节点与背景就允许翻页 -->
-
-
 <script type="text/javascript">
 Xut.Application.setConfig = {
 
@@ -43,7 +38,7 @@ Xut.Application.setConfig = {
     convert: 'svg',
     doublePageMode: false,
 
-    // columnCheck:false,
+    // columnCheck:true,
 
     // scrollMode: 'v',
 
@@ -97,7 +92,8 @@ Xut.Application.Watch('trackCode', function(type, options) {
     console.log(type, options)
 })
 
-var appId = 332 //306
+
+var appId = 1 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         // trackCode: ['swipe'], //代码跟踪

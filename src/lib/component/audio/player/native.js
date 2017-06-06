@@ -26,6 +26,7 @@ export class NativeVideo extends AudioSuper {
     let self = this
     let trackId = this.trackId
     let hasAudio = hasAudioes()
+
     if (hasAudio) {
       audio = getAudio()
       audio.src = this.$$url
