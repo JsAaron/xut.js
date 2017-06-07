@@ -91,7 +91,8 @@ module.exports = {
       if (process.platform === 'win32') {
         return 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build'
       } else {
-        return '/Users/mac/project/svn/www-dev/template/test/lib'
+        return '/Users/mac/project/xcode/www/lib'
+        // return '/Users/mac/project/svn/www-dev/template/test/lib'
       }
     })()
 

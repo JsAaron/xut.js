@@ -352,11 +352,11 @@ export function initConfig(pptWidth, pptHeight) {
   //第一次探测实际的PPT与屏幕尺寸
   getBasicSize(pptWidth, pptHeight)
 
-
   ////////////////////////////////////
   /// 横版PPT，竖版显示，强制为竖版双页面
   ////////////////////////////////////
   if (config.launch.visualMode === 5) {
+
     resetProportion(pptWidth, pptHeight, config.launch.visualMode)
     config.originalVisualSize = config.visualSize
     return

@@ -34,7 +34,7 @@ export default function initDefaults(setData) {
 
   _.defaults(data, defaults);
 
-  for(let i in defaults) {
+  for (let i in defaults) {
     setConfig[i] = Number(data[i]);
   }
 
@@ -46,7 +46,8 @@ export default function initDefaults(setData) {
     delayTime: data.delayTime,
     Inapp: data.Inapp,
     shortName: data.shortName,
-    visualMode:data.visualMode
+    /*字符串类型，需要转化*/
+    visualMode: data.visualMode ? Number(data.visualMode) : 0
   })
 
 
