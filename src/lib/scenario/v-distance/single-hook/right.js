@@ -42,8 +42,14 @@ export const rightPageHook = {
     prev() {},
     next(getStyle) {
 
-      let middlePageStyle = getStyle('middle')
       let rightPageStyle = getStyle('right')
+
+      /*如果页面模式是5，特殊处理,返回半页宽度*/
+      if (rightPageStyle && rightPageStyle.pageVisualMode === 5) {
+        return rightPageStyle.visualWidth / 2
+      }
+
+      let middlePageStyle = getStyle('middle')
 
       //中间：溢出
       if (middlePageStyle && middlePageStyle.visualLeftInteger) {

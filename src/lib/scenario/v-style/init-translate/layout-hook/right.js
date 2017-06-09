@@ -7,6 +7,10 @@ export default function rightTranslate(styleDataset) {
   let middlePageStyle = styleDataset.getPageStyle('middle', 'right')
   let rightPageStyle = styleDataset.getPageStyle('right')
 
+  if(rightPageStyle.pageVisualMode===5){
+    return rightPageStyle.visualWidth/2
+  }
+
   //中间：溢出
   if(middlePageStyle && middlePageStyle.visualLeftInteger) {
     //右边：溢出
