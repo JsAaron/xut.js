@@ -295,7 +295,7 @@ export default class PageMgr extends ManageSuper {
    */
   destroyManage() {
     //清理视频
-    var pageId = Xut.Presentation.GetPageId(Xut.Presentation.GetPageIndex())
+    const pageId = Xut.Presentation.GetPageId(Xut.Presentation.GetPageIndex())
 
     removeVideo(pageId)
 
