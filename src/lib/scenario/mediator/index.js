@@ -108,11 +108,14 @@ export default class Mediator extends Observer {
       sectionRang: options.sectionRang //分段值
     }
 
-    /**
-     * 如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式
-     */
+    /*如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式*/
     if (config.launch.mouseWheel !== false && config.launch.scrollMode === 'v') {
       setOptions.mouseWheel = true
+    }
+
+    /*虚拟摄像头模式，关闭边界反弹*/
+    if (config.launch.visualMode === 5) {
+      setOptions.borderBounce = false
     }
 
     /*快速配置了*/

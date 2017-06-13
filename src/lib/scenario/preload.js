@@ -6,7 +6,7 @@
  * 资源加载接口
  * @return {[type]} [description]
  */
-export function load() {
+export function initPreload() {
 
 }
 

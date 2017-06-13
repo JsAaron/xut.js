@@ -91,7 +91,7 @@ const getParentNode = (subtitles, pageId, queryId) => {
 
 
 /**
- * 组合数据结构 
+ * 组合数据结构
  */
 const deployAudio = (sqlData, pageId, queryId, type, actionData, columnData) => {
   //新的查询

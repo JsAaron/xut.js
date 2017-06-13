@@ -7,29 +7,29 @@ function pollCss(node, callback) {
     isLoaded;
 
   // for WebKit < 536
-  if(isOldWebKit) {
-    if(sheet) {
+  if (isOldWebKit) {
+    if (sheet) {
       isLoaded = true
     }
   }
   // for Firefox < 9.0
-  else if(sheet) {
+  else if (sheet) {
     try {
-      if(sheet.cssRules) {
+      if (sheet.cssRules) {
         isLoaded = true
       }
-    } catch(ex) {
+    } catch (ex) {
       // The value of `ex.name` is changed from "NS_ERROR_DOM_SECURITY_ERR"
       // to "SecurityError" since Firefox 13.0. But Firefox is less than 9.0
       // in here, So it is ok to just rely on "NS_ERROR_DOM_SECURITY_ERR"
-      if(ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
+      if (ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
         isLoaded = true
       }
     }
   }
 
-  setTimeout(function() {
-    if(isLoaded) {
+  setTimeout(function () {
+    if (isLoaded) {
       // Place callback here to give time for style rendering
       callback()
     } else {
@@ -42,10 +42,10 @@ function pollCss(node, callback) {
 function addOnload(node, callback, isCSS, url) {
   var supportOnload = "onload" in node;
 
-  if(isCSS && isOldWebKit) {
-    setTimeout(function() {
-      pollCss(node, callback)
-    }, 1) // Begin after node insertion
+  if (isCSS && isOldWebKit) {
+    setTimeout(function () {
+        pollCss(node, callback)
+      }, 1) // Begin after node insertion
     return
   }
 
@@ -55,7 +55,7 @@ function addOnload(node, callback, isCSS, url) {
     node.onload = node.onerror = node.onreadystatechange = null
 
     // Remove the script to reduce memory leak
-    if(!isCSS) {
+    if (!isCSS) {
       var head = document.getElementsByTagName("head")[0] || document.documentElement;
       head.removeChild(node)
     }
@@ -65,14 +65,14 @@ function addOnload(node, callback, isCSS, url) {
   }
 
 
-  if(supportOnload) {
+  if (supportOnload) {
     node.onload = onload
-    node.onerror = function() {
+    node.onerror = function () {
       onload(true)
     }
   } else {
-    node.onreadystatechange = function() {
-      if(/loaded|complete/.test(node.readyState)) {
+    node.onreadystatechange = function () {
+      if (/loaded|complete/.test(node.readyState)) {
         onload()
       }
     }
@@ -84,16 +84,16 @@ function loadFile(url, callback, charset) {
     isCSS = IS_CSS_RE.test(url),
     node = document.createElement(isCSS ? "link" : "script");
 
-  if(charset) {
+  if (charset) {
     var cs = $.isFunction(charset) ? charset(url) : charset
-    if(cs) {
+    if (cs) {
       node.charset = cs
     }
   }
 
   addOnload(node, callback, isCSS, url)
 
-  if(isCSS) {
+  if (isCSS) {
     node.rel = "stylesheet"
     node.href = url
   } else {
@@ -110,7 +110,7 @@ function loadFile(url, callback, charset) {
   baseElement ?
     head.insertBefore(node, baseElement) :
     head.appendChild(node)
-  //currentlyAddingScript = null
+    //currentlyAddingScript = null
 
   return node
 }
@@ -118,36 +118,35 @@ function loadFile(url, callback, charset) {
 /**
  * 加载图片
  */
-const loadFigure = (function() {
+const loadFigure = (function () {
 
   let list = []
   let intervalId = null
 
   // 用来执行队列
-  let tick = function() {
+  let tick = function () {
     var i = 0;
-    for(; i < list.length; i++) {
+    for (; i < list.length; i++) {
       list[i].end ? list.splice(i--, 1) : list[i]();
     };
     !list.length && stop();
   }
 
   // 停止所有定时器队列
-  let stop = function() {
+  let stop = function () {
     clearInterval(intervalId);
     intervalId = null;
   }
 
-  return function(url, ready, load, error) {
+  return function (url, callback) {
     var onready, width, height, newWidth, newHeight,
       img = new Image();
 
     img.src = url;
 
     // 如果图片被缓存，则直接返回缓存数据
-    if(img.complete) {
-      ready && ready.call(img);
-      load && load.call(img);
+    if (img.complete) {
+      callback && callback.call(img, true);
       return;
     };
 
@@ -155,42 +154,44 @@ const loadFigure = (function() {
     height = img.height;
 
     // 加载错误后的事件
-    img.onerror = function() {
-      error && error.call(img);
+    img.onerror = function () {
       onready.end = true;
       img = img.onload = img.onerror = null;
+      callback && callback.call(img, false);
     };
 
     // 图片尺寸就绪
-    onready = function() {
+    onready = function () {
       newWidth = img.width;
       newHeight = img.height;
-      if(newWidth !== width || newHeight !== height ||
+      if (newWidth !== width || newHeight !== height ||
         // 如果图片已经在其他地方加载可使用面积检测
         newWidth * newHeight > 1024
       ) {
-        ready && ready.call(img);
+        callback && callback.call(img);
         onready.end = true;
       };
     };
+
     onready();
+
     // 完全加载完毕的事件
-    img.onload = function() {
+    img.onload = function () {
       // onload在定时器时间差范围内可能比onready快
       // 这里进行检查并保证onready优先执行
       !onready.end && onready();
-      load && load.call(img);
       // IE gif动画会循环执行onload，置空onload即可
       img = img.onload = img.onerror = null;
     };
 
     // 加入队列中定期执行
-    if(!onready.end) {
+    if (!onready.end) {
       list.push(onready);
       // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-      if(intervalId === null) intervalId = setInterval(tick, 40);
+      if (intervalId === null) intervalId = setInterval(tick, 40);
     };
-  };
+  }
+
 })();
 
 export {

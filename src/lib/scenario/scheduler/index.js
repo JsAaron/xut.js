@@ -407,6 +407,16 @@ export default class Scheduler {
       orientation
     })
 
+    /**
+     * 外部设置swiper内部的反弹
+     * 主要是模式5的情况下处理
+     * swiper延伸判断，通过这里获取到页面真是的坐标
+     * 反馈给swiper,如果是反弹就不再处理了
+     */
+    if (options.setPageBanBounce && options.setPageBanBounce(moveDistance[1])) {
+      return
+    }
+
     const data = {
       nodes,
       speed,

@@ -7,6 +7,8 @@ import { initColumn } from '../component/column/init'
 import { contentFilter } from '../component/activity/content/content-filter'
 import { config, initConfig, initPathAddress } from '../config/index'
 
+import { initPreload } from '../initialize/preload/index'
+
 /**
  * 新增模式,用于记录浏览器退出记录
  * 默认启动
@@ -20,6 +22,7 @@ const setHistory = (data) => {
   if (config.launch.historyMode !== undefined) {
     return
   }
+
   //数据库定义 && == 1
   if (data.recordHistory !== undefined && Number(data.recordHistory)) {
     config.launch.historyMode = true
@@ -172,6 +175,10 @@ export default function baseConfig(callback) {
       }
 
       configInit(novelData, tempSettingData)
+
+      /*资源预加载*/
+      initPreload()
+
       loadGolbalStyle('svgsheet', () => configColumn(novelData, callback))
     })
   })

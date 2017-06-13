@@ -10,6 +10,7 @@ import { mainScene, deputyScene } from './factory/layout'
 import { getMainBar, getDeputyBar } from './factory/parse-bar'
 import { sceneController } from './factory/control'
 
+
 /**
  * 找到对应容器
  * @return {[type]}            [description]

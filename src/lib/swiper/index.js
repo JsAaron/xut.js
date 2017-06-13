@@ -228,8 +228,7 @@ export default class Swiper extends Observer {
     this._defaultFlipTime = banMove ? 0 : snapSpeed
 
     /*翻页速率*/
-    this._speedRate =
-      this._originalRate =
+    this._speedRate = this._originalRate =
       this._defaultFlipTime / (scrollX ? actualWidth : actualHeight)
 
     /*计算初始化页码*/
@@ -243,6 +242,13 @@ export default class Swiper extends Observer {
     /*保存上次滑动值*/
     this.keepDistX = 0
     this.keepDistY = 0
+
+    /*内部滑动页面，优化边界的敏感度*/
+    this.insideScrollRange = {
+      min: visualWidth * 0.05,
+      max: visualWidth - (visualWidth * 0.05)
+    }
+
   }
 
 
@@ -322,7 +328,7 @@ export default class Swiper extends Observer {
 
     /*针对拖拽翻页阻止是否滑动事件受限*/
     this._stopped = false //如果页面停止了动作，触发
-    this._hasBounce = false //是否有反弹
+    this._banBounce = false //是否有禁止了反弹
     this._hasTap = true //点击了屏幕
     this._isInvalid = false //无效的触发
     this._moved = false /*是否移动中*/
@@ -343,6 +349,9 @@ export default class Swiper extends Observer {
 
     this.pointX = point.pageX;
     this.pointY = point.pageY;
+
+    /*每次滑动第一次触碰页面的实际移动坐标*/
+    this.firstMovePosition = 0
 
     this.startTime = Swiper.getDate()
   }
@@ -414,11 +423,6 @@ export default class Swiper extends Observer {
       this._directionBan = 'h'
     }
 
-    /*前尾是否允许反弹*/
-    if (!this.options.borderBounce) {
-      if (this._hasBounce = this._borderBounce($delta)) return;
-    }
-
 
     /*滑动距离*/
     let $dist
@@ -456,19 +460,66 @@ export default class Swiper extends Observer {
       distance = this.distX = this.distY = $dist + delayDist
     }
 
-
     const self = this
     this._distributeMove({
       distance,
       speed: 0,
       action: 'flipMove',
       /**
+       * 因为模式5的情况下，判断是否是边界，需要获取正确的页面值才可以
+       * 所以移动页面在反弹计算之后，所以必须在延后 movePageBases中判断是否为反弹
+       */
+      setPageBanBounce(position) {
+        /*如果没有启动边界反弹*/
+        if (!self.options.borderBounce) {
+          /*如果是到边界了，就禁止反弹*/
+          if (self._banBounce = self._borderBounce(position)) {
+            return true
+          }
+        }
+
+        /*模式5下，边界翻页的敏感度处理*/
+        if (self.options.insideScroll) {
+
+          const absPosition = Math.abs(position)
+
+          /*只判断每次移动的，第一次触碰*/
+          if (!self.firstMovePosition) {
+            self.firstMovePosition = absPosition
+          }
+          if (self.direction === 'next') {
+            if (absPosition >= self.visualWidth) {
+              if (self.firstMovePosition > self.insideScrollRange.max) {
+                /*如果是在边界的位置翻页，是被允许的*/
+                return false
+              } else {
+                /*其余位置都是被禁止翻页的*/
+                self._setKeepDist(-self.visualWidth, 0)
+                self._banBounce = true
+                return true
+              }
+            }
+          } else if (self.direction === 'prev') {
+              // 边界
+            if (position >= 0) {
+              if (self.firstMovePosition < self.insideScrollRange.min) {
+                return false
+              } else {
+                self._setKeepDist(0, 0)
+                self._banBounce = true
+                return true
+              }
+            }
+          }
+        }
+      },
+      /**
        * 是否无效函数
        * 如果无效，end方法抛弃掉
        * 必须是同步方法：
        * 动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
        */
-      setSwipeInvalid: function () {
+      setSwipeInvalid() {
         self._isInvalid = true
       }
     })
@@ -481,7 +532,7 @@ export default class Swiper extends Observer {
   _onEnd(e) {
 
     /*停止滑动，或者多点触发，或者是边界，或者是停止翻页*/
-    if (!this.enabled || this._hasBounce || this._stopped || hasMultipleTouches(e)) {
+    if (!this.enabled || this._banBounce || this._stopped || hasMultipleTouches(e)) {
       return
     }
 
@@ -719,12 +770,14 @@ export default class Swiper extends Observer {
   /**
    * 前尾边界反弹判断
    */
-  _borderBounce(value) {
+  _borderBounce(position) {
     //首页,并且是左滑动
-    if (this.visualIndex === 0 && value > 0) {
-      return true;
+    if (this.visualIndex === 0 && position > 0) {
+      /*到首页边界，end事件不触发，还原内部的值*/
+      this._setKeepDist(0, 0)
+      return true
+    } else if (this.visualIndex === this.totalIndex - 1 && position < 0) {
       //尾页
-    } else if (this.visualIndex === this.totalIndex - 1 && value < 0) {
       return true;
     }
   }
