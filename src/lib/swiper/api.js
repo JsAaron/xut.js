@@ -1,5 +1,7 @@
 import { initPointer, calculationIndex } from './pointer'
 import { ease } from './ease'
+import { hasPreload } from '../initialize/preload/index'
+import { config } from '../config/index'
 
 export default function api(Swiper) {
 
@@ -156,29 +158,49 @@ export default function api(Swiper) {
   }
 
 
+
   /**
    * 外部直接调用
    * 前翻页接口
    * callback 翻页完成
    * {
+      speed,
+      callback
+    }
+   */
+  Swiper.prototype.prev = function ({
     speed,
     callback
-  }
-   */
-  Swiper.prototype.prev = function (options = {}) {
+  } = {}) {
     if (!this._borderBounce(1)) {
-      this._slideTo({
-        speed: options.speed,
-        callback: options.callback,
-        direction: 'prev',
-        action: 'outer'
-      });
+
+      const toNext = () => {
+        this._slideTo({ speed, callback, direction: 'prev', action: 'outer' })
+      }
+
+      /*启动了预加载模式*/
+      if (config.launch.preload) {
+        const status = hasPreload({
+          type: 'linear',
+          direction: 'prev',
+          processed() {
+            toNext()
+            Xut.View.HideBusy()
+          }
+        }, this);
+        /*如果还在预加载，禁止跳转*/
+        if (status) {
+          Xut.View.ShowBusy()
+          return
+        }
+      }
+
+      /*正常跳页面*/
+      toNext()
     } else {
       //边界反弹
-      this._setRebound({
-        direction: 'next'
-      })
-      options.callback && options.callback()
+      this._setRebound({ direction: 'next' })
+      callback && callback()
     }
   }
 
@@ -189,21 +211,42 @@ export default function api(Swiper) {
    * Xut.View.GotoNextSlide
    * callback 翻页完成
    */
-  Swiper.prototype.next = function (options = {}) {
+  Swiper.prototype.next = function ({
+    speed,
+    callback
+  } = {}) {
     if (!this._borderBounce(-1)) {
-      this._slideTo({
-        speed: options.speed,
-        callback: options.callback,
-        direction: 'next',
-        action: 'outer'
-      })
+
+      const toNext = () => {
+        this._slideTo({ speed, callback, direction: 'next', action: 'outer' })
+      }
+
+      /*启动了预加载模式*/
+      if (config.launch.preload) {
+        const status = hasPreload({
+          type: 'linear',
+          direction: 'next',
+          processed() {
+            toNext()
+            Xut.View.HideBusy()
+          }
+        }, this);
+        /*如果还在预加载，禁止跳转*/
+        if (status) {
+          Xut.View.ShowBusy()
+          return
+        }
+      }
+
+      /*正常模式*/
+      toNext()
     } else {
       //边界反弹
       this._setRebound({
         direction: 'prev',
         isAppBoundary: true
       })
-      options.callback && options.callback()
+      callback && callback()
     }
   }
 

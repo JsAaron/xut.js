@@ -130,7 +130,7 @@ const configInit = function (novelData, tempSettingData) {
  * 嵌入index分栏
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
-const configColumn = function (novelData, callback) {
+const configColumn = function (callback) {
   initColumn(haColumnCounts => {
     if (haColumnCounts) {
       //动画事件委托
@@ -138,7 +138,7 @@ const configColumn = function (novelData, callback) {
         config.launch.swipeDelegate = true
       }
     }
-    callback(novelData)
+    callback()
   })
 }
 
@@ -174,12 +174,22 @@ export default function baseConfig(callback) {
         config.launch.visualMode = config.data.visualMode || 1
       }
 
+      /*配置config*/
       configInit(novelData, tempSettingData)
 
-      /*资源预加载*/
-      initPreload()
+      /*加载svg的样式*/
+      loadGolbalStyle('svgsheet', function () {
+        /*分栏*/
+        configColumn(function () {
+          if (config.launch.preload) {
+            /*资源预加载*/
+            initPreload(dataRet.Chapter.length, () => callback(novelData))
+          } else {
+            callback(novelData)
+          }
+        })
+      })
 
-      loadGolbalStyle('svgsheet', () => configColumn(novelData, callback))
     })
   })
 }

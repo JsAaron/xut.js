@@ -81,6 +81,13 @@ export default {
    */
   banMove: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
 
+  /**
+   * 是否预加载资源
+   * 每次翻页必须等待资源加载完毕后才可以
+   * @type {Boolean}
+   */
+  preload:false,
+
   /*
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问
   比如，mini客户端

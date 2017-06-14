@@ -9,6 +9,7 @@ import { clearId } from './util/stroage'
 import { clearAndroid } from './initialize/button'
 import { clearGlobalEvent } from './initialize/golbal-event'
 import { clearRootNode } from './initialize/root-node'
+import { clearPreload } from './initialize/preload/index'
 
 /**
  * 销毁接口
@@ -75,6 +76,9 @@ export default function Destroy(action = 'exit') {
 
   //销毁节点
   clearRootNode()
+
+  /*清理预加载*/
+  clearPreload()
 
   //删除动态加载的两个css文件
   $('link[data-type]').each(function (index, link) {

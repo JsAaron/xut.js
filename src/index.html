@@ -31,9 +31,10 @@
 Xut.Application.setConfig = {
 
     lauchMode: 1,
+    preload:true,
     // visualMode: 5,
     platform: 'mini',
-    historyMode: true,
+    historyMode: false,
     launchAnim: false,
     convert: 'svg',
     doublePageMode: false,
@@ -93,7 +94,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 110 //306
+var appId = 106 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         // trackCode: ['swipe'], //代码跟踪

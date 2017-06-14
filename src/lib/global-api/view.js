@@ -2,7 +2,8 @@ import { SceneFactory } from '../scenario/index'
 import { sceneController } from '../scenario/factory/control'
 import { showBusy, hideBusy, showTextBusy } from '../initialize/cursor'
 import { toNumber, $remove, $extend, $warn } from '../util/index'
-
+import { hasPreload } from '../initialize/preload/index'
+import { config } from '../config/index'
 
 export function initView() {
 
@@ -21,7 +22,7 @@ export function initView() {
   /**
    * 关闭场景
    */
-  Xut.View.CloseScenario = function() {
+  Xut.View.CloseScenario = function () {
     if (repeatClick) return;
     repeatClick = true;
     var serial = sceneController.takeOutPrevChainId();
@@ -44,12 +45,13 @@ export function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  Xut.View.LoadScenario = function(options, callback) {
+  const _loadScenario = function (options, callback) {
 
     let seasonId = toNumber(options.seasonId)
     let chapterId = toNumber(options.chapterId)
     let pageIndex = toNumber(options.pageIndex)
     let createMode = options.createMode
+
 
     //ibooks模式下的跳转
     //全部转化成超链接
@@ -184,17 +186,45 @@ export function initView() {
     new SceneFactory(data);
   }
 
+
+  Xut.View.LoadScenario = function (options, callback) {
+    /**
+     * 如果启动了预加载模式
+     * 需要处理跳转的页面预加载逻辑
+     */
+    let chapterId = toNumber(options.chapterId)
+    if (!options.main && chapterId && config.launch.preload) {
+      const status = hasPreload({
+        chapterId,
+        type: 'nolinear',
+        processed() {
+          _loadScenario(options, callback)
+          Xut.View.HideBusy()
+        }
+      })
+
+      /*如果还在预加载，禁止加载*/
+      if (status) {
+        Xut.View.ShowBusy()
+        return
+      }
+    }
+
+    /*正常加载*/
+    _loadScenario(options, callback)
+  }
+
   /**
    * 通过插件打开一个新view窗口
    */
-  Xut.View.Open = function(pageUrl, width, height, left, top) {
+  Xut.View.Open = function (pageUrl, width, height, left, top) {
     Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
   }
 
   /**
    * 关闭view窗口
    */
-  Xut.View.Close = function() {
+  Xut.View.Close = function () {
     Xut.Plugin.WebView.close();
   }
 

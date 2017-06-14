@@ -10,6 +10,7 @@ import { ease } from './ease'
 import { $off, $handle, $event, $warn } from '../util/index'
 
 import { LINEARTAG } from './type'
+import { hasPreload } from '../initialize/preload/index'
 
 const transitionDuration = Xut.style.transitionDuration
 
@@ -500,7 +501,7 @@ export default class Swiper extends Observer {
               }
             }
           } else if (self.direction === 'prev') {
-              // 边界
+            // 边界
             if (position >= 0) {
               if (self.firstMovePosition < self.insideScrollRange.min) {
                 return false
@@ -602,7 +603,39 @@ export default class Swiper extends Observer {
      * 1 翻页或者反弹，或者移动
      * 2 这里要区分PPT之间，与PPT内部滑动
      */
-    const actionType = this.getActionType(this.touchX, this.touchY, duration)
+    let actionType = this.getActionType(this.touchX, this.touchY, duration)
+
+    /**
+     * 单独控制翻页的预加载检测
+     * 如果还在预加载中，强制翻页为反弹
+     * 然后记录动作，等加载结束后处理
+     */
+    if (actionType === 'flipOver' && config.launch.preload) {
+      const status = hasPreload({
+        type: 'linear',
+        direction: this.direction,
+        /*预加载加载结束*/
+        processed() {
+          this._nextAction('flipOver')
+          Xut.View.HideBusy()
+        }
+      }, this)
+
+      /*如果还在预加载，执行反弹与等待*/
+      if (status) {
+        Xut.View.ShowBusy()
+        actionType = 'flipRebound'
+      }
+    }
+
+    /*正常松手后动作处理*/
+    this._nextAction(actionType)
+  }
+
+  /**
+   * 执行松手后的动作
+   */
+  _nextAction(actionType) {
 
     /*如果是首位页面，直接反弹*/
     if (this._isFirstOrEnd()) {
@@ -656,6 +689,7 @@ export default class Swiper extends Observer {
     }
 
   }
+
 
   /**
    * 设置Keep
