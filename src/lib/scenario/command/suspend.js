@@ -6,6 +6,7 @@ import access from './access'
 import { $stopAutoWatch } from './auto'
 import { hangUpAudio, clearAudio } from '../../component/audio/api'
 import { removeVideo, clearVideo } from '../../component/video/api'
+import { stopPreload } from '../../initialize/preload/index'
 
 
 /**
@@ -15,17 +16,17 @@ import { removeVideo, clearVideo } from '../../component/video/api'
  * 如果传递了allHandle 停止所有的视频
  * allHandle 给接口Xut.Application.Original() 使用
  *
- * @param  {[type]} pageObj [description]
- * @param  {[type]} pageId  [description]
- * @param  {[type]} all     [description]
- * @return {[type]}         [description]
+ * 页面与模板翻页都会调用暂停接口
  */
-export function $suspend(pageObj, pageId, allHandle) {
+export function $suspend(pageBase, pageId, allHandle) {
 
   //零件对象翻页就直接销毁了
   //无需暂时
   //这里只处理音频 + content类型
-  access(pageObj, (pageObj, contentObjs) => {
+  access(pageBase, (pageBase, contentObjs) => {
+
+    /*停止预加载*/
+    stopPreload()
 
     /*这个必须要，翻页停止AUTO的自动延时延时器，否则任务会乱套,e.g. 跨页面音频*/
     $stopAutoWatch()
@@ -35,7 +36,7 @@ export function $suspend(pageObj, pageId, allHandle) {
       //离开页面销毁视频
       removeVideo(pageId);
       //翻页停止母板音频
-      if (pageObj.pageType === 'master') {
+      if (pageBase.pageType === 'master') {
         hangUpAudio()
       }
     }

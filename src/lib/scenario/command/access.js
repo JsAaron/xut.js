@@ -1,23 +1,23 @@
 /**
  * 获取访问对象参数
- * 如果pageObj 不存在，则取当前页面的
+ * 如果pageBase 不存在，则取当前页面的
  * @return {[type]} [description]
  */
-export default function access(pageObj, callback) {
+export default function access(pageBase, callback) {
 
   //如果只提供回调函数
-  if (arguments.length === 1 && _.isFunction(pageObj)) {
-    callback = pageObj
-    pageObj = Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase()
+  if (arguments.length === 1 && _.isFunction(pageBase)) {
+    callback = pageBase
+    pageBase = Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase()
   } else {
-    pageObj = pageObj || (Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase())
+    pageBase = pageBase || (Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase())
   }
 
-  if (pageObj) {
-    const contents = pageObj.baseGetContent();
-    const components = pageObj.baseGetComponent();
-    const pageType = pageObj.pageType || 'page';
-    const flag = callback(pageObj, contents.length && contents, components.length && components, pageType)
+  if (pageBase) {
+    const contents = pageBase.baseGetContent();
+    const components = pageBase.baseGetComponent();
+    const pageType = pageBase.pageType || 'page';
+    const flag = callback(pageBase, contents.length && contents, components.length && components, pageType)
     return flag
   }
 }

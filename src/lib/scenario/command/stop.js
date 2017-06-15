@@ -36,15 +36,16 @@ export function $stop() {
   //清理视频
   clearVideo()
 
+
   //停止热点
-  return access(function(pageObj, contentObjs, componentObjs) {
+  return access(function(pageBase, contentObjs, componentObjs) {
 
     //如果返回值是false,则是算热点处理行为
     let falg = false
 
     //content类型
     contentObjs && _.each(contentObjs, function(obj) {
-      if(obj.stop && obj.stop()) {
+      if (obj.stop && obj.stop()) {
         falg = true
       }
     })
@@ -52,7 +53,7 @@ export function $stop() {
 
     //零件类型
     componentObjs && _.each(componentObjs, function(obj) {
-      if(obj.stop && obj.stop()) {
+      if (obj.stop && obj.stop()) {
         falg = true
       }
     })

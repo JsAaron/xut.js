@@ -24,19 +24,19 @@ let hasOptimize = (fn) => {
  * 大量操作DOM结构，所以先隐藏根节点
  * 1 删除所有widget节点
  * 2 复位所有content节点
- * @param  {[type]} pageObj [description]
+ * @param  {[type]} pageBase [description]
  * @return {[type]}         [description]
  */
-export function $original(pageObj) {
+export function $original(pageBase) {
 
-  access(pageObj, (pageObj, contentObjs, componentObjs) => {
+  access(pageBase, (pageBase, contentObjs, componentObjs) => {
 
     //母版对象不还原
-    if (pageObj.pageType === 'master') return;
+    if (pageBase.pageType === 'master') return;
 
     var $containsNode
 
-    if ($containsNode = pageObj.getContainsNode()) {
+    if ($containsNode = pageBase.getContainsNode()) {
 
       //隐藏根节点
       //display:none下刷新
@@ -57,7 +57,7 @@ export function $original(pageObj) {
           obj && obj.destroy();
         });
         //销毁widget对象管理
-        pageObj.baseRemoveComponent()
+        pageBase.baseRemoveComponent()
       }
 
       hasOptimize(() => {

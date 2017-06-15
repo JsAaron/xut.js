@@ -43,13 +43,13 @@ const autoContents = (contentObjs, taskAnimCallback) => {
  * 运行自动的静态类型
  * @return {[type]} [description]
  */
-const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
+const autoComponents = (pageBase, pageIndex, autoData, pageType) => {
 
   if (pageIndex === undefined) {
     pageIndex = Xut.Presentation.GetPageIndex()
   }
 
-  let chapterId = pageObj.baseGetPageId(pageIndex)
+  let chapterId = pageBase.baseGetPageId(pageIndex)
   let directive
 
   _.each(autoData, (data, index) => {
@@ -60,7 +60,7 @@ const autoComponents = (pageObj, pageIndex, autoData, pageType) => {
       directive.autoPlay({
         'id': data.id,
         'pageType': pageType,
-        'rootNode': pageObj.getContainsNode(),
+        'rootNode': pageBase.getContainsNode(),
         'chapterId': chapterId,
         'category': data.category,
         'autoPlay': data.autoPlay,
@@ -81,12 +81,8 @@ export function $stopAutoWatch() {
 
 /**
  * 自动动作
- * @param  {[type]} pageObj          [description]
- * @param  {[type]} pageIndex        [description]
- * @param  {[type]} taskAnimCallback [description]
- * @return {[type]}                  [description]
  */
-export function $autoRun(pageObj, pageIndex, taskAnimCallback) {
+export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
 
   /**
    * 编译IBOOKSCONFIG的时候过滤自动运行的调用
@@ -111,23 +107,23 @@ export function $autoRun(pageObj, pageIndex, taskAnimCallback) {
   //pageType
   //用于区别触发类型
   //页面还是母版
-  access(pageObj, (pageObj, contentObjs, componentObjs, pageType) => {
+  access(pageBase, (pageBase, contentObjs, componentObjs, pageType) => {
 
     //如果是母版对象，一次生命周期种只激活一次
-    if (pageObj.pageType === 'master') {
-      if (pageObj.onceMaster) {
+    if (pageBase.pageType === 'master') {
+      if (pageBase.onceMaster) {
         return
       }
-      pageObj.onceMaster = true
+      pageBase.onceMaster = true
     }
 
     taskAnimCallback = taskAnimCallback || noop
 
     /*自动组件*/
-    let autoData = pageObj.baseAutoRun()
+    let autoData = pageBase.baseAutoRun()
     if (autoData) {
       pushWatcher('component', function () {
-        autoComponents(pageObj, pageIndex, autoData, pageType)
+        autoComponents(pageBase, pageIndex, autoData, pageType)
       })
     }
 
