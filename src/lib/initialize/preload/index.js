@@ -45,10 +45,10 @@ let preloadData = null
 let chapterIdCount = 0
 
 /**
- * 初始的ID游标值
+ * 正在加载的id标记
  * @type {Number}
  */
-let idVernier = 1
+let loadingId = 1
 
 /**
  * 预加载回调通知
@@ -216,7 +216,11 @@ function loadResource(data, callback) {
  */
 function nextTask(chapterId, callback) {
 
-  chapterId = chapterId || idVernier
+  if (!chapterId) {
+    /*新加载的Id游标*/
+    ++loadingId;
+    chapterId = loadingId
+  }
 
   /**
    * 检测下一个解析任务
@@ -226,21 +230,14 @@ function nextTask(chapterId, callback) {
 
     /*第一次加载才有回调*/
     if (callback) {
-      ++idVernier;
       callback()
-      return
-    }
-
-    /*如果加载数等于总计量数，这个证明加载完毕*/
-    if (idVernier === chapterIdCount) {
-      $warn('全部预加载完成')
       return
     }
 
     /*执行预加载等待的回调通知对象*/
     if (notification) {
       const cid = notification[0]
-      if (idVernier === cid) {
+      if (loadingId === cid) {
         /*如果下一个解析正好是等待的页面*/
         notification[1]()
         notification = null
@@ -251,11 +248,16 @@ function nextTask(chapterId, callback) {
       }
     }
 
-    ++idVernier;
+    /*如果加载数等于总计量数，这个证明加载完毕*/
+    console.log(loadingId, chapterIdCount)
+    if (loadingId === chapterIdCount) {
+      $warn('全部预加载完成')
+      return
+    }
 
     /*启动了才可以预加载*/
     if (enable) {
-      nextTask(idVernier)
+      nextTask()
     }
   }
 
@@ -366,7 +368,7 @@ export function requestInterrupt({
 export function clearPreload() {
   enable = true
   chapterIdCount = 0
-  idVernier = 1
+  loadingId = 1
   preloadData = null
   notification = null
 }
