@@ -32,20 +32,45 @@ export function initApplication() {
    * 2.initComplete
    */
   let __app__ = new Observer()
+
+  /**
+   * 监听应用事件
+   * @param {[type]}   event    [description]
+   * @param {Function} callback [description]
+   */
   Xut.Application.Watch = function (event, callback) {
     let fn = function () {
       callback.apply(__app__, arguments)
     }
-    __app__.bind(event, fn)
+    __app__.$$watch(event, fn)
     return fn
   }
 
-  Xut.Application.unWatch = function (event, fn) {
-    __app__.unbind(event, fn)
+  /**
+   * 只监听一次
+   * 触发后就销毁
+   */
+  Xut.Application.onceWatch = function (event, callback) {
+    let fn = function () {
+      callback.apply(__app__, arguments)
+    }
+    __app__.$$once(event, fn)
+    return fn
   }
 
+  /**
+   * 触发通知
+   * @param {...[type]} arg [description]
+   */
   Xut.Application.Notify = function (...arg) {
-    __app__.trigger(...arg)
+    __app__.$$emit(...arg)
+  }
+
+  /**
+   * 销毁
+   */
+  Xut.Application.unWatch = function (event, fn) {
+    __app__.$$unWatch(event, fn)
   }
 
 

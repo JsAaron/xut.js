@@ -10,7 +10,7 @@ import { config } from '../../config/index'
 import PageMgr from '../manage/page'
 import MasterMgr from '../manage/master'
 import goToPage from './jump-page'
-import Stack from '../../util/stack'
+import Stack from '../../observer/stack'
 
 import { sceneController } from '../factory/control'
 import { getVisualDistance } from '../v-distance/index'
@@ -549,23 +549,34 @@ export default class Scheduler {
       direction,
       createPointer,
       'isQuickTurn': this.isQuickTurn,
-      /*暂停的页面索引autorun*/
+
+      /**
+       * 暂停的页面索引autorun
+       */
       'suspendIndex': (action === 'init' ? '' : direction === 'next' ? frontIndex : backIndex),
-      //中断通知
+
+      /**
+       * 中断通知
+       */
       'suspendCallback': options.suspendAutoCallback,
-      //流程结束通知
-      //包括动画都已经结束了
-      'processComplete': function () {},
-      //构建完毕通知
-      'buildComplete': function (seasonId) {
-        /**
-         * 构建完成通知,用于处理历史缓存记录
-         * 如果是调试模式 && 不是收费提示页面 && 多场景应用
-         */
+
+      /**
+       * 构建完成通知,用于处理历史缓存记录
+       * 如果是调试模式 && 不是收费提示页面 && 多场景应用
+       */
+      buildComplete(seasonId) {
         if (config.launch.historyMode && !options.isInApp && options.hasMultiScene) {
           const history = sceneController.sequence(seasonId, middleIndex)
           if (history) { $set("history", history) }
         }
+      },
+
+      /**
+       * 流程结束通知
+       * 包括动画都已经结束了
+       */
+      processComplete() {
+        Xut.Application.Notify('autoRunComplete')
       }
     }
 

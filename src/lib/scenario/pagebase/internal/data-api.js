@@ -222,7 +222,7 @@ export default function (baseProto) {
   ], function (type) {
     baseProto['base' + type + 'Component'] = function (data) {
       switch (type) {
-        case 'add':
+        case 'Add':
           return this.componentGroup.add(data);
         case 'Get':
           return this.componentGroup.get();

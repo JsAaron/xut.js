@@ -1,4 +1,4 @@
-import Stack from '../../util/stack'
+import Stack from '../../observer/stack'
 import { config } from '../../config/index'
 import { getVisualSize } from './size'
 import { getPageProportion } from './proportion'

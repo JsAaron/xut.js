@@ -14,18 +14,11 @@ import { videoParse } from './video.parse'
 import { AsyAccess } from '../../observer/asy-access'
 
 const PARSE = {
+  // master 母版标记特殊处理
   content: loadFigure,
   widget: loadFigure,
-  audio: audioParse,
-  video: videoParse,
-  /**
-   * 母版解析器
-   * 母版复用了page的资源结构
-   * 所以这里需要递归处理
-   */
-  master(filePath, callback) {
-    console.log(filePath, callback)
-  }
+  audio: audioParse
+  // video: videoParse
 }
 
 /**

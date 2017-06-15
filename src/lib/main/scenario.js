@@ -1,6 +1,5 @@
 import { config } from '../config/index'
 import { $set, $get, $remove, execScript } from '../util/index'
-import { startPreload } from '../initialize/preload/index'
 
 /*设置缓存，必须要可设置*/
 const saveData = () => {
@@ -72,9 +71,6 @@ export default function (options) {
     'pageIndex': options.pageIndex,
     'history': options.history
   }, function () {
-
-    /*开始资源预加载*/
-    startPreload()
 
     /*应用初始化加载完毕*/
     Xut.Application.Notify('initComplete')
