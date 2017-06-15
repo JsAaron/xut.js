@@ -27,10 +27,10 @@ const _indexOf = (array, needle) => {
 export class Observer {
 
   constructor() {
-    this.$watch = this.bind
-    this.$off = this.unbind
-    this.$emit = this.trigger
-    this.$once = this.one
+    this.$$watch = this.bind
+    this.$$unWatch = this.unbind
+    this.$$emit = this.trigger
+    this.$$once = this.one
 
     //触发列表名称
     //防止同步触发
@@ -55,7 +55,7 @@ export class Observer {
     //执行
     var data
     if(data = this._handleName[event]) {
-      this.$emit(event, data[0])
+      this.$$emit(event, data[0])
     }
 
     return this;

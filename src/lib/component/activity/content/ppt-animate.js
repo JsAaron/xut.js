@@ -124,7 +124,7 @@ export default class Animation {
         //防止多条一样的数据绑多个动画
         //构建精灵动画完毕后
         //构建ppt对象
-        this.pixiObj.$once('load', () => {
+        this.pixiObj.$$once('load', () => {
           //ppt动画
           createPixiPPT()
 

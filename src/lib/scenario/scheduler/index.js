@@ -810,7 +810,7 @@ export default class Scheduler {
     }
 
     //创建完成回调
-    this.$$mediator.$emit('change:createComplete', () => {
+    this.$$mediator.$$emit('change:createComplete', () => {
       if (this.$$mediator.options.hasMultiScene) {
         triggerAuto()
       }

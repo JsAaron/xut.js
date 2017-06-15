@@ -1,6 +1,6 @@
 import { initPointer, calculationIndex } from './pointer'
 import { ease } from './ease'
-import { hasPreload } from '../initialize/preload/index'
+import { requestInterrupt } from '../initialize/preload/index'
 import { config } from '../config/index'
 
 export default function api(Swiper) {
@@ -180,7 +180,7 @@ export default function api(Swiper) {
 
       /*启动了预加载模式*/
       if (config.launch.preload) {
-        const status = hasPreload({
+        const status = requestInterrupt({
           type: 'linear',
           direction: 'prev',
           processed() {
@@ -223,7 +223,7 @@ export default function api(Swiper) {
 
       /*启动了预加载模式*/
       if (config.launch.preload) {
-        const status = hasPreload({
+        const status = requestInterrupt({
           type: 'linear',
           direction: 'next',
           processed() {
@@ -307,7 +307,7 @@ export default function api(Swiper) {
         //首页
       case visualIndex:
         if (visualIndex == 0) {
-          this.$emit('onDropApp');
+          this.$$emit('onDropApp');
         }
         return
         //后一页
@@ -325,7 +325,7 @@ export default function api(Swiper) {
     this._updatePointer(data)
     data.pagePointer = this.pagePointer
 
-    this.$emit('onJumpPage', data)
+    this.$$emit('onJumpPage', data)
   }
 
 
@@ -401,7 +401,7 @@ export default function api(Swiper) {
    */
   Swiper.prototype.destroy = function () {
     this._off();
-    this.$off();
+    this.$$unWatch();
     this.clearDelayTimer()
     if (this._childNodes) {
       this._childNodes.page = null

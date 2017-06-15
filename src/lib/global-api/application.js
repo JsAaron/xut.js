@@ -117,7 +117,7 @@ export function initApplication() {
      * @return {[type]} [description]
      */
     const destroy = () => {
-      __app__.$off()
+      __app__.$$unWatch()
       globalDestroy('destory')
       window.GLOBALCONTEXT = null;
     }

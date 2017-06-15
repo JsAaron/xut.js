@@ -235,7 +235,7 @@ export default function slide(Swiper) {
      * 需要翻页结束后触发外部通知，绑定一次
      */
     if (callback) {
-      this.$once('_slideFlipOver', callback)
+      this.$$once('_slideFlipOver', callback)
     }
 
     let distance = 0
@@ -257,7 +257,7 @@ export default function slide(Swiper) {
     setTimeout(() => {
       this._updateActionPointer();
       /*手指移开屏幕*/
-      this.$emit('onEnd', this.pagePointer)
+      this.$$emit('onEnd', this.pagePointer)
       this._updateVisualIndex(this.pagePointer.middleIndex)
     }, 0)
   }

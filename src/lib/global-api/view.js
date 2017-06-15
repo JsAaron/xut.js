@@ -2,7 +2,7 @@ import { SceneFactory } from '../scenario/index'
 import { sceneController } from '../scenario/factory/control'
 import { showBusy, hideBusy, showTextBusy } from '../initialize/cursor'
 import { toNumber, $remove, $extend, $warn } from '../util/index'
-import { hasPreload } from '../initialize/preload/index'
+import { requestInterrupt } from '../initialize/preload/index'
 import { config } from '../config/index'
 
 export function initView() {
@@ -194,7 +194,7 @@ export function initView() {
      */
     let chapterId = toNumber(options.chapterId)
     if (!options.main && chapterId && config.launch.preload) {
-      const status = hasPreload({
+      const status = requestInterrupt({
         chapterId,
         type: 'nolinear',
         processed() {

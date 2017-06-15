@@ -10,7 +10,7 @@ import { ease } from './ease'
 import { $off, $handle, $event, $warn } from '../util/index'
 
 import { LINEARTAG } from './type'
-import { hasPreload } from '../initialize/preload/index'
+import { requestInterrupt } from '../initialize/preload/index'
 
 const transitionDuration = Xut.style.transitionDuration
 
@@ -320,7 +320,7 @@ export default class Swiper extends Observer {
      * point 事件对象
      * @return {[type]} [description]
      */
-    this.$emit('onFilter', function () {
+    this.$$emit('onFilter', function () {
       interrupt = true;
     }, point, e)
 
@@ -554,7 +554,7 @@ export default class Swiper extends Observer {
     /*如果没有滚动页面，判断为点击*/
     if (!distX && !distY) {
       let isReturn = false
-      this.$emit('onTap', this.visualIndex, () => isReturn = true, e, duration)
+      this.$$emit('onTap', this.visualIndex, () => isReturn = true, e, duration)
       if (isReturn) return
     }
 
@@ -611,7 +611,7 @@ export default class Swiper extends Observer {
      * 然后记录动作，等加载结束后处理
      */
     if (actionType === 'flipOver' && config.launch.preload) {
-      const status = hasPreload({
+      const status = requestInterrupt({
         type: 'linear',
         direction: this.direction,
         /*预加载加载结束*/
@@ -750,7 +750,7 @@ export default class Swiper extends Observer {
     后续就会报错*/
     this.orientation = 'v'
 
-    this.$emit('onWheel', e, wheelDeltaY)
+    this.$$emit('onWheel', e, wheelDeltaY)
 
     return
   }
@@ -781,7 +781,7 @@ export default class Swiper extends Observer {
     if (!isVisual) {
       //只针对母板处理
       if (!pageType) {
-        this.$emit('onMasterMove', this.visualIndex, node);
+        this.$$emit('onMasterMove', this.visualIndex, node);
       }
       return
     }

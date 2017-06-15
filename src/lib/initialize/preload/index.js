@@ -11,12 +11,21 @@ import { config } from '../../config/index'
 import { $warn, loadFigure, loadFile } from '../../util/index'
 import { audioParse } from './auido.parse'
 import { videoParse } from './video.parse'
+import { AsyAccess } from '../../observer/asy-access'
 
 const PARSE = {
   content: loadFigure,
   widget: loadFigure,
   audio: audioParse,
-  video: videoParse
+  video: videoParse,
+  /**
+   * 母版解析器
+   * 母版复用了page的资源结构
+   * 所以这里需要递归处理
+   */
+  master(filePath, callback) {
+    console.log(filePath, callback)
+  }
 }
 
 /**
@@ -28,23 +37,13 @@ let preloadData = null
  * 页面chpater Id 总数
  * @type {Number}
  */
-let chapterIds = 0
+let chapterIdCount = 0
 
 /**
  * 初始的ID游标值
  * @type {Number}
  */
 let idVernier = 1
-
-/**
- * 由于跳转页面存在
- * 页面解析是按照顺序的
- * 如果刚好跳转的不是解析的顺序
- * 大于解析顺序，那么需要记录这个插入的解析id
- * 这样在正常解析的时候，可以跳过
- * @type {Array}
- */
-let insertIdVernier = []
 
 /**
  * 预加载回调通知
@@ -54,6 +53,8 @@ let notification = null
 
 /**
  * 强制成数组格式
+ * 1 字符串形式 content/audio/video
+ * 2 对象形式 widget
  */
 const formatArray = function (data) {
   const type = typeof data
@@ -84,66 +85,84 @@ const formatArray = function (data) {
 
 
 /**
- * 创建对应的处理器
+ * 完成后删除资源的列表
+ * 2个好处
+ * 1 优化内存空间
+ * 2 跳页面检测，如果遇到不存在的资源就不处理了
+ *   这代表，1.已经加载了
+ *          2.资源或错
+ * @return {[type]} [description]
  */
-function createProcessor(data, parse) {
-  data = formatArray(data)
-  let total = data.length
-  let basePath = data.basePath
-  return function (callback) {
-    const watchComplete = function () {
-      if (total === 1) {
-        callback()
-        return;
-      }
-      --total
-    }
-    data.fileNames.forEach(function (fileName) {
-      parse(basePath + fileName, watchComplete)
-    })
-  }
+function deleteResource(chaperId) {
+  preloadData[chaperId] = null
 }
 
 
-/**
- * 开始预加载资源
- */
-function startLoad(data, callback) {
 
-  let curryParse = []
+/**
+ * 开始加载资源
+ */
+function loadResource(data, callback) {
+  const asy = new AsyAccess()
+
+  /*创建对应的处理器*/
+  const createProcessor = function (type, childData, parse) {
+    if (type === 'master') {
+      /**
+       * 母版数据，需要重新递归解析
+       */
+      let masterId = childData
+      let masterData = preloadData[masterId]
+      if (masterData) {
+        return function (callback) {
+          loadResource(masterData, function () {
+            /*删除母版数据，多个Page会共享同一个母版加载*/
+            deleteResource(masterId)
+            callback()
+          })
+        }
+      }
+    } else {
+      /**
+       * 正常页面数据
+       * content/widget/audio/video
+       */
+      childData = formatArray(childData)
+      let total = childData.length
+      let basePath = childData.basePath
+      return function (callback) {
+        childData.fileNames.forEach(name => {
+          parse(basePath + name, () => {
+            if (total === 1) {
+              callback()
+              return;
+            }
+            --total
+          })
+        })
+      }
+    }
+  }
 
   for (let key in data) {
     let parse = PARSE[key]
     if (parse) {
-      curryParse.push(createProcessor(data[key], parse))
+      asy.create(createProcessor(key, data[key], parse))
     }
   }
 
-  const watchComplete = (function () {
-    let total = curryParse.length
-    return function () {
-      if (total === 1) {
-        callback()
-        return
-      }
-      --total
-    }
-  })()
-
-
-  curryParse.forEach(function (fn) {
-    fn(watchComplete)
-  })
-
+  /*执行后监听,监听完成*/
+  asy.exec().$$watch('complete', callback)
 }
+
 
 /**
  * 检测下一个页面加载执行
  * @return {Function} [description]
  */
-function next(chaperId, callback) {
+function nextTask(chapterId, callback) {
 
-  chaperId = chaperId || idVernier
+  chapterId = chapterId || idVernier
 
   /**
    * 检测下一个解析任务
@@ -151,11 +170,15 @@ function next(chaperId, callback) {
    */
   const _repeatCheck = function () {
 
-    callback && callback()
-
-    if (idVernier === chapterIds) {
-      /*因为最后一页的判断是需要大于请求的，所以这里需要叠加一次*/
+    /*第一次加载才有回调*/
+    if (callback) {
       ++idVernier;
+      callback()
+      return
+    }
+
+    /*如果加载数等于总计量数，这个证明加载完毕*/
+    if (idVernier === chapterIdCount) {
       $warn('全部预加载完成')
       return
     }
@@ -168,39 +191,28 @@ function next(chaperId, callback) {
         notification[1]()
         notification = null
       } else {
-        /*
-        跳转页面的情况
-        如果不是按照顺序的预加载方式
-        这里idVernier找不到对应的标记*/
-        insertIdVernier.push(cid)
-        next(cid)
+        /*跳转页面的情况， 如果不是按照顺序的预加载方式*/
+        nextTask(cid)
         return
       }
-
     }
 
     ++idVernier;
-    next(idVernier)
+    nextTask(idVernier)
   }
 
-
-  /*如果已经被动态解析过了*/
-  if (~insertIdVernier.indexOf(chaperId)) {
-    $warn('完成chaperId: ' + chaperId)
-    _repeatCheck()
-  } else {
-    const data = preloadData[chaperId]
-    if (data) {
-      startLoad(data, function () {
-        $warn('完成chaperId: ' + chaperId)
-        _repeatCheck()
-      })
-    } else {
-      $warn('预加载资源不存在,chaperId: ' + chaperId)
+  /*只有没有预加载的数据才能被找到*/
+  const data = preloadData[chapterId]
+  if (data) {
+    loadResource(data, function () {
+      $warn('完成chapterId: ' + chapterId)
+      deleteResource(chapterId)
       _repeatCheck()
-    }
+    })
+  } else {
+    $warn('预加载资源不存在，chapterId: ' + chapterId)
+    _repeatCheck()
   }
-
 
 }
 
@@ -214,10 +226,10 @@ function next(chaperId, callback) {
 export function initPreload(total, callback) {
   loadFile(config.data.pathAddress + 'preload.js', function () {
     if (window.preloadData) {
-      chapterIds = total
+      chapterIdCount = total
       preloadData = window.preloadData
       window.preloadData = null
-      next(1, callback)
+      nextTask(1, callback)
     } else {
       callback()
     }
@@ -225,13 +237,29 @@ export function initPreload(total, callback) {
 }
 
 
+/**
+ * 继续开始加载
+ * 初始化只加载了一页
+ * 在页面init进入后，在开始这个调用
+ * 继续解析剩下的页面
+ */
+export function startPreload(total, callback) {
+  /*从第2页开始预加载*/
+  if (preloadData) {
+    setTimeout(function () {
+      nextTask()
+    }, 0)
+  }
+}
+
 
 /**
+ * 预加载请求中断处理
  * 监听线性翻页预加载加载
  * 类型，方向，处理器
  * context 处理器的上下文
  */
-export function hasPreload({
+export function requestInterrupt({
   type,
   chapterId,
   direction,
@@ -246,12 +274,8 @@ export function hasPreload({
     /*非线性模式,跳转模式*/
   }
 
-  /**
-   * 证明加载完毕了
-   * 1 如果游标大于等于chaperId
-   * 2 如果被动态插入，动态加载过了
-   */
-  if (idVernier > chapterId || insertIdVernier.indexOf(chapterId) !== -1) {
+  /*如果不存在预加载数据，就说明加载完毕，或者没有这个数据*/
+  if (!preloadData[chapterId]) {
     return false
   } else {
     /*正在预加载，等待记录回调*/
@@ -272,9 +296,8 @@ export function hasPreload({
  * @return {[type]} [description]
  */
 export function clearPreload() {
-  chapterIds = 0
+  chapterIdCount = 0
   idVernier = 1
   preloadData = null
   notification = null
-  insertIdVernier = []
 }

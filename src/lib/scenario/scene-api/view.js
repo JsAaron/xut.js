@@ -19,7 +19,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    *   subIndex     子索引
    */
   Xut.View.UpdatePage = function (...arg) {
-    $$mediator.$emit('change:updatePage', ...arg)
+    $$mediator.$$emit('change:updatePage', ...arg)
   }
 
 
@@ -28,7 +28,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * @param {...[type]} arg [description]
    */
   Xut.View.ShowPrevBar = function (...arg) {
-    $$mediator.$emit('change:showPrev', ...arg)
+    $$mediator.$$emit('change:showPrev', ...arg)
   }
 
   /**
@@ -36,7 +36,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * @param {...[type]} arg [description]
    */
   Xut.View.HidePrevBar = function (...arg) {
-    $$mediator.$emit('change:hidePrev', ...arg)
+    $$mediator.$$emit('change:hidePrev', ...arg)
   }
 
 
@@ -45,7 +45,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * @param {...[type]} arg [description]
    */
   Xut.View.ShowNextBar = function (...arg) {
-    $$mediator.$emit('change:showNext', ...arg)
+    $$mediator.$$emit('change:showNext', ...arg)
   }
 
   /**
@@ -53,14 +53,14 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * @param {...[type]} arg [description]
    */
   Xut.View.HideNextBar = function (...arg) {
-    $$mediator.$emit('change:hideNext', ...arg)
+    $$mediator.$$emit('change:hideNext', ...arg)
   }
 
   /**
    * state, pointer
    */
   Xut.View.ToggleToolbar = function (...arg) {
-    $$mediator.$emit('change:toggleToolbar', ...arg)
+    $$mediator.$$emit('change:toggleToolbar', ...arg)
   }
 
   /**
@@ -85,7 +85,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 复位工具栏
    */
   Xut.View.ResetToolbar = function () {
-    $$mediator.$emit('change:resetToolbar')
+    $$mediator.$$emit('change:resetToolbar')
   }
 
 

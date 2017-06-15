@@ -194,7 +194,7 @@ export default class ColumnClass {
     coloumnObj.lastDistance = swipe.getInitDistance()
 
     let hasQrcode
-    swipe.$watch('onFilter', (hookCallback, point, evtObj) => {
+    swipe.$$watch('onFilter', (hookCallback, point, evtObj) => {
       /*二维码*/
       hasQrcode = false
       if (swiperHook(evtObj, point.target) === 'qrcode') {
@@ -202,7 +202,7 @@ export default class ColumnClass {
       }
     });
 
-    swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
+    swipe.$$watch('onTap', function (pageIndex, hookCallback, point, duration) {
       const node = point.target;
       /*图片缩放*/
       if (!hasQrcode) {
@@ -218,7 +218,7 @@ export default class ColumnClass {
     })
 
 
-    swipe.$watch('onMove', function (options) {
+    swipe.$$watch('onMove', function (options) {
 
       const {
         action,
@@ -318,7 +318,7 @@ export default class ColumnClass {
 
     })
 
-    swipe.$watch('onComplete', ({
+    swipe.$$watch('onComplete', ({
       unlock
     }) => {
       coloumnObj.lastDistance = moveDistance

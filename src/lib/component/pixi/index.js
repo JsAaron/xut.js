@@ -33,7 +33,7 @@ class Rule extends Observer {
      */
     this.successCallback = function() {
       //加载完成构建 ppt实例
-      self.$emit('load')
+      self.$$emit('load')
     }
 
     /**

@@ -20,7 +20,7 @@ export default function distribute(Swiper) {
     data.frontIndex = pointer.frontIndex
     data.backIndex = pointer.backIndex
     data.middleIndex = this.visualIndex
-    this.$emit('onMove', data)
+    this.$$emit('onMove', data)
   }
 
   /*
@@ -32,10 +32,10 @@ export default function distribute(Swiper) {
   Swiper.prototype._distributeComplete = function (...arg) {
     this._setRestore(...arg)
     /*触发翻页结束，通过slideTo绑定*/
-    this.$emit('_slideFlipOver')
+    this.$$emit('_slideFlipOver')
     const callback = () => this.enable()
     setTimeout(() => {
-      this.$emit('onComplete', {
+      this.$$emit('onComplete', {
         unlock: callback,
         direction: this.direction,
         pagePointer: this.pagePointer,

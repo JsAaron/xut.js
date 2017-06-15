@@ -136,7 +136,7 @@ export default class Mediator extends Observer {
      * 过滤器.全局控制函数
      * return true 阻止页面滑动
      */
-    $$globalSwiper.$watch('onFilter', (hookCallback, point, evtObj) => {
+    $$globalSwiper.$$watch('onFilter', (hookCallback, point, evtObj) => {
       let node = point.target
       swiperHook(evtObj, node)
         //页面类型
@@ -167,7 +167,7 @@ export default class Mediator extends Observer {
     /**
      * 触屏松手点击，无滑动，判断为点击
      */
-    $$globalSwiper.$watch('onTap', (pageIndex, hookCallback) => {
+    $$globalSwiper.$$watch('onTap', (pageIndex, hookCallback) => {
       if (handlerObj) {
         if (handlerObj.handlers) {
           handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex)
@@ -185,7 +185,7 @@ export default class Mediator extends Observer {
     /**
      * 触屏滑动,通知pageMgr处理页面移动
      */
-    $$globalSwiper.$watch('onMove', (data) => {
+    $$globalSwiper.$$watch('onMove', (data) => {
       $$scheduler.movePageBases(data)
     });
 
@@ -193,7 +193,7 @@ export default class Mediator extends Observer {
     /**
      * 触屏滑动,通知ProcessMgr关闭所有激活的热点
      */
-    $$globalSwiper.$watch('onEnd', (pointers) => {
+    $$globalSwiper.$$watch('onEnd', (pointers) => {
       $$scheduler.suspendPageBases(pointers)
     });
 
@@ -201,7 +201,7 @@ export default class Mediator extends Observer {
     /**
      * 翻页动画完成回调
      */
-    $$globalSwiper.$watch('onComplete', (...arg) => {
+    $$globalSwiper.$$watch('onComplete', (...arg) => {
       $$scheduler.completePageBases(...arg)
     });
 
@@ -210,7 +210,7 @@ export default class Mediator extends Observer {
      * 鼠标滚轮
      */
     let wheellook = false //如果首页向上滑动，那么锁定马上可以向下滑动
-    $$globalSwiper.$watch('onWheel', (e, wheelDeltaY) => {
+    $$globalSwiper.$$watch('onWheel', (e, wheelDeltaY) => {
 
       const currPageBase = Xut.Presentation.GetPageBase($$globalSwiper.visualIndex)
 
@@ -264,7 +264,7 @@ export default class Mediator extends Observer {
      * 切换页面
      * @return {[type]}      [description]
      */
-    $$globalSwiper.$watch('onJumpPage', (data) => {
+    $$globalSwiper.$$watch('onJumpPage', (data) => {
       $$scheduler.gotoPageBases(data);
     });
 
@@ -273,7 +273,7 @@ export default class Mediator extends Observer {
      * 退出应用
      * @return {[type]}      [description]
      */
-    $$globalSwiper.$watch('onDropApp', (data) => {
+    $$globalSwiper.$$watch('onDropApp', (data) => {
       window.GLOBALIFRAME && Xut.publish('magazine:dropApp');
     });
 
@@ -284,7 +284,7 @@ export default class Mediator extends Observer {
      * 才需要重新激活对象
      * 删除parallaxProcessed
      */
-    $$globalSwiper.$watch('onMasterMove', (hindex, target) => {
+    $$globalSwiper.$$watch('onMasterMove', (hindex, target) => {
       if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
         $$scheduler.masterMgr && $$scheduler.masterMgr.reactivation(target);
       }
@@ -406,7 +406,7 @@ defAccess(Mediator.prototype, '$curVmPage', {
  */
 defProtected(Mediator.prototype, '$bind', function (key, callback) {
   const $$mediator = this
-  $$mediator.$watch('change:' + key, function () {
+  $$mediator.$$watch('change:' + key, function () {
     callback.apply($$mediator, arguments)
   })
 })
@@ -457,7 +457,7 @@ defProtected(Mediator.prototype, '$suspend', function () {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$destroy', function () {
-  this.$off(); //观察事件
+  this.$$unWatch(); //观察事件
   this.$$globalSwiper.destroy(); //全局事件
   this.$$scheduler.destroyManage(); //派发器
   this.$$scheduler = null;
