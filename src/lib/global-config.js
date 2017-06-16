@@ -86,7 +86,7 @@ export default {
    * 每次翻页必须等待资源加载完毕后才可以
    * @type {Boolean}
    */
-  preload:false,
+  preload: DEFAULT, //可以填数量，预加载的数量限制
 
   /*
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问
@@ -213,7 +213,7 @@ export default {
    * @type {Boolean}
    * false 关闭
    */
-  mouseWheel:DEFAULT, //默认根据横竖屏幕自定义
+  mouseWheel: DEFAULT, //默认根据横竖屏幕自定义
 
   /**
    * 适配平台

@@ -1,6 +1,6 @@
 import { initPointer, calculationIndex } from './pointer'
 import { ease } from './ease'
-import { requestInterrupt } from '../initialize/preload/index'
+import { requestInterrupt } from '../preload/index'
 import { config } from '../config/index'
 
 export default function api(Swiper) {

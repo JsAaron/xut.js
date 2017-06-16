@@ -10,7 +10,7 @@ import { ease } from './ease'
 import { $off, $handle, $event, $warn } from '../util/index'
 
 import { LINEARTAG } from './type'
-import { requestInterrupt } from '../initialize/preload/index'
+import { requestInterrupt } from '../preload/index'
 
 const transitionDuration = Xut.style.transitionDuration
 

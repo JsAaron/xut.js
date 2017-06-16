@@ -2,7 +2,7 @@ import { SceneFactory } from '../scenario/index'
 import { sceneController } from '../scenario/factory/control'
 import { showBusy, hideBusy, showTextBusy } from '../initialize/cursor'
 import { toNumber, $remove, $extend, $warn } from '../util/index'
-import { requestInterrupt } from '../initialize/preload/index'
+import { requestInterrupt } from '../preload/index'
 import { config } from '../config/index'
 
 export function initView() {

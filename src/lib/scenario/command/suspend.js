@@ -6,7 +6,7 @@ import access from './access'
 import { $stopAutoWatch } from './auto'
 import { hangUpAudio, clearAudio } from '../../component/audio/api'
 import { removeVideo, clearVideo } from '../../component/video/api'
-import { stopPreload } from '../../initialize/preload/index'
+import { stopPreload } from '../../preload/index'
 
 
 /**
@@ -26,7 +26,7 @@ export function $suspend(pageBase, pageId, allHandle) {
   access(pageBase, (pageBase, contentObjs) => {
 
     /*停止预加载*/
-    stopPreload()
+    // stopPreload()
 
     /*这个必须要，翻页停止AUTO的自动延时延时器，否则任务会乱套,e.g. 跨页面音频*/
     $stopAutoWatch()

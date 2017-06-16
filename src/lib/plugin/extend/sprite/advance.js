@@ -268,6 +268,9 @@ export default class {
    * @return {[type]} [description]
    */
   _change() {
+    if(!this.originalImageList){
+      return
+    }
     this._changeImageUrl()
     if (this.isSports) {
       this._changePosition()

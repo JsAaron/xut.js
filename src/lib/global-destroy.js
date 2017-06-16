@@ -9,7 +9,7 @@ import { clearId } from './util/stroage'
 import { clearAndroid } from './initialize/button'
 import { clearGlobalEvent } from './initialize/golbal-event'
 import { clearRootNode } from './initialize/root-node'
-import { clearPreload } from './initialize/preload/index'
+import { clearPreload } from './preload/index'
 
 /**
  * 销毁接口

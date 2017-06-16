@@ -4,7 +4,7 @@
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-export function audioParse(filePath, callback) {
+function audioParse(filePath, callback) {
   var audio = new Audio();
   audio.src = filePath;
 

@@ -7,7 +7,7 @@ import { initColumn } from '../component/column/init'
 import { contentFilter } from '../component/activity/content/content-filter'
 import { config, initConfig, initPathAddress } from '../config/index'
 
-import { initPreload, startPreload } from '../initialize/preload/index'
+import { initPreload, startPreload } from '../preload/index'
 
 /**
  * 新增模式,用于记录浏览器退出记录
@@ -183,7 +183,7 @@ export default function baseConfig(callback) {
         configColumn(function() {
           if (config.launch.preload) {
             /*监听初始化第一次完成*/
-            Xut.Application.Watch('autoRunComplete', startPreload);
+            Xut.Application.onceWatch('autoRunComplete', startPreload);
             /*资源预加载*/
             initPreload(dataRet.Chapter.length, () => callback(novelData))
           } else {
