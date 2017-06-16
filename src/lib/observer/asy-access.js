@@ -10,7 +10,6 @@ export class AsyAccess extends Observer {
 
   constructor() {
     super()
-    this.vernier = 0
     this.asys = []
   }
 
@@ -31,17 +30,15 @@ export class AsyAccess extends Observer {
    */
   exec() {
     if (this.asys.length) {
-      /*监听完成书来个*/
-      const watchComplete = () => {
-        ++this.vernier;
-        if (this.asys.length === this.vernier) {
+      const next = () => {
+        if (this.asys.length) {
+          const asy = this.asys.shift()
+          asy(next)
+        } else {
           this.$$emit('complete')
-          return
         }
       }
-      for (let i = 0; i < this.asys.length; i++) {
-        this.asys[i](watchComplete)
-      }
+      next()
     }
     return this
   }

@@ -9,10 +9,10 @@
 ****************/
 import { config } from '../config/index'
 import { $warn, loadFigure, loadFile } from '../util/index'
-import { audioParse } from './frame/audio'
-import { videoParse } from './frame/video'
+import { audioParse } from './parser/audio'
+import { videoParse } from './parser/video'
+import formatHooks from './parser/format'
 import { AsyAccess } from '../observer/asy-access'
-import formatHooks from './frame/format'
 
 const PARSE = {
   // master 母版标记特殊处理
@@ -84,8 +84,8 @@ function createProcessor(type, childData, parse, isInit) {
     let masterId = childData
     let masterData = preloadData[masterId]
     if (masterData) {
-      return function (callback) {
-        loadResource(masterData, function () {
+      return function(callback) {
+        loadResource(masterData, function() {
           /*删除母版数据，多个Page会共享同一个母版加载*/
           deleteResource(masterId)
           callback()
@@ -96,7 +96,7 @@ function createProcessor(type, childData, parse, isInit) {
     childData = formatHooks[type](childData)
     let total = childData.length
     let basePath = childData.basePath
-    return function (callback) {
+    return function(callback) {
       /**
        * 分段间隔
        * 1.初始化全速
@@ -111,6 +111,7 @@ function createProcessor(type, childData, parse, isInit) {
 
       /**检测当然分段数是否完成*/
       function complete() {
+        // console.log('childData.fileNames',childData.fileNames.length)
         if (childData.fileNames.length) {
           segmentHandle()
         } else {
@@ -122,8 +123,6 @@ function createProcessor(type, childData, parse, isInit) {
        * 分段处理
        */
       function segmentHandle() {
-
-        console.log('加载数据，类型：' + type + ' 数量：' + section)
 
         let analyticData;
         let clean = false
@@ -138,7 +137,12 @@ function createProcessor(type, childData, parse, isInit) {
         }
 
         /*分段检测的回到次数*/
-        let analyticCount = analyticData.length
+        let analyticCount  = analyticData.length
+
+        let bakAnalyticCount = analyticCount
+
+        // console.log('加载类型：' + type + ' --- 数量：' + analyticCount)
+
         analyticData.forEach(name => {
           parse(basePath + name, () => {
             if (analyticCount === 1) {
@@ -146,6 +150,7 @@ function createProcessor(type, childData, parse, isInit) {
                 /*分段处理完毕就清理，用于判断跳出*/
                 childData.fileNames.length = 0
               }
+              // console.log('完成类型：' + type + ' --- 数量：' + bakAnalyticCount)
               complete()
               return;
             }
@@ -229,7 +234,7 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   const pageData = preloadData[chapterId]
   if (pageData) {
-    loadResource(pageData, function () {
+    loadResource(pageData, function() {
       console.log('【预加资源完成chapterId: ' + chapterId + '】')
       deleteResource(chapterId)
       repeatCheck(loadingId, callback)
@@ -245,7 +250,7 @@ function nextTask(chapterId, callback) {
  * 自身js解析
  */
 function _initJS(total, callback) {
-  loadFile(config.data.pathAddress + 'preload.js', function () {
+  loadFile(config.data.pathAddress + 'preload.js', function() {
     if (window.preloadData) {
       chapterIdCount = total
       preloadData = window.preloadData
@@ -261,7 +266,7 @@ function _initJS(total, callback) {
  * worker线程解析
  */
 function _initWorker(total, callback) {
-  loadFile(config.data.pathAddress + 'preload.js', function () {
+  loadFile(config.data.pathAddress + 'preload.js', function() {
     if (window.preloadData) {
       const worker = new Worker("/lib/preload/worker/index.js");
       worker.postMessage({
@@ -298,7 +303,7 @@ export function startPreload(total, callback) {
   /*从第2页开始预加载*/
   if (preloadData) {
     enable = true
-    setTimeout(function () {
+    setTimeout(function() {
       nextTask()
     }, 0)
   }
@@ -343,7 +348,7 @@ export function requestInterrupt({
     if (!processed) {
       $warn('预加载必须传递处理器，有错误')
     }
-    notification = [chapterId, function () {
+    notification = [chapterId, function() {
       processed.call(context)
     }]
     return true
