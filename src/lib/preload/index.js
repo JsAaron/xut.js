@@ -9,7 +9,7 @@
 ****************/
 import { config } from '../config/index'
 import { $warn, loadFigure, loadFile } from '../util/index'
-import { audioParse } from './parser/audio'
+import { audioParse, setAudio } from './parser/audio'
 import { videoParse } from './parser/video'
 import formatHooks from './parser/format'
 import { AsyAccess } from '../observer/asy-access'
@@ -71,6 +71,13 @@ function deleteResource(chaperId) {
   preloadData[chaperId] = null
 }
 
+/**
+ * 获取初始化数
+ * @return {[type]} [description]
+ */
+function getNumber() {
+  return typeof config.launch.preload === 'number' ? config.launch.preload : 5
+}
 
 /**
  * 创建对应的处理器
@@ -97,17 +104,8 @@ function createProcessor(type, childData, parse, isInit) {
     let total = childData.length
     let basePath = childData.basePath
     return function(callback) {
-      /**
-       * 分段间隔
-       * 1.初始化全速
-       * 2.后续页面分段
-       */
-      let section
-      if (isInit) {
-        section = total
-      } else {
-        section = typeof config.launch.preload === 'number' ? config.launch.preload : 5
-      }
+
+      let section = getNumber()
 
       /**检测当然分段数是否完成*/
       function complete() {
@@ -137,7 +135,7 @@ function createProcessor(type, childData, parse, isInit) {
         }
 
         /*分段检测的回到次数*/
-        let analyticCount  = analyticData.length
+        let analyticCount = analyticData.length
 
         let bakAnalyticCount = analyticCount
 
@@ -252,6 +250,7 @@ function nextTask(chapterId, callback) {
 function _initJS(total, callback) {
   loadFile(config.data.pathAddress + 'preload.js', function() {
     if (window.preloadData) {
+      setAudio(getNumber()) //初始化音频
       chapterIdCount = total
       preloadData = window.preloadData
       window.preloadData = null
