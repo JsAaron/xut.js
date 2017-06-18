@@ -183,7 +183,7 @@ function loadResource(data, callback, isInit) {
  * 检测下一个解析任务
  * 以及任务的完成度
  */
-function repeatCheck(loadingId, callback) {
+function repeatCheck(id, callback) {
 
   /*第一次加载才有回调*/
   if (callback) {
@@ -194,7 +194,7 @@ function repeatCheck(loadingId, callback) {
   /*执行预加载等待的回调通知对象*/
   if (notification) {
     const newChapterId = notification[0]
-    if (loadingId === newChapterId) {
+    if (id === newChapterId) {
       /*如果下一个解析正好是等待的页面*/
       notification[1]()
       notification = null
@@ -206,7 +206,7 @@ function repeatCheck(loadingId, callback) {
   }
 
   /*如果加载数等于总计量数，这个证明加载完毕*/
-  if (loadingId === chapterIdCount) {
+  if (id === chapterIdCount) {
     console.log('全部预加载完成')
     return
   }
