@@ -245,12 +245,14 @@ function nextTask(chapterId, callback) {
 
 
 /**
- * 自身js解析
+ * 资源加载接口
+ * 必须先预加载第一页
+ * @return {[type]} [description]
  */
-function _initJS(total, callback) {
+export function initPreload(total, callback) {
   loadFile(config.data.pathAddress + 'preload.js', function() {
     if (window.preloadData) {
-      setAudio(getNumber()) //初始化音频
+      setAudio(getNumber()) //初始化音频解析对象
       chapterIdCount = total
       preloadData = window.preloadData
       window.preloadData = null
@@ -259,36 +261,6 @@ function _initJS(total, callback) {
       callback()
     }
   })
-}
-
-/**
- * worker线程解析
- */
-function _initWorker(total, callback) {
-  loadFile(config.data.pathAddress + 'preload.js', function() {
-    if (window.preloadData) {
-      const worker = new Worker("/lib/preload/worker/index.js");
-      worker.postMessage({
-        action: 'initData',
-        value: window.preloadData,
-        rootPath: config.data.rootPath
-      });
-      window.preloadData = null
-      worker.postMessage({ action: 'initTask' })
-    } else {
-      callback()
-    }
-  })
-}
-
-
-/**
- * 资源加载接口
- * 必须先预加载第一页
- * @return {[type]} [description]
- */
-export function initPreload(total, callback) {
-  _initJS(total, callback)
 }
 
 
