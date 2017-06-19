@@ -11,17 +11,19 @@ import { config } from '../config/index'
 import { $warn, loadFigure, loadFile } from '../util/index'
 import { audioParse } from './parser/audio'
 import { videoParse } from './parser/video'
+import { svgParse } from './parser/svg'
 import formatHooks from './parser/format'
 import { AsyAccess } from '../observer/asy-access'
 
 const PARSE = {
-  // master 母版标记特殊处理
+  // master 母版标记特殊处理，递归PARSE
   // video: videoParse
   content: loadFigure,
   widget: loadFigure,
   autoSprite: loadFigure,
   seniorSprite: loadFigure,
-  audio: audioParse
+  audio: audioParse,
+  svg: svgParse
 }
 
 /**
