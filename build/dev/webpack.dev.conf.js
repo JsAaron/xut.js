@@ -11,7 +11,7 @@ const WriteFilePlugin = require('write-file-webpack-plugin');
 baseWebpackConfig.entry = ['./build/dev/client'].concat(baseWebpackConfig.entry)
 
 module.exports = merge(baseWebpackConfig, {
-  devtool: 'cheap-eval-source-map',
+  devtool:'cheap-module-source-map',
   plugins: [
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     // new webpack.optimize.OccurenceOrderPlugin(),

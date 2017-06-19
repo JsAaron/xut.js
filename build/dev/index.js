@@ -14,8 +14,7 @@ const utils = require('../utils')
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
 const killOccupied = require('../kill.occupied')
-const convertSVG = require('../convert.svg')
-const serialData = require('../serial.data')
+const convert = require('../convert/index')
 
 const app = express()
 const config = require('../../config')
@@ -25,8 +24,12 @@ const devConfig = _.extend(config.dev.conf, {
   rollup: config.dev.conf.distDir + 'rollup.js'
 })
 
-convertSVG(devConfig.srcDir)
-serialData(devConfig.srcDir)
+/**
+ * 转化
+ * 1 数据 db-json
+ * 2 文件 svg-js
+ */
+convert(devConfig.srcDir)
 
 fsextra.removeSync(devConfig.assetsRoot)
 fsextra.mkdirSync(devConfig.assetsRoot);
