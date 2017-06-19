@@ -1,4 +1,4 @@
-import { loadFile } from '../../../util/loader'
+import { loadFile } from '../../../util/loader/file'
 import { config } from '../../../config/index'
 
 /**

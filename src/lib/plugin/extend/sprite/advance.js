@@ -6,8 +6,7 @@
  * 2.复杂精灵动画
  *   提供给普通转化高级使用
  */
-import { loadFigure } from '../../../util/loader'
-import { getFileFullPath } from '../../../util/option'
+import { getFileFullPath, loadFigure } from '../../../util/index'
 import { config } from '../../../config/index'
 
 /*
@@ -268,7 +267,7 @@ export default class {
    * @return {[type]} [description]
    */
   _change() {
-    if(!this.originalImageList){
+    if (!this.originalImageList) {
       return
     }
     this._changeImageUrl()

@@ -1,6 +1,6 @@
 export * from './lang'
 export * from './event'
-export * from './loader'
+export * from './loader/index'
 export * from './stroage'
 export * from './option'
 export * from './buffer'

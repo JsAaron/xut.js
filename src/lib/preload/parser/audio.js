@@ -9,16 +9,6 @@
 let index = 0
 let cacheAudio = []
 
-function getAudio() {
-  var audio = cacheAudio[index++]
-  if (!audio) {
-    index = 0
-    return getAudio()
-  }
-  return audio
-}
-
-
 /**
  * 设置audio个数
  * 1 根据preload
@@ -41,6 +31,15 @@ export function setAudio(total) {
   }
 }
 
+function getAudio() {
+  const audio = cacheAudio[index++]
+  if (!audio) {
+    index = 0
+    return getAudio()
+  }
+  return audio
+}
+
 
 /**
  * 音频文件解析
@@ -50,7 +49,7 @@ export function setAudio(total) {
  */
 export function audioParse(filePath, callback) {
 
-  let audio = new Audio();
+  let audio = new Audio()
 
   audio.src = filePath;
   audio.muted = "muted";
@@ -58,13 +57,13 @@ export function audioParse(filePath, callback) {
   audio.autobuffer = true
 
   function success() {
-    callback()
     clear()
+    callback()
   }
 
   function error() {
-    callback()
     clear()
+    callback()
   }
 
   function clear() {

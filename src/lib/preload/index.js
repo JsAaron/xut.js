@@ -9,7 +9,7 @@
 ****************/
 import { config } from '../config/index'
 import { $warn, loadFigure, loadFile } from '../util/index'
-import { audioParse, setAudio } from './parser/audio'
+import { audioParse } from './parser/audio'
 import { videoParse } from './parser/video'
 import formatHooks from './parser/format'
 import { AsyAccess } from '../observer/asy-access'
@@ -91,8 +91,8 @@ function createProcessor(type, childData, parse, isInit) {
     let masterId = childData
     let masterData = preloadData[masterId]
     if (masterData) {
-      return function(callback) {
-        loadResource(masterData, function() {
+      return function (callback) {
+        loadResource(masterData, function () {
           /*删除母版数据，多个Page会共享同一个母版加载*/
           deleteResource(masterId)
           callback()
@@ -103,19 +103,9 @@ function createProcessor(type, childData, parse, isInit) {
     childData = formatHooks[type](childData)
     let total = childData.length
     let basePath = childData.basePath
-    return function(callback) {
+    return function (callback) {
 
       let section = getNumber()
-
-      /**检测当然分段数是否完成*/
-      function complete() {
-        // console.log('childData.fileNames',childData.fileNames.length)
-        if (childData.fileNames.length) {
-          segmentHandle()
-        } else {
-          callback()
-        }
-      }
 
       /**
        * 分段处理
@@ -123,7 +113,7 @@ function createProcessor(type, childData, parse, isInit) {
       function segmentHandle() {
 
         let analyticData;
-        let clean = false
+        let hasComplete = false
 
         /*如果可以取整*/
         if (childData.fileNames.length > section) {
@@ -131,26 +121,24 @@ function createProcessor(type, childData, parse, isInit) {
         } else {
           /*如果小于等于检测数*/
           analyticData = childData.fileNames
-          clean = true
+          hasComplete = true
         }
 
         /*分段检测的回到次数*/
         let analyticCount = analyticData.length
 
-        let bakAnalyticCount = analyticCount
-
-        // console.log('加载类型：' + type + ' --- 数量：' + analyticCount)
+        // $warn('加载类型：' + type + ' --- 数量：' + analyticCount)
 
         analyticData.forEach(name => {
           parse(basePath + name, () => {
             if (analyticCount === 1) {
-              if (clean) {
+              if (hasComplete) {
                 /*分段处理完毕就清理，用于判断跳出*/
-                childData.fileNames.length = 0
+                callback()
+                return
+              } else {
+                segmentHandle()
               }
-              // console.log('完成类型：' + type + ' --- 数量：' + bakAnalyticCount)
-              complete()
-              return;
             }
             --analyticCount
           })
@@ -207,7 +195,7 @@ function repeatCheck(id, callback) {
 
   /*如果加载数等于总计量数，这个证明加载完毕*/
   if (id === chapterIdCount) {
-    console.log('全部预加载完成')
+    $warn('全部预加载完成')
     return
   }
 
@@ -232,13 +220,13 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   const pageData = preloadData[chapterId]
   if (pageData) {
-    loadResource(pageData, function() {
-      console.log('【预加资源完成chapterId: ' + chapterId + '】')
+    loadResource(pageData, function () {
+      $warn('【预加资源完成chapterId: ' + chapterId + '】')
       deleteResource(chapterId)
       repeatCheck(loadingId, callback)
     }, callback)
   } else {
-    console.log('【预加资源已处理，chapterId: ' + chapterId + '】')
+    $warn('【预加资源已处理，chapterId: ' + chapterId + '】')
     repeatCheck(loadingId, callback)
   }
 }
@@ -250,14 +238,14 @@ function nextTask(chapterId, callback) {
  * @return {[type]} [description]
  */
 export function initPreload(total, callback) {
-  loadFile(config.data.pathAddress + 'preload.js', function() {
+  loadFile(config.data.pathAddress + 'preload.js', function () {
     if (window.preloadData) {
-      setAudio(getNumber()) //初始化音频解析对象
       chapterIdCount = total
       preloadData = window.preloadData
       window.preloadData = null
       nextTask('', callback)
     } else {
+      config.launch.preload = false
       callback()
     }
   })
@@ -274,7 +262,7 @@ export function startPreload(total, callback) {
   /*从第2页开始预加载*/
   if (preloadData) {
     enable = true
-    setTimeout(function() {
+    setTimeout(function () {
       nextTask()
     }, 0)
   }
@@ -319,7 +307,7 @@ export function requestInterrupt({
     if (!processed) {
       $warn('预加载必须传递处理器，有错误')
     }
-    notification = [chapterId, function() {
+    notification = [chapterId, function () {
       processed.call(context)
     }]
     return true

@@ -1,4 +1,4 @@
-import { loadFile } from './loader'
+import { loadFile } from './loader/file'
 import { $warn } from './debug'
 import { parseJSON } from './lang'
 import { config, resetVisualProportion } from '../config/index'
