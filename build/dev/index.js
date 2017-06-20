@@ -15,6 +15,7 @@ const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
 const killOccupied = require('../kill.occupied')
 const convert = require('../convert/index')
+// const cssWatcher = require('../cssWatcher')
 
 const app = express()
 const config = require('../../config')
@@ -88,7 +89,11 @@ compiler.plugin('compilation', (compilation) => {
     cb()
   })
 })
-
+// cssWatcher(devConfig.srcDir,function() {
+//    hotMiddleware.publish({
+//       action: 'reload'
+//     })
+// })
 // serve webpack bundle output
 app.use(devMiddleware)
 
