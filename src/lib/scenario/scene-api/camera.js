@@ -1,6 +1,7 @@
 /********************************************
  * 虚拟摄像机运行的接口
  ********************************************/
+import { config } from '../../config/index'
 
 export function extendCamera(access, $$globalSwiper) {
 
@@ -13,6 +14,8 @@ export function extendCamera(access, $$globalSwiper) {
      delay 延时执行时间
    */
   Xut.Camera.MoveX = function (position, speed, delay) {
-    $$globalSwiper.scrollToPosition(position, speed, delay)
+    if (config.launch.visualMode === 5) {
+      $$globalSwiper.scrollToPosition(position, speed, delay)
+    }
   }
 }

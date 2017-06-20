@@ -32,6 +32,7 @@ const formatObject = function (data, basePath) {
   }
 }
 
+
 export default {
 
   /**
@@ -52,6 +53,12 @@ export default {
       return formatString(data, config.data.pathAddress)
     },
 
+    /**
+     * svg
+     */
+    svg(data) {
+      return formatString(data, config.data.pathAddress)
+    },
 
     /**
      * 零件图片

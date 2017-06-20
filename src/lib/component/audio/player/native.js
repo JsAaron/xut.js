@@ -63,7 +63,12 @@ export class NativeVideo extends AudioSuper {
       this._$$callbackProcess(false)
     }
 
-    this.audio.addEventListener('canplay', this._canplayCallBack, false)
+    /*微信不支持canplay事件*/
+    if (window.WeixinJSBridge) {
+      this._startPlay()
+    } else {
+      this.audio.addEventListener('canplay', this._canplayCallBack, false)
+    }
     this.audio.addEventListener('ended', this._endCallBack, false)
     this.audio.addEventListener('error', this._errorCallBack, false)
   }

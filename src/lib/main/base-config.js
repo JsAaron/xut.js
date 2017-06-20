@@ -6,6 +6,7 @@ import { createCursor } from '../initialize/cursor'
 import { initColumn } from '../component/column/init'
 import { contentFilter } from '../component/activity/content/content-filter'
 import { config, initConfig, initPathAddress } from '../config/index'
+import { getSize } from '../config/v-screen'
 
 import { initPreload, startPreload } from '../preload/index'
 
@@ -35,7 +36,7 @@ const setHistory = (data) => {
 }
 
 /*画轴模式*/
-const setPaintingMode = function(data) {
+const setPaintingMode = function (data) {
   if (!config.launch.visualMode && Number(data.scrollPaintingMode)) {
     config.launch.visualMode = 4
   }
@@ -43,7 +44,7 @@ const setPaintingMode = function(data) {
 
 
 /*最大屏屏幕尺寸*/
-const getMaxWidth = function() {
+const getMaxWidth = function () {
   if (config.visualSize) {
     return config.visualSize.width
   }
@@ -60,7 +61,7 @@ const getMaxWidth = function() {
  * 1080: 'mi', //1080-1439
  * 1440: 'hi' //1440->
  */
-const setDefaultSuffix = function() {
+const setDefaultSuffix = function () {
   let doc = document.documentElement
     //竖版的情况才调整
   if (doc.clientHeight > doc.clientWidth) {
@@ -80,7 +81,7 @@ const setDefaultSuffix = function() {
 }
 
 /*自适应图片*/
-const adaptiveImage = function() {
+const adaptiveImage = function () {
   let $adaptiveImageNode = $('.xut-adaptive-image')
   if ($adaptiveImageNode.length) {
     let baseImageType = $adaptiveImageNode.width()
@@ -96,7 +97,7 @@ const adaptiveImage = function() {
 /*
   配置初始化
  */
-const configInit = function(novelData, tempSettingData) {
+const configInit = function (novelData, tempSettingData) {
 
   /*启动代码用户操作跟踪:启动*/
   config.sendTrackCode('launch')
@@ -130,7 +131,7 @@ const configInit = function(novelData, tempSettingData) {
  * 嵌入index分栏
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
-const configColumn = function(callback) {
+const configColumn = function (callback) {
   initColumn(haColumnCounts => {
     if (haColumnCounts) {
       //动画事件委托
@@ -158,7 +159,7 @@ export default function baseConfig(callback) {
   setFastAnalysisRE()
 
   importJsonDatabase((hasResults) => {
-    initDB(hasResults, function(dataRet) {
+    initDB(hasResults, function (dataRet) {
       const novelData = dataRet.Novel.item(0)
       const tempSettingData = initDefaults(dataRet.Setting)
 
@@ -174,13 +175,24 @@ export default function baseConfig(callback) {
         config.launch.visualMode = config.data.visualMode || 1
       }
 
+      /**
+       * 模式5 只在竖版下使用
+       */
+      if (config.launch.visualMode === 5) {
+        const screen = getSize()
+        if (screen.height < screen.width) {
+          config.launch.visualMode = 1
+        }
+      }
+
+
       /*配置config*/
       configInit(novelData, tempSettingData)
 
       /*加载svg的样式*/
-      loadGolbalStyle('svgsheet', function() {
+      loadGolbalStyle('svgsheet', function () {
         /*分栏*/
-        configColumn(function() {
+        configColumn(function () {
           if (config.launch.preload) {
             /*监听初始化第一次完成*/
             Xut.Application.onceWatch('autoRunComplete', startPreload);

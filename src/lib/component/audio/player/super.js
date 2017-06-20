@@ -140,7 +140,7 @@ export default class AudioSuper {
     if (this.audio && !this.isFlash) {
       this.status = 'playing';
       //支持自动播放,微信上单独处理
-      if (Xut.plat.hasAutoPlayAudio && window.WeixinJSBridge) {
+      if (window.WeixinJSBridge) {
         window.WeixinJSBridge.invoke('getNetworkType', {}, (e) => {
           this.audio.play();
         })

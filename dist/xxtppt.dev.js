@@ -41779,6 +41779,13 @@ var improtGolbalConfig = {
    */
   banMove: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
 
+  /**
+   * 是否预加载资源
+   * 每次翻页必须等待资源加载完毕后才可以
+   * @type {Boolean}
+   */
+  preload: DEFAULT, //可以填数量，预加载的数量限制
+
   /*
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问
   比如，mini客户端
@@ -43024,6 +43031,11 @@ function $event(e) {
   return e.touches && e.touches[0] ? e.touches[0] : e;
 }
 
+/**
+ *  加载文件
+ *  css/js
+ */
+
 var isOldWebKit = +navigator.userAgent.replace(/.*AppleWebKit\/(\d+)\..*/, "$1") < 536;
 
 function pollCss(node, callback) {
@@ -43136,85 +43148,92 @@ function loadFile(url, callback, charset) {
 }
 
 /**
- * 加载图片
+ * 图片预加载
  */
-var loadFigure = function () {
 
-  var list = [];
-  var intervalId = null;
+var list = [];
+var intervalId = null;
 
-  // 用来执行队列
-  var tick = function tick() {
-    var i = 0;
-    for (; i < list.length; i++) {
-      list[i].end ? list.splice(i--, 1) : list[i]();
-    }
-    !list.length && stop();
-  };
+/**
+ * 用来执行队列
+ * @return {[type]} [description]
+ */
+var tick = function tick() {
+  var i = 0;
+  for (; i < list.length; i++) {
+    list[i].end ? list.splice(i--, 1) : list[i]();
+  }
+  !list.length && stop();
+};
 
-  // 停止所有定时器队列
-  var stop = function stop() {
-    clearInterval(intervalId);
-    intervalId = null;
-  };
+/**
+ * 停止所有定时器队列
+ * @return {[type]} [description]
+ */
+var stop = function stop() {
+  clearInterval(intervalId);
+  intervalId = null;
+};
 
-  return function (url, ready, load, error) {
-    var _onready,
-        width,
-        height,
-        newWidth,
-        newHeight,
-        img = new Image();
+/**
+ * callback(1,2)
+ * 1 图片加载状态 success / fail   true/false
+ * 2 图片是否被缓存 hasCache       ture/false
+ */
+function loadFigure(url, callback) {
 
-    img.src = url;
+  var img = new Image();
+  img.src = url;
 
-    // 如果图片被缓存，则直接返回缓存数据
-    if (img.complete) {
-      ready && ready.call(img);
-      load && load.call(img);
-      return;
-    }
+  // 如果图片被缓存，则直接返回缓存数据
+  if (img.complete) {
+    callback && callback.call(img, true, true);
+    return;
+  }
 
-    width = img.width;
-    height = img.height;
+  var width = img.width;
+  var height = img.height;
 
-    // 加载错误后的事件
-    img.onerror = function () {
-      error && error.call(img);
-      _onready.end = true;
-      img = img.onload = img.onerror = null;
-    };
-
-    // 图片尺寸就绪
-    _onready = function onready() {
-      newWidth = img.width;
-      newHeight = img.height;
-      if (newWidth !== width || newHeight !== height ||
-      // 如果图片已经在其他地方加载可使用面积检测
-      newWidth * newHeight > 1024) {
-        ready && ready.call(img);
-        _onready.end = true;
-      }
-    };
-    _onready();
-    // 完全加载完毕的事件
-    img.onload = function () {
-      // onload在定时器时间差范围内可能比onready快
-      // 这里进行检查并保证onready优先执行
-      !_onready.end && _onready();
-      load && load.call(img);
-      // IE gif动画会循环执行onload，置空onload即可
-      img = img.onload = img.onerror = null;
-    };
-
-    // 加入队列中定期执行
-    if (!_onready.end) {
-      list.push(_onready);
-      // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-      if (intervalId === null) intervalId = setInterval(tick, 40);
+  /**
+   * 图片尺寸就绪
+   * 判断图片是否已经被缓存了
+   */
+  var onready = function onready(hasCache) {
+    var newWidth = img.width;
+    var newHeight = img.height;
+    // 如果图片已经在其他地方加载可使用面积检测
+    if (newWidth !== width || newHeight !== height || newWidth * newHeight > 1024) {
+      callback && callback.call(img, true, hasCache);
+      onready.end = true;
     }
   };
-}();
+
+  // 加载错误后的事件
+  img.onerror = function () {
+    onready.end = true;
+    img = img.onload = img.onerror = null;
+    callback && callback.call(img, false);
+  };
+
+  /**检测是不是已经缓存了*/
+  onready(true);
+
+  // 完全加载完毕的事件
+  img.onload = function () {
+    // onload在定时器时间差范围内可能比onready快
+    // 这里进行检查并保证onready优先执行
+    !onready.end && onready();
+    // IE gif动画会循环执行onload，置空onload即可
+    img = img.onload = img.onerror = null;
+  };
+
+  // 加入队列中定期执行
+  if (!onready.end) {
+    list.push(onready);
+    // 无论何时只允许出现一个定时器，减少浏览器性能损耗
+    if (intervalId === null) intervalId = setInterval(tick, 40);
+  }
+}
 
 var onlyId = void 0;
 
@@ -45569,6 +45588,736 @@ function contentFilter(filterName) {
 }
 
 /**
+ * 音频文件解析
+ * @param  {[type]}   filePath [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ *
+ * */
+
+var cacheAudio = [];
+
+/**
+ * 设置audio个数
+ * 1 根据preload
+ * 2 如果是重复加载，判断缓存已创建的
+ */
+
+
+/**
+ * 音频文件解析
+ * @param  {[type]}   filePath [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+function audioParse(filePath, callback) {
+
+  var audio = new Audio();
+
+  audio.src = filePath;
+  audio.muted = "muted";
+  audio.preload = "auto";
+  audio.autobuffer = true;
+
+  function success() {
+    clear();
+    callback();
+  }
+
+  function error() {
+    clear();
+    callback();
+  }
+
+  function clear() {
+    audio.removeEventListener("canplaythrough", success, false);
+    audio.removeEventListener("error", error, false);
+    audio = null;
+  }
+
+  audio.addEventListener("canplaythrough", success, false);
+  audio.addEventListener("error", error, false);
+}
+
+/**
+ * 视频文件解析
+ * @param  {[type]}   filePath [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+
+/**
+ * 视频SVG解析
+ */
+function svgParse(filePath, callback) {
+  $.ajax({
+    url: filePath,
+    complete: callback
+  });
+}
+
+/**
+ * 格式字符串
+ */
+var formatString = function formatString(data, basePath) {
+  data = data.split(',');
+  return {
+    basePath: basePath,
+    fileNames: data,
+    length: data.length
+  };
+};
+
+/**
+ * 格式对象
+ */
+var formatObject = function formatObject(data, basePath) {
+  var fileNames = [];
+
+  var _loop = function _loop(dir) {
+    var d = data[dir].split(',');
+    d.forEach(function (name) {
+      fileNames.push(basePath + dir + '/' + name);
+    });
+  };
+
+  for (var dir in data) {
+    _loop(dir);
+  }
+  return {
+    fileNames: fileNames,
+    basePath: '', //路径写到fileNames中了
+    length: fileNames.length
+  };
+};
+
+var formatHooks = {
+
+  /**
+   * 文本图片
+   */
+  content: function content(data) {
+    return formatString(data, config.data.pathAddress);
+  },
+
+
+  /**
+   * 媒体
+   * @type {[type]}
+   */
+  audio: function audio(data) {
+    return formatString(data, config.data.pathAddress);
+  },
+  video: function video(data) {
+    return formatString(data, config.data.pathAddress);
+  },
+
+
+  /**
+   * svg
+   */
+  svg: function svg(data) {
+    return formatString(data, config.data.pathAddress);
+  },
+
+
+  /**
+   * 零件图片
+   */
+  widget: function widget(data) {
+    return formatString(data, config.data.rootPath + '/widget/gallery/');
+  },
+
+
+  /**
+   * content下的自动精灵动画
+   * autoSprite: {
+   *   2: '1.jpg,2.jpg',
+   *   3: '1.jpg,2.jpg'
+   * }
+   */
+  autoSprite: function autoSprite(data) {
+    return formatObject(data, config.data.pathAddress);
+  },
+
+
+  /*
+    高级精灵动画
+    seniorSprite: {
+      2: '1.jpg,2.jpg',
+      3: '1.jpg,2.jpg'
+    }
+  */
+  seniorSprite: function seniorSprite(data) {
+    return formatObject(data, config.data.rootPath + '/widget/gallery/');
+  }
+};
+
+/**
+ *
+ * 基本事件管理
+ * 1 异步
+ * 2 同步
+ *
+ */
+
+var ArrayProto = Array.prototype;
+var nativeIndexOf = ArrayProto.indexOf;
+var slice = ArrayProto.slice;
+var _indexOf = function _indexOf(array, needle) {
+  var i, l;
+  if (nativeIndexOf && array.indexOf === nativeIndexOf) {
+    return array.indexOf(needle);
+  }
+  for (i = 0, l = array.length; i < l; i++) {
+    if (array[i] === needle) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+var Observer = function () {
+  function Observer() {
+    classCallCheck(this, Observer);
+
+    this.$$watch = this.bind;
+    this.$$unWatch = this.unbind;
+    this.$$emit = this.trigger;
+    this.$$once = this.one;
+
+    //触发列表名称
+    //防止同步触发
+    this._handleName = {};
+  }
+
+  createClass(Observer, [{
+    key: "bind",
+    value: function bind(event, fn) {
+      var i, part;
+      var events = this.events = this.events || {};
+      var parts = event.split(/\s+/);
+      var num = parts.length;
+
+      for (i = 0; i < num; i++) {
+        events[part = parts[i]] = events[part] || [];
+        if (_indexOf(events[part], fn) === -1) {
+          events[part].push(fn);
+        }
+      }
+
+      //假如存在同步句柄
+      //执行
+      var data;
+      if (data = this._handleName[event]) {
+        this.$$emit(event, data[0]);
+      }
+
+      return this;
+    }
+  }, {
+    key: "one",
+    value: function one(event, fn) {
+      // [notice] The value of fn and fn1 is not equivalent in the case of the following MSIE.
+      // var fn = function fn1 () { alert(fn === fn1) } ie.<9 false
+      var fnc = function fnc() {
+        this.unbind(event, fnc);
+        fn.apply(this, slice.call(arguments));
+      };
+      this.bind(event, fnc);
+      return this;
+    }
+
+    //event = 'a b c' 空格分离多个事件名
+    //提供fn 指定在某个事件中删除某一个
+    //否则只提供事件名 ，全删除
+
+  }, {
+    key: "unbind",
+    value: function unbind(event, fn) {
+
+      var eventName, i, index, num, parts;
+      var events = this.events;
+
+      if (!events) return this;
+
+      //指定
+      if (arguments.length) {
+        parts = event.split(/\s+/);
+        for (i = 0, num = parts.length; i < num; i++) {
+          if ((eventName = parts[i]) in events !== false) {
+            //如果提供函数引用
+            //那么就是在数组中删除其中一个
+            if (fn) {
+              index = _indexOf(events[eventName], fn);
+              if (index !== -1) {
+                events[eventName].splice(index, 1);
+              }
+            } else {
+              //如果只提供了名字，则全删除
+              events[eventName] = null;
+            }
+
+            //如果没有内容了
+            if (!events[eventName] || !events[eventName].length) {
+              delete events[eventName];
+            }
+          }
+        }
+      } else {
+        this.events = null;
+      }
+
+      return this;
+    }
+  }, {
+    key: "trigger",
+    value: function trigger(event) {
+      var args, i;
+      var events = this.events,
+          handlers;
+
+      //参数
+      args = slice.call(arguments, 1);
+
+      if (!events || event in events === false) {
+        // console.log(event)
+        //同步的情况
+        //如果除非了事件，可能事件句柄还没有加载
+        this._handleName[event] = args;
+        return this;
+      }
+
+      handlers = events[event];
+      for (i = 0; i < handlers.length; i++) {
+        handlers[i].apply(this, args);
+      }
+      return this;
+    }
+  }]);
+  return Observer;
+}();
+
+/**
+ *  异步存取器
+ *  用于异步任务创建
+ *  转化同步处理的一个类
+ */
+
+var AsyAccess = function (_Observer) {
+  inherits(AsyAccess, _Observer);
+
+  function AsyAccess() {
+    classCallCheck(this, AsyAccess);
+
+    var _this = possibleConstructorReturn(this, (AsyAccess.__proto__ || Object.getPrototypeOf(AsyAccess)).call(this));
+
+    _this.asys = [];
+    return _this;
+  }
+
+  /**
+   * 只接受函数类型
+   * @param  {Function} fn [description]
+   * @return {[type]}      [description]
+   */
+
+
+  createClass(AsyAccess, [{
+    key: 'create',
+    value: function create(fn) {
+      if (fn && typeof fn === 'function') {
+        this.asys.push(fn);
+      }
+    }
+
+    /**
+     * 执行
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'exec',
+    value: function exec() {
+      var _this2 = this;
+
+      if (this.asys.length) {
+        var next = function next() {
+          if (_this2.asys.length) {
+            var asy = _this2.asys.shift();
+            asy(next);
+          } else {
+            _this2.$$emit('complete');
+          }
+        };
+        next();
+      }
+      return this;
+    }
+  }]);
+  return AsyAccess;
+}(Observer);
+
+/***************
+  资源预加载
+一共有5处位置需要验证是否预加载完毕
+1 swpier 移动翻页反弹
+2 Xut.View.LoadScenario 全局跳转
+3 Xut.View.GotoPrevSlide
+4 Xut.View.GotoNextSlide
+5 Xut.View.GotoSlide
+****************/
+/**
+ * 是否启动预加载
+ * true 启动
+ * false 关闭
+ * 翻页的时候停止
+ * 动画结束后开始
+ * @type {Boolean}
+ */
+var enable = true;
+
+/**
+ * 预加载的资源列表
+ */
+var preloadData = null;
+
+/**
+ * 页面chpater Id 总数
+ * @type {Number}
+ */
+var chapterIdCount = 0;
+
+/**
+ * 正在加载的id标记
+ * @type {Number}
+ */
+var loadingId = 0;
+
+/**
+ * 预加载回调通知
+ * @type {Array}
+ */
+var notification = null;
+
+/**
+ * 用于检测图片是否有缓存的情况
+ * 检测chapter 1的数据情况
+ * 只检测第一个成功的content图片的缓存状态
+ * 如果本身图片获取失败，就递归图片检测
+ * @return {Boolean} [description]
+ */
+function checkFigure(url, callback) {
+  loadFigure(url, function (state, cache) {
+    /*如果是有效图，只检测第一次加载的缓存img*/
+    if (!checkFigure.url && state) {
+      checkFigure.url = url;
+    }
+    callback();
+  });
+}
+
+var PARSE = {
+  // master 母版标记特殊处理，递归PARSE
+  // video: videoParse
+  content: checkFigure,
+  widget: checkFigure,
+  autoSprite: checkFigure,
+  seniorSprite: checkFigure,
+  audio: audioParse,
+  svg: svgParse
+};
+
+/**
+ * 完成后删除资源的列表
+ * 2个好处
+ * 1 优化内存空间
+ * 2 跳页面检测，如果遇到不存在的资源就不处理了
+ *   这代表，1.已经加载了
+ *          2.资源或错
+ * @return {[type]} [description]
+ */
+function deleteResource(chaperId) {
+  preloadData[chaperId] = null;
+}
+
+/**
+ * 获取初始化数
+ * @return {[type]} [description]
+ */
+function getNumber() {
+  return typeof config.launch.preload === 'number' ? config.launch.preload : 5;
+}
+
+/**
+ * 创建对应的处理器
+ * master 母版数据，需要重新递归解析,类型需要递归创建
+ *
+ * 正常页面数据
+ * content/widget/audio/video/autoSprite/seniorSprite/svg
+ */
+function createProcessor(type, childData, parse, isInit) {
+  if (type === 'master') {
+    var masterId = childData;
+    var masterData = preloadData[masterId];
+    if (masterData) {
+      return function (callback) {
+        loadResource(masterData, function () {
+          /*删除母版数据，多个Page会共享同一个母版加载*/
+          deleteResource(masterId);
+          callback();
+        });
+      };
+    }
+  } else {
+    childData = formatHooks[type](childData);
+    var total = childData.length;
+    var basePath = childData.basePath;
+    return function (callback) {
+
+      var section = getNumber();
+
+      /**
+       * 分段处理
+       */
+      function segmentHandle() {
+
+        var analyticData = void 0;
+        var hasComplete = false;
+
+        /*如果可以取整*/
+        if (childData.fileNames.length > section) {
+          analyticData = childData.fileNames.splice(0, section);
+        } else {
+          /*如果小于等于检测数*/
+          analyticData = childData.fileNames;
+          hasComplete = true;
+        }
+
+        /*分段检测的回到次数*/
+        var analyticCount = analyticData.length;
+
+        // $warn('加载类型：' + type + ' - 数量：' + analyticCount)
+
+        analyticData.forEach(function (name) {
+          parse(basePath + name, function () {
+            if (analyticCount === 1) {
+              if (hasComplete) {
+                /*分段处理完毕就清理，用于判断跳出*/
+                callback();
+                return;
+              } else {
+                segmentHandle();
+              }
+            }
+            --analyticCount;
+          });
+        });
+      }
+
+      segmentHandle();
+    };
+  }
+}
+
+/**
+ * 开始加载资源
+ */
+function loadResource(data, callback, isInit) {
+  var asy = new AsyAccess();
+  for (var key in data) {
+    var parse = PARSE[key];
+    if (parse) {
+      asy.create(createProcessor(key, data[key], parse, isInit));
+    }
+  }
+  /*执行后监听,监听完成*/
+  asy.exec().$$watch('complete', callback);
+}
+
+/**
+ * 检测下一个解析任务
+ * 以及任务的完成度
+ */
+function repeatCheck(id, callback) {
+
+  /*第一次加载才有回调*/
+  if (callback) {
+    callback();
+    return;
+  }
+
+  /*执行预加载等待的回调通知对象*/
+  if (notification) {
+    var newChapterId = notification[0];
+    if (id === newChapterId) {
+      /*如果下一个解析正好是等待的页面*/
+      notification[1]();
+      notification = null;
+    } else {
+      /*跳转页面的情况， 如果不是按照顺序的预加载方式*/
+      nextTask(newChapterId);
+      return;
+    }
+  }
+
+  /*如果加载数等于总计量数，这个证明加载完毕*/
+  if (id === chapterIdCount) {
+    $warn('全部预加载完成');
+    set$1('preload', checkFigure.url);
+    return;
+  }
+
+  /*启动了才继续可以预加载*/
+  if (enable) {
+    nextTask();
+  }
+}
+
+/**
+ * 检测下一个页面加载执行
+ * @return {Function} [description]
+ */
+function nextTask(chapterId, callback) {
+  if (!chapterId) {
+    /*新加载的Id游标*/
+    ++loadingId;
+    chapterId = loadingId;
+  }
+
+  /*只有没有预加载的数据才能被找到*/
+  var pageData = preloadData[chapterId];
+  if (pageData) {
+    loadResource(pageData, function () {
+      $warn('----预加资源完成chapterId: ' + chapterId);
+      deleteResource(chapterId);
+      repeatCheck(loadingId, callback);
+    }, callback);
+  } else {
+    $warn('----预加资源已处理，chapterId: ' + chapterId);
+    repeatCheck(loadingId, callback);
+  }
+}
+
+/**
+ * 检测缓存是否存在
+ * @return {[type]} [description]
+ */
+function checkCache(finish, next) {
+  var cahceUrl = get$1('preload');
+  if (cahceUrl) {
+    loadFigure(cahceUrl, function (state, cache) {
+      if (cache) {
+        finish();
+      } else {
+        next();
+      }
+    });
+  } else {
+    next();
+  }
+}
+
+/**
+ * 资源加载接口
+ * 必须先预加载第一页
+ * @return {[type]} [description]
+ */
+function initPreload(total, callback) {
+
+  var close = function close() {
+    preloadData = null;
+    config.launch.preload = false;
+    callback();
+  };
+
+  var start = function start() {
+    nextTask('', callback);
+  };
+
+  loadFile(config.data.pathAddress + 'preload.js', function () {
+    if (window.preloadData) {
+      chapterIdCount = total;
+      preloadData = window.preloadData;
+      window.preloadData = null;
+      checkCache(close, start);
+    } else {
+      close();
+    }
+  });
+}
+
+/**
+ * 继续开始加载
+ * 初始化只加载了一页
+ * 在页面init进入后，在开始这个调用
+ * 继续解析剩下的页面
+ */
+function startPreload() {
+  /*从第2页开始预加载*/
+  if (preloadData) {
+    enable = true;
+    setTimeout(function () {
+      nextTask();
+    }, 0);
+  }
+}
+
+/**
+ * 翻页停止预加载
+ */
+
+
+/**
+ * 预加载请求中断处理
+ * 监听线性翻页预加载加载
+ * 类型，方向，处理器
+ * context 处理器的上下文
+ */
+function requestInterrupt(_ref, context) {
+  var type = _ref.type,
+      chapterId = _ref.chapterId,
+      direction = _ref.direction,
+      processed = _ref.processed;
+
+
+  /*如果是线性模式，左右翻页的情况处理*/
+  if (type === 'linear') {
+    var currentId = Xut.Presentation.GetPageId();
+    chapterId = direction === 'next' ? currentId + 1 : currentId - 1;
+  } else if (type === 'nolinear') {}
+  /*非线性模式,跳转模式*/
+
+
+  /*如果不存在预加载数据，就说明加载完毕，或者没有这个数据*/
+  if (!preloadData[chapterId]) {
+    return false;
+  } else {
+    /*正在预加载，等待记录回调*/
+    if (!processed) {
+      $warn('预加载必须传递处理器，有错误');
+    }
+    notification = [chapterId, function () {
+      processed.call(context);
+    }];
+    return true;
+  }
+}
+
+/**
+ * 资源销毁接口
+ * @return {[type]} [description]
+ */
+function clearPreload() {
+  checkFigure.url = null;
+  enable = true;
+  chapterIdCount = 0;
+  loadingId = 0;
+  preloadData = null;
+  notification = null;
+}
+
+/**
  * 新增模式,用于记录浏览器退出记录
  * 默认启动
  * 是否回到退出的页面
@@ -45581,6 +46330,7 @@ var setHistory = function setHistory(data) {
   if (config.launch.historyMode !== undefined) {
     return;
   }
+
   //数据库定义 && == 1
   if (data.recordHistory !== undefined && Number(data.recordHistory)) {
     config.launch.historyMode = true;
@@ -45684,7 +46434,7 @@ var configInit = function configInit(novelData, tempSettingData) {
  * 嵌入index分栏
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
-var configColumn = function configColumn(novelData, callback) {
+var configColumn = function configColumn(callback) {
   initColumn(function (haColumnCounts) {
     if (haColumnCounts) {
       //动画事件委托
@@ -45692,7 +46442,7 @@ var configColumn = function configColumn(novelData, callback) {
         config.launch.swipeDelegate = true;
       }
     }
-    callback(novelData);
+    callback();
   });
 };
 
@@ -45727,9 +46477,34 @@ function baseConfig(callback) {
         config.launch.visualMode = config.data.visualMode || 1;
       }
 
+      /**
+       * 模式5 只在竖版下使用
+       */
+      if (config.launch.visualMode === 5) {
+        var screen = getSize();
+        if (screen.height < screen.width) {
+          config.launch.visualMode = 1;
+        }
+      }
+
+      /*配置config*/
       configInit(novelData, tempSettingData);
+
+      /*加载svg的样式*/
       loadGolbalStyle('svgsheet', function () {
-        return configColumn(novelData, callback);
+        /*分栏*/
+        configColumn(function () {
+          if (config.launch.preload) {
+            /*监听初始化第一次完成*/
+            Xut.Application.onceWatch('autoRunComplete', startPreload);
+            /*资源预加载*/
+            initPreload(dataRet.Chapter.length, function () {
+              return callback(novelData);
+            });
+          } else {
+            callback(novelData);
+          }
+        });
       });
     });
   });
@@ -45807,8 +46582,10 @@ var loadScene = function (options) {
     'pageIndex': options.pageIndex,
     'history': options.history
   }, function () {
-    //应用加载完毕
+
+    /*应用初始化加载完毕*/
     Xut.Application.Notify('initComplete');
+
     /*发送初始化完毕代码跟踪*/
     config.sendTrackCode('init');
   });
@@ -46985,7 +47762,7 @@ var CordovaMedia = function (_AudioSuper) {
  * audio对象下标
  * @type {Number}
  */
-var index = 0;
+var index$1 = 0;
 var loop = 10;
 var audioes = [];
 
@@ -47025,11 +47802,11 @@ function hasAudioes() {
   return audioes.length;
 }
 
-function getAudio() {
-  var audio = audioes[index++];
+function getAudio$1() {
+  var audio = audioes[index$1++];
   if (!audio) {
-    index = 0;
-    return getAudio();
+    index$1 = 0;
+    return getAudio$1();
   }
   return audio;
 }
@@ -47070,7 +47847,7 @@ var NativeVideo = function (_AudioSuper) {
       var hasAudio = hasAudioes();
 
       if (hasAudio) {
-        audio = getAudio();
+        audio = getAudio$1();
         audio.src = this.$$url;
       } else {
         audio = new Audio(this.$$url);
@@ -47315,7 +48092,7 @@ var getParentNode = function getParentNode(subtitles, pageId, queryId) {
 };
 
 /**
- * 组合数据结构 
+ * 组合数据结构
  */
 var deployAudio = function deployAudio(sqlData, pageId, queryId, type, actionData, columnData) {
   //新的查询
@@ -48463,151 +49240,6 @@ function clearGlobalEvent() {
     onceBind = false;
   }
 }
-
-/**
- *
- * 基本事件管理
- * 1 异步
- * 2 同步
- *
- */
-
-var ArrayProto = Array.prototype;
-var nativeIndexOf = ArrayProto.indexOf;
-var slice = ArrayProto.slice;
-var _indexOf = function _indexOf(array, needle) {
-  var i, l;
-  if (nativeIndexOf && array.indexOf === nativeIndexOf) {
-    return array.indexOf(needle);
-  }
-  for (i = 0, l = array.length; i < l; i++) {
-    if (array[i] === needle) {
-      return i;
-    }
-  }
-  return -1;
-};
-
-var Observer = function () {
-  function Observer() {
-    classCallCheck(this, Observer);
-
-    this.$watch = this.bind;
-    this.$off = this.unbind;
-    this.$emit = this.trigger;
-    this.$once = this.one;
-
-    //触发列表名称
-    //防止同步触发
-    this._handleName = {};
-  }
-
-  createClass(Observer, [{
-    key: "bind",
-    value: function bind(event, fn) {
-      var i, part;
-      var events = this.events = this.events || {};
-      var parts = event.split(/\s+/);
-      var num = parts.length;
-
-      for (i = 0; i < num; i++) {
-        events[part = parts[i]] = events[part] || [];
-        if (_indexOf(events[part], fn) === -1) {
-          events[part].push(fn);
-        }
-      }
-
-      //假如存在同步句柄
-      //执行
-      var data;
-      if (data = this._handleName[event]) {
-        this.$emit(event, data[0]);
-      }
-
-      return this;
-    }
-  }, {
-    key: "one",
-    value: function one(event, fn) {
-      // [notice] The value of fn and fn1 is not equivalent in the case of the following MSIE.
-      // var fn = function fn1 () { alert(fn === fn1) } ie.<9 false
-      var fnc = function fnc() {
-        this.unbind(event, fnc);
-        fn.apply(this, slice.call(arguments));
-      };
-      this.bind(event, fnc);
-      return this;
-    }
-
-    //event = 'a b c' 空格分离多个事件名
-    //提供fn 指定在某个事件中删除某一个
-    //否则只提供事件名 ，全删除
-
-  }, {
-    key: "unbind",
-    value: function unbind(event, fn) {
-
-      var eventName, i, index, num, parts;
-      var events = this.events;
-
-      if (!events) return this;
-
-      //指定
-      if (arguments.length) {
-        parts = event.split(/\s+/);
-        for (i = 0, num = parts.length; i < num; i++) {
-          if ((eventName = parts[i]) in events !== false) {
-            //如果提供函数引用
-            //那么就是在数组中删除其中一个
-            if (fn) {
-              index = _indexOf(events[eventName], fn);
-              if (index !== -1) {
-                events[eventName].splice(index, 1);
-              }
-            } else {
-              //如果只提供了名字，则全删除
-              events[eventName] = null;
-            }
-
-            //如果没有内容了
-            if (!events[eventName] || !events[eventName].length) {
-              delete events[eventName];
-            }
-          }
-        }
-      } else {
-        this.events = null;
-      }
-
-      return this;
-    }
-  }, {
-    key: "trigger",
-    value: function trigger(event) {
-      var args, i;
-      var events = this.events,
-          handlers;
-
-      //参数
-      args = slice.call(arguments, 1);
-
-      if (!events || event in events === false) {
-        // console.log(event)
-        //同步的情况
-        //如果除非了事件，可能事件句柄还没有加载
-        this._handleName[event] = args;
-        return this;
-      }
-
-      handlers = events[event];
-      for (i = 0; i < handlers.length; i++) {
-        handlers[i].apply(this, args);
-      }
-      return this;
-    }
-  }]);
-  return Observer;
-}();
 
 /**
  * 抽象管理接口
@@ -52131,6 +52763,9 @@ var _class$1 = function () {
   }, {
     key: '_change',
     value: function _change() {
+      if (!this.originalImageList) {
+        return;
+      }
       this._changeImageUrl();
       if (this.isSports) {
         this._changePosition();
@@ -56895,7 +57530,7 @@ var Animation = function () {
           //防止多条一样的数据绑多个动画
           //构建精灵动画完毕后
           //构建ppt对象
-          this.pixiObj.$once('load', function () {
+          this.pixiObj.$$once('load', function () {
             //ppt动画
             createPixiPPT();
 
@@ -57592,7 +58227,7 @@ var getFlowFange = function getFlowFange(pageIndex) {
   }
 };
 
-function index$1(data, relatedData, getStyle) {
+function index$2(data, relatedData, getStyle) {
 
   //转化所有css特效的参数的比例
   var targetProperty = parseJSON(data.getParameter()[0]['parameter']);
@@ -57872,7 +58507,7 @@ var createScope = function createScope(base, contentId, chapterIndex, actName, p
 
   //生成视觉差对象
   if (data.processType === 'parallax') {
-    return index$1(data, base.relatedData, base.getStyle);
+    return index$2(data, base.relatedData, base.getStyle);
   }
 
   //数据预处理
@@ -62219,24 +62854,24 @@ var TaskActivitys = function (_TaskSuper) {
 
 /**
  * 获取访问对象参数
- * 如果pageObj 不存在，则取当前页面的
+ * 如果pageBase 不存在，则取当前页面的
  * @return {[type]} [description]
  */
-function access$1(pageObj, callback) {
+function access$1(pageBase, callback) {
 
   //如果只提供回调函数
-  if (arguments.length === 1 && _.isFunction(pageObj)) {
-    callback = pageObj;
-    pageObj = Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase();
+  if (arguments.length === 1 && _.isFunction(pageBase)) {
+    callback = pageBase;
+    pageBase = Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase();
   } else {
-    pageObj = pageObj || Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase();
+    pageBase = pageBase || Xut.Presentation.GetPageBase && Xut.Presentation.GetPageBase();
   }
 
-  if (pageObj) {
-    var contents = pageObj.baseGetContent();
-    var components = pageObj.baseGetComponent();
-    var pageType = pageObj.pageType || 'page';
-    var flag = callback(pageObj, contents.length && contents, components.length && components, pageType);
+  if (pageBase) {
+    var contents = pageBase.baseGetContent();
+    var components = pageBase.baseGetComponent();
+    var pageType = pageBase.pageType || 'page';
+    var flag = callback(pageBase, contents.length && contents, components.length && components, pageType);
     return flag;
   }
 }
@@ -62353,13 +62988,13 @@ var autoContents = function autoContents(contentObjs, taskAnimCallback) {
  * 运行自动的静态类型
  * @return {[type]} [description]
  */
-var autoComponents = function autoComponents(pageObj, pageIndex, autoData, pageType) {
+var autoComponents = function autoComponents(pageBase, pageIndex, autoData, pageType) {
 
   if (pageIndex === undefined) {
     pageIndex = Xut.Presentation.GetPageIndex();
   }
 
-  var chapterId = pageObj.baseGetPageId(pageIndex);
+  var chapterId = pageBase.baseGetPageId(pageIndex);
   var directive = void 0;
 
   _.each(autoData, function (data, index) {
@@ -62370,7 +63005,7 @@ var autoComponents = function autoComponents(pageObj, pageIndex, autoData, pageT
       directive.autoPlay({
         'id': data.id,
         'pageType': pageType,
-        'rootNode': pageObj.getContainsNode(),
+        'rootNode': pageBase.getContainsNode(),
         'chapterId': chapterId,
         'category': data.category,
         'autoPlay': data.autoPlay,
@@ -62390,12 +63025,8 @@ function $stopAutoWatch() {
 
 /**
  * 自动动作
- * @param  {[type]} pageObj          [description]
- * @param  {[type]} pageIndex        [description]
- * @param  {[type]} taskAnimCallback [description]
- * @return {[type]}                  [description]
  */
-function $autoRun(pageObj, pageIndex, taskAnimCallback) {
+function $autoRun(pageBase, pageIndex, taskAnimCallback) {
 
   /**
    * 编译IBOOKSCONFIG的时候过滤自动运行的调用
@@ -62420,23 +63051,23 @@ function $autoRun(pageObj, pageIndex, taskAnimCallback) {
   //pageType
   //用于区别触发类型
   //页面还是母版
-  access$1(pageObj, function (pageObj, contentObjs, componentObjs, pageType) {
+  access$1(pageBase, function (pageBase, contentObjs, componentObjs, pageType) {
 
     //如果是母版对象，一次生命周期种只激活一次
-    if (pageObj.pageType === 'master') {
-      if (pageObj.onceMaster) {
+    if (pageBase.pageType === 'master') {
+      if (pageBase.onceMaster) {
         return;
       }
-      pageObj.onceMaster = true;
+      pageBase.onceMaster = true;
     }
 
     taskAnimCallback = taskAnimCallback || noop$1;
 
     /*自动组件*/
-    var autoData = pageObj.baseAutoRun();
+    var autoData = pageBase.baseAutoRun();
     if (autoData) {
       pushWatcher('component', function () {
-        autoComponents(pageObj, pageIndex, autoData, pageType);
+        autoComponents(pageBase, pageIndex, autoData, pageType);
       });
     }
 
@@ -62516,17 +63147,17 @@ function $trigger(_ref, columnData) {
  * 如果传递了allHandle 停止所有的视频
  * allHandle 给接口Xut.Application.Original() 使用
  *
- * @param  {[type]} pageObj [description]
- * @param  {[type]} pageId  [description]
- * @param  {[type]} all     [description]
- * @return {[type]}         [description]
+ * 页面与模板翻页都会调用暂停接口
  */
-function $suspend(pageObj, pageId, allHandle) {
+function $suspend(pageBase, pageId, allHandle) {
 
   //零件对象翻页就直接销毁了
   //无需暂时
   //这里只处理音频 + content类型
-  access$1(pageObj, function (pageObj, contentObjs) {
+  access$1(pageBase, function (pageBase, contentObjs) {
+
+    /*停止预加载*/
+    // stopPreload()
 
     /*这个必须要，翻页停止AUTO的自动延时延时器，否则任务会乱套,e.g. 跨页面音频*/
     $stopAutoWatch();
@@ -62536,7 +63167,7 @@ function $suspend(pageObj, pageId, allHandle) {
       //离开页面销毁视频
       removeVideo(pageId);
       //翻页停止母板音频
-      if (pageObj.pageType === 'master') {
+      if (pageBase.pageType === 'master') {
         hangUpAudio();
       }
     }
@@ -62578,19 +63209,19 @@ var hasOptimize = function hasOptimize(fn) {
  * 大量操作DOM结构，所以先隐藏根节点
  * 1 删除所有widget节点
  * 2 复位所有content节点
- * @param  {[type]} pageObj [description]
+ * @param  {[type]} pageBase [description]
  * @return {[type]}         [description]
  */
-function $original(pageObj) {
+function $original(pageBase) {
 
-  access$1(pageObj, function (pageObj, contentObjs, componentObjs) {
+  access$1(pageBase, function (pageBase, contentObjs, componentObjs) {
 
     //母版对象不还原
-    if (pageObj.pageType === 'master') return;
+    if (pageBase.pageType === 'master') return;
 
     var $containsNode;
 
-    if ($containsNode = pageObj.getContainsNode()) {
+    if ($containsNode = pageBase.getContainsNode()) {
 
       //隐藏根节点
       //display:none下刷新
@@ -62611,7 +63242,7 @@ function $original(pageObj) {
           obj && obj.destroy();
         });
         //销毁widget对象管理
-        pageObj.baseRemoveComponent();
+        pageBase.baseRemoveComponent();
       }
 
       hasOptimize(function () {
@@ -62658,7 +63289,7 @@ function $stop() {
   clearVideo();
 
   //停止热点
-  return access$1(function (pageObj, contentObjs, componentObjs) {
+  return access$1(function (pageBase, contentObjs, componentObjs) {
 
     //如果返回值是false,则是算热点处理行为
     var falg = false;
@@ -64980,8 +65611,14 @@ var rightPageHook = {
     prev: function prev() {},
     next: function next(getStyle) {
 
-      var middlePageStyle = getStyle('middle');
       var rightPageStyle = getStyle('right');
+
+      /*如果页面模式是5，特殊处理,返回半页宽度*/
+      if (rightPageStyle && rightPageStyle.pageVisualMode === 5) {
+        return rightPageStyle.visualWidth / 2;
+      }
+
+      var middlePageStyle = getStyle('middle');
 
       //中间：溢出
       if (middlePageStyle && middlePageStyle.visualLeftInteger) {
@@ -65505,26 +66142,46 @@ function api(Swiper) {
    * 前翻页接口
    * callback 翻页完成
    * {
-    speed,
-    callback
-  }
+      speed,
+      callback
+    }
    */
   Swiper.prototype.prev = function () {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var _this2 = this;
+
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        speed = _ref.speed,
+        callback = _ref.callback;
 
     if (!this._borderBounce(1)) {
-      this._slideTo({
-        speed: options.speed,
-        callback: options.callback,
-        direction: 'prev',
-        action: 'outer'
-      });
+
+      var toNext = function toNext() {
+        _this2._slideTo({ speed: speed, callback: callback, direction: 'prev', action: 'outer' });
+      };
+
+      /*启动了预加载模式*/
+      if (config.launch.preload) {
+        var status = requestInterrupt({
+          type: 'linear',
+          direction: 'prev',
+          processed: function processed() {
+            toNext();
+            Xut.View.HideBusy();
+          }
+        }, this);
+        /*如果还在预加载，禁止跳转*/
+        if (status) {
+          Xut.View.ShowBusy();
+          return;
+        }
+      }
+
+      /*正常跳页面*/
+      toNext();
     } else {
       //边界反弹
-      this._setRebound({
-        direction: 'next'
-      });
-      options.callback && options.callback();
+      this._setRebound({ direction: 'next' });
+      callback && callback();
     }
   };
 
@@ -65535,22 +66192,44 @@ function api(Swiper) {
    * callback 翻页完成
    */
   Swiper.prototype.next = function () {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var _this3 = this;
+
+    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        speed = _ref2.speed,
+        callback = _ref2.callback;
 
     if (!this._borderBounce(-1)) {
-      this._slideTo({
-        speed: options.speed,
-        callback: options.callback,
-        direction: 'next',
-        action: 'outer'
-      });
+
+      var toNext = function toNext() {
+        _this3._slideTo({ speed: speed, callback: callback, direction: 'next', action: 'outer' });
+      };
+
+      /*启动了预加载模式*/
+      if (config.launch.preload) {
+        var status = requestInterrupt({
+          type: 'linear',
+          direction: 'next',
+          processed: function processed() {
+            toNext();
+            Xut.View.HideBusy();
+          }
+        }, this);
+        /*如果还在预加载，禁止跳转*/
+        if (status) {
+          Xut.View.ShowBusy();
+          return;
+        }
+      }
+
+      /*正常模式*/
+      toNext();
     } else {
       //边界反弹
       this._setRebound({
         direction: 'prev',
         isAppBoundary: true
       });
-      options.callback && options.callback();
+      callback && callback();
     }
   };
 
@@ -65608,7 +66287,7 @@ function api(Swiper) {
       //首页
       case visualIndex:
         if (visualIndex == 0) {
-          this.$emit('onDropApp');
+          this.$$emit('onDropApp');
         }
         return;
       //后一页
@@ -65626,7 +66305,7 @@ function api(Swiper) {
     this._updatePointer(data);
     data.pagePointer = this.pagePointer;
 
-    this.$emit('onJumpPage', data);
+    this.$$emit('onJumpPage', data);
   };
 
   /**
@@ -65681,7 +66360,7 @@ function api(Swiper) {
   Swiper.prototype.scrollToPosition = function () {
     var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    var _this2 = this;
+    var _this4 = this;
 
     var speed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5000;
     var delay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
@@ -65693,8 +66372,8 @@ function api(Swiper) {
     /*这里没用动画的时间延时，因为运动中延时有问题*/
     if (delay) {
       this.delayTimer = setTimeout(function () {
-        _this2.clearDelayTimer();
-        _this2._setPageMove(position, speed);
+        _this4.clearDelayTimer();
+        _this4._setPageMove(position, speed);
       }, delay);
       return;
     }
@@ -65707,7 +66386,7 @@ function api(Swiper) {
    */
   Swiper.prototype.destroy = function () {
     this._off();
-    this.$off();
+    this.$$unWatch();
     this.clearDelayTimer();
     if (this._childNodes) {
       this._childNodes.page = null;
@@ -66112,7 +66791,7 @@ function slide(Swiper) {
      * 需要翻页结束后触发外部通知，绑定一次
      */
     if (callback) {
-      this.$once('_slideFlipOver', callback);
+      this.$$once('_slideFlipOver', callback);
     }
 
     var distance = 0;
@@ -66134,7 +66813,7 @@ function slide(Swiper) {
     setTimeout(function () {
       _this._updateActionPointer();
       /*手指移开屏幕*/
-      _this.$emit('onEnd', _this.pagePointer);
+      _this.$$emit('onEnd', _this.pagePointer);
       _this._updateVisualIndex(_this.pagePointer.middleIndex);
     }, 0);
   };
@@ -66205,7 +66884,7 @@ function distribute$1(Swiper) {
     data.frontIndex = pointer.frontIndex;
     data.backIndex = pointer.backIndex;
     data.middleIndex = this.visualIndex;
-    this.$emit('onMove', data);
+    this.$$emit('onMove', data);
   };
 
   /*
@@ -66219,12 +66898,12 @@ function distribute$1(Swiper) {
 
     this._setRestore.apply(this, arguments);
     /*触发翻页结束，通过slideTo绑定*/
-    this.$emit('_slideFlipOver');
+    this.$$emit('_slideFlipOver');
     var callback = function callback() {
       return _this.enable();
     };
     setTimeout(function () {
-      _this.$emit('onComplete', {
+      _this.$$emit('onComplete', {
         unlock: callback,
         direction: _this.direction,
         pagePointer: _this.pagePointer,
@@ -66408,6 +67087,13 @@ var Swiper = function (_Observer) {
     /*保存上次滑动值*/
     _this.keepDistX = 0;
     _this.keepDistY = 0;
+
+    /*内部滑动页面，优化边界的敏感度*/
+    _this.insideScrollRange = {
+      min: visualWidth * 0.03,
+      max: visualWidth - visualWidth * 0.03
+    };
+
     return _this;
   }
 
@@ -66484,7 +67170,7 @@ var Swiper = function (_Observer) {
        * point 事件对象
        * @return {[type]} [description]
        */
-      this.$emit('onFilter', function () {
+      this.$$emit('onFilter', function () {
         interrupt = true;
       }, point, e);
 
@@ -66493,7 +67179,7 @@ var Swiper = function (_Observer) {
 
       /*针对拖拽翻页阻止是否滑动事件受限*/
       this._stopped = false; //如果页面停止了动作，触发
-      this._hasBounce = false; //是否有反弹
+      this._banBounce = false; //是否有禁止了反弹
       this._hasTap = true; //点击了屏幕
       this._isInvalid = false; //无效的触发
       this._moved = false; /*是否移动中*/
@@ -66514,6 +67200,9 @@ var Swiper = function (_Observer) {
 
       this.pointX = point.pageX;
       this.pointY = point.pageY;
+
+      /*每次滑动第一次触碰页面的实际移动坐标*/
+      this.firstMovePosition = 0;
 
       this.startTime = Swiper.getDate();
     }
@@ -66588,11 +67277,6 @@ var Swiper = function (_Observer) {
         this._directionBan = 'h';
       }
 
-      /*前尾是否允许反弹*/
-      if (!this.options.borderBounce) {
-        if (this._hasBounce = this._borderBounce($delta)) return;
-      }
-
       /*滑动距离*/
       var $dist = void 0;
       if (this.orientation === 'h') {
@@ -66634,6 +67318,55 @@ var Swiper = function (_Observer) {
         speed: 0,
         action: 'flipMove',
         /**
+         * 因为模式5的情况下，判断是否是边界，需要获取正确的页面值才可以
+         * 所以移动页面在反弹计算之后，所以必须在延后 movePageBases中判断是否为反弹
+         */
+        setPageBanBounce: function setPageBanBounce(position) {
+          /*如果没有启动边界反弹*/
+          if (!self.options.borderBounce) {
+            /*如果是到边界了，就禁止反弹*/
+            if (self._banBounce = self._borderBounce(position)) {
+              return true;
+            }
+          }
+
+          /*模式5下，边界翻页的敏感度处理*/
+          if (self.options.insideScroll) {
+
+            var absPosition = Math.abs(position);
+
+            /*只判断每次移动的，第一次触碰*/
+            if (!self.firstMovePosition) {
+              self.firstMovePosition = absPosition;
+            }
+            if (self.direction === 'next') {
+              if (absPosition >= self.visualWidth) {
+                if (self.firstMovePosition > self.insideScrollRange.max) {
+                  /*如果是在边界的位置翻页，是被允许的*/
+                  return false;
+                } else {
+                  /*其余位置都是被禁止翻页的*/
+                  self._setKeepDist(-self.visualWidth, 0);
+                  self._banBounce = true;
+                  return true;
+                }
+              }
+            } else if (self.direction === 'prev') {
+              // 边界
+              if (position >= 0) {
+                if (self.firstMovePosition < self.insideScrollRange.min) {
+                  return false;
+                } else {
+                  self._setKeepDist(0, 0);
+                  self._banBounce = true;
+                  return true;
+                }
+              }
+            }
+          }
+        },
+
+        /**
          * 是否无效函数
          * 如果无效，end方法抛弃掉
          * 必须是同步方法：
@@ -66654,7 +67387,7 @@ var Swiper = function (_Observer) {
     value: function _onEnd(e) {
 
       /*停止滑动，或者多点触发，或者是边界，或者是停止翻页*/
-      if (!this.enabled || this._hasBounce || this._stopped || hasMultipleTouches(e)) {
+      if (!this.enabled || this._banBounce || this._stopped || hasMultipleTouches(e)) {
         return;
       }
 
@@ -66675,7 +67408,7 @@ var Swiper = function (_Observer) {
       /*如果没有滚动页面，判断为点击*/
       if (!distX && !distY) {
         var isReturn = false;
-        this.$emit('onTap', this.visualIndex, function () {
+        this.$$emit('onTap', this.visualIndex, function () {
           return isReturn = true;
         }, e, duration);
         if (isReturn) return;
@@ -66726,6 +67459,41 @@ var Swiper = function (_Observer) {
        * 2 这里要区分PPT之间，与PPT内部滑动
        */
       var actionType = this.getActionType(this.touchX, this.touchY, duration);
+
+      /**
+       * 单独控制翻页的预加载检测
+       * 如果还在预加载中，强制翻页为反弹
+       * 然后记录动作，等加载结束后处理
+       */
+      if (actionType === 'flipOver' && config.launch.preload) {
+        var status = requestInterrupt({
+          type: 'linear',
+          direction: this.direction,
+          /*预加载加载结束*/
+          processed: function processed() {
+            this._nextAction('flipOver');
+            Xut.View.HideBusy();
+          }
+        }, this);
+
+        /*如果还在预加载，执行反弹与等待*/
+        if (status) {
+          Xut.View.ShowBusy();
+          actionType = 'flipRebound';
+        }
+      }
+
+      /*正常松手后动作处理*/
+      this._nextAction(actionType);
+    }
+
+    /**
+     * 执行松手后的动作
+     */
+
+  }, {
+    key: '_nextAction',
+    value: function _nextAction(actionType) {
 
       /*如果是首位页面，直接反弹*/
       if (this._isFirstOrEnd()) {
@@ -66851,7 +67619,7 @@ var Swiper = function (_Observer) {
       后续就会报错*/
       this.orientation = 'v';
 
-      this.$emit('onWheel', e, wheelDeltaY);
+      this.$$emit('onWheel', e, wheelDeltaY);
 
       return;
     }
@@ -66885,7 +67653,7 @@ var Swiper = function (_Observer) {
       if (!isVisual) {
         //只针对母板处理
         if (!pageType) {
-          this.$emit('onMasterMove', this.visualIndex, node);
+          this.$$emit('onMasterMove', this.visualIndex, node);
         }
         return;
       }
@@ -66912,12 +67680,14 @@ var Swiper = function (_Observer) {
 
   }, {
     key: '_borderBounce',
-    value: function _borderBounce(value) {
+    value: function _borderBounce(position) {
       //首页,并且是左滑动
-      if (this.visualIndex === 0 && value > 0) {
+      if (this.visualIndex === 0 && position > 0) {
+        /*到首页边界，end事件不触发，还原内部的值*/
+        this._setKeepDist(0, 0);
         return true;
+      } else if (this.visualIndex === this.totalIndex - 1 && position < 0) {
         //尾页
-      } else if (this.visualIndex === this.totalIndex - 1 && value < 0) {
         return true;
       }
     }
@@ -67453,7 +68223,7 @@ var ColumnClass = function () {
       coloumnObj.lastDistance = swipe.getInitDistance();
 
       var hasQrcode = void 0;
-      swipe.$watch('onFilter', function (hookCallback, point, evtObj) {
+      swipe.$$watch('onFilter', function (hookCallback, point, evtObj) {
         /*二维码*/
         hasQrcode = false;
         if (swiperHook(evtObj, point.target) === 'qrcode') {
@@ -67461,7 +68231,7 @@ var ColumnClass = function () {
         }
       });
 
-      swipe.$watch('onTap', function (pageIndex, hookCallback, point, duration) {
+      swipe.$$watch('onTap', function (pageIndex, hookCallback, point, duration) {
         var node = point.target;
         /*图片缩放*/
         if (!hasQrcode) {
@@ -67476,7 +68246,7 @@ var ColumnClass = function () {
         closestMedia(node, coloumnObj.chapterId, swipe.visualIndex);
       });
 
-      swipe.$watch('onMove', function (options) {
+      swipe.$$watch('onMove', function (options) {
         var action = options.action,
             speed = options.speed,
             distance = options.distance,
@@ -67573,7 +68343,7 @@ var ColumnClass = function () {
             }
       });
 
-      swipe.$watch('onComplete', function (_ref2) {
+      swipe.$$watch('onComplete', function (_ref2) {
         var unlock = _ref2.unlock;
 
         coloumnObj.lastDistance = moveDistance;
@@ -69252,7 +70022,7 @@ var dataExternal = function (baseProto) {
   _.each(["Get", "Remove", "Add", "Specified"], function (type) {
     baseProto['base' + type + 'Component'] = function (data) {
       switch (type) {
-        case 'add':
+        case 'Add':
           return this.componentGroup.add(data);
         case 'Get':
           return this.componentGroup.get();
@@ -71486,6 +72256,10 @@ function rightTranslate(styleDataset) {
   var middlePageStyle = styleDataset.getPageStyle('middle', 'right');
   var rightPageStyle = styleDataset.getPageStyle('right');
 
+  if (rightPageStyle.pageVisualMode === 5) {
+    return rightPageStyle.visualWidth / 2;
+  }
+
   //中间：溢出
   if (middlePageStyle && middlePageStyle.visualLeftInteger) {
     //右边：溢出
@@ -72088,6 +72862,16 @@ var Scheduler = function () {
         orientation: orientation
       });
 
+      /**
+       * 外部设置swiper内部的反弹
+       * 主要是模式5的情况下处理
+       * swiper延伸判断，通过这里获取到页面真是的坐标
+       * 反馈给swiper,如果是反弹就不再处理了
+       */
+      if (options.setPageBanBounce && options.setPageBanBounce(moveDistance[1])) {
+        return;
+      }
+
       var data = {
         nodes: nodes,
         speed: speed,
@@ -72238,25 +73022,37 @@ var Scheduler = function () {
         direction: direction,
         createPointer: createPointer,
         'isQuickTurn': this.isQuickTurn,
-        /*暂停的页面索引autorun*/
+
+        /**
+         * 暂停的页面索引autorun
+         */
         'suspendIndex': action === 'init' ? '' : direction === 'next' ? frontIndex : backIndex,
-        //中断通知
+
+        /**
+         * 中断通知
+         */
         'suspendCallback': options.suspendAutoCallback,
-        //流程结束通知
-        //包括动画都已经结束了
-        'processComplete': function processComplete() {},
-        //构建完毕通知
-        'buildComplete': function buildComplete(seasonId) {
-          /**
-           * 构建完成通知,用于处理历史缓存记录
-           * 如果是调试模式 && 不是收费提示页面 && 多场景应用
-           */
+
+        /**
+         * 构建完成通知,用于处理历史缓存记录
+         * 如果是调试模式 && 不是收费提示页面 && 多场景应用
+         */
+        buildComplete: function buildComplete(seasonId) {
           if (config.launch.historyMode && !options.isInApp && options.hasMultiScene) {
             var history = sceneController.sequence(seasonId, middleIndex);
             if (history) {
               set$1("history", history);
             }
           }
+        },
+
+
+        /**
+         * 流程结束通知
+         * 包括动画都已经结束了
+         */
+        processComplete: function processComplete() {
+          Xut.Application.Notify('autoRunComplete');
         }
       };
 
@@ -72531,7 +73327,7 @@ var Scheduler = function () {
       };
 
       //创建完成回调
-      this.$$mediator.$emit('change:createComplete', function () {
+      this.$$mediator.$$emit('change:createComplete', function () {
         if (_this4.$$mediator.options.hasMultiScene) {
           triggerAuto();
         }
@@ -72720,7 +73516,7 @@ function extendView($$mediator, access, $$globalSwiper) {
       arg[_key] = arguments[_key];
     }
 
-    $$mediator.$emit.apply($$mediator, ['change:updatePage'].concat(arg));
+    $$mediator.$$emit.apply($$mediator, ['change:updatePage'].concat(arg));
   };
 
   /**
@@ -72732,7 +73528,7 @@ function extendView($$mediator, access, $$globalSwiper) {
       arg[_key2] = arguments[_key2];
     }
 
-    $$mediator.$emit.apply($$mediator, ['change:showPrev'].concat(arg));
+    $$mediator.$$emit.apply($$mediator, ['change:showPrev'].concat(arg));
   };
 
   /**
@@ -72744,7 +73540,7 @@ function extendView($$mediator, access, $$globalSwiper) {
       arg[_key3] = arguments[_key3];
     }
 
-    $$mediator.$emit.apply($$mediator, ['change:hidePrev'].concat(arg));
+    $$mediator.$$emit.apply($$mediator, ['change:hidePrev'].concat(arg));
   };
 
   /**
@@ -72756,7 +73552,7 @@ function extendView($$mediator, access, $$globalSwiper) {
       arg[_key4] = arguments[_key4];
     }
 
-    $$mediator.$emit.apply($$mediator, ['change:showNext'].concat(arg));
+    $$mediator.$$emit.apply($$mediator, ['change:showNext'].concat(arg));
   };
 
   /**
@@ -72768,7 +73564,7 @@ function extendView($$mediator, access, $$globalSwiper) {
       arg[_key5] = arguments[_key5];
     }
 
-    $$mediator.$emit.apply($$mediator, ['change:hideNext'].concat(arg));
+    $$mediator.$$emit.apply($$mediator, ['change:hideNext'].concat(arg));
   };
 
   /**
@@ -72779,7 +73575,7 @@ function extendView($$mediator, access, $$globalSwiper) {
       arg[_key6] = arguments[_key6];
     }
 
-    $$mediator.$emit.apply($$mediator, ['change:toggleToolbar'].concat(arg));
+    $$mediator.$$emit.apply($$mediator, ['change:toggleToolbar'].concat(arg));
   };
 
   /**
@@ -72804,7 +73600,7 @@ function extendView($$mediator, access, $$globalSwiper) {
    * 复位工具栏
    */
   Xut.View.ResetToolbar = function () {
-    $$mediator.$emit('change:resetToolbar');
+    $$mediator.$$emit('change:resetToolbar');
   };
 
   /**
@@ -73388,7 +74184,6 @@ function extendApplication(access, $$mediator, $$globalSwiper) {
 /********************************************
  * 虚拟摄像机运行的接口
  ********************************************/
-
 function extendCamera(access, $$globalSwiper) {
 
   /**
@@ -73400,7 +74195,9 @@ function extendCamera(access, $$globalSwiper) {
      delay 延时执行时间
    */
   Xut.Camera.MoveX = function (position, speed, delay) {
-    $$globalSwiper.scrollToPosition(position, speed, delay);
+    if (config.launch.visualMode === 5) {
+      $$globalSwiper.scrollToPosition(position, speed, delay);
+    }
   };
 }
 
@@ -73568,11 +74365,14 @@ var Mediator = function (_Observer) {
       sectionRang: options.sectionRang //分段值
     };
 
-    /**
-     * 如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式
-     */
+    /*如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式*/
     if (config.launch.mouseWheel !== false && config.launch.scrollMode === 'v') {
       setOptions.mouseWheel = true;
+    }
+
+    /*虚拟摄像头模式，关闭边界反弹*/
+    if (config.launch.visualMode === 5) {
+      setOptions.borderBounce = false;
     }
 
     /*快速配置了*/
@@ -73593,7 +74393,7 @@ var Mediator = function (_Observer) {
      * 过滤器.全局控制函数
      * return true 阻止页面滑动
      */
-    $$globalSwiper.$watch('onFilter', function (hookCallback, point, evtObj) {
+    $$globalSwiper.$$watch('onFilter', function (hookCallback, point, evtObj) {
       var node = point.target;
       swiperHook(evtObj, node);
       //页面类型
@@ -73623,7 +74423,7 @@ var Mediator = function (_Observer) {
     /**
      * 触屏松手点击，无滑动，判断为点击
      */
-    $$globalSwiper.$watch('onTap', function (pageIndex, hookCallback) {
+    $$globalSwiper.$$watch('onTap', function (pageIndex, hookCallback) {
       if (handlerObj) {
         if (handlerObj.handlers) {
           handlerObj.handlers(handlerObj.elem, handlerObj.attribute, handlerObj.rootNode, pageIndex);
@@ -73640,21 +74440,21 @@ var Mediator = function (_Observer) {
     /**
      * 触屏滑动,通知pageMgr处理页面移动
      */
-    $$globalSwiper.$watch('onMove', function (data) {
+    $$globalSwiper.$$watch('onMove', function (data) {
       $$scheduler.movePageBases(data);
     });
 
     /**
      * 触屏滑动,通知ProcessMgr关闭所有激活的热点
      */
-    $$globalSwiper.$watch('onEnd', function (pointers) {
+    $$globalSwiper.$$watch('onEnd', function (pointers) {
       $$scheduler.suspendPageBases(pointers);
     });
 
     /**
      * 翻页动画完成回调
      */
-    $$globalSwiper.$watch('onComplete', function () {
+    $$globalSwiper.$$watch('onComplete', function () {
       $$scheduler.completePageBases.apply($$scheduler, arguments);
     });
 
@@ -73662,7 +74462,7 @@ var Mediator = function (_Observer) {
      * 鼠标滚轮
      */
     var wheellook = false; //如果首页向上滑动，那么锁定马上可以向下滑动
-    $$globalSwiper.$watch('onWheel', function (e, wheelDeltaY) {
+    $$globalSwiper.$$watch('onWheel', function (e, wheelDeltaY) {
 
       var currPageBase = Xut.Presentation.GetPageBase($$globalSwiper.visualIndex);
 
@@ -73714,7 +74514,7 @@ var Mediator = function (_Observer) {
      * 切换页面
      * @return {[type]}      [description]
      */
-    $$globalSwiper.$watch('onJumpPage', function (data) {
+    $$globalSwiper.$$watch('onJumpPage', function (data) {
       $$scheduler.gotoPageBases(data);
     });
 
@@ -73722,7 +74522,7 @@ var Mediator = function (_Observer) {
      * 退出应用
      * @return {[type]}      [description]
      */
-    $$globalSwiper.$watch('onDropApp', function (data) {
+    $$globalSwiper.$$watch('onDropApp', function (data) {
       window.GLOBALIFRAME && Xut.publish('magazine:dropApp');
     });
 
@@ -73732,7 +74532,7 @@ var Mediator = function (_Observer) {
      * 才需要重新激活对象
      * 删除parallaxProcessed
      */
-    $$globalSwiper.$watch('onMasterMove', function (hindex, target) {
+    $$globalSwiper.$$watch('onMasterMove', function (hindex, target) {
       if (/Content/i.test(target.id) && target.getAttribute('data-parallaxProcessed')) {
         $$scheduler.masterMgr && $$scheduler.masterMgr.reactivation(target);
       }
@@ -73854,7 +74654,7 @@ defAccess(Mediator.prototype, '$curVmPage', {
  */
 defProtected(Mediator.prototype, '$bind', function (key, callback) {
   var $$mediator = this;
-  $$mediator.$watch('change:' + key, function () {
+  $$mediator.$$watch('change:' + key, function () {
     callback.apply($$mediator, arguments);
   });
 });
@@ -73899,7 +74699,7 @@ defProtected(Mediator.prototype, '$suspend', function () {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$destroy', function () {
-  this.$off(); //观察事件
+  this.$$unWatch(); //观察事件
   this.$$globalSwiper.destroy(); //全局事件
   this.$$scheduler.destroyManage(); //派发器
   this.$$scheduler = null;
@@ -76730,7 +77530,7 @@ function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  Xut.View.LoadScenario = function (options, callback) {
+  var _loadScenario = function _loadScenario(options, callback) {
 
     var seasonId = toNumber(options.seasonId);
     var chapterId = toNumber(options.chapterId);
@@ -76868,6 +77668,33 @@ function initView() {
     }
 
     new SceneFactory(data);
+  };
+
+  Xut.View.LoadScenario = function (options, callback) {
+    /**
+     * 如果启动了预加载模式
+     * 需要处理跳转的页面预加载逻辑
+     */
+    var chapterId = toNumber(options.chapterId);
+    if (!options.main && chapterId && config.launch.preload) {
+      var status = requestInterrupt({
+        chapterId: chapterId,
+        type: 'nolinear',
+        processed: function processed() {
+          _loadScenario(options, callback);
+          Xut.View.HideBusy();
+        }
+      });
+
+      /*如果还在预加载，禁止加载*/
+      if (status) {
+        Xut.View.ShowBusy();
+        return;
+      }
+    }
+
+    /*正常加载*/
+    _loadScenario(options, callback);
   };
 
   /**
@@ -77149,6 +77976,9 @@ function Destroy() {
   //销毁节点
   clearRootNode();
 
+  /*清理预加载*/
+  clearPreload();
+
   //删除动态加载的两个css文件
   $('link[data-type]').each(function (index, link) {
     var type = link.getAttribute('data-type');
@@ -77192,20 +78022,45 @@ function initApplication() {
    * 2.initComplete
    */
   var __app__ = new Observer();
+
+  /**
+   * 监听应用事件
+   * @param {[type]}   event    [description]
+   * @param {Function} callback [description]
+   */
   Xut.Application.Watch = function (event, callback) {
     var fn = function fn() {
       callback.apply(__app__, arguments);
     };
-    __app__.bind(event, fn);
+    __app__.$$watch(event, fn);
     return fn;
   };
 
-  Xut.Application.unWatch = function (event, fn) {
-    __app__.unbind(event, fn);
+  /**
+   * 只监听一次
+   * 触发后就销毁
+   */
+  Xut.Application.onceWatch = function (event, callback) {
+    var fn = function fn() {
+      callback.apply(__app__, arguments);
+    };
+    __app__.$$once(event, fn);
+    return fn;
   };
 
+  /**
+   * 触发通知
+   * @param {...[type]} arg [description]
+   */
   Xut.Application.Notify = function () {
-    __app__.trigger.apply(__app__, arguments);
+    __app__.$$emit.apply(__app__, arguments);
+  };
+
+  /**
+   * 销毁
+   */
+  Xut.Application.unWatch = function (event, fn) {
+    __app__.$$unWatch(event, fn);
   };
 
   /**
@@ -77276,7 +78131,7 @@ function initApplication() {
      * @return {[type]} [description]
      */
     var destroy = function destroy() {
-      __app__.$off();
+      __app__.$$unWatch();
       Destroy('destory');
       window.GLOBALCONTEXT = null;
     };
@@ -77625,15 +78480,15 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 885.6;
+Xut.Version = 886.2;
 
 /*加载应用app*/
 var initApp = function initApp() {
   /*配置优先级*/
   priorityConfig();
-
   /*全局的一些事件处理*/
   initGlobalEvent();
+  /*根节点*/
 
   var _initRootNode = initRootNode.apply(undefined, arguments),
       $rootNode = _initRootNode.$rootNode,

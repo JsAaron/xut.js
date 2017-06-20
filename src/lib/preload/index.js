@@ -8,23 +8,12 @@
 5 Xut.View.GotoSlide
 ****************/
 import { config } from '../config/index'
-import { $warn, loadFigure, loadFile } from '../util/index'
 import { audioParse } from './parser/audio'
 import { videoParse } from './parser/video'
 import { svgParse } from './parser/svg'
 import formatHooks from './parser/format'
 import { AsyAccess } from '../observer/asy-access'
-
-const PARSE = {
-  // master 母版标记特殊处理，递归PARSE
-  // video: videoParse
-  content: loadFigure,
-  widget: loadFigure,
-  autoSprite: loadFigure,
-  seniorSprite: loadFigure,
-  audio: audioParse,
-  svg: svgParse
-}
+import { $set, $get, $warn, loadFigure, loadFile } from '../util/index'
 
 /**
  * 是否启动预加载
@@ -61,6 +50,36 @@ let notification = null
 
 
 /**
+ * 用于检测图片是否有缓存的情况
+ * 检测chapter 1的数据情况
+ * 只检测第一个成功的content图片的缓存状态
+ * 如果本身图片获取失败，就递归图片检测
+ * @return {Boolean} [description]
+ */
+function checkFigure(url, callback) {
+  loadFigure(url, (state, cache) => {
+    /*如果是有效图，只检测第一次加载的缓存img*/
+    if (!checkFigure.url && state) {
+      checkFigure.url = url
+    }
+    callback()
+  })
+}
+
+
+const PARSE = {
+  // master 母版标记特殊处理，递归PARSE
+  // video: videoParse
+  content: checkFigure,
+  widget: checkFigure,
+  autoSprite: checkFigure,
+  seniorSprite: checkFigure,
+  audio: audioParse,
+  svg: svgParse
+}
+
+
+/**
  * 完成后删除资源的列表
  * 2个好处
  * 1 优化内存空间
@@ -86,7 +105,7 @@ function getNumber() {
  * master 母版数据，需要重新递归解析,类型需要递归创建
  *
  * 正常页面数据
- * content/widget/audio/video/autoSprite/seniorSprite
+ * content/widget/audio/video/autoSprite/seniorSprite/svg
  */
 function createProcessor(type, childData, parse, isInit) {
   if (type === 'master') {
@@ -129,7 +148,7 @@ function createProcessor(type, childData, parse, isInit) {
         /*分段检测的回到次数*/
         let analyticCount = analyticData.length
 
-        // $warn('加载类型：' + type + ' --- 数量：' + analyticCount)
+        // $warn('加载类型：' + type + ' - 数量：' + analyticCount)
 
         analyticData.forEach(name => {
           parse(basePath + name, () => {
@@ -198,6 +217,7 @@ function repeatCheck(id, callback) {
   /*如果加载数等于总计量数，这个证明加载完毕*/
   if (id === chapterIdCount) {
     $warn('全部预加载完成')
+    $set('preload', checkFigure.url)
     return
   }
 
@@ -223,16 +243,35 @@ function nextTask(chapterId, callback) {
   const pageData = preloadData[chapterId]
   if (pageData) {
     loadResource(pageData, function () {
-      $warn('【预加资源完成chapterId: ' + chapterId + '】')
+      $warn('----预加资源完成chapterId: ' + chapterId)
       deleteResource(chapterId)
       repeatCheck(loadingId, callback)
     }, callback)
   } else {
-    $warn('【预加资源已处理，chapterId: ' + chapterId + '】')
+    $warn('----预加资源已处理，chapterId: ' + chapterId)
     repeatCheck(loadingId, callback)
   }
 }
 
+
+/**
+ * 检测缓存是否存在
+ * @return {[type]} [description]
+ */
+function checkCache(finish, next) {
+  const cahceUrl = $get('preload')
+  if (cahceUrl) {
+    loadFigure(cahceUrl, (state, cache) => {
+      if (cache) {
+        finish()
+      } else {
+        next()
+      }
+    })
+  } else {
+    next()
+  }
+}
 
 /**
  * 资源加载接口
@@ -240,15 +279,25 @@ function nextTask(chapterId, callback) {
  * @return {[type]} [description]
  */
 export function initPreload(total, callback) {
+
+  const close = function () {
+    preloadData = null
+    config.launch.preload = false
+    callback()
+  }
+
+  const start = function () {
+    nextTask('', callback)
+  }
+
   loadFile(config.data.pathAddress + 'preload.js', function () {
     if (window.preloadData) {
       chapterIdCount = total
       preloadData = window.preloadData
       window.preloadData = null
-      nextTask('', callback)
+      checkCache(close, start)
     } else {
-      config.launch.preload = false
-      callback()
+      close()
     }
   })
 }
@@ -260,7 +309,7 @@ export function initPreload(total, callback) {
  * 在页面init进入后，在开始这个调用
  * 继续解析剩下的页面
  */
-export function startPreload(total, callback) {
+export function startPreload() {
   /*从第2页开始预加载*/
   if (preloadData) {
     enable = true
@@ -323,6 +372,7 @@ export function requestInterrupt({
  * @return {[type]} [description]
  */
 export function clearPreload() {
+  checkFigure.url = null
   enable = true
   chapterIdCount = 0
   loadingId = 0

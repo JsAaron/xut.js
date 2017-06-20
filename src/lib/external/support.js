@@ -18,7 +18,7 @@
   var isIpad = device.ipad()
   var isIOS = device.ios()
   var isWebKit = device.find('applewebkit') //webkit内核
-  var isWeiXin = device.find('micromessenger') && window.WeixinJSBridge //微信
+  var isWeiXin = device.find('micromessenger')  //微信
   var hasTouch = ('ontouchstart' in window) //支持触屏
 
   //针对win8的处理

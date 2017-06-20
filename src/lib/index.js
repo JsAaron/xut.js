@@ -14,15 +14,15 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
-Xut.Version = 886
+Xut.Version = 886.2
 
 /*加载应用app*/
 const initApp = (...arg) => {
   /*配置优先级*/
-  priorityConfig()
-
+  priorityConfig();
   /*全局的一些事件处理*/
-  initGlobalEvent()
+  initGlobalEvent();
+  /*根节点*/
   const { $rootNode, $contentNode } = initRootNode(...arg)
   nextTick({ container: $rootNode, content: $contentNode }, main)
 }
@@ -39,7 +39,7 @@ let cacheOptions
 let delayTimer = null
 
 /*横竖切换*/
-const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function() {
+const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function () {
   $(window).on('orientationchange', (e) => {
 
     /**
@@ -56,7 +56,7 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function(
     //2016.11.8
     function delay(fn) {
       if (!delayTimer) {
-        delayTimer = setTimeout(function() {
+        delayTimer = setTimeout(function () {
           Xut.Application.Refresh()
           clearTimeout(delayTimer)
           delayTimer = null
@@ -77,7 +77,7 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function(
       })
     }
   })
-} : function() {}
+} : function () {}
 
 
 /*新版本加载*/
@@ -104,7 +104,7 @@ Xut.Application.Launch = option => {
 
 
 /*判断是否script有data-plat属性*/
-const hasLaunch = function() {
+const hasLaunch = function () {
   const scripts = document.querySelectorAll('script')
   for (let i = 0; i < scripts.length; i++) {
     let node = scripts[i]

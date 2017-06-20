@@ -67,11 +67,11 @@ export function audioParse(filePath, callback) {
   }
 
   function clear() {
-    audio.removeEventListener("canplaythrough", success, false)
+    audio.removeEventListener("loadstart", success, false)
     audio.removeEventListener("error", error, false)
     audio = null
   }
 
-  audio.addEventListener("canplaythrough", success, false)
+  audio.addEventListener("loadstart", success, false)
   audio.addEventListener("error", error, false)
 }
