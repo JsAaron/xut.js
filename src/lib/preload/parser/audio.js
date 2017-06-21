@@ -43,15 +43,12 @@ function getAudio() {
 
 /**
  * 音频文件解析
- * @param  {[type]}   filePath [description]
- * @param  {Function} callback [description]
- * @return {[type]}            [description]
  */
-export function audioParse(filePath, callback) {
+export function audioParse(url, callback) {
 
-  let audio = new Audio()
+  let audio = getAudio()
 
-  audio.src = filePath;
+  audio.src = url;
   audio.muted = "muted";
   audio.preload = "auto";
   audio.autobuffer = true

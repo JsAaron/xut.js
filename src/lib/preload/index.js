@@ -8,7 +8,8 @@
 5 Xut.View.GotoSlide
 ****************/
 import { config } from '../config/index'
-import { audioParse } from './parser/audio'
+import { audioParse, setAudio } from './parser/audio'
+import { imageParse, setImage } from './parser/image'
 import { videoParse } from './parser/video'
 import { svgParse } from './parser/svg'
 import formatHooks from './parser/format'
@@ -57,7 +58,7 @@ let notification = null
  * @return {Boolean} [description]
  */
 function checkFigure(url, callback) {
-  loadFigure(url, (state, cache) => {
+  imageParse(url, (state, cache) => {
     /*如果是有效图，只检测第一次加载的缓存img*/
     if (!checkFigure.url && state) {
       checkFigure.url = url
@@ -294,7 +295,10 @@ export function initPreload(total, callback) {
     if (window.preloadData) {
       chapterIdCount = total
       preloadData = window.preloadData
-      window.preloadData = null
+      window.preloadData = null;
+      //初始化音频数量
+      setAudio(getNumber())
+      setImage(getNumber())
       checkCache(close, start)
     } else {
       close()

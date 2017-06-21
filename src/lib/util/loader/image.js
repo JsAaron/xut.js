@@ -32,10 +32,24 @@ let stop = function () {
  * 1 图片加载状态 success / fail   true/false
  * 2 图片是否被缓存 hasCache       ture/false
  */
-export function loadFigure(url, callback) {
+export function loadFigure(data, callback) {
 
-  let img = new Image();
-  img.src = url;
+  if (!data) {
+    console.log('loadFigure data有错误')
+    callback()
+    return
+  }
+
+  let img
+  if (typeof data === 'string') {
+    img = new Image();
+    img.src = data;
+  } else {
+    /*如果传递了图片对象*/
+    img = data.image
+    img.src = data.url
+  }
+
 
   // 如果图片被缓存，则直接返回缓存数据
   if (img.complete) {
