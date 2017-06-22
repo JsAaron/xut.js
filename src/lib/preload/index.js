@@ -296,9 +296,10 @@ export function initPreload(total, callback) {
       chapterIdCount = total
       preloadData = window.preloadData
       window.preloadData = null;
-      //初始化音频数量
-      setAudio(getNumber())
-      setImage(getNumber())
+      //初始预加载对象数量
+      const count = getNumber()
+      setAudio(count)
+      setImage(count)
       checkCache(close, start)
     } else {
       close()

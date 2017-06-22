@@ -8,6 +8,7 @@ import {
 const maskBoxImage = Xut.style.maskBoxImage
 const FLOOR = Math.floor
 
+
 /**
  * 蒙版动画
  */
@@ -26,6 +27,7 @@ const maskContent = (data, wrapObj) => {
         `<img data-type="${data.qrCode ? 'qrcode' : 'mask'}"
               class="inherit-size fullscreen-background edges"
               src="${resourcePath}"
+              onerror="fixNodeError('image',this,'${wrapObj.chapterIndex}','${resourcePath}')"
               style="${isMaskImg}"/>`
       )
     } else {
@@ -70,12 +72,14 @@ const maskContent = (data, wrapObj) => {
       `<img data-type="${data.qrCode ? 'qrcode' : 'ordinary'}"
             class="inherit-size fullscreen-background fix-miaomiaoxue-img"
             src="${resourcePath}"
+            onerror="fixNodeError('image',this,'${wrapObj.chapterIndex}','${resourcePath}')"
             style="${isMaskImg}"/>`
     )
   }
 
   return restr
 }
+
 
 /**
  * 纯文本内容
@@ -244,19 +248,19 @@ const createContainer = (data, wrapObj) => {
   //如果是html内容
   if (wrapObj.isJs) {
     wapper = `<div id="${containerName}"
-                       data-behavior="click-swipe"
-                       class="fullscreen-background ${filterName}"
-                       style="width:${backwidth}px;
-                              height:${backheight}px;
-                              top:${backtop}px;
-                              left:${backleft}px;
-                              position:absolute;
-                              z-index:${zIndex};
-                              visibility:${visibility};
-                              {10}">
-                 <div data-type="scroller"
-                      style="width:${backwidth}px;
-                             position:absolute;">`
+                   data-behavior="click-swipe"
+                   class="fullscreen-background ${filterName}"
+                   style="width:${backwidth}px;
+                          height:${backheight}px;
+                          top:${backtop}px;
+                          left:${backleft}px;
+                          position:absolute;
+                          z-index:${zIndex};
+                          visibility:${visibility};
+                          {10}">
+               <div data-type="scroller"
+                    style="width:${backwidth}px;
+                           position:absolute;">`
     return String.styleFormat(wapper)
   } else {
     //scroller:=> absolute 因为别的元素有依赖

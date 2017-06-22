@@ -6,8 +6,9 @@
  *
  * */
 
-let index = 0
-let cacheAudio = []
+import { Share } from './share'
+
+let audioShare = null
 
 /**
  * 设置audio个数
@@ -15,29 +16,20 @@ let cacheAudio = []
  * 2 如果是重复加载，判断缓存已创建的
  */
 export function setAudio(total) {
-  let audio, i
-
-  /*如果缓存中已经存在*/
-  if (cacheAudio.length) {
-    if (total >= cacheAudio.length) {
-      total = total - cacheAudio.length
-    }
-  }
-
-  for (i = 0; i < total; i++) {
-    audio = new Audio()
-    audio.play()
-    cacheAudio.push(audio)
+  if (audioShare) {
+    audioShare.create(total)
+  } else {
+    audioShare = new Share('audio')
+    audioShare.create(total)
   }
 }
 
 function getAudio() {
-  const audio = cacheAudio[index++]
-  if (!audio) {
-    index = 0
-    return getAudio()
+  if (audioShare) {
+    return audioShare.get()
+  } else {
+    return new Audio()
   }
-  return audio
 }
 
 

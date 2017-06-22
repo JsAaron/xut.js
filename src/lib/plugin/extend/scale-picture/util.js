@@ -21,12 +21,12 @@ function getFinalSizePosition(imageSize, wrapperSize) {
     ratio;
 
   //宽度100% 自适应高度
-  var widthFullAdaptiveHeight = function() {
+  var widthFullAdaptiveHeight = function () {
     finalW = wrapperW;
     // calculate the height given the finalW
     ratio = imgW / wrapperW;
     finalH = imgH / ratio;
-    if(finalH > wrapperH) {
+    if (finalH > wrapperH) {
       checksource = true;
       ratio = finalH / wrapperH;
       finalW /= ratio;
@@ -35,13 +35,13 @@ function getFinalSizePosition(imageSize, wrapperSize) {
   }
 
   //高度100% 自适应宽度
-  var heightFullAdaptiveWidth = function() {
+  var heightFullAdaptiveWidth = function () {
     finalH = wrapperH;
     // calculate the width given the finalH
     ratio = imgH / wrapperH;
     finalW = imgW / ratio;
     checksource = true;
-    if(finalW > wrapperW) {
+    if (finalW > wrapperW) {
       checksource = false;
       ratio = finalW / wrapperW;
       finalW = wrapperW;
@@ -51,12 +51,12 @@ function getFinalSizePosition(imageSize, wrapperSize) {
 
   // check which image side is bigger
   //横屏图片
-  if(imgW > imgH) {
+  if (imgW > imgH) {
     widthFullAdaptiveHeight();
   } else {
     //竖屏图片
     //竖版显示
-    if(wrapperH > wrapperW) {
+    if (wrapperH > wrapperW) {
       widthFullAdaptiveHeight();
     }
     //横版显示
@@ -82,7 +82,7 @@ function getFinalSizePosition(imageSize, wrapperSize) {
  */
 export function createUnpeatableNumbers() {
   var rand = parseInt(Math.random() * 30);
-  if($("#oriHdimg" + rand).length > 0) {
+  if ($("#oriHdimg" + rand).length > 0) {
     return createUnpeatableNumbers();
   }
   return rand;
@@ -104,31 +104,31 @@ export function createContainerView(imgContainer) {
   let topCopy = top + 4;
 
   let zoomImg = `<img class="xut-zoom-fly"
-                        src="${imgContainer.originSrc}"
-                        style="width:${imgContainer.width}px;
-                               height:${imgContainer.height}px;
-                               top:${imgContainer.top}px;
-                               left:${imgContainer.left}px;" />`
+                      src="${imgContainer.originSrc}"
+                      style="width:${imgContainer.width}px;
+                             height:${imgContainer.height}px;
+                             top:${imgContainer.top}px;
+                             left:${imgContainer.left}px;" />`
 
-  if(config.screenHorizontal) {
+  if (config.screenHorizontal) {
     html = `<div class="xut-zoom-view">
-                            <div class="xut-zoom-overlay"></div>
-                            <div class="xut-zoom-close" style="right:${rightCopy}px;top:${topCopy}px;">
-                                <div class="si-icon Flaticon flaticon-error" style="font-size:5vw;border-radius:50%;right:0">
-                                </div>
-                            </div>
-                            ${zoomImg}
-                        </div>`;
+                <div class="xut-zoom-overlay"></div>
+                <div class="xut-zoom-close" style="right:${rightCopy}px;top:${topCopy}px;">
+                    <div class="si-icon Flaticon flaticon-error" style="font-size:5vw;border-radius:50%;right:0">
+                    </div>
+                </div>
+                ${zoomImg}
+            </div>`;
   } else {
     //竖屏
     html = `<div class="xut-zoom-view">
-                            <div class="xut-zoom-overlay"></div>
-                            <div class="xut-zoom-close" style=";right:${rightCopy}px;top:${topCopy}px;">
-                                <div class="si-icon Flaticon flaticon-error" style="font-size:5vh;border-radius:50%;right:0">
-                                </div>
-                            </div>
-                            ${zoomImg}
-                        </div>`;
+                <div class="xut-zoom-overlay"></div>
+                <div class="xut-zoom-close" style=";right:${rightCopy}px;top:${topCopy}px;">
+                    <div class="si-icon Flaticon flaticon-error" style="font-size:5vh;border-radius:50%;right:0">
+                    </div>
+                </div>
+                ${zoomImg}
+            </div>`;
 
   }
 
@@ -141,10 +141,10 @@ export function createContainerView(imgContainer) {
  * set by the user in the initial HTML
  */
 export function chooseImgSource(sources, w) {
-  if(w <= 0) w = 1;
-  for(var i = 0, len = sources.length; i < len; ++i) {
+  if (w <= 0) w = 1;
+  for (var i = 0, len = sources.length; i < len; ++i) {
     var source = sources[i];
-    if(w > source.width)
+    if (w > source.width)
       return source;
   }
 }
@@ -157,9 +157,9 @@ export function execAnimation({
   element,
   style,
   speed = 100
-}, callback = function() {}) {
-  if(!element) return
-  setTimeout(function() {
+}, callback = function () {}) {
+  if (!element) return
+  setTimeout(function () {
     element.stop().transition(style, speed, 'linear', callback)
   }, 0)
 }
@@ -180,12 +180,12 @@ export function getImgConfig(properties) {
   // then we need to check if the final width/height are eventually bigger
   // than the original image sizes. If so, we will show the image
   // with its original size, avoiding like this that the image gets pixelated
-  if(source.pos === 0 && (imgMaxW !== 0 && finalSizePosition.width > imgMaxW || imgMaxH !== 0 && finalSizePosition.height > imgMaxH)) {
-    if(imgMaxW !== 0 && finalSizePosition.width > imgMaxW) {
+  if (source.pos === 0 && (imgMaxW !== 0 && finalSizePosition.width > imgMaxW || imgMaxH !== 0 && finalSizePosition.height > imgMaxH)) {
+    if (imgMaxW !== 0 && finalSizePosition.width > imgMaxW) {
       var ratio = finalSizePosition.width / imgMaxW;
       finalSizePosition.width = imgMaxW;
       finalSizePosition.height /= ratio;
-    } else if(imgMaxH !== 0 && finalSizePosition.height > imgMaxH) {
+    } else if (imgMaxH !== 0 && finalSizePosition.height > imgMaxH) {
       var ratio = finalSizePosition.height / imgMaxH;
       finalSizePosition.height = imgMaxH;
       finalSizePosition.width /= ratio;
@@ -210,7 +210,7 @@ export function getFinalImgConfig(properties, imgMaxW = 0, imgMaxH = 0) {
     finalSizePosition = getFinalSizePosition(properties.image, properties.wrapper);
 
   // check for new source
-  if(finalSizePosition.checksource) {
+  if (finalSizePosition.checksource) {
     source = chooseImgSource(sources, finalSizePosition.width);
 
   }
@@ -218,14 +218,14 @@ export function getFinalImgConfig(properties, imgMaxW = 0, imgMaxH = 0) {
   // we still need to check one more detail:
   // if the source is the largest one provided in the html rules,
   // then we need to check if the final width/height are eventually bigger
-  // than the original image sizes. If so, we will show the image 
+  // than the original image sizes. If so, we will show the image
   // with its original size, avoiding like this that the image gets pixelated
-  if(source.pos === 0 && (imgMaxW !== 0 && finalSizePosition.width > imgMaxW || imgMaxH !== 0 && finalSizePosition.height > imgMaxH)) {
-    if(imgMaxW !== 0 && finalSizePosition.width > imgMaxW) {
+  if (source.pos === 0 && (imgMaxW !== 0 && finalSizePosition.width > imgMaxW || imgMaxH !== 0 && finalSizePosition.height > imgMaxH)) {
+    if (imgMaxW !== 0 && finalSizePosition.width > imgMaxW) {
       var ratio = finalSizePosition.width / imgMaxW;
       finalSizePosition.width = imgMaxW;
       finalSizePosition.height /= ratio;
-    } else if(imgMaxH !== 0 && finalSizePosition.height > imgMaxH) {
+    } else if (imgMaxH !== 0 && finalSizePosition.height > imgMaxH) {
       var ratio = finalSizePosition.height / imgMaxH;
       finalSizePosition.height = imgMaxH;
       finalSizePosition.width /= ratio;

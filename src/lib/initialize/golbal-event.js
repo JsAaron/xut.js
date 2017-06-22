@@ -5,6 +5,20 @@
 import { config } from '../config/index'
 import { fixAudio } from '../component/audio/fix'
 import { $set, $get } from '../util/index'
+import { repairImage } from '../repair/image'
+
+
+/**
+ * 特殊的一个方法，用来修正图片资源错误的
+ * dom中的事件onerror触发，所以直接
+ * @return {[type]} [description]
+ */
+window.fixNodeError = function (type, node, chapterIndex, src) {
+  if (type === 'image') {
+    repairImage(node, chapterIndex, src)
+  }
+}
+
 
 //修复H5音频自动播放bug
 if (!Xut.plat.hasAutoPlayAudio) {

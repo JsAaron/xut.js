@@ -1,8 +1,8 @@
 import { loadFigure } from '../../util/index'
 
+import { Share } from './share'
 
-let index = 0
-let cacheImage = []
+let imageShare = null
 
 /**
  * 设置image个数
@@ -10,25 +10,20 @@ let cacheImage = []
  * 2 如果是重复加载，判断缓存已创建的
  */
 export function setImage(total) {
-  let image, i
-    /*如果缓存中已经存在*/
-  if (cacheImage.length) {
-    if (total >= cacheImage.length) {
-      total = total - cacheImage.length
-    }
-  }
-  for (i = 0; i < total; i++) {
-    cacheImage.push(new Image())
+  if (imageShare) {
+    imageShare.create(total)
+  } else {
+    imageShare = new Share('image')
+    imageShare.create(total)
   }
 }
 
 function getImage() {
-  const image = cacheImage[index++]
-  if (!image) {
-    index = 0
-    return getImage()
+  if (imageShare) {
+    return imageShare.get()
+  } else {
+    return new Image()
   }
-  return image
 }
 
 

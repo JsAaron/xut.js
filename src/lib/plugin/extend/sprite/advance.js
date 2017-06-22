@@ -166,17 +166,16 @@ export default class {
       const maskUrl = resourcePath + filename
       html =
         `<div style="width:100%;height:100%;
-                             background: url(${maskUrl}.jpg) no-repeat;
-                             background-size: 100% 100%;
-                             -webkit-mask: url(${maskUrl}.png) no-repeat;
-                             -webkit-mask-size: 100% 100%;'>
-                </div>`
+                     background: url(${maskUrl}.jpg) no-repeat;
+                     background-size: 100% 100%;
+                     -webkit-mask: url(${maskUrl}.png) no-repeat;
+                     -webkit-mask-size: 100% 100%;'>
+        </div>`
       this.sprObj = $(String.styleFormat(html))
       obj.append(this.sprObj);
     } else {
       const src = resourcePath + this.originalImageList[0].name
       html = `<img src="${src}" style="width:100%;height:100%;"/>`
-
       this.sprObj = $(String.styleFormat(html))
       obj.html(this.sprObj)
     }

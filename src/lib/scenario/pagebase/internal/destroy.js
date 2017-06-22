@@ -1,13 +1,14 @@
 import { destroy as _destroy } from '../depend/multievent'
 import { unWatchColumn } from '../watch'
+import { clearRepairImage } from '../../../repair/image'
 
-export default function(baseProto) {
+export default function (baseProto) {
 
   /**
    * 销毁页面对象
    * @return {[type]} [description]
    */
-  baseProto.baseDestroy = function() {
+  baseProto.baseDestroy = function () {
     // console.log(this)
     // //清理图片缓存
     // //读库快速退出模式下报错修正
@@ -39,6 +40,10 @@ export default function(baseProto) {
       })
     }
 
+    /**
+     * 清理可能错误的img修复文件列表
+     */
+    clearRepairImage(this.chapterIndex)
 
     //清理多线程任务块
     const taskGroup = this.threadTaskRelated.assignTaskGroup

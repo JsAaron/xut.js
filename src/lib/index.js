@@ -9,6 +9,7 @@ import { initGlobalEvent } from './initialize/golbal-event'
 import { initGlobalAPI } from './global-api/index'
 import { priorityConfig } from './config/priority-config'
 
+
 /*代码初始化*/
 initAudio()
 initVideo()
