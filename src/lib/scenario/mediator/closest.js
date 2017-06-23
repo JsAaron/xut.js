@@ -84,6 +84,7 @@ export function closestMedia(target, chapterId, pageIndex) {
       if (fileName) {
         const type = matchType[1]
         const id = matchType[2]
+
         if (fileName) {
           $trigger({
             target,
@@ -91,6 +92,8 @@ export function closestMedia(target, chapterId, pageIndex) {
           }, {
             id,
             type,
+            startImage: target.getAttribute('data-startImage'),
+            stopImage: target.getAttribute('data-stopImage'),
             container: container || target,
             track: 8888, //播放就删除
             chapterId: 'column',

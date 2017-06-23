@@ -195,7 +195,7 @@ export default function baseConfig(callback) {
         configColumn(function () {
           if (config.launch.preload) {
             /*监听初始化第一次完成*/
-            Xut.Application.onceWatch('autoRunComplete', startPreload);
+            // Xut.Application.onceWatch('autoRunComplete', startPreload);
             /*资源预加载*/
             initPreload(dataRet.Chapter.length, () => callback(novelData))
           } else {

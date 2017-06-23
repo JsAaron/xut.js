@@ -99,4 +99,5 @@ export function loadFigure(data, callback) {
     // 无论何时只允许出现一个定时器，减少浏览器性能损耗
     if (intervalId === null) intervalId = setInterval(tick, 40);
   };
+
 }

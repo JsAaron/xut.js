@@ -67,7 +67,7 @@ const getParentNode = (subtitles, pageId, queryId) => {
     }
 
     //找到对应的节点
-    _.each(subtitles, function(data) {
+    _.each(subtitles, function (data) {
       //'Content_0_1' 规则 类型_页码（0开始）_id
       if (!parentDoms[data.id]) {
         dom = contentsFragment['Content_' + pageIndex + '_' + data.id];
@@ -109,6 +109,16 @@ const deployAudio = (sqlData, pageId, queryId, type, actionData, columnData) => 
       'audioId': queryId,
       'data': sqlData
     })
+
+    /*如果flow数据有动作切换图片*/
+    if (columnData.startImage || columnData.stopImage) {
+      _.extend(videoData, {
+        startImage: columnData.startImage,
+        stopImage: columnData.stopImage,
+        action: true
+      })
+    }
+
   } else {
     //有字幕处理
     const subtitles = sqlData.theTitle ? parseJSON(sqlData.theTitle) : null
@@ -212,7 +222,7 @@ const preCheck = (auidoData) => {
  * @param  {[type]} type   [description]
  * @return {[type]}        [description]
  */
-const fillBox = function(pageId, type) {
+const fillBox = function (pageId, type) {
   if (!playBox[type]) {
     playBox[type] = hash();
   }

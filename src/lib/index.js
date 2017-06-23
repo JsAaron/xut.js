@@ -1,3 +1,4 @@
+
 import main from './main/index'
 import { config } from './config/index'
 import { nextTick } from './util/nexttick'
@@ -15,7 +16,7 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
-Xut.Version = 886.2
+Xut.Version = 886.4
 
 /*加载应用app*/
 const initApp = (...arg) => {

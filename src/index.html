@@ -30,7 +30,7 @@
 Xut.Application.setConfig = {
 
     lauchMode: 1,
-    // preload: true,
+    preload: true,
     visualMode: 5,
     // platform: 'mini',
     historyMode: false,
@@ -83,6 +83,9 @@ Xut.Application.setConfig = {
     // convert: 'svg', //转化资源svg转化成js
 };
 
+
+
+
 Xut.Application.Watch('initComplete', function() {
     // console.log(1)
 })
@@ -93,7 +96,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 12 //306
+var appId = 18 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         // trackCode: ['swipe'], //代码跟踪

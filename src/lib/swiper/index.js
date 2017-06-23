@@ -471,6 +471,7 @@ export default class Swiper extends Observer {
        * 所以移动页面在反弹计算之后，所以必须在延后 movePageBases中判断是否为反弹
        */
       setPageBanBounce(position) {
+
         /*如果没有启动边界反弹*/
         if (!self.options.borderBounce) {
           /*如果是到边界了，就禁止反弹*/
@@ -488,10 +489,19 @@ export default class Swiper extends Observer {
           if (!self.firstMovePosition) {
             self.firstMovePosition = absPosition
           }
+
           if (self.direction === 'next') {
             if (absPosition >= self.visualWidth) {
               if (self.firstMovePosition > self.insideScrollRange.max) {
-                /*如果是在边界的位置翻页，是被允许的*/
+
+                /*如果是单页面，并且右边移动溢出了，这需要处理*/
+                if (!self.options.hasMultiPage) {
+                  self._setKeepDist(-self.visualWidth, 0)
+                  self._banBounce = true
+                  return true
+                }
+
+                /*如果是在尾部边界的位置翻页，是被允许的*/
                 return false
               } else {
                 /*其余位置都是被禁止翻页的*/

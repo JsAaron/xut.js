@@ -151,21 +151,56 @@ function createProcessor(type, childData, parse, isInit) {
 
         // $warn('加载类型：' + type + ' - 数量：' + analyticCount)
 
-        analyticData.forEach(name => {
-          parse(basePath + name, () => {
-            if (analyticCount === 1) {
-              if (hasComplete) {
-                /*分段处理完毕就清理，用于判断跳出*/
-                callback()
-                return
-              } else {
-                segmentHandle()
-              }
+        /**
+         * 检测完成度
+         */
+        const completeParse = function () {
+          if (analyticCount === 1) {
+            if (hasComplete) {
+              /*分段处理完毕就清理，用于判断跳出*/
+              callback()
+              return
+            } else {
+              segmentHandle()
             }
-            --analyticCount
-          })
+          }
+          --analyticCount
+        }
+
+        /**
+         * 分配任务
+         * 1 分配到每个解析器去处理
+         * 2 给一个定时器的范围
+         */
+        analyticData.forEach(function (name) {
+
+          let state = false
+
+          let timer = null
+          let reset = function () {
+            state = true
+            if (timer) {
+              clearTimeout(timer)
+              timer = null
+            }
+          }
+
+          let setComplete = function () {
+            if (!state) {
+              reset()
+              completeParse()
+            }
+          }
+
+          parse(basePath + name, setComplete)
+
+          /*主动监测2秒*/
+          if (!state) {
+            timer = setTimeout(setComplete, 2000);
+          }
 
         })
+
       }
 
       segmentHandle()
@@ -288,7 +323,13 @@ export function initPreload(total, callback) {
   }
 
   const start = function () {
-    nextTask('', callback)
+    nextTask('', function () {
+      callback();
+      /*第二次延迟5秒后开始*/
+      setTimeout(function () {
+        startPreload()
+      }, 5000)
+    })
   }
 
   loadFile(config.data.pathAddress + 'preload.js', function () {
