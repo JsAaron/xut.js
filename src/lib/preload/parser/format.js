@@ -4,11 +4,18 @@ import { config } from '../../config/index'
 /**
  * 格式字符串
  */
-const formatString = function (data, basePath) {
+const formatString = function(data, basePath) {
   data = data.split(',')
+  let sizes = []
+  let fileNames = []
+  data.forEach(function(name) {
+    const dataset = name.split('-')
+    sizes.push(dataset[0])
+    fileNames.push(basePath + '/' + dataset[1])
+  })
   return {
-    basePath,
-    fileNames: data,
+    sizes,
+    fileNames,
     length: data.length
   }
 }
@@ -17,17 +24,20 @@ const formatString = function (data, basePath) {
 /**
  * 格式对象
  */
-const formatObject = function (data, basePath) {
+const formatObject = function(data, basePath) {
   let fileNames = []
+  let sizes = [] //尺寸
   for (let dir in data) {
     let d = data[dir].split(',')
-    d.forEach(function (name) {
-      fileNames.push(basePath + dir + '/' + name)
+    d.forEach(function(name) {
+      const dataset = name.split('-')
+      sizes.push(dataset[0])
+      fileNames.push(basePath + dir + '/' + dataset[1])
     })
   }
   return {
+    sizes,
     fileNames,
-    basePath: '', //路径写到fileNames中了
     length: fileNames.length
   }
 }

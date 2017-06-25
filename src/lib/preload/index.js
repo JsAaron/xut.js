@@ -113,8 +113,8 @@ function createProcessor(type, childData, parse, isInit) {
     let masterId = childData
     let masterData = preloadData[masterId]
     if (masterData) {
-      return function (callback) {
-        loadResource(masterData, function () {
+      return function(callback) {
+        loadResource(masterData, function() {
           /*删除母版数据，多个Page会共享同一个母版加载*/
           deleteResource(masterId)
           callback()
@@ -124,8 +124,7 @@ function createProcessor(type, childData, parse, isInit) {
   } else {
     childData = formatHooks[type](childData)
     let total = childData.length
-    let basePath = childData.basePath
-    return function (callback) {
+    return function(callback) {
 
       let section = getNumber()
 
@@ -154,7 +153,7 @@ function createProcessor(type, childData, parse, isInit) {
         /**
          * 检测完成度
          */
-        const completeParse = function () {
+        const completeParse = function() {
           if (analyticCount === 1) {
             if (hasComplete) {
               /*分段处理完毕就清理，用于判断跳出*/
@@ -172,12 +171,12 @@ function createProcessor(type, childData, parse, isInit) {
          * 1 分配到每个解析器去处理
          * 2 给一个定时器的范围
          */
-        analyticData.forEach(function (name) {
+        analyticData.forEach(function(filePath, index) {
 
           let state = false
 
           let timer = null
-          let reset = function () {
+          let reset = function() {
             state = true
             if (timer) {
               clearTimeout(timer)
@@ -185,14 +184,14 @@ function createProcessor(type, childData, parse, isInit) {
             }
           }
 
-          let setComplete = function () {
+          let setComplete = function() {
             if (!state) {
               reset()
               completeParse()
             }
           }
 
-          parse(basePath + name, setComplete)
+          parse(filePath, setComplete)
 
           /*主动监测2秒*/
           if (!state) {
@@ -278,7 +277,7 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   const pageData = preloadData[chapterId]
   if (pageData) {
-    loadResource(pageData, function () {
+    loadResource(pageData, function() {
       $warn('----预加资源完成chapterId: ' + chapterId)
       deleteResource(chapterId)
       repeatCheck(loadingId, callback)
@@ -316,23 +315,23 @@ function checkCache(finish, next) {
  */
 export function initPreload(total, callback) {
 
-  const close = function () {
+  const close = function() {
     preloadData = null
     config.launch.preload = false
     callback()
   }
 
-  const start = function () {
-    nextTask('', function () {
+  const start = function() {
+    nextTask('', function() {
       callback();
       /*第二次延迟5秒后开始*/
-      setTimeout(function () {
+      setTimeout(function() {
         startPreload()
       }, 5000)
     })
   }
 
-  loadFile(config.data.pathAddress + 'preload.js', function () {
+  loadFile(config.data.pathAddress + 'preload.js', function() {
     if (window.preloadData) {
       chapterIdCount = total
       preloadData = window.preloadData
@@ -359,7 +358,7 @@ export function startPreload() {
   /*从第2页开始预加载*/
   if (preloadData) {
     enable = true
-    setTimeout(function () {
+    setTimeout(function() {
       nextTask()
     }, 0)
   }
@@ -404,7 +403,7 @@ export function requestInterrupt({
     if (!processed) {
       $warn('预加载必须传递处理器，有错误')
     }
-    notification = [chapterId, function () {
+    notification = [chapterId, function() {
       processed.call(context)
     }]
     return true
