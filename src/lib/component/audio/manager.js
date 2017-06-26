@@ -243,10 +243,7 @@ const fillBox = function (pageId, type) {
 const createAudio = (pageId, queryId, type, audioData) => {
 
   //检测是否打断
-  //如果不是预加载模式才检测
-  if (!audioData.preload) {
-    preCheck(audioData);
-  }
+  preCheck(audioData);
 
   //构建播放列表
   fillBox(pageId, type)
@@ -307,43 +304,11 @@ const loadAudio = ({
   type,
   action,
   data,
-  preload = false, //加载状态，是否为预加载模式
   columnData = {}
 }) => {
 
-  //////////////////////////
-  /// 播放处理
-  //  预加载对象已存在处理
-  //////////////////////////
-  if (!preload) {
-    const $type = playBox[type]
-    if ($type && $type[pageId]) {
-      const playObj = $type[pageId][queryId]
-
-      /**只有本地对象才有hasPreLoad方法，必须保证是预加载的对象 */
-      if (playObj && playObj.hasPreload && playObj.hasPreload()) {
-
-        //音频打断处理
-        preCheck({
-          stetObj: playObj, //保留当前对象
-          url: playObj.$$url,
-          trackId: playObj.trackId
-        });
-
-        console.log(playObj, queryId)
-
-        //这里不是play而是requestPlay
-        //需要在内部判断状态是否正确
-        playObj.requestPlay()
-        return
-      }
-    }
-  }
-
-  // console.log(preload,type,pageId,queryId)
-
   ///////////////////////
-  //  1.初始化预加载
+  //  1.初始化、
   //  2.直接加载播放对象
   ////////////////////////
 
@@ -354,9 +319,6 @@ const loadAudio = ({
   }
 
   const audioData = assemblyData(pageId, queryId, type, data, columnData);
-
-  /**加载状态，是否为预加载模式 */
-  audioData.preload = preload
 
   /*手动触发的热点,这种比较特别，手动点击可以切换状态*/
   if (type === 'hot' && action == 'trigger') {

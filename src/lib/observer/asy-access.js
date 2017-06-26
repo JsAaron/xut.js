@@ -18,9 +18,9 @@ export class AsyAccess extends Observer {
    * @param  {Function} fn [description]
    * @return {[type]}      [description]
    */
-  create(fn) {
+  create(fn, position = 'push') {
     if (fn && typeof fn === 'function') {
-      this.asys.push(fn)
+      this.asys[position](fn)
     }
   }
 

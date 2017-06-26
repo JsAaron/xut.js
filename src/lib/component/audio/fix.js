@@ -1,4 +1,5 @@
 import { $on, $off } from '../../util/event'
+import { getPlayBox } from './manager'
 
 /**
  * audio对象下标
@@ -23,8 +24,23 @@ export function fixAudio(obj, key, access) {
       audio.play()
       audioes.push(audio)
     }
+
+    /*如果*/
+    const playBox = getPlayBox()
+    var t, p, a;
+    for (t in playBox) {
+      for (p in playBox[t]) {
+        for (a in playBox[t][p]) {
+          if (playBox[t][p][a].needFix) {
+            playBox[t][p][a].resetContext()
+          }
+        }
+      }
+    }
+
     $off(document)
   }
+
   $on(document, { start })
 }
 

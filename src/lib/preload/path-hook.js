@@ -1,17 +1,27 @@
-import { config } from '../../config/index'
+////////////////////////////
+/// 文件路径生成器
+/// 不同类型对应不同的路径配置
+////////////////////////////
 
+import { config } from '../config/index'
 
 /**
  * 格式字符串
  */
-const formatString = function(data, basePath) {
+const formatString = function (data, basePath) {
   data = data.split(',')
+  let dataset
   let sizes = []
   let fileNames = []
-  data.forEach(function(name) {
-    const dataset = name.split('-')
-    sizes.push(dataset[0])
-    fileNames.push(basePath + '/' + dataset[1])
+  data.forEach(function (name) {
+    dataset = name.split('-');
+    /*如果没有尺寸*/
+    if (dataset.length === 1) {
+      fileNames.push(basePath + name)
+    } else {
+      sizes.push(Number(dataset[0]))
+      fileNames.push(basePath + dataset[1])
+    }
   })
   return {
     sizes,
@@ -24,15 +34,20 @@ const formatString = function(data, basePath) {
 /**
  * 格式对象
  */
-const formatObject = function(data, basePath) {
+const formatObject = function (data, basePath) {
+  let dataset
   let fileNames = []
   let sizes = [] //尺寸
   for (let dir in data) {
     let d = data[dir].split(',')
-    d.forEach(function(name) {
-      const dataset = name.split('-')
-      sizes.push(dataset[0])
-      fileNames.push(basePath + dir + '/' + dataset[1])
+    d.forEach(function (name) {
+      dataset = name.split('-')
+      if (dataset.length === 1) {
+        fileNames.push(basePath + dir + '/' + name)
+      } else {
+        sizes.push(Number(dataset[0]))
+        fileNames.push(basePath + dir + '/' + dataset[1])
+      }
     })
   }
   return {

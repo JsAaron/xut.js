@@ -22,5 +22,5 @@ module.exports = (srcDir) => {
   const rootPath = srcDir + 'content/'
   svg(rootPath)
   json(rootPath)
-  watchChange(rootPath)
+  // watchChange(rootPath)
 }

@@ -7,14 +7,10 @@ import { hasAudioes, getAudio } from '../fix'
  * 2-不支持audio的autoplay，部分的IOS微信
  * 3-不支持audio的autoplay，部分的安卓机子的自带浏览器（比如小米，开始模仿safari）和全部的ios safari（这种只能做用户触屏时就触发播放了）
  */
-export class NativeVideo extends AudioSuper {
+export class NativeAudio extends AudioSuper {
 
   constructor(options, controlDoms) {
     super(options, controlDoms);
-    /**标记是否为预加载模式 */
-    if (options.preload && this instanceof NativeVideo) {
-      this.status = 'preload';
-    }
   }
 
   /**
@@ -22,20 +18,34 @@ export class NativeVideo extends AudioSuper {
    * @return {[type]} [description]
    */
   _init() {
-    let audio
     let self = this
     let trackId = this.trackId
     let hasAudio = hasAudioes()
 
     if (hasAudio) {
-      audio = getAudio()
-      audio.src = this.$$url
+      this.audio = getAudio()
+      this.audio.src = this.$$url
     } else {
-      audio = new Audio(this.$$url)
+      this.audio = new Audio(this.$$url)
+      this.needFix = true
     }
-    this.audio = audio;
+
     this._watchAudio()
   }
+
+  /**
+   * 重设音频上下文
+   * @return {[type]} [description]
+   */
+  resetContext() {
+    // this._destroy()
+    // this.audio = getAudio()
+    // this.audio.src = this.$$url
+    // if (this.status === 'playing') {
+    //   this._startPlay()
+    // }
+  }
+
 
   /**
    * 监听音频播放
@@ -46,13 +56,7 @@ export class NativeVideo extends AudioSuper {
     //手动调用的时候会调用play的时候会调用canplay
     //导致重复播放，所以在第一次的去掉这个事件
     this._canplayCallBack = () => {
-      if (this.status === 'preload') {
-        this.audio.preload = 'metadata'
-        this.status = 'canplay' //可以准备播放
-      } else {
-        /**没有预加载，自动播放 */
-        this._startPlay()
-      }
+      this._startPlay()
       this.audio.removeEventListener('canplay', this._canplayCallBack, false)
     }
 
@@ -65,6 +69,9 @@ export class NativeVideo extends AudioSuper {
 
     /*微信不支持canplay事件*/
     if (window.WeixinJSBridge) {
+      this._startPlay()
+    } else if (Xut.plat.isAndroid) {
+      /*安卓手机浏览器canplay有问题*/
       this._startPlay()
     } else {
       this.audio.addEventListener('canplay', this._canplayCallBack, false)
@@ -121,32 +128,5 @@ export class NativeVideo extends AudioSuper {
     }
   }
 
-  ///////////////////////////
-  //  对外接口
-  //////////////////////////
 
-  /**
-   * 预处理接口
-   * 请求播放
-   * 这个接口是因为预处理的关系
-   * 预处理还在加载中
-   * 必须先等待加载完毕才能继续
-   */
-  requestPlay() {
-    if (this.status === 'canplay') {
-      this._startPlay()
-    } else {
-      console.log('音频没有准备完毕')
-    }
-  }
-
-  /**
-   * 预处理接口
-   * 是否有预加载
-   */
-  hasPreload() {
-    if (this.status === 'preload' || this.status === 'canplay') {
-      return true
-    }
-  }
 }

@@ -1,6 +1,6 @@
 import { PhoneGapMedia } from './player/phonegap'
 import { CordovaMedia } from './player/cordova'
-import { NativeVideo } from './player/native'
+import { NativeAudio } from './player/native'
 
 let audioPlayer
 
@@ -13,7 +13,7 @@ if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     audioPlayer = CordovaMedia
   } else {
     /*其余所有情况都用原声的H5播放器*/
-    audioPlayer = NativeVideo
+    audioPlayer = NativeAudio
   }
 }
 

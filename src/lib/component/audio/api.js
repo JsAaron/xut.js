@@ -73,25 +73,10 @@ export function triggerAudio({
 
 ////////////////////////
 /// 动画音频接口
-/// 1 预加载
 /// 2 直接播放
 /// 3 复位
 /// 4 销毁
 ///////////////////////
-
-/**
- * 预加载音频
- * 待用
- */
-export function preloadContentAudio(pageId, audioId) {
-  loadAudio({
-    pageId: pageId,
-    queryId: audioId,
-    type: CONTENT,
-    preload: true
-  })
-}
-
 
 /**
  * 动画音频触发接口
@@ -208,7 +193,7 @@ export function hangUpAudio() {
 
 
 ///////////////////////////////
-/// 
+///
 ///   清理全部音频
 ///
 ///////////////////////////////

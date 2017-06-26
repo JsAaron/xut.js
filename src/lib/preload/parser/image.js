@@ -9,7 +9,7 @@ let imageShare = null
  * 1 根据preload
  * 2 如果是重复加载，判断缓存已创建的
  */
-export function setImage(total) {
+export function initImage(total) {
   if (imageShare) {
     imageShare.create(total)
   } else {

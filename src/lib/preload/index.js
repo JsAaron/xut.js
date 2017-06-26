@@ -8,13 +8,15 @@
 5 Xut.View.GotoSlide
 ****************/
 import { config } from '../config/index'
-import { audioParse, setAudio } from './parser/audio'
-import { imageParse, setImage } from './parser/image'
+import { audioParse, initAudio } from './parser/audio'
+import { imageParse, initImage } from './parser/image'
 import { videoParse } from './parser/video'
 import { svgParse } from './parser/svg'
-import formatHooks from './parser/format'
+import pathHooks from './path-hook'
 import { AsyAccess } from '../observer/asy-access'
 import { $set, $get, $warn, loadFigure, loadFile } from '../util/index'
+import { addLoop, clearLoop } from './loop'
+import { Detect } from './detect'
 
 /**
  * 是否启动预加载
@@ -68,7 +70,7 @@ function checkFigure(url, callback) {
 }
 
 
-const PARSE = {
+const PARSER = {
   // master 母版标记特殊处理，递归PARSE
   // video: videoParse
   content: checkFigure,
@@ -102,120 +104,121 @@ function getNumber() {
 }
 
 /**
- * 创建对应的处理器
- * master 母版数据，需要重新递归解析,类型需要递归创建
- *
- * 正常页面数据
- * content/widget/audio/video/autoSprite/seniorSprite/svg
+ * 母版类型处理
+ * 需要重新递归解析,类型需要递归创建
+ * @return {[type]} [description]
  */
-function createProcessor(type, childData, parse, isInit) {
-  if (type === 'master') {
-    let masterId = childData
-    let masterData = preloadData[masterId]
-    if (masterData) {
-      return function(callback) {
-        loadResource(masterData, function() {
-          /*删除母版数据，多个Page会共享同一个母版加载*/
-          deleteResource(masterId)
-          callback()
-        })
-      }
+function masterHandle(childData) {
+  let masterId = childData
+  let masterData = preloadData[masterId]
+  if (masterData) {
+    return function (callback) {
+      loadResource(masterData, function () {
+        /*删除母版数据，多个Page会共享同一个母版加载*/
+        deleteResource(masterId)
+        callback()
+      })
     }
-  } else {
-    childData = formatHooks[type](childData)
-    let total = childData.length
-    return function(callback) {
+  }
+}
 
-      let section = getNumber()
+/**
+ * 页面层的处理
+ * content/widget/audio/video/autoSprite/seniorSprite/svg
+ * @return {[type]} [description]
+ */
+function pageHandle(type, childData, parser) {
+  childData = pathHooks[type](childData)
+  let total = childData.length
+  return function (callback) {
+    let section = getNumber()
+
+    /**
+     * 分段处理
+     * section 是分段数量
+     */
+    function segmentHandle() {
+
+      let preObjs = {} /*预加载对象列表*/
+      let analyticData
+      let hasComplete = false
+
+      /*如果可以取整*/
+      if (childData.fileNames.length > section) {
+        analyticData = childData.fileNames.splice(0, section)
+      } else {
+        /*如果小于等于检测数*/
+        analyticData = childData.fileNames
+        hasComplete = true
+      }
+
+      /*分段检测的回到次数*/
+      let analyticCount = analyticData.length
+
+      /*检测完成度*/
+      const parseComplete = function () {
+        if (analyticCount === 1) {
+          if (hasComplete) {
+            preObjs = null;
+            /*分段处理完毕就清理，用于判断跳出*/
+            callback()
+            return
+          } else {
+            segmentHandle()
+          }
+        }
+        --analyticCount
+      }
 
       /**
-       * 分段处理
+       * 分配任务
+       * 1 分配到每个解析器去处理
+       * 2 给一个定时器的范围
        */
-      function segmentHandle() {
-
-        let analyticData;
-        let hasComplete = false
-
-        /*如果可以取整*/
-        if (childData.fileNames.length > section) {
-          analyticData = childData.fileNames.splice(0, section)
-        } else {
-          /*如果小于等于检测数*/
-          analyticData = childData.fileNames
-          hasComplete = true
-        }
-
-        /*分段检测的回到次数*/
-        let analyticCount = analyticData.length
-
-        // $warn('加载类型：' + type + ' - 数量：' + analyticCount)
-
-        /**
-         * 检测完成度
-         */
-        const completeParse = function() {
-          if (analyticCount === 1) {
-            if (hasComplete) {
-              /*分段处理完毕就清理，用于判断跳出*/
-              callback()
-              return
-            } else {
-              segmentHandle()
-            }
-          }
-          --analyticCount
-        }
-
-        /**
-         * 分配任务
-         * 1 分配到每个解析器去处理
-         * 2 给一个定时器的范围
-         */
-        analyticData.forEach(function(filePath, index) {
-
-          let state = false
-
-          let timer = null
-          let reset = function() {
-            state = true
-            if (timer) {
-              clearTimeout(timer)
-              timer = null
-            }
-          }
-
-          let setComplete = function() {
-            if (!state) {
-              reset()
-              completeParse()
-            }
-          }
-
-          parse(filePath, setComplete)
-
-          /*主动监测2秒*/
-          if (!state) {
-            timer = setTimeout(setComplete, 2000);
-          }
-
+      analyticData.forEach(function (filePath, index) {
+        preObjs[filePath] = new Detect({
+          parser,
+          filePath,
+          checkTime: 2000 /*主动检测2秒*/
         })
-
-      }
-
-      segmentHandle()
+        preObjs[filePath].start(function (state) {
+          /*加入错误的循环检测列表，如果销毁了就不处理 */
+          if (state === false) {
+            if (preloadData) {
+              addLoop(filePath, parser)
+            }
+          }
+          parseComplete()
+        })
+      })
     }
+
+    segmentHandle()
+  }
+}
+
+
+/**
+ * 创建对应的处理器
+ */
+function createHandle(type, childData, parser) {
+  if (type === 'master') {
+    return masterHandle(childData)
+  } else {
+    return pageHandle(type, childData, parser)
   }
 }
 
 /**
  * 开始加载资源
  */
-function loadResource(data, callback, isInit) {
+function loadResource(data, callback) {
   const asy = new AsyAccess()
   for (let key in data) {
-    let parse = PARSE[key]
-    if (parse) {
-      asy.create(createProcessor(key, data[key], parse, isInit))
+    let parser = PARSER[key]
+    if (parser) {
+      /*audio优先解析*/
+      asy.create(createHandle(key, data[key], parser), key === 'audio' ? 'unshift' : 'push')
     }
   }
   /*执行后监听,监听完成*/
@@ -277,7 +280,7 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   const pageData = preloadData[chapterId]
   if (pageData) {
-    loadResource(pageData, function() {
+    loadResource(pageData, function () {
       $warn('----预加资源完成chapterId: ' + chapterId)
       deleteResource(chapterId)
       repeatCheck(loadingId, callback)
@@ -315,31 +318,31 @@ function checkCache(finish, next) {
  */
 export function initPreload(total, callback) {
 
-  const close = function() {
+  const close = function () {
     preloadData = null
     config.launch.preload = false
     callback()
   }
 
-  const start = function() {
-    nextTask('', function() {
+  const start = function () {
+    nextTask('', function () {
       callback();
       /*第二次延迟5秒后开始*/
-      setTimeout(function() {
+      setTimeout(function () {
         startPreload()
       }, 5000)
     })
   }
 
-  loadFile(config.data.pathAddress + 'preload.js', function() {
+  loadFile(config.data.pathAddress + 'preload.js', function () {
     if (window.preloadData) {
       chapterIdCount = total
       preloadData = window.preloadData
       window.preloadData = null;
       //初始预加载对象数量
-      const count = getNumber()
-      setAudio(count)
-      setImage(count)
+      let count = getNumber()
+      initAudio(count)
+      initImage(count)
       checkCache(close, start)
     } else {
       close()
@@ -358,7 +361,7 @@ export function startPreload() {
   /*从第2页开始预加载*/
   if (preloadData) {
     enable = true
-    setTimeout(function() {
+    setTimeout(function () {
       nextTask()
     }, 0)
   }
@@ -403,7 +406,7 @@ export function requestInterrupt({
     if (!processed) {
       $warn('预加载必须传递处理器，有错误')
     }
-    notification = [chapterId, function() {
+    notification = [chapterId, function () {
       processed.call(context)
     }]
     return true
@@ -423,4 +426,5 @@ export function clearPreload() {
   loadingId = 0
   preloadData = null
   notification = null
+  clearLoop()
 }

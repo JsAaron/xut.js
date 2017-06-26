@@ -27,11 +27,37 @@
 
 </html>
 <script type="text/javascript">
+
+// setTimeout(function(){
+// $("#Content_0_11").on('touchstart',function(){
+//   alert(211)
+//   var a = new Audio('content/20/gallery/m584704fd8a8e8e7600a0325fa48d2cf3.mp3')
+//   a.autoplay = true
+//     a.addEventListener('canplay', function(){
+//           alert('play123')
+//      a.play()
+
+//     }, false)
+//   // var b = new Audio('content/20/gallery/m9f795220ca57d45a6200b12f78e12388.mp3')
+//   // b.autoplay = true
+//   // b.play()
+//   //   var c = new Audio('content/20/gallery/mc49cb4229221423e3129db8672367364.mp3')
+//   // c.autoplay = true
+//   // c.play()
+// })
+
+
+
+// },5000)
+
+
+
+
 Xut.Application.setConfig = {
 
     lauchMode: 1,
-    preload: true,
-    visualMode: 5,
+    // preload: true,
+    visualMode: 1,
     // platform: 'mini',
     historyMode: false,
     launchAnim: false,
@@ -83,9 +109,6 @@ Xut.Application.setConfig = {
     // convert: 'svg', //转化资源svg转化成js
 };
 
-
-
-
 Xut.Application.Watch('initComplete', function() {
     // console.log(1)
 })
@@ -96,7 +119,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 18 //306
+var appId = 20 //306
 $("#launchMini").click(function() {
     Xut.Application.Launch({
         // trackCode: ['swipe'], //代码跟踪

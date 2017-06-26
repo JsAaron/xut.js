@@ -15,7 +15,7 @@ let audioShare = null
  * 1 根据preload
  * 2 如果是重复加载，判断缓存已创建的
  */
-export function setAudio(total) {
+export function initAudio(total) {
   if (audioShare) {
     audioShare.create(total)
   } else {
@@ -41,7 +41,6 @@ export function audioParse(url, callback) {
   let audio = getAudio()
 
   audio.src = url;
-  audio.muted = "muted";
   audio.preload = "auto";
   audio.autobuffer = true
 
@@ -56,12 +55,12 @@ export function audioParse(url, callback) {
   }
 
   function clear() {
-    audio.removeEventListener("loadstart", success, false)
+    audio.removeEventListener("canplay", success, false)
     audio.removeEventListener("error", error, false)
     audio = null
   }
 
-  audio.addEventListener("loadstart", success, false)
+  audio.addEventListener("canplay", success, false)
   audio.addEventListener("error", error, false)
 
 }

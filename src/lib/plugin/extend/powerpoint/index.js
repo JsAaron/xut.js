@@ -1,6 +1,6 @@
 import { config } from '../../../config/index'
 import { updateAction } from '../../../component/widget/page/extend/adv.sprite'
-import { preloadContentAudio, createContentAudio } from '../../../component/audio/api'
+import { createContentAudio } from '../../../component/audio/api'
 
 import fade from './extend/fade'
 import fly from './extend/fly'
@@ -110,8 +110,6 @@ export default class Powepoint {
      */
     this._initElement();
 
-    /**预加载音频 */
-    // this._preloadAudio()
   }
 
   /**
@@ -255,17 +253,6 @@ export default class Powepoint {
   }
 
 
-  /**
-   * 预加载音频
-   */
-  _preloadAudio() {
-    for (var i = 0; i < this.options.length; i++) {
-      let videoId = this.options[i].videoId
-      if (videoId > 0) {
-        // preloadContentAudio(this.chapterId, videoId)
-      }
-    }
-  }
 
   /**
    * 子动画通用开始事件
