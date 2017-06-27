@@ -1,4 +1,4 @@
-import { $get, $remove, $save, parseJSON, hash } from '../../../util/index'
+import { $setStorage, $getStorage, $removeStorage, parseJSON, hash } from '../../../util/index'
 
 /**
  * content对象的创建过滤器
@@ -6,31 +6,36 @@ import { $get, $remove, $save, parseJSON, hash } from '../../../util/index'
  */
 export function contentFilter(filterName) {
 
+  function setCache(listFilters) {
+    $setStorage(filterName || 'aaron', JSON.stringify(listFilters))
+  }
+
+  function getCache() {
+    var jsonStr = $getStorage(filterName);
+    if (jsonStr) {
+      return parseJSON(jsonStr)
+    }
+    return '';
+  }
+
+
   //过滤的节点
-  var listFilters = function() {
+  var listFilters = function () {
     var values = getCache();
     var h = hash()
-    if(values) {
+    if (values) {
       //keep the listFilters has no property
-      _.each(values, function(v, i) {
+      _.each(values, function (v, i) {
         h[i] = v;
       });
     }
     return h;
   }();
 
-  function setCache(listFilters) {
-    $save(filterName, listFilters)
-  }
-
-  function getCache() {
-    var jsonStr = $get(filterName);
-    return parseJSON(jsonStr);
-  }
 
   function access(callback, pageId, contentId) {
     //如果是transformFilter,不需要pageIndex处理
-    if(filterName === 'transformFilter' && contentId === undefined) {
+    if (filterName === 'transformFilter' && contentId === undefined) {
       contentId = pageId;
       pageId = 'transformFilter'
     }
@@ -39,12 +44,12 @@ export function contentFilter(filterName) {
 
   return {
     add(pageId, contentId) {
-      access(function(pageId, contentId) {
-        if(!listFilters[pageId]) {
+      access(function (pageId, contentId) {
+        if (!listFilters[pageId]) {
           listFilters[pageId] = [];
         }
         //去重
-        if(-1 === listFilters[pageId].indexOf(contentId)) {
+        if (-1 === listFilters[pageId].indexOf(contentId)) {
           listFilters[pageId].push(contentId);
           setCache(listFilters)
         }
@@ -52,10 +57,10 @@ export function contentFilter(filterName) {
     },
 
     remove(pageId, contentId) {
-      access(function(pageId, contentId) {
+      access(function (pageId, contentId) {
         var target = listFilters[pageId] || [],
           index = target.indexOf(contentId);
-        if(-1 !== index) {
+        if (-1 !== index) {
           target.splice(index, 1);
           setCache(listFilters);
         }
@@ -63,7 +68,7 @@ export function contentFilter(filterName) {
     },
 
     has(pageId, contentId) {
-      return access(function(pageId, contentId) {
+      return access(function (pageId, contentId) {
         var target = listFilters[pageId];
         return target ? -1 !== target.indexOf(contentId) ? true : false : false;
       }, pageId, contentId)
@@ -75,13 +80,13 @@ export function contentFilter(filterName) {
      * @return {[type]}        [description]
      */
     each(pageId) {
-      return access(function(pageId, contentId) {
+      return access(function (pageId, contentId) {
         var target, indexOf;
-        if(target = listFilters[pageId]) {
-          return function(contentIds, callback) {
-            _.each(target, function(ids) {
+        if (target = listFilters[pageId]) {
+          return function (contentIds, callback) {
+            _.each(target, function (ids) {
               var indexOf = contentIds.indexOf(ids);
-              if(-1 !== indexOf) {
+              if (-1 !== indexOf) {
                 callback(indexOf); //如果找到的过滤项目
               }
             })
@@ -96,7 +101,7 @@ export function contentFilter(filterName) {
     },
 
     empty() {
-      $remove(filterName);
+      $removeStorage(filterName);
       listFilters = {};
     }
   }

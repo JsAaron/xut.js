@@ -16,7 +16,7 @@ import { sceneController } from '../factory/control'
 import { getVisualDistance } from '../v-distance/index'
 import { setCustomStyle } from '../v-style/index'
 import { getVisualMode } from './mode'
-import { $set, hash, $warn } from '../../util/index'
+import { $setStorage, hash, $warn } from '../../util/index'
 
 import {
   initPointer,
@@ -567,7 +567,7 @@ export default class Scheduler {
       buildComplete(seasonId) {
         if (config.launch.historyMode && !options.isInApp && options.hasMultiScene) {
           const history = sceneController.sequence(seasonId, middleIndex)
-          if (history) { $set("history", history) }
+          if (history) { $setStorage("history", history) }
         }
       },
 
@@ -633,7 +633,7 @@ export default class Scheduler {
      * 保存目录索引
      */
     if (config.launch && config.launch.historyMode && !options.hasMultiScene) {
-      $set("pageIndex", middleIndex);
+      $setStorage("pageIndex", middleIndex);
     }
 
     /**

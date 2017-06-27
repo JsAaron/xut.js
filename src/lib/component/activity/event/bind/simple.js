@@ -48,7 +48,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
   //如果停止e.stopPropagation，那么默认行为就不会被触发
   //你绑定单击的情况下可以翻页
   //这里通过坐标的位置来判断
-  const start = function(e) {
+  const start = function (e) {
     let point = $event(e);
     //记录开始坐标
     startPageX = point.pageX;
@@ -57,32 +57,33 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
     setCanvasStart(supportSwipe);
   }
 
-  const move = function(e) {
-    if(!hasTap) {
+  const move = function (e) {
+    if (!hasTap) {
       return
     }
     let point = $event(e)
     let deltaX = point.pageX - startPageX
 
     //如果有move事件，则取消tap事件
-    if(Math.abs(deltaX)) {
+    /*三星S6上就算不移动也会给一个-0.6左右的值，所以这里强制加20PX的判断*/
+    if (Math.abs(deltaX) > 10) {
       hasTap = false;
       setCanvasMove(supportSwipe);
     }
   }
 
-  const end = function() {
+  const end = function () {
     hasTap && eventHandle();
   }
 
-  if(eventName === 'tap') {
+  if (eventName === 'tap') {
     $on(eventContext, {
       start: start,
       move: move,
       end: end,
       cancel: end
     })
-  } else if(onlyClick) {
+  } else if (onlyClick) {
     hasTap = true;
     $on(eventContext, {
       end: end
@@ -90,8 +91,8 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
   }
 
   return {
-    off: function() {
-      if(eventContext) {
+    off: function () {
+      if (eventContext) {
         $off(eventContext)
         eventContext = null;
       }

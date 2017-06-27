@@ -29,7 +29,6 @@ export class NativeAudio extends AudioSuper {
       this.audio = new Audio(this.$$url)
       this.needFix = true
     }
-
     this._watchAudio()
   }
 

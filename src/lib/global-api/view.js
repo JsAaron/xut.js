@@ -1,7 +1,7 @@
 import { SceneFactory } from '../scenario/index'
 import { sceneController } from '../scenario/factory/control'
 import { showBusy, hideBusy, showTextBusy } from '../initialize/cursor'
-import { toNumber, $remove, $extend, $warn } from '../util/index'
+import { toNumber, $removeStorage, $extend, $warn } from '../util/index'
 import { requestInterrupt } from '../preload/index'
 import { config } from '../config/index'
 
@@ -176,7 +176,7 @@ export function initView() {
     //主场景判断（第一个节,因为工具栏的配置不同）
     if (options.main || sceneController.mianId === seasonId) {
       //清理缓存
-      $remove("history");
+      $removeStorage("history");
       //确定主场景
       sceneController.mianId = seasonId;
       //是否主场景

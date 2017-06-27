@@ -1,4 +1,4 @@
-import { $set, $get } from '../util/index'
+import { $setStorage, $getStorage } from '../util/index'
 
 export function initAsset() {
 
@@ -22,10 +22,10 @@ export function initAsset() {
    */
   window.XXTAPI.ReadVar = function(variable, defaultValue) {
     var temp;
-    if(temp = $get(variable)) {
+    if(temp = $getStorage(variable)) {
       return temp;
     } else {
-      $set(variable, defaultValue);
+      $setStorage(variable, defaultValue);
       return defaultValue;
     }
   }
@@ -34,7 +34,7 @@ export function initAsset() {
    * 将变量的值保存起来
    */
   window.XXTAPI.SaveVar = function(variable, value) {
-    $set(variable, value)
+    $setStorage(variable, value)
   }
 
   /*
@@ -42,7 +42,7 @@ export function initAsset() {
    *对于全局变量，这个函数将是主要使用的，替代简单的“=”赋值
    */
   window.XXTAPI.SetVar = function(variable, value) {
-    $set(variable, value)
+    $setStorage(variable, value)
   }
 
 }

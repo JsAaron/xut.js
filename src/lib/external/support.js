@@ -18,7 +18,7 @@
   var isIpad = device.ipad()
   var isIOS = device.ios()
   var isWebKit = device.find('applewebkit') //webkit内核
-  var isWeiXin = device.find('micromessenger')  //微信
+  var isWeiXin = device.find('micromessenger') //微信
   var hasTouch = ('ontouchstart' in window) //支持触屏
 
   //针对win8的处理
@@ -45,6 +45,25 @@
   var androidVersionMatch = isAndroid && userAgent.match(/android ([\d_]+)/)
   var androidVersion = androidVersionMatch && androidVersionMatch[1].split('_')
 
+
+  /**
+   * 无痕浏览的模式
+   * 导致localStorage报错
+   * @param  {[type]} typeof localStorage  [description]
+   * @return {[type]}        [description]
+   */
+  var supportStorage = true
+  if (typeof localStorage === 'object') {
+    try {
+      localStorage.setItem('localStorage', 1);
+      localStorage.removeItem('localStorage');
+    } catch (e) {
+      Storage.prototype._setItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function () {};
+      supportStorage = false
+    }
+  }
+
   /**
    * 平台支持
    */
@@ -55,6 +74,14 @@
     isIpad: isIpad,
     isIOS: isIOS,
     isMacOS: isMacOS,
+
+    isWeiXin: isWeiXin,
+
+    /**
+     * 是否支持
+     * @type {[type]}
+     */
+    supportStorage: supportStorage,
 
     androidVersion: androidVersion,
 

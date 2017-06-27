@@ -4,7 +4,7 @@
  * @param options object
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
-import { $on, $off, $set, $get, $remove } from '../../../util/index'
+import { $on, $off, $setStorage, $getStorage, $removeStorage } from '../../../util/index'
 
 var icons = {
     hide: 'images/icons/arrowDown.svg'
@@ -108,7 +108,7 @@ BookMark.prototype.getMarkId = function(seasonId, pageId) {
  * @return {[type]} [description]
  */
 BookMark.prototype.getHistory = function() {
-  var mark = $get('bookMark');
+  var mark = $getStorage('bookMark');
   if(mark) {
     return mark.split(',');
   }
@@ -130,7 +130,7 @@ BookMark.prototype.addBookMark = function() {
     return;
   }
   BOOKCACHE.push(key)
-  $set('bookMark', BOOKCACHE);
+  $setStorage('bookMark', BOOKCACHE);
 }
 
 /**
@@ -155,10 +155,10 @@ BookMark.prototype.delBookMark = function(target) {
     index = BOOKCACHE.indexOf(key);
 
   BOOKCACHE.splice(index, 1);
-  $set('bookMark', BOOKCACHE);
+  $setStorage('bookMark', BOOKCACHE);
 
   if(BOOKCACHE.length == 0) {
-    $remove('bookMark');
+    $removeStorage('bookMark');
   }
 
   //移除该行

@@ -5,16 +5,7 @@
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
 import { config } from '../../config/index'
-import {
-  $on,
-  $off,
-  $handle,
-  $target,
-  $set,
-  $get,
-  $remove
-}
-from '../../util/index'
+import { $on, $off, $handle, $target, $setStorage, $getStorage, $removeStorage } from '../../util/index'
 
 
 /**
@@ -62,7 +53,7 @@ export default class Mark {
     this.parent.append($bookMark);
     this.bookMarkMenu = $bookMark.eq(0);
     //显示书签
-    setTimeout(function() {
+    setTimeout(function () {
       that.restore();
     }, 20);
     //获取历史记录
@@ -115,7 +106,7 @@ export default class Mark {
       self = this;
 
     //取历史记录
-    _.each(BOOKCACHE, function(mark) {
+    _.each(BOOKCACHE, function (mark) {
       tmp = mark.split('-');
       seasonId = tmp[0];
       pageId = tmp[1];
@@ -146,8 +137,8 @@ export default class Mark {
    * @return {[type]} [description]
    */
   getHistory() {
-    var mark = $get('bookMark');
-    if(mark) {
+    var mark = $getStorage('bookMark');
+    if (mark) {
       return mark.split(',');
     }
     return [];
@@ -165,11 +156,11 @@ export default class Mark {
     key = this.getMarkId(this.seasonId, this.pageId);
 
     //避免重复缓存
-    if(BOOKCACHE.indexOf(key) > -1) {
+    if (BOOKCACHE.indexOf(key) > -1) {
       return;
     }
     BOOKCACHE.push(key)
-    $set('bookMark', BOOKCACHE);
+    $setStorage('bookMark', BOOKCACHE);
   }
 
 
@@ -190,16 +181,16 @@ export default class Mark {
    * @return {[type]} [description]
    */
   delBookMark(target) {
-    if(!target || !target.dataset) return;
+    if (!target || !target.dataset) return;
 
     var key = target.dataset.mark,
       index = BOOKCACHE.indexOf(key);
 
     BOOKCACHE.splice(index, 1);
-    $set('bookMark', BOOKCACHE);
+    $setStorage('bookMark', BOOKCACHE);
 
-    if(BOOKCACHE.length == 0) {
-      $remove('bookMark');
+    if (BOOKCACHE.length == 0) {
+      $removeStorage('bookMark');
     }
 
     //移除该行
@@ -216,7 +207,7 @@ export default class Mark {
     var $bookMarkList,
       list = this.createMarkList();
 
-    if(this.bookMarkList) {
+    if (this.bookMarkList) {
       $bookMarkList = this.bookMarkList;
     } else {
       $bookMarkList = $(target).parent().parent().next();
@@ -260,7 +251,7 @@ export default class Mark {
    * @return {[type]}        [description]
    */
   goBookMark(target) {
-    if(!target || !target.dataset) return;
+    if (!target || !target.dataset) return;
 
     var key = target.dataset.mark.split('-')
     var seasonId = Number(key[0])
@@ -271,7 +262,7 @@ export default class Mark {
     this.backBookMark();
 
     //忽略当前页的跳转
-    if(this.pageId == pageId && this.seasonId == seasonId) {
+    if (this.pageId == pageId && this.seasonId == seasonId) {
       return;
     }
 
@@ -301,7 +292,7 @@ export default class Mark {
     var target = e.target;
     $handle({
       end(e) {
-        switch($target(e).className) {
+        switch ($target(e).className) {
           //加入书签
           case 'xut-bookmark-add':
             this.addBookMark();
@@ -371,19 +362,19 @@ export default class Mark {
     $off(this.parent)
 
     //菜单部分
-    if(this.bookMarkMenu) {
+    if (this.bookMarkMenu) {
       this.bookMarkMenu.remove();
       this.bookMarkMenu = null;
     }
 
     //列表部分
-    if(this.bookMarkList) {
+    if (this.bookMarkList) {
       this.bookMarkList.remove();
       this.bookMarkList = null;
     }
 
     //按钮效果
-    if(this.bookMarkIcon) {
+    if (this.bookMarkIcon) {
       this.bookMarkIcon[0].removeEventListener(Xut.style.transitionEnd, this.iconRestore, false);
       this.bookMarkIcon = null;
     }

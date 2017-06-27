@@ -6,7 +6,7 @@
 
 import { config } from '../../../config/index'
 import { bindContentEvent } from '../event/event'
-import { $on, $off, $set, $get } from '../../../util/index'
+import { $on, $off, $setStorage, $getStorage } from '../../../util/index'
 import { IScroll } from '../../../plugin/extend/iscroll'
 
 const docElement = document.documentElement
@@ -142,7 +142,7 @@ export default class HtmlBox {
     const closeTop = Math.floor(boxHeight / 2);
 
     //获取保存的字体值
-    const initValue = $get(this.storageName)
+    const initValue = $getStorage(this.storageName)
     if(initValue) {
       this._adjustSize(initValue)
     } else {
@@ -250,7 +250,7 @@ export default class HtmlBox {
   _adjustSize(value, save) {
     value = parseInt(value);
     docElement.style.fontSize = value + 'px'
-    save && $set(this.storageName, value)
+    save && $setStorage(this.storageName, value)
   }
 
 

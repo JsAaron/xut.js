@@ -14,9 +14,10 @@ import { videoParse } from './parser/video'
 import { svgParse } from './parser/svg'
 import pathHooks from './path-hook'
 import { AsyAccess } from '../observer/asy-access'
-import { $set, $get, $warn, loadFigure, loadFile } from '../util/index'
+import { $warn, loadFigure, loadFile, $setStorage, $getStorage } from '../util/index'
 import { addLoop, clearLoop } from './loop'
 import { Detect } from './detect'
+
 
 /**
  * 是否启动预加载
@@ -255,7 +256,7 @@ function repeatCheck(id, callback) {
   /*如果加载数等于总计量数，这个证明加载完毕*/
   if (id === chapterIdCount) {
     $warn('全部预加载完成')
-    $set('preload', checkFigure.url)
+    $setStorage('preload', checkFigure.url)
     return
   }
 
@@ -297,7 +298,7 @@ function nextTask(chapterId, callback) {
  * @return {[type]} [description]
  */
 function checkCache(finish, next) {
-  const cahceUrl = $get('preload')
+  const cahceUrl = $getStorage('preload')
   if (cahceUrl) {
     loadFigure(cahceUrl, (state, cache) => {
       if (cache) {

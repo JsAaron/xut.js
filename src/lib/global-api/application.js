@@ -5,7 +5,7 @@
  * **************************************************/
 
 import { config } from '../config/index'
-import { $get } from '../util/index'
+import { $getStorage } from '../util/index'
 import { Observer } from '../observer/index'
 import globalDestroy from '../global-destroy'
 import { $autoRun, $original, $suspend, $stop } from '../scenario/command/index'
@@ -159,7 +159,7 @@ export function initApplication() {
     if (window.DUKUCONFIG) {
       //外部回调通知
       if (window.DUKUCONFIG.iframeDrop) {
-        var appId = $get('appId');
+        var appId = $getStorage('appId');
         window.DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
       }
       window.DUKUCONFIG = null;

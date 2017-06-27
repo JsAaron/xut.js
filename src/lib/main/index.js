@@ -3,9 +3,9 @@ import loadScene from './scenario'
 import { config } from '../config/index'
 import { bindAndroid } from '../initialize/button'
 import { plugVideo, html5Video } from '../initialize/video'
-import { $get, parseJSON } from '../util/index'
+import { $getStorage, parseJSON } from '../util/index'
 
-const getCache = name => $get(name)
+const getCache = name => $getStorage(name)
 
 const initMain = novelData => {
 
@@ -63,7 +63,7 @@ const initMain = novelData => {
       return loadScene({
         "novelId": novelId,
         "pageIndex": pageIndex,
-        'history': $get('history')
+        'history': $getStorage('history')
       })
     }
   }
