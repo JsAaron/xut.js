@@ -53,7 +53,11 @@ export default class PageMgr extends ManageSuper {
   /*设置页面的初始化的translate值*/
   setInitTranslate(pageIndex) {
     if (config.launch.doublePageMode) {
-      this.rootNode.style[Xut.style.transform] = `translate3d(-${config.screenSize.width*pageIndex}px,0px,0px)`
+      let distance = config.screenSize.width * pageIndex
+      Xut.style.setTranslate({
+        x: -distance,
+        node: this.rootNode
+      })
     }
   }
 
@@ -81,8 +85,11 @@ export default class PageMgr extends ManageSuper {
   滑动页面容器
    */
   _moveContainer(distance, speed) {
-    this.rootNode.style[Xut.style.transform] = `translate3d(${distance}px,0px,0px)`
-    this.rootNode.style[Xut.style.transitionDuration] = speed + 'ms'
+    Xut.style.setTranslate({
+      speed,
+      x: distance,
+      node: this.rootNode
+    })
   }
 
   /**

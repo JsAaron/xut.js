@@ -35,10 +35,6 @@ export default class {
       this.resourcePath = getFileFullPath(options.resourcePath, 'autoSprite') + "/";
     }
 
-    //是否有蒙版图
-    //resType:1没有蒙版 0：有蒙版
-    this.isMask = false
-
     this.curFPS = 0
 
     /*默认值循环一次*/
@@ -69,7 +65,6 @@ export default class {
 
     this._init()
   }
-
 
 
   /**
@@ -105,6 +100,25 @@ export default class {
 
 
   /**
+   * 初始化位置信息
+   * @return {[type]} [description]
+   */
+  _initPosition() {
+    let obj = this.obj;
+    let params = this.data.params;
+    let action = this.action;
+    this.startPoint = {
+      x: this.originalImageList[0].X,
+      y: this.originalImageList[0].Y,
+      w: parseInt(params[action].width),
+      h: parseInt(params[action].height)
+    }
+    this.xRote = parseInt(obj.css("width")) / this.startPoint.w
+    this.yRote = parseInt(obj.css("height")) / this.startPoint.h
+  }
+
+
+  /**
    * 初始化qualified张图片
    * @return {[type]} [description]
    */
@@ -131,54 +145,23 @@ export default class {
   }
 
 
-  /**
-   * 初始化位置信息
-   * @return {[type]} [description]
-   */
-  _initPosition() {
-    let obj = this.obj;
-    let params = this.data.params;
-    let action = this.action;
-    this.startPoint = {
-      x: this.originalImageList[0].X,
-      y: this.originalImageList[0].Y,
-      w: parseInt(params[action].width),
-      h: parseInt(params[action].height)
-    }
-    this.xRote = parseInt(obj.css("width")) / this.startPoint.w
-    this.yRote = parseInt(obj.css("height")) / this.startPoint.h
-    this.startLeft = parseInt(obj.css("left"))
-    this.startTop = parseInt(obj.css("top"))
-  }
-
 
   /**
    * 初始化结构
    * @return {[type]} [description]
    */
   _initStructure() {
-    let obj = this.obj;
-    let framId;
-    let resourcePath = this.resourcePath
-    let html = ''
-    if (this.isMask) {
-      const filename = this._getFilename(this.originalImageList[0].name)
-      const maskUrl = resourcePath + filename
-      html =
-        `<div style="width:100%;height:100%;
-                     background: url(${maskUrl}.jpg) no-repeat;
-                     background-size: 100% 100%;
-                     -webkit-mask: url(${maskUrl}.png) no-repeat;
-                     -webkit-mask-size: 100% 100%;'>
-        </div>`
-      this.sprObj = $(String.styleFormat(html))
-      obj.append(this.sprObj);
+    const src = this.resourcePath + this.originalImageList[0].name
+    let container
+    if (Xut.plat.isIOS) {
+      container = `<img src=${src} class="inherit-size fullscreen-background" style="position:absolute;"/>`
     } else {
-      const src = resourcePath + this.originalImageList[0].name
-      html = `<img src="${src}" style="width:100%;height:100%;"/>`
-      this.sprObj = $(String.styleFormat(html))
-      obj.html(this.sprObj)
+      container = `<div class="inherit-size fullscreen-background"
+                            style="position:absolute;background-image: url(${src});"></div>`
     }
+    const $sprObj = $(String.styleFormat(container))
+    this.sprObj = $sprObj[0]
+    this.obj.html(this.sprObj)
   }
 
 
@@ -207,41 +190,9 @@ export default class {
       self._imgArray && self._imgArray.push(this)
       callback && callback()
     }
-
     let imageList = this.originalImageList
     let resourcePath = this.resourcePath
-    if (this.isMask) {
-      let filename = this._getFilename(imageList[index].name)
-      loadFigure(resourcePath + filename + ".png", collect)
-      loadFigure(resourcePath + filename + ".jpg", collect)
-    } else {
-      loadFigure(resourcePath + imageList[index].name, collect)
-    }
-  }
-
-
-  /**
-   * 改变图片url
-   * @return {[type]} [description]
-   */
-  _changeImageUrl() {
-    let imageList = this.originalImageList
-    let curFPS = imageList[this.curFPS];
-    let resourcePath = this.resourcePath;
-
-    //第一次循环才加载图片
-    if (this.resetCount === 0) {
-      this._preloadImage(this.curFPS + this.qualified)
-    }
-
-    if (this.isMask) {
-      let filename = this._getFilename(curFPS.name);
-      this.sprObj.css("background-image", "url(" + resourcePath + filename + ".jpg)");
-      this.sprObj.css("-webkit-mask-image", "url(" + resourcePath + filename + ".png)");
-    } else {
-      let str = resourcePath + curFPS.name
-      this.sprObj.attr("src", str);
-    }
+    loadFigure(resourcePath + imageList[index].name, collect)
   }
 
 
@@ -254,10 +205,42 @@ export default class {
     let curFPS = imageList[this.curFPS];
     let x = curFPS.X - this.startPoint.x;
     let y = curFPS.Y - this.startPoint.y;
-    this.obj.css({
-      left: this.startLeft + x * this.xRote,
-      top: this.startTop + y * this.yRote
-    })
+    return {
+      left: x * this.xRote,
+      top: y * this.yRote
+    }
+  }
+
+  /**
+   * 改变图片url 与 变化的位置
+   * @return {[type]} [description]
+   */
+  _changeImage() {
+    let imageList = this.originalImageList
+    let curFPS = imageList[this.curFPS];
+    let resourcePath = this.resourcePath;
+
+    /*第一次循环才加载图片*/
+    if (this.resetCount === 0) {
+      this._preloadImage(this.curFPS + this.qualified)
+    }
+
+    /*如果图片需要运动，改变地址*/
+    if (this.isSports) {
+      const position = this._changePosition()
+      Xut.style.setTranslate({
+        node: this.sprObj,
+        x: position.left,
+        y: position.top
+      })
+    }
+
+    /*改变图片*/
+    if (Xut.plat.isIOS) {
+      this.sprObj.setAttribute('src', resourcePath + curFPS.name)
+    } else {
+      this.sprObj.style.backgroundImage = `url(${ resourcePath + curFPS.name })`
+    }
   }
 
 
@@ -269,10 +252,8 @@ export default class {
     if (!this.originalImageList) {
       return
     }
-    this._changeImageUrl()
-    if (this.isSports) {
-      this._changePosition()
-    }
+    /*切换图片*/
+    this._changeImage()
   }
 
 

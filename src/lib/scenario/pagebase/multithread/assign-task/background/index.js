@@ -1,14 +1,14 @@
 import TaskSuper from '../super/index'
-import { readFile, replacePath } from '../../../../../util/option'
+import { readFileContent, replacePath } from '../../../../../util/index'
 import createBackground from './layout'
 
 /**
  * 解析背景内容
  */
-const parseContent = function(content, callback) {
+const parseContent = function (content, callback) {
   //背景是svg文件
-  if(/.svg$/i.test(content)) {
-    readFile(content, function(svgContent) {
+  if (/.svg$/i.test(content)) {
+    readFileContent(content, function (svgContent) {
       callback(svgContent);
     });
   } else {
@@ -37,7 +37,7 @@ export default class TaskBackground extends TaskSuper {
     //iboosk节点预编译
     //在执行的时候节点已经存在
     //不需要在创建
-    if(Xut.IBooks.runMode()) {
+    if (Xut.IBooks.runMode()) {
       //找到背景节点
       // var $element = $containsNode.find('.multilayer');
       success()
@@ -45,10 +45,10 @@ export default class TaskBackground extends TaskSuper {
     }
 
     //背景是否需要SVG解析
-    parseContent(content, function(svgContent) {
+    parseContent(content, function (svgContent) {
       svgContent = replacePath(svgContent)
       const htmlstr = createBackground(svgContent, data)
-      if(htmlstr) {
+      if (htmlstr) {
         svgContent = null
         self._checkNextTask($(htmlstr), $containsNode)
       } else {

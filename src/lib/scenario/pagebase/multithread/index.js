@@ -18,8 +18,11 @@ const createPageScale = (rootNode, pageIndex) => {
     tapClose: true,
     update(styleText, speed) {
       if (pageMasterNode && styleText) {
-        pageMasterNode.style[Xut.style.transform] = styleText
-        pageMasterNode.style[Xut.style.transitionDuration] = speed + 'ms'
+        Xut.style.setTranslate({
+          speed,
+          styleText,
+          node: pageMasterNode
+        })
       }
     }
   })

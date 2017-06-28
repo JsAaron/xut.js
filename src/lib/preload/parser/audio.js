@@ -55,12 +55,12 @@ export function audioParse(url, callback) {
   }
 
   function clear() {
-    audio.removeEventListener("canplay", success, false)
+    audio.removeEventListener("loadedmetadata", success, false)
     audio.removeEventListener("error", error, false)
     audio = null
   }
 
-  audio.addEventListener("canplay", success, false)
+  audio.addEventListener("loadedmetadata", success, false)
   audio.addEventListener("error", error, false)
 
 }

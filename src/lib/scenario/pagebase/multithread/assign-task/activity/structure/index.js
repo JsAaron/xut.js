@@ -17,7 +17,7 @@ import {
   $warn,
   parseJSON,
   reviseSize,
-  readFile,
+  readFileContent,
   getResources,
   createRandomImg,
   getFileFullPath
@@ -94,13 +94,13 @@ const analysisPath = (wrapObj, conData) => {
 const externalFile = (wrapObj, svgCallback) => {
   //svg零件不创建解析具体内容
   if (wrapObj.isSvg) {
-    readFile(wrapObj.contentData.md5, (svgdata) => {
+    readFileContent(wrapObj.contentData.md5, (svgdata) => {
       wrapObj.svgstr = svgdata
       svgCallback(wrapObj)
     });
   } else if (wrapObj.isJs) {
     //如果是.js的svg文件
-    readFile(wrapObj.contentData.md5, (htmldata) => {
+    readFileContent(wrapObj.contentData.md5, (htmldata) => {
       wrapObj.htmlstr = htmldata
       svgCallback(wrapObj)
     }, "js")

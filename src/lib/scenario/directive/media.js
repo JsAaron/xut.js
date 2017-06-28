@@ -1,4 +1,4 @@
-import { parseJSON, getFileFullPath,titleCase } from '../../util/index'
+import { parseJSON, getFileFullPath, titleCase } from '../../util/index'
 import { config } from '../../config/index'
 import { triggerAudio, autoAudio, getMediaData, hasHotAudioPlay } from '../../component/audio/api'
 import { triggerVideo, autoVideo } from '../../component/video/api'
@@ -131,7 +131,7 @@ export default {
     const mediaType = titleCase(category)
 
     /*默认状态*/
-    let imageBackground = stopImage || startImage
+    let imageBackground = startImage
 
     /*
     音频在创建dom的时候需要查下
@@ -139,7 +139,7 @@ export default {
     如果创建过，那么图标状态需要处理
     */
     if (hasHotAudioPlay(chapterId, _id)) {
-      imageBackground = startImage
+      imageBackground = stopImage
     }
 
     /*

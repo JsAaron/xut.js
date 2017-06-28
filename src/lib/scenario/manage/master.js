@@ -35,8 +35,6 @@ const toArray = (filter) => {
 }
 
 const rword = "-"
-const transitionDuration = Xut.style.transitionDuration
-const transform = Xut.style.transform
 
 /**
  * parallaObjsCollection: Object
@@ -413,8 +411,11 @@ export default class MasterMgr extends ManageSuper {
       const _fixToMove = function (distance, speed) {
         var $pageNode = parallaxObj.$pageNode;
         if ($pageNode) {
-          $pageNode.css(transitionDuration, speed + 'ms');
-          $pageNode.css(transform, 'translate3d(' + distance + 'px,0px,0px)')
+          Xut.style.setTranslate({
+            speed,
+            x: distance,
+            node: $pageNode
+          })
         }
       }
 

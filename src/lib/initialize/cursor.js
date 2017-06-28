@@ -4,8 +4,6 @@ import { config } from '../config/index'
  * 用css3实现的忙碌光标
  * @return {[type]} [description]
  */
-const transform = Xut.style.transform
-const animationDelay = Xut.style.animationDelay
 
 /**
  * 延时加载
@@ -69,7 +67,7 @@ export function createCursor() {
     while (count--) {
       container +=
         `<div class="xut-busy-spinner"
-              style="${transform}:rotate(${deg[count]}deg) translate(0,-142%);${animationDelay}:-${delay[count]}s">
+              style="${Xut.style.transform}:rotate(${deg[count]}deg) translate(0,-142%);${Xut.style.animationDelay}:-${delay[count]}s">
          </div>`
     }
     container = `<div class="xut-busy-middle">${container}</div>`

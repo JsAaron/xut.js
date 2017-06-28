@@ -31,13 +31,13 @@ export function Action(options) {
 
   return {
     play() {
-      options.startImage && toggleImage(options.startImage)
+      options.stopImage && toggleImage(options.stopImage)
       if (options.startScript) {
         Xut.Assist.Run(pageType, options.startScript.split(','))
       }
     },
     pause() {
-      options.stopImage && toggleImage(options.stopImage)
+      options.startImage && toggleImage(options.startImage)
       if (options.stopScript) {
         Xut.Assist.Stop(pageType, options.stopScript.split(','))
       }

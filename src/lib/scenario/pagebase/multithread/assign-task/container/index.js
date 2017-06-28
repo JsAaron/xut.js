@@ -10,8 +10,6 @@ import { config } from '../../../../../config/index'
 import { hasValue } from '../../../../../util/lang'
 import { getFileFullPath } from '../../../../../util/option'
 
-const TANSFROM = Xut.style.transform
-
 /**
  * 创建页面容器li
  */
@@ -27,7 +25,7 @@ const createHTML = function ({
 
   //设置滑动的偏移量
   //双页面只有布局偏移量，没有滑动偏移量
-  const translate3d = translate ? `${ TANSFROM }:${ translate }` : ''
+  const setTranslate = translate ? `${ Xut.style.transform }:${ translate }` : ''
 
   //增加一个main-content放body内容
   //增加一个header-footer放溢出的页眉页脚
@@ -42,7 +40,7 @@ const createHTML = function ({
                 height:${getStyle.visualHeight}px;
                 left:${getStyle.visualLeft}px;
                 top:${getStyle.visualTop}px;
-                ${translate3d};
+                ${setTranslate};
                 ${background}
                 ${customStyle}">
         <div class="page-scale">

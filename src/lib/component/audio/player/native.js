@@ -6,6 +6,8 @@ import { hasAudioes, getAudio } from '../fix'
  * 1-支持audio的autoplay，大部分安卓机子的自带浏览器和微信，大部分的IOS微信（无需特殊解决）
  * 2-不支持audio的autoplay，部分的IOS微信
  * 3-不支持audio的autoplay，部分的安卓机子的自带浏览器（比如小米，开始模仿safari）和全部的ios safari（这种只能做用户触屏时就触发播放了）
+ *
+ * ios10.3  不支持canplay事件
  */
 export class NativeAudio extends AudioSuper {
 
@@ -29,34 +31,39 @@ export class NativeAudio extends AudioSuper {
       this.audio = new Audio(this.$$url)
       this.needFix = true
     }
-    this._watchAudio()
+    this._watchAudio(true)
   }
 
   /**
    * 重设音频上下文
+   * 因为自动音频播放的关系
+   * 在点击后修复这个音频
    * @return {[type]} [description]
    */
   resetContext() {
-    // this._destroy()
-    // this.audio = getAudio()
-    // this.audio.src = this.$$url
-    // if (this.status === 'playing') {
-    //   this._startPlay()
-    // }
+    this._destroy()
+    this.audio = getAudio()
+    this.audio.src = this.$$url
+    this._watchAudio(this.status === 'playing' ? true : false)
   }
 
 
   /**
    * 监听音频播放
+   * status
+   *   如果为true就是时间完毕后，允许播放
+   *   否则就是在resetContext调用处理，音频已经跳过了playing，可能关闭或者停止了
    */
-  _watchAudio() {
+  _watchAudio(status) {
 
     //自动播放，只处理一次
     //手动调用的时候会调用play的时候会调用canplay
     //导致重复播放，所以在第一次的去掉这个事件
     this._canplayCallBack = () => {
-      this._startPlay()
-      this.audio.removeEventListener('canplay', this._canplayCallBack, false)
+      if (status) {
+        this._startPlay()
+      }
+      this.audio.removeEventListener('loadedmetadata', this._canplayCallBack, false)
     }
 
     this._endCallBack = () => {
@@ -69,11 +76,8 @@ export class NativeAudio extends AudioSuper {
     /*微信不支持canplay事件*/
     if (window.WeixinJSBridge) {
       this._startPlay()
-    } else if (Xut.plat.isAndroid) {
-      /*安卓手机浏览器canplay有问题*/
-      this._startPlay()
     } else {
-      this.audio.addEventListener('canplay', this._canplayCallBack, false)
+      this.audio.addEventListener('loadedmetadata', this._canplayCallBack, false)
     }
     this.audio.addEventListener('ended', this._endCallBack, false)
     this.audio.addEventListener('error', this._errorCallBack, false)
@@ -120,7 +124,7 @@ export class NativeAudio extends AudioSuper {
     if (this.audio) {
       this.audio.pause();
       //快速切换，防止在播放中就移除，导致没有销毁
-      this.audio.removeEventListener('canplay', this._canplayCallBack, false)
+      this.audio.removeEventListener('loadedmetadata', this._canplayCallBack, false)
       this.audio.removeEventListener('ended', this._endCallBack, false)
       this.audio.removeEventListener('error', this._errorCallBack, false)
       this.audio = null;

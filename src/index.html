@@ -27,13 +27,11 @@
 
 </html>
 <script type="text/javascript">
-
-
 Xut.Application.setConfig = {
 
     lauchMode: 1,
-    preload: true,
-    visualMode: 5,
+    // preload: true,
+    visualMode: 1,
     // platform: 'mini',
     historyMode: false,
     launchAnim: false,
@@ -95,8 +93,10 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 21 //306
-$("#launchMini").click(function() {
+
+
+var appId = 506 //306
+function play() {
     Xut.Application.Launch({
         // trackCode: ['swipe'], //代码跟踪
         el: '#xxtppt-app-container', //根节点
@@ -105,20 +105,16 @@ $("#launchMini").click(function() {
             database: 'content/' + appId + '/SQLResult.js'
         }
     });
-})
-$("#launchMini").trigger('click')
-
-
+}
+play()
+$("#launchMini").click(play)
 $("#home").click(function() {
     Xut.Application.Original()
 })
-
 $("#activate").click(function() {
     Xut.Application.Activate()
 })
-
 $("#closeMini").click(function() {
-    console.log(111)
     Xut.Application.Exit()
 })
 </script>

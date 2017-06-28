@@ -15,17 +15,18 @@ const hasTouch = Xut.plat.hasTouch
 
 
 //触发事件名
-const touchList = ['touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd]
-const mouseList = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseleave']
+const touchList = ['click', 'touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd]
+const mouseList = ['click', 'mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseleave']
 
 //绑定事件名排序
 const orderName = {
-  start: 0,
-  move: 1,
-  end: 2,
-  cancel: 3,
-  transitionend: 4,
-  leave: 5
+  click: 0,
+  start: 1,
+  move: 2,
+  end: 3,
+  cancel: 4,
+  transitionend: 5,
+  leave: 6
 }
 
 const eventNames = (() => {

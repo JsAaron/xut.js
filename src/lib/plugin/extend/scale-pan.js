@@ -1,9 +1,6 @@
 import { closeButton } from './close-button'
 import { config } from '../../config/index'
 
-const transform = Xut.style.transform
-const transitionDuration = Xut.style.transitionDuration
-
 const START_X = 0
 const START_Y = 0
 
@@ -122,7 +119,7 @@ export class ScalePan {
 
     //如果单击关闭存在，就增加
     //否则不能阻止外部的事件关闭
-    if(this.tapClose) {
+    if (this.tapClose) {
       bindHash['tap'] = '_onTap'
     }
 
@@ -141,10 +138,10 @@ export class ScalePan {
    * @return {[type]} [description]
    */
   _onTap() {
-    if(this.tapCallabck) {
+    if (this.tapCallabck) {
       this.tapCallabck()
     } else {
-      if(this.tapClose && this.data.scale != 1) {
+      if (this.tapClose && this.data.scale != 1) {
         this.reset()
       }
     }
@@ -166,8 +163,8 @@ export class ScalePan {
   _onPinchMove(ev) {
 
     //允许溢出值
-    if(!this.scaleing) {
-      if(ev.scale < this.overflowValue + 1) {
+    if (!this.scaleing) {
+      if (ev.scale < this.overflowValue + 1) {
         return
       }
       this.scaleing = true
@@ -177,7 +174,7 @@ export class ScalePan {
     scale = this.lastScale * scale
 
     //限定缩放的倍数
-    if(scale > this.maxScale) {
+    if (scale > this.maxScale) {
       return
     }
 
@@ -195,7 +192,7 @@ export class ScalePan {
    * @return {[type]} [description]
    */
   _onPinchEnd(ev) {
-    if(this.data.scale <= 1) {
+    if (this.data.scale <= 1) {
       Xut.nextTick(() => {
         this._initState()
         this._updateNodeStyle(500)
@@ -211,8 +208,8 @@ export class ScalePan {
    * @return {[type]}    [description]
    */
   _onPan(ev) {
-    if(this._isRunning) {
-      if(this.currentX != START_X || this.currentY != START_Y) {
+    if (this._isRunning) {
+      if (this.currentX != START_X || this.currentY != START_Y) {
         this.data.translate = {
           x: this.currentX + ev.deltaX,
           y: this.currentY + ev.deltaY
@@ -244,24 +241,24 @@ export class ScalePan {
    * @return {Boolean} [description]
    */
   _isBoundry() {
-    if(this._isRunning) {
+    if (this._isRunning) {
       var horizontalBoundry = (this.data.scale - 1) / 2 * this._offsetWidth
       var verticalBoundry = (this.data.scale - 1) / 2 * this._offsetHeight
 
       //左边界
-      if(this.data.translate.x >= horizontalBoundry) {
+      if (this.data.translate.x >= horizontalBoundry) {
         this.data.translate.x = horizontalBoundry
       }
       //右边界
-      if(this.data.translate.x <= -horizontalBoundry) {
+      if (this.data.translate.x <= -horizontalBoundry) {
         this.data.translate.x = -horizontalBoundry
       }
       //上边界
-      if(this.data.translate.y >= verticalBoundry) {
+      if (this.data.translate.y >= verticalBoundry) {
         this.data.translate.y = verticalBoundry
       }
       //下边界
-      if(this.data.translate.y <= -verticalBoundry) {
+      if (this.data.translate.y <= -verticalBoundry) {
         this.data.translate.y = -verticalBoundry
       }
 
@@ -278,12 +275,15 @@ export class ScalePan {
    * @return {[type]} [description]
    */
   _updateNodeStyle(speed = 0) {
-    if(!this.ticking) {
+    if (!this.ticking) {
       Xut.nextTick(() => {
         const data = this.data
         const styleText = `translate3d(${data.translate.x}px,${data.translate.y}px,0px) scale(${data.scale},${data.scale})`
-        this.rootNode.style[transform] = styleText
-        this.rootNode.style[transitionDuration] = speed + 'ms'
+        Xut.style.setTranslate({
+          speed,
+          styleText,
+          node: this.rootNode
+        })
         this.update && this.update(styleText, speed)
         this.ticking = false
       })
@@ -321,11 +321,11 @@ export class ScalePan {
    */
   _buttonShow() {
     //to heavy
-    if(this._isRunning) return
-    if(this.data.scale > 1) {
+    if (this._isRunning) return
+    if (this.data.scale > 1) {
       //必须启动配置
-      if(this.hasButton) {
-        if(this.$buttonNode) {
+      if (this.hasButton) {
+        if (this.$buttonNode) {
           Xut.nextTick(() => {
             this.$buttonNode.show()
           })
@@ -344,7 +344,7 @@ export class ScalePan {
    * @return {[type]} [description]
    */
   _buttonHide() {
-    if(!this._isRunning) return
+    if (!this._isRunning) return
     this.hasButton && this.$buttonNode.hide()
     this._isRunning = false
     Xut.View.SetSwiperEnable() //全局滑动
@@ -353,15 +353,15 @@ export class ScalePan {
 
 
   destroy() {
-    if(this.$buttonNode) {
+    if (this.$buttonNode) {
       this.$buttonNode.off()
       this.$buttonNode = null
     }
-    if(this.hammer){
+    if (this.hammer) {
       this.hammer.destroy()
       this.hammer = null
     }
-    if(this.$buttonNode){
+    if (this.$buttonNode) {
       this.$buttonNode.off()
     }
     this.update = null

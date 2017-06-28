@@ -1,6 +1,6 @@
 import { config } from '../../../../config/index'
 import { parseJSON } from '../../../../util/lang'
-import Sprite from '../../../../plugin/extend/sprite/advance'
+import SeniorSprite from '../../../../plugin/extend/sprite/senior'
 
 let spiritObjs = {}
 
@@ -87,7 +87,7 @@ export default function (inputPara, contents) {
         if (parentId != "0") {
           moveContent(contentPrefix, framId, parentId)
         }
-        spiritObjs[id] = new Sprite(spiritList, options)
+        spiritObjs[id] = new SeniorSprite(spiritList, options)
         ids.push(id)
       } else {
         console.log("inputPara undefine Spirit")

@@ -27,7 +27,7 @@ export default function slide(Swiper) {
     /*父容器滑动模式*/
     if (this.options.scope === 'parent') {
       if (this.options.scrollY) {
-        this.scroller.style[Xut.style.transform] = `translate3d(0px,${y}px,0px)`
+        Xut.style.setTranslate({ y, node: this.scroller })
       }
     }
     /*更新坐标*/

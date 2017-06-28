@@ -600,7 +600,7 @@ String.styleFormat = function(format) {
   var isIpad = device.ipad()
   var isIOS = device.ios()
   var isWebKit = device.find('applewebkit') //webkit内核
-  var isWeiXin = device.find('micromessenger') && window.WeixinJSBridge //微信
+  var isWeiXin = device.find('micromessenger') //微信
   var hasTouch = ('ontouchstart' in window) //支持触屏
 
   //针对win8的处理
@@ -627,6 +627,25 @@ String.styleFormat = function(format) {
   var androidVersionMatch = isAndroid && userAgent.match(/android ([\d_]+)/)
   var androidVersion = androidVersionMatch && androidVersionMatch[1].split('_')
 
+
+  /**
+   * 无痕浏览的模式
+   * 导致localStorage报错
+   * @param  {[type]} typeof localStorage  [description]
+   * @return {[type]}        [description]
+   */
+  var supportStorage = true
+  if (typeof localStorage === 'object') {
+    try {
+      localStorage.setItem('localStorage', 1);
+      localStorage.removeItem('localStorage');
+    } catch (e) {
+      Storage.prototype._setItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function () {};
+      supportStorage = false
+    }
+  }
+
   /**
    * 平台支持
    */
@@ -637,6 +656,14 @@ String.styleFormat = function(format) {
     isIpad: isIpad,
     isIOS: isIOS,
     isMacOS: isMacOS,
+
+    isWeiXin: isWeiXin,
+
+    /**
+     * 是否支持
+     * @type {[type]}
+     */
+    supportStorage: supportStorage,
 
     androidVersion: androidVersion,
 
@@ -782,10 +809,17 @@ String.styleFormat = function(format) {
     };
 
 
-  /**
-   * 样式style支持
-   * @type {Object}
-   */
+
+  ////////////////////
+  /// 样式style支持
+  ////////////////////
+
+  function setTranslateStyle(x, y) {
+    return 'translate(' + x + 'px,' + y + 'px)' + translateZ
+  }
+  var transitionDuration = prefixStyle('transition-duration')
+  var transform = prefixStyle('transform')
+
   Xut.mixin(Xut.style, {
 
     reqAnimationFrame: reqAnimationFrame,
@@ -806,9 +840,9 @@ String.styleFormat = function(format) {
      * transform
      * @type {[type]}
      */
-    transform: prefixStyle('transform'),
+    transform: transform,
     transition: prefixStyle('transition'),
-    transitionDuration: prefixStyle('transition-duration'),
+    transitionDuration: transitionDuration,
     transitionDelay: prefixStyle('transition-delay'),
     transformOrigin: prefixStyle('transform-origin'),
     transitionTimingFunction: prefixStyle('transition-timing-function'),
@@ -832,6 +866,43 @@ String.styleFormat = function(format) {
     setTranslateZ: function (zValue) {
       return hasPerspective ? ' translateZ(' + zValue + ')' : ''
     },
+
+    /**
+     * 设置Translate
+     * @param {[type]} node [description]
+     * @param {[type]} x    [description]
+     * @param {[type]} y    [description]
+     */
+    setTranslateStyle: setTranslateStyle,
+    setTranslate: function (options) {
+      var node = options.node
+      var x = options.x || 0
+      var y = options.y || 0
+      var speed = options.speed
+      var styleText = options.styleText
+
+      if (!node) {
+        console.log('setTranslate没有提供node')
+        return
+      }
+
+      /*如果是jquery对象*/
+      if (node.length) {
+        node = node[0]
+      }
+
+      /*设置*/
+      if (styleText) {
+
+      } else {
+        node.style[transform] = setTranslateStyle(x, y)
+      }
+
+      if (speed !== undefined) {
+        node.style[transitionDuration] = speed + 'ms'
+      }
+    },
+
 
     /**
      * 额外样式
@@ -42741,17 +42812,18 @@ var isMouseTouch = Xut.plat.isMouseTouch;
 var hasTouch = Xut.plat.hasTouch;
 
 //触发事件名
-var touchList = ['touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd];
-var mouseList = ['mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseleave'];
+var touchList = ['click', 'touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd];
+var mouseList = ['click', 'mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseleave'];
 
 //绑定事件名排序
 var orderName = {
-  start: 0,
-  move: 1,
-  end: 2,
-  cancel: 3,
-  transitionend: 4,
-  leave: 5
+  click: 0,
+  start: 1,
+  move: 2,
+  end: 3,
+  cancel: 4,
+  transitionend: 5,
+  leave: 6
 };
 
 var eventNames = function () {
@@ -43180,10 +43252,23 @@ var stop = function stop() {
  * 1 图片加载状态 success / fail   true/false
  * 2 图片是否被缓存 hasCache       ture/false
  */
-function loadFigure(url, callback) {
+function loadFigure(data, callback) {
 
-  var img = new Image();
-  img.src = url;
+  if (!data) {
+    console.log('loadFigure data有错误');
+    callback();
+    return;
+  }
+
+  var img = void 0;
+  if (typeof data === 'string') {
+    img = new Image();
+    img.src = data;
+  } else {
+    /*如果传递了图片对象*/
+    img = data.image;
+    img.src = data.url;
+  }
 
   // 如果图片被缓存，则直接返回缓存数据
   if (img.complete) {
@@ -43237,25 +43322,7 @@ function loadFigure(url, callback) {
 
 var onlyId = void 0;
 
-var TAG = 'aaron';
 var storage = window.localStorage;
-
-/*
-如果数据库为写入appid ,则创建
- */
-var createAppId = function createAppId() {
-  //添加UUID
-  var appId = 'aaron-' + new Date().getDate();
-  //写入数据库
-  config.data.db && config.data.db.transaction(function (tx) {
-    tx.executeSql("UPDATE Setting SET 'value' = " + appId + " WHERE [name] = 'appId'", function () {}, function () {});
-  }, function () {
-    //  callback && callback();
-  }, function () {
-    //  callback && callback();
-  });
-  return appId;
-};
 
 /*
 过滤
@@ -43266,7 +43333,7 @@ var filter = function filter(key) {
     return key + onlyId;
   } else {
     if (!config.data.appId) {
-      config.data.appId = createAppId();
+      config.data.appId = 'aaron-' + new Date().getDate();
     }
     //子文档标记
     var sub = window.SUbCONFIGT && window.SUbCONFIGT.dbId ? "-" + window.SUbCONFIGT.dbId : '';
@@ -43275,49 +43342,43 @@ var filter = function filter(key) {
   return key + onlyId;
 };
 
-var set$1 = function set(key, val) {
+/**
+ * 设置localStorage
+ * @param {[type]} key [description]
+ * @param {[type]} val [description]
+ */
+function setStorage(key, val) {
   var setkey;
-
-  //ipad ios8.3setItem出问题
-  function setItem(key, val) {
-    try {
-      storage.setItem(key, val);
-    } catch (e) {
-      console.log('storage.setItem(setkey, key[i]);');
-    }
-  }
 
   if (_.isObject(key)) {
     for (var i in key) {
       if (key.hasOwnProperty(i)) {
         setkey = filter(i);
-        setItem(setkey, key[i]);
+        storage.setItem(setkey, key[i]);
       }
     }
   } else {
     key = filter(key);
-    setItem(key, val);
+    storage.setItem(key, val);
   }
-};
-
-var get$1 = function get(key) {
-  key = filter(key);
-  return storage.getItem(key) || undefined;
-};
+}
 
 /**
- * *按索引值获取存储项的key
- * @param  {[type]} index [description]
- * @return {[type]}       [description]
+ * 获取localstorage中的值
+ * @param  {[type]} key [description]
+ * @return {[type]}     [description]
  */
-
+function getStorage(key) {
+  key = filter(key);
+  return storage.getItem(key) || undefined;
+}
 
 /**
  * 删除localStorage中指定项
  * @param  {[type]} key [description]
  * @return {[type]}     [description]
  */
-function $remove(key) {
+function removeStorage(key) {
   key = filter(key);
   storage.removeItem(key);
 }
@@ -43327,18 +43388,139 @@ function $remove(key) {
  * 为了只计算一次
  * @return {[type]} [description]
  */
-function clearId() {
+function clearStorageId() {
   onlyId = null;
 }
 
+/////////////////////////////////////////////////////////////////////
+///
+///  默认用H5的localStorage保存数据
+///  例外：safari开启了
+///  1 safari无痕模式下被禁用的localStorage，不可写，只能读
+///  2 有些机型不能存储信息到localStorage中,微信中通过cookie方式单独修复，直接用浏览器不可以
+///
+/////////////////////////////////////////////////////////////////////
+
+
 /**
- * 序列化
+ * 设置setCookie
+ * @param {[type]} c_name     [description]
+ * @param {[type]} value      [description]
+ * @param {[type]} expiredays [description]
+ */
+function setCookie(name, value, expiredays) {
+  if (!expiredays) {
+    var day = 30;
+    var exp = new Date();
+    exp.setTime(exp.getTime() + day * 24 * 60 * 60 * 1000);
+    expiredays = exp.toGMTString();
+  }
+  document.cookie = name + "=" + escape(value) + ";expires=" + expiredays;
+}
+
+/**
+ * 取回cookie
+ * @param  {[type]} c_name [description]
+ * @return {[type]}        [description]
+ */
+function getCookie(name) {
+  if (document.cookie.length > 0) {
+    var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+    if (arr = document.cookie.match(reg)) {
+      return unescape(arr[2]);
+    } else {
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
+ *  移除
+ * @param  {[type]} c_name     [description]
+ * @param  {[type]} value      [description]
+ * @param  {[type]} expiredays [description]
+ * @return {[type]}            [description]
+ */
+function removeCookie(name) {
+  var exp = new Date();
+  exp.setTime(exp.getTime() - 1);
+  var cval = getCookie(name);
+  if (cval != null) {
+    document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+  }
+}
+
+/////////////////////////////////////////////////////////////////////
+///
+///  默认用H5的localStorage保存数据
+///  例外：safari开启了
+///  1 safari无痕模式下被禁用的localStorage，不可写，只能读
+///  2 有些机型不能存储信息到localStorage中,微信中通过cookie方式单独修复，直接用浏览器不可以
+///
+/////////////////////////////////////////////////////////
+
+var supportPlat = function supportPlat(storage, cookie) {
+  if (Xut.plat.supportStorage) {
+    return storage;
+  } else {
+    /*微信支持cookie*/
+    if (Xut.plat.isWeiXin) {
+      return cookie;
+    }
+    /*剩余就下ios的safari无痕模式*/
+    /*无痕模式用cookie暂时替代，至少在不关闭浏览器的情况有一定作用*/
+    return cookie;
+  }
+};
+
+var SET = supportPlat(setStorage, setCookie);
+var GET = supportPlat(getStorage, getCookie);
+var REMOVE = supportPlat(removeStorage, removeCookie);
+var CLEAR = supportPlat(clearStorageId, clearStorageId);
+
+/**
+ * 设置localStorage
+ * @param {[type]} key [description]
+ * @param {[type]} value [description]
+ */
+function $setStorage(key, value) {
+  if (!key || !value) {
+    return;
+  }
+  SET(key, value);
+}
+
+/**
+ * 获取localstorage中的值
+ * @param  {[type]} key [description]
+ * @return {[type]}     [description]
+ */
+function $getStorage(key) {
+  if (!key) {
+    return;
+  }
+  return GET(key);
+}
+
+/**
+ * 删除localStorage中指定项
+ * @param  {[type]} key [description]
+ * @return {[type]}     [description]
+ */
+function $removeStorage(key) {
+  if (!key) {
+    REMOVE(key);
+  }
+}
+
+/**
+ * 退出清理
  * @return {[type]} [description]
  */
-
-
-function $save(name, val) {
-  set$1(name || TAG, JSON.stringify(val));
+function clearId() {
+  CLEAR();
 }
 
 var CEIL$1 = Math.ceil;
@@ -43443,7 +43625,12 @@ function analysisImageName(src) {
   };
 }
 
-/*给地址增加私有后缀*/
+/**
+ * 给地址增加私有后缀
+ * @param  {[type]} originalUrl [description]
+ * @param  {[type]} suffix      [description]
+ * @return {[type]}             [description]
+ */
 function insertImageUrlSuffix(originalUrl, suffix) {
   if (originalUrl && suffix) {
     //brModelType 没有类型后缀
@@ -43464,13 +43651,22 @@ function getHDFilePath(originalUrl) {
   return '';
 }
 
-/*文件是图片格式*/
+/**
+ * 文件是图片格式
+ * @param  {[type]}  fileName [description]
+ * @return {Boolean}          [description]
+ */
 function hasImages(fileName) {
   return (/\.[jpg|png|gif]+/i.test(fileName)
   );
 }
 
-/*获取文件的全路径*/
+/**
+ * 获取文件的全路径
+ * @param  {[type]} fileName  [description]
+ * @param  {[type]} debugType [description]
+ * @return {[type]}           [description]
+ */
 function getFileFullPath(fileName, debugType) {
 
   if (!fileName) {
@@ -43738,130 +43934,6 @@ function reviseSize(_ref2) {
 }
 
 /**
- * 随机Url地址
- * @param  {[type]} url [description]
- * @return {[type]}     [description]
- */
-function randomUrl(url) {
-  return url + '?r=' + new Date().getTime();
-}
-
-/**
- *  读取SVG内容
- *  @return {[type]} [string]
- */
-function readFile(path, callback, type) {
-
-  var paths = void 0;
-  var name = void 0;
-  var data = void 0;
-  var svgUrl = void 0;
-
-  /**
-   * js脚本加载
-   */
-  var loadJs = function loadJs(fileUrl, fileName) {
-    loadFile(randomUrl(fileUrl), function () {
-      data = window.HTMLCONFIG[fileName];
-      if (data) {
-        callback(data);
-        delete window.HTMLCONFIG[fileName];
-      } else {
-        $warn('js文件加载失败，文件名:' + path);
-        callback('');
-      }
-    });
-  };
-
-  //con str
-  //externalFile使用
-  //如果是js动态文件
-  //content的html结构
-  if (type === "js") {
-    paths = config.getSvgPath() + path;
-    name = path.replace(".js", '');
-    loadJs(paths, name);
-    return;
-  }
-
-  /**
-   * 如果配置了convert === 'svg'
-   * 那么所有的svg文件就强制转化成js读取
-   */
-  if (config.launch.convert === 'svg') {
-    path = path.replace('.svg', '.js');
-    name = path.replace(".js", '');
-    svgUrl = config.getSvgPath() + path;
-    loadJs(svgUrl, name); //直接采用脚本加载
-    return;
-  }
-
-  /**
-   * ibooks模式 单独处理svg转化策划给你js,加载js文件
-   */
-  if (Xut.IBooks.CONFIG) {
-    //如果是.svg结尾
-    //把svg替换成js
-    if (/.svg$/.test(path)) {
-      path = path.replace(".svg", '.js');
-    }
-    //全路径
-    paths = config.getSvgPath().replace("svg", 'js') + path;
-    //文件名
-    name = path.replace(".js", '');
-    //加载脚本
-    loadFile(randomUrl(paths), function () {
-      data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name];
-      if (data) {
-        callback(data);
-        delete window.HTMLCONFIG[name];
-        delete window.IBOOKSCONFIG[name];
-      } else {
-        $warn('编译:脚本加载失败，文件名:' + name);
-        callback('');
-      }
-    });
-    return;
-  }
-
-  //svg文件
-  //游览器模式 && 非强制插件模式
-  if (Xut.plat.isBrowser && !config.isPlugin) {
-    //默认的地址
-    svgUrl = config.getSvgPath().replace("www/", "") + path;
-
-    //mini杂志的情况，不处理目录的www
-    if (config.launch.resource) {
-      svgUrl = config.getSvgPath() + path;
-    }
-
-    $.ajax({
-      type: 'get',
-      dataType: 'html',
-      url: randomUrl(svgUrl),
-      success: function success(svgContent) {
-        callback(svgContent);
-      },
-      error: function error(xhr, type) {
-        $warn('svg文件解释出错，文件名:' + path);
-        callback('');
-      }
-    });
-    return;
-  }
-
-  /**
-   * 插件读取
-   * 手机客户端模式
-   */
-  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function (svgContent) {
-    callback(svgContent);
-  }, function (err) {
-    callback('');
-  });
-}
-
-/**
  * 缓存池
  * @return {[type]} [description]
  */
@@ -44076,6 +44148,139 @@ var nextTick = function nextTick(_ref, callback, context) {
 };
 
 Xut.nextTick = nextTick;
+
+////////////////////////
+///  获取文件的内容
+///  1 js
+///  2 svg->js
+///  3 IBooks
+///  4 PHP请求 => svg
+///  5 插件    => svg
+///////////////////////
+
+/**
+ * 随机Url地址
+ * @param  {[type]} url [description]
+ * @return {[type]}     [description]
+ */
+function randomUrl(url) {
+  return url + '?r=' + new Date().getTime();
+}
+
+/**
+ *  读取SVG内容
+ *  @return {[type]} [string]
+ */
+function readFileContent(path, callback, type) {
+
+  var paths = void 0;
+  var name = void 0;
+  var data = void 0;
+  var svgUrl = void 0;
+
+  /**
+   * js脚本加载
+   */
+  var loadJs = function loadJs(fileUrl, fileName) {
+    loadFile(randomUrl(fileUrl), function () {
+      data = window.HTMLCONFIG[fileName];
+      if (data) {
+        callback(data);
+        delete window.HTMLCONFIG[fileName];
+      } else {
+        $warn('js文件加载失败，文件名:' + path);
+        callback('');
+      }
+    });
+  };
+
+  //con str
+  //externalFile使用
+  //如果是js动态文件
+  //content的html结构
+  if (type === "js") {
+    paths = config.getSvgPath() + path;
+    name = path.replace(".js", '');
+    loadJs(paths, name);
+    return;
+  }
+
+  /**
+   * 如果配置了convert === 'svg'
+   * 那么所有的svg文件就强制转化成js读取
+   */
+  if (config.launch.convert === 'svg') {
+    path = path.replace('.svg', '.js');
+    name = path.replace(".js", '');
+    svgUrl = config.getSvgPath() + path;
+    loadJs(svgUrl, name); //直接采用脚本加载
+    return;
+  }
+
+  /**
+   * ibooks模式 单独处理svg转化策划给你js,加载js文件
+   */
+  if (Xut.IBooks.CONFIG) {
+    //如果是.svg结尾
+    //把svg替换成js
+    if (/.svg$/.test(path)) {
+      path = path.replace(".svg", '.js');
+    }
+    //全路径
+    paths = config.getSvgPath().replace("svg", 'js') + path;
+    //文件名
+    name = path.replace(".js", '');
+    //加载脚本
+    loadFile(randomUrl(paths), function () {
+      data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name];
+      if (data) {
+        callback(data);
+        delete window.HTMLCONFIG[name];
+        delete window.IBOOKSCONFIG[name];
+      } else {
+        $warn('编译:脚本加载失败，文件名:' + name);
+        callback('');
+      }
+    });
+    return;
+  }
+
+  //svg文件
+  //游览器模式 && 非强制插件模式
+  if (Xut.plat.isBrowser && !config.isPlugin) {
+    //默认的地址
+    svgUrl = config.getSvgPath().replace("www/", "") + path;
+
+    //mini杂志的情况，不处理目录的www
+    if (config.launch.resource) {
+      svgUrl = config.getSvgPath() + path;
+    }
+
+    $.ajax({
+      type: 'get',
+      dataType: 'html',
+      url: randomUrl(svgUrl),
+      success: function success(svgContent) {
+        callback(svgContent);
+      },
+      error: function error(xhr, type) {
+        $warn('svg文件解释出错，文件名:' + path);
+        callback('');
+      }
+    });
+    return;
+  }
+
+  /**
+   * 插件读取
+   * 手机客户端模式
+   */
+  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function (svgContent) {
+    callback(svgContent);
+  }, function (err) {
+    callback('');
+  });
+}
 
 //替换url
 //1. 路径
@@ -44908,8 +45113,6 @@ function initDefaults(setData) {
  * 用css3实现的忙碌光标
  * @return {[type]} [description]
  */
-var transform = Xut.style.transform;
-var animationDelay = Xut.style.animationDelay;
 
 /**
  * 延时加载
@@ -44969,7 +45172,7 @@ function createCursor() {
   } else {
     /*自带*/
     while (count--) {
-      container += '<div class="xut-busy-spinner"\n              style="' + transform + ':rotate(' + deg[count] + 'deg) translate(0,-142%);' + animationDelay + ':-' + delay[count] + 's">\n         </div>';
+      container += '<div class="xut-busy-spinner"\n              style="' + Xut.style.transform + ':rotate(' + deg[count] + 'deg) translate(0,-142%);' + Xut.style.animationDelay + ':-' + delay[count] + 's">\n         </div>';
     }
     container = '<div class="xut-busy-middle">' + container + '</div>';
   }
@@ -45492,6 +45695,18 @@ function initColumn(callback) {
  */
 function contentFilter(filterName) {
 
+  function setCache(listFilters) {
+    $setStorage(filterName || 'aaron', JSON.stringify(listFilters));
+  }
+
+  function getCache() {
+    var jsonStr = $getStorage(filterName);
+    if (jsonStr) {
+      return parseJSON(jsonStr);
+    }
+    return '';
+  }
+
   //过滤的节点
   var listFilters = function () {
     var values = getCache();
@@ -45504,15 +45719,6 @@ function contentFilter(filterName) {
     }
     return h;
   }();
-
-  function setCache(listFilters) {
-    $save(filterName, listFilters);
-  }
-
-  function getCache() {
-    var jsonStr = get$1(filterName);
-    return parseJSON(jsonStr);
-  }
 
   function access(callback, pageId, contentId) {
     //如果是transformFilter,不需要pageIndex处理
@@ -45581,11 +45787,72 @@ function contentFilter(filterName) {
       return _.keys(listFilters).length;
     },
     empty: function empty() {
-      $remove(filterName);
+      $removeStorage(filterName);
       listFilters = {};
     }
   };
 }
+
+/**
+ * 创建共享对象
+ * 这里是为了限制对象的创建数
+ * 优化
+ * @param  {[type]} total [description]
+ * @return {[type]}       [description]
+ */
+
+var TYPE = {
+  audio: function audio() {
+    return new Audio();
+  },
+  video: function video() {
+    return document.createElement("video");
+  },
+  image: function image() {
+    return new Image();
+  }
+};
+
+var Share = function () {
+  function Share(name) {
+    classCallCheck(this, Share);
+
+    this.name = name;
+    this.construct = TYPE[name];
+    this.index = 0;
+    this.cache = [];
+  }
+
+  createClass(Share, [{
+    key: "create",
+    value: function create(total) {
+      /*如果缓存中已经存在*/
+      if (this.cache.length) {
+        if (total >= this.cache.length) {
+          total = total - this.cache.length;
+        }
+      }
+      /*创建新的对象*/
+      if (total) {
+        for (var i = 0; i < total; i++) {
+          var object = this.construct();
+          this.cache.push(object);
+        }
+      }
+    }
+  }, {
+    key: "get",
+    value: function get$$1() {
+      var object = this.cache[this.index++];
+      if (!object) {
+        this.index = 0;
+        return this.get();
+      }
+      return object;
+    }
+  }]);
+  return Share;
+}();
 
 /**
  * 音频文件解析
@@ -45595,27 +45862,38 @@ function contentFilter(filterName) {
  *
  * */
 
-var cacheAudio = [];
+var audioShare = null;
 
 /**
  * 设置audio个数
  * 1 根据preload
  * 2 如果是重复加载，判断缓存已创建的
  */
+function initAudio(total) {
+  if (audioShare) {
+    audioShare.create(total);
+  } else {
+    audioShare = new Share('audio');
+    audioShare.create(total);
+  }
+}
 
+function getAudio() {
+  if (audioShare) {
+    return audioShare.get();
+  } else {
+    return new Audio();
+  }
+}
 
 /**
  * 音频文件解析
- * @param  {[type]}   filePath [description]
- * @param  {Function} callback [description]
- * @return {[type]}            [description]
  */
-function audioParse(filePath, callback) {
+function audioParse(url, callback) {
 
-  var audio = new Audio();
+  var audio = getAudio();
 
-  audio.src = filePath;
-  audio.muted = "muted";
+  audio.src = url;
   audio.preload = "auto";
   audio.autobuffer = true;
 
@@ -45630,13 +45908,47 @@ function audioParse(filePath, callback) {
   }
 
   function clear() {
-    audio.removeEventListener("canplaythrough", success, false);
+    audio.removeEventListener("loadedmetadata", success, false);
     audio.removeEventListener("error", error, false);
     audio = null;
   }
 
-  audio.addEventListener("canplaythrough", success, false);
+  audio.addEventListener("loadedmetadata", success, false);
   audio.addEventListener("error", error, false);
+}
+
+var imageShare = null;
+
+/**
+ * 设置image个数
+ * 1 根据preload
+ * 2 如果是重复加载，判断缓存已创建的
+ */
+function initImage(total) {
+  if (imageShare) {
+    imageShare.create(total);
+  } else {
+    imageShare = new Share('image');
+    imageShare.create(total);
+  }
+}
+
+function getImage() {
+  if (imageShare) {
+    return imageShare.get();
+  } else {
+    return new Image();
+  }
+}
+
+/**
+ * 图片解析
+ */
+function imageParse(url, callback) {
+  /**
+   * 这里最主要是替换了图片对象，优化了创建
+   */
+  loadFigure({ image: getImage(), url: url }, callback);
 }
 
 /**
@@ -45656,14 +45968,32 @@ function svgParse(filePath, callback) {
   });
 }
 
+////////////////////////////
+/// 文件路径生成器
+/// 不同类型对应不同的路径配置
+////////////////////////////
+
 /**
  * 格式字符串
  */
 var formatString = function formatString(data, basePath) {
   data = data.split(',');
+  var dataset = void 0;
+  var sizes = [];
+  var fileNames = [];
+  data.forEach(function (name) {
+    dataset = name.split('-');
+    /*如果没有尺寸*/
+    if (dataset.length === 1) {
+      fileNames.push(basePath + name);
+    } else {
+      sizes.push(Number(dataset[0]));
+      fileNames.push(basePath + dataset[1]);
+    }
+  });
   return {
-    basePath: basePath,
-    fileNames: data,
+    sizes: sizes,
+    fileNames: fileNames,
     length: data.length
   };
 };
@@ -45672,12 +46002,20 @@ var formatString = function formatString(data, basePath) {
  * 格式对象
  */
 var formatObject = function formatObject(data, basePath) {
+  var dataset = void 0;
   var fileNames = [];
+  var sizes = []; //尺寸
 
   var _loop = function _loop(dir) {
     var d = data[dir].split(',');
     d.forEach(function (name) {
-      fileNames.push(basePath + dir + '/' + name);
+      dataset = name.split('-');
+      if (dataset.length === 1) {
+        fileNames.push(basePath + dir + '/' + name);
+      } else {
+        sizes.push(Number(dataset[0]));
+        fileNames.push(basePath + dir + '/' + dataset[1]);
+      }
     });
   };
 
@@ -45685,13 +46023,13 @@ var formatObject = function formatObject(data, basePath) {
     _loop(dir);
   }
   return {
+    sizes: sizes,
     fileNames: fileNames,
-    basePath: '', //路径写到fileNames中了
     length: fileNames.length
   };
 };
 
-var formatHooks = {
+var pathHooks = {
 
   /**
    * 文本图片
@@ -45926,8 +46264,10 @@ var AsyAccess = function (_Observer) {
   createClass(AsyAccess, [{
     key: 'create',
     value: function create(fn) {
+      var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'push';
+
       if (fn && typeof fn === 'function') {
-        this.asys.push(fn);
+        this.asys[position](fn);
       }
     }
 
@@ -45957,6 +46297,162 @@ var AsyAccess = function (_Observer) {
   }]);
   return AsyAccess;
 }(Observer);
+
+///////////////////////
+///  探测资源的正确性
+///////////////////////
+var Detect = function () {
+  function Detect(_ref) {
+    var parser = _ref.parser,
+        filePath = _ref.filePath,
+        _ref$checkTime = _ref.checkTime,
+        checkTime = _ref$checkTime === undefined ? 2000 : _ref$checkTime;
+    classCallCheck(this, Detect);
+
+    this.state = false;
+    this.timer = null;
+    this.parser = parser;
+    this.filePath = filePath;
+    this.checkTime = checkTime;
+  }
+
+  /**
+   * 清理
+   * @return {[type]} [description]
+   */
+
+
+  createClass(Detect, [{
+    key: '_clear',
+    value: function _clear() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
+    }
+
+    /**
+     * 开始轮询，最多2次
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_request',
+    value: function _request() {
+      var _this = this;
+
+      this.parser(this.filePath, function () {
+        _this.state = true;
+        _this._clear();
+        // $warn(`文件循环加载成功 ${this.filePath}`)
+        _this.callback(_this.state);
+      });
+    }
+
+    /**
+     * 主动监听
+     * 如果parser同步加载完毕了，那么这里不执行了
+     * 这里会递归检测循环loopTime的指定次数
+     * 如果parse在这loop没完成就强制退出
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_active',
+    value: function _active() {
+      var _this2 = this;
+
+      if (!this.state) {
+        this.timer = setTimeout(function () {
+          _this2._clear();
+          if (_this2.state) {
+            // $warn(`文件加载成功 ${this.filePath}`)
+          } else {
+            $warn('\u6587\u4EF6\u52A0\u8F7D\u5931\u8D25 ' + _this2.filePath);
+          }
+          _this2.callback(_this2.state);
+        }, this.checkTime);
+      }
+    }
+
+    ///////////////////
+    ///
+    ///    对外接口
+    ///
+    //////////////////
+
+    /**
+     * 开始执行，主动完成，与被动监听
+     * callback //不管是失败或者成功都会调用，为了销毁对象的引用
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'start',
+    value: function start(callback) {
+      this.callback = callback;
+      this._request();
+      this._active();
+    }
+
+    /**
+     * 销毁
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'destory',
+    value: function destory() {
+      this.clear();
+      this.callback = function () {};
+      this.parse = null;
+    }
+  }]);
+  return Detect;
+}();
+
+////////////////////////////////
+/// 资源加载错误后，开始循环检测2次
+/// 分别是6秒 - 12秒的时间
+///////////////////////////////
+/**
+ * 循环的列表对象
+ * @type {Array}
+ */
+var loopList = {};
+
+/**
+ * 增加循环列表
+ * @param {[type]} argument [description]
+ */
+function addLoop(filePath, parser) {
+  if (loopList[filePath]) {
+    $warn('\u9519\u8BEF\u5FAA\u73AF\u7684\u6587\u4EF6\u5DF2\u7ECF\u5B58\u5728\u68C0\u6D4B\u5217\u8868 ' + filePath);
+  } else {
+    loopList[filePath] = new Detect({
+      parser: parser,
+      filePath: filePath,
+      checkTime: 12000
+    });
+    loopList[filePath].start(function () {
+      delete loopList[filePath];
+    });
+  }
+}
+
+/**
+ * 清理循环检测
+ * @return {[type]} [description]
+ */
+function clearLoop() {
+  if (loopList) {
+    for (var key in loopList) {
+      loopList[key].destory();
+      loopList[key] = null;
+    }
+  }
+  loopList = {};
+}
 
 /***************
   资源预加载
@@ -46008,7 +46504,7 @@ var notification = null;
  * @return {Boolean} [description]
  */
 function checkFigure(url, callback) {
-  loadFigure(url, function (state, cache) {
+  imageParse(url, function (state, cache) {
     /*如果是有效图，只检测第一次加载的缓存img*/
     if (!checkFigure.url && state) {
       checkFigure.url = url;
@@ -46017,7 +46513,7 @@ function checkFigure(url, callback) {
   });
 }
 
-var PARSE = {
+var PARSER = {
   // master 母版标记特殊处理，递归PARSE
   // video: videoParse
   content: checkFigure,
@@ -46050,85 +46546,120 @@ function getNumber() {
 }
 
 /**
- * 创建对应的处理器
- * master 母版数据，需要重新递归解析,类型需要递归创建
- *
- * 正常页面数据
- * content/widget/audio/video/autoSprite/seniorSprite/svg
+ * 母版类型处理
+ * 需要重新递归解析,类型需要递归创建
+ * @return {[type]} [description]
  */
-function createProcessor(type, childData, parse, isInit) {
-  if (type === 'master') {
-    var masterId = childData;
-    var masterData = preloadData[masterId];
-    if (masterData) {
-      return function (callback) {
-        loadResource(masterData, function () {
-          /*删除母版数据，多个Page会共享同一个母版加载*/
-          deleteResource(masterId);
-          callback();
-        });
-      };
-    }
-  } else {
-    childData = formatHooks[type](childData);
-    var total = childData.length;
-    var basePath = childData.basePath;
+function masterHandle(childData) {
+  var masterId = childData;
+  var masterData = preloadData[masterId];
+  if (masterData) {
     return function (callback) {
+      loadResource(masterData, function () {
+        /*删除母版数据，多个Page会共享同一个母版加载*/
+        deleteResource(masterId);
+        callback();
+      });
+    };
+  }
+}
 
-      var section = getNumber();
+/**
+ * 页面层的处理
+ * content/widget/audio/video/autoSprite/seniorSprite/svg
+ * @return {[type]} [description]
+ */
+function pageHandle(type, childData, parser) {
+  childData = pathHooks[type](childData);
+  var total = childData.length;
+  return function (callback) {
+    var section = getNumber();
 
-      /**
-       * 分段处理
-       */
-      function segmentHandle() {
+    /**
+     * 分段处理
+     * section 是分段数量
+     */
+    function segmentHandle() {
 
-        var analyticData = void 0;
-        var hasComplete = false;
+      var preObjs = {}; /*预加载对象列表*/
+      var analyticData = void 0;
+      var hasComplete = false;
 
-        /*如果可以取整*/
-        if (childData.fileNames.length > section) {
-          analyticData = childData.fileNames.splice(0, section);
-        } else {
-          /*如果小于等于检测数*/
-          analyticData = childData.fileNames;
-          hasComplete = true;
-        }
-
-        /*分段检测的回到次数*/
-        var analyticCount = analyticData.length;
-
-        // $warn('加载类型：' + type + ' - 数量：' + analyticCount)
-
-        analyticData.forEach(function (name) {
-          parse(basePath + name, function () {
-            if (analyticCount === 1) {
-              if (hasComplete) {
-                /*分段处理完毕就清理，用于判断跳出*/
-                callback();
-                return;
-              } else {
-                segmentHandle();
-              }
-            }
-            --analyticCount;
-          });
-        });
+      /*如果可以取整*/
+      if (childData.fileNames.length > section) {
+        analyticData = childData.fileNames.splice(0, section);
+      } else {
+        /*如果小于等于检测数*/
+        analyticData = childData.fileNames;
+        hasComplete = true;
       }
 
-      segmentHandle();
-    };
+      /*分段检测的回到次数*/
+      var analyticCount = analyticData.length;
+
+      /*检测完成度*/
+      var parseComplete = function parseComplete() {
+        if (analyticCount === 1) {
+          if (hasComplete) {
+            preObjs = null;
+            /*分段处理完毕就清理，用于判断跳出*/
+            callback();
+            return;
+          } else {
+            segmentHandle();
+          }
+        }
+        --analyticCount;
+      };
+
+      /**
+       * 分配任务
+       * 1 分配到每个解析器去处理
+       * 2 给一个定时器的范围
+       */
+      analyticData.forEach(function (filePath, index) {
+        preObjs[filePath] = new Detect({
+          parser: parser,
+          filePath: filePath,
+          checkTime: 2000 /*主动检测2秒*/
+        });
+        preObjs[filePath].start(function (state) {
+          /*加入错误的循环检测列表，如果销毁了就不处理 */
+          if (state === false) {
+            if (preloadData) {
+              addLoop(filePath, parser);
+            }
+          }
+          parseComplete();
+        });
+      });
+    }
+
+    segmentHandle();
+  };
+}
+
+/**
+ * 创建对应的处理器
+ */
+function createHandle(type, childData, parser) {
+  if (type === 'master') {
+    return masterHandle(childData);
+  } else {
+    return pageHandle(type, childData, parser);
   }
 }
 
 /**
  * 开始加载资源
  */
-function loadResource(data, callback, isInit) {
+function loadResource(data, callback) {
   var asy = new AsyAccess();
   for (var key in data) {
-    var parse = PARSE[key];
-    if (parse) {
-      asy.create(createProcessor(key, data[key], parse, isInit));
+    var parser = PARSER[key];
+    if (parser) {
+      /*audio优先解析*/
+      asy.create(createHandle(key, data[key], parser), key === 'audio' ? 'unshift' : 'push');
     }
   }
   /*执行后监听,监听完成*/
@@ -46164,7 +46695,7 @@ function repeatCheck(id, callback) {
   /*如果加载数等于总计量数，这个证明加载完毕*/
   if (id === chapterIdCount) {
     $warn('全部预加载完成');
-    set$1('preload', checkFigure.url);
+    $setStorage('preload', checkFigure.url);
     return;
   }
 
@@ -46204,7 +46735,7 @@ function nextTask(chapterId, callback) {
  * @return {[type]} [description]
  */
 function checkCache(finish, next) {
-  var cahceUrl = get$1('preload');
+  var cahceUrl = $getStorage('preload');
   if (cahceUrl) {
     loadFigure(cahceUrl, function (state, cache) {
       if (cache) {
@@ -46232,7 +46763,13 @@ function initPreload(total, callback) {
   };
 
   var start = function start() {
-    nextTask('', callback);
+    nextTask('', function () {
+      callback();
+      /*第二次延迟5秒后开始*/
+      setTimeout(function () {
+        startPreload();
+      }, 5000);
+    });
   };
 
   loadFile(config.data.pathAddress + 'preload.js', function () {
@@ -46240,6 +46777,10 @@ function initPreload(total, callback) {
       chapterIdCount = total;
       preloadData = window.preloadData;
       window.preloadData = null;
+      //初始预加载对象数量
+      var count = getNumber();
+      initAudio(count);
+      initImage(count);
       checkCache(close, start);
     } else {
       close();
@@ -46315,6 +46856,7 @@ function clearPreload() {
   loadingId = 0;
   preloadData = null;
   notification = null;
+  clearLoop();
 }
 
 /**
@@ -46496,7 +47038,7 @@ function baseConfig(callback) {
         configColumn(function () {
           if (config.launch.preload) {
             /*监听初始化第一次完成*/
-            Xut.Application.onceWatch('autoRunComplete', startPreload);
+            // Xut.Application.onceWatch('autoRunComplete', startPreload);
             /*资源预加载*/
             initPreload(dataRet.Chapter.length, function () {
               return callback(novelData);
@@ -46514,12 +47056,12 @@ function baseConfig(callback) {
 var saveData = function saveData() {
   if (config.launch.historyMode) {
     var data = config.data;
-    set$1({ "pageIndex": data.pageIndex, "novelId": data.novelId });
+    $setStorage({ "pageIndex": data.pageIndex, "novelId": data.novelId });
   } else {
     //清理
-    if (get$1('novelId')) {
-      $remove('pageIndex');
-      $remove('novelId');
+    if ($getStorage('novelId')) {
+      $removeStorage('pageIndex');
+      $removeStorage('novelId');
     }
   }
 };
@@ -46921,7 +47463,7 @@ function clearAndroid() {
 }
 
 var getCache = function getCache(name) {
-  return get$1(name);
+  return $getStorage(name);
 };
 
 var initMain = function initMain(novelData) {
@@ -46982,7 +47524,7 @@ var initMain = function initMain(novelData) {
       return loadScene({
         "novelId": novelId,
         "pageIndex": pageIndex,
-        'history': get$1('history')
+        'history': $getStorage('history')
       });
     }
   }
@@ -47101,13 +47643,13 @@ function Action(options) {
 
   return {
     play: function play() {
-      options.startImage && toggleImage(options.startImage);
+      options.stopImage && toggleImage(options.stopImage);
       if (options.startScript) {
         Xut.Assist.Run(pageType, options.startScript.split(','));
       }
     },
     pause: function pause() {
-      options.stopImage && toggleImage(options.stopImage);
+      options.startImage && toggleImage(options.startImage);
       if (options.stopScript) {
         Xut.Assist.Stop(pageType, options.stopScript.split(','));
       }
@@ -47495,7 +48037,7 @@ var AudioSuper = function () {
       if (this.audio && !this.isFlash) {
         this.status = 'playing';
         //支持自动播放,微信上单独处理
-        if (Xut.plat.hasAutoPlayAudio && window.WeixinJSBridge) {
+        if (window.WeixinJSBridge) {
           window.WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
             _this2.audio.play();
           });
@@ -47762,9 +48304,23 @@ var CordovaMedia = function (_AudioSuper) {
  * audio对象下标
  * @type {Number}
  */
-var index$1 = 0;
+var index = 0;
 var loop = 10;
 var audioes = [];
+
+///////////////////////////////////////////////////////////////////
+/// 2017.6.28
+/// 安卓5以后 chrome浏览器单独的问题处理 需要绑定click事件
+/// 因为可能存在修复音频的click事件
+/// 如果需要修复音频但是click的事件没有被触发，这里需要跳过preventDefault
+/// 因为touchstart的动作优先于click
+///////////////////////////////////////////////////////////////////
+
+/*自动音频的click事件，是否被响应了*/
+var hasClick = false;
+
+/*是否需要修复*/
+var hasFix = false;
 
 /**
  * 修复audio
@@ -47774,7 +48330,9 @@ var audioes = [];
  * @return {[type]}        [description]
  */
 function fixAudio(obj, key, access) {
-  var start = function start() {
+  hasFix = true;
+  var click = function click() {
+    hasClick = true;
     var audio = void 0,
         i = void 0;
     for (i = 0; i < loop; i++) {
@@ -47782,9 +48340,34 @@ function fixAudio(obj, key, access) {
       audio.play();
       audioes.push(audio);
     }
+    /*如果*/
+    var playBox = getPlayBox();
+    var t, p, a;
+    for (t in playBox) {
+      for (p in playBox[t]) {
+        for (a in playBox[t][p]) {
+          if (playBox[t][p][a].needFix) {
+            playBox[t][p][a].resetContext();
+          }
+        }
+      }
+    }
+
     $off(document);
   };
-  $on(document, { start: start });
+  $on(document, { click: click });
+}
+
+/**
+ * 是否触发了音频修复
+ * @return {[type]} [description]
+ */
+function hasFixClick() {
+  /*如果不需要修复，直接退出，模拟点击状态*/
+  if (!hasFix) {
+    return true;
+  }
+  return hasClick;
 }
 
 /**
@@ -47792,7 +48375,10 @@ function fixAudio(obj, key, access) {
  * @return {[type]} [description]
  */
 function clearFixAudio() {
+  hasClick = false;
+  hasFix = false;
   for (var i = 0; i < audioes.length; i++) {
+    audioes[i].destroy && audioes[i].destroy();
     audioes[i] = null;
   }
   audioes = null;
@@ -47803,9 +48389,9 @@ function hasAudioes() {
 }
 
 function getAudio$1() {
-  var audio = audioes[index$1++];
+  var audio = audioes[index++];
   if (!audio) {
-    index$1 = 0;
+    index = 0;
     return getAudio$1();
   }
   return audio;
@@ -47816,20 +48402,15 @@ function getAudio$1() {
  * 1-支持audio的autoplay，大部分安卓机子的自带浏览器和微信，大部分的IOS微信（无需特殊解决）
  * 2-不支持audio的autoplay，部分的IOS微信
  * 3-不支持audio的autoplay，部分的安卓机子的自带浏览器（比如小米，开始模仿safari）和全部的ios safari（这种只能做用户触屏时就触发播放了）
+ *
+ * ios10.3  不支持canplay事件
  */
-var NativeVideo = function (_AudioSuper) {
-  inherits(NativeVideo, _AudioSuper);
+var NativeAudio = function (_AudioSuper) {
+  inherits(NativeAudio, _AudioSuper);
 
-  function NativeVideo(options, controlDoms) {
-    classCallCheck(this, NativeVideo);
-
-    /**标记是否为预加载模式 */
-    var _this = possibleConstructorReturn(this, (NativeVideo.__proto__ || Object.getPrototypeOf(NativeVideo)).call(this, options, controlDoms));
-
-    if (options.preload && _this instanceof NativeVideo) {
-      _this.status = 'preload';
-    }
-    return _this;
+  function NativeAudio(options, controlDoms) {
+    classCallCheck(this, NativeAudio);
+    return possibleConstructorReturn(this, (NativeAudio.__proto__ || Object.getPrototypeOf(NativeAudio)).call(this, options, controlDoms));
   }
 
   /**
@@ -47838,45 +48419,59 @@ var NativeVideo = function (_AudioSuper) {
    */
 
 
-  createClass(NativeVideo, [{
+  createClass(NativeAudio, [{
     key: '_init',
     value: function _init() {
-      var audio = void 0;
       var self = this;
       var trackId = this.trackId;
       var hasAudio = hasAudioes();
 
       if (hasAudio) {
-        audio = getAudio$1();
-        audio.src = this.$$url;
+        this.audio = getAudio$1();
+        this.audio.src = this.$$url;
       } else {
-        audio = new Audio(this.$$url);
+        this.audio = new Audio(this.$$url);
+        this.needFix = true;
       }
-      this.audio = audio;
-      this._watchAudio();
+      this._watchAudio(true);
+    }
+
+    /**
+     * 重设音频上下文
+     * 因为自动音频播放的关系
+     * 在点击后修复这个音频
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'resetContext',
+    value: function resetContext() {
+      this._destroy();
+      this.audio = getAudio$1();
+      this.audio.src = this.$$url;
+      this._watchAudio(this.status === 'playing' ? true : false);
     }
 
     /**
      * 监听音频播放
+     * status
+     *   如果为true就是时间完毕后，允许播放
+     *   否则就是在resetContext调用处理，音频已经跳过了playing，可能关闭或者停止了
      */
 
   }, {
     key: '_watchAudio',
-    value: function _watchAudio() {
+    value: function _watchAudio(status) {
       var _this2 = this;
 
       //自动播放，只处理一次
       //手动调用的时候会调用play的时候会调用canplay
       //导致重复播放，所以在第一次的去掉这个事件
       this._canplayCallBack = function () {
-        if (_this2.status === 'preload') {
-          _this2.audio.preload = 'metadata';
-          _this2.status = 'canplay'; //可以准备播放
-        } else {
-          /**没有预加载，自动播放 */
+        if (status) {
           _this2._startPlay();
         }
-        _this2.audio.removeEventListener('canplay', _this2._canplayCallBack, false);
+        _this2.audio.removeEventListener('loadedmetadata', _this2._canplayCallBack, false);
       };
 
       this._endCallBack = function () {
@@ -47886,7 +48481,12 @@ var NativeVideo = function (_AudioSuper) {
         _this2._$$callbackProcess(false);
       };
 
-      this.audio.addEventListener('canplay', this._canplayCallBack, false);
+      /*微信不支持canplay事件*/
+      if (window.WeixinJSBridge) {
+        this._startPlay();
+      } else {
+        this.audio.addEventListener('loadedmetadata', this._canplayCallBack, false);
+      }
       this.audio.addEventListener('ended', this._endCallBack, false);
       this.audio.addEventListener('error', this._errorCallBack, false);
     }
@@ -47944,49 +48544,14 @@ var NativeVideo = function (_AudioSuper) {
       if (this.audio) {
         this.audio.pause();
         //快速切换，防止在播放中就移除，导致没有销毁
-        this.audio.removeEventListener('canplay', this._canplayCallBack, false);
+        this.audio.removeEventListener('loadedmetadata', this._canplayCallBack, false);
         this.audio.removeEventListener('ended', this._endCallBack, false);
         this.audio.removeEventListener('error', this._errorCallBack, false);
         this.audio = null;
       }
     }
-
-    ///////////////////////////
-    //  对外接口
-    //////////////////////////
-
-    /**
-     * 预处理接口
-     * 请求播放
-     * 这个接口是因为预处理的关系
-     * 预处理还在加载中
-     * 必须先等待加载完毕才能继续
-     */
-
-  }, {
-    key: 'requestPlay',
-    value: function requestPlay() {
-      if (this.status === 'canplay') {
-        this._startPlay();
-      } else {
-        console.log('音频没有准备完毕');
-      }
-    }
-
-    /**
-     * 预处理接口
-     * 是否有预加载
-     */
-
-  }, {
-    key: 'hasPreload',
-    value: function hasPreload() {
-      if (this.status === 'preload' || this.status === 'canplay') {
-        return true;
-      }
-    }
   }]);
-  return NativeVideo;
+  return NativeAudio;
 }(AudioSuper);
 
 var audioPlayer = void 0;
@@ -48000,7 +48565,7 @@ if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     audioPlayer = CordovaMedia;
   } else {
     /*其余所有情况都用原声的H5播放器*/
-    audioPlayer = NativeVideo;
+    audioPlayer = NativeAudio;
   }
 }
 
@@ -48110,6 +48675,15 @@ var deployAudio = function deployAudio(sqlData, pageId, queryId, type, actionDat
       'audioId': queryId,
       'data': sqlData
     });
+
+    /*如果flow数据有动作切换图片*/
+    if (columnData.startImage || columnData.stopImage) {
+      _.extend(videoData, {
+        startImage: columnData.startImage,
+        stopImage: columnData.stopImage,
+        action: true
+      });
+    }
   } else {
     //有字幕处理
     var subtitles = sqlData.theTitle ? parseJSON(sqlData.theTitle) : null;
@@ -48232,10 +48806,7 @@ var fillBox = function fillBox(pageId, type) {
 var createAudio = function createAudio(pageId, queryId, type, audioData) {
 
   //检测是否打断
-  //如果不是预加载模式才检测
-  if (!audioData.preload) {
-    preCheck(audioData);
-  }
+  preCheck(audioData);
 
   //构建播放列表
   fillBox(pageId, type);
@@ -48295,45 +48866,12 @@ var loadAudio = function loadAudio(_ref) {
       type = _ref.type,
       action = _ref.action,
       data = _ref.data,
-      _ref$preload = _ref.preload,
-      preload = _ref$preload === undefined ? false : _ref$preload,
       _ref$columnData = _ref.columnData,
       columnData = _ref$columnData === undefined ? {} : _ref$columnData;
 
 
-  //////////////////////////
-  /// 播放处理
-  //  预加载对象已存在处理
-  //////////////////////////
-  if (!preload) {
-    var $type = playBox[type];
-    if ($type && $type[pageId]) {
-      var playObj = $type[pageId][queryId];
-
-      /**只有本地对象才有hasPreLoad方法，必须保证是预加载的对象 */
-      if (playObj && playObj.hasPreload && playObj.hasPreload()) {
-
-        //音频打断处理
-        preCheck({
-          stetObj: playObj, //保留当前对象
-          url: playObj.$$url,
-          trackId: playObj.trackId
-        });
-
-        console.log(playObj, queryId);
-
-        //这里不是play而是requestPlay
-        //需要在内部判断状态是否正确
-        playObj.requestPlay();
-        return;
-      }
-    }
-  }
-
-  // console.log(preload,type,pageId,queryId)
-
   ///////////////////////
-  //  1.初始化预加载
+  //  1.初始化、
   //  2.直接加载播放对象
   ////////////////////////
 
@@ -48344,9 +48882,6 @@ var loadAudio = function loadAudio(_ref) {
   }
 
   var audioData = assemblyData(pageId, queryId, type, data, columnData);
-
-  /**加载状态，是否为预加载模式 */
-  audioData.preload = preload;
 
   /*手动触发的热点,这种比较特别，手动点击可以切换状态*/
   if (type === 'hot' && action == 'trigger') {
@@ -48366,7 +48901,7 @@ function getPlayBox() {
 ///////////////////
 
 /*代码初始化*/
-function initAudio() {
+function initAudio$1() {
   initBox();
 }
 
@@ -48425,17 +48960,10 @@ function triggerAudio(_ref) {
 
 ////////////////////////
 /// 动画音频接口
-/// 1 预加载
 /// 2 直接播放
 /// 3 复位
 /// 4 销毁
 ///////////////////////
-
-/**
- * 预加载音频
- * 待用
- */
-
 
 /**
  * 动画音频触发接口
@@ -48542,7 +49070,7 @@ function hangUpAudio() {
 }
 
 ///////////////////////////////
-/// 
+///
 ///   清理全部音频
 ///
 ///////////////////////////////
@@ -49166,9 +49694,134 @@ function clearRootNode() {
   $rootNode = null;
 }
 
+var queue = {};
+var waiting = false;
+
+/**
+ * 检测一个chpater中的图片加载是否完成
+ * @param  {[type]} chapterIndex [description]
+ * @return {[type]}              [description]
+ */
+function checkFigure$1(chapterIndex, callback) {
+  var length = queue[chapterIndex].length;
+
+  if (!length) {
+    callback();
+    return;
+  }
+
+  var count = length;
+  var complete = function complete() {
+    if (count === 1) {
+      callback();
+      return;
+    }
+    --count;
+  };
+
+  var data = void 0;
+  while (data = queue[chapterIndex].shift()) {
+    data(complete);
+  }
+}
+
+/*
+  运行队列
+  1.因为queue的对象结构通过chapterId做页面的标记，保存所有每个页面图片的索引
+  2.在这个chapter去检测图片的时候，如果成功了就处理图片显示，然后要删除这个检测的fn
+  3.因为是动态加入的，所以每个chapter检测完毕后，还要根据列表是否有值，在去处理
+  4.最后通过runBatcherQueue在递归一次检测，最终每个chapter是否都处理完毕了
+ */
+function runBatcherQueue() {
+  var keys = Object.keys(queue);
+  if (keys.length) {
+    var chapterIndex = keys.shift();
+    if (chapterIndex.length) {
+      checkFigure$1(chapterIndex, function () {
+        /*如果列表没有数据了*/
+        if (!queue[chapterIndex].length) {
+          delete queue[chapterIndex];
+        }
+        /*如果列表还有后续新加入的继续修复当前这个列表*/
+        runBatcherQueue();
+      });
+    } else {
+      delete queue[chapterIndex];
+    }
+  } else {
+    waiting = false;
+  }
+}
+
+/**
+ * 修复错误的图片加载
+ * 图片错误了，会先隐藏，然后再去请求一次
+ * 如果还是错误，就抛弃，正确就显示出来
+ * queue:{
+ *   chpaerId:[1.png,2.png,3.png]
+ *   ................
+ * }
+ * 特别注意，这里是动态加入的
+ * 所以，有可能是边解析边加入新的
+ * @return {[type]} [description]
+ */
+function repairImage(node, chapterIndex, src) {
+  if (!node) {
+    return;
+  }
+  /*先隐藏错误节点*/
+  node.style.display = "none";
+
+  /*根据页面chpater加入列表*/
+  if (!queue[chapterIndex]) {
+    queue[chapterIndex] = [];
+  }
+
+  /*做一次错误节点的预加载处理*/
+  queue[chapterIndex].push(function (callback) {
+    loadFigure(src, function (state) {
+      /*如果请求成功，修改图片状态*/
+      if (state) {
+        if (node && node.style) {
+          node.style.display = "block";
+        }
+      }
+      node = null;
+      callback();
+    });
+  });
+
+  if (!waiting) {
+    waiting = true;
+    runBatcherQueue();
+  }
+}
+
+/**
+ * 清理错误检测的图片
+ * @return {[type]} [description]
+ */
+function clearRepairImage(chapterIndex) {
+  if (queue && queue[chapterIndex]) {
+    queue[chapterIndex].length = 0;
+    delete queue[chapterIndex];
+  }
+}
+
 /////////////////////////////
 /// 初始化页面默认行为
 /////////////////////////////
+
+/**
+ * 特殊的一个方法，用来修正图片资源错误的
+ * dom中的事件onerror触发，所以直接
+ * @return {[type]} [description]
+ */
+window.fixNodeError = function (type, node, chapterIndex, src) {
+  if (type === 'image') {
+    repairImage(node, chapterIndex, src);
+  }
+};
 
 //修复H5音频自动播放bug
 if (!Xut.plat.hasAutoPlayAudio) {
@@ -49669,7 +50322,8 @@ function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) {
     var deltaX = point.pageX - startPageX;
 
     //如果有move事件，则取消tap事件
-    if (Math.abs(deltaX)) {
+    /*三星S6上就算不移动也会给一个-0.6左右的值，所以这里强制加20PX的判断*/
+    if (Math.abs(deltaX) > 10) {
       hasTap = false;
       setCanvasMove(supportSwipe);
     }
@@ -50395,8 +51049,6 @@ function parseContentMode(pageData, base) {
  *      2 创建完毕
  *      3 创建失败
  */
-var TANSFROM = Xut.style.transform;
-
 /**
  * 创建页面容器li
  */
@@ -50412,11 +51064,11 @@ var createHTML = function createHTML(_ref) {
 
   //设置滑动的偏移量
   //双页面只有布局偏移量，没有滑动偏移量
-  var translate3d = translate ? TANSFROM + ':' + translate : '';
+  var setTranslate = translate ? Xut.style.transform + ':' + translate : '';
 
   //增加一个main-content放body内容
   //增加一个header-footer放溢出的页眉页脚
-  return String.styleFormat('<li id="' + prefix + '"\n         data-chapter-index="' + base.chapterIndex + '"\n         data-chapter-id="' + pageData._id + '"\n         data-type="' + base.pageType + '"\n         data-container="true"\n         class="xut-flip preserve-3d"\n         style="width:' + getStyle.visualWidth + 'px;\n                height:' + getStyle.visualHeight + 'px;\n                left:' + getStyle.visualLeft + 'px;\n                top:' + getStyle.visualTop + 'px;\n                ' + translate3d + ';\n                ' + background + '\n                ' + customStyle + '">\n        <div class="page-scale">\n            <div data-type="main-content"></div>\n            <div data-type="header-footer"></div>\n        </div>\n    </li>');
+  return String.styleFormat('<li id="' + prefix + '"\n         data-chapter-index="' + base.chapterIndex + '"\n         data-chapter-id="' + pageData._id + '"\n         data-type="' + base.pageType + '"\n         data-container="true"\n         class="xut-flip preserve-3d"\n         style="width:' + getStyle.visualWidth + 'px;\n                height:' + getStyle.visualHeight + 'px;\n                left:' + getStyle.visualLeft + 'px;\n                top:' + getStyle.visualTop + 'px;\n                ' + setTranslate + ';\n                ' + background + '\n                ' + customStyle + '">\n        <div class="page-scale">\n            <div data-type="main-content"></div>\n            <div data-type="header-footer"></div>\n        </div>\n    </li>');
 };
 
 /**
@@ -50876,7 +51528,7 @@ function createBackground(svgContent, data) {
 var parseContent = function parseContent(content, callback) {
   //背景是svg文件
   if (/.svg$/i.test(content)) {
-    readFile(content, function (svgContent) {
+    readFileContent(content, function (svgContent) {
       callback(svgContent);
     });
   } else {
@@ -51354,7 +52006,7 @@ var HtmlBox = function () {
       var closeTop = Math.floor(boxHeight / 2);
 
       //获取保存的字体值
-      var initValue = get$1(this.storageName);
+      var initValue = $getStorage(this.storageName);
       if (initValue) {
         this._adjustSize(initValue);
       } else {
@@ -51465,7 +52117,7 @@ var HtmlBox = function () {
     value: function _adjustSize(value, save) {
       value = parseInt(value);
       docElement.style.fontSize = value + 'px';
-      save && set$1(this.storageName, value);
+      save && $setStorage(this.storageName, value);
     }
 
     /**
@@ -51725,7 +52377,7 @@ BookMark.prototype.getMarkId = function (seasonId, pageId) {
  * @return {[type]} [description]
  */
 BookMark.prototype.getHistory = function () {
-  var mark = get$1('bookMark');
+  var mark = $getStorage('bookMark');
   if (mark) {
     return mark.split(',');
   }
@@ -51747,7 +52399,7 @@ BookMark.prototype.addBookMark = function () {
     return;
   }
   BOOKCACHE.push(key);
-  set$1('bookMark', BOOKCACHE);
+  $setStorage('bookMark', BOOKCACHE);
 };
 
 /**
@@ -51772,10 +52424,10 @@ BookMark.prototype.delBookMark = function (target) {
       index = BOOKCACHE.indexOf(key);
 
   BOOKCACHE.splice(index, 1);
-  set$1('bookMark', BOOKCACHE);
+  $setStorage('bookMark', BOOKCACHE);
 
   if (BOOKCACHE.length == 0) {
-    $remove('bookMark');
+    $removeStorage('bookMark');
   }
 
   //移除该行
@@ -51810,7 +52462,6 @@ BookMark.prototype.viewBookMark = function (target) {
 BookMark.prototype.iconManager = function (target) {
   var $icon = this.bookMarkIcon = $(target),
       restore = this.iconRestore;
-  console.log(Xut.style);
   $icon.css({
     'transform': 'scale(1.2)',
     'transition-duration': '500ms'
@@ -51905,9 +52556,10 @@ BookMark.prototype.handleEvent = function (evt) {
  * @return {[type]} [description]
  */
 BookMark.prototype.closeBookMark = function () {
-  this.bookMarkMenu.css({
-    transform: 'translate3d(0px,0px,0px)',
-    'transition-duration': '1s'
+
+  Xut.style.setTranslate({
+    node: this.bookMarkMenu,
+    speed: 1000
   });
 };
 
@@ -51915,9 +52567,10 @@ BookMark.prototype.closeBookMark = function () {
  * 恢复书签菜单
  */
 BookMark.prototype.restore = function () {
-  this.bookMarkMenu.css({
-    transform: 'translate3d(0px,-' + this.markHeight + 'px,0px)',
-    'transition-duration': '1s'
+  Xut.style.setTranslate({
+    y: -this.markHeight,
+    node: this.bookMarkMenu,
+    speed: 1000
   });
 };
 
@@ -52515,10 +53168,6 @@ var _class$1 = function () {
       this.resourcePath = getFileFullPath(options.resourcePath, 'autoSprite') + "/";
     }
 
-    //是否有蒙版图
-    //resType:1没有蒙版 0：有蒙版
-    this.isMask = false;
-
     this.curFPS = 0;
 
     /*默认值循环一次*/
@@ -52588,6 +53237,27 @@ var _class$1 = function () {
     }
 
     /**
+     * 初始化位置信息
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_initPosition',
+    value: function _initPosition() {
+      var obj = this.obj;
+      var params = this.data.params;
+      var action = this.action;
+      this.startPoint = {
+        x: this.originalImageList[0].X,
+        y: this.originalImageList[0].Y,
+        w: parseInt(params[action].width),
+        h: parseInt(params[action].height)
+      };
+      this.xRote = parseInt(obj.css("width")) / this.startPoint.w;
+      this.yRote = parseInt(obj.css("height")) / this.startPoint.h;
+    }
+
+    /**
      * 初始化qualified张图片
      * @return {[type]} [description]
      */
@@ -52619,29 +53289,6 @@ var _class$1 = function () {
     }
 
     /**
-     * 初始化位置信息
-     * @return {[type]} [description]
-     */
-
-  }, {
-    key: '_initPosition',
-    value: function _initPosition() {
-      var obj = this.obj;
-      var params = this.data.params;
-      var action = this.action;
-      this.startPoint = {
-        x: this.originalImageList[0].X,
-        y: this.originalImageList[0].Y,
-        w: parseInt(params[action].width),
-        h: parseInt(params[action].height)
-      };
-      this.xRote = parseInt(obj.css("width")) / this.startPoint.w;
-      this.yRote = parseInt(obj.css("height")) / this.startPoint.h;
-      this.startLeft = parseInt(obj.css("left"));
-      this.startTop = parseInt(obj.css("top"));
-    }
-
-    /**
      * 初始化结构
      * @return {[type]} [description]
      */
@@ -52649,23 +53296,16 @@ var _class$1 = function () {
   }, {
     key: '_initStructure',
     value: function _initStructure() {
-      var obj = this.obj;
-      var framId = void 0;
-      var resourcePath = this.resourcePath;
-      var html = '';
-      if (this.isMask) {
-        var filename = this._getFilename(this.originalImageList[0].name);
-        var maskUrl = resourcePath + filename;
-        html = '<div style="width:100%;height:100%;\n                             background: url(' + maskUrl + '.jpg) no-repeat;\n                             background-size: 100% 100%;\n                             -webkit-mask: url(' + maskUrl + '.png) no-repeat;\n                             -webkit-mask-size: 100% 100%;\'>\n                </div>';
-        this.sprObj = $(String.styleFormat(html));
-        obj.append(this.sprObj);
+      var src = this.resourcePath + this.originalImageList[0].name;
+      var container = void 0;
+      if (Xut.plat.isIOS) {
+        container = '<img src=' + src + ' class="inherit-size fullscreen-background" style="position:absolute;"/>';
       } else {
-        var src = resourcePath + this.originalImageList[0].name;
-        html = '<img src="' + src + '" style="width:100%;height:100%;"/>';
-
-        this.sprObj = $(String.styleFormat(html));
-        obj.html(this.sprObj);
+        container = '<div class="inherit-size fullscreen-background"\n                            style="position:absolute;background-image: url(' + src + ');"></div>';
       }
+      var $sprObj = $(String.styleFormat(container));
+      this.sprObj = $sprObj[0];
+      this.obj.html(this.sprObj);
     }
 
     /**
@@ -52698,43 +53338,9 @@ var _class$1 = function () {
         self._imgArray && self._imgArray.push(this);
         callback && callback();
       };
-
       var imageList = this.originalImageList;
       var resourcePath = this.resourcePath;
-      if (this.isMask) {
-        var filename = this._getFilename(imageList[index].name);
-        loadFigure(resourcePath + filename + ".png", collect);
-        loadFigure(resourcePath + filename + ".jpg", collect);
-      } else {
-        loadFigure(resourcePath + imageList[index].name, collect);
-      }
-    }
-
-    /**
-     * 改变图片url
-     * @return {[type]} [description]
-     */
-
-  }, {
-    key: '_changeImageUrl',
-    value: function _changeImageUrl() {
-      var imageList = this.originalImageList;
-      var curFPS = imageList[this.curFPS];
-      var resourcePath = this.resourcePath;
-
-      //第一次循环才加载图片
-      if (this.resetCount === 0) {
-        this._preloadImage(this.curFPS + this.qualified);
-      }
-
-      if (this.isMask) {
-        var filename = this._getFilename(curFPS.name);
-        this.sprObj.css("background-image", "url(" + resourcePath + filename + ".jpg)");
-        this.sprObj.css("-webkit-mask-image", "url(" + resourcePath + filename + ".png)");
-      } else {
-        var str = resourcePath + curFPS.name;
-        this.sprObj.attr("src", str);
-      }
+      loadFigure(resourcePath + imageList[index].name, collect);
     }
 
     /**
@@ -52749,10 +53355,45 @@ var _class$1 = function () {
       var curFPS = imageList[this.curFPS];
       var x = curFPS.X - this.startPoint.x;
       var y = curFPS.Y - this.startPoint.y;
-      this.obj.css({
-        left: this.startLeft + x * this.xRote,
-        top: this.startTop + y * this.yRote
-      });
+      return {
+        left: x * this.xRote,
+        top: y * this.yRote
+      };
+    }
+
+    /**
+     * 改变图片url 与 变化的位置
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_changeImage',
+    value: function _changeImage() {
+      var imageList = this.originalImageList;
+      var curFPS = imageList[this.curFPS];
+      var resourcePath = this.resourcePath;
+
+      /*第一次循环才加载图片*/
+      if (this.resetCount === 0) {
+        this._preloadImage(this.curFPS + this.qualified);
+      }
+
+      /*如果图片需要运动，改变地址*/
+      if (this.isSports) {
+        var position = this._changePosition();
+        Xut.style.setTranslate({
+          node: this.sprObj,
+          x: position.left,
+          y: position.top
+        });
+      }
+
+      /*改变图片*/
+      if (Xut.plat.isIOS) {
+        this.sprObj.setAttribute('src', resourcePath + curFPS.name);
+      } else {
+        this.sprObj.style.backgroundImage = 'url(' + (resourcePath + curFPS.name) + ')';
+      }
     }
 
     /**
@@ -52766,10 +53407,8 @@ var _class$1 = function () {
       if (!this.originalImageList) {
         return;
       }
-      this._changeImageUrl();
-      if (this.isSports) {
-        this._changePosition();
-      }
+      /*切换图片*/
+      this._changeImage();
     }
   }, {
     key: '_time',
@@ -55744,7 +56383,14 @@ function zoom(animproto) {
     var t1 = null;
     object.css(Xut.style.transformOrigin, "center"); //设置缩放基点(默认是正中心点)
     var svgElement = object.find("svg"); //获取SVG对象
-    if (svgElement) svgElement.css(Xut.style.transform, 'translate3d(0px, 0px, 0px)'); //解决SVG文字错乱问题
+    //解决SVG文字错乱问题
+    if (svgElement) {
+      Xut.style.setTranslate({
+        node: svgElement,
+        x: 0,
+        y: 0
+      });
+    }
 
     var keepRatio = parameter.keepRatio == 0 ? false : true; //保持长宽比
     var fullScreen = parameter.fullScreen == 1 ? true : false; //缩放到全屏
@@ -56305,9 +56951,6 @@ var Powepoint = function () {
      * 初始对象状态:opacity(visibility)
      */
     this._initElement();
-
-    /**预加载音频 */
-    // this._preloadAudio()
   }
 
   /**
@@ -56459,21 +57102,6 @@ var Powepoint = function () {
         offsetBottom: offsetBottom,
         offsetRight: offsetRight
       };
-    }
-
-    /**
-     * 预加载音频
-     */
-
-  }, {
-    key: '_preloadAudio',
-    value: function _preloadAudio() {
-      for (var i = 0; i < this.options.length; i++) {
-        var videoId = this.options[i].videoId;
-        if (videoId > 0) {
-          // preloadContentAudio(this.chapterId, videoId)
-        }
-      }
     }
 
     /**
@@ -57859,7 +58487,7 @@ function FastPipe(data, base) {
 }
 
 var transitionDuration = Xut.style.transitionDuration;
-var transform$1 = Xut.style.transform;
+var transform = Xut.style.transform;
 var setTranslateZ = Xut.style.setTranslateZ;
 var round = Math.round;
 
@@ -57991,7 +58619,7 @@ function setStyle(_ref) {
         tempProperty += transformProperty[key];
       }
       if (tempProperty) {
-        style[transform$1] = tempProperty;
+        style[transform] = tempProperty;
       }
     }
     //拿到属性的最终值
@@ -58227,7 +58855,7 @@ var getFlowFange = function getFlowFange(pageIndex) {
   }
 };
 
-function index$2(data, relatedData, getStyle) {
+function index$1(data, relatedData, getStyle) {
 
   //转化所有css特效的参数的比例
   var targetProperty = parseJSON(data.getParameter()[0]['parameter']);
@@ -58507,7 +59135,7 @@ var createScope = function createScope(base, contentId, chapterIndex, actName, p
 
   //生成视觉差对象
   if (data.processType === 'parallax') {
-    return index$2(data, base.relatedData, base.getStyle);
+    return index$1(data, base.relatedData, base.getStyle);
   }
 
   //数据预处理
@@ -59573,9 +60201,6 @@ function closeButton(callback) {
   return $closeNode;
 }
 
-var transform$2 = Xut.style.transform;
-var transitionDuration$1 = Xut.style.transitionDuration;
-
 var START_X = 0;
 var START_Y = 0;
 
@@ -59884,8 +60509,11 @@ var ScalePan = function () {
         Xut.nextTick(function () {
           var data = _this3.data;
           var styleText = 'translate3d(' + data.translate.x + 'px,' + data.translate.y + 'px,0px) scale(' + data.scale + ',' + data.scale + ')';
-          _this3.rootNode.style[transform$2] = styleText;
-          _this3.rootNode.style[transitionDuration$1] = speed + 'ms';
+          Xut.style.setTranslate({
+            speed: speed,
+            styleText: styleText,
+            node: _this3.rootNode
+          });
           _this3.update && _this3.update(styleText, speed);
           _this3.ticking = false;
         });
@@ -60313,13 +60941,13 @@ function createContainerView(imgContainer) {
   var rightCopy2 = right + 3.5;
   var topCopy = top + 4;
 
-  var zoomImg = '<img class="xut-zoom-fly"\n                        src="' + imgContainer.originSrc + '"\n                        style="width:' + imgContainer.width + 'px;\n                               height:' + imgContainer.height + 'px;\n                               top:' + imgContainer.top + 'px;\n                               left:' + imgContainer.left + 'px;" />';
+  var zoomImg = '<img class="xut-zoom-fly"\n                      src="' + imgContainer.originSrc + '"\n                      style="width:' + imgContainer.width + 'px;\n                             height:' + imgContainer.height + 'px;\n                             top:' + imgContainer.top + 'px;\n                             left:' + imgContainer.left + 'px;" />';
 
   if (config.screenHorizontal) {
-    html = '<div class="xut-zoom-view">\n                            <div class="xut-zoom-overlay"></div>\n                            <div class="xut-zoom-close" style="right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                                <div class="si-icon Flaticon flaticon-error" style="font-size:5vw;border-radius:50%;right:0">\n                                </div>\n                            </div>\n                            ' + zoomImg + '\n                        </div>';
+    html = '<div class="xut-zoom-view">\n                <div class="xut-zoom-overlay"></div>\n                <div class="xut-zoom-close" style="right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                    <div class="si-icon Flaticon flaticon-error" style="font-size:5vw;border-radius:50%;right:0">\n                    </div>\n                </div>\n                ' + zoomImg + '\n            </div>';
   } else {
     //竖屏
-    html = '<div class="xut-zoom-view">\n                            <div class="xut-zoom-overlay"></div>\n                            <div class="xut-zoom-close" style=";right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                                <div class="si-icon Flaticon flaticon-error" style="font-size:5vh;border-radius:50%;right:0">\n                                </div>\n                            </div>\n                            ' + zoomImg + '\n                        </div>';
+    html = '<div class="xut-zoom-view">\n                <div class="xut-zoom-overlay"></div>\n                <div class="xut-zoom-close" style=";right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                    <div class="si-icon Flaticon flaticon-error" style="font-size:5vh;border-radius:50%;right:0">\n                    </div>\n                </div>\n                ' + zoomImg + '\n            </div>';
   }
 
   return String.styleFormat(html);
@@ -61600,7 +62228,7 @@ var maskContent = function maskContent(data, wrapObj) {
   if (data.mask || wrapObj['isGif']) {
     //蒙版图
     if (maskBoxImage$1 != undefined) {
-      restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'mask') + '"\n              class="inherit-size fullscreen-background edges"\n              src="' + resourcePath + '"\n              style="' + isMaskImg + '"/>');
+      restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'mask') + '"\n              class="inherit-size fullscreen-background edges"\n              src="' + resourcePath + '"\n              onerror="fixNodeError(\'image\',this,\'' + wrapObj.chapterIndex + '\',\'' + resourcePath + '\')"\n              style="' + isMaskImg + '"/>');
     } else {
       //canvas
       restr += String.styleFormat('<canvas class="inherit-size fullscreen-background edges"\n                 src="' + resourcePath + '"\n                 mask="' + isMaskImg + '"\n                 width="' + data.scaleWidth + '"\n                 height="' + data.scaleHeight + '"\n                 style="opacity:0;' + (config.data.pathAddress.replace(/\//g, "\/") + data.mask) + '"/>');
@@ -61625,7 +62253,7 @@ var maskContent = function maskContent(data, wrapObj) {
     restr += String.styleFormat('<div data-type="sprite-images"\n            class="sprite"\n            style="height:' + data.scaleHeight + 'px;\n                   background-image:url(' + resourcePath + ');\n                   background-size:' + matrixX + '% ' + matrixY + '%;">\n      </div>');
   } else {
     //普通图片
-    restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'ordinary') + '"\n            class="inherit-size fullscreen-background fix-miaomiaoxue-img"\n            src="' + resourcePath + '"\n            style="' + isMaskImg + '"/>');
+    restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'ordinary') + '"\n            class="inherit-size fullscreen-background fix-miaomiaoxue-img"\n            src="' + resourcePath + '"\n            onerror="fixNodeError(\'image\',this,\'' + wrapObj.chapterIndex + '\',\'' + resourcePath + '\')"\n            style="' + isMaskImg + '"/>');
   }
 
   return restr;
@@ -61780,7 +62408,7 @@ var createContainer$1 = function createContainer(data, wrapObj) {
   //2015.12.29
   //如果是html内容
   if (wrapObj.isJs) {
-    wapper = '<div id="' + containerName + '"\n                       data-behavior="click-swipe"\n                       class="fullscreen-background ' + filterName + '"\n                       style="width:' + backwidth + 'px;\n                              height:' + backheight + 'px;\n                              top:' + backtop + 'px;\n                              left:' + backleft + 'px;\n                              position:absolute;\n                              z-index:' + zIndex + ';\n                              visibility:' + visibility + ';\n                              {10}">\n                 <div data-type="scroller"\n                      style="width:' + backwidth + 'px;\n                             position:absolute;">';
+    wapper = '<div id="' + containerName + '"\n                   data-behavior="click-swipe"\n                   class="fullscreen-background ' + filterName + '"\n                   style="width:' + backwidth + 'px;\n                          height:' + backheight + 'px;\n                          top:' + backtop + 'px;\n                          left:' + backleft + 'px;\n                          position:absolute;\n                          z-index:' + zIndex + ';\n                          visibility:' + visibility + ';\n                          {10}">\n               <div data-type="scroller"\n                    style="width:' + backwidth + 'px;\n                           position:absolute;">';
     return String.styleFormat(wapper);
   } else {
     //scroller:=> absolute 因为别的元素有依赖
@@ -62143,13 +62771,13 @@ var analysisPath = function analysisPath(wrapObj, conData) {
 var externalFile = function externalFile(wrapObj, svgCallback) {
   //svg零件不创建解析具体内容
   if (wrapObj.isSvg) {
-    readFile(wrapObj.contentData.md5, function (svgdata) {
+    readFileContent(wrapObj.contentData.md5, function (svgdata) {
       wrapObj.svgstr = svgdata;
       svgCallback(wrapObj);
     });
   } else if (wrapObj.isJs) {
     //如果是.js的svg文件
-    readFile(wrapObj.contentData.md5, function (htmldata) {
+    readFileContent(wrapObj.contentData.md5, function (htmldata) {
       wrapObj.htmlstr = htmldata;
       svgCallback(wrapObj);
     }, "js");
@@ -62901,14 +63529,14 @@ var allowNext$1 = allowNext();
 需要注意快速翻页要立马清理，因为定时器在延后触发
  */
 
-var queue = [];
+var queue$1 = [];
 var timer$1 = null;
 
 /*
 重设状态
  */
 function resetBatcherState() {
-  queue.length = 0;
+  queue$1.length = 0;
   if (timer$1) {
     clearTimeout(timer$1);
     timer$1 = null;
@@ -62918,7 +63546,7 @@ function resetBatcherState() {
 /*
   运行队列
  */
-function runBatcherQueue(queue) {
+function runBatcherQueue$1(queue) {
   for (var i = 0; i < queue.length; i++) {
     var watcher = queue[i];
     if (watcher) {
@@ -62932,11 +63560,11 @@ function runBatcherQueue(queue) {
 加入监控
  */
 function pushWatcher(type, watcher) {
-  queue.push(watcher); //加入队列
+  queue$1.push(watcher); //加入队列
   if (!timer$1) {
     //只第一次调用开始执行
     timer$1 = setTimeout(function () {
-      runBatcherQueue(queue);
+      runBatcherQueue$1(queue$1);
       resetBatcherState();
     }, 500);
   }
@@ -63493,7 +64121,7 @@ var Media = {
     var mediaType = titleCase(category);
 
     /*默认状态*/
-    var imageBackground = stopImage || startImage;
+    var imageBackground = startImage;
 
     /*
     音频在创建dom的时候需要查下
@@ -63501,7 +64129,7 @@ var Media = {
     如果创建过，那么图标状态需要处理
     */
     if (hasHotAudioPlay(chapterId, _id)) {
-      imageBackground = startImage;
+      imageBackground = stopImage;
     }
 
     /*
@@ -65308,21 +65936,19 @@ var TaskComponents = function (_TaskSuper) {
  * 平移
  * @return {[type]} [description]
  */
-var transitionDuration$2 = Xut.style.transitionDuration;
-var transform$3 = Xut.style.transform;
+var transitionDuration$1 = Xut.style.transitionDuration;
 
 /**
  * 切换坐标
  * 保证只是pageType === page才捕获动作
  */
-var toTranslate3d = function toTranslate3d(node, distance, speed, callback) {
+var setTranslate = function setTranslate(node, distance, speed, callback) {
   if (node) {
     if (config.launch.scrollMode === 'v') {
-      node.style[transform$3] = 'translate3d(0px,' + distance + 'px,0px)';
+      Xut.style.setTranslate({ node: node, speed: speed, y: distance });
     } else {
-      node.style[transform$3] = 'translate3d(' + distance + 'px,0px,0px)';
+      Xut.style.setTranslate({ node: node, speed: speed, x: distance });
     }
-    node.style[transitionDuration$2] = speed + 'ms';
     callback && callback();
   }
 };
@@ -65332,12 +65958,12 @@ var toTranslate3d = function toTranslate3d(node, distance, speed, callback) {
  * @param  {[type]} node [description]
  * @return {[type]}      [description]
  */
-var set$2 = function set(node, value) {
+var set$1 = function set(node, value) {
   if (node) {
     if (config.launch.scrollMode === 'v') {
-      node.style[transform$3] = 'translate3d(0px,' + value + 'px,0px)';
+      Xut.style.setTranslate({ node: node, y: value });
     } else {
-      node.style[transform$3] = 'translate3d(' + value + 'px,0px,0px)';
+      Xut.style.setTranslate({ node: node, x: value });
     }
   }
 };
@@ -65348,8 +65974,8 @@ var set$2 = function set(node, value) {
  */
 var reset = function reset(node) {
   if (node) {
-    node.style[transform$3] = 'translate3d(0px,0px,0px)';
-    node.style[transitionDuration$2] = '';
+    Xut.style.setTranslate({ node: node, x: 0, y: 0 });
+    node.style[transitionDuration$1] = '';
   }
 };
 
@@ -65358,7 +65984,7 @@ var reset = function reset(node) {
  * @return {[type]} [description]
  */
 var flipMove$1 = function flipMove() {
-  toTranslate3d.apply(undefined, arguments);
+  setTranslate.apply(undefined, arguments);
 };
 
 /**
@@ -65366,7 +65992,7 @@ var flipMove$1 = function flipMove() {
  * @return {[type]} [description]
  */
 var flipRebound$1 = function flipRebound() {
-  toTranslate3d.apply(undefined, arguments);
+  setTranslate.apply(undefined, arguments);
 };
 
 /**
@@ -65374,7 +66000,7 @@ var flipRebound$1 = function flipRebound() {
  * @return {[type]} [description]
  */
 var flipOver$1 = function flipOver() {
-  toTranslate3d.apply(undefined, arguments);
+  setTranslate.apply(undefined, arguments);
 };
 
 /**
@@ -65382,7 +66008,7 @@ var flipOver$1 = function flipOver() {
  * @type {Object}
  */
 var translation = {
-  set: set$2,
+  set: set$1,
   reset: reset,
   flipMove: flipMove$1,
   flipRebound: flipRebound$1,
@@ -65396,9 +66022,9 @@ var translation = {
  */
 var createTranslate = function createTranslate(value) {
   if (config.launch.scrollMode === 'v') {
-    return 'translate3d(0px,' + value + 'px,0px)';
+    return Xut.style.setTranslateStyle(0, value);
   }
-  return 'translate3d(' + value + 'px,0px,0px)';
+  return Xut.style.setTranslateStyle(value, 0);
 };
 
 /**
@@ -65415,7 +66041,7 @@ function fix($node, action) {
     var visualWidth = config.visualSize.width;
     translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth);
   }
-  $node.css(transform$3, translate);
+  $node.css(Xut.style.transform, translate);
 }
 
 /************************
@@ -66503,9 +67129,15 @@ function init(Swiper) {
   Swiper.prototype._setTransform = function (element) {
     this._initDistance = -this.visualIndex * this._getRollVisual();
     if (element) {
-      element.style[Xut.style.transform] = 'translate3d(0px,' + this._initDistance + 'px,0px)';
+      Xut.style.setTranslate({
+        y: this._initDistance,
+        node: element
+      });
     } else {
-      this.container.style[Xut.style.transform] = 'translate3d(' + this._initDistance + 'px,0px,0px)';
+      Xut.style.setTranslate({
+        x: this._initDistance,
+        node: this.container
+      });
     }
   };
 
@@ -66580,7 +67212,7 @@ function slide(Swiper) {
     /*父容器滑动模式*/
     if (this.options.scope === 'parent') {
       if (this.options.scrollY) {
-        this.scroller.style[Xut.style.transform] = 'translate3d(0px,' + y + 'px,0px)';
+        Xut.style.setTranslate({ y: y, node: this.scroller });
       }
     }
     /*更新坐标*/
@@ -66917,7 +67549,7 @@ function distribute$1(Swiper) {
         惯性算法
 ************************/
 
-var transitionDuration$3 = Xut.style.transitionDuration;
+var transitionDuration$2 = Xut.style.transitionDuration;
 
 var ABS = Math.abs;
 
@@ -67090,8 +67722,8 @@ var Swiper = function (_Observer) {
 
     /*内部滑动页面，优化边界的敏感度*/
     _this.insideScrollRange = {
-      min: visualWidth * 0.03,
-      max: visualWidth - visualWidth * 0.03
+      min: visualWidth * 0.01,
+      max: visualWidth - visualWidth * 0.01
     };
 
     return _this;
@@ -67322,6 +67954,7 @@ var Swiper = function (_Observer) {
          * 所以移动页面在反弹计算之后，所以必须在延后 movePageBases中判断是否为反弹
          */
         setPageBanBounce: function setPageBanBounce(position) {
+
           /*如果没有启动边界反弹*/
           if (!self.options.borderBounce) {
             /*如果是到边界了，就禁止反弹*/
@@ -67339,10 +67972,19 @@ var Swiper = function (_Observer) {
             if (!self.firstMovePosition) {
               self.firstMovePosition = absPosition;
             }
+
             if (self.direction === 'next') {
               if (absPosition >= self.visualWidth) {
                 if (self.firstMovePosition > self.insideScrollRange.max) {
-                  /*如果是在边界的位置翻页，是被允许的*/
+
+                  /*如果是单页面，并且右边移动溢出了，这需要处理*/
+                  if (!self.options.hasMultiPage) {
+                    self._setKeepDist(-self.visualWidth, 0);
+                    self._banBounce = true;
+                    return true;
+                  }
+
+                  /*如果是在尾部边界的位置翻页，是被允许的*/
                   return false;
                 } else {
                   /*其余位置都是被禁止翻页的*/
@@ -67724,7 +68366,7 @@ var Swiper = function (_Observer) {
     key: '_removeDuration',
     value: function _removeDuration(node) {
       if (node) {
-        node.style[transitionDuration$3] = '';
+        node.style[transitionDuration$2] = '';
       }
     }
 
@@ -67863,7 +68505,15 @@ function swiperHook(e, node) {
     nodeName !== 'video' && //pc视频控制条不灵敏问题
     !hasTyperlink) {
       //超链接不阻止
-      e.preventDefault && e.preventDefault();
+
+      ///////////////////////////////////////////////////////////////////
+      /// 因为可能存在修复音频的click事件
+      /// 如果需要修复音频但是click的事件没有被触发，这里需要跳过preventDefault
+      /// 因为touchstart的动作优先于click
+      ///////////////////////////////////////////////////////////////////
+      if (hasFixClick()) {
+        e.preventDefault && e.preventDefault();
+      }
     }
   }
 }
@@ -68005,6 +68655,7 @@ function closestMedia(target, chapterId, pageIndex) {
       if (fileName) {
         var type = matchType[1];
         var id = matchType[2];
+
         if (fileName) {
           $trigger({
             target: target,
@@ -68012,6 +68663,8 @@ function closestMedia(target, chapterId, pageIndex) {
           }, {
             id: id,
             type: type,
+            startImage: target.getAttribute('data-startImage'),
+            stopImage: target.getAttribute('data-stopImage'),
             container: container || target,
             track: 8888, //播放就删除
             chapterId: 'column',
@@ -68956,8 +69609,11 @@ var createPageScale = function createPageScale(rootNode, pageIndex) {
     tapClose: true,
     update: function update(styleText, speed) {
       if (pageMasterNode && styleText) {
-        pageMasterNode.style[Xut.style.transform] = styleText;
-        pageMasterNode.style[Xut.style.transitionDuration] = speed + 'ms';
+        Xut.style.setTranslate({
+          speed: speed,
+          styleText: styleText,
+          node: pageMasterNode
+        });
       }
     }
   });
@@ -70096,6 +70752,11 @@ var destroy$1 = function (baseProto) {
       });
     }
 
+    /**
+     * 清理可能错误的img修复文件列表
+     */
+    clearRepairImage(this.chapterIndex);
+
     //清理多线程任务块
     var taskGroup = this.threadTaskRelated.assignTaskGroup;
     if (taskGroup) {
@@ -70886,7 +71547,11 @@ var PageMgr = function (_ManageSuper) {
     key: 'setInitTranslate',
     value: function setInitTranslate(pageIndex) {
       if (config.launch.doublePageMode) {
-        this.rootNode.style[Xut.style.transform] = 'translate3d(-' + config.screenSize.width * pageIndex + 'px,0px,0px)';
+        var distance = config.screenSize.width * pageIndex;
+        Xut.style.setTranslate({
+          x: -distance,
+          node: this.rootNode
+        });
       }
     }
 
@@ -70918,8 +71583,11 @@ var PageMgr = function (_ManageSuper) {
   }, {
     key: '_moveContainer',
     value: function _moveContainer(distance, speed) {
-      this.rootNode.style[Xut.style.transform] = 'translate3d(' + distance + 'px,0px,0px)';
-      this.rootNode.style[Xut.style.transitionDuration] = speed + 'ms';
+      Xut.style.setTranslate({
+        speed: speed,
+        x: distance,
+        node: this.rootNode
+      });
     }
 
     /**
@@ -71255,8 +71923,6 @@ var toArray$2 = function toArray$$1(filter) {
 };
 
 var rword = "-";
-var transitionDuration$4 = Xut.style.transitionDuration;
-var transform$4 = Xut.style.transform;
 
 /**
  * parallaObjsCollection: Object
@@ -71666,8 +72332,11 @@ var MasterMgr = function (_ManageSuper) {
         var _fixToMove = function _fixToMove(distance, speed) {
           var $pageNode = parallaxObj.$pageNode;
           if ($pageNode) {
-            $pageNode.css(transitionDuration$4, speed + 'ms');
-            $pageNode.css(transform$4, 'translate3d(' + distance + 'px,0px,0px)');
+            Xut.style.setTranslate({
+              speed: speed,
+              x: distance,
+              node: $pageNode
+            });
           }
         };
 
@@ -72312,11 +72981,11 @@ function getOffset$1(name, styleDataset) {
  * @param  {[type]} offset [description]
  * @return {[type]}        [description]
  */
-var setTranslate = function setTranslate() {
+var setTranslate$1 = function setTranslate() {
   var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
   var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-  return 'translate3d(' + x + 'px,' + y + 'px,0px)';
+  return Xut.style.setTranslateStyle(x, y);
 };
 
 /**
@@ -72335,16 +73004,16 @@ function initTranslate(_ref) {
     case 'right':
       /*设置X轴*/
       offset = getOffset$1(position, styleDataset);
-      translate = setTranslate(offset);
+      translate = setTranslate$1(offset);
       break;
     case 'top':
     case 'bottom':
       /*设置Y轴*/
       offset = getOffset$1(position, styleDataset);
-      translate = setTranslate(0, offset);
+      translate = setTranslate$1(0, offset);
       break;
     case 'middle':
-      translate = setTranslate();
+      translate = setTranslate$1();
       offset = 0;
       break;
   }
@@ -73041,7 +73710,7 @@ var Scheduler = function () {
           if (config.launch.historyMode && !options.isInApp && options.hasMultiScene) {
             var history = sceneController.sequence(seasonId, middleIndex);
             if (history) {
-              set$1("history", history);
+              $setStorage("history", history);
             }
           }
         },
@@ -73109,7 +73778,7 @@ var Scheduler = function () {
        * 保存目录索引
        */
       if (config.launch && config.launch.historyMode && !options.hasMultiScene) {
-        set$1("pageIndex", middleIndex);
+        $setStorage("pageIndex", middleIndex);
       }
 
       /**
@@ -76748,8 +77417,7 @@ var Scrollbar = function (_MiniSuper) {
       var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
       var speed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
-      this.indicatorNode.style[Xut.style.transitionDuration] = speed + 'ms';
-      this.indicatorNode.style[Xut.style.transform] = 'translate3d(' + x + 'px,' + y + 'px,0px)';
+      Xut.style.setTranslate({ x: x, y: y, speed: speed, node: this.indicatorNode });
     }
   }, {
     key: '_updateTranslate',
@@ -77660,7 +78328,7 @@ function initView() {
     //主场景判断（第一个节,因为工具栏的配置不同）
     if (options.main || sceneController.mianId === seasonId) {
       //清理缓存
-      $remove("history");
+      $removeStorage("history");
       //确定主场景
       sceneController.mianId = seasonId;
       //是否主场景
@@ -77734,10 +78402,10 @@ function initAsset() {
    */
   window.XXTAPI.ReadVar = function (variable, defaultValue) {
     var temp;
-    if (temp = get$1(variable)) {
+    if (temp = $getStorage(variable)) {
       return temp;
     } else {
-      set$1(variable, defaultValue);
+      $setStorage(variable, defaultValue);
       return defaultValue;
     }
   };
@@ -77746,7 +78414,7 @@ function initAsset() {
    * 将变量的值保存起来
    */
   window.XXTAPI.SaveVar = function (variable, value) {
-    set$1(variable, value);
+    $setStorage(variable, value);
   };
 
   /*
@@ -77754,7 +78422,7 @@ function initAsset() {
    *对于全局变量，这个函数将是主要使用的，替代简单的“=”赋值
    */
   window.XXTAPI.SetVar = function (variable, value) {
-    set$1(variable, value);
+    $setStorage(variable, value);
   };
 }
 
@@ -78148,7 +78816,7 @@ function initApplication() {
     if (window.DUKUCONFIG) {
       //外部回调通知
       if (window.DUKUCONFIG.iframeDrop) {
-        var appId = get$1('appId');
+        var appId = $getStorage('appId');
         window.DUKUCONFIG.iframeDrop(['appId-' + appId, 'novelId-' + appId, 'pageIndex-' + appId]);
       }
       window.DUKUCONFIG = null;
@@ -78476,11 +79144,11 @@ function priorityConfig() {
 }
 
 /*代码初始化*/
-initAudio();
+initAudio$1();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 886.2;
+Xut.Version = 886.6;
 
 /*加载应用app*/
 var initApp = function initApp() {

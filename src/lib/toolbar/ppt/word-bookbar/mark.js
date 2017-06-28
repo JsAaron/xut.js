@@ -227,7 +227,6 @@ export default class Mark {
   iconManager(target) {
     var $icon = this.bookMarkIcon = $(target),
       restore = this.iconRestore;
-
     $icon.css({
       'transform': 'scale(1.2)',
       'transition-duration': '500ms'
@@ -335,9 +334,9 @@ export default class Mark {
    * @return {[type]} [description]
    */
   closeBookMark(target) {
-    this.bookMarkMenu.css({
-      transform: 'translate3d(0px,0px,0px)',
-      'transition-duration': '1s'
+    Xut.style.setTranslate({
+      speed: 1000,
+      node: this.bookMarkMenu
     })
   }
 
@@ -346,9 +345,10 @@ export default class Mark {
    * 恢复书签菜单
    */
   restore() {
-    this.bookMarkMenu.css({
-      transform: 'translate3d(0px,-' + this.markHeight + 'px,0px)',
-      'transition-duration': '1s'
+    Xut.style.setTranslate({
+      y: (-this.markHeight),
+      speed: 1000,
+      node: this.bookMarkMenu
     })
   }
 

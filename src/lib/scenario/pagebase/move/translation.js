@@ -5,22 +5,19 @@
  */
 import { config } from '../../../config/index'
 
-const reqAnimationFrame = Xut.style.reqAnimationFrame
 const transitionDuration = Xut.style.transitionDuration
-const transform = Xut.style.transform
 
 /**
  * 切换坐标
  * 保证只是pageType === page才捕获动作
  */
-const toTranslate3d = (node, distance, speed, callback) => {
+const setTranslate = (node, distance, speed, callback) => {
   if (node) {
     if (config.launch.scrollMode === 'v') {
-      node.style[transform] = `translate3d(0px,${distance}px,0px)`
+      Xut.style.setTranslate({ node, speed, y: distance })
     } else {
-      node.style[transform] = `translate3d(${distance}px,0px,0px)`
+      Xut.style.setTranslate({ node, speed, x: distance })
     }
-    node.style[transitionDuration] = speed + 'ms'
     callback && callback()
   }
 }
@@ -33,9 +30,9 @@ const toTranslate3d = (node, distance, speed, callback) => {
 const set = (node, value) => {
   if (node) {
     if (config.launch.scrollMode === 'v') {
-      node.style[transform] = `translate3d(0px,${value}px,0px)`
+      Xut.style.setTranslate({ node, y: value })
     } else {
-      node.style[transform] = `translate3d(${value}px,0px,0px)`
+      Xut.style.setTranslate({ node, x: value })
     }
   }
 }
@@ -46,7 +43,7 @@ const set = (node, value) => {
  */
 const reset = (node) => {
   if (node) {
-    node.style[transform] = `translate3d(0px,0px,0px)`
+    Xut.style.setTranslate({ node, x: 0, y: 0 })
     node.style[transitionDuration] = ''
   }
 }
@@ -56,7 +53,7 @@ const reset = (node) => {
  * @return {[type]} [description]
  */
 const flipMove = (...arg) => {
-  toTranslate3d(...arg)
+  setTranslate(...arg)
 }
 
 /**
@@ -64,7 +61,7 @@ const flipMove = (...arg) => {
  * @return {[type]} [description]
  */
 const flipRebound = (...arg) => {
-  toTranslate3d(...arg)
+  setTranslate(...arg)
 }
 
 /**
@@ -72,7 +69,7 @@ const flipRebound = (...arg) => {
  * @return {[type]} [description]
  */
 const flipOver = (...arg) => {
-  toTranslate3d(...arg)
+  setTranslate(...arg)
 }
 
 /**
@@ -95,9 +92,9 @@ export const translation = {
  */
 const createTranslate = (value) => {
   if (config.launch.scrollMode === 'v') {
-    return `translate3d(0px,${value}px,0px)`
+    return Xut.style.setTranslateStyle(0, value)
   }
-  return `translate3d(${value}px,0px,0px)`
+  return Xut.style.setTranslateStyle(value, 0)
 }
 
 
@@ -115,5 +112,5 @@ export function fix($node, action) {
     const visualWidth = config.visualSize.width
     translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth)
   }
-  $node.css(transform, translate)
+  $node.css(Xut.style.transform, translate)
 }

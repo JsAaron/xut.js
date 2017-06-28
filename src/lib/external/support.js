@@ -227,10 +227,17 @@
     };
 
 
-  /**
-   * 样式style支持
-   * @type {Object}
-   */
+
+  ////////////////////
+  /// 样式style支持
+  ////////////////////
+
+  function setTranslateStyle(x, y) {
+    return 'translate(' + x + 'px,' + y + 'px)' + translateZ
+  }
+  var transitionDuration = prefixStyle('transition-duration')
+  var transform = prefixStyle('transform')
+
   Xut.mixin(Xut.style, {
 
     reqAnimationFrame: reqAnimationFrame,
@@ -251,9 +258,9 @@
      * transform
      * @type {[type]}
      */
-    transform: prefixStyle('transform'),
+    transform: transform,
     transition: prefixStyle('transition'),
-    transitionDuration: prefixStyle('transition-duration'),
+    transitionDuration: transitionDuration,
     transitionDelay: prefixStyle('transition-delay'),
     transformOrigin: prefixStyle('transform-origin'),
     transitionTimingFunction: prefixStyle('transition-timing-function'),
@@ -277,6 +284,43 @@
     setTranslateZ: function (zValue) {
       return hasPerspective ? ' translateZ(' + zValue + ')' : ''
     },
+
+    /**
+     * 设置Translate
+     * @param {[type]} node [description]
+     * @param {[type]} x    [description]
+     * @param {[type]} y    [description]
+     */
+    setTranslateStyle: setTranslateStyle,
+    setTranslate: function (options) {
+      var node = options.node
+      var x = options.x || 0
+      var y = options.y || 0
+      var speed = options.speed
+      var styleText = options.styleText
+
+      if (!node) {
+        console.log('setTranslate没有提供node')
+        return
+      }
+
+      /*如果是jquery对象*/
+      if (node.length) {
+        node = node[0]
+      }
+
+      /*设置*/
+      if (styleText) {
+
+      } else {
+        node.style[transform] = setTranslateStyle(x, y)
+      }
+
+      if (speed !== undefined) {
+        node.style[transitionDuration] = speed + 'ms'
+      }
+    },
+
 
     /**
      * 额外样式

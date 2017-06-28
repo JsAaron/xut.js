@@ -1,8 +1,6 @@
-
 import main from './main/index'
 import { config } from './config/index'
-import { nextTick } from './util/nexttick'
-import { slashPostfix } from './util/option'
+import { slashPostfix, nextTick } from './util/index'
 import { initAudio } from './component/audio/api'
 import { initVideo } from './component/video/api'
 import { initRootNode } from './initialize/root-node'
@@ -16,7 +14,7 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
-Xut.Version = 886.5
+Xut.Version = 886.6
 
 /*加载应用app*/
 const initApp = (...arg) => {

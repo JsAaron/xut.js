@@ -6,7 +6,7 @@
  * ***************************************************/
 import TaskSuper from '../super/index'
 import { config } from '../../../../../config/index'
-import { nextTick } from '../../../../../util/nexttick'
+import { nextTick } from '../../../../../util/tick'
 import { textFx } from './text-fx'
 import { compileActivity } from './compile-activity'
 import { zoomPicture } from './zoom-picture'

@@ -3,6 +3,7 @@
 ////////////////////////
 
 import { config } from '../config/index'
+import { hasFixClick } from '../component/audio/fix'
 
 /**
  * 阻止元素的默认行为
@@ -55,7 +56,16 @@ export default function swiperHook(e, node) {
       nodeName !== 'a' && //并且不是a标签(在cloumn中有a标签，需要跳转)
       nodeName !== 'video' && //pc视频控制条不灵敏问题
       !hasTyperlink) { //超链接不阻止
-      e.preventDefault && e.preventDefault();
+
+      ///////////////////////////////////////////////////////////////////
+      /// 因为可能存在修复音频的click事件
+      /// 如果需要修复音频但是click的事件没有被触发，这里需要跳过preventDefault
+      /// 因为touchstart的动作优先于click
+      ///////////////////////////////////////////////////////////////////
+      if (hasFixClick()) {
+        e.preventDefault && e.preventDefault();
+      }
+
     }
   }
 }

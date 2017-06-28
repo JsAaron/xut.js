@@ -7,7 +7,7 @@ import { getOffset } from './layout-hook/index'
  * @return {[type]}        [description]
  */
 const setTranslate = (x = 0, y = 0) => {
-  return `translate3d(${x}px,${y}px,0px)`
+  return Xut.style.setTranslateStyle(x, y)
 }
 
 /**

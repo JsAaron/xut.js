@@ -50,8 +50,7 @@ export default class Scrollbar extends MiniSuper {
 
 
   _setTranslate(x = 0, y = 0, speed = 0) {
-    this.indicatorNode.style[Xut.style.transitionDuration] = speed + 'ms'
-    this.indicatorNode.style[Xut.style.transform] = `translate3d(${x}px,${y}px,0px)`
+    Xut.style.setTranslate({ x, y, speed, node: this.indicatorNode })
   }
 
 

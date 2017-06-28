@@ -66,9 +66,15 @@ export default function init(Swiper) {
   Swiper.prototype._setTransform = function (element) {
     this._initDistance = (-this.visualIndex * this._getRollVisual())
     if (element) {
-      element.style[Xut.style.transform] = `translate3d(0px,${this._initDistance}px,0px)`
+      Xut.style.setTranslate({
+        y: this._initDistance,
+        node: element
+      })
     } else {
-      this.container.style[Xut.style.transform] = `translate3d(${this._initDistance}px,0px,0px)`
+      Xut.style.setTranslate({
+        x: this._initDistance,
+        node: this.container
+      })
     }
   }
 

@@ -246,8 +246,8 @@ export default class Swiper extends Observer {
 
     /*内部滑动页面，优化边界的敏感度*/
     this.insideScrollRange = {
-      min: visualWidth * 0.03,
-      max: visualWidth - (visualWidth * 0.03)
+      min: visualWidth * 0.01,
+      max: visualWidth - (visualWidth * 0.01)
     }
 
   }
