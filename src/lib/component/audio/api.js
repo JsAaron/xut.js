@@ -71,6 +71,7 @@ export function triggerAudio({
 }
 
 
+
 ////////////////////////
 /// 动画音频接口
 /// 2 直接播放
@@ -90,7 +91,7 @@ export function createContentAudio(pageId, audioId) {
 }
 
 
-const accessAudio = function(pageId, queryId, callback) {
+const accessAudio = function (pageId, queryId, callback) {
   const playBox = getPlayBox()
   if (playBox[CONTENT]) {
     const pagePlayObj = playBox[CONTENT][pageId];
@@ -109,7 +110,7 @@ const accessAudio = function(pageId, queryId, callback) {
  * 待用
  */
 export function resetContentAudio(pageId, queryId) {
-  accessAudio(pageId, queryId, function(playObj) {
+  accessAudio(pageId, queryId, function (playObj) {
     playObj.reset()
   })
 }
@@ -124,12 +125,11 @@ export function destroyContentAudio(pageId, queryId) {
 
   /*如果只有pageId没有queryId就是全部清理*/
   if (pageId && queryId === undefined) {
-    console.log(123)
     return
   }
 
   /*单独清理*/
-  accessAudio(pageId, queryId, function(playObj, playBox) {
+  accessAudio(pageId, queryId, function (playObj, playBox) {
     playObj.destroy()
       /*清理保存容器*/
     delete playBox[CONTENT][pageId][queryId];
@@ -137,6 +137,29 @@ export function destroyContentAudio(pageId, queryId) {
       delete playBox[CONTENT][pageId]
     }
   })
+}
+
+
+/**
+ * 重置音频对象
+ * 如果在不支持自动音频的情况下
+ * 如果修复代码没有执行的时候，就运行自动音频
+ * 那么音频是没有声音的
+ * 所以等修复音频代码执行完毕后，手动调用
+ * 然后让音频能支持自动播放
+ * @return {[type]} [description]
+ */
+export function resetAudioContext() {
+  const playBox = getPlayBox()
+  var t, p, a;
+  for (t in playBox) {
+    for (p in playBox[t]) {
+      for (a in playBox[t][p]) {
+        /*needFix：如果是需要修复的代码*/
+        playBox[t][p][a].resetContext()
+      }
+    }
+  }
 }
 
 
@@ -162,6 +185,7 @@ export function clearColumnAudio() {
   }
 }
 
+
 /**
  * 获取媒体数据，视频音频
  */
@@ -173,6 +197,7 @@ export function getMediaData(type, queryId) {
     return Xut.data.query('Video', queryId);
   }
 }
+
 
 /**
  * 挂起音频

@@ -134,16 +134,17 @@ export default class AudioSuper {
       this._play()
     }
 
+    this.status = 'playing';
+
     //flash模式不执行
-    if (this.audio && !this.isFlash) {
-      this.status = 'playing';
+    if (this.audio) {
       //支持自动播放,微信上单独处理
       if (window.WeixinJSBridge) {
         window.WeixinJSBridge.invoke('getNetworkType', {}, (e) => {
           this.audio.play();
         })
       } else {
-        this.audio.play && this.audio.play();
+        this.audio.play();
       }
     }
     this.acitonObj && this.acitonObj.play();

@@ -5,6 +5,7 @@
  */
 
 import { getFileFullPath } from '../../util/option'
+import { loadFigure } from '../../util/loader/image'
 
 //音频动作
 //替换背景图
@@ -18,26 +19,32 @@ export function Action(options) {
     element = document.querySelector('#Audio_' + options.audioId)
   }
 
+  let startImage = options.startImage && getFileFullPath(options.startImage, 'audio-action')
+  let stopImage = options.stopImage && getFileFullPath(options.stopImage, 'audio-action')
+
   //切换背景
   const toggleImage = function (fileName) {
     getAudioNode() //每次都重新获取新的节点
     if (element) {
-      element.style.backgroundImage = `url(${ getFileFullPath(fileName,'audio-action')})`
+      element.style.backgroundImage = `url(${fileName})`
     }
   }
 
   getAudioNode()
   pageType = element.getAttribute('data-belong')
 
+
+  stopImage && loadFigure(stopImage)
+
   return {
     play() {
-      options.stopImage && toggleImage(options.stopImage)
+      stopImage && toggleImage(stopImage)
       if (options.startScript) {
         Xut.Assist.Run(pageType, options.startScript.split(','))
       }
     },
     pause() {
-      options.startImage && toggleImage(options.startImage)
+      startImage && toggleImage(startImage)
       if (options.stopScript) {
         Xut.Assist.Stop(pageType, options.stopScript.split(','))
       }

@@ -3,16 +3,35 @@ import { hasAudioes, getAudio } from '../fix'
 
 /**
  * 使用html5的audio播放
- * 1-支持audio的autoplay，大部分安卓机子的自带浏览器和微信，大部分的IOS微信（无需特殊解决）
- * 2-不支持audio的autoplay，部分的IOS微信
- * 3-不支持audio的autoplay，部分的安卓机子的自带浏览器（比如小米，开始模仿safari）和全部的ios safari（这种只能做用户触屏时就触发播放了）
  *
- * ios10.3  不支持canplay事件
+ * 1.移动端自动播放，需要调用2次play，但是通过getAudio的方法获取的上下文，每个context被自动play一次
+ * 2.如果需要修复自动播放的情况下
+ *   A. 音频的执行比hasAudioes的处理快，那么需要resetContext正在播放的音频上下文
+ *   B. 如果hasAudioes有了后，在执行音频，正常播放
+ * 3.不需要修复自动播放的情况，只有正常的1次play了
  */
 export class NativeAudio extends AudioSuper {
 
   constructor(options, controlDoms) {
     super(options, controlDoms);
+  }
+
+  /**
+   * 创建音频上下文对象
+   */
+  _createContext(state) {
+    this.audio = getAudio();
+    // 必须调用，点击播放的时候没有声音，修复
+    if (Xut.plat.isIOS) {
+      this.audio.play()
+    }
+    /**由于修复的问题，先调用了play，改src, 会提示中断报错，所以这延时修改src*/
+    setTimeout(() => {
+      if (this.audio) {
+        this.audio.src = this.$$url;
+        this._initPlay(state != undefined ? state : true)
+      }
+    }, 150)
   }
 
   /**
@@ -25,62 +44,65 @@ export class NativeAudio extends AudioSuper {
     let hasAudio = hasAudioes()
 
     if (hasAudio) {
-      this.audio = getAudio()
-      this.audio.src = this.$$url
+      this._createContext();
     } else {
       this.audio = new Audio(this.$$url)
-      this.needFix = true
+      this._needFix = true
+      this._initPlay(true)
     }
-    this._watchAudio(true)
   }
 
   /**
-   * 重设音频上下文
-   * 因为自动音频播放的关系
-   * 在点击后修复这个音频
+   * 清理定时器
    * @return {[type]} [description]
    */
-  resetContext() {
-    this._destroy()
-    this.audio = getAudio()
-    this.audio.src = this.$$url
-    this._watchAudio(this.status === 'playing' ? true : false)
+  _clearTimer() {
+    if (this.timer) {
+      clearTimeout(this.timer)
+      this.timer = null
+    }
   }
-
 
   /**
    * 监听音频播放
-   * status
+   * toPlay
    *   如果为true就是时间完毕后，允许播放
    *   否则就是在resetContext调用处理，音频已经跳过了playing，可能关闭或者停止了
    */
-  _watchAudio(status) {
+  _initPlay(toPlay) {
 
-    //自动播放，只处理一次
-    //手动调用的时候会调用play的时候会调用canplay
-    //导致重复播放，所以在第一次的去掉这个事件
-    this._canplayCallBack = () => {
-      if (status) {
-        this._startPlay()
-      }
-      this.audio.removeEventListener('loadedmetadata', this._canplayCallBack, false)
-    }
-
-    this._endCallBack = () => {
+    this._endBack = () => {
+      this._clearTimer()
       this._$$callbackProcess(true)
     }
-    this._errorCallBack = () => {
+
+    this._errorBack = () => {
+      this._clearTimer()
       this._$$callbackProcess(false)
     }
 
-    /*微信不支持canplay事件*/
-    if (window.WeixinJSBridge) {
-      this._startPlay()
-    } else {
-      this.audio.addEventListener('loadedmetadata', this._canplayCallBack, false)
+
+    this._startBack = () => {
+      if (toPlay) {
+        this.status = 'ready';
+        /*延时150毫秒执行*/
+        this.timer = setTimeout(() => {
+          this._clearTimer();
+          /*必须保证状态正确，因为有翻页太快，状态被修改*/
+          if (this.status === 'ready') {
+            this._startPlay()
+          }
+        }, 150)
+      }
     }
-    this.audio.addEventListener('ended', this._endCallBack, false)
-    this.audio.addEventListener('error', this._errorCallBack, false)
+
+    /**
+     * loadedmetadata 准好就播
+     * canplay 循环一小段
+     */
+    this.audio.addEventListener('loadedmetadata', this._startBack, false)
+    this.audio.addEventListener('ended', this._endBack, false)
+    this.audio.addEventListener('error', this._errorBack, false)
   }
 
   /**
@@ -93,8 +115,7 @@ export class NativeAudio extends AudioSuper {
      * 2016.8.26
      * @type {Boolean}
      */
-    this.audio.autoplay = true
-    this.status = 'playing';
+    this.audio.autoplay = 'autoplay'
     this.play()
   }
 
@@ -123,12 +144,36 @@ export class NativeAudio extends AudioSuper {
   _destroy() {
     if (this.audio) {
       this.audio.pause();
-      //快速切换，防止在播放中就移除，导致没有销毁
-      this.audio.removeEventListener('loadedmetadata', this._canplayCallBack, false)
-      this.audio.removeEventListener('ended', this._endCallBack, false)
-      this.audio.removeEventListener('error', this._errorCallBack, false)
+      this.audio.removeEventListener('loadedmetadata', this._startBack, false)
+      this.audio.removeEventListener('ended', this._endBack, false)
+      this.audio.removeEventListener('error', this._errorBack, false)
       this.audio = null;
     }
+  }
+
+  ///////////////////////////
+  ///   对外接口，修复上下文
+  //////////////////////////
+
+  /**
+   * 重设音频上下文
+   * 因为自动音频播放的关系
+   * 在点击后修复这个音频
+   * @return {[type]} [description]
+   *
+   * 这个接口特别注意
+   * 音频绑定click可能与这个同时触发
+   * 会导致loadedmetadata事件失效
+   * this.status === ready
+   */
+  resetContext() {
+
+    /*如果不需要修复或者播放结束了*/
+    if (!this._needFix || this.status === 'ended') {
+      return
+    }
+    this._destroy()
+    this._createContext(this.status === 'playing' ? true : false)
   }
 
 

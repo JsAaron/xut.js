@@ -36,7 +36,7 @@ export function loadFigure(data, callback) {
 
   if (!data) {
     console.log('loadFigure data有错误')
-    callback()
+    callback && callback()
     return
   }
 
