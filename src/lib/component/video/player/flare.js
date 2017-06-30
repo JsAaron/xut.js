@@ -2,7 +2,10 @@
  增强判断
  ios上支持行内播放，不能用默认的H5控制条，拖动失效，必须要加进度条
  ios低于10的情况下，用原生播放,而且不能是平板，只能是手机，touch
- */
+
+201.7.6.30
+ *微信版本的安卓上面，需要增加这２个属性，要不会弹出广告
+**/
 import { getFilePath, getContainer, createVideoWrap } from './util'
 import { config } from '../../../config/index'
 
@@ -17,6 +20,16 @@ export default class flarePlayer {
 
     let url = getFilePath(options.url)
     let { width, height, top, left, zIndex } = options
+
+    /*微信版本的安卓上面，需要增加这２个属性,并修改页面全屏，要不会弹出广告*/
+    let needFix = false
+    if (Xut.plat.isAndroid && Xut.plat.isWeiXin) {
+      needFix = true
+      width = config.screenSize.width
+      height = config.screenSize.height
+      top = 0
+      left = 0
+    }
 
     this.container = getContainer(options)
 
@@ -37,6 +50,12 @@ export default class flarePlayer {
 
     /*窗口化*/
     fv.video.setAttribute('playsinline', 'playsinline')
+
+    /*微信版本的安卓上面，需要增加这２个属性，要不会弹出广告*/
+    if (needFix) {
+      fv.video.setAttribute("x5-video-player-type", "h5")
+      fv.video.setAttribute("x5-video-player-fullscreen", true)
+    }
 
     /*播放完毕，关闭视频窗口*/
     fv.bind('ended', function () {
