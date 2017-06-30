@@ -645,8 +645,12 @@
   };
 
   FlareVideo.fn.fullScreen = function (state) {
-    if (typeof state == "undefined") state = true;
+    if (typeof state == "undefined") {
+      state = true
+    };
+
     this.inFullScreen = state;
+
     switch (this.options.useNativeFullScreen) {
       case 'webkit':
         this.video[state ? "enterFullScreen" : "exitFullScreen"]();

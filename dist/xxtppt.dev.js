@@ -21117,8 +21117,12 @@ Xut.IBooks = {
   };
 
   FlareVideo.fn.fullScreen = function (state) {
-    if (typeof state == "undefined") state = true;
+    if (typeof state == "undefined") {
+      state = true
+    };
+
     this.inFullScreen = state;
+
     switch (this.options.useNativeFullScreen) {
       case 'webkit':
         this.video[state ? "enterFullScreen" : "exitFullScreen"]();
@@ -43256,7 +43260,7 @@ function loadFigure(data, callback) {
 
   if (!data) {
     console.log('loadFigure data有错误');
-    callback();
+    callback && callback();
     return;
   }
 
@@ -47208,7 +47212,10 @@ function getContainer(options) {
  增强判断
  ios上支持行内播放，不能用默认的H5控制条，拖动失效，必须要加进度条
  ios低于10的情况下，用原生播放,而且不能是平板，只能是手机，touch
- */
+
+201.7.6.30
+ *微信版本的安卓上面，需要增加这２个属性，要不会弹出广告
+**/
 /**
  * html5 and flash player
  * @param  {[type]} options [description]
@@ -47227,6 +47234,16 @@ var flarePlayer = function () {
         left = options.left,
         zIndex = options.zIndex;
 
+    /*微信版本的安卓上面，需要增加这２个属性,并修改页面全屏，要不会弹出广告*/
+
+    var needFix = false;
+    if (Xut.plat.isAndroid && Xut.plat.isWeiXin) {
+      needFix = true;
+      width = config.screenSize.width;
+      height = config.screenSize.height;
+      top = 0;
+      left = 0;
+    }
 
     this.container = getContainer(options);
 
@@ -47247,6 +47264,12 @@ var flarePlayer = function () {
 
     /*窗口化*/
     fv.video.setAttribute('playsinline', 'playsinline');
+
+    /*微信版本的安卓上面，需要增加这２个属性，要不会弹出广告*/
+    if (needFix) {
+      fv.video.setAttribute("x5-video-player-type", "h5");
+      fv.video.setAttribute("x5-video-player-fullscreen", true);
+    }
 
     /*播放完毕，关闭视频窗口*/
     fv.bind('ended', function () {
@@ -47630,26 +47653,31 @@ function Action(options) {
     element = document.querySelector('#Audio_' + options.audioId);
   };
 
+  var startImage = options.startImage && getFileFullPath(options.startImage, 'audio-action');
+  var stopImage = options.stopImage && getFileFullPath(options.stopImage, 'audio-action');
+
   //切换背景
   var toggleImage = function toggleImage(fileName) {
     getAudioNode(); //每次都重新获取新的节点
     if (element) {
-      element.style.backgroundImage = 'url(' + getFileFullPath(fileName, 'audio-action') + ')';
+      element.style.backgroundImage = 'url(' + fileName + ')';
     }
   };
 
   getAudioNode();
   pageType = element.getAttribute('data-belong');
 
+  stopImage && loadFigure(stopImage);
+
   return {
     play: function play() {
-      options.stopImage && toggleImage(options.stopImage);
+      stopImage && toggleImage(stopImage);
       if (options.startScript) {
         Xut.Assist.Run(pageType, options.startScript.split(','));
       }
     },
     pause: function pause() {
-      options.startImage && toggleImage(options.startImage);
+      startImage && toggleImage(startImage);
       if (options.stopScript) {
         Xut.Assist.Stop(pageType, options.stopScript.split(','));
       }
@@ -48033,16 +48061,17 @@ var AudioSuper = function () {
         this._play();
       }
 
+      this.status = 'playing';
+
       //flash模式不执行
-      if (this.audio && !this.isFlash) {
-        this.status = 'playing';
+      if (this.audio) {
         //支持自动播放,微信上单独处理
         if (window.WeixinJSBridge) {
           window.WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
             _this2.audio.play();
           });
         } else {
-          this.audio.play && this.audio.play();
+          this.audio.play();
         }
       }
       this.acitonObj && this.acitonObj.play();
@@ -48310,17 +48339,10 @@ var audioes = [];
 
 ///////////////////////////////////////////////////////////////////
 /// 2017.6.28
-/// 安卓5以后 chrome浏览器单独的问题处理 需要绑定click事件
-/// 因为可能存在修复音频的click事件
-/// 如果需要修复音频但是click的事件没有被触发，这里需要跳过preventDefault
-/// 因为touchstart的动作优先于click
+/// 安卓5以后 chrome浏览器单独的问题处理 需要绑定touchend事件
+/// 如果用click那么需要处理swiper的hook 这里需要跳过preventDefault
 ///////////////////////////////////////////////////////////////////
 
-/*自动音频的click事件，是否被响应了*/
-var hasClick = false;
-
-/*是否需要修复*/
-var hasFix = false;
 
 /**
  * 修复audio
@@ -48330,44 +48352,20 @@ var hasFix = false;
  * @return {[type]}        [description]
  */
 function fixAudio(obj, key, access) {
-  hasFix = true;
-  var click = function click() {
-    hasClick = true;
-    var audio = void 0,
-        i = void 0;
-    for (i = 0; i < loop; i++) {
-      audio = new Audio();
-      audio.play();
-      audioes.push(audio);
-    }
-    /*如果*/
-    var playBox = getPlayBox();
-    var t, p, a;
-    for (t in playBox) {
-      for (p in playBox[t]) {
-        for (a in playBox[t][p]) {
-          if (playBox[t][p][a].needFix) {
-            playBox[t][p][a].resetContext();
-          }
-        }
+  $on(document, {
+    end: function end() {
+      var audio = void 0,
+          i = void 0;
+      for (i = 0; i < loop; i++) {
+        audio = new Audio();
+        audio.play(); /*必须调用，自动播放的时候没有声音*/
+        audioes.push(audio);
       }
+      /*修复音频上下文对象*/
+      resetAudioContext();
+      $off(document);
     }
-
-    $off(document);
-  };
-  $on(document, { click: click });
-}
-
-/**
- * 是否触发了音频修复
- * @return {[type]} [description]
- */
-function hasFixClick() {
-  /*如果不需要修复，直接退出，模拟点击状态*/
-  if (!hasFix) {
-    return true;
-  }
-  return hasClick;
+  });
 }
 
 /**
@@ -48375,8 +48373,6 @@ function hasFixClick() {
  * @return {[type]} [description]
  */
 function clearFixAudio() {
-  hasClick = false;
-  hasFix = false;
   for (var i = 0; i < audioes.length; i++) {
     audioes[i].destroy && audioes[i].destroy();
     audioes[i] = null;
@@ -48384,10 +48380,18 @@ function clearFixAudio() {
   audioes = null;
 }
 
+/**
+ * 是否存在修复的音频对象
+ * @return {Boolean} [description]
+ */
 function hasAudioes() {
   return audioes.length;
 }
 
+/**
+ * 获取音频对象
+ * @return {[type]} [description]
+ */
 function getAudio$1() {
   var audio = audioes[index++];
   if (!audio) {
@@ -48399,11 +48403,12 @@ function getAudio$1() {
 
 /**
  * 使用html5的audio播放
- * 1-支持audio的autoplay，大部分安卓机子的自带浏览器和微信，大部分的IOS微信（无需特殊解决）
- * 2-不支持audio的autoplay，部分的IOS微信
- * 3-不支持audio的autoplay，部分的安卓机子的自带浏览器（比如小米，开始模仿safari）和全部的ios safari（这种只能做用户触屏时就触发播放了）
  *
- * ios10.3  不支持canplay事件
+ * 1.移动端自动播放，需要调用2次play，但是通过getAudio的方法获取的上下文，每个context被自动play一次
+ * 2.如果需要修复自动播放的情况下
+ *   A. 音频的执行比hasAudioes的处理快，那么需要resetContext正在播放的音频上下文
+ *   B. 如果hasAudioes有了后，在执行音频，正常播放
+ * 3.不需要修复自动播放的情况，只有正常的1次play了
  */
 var NativeAudio = function (_AudioSuper) {
   inherits(NativeAudio, _AudioSuper);
@@ -48414,12 +48419,35 @@ var NativeAudio = function (_AudioSuper) {
   }
 
   /**
-   * 初始化
-   * @return {[type]} [description]
+   * 创建音频上下文对象
    */
 
 
   createClass(NativeAudio, [{
+    key: '_createContext',
+    value: function _createContext(state) {
+      var _this2 = this;
+
+      this.audio = getAudio$1();
+      // 必须调用，点击播放的时候没有声音，修复
+      if (Xut.plat.isIOS) {
+        this.audio.play();
+      }
+      /**由于修复的问题，先调用了play，改src, 会提示中断报错，所以这延时修改src*/
+      setTimeout(function () {
+        if (_this2.audio) {
+          _this2.audio.src = _this2.$$url;
+          _this2._initPlay(state != undefined ? state : true);
+        }
+      }, 150);
+    }
+
+    /**
+     * 初始化
+     * @return {[type]} [description]
+     */
+
+  }, {
     key: '_init',
     value: function _init() {
       var self = this;
@@ -48427,68 +48455,71 @@ var NativeAudio = function (_AudioSuper) {
       var hasAudio = hasAudioes();
 
       if (hasAudio) {
-        this.audio = getAudio$1();
-        this.audio.src = this.$$url;
+        this._createContext();
       } else {
         this.audio = new Audio(this.$$url);
-        this.needFix = true;
+        this._needFix = true;
+        this._initPlay(true);
       }
-      this._watchAudio(true);
     }
 
     /**
-     * 重设音频上下文
-     * 因为自动音频播放的关系
-     * 在点击后修复这个音频
+     * 清理定时器
      * @return {[type]} [description]
      */
 
   }, {
-    key: 'resetContext',
-    value: function resetContext() {
-      this._destroy();
-      this.audio = getAudio$1();
-      this.audio.src = this.$$url;
-      this._watchAudio(this.status === 'playing' ? true : false);
+    key: '_clearTimer',
+    value: function _clearTimer() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
     }
 
     /**
      * 监听音频播放
-     * status
+     * toPlay
      *   如果为true就是时间完毕后，允许播放
      *   否则就是在resetContext调用处理，音频已经跳过了playing，可能关闭或者停止了
      */
 
   }, {
-    key: '_watchAudio',
-    value: function _watchAudio(status) {
-      var _this2 = this;
+    key: '_initPlay',
+    value: function _initPlay(toPlay) {
+      var _this3 = this;
 
-      //自动播放，只处理一次
-      //手动调用的时候会调用play的时候会调用canplay
-      //导致重复播放，所以在第一次的去掉这个事件
-      this._canplayCallBack = function () {
-        if (status) {
-          _this2._startPlay();
+      this._endBack = function () {
+        _this3._clearTimer();
+        _this3._$$callbackProcess(true);
+      };
+
+      this._errorBack = function () {
+        _this3._clearTimer();
+        _this3._$$callbackProcess(false);
+      };
+
+      this._startBack = function () {
+        if (toPlay) {
+          _this3.status = 'ready';
+          /*延时150毫秒执行*/
+          _this3.timer = setTimeout(function () {
+            _this3._clearTimer();
+            /*必须保证状态正确，因为有翻页太快，状态被修改*/
+            if (_this3.status === 'ready') {
+              _this3._startPlay();
+            }
+          }, 150);
         }
-        _this2.audio.removeEventListener('loadedmetadata', _this2._canplayCallBack, false);
       };
 
-      this._endCallBack = function () {
-        _this2._$$callbackProcess(true);
-      };
-      this._errorCallBack = function () {
-        _this2._$$callbackProcess(false);
-      };
-
-      /*微信不支持canplay事件*/
-      if (window.WeixinJSBridge) {
-        this._startPlay();
-      } else {
-        this.audio.addEventListener('loadedmetadata', this._canplayCallBack, false);
-      }
-      this.audio.addEventListener('ended', this._endCallBack, false);
-      this.audio.addEventListener('error', this._errorCallBack, false);
+      /**
+       * loadedmetadata 准好就播
+       * canplay 循环一小段
+       */
+      this.audio.addEventListener('loadedmetadata', this._startBack, false);
+      this.audio.addEventListener('ended', this._endBack, false);
+      this.audio.addEventListener('error', this._errorBack, false);
     }
 
     /**
@@ -48504,8 +48535,7 @@ var NativeAudio = function (_AudioSuper) {
        * 2016.8.26
        * @type {Boolean}
        */
-      this.audio.autoplay = true;
-      this.status = 'playing';
+      this.audio.autoplay = 'autoplay';
       this.play();
     }
 
@@ -48543,12 +48573,39 @@ var NativeAudio = function (_AudioSuper) {
     value: function _destroy() {
       if (this.audio) {
         this.audio.pause();
-        //快速切换，防止在播放中就移除，导致没有销毁
-        this.audio.removeEventListener('loadedmetadata', this._canplayCallBack, false);
-        this.audio.removeEventListener('ended', this._endCallBack, false);
-        this.audio.removeEventListener('error', this._errorCallBack, false);
+        this.audio.removeEventListener('loadedmetadata', this._startBack, false);
+        this.audio.removeEventListener('ended', this._endBack, false);
+        this.audio.removeEventListener('error', this._errorBack, false);
         this.audio = null;
       }
+    }
+
+    ///////////////////////////
+    ///   对外接口，修复上下文
+    //////////////////////////
+
+    /**
+     * 重设音频上下文
+     * 因为自动音频播放的关系
+     * 在点击后修复这个音频
+     * @return {[type]} [description]
+     *
+     * 这个接口特别注意
+     * 音频绑定click可能与这个同时触发
+     * 会导致loadedmetadata事件失效
+     * this.status === ready
+     */
+
+  }, {
+    key: 'resetContext',
+    value: function resetContext() {
+
+      /*如果不需要修复或者播放结束了*/
+      if (!this._needFix || this.status === 'ended') {
+        return;
+      }
+      this._destroy();
+      this._createContext(this.status === 'playing' ? true : false);
     }
   }]);
   return NativeAudio;
@@ -49005,7 +49062,6 @@ function destroyContentAudio(pageId, queryId) {
 
   /*如果只有pageId没有queryId就是全部清理*/
   if (pageId && queryId === undefined) {
-    console.log(123);
     return;
   }
 
@@ -49018,6 +49074,28 @@ function destroyContentAudio(pageId, queryId) {
       delete playBox[CONTENT][pageId];
     }
   });
+}
+
+/**
+ * 重置音频对象
+ * 如果在不支持自动音频的情况下
+ * 如果修复代码没有执行的时候，就运行自动音频
+ * 那么音频是没有声音的
+ * 所以等修复音频代码执行完毕后，手动调用
+ * 然后让音频能支持自动播放
+ * @return {[type]} [description]
+ */
+function resetAudioContext() {
+  var playBox = getPlayBox();
+  var t, p, a;
+  for (t in playBox) {
+    for (p in playBox[t]) {
+      for (a in playBox[t][p]) {
+        /*needFix：如果是需要修复的代码*/
+        playBox[t][p][a].resetContext();
+      }
+    }
+  }
 }
 
 ////////////////////////
@@ -49694,6 +49772,21 @@ function clearRootNode() {
   $rootNode = null;
 }
 
+////////////////////////////////////////////
+///
+/// 修复采用img的图片错误问题
+///   修复错误的图片加载
+///   图片错误了，会先隐藏，然后再去请求一次
+///   如果还是错误，就抛弃，正确就显示出来
+///   queue:{
+///     chpaerId:[1.png,2.png,3.png]
+///     ................
+///   }
+///   特别注意，这里是动态加入的
+///   所以，有可能是边解析边加入新的
+///
+///////////////////////////////////////////
+
 var queue = {};
 var waiting = false;
 
@@ -49755,14 +49848,6 @@ function runBatcherQueue() {
 
 /**
  * 修复错误的图片加载
- * 图片错误了，会先隐藏，然后再去请求一次
- * 如果还是错误，就抛弃，正确就显示出来
- * queue:{
- *   chpaerId:[1.png,2.png,3.png]
- *   ................
- * }
- * 特别注意，这里是动态加入的
- * 所以，有可能是边解析边加入新的
  * @return {[type]} [description]
  */
 function repairImage(node, chapterIndex, src) {
@@ -68505,15 +68590,7 @@ function swiperHook(e, node) {
     nodeName !== 'video' && //pc视频控制条不灵敏问题
     !hasTyperlink) {
       //超链接不阻止
-
-      ///////////////////////////////////////////////////////////////////
-      /// 因为可能存在修复音频的click事件
-      /// 如果需要修复音频但是click的事件没有被触发，这里需要跳过preventDefault
-      /// 因为touchstart的动作优先于click
-      ///////////////////////////////////////////////////////////////////
-      if (hasFixClick()) {
-        e.preventDefault && e.preventDefault();
-      }
+      e.preventDefault && e.preventDefault();
     }
   }
 }
@@ -79148,7 +79225,7 @@ initAudio$1();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 886.6;
+Xut.Version = 887;
 
 /*加载应用app*/
 var initApp = function initApp() {
