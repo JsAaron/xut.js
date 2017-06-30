@@ -21,16 +21,6 @@ export default class flarePlayer {
     let url = getFilePath(options.url)
     let { width, height, top, left, zIndex } = options
 
-    /*微信版本的安卓上面，需要增加这２个属性,并修改页面全屏，要不会弹出广告*/
-    let needFix = false
-    if (Xut.plat.isAndroid && Xut.plat.isWeiXin) {
-      needFix = true
-      width = config.screenSize.width
-      height = config.screenSize.height
-      top = 0
-      left = 0
-    }
-
     this.container = getContainer(options)
 
     let $videoWrap = createVideoWrap('video-flare', {
@@ -52,7 +42,7 @@ export default class flarePlayer {
     fv.video.setAttribute('playsinline', 'playsinline')
 
     /*微信版本的安卓上面，需要增加这２个属性，要不会弹出广告*/
-    if (needFix) {
+    if (Xut.plat.isAndroid && Xut.plat.isWeiXin) {
       fv.video.setAttribute("x5-video-player-type", "h5")
       fv.video.setAttribute("x5-video-player-fullscreen", true)
     }
