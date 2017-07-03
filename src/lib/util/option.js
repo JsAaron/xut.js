@@ -182,6 +182,7 @@ export function getFileFullPath(fileName, debugType) {
     3 并且没有被修改过
   */
   if (launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
+
     let suffix = ''
     let name
     if (Xut.plat.isBrowser) { //手机浏览器访问
@@ -192,6 +193,7 @@ export function getFileFullPath(fileName, debugType) {
       } else {
         name = fileMatch[0]
       }
+
       //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
       return `${config.data.pathAddress + name}${launch.brModelType}${suffix}`
     } else {

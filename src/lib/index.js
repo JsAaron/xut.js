@@ -5,6 +5,7 @@ import { initAudio } from './component/audio/api'
 import { initVideo } from './component/video/api'
 import { initRootNode } from './initialize/root-node'
 import { initGlobalEvent } from './initialize/golbal-event'
+import { initAsyn } from './initialize/asyn'
 import { initGlobalAPI } from './global-api/index'
 import { priorityConfig } from './config/priority-config'
 
@@ -18,13 +19,17 @@ Xut.Version = 887.1
 
 /*加载应用app*/
 const initApp = (...arg) => {
-  /*配置优先级*/
-  priorityConfig();
-  /*全局的一些事件处理*/
-  initGlobalEvent();
-  /*根节点*/
-  const { $rootNode, $contentNode } = initRootNode(...arg)
-  nextTick({ container: $rootNode, content: $contentNode }, main)
+  /*针对异步的代码以前检测出来*/
+  initAsyn(function () {
+    /*配置优先级*/
+    priorityConfig();
+    /*全局的一些事件处理*/
+    initGlobalEvent();
+    /*根节点*/
+    const { $rootNode, $contentNode } = initRootNode(...arg)
+    nextTick({ container: $rootNode, content: $contentNode }, main)
+  })
+
 }
 
 /*提供全局配置文件*/

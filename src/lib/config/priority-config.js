@@ -133,10 +133,17 @@ export function priorityConfig() {
     if (!launch.brModel && golbal.brModel) {
       launch.brModel = golbal.brModel
     }
-    /*预先判断出基础类型*/
-    if (launch.brModel) {
-      launch.brModelType = getBrType(launch.brModel)
+
+    if (Xut.plat.supportWebp) {
+      /*预先判断出基础类型*/
+      if (launch.brModel) {
+        launch.brModelType = getBrType(launch.brModel)
+      }
+    } else {
+      /*如果不支持的话，强制改状态*/
+      launch.brModel = 0
     }
+
   }
 
   //////////////////////////////////
@@ -156,7 +163,3 @@ export function priorityConfig() {
   }
 
 }
-
-
-
-
