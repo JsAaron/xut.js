@@ -21,8 +21,10 @@ export class NativeAudio extends AudioSuper {
    */
   _createContext(state) {
     this.audio = getAudio();
-    // 必须调用，点击播放的时候没有声音，修复
-    if (Xut.plat.isIOS) {
+    /*IOS上手动点击播放的修复
+    1 必须调用，点击播放的时候没有声音
+    2 必须手动播放，自动播放跳过，否则有杂音*/
+    if (Xut.plat.isIOS && this.options.isTrigger) {
       this.audio.play()
     }
     /**由于修复的问题，先调用了play，改src, 会提示中断报错，所以这延时修改src*/

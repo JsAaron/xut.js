@@ -31,6 +31,9 @@ var jsName = [
   'lib/external/postmessage.js',
   'lib/external/ibooks.epub.js',
 
+  /*这个是调试的插件，正发布版要去掉*/
+  'lib/plugin/library/debug.js',
+
   'lib/plugin/library/jquery.js',
   'lib/plugin/library/jquery.transit.js', //2016.11.2 新增
   'lib/plugin/library/underscore.js',

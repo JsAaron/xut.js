@@ -83,8 +83,9 @@
     this._load();
 
     /*绑定监控工具条的显示隐藏控制*/
+    this.initHideIdie = false
     if (this.options.controls) {
-      this.idleTimer();
+      this.createIdleTimer();
     }
   };
 
@@ -104,24 +105,22 @@
    * @param  {[type]} options [description]
    * @return {[type]}         [description]
    */
-  FlareVideo.fn.idleTimer = function () {
+  FlareVideo.fn.createIdleTimer = function () {
 
-    var element = this.element
     var self = this
-
     var idle = false;
 
     /*检测的定时器*/
     var checkTimer = null
 
-    var triggerIdle = function (e, time) {
+    self.triggerIdle = function (e, time) {
 
       var time = time || 2000
 
       /*如果点击是控制条区域，那么控制条不关闭，重新计算时间*/
       if (e && e.target && e.target.className !== 'video') {
         self.clearTimeout()
-        self.checkTimer = setTimeout(triggerIdle, time);
+        self.checkTimer = setTimeout(self.triggerIdle, time);
         return
       }
 
@@ -133,15 +132,30 @@
       } else {
         idle = true;
         self.idle("idle", false);
-        self.checkTimer = setTimeout(triggerIdle, time);
+        self.checkTimer = setTimeout(self.triggerIdle, time);
       }
     }
 
-    element.on(clickName, triggerIdle);
+    this.element.on(clickName, self.triggerIdle);
+
+    /*如果触发了控制条*/
     this.controls.on('touchmove mousemove', function (e) {
-      triggerIdle(e, 3000)
+      self.triggerIdle(e, 3000)
     })
   };
+
+  /**
+   * 隐藏控制条
+   * 开始播放第一次调用2S后隐藏控制条
+   * @return {[type]} [description]
+   */
+  FlareVideo.fn.hideIdleTimer = function () {
+    /*只处理第一次的隐藏*/
+    if (!this.initHideIdie) {
+      this.initHideIdie = true
+      this.triggerIdle()
+    }
+  }
 
 
   /**
@@ -352,6 +366,7 @@
 
     /*提示该视频已准备好开始播放*/
     this.oncanplay($.proxy(function () {
+      this.hideIdleTimer()
       this.canPlay = true;
       this.controls.removeClass("disabled");
       this.element.css('visibility', 'visible')
@@ -633,6 +648,7 @@
   };
 
   FlareVideo.fn.remove = function () {
+    this.triggerIdle = null
     this.clearTimeout()
     if (this.controls) {
       this.controls.remove()

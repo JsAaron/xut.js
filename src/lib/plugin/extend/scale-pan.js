@@ -12,13 +12,13 @@ export class ScalePan {
   constructor({
     rootNode,
     hasButton = true,
-    update,
+    updateHook,
     tapClose = false, //支持单击关闭
     tapCallabck //关闭回调
   }) {
 
     this.hasButton = hasButton
-    this.update = update
+    this.updateHook = updateHook
     this.tapClose = tapClose
     this.tapCallabck = tapCallabck
 
@@ -278,13 +278,24 @@ export class ScalePan {
     if (!this.ticking) {
       Xut.nextTick(() => {
         const data = this.data
-        const styleText = `translate3d(${data.translate.x}px,${data.translate.y}px,0px) scale(${data.scale},${data.scale})`
-        Xut.style.setTranslate({
+        let transform = {
+          translate: {
+            x: data.translate.x,
+            y: data.translate.y
+          },
+          scale: {
+            x: data.scale,
+            y: data.scale
+          }
+        }
+
+        Xut.style.setTransform({
           speed,
-          styleText,
+          translate: transform.translate,
+          scale: transform.scale,
           node: this.rootNode
         })
-        this.update && this.update(styleText, speed)
+        this.updateHook && this.updateHook(transform, speed)
         this.ticking = false
       })
       this.ticking = true

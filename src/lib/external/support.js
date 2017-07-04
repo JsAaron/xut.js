@@ -238,6 +238,33 @@
   var transitionDuration = prefixStyle('transition-duration')
   var transform = prefixStyle('transform')
 
+  /**
+   * 获取真的node
+   * 1 jquery转化成node
+   * 2 普通node
+   * 3 jquery是svg但是没有lenght有context
+   * @param  {[type]} node [description]
+   * @return {[type]}      [description]
+   */
+  function getNode(node) {
+    if (!node) {
+      console.log('setTranslate没有提供node')
+      return false
+    }
+
+    /*如果是jquery对象*/
+    if (node instanceof $) {
+      /*svg对象length=0所以还需要取context*/
+      node = node[0] || node['context']
+      if (!node) {
+        console.log('setTranslate node不存在,需要检测')
+        return false
+      }
+    }
+
+    return node
+  }
+
   Xut.mixin(Xut.style, {
 
     reqAnimationFrame: reqAnimationFrame,
@@ -292,32 +319,76 @@
      * @param {[type]} y    [description]
      */
     setTranslateStyle: setTranslateStyle,
+
+    /**
+     * 多种组合
+     * translate
+     * scale
+     * 等等
+        Xut.style.setTransform({
+          speed,
+          translate: {
+            x: data.translate.x
+            y: data.translate.y
+          },
+          scale: {
+            x: data.scale,
+            y: data.scale
+          },
+          node: this.rootNode
+        })
+        styleText = `translate3d(${}px,${}px,0px) scale(${data.scale},${data.scale})`
+     */
+    setTransform: function (options) {
+      var node = options.node
+      if (node = getNode(node)) {
+        var styleText = ''
+        var translate = options.translate
+        if (translate) {
+          var translateX = translate.x || 0
+          var translateY = translate.y || 0
+          styleText += setTranslateStyle(translateX, translateY)
+        }
+        var scale = options.scale
+        if (scale) {
+          var scaleX = scale.x || 1
+          var scaleY = scale.y || 1
+          styleText += 'scale(' + scaleX + ',' + scaleY + ') '
+        }
+        if (styleText) {
+          /*设置styleText*/
+          node.style[transform] = styleText;
+          /*设置时间*/
+          if (options.speed !== undefined) {
+            node.style[transitionDuration] = options.speed + 'ms'
+          }
+          // Xut.$warn(styleText, 'log')
+        }
+      }
+    },
+
+    /**
+     * 设置setTranslate
+     * 1 node是普通的对象
+     * 2 node是jquery对象
+     *   如果是svg的情况jquery有context但是lenght为0
+     * 3 设置xy
+     * 4 设置文本style
+     * 5 设置事件
+     * @param {[type]} options [description]
+     */
     setTranslate: function (options) {
       var node = options.node
       var x = options.x || 0
       var y = options.y || 0
       var speed = options.speed
-      var styleText = options.styleText
-
-      if (!node) {
-        console.log('setTranslate没有提供node')
-        return
-      }
-
-      /*如果是jquery对象*/
-      if (node.length) {
-        node = node[0]
-      }
-
-      /*设置*/
-      if (styleText) {
-
-      } else {
-        node.style[transform] = setTranslateStyle(x, y)
-      }
-
-      if (speed !== undefined) {
-        node.style[transitionDuration] = speed + 'ms'
+      if (node = getNode(node)) {
+        /*Translate*/
+        node.style[transform] = setTranslateStyle(x, y);
+        /*设置动画的时间*/
+        if (speed !== undefined) {
+          node.style[transitionDuration] = speed + 'ms'
+        }
       }
     },
 

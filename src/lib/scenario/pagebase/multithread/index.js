@@ -5,24 +5,30 @@ import { ScalePan } from '../../../plugin/extend/scale-pan'
 
 const noop = function () {}
 
-/*页面缩放*/
-const createPageScale = (rootNode, pageIndex) => {
-  let relatedMasterObj = Xut.Presentation.GetPageBase('master', pageIndex)
-  let pageMasterNode
-  if (relatedMasterObj) {
-    pageMasterNode = relatedMasterObj.getContainsNode()[0]
-  }
+/**
+ * 页面缩放
+ * @param  {[type]} rootNode  [description]
+ * @param  {[type]} pageIndex [description]
+ * @return {[type]}           [description]
+ */
+const initPageScale = (rootNode, pageIndex) => {
   return new ScalePan({
     rootNode,
-    hasButton: false,
+    hasButton: true,
     tapClose: true,
-    update(styleText, speed) {
-      if (pageMasterNode && styleText) {
-        Xut.style.setTranslate({
-          speed,
-          styleText,
-          node: pageMasterNode
-        })
+    updateHook(transform, speed) {
+      if (transform) {
+        /*如果有母版，缩放母版*/
+        let relatedMasterObj = Xut.Presentation.GetPageBase('master', pageIndex)
+        if (relatedMasterObj) {
+          let pageMasterNode = relatedMasterObj.getContainsNode()[0]
+          Xut.style.setTranslate({
+            speed,
+            translate: transform.translate,
+            scale: transform.scale,
+            node: pageMasterNode
+          })
+        }
       }
     }
   })
@@ -172,7 +178,7 @@ export default function initThreadtasks(instance) {
       const createScale = () => {
         const salePageType = config.launch.salePageType
         if (isPageType && (salePageType === 'page' || salePageType === 'all')) {
-          instance._pageScaleObj = createPageScale(instance.getScaleNode(), instance.pageIndex)
+          instance._pageScaleObj = initPageScale(instance.getScaleNode(), instance.pageIndex)
         }
       }
 

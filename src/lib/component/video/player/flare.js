@@ -41,8 +41,12 @@ export default class flarePlayer {
     /*窗口化*/
     fv.video.setAttribute('playsinline', 'playsinline')
 
-    /*微信版本的安卓上面，需要增加这２个属性，要不会弹出广告*/
-    if (Xut.plat.isAndroid && Xut.plat.isWeiXin) {
+    /**
+     * 微信版本的安卓上面，需要增加这２个属性，要不会弹出广告
+     * 如果是column页面触发的广告
+     * 需要排除，会出现视频错乱的问题
+     */
+    if (Xut.plat.isAndroid && Xut.plat.isWeiXin && !options.isColumn) {
       fv.video.setAttribute("x5-video-player-type", "h5")
       fv.video.setAttribute("x5-video-player-fullscreen", true)
     }

@@ -320,8 +320,11 @@ const loadAudio = ({
 
   const audioData = assemblyData(pageId, queryId, type, data, columnData);
 
+
   /*手动触发的热点,这种比较特别，手动点击可以切换状态*/
   if (type === 'hot' && action == 'trigger') {
+    /*判断是否为点击动作*/
+    audioData.isTrigger = true
     tiggerAudio(pageId, queryId, type, audioData);
   } else {
     createAudio(pageId, queryId, type, audioData)

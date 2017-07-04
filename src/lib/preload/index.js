@@ -18,7 +18,6 @@ import { $warn, loadFigure, loadFile, $setStorage, $getStorage } from '../util/i
 import { addLoop, clearLoop } from './loop'
 import { Detect } from './detect'
 
-
 /**
  * 是否启动预加载
  * true 启动
@@ -280,15 +279,19 @@ function nextTask(chapterId, callback) {
 
   /*只有没有预加载的数据才能被找到*/
   const pageData = preloadData[chapterId]
-  if (pageData) {
-    loadResource(pageData, function () {
-      $warn('----预加资源完成chapterId: ' + chapterId)
-      deleteResource(chapterId)
-      repeatCheck(loadingId, callback)
-    }, callback)
-  } else {
-    $warn('----预加资源已处理，chapterId: ' + chapterId)
+
+  const complete = function (info) {
+    $warn(`${info}:${chapterId}`)
+    deleteResource(chapterId)
     repeatCheck(loadingId, callback)
+  }
+
+  /*必须保证pageData不是一个空对象*/
+  if (pageData && Object.keys(pageData).length) {
+    // $warn('----预加资源开始chapterId: ' + chapterId)
+    loadResource(pageData, () => complete('预加资源完成-chapterId'))
+  } else {
+    complete('预加载数据是空-chapterId')
   }
 }
 
@@ -327,11 +330,9 @@ export function initPreload(total, callback) {
 
   const start = function () {
     nextTask('', function () {
+      /*监听预加载初四华*/
+      watchPreloadInit()
       callback();
-      /*第二次延迟5秒后开始*/
-      setTimeout(function () {
-        startPreload()
-      }, 5000)
     })
   }
 
@@ -353,19 +354,36 @@ export function initPreload(total, callback) {
 
 
 /**
- * 继续开始加载
- * 初始化只加载了一页
- * 在页面init进入后，在开始这个调用
- * 继续解析剩下的页面
+ * 监听预加载初始化调用
+ * 1 原则上是监听一次autoRunComplete事件
+ * 2 可能autoRunComplete会丢失，所以需要定时器处理
+ * @return {[type]} [description]
  */
-export function startPreload() {
-  /*从第2页开始预加载*/
-  if (preloadData) {
-    enable = true
-    setTimeout(function () {
-      nextTask()
-    }, 0)
+function watchPreloadInit() {
+
+  if (!preloadData) {
+    return
   }
+
+  let timer = null
+  let count = 2
+
+  /*从第二次开始加载数据*/
+  const start = function (type) {
+    if (count === 2) {
+      clearTimeout(timer)
+      timer = null
+      enable = true
+      nextTask()
+    }
+    --count
+  }
+
+  /*监听初始化第一次完成*/
+  Xut.Application.onceWatch('autoRunComplete', start);
+
+  /*防止autoRunComplete事件丢失处理,或者autoRunComplete执行很长*/
+  timer = setTimeout(start, 5000)
 }
 
 

@@ -820,6 +820,33 @@ String.styleFormat = function(format) {
   var transitionDuration = prefixStyle('transition-duration')
   var transform = prefixStyle('transform')
 
+  /**
+   * 获取真的node
+   * 1 jquery转化成node
+   * 2 普通node
+   * 3 jquery是svg但是没有lenght有context
+   * @param  {[type]} node [description]
+   * @return {[type]}      [description]
+   */
+  function getNode(node) {
+    if (!node) {
+      console.log('setTranslate没有提供node')
+      return false
+    }
+
+    /*如果是jquery对象*/
+    if (node instanceof $) {
+      /*svg对象length=0所以还需要取context*/
+      node = node[0] || node['context']
+      if (!node) {
+        console.log('setTranslate node不存在,需要检测')
+        return false
+      }
+    }
+
+    return node
+  }
+
   Xut.mixin(Xut.style, {
 
     reqAnimationFrame: reqAnimationFrame,
@@ -874,32 +901,76 @@ String.styleFormat = function(format) {
      * @param {[type]} y    [description]
      */
     setTranslateStyle: setTranslateStyle,
+
+    /**
+     * 多种组合
+     * translate
+     * scale
+     * 等等
+        Xut.style.setTransform({
+          speed,
+          translate: {
+            x: data.translate.x
+            y: data.translate.y
+          },
+          scale: {
+            x: data.scale,
+            y: data.scale
+          },
+          node: this.rootNode
+        })
+        styleText = `translate3d(${}px,${}px,0px) scale(${data.scale},${data.scale})`
+     */
+    setTransform: function (options) {
+      var node = options.node
+      if (node = getNode(node)) {
+        var styleText = ''
+        var translate = options.translate
+        if (translate) {
+          var translateX = translate.x || 0
+          var translateY = translate.y || 0
+          styleText += setTranslateStyle(translateX, translateY)
+        }
+        var scale = options.scale
+        if (scale) {
+          var scaleX = scale.x || 1
+          var scaleY = scale.y || 1
+          styleText += 'scale(' + scaleX + ',' + scaleY + ') '
+        }
+        if (styleText) {
+          /*设置styleText*/
+          node.style[transform] = styleText;
+          /*设置时间*/
+          if (options.speed !== undefined) {
+            node.style[transitionDuration] = options.speed + 'ms'
+          }
+          // Xut.$warn(styleText, 'log')
+        }
+      }
+    },
+
+    /**
+     * 设置setTranslate
+     * 1 node是普通的对象
+     * 2 node是jquery对象
+     *   如果是svg的情况jquery有context但是lenght为0
+     * 3 设置xy
+     * 4 设置文本style
+     * 5 设置事件
+     * @param {[type]} options [description]
+     */
     setTranslate: function (options) {
       var node = options.node
       var x = options.x || 0
       var y = options.y || 0
       var speed = options.speed
-      var styleText = options.styleText
-
-      if (!node) {
-        console.log('setTranslate没有提供node')
-        return
-      }
-
-      /*如果是jquery对象*/
-      if (node.length) {
-        node = node[0]
-      }
-
-      /*设置*/
-      if (styleText) {
-
-      } else {
-        node.style[transform] = setTranslateStyle(x, y)
-      }
-
-      if (speed !== undefined) {
-        node.style[transitionDuration] = speed + 'ms'
+      if (node = getNode(node)) {
+        /*Translate*/
+        node.style[transform] = setTranslateStyle(x, y);
+        /*设置动画的时间*/
+        if (speed !== undefined) {
+          node.style[transitionDuration] = speed + 'ms'
+        }
       }
     },
 
@@ -20555,8 +20626,9 @@ Xut.IBooks = {
     this._load();
 
     /*绑定监控工具条的显示隐藏控制*/
+    this.initHideIdie = false
     if (this.options.controls) {
-      this.idleTimer();
+      this.createIdleTimer();
     }
   };
 
@@ -20576,24 +20648,22 @@ Xut.IBooks = {
    * @param  {[type]} options [description]
    * @return {[type]}         [description]
    */
-  FlareVideo.fn.idleTimer = function () {
+  FlareVideo.fn.createIdleTimer = function () {
 
-    var element = this.element
     var self = this
-
     var idle = false;
 
     /*检测的定时器*/
     var checkTimer = null
 
-    var triggerIdle = function (e, time) {
+    self.triggerIdle = function (e, time) {
 
       var time = time || 2000
 
       /*如果点击是控制条区域，那么控制条不关闭，重新计算时间*/
       if (e && e.target && e.target.className !== 'video') {
         self.clearTimeout()
-        self.checkTimer = setTimeout(triggerIdle, time);
+        self.checkTimer = setTimeout(self.triggerIdle, time);
         return
       }
 
@@ -20605,15 +20675,30 @@ Xut.IBooks = {
       } else {
         idle = true;
         self.idle("idle", false);
-        self.checkTimer = setTimeout(triggerIdle, time);
+        self.checkTimer = setTimeout(self.triggerIdle, time);
       }
     }
 
-    element.on(clickName, triggerIdle);
+    this.element.on(clickName, self.triggerIdle);
+
+    /*如果触发了控制条*/
     this.controls.on('touchmove mousemove', function (e) {
-      triggerIdle(e, 3000)
+      self.triggerIdle(e, 3000)
     })
   };
+
+  /**
+   * 隐藏控制条
+   * 开始播放第一次调用2S后隐藏控制条
+   * @return {[type]} [description]
+   */
+  FlareVideo.fn.hideIdleTimer = function () {
+    /*只处理第一次的隐藏*/
+    if (!this.initHideIdie) {
+      this.initHideIdie = true
+      this.triggerIdle()
+    }
+  }
 
 
   /**
@@ -20824,6 +20909,7 @@ Xut.IBooks = {
 
     /*提示该视频已准备好开始播放*/
     this.oncanplay($.proxy(function () {
+      this.hideIdleTimer()
       this.canPlay = true;
       this.controls.removeClass("disabled");
       this.element.css('visibility', 'visible')
@@ -21105,6 +21191,7 @@ Xut.IBooks = {
   };
 
   FlareVideo.fn.remove = function () {
+    this.triggerIdle = null
     this.clearTimeout()
     if (this.controls) {
       this.controls.remove()
@@ -41522,7 +41609,15 @@ var $warn = function $warn() {};
   $warn('信息','info');
   $warn('错误','error');
   $warn('警告','warn');
+
+
+  debug.success("This is success message:)");
+  debug.error("This is error message:)");
+  debug.log("This is primary message:)");
+  debug.log({a: 1, b: 2});
+  debug.log([1,2,3]);
  */
+Xut.$warn = $warn;
 
 var CEIL = Math.ceil;
 
@@ -43702,6 +43797,7 @@ function getFileFullPath(fileName, debugType) {
     3 并且没有被修改过
   */
   if (launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
+
     var suffix = '';
     var _name = void 0;
     if (Xut.plat.isBrowser) {
@@ -43713,6 +43809,7 @@ function getFileFullPath(fileName, debugType) {
       } else {
         _name = _fileMatch[0];
       }
+
       //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
       return '' + (config.data.pathAddress + _name) + launch.brModelType + suffix;
     } else {
@@ -46722,15 +46819,21 @@ function nextTask(chapterId, callback) {
 
   /*只有没有预加载的数据才能被找到*/
   var pageData = preloadData[chapterId];
-  if (pageData) {
-    loadResource(pageData, function () {
-      $warn('----预加资源完成chapterId: ' + chapterId);
-      deleteResource(chapterId);
-      repeatCheck(loadingId, callback);
-    }, callback);
-  } else {
-    $warn('----预加资源已处理，chapterId: ' + chapterId);
+
+  var complete = function complete(info) {
+    $warn(info + ':' + chapterId);
+    deleteResource(chapterId);
     repeatCheck(loadingId, callback);
+  };
+
+  /*必须保证pageData不是一个空对象*/
+  if (pageData && Object.keys(pageData).length) {
+    // $warn('----预加资源开始chapterId: ' + chapterId)
+    loadResource(pageData, function () {
+      return complete('预加资源完成-chapterId');
+    });
+  } else {
+    complete('预加载数据是空-chapterId');
   }
 }
 
@@ -46768,11 +46871,9 @@ function initPreload(total, callback) {
 
   var start = function start() {
     nextTask('', function () {
+      /*监听预加载初四华*/
+      watchPreloadInit();
       callback();
-      /*第二次延迟5秒后开始*/
-      setTimeout(function () {
-        startPreload();
-      }, 5000);
     });
   };
 
@@ -46793,19 +46894,36 @@ function initPreload(total, callback) {
 }
 
 /**
- * 继续开始加载
- * 初始化只加载了一页
- * 在页面init进入后，在开始这个调用
- * 继续解析剩下的页面
+ * 监听预加载初始化调用
+ * 1 原则上是监听一次autoRunComplete事件
+ * 2 可能autoRunComplete会丢失，所以需要定时器处理
+ * @return {[type]} [description]
  */
-function startPreload() {
-  /*从第2页开始预加载*/
-  if (preloadData) {
-    enable = true;
-    setTimeout(function () {
-      nextTask();
-    }, 0);
+function watchPreloadInit() {
+
+  if (!preloadData) {
+    return;
   }
+
+  var timer = null;
+  var count = 2;
+
+  /*从第二次开始加载数据*/
+  var start = function start(type) {
+    if (count === 2) {
+      clearTimeout(timer);
+      timer = null;
+      enable = true;
+      nextTask();
+    }
+    --count;
+  };
+
+  /*监听初始化第一次完成*/
+  Xut.Application.onceWatch('autoRunComplete', start);
+
+  /*防止autoRunComplete事件丢失处理,或者autoRunComplete执行很长*/
+  timer = setTimeout(start, 5000);
 }
 
 /**
@@ -47041,9 +47159,7 @@ function baseConfig(callback) {
         /*分栏*/
         configColumn(function () {
           if (config.launch.preload) {
-            /*监听初始化第一次完成*/
-            // Xut.Application.onceWatch('autoRunComplete', startPreload);
-            /*资源预加载*/
+            /*预加载*/
             initPreload(dataRet.Chapter.length, function () {
               return callback(novelData);
             });
@@ -47255,8 +47371,12 @@ var flarePlayer = function () {
     /*窗口化*/
     fv.video.setAttribute('playsinline', 'playsinline');
 
-    /*微信版本的安卓上面，需要增加这２个属性，要不会弹出广告*/
-    if (Xut.plat.isAndroid && Xut.plat.isWeiXin) {
+    /**
+     * 微信版本的安卓上面，需要增加这２个属性，要不会弹出广告
+     * 如果是column页面触发的广告
+     * 需要排除，会出现视频错乱的问题
+     */
+    if (Xut.plat.isAndroid && Xut.plat.isWeiXin && !options.isColumn) {
       fv.video.setAttribute("x5-video-player-type", "h5");
       fv.video.setAttribute("x5-video-player-fullscreen", true);
     }
@@ -48419,8 +48539,10 @@ var NativeAudio = function (_AudioSuper) {
       var _this2 = this;
 
       this.audio = getAudio$1();
-      // 必须调用，点击播放的时候没有声音，修复
-      if (Xut.plat.isIOS) {
+      /*IOS上手动点击播放的修复
+      1 必须调用，点击播放的时候没有声音
+      2 必须手动播放，自动播放跳过，否则有杂音*/
+      if (Xut.plat.isIOS && this.options.isTrigger) {
         this.audio.play();
       }
       /**由于修复的问题，先调用了play，改src, 会提示中断报错，所以这延时修改src*/
@@ -48932,6 +49054,8 @@ var loadAudio = function loadAudio(_ref) {
 
   /*手动触发的热点,这种比较特别，手动点击可以切换状态*/
   if (type === 'hot' && action == 'trigger') {
+    /*判断是否为点击动作*/
+    audioData.isTrigger = true;
     tiggerAudio(pageId, queryId, type, audioData);
   } else {
     createAudio(pageId, queryId, type, audioData);
@@ -49967,6 +50091,34 @@ function clearGlobalEvent() {
     $(window).off(); //beforeunload,orientationchange
     onceBind = false;
   }
+}
+
+/**
+ * 判断是否支持webp模式
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+function supportWebP(callback) {
+  var webP = new Image();
+  webP.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+  webP.onload = webP.onerror = function () {
+    callback(webP.height === 2);
+  };
+}
+
+/**
+ * 提前检测出异步的功能支持
+ * @return {[type]} [description]
+ */
+function initAsyn(callback) {
+
+  /**
+   * 检测是否支持webp格式
+   */
+  supportWebP(function (state) {
+    Xut.plat.supportWebp = state;
+    callback();
+  });
 }
 
 /**
@@ -60287,7 +60439,7 @@ var ScalePan = function () {
     var rootNode = _ref.rootNode,
         _ref$hasButton = _ref.hasButton,
         hasButton = _ref$hasButton === undefined ? true : _ref$hasButton,
-        update = _ref.update,
+        updateHook = _ref.updateHook,
         _ref$tapClose = _ref.tapClose,
         tapClose = _ref$tapClose === undefined ? false : _ref$tapClose,
         tapCallabck = _ref.tapCallabck;
@@ -60295,7 +60447,7 @@ var ScalePan = function () {
 
 
     this.hasButton = hasButton;
-    this.update = update;
+    this.updateHook = updateHook;
     this.tapClose = tapClose;
     this.tapCallabck = tapCallabck;
 
@@ -60583,13 +60735,24 @@ var ScalePan = function () {
       if (!this.ticking) {
         Xut.nextTick(function () {
           var data = _this3.data;
-          var styleText = 'translate3d(' + data.translate.x + 'px,' + data.translate.y + 'px,0px) scale(' + data.scale + ',' + data.scale + ')';
-          Xut.style.setTranslate({
+          var transform = {
+            translate: {
+              x: data.translate.x,
+              y: data.translate.y
+            },
+            scale: {
+              x: data.scale,
+              y: data.scale
+            }
+          };
+
+          Xut.style.setTransform({
             speed: speed,
-            styleText: styleText,
+            translate: transform.translate,
+            scale: transform.scale,
             node: _this3.rootNode
           });
-          _this3.update && _this3.update(styleText, speed);
+          _this3.updateHook && _this3.updateHook(transform, speed);
           _this3.ticking = false;
         });
         this.ticking = true;
@@ -69663,24 +69826,30 @@ function initThreadState(instance) {
   };
 }
 
-/*页面缩放*/
-var createPageScale = function createPageScale(rootNode, pageIndex) {
-  var relatedMasterObj = Xut.Presentation.GetPageBase('master', pageIndex);
-  var pageMasterNode = void 0;
-  if (relatedMasterObj) {
-    pageMasterNode = relatedMasterObj.getContainsNode()[0];
-  }
+/**
+ * 页面缩放
+ * @param  {[type]} rootNode  [description]
+ * @param  {[type]} pageIndex [description]
+ * @return {[type]}           [description]
+ */
+var initPageScale = function initPageScale(rootNode, pageIndex) {
   return new ScalePan({
     rootNode: rootNode,
-    hasButton: false,
+    hasButton: true,
     tapClose: true,
-    update: function update(styleText, speed) {
-      if (pageMasterNode && styleText) {
-        Xut.style.setTranslate({
-          speed: speed,
-          styleText: styleText,
-          node: pageMasterNode
-        });
+    updateHook: function updateHook(transform, speed) {
+      if (transform) {
+        /*如果有母版，缩放母版*/
+        var relatedMasterObj = Xut.Presentation.GetPageBase('master', pageIndex);
+        if (relatedMasterObj) {
+          var pageMasterNode = relatedMasterObj.getContainsNode()[0];
+          Xut.style.setTranslate({
+            speed: speed,
+            translate: transform.translate,
+            scale: transform.scale,
+            node: pageMasterNode
+          });
+        }
       }
     }
   });
@@ -69830,7 +69999,7 @@ function initThreadtasks(instance) {
       var createScale = function createScale() {
         var salePageType = config.launch.salePageType;
         if (isPageType && (salePageType === 'page' || salePageType === 'all')) {
-          instance._pageScaleObj = createPageScale(instance.getScaleNode(), instance.pageIndex);
+          instance._pageScaleObj = initPageScale(instance.getScaleNode(), instance.pageIndex);
         }
       };
 
@@ -78285,7 +78454,7 @@ function initView() {
     /*获取到当前的页面对象,用于跳转去重复*/
     var curVmPage = current && current.$$mediator && current.$$mediator.$curVmPage;
     if (curVmPage && curVmPage.seasonId == seasonId && curVmPage.chapterId == chapterId) {
-      $warn('\u91CD\u590D\u89E6\u53D1\u9875\u9762\u52A0\u8F7D:seasonId:' + seasonId + ',chapterId:' + chapterId, 'warn');
+      $warn('\u91CD\u590D\u89E6\u53D1\u9875\u9762\u52A0\u8F7D:seasonId:' + seasonId + ',chapterId:' + chapterId);
       return;
     }
 
@@ -79187,9 +79356,15 @@ function priorityConfig() {
     if (!launch.brModel && golbal.brModel) {
       launch.brModel = golbal.brModel;
     }
-    /*预先判断出基础类型*/
-    if (launch.brModel) {
-      launch.brModelType = getBrType(launch.brModel);
+
+    if (Xut.plat.supportWebp) {
+      /*预先判断出基础类型*/
+      if (launch.brModel) {
+        launch.brModelType = getBrType(launch.brModel);
+      }
+    } else {
+      /*如果不支持的话，强制改状态*/
+      launch.brModel = 0;
     }
   }
 
@@ -79215,21 +79390,28 @@ initAudio$1();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 887.1;
+Xut.Version = 887.3;
 
 /*加载应用app*/
 var initApp = function initApp() {
-  /*配置优先级*/
-  priorityConfig();
-  /*全局的一些事件处理*/
-  initGlobalEvent();
-  /*根节点*/
+  for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
+    arg[_key] = arguments[_key];
+  }
 
-  var _initRootNode = initRootNode.apply(undefined, arguments),
-      $rootNode = _initRootNode.$rootNode,
-      $contentNode = _initRootNode.$contentNode;
+  /*针对异步的代码以前检测出来*/
+  initAsyn(function () {
+    /*配置优先级*/
+    priorityConfig();
+    /*全局的一些事件处理*/
+    initGlobalEvent();
+    /*根节点*/
 
-  nextTick({ container: $rootNode, content: $contentNode }, main);
+    var _initRootNode = initRootNode.apply(undefined, arg),
+        $rootNode = _initRootNode.$rootNode,
+        $contentNode = _initRootNode.$contentNode;
+
+    nextTick({ container: $rootNode, content: $contentNode }, main);
+  });
 };
 
 /*提供全局配置文件*/

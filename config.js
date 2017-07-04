@@ -92,7 +92,7 @@ module.exports = {
         return 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build'
       } else {
         return '/Users/mac/project/xcode/www/lib'
-        // return '/Users/mac/project/svn/www-dev/template/test/lib'
+          // return '/Users/mac/project/svn/www-dev/template/test/lib'
       }
     })()
 
@@ -116,7 +116,7 @@ module.exports = {
      * @type {Array}
      * Parameter is an array format
      */
-    exclude: ['SQLResult.js', 'sqlResult.js', 'pixi.js', 'redux.js']
+    exclude: ['SQLResult.js', 'sqlResult.js', 'pixi.js', 'redux.js', 'debug.js']
 
   },
 
