@@ -1,5 +1,5 @@
 import { closeButton } from './close-button'
-import { config } from '../../config/index'
+import { config } from '../config/index'
 
 const START_X = 0
 const START_Y = 0

@@ -2,7 +2,7 @@
  * 场景API
  * 数据接口。和电子杂志的数据相关的接口，都在这里。
  ********************************************/
-import { $warn } from '../../util/debug'
+import { $warn } from '../../util/debug/index'
 
 /**
  * 命名前缀

@@ -1,6 +1,6 @@
 import { config } from '../../../config/index'
 import { getFileFullPath } from '../../../util/option'
-import { IScroll } from '../../../plugin/extend/iscroll'
+import { IScroll } from '../../../parts/iscroll'
 
 /**
  * 下拉章节列表

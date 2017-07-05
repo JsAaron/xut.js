@@ -1,8 +1,7 @@
-import { config } from '../../../config/index'
-import { $warn } from '../../../util/debug'
+import { config } from '../../config/index'
 import { ScalePan } from '../scale-pan'
-import { $on, $off } from '../../../util/event'
-import { sceneController } from '../../../scenario/factory/control'
+import { $on, $off, $warn } from '../../util/index'
+import { sceneController } from '../../scenario/factory/control'
 import {
   createUnpeatableNumbers,
   createContainerView,
@@ -26,10 +25,10 @@ export class ScalePicture {
   }) {
 
     let current = sceneController.containerObj('current')
-    if(current){
+    if (current) {
       this.$container = current.getSceneNode()
     }
-    if(!this.$container.length) {
+    if (!this.$container.length) {
       $warn('图片缩放依赖的容器不存在')
       return
     }
@@ -39,7 +38,7 @@ export class ScalePicture {
     let containerLeft = 0
     let containerTop = 0
     let visualSize = config.visualSize
-    if(visualSize.left) {
+    if (visualSize.left) {
       containerLeft = visualSize.left
       containerTop = visualSize.top
     }
@@ -76,7 +75,7 @@ export class ScalePicture {
   _init() {
     this._initSingleView()
     this._bindTapClose()
-    if(!this.targetSize) {
+    if (!this.targetSize) {
       this.targetSize = this._getData()
     }
     this._startZoom()
@@ -95,7 +94,7 @@ export class ScalePicture {
     this.$flyNode = this.$singleView.find('.xut-zoom-fly')
 
     //关闭按钮
-    if(this.hasButton) {
+    if (this.hasButton) {
       this.$closeButton = this.$singleView.find('.xut-zoom-close')
       this.callbackEnd = () => {
         this._closeSingleView()
@@ -122,12 +121,12 @@ export class ScalePicture {
 
     //如果有宽度溢出
     //就是说用了窗口指定模式
-    if(config.visualSize.left) {
+    if (config.visualSize.left) {
       view = config.visualSize
     }
 
     //虚拟模拟3下，宽度可能溢出，所以需要取屏幕宽度
-    if(config.launch.visualMode === 3) {
+    if (config.launch.visualMode === 3) {
       view = config.screenSize
       overflowLeft = config.visualSize.left
     }
@@ -185,7 +184,7 @@ export class ScalePicture {
   _createHQIMG(position, src, success, fail) {
 
     //如果高清图已经存在
-    if(this.$hQNode) {
+    if (this.$hQNode) {
       this.$hQNode.show()
       success()
       return
@@ -201,7 +200,7 @@ export class ScalePicture {
 
     //图片失败处理
     function isFail() {
-      if(hasFail) {
+      if (hasFail) {
         return
       }
       hasFail = true
@@ -209,10 +208,10 @@ export class ScalePicture {
       fail()
     }
 
-    img.onload = function() {
+    img.onload = function () {
       //关闭动画正在执行中
       //这里要强制退出
-      if(self.isCloseAniming) {
+      if (self.isCloseAniming) {
         isFail()
         return
       }
@@ -226,7 +225,7 @@ export class ScalePicture {
       img = null
       success(500)
     }
-    img.onerror = function() {
+    img.onerror = function () {
       isFail()
     }
     img.src = src
@@ -234,7 +233,7 @@ export class ScalePicture {
 
   /*绑定滑动*/
   _bindPan($imgNode) {
-    if(!this.slideObj && Xut.plat.hasTouch && config.launch.salePicture) {
+    if (!this.slideObj && Xut.plat.hasTouch && config.launch.salePicture) {
       let tapCallabck = () => this._closeSingleView()
       this.slideObj = new ScalePan({
         hasButton: false,
@@ -250,18 +249,18 @@ export class ScalePicture {
    */
   _addPinchPan() {
     //高清图
-    if(this.$hQNode) {
+    if (this.$hQNode) {
       //如果高清图存在
       //因为高清可能是加载有延时
       //所以可能存在fly图先加载过的情况，这里需要直接清理
-      if(this._hasBindFlyPan) {
+      if (this._hasBindFlyPan) {
         this._hasBindFlyPan = false
         this._destroyRelated()
       }
       this._bindPan(this.$hQNode)
     }
     //普通图
-    else if(this.$flyNode) {
+    else if (this.$flyNode) {
       this._hasBindFlyPan = true
       this._bindPan(this.$flyNode)
     }
@@ -288,8 +287,8 @@ export class ScalePicture {
     }
     let end = e => {
       this._stopDefault(e)
-      if(!isMove) {
-        if(this.slideObj) {
+      if (!isMove) {
+        if (this.slideObj) {
           //如果有zoom对象后，关闭由zoom接管
           //因为缩放的情况下，如果没有移动页面，会默认关闭
           //这个逻辑是不对的，只能让zoom自己检测
@@ -316,7 +315,7 @@ export class ScalePicture {
    */
   _replaceHQIMG(position, src) {
     //高清图
-    if(this.hdSrc) {
+    if (this.hdSrc) {
       this._createHQIMG(position, src, (speed = 200) => {
         //第一次高清图切换
         execAnimation({
@@ -355,7 +354,7 @@ export class ScalePicture {
       display: 'block'
     })
 
-    if(this.$hQNode) {
+    if (this.$hQNode) {
       let position = this.targetSize.position
       this.$hQNode.css({
         width: position.width,
@@ -366,13 +365,13 @@ export class ScalePicture {
       })
     }
 
-    if(this.hasButton) {
+    if (this.hasButton) {
       this.$closeButton.show()
     }
 
     this.$overlay.css('opacity', 0)
 
-    if(this.slideObj) {
+    if (this.slideObj) {
       this.slideObj.reset()
     }
   }
@@ -382,13 +381,13 @@ export class ScalePicture {
    * @return {[type]} [description]
    */
   _closeSingleView() {
-    if(this.isCloseAniming) {
+    if (this.isCloseAniming) {
       return
     }
     this.isCloseAniming = true
     let $imgNode = this.$hQNode ? this.$hQNode : this.$flyNode
 
-    if(this.hasButton) {
+    if (this.hasButton) {
       this.$closeButton.hide()
     }
 
@@ -429,7 +428,7 @@ export class ScalePicture {
    * 销毁相关的一些数据
    */
   _destroyRelated() {
-    if(this.slideObj) {
+    if (this.slideObj) {
       this.slideObj.destroy()
       this.slideObj = null
     }
@@ -447,7 +446,7 @@ export class ScalePicture {
     $off(this.$singleView)
 
     //关闭按钮
-    if(this.hasButton) {
+    if (this.hasButton) {
       $off(this.$closeButton)
       this.$closeButton = null
     }

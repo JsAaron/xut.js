@@ -1,7 +1,7 @@
 import { config } from '../../../config/index'
 import assignedTasks from './assign-task/index'
 import initThreadState from './thread-state'
-import { ScalePan } from '../../../plugin/extend/scale-pan'
+import { ScalePan } from '../../../parts/scale-pan'
 
 const noop = function () {}
 

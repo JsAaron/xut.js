@@ -1,6 +1,6 @@
-import { config } from '../../../config/index'
-import { updateAction } from '../../../component/widget/page/extend/adv.sprite'
-import { createContentAudio } from '../../../component/audio/api'
+import { config } from '../../config/index'
+import { updateAction } from '../../component/widget/page/extend/adv.sprite'
+import { createContentAudio } from '../../component/audio/api'
 
 import fade from './extend/fade'
 import fly from './extend/fly'
@@ -10,7 +10,7 @@ import special from './extend/special'
 import zoom from './extend/zoom'
 import shape from './extend/shape'
 
-import { parseJSON, makeJsonPack } from '../../../util/lang'
+import { parseJSON, makeJsonPack } from '../../util/lang'
 
 const ROUND = Math.round
 const CEIL = Math.ceil

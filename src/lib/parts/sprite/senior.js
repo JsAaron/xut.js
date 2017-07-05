@@ -6,8 +6,8 @@
  * 2.复杂精灵动画
  *   提供给普通转化高级使用
  */
-import { getFileFullPath, loadFigure } from '../../../util/index'
-import { config } from '../../../config/index'
+import { getFileFullPath, loadFigure } from '../../util/index'
+import { config } from '../../config/index'
 
 /*
 1 高级精灵动画 =>  替换一张张图片

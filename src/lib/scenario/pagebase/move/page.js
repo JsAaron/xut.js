@@ -1,5 +1,5 @@
 import { config } from '../../../config/index'
-import { $warn } from '../../../util/debug'
+import { $warn } from '../../../util/debug/index'
 import { translation } from './translation'
 
 /**

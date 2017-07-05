@@ -2,7 +2,7 @@
 ///    缩放提示图片
 //////////////////////////
 import { config } from '../../../../../config/index'
-import { ScalePicture } from '../../../../../plugin/extend/scale-picture/index'
+import { ScalePicture } from '../../../../../parts/scale-picture/index'
 import {
   $on,
   $off,

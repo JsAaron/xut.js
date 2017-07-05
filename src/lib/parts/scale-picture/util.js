@@ -1,4 +1,4 @@
-import { config } from '../../../config/index'
+import { config } from '../../config/index'
 
 /**
  * given the wrapper's width and height,

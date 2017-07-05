@@ -71,8 +71,8 @@ export default function Destroy(action = 'exit') {
    */
   clearId()
 
-  Xut.TransformFilter = null
-  Xut.CreateFilter = null
+  Xut.TransformFilter.empty()
+  Xut.CreateFilter.empty()
 
   //销毁节点
   clearRootNode()

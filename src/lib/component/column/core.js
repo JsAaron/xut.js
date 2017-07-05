@@ -3,10 +3,10 @@ import { getFileFullPath } from '../../util/option'
 import { translation } from '../../scenario/pagebase/move/translation'
 import { getColumnCount } from './api'
 import { getVisualDistance } from '../../scenario/v-distance/index'
-import { ScalePicture } from '../../plugin/extend/scale-picture/index'
-import { closeButton } from '../../plugin/extend/close-button'
+import { ScalePicture } from '../../parts/scale-picture/index'
+import { closeButton } from '../../parts/close-button'
 
-import { delegateScrollY } from '../../plugin/extend/iscroll'
+import { delegateScrollY } from '../../parts/iscroll'
 
 import { analysisImageName, getHDFilePath } from '../../util/option'
 

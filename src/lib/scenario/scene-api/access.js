@@ -1,4 +1,4 @@
-import { $warn } from '../../util/debug'
+import { $warn } from '../../util/debug/index'
 import { typeFilter } from './page-type'
 
 /**

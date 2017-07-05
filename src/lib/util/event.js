@@ -1,4 +1,4 @@
-import { $warn } from './debug'
+import { $warn } from './debug/index'
 
 /**
  * 2015.3.24

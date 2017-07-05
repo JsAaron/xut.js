@@ -1,4 +1,4 @@
-import { $warn } from './debug'
+import { $warn } from './debug/index'
 
 //定义属性
 var def = Object.defineProperty;

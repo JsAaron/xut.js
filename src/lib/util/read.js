@@ -9,7 +9,7 @@
 
 import { loadFile } from './loader/file'
 import { config } from '../config/index'
-import { $warn } from './debug'
+import { $warn } from './debug/index'
 
 /**
  * 随机Url地址

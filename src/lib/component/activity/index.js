@@ -21,7 +21,7 @@ import { hasAudioes } from '../audio/fix'
 import { destroyContentEvent } from './event/event'
 import createContent from './content/content-scope'
 import createTask from './task-check'
-import { IScroll } from '../../plugin/extend/iscroll'
+import { IScroll } from '../../parts/iscroll'
 
 /**
  * 处理拖动对象

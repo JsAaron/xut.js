@@ -1,4 +1,4 @@
-import { config } from '../../config/index'
+import { config } from '../config/index'
 
 /**
  * 横版委托
