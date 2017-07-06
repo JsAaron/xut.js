@@ -8,6 +8,17 @@
 import { config } from './index'
 import { setDelay, setDisable, setPath, resetCursor } from '../initialize/cursor'
 
+/**
+ * 获取后缀
+ * @return {[type]} [description]
+ * ios 支持apng '_i'
+ * 安卓支持webp  '_a'
+ */
+function getSuffix() {
+  return Xut.plat.supportWebp ? '_a' : '_i'
+}
+
+
 /*预先判断br的基础类型*/
 // 1 在线模式 返回增加后缀
 // 2 手机模式 返回删除后缀
@@ -27,7 +38,7 @@ function getBrType(mode) {
   //ios
   if (mode === 2) {
     if (Xut.plat.isBrowser) { //浏览器访问
-      return '_i'
+      return getSuffix()
     } else {
       //app访问
       return 'delete'
@@ -36,13 +47,23 @@ function getBrType(mode) {
   //android
   if (mode === 3) {
     if (Xut.plat.isBrowser) { //浏览器访问
-      return '_a'
+      return getSuffix()
     } else {
       //app访问
       return 'delete'
     }
   }
-  //模式 brModel==0
+
+  /**
+   * 纯PC端
+   * 自动选择支持的
+   * 但是不用APNG了
+   */
+  if (Xut.plat.isBrowser) {
+    return getSuffix()
+  }
+
+  /*默认选择png，理论不会走这里了*/
   return ''
 }
 
@@ -134,14 +155,9 @@ export function priorityConfig() {
       launch.brModel = golbal.brModel
     }
 
-    if (Xut.plat.supportWebp) {
-      /*预先判断出基础类型*/
-      if (launch.brModel) {
-        launch.brModelType = getBrType(launch.brModel)
-      }
-    } else {
-      /*如果不支持的话，强制改状态*/
-      launch.brModel = 0
+    /*预先判断出基础类型*/
+    if (launch.brModel) {
+      launch.brModelType = getBrType(launch.brModel)
     }
 
   }

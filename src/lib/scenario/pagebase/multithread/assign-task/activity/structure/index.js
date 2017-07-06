@@ -73,7 +73,14 @@ const analysisPath = (wrapObj, conData) => {
   } else {
     let isGif = /.gif$/i.test(fileName)
     let fileFullPath = getFileFullPath(fileName, 'content')
-    resourcePath = isGif ? createRandomImg(fileFullPath) : fileFullPath
+
+    /*如果启动了预加载，去掉随机后缀*/
+    if (config.launch.preload) {
+      resourcePath = fileFullPath
+    } else {
+      resourcePath = isGif ? createRandomImg(fileFullPath) : fileFullPath
+    }
+
   }
 
   wrapObj.fileName = fileName;

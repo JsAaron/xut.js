@@ -1,5 +1,5 @@
 import { loadFigure } from '../../util/index'
-
+import { config } from '../../config/index'
 import { Share } from './share'
 
 let imageShare = null
@@ -31,6 +31,13 @@ function getImage() {
  * 图片解析
  */
 export function imageParse(url, callback) {
+
+  /**如果有缓存图片的后缀*/
+  const brModelType = config.launch.brModelType
+  if (brModelType) {
+    url = url.replace(/.png|.jpg/, brModelType)
+  }
+
   /**
    * 这里最主要是替换了图片对象，优化了创建
    */

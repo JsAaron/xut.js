@@ -17,7 +17,12 @@ import { $warn } from './debug/index'
  * @return {[type]}     [description]
  */
 function randomUrl(url) {
-  return url + '?r=' + new Date().getTime()
+  /*启动了预览，就必须要要缓存*/
+  if (config.launch.preload) {
+    return url
+  } else {
+    return url + '?r=' + new Date().getTime()
+  }
 }
 
 

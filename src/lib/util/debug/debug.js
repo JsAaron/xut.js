@@ -179,13 +179,13 @@ var bind1 = function (fn, me) {
   entry.silence = function () {
     return unbind(WIN, ERROR, errListener);
   };
-  if (isTouch) {
-    _log = window.console.log;
-    console.log = function () {
-      entry.log(arguments[0]);
-      return _log.apply(window.console, arguments);
-    };
-  }
+  // if (isTouch) {
+  //   _log = window.console.log;
+  //   console.log = function () {
+  //     entry.log(arguments[0]);
+  //     return _log.apply(window.console, arguments);
+  //   };
+  // }
   if (typeof exports !== "undefined" && module.exports) {
     return module.exports = exports = entry;
   } else if (typeof define === "function") {
