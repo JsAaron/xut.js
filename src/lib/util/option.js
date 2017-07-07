@@ -148,8 +148,10 @@ export function hasImages(fileName) {
  * @param  {[type]} fileName  [description]
  * @param  {[type]} debugType [description]
  * @return {[type]}           [description]
+ *
+ * isGif 为true 跳过brModelType模式
  */
-export function getFileFullPath(fileName, debugType) {
+export function getFileFullPath(fileName, debugType, isGif) {
 
   if (!fileName) {
     return ''
@@ -173,6 +175,11 @@ export function getFileFullPath(fileName, debugType) {
     let name = fileMatch[1]
     let type = fileMatch[2]
     fileName = `${fileMatch[1]}.${launch.baseImageSuffix}.${fileMatch[2]}`
+  }
+
+  /*如果是GIF的话需要跳过brModelType类型的处理*/
+  if (isGif) {
+    return config.data.pathAddress + fileName
   }
 
   /*

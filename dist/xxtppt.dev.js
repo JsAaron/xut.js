@@ -43765,8 +43765,10 @@ function hasImages(fileName) {
  * @param  {[type]} fileName  [description]
  * @param  {[type]} debugType [description]
  * @return {[type]}           [description]
+ *
+ * isGif 为true 跳过brModelType模式
  */
-function getFileFullPath(fileName, debugType) {
+function getFileFullPath(fileName, debugType, isGif) {
 
   if (!fileName) {
     return '';
@@ -43788,6 +43790,11 @@ function getFileFullPath(fileName, debugType) {
     var name = fileMatch[1];
     var type = fileMatch[2];
     fileName = fileMatch[1] + '.' + launch.baseImageSuffix + '.' + fileMatch[2];
+  }
+
+  /*如果是GIF的话需要跳过brModelType类型的处理*/
+  if (isGif) {
+    return config.data.pathAddress + fileName;
   }
 
   /*
@@ -44265,7 +44272,12 @@ Xut.nextTick = nextTick;
  * @return {[type]}     [description]
  */
 function randomUrl(url) {
-  return url + '?r=' + new Date().getTime();
+  /*启动了预览，就必须要要缓存*/
+  if (config.launch.preload) {
+    return url;
+  } else {
+    return url + '?r=' + new Date().getTime();
+  }
 }
 
 /**
@@ -45898,6 +45910,9 @@ function contentFilter(filterName) {
  * 创建共享对象
  * 这里是为了限制对象的创建数
  * 优化
+ *
+ * 暂时关闭，因为数量会出现中断提示
+ *
  * @param  {[type]} total [description]
  * @return {[type]}       [description]
  */
@@ -45963,93 +45978,167 @@ var Share = function () {
  *
  * */
 
-var audioShare = null;
-
 /**
  * 设置audio个数
  * 1 根据preload
  * 2 如果是重复加载，判断缓存已创建的
  */
-function initAudio(total) {
-  if (audioShare) {
-    audioShare.create(total);
-  } else {
-    audioShare = new Share('audio');
-    audioShare.create(total);
-  }
-}
 
-function getAudio() {
-  if (audioShare) {
-    return audioShare.get();
-  } else {
-    return new Audio();
-  }
-}
 
 /**
  * 音频文件解析
  */
 function audioParse(url, callback) {
 
-  var audio = getAudio();
-
+  var audio = new Audio();
   audio.src = url;
   audio.preload = "auto";
   audio.autobuffer = true;
+  audio.autoplay = true;
+  audio.muted = true; //ios 10以上静音后可以自动播放
 
-  function success() {
-    clear();
-    callback();
+  var lagerTimer = null; //最大的检测时间
+  var loopTimer = null; //循环检测时间
+
+  /**
+   * 清理定时器检测
+   * @return {[type]} [description]
+   */
+  function clearTimer() {
+    if (lagerTimer) {
+      clearTimeout(lagerTimer);
+      lagerTimer = null;
+    }
+    if (loopTimer) {
+      clearTimeout(loopTimer);
+      loopTimer = null;
+    }
   }
 
-  function error() {
-    clear();
-    callback();
-  }
-
+  /**
+   * 清理检测对象
+   * @return {[type]} [description]
+   */
   function clear() {
-    audio.removeEventListener("loadedmetadata", success, false);
-    audio.removeEventListener("error", error, false);
-    audio = null;
+    clearTimer();
+    if (audio) {
+      audio.removeEventListener("loadedmetadata", success, false);
+      audio.removeEventListener("error", error, false);
+      audio = null;
+    }
   }
 
-  audio.addEventListener("loadedmetadata", success, false);
-  audio.addEventListener("error", error, false);
-}
+  /**
+   * 成功退出
+   * @return {[type]} [description]
+   */
+  function exit() {
+    clear();
+    callback();
+  }
 
-var imageShare = null;
+  /**
+   * 文件存在能加载数据，检测检测是否加载完毕
+   * 1 网络足够好，支持buffered 直接靠buffered
+   * 2 网络很差直接给不支持buffered，直接给5秒的最大下载量
+   */
+  function success() {
+
+    audio.play();
+
+    /*总时间*/
+    var allTime = audio.duration;
+
+    /*是否缓存完毕*/
+    function getComplete() {
+      console.log(audio.buffered.length);
+      if (allTime == audio.buffered.end(audio.buffered.length - 1)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    /**
+     * loopBuffered检测
+     * 循环500毫秒一次
+     * @return {[type]} [description]
+     */
+    function loopBuffered() {
+      loopTimer = setTimeout(function () {
+        if (getComplete()) {
+          exit();
+          return;
+        } else {
+          loopBuffered();
+        }
+      }, 500);
+    }
+
+    /////////////////////////////
+    /// ios 10与PC端
+    /// 1、速度很快的情况马上就缓存完毕
+    /// 2、如果文件已经被缓存过了
+    /////////////////////////////
+    if (audio.buffered) {
+      if (getComplete()) {
+        exit();
+        return;
+      }
+      /*开始循环*/
+      loopBuffered();
+    }
+
+    /**
+     * 1.IOS10一下与安卓端
+     * 2.Buffered检测出错的情况
+     * 最大检测5秒的情况
+     */
+    lagerTimer = setTimeout(function () {
+      exit();
+    }, 5000);
+  }
+
+  /**
+   * 文件错误直接算完成了
+   * 出现可能就是文件不存在了
+   */
+  function error() {
+    exit();
+  }
+
+  audio.addEventListener("loadedmetadata", error, false);
+  audio.addEventListener("error", error, false);
+
+  return {
+    destory: function destory() {
+      clear();
+    }
+  };
+}
 
 /**
  * 设置image个数
  * 1 根据preload
  * 2 如果是重复加载，判断缓存已创建的
  */
-function initImage(total) {
-  if (imageShare) {
-    imageShare.create(total);
-  } else {
-    imageShare = new Share('image');
-    imageShare.create(total);
-  }
-}
 
-function getImage() {
-  if (imageShare) {
-    return imageShare.get();
-  } else {
-    return new Image();
-  }
-}
 
 /**
  * 图片解析
  */
 function imageParse(url, callback) {
+
+  /**如果有缓存图片的后缀*/
+  var brModelType = config.launch.brModelType;
+  if (brModelType) {
+    url = url.replace(/.png|.jpg/, brModelType);
+  }
+
   /**
    * 这里最主要是替换了图片对象，优化了创建
    */
-  loadFigure({ image: getImage(), url: url }, callback);
+  loadFigure(url, callback);
 }
 
 /**
@@ -46399,22 +46488,74 @@ var AsyAccess = function (_Observer) {
   return AsyAccess;
 }(Observer);
 
-///////////////////////
+////////////////////////////////
+/// 资源加载错误后，开始循环检测2次
+/// 分别是6秒 - 12秒的时间
+///////////////////////////////
+/**
+ * 循环的列表对象
+ * @type {Array}
+ */
+var loopQueue = {};
+
+/**
+ * 增加循环列表
+ * @param {[type]} argument [description]
+ */
+function addLoop(filePath, detect) {
+  if (loopQueue[filePath]) {
+    // $warn(`错误循环的文件已经存在检测列表 ${filePath}`)
+  } else {
+    /**
+     * 重设循环检测
+     * 不重新创建新的对象
+     * 通过实例重设检测
+     * 1 减少http检测
+     * 2 不重复创建对象
+     */
+    loopQueue[filePath] = detect;
+    detect.reset({
+      checkTime: 12000,
+      callback: function callback() {
+        loopQueue[filePath].destory();
+        delete loopQueue[filePath];
+      }
+    });
+  }
+}
+
+/**
+ * 清理循环检测
+ * @return {[type]} [description]
+ */
+function clearLoop() {
+  if (loopQueue) {
+    for (var key in loopQueue) {
+      loopQueue[key].destory();
+      loopQueue[key] = null;
+    }
+  }
+  loopQueue = {};
+}
+
+/////////////////////////////////////////////////////////////////////
 ///  探测资源的正确性
-///////////////////////
+///
+///  1. 通过每个parser自己去请求缓存成功
+///  2. 如果parser的第一次请求时间大于2秒，那么主动就默认返回失败
+///  3. 失败文件就会走loop队列
+///
+/////////////////////////////////////////////////////////////////////
 var Detect = function () {
   function Detect(_ref) {
     var parser = _ref.parser,
-        filePath = _ref.filePath,
-        _ref$checkTime = _ref.checkTime,
-        checkTime = _ref$checkTime === undefined ? 2000 : _ref$checkTime;
+        filePath = _ref.filePath;
     classCallCheck(this, Detect);
 
     this.state = false;
     this.timer = null;
     this.parser = parser;
     this.filePath = filePath;
-    this.checkTime = checkTime;
   }
 
   /**
@@ -46424,8 +46565,8 @@ var Detect = function () {
 
 
   createClass(Detect, [{
-    key: '_clear',
-    value: function _clear() {
+    key: '_clearTimer',
+    value: function _clearTimer() {
       if (this.timer) {
         clearTimeout(this.timer);
         this.timer = null;
@@ -46433,46 +46574,53 @@ var Detect = function () {
     }
 
     /**
-     * 开始轮询，最多2次
+     * 销毁检测对象
+     * 如果parser解析完毕后，主动调用销毁接口
+     * 1 audio
+     */
+
+  }, {
+    key: '_destoryDownload',
+    value: function _destoryDownload() {
+      if (this.downObject) {
+        this.downObject.destory && this.downObject.destory();
+        this.downObject = null;
+      }
+    }
+
+    /**
+     * 开始通过API下载文件
      * @return {[type]} [description]
      */
 
   }, {
-    key: '_request',
-    value: function _request() {
+    key: '_downloadFile',
+    value: function _downloadFile() {
       var _this = this;
 
-      this.parser(this.filePath, function () {
+      this.downObject = this.parser(this.filePath, function () {
         _this.state = true;
-        _this._clear();
-        // $warn(`文件循环加载成功 ${this.filePath}`)
+        _this._clearTimer();
+        _this._destoryDownload();
         _this.callback(_this.state);
       });
     }
 
     /**
-     * 主动监听
-     * 如果parser同步加载完毕了，那么这里不执行了
-     * 这里会递归检测循环loopTime的指定次数
-     * 如果parse在这loop没完成就强制退出
+     * 创建主动监听
      * @return {[type]} [description]
      */
 
   }, {
-    key: '_active',
-    value: function _active() {
+    key: '_createActive',
+    value: function _createActive(time, fn) {
       var _this2 = this;
 
       if (!this.state) {
         this.timer = setTimeout(function () {
-          _this2._clear();
-          if (_this2.state) {
-            // $warn(`文件加载成功 ${this.filePath}`)
-          } else {
-            $warn('\u6587\u4EF6\u52A0\u8F7D\u5931\u8D25 ' + _this2.filePath);
-          }
-          _this2.callback(_this2.state);
-        }, this.checkTime);
+          _this2._clearTimer();
+          fn();
+        }, time);
       }
     }
 
@@ -46483,6 +46631,31 @@ var Detect = function () {
     //////////////////
 
     /**
+     * 重设检测
+     * 1 在第一次检测失败后
+     * 2 循环队列中开始重复检测
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'reset',
+    value: function reset(_ref2) {
+      var _this3 = this;
+
+      var checkTime = _ref2.checkTime,
+          callback = _ref2.callback;
+
+      /*重写回调,等待_request的执行完毕*/
+      this.callback = callback;
+
+      /*开始新的主动检测最长12秒*/
+      this._createActive(checkTime, function () {
+        _this3._destoryDownload();
+        _this3.callback();
+      });
+    }
+
+    /**
      * 开始执行，主动完成，与被动监听
      * callback //不管是失败或者成功都会调用，为了销毁对象的引用
      * @return {[type]} [description]
@@ -46490,10 +46663,27 @@ var Detect = function () {
 
   }, {
     key: 'start',
-    value: function start(callback) {
+    value: function start(_ref3) {
+      var _this4 = this;
+
+      var checkTime = _ref3.checkTime,
+          callback = _ref3.callback;
+
       this.callback = callback;
-      this._request();
-      this._active();
+
+      /*自动检测*/
+      this._downloadFile();
+
+      /**
+       * 主动监听
+       * 如果parser同步加载完毕了，那么这里不执行了
+       * 这里会递归检测循环loopTime的指定次数
+       * 如果parse在这loop没完成就强制退出
+       * @return {[type]} [description]
+       */
+      this._createActive(checkTime, function () {
+        _this4.callback(_this4.state);
+      });
     }
 
     /**
@@ -46504,7 +46694,8 @@ var Detect = function () {
   }, {
     key: 'destory',
     value: function destory() {
-      this.clear();
+      this._destoryDownload();
+      this._clearTimer();
       this.callback = function () {};
       this.parse = null;
     }
@@ -46512,51 +46703,8 @@ var Detect = function () {
   return Detect;
 }();
 
-////////////////////////////////
-/// 资源加载错误后，开始循环检测2次
-/// 分别是6秒 - 12秒的时间
-///////////////////////////////
-/**
- * 循环的列表对象
- * @type {Array}
- */
-var loopList = {};
-
-/**
- * 增加循环列表
- * @param {[type]} argument [description]
- */
-function addLoop(filePath, parser) {
-  if (loopList[filePath]) {
-    $warn('\u9519\u8BEF\u5FAA\u73AF\u7684\u6587\u4EF6\u5DF2\u7ECF\u5B58\u5728\u68C0\u6D4B\u5217\u8868 ' + filePath);
-  } else {
-    loopList[filePath] = new Detect({
-      parser: parser,
-      filePath: filePath,
-      checkTime: 12000
-    });
-    loopList[filePath].start(function () {
-      delete loopList[filePath];
-    });
-  }
-}
-
-/**
- * 清理循环检测
- * @return {[type]} [description]
- */
-function clearLoop() {
-  if (loopList) {
-    for (var key in loopList) {
-      loopList[key].destory();
-      loopList[key] = null;
-    }
-  }
-  loopList = {};
-}
-
 /***************
-  资源预加载
+资源预加载
 一共有5处位置需要验证是否预加载完毕
 1 swpier 移动翻页反弹
 2 Xut.View.LoadScenario 全局跳转
@@ -46695,14 +46843,19 @@ function pageHandle(type, childData, parser) {
         hasComplete = true;
       }
 
-      /*分段检测的回到次数*/
+      /**
+       * 分段检测的回到次数
+       * @type {[type]}
+       */
       var analyticCount = analyticData.length;
 
-      /*检测完成度*/
-      var parseComplete = function parseComplete() {
+      /**
+       * 检测完成度
+       * @return {[type]} [description]
+       */
+      function complete() {
         if (analyticCount === 1) {
           if (hasComplete) {
-            preObjs = null;
             /*分段处理完毕就清理，用于判断跳出*/
             callback();
             return;
@@ -46711,7 +46864,7 @@ function pageHandle(type, childData, parser) {
           }
         }
         --analyticCount;
-      };
+      }
 
       /**
        * 分配任务
@@ -46719,19 +46872,21 @@ function pageHandle(type, childData, parser) {
        * 2 给一个定时器的范围
        */
       analyticData.forEach(function (filePath, index) {
-        preObjs[filePath] = new Detect({
-          parser: parser,
-          filePath: filePath,
-          checkTime: 2000 /*主动检测2秒*/
-        });
-        preObjs[filePath].start(function (state) {
-          /*加入错误的循环检测列表，如果销毁了就不处理 */
-          if (state === false) {
-            if (preloadData) {
-              addLoop(filePath, parser);
+        preObjs[filePath] = new Detect({ parser: parser, filePath: filePath });
+        preObjs[filePath].start({
+          /*主动检测2秒*/
+          checkTime: 2000,
+          callback: function callback(state) {
+            /*如果请求成功了，就必须销毁*/
+            if (state) {
+              //必须销毁，否则异步乱套
+              preObjs[filePath] && preObjs[filePath].destory();
+            } else {
+              addLoop(filePath, preObjs[filePath]);
             }
+            preObjs[filePath] = null;
+            complete();
           }
-          parseComplete();
         });
       });
     }
@@ -46821,7 +46976,7 @@ function nextTask(chapterId, callback) {
   var pageData = preloadData[chapterId];
 
   var complete = function complete(info) {
-    $warn(info + ':' + chapterId);
+    // $warn(`${info}:${chapterId}`)
     deleteResource(chapterId);
     repeatCheck(loadingId, callback);
   };
@@ -46871,6 +47026,7 @@ function initPreload(total, callback) {
 
   var start = function start() {
     nextTask('', function () {
+      $warn('预加载资源总数：' + total);
       /*监听预加载初四华*/
       watchPreloadInit();
       callback();
@@ -46884,8 +47040,6 @@ function initPreload(total, callback) {
       window.preloadData = null;
       //初始预加载对象数量
       var count = getNumber();
-      initAudio(count);
-      initImage(count);
       checkCache(close, start);
     } else {
       close();
@@ -53411,6 +53565,16 @@ var _class$1 = function () {
     this.isSports = parseInt(pa.isSports);
     this.originalImageList = pa.ImageList;
 
+    /**webp图片的后缀*/
+    var brModelType = config.launch.brModelType;
+    if (brModelType) {
+      _.each(this.originalImageList, function (imageData) {
+        if (imageData.name) {
+          imageData.name = imageData.name.replace(/.png|.jpg/, brModelType);
+        }
+      });
+    }
+
     this.totalFPS = this.originalImageList.length;
     this._imgArray = [];
     this.sprObj = null;
@@ -53524,6 +53688,7 @@ var _class$1 = function () {
     key: '_initStructure',
     value: function _initStructure() {
       var src = this.resourcePath + this.originalImageList[0].name;
+
       var container = void 0;
       if (Xut.plat.isIOS) {
         container = '<img src=' + src + ' class="inherit-size fullscreen-background" style="position:absolute;"/>';
@@ -62968,14 +63133,15 @@ var makeWarpObj = function makeWarpObj(contentId, content, pageType, chapterInde
  * @return {[type]}         [description]
  */
 var analysisPath = function analysisPath(wrapObj, conData) {
-  var isGif = void 0;
+
   var resourcePath = void 0; //资源路径,png/jpg/svg..
   var fileName = conData.md5;
+  var isGif = /.gif$/i.test(fileName);
 
   /*是自动精灵动画*/
   if (conData.category === "AutoCompSprite") {
     try {
-      resourcePath = getFileFullPath(fileName, 'content-autoCompSprite');
+      resourcePath = getFileFullPath(fileName, 'content-autoCompSprite', isGif);
       var results = getResources(resourcePath + '/app.json');
       var spiritList = results.spiritList[0];
       var actListName = spiritList.params.actList;
@@ -62987,9 +63153,16 @@ var analysisPath = function analysisPath(wrapObj, conData) {
       console.log('AutoCompSprite获取数据失败');
     }
   } else {
-    var _isGif = /.gif$/i.test(fileName);
-    var fileFullPath = getFileFullPath(fileName, 'content');
-    resourcePath = _isGif ? createRandomImg(fileFullPath) : fileFullPath;
+
+    var fileFullPath = getFileFullPath(fileName, 'content', isGif);
+
+    /*如果启动了预加载，去掉随机后缀*/
+    if (config.launch.preload) {
+      resourcePath = fileFullPath;
+    } else {
+      /*如果没有启动preload，需要随机，保证不缓存*/
+      resourcePath = isGif ? createRandomImg(fileFullPath) : fileFullPath;
+    }
   }
 
   wrapObj.fileName = fileName;
@@ -78874,8 +79047,8 @@ function Destroy() {
    */
   clearId();
 
-  Xut.TransformFilter = null;
-  Xut.CreateFilter = null;
+  Xut.TransformFilter.empty();
+  Xut.CreateFilter.empty();
 
   //销毁节点
   clearRootNode();
@@ -79226,6 +79399,16 @@ function initGlobalAPI() {
 ///
 ////////////////////////////////
 
+/**
+ * 获取后缀
+ * @return {[type]} [description]
+ * ios 支持apng '_i'
+ * 安卓支持webp  '_a'
+ */
+function getSuffix() {
+  return Xut.plat.supportWebp ? '_a' : '_i';
+}
+
 /*预先判断br的基础类型*/
 // 1 在线模式 返回增加后缀
 // 2 手机模式 返回删除后缀
@@ -79246,7 +79429,7 @@ function getBrType(mode) {
   if (mode === 2) {
     if (Xut.plat.isBrowser) {
       //浏览器访问
-      return '_i';
+      return getSuffix();
     } else {
       //app访问
       return 'delete';
@@ -79256,13 +79439,23 @@ function getBrType(mode) {
   if (mode === 3) {
     if (Xut.plat.isBrowser) {
       //浏览器访问
-      return '_a';
+      return getSuffix();
     } else {
       //app访问
       return 'delete';
     }
   }
-  //模式 brModel==0
+
+  /**
+   * 纯PC端
+   * 自动选择支持的
+   * 但是不用APNG了
+   */
+  if (Xut.plat.isBrowser) {
+    return getSuffix();
+  }
+
+  /*默认选择png，理论不会走这里了*/
   return '';
 }
 
@@ -79357,14 +79550,9 @@ function priorityConfig() {
       launch.brModel = golbal.brModel;
     }
 
-    if (Xut.plat.supportWebp) {
-      /*预先判断出基础类型*/
-      if (launch.brModel) {
-        launch.brModelType = getBrType(launch.brModel);
-      }
-    } else {
-      /*如果不支持的话，强制改状态*/
-      launch.brModel = 0;
+    /*预先判断出基础类型*/
+    if (launch.brModel) {
+      launch.brModelType = getBrType(launch.brModel);
     }
   }
 
@@ -79390,7 +79578,7 @@ initAudio$1();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 887.3;
+Xut.Version = 887.5;
 
 /*加载应用app*/
 var initApp = function initApp() {

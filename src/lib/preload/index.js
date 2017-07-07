@@ -1,5 +1,5 @@
 /***************
-  资源预加载
+资源预加载
 一共有5处位置需要验证是否预加载完毕
 1 swpier 移动翻页反弹
 2 Xut.View.LoadScenario 全局跳转
@@ -152,14 +152,19 @@ function pageHandle(type, childData, parser) {
         hasComplete = true
       }
 
-      /*分段检测的回到次数*/
+      /**
+       * 分段检测的回到次数
+       * @type {[type]}
+       */
       let analyticCount = analyticData.length
 
-      /*检测完成度*/
-      const parseComplete = function () {
+      /**
+       * 检测完成度
+       * @return {[type]} [description]
+       */
+      function complete() {
         if (analyticCount === 1) {
           if (hasComplete) {
-            preObjs = null;
             /*分段处理完毕就清理，用于判断跳出*/
             callback()
             return
@@ -176,27 +181,29 @@ function pageHandle(type, childData, parser) {
        * 2 给一个定时器的范围
        */
       analyticData.forEach(function (filePath, index) {
-        preObjs[filePath] = new Detect({
-          parser,
-          filePath,
-          checkTime: 2000 /*主动检测2秒*/
-        })
-        preObjs[filePath].start(function (state) {
-          /*加入错误的循环检测列表，如果销毁了就不处理 */
-          if (state === false) {
-            if (preloadData) {
-              addLoop(filePath, parser)
+        preObjs[filePath] = new Detect({ parser, filePath })
+        preObjs[filePath].start({
+          /*主动检测2秒*/
+          checkTime: 2000,
+          callback: function (state) {
+            /*如果请求成功了，就必须销毁*/
+            if (state) {
+              //必须销毁，否则异步乱套
+              preObjs[filePath] && preObjs[filePath].destory()
+            } else {
+              addLoop(filePath, preObjs[filePath])
             }
+            preObjs[filePath] = null
+            complete()
           }
-          parseComplete()
         })
       })
+
     }
 
     segmentHandle()
   }
 }
-
 
 /**
  * 创建对应的处理器
@@ -281,7 +288,7 @@ function nextTask(chapterId, callback) {
   const pageData = preloadData[chapterId]
 
   const complete = function (info) {
-    $warn(`${info}:${chapterId}`)
+    // $warn(`${info}:${chapterId}`)
     deleteResource(chapterId)
     repeatCheck(loadingId, callback)
   }
@@ -330,6 +337,7 @@ export function initPreload(total, callback) {
 
   const start = function () {
     nextTask('', function () {
+      $warn('预加载资源总数：' + total);
       /*监听预加载初四华*/
       watchPreloadInit()
       callback();
@@ -343,8 +351,6 @@ export function initPreload(total, callback) {
       window.preloadData = null;
       //初始预加载对象数量
       let count = getNumber()
-      initAudio(count)
-      initImage(count)
       checkCache(close, start)
     } else {
       close()

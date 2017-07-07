@@ -2,6 +2,9 @@
  * 创建共享对象
  * 这里是为了限制对象的创建数
  * 优化
+ *
+ * 暂时关闭，因为数量会出现中断提示
+ *
  * @param  {[type]} total [description]
  * @return {[type]}       [description]
  */

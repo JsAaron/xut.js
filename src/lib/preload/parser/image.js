@@ -41,5 +41,5 @@ export function imageParse(url, callback) {
   /**
    * 这里最主要是替换了图片对象，优化了创建
    */
-  loadFigure({ image: getImage(), url }, callback)
+  loadFigure(url,callback)
 }

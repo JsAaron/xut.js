@@ -52,14 +52,15 @@ const makeWarpObj = (contentId, content, pageType, chapterIndex) => {
  * @return {[type]}         [description]
  */
 const analysisPath = (wrapObj, conData) => {
-  let isGif
+
   let resourcePath //资源路径,png/jpg/svg..
   let fileName = conData.md5
+  let isGif = /.gif$/i.test(fileName)
 
   /*是自动精灵动画*/
   if (conData.category === "AutoCompSprite") {
     try {
-      resourcePath = getFileFullPath(fileName, 'content-autoCompSprite')
+      resourcePath = getFileFullPath(fileName, 'content-autoCompSprite', isGif)
       let results = getResources(resourcePath + '/app.json')
       let spiritList = results.spiritList[0]
       let actListName = spiritList.params.actList
@@ -71,13 +72,14 @@ const analysisPath = (wrapObj, conData) => {
       console.log('AutoCompSprite获取数据失败')
     }
   } else {
-    let isGif = /.gif$/i.test(fileName)
-    let fileFullPath = getFileFullPath(fileName, 'content')
+
+    let fileFullPath = getFileFullPath(fileName, 'content', isGif)
 
     /*如果启动了预加载，去掉随机后缀*/
     if (config.launch.preload) {
       resourcePath = fileFullPath
     } else {
+      /*如果没有启动preload，需要随机，保证不缓存*/
       resourcePath = isGif ? createRandomImg(fileFullPath) : fileFullPath
     }
 

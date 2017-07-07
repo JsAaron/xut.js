@@ -51,6 +51,16 @@ export default class {
     this.isSports = parseInt(pa.isSports);
     this.originalImageList = pa.ImageList;
 
+    /**webp图片的后缀*/
+    const brModelType = config.launch.brModelType;
+    if (brModelType) {
+      _.each(this.originalImageList, function (imageData) {
+        if (imageData.name) {
+          imageData.name = imageData.name.replace(/.png|.jpg/, brModelType)
+        }
+      })
+    }
+
     this.totalFPS = this.originalImageList.length;
     this._imgArray = []
     this.sprObj = null
@@ -152,6 +162,7 @@ export default class {
    */
   _initStructure() {
     const src = this.resourcePath + this.originalImageList[0].name
+
     let container
     if (Xut.plat.isIOS) {
       container = `<img src=${src} class="inherit-size fullscreen-background" style="position:absolute;"/>`
