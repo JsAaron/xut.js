@@ -10,10 +10,13 @@ import { $warn } from '../util/index'
 
 export class Detect {
 
-  constructor({
-    parser,
-    filePath
-  }) {
+  /**
+   * [constructor description]
+   * @param  {[type]} parser   [解析器]
+   * @param  {[type]} filePath [路径]
+   * @return {[type]}          [description]
+   */
+  constructor(parser, filePath) {
     this.state = false
     this.timer = null
     this.parser = parser
@@ -21,10 +24,34 @@ export class Detect {
   }
 
   /**
-   * 清理
+   * 销毁检测对象
+   * 如果parser解析完毕后，主动调用销毁接口
+   * 1 audio
+   */
+  _clearDownload() {
+    if (this._downObj) {
+      this._downObj.destory && this._downObj.destory()
+      this._downObj = null
+    }
+  }
+
+  /**
+   * 开始通过API下载文件
    * @return {[type]} [description]
    */
-  _clearTimer() {
+  _downloadFile() {
+    this._downObj = this.parser(this.filePath, () => {
+      this.state = true;
+      this.callback && this.callback()
+    })
+  }
+
+
+  /**
+   * 清理定时器
+   * @return {[type]} [description]
+   */
+  _clearWatcher() {
     if (this.timer) {
       clearTimeout(this.timer)
       this.timer = null
@@ -32,52 +59,56 @@ export class Detect {
   }
 
   /**
-   * 销毁检测对象
-   * 如果parser解析完毕后，主动调用销毁接口
-   * 1 audio
-   */
-  _destoryDownload() {
-    if (this.downObject) {
-      this.downObject.destory && this.downObject.destory()
-      this.downObject = null
-    }
-  }
-
-
-  /**
-   * 开始通过API下载文件
-   * @return {[type]} [description]
-   */
-  _downloadFile() {
-    this.downObject = this.parser(this.filePath, () => {
-      this.state = true;
-      this._clearTimer();
-      this._destoryDownload()
-      this.callback(this.state)
-    })
-  }
-
-
-  /**
    * 创建主动监听
    * @return {[type]} [description]
    */
-  _createActive(time, fn) {
+  _createWather(time) {
     if (!this.state) {
       this.timer = setTimeout(() => {
-        this._clearTimer();
-        fn()
+        this.callback && this.callback()
       }, time);
     }
   }
 
+  /**
+   * 创建退出函数
+   * @return {[type]} [description]
+   */
+  _createExitFn(fn) {
+    this.callback = () => {
+      this._clearWatcher(); //清理主动观察
+      this.callback = null
+      fn(this.state)
+    }
+  }
 
+  /////////////////////////////////////
+  ///
+  ///          对外接口
+  ///
+  /////////////////////////////////////
 
-  ///////////////////
-  ///
-  ///    对外接口
-  ///
-  //////////////////
+  /**
+   * 开始下载
+   * @param  {[type]}   checkTime [主动检测时间]
+   * @param  {Function} fn        [不管成功或者失败都会调用]
+   * @return {[type]}             [description]
+   */
+  start(checkTime, fn) {
+
+    this._createExitFn(fn)
+
+    /*开始下载*/
+    this._downloadFile()
+
+    /**
+     * 主动监听
+     * 如果在主动观察指定的时间内自动下载没有完毕
+     * 那么主动就会被调用，这个detect对象就会走循环队列
+     * 执行reset长轮询
+     */
+    this._createWather(checkTime)
+  }
 
   /**
    * 重设检测
@@ -85,56 +116,22 @@ export class Detect {
    * 2 循环队列中开始重复检测
    * @return {[type]} [description]
    */
-  reset({
-    checkTime, //最大的循环检测时间12秒
-    callback //完毕后的处理
-  }) {
-    /*重写回调,等待_request的执行完毕*/
-    this.callback = callback
+  reset(checkTime, fn) {
 
-    /*开始新的主动检测最长12秒*/
-    this._createActive(checkTime, () => {
-      this._destoryDownload()
-      this.callback()
-    })
+    this._createExitFn(fn)
+
+    // 开始新的主动检测最长12秒
+    this._createWather(checkTime)
   }
-
-
-  /**
-   * 开始执行，主动完成，与被动监听
-   * callback //不管是失败或者成功都会调用，为了销毁对象的引用
-   * @return {[type]} [description]
-   */
-  start({
-    checkTime,
-    callback
-  }) {
-    this.callback = callback;
-
-    /*自动检测*/
-    this._downloadFile();
-
-    /**
-     * 主动监听
-     * 如果parser同步加载完毕了，那么这里不执行了
-     * 这里会递归检测循环loopTime的指定次数
-     * 如果parse在这loop没完成就强制退出
-     * @return {[type]} [description]
-     */
-    this._createActive(checkTime, () => {
-      this.callback(this.state)
-    })
-  }
-
 
   /**
    * 销毁
    * @return {[type]} [description]
    */
   destory() {
-    this._destoryDownload()
-    this._clearTimer()
-    this.callback = function(){}
+    this._clearDownload()
+    this._clearWatcher()
+    this.callback = null
     this.parse = null
   }
 }

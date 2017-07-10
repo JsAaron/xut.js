@@ -17,7 +17,7 @@ let loopQueue = {}
  */
 export function addLoop(filePath, detect) {
   if (loopQueue[filePath]) {
-    // $warn(`错误循环的文件已经存在检测列表 ${filePath}`)
+    // $warn(`错误循环的文件已经存在循环列表 ${filePath}`)
   } else {
     /**
      * 重设循环检测
@@ -27,12 +27,10 @@ export function addLoop(filePath, detect) {
      * 2 不重复创建对象
      */
     loopQueue[filePath] = detect
-    detect.reset({
-      checkTime: 12000,
-      callback: function () {
-        loopQueue[filePath].destory()
-        delete loopQueue[filePath]
-      }
+    detect.reset(12000, function () {
+      loopQueue[filePath].destory()
+      loopQueue[filePath] = null
+      delete loopQueue[filePath]
     })
   }
 }

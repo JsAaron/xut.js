@@ -41,5 +41,14 @@ export function imageParse(url, callback) {
   /**
    * 这里最主要是替换了图片对象，优化了创建
    */
-  loadFigure(url,callback)
+  let object = loadFigure(url, callback)
+
+  return {
+    destory: function () {
+      if (object) {
+        object.src = null
+        object = null
+      }
+    }
+  }
 }

@@ -139,7 +139,7 @@ function pageHandle(type, childData, parser) {
      */
     function segmentHandle() {
 
-      let preObjs = {} /*预加载对象列表*/
+      let detectObjs = {} /*预加载对象列表*/
       let analyticData
       let hasComplete = false
 
@@ -175,29 +175,33 @@ function pageHandle(type, childData, parser) {
         --analyticCount
       }
 
+
+      function reduce(path) {
+        detectObjs[path] = new Detect(parser, path)
+        detectObjs[path].start(2000, function (state) {
+          if (state) {
+            /*如果请求成功了，就必须销毁*/
+            detectObjs[path].destory()
+          } else {
+            /*失败加入到循环队列*/
+            addLoop(path, detectObjs[path])
+          }
+          detectObjs[path] = null
+          complete()
+        })
+      }
+
       /**
        * 分配任务
        * 1 分配到每个解析器去处理
        * 2 给一个定时器的范围
+       * 主动检测2秒
+       * 成功与失败都认为通过
+       * 失败单独加到循环队列中去处理
        */
-      analyticData.forEach(function (filePath, index) {
-        preObjs[filePath] = new Detect({ parser, filePath })
-        preObjs[filePath].start({
-          /*主动检测2秒*/
-          checkTime: 2000,
-          callback: function (state) {
-            /*如果请求成功了，就必须销毁*/
-            if (state) {
-              //必须销毁，否则异步乱套
-              preObjs[filePath] && preObjs[filePath].destory()
-            } else {
-              addLoop(filePath, preObjs[filePath])
-            }
-            preObjs[filePath] = null
-            complete()
-          }
-        })
-      })
+      for (let i = 0; i < analyticData.length; i++) {
+        reduce(analyticData[i])
+      }
 
     }
 
