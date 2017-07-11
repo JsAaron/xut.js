@@ -47,6 +47,7 @@ export function imageParse(url, callback) {
     destory: function () {
       if (object) {
         object.src = null
+        object.removeAttribute("src")
         object = null
       }
     }

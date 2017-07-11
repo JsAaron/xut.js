@@ -60,7 +60,7 @@ let notification = null
  * @return {Boolean} [description]
  */
 function checkFigure(url, callback) {
-  imageParse(url, (state, cache) => {
+  return imageParse(url, (state, cache) => {
     /*如果是有效图，只检测第一次加载的缓存img*/
     if (!checkFigure.url && state) {
       checkFigure.url = url
