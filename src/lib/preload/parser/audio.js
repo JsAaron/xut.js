@@ -59,7 +59,9 @@ export function audioParse(url, callback) {
     if (audio) {
       audio.removeEventListener("loadedmetadata", success, false)
       audio.removeEventListener("error", exit, false)
-      audio.url = null
+      audio.src = null
+      //置空src后会报错 找不到null资源 移除src属性即可
+      audio.removeAttribute("src")
       audio = null
     }
   }
@@ -83,6 +85,14 @@ export function audioParse(url, callback) {
    */
   function startBuffered() {
 
+     /*如果第一次就已经加载结束
+       加载完成之后就不需要再调play了 不然chrome会报打断错误
+     */
+    if (getComplete()) {
+      exit('isExit')
+      return
+    }
+
     audio.play()
 
     /*总时间*/
@@ -90,17 +100,13 @@ export function audioParse(url, callback) {
 
     /*是否缓存完毕*/
     function getComplete(loop) {
-      if (allTime == audio.buffered.end(audio.buffered.length - 1)) {
+      //移动端浏览器loadedmetadata事件执行时可能还没有开始缓存
+      //判断是否缓存完毕时要加上audio.buffered.length条件
+      if (audio.buffered.length && allTime == audio.buffered.end(audio.buffered.length - 1)) {
         return true
       } else {
         return false
       }
-    }
-
-    /*如果第一次就已经加载结束*/
-    if (getComplete()) {
-      exit('isExit')
-      return
     }
 
     /**
