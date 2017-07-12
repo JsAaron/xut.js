@@ -10,35 +10,41 @@ import { Share } from './share'
 
 let audioShare = null
 
+
 /**
- * 设置audio个数
- * 1 根据preload
- * 2 如果是重复加载，判断缓存已创建的
+ * 如果有共享的音频对象就返回
+ * @return {[type]} [description]
  */
-export function initAudio(total) {
-  if (audioShare) {
-    audioShare.create(total)
-  } else {
-    audioShare = new Share('audio')
-    audioShare.create(total)
-  }
-}
-
 function getAudio() {
-  if (audioShare) {
-    return audioShare.get()
-  } else {
-    return new Audio()
+  if (!audioShare) {
+    audioShare = new Share()
   }
+  if (audioShare) {
+    let audio = audioShare.get()
+    if (audio) {
+      return audio
+    }
+  }
+  return new Audio()
 }
 
+/**
+ * 预加载完毕后清除对象
+ * @return {[type]} [description]
+ */
+export function clearAudio() {
+  if (audioShare) {
+    audioShare.destory()
+  }
+  audioShare = null
+}
 
 /**
  * 音频文件解析
  */
 export function audioParse(url, callback) {
 
-  let audio = new Audio()
+  let audio = getAudio()
   audio.src = url;
   audio.preload = "auto";
   audio.autobuffer = true
@@ -59,9 +65,10 @@ export function audioParse(url, callback) {
     if (audio) {
       audio.removeEventListener("loadedmetadata", success, false)
       audio.removeEventListener("error", exit, false)
-      audio.src = null
-      //置空src后会报错 找不到null资源 移除src属性即可
+        //置空src后会报错 找不到null资源 移除src属性即可
+      audio.src = null;
       audio.removeAttribute("src")
+      audioShare && audioShare.add(audio) //加入到循环队列
       audio = null
     }
   }
@@ -85,9 +92,9 @@ export function audioParse(url, callback) {
    */
   function startBuffered() {
 
-     /*如果第一次就已经加载结束
-       加载完成之后就不需要再调play了 不然chrome会报打断错误
-     */
+    /*如果第一次就已经加载结束
+      加载完成之后就不需要再调play了 不然chrome会报打断错误
+    */
     if (getComplete()) {
       exit('isExit')
       return

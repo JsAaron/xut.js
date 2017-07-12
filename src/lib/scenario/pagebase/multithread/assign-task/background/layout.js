@@ -69,7 +69,7 @@ export default function createBackground(svgContent, data) {
    * 只有SVG数据，没有层次数据 ,不是视觉差
    * @return {[type]}          [description]
    */
-  if(backText && !masterData && !pptMaster && !imageLayerData) {
+  if(backText && !masterData && !pptMaster && !imageLayerData && !backImageData) {
     return svgContent ?
       String.styleFormat(`<div data-multilayer ="true"class="multilayer"> ${svgContent} </div>`) :
       ''

@@ -3,55 +3,34 @@
  * 这里是为了限制对象的创建数
  * 优化
  *
- * 暂时关闭，因为数量会出现中断提示
- *
  * @param  {[type]} total [description]
  * @return {[type]}       [description]
  */
 
-const TYPE = {
-  audio() {
-    return new Audio()
-  },
-  video() {
-    return document.createElement("video")
-  },
-  image() {
-    return new Image()
-  }
-}
-
 export class Share {
 
   constructor(name) {
-    this.name = name
-    this.construct = TYPE[name]
-    this.index = 0
+    this.state = 'init'
     this.cache = []
   }
 
-  create(total) {
-    /*如果缓存中已经存在*/
-    if (this.cache.length) {
-      if (total >= this.cache.length) {
-        total = total - this.cache.length
-      }
-    }
-    /*创建新的对象*/
-    if (total) {
-      for (let i = 0; i < total; i++) {
-        let object = this.construct()
-        this.cache.push(object)
-      }
-    }
+  add(object) {
+    this.cache.push(object)
   }
 
   get() {
-    const object = this.cache[this.index++]
-    if (!object) {
-      this.index = 0
-      return this.get()
+
+    if (this.cache.length) {
+      return this.cache.shift()
     }
-    return object
   }
+
+  destory() {
+    for (let i = 0; i < this.cache.length; i++) {
+      this.cache[i].src = null;
+      this.cache[i].removeAttribute("src")
+      this.cache[i] = null
+    }
+  }
+
 }

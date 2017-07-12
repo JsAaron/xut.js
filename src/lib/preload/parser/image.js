@@ -4,26 +4,26 @@ import { Share } from './share'
 
 let imageShare = null
 
-/**
- * 设置image个数
- * 1 根据preload
- * 2 如果是重复加载，判断缓存已创建的
- */
-export function initImage(total) {
-  if (imageShare) {
-    imageShare.create(total)
-  } else {
-    imageShare = new Share('image')
-    imageShare.create(total)
-  }
-}
 
 function getImage() {
-  if (imageShare) {
-    return imageShare.get()
-  } else {
-    return new Image()
+  if (!imageShare) {
+    imageShare = new Share()
   }
+  if (imageShare) {
+    let image = imageShare.get()
+    if (image) {
+      return image
+    }
+  }
+  return new Image()
+}
+
+
+export function clearImage() {
+  if (imageShare) {
+    imageShare.destory()
+  }
+  imageShare = null
 }
 
 
@@ -41,14 +41,20 @@ export function imageParse(url, callback) {
   /**
    * 这里最主要是替换了图片对象，优化了创建
    */
-  let object = loadFigure(url, callback)
+  let imageObject = loadFigure({
+    image: getImage(),
+    url: url
+  }, function () {
+    imageShare && imageShare.add(imageObject) //加入到循环队列
+    callback()
+  })
 
   return {
     destory: function () {
-      if (object) {
-        object.src = null
-        object.removeAttribute("src")
-        object = null
+      if (imageObject) {
+        imageObject.src = null
+        imageObject.removeAttribute("src")
+        imageObject = null
       }
     }
   }

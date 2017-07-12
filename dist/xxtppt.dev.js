@@ -43322,30 +43322,6 @@ function loadFile(url, callback, charset) {
  * 图片预加载
  */
 
-var list = [];
-var intervalId = null;
-
-/**
- * 用来执行队列
- * @return {[type]} [description]
- */
-var tick = function tick() {
-  var i = 0;
-  for (; i < list.length; i++) {
-    list[i].end ? list.splice(i--, 1) : list[i]();
-  }
-  !list.length && stop();
-};
-
-/**
- * 停止所有定时器队列
- * @return {[type]} [description]
- */
-var stop = function stop() {
-  clearInterval(intervalId);
-  intervalId = null;
-};
-
 /**
  * callback(1,2)
  * 1 图片加载状态 success / fail   true/false
@@ -43372,11 +43348,15 @@ function loadFigure(data, callback) {
   // 如果图片被缓存，则直接返回缓存数据
   if (img.complete) {
     callback && callback.call(img, true, true);
-    return;
+    return img;
   }
 
   var width = img.width;
   var height = img.height;
+
+  var clear = function clear() {
+    img = img.onload = img.onerror = null;
+  };
 
   /**
    * 图片尺寸就绪
@@ -43387,36 +43367,40 @@ function loadFigure(data, callback) {
     var newHeight = img.height;
     // 如果图片已经在其他地方加载可使用面积检测
     if (newWidth !== width || newHeight !== height || newWidth * newHeight > 1024) {
-      callback && callback.call(img, true, hasCache);
+      clear();
+      callback && callback(true, hasCache);
       onready.end = true;
+      return true;
     }
   };
 
   // 加载错误后的事件
   img.onerror = function () {
     onready.end = true;
-    img = img.onload = img.onerror = null;
-    callback && callback.call(img, false);
+    clear();
+    callback && callback(false);
   };
 
   /**检测是不是已经缓存了*/
-  onready(true);
+  if (onready(true)) {
+    /*如果缓存存在，就跳过*/
+    return;
+  }
 
-  // 完全加载完毕的事件
+  /*完全加载完毕的事件*/
   img.onload = function () {
-    // onload在定时器时间差范围内可能比onready快
-    // 这里进行检查并保证onready优先执行
-    !onready.end && onready();
-    // IE gif动画会循环执行onload，置空onload即可
-    img = img.onload = img.onerror = null;
+    clear();
+    callback && callback(true);
   };
 
   // 加入队列中定期执行
-  if (!onready.end) {
-    list.push(onready);
-    // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-    if (intervalId === null) intervalId = setInterval(tick, 40);
-  }
+  // if (!onready.end) {
+  //   list.push(onready);
+  //   // 无论何时只允许出现一个定时器，减少浏览器性能损耗
+  //   if (intervalId === null) intervalId = setInterval(tick, 40);
+  // };
+
+  return img;
 }
 
 var onlyId = void 0;
@@ -45911,60 +45895,39 @@ function contentFilter(filterName) {
  * 这里是为了限制对象的创建数
  * 优化
  *
- * 暂时关闭，因为数量会出现中断提示
- *
  * @param  {[type]} total [description]
  * @return {[type]}       [description]
  */
-
-var TYPE = {
-  audio: function audio() {
-    return new Audio();
-  },
-  video: function video() {
-    return document.createElement("video");
-  },
-  image: function image() {
-    return new Image();
-  }
-};
 
 var Share = function () {
   function Share(name) {
     classCallCheck(this, Share);
 
-    this.name = name;
-    this.construct = TYPE[name];
-    this.index = 0;
+    this.state = 'init';
     this.cache = [];
   }
 
   createClass(Share, [{
-    key: "create",
-    value: function create(total) {
-      /*如果缓存中已经存在*/
-      if (this.cache.length) {
-        if (total >= this.cache.length) {
-          total = total - this.cache.length;
-        }
-      }
-      /*创建新的对象*/
-      if (total) {
-        for (var i = 0; i < total; i++) {
-          var object = this.construct();
-          this.cache.push(object);
-        }
-      }
+    key: "add",
+    value: function add(object) {
+      this.cache.push(object);
     }
   }, {
     key: "get",
     value: function get$$1() {
-      var object = this.cache[this.index++];
-      if (!object) {
-        this.index = 0;
-        return this.get();
+
+      if (this.cache.length) {
+        return this.cache.shift();
       }
-      return object;
+    }
+  }, {
+    key: "destory",
+    value: function destory() {
+      for (var i = 0; i < this.cache.length; i++) {
+        this.cache[i].src = null;
+        this.cache[i].removeAttribute("src");
+        this.cache[i] = null;
+      }
     }
   }]);
   return Share;
@@ -45978,52 +45941,66 @@ var Share = function () {
  *
  * */
 
-/**
- * 设置audio个数
- * 1 根据preload
- * 2 如果是重复加载，判断缓存已创建的
- */
+var audioShare = null;
 
+/**
+ * 如果有共享的音频对象就返回
+ * @return {[type]} [description]
+ */
+function getAudio() {
+  if (!audioShare) {
+    audioShare = new Share();
+  }
+  if (audioShare) {
+    var audio = audioShare.get();
+    if (audio) {
+      return audio;
+    }
+  }
+  return new Audio();
+}
+
+/**
+ * 预加载完毕后清除对象
+ * @return {[type]} [description]
+ */
+function clearAudio() {
+  if (audioShare) {
+    audioShare.destory();
+  }
+  audioShare = null;
+}
 
 /**
  * 音频文件解析
  */
 function audioParse(url, callback) {
 
-  var audio = new Audio();
+  var audio = getAudio();
   audio.src = url;
   audio.preload = "auto";
   audio.autobuffer = true;
   audio.autoplay = true;
   audio.muted = true; //ios 10以上静音后可以自动播放
 
-  var lagerTimer = null; //最大的检测时间
   var loopTimer = null; //循环检测时间
-
-  /**
-   * 清理定时器检测
-   * @return {[type]} [description]
-   */
-  function clearTimer() {
-    if (lagerTimer) {
-      clearTimeout(lagerTimer);
-      lagerTimer = null;
-    }
-    if (loopTimer) {
-      clearTimeout(loopTimer);
-      loopTimer = null;
-    }
-  }
 
   /**
    * 清理检测对象
    * @return {[type]} [description]
    */
-  function clear() {
-    clearTimer();
+  function clear(isExit) {
+    if (loopTimer) {
+      clearTimeout(loopTimer);
+      loopTimer = null;
+    }
     if (audio) {
       audio.removeEventListener("loadedmetadata", success, false);
-      audio.removeEventListener("error", error, false);
+      audio.removeEventListener("error", exit, false);
+      //置空src后会报错 找不到null资源 移除src属性即可
+      audio.src = null;
+      audio.removeAttribute("src");
+      audioShare && audioShare.add(audio); //加入到循环队列
       audio = null;
     }
   }
@@ -46032,17 +46009,26 @@ function audioParse(url, callback) {
    * 成功退出
    * @return {[type]} [description]
    */
-  function exit() {
-    clear();
+  function exit(isExit) {
+    clear(isExit);
     callback();
   }
 
   /**
-   * 文件存在能加载数据，检测检测是否加载完毕
-   * 1 网络足够好，支持buffered 直接靠buffered
-   * 2 网络很差直接给不支持buffered，直接给5秒的最大下载量
+   * 支持buffered的情况下
+   * 可以通过buffered提前判断
+   * 为了优化下载的时间
+   * @return {[type]} [description]
    */
-  function success() {
+  function startBuffered() {
+
+    /*如果第一次就已经加载结束
+      加载完成之后就不需要再调play了 不然chrome会报打断错误
+    */
+    if (getComplete()) {
+      exit('isExit');
+      return;
+    }
 
     audio.play();
 
@@ -46050,9 +46036,10 @@ function audioParse(url, callback) {
     var allTime = audio.duration;
 
     /*是否缓存完毕*/
-    function getComplete() {
-      console.log(audio.buffered.length);
-      if (allTime == audio.buffered.end(audio.buffered.length - 1)) {
+    function getComplete(loop) {
+      //移动端浏览器loadedmetadata事件执行时可能还没有开始缓存
+      //判断是否缓存完毕时要加上audio.buffered.length条件
+      if (audio.buffered.length && allTime == audio.buffered.end(audio.buffered.length - 1)) {
         return true;
       } else {
         return false;
@@ -46067,62 +46054,63 @@ function audioParse(url, callback) {
     function loopBuffered() {
       loopTimer = setTimeout(function () {
         if (getComplete()) {
-          exit();
+          exit('isExit');
           return;
         } else {
           loopBuffered();
         }
       }, 500);
     }
+    loopBuffered();
+  }
 
+  /**
+   * 在loadedmetadata事件完成后
+   * 1 如果支持buffered判断，那么走buffered
+   * 2 如果不支持buffered那么靠外部的定时器处理
+   */
+  function success() {
+    if (!audio.buffered) {
+      exit(); //如果不支持buffered，直接退出
+      return;
+    }
     /////////////////////////////
     /// ios 10与PC端
     /// 1、速度很快的情况马上就缓存完毕
     /// 2、如果文件已经被缓存过了
     /////////////////////////////
-    if (audio.buffered) {
-      if (getComplete()) {
-        exit();
-        return;
-      }
-      /*开始循环*/
-      loopBuffered();
-    }
-
-    /**
-     * 1.IOS10一下与安卓端
-     * 2.Buffered检测出错的情况
-     * 最大检测5秒的情况
-     */
-    lagerTimer = setTimeout(function () {
-      exit();
-    }, 5000);
+    startBuffered();
   }
 
-  /**
-   * 文件错误直接算完成了
-   * 出现可能就是文件不存在了
-   */
-  function error() {
-    exit();
-  }
-
-  audio.addEventListener("loadedmetadata", error, false);
-  audio.addEventListener("error", error, false);
+  audio.addEventListener("loadedmetadata", success, false);
+  audio.addEventListener("error", exit, false);
 
   return {
-    destory: function destory() {
-      clear();
-    }
+    destory: clear
   };
 }
 
-/**
- * 设置image个数
- * 1 根据preload
- * 2 如果是重复加载，判断缓存已创建的
- */
+var imageShare = null;
 
+function getImage() {
+  if (!imageShare) {
+    imageShare = new Share();
+  }
+  if (imageShare) {
+    var image = imageShare.get();
+    if (image) {
+      return image;
+    }
+  }
+  return new Image();
+}
+
+function clearImage() {
+  if (imageShare) {
+    imageShare.destory();
+  }
+  imageShare = null;
+}
 
 /**
  * 图片解析
@@ -46138,7 +46126,23 @@ function imageParse(url, callback) {
   /**
    * 这里最主要是替换了图片对象，优化了创建
    */
-  loadFigure(url, callback);
+  var imageObject = loadFigure({
+    image: getImage(),
+    url: url
+  }, function () {
+    imageShare && imageShare.add(imageObject); //加入到循环队列
+    callback();
+  });
+
+  return {
+    destory: function destory() {
+      if (imageObject) {
+        imageObject.src = null;
+        imageObject.removeAttribute("src");
+        imageObject = null;
+      }
+    }
+  };
 }
 
 /**
@@ -46504,7 +46508,7 @@ var loopQueue = {};
  */
 function addLoop(filePath, detect) {
   if (loopQueue[filePath]) {
-    // $warn(`错误循环的文件已经存在检测列表 ${filePath}`)
+    // $warn(`错误循环的文件已经存在循环列表 ${filePath}`)
   } else {
     /**
      * 重设循环检测
@@ -46514,12 +46518,10 @@ function addLoop(filePath, detect) {
      * 2 不重复创建对象
      */
     loopQueue[filePath] = detect;
-    detect.reset({
-      checkTime: 12000,
-      callback: function callback() {
-        loopQueue[filePath].destory();
-        delete loopQueue[filePath];
-      }
+    detect.reset(12000, function () {
+      loopQueue[filePath].destory();
+      loopQueue[filePath] = null;
+      delete loopQueue[filePath];
     });
   }
 }
@@ -46547,9 +46549,14 @@ function clearLoop() {
 ///
 /////////////////////////////////////////////////////////////////////
 var Detect = function () {
-  function Detect(_ref) {
-    var parser = _ref.parser,
-        filePath = _ref.filePath;
+
+  /**
+   * [constructor description]
+   * @param  {[type]} parser   [解析器]
+   * @param  {[type]} filePath [路径]
+   * @return {[type]}          [description]
+   */
+  function Detect(parser, filePath) {
     classCallCheck(this, Detect);
 
     this.state = false;
@@ -46559,32 +46566,18 @@ var Detect = function () {
   }
 
   /**
-   * 清理
-   * @return {[type]} [description]
+   * 销毁检测对象
+   * 如果parser解析完毕后，主动调用销毁接口
+   * 1 audio
    */
 
 
   createClass(Detect, [{
-    key: '_clearTimer',
-    value: function _clearTimer() {
-      if (this.timer) {
-        clearTimeout(this.timer);
-        this.timer = null;
-      }
-    }
-
-    /**
-     * 销毁检测对象
-     * 如果parser解析完毕后，主动调用销毁接口
-     * 1 audio
-     */
-
-  }, {
-    key: '_destoryDownload',
-    value: function _destoryDownload() {
-      if (this.downObject) {
-        this.downObject.destory && this.downObject.destory();
-        this.downObject = null;
+    key: '_clearDownload',
+    value: function _clearDownload() {
+      if (this._downObj) {
+        this._downObj.destory && this._downObj.destory();
+        this._downObj = null;
       }
     }
 
@@ -46598,12 +46591,24 @@ var Detect = function () {
     value: function _downloadFile() {
       var _this = this;
 
-      this.downObject = this.parser(this.filePath, function () {
+      this._downObj = this.parser(this.filePath, function () {
         _this.state = true;
-        _this._clearTimer();
-        _this._destoryDownload();
-        _this.callback(_this.state);
+        _this.callback && _this.callback();
       });
+    }
+
+    /**
+     * 清理定时器
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_clearWatcher',
+    value: function _clearWatcher() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
     }
 
     /**
@@ -46612,23 +46617,64 @@ var Detect = function () {
      */
 
   }, {
-    key: '_createActive',
-    value: function _createActive(time, fn) {
+    key: '_createWather',
+    value: function _createWather(time) {
       var _this2 = this;
 
       if (!this.state) {
         this.timer = setTimeout(function () {
-          _this2._clearTimer();
-          fn();
+          _this2.callback && _this2.callback();
         }, time);
       }
     }
 
-    ///////////////////
+    /**
+     * 创建退出函数
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_createExitFn',
+    value: function _createExitFn(fn) {
+      var _this3 = this;
+
+      this.callback = function () {
+        _this3._clearWatcher(); //清理主动观察
+        _this3.callback = null;
+        fn(_this3.state);
+      };
+    }
+
+    /////////////////////////////////////
     ///
-    ///    对外接口
+    ///          对外接口
     ///
-    //////////////////
+    /////////////////////////////////////
+
+    /**
+     * 开始下载
+     * @param  {[type]}   checkTime [主动检测时间]
+     * @param  {Function} fn        [不管成功或者失败都会调用]
+     * @return {[type]}             [description]
+     */
+
+  }, {
+    key: 'start',
+    value: function start(checkTime, fn) {
+
+      this._createExitFn(fn);
+
+      /*开始下载*/
+      this._downloadFile();
+
+      /**
+       * 主动监听
+       * 如果在主动观察指定的时间内自动下载没有完毕
+       * 那么主动就会被调用，这个detect对象就会走循环队列
+       * 执行reset长轮询
+       */
+      this._createWather(checkTime);
+    }
 
     /**
      * 重设检测
@@ -46639,51 +46685,12 @@ var Detect = function () {
 
   }, {
     key: 'reset',
-    value: function reset(_ref2) {
-      var _this3 = this;
+    value: function reset(checkTime, fn) {
 
-      var checkTime = _ref2.checkTime,
-          callback = _ref2.callback;
+      this._createExitFn(fn);
 
-      /*重写回调,等待_request的执行完毕*/
-      this.callback = callback;
-
-      /*开始新的主动检测最长12秒*/
-      this._createActive(checkTime, function () {
-        _this3._destoryDownload();
-        _this3.callback();
-      });
-    }
-
-    /**
-     * 开始执行，主动完成，与被动监听
-     * callback //不管是失败或者成功都会调用，为了销毁对象的引用
-     * @return {[type]} [description]
-     */
-
-  }, {
-    key: 'start',
-    value: function start(_ref3) {
-      var _this4 = this;
-
-      var checkTime = _ref3.checkTime,
-          callback = _ref3.callback;
-
-      this.callback = callback;
-
-      /*自动检测*/
-      this._downloadFile();
-
-      /**
-       * 主动监听
-       * 如果parser同步加载完毕了，那么这里不执行了
-       * 这里会递归检测循环loopTime的指定次数
-       * 如果parse在这loop没完成就强制退出
-       * @return {[type]} [description]
-       */
-      this._createActive(checkTime, function () {
-        _this4.callback(_this4.state);
-      });
+      // 开始新的主动检测最长12秒
+      this._createWather(checkTime);
     }
 
     /**
@@ -46694,9 +46701,9 @@ var Detect = function () {
   }, {
     key: 'destory',
     value: function destory() {
-      this._destoryDownload();
-      this._clearTimer();
-      this.callback = function () {};
+      this._clearDownload();
+      this._clearWatcher();
+      this.callback = null;
       this.parse = null;
     }
   }]);
@@ -46753,7 +46760,7 @@ var notification = null;
  * @return {Boolean} [description]
  */
 function checkFigure(url, callback) {
-  imageParse(url, function (state, cache) {
+  return imageParse(url, function (state, cache) {
     /*如果是有效图，只检测第一次加载的缓存img*/
     if (!checkFigure.url && state) {
       checkFigure.url = url;
@@ -46830,7 +46837,7 @@ function pageHandle(type, childData, parser) {
      */
     function segmentHandle() {
 
-      var preObjs = {}; /*预加载对象列表*/
+      var detectObjs = {}; /*预加载对象列表*/
       var analyticData = void 0;
       var hasComplete = false;
 
@@ -46866,29 +46873,32 @@ function pageHandle(type, childData, parser) {
         --analyticCount;
       }
 
+      function reduce(path) {
+        detectObjs[path] = new Detect(parser, path);
+        detectObjs[path].start(2000, function (state) {
+          if (state) {
+            /*如果请求成功了，就必须销毁*/
+            detectObjs[path].destory();
+          } else {
+            /*失败加入到循环队列*/
+            addLoop(path, detectObjs[path]);
+          }
+          detectObjs[path] = null;
+          complete();
+        });
+      }
+
       /**
        * 分配任务
        * 1 分配到每个解析器去处理
        * 2 给一个定时器的范围
+       * 主动检测2秒
+       * 成功与失败都认为通过
+       * 失败单独加到循环队列中去处理
        */
-      analyticData.forEach(function (filePath, index) {
-        preObjs[filePath] = new Detect({ parser: parser, filePath: filePath });
-        preObjs[filePath].start({
-          /*主动检测2秒*/
-          checkTime: 2000,
-          callback: function callback(state) {
-            /*如果请求成功了，就必须销毁*/
-            if (state) {
-              //必须销毁，否则异步乱套
-              preObjs[filePath] && preObjs[filePath].destory();
-            } else {
-              addLoop(filePath, preObjs[filePath]);
-            }
-            preObjs[filePath] = null;
-            complete();
-          }
-        });
-      });
+      for (var i = 0; i < analyticData.length; i++) {
+        reduce(analyticData[i]);
+      }
     }
 
     segmentHandle();
@@ -46928,9 +46938,25 @@ function loadResource(data, callback) {
  */
 function repeatCheck(id, callback) {
 
+  //判断是否所有页面加载完毕
+  var completeLoad = function completeLoad() {
+    /*如果加载数等于总计量数，这个证明加载完毕*/
+    if (id === chapterIdCount) {
+      $warn('全部预加载完成');
+      $setStorage('preload', checkFigure.url);
+      clearAudio();
+      clearImage();
+      return true;
+    }
+    return false;
+  };
+
   /*第一次加载才有回调*/
   if (callback) {
     callback();
+    if (completeLoad()) {
+      return;
+    }
     return;
   }
 
@@ -46949,9 +46975,7 @@ function repeatCheck(id, callback) {
   }
 
   /*如果加载数等于总计量数，这个证明加载完毕*/
-  if (id === chapterIdCount) {
-    $warn('全部预加载完成');
-    $setStorage('preload', checkFigure.url);
+  if (completeLoad()) {
     return;
   }
 
@@ -47038,8 +47062,6 @@ function initPreload(total, callback) {
       chapterIdCount = total;
       preloadData = window.preloadData;
       window.preloadData = null;
-      //初始预加载对象数量
-      var count = getNumber();
       checkCache(close, start);
     } else {
       close();
@@ -47055,7 +47077,8 @@ function initPreload(total, callback) {
  */
 function watchPreloadInit() {
 
-  if (!preloadData) {
+  //如果预加载的只有1页数据 判断第一页加载完成后return
+  if (!preloadData[chapterIdCount]) {
     return;
   }
 
@@ -49226,7 +49249,7 @@ function getPlayBox() {
 ///////////////////
 
 /*代码初始化*/
-function initAudio$1() {
+function initAudio() {
   initBox();
 }
 
@@ -49425,7 +49448,7 @@ function hangUpAudio() {
 /**
  * 清理所有音频
  */
-function clearAudio() {
+function clearAudio$1() {
   var playBox = getPlayBox();
   var t, p, a;
   for (t in playBox) {
@@ -51833,7 +51856,7 @@ function createBackground(svgContent, data) {
    * 只有SVG数据，没有层次数据 ,不是视觉差
    * @return {[type]}          [description]
    */
-  if (backText && !masterData && !pptMaster && !imageLayerData) {
+  if (backText && !masterData && !pptMaster && !imageLayerData && !backImageData) {
     return svgContent ? String.styleFormat('<div data-multilayer ="true"class="multilayer"> ' + svgContent + ' </div>') : '';
   }
 
@@ -64222,7 +64245,7 @@ function $suspend(pageBase, pageId, allHandle) {
     //销毁所有的音频
     if (allHandle) {
       clearVideo();
-      clearAudio();
+      clearAudio$1();
     }
   });
 }
@@ -64322,7 +64345,7 @@ function $original(pageBase) {
 function $stop() {
 
   //清理音频
-  clearAudio();
+  clearAudio$1();
 
   //清理视频
   clearVideo();
@@ -79032,7 +79055,7 @@ function Destroy() {
   clearCache();
 
   //音视频
-  clearAudio();
+  clearAudio$1();
 
   //音频
   clearVideo();
@@ -79574,11 +79597,11 @@ function priorityConfig() {
 }
 
 /*代码初始化*/
-initAudio$1();
+initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 887.5;
+Xut.Version = 887.6;
 
 /*加载应用app*/
 var initApp = function initApp() {

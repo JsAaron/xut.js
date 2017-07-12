@@ -15,7 +15,7 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
-Xut.Version = 887.5
+Xut.Version = 887.6
 
 /*加载应用app*/
 const initApp = (...arg) => {

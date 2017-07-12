@@ -8,8 +8,8 @@
 5 Xut.View.GotoSlide
 ****************/
 import { config } from '../config/index'
-import { audioParse, initAudio } from './parser/audio'
-import { imageParse, initImage } from './parser/image'
+import { audioParse, clearAudio } from './parser/audio'
+import { imageParse, clearImage } from './parser/image'
 import { videoParse } from './parser/video'
 import { svgParse } from './parser/svg'
 import pathHooks from './path-hook'
@@ -243,37 +243,52 @@ function loadResource(data, callback) {
  */
 function repeatCheck(id, callback) {
 
-  /*第一次加载才有回调*/
-  if (callback) {
-    callback()
-    return
-  }
-
-  /*执行预加载等待的回调通知对象*/
-  if (notification) {
-    const newChapterId = notification[0]
-    if (id === newChapterId) {
-      /*如果下一个解析正好是等待的页面*/
-      notification[1]()
-      notification = null
-    } else {
-      /*跳转页面的情况， 如果不是按照顺序的预加载方式*/
-      nextTask(newChapterId)
-      return
+    //判断是否所有页面加载完毕
+    const completeLoad = function() {
+        /*如果加载数等于总计量数，这个证明加载完毕*/
+        if (id === chapterIdCount) {
+            $warn('全部预加载完成')
+            $setStorage('preload', checkFigure.url)
+            clearAudio()
+            clearImage()
+            return true
+        }
+        return false
     }
-  }
 
-  /*如果加载数等于总计量数，这个证明加载完毕*/
-  if (id === chapterIdCount) {
-    $warn('全部预加载完成')
-    $setStorage('preload', checkFigure.url)
-    return
-  }
+    /*第一次加载才有回调*/
+    if (callback) {
+        callback()
+        if (completeLoad()) {
+            return;
+        }
+        return
+    }
 
-  /*启动了才继续可以预加载*/
-  if (enable) {
-    nextTask()
-  }
+    /*执行预加载等待的回调通知对象*/
+    if (notification) {
+        const newChapterId = notification[0]
+        if (id === newChapterId) {
+            /*如果下一个解析正好是等待的页面*/
+            notification[1]()
+            notification = null
+        } else {
+            /*跳转页面的情况， 如果不是按照顺序的预加载方式*/
+            nextTask(newChapterId)
+            return
+        }
+    }
+
+
+    /*如果加载数等于总计量数，这个证明加载完毕*/
+    if (completeLoad()) {
+        return;
+    }
+
+    /*启动了才继续可以预加载*/
+    if (enable) {
+        nextTask()
+    }
 }
 
 
@@ -353,8 +368,6 @@ export function initPreload(total, callback) {
       chapterIdCount = total
       preloadData = window.preloadData
       window.preloadData = null;
-      //初始预加载对象数量
-      let count = getNumber()
       checkCache(close, start)
     } else {
       close()
@@ -371,9 +384,10 @@ export function initPreload(total, callback) {
  */
 function watchPreloadInit() {
 
-  if (!preloadData) {
-    return
-  }
+   //如果预加载的只有1页数据 判断第一页加载完成后return
+    if (!preloadData[chapterIdCount]) {
+        return
+    }
 
   let timer = null
   let count = 2
