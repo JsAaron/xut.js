@@ -131,7 +131,7 @@ export default {
     const mediaType = titleCase(category)
 
     /*默认状态*/
-    let imageBackground = startImage
+    let imageBackground = startImage || ''
 
     /*
     音频在创建dom的时候需要查下
@@ -153,7 +153,7 @@ export default {
     }
 
     /*是否隐藏,如果隐藏通过脚本调用*/
-    const visibility = display === 'hidden' ? "visibility:hidden" : ''
+    const visibility = display === 'hidden' ? "visibility:hidden;" : ''
 
 
     //创建音频对象
@@ -169,7 +169,7 @@ export default {
                    left:${scaleLeft}px;
                    top:${scaleTop}px;
                    z-index:${zIndex};
-                   ${visibility};
+                   ${visibility}
                    ${imageBackground}
                    background-size:100% 100%;
                    position:absolute;">
@@ -201,6 +201,12 @@ export default {
     if (category == 'audio') {
       autoAudio(chapterId, id, onlyCreateOnce(id));
     } else {
+      /*通过id搜索*/
+      rootNode = rootNode.closest(`#${Xut.View.GetPageNodeIdName(pageType,pageIndex,chapterId)}`)
+      if (!rootNode.length) {
+        /*自动ppt视频，是采用的li父节点，所以这里需要处理下*/
+        rootNode = rootNode.closest('li')
+      }
       autoVideo({
         pageType,
         rootNode,

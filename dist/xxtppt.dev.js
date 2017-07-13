@@ -45924,9 +45924,11 @@ var Share = function () {
     key: "destory",
     value: function destory() {
       for (var i = 0; i < this.cache.length; i++) {
-        this.cache[i].src = null;
-        this.cache[i].removeAttribute("src");
-        this.cache[i] = null;
+        if (this.cache[i]) {
+          this.cache[i].src = null;
+          this.cache[i].removeAttribute("src");
+          this.cache[i] = null;
+        }
       }
     }
   }]);
@@ -46120,7 +46122,9 @@ function imageParse(url, callback) {
   /**如果有缓存图片的后缀*/
   var brModelType = config.launch.brModelType;
   if (brModelType) {
-    url = url.replace(/.png|.jpg/, brModelType);
+    /*必须$结尾，因为url中间有可能存在apng_
+    content/22/gallery/apng_70fe7a26b9208e74451c6262fd253cd2_a*/
+    url = url.replace(/.png$|.jpg$/, brModelType);
   }
 
   /**
@@ -51472,7 +51476,7 @@ var createHTML = function createHTML(_ref) {
 
   //增加一个main-content放body内容
   //增加一个header-footer放溢出的页眉页脚
-  return String.styleFormat('<li id="' + prefix + '"\n         data-chapter-index="' + base.chapterIndex + '"\n         data-chapter-id="' + pageData._id + '"\n         data-type="' + base.pageType + '"\n         data-container="true"\n         class="xut-flip preserve-3d"\n         style="width:' + getStyle.visualWidth + 'px;\n                height:' + getStyle.visualHeight + 'px;\n                left:' + getStyle.visualLeft + 'px;\n                top:' + getStyle.visualTop + 'px;\n                ' + setTranslate + ';\n                ' + background + '\n                ' + customStyle + '">\n        <div class="page-scale">\n            <div data-type="main-content"></div>\n            <div data-type="header-footer"></div>\n        </div>\n    </li>');
+  return String.styleFormat('<li id="' + prefix + '"\n         data-type="' + base.pageType + '"\n         data-chapter-index="' + base.chapterIndex + '"\n         data-container="true"\n         class="xut-flip preserve-3d"\n         style="width:' + getStyle.visualWidth + 'px;\n                height:' + getStyle.visualHeight + 'px;\n                left:' + getStyle.visualLeft + 'px;\n                top:' + getStyle.visualTop + 'px;\n                ' + setTranslate + ';\n                ' + background + '\n                ' + customStyle + '">\n        <div class="page-scale">\n            <div data-type="main-content"></div>\n            <div data-type="header-footer"></div>\n        </div>\n    </li>');
 };
 
 /**
@@ -51515,7 +51519,7 @@ var TaskContainer = function (base, pageData, taskCallback) {
   var $pageNode = void 0;
   var $pseudoElement = void 0;
 
-  var prefix = base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId;
+  var prefix = Xut.View.GetPageNodeIdName(base.pageType, base.pageIndex, base.chapterId);
   var getStyle = base.getStyle;
 
   //iboosk编译
@@ -64555,7 +64559,7 @@ var Media = {
     var mediaType = titleCase(category);
 
     /*默认状态*/
-    var imageBackground = startImage;
+    var imageBackground = startImage || '';
 
     /*
     音频在创建dom的时候需要查下
@@ -64577,13 +64581,13 @@ var Media = {
     }
 
     /*是否隐藏,如果隐藏通过脚本调用*/
-    var visibility = display === 'hidden' ? "visibility:hidden" : '';
+    var visibility = display === 'hidden' ? "visibility:hidden;" : '';
 
     //创建音频对象
     //Webpage_1
     //Audio_1
     //Video_1
-    var html = String.styleFormat('<div id="' + (mediaType + "_" + _id) + '"\n            data-belong="' + pageType + '"\n            data-delegate="' + category + '"\n            style="width:' + scaleWidth + 'px;\n                   height:' + scaleHeight + 'px;\n                   left:' + scaleLeft + 'px;\n                   top:' + scaleTop + 'px;\n                   z-index:' + zIndex + ';\n                   ' + visibility + ';\n                   ' + imageBackground + '\n                   background-size:100% 100%;\n                   position:absolute;">\n            ' + mediaIcon + '\n       </div>');
+    var html = String.styleFormat('<div id="' + (mediaType + "_" + _id) + '"\n            data-belong="' + pageType + '"\n            data-delegate="' + category + '"\n            style="width:' + scaleWidth + 'px;\n                   height:' + scaleHeight + 'px;\n                   left:' + scaleLeft + 'px;\n                   top:' + scaleTop + 'px;\n                   z-index:' + zIndex + ';\n                   ' + visibility + '\n                   ' + imageBackground + '\n                   background-size:100% 100%;\n                   position:absolute;">\n            ' + mediaIcon + '\n       </div>');
 
     return {
       html: html,
@@ -64610,6 +64614,12 @@ var Media = {
     if (category == 'audio') {
       autoAudio(chapterId, id, onlyCreateOnce(id));
     } else {
+      /*通过id搜索*/
+      rootNode = rootNode.closest('#' + Xut.View.GetPageNodeIdName(pageType, pageIndex, chapterId));
+      if (!rootNode.length) {
+        /*自动ppt视频，是采用的li父节点，所以这里需要处理下*/
+        rootNode = rootNode.closest('li');
+      }
       autoVideo({
         pageType: pageType,
         rootNode: rootNode,
@@ -74602,6 +74612,15 @@ function extendView($$mediator, access, $$globalSwiper) {
 
   var options = $$mediator.options;
 
+  /**
+   * 获取页面根节点的ID命名规则
+   * chapterId是页面ID编号
+   * base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId
+   */
+  Xut.View.GetPageNodeIdName = function (pageType, pageIndex, chapterId) {
+    return pageType + '-' + (pageIndex + 1) + '-' + chapterId;
+  };
+
   //========================
   //  页面工具栏按钮
   //========================
@@ -79601,7 +79620,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 887.6;
+Xut.Version = 887.8;
 
 /*加载应用app*/
 var initApp = function initApp() {

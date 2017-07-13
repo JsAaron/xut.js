@@ -31,9 +31,8 @@ const createHTML = function ({
   //增加一个header-footer放溢出的页眉页脚
   return String.styleFormat(
     `<li id="${prefix}"
-         data-chapter-index="${base.chapterIndex}"
-         data-chapter-id="${pageData._id}"
          data-type="${base.pageType}"
+         data-chapter-index="${base.chapterIndex}"
          data-container="true"
          class="xut-flip preserve-3d"
          style="width:${getStyle.visualWidth}px;
@@ -92,7 +91,7 @@ export default function (base, pageData, taskCallback) {
   let $pageNode
   let $pseudoElement
 
-  const prefix = base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId
+  const prefix = Xut.View.GetPageNodeIdName(base.pageType, base.pageIndex, base.chapterId)
   const getStyle = base.getStyle
 
   //iboosk编译

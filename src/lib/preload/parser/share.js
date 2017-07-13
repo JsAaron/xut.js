@@ -27,9 +27,11 @@ export class Share {
 
   destory() {
     for (let i = 0; i < this.cache.length; i++) {
-      this.cache[i].src = null;
-      this.cache[i].removeAttribute("src")
-      this.cache[i] = null
+      if (this.cache[i]) {
+        this.cache[i].src = null;
+        this.cache[i].removeAttribute("src")
+        this.cache[i] = null
+      }
     }
   }
 

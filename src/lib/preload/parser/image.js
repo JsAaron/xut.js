@@ -35,7 +35,9 @@ export function imageParse(url, callback) {
   /**如果有缓存图片的后缀*/
   const brModelType = config.launch.brModelType
   if (brModelType) {
-    url = url.replace(/.png|.jpg/, brModelType)
+    /*必须$结尾，因为url中间有可能存在apng_
+    content/22/gallery/apng_70fe7a26b9208e74451c6262fd253cd2_a*/
+    url = url.replace(/.png$|.jpg$/, brModelType)
   }
 
   /**

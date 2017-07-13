@@ -8,6 +8,15 @@ export function extendView($$mediator, access, $$globalSwiper) {
 
   const options = $$mediator.options
 
+  /**
+   * 获取页面根节点的ID命名规则
+   * chapterId是页面ID编号
+   * base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId
+   */
+  Xut.View.GetPageNodeIdName = function (pageType, pageIndex, chapterId) {
+    return `${pageType}-${pageIndex+1}-${chapterId}`
+  }
+
   //========================
   //  页面工具栏按钮
   //========================
