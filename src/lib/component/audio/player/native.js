@@ -49,8 +49,14 @@ export class NativeAudio extends AudioSuper {
       this._createContext();
     } else {
       this.audio = new Audio(this.$$url)
-      this._needFix = true
-      this._initPlay(true)
+      //如果是在微信中
+      if (window.WeixinJSBridge) {
+        //通过微信自己的事件处理，支持自动播放了
+        this._startPlay()
+      } else {
+        this._needFix = true
+        this._initPlay(true)
+      }
     }
   }
 
@@ -146,9 +152,11 @@ export class NativeAudio extends AudioSuper {
   _destroy() {
     if (this.audio) {
       this.audio.pause();
-      this.audio.removeEventListener('loadedmetadata', this._startBack, false)
-      this.audio.removeEventListener('ended', this._endBack, false)
-      this.audio.removeEventListener('error', this._errorBack, false)
+      if (!window.WeixinJSBridge) {//微信通过自己API 没有绑定事件
+        this.audio.removeEventListener('loadedmetadata', this._startBack, false)
+        this.audio.removeEventListener('ended', this._endBack, false)
+        this.audio.removeEventListener('error', this._errorBack, false)
+      }
       this.audio = null;
     }
   }
@@ -169,7 +177,6 @@ export class NativeAudio extends AudioSuper {
    * this.status === ready
    */
   resetContext() {
-
     /*如果不需要修复或者播放结束了*/
     if (!this._needFix || this.status === 'ended') {
       return

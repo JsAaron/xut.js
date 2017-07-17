@@ -141,7 +141,7 @@ export default class AudioSuper {
       //支持自动播放,微信上单独处理
       if (window.WeixinJSBridge) {
         window.WeixinJSBridge.invoke('getNetworkType', {}, (e) => {
-          this.audio.play();
+          this.audio && this.audio.play();
         })
       } else {
         this.audio.play();

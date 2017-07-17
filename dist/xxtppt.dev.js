@@ -48359,7 +48359,7 @@ var AudioSuper = function () {
         //支持自动播放,微信上单独处理
         if (window.WeixinJSBridge) {
           window.WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
-            _this2.audio.play();
+            _this2.audio && _this2.audio.play();
           });
         } else {
           this.audio.play();
@@ -48751,8 +48751,14 @@ var NativeAudio = function (_AudioSuper) {
         this._createContext();
       } else {
         this.audio = new Audio(this.$$url);
-        this._needFix = true;
-        this._initPlay(true);
+        //如果是在微信中
+        if (window.WeixinJSBridge) {
+          //通过微信自己的事件处理，支持自动播放了
+          this._startPlay();
+        } else {
+          this._needFix = true;
+          this._initPlay(true);
+        }
       }
     }
 
@@ -48866,9 +48872,12 @@ var NativeAudio = function (_AudioSuper) {
     value: function _destroy() {
       if (this.audio) {
         this.audio.pause();
-        this.audio.removeEventListener('loadedmetadata', this._startBack, false);
-        this.audio.removeEventListener('ended', this._endBack, false);
-        this.audio.removeEventListener('error', this._errorBack, false);
+        if (!window.WeixinJSBridge) {
+          //微信通过自己API 没有绑定事件
+          this.audio.removeEventListener('loadedmetadata', this._startBack, false);
+          this.audio.removeEventListener('ended', this._endBack, false);
+          this.audio.removeEventListener('error', this._errorBack, false);
+        }
         this.audio = null;
       }
     }
@@ -48892,7 +48901,6 @@ var NativeAudio = function (_AudioSuper) {
   }, {
     key: 'resetContext',
     value: function resetContext() {
-
       /*如果不需要修复或者播放结束了*/
       if (!this._needFix || this.status === 'ended') {
         return;
@@ -79620,7 +79628,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 887.8;
+Xut.Version = 887.9;
 
 /*加载应用app*/
 var initApp = function initApp() {
