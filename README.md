@@ -7,7 +7,7 @@ Here, I use the front-end implementation of the project core
 <p align="center">
   <b>Supporting xut.js:</b>
   <br><br>
-  <a href="https://www.miaomiaoxue.com">
+  <a href="http://www.miaomiaoxue.com">
     <img width="200px" src="https://github.com/JsAaron/res/blob/master/mmx.png">
   </a>
   <br><br>
@@ -22,10 +22,11 @@ Here, I use the front-end implementation of the project core
   <a href="http://www.cnblogs.com/aaronjs/p/4912316.html">
     <img width="200px" src="https://github.com/JsAaron/res/blob/master/tool.png">
   </a>
+  <br><br>
+  <a href="www.docooldigest.com">
+    <img width="200px" src="https://github.com/JsAaron/res/blob/master/mini.png">
+  </a>
 </p>
-
-
-
 
 * Web page: [miaomiaoxue](http://www.miaomiaoxue.com/)
 * Mobile application: [appone](http://www.appone.cn/)
@@ -33,7 +34,6 @@ Here, I use the front-end implementation of the project core
 * Packer application：[kidreadcool](http://www.kidreadcool.com/)
 * Mini magazine: [test app](http://www.docooldigest.com)
 * Support more platforms........
-
 
 What is xut.js?
 -----------------------------------
