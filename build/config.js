@@ -54,7 +54,7 @@ const webpackConfig = {
   },
   debug: {},
   assetsName: 'xut.js',
-  assetsRootPath: resolve('/temp'), //临时编译文件
+  assetsRootPath: resolve('/template/compile'), //临时编译文件
   assetsPublicPath: '/',
 
 

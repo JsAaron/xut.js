@@ -1,5 +1,6 @@
 const webpack = require('webpack')
 const merge = require('webpack-merge')
+const util = require('../util')
 
 //https://github.com/ampedandwired/html-webpack-plugin
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -35,10 +36,12 @@ module.exports = function(config) {
       new webpack.HotModuleReplacementPlugin(),
       new webpack.NoEmitOnErrorsPlugin(),
 
+      //https://segmentfault.com/a/1190000008590102
       new HtmlWebpackPlugin({
-        filename: './index.html',
-        template: './template/index.html',
-        inject: 'head'
+        filename: util.joinPath(config.assetsRootPath, 'index.html'),
+        template: util.joinPath(config.templateDirPath, 'index.html'),
+        inject: 'head',
+        hash: true
       }),
 
       new WriteFilePlugin()

@@ -26,17 +26,17 @@
 
 </html>
 <script type="text/javascript">
-
-
 Xut.Application.setConfig = {
   lauchMode: 1,
-  // preload: true,
-  visualMode: 1,
+  preload: true,
+  visualMode: 5,
   // platform: 'mini',
   historyMode: true,
   launchAnim: false,
   // convert: 'svg',
   doublePageMode: false,
+
+  brModel: 1, //图片模式
 
   // columnCheck:true,
 
@@ -49,18 +49,17 @@ Xut.Application.setConfig = {
   // convert: 'svg', //转化资源svg转化成js
   // platform 平台
   // visualMode:1,2,3,4 页面模式
-  // brModel: 1, //图片模式
   // columnCheck:false, //分栏检测
   // doublePageMode: false //双页模式
   // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
   pageBar: {
     type: ['scrollbar', 'digital']
-      // direction:''
-      // mode: 1,
-      // position: {
-      //     top: '90%',
-      //     left: '20%'
-      // }
+    // direction:''
+    // mode: 1,
+    // position: {
+    //     top: '90%',
+    //     left: '20%'
+    // }
   },
   // quickFlip:true,//是否支持快速翻页
   // supportQR: true, //是否启动二维码
@@ -83,19 +82,10 @@ Xut.Application.setConfig = {
   // convert: 'svg', //转化资源svg转化成js
 };
 
-Xut.Application.Watch('initComplete', function() {
-  // console.log(1)
-})
+Xut.Application.Watch('initComplete', function() {})
+Xut.Application.Watch('trackCode', function(type, options) {})
 
-
-Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type, options)
-})
-
-
-
-
-var appId = 101 //306
+var appId = 22 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪
@@ -117,4 +107,5 @@ $("#activate").click(function() {
 $("#closeMini").click(function() {
   Xut.Application.Exit()
 })
+
 </script>

@@ -19,7 +19,7 @@ const filterRE = createRE()
 //./build/dev/test.js
 //build/dev/webpack.dev.conf.js
 const excludeDel = new RegExp(".git|epub|.svn|README.md|README|README.gif|安装说明.docx", "i")
-const excludeCopy = new RegExp("^./test|^./template/content|^./node_modules|^./.svn|^./release/|^./temp/", "i")
+const excludeCopy = new RegExp("^./test|^./template/content|^./template/compile|^./node_modules|^./.svn|^./release/|^./temp/", "i")
 
 console.log(
   '【Regular filter】\n' +
