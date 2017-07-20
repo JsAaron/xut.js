@@ -1,7 +1,7 @@
 const beautify = require('js-beautify').js_beautify
 const fs = require('fs')
 const path = require('path');
-const utils = require('./utils')
+const util = require('./util')
 
 function formatJS(filename) {
   let data = fs.readFileSync(filename, 'utf8')
@@ -58,4 +58,4 @@ function ls(src) {
 
 ls('src/lib')
 
-utils.log(`The format of the file number：${count}`, 'debug')
+util.log(`The format of the file number：${count}`, 'debug')

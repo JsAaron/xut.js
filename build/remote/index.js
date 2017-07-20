@@ -1,6 +1,6 @@
 const bs = require("browser-sync");
 const watch = require('gulp-watch');
-const config = require('../../config')
+const config = require('../config')
 const build = require('../build/build')
 
 const noop = function() {}

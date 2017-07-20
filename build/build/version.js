@@ -1,28 +1,28 @@
 const fs = require('fs')
-const utils = require('../utils')
+const util = require('../util')
+
 const readFile = (path) => {
-    return fs.readFileSync(path, {
-        flag: 'r+',
-        encoding: 'utf8'
-    })
+  return fs.readFileSync(path, {
+    flag: 'r+',
+    encoding: 'utf8'
+  })
 }
 
 const writeFile = (filename, content) => {
-    fs.writeFileSync(filename, content, {
-        encoding: 'utf8',
-        flag: 'w+'
-    })
+  fs.writeFileSync(filename, content, {
+    encoding: 'utf8',
+    flag: 'w+'
+  })
 }
 
-module.exports = (conf) => {
-    return new Promise((resolve, reject) => {
-        let rpath = conf.distDir + conf.devName
-        let wpath = conf.distDir + 'version.js'
-        let data = readFile(rpath)
-        let vs = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
-        utils.log(`【create Xut.Version = ${vs}】`, 'debug')
-        writeFile(wpath, vs)
-        writeFile('./template/test/lib/version.js', vs)
-        resolve && resolve()
-    })
+module.exports = (config) => {
+  return new Promise((resolve, reject) => {
+    const rPath = util.joinPath(config.distDirPath, config.devName)
+    const wPath = util.joinPath(config.distDirPath, 'version.js')
+    const data = readFile(rPath)
+    const vs = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
+    util.log(`【create Xut.Version = ${vs}】`, 'debug')
+    writeFile(wPath, vs)
+    resolve && resolve()
+  })
 }

@@ -5,7 +5,7 @@ const fs = require('fs');
 const fsextra = require('fs-extra')
 const _ = require("underscore")
 const sqlite = require('./sqlite/index')
-const utils = require('../utils')
+const util = require('../util')
 
 /*数据库**/
 const GALLERY = 'gallery'
@@ -53,7 +53,7 @@ const createJsonData = function(listPath) {
   /*如果转化的文件不存在*/
   if (!fs.existsSync(path + '/SQLResult.js')) {
     sqlite.resolve(path, path + '/' + DBNAME, function() {
-      utils.log(`create json data: ${path + '/SQLResult.js'}`)
+      util.log(`create json data: ${path + '/SQLResult.js'}`)
       createJsonData(listPath)
     })
   } else {

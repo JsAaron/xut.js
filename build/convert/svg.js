@@ -6,7 +6,7 @@
 const stats = []
 const fs = require("fs")
 const _ = require("underscore")
-const utils = require('../utils')
+const util = require('../util')
 
 const readFile = (path) => {
   let data = fs.readFileSync(path, {
@@ -37,17 +37,17 @@ const convertFile = function(path) {
   if (exists) {
     let data = readFile(convertedPath)
     if (data) {
-      utils.log(`conver svg:${data} --- ${path}`, 'info')
+      util.log(`conver svg:${data} --- ${path}`, 'info')
       return
     }
   }
 
-  // utils.log(`start convert svg --- ${path}`, 'cyan')
+  // util.log(`start convert svg --- ${path}`, 'cyan')
 
   let files = fs.readdirSync(path)
 
   if (!files.length) {
-    utils.log(`empty file --- ${path}`, 'error')
+    // util.log(`empty file --- ${path}`, 'error')
     return
   }
 
@@ -61,7 +61,7 @@ const convertFile = function(path) {
 
 
   if (!svgfiles.length) {
-    utils.log(`empty svg file --- ${path}`, 'cyan')
+    // util.log(`empty svg file --- ${path}`, 'cyan')
     return
   }
 
@@ -85,14 +85,14 @@ const convertFile = function(path) {
 
     handle = writeFile(path + '/' + filename + '.js', str)
     if (handle) {
-      utils.log(`convert svg failure`)
+      util.log(`convert svg failure`)
       return
     } else {
-      // utils.log(`converted svg is ${readPath}`)
+      util.log(`converted svg is ${readPath}`)
     }
 
     if (!count) {
-      utils.log(`convert ${total} files`)
+      util.log(`convert ${total} files`)
       writeFile(convertedPath, total)
       return
     }

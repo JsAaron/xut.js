@@ -1,51 +1,51 @@
 const fs = require('fs')
 const http = require('http');
-const express = require('express')
-const webpack = require('webpack')
+const path = require('path')
+const cp = require('child_process');
+
+const _ = require("underscore");
 const open = require("open");
 const watch = require('gulp-watch');
-const path = require('path')
-const _ = require("underscore");
+const express = require('express')
+const webpack = require('webpack')
 const fsextra = require('fs-extra')
-const cp = require('child_process');
-const utils = require('../utils')
+
+const util = require('../util')
+const execDebug = require('../debug/index')
 
 //https://github.com/webpack/webpack-dev-middleware#usage
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpacHotMiddleware = require('webpack-hot-middleware')
 const killOccupied = require('../kill.occupied')
 const convert = require('../convert/index')
-// const cssWatcher = require('../cssWatcher')
-
 const app = express()
-const config = require('../../config')
-const port = process.env.PORT || config.dev.port
 
-const devConfig = _.extend(config.dev.conf, {
-  rollup: config.dev.conf.distDir + 'rollup.js'
-})
+const buildName = process.argv[process.argv.length - 1] || 'webpack-full-dev'
+const config = require('../config')(buildName)
+const port = config.port
 
 /**
  * 转化
  * 1 数据 db-json
  * 2 文件 svg-js
  */
-convert(devConfig.srcDir)
+convert(config.templateDirPath)
 
-fsextra.removeSync(devConfig.assetsRoot)
-fsextra.mkdirSync(devConfig.assetsRoot);
+//清理temp目录
+fsextra.removeSync(config.assetsRootPath)
+fsextra.mkdirSync(config.assetsRootPath)
 
-const webpackConfig = require('./webpack.dev.conf')
+const webpackConfig = require('./webpack.config')(config)
 
-
-/*eslint
-  https://segmentfault.com/a/1190000008575829?utm_source=itdadao&utm_medium=referral
-*/
-if (config.dev.eslint.launch) {
+/**
+ *  eslint
+ *  https://segmentfault.com/a/1190000008575829?utm_source=itdadao&utm_medium=referral
+ **/
+if (config.eslint.launch) {
   webpackConfig.module.rules.push({
     test: /\.js$/,
     enforce: "pre", //在babel-loader对源码进行编译前进行lint的检查
-    include: config.dev.eslint.includePath,
+    include: config.eslint.includePath,
     exclude: /node_modules/,
     use: [{
       loader: "eslint-loader",
@@ -89,11 +89,7 @@ compiler.plugin('compilation', (compilation) => {
     cb()
   })
 })
-// cssWatcher(devConfig.srcDir,function() {
-//    hotMiddleware.publish({
-//       action: 'reload'
-//     })
-// })
+
 // serve webpack bundle output
 app.use(devMiddleware)
 
@@ -101,47 +97,20 @@ app.use(devMiddleware)
 // compilation error display
 app.use(hotMiddleware)
 
-app.use('/lib', express.static('src/lib'));
-app.use('/css', express.static('src/css'));
-app.use('/images', express.static('src/images'));
-app.use('/content', express.static('src/content'));
+app.use('/src', express.static('template/src'));
+app.use('/css', express.static('template/css'));
+app.use('/images', express.static('template/images'));
+app.use('/content', express.static('template/content'));
 
 
 let first = true
-let preChildRun = null
-
-/*
-如果packMode模式是rollup
-那么优化第一次采用all的方式,必须先生成一次External文件
-之后全用rollup
- */
-let packMode = config.debug.packMode
-if (config.debug.launch && config.debug.packMode === 'rollup') {
-  packMode = 'all'
-}
-
-watch(devConfig.assetsRoot + '/app.js', () => {
-  if (config.dev.openBrowser && first) {
+watch(path.join(config.assetsRootPath, config.assetsName), () => {
+  if (config.openBrowser && first) {
     open("http://localhost:" + port)
     first = false
   }
   if (config.debug.launch) {
-    utils.log("\nDebug Mode: Packed File", 'red')
-    if (preChildRun) {
-      preChildRun.kill()
-      preChildRun = null
-    }
-    let child = cp.spawn('node', [
-      'build/debug/index.js', [config.debug.path, packMode, config.debug.uglify]
-    ])
-    const start = (new Date().getSeconds())
-    child.stdout.on('data', (data) => utils.log('\n' + data))
-    child.stderr.on('data', (data) => utils.log('fail out：\n' + data));
-    child.on('close', (code) => {
-      packMode = config.debug.packMode
-      utils.log(`Completion time：${(new Date().getSeconds()) - start}s`)
-    });
-    preChildRun = child
+    execDebug(config)
   }
 })
 
@@ -149,9 +118,9 @@ watch(devConfig.assetsRoot + '/app.js', () => {
 killOccupied(port, () => {
   app.listen(port, (err) => {
     if (err) {
-      utils.log(err)
+      util.log(err)
       return
     }
-    utils.log('Listening at http://localhost:' + port + '\n')
+    util.log('Listening at http://localhost:' + port + '\n')
   })
 })

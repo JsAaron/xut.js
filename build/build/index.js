@@ -1,27 +1,32 @@
 const rollup = require('../rollup.base.conf')
-const getScript = require('../external.script')
-const compilerCSS = require('./compiler.css')
-const compilerJs = require('./compiler.js')
-const version = require('./version')
-const _ = require("underscore");
-const config = require('../../config')
 
-const buildConfig = _.extend(config.build.conf, {
-  rollup: config.build.conf.distDir + 'rollup.dev.js',
-  exclude: config.build.exclude,
-  server: config.build.server
-})
+const compileExternal = require('../external.script')
+const compileJs = require('./compile.js')
+const compileCSS = require('./compile.css')
+const buildVersion = require('./version')
 
-rollup(buildConfig)
-  .then(() => {
-    return getScript(buildConfig.srcDir, buildConfig.exclude)
+const buildName = process.argv[process.argv.length - 1] || 'webpack-full-dev'
+const config = require('../config')(buildName)
+
+rollup({
+    entry: config.entry,
+    aliases:config.aliases,
+    distDirPath: config.distDirPath,
+    rollupDevFilePath: config.rollupDevFilePath
   })
-  .then((scriptUrl) => {
-    return compilerJs(buildConfig, scriptUrl)
+  .then(() => {
+    return compileExternal({
+      exclude: config.exclude,
+      templateDirPath: config.templateDirPath,
+      externalFiles: config.externalFiles
+    })
+  })
+  .then((scriptUrls) => {
+    return compileJs(config, scriptUrls)
   })
   .then(() => {
-    return version(buildConfig)
+    return buildVersion(config)
   })
   .then(() => {
-    return compilerCSS(buildConfig)
+    return compileCSS(config)
   })

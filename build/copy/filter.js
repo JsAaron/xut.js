@@ -17,11 +17,11 @@ const excludeKeywords = [
   'epub',
   'node_modules',
   'temp',
-  'template',
+  // 'test',
   // 'dist',
-  'src/*.number',
-  'src/content',
-  'src/test'
+  // 'src/*.number',
+  'template/content',
+  'template/test'
 ]
 
 

@@ -6,6 +6,8 @@ const _ = require("underscore");
 const createRE = require('./filter')
 
 const src = '.'
+
+//复制文件目录
 const dists = [
   '/Users/mac/project/git/xut.js/'
   // '/Users/mac/project/svn/server/magazine-develop/www/'
@@ -16,8 +18,8 @@ const filterRE = createRE()
 //./build/.config.js
 //./build/dev/test.js
 //build/dev/webpack.dev.conf.js
-const segmentation = new RegExp("[.]?\\w+([.]?\\w*)*", "ig")
-const excludeRE = new RegExp(".git|epub|.svn|README.md|README|README.gif|安装说明.docx", "ig")
+const excludeDel = new RegExp(".git|epub|.svn|README.md|README|README.gif|安装说明.docx", "i")
+const excludeCopy = new RegExp("^./test|^./template/content|^./node_modules|^./.svn|^./release/|^./temp/", "i")
 
 console.log(
   '【Regular filter】\n' +
@@ -28,26 +30,26 @@ console.log(
 const del = (dist) => {
   var files = fs.readdirSync(dist);
   for (file of files) {
-    if (!excludeRE.test(file)) {
+    if (!excludeDel.test(file)) {
       fsextra.removeSync(dist + file)
     }
   }
   console.log('del: ' + dist)
 }
 
-const ls = (src, dist) => {
+const copy = (src, dist) => {
   var files = fs.readdirSync(src);
   for (fn in files) {
     var rootPath = src + path.sep
     var filename = rootPath + files[fn]
     var stat = fs.lstatSync(filename);
     if (stat.isDirectory() == true) {
-      ls(filename, dist)
+      copy(filename, dist)
     } else {
-      if (!filterRE.test(rootPath)) {
+      if (!excludeCopy.test(rootPath)) {
         fsextra.copySync(filename, dist + filename)
       } else {
-        // console.log(111,filename)
+        // console.log(src)
       }
     }
   }
@@ -56,6 +58,6 @@ const ls = (src, dist) => {
 
 dists.forEach((dist) => {
   del(dist)
-  ls(src, dist)
+  copy(src, dist)
   console.log('copy: ' + dist)
 })
