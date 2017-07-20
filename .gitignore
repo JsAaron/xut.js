@@ -9,3 +9,5 @@ src/content
 lib/.tags
 lib/.tags_sorted_by_file
 
+/template/content
+/template/compile
