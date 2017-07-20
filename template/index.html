@@ -30,8 +30,8 @@
 
 Xut.Application.setConfig = {
   lauchMode: 1,
-  preload: true,
-  visualMode: 5,
+  // preload: true,
+  visualMode: 1,
   // platform: 'mini',
   historyMode: true,
   launchAnim: false,
@@ -49,7 +49,7 @@ Xut.Application.setConfig = {
   // convert: 'svg', //转化资源svg转化成js
   // platform 平台
   // visualMode:1,2,3,4 页面模式
-  brModel: 1, //图片模式
+  // brModel: 1, //图片模式
   // columnCheck:false, //分栏检测
   // doublePageMode: false //双页模式
   // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
@@ -95,7 +95,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 
 
 
-var appId = 22 //306
+var appId = 101 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

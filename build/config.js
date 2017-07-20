@@ -13,7 +13,7 @@ const resolve = (p) => {
  * 公共配置
  */
 const common = {
-  entry: resolve('template/src/core/index'), //入口
+  entry: resolve('src/core/index'), //入口
 
   //生成名称
   devName: 'xxtppt.dev.js',
@@ -59,7 +59,7 @@ const webpackConfig = {
 
 
   //外加列表的所有文件
-  externalFiles: require('../template/src/external/load.js'),
+  externalFiles: require('../src/external/load.js'),
   /**
    * index中排除的文件
    * @type {Array}

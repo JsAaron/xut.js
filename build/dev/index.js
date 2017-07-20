@@ -97,7 +97,7 @@ app.use(devMiddleware)
 // compilation error display
 app.use(hotMiddleware)
 
-app.use('/src', express.static('template/src'));
+app.use('/src', express.static('src'));
 app.use('/css', express.static('template/css'));
 app.use('/images', express.static('template/images'));
 app.use('/content', express.static('template/content'));

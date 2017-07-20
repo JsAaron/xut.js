@@ -112,8 +112,8 @@ function masterHandle(childData) {
   let masterId = childData
   let masterData = preloadData[masterId]
   if (masterData) {
-    return function (callback) {
-      loadResource(masterData, function () {
+    return function(callback) {
+      loadResource(masterData, function() {
         /*删除母版数据，多个Page会共享同一个母版加载*/
         deleteResource(masterId)
         callback()
@@ -130,7 +130,7 @@ function masterHandle(childData) {
 function pageHandle(type, childData, parser) {
   childData = pathHooks[type](childData)
   let total = childData.length
-  return function (callback) {
+  return function(callback) {
     let section = getNumber()
 
     /**
@@ -178,7 +178,7 @@ function pageHandle(type, childData, parser) {
 
       function reduce(path) {
         detectObjs[path] = new Detect(parser, path)
-        detectObjs[path].start(2000, function (state) {
+        detectObjs[path].start(2000, function(state) {
           if (state) {
             /*如果请求成功了，就必须销毁*/
             detectObjs[path].destory()
@@ -243,52 +243,52 @@ function loadResource(data, callback) {
  */
 function repeatCheck(id, callback) {
 
-    //判断是否所有页面加载完毕
-    const completeLoad = function() {
-        /*如果加载数等于总计量数，这个证明加载完毕*/
-        if (id === chapterIdCount) {
-            $warn('全部预加载完成')
-            $setStorage('preload', checkFigure.url)
-            clearAudio()
-            clearImage()
-            return true
-        }
-        return false
-    }
-
-    /*第一次加载才有回调*/
-    if (callback) {
-        callback()
-        if (completeLoad()) {
-            return;
-        }
-        return
-    }
-
-    /*执行预加载等待的回调通知对象*/
-    if (notification) {
-        const newChapterId = notification[0]
-        if (id === newChapterId) {
-            /*如果下一个解析正好是等待的页面*/
-            notification[1]()
-            notification = null
-        } else {
-            /*跳转页面的情况， 如果不是按照顺序的预加载方式*/
-            nextTask(newChapterId)
-            return
-        }
-    }
-
-
+  //判断是否所有页面加载完毕
+  const completeLoad = function() {
     /*如果加载数等于总计量数，这个证明加载完毕*/
-    if (completeLoad()) {
-        return;
+    if (id === chapterIdCount) {
+      $warn('全部预加载完成')
+      $setStorage('preload', checkFigure.url)
+      clearAudio()
+      clearImage()
+      return true
     }
+    return false
+  }
 
-    /*启动了才继续可以预加载*/
-    if (enable) {
-        nextTask()
+  /*第一次加载才有回调*/
+  if (callback) {
+    callback()
+    if (completeLoad()) {
+      return;
     }
+    return
+  }
+
+  /*执行预加载等待的回调通知对象*/
+  if (notification) {
+    const newChapterId = notification[0]
+    if (id === newChapterId) {
+      /*如果下一个解析正好是等待的页面*/
+      notification[1]()
+      notification = null
+    } else {
+      /*跳转页面的情况， 如果不是按照顺序的预加载方式*/
+      nextTask(newChapterId)
+      return
+    }
+  }
+
+
+  /*如果加载数等于总计量数，这个证明加载完毕*/
+  if (completeLoad()) {
+    return;
+  }
+
+  /*启动了才继续可以预加载*/
+  if (enable) {
+    nextTask()
+  }
 }
 
 
@@ -306,7 +306,7 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   const pageData = preloadData[chapterId]
 
-  const complete = function (info) {
+  const complete = function(info) {
     // $warn(`${info}:${chapterId}`)
     deleteResource(chapterId)
     repeatCheck(loadingId, callback)
@@ -348,14 +348,14 @@ function checkCache(finish, next) {
  */
 export function initPreload(total, callback) {
 
-  const close = function () {
+  const close = function() {
     preloadData = null
     config.launch.preload = false
     callback()
   }
 
-  const start = function () {
-    nextTask('', function () {
+  const start = function() {
+    nextTask('', function() {
       $warn('预加载资源总数：' + total);
       /*监听预加载初四华*/
       watchPreloadInit()
@@ -363,7 +363,7 @@ export function initPreload(total, callback) {
     })
   }
 
-  loadFile(config.data.pathAddress + 'preload.js', function () {
+  loadFile(config.data.pathAddress + 'preload.js', function() {
     if (window.preloadData) {
       chapterIdCount = total
       preloadData = window.preloadData
@@ -384,16 +384,16 @@ export function initPreload(total, callback) {
  */
 function watchPreloadInit() {
 
-   //如果预加载的只有1页数据 判断第一页加载完成后return
-    if (!preloadData[chapterIdCount]) {
-        return
-    }
+  //如果预加载的只有1页数据 判断第一页加载完成后return
+  if (!preloadData[chapterIdCount]) {
+    return
+  }
 
   let timer = null
   let count = 2
 
   /*从第二次开始加载数据*/
-  const start = function (type) {
+  const start = function(type) {
     if (count === 2) {
       clearTimeout(timer)
       timer = null
@@ -449,7 +449,7 @@ export function requestInterrupt({
     if (!processed) {
       $warn('预加载必须传递处理器，有错误')
     }
-    notification = [chapterId, function () {
+    notification = [chapterId, function() {
       processed.call(context)
     }]
     return true
