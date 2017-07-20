@@ -8,11 +8,19 @@ Here, I use the front-end implementation of the project core
   <b>Supporting xut.js:</b>
   <br><br>
   <a href="https://www.miaomiaoxue.com">
-    <img width="240px" src="https://github.com/JsAaron/res/blob/master/mmx.png">
+    <img width="200px" src="https://github.com/JsAaron/res/blob/master/mmx.png">
   </a>
   <br><br>
   <a href="http://www.kidreadcool.com/">
-    <img width="240px" src="https://github.com/JsAaron/res/blob/master/duku.png">
+    <img width="200px" src="https://github.com/JsAaron/res/blob/master/duku.png">
+  </a>
+  <br><br>
+  <a href="http://www.appone.cn/">
+    <img width="200px" src="https://github.com/JsAaron/res/blob/master/app.png">
+  </a>
+  <br><br>
+  <a href="http://www.cnblogs.com/aaronjs/p/4912316.html">
+    <img width="200px" src="https://github.com/JsAaron/res/blob/master/tool.png">
   </a>
 </p>
 
