@@ -12,11 +12,11 @@ const resolve = (p) => {
  * 公共配置
  */
 const common = {
-  entry: resolve('src/core/index'), //入口
+  entry: path.normalize(resolve('src/core/index')), //入口
 
   //生成名称
   devName: 'xxtppt.dev.js',
-  distName: 'xxtppt.js',
+  productionName: 'xxtppt.js',
 
   //目录
   srcDirPath: resolve('src'),
@@ -131,13 +131,14 @@ const builds = {
     //version
     const data = util.readFile(resolve('src/core/index.js'))
     const version = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
-
+    webpackConfig.version = version
     webpackConfig.banner =
       '/*!\n' +
       ' * Xut.js v' + version + '\n' +
-      ' * (c) 2010-' + new Date().getFullYear() + ' Aaron\n' +
-      ' * Released under the MIT License.\n' +
-      ' */'
+      ' * Release date '+ new Date().toLocaleDateString() +  '\n' +
+      ' * (c) 2010-' + new Date().getFullYear() + ' @by Aaron\n' +
+      ' * 仅供公司内部使用\n' +
+      ' */\n'
 
     return webpackConfig
   }

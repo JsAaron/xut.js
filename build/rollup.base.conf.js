@@ -3,6 +3,7 @@ const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
 const replace = require('rollup-plugin-replace')
 const alias = require('rollup-plugin-alias')
+const buble = require('rollup-plugin-buble')
 const fsextra = require('fs-extra')
 const util = require('./util')
 const flow = require('rollup-plugin-flow');
@@ -65,22 +66,8 @@ module.exports = ({
           format: 'umd',
           moduleName: 'Aaron'
         }).code
-
+        
         return util.write(rollupDevFilePath, code)
-
-        // if (banner) {
-        //   // var minified = banner + '\n' + uglify.minify(code, {
-        //   //   output: {
-        //   //     ascii_only: true
-        //   //   },
-        //   //   compress: {
-        //   //     pure_funcs: ['makeMap']
-        //   //   }
-        //   // }).code
-        //   // return write(config.dest, minified, true)
-        // } else {
-        //   return util.write(rollupDevFilePath, code)
-        // }
 
       }).then(() => {
         resolve()

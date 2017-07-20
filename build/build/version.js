@@ -17,12 +17,15 @@ const writeFile = (filename, content) => {
 
 module.exports = (config) => {
   return new Promise((resolve, reject) => {
-    const rPath = util.joinPath(config.distDirPath, config.devName)
-    const wPath = util.joinPath(config.distDirPath, 'version.js')
-    const data = readFile(rPath)
-    const vs = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
-    util.log(`【create Xut.Version = ${vs}】`, 'debug')
-    writeFile(wPath, vs)
+    let version = config.version
+    if (!version) {
+      let rPath = util.joinPath(config.distDirPath, config.devName)
+      let data = readFile(rPath)
+      let version = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
+    }
+    const wirtePath = util.joinPath(config.distDirPath, 'version.js')
+    util.log(`【create Xut.Version = ${config.version}】`, 'debug')
+    writeFile(wirtePath, config.version)
     resolve && resolve()
   })
 }
