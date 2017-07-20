@@ -10,7 +10,8 @@ const config = require('../config')(buildName)
 
 rollup({
     entry: config.entry,
-    aliases:config.aliases,
+    banner: config.banner,
+    aliases: config.aliases,
     distDirPath: config.distDirPath,
     rollupDevFilePath: config.rollupDevFilePath
   })

@@ -61,6 +61,14 @@ exports.write = (path, code) => {
   })
 }
 
+exports.readFile = (path) => {
+  return fs.readFileSync(path, {
+    flag: 'r+',
+    encoding: 'utf8'
+  })
+}
+
+
 exports.joinPath = function(base, fileName) {
   return path.join(base, fileName)
 }

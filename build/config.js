@@ -8,7 +8,6 @@ const resolve = (p) => {
   return path.join(rootPath, p)
 }
 
-
 /**
  * 公共配置
  */
@@ -128,7 +127,20 @@ const builds = {
    * 发布版本
    * @return {[type]} [description]
    */
-  'compiler-full': webpackConfig
+  'compiler-full': function() {
+    //version
+    const data = util.readFile(resolve('src/core/index.js'))
+    const version = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
+
+    webpackConfig.banner =
+      '/*!\n' +
+      ' * Xut.js v' + version + '\n' +
+      ' * (c) 2010-' + new Date().getFullYear() + ' Aaron\n' +
+      ' * Released under the MIT License.\n' +
+      ' */'
+
+    return webpackConfig
+  }
 
 }
 

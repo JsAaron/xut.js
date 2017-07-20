@@ -20,6 +20,7 @@ const del = (dist) => {
 //config
 module.exports = ({
   entry,
+  banner,
   aliases,
   distDirPath,
   rollupDevFilePath,
@@ -64,7 +65,23 @@ module.exports = ({
           format: 'umd',
           moduleName: 'Aaron'
         }).code
+
         return util.write(rollupDevFilePath, code)
+
+        // if (banner) {
+        //   // var minified = banner + '\n' + uglify.minify(code, {
+        //   //   output: {
+        //   //     ascii_only: true
+        //   //   },
+        //   //   compress: {
+        //   //     pure_funcs: ['makeMap']
+        //   //   }
+        //   // }).code
+        //   // return write(config.dest, minified, true)
+        // } else {
+        //   return util.write(rollupDevFilePath, code)
+        // }
+
       }).then(() => {
         resolve()
       })
