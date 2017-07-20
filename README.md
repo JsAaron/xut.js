@@ -4,6 +4,13 @@ What can a front-end developer do?
 Front-end can not only write pages, but also to do web applications, mobile, and even desktop programs
 Here, I use the front-end implementation of the project core
 
+* Web page: [miaomiaoxue](http://www.miaomiaoxue.com/)
+* Mobile application: [appone](http://www.appone.cn/)
+* Desktop program: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
+* Packer application：[kidreadcool](http://www.kidreadcool.com/)
+* Mini magazine: [test app](http://www.docooldigest.com)
+* Support more platforms........
+
 <p align="center">
   <b>Supporting xut.js:</b>
   <br><br>
@@ -28,12 +35,6 @@ Here, I use the front-end implementation of the project core
   </a>
 </p>
 
-* Web page: [miaomiaoxue](http://www.miaomiaoxue.com/)
-* Mobile application: [appone](http://www.appone.cn/)
-* Desktop program: [apk to epub](http://www.cnblogs.com/aaronjs/p/4912316.html)
-* Packer application：[kidreadcool](http://www.kidreadcool.com/)
-* Mini magazine: [test app](http://www.docooldigest.com)
-* Support more platforms........
 
 What is xut.js?
 -----------------------------------
