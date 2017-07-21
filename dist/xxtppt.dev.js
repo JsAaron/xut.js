@@ -46468,6 +46468,11 @@ var AsyAccess = function (_Observer) {
         this.asys[position](fn);
       }
     }
+  }, {
+    key: 'destory',
+    value: function destory() {
+      this.asys = [];
+    }
 
     /**
      * 执行
@@ -46479,7 +46484,7 @@ var AsyAccess = function (_Observer) {
     value: function exec() {
       var _this2 = this;
 
-      if (this.asys.length) {
+      if (this.asys && this.asys.length) {
         var next = function next() {
           if (_this2.asys.length) {
             var asy = _this2.asys.shift();
@@ -46734,11 +46739,6 @@ var Detect = function () {
 var enable = true;
 
 /**
- * 预加载的资源列表
- */
-var preloadData = null;
-
-/**
  * 页面chpater Id 总数
  * @type {Number}
  */
@@ -46755,6 +46755,8 @@ var loadingId = 0;
  * @type {Array}
  */
 var notification = null;
+
+var asyObject = null;
 
 /**
  * 用于检测图片是否有缓存的情况
@@ -46784,6 +46786,13 @@ var PARSER = {
   svg: svgParse
 };
 
+function getDataset(id) {
+  if (!window.preloadData) {
+    return '';
+  }
+  return window.preloadData[id];
+}
+
 /**
  * 完成后删除资源的列表
  * 2个好处
@@ -46794,7 +46803,9 @@ var PARSER = {
  * @return {[type]} [description]
  */
 function deleteResource(chaperId) {
-  preloadData[chaperId] = null;
+  if (window.preloadData) {
+    window.preloadData[chaperId] = null;
+  }
 }
 
 /**
@@ -46802,6 +46813,10 @@ function deleteResource(chaperId) {
  * @return {[type]} [description]
  */
 function getNumber() {
+  //退出清理的情况下
+  if (!config.launch) {
+    return false;
+  }
   return typeof config.launch.preload === 'number' ? config.launch.preload : 5;
 }
 
@@ -46812,10 +46827,10 @@ function getNumber() {
  */
 function masterHandle(childData) {
   var masterId = childData;
-  var masterData = preloadData[masterId];
+  var masterData = getDataset(masterId);
   if (masterData) {
     return function (callback) {
-      loadResource(masterData, function () {
+      loadResource(masterId, masterData, function () {
         /*删除母版数据，多个Page会共享同一个母版加载*/
         deleteResource(masterId);
         callback();
@@ -46888,7 +46903,7 @@ function pageHandle(type, childData, parser) {
             addLoop(path, detectObjs[path]);
           }
           detectObjs[path] = null;
-          complete();
+          window.preloadData && complete();
         });
       }
 
@@ -46905,7 +46920,7 @@ function pageHandle(type, childData, parser) {
       }
     }
 
-    segmentHandle();
+    section && segmentHandle();
   };
 }
 
@@ -46923,17 +46938,21 @@ function createHandle(type, childData, parser) {
 /**
  * 开始加载资源
  */
-function loadResource(data, callback) {
-  var asy = new AsyAccess();
+function loadResource(id, data, callback) {
+  asyObject = new AsyAccess();
   for (var key in data) {
     var parser = PARSER[key];
     if (parser) {
       /*audio优先解析*/
-      asy.create(createHandle(key, data[key], parser), key === 'audio' ? 'unshift' : 'push');
+      asyObject.create(createHandle(key, data[key], parser), key === 'audio' ? 'unshift' : 'push');
     }
   }
+
   /*执行后监听,监听完成*/
-  asy.exec().$$watch('complete', callback);
+  asyObject.exec().$$watch('complete', function () {
+    asyObject = null;
+    callback();
+  });
 }
 
 /**
@@ -46950,6 +46969,7 @@ function repeatCheck(id, callback) {
       $setStorage('preload', checkFigure.url);
       clearAudio();
       clearImage();
+      window.preloadData = null; //全加载完毕了，就可以清理了
       return true;
     }
     return false;
@@ -47001,18 +47021,21 @@ function nextTask(chapterId, callback) {
   }
 
   /*只有没有预加载的数据才能被找到*/
-  var pageData = preloadData[chapterId];
+  var pageData = getDataset(chapterId);
 
   var complete = function complete(info) {
-    // $warn(`${info}:${chapterId}`)
-    deleteResource(chapterId);
-    repeatCheck(loadingId, callback);
+    //如果加载了数据，但是数据还未加载完毕
+    if (window.preloadData) {
+      // $warn(`${info}:${chapterId}`)
+      deleteResource(chapterId);
+      repeatCheck(loadingId, callback);
+    }
   };
 
   /*必须保证pageData不是一个空对象*/
   if (pageData && Object.keys(pageData).length) {
     // $warn('----预加资源开始chapterId: ' + chapterId)
-    loadResource(pageData, function () {
+    loadResource(chapterId, pageData, function () {
       return complete('预加资源完成-chapterId');
     });
   } else {
@@ -47047,7 +47070,6 @@ function checkCache(finish, next) {
 function initPreload(total, callback) {
 
   var close = function close() {
-    preloadData = null;
     config.launch.preload = false;
     callback();
   };
@@ -47064,8 +47086,6 @@ function initPreload(total, callback) {
   loadFile(config.data.pathAddress + 'preload.js', function () {
     if (window.preloadData) {
       chapterIdCount = total;
-      preloadData = window.preloadData;
-      window.preloadData = null;
       checkCache(close, start);
     } else {
       close();
@@ -47082,7 +47102,7 @@ function initPreload(total, callback) {
 function watchPreloadInit() {
 
   //如果预加载的只有1页数据 判断第一页加载完成后return
-  if (!preloadData[chapterIdCount]) {
+  if (!getDataset(chapterIdCount)) {
     return;
   }
 
@@ -47134,7 +47154,7 @@ function requestInterrupt(_ref, context) {
 
 
   /*如果不存在预加载数据，就说明加载完毕，或者没有这个数据*/
-  if (!preloadData[chapterId]) {
+  if (!getDataset(chapterId)) {
     return false;
   } else {
     /*正在预加载，等待记录回调*/
@@ -47153,11 +47173,17 @@ function requestInterrupt(_ref, context) {
  * @return {[type]} [description]
  */
 function clearPreload() {
+
+  if (asyObject) {
+    asyObject.destory();
+    asyObject = null;
+  }
+
   checkFigure.url = null;
   enable = true;
   chapterIdCount = 0;
   loadingId = 0;
-  preloadData = null;
+  window.preloadData = null;
   notification = null;
   clearLoop();
 }
@@ -79106,6 +79132,9 @@ function Destroy() {
   /*清理预加载*/
   clearPreload();
 
+  //清理自动运行
+  $stopAutoWatch();
+
   //删除动态加载的两个css文件
   $('link[data-type]').each(function (index, link) {
     var type = link.getAttribute('data-type');
@@ -79224,9 +79253,12 @@ function initApplication() {
    * 退出应用
    */
   Xut.Application.Exit = function () {
-    /*启动代码用户操作跟踪*/
-    config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
-    Destroy('exit');
+    //判断重复调用
+    if (config.launch) {
+      /*启动代码用户操作跟踪*/
+      config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
+      Destroy('exit');
+    }
   };
 
   /**
@@ -79628,7 +79660,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 887.9;
+Xut.Version = 888;
 
 /*加载应用app*/
 var initApp = function initApp() {

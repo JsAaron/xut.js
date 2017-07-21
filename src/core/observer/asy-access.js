@@ -24,12 +24,16 @@ export class AsyAccess extends Observer {
     }
   }
 
+  destory() {
+    this.asys = []
+  }
+
   /**
    * 执行
    * @return {[type]} [description]
    */
   exec() {
-    if (this.asys.length) {
+    if (this.asys && this.asys.length) {
       const next = () => {
         if (this.asys.length) {
           const asy = this.asys.shift()

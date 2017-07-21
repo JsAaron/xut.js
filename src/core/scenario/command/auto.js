@@ -3,12 +3,13 @@
  * @return {[type]} [description]
  */
 
+import { config } from '../../config/index'
 import access from './access'
 import allowNext from './allow-next'
 import directives from '../directive/index'
 import { pushWatcher, clearWatcher } from '../../observer/batcher'
 
-const noop = function () {}
+const noop = function() {}
 
 /**
  * 运行自动的content对象
@@ -54,8 +55,8 @@ const autoComponents = (pageBase, pageIndex, autoData, pageType) => {
 
   _.each(autoData, (data, index) => {
     directive = directives[data.actType]
-      //零件类型的接口调用不一致
-      //这里需要转接口处理
+    //零件类型的接口调用不一致
+    //这里需要转接口处理
     if (directive && directive.autoPlay) {
       directive.autoPlay({
         'id': data.id,
@@ -122,14 +123,14 @@ export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
     /*自动组件*/
     let autoData = pageBase.baseAutoRun()
     if (autoData) {
-      pushWatcher('component', function () {
+      pushWatcher('component', function() {
         autoComponents(pageBase, pageIndex, autoData, pageType)
       })
     }
 
     /*自动content*/
     if (contentObjs) {
-      pushWatcher('content', function () {
+      pushWatcher('content', function() {
         autoContents(contentObjs, taskAnimCallback)
       })
     } else {

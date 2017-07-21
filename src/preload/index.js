@@ -29,11 +29,6 @@ import { Detect } from './detect'
 let enable = true
 
 /**
- * 预加载的资源列表
- */
-let preloadData = null
-
-/**
  * 页面chpater Id 总数
  * @type {Number}
  */
@@ -51,6 +46,8 @@ let loadingId = 0
  */
 let notification = null
 
+
+let asyObject = null
 
 /**
  * 用于检测图片是否有缓存的情况
@@ -81,6 +78,12 @@ const PARSER = {
   svg: svgParse
 }
 
+function getDataset(id) {
+  if (!window.preloadData) {
+    return ''
+  }
+  return window.preloadData[id]
+}
 
 /**
  * 完成后删除资源的列表
@@ -92,7 +95,9 @@ const PARSER = {
  * @return {[type]} [description]
  */
 function deleteResource(chaperId) {
-  preloadData[chaperId] = null
+  if (window.preloadData) {
+    window.preloadData[chaperId] = null
+  }
 }
 
 /**
@@ -100,6 +105,10 @@ function deleteResource(chaperId) {
  * @return {[type]} [description]
  */
 function getNumber() {
+  //退出清理的情况下
+  if (!config.launch) {
+    return false
+  }
   return typeof config.launch.preload === 'number' ? config.launch.preload : 5
 }
 
@@ -110,10 +119,10 @@ function getNumber() {
  */
 function masterHandle(childData) {
   let masterId = childData
-  let masterData = preloadData[masterId]
+  let masterData = getDataset(masterId)
   if (masterData) {
     return function(callback) {
-      loadResource(masterData, function() {
+      loadResource(masterId, masterData, function() {
         /*删除母版数据，多个Page会共享同一个母版加载*/
         deleteResource(masterId)
         callback()
@@ -187,7 +196,7 @@ function pageHandle(type, childData, parser) {
             addLoop(path, detectObjs[path])
           }
           detectObjs[path] = null
-          complete()
+          window.preloadData && complete()
         })
       }
 
@@ -205,7 +214,7 @@ function pageHandle(type, childData, parser) {
 
     }
 
-    segmentHandle()
+    section && segmentHandle()
   }
 }
 
@@ -223,17 +232,21 @@ function createHandle(type, childData, parser) {
 /**
  * 开始加载资源
  */
-function loadResource(data, callback) {
-  const asy = new AsyAccess()
+function loadResource(id, data, callback) {
+  asyObject = new AsyAccess()
   for (let key in data) {
     let parser = PARSER[key]
     if (parser) {
       /*audio优先解析*/
-      asy.create(createHandle(key, data[key], parser), key === 'audio' ? 'unshift' : 'push')
+      asyObject.create(createHandle(key, data[key], parser), key === 'audio' ? 'unshift' : 'push')
     }
   }
+
   /*执行后监听,监听完成*/
-  asy.exec().$$watch('complete', callback)
+  asyObject.exec().$$watch('complete', function() {
+    asyObject = null
+    callback()
+  })
 }
 
 
@@ -251,6 +264,7 @@ function repeatCheck(id, callback) {
       $setStorage('preload', checkFigure.url)
       clearAudio()
       clearImage()
+      window.preloadData = null //全加载完毕了，就可以清理了
       return true
     }
     return false
@@ -304,18 +318,21 @@ function nextTask(chapterId, callback) {
   }
 
   /*只有没有预加载的数据才能被找到*/
-  const pageData = preloadData[chapterId]
+  const pageData = getDataset(chapterId)
 
   const complete = function(info) {
-    // $warn(`${info}:${chapterId}`)
-    deleteResource(chapterId)
-    repeatCheck(loadingId, callback)
+    //如果加载了数据，但是数据还未加载完毕
+    if (window.preloadData) {
+      // $warn(`${info}:${chapterId}`)
+      deleteResource(chapterId)
+      repeatCheck(loadingId, callback)
+    }
   }
 
   /*必须保证pageData不是一个空对象*/
   if (pageData && Object.keys(pageData).length) {
     // $warn('----预加资源开始chapterId: ' + chapterId)
-    loadResource(pageData, () => complete('预加资源完成-chapterId'))
+    loadResource(chapterId, pageData, () => complete('预加资源完成-chapterId'))
   } else {
     complete('预加载数据是空-chapterId')
   }
@@ -349,7 +366,6 @@ function checkCache(finish, next) {
 export function initPreload(total, callback) {
 
   const close = function() {
-    preloadData = null
     config.launch.preload = false
     callback()
   }
@@ -366,8 +382,6 @@ export function initPreload(total, callback) {
   loadFile(config.data.pathAddress + 'preload.js', function() {
     if (window.preloadData) {
       chapterIdCount = total
-      preloadData = window.preloadData
-      window.preloadData = null;
       checkCache(close, start)
     } else {
       close()
@@ -385,7 +399,7 @@ export function initPreload(total, callback) {
 function watchPreloadInit() {
 
   //如果预加载的只有1页数据 判断第一页加载完成后return
-  if (!preloadData[chapterIdCount]) {
+  if (!getDataset(chapterIdCount)) {
     return
   }
 
@@ -442,7 +456,7 @@ export function requestInterrupt({
   }
 
   /*如果不存在预加载数据，就说明加载完毕，或者没有这个数据*/
-  if (!preloadData[chapterId]) {
+  if (!getDataset(chapterId)) {
     return false
   } else {
     /*正在预加载，等待记录回调*/
@@ -463,11 +477,17 @@ export function requestInterrupt({
  * @return {[type]} [description]
  */
 export function clearPreload() {
+
+  if (asyObject) {
+    asyObject.destory()
+    asyObject = null
+  }
+
   checkFigure.url = null
   enable = true
   chapterIdCount = 0
   loadingId = 0
-  preloadData = null
+  window.preloadData = null
   notification = null
   clearLoop()
 }

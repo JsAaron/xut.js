@@ -10,6 +10,7 @@ import { clearAndroid } from './initialize/button'
 import { clearGlobalEvent } from './initialize/golbal-event'
 import { clearRootNode } from './initialize/root-node'
 import { clearPreload } from 'preload/index'
+import { $stopAutoWatch } from './scenario/command/auto'
 
 /**
  * 销毁接口
@@ -80,8 +81,11 @@ export default function Destroy(action = 'exit') {
   /*清理预加载*/
   clearPreload()
 
+  //清理自动运行
+  $stopAutoWatch()
+
   //删除动态加载的两个css文件
-  $('link[data-type]').each(function (index, link) {
+  $('link[data-type]').each(function(index, link) {
     let type = link.getAttribute('data-type')
     if (type === 'svgsheet' || type === 'xxtflow') {
       link.parentNode.removeChild(link)
@@ -93,4 +97,6 @@ export default function Destroy(action = 'exit') {
 
   //启动配置文件去掉
   config.launch = null
+
+  Xut.Application.Notify('appDestory')
 }
