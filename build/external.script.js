@@ -4,8 +4,8 @@ const util = require('./util')
 
 module.exports = ({
   exclude,
+  basePath,
   externalFiles,
-  templateDirPath
 }) => {
   return new Promise((resolve, reject) => {
     let paths = []
@@ -16,7 +16,7 @@ module.exports = ({
     }
     externalFiles.jsName.forEach((path) => {
       if (!exclude.test(path)) {
-        paths.push(util.joinPath(templateDirPath, path))
+        paths.push(util.joinPath(basePath, path))
       }
     })
     util.log(`external file：${paths.length}`, 'debug')

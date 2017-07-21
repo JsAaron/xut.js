@@ -98,7 +98,7 @@ module.exports = (config) => {
       if (config.debug.mode === 'all') {
         compileExternal({
           exclude: config.exclude,
-          templateDirPath: config.templateDirPath,
+          basePath: config.basePath,
           externalFiles: config.externalFiles
         }).then(names => {
           buildExternal(config.distDirPath, names)

@@ -66,7 +66,7 @@ module.exports = ({
           format: 'umd',
           moduleName: 'Aaron'
         }).code
-        
+
         return util.write(rollupDevFilePath, code)
 
       }).then(() => {

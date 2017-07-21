@@ -6,11 +6,12 @@ const tap = require('gulp-tap');
 const fs = require('fs')
 const util = require('../util')
 
-module.exports = (config, scriptUrls) => {
+module.exports = (config, mergeUrls) => {
   return new Promise((resolve, reject) => {
     //合成xxtppt.js
-    scriptUrls.push(config.rollupDevFilePath)
-    gulp.src(scriptUrls)
+    mergeUrls.push(config.rollupDevFilePath)
+
+    gulp.src(mergeUrls)
       .pipe(concat(config.devName))
       .on('error', (err) => {
         util.log('concat Error!' + err.message, 'error');

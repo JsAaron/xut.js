@@ -11,6 +11,7 @@ const util = require('../util')
 const GALLERY = 'gallery'
 const WIDGET = 'widget'
 const DBNAME = 'xxtebook.db'
+const DATANAME = 'SQLResult.js'
 
 /**
  * 获取数据库文件的目录
@@ -51,9 +52,10 @@ const createJsonData = function(listPath) {
   let path = listPath.shift()
 
   /*如果转化的文件不存在*/
-  if (!fs.existsSync(path + '/SQLResult.js')) {
+  const dataFile = util.joinPath(path, DATANAME)
+  if (!fs.existsSync(dataFile)) {
     sqlite.resolve(path, path + '/' + DBNAME, function() {
-      util.log(`create json data: ${path + '/SQLResult.js'}`)
+      util.log(`create json data: ${dataFile}`)
       createJsonData(listPath)
     })
   } else {

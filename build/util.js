@@ -61,12 +61,23 @@ exports.write = (path, code) => {
   })
 }
 
-exports.readFile = (path) => {
+
+exports.writeFile = (filename, content) => {
+  fs.writeFileSync(filename, content, {
+    encoding: 'utf8',
+    flag: 'w+'
+  })
+}
+
+
+function readFile(path) {
   return fs.readFileSync(path, {
     flag: 'r+',
     encoding: 'utf8'
   })
 }
+
+exports.readFile = readFile
 
 
 exports.joinPath = function(base, fileName) {
@@ -74,3 +85,11 @@ exports.joinPath = function(base, fileName) {
 }
 
 
+/**
+ * 获取版本
+ * @return {[type]} [description]
+ */
+exports.getVersion = function(filePath) {
+  let data = readFile(filePath)
+  return data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
+}

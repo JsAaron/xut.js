@@ -18,7 +18,7 @@ rollup({
   .then(() => {
     return compileExternal({
       exclude: config.exclude,
-      templateDirPath: config.templateDirPath,
+      basePath: config.basePath,
       externalFiles: config.externalFiles
     })
   })

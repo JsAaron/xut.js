@@ -37,7 +37,7 @@ const convertFile = function(path) {
   if (exists) {
     let data = readFile(convertedPath)
     if (data) {
-      util.log(`conver svg:${data} --- ${path}`, 'info')
+      // util.log(`conver svg:${data} --- ${path}`, 'info')
       return
     }
   }

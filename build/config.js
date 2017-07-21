@@ -1,11 +1,11 @@
 const path = require('path')
-const rootPath = process.cwd()
+const basePath = process.cwd()
 const util = require('./util')
 const _ = require("underscore")
 
 const aliases = require('./alias')
 const resolve = (p) => {
-  return path.join(rootPath, p)
+  return path.join(basePath, p)
 }
 
 /**
@@ -13,6 +13,8 @@ const resolve = (p) => {
  */
 const common = {
   entry: path.normalize(resolve('src/core/index')), //入口
+
+  basePath: basePath,
 
   //生成名称
   devName: 'xxtppt.dev.js',
@@ -26,7 +28,12 @@ const common = {
 
   //rollup配置
   //dev debug / build 使用
-  rollupDevFilePath: resolve('dist/rollup.dev.js')
+  rollupDevFilePath: resolve('dist/rollup.dev.js'),
+
+  //外加列表的所有文件
+  externalFiles: require('../src/external/load.js'),
+  //index中排除的文件
+  exclude: ['SQLResult.js', 'sqlResult.js', 'pixi.js', 'redux.js', 'debug.js']
 }
 
 /**
@@ -54,17 +61,7 @@ const webpackConfig = {
   debug: {},
   assetsName: 'xut.js',
   assetsRootPath: resolve('/template/compile'), //临时编译文件
-  assetsPublicPath: '/',
-
-
-  //外加列表的所有文件
-  externalFiles: require('../src/external/load.js'),
-  /**
-   * index中排除的文件
-   * @type {Array}
-   * Parameter is an array format
-   */
-  exclude: ['SQLResult.js', 'sqlResult.js', 'pixi.js', 'redux.js', 'debug.js']
+  assetsPublicPath: '/'
 }
 
 
@@ -77,12 +74,8 @@ const builds = {
   'webpack-full-dev': webpackConfig,
 
   /**
-   * 真机调试环境
+   * full-dev带生成调试代码
    * npm run dev:debug
-   * 每次修改都会打包一个完整的文件''
-   * 这里填入目标地址er
-   * e.g:d:/xxxx
-   * @type {Object}
    */
   'webpack-full-debug': function() {
     _.extend(webpackConfig.debug, {
@@ -129,13 +122,12 @@ const builds = {
    */
   'compiler-full': function() {
     //version
-    const data = util.readFile(resolve('src/core/index.js'))
-    const version = data.match(/Xut.Version\s?=\s?\d*([.]?\d*)/ig)[0].split('=')[1].trim()
+    const version = util.getVersion(resolve('src/core/index.js'))
     webpackConfig.version = version
     webpackConfig.banner =
       '/*!\n' +
       ' * Xut.js v' + version + '\n' +
-      ' * Release date '+ new Date().toLocaleDateString() +  '\n' +
+      ' * Release date ' + new Date().toLocaleDateString() + '\n' +
       ' * (c) 2010-' + new Date().getFullYear() + ' @by Aaron\n' +
       ' * 仅供公司内部使用\n' +
       ' */\n'
