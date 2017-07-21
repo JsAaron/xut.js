@@ -2,7 +2,7 @@
 *   一些系统按钮图标
 * *******************/
 @font-face {
-    font-family: 'pageFontFamily';
+    font-family: 'xut-pageFontFamily';
     src: url('../images/fonts/icomoon.eot?vv9atf');
     src: url('../images/fonts/icomoon.eot?vv9atf#iefix') format('embedded-opentype'), url('../images/fonts/icomoon.ttf?vv9atf') format('truetype'), url('../images/fonts/icomoon.woff?vv9atf') format('woff'), url('../images/fonts/icomoon.svg?vv9atf#icomoon') format('svg');
     font-weight: normal;
@@ -12,7 +12,7 @@
 [class^="icon-"],
 [class*=" icon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'pageFontFamily' !important;
+    font-family: 'xut-pageFontFamily' !important;
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -132,7 +132,7 @@
 *   视频播放器图标
 * *******************/
 @font-face {
-    font-family: "flaticon";
+    font-family: "xut-flaticon";
     src: url("../images/fonts/flaticon.eot");
     src: url("../images/fonts/flaticon.eot?#iefix") format("embedded-opentype"), url("../images/fonts/flaticon.woff") format("woff"), url("../images/fonts/flaticon.ttf") format("truetype"), url("../images/fonts/flaticon.svg#flaticon") format("svg");
     font-weight: normal;
@@ -142,7 +142,7 @@
 [class^="flaticon-"],
 [class*=" flaticon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'flaticon' !important;
+    font-family: 'xut-flaticon' !important;
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -166,7 +166,7 @@
 
 
 @font-face {
-  font-family: 'dotStyle';
+  font-family: 'xut-dotStyle';
   src:  url('../images/fonts/icomoonDot.eot?67pv3l');
   src:  url('../images/fonts/icomoonDot.eot?67pv3l#iefix') format('embedded-opentype'),
     url('../images/fonts/icomoonDot.ttf?67pv3l') format('truetype'),
@@ -180,7 +180,7 @@
 
 [class^="dotIcon-"], [class*=" dotIcon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'dotStyle' !important;
+  font-family: 'xut-dotStyle' !important;
   speak: none;
   font-style: normal;
   font-weight: bold;
@@ -213,5 +213,18 @@
 }
 .dotIcon-record:before {
   content: "\e049";
+}
+
+
+/******************
+*   flare视频播放器图标
+* *******************/
+
+@font-face {
+    font-family: "xut-flareicon";
+    src: url("../images/fonts/flareicon.eot");
+    src: url("../images/fonts/flareicon.eot?#iefix") format("embedded-opentype"), url("../images/fonts/flareicon.woff") format("woff"), url("../images/fonts/flareicon.ttf") format("truetype"), url("../images/fonts/flareicon.svg#flaticon") format("svg");
+    font-weight: normal;
+    font-style: normal;
 }
 
