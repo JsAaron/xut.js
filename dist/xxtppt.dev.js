@@ -79148,6 +79148,8 @@ function Destroy() {
 
   //启动配置文件去掉
   config.launch = null;
+
+  Xut.Application.Notify('appDestory');
 }
 
 /****************************************************
@@ -79660,7 +79662,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 888;
+Xut.Version = 888.1;
 
 /*加载应用app*/
 var initApp = function initApp() {

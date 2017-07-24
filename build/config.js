@@ -128,8 +128,9 @@ const builds = {
       '/*!\n' +
       ' * Xut.js v' + version + '\n' +
       ' * Release date ' + new Date().toLocaleDateString() + '\n' +
-      ' * (c) 2010-' + new Date().getFullYear() + ' @by Aaron\n' +
-      ' * 仅供公司内部使用\n' +
+      ' * (c) 2010-' + new Date().getFullYear() + '\n' +
+      ' * author @by【Aaron】\n' +
+      ' * For internal use only\n' +
       ' */\n'
 
     return webpackConfig

@@ -5,7 +5,11 @@ var cssName = [
   'css/vertical.css',
   'css/adaptive-image.css',
   'css/css3-filters.css',
-  'css/flarevideo.css'
+
+  'css/font-dot.css',
+  'css/font-flaticon.css',
+  'css/font-tool.css',
+  'css/font-flarevideo.css'
 ]
 
 //2016.11.14 去掉代码区域
@@ -76,7 +80,7 @@ var jsName = [
 
 function load(fileList, temp) {
   var list = ''
-  fileList.forEach(function (name) {
+  fileList.forEach(function(name) {
     list += temp(name)
   })
   document.write(list)
@@ -89,10 +93,10 @@ if (typeof exports === "object" && typeof module !== "undefined") {
   exports.fontName = fontName
 } else {
   //for index.html
-  load(cssName.concat(fontName), function (name) {
+  load(cssName.concat(fontName), function(name) {
     return '<link type="text/css" rel="stylesheet" href="' + name + '?random=' + Math.random() + '">'
   })
-  load(jsName, function (name) {
+  load(jsName, function(name) {
     return '<script type="text/javascript" src="' + name + '?random=' + Math.random() + '"><\/script>'
   })
 }
