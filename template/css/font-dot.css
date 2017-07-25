@@ -1,5 +1,5 @@
-[class^="dotIcon-"],
-[class*=" dotIcon-"] {
+[class^="xut-dotIcon-"],
+[class*=" xut-dotIcon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'xut-dotStyle' !important;
   speak: none;
@@ -16,26 +16,26 @@
 }
 
 
-.dotIcon-stop:before {
+.xut-dotIcon-stop:before {
   content: "\e902";
 }
 
-.dotIcon-circle-full:before {
+.xut-dotIcon-circle-full:before {
   content: "\e903";
 }
 
-.dotIcon-cd:before {
+.xut-dotIcon-cd:before {
   content: "\e904";
 }
 
-.dotIcon-adjust:before {
+.xut-dotIcon-adjust:before {
   content: "\e39e";
 }
 
-.dotIcon-brightness_1:before {
+.xut-dotIcon-brightness_1:before {
   content: "\e3a6";
 }
 
-.dotIcon-record:before {
+.xut-dotIcon-record:before {
   content: "\e049";
 }

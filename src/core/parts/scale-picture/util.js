@@ -114,7 +114,7 @@ export function createContainerView(imgContainer) {
     html = `<div class="xut-zoom-view">
                 <div class="xut-zoom-overlay"></div>
                 <div class="xut-zoom-close" style="right:${rightCopy}px;top:${topCopy}px;">
-                    <div class="si-icon Flaticon flaticon-error" style="font-size:5vw;border-radius:50%;right:0">
+                    <div class="si-icon Flaticon xut-flaticon-error" style="font-size:5vw;border-radius:50%;right:0">
                     </div>
                 </div>
                 ${zoomImg}
@@ -124,7 +124,7 @@ export function createContainerView(imgContainer) {
     html = `<div class="xut-zoom-view">
                 <div class="xut-zoom-overlay"></div>
                 <div class="xut-zoom-close" style=";right:${rightCopy}px;top:${topCopy}px;">
-                    <div class="si-icon Flaticon flaticon-error" style="font-size:5vh;border-radius:50%;right:0">
+                    <div class="si-icon Flaticon xut-flaticon-error" style="font-size:5vh;border-radius:50%;right:0">
                     </div>
                 </div>
                 ${zoomImg}

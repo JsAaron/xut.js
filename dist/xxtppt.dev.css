@@ -4415,8 +4415,8 @@ video {
     }
 }
 
-[class^="dotIcon-"],
-[class*=" dotIcon-"] {
+[class^="xut-dotIcon-"],
+[class*=" xut-dotIcon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'xut-dotStyle' !important;
   speak: none;
@@ -4433,35 +4433,35 @@ video {
 }
 
 
-.dotIcon-stop:before {
+.xut-dotIcon-stop:before {
   content: "\e902";
 }
 
-.dotIcon-circle-full:before {
+.xut-dotIcon-circle-full:before {
   content: "\e903";
 }
 
-.dotIcon-cd:before {
+.xut-dotIcon-cd:before {
   content: "\e904";
 }
 
-.dotIcon-adjust:before {
+.xut-dotIcon-adjust:before {
   content: "\e39e";
 }
 
-.dotIcon-brightness_1:before {
+.xut-dotIcon-brightness_1:before {
   content: "\e3a6";
 }
 
-.dotIcon-record:before {
+.xut-dotIcon-record:before {
   content: "\e049";
 }
 
 /******************
 *   视频播放器图标
 * *******************/
-[class^="flaticon-"],
-[class*=" flaticon-"] {
+[class^="xut-flaticon-"],
+[class*=" xut-flaticon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
     font-family: 'xut-flaticon' !important;
     speak: none;
@@ -4478,7 +4478,7 @@ video {
 
 
 
-.flaticon-error:before {
+.xut-flaticon-error:before {
     content: "\f100";
     color: #000;
     /* background-color: rgba(0, 0, 0, 0.25);*/
@@ -4489,8 +4489,8 @@ video {
 *   一些系统按钮图标
 * *******************/
 
-[class^="icon-"],
-[class*=" icon-"] {
+[class^="xut-icon-"],
+[class*=" xut-icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'xut-pageFontFamily' !important;
   speak: none;
@@ -4505,11 +4505,11 @@ video {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-angle-left:before {
+.xut-icon-angle-left:before {
   content: "\f104";
 }
 
-.icon-angle-right:before {
+.xut-icon-angle-right:before {
   content: "\f105";
   font-size: 4vh;
 }
@@ -4520,7 +4520,7 @@ video {
     content: "\e905";
 }*/
 
-.icon-close:before {
+.xut-icon-close:before {
   /*   content: "\e908";*/
   /*   content: "\e043";*/
   content: "\ea0d";
@@ -4529,7 +4529,7 @@ video {
   top: 0.12vh;
 }
 
-.icon-close2:before {
+.xut-icon-close2:before {
   /*   content: "\e908";*/
   /*   content: "\e043";*/
   content: "\ea0d";
@@ -4537,75 +4537,78 @@ video {
   top: 0.12vh;
 }
 
-.icon-arrow-left:before {
+
+.xut-icon-arrow-left:before {
   content: "\e094";
   font-size: 3vh;
 }
 
-.icon-chevron-down:before {
+.xut-icon-chevron-down:before {
   content: "\f0a3";
   font-size: 5vh;
   color: #000;
 }
 
-.icon-th-list2:before {
+.xut-icon-th-list2:before {
   content: "\f00b";
 }
 
-.icon-bookmark2:before {
+.xut-icon-bookmark2:before {
   content: "\e9d2";
   color: red;
 }
 
-.icon-chevron-left2:before {
+.xut-icon-maximize:before {
+  content: "\f0b2";
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.xut-icon-chevron-left2:before {
   content: "\f053";
 }
 
-.icon-chevron-right2:before {
+.xut-icon-chevron-right2:before {
   content: "\f054";
 }
 
-.icon-outbox:before {
+.xut-icon-outbox:before {
   content: "\e123";
 }
 
-.icon-book:before {
+.xut-icon-book:before {
   content: "\f007";
 }
 
-.icon-star:before {
+.xut-icon-star:before {
   content: "\e907";
 }
 
-.icon-bookmark:before {
+.xut-icon-bookmark:before {
   content: "\e904";
   color: red;
 }
 
-.icon-inbox-upload:before {
+.xut-icon-inbox-upload:before {
   content: "\e902";
 }
 
-.icon-chevron-right:before {
+.xut-icon-chevron-right:before {
   content: "\e900";
 }
 
-.icon-chevron-left:before {
+.xut-icon-chevron-left:before {
   content: "\e901";
 }
 
-.icon-back:before {
+.xut-icon-back:before {
   content: "\e906";
 }
 
-.icon-th-list:before {
+.xut-icon-th-list:before {
   content: "\e903";
 }
 
-.icon-maximize:before {
-  content: "\f0b2";
-  color: rgba(0, 0, 0, 0.25);
-}
+
 
 .flareVideo {
     position: relative;

@@ -183,7 +183,7 @@ export default class fnBar extends BarSuper {
   _createCloseIcon() {
     const height = this.$$iconHeight;
     const html = $(
-      `<div class="si-icon xut-scenario-close icon-close2"
+      `<div class="si-icon xut-scenario-close xut-icon-close2"
                 style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;text-align:center;font-size:3vh;">
             </div>`);
 
@@ -200,7 +200,7 @@ export default class fnBar extends BarSuper {
   _createBackIcon() {
     const height = this.$$iconHeight;
     const html = $(
-      `<div class="si-icon xut-scenario-back icon-arrow-left"
+      `<div class="si-icon xut-scenario-back xut-icon-arrow-left"
                   style="top:${this.top}px;width:${height}px;height:${height}px;line-height:${height}px;">
             </div>`);
 

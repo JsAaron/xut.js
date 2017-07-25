@@ -113,10 +113,10 @@ export default class BarSuper {
    */
   _$$createArrow() {
     const option = this._$$getArrowOption()
-    return `<div class="si-icon xut-flip-control xut-flip-control-left icon-angle-left ${option.state}"
+    return `<div class="si-icon xut-flip-control xut-flip-control-left xut-icon-angle-left ${option.state}"
                  style="${option.style};text-align:center;line-height:${option.height}px;font-size:4vh;">
             </div>
-            <div class="si-icon xut-flip-control xut-flip-control-right icon-angle-right ${option.state}"
+            <div class="si-icon xut-flip-control xut-flip-control-right xut-icon-angle-right ${option.state}"
                  style="${option.style};text-align:center;line-height:${option.height}px;">
             </div>`
   }

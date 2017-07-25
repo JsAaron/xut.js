@@ -15,7 +15,7 @@ import {
 /*图片*/
 function createHTML() {
   const size = config.screenSize.width > config.screenSize.height ? '2vw' : '2vh'
-  return `<div class="icon-maximize"style="font-size:${size};position:absolute;right:0;"></div>`
+  return `<div class="xut-icon-maximize"style="font-size:${size};position:absolute;right:0;"></div>`
 }
 
 export function zoomPicture(pipeData) {

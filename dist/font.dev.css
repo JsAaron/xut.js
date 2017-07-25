@@ -11,7 +11,7 @@
 
 
 /******************
-*   视频播放器图标
+*   页面缩放关闭按钮
 * *******************/
 @font-face {
     font-family: "xut-flaticon";
@@ -22,6 +22,9 @@
 }
 
 
+/******************
+*   迷你杂志页码圆点样式
+* *******************/
 @font-face {
   font-family: 'xut-dotStyle';
   src:  url('../images/fonts/icomoonDot.eot?67pv3l');

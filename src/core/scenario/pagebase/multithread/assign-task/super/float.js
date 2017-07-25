@@ -20,7 +20,7 @@ export function crateFloat(pageType, pipeData, divertor, baseFloatGroup, complet
     const prefix = 'Content_' + pipeData.chapterIndex + "_";
     //去重复
     divertor.ids = arrayUnique(divertor.ids)
-    _.each(divertor.ids, function (id) {
+    _.each(divertor.ids, function(id) {
       makePrefix = prefix + id;
       fragment = pipeData.contentsFragment[makePrefix]
       if (fragment) {
@@ -72,7 +72,7 @@ export function crateFloat(pageType, pipeData, divertor, baseFloatGroup, complet
 
   /*有可能在competent中已经创建,在content不需要重复创建*/
   if (!container) {
-    const id = `float-${pageType}-li-${pipeData.chapterIndex}`
+    const id = `float-${pageType}-${pipeData.chapterIndex+1}`
     container = $(String.styleFormat(
       `<ul id="${id}"
          class="xut-float"

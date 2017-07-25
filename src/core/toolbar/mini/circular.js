@@ -2,12 +2,12 @@ import MiniSuper from './super'
 
 //样式类型
 const dotStyleClass = [
-  "dotIcon-brightness_1",
-  "dotIcon-circle-full",
-  "dotIcon-cd",
-  "dotIcon-adjust",
-  "dotIcon-stop",
-  "dotIcon-record"
+  "xut-dotIcon-brightness_1",
+  "xut-dotIcon-circle-full",
+  "xut-dotIcon-cd",
+  "xut-dotIcon-adjust",
+  "xut-dotIcon-stop",
+  "xut-dotIcon-record"
 ]
 
 /**

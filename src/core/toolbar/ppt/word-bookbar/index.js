@@ -106,7 +106,7 @@ export default class BookBar extends BarSuper {
 
     icon.style.fontSize = "2.5vh";
     icon.style.color = "#fff";
-    icon.className = 'icon-th-list2';
+    icon.className = 'xut-icon-th-list2';
     icon.style.position = "absolute";
     icon.style.bottom = this.$$iconHeight * 0.5 + 'px';
 
@@ -143,7 +143,7 @@ export default class BookBar extends BarSuper {
     icon.style.color = "#fff";
     icon.style.position = "absolute";
     icon.style.bottom = this.$$iconHeight * 0.5 + 'px';
-    icon.className = 'icon-bookmark2';
+    icon.className = 'xut-icon-bookmark2';
 
     iconText.innerHTML = '书签';
     iconText.className = "xut-book-markFont"
@@ -181,7 +181,7 @@ export default class BookBar extends BarSuper {
     icon.style.lineHeight = this.topBarHeight + 'px';
     icon.style.color = "#fff";
 
-    icon.className = 'icon-angle-left icon-book-bar';
+    icon.className = 'xut-icon-angle-left xut-icon-book-bar';
     icon.style.fontSize = "6vh";
     this.$controlNode.append(icon)
   }
@@ -400,16 +400,16 @@ export default class BookBar extends BarSuper {
     $handle({
       end(e) {
         switch ($target(e).className) {
-          case 'icon-angle-left icon-book-bar':
+          case 'xut-icon-angle-left xut-icon-book-bar':
             this.goBack();
             //返回
             break;
-          case 'icon-th-list2':
+          case 'xut-icon-th-list2':
           case 'xut-book-dirFont':
             //目录
             this._showDirMenu();
             break;
-          case 'icon-bookmark2':
+          case 'xut-icon-bookmark2':
           case 'xut-book-markFont':
             //书签
             this._showBookMark();

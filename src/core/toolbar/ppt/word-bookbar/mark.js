@@ -79,7 +79,7 @@ export default class Mark {
                style="width:100%;height:${height}px;left:0;top:${sHeight}px;">
               <div class="xut-bookmark-wrap">
                 <div class="xut-bookmark-add">加入书签</div>
-                <div class="xut-bookmark-off icon-chevron-down" style="vertical-align:bottom;"></div>
+                <div class="xut-bookmark-off xut-icon-chevron-down" style="vertical-align:bottom;"></div>
                 <div class="xut-bookmark-view">书签记录</div>
               </div>
             </div>
@@ -304,7 +304,7 @@ export default class Mark {
             break;
             //关闭书签
           case 'xut-bookmark-off':
-          case 'xut-bookmark-off icon-chevron-down':
+          case 'xut-bookmark-off xut-icon-chevron-down':
             this.closeBookMark(target);
             break;
             //返回书签主菜单

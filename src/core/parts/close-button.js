@@ -12,13 +12,13 @@ const createCloseIcon = function(right, top) {
   if(width > height) {
     html =
       `<div class="page-scale-close" style="position: absolute;right:${right}px;top:${top}px;">
-           <div class="si-icon Flaticon flaticon-error" style="font-size:5.3vw;border-radius:50%;right:0">
+           <div class="si-icon Flaticon xut-flaticon-error" style="font-size:5.3vw;border-radius:50%;right:0">
            </div>
         </div>`
   } else {
     html =
       `<div class="page-scale-close" style="position: absolute;right:${right}px;top:${top}px;">
-             <div class="si-icon Flaticon flaticon-error" style="font-size:5.3vh;border-radius:50%;right:0;"></div>
+             <div class="si-icon Flaticon xut-flaticon-error" style="font-size:5.3vh;border-radius:50%;right:0;"></div>
         </div>`
   }
   return $(String.styleFormat(html))

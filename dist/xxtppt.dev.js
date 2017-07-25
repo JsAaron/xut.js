@@ -60632,9 +60632,9 @@ var createCloseIcon = function createCloseIcon(right, top) {
   var width = screenSize.width;
   var height = screenSize.height;
   if (width > height) {
-    html = "<div class=\"page-scale-close\" style=\"position: absolute;right:" + right + "px;top:" + top + "px;\">\n           <div class=\"si-icon Flaticon flaticon-error\" style=\"font-size:5.3vw;border-radius:50%;right:0\">\n           </div>\n        </div>";
+    html = "<div class=\"page-scale-close\" style=\"position: absolute;right:" + right + "px;top:" + top + "px;\">\n           <div class=\"si-icon Flaticon xut-flaticon-error\" style=\"font-size:5.3vw;border-radius:50%;right:0\">\n           </div>\n        </div>";
   } else {
-    html = "<div class=\"page-scale-close\" style=\"position: absolute;right:" + right + "px;top:" + top + "px;\">\n             <div class=\"si-icon Flaticon flaticon-error\" style=\"font-size:5.3vh;border-radius:50%;right:0;\"></div>\n        </div>";
+    html = "<div class=\"page-scale-close\" style=\"position: absolute;right:" + right + "px;top:" + top + "px;\">\n             <div class=\"si-icon Flaticon xut-flaticon-error\" style=\"font-size:5.3vh;border-radius:50%;right:0;\"></div>\n        </div>";
   }
   return $(String.styleFormat(html));
 };
@@ -61408,10 +61408,10 @@ function createContainerView(imgContainer) {
   var zoomImg = '<img class="xut-zoom-fly"\n                      src="' + imgContainer.originSrc + '"\n                      style="width:' + imgContainer.width + 'px;\n                             height:' + imgContainer.height + 'px;\n                             top:' + imgContainer.top + 'px;\n                             left:' + imgContainer.left + 'px;" />';
 
   if (config.screenHorizontal) {
-    html = '<div class="xut-zoom-view">\n                <div class="xut-zoom-overlay"></div>\n                <div class="xut-zoom-close" style="right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                    <div class="si-icon Flaticon flaticon-error" style="font-size:5vw;border-radius:50%;right:0">\n                    </div>\n                </div>\n                ' + zoomImg + '\n            </div>';
+    html = '<div class="xut-zoom-view">\n                <div class="xut-zoom-overlay"></div>\n                <div class="xut-zoom-close" style="right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                    <div class="si-icon Flaticon xut-flaticon-error" style="font-size:5vw;border-radius:50%;right:0">\n                    </div>\n                </div>\n                ' + zoomImg + '\n            </div>';
   } else {
     //竖屏
-    html = '<div class="xut-zoom-view">\n                <div class="xut-zoom-overlay"></div>\n                <div class="xut-zoom-close" style=";right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                    <div class="si-icon Flaticon flaticon-error" style="font-size:5vh;border-radius:50%;right:0">\n                    </div>\n                </div>\n                ' + zoomImg + '\n            </div>';
+    html = '<div class="xut-zoom-view">\n                <div class="xut-zoom-overlay"></div>\n                <div class="xut-zoom-close" style=";right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                    <div class="si-icon Flaticon xut-flaticon-error" style="font-size:5vh;border-radius:50%;right:0">\n                    </div>\n                </div>\n                ' + zoomImg + '\n            </div>';
   }
 
   return String.styleFormat(html);
@@ -61996,7 +61996,7 @@ var ScalePicture = function () {
 /*图片*/
 function createHTML$1() {
   var size = config.screenSize.width > config.screenSize.height ? '2vw' : '2vh';
-  return '<div class="icon-maximize"style="font-size:' + size + ';position:absolute;right:0;"></div>';
+  return '<div class="xut-icon-maximize"style="font-size:' + size + ';position:absolute;right:0;"></div>';
 }
 
 function zoomPicture(pipeData) {
@@ -75974,7 +75974,7 @@ var BarSuper = function () {
     key: '_$$createArrow',
     value: function _$$createArrow() {
       var option = this._$$getArrowOption();
-      return '<div class="si-icon xut-flip-control xut-flip-control-left icon-angle-left ' + option.state + '"\n                 style="' + option.style + ';text-align:center;line-height:' + option.height + 'px;font-size:4vh;">\n            </div>\n            <div class="si-icon xut-flip-control xut-flip-control-right icon-angle-right ' + option.state + '"\n                 style="' + option.style + ';text-align:center;line-height:' + option.height + 'px;">\n            </div>';
+      return '<div class="si-icon xut-flip-control xut-flip-control-left xut-icon-angle-left ' + option.state + '"\n                 style="' + option.style + ';text-align:center;line-height:' + option.height + 'px;font-size:4vh;">\n            </div>\n            <div class="si-icon xut-flip-control xut-flip-control-right xut-icon-angle-right ' + option.state + '"\n                 style="' + option.style + ';text-align:center;line-height:' + option.height + 'px;">\n            </div>';
     }
 
     /**
@@ -76780,7 +76780,7 @@ function createHideToolbar(height) {
  * @return {[type]}        [description]
  */
 function createCloseIcon$1(height) {
-  return "<div class=\"si-icon icon-close2\"\n                 style=\"float:right;margin-right:4px;width:" + height + "px;height:" + height + "px\">\n            </div>";
+  return "<div class=\"si-icon xut-icon-close2\"\n                 style=\"float:right;margin-right:4px;width:" + height + "px;height:" + height + "px\">\n            </div>";
 }
 
 /**
@@ -77282,7 +77282,7 @@ var fnBar = function (_BarSuper) {
     key: '_createCloseIcon',
     value: function _createCloseIcon() {
       var height = this.$$iconHeight;
-      var html = $('<div class="si-icon xut-scenario-close icon-close2"\n                style="top:' + this.top + 'px;width:' + height + 'px;height:' + height + 'px;line-height:' + height + 'px;text-align:center;font-size:3vh;">\n            </div>');
+      var html = $('<div class="si-icon xut-scenario-close xut-icon-close2"\n                style="top:' + this.top + 'px;width:' + height + 'px;height:' + height + 'px;line-height:' + height + 'px;text-align:center;font-size:3vh;">\n            </div>');
 
       this.$closeIcon = html;
       this._onBackClose(this.$closeIcon);
@@ -77299,7 +77299,7 @@ var fnBar = function (_BarSuper) {
     key: '_createBackIcon',
     value: function _createBackIcon() {
       var height = this.$$iconHeight;
-      var html = $('<div class="si-icon xut-scenario-back icon-arrow-left"\n                  style="top:' + this.top + 'px;width:' + height + 'px;height:' + height + 'px;line-height:' + height + 'px;">\n            </div>');
+      var html = $('<div class="si-icon xut-scenario-back xut-icon-arrow-left"\n                  style="top:' + this.top + 'px;width:' + height + 'px;height:' + height + 'px;line-height:' + height + 'px;">\n            </div>');
 
       this.$backIcon = html;
       this._onBackClose(this.$backIcon);
@@ -77711,7 +77711,7 @@ var Digital = function (_MiniSuper) {
 }(MiniSuper);
 
 //样式类型
-var dotStyleClass = ["dotIcon-brightness_1", "dotIcon-circle-full", "dotIcon-cd", "dotIcon-adjust", "dotIcon-stop", "dotIcon-record"];
+var dotStyleClass = ["xut-dotIcon-brightness_1", "xut-dotIcon-circle-full", "xut-dotIcon-cd", "xut-dotIcon-adjust", "xut-dotIcon-stop", "xut-dotIcon-record"];
 
 /**
  * 迷你杂志页面工具栏扩展
@@ -79662,7 +79662,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 888.1;
+Xut.Version = 888.2;
 
 /*加载应用app*/
 var initApp = function initApp() {
