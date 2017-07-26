@@ -1,5 +1,5 @@
-import { config } from '../config/index'
-import { $warn, loadFile } from '../util/index'
+import { config } from 'core/config/index'
+import { $warn, loadFile } from 'core/util/index'
 
 //替换url
 //1. 路径

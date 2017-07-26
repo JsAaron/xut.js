@@ -13,7 +13,7 @@
 ///
 ///////////////////////////////////////////
 
-import { loadFigure } from '../util/loader/image'
+import { loadFigure } from 'core/util/loader/image'
 
 let queue = {}
 let waiting = false
@@ -82,6 +82,7 @@ function runBatcherQueue() {
  * @return {[type]} [description]
  */
 export function repairImage(node, chapterIndex, src) {
+
   if (!node) {
     return
   }

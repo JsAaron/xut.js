@@ -1,6 +1,6 @@
 import { config, resetVisualLayout } from '../../config/index'
 import { defAccess, nextTick, $warn, loadGolbalStyle } from '../../util/index'
-import { getResults, removeColumnData } from '../../database/result'
+import { getResults, removeColumnData } from 'database/result'
 import { startColumnDetect, simulateCount, debug } from './detect'
 import { addCache } from './api'
 

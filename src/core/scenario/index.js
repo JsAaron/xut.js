@@ -16,7 +16,7 @@ import { sceneController } from './factory/control'
  * @return {[type]}            [description]
  */
 const findContainer = ($context, id, isMain) => {
-  return function (pane, parallax) {
+  return function(pane, parallax) {
     var node;
     if (isMain) {
       node = '#' + pane;
@@ -33,10 +33,11 @@ const findContainer = ($context, id, isMain) => {
  * 加载新的场景
  * @return {[type]} [description]
  */
-const checkHistory = (history) => {
+const checkHistory = (history, callback) => {
+
   //直接启用快捷调试模式
-  if (config.debug.deBugHistory) {
-    Xut.View.LoadScenario(config.debug.deBugHistory)
+  if (config.debug.locationPage) {
+    Xut.View.LoadScenario(config.debug.locationPage, callback)
     return true;
   }
 
@@ -49,7 +50,7 @@ const checkHistory = (history) => {
         'seasonId': scenarioInfo[0],
         'chapterId': scenarioInfo[1],
         'pageIndex': scenarioInfo[2]
-      })
+      }, callback)
       return true;
     } else {
       return false;
@@ -64,8 +65,8 @@ const checkHistory = (history) => {
 export class SceneFactory {
 
   constructor(data) {
-    const options = _.extend(this, data)
-      //创建主场景
+    const options = _.extend(this, data);
+    //创建主场景
     this._createHTML(options, () => {
       if (!Xut.IBooks.Enabled) {
         this._initToolBar()
@@ -196,7 +197,7 @@ export class SceneFactory {
       /*页面总数改变*/
       if (config.launch.columnCheck) {
         Xut.Application.Watch('change:number:total', () => {
-          this._eachMiniBar(function () {
+          this._eachMiniBar(function() {
             this.updateTotal(getPageTotal(true))
           })
         })
@@ -266,7 +267,7 @@ export class SceneFactory {
      */
     $$mediator.$bind('updatePage', (...arg) => {
       pptBar && pptBar.updatePointer(...arg)
-      this._eachMiniBar(function () {
+      this._eachMiniBar(function() {
         this.updatePointer(...arg)
       })
     })
@@ -306,7 +307,7 @@ export class SceneFactory {
      */
     $$mediator.$bind('toggleToolbar', (...arg) => {
       pptBar && pptBar.toggle(...arg)
-      this._eachMiniBar(function () {
+      this._eachMiniBar(function() {
         this.toggle(...arg)
       })
     })
@@ -331,8 +332,8 @@ export class SceneFactory {
         if (isMain) {
           this.complete(() => {
             Xut.View.HideBusy()
-              //检测是不是有缓存加载
-            if (!checkHistory(this.history)) {
+            //检测是不是有缓存加载
+            if (!checkHistory(this.history, nextAction)) {
               //指定自动运行的动作
               nextAction && nextAction();
             }
@@ -389,7 +390,7 @@ export class SceneFactory {
       this.pptBar.destroy()
       this.pptBar = null
     }
-    this._eachMiniBar(function () {
+    this._eachMiniBar(function() {
       this.destroy()
     })
     this.$$mediator.miniBar = null

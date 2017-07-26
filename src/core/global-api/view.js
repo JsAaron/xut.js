@@ -22,7 +22,7 @@ export function initView() {
   /**
    * 关闭场景
    */
-  Xut.View.CloseScenario = function () {
+  Xut.View.CloseScenario = function() {
     if (repeatClick) return;
     repeatClick = true;
     var serial = sceneController.takeOutPrevChainId();
@@ -45,7 +45,7 @@ export function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  const _loadScenario = function (options, callback) {
+  const _loadScenario = function(options, callback) {
 
     let seasonId = toNumber(options.seasonId)
     let chapterId = toNumber(options.chapterId)
@@ -77,10 +77,9 @@ export function initView() {
      * 场景内部跳转
      * 节相同，章与章的跳转
      * 用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
-     * @return {[type]}            [description]
      */
     if (userAssign && current && current.seasonId === seasonId) {
-      Xut.View.GotoSlide(seasonId, chapterId)
+      Xut.View.GotoSlide(seasonId, chapterId, pageIndex, callback)
       return
     }
 
@@ -166,7 +165,7 @@ export function initView() {
 
         //销毁旧场景
         current && current.destroy()
-          //下一个任务存在,执行切换回调后,在执行页面任务
+        //下一个任务存在,执行切换回调后,在执行页面任务
         nextBack && nextBack();
         //去掉忙碌
         Xut.View.HideBusy();
@@ -187,7 +186,15 @@ export function initView() {
   }
 
 
-  Xut.View.LoadScenario = function (options, callback) {
+  /**
+   * 'main': true, //主场景入口
+   * 'seasonId': seasonId,
+   * 'pageIndex': options.pageIndex,
+   * 'chapterId'
+   * 'history': options.history
+   */
+  Xut.View.LoadScenario = function(options, callback) {
+
     /**
      * 如果启动了预加载模式
      * 需要处理跳转的页面预加载逻辑
@@ -217,14 +224,14 @@ export function initView() {
   /**
    * 通过插件打开一个新view窗口
    */
-  Xut.View.Open = function (pageUrl, width, height, left, top) {
+  Xut.View.Open = function(pageUrl, width, height, left, top) {
     Xut.Plugin.WebView.open(pageUrl, left, top, height, width, 1);
   }
 
   /**
    * 关闭view窗口
    */
-  Xut.View.Close = function () {
+  Xut.View.Close = function() {
     Xut.Plugin.WebView.close();
   }
 

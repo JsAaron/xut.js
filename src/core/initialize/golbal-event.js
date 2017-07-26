@@ -4,7 +4,7 @@
 
 import { config } from '../config/index'
 import { fixAudio } from '../component/audio/fix'
-import { repairImage } from '../repair/image'
+import { repairImage } from 'repair/image'
 
 
 /**

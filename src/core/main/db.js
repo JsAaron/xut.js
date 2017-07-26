@@ -1,4 +1,4 @@
-import { createStore } from '../database/index'
+import { createStore } from 'database/index'
 import { config } from '../config/index'
 
 /**

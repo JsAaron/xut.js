@@ -1,7 +1,10 @@
 import { config } from '../config/index'
 import { $setStorage, $getStorage, $removeStorage, execScript } from '../util/index'
 
-/*设置缓存，必须要可设置*/
+/**
+ * 设置缓存，必须要可设置
+ * @return {[type]} [description]
+ */
 const saveData = () => {
   if (config.launch.historyMode) {
     const data = config.data
@@ -39,7 +42,7 @@ const runScript = () => {
   }
 }
 
-export default function (options) {
+export default function(options) {
 
   options = initDefaultValues(options || {});
 
@@ -70,7 +73,7 @@ export default function (options) {
     'seasonId': seasonId,
     'pageIndex': options.pageIndex,
     'history': options.history
-  }, function () {
+  }, function() {
 
     /*应用初始化加载完毕*/
     Xut.Application.Notify('initComplete')

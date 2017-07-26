@@ -1,6 +1,6 @@
 import initDB from './db'
 import initDefaults from './defaults'
-import { importJsonDatabase } from '../database/result'
+import { importJsonDatabase } from 'database/result'
 import { $warn, loadGolbalStyle, setFastAnalysisRE } from '../util/index'
 import { createCursor } from '../initialize/cursor'
 import { initColumn } from '../component/column/init'

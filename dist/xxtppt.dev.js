@@ -42247,6 +42247,7 @@ var improtDebugConfig = {
   },
 
   /**
+   * 直接定位页面
    * 直接通过数据库的历史记录定位到指定的页面
    * Xut.View.LoadScenario({
    *     'seasonId' : scenarioInfo[0],
@@ -42259,7 +42260,7 @@ var improtDebugConfig = {
    *  }
    * @type {Boolean}
    */
-  deBugHistory: DEFAULT$1,
+  locationPage: DEFAULT$1,
 
   /**
    *  仅做测试处理，因为每个section都可以对应配置pageMode参数
@@ -46962,7 +46963,7 @@ function loadResource(id, data, callback) {
 function repeatCheck(id, callback) {
 
   //判断是否所有页面加载完毕
-  var completeLoad = function completeLoad() {
+  function completeLoad() {
     /*如果加载数等于总计量数，这个证明加载完毕*/
     if (id === chapterIdCount) {
       $warn('全部预加载完成');
@@ -46973,7 +46974,7 @@ function repeatCheck(id, callback) {
       return true;
     }
     return false;
-  };
+  }
 
   /*第一次加载才有回调*/
   if (callback) {
@@ -46992,7 +46993,7 @@ function repeatCheck(id, callback) {
       notification[1]();
       notification = null;
     } else {
-      /*跳转页面的情况， 如果不是按照顺序的预加载方式*/
+      /*跳转页面的情况,跳到任何一页，newChapterId不等于id*/
       nextTask(newChapterId);
       return;
     }
@@ -47011,7 +47012,8 @@ function repeatCheck(id, callback) {
 
 /**
  * 检测下一个页面加载执行
- * @return {Function} [description]
+ * 如果传入了检测chpaterId
+ * 否则就用默认的正索引
  */
 function nextTask(chapterId, callback) {
   if (!chapterId) {
@@ -47023,14 +47025,14 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   var pageData = getDataset(chapterId);
 
-  var complete = function complete(info) {
+  function complete(info) {
     //如果加载了数据，但是数据还未加载完毕
     if (window.preloadData) {
       // $warn(`${info}:${chapterId}`)
       deleteResource(chapterId);
-      repeatCheck(loadingId, callback);
+      repeatCheck(chapterId, callback);
     }
-  };
+  }
 
   /*必须保证pageData不是一个空对象*/
   if (pageData && Object.keys(pageData).length) {
@@ -47161,6 +47163,7 @@ function requestInterrupt(_ref, context) {
     if (!processed) {
       $warn('预加载必须传递处理器，有错误');
     }
+    //等待预加载完毕后调用
     notification = [chapterId, function () {
       processed.call(context);
     }];
@@ -47379,7 +47382,10 @@ function baseConfig(callback) {
   });
 }
 
-/*设置缓存，必须要可设置*/
+/**
+ * 设置缓存，必须要可设置
+ * @return {[type]} [description]
+ */
 var saveData = function saveData() {
   if (config.launch.historyMode) {
     var data = config.data;
@@ -47417,7 +47423,7 @@ var runScript = function runScript() {
   }
 };
 
-var loadScene = function (options) {
+var initMainScene = function (options) {
 
   options = initDefaultValues(options || {});
 
@@ -47814,7 +47820,7 @@ var initMain = function initMain(novelData) {
   if (Xut.IBooks.Enabled) {
     //删除背景图
     $(".xut-cover").remove();
-    loadScene({
+    initMainScene({
       "pageIndex": Xut.IBooks.CONFIG.pageIndex
     });
     return;
@@ -47861,7 +47867,7 @@ var initMain = function initMain(novelData) {
   if (config.launch.historyMode && pageIndex !== undefined) {
     var novelId = parseInt(getCache("novelId"));
     if (novelId) {
-      return loadScene({
+      return initMainScene({
         "novelId": novelId,
         "pageIndex": pageIndex,
         'history': $getStorage('history')
@@ -47871,7 +47877,7 @@ var initMain = function initMain(novelData) {
 
   //第一次加载
   //没有缓存
-  loadScene({ "novelId": novelData._id, "pageIndex": 0 });
+  initMainScene({ "novelId": novelData._id, "pageIndex": 0 });
 };
 
 /**
@@ -50180,6 +50186,7 @@ function runBatcherQueue() {
  * @return {[type]} [description]
  */
 function repairImage(node, chapterIndex, src) {
+
   if (!node) {
     return;
   }
@@ -51650,7 +51657,7 @@ function crateFloat(pageType, pipeData, divertor, baseFloatGroup, complete) {
 
   /*有可能在competent中已经创建,在content不需要重复创建*/
   if (!container) {
-    var id = 'float-' + pageType + '-li-' + pipeData.chapterIndex;
+    var id = 'float-' + pageType + '-' + (pipeData.chapterIndex + 1);
     container = $(String.styleFormat('<ul id="' + id + '"\n         class="xut-float"\n         style="left:' + getStyle.visualLeft + 'px;\n                top:' + getStyle.visualTop + 'px;\n                ' + Xut.style.transform + ':' + getStyle.translate + ';\n                z-index:' + zIndex + ';' + overflow + '">\n       </ul>'));
     $(pipeData.rootNode).after(container);
   }
@@ -67364,13 +67371,11 @@ function api(Swiper) {
 
   /**
    * 跳指定页面
-   * @param  {[type]} targetIndex [description]
-   * @param  {[type]} preMode     [description]
-   * @param  {[type]} complete    [description]
-   * @return {[type]}             [description]
+   * targetIndex：目标页面
+   * 在一个场景内部跳转
+   * 提供一个跳转完毕后的回调
    */
-  Swiper.prototype.scrollToPage = function (targetIndex) {
-    //目标页面
+  Swiper.prototype.scrollToPage = function (targetIndex, callback) {
 
     //如果还在翻页中
     if (!this.enabled) return;
@@ -67385,7 +67390,7 @@ function api(Swiper) {
       //前一页
       case visualIndex - 1:
         if (this.options.hasMultiPage) {
-          return this.prev();
+          return this.prev({ callback: callback });
         }
         break;
       //首页
@@ -67397,13 +67402,15 @@ function api(Swiper) {
       //后一页
       case visualIndex + 1:
         if (this.options.hasMultiPage) {
-          return this.next();
+          return this.next({ callback: callback });
         }
         break;
     }
 
     //算出是相关数据
     var data = calculationIndex(visualIndex, targetIndex, this.totalIndex);
+
+    data.callback = callback;
 
     //更新页码索引
     this._updatePointer(data);
@@ -71197,16 +71204,24 @@ var destroy$1 = function (baseProto) {
    * @return {[type]} [description]
    */
   baseProto.baseDestroy = function () {
-    // console.log(this)
-    // //清理图片缓存
-    // //读库快速退出模式下报错修正
-    // try {
-    //     this.$pageNode.hide().find('img').each(function(aaa, img) {
-    //         img.src = 'images/icons/clearmem.png'
-    //     })
-    // } catch (e) {
-    //     console.log('销毁图片出错')
-    // }
+
+    /**
+     * 2017.6.26
+     * 销毁图片apng
+     * 一次性的apng图片，必须要清理src
+     * 否则重复不生效，因为缓存的关系
+     */
+    try {
+      this.$pageNode.hide().find('img').each(function (index, img) {
+        if (img) {
+          img.removeAttribute('onerror');
+          img.src = null;
+          img.removeAttribute('src');
+        }
+      });
+    } catch (e) {
+      console.log('销毁图片出错');
+    }
 
     //最后一页动作处理
     //for miaomiaoxue
@@ -74395,6 +74410,8 @@ var Scheduler = function () {
           'createPointer': data.create
         });
         Xut.View.HideBusy();
+        //执行切换完毕通知
+        data.callback && data.callback();
       });
     }
 
@@ -74886,6 +74903,17 @@ function extendView($$mediator, access, $$globalSwiper) {
   };
 
   /**
+   * 修正参数
+   */
+  function fixParameter(index) {
+    index = Number(index) - 1;
+    if (index < 0) {
+      index = 0;
+    }
+    return index;
+  }
+
+  /**
    * 跳转页面
    * 场景内部切换
    * 跳转到指定编号的页面
@@ -74894,16 +74922,7 @@ function extendView($$mediator, access, $$globalSwiper) {
    * 文本框跳转
    * ........
    */
-  Xut.View.GotoSlide = function (seasonId, chapterId) {
-
-    //修正参数
-    var fixParameter = function fixParameter(pageIndex) {
-      pageIndex = Number(pageIndex) - 1;
-      if (pageIndex < 0) {
-        pageIndex = 0;
-      }
-      return pageIndex;
-    };
+  Xut.View.GotoSlide = function (seasonId, chapterId, pageIndex, callback) {
 
     //ibooks模式下的跳转
     //全部转化成超链接
@@ -74915,27 +74934,42 @@ function extendView($$mediator, access, $$globalSwiper) {
     //兼容数据错误
     if (!seasonId && !chapterId) return;
 
-    //如果是一个参数是传递页码数,则为内部跳转
+    ///////////////////////////////////////
+    // 如果是一个参数是传递页码数,则为内部跳转
+    ///////////////////////////////////////
     if (arguments.length === 1) {
       //复位翻页按钮
       Xut.View.ShowNextBar();
-      return $$globalSwiper.scrollToPage(fixParameter(seasonId));
+      //seasonId == pageIndex
+      return $$globalSwiper.scrollToPage(fixParameter(seasonId), callback);
     }
 
-    //场景模式内部跳转
+    ////////////////////////////
+    /// 场景模式内部跳转
+    /// 1 保证同一个seasonId
+    /// 2 如果传递了pageIndex
+    /// 3 如果只传递了chpaterId
+    ////////////////////////////
     if (options.seasonId == seasonId) {
-      //chpaterId 转化成实际页码
-      var sectionRang = Xut.data.query('sectionRelated', seasonId);
-      var pageIndex = chapterId - sectionRang.start;
-      Xut.View.ShowNextBar();
-      return $$globalSwiper.scrollToPage(fixParameter(pageIndex));
+      if (pageIndex && !chapterId) {
+        //如果传递了页码数
+        return $$globalSwiper.scrollToPage(fixParameter(pageIndex), callback);
+      } else {
+        //chpaterId 转化成实际页码
+        var sectionRang = Xut.data.query('sectionRelated', seasonId);
+        var pageIndex = chapterId - sectionRang.start;
+        Xut.View.ShowNextBar();
+        return $$globalSwiper.scrollToPage(fixParameter(pageIndex), callback);
+      }
     }
 
-    //场景与场景的跳转
+    ////////////////////
+    // 场景与场景的跳转
+    ////////////////////
     return Xut.View.LoadScenario({
       'seasonId': seasonId,
       'chapterId': chapterId
-    });
+    }, callback);
   };
 
   /**
@@ -78244,10 +78278,11 @@ var findContainer = function findContainer($context, id, isMain) {
  * 加载新的场景
  * @return {[type]} [description]
  */
-var checkHistory = function checkHistory(history) {
+var checkHistory = function checkHistory(history, callback) {
+
   //直接启用快捷调试模式
-  if (config.debug.deBugHistory) {
-    Xut.View.LoadScenario(config.debug.deBugHistory);
+  if (config.debug.locationPage) {
+    Xut.View.LoadScenario(config.debug.locationPage, callback);
     return true;
   }
 
@@ -78260,7 +78295,7 @@ var checkHistory = function checkHistory(history) {
         'seasonId': scenarioInfo[0],
         'chapterId': scenarioInfo[1],
         'pageIndex': scenarioInfo[2]
-      });
+      }, callback);
       return true;
     } else {
       return false;
@@ -78563,7 +78598,7 @@ var SceneFactory = function () {
             _this3.complete(function () {
               Xut.View.HideBusy();
               //检测是不是有缓存加载
-              if (!checkHistory(_this3.history)) {
+              if (!checkHistory(_this3.history, nextAction)) {
                 //指定自动运行的动作
                 nextAction && nextAction();
               }
@@ -78714,10 +78749,9 @@ function initView() {
      * 场景内部跳转
      * 节相同，章与章的跳转
      * 用户指定跳转模式,如果目标对象是当前应用页面，按内部跳转处理
-     * @return {[type]}            [description]
      */
     if (userAssign && current && current.seasonId === seasonId) {
-      Xut.View.GotoSlide(seasonId, chapterId);
+      Xut.View.GotoSlide(seasonId, chapterId, pageIndex, callback);
       return;
     }
 
@@ -78823,7 +78857,15 @@ function initView() {
     new SceneFactory(data);
   };
 
+  /**
+   * 'main': true, //主场景入口
+   * 'seasonId': seasonId,
+   * 'pageIndex': options.pageIndex,
+   * 'chapterId'
+   * 'history': options.history
+   */
   Xut.View.LoadScenario = function (options, callback) {
+
     /**
      * 如果启动了预加载模式
      * 需要处理跳转的页面预加载逻辑
@@ -79557,6 +79599,13 @@ function priorityConfig() {
   var golbal = config.golbal;
 
   //////////////////////////////////
+  /// debug模式
+  //////////////////////////////////
+  for (var key in golbal.debug) {
+    config.debug[key] = golbal.debug[key];
+  }
+
+  //////////////////////////////////
   /// 忙碌光标
   //////////////////////////////////
   if (launch) {
@@ -79643,9 +79692,9 @@ function priorityConfig() {
   //////////////////////////////////
   ///golbal混入到launch中
   //////////////////////////////////
-  for (var key in golbal) {
-    if (launch[key] === undefined) {
-      launch[key] = golbal[key];
+  for (var _key in golbal) {
+    if (launch[_key] === undefined) {
+      launch[_key] = golbal[_key];
     }
   }
 
@@ -79662,7 +79711,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 888.2;
+Xut.Version = 888.3;
 
 /*加载应用app*/
 var initApp = function initApp() {

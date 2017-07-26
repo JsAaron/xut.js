@@ -13,7 +13,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * chapterId是页面ID编号
    * base.pageType + "-" + (base.pageIndex + 1) + "-" + base.chapterId
    */
-  Xut.View.GetPageNodeIdName = function (pageType, pageIndex, chapterId) {
+  Xut.View.GetPageNodeIdName = function(pageType, pageIndex, chapterId) {
     return `${pageType}-${pageIndex+1}-${chapterId}`
   }
 
@@ -27,7 +27,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    *   parentIndex  父索引
    *   subIndex     子索引
    */
-  Xut.View.UpdatePage = function (...arg) {
+  Xut.View.UpdatePage = function(...arg) {
     $$mediator.$$emit('change:updatePage', ...arg)
   }
 
@@ -36,7 +36,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 显示上一页按钮
    * @param {...[type]} arg [description]
    */
-  Xut.View.ShowPrevBar = function (...arg) {
+  Xut.View.ShowPrevBar = function(...arg) {
     $$mediator.$$emit('change:showPrev', ...arg)
   }
 
@@ -44,7 +44,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 隐藏上一页按钮
    * @param {...[type]} arg [description]
    */
-  Xut.View.HidePrevBar = function (...arg) {
+  Xut.View.HidePrevBar = function(...arg) {
     $$mediator.$$emit('change:hidePrev', ...arg)
   }
 
@@ -53,7 +53,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 显示下一页按钮
    * @param {...[type]} arg [description]
    */
-  Xut.View.ShowNextBar = function (...arg) {
+  Xut.View.ShowNextBar = function(...arg) {
     $$mediator.$$emit('change:showNext', ...arg)
   }
 
@@ -61,14 +61,14 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 隐藏下一页按钮
    * @param {...[type]} arg [description]
    */
-  Xut.View.HideNextBar = function (...arg) {
+  Xut.View.HideNextBar = function(...arg) {
     $$mediator.$$emit('change:hideNext', ...arg)
   }
 
   /**
    * state, pointer
    */
-  Xut.View.ToggleToolbar = function (...arg) {
+  Xut.View.ToggleToolbar = function(...arg) {
     $$mediator.$$emit('change:toggleToolbar', ...arg)
   }
 
@@ -77,7 +77,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 没有参数显示 工具栏与控制翻页按钮
    * 有参数单独显示指定的
    */
-  Xut.View.ShowToolBar = function (point) {
+  Xut.View.ShowToolBar = function(point) {
     Xut.View.ToggleToolbar('show', point)
   }
 
@@ -86,14 +86,14 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 没有参数隐藏 工具栏与控制翻页按钮
    * 有参数单独隐藏指定
    */
-  Xut.View.HideToolBar = function (point) {
+  Xut.View.HideToolBar = function(point) {
     Xut.View.ToggleToolbar('hide', point)
   }
 
   /**
    * 复位工具栏
    */
-  Xut.View.ResetToolbar = function () {
+  Xut.View.ResetToolbar = function() {
     $$mediator.$$emit('change:resetToolbar')
   }
 
@@ -110,7 +110,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    *  Xut.View.Toolbar('hide')
    *
    */
-  Xut.View.Toolbar = function (cfg) {
+  Xut.View.Toolbar = function(cfg) {
     Xut.View.ToggleToolbar(cfg)
   };
 
@@ -122,7 +122,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
      prev
      next
    */
-  const gotoPage = function (data, direction) {
+  const gotoPage = function(data, direction) {
     let seasonId, chapterId, callback, speed
 
     /**
@@ -167,14 +167,14 @@ export function extendView($$mediator, access, $$globalSwiper) {
   /**
    * 跳转到上一个页面
    */
-  Xut.View.GotoPrevSlide = function (data) {
+  Xut.View.GotoPrevSlide = function(data) {
     gotoPage(data, 'prev')
   }
 
   /**
    * 跳转到下一个页面
    */
-  Xut.View.GotoNextSlide = function (data) {
+  Xut.View.GotoNextSlide = function(data) {
     gotoPage(data, 'next')
   }
 
@@ -183,28 +183,28 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 是否启动
    * @return {[type]} [description]
    */
-  Xut.View.HasEnabledSwiper = function () {
+  Xut.View.HasEnabledSwiper = function() {
     return $$globalSwiper.hasEnabled()
   }
 
   /**
    * 禁止滑动
    */
-  Xut.View.SetSwiperDisable = function () {
+  Xut.View.SetSwiperDisable = function() {
     $$globalSwiper.disable();
   }
 
   /**
    * 允许滑动
    */
-  Xut.View.SetSwiperEnable = function () {
+  Xut.View.SetSwiperEnable = function() {
     $$globalSwiper.enable();
   }
 
   /**
    * 设置翻页完成
    */
-  Xut.View.SetSwiperFilpComplete = function (...arg) {
+  Xut.View.SetSwiperFilpComplete = function(...arg) {
     $$globalSwiper.setTransitionComplete(...arg)
   }
 
@@ -214,7 +214,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 2.反弹
    * distX, distY, duration
    */
-  Xut.View.GetSwiperActionType = function (...arg) {
+  Xut.View.GetSwiperActionType = function(...arg) {
     return $$globalSwiper.getActionType(...arg)
   }
 
@@ -222,10 +222,21 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 是否为翻页的边界
    * @return {Boolean} [description]
    */
-  Xut.View.GetSwpierBorderBounce = function (distance) {
+  Xut.View.GetSwpierBorderBounce = function(distance) {
     return $$globalSwiper.isBorder(distance)
   }
 
+
+  /**
+   * 修正参数
+   */
+  function fixParameter(index) {
+    index = Number(index) - 1
+    if (index < 0) {
+      index = 0
+    }
+    return index
+  }
 
   /**
    * 跳转页面
@@ -236,16 +247,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
    * 文本框跳转
    * ........
    */
-  Xut.View.GotoSlide = function (seasonId, chapterId) {
-
-    //修正参数
-    const fixParameter = function (pageIndex) {
-      pageIndex = Number(pageIndex) - 1
-      if (pageIndex < 0) {
-        pageIndex = 0
-      }
-      return pageIndex
-    }
+  Xut.View.GotoSlide = function(seasonId, chapterId, pageIndex, callback) {
 
     //ibooks模式下的跳转
     //全部转化成超链接
@@ -257,27 +259,41 @@ export function extendView($$mediator, access, $$globalSwiper) {
     //兼容数据错误
     if (!seasonId && !chapterId) return;
 
-    //如果是一个参数是传递页码数,则为内部跳转
+    ///////////////////////////////////////
+    // 如果是一个参数是传递页码数,则为内部跳转
+    ///////////////////////////////////////
     if (arguments.length === 1) {
       //复位翻页按钮
       Xut.View.ShowNextBar()
-      return $$globalSwiper.scrollToPage(fixParameter(seasonId))
+      //seasonId == pageIndex
+      return $$globalSwiper.scrollToPage(fixParameter(seasonId), callback)
     }
 
-    //场景模式内部跳转
+    ////////////////////////////
+    /// 场景模式内部跳转
+    /// 1 保证同一个seasonId
+    /// 2 如果传递了pageIndex
+    /// 3 如果只传递了chpaterId
+    ////////////////////////////
     if (options.seasonId == seasonId) {
-      //chpaterId 转化成实际页码
-      var sectionRang = Xut.data.query('sectionRelated', seasonId)
-      var pageIndex = chapterId - sectionRang.start
-      Xut.View.ShowNextBar()
-      return $$globalSwiper.scrollToPage(fixParameter(pageIndex))
+      if (pageIndex && !chapterId) { //如果传递了页码数
+        return $$globalSwiper.scrollToPage(fixParameter(pageIndex), callback)
+      } else {
+        //chpaterId 转化成实际页码
+        var sectionRang = Xut.data.query('sectionRelated', seasonId)
+        var pageIndex = chapterId - sectionRang.start
+        Xut.View.ShowNextBar()
+        return $$globalSwiper.scrollToPage(fixParameter(pageIndex), callback)
+      }
     }
 
-    //场景与场景的跳转
+    ////////////////////
+    // 场景与场景的跳转
+    ////////////////////
     return Xut.View.LoadScenario({
       'seasonId': seasonId,
       'chapterId': chapterId
-    })
+    }, callback)
   }
 
 
@@ -298,7 +314,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
       speed : 300
    *
    */
-  Xut.View.SetSwiperMove = function ({
+  Xut.View.SetSwiperMove = function({
     action,
     direction,
     distance,

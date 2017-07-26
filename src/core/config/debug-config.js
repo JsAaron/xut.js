@@ -49,6 +49,7 @@ export default {
   },
 
   /**
+   * 直接定位页面
    * 直接通过数据库的历史记录定位到指定的页面
    * Xut.View.LoadScenario({
    *     'seasonId' : scenarioInfo[0],
@@ -61,7 +62,7 @@ export default {
    *  }
    * @type {Boolean}
    */
-  deBugHistory: DEFAULT,
+  locationPage: DEFAULT,
 
   /**
    *  仅做测试处理，因为每个section都可以对应配置pageMode参数

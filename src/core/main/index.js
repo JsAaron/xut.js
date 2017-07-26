@@ -1,5 +1,5 @@
 import baseConfig from './base-config'
-import loadScene from './scenario'
+import initMainScene from './main-scene'
 import { config } from '../config/index'
 import { bindAndroid } from '../initialize/button'
 import { plugVideo, html5Video } from '../initialize/video'
@@ -15,7 +15,7 @@ const initMain = novelData => {
   if (Xut.IBooks.Enabled) {
     //删除背景图
     $(".xut-cover").remove()
-    loadScene({
+    initMainScene({
       "pageIndex": Xut.IBooks.CONFIG.pageIndex
     })
     return
@@ -60,7 +60,7 @@ const initMain = novelData => {
   if (config.launch.historyMode && pageIndex !== undefined) {
     let novelId = parseInt(getCache("novelId"))
     if (novelId) {
-      return loadScene({
+      return initMainScene({
         "novelId": novelId,
         "pageIndex": pageIndex,
         'history': $getStorage('history')
@@ -70,7 +70,7 @@ const initMain = novelData => {
 
   //第一次加载
   //没有缓存
-  loadScene({ "novelId": novelData._id, "pageIndex": 0 })
+  initMainScene({ "novelId": novelData._id, "pageIndex": 0 })
 }
 
 

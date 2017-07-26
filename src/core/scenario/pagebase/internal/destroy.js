@@ -1,24 +1,32 @@
 import { destroy as _destroy } from '../depend/multievent'
 import { unWatchColumn } from '../watch'
-import { clearRepairImage } from '../../../repair/image'
+import { clearRepairImage } from 'repair/image'
 
-export default function (baseProto) {
+export default function(baseProto) {
 
   /**
    * 销毁页面对象
    * @return {[type]} [description]
    */
-  baseProto.baseDestroy = function () {
-    // console.log(this)
-    // //清理图片缓存
-    // //读库快速退出模式下报错修正
-    // try {
-    //     this.$pageNode.hide().find('img').each(function(aaa, img) {
-    //         img.src = 'images/icons/clearmem.png'
-    //     })
-    // } catch (e) {
-    //     console.log('销毁图片出错')
-    // }
+  baseProto.baseDestroy = function() {
+
+    /**
+     * 2017.6.26
+     * 销毁图片apng
+     * 一次性的apng图片，必须要清理src
+     * 否则重复不生效，因为缓存的关系
+     */
+    try {
+      this.$pageNode.hide().find('img').each(function(index, img) {
+        if (img) {
+          img.removeAttribute('onerror')
+          img.src = null
+          img.removeAttribute('src')
+        }
+      })
+    } catch (e) {
+      console.log('销毁图片出错')
+    }
 
     //最后一页动作处理
     //for miaomiaoxue

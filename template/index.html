@@ -33,8 +33,15 @@ Xut.Application.setConfig = {
   // platform: 'mini',
   historyMode: true,
   launchAnim: false,
+
   // convert: 'svg',
-  doublePageMode: false,
+
+  // debug: {
+  //   locationPage: {
+  //     seasonId: 1,
+  //     pageIndex: 18
+  //   }
+  // },
 
   // brModel: 1, //图片模式
 
@@ -93,7 +100,7 @@ Xut.Application.Watch('appDestory', function() {
 Xut.Application.Watch('trackCode', function(type, options) {})
 
 
-var appId = 27 //306
+var appId = 1 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

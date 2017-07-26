@@ -1,4 +1,4 @@
-import { query } from '../../../../database/query'
+import { query } from 'database/query'
 
 /*
 更新数据缓存

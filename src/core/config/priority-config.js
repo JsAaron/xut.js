@@ -81,6 +81,14 @@ export function priorityConfig() {
   const golbal = config.golbal
 
   //////////////////////////////////
+  /// debug模式
+  //////////////////////////////////
+  for (let key in golbal.debug) {
+    config.debug[key] = golbal.debug[key]
+  }
+
+
+  //////////////////////////////////
   /// 忙碌光标
   //////////////////////////////////
   if (launch) {
@@ -113,7 +121,7 @@ export function priorityConfig() {
   const trackTypes = launch && launch.trackCode || golbal.trackCode
   config.sendTrackCode = () => {}
   config.hasTrackCode = () => {}
-    /*'launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe']*/
+  /*'launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe']*/
   if (trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if (!launch.trackCode) { launch.trackCode = {} }
     trackTypes.forEach(type => { launch.trackCode[type] = true })

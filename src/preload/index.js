@@ -257,7 +257,7 @@ function loadResource(id, data, callback) {
 function repeatCheck(id, callback) {
 
   //判断是否所有页面加载完毕
-  const completeLoad = function() {
+  function completeLoad() {
     /*如果加载数等于总计量数，这个证明加载完毕*/
     if (id === chapterIdCount) {
       $warn('全部预加载完成')
@@ -287,7 +287,7 @@ function repeatCheck(id, callback) {
       notification[1]()
       notification = null
     } else {
-      /*跳转页面的情况， 如果不是按照顺序的预加载方式*/
+      /*跳转页面的情况,跳到任何一页，newChapterId不等于id*/
       nextTask(newChapterId)
       return
     }
@@ -308,7 +308,8 @@ function repeatCheck(id, callback) {
 
 /**
  * 检测下一个页面加载执行
- * @return {Function} [description]
+ * 如果传入了检测chpaterId
+ * 否则就用默认的正索引
  */
 function nextTask(chapterId, callback) {
   if (!chapterId) {
@@ -320,12 +321,12 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   const pageData = getDataset(chapterId)
 
-  const complete = function(info) {
+  function complete(info) {
     //如果加载了数据，但是数据还未加载完毕
     if (window.preloadData) {
       // $warn(`${info}:${chapterId}`)
       deleteResource(chapterId)
-      repeatCheck(loadingId, callback)
+      repeatCheck(chapterId, callback)
     }
   }
 
@@ -463,6 +464,7 @@ export function requestInterrupt({
     if (!processed) {
       $warn('预加载必须传递处理器，有错误')
     }
+    //等待预加载完毕后调用
     notification = [chapterId, function() {
       processed.call(context)
     }]

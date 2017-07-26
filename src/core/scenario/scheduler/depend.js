@@ -1,5 +1,5 @@
-import { errorTable } from '../../database/cache'
-import { query } from '../../database/query'
+import { errorTable } from 'database/cache'
+import { query } from 'database/query'
 import { config } from '../../config/index'
 import { $warn } from '../../util/debug/index'
 

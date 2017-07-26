@@ -35,7 +35,7 @@ import {
 1:从属的主索引
 2:摆放位置
  */
-const getDoubleOption = function (chapterIndex, doublePage) {
+const getDoubleOption = function(chapterIndex, doublePage) {
   if (doublePage.total) {
     for (let key in doublePage) {
       if (key !== 'total') {
@@ -273,7 +273,7 @@ export default class Scheduler {
         ///////////////////////////
         return pageStyle => {
           //创建新的页面管理，masterFilter 母板过滤器回调函数
-          const _createPageBase = function (masterFilter) {
+          const _createPageBase = function(masterFilter) {
 
             //初始化构建页面对象
             //1:page，2:master
@@ -284,7 +284,7 @@ export default class Scheduler {
               chapterIndex,
               hasMultiPage,
               'getStyle': currentStyle
-            }, pageIndex, masterFilter, function (shareMaster) {
+            }, pageIndex, masterFilter, function(shareMaster) {
               if (config.debug.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                 $warn(`母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`)
               }
@@ -432,7 +432,7 @@ export default class Scheduler {
 
     /*移动页面*/
     this.pageMgr.move(data)
-    this.getMasterContext(function () { this.move(data, isAppBoundary) })
+    this.getMasterContext(function() { this.move(data, isAppBoundary) })
 
     //更新页码
     if (action === 'flipOver') {
@@ -458,7 +458,7 @@ export default class Scheduler {
     /*暂停*/
     const suspendAction = (front, middle, back, stop) => {
       this.pageMgr.suspend(front, middle, back, stop)
-      this.getMasterContext(function () { this.suspend(stop) })
+      this.getMasterContext(function() { this.suspend(stop) })
     }
 
     const stopPageIndexs = converDoublePage(stopIndex)
@@ -584,7 +584,7 @@ export default class Scheduler {
     this.pageMgr.autoRun(data);
 
     //模板自动运行
-    this.getMasterContext(function () {
+    this.getMasterContext(function() {
       //如果动作是初始化，或者触发了母版自动运行
       //如果是越界处理
       //console.log(action,this.isBoundary,para.createMaster)
@@ -676,7 +676,7 @@ export default class Scheduler {
     const middleIndex = pagePointer.middleIndex
 
     /*清理页码*/
-    const clearPointer = function () {
+    const clearPointer = function() {
       pagePointer.createIndex = null
       pagePointer.destroyIndex = null
     }
@@ -748,13 +748,15 @@ export default class Scheduler {
     }
 
     //执行页面切换
-    goToPage(this, data, function (data) {
+    goToPage(this, data, function(data) {
       this._updatePointer(data.pagePointer);
       this._runPageBase({
         'action': 'toPage',
         'createPointer': data.create
       });
       Xut.View.HideBusy();
+      //执行切换完毕通知
+      data.callback && data.callback()
     })
   }
 
@@ -775,7 +777,7 @@ export default class Scheduler {
    */
   destroyManage() {
     this.pageMgr.destroyManage()
-    this.getMasterContext(function () {
+    this.getMasterContext(function() {
       this.destroyManage()
     })
   }
@@ -794,7 +796,7 @@ export default class Scheduler {
       //第一次进入，处理背景
       let $cover = $(".xut-cover")
       if ($cover.length) { //主动探测,只检查一次
-        let complete = function () {
+        let complete = function() {
           $cover && $cover.remove()
           $cover = null
           autoRun()
@@ -836,7 +838,7 @@ export default class Scheduler {
         if (Xut.Application.getAppState()) {
           //保留启动方法
           var pre = Xut.Application.LaunchApp;
-          Xut.Application.LaunchApp = function () {
+          Xut.Application.LaunchApp = function() {
             pre()
             triggerAuto()
           };

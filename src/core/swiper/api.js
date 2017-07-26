@@ -9,7 +9,7 @@ export default function api(Swiper) {
    * 在column中滑动的时候，会丢失Direction
    * 具体就是flow在首页，而且chpater只有一个flow的情况下
    */
-  Swiper.prototype.setDirection = function (value) {
+  Swiper.prototype.setDirection = function(value) {
     if (value !== undefined) {
       this.direction = value > 0 ? 'prev' : 'next'
     }
@@ -20,7 +20,7 @@ export default function api(Swiper) {
    * 是翻页还是反弹
    * @return {[type]} [description]
    */
-  Swiper.prototype.getActionType = function (touchX, touchY, duration, orientation) {
+  Swiper.prototype.getActionType = function(touchX, touchY, duration, orientation) {
     orientation = orientation || this.orientation
     if (orientation === 'h') {
       /**单独PPT页面内部滑动 */
@@ -57,14 +57,14 @@ export default function api(Swiper) {
    * column的情况
    * 动态设置新的页面总数
    */
-  Swiper.prototype.setLinearTotal = function (total, location) {
+  Swiper.prototype.setLinearTotal = function(total, location) {
 
     //如果当前是column
     if (location === 'middle') {
 
       let borderIndex
-        //必须是有2页以上并且当前页面就是最后一页
-        //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
+      //必须是有2页以上并且当前页面就是最后一页
+      //如果分栏默认只分出1页的情况，后需要不全就跳过这个处理
       if (this.totalIndex > 1 && this.visualIndex == this.totalIndex - 1) {
         borderIndex = this.visualIndex
       }
@@ -87,7 +87,7 @@ export default function api(Swiper) {
       this.visualIndex = total - 1;
       this.setPointer(this.visualIndex, total)
       this._updatePointer()
-        //设置Transform的偏移量，为最后一页
+      //设置Transform的偏移量，为最后一页
       this._setTransform()
     }
 
@@ -104,7 +104,7 @@ export default function api(Swiper) {
    * 获取初始化距离值
    * @return {[type]} [description]
    */
-  Swiper.prototype.getInitDistance = function () {
+  Swiper.prototype.getInitDistance = function() {
     return this._initDistance
   }
 
@@ -112,7 +112,7 @@ export default function api(Swiper) {
    * 模拟完成状态调用
    * @return {[type]} [description]
    */
-  Swiper.prototype.simulationComplete = function () {
+  Swiper.prototype.simulationComplete = function() {
     setTimeout(() => {
       this._setRestore()
       this.enable()
@@ -121,12 +121,12 @@ export default function api(Swiper) {
 
 
   /*启动滑动*/
-  Swiper.prototype.enable = function () {
+  Swiper.prototype.enable = function() {
     this.enabled = true;
   }
 
   //禁止滑动
-  Swiper.prototype.disable = function () {
+  Swiper.prototype.disable = function() {
     this.enabled = false;
   }
 
@@ -134,7 +134,7 @@ export default function api(Swiper) {
    * 是否锁定
    * @return {Boolean} [description]
    */
-  Swiper.prototype.hasEnabled = function () {
+  Swiper.prototype.hasEnabled = function() {
     return this.enabled
   }
 
@@ -144,7 +144,7 @@ export default function api(Swiper) {
    * @param  {[type]}  distance [description]
    * @return {Boolean}          [description]
    */
-  Swiper.prototype.isBorder = function (...arg) {
+  Swiper.prototype.isBorder = function(...arg) {
     this._borderBounce(...arg)
   }
 
@@ -153,7 +153,7 @@ export default function api(Swiper) {
    * 获取移动状态
    * @return {Boolean} [description]
    */
-  Swiper.prototype.getMoved = function () {
+  Swiper.prototype.getMoved = function() {
     return this._moved
   }
 
@@ -168,7 +168,7 @@ export default function api(Swiper) {
       callback
     }
    */
-  Swiper.prototype.prev = function ({
+  Swiper.prototype.prev = function({
     speed,
     callback
   } = {}) {
@@ -211,7 +211,7 @@ export default function api(Swiper) {
    * Xut.View.GotoNextSlide
    * callback 翻页完成
    */
-  Swiper.prototype.next = function ({
+  Swiper.prototype.next = function({
     speed,
     callback
   } = {}) {
@@ -255,7 +255,7 @@ export default function api(Swiper) {
    * 获取当前页码
    * @return {[type]} [description]
    */
-  Swiper.prototype.getVisualIndex = function () {
+  Swiper.prototype.getVisualIndex = function() {
     return this.visualIndex
   }
 
@@ -265,7 +265,7 @@ export default function api(Swiper) {
    * 因为分栏的关系，内部修改外部
    * 页面需要拼接
    */
-  Swiper.prototype.setPointer = function (target, totalIndex) {
+  Swiper.prototype.setPointer = function(target, totalIndex) {
     this.pagePointer = initPointer(target, totalIndex || this.totalIndex)
   }
 
@@ -274,19 +274,18 @@ export default function api(Swiper) {
    * 获取页面Pointer
    * @return {[type]} [description]
    */
-  Swiper.prototype.getPointer = function () {
+  Swiper.prototype.getPointer = function() {
     return this.pagePointer
   }
 
 
   /**
    * 跳指定页面
-   * @param  {[type]} targetIndex [description]
-   * @param  {[type]} preMode     [description]
-   * @param  {[type]} complete    [description]
-   * @return {[type]}             [description]
+   * targetIndex：目标页面
+   * 在一个场景内部跳转
+   * 提供一个跳转完毕后的回调
    */
-  Swiper.prototype.scrollToPage = function (targetIndex) { //目标页面
+  Swiper.prototype.scrollToPage = function(targetIndex, callback) {
 
     //如果还在翻页中
     if (!this.enabled) return
@@ -301,7 +300,7 @@ export default function api(Swiper) {
       //前一页
       case (visualIndex - 1):
         if (this.options.hasMultiPage) {
-          return this.prev();
+          return this.prev({ callback });
         }
         break
         //首页
@@ -313,13 +312,15 @@ export default function api(Swiper) {
         //后一页
       case (visualIndex + 1):
         if (this.options.hasMultiPage) {
-          return this.next();
+          return this.next({ callback });
         }
         break
     }
 
     //算出是相关数据
     const data = calculationIndex(visualIndex, targetIndex, this.totalIndex)
+
+    data.callback = callback
 
     //更新页码索引
     this._updatePointer(data)
@@ -332,7 +333,7 @@ export default function api(Swiper) {
   /**
    * 设置页面移动
    */
-  Swiper.prototype._setPageMove = function (position, speed) {
+  Swiper.prototype._setPageMove = function(position, speed) {
     let distance = (this.actualWidth * (position / 100)) / 2
 
     /*必须有效*/
@@ -354,7 +355,7 @@ export default function api(Swiper) {
        * 必须是同步方法：
        * 动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
        */
-      setSwipeInvalid: function () {
+      setSwipeInvalid: function() {
         self._isInvalid = true
       }
     })
@@ -364,7 +365,7 @@ export default function api(Swiper) {
    * 清理延时运行
    * @return {[type]} [description]
    */
-  Swiper.prototype.clearDelayTimer = function () {
+  Swiper.prototype.clearDelayTimer = function() {
     if (this.delayTimer) {
       clearTimeout(this.delayTimer)
       this.delayTimer = null
@@ -378,7 +379,7 @@ export default function api(Swiper) {
    * delay 默认没有延时
    */
 
-  Swiper.prototype.scrollToPosition = function (position = 100, speed = 5000, delay = 0) {
+  Swiper.prototype.scrollToPosition = function(position = 100, speed = 5000, delay = 0) {
     /*清理上一个延时*/
     this.clearDelayTimer()
 
@@ -399,7 +400,7 @@ export default function api(Swiper) {
    * 销毁所有
    * @return {[type]} [description]
    */
-  Swiper.prototype.destroy = function () {
+  Swiper.prototype.destroy = function() {
     this._off();
     this.$$unWatch();
     this.clearDelayTimer()
@@ -420,7 +421,7 @@ export default function api(Swiper) {
    * 调用动画完成
    * @param {[type]} element [description]
    */
-  Swiper.prototype.setTransitionComplete = function (...arg) {
+  Swiper.prototype.setTransitionComplete = function(...arg) {
     this._distributeComplete(...arg)
   }
 
@@ -431,7 +432,7 @@ export default function api(Swiper) {
    * @param  {Function} callback [description]
    * @return {[type]}            [description]
    */
-  Swiper.prototype.findBubbleRootNode = function (point, pageType) {
+  Swiper.prototype.findBubbleRootNode = function(point, pageType) {
     let liNode, pageChpaterIndex
     let visualIndex = this.visualIndex
     let sectionRang = this.options.sectionRang
