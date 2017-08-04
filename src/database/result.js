@@ -89,7 +89,7 @@ function filterJsonData() {
     //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
-    result.FlowData = result.FlowData.replace(urlRE, function (a, prefix, fileName, type) {
+    result.FlowData = result.FlowData.replace(urlRE, function(a, prefix, fileName, type) {
       return `${prefix}="${config.launch.resource}/gallery/${parseFileName(fileName,baseSuffix,type)}`
     })
   }
@@ -128,10 +128,10 @@ function filterJsonData() {
 export function importJsonDatabase(callback) {
   let path = config.launch.database;
   //如果外联指定路径json数据
-  if (path) {
+  if (path && /.js$/.test(path)) {
     //防止外部链接影响
     window.SQLResult = null
-    loadFile(path, function () {
+    loadFile(path, function() {
       callback(filterJsonData())
     })
   }

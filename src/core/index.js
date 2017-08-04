@@ -15,12 +15,12 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
-Xut.Version = 888.3
+Xut.Version = 888.4
 
 /*加载应用app*/
 const initApp = (...arg) => {
   /*针对异步的代码以前检测出来*/
-  initAsyn(function () {
+  initAsyn(function() {
     /*配置优先级*/
     priorityConfig();
     /*全局的一些事件处理*/
@@ -44,7 +44,7 @@ let cacheOptions
 let delayTimer = null
 
 /*横竖切换*/
-const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function () {
+const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function() {
   $(window).on('orientationchange', (e) => {
 
     /**
@@ -61,7 +61,7 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function 
     //2016.11.8
     function delay(fn) {
       if (!delayTimer) {
-        delayTimer = setTimeout(function () {
+        delayTimer = setTimeout(function() {
           Xut.Application.Refresh()
           clearTimeout(delayTimer)
           delayTimer = null
@@ -82,7 +82,7 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function 
       })
     }
   })
-} : function () {}
+} : function() {}
 
 
 /*新版本加载*/
@@ -108,11 +108,14 @@ Xut.Application.Launch = option => {
 }
 
 
-/*判断是否script有data-plat属性*/
-const hasLaunch = function () {
+/*判断是否script有data-plat或者data-mode属性*/
+const hasLaunch = function() {
   const scripts = document.querySelectorAll('script')
   for (let i = 0; i < scripts.length; i++) {
     let node = scripts[i]
+    if (node.getAttribute('data-lauchMode') == 1) {
+      return true
+    }
     if (node.getAttribute('data-plat') === 'mini') {
       return true
     }
@@ -128,7 +131,7 @@ setTimeout(() => {
       return
     }
     mixGolbalConfig(setConfig)
-      /*保证兼容，不需要判断launch存在，初始空对象*/
+    /*保证兼容，不需要判断launch存在，初始空对象*/
     config.launch = {}
     initApp()
   }

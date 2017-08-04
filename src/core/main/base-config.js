@@ -1,4 +1,4 @@
-import initDB from './db'
+import initDatabse from './db'
 import initDefaults from './defaults'
 import { importJsonDatabase } from 'database/result'
 import { $warn, loadGolbalStyle, setFastAnalysisRE } from '../util/index'
@@ -8,7 +8,7 @@ import { contentFilter } from '../component/activity/content/content-filter'
 import { config, initConfig, initPathAddress } from '../config/index'
 import { getSize } from '../config/v-screen'
 
-import { initPreload } from 'preload/index'
+import { initPreload, hasPrelaodFile } from 'preload/index'
 
 /**
  * 新增模式,用于记录浏览器退出记录
@@ -36,7 +36,7 @@ const setHistory = (data) => {
 }
 
 /*画轴模式*/
-const setPaintingMode = function (data) {
+const setPaintingMode = function(data) {
   if (!config.launch.visualMode && Number(data.scrollPaintingMode)) {
     config.launch.visualMode = 4
   }
@@ -44,7 +44,7 @@ const setPaintingMode = function (data) {
 
 
 /*最大屏屏幕尺寸*/
-const getMaxWidth = function () {
+const getMaxWidth = function() {
   if (config.visualSize) {
     return config.visualSize.width
   }
@@ -61,9 +61,9 @@ const getMaxWidth = function () {
  * 1080: 'mi', //1080-1439
  * 1440: 'hi' //1440->
  */
-const setDefaultSuffix = function () {
+const setDefaultSuffix = function() {
   let doc = document.documentElement
-    //竖版的情况才调整
+  //竖版的情况才调整
   if (doc.clientHeight > doc.clientWidth) {
     let ratio = window.devicePixelRatio || 1
     let maxWidth = getMaxWidth() * ratio
@@ -81,7 +81,7 @@ const setDefaultSuffix = function () {
 }
 
 /*自适应图片*/
-const adaptiveImage = function () {
+const adaptiveImage = function() {
   let $adaptiveImageNode = $('.xut-adaptive-image')
   if ($adaptiveImageNode.length) {
     let baseImageType = $adaptiveImageNode.width()
@@ -97,7 +97,7 @@ const adaptiveImage = function () {
 /*
   配置初始化
  */
-const configInit = function (novelData, tempSettingData) {
+const configInit = function(novelData, tempSettingData) {
 
   /*启动代码用户操作跟踪:启动*/
   config.sendTrackCode('launch')
@@ -131,7 +131,7 @@ const configInit = function (novelData, tempSettingData) {
  * 嵌入index分栏
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
-const configColumn = function (callback) {
+const configColumn = function(callback) {
   initColumn(haColumnCounts => {
     if (haColumnCounts) {
       //动画事件委托
@@ -158,49 +158,86 @@ export default function baseConfig(callback) {
   /*建议快速正则，提高计算*/
   setFastAnalysisRE()
 
-  importJsonDatabase((hasResults) => {
-    initDB(hasResults, function (dataRet) {
+  /**
+   * 导入数据库
+   */
+  importJsonDatabase((results) => {
+    setDatabse(results)
+  })
+
+
+  function setDatabse(results) {
+    initDatabse(results, function(dataRet) {
       const novelData = dataRet.Novel.item(0)
       const tempSettingData = initDefaults(dataRet.Setting)
-
-      /**
-       * 重设全局的页面模式
-       * 默认页面模式选择
-       * 1 全局用户接口
-       * 2 PPT的数据接口
-       * 3 默认1
-       * @type {[type]}
-       */
-      if (config.launch.visualMode === undefined) {
-        config.launch.visualMode = config.data.visualMode || 1
-      }
-
-      /**
-       * 模式5 只在竖版下使用
-       */
-      if (config.launch.visualMode === 5) {
-        const screen = getSize()
-        if (screen.height < screen.width) {
-          config.launch.visualMode = 1
-        }
-      }
+      const chapterTotal = dataRet.Chapter.length
 
       /*配置config*/
       configInit(novelData, tempSettingData)
 
-      /*加载svg的样式*/
-      loadGolbalStyle('svgsheet', function () {
-        /*分栏*/
-        configColumn(function () {
-          if (config.launch.preload) {
-            /*预加载*/
-            initPreload(dataRet.Chapter.length, () => callback(novelData))
-          } else {
-            callback(novelData)
-          }
-        })
+      /**
+       * 判断是否有预加载文件
+       */
+      hasPrelaodFile(function(hasFile) {
+        setConfig(hasFile)
+        loadStyle(novelData, chapterTotal)
       })
-
     })
-  })
+  }
+
+
+  /**
+   * 设置配置文件
+   */
+  function setConfig(hasFile) {
+
+    //如果没有预加载文件
+    //如果启动了图片模式，那么就需要去掉
+    if (!hasFile) {
+      config.launch.brModel = ''
+      config.launch.brModelType = ''
+    }
+
+    /**
+     * 重设全局的页面模式
+     * 默认页面模式选择
+     * 1 全局用户接口
+     * 2 PPT的数据接口
+     * 3 默认1
+     */
+    if (config.launch.visualMode === undefined) {
+      config.launch.visualMode = config.data.visualMode || 1
+    }
+
+    /**
+     * 模式5 只在竖版下使用
+     */
+    if (config.launch.visualMode === 5) {
+      const screen = getSize()
+      if (screen.height < screen.width) {
+        config.launch.visualMode = 1
+      }
+    }
+
+  }
+
+  /**
+   * 加载样式
+   * @return {[type]} [description]
+   */
+  function loadStyle(novelData, chapterTotal) {
+    /*加载svg的样式*/
+    loadGolbalStyle('svgsheet', function() {
+      /*分栏*/
+      configColumn(function() {
+        if (config.launch.preload) {
+          /*预加载*/
+          initPreload(chapterTotal, () => callback(novelData))
+        } else {
+          callback(novelData)
+        }
+      })
+    })
+  }
+
 }

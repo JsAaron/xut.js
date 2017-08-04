@@ -42042,6 +42042,9 @@ var improtGolbalConfig = {
         图像带有蒙板
          首先，忽略蒙板设置
          然后按照上面的规则，合成新的文件名即
+     2017.8.4
+      如果有perload那么就会自适应 webp/apng
+      如果没有就强制为0，只支持png,jpng
   */
   brModel: 0,
 
@@ -44504,7 +44507,7 @@ function filterJsonData() {
 function importJsonDatabase(callback) {
   var path = config.launch.database;
   //如果外联指定路径json数据
-  if (path) {
+  if (path && /.js$/.test(path)) {
     //防止外部链接影响
     window.SQLResult = null;
     loadFile(path, function () {
@@ -45139,7 +45142,7 @@ var initStore = function initStore(callback) {
  * 初始化
  * 数据结构
  */
-var initDB = function (hasResults, callback) {
+var initDatabse = function (hasResults, callback) {
   if (hasResults) {
     config.data.db = null;
     initStore(callback);
@@ -47065,6 +47068,20 @@ function checkCache(finish, next) {
 }
 
 /**
+ * 判断是否有预加载文件
+ * @return {Boolean} [description]
+ */
+function hasPrelaodFile(callback) {
+  loadFile(config.data.pathAddress + 'preload.js', function () {
+    if (window.preloadData) {
+      callback(true);
+    } else {
+      callback(false);
+    }
+  });
+}
+
+/**
  * 资源加载接口
  * 必须先预加载第一页
  * @return {[type]} [description]
@@ -47073,7 +47090,7 @@ function initPreload(total, callback) {
 
   var close = function close() {
     config.launch.preload = false;
-    callback();
+    callback(false);
   };
 
   var start = function start() {
@@ -47081,18 +47098,16 @@ function initPreload(total, callback) {
       $warn('预加载资源总数：' + total);
       /*监听预加载初四华*/
       watchPreloadInit();
-      callback();
+      callback(true);
     });
   };
 
-  loadFile(config.data.pathAddress + 'preload.js', function () {
-    if (window.preloadData) {
-      chapterIdCount = total;
-      checkCache(close, start);
-    } else {
-      close();
-    }
-  });
+  if (window.preloadData) {
+    chapterIdCount = total;
+    checkCache(close, start);
+  } else {
+    close();
+  }
 }
 
 /**
@@ -47334,52 +47349,86 @@ function baseConfig(callback) {
   /*建议快速正则，提高计算*/
   setFastAnalysisRE();
 
-  importJsonDatabase(function (hasResults) {
-    initDB(hasResults, function (dataRet) {
+  /**
+   * 导入数据库
+   */
+  importJsonDatabase(function (results) {
+    setDatabse(results);
+  });
+
+  function setDatabse(results) {
+    initDatabse(results, function (dataRet) {
       var novelData = dataRet.Novel.item(0);
       var tempSettingData = initDefaults(dataRet.Setting);
-
-      /**
-       * 重设全局的页面模式
-       * 默认页面模式选择
-       * 1 全局用户接口
-       * 2 PPT的数据接口
-       * 3 默认1
-       * @type {[type]}
-       */
-      if (config.launch.visualMode === undefined) {
-        config.launch.visualMode = config.data.visualMode || 1;
-      }
-
-      /**
-       * 模式5 只在竖版下使用
-       */
-      if (config.launch.visualMode === 5) {
-        var screen = getSize();
-        if (screen.height < screen.width) {
-          config.launch.visualMode = 1;
-        }
-      }
+      var chapterTotal = dataRet.Chapter.length;
 
       /*配置config*/
       configInit(novelData, tempSettingData);
 
-      /*加载svg的样式*/
-      loadGolbalStyle('svgsheet', function () {
-        /*分栏*/
-        configColumn(function () {
-          if (config.launch.preload) {
-            /*预加载*/
-            initPreload(dataRet.Chapter.length, function () {
-              return callback(novelData);
-            });
-          } else {
-            callback(novelData);
-          }
-        });
+      /**
+       * 判断是否有预加载文件
+       */
+      hasPrelaodFile(function (hasFile) {
+        setConfig(hasFile);
+        loadStyle(novelData, chapterTotal);
       });
     });
-  });
+  }
+
+  /**
+   * 设置配置文件
+   */
+  function setConfig(hasFile) {
+
+    //如果没有预加载文件
+    //如果启动了图片模式，那么就需要去掉
+    if (!hasFile) {
+      config.launch.brModel = '';
+      config.launch.brModelType = '';
+    }
+
+    /**
+     * 重设全局的页面模式
+     * 默认页面模式选择
+     * 1 全局用户接口
+     * 2 PPT的数据接口
+     * 3 默认1
+     */
+    if (config.launch.visualMode === undefined) {
+      config.launch.visualMode = config.data.visualMode || 1;
+    }
+
+    /**
+     * 模式5 只在竖版下使用
+     */
+    if (config.launch.visualMode === 5) {
+      var screen = getSize();
+      if (screen.height < screen.width) {
+        config.launch.visualMode = 1;
+      }
+    }
+  }
+
+  /**
+   * 加载样式
+   * @return {[type]} [description]
+   */
+  function loadStyle(novelData, chapterTotal) {
+    /*加载svg的样式*/
+    loadGolbalStyle('svgsheet', function () {
+      /*分栏*/
+      configColumn(function () {
+        if (config.launch.preload) {
+          /*预加载*/
+          initPreload(chapterTotal, function () {
+            return callback(novelData);
+          });
+        } else {
+          callback(novelData);
+        }
+      });
+    });
+  }
 }
 
 /**
@@ -79677,6 +79726,7 @@ function priorityConfig() {
 
   //////////////////////////////////
   /// 图片模式webp
+  /// 需要兼容老版本的png模式，base-config会重设
   //////////////////////////////////
   if (launch) {
     if (!launch.brModel && golbal.brModel) {
@@ -79711,7 +79761,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 888.3;
+Xut.Version = 888.4;
 
 /*加载应用app*/
 var initApp = function initApp() {
@@ -79809,11 +79859,14 @@ Xut.Application.Launch = function (option) {
   }
 };
 
-/*判断是否script有data-plat属性*/
+/*判断是否script有data-plat或者data-mode属性*/
 var hasLaunch = function hasLaunch() {
   var scripts = document.querySelectorAll('script');
   for (var i = 0; i < scripts.length; i++) {
     var node = scripts[i];
+    if (node.getAttribute('data-lauchMode') == 1) {
+      return true;
+    }
     if (node.getAttribute('data-plat') === 'mini') {
       return true;
     }

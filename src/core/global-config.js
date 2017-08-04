@@ -179,6 +179,10 @@ export default {
        图像带有蒙板
          首先，忽略蒙板设置
          然后按照上面的规则，合成新的文件名即
+
+    2017.8.4
+      如果有perload那么就会自适应 webp/apng
+      如果没有就强制为0，只支持png,jpng
   */
   brModel: 0,
 

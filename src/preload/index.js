@@ -359,6 +359,22 @@ function checkCache(finish, next) {
   }
 }
 
+
+/**
+ * 判断是否有预加载文件
+ * @return {Boolean} [description]
+ */
+export function hasPrelaodFile(callback) {
+  loadFile(config.data.pathAddress + 'preload.js', function() {
+    if (window.preloadData) {
+      callback(true)
+    } else {
+      callback(false)
+    }
+  })
+}
+
+
 /**
  * 资源加载接口
  * 必须先预加载第一页
@@ -368,7 +384,7 @@ export function initPreload(total, callback) {
 
   const close = function() {
     config.launch.preload = false
-    callback()
+    callback(false)
   }
 
   const start = function() {
@@ -376,18 +392,16 @@ export function initPreload(total, callback) {
       $warn('预加载资源总数：' + total);
       /*监听预加载初四华*/
       watchPreloadInit()
-      callback();
+      callback(true);
     })
   }
 
-  loadFile(config.data.pathAddress + 'preload.js', function() {
-    if (window.preloadData) {
-      chapterIdCount = total
-      checkCache(close, start)
-    } else {
-      close()
-    }
-  })
+  if (window.preloadData) {
+    chapterIdCount = total
+    checkCache(close, start)
+  } else {
+    close()
+  }
 }
 
 

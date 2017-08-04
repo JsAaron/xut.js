@@ -157,6 +157,7 @@ export function priorityConfig() {
 
   //////////////////////////////////
   /// 图片模式webp
+  /// 需要兼容老版本的png模式，base-config会重设
   //////////////////////////////////
   if (launch) {
     if (!launch.brModel && golbal.brModel) {
@@ -167,7 +168,6 @@ export function priorityConfig() {
     if (launch.brModel) {
       launch.brModelType = getBrType(launch.brModel)
     }
-
   }
 
   //////////////////////////////////
