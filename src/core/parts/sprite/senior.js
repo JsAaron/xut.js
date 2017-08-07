@@ -6,7 +6,8 @@
  * 2.复杂精灵动画
  *   提供给普通转化高级使用
  */
-import { getFileFullPath, loadFigure } from '../../util/index'
+import { getFileFullPath } from '../../util/index'
+import { imgReady } from '../../util/loader/imageOld'
 import { config } from '../../config/index'
 
 /*
@@ -54,7 +55,7 @@ export default class {
     /**webp图片的后缀*/
     const brModelType = config.launch.brModelType;
     if (brModelType) {
-      _.each(this.originalImageList, function (imageData) {
+      _.each(this.originalImageList, function(imageData) {
         if (imageData.name) {
           imageData.name = imageData.name.replace(/.png|.jpg/, brModelType)
         }
@@ -125,6 +126,8 @@ export default class {
     }
     this.xRote = parseInt(obj.css("width")) / this.startPoint.w
     this.yRote = parseInt(obj.css("height")) / this.startPoint.h
+    this.startLeft = parseInt(obj.css("left"))
+    this.startTop = parseInt(obj.css("top"))
   }
 
 
@@ -162,15 +165,8 @@ export default class {
    */
   _initStructure() {
     const src = this.resourcePath + this.originalImageList[0].name
-
-    let container
-    if (Xut.plat.isIOS) {
-      container = `<img src=${src} class="inherit-size fullscreen-background" style="position:absolute;"/>`
-    } else {
-      container = `<div class="inherit-size fullscreen-background"
-                            style="position:absolute;background-image: url(${src});"></div>`
-    }
-    const $sprObj = $(String.styleFormat(container))
+    const html = `<img src="${src}" style="width:100%;height:100%;"/>`
+    const $sprObj = $(String.styleFormat(html))
     this.sprObj = $sprObj[0]
     this.obj.html(this.sprObj)
   }
@@ -197,13 +193,13 @@ export default class {
       return
     }
     let self = this
-    let collect = function () {
+    let collect = function() {
       self._imgArray && self._imgArray.push(this)
       callback && callback()
     }
     let imageList = this.originalImageList
     let resourcePath = this.resourcePath
-    loadFigure(resourcePath + imageList[index].name, collect)
+    imgReady(resourcePath + imageList[index].name, collect)
   }
 
 
@@ -216,10 +212,10 @@ export default class {
     let curFPS = imageList[this.curFPS];
     let x = curFPS.X - this.startPoint.x;
     let y = curFPS.Y - this.startPoint.y;
-    return {
-      left: x * this.xRote,
-      top: y * this.yRote
-    }
+    this.obj.css({
+      left: this.startLeft + x * this.xRote,
+      top: this.startTop + y * this.yRote
+    })
   }
 
   /**
@@ -238,20 +234,11 @@ export default class {
 
     /*如果图片需要运动，改变地址*/
     if (this.isSports) {
-      const position = this._changePosition()
-      Xut.style.setTranslate({
-        node: this.sprObj,
-        x: position.left,
-        y: position.top
-      })
+      this._changePosition();
     }
 
     /*改变图片*/
-    if (Xut.plat.isIOS) {
-      this.sprObj.setAttribute('src', resourcePath + curFPS.name)
-    } else {
-      this.sprObj.style.backgroundImage = `url(${ resourcePath + curFPS.name })`
-    }
+    this.sprObj.setAttribute('src', resourcePath + curFPS.name)
   }
 
 
@@ -351,7 +338,7 @@ export default class {
     this.sprObj = null
     this.data.params = null
     this.data = null
-    this._imgArray.forEach(function (img) {
+    this._imgArray.forEach(function(img) {
       img = null
     })
     this.originalImageList = null
