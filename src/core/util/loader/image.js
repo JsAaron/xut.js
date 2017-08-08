@@ -73,9 +73,11 @@ export function loadFigure(data, callback) {
     let newHeight = img.height;
     // 如果图片已经在其他地方加载可使用面积检测
     if (newWidth !== width || newHeight !== height || newWidth * newHeight > 1024) {
-      clear()
       callback && callback(true, hasCache);
       onready.end = true;
+      if (hasCache) {
+        clear()
+      }
       return true
     }
   }
@@ -83,8 +85,8 @@ export function loadFigure(data, callback) {
   // 加载错误后的事件
   img.onerror = function () {
     onready.end = true;
-    clear()
     callback && callback(false);
+    clear()
   };
 
 
@@ -96,16 +98,17 @@ export function loadFigure(data, callback) {
 
   /*完全加载完毕的事件*/
   img.onload = function () {
-    clear()
+    !onready.end && onready();
     callback && callback(true);
+    clear()
   };
 
   // 加入队列中定期执行
-  // if (!onready.end) {
-  //   list.push(onready);
-  //   // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-  //   if (intervalId === null) intervalId = setInterval(tick, 40);
-  // };
+  if (!onready.end) {
+    list.push(onready);
+    // 无论何时只允许出现一个定时器，减少浏览器性能损耗
+    if (intervalId === null) intervalId = setInterval(tick, 40);
+  };
 
   return img
 }

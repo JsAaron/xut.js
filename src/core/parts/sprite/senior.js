@@ -6,8 +6,7 @@
  * 2.复杂精灵动画
  *   提供给普通转化高级使用
  */
-import { getFileFullPath } from '../../util/index'
-import { imgReady } from '../../util/loader/imageOld'
+import { getFileFullPath,loadFigure } from '../../util/index'
 import { config } from '../../config/index'
 
 /*
@@ -199,7 +198,7 @@ export default class {
     }
     let imageList = this.originalImageList
     let resourcePath = this.resourcePath
-    imgReady(resourcePath + imageList[index].name, collect)
+    loadFigure(resourcePath + imageList[index].name, collect)
   }
 
 

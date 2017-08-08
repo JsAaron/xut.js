@@ -173,30 +173,33 @@ export default function baseConfig(callback) {
       const chapterTotal = dataRet.Chapter.length
 
       /*配置config*/
+      setConfig()
       configInit(novelData, tempSettingData)
 
       /**
        * 判断是否有预加载文件
        */
       hasPrelaodFile(function(hasFile) {
-        setConfig(hasFile)
+        setBrModel(hasFile)
         loadStyle(novelData, chapterTotal)
       })
     })
   }
 
-
-  /**
-   * 设置配置文件
-   */
-  function setConfig(hasFile) {
-
+  function setBrModel(hasFile) {
     //如果没有预加载文件
     //如果启动了图片模式，那么就需要去掉
     if (!hasFile) {
       config.launch.brModel = ''
       config.launch.brModelType = ''
     }
+
+  }
+
+  /**
+   * 设置配置文件
+   */
+  function setConfig() {
 
     /**
      * 重设全局的页面模式

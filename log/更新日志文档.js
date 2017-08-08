@@ -12,6 +12,8 @@
 
 /*
 *
+* v888.7 2018.8.6   set brModel修复
+* v888.5 2018.8.5   修复高级精灵动画闪的问题，只能用lefe top不能用css3 transfrom
 * v888.4 2018.8.4   1.增加data-lauchMode
 *                   2.修正了图模式的判断，如果不存在preload那么只用png默认图片
 * v888.3 2017.7.26   一次性的apng图片，必须要清理src

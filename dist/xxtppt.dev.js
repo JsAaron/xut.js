@@ -43326,6 +43326,30 @@ function loadFile(url, callback, charset) {
  * 图片预加载
  */
 
+var list = [];
+var intervalId = null;
+
+/**
+ * 用来执行队列
+ * @return {[type]} [description]
+ */
+var tick = function tick() {
+  var i = 0;
+  for (; i < list.length; i++) {
+    list[i].end ? list.splice(i--, 1) : list[i]();
+  }
+  !list.length && stop();
+};
+
+/**
+ * 停止所有定时器队列
+ * @return {[type]} [description]
+ */
+var stop = function stop() {
+  clearInterval(intervalId);
+  intervalId = null;
+};
+
 /**
  * callback(1,2)
  * 1 图片加载状态 success / fail   true/false
@@ -43371,9 +43395,11 @@ function loadFigure(data, callback) {
     var newHeight = img.height;
     // 如果图片已经在其他地方加载可使用面积检测
     if (newWidth !== width || newHeight !== height || newWidth * newHeight > 1024) {
-      clear();
       callback && callback(true, hasCache);
       onready.end = true;
+      if (hasCache) {
+        clear();
+      }
       return true;
     }
   };
@@ -43381,8 +43407,8 @@ function loadFigure(data, callback) {
   // 加载错误后的事件
   img.onerror = function () {
     onready.end = true;
-    clear();
     callback && callback(false);
+    clear();
   };
 
   /**检测是不是已经缓存了*/
@@ -43393,16 +43419,17 @@ function loadFigure(data, callback) {
 
   /*完全加载完毕的事件*/
   img.onload = function () {
-    clear();
+    !onready.end && onready();
     callback && callback(true);
+    clear();
   };
 
   // 加入队列中定期执行
-  // if (!onready.end) {
-  //   list.push(onready);
-  //   // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-  //   if (intervalId === null) intervalId = setInterval(tick, 40);
-  // };
+  if (!onready.end) {
+    list.push(onready);
+    // 无论何时只允许出现一个定时器，减少浏览器性能损耗
+    if (intervalId === null) intervalId = setInterval(tick, 40);
+  }
 
   return img;
 }
@@ -47363,29 +47390,32 @@ function baseConfig(callback) {
       var chapterTotal = dataRet.Chapter.length;
 
       /*配置config*/
+      setConfig();
       configInit(novelData, tempSettingData);
 
       /**
        * 判断是否有预加载文件
        */
       hasPrelaodFile(function (hasFile) {
-        setConfig(hasFile);
+        setBrModel(hasFile);
         loadStyle(novelData, chapterTotal);
       });
     });
   }
 
-  /**
-   * 设置配置文件
-   */
-  function setConfig(hasFile) {
-
+  function setBrModel(hasFile) {
     //如果没有预加载文件
     //如果启动了图片模式，那么就需要去掉
     if (!hasFile) {
       config.launch.brModel = '';
       config.launch.brModelType = '';
     }
+  }
+
+  /**
+   * 设置配置文件
+   */
+  function setConfig() {
 
     /**
      * 重设全局的页面模式
@@ -53763,6 +53793,8 @@ var _class$1 = function () {
       };
       this.xRote = parseInt(obj.css("width")) / this.startPoint.w;
       this.yRote = parseInt(obj.css("height")) / this.startPoint.h;
+      this.startLeft = parseInt(obj.css("left"));
+      this.startTop = parseInt(obj.css("top"));
     }
 
     /**
@@ -53805,14 +53837,8 @@ var _class$1 = function () {
     key: '_initStructure',
     value: function _initStructure() {
       var src = this.resourcePath + this.originalImageList[0].name;
-
-      var container = void 0;
-      if (Xut.plat.isIOS) {
-        container = '<img src=' + src + ' class="inherit-size fullscreen-background" style="position:absolute;"/>';
-      } else {
-        container = '<div class="inherit-size fullscreen-background"\n                            style="position:absolute;background-image: url(' + src + ');"></div>';
-      }
-      var $sprObj = $(String.styleFormat(container));
+      var html = '<img src="' + src + '" style="width:100%;height:100%;"/>';
+      var $sprObj = $(String.styleFormat(html));
       this.sprObj = $sprObj[0];
       this.obj.html(this.sprObj);
     }
@@ -53864,10 +53890,10 @@ var _class$1 = function () {
       var curFPS = imageList[this.curFPS];
       var x = curFPS.X - this.startPoint.x;
       var y = curFPS.Y - this.startPoint.y;
-      return {
-        left: x * this.xRote,
-        top: y * this.yRote
-      };
+      this.obj.css({
+        left: this.startLeft + x * this.xRote,
+        top: this.startTop + y * this.yRote
+      });
     }
 
     /**
@@ -53889,20 +53915,11 @@ var _class$1 = function () {
 
       /*如果图片需要运动，改变地址*/
       if (this.isSports) {
-        var position = this._changePosition();
-        Xut.style.setTranslate({
-          node: this.sprObj,
-          x: position.left,
-          y: position.top
-        });
+        this._changePosition();
       }
 
       /*改变图片*/
-      if (Xut.plat.isIOS) {
-        this.sprObj.setAttribute('src', resourcePath + curFPS.name);
-      } else {
-        this.sprObj.style.backgroundImage = 'url(' + (resourcePath + curFPS.name) + ')';
-      }
+      this.sprObj.setAttribute('src', resourcePath + curFPS.name);
     }
 
     /**
@@ -79761,7 +79778,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 888.4;
+Xut.Version = 888.7;
 
 /*加载应用app*/
 var initApp = function initApp() {
