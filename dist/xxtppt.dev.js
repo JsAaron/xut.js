@@ -48438,6 +48438,19 @@ var AudioSuper = function () {
       }
     }
 
+    /**
+     * 获取微信播放对象
+     * 2017.8.10
+     * 妙妙学ios公众号问题
+     * 如果嵌套了iframe必须要找parent的WeixinJSBridge
+     */
+
+  }, {
+    key: '$$getWeixinJSBridge',
+    value: function $$getWeixinJSBridge() {
+      return window.WeixinJSBridge || window.parent.WeixinJSBridge;
+    }
+
     //=============================
     //    提供外部接口，向上转型
     //=============================
@@ -48468,8 +48481,9 @@ var AudioSuper = function () {
       //flash模式不执行
       if (this.audio) {
         //支持自动播放,微信上单独处理
-        if (window.WeixinJSBridge) {
-          window.WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
+        var weixinJSBridge = this.$$getWeixinJSBridge();
+        if (weixinJSBridge) {
+          weixinJSBridge.invoke('getNetworkType', {}, function (e) {
             _this2.audio && _this2.audio.play();
           });
         } else {
@@ -48858,13 +48872,16 @@ var NativeAudio = function (_AudioSuper) {
       var trackId = this.trackId;
       var hasAudio = hasAudioes();
 
+      //如果不支持自动播放
+      //webkit移动端....
       if (hasAudio) {
         this._createContext();
       } else {
+        //pc与微信....
         this.audio = new Audio(this.$$url);
-        //如果是在微信中
-        if (window.WeixinJSBridge) {
-          //通过微信自己的事件处理，支持自动播放了
+
+        //通过微信自己的事件处理，支持自动播放了
+        if (this.$$getWeixinJSBridge()) {
           this._startPlay();
         } else {
           this._needFix = true;
@@ -79778,7 +79795,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 888.7;
+Xut.Version = 888.8;
 
 /*加载应用app*/
 var initApp = function initApp() {

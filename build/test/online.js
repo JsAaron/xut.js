@@ -7,7 +7,7 @@ killOccupied(prot, () => {
   browserSync({
     port: prot,
     server: {
-      baseDir: 'test/online',
+      baseDir: 'test/duku-test',
       index: "index.html"
     },
     open: true

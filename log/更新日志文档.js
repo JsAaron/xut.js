@@ -12,9 +12,10 @@
 
 /*
 *
-* v888.7 2018.8.6   set brModel修复
-* v888.5 2018.8.5   修复高级精灵动画闪的问题，只能用lefe top不能用css3 transfrom
-* v888.4 2018.8.4   1.增加data-lauchMode
+* v888.8 2017.8.10  妙妙学ios公众号问题  * 如果嵌套了iframe必须要找parent的WeixinJSBridge
+* v888.7 2017.8.6   set brModel修复
+* v888.5 2017.8.5   修复高级精灵动画闪的问题，只能用lefe top不能用css3 transfrom
+* v888.4 2017.8.4   1.增加data-lauchMode
 *                   2.修正了图模式的判断，如果不存在preload那么只用png默认图片
 * v888.3 2017.7.26   一次性的apng图片，必须要清理src
 * v888.2 2017.7.24   分离font文件，新增字体样式的xut前缀

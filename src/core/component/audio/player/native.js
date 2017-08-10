@@ -45,13 +45,16 @@ export class NativeAudio extends AudioSuper {
     let trackId = this.trackId
     let hasAudio = hasAudioes()
 
+    //如果不支持自动播放
+    //webkit移动端....
     if (hasAudio) {
       this._createContext();
     } else {
+      //pc与微信....
       this.audio = new Audio(this.$$url)
-      //如果是在微信中
-      if (window.WeixinJSBridge) {
-        //通过微信自己的事件处理，支持自动播放了
+
+      //通过微信自己的事件处理，支持自动播放了
+      if (this.$$getWeixinJSBridge()) {
         this._startPlay()
       } else {
         this._needFix = true
@@ -152,7 +155,7 @@ export class NativeAudio extends AudioSuper {
   _destroy() {
     if (this.audio) {
       this.audio.pause();
-      if (!window.WeixinJSBridge) {//微信通过自己API 没有绑定事件
+      if (!window.WeixinJSBridge) { //微信通过自己API 没有绑定事件
         this.audio.removeEventListener('loadedmetadata', this._startBack, false)
         this.audio.removeEventListener('ended', this._endBack, false)
         this.audio.removeEventListener('error', this._errorBack, false)
