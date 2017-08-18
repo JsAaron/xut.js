@@ -1,10 +1,5 @@
 import { dataQuery } from './sql'
-
-import {
-  setApi,
-  saveCache,
-  convertCache
-} from './cache'
+import { setApi, saveCache, convertCache } from './cache'
 
 /**
  * 初始化数据类

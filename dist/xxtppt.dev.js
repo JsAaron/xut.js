@@ -42033,12 +42033,13 @@ var improtGolbalConfig = {
      3：Android
   、
      brModel === 0，则什么都不变
-     brModel === 1/2/3，
+      brModel === 1/2/3，
        在线版：
          brModel为ios或android，获取了数据库的文件名之后，去掉扩展名。
-         如果是ios，则文件名之后加上_i，Android，则文件名之后，加上_a。
+         如果是ios，则文件名之后加上_i
+         Android，则文件名之后，加上_a
         本地版：
-         brModel为ios或android，获取了数据库的文件名之后，去掉扩展名
+         brModel为ios或android，后缀不改变，用数据库定义的文件名
         图像带有蒙板
          首先，忽略蒙板设置
          然后按照上面的规则，合成新的文件名即
@@ -44054,6 +44055,57 @@ function reviseSize(_ref2) {
   results.scaleBackTop = backSize.top;
 
   return results;
+}
+
+/**
+ * 清理图片
+ * @return {[type]} [description]
+ */
+function cleanImage(context) {
+
+  if (!context) {
+    return;
+  }
+
+  if (!context.length) {
+    context = $(context);
+  }
+  /**
+   * 2017.6.26
+   * 销毁图片apng
+   * 一次性的apng图片，必须要清理src
+   * 否则重复不生效，因为缓存的关系
+   */
+  try {
+    context.hide().find('img').each(function (index, img) {
+      if (img) {
+        img.removeAttribute('onerror');
+        img.src = null;
+        img.removeAttribute('src');
+      }
+    });
+  } catch (e) {
+    console.log('销毁图片出错');
+  }
+}
+
+/**
+ * 设置图片src
+ * @param {[type]} context [description]
+ * @param {[type]} path    [description]
+ */
+function setImage(context, path) {
+  if (!context) {
+    return;
+  }
+  if (!context.length) {
+    context = $(context);
+  }
+  context.find('img').each(function (index, img) {
+    if (!img.src) {
+      img.src = path;
+    }
+  });
 }
 
 /**
@@ -47241,7 +47293,7 @@ function clearPreload() {
  * 是   1
  * 否   0
  */
-var setHistory = function setHistory(data) {
+function setHistory(data) {
   //Launch接口定义
   if (config.launch.historyMode !== undefined) {
     return;
@@ -47256,22 +47308,22 @@ var setHistory = function setHistory(data) {
   if (config.debug.devtools) {
     config.launch.historyMode = true;
   }
-};
+}
 
 /*画轴模式*/
-var setPaintingMode = function setPaintingMode(data) {
+function setPaintingMode(data) {
   if (!config.launch.visualMode && Number(data.scrollPaintingMode)) {
     config.launch.visualMode = 4;
   }
-};
+}
 
 /*最大屏屏幕尺寸*/
-var getMaxWidth = function getMaxWidth() {
+function getMaxWidth() {
   if (config.visualSize) {
     return config.visualSize.width;
   }
   return window.screen.width > document.documentElement.clientWidth ? window.screen.width : document.documentElement.clientWidth;
-};
+}
 
 /**
  * 检车分辨率失败的情况
@@ -47280,7 +47332,7 @@ var getMaxWidth = function getMaxWidth() {
  * 1080: 'mi', //1080-1439
  * 1440: 'hi' //1440->
  */
-var setDefaultSuffix = function setDefaultSuffix() {
+function setDefaultSuffix() {
   var doc = document.documentElement;
   //竖版的情况才调整
   if (doc.clientHeight > doc.clientWidth) {
@@ -47297,10 +47349,10 @@ var setDefaultSuffix = function setDefaultSuffix() {
       $warn('css media匹配suffix失败，采用js采用计算. config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix);
     }
   }
-};
+}
 
 /*自适应图片*/
-var adaptiveImage = function adaptiveImage() {
+function adaptiveImage() {
   var $adaptiveImageNode = $('.xut-adaptive-image');
   if ($adaptiveImageNode.length) {
     var baseImageType = $adaptiveImageNode.width();
@@ -47311,12 +47363,12 @@ var adaptiveImage = function adaptiveImage() {
     }
   }
   setDefaultSuffix();
-};
+}
 
 /*
   配置初始化
  */
-var configInit = function configInit(novelData, tempSettingData) {
+function configInit(novelData, tempSettingData) {
 
   /*启动代码用户操作跟踪:启动*/
   config.sendTrackCode('launch');
@@ -47343,14 +47395,14 @@ var configInit = function configInit(novelData, tempSettingData) {
 
   //初始资源地址
   initPathAddress();
-};
+}
 
 /**
  * 初始分栏排版
  * 嵌入index分栏
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
-var configColumn = function configColumn(callback) {
+function configColumn(callback) {
   initColumn(function (haColumnCounts) {
     if (haColumnCounts) {
       //动画事件委托
@@ -47360,7 +47412,7 @@ var configColumn = function configColumn(callback) {
     }
     callback();
   });
-};
+}
 
 function baseConfig(callback) {
 
@@ -47389,23 +47441,21 @@ function baseConfig(callback) {
       var tempSettingData = initDefaults(dataRet.Setting);
       var chapterTotal = dataRet.Chapter.length;
 
-      /*配置config*/
+      //配置config
       setConfig();
       configInit(novelData, tempSettingData);
 
-      /**
-       * 判断是否有预加载文件
-       */
+      //判断是否有预加载文件
       hasPrelaodFile(function (hasFile) {
-        setBrModel(hasFile);
+        resetBrModel(hasFile);
         loadStyle(novelData, chapterTotal);
       });
     });
   }
 
-  function setBrModel(hasFile) {
-    //如果没有预加载文件
-    //如果启动了图片模式，那么就需要去掉
+  //如果没有预加载文件
+  //如果启动了图片模式，那么就需要去掉
+  function resetBrModel(hasFile) {
     if (!hasFile) {
       config.launch.brModel = '';
       config.launch.brModelType = '';
@@ -47463,7 +47513,6 @@ function baseConfig(callback) {
 
 /**
  * 设置缓存，必须要可设置
- * @return {[type]} [description]
  */
 var saveData = function saveData() {
   if (config.launch.historyMode) {
@@ -58814,6 +58863,12 @@ var Animation = function () {
               });
             }
           }
+
+          //如果是一次性动画，需要动态设置图片的src
+          if (_this3.markImgAnim) {
+            setImage(_this3.$contentNode, _this3.contentData.resourcePath);
+          }
+
           _this3[key].play && _this3[key].play(playComplete);
         }
       });
@@ -58835,7 +58890,9 @@ var Animation = function () {
           if (key === 'pptObj') {
             audioHandle(destroyContentAudio, _this4[key].options, chapterId);
           }
-          _this4[key].stop && _this4[key].stop();
+          if (_this4[key].stop) {
+            _this4[key].stop();
+          }
         }
       });
     }
@@ -58851,7 +58908,13 @@ var Animation = function () {
       var _this5 = this;
 
       access(function (key) {
-        _this5[key] && _this5[key].reset && _this5[key].reset();
+        if (_this5[key]) {
+          //如果是一次性动画，需要动态处理
+          if (_this5.markImgAnim) {
+            cleanImage(_this5.$contentNode);
+          }
+          _this5[key].reset && _this5[key].reset();
+        }
       });
     }
 
@@ -59510,7 +59573,6 @@ function index$1(data, relatedData, getStyle) {
 ///  1.动画直接改变显示隐藏状态
 ///  2.动画直接执行脚本
 /////////////////////////////////
-
 function pretreatment(data, eventName) {
   var parameter = data.getParameter();
 
@@ -59528,6 +59590,15 @@ function pretreatment(data, eventName) {
     category !== 'AutoCompSprite' && //不是自动精灵
     !/"inapp"/i.test(para.parameter)) {
       //并且不能是收费处理
+
+      //如果是apng、webp、gif的图片
+      //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
+      //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
+      //等执行的时候处理
+      if (data.contentData.markImgAnim) {
+        data.markImgAnim = true; //标记动画图片动画
+        return;
+      }
 
       //针对预处理动作,并且没有卷滚的不注册，满足是静态动画，true是显示,false隐藏
       if (!para.preCode && !para.postCode) {
@@ -63251,7 +63322,7 @@ function parseCanvas(contentId, category, conData, data) {
  * 编译content的容器
  * 2013.10.12
  * 1 为处理重复content数据引用问题,增加
- *            makeWarpObj方法,用于隔绝content数据的引用关系，导致重复数据被修正的问题
+ *            createScopeWarpObj方法,用于隔绝content数据的引用关系，导致重复数据被修正的问题
  * 2 多个页面引用同一个content的处理，Conetnt_0_1 ,类型+页码+ID的标示
  * @return {[type]} [description]
  */
@@ -63262,14 +63333,16 @@ function parseCanvas(contentId, category, conData, data) {
  * 导致重复数据被修正的问题
  * @return {[type]}             [description]
  */
-var makeWarpObj = function makeWarpObj(contentId, content, pageType, chapterIndex) {
+var createScopeWarpObj = function createScopeWarpObj(contentId, content, pageType, chapterIndex) {
   //唯一标示符
   var prefix = "_" + chapterIndex + "_" + contentId;
-  return {
+  var fileName = content.md5;
+
+  var data = {
     pageType: pageType,
     contentId: contentId,
-    isJs: /.js$/i.test(content.md5), //html类型
-    isSvg: /.svg$/i.test(content.md5), //svg类型
+    isJs: /.js$/i.test(fileName), //html类型
+    isSvg: /.svg$/i.test(fileName), //svg类型
     contentData: content,
     chapterIndex: chapterIndex,
     containerName: 'Content' + prefix,
@@ -63277,6 +63350,16 @@ var makeWarpObj = function makeWarpObj(contentId, content, pageType, chapterInde
       return name + prefix;
     }
   };
+
+  //如果是apng、webp、gif的图片
+  //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
+  //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
+  //等执行的时候处理
+  if (fileName && /^apng_|.gif$/i.test(fileName)) {
+    data.markImgAnim = true; //标记动画图片动画
+  }
+
+  return data;
 };
 
 /**
@@ -63529,6 +63612,13 @@ function contentStructure(pipeData, $$floatDivertor, callback) {
       /*分析图片地址*/
       analysisPath(wrapObj, conData);
 
+      //////////////////////
+      /// 扩展给PPT调用
+      /// 处理一次性APNG的不播放问题
+      //////////////////////
+      conData.resourcePath = wrapObj.resourcePath;
+      conData.markImgAnim = wrapObj.markImgAnim;
+
       //canvas节点
       if (conData.canvasMode) {
         contentStr = createCanvas(conData, wrapObj);
@@ -63599,7 +63689,8 @@ function contentStructure(pipeData, $$floatDivertor, callback) {
     if (content = contentCollection[contentCount]) {
       contentId = content['_id'];
       //创建包装器,处理数据引用关系
-      wrapObj = makeWarpObj(contentId, content, pageType, chapterIndex);
+      wrapObj = createScopeWarpObj(contentId, content, pageType, chapterIndex);
+
       idFix.push(wrapObj.containerName);
 
       //如果有文本效果标记
@@ -71294,17 +71385,7 @@ var destroy$1 = function (baseProto) {
      * 一次性的apng图片，必须要清理src
      * 否则重复不生效，因为缓存的关系
      */
-    try {
-      this.$pageNode.hide().find('img').each(function (index, img) {
-        if (img) {
-          img.removeAttribute('onerror');
-          img.src = null;
-          img.removeAttribute('src');
-        }
-      });
-    } catch (e) {
-      console.log('销毁图片出错');
-    }
+    cleanImage(this.$pageNode);
 
     //最后一页动作处理
     //for miaomiaoxue
@@ -79620,8 +79701,8 @@ function getSuffix() {
 
 /*预先判断br的基础类型*/
 // 1 在线模式 返回增加后缀
-// 2 手机模式 返回删除后缀
-// 3 PC模式，不修改
+// 2 手机模式 不修改，保留后缀
+// 3 PC模式，不修改，保留后缀
 function getBrType(mode) {
 
   //自适应平台
@@ -79641,9 +79722,10 @@ function getBrType(mode) {
       return getSuffix();
     } else {
       //app访问
-      return 'delete';
+      return '';
     }
   }
+
   //android
   if (mode === 3) {
     if (Xut.plat.isBrowser) {
@@ -79651,7 +79733,7 @@ function getBrType(mode) {
       return getSuffix();
     } else {
       //app访问
-      return 'delete';
+      return '';
     }
   }
 
@@ -79661,7 +79743,12 @@ function getBrType(mode) {
    * 但是不用APNG了
    */
   if (Xut.plat.isBrowser) {
-    return getSuffix();
+    //浏览器访问，要探测下是否支持Webp
+    if (Xut.plat.supportWebp) {
+      return getSuffix();
+    }
+    //否则用默认的格式
+    return '';
   }
 
   /*默认选择png，理论不会走这里了*/
@@ -79795,7 +79882,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-Xut.Version = 888.8;
+Xut.Version = 888.9;
 
 /*加载应用app*/
 var initApp = function initApp() {

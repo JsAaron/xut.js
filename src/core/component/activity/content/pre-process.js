@@ -3,7 +3,6 @@
 ///  1.动画直接改变显示隐藏状态
 ///  2.动画直接执行脚本
 /////////////////////////////////
-
 export default function pretreatment(data, eventName) {
   const parameter = data.getParameter()
 
@@ -11,6 +10,7 @@ export default function pretreatment(data, eventName) {
   if (parameter && parameter.length === 1) {
     const category = data.contentData.category
     const para = parameter[0];
+
 
     if (para.animationName === 'EffectAppear' && //出现动画
       data.domMode && //并且只有dom模式才可以，canvas排除
@@ -20,6 +20,15 @@ export default function pretreatment(data, eventName) {
       category !== 'Sprite' && //不是精灵
       category !== 'AutoCompSprite' && //不是自动精灵
       !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
+
+      //如果是apng、webp、gif的图片
+      //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
+      //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
+      //等执行的时候处理
+      if(data.contentData.markImgAnim){
+         data.markImgAnim = true //标记动画图片动画
+        return
+      }
 
       //针对预处理动作,并且没有卷滚的不注册，满足是静态动画，true是显示,false隐藏
       if (!para.preCode && !para.postCode) {
@@ -46,7 +55,7 @@ export default function pretreatment(data, eventName) {
 
         //方式二
         ;
-        ['window.location.href', 'window.open'].forEach(function (url) {
+        ['window.location.href', 'window.open'].forEach(function(url) {
           if (-1 !== para.preCode.indexOf(url)) {
             return data.prepScript = para.preCode
           }

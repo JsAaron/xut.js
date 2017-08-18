@@ -2,7 +2,7 @@
  * 编译content的容器
  * 2013.10.12
  * 1 为处理重复content数据引用问题,增加
- *            makeWarpObj方法,用于隔绝content数据的引用关系，导致重复数据被修正的问题
+ *            createScopeWarpObj方法,用于隔绝content数据的引用关系，导致重复数据被修正的问题
  * 2 多个页面引用同一个content的处理，Conetnt_0_1 ,类型+页码+ID的标示
  * @return {[type]} [description]
  */
@@ -29,14 +29,16 @@ import {
  * 导致重复数据被修正的问题
  * @return {[type]}             [description]
  */
-const makeWarpObj = (contentId, content, pageType, chapterIndex) => {
+const createScopeWarpObj = (contentId, content, pageType, chapterIndex) => {
   //唯一标示符
   let prefix = "_" + chapterIndex + "_" + contentId;
-  return {
+  let fileName = content.md5
+
+  const data = {
     pageType: pageType,
     contentId: contentId,
-    isJs: /.js$/i.test(content.md5), //html类型
-    isSvg: /.svg$/i.test(content.md5), //svg类型
+    isJs: /.js$/i.test(fileName), //html类型
+    isSvg: /.svg$/i.test(fileName), //svg类型
     contentData: content,
     chapterIndex: chapterIndex,
     containerName: 'Content' + prefix,
@@ -44,6 +46,16 @@ const makeWarpObj = (contentId, content, pageType, chapterIndex) => {
       return name + prefix;
     }
   }
+
+  //如果是apng、webp、gif的图片
+  //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
+  //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
+  //等执行的时候处理
+  if (fileName && /^apng_|.gif$/i.test(fileName)) {
+    data.markImgAnim = true //标记动画图片动画
+  }
+
+  return data
 }
 
 
@@ -285,12 +297,19 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
 
   /*创建content节点*/
   function createRelated(contentId, wrapObj) {
-    externalFile(wrapObj, function (wrapObj) {
+    externalFile(wrapObj, function(wrapObj) {
       let uuid, startStr, contentStr
       let conData = wrapObj.contentData
 
       /*分析图片地址*/
       analysisPath(wrapObj, conData)
+
+      //////////////////////
+      /// 扩展给PPT调用
+      /// 处理一次性APNG的不播放问题
+      //////////////////////
+      conData.resourcePath = wrapObj.resourcePath
+      conData.markImgAnim = wrapObj.markImgAnim
 
       //canvas节点
       if (conData.canvasMode) {
@@ -342,7 +361,7 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
         containerStr = []
 
         //合并容器
-        containerObj.createUUID.forEach(function (uuid) {
+        containerObj.createUUID.forEach(function(uuid) {
           start = containerObj[uuid].start.join('');
           end = containerObj[uuid].end;
           containerStr.push(start.concat(end));
@@ -368,7 +387,8 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
     if (content = contentCollection[contentCount]) {
       contentId = content['_id'];
       //创建包装器,处理数据引用关系
-      wrapObj = makeWarpObj(contentId, content, pageType, chapterIndex);
+      wrapObj = createScopeWarpObj(contentId, content, pageType, chapterIndex);
+
       idFix.push(wrapObj.containerName)
 
       //如果有文本效果标记
@@ -383,7 +403,7 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
       }
 
       /*转换缩放比*/
-      const setRatio = function (proportion = getStyle.pageProportion) {
+      const setRatio = function(proportion = getStyle.pageProportion) {
         sizeResults = reviseSize({
           results: wrapObj.contentData,
           getStyle: getStyle,
@@ -394,9 +414,9 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
       setRatio()
 
       /*设置页面缩放比*/
-      const setPageProportion = function (baseRatio) {
+      const setPageProportion = function(baseRatio) {
         let pageProportion = {}
-        _.each(getStyle.pageProportion, function (prop, key) {
+        _.each(getStyle.pageProportion, function(prop, key) {
           pageProportion[key] = prop * baseRatio
         })
         return pageProportion

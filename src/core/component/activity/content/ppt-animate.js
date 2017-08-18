@@ -12,7 +12,7 @@ import Powepoint from '../../../expand/powerpoint/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
 import { resetContentAudio, destroyContentAudio } from '../../audio/api'
-import { makeJsonPack } from '../../../util/lang'
+import { makeJsonPack, cleanImage, setImage } from '../../../util/index'
 
 //2016.7.15废弃
 //pixi暂时不使用
@@ -228,6 +228,12 @@ export default class Animation {
             })
           }
         }
+
+        //如果是一次性动画，需要动态设置图片的src
+        if (this.markImgAnim) {
+          setImage(this.$contentNode, this.contentData.resourcePath)
+        }
+
         this[key].play && this[key].play(playComplete)
       }
     })
@@ -245,7 +251,9 @@ export default class Animation {
         if (key === 'pptObj') {
           audioHandle(destroyContentAudio, this[key].options, chapterId);
         }
-        this[key].stop && this[key].stop()
+        if (this[key].stop) {
+          this[key].stop()
+        }
       }
     })
   }
@@ -257,7 +265,13 @@ export default class Animation {
    */
   reset() {
     access((key) => {
-      this[key] && this[key].reset && this[key].reset()
+      if (this[key]) {
+        //如果是一次性动画，需要动态处理
+        if (this.markImgAnim) {
+          cleanImage(this.$contentNode)
+        }
+        this[key].reset && this[key].reset()
+      }
     })
   }
 

@@ -1,6 +1,7 @@
 import { destroy as _destroy } from '../depend/multievent'
 import { unWatchColumn } from '../watch'
 import { clearRepairImage } from 'repair/image'
+import { cleanImage } from '../../../util/option'
 
 export default function(baseProto) {
 
@@ -16,17 +17,7 @@ export default function(baseProto) {
      * 一次性的apng图片，必须要清理src
      * 否则重复不生效，因为缓存的关系
      */
-    try {
-      this.$pageNode.hide().find('img').each(function(index, img) {
-        if (img) {
-          img.removeAttribute('onerror')
-          img.src = null
-          img.removeAttribute('src')
-        }
-      })
-    } catch (e) {
-      console.log('销毁图片出错')
-    }
+    cleanImage(this.$pageNode)
 
     //最后一页动作处理
     //for miaomiaoxue

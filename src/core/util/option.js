@@ -40,7 +40,7 @@ export function loadGolbalStyle(fileName, callback) {
 let brModelRE = null
 export function setFastAnalysisRE() {
   brModelRE = null
-    //如果存在brModelType
+  //如果存在brModelType
   if (config.launch.brModelType && config.launch.brModelType !== 'delete') {
     //(\w+[_a|_i]?)([.hi|.mi]*)$/i
     brModelRE = new RegExp(`(\\w+[${config.launch.brModelType}]?)([.${config.launch.baseImageSuffix}]*)$`, 'i')
@@ -240,7 +240,7 @@ export function createFn(obj, id, callback) {
  */
 export function execScript(code, type) {
   //过滤回车符号
-  var enterReplace = function (str) {
+  var enterReplace = function(str) {
     return str.replace(/\r\n/ig, '').replace(/\r/ig, '').replace(/\n/ig, '');
   }
   try {
@@ -280,7 +280,7 @@ export function replacePath(svgstr) {
 /**
  * 转化缩放比
  */
-const converProportion = function ({
+const converProportion = function({
   width,
   height,
   left,
@@ -427,4 +427,56 @@ export function reviseSize({
   results.scaleBackTop = backSize.top
 
   return results
+}
+
+
+/**
+ * 清理图片
+ * @return {[type]} [description]
+ */
+export function cleanImage(context) {
+
+  if (!context) {
+    return
+  }
+
+  if (!context.length) {
+    context = $(context)
+  }
+  /**
+   * 2017.6.26
+   * 销毁图片apng
+   * 一次性的apng图片，必须要清理src
+   * 否则重复不生效，因为缓存的关系
+   */
+  try {
+    context.hide().find('img').each(function(index, img) {
+      if (img) {
+        img.removeAttribute('onerror')
+        img.src = null
+        img.removeAttribute('src')
+      }
+    })
+  } catch (e) {
+    console.log('销毁图片出错')
+  }
+}
+
+/**
+ * 设置图片src
+ * @param {[type]} context [description]
+ * @param {[type]} path    [description]
+ */
+export function setImage(context, path) {
+  if (!context) {
+    return
+  }
+  if (!context.length) {
+    context = $(context)
+  }
+  context.find('img').each(function(index, img) {
+    if (!img.src) {
+      img.src = path
+    }
+  })
 }
