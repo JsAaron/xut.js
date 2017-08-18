@@ -586,6 +586,7 @@
 
 
     this.ontimeupdate($.proxy(function () {
+      timeMax.text(secondsFormat(this.video.getEndTime()))
       //timeToGo.text(secondsFormat(this.video.getCurrentTime()));
       timeChange.text(secondsFormat(this.video.getCurrentTime()))
     }, this));

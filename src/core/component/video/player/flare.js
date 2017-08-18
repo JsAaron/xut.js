@@ -49,6 +49,19 @@ export default class flarePlayer {
     if (Xut.plat.isAndroid && Xut.plat.isWeiXin && !options.isColumn) {
       fv.video.setAttribute("x5-video-player-type", "h5")
       fv.video.setAttribute("x5-video-player-fullscreen", true)
+
+      //小窗播放时 安卓微信浏览器自动全屏
+      //如果视频的top值大于(window.screen.height - height) / 2
+      //则视频有一部分会被遮挡  进入全屏事件时调整视频top值 退出全屏事件恢复原有top值
+      fv.video.addEventListener("x5videoenterfullscreen", function() {
+        if (top > (window.screen.height - height) / 2) {
+          $videoWrap[0].style.top = (window.screen.height - height) / 2
+        }
+      })
+      fv.video.addEventListener("x5videoexitfullscreen", function() {
+        $videoWrap[0].style.top = top;
+      })
+
     }
 
     /*播放完毕，关闭视频窗口*/
