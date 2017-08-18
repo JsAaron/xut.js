@@ -1,4 +1,4 @@
-import baseConfig from './base-config'
+import baseConfig from './base-config/index'
 import initMainScene from './main-scene'
 import { config } from '../config/index'
 import { bindAndroid } from '../initialize/button'

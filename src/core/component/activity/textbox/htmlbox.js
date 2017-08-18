@@ -7,7 +7,7 @@
 import { config } from '../../../config/index'
 import { bindContentEvent } from '../event/event'
 import { $on, $off, $setStorage, $getStorage } from '../../../util/index'
-import { IScroll } from '../../../parts/iscroll'
+import { IScroll } from '../../../expand/iscroll'
 
 const docElement = document.documentElement
 

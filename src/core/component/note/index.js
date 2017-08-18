@@ -1,4 +1,4 @@
-import { IScroll } from '../../parts/iscroll'
+import { IScroll } from '../../expand/iscroll'
 import { config } from '../../config/index'
 
 /**

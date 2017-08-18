@@ -1,4 +1,4 @@
-import { config } from '../config/index'
+import { config } from '../../config/index'
 
 /**
  * 默认工具栏配置

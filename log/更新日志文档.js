@@ -12,6 +12,7 @@
 
 /*
 *
+* v888.9 2017.8.18  修正BrModel类型的处理，增加平台自适应，本地app，保留数据库后缀
 * v888.8 2017.8.10  妙妙学ios公众号问题  * 如果嵌套了iframe必须要找parent的WeixinJSBridge
 * v888.7 2017.8.6   set brModel修复
 * v888.5 2017.8.5   修复高级精灵动画闪的问题，只能用lefe top不能用css3 transfrom

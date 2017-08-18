@@ -3,7 +3,6 @@ import { $setStorage, $getStorage, $removeStorage, execScript } from '../util/in
 
 /**
  * 设置缓存，必须要可设置
- * @return {[type]} [description]
  */
 const saveData = () => {
   if (config.launch.historyMode) {

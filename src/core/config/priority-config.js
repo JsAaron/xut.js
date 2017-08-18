@@ -21,8 +21,8 @@ function getSuffix() {
 
 /*预先判断br的基础类型*/
 // 1 在线模式 返回增加后缀
-// 2 手机模式 返回删除后缀
-// 3 PC模式，不修改
+// 2 手机模式 不修改，保留后缀
+// 3 PC模式，不修改，保留后缀
 function getBrType(mode) {
 
   //自适应平台
@@ -41,16 +41,17 @@ function getBrType(mode) {
       return getSuffix()
     } else {
       //app访问
-      return 'delete'
+      return ''
     }
   }
+
   //android
   if (mode === 3) {
     if (Xut.plat.isBrowser) { //浏览器访问
       return getSuffix()
     } else {
       //app访问
-      return 'delete'
+      return ''
     }
   }
 
@@ -60,7 +61,12 @@ function getBrType(mode) {
    * 但是不用APNG了
    */
   if (Xut.plat.isBrowser) {
-    return getSuffix()
+    //浏览器访问，要探测下是否支持Webp
+    if (Xut.plat.supportWebp) {
+      return getSuffix()
+    }
+    //否则用默认的格式
+    return ''
   }
 
   /*默认选择png，理论不会走这里了*/

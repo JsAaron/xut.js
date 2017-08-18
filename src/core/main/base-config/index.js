@@ -1,12 +1,12 @@
-import initDatabse from './db'
-import initDefaults from './defaults'
+import initDatabse from './init-database'
+import setData from './set-data'
 import { importJsonDatabase } from 'database/result'
-import { $warn, loadGolbalStyle, setFastAnalysisRE } from '../util/index'
-import { createCursor } from '../initialize/cursor'
-import { initColumn } from '../component/column/init'
-import { contentFilter } from '../component/activity/content/content-filter'
-import { config, initConfig, initPathAddress } from '../config/index'
-import { getSize } from '../config/v-screen'
+import { $warn, loadGolbalStyle, setFastAnalysisRE } from '../../util/index'
+import { createCursor } from '../../initialize/cursor'
+import { initColumn } from '../../component/column/init'
+import { contentFilter } from '../../component/activity/content/content-filter'
+import { config, initConfig, initPathAddress } from '../../config/index'
+import { getSize } from '../../config/v-screen'
 
 import { initPreload, hasPrelaodFile } from 'preload/index'
 
@@ -18,7 +18,7 @@ import { initPreload, hasPrelaodFile } from 'preload/index'
  * 是   1
  * 否   0
  */
-const setHistory = (data) => {
+function setHistory(data) {
   //Launch接口定义
   if (config.launch.historyMode !== undefined) {
     return
@@ -35,8 +35,9 @@ const setHistory = (data) => {
   }
 }
 
+
 /*画轴模式*/
-const setPaintingMode = function(data) {
+function setPaintingMode(data) {
   if (!config.launch.visualMode && Number(data.scrollPaintingMode)) {
     config.launch.visualMode = 4
   }
@@ -44,7 +45,7 @@ const setPaintingMode = function(data) {
 
 
 /*最大屏屏幕尺寸*/
-const getMaxWidth = function() {
+function getMaxWidth() {
   if (config.visualSize) {
     return config.visualSize.width
   }
@@ -61,7 +62,7 @@ const getMaxWidth = function() {
  * 1080: 'mi', //1080-1439
  * 1440: 'hi' //1440->
  */
-const setDefaultSuffix = function() {
+function setDefaultSuffix() {
   let doc = document.documentElement
   //竖版的情况才调整
   if (doc.clientHeight > doc.clientWidth) {
@@ -81,7 +82,7 @@ const setDefaultSuffix = function() {
 }
 
 /*自适应图片*/
-const adaptiveImage = function() {
+function adaptiveImage() {
   let $adaptiveImageNode = $('.xut-adaptive-image')
   if ($adaptiveImageNode.length) {
     let baseImageType = $adaptiveImageNode.width()
@@ -97,7 +98,7 @@ const adaptiveImage = function() {
 /*
   配置初始化
  */
-const configInit = function(novelData, tempSettingData) {
+function configInit(novelData, tempSettingData) {
 
   /*启动代码用户操作跟踪:启动*/
   config.sendTrackCode('launch')
@@ -131,7 +132,7 @@ const configInit = function(novelData, tempSettingData) {
  * 嵌入index分栏
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
-const configColumn = function(callback) {
+function configColumn(callback) {
   initColumn(haColumnCounts => {
     if (haColumnCounts) {
       //动画事件委托
@@ -169,31 +170,28 @@ export default function baseConfig(callback) {
   function setDatabse(results) {
     initDatabse(results, function(dataRet) {
       const novelData = dataRet.Novel.item(0)
-      const tempSettingData = initDefaults(dataRet.Setting)
+      const tempSettingData = setData(dataRet.Setting)
       const chapterTotal = dataRet.Chapter.length
 
-      /*配置config*/
+      //配置config
       setConfig()
       configInit(novelData, tempSettingData)
 
-      /**
-       * 判断是否有预加载文件
-       */
+      //判断是否有预加载文件
       hasPrelaodFile(function(hasFile) {
-        setBrModel(hasFile)
+        resetBrModel(hasFile)
         loadStyle(novelData, chapterTotal)
       })
     })
   }
 
-  function setBrModel(hasFile) {
-    //如果没有预加载文件
-    //如果启动了图片模式，那么就需要去掉
+  //如果没有预加载文件
+  //如果启动了图片模式，那么就需要去掉
+  function resetBrModel(hasFile) {
     if (!hasFile) {
       config.launch.brModel = ''
       config.launch.brModelType = ''
     }
-
   }
 
   /**

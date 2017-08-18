@@ -1,5 +1,5 @@
 import { createStore } from 'database/index'
-import { config } from '../config/index'
+import { config } from '../../config/index'
 
 /**
  * 数据库支持

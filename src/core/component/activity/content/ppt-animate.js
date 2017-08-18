@@ -8,7 +8,7 @@
  * @return {[type]} [description]
  *
  ********************************************************************/
-import Powepoint from '../../../parts/powerpoint/index'
+import Powepoint from '../../../expand/powerpoint/index'
 import ComSprite from './sprite/com'
 import AutoSprite from './sprite/auto'
 import { resetContentAudio, destroyContentAudio } from '../../audio/api'

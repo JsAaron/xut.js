@@ -1,6 +1,6 @@
 import { config } from '../../../../config/index'
 import { parseJSON } from '../../../../util/lang'
-import SeniorSprite from '../../../../parts/sprite/senior'
+import SeniorSprite from '../../../../expand/sprite/senior'
 
 let spiritObjs = {}
 

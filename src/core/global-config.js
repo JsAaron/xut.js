@@ -168,13 +168,15 @@ export default {
      3：Android
 、
      brModel === 0，则什么都不变
+
      brModel === 1/2/3，
        在线版：
          brModel为ios或android，获取了数据库的文件名之后，去掉扩展名。
-         如果是ios，则文件名之后加上_i，Android，则文件名之后，加上_a。
+         如果是ios，则文件名之后加上_i
+         Android，则文件名之后，加上_a
 
        本地版：
-         brModel为ios或android，获取了数据库的文件名之后，去掉扩展名
+         brModel为ios或android，后缀不改变，用数据库定义的文件名
 
        图像带有蒙板
          首先，忽略蒙板设置

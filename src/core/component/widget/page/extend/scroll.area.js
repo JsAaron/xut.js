@@ -1,5 +1,5 @@
 import { parseJSON } from '../../../../util/lang'
-import { IScroll } from '../../../../parts/iscroll'
+import { IScroll } from '../../../../expand/iscroll'
 
 /**
  * 眷顾区域扩展
