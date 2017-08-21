@@ -15,6 +15,9 @@ initAudio()
 initVideo()
 initGlobalAPI()
 
+/////////////////
+////  版本号  ////
+/////////////////
 Xut.Version = 889
 
 /*加载应用app*/
