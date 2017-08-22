@@ -22,7 +22,9 @@ if (process.env.NODE_ENV !== 'production') {
       if (window.debug && window.debug[level]) {
         window.debug[level](msg)
       } else {
-        const command = console[level] || console.error
+        const command = function() {
+          return console[level] || console.error
+        }
         if (typeof msg == 'object') {
           command(`[Xut warn]:`, msg)
         } else {

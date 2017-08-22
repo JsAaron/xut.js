@@ -1,6 +1,6 @@
 /*!
  * Xut.js v889
- * Release date 2017-08-18
+ * Release date 2017-08-22
  * (c) 2010-2017
  * author @by【Aaron】
  * For internal use only
