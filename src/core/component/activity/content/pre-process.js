@@ -11,7 +11,6 @@ export default function pretreatment(data, eventName) {
     const category = data.contentData.category
     const para = parameter[0];
 
-
     if (para.animationName === 'EffectAppear' && //出现动画
       data.domMode && //并且只有dom模式才可以，canvas排除
       eventName === 'auto' && //自动运行
@@ -25,8 +24,16 @@ export default function pretreatment(data, eventName) {
       //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
       //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
       //等执行的时候处理
-      if(data.contentData.markImgAnim){
-         data.markImgAnim = true //标记动画图片动画
+      const fileName = data.contentData.md5
+      if (fileName && /^apng_|gif$/i.test(fileName)) {
+        data.$contentNode.find('img').each(function(index, img) {
+          if (img) {
+            img.removeAttribute('onerror')
+            img.src = null
+            img.removeAttribute('src')
+          }
+        })
+        data.useImgAnim = true //标记动画图片动画
         return
       }
 

@@ -12,6 +12,13 @@
 
 /*
 *
+* v889.2            brModel=>brMode
+                    增加brMode全局指定模式
+                    globalBrMode:单模式 1 =>png
+                    globalBrMode:混合模式 2 =>_i _a
+                    修改apng动画的一次性播放问题
+                    ppt的 apng与gif，动画赋值src了
+
 * v889.1            修正微信安卓中，视频全屏后移位的问题
 * v889              安卓微信浏览器视频播放部分视频被遮挡bug修改 视频总长度不显示bug修改
 * v888.9 2017.8.18  修正BrModel类型的处理，增加平台自适应，本地app，保留数据库后缀

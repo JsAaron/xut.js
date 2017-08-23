@@ -52,11 +52,11 @@ export default class {
     this.originalImageList = pa.ImageList;
 
     /**webp图片的后缀*/
-    const brModelType = config.launch.brModelType;
-    if (brModelType) {
+    const brModeType = config.launch.brModeType;
+    if (brModeType) {
       _.each(this.originalImageList, function(imageData) {
         if (imageData.name) {
-          imageData.name = imageData.name.replace(/.png|.jpg/, brModelType)
+          imageData.name = imageData.name.replace(/.png|.jpg/, brModeType)
         }
       })
     }

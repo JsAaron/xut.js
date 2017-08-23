@@ -364,10 +364,10 @@ function checkCache(finish, next) {
  * 判断是否有预加载文件
  * @return {Boolean} [description]
  */
-export function hasPrelaodFile(callback) {
+export function loadPrelaod(callback) {
   loadFile(config.data.pathAddress + 'preload.js', function() {
     if (window.preloadData) {
-      callback(true)
+      callback(true, window.globalBrMode)
     } else {
       callback(false)
     }

@@ -230,7 +230,7 @@ export default class Animation {
         }
 
         //如果是一次性动画，需要动态设置图片的src
-        if (this.markImgAnim) {
+        if (this.useImgAnim) {
           setImage(this.$contentNode, this.contentData.resourcePath)
         }
 
@@ -267,7 +267,7 @@ export default class Animation {
     access((key) => {
       if (this[key]) {
         //如果是一次性动画，需要动态处理
-        if (this.markImgAnim) {
+        if (this.useImgAnim) {
           cleanImage(this.$contentNode)
         }
         this[key].reset && this[key].reset()

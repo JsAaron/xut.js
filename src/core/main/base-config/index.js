@@ -7,8 +7,9 @@ import { initColumn } from '../../component/column/init'
 import { contentFilter } from '../../component/activity/content/content-filter'
 import { config, initConfig, initPathAddress } from '../../config/index'
 import { getSize } from '../../config/v-screen'
+import { getBrType } from '../../config/priority-config.js'
 
-import { initPreload, hasPrelaodFile } from 'preload/index'
+import { initPreload, loadPrelaod } from 'preload/index'
 
 /**
  * 新增模式,用于记录浏览器退出记录
@@ -177,20 +178,40 @@ export default function baseConfig(callback) {
       setConfig()
       configInit(novelData, tempSettingData)
 
-      //判断是否有预加载文件
-      hasPrelaodFile(function(hasFile) {
-        resetBrModel(hasFile)
+      //处理预加载文件
+      loadPrelaod(function(hasFile, globalBrMode) {
+        resetBrMode(hasFile, globalBrMode)
         loadStyle(novelData, chapterTotal)
       })
     })
   }
 
-  //如果没有预加载文件
-  //如果启动了图片模式，那么就需要去掉
-  function resetBrModel(hasFile) {
+
+  /**
+   * 如果没有预加载文件
+   * 如果启动了图片模式，那么就需要去掉
+   */
+  function resetBrMode(hasFile, globalBrMode) {
     if (!hasFile) {
-      config.launch.brModel = ''
-      config.launch.brModelType = ''
+      config.launch.brMode = ''
+      config.launch.brModeType = ''
+      return
+    }
+
+    //全局指定模式
+    //globalBrMode:单模式 1 =>png
+    //globalBrMode:混合模式 2 =>_i _a
+    if (globalBrMode === 1) {
+      /*如果用单模式，但是判断出来是混合模式，那么直接清空*/
+      if (config.launch.brModeType) {
+        config.launch.brMode = ''
+        config.launch.brModeType = ''
+      }
+    } else if (globalBrMode === 2) {
+      /*如果是混合模式，判断出来是单模式，需要重新处理*/
+      if (!config.launch.brModeType) {
+        config.launch.brModeType = getBrType(1)
+      }
     }
   }
 

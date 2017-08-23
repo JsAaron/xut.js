@@ -42033,14 +42033,14 @@ var improtGolbalConfig = {
      2：Ios
      3：Android
   、
-     brModel === 0，则什么都不变
-      brModel === 1/2/3，
+     brMode === 0，则什么都不变
+      brMode === 1/2/3，
        在线版：
-         brModel为ios或android，获取了数据库的文件名之后，去掉扩展名。
+         brMode为ios或android，获取了数据库的文件名之后，去掉扩展名。
          如果是ios，则文件名之后加上_i
          Android，则文件名之后，加上_a
         本地版：
-         brModel为ios或android，后缀不改变，用数据库定义的文件名
+         brMode为ios或android，后缀不改变，用数据库定义的文件名
         图像带有蒙板
          首先，忽略蒙板设置
          然后按照上面的规则，合成新的文件名即
@@ -42048,7 +42048,7 @@ var improtGolbalConfig = {
       如果有perload那么就会自适应 webp/apng
       如果没有就强制为0，只支持png,jpng
   */
-  brModel: 0,
+  brMode: 0,
 
   /**
    * 是否启动分栏高度检测
@@ -43670,13 +43670,13 @@ function loadGolbalStyle(fileName, callback) {
  * 每个图片在点击的时候，需要解析文件的一些参数
  * 这里正则只做一次匹配
  */
-var brModelRE = null;
+var brModeRE = null;
 function setFastAnalysisRE() {
-  brModelRE = null;
-  //如果存在brModelType
-  if (config.launch.brModelType && config.launch.brModelType !== 'delete') {
+  brModeRE = null;
+  //如果存在brModeType
+  if (config.launch.brModeType && config.launch.brModeType !== 'delete') {
     //(\w+[_a|_i]?)([.hi|.mi]*)$/i
-    brModelRE = new RegExp('(\\w+[' + config.launch.brModelType + ']?)([.' + config.launch.baseImageSuffix + ']*)$', 'i');
+    brModeRE = new RegExp('(\\w+[' + config.launch.brModeType + ']?)([.' + config.launch.baseImageSuffix + ']*)$', 'i');
   }
 }
 
@@ -43697,14 +43697,14 @@ function analysisImageName(src) {
   var original = src;
   var result = void 0;
 
-  //如果存在brModelType
-  if (brModelRE) {
-    result = src.match(brModelRE);
+  //如果存在brModeType
+  if (brModeRE) {
+    result = src.match(brModeRE);
     if (result && result.length) {
       suffix = result[0];
       original = result[1];
     } else {
-      $warn('zoom-image-brModelType解析出错,result：' + result);
+      $warn('zoom-image-brModeType解析出错,result：' + result);
     }
   }
   //有基础后缀
@@ -43749,8 +43749,8 @@ function analysisImageName(src) {
  */
 function insertImageUrlSuffix(originalUrl, suffix) {
   if (originalUrl && suffix) {
-    //brModelType 没有类型后缀
-    if (config.launch.brModelType && config.launch.brModelType !== 'delete') {
+    //brModeType 没有类型后缀
+    if (config.launch.brModeType && config.launch.brModeType !== 'delete') {
       return originalUrl.replace(/\w+/ig, '$&' + '.' + suffix);
     }
     //带后缀
@@ -43783,7 +43783,7 @@ function hasImages(fileName) {
  * @param  {[type]} debugType [description]
  * @return {[type]}           [description]
  *
- * isGif 为true 跳过brModelType模式
+ * isGif 为true 跳过brModeType模式
  */
 function getFileFullPath(fileName, debugType, isGif) {
 
@@ -43809,18 +43809,18 @@ function getFileFullPath(fileName, debugType, isGif) {
     fileName = fileMatch[1] + '.' + launch.baseImageSuffix + '.' + fileMatch[2];
   }
 
-  /*如果是GIF的话需要跳过brModelType类型的处理*/
+  /*如果是GIF的话需要跳过brModeType类型的处理*/
   if (isGif) {
     return config.data.pathAddress + fileName;
   }
 
   /*
     支持webp图
-    1 如果启动brModelType
+    1 如果启动brModeType
     2 并且是图片
     3 并且没有被修改过
   */
-  if (launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
+  if (launch.brModeType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
 
     var suffix = '';
     var _name = void 0;
@@ -43835,7 +43835,7 @@ function getFileFullPath(fileName, debugType, isGif) {
       }
 
       //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
-      return '' + (config.data.pathAddress + _name) + launch.brModelType + suffix;
+      return '' + (config.data.pathAddress + _name) + launch.brModeType + suffix;
     } else {
       //手机app访问
       //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a.mi
@@ -44495,15 +44495,15 @@ var urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(\.[png|jpg|gif]+)/ig
 var result = void 0;
 
 /*
-fileName + brModelType + baseSuffix + type
+fileName + brModeType + baseSuffix + type
  */
 function parseFileName(fileName, baseSuffix, type) {
   //如果启动了模式
-  if (config.launch.brModelType) {
-    if (config.launch.brModelType === 'delete') {
+  if (config.launch.brModeType) {
+    if (config.launch.brModeType === 'delete') {
       return '' + fileName + baseSuffix; //增加后缀，去掉类型
     } else {
-      return '' + fileName + config.launch.brModelType + baseSuffix; //增加brModelType，增加后缀，去掉类型
+      return '' + fileName + config.launch.brModeType + baseSuffix; //增加brModeType，增加后缀，去掉类型
     }
   }
   //如果只加了baseSuffix模式处理
@@ -45974,6 +45974,212 @@ function contentFilter(filterName) {
   };
 }
 
+////////////////////////////////
+///
+/// 全局config与 launch配置优先级
+/// lauch可以覆盖全局config配置
+///
+////////////////////////////////
+
+/**
+ * 获取后缀
+ * @return {[type]} [description]
+ * ios 支持apng '_i'
+ * 安卓支持webp  '_a'
+ */
+function getSuffix() {
+  return Xut.plat.supportWebp ? '_a' : '_i';
+}
+
+/*预先判断br的基础类型*/
+// 1 在线模式 返回增加后缀
+// 2 手机模式 不修改，保留后缀
+// 3 PC模式，不修改，保留后缀
+function getBrType(mode) {
+
+  //自适应平台
+  if (mode === 1) {
+    if (Xut.plat.isIOS) {
+      return getBrType(2);
+    }
+    if (Xut.plat.isAndroid) {
+      return getBrType(3);
+    }
+  }
+
+  //ios
+  if (mode === 2) {
+    if (Xut.plat.isBrowser) {
+      //浏览器访问
+      return getSuffix();
+    } else {
+      //app访问
+      return '';
+    }
+  }
+
+  //android
+  if (mode === 3) {
+    if (Xut.plat.isBrowser) {
+      //浏览器访问
+      return getSuffix();
+    } else {
+      //app访问
+      return '';
+    }
+  }
+
+  /**
+   * 纯PC端
+   * 自动选择支持的
+   * 但是不用APNG了
+   */
+  if (Xut.plat.isBrowser) {
+    //浏览器访问，要探测下是否支持Webp
+    if (Xut.plat.supportWebp) {
+      return getSuffix();
+    }
+    //否则用默认的格式
+    return '';
+  }
+
+  /*默认选择png，理论不会走这里了*/
+  return '';
+}
+
+/*
+  获取真实的配置文件 priority
+  优先级： launch > config
+  1 cursor
+  2 trackCode
+  3 brMode
+ */
+function priorityConfig() {
+
+  /*独立app与全局配置文件*/
+  var launch = config.launch;
+  var golbal = config.golbal;
+
+  //////////////////////////////////
+  /// brModel命名被修改该了
+  /// 这个为了兼容老版本采用了brModel的配置
+  //////////////////////////////////
+  if (launch.brModel && !launch.brMode) {
+    launch.brMode = launch.brModel;
+  }
+  if (golbal.brModel && !golbal.brMode) {
+    golbal.brMode = golbal.brModel;
+  }
+
+  //////////////////////////////////
+  /// debug模式
+  //////////////////////////////////
+  for (var key in golbal.debug) {
+    config.debug[key] = golbal.debug[key];
+  }
+
+  //////////////////////////////////
+  /// 忙碌光标
+  //////////////////////////////////
+  if (launch) {
+    /*因为光标可以配置false 关闭，所以这里需要注意判断*/
+    var cursor = launch.cursor || launch.cursor === false ? launch.cursor : golbal.cursor;
+
+    /*每次配置光标之前都重置，可能被上个给覆盖默认的*/
+    resetCursor();
+
+    /*如果配置了关闭*/
+    if (cursor === false) {
+      setDisable();
+    } else if (cursor) {
+      /*自定义忙碌*/
+      if (cursor.time) {
+        setDelay(cursor.time);
+      }
+      if (cursor.url) {
+        setPath(cursor.url);
+      }
+    }
+  }
+
+  //////////////////////////////////
+  /// 如果启动了代码追踪，配置基本信息
+  //////////////////////////////////
+  var trackTypes = launch && launch.trackCode || golbal.trackCode;
+  config.sendTrackCode = function () {};
+  config.hasTrackCode = function () {};
+  /*'launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe']*/
+  if (trackTypes && _.isArray(trackTypes) && trackTypes.length) {
+    if (!launch.trackCode) {
+      launch.trackCode = {};
+    }
+    trackTypes.forEach(function (type) {
+      launch.trackCode[type] = true;
+    });
+    var uuid = Xut.guid();
+
+    /*检测是否有代码追踪*/
+    config.hasTrackCode = function (type) {
+      if (launch && launch.trackCode && launch.trackCode[type]) {
+        return true;
+      }
+    };
+
+    /*合并命令，动作类型归类为action*/
+    var modifyName = ['content', 'hot'];
+    var getTrackName = function getTrackName(type) {
+      if (~modifyName.indexOf(type)) {
+        return 'action';
+      }
+      return type;
+    };
+
+    /*发送代码追踪数据*/
+    config.sendTrackCode = function (type) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (config.hasTrackCode(type)) {
+        Xut.Application.Notify('trackCode', getTrackName(type), _.extend(options || {}, {
+          uuid: uuid,
+          appId: config.data.appId,
+          appName: config.data.shortName
+        }));
+      }
+    };
+  }
+
+  //////////////////////////////////
+  /// 图片模式webp
+  /// 需要兼容老版本的png模式，base-config会重设
+  //////////////////////////////////
+  if (launch) {
+    if (!launch.brMode && golbal.brMode) {
+      launch.brMode = golbal.brMode;
+    }
+
+    /*预先判断出基础类型*/
+    if (launch.brMode) {
+      launch.brModeType = getBrType(launch.brMode);
+    }
+  }
+
+  //////////////////////////////////
+  ///golbal混入到launch中
+  //////////////////////////////////
+  for (var _key in golbal) {
+    if (launch[_key] === undefined) {
+      launch[_key] = golbal[_key];
+    }
+  }
+
+  //////////////////////////////////
+  ///竖版的情况下，页面模式都强制为1
+  //////////////////////////////////
+  if (launch.scrollMode === 'v') {
+    launch.visualMode = 1;
+  }
+}
+
 /**
  * 创建共享对象
  * 这里是为了限制对象的创建数
@@ -46204,11 +46410,11 @@ function clearImage() {
 function imageParse(url, callback) {
 
   /**如果有缓存图片的后缀*/
-  var brModelType = config.launch.brModelType;
-  if (brModelType) {
+  var brModeType = config.launch.brModeType;
+  if (brModeType) {
     /*必须$结尾，因为url中间有可能存在apng_
     content/22/gallery/apng_70fe7a26b9208e74451c6262fd253cd2_a*/
-    url = url.replace(/.png$|.jpg$/, brModelType);
+    url = url.replace(/.png$|.jpg$/, brModeType);
   }
 
   /**
@@ -47151,10 +47357,10 @@ function checkCache(finish, next) {
  * 判断是否有预加载文件
  * @return {Boolean} [description]
  */
-function hasPrelaodFile(callback) {
+function loadPrelaod(callback) {
   loadFile(config.data.pathAddress + 'preload.js', function () {
     if (window.preloadData) {
-      callback(true);
+      callback(true, window.globalBrMode);
     } else {
       callback(false);
     }
@@ -47446,20 +47652,39 @@ function baseConfig(callback) {
       setConfig();
       configInit(novelData, tempSettingData);
 
-      //判断是否有预加载文件
-      hasPrelaodFile(function (hasFile) {
-        resetBrModel(hasFile);
+      //处理预加载文件
+      loadPrelaod(function (hasFile, globalBrMode) {
+        resetBrMode(hasFile, globalBrMode);
         loadStyle(novelData, chapterTotal);
       });
     });
   }
 
-  //如果没有预加载文件
-  //如果启动了图片模式，那么就需要去掉
-  function resetBrModel(hasFile) {
+  /**
+   * 如果没有预加载文件
+   * 如果启动了图片模式，那么就需要去掉
+   */
+  function resetBrMode(hasFile, globalBrMode) {
     if (!hasFile) {
-      config.launch.brModel = '';
-      config.launch.brModelType = '';
+      config.launch.brMode = '';
+      config.launch.brModeType = '';
+      return;
+    }
+
+    //全局指定模式
+    //globalBrMode:单模式 1 =>png
+    //globalBrMode:混合模式 2 =>_i _a
+    if (globalBrMode === 1) {
+      /*如果用单模式，但是判断出来是混合模式，那么直接清空*/
+      if (config.launch.brModeType) {
+        config.launch.brMode = '';
+        config.launch.brModeType = '';
+      }
+    } else if (globalBrMode === 2) {
+      /*如果是混合模式，判断出来是单模式，需要重新处理*/
+      if (!config.launch.brModeType) {
+        config.launch.brModeType = getBrType(1);
+      }
     }
   }
 
@@ -53791,11 +54016,11 @@ var _class$1 = function () {
     this.originalImageList = pa.ImageList;
 
     /**webp图片的后缀*/
-    var brModelType = config.launch.brModelType;
-    if (brModelType) {
+    var brModeType = config.launch.brModeType;
+    if (brModeType) {
       _.each(this.originalImageList, function (imageData) {
         if (imageData.name) {
-          imageData.name = imageData.name.replace(/.png|.jpg/, brModelType);
+          imageData.name = imageData.name.replace(/.png|.jpg/, brModeType);
         }
       });
     }
@@ -58877,7 +59102,7 @@ var Animation = function () {
           }
 
           //如果是一次性动画，需要动态设置图片的src
-          if (_this3.markImgAnim) {
+          if (_this3.useImgAnim) {
             setImage(_this3.$contentNode, _this3.contentData.resourcePath);
           }
 
@@ -58922,7 +59147,7 @@ var Animation = function () {
       access(function (key) {
         if (_this5[key]) {
           //如果是一次性动画，需要动态处理
-          if (_this5.markImgAnim) {
+          if (_this5.useImgAnim) {
             cleanImage(_this5.$contentNode);
           }
           _this5[key].reset && _this5[key].reset();
@@ -59607,8 +59832,16 @@ function pretreatment(data, eventName) {
       //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
       //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
       //等执行的时候处理
-      if (data.contentData.markImgAnim) {
-        data.markImgAnim = true; //标记动画图片动画
+      var fileName = data.contentData.md5;
+      if (fileName && /^apng_|gif$/i.test(fileName)) {
+        data.$contentNode.find('img').each(function (index, img) {
+          if (img) {
+            img.removeAttribute('onerror');
+            img.src = null;
+            img.removeAttribute('src');
+          }
+        });
+        data.useImgAnim = true; //标记动画图片动画
         return;
       }
 
@@ -62861,11 +63094,15 @@ var maskContent = function maskContent(data, wrapObj) {
   var resourcePath = wrapObj.resourcePath;
   var restr = "";
 
+  function getImgSrc() {
+    return 'src="' + resourcePath + '"\n            onerror="fixNodeError(\'image\',this,\'' + wrapObj.chapterIndex + '\',\'' + resourcePath + '\')"\n            style="' + isMaskImg + '"';
+  }
+
   //蒙板图
-  if (data.mask || wrapObj['isGif']) {
+  if (data.mask || wrapObj.isGif) {
     //蒙版图
     if (maskBoxImage$1 != undefined) {
-      restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'mask') + '"\n              class="inherit-size fullscreen-background edges"\n              src="' + resourcePath + '"\n              onerror="fixNodeError(\'image\',this,\'' + wrapObj.chapterIndex + '\',\'' + resourcePath + '\')"\n              style="' + isMaskImg + '"/>');
+      restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'mask') + '"\n              class="inherit-size fullscreen-background edges"\n              ' + getImgSrc() + '/>');
     } else {
       //canvas
       restr += String.styleFormat('<canvas class="inherit-size fullscreen-background edges"\n                 src="' + resourcePath + '"\n                 mask="' + isMaskImg + '"\n                 width="' + data.scaleWidth + '"\n                 height="' + data.scaleHeight + '"\n                 style="opacity:0;' + (config.data.pathAddress.replace(/\//g, "\/") + data.mask) + '"/>');
@@ -62890,7 +63127,7 @@ var maskContent = function maskContent(data, wrapObj) {
     restr += String.styleFormat('<div data-type="sprite-images"\n            class="sprite"\n            style="height:' + data.scaleHeight + 'px;\n                   background-image:url(' + resourcePath + ');\n                   background-size:' + matrixX + '% ' + matrixY + '%;">\n      </div>');
   } else {
     //普通图片
-    restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'ordinary') + '"\n            class="inherit-size fullscreen-background fix-miaomiaoxue-img"\n            src="' + resourcePath + '"\n            onerror="fixNodeError(\'image\',this,\'' + wrapObj.chapterIndex + '\',\'' + resourcePath + '\')"\n            style="' + isMaskImg + '"/>');
+    restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'ordinary') + '"\n            class="inherit-size fullscreen-background fix-miaomiaoxue-img"\n            ' + getImgSrc() + '/>');
   }
 
   return restr;
@@ -63345,12 +63582,12 @@ function parseCanvas(contentId, category, conData, data) {
  * 导致重复数据被修正的问题
  * @return {[type]}             [description]
  */
-var createScopeWarpObj = function createScopeWarpObj(contentId, content, pageType, chapterIndex) {
+function createScopeWarpObj(contentId, content, pageType, chapterIndex) {
   //唯一标示符
   var prefix = "_" + chapterIndex + "_" + contentId;
   var fileName = content.md5;
 
-  var data = {
+  return {
     pageType: pageType,
     contentId: contentId,
     isJs: /.js$/i.test(fileName), //html类型
@@ -63362,17 +63599,7 @@ var createScopeWarpObj = function createScopeWarpObj(contentId, content, pageTyp
       return name + prefix;
     }
   };
-
-  //如果是apng、webp、gif的图片
-  //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
-  //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
-  //等执行的时候处理
-  if (fileName && /^apng_|.gif$/i.test(fileName)) {
-    data.markImgAnim = true; //标记动画图片动画
-  }
-
-  return data;
-};
+}
 
 /**
  * 创建图片地址
@@ -63629,7 +63856,6 @@ function contentStructure(pipeData, $$floatDivertor, callback) {
       /// 处理一次性APNG的不播放问题
       //////////////////////
       conData.resourcePath = wrapObj.resourcePath;
-      conData.markImgAnim = wrapObj.markImgAnim;
 
       //canvas节点
       if (conData.canvasMode) {
@@ -79693,201 +79919,6 @@ function initGlobalAPI() {
   initApplication();
 }
 
-////////////////////////////////
-///
-/// 全局config与 launch配置优先级
-/// lauch可以覆盖全局config配置
-///
-////////////////////////////////
-
-/**
- * 获取后缀
- * @return {[type]} [description]
- * ios 支持apng '_i'
- * 安卓支持webp  '_a'
- */
-function getSuffix() {
-  return Xut.plat.supportWebp ? '_a' : '_i';
-}
-
-/*预先判断br的基础类型*/
-// 1 在线模式 返回增加后缀
-// 2 手机模式 不修改，保留后缀
-// 3 PC模式，不修改，保留后缀
-function getBrType(mode) {
-
-  //自适应平台
-  if (mode === 1) {
-    if (Xut.plat.isIOS) {
-      return getBrType(2);
-    }
-    if (Xut.plat.isAndroid) {
-      return getBrType(3);
-    }
-  }
-
-  //ios
-  if (mode === 2) {
-    if (Xut.plat.isBrowser) {
-      //浏览器访问
-      return getSuffix();
-    } else {
-      //app访问
-      return '';
-    }
-  }
-
-  //android
-  if (mode === 3) {
-    if (Xut.plat.isBrowser) {
-      //浏览器访问
-      return getSuffix();
-    } else {
-      //app访问
-      return '';
-    }
-  }
-
-  /**
-   * 纯PC端
-   * 自动选择支持的
-   * 但是不用APNG了
-   */
-  if (Xut.plat.isBrowser) {
-    //浏览器访问，要探测下是否支持Webp
-    if (Xut.plat.supportWebp) {
-      return getSuffix();
-    }
-    //否则用默认的格式
-    return '';
-  }
-
-  /*默认选择png，理论不会走这里了*/
-  return '';
-}
-
-/*
-  获取真实的配置文件 priority
-  优先级： launch > config
-  1 cursor
-  2 trackCode
-  3 brModel
- */
-function priorityConfig() {
-
-  /*独立app与全局配置文件*/
-  var launch = config.launch;
-  var golbal = config.golbal;
-
-  //////////////////////////////////
-  /// debug模式
-  //////////////////////////////////
-  for (var key in golbal.debug) {
-    config.debug[key] = golbal.debug[key];
-  }
-
-  //////////////////////////////////
-  /// 忙碌光标
-  //////////////////////////////////
-  if (launch) {
-    /*因为光标可以配置false 关闭，所以这里需要注意判断*/
-    var cursor = launch.cursor || launch.cursor === false ? launch.cursor : golbal.cursor;
-
-    /*每次配置光标之前都重置，可能被上个给覆盖默认的*/
-    resetCursor();
-
-    /*如果配置了关闭*/
-    if (cursor === false) {
-      setDisable();
-    } else if (cursor) {
-      /*自定义忙碌*/
-      if (cursor.time) {
-        setDelay(cursor.time);
-      }
-      if (cursor.url) {
-        setPath(cursor.url);
-      }
-    }
-  }
-
-  //////////////////////////////////
-  /// 如果启动了代码追踪，配置基本信息
-  //////////////////////////////////
-  var trackTypes = launch && launch.trackCode || golbal.trackCode;
-  config.sendTrackCode = function () {};
-  config.hasTrackCode = function () {};
-  /*'launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe']*/
-  if (trackTypes && _.isArray(trackTypes) && trackTypes.length) {
-    if (!launch.trackCode) {
-      launch.trackCode = {};
-    }
-    trackTypes.forEach(function (type) {
-      launch.trackCode[type] = true;
-    });
-    var uuid = Xut.guid();
-
-    /*检测是否有代码追踪*/
-    config.hasTrackCode = function (type) {
-      if (launch && launch.trackCode && launch.trackCode[type]) {
-        return true;
-      }
-    };
-
-    /*合并命令，动作类型归类为action*/
-    var modifyName = ['content', 'hot'];
-    var getTrackName = function getTrackName(type) {
-      if (~modifyName.indexOf(type)) {
-        return 'action';
-      }
-      return type;
-    };
-
-    /*发送代码追踪数据*/
-    config.sendTrackCode = function (type) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      if (config.hasTrackCode(type)) {
-        Xut.Application.Notify('trackCode', getTrackName(type), _.extend(options || {}, {
-          uuid: uuid,
-          appId: config.data.appId,
-          appName: config.data.shortName
-        }));
-      }
-    };
-  }
-
-  //////////////////////////////////
-  /// 图片模式webp
-  /// 需要兼容老版本的png模式，base-config会重设
-  //////////////////////////////////
-  if (launch) {
-    if (!launch.brModel && golbal.brModel) {
-      launch.brModel = golbal.brModel;
-    }
-
-    /*预先判断出基础类型*/
-    if (launch.brModel) {
-      launch.brModelType = getBrType(launch.brModel);
-    }
-  }
-
-  //////////////////////////////////
-  ///golbal混入到launch中
-  //////////////////////////////////
-  for (var _key in golbal) {
-    if (launch[_key] === undefined) {
-      launch[_key] = golbal[_key];
-    }
-  }
-
-  //////////////////////////////////
-  ///竖版的情况下，页面模式都强制为1
-  //////////////////////////////////
-  if (launch.scrollMode === 'v') {
-    launch.visualMode = 1;
-  }
-}
-
 /*代码初始化*/
 initAudio();
 initVideo();
@@ -79896,7 +79927,7 @@ initGlobalAPI();
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.1;
+Xut.Version = 889.2;
 
 /*加载应用app*/
 var initApp = function initApp() {

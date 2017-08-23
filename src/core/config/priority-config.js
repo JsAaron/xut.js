@@ -23,7 +23,7 @@ function getSuffix() {
 // 1 在线模式 返回增加后缀
 // 2 手机模式 不修改，保留后缀
 // 3 PC模式，不修改，保留后缀
-function getBrType(mode) {
+export function getBrType(mode) {
 
   //自适应平台
   if (mode === 1) {
@@ -78,13 +78,26 @@ function getBrType(mode) {
   优先级： launch > config
   1 cursor
   2 trackCode
-  3 brModel
+  3 brMode
  */
 export function priorityConfig() {
 
   /*独立app与全局配置文件*/
   const launch = config.launch
   const golbal = config.golbal
+
+
+  //////////////////////////////////
+  /// brModel命名被修改该了
+  /// 这个为了兼容老版本采用了brModel的配置
+  //////////////////////////////////
+  if (launch.brModel && !launch.brMode) {
+    launch.brMode = launch.brModel
+  }
+  if (golbal.brModel && !golbal.brMode) {
+    golbal.brMode = golbal.brModel
+  }
+
 
   //////////////////////////////////
   /// debug模式
@@ -166,13 +179,13 @@ export function priorityConfig() {
   /// 需要兼容老版本的png模式，base-config会重设
   //////////////////////////////////
   if (launch) {
-    if (!launch.brModel && golbal.brModel) {
-      launch.brModel = golbal.brModel
+    if (!launch.brMode && golbal.brMode) {
+      launch.brMode = golbal.brMode
     }
 
     /*预先判断出基础类型*/
-    if (launch.brModel) {
-      launch.brModelType = getBrType(launch.brModel)
+    if (launch.brMode) {
+      launch.brModeType = getBrType(launch.brMode)
     }
   }
 

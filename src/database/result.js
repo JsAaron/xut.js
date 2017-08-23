@@ -33,15 +33,15 @@ const urlRE = /(img\s+src|xlink:href)=\"[\w\/]*gallery\/(\w+)(\.[png|jpg|gif]+)/
 let result
 
 /*
-fileName + brModelType + baseSuffix + type
+fileName + brModeType + baseSuffix + type
  */
 function parseFileName(fileName, baseSuffix, type) {
   //如果启动了模式
-  if (config.launch.brModelType) {
-    if (config.launch.brModelType === 'delete') {
+  if (config.launch.brModeType) {
+    if (config.launch.brModeType === 'delete') {
       return `${fileName}${baseSuffix}` //增加后缀，去掉类型
     } else {
-      return `${fileName}${config.launch.brModelType}${baseSuffix}` //增加brModelType，增加后缀，去掉类型
+      return `${fileName}${config.launch.brModeType}${baseSuffix}` //增加brModeType，增加后缀，去掉类型
     }
   }
   //如果只加了baseSuffix模式处理

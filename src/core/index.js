@@ -18,7 +18,7 @@ initGlobalAPI()
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.1
+Xut.Version = 889.2
 
 /*加载应用app*/
 const initApp = (...arg) => {

@@ -29,12 +29,12 @@ import {
  * 导致重复数据被修正的问题
  * @return {[type]}             [description]
  */
-const createScopeWarpObj = (contentId, content, pageType, chapterIndex) => {
+function createScopeWarpObj(contentId, content, pageType, chapterIndex) {
   //唯一标示符
   let prefix = "_" + chapterIndex + "_" + contentId;
   let fileName = content.md5
 
-  const data = {
+  return {
     pageType: pageType,
     contentId: contentId,
     isJs: /.js$/i.test(fileName), //html类型
@@ -46,17 +46,8 @@ const createScopeWarpObj = (contentId, content, pageType, chapterIndex) => {
       return name + prefix;
     }
   }
-
-  //如果是apng、webp、gif的图片
-  //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
-  //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
-  //等执行的时候处理
-  if (fileName && /^apng_|.gif$/i.test(fileName)) {
-    data.markImgAnim = true //标记动画图片动画
-  }
-
-  return data
 }
+
 
 
 /**
@@ -309,7 +300,6 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
       /// 处理一次性APNG的不播放问题
       //////////////////////
       conData.resourcePath = wrapObj.resourcePath
-      conData.markImgAnim = wrapObj.markImgAnim
 
       //canvas节点
       if (conData.canvasMode) {

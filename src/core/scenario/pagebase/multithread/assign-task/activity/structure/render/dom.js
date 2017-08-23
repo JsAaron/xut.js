@@ -19,16 +19,20 @@ const maskContent = (data, wrapObj) => {
   let resourcePath = wrapObj.resourcePath
   let restr = ""
 
+  function getImgSrc() {
+    return `src="${resourcePath}"
+            onerror="fixNodeError('image',this,'${wrapObj.chapterIndex}','${resourcePath}')"
+            style="${isMaskImg}"`
+  }
+
   //蒙板图
-  if (data.mask || wrapObj['isGif']) {
+  if (data.mask || wrapObj.isGif) {
     //蒙版图
     if (maskBoxImage != undefined) {
       restr += String.styleFormat(
         `<img data-type="${data.qrCode ? 'qrcode' : 'mask'}"
               class="inherit-size fullscreen-background edges"
-              src="${resourcePath}"
-              onerror="fixNodeError('image',this,'${wrapObj.chapterIndex}','${resourcePath}')"
-              style="${isMaskImg}"/>`
+              ${getImgSrc()}/>`
       )
     } else {
       //canvas
@@ -71,9 +75,7 @@ const maskContent = (data, wrapObj) => {
     restr += String.styleFormat(
       `<img data-type="${data.qrCode ? 'qrcode' : 'ordinary'}"
             class="inherit-size fullscreen-background fix-miaomiaoxue-img"
-            src="${resourcePath}"
-            onerror="fixNodeError('image',this,'${wrapObj.chapterIndex}','${resourcePath}')"
-            style="${isMaskImg}"/>`
+            ${getImgSrc()}/>`
     )
   }
 

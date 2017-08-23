@@ -37,13 +37,13 @@ export function loadGolbalStyle(fileName, callback) {
  * 每个图片在点击的时候，需要解析文件的一些参数
  * 这里正则只做一次匹配
  */
-let brModelRE = null
+let brModeRE = null
 export function setFastAnalysisRE() {
-  brModelRE = null
-  //如果存在brModelType
-  if (config.launch.brModelType && config.launch.brModelType !== 'delete') {
+  brModeRE = null
+  //如果存在brModeType
+  if (config.launch.brModeType && config.launch.brModeType !== 'delete') {
     //(\w+[_a|_i]?)([.hi|.mi]*)$/i
-    brModelRE = new RegExp(`(\\w+[${config.launch.brModelType}]?)([.${config.launch.baseImageSuffix}]*)$`, 'i')
+    brModeRE = new RegExp(`(\\w+[${config.launch.brModeType}]?)([.${config.launch.baseImageSuffix}]*)$`, 'i')
   }
 }
 
@@ -64,14 +64,14 @@ export function analysisImageName(src) {
   let original = src
   let result
 
-  //如果存在brModelType
-  if (brModelRE) {
-    result = src.match(brModelRE)
+  //如果存在brModeType
+  if (brModeRE) {
+    result = src.match(brModeRE)
     if (result && result.length) {
       suffix = result[0]
       original = result[1]
     } else {
-      $warn('zoom-image-brModelType解析出错,result：' + result)
+      $warn('zoom-image-brModeType解析出错,result：' + result)
     }
   }
   //有基础后缀
@@ -116,8 +116,8 @@ export function analysisImageName(src) {
  */
 function insertImageUrlSuffix(originalUrl, suffix) {
   if (originalUrl && suffix) {
-    //brModelType 没有类型后缀
-    if (config.launch.brModelType && config.launch.brModelType !== 'delete') {
+    //brModeType 没有类型后缀
+    if (config.launch.brModeType && config.launch.brModeType !== 'delete') {
       return originalUrl.replace(/\w+/ig, '$&' + '.' + suffix)
     }
     //带后缀
@@ -149,7 +149,7 @@ export function hasImages(fileName) {
  * @param  {[type]} debugType [description]
  * @return {[type]}           [description]
  *
- * isGif 为true 跳过brModelType模式
+ * isGif 为true 跳过brModeType模式
  */
 export function getFileFullPath(fileName, debugType, isGif) {
 
@@ -177,18 +177,18 @@ export function getFileFullPath(fileName, debugType, isGif) {
     fileName = `${fileMatch[1]}.${launch.baseImageSuffix}.${fileMatch[2]}`
   }
 
-  /*如果是GIF的话需要跳过brModelType类型的处理*/
+  /*如果是GIF的话需要跳过brModeType类型的处理*/
   if (isGif) {
     return config.data.pathAddress + fileName
   }
 
   /*
     支持webp图
-    1 如果启动brModelType
+    1 如果启动brModeType
     2 并且是图片
     3 并且没有被修改过
   */
-  if (launch.brModelType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
+  if (launch.brModeType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
 
     let suffix = ''
     let name
@@ -202,7 +202,7 @@ export function getFileFullPath(fileName, debugType, isGif) {
       }
 
       //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
-      return `${config.data.pathAddress + name}${launch.brModelType}${suffix}`
+      return `${config.data.pathAddress + name}${launch.brModeType}${suffix}`
     } else {
       //手机app访问
       //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a.mi
