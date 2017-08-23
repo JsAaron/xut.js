@@ -47723,15 +47723,14 @@ var flarePlayer = function () {
       fv.video.setAttribute("x5-video-player-fullscreen", true);
 
       //小窗播放时 安卓微信浏览器自动全屏
-      //如果视频的top值大于(window.screen.height - height) / 2
       //则视频有一部分会被遮挡  进入全屏事件时调整视频top值 退出全屏事件恢复原有top值
       fv.video.addEventListener("x5videoenterfullscreen", function () {
-        if (top > (window.screen.height - height) / 2) {
-          $videoWrap[0].style.top = (window.screen.height - height) / 2;
-        }
+        $videoWrap[0].style.top = '0px';
+        $videoWrap[0].style.left = '0px';
       });
       fv.video.addEventListener("x5videoexitfullscreen", function () {
-        $videoWrap[0].style.top = top;
+        $videoWrap[0].style.top = top + 'px';
+        $videoWrap[0].style.left = left + 'px';
       });
     }
 
@@ -78459,6 +78458,7 @@ var checkHistory = function checkHistory(history, callback) {
 
   //直接启用快捷调试模式
   if (config.debug.locationPage) {
+    console.log('启动了debug.locationPage,如果进不去，需要检测定位的坐标');
     Xut.View.LoadScenario(config.debug.locationPage, callback);
     return true;
   }
@@ -79008,10 +79008,8 @@ function initView() {
       pageTotal: sectionRang.length, //页面总数
       complete: function complete(nextBack) {
         //构件完毕回调
-
-        /*第一次加载的外部回调*/
+        //第一次加载的外部回调
         callback && callback();
-
         //销毁旧场景
         current && current.destroy();
         //下一个任务存在,执行切换回调后,在执行页面任务
@@ -79898,7 +79896,7 @@ initGlobalAPI();
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889;
+Xut.Version = 889.1;
 
 /*加载应用app*/
 var initApp = function initApp() {

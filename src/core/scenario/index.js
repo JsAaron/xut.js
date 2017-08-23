@@ -37,6 +37,7 @@ const checkHistory = (history, callback) => {
 
   //直接启用快捷调试模式
   if (config.debug.locationPage) {
+    console.log('启动了debug.locationPage,如果进不去，需要检测定位的坐标')
     Xut.View.LoadScenario(config.debug.locationPage, callback)
     return true;
   }

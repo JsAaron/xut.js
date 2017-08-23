@@ -159,12 +159,10 @@ export function initView() {
       pageIndex: pageIndex || getInitIndex(), //指定页码
       pageTotal: sectionRang.length, //页面总数
       complete(nextBack) { //构件完毕回调
-
-        /*第一次加载的外部回调*/
-        callback && callback()
-
+        //第一次加载的外部回调
+        callback && callback();
         //销毁旧场景
-        current && current.destroy()
+        current && current.destroy();
         //下一个任务存在,执行切换回调后,在执行页面任务
         nextBack && nextBack();
         //去掉忙碌
