@@ -54,7 +54,9 @@ export default class PageWidget {
   /**
    * 元素隐藏状态下，绑定iScroll获取高度是有问题
    * 所以这里需要补丁方式修正一下
-   让其不可见，但是可以获取高度 存在卷滚区域 第一个子元素最开始也要修改样式
+     让其不可见，但是可以获取高度 存在卷滚区域 第一个子元素最开始也要修改样式
+     修改第一个子元素样式后 在初始化卷滚条后不是将第一个子元素的visibility还原为
+     其最开始的状态，而是跟scroll.area.js中346行一样的值
    * @return {[type]} [description]
    */
   _resetOpacityVisibility(firstArg, secondArg) {
@@ -72,18 +74,17 @@ export default class PageWidget {
           //第一个卷滚区域的第一个子元素样式修改 如果不改的话 强制显示后他会显示出来 出现闪图现象
           let parent = secondArg[0]
           let prefix = firstArg.contentPrefix
-          let contentName, $firstChild, firstVisible
+          let contentName, $firstChild
           let theTitle = parseJSON(parent.theTitle)
           let obj = theTitle["data-widgetscrollareaList"].split(",");
           if(obj[0]) {
             contentName = prefix + obj[0]
             $firstChild = $("#" + contentName)
-            firstVisible = $firstChild.css('visibility')
             $firstChild.css('visibility', "hidden")
           }
 
           const firstChildTemp = function() {
-            $firstChild.css('visibility', firstVisible)
+            $firstChild.css('visibility', "inherit")
           }
           resetStyle.push(firstChildTemp)
         }

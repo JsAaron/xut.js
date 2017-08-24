@@ -9,19 +9,22 @@ import { initAsyn } from './initialize/asyn'
 import { initGlobalAPI } from './global-api/index'
 import { priorityConfig } from './config/priority-config'
 
+/////////////////
+////  版本号  ////
+/////////////////
+Xut.Version = 889.4
 
-/*代码初始化*/
+/**
+ * 代码初始化
+ */
 initAudio()
 initVideo()
 initGlobalAPI()
 
-/////////////////
-////  版本号  ////
-/////////////////
-Xut.Version = 889.2
-
-/*加载应用app*/
-const initApp = (...arg) => {
+/**
+ * 加载应用app
+ */
+function initApp(...arg) {
   /*针对异步的代码以前检测出来*/
   initAsyn(function() {
     /*配置优先级*/
@@ -32,21 +35,25 @@ const initApp = (...arg) => {
     const { $rootNode, $contentNode } = initRootNode(...arg)
     nextTick({ container: $rootNode, content: $contentNode }, main)
   })
-
 }
 
-/*提供全局配置文件*/
-const mixGolbalConfig = setConfig => {
+/**
+ * 提供全局配置文件
+ */
+function mixGolbalConfig(setConfig) {
   if (setConfig) {
     Xut.mixin(config.golbal, setConfig)
   }
 }
 
-/*接口接在参数,用户横竖切换刷新*/
+
+//接口接在参数,用户横竖切换刷新
 let cacheOptions
 let delayTimer = null
 
-/*横竖切换*/
+/**
+ * 横竖切换
+ */
 const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function() {
   $(window).on('orientationchange', (e) => {
 
@@ -88,7 +95,9 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function(
 } : function() {}
 
 
-/*新版本加载*/
+/**
+ * 新版本加载
+ */
 Xut.Application.Launch = option => {
   if (config.launch) {
     return
@@ -111,8 +120,10 @@ Xut.Application.Launch = option => {
 }
 
 
-/*判断是否script有data-plat或者data-mode属性*/
-const hasLaunch = function() {
+/**
+ * 判断是否script有data-plat或者data-mode属性
+ */
+function hasLaunch() {
   const scripts = document.querySelectorAll('script')
   for (let i = 0; i < scripts.length; i++) {
     let node = scripts[i]
@@ -126,7 +137,9 @@ const hasLaunch = function() {
 }
 
 
-/*老版本加载*/
+/**
+ * 老版本加载
+ */
 setTimeout(() => {
   const setConfig = Xut.Application.setConfig
   if (!setConfig || setConfig && setConfig.lauchMode !== 1) {

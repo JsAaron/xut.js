@@ -433,8 +433,10 @@ export function reviseSize({
 /**
  * 清理图片
  * @return {[type]} [description]
+ * action  'show' / 'hide'
+ * default: 'hide'
  */
-export function cleanImage(context) {
+export function cleanImage(context, action) {
 
   if (!context) {
     return
@@ -457,6 +459,9 @@ export function cleanImage(context) {
         img.removeAttribute('src')
       }
     })
+    if (action === 'show') {
+      context.show()
+    }
   } catch (e) {
     console.log('销毁图片出错')
   }

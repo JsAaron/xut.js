@@ -44061,8 +44061,10 @@ function reviseSize(_ref2) {
 /**
  * 清理图片
  * @return {[type]} [description]
+ * action  'show' / 'hide'
+ * default: 'hide'
  */
-function cleanImage(context) {
+function cleanImage(context, action) {
 
   if (!context) {
     return;
@@ -44085,6 +44087,9 @@ function cleanImage(context) {
         img.removeAttribute('src');
       }
     });
+    if (action === 'show') {
+      context.show();
+    }
   } catch (e) {
     console.log('销毁图片出错');
   }
@@ -59102,7 +59107,7 @@ var Animation = function () {
           }
 
           //如果是一次性动画，需要动态设置图片的src
-          if (_this3.useImgAnim) {
+          if (_this3.useDynamicDiagram) {
             setImage(_this3.$contentNode, _this3.contentData.resourcePath);
           }
 
@@ -59147,7 +59152,7 @@ var Animation = function () {
       access(function (key) {
         if (_this5[key]) {
           //如果是一次性动画，需要动态处理
-          if (_this5.useImgAnim) {
+          if (_this5.useDynamicDiagram) {
             cleanImage(_this5.$contentNode);
           }
           _this5[key].reset && _this5[key].reset();
@@ -59199,7 +59204,7 @@ var Animation = function () {
  * 1 动画直接显示与隐藏设置
  * 2 动画脚本与处理（跳转）
  */
-function FastPipe(data, base) {
+function fastPipe(data, base) {
   var id = //预显示动画
   //预跳转脚本
   data.id,
@@ -59810,6 +59815,7 @@ function index$1(data, relatedData, getStyle) {
 ///  1.动画直接改变显示隐藏状态
 ///  2.动画直接执行脚本
 /////////////////////////////////
+
 function pretreatment(data, eventName) {
   var parameter = data.getParameter();
 
@@ -59828,30 +59834,31 @@ function pretreatment(data, eventName) {
     !/"inapp"/i.test(para.parameter)) {
       //并且不能是收费处理
 
+      ///////////////////////////////////////////////////////////////
       //如果是apng、webp、gif的图片
       //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
-      //那么可能是一次性动画，那么这里会跳过与加载的显示隐藏处理
-      //等执行的时候处理
+      //所以规定
+      //1 如果是显示动画中绑定了apng、webp、gif的资源，那么就需要动态处理
+      //2 在dom阶段创建了所有的img.src 在ppt动画阶段需要判断，删除后动态处理
+      ///////////////////////////////////////////////////////////////
       var fileName = data.contentData.md5;
       if (fileName && /^apng_|gif$/i.test(fileName)) {
-        data.$contentNode.find('img').each(function (index, img) {
-          if (img) {
-            img.removeAttribute('onerror');
-            img.src = null;
-            img.removeAttribute('src');
-          }
-        });
-        data.useImgAnim = true; //标记动画图片动画
+        cleanImage(data.$contentNode, 'show');
+        data.useDynamicDiagram = true; //标记动画图片动画
         return;
       }
 
+      ///////////////////////////////////////////////////////////////
       //针对预处理动作,并且没有卷滚的不注册，满足是静态动画，true是显示,false隐藏
+      ///////////////////////////////////////////////////////////////
       if (!para.preCode && !para.postCode) {
         return data.prepVisible = /"exit":"False"/i.test(para.parameter) === true ? 'visible' : 'hidden';
       }
 
+      ///////////////////////////////////////////////////////////////
       //如果有脚本，可能是针对迷你杂志跳转的数据
       //需要通过onclick绑定，那么就截断这个数据
+      /////////////////////////////////////////////////////////////////
       if (para.preCode) {
 
         //方式一
@@ -60000,7 +60007,7 @@ var createScope = function createScope(base, contentId, chapterIndex, actName, p
   //数据预处理
   var hasPipe = pretreatment(data, base.eventData.eventName);
   if (hasPipe) {
-    return FastPipe(data, base);
+    return fastPipe(data, base);
   } else {
     //生成子作用域对象，用于抽象处理动画,行为
     data.getStyle = base.getStyle;
@@ -65833,7 +65840,9 @@ var PageWidget = function () {
     /**
      * 元素隐藏状态下，绑定iScroll获取高度是有问题
      * 所以这里需要补丁方式修正一下
-     让其不可见，但是可以获取高度 存在卷滚区域 第一个子元素最开始也要修改样式
+       让其不可见，但是可以获取高度 存在卷滚区域 第一个子元素最开始也要修改样式
+       修改第一个子元素样式后 在初始化卷滚条后不是将第一个子元素的visibility还原为
+       其最开始的状态，而是跟scroll.area.js中346行一样的值
      * @return {[type]} [description]
      */
 
@@ -65855,19 +65864,17 @@ var PageWidget = function () {
             var parent = secondArg[0];
             var prefix = firstArg.contentPrefix;
             var contentName = void 0,
-                $firstChild = void 0,
-                firstVisible = void 0;
+                $firstChild = void 0;
             var theTitle = parseJSON(parent.theTitle);
             var obj = theTitle["data-widgetscrollareaList"].split(",");
             if (obj[0]) {
               contentName = prefix + obj[0];
               $firstChild = $("#" + contentName);
-              firstVisible = $firstChild.css('visibility');
               $firstChild.css('visibility', "hidden");
             }
 
             var firstChildTemp = function firstChildTemp() {
-              $firstChild.css('visibility', firstVisible);
+              $firstChild.css('visibility', "inherit");
             };
             resetStyle.push(firstChildTemp);
           }
@@ -79919,18 +79926,22 @@ function initGlobalAPI() {
   initApplication();
 }
 
-/*代码初始化*/
+/////////////////
+////  版本号  ////
+/////////////////
+Xut.Version = 889.4;
+
+/**
+ * 代码初始化
+ */
 initAudio();
 initVideo();
 initGlobalAPI();
 
-/////////////////
-////  版本号  ////
-/////////////////
-Xut.Version = 889.2;
-
-/*加载应用app*/
-var initApp = function initApp() {
+/**
+ * 加载应用app
+ */
+function initApp() {
   for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
     arg[_key] = arguments[_key];
   }
@@ -79949,20 +79960,24 @@ var initApp = function initApp() {
 
     nextTick({ container: $rootNode, content: $contentNode }, main);
   });
-};
+}
 
-/*提供全局配置文件*/
-var mixGolbalConfig = function mixGolbalConfig(setConfig) {
+/**
+ * 提供全局配置文件
+ */
+function mixGolbalConfig(setConfig) {
   if (setConfig) {
     Xut.mixin(config.golbal, setConfig);
   }
-};
+}
 
-/*接口接在参数,用户横竖切换刷新*/
+//接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
 var delayTimer = null;
 
-/*横竖切换*/
+/**
+ * 横竖切换
+ */
 var bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function () {
   $(window).on('orientationchange', function (e) {
 
@@ -80003,7 +80018,9 @@ var bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function ()
   });
 } : function () {};
 
-/*新版本加载*/
+/**
+ * 新版本加载
+ */
 Xut.Application.Launch = function (option) {
   if (config.launch) {
     return;
@@ -80025,8 +80042,10 @@ Xut.Application.Launch = function (option) {
   }
 };
 
-/*判断是否script有data-plat或者data-mode属性*/
-var hasLaunch = function hasLaunch() {
+/**
+ * 判断是否script有data-plat或者data-mode属性
+ */
+function hasLaunch() {
   var scripts = document.querySelectorAll('script');
   for (var i = 0; i < scripts.length; i++) {
     var node = scripts[i];
@@ -80037,9 +80056,11 @@ var hasLaunch = function hasLaunch() {
       return true;
     }
   }
-};
+}
 
-/*老版本加载*/
+/**
+ * 老版本加载
+ */
 setTimeout(function () {
   var setConfig = Xut.Application.setConfig;
   if (!setConfig || setConfig && setConfig.lauchMode !== 1) {

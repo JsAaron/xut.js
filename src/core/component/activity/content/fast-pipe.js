@@ -7,7 +7,7 @@ import { simpleEvent } from '../event/bind/simple'
  * 1 动画直接显示与隐藏设置
  * 2 动画脚本与处理（跳转）
  */
-export default function FastPipe(data, base) {
+export default function fastPipe(data, base) {
   let {
     id,
     canvasMode,

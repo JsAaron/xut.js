@@ -7,7 +7,7 @@
 import PPTAnimation from './ppt-animate'
 import FastPipe from './fast-pipe'
 import Parallax from './parallax/index'
-import pretreatment from './pre-process'
+import preTreatment from './pre-treatment'
 
 //2016.7.15废弃
 //pixi暂时不使用
@@ -119,7 +119,7 @@ const createScope = function(base, contentId, chapterIndex, actName, parameter, 
   }
 
   //数据预处理
-  let hasPipe = pretreatment(data, base.eventData.eventName)
+  let hasPipe = preTreatment(data, base.eventData.eventName)
   if(hasPipe) {
     return FastPipe(data, base)
   } else {
