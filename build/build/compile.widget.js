@@ -11,21 +11,9 @@ const conf = config.build.conf
 const rootPath = conf.srcDir + 'content/'
 const contentFiles = fs.readdirSync(rootPath)
 
-
-const writeFile = (filename, content) => {
-  fs.writeFileSync(filename, content, {
-    encoding: 'utf8',
-    flag: 'w+'
-  })
-}
-
 /**
  * 编译文件的j's
  * traverse：是不是子节点: 默认递归
- * @param  {[type]}   srcPath  [description]
- * @param  {Function} callback [description]
- * @param  {[type]}   traverse [description]
- * @return {[type]}            [description]
  */
 const compilecJs = function(srcPath, callback, traverse = true) {
 

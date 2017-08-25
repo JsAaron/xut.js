@@ -14,17 +14,10 @@ const config = require('../config')(buildName);
     distDirPath: config.distDirPath,
     rollupDevFilePath: config.rollupDevFilePath
   })
-
   const scriptUrls = await compileExternal({
     exclude: config.exclude,
     basePath: config.basePath,
     externalFiles: config.externalFiles
   })
-
-  const jsPromise = compileJs(config, scriptUrls)
-  const cssPromise = compileCSS(config)
-  const versionPromise = compileVersion(config)
-  await jsPromise
-  await cssPromise
-  await versionPromise
+  await Promise.all([compileJs(config, scriptUrls), compileCSS(config), compileVersion(config)])
 })();
