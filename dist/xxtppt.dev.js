@@ -43602,10 +43602,22 @@ var CLEAR = supportPlat(clearStorageId, clearStorageId);
  * @param {[type]} value [description]
  */
 function $setStorage(key, value) {
-  if (!key || !value) {
+
+  if (!key) {
     return;
   }
-  SET(key, value);
+
+  //字符串
+  if (_.isString(key) && value !== undefined) {
+    SET(key, value);
+  }
+
+  //对象
+  if (_.isObject(key)) {
+    for (var i in key) {
+      $setStorage(i, key[i]);
+    }
+  }
 }
 
 /**
@@ -45253,13 +45265,13 @@ var defaults$1 = {
   NavRight: 1, //右翻页按钮[0不显示,1显示]
   customButton: 0, //自定义翻页按钮
   CloseBut: window.SUbDOCCONTEXT ? 1 : 0 //关闭按钮[0不显示,1显示]
-};
 
-/**
- * 配置默认数据
- * @return {[type]} [description]
- */
-function initDefaults(setData) {
+
+  /**
+   * 配置默认数据
+   * @return {[type]} [description]
+   */
+};function initDefaults(setData) {
 
   var rs = void 0;
   var data = {};
@@ -45751,7 +45763,7 @@ var eachColumn = function eachColumn(columnData, $seasons, visualWidth, visualHe
 /**
  * 获取分栏数
  */
-var getColumnCount$$1 = function getColumnCount$$1(content, id) {
+var getColumnCount = function getColumnCount(content, id) {
   var theChildren = $(content).find(id).children();
   var paraHeight = 0;
   for (var i = 0; i < theChildren.length; i++) {
@@ -45776,9 +45788,9 @@ function getColumnData($seasons, callback) {
         var chapterId = tag.match(/\d+/)[0];
         var count = void 0;
         if (config.launch.scrollMode === 'h') {
-          count = getColumnCount$$1(node, '#columns-content');
+          count = getColumnCount(node, '#columns-content');
         } else if (config.launch.scrollMode === 'v') {
-          count = getColumnCount$$1(node, '#scroller-section');
+          count = getColumnCount(node, '#scroller-section');
         }
         callback(seasonsId, chapterId, count);
       }
@@ -48984,10 +48996,9 @@ var CordovaMedia = function (_AudioSuper) {
         expansionCurrentPosition: function expansionCurrentPosition() {
           return window.getCurrentPosition(self.id);
         }
-      };
 
-      //autoplay
-      this.audio = audio;
+        //autoplay
+      };this.audio = audio;
       this.play();
     }
 
@@ -50990,9 +51001,8 @@ var _class = function () {
               y: fromOffset.top,
               w: self.dragElement.width(),
               h: self.dragElement.height()
-            };
-            //获取目标对象参数
-            var toOffset = dropElement.offset();
+              //获取目标对象参数
+            };var toOffset = dropElement.offset();
             var toPoint = {
               x: toOffset.left,
               y: toOffset.top,
@@ -52754,13 +52764,12 @@ var whiteObject = {
   "#FFFFFF": true,
   "#fff": true,
   "#FFF": true
-};
 
-/**
- * 字体大小
- * @type {Array}
- */
-var sizeArray = ["1", "1.5", "2.0"];
+  /**
+   * 字体大小
+   * @type {Array}
+   */
+};var sizeArray = ["1", "1.5", "2.0"];
 
 var getFontSize = function getFontSize() {
   newFontSize = defaultFontSize * config.proportion.width;
@@ -53878,14 +53887,13 @@ var eventMixin = function (activitProto) {
           self.runAnimation();
         }
       }
-    };
 
-    /**
-     * 正常动画执行
-     * 除去拖动拖住外的所有事件
-     * 点击,双击,滑动等等....
-     */
-    var eventRun = function eventRun() {
+      /**
+       * 正常动画执行
+       * 除去拖动拖住外的所有事件
+       * 点击,双击,滑动等等....
+       */
+    };var eventRun = function eventRun() {
 
       /*
       跟踪点击动作
@@ -58959,10 +58967,9 @@ var Animation = function () {
         data: this.contentData,
         renderer: this.$contentNode,
         pageIndex: this.pageIndex
-      };
 
-      //创建pixi上下文的ppt对象
-      var createPixiPPT = function createPixiPPT() {
+        //创建pixi上下文的ppt对象
+      };var createPixiPPT = function createPixiPPT() {
         //parameter存在就是ppt动画
         if ((parameter || actionTypes.pptId) && _this.$contentNode.view) {
           _this.pptObj = callback(Powepoint, $(_this.$contentNode.view));
@@ -59205,9 +59212,7 @@ var Animation = function () {
  * 2 动画脚本与处理（跳转）
  */
 function fastPipe(data, base) {
-  var id = //预显示动画
-  //预跳转脚本
-  data.id,
+  var id = data.id,
       canvasMode = data.canvasMode,
       $contentNode = data.$contentNode,
       prepTag = data.prepTag,
@@ -60443,10 +60448,9 @@ var Activity = function () {
           var option = {
             scrollbars: 'custom',
             fadeScrollbars: true
-          };
 
-          /*迷你平台，工具栏不消失*/
-          if (config.launch.platform === 'mini') {
+            /*迷你平台，工具栏不消失*/
+          };if (config.launch.platform === 'mini') {
             option.fadeScrollbars = false;
           }
 
@@ -60926,10 +60930,9 @@ function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
      * 2016.11.8
      */
     'swipeDelegateContents': pageBaseHooks.swipeDelegateContents
-  };
 
-  //相关数据
-  var relatedData = {
+    //相关数据
+  };var relatedData = {
     floatMasterDivertor: floatMasterDivertor,
     'seasonId': pipeData.chpaterData.seasonId,
     'pageId': pageId,
@@ -60944,13 +60947,12 @@ function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
     'getTransformOffset': getTransformOffset,
     'contentsFragment': pipeData.contentsFragment,
     'contentHtmlBoxIds': pipeData.contentHtmlBoxIds
-  };
 
-  /**
-   * 继续下一个任务
-   * @return {[type]} [description]
-   */
-  var nextTask = function nextTask() {
+    /**
+     * 继续下一个任务
+     * @return {[type]} [description]
+     */
+  };var nextTask = function nextTask() {
     //多事件合集处理pagebase
     if (eventRelated) {
       pageBaseHooks.eventBinding && pageBaseHooks.eventBinding(eventRelated);
@@ -61187,11 +61189,10 @@ var ScalePan = function () {
         'panstart panmove': '_onPan',
         'panend': '_onPanEnd',
         'pinchcancel': '_onPinchEnd'
-      };
 
-      //如果单击关闭存在，就增加
-      //否则不能阻止外部的事件关闭
-      if (this.tapClose) {
+        //如果单击关闭存在，就增加
+        //否则不能阻止外部的事件关闭
+      };if (this.tapClose) {
         bindHash['tap'] = '_onTap';
       }
 
@@ -62865,10 +62866,10 @@ function contentParser(compileActivitys, pipeData) {
     containerRelated: [], //容器合集相关数据信息
     eventRelated: {}, //多事件容器合集
     partContentRelated: [] //卷滚conten只创建,不处理行为
-  };
 
-  /*创建解析*/
-  var createResolve = function createResolve(callback) {
+
+    /*创建解析*/
+  };var createResolve = function createResolve(callback) {
     return coreParser(function (tokens) {
       return callback(tokens);
     }, activity, pageType, chapterIndex);
@@ -63493,12 +63494,10 @@ var pixiType = {
     createCanvasData('compSpriteId', opts);
   }
 
-};
-
-/**
- * 解析参数
- */
-function callResolveArgs(category, opts) {
+  /**
+   * 解析参数
+   */
+};function callResolveArgs(category, opts) {
   var cate;
   var val;
   var data = opts.data;
@@ -63558,20 +63557,19 @@ function parseCanvas(contentId, category, conData, data) {
     contentId: contentId,
     conData: conData,
     data: data
-  };
 
-  //转成canvas标记
-  //如果有pixi的处理类型
-  //2016.2.25
-  //SeniorSprite,PPT
-  //Sprite,PPT
-  //SeniorSprite
-  //Sprite
-  //PPT
-  //CompSprite
-  //多种处理方式
-  //可以组合
-  category && callResolveArgs(category, opts);
+    //转成canvas标记
+    //如果有pixi的处理类型
+    //2016.2.25
+    //SeniorSprite,PPT
+    //Sprite,PPT
+    //SeniorSprite
+    //Sprite
+    //PPT
+    //CompSprite
+    //多种处理方式
+    //可以组合
+  };category && callResolveArgs(category, opts);
 }
 
 /**
@@ -63900,10 +63898,9 @@ function contentStructure(pipeData, $$floatDivertor, callback) {
         contentHtmlBoxIds: contentHtmlBoxIds,
         headerFooterMode: headerFooterMode,
         containerPrefix: ''
-      };
 
-      //针对容器处理
-      if (containerObj) {
+        //针对容器处理
+      };if (containerObj) {
         var start, end, containerPrefix, containerStr;
         containerStr = [];
 
@@ -64637,10 +64634,10 @@ function $trigger(_ref, columnData) {
       /*获取页面类型,page或master*/
       var pageType = rootNode && rootNode.id ? /page/.test(rootNode.id) ? 'page' : 'master' : 'page';
 
-      var data = { id: id, key: key, type: type, rootNode: rootNode, target: target, pageIndex: pageIndex, pageType: pageType, "activityId": id, columnData: columnData };
+      var data = { id: id, key: key, type: type, rootNode: rootNode, target: target, pageIndex: pageIndex, pageType: pageType, "activityId": id, columnData: columnData
 
-      /*如果有代码跟踪*/
-      config.sendTrackCode('hot', {
+        /*如果有代码跟踪*/
+      };config.sendTrackCode('hot', {
         id: id,
         type: type,
         pageId: Xut.Presentation.GetPageId(pageType, pageIndex),
@@ -64837,11 +64834,6 @@ function $stop() {
     return falg;
   });
 }
-
-/**
- * 扩展子文档
- * @return {[type]} [description]
- */
 
 /**
  *
@@ -65454,10 +65446,9 @@ var ScrollArea = function () {
       var max = {
         l: null,
         t: null
-      };
 
-      //最小区间
-      var min = {
+        //最小区间
+      };var min = {
         l: null,
         t: null
       };
@@ -66917,14 +66908,13 @@ var translation = {
   flipMove: flipMove$1,
   flipRebound: flipRebound$1,
   flipOver: flipOver$1
-};
 
-/**
- * 创建translate初始值
- * @param  {[type]} offset [description]
- * @return {[type]}        [description]
- */
-var createTranslate = function createTranslate(value) {
+  /**
+   * 创建translate初始值
+   * @param  {[type]} offset [description]
+   * @return {[type]}        [description]
+   */
+};var createTranslate = function createTranslate(value) {
   if (config.launch.scrollMode === 'v') {
     return Xut.style.setTranslateStyle(0, value);
   }
@@ -68594,14 +68584,13 @@ var Swiper = function (_Observer) {
       preventDefault: preventDefault,
       hasMultiPage: hasMultiPage,
       sectionRang: sectionRang
-    };
 
-    /**
-     * 滑动的方向
-     * 横版：prev next (left/right)
-     * 竖版：prev next (up/down)
-     */
-    _this.direction = '';
+      /**
+       * 滑动的方向
+       * 横版：prev next (left/right)
+       * 竖版：prev next (up/down)
+       */
+    };_this.direction = '';
 
     /*默认允许滑动*/
     _this.enabled = true;
@@ -70961,13 +70950,12 @@ var initstate = function (baseProto) {
        *     2: PPTeffect  {}  //行为对象
        */
       masterGroup: {}
-    };
 
-    /**
-     * 对象的处理情况的内部钩子方法
-     * 收集内部的一些状态与对象
-     */
-    this.divertorHooks = {
+      /**
+       * 对象的处理情况的内部钩子方法
+       * 收集内部的一些状态与对象
+       */
+    };this.divertorHooks = {
 
       /**
        * 多线程任务完成后
@@ -74290,12 +74278,11 @@ var Scheduler = function () {
             /*页面的布局位置*/
             position: getPosition(doubleMainIndex !== undefined ? doubleMainIndex : chapterIndex, visualChapterIndex),
             pageVisualMode: getVisualMode(chapterData)
-          };
 
-          ///////////////////////////
-          /// 延迟创建,先处理style规则
-          ///////////////////////////
-          return function (pageStyle) {
+            ///////////////////////////
+            /// 延迟创建,先处理style规则
+            ///////////////////////////
+          };return function (pageStyle) {
             //创建新的页面管理，masterFilter 母板过滤器回调函数
             var _createPageBase = function _createPageBase(masterFilter) {
 
@@ -74364,9 +74351,7 @@ var Scheduler = function () {
   }, {
     key: 'movePageBases',
     value: function movePageBases(options) {
-      var action = //应用边界反弹
-      //设置翻页无效
-      options.action,
+      var action = options.action,
           speed = options.speed,
           outerCallFlip = options.outerCallFlip,
           distance = options.distance,
@@ -74451,10 +74436,9 @@ var Scheduler = function () {
         frontIndex: frontIndex,
         middleIndex: middleIndex,
         backIndex: backIndex
-      };
 
-      /*移动页面*/
-      this.pageMgr.move(data);
+        /*移动页面*/
+      };this.pageMgr.move(data);
       this.getMasterContext(function () {
         this.move(data, isAppBoundary);
       });
@@ -75960,10 +75944,10 @@ var Mediator = function (_Observer) {
       visualWidth: config.screenSize.width, //可视区的宽度
       hasMultiPage: options.hasMultiPage, //多页面
       sectionRang: options.sectionRang //分段值
-    };
 
-    /*如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式*/
-    if (config.launch.mouseWheel !== false && config.launch.scrollMode === 'v') {
+
+      /*如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式*/
+    };if (config.launch.mouseWheel !== false && config.launch.scrollMode === 'v') {
       setOptions.mouseWheel = true;
     }
 
@@ -79929,7 +79913,7 @@ function initGlobalAPI() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.4;
+Xut.Version = 889.5;
 
 /**
  * 代码初始化

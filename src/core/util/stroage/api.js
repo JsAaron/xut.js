@@ -10,7 +10,7 @@
 import { setStorage, getStorage, removeStorage, clearStorageId } from './storage'
 import { setCookie, getCookie, removeCookie } from './cookie'
 
-const supportPlat = function (storage, cookie) {
+const supportPlat = function(storage, cookie) {
   if (Xut.plat.supportStorage) {
     return storage
   } else {
@@ -37,10 +37,23 @@ const CLEAR = supportPlat(clearStorageId, clearStorageId)
  * @param {[type]} value [description]
  */
 export function $setStorage(key, value) {
-  if (!key || !value) {
+
+  if (!key) {
     return
   }
-  SET(key, value)
+
+  //字符串
+  if (_.isString(key) && value !== undefined) {
+    SET(key, value)
+  }
+
+  //对象
+  if (_.isObject(key)) {
+    for (let i in key) {
+      $setStorage(i, key[i])
+    }
+  }
+
 }
 
 /**

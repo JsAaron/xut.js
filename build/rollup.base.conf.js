@@ -9,7 +9,8 @@ const util = require('./util')
 const flow = require('rollup-plugin-flow');
 
 const excludeRE = new RegExp(".git|epub|.svn|node_modules|README.md|README|README.gif|安装说明.docx", "ig")
-const del = (dist) => {
+
+function del(dist) {
   var files = fs.readdirSync(dist);
   for (file of files) {
     if (!excludeRE.test(file)) {
@@ -18,6 +19,15 @@ const del = (dist) => {
   }
   console.log('del: ' + dist)
 }
+
+function createDir(distDirPath) {
+  if (!fs.existsSync(distDirPath)) {
+    fs.mkdirSync(distDirPath);
+    util.log(distDirPath + '目录创建成功', 'info');
+  }
+}
+
+
 //config
 module.exports = ({
   entry,
@@ -31,10 +41,15 @@ module.exports = ({
     fsextra.emptyDirSync(distDirPath)
     util.log(`delete the directory : ${distDirPath}`, 'prompt')
   }
+
   return new Promise((resolve, reject) => {
+
     util.log('Compiling Rollup Pack', 'debug')
-    rollup.rollup({
-        entry: entry,
+
+    async function build() {
+
+      const bundle = await rollup.rollup({
+        input: entry,
         plugins: [
           flow(),
           babel({
@@ -57,24 +72,18 @@ module.exports = ({
           }),
           alias(aliases)
         ]
-      }).then((bundle) => {
-        if (!fs.existsSync(distDirPath)) {
-          fs.mkdirSync(distDirPath);
-          util.log(distDirPath + '目录创建成功', 'info');
-        }
-        const code = bundle.generate({
-          format: 'umd',
-          moduleName: 'Aaron'
-        }).code
-
-        return util.write(rollupDevFilePath, code)
-
-      }).then(() => {
-        resolve()
       })
-      .catch((err) => {
-        util.log('错误：' + err, 'error')
-        reject()
-      })
+
+      await createDir(distDirPath)
+      await bundle.write({
+        file: rollupDevFilePath,
+        format: 'umd',
+        // sourcemap:true,
+        name: 'Aaron'
+      });
+      await resolve()
+    }
+
+    build();
   })
 }
