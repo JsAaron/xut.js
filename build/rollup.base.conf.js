@@ -10,6 +10,7 @@ const flow = require('rollup-plugin-flow');
 
 const excludeRE = new RegExp(".git|epub|.svn|node_modules|README.md|README|README.gif|安装说明.docx", "ig")
 
+
 function del(dist) {
   var files = fs.readdirSync(dist);
   for (file of files) {
@@ -28,62 +29,57 @@ function createDir(distDirPath) {
 }
 
 
-//config
-module.exports = ({
+module.exports = async function compileRollup({
   entry,
   banner,
   aliases,
   distDirPath,
   rollupDevFilePath,
-}, skipCleanDir) => {
+}, skipCleanDir) {
+
   //跳过清理
   if (!skipCleanDir) {
     fsextra.emptyDirSync(distDirPath)
     util.log(`delete the directory : ${distDirPath}`, 'prompt')
   }
 
-  return new Promise((resolve, reject) => {
+  util.log('compile rollup', 'debug')
 
-    util.log('Compiling Rollup Pack', 'debug')
-
-    async function build() {
-
-      const bundle = await rollup.rollup({
-        input: entry,
-        plugins: [
-          flow(),
-          babel({
-            babelrc: false,
-            exclude: 'node_modules/**',
-            "presets": [
-              [
-                "es2015", {
-                  "modules": false
-                }
-              ]
-            ],
-            "plugins": [
-              "external-helpers"
+  async function build() {
+    const bundle = await rollup.rollup({
+      input: entry,
+      plugins: [
+        flow(),
+        babel({
+          babelrc: false,
+          exclude: 'node_modules/**',
+          "presets": [
+            [
+              "es2015", {
+                "modules": false
+              }
             ]
-          }),
-          replace({
-            exclude: 'node_modules/**',
-            'process.env.NODE_ENV': JSON.stringify('production')
-          }),
-          alias(aliases)
-        ]
-      })
+          ],
+          "plugins": [
+            "external-helpers"
+          ]
+        }),
+        replace({
+          exclude: 'node_modules/**',
+          'process.env.NODE_ENV': JSON.stringify('production')
+        }),
+        alias(aliases)
+      ]
+    })
+    await createDir(distDirPath)
+    await bundle.write({
+      file: rollupDevFilePath,
+      format: 'umd',
+      // sourcemap:true,
+      name: 'Aaron'
+    });
+    return await Promise.resolve()
+  }
 
-      await createDir(distDirPath)
-      await bundle.write({
-        file: rollupDevFilePath,
-        format: 'umd',
-        // sourcemap:true,
-        name: 'Aaron'
-      });
-      await resolve()
-    }
-
-    build();
-  })
+  return build()
 }

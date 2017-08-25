@@ -5,7 +5,7 @@ const rename = require("gulp-rename");
 const autoprefixer = require('gulp-autoprefixer');
 const util = require('../util')
 
-function createFile(fileName, path, config, resolve, reject) {
+async function createFile(fileName, path, config, resolve, reject) {
   gulp.src(path)
     .pipe(autoprefixer({
       browsers: ['last 2 versions', 'Android >= 4.0'],
@@ -17,43 +17,39 @@ function createFile(fileName, path, config, resolve, reject) {
     .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(rename(fileName + '.css'))
     .pipe(gulp.dest(config.distDirPath))
-    .on('error', (err) => {
+    .on('error', async(err) => {
       util.log('【css】compile complete error', 'debug')
-      reject()
+      return await Promise.reject()
     })
-    .on('end', () => {
+    .on('end', async() => {
       util.log('【css ' + fileName + '】compile complete', 'debug')
-      resolve()
+      return await Promise.resolve()
     })
 }
 
 
-module.exports = (config) => {
-
+async function compileCSS(config) {
   const cssNames = []
-
   config.externalFiles.cssName.forEach(function(url) {
     cssNames.push(util.joinPath(config.templateDirPath, url))
   })
-
-  return new Promise((resolve, reject) => {
-    let sucCount = 2
-    let failCount = 2
-    let success = function() {
-      if (sucCount === 1) {
-        resolve()
-        return
-      }
-      sucCount--
+  let sucCount = 2
+  let failCount = 2
+  const success = async function() {
+    if (sucCount === 1) {
+      return await Promise.resolve()
     }
-    let fail = function() {
-      if (failCount === 1) {
-        reject()
-        return
-      }
-      failCount--
+    sucCount--
+  }
+  const fail = async function() {
+    if (failCount === 1) {
+      return await Promise.reject()
     }
-    createFile('xxtppt', cssNames, config, success, fail)
-    createFile('font', [util.joinPath(config.templateDirPath, config.externalFiles.fontName.join(''))], config, success, fail)
-  })
+    failCount--
+  }
+  createFile('xxtppt', cssNames, config, success, fail)
+  createFile('font', [util.joinPath(config.templateDirPath, config.externalFiles.fontName.join(''))], config, success, fail)
 }
+
+
+module.exports = compileCSS
