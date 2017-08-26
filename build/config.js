@@ -91,7 +91,7 @@ const builds = {
        * 打包模式有2种
        * 1 全部打包
        * 2 只打包rollup部分，提高打包速度
-       * 参数： all / rollup
+       * 参数： all / onlyRollup
        * rollup: 不处理外部js的引入部分，加快调试速度
        */
       mode: 'all',

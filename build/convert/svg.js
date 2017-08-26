@@ -8,6 +8,7 @@ const fs = require("fs")
 const _ = require("underscore")
 const util = require('../util')
 
+
 const readFile = (path) => {
   let data = fs.readFileSync(path, {
     // flag: 'r+',
@@ -15,6 +16,7 @@ const readFile = (path) => {
   })
   return data
 }
+
 
 const writeFile = (filename, content) => {
   fs.writeFileSync(filename, content, {
@@ -26,10 +28,8 @@ const writeFile = (filename, content) => {
 
 /**
  * 转化svg为js
- * @param  {[type]} path [description]
- * @return {[type]}      [description]
  */
-const convertFile = function(path) {
+function convertFile(path) {
 
   /*如果已经转化过了*/
   let convertedPath = path + '/converted.txt'
@@ -107,25 +107,22 @@ const convertFile = function(path) {
  * 包含
  * 1 content gallery
  * 2 widget gallery
- * @return {[type]} [description]
  */
-const checkDir = function(path) {
-  const files = fs.readdirSync(path)
-  _.each(files, function(file) {
+function scanDir(path) {
+  _.each(fs.readdirSync(path), function(file) {
     const stat = fs.lstatSync(path + file);
-    /*如果是目录*/
+    //如果是目录
     if (stat.isDirectory()) {
       if (file === 'gallery') {
         convertFile(path + file)
       } else {
-        checkDir(path + file + '/')
+        scanDir(path + file + '/')
       }
     }
   })
-
 }
 
 
 module.exports = function(path) {
-  checkDir(path)
+  scanDir(path)
 }

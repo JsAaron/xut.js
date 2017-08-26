@@ -2,14 +2,13 @@ const fs = require('fs')
 const path = require('path')
 const util = require('./util')
 
-async function compileExternal({
+module.exports = async function compileExternal({
   exclude,
   basePath,
   externalFiles,
 }) {
-  const paths = []
-  const len = exclude.length
-  if (len) {
+  let paths = []
+  if (exclude.length) {
     exclude = exclude.join(',')
     exclude = new RegExp('(' + exclude.replace(/,/g, '|') + ')')
   }
@@ -19,9 +18,5 @@ async function compileExternal({
     }
   })
   util.log(`external file：${paths.length}`, 'debug')
-
-  return await Promise.resolve(paths)
+  return await paths;
 }
-
-
-module.exports = compileExternal

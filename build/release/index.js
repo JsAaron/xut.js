@@ -32,21 +32,16 @@ const remotePath = '/var/www/mobileclouddata/exports/xxtppt/assets/www'
 const remoteDirectory = `${config.username}@${config.host}:${remotePath}`
 const localRoot = process.cwd()
 const localDirectory = `${localRoot}/release`
-
 const uploadDir = `${localDirectory}/upload`
 const downloadDir = `${localDirectory}/download`
-
 const conn = new Client();
 
 
-function syncFiles() {
-  fsextra.emptyDirSync(uploadDir)
-  fsextra.copySync(downloadDir, uploadDir)
-  util.log('The server and the local file synchronization is complete')
-}
-
-function downloadFile() {
-  return new Promise(function(resolve, reject) {
+/**
+ * 下载服务器文件
+ */
+async function downloadFile() {
+  await new Promise(function(resolve, reject) {
     fsextra.emptyDirSync(downloadDir)
     const command = `scp -r ${remoteDirectory} ${downloadDir}`
     util.log('The server path:' + remotePath)
@@ -65,12 +60,15 @@ function downloadFile() {
   })
 }
 
-function uploadFile() {
-  return new Promise(function(resolve, reject) {
+/**
+ * 更新上传文件
+ */
+async function uploadFile() {
+  await new Promise(function(resolve, reject) {
     const command = `scp -r ${uploadDir}/www ${remoteDirectory}`
     const child = exec(command, (error, stdout, stderr) => {
       if (error) {
-        console.error(`exec error: ${error}`);
+        reject()
         return;
       }
       resolve()
@@ -81,8 +79,8 @@ function uploadFile() {
 
 //sshCommand(`mkdir ${remotePath}/chenwen`).
 //sshCommand(`cp -r ${remotePath}/css ${remotePath}/chenwen`)
-function sshCommand(command, options) {
-  return new Promise(function(resolve, reject) {
+async function sshCommand(command, options) {
+  await new Promise(function(resolve, reject) {
     conn.exec(command, function(err, stream) {
       if (err) throw err;
       let buf = '';
@@ -96,8 +94,12 @@ function sshCommand(command, options) {
 }
 
 
-function compareInfo() {
-  return new Promise(function(resolve, reject) {
+/**
+ * 比较版本号
+ * @return {[type]} [description]
+ */
+async function compareVsersion() {
+  await new Promise(function(resolve, reject) {
     sshCommand(`cd ${remotePath} && cat lib/version.js`).then(function(version) {
       return sshCommand(`cd ${remotePath} && ls -lR|grep "^-"|wc -l`, version)
     }).then(function(data) {
@@ -107,38 +109,40 @@ function compareInfo() {
   })
 }
 
-function ssh() {
-  return new Promise(function(resolve, reject) {
-    util.log('SSH link success');
+/**
+ * 链接ssh服务器
+ */
+async function sshLink() {
+  util.log('SSH link success');
+  await new Promise(function(resolve, reject) {
     conn.on('ready', resolve).connect(config);
-  })
+  });
 }
 
-function actionUp() {
-  //upload files
-  ssh().then(function() {
-    return compareInfo()
-  }).then(function() {
-    util.log('Clean up the server directory')
-    return sshCommand(`rm -r ${remotePath}`)
-  }).then(function() {
-    util.log('Upload new release code')
-    return uploadFile()
-  }).then(function() {
-    return compareInfo()
-  }).then(function(data) {
-    util.log('Updated completely')
-    conn.end()
-  })
+async function actionUp() {
+  await sshLink()
+  await compareVsersion()
+  //清理目录
+  await sshCommand(`rm -r ${remotePath}`)
+  //上传发布代码
+  await uploadFile()
+  await compareVsersion()
+  //更新完毕
+  conn.end()
 }
+
 
 function actionDown() {
-  downloadFile().then(() => syncFiles())
+  downloadFile().then(() => {
+    fsextra.emptyDirSync(uploadDir)
+    fsextra.copySync(downloadDir, uploadDir)
+    util.log('The server and the local file synchronization is complete')
+  })
 }
 
 
-function updateLocalFiles(options) {
-  return new Promise(function(resolve, reject) {
+async function updateLocalFiles(options) {
+  await new Promise(function(resolve, reject) {
     _.each(options, function(data) {
       _.each(data.name, function(fileName) {
         fsextra.copySync(`${localRoot}/dist/${fileName}`, `${uploadDir}/www/${data.dir}/${fileName}`)
@@ -150,7 +154,16 @@ function updateLocalFiles(options) {
 }
 
 
-function release() {
+//上传
+if (action === 'upload') {
+  actionUp()
+}
+//下载
+else if (action === 'download') {
+  actionDown()
+}
+//发布
+else if (action === 'all') {
   updateLocalFiles([{
     dir: 'lib',
     name: ['xxtppt.js', 'version.js']
@@ -160,17 +173,4 @@ function release() {
   }]).then(function() {
     actionUp()
   })
-}
-
-//下载
-if (action === 'download') {
-  actionDown()
-}
-//上传
-else if (action === 'upload') {
-  actionUp()
-}
-//发布
-else if (action === 'all') {
-  release()
 }
