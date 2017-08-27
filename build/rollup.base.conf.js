@@ -45,41 +45,39 @@ module.exports = async function compileRollup({
 
   util.log('compile rollup', 'debug')
 
-  async function build() {
-    const bundle = await rollup.rollup({
-      input: entry,
-      plugins: [
-        flow(),
-        babel({
-          babelrc: false,
-          exclude: 'node_modules/**',
-          "presets": [
-            [
-              "es2015", {
-                "modules": false
-              }
-            ]
-          ],
-          "plugins": [
-            "external-helpers"
+  const bundle = await rollup.rollup({
+    input: entry,
+    plugins: [
+      flow(),
+      babel({
+        babelrc: false,
+        exclude: 'node_modules/**',
+        "presets": [
+          [
+            "es2015", {
+              "modules": false
+            }
           ]
-        }),
-        replace({
-          exclude: 'node_modules/**',
-          'process.env.NODE_ENV': JSON.stringify('production')
-        }),
-        alias(aliases)
-      ]
-    })
-    await createDir(distDirPath)
-    await bundle.write({
-      file: rollupDevFilePath,
-      format: 'umd',
-      // sourcemap:true,
-      name: 'Aaron'
-    });
-    return await Promise.resolve()
-  }
+        ],
+        "plugins": [
+          "external-helpers"
+        ]
+      }),
+      replace({
+        exclude: 'node_modules/**',
+        'process.env.NODE_ENV': JSON.stringify('production')
+      }),
+      alias(aliases)
+    ]
+  })
 
-  return build()
+  await createDir(distDirPath)
+  await bundle.write({
+    file: rollupDevFilePath,
+    format: 'umd',
+    // sourcemap:true,
+    name: 'Aaron'
+  });
+  return await Promise.resolve()
+
 }
