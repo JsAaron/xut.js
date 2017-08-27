@@ -8,10 +8,11 @@ const uglify = require('gulp-uglify');
 const concat = require('gulp-concat')
 const compileRollup = require('../rollup.base.conf.js')
 const compileExternal = require('../external.script')
-
 const util = require('../util')
 
-/*压缩*/
+/**
+ * 压缩
+ */
 function uglifyFile(filePath, fileName, cb) {
   gulp.src(filePath)
     .pipe(uglify())
@@ -20,7 +21,9 @@ function uglifyFile(filePath, fileName, cb) {
     .on('end', cb)
 }
 
-/*拷贝*/
+/**
+ * 拷贝
+ */
 function copy(config) {
   const distDir = config.distDirPath
   const tragetDir = config.debug.targetDirPath
@@ -35,8 +38,8 @@ function copy(config) {
 /**
  * 合并整包
  */
-async function mergeuglify(config, externalName) {
-  await new Promise((resolve, reject) => {
+function mergeuglify(config, externalName) {
+  return new Promise((resolve, reject) => {
     console.log("Merge file")
 
     function merge() {
@@ -56,7 +59,6 @@ async function mergeuglify(config, externalName) {
     }
   })
 }
-
 
 /**
  * 合并外部文件
@@ -103,12 +105,9 @@ module.exports = async(config) => {
       basePath: config.basePath,
       externalFiles: config.externalFiles
     })
-
-    await mergeExternal(config.distDirPath, scriptUrls)
-      .then(externalName => {
-        return mergeuglify(config, externalName)
-      })
-      .then(() => copy(config))
+    const externalName = await mergeExternal(config.distDirPath, scriptUrls)
+    await mergeuglify(config, externalName)
+    await copy(config)
   }
 
 }
