@@ -123,14 +123,14 @@ export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
     /*自动组件*/
     let autoData = pageBase.baseAutoRun()
     if (autoData) {
-      pushWatcher('component', function() {
+      pushWatcher(pageIndex, function() {
         autoComponents(pageBase, pageIndex, autoData, pageType)
       })
     }
 
     /*自动content*/
     if (contentObjs) {
-      pushWatcher('content', function() {
+      pushWatcher(pageIndex, function() {
         autoContents(contentObjs, taskAnimCallback)
       })
     } else {

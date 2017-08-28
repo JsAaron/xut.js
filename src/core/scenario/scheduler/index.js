@@ -789,7 +789,16 @@ export default class Scheduler {
    */
   _initPage(action) {
 
-    const autoRun = () => this._runPageBase({ action })
+    const autoRun = () => {
+      //2017.8.28
+      //如果有没有历史记录就需要运行auto
+      //主要是auto中有异步的延时处理
+      //因为反正这个页面是中间处理，是不需要auto的
+      //会马上调到下一个场景
+      if (!this.$$mediator.options.hasHistory) {
+        this._runPageBase({ action })
+      }
+    }
 
     //触发自动任务
     const triggerAuto = () => {

@@ -240,6 +240,7 @@ export class SceneFactory {
     const $$mediator = this.$$mediator = new Mediator({
       scenePageNode,
       sceneMasterNode,
+      'hasHistory': this.history, //有历史记录
       'pageMode': this.pageMode,
       'sceneNode': this.$sceneNode[0],
       'hasMultiScene': !isMain,
