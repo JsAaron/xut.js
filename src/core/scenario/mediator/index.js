@@ -16,9 +16,8 @@ import { defProtected, defAccess } from '../../util/index'
 
 /**
  * 配置多页面参数
- * @return {[type]} [description]
  */
-const configMultiple = (options) => {
+function configMultiple(options) {
   //如果是epub,强制转换为单页面
   if (Xut.IBooks.Enabled) {
     options.hasMultiPage = false
@@ -56,7 +55,7 @@ const configMultiple = (options) => {
  * 因为冒泡的元素，可能是页面层，也可能是母板上的
  * @return {Boolean} [description]
  */
-const isBelong = (node) => {
+function isBelong(node) {
   var pageType = 'page';
   if (node.dataset && node.dataset.belong) {
     pageType = node.dataset.belong;
@@ -65,6 +64,12 @@ const isBelong = (node) => {
 }
 
 
+////////////////////////////////////////////
+///
+/// 中介类
+/// 全局事件Swiper与全局调度器Scheduler通讯
+///
+////////////////////////////////////////////
 export default class Mediator extends Observer {
 
   constructor(parameter) {
@@ -126,7 +131,7 @@ export default class Mediator extends Observer {
 
     //如果是主场景,才能切换系统工具栏
     if (options.hasMultiPage) {
-      this.addTools($$mediator)
+      this._mixTool($$mediator)
     }
 
     //事件句柄对象
@@ -139,7 +144,7 @@ export default class Mediator extends Observer {
     $$globalSwiper.$$watch('onFilter', (hookCallback, point, evtObj) => {
       let node = point.target
       swiperHook(evtObj, node)
-        //页面类型
+      //页面类型
       let pageType = isBelong(node);
       //冒泡的ul根节点
       let parentNode = $$globalSwiper.findBubbleRootNode(point, pageType);
@@ -243,14 +248,14 @@ export default class Mediator extends Observer {
         if (wheelDeltaY > 0) {
           $$globalSwiper.prev({
             speed: Xut.plat.isMacOS ? 600 : 300,
-            callback: function () {
+            callback: function() {
               wheellook = false
             }
           })
         } else {
           $$globalSwiper.next({
             speed: Xut.plat.isMacOS ? 600 : 300,
-            callback: function () {
+            callback: function() {
               wheellook = false
             }
           })
@@ -301,7 +306,7 @@ export default class Mediator extends Observer {
   /**
    * 系统工具栏
    */
-  addTools($$mediator) {
+  _mixTool($$mediator) {
 
     _.extend(delegateHooks, {
 
@@ -340,7 +345,7 @@ export default class Mediator extends Observer {
  * 是否多场景模式
  */
 defAccess(Mediator.prototype, '$hasMultiScene', {
-  get: function () {
+  get: function() {
     return this.options.hasMultiScene
   }
 })
@@ -355,10 +360,10 @@ defAccess(Mediator.prototype, '$hasMultiScene', {
  *  这种类型是冒泡处理，无法传递钩子，直接用这个接口与场景对接
  */
 defAccess(Mediator.prototype, '$injectionComponent', {
-  set: function (regData) {
+  set: function(regData) {
     var injection;
     if (injection = this.$$scheduler[regData.pageType + 'Mgr']) {
-      injection.assistPocess(regData.pageIndex, function (pageObj) {
+      injection.assistPocess(regData.pageIndex, function(pageObj) {
         pageObj.baseAddComponent.call(pageObj, regData.widget);
       })
     } else {
@@ -372,7 +377,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  * @return {[type]}   [description]
  */
 defAccess(Mediator.prototype, '$curVmPage', {
-  get: function () {
+  get: function() {
     return this.$$scheduler.pageMgr.$$getPageBase(this.$$globalSwiper.getVisualIndex());
   }
 });
@@ -399,14 +404,14 @@ defAccess(Mediator.prototype, '$curVmPage', {
  *
  *  与创建相关
  *      创建完毕回调
- *          'createComplete': null,
+ *          'createPageComplete': null,
  *      创建后中断自动运行回调
  *          'suspendAutoCallback': null
  *
  */
-defProtected(Mediator.prototype, '$bind', function (key, callback) {
+defProtected(Mediator.prototype, '$bind', function(key, callback) {
   const $$mediator = this
-  $$mediator.$$watch('change:' + key, function () {
+  $$mediator.$$watch(key, function() {
     callback.apply($$mediator, arguments)
   })
 })
@@ -416,28 +421,23 @@ defProtected(Mediator.prototype, '$bind', function (key, callback) {
  * 创建页面
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$init', function () {
-  this.$$scheduler.initCreate();
+defProtected(Mediator.prototype, '$init', function() {
+  //如果是主场景，并且有历史记录
+  //那么就不需要创建当前页面了
+  if (this.options.isMain && this.options.hasHistory) {
+    this.$$scheduler.initPage('init', false)
+  } else {
+    this.$$scheduler.initCreate();
+  }
 });
 
-
-/**
- * 运动动画
- * @return {[type]} [description]
- */
-defProtected(Mediator.prototype, '$run', function () {
-  const $$mediator = this;
-  $$mediator.$$scheduler.pageMgr.activateAutoRuns(
-    $$mediator.$$globalSwiper.getVisualIndex(), Xut.Presentation.GetPageBase()
-  )
-})
 
 
 /**
  * 复位对象
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$reset', function () {
+defProtected(Mediator.prototype, '$reset', function() {
   return this.$$scheduler.pageMgr.resetOriginal(this.$$globalSwiper.getVisualIndex());
 })
 
@@ -446,7 +446,7 @@ defProtected(Mediator.prototype, '$reset', function () {
  * 停止所有任务
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$suspend', function () {
+defProtected(Mediator.prototype, '$suspend', function() {
   Xut.Application.Suspend({
     skipAudio: true //跨页面不处理
   })
@@ -456,7 +456,7 @@ defProtected(Mediator.prototype, '$suspend', function () {
  * 销毁场景内部对象
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$destroy', function () {
+defProtected(Mediator.prototype, '$destroy', function() {
   this.$$unWatch(); //观察事件
   this.$$globalSwiper.destroy(); //全局事件
   this.$$scheduler.destroyManage(); //派发器

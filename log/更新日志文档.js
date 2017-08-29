@@ -12,6 +12,9 @@
 
 /*
 *
+* v889.6 2017.8.29  优化了场景回调处理
+*                   读酷客户端版本不支持视觉差translateZ属性
+                    会出现图片显示不出来的情况，所以全部去掉
 * v889.2            brModel=>brMode
                     增加brMode全局指定模式
                     globalBrMode:单模式 1 =>png

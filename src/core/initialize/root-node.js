@@ -4,7 +4,7 @@ import { hasDisable } from './cursor'
 /*
 忙碌光标
  */
-const getBusyHTML = function () {
+const getBusyHTML = function() {
   return hasDisable() ? '' : '<div class="xut-busy-icon xut-fullscreen"></div>'
 }
 
@@ -14,11 +14,11 @@ const getBusyHTML = function () {
  */
 const getContentHTML = newCursor => {
   let coverStyle = ''
-    //mini平台不要背景图
+  //mini平台不要背景图
   if (config.launch.platform === 'mini') {} else {
     //默认背景图
     let coverUrl = './content/gallery/cover.jpg'
-      //重写背景图
+    //重写背景图
     if (config.launch.resource) {
       coverUrl = config.launch.resource + '/gallery/cover.jpg'
     }
@@ -57,10 +57,43 @@ export function initRootNode(nodeName = '#xxtppt-app-container', cursor) {
   return { $rootNode, $contentNode }
 }
 
+
 export function clearRootNode() {
   if ($contentNode) {
     $contentNode.remove()
     $contentNode = null
   }
   $rootNode = null
+}
+
+
+/**
+ * 移除背景
+ * @return {[type]} [description]
+ */
+export function removeCover(callback) {
+  //第一次进入，处理背景
+  let $cover = $(".xut-cover")
+  if ($cover.length) { //主动探测,只检查一次
+    function complete() {
+      $cover && $cover.remove()
+      $cover = null
+      callback()
+    }
+    //是否配置启动动画关闭
+    if (config.launch.launchAnim === false) {
+      complete()
+    } else {
+      //有动画
+      $cover.transition({
+        opacity: 0,
+        duration: 1000,
+        easing: 'in',
+        complete
+      });
+    }
+  } else {
+    $cover = null
+    callback()
+  }
 }

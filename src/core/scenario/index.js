@@ -9,13 +9,12 @@ import MiniBar from '../toolbar/mini/index'
 import { mainScene, deputyScene } from './factory/layout'
 import { getMainBar, getDeputyBar } from './factory/parse-bar'
 import { sceneController } from './factory/control'
-
+import { removeCover } from '../initialize/root-node'
 
 /**
  * 找到对应容器
- * @return {[type]}            [description]
  */
-const findContainer = ($context, id, isMain) => {
+function findContainer($context, id, isMain) {
   return function(pane, parallax) {
     var node;
     if (isMain) {
@@ -31,15 +30,14 @@ const findContainer = ($context, id, isMain) => {
 /**
  * 如果启动了缓存记录
  * 加载新的场景
- * @return {[type]} [description]
  */
-const checkHistory = (history, callback) => {
+function checkHistory(history, callback) {
 
   //直接启用快捷调试模式
   if (config.debug.locationPage) {
     console.log('启动了debug.locationPage,如果进不去，需要检测定位的坐标')
     Xut.View.LoadScenario(config.debug.locationPage, callback)
-    return true;
+    return
   }
 
   //如果有历史记录
@@ -52,11 +50,12 @@ const checkHistory = (history, callback) => {
         'chapterId': scenarioInfo[1],
         'pageIndex': scenarioInfo[2]
       }, callback)
-      return true;
-    } else {
-      return false;
+      return
     }
   }
+
+  //正常模式
+  callback()
 }
 
 
@@ -240,6 +239,7 @@ export class SceneFactory {
     const $$mediator = this.$$mediator = new Mediator({
       scenePageNode,
       sceneMasterNode,
+      isMain, //是否为主场景
       'hasHistory': this.history, //有历史记录
       'pageMode': this.pageMode,
       'sceneNode': this.$sceneNode[0],
@@ -324,29 +324,6 @@ export class SceneFactory {
       }
     })
 
-
-    /**
-     * 监听创建完成
-     * @return {[type]} [description]
-     */
-    $$mediator.$bind('createComplete', (nextAction) => {
-      this.complete && setTimeout(() => {
-        if (isMain) {
-          this.complete(() => {
-            Xut.View.HideBusy()
-            //检测是不是有缓存加载
-            if (!checkHistory(this.history, nextAction)) {
-              //指定自动运行的动作
-              nextAction && nextAction();
-            }
-          })
-        } else {
-          this.complete(nextAction)
-        }
-      }, 200);
-    })
-
-
     /**
      * 获取滚动条对象
      */
@@ -354,19 +331,62 @@ export class SceneFactory {
       return this.miniBar
     })
 
+    /**
+     * 监听内部管理页面创建完成
+     */
+    $$mediator.$bind('createPageComplete', (nextAction) => {
+      //主场景
+      if (isMain) {
+        //1 回到SceneFactory处理完成，历史记录
+        //2 回调View接口处理销毁
+        //3 回调main入口处理回调
+        this.complete(() => {
+          Xut.View.HideBusy()
+          //检测是不是有缓存加载
+          checkHistory(this.history, function() {
+            //第一次加载应用
+            if (window.GLOBALIFRAME) {
+              removeCover(nextAction)
+              return
+            }
+            //获取应用的状态
+            if (Xut.Application.getAppState()) {
+              //保留启动方法
+              var pre = Xut.Application.LaunchApp;
+              Xut.Application.LaunchApp = function() {
+                pre()
+                removeCover(nextAction)
+              };
+            } else {
+              removeCover(nextAction)
+            }
+          })
+        })
+        return
+      }
+      //副场景切换
+      this.complete(nextAction)
+    })
 
-    //如果是读酷端加载
-    if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
-      window.DUKUCONFIG.success();
-      $$mediator.$init();
-      //如果是客户端加载
-    } else if (window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
-      window.CLIENTCONFIGT.success();
-      $$mediator.$init();
-    } else {
-      //正常加载
-      $$mediator.$init();
-    }
+
+    /**
+     * 必须要延时下，让this加入对象管理器
+     */
+    setTimeout(() => {
+      //如果是读酷端加载
+      if (window.DUKUCONFIG && isMain && window.DUKUCONFIG.success) {
+        window.DUKUCONFIG.success();
+        $$mediator.$init();
+        //如果是客户端加载
+      } else if (window.CLIENTCONFIGT && isMain && window.CLIENTCONFIGT.success) {
+        window.CLIENTCONFIGT.success();
+        $$mediator.$init();
+      } else {
+        //正常加载
+        $$mediator.$init();
+      }
+    }, 100)
+
   }
 
   /**

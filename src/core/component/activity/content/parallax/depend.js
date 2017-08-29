@@ -52,7 +52,9 @@ export function setStyle({
   //视觉差对象初始化偏移量
   let parallaxOffset = pageOffset
 
-  //平移
+  //===========
+  //  平移
+  //===========
   let hasTranslateX = property.translateX !== undefined
   let hasTranslateY = property.translateY !== undefined
   let hasTranslateZ = property.translateZ !== undefined
@@ -65,13 +67,17 @@ export function setStyle({
     y = round(property.translateY) || 0
     transformProperty.translateY = `translateY(${y}px)`
   }
-  if(hasTranslateX || hasTranslateY || hasTranslateZ) {
-    z = round(property.translateZ) || 0
-    transformProperty.translateZ = setTranslateZ(z)
-  }
+  //2017.8.29
+  // 读酷客户端版本不支持Z属性
+  // 会出现图片显示不出来的情况，所以全部去掉
+  // if(hasTranslateX || hasTranslateY || hasTranslateZ) {
+  //   z = round(property.translateZ) || 0
+  //   transformProperty.translateZ = setTranslateZ(0)
+  // }
 
-
-  //旋转
+  //===========
+  //  旋转
+  //===========
   if(property.rotateX !== undefined) {
     transformProperty.rotateX = `rotateX(${round(property.rotateX)}deg)`
   }
@@ -82,8 +88,9 @@ export function setStyle({
     transformProperty.rotateZ = `rotateZ(${round(property.rotateZ)}deg)`
   }
 
-
-  //缩放
+  //===========
+  //  缩放
+  //===========
   let hasScaleX = property.scaleX !== undefined
   let hasScaleY = property.scaleY !== undefined
   let hasScaleZ = property.scaleZ !== undefined
@@ -104,8 +111,9 @@ export function setStyle({
     transformProperty.scaleZ = `scaleZ(1)` //默认打开3D，如不指定iphone闪屏
   }
 
-
-  //透明度
+  //===========
+  //  透明度
+  //===========
   let hasOpacity = false
   if(property.opacity !== undefined) {
     if(action === 'init') {
@@ -118,7 +126,9 @@ export function setStyle({
     }
   }
 
-  //style可以单独设置opacity属性
+  //=================================
+  // style可以单独设置opacity属性
+  //=================================
   if(transformProperty || hasOpacity) {
     if(transformProperty) {
 

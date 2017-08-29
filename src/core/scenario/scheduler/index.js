@@ -35,7 +35,7 @@ import {
 1:从属的主索引
 2:摆放位置
  */
-const getDoubleOption = function(chapterIndex, doublePage) {
+function getDoubleOption(chapterIndex, doublePage) {
   if (doublePage.total) {
     for (let key in doublePage) {
       if (key !== 'total') {
@@ -168,7 +168,7 @@ export default class Scheduler {
       /*初始化完毕*/
       init() {
         collectCallback(() => {
-          self._initPage('init');
+          self.initPage('init');
         })
       },
       /*翻页完毕，运行自动*/
@@ -787,74 +787,9 @@ export default class Scheduler {
    *加载页面事件与动作
    *每次初始化一个新的场景都会触发
    */
-  _initPage(action) {
-
-    const autoRun = () => {
-      //2017.8.28
-      //如果有没有历史记录就需要运行auto
-      //主要是auto中有异步的延时处理
-      //因为反正这个页面是中间处理，是不需要auto的
-      //会马上调到下一个场景
-      if (!this.$$mediator.options.hasHistory) {
-        this._runPageBase({ action })
-      }
-    }
-
-    //触发自动任务
-    const triggerAuto = () => {
-      //第一次进入，处理背景
-      let $cover = $(".xut-cover")
-      if ($cover.length) { //主动探测,只检查一次
-        let complete = function() {
-          $cover && $cover.remove()
-          $cover = null
-          autoRun()
-        }
-
-        //是否配置启动动画关闭
-        if (config.launch.launchAnim === false) {
-          complete()
-        } else {
-          //有动画
-          $cover.transition({
-            opacity: 0,
-            duration: 1000,
-            easing: 'in',
-            complete
-          });
-        }
-      }
-      //第二次
-      else {
-        $cover = null
-        autoRun()
-      }
-    }
-
-    //创建完成回调
-    this.$$mediator.$$emit('change:createComplete', () => {
-      if (this.$$mediator.options.hasMultiScene) {
-        triggerAuto()
-      }
-      //第一次加载
-      //进入应用
-      else {
-        if (window.GLOBALIFRAME) {
-          triggerAuto()
-          return
-        }
-        //获取应用的状态
-        if (Xut.Application.getAppState()) {
-          //保留启动方法
-          var pre = Xut.Application.LaunchApp;
-          Xut.Application.LaunchApp = function() {
-            pre()
-            triggerAuto()
-          };
-        } else {
-          triggerAuto()
-        }
-      }
+  initPage(action, hasRun = true) {
+    this.$$mediator.$$emit('createPageComplete', () => {
+      hasRun && this._runPageBase({ action })
     })
   }
 
