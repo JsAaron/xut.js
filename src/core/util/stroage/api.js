@@ -62,10 +62,9 @@ export function $setStorage(key, value) {
  * @return {[type]}     [description]
  */
 export function $getStorage(key) {
-  if (!key) {
-    return
+  if (key) {
+    return GET(key)
   }
-  return GET(key)
 }
 
 
@@ -75,7 +74,7 @@ export function $getStorage(key) {
  * @return {[type]}     [description]
  */
 export function $removeStorage(key) {
-  if (!key) {
+  if (key) {
     REMOVE(key)
   }
 }

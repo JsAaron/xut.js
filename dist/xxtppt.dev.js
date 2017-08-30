@@ -43626,10 +43626,9 @@ function $setStorage(key, value) {
  * @return {[type]}     [description]
  */
 function $getStorage(key) {
-  if (!key) {
-    return;
+  if (key) {
+    return GET(key);
   }
-  return GET(key);
 }
 
 /**
@@ -43638,7 +43637,7 @@ function $getStorage(key) {
  * @return {[type]}     [description]
  */
 function $removeStorage(key) {
-  if (!key) {
+  if (key) {
     REMOVE(key);
   }
 }
@@ -59375,6 +59374,7 @@ function fastPipe(data, base) {
 
 var transitionDuration = Xut.style.transitionDuration;
 var transform = Xut.style.transform;
+var setTranslateZ = Xut.style.setTranslateZ;
 var round = Math.round;
 
 /**
@@ -59443,13 +59443,10 @@ function setStyle(_ref) {
     y = round(property.translateY) || 0;
     transformProperty.translateY = 'translateY(' + y + 'px)';
   }
-  //2017.8.29
-  // 读酷客户端版本不支持Z属性
-  // 会出现图片显示不出来的情况，所以全部去掉
-  // if(hasTranslateX || hasTranslateY || hasTranslateZ) {
-  //   z = round(property.translateZ) || 0
-  //   transformProperty.translateZ = setTranslateZ(0)
-  // }
+  if (hasTranslateX || hasTranslateY || hasTranslateZ) {
+    z = round(property.translateZ) || 0;
+    transformProperty.translateZ = setTranslateZ(0);
+  }
 
   //===========
   //  旋转
@@ -61577,14 +61574,17 @@ var sceneController = {
    * @param {[type]} relevant   [description]
    * @param {[type]} sceneObj   [description]
    */
-  add: function add(seasonId, relevant, sceneObj) {
+  add: function add(seasonId, chapterId, sceneObj) {
+    if (seasonId) {
+      seasonId = Number(seasonId);
+    }
+    if (chapterId) {
+      chapterId = Number(chapterId);
+    }
     sceneCollection.scenarioStack.push(seasonId);
     sceneCollection['seasonId->' + seasonId] = sceneObj;
     //场景链表,拥挤记录场景的加载上一页
-    sceneCollection.scenarioChain.push({
-      'seasonId': seasonId,
-      'chapterId': relevant
-    });
+    sceneCollection.scenarioChain.push({ seasonId: seasonId, chapterId: chapterId });
     return sceneObj;
   },
 
@@ -64469,17 +64469,14 @@ var allowNext$1 = allowNext();
 提供给auto运行动作的延时触发处理
 需要注意快速翻页要立马清理，因为定时器在延后触发
  */
-
-var preIndex = undefined; //上一个页码索引标记
-var queue$1 = [];
+var queue$1 = {};
 var timer$1 = null;
 
 /*
 重设状态
  */
 function resetBatcherState() {
-  queue$1.length = 0;
-  preIndex = undefined;
+  queue$1 = {};
   if (timer$1) {
     clearTimeout(timer$1);
     timer$1 = null;
@@ -64489,39 +64486,39 @@ function resetBatcherState() {
 /*
   运行队列
  */
-function runBatcherQueue$1(queue) {
-  for (var i = 0; i < queue.length; i++) {
-    var watcher = queue[i];
-    if (watcher) {
-      watcher();
+function runBatcherQueue$1() {
+  for (var key in queue$1) {
+    var watchers = queue$1[key];
+    if (watchers.length) {
+      var wather = void 0;
+      while (wather = watchers.shift()) {
+        wather();
+        wather = null;
+      }
     }
   }
-  queue.length = 0;
 }
 
 /*
 加入监控
-preIndex 的加入非常有必要
-1 多场景在跳转的时候，由于自动动画会延时导致了还会调用上一个场景的自动运行动画
  */
 function pushWatcher(pageIndex, watcher) {
-
-  //如果preIndex有值，
-  //先比较这个值是不是一样
-  //如果不是一样就需要清理
-  if (preIndex !== undefined) {
-    //如果是新的一页,新清理，然后重新处理
-    if (preIndex != pageIndex) {
-      clearWatcher();
+  //如果存在了
+  if (queue$1[pageIndex]) {
+    queue$1[pageIndex].push(watcher);
+  } else {
+    //如果找不到
+    //并且存在了上一个处理，清空
+    if (Object.keys(queue$1).length) {
+      resetBatcherState();
     }
+    queue$1[pageIndex] = [watcher];
   }
 
-  preIndex = pageIndex;
-  queue$1.push(watcher); //加入队列
   if (!timer$1) {
     //只第一次调用开始执行
     timer$1 = setTimeout(function () {
-      runBatcherQueue$1(queue$1);
+      runBatcherQueue$1();
       resetBatcherState();
     }, 500);
   }
@@ -64609,6 +64606,18 @@ function $stopAutoWatch() {
 }
 
 /**
+ * 兼容高级动画闪动的问题处理
+ * 新版本只有apng动画了
+ */
+function delayWatcher(pageIndex, fn) {
+  if (window.preloadData) {
+    pushWatcher(pageIndex, fn);
+  } else {
+    fn();
+  }
+}
+
+/**
  * 自动动作
  */
 function $autoRun(pageBase, pageIndex, taskAnimCallback) {
@@ -64651,14 +64660,14 @@ function $autoRun(pageBase, pageIndex, taskAnimCallback) {
     /*自动组件*/
     var autoData = pageBase.baseAutoRun();
     if (autoData) {
-      pushWatcher(pageIndex, function () {
+      delayWatcher(pageIndex, function () {
         autoComponents(pageBase, pageIndex, autoData, pageType);
       });
     }
 
     /*自动content*/
     if (contentObjs) {
-      pushWatcher(pageIndex, function () {
+      delayWatcher(pageIndex, function () {
         autoContents(contentObjs, taskAnimCallback);
       });
     } else {
@@ -64872,6 +64881,9 @@ function $stop() {
 
   //清理视频
   clearVideo();
+
+  //场景页面切换的调用，需要停止
+  $stopAutoWatch();
 
   //停止热点
   return access$1(function (pageBase, contentObjs, componentObjs) {
@@ -74653,10 +74665,20 @@ var Scheduler = function () {
          * 如果是调试模式 && 不是收费提示页面 && 多场景应用
          */
         buildComplete: function buildComplete(seasonId) {
-          if (config.launch.historyMode && !options.isInApp && options.hasMultiScene) {
-            var history = sceneController.sequence(seasonId, middleIndex);
-            if (history) {
-              $setStorage("history", history);
+
+          if (config.launch.historyMode && !options.isInApp) {
+
+            //如果是主页面，删除历史记录
+            if (options.isMain) {
+              $removeStorage('history');
+            }
+
+            //如果是副场景，添加历史记录
+            if (options.hasMultiScene) {
+              var history = sceneController.sequence(seasonId, middleIndex);
+              if (history) {
+                $setStorage("history", history);
+              }
             }
           }
         },
@@ -78721,6 +78743,13 @@ var SceneFactory = function () {
         _this._initToolBar();
       }
       _this._createMediator();
+
+      //主场景有历史记录，并且没有chapterId的时候
+      //主动赋值，因为没有读取数据
+      if (data.isMain && data.history && !data.chapterId) {
+        data.chapterId = 1;
+      }
+
       sceneController.add(data.seasonId, data.chapterId, _this);
     });
   }

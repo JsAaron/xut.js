@@ -67,13 +67,10 @@ export function setStyle({
     y = round(property.translateY) || 0
     transformProperty.translateY = `translateY(${y}px)`
   }
-  //2017.8.29
-  // 读酷客户端版本不支持Z属性
-  // 会出现图片显示不出来的情况，所以全部去掉
-  // if(hasTranslateX || hasTranslateY || hasTranslateZ) {
-  //   z = round(property.translateZ) || 0
-  //   transformProperty.translateZ = setTranslateZ(0)
-  // }
+  if(hasTranslateX || hasTranslateY || hasTranslateZ) {
+    z = round(property.translateZ) || 0
+    transformProperty.translateZ = setTranslateZ(0)
+  }
 
   //===========
   //  旋转

@@ -81,6 +81,18 @@ export function $stopAutoWatch() {
 }
 
 /**
+ * 兼容高级动画闪动的问题处理
+ * 新版本只有apng动画了
+ */
+function delayWatcher(pageIndex, fn) {
+  if (window.preloadData) {
+    pushWatcher(pageIndex, fn)
+  } else {
+    fn()
+  }
+}
+
+/**
  * 自动动作
  */
 export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
@@ -123,14 +135,14 @@ export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
     /*自动组件*/
     let autoData = pageBase.baseAutoRun()
     if (autoData) {
-      pushWatcher(pageIndex, function() {
+      delayWatcher(pageIndex, function() {
         autoComponents(pageBase, pageIndex, autoData, pageType)
       })
     }
 
     /*自动content*/
     if (contentObjs) {
-      pushWatcher(pageIndex, function() {
+      delayWatcher(pageIndex, function() {
         autoContents(contentObjs, taskAnimCallback)
       })
     } else {

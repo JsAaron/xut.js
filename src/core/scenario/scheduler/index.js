@@ -16,7 +16,7 @@ import { sceneController } from '../factory/control'
 import { getVisualDistance } from '../v-distance/index'
 import { setCustomStyle } from '../v-style/index'
 import { getVisualMode } from './mode'
-import { $setStorage, hash, $warn } from '../../util/index'
+import { $setStorage, $removeStorage, hash, $warn } from '../../util/index'
 
 import {
   initPointer,
@@ -565,9 +565,20 @@ export default class Scheduler {
        * 如果是调试模式 && 不是收费提示页面 && 多场景应用
        */
       buildComplete(seasonId) {
-        if (config.launch.historyMode && !options.isInApp && options.hasMultiScene) {
-          const history = sceneController.sequence(seasonId, middleIndex)
-          if (history) { $setStorage("history", history) }
+
+        if (config.launch.historyMode && !options.isInApp) {
+
+          //如果是主页面，删除历史记录
+          if (options.isMain) {
+            $removeStorage('history')
+          }
+
+          //如果是副场景，添加历史记录
+          if (options.hasMultiScene) {
+            const history = sceneController.sequence(seasonId, middleIndex)
+            if (history) { $setStorage("history", history) }
+          }
+
         }
       },
 

@@ -72,6 +72,13 @@ export class SceneFactory {
         this._initToolBar()
       }
       this._createMediator();
+
+      //主场景有历史记录，并且没有chapterId的时候
+      //主动赋值，因为没有读取数据
+      if(data.isMain && data.history && !data.chapterId){
+        data.chapterId = 1
+      }
+
       sceneController.add(data.seasonId, data.chapterId, this);
     })
   }

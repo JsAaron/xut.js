@@ -21,6 +21,8 @@ import { clearVideo } from '../../component/video/api'
  *    false 不跳过
  */
 
+import { $stopAutoWatch } from './auto'
+
 /**
  * 复位状态/状态控制
  * 如果返回false证明有热点
@@ -36,6 +38,8 @@ export function $stop() {
   //清理视频
   clearVideo()
 
+  //场景页面切换的调用，需要停止
+  $stopAutoWatch()
 
   //停止热点
   return access(function(pageBase, contentObjs, componentObjs) {

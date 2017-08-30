@@ -38,14 +38,17 @@ export const sceneController = {
    * @param {[type]} relevant   [description]
    * @param {[type]} sceneObj   [description]
    */
-  add(seasonId, relevant, sceneObj) {
+  add(seasonId, chapterId, sceneObj) {
+    if(seasonId){
+      seasonId = Number(seasonId)
+    }
+    if(chapterId){
+      chapterId = Number(chapterId)
+    }
     sceneCollection.scenarioStack.push(seasonId);
     sceneCollection['seasonId->' + seasonId] = sceneObj;
     //场景链表,拥挤记录场景的加载上一页
-    sceneCollection.scenarioChain.push({
-      'seasonId': seasonId,
-      'chapterId': relevant
-    })
+    sceneCollection.scenarioChain.push({seasonId,chapterId})
     return sceneObj;
   },
 
