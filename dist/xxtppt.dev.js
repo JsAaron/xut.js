@@ -69014,8 +69014,12 @@ var Swiper = function (_Observer) {
       var distY = ABS(this.distY);
       var orientation = this.orientation;
 
-      /*如果没有滚动页面，判断为点击*/
-      if (!distX && !distY) {
+      /*如果没有滚动页面，判断为点击
+        2017.8.30
+        在三星9150设备上，没用移动，会产生X或Y的移动值，很小的值
+        兼容处理X Y 都要<5
+      */
+      if (!distX && !distY || distX && distX < 5 && !distY || distY && distY < 5 && !distX) {
         var isReturn = false;
         this.$$emit('onTap', this.visualIndex, function () {
           return isReturn = true;
@@ -79973,7 +79977,7 @@ function initGlobalAPI() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.6;
+Xut.Version = 889.7;
 
 /**
  * 代码初始化

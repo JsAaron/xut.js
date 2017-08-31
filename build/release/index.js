@@ -63,8 +63,8 @@ async function downloadFile() {
 /**
  * 更新上传文件
  */
-async function uploadFile() {
-  await new Promise(function(resolve, reject) {
+function uploadFile() {
+  return new Promise(function(resolve, reject) {
     const command = `scp -r ${uploadDir}/www ${remoteDirectory}`
     const child = exec(command, (error, stdout, stderr) => {
       if (error) {
@@ -79,8 +79,8 @@ async function uploadFile() {
 
 //sshCommand(`mkdir ${remotePath}/chenwen`).
 //sshCommand(`cp -r ${remotePath}/css ${remotePath}/chenwen`)
-async function sshCommand(command, options) {
-  await new Promise(function(resolve, reject) {
+function sshCommand(command, options) {
+  return new Promise(function(resolve, reject) {
     conn.exec(command, function(err, stream) {
       if (err) throw err;
       let buf = '';
@@ -96,10 +96,9 @@ async function sshCommand(command, options) {
 
 /**
  * 比较版本号
- * @return {[type]} [description]
  */
-async function compareVsersion() {
-  await new Promise(function(resolve, reject) {
+function compareVsersion() {
+  return new Promise(function(resolve, reject) {
     sshCommand(`cd ${remotePath} && cat lib/version.js`).then(function(version) {
       return sshCommand(`cd ${remotePath} && ls -lR|grep "^-"|wc -l`, version)
     }).then(function(data) {

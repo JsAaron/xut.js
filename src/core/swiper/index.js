@@ -20,7 +20,7 @@ const ABS = Math.abs
  * 是否多点触发
  * @return {Boolean} [description]
  */
-const hasMultipleTouches = function (e) {
+const hasMultipleTouches = function(e) {
   return e.touches && e.touches.length > 1
 }
 
@@ -320,7 +320,7 @@ export default class Swiper extends Observer {
      * point 事件对象
      * @return {[type]} [description]
      */
-    this.$$emit('onFilter', function () {
+    this.$$emit('onFilter', function() {
       interrupt = true;
     }, point, e)
 
@@ -561,12 +561,19 @@ export default class Swiper extends Observer {
     const distY = ABS(this.distY)
     const orientation = this.orientation
 
-    /*如果没有滚动页面，判断为点击*/
-    if (!distX && !distY) {
+    /*如果没有滚动页面，判断为点击
+      2017.8.30
+      在三星9150设备上，没用移动，会产生X或Y的移动值，很小的值
+      兼容处理X Y 都要<5
+    */
+    if (!distX && !distY ||
+      distX && distX < 5 && !distY ||
+      distY && distY < 5 && !distX) {
       let isReturn = false
       this.$$emit('onTap', this.visualIndex, () => isReturn = true, e, duration)
       if (isReturn) return
     }
+
 
     /*如果是Y轴移动，发送请求,并且不是mouseleave事件，在PC上mouseleave离开非可视区重复触发*/
     if (this._behavior === 'reverse' && e.type !== 'mouseleave') {
