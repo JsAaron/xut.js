@@ -50,21 +50,27 @@ export default class flarePlayer {
       fv.video.setAttribute("x5-video-player-type", "h5")
       fv.video.setAttribute("x5-video-player-fullscreen", true)
 
+      //默认竖屏 设置属性跟随屏幕方向变化
+      fv.video.setAttribute("x5-video-orientation", "landscape|portrait")
+      //浮动层会脱离文档流 在视频全屏时仍然会显示 现将其隐藏 然后还原visibility
+      var floatLayerVisibility = $(".xut-float").css("visibility");
       //小窗播放时 安卓微信浏览器自动全屏
       //则视频有一部分会被遮挡  进入全屏事件时调整视频top值 退出全屏事件恢复原有top值
       fv.video.addEventListener("x5videoenterfullscreen", function() {
-          $videoWrap[0].style.top = '0px'
-          $videoWrap[0].style.left = '0px'
+        $videoWrap[0].style.top = '0px'
+        $videoWrap[0].style.left = '0px'
+        $(".xut-float").css("visibility", "hidden")
       })
       fv.video.addEventListener("x5videoexitfullscreen", function() {
-        $videoWrap[0].style.top = top+'px';
-        $videoWrap[0].style.left = left+'px'
+        $videoWrap[0].style.top = top + 'px';
+        $videoWrap[0].style.left = left + 'px'
+        $(".xut-float").css("visibility", floatLayerVisibility)
       })
 
     }
 
     /*播放完毕，关闭视频窗口*/
-    fv.bind('ended', function () {
+    fv.bind('ended', function() {
       if (options.startBoot) {
         options.startBoot();
       }
@@ -75,7 +81,7 @@ export default class flarePlayer {
     })
 
     /*播放出错*/
-    fv.bind('error', function () {
+    fv.bind('error', function() {
       if (options.startBoot) {
         options.startBoot();
       }
@@ -85,7 +91,7 @@ export default class flarePlayer {
     this.container.append($videoWrap)
 
     /*触发了关闭按钮*/
-    fv.bind('close', function () {
+    fv.bind('close', function() {
       removeVideo(options.chapterId);
     })
 

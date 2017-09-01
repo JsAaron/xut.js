@@ -12,7 +12,7 @@ import { priorityConfig } from './config/priority-config'
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.7
+Xut.Version = 889.8
 
 /**
  * 代码初始化

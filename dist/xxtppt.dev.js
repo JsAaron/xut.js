@@ -41953,6 +41953,9 @@ var improtGolbalConfig = {
   /**
    * 是否预加载资源
    * 每次翻页必须等待资源加载完毕后才可以
+  //2017.9.1
+  //如果不是浏览器模式
+  //强制关闭预加载模式
    * @type {Boolean}
    */
   preload: DEFAULT, //可以填数量，预加载的数量限制
@@ -46194,6 +46197,12 @@ function priorityConfig() {
   if (launch.scrollMode === 'v') {
     launch.visualMode = 1;
   }
+
+  //如果不是浏览器模式
+  //强制关闭预加载模式
+  if (!Xut.plat.isBrowser) {
+    config.launch.preload = null;
+  }
 }
 
 /**
@@ -47963,15 +47972,21 @@ var flarePlayer = function () {
       fv.video.setAttribute("x5-video-player-type", "h5");
       fv.video.setAttribute("x5-video-player-fullscreen", true);
 
+      //默认竖屏 设置属性跟随屏幕方向变化
+      fv.video.setAttribute("x5-video-orientation", "landscape|portrait");
+      //浮动层会脱离文档流 在视频全屏时仍然会显示 现将其隐藏 然后还原visibility
+      var floatLayerVisibility = $(".xut-float").css("visibility");
       //小窗播放时 安卓微信浏览器自动全屏
       //则视频有一部分会被遮挡  进入全屏事件时调整视频top值 退出全屏事件恢复原有top值
       fv.video.addEventListener("x5videoenterfullscreen", function () {
         $videoWrap[0].style.top = '0px';
         $videoWrap[0].style.left = '0px';
+        $(".xut-float").css("visibility", "hidden");
       });
       fv.video.addEventListener("x5videoexitfullscreen", function () {
         $videoWrap[0].style.top = top + 'px';
         $videoWrap[0].style.left = left + 'px';
+        $(".xut-float").css("visibility", floatLayerVisibility);
       });
     }
 
@@ -79977,7 +79992,7 @@ function initGlobalAPI() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.7;
+Xut.Version = 889.8;
 
 /**
  * 代码初始化

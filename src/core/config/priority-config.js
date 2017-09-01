@@ -205,4 +205,10 @@ export function priorityConfig() {
     launch.visualMode = 1
   }
 
+  //如果不是浏览器模式
+  //强制关闭预加载模式
+  if (!Xut.plat.isBrowser) {
+    config.launch.preload = null
+  }
+
 }
