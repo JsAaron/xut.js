@@ -102,12 +102,12 @@ const builds = {
       /*文件打包后拷贝的路径*/
       targetDirPath: (() => {
         //win:D:\svn\magazine-develop\assets\www\epub\epub\dir\assets\www\lib
-        //os:Users/mac/project/xcode/www/build
+        //os:Users/Aaron/project/xcode/www/build
         if (process.platform === 'win32') {
           return 'D:\\192.168.1.113\\magazine-develop\\assets\\www\\build'
         } else {
-          return '/Users/mac/project/xcode/www/lib'
-          // return '/Users/mac/project/svn/www-dev/template/test/lib'
+          return '/Users/Aaron/project/xcode/www/lib'
+          // return '/Users/Aaron/project/svn/www-dev/template/test/lib'
         }
       })()
     })

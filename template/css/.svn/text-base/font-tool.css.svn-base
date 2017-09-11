@@ -1,0 +1,124 @@
+/******************
+*   一些系统按钮图标
+* *******************/
+
+[class^="xut-icon-"],
+[class*=" xut-icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'xut-pageFontFamily' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  color: #007aff;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.xut-icon-angle-left:before {
+  content: "\f104";
+}
+
+.xut-icon-angle-right:before {
+  content: "\f105";
+  font-size: 4vh;
+}
+
+
+
+/*.icon-close:before {
+    content: "\e905";
+}*/
+
+.xut-icon-close:before {
+  /*   content: "\e908";*/
+  /*   content: "\e043";*/
+  content: "\ea0d";
+  color: #000;
+  position: relative;
+  top: 0.12vh;
+}
+
+.xut-icon-close2:before {
+  /*   content: "\e908";*/
+  /*   content: "\e043";*/
+  content: "\ea0d";
+  position: relative;
+  top: 0.12vh;
+}
+
+
+.xut-icon-arrow-left:before {
+  content: "\e094";
+  font-size: 3vh;
+}
+
+.xut-icon-chevron-down:before {
+  content: "\f0a3";
+  font-size: 5vh;
+  color: #000;
+}
+
+.xut-icon-th-list2:before {
+  content: "\f00b";
+}
+
+.xut-icon-bookmark2:before {
+  content: "\e9d2";
+  color: red;
+}
+
+.xut-icon-maximize:before {
+  content: "\f0b2";
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.xut-icon-chevron-left2:before {
+  content: "\f053";
+}
+
+.xut-icon-chevron-right2:before {
+  content: "\f054";
+}
+
+.xut-icon-outbox:before {
+  content: "\e123";
+}
+
+.xut-icon-book:before {
+  content: "\f007";
+}
+
+.xut-icon-star:before {
+  content: "\e907";
+}
+
+.xut-icon-bookmark:before {
+  content: "\e904";
+  color: red;
+}
+
+.xut-icon-inbox-upload:before {
+  content: "\e902";
+}
+
+.xut-icon-chevron-right:before {
+  content: "\e900";
+}
+
+.xut-icon-chevron-left:before {
+  content: "\e901";
+}
+
+.xut-icon-back:before {
+  content: "\e906";
+}
+
+.xut-icon-th-list:before {
+  content: "\e903";
+}
+
+

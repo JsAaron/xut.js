@@ -1,0 +1,17 @@
+{
+  "frames": {
+    "frame1": {
+      "frame": { "x": 0, "y": 0, "w": 100, "h": 100 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 100, "h": 100 },
+      "sourceSize": { "w": 100, "h": 100 }
+    }
+  },
+  "meta": {
+    "image": "fighter.png",
+    "format": "RGBA8888",
+    "size": { "w": 400, "h": 400 },
+    "scale": "1"
+  }
+}

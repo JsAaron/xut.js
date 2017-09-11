@@ -1,0 +1,52 @@
+/******************
+*   一些系统按钮图标
+* *******************/
+@font-face {
+    font-family: 'xut-pageFontFamily';
+    src: url('../images/fonts/icomoon.eot?vv9atf');
+    src: url('../images/fonts/icomoon.eot?vv9atf#iefix') format('embedded-opentype'), url('../images/fonts/icomoon.ttf?vv9atf') format('truetype'), url('../images/fonts/icomoon.woff?vv9atf') format('woff'), url('../images/fonts/icomoon.svg?vv9atf#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+/******************
+*   页面缩放关闭按钮
+* *******************/
+@font-face {
+    font-family: "xut-flaticon";
+    src: url("../images/fonts/flaticon.eot");
+    src: url("../images/fonts/flaticon.eot?#iefix") format("embedded-opentype"), url("../images/fonts/flaticon.woff") format("woff"), url("../images/fonts/flaticon.ttf") format("truetype"), url("../images/fonts/flaticon.svg#flaticon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+/******************
+*   迷你杂志页码圆点样式
+* *******************/
+@font-face {
+  font-family: 'xut-dotStyle';
+  src:  url('../images/fonts/icomoonDot.eot?67pv3l');
+  src:  url('../images/fonts/icomoonDot.eot?67pv3l#iefix') format('embedded-opentype'),
+    url('../images/fonts/icomoonDot.ttf?67pv3l') format('truetype'),
+    url('../images/fonts/icomoonDot.woff?67pv3l') format('woff'),
+    url('../images/fonts/icomoonDot.svg?67pv3l#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-weight: bold;
+  font-style: normal;
+}
+
+
+/******************
+*   flare视频播放器图标
+* *******************/
+@font-face {
+    font-family: "xut-flareicon";
+    src: url("../images/fonts/flareicon.eot");
+    src: url("../images/fonts/flareicon.eot?#iefix") format("embedded-opentype"), url("../images/fonts/flareicon.woff") format("woff"), url("../images/fonts/flareicon.ttf") format("truetype"), url("../images/fonts/flareicon.svg#flaticon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+

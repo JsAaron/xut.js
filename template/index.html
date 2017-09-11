@@ -21,113 +21,106 @@
     <button id="home">home</button>
     <button id="activate">激活</button>
   </div>
-
-  <!-- <img src="content/63/gallery/apng_fc442b496dc11b1aba698659f610ab27.png" style="width:100%;height:100%;"> -->
-
   <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
 </body>
 
 </html>
 <script type="text/javascript">
-window.onload = function() {
+Xut.Application.setConfig = {
+  lauchMode: 1,
+  preload: true,
+  visualMode: 1,
+  // platform: 'mini',
+  historyMode: true,
+  launchAnim: false,
 
-  Xut.Application.setConfig = {
-    lauchMode: 1,
-    preload: true,
-    visualMode: 1,
-    // platform: 'mini',
-    historyMode: true,
-    launchAnim: false,
+  // convert: 'svg',
 
-    // convert: 'svg',
+  // debug: {
+  //   locationPage: {
+  //     seasonId:1,
+  //     pageIndex: 18
+  //   }
+  // },
 
-    // debug: {
-    //   locationPage: {
-    //     seasonId:1,
-    //     pageIndex: 18
-    //   }
-    // },
+  // brModel: 1, //图片模式
 
-    brMode: 1, //图片模式
+  // columnCheck:true,
 
-    // columnCheck:true,
+  // scrollMode: 'v',
 
-    // scrollMode: 'v',
+  //
+  // banMove:true,
 
-    //
-    // banMove:true,
+  // launchAnim:false,是否关闭启动动画
+  // convert: 'svg', //转化资源svg转化成js
+  // platform 平台
+  // visualMode:1,2,3,4 页面模式
+  // columnCheck:false, //分栏检测
+  // doublePageMode: false //双页模式
+  // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
+  pageBar: {
+    type: ['scrollbar', 'digital']
+    // direction:''
+    // mode: 1,
+    // position: {
+    //     top: '90%',
+    //     left: '20%'
+    // }
+  },
+  // quickFlip:true,//是否支持快速翻页
+  // supportQR: true, //是否启动二维码
+  // visualHeight: DEFAULT,
+  // visualTop: 0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
+  // cursor: {  //定义忙碌光标
+  //     url: 'images/icons/busyicon.gif',
+  //     delayTime: 300
+  // },
+  // imageSuffix: { //定义基础图片取值
+  //     1080: 'mi',
+  //     1440: 'hi'
+  // },
+  // salePicture: true, //默认图片支持缩放
+  // salePictureMultiples: 2, //缩放倍数
+  // salePageType:'page', //页面缩放
+  // historyMode: true, //历史记录模式
+  // swipeDelegate: true, //滑动事件猥琐
+  // useHDImageZoom: true, //是否启动图片要高清图
+  // convert: 'svg', //转化资源svg转化成js
+};
 
-    // launchAnim:false,是否关闭启动动画
-    // convert: 'svg', //转化资源svg转化成js
-    // platform 平台
-    // visualMode:1,2,3,4 页面模式
-    // columnCheck:false, //分栏检测
-    // doublePageMode: false //双页模式
-    // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
-    pageBar: {
-      type: ['scrollbar', 'digital']
-      // direction:''
-      // mode: 1,
-      // position: {
-      //     top: '90%',
-      //     left: '20%'
-      // }
-    },
-    // quickFlip:true,//是否支持快速翻页
-    // supportQR: true, //是否启动二维码
-    // visualHeight: DEFAULT,
-    // visualTop: 0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
-    // cursor: {  //定义忙碌光标
-    //     url: 'images/icons/busyicon.gif',
-    //     delayTime: 300
-    // },
-    // imageSuffix: { //定义基础图片取值
-    //     1080: 'mi',
-    //     1440: 'hi'
-    // },
-    // salePicture: true, //默认图片支持缩放
-    // salePictureMultiples: 2, //缩放倍数
-    // salePageType:'page', //页面缩放
-    // historyMode: true, //历史记录模式
-    // swipeDelegate: true, //滑动事件猥琐
-    // useHDImageZoom: true, //是否启动图片要高清图
-    // convert: 'svg', //转化资源svg转化成js
-  };
+Xut.Application.Watch('initComplete', function() {
+  // console.log('initComplete')
+})
 
-  Xut.Application.Watch('initComplete', function() {
-    // console.log('initComplete')
-  })
+Xut.Application.Watch('appDestory', function() {
+  console.log('appDestory')
+})
 
-  Xut.Application.Watch('appDestory', function() {
-    console.log('appDestory')
-  })
-
-  Xut.Application.Watch('trackCode', function(type, options) {})
+Xut.Application.Watch('trackCode', function(type, options) {})
 
 
-  var appId = 71 //306
-  function play() {
-    Xut.Application.Launch({
-      // trackCode: ['swipe'], //代码跟踪
-      el: '#xxtppt-app-container', //根节点
-      path: {
-        resource: 'content/' + appId,
-        database: 'content/' + appId + '/SQLResult.js'
-      }
-    });
-  }
-  play()
-  $("#launchMini").click(play)
-  $("#home").click(function() {
-    Xut.Application.Original()
-  })
-  $("#activate").click(function() {
-    Xut.Application.Activate()
-  })
-  $("#closeMini").click(function() {
-    Xut.Application.Exit()
-  })
-
+var appId = 91 //306
+function play() {
+  Xut.Application.Launch({
+    // trackCode: ['swipe'], //代码跟踪
+    el: '#xxtppt-app-container', //根节点
+    path: {
+      resource: 'content/' + appId,
+      database: 'content/' + appId + '/SQLResult.js'
+    }
+  });
 }
+play()
+$("#launchMini").click(play)
+$("#home").click(function() {
+  Xut.Application.Original()
+})
+$("#activate").click(function() {
+  Xut.Application.Activate()
+})
+$("#closeMini").click(function() {
+  Xut.Application.Exit()
+})
 
 </script>
