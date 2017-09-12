@@ -17,7 +17,7 @@ const action = process.argv[process.argv.length - 1]
 ///////////////////////
 /// ssh config
 ///////////////////////
-let data = fs.readFileSync("/Users/mac/project/svn/bak/ssh.js", "utf-8");
+let data = fs.readFileSync("/Users/Aaron/project/svn/bak/ssh.js", "utf-8");
 let config = {
   "host": "",
   "port": 22,

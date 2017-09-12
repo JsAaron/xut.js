@@ -6,46 +6,20 @@ import { createCursor } from '../../initialize/cursor'
 import { initColumn } from '../../component/column/init'
 import { contentFilter } from '../../component/activity/content/content-filter'
 import { config, initConfig, initPathAddress } from '../../config/index'
-import { getSize } from '../../config/v-screen'
-import { getBrType } from '../../config/priority-config.js'
-
 import { initPreload, loadPrelaod } from 'preload/index'
+import {
+  resetBrMode,
+  resetVisualMode,
+  resetDelegate,
+  setHistory,
+  setPaintingMode
+} from '../../config/launch-config.js'
+
 
 /**
- * 新增模式,用于记录浏览器退出记录
- * 默认启动
- * 是否回到退出的页面
- * set表中写一个recordHistory
- * 是   1
- * 否   0
+ * 最大屏屏幕尺寸
+ * @return {[type]} [description]
  */
-function setHistory(data) {
-  //Launch接口定义
-  if (config.launch.historyMode !== undefined) {
-    return
-  }
-
-  //数据库定义 && == 1
-  if (data.recordHistory !== undefined && Number(data.recordHistory)) {
-    config.launch.historyMode = true
-    return
-  }
-  //调试模式，默认启动缓存
-  if (config.debug.devtools) {
-    config.launch.historyMode = true
-  }
-}
-
-
-/*画轴模式*/
-function setPaintingMode(data) {
-  if (!config.launch.visualMode && Number(data.scrollPaintingMode)) {
-    config.launch.visualMode = 4
-  }
-}
-
-
-/*最大屏屏幕尺寸*/
 function getMaxWidth() {
   if (config.visualSize) {
     return config.visualSize.width
@@ -75,7 +49,6 @@ function setDefaultSuffix() {
     if (maxWidth >= 1440) {
       config.launch.baseImageSuffix = config.launch.imageSuffix['1440']
     }
-
     if (config.debug.devtools && config.launch.baseImageSuffix) {
       $warn('css media匹配suffix失败，采用js采用计算. config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix)
     }
@@ -136,10 +109,7 @@ function configInit(novelData, tempSettingData) {
 function configColumn(callback) {
   initColumn(haColumnCounts => {
     if (haColumnCounts) {
-      //动画事件委托
-      if (config.launch.swipeDelegate !== false) {
-        config.launch.swipeDelegate = true
-      }
+      resetDelegate()
     }
     callback()
   })
@@ -155,7 +125,9 @@ export default function baseConfig(callback) {
   }
 
   /*图片分辨了自适应*/
-  config.launch.imageSuffix && adaptiveImage()
+  if (config.launch.imageSuffix) {
+    adaptiveImage()
+  }
 
   /*建议快速正则，提高计算*/
   setFastAnalysisRE()
@@ -167,7 +139,6 @@ export default function baseConfig(callback) {
     setDatabse(results)
   })
 
-
   function setDatabse(results) {
     initDatabse(results, function(dataRet) {
       const novelData = dataRet.Novel.item(0)
@@ -175,72 +146,15 @@ export default function baseConfig(callback) {
       const chapterTotal = dataRet.Chapter.length
 
       //配置config
-      setConfig()
+      resetVisualMode()
       configInit(novelData, tempSettingData)
 
       //处理预加载文件
-      loadPrelaod(function(hasFile, globalBrMode) {
-        resetBrMode(hasFile, globalBrMode)
+      loadPrelaod(function(hasPreFile, globalBrMode) {
+        resetBrMode(hasPreFile, globalBrMode)
         loadStyle(novelData, chapterTotal)
       })
     })
-  }
-
-
-  /**
-   * 如果没有预加载文件
-   * 如果启动了图片模式，那么就需要去掉
-   */
-  function resetBrMode(hasFile, globalBrMode) {
-    if (!hasFile) {
-      config.launch.brMode = ''
-      config.launch.brModeType = ''
-      return
-    }
-
-    //全局指定模式
-    //globalBrMode:单模式 1 =>png
-    //globalBrMode:混合模式 2 =>_i _a
-    if (globalBrMode === 1) {
-      /*如果用单模式，但是判断出来是混合模式，那么直接清空*/
-      if (config.launch.brModeType) {
-        config.launch.brMode = ''
-        config.launch.brModeType = ''
-      }
-    } else if (globalBrMode === 2) {
-      /*如果是混合模式，判断出来是单模式，需要重新处理*/
-      if (!config.launch.brModeType) {
-        config.launch.brModeType = getBrType(1)
-      }
-    }
-  }
-
-  /**
-   * 设置配置文件
-   */
-  function setConfig() {
-
-    /**
-     * 重设全局的页面模式
-     * 默认页面模式选择
-     * 1 全局用户接口
-     * 2 PPT的数据接口
-     * 3 默认1
-     */
-    if (config.launch.visualMode === undefined) {
-      config.launch.visualMode = config.data.visualMode || 1
-    }
-
-    /**
-     * 模式5 只在竖版下使用
-     */
-    if (config.launch.visualMode === 5) {
-      const screen = getSize()
-      if (screen.height < screen.width) {
-        config.launch.visualMode = 1
-      }
-    }
-
   }
 
   /**
@@ -250,10 +164,10 @@ export default function baseConfig(callback) {
   function loadStyle(novelData, chapterTotal) {
     /*加载svg的样式*/
     loadGolbalStyle('svgsheet', function() {
-      /*分栏*/
+      //判断是否有分栏处理
       configColumn(function() {
         if (config.launch.preload) {
-          /*预加载*/
+          //资源预加载
           initPreload(chapterTotal, () => callback(novelData))
         } else {
           callback(novelData)

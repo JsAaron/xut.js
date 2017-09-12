@@ -1,14 +1,14 @@
 10
 
 dir
-19317
+19327
 svn://chenwen@192.168.1.189/magazine-develop/assets/www/src/core/config
 svn://chenwen@192.168.1.189
 
 
 
-2017-09-01T00:19:26.673543Z
-19315
+2017-09-12T00:50:12.874935Z
+19323
 chenwen
 
 
@@ -28,40 +28,6 @@ chenwen
 
 path-config
 dir
-
-priority-config.js
-file
-
-
-
-
-2017-09-08T08:22:11.000000Z
-c842b7c92a63c999f3691d58a93cf9d8
-2017-09-01T00:19:26.673543Z
-19315
-chenwen
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-5079
 
 v-visual.js
 file
@@ -198,6 +164,40 @@ chenwen
 
 
 668
+
+launch-config.js
+file
+
+
+
+
+2017-09-12T00:30:07.000000Z
+2e7f855dce9932333a8c170679aa97c0
+2017-09-12T00:38:03.437223Z
+19322
+chenwen
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7532
 
 v-proportion.js
 file

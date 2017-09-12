@@ -1,16 +1,16 @@
 10
 
 dir
-19317
+19327
 svn://chenwen@192.168.1.189/magazine-develop/assets/www/build
 svn://chenwen@192.168.1.189
 
 
 
-2017-08-31T01:07:35.604345Z
-19311
+2017-09-12T01:03:04.351967Z
+19326
 chenwen
-
+has-props
 
 
 
@@ -29,16 +29,22 @@ chenwen
 test
 dir
 
+release
+dir
+
+convert
+dir
+
 config.js
 file
 
 
 
 
-2017-09-08T08:22:19.000000Z
-d7e719e21985118cc784df69a6bbd2a4
-2017-08-28T00:36:29.155778Z
-19300
+2017-09-11T01:48:11.000000Z
+ef93ab3e8057b9638511acf1fc4b6a68
+2017-09-12T00:32:02.106229Z
+19320
 chenwen
 
 
@@ -61,13 +67,7 @@ chenwen
 
 
 
-3306
-
-convert
-dir
-
-release
-dir
+3312
 
 rollup.base.conf.js
 file
@@ -180,40 +180,6 @@ dir
 build
 dir
 
-kill.occupied.js
-file
-
-
-
-
-2017-09-08T08:22:19.000000Z
-9aea80da45a91999ef0f3c578311eceb
-2017-07-20T02:07:22.621741Z
-19192
-chenwen
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1060
-
 external.script.js
 file
 
@@ -247,6 +213,40 @@ chenwen
 
 
 535
+
+kill.occupied.js
+file
+
+
+
+
+2017-09-08T08:22:19.000000Z
+9aea80da45a91999ef0f3c578311eceb
+2017-07-20T02:07:22.621741Z
+19192
+chenwen
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1060
 
 format.js
 file

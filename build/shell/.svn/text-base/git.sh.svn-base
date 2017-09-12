@@ -2,7 +2,7 @@
 #http://www.jb51.net/article/56563.htm
 
 dir=$(pwd)
-# dir="/Users/mac/project/git/es6-magazine/'"
+# dir="/Users/Aaron/project/git/es6-magazine/'"
 main="$dir/src/lib/main.js"
 log="$dir/src/log.js"
 

@@ -3,4 +3,9 @@ svn:global-ignores
 V 4
 lib
 
+K 10
+svn:ignore
+V 10
+.DS_Store
+
 END

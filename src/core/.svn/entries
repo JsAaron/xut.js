@@ -1,14 +1,14 @@
 10
 
 dir
-19317
+19327
 svn://chenwen@192.168.1.189/magazine-develop/assets/www/src/core
 svn://chenwen@192.168.1.189
 
 
 
-2017-09-01T00:19:26.673543Z
-19315
+2017-09-12T00:50:12.874935Z
+19323
 chenwen
 
 
@@ -35,10 +35,10 @@ file
 
 
 
-2017-09-11T00:57:44.000000Z
-a382a2775489a840702ab1911ed0d69f
-2017-09-01T00:19:26.673543Z
-19315
+2017-09-12T00:33:30.000000Z
+c68953d14617bbca900446cca4948cc1
+2017-09-12T00:38:03.437223Z
+19322
 chenwen
 
 
@@ -61,7 +61,7 @@ chenwen
 
 
 
-3612
+3610
 
 main
 dir
@@ -70,12 +70,6 @@ observer
 dir
 
 initialize
-dir
-
-component
-dir
-
-toolbar
 dir
 
 global-destroy.js
@@ -112,6 +106,12 @@ chenwen
 
 2548
 
+toolbar
+dir
+
+component
+dir
+
 scenario
 dir
 
@@ -121,10 +121,10 @@ dir
 global-api
 dir
 
-swiper
+data
 dir
 
-data
+swiper
 dir
 
 util

@@ -7,7 +7,7 @@ import { initRootNode } from './initialize/root-node'
 import { initGlobalEvent } from './initialize/golbal-event'
 import { initAsyn } from './initialize/asyn'
 import { initGlobalAPI } from './global-api/index'
-import { priorityConfig } from './config/priority-config'
+import { priorityConfig } from './config/launch-config'
 
 /////////////////
 ////  版本号  ////

@@ -9,8 +9,8 @@ const src = '.'
 
 //复制文件目录
 const dists = [
-  '/Users/mac/project/git/xut.js/'
-  // '/Users/mac/project/svn/server/magazine-develop/www/'
+  '/Users/Aaron/project/git/xut.js/'
+  // '/Users/Aaron/project/svn/server/magazine-develop/www/'
 ]
 
 const filterRE = createRE()
