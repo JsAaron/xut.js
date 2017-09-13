@@ -239,10 +239,6 @@ export default class Animation {
     })
   }
 
-陈文
-299任务：淘宝账号：cwyy205          支付宝账号：chenwenkl@163.com
-199任务：淘宝账号：lanzhuzhu198832  支付宝账号：lanzhuzhu198832@sina.com
-199任务：淘宝账号：lanzhuzhu198832  支付宝账号：lanzhuzhu198832@sina.com
 
   /**
    * 停止动画

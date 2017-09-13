@@ -3,6 +3,7 @@ const cleanCSS = require('gulp-clean-css');
 const concat = require('gulp-concat')
 const rename = require("gulp-rename");
 const autoprefixer = require('gulp-autoprefixer');
+const tap = require('gulp-tap');
 const util = require('../util')
 
 async function createFile(fileName, path, config, resolve, reject) {
@@ -16,6 +17,13 @@ async function createFile(fileName, path, config, resolve, reject) {
     .pipe(gulp.dest(config.distDirPath))
     .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(rename(fileName + '.css'))
+    .pipe(tap(function(file, t) {
+      //增加版本头部
+      file.contents = Buffer.concat([
+        new Buffer(config.banner),
+        file.contents
+      ]);
+    }))
     .pipe(gulp.dest(config.distDirPath))
     .on('error', async(err) => {
       util.log('【css】compile complete error', 'debug')
