@@ -19,7 +19,7 @@ const filterRE = createRE()
 //./build/dev/test.js
 //build/dev/webpack.dev.conf.js
 const excludeDel = new RegExp(".git|epub|.svn|README.md|README|README.gif|安装说明.docx", "i")
-const excludeCopy = new RegExp("^./test|^./template/content|^./template/compile|^./node_modules|^./.svn|^./release/|^./temp/", "i")
+const excludeCopy = new RegExp("^./test|^./template/content|^./template/compile|^./node_modules|^./.svn|^./release/|^./temp/|/.svn/", "i")
 
 console.log(
   '【Regular filter】\n' +
@@ -36,7 +36,7 @@ const del = (dist) => {
   }
   console.log('del: ' + dist)
 }
-
+console.log(excludeCopy)
 const copy = (src, dist) => {
   var files = fs.readdirSync(src);
   for (fn in files) {
@@ -46,6 +46,7 @@ const copy = (src, dist) => {
     if (stat.isDirectory() == true) {
       copy(filename, dist)
     } else {
+
       if (!excludeCopy.test(rootPath)) {
         fsextra.copySync(filename, dist + filename)
       } else {
