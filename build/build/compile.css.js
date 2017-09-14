@@ -17,7 +17,7 @@ async function createFile(fileName, path, config, resolve, reject) {
     .pipe(gulp.dest(config.distDirPath))
     .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(rename(fileName + '.css'))
-    .pipe(tap(function(file, t) {
+    .pipe(tap((file, t) => {
       //增加版本头部
       file.contents = Buffer.concat([
         new Buffer(config.banner),
@@ -36,20 +36,20 @@ async function createFile(fileName, path, config, resolve, reject) {
 }
 
 
-async function compileCSS(config) {
+module.exports = async function compileCSS(config) {
   const cssNames = []
-  config.externalFiles.cssName.forEach(function(url) {
+  config.externalFiles.cssName.forEach(url => {
     cssNames.push(util.joinPath(config.templateDirPath, url))
   })
   let sucCount = 2
   let failCount = 2
-  const success = async function() {
+  const success = async() => {
     if (sucCount === 1) {
       return await Promise.resolve()
     }
     sucCount--
   }
-  const fail = async function() {
+  const fail = async() => {
     if (failCount === 1) {
       return await Promise.reject()
     }
@@ -58,6 +58,3 @@ async function compileCSS(config) {
   createFile('xxtppt', cssNames, config, success, fail)
   createFile('font', [util.joinPath(config.templateDirPath, config.externalFiles.fontName.join(''))], config, success, fail)
 }
-
-
-module.exports = compileCSS

@@ -44,7 +44,7 @@ const compilecJs = function(srcPath, callback, traverse = true) {
 
 const eachFile = function(src) {
   const compile = []
-  _.each(fs.readdirSync(src), function(file) {
+  _.each(fs.readdirSync(src), file => {
     let filePath = src + file
     let stat = fs.lstatSync(filePath);
     //是目录
@@ -53,10 +53,10 @@ const eachFile = function(src) {
       let exists = fs.existsSync(widgetPath)
       if (exists) {
         let widgetFiles = fs.readdirSync(widgetPath)
-        _.each(widgetFiles, function(file) {
+        _.each(widgetFiles, file => {
           //is widget files
           if (/^\d+$/ig.test(file)) {
-            compile.push(function(callback) {
+            compile.push(callback => {
               compilecJs(widgetPath + '/' + file, callback)
             })
           }
@@ -70,9 +70,7 @@ const eachFile = function(src) {
       return
     }
     let pop = compile.pop()
-    pop(function() {
-      startCompile()
-    })
+    pop(() => startCompile())
   }
 
   startCompile()

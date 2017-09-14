@@ -22,7 +22,8 @@
     "ncu": "node build/ncu.package.js",
     "format": "node build/format.js",
     "check": "flow; test $? -eq 0 -o $? -eq 2",
-    "flow:check": "flow check"
+    "flow:check": "flow check",
+    "flow": "flow; test $? -eq 0 -o $? -eq 2"
   },
   "repository": {
     "type": "git",

@@ -12,7 +12,7 @@ import { priorityConfig } from './config/launch-config'
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.8
+Xut.Version = 889.9
 
 /**
  * 代码初始化

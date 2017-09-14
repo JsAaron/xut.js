@@ -608,10 +608,8 @@ export default class Powepoint {
     }
     if (this.animation) {
       this.stop();
-      animComplete && animComplete()
-    } else {
-      this.animation = this._initAnimation(animComplete)
     }
+    this.animation = this._initAnimation(animComplete)
     this.animation.play()
   }
 

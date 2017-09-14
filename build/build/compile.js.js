@@ -6,7 +6,7 @@ const tap = require('gulp-tap');
 const fs = require('fs')
 const util = require('../util')
 
-async function compileJs(config, mergeUrls) {
+module.exports = async function compileJs(config, mergeUrls) {
   //合成xxtppt.js
   mergeUrls.push(config.rollupDevFilePath)
   gulp.src(mergeUrls)
@@ -24,7 +24,7 @@ async function compileJs(config, mergeUrls) {
       console.log(err)
     })
     .pipe(rename(config.productionName))
-    .pipe(tap(function(file, t) {
+    .pipe(tap((file, t) => {
       //增加版本头部
       file.contents = Buffer.concat([
         new Buffer(config.banner),
@@ -38,5 +38,3 @@ async function compileJs(config, mergeUrls) {
       await Promise.resolve()
     })
 }
-
-module.exports = compileJs

@@ -10,6 +10,18 @@ import { cleanImage } from '../../../util/option'
 export default function pretreatment(data, eventName) {
   const parameter = data.getParameter()
 
+  ///////////////////////////////////////////////////////////////
+  //如果是apng、webp、gif的图片
+  //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
+  //所以规定
+  //1 如果是显示动画中绑定了apng、webp、gif的资源，那么就需要动态处理
+  //2 在dom阶段创建了所有的img.src 在ppt动画阶段需要判断，删除后动态处理
+  ///////////////////////////////////////////////////////////////
+  const fileName = data.contentData.md5
+  if (fileName && /^apng_|gif$/i.test(fileName)) {
+    data.useDynamicDiagram = true //标记动画图片动画
+  }
+
   //过滤预生成动画
   if (parameter && parameter.length === 1) {
     const category = data.contentData.category
@@ -24,19 +36,6 @@ export default function pretreatment(data, eventName) {
       category !== 'AutoCompSprite' && //不是自动精灵
       !/"inapp"/i.test(para.parameter)) { //并且不能是收费处理
 
-      ///////////////////////////////////////////////////////////////
-      //如果是apng、webp、gif的图片
-      //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
-      //所以规定
-      //1 如果是显示动画中绑定了apng、webp、gif的资源，那么就需要动态处理
-      //2 在dom阶段创建了所有的img.src 在ppt动画阶段需要判断，删除后动态处理
-      ///////////////////////////////////////////////////////////////
-      const fileName = data.contentData.md5
-      if (fileName && /^apng_|gif$/i.test(fileName)) {
-        cleanImage(data.$contentNode, 'show')
-        data.useDynamicDiagram = true //标记动画图片动画
-        return
-      }
 
       ///////////////////////////////////////////////////////////////
       //针对预处理动作,并且没有卷滚的不注册，满足是静态动画，true是显示,false隐藏

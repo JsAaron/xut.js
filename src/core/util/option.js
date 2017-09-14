@@ -433,10 +433,11 @@ export function reviseSize({
 /**
  * 清理图片
  * @return {[type]} [description]
- * action  'show' / 'hide'
+ * action  'show' / 'hide'  在什么状态下删除
+ * clone   克隆一份解决删除的闪动
  * default: 'hide'
  */
-export function cleanImage(context, action) {
+export function cleanImage(context, action, clone) {
 
   if (!context) {
     return
@@ -451,16 +452,19 @@ export function cleanImage(context, action) {
    * 一次性的apng图片，必须要清理src
    * 否则重复不生效，因为缓存的关系
    */
+  function removeSRC(img) {
+    if (img) {
+      img.removeAttribute('onerror')
+      img.src = null
+      img.removeAttribute('src')
+    }
+  }
+
   try {
-    context.hide().find('img').each(function(index, img) {
-      if (img) {
-        img.removeAttribute('onerror')
-        img.src = null
-        img.removeAttribute('src')
-      }
-    })
     if (action === 'show') {
-      context.show()
+      context.find('img').each((index, img) => removeSRC(img))
+    } else {
+      context.hide().find('img').each((index, img) => removeSRC(img))
     }
   } catch (e) {
     console.log('销毁图片出错')
