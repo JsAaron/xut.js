@@ -4,8 +4,16 @@
  * @param options object
  * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
  */
-import { config } from '../../config/index'
-import { $on, $off, $handle, $target, $setStorage, $getStorage, $removeStorage } from '../../util/index'
+import { config } from '../../../config/index'
+import {
+  $on,
+  $off,
+  $handle,
+  $target,
+  $setStorage,
+  $getStorage,
+  $removeStorage
+} from '../../../util/index'
 
 
 /**
@@ -53,7 +61,7 @@ export default class Mark {
     this.parent.append($bookMark);
     this.bookMarkMenu = $bookMark.eq(0);
     //显示书签
-    setTimeout(function () {
+    setTimeout(function() {
       that.restore();
     }, 20);
     //获取历史记录
@@ -106,7 +114,7 @@ export default class Mark {
       self = this;
 
     //取历史记录
-    _.each(BOOKCACHE, function (mark) {
+    _.each(BOOKCACHE, function(mark) {
       tmp = mark.split('-');
       seasonId = tmp[0];
       pageId = tmp[1];

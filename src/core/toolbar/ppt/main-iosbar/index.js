@@ -270,20 +270,6 @@ export default class IosBar extends BarSuper {
   ///////////////////////
 
   /**
-   * 重置翻页按钮,状态以工具栏为标准
-   */
-  resetArrow() {
-    this.toolBarStatus ? this._$$showArrow() : this._$$hideArrow();
-  }
-
-  /**
-   * 隐藏导航栏
-   */
-  hideNavbar() {
-    this.navbarObj && this.navbarObj.hide('hide')
-  }
-
-  /**
    * 更新页码指示
    */
   updatePointer({ parentIndex }) {

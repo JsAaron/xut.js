@@ -41943,12 +41943,18 @@ var improtGolbalConfig = {
   scrollMode: 'h',
 
   /**
-   * 是否锁定页面移动
-   * false 不锁定，可以移动
-   * true 锁定，不能移动
+   * 切换切换模式
+   * 多模式判断
+   * 如果
+   *   缓存存在
+   *   否则数据库解析
+         数据库filpMode全局翻页模式
+         0 滑动翻页 =》true
+         1 直接换  =》 false
+   * 所以pageFlip只有在左面的情况下
    * @type {Boolean}
    */
-  banMove: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
+  gestureGlide: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
 
   /**
    * 是否预加载资源
@@ -44080,10 +44086,11 @@ function reviseSize(_ref2) {
 /**
  * 清理图片
  * @return {[type]} [description]
- * action  'show' / 'hide'
+ * action  'show' / 'hide'  在什么状态下删除
+ * clone   克隆一份解决删除的闪动
  * default: 'hide'
  */
-function cleanImage(context, action) {
+function cleanImage(context, action, clone) {
 
   if (!context) {
     return;
@@ -44098,16 +44105,23 @@ function cleanImage(context, action) {
    * 一次性的apng图片，必须要清理src
    * 否则重复不生效，因为缓存的关系
    */
+  function removeSRC(img) {
+    if (img) {
+      img.removeAttribute('onerror');
+      img.src = null;
+      img.removeAttribute('src');
+    }
+  }
+
   try {
-    context.hide().find('img').each(function (index, img) {
-      if (img) {
-        img.removeAttribute('onerror');
-        img.src = null;
-        img.removeAttribute('src');
-      }
-    });
     if (action === 'show') {
-      context.show();
+      context.find('img').each(function (index, img) {
+        return removeSRC(img);
+      });
+    } else {
+      context.hide().find('img').each(function (index, img) {
+        return removeSRC(img);
+      });
     }
   } catch (e) {
     console.log('销毁图片出错');
@@ -48246,36 +48260,38 @@ var initMain = function initMain(novelData) {
   }
 
   /**
+   * 切换切换模式
    * 多模式判断
    * 如果
    *   缓存存在
    *   否则数据库解析
          全局翻页模式
-         0 滑动翻页 =》allow
-         1 直接换  =》ban
+         0 滑动翻页 =》true
+         1 直接换  =》 false
    * 所以pageFlip只有在左面的情况下
+   * @type {Boolean}
    */
-
   if (novelData.parameter) {
     var parameter = parseJSON(novelData.parameter);
     /*全局优先设置覆盖*/
-    if (config.launch.banMove === undefined && parameter.pageflip !== undefined) {
+    if (config.launch.gestureGlide === undefined && parameter.pageflip !== undefined) {
       switch (Number(parameter.pageflip)) {
         case 0:
-          //允许翻页
-          config.launch.banMove = false;
+          //滑动翻页
+          config.launch.gestureGlide = true;
           break;
         case 1:
-          //禁止翻页
-          config.launch.banMove = true;
+          //直接换
+          config.launch.pageFlip = true;
+          config.launch.gestureGlide = false;
           break;
       }
     }
   }
 
-  /*默认不锁定页面*/
-  if (config.launch.banMove === undefined) {
-    config.launch.banMove = false;
+  /*默认不锁定页面，支持手势滑动*/
+  if (config.launch.gestureGlide === undefined) {
+    config.launch.gestureGlide = true;
   }
 
   /**
@@ -58425,10 +58441,8 @@ var Powepoint = function () {
       }
       if (this.animation) {
         this.stop();
-        animComplete && animComplete();
-      } else {
-        this.animation = this._initAnimation(animComplete);
       }
+      this.animation = this._initAnimation(animComplete);
       this.animation.play();
     }
 
@@ -59127,6 +59141,14 @@ var Animation = function () {
       //ppt动画
       this.pptObj = callback(Powepoint);
     }
+  }, {
+    key: '_cleanTimer',
+    value: function _cleanTimer() {
+      if (this.imageTimer) {
+        clearTimeout(this.imageTimer);
+        this.imageTimer = null;
+      }
+    }
 
     /**
      * 绑定动画
@@ -59184,12 +59206,24 @@ var Animation = function () {
             }
           }
 
-          //如果是一次性动画，需要动态设置图片的src
           if (_this3.useDynamicDiagram) {
-            setImage(_this3.$contentNode, _this3.contentData.resourcePath);
+            //如果是一次性动画
+            //如果存在重复点击的情况
+            //需要先删除在赋值
+            //考虑点击速度过快，增加定时器控制
+            cleanImage(_this3.$contentNode, 'show', 'clone');
+            _this3._cleanTimer();
+            _this3.imageTimer = setTimeout(function () {
+              if (_this3.$contentNode) {
+                setImage(_this3.$contentNode, _this3.contentData.resourcePath);
+              }
+              if (_this3[key]) {
+                _this3[key].play && _this3[key].play(playComplete);
+              }
+            }, 0);
+          } else {
+            _this3[key].play && _this3[key].play(playComplete);
           }
-
-          _this3[key].play && _this3[key].play(playComplete);
         }
       });
     }
@@ -59265,6 +59299,8 @@ var Animation = function () {
       if (this.contentData.$contentNode) {
         this.contentData.$contentNode = null;
       }
+
+      this._cleanTimer();
 
       access(function (key) {
         _this6[key] = null;
@@ -59905,6 +59941,18 @@ function index$1(data, relatedData, getStyle) {
 function pretreatment(data, eventName) {
   var parameter = data.getParameter();
 
+  ///////////////////////////////////////////////////////////////
+  //如果是apng、webp、gif的图片
+  //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
+  //所以规定
+  //1 如果是显示动画中绑定了apng、webp、gif的资源，那么就需要动态处理
+  //2 在dom阶段创建了所有的img.src 在ppt动画阶段需要判断，删除后动态处理
+  ///////////////////////////////////////////////////////////////
+  var fileName = data.contentData.md5;
+  if (fileName && /^apng_|gif$/i.test(fileName)) {
+    data.useDynamicDiagram = true; //标记动画图片动画
+  }
+
   //过滤预生成动画
   if (parameter && parameter.length === 1) {
     var category = data.contentData.category;
@@ -59920,19 +59968,6 @@ function pretreatment(data, eventName) {
     !/"inapp"/i.test(para.parameter)) {
       //并且不能是收费处理
 
-      ///////////////////////////////////////////////////////////////
-      //如果是apng、webp、gif的图片
-      //在线性模式，由于预加载一页的原理，会让apng提前在非可视区运行
-      //所以规定
-      //1 如果是显示动画中绑定了apng、webp、gif的资源，那么就需要动态处理
-      //2 在dom阶段创建了所有的img.src 在ppt动画阶段需要判断，删除后动态处理
-      ///////////////////////////////////////////////////////////////
-      var fileName = data.contentData.md5;
-      if (fileName && /^apng_|gif$/i.test(fileName)) {
-        cleanImage(data.$contentNode, 'show');
-        data.useDynamicDiagram = true; //标记动画图片动画
-        return;
-      }
 
       ///////////////////////////////////////////////////////////////
       //针对预处理动作,并且没有卷滚的不注册，满足是静态动画，true是显示,false隐藏
@@ -68612,7 +68647,7 @@ var Swiper = function (_Observer) {
       return {
         scrollY: scrollY,
         scrollX: scrollX,
-        banMove: config.launch.banMove
+        banMove: config.launch.gestureGlide === false ? true : false
       };
     }
 
@@ -71922,10 +71957,10 @@ var movePage = function (baseProto) {
     toTranslateCB = function toTranslateCB() {
       /*
       2种情况下会主动触发翻页结束回调
-      1.banMove，关闭了翻页效果，并且是可视区页面
+      1.gestureGlide，关闭了翻页效果,直接跳页面，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if (isVisual && (fixQuickFlip || config.launch.banMove)) {
+      if (isVisual && (fixQuickFlip || !config.launch.gestureGlide)) {
         Xut.View.SetSwiperFilpComplete(pageNode, true);
         return true;
       }
@@ -74482,7 +74517,7 @@ var Scheduler = function () {
       //用户强制直接切换模式
       //禁止页面跟随滑动
 
-      if (config.launch.banMove && action == 'flipMove') {
+      if (!config.launch.gestureGlide && action == 'flipMove') {
         return;
       }
 
@@ -75935,10 +75970,21 @@ function configMultiple(options) {
     var pageMode = Number(options.pageMode);
 
     //如果是禁止翻页，然后还要看是不是有pageMode的设置
-    if (config.launch.banMove) {
+    if (!config.launch.gestureGlide) {
+
+      //喵喵学模式比较特别
+      //在数据里中设定了filpMode为1
+      //那么就是锁定了不允许翻页，但是还要能支持左右跳页面
+      //这里就需要按照多页面的模式处理
+      //强制是多页面的方式创建，但是锁住翻页而已
+      if (config.launch.pageFlip) {
+        options.hasMultiPage = true;
+        return;
+      }
+
       options.hasMultiPage = false;
+      //如果工具栏单独设置了页面模式，那么多页面强制改成true
       if (pageMode > 0) {
-        //如果工具栏单独设置了页面模式，那么多页面强制改成true
         options.hasMultiPage = true;
       }
     } else {
@@ -76657,6 +76703,26 @@ var BarSuper = function () {
     ///   对外接口，子类向上转型接口
     /////////////////////////////////////
 
+
+    /**
+     * 重置翻页按钮,状态以工具栏为标准
+     */
+
+  }, {
+    key: 'resetArrow',
+    value: function resetArrow() {
+      this.toolBarStatus ? this._$$showArrow() : this._$$hideArrow();
+    }
+
+    /**
+     * 隐藏导航栏
+     */
+
+  }, {
+    key: 'hideNavbar',
+    value: function hideNavbar() {
+      this.navbarObj && this.navbarObj.hide('hide');
+    }
 
     /**
      * 隐藏下一页按钮
@@ -77541,26 +77607,6 @@ var IosBar = function (_BarSuper) {
     ///////////////////////
 
     /**
-     * 重置翻页按钮,状态以工具栏为标准
-     */
-
-  }, {
-    key: 'resetArrow',
-    value: function resetArrow() {
-      this.toolBarStatus ? this._$$showArrow() : this._$$hideArrow();
-    }
-
-    /**
-     * 隐藏导航栏
-     */
-
-  }, {
-    key: 'hideNavbar',
-    value: function hideNavbar() {
-      this.navbarObj && this.navbarObj.hide('hide');
-    }
-
-    /**
      * 更新页码指示
      */
 
@@ -77981,6 +78027,959 @@ var fnBar = function (_BarSuper) {
     }
   }]);
   return fnBar;
+}(BarSuper);
+
+/**
+ * 书签栏
+ * 加入这个书签功能后，可以让用户自由选择哪页是需要保存记录的
+ * @param options object
+ * @example {parent:页面容器,pageId:chapterId,seasonId:seasionId}
+ */
+/**
+ * 行高
+ * @type {[type]}
+ */
+var sLineHeiht$1 = parseInt($('body').css('font-size')) || 16; //行高
+
+/**
+ * 书签缓存
+ */
+var BOOKCACHE$1 = void 0;
+
+var Mark = function () {
+  function Mark() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        parent = _ref.parent,
+        pageId = _ref.pageId,
+        seasonId = _ref.seasonId;
+
+    classCallCheck(this, Mark);
+
+    this.parent = parent;
+    this.pageId = pageId;
+    this.seasonId = seasonId;
+
+    var visualSize = config.visualSize;
+    this.sHeight = visualSize.height;
+    this.sWidth = visualSize.width;
+
+    //是否已存储
+    this.isStored = false;
+    this.init();
+  }
+
+  /**
+   * 初始化
+   * @return {[type]} [description]
+   */
+
+
+  createClass(Mark, [{
+    key: 'init',
+    value: function init() {
+      var $bookMark = this.createBookMarkFont(),
+          dom = this.parent[0],
+          that = this;
+
+      this.parent.append($bookMark);
+      this.bookMarkMenu = $bookMark.eq(0);
+      //显示书签
+      setTimeout(function () {
+        that.restore();
+      }, 20);
+      //获取历史记录
+      BOOKCACHE$1 = this.getHistory();
+
+      //邦定用户事件
+      $on(dom, {
+        end: this
+      });
+    }
+
+    /**
+     * 创建书签(font版本)
+     * @return {[object]} [jquery生成的dom对象]
+     */
+
+  }, {
+    key: 'createBookMarkFont',
+    value: function createBookMarkFont() {
+      var height = sLineHeiht$1 * 3; // menu的高为3em
+      var sHeight = this.sHeight;
+      var box = '<div class="xut-bookmark-menu"\n               style="width:100%;height:' + height + 'px;left:0;top:' + sHeight + 'px;">\n              <div class="xut-bookmark-wrap">\n                <div class="xut-bookmark-add">\u52A0\u5165\u4E66\u7B7E</div>\n                <div class="xut-bookmark-off xut-icon-chevron-down" style="vertical-align:bottom;"></div>\n                <div class="xut-bookmark-view">\u4E66\u7B7E\u8BB0\u5F55</div>\n              </div>\n            </div>\n            <div class="xut-bookmark-list" style="display:none;width:100%;height:' + sHeight + 'px;">\n              <ul class="xut-bookmark-head">\n                <li class="xut-bookmark-back">\u8FD4\u56DE</li>\n                <li>\u4E66\u7B7E</li>\n              </ul>\n              <ul class="xut-bookmark-body"></ul>\n            </div>';
+      this.markHeight = height;
+      return $(box);
+    }
+
+    /**
+     * 生成书签列表
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'createMarkList',
+    value: function createMarkList() {
+      var tmp,
+          seasonId,
+          pageId,
+          list = '',
+          box = '',
+          self = this;
+
+      //取历史记录
+      _.each(BOOKCACHE$1, function (mark) {
+        tmp = mark.split('-');
+        seasonId = tmp[0];
+        pageId = tmp[1];
+        mark = self.getMarkId(seasonId, pageId);
+        list += '<li>\n               <a data-mark="' + mark + '" class="xut-bookmark-id" href="javascript:0">\u7B2C' + pageId + '\u9875</a>\n               <a class="xut-bookmark-del" data-mark="' + mark + '" href="javascript:0">X</a>\n             </li>';
+      });
+
+      return list;
+    }
+
+    /**
+     * 创建存储标签
+     * 存储格式 seasonId-pageId
+     * @return {string} [description]
+     */
+
+  }, {
+    key: 'getMarkId',
+    value: function getMarkId(seasonId, pageId) {
+      return seasonId + '-' + pageId;
+    }
+
+    /**
+     * 获取历史记录
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'getHistory',
+    value: function getHistory() {
+      var mark = $getStorage('bookMark');
+      if (mark) {
+        return mark.split(',');
+      }
+      return [];
+    }
+
+    /**
+     * 添加书签
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'addBookMark',
+    value: function addBookMark() {
+      var key;
+
+      this.updatePageInfo();
+      key = this.getMarkId(this.seasonId, this.pageId);
+
+      //避免重复缓存
+      if (BOOKCACHE$1.indexOf(key) > -1) {
+        return;
+      }
+      BOOKCACHE$1.push(key);
+      $setStorage('bookMark', BOOKCACHE$1);
+    }
+
+    /**
+     * 更新页信息
+     *  针对母板层上的书签
+     */
+
+  }, {
+    key: 'updatePageInfo',
+    value: function updatePageInfo() {
+      var pageData = Xut.Presentation.GetPageData();
+      this.pageId = pageData._id;
+      this.seasonId = pageData.seasonId;
+    }
+
+    /**
+     * 删除书签
+     * @param {object} [key] [事件目标对象]
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'delBookMark',
+    value: function delBookMark(target) {
+      if (!target || !target.dataset) return;
+
+      var key = target.dataset.mark,
+          index = BOOKCACHE$1.indexOf(key);
+
+      BOOKCACHE$1.splice(index, 1);
+      $setStorage('bookMark', BOOKCACHE$1);
+
+      if (BOOKCACHE$1.length == 0) {
+        $removeStorage('bookMark');
+      }
+
+      //移除该行
+      $(target).parent().remove();
+    }
+
+    /**
+     * 显示书签
+     * @param {object} [target] [事件目标对象]
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'viewBookMark',
+    value: function viewBookMark(target) {
+      var $bookMarkList,
+          list = this.createMarkList();
+
+      if (this.bookMarkList) {
+        $bookMarkList = this.bookMarkList;
+      } else {
+        $bookMarkList = $(target).parent().parent().next();
+      }
+      //更新书签内容
+      $bookMarkList.find('.xut-bookmark-body').html(list);
+      this.bookMarkList = $bookMarkList;
+      $bookMarkList.fadeIn();
+    }
+
+    /**
+     * 点击放大效果
+     * @param  {[object]} target [事件目标对象]
+     * @return {[type]}      [description]
+     */
+
+  }, {
+    key: 'iconManager',
+    value: function iconManager(target) {
+      var $icon = this.bookMarkIcon = $(target),
+          restore = this.iconRestore;
+      $icon.css({
+        'transform': 'scale(1.2)',
+        'transition-duration': '500ms'
+      })[0].addEventListener(Xut.style.transitionEnd, restore.bind(this), false);
+    }
+
+    /**
+     * 复原按钮
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'iconRestore',
+    value: function iconRestore() {
+      this.bookMarkIcon.css('transform', '');
+    }
+
+    /**
+     * 跳转到书签页
+     * @param  {[type]} target [description]
+     * @return {[type]}        [description]
+     */
+
+  }, {
+    key: 'goBookMark',
+    value: function goBookMark(target) {
+      if (!target || !target.dataset) return;
+
+      var key = target.dataset.mark.split('-');
+      var seasonId = Number(key[0]);
+      var pageId = Number(key[1]);
+
+      this.updatePageInfo();
+      //关闭书签列表
+      this.backBookMark();
+
+      //忽略当前页的跳转
+      if (this.pageId == pageId && this.seasonId == seasonId) {
+        return;
+      }
+
+      Xut.View.LoadScenario({
+        'seasonId': seasonId,
+        'chapterId': pageId
+      });
+    }
+
+    /**
+     * 书签回退键
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'backBookMark',
+    value: function backBookMark() {
+      this.bookMarkList.fadeOut();
+    }
+
+    /**
+     * 邦定事件
+     * @param  {[type]} evt [事件]
+     * @return {[type]}     [description]
+     */
+
+  }, {
+    key: 'handleEvent',
+    value: function handleEvent(e) {
+      var target = e.target;
+      $handle({
+        end: function end(e) {
+          switch ($target(e).className) {
+            //加入书签
+            case 'xut-bookmark-add':
+              this.addBookMark();
+              this.iconManager(target);
+              break;
+            //显示书签记录
+            case 'xut-bookmark-view':
+              this.viewBookMark(target);
+              this.iconManager(target);
+              break;
+            //关闭书签
+            case 'xut-bookmark-off':
+            case 'xut-bookmark-off xut-icon-chevron-down':
+              this.closeBookMark(target);
+              break;
+            //返回书签主菜单
+            case 'xut-bookmark-back':
+              this.backBookMark();
+              break;
+            //删除书签记录
+            case 'xut-bookmark-del':
+              this.delBookMark(target);
+              break;
+            //跳转到书签页
+            case 'xut-bookmark-id':
+              this.goBookMark(target);
+              break;
+            default:
+              //console.log(target.className)
+              break;
+          }
+        }
+      }, this, e);
+    }
+
+    /**
+     * 关闭书签菜单
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'closeBookMark',
+    value: function closeBookMark(target) {
+      Xut.style.setTranslate({
+        speed: 1000,
+        node: this.bookMarkMenu
+      });
+    }
+
+    /**
+     * 恢复书签菜单
+     */
+
+  }, {
+    key: 'restore',
+    value: function restore() {
+      Xut.style.setTranslate({
+        y: -this.markHeight,
+        speed: 1000,
+        node: this.bookMarkMenu
+      });
+    }
+
+    /**
+     * 销毁书签
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+
+      $off(this.parent);
+
+      //菜单部分
+      if (this.bookMarkMenu) {
+        this.bookMarkMenu.remove();
+        this.bookMarkMenu = null;
+      }
+
+      //列表部分
+      if (this.bookMarkList) {
+        this.bookMarkList.remove();
+        this.bookMarkList = null;
+      }
+
+      //按钮效果
+      if (this.bookMarkIcon) {
+        this.bookMarkIcon[0].removeEventListener(Xut.style.transitionEnd, this.iconRestore, false);
+        this.bookMarkIcon = null;
+      }
+
+      this.parent = null;
+    }
+  }]);
+  return Mark;
+}();
+
+/**
+ * 阅读模式工具栏
+ * @param options object
+ * @demo {$sceneNode:页面容器,$controlNode:工具栏容器,...}
+ * @desc 继承自Toolbar.js
+ */
+
+var BookBar = function (_BarSuper) {
+  inherits(BookBar, _BarSuper);
+
+  /*
+      arrowButton = false,
+      sceneNode,
+      toolType,
+      pageTotal
+   */
+  function BookBar(options) {
+    classCallCheck(this, BookBar);
+    return possibleConstructorReturn(this, (BookBar.__proto__ || Object.getPrototypeOf(BookBar)).call(this, options));
+  }
+
+  ////////////////////////
+  ///  私有方法
+  ///////////////////////
+
+
+  createClass(BookBar, [{
+    key: '_initState',
+    value: function _initState() {
+      //工具栏容器
+      this.$controlNode = this.$sceneNode.find('.xut-control-bar');
+      //是否有顶部工具栏
+      this.hasTopBar = true;
+      this.Lock = false;
+      this.delay = 50;
+
+      //图书工具栏高度
+      this.topBarHeight = this.$$iconHeight * 1.25;
+    }
+
+    /**
+     * 初始化
+     */
+
+  }, {
+    key: '_initToolbar',
+    value: function _initToolbar() {
+
+      //工具栏的显示状态
+      var display = this.$controlNode.css('display');
+      this.barStatus = display == 'none' ? false : true;
+      this._setToolbarStyle();
+
+      this._createBackIcon();
+      this._createDirIcon();
+      this._createMarkIcon();
+
+      // this._createStarIcon();
+
+      //翻页按钮
+      if (this.arrowButton) {
+        this._$$createArrows();
+      }
+
+      //监听事件
+      $on(this.$sceneNode, {
+        end: this,
+        cancel: this
+      });
+    }
+
+    /**
+     * 工具条的样式
+     */
+
+  }, {
+    key: '_setToolbarStyle',
+    value: function _setToolbarStyle() {
+      var height = this.topBarHeight;
+
+      //在顶部
+      this.$controlNode.css({
+        top: 0,
+        height: height + 'px',
+        paddingTop: this.$$barHeight + 'px', //系统工具栏占用的高度
+        backgroundColor: 'rgba(0, 0, 0, 0.2)', //transparent
+        fontSize: '0.625em',
+        color: 'white'
+      });
+    }
+
+    /**
+     *  font版本：创建目录图标
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_createDirIcon',
+    value: function _createDirIcon() {
+      var parent = document.createElement('div');
+      var icon = document.createElement('div');
+      var iconText = document.createElement('div');
+
+      parent.style.width = '48px';
+      parent.style.height = "100%";
+      parent.style.float = "left";
+      parent.style.marginLeft = "3vw";
+      parent.style.cursor = "pointer";
+      parent.style.position = "relative";
+
+      icon.style.fontSize = "2.5vh";
+      icon.style.color = "#fff";
+      icon.className = 'xut-icon-th-list2';
+      icon.style.position = "absolute";
+      icon.style.bottom = this.$$iconHeight * 0.5 + 'px';
+
+      iconText.innerHTML = '目录';
+      iconText.className = "xut-book-dirFont";
+      // iconText.style.height = "40%";
+      // iconText.style.width = "100%";
+      iconText.style.position = "absolute";
+      iconText.style.bottom = "0";
+
+      parent.appendChild(icon);
+      parent.appendChild(iconText);
+      this.$controlNode.append(parent);
+    }
+
+    /**
+     * font版本：创建书签图标
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_createMarkIcon',
+    value: function _createMarkIcon() {
+      var parent = document.createElement('div');
+      var icon = document.createElement('div');
+      var iconText = document.createElement('div');
+
+      parent.style.width = '48px';
+      parent.style.height = "100%";
+      parent.style.float = "left";
+      parent.style.marginLeft = "1vw";
+      parent.style.cursor = "pointer";
+      parent.style.position = "relative";
+
+      icon.style.fontSize = "2.5vh";
+      icon.style.color = "#fff";
+      icon.style.position = "absolute";
+      icon.style.bottom = this.$$iconHeight * 0.5 + 'px';
+      icon.className = 'xut-icon-bookmark2';
+
+      iconText.innerHTML = '书签';
+      iconText.className = "xut-book-markFont";
+      //iconText.style.height = "40%";
+      iconText.style.position = "absolute";
+      iconText.style.bottom = "0";
+
+      parent.appendChild(icon);
+      parent.appendChild(iconText);
+      this.$controlNode.append(parent);
+    }
+
+    /**
+     * 创建评分图标
+     */
+
+  }, {
+    key: '_createStarIcon',
+    value: function _createStarIcon(bar) {
+      var icon = document.createElement('div');
+      icon.innerHTML = '评分';
+      icon.style.width = this.$$iconHeight + 'px';
+      icon.style.lineHeight = 1.5 * this.topBarHeight + 'px';
+      icon.className = 'xut-book-bar-star';
+      this.$controlNode.append(icon);
+    }
+
+    /**
+     * font字体版本：后退按钮
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_createBackIcon',
+    value: function _createBackIcon() {
+      var icon = document.createElement('div');
+      icon.style.width = this.topBarHeight + 'px';
+      icon.style.lineHeight = this.topBarHeight + 'px';
+      icon.style.color = "#fff";
+
+      icon.className = 'xut-icon-angle-left xut-icon-book-bar';
+      icon.style.fontSize = "6vh";
+      this.$controlNode.append(icon);
+    }
+
+    /**
+     * 创建目录菜单
+     */
+
+  }, {
+    key: '_createDirMenu',
+    value: function _createDirMenu() {
+      var self = this;
+      var wrap = document.createElement('div');
+      var mask = document.createElement('div');
+      //添加遮层
+      mask.className = 'xut-book-menu-mask';
+      //获取内容
+      this._getDirContent();
+      wrap.className = 'xut-book-menu';
+      wrap.innerHTML = '<ul>' + this.contentText + '</ul>';
+      this.$sceneNode.append(wrap);
+      //是否滚动
+      this.isScrolled = false;
+
+      //添加滚动条
+      //url : http://iscrolljs.com/
+      this.iscroll = IScroll(wrap, {
+        scrollbars: 'custom',
+        fadeScrollbars: true,
+        scrollX: false
+      });
+
+      this.menu = wrap;
+
+      this._setColor();
+
+      this.iscroll.on('scrollStart', function (e) {
+        self.isScrolled = true;
+      });
+
+      this.iscroll.on('scrollEnd', function (e) {
+        self.isScrolled = false;
+      });
+
+      wrap.appendChild(mask);
+    }
+
+    /**
+     *  显示目录菜单
+     */
+
+  }, {
+    key: '_showDirMenu',
+    value: function _showDirMenu() {
+      //获取当前页面
+      var page = Xut.Presentation.GetPageElement();
+
+      if (this.menu) {
+        this.menu.style.display = 'block';
+      } else {
+        this._createDirMenu();
+      }
+
+      //添加模糊效果
+      page.addClass('filter');
+      this.page = page;
+
+      //隐藏顶部工具栏
+      this.$controlNode.hide();
+      var iscroll = this.iscroll;
+      //自动定位到上一位置
+      if (iscroll.y > iscroll.wrapperHeight) {
+        iscroll.scrollToElement(this.selectedChild);
+      }
+    }
+
+    /**
+     *  隐藏目录菜单
+     */
+
+  }, {
+    key: '_hideDirMenu',
+    value: function _hideDirMenu() {
+      this.menu.style.display = 'none';
+      //恢复顶部工具栏
+      this.$controlNode.show();
+      //移除模糊效果
+      this.page.removeClass('filter');
+    }
+
+    /**
+     *  创建目录内容
+     */
+
+  }, {
+    key: '_getDirContent',
+    value: function _getDirContent() {
+
+      var Api = Xut.Presentation;
+      var data = Api.GetAppSectionData();
+      var sns = data[0];
+      var seaonId = sns._id;
+      var cids = Xut.data.Chapter;
+
+      ////////////////////////////
+      //针对book模式，合并了Season的参数 //
+      //1 SeasonTitle
+      //2 ChapterList列表的范围区间
+      ////////////////////////////
+      data = parseJSON(sns.parameter);
+
+      if (!data) {
+        console.log('book模式parameter数据出错');
+        return;
+      }
+
+      //二级目录
+      function secondaryDirectory(startCid, endCid) {
+        var cid,
+            str = '';
+        for (startCid; startCid <= endCid; startCid++) {
+          cid = cids.item(startCid - 1);
+          if (cid && cid.chapterTitle) {
+            str += '<section><a class="xut-book-menu-item" data-mark=' + seaonId + '-' + startCid + ' href="javascript:0">' + cid.chapterTitle + '</a></section>';
+          }
+        }
+        return str;
+      }
+
+      var i = 0;
+      var len = data.length;
+      var li = '<li class="title"><center class="select">目录</center></li>';
+      var seasonInfo, mark, seasonTitle, seaonId, startCid, endCid;
+
+      for (i; i < len; i++) {
+        seasonInfo = data[i];
+        startCid = seasonInfo.ChapterList[0];
+        endCid = seasonInfo.ChapterList[1];
+        mark = seaonId + '-' + startCid;
+        if (seasonInfo.SeasonTitle.length <= 0) continue;
+        seasonTitle = seasonInfo.SeasonTitle || '第' + (i + 1) + '章';
+        //第一级目录
+        li += '<li>' + '<a class="xut-book-menu-item" data-mark="' + mark + '" href="javascript:0">' + seasonTitle + '</a>' +
+        //第二级目录
+        secondaryDirectory(startCid, endCid) + '</li>';
+      }
+
+      this.contentText = li;
+    }
+
+    /**
+     * 突出显示点击颜色
+     */
+
+  }, {
+    key: '_setColor',
+    value: function _setColor(element) {
+      if (this.selectedChild) {
+        this.selectedChild.className = 'xut-book-menu-item';
+      }
+      if (!element || !this.menu) {
+        return;
+      }
+      element = element || this.menu.querySelectorAll('li')[0].children[0];
+      element.className = 'select';
+      this.selectedChild = element;
+    }
+
+    /**
+     * 跳转到指定书页
+     */
+
+  }, {
+    key: '_turnToPage',
+    value: function _turnToPage(target) {
+      //忽略滚动点击
+      if (this.isScrolled) return;
+      this._setColor(target);
+      this._hideDirMenu();
+      var data = target.dataset.mark || '';
+      if (data) {
+        data = data.split('-');
+        Xut.View.LoadScenario({
+          'seasonId': data[0],
+          'chapterId': data[1]
+        });
+      }
+    }
+
+    /**
+     * 显示书签
+     */
+
+  }, {
+    key: '_showBookMark',
+    value: function _showBookMark() {
+      if (this.bookMark) {
+        this.bookMark.restore();
+      } else {
+        var pageData = Xut.Presentation.GetPageData();
+        this.bookMark = new Mark({
+          parent: this.$sceneNode,
+          seasonId: pageData.seasonId,
+          pageId: pageData._id
+        });
+      }
+    }
+
+    /**
+     * 返回首页
+     */
+
+  }, {
+    key: '_goBack',
+    value: function _goBack() {
+      var self = this;
+      Xut.Application.Suspend({
+        processed: function processed() {
+          Xut.View.GotoSlide(1); //调整到首页
+          self._setColor();
+        }
+      });
+    }
+
+    /**
+     * 相应事件
+     * @param  {[type]} e [description]
+     * @return {[type]}   [description]
+     */
+
+  }, {
+    key: 'handleEvent',
+    value: function handleEvent(e) {
+      var target = e.target || e.srcElement;
+      $handle({
+        end: function end(e) {
+          switch ($target(e).className) {
+            case 'xut-icon-angle-left xut-icon-book-bar':
+              this._goBack();
+              //返回
+              break;
+            case 'xut-icon-th-list2':
+            case 'xut-book-dirFont':
+              //目录
+              this._showDirMenu();
+              break;
+            case 'xut-icon-bookmark2':
+            case 'xut-book-markFont':
+              //书签
+              this._showBookMark();
+              break;
+            case 'xut-book-bar-star':
+              //评分
+              break;
+            case 'xut-book-menu-item':
+              //跳转
+              this._turnToPage(target);
+              break;
+            case 'xut-book-menu-mask':
+            case 'select':
+              this._hideDirMenu();
+              break;
+            default:
+              // console.log(name+':undefined')
+              break;
+          }
+        }
+      }, this, e);
+    }
+
+    ////////////////////////
+    ///  提供super接口
+    ///////////////////////
+
+    /**
+     * 显示顶部工具栏
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_showTopBar',
+    value: function _showTopBar() {
+      var that = this;
+
+      if (this.barStatus) {
+        this.Lock = false;
+        return;
+      }
+
+      this.$controlNode.css({
+        'display': 'block',
+        'opacity': 0
+      });
+
+      setTimeout(function () {
+        that.$controlNode.transition({
+          'opacity': 1
+        }, that.delay, 'linear', function () {
+          that._$$showSystemBar();
+          that.barStatus = true;
+          that.Lock = false;
+        });
+      }, 50);
+    }
+
+    /**
+     * 隐藏顶部工具栏
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_hideTopBar',
+    value: function _hideTopBar() {
+      var that = this;
+
+      if (!this.barStatus) {
+        this.Lock = false;
+        return;
+      }
+
+      this.$controlNode.transition({
+        'opacity': 0
+      }, that.delay, 'linear', function () {
+        that.$controlNode.hide();
+        that._$$hideSystemBar();
+        that.barStatus = false;
+        that.Lock = false;
+      });
+    }
+
+    /**
+     * 销毁
+     */
+
+  }, {
+    key: '_destroy',
+    value: function _destroy() {
+      this.iscroll && this.iscroll.destroy();
+      this.bookMark && this.bookMark.destroy();
+      $off(this.$sceneNode);
+      this.iscroll = null;
+      this.menu = null;
+      this.page = null;
+    }
+
+    ////////////////////////
+    ///  对外接口
+    ///////////////////////
+
+    /**
+     * 更新页码
+     */
+
+  }, {
+    key: 'updatePointer',
+    value: function updatePointer() {
+      //预留
+    }
+  }]);
+  return BookBar;
 }(BarSuper);
 
 /**
@@ -78852,9 +79851,22 @@ var SceneFactory = function () {
       //配置文件
       var barConfig = {};
 
-      //主场景工具栏设置
+      ///////////////////
+      /// 主场景工具栏设置
+      //////////////////
       if (this.isMain) {
         barConfig = getMainBar(seasonId, pageTotal);
+
+        //word模式，自动启动工具条
+        //秒秒学中会使用
+        // if (config.launch.visualMode === 1) {
+        //   this.mainToolbar = new BookBar({
+        //     $sceneNode: $sceneNode,
+        //     arrowButton: barConfig.pageMode === 2
+        //   })
+        // }
+        //如果工具栏提供可配置选项
+        //或者pageMode带有翻页按钮
         if (_.some(barConfig.toolType)) {
           this.mainToolbar = new IosBar({
             $sceneNode: $sceneNode,
@@ -78865,7 +79877,9 @@ var SceneFactory = function () {
           });
         }
       } else {
-        //副场工具栏配置
+        ///////////////////
+        /// 副场工具栏配置
+        //////////////////
         barConfig = getDeputyBar(this.barInfo, pageTotal);
         if (_.some(barConfig.toolType)) {
           this.deputyToolbar = new fnBar({
@@ -80015,7 +81029,7 @@ function initGlobalAPI() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.8;
+Xut.Version = 889.9;
 
 /**
  * 代码初始化

@@ -22,34 +22,36 @@ const initMain = novelData => {
   }
 
   /**
+   * 切换切换模式
    * 多模式判断
    * 如果
    *   缓存存在
    *   否则数据库解析
          全局翻页模式
-         0 滑动翻页 =》allow
-         1 直接换  =》ban
+         0 滑动翻页 =》true
+         1 直接换  =》 false
    * 所以pageFlip只有在左面的情况下
+   * @type {Boolean}
    */
-
   if (novelData.parameter) {
     const parameter = parseJSON(novelData.parameter)
     /*全局优先设置覆盖*/
-    if (config.launch.banMove === undefined && parameter.pageflip !== undefined) {
+    if (config.launch.gestureGlide === undefined && parameter.pageflip !== undefined) {
       switch (Number(parameter.pageflip)) {
-        case 0: //允许翻页
-          config.launch.banMove = false
+        case 0: //滑动翻页
+          config.launch.gestureGlide = true
           break;
-        case 1: //禁止翻页
-          config.launch.banMove = true
+        case 1: //直接换
+          config.launch.pageFlip = true
+          config.launch.gestureGlide = false
           break
       }
     }
   }
 
-  /*默认不锁定页面*/
-  if (config.launch.banMove === undefined) {
-    config.launch.banMove = false
+  /*默认不锁定页面，支持手势滑动*/
+  if (config.launch.gestureGlide === undefined) {
+    config.launch.gestureGlide = true
   }
 
   /**

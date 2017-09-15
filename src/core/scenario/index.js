@@ -4,6 +4,7 @@ import { getColumnCount, getColumnChapterCount } from '../component/column/api'
 
 import MainBar from '../toolbar/ppt/main-iosbar/index'
 import DeputyBar from '../toolbar/ppt/deputy-fnbar'
+import BookBar from '../toolbar/ppt/word-bookbar/index'
 import MiniBar from '../toolbar/mini/index'
 
 import { mainScene, deputyScene } from './factory/layout'
@@ -75,7 +76,7 @@ export class SceneFactory {
 
       //主场景有历史记录，并且没有chapterId的时候
       //主动赋值，因为没有读取数据
-      if(data.isMain && data.history && !data.chapterId){
+      if (data.isMain && data.history && !data.chapterId) {
         data.chapterId = 1
       }
 
@@ -135,9 +136,22 @@ export class SceneFactory {
     //配置文件
     let barConfig = {}
 
-    //主场景工具栏设置
+    ///////////////////
+    /// 主场景工具栏设置
+    //////////////////
     if (this.isMain) {
       barConfig = getMainBar(seasonId, pageTotal)
+
+      //word模式，自动启动工具条
+      //秒秒学中会使用
+      // if (config.launch.visualMode === 1) {
+      //   this.mainToolbar = new BookBar({
+      //     $sceneNode: $sceneNode,
+      //     arrowButton: barConfig.pageMode === 2
+      //   })
+      // }
+      //如果工具栏提供可配置选项
+      //或者pageMode带有翻页按钮
       if (_.some(barConfig.toolType)) {
         this.mainToolbar = new MainBar({
           $sceneNode: $sceneNode,
@@ -148,7 +162,9 @@ export class SceneFactory {
         })
       }
     } else {
-      //副场工具栏配置
+      ///////////////////
+      /// 副场工具栏配置
+      //////////////////
       barConfig = getDeputyBar(this.barInfo, pageTotal)
       if (_.some(barConfig.toolType)) {
         this.deputyToolbar = new DeputyBar({

@@ -1,8 +1,14 @@
-import BookMark from './mark'
-import { parseJSON } from '../../util/index'
-import { $on, $off, $handle, $target } from '../../util/event'
-import { IScroll } from '../../expand/iscroll'
 import BarSuper from '../super'
+import BookMark from './mark'
+import { IScroll } from '../../../expand/iscroll'
+import {
+  $on,
+  $off,
+  $handle,
+  $target,
+  parseJSON
+} from '../../../util/index'
+
 /**
  * 阅读模式工具栏
  * @param options object
@@ -15,8 +21,7 @@ export default class BookBar extends BarSuper {
       arrowButton = false,
       sceneNode,
       toolType,
-      pageTotal,
-      currentPage
+      pageTotal
    */
   constructor(options) {
     super(options)
@@ -35,7 +40,8 @@ export default class BookBar extends BarSuper {
     this.hasTopBar = true
     this.Lock = false
     this.delay = 50
-      //图书工具栏高度
+
+    //图书工具栏高度
     this.topBarHeight = this.$$iconHeight * 1.25
   }
 
@@ -112,8 +118,8 @@ export default class BookBar extends BarSuper {
 
     iconText.innerHTML = '目录';
     iconText.className = "xut-book-dirFont"
-      // iconText.style.height = "40%";
-      // iconText.style.width = "100%";
+    // iconText.style.height = "40%";
+    // iconText.style.width = "100%";
     iconText.style.position = "absolute";
     iconText.style.bottom = "0";
 
@@ -147,7 +153,7 @@ export default class BookBar extends BarSuper {
 
     iconText.innerHTML = '书签';
     iconText.className = "xut-book-markFont"
-      //iconText.style.height = "40%";
+    //iconText.style.height = "40%";
     iconText.style.position = "absolute";
     iconText.style.bottom = "0";
 
@@ -217,11 +223,11 @@ export default class BookBar extends BarSuper {
 
     this._setColor();
 
-    this.iscroll.on('scrollStart', function (e) {
+    this.iscroll.on('scrollStart', function(e) {
       self.isScrolled = true;
     });
 
-    this.iscroll.on('scrollEnd', function (e) {
+    this.iscroll.on('scrollEnd', function(e) {
       self.isScrolled = false;
     });
 
@@ -335,7 +341,10 @@ export default class BookBar extends BarSuper {
     if (this.selectedChild) {
       this.selectedChild.className = 'xut-book-menu-item';
     }
-    element = element || this.menu.querySelectorAll('li')[1].children[0];
+    if(!element || !this.menu){
+      return
+    }
+    element = element || this.menu.querySelectorAll('li')[0].children[0];
     element.className = 'select';
     this.selectedChild = element;
   }
@@ -379,10 +388,10 @@ export default class BookBar extends BarSuper {
   /**
    * 返回首页
    */
-  static goBack() {
+  _goBack() {
     var self = this;
     Xut.Application.Suspend({
-      processed: function () {
+      processed() {
         Xut.View.GotoSlide(1) //调整到首页
         self._setColor();
       }
@@ -401,7 +410,7 @@ export default class BookBar extends BarSuper {
       end(e) {
         switch ($target(e).className) {
           case 'xut-icon-angle-left xut-icon-book-bar':
-            this.goBack();
+            this._goBack();
             //返回
             break;
           case 'xut-icon-th-list2':
@@ -456,10 +465,10 @@ export default class BookBar extends BarSuper {
       'opacity': 0
     });
 
-    setTimeout(function () {
+    setTimeout(function() {
       that.$controlNode.transition({
         'opacity': 1
-      }, that.delay, 'linear', function () {
+      }, that.delay, 'linear', function() {
         that._$$showSystemBar();
         that.barStatus = true;
         that.Lock = false;
@@ -482,7 +491,7 @@ export default class BookBar extends BarSuper {
 
     this.$controlNode.transition({
       'opacity': 0
-    }, that.delay, 'linear', function () {
+    }, that.delay, 'linear', function() {
       that.$controlNode.hide();
       that._$$hideSystemBar();
       that.barStatus = false;

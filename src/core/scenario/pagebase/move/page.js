@@ -7,13 +7,13 @@ import { translation } from './translation'
  * @param  {[type]} baseProto [description]
  * @return {[type]}           [description]
  */
-export default function (baseProto) {
+export default function(baseProto) {
 
   /**
    * 页面移动
    * @return {[type]} [description]
    */
-  baseProto.movePage = function (action, distance, speed, viewOffset, outerCallFlip) {
+  baseProto.movePage = function(action, distance, speed, viewOffset, outerCallFlip) {
 
     const pageNode = this.$pageNode[0]
 
@@ -84,7 +84,7 @@ export default function (baseProto) {
          只处理Visual页面
          这里必须监控data-visual是否被移除了，才能正确处理
          */
-        timer = setTimeout(function () {
+        timer = setTimeout(function() {
           clearTimeout(timer)
           timer = null
           if (pageNode.getAttribute('data-visual')) {
@@ -101,10 +101,10 @@ export default function (baseProto) {
     toTranslateCB = () => {
       /*
       2种情况下会主动触发翻页结束回调
-      1.banMove，关闭了翻页效果，并且是可视区页面
+      1.gestureGlide，关闭了翻页效果,直接跳页面，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if (isVisual && (fixQuickFlip || config.launch.banMove)) {
+      if (isVisual && (fixQuickFlip || !config.launch.gestureGlide)) {
         Xut.View.SetSwiperFilpComplete(pageNode, true)
         return true
       }

@@ -30,9 +30,21 @@ function configMultiple(options) {
     let pageMode = Number(options.pageMode)
 
     //如果是禁止翻页，然后还要看是不是有pageMode的设置
-    if (config.launch.banMove) {
+    if (!config.launch.gestureGlide) {
+
+      //喵喵学模式比较特别
+      //在数据里中设定了filpMode为1
+      //那么就是锁定了不允许翻页，但是还要能支持左右跳页面
+      //这里就需要按照多页面的模式处理
+      //强制是多页面的方式创建，但是锁住翻页而已
+      if (config.launch.pageFlip) {
+        options.hasMultiPage = true
+        return
+      }
+
       options.hasMultiPage = false
-      if (pageMode > 0) { //如果工具栏单独设置了页面模式，那么多页面强制改成true
+      //如果工具栏单独设置了页面模式，那么多页面强制改成true
+      if (pageMode > 0) {
         options.hasMultiPage = true
       }
     } else {

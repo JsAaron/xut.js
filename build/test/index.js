@@ -7,16 +7,13 @@ const buildName = process.argv[process.argv.length - 1]
 
 killOccupied(prot, () => {
   let baseDir = 'ppt-template'
-  if (buildName === 'duku-online') {
-    baseDir = 'test/duku-online'
-  }
-  if (buildName === 'ppt-template') {
-    baseDir = 'ppt-template'
+  if (buildName) {
+    baseDir = buildName
   }
   const bs = browserSync({
     port: prot,
     server: {
-      baseDir: baseDir,
+      baseDir: './test/' + baseDir,
       index: "index.html"
     },
     open: true

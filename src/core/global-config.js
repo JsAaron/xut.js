@@ -74,12 +74,18 @@ export default {
   scrollMode: 'h',
 
   /**
-   * 是否锁定页面移动
-   * false 不锁定，可以移动
-   * true 锁定，不能移动
+   * 切换切换模式
+   * 多模式判断
+   * 如果
+   *   缓存存在
+   *   否则数据库解析
+         数据库filpMode全局翻页模式
+         0 滑动翻页 =》true
+         1 直接换  =》 false
+   * 所以pageFlip只有在左面的情况下
    * @type {Boolean}
    */
-  banMove: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
+  gestureGlide: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
 
   /**
    * 是否预加载资源

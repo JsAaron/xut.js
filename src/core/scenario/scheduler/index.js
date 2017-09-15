@@ -357,7 +357,7 @@ export default class Scheduler {
 
     //用户强制直接切换模式
     //禁止页面跟随滑动
-    if (config.launch.banMove && action == 'flipMove') {
+    if (!config.launch.gestureGlide && action == 'flipMove') {
       return
     }
 

@@ -852,7 +852,7 @@ video {
     filter: blur(5px);
 }
 /*阅读模式工具栏*/
-.icon-book-bar {
+.xut-icon-book-bar {
     width: 48px;
     height: 100%;
     background-repeat: no-repeat;
