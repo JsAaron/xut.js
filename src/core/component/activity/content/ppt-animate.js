@@ -181,12 +181,6 @@ export default class Animation {
     this.pptObj = callback(Powepoint)
   }
 
-  _cleanTimer() {
-    if (this.imageTimer) {
-      clearTimeout(this.imageTimer)
-      this.imageTimer = null
-    }
-  }
 
   /**
    * 绑定动画
@@ -238,18 +232,14 @@ export default class Animation {
         if (this.useDynamicDiagram) {
           //如果是一次性动画
           //如果存在重复点击的情况
-          //需要先删除在赋值
-          //考虑点击速度过快，增加定时器控制
-          cleanImage(this.$contentNode, 'show', 'clone')
-          this._cleanTimer()
-          this.imageTimer = setTimeout(() => {
-            if (this.$contentNode) {
-              setImage(this.$contentNode, this.contentData.resourcePath)
-            }
-            if (this[key]) {
-              this[key].play && this[key].play(playComplete)
-            }
-          }, 0)
+          //重新给img的src赋值
+          //解决闪动问题
+          if (this.$contentNode) {
+            setImage(this.$contentNode, this.contentData.resourcePath)
+          }
+          if (this[key]) {
+            this[key].play && this[key].play(playComplete)
+          }
         } else {
           this[key].play && this[key].play(playComplete)
         }
@@ -301,10 +291,6 @@ export default class Animation {
   destroy(chapterId) {
 
     access((key) => {
-      if (key === 'pptObj') {
-        //销毁ppt音频
-        // audioHandle(clearContentAudio, this[key].options, chapterId);
-      }
       this[key] && this[key].destroy && this[key].destroy()
     })
 
@@ -317,8 +303,6 @@ export default class Animation {
     if (this.contentData.$contentNode) {
       this.contentData.$contentNode = null;
     }
-
-    this._cleanTimer()
 
     access((key) => {
       this[key] = null

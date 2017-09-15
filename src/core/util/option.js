@@ -437,7 +437,7 @@ export function reviseSize({
  * clone   克隆一份解决删除的闪动
  * default: 'hide'
  */
-export function cleanImage(context, action, clone) {
+export function cleanImage(context, action) {
 
   if (!context) {
     return
@@ -484,8 +484,6 @@ export function setImage(context, path) {
     context = $(context)
   }
   context.find('img').each(function(index, img) {
-    if (!img.src) {
       img.src = path
-    }
   })
 }

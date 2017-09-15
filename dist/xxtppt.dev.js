@@ -44090,7 +44090,7 @@ function reviseSize(_ref2) {
  * clone   克隆一份解决删除的闪动
  * default: 'hide'
  */
-function cleanImage(context, action, clone) {
+function cleanImage(context, action) {
 
   if (!context) {
     return;
@@ -44141,9 +44141,7 @@ function setImage(context, path) {
     context = $(context);
   }
   context.find('img').each(function (index, img) {
-    if (!img.src) {
-      img.src = path;
-    }
+    img.src = path;
   });
 }
 
@@ -59141,14 +59139,6 @@ var Animation = function () {
       //ppt动画
       this.pptObj = callback(Powepoint);
     }
-  }, {
-    key: '_cleanTimer',
-    value: function _cleanTimer() {
-      if (this.imageTimer) {
-        clearTimeout(this.imageTimer);
-        this.imageTimer = null;
-      }
-    }
 
     /**
      * 绑定动画
@@ -59209,18 +59199,14 @@ var Animation = function () {
           if (_this3.useDynamicDiagram) {
             //如果是一次性动画
             //如果存在重复点击的情况
-            //需要先删除在赋值
-            //考虑点击速度过快，增加定时器控制
-            cleanImage(_this3.$contentNode, 'show', 'clone');
-            _this3._cleanTimer();
-            _this3.imageTimer = setTimeout(function () {
-              if (_this3.$contentNode) {
-                setImage(_this3.$contentNode, _this3.contentData.resourcePath);
-              }
-              if (_this3[key]) {
-                _this3[key].play && _this3[key].play(playComplete);
-              }
-            }, 0);
+            //重新给img的src赋值
+            //解决闪动问题
+            if (_this3.$contentNode) {
+              setImage(_this3.$contentNode, _this3.contentData.resourcePath);
+            }
+            if (_this3[key]) {
+              _this3[key].play && _this3[key].play(playComplete);
+            }
           } else {
             _this3[key].play && _this3[key].play(playComplete);
           }
@@ -59283,10 +59269,6 @@ var Animation = function () {
       var _this6 = this;
 
       access(function (key) {
-        if (key === 'pptObj') {
-          //销毁ppt音频
-          // audioHandle(clearContentAudio, this[key].options, chapterId);
-        }
         _this6[key] && _this6[key].destroy && _this6[key].destroy();
       });
 
@@ -59299,8 +59281,6 @@ var Animation = function () {
       if (this.contentData.$contentNode) {
         this.contentData.$contentNode = null;
       }
-
-      this._cleanTimer();
 
       access(function (key) {
         _this6[key] = null;
@@ -81029,7 +81009,7 @@ function initGlobalAPI() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 889.9;
+Xut.Version = 890;
 
 /**
  * 代码初始化
