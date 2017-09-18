@@ -115,7 +115,6 @@ export default class Powepoint {
   /**
    * 解析脚本代码
    * 包装能函数
-   * @return {[type]} [description]
    */
   _parseCode(code1, code2) {
     if (code1 && code1.length > 0) {
@@ -127,9 +126,6 @@ export default class Powepoint {
 
   /**
    * 解析延时脚本
-   * @param  {[type]} code1 [description]
-   * @param  {[type]} code2 [description]
-   * @return {[type]}       [description]
    */
   _parseDelayCode(code1, code2) {
     if (code1 && code1.length > 0) {
@@ -142,7 +138,6 @@ export default class Powepoint {
   /**
    * 根据数据库的设置
    * 对象初始化(visibility)
-   * @return {[type]} [description]
    */
   _initElement() {
 
@@ -212,11 +207,8 @@ export default class Powepoint {
 
   }
 
-
   /**
    * 获取对象相关信息
-   * @param  {[type]} object [description]
-   * @return {[type]}        [description]
    */
   _getObjectInfo(object) {
     var width = ROUND(object.width()); //四舍五入取整
@@ -252,14 +244,8 @@ export default class Powepoint {
     };
   }
 
-
-
   /**
    * 子动画通用开始事件
-   * @param  {[type]} parameter [description]
-   * @param  {[type]} object    [description]
-   * @param  {[type]} params    [description]
-   * @return {[type]}           [description]
    */
   _startHandler(parameter, object, params) {
     for (var item in params) {
@@ -329,10 +315,6 @@ export default class Powepoint {
 
   /**
    * 子动画通用结束事件
-   * @param  {[type]} parameter [description]
-   * @param  {[type]} object    [description]
-   * @param  {[type]} params    [description]
-   * @return {[type]}           [description]
    */
   _completeHandler(parameter, object, params) {
     for (var item in params) {
@@ -376,9 +358,6 @@ export default class Powepoint {
 
   /**
    * 返回动画对象
-   * @param  {[type]} data  [description]
-   * @param  {[type]} index [description]
-   * @return {[type]}       [description]
    */
   _getTimeline(data, index) {
     var object = this.element;
