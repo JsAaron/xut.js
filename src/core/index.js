@@ -1,50 +1,11 @@
-import main from './main/index'
+import initApp from './initialize/index'
 import { config } from './config/index'
-import { slashPostfix, nextTick } from './util/index'
-import { initAudio } from './component/audio/api'
-import { initVideo } from './component/video/api'
-import { initRootNode } from './initialize/root-node'
-import { initGlobalEvent } from './initialize/golbal-event'
-import { initAsyn } from './initialize/asyn'
-import { initGlobalAPI } from './global-api/index'
-import { priorityConfig } from './config/launch-config'
+import { removeSlash, mixGolbalConfig } from './util/index'
 
 /////////////////
 ////  版本号  ////
 /////////////////
 Xut.Version = 890
-
-/**
- * 代码初始化
- */
-initAudio()
-initVideo()
-initGlobalAPI()
-
-/**
- * 加载应用app
- */
-function initApp(...arg) {
-  /*针对异步的代码以前检测出来*/
-  initAsyn(function() {
-    /*配置优先级*/
-    priorityConfig();
-    /*全局的一些事件处理*/
-    initGlobalEvent();
-    /*根节点*/
-    const { $rootNode, $contentNode } = initRootNode(...arg)
-    nextTick({ container: $rootNode, content: $contentNode }, main)
-  })
-}
-
-/**
- * 提供全局配置文件
- */
-function mixGolbalConfig(setConfig) {
-  if (setConfig) {
-    Xut.mixin(config.golbal, setConfig)
-  }
-}
 
 
 //接口接在参数,用户横竖切换刷新
@@ -110,7 +71,7 @@ Xut.Application.Launch = option => {
     config.launch = $.extend(true, { launchTime: (+new Date) }, option)
     if (option.path) {
       _.each(option.path, (value, key) => {
-        config.launch[key] = key === 'resource' ? slashPostfix(value) : value
+        config.launch[key] = key === 'resource' ? removeSlash(value) : value
       })
       delete config.launch.path
     }

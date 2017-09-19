@@ -11,7 +11,7 @@ import delegateHooks from './hooks'
 import { closestProcessor } from './closest'
 import Swiper from '../../swiper/index.js'
 import swiperHook from '../../swiper/hook.js'
-import { initSceneApi } from '../scene-api/index'
+import { initSceneApi } from '../../api/scene-api/index'
 import { defProtected, defAccess } from '../../util/index'
 
 /**
@@ -30,7 +30,7 @@ function configMultiple(options) {
     let pageMode = Number(options.pageMode)
 
     //如果是禁止翻页，然后还要看是不是有pageMode的设置
-    if (!config.launch.gestureGlide) {
+    if (!config.launch.gestureSwipe) {
 
       //喵喵学模式比较特别
       //在数据里中设定了filpMode为1

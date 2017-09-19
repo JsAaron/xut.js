@@ -120,7 +120,12 @@ export default class AudioSuper {
    * 如果嵌套了iframe必须要找parent的WeixinJSBridge
    */
   $$getWeixinJSBridge() {
-    return window.WeixinJSBridge || window.parent.WeixinJSBridge
+    if(window.WeixinJSBridge){
+      return window.WeixinJSBridge
+    }
+    if(window.parent && window.parent.WeixinJSBridge){
+      return window.parent.WeixinJSBridge
+    }
   }
 
 

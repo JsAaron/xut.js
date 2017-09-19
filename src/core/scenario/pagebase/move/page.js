@@ -101,10 +101,10 @@ export default function(baseProto) {
     toTranslateCB = () => {
       /*
       2种情况下会主动触发翻页结束回调
-      1.gestureGlide，关闭了翻页效果,直接跳页面，并且是可视区页面
+      1.gestureSwipe，关闭了翻页效果,直接跳页面，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if (isVisual && (fixQuickFlip || !config.launch.gestureGlide)) {
+      if (isVisual && (fixQuickFlip || !config.launch.gestureSwipe)) {
         Xut.View.SetSwiperFilpComplete(pageNode, true)
         return true
       }

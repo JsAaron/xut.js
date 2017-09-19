@@ -3,14 +3,14 @@
  * @param  {[type]} tableName [description]
  * @return {[type]}           [description]
  */
-export const dataOffset = (dataCache) => {
+export function dataOffset(dataCache) {
 
   const set = (tableName) => {
     let start
     let data = dataCache[tableName]
-    if(data.length) {
-      if(data.item(0)) {
-        if(start = data.item(0)._id) {
+    if (data.length) {
+      if (data.item(0)) {
+        if (start = data.item(0)._id) {
           dataCache[tableName].start = start
         }
       }
@@ -18,8 +18,8 @@ export const dataOffset = (dataCache) => {
   }
 
   //数据段标记
-  for(let key in dataCache) {
-    if(dataCache[key].item) {
+  for (let key in dataCache) {
+    if (dataCache[key].item) {
       set(key);
     }
   }
@@ -34,7 +34,7 @@ export const dataOffset = (dataCache) => {
  * [description]
  * @return {[type]} [description]
  */
-export const transformVideoActivity = (dataCache) => {
+export function transformVideoActivity(dataCache) {
   let data
   let activityIds = {}
   let video = dataCache.Video
@@ -44,7 +44,7 @@ export const transformVideoActivity = (dataCache) => {
     //确保activityIdID是有值，
     //这样才是靠activity关联的video,
     //而不是动画的video
-    if(data && data.activityId) {
+    if (data && data.activityId) {
       activityIds[data.activityId] = data._id;
     }
   })
@@ -69,25 +69,25 @@ export const transformSectionRelated = (dataCache) => {
   const findSeasonInfo = seasonId => {
     var temp,
       seasonNum = dataCache.Season.length;
-    while(seasonNum--) {
-      if(temp = dataCache.Season.item(seasonNum)) {
-        if(temp._id == seasonId) {
+    while (seasonNum--) {
+      if (temp = dataCache.Season.item(seasonNum)) {
+        if (temp._id == seasonId) {
           return temp;
         }
       }
     }
   }
 
-  for(i = 0; i < l; i++) {
+  for (i = 0; i < l; i++) {
     Chapters = Chapter.item(i);
-    if(Chapters) {
+    if (Chapters) {
       id = Chapters._id - 1; //保存兼容性,用0开头
       seasonId = Chapters.seasonId;
       sid = 'seasonId->' + seasonId;
       //如果不在集合,先创建
-      if(!container[sid]) {
+      if (!container[sid]) {
         //场景工具栏配置信息
-        if(seasonInfo = findSeasonInfo(seasonId)) {
+        if (seasonInfo = findSeasonInfo(seasonId)) {
           toolbar = seasonInfo.parameter;
         }
         container[sid] = {

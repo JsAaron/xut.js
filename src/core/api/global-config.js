@@ -85,7 +85,7 @@ export default {
    * 所以pageFlip只有在左面的情况下
    * @type {Boolean}
    */
-  gestureGlide: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
+  gestureSwipe: DEFAULT, //等之后全局设置，或者数据库填充，这里可以全局优先
 
   /**
    * 是否预加载资源

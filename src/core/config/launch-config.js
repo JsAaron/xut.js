@@ -7,7 +7,12 @@
 
 import { config } from './index'
 import { getSize } from './v-screen'
-import { setDelay, setDisable, setPath, resetCursor } from '../initialize/cursor'
+import {
+  setDelay,
+  setDisable,
+  setPath,
+  resetCursor
+} from '../expand/cursor'
 
 /**
  * 获取后缀

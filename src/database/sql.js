@@ -23,15 +23,12 @@ export function oneQuery(tableName, callback) {
  */
 export function dataQuery(callback) {
   //ibook模式，数据库外部注入的
-  if(Xut.IBooks.CONFIG) {
+  if (Xut.IBooks.CONFIG) {
     callback(Xut.IBooks.CONFIG.data);
   } else {
     //查询所有数据
-    execute(statement, function(successRet, collectError) {
-      callback(successRet, collectError);
-    })
+    execute(statement, (successRet, collectError) => callback(successRet, collectError))
   }
-
 }
 
 
@@ -43,9 +40,9 @@ export function dataRemove(tableName, id, success, fail) {
   var sql = 'delete from ' + tableName + ' where _id = ' + id;
   //查询所有数据
   execute(sql, function(success, failure) {
-    if(success) { //成功回调
+    if (success) { //成功回调
       success();
-    } else if(failure) { //失败回调
+    } else if (failure) { //失败回调
       fail();
     }
   })

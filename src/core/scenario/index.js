@@ -10,7 +10,7 @@ import MiniBar from '../toolbar/mini/index'
 import { mainScene, deputyScene } from './factory/layout'
 import { getMainBar, getDeputyBar } from './factory/parse-bar'
 import { sceneController } from './factory/control'
-import { removeCover } from '../initialize/root-node'
+import { removeCover } from '../expand/root-node'
 
 /**
  * 找到对应容器

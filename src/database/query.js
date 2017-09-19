@@ -2,7 +2,7 @@
  * 根据指定的chpaterId解析
  * @return {[type]} [description]
  */
-const scenarioChapter = function(chapterId) {
+function scenarioChapter(chapterId) {
   var chapterSection = Xut.data.chapterSection;
   var rang = chapterSection['seasonId->' + chapterId];
   return rang;
@@ -15,18 +15,18 @@ const scenarioChapter = function(chapterId) {
  * chpater直接对应页面的ID编码，直接去下标即可
  * waitCreatePointer     需要分解的页面
  */
-const parseChapter = function(createPointer) {
+function parseChapter(createPointer) {
 
   let points = createPointer.length
   let chapter, key
   let dataChpater = Xut.data.Chapter
 
   //如果是合集
-  if(points) {
+  if (points) {
     let chapterDataset = []
-    while(points--) {
+    while (points--) {
       key = createPointer[points];
-      if(chapter = dataChpater.item(key)) {
+      if (chapter = dataChpater.item(key)) {
         chapterDataset.unshift(chapter);
       }
     }
@@ -45,7 +45,7 @@ const parseChapter = function(createPointer) {
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-const getMasterData = function(data, callback) {
+function getMasterData(data, callback) {
   var pptMaster = data['pptMaster'];
   var masterData = Xut.data.query('Master', pptMaster)
   makeActivitys(masterData, function(activitys, autoData) {
@@ -61,9 +61,9 @@ const getMasterData = function(data, callback) {
  * @param  {[type]} activitys [description]
  * @return {[type]}           [description]
  */
-const makeAuto = function(activityData) {
+function makeAuto(activityData) {
 
-  if(!activityData || !activityData.length) return
+  if (!activityData || !activityData.length) return
 
   let sub;
   //自动热点
@@ -72,7 +72,7 @@ const makeAuto = function(activityData) {
   activityData.forEach((target, b) => {
     //如果是自动播放,并且满足自定义条件
     //并且不是content类型
-    if(target.autoPlay && target.actType !== 'Content') {
+    if (target.autoPlay && target.actType !== 'Content') {
       //增加note提示信息数据
       // id = target._id
       // key = target.actType ? target.actType + "_" + id : 'showNote_' + id
@@ -96,8 +96,8 @@ const makeAuto = function(activityData) {
  * shownote是chater的信息，混入到activity列表中当作每页的对象处理
  * @return {[type]} [description]
  */
-const mixShowNote = function(oneChapter, activityData) {
-  if(oneChapter.note) {
+function mixShowNote(oneChapter, activityData) {
+  if (oneChapter.note) {
     activityData.push(oneChapter);
   }
 }
@@ -111,8 +111,8 @@ const mixShowNote = function(oneChapter, activityData) {
  *     pageIndex-14: Object
  *  }
  **/
-const makeActivitys = function(chapterData, callback) {
-  if(!chapterData) callback()
+function makeActivitys(chapterData, callback) {
+  if (!chapterData) callback()
 
   const activitys = []
   const chapterId = chapterData._id
@@ -139,7 +139,7 @@ const makeActivitys = function(chapterData, callback) {
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-const getActivitys = function(chapterData, callback) {
+function getActivitys(chapterData, callback) {
   makeActivitys(chapterData, function(activitys, autoData) {
     callback(chapterData, activitys, autoData);
   })
@@ -154,10 +154,10 @@ const getActivitys = function(chapterData, callback) {
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-const getPageData = function(data, callback) {
+function getPageData(data, callback) {
   let parsePointer = data.pageIndex
   let chapterData = data.pageData
-  if(chapterData) {
+  if (chapterData) {
     getActivitys(chapterData, callback);
   } else {
     //解析章节数据
@@ -176,7 +176,7 @@ const getPageData = function(data, callback) {
  * @return {[type]}             [description]
  */
 export function query(tableName, options, callback) {
-  switch(tableName) {
+  switch (tableName) {
     case 'page':
       //得到页面关联的数据
       return getPageData(options, callback);

@@ -1,12 +1,18 @@
 /**
- * 数据配置
+ * 数据配置接口文件
  */
 export default {
 
-  /*应用novelId*/
+  /**
+   * 应用novelId
+   * @type {[type]}
+   */
   novelId:null,
 
-  /*应用页码索引*/
+  /**
+   * 应用页码索引
+   * @type {[type]}
+   */
   pageIndex:null,
 
   /**

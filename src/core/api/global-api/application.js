@@ -4,11 +4,11 @@
  *  整个应用程序的接口，执行应用级别的操作，例如退出应用之类
  * **************************************************/
 
-import { config } from '../config/index'
-import { $getStorage } from '../util/index'
-import { Observer } from '../observer/index'
+import { config } from '../../config/index'
+import { $getStorage } from '../../util/index'
+import { Observer } from '../../observer/index'
 import globalDestroy from '../global-destroy'
-import { $autoRun, $original, $suspend, $stop } from '../scenario/command/index'
+import { $autoRun, $original, $suspend, $stop } from '../../scenario/command/index'
 
 export function initApplication() {
 

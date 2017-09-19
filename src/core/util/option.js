@@ -11,7 +11,7 @@ const slashRE = /\/$/
  * 去掉后缀的斜杠
  * @return {[type]} [description]
  */
-export function slashPostfix(resource) {
+export function removeSlash(resource) {
   if (resource && slashRE.test(resource)) {
     return resource.substring(0, resource.length - 1)
   }
@@ -431,6 +431,15 @@ export function reviseSize({
 
 
 /**
+ * 提供全局配置文件
+ */
+export function mixGolbalConfig(setConfig) {
+  if (setConfig) {
+    Xut.mixin(config.golbal, setConfig)
+  }
+}
+
+/**
  * 清理图片
  * @return {[type]} [description]
  * action  'show' / 'hide'  在什么状态下删除
@@ -484,6 +493,6 @@ export function setImage(context, path) {
     context = $(context)
   }
   context.find('img').each(function(index, img) {
-      img.src = path
+    img.src = path
   })
 }

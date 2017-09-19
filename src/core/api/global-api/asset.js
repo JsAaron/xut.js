@@ -1,4 +1,4 @@
-import { $setStorage, $getStorage } from '../util/index'
+import { $setStorage, $getStorage } from '../../util/index'
 
 export function initAsset() {
 

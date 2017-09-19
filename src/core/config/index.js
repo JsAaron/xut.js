@@ -16,9 +16,9 @@ import { getFullProportion, getRealProportion } from './v-proportion'
 2 内部配置
 3 依赖数据
  */
-import improtGolbalConfig from '../global-config'
-import improtDebugConfig from './debug-config'
-import improtDataConfig from './data-config'
+import improtGolbalConfig from '../api/global-config'
+import improtDebugConfig from '../api/debug-config'
+import improtDataConfig from '../api/data-config'
 
 const plat = Xut.plat
 const isBrowser = Xut.plat.isBrowser

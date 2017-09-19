@@ -64,7 +64,7 @@ export default class Swiper extends Observer {
     return {
       scrollY,
       scrollX,
-      banMove: config.launch.gestureGlide === false ? true : false
+      banMove: config.launch.gestureSwipe === false ? true : false
     }
   }
 

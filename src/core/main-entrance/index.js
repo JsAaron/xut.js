@@ -36,22 +36,22 @@ const initMain = novelData => {
   if (novelData.parameter) {
     const parameter = parseJSON(novelData.parameter)
     /*全局优先设置覆盖*/
-    if (config.launch.gestureGlide === undefined && parameter.pageflip !== undefined) {
+    if (config.launch.gestureSwipe === undefined && parameter.pageflip !== undefined) {
       switch (Number(parameter.pageflip)) {
         case 0: //滑动翻页
-          config.launch.gestureGlide = true
+          config.launch.gestureSwipe = true
           break;
         case 1: //直接换
           config.launch.pageFlip = true
-          config.launch.gestureGlide = false
+          config.launch.gestureSwipe = false
           break
       }
     }
   }
 
   /*默认不锁定页面，支持手势滑动*/
-  if (config.launch.gestureGlide === undefined) {
-    config.launch.gestureGlide = true
+  if (config.launch.gestureSwipe === undefined) {
+    config.launch.gestureSwipe = true
   }
 
   /**
