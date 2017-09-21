@@ -166,8 +166,9 @@ export default function baseConfig(callback) {
     loadGolbalStyle('svgsheet', function() {
       //判断是否有分栏处理
       configColumn(function() {
+        //如果启动预加载配置
+        //先探测下是否能支持
         if (config.launch.preload) {
-          //资源预加载
           initPreload(chapterTotal, () => callback(novelData))
         } else {
           callback(novelData)

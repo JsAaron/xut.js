@@ -341,26 +341,6 @@ function nextTask(chapterId, callback) {
 
 
 /**
- * 检测缓存是否存在
- * @return {[type]} [description]
- */
-function checkCache(finish, next) {
-  const cahceUrl = $getStorage('preload')
-  if (cahceUrl) {
-    loadFigure(cahceUrl, (state, cache) => {
-      if (cache) {
-        finish()
-      } else {
-        next()
-      }
-    })
-  } else {
-    next()
-  }
-}
-
-
-/**
  * 判断是否有预加载文件
  * @return {Boolean} [description]
  */
@@ -372,36 +352,6 @@ export function loadPrelaod(callback) {
       callback(false)
     }
   })
-}
-
-
-/**
- * 资源加载接口
- * 必须先预加载第一页
- * @return {[type]} [description]
- */
-export function initPreload(total, callback) {
-
-  const close = function() {
-    config.launch.preload = false
-    callback(false)
-  }
-
-  const start = function() {
-    nextTask('', function() {
-      $warn('预加载资源总数：' + total);
-      /*监听预加载初四华*/
-      watchPreloadInit()
-      callback(true);
-    })
-  }
-
-  if (window.preloadData) {
-    chapterIdCount = total
-    checkCache(close, start)
-  } else {
-    close()
-  }
 }
 
 
@@ -422,7 +372,7 @@ function watchPreloadInit() {
   let count = 2
 
   /*从第二次开始加载数据*/
-  const start = function(type) {
+  function startDownload(type) {
     if (count === 2) {
       clearTimeout(timer)
       timer = null
@@ -433,11 +383,65 @@ function watchPreloadInit() {
   }
 
   /*监听初始化第一次完成*/
-  Xut.Application.onceWatch('autoRunComplete', start);
+  Xut.Application.onceWatch('autoRunComplete', startDownload);
 
   /*防止autoRunComplete事件丢失处理,或者autoRunComplete执行很长*/
-  timer = setTimeout(start, 5000)
+  timer = setTimeout(startDownload, 5000)
 }
+
+
+
+/**
+ * 资源加载接口
+ * 必须先预加载第一页
+ */
+export function initPreload(total, callback) {
+
+  function exit() {
+    config.launch.preload = null
+    callback(false)
+  }
+
+  /**
+   * 初始化，只预加载第一次的内容
+   */
+  function firstDownload() {
+    nextTask('', function() {
+      $warn('预加载资源总数：' + total);
+      /*监听预加载初始化*/
+      watchPreloadInit()
+      callback(true);
+    })
+  }
+
+  /**
+   * 检测缓存是否存在
+   * 如果没有预加载完毕就继续加载
+   * 否则缓存存在就退出
+   */
+  function checkCache(next, finish) {
+    const cahceUrl = $getStorage('preload')
+    if (cahceUrl) {
+      loadFigure(cahceUrl, (state, cache) => {
+        if (cache) {
+          finish()
+        } else {
+          next()
+        }
+      })
+    } else {
+      next()
+    }
+  }
+
+  if (window.preloadData) {
+    chapterIdCount = total
+    checkCache(firstDownload, exit)
+  } else {
+    exit()
+  }
+}
+
 
 
 /**

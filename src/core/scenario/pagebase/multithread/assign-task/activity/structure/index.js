@@ -82,7 +82,7 @@ const analysisPath = (wrapObj, conData) => {
     if (config.launch.preload) {
       resourcePath = fileFullPath
     } else {
-      /*如果没有启动preload，需要随机，保证不缓存*/
+      //如果没有启动preload，需要随机，保证不缓存
       resourcePath = isGif ? createRandomImg(fileFullPath) : fileFullPath
     }
 

@@ -42210,9 +42210,10 @@ var improtGolbalConfig = {
   storageMode: 0
 };
 
-/*
-内部调试配置
- */
+////////////////////////
+///   内部调试配置
+////////////////////////
+
 var DEFAULT$1 = undefined;
 
 var improtDebugConfig = {
@@ -42296,9 +42297,10 @@ var improtDebugConfig = {
 
 };
 
-/**
- * 数据配置接口文件
- */
+////////////////////////
+///   数据配置接口文件
+////////////////////////
+
 var improtDataConfig = {
 
   /**
@@ -47180,25 +47182,6 @@ function nextTask(chapterId, callback) {
 }
 
 /**
- * 检测缓存是否存在
- * @return {[type]} [description]
- */
-function checkCache(finish, next) {
-  var cahceUrl = $getStorage('preload');
-  if (cahceUrl) {
-    loadFigure(cahceUrl, function (state, cache) {
-      if (cache) {
-        finish();
-      } else {
-        next();
-      }
-    });
-  } else {
-    next();
-  }
-}
-
-/**
  * 判断是否有预加载文件
  * @return {Boolean} [description]
  */
@@ -47210,35 +47193,6 @@ function loadPrelaod(callback) {
       callback(false);
     }
   });
-}
-
-/**
- * 资源加载接口
- * 必须先预加载第一页
- * @return {[type]} [description]
- */
-function initPreload(total, callback) {
-
-  var close = function close() {
-    config.launch.preload = false;
-    callback(false);
-  };
-
-  var start = function start() {
-    nextTask('', function () {
-      $warn('预加载资源总数：' + total);
-      /*监听预加载初四华*/
-      watchPreloadInit();
-      callback(true);
-    });
-  };
-
-  if (window.preloadData) {
-    chapterIdCount = total;
-    checkCache(close, start);
-  } else {
-    close();
-  }
 }
 
 /**
@@ -47258,7 +47212,7 @@ function watchPreloadInit() {
   var count = 2;
 
   /*从第二次开始加载数据*/
-  var start = function start(type) {
+  function startDownload(type) {
     if (count === 2) {
       clearTimeout(timer);
       timer = null;
@@ -47266,13 +47220,64 @@ function watchPreloadInit() {
       nextTask();
     }
     --count;
-  };
+  }
 
   /*监听初始化第一次完成*/
-  Xut.Application.onceWatch('autoRunComplete', start);
+  Xut.Application.onceWatch('autoRunComplete', startDownload);
 
   /*防止autoRunComplete事件丢失处理,或者autoRunComplete执行很长*/
-  timer = setTimeout(start, 5000);
+  timer = setTimeout(startDownload, 5000);
+}
+
+/**
+ * 资源加载接口
+ * 必须先预加载第一页
+ */
+function initPreload(total, callback) {
+
+  function exit() {
+    config.launch.preload = null;
+    callback(false);
+  }
+
+  /**
+   * 初始化，只预加载第一次的内容
+   */
+  function firstDownload() {
+    nextTask('', function () {
+      $warn('预加载资源总数：' + total);
+      /*监听预加载初始化*/
+      watchPreloadInit();
+      callback(true);
+    });
+  }
+
+  /**
+   * 检测缓存是否存在
+   * 如果没有预加载完毕就继续加载
+   * 否则缓存存在就退出
+   */
+  function checkCache(next, finish) {
+    var cahceUrl = $getStorage('preload');
+    if (cahceUrl) {
+      loadFigure(cahceUrl, function (state, cache) {
+        if (cache) {
+          finish();
+        } else {
+          next();
+        }
+      });
+    } else {
+      next();
+    }
+  }
+
+  if (window.preloadData) {
+    chapterIdCount = total;
+    checkCache(firstDownload, exit);
+  } else {
+    exit();
+  }
 }
 
 /**
@@ -47799,8 +47804,9 @@ function baseConfig(callback) {
     loadGolbalStyle('svgsheet', function () {
       //判断是否有分栏处理
       configColumn(function () {
+        //如果启动预加载配置
+        //先探测下是否能支持
         if (config.launch.preload) {
-          //资源预加载
           initPreload(chapterTotal, function () {
             return callback(novelData);
           });
@@ -63739,7 +63745,7 @@ var analysisPath = function analysisPath(wrapObj, conData) {
     if (config.launch.preload) {
       resourcePath = fileFullPath;
     } else {
-      /*如果没有启动preload，需要随机，保证不缓存*/
+      //如果没有启动preload，需要随机，保证不缓存
       resourcePath = isGif ? createRandomImg(fileFullPath) : fileFullPath;
     }
   }
@@ -64591,7 +64597,7 @@ function clearWatcher() {
  * @return {[type]} [description]
  */
 
-var noop$1 = function noop() {};
+var noop = function noop() {};
 
 /**
  * 运行自动的content对象
@@ -64710,7 +64716,7 @@ function $autoRun(pageBase, pageIndex, taskAnimCallback) {
       pageBase.onceMaster = true;
     }
 
-    taskAnimCallback = taskAnimCallback || noop$1;
+    taskAnimCallback = taskAnimCallback || noop;
 
     /*自动组件*/
     var autoData = pageBase.baseAutoRun();
@@ -70559,7 +70565,7 @@ var assignedTasks = {
   }
 };
 
-var noop$2 = function noop() {};
+var noop$1 = function noop() {};
 
 function initThreadState(instance) {
 
@@ -70604,23 +70610,20 @@ function initThreadState(instance) {
      * 构建页面主容器完毕后,此时可以翻页
      * @return {[type]} [description]
      */
-    preforkComplete: noop$2,
+    preforkComplete: noop$1,
 
     /**
      * 整个页面都构建完毕通知
      * @return {[type]} [description]
      */
-    createTasksComplete: noop$2
+    createTasksComplete: noop$1
   };
 }
 
 /**
  * 页面缩放
- * @param  {[type]} rootNode  [description]
- * @param  {[type]} pageIndex [description]
- * @return {[type]}           [description]
  */
-var initPageScale = function initPageScale(rootNode, pageIndex) {
+function initPageScale(rootNode, pageIndex) {
   return new ScalePan({
     rootNode: rootNode,
     hasButton: true,
@@ -70641,7 +70644,7 @@ var initPageScale = function initPageScale(rootNode, pageIndex) {
       }
     }
   });
-};
+}
 
 /**
  * 缓存构建中断回调
@@ -70650,14 +70653,14 @@ var initPageScale = function initPageScale(rootNode, pageIndex) {
  * 2 构建绘制页面
  * @type {Object}
  */
-var registerCacheTask = function registerCacheTask(threadtasks) {
+function registerCacheTask(threadtasks) {
   /*设置缓存的任务名*/
   var cache = {};
   Object.keys(threadtasks).forEach(function (taskName) {
     cache[taskName] = false;
   });
   return cache;
-};
+}
 
 function initThreadtasks(instance) {
 
@@ -70669,20 +70672,21 @@ function initThreadtasks(instance) {
 
   /*注册缓存任务名*/
   threadTaskRelated.assignTaskGroup = registerCacheTask(assignedTasks);
+  //初始化第一次的任务名
   threadTaskRelated.nextTaskName = 'container';
 
   /**
    * 设置下一个任务名
    * 用于标记完成度
    */
-  var setNextTaskName = function setNextTaskName(taskName) {
+  function setNextTaskName(taskName) {
     threadTaskRelated.nextTaskName = taskName;
-  };
+  }
 
   /* 创建新任务*/
-  var createAssignTask = function createAssignTask(taskName, fn) {
+  function createAssignTask(taskName, fn) {
     return assignedTasks[taskName](fn, instance);
-  };
+  }
 
   /**
    * 任务钩子
@@ -70772,7 +70776,6 @@ function initThreadtasks(instance) {
      * 2016.9.7
      * 特殊的一个内容
      * 是否为流式排版
-     * @return {[type]} [description]
      */
     column: function column() {
 
@@ -81046,7 +81049,7 @@ function initApp() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 890;
+Xut.Version = 890.1;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
