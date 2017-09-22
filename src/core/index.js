@@ -1,4 +1,4 @@
-import initApp from './initialize/index'
+ import initApp from './initialize/index'
 import { config } from './config/index'
 import { removeSlash, mixGolbalConfig } from './util/index'
 
