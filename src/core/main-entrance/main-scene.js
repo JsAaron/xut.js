@@ -78,6 +78,6 @@ export default function(options) {
     Xut.Application.Notify('initComplete')
 
     /*发送初始化完毕代码跟踪*/
-    config.sendTrackCode('init')
+    config.sendTrackCode('init', { time: (+new Date) - config.launch.launchTime })
   })
 }

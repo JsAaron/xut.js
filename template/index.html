@@ -96,10 +96,12 @@ Xut.Application.Watch('appDestory', function() {
   console.log('appDestory')
 })
 
-Xut.Application.Watch('trackCode', function(type, options) {})
+Xut.Application.Watch('trackCode', function(type, options) {
+  console.log(type,options)
+})
 
 
-var appId = 341 //306
+var appId = 123 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

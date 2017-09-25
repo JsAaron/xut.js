@@ -47897,7 +47897,7 @@ var initMainScene = function (options) {
     Xut.Application.Notify('initComplete');
 
     /*发送初始化完毕代码跟踪*/
-    config.sendTrackCode('init');
+    config.sendTrackCode('init', { time: +new Date() - config.launch.launchTime });
   });
 };
 
@@ -81049,7 +81049,7 @@ function initApp() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 890.1;
+Xut.Version = 890.2;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

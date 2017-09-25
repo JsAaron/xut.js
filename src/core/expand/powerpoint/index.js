@@ -512,8 +512,6 @@ export default class Powepoint {
       onCompleteParams: [this.postCode, this.codeDelay],
       /**
        * 动画执行前的初始化
-       * @param  {[type]} preCode [description]
-       * @return {[type]}         [description]
        */
       onStart(preCode) {
         //条件判断动画是否执行
@@ -535,9 +533,6 @@ export default class Powepoint {
       },
       /**
        * 动画完成
-       * @param  {[type]} postCode  [description]
-       * @param  {[type]} codeDelay [description]
-       * @return {[type]}           [description]
        */
       onComplete(postCode, codeDelay) {
         self.isCompleted = true;
@@ -566,10 +561,11 @@ export default class Powepoint {
         tl.add(this._getTimeline(this.options[i], i), "shape0");
       } else {
         var invokeMode = this.options[i].invokeMode;
-        if (invokeMode == 2)
+        if (invokeMode == 2) {
           tl.add(this._getTimeline(this.options[i], i));
-        else
+        } else {
           tl.add(this._getTimeline(this.options[i], i), "shape0"); //"shape"+(i-1)
+        }
       }
     }
     return tl;
