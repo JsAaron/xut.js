@@ -46,13 +46,13 @@ export function imageParse(url, callback) {
   let imageObject = loadFigure({
     image: getImage(),
     url: url
-  }, function () {
+  }, function(success, hasCache) {
     imageShare && imageShare.add(imageObject) //加入到循环队列
-    callback()
+    callback(success, hasCache)
   })
 
   return {
-    destory: function () {
+    destory: function() {
       if (imageObject) {
         imageObject.src = null
         imageObject.removeAttribute("src")

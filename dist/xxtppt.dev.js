@@ -46270,9 +46270,9 @@ function imageParse(url, callback) {
   var imageObject = loadFigure({
     image: getImage(),
     url: url
-  }, function () {
+  }, function (success, hasCache) {
     imageShare && imageShare.add(imageObject); //加入到循环队列
-    callback();
+    callback(success, hasCache);
   });
 
   return {
@@ -58374,8 +58374,6 @@ var Powepoint = function () {
         onCompleteParams: [this.postCode, this.codeDelay],
         /**
          * 动画执行前的初始化
-         * @param  {[type]} preCode [description]
-         * @return {[type]}         [description]
          */
         onStart: function onStart(preCode) {
           //条件判断动画是否执行
@@ -58396,9 +58394,6 @@ var Powepoint = function () {
 
         /**
          * 动画完成
-         * @param  {[type]} postCode  [description]
-         * @param  {[type]} codeDelay [description]
-         * @return {[type]}           [description]
          */
         onComplete: function onComplete(postCode, codeDelay) {
           self.isCompleted = true;
@@ -58427,7 +58422,11 @@ var Powepoint = function () {
           tl.add(this._getTimeline(this.options[i], i), "shape0");
         } else {
           var invokeMode = this.options[i].invokeMode;
-          if (invokeMode == 2) tl.add(this._getTimeline(this.options[i], i));else tl.add(this._getTimeline(this.options[i], i), "shape0"); //"shape"+(i-1)
+          if (invokeMode == 2) {
+            tl.add(this._getTimeline(this.options[i], i));
+          } else {
+            tl.add(this._getTimeline(this.options[i], i), "shape0"); //"shape"+(i-1)
+          }
         }
       }
       return tl;
@@ -81049,7 +81048,7 @@ function initApp() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 890.2;
+Xut.Version = 890.3;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
