@@ -31,7 +31,7 @@ Xut.Application.setConfig = {
   preload: true,
   visualMode: 1,
   // platform: 'mini',
-  historyMode: true,
+  historyMode: false,
   launchAnim: false,
   // convert: 'svg',
 
@@ -42,7 +42,11 @@ Xut.Application.setConfig = {
   //   }
   // },
 
-  // brModel: 1, //图片模式
+  brModel: 1, //图片模式
+  imageSuffix: { //定义基础图片取值
+      1080: 'mi',
+      1440: 'hi'
+  },
 
   // columnCheck:true,
 
@@ -74,10 +78,6 @@ Xut.Application.setConfig = {
   // cursor: {  //定义忙碌光标
   //     url: 'images/icons/busyicon.gif',
   //     delayTime: 300
-  // },
-  // imageSuffix: { //定义基础图片取值
-  //     1080: 'mi',
-  //     1440: 'hi'
   // },
   // salePicture: true, //默认图片支持缩放
   // salePictureMultiples: 2, //缩放倍数

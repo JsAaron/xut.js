@@ -43699,6 +43699,46 @@ function loadGolbalStyle(fileName, callback) {
 }
 
 /**
+ * 预加载转化URL
+ * @param  {[type]} converURL [description]
+ * @return {[type]}           [description]
+ */
+function converURL(url) {
+
+  if (!url) {
+    return '';
+  }
+
+  var brModeType = config.launch.brModeType;
+  var baseImageSuffix = config.launch.baseImageSuffix;
+
+  if (!brModeType && !baseImageSuffix) {
+    return url;
+  }
+
+  var imageData = url.split('.');
+  var imagePrefix = imageData[0];
+  var imgetPostfix = imageData[1];
+
+  if (brModeType) {
+    if (baseImageSuffix) {
+      //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2_a.hi
+      return '' + imagePrefix + brModeType + '.' + baseImageSuffix;
+    } else {
+      //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2_a
+      return '' + imagePrefix + brModeType;
+    }
+  }
+
+  if (!brModeType) {
+    if (baseImageSuffix) {
+      //content/11/gallery/b9ba3dfc39ddd207.hi.jpg
+      return imagePrefix + '.' + baseImageSuffix + '.' + imgetPostfix;
+    }
+  }
+}
+
+/**
  * 设置快速的文件解释正则
  * 每个图片在点击的时候，需要解析文件的一些参数
  * 这里正则只做一次匹配
@@ -43707,7 +43747,7 @@ var brModeRE = null;
 function setFastAnalysisRE() {
   brModeRE = null;
   //如果存在brModeType
-  if (config.launch.brModeType && config.launch.brModeType !== 'delete') {
+  if (config.launch.brModeType) {
     //(\w+[_a|_i]?)([.hi|.mi]*)$/i
     brModeRE = new RegExp('(\\w+[' + config.launch.brModeType + ']?)([.' + config.launch.baseImageSuffix + ']*)$', 'i');
   }
@@ -43715,17 +43755,35 @@ function setFastAnalysisRE() {
 
 /**
  * 获取正确的图片文件名
- * 因为图片可能存在
+ * 因为图片可能存在,因为图片可能是在flow数据中获取的
+ * flow的数据是被处理过的
+ * 所以文件路径可以是几种情况
  * .mi.jpg
  * .mi.php
  * .hi.jpg
  * .hi.php
  * 等等这样的地址
+
+  src的地址 4种情况
+
+  content/11/gallery/b9ba3dfc39ddd207.jpg
+  content/11/gallery/b9ba3dfc39ddd207.hi.jpg
+  content/11/gallery/b9ba3dfc39ddd207.mi.jpg
+
+  content/11/gallery/b9ba3dfc39ddd207_a
+  content/11/gallery/b9ba3dfc39ddd207_a.mi
+  content/11/gallery/b9ba3dfc39ddd207_a.hi
+
+  content/11/gallery/b9ba3dfc39ddd207_i
+  content/11/gallery/b9ba3dfc39ddd207_i.mi
+  content/11/gallery/b9ba3dfc39ddd207_i.hi
+
  * @return
     original: "1d7949a5585942ed.jpg"
     suffix  : "1d7949a5585942ed.mi.jpg"
+
  */
-function analysisImageName(src) {
+function analysisZoomImageName(src) {
   var suffix = src;
   var original = src;
   var result = void 0;
@@ -43783,7 +43841,7 @@ function analysisImageName(src) {
 function insertImageUrlSuffix(originalUrl, suffix) {
   if (originalUrl && suffix) {
     //brModeType 没有类型后缀
-    if (config.launch.brModeType && config.launch.brModeType !== 'delete') {
+    if (config.launch.brModeType) {
       return originalUrl.replace(/\w+/ig, '$&' + '.' + suffix);
     }
     //带后缀
@@ -44553,11 +44611,8 @@ fileName + brModeType + baseSuffix + type
 function parseFileName(fileName, baseSuffix, type) {
   //如果启动了模式
   if (config.launch.brModeType) {
-    if (config.launch.brModeType === 'delete') {
-      return '' + fileName + baseSuffix; //增加后缀，去掉类型
-    } else {
-      return '' + fileName + config.launch.brModeType + baseSuffix; //增加brModeType，增加后缀，去掉类型
-    }
+    //增加brModeType，增加后缀，去掉类型
+    return '' + fileName + config.launch.brModeType + baseSuffix;
   }
   //如果只加了baseSuffix模式处理
   return '' + fileName + baseSuffix + type;
@@ -44604,6 +44659,7 @@ function filterJsonData() {
     //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
+    //img src="content/11/gallery/b9ba3dfc39ddd207_a.hi
     result.FlowData = result.FlowData.replace(urlRE, function (a, prefix, fileName, type) {
       return prefix + '="' + config.launch.resource + '/gallery/' + parseFileName(fileName, baseSuffix, type);
     });
@@ -46256,13 +46312,7 @@ function clearImage() {
  */
 function imageParse(url, callback) {
 
-  /**如果有缓存图片的后缀*/
-  var brModeType = config.launch.brModeType;
-  if (brModeType) {
-    /*必须$结尾，因为url中间有可能存在apng_
-    content/22/gallery/apng_70fe7a26b9208e74451c6262fd253cd2_a*/
-    url = url.replace(/.png$|.jpg$/, brModeType);
-  }
+  url = converURL(url);
 
   /**
    * 这里最主要是替换了图片对象，优化了创建
@@ -47767,12 +47817,7 @@ function baseConfig(callback) {
     adaptiveImage();
   }
 
-  /*建议快速正则，提高计算*/
-  setFastAnalysisRE();
-
-  /**
-   * 导入数据库
-   */
+  //导入数据库
   importJsonDatabase(function (results) {
     setDatabse(results);
   });
@@ -47790,6 +47835,8 @@ function baseConfig(callback) {
       //处理预加载文件
       loadPrelaod(function (hasPreFile, globalBrMode) {
         resetBrMode(hasPreFile, globalBrMode);
+        /*建议快速正则，提高计算*/
+        setFastAnalysisRE();
         loadStyle(novelData, chapterTotal);
       });
     });
@@ -62551,7 +62598,7 @@ function zoomPicture(pipeData) {
           }
 
           /*创建*/
-          var analysisName = analysisImageName(src);
+          var analysisName = analysisZoomImageName(src);
           zoomObjs[src] = new ScalePicture({
             element: $imgNode,
             originalSrc: getFileFullPath(analysisName.suffix, 'pagebase-zoom'),
@@ -69753,7 +69800,10 @@ var ColumnClass = function () {
       if (!src) {
         return;
       }
-      var analysisName = analysisImageName(src);
+      //src : http://localhost:8888/content/11/gallery/b9ba3dfc39ddd207_a
+      //    original : "b9ba3dfc39ddd207_a"
+      //    suffix : "b9ba3dfc39ddd207_a"
+      var analysisName = analysisZoomImageName(src);
       var originalName = analysisName.original;
 
       /*存在*/

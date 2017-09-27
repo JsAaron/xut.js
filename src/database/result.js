@@ -38,11 +38,8 @@ fileName + brModeType + baseSuffix + type
 function parseFileName(fileName, baseSuffix, type) {
   //如果启动了模式
   if (config.launch.brModeType) {
-    if (config.launch.brModeType === 'delete') {
-      return `${fileName}${baseSuffix}` //增加后缀，去掉类型
-    } else {
-      return `${fileName}${config.launch.brModeType}${baseSuffix}` //增加brModeType，增加后缀，去掉类型
-    }
+    //增加brModeType，增加后缀，去掉类型
+    return `${fileName}${config.launch.brModeType}${baseSuffix}`
   }
   //如果只加了baseSuffix模式处理
   return `${fileName}${baseSuffix}${type}`
@@ -89,6 +86,7 @@ function filterJsonData() {
     //<img src="content/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //<img src="content/310/gallery/0920c97a591f525044c8d0d5dbdf12b3.png"
     //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
+    //img src="content/11/gallery/b9ba3dfc39ddd207_a.hi
     result.FlowData = result.FlowData.replace(urlRE, function(a, prefix, fileName, type) {
       return `${prefix}="${config.launch.resource}/gallery/${parseFileName(fileName,baseSuffix,type)}`
     })

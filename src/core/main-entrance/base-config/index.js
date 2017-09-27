@@ -129,12 +129,7 @@ export default function baseConfig(callback) {
     adaptiveImage()
   }
 
-  /*建议快速正则，提高计算*/
-  setFastAnalysisRE()
-
-  /**
-   * 导入数据库
-   */
+  //导入数据库
   importJsonDatabase((results) => {
     setDatabse(results)
   })
@@ -152,6 +147,8 @@ export default function baseConfig(callback) {
       //处理预加载文件
       loadPrelaod(function(hasPreFile, globalBrMode) {
         resetBrMode(hasPreFile, globalBrMode)
+        /*建议快速正则，提高计算*/
+        setFastAnalysisRE()
         loadStyle(novelData, chapterTotal)
       })
     })

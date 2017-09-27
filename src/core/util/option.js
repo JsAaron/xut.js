@@ -18,6 +18,7 @@ export function removeSlash(resource) {
   return resource
 }
 
+
 /**
  * 动态加载link
  * @return {[type]} [description]
@@ -32,6 +33,48 @@ export function loadGolbalStyle(fileName, callback) {
   node && node.setAttribute('data-type', fileName)
 }
 
+
+/**
+ * 预加载转化URL
+ * @param  {[type]} converURL [description]
+ * @return {[type]}           [description]
+ */
+export function converURL(url) {
+
+  if (!url) {
+    return ''
+  }
+
+  const brModeType = config.launch.brModeType
+  const baseImageSuffix = config.launch.baseImageSuffix
+
+  if (!brModeType && !baseImageSuffix) {
+    return url
+  }
+
+  const imageData = url.split('.')
+  const imagePrefix = imageData[0]
+  const imgetPostfix = imageData[1]
+
+  if (brModeType) {
+    if (baseImageSuffix) {
+      //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2_a.hi
+      return `${imagePrefix}${brModeType}.${baseImageSuffix}`
+    } else {
+      //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2_a
+      return `${imagePrefix}${brModeType}`
+    }
+  }
+
+  if (!brModeType) {
+    if (baseImageSuffix) {
+      //content/11/gallery/b9ba3dfc39ddd207.hi.jpg
+      return `${imagePrefix}.${baseImageSuffix}.${imgetPostfix}`
+    }
+  }
+}
+
+
 /**
  * 设置快速的文件解释正则
  * 每个图片在点击的时候，需要解析文件的一些参数
@@ -41,7 +84,7 @@ let brModeRE = null
 export function setFastAnalysisRE() {
   brModeRE = null
   //如果存在brModeType
-  if (config.launch.brModeType && config.launch.brModeType !== 'delete') {
+  if (config.launch.brModeType) {
     //(\w+[_a|_i]?)([.hi|.mi]*)$/i
     brModeRE = new RegExp(`(\\w+[${config.launch.brModeType}]?)([.${config.launch.baseImageSuffix}]*)$`, 'i')
   }
@@ -49,20 +92,39 @@ export function setFastAnalysisRE() {
 
 /**
  * 获取正确的图片文件名
- * 因为图片可能存在
+ * 因为图片可能存在,因为图片可能是在flow数据中获取的
+ * flow的数据是被处理过的
+ * 所以文件路径可以是几种情况
  * .mi.jpg
  * .mi.php
  * .hi.jpg
  * .hi.php
  * 等等这样的地址
+
+  src的地址 4种情况
+
+  content/11/gallery/b9ba3dfc39ddd207.jpg
+  content/11/gallery/b9ba3dfc39ddd207.hi.jpg
+  content/11/gallery/b9ba3dfc39ddd207.mi.jpg
+
+  content/11/gallery/b9ba3dfc39ddd207_a
+  content/11/gallery/b9ba3dfc39ddd207_a.mi
+  content/11/gallery/b9ba3dfc39ddd207_a.hi
+
+  content/11/gallery/b9ba3dfc39ddd207_i
+  content/11/gallery/b9ba3dfc39ddd207_i.mi
+  content/11/gallery/b9ba3dfc39ddd207_i.hi
+
  * @return
     original: "1d7949a5585942ed.jpg"
     suffix  : "1d7949a5585942ed.mi.jpg"
+
  */
-export function analysisImageName(src) {
+export function analysisZoomImageName(src) {
   let suffix = src
   let original = src
   let result
+
 
   //如果存在brModeType
   if (brModeRE) {
@@ -117,7 +179,7 @@ export function analysisImageName(src) {
 function insertImageUrlSuffix(originalUrl, suffix) {
   if (originalUrl && suffix) {
     //brModeType 没有类型后缀
-    if (config.launch.brModeType && config.launch.brModeType !== 'delete') {
+    if (config.launch.brModeType) {
       return originalUrl.replace(/\w+/ig, '$&' + '.' + suffix)
     }
     //带后缀

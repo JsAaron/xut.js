@@ -1,4 +1,4 @@
-import { loadFigure } from 'core/util/index'
+import { loadFigure, converURL } from 'core/util/index'
 import { config } from 'core/config/index'
 import { Share } from './share'
 
@@ -27,18 +27,13 @@ export function clearImage() {
 }
 
 
+
 /**
  * 图片解析
  */
 export function imageParse(url, callback) {
 
-  /**如果有缓存图片的后缀*/
-  const brModeType = config.launch.brModeType
-  if (brModeType) {
-    /*必须$结尾，因为url中间有可能存在apng_
-    content/22/gallery/apng_70fe7a26b9208e74451c6262fd253cd2_a*/
-    url = url.replace(/.png$|.jpg$/, brModeType)
-  }
+  url = converURL(url)
 
   /**
    * 这里最主要是替换了图片对象，优化了创建

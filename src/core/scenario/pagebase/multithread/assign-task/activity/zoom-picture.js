@@ -7,7 +7,7 @@ import {
   $on,
   $off,
   getFileFullPath,
-  analysisImageName,
+  analysisZoomImageName,
   getHDFilePath
 } from '../../../../../util/index'
 
@@ -46,7 +46,7 @@ export function zoomPicture(pipeData) {
           }
 
           /*创建*/
-          const analysisName = analysisImageName(src)
+          const analysisName = analysisZoomImageName(src)
           zoomObjs[src] = new ScalePicture({
             element: $imgNode,
             originalSrc: getFileFullPath(analysisName.suffix, 'pagebase-zoom'),

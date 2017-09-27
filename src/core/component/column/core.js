@@ -8,7 +8,7 @@ import { closeButton } from '../../expand/close-button'
 
 import { delegateScrollY } from '../../expand/iscroll'
 
-import { analysisImageName, getHDFilePath } from '../../util/option'
+import { analysisZoomImageName, getHDFilePath } from '../../util/option'
 
 import Swiper from '../../swiper/index'
 import swiperHook from '../../swiper/hook.js'
@@ -62,7 +62,10 @@ export default class ColumnClass {
     if (!src) {
       return
     }
-    const analysisName = analysisImageName(src)
+    //src : http://localhost:8888/content/11/gallery/b9ba3dfc39ddd207_a
+    //    original : "b9ba3dfc39ddd207_a"
+    //    suffix : "b9ba3dfc39ddd207_a"
+    const analysisName = analysisZoomImageName(src)
     const originalName = analysisName.original
 
     /*存在*/
