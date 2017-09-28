@@ -225,12 +225,16 @@ export function priorityConfig() {
  * 重写配置文件
  * 由于一些数据库，或者不支持的
  * 在框架内部强制修改用户的设定
+ *
  * 如果没有预加载文件
  * 如果启动了图片模式，那么就需要去掉
  */
 export function resetBrMode(hasPreFile, globalBrMode) {
-  if (!hasPreFile) {
+  //如果在没有hasPreFile，并且没有hasFlowData，那么就是兼容读库的旧版的处理
+  //如果没有hasPreFile，但是有hasFlowData，那么就是迷你杂志，不能去掉
+  if (!hasPreFile && !config.launch.hasFlowData) {
     config.launch.brMode = ''
+    config.launch.brModel = '被resetBrMode清空了'
     config.launch.brModeType = ''
     return
   }

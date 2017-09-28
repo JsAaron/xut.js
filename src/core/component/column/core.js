@@ -1,14 +1,11 @@
 import { config, resetVisualLayout } from '../../config/index'
-import { getFileFullPath } from '../../util/option'
+import { converUrlName, getFileFullPath } from '../../util/index'
 import { translation } from '../../scenario/pagebase/move/translation'
 import { getColumnCount } from './api'
 import { getVisualDistance } from '../../scenario/v-distance/index'
 import { ScalePicture } from '../../expand/scale-picture/index'
 import { closeButton } from '../../expand/close-button'
-
 import { delegateScrollY } from '../../expand/iscroll'
-
-import { analysisZoomImageName, getHDFilePath } from '../../util/option'
 
 import Swiper from '../../swiper/index'
 import swiperHook from '../../swiper/hook.js'
@@ -62,23 +59,21 @@ export default class ColumnClass {
     if (!src) {
       return
     }
-    //src : http://localhost:8888/content/11/gallery/b9ba3dfc39ddd207_a
-    //    original : "b9ba3dfc39ddd207_a"
-    //    suffix : "b9ba3dfc39ddd207_a"
-    const analysisName = analysisZoomImageName(src)
-    const originalName = analysisName.original
+
+    const conver = converUrlName(src)
+    const original = conver.original
 
     /*存在*/
-    const zoomObj = this._scaleObjs[originalName]
+    const zoomObj = this._scaleObjs[original]
     if (zoomObj) {
       return zoomObj.play()
     }
 
     /*创建*/
-    this._scaleObjs[originalName] = new ScalePicture({
+    this._scaleObjs[original] = new ScalePicture({
       element: $(node),
-      originalSrc: getFileFullPath(analysisName.suffix, 'column-zoom'),
-      hdSrc: getHDFilePath(originalName)
+      originalSrc: getFileFullPath(conver.suffix, 'column-zoom'),
+      hdSrc: getFileFullPath(conver.hdName, 'getHDFilePath')
     })
   }
 
@@ -205,7 +200,7 @@ export default class ColumnClass {
       }
     });
 
-    swipe.$$watch('onTap', function (pageIndex, hookCallback, point, duration) {
+    swipe.$$watch('onTap', function(pageIndex, hookCallback, point, duration) {
       const node = point.target;
       /*图片缩放*/
       if (!hasQrcode) {
@@ -221,7 +216,7 @@ export default class ColumnClass {
     })
 
 
-    swipe.$$watch('onMove', function (options) {
+    swipe.$$watch('onMove', function(options) {
 
       const {
         action,
@@ -677,7 +672,7 @@ export default class ColumnClass {
    */
   resetColumnDep() {
     let newColumnCount = getColumnCount(this.seasonId, this.chapterId)
-      /*假如分栏数有变化*/
+    /*假如分栏数有变化*/
     if (newColumnCount > this.columnCount) {
       if (config.launch.scrollMode === 'h') {
         this._resetX(newColumnCount)

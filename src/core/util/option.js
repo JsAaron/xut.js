@@ -1,6 +1,7 @@
 import { loadFile } from './loader/file'
 import { $warn } from './debug/index'
 import { parseJSON } from './lang'
+import { converImageURL } from './url'
 import { config, resetVisualProportion } from '../config/index'
 
 const CEIL = Math.ceil
@@ -24,177 +25,13 @@ export function removeSlash(resource) {
  * @return {[type]} [description]
  */
 export function loadGolbalStyle(fileName, callback) {
-
   const path = config.launch.resource ?
     config.launch.resource + '/gallery/' + fileName + '.css' :
     config.data.pathAddress + fileName + '.css'
-
   const node = loadFile(path, callback)
   node && node.setAttribute('data-type', fileName)
 }
 
-
-/**
- * 预加载转化URL
- * @param  {[type]} converURL [description]
- * @return {[type]}           [description]
- */
-export function converURL(url) {
-
-  if (!url) {
-    return ''
-  }
-
-  const brModeType = config.launch.brModeType
-  const baseImageSuffix = config.launch.baseImageSuffix
-
-  if (!brModeType && !baseImageSuffix) {
-    return url
-  }
-
-  const imageData = url.split('.')
-  const imagePrefix = imageData[0]
-  const imgetPostfix = imageData[1]
-
-  if (brModeType) {
-    if (baseImageSuffix) {
-      //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2_a.hi
-      return `${imagePrefix}${brModeType}.${baseImageSuffix}`
-    } else {
-      //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2_a
-      return `${imagePrefix}${brModeType}`
-    }
-  }
-
-  if (!brModeType) {
-    if (baseImageSuffix) {
-      //content/11/gallery/b9ba3dfc39ddd207.hi.jpg
-      return `${imagePrefix}.${baseImageSuffix}.${imgetPostfix}`
-    }
-  }
-}
-
-
-/**
- * 设置快速的文件解释正则
- * 每个图片在点击的时候，需要解析文件的一些参数
- * 这里正则只做一次匹配
- */
-let brModeRE = null
-export function setFastAnalysisRE() {
-  brModeRE = null
-  //如果存在brModeType
-  if (config.launch.brModeType) {
-    //(\w+[_a|_i]?)([.hi|.mi]*)$/i
-    brModeRE = new RegExp(`(\\w+[${config.launch.brModeType}]?)([.${config.launch.baseImageSuffix}]*)$`, 'i')
-  }
-}
-
-/**
- * 获取正确的图片文件名
- * 因为图片可能存在,因为图片可能是在flow数据中获取的
- * flow的数据是被处理过的
- * 所以文件路径可以是几种情况
- * .mi.jpg
- * .mi.php
- * .hi.jpg
- * .hi.php
- * 等等这样的地址
-
-  src的地址 4种情况
-
-  content/11/gallery/b9ba3dfc39ddd207.jpg
-  content/11/gallery/b9ba3dfc39ddd207.hi.jpg
-  content/11/gallery/b9ba3dfc39ddd207.mi.jpg
-
-  content/11/gallery/b9ba3dfc39ddd207_a
-  content/11/gallery/b9ba3dfc39ddd207_a.mi
-  content/11/gallery/b9ba3dfc39ddd207_a.hi
-
-  content/11/gallery/b9ba3dfc39ddd207_i
-  content/11/gallery/b9ba3dfc39ddd207_i.mi
-  content/11/gallery/b9ba3dfc39ddd207_i.hi
-
- * @return
-    original: "1d7949a5585942ed.jpg"
-    suffix  : "1d7949a5585942ed.mi.jpg"
-
- */
-export function analysisZoomImageName(src) {
-  let suffix = src
-  let original = src
-  let result
-
-
-  //如果存在brModeType
-  if (brModeRE) {
-    result = src.match(brModeRE)
-    if (result && result.length) {
-      suffix = result[0]
-      original = result[1]
-    } else {
-      $warn('zoom-image-brModeType解析出错,result：' + result)
-    }
-  }
-  //有基础后缀
-  //suffix: 1d7949a5585942ed.mi.jpg
-  //original: 1d7949a5585942ed.jpg
-  else if (config.launch.baseImageSuffix) {
-    /*
-        0 1d7949a5585942ed.mi.jpg"
-        1 "1d7949a5585942ed"
-        2 : ".mi"
-        3: ".jpg"
-     */
-    result = src.match(/(\w+)(\.\w+)(\.\w+)$/)
-    if (result && result.length) {
-      suffix = result[0]
-      original = result[1] + result[3]
-    } else {
-      $warn('zoom-image-suffix解析出错,result：' + result)
-    }
-  }
-  //如果没有后缀
-  else {
-    //"1d7949a5585942ed.jpg"
-    result = src.match(/\w+\.\w+$/)
-    if (result && result.length) {
-      suffix = original = result[0]
-    } else {
-      $warn('zoom-image解析出错,result：' + result)
-    }
-  }
-  return {
-    original, //原始版
-    suffix //带有后缀
-  }
-}
-
-/**
- * 给地址增加私有后缀
- * @param  {[type]} originalUrl [description]
- * @param  {[type]} suffix      [description]
- * @return {[type]}             [description]
- */
-function insertImageUrlSuffix(originalUrl, suffix) {
-  if (originalUrl && suffix) {
-    //brModeType 没有类型后缀
-    if (config.launch.brModeType) {
-      return originalUrl.replace(/\w+/ig, '$&' + '.' + suffix)
-    }
-    //带后缀
-    return originalUrl.replace(/\w+\./ig, '$&' + suffix + '.')
-  }
-  return originalUrl
-}
-
-/*获取高清图文件*/
-export function getHDFilePath(originalUrl) {
-  if (config.launch.useHDImageZoom && config.launch.imageSuffix && config.launch.imageSuffix['1440']) {
-    return getFileFullPath(insertImageUrlSuffix(originalUrl, config.launch.imageSuffix['1440']), 'getHDFilePath')
-  }
-  return ''
-}
 
 /**
  * 文件是图片格式
@@ -204,6 +41,7 @@ export function getHDFilePath(originalUrl) {
 export function hasImages(fileName) {
   return /\.[jpg|png|gif]+/i.test(fileName)
 }
+
 
 /**
  * 获取文件的全路径
@@ -219,60 +57,59 @@ export function getFileFullPath(fileName, debugType, isGif) {
     return ''
   }
 
-  const launch = config.launch
+  const fileNameData = fileName.split('.')
+  const splitNumber = fileNameData.length
 
-  /*
-  如果启动了基础图匹配,替换全部
-  并且要是图片
-  并且没有私有后缀
-  */
-  if (launch.baseImageSuffix &&
-    hasImages(fileName) &&
-    -1 === fileName.indexOf(`.${launch.baseImageSuffix}.`)) {
-    /*"50f110321f467d25474b9dba9b342f0a.png"
-      1 : "50f110321f467d25474b9dba9b342f0a"
-      2 : "png"
-    */
-    let fileMatch = fileName.match(/(\w+)\.(\w+)$/)
-    let name = fileMatch[1]
-    let type = fileMatch[2]
-    fileName = `${fileMatch[1]}.${launch.baseImageSuffix}.${fileMatch[2]}`
-  }
-
-  /*如果是GIF的话需要跳过brModeType类型的处理*/
-  if (isGif) {
+  //没有点
+  // 配置了brMode没有配置imageSuffix
+  // 'd048193365eac224_a'
+  // 'd048193365eac224_i'
+  if (splitNumber === 1) {
     return config.data.pathAddress + fileName
   }
 
-  /*
-    支持webp图
-    1 如果启动brModeType
-    2 并且是图片
-    3 并且没有被修改过
-  */
-  if (launch.brModeType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
-
-    let suffix = ''
-    let name
-    if (Xut.plat.isBrowser) { //手机浏览器访问
-      let fileMatch = fileName.match(/\w+([.]?[\w]*)\1/ig)
-      if (fileMatch.length === 3) {
-        name = fileMatch[0]
-        suffix = '.' + fileMatch[1]
-      } else {
-        name = fileMatch[0]
-      }
-
-      //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
-      return `${config.data.pathAddress + name}${launch.brModeType}${suffix}`
-    } else {
-      //手机app访问
-      //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a.mi
-      return `${config.data.pathAddress + name}${suffix}`
-    }
+  //有2个点
+  // 没有brMode，有配置imageSuffix
+  // 'b9ba3dfc39ddd207.hi.jpg'
+  // 'b9ba3dfc39ddd207.mi.jpg'
+  if (splitNumber === 3) {
+    return config.data.pathAddress + fileName
   }
 
-  return config.data.pathAddress + fileName
+  //只有一个点
+  // 9b7adc63c04af0651a60a211ed03085c.svg
+  //
+  // 如果是正常的图片格式，就需要转化
+  // 'b9ba3dfc39ddd207.jpg'
+  //
+  // 如果是转化后的就不需要再处理
+  // 'd048193365eac224_i.mi'
+  // 'd048193365eac224_i.hi'
+  // 'd048193365eac224_a.hi'
+  // 'd048193365eac224_a.mi'
+  if (splitNumber === 2) {
+
+    //排除非图片的情况
+    //9b7adc63c04af0651a60a211ed03085c.svg
+    if (!hasImages(fileName)) {
+      return config.data.pathAddress + fileName
+    }
+
+    //如果包含已经包含了执行的后缀
+    //不需要处理，名字
+    // 'd048193365eac224_i.mi'
+    // 'd048193365eac224_i.hi'
+    // 'd048193365eac224_a.hi'
+    // 'd048193365eac224_a.mi
+    if (/_[ia]\.(mi|hi)$/.test(fileName)) {
+      return config.data.pathAddress + fileName
+    }
+
+    //仅仅是正常的png jpg gif图片
+    //需要生成新的后缀
+    return config.data.pathAddress + converImageURL(fileName)
+  }
+
 }
 
 /**
@@ -288,6 +125,7 @@ export function getResources(url) {
   option = parseJSON(xhr.responseText);
   return option;
 }
+
 
 export function createFn(obj, id, callback) {
   var cObj = obj[id];

@@ -9,7 +9,7 @@ let intervalId = null
  * 用来执行队列
  * @return {[type]} [description]
  */
-let tick = function () {
+let tick = function() {
   var i = 0;
   for (; i < list.length; i++) {
     list[i].end ? list.splice(i--, 1) : list[i]();
@@ -22,7 +22,7 @@ let tick = function () {
  * 停止所有定时器队列
  * @return {[type]} [description]
  */
-let stop = function () {
+let stop = function() {
   clearInterval(intervalId);
   intervalId = null;
 }
@@ -50,65 +50,72 @@ export function loadFigure(data, callback) {
     img.src = data.url
   }
 
-
-  // 如果图片被缓存，则直接返回缓存数据
-  if (img.complete) {
-    callback && callback.call(img, true, true);
-    return img
-  };
-
   let width = img.width
   let height = img.height
 
-  let clear = function () {
+
+  function clear() {
     img = img.onload = img.onerror = null;
   }
+
+  // 如果图片被缓存，则直接返回缓存数据
+  if (img.complete) {
+    //加载成功，并且有缓存
+    callback && callback.call(img, true, true);
+    //返回缓存的，不清理
+    return img
+  };
+
+  //完成状态
+  //定义没有完成
+  var unfinished = true
 
   /**
    * 图片尺寸就绪
    * 判断图片是否已经被缓存了
    */
-  let onready = function (hasCache) {
+  function onReady() {
     let newWidth = img.width;
     let newHeight = img.height;
     // 如果图片已经在其他地方加载可使用面积检测
     if (newWidth !== width || newHeight !== height || newWidth * newHeight > 1024) {
-      callback && callback(true, hasCache);
-      onready.end = true;
-      if (hasCache) {
-        clear()
-      }
-      return true
+      //定义已经完成
+      unfinished = false
+      callback && callback(true, true);
+      clear()
     }
   }
 
   // 加载错误后的事件
-  img.onerror = function () {
-    onready.end = true;
-    callback && callback(false);
-    clear()
-  };
+  img.onerror = function() {
+    if (unfinished) {
+      callback && callback(false);
+      clear()
+    }
+  }
 
+  //完全加载完毕的事件
+  img.onload = function() {
+    if (unfinished) {
+      callback && callback(true);
+      clear()
+    }
+  }
 
-  /**检测是不是已经缓存了*/
-  if (onready(true)) {
-    /*如果缓存存在，就跳过*/
+  //检测是不是已经缓存了
+  //如果缓存存在，就跳过
+  if (onReady()) {
     return
   }
 
-  /*完全加载完毕的事件*/
-  img.onload = function () {
-    !onready.end && onready();
-    callback && callback(true);
-    clear()
-  };
-
-  // 加入队列中定期执行
-  if (!onready.end) {
-    list.push(onready);
-    // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-    if (intervalId === null) intervalId = setInterval(tick, 40);
-  };
+  // // 加入队列中定期执行
+  // if (!onready.end) {
+  //   list.push(onready);
+  //   // 无论何时只允许出现一个定时器，减少浏览器性能损耗
+  //   if (intervalId === null) {
+  //     intervalId = setInterval(tick, 40);
+  //   }
+  // };
 
   return img
 }

@@ -43345,30 +43345,6 @@ function loadFile(url, callback, charset) {
  * 图片预加载
  */
 
-var list = [];
-var intervalId = null;
-
-/**
- * 用来执行队列
- * @return {[type]} [description]
- */
-var tick = function tick() {
-  var i = 0;
-  for (; i < list.length; i++) {
-    list[i].end ? list.splice(i--, 1) : list[i]();
-  }
-  !list.length && stop();
-};
-
-/**
- * 停止所有定时器队列
- * @return {[type]} [description]
- */
-var stop = function stop() {
-  clearInterval(intervalId);
-  intervalId = null;
-};
-
 /**
  * callback(1,2)
  * 1 图片加载状态 success / fail   true/false
@@ -43392,63 +43368,71 @@ function loadFigure(data, callback) {
     img.src = data.url;
   }
 
-  // 如果图片被缓存，则直接返回缓存数据
-  if (img.complete) {
-    callback && callback.call(img, true, true);
-    return img;
-  }
-
   var width = img.width;
   var height = img.height;
 
-  var clear = function clear() {
+  function clear() {
     img = img.onload = img.onerror = null;
-  };
+  }
+
+  // 如果图片被缓存，则直接返回缓存数据
+  if (img.complete) {
+    //加载成功，并且有缓存
+    callback && callback.call(img, true, true);
+    //返回缓存的，不清理
+    return img;
+  }
+
+  //完成状态
+  //定义没有完成
+  var unfinished = true;
 
   /**
    * 图片尺寸就绪
    * 判断图片是否已经被缓存了
    */
-  var onready = function onready(hasCache) {
+  function onReady() {
     var newWidth = img.width;
     var newHeight = img.height;
     // 如果图片已经在其他地方加载可使用面积检测
     if (newWidth !== width || newHeight !== height || newWidth * newHeight > 1024) {
-      callback && callback(true, hasCache);
-      onready.end = true;
-      if (hasCache) {
-        clear();
-      }
-      return true;
+      //定义已经完成
+      unfinished = false;
+      callback && callback(true, true);
+      clear();
     }
-  };
+  }
 
   // 加载错误后的事件
   img.onerror = function () {
-    onready.end = true;
-    callback && callback(false);
-    clear();
+    if (unfinished) {
+      callback && callback(false);
+      clear();
+    }
   };
 
-  /**检测是不是已经缓存了*/
-  if (onready(true)) {
-    /*如果缓存存在，就跳过*/
+  //完全加载完毕的事件
+  img.onload = function () {
+    if (unfinished) {
+      callback && callback(true);
+      clear();
+    }
+  };
+
+  //检测是不是已经缓存了
+  //如果缓存存在，就跳过
+  if (onReady()) {
     return;
   }
 
-  /*完全加载完毕的事件*/
-  img.onload = function () {
-    !onready.end && onready();
-    callback && callback(true);
-    clear();
-  };
-
-  // 加入队列中定期执行
-  if (!onready.end) {
-    list.push(onready);
-    // 无论何时只允许出现一个定时器，减少浏览器性能损耗
-    if (intervalId === null) intervalId = setInterval(tick, 40);
-  }
+  // // 加入队列中定期执行
+  // if (!onready.end) {
+  //   list.push(onready);
+  //   // 无论何时只允许出现一个定时器，减少浏览器性能损耗
+  //   if (intervalId === null) {
+  //     intervalId = setInterval(tick, 40);
+  //   }
+  // };
 
   return img;
 }
@@ -43672,86 +43656,13 @@ function clearId() {
   CLEAR();
 }
 
-var CEIL$1 = Math.ceil;
-var slashRE = /\/$/;
-
-/**
- * 去掉后缀的斜杠
- * @return {[type]} [description]
- */
-function removeSlash(resource) {
-  if (resource && slashRE.test(resource)) {
-    return resource.substring(0, resource.length - 1);
-  }
-  return resource;
-}
-
-/**
- * 动态加载link
- * @return {[type]} [description]
- */
-function loadGolbalStyle(fileName, callback) {
-
-  var path = config.launch.resource ? config.launch.resource + '/gallery/' + fileName + '.css' : config.data.pathAddress + fileName + '.css';
-
-  var node = loadFile(path, callback);
-  node && node.setAttribute('data-type', fileName);
-}
-
-/**
- * 预加载转化URL
- * @param  {[type]} converURL [description]
- * @return {[type]}           [description]
- */
-function converURL(url) {
-
-  if (!url) {
-    return '';
-  }
-
-  var brModeType = config.launch.brModeType;
-  var baseImageSuffix = config.launch.baseImageSuffix;
-
-  if (!brModeType && !baseImageSuffix) {
-    return url;
-  }
-
-  var imageData = url.split('.');
-  var imagePrefix = imageData[0];
-  var imgetPostfix = imageData[1];
-
-  if (brModeType) {
-    if (baseImageSuffix) {
-      //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2_a.hi
-      return '' + imagePrefix + brModeType + '.' + baseImageSuffix;
-    } else {
-      //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2_a
-      return '' + imagePrefix + brModeType;
-    }
-  }
-
-  if (!brModeType) {
-    if (baseImageSuffix) {
-      //content/11/gallery/b9ba3dfc39ddd207.hi.jpg
-      return imagePrefix + '.' + baseImageSuffix + '.' + imgetPostfix;
-    }
-  }
-}
-
-/**
- * 设置快速的文件解释正则
- * 每个图片在点击的时候，需要解析文件的一些参数
- * 这里正则只做一次匹配
- */
-var brModeRE = null;
-function setFastAnalysisRE() {
-  brModeRE = null;
-  //如果存在brModeType
-  if (config.launch.brModeType) {
-    //(\w+[_a|_i]?)([.hi|.mi]*)$/i
-    brModeRE = new RegExp('(\\w+[' + config.launch.brModeType + ']?)([.' + config.launch.baseImageSuffix + ']*)$', 'i');
-  }
-}
+////////////////////////////////////////////////////
+///
+///  * 杂志支持多种资源的组合形式
+///  * _a _i .hi .mi
+///  * 根据brModeType与的baseImageSuffix的组合
+///
+////////////////////////////////////////////////////
 
 /**
  * 获取正确的图片文件名
@@ -43778,84 +43689,183 @@ function setFastAnalysisRE() {
   content/11/gallery/b9ba3dfc39ddd207_i.mi
   content/11/gallery/b9ba3dfc39ddd207_i.hi
 
- * @return
-    original: "1d7949a5585942ed.jpg"
-    suffix  : "1d7949a5585942ed.mi.jpg"
-
+ *
+   根据不同的模式
+   解析出对应的文件名出来
  */
-function analysisZoomImageName(src) {
-  var suffix = src;
-  var original = src;
+function converUrlName(src) {
   var result = void 0;
+  var hdName = void 0; //高清图名
+  var brModeType = config.launch.brModeType;
+  var baseImageSuffix = config.launch.baseImageSuffix;
 
-  //如果存在brModeType
-  if (brModeRE) {
-    result = src.match(brModeRE);
+  //如果支持高清图
+  //判断出高清图后缀
+  var hdPostfix = config.launch.useHDImageZoom && config.launch.imageSuffix && config.launch.imageSuffix['1440'];
+
+  //没有任何后缀
+  //"1d7949a5585942ed.jpg"
+  if (!brModeType && !baseImageSuffix) {
+    result = src.match(/\w+\.\w+$/);
     if (result && result.length) {
-      suffix = result[0];
-      original = result[1];
+      return {
+        hdName: result[0],
+        suffix: result[0],
+        original: result[0]
+      };
+    } else {
+      $warn('zoom-image解析出错,result：' + result);
+    }
+  }
+
+  //仅仅只有 _a _i的情况
+  if (brModeType && !baseImageSuffix) {
+    result = src.match(/(?!\/)\w+$/);
+    if (result && result.length) {
+      //因为不存在baseImageSuffix，所以不存在高清图
+      return {
+        hdName: result[0],
+        suffix: result[0],
+        original: result[0]
+      };
     } else {
       $warn('zoom-image-brModeType解析出错,result：' + result);
     }
   }
-  //有基础后缀
-  //suffix: 1d7949a5585942ed.mi.jpg
-  //original: 1d7949a5585942ed.jpg
-  else if (config.launch.baseImageSuffix) {
-      /*
-          0 1d7949a5585942ed.mi.jpg"
-          1 "1d7949a5585942ed"
-          2 : ".mi"
-          3: ".jpg"
-       */
-      result = src.match(/(\w+)(\.\w+)(\.\w+)$/);
-      if (result && result.length) {
-        suffix = result[0];
-        original = result[1] + result[3];
+
+  //如果有_a _i 与 mi hi的 并存的情况
+  //http://localhost:8888/content/326/gallery/96c09043866bd398_a.mi
+  //0: "96c09043866bd398_a.mi"
+  //1: "96c09043866bd398_a"
+  //2: ".mi"
+  if (baseImageSuffix && brModeType) {
+    result = src.match(/(\w+)(\.\w+)$/);
+    if (result && result.length) {
+      if (hdPostfix) {
+        //96c09043866bd398_a.hi
+        hdName = result[1] + '.' + hdPostfix;
       } else {
-        $warn('zoom-image-suffix解析出错,result：' + result);
+        hdName = result[0];
       }
+      return {
+        hdName: hdName,
+        suffix: result[0], //带有后缀的 "96c09043866bd398_a.mi"
+        original: result[1] //解析出来原始的 "96c09043866bd398_a"
+      };
+    } else {
+      $warn('zoom-image-suffix解析出错,result：' + result);
     }
-    //如果没有后缀
-    else {
-        //"1d7949a5585942ed.jpg"
-        result = src.match(/\w+\.\w+$/);
-        if (result && result.length) {
-          suffix = original = result[0];
-        } else {
-          $warn('zoom-image解析出错,result：' + result);
-        }
+    return;
+  }
+
+  //仅仅只有 .hi/.mi的情况
+  //http://localhost:8888/content/326/gallery/96c09043866bd398.mi.jpg"
+  // 0 1d7949a5585942ed.mi.jpg"
+  // 1 "1d7949a5585942ed"
+  // 2 : ".mi"
+  // 3: ".jpg"
+  if (baseImageSuffix && !brModeType) {
+    result = src.match(/(\w+)(\.\w+)(\.\w+)$/);
+    if (result && result.length) {
+      if (hdPostfix) {
+        //96c09043866bd398.hi.jpg
+        hdName = result[1] + '.' + hdPostfix + result[3];
+      } else {
+        hdName = result[0];
       }
-  return {
-    original: original, //原始版
-    suffix: suffix //带有后缀
-  };
+      return {
+        hdName: hdName,
+        suffix: result[0], //带有后缀的 "1d7949a5585942ed.mi.jpg"
+        original: result[1] + result[3] //解析出来原始的 1d7949a5585942ed" + ".jpg"
+      };
+    } else {
+      $warn('zoom-image-suffix解析出错,result：' + result);
+    }
+  }
 }
 
 /**
- * 给地址增加私有后缀
- * @param  {[type]} originalUrl [description]
- * @param  {[type]} suffix      [description]
- * @return {[type]}             [description]
+ * 普通资源路径转化
+ * 载资源都是PNG.JPG的格式
+ * 但是杂志支持多种资源的组合形式
+ * _a _i .hi .mi
+ * 根据brModeType与的baseImageSuffix的组合
+ * 匹配正确的后缀名
+ *
+ * url 传入完成的URL
+
+一种有四种大的组合情况
+
+// 'd048193365eac224_a'
+// 'd048193365eac224_i'
+//
+// 'b9ba3dfc39ddd207.jpg'
+//
+// 'd048193365eac224_i.mi'
+// 'd048193365eac224_i.hi'
+// 'd048193365eac224_a.hi'
+// 'd048193365eac224_a.mi'
+//
+// 'b9ba3dfc39ddd207.hi.jpg'
+// 'b9ba3dfc39ddd207.mi.jpg'
+
  */
-function insertImageUrlSuffix(originalUrl, suffix) {
-  if (originalUrl && suffix) {
-    //brModeType 没有类型后缀
-    if (config.launch.brModeType) {
-      return originalUrl.replace(/\w+/ig, '$&' + '.' + suffix);
-    }
-    //带后缀
-    return originalUrl.replace(/\w+\./ig, '$&' + suffix + '.');
+function converImageURL(url, supportBrMode, supportSuffix) {
+
+  if (!url) {
+    return '';
   }
-  return originalUrl;
+
+  var brModeType = supportBrMode ? supportBrMode : config.launch.brModeType;
+  var baseImageSuffix = supportSuffix ? supportSuffix : config.launch.baseImageSuffix;
+
+  //不需要转换
+  if (!brModeType && !baseImageSuffix) {
+    return url;
+  }
+
+  var imageData = url.split('.');
+  var imagePrefix = imageData[0];
+  var imgetPostfix = imageData[1];
+
+  if (brModeType && baseImageSuffix) {
+    //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2 _a .hi
+    return '' + imagePrefix + brModeType + '.' + baseImageSuffix;
+  }
+
+  if (brModeType && !baseImageSuffix) {
+    //http://localhost:8888/content/11/gallery/1ffa8897140f3b99f7b3a5173fbc3ac2 _a
+    return '' + imagePrefix + brModeType;
+  }
+
+  if (!brModeType && baseImageSuffix) {
+    //content/11/gallery/b9ba3dfc39ddd207 .hi .jpg
+    return imagePrefix + '.' + baseImageSuffix + '.' + imgetPostfix;
+  }
 }
 
-/*获取高清图文件*/
-function getHDFilePath(originalUrl) {
-  if (config.launch.useHDImageZoom && config.launch.imageSuffix && config.launch.imageSuffix['1440']) {
-    return getFileFullPath(insertImageUrlSuffix(originalUrl, config.launch.imageSuffix['1440']), 'getHDFilePath');
+var CEIL$1 = Math.ceil;
+var slashRE = /\/$/;
+
+/**
+ * 去掉后缀的斜杠
+ * @return {[type]} [description]
+ */
+function removeSlash(resource) {
+  if (resource && slashRE.test(resource)) {
+    return resource.substring(0, resource.length - 1);
   }
-  return '';
+  return resource;
+}
+
+/**
+ * 动态加载link
+ * @return {[type]} [description]
+ */
+function loadGolbalStyle(fileName, callback) {
+  var path = config.launch.resource ? config.launch.resource + '/gallery/' + fileName + '.css' : config.data.pathAddress + fileName + '.css';
+  var node = loadFile(path, callback);
+  node && node.setAttribute('data-type', fileName);
 }
 
 /**
@@ -43882,59 +43892,58 @@ function getFileFullPath(fileName, debugType, isGif) {
     return '';
   }
 
-  var launch = config.launch;
+  var fileNameData = fileName.split('.');
+  var splitNumber = fileNameData.length;
 
-  /*
-  如果启动了基础图匹配,替换全部
-  并且要是图片
-  并且没有私有后缀
-  */
-  if (launch.baseImageSuffix && hasImages(fileName) && -1 === fileName.indexOf('.' + launch.baseImageSuffix + '.')) {
-    /*"50f110321f467d25474b9dba9b342f0a.png"
-      1 : "50f110321f467d25474b9dba9b342f0a"
-      2 : "png"
-    */
-    var fileMatch = fileName.match(/(\w+)\.(\w+)$/);
-    var name = fileMatch[1];
-    var type = fileMatch[2];
-    fileName = fileMatch[1] + '.' + launch.baseImageSuffix + '.' + fileMatch[2];
-  }
-
-  /*如果是GIF的话需要跳过brModeType类型的处理*/
-  if (isGif) {
+  //没有点
+  // 配置了brMode没有配置imageSuffix
+  // 'd048193365eac224_a'
+  // 'd048193365eac224_i'
+  if (splitNumber === 1) {
     return config.data.pathAddress + fileName;
   }
 
-  /*
-    支持webp图
-    1 如果启动brModeType
-    2 并且是图片
-    3 并且没有被修改过
-  */
-  if (launch.brModeType && hasImages(fileName) && !/\_[i|a]+\./i.test(fileName)) {
-
-    var suffix = '';
-    var _name = void 0;
-    if (Xut.plat.isBrowser) {
-      //手机浏览器访问
-      var _fileMatch = fileName.match(/\w+([.]?[\w]*)\1/ig);
-      if (_fileMatch.length === 3) {
-        _name = _fileMatch[0];
-        suffix = '.' + _fileMatch[1];
-      } else {
-        _name = _fileMatch[0];
-      }
-
-      //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a_i.mi
-      return '' + (config.data.pathAddress + _name) + launch.brModeType + suffix;
-    } else {
-      //手机app访问
-      //content/13/gallery/106d9d86fa19e56ecdff689152ecb28a.mi
-      return '' + (config.data.pathAddress + _name) + suffix;
-    }
+  //有2个点
+  // 没有brMode，有配置imageSuffix
+  // 'b9ba3dfc39ddd207.hi.jpg'
+  // 'b9ba3dfc39ddd207.mi.jpg'
+  if (splitNumber === 3) {
+    return config.data.pathAddress + fileName;
   }
 
-  return config.data.pathAddress + fileName;
+  //只有一个点
+  // 9b7adc63c04af0651a60a211ed03085c.svg
+  //
+  // 如果是正常的图片格式，就需要转化
+  // 'b9ba3dfc39ddd207.jpg'
+  //
+  // 如果是转化后的就不需要再处理
+  // 'd048193365eac224_i.mi'
+  // 'd048193365eac224_i.hi'
+  // 'd048193365eac224_a.hi'
+  // 'd048193365eac224_a.mi'
+  if (splitNumber === 2) {
+
+    //排除非图片的情况
+    //9b7adc63c04af0651a60a211ed03085c.svg
+    if (!hasImages(fileName)) {
+      return config.data.pathAddress + fileName;
+    }
+
+    //如果包含已经包含了执行的后缀
+    //不需要处理，名字
+    // 'd048193365eac224_i.mi'
+    // 'd048193365eac224_i.hi'
+    // 'd048193365eac224_a.hi'
+    // 'd048193365eac224_a.mi
+    if (/_[ia]\.(mi|hi)$/.test(fileName)) {
+      return config.data.pathAddress + fileName;
+    }
+
+    //仅仅是正常的png jpg gif图片
+    //需要生成新的后缀
+    return config.data.pathAddress + converImageURL(fileName);
+  }
 }
 
 /**
@@ -44666,6 +44675,9 @@ function filterJsonData() {
   }
 
   window.SQLResult = null;
+
+  //标记有Flow数据处理
+  config.launch.hasFlowData = true;
 
   return result;
 }
@@ -46312,7 +46324,7 @@ function clearImage() {
  */
 function imageParse(url, callback) {
 
-  url = converURL(url);
+  url = converImageURL(url);
 
   /**
    * 这里最主要是替换了图片对象，优化了创建
@@ -47608,12 +47620,16 @@ function priorityConfig() {
  * 重写配置文件
  * 由于一些数据库，或者不支持的
  * 在框架内部强制修改用户的设定
+ *
  * 如果没有预加载文件
  * 如果启动了图片模式，那么就需要去掉
  */
 function resetBrMode(hasPreFile, globalBrMode) {
-  if (!hasPreFile) {
+  //如果在没有hasPreFile，并且没有hasFlowData，那么就是兼容读库的旧版的处理
+  //如果没有hasPreFile，但是有hasFlowData，那么就是迷你杂志，不能去掉
+  if (!hasPreFile && !config.launch.hasFlowData) {
     config.launch.brMode = '';
+    config.launch.brModel = '被resetBrMode清空了';
     config.launch.brModeType = '';
     return;
   }
@@ -47835,8 +47851,6 @@ function baseConfig(callback) {
       //处理预加载文件
       loadPrelaod(function (hasPreFile, globalBrMode) {
         resetBrMode(hasPreFile, globalBrMode);
-        /*建议快速正则，提高计算*/
-        setFastAnalysisRE();
         loadStyle(novelData, chapterTotal);
       });
     });
@@ -62598,11 +62612,11 @@ function zoomPicture(pipeData) {
           }
 
           /*创建*/
-          var analysisName = analysisZoomImageName(src);
+          var analysisName = converUrlName(src);
           zoomObjs[src] = new ScalePicture({
             element: $imgNode,
             originalSrc: getFileFullPath(analysisName.suffix, 'pagebase-zoom'),
-            hdSrc: getHDFilePath(analysisName.original)
+            hdSrc: getFileFullPath(analysisName.hdName, 'getHDFilePath')
           });
         }
       });
@@ -69800,23 +69814,21 @@ var ColumnClass = function () {
       if (!src) {
         return;
       }
-      //src : http://localhost:8888/content/11/gallery/b9ba3dfc39ddd207_a
-      //    original : "b9ba3dfc39ddd207_a"
-      //    suffix : "b9ba3dfc39ddd207_a"
-      var analysisName = analysisZoomImageName(src);
-      var originalName = analysisName.original;
+
+      var conver = converUrlName(src);
+      var original = conver.original;
 
       /*存在*/
-      var zoomObj = this._scaleObjs[originalName];
+      var zoomObj = this._scaleObjs[original];
       if (zoomObj) {
         return zoomObj.play();
       }
 
       /*创建*/
-      this._scaleObjs[originalName] = new ScalePicture({
+      this._scaleObjs[original] = new ScalePicture({
         element: $(node),
-        originalSrc: getFileFullPath(analysisName.suffix, 'column-zoom'),
-        hdSrc: getHDFilePath(originalName)
+        originalSrc: getFileFullPath(conver.suffix, 'column-zoom'),
+        hdSrc: getFileFullPath(conver.hdName, 'getHDFilePath')
       });
     }
 
@@ -81098,7 +81110,7 @@ function initApp() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 890.3;
+Xut.Version = 890.4;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

@@ -31,9 +31,17 @@ Xut.Application.setConfig = {
   preload: true,
   visualMode: 1,
   // platform: 'mini',
-  historyMode: false,
+  historyMode: true,
   launchAnim: false,
   // convert: 'svg',
+
+
+  brMode: 1, //图片模式
+  imageSuffix: { //定义基础图片取值
+      1080: 'mi',
+      1440: 'hi'
+  },
+
 
   // debug: {
   //   locationPage: {
@@ -41,23 +49,11 @@ Xut.Application.setConfig = {
   //     pageIndex: 18
   //   }
   // },
-
-  brModel: 1, //图片模式
-  imageSuffix: { //定义基础图片取值
-      1080: 'mi',
-      1440: 'hi'
-  },
-
   // columnCheck:true,
-
   // scrollMode: 'v',
-
-  //
   // gestureSwipe:true,
-
   // launchAnim:false,是否关闭启动动画
   // convert: 'svg', //转化资源svg转化成js
-  // platform 平台
   // visualMode:1,2,3,4 页面模式
   // columnCheck:false, //分栏检测
   // doublePageMode: false //双页模式
@@ -101,7 +97,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 11 //306
+var appId = 16 //326
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

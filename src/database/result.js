@@ -92,7 +92,11 @@ function filterJsonData() {
     })
   }
 
+
   window.SQLResult = null;
+
+  //标记有Flow数据处理
+  config.launch.hasFlowData = true
 
   return result
 }

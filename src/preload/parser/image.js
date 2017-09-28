@@ -1,4 +1,4 @@
-import { loadFigure, converURL } from 'core/util/index'
+import { loadFigure, converImageURL } from 'core/util/index'
 import { config } from 'core/config/index'
 import { Share } from './share'
 
@@ -33,7 +33,7 @@ export function clearImage() {
  */
 export function imageParse(url, callback) {
 
-  url = converURL(url)
+  url = converImageURL(url)
 
   /**
    * 这里最主要是替换了图片对象，优化了创建

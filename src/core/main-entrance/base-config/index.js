@@ -1,7 +1,7 @@
 import initDatabse from './init-database'
 import setData from './set-data'
 import { importJsonDatabase } from 'database/result'
-import { $warn, loadGolbalStyle, setFastAnalysisRE } from '../../util/index'
+import { $warn, loadGolbalStyle } from '../../util/index'
 import { createCursor } from '../../expand/cursor'
 import { initColumn } from '../../component/column/init'
 import { contentFilter } from '../../component/activity/content/content-filter'
@@ -147,8 +147,6 @@ export default function baseConfig(callback) {
       //处理预加载文件
       loadPrelaod(function(hasPreFile, globalBrMode) {
         resetBrMode(hasPreFile, globalBrMode)
-        /*建议快速正则，提高计算*/
-        setFastAnalysisRE()
         loadStyle(novelData, chapterTotal)
       })
     })
