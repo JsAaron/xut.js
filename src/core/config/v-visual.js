@@ -19,46 +19,49 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
   let newTop = 0
   let newLeft = 0
 
-  if(!setVisualMode) {
-    $warn('getVisualSize没有提供setVisualMode')
+  if (!setVisualMode) {
+    $warn({
+      type: 'visual',
+      content: 'getVisualSize没有提供setVisualMode'
+    })
   }
 
   /**
    * 模式2：
    * 宽度100%，正比缩放高度
    */
-  if(setVisualMode === 2) {
+  if (setVisualMode === 2) {
 
     //竖版PPT
-    if(config.pptVertical) {
+    if (config.pptVertical) {
       //竖版显示：正常
-      if(config.screenVertical) {
+      if (config.screenVertical) {
         newHeight = fullProportion.pptHeight * fullProportion.width
         newTop = (screenHeight - newHeight) / 2
       }
       //横版显示：反向
-      if(config.screenHorizontal) {
+      if (config.screenHorizontal) {
         newWidth = fullProportion.pptWidth * fullProportion.height
         newLeft = (screenWidth - newWidth) / 2
       }
     }
 
     //横版PPT
-    if(config.pptHorizontal) {
+    if (config.pptHorizontal) {
       //横版显示：正常
-      if(config.screenHorizontal) {
+      if (config.screenHorizontal) {
         newHeight = fullProportion.pptHeight * fullProportion.width
         newTop = (screenHeight - newHeight) / 2
       }
       //竖版显示：反向
-      if(config.screenVertical) {
+      if (config.screenVertical) {
         newHeight = fullProportion.pptHeight * fullProportion.width
         newTop = (screenHeight - newHeight) / 2
       }
     }
 
     //保证模式2高度不能溢出分辨率最大距离
-    if(newHeight > screenHeight) {
+    if (newHeight > screenHeight) {
       newHeight = screenHeight
       newTop = 0
     }
@@ -68,48 +71,48 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
    * 模式3：
    * 高度100%,宽度溢出可视区隐藏
    */
-  if(setVisualMode === 3) {
+  if (setVisualMode === 3) {
 
     //竖版：PPT
-    if(config.pptVertical) {
+    if (config.pptVertical) {
       //竖版显示：正常
-      if(config.screenVertical) {
+      if (config.screenVertical) {
         //宽度溢出的情况
         newWidth = fullProportion.pptWidth * fullProportion.height
         newLeft = (screenWidth - newWidth) / 2
 
         //宽度没办法溢出
         //要强制宽度100%
-        if(newWidth < screenWidth) {
+        if (newWidth < screenWidth) {
           newWidth = screenWidth
           newLeft = 0
         }
       }
       //横版显示：反向
-      if(config.screenHorizontal) {
+      if (config.screenHorizontal) {
         newWidth = fullProportion.pptWidth * fullProportion.height
         newLeft = (screenWidth - newWidth) / 2
       }
     }
 
     //横版：PPT
-    if(config.pptHorizontal) {
+    if (config.pptHorizontal) {
 
       //横版显示:正常
-      if(config.screenHorizontal) {
+      if (config.screenHorizontal) {
         newWidth = fullProportion.pptWidth * fullProportion.height
         newLeft = (screenWidth - newWidth) / 2
 
         //宽度没办法溢出
         //要强制宽度100%
-        if(!noModifyValue && newWidth < screenWidth) {
+        if (!noModifyValue && newWidth < screenWidth) {
           newWidth = screenWidth
           newLeft = 0
         }
       }
 
       //竖版显示：反向
-      if(config.screenVertical) {
+      if (config.screenVertical) {
         newHeight = fullProportion.pptHeight * fullProportion.width
         newTop = (screenHeight - newHeight) / 2
       }
@@ -121,14 +124,14 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
    * 模式1
    * 如果启动了双页模式
    */
-  if(config.launch.doublePageMode && setVisualMode === 1) {
+  if (config.launch.doublePageMode && setVisualMode === 1) {
     newWidth = newWidth / 2
   }
 
   /**
    * 模式5
    */
-  if(setVisualMode === 5){
+  if (setVisualMode === 5) {
     newWidth = screenWidth * 2
   }
 

@@ -69,13 +69,17 @@ export function extendPresentation(access, $$globalSwiper) {
   1 page
   2 master
    */
-  Xut.Presentation.GetFloatContainer = function (pageType) {
+  Xut.Presentation.GetFloatContainer = function(pageType) {
     const pageObj = Xut.Presentation.GetPageBase(pageType)
     const containerName = pageType === 'page' ? 'pageContainer' : 'masterContainer'
     if (pageObj.floatGroup[containerName].length) {
       return pageObj.floatGroup[containerName]
     } else {
-      $warn(pageType + ',浮动根节点没有找到')
+      $warn({
+        type: 'api',
+        content: `浮动根节点没有找到, pageType:${pageType}`,
+        color: 'red'
+      })
     }
   }
 
@@ -107,7 +111,11 @@ export function extendPresentation(access, $$globalSwiper) {
     if (pageBase && pageBase.getStyle) {
       return pageBase.getStyle
     } else {
-      $warn('页面Style配置文件获取失败,pageIndex:' + pageIndex)
+      $warn({
+        type: 'api',
+        content: `页面Style配置文件获取失败, pageIndex:${pageIndex}`,
+        color: 'red'
+      })
     }
   }
 
@@ -127,14 +135,14 @@ export function extendPresentation(access, $$globalSwiper) {
   /**
    * 得到content的命名规则
    */
-  Xut.Presentation.GetContentPrefix = function (pageIndex) {
+  Xut.Presentation.GetContentPrefix = function(pageIndex) {
     return CONTENTPREFIX + Xut.Presentation.GetPagePrefix(pageIndex) + "_";
   }
 
   /**
    * 获取命名规则
    */
-  Xut.Presentation.GetContentName = function (id) {
+  Xut.Presentation.GetContentName = function(id) {
     if (id) {
       return CONTENTPREFIX + Xut.Presentation.GetPagePrefix() + "_" + id;
     } else {

@@ -9,7 +9,7 @@ import { typeFilter } from './page-type'
  * 4 args参数
  * 5 回调每一个上下文
  */
-export  function createaAccess(mgr) {
+export function createaAccess(mgr) {
   return (callback, pageType, args, eachContext) => {
     //如果第一个参数不是pageType模式
     //参数移位
@@ -28,7 +28,11 @@ export  function createaAccess(mgr) {
     if (mgr[pageType]) {
       return callback(mgr[pageType], pageType, args, eachContext)
     } else {
-      $warn('传递到access的pageType错误,pageType=' + pageType)
+      $warn({
+        type: 'api',
+        content: `传递到access的pageType错误，pageType=${pageType}`,
+        color: 'red'
+      })
     }
   }
 }

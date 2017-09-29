@@ -9,6 +9,12 @@
 import { $warn } from './debug/index'
 import { config } from '../config/index'
 
+function showWarn(data) {
+  $warn({
+    type: 'util',
+    content: data
+  })
+}
 
 /**
  * 获取正确的图片文件名
@@ -62,7 +68,7 @@ export function converUrlName(src) {
         original: result[0]
       }
     } else {
-      $warn('zoom-image解析出错,result：' + result)
+      showWarn('zoom-image解析出错,result：' + result)
     }
   }
 
@@ -77,7 +83,7 @@ export function converUrlName(src) {
         original: result[0]
       }
     } else {
-      $warn('zoom-image-brModeType解析出错,result：' + result)
+      showWarn('zoom-image-brModeType解析出错,result：' + result)
     }
   }
 
@@ -101,7 +107,7 @@ export function converUrlName(src) {
         original: result[1] //解析出来原始的 "96c09043866bd398_a"
       }
     } else {
-      $warn('zoom-image-suffix解析出错,result：' + result)
+      showWarn('zoom-image-suffix解析出错,result：' + result)
     }
     return
   }
@@ -127,7 +133,7 @@ export function converUrlName(src) {
         original: result[1] + result[3] //解析出来原始的 1d7949a5585942ed" + ".jpg"
       }
     } else {
-      $warn('zoom-image-suffix解析出错,result：' + result)
+      showWarn('zoom-image-suffix解析出错,result：' + result)
     }
   }
 

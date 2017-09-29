@@ -109,9 +109,10 @@ export function priorityConfig() {
   /// debug模式
   //////////////////////////////////
   for (let key in golbal.debug) {
-    config.debug[key] = golbal.debug[key]
+    if (golbal.debug[key] !== undefined) {
+      config.debug[key] = golbal.debug[key]
+    }
   }
-
 
   //////////////////////////////////
   /// 忙碌光标

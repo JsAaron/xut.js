@@ -87,7 +87,10 @@ export function $extend(object, config) {
   for (var i in config) {
     if (i) {
       if (object[i]) {
-        $warn('接口方法重复', 'Key->' + i, 'Value->' + object[i])
+        $warn({
+          type: 'util',
+          content: `'接口方法重复', 'Key->' + i, 'Value->' + object[i]`
+        })
       } else {
         object[i] = config[i];
       }
@@ -106,7 +109,10 @@ export function parseJSON(parameter) {
   try {
     json = JSON.parse(parameter)
   } catch (error) {
-    $warn(`parseJSON失败:${parameter}`)
+    $warn({
+      type: 'util',
+      content: `parseJSON失败:${parameter}`
+    })
     return false
   }
   return json
@@ -132,7 +138,10 @@ export function makeJsonPack(code) {
     let post = "(function(){" + enterReplace(code) + "})"
     return (new Function("return " + post))();
   } catch (error) {
-    $warn('解析json出错' + code)
+    $warn({
+      type: 'util',
+      content: '解析json出错' + code
+    })
   }
 }
 
@@ -292,7 +301,7 @@ export function joinPaths() {
         paths.push(arg);
       }
     } catch (e) {
-      $warn(e);
+
     }
 
   }

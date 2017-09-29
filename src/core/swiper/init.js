@@ -4,7 +4,7 @@ import { LINEARTAG } from './type'
 export default function init(Swiper) {
 
 
-  Swiper.prototype._init = function () {
+  Swiper.prototype._init = function() {
     this._initMode()
     this._initEvents()
     this._initPrevent()
@@ -15,7 +15,7 @@ export default function init(Swiper) {
 
 
   /*基本模式设置*/
-  Swiper.prototype._initMode = function () {
+  Swiper.prototype._initMode = function() {
     /*分段模式*/
     if (this.options.snap) {
       //用于查找跟元素
@@ -23,7 +23,10 @@ export default function init(Swiper) {
       //ul => master
       const ul = this.container.querySelectorAll('ul')
       if (!ul.length) {
-        $warn(" ul element don't found !")
+        $warn({
+          type: 'swiper',
+          content: "ul element don't found"
+        })
       } else {
         this._childNodes = {
           page: ul[0],
@@ -54,16 +57,16 @@ export default function init(Swiper) {
   }
 
   /*默认行为*/
-  Swiper.prototype._initPrevent = function () {
-    this._stopDefault = this.options.preventDefault ? function (e) {
+  Swiper.prototype._initPrevent = function() {
+    this._stopDefault = this.options.preventDefault ? function(e) {
       e.preventDefault && e.preventDefault()
-    } : function () {}
+    } : function() {}
   }
 
   /**
    * 设置初始的
    */
-  Swiper.prototype._setTransform = function (element) {
+  Swiper.prototype._setTransform = function(element) {
     this._initDistance = (-this.visualIndex * this._getRollVisual())
     if (element) {
       Xut.style.setTranslate({
@@ -81,7 +84,7 @@ export default function init(Swiper) {
   /**
    * 设置容易溢出的尺寸
    */
-  Swiper.prototype._setContainerValue = function (element) {
+  Swiper.prototype._setContainerValue = function(element) {
     if (element) {
       element.style.height = this.actualHeight * this.totalIndex + 'px'
     } else {
@@ -92,7 +95,7 @@ export default function init(Swiper) {
   /**
    * 绑定事件
    */
-  Swiper.prototype._initEvents = function () {
+  Swiper.prototype._initEvents = function() {
     const callback = {
       start: this,
       end: this,
@@ -117,7 +120,7 @@ export default function init(Swiper) {
   }
 
   /*滚轮*/
-  Swiper.prototype._initWheel = function () {
+  Swiper.prototype._initWheel = function() {
     this.container.addEventListener('wheel', this._onWheel.bind(this), false);
     this.container.addEventListener('mousewheel', this._onWheel.bind(this), false);
     this.container.addEventListener('DOMMouseScroll', this._onWheel.bind(this), false);

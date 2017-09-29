@@ -63,7 +63,10 @@ function addHandler(element, eventName, handler, capture) {
         //所以transitionend就比较特殊了，因为都是同一个事件名称
         //所以只要一份，所以重复绑定就需要去掉
         if (eventName !== 'transitionend') {
-          $warn(eventName + '：事件重复绑定添加')
+          $warn({
+            type: 'event',
+            content: eventName + '：事件重复绑定添加'
+          })
         }
       } else {
         dataCache[eventName] = [handler, capture]
@@ -78,7 +81,7 @@ function addHandler(element, eventName, handler, capture) {
 }
 
 const eachApply = (events, callbacks, processor, isRmove) => {
-  _.each(callbacks, function (handler, key) {
+  _.each(callbacks, function(handler, key) {
     let eventName
     if (isRmove) {
       //如果是移除，callbacks是数组
@@ -101,7 +104,7 @@ const eachApply = (events, callbacks, processor, isRmove) => {
  * @return {[type]} [description]
  */
 const addEvent = (element, events, callbacks, capture) => {
-  eachApply(events, callbacks, function (eventName, handler) {
+  eachApply(events, callbacks, function(eventName, handler) {
     addHandler(element, eventName, handler, capture)
     element.addEventListener(eventName, handler, capture)
   })
@@ -116,10 +119,16 @@ function removeAll(element) {
   let uuid = element.xutHandler
   let dataCache = eventDataCache[uuid]
   if (!dataCache) {
-    $warn('移除所有事件出错')
+
+    $warn({
+      type: 'event',
+      content: '移除所有事件出错'
+    })
+
+
     return
   }
-  _.each(dataCache, function (data, eventName) {
+  _.each(dataCache, function(data, eventName) {
     if (data) {
       element.removeEventListener(eventName, data[0], data[1])
       dataCache[eventName] = null
@@ -136,7 +145,10 @@ function removeone(element, eventName) {
   let uuid = element.xutHandler
   let dataCache = eventDataCache[uuid]
   if (!dataCache) {
-    $warn('移除事件' + eventName + '出错')
+    $warn({
+      type: 'event',
+      content: '移除事件' + eventName + '出错'
+    })
     return
   }
   let data = dataCache[eventName]
@@ -145,7 +157,10 @@ function removeone(element, eventName) {
     dataCache[eventName] = null
     delete dataCache[eventName]
   } else {
-    $warn('移除事件' + eventName + '出错')
+    $warn({
+      type: 'event',
+      content: '移除事件' + eventName + '出错'
+    })
   }
 
   //如果没有数据
@@ -161,7 +176,7 @@ function removeone(element, eventName) {
  * @return {[type]} [description]
  */
 const removeEvent = (element, events, callbacks) => {
-  eachApply(events, callbacks, function (eventName) {
+  eachApply(events, callbacks, function(eventName) {
     removeone(element, eventName)
   }, 'remove')
 }
@@ -202,7 +217,7 @@ function toNodeObj(element) {
  * 检测end事件，默认要绑定cancel
  * @return {[type]} [description]
  */
-const checkBindCancel = function (callbacks) {
+const checkBindCancel = function(callbacks) {
   if (callbacks && callbacks.end && !callbacks.cancel) {
     callbacks.cancel = callbacks.end
   }
@@ -235,7 +250,10 @@ export function $on(element, callbacks, capture = false) {
 export function $off(element, callbacks) {
 
   if (!element) {
-    $warn('移除事件对象不存在')
+    $warn({
+      type: 'event',
+      content: '移除事件对象不存在'
+    })
     return
   }
 
@@ -248,7 +266,10 @@ export function $off(element, callbacks) {
   }
 
   if (!_.isArray(callbacks)) {
-    $warn('移除的事件句柄参数，必须是数组')
+    $warn({
+      type: 'event',
+      content: '移除的事件句柄参数，必须是数组'
+    })
     return
   }
 

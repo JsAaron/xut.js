@@ -43,7 +43,7 @@ export function imageParse(url, callback) {
     url: url
   }, function(success, hasCache) {
     imageShare && imageShare.add(imageObject) //加入到循环队列
-    callback(success, hasCache)
+    callback({url, success, hasCache })
   })
 
   return {

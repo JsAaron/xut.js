@@ -56,16 +56,25 @@ function filterJsonData() {
 
   /*必须保证数据存在*/
   if (!result) {
-    $warn('json数据库加载出错')
+    $warn({
+      type: 'database',
+      content: 'json数据库加载出错'
+    })
     return
   }
   /*快速刷新会出错，加强判断*/
   if (!_.isObject(result)) {
-    $warn('json数据库必须是对象')
+    $warn({
+      type: 'database',
+      content: 'json数据库必须是对象'
+    })
     return
   }
   if (!result.Setting) {
-    $warn('json数据库必须要表')
+    $warn({
+      type: 'database',
+      content: 'json数据库必须要表'
+    })
     return
   }
 

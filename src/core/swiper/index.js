@@ -185,7 +185,10 @@ export default class Swiper extends Observer {
     if (insideScroll) {
       if (!visualWidth || visualWidth && (actualWidth < visualWidth)) {
         insideScroll = false
-        $warn('启动了insideScroll，但是条件还不成立')
+        $warn({
+          type: 'swiper',
+          content: '启动了insideScroll，但是条件还不成立'
+        })
       }
     }
 

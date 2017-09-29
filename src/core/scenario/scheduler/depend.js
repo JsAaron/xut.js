@@ -196,7 +196,6 @@ return []
 export function getRealPage(pageIndex, type) {
 
   if (pageIndex === undefined) {
-    // $warn(`${type}调用getRealPage传递pageIndex为空`)
     return []
   }
 

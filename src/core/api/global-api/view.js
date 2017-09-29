@@ -66,7 +66,11 @@ export function initView() {
     /*获取到当前的页面对象,用于跳转去重复*/
     const curVmPage = current && current.$$mediator && current.$$mediator.$curVmPage
     if (curVmPage && curVmPage.seasonId == seasonId && curVmPage.chapterId == chapterId) {
-      $warn(`重复触发页面加载:seasonId:${seasonId},chapterId:${chapterId}`)
+      $warn({
+        type: 'api',
+        content: `拦截:重复触发Xut.View.LoadScenario,seasonId:${seasonId},chapterId:${chapterId}`,
+        color: 'red'
+      })
       return
     }
 

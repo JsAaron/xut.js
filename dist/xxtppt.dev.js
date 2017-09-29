@@ -944,7 +944,6 @@ String.styleFormat = function(format) {
           if (options.speed !== undefined) {
             node.style[transitionDuration] = options.speed + 'ms'
           }
-          // Xut.$warn(styleText, 'log')
         }
       }
     },
@@ -41524,6 +41523,22 @@ var iframeConfig = {
   }
 };
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -41603,8 +41618,6 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-var $warn = function $warn() {};
-
 /*
   $warn('hello');
   $warn('信息','info');
@@ -41618,6 +41631,54 @@ var $warn = function $warn() {};
   debug.log({a: 1, b: 2});
   debug.log([1,2,3]);
  */
+var hasConsole = typeof console !== 'undefined';
+
+function $warn(data, content, level, color) {
+
+  var silent = config.debug.silent;
+
+  if (!silent) {
+    return;
+  }
+
+  if (!hasConsole) {
+    return;
+  }
+
+  //传递的是字符串
+  //$warn(type,content,level,color)
+  if (typeof data === 'string') {
+    console.log(123);
+    return;
+  }
+
+  //如果是对象数据
+  //data = {
+  //  type
+  //  content
+  //  level
+  //  color
+  //}
+  if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+    var type = data.type;
+    var _content = data.content;
+    var _level = data.level;
+    var _color = data.color;
+    //默认按照普通日子输出
+    var command = console[_level] || console.log;
+
+    //如果启动了全部处理
+    //如果能找到对应的处理
+    //silent：['all','preload'.....]
+    if (~silent.indexOf('all') || ~silent.indexOf(type)) {
+      command('%c<\u7C7B\u578B>:%c' + type + ' %c<\u5185\u5BB9>:%c' + _content, "color:#A0522D", "color:" + _color, "color:#A0522D", "color:" + _color);
+    }
+    return;
+  }
+
+  console.log('$warn传递了错误参数', arguments);
+}
+
 Xut.$warn = $warn;
 
 var CEIL = Math.ceil;
@@ -41639,7 +41700,10 @@ function getVisualSize(config, fullProportion, setVisualMode, noModifyValue) {
   var newLeft = 0;
 
   if (!setVisualMode) {
-    $warn('getVisualSize没有提供setVisualMode');
+    $warn({
+      type: 'visual',
+      content: 'getVisualSize没有提供setVisualMode'
+    });
   }
 
   /**
@@ -42226,9 +42290,23 @@ var improtDebugConfig = {
 
   /**
    * 是否支持错误日志打印
-   * @type {Boolean}
+   * silent 启动是所有的调试内容
+   * 也可以单独启用每一项的调试内容
+   * ['all','api','preload','column','visual','scale',
+   *   'config','pagebase','swiper','event','util','database']
+   * api 级别
+   * preload 预加载处理
+   * column 根流式布局相关的
+   * visual 跟visualMode相关的
+   * scale 跟图片缩放相关
+   * config 跟基本配置相关
+   * pagebase pagebase页面相关
+   * swiper 跟滑动相关的
+   * event 根事件相关
+   * util 工具处理相关
+   * database 数据库处理相关
    */
-  silent: "production" !== 'production',
+  silent: null,
 
   /**
    * 独立canvas模式处理
@@ -42848,7 +42926,10 @@ function $extend(object, config) {
   for (var i in config) {
     if (i) {
       if (object[i]) {
-        $warn('接口方法重复', 'Key->' + i, 'Value->' + object[i]);
+        $warn({
+          type: 'util',
+          content: '\'\u63A5\u53E3\u65B9\u6CD5\u91CD\u590D\', \'Key->\' + i, \'Value->\' + object[i]'
+        });
       } else {
         object[i] = config[i];
       }
@@ -42866,7 +42947,10 @@ function parseJSON(parameter) {
   try {
     json = JSON.parse(parameter);
   } catch (error) {
-    $warn('parseJSON\u5931\u8D25:' + parameter);
+    $warn({
+      type: 'util',
+      content: 'parseJSON\u5931\u8D25:' + parameter
+    });
     return false;
   }
   return json;
@@ -42890,7 +42974,10 @@ function makeJsonPack(code) {
     var post = "(function(){" + enterReplace(code) + "})";
     return new Function("return " + post)();
   } catch (error) {
-    $warn('解析json出错' + code);
+    $warn({
+      type: 'util',
+      content: '解析json出错' + code
+    });
   }
 }
 
@@ -42981,7 +43068,10 @@ function addHandler(element, eventName, handler, capture) {
         //所以transitionend就比较特殊了，因为都是同一个事件名称
         //所以只要一份，所以重复绑定就需要去掉
         if (eventName !== 'transitionend') {
-          $warn(eventName + '：事件重复绑定添加');
+          $warn({
+            type: 'event',
+            content: eventName + '：事件重复绑定添加'
+          });
         }
       } else {
         dataCache[eventName] = [handler, capture];
@@ -43032,7 +43122,12 @@ function removeAll(element) {
   var uuid = element.xutHandler;
   var dataCache = eventDataCache[uuid];
   if (!dataCache) {
-    $warn('移除所有事件出错');
+
+    $warn({
+      type: 'event',
+      content: '移除所有事件出错'
+    });
+
     return;
   }
   _.each(dataCache, function (data, eventName) {
@@ -43052,7 +43147,10 @@ function removeone(element, eventName) {
   var uuid = element.xutHandler;
   var dataCache = eventDataCache[uuid];
   if (!dataCache) {
-    $warn('移除事件' + eventName + '出错');
+    $warn({
+      type: 'event',
+      content: '移除事件' + eventName + '出错'
+    });
     return;
   }
   var data = dataCache[eventName];
@@ -43061,7 +43159,10 @@ function removeone(element, eventName) {
     dataCache[eventName] = null;
     delete dataCache[eventName];
   } else {
-    $warn('移除事件' + eventName + '出错');
+    $warn({
+      type: 'event',
+      content: '移除事件' + eventName + '出错'
+    });
   }
 
   //如果没有数据
@@ -43151,7 +43252,10 @@ function $on(element, callbacks) {
 function $off(element, callbacks) {
 
   if (!element) {
-    $warn('移除事件对象不存在');
+    $warn({
+      type: 'event',
+      content: '移除事件对象不存在'
+    });
     return;
   }
 
@@ -43164,7 +43268,10 @@ function $off(element, callbacks) {
   }
 
   if (!_.isArray(callbacks)) {
-    $warn('移除的事件句柄参数，必须是数组');
+    $warn({
+      type: 'event',
+      content: '移除的事件句柄参数，必须是数组'
+    });
     return;
   }
 
@@ -43378,26 +43485,26 @@ function loadFigure(data, callback) {
   // 如果图片被缓存，则直接返回缓存数据
   if (img.complete) {
     //加载成功，并且有缓存
-    callback && callback.call(img, true, true);
+    callback && callback(true, true);
     //返回缓存的，不清理
     return img;
   }
-
-  //完成状态
-  //定义没有完成
-  var unfinished = true;
 
   /**
    * 图片尺寸就绪
    * 判断图片是否已经被缓存了
    */
   function onReady() {
+    //通过onload与onerror提前完成了
+    if (onReady.end) {
+      return;
+    }
     var newWidth = img.width;
     var newHeight = img.height;
     // 如果图片已经在其他地方加载可使用面积检测
     if (newWidth !== width || newHeight !== height || newWidth * newHeight > 1024) {
-      //定义已经完成
-      unfinished = false;
+      //标记完成了
+      onReady.end = true;
       callback && callback(true, true);
       clear();
     }
@@ -43405,18 +43512,22 @@ function loadFigure(data, callback) {
 
   // 加载错误后的事件
   img.onerror = function () {
-    if (unfinished) {
-      callback && callback(false);
-      clear();
+    if (onReady.end) {
+      return;
     }
+    onReady.end = true; //标记完成
+    callback && callback(false);
+    clear();
   };
 
   //完全加载完毕的事件
   img.onload = function () {
-    if (unfinished) {
-      callback && callback(true);
-      clear();
+    if (onReady.end) {
+      return;
     }
+    onReady.end = true; //标记完成
+    callback && callback(true);
+    clear();
   };
 
   //检测是不是已经缓存了
@@ -43425,9 +43536,9 @@ function loadFigure(data, callback) {
     return;
   }
 
-  // // 加入队列中定期执行
-  // if (!onready.end) {
-  //   list.push(onready);
+  //加入队列中定期执行
+  // if (!onReady.end) {
+  //   list.push(onReady);
   //   // 无论何时只允许出现一个定时器，减少浏览器性能损耗
   //   if (intervalId === null) {
   //     intervalId = setInterval(tick, 40);
@@ -43664,6 +43775,13 @@ function clearId() {
 ///
 ////////////////////////////////////////////////////
 
+function showWarn(data) {
+  $warn({
+    type: 'util',
+    content: data
+  });
+}
+
 /**
  * 获取正确的图片文件名
  * 因为图片可能存在,因为图片可能是在flow数据中获取的
@@ -43714,7 +43832,7 @@ function converUrlName(src) {
         original: result[0]
       };
     } else {
-      $warn('zoom-image解析出错,result：' + result);
+      showWarn('zoom-image解析出错,result：' + result);
     }
   }
 
@@ -43729,7 +43847,7 @@ function converUrlName(src) {
         original: result[0]
       };
     } else {
-      $warn('zoom-image-brModeType解析出错,result：' + result);
+      showWarn('zoom-image-brModeType解析出错,result：' + result);
     }
   }
 
@@ -43753,7 +43871,7 @@ function converUrlName(src) {
         original: result[1] //解析出来原始的 "96c09043866bd398_a"
       };
     } else {
-      $warn('zoom-image-suffix解析出错,result：' + result);
+      showWarn('zoom-image-suffix解析出错,result：' + result);
     }
     return;
   }
@@ -43779,7 +43897,7 @@ function converUrlName(src) {
         original: result[1] + result[3] //解析出来原始的 1d7949a5585942ed" + ".jpg"
       };
     } else {
-      $warn('zoom-image-suffix解析出错,result：' + result);
+      showWarn('zoom-image-suffix解析出错,result：' + result);
     }
   }
 }
@@ -43979,7 +44097,10 @@ function execScript(code, type) {
   try {
     new Function(enterReplace$$1(code))();
   } catch (e) {
-    $warn('加载脚本错误', type);
+    $warn({
+      type: 'util',
+      content: '加载脚本错误'
+    });
   }
 }
 
@@ -44025,7 +44146,10 @@ var converProportion = function converProportion(_ref) {
 
 
   if (!proportion) {
-    $warn('没有传递缩放比,取全局config');
+    $warn({
+      type: 'util',
+      content: '没有传递缩放比,取全局config'
+    });
     proportion = config.proportion;
   }
 
@@ -44489,7 +44613,10 @@ function readFileContent(path, callback, type) {
         callback(data);
         delete window.HTMLCONFIG[fileName];
       } else {
-        $warn('js文件加载失败，文件名:' + path);
+        $warn({
+          type: 'util',
+          content: 'js文件加载失败，文件名:' + path
+        });
         callback('');
       }
     });
@@ -44539,7 +44666,10 @@ function readFileContent(path, callback, type) {
         delete window.HTMLCONFIG[name];
         delete window.IBOOKSCONFIG[name];
       } else {
-        $warn('编译:脚本加载失败，文件名:' + name);
+        $warn({
+          type: 'util',
+          content: '编译:脚本加载失败，文件名:' + name
+        });
         callback('');
       }
     });
@@ -44565,7 +44695,10 @@ function readFileContent(path, callback, type) {
         callback(svgContent);
       },
       error: function error(xhr, type) {
-        $warn('svg文件解释出错，文件名:' + path);
+        $warn({
+          type: 'util',
+          content: 'svg文件解释出错，文件名:' + path
+        });
         callback('');
       }
     });
@@ -44638,16 +44771,25 @@ function filterJsonData() {
 
   /*必须保证数据存在*/
   if (!result) {
-    $warn('json数据库加载出错');
+    $warn({
+      type: 'database',
+      content: 'json数据库加载出错'
+    });
     return;
   }
   /*快速刷新会出错，加强判断*/
   if (!_.isObject(result)) {
-    $warn('json数据库必须是对象');
+    $warn({
+      type: 'database',
+      content: 'json数据库必须是对象'
+    });
     return;
   }
   if (!result.Setting) {
-    $warn('json数据库必须要表');
+    $warn({
+      type: 'database',
+      content: 'json数据库必须要表'
+    });
     return;
   }
 
@@ -45780,7 +45922,7 @@ var newViewHight = 0;
 /**
  * create dom...
  */
-var createStr = function createStr(chapterId, data, visualWidth, visualHeight, margin) {
+function createStr(chapterId, data, visualWidth, visualHeight, margin) {
 
   var percentageTop = Number(margin[0]);
   var percentageLeft = Number(margin[1]);
@@ -45826,9 +45968,9 @@ var createStr = function createStr(chapterId, data, visualWidth, visualHeight, m
     newViewHight = containerHeight;
     return String.styleFormat(_container);
   }
-};
+}
 
-var insertColumn = function insertColumn(seasonNode, seasonsId, visualWidth, visualHeight, columnData) {
+function insertColumn(seasonNode, seasonsId, visualWidth, visualHeight, columnData) {
   for (var i = 0; i < seasonNode.childNodes.length; i++) {
     var chapterNode = seasonNode.childNodes[i];
     if (chapterNode.nodeType == 1) {
@@ -45845,16 +45987,22 @@ var insertColumn = function insertColumn(seasonNode, seasonsId, visualWidth, vis
           chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin);
           columnData[seasonsId][id] = 0;
         } else {
-          $warn('node tag is null on insertColumn');
+          $warn({
+            type: 'column',
+            content: 'insertColumn节点是空的'
+          });
         }
       } else {
-        $warn('node tag is null on insertColumn');
+        $warn({
+          type: 'column',
+          content: 'insertColumn节点是空的'
+        });
       }
     }
   }
-};
+}
 
-var eachColumn = function eachColumn(columnData, $seasons, visualWidth, visualHeight) {
+function eachColumn(columnData, $seasons, visualWidth, visualHeight) {
   $seasons.each(function (index, node) {
     var tag = node.id;
     var seasonsId = tag.match(/\d/)[0];
@@ -45862,19 +46010,19 @@ var eachColumn = function eachColumn(columnData, $seasons, visualWidth, visualHe
     columnData[seasonsId] = {};
     insertColumn(node, seasonsId, visualWidth, visualHeight, columnData);
   });
-};
+}
 
 /**
  * 获取分栏数
  */
-var getColumnCount = function getColumnCount(content, id) {
+function getColumnCount(content, id) {
   var theChildren = $(content).find(id).children();
   var paraHeight = 0;
   for (var i = 0; i < theChildren.length; i++) {
     paraHeight += Math.max(theChildren[i].scrollHeight, theChildren[i].clientHeight);
   }
   return Math.ceil(paraHeight / newViewHight);
-};
+}
 
 /**
  * 获取分栏的数量与高度
@@ -46334,7 +46482,7 @@ function imageParse(url, callback) {
     url: url
   }, function (success, hasCache) {
     imageShare && imageShare.add(imageObject); //加入到循环队列
-    callback(success, hasCache);
+    callback({ url: url, success: success, hasCache: hasCache });
   });
 
   return {
@@ -46716,7 +46864,11 @@ var loopQueue = {};
  */
 function addLoop(filePath, detect) {
   if (loopQueue[filePath]) {
-    // $warn(`错误循环的文件已经存在循环列表 ${filePath}`)
+    $warn({
+      type: 'preload',
+      content: '\u91CD\u590D\u589E\u52A0,\u6587\u4EF6\u5DF2\u7ECF\u5B58\u5728\u5FAA\u73AF\u5217\u8868 ' + filePath,
+      level: 'error'
+    });
   } else {
     /**
      * 重设循环检测
@@ -46756,6 +46908,7 @@ function clearLoop() {
 ///  3. 失败文件就会走loop队列
 ///
 /////////////////////////////////////////////////////////////////////
+
 var Detect = function () {
 
   /**
@@ -46781,7 +46934,7 @@ var Detect = function () {
 
 
   createClass(Detect, [{
-    key: '_clearDownload',
+    key: "_clearDownload",
     value: function _clearDownload() {
       if (this._downObj) {
         this._downObj.destory && this._downObj.destory();
@@ -46795,7 +46948,7 @@ var Detect = function () {
      */
 
   }, {
-    key: '_downloadFile',
+    key: "_downloadFile",
     value: function _downloadFile() {
       var _this = this;
 
@@ -46811,7 +46964,7 @@ var Detect = function () {
      */
 
   }, {
-    key: '_clearWatcher',
+    key: "_clearWatcher",
     value: function _clearWatcher() {
       if (this.timer) {
         clearTimeout(this.timer);
@@ -46825,7 +46978,7 @@ var Detect = function () {
      */
 
   }, {
-    key: '_createWather',
+    key: "_createWather",
     value: function _createWather(time) {
       var _this2 = this;
 
@@ -46842,7 +46995,7 @@ var Detect = function () {
      */
 
   }, {
-    key: '_createExitFn',
+    key: "_createExitFn",
     value: function _createExitFn(fn) {
       var _this3 = this;
 
@@ -46867,7 +47020,7 @@ var Detect = function () {
      */
 
   }, {
-    key: 'start',
+    key: "start",
     value: function start(checkTime, fn) {
 
       this._createExitFn(fn);
@@ -46892,7 +47045,7 @@ var Detect = function () {
      */
 
   }, {
-    key: 'reset',
+    key: "reset",
     value: function reset(checkTime, fn) {
 
       this._createExitFn(fn);
@@ -46907,7 +47060,7 @@ var Detect = function () {
      */
 
   }, {
-    key: 'destory',
+    key: "destory",
     value: function destory() {
       this._clearDownload();
       this._clearWatcher();
@@ -46965,10 +47118,12 @@ var asyObject = null;
  * @return {Boolean} [description]
  */
 function checkFigure(url, callback) {
-  return imageParse(url, function (state, cache) {
+  return imageParse(url, function (data) {
+    //data {url, success, hasCache }
     /*如果是有效图，只检测第一次加载的缓存img*/
-    if (!checkFigure.url && state) {
-      checkFigure.url = url;
+    if (!checkFigure.url && data.success) {
+      //这里必须用data.url因为原始的url被修改了
+      checkFigure.url = data.url;
     }
     callback();
   });
@@ -47164,7 +47319,11 @@ function repeatCheck(id, callback) {
   function completeLoad() {
     /*如果加载数等于总计量数，这个证明加载完毕*/
     if (id === chapterIdCount) {
-      $warn('全部预加载完成');
+      $warn({
+        type: 'preload',
+        content: '\u5168\u90E8\u9884\u52A0\u8F7D\u5B8C\u6210,\u672C\u6B21\u5904\u7406\u4E86' + chapterIdCount + '\u9875',
+        color: 'red'
+      });
       $setStorage('preload', checkFigure.url);
       clearAudio();
       clearImage();
@@ -47223,10 +47382,13 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   var pageData = getDataset(chapterId);
 
-  function complete(info) {
+  function complete(data) {
     //如果加载了数据，但是数据还未加载完毕
     if (window.preloadData) {
-      // $warn(`${info}:${chapterId}`)
+      $warn({
+        type: 'preload',
+        content: data
+      });
       deleteResource(chapterId);
       repeatCheck(chapterId, callback);
     }
@@ -47236,10 +47398,10 @@ function nextTask(chapterId, callback) {
   if (pageData && Object.keys(pageData).length) {
     // $warn('----预加资源开始chapterId: ' + chapterId)
     loadResource(chapterId, pageData, function () {
-      return complete('预加资源完成-chapterId');
+      return complete('\u7B2C' + chapterId + '\u9875\uFF0C\u9884\u52A0\u8D44\u6E90\u5B8C\u6210');
     });
   } else {
-    complete('预加载数据是空-chapterId');
+    complete('\u7B2C' + chapterId + '\u9875\uFF0C\u9884\u52A0\u8F7D\u6570\u636E\u662F\u7A7A');
   }
 }
 
@@ -47307,7 +47469,10 @@ function initPreload(total, callback) {
    */
   function firstDownload() {
     nextTask('', function () {
-      $warn('预加载资源总数：' + total);
+      $warn({
+        type: 'preload',
+        content: '\u9700\u9884\u52A0\u8F7D' + total + '\u9875\u8D44\u6E90'
+      });
       /*监听预加载初始化*/
       watchPreloadInit();
       callback(true);
@@ -47322,8 +47487,14 @@ function initPreload(total, callback) {
   function checkCache(next, finish) {
     var cahceUrl = $getStorage('preload');
     if (cahceUrl) {
+      //这里主要加强判断，用户可能会清理数据的情况
       loadFigure(cahceUrl, function (state, cache) {
         if (cache) {
+          $warn({
+            type: 'preload',
+            content: '预加载已完成了',
+            color: 'red'
+          });
           finish();
         } else {
           next();
@@ -47374,7 +47545,11 @@ function requestInterrupt(_ref, context) {
   } else {
     /*正在预加载，等待记录回调*/
     if (!processed) {
-      $warn('预加载必须传递处理器，有错误');
+      $warn({
+        type: 'preload',
+        content: '\u9519\u8BEF,\u9884\u52A0\u8F7D\u5FC5\u987B\u4F20\u9012\u5904\u7406\u5668',
+        level: 'error'
+      });
     }
     //等待预加载完毕后调用
     notification = [chapterId, function () {
@@ -47505,7 +47680,9 @@ function priorityConfig() {
   /// debug模式
   //////////////////////////////////
   for (var key in golbal.debug) {
-    config.debug[key] = golbal.debug[key];
+    if (golbal.debug[key] !== undefined) {
+      config.debug[key] = golbal.debug[key];
+    }
   }
 
   //////////////////////////////////
@@ -47755,7 +47932,10 @@ function setDefaultSuffix() {
       config.launch.baseImageSuffix = config.launch.imageSuffix['1440'];
     }
     if (config.debug.devtools && config.launch.baseImageSuffix) {
-      $warn('css media匹配suffix失败，采用js采用计算. config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix);
+      $warn({
+        type: 'config',
+        content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix
+      });
     }
   }
 }
@@ -62082,7 +62262,10 @@ var ScalePicture = function () {
       this.$container = current.getSceneNode();
     }
     if (!this.$container.length) {
-      $warn('图片缩放依赖的容器不存在');
+      $warn({
+        type: 'scale',
+        content: '图片缩放依赖的容器不存在'
+      });
       return;
     }
 
@@ -62760,7 +62943,10 @@ function parseBaseTokens(tableName, tokenIds) {
   _.each(tableName, function (name) {
     if (tokenId = tokenIds[name]) {
       if (result[name]) {
-        $warn('未处理解析同一个表');
+        $warn({
+          type: 'pagebase',
+          content: '未处理解析同一个表'
+        });
       } else {
         result[name] = tokenGroup(name, tokenId);
       }
@@ -63848,7 +64034,12 @@ var externalFile = function externalFile(wrapObj, svgCallback) {
  */
 var allotRatio = function allotRatio(fixRadio, headerFooterMode) {
   if (fixRadio && headerFooterMode) {
-    config.debug.devtools && $warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式');
+    if (config.debug.devtools) {
+      $warn({
+        type: 'pagebase',
+        content: 'content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式'
+      });
+    }
   }
   //页眉页脚模式
   if (headerFooterMode) {
@@ -63943,7 +64134,10 @@ function contentStructure(pipeData, $$floatDivertor, callback) {
       //2017.1.18
       if (para.HeaderOrFooter) {
         if (headerFooterMode[contentId]) {
-          $warn('页眉页脚对象重复设置,contentId:' + contentId);
+          $warn({
+            type: 'pagebase',
+            content: '页眉页脚对象重复设置,contentId:' + contentId
+          });
         }
         headerFooterMode[contentId] = Number(para.HeaderOrFooter);
       }
@@ -68175,7 +68369,10 @@ function init(Swiper) {
       //ul => master
       var ul = this.container.querySelectorAll('ul');
       if (!ul.length) {
-        $warn(" ul element don't found !");
+        $warn({
+          type: 'swiper',
+          content: "ul element don't found"
+        });
       } else {
         this._childNodes = {
           page: ul[0],
@@ -68751,7 +68948,10 @@ var Swiper = function (_Observer) {
     if (insideScroll) {
       if (!visualWidth || visualWidth && actualWidth < visualWidth) {
         insideScroll = false;
-        $warn('启动了insideScroll，但是条件还不成立');
+        $warn({
+          type: 'swiper',
+          content: '启动了insideScroll，但是条件还不成立'
+        });
       }
     }
 
@@ -71198,7 +71398,10 @@ var initstate = function (baseProto) {
 
         /*component与activity共享了一个Container，所以只能处理一次*/
         if (divertor && floatGroup.pageContainer) {
-          $warn('floatPages重复pageContainer', 'info');
+          $warn({
+            type: 'pagebase',
+            content: 'floatPages重复pageContainer'
+          });
         } else {
           floatGroup.pageContainer = divertor.container;
         }
@@ -71213,7 +71416,10 @@ var initstate = function (baseProto) {
               }
               floatGroup.pageGroup[id] = contentObj;
             } else {
-              console.log('页面浮动对象找不到');
+              $warn({
+                type: 'pagebase',
+                content: '页面浮动对象找不到'
+              });
             }
           });
         }
@@ -71230,7 +71436,10 @@ var initstate = function (baseProto) {
 
         /*component与activity共享了一个Container，所以只能处理一次*/
         if (divertor && floatGroup.masterContainer) {
-          $warn('floatMasters重复masterContainer', 'info');
+          $warn({
+            type: 'pagebase',
+            content: 'floatMasters重复masterContainer'
+          });
         } else {
           floatGroup.masterContainer = divertor.container;
         }
@@ -71991,7 +72200,10 @@ var movePage = function (baseProto) {
           clearTimeout(timer);
           timer = null;
           if (pageNode.getAttribute('data-visual')) {
-            $warn('翻页translate回调丢失了，通过定时器手动调用修复');
+            $warn({
+              type: 'pagebase',
+              content: '翻页translate回调丢失了，通过定时器手动调用修复'
+            });
             toTranslateCB = null;
             Xut.View.SetSwiperFilpComplete(pageNode, true);
           }
@@ -72486,7 +72698,6 @@ return []
 function getRealPage(pageIndex, type) {
 
   if (pageIndex === undefined) {
-    // $warn(`${type}调用getRealPage传递pageIndex为空`)
     return [];
   }
 
@@ -74436,7 +74647,10 @@ var Scheduler = function () {
           var chapterData = converChapterData(chapterIndex);
 
           if (chapterData === undefined) {
-            $warn('\u521B\u5EFA\u9875\u9762\u51FA\u9519,chapterIndex:' + chapterIndex);
+            $warn({
+              type: 'pagebase',
+              content: '\u521B\u5EFA\u9875\u9762\u51FA\u9519,chapterIndex:' + chapterIndex
+            });
             return;
           }
 
@@ -74494,7 +74708,10 @@ var Scheduler = function () {
                 'getStyle': currentStyle
               }, pageIndex, masterFilter, function (shareMaster) {
                 if (config.debug.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
-                  $warn('\u6BCD\u7248\u4E0E\u9875\u9762VisualMode\u4E0D\u4E00\u81F4,\u9519\u8BEF\u9875\u7801:' + (pageIndex + 1) + ',\u6BCD\u7248visualMode:' + shareMaster.getStyle.pageVisualMode + ',\u9875\u9762visualMode:' + currentStyle.pageVisualMode);
+                  $warn({
+                    type: 'pagebase',
+                    content: '\u6BCD\u7248\u4E0E\u9875\u9762VisualMode\u4E0D\u4E00\u81F4,\u9519\u8BEF\u9875\u7801:' + (pageIndex + 1) + ',\u6BCD\u7248visualMode:' + shareMaster.getStyle.pageVisualMode + ',\u9875\u9762visualMode:' + currentStyle.pageVisualMode
+                  });
                 }
               });
 
@@ -75131,7 +75348,11 @@ function extendPresentation(access, $$globalSwiper) {
     if (pageObj.floatGroup[containerName].length) {
       return pageObj.floatGroup[containerName];
     } else {
-      $warn(pageType + ',浮动根节点没有找到');
+      $warn({
+        type: 'api',
+        content: '\u6D6E\u52A8\u6839\u8282\u70B9\u6CA1\u6709\u627E\u5230, pageType:' + pageType,
+        color: 'red'
+      });
     }
   };
 
@@ -75163,7 +75384,11 @@ function extendPresentation(access, $$globalSwiper) {
     if (pageBase && pageBase.getStyle) {
       return pageBase.getStyle;
     } else {
-      $warn('页面Style配置文件获取失败,pageIndex:' + pageIndex);
+      $warn({
+        type: 'api',
+        content: '\u9875\u9762Style\u914D\u7F6E\u6587\u4EF6\u83B7\u53D6\u5931\u8D25, pageIndex:' + pageIndex,
+        color: 'red'
+      });
     }
   };
 
@@ -75960,7 +76185,11 @@ function createaAccess(mgr) {
     if (mgr[pageType]) {
       return callback(mgr[pageType], pageType, args, eachContext);
     } else {
-      $warn('传递到access的pageType错误,pageType=' + pageType);
+      $warn({
+        type: 'api',
+        content: '\u4F20\u9012\u5230access\u7684pageType\u9519\u8BEF\uFF0CpageType=' + pageType,
+        color: 'red'
+      });
     }
   };
 }
@@ -80294,7 +80523,11 @@ function initView() {
     /*获取到当前的页面对象,用于跳转去重复*/
     var curVmPage = current && current.$$mediator && current.$$mediator.$curVmPage;
     if (curVmPage && curVmPage.seasonId == seasonId && curVmPage.chapterId == chapterId) {
-      $warn('\u91CD\u590D\u89E6\u53D1\u9875\u9762\u52A0\u8F7D:seasonId:' + seasonId + ',chapterId:' + chapterId);
+      $warn({
+        type: 'api',
+        content: '\u62E6\u622A:\u91CD\u590D\u89E6\u53D1Xut.View.LoadScenario,seasonId:' + seasonId + ',chapterId:' + chapterId,
+        color: 'red'
+      });
       return;
     }
 
@@ -81110,7 +81343,7 @@ function initApp() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 890.4;
+Xut.Version = 890.5;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

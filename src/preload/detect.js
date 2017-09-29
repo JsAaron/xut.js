@@ -6,7 +6,6 @@
 ///  3. 失败文件就会走loop队列
 ///
 /////////////////////////////////////////////////////////////////////
-import { $warn } from 'core/util/index'
 
 export class Detect {
 

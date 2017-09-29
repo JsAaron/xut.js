@@ -37,18 +37,18 @@ Xut.Application.setConfig = {
 
 
   brMode: 1, //图片模式
-  imageSuffix: { //定义基础图片取值
-      1080: 'mi',
-      1440: 'hi'
-  },
-
-
-  // debug: {
-  //   locationPage: {
-  //     seasonId:1,
-  //     pageIndex: 18
-  //   }
+  // imageSuffix: { //定义基础图片取值
+  //     1080: 'mi',
+  //     1440: 'hi'
   // },
+
+  debug: {
+    silent: ['preload'],
+    // locationPage: {
+    //   seasonId:1,
+    //   pageIndex: 18
+    // }
+  },
   // columnCheck:true,
   // scrollMode: 'v',
   // gestureSwipe:true,
@@ -93,11 +93,11 @@ Xut.Application.Watch('appDestory', function() {
 })
 
 Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type,options)
+  console.log(type, options)
 })
 
 
-var appId = 16 //326
+var appId = 334 //326
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

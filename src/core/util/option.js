@@ -146,7 +146,10 @@ export function execScript(code, type) {
   try {
     new Function(enterReplace(code))()
   } catch (e) {
-    $warn('加载脚本错误', type)
+    $warn({
+      type: 'util',
+      content: '加载脚本错误'
+    })
   }
 }
 
@@ -192,7 +195,10 @@ const converProportion = function({
 }) {
 
   if (!proportion) {
-    $warn('没有传递缩放比,取全局config')
+    $warn({
+      type: 'util',
+      content: '没有传递缩放比,取全局config'
+    })
     proportion = config.proportion
   }
 

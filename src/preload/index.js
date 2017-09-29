@@ -57,10 +57,12 @@ let asyObject = null
  * @return {Boolean} [description]
  */
 function checkFigure(url, callback) {
-  return imageParse(url, (state, cache) => {
+  return imageParse(url, (data) => {
+    //data {url, success, hasCache }
     /*如果是有效图，只检测第一次加载的缓存img*/
-    if (!checkFigure.url && state) {
-      checkFigure.url = url
+    if (!checkFigure.url && data.success) {
+      //这里必须用data.url因为原始的url被修改了
+      checkFigure.url = data.url
     }
     callback()
   })
@@ -260,7 +262,11 @@ function repeatCheck(id, callback) {
   function completeLoad() {
     /*如果加载数等于总计量数，这个证明加载完毕*/
     if (id === chapterIdCount) {
-      $warn('全部预加载完成')
+      $warn({
+        type: 'preload',
+        content: `全部预加载完成,本次处理了${chapterIdCount}页`,
+        color: 'red'
+      })
       $setStorage('preload', checkFigure.url)
       clearAudio()
       clearImage()
@@ -321,10 +327,13 @@ function nextTask(chapterId, callback) {
   /*只有没有预加载的数据才能被找到*/
   const pageData = getDataset(chapterId)
 
-  function complete(info) {
+  function complete(data) {
     //如果加载了数据，但是数据还未加载完毕
     if (window.preloadData) {
-      // $warn(`${info}:${chapterId}`)
+      $warn({
+        type: 'preload',
+        content: data
+      })
       deleteResource(chapterId)
       repeatCheck(chapterId, callback)
     }
@@ -333,9 +342,9 @@ function nextTask(chapterId, callback) {
   /*必须保证pageData不是一个空对象*/
   if (pageData && Object.keys(pageData).length) {
     // $warn('----预加资源开始chapterId: ' + chapterId)
-    loadResource(chapterId, pageData, () => complete('预加资源完成-chapterId'))
+    loadResource(chapterId, pageData, () => complete(`第${chapterId}页，预加资源完成`))
   } else {
-    complete('预加载数据是空-chapterId')
+    complete(`第${chapterId}页，预加载数据是空`)
   }
 }
 
@@ -407,7 +416,10 @@ export function initPreload(total, callback) {
    */
   function firstDownload() {
     nextTask('', function() {
-      $warn('预加载资源总数：' + total);
+      $warn({
+        type: 'preload',
+        content: `需预加载${total}页资源`
+      })
       /*监听预加载初始化*/
       watchPreloadInit()
       callback(true);
@@ -422,8 +434,14 @@ export function initPreload(total, callback) {
   function checkCache(next, finish) {
     const cahceUrl = $getStorage('preload')
     if (cahceUrl) {
+      //这里主要加强判断，用户可能会清理数据的情况
       loadFigure(cahceUrl, (state, cache) => {
         if (cache) {
+          $warn({
+            type: 'preload',
+            content: '预加载已完成了',
+            color: 'red'
+          })
           finish()
         } else {
           next()
@@ -480,7 +498,11 @@ export function requestInterrupt({
   } else {
     /*正在预加载，等待记录回调*/
     if (!processed) {
-      $warn('预加载必须传递处理器，有错误')
+      $warn({
+        type: 'preload',
+        content: `错误,预加载必须传递处理器`,
+        level: 'error'
+      })
     }
     //等待预加载完毕后调用
     notification = [chapterId, function() {

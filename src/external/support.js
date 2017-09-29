@@ -362,7 +362,6 @@
           if (options.speed !== undefined) {
             node.style[transitionDuration] = options.speed + 'ms'
           }
-          // Xut.$warn(styleText, 'log')
         }
       }
     },

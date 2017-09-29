@@ -128,7 +128,12 @@ const externalFile = (wrapObj, svgCallback) => {
  */
 const allotRatio = (fixRadio, headerFooterMode) => {
   if (fixRadio && headerFooterMode) {
-    config.debug.devtools && $warn('content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式')
+    if (config.debug.devtools) {
+      $warn({
+        type: 'pagebase',
+        content: 'content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式'
+      })
+    }
   }
   //页眉页脚模式
   if (headerFooterMode) {
@@ -216,7 +221,10 @@ export function contentStructure(pipeData, $$floatDivertor, callback) {
       //2017.1.18
       if (para.HeaderOrFooter) {
         if (headerFooterMode[contentId]) {
-          $warn('页眉页脚对象重复设置,contentId:' + contentId)
+          $warn({
+            type: 'pagebase',
+            content: '页眉页脚对象重复设置,contentId:' + contentId
+          })
         }
         headerFooterMode[contentId] = Number(para.HeaderOrFooter)
       }

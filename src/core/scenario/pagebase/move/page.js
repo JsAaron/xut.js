@@ -88,7 +88,10 @@ export default function(baseProto) {
           clearTimeout(timer)
           timer = null
           if (pageNode.getAttribute('data-visual')) {
-            $warn('翻页translate回调丢失了，通过定时器手动调用修复')
+            $warn({
+              type: 'pagebase',
+              content: '翻页translate回调丢失了，通过定时器手动调用修复'
+            })
             toTranslateCB = null
             Xut.View.SetSwiperFilpComplete(pageNode, true)
           }

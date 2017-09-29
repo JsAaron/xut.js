@@ -50,7 +50,10 @@ function setDefaultSuffix() {
       config.launch.baseImageSuffix = config.launch.imageSuffix['1440']
     }
     if (config.debug.devtools && config.launch.baseImageSuffix) {
-      $warn('css media匹配suffix失败，采用js采用计算. config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix)
+      $warn({
+        type: 'config',
+        content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix
+      })
     }
   }
 }

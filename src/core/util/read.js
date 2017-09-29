@@ -41,13 +41,16 @@ export function readFileContent(path, callback, type) {
    * js脚本加载
    */
   const loadJs = (fileUrl, fileName) => {
-    loadFile(randomUrl(fileUrl), function () {
+    loadFile(randomUrl(fileUrl), function() {
       data = window.HTMLCONFIG[fileName];
       if (data) {
         callback(data)
         delete window.HTMLCONFIG[fileName];
       } else {
-        $warn('js文件加载失败，文件名:' + path);
+        $warn({
+          type: 'util',
+          content: 'js文件加载失败，文件名:' + path
+        })
         callback('')
       }
     })
@@ -92,14 +95,17 @@ export function readFileContent(path, callback, type) {
     //文件名
     name = path.replace(".js", '');
     //加载脚本
-    loadFile(randomUrl(paths), function () {
+    loadFile(randomUrl(paths), function() {
       data = window.HTMLCONFIG[name] || window.IBOOKSCONFIG[name]
       if (data) {
         callback(data)
         delete window.HTMLCONFIG[name];
         delete window.IBOOKSCONFIG[name]
       } else {
-        $warn('编译:脚本加载失败，文件名:' + name)
+        $warn({
+          type: 'util',
+          content: '编译:脚本加载失败，文件名:' + name
+        })
         callback('');
       }
     })
@@ -122,11 +128,14 @@ export function readFileContent(path, callback, type) {
       type: 'get',
       dataType: 'html',
       url: randomUrl(svgUrl),
-      success: function (svgContent) {
+      success: function(svgContent) {
         callback(svgContent);
       },
-      error: function (xhr, type) {
-        $warn('svg文件解释出错，文件名:' + path);
+      error: function(xhr, type) {
+        $warn({
+          type: 'util',
+          content: 'svg文件解释出错，文件名:' + path
+        })
         callback('');
       }
     })
@@ -138,9 +147,9 @@ export function readFileContent(path, callback, type) {
    * 插件读取
    * 手机客户端模式
    */
-  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function (svgContent) {
+  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function(svgContent) {
     callback(svgContent);
-  }, function (err) {
+  }, function(err) {
     callback('')
   });
 

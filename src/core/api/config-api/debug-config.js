@@ -14,9 +14,23 @@ export default {
 
   /**
    * 是否支持错误日志打印
-   * @type {Boolean}
+   * silent 启动是所有的调试内容
+   * 也可以单独启用每一项的调试内容
+   * ['all','api','preload','column','visual','scale',
+   *   'config','pagebase','swiper','event','util','database']
+   * api 级别
+   * preload 预加载处理
+   * column 根流式布局相关的
+   * visual 跟visualMode相关的
+   * scale 跟图片缩放相关
+   * config 跟基本配置相关
+   * pagebase pagebase页面相关
+   * swiper 跟滑动相关的
+   * event 根事件相关
+   * util 工具处理相关
+   * database 数据库处理相关
    */
-  silent: process.env.NODE_ENV !== 'production',
+  silent: null,
 
   /**
    * 独立canvas模式处理

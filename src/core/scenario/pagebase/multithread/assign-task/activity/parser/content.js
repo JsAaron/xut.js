@@ -40,7 +40,7 @@ function relatedTokens(relateds, activitys, tokens) {
   let tokenNumber = Object.keys(tokens)
 
   //快速过滤，如果仅仅只是Animation
-  if(tokenNumber.length === 1 && ~tokenNumber.indexOf('Animation')) {
+  if (tokenNumber.length === 1 && ~tokenNumber.indexOf('Animation')) {
     return
   }
 
@@ -48,7 +48,7 @@ function relatedTokens(relateds, activitys, tokens) {
 
   /*创建事件容器*/
   const createEventContainer = function() {
-    if(!relateds.seasonRelated[eventId]) {
+    if (!relateds.seasonRelated[eventId]) {
       relateds.seasonRelated[eventId] = {}
     }
   }
@@ -56,9 +56,9 @@ function relatedTokens(relateds, activitys, tokens) {
   itemTokens.forEach(function(type) {
     let values = tokens[type];
     let chapterId
-    if(values !== undefined) {
+    if (values !== undefined) {
       createEventContainer(); //创建容器
-      switch(type) {
+      switch (type) {
         case 'seasonId': //跳转新场景信息
           chapterId = tokens['chapterId'] || tokens['chapter'];
           relateds.seasonRelated[eventId] = {
@@ -91,14 +91,14 @@ function tokenGroup(tableName, contentIds) {
   const query = Xut.data.query;
 
   _.each(contentIds, function(id) {
-    if(data = query(tableName, id)) {
+    if (data = query(tableName, id)) {
       contentId = data.contentId;
-      if(-1 === idset.indexOf(contentId)) {
+      if (-1 === idset.indexOf(contentId)) {
         idset.push(contentId)
       }
       //合并同个contentId多条动画数据的情况
       keyName = "contentId-" + contentId;
-      if(temp[keyName]) {
+      if (temp[keyName]) {
         temp[keyName].push(data)
       } else {
         temp[keyName] = [data];
@@ -107,7 +107,7 @@ function tokenGroup(tableName, contentIds) {
   })
 
   //转成数组格式
-  for(k in temp) {
+  for (k in temp) {
     dataset.push(temp[k])
   }
 
@@ -125,9 +125,12 @@ function parseBaseTokens(tableName, tokenIds) {
   let tokenId;
   let result = {};
   _.each(tableName, function(name) {
-    if(tokenId = tokenIds[name]) {
-      if(result[name]) {
-        $warn('未处理解析同一个表')
+    if (tokenId = tokenIds[name]) {
+      if (result[name]) {
+        $warn({
+          type: 'pagebase',
+          content: '未处理解析同一个表'
+        })
       } else {
         result[name] = tokenGroup(name, tokenId);
       }
@@ -152,14 +155,14 @@ function parseBaseTokens(tableName, tokenIds) {
      }
  */
 function parseItems(itemArray) {
-  if(!itemArray) return;
+  if (!itemArray) return;
   let actType
   let tokens = {}
   itemArray = parseJSON(itemArray)
-  if(itemArray.length) {
+  if (itemArray.length) {
     _.each(itemArray, function(item) {
       actType = item.actType;
-      if(!tokens[actType]) {
+      if (!tokens[actType]) {
         tokens[actType] = [];
       }
       tokens[actType].push(item.id);
@@ -208,15 +211,15 @@ function coreParser(callback, activity, pageType, chapterIndex) {
    *
    */
   function toRepeatContents(original) {
-    if(original && eventId) {
+    if (original && eventId) {
       var indexOf = original.indexOf(eventId);
-      if(-1 !== indexOf) {
+      if (-1 !== indexOf) {
         original.splice(indexOf, 1);
       }
     }
   }
 
-  switch(type) {
+  switch (type) {
     case 'Container': //容器
       contentIdset = seed.Container;
       toRepeatContents(contentIdset);
@@ -231,14 +234,14 @@ function coreParser(callback, activity, pageType, chapterIndex) {
       ////////////////////////////////////////
 
       /*需要创建的content合集*/
-      if(_.keys(seed).length) {
+      if (_.keys(seed).length) {
 
         let seedAnimations = seed.Animation;
         let seedParallaxs = seed.Parallax;
 
         //页面模式
-        if(pageType === 'page') {
-          if(seedAnimations) {
+        if (pageType === 'page') {
+          if (seedAnimations) {
             contentIdset = seedAnimations.idset;
             contentDataset = seedAnimations.dataset;
           }
@@ -246,12 +249,12 @@ function coreParser(callback, activity, pageType, chapterIndex) {
           //视觉差存在视觉差表处理
           // console.log(1111,seedAnimations, seedParallaxs)
           //母版的动画数据
-          if(seedAnimations) {
+          if (seedAnimations) {
             contentIdset = seedAnimations.idset;
             contentDataset = seedAnimations.dataset;
           }
           //母版的视察数据
-          if(seedParallaxs) {
+          if (seedParallaxs) {
             parallaxContentIdset = seedParallaxs.idset;
             parallaxDataset = seedParallaxs.dataset;
           }
@@ -259,12 +262,12 @@ function coreParser(callback, activity, pageType, chapterIndex) {
 
         //如果id都存在
         //合并
-        if(contentIdset && parallaxContentIdset) {
+        if (contentIdset && parallaxContentIdset) {
           contentIdset = contentIdset.concat(parallaxContentIdset)
         }
 
         //只存在视察
-        if(!contentIdset && parallaxContentIdset) {
+        if (!contentIdset && parallaxContentIdset) {
           contentIdset = parallaxContentIdset;
         }
         toRepeatContents(contentIdset);
@@ -311,14 +314,14 @@ function toRepeatCombineGroup(compilerActivitys, mixFilterRelated, pageType) {
   function pushCache(target, original, callback) {
     var id,
       i = original.length;
-    while(i--) {
+    while (i--) {
       id = Number(original[i]);
       target.push(id)
       callback && callback(id);
     }
   }
 
-  while(i--) {
+  while (i--) {
     //开始执行过滤操作
     activityRelated = compilerActivitys[i];
     idset = activityRelated.idset;
@@ -327,32 +330,32 @@ function toRepeatCombineGroup(compilerActivitys, mixFilterRelated, pageType) {
     imageIds = activityRelated.imageIds;
 
     //针对普通content对象
-    if(contentIds && contentIds.length) { //如果不为空
+    if (contentIds && contentIds.length) { //如果不为空
       pushCache(combineItemIds, contentIds);
     }
 
     //视察对象
-    if(parallaxId && parallaxId.length) { //如果不为空
+    if (parallaxId && parallaxId.length) { //如果不为空
       pushCache(combineItemIds, parallaxId);
     }
 
     //事件合集
-    if(imageIds) {
+    if (imageIds) {
       combineImageIds.push(Number(imageIds))
     }
   }
 
   //混入外部合并了逻辑
-  if(mixFilterRelated && mixFilterRelated.length) {
+  if (mixFilterRelated && mixFilterRelated.length) {
     _.each(mixFilterRelated, function(data) {
-      if(data) {
+      if (data) {
         combineItemIds = combineItemIds.concat(data)
       }
     })
   }
 
   //过滤合并多个content数据
-  if(combineImageIds.length) {
+  if (combineImageIds.length) {
     needCreateContentIds = arrayUnique(combineItemIds.concat(combineImageIds));
   } else {
     needCreateContentIds = arrayUnique(combineItemIds);
@@ -422,7 +425,7 @@ export function contentParser(compileActivitys, pipeData) {
     /*多事件*/
     Contents() {
       var item;
-      if(item = createResolve(function(tokens) {
+      if (item = createResolve(function(tokens) {
           return {
             'Contents': [tokens]
           }
@@ -437,7 +440,7 @@ export function contentParser(compileActivitys, pipeData) {
           'dragdropPara': activity.para1 //拖拽对象
         }
         var isEvt = relateds.eventRelated['eventContentId->' + eventId];
-        if(isEvt) {
+        if (isEvt) {
           isEvt.push(eventData);
         } else {
           relateds.eventRelated['eventContentId->' + eventId] = [eventData]
@@ -448,7 +451,7 @@ export function contentParser(compileActivitys, pipeData) {
     /*所有js零件*/
     JsWidget() {
       const scrollContents = parseJSON(activity.itemArray);
-      if(_.isArray(scrollContents)) {
+      if (_.isArray(scrollContents)) {
         _.each(scrollContents, function(content) {
           relateds.partContentRelated.push(content.id)
         })
@@ -467,26 +470,26 @@ export function contentParser(compileActivitys, pipeData) {
    * 4 Scenario 类型
    * 5 content合集 contents处理
    */
-  while(activity = compileActivitys.shift()) {
+  while (activity = compileActivitys.shift()) {
     //统一类型
     hookType = unifyType(activity)
 
     /*如果有钩子匹配就先处理钩子*/
-    if(!hookResolve[hookType] || (hookResolve[hookType] && hookResolve[hookType](relateds))) {
+    if (!hookResolve[hookType] || (hookResolve[hookType] && hookResolve[hookType](relateds))) {
       /*如果是动画表,视觉差表关联的content类型 ,tokens => itemArray分类数据*/
       let results = createResolve((tokens) => {
         //解析其余tokens
         relatedTokens(relateds, activity, tokens)
-          //母版是可能带视觉差的，所以除了Animation还有Parallax
-        if(pageType === 'page') {
+        //母版是可能带视觉差的，所以除了Animation还有Parallax
+        if (pageType === 'page') {
           return parseBaseTokens(['Animation'], tokens)
-        } else if(pageType === 'master') {
+        } else if (pageType === 'master') {
           return parseBaseTokens(['Animation', 'Parallax'], tokens)
         }
       })
 
       //如果有手动触发器,置于最后
-      if(activity.imageId) {
+      if (activity.imageId) {
         tempRelated.push(results)
       } else {
         activityRelated.push(results)
@@ -495,7 +498,7 @@ export function contentParser(compileActivitys, pipeData) {
   }
 
   //合并排序
-  if(tempRelated.length) {
+  if (tempRelated.length) {
     activityRelated = activityRelated.concat(tempRelated)
     tempRelated = null
   }
@@ -511,9 +514,9 @@ export function contentParser(compileActivitys, pipeData) {
   let createContentIds = createRelevant[1]
 
   //如果存在过滤器
-  if(Xut.CreateFilter.size()) {
+  if (Xut.CreateFilter.size()) {
     var filterEach = Xut.CreateFilter.each(pipeData.chapterId)
-    if(filterEach) {
+    if (filterEach) {
       filterEach(createEventIds, function(indexOf) {
         createEventIds.splice(indexOf, 1)
       })

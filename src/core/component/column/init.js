@@ -17,7 +17,7 @@ let newViewHight = 0
 /**
  * create dom...
  */
-const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
+function createStr(chapterId, data, visualWidth, visualHeight, margin) {
 
   const percentageTop = Number(margin[0])
   const percentageLeft = Number(margin[1])
@@ -78,7 +78,7 @@ const createStr = (chapterId, data, visualWidth, visualHeight, margin) => {
 }
 
 
-const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnData) => {
+function insertColumn(seasonNode, seasonsId, visualWidth, visualHeight, columnData) {
   for (let i = 0; i < seasonNode.childNodes.length; i++) {
     let chapterNode = seasonNode.childNodes[i]
     if (chapterNode.nodeType == 1) {
@@ -95,17 +95,23 @@ const insertColumn = (seasonNode, seasonsId, visualWidth, visualHeight, columnDa
           chapterNode.innerHTML = createStr(id, chapterNode.innerHTML, visualWidth, visualHeight, margin)
           columnData[seasonsId][id] = 0
         } else {
-          $warn('node tag is null on insertColumn')
+          $warn({
+            type: 'column',
+            content: 'insertColumn节点是空的'
+          })
         }
       } else {
-        $warn('node tag is null on insertColumn')
+        $warn({
+          type: 'column',
+          content: 'insertColumn节点是空的'
+        })
       }
     }
   }
 }
 
 
-const eachColumn = function (columnData, $seasons, visualWidth, visualHeight) {
+function eachColumn(columnData, $seasons, visualWidth, visualHeight) {
   $seasons.each((index, node) => {
     let tag = node.id
     let seasonsId = tag.match(/\d/)[0]
@@ -119,7 +125,7 @@ const eachColumn = function (columnData, $seasons, visualWidth, visualHeight) {
 /**
  * 获取分栏数
  */
-const getColumnCount = (content, id) => {
+function getColumnCount(content, id) {
   let theChildren = $(content).find(id).children()
   let paraHeight = 0
   for (let i = 0; i < theChildren.length; i++) {
@@ -139,7 +145,7 @@ export function getColumnData($seasons, callback) {
     let tag = node.id
     let seasonsId = tag.match(/\d/)[0]
     let $chapters = $seasons.children()
-    $chapters.each(function (index, node) {
+    $chapters.each(function(index, node) {
       let tag = node.id
       if (tag) {
         let chapterId = tag.match(/\d+/)[0]
@@ -166,7 +172,7 @@ export function initColumn(callback) {
     $container.remove()
   }
 
-  const setHeight = function ($container, visualWidth, visualHeight) {
+  const setHeight = function($container, visualWidth, visualHeight) {
     $container.css({
       width: visualWidth,
       height: visualHeight,
@@ -174,7 +180,7 @@ export function initColumn(callback) {
     })
   }
 
-  const setInit = function (visualWidth, visualHeight) {
+  const setInit = function(visualWidth, visualHeight) {
     let $seasons = $container.children()
     if (!$seasons.length) {
       callback()
@@ -234,7 +240,7 @@ export function initColumn(callback) {
     let visualHeight = newViewHight = visuals.height
 
     //加载flow样式
-    loadGolbalStyle('xxtflow', function () {
+    loadGolbalStyle('xxtflow', function() {
       $container = $(results.FlowData)
       removeColumnData() //删除flowdata，优化缓存
       setInit(visuals.width, visualHeight)

@@ -29,7 +29,10 @@ export class ScalePicture {
       this.$container = current.getSceneNode()
     }
     if (!this.$container.length) {
-      $warn('图片缩放依赖的容器不存在')
+      $warn({
+        type: 'scale',
+        content: '图片缩放依赖的容器不存在'
+      })
       return
     }
 
@@ -208,7 +211,7 @@ export class ScalePicture {
       fail()
     }
 
-    img.onload = function () {
+    img.onload = function() {
       //关闭动画正在执行中
       //这里要强制退出
       if (self.isCloseAniming) {
@@ -225,7 +228,7 @@ export class ScalePicture {
       img = null
       success(500)
     }
-    img.onerror = function () {
+    img.onerror = function() {
       isFail()
     }
     img.src = src
