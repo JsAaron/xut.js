@@ -33,7 +33,7 @@ function checkFigure(chapterIndex, callback) {
   }
 
   let count = length
-  let complete = function () {
+  let complete = function() {
     if (count === 1) {
       callback()
       return
@@ -60,7 +60,7 @@ function runBatcherQueue() {
   if (keys.length) {
     const chapterIndex = keys.shift()
     if (chapterIndex.length) {
-      checkFigure(chapterIndex, function () {
+      checkFigure(chapterIndex, function() {
         /*如果列表没有数据了*/
         if (!queue[chapterIndex].length) {
           delete queue[chapterIndex]
@@ -95,10 +95,10 @@ export function repairImage(node, chapterIndex, src) {
   }
 
   /*做一次错误节点的预加载处理*/
-  queue[chapterIndex].push(function (callback) {
-    loadFigure(src, function (state) {
+  queue[chapterIndex].push(function(callback) {
+    loadFigure(src, function(data) {
       /*如果请求成功，修改图片状态*/
-      if (state) {
+      if (data.state === 'success') {
         if (node && node.style) {
           node.style.display = "block";
         }

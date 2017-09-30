@@ -41,9 +41,9 @@ export function imageParse(url, callback) {
   let imageObject = loadFigure({
     image: getImage(),
     url: url
-  }, function(success, hasCache) {
+  }, function(data) {
     imageShare && imageShare.add(imageObject) //加入到循环队列
-    callback({url, success, hasCache })
+    callback(url, data)
   })
 
   return {

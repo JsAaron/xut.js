@@ -1,3 +1,5 @@
+import { $warn } from '../debug/index'
+
 /**
  * 图片预加载
  */
@@ -43,7 +45,7 @@ let stop = function() {
 export function loadFigure(data, callback) {
 
   if (!data) {
-    console.log('loadFigure data有错误')
+    $warn('util', 'loadFigure data有错误')
     callback && callback()
     return
   }
@@ -68,7 +70,10 @@ export function loadFigure(data, callback) {
   // 如果图片被缓存，则直接返回缓存数据
   if (img.complete) {
     //加载成功，并且有缓存
-    callback && callback(true, true);
+    callback && callback({
+      state: 'success',
+      cache: true
+    });
     //返回缓存的，不清理
     return img
   };
@@ -89,7 +94,10 @@ export function loadFigure(data, callback) {
     if (newWidth !== width || newHeight !== height || newWidth * newHeight > 1024) {
       //标记完成了
       onReady.end = true
-      callback && callback(true, true);
+      callback && callback({
+        state: 'success',
+        cache: true
+      });
       clear()
     }
   }
@@ -100,7 +108,7 @@ export function loadFigure(data, callback) {
       return
     }
     onReady.end = true //标记完成
-    callback && callback(false);
+    callback && callback({ state: 'fail' })
     clear()
   }
 
@@ -110,7 +118,7 @@ export function loadFigure(data, callback) {
       return
     }
     onReady.end = true //标记完成
-    callback && callback(true);
+    callback && callback({ state: 'success' })
     clear()
   }
 

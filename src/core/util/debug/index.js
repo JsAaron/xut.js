@@ -27,11 +27,26 @@ function $warn(data, content, level, color) {
     return
   }
 
-  //传递的是字符串
-  //$warn(type,content,level,color)
-  if (typeof data === 'string') {
-    console.log(123)
-    return
+  const dataType = typeof data
+
+  /**
+   * 输出日志
+   * @return {[type]} [description]
+   */
+  function outlog(type, content, level, color) {
+    //默认按照普通日子输出
+    const command = console[level] || console.log
+
+    //如果启动了全部处理
+    //如果能找到对应的处理
+    //silent：['all','preload'.....]
+    if ((~silent.indexOf('all')) || (~silent.indexOf(type))) {
+      if (typeof content === 'string') {
+        command(`%c<类型>:%c${type} %c<结果>:%c${content}`, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color)
+      } else {
+        command(`<类型>:${type} <结果>:`, content)
+      }
+    }
   }
 
   //如果是对象数据
@@ -41,25 +56,20 @@ function $warn(data, content, level, color) {
   //  level
   //  color
   //}
-  if (typeof data === 'object') {
+  if (dataType === 'object') {
     const type = data.type
     const content = data.content
     const level = data.level
     const color = data.color
-    //默认按照普通日子输出
-    const command = console[level] || console.log
-
-    //如果启动了全部处理
-    //如果能找到对应的处理
-    //silent：['all','preload'.....]
-    if ((~silent.indexOf('all')) || (~silent.indexOf(type))) {
-      command(`%c<类型>:%c${type} %c<内容>:%c${content}`, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color)
-    }
-    return
+    outlog(type, content, level, color)
+  } else {
+    //传递的是普通类型
+    //$warn(type,content,level,color)
+    outlog(data, content, level, color)
   }
 
-  console.log('$warn传递了错误参数', arguments)
 }
+
 
 Xut.$warn = $warn
 

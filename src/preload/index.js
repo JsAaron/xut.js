@@ -57,12 +57,12 @@ let asyObject = null
  * @return {Boolean} [description]
  */
 function checkFigure(url, callback) {
-  return imageParse(url, (data) => {
-    //data {url, success, hasCache }
-    /*如果是有效图，只检测第一次加载的缓存img*/
-    if (!checkFigure.url && data.success) {
+  return imageParse(url, (newUrl, data) => {
+    if (data.state === 'success') {
+      //保持最后一张加载图片的有效值
+      //用于处理加载检测
       //这里必须用data.url因为原始的url被修改了
-      checkFigure.url = data.url
+      checkFigure.url = newUrl
     }
     callback()
   })
@@ -435,8 +435,8 @@ export function initPreload(total, callback) {
     const cahceUrl = $getStorage('preload')
     if (cahceUrl) {
       //这里主要加强判断，用户可能会清理数据的情况
-      loadFigure(cahceUrl, (state, cache) => {
-        if (cache) {
+      loadFigure(cahceUrl, (data) => {
+        if (data.state === 'success') {
           $warn({
             type: 'preload',
             content: '预加载已完成了',

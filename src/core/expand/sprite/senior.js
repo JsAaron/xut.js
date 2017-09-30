@@ -6,7 +6,7 @@
  * 2.复杂精灵动画
  *   提供给普通转化高级使用
  */
-import { getFileFullPath,loadFigure } from '../../util/index'
+import { getFileFullPath, loadFigure } from '../../util/index'
 import { config } from '../../config/index'
 
 /*
@@ -192,13 +192,12 @@ export default class {
       return
     }
     let self = this
-    let collect = function() {
-      self._imgArray && self._imgArray.push(this)
-      callback && callback()
-    }
     let imageList = this.originalImageList
     let resourcePath = this.resourcePath
-    loadFigure(resourcePath + imageList[index].name, collect)
+    loadFigure(resourcePath + imageList[index].name, function() {
+      self._imgArray && self._imgArray.push(this)
+      callback && callback()
+    })
   }
 
 
