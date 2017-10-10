@@ -464,7 +464,7 @@ export default class Scheduler {
     /*暂停*/
     const suspendAction = (front, middle, back, stop) => {
       this.pageMgr.suspend(front, middle, back, stop)
-      this.getMasterContext(function() { this.suspend(stop) })
+      this.getMasterContext(function() { this.suspend(options.action, stop) })
     }
 
     const stopPageIndexs = converDoublePage(stopIndex)
@@ -602,12 +602,7 @@ export default class Scheduler {
 
     //模板自动运行
     this.getMasterContext(function() {
-      //如果动作是初始化，或者触发了母版自动运行
-      //如果是越界处理
-      //console.log(action,this.isBoundary,para.createMaster)
-      if (action || this.isBoundary) {
-        this.autoRun(data);
-      }
+      this.autoRun(action, data)
     })
 
     /*初始化与跳转针对翻页案例的设置逻辑*/

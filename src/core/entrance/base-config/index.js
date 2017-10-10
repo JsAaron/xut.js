@@ -1,5 +1,6 @@
 import initDatabse from './init-database'
 import setData from './set-data'
+
 import { importJsonDatabase } from 'database/result'
 import { $warn, loadGolbalStyle } from '../../util/index'
 import { createCursor } from '../../expand/cursor'
@@ -12,9 +13,9 @@ import {
   resetVisualMode,
   resetDelegate,
   setHistory,
-  setPaintingMode
-} from '../../config/launch-config.js'
-
+  setPaintingMode,
+  setGestureSwipe
+} from '../../config/launch-config/index.js'
 
 /**
  * 最大屏屏幕尺寸
@@ -58,7 +59,11 @@ function setDefaultSuffix() {
   }
 }
 
-/*自适应图片*/
+
+/**
+ * 自适应图片
+ * @return {[type]} [description]
+ */
 function adaptiveImage() {
   let $adaptiveImageNode = $('.xut-adaptive-image')
   if ($adaptiveImageNode.length) {
@@ -71,6 +76,7 @@ function adaptiveImage() {
   }
   setDefaultSuffix()
 }
+
 
 /*
   配置初始化
@@ -146,6 +152,9 @@ export default function baseConfig(callback) {
       //配置config
       resetVisualMode()
       configInit(novelData, tempSettingData)
+
+      //配置师傅翻页
+      setGestureSwipe(novelData)
 
       //处理预加载文件
       loadPrelaod(function(hasPreFile, globalBrMode) {

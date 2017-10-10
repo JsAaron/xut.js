@@ -2,12 +2,12 @@
  * app初始化功能
  * @return {[type]} [description]
  */
-import main from '../main-entrance/index'
+import entrance from '../entrance/index'
 import { initAsyn } from './asyn'
 import { initRootNode } from '../expand/root-node'
 import { initGlobalEvent } from './golbal-event'
 import { nextTick } from '../util/index'
-import { priorityConfig } from '../config/launch-config'
+import { priorityConfig } from '../config/launch-config/index'
 
 import { initAudio } from '../component/audio/api'
 import { initVideo } from '../component/video/api'
@@ -32,6 +32,6 @@ export default function initApp(...arg) {
     nextTick({
       container: $rootNode,
       content: $contentNode
-    }, main)
+    }, entrance)
   })
 }

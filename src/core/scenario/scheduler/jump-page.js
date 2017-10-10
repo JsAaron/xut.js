@@ -4,7 +4,7 @@ import { fix } from '../pagebase/move/translation'
  * 跳转之前提高层级问题
  * 提高当前页面的层级，方便别的页面切换不产生视觉影响
  */
-const raiseHierarchy = (complier, visualIndex) => {
+function raiseHierarchy(complier, visualIndex) {
   complier.pageMgr.assistPocess(visualIndex, pageObj => {
     pageObj.setPageContainerHierarchy({ 'z-index': 9997 })
   })
@@ -19,7 +19,7 @@ const raiseHierarchy = (complier, visualIndex) => {
 /**
  * 创建新的页面
  */
-const createNewPage = (complier, data, createCallback) => {
+function createNewPage(complier, data, createCallback) {
 
   //缓存当前页面索引用于销毁
   let pageIndex
@@ -31,8 +31,8 @@ const createNewPage = (complier, data, createCallback) => {
   //需要创建的页面闭包器
   for (; i < create.length; i++) {
     pageIndex = create[i];
-    collectContainers.push(function (targetIndex, pageIndex) {
-      return function (callback) {
+    collectContainers.push(function(targetIndex, pageIndex) {
+      return function(callback) {
         //创建新结构
         this.createPageBase([pageIndex], targetIndex, 'toPage', callback, {
           'opacity': 0 //同页面切换,规定切换的样式
@@ -74,14 +74,14 @@ const createNewPage = (complier, data, createCallback) => {
 /**
  * 节点创建完毕后，切换页面动，执行动作
  */
-const creationLogic = (complier, data) => {
+function creationLogic(complier, data) {
 
   const visualIndex = data.visualIndex
   const pageMgr = complier.pageMgr
   const targetIndex = data.targetIndex
 
   //停止当前页面动作
-  complier.suspendPageBases({ 'stopIndex': visualIndex })
+  complier.suspendPageBases({ 'stopIndex': visualIndex, 'action': 'toPage' })
 
   //========处理跳转中逻辑=========
 
@@ -89,21 +89,21 @@ const creationLogic = (complier, data) => {
    * 清除掉不需要的页面
    * 排除掉当前提高层次页面
    */
-  _.each(data.destroy, function (destroyIndex) {
+  _.each(data.destroy, function(destroyIndex) {
     if (destroyIndex !== visualIndex) {
       pageMgr.clearPage(destroyIndex)
     }
   })
 
   /*修正翻页2页的页面坐标值*/
-  _.each(data.ruleOut, function (pageIndex) {
+  _.each(data.ruleOut, function(pageIndex) {
     if (pageIndex > targetIndex) {
-      pageMgr.assistAppoint(pageIndex, function (pageObj) {
+      pageMgr.assistAppoint(pageIndex, function(pageObj) {
         fix(pageObj.$pageNode, 'nextEffect')
       })
     }
     if (pageIndex < targetIndex) {
-      pageMgr.assistAppoint(pageIndex, function (pageObj) {
+      pageMgr.assistAppoint(pageIndex, function(pageObj) {
         fix(pageObj.$pageNode, 'prevEffect')
       })
     }
@@ -113,7 +113,7 @@ const creationLogic = (complier, data) => {
   let jumpPocesss
 
   //母版
-  complier.getMasterContext(function () {
+  complier.getMasterContext(function() {
     jumpPocesss = this.makeJumpPocesss(targetIndex)
     jumpPocesss.pre();
   })
@@ -126,8 +126,8 @@ const creationLogic = (complier, data) => {
   /**
    * 同页面切换,规定切换的样式复位
    */
-  _.each(data.pageBaseCollect, function (pageBase) {
-    _.each(pageBase, function (pageObj) {
+  _.each(data.pageBaseCollect, function(pageBase) {
+    _.each(pageBase, function(pageObj) {
       pageObj && pageObj.setPageContainerHierarchy({
         'opacity': 1
       })
@@ -151,7 +151,7 @@ export default function goToPage(complier, data, success) {
   //跳前逻辑
   raiseHierarchy(complier, data.visualIndex);
   /*创建新页面*/
-  createNewPage(complier, data, function (data) {
+  createNewPage(complier, data, function(data) {
     /*执行切换动作*/
     creationLogic(complier, data);
     success.call(complier, data)

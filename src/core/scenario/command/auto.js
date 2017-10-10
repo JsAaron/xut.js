@@ -16,7 +16,7 @@ const noop = function() {}
  * 延时500毫秒执行
  * @return {[type]} [description]
  */
-const autoContents = (contentObjs, taskAnimCallback) => {
+function autoContents(contentObjs, taskAnimCallback) {
   let markComplete = (() => {
     let completeStatistics = contentObjs.length; //动画完成统计
     return () => {
@@ -44,7 +44,7 @@ const autoContents = (contentObjs, taskAnimCallback) => {
  * 运行自动的静态类型
  * @return {[type]} [description]
  */
-const autoComponents = (pageBase, pageIndex, autoData, pageType) => {
+function autoComponents(pageBase, pageIndex, autoData, pageType) {
 
   if (pageIndex === undefined) {
     pageIndex = Xut.Presentation.GetPageIndex()
@@ -117,17 +117,29 @@ export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
     return
   }
 
+  /**
+   * 设置母版不重复，但是需要排除一个问题
+    //标记已经运行过autoComponent的命令了
+    //因为采用delayWatcher
+    //那么共享模板，如果翻页低于delayWatcher的延时
+    //那么自动运行的动作在第二页会丢失
+    //所以这里需要标注下
+    //只要满足一个，就可以了
+   */
+  function setMaster(pageBase) {
+    if (pageBase && pageBase.pageType === 'master') {
+      pageBase.onceMaster = true
+    }
+  }
+
   //pageType
   //用于区别触发类型
   //页面还是母版
   access(pageBase, (pageBase, contentObjs, componentObjs, pageType) => {
 
     //如果是母版对象，一次生命周期种只激活一次
-    if (pageBase.pageType === 'master') {
-      if (pageBase.onceMaster) {
-        return
-      }
-      pageBase.onceMaster = true
+    if (pageBase.onceMaster) {
+      return
     }
 
     taskAnimCallback = taskAnimCallback || noop
@@ -136,6 +148,7 @@ export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
     let autoData = pageBase.baseAutoRun()
     if (autoData) {
       delayWatcher(pageIndex, function() {
+        setMaster(pageBase)
         autoComponents(pageBase, pageIndex, autoData, pageType)
       })
     }
@@ -143,6 +156,7 @@ export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
     /*自动content*/
     if (contentObjs) {
       delayWatcher(pageIndex, function() {
+        setMaster(pageBase)
         autoContents(contentObjs, taskAnimCallback)
       })
     } else {

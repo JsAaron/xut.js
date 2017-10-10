@@ -157,7 +157,7 @@ export default class MasterMgr extends ManageSuper {
     //找到需要滑动的母版
     let masterObjs = this._findMaster(frontIndex, middleIndex, backIndex, direction, action, isAppBoundary)
 
-    _.each(masterObjs, function (pageObj, index) {
+    _.each(masterObjs, function(pageObj, index) {
       if (pageObj) {
         isBoundary = true
         pageObj.movePage(action, moveDistance[index], speed, moveDistance[3])
@@ -206,14 +206,19 @@ export default class MasterMgr extends ManageSuper {
    * 停止行为
    * @return {[type]} [description]
    */
-  suspend(stopPointer) {
-    //如果未越界不需要处理行为
-    if (!this.isBoundary) return;
-    let masterObj
-    if (masterObj = this.$$getPageBase(stopPointer)) {
-      let pageId = masterObj.baseGetPageId(stopPointer);
-      //停止活动对象活动
-      $suspend(masterObj, pageId);
+  suspend(action, stopPointer) {
+    //翻页，如果越界，需要处理
+    //跳页，需要处理
+    //
+    //暂时没有处理
+    //如果跳的新页面，还是同一个模板的情况
+    if (this.isBoundary || action === 'toPage') {
+      let masterObj
+      if (masterObj = this.$$getPageBase(stopPointer)) {
+        let pageId = masterObj.baseGetPageId(stopPointer);
+        //停止活动对象活动
+        $suspend(masterObj, pageId);
+      }
     }
   }
 
@@ -233,18 +238,18 @@ export default class MasterMgr extends ManageSuper {
   /**
    *  母版自动运行
    */
-  autoRun(data) {
-
-    const {
-      middleIndex,
-      suspendIndex
-    } = data
-
-    var masterObj
-    if (masterObj = this.$$getPageBase(middleIndex)) {
-      //热点状态复位
-      this.resetOriginal(suspendIndex)
-      $autoRun(masterObj, middleIndex);
+  autoRun(action, data) {
+    const { middleIndex, suspendIndex } = data
+    const masterObj = this.$$getPageBase(middleIndex)
+    if (masterObj) {
+      //如果没有运行自动任务
+      //如果动作是初始化，或者触发了母版自动运行
+      //如果是越界处理
+      if (!masterObj.onceMaster || action || this.isBoundary) {
+        //热点状态复位
+        this.resetOriginal(suspendIndex)
+        $autoRun(masterObj, middleIndex);
+      }
     }
   }
 
@@ -283,7 +288,7 @@ export default class MasterMgr extends ManageSuper {
     var filter;
     var master = this;
     return {
-      pre: function () {
+      pre: function() {
         //目标母板对象
         var targetkey = master.converMasterId(targetIndex);
         //得到过滤的边界keys
@@ -296,7 +301,7 @@ export default class MasterMgr extends ManageSuper {
         master.currMasterId = targetkey;
       },
       //修正位置
-      clean: function (visualIndex, targetIndex) {
+      clean: function(visualIndex, targetIndex) {
         master._fixPosition(filter);
         master._checkParallaxPox(visualIndex, targetIndex);
       }
@@ -403,12 +408,12 @@ export default class MasterMgr extends ManageSuper {
 
     var self = this
 
-    const setPosition = function (parallaxObj, position) {
+    const setPosition = function(parallaxObj, position) {
 
       /**
        * 设置移动
        */
-      const _fixToMove = function (distance, speed) {
+      const _fixToMove = function(distance, speed) {
         var $pageNode = parallaxObj.$pageNode;
         if ($pageNode) {
           Xut.style.setTranslate({
@@ -522,7 +527,7 @@ export default class MasterMgr extends ManageSuper {
     let prevNodes
     let nodes
 
-    const repairNodes = function (parallax) {
+    const repairNodes = function(parallax) {
       let rangePage = parallax.calculateRangePage()
       let lastProperty = parallax.lastProperty
 
@@ -560,8 +565,8 @@ export default class MasterMgr extends ManageSuper {
     if (contentObjs = parallaxObj.baseGetContent()) {
       //获取到页面nodes
       nodes = Xut.Presentation.GetPageNode(targetIndex - 1);
-      contentObjs.forEach(function (contentObj) {
-        contentObj.eachAssistContents(function (scope) {
+      contentObjs.forEach(function(contentObj) {
+        contentObj.eachAssistContents(function(scope) {
           if (scope.parallax) {
             repairNodes(scope.parallax)
           }
@@ -584,7 +589,7 @@ export default class MasterMgr extends ManageSuper {
       //解析对象
       filter = toArray(filter);
       //过滤
-      _.each(filter, function (masterId) {
+      _.each(filter, function(masterId) {
         if (masterId !== undefined) {
           indexOf = removeMasterId.indexOf(masterId.toString());
           if (-1 !== indexOf) {
@@ -606,7 +611,7 @@ export default class MasterMgr extends ManageSuper {
    */
   _clearMemory(removeMasterId) {
     var pageObj, self = this;
-    _.each(removeMasterId, function (removekey) {
+    _.each(removeMasterId, function(removekey) {
       //销毁页面对象事件
       if (pageObj = self.$$getPageBase(removekey)) {
         //移除事件
@@ -635,7 +640,7 @@ export default class MasterMgr extends ManageSuper {
     var me = this;
     var recordMasterRange = me.recordMasterRange[removekey];
     //清理页码指示标记
-    recordMasterRange.forEach(function (scope) {
+    recordMasterRange.forEach(function(scope) {
       delete me.recordMasterId[scope];
     })
   }

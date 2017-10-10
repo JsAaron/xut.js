@@ -3,11 +3,10 @@ import initMainScene from './main-scene'
 import { config } from '../config/index'
 import { bindAndroid } from '../initialize/button'
 import { plugVideo, html5Video } from '../initialize/video'
-import { $getStorage, parseJSON } from '../util/index'
+import { $getStorage } from '../util/index'
 
-const getCache = name => $getStorage(name)
 
-const initMain = novelData => {
+function initMain(novelData) {
 
   /**
    * IBOOS模式
@@ -22,45 +21,12 @@ const initMain = novelData => {
   }
 
   /**
-   * 切换切换模式
-   * 多模式判断
-   * 如果
-   *   缓存存在
-   *   否则数据库解析
-         全局翻页模式
-         0 滑动翻页 =》true
-         1 直接换  =》 false
-   * 所以pageFlip只有在左面的情况下
-   * @type {Boolean}
-   */
-  if (novelData.parameter) {
-    const parameter = parseJSON(novelData.parameter)
-    /*全局优先设置覆盖*/
-    if (config.launch.gestureSwipe === undefined && parameter.pageflip !== undefined) {
-      switch (Number(parameter.pageflip)) {
-        case 0: //滑动翻页
-          config.launch.gestureSwipe = true
-          break;
-        case 1: //直接换
-          config.launch.pageFlip = true
-          config.launch.gestureSwipe = false
-          break
-      }
-    }
-  }
-
-  /*默认不锁定页面，支持手势滑动*/
-  if (config.launch.gestureSwipe === undefined) {
-    config.launch.gestureSwipe = true
-  }
-
-  /**
    * 缓存加载
    * 如果启动recordHistory记录
    */
-  let pageIndex = Number(getCache('pageIndex'))
+  let pageIndex = Number($getStorage('pageIndex'))
   if (config.launch.historyMode && pageIndex !== undefined) {
-    let novelId = parseInt(getCache("novelId"))
+    let novelId = parseInt($getStorage("novelId"))
     if (novelId) {
       return initMainScene({
         "novelId": novelId,
@@ -78,8 +44,6 @@ const initMain = novelData => {
 
 /**
  * 加载app应用
- * @param  {[type]} config [description]
- * @return {[type]}        [description]
  */
 const initApp = () => baseConfig(initMain)
 
@@ -89,7 +53,7 @@ const initApp = () => baseConfig(initMain)
  * 绑定事件
  * @return {[type]} [description]
  */
-const bindPlatEvent = () => {
+function bindPlatEvent() {
   //安卓上并且不是浏览器打开的情况
   if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
     //预加载处理视频
@@ -129,7 +93,7 @@ const bindPlatEvent = () => {
   3 pc
   4 ios/android
  */
-export default function main() {
+export default function entrance() {
   if (window.GLOBALIFRAME) {
     bindPlatEvent()
   } else {
