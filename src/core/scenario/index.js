@@ -7,9 +7,9 @@ import DeputyBar from '../toolbar/ppt/deputy-fnbar'
 import BookBar from '../toolbar/ppt/word-bookbar/index'
 import MiniBar from '../toolbar/mini/index'
 
-import { mainScene, deputyScene } from './factory/layout'
-import { getMainBar, getDeputyBar } from './factory/parse-bar'
-import { sceneController } from './factory/control'
+import { getMainBar, getDeputyBar } from './config/set-bar'
+import { mainScene, deputyScene } from './config/layout'
+import { sceneController } from './control'
 import { removeCover } from '../expand/root-node'
 
 /**
@@ -140,6 +140,7 @@ export class SceneFactory {
     /// 主场景工具栏设置
     //////////////////
     if (this.isMain) {
+
       barConfig = getMainBar(seasonId, pageTotal)
 
       //word模式，自动启动工具条

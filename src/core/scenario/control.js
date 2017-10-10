@@ -7,9 +7,6 @@
 //场景层级控制
 let zIndex = 999999
 
-//去重复标记，可以复用场景
-let toRepeat = 0
-
 //场景合集
 //主场景
 //副场景
@@ -19,7 +16,6 @@ const sceneCollection = {
   //场景链表
   scenarioChain: []
 }
-
 
 export const sceneController = {
 

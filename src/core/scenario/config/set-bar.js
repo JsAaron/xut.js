@@ -23,10 +23,10 @@ import { parseJSON } from '../../util/index'
 /**
  * 分解工具栏配置文件
  */
-const parseTooBar = (toolbar, toolType, pageMode) => {
+function parseTooBar(toolbar, toolType, pageMode) {
   if (toolbar = parseJSON(toolbar)) {
     //兼容数据库中未指定的情况
-    var n = Number(toolbar.pageMode)
+    let n = Number(toolbar.pageMode)
     pageMode = _.isFinite(n) ? n : pageMode;
     if (_.isString(toolbar.tbType)) {
       toolType = _.map(toolbar.tbType.split(','), (num) => {
@@ -71,3 +71,5 @@ export function getDeputyBar(toolbar, totalCount) {
   const pageMode = totalCount > 1 ? 1 : 0
   return parseTooBar(toolbar, toolType, pageMode)
 }
+
+

@@ -14,7 +14,7 @@ import { contentParser } from './parser/content'
 import { parseBehavior } from './parser/behavior'
 import { activityParser } from './parser/activity'
 import { contentStructure } from './structure/index'
-import { sceneController } from '../../../../../scenario/factory/control'
+import { sceneController } from '../../../../../scenario/control'
 
 
 /**

@@ -1,5 +1,5 @@
 import { SceneFactory } from '../../scenario/index'
-import { sceneController } from '../../scenario/factory/control'
+import { sceneController } from '../../scenario/control'
 import { showBusy, hideBusy, showTextBusy } from '../../expand/cursor'
 import { toNumber, $removeStorage, $extend, $warn } from '../../util/index'
 import { requestInterrupt } from 'preload/index'

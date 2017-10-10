@@ -12,7 +12,7 @@ import MasterMgr from '../manage/master'
 import goToPage from './jump-page'
 import Stack from '../../observer/stack'
 
-import { sceneController } from '../factory/control'
+import { sceneController } from '../control'
 import { getVisualDistance } from '../v-distance/index'
 import { setCustomStyle } from '../v-style/index'
 import { getVisualMode } from './mode'
