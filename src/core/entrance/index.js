@@ -3,10 +3,12 @@ import initMainScene from './main-scene'
 import { config } from '../config/index'
 import { bindAndroid } from '../initialize/button'
 import { plugVideo, html5Video } from '../initialize/video'
-import { $getStorage } from '../util/index'
+import { $getStorage, $warn } from '../util/index'
 
 
 function initMain(novelData) {
+
+  $warn('logic', '初始化base-config完成')
 
   /**
    * IBOOS模式

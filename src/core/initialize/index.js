@@ -6,7 +6,7 @@ import entrance from '../entrance/index'
 import { initAsyn } from './asyn'
 import { initRootNode } from '../expand/root-node'
 import { initGlobalEvent } from './golbal-event'
-import { nextTick } from '../util/index'
+import { nextTick, $warn } from '../util/index'
 import { priorityConfig } from '../config/launch-config/index'
 
 import { initAudio } from '../component/audio/api'
@@ -29,6 +29,9 @@ export default function initApp(...arg) {
     initGlobalEvent();
     /*根节点*/
     const { $rootNode, $contentNode } = initRootNode(...arg)
+
+    $warn('logic', '初始化设置参数完成')
+
     nextTick({
       container: $rootNode,
       content: $contentNode

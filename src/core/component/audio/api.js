@@ -91,7 +91,7 @@ export function createContentAudio(pageId, audioId) {
 }
 
 
-const accessAudio = function (pageId, queryId, callback) {
+const accessAudio = function(pageId, queryId, callback) {
   const playBox = getPlayBox()
   if (playBox[CONTENT]) {
     const pagePlayObj = playBox[CONTENT][pageId];
@@ -110,7 +110,7 @@ const accessAudio = function (pageId, queryId, callback) {
  * 待用
  */
 export function resetContentAudio(pageId, queryId) {
-  accessAudio(pageId, queryId, function (playObj) {
+  accessAudio(pageId, queryId, function(playObj) {
     playObj.reset()
   })
 }
@@ -129,9 +129,9 @@ export function destroyContentAudio(pageId, queryId) {
   }
 
   /*单独清理*/
-  accessAudio(pageId, queryId, function (playObj, playBox) {
+  accessAudio(pageId, queryId, function(playObj, playBox) {
     playObj.destroy()
-      /*清理保存容器*/
+    /*清理保存容器*/
     delete playBox[CONTENT][pageId][queryId];
     if (!Object.keys(playBox[CONTENT][pageId]).length) {
       delete playBox[CONTENT][pageId]
@@ -156,7 +156,10 @@ export function resetAudioContext() {
     for (p in playBox[t]) {
       for (a in playBox[t][p]) {
         /*needFix：如果是需要修复的代码*/
-        playBox[t][p][a].resetContext()
+        if (playBox[t][p][a].resetContext) { //mmx报错，加判断
+          playBox[t][p][a].resetContext()
+        }
+
       }
     }
   }

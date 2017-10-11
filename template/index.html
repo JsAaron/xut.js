@@ -27,18 +27,18 @@
 </html>
 <script type="text/javascript">
 
-function GolbalForumOpen(pageIndex){
-  console.log(pageIndex)
+function GolbalForumOpen(data){
+  console.log(data.pageIndex)
 }
 
-function GolbalForumClose(pageIndex){
-  console.log(pageIndex)
+function GolbalForumClose(data){
+  console.log(data.pageIndex)
 }
 
 
 Xut.Application.setConfig = {
   lauchMode: 1,
-  preload: false,
+  preload: true,
   visualMode: 1,
   // platform: 'mini',
   historyMode: true,
@@ -53,7 +53,7 @@ Xut.Application.setConfig = {
   // },
 
   debug: {
-    silent: ['preload'],
+    // silent: ['all'],
     // locationPage: {
     //   seasonId:1,
     //   pageIndex: 18
@@ -107,7 +107,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 60 //326
+var appId = 334 //326
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

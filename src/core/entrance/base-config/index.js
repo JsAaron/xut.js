@@ -145,6 +145,9 @@ export default function baseConfig(callback) {
 
   function setDatabse(results) {
     initDatabse(results, function(dataRet) {
+
+      $warn('logic', '初始化数据库完成')
+
       const novelData = dataRet.Novel.item(0)
       const tempSettingData = setData(dataRet.Setting)
       const chapterTotal = dataRet.Chapter.length

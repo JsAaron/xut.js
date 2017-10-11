@@ -33,7 +33,7 @@ const common = {
   //外加列表的所有文件
   externalFiles: require('../src/external/load.js'),
   //index中排除的文件
-  exclude: ['SQLResult.js', 'sqlResult.js', 'pixi.js', 'redux.js', 'debug.js']
+  exclude: ['SQLResult.js', 'sqlResult.js', 'pixi.js', 'redux.js']
 }
 
 /**

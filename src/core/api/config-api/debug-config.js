@@ -13,11 +13,17 @@ export default {
   devtools: process.env.NODE_ENV !== 'production',
 
   /**
+   * 是否支持debug.js的远程处理
+   * @type {Boolean}
+   */
+  terminal: false,
+
+  /**
    * 是否支持错误日志打印
    * silent 启动是所有的调试内容
    * 也可以单独启用每一项的调试内容
    * ['all','api','preload','column','visual','scale',
-   *   'config','pagebase','swiper','event','util','database']
+   *   'config','pagebase','swiper','event','util','database','logic']
    * api 级别
    * preload 预加载处理
    * column 根流式布局相关的
@@ -29,6 +35,7 @@ export default {
    * event 根事件相关
    * util 工具处理相关
    * database 数据库处理相关
+   * logic 跟逻辑相关的，流程跑通测试
    */
   silent: null,
 

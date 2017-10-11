@@ -1,5 +1,5 @@
 import { config } from '../config/index'
-import { $setStorage, $getStorage, $removeStorage, execScript } from '../util/index'
+import { $setStorage, $getStorage, $removeStorage, execScript, $warn } from '../util/index'
 
 /**
  * 设置缓存，必须要可设置
@@ -17,7 +17,7 @@ const saveData = () => {
   }
 }
 
-/**
+/**a
  * 初始化值
  * @param {[type]} options [description]
  */
@@ -66,6 +66,8 @@ export default function(options) {
     }
   }
 
+  $warn('logic', '加载主场景')
+
   //加载新的场景
   Xut.View.LoadScenario({
     'main': true, //主场景入口
@@ -73,6 +75,8 @@ export default function(options) {
     'pageIndex': options.pageIndex,
     'history': options.history
   }, function() {
+
+    $warn('logic', '主场景加载完毕')
 
     /*应用初始化加载完毕*/
     Xut.Application.Notify('initComplete')

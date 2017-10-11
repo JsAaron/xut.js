@@ -1,11 +1,11 @@
 import { config } from '../../config/index'
+import Debug from './debug'
 
 /*
   $warn('hello');
   $warn('信息','info');
   $warn('错误','error');
   $warn('警告','warn');
-
 
   debug.success("This is success message:)");
   debug.error("This is error message:)");
@@ -14,6 +14,8 @@ import { config } from '../../config/index'
   debug.log([1,2,3]);
  */
 const hasConsole = typeof console !== 'undefined'
+
+let debug
 
 function $warn(data, content, level, color) {
 
@@ -34,14 +36,35 @@ function $warn(data, content, level, color) {
    * @return {[type]} [description]
    */
   function outlog(type, content, level, color) {
-    //默认按照普通日子输出
-    const command = console[level] || console.log
 
     //如果启动了全部处理
     //如果能找到对应的处理
     //silent：['all','preload'.....]
     if ((~silent.indexOf('all')) || (~silent.indexOf(type))) {
-      if (typeof content === 'string') {
+
+      const stringType = typeof content === 'string'
+
+      //远程debug输出
+      if (config.debug.terminal) {
+        if (!debug) {
+          debug = new Debug()
+        }
+
+        function errListener(error) {
+          var msg;
+          msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
+          return debug.error(msg.join("<br/>"));
+        }
+        //监听错误
+        window.addEventListener('error', errListener, false);
+        debug.log(`<类型>:${type} <结果>:${content}`)
+
+        return
+      }
+
+      //console输出
+      const command = console[level] || console.log
+      if (stringType) {
         command(`%c<类型>:%c${type} %c<结果>:%c${content}`, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color)
       } else {
         command(`<类型>:${type} <结果>:`, content)

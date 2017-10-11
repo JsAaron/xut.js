@@ -159,7 +159,8 @@ export default class AudioSuper {
           this.audio && this.audio.play();
         })
       } else {
-        this.audio.play();
+        //秒秒学提示play不存在
+        this.audio.play && this.audio.play()
       }
     }
     this.acitonObj && this.acitonObj.play();

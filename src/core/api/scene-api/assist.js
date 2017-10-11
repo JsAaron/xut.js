@@ -12,42 +12,45 @@ export function extendAssist(access, $$globalSwiper) {
   Xut.Assist.ForumStatus = false
 
 
-  function setForum(context, fn) {
-    if (context[fn]) {
+  function setForum(fn, state) {
+    if (fn) {
       //从1开始算
       const pageIndex = Xut.Presentation.GetPageIndex() + 1
-      Xut.Assist.ForumStatus = true
-      context[fn](pageIndex)
-      return true
+      //标记状态，提供关闭
+      Xut.Assist.ForumStatus = state
+      fn({ pageIndex })
     }
   }
+
+  /**
+   * 获取到全局定义的开关函数
+   * contextName 全局上下文名
+   * @return {[type]} [description]
+   */
+  function getGolbalForumFn(contextName) {
+    //如果有iframe的情况，优先查找最顶层
+    if (window.GLOBALIFRAME) {
+      if (top[contextName]) {
+        return top[contextName]
+      }
+    }
+    //否则查找当前
+    return window[contextName]
+  }
+
 
   /**
    * 针对秒秒学的api
    * 打开讨论区
    */
-  Xut.Assist.ForumOpen = function() {
-    //如果存在IFRAME优先找最外层的
-    //否则就找当前层
-    if (setForum(top, 'GolbalForumOpen')) {
-      return
-    }
-    setForum(window, 'GolbalForumOpen')
-  }
+  Xut.Assist.ForumOpen = () => setForum(getGolbalForumFn('GolbalForumOpen'), true)
 
 
   /**
    * 针对秒秒学的api
    * 关闭讨论区
    */
-  Xut.Assist.ForumClose = function() {
-    //如果存在IFRAME优先找最外层的
-    //否则就找当前层
-    if (setForum(top, 'GolbalForumClose')) {
-      return
-    }
-    setForum(window, 'GolbalForumClose')
-  }
+  Xut.Assist.ForumClose = () => setForum(getGolbalForumFn('GolbalForumClose'), false)
 
 
   /**

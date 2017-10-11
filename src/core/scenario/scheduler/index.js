@@ -463,6 +463,12 @@ export default class Scheduler {
 
     /*暂停*/
     const suspendAction = (front, middle, back, stop) => {
+
+      //每次翻页都要探测一次是否启动了评论区域
+      if (Xut.Assist.ForumStatus) {
+        Xut.Assist.ForumClose()
+      }
+
       this.pageMgr.suspend(front, middle, back, stop)
       this.getMasterContext(function() { this.suspend(options.action, stop) })
     }
