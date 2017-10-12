@@ -61246,10 +61246,18 @@ var Activity = function () {
           //动画结束,删除这个hack
           scope && scope.$contentNode && scope.$contentNode.removeProp && scope.$contentNode.removeProp('animOffset');
 
-          //如果快速翻页
-          //运行动画的时候，发现不是可视页面
-          //需要关闭这些动画
-          var closeAnim = pageId != Xut.Presentation.GetPageId();
+          //2017.10.12修复
+          //母版上的回调
+          //不能通过这个判断
+          //否则动画不执行
+          //
+          //暂时没处理母版上的快速动画问题
+          //只处理页面级的
+          var closeAnim = void 0;
+          if (self.pageType === 'page') {
+            //如果快速翻页，运行动画的时候，发现不是可视页面，需要关闭这些动画
+            closeAnim = pageId != Xut.Presentation.GetPageId();
+          }
 
           if (closeAnim && scope) {
             scope.stop && scope.stop(pageId);
@@ -81660,7 +81668,7 @@ function initApp() {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 890.8;
+Xut.Version = 890.9;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

@@ -420,10 +420,18 @@ export default class Activity {
           scope.$contentNode.removeProp &&
           scope.$contentNode.removeProp('animOffset')
 
-        //如果快速翻页
-        //运行动画的时候，发现不是可视页面
-        //需要关闭这些动画
-        let closeAnim = (pageId != Xut.Presentation.GetPageId());
+        //2017.10.12修复
+        //母版上的回调
+        //不能通过这个判断
+        //否则动画不执行
+        //
+        //暂时没处理母版上的快速动画问题
+        //只处理页面级的
+        let closeAnim
+        if (self.pageType === 'page') {
+          //如果快速翻页，运行动画的时候，发现不是可视页面，需要关闭这些动画
+          closeAnim = (pageId != Xut.Presentation.GetPageId());
+        }
 
         if (closeAnim && scope) {
           scope.stop && scope.stop(pageId);
