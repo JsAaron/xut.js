@@ -29,10 +29,8 @@ export function extendAssist(access, $$globalSwiper) {
    */
   function getGolbalForumFn(contextName) {
     //如果有iframe的情况，优先查找最顶层
-    if (window.GLOBALIFRAME) {
-      if (top[contextName]) {
-        return top[contextName]
-      }
+    if (top && top[contextName]) {
+      return top[contextName]
     }
     //否则查找当前
     return window[contextName]

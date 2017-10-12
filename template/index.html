@@ -27,14 +27,7 @@
 </html>
 <script type="text/javascript">
 
-function GolbalForumOpen(data){
-  console.log('GolbalForumOpen',data.pageIndex)
-}
-
-function GolbalForumClose(data){
-  console.log('GolbalForumClose',data.pageIndex)
-}
-
+console.log(parent.document)
 
 Xut.Application.setConfig = {
   lauchMode: 1,
@@ -107,7 +100,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 101 //326
+var appId = 1 //326
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

@@ -26,6 +26,10 @@ const common = {
   //template
   templateDirPath: resolve('template'),
 
+  //上传目录，build后直接更新js与css
+  uploadJsPath: resolve('release/upload/www/lib'),
+  uploadCssPath: resolve('release/upload/www/css'),
+
   //rollup配置
   //dev debug / build 使用
   rollupDevFilePath: resolve('dist/rollup.dev.js'),

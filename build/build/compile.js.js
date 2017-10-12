@@ -32,6 +32,7 @@ module.exports = async function compileJs(config, mergeUrls) {
       ]);
     }))
     .pipe(gulp.dest(config.distDirPath))
+    .pipe(gulp.dest(config.uploadJsPath))
     .on('end', async(err) => {
       util.log(`【${config.devName}、${config.productionName}】compile complete`, 'debug')
       fs.unlinkSync(config.rollupDevFilePath)

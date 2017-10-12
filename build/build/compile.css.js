@@ -25,6 +25,7 @@ async function createFile(fileName, path, config, resolve, reject) {
       ]);
     }))
     .pipe(gulp.dest(config.distDirPath))
+    .pipe(gulp.dest(config.uploadCssPath))
     .on('error', async(err) => {
       util.log('【css】compile complete error', 'debug')
       return await Promise.reject()
