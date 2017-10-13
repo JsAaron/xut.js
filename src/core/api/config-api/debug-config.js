@@ -7,12 +7,6 @@ const DEFAULT = undefined
 export default {
 
   /**
-   * 支持调试模式
-   * @type {[type]}
-   */
-  devtools: process.env.NODE_ENV !== 'production',
-
-  /**
    * 是否支持debug.js的远程处理
    * @type {Boolean}
    */

@@ -288,7 +288,7 @@ export default class Scheduler {
               hasMultiPage,
               'getStyle': currentStyle
             }, pageIndex, masterFilter, function(shareMaster) {
-              if (config.debug.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
+              if (shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                 $warn({
                   type: 'pagebase',
                   content: `母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`

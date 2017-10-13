@@ -19,8 +19,5 @@ export default function setHistory(data) {
     config.launch.historyMode = true
     return
   }
-  //调试模式，默认启动缓存
-  if (config.debug.devtools) {
-    config.launch.historyMode = true
-  }
+
 }
