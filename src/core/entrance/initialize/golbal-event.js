@@ -2,8 +2,8 @@
 /// 初始化页面默认行为
 /////////////////////////////
 
-import { config } from '../config/index'
-import { fixAudio } from '../component/audio/fix'
+import { config } from '../../config/index'
+import { fixAudio } from '../../component/audio/fix'
 import { repairImage } from 'repair/image'
 
 

@@ -1,5 +1,4 @@
-
-"UPDATE DATA: Fri Aug 25 2017 14:24:16 GMT+0800 (CST)"
+"UPDATE DATA: Fri Aug 25 2017 14:24:16 GMT+0800 (CST)" 
 {
 "name":"es6-magazine",
 "version":"1.0.0-csp",

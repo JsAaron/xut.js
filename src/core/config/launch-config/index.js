@@ -11,10 +11,12 @@ import setCursor from './set-cursor'
 import setHistory from './set-history'
 import setGestureSwipe from './set-gesture'
 import setBrType, { resetBrMode } from './set-br'
+import { setVisualMode } from './set-mode'
+
 
 //导出其余模式
 export * from './set-mode'
-export { setGestureSwipe, resetBrMode, setHistory }
+export {resetBrMode, setHistory }
 
 /*
   获取真实的配置文件 priority
@@ -23,7 +25,7 @@ export { setGestureSwipe, resetBrMode, setHistory }
   2 trackCode
   3 brMode
  */
-export function priorityConfig() {
+export function configLaunch(novelData) {
 
   /*独立app与全局配置文件*/
   const launch = config.launch
@@ -63,15 +65,16 @@ export function priorityConfig() {
     }
   }
 
-  //竖版的情况下，页面模式都强制为1
-  if (launch.scrollMode === 'v') {
-    launch.visualMode = 1
-  }
-
   //如果不是浏览器模式
   //强制关闭预加载模式
   if (!Xut.plat.isBrowser) {
     config.launch.preload = null
   }
+
+  //配置VisualMode
+  setVisualMode()
+
+  //配置手势
+  setGestureSwipe(novelData)
 
 }

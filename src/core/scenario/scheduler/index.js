@@ -357,8 +357,7 @@ export default class Scheduler {
       backIndex,
       direction,
       orientation,
-      isAppBoundary, //应用边界反弹
-      setSwipeInvalid //设置翻页无效
+      isAppBoundary //应用边界反弹
     } = options
 
     //用户强制直接切换模式
@@ -390,20 +389,19 @@ export default class Scheduler {
       //拦截
       if (visualObj.hasSwipeSequence(direction)) {
         //设置为无效翻页
-        setSwipeInvalid && setSwipeInvalid()
+        options.setSwipeInvalidCallback && options.setSwipeInvalidCallback()
         return
       }
     }
 
-
-    /*视觉差页面滑动*/
+    //视觉差页面滑动
     let nodes
     if (visualObj) {
       const chapterData = visualObj.chapterData
       nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined
     }
 
-    /*移动的距离,合集*/
+    //移动的距离,合集
     const moveDistance = getVisualDistance({
       action,
       distance,
@@ -420,7 +418,7 @@ export default class Scheduler {
      * swiper延伸判断，通过这里获取到页面真是的坐标
      * 反馈给swiper,如果是反弹就不再处理了
      */
-    if (options.setPageBanBounce && options.setPageBanBounce(moveDistance[1])) {
+    if (options.setPageBanBounceCallback && options.setPageBanBounceCallback(moveDistance[1])) {
       return
     }
 

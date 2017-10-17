@@ -471,19 +471,23 @@ export default class Swiper extends Observer {
       action: 'flipMove',
       /**
        * 因为模式5的情况下，判断是否是边界，需要获取正确的页面值才可以
-       * 所以移动页面在反弹计算之后，所以必须在延后 movePageBases中判断是否为反弹
+       * 获取的值，需要转化，所以必须流程在在后面的代码中控制
+       * 移动页面在反弹计算之后，所以必须在延后 movePageBases中判断是否为反弹
        */
-      setPageBanBounce(position) {
+      setPageBanBounceCallback(position) {
 
-        /*如果没有启动边界反弹*/
+        //如果没有启动边界反弹
+        //要主动探测下是否到了边界
         if (!self.options.borderBounce) {
-          /*如果是到边界了，就禁止反弹*/
+          //如果是到边界了，就禁止反弹
           if (self._banBounce = self._borderBounce(position)) {
             return true
           }
         }
 
-        /*模式5下，边界翻页的敏感度处理*/
+        //模式5下，边界翻页的敏感度处理
+        //滑动页面到边界的时候，需要判断当前的操作行为
+        //确定是否是翻页行为
         if (self.options.insideScroll) {
 
           const absPosition = Math.abs(position)
@@ -533,7 +537,7 @@ export default class Swiper extends Observer {
        * 必须是同步方法：
        * 动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
        */
-      setSwipeInvalid() {
+      setSwipeInvalidCallback() {
         self._isInvalid = true
       }
     })
@@ -830,9 +834,27 @@ export default class Swiper extends Observer {
       /*到首页边界，end事件不触发，还原内部的值*/
       this._setKeepDist(0, 0)
       return true
-    } else if (this.visualIndex === this.totalIndex - 1 && position < 0) {
-      //尾页
-      return true;
+    } else if (this.visualIndex === this.totalIndex - 1) {
+
+      //如果是模式5，左右页面
+      //让在最后一页需要判断可以向前移动
+      //不能通过position<0因为position左边移动也是<0
+      if (this.options.insideScroll) {
+        //往后翻页，需要判断
+        if (this.direction === 'next' && Math.abs(position) > this.visualWidth) {
+          //最后一页，还往右边翻需要禁止
+          return true
+        }
+        //往前翻
+        if (this.direction === 'prev' && position > 0) {
+          return true
+        }
+      } else {
+        //单页模式的尾页
+        if (position < 0) {
+          return true
+        }
+      }
     }
   }
 

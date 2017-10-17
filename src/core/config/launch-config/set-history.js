@@ -19,5 +19,4 @@ export default function setHistory(data) {
     config.launch.historyMode = true
     return
   }
-
 }

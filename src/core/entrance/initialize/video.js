@@ -1,4 +1,4 @@
-import flarePlayer from '../component/video/player/flare'
+import flarePlayer from '../../component/video/player/flare'
 
 
 const preloadVideo = {

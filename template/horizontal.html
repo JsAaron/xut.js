@@ -18,21 +18,11 @@ small
 
 <script type="text/javascript">
 
-function GolbalForumOpen(data){
-  console.log('GolbalForumOpen',data.pageIndex)
-}
-
-function GolbalForumClose(data){
-  console.log('GolbalForumClose',data.pageIndex)
-}
-
-
-
     var debugging = true;
 
     var iframe = document.getElementById("iframe");
 
-    iframe.src = "index.html?"+ (+new Date)
+    iframe.src = "http://localhost:8888/index.html?"+ (+new Date)
 
     var resolution = 5;
     var mode = 0;

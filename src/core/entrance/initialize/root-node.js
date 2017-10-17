@@ -1,5 +1,5 @@
-import { config } from '../config/index'
-import { hasDisable } from './cursor'
+import { config } from '../../config/index'
+import { hasDisable } from '../../expand/cursor'
 
 /**
  * 忙碌光标

@@ -1,10 +1,10 @@
 import baseConfig from './base-config/index'
 import initMainScene from './main-scene'
 import { config } from '../config/index'
-import { bindAndroid } from '../initialize/button'
-import { plugVideo, html5Video } from '../initialize/video'
+import { bindAndroid } from './initialize/button'
+import { plugVideo, html5Video } from './initialize/video'
 import { $getStorage, $warn } from '../util/index'
-
+import initBase from './initialize/index'
 
 function initMain(novelData) {
 
@@ -95,20 +95,23 @@ function bindPlatEvent() {
   3 pc
   4 ios/android
  */
-export default function entrance() {
-  if (window.GLOBALIFRAME) {
-    bindPlatEvent()
-  } else {
-    //brower
-    if (Xut.plat.isBrowser) {
-      initApp()
+export default function entrance(options) {
+  //初始化全局一些配置
+  initBase(options, () => {
+    if (window.GLOBALIFRAME) {
+      bindPlatEvent()
     } else {
-      //mobile(apk or ipa)
-      window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
-      document.addEventListener("deviceready", () => {
-        Xut.plat.hasPlugin = true //支持插件
-        Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function() {});
-      }, false)
+      //brower
+      if (Xut.plat.isBrowser) {
+        initApp()
+      } else {
+        //mobile(apk or ipa)
+        window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
+        document.addEventListener("deviceready", () => {
+          Xut.plat.hasPlugin = true //支持插件
+          Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function() {});
+        }, false)
+      }
     }
-  }
+  })
 }

@@ -355,7 +355,7 @@ export default function api(Swiper) {
        * 必须是同步方法：
        * 动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
        */
-      setSwipeInvalid: function() {
+      setSwipeInvalidCallback: function() {
         self._isInvalid = true
       }
     })

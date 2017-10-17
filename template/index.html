@@ -26,9 +26,6 @@
 
 </html>
 <script type="text/javascript">
-
-console.log(parent.document)
-
 Xut.Application.setConfig = {
   lauchMode: 1,
   preload: true,
@@ -45,13 +42,13 @@ Xut.Application.setConfig = {
   //     1440: 'hi'
   // },
 
-  debug: {
-    // silent: ['all'],
-    // locationPage: {
-    //   seasonId:1,
-    //   pageIndex: 18
-    // }
-  },
+
+  // debug: {
+  //   locationPage: {
+  //     seasonId:1,
+  //     pageIndex: 18
+  //   }
+  // },
   // columnCheck:true,
   // scrollMode: 'v',
   // gestureSwipe:true,
@@ -96,11 +93,11 @@ Xut.Application.Watch('appDestory', function() {
 })
 
 Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type, options)
+  console.log(type,options)
 })
 
 
-var appId = 1 //326
+var appId = 11 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

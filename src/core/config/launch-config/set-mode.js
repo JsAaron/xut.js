@@ -5,28 +5,33 @@ import { getSize } from '../v-screen'
  * 重设视图显示模式
  * @return {[type]} [description]
  */
-export function resetVisualMode(data) {
+export function setVisualMode() {
 
-  /**
-   * 重设全局的页面模式
-   * 默认页面模式选择
-   * 1 全局用户接口
-   * 2 PPT的数据接口
-   * 3 默认1
-   */
-  if (config.launch.visualMode === undefined) {
-    config.launch.visualMode = config.data.visualMode || 1
+  //竖版的情况下，页面模式都强制为1
+  if (config.launch.scrollMode === 'v') {
+    config.launch.visualMode = 1
+    return
   }
 
-  /**
-   * 模式5 只在竖版下使用
-   */
+  //如果数据库定义了模式
+  //那么优先数据库
+  if (config.data.visualMode !== undefined) {
+    config.launch.visualMode = config.data.visualMode
+  }
+
+  //默认为1
+  if (config.launch.visualMode === undefined) {
+    config.launch.visualMode = 1
+  }
+
+  //模式5 只在竖版下使用
   if (config.launch.visualMode === 5) {
     const screen = getSize()
     if (screen.height < screen.width) {
       config.launch.visualMode = 1
     }
   }
+
 }
 
 

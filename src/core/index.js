@@ -1,11 +1,11 @@
-import initApp from './initialize/index'
+import enterApp from './entrance/index'
 import { config } from './config/index'
 import { removeSlash, mixGolbalConfig } from './util/index'
 
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891
+Xut.Version = 891.1
 
 
 //接口接在参数,用户横竖切换刷新
@@ -49,7 +49,7 @@ const bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function(
       })
     } else {
       delay(() => {
-        initApp()
+        enterApp()
       })
     }
   })
@@ -76,7 +76,10 @@ Xut.Application.Launch = option => {
       delete config.launch.path
     }
     bindOrientateMode()
-    initApp(option.el, option.cursor)
+    enterApp({
+      el: option.el,
+      cursor: option.cursor
+    })
   }
 }
 
@@ -110,6 +113,6 @@ setTimeout(() => {
     mixGolbalConfig(setConfig)
     /*保证兼容，不需要判断launch存在，初始空对象*/
     config.launch = {}
-    initApp()
+    enterApp()
   }
 }, 100)

@@ -42818,12 +42818,6 @@ var DEFAULT$1 = undefined;
 var improtDebugConfig = {
 
   /**
-   * 支持调试模式
-   * @type {[type]}
-   */
-  devtools: "production" !== 'production',
-
-  /**
    * 是否支持debug.js的远程处理
    * @type {Boolean}
    */
@@ -47789,6 +47783,60 @@ function clearPreload() {
   clearLoop();
 }
 
+/**
+ * 自适应图片
+ * @return {[type]} [description]
+ */
+function adaptiveImage() {
+  var $adaptiveImageNode = $('.xut-adaptive-image');
+  if ($adaptiveImageNode.length) {
+    var baseImageType = $adaptiveImageNode.width();
+    var type = config.launch.imageSuffix[baseImageType];
+    if (type) {
+      config.launch.baseImageSuffix = type;
+      return;
+    }
+  }
+  setDefaultSuffix();
+}
+
+/**
+ * 最大屏屏幕尺寸
+ * @return {[type]} [description]
+ */
+function getMaxWidth() {
+  if (config.visualSize) {
+    return config.visualSize.width;
+  }
+  return window.screen.width > document.documentElement.clientWidth ? window.screen.width : document.documentElement.clientWidth;
+}
+
+/**
+ * 检车分辨率失败的情况
+ * 强制用js转化
+ * 750:  '', //0-1079
+ * 1080: 'mi', //1080-1439
+ * 1440: 'hi' //1440->
+ */
+function setDefaultSuffix() {
+  var doc = document.documentElement;
+  //竖版的情况才调整
+  if (doc.clientHeight > doc.clientWidth) {
+    var ratio = window.devicePixelRatio || 1;
+    var maxWidth = getMaxWidth() * ratio;
+    if (maxWidth >= 1080 && maxWidth < 1439) {
+      config.launch.baseImageSuffix = config.launch.imageSuffix['1080'];
+    }
+    if (maxWidth >= 1440) {
+      config.launch.baseImageSuffix = config.launch.imageSuffix['1440'];
+    }
+    $warn({
+      type: 'config',
+      content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix
+    });
+  }
+}
+
 //////////////////////////////////
 /// 如果启动了代码追踪，配置基本信息
 //////////////////////////////////
@@ -47883,10 +47931,6 @@ function setHistory(data) {
   if (data.recordHistory !== undefined && Number(data.recordHistory)) {
     config.launch.historyMode = true;
     return;
-  }
-  //调试模式，默认启动缓存
-  if (config.debug.devtools) {
-    config.launch.historyMode = true;
   }
 }
 
@@ -48056,22 +48100,26 @@ function getBrType(mode) {
  * 重设视图显示模式
  * @return {[type]} [description]
  */
-function resetVisualMode(data) {
+function setVisualMode() {
 
-  /**
-   * 重设全局的页面模式
-   * 默认页面模式选择
-   * 1 全局用户接口
-   * 2 PPT的数据接口
-   * 3 默认1
-   */
-  if (config.launch.visualMode === undefined) {
-    config.launch.visualMode = config.data.visualMode || 1;
+  //竖版的情况下，页面模式都强制为1
+  if (config.launch.scrollMode === 'v') {
+    config.launch.visualMode = 1;
+    return;
   }
 
-  /**
-   * 模式5 只在竖版下使用
-   */
+  //如果数据库定义了模式
+  //那么优先数据库
+  if (config.data.visualMode !== undefined) {
+    config.launch.visualMode = config.data.visualMode;
+  }
+
+  //默认为1
+  if (config.launch.visualMode === undefined) {
+    config.launch.visualMode = 1;
+  }
+
+  //模式5 只在竖版下使用
   if (config.launch.visualMode === 5) {
     var screen = getSize();
     if (screen.height < screen.width) {
@@ -48114,7 +48162,7 @@ function setPaintingMode(data) {
   2 trackCode
   3 brMode
  */
-function priorityConfig() {
+function configLaunch(novelData) {
 
   /*独立app与全局配置文件*/
   var launch = config.launch;
@@ -48154,72 +48202,71 @@ function priorityConfig() {
     }
   }
 
-  //竖版的情况下，页面模式都强制为1
-  if (launch.scrollMode === 'v') {
-    launch.visualMode = 1;
-  }
-
   //如果不是浏览器模式
   //强制关闭预加载模式
   if (!Xut.plat.isBrowser) {
     config.launch.preload = null;
   }
+
+  //配置VisualMode
+  setVisualMode();
+
+  //配置手势
+  setGestureSwipe(novelData);
 }
 
-/**
- * 最大屏屏幕尺寸
- * @return {[type]} [description]
- */
-function getMaxWidth() {
-  if (config.visualSize) {
-    return config.visualSize.width;
-  }
-  return window.screen.width > document.documentElement.clientWidth ? window.screen.width : document.documentElement.clientWidth;
-}
+function baseConfig(callback) {
+  //导入数据库
+  importJsonDatabase(function (results) {
+    setDatabse(results);
+  });
 
-/**
- * 检车分辨率失败的情况
- * 强制用js转化
- * 750:  '', //0-1079
- * 1080: 'mi', //1080-1439
- * 1440: 'hi' //1440->
- */
-function setDefaultSuffix() {
-  var doc = document.documentElement;
-  //竖版的情况才调整
-  if (doc.clientHeight > doc.clientWidth) {
-    var ratio = window.devicePixelRatio || 1;
-    var maxWidth = getMaxWidth() * ratio;
-    if (maxWidth >= 1080 && maxWidth < 1439) {
-      config.launch.baseImageSuffix = config.launch.imageSuffix['1080'];
-    }
-    if (maxWidth >= 1440) {
-      config.launch.baseImageSuffix = config.launch.imageSuffix['1440'];
-    }
-    if (config.debug.devtools && config.launch.baseImageSuffix) {
-      $warn({
-        type: 'config',
-        content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix
+  //根据数据库的配置设置
+  function setDatabse(results) {
+    initDatabse(results, function (dataRet) {
+      $warn('logic', '初始化数据库完成');
+      var novelData = dataRet.Novel.item(0);
+      var data = initDefaults(dataRet.Setting);
+      var chapterTotal = dataRet.Chapter.length;
+
+      //配置lanuch
+      configLaunch(novelData);
+
+      //配置config
+      configInit(novelData, data);
+
+      //配置图片
+      configImage();
+
+      //处理预加载文件
+      loadPrelaod(function (hasPreFile, globalBrMode) {
+        resetBrMode(hasPreFile, globalBrMode);
+        loadStyle(novelData, chapterTotal);
       });
-    }
+    });
   }
-}
 
-/**
- * 自适应图片
- * @return {[type]} [description]
- */
-function adaptiveImage() {
-  var $adaptiveImageNode = $('.xut-adaptive-image');
-  if ($adaptiveImageNode.length) {
-    var baseImageType = $adaptiveImageNode.width();
-    var type = config.launch.imageSuffix[baseImageType];
-    if (type) {
-      config.launch.baseImageSuffix = type;
-      return;
-    }
+  /**
+   * 加载样式
+   * @return {[type]} [description]
+   */
+  function loadStyle(novelData, chapterTotal) {
+    /*加载svg的样式*/
+    loadGolbalStyle('svgsheet', function () {
+      //判断是否有分栏处理
+      configColumn(function () {
+        //如果启动预加载配置
+        //先探测下是否能支持
+        if (config.launch.preload) {
+          initPreload(chapterTotal, function () {
+            return callback(novelData);
+          });
+        } else {
+          callback(novelData);
+        }
+      });
+    });
   }
-  setDefaultSuffix();
 }
 
 /*
@@ -48268,8 +48315,7 @@ function configColumn(callback) {
   });
 }
 
-function baseConfig(callback) {
-
+function configImage() {
   //mini杂志设置
   //如果是pad的情况下设置font为125%
   if (config.launch.platform === 'mini' && Xut.plat.isTablet) {
@@ -48279,57 +48325,6 @@ function baseConfig(callback) {
   /*图片分辨了自适应*/
   if (config.launch.imageSuffix) {
     adaptiveImage();
-  }
-
-  //导入数据库
-  importJsonDatabase(function (results) {
-    setDatabse(results);
-  });
-
-  function setDatabse(results) {
-    initDatabse(results, function (dataRet) {
-
-      $warn('logic', '初始化数据库完成');
-
-      var novelData = dataRet.Novel.item(0);
-      var tempSettingData = initDefaults(dataRet.Setting);
-      var chapterTotal = dataRet.Chapter.length;
-
-      //配置config
-      resetVisualMode();
-      configInit(novelData, tempSettingData);
-
-      //配置师傅翻页
-      setGestureSwipe(novelData);
-
-      //处理预加载文件
-      loadPrelaod(function (hasPreFile, globalBrMode) {
-        resetBrMode(hasPreFile, globalBrMode);
-        loadStyle(novelData, chapterTotal);
-      });
-    });
-  }
-
-  /**
-   * 加载样式
-   * @return {[type]} [description]
-   */
-  function loadStyle(novelData, chapterTotal) {
-    /*加载svg的样式*/
-    loadGolbalStyle('svgsheet', function () {
-      //判断是否有分栏处理
-      configColumn(function () {
-        //如果启动预加载配置
-        //先探测下是否能支持
-        if (config.launch.preload) {
-          initPreload(chapterTotal, function () {
-            return callback(novelData);
-          });
-        } else {
-          callback(novelData);
-        }
-      });
-    });
   }
 }
 
@@ -48779,112 +48774,6 @@ function clearAndroid() {
   }
 }
 
-function initMain(novelData) {
-
-  $warn('logic', '初始化base-config完成');
-
-  /**
-   * IBOOS模式
-   */
-  if (Xut.IBooks.Enabled) {
-    //删除背景图
-    $(".xut-cover").remove();
-    initMainScene({
-      "pageIndex": Xut.IBooks.CONFIG.pageIndex
-    });
-    return;
-  }
-
-  /**
-   * 缓存加载
-   * 如果启动recordHistory记录
-   */
-  var pageIndex = Number($getStorage('pageIndex'));
-  if (config.launch.historyMode && pageIndex !== undefined) {
-    var novelId = parseInt($getStorage("novelId"));
-    if (novelId) {
-      return initMainScene({
-        "novelId": novelId,
-        "pageIndex": pageIndex,
-        'history': $getStorage('history')
-      });
-    }
-  }
-
-  //第一次加载
-  //没有缓存
-  initMainScene({ "novelId": novelData._id, "pageIndex": 0 });
-}
-
-/**
- * 加载app应用
- */
-var initApp$1 = function initApp() {
-  return baseConfig(initMain);
-};
-
-/**
- * 如果是安卓桌面端
- * 绑定事件
- * @return {[type]} [description]
- */
-function bindPlatEvent() {
-  //安卓上并且不是浏览器打开的情况
-  if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
-    //预加载处理视频
-    //妙妙学不加载视频
-    //读库不加载视频
-    if (window.MMXCONFIG && !window.DUKUCONFIG) {
-      plugVideo();
-    }
-    //不是子文档指定绑定按键
-    if (!window.SUbCONFIGT) {
-      /*app初始化完毕*/
-      Xut.Application.Watch('initComplete', function () {
-        bindAndroid();
-      });
-    }
-  }
-  if (window.DUKUCONFIG) {
-    PMS.bind("MagazineExit", function () {
-      PMS.unbind();
-      Xut.Application.DropApp();
-    }, "*");
-  }
-  initApp$1();
-}
-
-/*
-  如果不是读库模式
-  播放HTML5视频
-  在IOS
-  if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
-      html5Video()
-  }
-  Ifarme嵌套处理
-  1 新阅读
-  2 子文档
-  3 pc
-  4 ios/android
- */
-function entrance() {
-  if (window.GLOBALIFRAME) {
-    bindPlatEvent();
-  } else {
-    //brower
-    if (Xut.plat.isBrowser) {
-      initApp$1();
-    } else {
-      //mobile(apk or ipa)
-      window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
-      document.addEventListener("deviceready", function () {
-        Xut.plat.hasPlugin = true; //支持插件
-        Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function () {});
-      }, false);
-    }
-  }
-}
-
 /**
  * 判断是否支持webp模式
  * @param  {Function} callback [description]
@@ -48913,17 +48802,20 @@ function initAsyn(callback) {
   });
 }
 
-/*
-忙碌光标
+/**
+ * 忙碌光标
+ * @return {[type]} [description]
  */
-var getBusyHTML = function getBusyHTML() {
+function getBusyHTML() {
   return hasDisable() ? '' : '<div class="xut-busy-icon xut-fullscreen"></div>';
-};
+}
 
 /**
  * 初始化根节点
+ * @param  {[type]} newCursor [description]
+ * @return {[type]}           [description]
  */
-var getContentHTML = function getContentHTML(newCursor) {
+function getContentHTML(newCursor) {
   var coverStyle = '';
   //mini平台不要背景图
   if (config.launch.platform === 'mini') {} else {
@@ -48937,33 +48829,40 @@ var getContentHTML = function getContentHTML(newCursor) {
     coverStyle = 'style="background-image: url(' + coverUrl + ');"';
   }
   return getBusyHTML() + '\n            <div class="xut-adaptive-image"></div>\n            <div class="xut-cover xut-fullscreen" ' + coverStyle + '></div>\n            <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>';
-};
+}
 
 /**
  * 根节点
  */
 var $rootNode = void 0;
 var $contentNode = void 0;
-function initRootNode() {
-  var nodeName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '#xxtppt-app-container';
-  var cursor = arguments[1];
+function initRootNode(_ref) {
+  var _ref$el = _ref.el,
+      el = _ref$el === undefined ? '#xxtppt-app-container' : _ref$el,
+      cursor = _ref.cursor;
 
-  if (nodeName) {
-    $rootNode = $(nodeName);
+
+  var contentHtml = void 0;
+
+  if (el) {
+    $rootNode = $(el);
   }
+
+  //如果没有传递节点名，直接放到body下面
   if (!$rootNode.length) {
-    //如果没有传递节点名，直接放到body下面
-    nodeName = '';
+    el = '';
     $rootNode = $('body');
   }
 
-  var contentHtml = getContentHTML(cursor);
-
-  //如果根节点不存在,配置根节点
-  if (!nodeName) {
+  if (el) {
+    contentHtml = getContentHTML(cursor);
+  } else {
+    //如果根节点不存在,配置根节点
     contentHtml = '<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden">' + contentHtml + '</div>';
   }
+
   $contentNode = $(String.styleFormat(contentHtml));
+
   return { $rootNode: $rootNode, $contentNode: $contentNode };
 }
 
@@ -64284,12 +64183,10 @@ var externalFile = function externalFile(wrapObj, svgCallback) {
  */
 var allotRatio = function allotRatio(fixRadio, headerFooterMode) {
   if (fixRadio && headerFooterMode) {
-    if (config.debug.devtools) {
-      $warn({
-        type: 'pagebase',
-        content: 'content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式'
-      });
-    }
+    $warn({
+      type: 'pagebase',
+      content: 'content缩放模式fixRadio与headerFooterMode重叠,优先选择headerFooterMode模式'
+    });
   }
   //页眉页脚模式
   if (headerFooterMode) {
@@ -68506,7 +68403,7 @@ function api(Swiper) {
        * 必须是同步方法：
        * 动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
        */
-      setSwipeInvalid: function setSwipeInvalid() {
+      setSwipeInvalidCallback: function setSwipeInvalidCallback() {
         self._isInvalid = true;
       }
     });
@@ -69503,19 +69400,23 @@ var Swiper = function (_Observer) {
         action: 'flipMove',
         /**
          * 因为模式5的情况下，判断是否是边界，需要获取正确的页面值才可以
-         * 所以移动页面在反弹计算之后，所以必须在延后 movePageBases中判断是否为反弹
+         * 获取的值，需要转化，所以必须流程在在后面的代码中控制
+         * 移动页面在反弹计算之后，所以必须在延后 movePageBases中判断是否为反弹
          */
-        setPageBanBounce: function setPageBanBounce(position) {
+        setPageBanBounceCallback: function setPageBanBounceCallback(position) {
 
-          /*如果没有启动边界反弹*/
+          //如果没有启动边界反弹
+          //要主动探测下是否到了边界
           if (!self.options.borderBounce) {
-            /*如果是到边界了，就禁止反弹*/
+            //如果是到边界了，就禁止反弹
             if (self._banBounce = self._borderBounce(position)) {
               return true;
             }
           }
 
-          /*模式5下，边界翻页的敏感度处理*/
+          //模式5下，边界翻页的敏感度处理
+          //滑动页面到边界的时候，需要判断当前的操作行为
+          //确定是否是翻页行为
           if (self.options.insideScroll) {
 
             var absPosition = Math.abs(position);
@@ -69566,7 +69467,7 @@ var Swiper = function (_Observer) {
          * 必须是同步方法：
          * 动画不能在回调中更改状态，因为翻页动作可能在动画没有结束之前，所以会导致翻页卡住
          */
-        setSwipeInvalid: function setSwipeInvalid() {
+        setSwipeInvalidCallback: function setSwipeInvalidCallback() {
           self._isInvalid = true;
         }
       });
@@ -69884,9 +69785,27 @@ var Swiper = function (_Observer) {
         /*到首页边界，end事件不触发，还原内部的值*/
         this._setKeepDist(0, 0);
         return true;
-      } else if (this.visualIndex === this.totalIndex - 1 && position < 0) {
-        //尾页
-        return true;
+      } else if (this.visualIndex === this.totalIndex - 1) {
+
+        //如果是模式5，左右页面
+        //让在最后一页需要判断可以向前移动
+        //不能通过position<0因为position左边移动也是<0
+        if (this.options.insideScroll) {
+          //往后翻页，需要判断
+          if (this.direction === 'next' && Math.abs(position) > this.visualWidth) {
+            //最后一页，还往右边翻需要禁止
+            return true;
+          }
+          //往前翻
+          if (this.direction === 'prev' && position > 0) {
+            return true;
+          }
+        } else {
+          //单页模式的尾页
+          if (position < 0) {
+            return true;
+          }
+        }
       }
     }
 
@@ -73564,12 +73483,10 @@ var MasterMgr = function (_ManageSuper) {
 
       //检测母版已经创建
       if (this._hasMaster(reuseMasterKey, pageOffset, pageIndex)) {
-        if (config.debug.devtools) {
-          //重复的母版对象
-          //用于检测页面模式是否一致
-          var currMasterObj = this.$$getPageBase(reuseMasterKey);
-          currMasterObj && repeatCallBack(currMasterObj);
-        }
+        //重复的母版对象
+        //用于检测页面模式是否一致
+        var currMasterObj = this.$$getPageBase(reuseMasterKey);
+        currMasterObj && repeatCallBack(currMasterObj);
         return;
       }
 
@@ -74980,7 +74897,7 @@ var Scheduler = function () {
                 hasMultiPage: hasMultiPage,
                 'getStyle': currentStyle
               }, pageIndex, masterFilter, function (shareMaster) {
-                if (config.debug.devtools && shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
+                if (shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                   $warn({
                     type: 'pagebase',
                     content: '\u6BCD\u7248\u4E0E\u9875\u9762VisualMode\u4E0D\u4E00\u81F4,\u9519\u8BEF\u9875\u7801:' + (pageIndex + 1) + ',\u6BCD\u7248visualMode:' + shareMaster.getStyle.pageVisualMode + ',\u9875\u9762visualMode:' + currentStyle.pageVisualMode
@@ -75047,8 +74964,7 @@ var Scheduler = function () {
           backIndex = options.backIndex,
           direction = options.direction,
           orientation = options.orientation,
-          isAppBoundary = options.isAppBoundary,
-          setSwipeInvalid = options.setSwipeInvalid;
+          isAppBoundary = options.isAppBoundary;
 
       //用户强制直接切换模式
       //禁止页面跟随滑动
@@ -75080,19 +74996,19 @@ var Scheduler = function () {
         //拦截
         if (visualObj.hasSwipeSequence(direction)) {
           //设置为无效翻页
-          setSwipeInvalid && setSwipeInvalid();
+          options.setSwipeInvalidCallback && options.setSwipeInvalidCallback();
           return;
         }
       }
 
-      /*视觉差页面滑动*/
+      //视觉差页面滑动
       var nodes = void 0;
       if (visualObj) {
         var chapterData = visualObj.chapterData;
         nodes = chapterData && chapterData.nodes ? chapterData.nodes : undefined;
       }
 
-      /*移动的距离,合集*/
+      //移动的距离,合集
       var moveDistance = getVisualDistance({
         action: action,
         distance: distance,
@@ -75109,7 +75025,7 @@ var Scheduler = function () {
        * swiper延伸判断，通过这里获取到页面真是的坐标
        * 反馈给swiper,如果是反弹就不再处理了
        */
-      if (options.setPageBanBounce && options.setPageBanBounce(moveDistance[1])) {
+      if (options.setPageBanBounceCallback && options.setPageBanBounceCallback(moveDistance[1])) {
         return;
       }
 
@@ -81637,36 +81553,138 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-function initApp() {
-  for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
-    arg[_key] = arguments[_key];
-  }
-
+function initApp$1(options, callback) {
   /*针对异步的代码以前检测出来*/
   initAsyn(function () {
-    /*配置优先级*/
-    priorityConfig();
-    /*全局的一些事件处理*/
+    //全局的一些事件处理
     initGlobalEvent();
-    /*根节点*/
+    //根节点
 
-    var _initRootNode = initRootNode.apply(undefined, arg),
+    var _initRootNode = initRootNode(options),
         $rootNode = _initRootNode.$rootNode,
         $contentNode = _initRootNode.$contentNode;
 
     $warn('logic', '初始化设置参数完成');
-
     nextTick({
       container: $rootNode,
       content: $contentNode
-    }, entrance);
+    }, callback);
+  });
+}
+
+function initMain(novelData) {
+
+  $warn('logic', '初始化base-config完成');
+
+  /**
+   * IBOOS模式
+   */
+  if (Xut.IBooks.Enabled) {
+    //删除背景图
+    $(".xut-cover").remove();
+    initMainScene({
+      "pageIndex": Xut.IBooks.CONFIG.pageIndex
+    });
+    return;
+  }
+
+  /**
+   * 缓存加载
+   * 如果启动recordHistory记录
+   */
+  var pageIndex = Number($getStorage('pageIndex'));
+  if (config.launch.historyMode && pageIndex !== undefined) {
+    var novelId = parseInt($getStorage("novelId"));
+    if (novelId) {
+      return initMainScene({
+        "novelId": novelId,
+        "pageIndex": pageIndex,
+        'history': $getStorage('history')
+      });
+    }
+  }
+
+  //第一次加载
+  //没有缓存
+  initMainScene({ "novelId": novelData._id, "pageIndex": 0 });
+}
+
+/**
+ * 加载app应用
+ */
+var initApp = function initApp() {
+  return baseConfig(initMain);
+};
+
+/**
+ * 如果是安卓桌面端
+ * 绑定事件
+ * @return {[type]} [description]
+ */
+function bindPlatEvent() {
+  //安卓上并且不是浏览器打开的情况
+  if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
+    //预加载处理视频
+    //妙妙学不加载视频
+    //读库不加载视频
+    if (window.MMXCONFIG && !window.DUKUCONFIG) {
+      plugVideo();
+    }
+    //不是子文档指定绑定按键
+    if (!window.SUbCONFIGT) {
+      /*app初始化完毕*/
+      Xut.Application.Watch('initComplete', function () {
+        bindAndroid();
+      });
+    }
+  }
+  if (window.DUKUCONFIG) {
+    PMS.bind("MagazineExit", function () {
+      PMS.unbind();
+      Xut.Application.DropApp();
+    }, "*");
+  }
+  initApp();
+}
+
+/*
+  如果不是读库模式
+  播放HTML5视频
+  在IOS
+  if (!window.DUKUCONFIG && !window.GLOBALIFRAME && Xut.plat.isIOS) {
+      html5Video()
+  }
+  Ifarme嵌套处理
+  1 新阅读
+  2 子文档
+  3 pc
+  4 ios/android
+ */
+function entrance(options) {
+  //初始化全局一些配置
+  initApp$1(options, function () {
+    if (window.GLOBALIFRAME) {
+      bindPlatEvent();
+    } else {
+      //brower
+      if (Xut.plat.isBrowser) {
+        initApp();
+      } else {
+        //mobile(apk or ipa)
+        window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
+        document.addEventListener("deviceready", function () {
+          Xut.plat.hasPlugin = true; //支持插件
+          Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function () {});
+        }, false);
+      }
+    }
   });
 }
 
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891;
+Xut.Version = 891.1;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
@@ -81709,7 +81727,7 @@ var bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function ()
       });
     } else {
       delay(function () {
-        initApp();
+        entrance();
       });
     }
   });
@@ -81735,7 +81753,10 @@ Xut.Application.Launch = function (option) {
       delete config.launch.path;
     }
     bindOrientateMode();
-    initApp(option.el, option.cursor);
+    entrance({
+      el: option.el,
+      cursor: option.cursor
+    });
   }
 };
 
@@ -81767,7 +81788,7 @@ setTimeout(function () {
     mixGolbalConfig(setConfig);
     /*保证兼容，不需要判断launch存在，初始空对象*/
     config.launch = {};
-    initApp();
+    entrance();
   }
 }, 100);
 
