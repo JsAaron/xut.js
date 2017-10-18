@@ -48836,11 +48836,11 @@ function getContentHTML(newCursor) {
  */
 var $rootNode = void 0;
 var $contentNode = void 0;
-function initRootNode(_ref) {
-  var _ref$el = _ref.el,
+function initRootNode() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$el = _ref.el,
       el = _ref$el === undefined ? '#xxtppt-app-container' : _ref$el,
       cursor = _ref.cursor;
-
 
   var contentHtml = void 0;
 
@@ -81553,7 +81553,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-function initApp$1(options, callback) {
+function enterApp(options, callback) {
   /*针对异步的代码以前检测出来*/
   initAsyn(function () {
     //全局的一些事件处理
@@ -81662,7 +81662,7 @@ function bindPlatEvent() {
  */
 function entrance(options) {
   //初始化全局一些配置
-  initApp$1(options, function () {
+  enterApp(options, function () {
     if (window.GLOBALIFRAME) {
       bindPlatEvent();
     } else {
@@ -81684,7 +81684,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891.1;
+Xut.Version = 891.2;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

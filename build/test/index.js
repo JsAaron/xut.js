@@ -10,6 +10,9 @@ killOccupied(prot, () => {
   if (buildName) {
     baseDir = buildName
   }
+
+  baseDir ='www'
+
   const bs = browserSync({
     port: prot,
     server: {

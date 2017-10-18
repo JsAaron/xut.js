@@ -43,7 +43,7 @@ let $contentNode
 export function initRootNode({
   el = '#xxtppt-app-container',
   cursor
-}) {
+} = {}) {
 
   let contentHtml
 
