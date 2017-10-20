@@ -20,6 +20,7 @@ export default function distribute(Swiper) {
     data.frontIndex = pointer.frontIndex
     data.backIndex = pointer.backIndex
     data.middleIndex = this.visualIndex
+
     this.$$emit('onMove', data)
   }
 

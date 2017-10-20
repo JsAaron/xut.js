@@ -75,7 +75,6 @@ export default class PageMgr extends ManageSuper {
         'rootNode': this.rootNode //根元素
       })
     )
-
     //增加页面管理
     this._$$addBaseGroup(pageIndex, pageObjs);
     return pageObjs;

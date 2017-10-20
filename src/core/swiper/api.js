@@ -1,4 +1,4 @@
-import { initPointer, calculationIndex } from './pointer'
+import { initPointer, getJumpDepend } from './pointer'
 import { ease } from './ease'
 import { requestInterrupt } from 'preload/index'
 import { config } from '../config/index'
@@ -317,13 +317,14 @@ export default function api(Swiper) {
         break
     }
 
-    //算出是相关数据
-    const data = calculationIndex(visualIndex, targetIndex, this.totalIndex)
+    //算出是跳页相关数据
+    const data = getJumpDepend(visualIndex, targetIndex, this.totalIndex)
 
     data.callback = callback
 
-    //更新页码索引
+    //更新新的页码索引
     this._updatePointer(data)
+
     data.pagePointer = this.pagePointer
 
     this.$$emit('onJumpPage', data)

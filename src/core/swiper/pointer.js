@@ -1,15 +1,18 @@
-/*
-计算当前已经创建的页面索引
+/**
+ * 获取跳转页面依赖的数据
+ * visualIndex 可视区页面索引
+ * targetIndex 目标页面索引
+ * totalIndex  总页数
  */
-export function calculationIndex(visualIndex, targetIndex, totalIndex) {
+export function getJumpDepend(visualIndex, targetIndex, totalIndex) {
   var i = 0,
     existpage,
     createpage,
     pageIndex,
-    ruleOut = [],
+    exclude = [],
     create = [],
     destroy,
-    viewFlip;
+    newPointers;
 
   //存在的页面
   if (visualIndex === 0) {
@@ -37,25 +40,25 @@ export function calculationIndex(visualIndex, targetIndex, totalIndex) {
       create.push(pageIndex);
     } else {
       //排除已存在的页面
-      ruleOut.push(pageIndex);
+      exclude.push(pageIndex);
     }
   }
 
-  _.each(ruleOut, function (ruleOutIndex) {
-    existpage.splice(existpage.indexOf(ruleOutIndex), 1)
+  _.each(exclude, function (excludeIndex) {
+    existpage.splice(existpage.indexOf(excludeIndex), 1)
   });
 
   destroy = existpage;
 
-  viewFlip = [].concat(create).concat(ruleOut).sort(function (a, b) {
+  newPointers = [].concat(create).concat(exclude).sort(function (a, b) {
     return a - b
   });
 
   return {
     'create': create, //创建的页面
-    'ruleOut': ruleOut, //排除已存在的页面
+    'exclude': exclude, //排除已存在的页面
     'destroy': destroy, //销毁的页面
-    'viewFlip': viewFlip,
+    'newPointers': newPointers, //新的页码合集
     'targetIndex': targetIndex,
     'visualIndex': visualIndex
   }

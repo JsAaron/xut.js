@@ -67937,18 +67937,21 @@ function getVisualDistance(options) {
   return config.launch.doublePageMode ? getDouble(options) : getSingle(options);
 }
 
-/*
-计算当前已经创建的页面索引
+/**
+ * 获取跳转页面依赖的数据
+ * visualIndex 可视区页面索引
+ * targetIndex 目标页面索引
+ * totalIndex  总页数
  */
-function calculationIndex(visualIndex, targetIndex, totalIndex) {
+function getJumpDepend(visualIndex, targetIndex, totalIndex) {
   var i = 0,
       existpage,
       createpage,
       pageIndex,
-      ruleOut = [],
+      exclude = [],
       create = [],
       destroy,
-      viewFlip;
+      newPointers;
 
   //存在的页面
   if (visualIndex === 0) {
@@ -67976,25 +67979,25 @@ function calculationIndex(visualIndex, targetIndex, totalIndex) {
       create.push(pageIndex);
     } else {
       //排除已存在的页面
-      ruleOut.push(pageIndex);
+      exclude.push(pageIndex);
     }
   }
 
-  _.each(ruleOut, function (ruleOutIndex) {
-    existpage.splice(existpage.indexOf(ruleOutIndex), 1);
+  _.each(exclude, function (excludeIndex) {
+    existpage.splice(existpage.indexOf(excludeIndex), 1);
   });
 
   destroy = existpage;
 
-  viewFlip = [].concat(create).concat(ruleOut).sort(function (a, b) {
+  newPointers = [].concat(create).concat(exclude).sort(function (a, b) {
     return a - b;
   });
 
   return {
     'create': create, //创建的页面
-    'ruleOut': ruleOut, //排除已存在的页面
+    'exclude': exclude, //排除已存在的页面
     'destroy': destroy, //销毁的页面
-    'viewFlip': viewFlip,
+    'newPointers': newPointers, //新的页码合集
     'targetIndex': targetIndex,
     'visualIndex': visualIndex
   };
@@ -68366,13 +68369,14 @@ function api(Swiper) {
         break;
     }
 
-    //算出是相关数据
-    var data = calculationIndex(visualIndex, targetIndex, this.totalIndex);
+    //算出是跳页相关数据
+    var data = getJumpDepend(visualIndex, targetIndex, this.totalIndex);
 
     data.callback = callback;
 
-    //更新页码索引
+    //更新新的页码索引
     this._updatePointer(data);
+
     data.pagePointer = this.pagePointer;
 
     this.$$emit('onJumpPage', data);
@@ -68963,6 +68967,7 @@ function distribute$1(Swiper) {
     data.frontIndex = pointer.frontIndex;
     data.backIndex = pointer.backIndex;
     data.middleIndex = this.visualIndex;
+
     this.$$emit('onMove', data);
   };
 
@@ -69888,23 +69893,27 @@ var Swiper = function (_Observer) {
         this.pagePointer = { frontIndex: frontIndex, middleIndex: middleIndex, backIndex: backIndex };
         return;
       }
+      //跳转页面传入一个对象数据
       if (arguments.length === 1) {
         var data = frontIndex;
-        var viewFlip = data.viewFlip;
+        var newPointers = data.newPointers;
+        //设置新的页面当前页码索引
         this._updateVisualIndex(data.targetIndex);
-        if (viewFlip.length === 3) {
-          this._updatePointer(viewFlip[0], viewFlip[1], viewFlip[2]);
+        if (newPointers.length === 3) {
+          this._updatePointer(newPointers[0], newPointers[1], newPointers[2]);
         }
-        if (viewFlip.length === 2) {
-          if (viewFlip[0] === 0) {
-            //首页
-            this.pagePointer.backIndex = viewFlip[1];
-            this.pagePointer.middleIndex = viewFlip[0];
+        if (newPointers.length === 2) {
+          //2017.10.20修复问题
+          //根据目标的地址判断是否首页页面，来更新对应的页码
+          //如果是跳到首页
+          if (newPointers[0] === data.targetIndex) {
+            this.pagePointer.backIndex = newPointers[1];
+            this.pagePointer.middleIndex = newPointers[0];
             delete this.pagePointer.frontIndex;
           } else {
-            //尾页
-            this.pagePointer.frontIndex = viewFlip[0];
-            this.pagePointer.middleIndex = viewFlip[1];
+            //跳尾页
+            this.pagePointer.frontIndex = newPointers[0];
+            this.pagePointer.middleIndex = newPointers[1];
             delete this.pagePointer.backIndex;
           }
         }
@@ -73049,7 +73058,6 @@ var PageMgr = function (_ManageSuper) {
         'pageType': this.pageType, //创建页面的类型
         'rootNode': this.rootNode //根元素
       }));
-
       //增加页面管理
       this._$$addBaseGroup(pageIndex, pageObjs);
       return pageObjs;
@@ -81553,7 +81561,7 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-function enterApp(options, callback) {
+function initApp$1(options, callback) {
   /*针对异步的代码以前检测出来*/
   initAsyn(function () {
     //全局的一些事件处理
@@ -81662,7 +81670,7 @@ function bindPlatEvent() {
  */
 function entrance(options) {
   //初始化全局一些配置
-  enterApp(options, function () {
+  initApp$1(options, function () {
     if (window.GLOBALIFRAME) {
       bindPlatEvent();
     } else {
@@ -81684,7 +81692,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891.2;
+Xut.Version = 891.3;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

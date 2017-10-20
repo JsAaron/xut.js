@@ -922,21 +922,26 @@ export default class Swiper extends Observer {
       this.pagePointer = { frontIndex, middleIndex, backIndex }
       return;
     }
+    //跳转页面传入一个对象数据
     if (arguments.length === 1) {
       const data = frontIndex;
-      const viewFlip = data.viewFlip
+      const newPointers = data.newPointers
+      //设置新的页面当前页码索引
       this._updateVisualIndex(data.targetIndex)
-      if (viewFlip.length === 3) {
-        this._updatePointer(viewFlip[0], viewFlip[1], viewFlip[2]);
+      if (newPointers.length === 3) {
+        this._updatePointer(newPointers[0], newPointers[1], newPointers[2]);
       }
-      if (viewFlip.length === 2) {
-        if (viewFlip[0] === 0) { //首页
-          this.pagePointer.backIndex = viewFlip[1];
-          this.pagePointer.middleIndex = viewFlip[0];
+      if (newPointers.length === 2) {
+        //2017.10.20修复问题
+        //根据目标的地址判断是否首页页面，来更新对应的页码
+        //如果是跳到首页
+        if (newPointers[0] === data.targetIndex) {
+          this.pagePointer.backIndex = newPointers[1];
+          this.pagePointer.middleIndex = newPointers[0];
           delete this.pagePointer.frontIndex;
-        } else { //尾页
-          this.pagePointer.frontIndex = viewFlip[0];
-          this.pagePointer.middleIndex = viewFlip[1];
+        } else { //跳尾页
+          this.pagePointer.frontIndex = newPointers[0];
+          this.pagePointer.middleIndex = newPointers[1];
           delete this.pagePointer.backIndex
         }
       }
