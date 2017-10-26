@@ -191,7 +191,7 @@ export default class PageMgr extends ManageSuper {
       middleIndex,
       backIndex,
       suspendIndex,
-      isQuickTurn,
+      isFastSlider,
       direction
     } = data
 
@@ -205,7 +205,7 @@ export default class PageMgr extends ManageSuper {
      */
     const preCreateTask = taskName => {
       let resumePointer
-      if (isQuickTurn || !direction) {
+      if (isFastSlider || !direction) {
         //init
         resumePointer = [frontIndex, backIndex];
       } else {

@@ -87,7 +87,7 @@ export default function slide(Swiper) {
    */
   Swiper.prototype._setRate = function () {
     this._speedRate = 50 / this._getRollVisual()
-    this._isQuickTurn = true;
+    this._isFastSlider = true;
   }
 
   /**
@@ -95,7 +95,7 @@ export default function slide(Swiper) {
    */
   Swiper.prototype._resetRate = function () {
     this._speedRate = this._originalRate;
-    this._isQuickTurn = false;
+    this._isFastSlider = false;
   }
 
   /**

@@ -40,7 +40,7 @@ export default function distribute(Swiper) {
         unlock: callback,
         direction: this.direction,
         pagePointer: this.pagePointer,
-        isQuickTurn: this._isQuickTurn
+        isFastSlider: this._isFastSlider
       })
     }, 50)
   }

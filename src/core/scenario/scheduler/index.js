@@ -512,11 +512,11 @@ export default class Scheduler {
    * 3.需要清理页面
    */
   completePageBases(options) {
-    const { direction, pagePointer, unlock, isQuickTurn } = options
+    const { direction, pagePointer, unlock, isFastSlider } = options
     /*方向*/
     this.direction = direction;
     /*是否快速翻页*/
-    this.isQuickTurn = isQuickTurn || false;
+    this.isFastSlider = isFastSlider || false;
     /*翻页解锁*/
     this.unlock = unlock;
     /*清理上一个页面*/
@@ -558,7 +558,7 @@ export default class Scheduler {
       backIndex,
       direction,
       createPointer,
-      'isQuickTurn': this.isQuickTurn,
+      'isFastSlider': this.isFastSlider,
 
       /**
        * 暂停的页面索引autorun
@@ -662,7 +662,7 @@ export default class Scheduler {
     }
 
     //关闭快速翻页
-    this.isQuickTurn = false;
+    this.isFastSlider = false;
   }
 
 
