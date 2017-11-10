@@ -1,13 +1,13 @@
 import AudioSuper from './super'
-import { hasAudioes, getAudio } from '../fix'
+import { hasFixAudio, getAudioContext } from '../fix'
 
 /**
  * 使用html5的audio播放
  *
- * 1.移动端自动播放，需要调用2次play，但是通过getAudio的方法获取的上下文，每个context被自动play一次
+ * 1.移动端自动播放，需要调用2次play，但是通过getAudioContext的方法获取的上下文，每个context被自动play一次
  * 2.如果需要修复自动播放的情况下
- *   A. 音频的执行比hasAudioes的处理快，那么需要resetContext正在播放的音频上下文
- *   B. 如果hasAudioes有了后，在执行音频，正常播放
+ *   A. 音频的执行比hasFixAudio的处理快，那么需要resetContext正在播放的音频上下文
+ *   B. 如果hasFixAudio有了后，在执行音频，正常播放
  * 3.不需要修复自动播放的情况，只有正常的1次play了
  */
 export class NativeAudio extends AudioSuper {
@@ -16,11 +16,47 @@ export class NativeAudio extends AudioSuper {
     super(options, controlDoms);
   }
 
+
+  /**
+   * 初始化
+   * @return {[type]} [description]
+   */
+  _init() {
+    let self = this
+    let trackId = this.trackId
+
+    if (Xut.plat.supportFixAudio) {
+      //webkit移动端....
+      //不支持自动播放
+      this._createContext();
+    } else {
+
+      //微信有接口
+      //PC正常播放
+      this.audio = new Audio(this.$$url)
+
+      //通过微信自己的事件处理，支持自动播放了
+      if (this.$$getWeixinJSBridgeContext()) {
+        this._startPlay()
+      } else {
+        this._bindPlay()
+      }
+    }
+  }
+
+
   /**
    * 创建音频上下文对象
    */
-  _createContext(state) {
-    this.audio = getAudio();
+  _createContext() {
+    this.audio = getAudioContext();
+    if (!this.audio) {
+      //还没有点击修复，并且已经运行的是自动
+      //第一次进入页面才会存在
+      this._needFix = true
+      return
+    }
+    this._needFix = false
     /*IOS上手动点击播放的修复
     1 必须调用，点击播放的时候没有声音
     2 必须手动播放，自动播放跳过，否则有杂音*/
@@ -31,37 +67,11 @@ export class NativeAudio extends AudioSuper {
     setTimeout(() => {
       if (this.audio) {
         this.audio.src = this.$$url;
-        this._initPlay(state != undefined ? state : true)
+        this._bindPlay()
       }
     }, 150)
   }
 
-  /**
-   * 初始化
-   * @return {[type]} [description]
-   */
-  _init() {
-    let self = this
-    let trackId = this.trackId
-    let hasAudio = hasAudioes()
-
-    //如果不支持自动播放
-    //webkit移动端....
-    if (hasAudio) {
-      this._createContext();
-    } else {
-      //pc与微信....
-      this.audio = new Audio(this.$$url)
-
-      //通过微信自己的事件处理，支持自动播放了
-      if (this.$$getWeixinJSBridge()) {
-        this._startPlay()
-      } else {
-        this._needFix = true
-        this._initPlay(true)
-      }
-    }
-  }
 
   /**
    * 清理定时器
@@ -76,11 +86,8 @@ export class NativeAudio extends AudioSuper {
 
   /**
    * 监听音频播放
-   * toPlay
-   *   如果为true就是时间完毕后，允许播放
-   *   否则就是在resetContext调用处理，音频已经跳过了playing，可能关闭或者停止了
    */
-  _initPlay(toPlay) {
+  _bindPlay() {
 
     this._endBack = () => {
       this._clearTimer()
@@ -92,19 +99,16 @@ export class NativeAudio extends AudioSuper {
       this._$$callbackProcess(false)
     }
 
-
     this._startBack = () => {
-      if (toPlay) {
-        this.status = 'ready';
-        /*延时150毫秒执行*/
-        this.timer = setTimeout(() => {
-          this._clearTimer();
-          /*必须保证状态正确，因为有翻页太快，状态被修改*/
-          if (this.status === 'ready') {
-            this._startPlay()
-          }
-        }, 150)
-      }
+      this.status = 'ready';
+      /*延时150毫秒执行*/
+      this.timer = setTimeout(() => {
+        this._clearTimer();
+        /*必须保证状态正确，因为有翻页太快，状态被修改*/
+        if (this.status === 'ready') {
+          this._startPlay()
+        }
+      }, 150)
     }
 
     /**
@@ -172,20 +176,16 @@ export class NativeAudio extends AudioSuper {
    * 重设音频上下文
    * 因为自动音频播放的关系
    * 在点击后修复这个音频
-   * @return {[type]} [description]
-   *
-   * 这个接口特别注意
-   * 音频绑定click可能与这个同时触发
-   * 会导致loadedmetadata事件失效
-   * this.status === ready
    */
   resetContext() {
-    /*如果不需要修复或者播放结束了*/
-    if (!this._needFix || this.status === 'ended') {
-      return
+    //不支持自动播放的情况下
+    //又开始了自动播放
+    //但是又没有点击动作
+    //所以自动播放被阻止了
+    //需要修复
+    if (this._needFix) {
+      this._createContext()
     }
-    this._destroy()
-    this._createContext(this.status === 'playing' ? true : false)
   }
 
 

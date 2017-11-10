@@ -3,7 +3,6 @@
 /////////////////////////////
 
 import { config } from '../../config/index'
-import { fixAudio } from '../../component/audio/fix'
 import { repairImage } from 'repair/image'
 
 
@@ -18,11 +17,6 @@ window.fixNodeError = function (type, node, chapterIndex, src) {
   }
 }
 
-
-//修复H5音频自动播放bug
-if (!Xut.plat.hasAutoPlayAudio) {
-  fixAudio()
-}
 
 //只初始一次
 //横竖切换要判断

@@ -97,7 +97,6 @@ export function extendAssist(access, $$globalSwiper) {
     }
   }
 
-
   /**
    * 文字动画
    * @param {[type]} contentId [description]

@@ -119,7 +119,7 @@ export default class AudioSuper {
    * 妙妙学ios公众号问题
    * 如果嵌套了iframe必须要找parent的WeixinJSBridge
    */
-  $$getWeixinJSBridge() {
+  $$getWeixinJSBridgeContext() {
     if(window.WeixinJSBridge){
       return window.WeixinJSBridge
     }
@@ -153,7 +153,7 @@ export default class AudioSuper {
     //flash模式不执行
     if (this.audio) {
       //支持自动播放,微信上单独处理
-      const weixinJSBridge = this.$$getWeixinJSBridge()
+      const weixinJSBridge = this.$$getWeixinJSBridgeContext()
       if (weixinJSBridge) {
         weixinJSBridge.invoke('getNetworkType', {}, (e) => {
           this.audio && this.audio.play();

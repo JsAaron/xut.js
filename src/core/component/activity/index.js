@@ -17,7 +17,7 @@ import textBoxMixin from './textbox/index'
 import bookMarkMixin from './bookmark/index'
 import searchBarMixin from './searchbar/index'
 import eventMixin from './event/index'
-import { hasAudioes } from '../audio/fix'
+import { hasFixAudio } from '../audio/fix'
 import { destroyContentEvent } from './event/event'
 import createContent from './content/content-scope'
 import createTask from './task-check'
@@ -362,7 +362,7 @@ export default class Activity {
               'seasonId': scenarioInfo.seasonId,
               'chapterId': scenarioInfo.chapterId
             })
-          }, hasAudioes() ? 500 : 0)
+          }, hasFixAudio() ? 500 : 0)
           return
         }
       }

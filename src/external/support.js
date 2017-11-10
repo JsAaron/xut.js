@@ -3,11 +3,11 @@
  * @return {[type]} [description]
  */
 ;
-(function () {
+(function() {
 
   var location = document.location.href
-    //在读酷pc端 navigator的值被改写过了!!
-    //navigator.appVersion: "xxt 1.0.5260.29725"
+  //在读酷pc端 navigator的值被改写过了!!
+  //navigator.appVersion: "xxt 1.0.5260.29725"
   var userAgent = window.navigator.userAgent.toLowerCase()
   var appVersion = window.navigator.appVersion.toLowerCase()
 
@@ -59,7 +59,7 @@
       localStorage.removeItem('localStorage');
     } catch (e) {
       Storage.prototype._setItem = Storage.prototype.setItem;
-      Storage.prototype.setItem = function () {};
+      Storage.prototype.setItem = function() {};
       supportStorage = false
     }
   }
@@ -105,16 +105,12 @@
     supportPlayInline: iosMainVersion >= 10,
 
     /**
-     * 是否能自动播放媒体
-     * audio
-     * video
+     * 需要修复音频
+     * 修复不能自动播放的情况
+     * 不是微信 && 手机浏览器
      * @type {[type]}
-     * 浏览器端
-     * 不是微信
-     * 是webkit
-     * 是手机端浏览器
      */
-    hasAutoPlayAudio: isWeiXin || isDesktop,
+    supportFixAudio: isBrowser && device.mobile() && !isWeiXin,
 
     /**
      * 支持触摸
@@ -151,18 +147,18 @@
   //私有前缀
   var rdashAlpha = /-([a-z]|[0-9])/ig
   var rmsPrefix = /^-ms-/
-  var fcamelCase = function (all, letter) {
+  var fcamelCase = function(all, letter) {
     return (letter + '').toUpperCase();
   }
-  var camelCase = function (string) {
+  var camelCase = function(string) {
     return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
   }
   var prefix = ['webkit', 'Moz', 'ms', 'o']
   var elementStyle = document.createElement('div').style
   var cache = Object.create(null)
-  var prefixStyle = function (attr) {
+  var prefixStyle = function(attr) {
     var name
-      //缓存中存在
+    //缓存中存在
     if (cache[attr]) {
       return cache[attr];
     }
@@ -171,7 +167,7 @@
       return cache[attr] = attr;
     }
     //需要加前缀
-    prefix.forEach(function (v) {
+    prefix.forEach(function(v) {
       if (camelCase(v + '-' + attr) in elementStyle) {
         name = '-' + v + '-' + attr;
         return cache[attr] = name;
@@ -185,7 +181,7 @@
   var animationEnd = 'animationend'
   var keyframes = '@keyframes '
   var animation = prefixStyle('animation');
-  var adapterPrefix = function () {
+  var adapterPrefix = function() {
     var vendors = animation
     var transitionName = {
       "moz": "transitionend",
@@ -222,10 +218,9 @@
     window.mozRequestAnimationFrame ||
     window.oRequestAnimationFrame ||
     window.msRequestAnimationFrame ||
-    function (callback) {
+    function(callback) {
       window.setTimeout(callback, 1000 / 60);
     };
-
 
 
   ////////////////////
@@ -308,7 +303,7 @@
      * @type {[type]}
      */
     translateZ: translateZ,
-    setTranslateZ: function (zValue) {
+    setTranslateZ: function(zValue) {
       return hasPerspective ? ' translateZ(' + zValue + ')' : ''
     },
 
@@ -339,7 +334,7 @@
         })
         styleText = `translate3d(${}px,${}px,0px) scale(${data.scale},${data.scale})`
      */
-    setTransform: function (options) {
+    setTransform: function(options) {
       var node = options.node
       if (node = getNode(node)) {
         var styleText = ''
@@ -376,7 +371,7 @@
      * 5 设置事件
      * @param {[type]} options [description]
      */
-    setTranslate: function (options) {
+    setTranslate: function(options) {
       var node = options.node
       var x = options.x || 0
       var y = options.y || 0

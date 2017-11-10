@@ -1,6 +1,7 @@
 import { PhoneGapMedia } from './player/phonegap'
 import { CordovaMedia } from './player/cordova'
 import { NativeAudio } from './player/native'
+import { fixAudio } from './fix'
 
 let audioPlayer
 
@@ -12,9 +13,18 @@ if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
   if (window.MMXCONFIG && window.audioHandler) {
     audioPlayer = CordovaMedia
   } else {
+
+    //需要修复音频
+    if (Xut.plat.supportFixAudio) {
+      fixAudio()
+    }
+
     /*其余所有情况都用原声的H5播放器*/
     audioPlayer = NativeAudio
   }
 }
+
+
+
 
 export { audioPlayer }

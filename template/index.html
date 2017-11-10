@@ -26,6 +26,21 @@
 
 </html>
 <script type="text/javascript">
+
+//打开调试模式
+var x = document.createElement('div');
+Object.defineProperty(x, 'id', {
+  get: function() {
+    // 在这里放入你的代码
+    // console.log('Console is opened');
+  }
+});
+
+// console.log(x);
+
+
+
+
 Xut.Application.setConfig = {
   lauchMode: 1,
   preload: false,
@@ -93,11 +108,11 @@ Xut.Application.Watch('appDestory', function() {
 })
 
 Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type,options)
+  console.log(type, options)
 })
 
 
-var appId = 136 //306 126
+var appId = 133 //306 126
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

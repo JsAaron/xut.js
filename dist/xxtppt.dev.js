@@ -585,11 +585,11 @@ String.styleFormat = function(format) {
  * @return {[type]} [description]
  */
 ;
-(function () {
+(function() {
 
   var location = document.location.href
-    //在读酷pc端 navigator的值被改写过了!!
-    //navigator.appVersion: "xxt 1.0.5260.29725"
+  //在读酷pc端 navigator的值被改写过了!!
+  //navigator.appVersion: "xxt 1.0.5260.29725"
   var userAgent = window.navigator.userAgent.toLowerCase()
   var appVersion = window.navigator.appVersion.toLowerCase()
 
@@ -641,7 +641,7 @@ String.styleFormat = function(format) {
       localStorage.removeItem('localStorage');
     } catch (e) {
       Storage.prototype._setItem = Storage.prototype.setItem;
-      Storage.prototype.setItem = function () {};
+      Storage.prototype.setItem = function() {};
       supportStorage = false
     }
   }
@@ -687,16 +687,12 @@ String.styleFormat = function(format) {
     supportPlayInline: iosMainVersion >= 10,
 
     /**
-     * 是否能自动播放媒体
-     * audio
-     * video
+     * 需要修复音频
+     * 修复不能自动播放的情况
+     * 不是微信 && 手机浏览器
      * @type {[type]}
-     * 浏览器端
-     * 不是微信
-     * 是webkit
-     * 是手机端浏览器
      */
-    hasAutoPlayAudio: isWeiXin || isDesktop,
+    supportFixAudio: isBrowser && device.mobile() && !isWeiXin,
 
     /**
      * 支持触摸
@@ -733,18 +729,18 @@ String.styleFormat = function(format) {
   //私有前缀
   var rdashAlpha = /-([a-z]|[0-9])/ig
   var rmsPrefix = /^-ms-/
-  var fcamelCase = function (all, letter) {
+  var fcamelCase = function(all, letter) {
     return (letter + '').toUpperCase();
   }
-  var camelCase = function (string) {
+  var camelCase = function(string) {
     return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
   }
   var prefix = ['webkit', 'Moz', 'ms', 'o']
   var elementStyle = document.createElement('div').style
   var cache = Object.create(null)
-  var prefixStyle = function (attr) {
+  var prefixStyle = function(attr) {
     var name
-      //缓存中存在
+    //缓存中存在
     if (cache[attr]) {
       return cache[attr];
     }
@@ -753,7 +749,7 @@ String.styleFormat = function(format) {
       return cache[attr] = attr;
     }
     //需要加前缀
-    prefix.forEach(function (v) {
+    prefix.forEach(function(v) {
       if (camelCase(v + '-' + attr) in elementStyle) {
         name = '-' + v + '-' + attr;
         return cache[attr] = name;
@@ -767,7 +763,7 @@ String.styleFormat = function(format) {
   var animationEnd = 'animationend'
   var keyframes = '@keyframes '
   var animation = prefixStyle('animation');
-  var adapterPrefix = function () {
+  var adapterPrefix = function() {
     var vendors = animation
     var transitionName = {
       "moz": "transitionend",
@@ -804,10 +800,9 @@ String.styleFormat = function(format) {
     window.mozRequestAnimationFrame ||
     window.oRequestAnimationFrame ||
     window.msRequestAnimationFrame ||
-    function (callback) {
+    function(callback) {
       window.setTimeout(callback, 1000 / 60);
     };
-
 
 
   ////////////////////
@@ -890,7 +885,7 @@ String.styleFormat = function(format) {
      * @type {[type]}
      */
     translateZ: translateZ,
-    setTranslateZ: function (zValue) {
+    setTranslateZ: function(zValue) {
       return hasPerspective ? ' translateZ(' + zValue + ')' : ''
     },
 
@@ -921,7 +916,7 @@ String.styleFormat = function(format) {
         })
         styleText = `translate3d(${}px,${}px,0px) scale(${data.scale},${data.scale})`
      */
-    setTransform: function (options) {
+    setTransform: function(options) {
       var node = options.node
       if (node = getNode(node)) {
         var styleText = ''
@@ -958,7 +953,7 @@ String.styleFormat = function(format) {
      * 5 设置事件
      * @param {[type]} options [description]
      */
-    setTranslate: function (options) {
+    setTranslate: function(options) {
       var node = options.node
       var x = options.x || 0
       var y = options.y || 0
@@ -48908,6 +48903,209 @@ function removeCover(callback) {
   }
 }
 
+////////////////////////////////////////////
+///
+/// 修复采用img的图片错误问题
+///   修复错误的图片加载
+///   图片错误了，会先隐藏，然后再去请求一次
+///   如果还是错误，就抛弃，正确就显示出来
+///   queue:{
+///     chpaerId:[1.png,2.png,3.png]
+///     ................
+///   }
+///   特别注意，这里是动态加入的
+///   所以，有可能是边解析边加入新的
+///
+///////////////////////////////////////////
+
+var queue = {};
+var waiting = false;
+
+/**
+ * 检测一个chpater中的图片加载是否完成
+ * @param  {[type]} chapterIndex [description]
+ * @return {[type]}              [description]
+ */
+function checkFigure$1(chapterIndex, callback) {
+  var length = queue[chapterIndex].length;
+
+  if (!length) {
+    callback();
+    return;
+  }
+
+  var count = length;
+  var complete = function complete() {
+    if (count === 1) {
+      callback();
+      return;
+    }
+    --count;
+  };
+
+  var data = void 0;
+  while (data = queue[chapterIndex].shift()) {
+    data(complete);
+  }
+}
+
+/*
+  运行队列
+  1.因为queue的对象结构通过chapterId做页面的标记，保存所有每个页面图片的索引
+  2.在这个chapter去检测图片的时候，如果成功了就处理图片显示，然后要删除这个检测的fn
+  3.因为是动态加入的，所以每个chapter检测完毕后，还要根据列表是否有值，在去处理
+  4.最后通过runBatcherQueue在递归一次检测，最终每个chapter是否都处理完毕了
+ */
+function runBatcherQueue() {
+  var keys = Object.keys(queue);
+  if (keys.length) {
+    var chapterIndex = keys.shift();
+    if (chapterIndex.length) {
+      checkFigure$1(chapterIndex, function () {
+        /*如果列表没有数据了*/
+        if (!queue[chapterIndex].length) {
+          delete queue[chapterIndex];
+        }
+        /*如果列表还有后续新加入的继续修复当前这个列表*/
+        runBatcherQueue();
+      });
+    } else {
+      delete queue[chapterIndex];
+    }
+  } else {
+    waiting = false;
+  }
+}
+
+/**
+ * 修复错误的图片加载
+ * @return {[type]} [description]
+ */
+function repairImage(node, chapterIndex, src) {
+
+  if (!node) {
+    return;
+  }
+  /*先隐藏错误节点*/
+  node.style.display = "none";
+
+  /*根据页面chpater加入列表*/
+  if (!queue[chapterIndex]) {
+    queue[chapterIndex] = [];
+  }
+
+  /*做一次错误节点的预加载处理*/
+  queue[chapterIndex].push(function (callback) {
+    loadFigure(src, function (data) {
+      /*如果请求成功，修改图片状态*/
+      if (data.state === 'success') {
+        if (node && node.style) {
+          node.style.display = "block";
+        }
+      }
+      node = null;
+      callback();
+    });
+  });
+
+  if (!waiting) {
+    waiting = true;
+    runBatcherQueue();
+  }
+}
+
+/**
+ * 清理错误检测的图片
+ * @return {[type]} [description]
+ */
+function clearRepairImage(chapterIndex) {
+  if (queue && queue[chapterIndex]) {
+    queue[chapterIndex].length = 0;
+    delete queue[chapterIndex];
+  }
+}
+
+/////////////////////////////
+/// 初始化页面默认行为
+/////////////////////////////
+
+/**
+ * 特殊的一个方法，用来修正图片资源错误的
+ * dom中的事件onerror触发，所以直接
+ * @return {[type]} [description]
+ */
+window.fixNodeError = function (type, node, chapterIndex, src) {
+  if (type === 'image') {
+    repairImage(node, chapterIndex, src);
+  }
+};
+
+//只初始一次
+//横竖切换要判断
+var onceBind = false;
+
+function initGlobalEvent() {
+
+  if (Xut.plat.isBrowser && !onceBind) {
+
+    onceBind = true;
+
+    //禁止全局的缩放处理
+    $('body').on('touchmove', function (event) {
+      event.preventDefault && event.preventDefault();
+    });
+
+    //桌面鼠标控制翻页
+    $(document).keyup(function (event) {
+      switch (event.keyCode) {
+        case 37:
+          Xut.View.GotoPrevSlide();
+          break;
+        case 39:
+          Xut.View.GotoNextSlide();
+          break;
+      }
+    });
+
+    /*防止快速刷新，会触发Original时间*/
+    setTimeout(function () {
+      /*Home键音频动作处理*/
+      $(document).on('visibilitychange', function (event) {
+        /*home 后台*/
+        if (document.visibilityState === 'hidden') {
+          Xut.Application.Original();
+        } else {
+          /*如果不是嵌套iframe，激活*/
+          if (!window.GLOBALIFRAME) {
+            Xut.Application.Activate();
+          }
+        }
+      });
+    }, 1000);
+
+    /*
+    启动代码用户操作跟踪
+    1、先不判断，一律按关闭提交（要有延迟）。
+    2、如果是刷新，取消之前的延迟，提交刷新提示。
+    */
+    $(window).on('beforeunload', function () {
+      config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
+    });
+  }
+}
+
+/*
+移除全局绑定
+ */
+function clearGlobalEvent() {
+  if (onceBind) {
+    $('body').off(); //touchmove 禁止全局的缩放处理
+    $(document).off(); //keyup 左右按钮
+    $(window).off(); //beforeunload,orientationchange
+    onceBind = false;
+  }
+}
+
 //动作标示
 var HOT = 'hot'; //热点音频
 var CONTENT = 'content'; //动画音频
@@ -49324,8 +49522,8 @@ var AudioSuper = function () {
      */
 
   }, {
-    key: '$$getWeixinJSBridge',
-    value: function $$getWeixinJSBridge() {
+    key: '$$getWeixinJSBridgeContext',
+    value: function $$getWeixinJSBridgeContext() {
       if (window.WeixinJSBridge) {
         return window.WeixinJSBridge;
       }
@@ -49364,7 +49562,7 @@ var AudioSuper = function () {
       //flash模式不执行
       if (this.audio) {
         //支持自动播放,微信上单独处理
-        var weixinJSBridge = this.$$getWeixinJSBridge();
+        var weixinJSBridge = this.$$getWeixinJSBridgeContext();
         if (weixinJSBridge) {
           weixinJSBridge.invoke('getNetworkType', {}, function (e) {
             _this2.audio && _this2.audio.play();
@@ -49629,12 +49827,88 @@ var CordovaMedia = function (_AudioSuper) {
 }(AudioSuper);
 
 /**
+ * audio对象下标
+ * @type {Number}
+ */
+var index = 0;
+var loop = 10;
+var audioes = [];
+//usable  可用状态
+var status = '';
+
+///////////////////////////////////////////////////////////////////
+/// 2017.6.28
+/// 安卓5以后 chrome浏览器单独的问题处理 需要绑定touchend事件
+/// 如果用click那么需要处理swiper的hook 这里需要跳过preventDefault
+///////////////////////////////////////////////////////////////////
+
+/**
+ * 修复audio
+ * @param  {[type]} obj    [description]
+ * @param  {[type]} key    [description]
+ * @param  {[type]} access [description]
+ * @return {[type]}        [description]
+ */
+function fixAudio(obj, key, access) {
+  $on(document, {
+    end: function end() {
+      for (var i = 0; i < loop; i++) {
+        var audio = new Audio();
+        audio.play(); /*必须调用，自动播放的时候没有声音*/
+        audioes.push(audio);
+      }
+      //修改为可用状态
+      status = 'usable';
+      //修复音频上下文对象
+      resetAudioContext();
+      $off(document);
+    }
+  });
+}
+
+/**
+ * 销毁创建的video对象
+ * @return {[type]} [description]
+ */
+function clearFixAudio() {
+  for (var i = 0; i < audioes.length; i++) {
+    audioes[i].destroy && audioes[i].destroy();
+    audioes[i] = null;
+  }
+  audioes = null;
+  status = '';
+}
+
+/**
+ * 是否存在修复的音频对象
+ * @return {Boolean} [description]
+ */
+function hasFixAudio() {
+  return audioes.length;
+}
+
+/**
+ * 获取音频对象
+ * @return {[type]} [description]
+ */
+function getAudioContext() {
+  if (status === 'usable') {
+    var audio = audioes[index++];
+    if (!audio) {
+      index = 0;
+      return getAudioContext();
+    }
+    return audio;
+  }
+}
+
+/**
  * 使用html5的audio播放
  *
- * 1.移动端自动播放，需要调用2次play，但是通过getAudio的方法获取的上下文，每个context被自动play一次
+ * 1.移动端自动播放，需要调用2次play，但是通过getAudioContext的方法获取的上下文，每个context被自动play一次
  * 2.如果需要修复自动播放的情况下
- *   A. 音频的执行比hasAudioes的处理快，那么需要resetContext正在播放的音频上下文
- *   B. 如果hasAudioes有了后，在执行音频，正常播放
+ *   A. 音频的执行比hasFixAudio的处理快，那么需要resetContext正在播放的音频上下文
+ *   B. 如果hasFixAudio有了后，在执行音频，正常播放
  * 3.不需要修复自动播放的情况，只有正常的1次play了
  */
 var NativeAudio = function (_AudioSuper) {
@@ -49646,16 +49920,53 @@ var NativeAudio = function (_AudioSuper) {
   }
 
   /**
-   * 创建音频上下文对象
+   * 初始化
+   * @return {[type]} [description]
    */
 
 
   createClass(NativeAudio, [{
+    key: '_init',
+    value: function _init() {
+      var self = this;
+      var trackId = this.trackId;
+
+      if (Xut.plat.supportFixAudio) {
+        //webkit移动端....
+        //不支持自动播放
+        this._createContext();
+      } else {
+
+        //微信有接口
+        //PC正常播放
+        this.audio = new Audio(this.$$url);
+
+        //通过微信自己的事件处理，支持自动播放了
+        if (this.$$getWeixinJSBridgeContext()) {
+          this._startPlay();
+        } else {
+          this._bindPlay();
+        }
+      }
+    }
+
+    /**
+     * 创建音频上下文对象
+     */
+
+  }, {
     key: '_createContext',
-    value: function _createContext(state) {
+    value: function _createContext() {
       var _this2 = this;
 
-      this.audio = getAudio$1();
+      this.audio = getAudioContext();
+      if (!this.audio) {
+        //还没有点击修复，并且已经运行的是自动
+        //第一次进入页面才会存在
+        this._needFix = true;
+        return;
+      }
+      this._needFix = false;
       /*IOS上手动点击播放的修复
       1 必须调用，点击播放的时候没有声音
       2 必须手动播放，自动播放跳过，否则有杂音*/
@@ -49666,39 +49977,9 @@ var NativeAudio = function (_AudioSuper) {
       setTimeout(function () {
         if (_this2.audio) {
           _this2.audio.src = _this2.$$url;
-          _this2._initPlay(state != undefined ? state : true);
+          _this2._bindPlay();
         }
       }, 150);
-    }
-
-    /**
-     * 初始化
-     * @return {[type]} [description]
-     */
-
-  }, {
-    key: '_init',
-    value: function _init() {
-      var self = this;
-      var trackId = this.trackId;
-      var hasAudio = hasAudioes();
-
-      //如果不支持自动播放
-      //webkit移动端....
-      if (hasAudio) {
-        this._createContext();
-      } else {
-        //pc与微信....
-        this.audio = new Audio(this.$$url);
-
-        //通过微信自己的事件处理，支持自动播放了
-        if (this.$$getWeixinJSBridge()) {
-          this._startPlay();
-        } else {
-          this._needFix = true;
-          this._initPlay(true);
-        }
-      }
     }
 
     /**
@@ -49717,14 +49998,11 @@ var NativeAudio = function (_AudioSuper) {
 
     /**
      * 监听音频播放
-     * toPlay
-     *   如果为true就是时间完毕后，允许播放
-     *   否则就是在resetContext调用处理，音频已经跳过了playing，可能关闭或者停止了
      */
 
   }, {
-    key: '_initPlay',
-    value: function _initPlay(toPlay) {
+    key: '_bindPlay',
+    value: function _bindPlay() {
       var _this3 = this;
 
       this._endBack = function () {
@@ -49738,17 +50016,15 @@ var NativeAudio = function (_AudioSuper) {
       };
 
       this._startBack = function () {
-        if (toPlay) {
-          _this3.status = 'ready';
-          /*延时150毫秒执行*/
-          _this3.timer = setTimeout(function () {
-            _this3._clearTimer();
-            /*必须保证状态正确，因为有翻页太快，状态被修改*/
-            if (_this3.status === 'ready') {
-              _this3._startPlay();
-            }
-          }, 150);
-        }
+        _this3.status = 'ready';
+        /*延时150毫秒执行*/
+        _this3.timer = setTimeout(function () {
+          _this3._clearTimer();
+          /*必须保证状态正确，因为有翻页太快，状态被修改*/
+          if (_this3.status === 'ready') {
+            _this3._startPlay();
+          }
+        }, 150);
       };
 
       /**
@@ -49829,23 +50105,19 @@ var NativeAudio = function (_AudioSuper) {
      * 重设音频上下文
      * 因为自动音频播放的关系
      * 在点击后修复这个音频
-     * @return {[type]} [description]
-     *
-     * 这个接口特别注意
-     * 音频绑定click可能与这个同时触发
-     * 会导致loadedmetadata事件失效
-     * this.status === ready
      */
 
   }, {
     key: 'resetContext',
     value: function resetContext() {
-      /*如果不需要修复或者播放结束了*/
-      if (!this._needFix || this.status === 'ended') {
-        return;
+      //不支持自动播放的情况下
+      //又开始了自动播放
+      //但是又没有点击动作
+      //所以自动播放被阻止了
+      //需要修复
+      if (this._needFix) {
+        this._createContext();
       }
-      this._destroy();
-      this._createContext(this.status === 'playing' ? true : false);
     }
   }]);
   return NativeAudio;
@@ -49861,6 +50133,12 @@ if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
   if (window.MMXCONFIG && window.audioHandler) {
     audioPlayer = CordovaMedia;
   } else {
+
+    //需要修复音频
+    if (Xut.plat.supportFixAudio) {
+      fixAudio();
+    }
+
     /*其余所有情况都用原声的H5播放器*/
     audioPlayer = NativeAudio;
   }
@@ -50413,286 +50691,6 @@ function clearAudio$1() {
     }
   }
   initBox();
-}
-
-/**
- * audio对象下标
- * @type {Number}
- */
-var index = 0;
-var loop = 10;
-var audioes = [];
-
-///////////////////////////////////////////////////////////////////
-/// 2017.6.28
-/// 安卓5以后 chrome浏览器单独的问题处理 需要绑定touchend事件
-/// 如果用click那么需要处理swiper的hook 这里需要跳过preventDefault
-///////////////////////////////////////////////////////////////////
-
-
-/**
- * 修复audio
- * @param  {[type]} obj    [description]
- * @param  {[type]} key    [description]
- * @param  {[type]} access [description]
- * @return {[type]}        [description]
- */
-function fixAudio(obj, key, access) {
-  $on(document, {
-    end: function end() {
-      var audio = void 0,
-          i = void 0;
-      for (i = 0; i < loop; i++) {
-        audio = new Audio();
-        audio.play(); /*必须调用，自动播放的时候没有声音*/
-        audioes.push(audio);
-      }
-      /*修复音频上下文对象*/
-      resetAudioContext();
-      $off(document);
-    }
-  });
-}
-
-/**
- * 销毁创建的video对象
- * @return {[type]} [description]
- */
-function clearFixAudio() {
-  for (var i = 0; i < audioes.length; i++) {
-    audioes[i].destroy && audioes[i].destroy();
-    audioes[i] = null;
-  }
-  audioes = null;
-}
-
-/**
- * 是否存在修复的音频对象
- * @return {Boolean} [description]
- */
-function hasAudioes() {
-  return audioes.length;
-}
-
-/**
- * 获取音频对象
- * @return {[type]} [description]
- */
-function getAudio$1() {
-  var audio = audioes[index++];
-  if (!audio) {
-    index = 0;
-    return getAudio$1();
-  }
-  return audio;
-}
-
-////////////////////////////////////////////
-///
-/// 修复采用img的图片错误问题
-///   修复错误的图片加载
-///   图片错误了，会先隐藏，然后再去请求一次
-///   如果还是错误，就抛弃，正确就显示出来
-///   queue:{
-///     chpaerId:[1.png,2.png,3.png]
-///     ................
-///   }
-///   特别注意，这里是动态加入的
-///   所以，有可能是边解析边加入新的
-///
-///////////////////////////////////////////
-
-var queue = {};
-var waiting = false;
-
-/**
- * 检测一个chpater中的图片加载是否完成
- * @param  {[type]} chapterIndex [description]
- * @return {[type]}              [description]
- */
-function checkFigure$1(chapterIndex, callback) {
-  var length = queue[chapterIndex].length;
-
-  if (!length) {
-    callback();
-    return;
-  }
-
-  var count = length;
-  var complete = function complete() {
-    if (count === 1) {
-      callback();
-      return;
-    }
-    --count;
-  };
-
-  var data = void 0;
-  while (data = queue[chapterIndex].shift()) {
-    data(complete);
-  }
-}
-
-/*
-  运行队列
-  1.因为queue的对象结构通过chapterId做页面的标记，保存所有每个页面图片的索引
-  2.在这个chapter去检测图片的时候，如果成功了就处理图片显示，然后要删除这个检测的fn
-  3.因为是动态加入的，所以每个chapter检测完毕后，还要根据列表是否有值，在去处理
-  4.最后通过runBatcherQueue在递归一次检测，最终每个chapter是否都处理完毕了
- */
-function runBatcherQueue() {
-  var keys = Object.keys(queue);
-  if (keys.length) {
-    var chapterIndex = keys.shift();
-    if (chapterIndex.length) {
-      checkFigure$1(chapterIndex, function () {
-        /*如果列表没有数据了*/
-        if (!queue[chapterIndex].length) {
-          delete queue[chapterIndex];
-        }
-        /*如果列表还有后续新加入的继续修复当前这个列表*/
-        runBatcherQueue();
-      });
-    } else {
-      delete queue[chapterIndex];
-    }
-  } else {
-    waiting = false;
-  }
-}
-
-/**
- * 修复错误的图片加载
- * @return {[type]} [description]
- */
-function repairImage(node, chapterIndex, src) {
-
-  if (!node) {
-    return;
-  }
-  /*先隐藏错误节点*/
-  node.style.display = "none";
-
-  /*根据页面chpater加入列表*/
-  if (!queue[chapterIndex]) {
-    queue[chapterIndex] = [];
-  }
-
-  /*做一次错误节点的预加载处理*/
-  queue[chapterIndex].push(function (callback) {
-    loadFigure(src, function (data) {
-      /*如果请求成功，修改图片状态*/
-      if (data.state === 'success') {
-        if (node && node.style) {
-          node.style.display = "block";
-        }
-      }
-      node = null;
-      callback();
-    });
-  });
-
-  if (!waiting) {
-    waiting = true;
-    runBatcherQueue();
-  }
-}
-
-/**
- * 清理错误检测的图片
- * @return {[type]} [description]
- */
-function clearRepairImage(chapterIndex) {
-  if (queue && queue[chapterIndex]) {
-    queue[chapterIndex].length = 0;
-    delete queue[chapterIndex];
-  }
-}
-
-/////////////////////////////
-/// 初始化页面默认行为
-/////////////////////////////
-
-/**
- * 特殊的一个方法，用来修正图片资源错误的
- * dom中的事件onerror触发，所以直接
- * @return {[type]} [description]
- */
-window.fixNodeError = function (type, node, chapterIndex, src) {
-  if (type === 'image') {
-    repairImage(node, chapterIndex, src);
-  }
-};
-
-//修复H5音频自动播放bug
-if (!Xut.plat.hasAutoPlayAudio) {
-  fixAudio();
-}
-
-//只初始一次
-//横竖切换要判断
-var onceBind = false;
-
-function initGlobalEvent() {
-
-  if (Xut.plat.isBrowser && !onceBind) {
-
-    onceBind = true;
-
-    //禁止全局的缩放处理
-    $('body').on('touchmove', function (event) {
-      event.preventDefault && event.preventDefault();
-    });
-
-    //桌面鼠标控制翻页
-    $(document).keyup(function (event) {
-      switch (event.keyCode) {
-        case 37:
-          Xut.View.GotoPrevSlide();
-          break;
-        case 39:
-          Xut.View.GotoNextSlide();
-          break;
-      }
-    });
-
-    /*防止快速刷新，会触发Original时间*/
-    setTimeout(function () {
-      /*Home键音频动作处理*/
-      $(document).on('visibilitychange', function (event) {
-        /*home 后台*/
-        if (document.visibilityState === 'hidden') {
-          Xut.Application.Original();
-        } else {
-          /*如果不是嵌套iframe，激活*/
-          if (!window.GLOBALIFRAME) {
-            Xut.Application.Activate();
-          }
-        }
-      });
-    }, 1000);
-
-    /*
-    启动代码用户操作跟踪
-    1、先不判断，一律按关闭提交（要有延迟）。
-    2、如果是刷新，取消之前的延迟，提交刷新提示。
-    */
-    $(window).on('beforeunload', function () {
-      config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
-    });
-  }
-}
-
-/*
-移除全局绑定
- */
-function clearGlobalEvent() {
-  if (onceBind) {
-    $('body').off(); //touchmove 禁止全局的缩放处理
-    $(document).off(); //keyup 左右按钮
-    $(window).off(); //beforeunload,orientationchange
-    onceBind = false;
-  }
 }
 
 /**
@@ -61086,7 +61084,7 @@ var Activity = function () {
                 'seasonId': scenarioInfo.seasonId,
                 'chapterId': scenarioInfo.chapterId
               });
-            }, hasAudioes() ? 500 : 0);
+            }, hasFixAudio() ? 500 : 0);
             return;
           }
         }
@@ -68723,7 +68721,7 @@ function slide(Swiper) {
    */
   Swiper.prototype._setRate = function () {
     this._speedRate = 50 / this._getRollVisual();
-    this._isQuickTurn = true;
+    this._isFastSlider = true;
   };
 
   /**
@@ -68731,7 +68729,7 @@ function slide(Swiper) {
    */
   Swiper.prototype._resetRate = function () {
     this._speedRate = this._originalRate;
-    this._isQuickTurn = false;
+    this._isFastSlider = false;
   };
 
   /**
@@ -68991,7 +68989,7 @@ function distribute$1(Swiper) {
         unlock: callback,
         direction: _this.direction,
         pagePointer: _this.pagePointer,
-        isQuickTurn: _this._isQuickTurn
+        isFastSlider: _this._isFastSlider
       });
     }, 50);
   };
@@ -73184,7 +73182,7 @@ var PageMgr = function (_ManageSuper) {
           middleIndex = data.middleIndex,
           backIndex = data.backIndex,
           suspendIndex = data.suspendIndex,
-          isQuickTurn = data.isQuickTurn,
+          isFastSlider = data.isFastSlider,
           direction = data.direction;
 
 
@@ -73198,7 +73196,7 @@ var PageMgr = function (_ManageSuper) {
        */
       var preCreateTask = function preCreateTask(taskName) {
         var resumePointer = void 0;
-        if (isQuickTurn || !direction) {
+        if (isFastSlider || !direction) {
           //init
           resumePointer = [frontIndex, backIndex];
         } else {
@@ -75142,12 +75140,12 @@ var Scheduler = function () {
       var direction = options.direction,
           pagePointer = options.pagePointer,
           unlock = options.unlock,
-          isQuickTurn = options.isQuickTurn;
+          isFastSlider = options.isFastSlider;
       /*方向*/
 
       this.direction = direction;
       /*是否快速翻页*/
-      this.isQuickTurn = isQuickTurn || false;
+      this.isFastSlider = isFastSlider || false;
       /*翻页解锁*/
       this.unlock = unlock;
       /*清理上一个页面*/
@@ -75191,7 +75189,7 @@ var Scheduler = function () {
         backIndex: backIndex,
         direction: direction,
         createPointer: createPointer,
-        'isQuickTurn': this.isQuickTurn,
+        'isFastSlider': this.isFastSlider,
 
         /**
          * 暂停的页面索引autorun
@@ -75297,7 +75295,7 @@ var Scheduler = function () {
       }
 
       //关闭快速翻页
-      this.isQuickTurn = false;
+      this.isFastSlider = false;
     }
 
     /**
@@ -81692,7 +81690,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891.3;
+Xut.Version = 891.4;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

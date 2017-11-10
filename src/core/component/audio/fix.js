@@ -8,13 +8,15 @@ import { resetAudioContext } from './api'
 let index = 0
 let loop = 10
 let audioes = []
+//usable  可用状态
+let status = ''
+
 
 ///////////////////////////////////////////////////////////////////
 /// 2017.6.28
 /// 安卓5以后 chrome浏览器单独的问题处理 需要绑定touchend事件
 /// 如果用click那么需要处理swiper的hook 这里需要跳过preventDefault
 ///////////////////////////////////////////////////////////////////
-
 
 /**
  * 修复audio
@@ -26,13 +28,14 @@ let audioes = []
 export function fixAudio(obj, key, access) {
   $on(document, {
     end() {
-      let audio, i
-      for (i = 0; i < loop; i++) {
-        audio = new Audio()
+      for (let i = 0; i < loop; i++) {
+        let audio = new Audio()
         audio.play() /*必须调用，自动播放的时候没有声音*/
         audioes.push(audio)
       }
-      /*修复音频上下文对象*/
+      //修改为可用状态
+      status = 'usable'
+      //修复音频上下文对象
       resetAudioContext()
       $off(document)
     }
@@ -50,6 +53,7 @@ export function clearFixAudio() {
     audioes[i] = null
   }
   audioes = null
+  status = ''
 }
 
 
@@ -57,7 +61,7 @@ export function clearFixAudio() {
  * 是否存在修复的音频对象
  * @return {Boolean} [description]
  */
-export function hasAudioes() {
+export function hasFixAudio() {
   return audioes.length
 }
 
@@ -66,11 +70,13 @@ export function hasAudioes() {
  * 获取音频对象
  * @return {[type]} [description]
  */
-export function getAudio() {
-  var audio = audioes[index++]
-  if (!audio) {
-    index = 0
-    return getAudio()
+export function getAudioContext() {
+  if (status === 'usable') {
+    var audio = audioes[index++]
+    if (!audio) {
+      index = 0
+      return getAudioContext()
+    }
+    return audio
   }
-  return audio
 }
