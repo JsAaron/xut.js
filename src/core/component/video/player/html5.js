@@ -13,7 +13,7 @@ import { config } from '../../../config/index'
  *  var video = new Video({url:'1.mp4',width:'320',...});
  *  video.play();
  */
-export default class h5Player {
+export default class HTML5Player {
 
   constructor(options) {
 

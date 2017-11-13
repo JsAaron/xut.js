@@ -14,7 +14,7 @@ import { config } from '../../../config/index'
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
-export default class flarePlayer {
+export default class FlarePlayer {
 
   constructor(options, removeVideo) {
 

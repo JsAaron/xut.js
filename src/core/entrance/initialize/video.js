@@ -1,4 +1,4 @@
-import flarePlayer from '../../component/video/player/flare'
+import FlarePlayer from '../../component/video/player/flare'
 
 
 const preloadVideo = {
@@ -78,7 +78,7 @@ export function plugVideo() {
 export function html5Video() {
   //延时应用开始
   Xut.Application.delayAppRun()
-  flarePlayer({
+  FlarePlayer({
     url: 'duku.mp4',
     startBoot: function () {
       Xut.Application.LaunchApp();

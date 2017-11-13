@@ -10,7 +10,7 @@ import { hasFixAudio, getAudioContext } from '../fix'
  *   B. 如果hasFixAudio有了后，在执行音频，正常播放
  * 3.不需要修复自动播放的情况，只有正常的1次play了
  */
-export class NativeAudio extends AudioSuper {
+export class HTML5Audio extends AudioSuper {
 
   constructor(options, controlDoms) {
     super(options, controlDoms);
@@ -25,7 +25,7 @@ export class NativeAudio extends AudioSuper {
     let self = this
     let trackId = this.trackId
 
-    if (Xut.plat.supportFixAudio) {
+    if (Xut.plat.fixWebkitAutoAudio) {
       //webkit移动端....
       //不支持自动播放
       this._createContext();

@@ -1,5 +1,5 @@
 import { config } from '../../../config/index'
-import { audioPlayer } from '../../audio/player'
+import { AudioPlayer } from '../../audio/player'
 import { conversionEventType, bindContentEvent } from './event'
 
 export default function (activitProto) {
@@ -136,7 +136,7 @@ export default function (activitProto) {
       if(behaviorSound = feedbackBehavior.behaviorSound) {
         //妙妙学客户端强制删除
         if(window.MMXCONFIG && window.audioHandler) {
-          self._fixAudio.push(new audioPlayer({
+          self._fixAudio.push(new AudioPlayer({
             url: behaviorSound,
             trackId: 9999,
             complete: function () {
@@ -152,7 +152,7 @@ export default function (activitProto) {
           } else {
             //相同对象创建一次
             //以后取缓存
-            audio = new audioPlayer({
+            audio = new AudioPlayer({
               url: behaviorSound
             })
             self._cacheBehaviorAudio[behaviorSound] = audio

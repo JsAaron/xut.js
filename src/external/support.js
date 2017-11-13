@@ -110,7 +110,7 @@
      * 不是微信 && 手机浏览器
      * @type {[type]}
      */
-    supportFixAudio: isBrowser && device.mobile() && !isWeiXin,
+    fixWebkitAutoAudio: isBrowser && device.mobile() && !isWeiXin,
 
     /**
      * 支持触摸

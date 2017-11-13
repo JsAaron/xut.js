@@ -32,7 +32,7 @@
 
 import { parseJSON, hash } from '../../util/index'
 import { getMediaData } from './api'
-import { audioPlayer } from './player'
+import { AudioPlayer } from './player'
 
 /**
  * 容器合集
@@ -263,7 +263,7 @@ const createAudio = (pageId, queryId, type, audioData) => {
     }
   }
 
-  playBox[type][pageId][queryId] = new audioPlayer(audioData, subtitleNode)
+  playBox[type][pageId][queryId] = new AudioPlayer(audioData, subtitleNode)
 }
 
 
