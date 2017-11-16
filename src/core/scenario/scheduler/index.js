@@ -524,7 +524,7 @@ export default class Scheduler {
     /*更新索引*/
     this._updatePointer(pagePointer);
     //预创建下一页
-    this._createNextPage(direction, pagePointer);
+    this._preforkPage(direction, pagePointer);
   }
 
 
@@ -685,7 +685,7 @@ export default class Scheduler {
   /**
    * 预创建新页面
    */
-  _createNextPage(direction, pagePointer) {
+  _preforkPage(direction, pagePointer) {
 
     const pageTotal = this.$$mediator.options.pageTotal
     const createIndex = pagePointer.createIndex

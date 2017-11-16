@@ -298,6 +298,34 @@ export function extendView($$mediator, access, $$globalSwiper) {
 
 
   /**
+   * 将指定页面插入到目标的页面后面
+   * original 当前页面
+   * target   目标页面
+   * 1.传递2个参数，将指定original页面，插入出入到目标target页面之后
+   * 2.如果只有一个参数，只需要传递目标target页面, 默认original为当前页面
+   * 3.如果不传递任何参数，讲当前页面插入到下一页
+   */
+  Xut.View.InsertAfter = function(original, target) {
+
+    let hasMultiPage = $$mediator.options.hasMultiPage
+    let pageMode = $$mediator.options.pageMode
+
+    //如果是多页面的情况
+    //处理比较复杂了
+    //因为涉及预加载
+    if (hasMultiPage) {
+      //讲当前页面直接插入到下一页
+      if (!original && !target) {
+        console.log(1)
+      }
+    }
+
+
+
+  }
+
+
+  /**
    * 页面滑动
    * action 动作
    * direction 方向

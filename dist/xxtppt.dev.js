@@ -692,7 +692,7 @@ String.styleFormat = function(format) {
      * 不是微信 && 手机浏览器
      * @type {[type]}
      */
-    supportFixAudio: isBrowser && device.mobile() && !isWeiXin,
+    fixWebkitAutoAudio: isBrowser && device.mobile() && !isWeiXin,
 
     /**
      * 支持触摸
@@ -48495,9 +48495,9 @@ function getContainer(options) {
  * @return {[type]}         [description]
  */
 
-var flarePlayer = function () {
-  function flarePlayer(options, removeVideo) {
-    classCallCheck(this, flarePlayer);
+var FlarePlayer = function () {
+  function FlarePlayer(options, removeVideo) {
+    classCallCheck(this, FlarePlayer);
 
 
     var url = getFilePath(options.url);
@@ -48582,7 +48582,7 @@ var flarePlayer = function () {
     });
   }
 
-  createClass(flarePlayer, [{
+  createClass(FlarePlayer, [{
     key: 'play',
     value: function play() {
       this.fv.play();
@@ -48600,7 +48600,7 @@ var flarePlayer = function () {
       this.container = null;
     }
   }]);
-  return flarePlayer;
+  return FlarePlayer;
 }();
 
 var preloadVideo = {
@@ -49911,12 +49911,12 @@ function getAudioContext() {
  *   B. 如果hasFixAudio有了后，在执行音频，正常播放
  * 3.不需要修复自动播放的情况，只有正常的1次play了
  */
-var NativeAudio = function (_AudioSuper) {
-  inherits(NativeAudio, _AudioSuper);
+var HTML5Audio = function (_AudioSuper) {
+  inherits(HTML5Audio, _AudioSuper);
 
-  function NativeAudio(options, controlDoms) {
-    classCallCheck(this, NativeAudio);
-    return possibleConstructorReturn(this, (NativeAudio.__proto__ || Object.getPrototypeOf(NativeAudio)).call(this, options, controlDoms));
+  function HTML5Audio(options, controlDoms) {
+    classCallCheck(this, HTML5Audio);
+    return possibleConstructorReturn(this, (HTML5Audio.__proto__ || Object.getPrototypeOf(HTML5Audio)).call(this, options, controlDoms));
   }
 
   /**
@@ -49925,13 +49925,13 @@ var NativeAudio = function (_AudioSuper) {
    */
 
 
-  createClass(NativeAudio, [{
+  createClass(HTML5Audio, [{
     key: '_init',
     value: function _init() {
       var self = this;
       var trackId = this.trackId;
 
-      if (Xut.plat.supportFixAudio) {
+      if (Xut.plat.fixWebkitAutoAudio) {
         //webkit移动端....
         //不支持自动播放
         this._createContext();
@@ -50120,27 +50120,27 @@ var NativeAudio = function (_AudioSuper) {
       }
     }
   }]);
-  return NativeAudio;
+  return HTML5Audio;
 }(AudioSuper);
 
-var audioPlayer = void 0;
+var AudioPlayer = void 0;
 
 /*安卓客户端apk的情况下*/
 if (Xut.plat.isAndroid && !Xut.plat.isBrowser) {
-  audioPlayer = PhoneGapMedia;
+  AudioPlayer = PhoneGapMedia;
 } else {
   /*妙妙学的 客户端浏览器模式*/
   if (window.MMXCONFIG && window.audioHandler) {
-    audioPlayer = CordovaMedia;
+    AudioPlayer = CordovaMedia;
   } else {
 
     //需要修复音频
-    if (Xut.plat.supportFixAudio) {
+    if (Xut.plat.fixWebkitAutoAudio) {
       fixAudio();
     }
 
     /*其余所有情况都用原声的H5播放器*/
-    audioPlayer = NativeAudio;
+    AudioPlayer = HTML5Audio;
   }
 }
 
@@ -50401,7 +50401,7 @@ var createAudio = function createAudio(pageId, queryId, type, audioData) {
     }
   };
 
-  playBox[type][pageId][queryId] = new audioPlayer(audioData, subtitleNode);
+  playBox[type][pageId][queryId] = new AudioPlayer(audioData, subtitleNode);
 };
 
 /**
@@ -50704,9 +50704,9 @@ function clearAudio$1() {
  *  video.play();
  */
 
-var h5Player = function () {
-  function h5Player(options) {
-    classCallCheck(this, h5Player);
+var HTML5Player = function () {
+  function HTML5Player(options) {
+    classCallCheck(this, HTML5Player);
     var width = options.width,
         height = options.height,
         top = options.top,
@@ -50742,7 +50742,7 @@ var h5Player = function () {
   /*初始化容器*/
 
 
-  createClass(h5Player, [{
+  createClass(HTML5Player, [{
     key: '_initWrap',
     value: function _initWrap(width, height, top, left, zIndex, src) {
       this.$videoWrap = createVideoWrap('video-h5', { width: width, height: height, top: top, left: left, zIndex: zIndex });
@@ -50829,7 +50829,7 @@ var h5Player = function () {
       }, 1000);
     }
   }]);
-  return h5Player;
+  return HTML5Player;
 }();
 
 var pixelRatio = window.devicePixelRatio;
@@ -50973,25 +50973,25 @@ if (Xut.plat.isBrowser) {
   // 安卓手机浏览器全屏问题太多,默认全屏回去的时候会顶出来
   // 苹果手机初始化有一个白色的圆，控制条丢失
   if (Xut.plat.isIOS || Xut.plat.isAndroid) {
-    VideoPlayer = flarePlayer;
+    VideoPlayer = FlarePlayer;
   } else {
-    VideoPlayer = h5Player;
+    VideoPlayer = HTML5Player;
   }
 } else {
   //apk ipa
   if (Xut.plat.isIOS || top.EduStoreClient) {
     //如果是ibooks模式
     if (Xut.IBooks.Enabled) {
-      VideoPlayer = flarePlayer;
+      VideoPlayer = FlarePlayer;
     } else {
       //如果是ios或读酷pc版则使用html5播放
-      VideoPlayer = flarePlayer;
+      VideoPlayer = FlarePlayer;
     }
   } else if (Xut.plat.isAndroid) {
     if (window.MMXCONFIG) {
       // 安卓妙妙学强制走h5
       // 由于原生H5控制条不显示的问题
-      VideoPlayer = flarePlayer;
+      VideoPlayer = FlarePlayer;
     } else {
       //android平台
       VideoPlayer = PhoneGapMedia$1;
@@ -54320,7 +54320,7 @@ var eventMixin = function (activitProto) {
       if (behaviorSound = feedbackBehavior.behaviorSound) {
         //妙妙学客户端强制删除
         if (window.MMXCONFIG && window.audioHandler) {
-          self._fixAudio.push(new audioPlayer({
+          self._fixAudio.push(new AudioPlayer({
             url: behaviorSound,
             trackId: 9999,
             complete: function complete() {
@@ -54336,7 +54336,7 @@ var eventMixin = function (activitProto) {
           } else {
             //相同对象创建一次
             //以后取缓存
-            audio = new audioPlayer({
+            audio = new AudioPlayer({
               url: behaviorSound
             });
             self._cacheBehaviorAudio[behaviorSound] = audio;

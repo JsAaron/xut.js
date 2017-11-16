@@ -536,7 +536,6 @@ export default class Powepoint {
        */
       onComplete(postCode, codeDelay) {
         self.isCompleted = true;
-
         //延迟执行postCode代码
         if (postCode) {
           try {
