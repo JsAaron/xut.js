@@ -34,16 +34,28 @@ export function mainScene() {
   proportion = isHorizontal ? proportion.width : proportion.height
   iconHeight = isIOS ? iconHeight : round(proportion * iconHeight)
 
-  const navBarWidth = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px'
-  const navBarHeight = isHorizontal ? round(sHeight / ratio) : round((sHeight - iconHeight - TOP) * 0.96)
+  let navBarWidth
+  let navBarHeight
+  if (isHorizontal) {
+    navBarWidth = '100%'
+    navBarHeight = round(sHeight / ratio)
+  } else {
+    if (sHeight) {
+      navBarWidth = Math.min(sWidth, sHeight) / (isIOS ? 8 : 3) + 'px'
+      navBarHeight = round((sHeight - iconHeight - TOP) * 0.96)
+    }
+  }
+
   const navBarTop = isHorizontal ? '' : 'top:' + (iconHeight + TOP + 2) + 'px;'
   const navBarLeft = isHorizontal ? '' : 'left:' + iconHeight + 'px;'
   const navBarBottom = isHorizontal ? 'bottom:4px;' : ''
   const navBaroOverflow = isHorizontal ? 'hidden' : 'visible'
 
   //导航
-  const navBarHTML =
-    `<div class="xut-nav-bar"
+  let navBarHTML
+  if (navBarWidth || navBarHeight) {
+    navBarHTML =
+      `<div class="xut-nav-bar"
           style="width:${navBarWidth};
                  height:${navBarHeight}px;
                  ${navBarTop}
@@ -53,6 +65,9 @@ export function mainScene() {
                  border-top:1px solid rgba(0,0,0,0.1);
                  overflow:${navBaroOverflow};">
     </div>`
+  } else {
+    navBarHTML = '<div class="xut-nav-bar"></div>'
+  }
 
 
   //如果启动了双页模式

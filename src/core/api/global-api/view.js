@@ -64,8 +64,21 @@ export function initView() {
     const current = sceneController.containerObj('current')
 
     /*获取到当前的页面对象,用于跳转去重复*/
-    const curVmPage = current && current.$$mediator && current.$$mediator.$curVmPage
-    if (curVmPage && curVmPage.seasonId == seasonId && curVmPage.chapterId == chapterId) {
+    const visualPageBase = current && current.$$mediator && current.$$mediator.$visualPageBase
+
+    //如果下一页被拦截了
+    //有map链接表
+    //用于动态插入页面
+    if (visualPageBase) {
+      const linkMap = Xut.View.linkMap[visualPageBase.chapterId]
+      if (linkMap) {
+        linkMap()
+        return
+      }
+    }
+
+
+    if (visualPageBase && visualPageBase.seasonId == seasonId && visualPageBase.chapterId == chapterId) {
       $warn({
         type: 'api',
         content: `拦截:重复触发Xut.View.LoadScenario,seasonId:${seasonId},chapterId:${chapterId}`,

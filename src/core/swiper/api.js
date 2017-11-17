@@ -444,7 +444,7 @@ export default function api(Swiper) {
 
     while (nodeTotal--) {
       liNode = childNodes[nodeTotal]
-      pageChpaterIndex = liNode.getAttribute('data-chapter-index');
+      pageChpaterIndex = liNode.getAttribute('data-cix');
       if (sectionRang) {
         visualIndex += sectionRang.start;
       }

@@ -241,7 +241,7 @@ export default class BookBar extends BarSuper {
    */
   _showDirMenu() {
     //获取当前页面
-    var page = Xut.Presentation.GetPageElement();
+    var page = Xut.Presentation.GetPageRootNode('page')
 
     if (this.menu) {
       this.menu.style.display = 'block';

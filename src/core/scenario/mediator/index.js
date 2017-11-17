@@ -388,7 +388,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  * 得到当前的视图页面
  * @return {[type]}   [description]
  */
-defAccess(Mediator.prototype, '$curVmPage', {
+defAccess(Mediator.prototype, '$visualPageBase', {
   get: function() {
     return this.$$scheduler.pageMgr.$$getPageBase(this.$$globalSwiper.getVisualIndex());
   }
@@ -449,8 +449,10 @@ defProtected(Mediator.prototype, '$init', function() {
  * 复位对象
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$reset', function() {
-  return this.$$scheduler.pageMgr.resetOriginal(this.$$globalSwiper.getVisualIndex());
+defProtected(Mediator.prototype, '$reset', function({ pageType, pageIndex } = {}) {
+  pageType = pageType || 'page'
+  const mgr = pageType === 'page' ? 'pageMgr' : 'masterMgr'
+  this.$$scheduler[mgr].resetOriginal(pageIndex || this.$$globalSwiper.getVisualIndex());
 })
 
 
@@ -458,10 +460,14 @@ defProtected(Mediator.prototype, '$reset', function() {
  * 停止所有任务
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$suspend', function() {
-  Xut.Application.Suspend({
-    skipAudio: true //跨页面不处理
-  })
+defProtected(Mediator.prototype, '$suspend', function(pageIndex) {
+  if (pageIndex) {
+
+  } else {
+    Xut.Application.Suspend({
+      skipAudio: true //跨页面不处理
+    })
+  }
 })
 
 /**

@@ -97,8 +97,8 @@ export function extendPresentation(access, $$globalSwiper) {
    * 得到页面根节点
    * li节点
    */
-  Xut.Presentation.GetPageElement = () => {
-    var obj = Xut.Presentation.GetPageBase()
+  Xut.Presentation.GetPageRootNode = (pageType) => {
+    var obj = Xut.Presentation.GetPageBase(pageType || 'page')
     return obj.$pageNode
   }
 

@@ -1,4 +1,6 @@
 import { config } from '../../config/index'
+import { $warn } from '../../util/debug/index'
+import { $autoRun } from '../../scenario/command/index'
 
 /********************************************
  * 场景API
@@ -298,29 +300,73 @@ export function extendView($$mediator, access, $$globalSwiper) {
 
 
   /**
+   * 动态出入PPT页面
+   * 数据中链接的对应映射处理
+   * @type {[type]}
+   */
+  const linkMap = Xut.View.linkMap = {}
+
+  /**
    * 将指定页面插入到目标的页面后面
-   * original 当前页面
-   * target   目标页面
+   * originalChapterId 当前chapterId页面
+   * targetChapterId   目标chapterId页面
    * 1.传递2个参数，将指定original页面，插入出入到目标target页面之后
    * 2.如果只有一个参数，只需要传递目标target页面, 默认original为当前页面
    * 3.如果不传递任何参数，讲当前页面插入到下一页
    */
-  Xut.View.InsertAfter = function(original, target) {
+  Xut.View.InsertAfter = function(originalChapterId, targetChapterId) {
 
-    let hasMultiPage = $$mediator.options.hasMultiPage
-    let pageMode = $$mediator.options.pageMode
+    //这个模式必须是禁止手势滑动的
+    if (config.launch.gestureSwipe) {
+      $warn({
+        type: 'api',
+        content: 'gestureSwipe启动了，Xut.View.InsertAfter不生效',
+        color: 'red'
+      })
+      return
+    }
 
-    //如果是多页面的情况
-    //处理比较复杂了
-    //因为涉及预加载
-    if (hasMultiPage) {
-      //讲当前页面直接插入到下一页
-      if (!original && !target) {
-        console.log(1)
+    const pageObj = Xut.Presentation.GetPageBase('page')
+    if (!pageObj) {
+      return
+    }
+
+    const chapterId = pageObj.chapterId
+
+    //是下一页
+    let isNext = false
+
+    //一个参数情况，只传递目标
+    if (originalChapterId && !targetChapterId) {
+      //如果目标是当前页之后
+      if (originalChapterId === chapterId) {
+        isNext = true
       }
     }
 
+    //当前页面直接插入到下一页
+    //做一个最简单的还原处理
+    if (!originalChapterId && !targetChapterId) {
+      isNext = true
+    }
 
+    //下一页插入处理
+    if (isNext) {
+      if (chapterId &&
+        !linkMap[chapterId] &&
+        linkMap[chapterId] !== 0) {
+        linkMap[chapterId] = function() {
+          pageObj.hide()
+          $$mediator.$reset()
+          setTimeout(function() {
+            pageObj.show()
+            $autoRun()
+            //只处理一次
+            linkMap[chapterId] = 0
+          }, 0)
+        }
+      }
+    }
 
   }
 

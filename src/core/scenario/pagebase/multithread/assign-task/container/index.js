@@ -13,7 +13,7 @@ import { getFileFullPath } from '../../../../../util/option'
 /**
  * 创建页面容器li
  */
-const createHTML = function ({
+function createHTML({
   base,
   prefix,
   translate,
@@ -32,7 +32,7 @@ const createHTML = function ({
   return String.styleFormat(
     `<li id="${prefix}"
          data-type="${base.pageType}"
-         data-chapter-index="${base.chapterIndex}"
+         data-cix="${base.chapterIndex}"
          data-container="true"
          class="xut-flip preserve-3d"
          style="width:${getStyle.visualWidth}px;
@@ -53,7 +53,7 @@ const createHTML = function ({
 /**
  * 创建父容器li结构
  */
-const createContainer = (base, pageData, getStyle, prefix) => {
+function createContainer(base, pageData, getStyle, prefix) {
 
   let background = ''
 
@@ -86,7 +86,7 @@ const createContainer = (base, pageData, getStyle, prefix) => {
 }
 
 
-export default function (base, pageData, taskCallback) {
+export default function(base, pageData, taskCallback) {
 
   let $pageNode
   let $pseudoElement
@@ -103,14 +103,18 @@ export default function (base, pageData, taskCallback) {
     return
   }
 
-  //创建的flip结构体
+  //创建的li结构体
   $pageNode = createContainer(base, pageData, getStyle, prefix)
 
   Xut.nextTick({
     container: base.rootNode,
     content: $pageNode,
     position: (getStyle.position === 'left' || getStyle.position === 'top') ? 'first' : 'last'
-  }, () => {
-    taskCallback($pageNode, $pseudoElement)
-  });
+  }, () => taskCallback($pageNode, $pseudoElement))
+
 }
+
+
+
+
+

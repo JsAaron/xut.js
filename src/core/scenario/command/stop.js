@@ -30,10 +30,12 @@ import { $stopAutoWatch } from './auto'
  * @param  {[type]} pageObj [description]
  * @return {[type]}         [description]
  */
-export function $stop() {
+export function $stop(skipAudio) {
 
-  //清理音频
-  clearAudio()
+  if (!skipAudio) {
+    //清理音频
+    clearAudio()
+  }
 
   //清理视频
   clearVideo()
