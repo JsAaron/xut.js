@@ -5,7 +5,7 @@ import { hasDisable } from './cursor'
  * 忙碌光标
  * @return {[type]} [description]
  */
-function getBusyHTML() {
+function getBusyHTML(newCursor) {
   return hasDisable() ? '' : '<div class="xut-busy-icon xut-fullscreen"></div>'
 }
 
@@ -28,7 +28,7 @@ function getContentHTML(newCursor) {
     //背景样式
     coverStyle = `style="background-image: url(${coverUrl});"`
   }
-  return `${getBusyHTML()}
+  return `${getBusyHTML(newCursor)}
             <div class="xut-adaptive-image"></div>
             <div class="xut-cover xut-fullscreen" ${coverStyle}></div>
             <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`
@@ -40,10 +40,7 @@ function getContentHTML(newCursor) {
  */
 let $rootNode
 let $contentNode
-export function initRootNode({
-  el = '#xxtppt-app-container',
-  cursor
-} = {}) {
+export function initRootNode(el = '#xxtppt-app-container', cursor) {
 
   let contentHtml
 

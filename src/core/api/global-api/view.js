@@ -37,6 +37,59 @@ export function initView() {
 
 
   /**
+   * 'main': true, //主场景入口
+   * 'seasonId': seasonId,
+   * 'pageIndex': options.pageIndex,
+   * 'chapterId'
+   * 'history': options.history
+   */
+  Xut.View.LoadScenario = function(options, callback) {
+
+    /**
+     * 如果启动了预加载模式
+     * 需要处理跳转的页面预加载逻辑
+     */
+    let chapterId = toNumber(options.chapterId)
+    if (!options.main && chapterId && config.launch.preload) {
+      const status = requestInterrupt({
+        chapterId,
+        type: 'nolinear',
+        processed() {
+          loadScenario(options, callback)
+          Xut.View.HideBusy()
+        }
+      })
+
+      //如果还在预加载，禁止新进场的处理
+      if (status) {
+        Xut.View.ShowBusy()
+        return
+      }
+    }
+
+    //正常加载
+    loadScenario(options, callback)
+  }
+
+
+
+  /**
+   * 页面跳转拦截
+   */
+  Xut.View.Intercept = function(chapterId) {
+    //有map链接表
+    //用于动态插入页面
+    if (chapterId) {
+      const linkMap = Xut.View.linkMap[chapterId]
+      if (linkMap) {
+        linkMap()
+        return true
+      }
+    }
+  }
+
+
+  /**
    * 加载一个新的场景
    * 1 节与节跳
    *    单场景情况
@@ -45,13 +98,12 @@ export function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  const _loadScenario = function(options, callback) {
+  function loadScenario(options, callback) {
 
     let seasonId = toNumber(options.seasonId)
     let chapterId = toNumber(options.chapterId)
     let pageIndex = toNumber(options.pageIndex)
     let createMode = options.createMode
-
 
     //ibooks模式下的跳转
     //全部转化成超链接
@@ -63,20 +115,13 @@ export function initView() {
     //当前活动场景容器对象
     const current = sceneController.containerObj('current')
 
-    /*获取到当前的页面对象,用于跳转去重复*/
+    //获取到当前的页面对象,用于跳转去重复
     const visualPageBase = current && current.$$mediator && current.$$mediator.$visualPageBase
 
     //如果下一页被拦截了
-    //有map链接表
-    //用于动态插入页面
-    if (visualPageBase) {
-      const linkMap = Xut.View.linkMap[visualPageBase.chapterId]
-      if (linkMap) {
-        linkMap()
-        return
-      }
+    if (visualPageBase && Xut.View.Intercept(visualPageBase.chapterId)) {
+      return
     }
-
 
     if (visualPageBase && visualPageBase.seasonId == seasonId && visualPageBase.chapterId == chapterId) {
       $warn({
@@ -87,7 +132,7 @@ export function initView() {
       return
     }
 
-    /*用户指定的跳转入口，而不是通过内部关闭按钮处理的*/
+    //用户指定的跳转入口，而不是通过内部关闭按钮处理的
     const userAssign = createMode === 'sysClose' ? false : true
 
     /**
@@ -107,14 +152,6 @@ export function initView() {
     ///
     /////////////////////////////////////
 
-    /*清理热点动作,场景外部跳转,需要对场景的处理*/
-    current && current.$$mediator.$suspend()
-
-    /*通过内部关闭按钮加载新场景处理，检测是不是往回跳转,重复处理*/
-    if (current && userAssign) {
-      sceneController.checkToRepeat(seasonId)
-    }
-
     /*读酷启动时不需要忙碌光标*/
     if (options.main && window.DUKUCONFIG) {
       Xut.View.HideBusy()
@@ -122,25 +159,37 @@ export function initView() {
       Xut.View.ShowBusy()
     }
 
-    /**
-     * 跳出去
-     * $hasMultiScene
-     * 场景模式
-     * $hasMultiScene
-     *      true  多场景
-     *      false 单场景模式
-     * 如果当前是从主场景加载副场景
-     * 关闭系统工具栏
-     */
-    if (current && !current.$$mediator.$hasMultiScene) {
-      Xut.View.HideToolBar()
+    if (current) {
+
+      //清理热点动作,场景外部跳转,需要对场景的处理
+      current.$$mediator.$suspend()
+
+      //通过内部关闭按钮加载新场景处理，检测是不是往回跳转,重复处理
+      if (userAssign) {
+        sceneController.checkToRepeat(seasonId)
+      }
+
+      /**
+       * 跳出去
+       * $hasMultiScene
+       * 场景模式
+       * $hasMultiScene
+       *      true  多场景
+       *      false 单场景模式
+       * 如果当前是从主场景加载副场景
+       * 关闭系统工具栏
+       */
+      if (!current.$$mediator.$hasMultiScene) {
+        Xut.View.HideToolBar()
+      }
+
+      //重写场景的顺序编号,用于记录场景最后记录
+      const pageId = Xut.Presentation.GetPageId()
+      if (pageId) {
+        sceneController.rewrite(current.seasonId, pageId);
+      }
     }
 
-    /*重写场景的顺序编号,用于记录场景最后记录*/
-    let pageId;
-    if (current && (pageId = Xut.Presentation.GetPageId())) {
-      sceneController.rewrite(current.seasonId, pageId);
-    }
 
     /*场景信息*/
     const sectionRang = Xut.data.query('sectionRelated', seasonId)
@@ -200,41 +249,6 @@ export function initView() {
     new SceneFactory(data);
   }
 
-
-  /**
-   * 'main': true, //主场景入口
-   * 'seasonId': seasonId,
-   * 'pageIndex': options.pageIndex,
-   * 'chapterId'
-   * 'history': options.history
-   */
-  Xut.View.LoadScenario = function(options, callback) {
-
-    /**
-     * 如果启动了预加载模式
-     * 需要处理跳转的页面预加载逻辑
-     */
-    let chapterId = toNumber(options.chapterId)
-    if (!options.main && chapterId && config.launch.preload) {
-      const status = requestInterrupt({
-        chapterId,
-        type: 'nolinear',
-        processed() {
-          _loadScenario(options, callback)
-          Xut.View.HideBusy()
-        }
-      })
-
-      /*如果还在预加载，禁止加载*/
-      if (status) {
-        Xut.View.ShowBusy()
-        return
-      }
-    }
-
-    /*正常加载*/
-    _loadScenario(options, callback)
-  }
 
   /**
    * 通过插件打开一个新view窗口

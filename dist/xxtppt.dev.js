@@ -48801,7 +48801,10 @@ function initAsyn(callback) {
  * 忙碌光标
  * @return {[type]} [description]
  */
-function getBusyHTML() {
+function getBusyHTML(newCursor) {
+  if (!newCursor || newCursor == false) {
+    return '';
+  }
   return hasDisable() ? '' : '<div class="xut-busy-icon xut-fullscreen"></div>';
 }
 
@@ -48823,7 +48826,7 @@ function getContentHTML(newCursor) {
     //背景样式
     coverStyle = 'style="background-image: url(' + coverUrl + ');"';
   }
-  return getBusyHTML() + '\n            <div class="xut-adaptive-image"></div>\n            <div class="xut-cover xut-fullscreen" ' + coverStyle + '></div>\n            <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>';
+  return getBusyHTML(newCursor) + '\n            <div class="xut-adaptive-image"></div>\n            <div class="xut-cover xut-fullscreen" ' + coverStyle + '></div>\n            <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>';
 }
 
 /**
@@ -52390,7 +52393,7 @@ function parseContentMode(pageData, base) {
 /**
  * 创建页面容器li
  */
-var createHTML = function createHTML(_ref) {
+function createHTML(_ref) {
   var base = _ref.base,
       prefix = _ref.prefix,
       translate = _ref.translate,
@@ -52406,13 +52409,13 @@ var createHTML = function createHTML(_ref) {
 
   //增加一个main-content放body内容
   //增加一个header-footer放溢出的页眉页脚
-  return String.styleFormat('<li id="' + prefix + '"\n         data-type="' + base.pageType + '"\n         data-chapter-index="' + base.chapterIndex + '"\n         data-container="true"\n         class="xut-flip preserve-3d"\n         style="width:' + getStyle.visualWidth + 'px;\n                height:' + getStyle.visualHeight + 'px;\n                left:' + getStyle.visualLeft + 'px;\n                top:' + getStyle.visualTop + 'px;\n                ' + setTranslate + ';\n                ' + background + '\n                ' + customStyle + '">\n        <div class="page-scale">\n            <div data-type="main-content"></div>\n            <div data-type="header-footer"></div>\n        </div>\n    </li>');
-};
+  return String.styleFormat('<li id="' + prefix + '"\n         data-type="' + base.pageType + '"\n         data-cix="' + base.chapterIndex + '"\n         data-container="true"\n         class="xut-flip preserve-3d"\n         style="width:' + getStyle.visualWidth + 'px;\n                height:' + getStyle.visualHeight + 'px;\n                left:' + getStyle.visualLeft + 'px;\n                top:' + getStyle.visualTop + 'px;\n                ' + setTranslate + ';\n                ' + background + '\n                ' + customStyle + '">\n        <div class="page-scale">\n            <div data-type="main-content"></div>\n            <div data-type="header-footer"></div>\n        </div>\n    </li>');
+}
 
 /**
  * 创建父容器li结构
  */
-var createContainer = function createContainer(base, pageData, getStyle, prefix) {
+function createContainer(base, pageData, getStyle, prefix) {
 
   var background = '';
 
@@ -52442,7 +52445,7 @@ var createContainer = function createContainer(base, pageData, getStyle, prefix)
     pageData: pageData,
     background: background
   }));
-};
+}
 
 var TaskContainer = function (base, pageData, taskCallback) {
 
@@ -52461,7 +52464,7 @@ var TaskContainer = function (base, pageData, taskCallback) {
     return;
   }
 
-  //创建的flip结构体
+  //创建的li结构体
   $pageNode = createContainer(base, pageData, getStyle, prefix);
 
   Xut.nextTick({
@@ -52469,7 +52472,7 @@ var TaskContainer = function (base, pageData, taskCallback) {
     content: $pageNode,
     position: getStyle.position === 'left' || getStyle.position === 'top' ? 'first' : 'last'
   }, function () {
-    taskCallback($pageNode, $pseudoElement);
+    return taskCallback($pageNode, $pseudoElement);
   });
 };
 
@@ -58777,7 +58780,6 @@ var Powepoint = function () {
          */
         onComplete: function onComplete(postCode, codeDelay) {
           self.isCompleted = true;
-
           //延迟执行postCode代码
           if (postCode) {
             try {
@@ -65348,10 +65350,12 @@ function $original(pageBase) {
  * @param  {[type]} pageObj [description]
  * @return {[type]}         [description]
  */
-function $stop() {
+function $stop(skipAudio) {
 
-  //清理音频
-  clearAudio$1();
+  if (!skipAudio) {
+    //清理音频
+    clearAudio$1();
+  }
 
   //清理视频
   clearVideo();
@@ -68498,7 +68502,7 @@ function api(Swiper) {
 
     while (nodeTotal--) {
       liNode = childNodes[nodeTotal];
-      pageChpaterIndex = liNode.getAttribute('data-chapter-index');
+      pageChpaterIndex = liNode.getAttribute('data-cix');
       if (sectionRang) {
         visualIndex += sectionRang.start;
       }
@@ -72156,6 +72160,22 @@ var dataExternal = function (baseProto) {
     };
   });
 
+  /**
+   * 隐藏li节点
+   * @return {[type]} [description]
+   */
+  baseProto.hide = function () {
+    this.$pageNode.hide();
+  };
+
+  /**
+   * 显示li节点
+   * @return {[type]} [description]
+   */
+  baseProto.show = function () {
+    this.$pageNode.show();
+  };
+
   //components零件类型处理
   //baseGetComponent
   //baseRemoveComponent
@@ -75153,7 +75173,7 @@ var Scheduler = function () {
       /*更新索引*/
       this._updatePointer(pagePointer);
       //预创建下一页
-      this._createNextPage(direction, pagePointer);
+      this._preforkPage(direction, pagePointer);
     }
 
     /**
@@ -75327,8 +75347,8 @@ var Scheduler = function () {
      */
 
   }, {
-    key: '_createNextPage',
-    value: function _createNextPage(direction, pagePointer) {
+    key: '_preforkPage',
+    value: function _preforkPage(direction, pagePointer) {
       var _this3 = this;
 
       var pageTotal = this.$$mediator.options.pageTotal;
@@ -75566,8 +75586,8 @@ function extendPresentation(access, $$globalSwiper) {
    * 得到页面根节点
    * li节点
    */
-  Xut.Presentation.GetPageElement = function () {
-    var obj = Xut.Presentation.GetPageBase();
+  Xut.Presentation.GetPageRootNode = function (pageType) {
+    var obj = Xut.Presentation.GetPageBase(pageType || 'page');
     return obj.$pageNode;
   };
 
@@ -75935,6 +75955,74 @@ function extendView($$mediator, access, $$globalSwiper) {
       'seasonId': seasonId,
       'chapterId': chapterId
     }, callback);
+  };
+
+  /**
+   * 动态出入PPT页面
+   * 数据中链接的对应映射处理
+   * @type {[type]}
+   */
+  var linkMap = Xut.View.linkMap = {};
+
+  /**
+   * 将指定页面插入到目标的页面后面
+   * originalChapterId 当前chapterId页面
+   * targetChapterId   目标chapterId页面
+   * 1.传递2个参数，将指定original页面，插入出入到目标target页面之后
+   * 2.如果只有一个参数，只需要传递目标target页面, 默认original为当前页面
+   * 3.如果不传递任何参数，讲当前页面插入到下一页
+   */
+  Xut.View.InsertAfter = function (originalChapterId, targetChapterId) {
+
+    //这个模式必须是禁止手势滑动的
+    if (config.launch.gestureSwipe) {
+      $warn({
+        type: 'api',
+        content: 'gestureSwipe启动了，Xut.View.InsertAfter不生效',
+        color: 'red'
+      });
+      return;
+    }
+
+    var pageObj = Xut.Presentation.GetPageBase('page');
+    if (!pageObj) {
+      return;
+    }
+
+    var chapterId = pageObj.chapterId;
+
+    //是下一页
+    var isNext = false;
+
+    //一个参数情况，只传递目标
+    if (originalChapterId && !targetChapterId) {
+      //如果目标是当前页之后
+      if (originalChapterId === chapterId) {
+        isNext = true;
+      }
+    }
+
+    //当前页面直接插入到下一页
+    //做一个最简单的还原处理
+    if (!originalChapterId && !targetChapterId) {
+      isNext = true;
+    }
+
+    //下一页插入处理
+    if (isNext) {
+      if (chapterId && !linkMap[chapterId] && linkMap[chapterId] !== 0) {
+        linkMap[chapterId] = function () {
+          pageObj.hide();
+          $$mediator.$reset();
+          setTimeout(function () {
+            pageObj.show();
+            $autoRun();
+            //只处理一次
+            linkMap[chapterId] = 0;
+          }, 0);
+        };
+      }
+    }
   };
 
   /**
@@ -76840,7 +76928,7 @@ defAccess(Mediator.prototype, '$injectionComponent', {
  * 得到当前的视图页面
  * @return {[type]}   [description]
  */
-defAccess(Mediator.prototype, '$curVmPage', {
+defAccess(Mediator.prototype, '$visualPageBase', {
   get: function get$$1() {
     return this.$$scheduler.pageMgr.$$getPageBase(this.$$globalSwiper.getVisualIndex());
   }
@@ -76898,17 +76986,25 @@ defProtected(Mediator.prototype, '$init', function () {
  * @return {[type]} [description]
  */
 defProtected(Mediator.prototype, '$reset', function () {
-  return this.$$scheduler.pageMgr.resetOriginal(this.$$globalSwiper.getVisualIndex());
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      pageType = _ref.pageType,
+      pageIndex = _ref.pageIndex;
+
+  pageType = pageType || 'page';
+  var mgr = pageType === 'page' ? 'pageMgr' : 'masterMgr';
+  this.$$scheduler[mgr].resetOriginal(pageIndex || this.$$globalSwiper.getVisualIndex());
 });
 
 /**
  * 停止所有任务
  * @return {[type]} [description]
  */
-defProtected(Mediator.prototype, '$suspend', function () {
-  Xut.Application.Suspend({
-    skipAudio: true //跨页面不处理
-  });
+defProtected(Mediator.prototype, '$suspend', function (pageIndex) {
+  if (pageIndex) {} else {
+    Xut.Application.Suspend({
+      skipAudio: true //跨页面不处理
+    });
+  }
 });
 
 /**
@@ -79192,7 +79288,7 @@ var BookBar = function (_BarSuper) {
     key: '_showDirMenu',
     value: function _showDirMenu() {
       //获取当前页面
-      var page = Xut.Presentation.GetPageElement();
+      var page = Xut.Presentation.GetPageRootNode('page');
 
       if (this.menu) {
         this.menu.style.display = 'block';
@@ -80209,15 +80305,30 @@ function mainScene() {
   proportion = isHorizontal ? proportion.width : proportion.height;
   iconHeight = isIOS$5 ? iconHeight : round$2(proportion * iconHeight);
 
-  var navBarWidth = isHorizontal ? '100%' : Math.min(sWidth, sHeight) / (isIOS$5 ? 8 : 3) + 'px';
-  var navBarHeight = isHorizontal ? round$2(sHeight / ratio$1) : round$2((sHeight - iconHeight - TOP$1) * 0.96);
+  var navBarWidth = void 0;
+  var navBarHeight = void 0;
+  if (isHorizontal) {
+    navBarWidth = '100%';
+    navBarHeight = round$2(sHeight / ratio$1);
+  } else {
+    if (sHeight) {
+      navBarWidth = Math.min(sWidth, sHeight) / (isIOS$5 ? 8 : 3) + 'px';
+      navBarHeight = round$2((sHeight - iconHeight - TOP$1) * 0.96);
+    }
+  }
+
   var navBarTop = isHorizontal ? '' : 'top:' + (iconHeight + TOP$1 + 2) + 'px;';
   var navBarLeft = isHorizontal ? '' : 'left:' + iconHeight + 'px;';
   var navBarBottom = isHorizontal ? 'bottom:4px;' : '';
   var navBaroOverflow = isHorizontal ? 'hidden' : 'visible';
 
   //导航
-  var navBarHTML = '<div class="xut-nav-bar"\n          style="width:' + navBarWidth + ';\n                 height:' + navBarHeight + 'px;\n                 ' + navBarTop + '\n                 ' + navBarLeft + '\n                 ' + navBarBottom + '\n                 background-color:white;\n                 border-top:1px solid rgba(0,0,0,0.1);\n                 overflow:' + navBaroOverflow + ';">\n    </div>';
+  var navBarHTML = void 0;
+  if (navBarWidth || navBarHeight) {
+    navBarHTML = '<div class="xut-nav-bar"\n          style="width:' + navBarWidth + ';\n                 height:' + navBarHeight + 'px;\n                 ' + navBarTop + '\n                 ' + navBarLeft + '\n                 ' + navBarBottom + '\n                 background-color:white;\n                 border-top:1px solid rgba(0,0,0,0.1);\n                 overflow:' + navBaroOverflow + ';">\n    </div>';
+  } else {
+    navBarHTML = '<div class="xut-nav-bar"></div>';
+  }
 
   //如果启动了双页模式
   //那么可视区的宽度是就是全屏的宽度了，因为有2个页面拼接
@@ -80738,6 +80849,56 @@ function initView() {
   };
 
   /**
+   * 'main': true, //主场景入口
+   * 'seasonId': seasonId,
+   * 'pageIndex': options.pageIndex,
+   * 'chapterId'
+   * 'history': options.history
+   */
+  Xut.View.LoadScenario = function (options, callback) {
+
+    /**
+     * 如果启动了预加载模式
+     * 需要处理跳转的页面预加载逻辑
+     */
+    var chapterId = toNumber(options.chapterId);
+    if (!options.main && chapterId && config.launch.preload) {
+      var status = requestInterrupt({
+        chapterId: chapterId,
+        type: 'nolinear',
+        processed: function processed() {
+          loadScenario(options, callback);
+          Xut.View.HideBusy();
+        }
+      });
+
+      //如果还在预加载，禁止新进场的处理
+      if (status) {
+        Xut.View.ShowBusy();
+        return;
+      }
+    }
+
+    //正常加载
+    loadScenario(options, callback);
+  };
+
+  /**
+   * 页面跳转拦截
+   */
+  Xut.View.Intercept = function (chapterId) {
+    //有map链接表
+    //用于动态插入页面
+    if (chapterId) {
+      var linkMap = Xut.View.linkMap[chapterId];
+      if (linkMap) {
+        linkMap();
+        return true;
+      }
+    }
+  };
+
+  /**
    * 加载一个新的场景
    * 1 节与节跳
    *    单场景情况
@@ -80746,7 +80907,7 @@ function initView() {
    * useUnlockCallBack 用来解锁回调,重复判断
    * isInApp 是否跳转到提示页面
    */
-  var _loadScenario = function _loadScenario(options, callback) {
+  function loadScenario(options, callback) {
 
     var seasonId = toNumber(options.seasonId);
     var chapterId = toNumber(options.chapterId);
@@ -80763,9 +80924,15 @@ function initView() {
     //当前活动场景容器对象
     var current = sceneController.containerObj('current');
 
-    /*获取到当前的页面对象,用于跳转去重复*/
-    var curVmPage = current && current.$$mediator && current.$$mediator.$curVmPage;
-    if (curVmPage && curVmPage.seasonId == seasonId && curVmPage.chapterId == chapterId) {
+    //获取到当前的页面对象,用于跳转去重复
+    var visualPageBase = current && current.$$mediator && current.$$mediator.$visualPageBase;
+
+    //如果下一页被拦截了
+    if (visualPageBase && Xut.View.Intercept(visualPageBase.chapterId)) {
+      return;
+    }
+
+    if (visualPageBase && visualPageBase.seasonId == seasonId && visualPageBase.chapterId == chapterId) {
       $warn({
         type: 'api',
         content: '\u62E6\u622A:\u91CD\u590D\u89E6\u53D1Xut.View.LoadScenario,seasonId:' + seasonId + ',chapterId:' + chapterId,
@@ -80774,7 +80941,7 @@ function initView() {
       return;
     }
 
-    /*用户指定的跳转入口，而不是通过内部关闭按钮处理的*/
+    //用户指定的跳转入口，而不是通过内部关闭按钮处理的
     var userAssign = createMode === 'sysClose' ? false : true;
 
     /**
@@ -80793,14 +80960,6 @@ function initView() {
     ///
     /////////////////////////////////////
 
-    /*清理热点动作,场景外部跳转,需要对场景的处理*/
-    current && current.$$mediator.$suspend();
-
-    /*通过内部关闭按钮加载新场景处理，检测是不是往回跳转,重复处理*/
-    if (current && userAssign) {
-      sceneController.checkToRepeat(seasonId);
-    }
-
     /*读酷启动时不需要忙碌光标*/
     if (options.main && window.DUKUCONFIG) {
       Xut.View.HideBusy();
@@ -80808,24 +80967,35 @@ function initView() {
       Xut.View.ShowBusy();
     }
 
-    /**
-     * 跳出去
-     * $hasMultiScene
-     * 场景模式
-     * $hasMultiScene
-     *      true  多场景
-     *      false 单场景模式
-     * 如果当前是从主场景加载副场景
-     * 关闭系统工具栏
-     */
-    if (current && !current.$$mediator.$hasMultiScene) {
-      Xut.View.HideToolBar();
-    }
+    if (current) {
 
-    /*重写场景的顺序编号,用于记录场景最后记录*/
-    var pageId = void 0;
-    if (current && (pageId = Xut.Presentation.GetPageId())) {
-      sceneController.rewrite(current.seasonId, pageId);
+      //清理热点动作,场景外部跳转,需要对场景的处理
+      current.$$mediator.$suspend();
+
+      //通过内部关闭按钮加载新场景处理，检测是不是往回跳转,重复处理
+      if (userAssign) {
+        sceneController.checkToRepeat(seasonId);
+      }
+
+      /**
+       * 跳出去
+       * $hasMultiScene
+       * 场景模式
+       * $hasMultiScene
+       *      true  多场景
+       *      false 单场景模式
+       * 如果当前是从主场景加载副场景
+       * 关闭系统工具栏
+       */
+      if (!current.$$mediator.$hasMultiScene) {
+        Xut.View.HideToolBar();
+      }
+
+      //重写场景的顺序编号,用于记录场景最后记录
+      var pageId = Xut.Presentation.GetPageId();
+      if (pageId) {
+        sceneController.rewrite(current.seasonId, pageId);
+      }
     }
 
     /*场景信息*/
@@ -80885,42 +81055,7 @@ function initView() {
     }
 
     new SceneFactory(data);
-  };
-
-  /**
-   * 'main': true, //主场景入口
-   * 'seasonId': seasonId,
-   * 'pageIndex': options.pageIndex,
-   * 'chapterId'
-   * 'history': options.history
-   */
-  Xut.View.LoadScenario = function (options, callback) {
-
-    /**
-     * 如果启动了预加载模式
-     * 需要处理跳转的页面预加载逻辑
-     */
-    var chapterId = toNumber(options.chapterId);
-    if (!options.main && chapterId && config.launch.preload) {
-      var status = requestInterrupt({
-        chapterId: chapterId,
-        type: 'nolinear',
-        processed: function processed() {
-          _loadScenario(options, callback);
-          Xut.View.HideBusy();
-        }
-      });
-
-      /*如果还在预加载，禁止加载*/
-      if (status) {
-        Xut.View.ShowBusy();
-        return;
-      }
-    }
-
-    /*正常加载*/
-    _loadScenario(options, callback);
-  };
+  }
 
   /**
    * 通过插件打开一个新view窗口
@@ -81690,7 +81825,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891.4;
+Xut.Version = 891.5;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

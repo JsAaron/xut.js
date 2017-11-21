@@ -5,7 +5,7 @@ import { removeSlash, mixGolbalConfig } from './util/index'
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891.4
+Xut.Version = 891.5
 
 
 //接口接在参数,用户横竖切换刷新
@@ -76,10 +76,7 @@ Xut.Application.Launch = option => {
       delete config.launch.path
     }
     bindOrientateMode()
-    enterApp({
-      el: option.el,
-      cursor: option.cursor
-    })
+    enterApp()
   }
 }
 

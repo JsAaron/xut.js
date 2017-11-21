@@ -97,7 +97,7 @@ function bindPlatEvent() {
  */
 export default function entrance(options) {
   //初始化全局一些配置
-  initBase(options, () => {
+  initBase(() => {
     if (window.GLOBALIFRAME) {
       bindPlatEvent()
     } else {

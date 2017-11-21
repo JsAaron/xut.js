@@ -2,8 +2,9 @@ import initDatabse from './init-database'
 import getSetData from './set-data'
 
 import { importJsonDatabase } from 'database/result'
-import { $warn, loadGolbalStyle } from '../../util/index'
+import { $warn, loadGolbalStyle, nextTick } from '../../util/index'
 import { createCursor } from '../../expand/cursor'
+import { initRootNode } from '../../expand/root-node'
 import { initColumn } from '../../component/column/init'
 import { contentFilter } from '../../component/activity/content/content-filter'
 import { config, initConfig, initPathAddress } from '../../config/index'
@@ -42,13 +43,38 @@ export default function baseConfig(callback) {
       //配置图片
       configImage()
 
-      //处理预加载文件
-      loadPrelaod(function(hasPreFile, globalBrMode) {
-        resetBrMode(hasPreFile, globalBrMode)
-        loadStyle(novelData, chapterTotal)
-      })
+      //创建根节点
+      //开始预加载文件
+      ccreateRoot(() => initPrelaod(novelData, chapterTotal))
     })
   }
+
+
+  /**
+   * 创建根节点
+   * @return {[type]} [description]
+   */
+  function ccreateRoot(callback) {
+    //根节点
+    const { $rootNode, $contentNode } = initRootNode(config.launch.el, config.launch.cursor);
+    $warn('logic', '初始化设置参数完成')
+    nextTick({
+      container: $rootNode,
+      content: $contentNode
+    }, callback)
+  }
+
+  /**
+   * 处理预加载文件
+   * @return {[type]} [description]
+   */
+  function initPrelaod(novelData, chapterTotal) {
+    loadPrelaod(function(hasPreFile, globalBrMode) {
+      resetBrMode(hasPreFile, globalBrMode)
+      loadStyle(novelData, chapterTotal)
+    })
+  }
+
 
   /**
    * 加载样式
