@@ -44,6 +44,7 @@ let path
 /**
  * create
  * @return {[type]} [description]
+ *   return hasDisable() ? '' : '<div class="xut-busy-icon xut-fullscreen"></div>'
  */
 export function createCursor() {
   if (isDisable) return
@@ -73,13 +74,13 @@ export function createCursor() {
     container = `<div class="xut-busy-middle">${container}</div>`
   }
 
-  node = $('.xut-busy-icon').html(String.styleFormat(
-    `<div style="width:${width}px;height:${width}px;margin:${space}px auto;margin-top:${config.visualSize.top+space}px;">
-        <div style="height:30%;"></div>
-          ${container}
-        <div class="xut-busy-text"></div>
-     </div>`
-  ))
+  return `<div class="xut-busy-icon xut-fullscreen">
+            <div style="width:${width}px;height:${width}px;margin:${space}px auto;margin-top:${config.visualSize.top+space}px;">
+                <div style="height:30%;"></div>
+                  ${container}
+                <div class="xut-busy-text"></div>
+             </div>
+          </div>`
 }
 
 
@@ -94,6 +95,9 @@ const clear = () => {
 export const showBusy = () => {
   if (isDisable || Xut.IBooks.Enabled || timer) return
   timer = setTimeout(() => {
+    if (!node) {
+      node = $('.xut-busy-icon')
+    }
     node.show()
     clear()
     if (isCallHide) {

@@ -15,7 +15,9 @@ export function setVisualMode() {
 
   //如果数据库定义了模式
   //那么优先数据库
-  if (config.data.visualMode !== undefined) {
+  //因为数据库默认写1了。所以1排除
+  //只是有一种情况，就是你全局设了模式3，然后编辑想某些页面或者应用，用模式1，就会出现问题了
+  if (config.data.visualMode !== undefined && config.data.visualMode != 1) {
     config.launch.visualMode = config.data.visualMode
   }
 

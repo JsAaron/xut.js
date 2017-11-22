@@ -1,12 +1,16 @@
 import { config } from '../config/index'
-import { hasDisable } from './cursor'
+import { hasDisable, createCursor } from './cursor'
 
 /**
  * 忙碌光标
  * @return {[type]} [description]
  */
-function getBusyHTML(newCursor) {
-  return hasDisable() ? '' : '<div class="xut-busy-icon xut-fullscreen"></div>'
+function getBusyHTML() {
+  //创建忙碌光标
+  if (!hasDisable() && !Xut.IBooks.Enabled) {
+    return createCursor()
+  }
+  return ''
 }
 
 
@@ -15,7 +19,7 @@ function getBusyHTML(newCursor) {
  * @param  {[type]} newCursor [description]
  * @return {[type]}           [description]
  */
-function getContentHTML(newCursor) {
+function getContentHTML() {
   let coverStyle = ''
   //mini平台不要背景图
   if (config.launch.platform === 'mini') {} else {
@@ -28,7 +32,7 @@ function getContentHTML(newCursor) {
     //背景样式
     coverStyle = `style="background-image: url(${coverUrl});"`
   }
-  return `${getBusyHTML(newCursor)}
+  return `${getBusyHTML()}
             <div class="xut-adaptive-image"></div>
             <div class="xut-cover xut-fullscreen" ${coverStyle}></div>
             <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>`

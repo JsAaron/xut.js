@@ -3,7 +3,6 @@ import getSetData from './set-data'
 
 import { importJsonDatabase } from 'database/result'
 import { $warn, loadGolbalStyle, nextTick } from '../../util/index'
-import { createCursor } from '../../expand/cursor'
 import { initRootNode } from '../../expand/root-node'
 import { initColumn } from '../../component/column/init'
 import { contentFilter } from '../../component/activity/content/content-filter'
@@ -12,7 +11,7 @@ import { initPreload, loadPrelaod } from 'preload/index'
 import { adaptiveImage } from './adp-image'
 
 import {
-  configLaunch,
+  setLaunch,
   resetBrMode,
   resetDelegate,
   setHistory,
@@ -33,20 +32,23 @@ export default function baseConfig(callback) {
       const novelData = dataRet.Novel.item(0)
       const data = getSetData(dataRet.Setting)
       const chapterTotal = dataRet.Chapter.length
-
-      //配置lanuch
-      configLaunch(novelData)
-
-      //配置config
-      configInit(novelData, data)
-
-      //配置图片
-      configImage()
-
-      //创建根节点
-      //开始预加载文件
-      ccreateRoot(() => initPrelaod(novelData, chapterTotal))
+      setBaseConfig(novelData, data, chapterTotal)
     })
+  }
+
+  /**
+   * 设置一些基础配置
+   */
+  function setBaseConfig(novelData, data, chapterTotal) {
+    //配置lanuch
+    setLaunch(novelData);
+    //配置config
+    configInit(novelData, data);
+    //配置图片
+    configImage();
+    //创建根节点
+    //开始预加载文件
+    ccreateRoot(() => initPrelaod(novelData, chapterTotal));
   }
 
 
@@ -121,11 +123,6 @@ function configInit(novelData, tempSettingData) {
   //启动画轴模式
   setPaintingMode(tempSettingData)
 
-  //创建忙碌光标
-  if (!Xut.IBooks.Enabled) {
-    createCursor()
-  }
-
   //初始资源地址
   initPathAddress()
 }
@@ -137,6 +134,7 @@ function configInit(novelData, tempSettingData) {
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
 function configColumn(callback) {
+  $warn(123)
   initColumn(haColumnCounts => {
     if (haColumnCounts) {
       resetDelegate()

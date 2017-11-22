@@ -45796,6 +45796,7 @@ var path = void 0;
 /**
  * create
  * @return {[type]} [description]
+ *   return hasDisable() ? '' : '<div class="xut-busy-icon xut-fullscreen"></div>'
  */
 function createCursor() {
   if (isDisable) return;
@@ -45820,7 +45821,7 @@ function createCursor() {
     container = '<div class="xut-busy-middle">' + container + '</div>';
   }
 
-  node = $('.xut-busy-icon').html(String.styleFormat('<div style="width:' + width + 'px;height:' + width + 'px;margin:' + space + 'px auto;margin-top:' + (config.visualSize.top + space) + 'px;">\n        <div style="height:30%;"></div>\n          ' + container + '\n        <div class="xut-busy-text"></div>\n     </div>'));
+  return '<div class="xut-busy-icon xut-fullscreen">\n            <div style="width:' + width + 'px;height:' + width + 'px;margin:' + space + 'px auto;margin-top:' + (config.visualSize.top + space) + 'px;">\n                <div style="height:30%;"></div>\n                  ' + container + '\n                <div class="xut-busy-text"></div>\n             </div>\n          </div>';
 }
 
 var clear = function clear() {
@@ -45834,6 +45835,9 @@ var clear = function clear() {
 var showBusy = function showBusy() {
   if (isDisable || Xut.IBooks.Enabled || timer) return;
   timer = setTimeout(function () {
+    if (!node) {
+      node = $('.xut-busy-icon');
+    }
     node.show();
     clear();
     if (isCallHide) {
@@ -45904,6 +45908,115 @@ var setDisable = function setDisable() {
 var hasDisable = function hasDisable() {
   return isDisable;
 };
+
+/**
+ * 忙碌光标
+ * @return {[type]} [description]
+ */
+function getBusyHTML() {
+  //创建忙碌光标
+  if (!hasDisable() && !Xut.IBooks.Enabled) {
+    return createCursor();
+  }
+  return '';
+}
+
+/**
+ * 初始化根节点
+ * @param  {[type]} newCursor [description]
+ * @return {[type]}           [description]
+ */
+function getContentHTML() {
+  var coverStyle = '';
+  //mini平台不要背景图
+  if (config.launch.platform === 'mini') {} else {
+    //默认背景图
+    var coverUrl = './content/gallery/cover.jpg';
+    //重写背景图
+    if (config.launch.resource) {
+      coverUrl = config.launch.resource + '/gallery/cover.jpg';
+    }
+    //背景样式
+    coverStyle = 'style="background-image: url(' + coverUrl + ');"';
+  }
+  return getBusyHTML() + '\n            <div class="xut-adaptive-image"></div>\n            <div class="xut-cover xut-fullscreen" ' + coverStyle + '></div>\n            <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>';
+}
+
+/**
+ * 根节点
+ */
+var $rootNode = void 0;
+var $contentNode = void 0;
+function initRootNode() {
+  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '#xxtppt-app-container';
+  var cursor = arguments[1];
+
+
+  var contentHtml = void 0;
+
+  if (el) {
+    $rootNode = $(el);
+  }
+
+  //如果没有传递节点名，直接放到body下面
+  if (!$rootNode.length) {
+    el = '';
+    $rootNode = $('body');
+  }
+
+  if (el) {
+    contentHtml = getContentHTML(cursor);
+  } else {
+    //如果根节点不存在,配置根节点
+    contentHtml = '<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden">' + contentHtml + '</div>';
+  }
+
+  $contentNode = $(String.styleFormat(contentHtml));
+
+  return { $rootNode: $rootNode, $contentNode: $contentNode };
+}
+
+function clearRootNode() {
+  if ($contentNode) {
+    $contentNode.remove();
+    $contentNode = null;
+  }
+  $rootNode = null;
+}
+
+/**
+ * 移除背景
+ * @return {[type]} [description]
+ */
+function removeCover(callback) {
+  //第一次进入，处理背景
+  var $cover = $(".xut-cover");
+  if ($cover.length) {
+    //主动探测,只检查一次
+    var complete = function complete() {
+      $cover && $cover.remove();
+      $cover = null;
+      callback();
+    };
+    //是否配置启动动画关闭
+
+
+    if (config.launch.launchAnim === false) {
+      complete();
+    } else {
+      //有动画
+      $cover.transition({
+        opacity: 0,
+        duration: 1000,
+        easing: 'in',
+        complete: complete
+      });
+    }
+  } else {
+    $cover = null;
+    callback();
+  }
+}
 
 /**
  * 记录分栏数据
@@ -47893,17 +48006,20 @@ function setCursor(launch, golbal) {
     /*每次配置光标之前都重置，可能被上个给覆盖默认的*/
     resetCursor();
 
-    /*如果配置了关闭*/
-    if (cursor === false) {
+    var type = typeof cursor === 'undefined' ? 'undefined' : _typeof(cursor);
+
+    //设置关闭
+    if (cursor == false) {
       setDisable();
-    } else if (cursor) {
-      /*自定义忙碌*/
-      if (cursor.time) {
-        setDelay(cursor.time);
-      }
-      if (cursor.url) {
-        setPath(cursor.url);
-      }
+      return;
+    }
+
+    //自定义忙绿光标
+    if (cursor.time) {
+      setDelay(cursor.time);
+    }
+    if (cursor.url) {
+      setPath(cursor.url);
     }
   }
 }
@@ -48105,7 +48221,8 @@ function setVisualMode() {
 
   //如果数据库定义了模式
   //那么优先数据库
-  if (config.data.visualMode !== undefined) {
+  //因为数据库默认写1了。所以1排除
+  if (config.data.visualMode !== undefined && config.data.visualMode != 1) {
     config.launch.visualMode = config.data.visualMode;
   }
 
@@ -48157,7 +48274,7 @@ function setPaintingMode(data) {
   2 trackCode
   3 brMode
  */
-function configLaunch(novelData) {
+function setLaunch(novelData) {
 
   /*独立app与全局配置文件*/
   var launch = config.launch;
@@ -48223,21 +48340,52 @@ function baseConfig(callback) {
       var novelData = dataRet.Novel.item(0);
       var data = initDefaults(dataRet.Setting);
       var chapterTotal = dataRet.Chapter.length;
+      setBaseConfig(novelData, data, chapterTotal);
+    });
+  }
 
-      //配置lanuch
-      configLaunch(novelData);
+  /**
+   * 设置一些基础配置
+   */
+  function setBaseConfig(novelData, data, chapterTotal) {
+    //配置lanuch
+    setLaunch(novelData);
+    //配置config
+    configInit(novelData, data);
+    //配置图片
+    configImage();
+    //创建根节点
+    //开始预加载文件
+    ccreateRoot(function () {
+      return initPrelaod(novelData, chapterTotal);
+    });
+  }
 
-      //配置config
-      configInit(novelData, data);
+  /**
+   * 创建根节点
+   * @return {[type]} [description]
+   */
+  function ccreateRoot(callback) {
+    //根节点
+    var _initRootNode = initRootNode(config.launch.el, config.launch.cursor),
+        $rootNode = _initRootNode.$rootNode,
+        $contentNode = _initRootNode.$contentNode;
 
-      //配置图片
-      configImage();
+    $warn('logic', '初始化设置参数完成');
+    nextTick({
+      container: $rootNode,
+      content: $contentNode
+    }, callback);
+  }
 
-      //处理预加载文件
-      loadPrelaod(function (hasPreFile, globalBrMode) {
-        resetBrMode(hasPreFile, globalBrMode);
-        loadStyle(novelData, chapterTotal);
-      });
+  /**
+   * 处理预加载文件
+   * @return {[type]} [description]
+   */
+  function initPrelaod(novelData, chapterTotal) {
+    loadPrelaod(function (hasPreFile, globalBrMode) {
+      resetBrMode(hasPreFile, globalBrMode);
+      loadStyle(novelData, chapterTotal);
     });
   }
 
@@ -48286,11 +48434,6 @@ function configInit(novelData, tempSettingData) {
   //2015.2.26
   //启动画轴模式
   setPaintingMode(tempSettingData);
-
-  //创建忙碌光标
-  if (!Xut.IBooks.Enabled) {
-    createCursor();
-  }
 
   //初始资源地址
   initPathAddress();
@@ -48795,115 +48938,6 @@ function initAsyn(callback) {
     Xut.plat.supportWebp = state;
     callback();
   });
-}
-
-/**
- * 忙碌光标
- * @return {[type]} [description]
- */
-function getBusyHTML(newCursor) {
-  if (!newCursor || newCursor == false) {
-    return '';
-  }
-  return hasDisable() ? '' : '<div class="xut-busy-icon xut-fullscreen"></div>';
-}
-
-/**
- * 初始化根节点
- * @param  {[type]} newCursor [description]
- * @return {[type]}           [description]
- */
-function getContentHTML(newCursor) {
-  var coverStyle = '';
-  //mini平台不要背景图
-  if (config.launch.platform === 'mini') {} else {
-    //默认背景图
-    var coverUrl = './content/gallery/cover.jpg';
-    //重写背景图
-    if (config.launch.resource) {
-      coverUrl = config.launch.resource + '/gallery/cover.jpg';
-    }
-    //背景样式
-    coverStyle = 'style="background-image: url(' + coverUrl + ');"';
-  }
-  return getBusyHTML(newCursor) + '\n            <div class="xut-adaptive-image"></div>\n            <div class="xut-cover xut-fullscreen" ' + coverStyle + '></div>\n            <div class="xut-scene-container xut-fullscreen xut-overflow-hidden"></div>';
-}
-
-/**
- * 根节点
- */
-var $rootNode = void 0;
-var $contentNode = void 0;
-function initRootNode() {
-  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      _ref$el = _ref.el,
-      el = _ref$el === undefined ? '#xxtppt-app-container' : _ref$el,
-      cursor = _ref.cursor;
-
-  var contentHtml = void 0;
-
-  if (el) {
-    $rootNode = $(el);
-  }
-
-  //如果没有传递节点名，直接放到body下面
-  if (!$rootNode.length) {
-    el = '';
-    $rootNode = $('body');
-  }
-
-  if (el) {
-    contentHtml = getContentHTML(cursor);
-  } else {
-    //如果根节点不存在,配置根节点
-    contentHtml = '<div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden">' + contentHtml + '</div>';
-  }
-
-  $contentNode = $(String.styleFormat(contentHtml));
-
-  return { $rootNode: $rootNode, $contentNode: $contentNode };
-}
-
-function clearRootNode() {
-  if ($contentNode) {
-    $contentNode.remove();
-    $contentNode = null;
-  }
-  $rootNode = null;
-}
-
-/**
- * 移除背景
- * @return {[type]} [description]
- */
-function removeCover(callback) {
-  //第一次进入，处理背景
-  var $cover = $(".xut-cover");
-  if ($cover.length) {
-    //主动探测,只检查一次
-    var complete = function complete() {
-      $cover && $cover.remove();
-      $cover = null;
-      callback();
-    };
-    //是否配置启动动画关闭
-
-
-    if (config.launch.launchAnim === false) {
-      complete();
-    } else {
-      //有动画
-      $cover.transition({
-        opacity: 0,
-        duration: 1000,
-        easing: 'in',
-        complete: complete
-      });
-    }
-  } else {
-    $cover = null;
-    callback();
-  }
 }
 
 ////////////////////////////////////////////
@@ -81694,22 +81728,12 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
-function initApp$1(options, callback) {
+function initApp$1(callback) {
   /*针对异步的代码以前检测出来*/
   initAsyn(function () {
     //全局的一些事件处理
     initGlobalEvent();
-    //根节点
-
-    var _initRootNode = initRootNode(options),
-        $rootNode = _initRootNode.$rootNode,
-        $contentNode = _initRootNode.$contentNode;
-
-    $warn('logic', '初始化设置参数完成');
-    nextTick({
-      container: $rootNode,
-      content: $contentNode
-    }, callback);
+    callback();
   });
 }
 
@@ -81803,7 +81827,7 @@ function bindPlatEvent() {
  */
 function entrance(options) {
   //初始化全局一些配置
-  initApp$1(options, function () {
+  initApp$1(function () {
     if (window.GLOBALIFRAME) {
       bindPlatEvent();
     } else {
@@ -81894,10 +81918,7 @@ Xut.Application.Launch = function (option) {
       delete config.launch.path;
     }
     bindOrientateMode();
-    entrance({
-      el: option.el,
-      cursor: option.cursor
-    });
+    entrance();
   }
 };
 

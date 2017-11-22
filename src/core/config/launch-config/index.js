@@ -25,7 +25,7 @@ export {resetBrMode, setHistory }
   2 trackCode
   3 brMode
  */
-export function configLaunch(novelData) {
+export function setLaunch(novelData) {
 
   /*独立app与全局配置文件*/
   const launch = config.launch
