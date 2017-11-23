@@ -5,6 +5,7 @@
 ////////////////////////
 
 import { $on, $off, $event } from '../../util/event'
+import { resetCount } from './index'
 
 let NULL = null;
 
@@ -81,11 +82,19 @@ function joinCss(css) {
 };
 
 
-let parentBottom = 15;
+let parentBottom = 50;
 let publicCss = ["-webkit-transition: all .3s ease", "transition: all .3s ease"];
 let childCss = ["margin-top:-1px", "padding:1px", "border-top:1px solid rgba(255,255,255,.1)", "margin:0", "max-width:" + (window.outerWidth - 20) + "px"].concat(publicCss);
-let parentCss = ["-webkit-overflow-scrolling:touch", "overflow:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:50%"].concat(publicCss);
+let parentCss = ["-webkit-overflow-scrolling:touch", "overflow-y:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:50%"].concat(publicCss);
+let clearCSS = "text-align:right;font-size:16px;color:white;margin-top:30px;margin-right:10px;position:absolute;right:0;"
+let clearCountCSS = "text-align:right;font-size:16px;;color:white;margin-right:10px;margin-top:30px;position:absolute;right:50px;"
 
+let showNodeCSS = "text-align:right;font-size:16px;;color:white;margin-right:70px;margin-top:30px;position:absolute;right:50px;"
+let hideNodeCSS = "text-align:right;font-size:16px;;color:white;margin-right:120px;position:absolute;right:50px;margin-top:30px;"
+
+
+
+let containerCSS = "width:100%;height:90%;padding:10px"
 
 function Debug() {
   this.isInit = this.isHide = false;
@@ -95,40 +104,78 @@ function Debug() {
 
 Debug.prototype.init = function() {
   var body, el;
+  var self = this
+
   el = this.el = document.createElement("div");
+
+  var clearNode = document.createElement("a");
+  var clearCount = document.createElement("a");
+  var showNode = document.createElement("a");
+  var hideNode = document.createElement("a");
+
+  this.container = document.createElement("div");
+  this.container.setAttribute("style", containerCSS)
+
+  showNode.textContent = '显示'
+  hideNode.textContent = '隐藏'
+  clearNode.textContent = '清屏'
+  clearCount.textContent = '清计数'
+
+  clearNode.setAttribute("style", clearCSS);
+  clearCount.setAttribute("style", clearCountCSS);
+  showNode.setAttribute("style", showNodeCSS);
+  hideNode.setAttribute("style", hideNodeCSS);
+
   el.setAttribute("style", joinCss(parentCss));
+  el.appendChild(this.container)
+  el.appendChild(clearNode)
+  el.appendChild(clearCount)
+  el.appendChild(showNode)
+  el.appendChild(hideNode)
+
   body = getBody();
   body.appendChild(el);
+
   translate(el, 0);
 
-  let hasTap = false
-  let startPageX
-  const start = function(e) {
-    let point = $event(e);
-    startPageX = point.pageX;
-    hasTap = true;
+  function setColor(node) {
+    node.style.backgroundColor = 'red'
+    setTimeout(function() {
+      node.style.backgroundColor = ''
+    }, 50)
   }
 
-  const move = function(e) {
-    if (!hasTap) {
-      return
+  $on(clearCount, {
+    end: function(e) {
+      setColor(clearCount)
+      e.stopPropagation()
+      resetCount()
     }
-    let point = $event(e)
-    let deltaX = point.pageX - startPageX
-    hasTap = false;
-  }
+  })
 
-  const end = () => {
-    if (hasTap) {
-      this.toggle()
+  $on(clearNode, {
+    end: function(e) {
+      setColor(clearNode)
+      e.stopPropagation()
+      self.container.innerHTML = ''
     }
-  }
+  })
 
-  $on(el, {
-    start: start,
-    move: move,
-    end: end,
-    cancel: end
+
+  $on(showNode, {
+    end: function(e) {
+      setColor(showNode)
+      e.stopPropagation()
+      self.show()
+    }
+  })
+
+  $on(hideNode, {
+    end: function(e) {
+      setColor(hideNode)
+      e.stopPropagation()
+      self.hide()
+    }
   })
 
   this.isInit = true;
@@ -141,16 +188,23 @@ Debug.prototype.print = function() {
   if (!this.isInit) {
     this.init();
   }
+
+  if(this.isHide){
+    this.show()
+  }
+
   css = childCss.concat(["color:#" + this.color]);
   child = document.createElement("p");
   child.setAttribute("style", joinCss(css));
   child.innerHTML = this.msg;
   /*只显示一半的区域，然后可以被重复的替换*/
-  if (this.el.offsetHeight > document.documentElement.clientHeight / 2) {
-    var node = this.el.firstChild
-    this.el.removeChild(node)
+  if (this.container.offsetHeight > document.documentElement.clientHeight / 2) {
+    var node = this.container.firstChild
+    if (node.nodeName === 'P') {
+      this.container.removeChild(node)
+    }
   }
-  this.el.appendChild(child);
+  this.container.appendChild(child);
   return this;
 };
 

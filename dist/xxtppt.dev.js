@@ -41958,7 +41958,7 @@ var isArray = Array.isArray || function (val) {
 };
 
 function isObejct(val) {
-  return (typeof val === "undefined" ? "undefined" : _typeof(val)) === "object" && !isArray(val) && !isNull(val);
+  return (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === "object" && !isArray(val) && !isNull(val);
 }
 
 function getBody() {
@@ -41981,7 +41981,7 @@ function render(msg) {
   if (isArray(msg)) {
     for (i = 0, len = msg.length; i < len; i++) {
       item = msg[i];
-      if ((typeof item === "undefined" ? "undefined" : _typeof(item)) === "object") {
+      if ((typeof item === 'undefined' ? 'undefined' : _typeof(item)) === "object") {
         arr.push(render(item));
         text = "[" + arr.join(',') + "]";
       } else {
@@ -42014,10 +42014,17 @@ function joinCss(css) {
   return css.join(";");
 }
 
-var parentBottom = 15;
+var parentBottom = 50;
 var publicCss = ["-webkit-transition: all .3s ease", "transition: all .3s ease"];
 var childCss = ["margin-top:-1px", "padding:1px", "border-top:1px solid rgba(255,255,255,.1)", "margin:0", "max-width:" + (window.outerWidth - 20) + "px"].concat(publicCss);
-var parentCss = ["-webkit-overflow-scrolling:touch", "overflow:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:50%"].concat(publicCss);
+var parentCss = ["-webkit-overflow-scrolling:touch", "overflow-y:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:50%"].concat(publicCss);
+var clearCSS = "text-align:right;font-size:16px;color:white;margin-top:30px;margin-right:10px;position:absolute;right:0;";
+var clearCountCSS = "text-align:right;font-size:16px;;color:white;margin-right:10px;margin-top:30px;position:absolute;right:50px;";
+
+var showNodeCSS = "text-align:right;font-size:16px;;color:white;margin-right:70px;margin-top:30px;position:absolute;right:50px;";
+var hideNodeCSS = "text-align:right;font-size:16px;;color:white;margin-right:120px;position:absolute;right:50px;margin-top:30px;";
+
+var containerCSS = "width:100%;height:90%;padding:10px";
 
 function Debug() {
   this.isInit = this.isHide = false;
@@ -42026,43 +42033,78 @@ function Debug() {
 }
 
 Debug.prototype.init = function () {
-  var _this = this;
-
   var body, el;
+  var self = this;
+
   el = this.el = document.createElement("div");
+
+  var clearNode = document.createElement("a");
+  var clearCount = document.createElement("a");
+  var showNode = document.createElement("a");
+  var hideNode = document.createElement("a");
+
+  this.container = document.createElement("div");
+  this.container.setAttribute("style", containerCSS);
+
+  showNode.textContent = '显示';
+  hideNode.textContent = '隐藏';
+  clearNode.textContent = '清屏';
+  clearCount.textContent = '清计数';
+
+  clearNode.setAttribute("style", clearCSS);
+  clearCount.setAttribute("style", clearCountCSS);
+  showNode.setAttribute("style", showNodeCSS);
+  hideNode.setAttribute("style", hideNodeCSS);
+
   el.setAttribute("style", joinCss(parentCss));
+  el.appendChild(this.container);
+  el.appendChild(clearNode);
+  el.appendChild(clearCount);
+  el.appendChild(showNode);
+  el.appendChild(hideNode);
+
   body = getBody();
   body.appendChild(el);
+
   translate(el, 0);
 
-  var hasTap = false;
-  var startPageX = void 0;
-  var start = function start(e) {
-    var point = $event(e);
-    startPageX = point.pageX;
-    hasTap = true;
-  };
+  function setColor(node) {
+    node.style.backgroundColor = 'red';
+    setTimeout(function () {
+      node.style.backgroundColor = '';
+    }, 50);
+  }
 
-  var move = function move(e) {
-    if (!hasTap) {
-      return;
+  $on(clearCount, {
+    end: function end(e) {
+      setColor(clearCount);
+      e.stopPropagation();
+      resetCount();
     }
-    var point = $event(e);
-    var deltaX = point.pageX - startPageX;
-    hasTap = false;
-  };
+  });
 
-  var end = function end() {
-    if (hasTap) {
-      _this.toggle();
+  $on(clearNode, {
+    end: function end(e) {
+      setColor(clearNode);
+      e.stopPropagation();
+      self.container.innerHTML = '';
     }
-  };
+  });
 
-  $on(el, {
-    start: start,
-    move: move,
-    end: end,
-    cancel: end
+  $on(showNode, {
+    end: function end(e) {
+      setColor(showNode);
+      e.stopPropagation();
+      self.show();
+    }
+  });
+
+  $on(hideNode, {
+    end: function end(e) {
+      setColor(hideNode);
+      e.stopPropagation();
+      self.hide();
+    }
   });
 
   this.isInit = true;
@@ -42074,16 +42116,23 @@ Debug.prototype.print = function () {
   if (!this.isInit) {
     this.init();
   }
+
+  if (this.isHide) {
+    this.show();
+  }
+
   css = childCss.concat(["color:#" + this.color]);
   child = document.createElement("p");
   child.setAttribute("style", joinCss(css));
   child.innerHTML = this.msg;
   /*只显示一半的区域，然后可以被重复的替换*/
-  if (this.el.offsetHeight > document.documentElement.clientHeight / 2) {
-    var node = this.el.firstChild;
-    this.el.removeChild(node);
+  if (this.container.offsetHeight > document.documentElement.clientHeight / 2) {
+    var node = this.container.firstChild;
+    if (node.nodeName === 'P') {
+      this.container.removeChild(node);
+    }
   }
-  this.el.appendChild(child);
+  this.container.appendChild(child);
   return this;
 };
 
@@ -42131,6 +42180,7 @@ for (var fn in debugMap) {
 var hasConsole = typeof console !== 'undefined';
 
 var debug = void 0;
+var count = 0;
 
 function $warn(data, content, level, color) {
 
@@ -42159,11 +42209,12 @@ function $warn(data, content, level, color) {
 
       var stringType = typeof content === 'string';
 
+      ++count;
+
       //远程debug输出
       if (config.debug.terminal) {
         var errListener = function errListener(error) {
-          var msg;
-          msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
+          var msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
           return debug.error(msg.join("<br/>"));
         };
         //监听错误
@@ -42174,17 +42225,16 @@ function $warn(data, content, level, color) {
         }
 
         window.addEventListener('error', errListener, false);
-        debug.log('<\u7C7B\u578B>:' + type + ' <\u7ED3\u679C>:' + content);
-
+        debug.log(count + ' \u7C7B\u578B:' + type + ' \u5185\u5BB9:' + content);
         return;
       }
 
       //console输出
       var command = console[level] || console.log;
       if (stringType) {
-        command('%c<\u7C7B\u578B>:%c' + type + ' %c<\u7ED3\u679C>:%c' + content, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color);
+        command('%c' + count + ' \u7C7B\u578B:%c' + type + ' %c\u5185\u5BB9:%c' + content, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color);
       } else {
-        command('<\u7C7B\u578B>:' + type + ' <\u7ED3\u679C>:', content);
+        command(count + ' \u7C7B\u578B:' + type + ' \u5185\u5BB9:', content);
       }
     }
   }
@@ -42207,6 +42257,10 @@ function $warn(data, content, level, color) {
     //$warn(type,content,level,color)
     outlog(data, content, level, color);
   }
+}
+
+function resetCount() {
+  count = 0;
 }
 
 Xut.$warn = $warn;
@@ -42823,7 +42877,7 @@ var improtDebugConfig = {
    * silent 启动是所有的调试内容
    * 也可以单独启用每一项的调试内容
    * ['all','api','preload','column','visual','scale',
-   *   'config','pagebase','swiper','event','util','database','logic']
+   *   'config','pagebase','swiper','event','util','database','logic',html5Audio]
    * api 级别
    * preload 预加载处理
    * column 根流式布局相关的
@@ -45829,16 +45883,24 @@ var clear = function clear() {
   timer = null;
 };
 
+function access(callback) {
+  if (!node) {
+    node = $('.xut-busy-icon');
+  }
+  if (node && node.length) {
+    callback(node);
+  }
+}
+
 /**
  * 显示光标
  */
 var showBusy = function showBusy() {
   if (isDisable || Xut.IBooks.Enabled || timer) return;
   timer = setTimeout(function () {
-    if (!node) {
-      node = $('.xut-busy-icon');
-    }
-    node.show();
+    access(function (context) {
+      context.show();
+    });
     clear();
     if (isCallHide) {
       hideBusy();
@@ -45854,7 +45916,9 @@ var hideBusy = function hideBusy() {
   //显示忙碌加锁，用于不处理hideBusy
   if (isDisable || Xut.IBooks.Enabled || showBusy.lock) return;
   if (!timer) {
-    node.hide();
+    access(function (context) {
+      context.hide();
+    });
   } else {
     isCallHide = true;
   }
@@ -45866,7 +45930,9 @@ var hideBusy = function hideBusy() {
  */
 var showTextBusy = function showTextBusy(txt) {
   if (isDisable || Xut.IBooks.Enabled) return;
-  node.css('pointer-events', 'none').find('.xut-busy-text').html(txt);
+  access(function (context) {
+    context.css('pointer-events', 'none').find('.xut-busy-text').html(txt);
+  });
   showBusy();
 };
 
@@ -48006,8 +48072,6 @@ function setCursor(launch, golbal) {
     /*每次配置光标之前都重置，可能被上个给覆盖默认的*/
     resetCursor();
 
-    var type = typeof cursor === 'undefined' ? 'undefined' : _typeof(cursor);
-
     //设置关闭
     if (cursor == false) {
       setDisable();
@@ -48222,6 +48286,7 @@ function setVisualMode() {
   //如果数据库定义了模式
   //那么优先数据库
   //因为数据库默认写1了。所以1排除
+  //只是有一种情况，就是你全局设了模式3，然后编辑想某些页面或者应用，用模式1，就会出现问题了
   if (config.data.visualMode !== undefined && config.data.visualMode != 1) {
     config.launch.visualMode = config.data.visualMode;
   }
@@ -49605,6 +49670,12 @@ var AudioSuper = function () {
             _this2.audio && _this2.audio.play();
           });
         } else {
+
+          $warn({
+            type: 'html5Audio',
+            content: '+\u64AD\u653E\u97F3\u9891,audio\u7684id:' + this.options.audioId
+          });
+
           //秒秒学提示play不存在
           this.audio.play && this.audio.play();
         }
@@ -49672,6 +49743,11 @@ var AudioSuper = function () {
         this.acitonObj.destroy();
         this.acitonObj = null;
       }
+
+      $warn({
+        type: 'html5Audio',
+        content: '-\u9500\u6BC1\u97F3\u9891,audio\u7684id:' + this.options.audioId
+      });
     }
   }]);
   return AudioSuper;
@@ -50009,6 +50085,10 @@ var HTML5Audio = function (_AudioSuper) {
       2 必须手动播放，自动播放跳过，否则有杂音*/
       if (Xut.plat.isIOS && this.options.isTrigger) {
         this.audio.play && this.audio.play();
+        $warn({
+          type: 'html5Audio',
+          content: 'ios\u624B\u52A8\u70B9\u51FB\u64AD\u653E\u7684\u4FEE\u590D,\u4E3B\u52A8\u8C03\u7528\u4E00\u6B21\u64AD\u653E,audio\u7684id:' + this.options.audioId
+        });
       }
       /**由于修复的问题，先调用了play，改src, 会提示中断报错，所以这延时修改src*/
       setTimeout(function () {
@@ -50153,6 +50233,11 @@ var HTML5Audio = function (_AudioSuper) {
       //所以自动播放被阻止了
       //需要修复
       if (this._needFix) {
+
+        $warn({
+          type: 'html5Audio',
+          content: '\u4FEE\u590D\u672A\u81EA\u52A8\u64AD\u653E\u5BF9\u8C61,audio\u7684id:' + this.options.audioId
+        });
         this._createContext();
       }
     }
@@ -52376,12 +52461,14 @@ function syncCache(base, callback) {
  * 如果是canvas模式的时候，同时也是能够存在dom模式是
  * @return {[type]} [description]
  */
-function parseContentMode(pageData, base) {
+function parseChapterParameter(pageData, base) {
   var parameter = pageData.parameter;
   if (parameter) {
     try {
       parameter = JSON.parse(parameter);
       if (parameter) {
+
+        //parameter
         if (parameter.contentMode && parameter.contentMode == 1) {
           //非强制dom模式
           if (!config.debug.onlyDomMode) {
@@ -52389,7 +52476,8 @@ function parseContentMode(pageData, base) {
             base.canvasRelated.enable = true;
           }
         }
-        //如果是最后一页处理
+
+        //lastPage如果是最后一页处理
         if (parameter.lastPage && base.pageType === 'page') {
           //运行应用运行时间
           base.runLastPageAction = function () {
@@ -52408,6 +52496,12 @@ function parseContentMode(pageData, base) {
               }
             };
           };
+        }
+
+        //页面属性
+        //2017.11.23
+        if (parameter.pageAttr) {
+          base.pageAttr = parameter.pageAttr;
         }
       }
     } catch (e) {
@@ -54360,6 +54454,7 @@ var eventMixin = function (activitProto) {
           self._fixAudio.push(new AudioPlayer({
             url: behaviorSound,
             trackId: 9999,
+            audioId: '一次性行点击',
             complete: function complete() {
               this.play();
             }
@@ -54374,7 +54469,8 @@ var eventMixin = function (activitProto) {
             //相同对象创建一次
             //以后取缓存
             audio = new AudioPlayer({
-              url: behaviorSound
+              url: behaviorSound,
+              audioId: '一次性行点击'
             });
             self._cacheBehaviorAudio[behaviorSound] = audio;
           }
@@ -59429,7 +59525,7 @@ var OBJNAME = ['pptObj', 'pixiObj', 'comSpriteObj', 'autoSpriteObj'];
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-var access = function access(callback) {
+var access$1 = function access(callback) {
   OBJNAME.forEach(function (key) {
     callback(key);
   });
@@ -59607,7 +59703,7 @@ var Animation = function () {
         $contentNode = this.$contentNode.view;
       }
 
-      access(function (key) {
+      access$1(function (key) {
         if (_this3[key]) {
           if (key === 'pptObj') {
             //优化处理,只针对互斥的情况下
@@ -59648,7 +59744,7 @@ var Animation = function () {
     value: function stop(chapterId) {
       var _this4 = this;
 
-      access(function (key) {
+      access$1(function (key) {
         if (_this4[key]) {
           if (key === 'pptObj') {
             audioHandle(destroyContentAudio, _this4[key].options, chapterId);
@@ -59670,7 +59766,7 @@ var Animation = function () {
     value: function reset() {
       var _this5 = this;
 
-      access(function (key) {
+      access$1(function (key) {
         if (_this5[key]) {
           //如果是一次性动画，需要动态处理
           if (_this5.useDynamicDiagram) {
@@ -59691,7 +59787,7 @@ var Animation = function () {
     value: function destroy(chapterId) {
       var _this6 = this;
 
-      access(function (key) {
+      access$1(function (key) {
         _this6[key] && _this6[key].destroy && _this6[key].destroy();
       });
 
@@ -59705,7 +59801,7 @@ var Animation = function () {
         this.contentData.$contentNode = null;
       }
 
-      access(function (key) {
+      access$1(function (key) {
         _this6[key] = null;
       });
 
@@ -64922,7 +65018,7 @@ var TaskActivitys = function (_TaskSuper) {
  * 如果pageBase 不存在，则取当前页面的
  * @return {[type]} [description]
  */
-function access$1(pageBase, callback) {
+function access$2(pageBase, callback) {
 
   //如果只提供回调函数
   if (arguments.length === 1 && _.isFunction(pageBase)) {
@@ -65156,7 +65252,7 @@ function $autoRun(pageBase, pageIndex, taskAnimCallback) {
   //pageType
   //用于区别触发类型
   //页面还是母版
-  access$1(pageBase, function (pageBase, contentObjs, componentObjs, pageType) {
+  access$2(pageBase, function (pageBase, contentObjs, componentObjs, pageType) {
 
     //如果是母版对象，一次生命周期种只激活一次
     if (pageBase.onceMaster) {
@@ -65258,7 +65354,7 @@ function $suspend(pageBase, pageId, allHandle) {
   //零件对象翻页就直接销毁了
   //无需暂时
   //这里只处理音频 + content类型
-  access$1(pageBase, function (pageBase, contentObjs) {
+  access$2(pageBase, function (pageBase, contentObjs) {
 
     /*停止预加载*/
     // stopPreload()
@@ -65318,7 +65414,7 @@ var hasOptimize = function hasOptimize(fn) {
  */
 function $original(pageBase) {
 
-  access$1(pageBase, function (pageBase, contentObjs, componentObjs) {
+  access$2(pageBase, function (pageBase, contentObjs, componentObjs) {
 
     //母版对象不还原
     if (pageBase.pageType === 'master') return;
@@ -65398,7 +65494,7 @@ function $stop(skipAudio) {
   $stopAutoWatch();
 
   //停止热点
-  return access$1(function (pageBase, contentObjs, componentObjs) {
+  return access$2(function (pageBase, contentObjs, componentObjs) {
 
     //如果返回值是false,则是算热点处理行为
     var falg = false;
@@ -70951,7 +71047,7 @@ var assignedTasks = {
     //同步数据
     syncCache(base, function () {
       var pageData = base.baseData();
-      parseContentMode(pageData, base);
+      parseChapterParameter(pageData, base);
       TaskContainer(base, pageData, success);
     });
   },

@@ -89,16 +89,24 @@ const clear = () => {
   timer = null
 }
 
+function access(callback) {
+  if (!node) {
+    node = $('.xut-busy-icon')
+  }
+  if (node && node.length) {
+    callback(node)
+  }
+}
+
 /**
  * 显示光标
  */
 export const showBusy = () => {
   if (isDisable || Xut.IBooks.Enabled || timer) return
   timer = setTimeout(() => {
-    if (!node) {
-      node = $('.xut-busy-icon')
-    }
-    node.show()
+    access(function(context) {
+      context.show()
+    })
     clear()
     if (isCallHide) {
       hideBusy()
@@ -115,7 +123,9 @@ export const hideBusy = () => {
   //显示忙碌加锁，用于不处理hideBusy
   if (isDisable || Xut.IBooks.Enabled || showBusy.lock) return;
   if (!timer) {
-    node.hide();
+    access(function(context) {
+      context.hide()
+    })
   } else {
     isCallHide = true
   }
@@ -128,7 +138,9 @@ export const hideBusy = () => {
  */
 export const showTextBusy = (txt) => {
   if (isDisable || Xut.IBooks.Enabled) return;
-  node.css('pointer-events', 'none').find('.xut-busy-text').html(txt);
+  access(function(context) {
+    context.css('pointer-events', 'none').find('.xut-busy-text').html(txt);
+  })
   showBusy();
 }
 

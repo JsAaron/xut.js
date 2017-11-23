@@ -2,13 +2,13 @@ import { config } from '../../../config/index'
 import { AudioPlayer } from '../../audio/player'
 import { conversionEventType, bindContentEvent } from './event'
 
-export default function (activitProto) {
+export default function(activitProto) {
 
   /**
    * 构建事件体系
    * 解析出事件类型
    */
-  activitProto._initEvents = function () {
+  activitProto._initEvents = function() {
     this.eventData.eventName = conversionEventType(this.eventData.eventType);
   }
 
@@ -16,7 +16,7 @@ export default function (activitProto) {
    * 找到事件上下文
    * @return {[type]} [description]
    */
-  activitProto._findContentName = function (chapterIndex, contentId, eventId) {
+  activitProto._findContentName = function(chapterIndex, contentId, eventId) {
     let contentName
     let eventData = this.eventData
 
@@ -40,7 +40,7 @@ export default function (activitProto) {
     }
 
     //canvas事件
-    if(eventId && -1 !== this.canvasRelated.contentIdset.indexOf(eventId)) {
+    if (eventId && -1 !== this.canvasRelated.contentIdset.indexOf(eventId)) {
       parseCanavs()
     } else {
       //dom事件
@@ -54,21 +54,21 @@ export default function (activitProto) {
    * 获取事件上下文
    * @return {[type]} [description]
    */
-  activitProto._parseEventContext = function () {
+  activitProto._parseEventContext = function() {
     //事件上下文对象
     let eventData = this.eventData
     let eventId = eventData.eventContentId
     let eventContext = eventData.eventContext
 
-    if(eventId) {
-      if(!eventContext) {
+    if (eventId) {
+      if (!eventContext) {
         //被重写过的事件
         let contentId = eventData.rewrite ? eventId : this.id
         let contentName = this._findContentName(this.chapterIndex, contentId, eventId)
         eventContext = this.getContextNode(contentName)
         eventData.eventContext = eventContext;
       }
-      if(eventContext) {
+      if (eventContext) {
         //绑定事件加入到content钩子
         this.relatedCallback.contentsHooks(this.chapterIndex, eventId, {
           $contentNode: eventContext,
@@ -92,7 +92,7 @@ export default function (activitProto) {
    * 绑定事件行为
    * @return {[type]} [description]
    */
-  activitProto._bindEvents = function (callback) {
+  activitProto._bindEvents = function(callback) {
     let self = this
     let eventData = this.eventData
     let eventName = eventData.eventName
@@ -102,11 +102,11 @@ export default function (activitProto) {
      * 运行动画
      * @return {[type]} [description]
      */
-    const startRunAnim = function () {
+    const startRunAnim = function() {
       //当前事件对象没有动画的时候才能触发关联动作
       let animOffset
       let boundary = 5 //边界值
-      if(eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
+      if (eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
         let originalLeft = animOffset.left;
         let originalTop = animOffset.top;
         let newOffset = eventContext.offset();
@@ -115,7 +115,7 @@ export default function (activitProto) {
         //在合理的动画范围是允许点击的
         //比如对象只是一个小范围的内的改变
         //正负10px的移动是允许接受的
-        if(originalLeft > (newLeft - boundary) &&
+        if (originalLeft > (newLeft - boundary) &&
           originalLeft < (newLeft + boundary) || originalTop > (newTop - boundary) &&
           originalTop < (newTop + boundary)) {
           self.runAnimation()
@@ -130,16 +130,17 @@ export default function (activitProto) {
      * 音频
      * 反弹
      */
-    const setBehavior = function (feedbackBehavior) {
+    const setBehavior = function(feedbackBehavior) {
       let behaviorSound
-        //音频地址
-      if(behaviorSound = feedbackBehavior.behaviorSound) {
+      //音频地址
+      if (behaviorSound = feedbackBehavior.behaviorSound) {
         //妙妙学客户端强制删除
-        if(window.MMXCONFIG && window.audioHandler) {
+        if (window.MMXCONFIG && window.audioHandler) {
           self._fixAudio.push(new AudioPlayer({
             url: behaviorSound,
             trackId: 9999,
-            complete: function () {
+            audioId: '一次性行点击',
+            complete: function() {
               this.play()
             }
           }))
@@ -147,13 +148,14 @@ export default function (activitProto) {
           //其余平台,如果存在点击过的
           //这里主要是防止重复点击创建
           let audio = self._cacheBehaviorAudio[behaviorSound]
-          if(audio) {
+          if (audio) {
             audio.play()
           } else {
             //相同对象创建一次
             //以后取缓存
             audio = new AudioPlayer({
-              url: behaviorSound
+              url: behaviorSound,
+              audioId: '一次性行点击'
             })
             self._cacheBehaviorAudio[behaviorSound] = audio
           }
@@ -161,11 +163,11 @@ export default function (activitProto) {
       }
 
       //反弹效果
-      if(feedbackBehavior.isButton) {
+      if (feedbackBehavior.isButton) {
         //div通过css实现反弹
-        if(eventData.domMode) {
+        if (eventData.domMode) {
           eventContext.addClass('xut-behavior');
-          setTimeout(function () {
+          setTimeout(function() {
             eventContext.removeClass('xut-behavior');
             startRunAnim();
           }, 500)
@@ -183,16 +185,16 @@ export default function (activitProto) {
      */
     const eventDrop = {
       //保存引用,方便直接销毁
-      init: function (drag) {
+      init: function(drag) {
         eventData.dragDrop = drag;
       },
       //拖拽开始的处理
-      startRun: function () {
+      startRun: function() {
 
       },
       //拖拽结束的处理
-      stopRun: function (isEnter) {
-        if(isEnter) { //为true表示拖拽进入目标对象区域
+      stopRun: function(isEnter) {
+        if (isEnter) { //为true表示拖拽进入目标对象区域
           self.runAnimation();
         }
       }
@@ -203,7 +205,7 @@ export default function (activitProto) {
      * 除去拖动拖住外的所有事件
      * 点击,双击,滑动等等....
      */
-    const eventRun = function () {
+    const eventRun = function() {
 
       /*
       跟踪点击动作
@@ -211,7 +213,7 @@ export default function (activitProto) {
       2. 而且content要有标记
       */
       const contentData = self.relatedData.contentDataset[self.id]
-      if(contentData && contentData.trackCode) {
+      if (contentData && contentData.trackCode) {
         config.sendTrackCode('content', {
           pageId: self.pageId,
           id: self.id,
@@ -222,14 +224,14 @@ export default function (activitProto) {
 
 
       //脚本动画
-      if(eventData.rewrite) {
+      if (eventData.rewrite) {
         self.runAnimation()
         return
       }
       //如果存在反馈动作
       //优先于动画执行
       const feedbackBehavior = eventData.feedbackBehavior[eventData.eventContentId]
-      if(feedbackBehavior) {
+      if (feedbackBehavior) {
         setBehavior(feedbackBehavior)
       } else {
         startRunAnim();
@@ -240,16 +242,16 @@ export default function (activitProto) {
     /**
      * 事件对象引用
      */
-    const eventHandler = function (eventReference, eventHandler) {
+    const eventHandler = function(eventReference, eventHandler) {
       eventData.eventReference = eventReference;
       eventData.eventHandler = eventHandler;
     }
 
     //绑定用户自定义事件
-    if(eventContext && eventName) {
+    if (eventContext && eventName) {
       //如果是翻页委托启动了
       //这里处理swiperight与swipeleft
-      if(config.launch.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
+      if (config.launch.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
         self.relatedCallback.swipeDelegateContents(eventName, (callback) => {
           self.runAnimation(callback)
         })
@@ -264,7 +266,7 @@ export default function (activitProto) {
         dragdropPara = eventData.dragdropPara;
 
         //获取拖拽目标对象
-        if(eventName === 'dragTag') {
+        if (eventName === 'dragTag') {
           domName = this.makePrefix('Content', this.chapterIndex, dragdropPara);
           target = this.getContextNode(domName);
         }

@@ -131,7 +131,7 @@ const builds = {
     webpackConfig.banner =
       '/*!\n' +
       ' * Xut.js v' + version + '\n' +
-      ' * Release date ' + new Date().toLocaleDateString() + '\n' +
+      ' * Release date ' + getNowFormatDate() + '\n' +
       ' * (c) 2010-' + new Date().getFullYear() + '\n' +
       ' * author @by【Aaron】\n' +
       ' * For internal use only\n' +
@@ -140,6 +140,24 @@ const builds = {
     return webpackConfig
   }
 
+}
+
+function getNowFormatDate() {
+  var date = new Date();
+  var seperator1 = "-";
+  var seperator2 = ":";
+  var month = date.getMonth() + 1;
+  var strDate = date.getDate();
+  if (month >= 1 && month <= 9) {
+    month = "0" + month;
+  }
+  if (strDate >= 0 && strDate <= 9) {
+    strDate = "0" + strDate;
+  }
+  var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate +
+    " " + date.getHours() + seperator2 + date.getMinutes() +
+    seperator2 + date.getSeconds();
+  return currentdate;
 }
 
 

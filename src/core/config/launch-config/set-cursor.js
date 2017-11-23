@@ -19,8 +19,6 @@ export default function setCursor(launch, golbal) {
     /*每次配置光标之前都重置，可能被上个给覆盖默认的*/
     resetCursor()
 
-    const type = typeof cursor
-
     //设置关闭
     if (cursor == false) {
       setDisable()

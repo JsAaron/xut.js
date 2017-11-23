@@ -1,7 +1,7 @@
 import { config } from '../../../config/index'
 import { Action } from '../action'
 import { Subtitle } from '../subtitle'
-
+import { $warn } from '../../../util/debug/index'
 
 /**
  * 音频工厂类
@@ -120,10 +120,10 @@ export default class AudioSuper {
    * 如果嵌套了iframe必须要找parent的WeixinJSBridge
    */
   $$getWeixinJSBridgeContext() {
-    if(window.WeixinJSBridge){
+    if (window.WeixinJSBridge) {
       return window.WeixinJSBridge
     }
-    if(window.parent && window.parent.WeixinJSBridge){
+    if (window.parent && window.parent.WeixinJSBridge) {
       return window.parent.WeixinJSBridge
     }
   }
@@ -159,6 +159,12 @@ export default class AudioSuper {
           this.audio && this.audio.play();
         })
       } else {
+
+        $warn({
+          type: 'html5Audio',
+          content: `+播放音频,audio的id:${this.options.audioId}`
+        })
+
         //秒秒学提示play不存在
         this.audio.play && this.audio.play()
       }
@@ -219,6 +225,12 @@ export default class AudioSuper {
       this.acitonObj.destroy();
       this.acitonObj = null;
     }
+
+    $warn({
+      type: 'html5Audio',
+      content: `-销毁音频,audio的id:${this.options.audioId}`
+    })
+
   }
 
 }

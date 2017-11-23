@@ -16,6 +16,7 @@ import Debug from './debug'
 const hasConsole = typeof console !== 'undefined'
 
 let debug
+let count = 0
 
 function $warn(data, content, level, color) {
 
@@ -44,6 +45,8 @@ function $warn(data, content, level, color) {
 
       const stringType = typeof content === 'string'
 
+        ++count
+
       //远程debug输出
       if (config.debug.terminal) {
         if (!debug) {
@@ -51,23 +54,21 @@ function $warn(data, content, level, color) {
         }
 
         function errListener(error) {
-          var msg;
-          msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
+          var msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
           return debug.error(msg.join("<br/>"));
         }
         //监听错误
         window.addEventListener('error', errListener, false);
-        debug.log(`<类型>:${type} <结果>:${content}`)
-
+        debug.log(`${count} 类型:${type} 内容:${content}`)
         return
       }
 
       //console输出
       const command = console[level] || console.log
       if (stringType) {
-        command(`%c<类型>:%c${type} %c<结果>:%c${content}`, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color)
+        command(`%c${count} 类型:%c${type} %c内容:%c${content}`, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color)
       } else {
-        command(`<类型>:${type} <结果>:`, content)
+        command(`${count} 类型:${type} 内容:`, content)
       }
     }
   }
@@ -93,9 +94,13 @@ function $warn(data, content, level, color) {
 
 }
 
+function resetCount() {
+  count = 0
+}
 
 Xut.$warn = $warn
 
 export {
+  resetCount,
   $warn
 }

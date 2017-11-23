@@ -1,5 +1,5 @@
 import syncCache from './sync-cache'
-import parseContentMode from './parse-mode'
+import parseParameter from './parse-parameter'
 import TaskContainer from './container/index'
 import TaskBackground from './background/index'
 import TaskActivitys from './activity/index'
@@ -23,7 +23,7 @@ export default {
     //同步数据
      syncCache(base, function () {
       const pageData = base.baseData()
-      parseContentMode(pageData, base)
+      parseParameter(pageData, base)
       TaskContainer(base, pageData, success)
     })
   },

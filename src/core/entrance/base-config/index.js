@@ -134,7 +134,6 @@ function configInit(novelData, tempSettingData) {
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
 function configColumn(callback) {
-  $warn(123)
   initColumn(haColumnCounts => {
     if (haColumnCounts) {
       resetDelegate()

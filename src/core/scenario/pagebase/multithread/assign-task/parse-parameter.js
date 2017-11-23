@@ -11,12 +11,14 @@
  * 如果是canvas模式的时候，同时也是能够存在dom模式是
  * @return {[type]} [description]
  */
-export default function parseContentMode(pageData, base) {
+export default function parseChapterParameter(pageData, base) {
   let parameter = pageData.parameter
   if (parameter) {
     try {
       parameter = JSON.parse(parameter)
       if (parameter) {
+
+        //parameter
         if (parameter.contentMode && parameter.contentMode == 1) {
           //非强制dom模式
           if (!config.debug.onlyDomMode) {
@@ -24,7 +26,8 @@ export default function parseContentMode(pageData, base) {
             base.canvasRelated.enable = true;
           }
         }
-        //如果是最后一页处理
+
+        //lastPage如果是最后一页处理
         if (parameter.lastPage && base.pageType === 'page') {
           //运行应用运行时间
           base.runLastPageAction = function () {
@@ -44,6 +47,13 @@ export default function parseContentMode(pageData, base) {
           }
 
         }
+
+        //页面属性
+        //2017.11.23
+        if(parameter.pageAttr){
+          base.pageAttr = parameter.pageAttr
+        }
+
       }
     } catch (e) {
       console.log('JSON错误,chpterId为', base.chapterId, parameter)

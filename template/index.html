@@ -26,33 +26,15 @@
 
 </html>
 <script type="text/javascript">
-//打开调试模式
-var x = document.createElement('div');
-Object.defineProperty(x, 'id', {
-  get: function() {
-    // 在这里放入你的代码
-    // console.log('Console is opened');
-  }
-});
-
-// console.log(x);
-
-
-
-
 Xut.Application.setConfig = {
   lauchMode: 1,
   preload: false,
-  visualMode: 3,
+  visualMode: 1,
+  cursor:true,
   // platform: 'mini',
   historyMode: true,
   launchAnim: false,
   // convert: 'svg',
-
-  debug: {
-    terminal: true,
-    silent: ['all']
-  },
 
 
   // brMode: 1, //图片模式
@@ -60,7 +42,12 @@ Xut.Application.setConfig = {
   //     1080: 'mi',
   //     1440: 'hi'
   // },
-  // cursor: true,
+
+  // debug:{
+  //   terminal:true,
+  //   silent:'all'
+  // },
+
 
   // debug: {
   //   locationPage: {
@@ -77,6 +64,7 @@ Xut.Application.setConfig = {
   // columnCheck:false, //分栏检测
   // doublePageMode: false //双页模式
   // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
+  // trackCode:['flip'],
   pageBar: {
     type: ['scrollbar', 'digital']
     // direction:''
@@ -91,8 +79,8 @@ Xut.Application.setConfig = {
   // visualHeight: DEFAULT,
   // visualTop: 0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
   // cursor: {  //定义忙碌光标
-  //     url: 'images/icons/b8b7f5dabc0365c3c934b6b068725710.gif',
-  //     delayTime: 2000
+  //     url: 'images/icons/busyicon.gif',
+  //     delayTime: 300
   // },
   // salePicture: true, //默认图片支持缩放
   // salePictureMultiples: 2, //缩放倍数
@@ -112,11 +100,11 @@ Xut.Application.Watch('appDestory', function() {
 })
 
 Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type, options)
+  console.log(type,options)
 })
 
 
-var appId = 13 //306 126
+var appId = 13 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

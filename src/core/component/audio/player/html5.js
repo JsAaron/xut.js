@@ -1,5 +1,6 @@
 import AudioSuper from './super'
 import { hasFixAudio, getAudioContext } from '../fix'
+import { $warn } from '../../../util/debug/index'
 
 /**
  * 使用html5的audio播放
@@ -62,6 +63,10 @@ export class HTML5Audio extends AudioSuper {
     2 必须手动播放，自动播放跳过，否则有杂音*/
     if (Xut.plat.isIOS && this.options.isTrigger) {
       this.audio.play && this.audio.play()
+      $warn({
+        type: 'html5Audio',
+        content: `ios手动点击播放的修复,主动调用一次播放,audio的id:${this.options.audioId}`
+      })
     }
     /**由于修复的问题，先调用了play，改src, 会提示中断报错，所以这延时修改src*/
     setTimeout(() => {
@@ -184,6 +189,11 @@ export class HTML5Audio extends AudioSuper {
     //所以自动播放被阻止了
     //需要修复
     if (this._needFix) {
+
+      $warn({
+        type: 'html5Audio',
+        content: `修复未自动播放对象,audio的id:${this.options.audioId}`
+      })
       this._createContext()
     }
   }

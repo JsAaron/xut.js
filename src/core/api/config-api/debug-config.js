@@ -17,7 +17,7 @@ export default {
    * silent 启动是所有的调试内容
    * 也可以单独启用每一项的调试内容
    * ['all','api','preload','column','visual','scale',
-   *   'config','pagebase','swiper','event','util','database','logic']
+   *   'config','pagebase','swiper','event','util','database','logic',html5Audio]
    * api 级别
    * preload 预加载处理
    * column 根流式布局相关的
