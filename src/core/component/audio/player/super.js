@@ -120,6 +120,14 @@ export default class AudioSuper {
    * 如果嵌套了iframe必须要找parent的WeixinJSBridge
    */
   $$getWeixinJSBridgeContext() {
+    //必须是微信平台
+    //2017.11.24
+    //秒秒学在线打开
+    //本地化资源后报错这个，强制判断必须是微信
+    if (!Xut.plat.isWeiXin) {
+      return
+    }
+
     if (window.WeixinJSBridge) {
       return window.WeixinJSBridge
     }

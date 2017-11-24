@@ -1,5 +1,5 @@
 import { config } from '../../config/index'
-import { getSize } from '../v-screen'
+import { getSize } from '../view-config/screen'
 
 /**
  * 重设视图显示模式

@@ -9,7 +9,7 @@
 import { config } from '../../config/index'
 import PageMgr from '../manage/page'
 import MasterMgr from '../manage/master'
-import goToPage from './jump-page'
+import goToPage from './goto'
 import Stack from '../../observer/stack'
 
 import { sceneController } from '../control'
@@ -27,7 +27,7 @@ import {
   converChapterData,
   converChapterIndex,
   hasMaster
-} from './depend'
+} from './public'
 
 
 /*

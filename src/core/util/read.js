@@ -27,7 +27,7 @@ function randomUrl(url) {
 
 
 /**
- *  读取SVG内容
+ *  读取文件内容
  *  @return {[type]} [string]
  */
 export function readFileContent(path, callback, type) {
@@ -40,7 +40,7 @@ export function readFileContent(path, callback, type) {
   /**
    * js脚本加载
    */
-  const loadJs = (fileUrl, fileName) => {
+  function loadJs(fileUrl, fileName) {
     loadFile(randomUrl(fileUrl), function() {
       data = window.HTMLCONFIG[fileName];
       if (data) {
@@ -69,10 +69,11 @@ export function readFileContent(path, callback, type) {
   }
 
   /**
-   * 如果配置了convert === 'svg'
+   * 如果启动了跨域处理
+   * crossDomain = true
    * 那么所有的svg文件就强制转化成js读取
    */
-  if (config.launch.convert === 'svg') {
+  if (config.launch.crossDomain || config.launch.convert === 'svg') {
     path = path.replace('.svg', '.js')
     name = path.replace(".js", '')
     svgUrl = config.getSvgPath() + path

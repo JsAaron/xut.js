@@ -6,9 +6,9 @@ import nativeConfig from './path-config/native'
 import iframeConfig from './path-config/iframe'
 import { getWidgetPath, getSourcePath } from './path-config/browser'
 
-import { getVisualSize } from './v-visual'
-import { getSize, getLayerMode } from './v-screen'
-import { getFullProportion, getRealProportion } from './v-proportion'
+import { getVisualSize } from './view-config/visual'
+import { getSize, getLayerMode } from './view-config/screen'
+import { getFullProportion, getRealProportion } from './view-config/proportion'
 
 /*
 导入

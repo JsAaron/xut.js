@@ -1,5 +1,13 @@
 ////////////////////////
 ///   内部调试配置
+///
+///   Xut.Application.setConfig ={
+///       debug:{
+///          terminal:true,
+///          silent:'all'
+//        }
+///   }
+///
 ////////////////////////
 
 const DEFAULT = undefined

@@ -42615,12 +42615,12 @@ var improtGolbalConfig = {
   preload: DEFAULT, //可以填数量，预加载的数量限制
 
   /*
+  跨域处理资源
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问
   比如，mini客户端
   所以svg的资源会强制转化成js
-  这里要填写'svg'
    */
-  convert: DEFAULT, //默认不处理svg转化  参数 'svg'
+  crossDomain: DEFAULT, //默认不处理svg转化  参数 'svg'
 
   /**
    * 是否关闭启动动画，默认是true启动，false为关闭
@@ -42860,6 +42860,14 @@ var improtGolbalConfig = {
 
 ////////////////////////
 ///   内部调试配置
+///
+///   Xut.Application.setConfig ={
+///       debug:{
+///          terminal:true,
+///          silent:'all'
+//        }
+///   }
+///
 ////////////////////////
 
 var DEFAULT$1 = undefined;
@@ -43556,8 +43564,10 @@ function enterReplace(str) {
  */
 function makeJsonPack(code) {
   try {
-    var post = "(function(){" + enterReplace(code) + "})";
-    return new Function("return " + post)();
+    return '(function(){' + enterReplace(code) + '}())';
+
+    // let post = "(function(){" + enterReplace(code) + "})"
+    // return (new Function("return " + post))();
   } catch (error) {
     $warn({
       type: 'util',
@@ -44855,7 +44865,7 @@ function randomUrl(url) {
 }
 
 /**
- *  读取SVG内容
+ *  读取文件内容
  *  @return {[type]} [string]
  */
 function readFileContent(path, callback, type) {
@@ -44868,7 +44878,7 @@ function readFileContent(path, callback, type) {
   /**
    * js脚本加载
    */
-  var loadJs = function loadJs(fileUrl, fileName) {
+  function loadJs(fileUrl, fileName) {
     loadFile(randomUrl(fileUrl), function () {
       data = window.HTMLCONFIG[fileName];
       if (data) {
@@ -44882,7 +44892,7 @@ function readFileContent(path, callback, type) {
         callback('');
       }
     });
-  };
+  }
 
   //con str
   //externalFile使用
@@ -44896,10 +44906,11 @@ function readFileContent(path, callback, type) {
   }
 
   /**
-   * 如果配置了convert === 'svg'
+   * 如果启动了跨域处理
+   * crossDomain = true
    * 那么所有的svg文件就强制转化成js读取
    */
-  if (config.launch.convert === 'svg') {
+  if (config.launch.crossDomain || config.launch.convert === 'svg') {
     path = path.replace('.svg', '.js');
     name = path.replace(".js", '');
     svgUrl = config.getSvgPath() + path;
@@ -44976,6 +44987,72 @@ function readFileContent(path, callback, type) {
   }, function (err) {
     callback('');
   });
+}
+
+/**
+ * 利用canvas绘制出蒙板效果替换，需要蒙板效果的图片先用一个canvas占位，绘制是异步的
+ */
+
+function _getCanvas(className) {
+  var children = document.getElementsByTagName('canvas'),
+      elements = new Array(),
+      i = 0,
+      child,
+      classNames,
+      j = 0;
+  for (i = 0; i < children.length; i++) {
+    child = children[i];
+    classNames = child.className.split(' ');
+    for (var j = 0; j < classNames.length; j++) {
+      if (classNames[j] == className) {
+        elements.push(child);
+        break;
+      }
+    }
+  }
+  return elements;
+}
+
+function _addEdge(canvas) {
+
+  var img = new Image(),
+      maskimg = new Image();
+
+  var classNames = canvas.className.split(' ');
+  var context = canvas.getContext("2d");
+  img.addEventListener("load", loadimg);
+  maskimg.addEventListener("load", loadmask);
+
+  function loadimg() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.globalCompositeOperation = "source-over";
+    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    maskimg.src = canvas.getAttribute("mask");
+    img.removeEventListener("load", loadimg);
+    img.src = null;
+    img = null;
+  }
+
+  function loadmask() {
+    context.globalCompositeOperation = "destination-atop";
+    context.drawImage(maskimg, 0, 0, canvas.width, canvas.height);
+    canvas.style.opacity = 1;
+    maskimg.removeEventListener("load", loadmask);
+    maskimg.src = null;
+    maskimg = null;
+    context = null;
+    classNames = null;
+    canvas.className = canvas.className.replace("edges", "");
+  }
+  img.src = canvas.getAttribute("src");
+}
+
+function addEdges() {
+  var thecanvas = _getCanvas('edges'),
+      i;
+  for (i = 0; i < thecanvas.length; i++) {
+    _addEdge(thecanvas[i]);
+  }
 }
 
 //替换url
@@ -49626,6 +49703,14 @@ var AudioSuper = function () {
   }, {
     key: '$$getWeixinJSBridgeContext',
     value: function $$getWeixinJSBridgeContext() {
+      //必须是微信平台
+      //2017.11.24
+      //秒秒学在线打开
+      //本地化资源后报错这个，强制判断必须是微信
+      if (!Xut.plat.isWeiXin) {
+        return;
+      }
+
       if (window.WeixinJSBridge) {
         return window.WeixinJSBridge;
       }
@@ -58911,19 +58996,25 @@ var Powepoint = function () {
         onComplete: function onComplete(postCode, codeDelay) {
           self.isCompleted = true;
           //延迟执行postCode代码
+          // var a = '(function(){Xut.Assist.ForumOpen()})();'
           if (postCode) {
-            try {
-              //简单判断是函数可执行
-              if (_.isFunction(postCode)) {
-                if (codeDelay > 0) {
-                  setTimeout(postCode, codeDelay);
-                } else {
-                  postCode();
-                }
-              }
-            } catch (error) {
-              console.log("Run postCode is error in completeHandler:" + error);
-            }
+            console.log('Xut.Assist.ForumOpen()');
+            Xut.Assist.ForumOpen();
+            // try {
+            //   console.log('Xut.Assist.ForumOpen()')
+            //   Xut.Assist.ForumOpen()
+            //   // eval(postCode)
+            //   //简单判断是函数可执行
+            //   // if (_.isFunction(postCode)) {
+            //   //   if (codeDelay > 0) {
+            //   //     setTimeout(postCode, codeDelay)
+            //   //   } else {
+            //   //     postCode()
+            //   //   }
+            //   // }
+            // } catch (error) {
+            //   console.log("Run postCode is error in completeHandler:" + error)
+            // }
           }
           completeAction();
         }
@@ -72782,72 +72873,6 @@ moveParallax(baseProto);
 destroy$1(baseProto);
 
 /**
- * 利用canvas绘制出蒙板效果替换，需要蒙板效果的图片先用一个canvas占位，绘制是异步的
- */
-
-function _getCanvas(className) {
-  var children = document.getElementsByTagName('canvas'),
-      elements = new Array(),
-      i = 0,
-      child,
-      classNames,
-      j = 0;
-  for (i = 0; i < children.length; i++) {
-    child = children[i];
-    classNames = child.className.split(' ');
-    for (var j = 0; j < classNames.length; j++) {
-      if (classNames[j] == className) {
-        elements.push(child);
-        break;
-      }
-    }
-  }
-  return elements;
-}
-
-function _addEdge(canvas) {
-
-  var img = new Image(),
-      maskimg = new Image();
-
-  var classNames = canvas.className.split(' ');
-  var context = canvas.getContext("2d");
-  img.addEventListener("load", loadimg);
-  maskimg.addEventListener("load", loadmask);
-
-  function loadimg() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.globalCompositeOperation = "source-over";
-    context.drawImage(img, 0, 0, canvas.width, canvas.height);
-    maskimg.src = canvas.getAttribute("mask");
-    img.removeEventListener("load", loadimg);
-    img.src = null;
-    img = null;
-  }
-
-  function loadmask() {
-    context.globalCompositeOperation = "destination-atop";
-    context.drawImage(maskimg, 0, 0, canvas.width, canvas.height);
-    canvas.style.opacity = 1;
-    maskimg.removeEventListener("load", loadmask);
-    maskimg.src = null;
-    maskimg = null;
-    context = null;
-    classNames = null;
-    canvas.className = canvas.className.replace("edges", "");
-  }
-  img.src = canvas.getAttribute("src");
-}
-
-function addEdges() {
-  var thecanvas = _getCanvas('edges'),
-      i;
-  for (i = 0; i < thecanvas.length; i++) {
-    _addEdge(thecanvas[i]);
-  }
-}
-
-/**
  * 判断是否能整除2
  * @param  {[type]} num [description]
  * @return {[type]}     [description]
@@ -76239,11 +76264,20 @@ function extendAssist(access, $$globalSwiper) {
    */
   function getGolbalForumFn(contextName) {
     //如果有iframe的情况，优先查找最顶层
-    if (top && top[contextName]) {
-      return top[contextName];
+    if (window.parent && window.parent[contextName]) {
+      return window.parent[contextName];
     }
     //否则查找当前
     return window[contextName];
+  }
+
+  function setGolbalForumOpen() {
+    //如果有iframe的情况，优先查找最顶层
+    if (window && window.parent && window.parent.GolbalForumOpen) {
+      return window.parent.GolbalForumOpen;
+    }
+    //否则查找当前
+    return window && window.GolbalForumOpen;
   }
 
   /**
@@ -76251,7 +76285,7 @@ function extendAssist(access, $$globalSwiper) {
    * 打开讨论区
    */
   Xut.Assist.ForumOpen = function () {
-    return setForum(getGolbalForumFn('GolbalForumOpen'), true);
+    return setForum(setGolbalForumOpen(), true);
   };
 
   /**
@@ -81945,7 +81979,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891.5;
+Xut.Version = 891.7;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

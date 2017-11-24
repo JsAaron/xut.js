@@ -6,16 +6,15 @@
 import { ManageSuper } from './super'
 import { Pagebase } from '../pagebase/index'
 import { removeVideo } from '../../component/video/api'
-import { execScript, $on, $off } from '../../util/index'
+import { execScript, $on, $off, addEdges } from '../../util/index'
 import { config } from '../../config/index'
-import { addEdges } from '../../util/edge'
 import {
   $suspend,
   $original,
   $autoRun
 } from '../command/index'
 
-import { getRealPage } from '../scheduler/depend'
+import { getRealPage } from '../scheduler/public'
 
 
 /**
@@ -43,7 +42,7 @@ export default class PageMgr extends ManageSuper {
     */
     if (config.launch.doublePageMode) {
       $on(rootNode, {
-        transitionend: function () {
+        transitionend: function() {
           Xut.View.SetSwiperFilpComplete()
         }
       })
@@ -115,7 +114,7 @@ export default class PageMgr extends ManageSuper {
         this.$$getPageBase(frontIndex),
         this.$$getPageBase(middleIndex),
         this.$$getPageBase(backIndex)
-      ], function (pageObj, index) {
+      ], function(pageObj, index) {
         const dist = moveDistance[index]
         if (pageObj && dist !== undefined) {
           pageObj.movePage(action, dist, speed, moveDistance[3], outerCallFlip)
@@ -217,16 +216,16 @@ export default class PageMgr extends ManageSuper {
 
 
     /*激活自动运行对象*/
-    const activateAutoRun = function (pageObj, data) {
+    const activateAutoRun = function(pageObj, data) {
 
       //结束通知
-      const _complete = function () {
+      const _complete = function() {
         data.processComplete()
         preCreateTask()
       }
 
       //运行动作
-      const _startRun = function () {
+      const _startRun = function() {
         $autoRun(pageObj, middleIndex, _complete);
       }
 
@@ -245,7 +244,7 @@ export default class PageMgr extends ManageSuper {
     }
 
     /*检测页面是否已经完全创建完毕，并且返回页面对象*/
-    this._checkTaskCompleted(middleIndex, function (activatePageObj) {
+    this._checkTaskCompleted(middleIndex, function(activatePageObj) {
 
       /*跟踪，每个页面的停留时间，开始*/
       if (config.hasTrackCode('flip')) {
@@ -326,13 +325,13 @@ export default class PageMgr extends ManageSuper {
     /*设置中断任务
     1.如果没有参数返回
     2.保证数组格式遍历*/
-    const suspendTask = function (pageIndex) {
+    const suspendTask = function(pageIndex) {
       if (pageIndex !== undefined) {
         if (!pageIndex.length) {
           pageIndex = [pageIndex]
         }
         let pageObj;
-        pageIndex.forEach(function (pointer) {
+        pageIndex.forEach(function(pointer) {
           if (pageObj = self.$$getPageBase(pointer)) {
             pageObj.setTaskSuspend();
           }
@@ -349,7 +348,7 @@ export default class PageMgr extends ManageSuper {
   _checkTaskCompleted(currIndex, callback) {
     const currPageObj = this.$$getPageBase(currIndex)
     if (currPageObj) {
-      currPageObj.checkThreadTaskComplete(function () {
+      currPageObj.checkThreadTaskComplete(function() {
         // console.log('11111111111当前页面创建完毕',currIndex+1)
         callback(currPageObj)
       })
@@ -368,7 +367,7 @@ export default class PageMgr extends ManageSuper {
     resumeCount = resumePointer.length;
     while (resumeCount--) {
       if (resumeObj = this.$$getPageBase(resumePointer[resumeCount])) {
-        resumeObj.createPreforkTask(function () {
+        resumeObj.createPreforkTask(function() {
           // console.log('后台处理完毕')
         }, preCreateTask)
       }

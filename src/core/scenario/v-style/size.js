@@ -1,5 +1,5 @@
 import { config, resetVisualLayout } from '../../config/index'
-import { converDoublePage } from '../scheduler/depend'
+import { converDoublePage } from '../scheduler/public'
 
 /**
  * 创建li的translate起始坐标信息

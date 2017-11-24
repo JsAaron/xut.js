@@ -98,12 +98,12 @@ export default {
   preload: DEFAULT, //可以填数量，预加载的数量限制
 
   /*
+  跨域处理资源
   资源转化处理，默认资源可能是svg，在跨域的情况下没办法访问
   比如，mini客户端
   所以svg的资源会强制转化成js
-  这里要填写'svg'
    */
-  convert: DEFAULT, //默认不处理svg转化  参数 'svg'
+  crossDomain: DEFAULT, //默认不处理svg转化  参数 'svg'
 
   /**
    * 是否关闭启动动画，默认是true启动，false为关闭
