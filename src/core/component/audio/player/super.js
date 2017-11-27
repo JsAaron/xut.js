@@ -164,17 +164,32 @@ export default class AudioSuper {
       const weixinJSBridge = this.$$getWeixinJSBridgeContext()
       if (weixinJSBridge) {
         weixinJSBridge.invoke('getNetworkType', {}, (e) => {
-          this.audio && this.audio.play();
+          if (this.audio) {
+            $warn({
+              type: 'weixinJSBridgeAudio',
+              content: `+播放音频,audio的id:${this.options.audioId}`
+            })
+            this.audio.play();
+          }
         })
       } else {
-
-        $warn({
-          type: 'html5Audio',
-          content: `+播放音频,audio的id:${this.options.audioId}`
-        })
-
         //秒秒学提示play不存在
-        this.audio.play && this.audio.play()
+        if (this.audio.play) {
+          $warn({
+            type: 'html5Audio',
+            content: `+播放音频,audio的id:${this.options.audioId}`
+          })
+
+          /**
+           * safari 自动播放
+           * 手机浏览器需要加
+           * 2016.8.26
+           * @type {Boolean}
+           */
+          this.audio.autoplay = true
+
+          this.audio.play()
+        }
       }
     }
     this.acitonObj && this.acitonObj.play();

@@ -459,6 +459,13 @@ export default class Scheduler {
 
     let { frontIndex, middleIndex, backIndex, stopIndex } = options
 
+
+    $warn({
+      type: 'logic',
+      content: `----翻页暂停页面:${stopIndex}----`
+    })
+
+
     /*暂停*/
     const suspendAction = (front, middle, back, stop) => {
 
@@ -601,6 +608,11 @@ export default class Scheduler {
       }
     }
 
+    $warn({
+      type: 'logic',
+      content: `++++自动播放页面:${middleIndex}++++`
+    })
+
     //页面自动运行
     this.pageMgr.autoRun(data);
 
@@ -651,6 +663,7 @@ export default class Scheduler {
     if (config.launch && config.launch.historyMode && !options.hasMultiScene) {
       $setStorage("pageIndex", middleIndex);
     }
+
 
     /**
      * 解锁翻页

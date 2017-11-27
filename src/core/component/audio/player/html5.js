@@ -5,6 +5,11 @@ import { $warn } from '../../../util/debug/index'
 /**
  * 使用html5的audio播放
  *
+ *
+ * html audio 在iPhone，ipd,safari浏览器不能播放是有原因滴
+(在safri on ios里面明确指出等待用户的交互动作后才能播放media，也就是说如果你没有得到用户的action就播放的话就会被safri拦截)
+
+ *
  * 1.移动端自动播放，需要调用2次play，但是通过getAudioContext的方法获取的上下文，每个context被自动play一次
  * 2.如果需要修复自动播放的情况下
  *   A. 音频的执行比hasFixAudio的处理快，那么需要resetContext正在播放的音频上下文
@@ -38,7 +43,7 @@ export class HTML5Audio extends AudioSuper {
 
       //通过微信自己的事件处理，支持自动播放了
       if (this.$$getWeixinJSBridgeContext()) {
-        this._startPlay()
+        this.play()
       } else {
         this._bindPlay()
       }
@@ -91,6 +96,16 @@ export class HTML5Audio extends AudioSuper {
 
   /**
    * 监听音频播放
+     可以自动播放时正确的事件顺序是
+  // loadstart
+  // loadedmetadata
+  // loadeddata
+  // canplay
+  // play
+  // playing
+  // 不能自动播放时触发的事件是
+  // iPhone5  iOS 7.0.6 loadstart
+  // iPhone6s iOS 9.1   loadstart -> loadedmetadata -> loadeddata -> canplay
    */
   _bindPlay() {
 
@@ -111,7 +126,7 @@ export class HTML5Audio extends AudioSuper {
         this._clearTimer();
         /*必须保证状态正确，因为有翻页太快，状态被修改*/
         if (this.status === 'ready') {
-          this._startPlay()
+          this.play()
         }
       }, 150)
     }
@@ -123,20 +138,6 @@ export class HTML5Audio extends AudioSuper {
     this.audio.addEventListener('loadedmetadata', this._startBack, false)
     this.audio.addEventListener('ended', this._endBack, false)
     this.audio.addEventListener('error', this._errorBack, false)
-  }
-
-  /**
-   * 开始播放音频
-   */
-  _startPlay() {
-    /**
-     * safari 自动播放
-     * 手机浏览器需要加
-     * 2016.8.26
-     * @type {Boolean}
-     */
-    this.audio.autoplay = 'autoplay'
-    this.play()
   }
 
   /**

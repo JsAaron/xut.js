@@ -43564,10 +43564,8 @@ function enterReplace(str) {
  */
 function makeJsonPack(code) {
   try {
-    return '(function(){' + enterReplace(code) + '}())';
-
-    // let post = "(function(){" + enterReplace(code) + "})"
-    // return (new Function("return " + post))();
+    var post = "(function(){" + enterReplace(code) + "})";
+    return new Function("return " + post)();
   } catch (error) {
     $warn({
       type: 'util',
@@ -46792,6 +46790,7 @@ function audioParse(url, callback) {
   audio.autobuffer = true;
   audio.autoplay = true;
   audio.muted = true; //ios 10以上静音后可以自动播放
+  audio.volume = 0.0; //静音 ios 9 不静音的问题
 
   var loopTimer = null; //循环检测时间
 
@@ -58996,25 +58995,19 @@ var Powepoint = function () {
         onComplete: function onComplete(postCode, codeDelay) {
           self.isCompleted = true;
           //延迟执行postCode代码
-          // var a = '(function(){Xut.Assist.ForumOpen()})();'
           if (postCode) {
-            console.log('Xut.Assist.ForumOpen()');
-            Xut.Assist.ForumOpen();
-            // try {
-            //   console.log('Xut.Assist.ForumOpen()')
-            //   Xut.Assist.ForumOpen()
-            //   // eval(postCode)
-            //   //简单判断是函数可执行
-            //   // if (_.isFunction(postCode)) {
-            //   //   if (codeDelay > 0) {
-            //   //     setTimeout(postCode, codeDelay)
-            //   //   } else {
-            //   //     postCode()
-            //   //   }
-            //   // }
-            // } catch (error) {
-            //   console.log("Run postCode is error in completeHandler:" + error)
-            // }
+            try {
+              //简单判断是函数可执行
+              if (_.isFunction(postCode)) {
+                if (codeDelay > 0) {
+                  setTimeout(postCode, codeDelay);
+                } else {
+                  postCode();
+                }
+              }
+            } catch (error) {
+              console.log("Run postCode is error in completeHandler:" + error);
+            }
           }
           completeAction();
         }
@@ -76264,20 +76257,11 @@ function extendAssist(access, $$globalSwiper) {
    */
   function getGolbalForumFn(contextName) {
     //如果有iframe的情况，优先查找最顶层
-    if (window.parent && window.parent[contextName]) {
-      return window.parent[contextName];
+    if (top && top[contextName]) {
+      return top[contextName];
     }
     //否则查找当前
     return window[contextName];
-  }
-
-  function setGolbalForumOpen() {
-    //如果有iframe的情况，优先查找最顶层
-    if (window && window.parent && window.parent.GolbalForumOpen) {
-      return window.parent.GolbalForumOpen;
-    }
-    //否则查找当前
-    return window && window.GolbalForumOpen;
   }
 
   /**
@@ -76285,7 +76269,7 @@ function extendAssist(access, $$globalSwiper) {
    * 打开讨论区
    */
   Xut.Assist.ForumOpen = function () {
-    return setForum(setGolbalForumOpen(), true);
+    return setForum(getGolbalForumFn('GolbalForumOpen'), true);
   };
 
   /**
@@ -81979,7 +81963,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891.7;
+Xut.Version = 891.8;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

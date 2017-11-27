@@ -15,6 +15,7 @@
 </head>
 
 <body>
+  <audio id="myAudio">12111113</audio>
   <div id="testButton">
     <button id="launchMini">进入</button>
     <button id="closeMini">退出</button>
@@ -26,106 +27,124 @@
 
 </html>
 <script type="text/javascript">
-Xut.Application.setConfig = {
-  // crossDomain:true,
-  lauchMode: 1,
-  preload: false,
-  visualMode: 1,
-  cursor:true,
-  // platform: 'mini',
-  historyMode: true,
-  launchAnim: false,
-  // convert: 'svg',
+
+    var myAudio = document.getElementById('myAudio');
+        myAudio.src = './content/106/mf343cc60c74e3e2440788203209f4d05.mp3';
+        myAudio.play();
+        myAudio.loop = true;
+        myAudio.preload = true;
 
 
-  // brMode: 1, //图片模式
-  // imageSuffix: { //定义基础图片取值
-  //     1080: 'mi',
-  //     1440: 'hi'
-  // },
-
-  // debug:{
-  //   terminal:true,
-  //   silent:'all'
-  // },
+// // window.parent.postMessage({
+// //   type:'forumOpen',
+// //   data:{
+// //     page:1,
+// //     id:xxx,
+// //     xx:xxxx,
+// //   }
+// // }, 'http://www.miaomiaoxue.com');
 
 
-  // debug: {
-  //   locationPage: {
-  //     seasonId:1,
-  //     pageIndex: 18
-  //   }
-  // },
-  // columnCheck:true,
-  // scrollMode: 'v',
-  // gestureSwipe:true,
-  // launchAnim:false,是否关闭启动动画
-  // convert: 'svg', //转化资源svg转化成js
-  // visualMode:1,2,3,4 页面模式
-  // columnCheck:false, //分栏检测
-  // doublePageMode: false //双页模式
-  // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
-  // trackCode:['flip'],
-  pageBar: {
-    type: ['scrollbar', 'digital']
-    // direction:''
-    // mode: 1,
-    // position: {
-    //     top: '90%',
-    //     left: '20%'
-    // }
-  },
-  // quickFlip:true,//是否支持快速翻页
-  // supportQR: true, //是否启动二维码
-  // visualHeight: DEFAULT,
-  // visualTop: 0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
-  // cursor: {  //定义忙碌光标
-  //     url: 'images/icons/busyicon.gif',
-  //     delayTime: 300
-  // },
-  // salePicture: true, //默认图片支持缩放
-  // salePictureMultiples: 2, //缩放倍数
-  // salePageType:'page', //页面缩放
-  // historyMode: true, //历史记录模式
-  // swipeDelegate: true, //滑动事件猥琐
-  // useHDImageZoom: true, //是否启动图片要高清图
-  // convert: 'svg', //转化资源svg转化成js
-};
-
-Xut.Application.Watch('initComplete', function() {
-  // console.log('initComplete')
-})
-
-Xut.Application.Watch('appDestory', function() {
-  console.log('appDestory')
-})
-
-Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type,options)
-})
+// Xut.Application.setConfig = {
+//   // crossDomain:true,
+//   lauchMode: 1,
+//   // preload: true,
+//   visualMode: 1,
+//   cursor: true,
+//   // platform: 'mini',
+//   historyMode: true,
+//   launchAnim: false,
+//   // convert: 'svg',
 
 
-var appId = 130 //306
-function play() {
-  Xut.Application.Launch({
-    // trackCode: ['swipe'], //代码跟踪
-    el: '#xxtppt-app-container', //根节点
-    path: {
-      resource: 'content/' + appId,
-      database: 'content/' + appId + '/SQLResult.js'
-    }
-  });
-}
-play()
-$("#launchMini").click(play)
-$("#home").click(function() {
-  Xut.Application.Original()
-})
-$("#activate").click(function() {
-  Xut.Application.Activate()
-})
-$("#closeMini").click(function() {
-  Xut.Application.Exit()
-})
+//   // brMode: 1, //图片模式
+//   // imageSuffix: { //定义基础图片取值
+//   //     1080: 'mi',
+//   //     1440: 'hi'
+//   // },
+
+//   debug:{
+//     terminal:true,
+//     silent:['all']
+//   },
+
+
+//   // debug: {
+//   //   locationPage: {
+//   //     seasonId:1,
+//   //     pageIndex: 18
+//   //   }
+//   // },
+//   // columnCheck:true,
+//   // scrollMode: 'v',
+//   // gestureSwipe:true,
+//   // launchAnim:false,是否关闭启动动画
+//   // convert: 'svg', //转化资源svg转化成js
+//   // visualMode:1,2,3,4 页面模式
+//   // columnCheck:false, //分栏检测
+//   // doublePageMode: false //双页模式
+//   // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
+//   // trackCode:['flip'],
+//   pageBar: {
+//     type: ['scrollbar', 'digital']
+//     // direction:''
+//     // mode: 1,
+//     // position: {
+//     //     top: '90%',
+//     //     left: '20%'
+//     // }
+//   },
+//   // quickFlip:true,//是否支持快速翻页
+//   // supportQR: true, //是否启动二维码
+//   // visualHeight: DEFAULT,
+//   // visualTop: 0, //根据高度内部算出的top提供给缩放图片的全屏放大使用
+//   // cursor: {  //定义忙碌光标
+//   //     url: 'images/icons/busyicon.gif',
+//   //     delayTime: 300
+//   // },
+//   // salePicture: true, //默认图片支持缩放
+//   // salePictureMultiples: 2, //缩放倍数
+//   // salePageType:'page', //页面缩放
+//   // historyMode: true, //历史记录模式
+//   // swipeDelegate: true, //滑动事件猥琐
+//   // useHDImageZoom: true, //是否启动图片要高清图
+//   // convert: 'svg', //转化资源svg转化成js
+// };
+
+// Xut.Application.Watch('initComplete', function() {
+//   // console.log('initComplete')
+// })
+
+// Xut.Application.Watch('appDestory', function() {
+//   console.log('appDestory')
+// })
+
+// Xut.Application.Watch('trackCode', function(type, options) {
+//   console.log(type, options)
+// })
+
+
+// var appId = 132 //306
+// function play() {
+//   Xut.Application.Launch({
+//     // trackCode: ['swipe'], //代码跟踪
+//     el: '#xxtppt-app-container', //根节点
+//     path: {
+//       resource: 'content/' + appId,
+//       database: 'content/' + appId + '/SQLResult.js'
+//     }
+//   });
+// }
+// play()
+// $("#launchMini").click(play)
+// $("#home").click(function() {
+//   Xut.Application.Original()
+// })
+// $("#activate").click(function() {
+//   Xut.Application.Activate()
+// })
+// $("#closeMini").click(function() {
+//   Xut.Application.Exit()
+// })
 
 </script>

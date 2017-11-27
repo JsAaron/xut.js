@@ -14,7 +14,7 @@ killOccupied(prot, () => {
     port: prot,
     server: {
       baseDir: './test/' + baseDir,
-      index: "index.html"
+      index: "index4.html"
     },
     open: true
   })

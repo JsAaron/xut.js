@@ -99,6 +99,12 @@
      */
     hasPlugin: false,
 
+    /**
+     * ios版本号
+     * @type {[type]}
+     */
+    iosVersion: iosMainVersion,
+
     /*
     ios的版本>=10 支持视频行内播放
      */
