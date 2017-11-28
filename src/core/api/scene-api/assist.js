@@ -23,17 +23,18 @@ export function extendAssist(access, $$globalSwiper) {
   }
 
   /**
-   * 获取到全局定义的开关函数
-   * contextName 全局上下文名
+   * 跨域问题，定义postMessage
    * @return {[type]} [description]
    */
-  function getGolbalForumFn(contextName) {
-    //如果有iframe的情况，优先查找最顶层
-    if (top && top[contextName]) {
-      return top[contextName]
+  function getGolbalForumFn(name) {
+    if (window.parent) {
+      return function(data) {
+        window.parent.postMessage({
+          type: name,
+          content: data
+        }, '*');
+      }
     }
-    //否则查找当前
-    return window[contextName]
   }
 
 
@@ -41,14 +42,14 @@ export function extendAssist(access, $$globalSwiper) {
    * 针对秒秒学的api
    * 打开讨论区
    */
-  Xut.Assist.ForumOpen = () => setForum(getGolbalForumFn('GolbalForumOpen'), true)
+  Xut.Assist.ForumOpen = () => setForum(getGolbalForumFn('forumOpen'), true)
 
 
   /**
    * 针对秒秒学的api
    * 关闭讨论区
    */
-  Xut.Assist.ForumClose = () => setForum(getGolbalForumFn('GolbalForumClose'), false)
+  Xut.Assist.ForumClose = () => setForum(getGolbalForumFn('forumClose'), false)
 
 
   /**

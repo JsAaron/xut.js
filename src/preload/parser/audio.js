@@ -52,10 +52,9 @@ export function audioParse(url, callback) {
   let audio = getAudio()
   audio.src = url;
   audio.preload = "auto";
-  audio.autobuffer = true
   audio.autoplay = true
   audio.muted = true //ios 10以上静音后可以自动播放
-  // audio.volume = 0.0 //静音 ios 9 不静音的问题
+  audio.volume = 0 //静音 ios 9 不静音的问题
 
   let loopTimer = null //循环检测时间
 

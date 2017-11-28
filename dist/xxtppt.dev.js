@@ -681,6 +681,12 @@ String.styleFormat = function(format) {
      */
     hasPlugin: false,
 
+    /**
+     * ios版本号
+     * @type {[type]}
+     */
+    iosVersion: iosMainVersion,
+
     /*
     ios的版本>=10 支持视频行内播放
      */
@@ -689,10 +695,27 @@ String.styleFormat = function(format) {
     /**
      * 需要修复音频
      * 修复不能自动播放的情况
-     * 不是微信 && 手机浏览器
+     * 不是微信 && 手机浏览器 或 ipad
      * @type {[type]}
      */
-    fixWebkitAutoAudio: isBrowser && device.mobile() && !isWeiXin,
+    fixWebkitAutoAudio: (function() {
+      //微信用自己api播放
+      if (isWeiXin) {
+        return false
+      }
+
+      //2017.11.28
+      //读库客户端支持自动播放
+      //只有ios的客户端才可以，客户端内部通过浏览器打开
+      if (window.DUKUCONFIG && isIOS && /localhost/ig.test(window.location.href)) {
+        return false
+      }
+
+      //移动端ipad 手机不支持自动播放
+      if(isBrowser && (device.mobile() || device.tablet())){
+        return true
+      }
+    })(),
 
     /**
      * 支持触摸
@@ -42017,7 +42040,7 @@ function joinCss(css) {
 var parentBottom = 50;
 var publicCss = ["-webkit-transition: all .3s ease", "transition: all .3s ease"];
 var childCss = ["margin-top:-1px", "padding:1px", "border-top:1px solid rgba(255,255,255,.1)", "margin:0", "max-width:" + (window.outerWidth - 20) + "px"].concat(publicCss);
-var parentCss = ["-webkit-overflow-scrolling:touch", "overflow-y:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:50%"].concat(publicCss);
+var parentCss = ["-webkit-overflow-scrolling:touch", "overflow-y:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:55%"].concat(publicCss);
 var clearCSS = "text-align:right;font-size:16px;color:white;margin-top:30px;margin-right:10px;position:absolute;right:0;";
 var clearCountCSS = "text-align:right;font-size:16px;;color:white;margin-right:10px;margin-top:30px;position:absolute;right:50px;";
 
@@ -46784,13 +46807,17 @@ function clearAudio() {
  */
 function audioParse(url, callback) {
 
+  //在ios10以内，预加载音频无法静音
+  if (Xut.plat.iosVersion < 10) {
+    return;
+  }
+
   var audio = getAudio();
   audio.src = url;
   audio.preload = "auto";
-  audio.autobuffer = true;
   audio.autoplay = true;
   audio.muted = true; //ios 10以上静音后可以自动播放
-  audio.volume = 0.0; //静音 ios 9 不静音的问题
+  audio.volume = 0; //静音 ios 9 不静音的问题
 
   var loopTimer = null; //循环检测时间
 
@@ -49218,6 +49245,27 @@ window.fixNodeError = function (type, node, chapterIndex, src) {
   }
 };
 
+/**
+ * 监听跨域的外部事件
+ * 秒秒学使用
+ * 2017.11.28
+ */
+window.addEventListener('message', function (event) {
+  if (event.data && event.data.type) {
+    //外部调用内部API处理
+    if (event.data.type === 'api' && event.data.content) {
+      try {
+        makeJsonPack(event.data.content)();
+      } catch (err) {
+        $warn({
+          type: 'api',
+          content: '\u8DE8\u57DFmessage\u63A5\u53D7API\u51FA\u9519 ' + event.data.content
+        });
+      }
+    }
+  }
+}, false);
+
 //只初始一次
 //横竖切换要判断
 var onceBind = false;
@@ -49751,17 +49799,24 @@ var AudioSuper = function () {
         var weixinJSBridge = this.$$getWeixinJSBridgeContext();
         if (weixinJSBridge) {
           weixinJSBridge.invoke('getNetworkType', {}, function (e) {
-            _this2.audio && _this2.audio.play();
+            if (_this2.audio) {
+              $warn({
+                type: 'weixinJSBridgeAudio',
+                content: '+\u64AD\u653E\u97F3\u9891,audio\u7684id:' + _this2.options.audioId
+              });
+              _this2.audio.play();
+            }
           });
         } else {
-
-          $warn({
-            type: 'html5Audio',
-            content: '+\u64AD\u653E\u97F3\u9891,audio\u7684id:' + this.options.audioId
-          });
-
           //秒秒学提示play不存在
-          this.audio.play && this.audio.play();
+          if (this.audio.play) {
+            $warn({
+              type: 'html5Audio',
+              content: '+\u64AD\u653E\u97F3\u9891,audio\u7684id:' + this.options.audioId
+            });
+
+            this.audio.play();
+          }
         }
       }
       this.acitonObj && this.acitonObj.play();
@@ -50102,6 +50157,11 @@ function getAudioContext() {
 /**
  * 使用html5的audio播放
  *
+ *
+ * html audio 在iPhone，ipd,safari浏览器不能播放是有原因滴
+(在safri on ios里面明确指出等待用户的交互动作后才能播放media，也就是说如果你没有得到用户的action就播放的话就会被safri拦截)
+
+ *
  * 1.移动端自动播放，需要调用2次play，但是通过getAudioContext的方法获取的上下文，每个context被自动play一次
  * 2.如果需要修复自动播放的情况下
  *   A. 音频的执行比hasFixAudio的处理快，那么需要resetContext正在播放的音频上下文
@@ -50133,16 +50193,15 @@ var HTML5Audio = function (_AudioSuper) {
         //不支持自动播放
         this._createContext();
       } else {
-
         //微信有接口
         //PC正常播放
         this.audio = new Audio(this.$$url);
 
         //通过微信自己的事件处理，支持自动播放了
         if (this.$$getWeixinJSBridgeContext()) {
-          this._startPlay();
+          this.play();
         } else {
-          this._bindPlay();
+          this._initPlay();
         }
       }
     }
@@ -50164,23 +50223,11 @@ var HTML5Audio = function (_AudioSuper) {
         return;
       }
       this._needFix = false;
-      /*IOS上手动点击播放的修复
-      1 必须调用，点击播放的时候没有声音
-      2 必须手动播放，自动播放跳过，否则有杂音*/
-      if (Xut.plat.isIOS && this.options.isTrigger) {
-        this.audio.play && this.audio.play();
-        $warn({
-          type: 'html5Audio',
-          content: 'ios\u624B\u52A8\u70B9\u51FB\u64AD\u653E\u7684\u4FEE\u590D,\u4E3B\u52A8\u8C03\u7528\u4E00\u6B21\u64AD\u653E,audio\u7684id:' + this.options.audioId
-        });
-      }
-      /**由于修复的问题，先调用了play，改src, 会提示中断报错，所以这延时修改src*/
+
       setTimeout(function () {
-        if (_this2.audio) {
-          _this2.audio.src = _this2.$$url;
-          _this2._bindPlay();
-        }
-      }, 150);
+        _this2.audio.src = _this2.$$url;
+        _this2._initPlay();
+      }, 0);
     }
 
     /**
@@ -50199,12 +50246,24 @@ var HTML5Audio = function (_AudioSuper) {
 
     /**
      * 监听音频播放
+       可以自动播放时正确的事件顺序是
+    // loadstart
+    // loadedmetadata
+    // loadeddata
+    // canplay
+    // play
+    // playing
+    // 不能自动播放时触发的事件是
+    // iPhone5  iOS 7.0.6 loadstart
+    // iPhone6s iOS 9.1   loadstart -> loadedmetadata -> loadeddata -> canplay
      */
 
   }, {
-    key: '_bindPlay',
-    value: function _bindPlay() {
+    key: '_initPlay',
+    value: function _initPlay() {
       var _this3 = this;
+
+      this.audio.autoplay = 'autoplay';
 
       this._endBack = function () {
         _this3._clearTimer();
@@ -50221,37 +50280,16 @@ var HTML5Audio = function (_AudioSuper) {
         /*延时150毫秒执行*/
         _this3.timer = setTimeout(function () {
           _this3._clearTimer();
-          /*必须保证状态正确，因为有翻页太快，状态被修改*/
+          //必须保证状态正确，因为有翻页太快，状态被修改
           if (_this3.status === 'ready') {
-            _this3._startPlay();
+            _this3.play();
           }
         }, 150);
       };
 
-      /**
-       * loadedmetadata 准好就播
-       * canplay 循环一小段
-       */
-      this.audio.addEventListener('loadedmetadata', this._startBack, false);
+      this.audio.addEventListener('loadedmetadata', this._startBack(), false);
       this.audio.addEventListener('ended', this._endBack, false);
       this.audio.addEventListener('error', this._errorBack, false);
-    }
-
-    /**
-     * 开始播放音频
-     */
-
-  }, {
-    key: '_startPlay',
-    value: function _startPlay() {
-      /**
-       * safari 自动播放
-       * 手机浏览器需要加
-       * 2016.8.26
-       * @type {Boolean}
-       */
-      this.audio.autoplay = 'autoplay';
-      this.play();
     }
 
     /**
@@ -52569,6 +52607,8 @@ function parseChapterParameter(pageData, base) {
             var timeout = void 0;
             if (runTime) {
               timeout = setTimeout(function () {
+                //发送跨域的postMessage消息
+                window.parent && window.parent.postMessage({ type: 'complete' }, '*');
                 Xut.Application.Notify('complete');
               }, runTime * 1000); //转成秒
             }
@@ -75247,8 +75287,13 @@ var Scheduler = function () {
           backIndex = options.backIndex,
           stopIndex = options.stopIndex;
 
-      /*暂停*/
 
+      $warn({
+        type: 'logic',
+        content: '----\u7FFB\u9875\u6682\u505C\u9875\u9762:' + stopIndex + '----'
+      });
+
+      /*暂停*/
       var suspendAction = function suspendAction(front, middle, back, stop) {
 
         //每次翻页都要探测一次是否启动了评论区域
@@ -75401,6 +75446,11 @@ var Scheduler = function () {
           Xut.Application.Notify('autoRunComplete');
         }
       };
+
+      $warn({
+        type: 'logic',
+        content: '++++\u81EA\u52A8\u64AD\u653E\u9875\u9762:' + middleIndex + '++++'
+      });
 
       //页面自动运行
       this.pageMgr.autoRun(data);
@@ -76251,17 +76301,18 @@ function extendAssist(access, $$globalSwiper) {
   }
 
   /**
-   * 获取到全局定义的开关函数
-   * contextName 全局上下文名
+   * 跨域问题，定义postMessage
    * @return {[type]} [description]
    */
-  function getGolbalForumFn(contextName) {
-    //如果有iframe的情况，优先查找最顶层
-    if (top && top[contextName]) {
-      return top[contextName];
+  function getGolbalForumFn(name) {
+    if (window.parent) {
+      return function (data) {
+        window.parent.postMessage({
+          type: name,
+          content: data
+        }, '*');
+      };
     }
-    //否则查找当前
-    return window[contextName];
   }
 
   /**
@@ -76269,7 +76320,7 @@ function extendAssist(access, $$globalSwiper) {
    * 打开讨论区
    */
   Xut.Assist.ForumOpen = function () {
-    return setForum(getGolbalForumFn('GolbalForumOpen'), true);
+    return setForum(getGolbalForumFn('forumOpen'), true);
   };
 
   /**
@@ -76277,7 +76328,7 @@ function extendAssist(access, $$globalSwiper) {
    * 关闭讨论区
    */
   Xut.Assist.ForumClose = function () {
-    return setForum(getGolbalForumFn('GolbalForumClose'), false);
+    return setForum(getGolbalForumFn('forumClose'), false);
   };
 
   /**
@@ -81963,7 +82014,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 891.8;
+Xut.Version = 892.1;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

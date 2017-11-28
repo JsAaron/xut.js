@@ -22,7 +22,7 @@ export function initAsset() {
    */
   window.XXTAPI.ReadVar = function(variable, defaultValue) {
     var temp;
-    if(temp = $getStorage(variable)) {
+    if (temp = $getStorage(variable)) {
       return temp;
     } else {
       $setStorage(variable, defaultValue);

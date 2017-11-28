@@ -85,7 +85,7 @@ function joinCss(css) {
 let parentBottom = 50;
 let publicCss = ["-webkit-transition: all .3s ease", "transition: all .3s ease"];
 let childCss = ["margin-top:-1px", "padding:1px", "border-top:1px solid rgba(255,255,255,.1)", "margin:0", "max-width:" + (window.outerWidth - 20) + "px"].concat(publicCss);
-let parentCss = ["-webkit-overflow-scrolling:touch", "overflow-y:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:50%"].concat(publicCss);
+let parentCss = ["-webkit-overflow-scrolling:touch", "overflow-y:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:55%"].concat(publicCss);
 let clearCSS = "text-align:right;font-size:16px;color:white;margin-top:30px;margin-right:10px;position:absolute;right:0;"
 let clearCountCSS = "text-align:right;font-size:16px;;color:white;margin-right:10px;margin-top:30px;position:absolute;right:50px;"
 

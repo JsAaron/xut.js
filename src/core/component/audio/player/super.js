@@ -180,14 +180,6 @@ export default class AudioSuper {
             content: `+播放音频,audio的id:${this.options.audioId}`
           })
 
-          /**
-           * safari 自动播放
-           * 手机浏览器需要加
-           * 2016.8.26
-           * @type {Boolean}
-           */
-          this.audio.autoplay = true
-
           this.audio.play()
         }
       }

@@ -4,6 +4,7 @@
 
 import { config } from '../../config/index'
 import { repairImage } from 'repair/image'
+import { makeJsonPack, $warn } from '../../util/index'
 
 
 /**
@@ -11,11 +12,32 @@ import { repairImage } from 'repair/image'
  * dom中的事件onerror触发，所以直接
  * @return {[type]} [description]
  */
-window.fixNodeError = function (type, node, chapterIndex, src) {
+window.fixNodeError = function(type, node, chapterIndex, src) {
   if (type === 'image') {
     repairImage(node, chapterIndex, src)
   }
 }
+
+/**
+ * 监听跨域的外部事件
+ * 秒秒学使用
+ * 2017.11.28
+ */
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type) {
+    //外部调用内部API处理
+    if (event.data.type === 'api' && event.data.content) {
+      try {
+        makeJsonPack(event.data.content)()
+      } catch (err) {
+        $warn({
+          type: 'api',
+          content: `跨域message接受API出错 ${event.data.content}`
+        })
+      }
+    }
+  }
+}, false);
 
 
 //只初始一次
@@ -46,7 +68,7 @@ export function initGlobalEvent() {
     })
 
     /*防止快速刷新，会触发Original时间*/
-    setTimeout(function () {
+    setTimeout(function() {
       /*Home键音频动作处理*/
       $(document).on('visibilitychange', event => {
         /*home 后台*/
@@ -66,7 +88,7 @@ export function initGlobalEvent() {
     1、先不判断，一律按关闭提交（要有延迟）。
     2、如果是刷新，取消之前的延迟，提交刷新提示。
     */
-    $(window).on('beforeunload', function () {
+    $(window).on('beforeunload', function() {
       config.sendTrackCode('exit', { time: (+new Date) - config.launch.launchTime })
     })
 

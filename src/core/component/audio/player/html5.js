@@ -36,7 +36,6 @@ export class HTML5Audio extends AudioSuper {
       //不支持自动播放
       this._createContext();
     } else {
-
       //微信有接口
       //PC正常播放
       this.audio = new Audio(this.$$url)
@@ -45,7 +44,7 @@ export class HTML5Audio extends AudioSuper {
       if (this.$$getWeixinJSBridgeContext()) {
         this.play()
       } else {
-        this._bindPlay()
+        this._initPlay()
       }
     }
   }
@@ -63,23 +62,11 @@ export class HTML5Audio extends AudioSuper {
       return
     }
     this._needFix = false
-    /*IOS上手动点击播放的修复
-    1 必须调用，点击播放的时候没有声音
-    2 必须手动播放，自动播放跳过，否则有杂音*/
-    if (Xut.plat.isIOS && this.options.isTrigger) {
-      this.audio.play && this.audio.play()
-      $warn({
-        type: 'html5Audio',
-        content: `ios手动点击播放的修复,主动调用一次播放,audio的id:${this.options.audioId}`
-      })
-    }
-    /**由于修复的问题，先调用了play，改src, 会提示中断报错，所以这延时修改src*/
+
     setTimeout(() => {
-      if (this.audio) {
-        this.audio.src = this.$$url;
-        this._bindPlay()
-      }
-    }, 150)
+      this.audio.src = this.$$url;
+      this._initPlay()
+    }, 0)
   }
 
 
@@ -107,7 +94,9 @@ export class HTML5Audio extends AudioSuper {
   // iPhone5  iOS 7.0.6 loadstart
   // iPhone6s iOS 9.1   loadstart -> loadedmetadata -> loadeddata -> canplay
    */
-  _bindPlay() {
+  _initPlay() {
+
+    this.audio.autoplay = 'autoplay'
 
     this._endBack = () => {
       this._clearTimer()
@@ -124,18 +113,14 @@ export class HTML5Audio extends AudioSuper {
       /*延时150毫秒执行*/
       this.timer = setTimeout(() => {
         this._clearTimer();
-        /*必须保证状态正确，因为有翻页太快，状态被修改*/
+        //必须保证状态正确，因为有翻页太快，状态被修改
         if (this.status === 'ready') {
           this.play()
         }
       }, 150)
     }
 
-    /**
-     * loadedmetadata 准好就播
-     * canplay 循环一小段
-     */
-    this.audio.addEventListener('loadedmetadata', this._startBack, false)
+    this.audio.addEventListener('loadedmetadata', this._startBack(), false)
     this.audio.addEventListener('ended', this._endBack, false)
     this.audio.addEventListener('error', this._errorBack, false)
   }

@@ -113,10 +113,27 @@
     /**
      * 需要修复音频
      * 修复不能自动播放的情况
-     * 不是微信 && 手机浏览器
+     * 不是微信 && 手机浏览器 或 ipad
      * @type {[type]}
      */
-    fixWebkitAutoAudio: isBrowser && device.mobile() && !isWeiXin,
+    fixWebkitAutoAudio: (function() {
+      //微信用自己api播放
+      if (isWeiXin) {
+        return false
+      }
+
+      //2017.11.28
+      //读库客户端支持自动播放
+      //只有ios的客户端才可以，客户端内部通过浏览器打开
+      if (window.DUKUCONFIG && isIOS && /localhost/ig.test(window.location.href)) {
+        return false
+      }
+
+      //移动端ipad 手机不支持自动播放
+      if(isBrowser && (device.mobile() || device.tablet())){
+        return true
+      }
+    })(),
 
     /**
      * 支持触摸
