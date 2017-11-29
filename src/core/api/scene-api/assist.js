@@ -3,7 +3,23 @@
  * 辅助对象
  ********************************************/
 
+import { sendPostMessage } from '../post-message'
+
+
 export function extendAssist(access, $$globalSwiper) {
+
+  /**
+   * 制作PostMessage闭包
+   * @return {[type]} [description]
+   */
+  function getPostMessage(type) {
+    if (window.parent && type) {
+      return function(data) {
+        return sendPostMessage(type, data)
+      }
+    }
+  }
+
 
   /**
    * 标记讨论区状态
@@ -11,7 +27,11 @@ export function extendAssist(access, $$globalSwiper) {
    */
   Xut.Assist.ForumStatus = false
 
-
+  /**
+   * 设置讨论区
+   * @param {Function} fn    [description]
+   * @param {[type]}   state [description]
+   */
   function setForum(fn, state) {
     if (fn) {
       //从1开始算
@@ -22,34 +42,45 @@ export function extendAssist(access, $$globalSwiper) {
     }
   }
 
-  /**
-   * 跨域问题，定义postMessage
-   * @return {[type]} [description]
-   */
-  function getGolbalForumFn(name) {
-    if (window.parent) {
-      return function(data) {
-        window.parent.postMessage({
-          type: name,
-          content: data
-        }, '*');
-      }
-    }
-  }
-
 
   /**
    * 针对秒秒学的api
    * 打开讨论区
    */
-  Xut.Assist.ForumOpen = () => setForum(getGolbalForumFn('forumOpen'), true)
+  Xut.Assist.ForumOpen = () => setForum(getPostMessage('forumOpen'), true)
 
 
   /**
    * 针对秒秒学的api
    * 关闭讨论区
    */
-  Xut.Assist.ForumClose = () => setForum(getGolbalForumFn('forumClose'), false)
+  Xut.Assist.ForumClose = () => setForum(getPostMessage('forumClose'), false)
+
+
+  /**
+   * 设置答题卡的正确错误率
+   */
+  function setAnswer(fn) {
+    if (fn) {
+      var pageBase = Xut.Presentation.GetPageBase()
+      fn({
+        appId: config.data.originalAppId,
+        pageId: pageBase.chapterId
+      })
+    }
+  }
+
+  /**
+   * 秒秒学答题卡
+   * 正确性
+   */
+  Xut.Assist.Correct = () => setAnswer(getPostMessage('Correct'))
+
+  /**
+   * 秒秒学答题卡
+   * 错误性
+   */
+  Xut.Assist.Incorrect = () => setAnswer(getPostMessage('Incorrect'))
 
 
   /**

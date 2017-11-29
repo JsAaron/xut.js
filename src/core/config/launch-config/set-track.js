@@ -8,7 +8,16 @@ export default function setTrack(launch, golbal) {
   const trackTypes = launch && launch.trackCode || golbal.trackCode
   config.sendTrackCode = () => {}
   config.hasTrackCode = () => {}
-  /*'launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe']*/
+  /*
+  'launch'
+  'init'
+  'exit'
+  'flip'
+  'content'
+  'hot'
+  'swipe'
+  'enter' 进入每次页面触发
+  */
   if (trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if (!launch.trackCode) { launch.trackCode = {} }
     trackTypes.forEach(type => { launch.trackCode[type] = true })
@@ -33,9 +42,13 @@ export default function setTrack(launch, golbal) {
     /*发送代码追踪数据*/
     config.sendTrackCode = (type, options = {}) => {
       if (config.hasTrackCode(type)) {
+        if (options.time) {
+          //转化秒
+          options.time = Math.round((options.time % (1000 * 60)) / 1000)
+        }
         Xut.Application.Notify('trackCode', getTrackName(type), _.extend(options || {}, {
           uuid,
-          appId: config.data.appId,
+          appId: config.data.originalAppId,
           appName: config.data.shortName
         }))
       }

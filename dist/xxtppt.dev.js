@@ -513,12 +513,12 @@ Xut.style = {}
  * @return {[type]}        [description]
  */
 Xut.mixin = function(target, source) {
-  if(!source) {
+  if (!source) {
     source = target
     target = this
   }
-  for(var p in source) {
-    if(source.hasOwnProperty(p)) {
+  for (var p in source) {
+    if (source.hasOwnProperty(p)) {
       target[p] = source[p]
     }
   }
@@ -547,8 +547,8 @@ Xut.mixin({
    * @return {[type]}     [description]
    */
   guid: function(mark) {
-    var id = (+new Date()) + (Math.random() + '').slice(-8);
-    return mark ? (mark + id) : id
+    var id = (+new Date()) + (Math.random() + '').slice(-1);
+    return mark ? (mark + id) : Number(id)
   },
 
   /**
@@ -699,22 +699,36 @@ String.styleFormat = function(format) {
      * @type {[type]}
      */
     fixWebkitAutoAudio: (function() {
+
       //微信用自己api播放
       if (isWeiXin) {
         return false
       }
 
+      var localhost = /localhost/ig.test(window.location.href)
+
       //2017.11.28
       //读库客户端支持自动播放
       //只有ios的客户端才可以，客户端内部通过浏览器打开
-      if (window.DUKUCONFIG && isIOS && /localhost/ig.test(window.location.href)) {
+      if (window.DUKUCONFIG && isIOS && localhost) {
         return false
       }
 
-      //移动端ipad 手机不支持自动播放
-      if(isBrowser && (device.mobile() || device.tablet())){
-        return true
+      //浏览器打开
+      if (isBrowser) {
+
+        //pc端测试
+        if (localhost) {
+          return false
+        }
+
+        //移动端ipad 手机不支持自动播放
+        if (device.mobile() || device.tablet()) {
+          return true
+        }
+
       }
+
     })(),
 
     /**
@@ -41203,8 +41217,8 @@ var defaultWidgetPath = "content/widget/";
  * @type {String}
  */
 var getSourcePath = function getSourcePath() {
-  if (config.launch.resource) {
-    return config.launch.resource + '/gallery/';
+  if (config$1.launch.resource) {
+    return config$1.launch.resource + '/gallery/';
   } else {
     return defaultSourcePath;
   }
@@ -41216,8 +41230,8 @@ var getSourcePath = function getSourcePath() {
  * @return {[type]}          [description]
  */
 var getWidgetPath = function getWidgetPath() {
-  if (config.launch.resource) {
-    return config.launch.resource + '/widget/';
+  if (config$1.launch.resource) {
+    return config$1.launch.resource + '/widget/';
   } else {
     return defaultWidgetPath;
   }
@@ -42207,7 +42221,7 @@ var count = 0;
 
 function $warn(data, content, level, color) {
 
-  var silent = config.debug.silent;
+  var silent = config$1.debug.silent;
 
   if (!silent) {
     return;
@@ -42235,7 +42249,7 @@ function $warn(data, content, level, color) {
       ++count;
 
       //远程debug输出
-      if (config.debug.terminal) {
+      if (config$1.debug.terminal) {
         var errListener = function errListener(error) {
           var msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
           return debug.error(msg.join("<br/>"));
@@ -42455,9 +42469,9 @@ function getSize() {
 
   //配置可视区窗口
   //用户在外部指定了可视区域
-  if (config.launch.visualHeight) {
-    config.launch.visualTop = clientHeight - config.launch.visualHeight;
-    clientHeight = config.launch.visualHeight;
+  if (config$1.launch.visualHeight) {
+    config$1.launch.visualTop = clientHeight - config$1.launch.visualHeight;
+    clientHeight = config$1.launch.visualHeight;
   }
 
   return {
@@ -43058,7 +43072,7 @@ var GLOBALIFRAME = window.GLOBALIFRAME;
 var CLIENTCONFIGT = window.CLIENTCONFIGT;
 var MMXCONFIG = window.MMXCONFIG;
 
-var config = {};
+var config$1 = {};
 
 var layoutMode = void 0;
 var proportion = void 0;
@@ -43073,7 +43087,7 @@ Xut.zIndexlevel = function () {
 //通过新学堂加载
 //用于处理iframe窗口去全屏
 if (/xinxuetang/.test(window.location.href)) {
-  config.iframeFullScreen = true;
+  config$1.iframeFullScreen = true;
 }
 
 /**
@@ -43102,7 +43116,7 @@ var desktopPlat = function desktopPlat() {
 
   //2016.9.13
   //新增动态模式
-  if (config.launch.resource) {
+  if (config$1.launch.resource) {
     return getSourcePath();
   }
 
@@ -43119,8 +43133,8 @@ var desktopPlat = function desktopPlat() {
     // * storageMode 存放的位置
     // * 0 APK应用本身
     // 1 外置SD卡
-    if (Number(config.launch.storageMode)) {
-      return "sdcard/" + config.data.appId + "/" + getSourcePath();
+    if (Number(config$1.launch.storageMode)) {
+      return "sdcard/" + config$1.data.appId + "/" + getSourcePath();
     } else {
       return getSourcePath();
     }
@@ -43148,7 +43162,7 @@ var runMode = function () {
  * @return {[type]} [description]
  */
 var _rsourcesPath = function _rsourcesPath() {
-  return isBrowser ? desktopPlat() : GLOBALIFRAME ? iframeConfig.resources(config) : nativeConfig.resources(config);
+  return isBrowser ? desktopPlat() : GLOBALIFRAME ? iframeConfig.resources(config$1) : nativeConfig.resources(config$1);
 };
 
 /**
@@ -43191,7 +43205,7 @@ var _jsWidgetPath = function _jsWidgetPath() {
  * 全局配置文件
  * @type {Boolean}
  */
-_.extend(config, {
+_.extend(config$1, {
 
   /**
    * 应用横竖自适应切换
@@ -43270,7 +43284,7 @@ _.extend(config, {
   golbal: improtGolbalConfig
 });
 
-Xut.config = config;
+Xut.config = config$1;
 
 /**
  * 销毁配置
@@ -43294,10 +43308,10 @@ function initPathAddress() {
   isCacheJsWidgetPath = false;
 
   /*资源路径*/
-  config.data.pathAddress = _rsourcesPath();
+  config$1.data.pathAddress = _rsourcesPath();
 
   /*根路径*/
-  config.data.rootPath = config.data.pathAddress.replace('/gallery/', '');
+  config$1.data.rootPath = config$1.data.pathAddress.replace('/gallery/', '');
 }
 
 /**
@@ -43307,8 +43321,8 @@ function initPathAddress() {
 var resetProportion = function resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue) {
   //获取全屏比值，用来设定view的尺寸
   //根据分辨率与PPT排版的比值来确定
-  fullProportion = getFullProportion(config, pptWidth, pptHeight);
-  var visualSize = config.visualSize = getVisualSize(config, fullProportion, setVisualMode, noModifyValue);
+  fullProportion = getFullProportion(config$1, pptWidth, pptHeight);
+  var visualSize = config$1.visualSize = getVisualSize(config$1, fullProportion, setVisualMode, noModifyValue);
 
   //溢出宽度
   visualSize.overflowWidth = false;
@@ -43321,21 +43335,21 @@ var resetProportion = function resetProportion(pptWidth, pptHeight, setVisualMod
     visualSize.overflowHeight = true;
   }
   //获取全局缩放比
-  proportion = config.proportion = getRealProportion(config, visualSize, fullProportion);
+  proportion = config$1.proportion = getRealProportion(config$1, visualSize, fullProportion);
 };
 
 /*获取基本尺寸*/
 var getBasicSize = function getBasicSize(pptWidth, pptHeight, screenSize) {
   //获取分辨率
-  config.screenSize = screenSize || getSize();
+  config$1.screenSize = screenSize || getSize();
   //根据设备判断设备的横竖屏
-  config.screenHorizontal = config.screenSize.width > config.screenSize.height ? true : false;
-  config.screenVertical = !config.screenHorizontal;
-  layoutMode = config.layoutMode = getLayerMode(config.screenSize);
+  config$1.screenHorizontal = config$1.screenSize.width > config$1.screenSize.height ? true : false;
+  config$1.screenVertical = !config$1.screenHorizontal;
+  layoutMode = config$1.layoutMode = getLayerMode(config$1.screenSize);
   //数据ppt排版设计
   if (pptWidth && pptHeight) {
-    config.pptHorizontal = pptWidth > pptHeight ? true : false;
-    config.pptVertical = !config.pptHorizontal;
+    config$1.pptHorizontal = pptWidth > pptHeight ? true : false;
+    config$1.pptVertical = !config$1.pptHorizontal;
   }
 };
 
@@ -43359,19 +43373,19 @@ function initConfig(pptWidth, pptHeight) {
   ////////////////////////////////////
   /// 横版PPT，竖版显示，强制为竖版双页面
   ////////////////////////////////////
-  if (config.launch.visualMode === 5) {
+  if (config$1.launch.visualMode === 5) {
 
-    resetProportion(pptWidth, pptHeight, config.launch.visualMode);
-    config.originalVisualSize = config.visualSize;
+    resetProportion(pptWidth, pptHeight, config$1.launch.visualMode);
+    config$1.originalVisualSize = config$1.visualSize;
     return;
   }
 
   ////////////////////////////////////
   /// 竖版PPT，横版显示，并启动了双页模式
   ////////////////////////////////////
-  if (config.launch.doublePageMode && config.pptVertical && config.screenHorizontal) {
-    resetProportion(pptWidth, pptHeight, config.launch.visualMode === 3 ? 2 : config.launch.visualMode);
-    config.originalVisualSize = config.visualSize;
+  if (config$1.launch.doublePageMode && config$1.pptVertical && config$1.screenHorizontal) {
+    resetProportion(pptWidth, pptHeight, config$1.launch.visualMode === 3 ? 2 : config$1.launch.visualMode);
+    config$1.originalVisualSize = config$1.visualSize;
     return;
   }
 
@@ -43387,52 +43401,52 @@ function initConfig(pptWidth, pptHeight) {
   //如果是横版PPT，横版显示的情况下，并且是全局模式3的情况
   //可能存在宽度，不能铺满全屏的情况
   //所以可能存在要修改尺寸
-  if (config.pptHorizontal && config.screenHorizontal && config.launch.visualMode === 3) {
+  if (config$1.pptHorizontal && config$1.screenHorizontal && config$1.launch.visualMode === 3) {
     //可能会修改全局布局尺寸，所以采用3模式探测
-    resetProportion(pptWidth, pptHeight, config.launch.visualMode, true);
+    resetProportion(pptWidth, pptHeight, config$1.launch.visualMode, true);
   } else {
     //强制检测是否是反向显示模式
     //模式3的情况下，用2检测
-    resetProportion(pptWidth, pptHeight, config.launch.visualMode === 3 ? 2 : config.launch.visualMode);
+    resetProportion(pptWidth, pptHeight, config$1.launch.visualMode === 3 ? 2 : config$1.launch.visualMode);
   }
 
   //如果是PPT与设备反向显示
   //这里可能会溢出left的值
   //那么把每个visual就当做一个整体处理
   // config.originalScreenSize = config.screenSize
-  config.originalVisualSize = config.visualSize;
+  config$1.originalVisualSize = config$1.visualSize;
 
   //竖版PPT,横版显示
-  if (config.pptVertical && config.screenHorizontal) {
-    config.verticalToHorizontalVisual = true;
+  if (config$1.pptVertical && config$1.screenHorizontal) {
+    config$1.verticalToHorizontalVisual = true;
   }
 
   //横版PPT,竖版显示
-  if (config.pptHorizontal && config.screenVertical) {
-    config.horizontalToVerticalVisual = true;
+  if (config$1.pptHorizontal && config$1.screenVertical) {
+    config$1.horizontalToVerticalVisual = true;
   }
 
   /*******************************
    *   受反向检测影响了，需要修正config
    * ******************************/
-  if (config.launch.visualMode === 2) {
+  if (config$1.launch.visualMode === 2) {
     //如果是反向模式
     //强制设置visualSize=screenSize
     //从新计算config依赖比值
-    if (config.visualSize.left) {
+    if (config$1.visualSize.left) {
       resetConfig(pptWidth, pptHeight, {
-        width: config.visualSize.width,
-        height: config.visualSize.height
-      }, config.launch.visualMode);
+        width: config$1.visualSize.width,
+        height: config$1.visualSize.height
+      }, config$1.launch.visualMode);
     }
-  } else if (config.launch.visualMode === 3) {
+  } else if (config$1.launch.visualMode === 3) {
     //反模式下，重置高度
     //已经尺寸因为探测已经被改过一次了
     //实际使用的时候，需要还原
-    if (config.visualSize.left) {
+    if (config$1.visualSize.left) {
       resetConfig(pptWidth, pptHeight, {
-        width: config.visualSize.width,
-        height: config.visualSize.height
+        width: config$1.visualSize.width,
+        height: config$1.visualSize.height
       }, 1);
     } else {
       //重新把3模式下按照正常1的情况设置
@@ -43447,7 +43461,7 @@ function initConfig(pptWidth, pptHeight) {
  * 每个页面可以重写页面的view
  */
 function resetVisualLayout(setVisualMode) {
-  return getVisualSize(config, fullProportion, setVisualMode);
+  return getVisualSize(config$1, fullProportion, setVisualMode);
 }
 
 /**
@@ -43455,7 +43469,7 @@ function resetVisualLayout(setVisualMode) {
  * 每个页面可以重写页面的元素缩放比
  */
 function resetVisualProportion(newVisualSize) {
-  return getRealProportion(config, newVisualSize, fullProportion);
+  return getRealProportion(config$1, newVisualSize, fullProportion);
 }
 
 //定义属性
@@ -43853,12 +43867,12 @@ var filter = function filter(key) {
   if (onlyId) {
     return key + onlyId;
   } else {
-    if (!config.data.appId) {
-      config.data.appId = 'aaron-' + new Date().getDate();
+    if (!config$1.data.appId) {
+      config$1.data.appId = 'aaron-' + new Date().getDate();
     }
     //子文档标记
     var sub = window.SUbCONFIGT && window.SUbCONFIGT.dbId ? "-" + window.SUbCONFIGT.dbId : '';
-    onlyId = "-" + config.data.appId + sub;
+    onlyId = "-" + config$1.data.appId + sub;
   }
   return key + onlyId;
 };
@@ -44107,12 +44121,12 @@ function showWarn(data) {
 function converUrlName(src) {
   var result = void 0;
   var hdName = void 0; //高清图名
-  var brModeType = config.launch.brModeType;
-  var baseImageSuffix = config.launch.baseImageSuffix;
+  var brModeType = config$1.launch.brModeType;
+  var baseImageSuffix = config$1.launch.baseImageSuffix;
 
   //如果支持高清图
   //判断出高清图后缀
-  var hdPostfix = config.launch.useHDImageZoom && config.launch.imageSuffix && config.launch.imageSuffix['1440'];
+  var hdPostfix = config$1.launch.useHDImageZoom && config$1.launch.imageSuffix && config$1.launch.imageSuffix['1440'];
 
   //没有任何后缀
   //"1d7949a5585942ed.jpg"
@@ -44227,8 +44241,8 @@ function converImageURL(url, supportBrMode, supportSuffix) {
     return '';
   }
 
-  var brModeType = supportBrMode ? supportBrMode : config.launch.brModeType;
-  var baseImageSuffix = supportSuffix ? supportSuffix : config.launch.baseImageSuffix;
+  var brModeType = supportBrMode ? supportBrMode : config$1.launch.brModeType;
+  var baseImageSuffix = supportSuffix ? supportSuffix : config$1.launch.baseImageSuffix;
 
   //不需要转换
   if (!brModeType && !baseImageSuffix) {
@@ -44274,7 +44288,7 @@ function removeSlash(resource) {
  * @return {[type]} [description]
  */
 function loadGolbalStyle(fileName, callback) {
-  var path = config.launch.resource ? config.launch.resource + '/gallery/' + fileName + '.css' : config.data.pathAddress + fileName + '.css';
+  var path = config$1.launch.resource ? config$1.launch.resource + '/gallery/' + fileName + '.css' : config$1.data.pathAddress + fileName + '.css';
   var node = loadFile(path, callback);
   node && node.setAttribute('data-type', fileName);
 }
@@ -44311,7 +44325,7 @@ function getFileFullPath(fileName, debugType, isGif) {
   // 'd048193365eac224_a'
   // 'd048193365eac224_i'
   if (splitNumber === 1) {
-    return config.data.pathAddress + fileName;
+    return config$1.data.pathAddress + fileName;
   }
 
   //有2个点
@@ -44319,7 +44333,7 @@ function getFileFullPath(fileName, debugType, isGif) {
   // 'b9ba3dfc39ddd207.hi.jpg'
   // 'b9ba3dfc39ddd207.mi.jpg'
   if (splitNumber === 3) {
-    return config.data.pathAddress + fileName;
+    return config$1.data.pathAddress + fileName;
   }
 
   //只有一个点
@@ -44338,7 +44352,7 @@ function getFileFullPath(fileName, debugType, isGif) {
     //排除非图片的情况
     //9b7adc63c04af0651a60a211ed03085c.svg
     if (!hasImages(fileName)) {
-      return config.data.pathAddress + fileName;
+      return config$1.data.pathAddress + fileName;
     }
 
     //如果包含已经包含了执行的后缀
@@ -44348,12 +44362,12 @@ function getFileFullPath(fileName, debugType, isGif) {
     // 'd048193365eac224_a.hi'
     // 'd048193365eac224_a.mi
     if (/_[ia]\.(mi|hi)$/.test(fileName)) {
-      return config.data.pathAddress + fileName;
+      return config$1.data.pathAddress + fileName;
     }
 
     //仅仅是正常的png jpg gif图片
     //需要生成新的后缀
-    return config.data.pathAddress + converImageURL(fileName);
+    return config$1.data.pathAddress + converImageURL(fileName);
   }
 }
 
@@ -44415,10 +44429,10 @@ function createRandomImg(url) {
  * @return {[type]} [description]
  */
 function replacePath(svgstr) {
-  if (config.launch.lauchMode === 1) {
+  if (config$1.launch.lauchMode === 1) {
     //如果能找到对应的默认路径，则替换
     if (-1 !== svgstr.indexOf('content/gallery/')) {
-      svgstr = svgstr.replace(/content\/gallery/ig, config.data.pathAddress);
+      svgstr = svgstr.replace(/content\/gallery/ig, config$1.data.pathAddress);
     }
   }
   return svgstr;
@@ -44443,7 +44457,7 @@ var converProportion = function converProportion(_ref) {
       type: 'util',
       content: '没有传递缩放比,取全局config'
     });
-    proportion = config.proportion;
+    proportion = config$1.proportion;
   }
 
   //页眉，保持横纵比
@@ -44580,7 +44594,7 @@ function reviseSize(_ref2) {
  */
 function mixGolbalConfig(setConfig) {
   if (setConfig) {
-    Xut.mixin(config.golbal, setConfig);
+    Xut.mixin(config$1.golbal, setConfig);
   }
 }
 
@@ -44878,7 +44892,7 @@ Xut.nextTick = nextTick;
  */
 function randomUrl(url) {
   /*启动了预览，就必须要要缓存*/
-  if (config.launch.preload) {
+  if (config$1.launch.preload) {
     return url;
   } else {
     return url + '?r=' + new Date().getTime();
@@ -44920,7 +44934,7 @@ function readFileContent(path, callback, type) {
   //如果是js动态文件
   //content的html结构
   if (type === "js") {
-    paths = config.getSvgPath() + path;
+    paths = config$1.getSvgPath() + path;
     name = path.replace(".js", '');
     loadJs(paths, name);
     return;
@@ -44931,10 +44945,10 @@ function readFileContent(path, callback, type) {
    * crossDomain = true
    * 那么所有的svg文件就强制转化成js读取
    */
-  if (config.launch.crossDomain || config.launch.convert === 'svg') {
+  if (config$1.launch.crossDomain || config$1.launch.convert === 'svg') {
     path = path.replace('.svg', '.js');
     name = path.replace(".js", '');
-    svgUrl = config.getSvgPath() + path;
+    svgUrl = config$1.getSvgPath() + path;
     loadJs(svgUrl, name); //直接采用脚本加载
     return;
   }
@@ -44949,7 +44963,7 @@ function readFileContent(path, callback, type) {
       path = path.replace(".svg", '.js');
     }
     //全路径
-    paths = config.getSvgPath().replace("svg", 'js') + path;
+    paths = config$1.getSvgPath().replace("svg", 'js') + path;
     //文件名
     name = path.replace(".js", '');
     //加载脚本
@@ -44972,13 +44986,13 @@ function readFileContent(path, callback, type) {
 
   //svg文件
   //游览器模式 && 非强制插件模式
-  if (Xut.plat.isBrowser && !config.isPlugin) {
+  if (Xut.plat.isBrowser && !config$1.isPlugin) {
     //默认的地址
-    svgUrl = config.getSvgPath().replace("www/", "") + path;
+    svgUrl = config$1.getSvgPath().replace("www/", "") + path;
 
     //mini杂志的情况，不处理目录的www
-    if (config.launch.resource) {
-      svgUrl = config.getSvgPath() + path;
+    if (config$1.launch.resource) {
+      svgUrl = config$1.getSvgPath() + path;
     }
 
     $.ajax({
@@ -45003,7 +45017,7 @@ function readFileContent(path, callback, type) {
    * 插件读取
    * 手机客户端模式
    */
-  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function (svgContent) {
+  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config$1.getSvgPath() + path, function (svgContent) {
     callback(svgContent);
   }, function (err) {
     callback('');
@@ -45112,9 +45126,9 @@ fileName + brModeType + baseSuffix + type
  */
 function parseFileName(fileName, baseSuffix, type) {
   //如果启动了模式
-  if (config.launch.brModeType) {
+  if (config$1.launch.brModeType) {
     //增加brModeType，增加后缀，去掉类型
-    return '' + fileName + config.launch.brModeType + baseSuffix;
+    return '' + fileName + config$1.launch.brModeType + baseSuffix;
   }
   //如果只加了baseSuffix模式处理
   return '' + fileName + baseSuffix + type;
@@ -45146,15 +45160,15 @@ function filterJsonData() {
 
   //配置了远程地址
   //需要把flow的给处理掉
-  if (config.launch.resource && result.FlowData) {
+  if (config$1.launch.resource && result.FlowData) {
 
     /*如果没有强制关闭，并且有flow数据，那么就默认启动*/
-    if (config.launch.columnCheck !== false) {
-      config.launch.columnCheck = true;
+    if (config$1.launch.columnCheck !== false) {
+      config$1.launch.columnCheck = true;
     }
 
     //有基础后缀，需要补上所有的图片地址
-    var baseSuffix = config.launch.baseImageSuffix ? '.' + config.launch.baseImageSuffix : '';
+    var baseSuffix = config$1.launch.baseImageSuffix ? '.' + config$1.launch.baseImageSuffix : '';
 
     //xlink:href
     //<img src
@@ -45163,14 +45177,14 @@ function filterJsonData() {
     //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
     //img src="content/11/gallery/b9ba3dfc39ddd207_a.hi
     result.FlowData = result.FlowData.replace(urlRE, function (a, prefix, fileName, type) {
-      return prefix + '="' + config.launch.resource + '/gallery/' + parseFileName(fileName, baseSuffix, type);
+      return prefix + '="' + config$1.launch.resource + '/gallery/' + parseFileName(fileName, baseSuffix, type);
     });
   }
 
   window.SQLResult = null;
 
   //标记有Flow数据处理
-  config.launch.hasFlowData = true;
+  config$1.launch.hasFlowData = true;
 
   return result;
 }
@@ -45199,7 +45213,7 @@ function filterJsonData() {
  * 2 缓存
  */
 function importJsonDatabase(callback) {
-  var path = config.launch.database;
+  var path = config$1.launch.database;
   //如果外联指定路径json数据
   if (path && /.js$/.test(path)) {
     //防止外部链接影响
@@ -45284,7 +45298,7 @@ function executeDB(sql, callback, errorCB, tName) {
   //否则直接ajax php
   else {
       $.ajax({
-        url: config.data.onlineModeUrl,
+        url: config$1.data.onlineModeUrl,
         dataType: 'json',
         data: {
           xxtsql: sql
@@ -45308,7 +45322,7 @@ function executeDB(sql, callback, errorCB, tName) {
 //建立sql查询
 function execute(selectSql, callback) {
 
-  var database = config.data.db,
+  var database = config$1.data.db,
       tableName,
       //表名
   successResults = {},
@@ -45802,19 +45816,19 @@ var supportTransaction = function supportTransaction(callback) {
   if (window.openDatabase) {
     try {
       //数据库链接对象
-      config.data.db = window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
+      config$1.data.db = window.openDatabase(config$1.data.dbName, "1.0", "Xxtebook Database", config$1.data.dbSize);
     } catch (err) {
       console.log('window.openDatabase出错');
     }
   }
 
   //如果读不出数据
-  if (config.data.db) {
-    config.data.db.transaction(function (tx) {
+  if (config$1.data.db) {
+    config$1.data.db.transaction(function (tx) {
       tx.executeSql('SELECT * FROM Novel', [], function (tx, rs) {
         callback();
       }, function () {
-        config.data.db = null;
+        config$1.data.db = null;
         callback();
       });
     });
@@ -45838,7 +45852,7 @@ var initStore = function initStore(callback) {
  */
 var initDatabse = function (hasResults, callback) {
   if (hasResults) {
-    config.data.db = null;
+    config$1.data.db = null;
     initStore(callback);
     return;
   }
@@ -45885,7 +45899,8 @@ var defaults$1 = {
     setConfig[i] = Number(data[i]);
   }
 
-  _.extend(config.data, {
+  _.extend(config$1.data, {
+    originalAppId: Number(data.appId),
     //应用的唯一标识符
     //生成时间+appid
     appId: data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.appId,
@@ -45952,8 +45967,8 @@ var path = void 0;
  */
 function createCursor() {
   if (isDisable) return;
-  var sWidth = config.visualSize.width;
-  var sHeight = config.visualSize.height;
+  var sWidth = config$1.visualSize.width;
+  var sHeight = config$1.visualSize.height;
   var width = Math.min(sWidth, sHeight) / 4;
   var space = Math.round((sHeight - width) / 2);
   var delay = [0, 0.9167, 0.833, 0.75, 0.667, 0.5833, 0.5, 0.41667, 0.333, 0.25, 0.1667, 0.0833];
@@ -45973,7 +45988,7 @@ function createCursor() {
     container = '<div class="xut-busy-middle">' + container + '</div>';
   }
 
-  return '<div class="xut-busy-icon xut-fullscreen">\n            <div style="width:' + width + 'px;height:' + width + 'px;margin:' + space + 'px auto;margin-top:' + (config.visualSize.top + space) + 'px;">\n                <div style="height:30%;"></div>\n                  ' + container + '\n                <div class="xut-busy-text"></div>\n             </div>\n          </div>';
+  return '<div class="xut-busy-icon xut-fullscreen">\n            <div style="width:' + width + 'px;height:' + width + 'px;margin:' + space + 'px auto;margin-top:' + (config$1.visualSize.top + space) + 'px;">\n                <div style="height:30%;"></div>\n                  ' + container + '\n                <div class="xut-busy-text"></div>\n             </div>\n          </div>';
 }
 
 var clear = function clear() {
@@ -46041,6 +46056,7 @@ var showTextBusy = function showTextBusy(txt) {
 var resetCursor = function resetCursor(data) {
   path = null;
   delayTime = 500;
+  node = null;
 };
 
 /**
@@ -46093,12 +46109,12 @@ function getBusyHTML() {
 function getContentHTML() {
   var coverStyle = '';
   //mini平台不要背景图
-  if (config.launch.platform === 'mini') {} else {
+  if (config$1.launch.platform === 'mini') {} else {
     //默认背景图
     var coverUrl = './content/gallery/cover.jpg';
     //重写背景图
-    if (config.launch.resource) {
-      coverUrl = config.launch.resource + '/gallery/cover.jpg';
+    if (config$1.launch.resource) {
+      coverUrl = config$1.launch.resource + '/gallery/cover.jpg';
     }
     //背景样式
     coverStyle = 'style="background-image: url(' + coverUrl + ');"';
@@ -46165,7 +46181,7 @@ function removeCover(callback) {
     //是否配置启动动画关闭
 
 
-    if (config.launch.launchAnim === false) {
+    if (config$1.launch.launchAnim === false) {
       complete();
     } else {
       //有动画
@@ -46363,7 +46379,7 @@ function detectColumn($seasons, columnCollection, callback, checkCount) {
     }, 500);
   } else {
     //如果探测完毕就强制关闭检测了
-    config.launch.columnCheck = false;
+    config$1.launch.columnCheck = false;
     clearColumnDetection();
     callback();
   }
@@ -46429,7 +46445,7 @@ function createStr(chapterId, data, visualWidth, visualHeight, margin) {
     data = $(data).find("#columns-content").html();
   }
 
-  if (config.launch.scrollMode === 'v') {
+  if (config$1.launch.scrollMode === 'v') {
     /*竖版的情况下，不需要分栏了，直接处理*/
     var columnGap = COLUMNTAP + ':' + negativeWidth + 'px';
     var columnWidth = COLUMNWIDTH + ':' + containerWidth + 'px';
@@ -46515,9 +46531,9 @@ function getColumnData($seasons, callback) {
       if (tag) {
         var chapterId = tag.match(/\d+/)[0];
         var count = void 0;
-        if (config.launch.scrollMode === 'h') {
+        if (config$1.launch.scrollMode === 'h') {
           count = getColumnCount(node, '#columns-content');
-        } else if (config.launch.scrollMode === 'v') {
+        } else if (config$1.launch.scrollMode === 'v') {
           count = getColumnCount(node, '#scroller-section');
         }
         callback(seasonsId, chapterId, count);
@@ -46573,7 +46589,7 @@ function initColumn(callback) {
 
       //第一次获取分栏数与高度 analysis
       getColumnData($seasons, function (seasonsId, chapterId, count) {
-        if (debug$1 && config.launch.columnCheck) {
+        if (debug$1 && config$1.launch.columnCheck) {
           count = simulateCount;
         }
         columnData[seasonsId][chapterId] = count;
@@ -46582,7 +46598,7 @@ function initColumn(callback) {
       addCache(columnData);
 
       //检测分栏是否丢失，补充
-      if (config.launch.columnCheck) {
+      if (config$1.launch.columnCheck) {
         startColumnDetect($seasons, $.extend(true, {}, columnData), function () {
           $container.hide();
         });
@@ -47061,7 +47077,7 @@ var pathHooks = {
    * 文本图片
    */
   content: function content(data) {
-    return formatString(data, config.data.pathAddress);
+    return formatString(data, config$1.data.pathAddress);
   },
 
 
@@ -47070,10 +47086,10 @@ var pathHooks = {
    * @type {[type]}
    */
   audio: function audio(data) {
-    return formatString(data, config.data.pathAddress);
+    return formatString(data, config$1.data.pathAddress);
   },
   video: function video(data) {
-    return formatString(data, config.data.pathAddress);
+    return formatString(data, config$1.data.pathAddress);
   },
 
 
@@ -47081,7 +47097,7 @@ var pathHooks = {
    * svg
    */
   svg: function svg(data) {
-    return formatString(data, config.data.pathAddress);
+    return formatString(data, config$1.data.pathAddress);
   },
 
 
@@ -47089,7 +47105,7 @@ var pathHooks = {
    * 零件图片
    */
   widget: function widget(data) {
-    return formatString(data, config.data.rootPath + '/widget/gallery/');
+    return formatString(data, config$1.data.rootPath + '/widget/gallery/');
   },
 
 
@@ -47101,7 +47117,7 @@ var pathHooks = {
    * }
    */
   autoSprite: function autoSprite(data) {
-    return formatObject(data, config.data.pathAddress);
+    return formatObject(data, config$1.data.pathAddress);
   },
 
 
@@ -47113,7 +47129,7 @@ var pathHooks = {
     }
   */
   seniorSprite: function seniorSprite(data) {
-    return formatObject(data, config.data.rootPath + '/widget/gallery/');
+    return formatObject(data, config$1.data.rootPath + '/widget/gallery/');
   }
 };
 
@@ -47649,10 +47665,10 @@ function deleteResource(chaperId) {
  */
 function getNumber() {
   //退出清理的情况下
-  if (!config.launch) {
+  if (!config$1.launch) {
     return false;
   }
-  return typeof config.launch.preload === 'number' ? config.launch.preload : 5;
+  return typeof config$1.launch.preload === 'number' ? config$1.launch.preload : 5;
 }
 
 /**
@@ -47891,7 +47907,7 @@ function nextTask(chapterId, callback) {
  * @return {Boolean} [description]
  */
 function loadPrelaod(callback) {
-  loadFile(config.data.pathAddress + 'preload.js', function () {
+  loadFile(config$1.data.pathAddress + 'preload.js', function () {
     if (window.preloadData) {
       callback(true, window.globalBrMode);
     } else {
@@ -47941,7 +47957,7 @@ function watchPreloadInit() {
 function initPreload(total, callback) {
 
   function exit() {
-    config.launch.preload = null;
+    config$1.launch.preload = null;
     callback(false);
   }
 
@@ -48068,9 +48084,9 @@ function adaptiveImage() {
   var $adaptiveImageNode = $('.xut-adaptive-image');
   if ($adaptiveImageNode.length) {
     var baseImageType = $adaptiveImageNode.width();
-    var type = config.launch.imageSuffix[baseImageType];
+    var type = config$1.launch.imageSuffix[baseImageType];
     if (type) {
-      config.launch.baseImageSuffix = type;
+      config$1.launch.baseImageSuffix = type;
       return;
     }
   }
@@ -48082,8 +48098,8 @@ function adaptiveImage() {
  * @return {[type]} [description]
  */
 function getMaxWidth() {
-  if (config.visualSize) {
-    return config.visualSize.width;
+  if (config$1.visualSize) {
+    return config$1.visualSize.width;
   }
   return window.screen.width > document.documentElement.clientWidth ? window.screen.width : document.documentElement.clientWidth;
 }
@@ -48102,14 +48118,14 @@ function setDefaultSuffix() {
     var ratio = window.devicePixelRatio || 1;
     var maxWidth = getMaxWidth() * ratio;
     if (maxWidth >= 1080 && maxWidth < 1439) {
-      config.launch.baseImageSuffix = config.launch.imageSuffix['1080'];
+      config$1.launch.baseImageSuffix = config$1.launch.imageSuffix['1080'];
     }
     if (maxWidth >= 1440) {
-      config.launch.baseImageSuffix = config.launch.imageSuffix['1440'];
+      config$1.launch.baseImageSuffix = config$1.launch.imageSuffix['1440'];
     }
     $warn({
       type: 'config',
-      content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix
+      content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config$1.launch.baseImageSuffix
     });
   }
 }
@@ -48120,9 +48136,18 @@ function setDefaultSuffix() {
 function setTrack(launch, golbal) {
 
   var trackTypes = launch && launch.trackCode || golbal.trackCode;
-  config.sendTrackCode = function () {};
-  config.hasTrackCode = function () {};
-  /*'launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe']*/
+  config$1.sendTrackCode = function () {};
+  config$1.hasTrackCode = function () {};
+  /*
+  'launch'
+  'init'
+  'exit'
+  'flip'
+  'content'
+  'hot'
+  'swipe'
+  'enter' 进入每次页面触发
+  */
   if (trackTypes && _.isArray(trackTypes) && trackTypes.length) {
     if (!launch.trackCode) {
       launch.trackCode = {};
@@ -48133,7 +48158,7 @@ function setTrack(launch, golbal) {
     var uuid = Xut.guid();
 
     /*检测是否有代码追踪*/
-    config.hasTrackCode = function (type) {
+    config$1.hasTrackCode = function (type) {
       if (launch && launch.trackCode && launch.trackCode[type]) {
         return true;
       }
@@ -48149,14 +48174,18 @@ function setTrack(launch, golbal) {
     };
 
     /*发送代码追踪数据*/
-    config.sendTrackCode = function (type) {
+    config$1.sendTrackCode = function (type) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      if (config.hasTrackCode(type)) {
+      if (config$1.hasTrackCode(type)) {
+        if (options.time) {
+          //转化秒
+          options.time = Math.round(options.time % (1000 * 60) / 1000);
+        }
         Xut.Application.Notify('trackCode', getTrackName(type), _.extend(options || {}, {
           uuid: uuid,
-          appId: config.data.appId,
-          appName: config.data.shortName
+          appId: config$1.data.originalAppId,
+          appName: config$1.data.shortName
         }));
       }
     };
@@ -48201,13 +48230,13 @@ function setCursor(launch, golbal) {
  */
 function setHistory(data) {
   //Launch接口定义
-  if (config.launch.historyMode !== undefined) {
+  if (config$1.launch.historyMode !== undefined) {
     return;
   }
 
   //数据库定义 && == 1
   if (data.recordHistory !== undefined && Number(data.recordHistory)) {
-    config.launch.historyMode = true;
+    config$1.launch.historyMode = true;
     return;
   }
 }
@@ -48235,24 +48264,24 @@ function setGestureSwipe(novelData) {
   if (novelData.parameter) {
     var parameter = parseJSON(novelData.parameter);
     /*全局优先设置覆盖*/
-    if (config.launch.gestureSwipe === undefined && parameter.pageflip !== undefined) {
+    if (config$1.launch.gestureSwipe === undefined && parameter.pageflip !== undefined) {
       switch (Number(parameter.pageflip)) {
         case 0:
           //滑动翻页
-          config.launch.gestureSwipe = true;
+          config$1.launch.gestureSwipe = true;
           break;
         case 1:
           //直接换
-          config.launch.pageFlip = true;
-          config.launch.gestureSwipe = false;
+          config$1.launch.pageFlip = true;
+          config$1.launch.gestureSwipe = false;
           break;
       }
     }
   }
 
   /*默认不锁定页面，支持手势滑动*/
-  if (config.launch.gestureSwipe === undefined) {
-    config.launch.gestureSwipe = true;
+  if (config$1.launch.gestureSwipe === undefined) {
+    config$1.launch.gestureSwipe = true;
   }
 }
 
@@ -48284,10 +48313,10 @@ function setBrType(launch, golbal) {
 function resetBrMode(hasPreFile, globalBrMode) {
   //如果在没有hasPreFile，并且没有hasFlowData，那么就是兼容读库的旧版的处理
   //如果没有hasPreFile，但是有hasFlowData，那么就是迷你杂志，不能去掉
-  if (!hasPreFile && !config.launch.hasFlowData) {
-    config.launch.brMode = '';
-    config.launch.brModel = '被resetBrMode清空了';
-    config.launch.brModeType = '';
+  if (!hasPreFile && !config$1.launch.hasFlowData) {
+    config$1.launch.brMode = '';
+    config$1.launch.brModel = '被resetBrMode清空了';
+    config$1.launch.brModeType = '';
     return;
   }
 
@@ -48296,14 +48325,14 @@ function resetBrMode(hasPreFile, globalBrMode) {
   //globalBrMode:混合模式 2 =>_i _a
   if (globalBrMode === 1) {
     /*如果用单模式，但是判断出来是混合模式，那么直接清空*/
-    if (config.launch.brModeType) {
-      config.launch.brMode = '';
-      config.launch.brModeType = '';
+    if (config$1.launch.brModeType) {
+      config$1.launch.brMode = '';
+      config$1.launch.brModeType = '';
     }
   } else if (globalBrMode === 2) {
     /*如果是混合模式，判断出来是单模式，需要重新处理*/
-    if (!config.launch.brModeType) {
-      config.launch.brModeType = getBrType(1);
+    if (!config$1.launch.brModeType) {
+      config$1.launch.brModeType = getBrType(1);
     }
   }
 }
@@ -48381,8 +48410,8 @@ function getBrType(mode) {
 function setVisualMode() {
 
   //竖版的情况下，页面模式都强制为1
-  if (config.launch.scrollMode === 'v') {
-    config.launch.visualMode = 1;
+  if (config$1.launch.scrollMode === 'v') {
+    config$1.launch.visualMode = 1;
     return;
   }
 
@@ -48390,20 +48419,20 @@ function setVisualMode() {
   //那么优先数据库
   //因为数据库默认写1了。所以1排除
   //只是有一种情况，就是你全局设了模式3，然后编辑想某些页面或者应用，用模式1，就会出现问题了
-  if (config.data.visualMode !== undefined && config.data.visualMode != 1) {
-    config.launch.visualMode = config.data.visualMode;
+  if (config$1.data.visualMode !== undefined && config$1.data.visualMode != 1) {
+    config$1.launch.visualMode = config$1.data.visualMode;
   }
 
   //默认为1
-  if (config.launch.visualMode === undefined) {
-    config.launch.visualMode = 1;
+  if (config$1.launch.visualMode === undefined) {
+    config$1.launch.visualMode = 1;
   }
 
   //模式5 只在竖版下使用
-  if (config.launch.visualMode === 5) {
+  if (config$1.launch.visualMode === 5) {
     var screen = getSize();
     if (screen.height < screen.width) {
-      config.launch.visualMode = 1;
+      config$1.launch.visualMode = 1;
     }
   }
 }
@@ -48413,8 +48442,8 @@ function setVisualMode() {
  * @return {[type]} [description]
  */
 function resetDelegate() {
-  if (config.launch.swipeDelegate !== false) {
-    config.launch.swipeDelegate = true;
+  if (config$1.launch.swipeDelegate !== false) {
+    config$1.launch.swipeDelegate = true;
   }
 }
 
@@ -48423,8 +48452,8 @@ function resetDelegate() {
  * @param {[type]} data [description]
  */
 function setPaintingMode(data) {
-  if (!config.launch.visualMode && Number(data.scrollPaintingMode)) {
-    config.launch.visualMode = 4;
+  if (!config$1.launch.visualMode && Number(data.scrollPaintingMode)) {
+    config$1.launch.visualMode = 4;
   }
 }
 
@@ -48445,8 +48474,8 @@ function setPaintingMode(data) {
 function setLaunch(novelData) {
 
   /*独立app与全局配置文件*/
-  var launch = config.launch;
-  var golbal = config.golbal;
+  var launch = config$1.launch;
+  var golbal = config$1.golbal;
 
   //////////////////////////////////
   /// brModel命名被修改该了
@@ -48462,7 +48491,7 @@ function setLaunch(novelData) {
   //debug模式
   for (var key in golbal.debug) {
     if (golbal.debug[key] !== undefined) {
-      config.debug[key] = golbal.debug[key];
+      config$1.debug[key] = golbal.debug[key];
     }
   }
 
@@ -48485,7 +48514,7 @@ function setLaunch(novelData) {
   //如果不是浏览器模式
   //强制关闭预加载模式
   if (!Xut.plat.isBrowser) {
-    config.launch.preload = null;
+    config$1.launch.preload = null;
   }
 
   //配置VisualMode
@@ -48535,7 +48564,7 @@ function baseConfig(callback) {
    */
   function ccreateRoot(callback) {
     //根节点
-    var _initRootNode = initRootNode(config.launch.el, config.launch.cursor),
+    var _initRootNode = initRootNode(config$1.launch.el, config$1.launch.cursor),
         $rootNode = _initRootNode.$rootNode,
         $contentNode = _initRootNode.$contentNode;
 
@@ -48568,7 +48597,7 @@ function baseConfig(callback) {
       configColumn(function () {
         //如果启动预加载配置
         //先探测下是否能支持
-        if (config.launch.preload) {
+        if (config$1.launch.preload) {
           initPreload(chapterTotal, function () {
             return callback(novelData);
           });
@@ -48586,7 +48615,7 @@ function baseConfig(callback) {
 function configInit(novelData, tempSettingData) {
 
   /*启动代码用户操作跟踪:启动*/
-  config.sendTrackCode('launch');
+  config$1.sendTrackCode('launch');
 
   //创建过滤器
   Xut.CreateFilter = contentFilter('createFilter');
@@ -48624,12 +48653,12 @@ function configColumn(callback) {
 function configImage() {
   //mini杂志设置
   //如果是pad的情况下设置font为125%
-  if (config.launch.platform === 'mini' && Xut.plat.isTablet) {
+  if (config$1.launch.platform === 'mini' && Xut.plat.isTablet) {
     $('body').css('font-size', '125%');
   }
 
   /*图片分辨了自适应*/
-  if (config.launch.imageSuffix) {
+  if (config$1.launch.imageSuffix) {
     adaptiveImage();
   }
 }
@@ -48638,8 +48667,8 @@ function configImage() {
  * 设置缓存，必须要可设置
  */
 var saveData = function saveData() {
-  if (config.launch.historyMode) {
-    var data = config.data;
+  if (config$1.launch.historyMode) {
+    var data = config$1.data;
     $setStorage({ "pageIndex": data.pageIndex, "novelId": data.novelId });
   } else {
     //清理
@@ -48678,8 +48707,8 @@ var initMainScene = function (options) {
 
   options = initDefaultValues(options || {});
 
-  config.data.novelId = options.novelId;
-  config.data.pageIndex = options.pageIndex;
+  config$1.data.novelId = options.novelId;
+  config$1.data.pageIndex = options.pageIndex;
 
   //设置缓存
   saveData();
@@ -48717,7 +48746,7 @@ var initMainScene = function (options) {
     Xut.Application.Notify('initComplete');
 
     /*发送初始化完毕代码跟踪*/
-    config.sendTrackCode('init', { time: +new Date() - config.launch.launchTime });
+    config$1.sendTrackCode('init', { time: +new Date() - config$1.launch.launchTime });
   });
 };
 
@@ -48760,7 +48789,7 @@ function createVideoWrap(type, options) {
 
 /*获取视频文件路径*/
 function getFilePath(url) {
-  return config.getVideoPath() + url;
+  return config$1.getVideoPath() + url;
 }
 
 /**
@@ -48872,7 +48901,7 @@ var FlarePlayer = function () {
         options.startBoot();
       }
       /*非迷你平台关闭视频*/
-      if (config.launch.platform !== 'mini') {
+      if (config$1.launch.platform !== 'mini') {
         removeVideo(options.chapterId);
       }
     });
@@ -49230,6 +49259,94 @@ function clearRepairImage(chapterIndex) {
   }
 }
 
+/**
+ * 读库服务器网址
+ * 通过iframe加载本地localhost地址的时候
+ * 会有通讯跨域的问题
+ * 这里统一解决问题的接口
+ */
+/////////////////////////
+///
+/// 发送外部消息
+///
+////////////////////////
+
+
+/**
+ * 发送通讯接口
+ * @param  {[type]} type [description]
+ * @return {[type]}      [description]
+ */
+function sendPostMessage(type) {
+  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  return type && window.parent && window.parent.postMessage({
+    type: type,
+    content: data
+  }, '*');
+}
+
+/**
+ * 监控内部的watch，转化成外部的PostMessage
+ * @return {[type]} [description]
+ */
+function watchPostMessage() {
+  //秒秒学，完成通知
+  Xut.Application.Watch('complete', function () {
+    sendPostMessage('complete');
+  });
+
+  //秒秒学收集用户信息通知
+  Xut.Application.Watch('trackCode', function (type, options) {
+    sendPostMessage(type, options);
+  });
+}
+
+function unWatchPostMessage() {
+  Xut.Application.unWatch('complete');
+  Xut.Application.unWatch('trackCode');
+}
+
+/////////////////////////
+///
+/// 接收外部消息后处理
+///
+////////////////////////
+
+
+/**
+ * 监听跨域的外部事件
+ * 秒秒学使用
+ * 2017.11.28
+ */
+function bindMessage() {
+  window.addEventListener('message', handleMessage, false);
+}
+
+function unBindMessage() {
+  window.removeEventListener('message', handleMessage, false);
+}
+
+/**
+ * 接收外部通讯，设置
+ * @param {[type]} event [description]
+ */
+function handleMessage(event) {
+  if (event.data && event.data.type) {
+    //外部调用内部API处理
+    if (event.data.type === 'api' && event.data.content) {
+      try {
+        makeJsonPack(event.data.content)();
+      } catch (err) {
+        $warn({
+          type: 'api',
+          content: '\u8DE8\u57DFmessage\u63A5\u53D7API\u51FA\u9519 ' + event.data.content
+        });
+      }
+    }
+  }
+}
+
 /////////////////////////////
 /// 初始化页面默认行为
 /////////////////////////////
@@ -49245,52 +49362,30 @@ window.fixNodeError = function (type, node, chapterIndex, src) {
   }
 };
 
-/**
- * 监听跨域的外部事件
- * 秒秒学使用
- * 2017.11.28
- */
-window.addEventListener('message', function (event) {
-  if (event.data && event.data.type) {
-    //外部调用内部API处理
-    if (event.data.type === 'api' && event.data.content) {
-      try {
-        makeJsonPack(event.data.content)();
-      } catch (err) {
-        $warn({
-          type: 'api',
-          content: '\u8DE8\u57DFmessage\u63A5\u53D7API\u51FA\u9519 ' + event.data.content
-        });
-      }
-    }
-  }
-}, false);
-
 //只初始一次
 //横竖切换要判断
 var onceBind = false;
 
+/**
+ * 全局事件
+ * 只有完全退出整个应用
+ * 或者退出iframe的情况下才使用
+ *
+ * 只是动态切换应用
+ * 或者横竖切换不销毁
+ * @return {[type]} [description]
+ */
 function initGlobalEvent() {
-
-  if (Xut.plat.isBrowser && !onceBind) {
+  if (!onceBind) {
 
     onceBind = true;
+
+    watchPostMessage();
+    bindMessage();
 
     //禁止全局的缩放处理
     $('body').on('touchmove', function (event) {
       event.preventDefault && event.preventDefault();
-    });
-
-    //桌面鼠标控制翻页
-    $(document).keyup(function (event) {
-      switch (event.keyCode) {
-        case 37:
-          Xut.View.GotoPrevSlide();
-          break;
-        case 39:
-          Xut.View.GotoNextSlide();
-          break;
-      }
     });
 
     /*防止快速刷新，会触发Original时间*/
@@ -49307,16 +49402,31 @@ function initGlobalEvent() {
           }
         }
       });
-    }, 1000);
+    }, 1500);
 
-    /*
-    启动代码用户操作跟踪
-    1、先不判断，一律按关闭提交（要有延迟）。
-    2、如果是刷新，取消之前的延迟，提交刷新提示。
-    */
-    $(window).on('beforeunload', function () {
-      config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
-    });
+    if (Xut.plat.isBrowser) {
+
+      //桌面鼠标控制翻页
+      $(document).keyup(function (event) {
+        switch (event.keyCode) {
+          case 37:
+            Xut.View.GotoPrevSlide();
+            break;
+          case 39:
+            Xut.View.GotoNextSlide();
+            break;
+        }
+      });
+
+      /*
+      启动代码用户操作跟踪
+      1、先不判断，一律按关闭提交（要有延迟）。
+      2、如果是刷新，取消之前的延迟，提交刷新提示。
+      */
+      $(window).on('beforeunload', function () {
+        config$1.sendTrackCode('exit', { time: +new Date() - config$1.launch.launchTime });
+      });
+    }
   }
 }
 
@@ -49325,6 +49435,8 @@ function initGlobalEvent() {
  */
 function clearGlobalEvent() {
   if (onceBind) {
+    unBindMessage();
+    unWatchPostMessage();
     $('body').off(); //touchmove 禁止全局的缩放处理
     $(document).off(); //keyup 左右按钮
     $(window).off(); //beforeunload,orientationchange
@@ -49508,7 +49620,7 @@ var Subtitle = function () {
     value: function _createDom(data) {
 
       //屏幕分辨率
-      var proportion = config.proportion;
+      var proportion = config$1.proportion;
       var proportionWidth = proportion.width;
       var proportionHeight = proportion.height;
 
@@ -49656,7 +49768,7 @@ var AudioSuper = function () {
     value: function _$$preRelated(options) {
 
       /*匹配URL地址*/
-      this.$$url = config.getAudioPath() + options.url;
+      this.$$url = config$1.getAudioPath() + options.url;
 
       //在manager中附加，播放一次后删除这个对象
       this.innerCallback = options.innerCallback;
@@ -50225,8 +50337,11 @@ var HTML5Audio = function (_AudioSuper) {
       this._needFix = false;
 
       setTimeout(function () {
-        _this2.audio.src = _this2.$$url;
-        _this2._initPlay();
+        if (_this2.audio) {
+          //可能已经调动了销毁
+          _this2.audio.src = _this2.$$url;
+          _this2._initPlay();
+        }
       }, 0);
     }
 
@@ -51327,8 +51442,8 @@ var deployVideo = function deployVideo(videoData, options, columnData) {
     var layerSize = setProportion({
       getStyle: getStyle,
       proportion: getStyle.pageProportion,
-      width: videoData.width || config.visualSize.width,
-      height: videoData.height || config.visualSize.height,
+      width: videoData.width || config$1.visualSize.width,
+      height: videoData.height || config$1.visualSize.height,
       left: videoData.left,
       top: videoData.top,
       padding: videoData.padding
@@ -52588,27 +52703,27 @@ function parseChapterParameter(pageData, base) {
   if (parameter) {
     try {
       parameter = JSON.parse(parameter);
+
       if (parameter) {
 
-        //parameter
+        //contentMode
         if (parameter.contentMode && parameter.contentMode == 1) {
           //非强制dom模式
-          if (!config.debug.onlyDomMode) {
+          if (!config$1.debug.onlyDomMode) {
             //启动dom模式
             base.canvasRelated.enable = true;
           }
         }
 
+        //秒秒学使用
         //lastPage如果是最后一页处理
         if (parameter.lastPage && base.pageType === 'page') {
           //运行应用运行时间
           base.runLastPageAction = function () {
-            var runTime = Number(config.data.delayTime);
+            var runTime = Number(config$1.data.delayTime);
             var timeout = void 0;
             if (runTime) {
               timeout = setTimeout(function () {
-                //发送跨域的postMessage消息
-                window.parent && window.parent.postMessage({ type: 'complete' }, '*');
                 Xut.Application.Notify('complete');
               }, runTime * 1000); //转成秒
             }
@@ -52624,6 +52739,8 @@ function parseChapterParameter(pageData, base) {
 
         //页面属性
         //2017.11.23
+        //页面属性
+        //秒秒学使用 2017.11.29
         if (parameter.pageAttr) {
           base.pageAttr = parameter.pageAttr;
         }
@@ -52982,7 +53099,7 @@ var maskBoxImage = Xut.style.maskBoxImage;
  */
 var setDataSize = function setDataSize(data) {
   //缩放比
-  var proportion = config.proportion;
+  var proportion = config$1.proportion;
 
   if (data.imageWidth) {
     data.imageWidth = data.imageWidth * proportion.width;
@@ -53009,7 +53126,7 @@ var getOffset = function getOffset(pageSide) {
       background = 'background-position:0';
       break;
     case 2:
-      background = 'background-position:' + config.screenSize.width + 'px';
+      background = 'background-position:' + config$1.screenSize.width + 'px';
       break;
   }
   return background;
@@ -53457,7 +53574,7 @@ function IScroll(node, options, delegate) {
   ///////////////////////////////
   /// 竖版禁止上下滑动的冒泡，并且不是强制的横屏滑动模式
   ///////////////////////////////
-  if (delegate && config.launch.scrollMode === 'v') {
+  if (delegate && config$1.launch.scrollMode === 'v') {
     /*如果是竖版滑动，那么就需要代理下，竖版滑动后，上下翻页*/
     if (!options.scrollX || options.scrollY) {
       return new delegateScrollY(node, options);
@@ -53519,7 +53636,7 @@ var whiteObject = {
 };var sizeArray = ["1", "1.5", "2.0"];
 
 var getFontSize = function getFontSize() {
-  newFontSize = defaultFontSize * config.proportion.width;
+  newFontSize = defaultFontSize * config$1.proportion.width;
   return [Math.floor(newFontSize * 1.5), Math.floor(newFontSize * 2.0), Math.floor(newFontSize * 2.5)];
 };
 
@@ -53588,7 +53705,7 @@ var HtmlBox = function () {
       var iscrollName = "htmlbox-iscroll-" + contentId;
 
       //缓存名
-      this.storageName = iscrollName + config.data.appId;
+      this.storageName = iscrollName + config$1.data.appId;
 
       var fontSize = getFontSize();
 
@@ -53742,7 +53859,7 @@ var HtmlBox = function () {
     key: '_relocateToolbar',
     value: function _relocateToolbar(iscrollName) {
       //修正模式2下屏幕溢出高度
-      var visualSize = config.visualSize;
+      var visualSize = config$1.visualSize;
       var left = visualSize.overflowWidth && Math.abs(visualSize.left) || 0;
       var top = visualSize.overflowHeight && Math.abs(visualSize.top) || 0;
       this.$htmlbox[0].style.cssText += "margin-top:" + top + "px";
@@ -54651,7 +54768,7 @@ var eventMixin = function (activitProto) {
       */
       var contentData = self.relatedData.contentDataset[self.id];
       if (contentData && contentData.trackCode) {
-        config.sendTrackCode('content', {
+        config$1.sendTrackCode('content', {
           pageId: self.pageId,
           id: self.id,
           type: self.type,
@@ -54686,7 +54803,7 @@ var eventMixin = function (activitProto) {
     if (eventContext && eventName) {
       //如果是翻页委托启动了
       //这里处理swiperight与swipeleft
-      if (config.launch.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
+      if (config$1.launch.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
         self.relatedCallback.swipeDelegateContents(eventName, function (callback) {
           self.runAnimation(callback);
         });
@@ -54778,7 +54895,7 @@ var _class$1 = function () {
     this.originalImageList = pa.ImageList;
 
     /**webp图片的后缀*/
-    var brModeType = config.launch.brModeType;
+    var brModeType = config$1.launch.brModeType;
     if (brModeType) {
       _.each(this.originalImageList, function (imageData) {
         if (imageData.name) {
@@ -55121,7 +55238,7 @@ var spiritObjs = {};
  */
 var getData = function getData(inputPara, contents) {
   var option = void 0;
-  var resourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
+  var resourcePath = config$1.getWidgetPath() + "gallery/" + inputPara.id + "/";
   var xhr = new XMLHttpRequest();
   xhr.open('GET', resourcePath + 'app.json', false);
   xhr.send(null);
@@ -55169,7 +55286,7 @@ function updateAction(id, params) {
 
 var AdvSprite = function (inputPara, contents) {
   var option = getData(inputPara, contents);
-  var ResourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
+  var ResourcePath = config$1.getWidgetPath() + "gallery/" + inputPara.id + "/";
   var contentPrefix = inputPara.contentPrefix;
   var ids = [];
   var options = {};
@@ -58544,17 +58661,44 @@ var Powepoint = function () {
   }
 
   /**
-   * 解析脚本代码
-   * 包装能函数
+   * 过滤出论坛脚本
+   * @return {[type]} [description]
+   * Xut.Assist.ForumOpen();
+   * Xut.Assist.ForumClose();
    */
 
 
   createClass(Powepoint, [{
+    key: '_filterCode',
+    value: function _filterCode(code) {
+      //过滤出论坛的脚本
+      //因为翻页需要关闭
+      //母版上不会操作复位，需要手动过滤
+      if (this.pageType === 'master') {
+        //打开
+        if (/ForumOpen/ig.test(code)) {
+          this.forumOpen = true;
+        }
+        //关闭
+        if (/ForumClose/ig.test(code)) {
+          this.forumClose = true;
+        }
+      }
+    }
+
+    /**
+     * 解析脚本代码
+     * 包装能函数
+     */
+
+  }, {
     key: '_parseCode',
     value: function _parseCode(code1, code2) {
       if (code1 && code1.length > 0) {
+        this._filterCode(code1);
         return makeJsonPack(code1);
       } else if (code2 && code2.length > 0) {
+        this._filterCode(code2);
         return makeJsonPack(code2);
       }
     }
@@ -60029,6 +60173,9 @@ function fastPipe(data, base) {
   };
 
   return _.extend(data, {
+
+    constructor: 'fastPipe',
+
     init: function init() {
       //预显示跳过动画创建
       prepVisible && $contentNode.css({ 'visibility': prepVisible });
@@ -60317,7 +60464,7 @@ function getStepProperty(_ref2) {
 
   //这里有页面模式的配置处理
   //获取的页面翻页的区域值不一样
-  var size = isColumn ? config.screenSize : config.visualSize;
+  var size = isColumn ? config$1.screenSize : config$1.visualSize;
   var width = size.width;
   var height = size.height;
 
@@ -61189,7 +61336,7 @@ var Activity = function () {
             fadeScrollbars: true
 
             /*迷你平台，工具栏不消失*/
-          };if (config.launch.platform === 'mini') {
+          };if (config$1.launch.platform === 'mini') {
             option.fadeScrollbars = false;
           }
 
@@ -61858,7 +62005,7 @@ var ScalePan = function () {
        * 最大缩放值
        * @type {Number}
        */
-      this.maxScale = config.launch.salePictureMultiples || 4;
+      this.maxScale = config$1.launch.salePictureMultiples || 4;
 
       /**
        * 允许溢出值
@@ -62168,7 +62315,7 @@ var ScalePan = function () {
     value: function _createPinchButton() {
       var _this4 = this;
 
-      var visualSize = config.visualSize;
+      var visualSize = config$1.visualSize;
       var left = visualSize.overflowWidth && Math.abs(visualSize.left) || 0;
       var top = visualSize.overflowHeight && Math.abs(visualSize.top) || 0;
       var $node = closeButton(function () {
@@ -62562,7 +62709,7 @@ function getFinalSizePosition(imageSize, wrapperSize) {
  */
 function createContainerView(imgContainer) {
   var html = void 0;
-  var visualSize = config.visualSize;
+  var visualSize = config$1.visualSize;
   var right = visualSize.overflowWidth && Math.abs(visualSize.right) || 0;
   var top = visualSize.overflowHeight && Math.abs(visualSize.top) || 0;
   var rightCopy = right + 4;
@@ -62571,7 +62718,7 @@ function createContainerView(imgContainer) {
 
   var zoomImg = '<img class="xut-zoom-fly"\n                      src="' + imgContainer.originSrc + '"\n                      style="width:' + imgContainer.width + 'px;\n                             height:' + imgContainer.height + 'px;\n                             top:' + imgContainer.top + 'px;\n                             left:' + imgContainer.left + 'px;" />';
 
-  if (config.screenHorizontal) {
+  if (config$1.screenHorizontal) {
     html = '<div class="xut-zoom-view">\n                <div class="xut-zoom-overlay"></div>\n                <div class="xut-zoom-close" style="right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                    <div class="si-icon Flaticon xut-flaticon-error" style="font-size:5vw;border-radius:50%;right:0">\n                    </div>\n                </div>\n                ' + zoomImg + '\n            </div>';
   } else {
     //竖屏
@@ -62676,7 +62823,7 @@ var ScalePicture = function () {
     //所以坐标的算法是有区别了
     var containerLeft = 0;
     var containerTop = 0;
-    var visualSize = config.visualSize;
+    var visualSize = config$1.visualSize;
     if (visualSize.left) {
       containerLeft = visualSize.left;
       containerTop = visualSize.top;
@@ -62693,7 +62840,7 @@ var ScalePicture = function () {
 
     var offset = element.offset();
     this.originImgLeft = offset.left - containerLeft;
-    this.originImgTop = offset.top - containerTop - config.launch.visualTop;
+    this.originImgTop = offset.top - containerTop - config$1.launch.visualTop;
 
     //关闭动画中执行中
     this.isCloseAniming = false;
@@ -62763,19 +62910,19 @@ var ScalePicture = function () {
     key: '_getData',
     value: function _getData() {
 
-      var view = config.screenSize;
+      var view = config$1.screenSize;
       var overflowLeft = 0;
 
       //如果有宽度溢出
       //就是说用了窗口指定模式
-      if (config.visualSize.left) {
-        view = config.visualSize;
+      if (config$1.visualSize.left) {
+        view = config$1.visualSize;
       }
 
       //虚拟模拟3下，宽度可能溢出，所以需要取屏幕宽度
-      if (config.launch.visualMode === 3) {
-        view = config.screenSize;
-        overflowLeft = config.visualSize.left;
+      if (config$1.launch.visualMode === 3) {
+        view = config$1.screenSize;
+        overflowLeft = config$1.visualSize.left;
       }
 
       return getImgConfig({
@@ -62893,7 +63040,7 @@ var ScalePicture = function () {
     value: function _bindPan($imgNode) {
       var _this3 = this;
 
-      if (!this.slideObj && Xut.plat.hasTouch && config.launch.salePicture) {
+      if (!this.slideObj && Xut.plat.hasTouch && config$1.launch.salePicture) {
         var tapCallabck = function tapCallabck() {
           return _this3._closeSingleView();
         };
@@ -63162,7 +63309,7 @@ var ScalePicture = function () {
 //////////////////////////
 /*图片*/
 function createHTML$1() {
-  var size = config.screenSize.width > config.screenSize.height ? '2vw' : '2vh';
+  var size = config$1.screenSize.width > config$1.screenSize.height ? '2vw' : '2vh';
   return '<div class="xut-icon-maximize"style="font-size:' + size + ';position:absolute;right:0;"></div>';
 }
 
@@ -63869,7 +64016,7 @@ var maskContent = function maskContent(data, wrapObj) {
       restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'mask') + '"\n              class="inherit-size fullscreen-background edges"\n              ' + getImgSrc() + '/>');
     } else {
       //canvas
-      restr += String.styleFormat('<canvas class="inherit-size fullscreen-background edges"\n                 src="' + resourcePath + '"\n                 mask="' + isMaskImg + '"\n                 width="' + data.scaleWidth + '"\n                 height="' + data.scaleHeight + '"\n                 style="opacity:0;' + (config.data.pathAddress.replace(/\//g, "\/") + data.mask) + '"/>');
+      restr += String.styleFormat('<canvas class="inherit-size fullscreen-background edges"\n                 src="' + resourcePath + '"\n                 mask="' + isMaskImg + '"\n                 width="' + data.scaleWidth + '"\n                 height="' + data.scaleHeight + '"\n                 style="opacity:0;' + (config$1.data.pathAddress.replace(/\//g, "\/") + data.mask) + '"/>');
     }
 
     //精灵图
@@ -64391,7 +64538,7 @@ var analysisPath = function analysisPath(wrapObj, conData) {
     var fileFullPath = getFileFullPath(fileName, 'content', isGif);
 
     /*如果启动了预加载，去掉随机后缀*/
-    if (config.launch.preload) {
+    if (config$1.launch.preload) {
       resourcePath = fileFullPath;
     } else {
       //如果没有启动preload，需要随机，保证不缓存
@@ -64766,7 +64913,7 @@ function contentStructure(pipeData, $$floatDivertor, callback) {
         } else if (overflowMode === 'all') {
           //左右都溢出
           //强制全屏
-          var _baseRatio2 = config.screenSize.width / sizeResults.scaleWidth;
+          var _baseRatio2 = config$1.screenSize.width / sizeResults.scaleWidth;
           setRatio(setPageProportion(_baseRatio2));
           sizeResults.scaleLeft = visualLeftInteger;
           sizeResults.scaleTop = originalTop + (originalHeight - sizeResults.scaleHeight) / 2;
@@ -65438,7 +65585,7 @@ function $trigger(_ref, columnData) {
       var data = { id: id, key: key, type: type, rootNode: rootNode, target: target, pageIndex: pageIndex, pageType: pageType, "activityId": id, columnData: columnData
 
         /*如果有代码跟踪*/
-      };config.sendTrackCode('hot', {
+      };config$1.sendTrackCode('hot', {
         id: id,
         type: type,
         pageId: Xut.Presentation.GetPageId(pageType, pageIndex),
@@ -65523,7 +65670,7 @@ function $suspend(pageBase, pageId, allHandle) {
  * @return {[type]}      [description]
  */
 var hasOptimize = function hasOptimize(fn) {
-  if (!config.launch.visualMode !== 4) {
+  if (!config$1.launch.visualMode !== 4) {
     fn && fn();
   }
 };
@@ -65809,7 +65956,7 @@ var Media = {
 
     //只针对网页插件增加单独的点击界面
     //如果有视频图标
-    if (category == 'webpage' && scaleWidth > 200 && scaleHeight > 100 && scaleWidth <= config.visualSize.width && scaleHeight <= config.visualSize.height) {
+    if (category == 'webpage' && scaleWidth > 200 && scaleHeight > 100 && scaleWidth <= config$1.visualSize.width && scaleHeight <= config$1.visualSize.height) {
       mediaIcon = '<div id="icon_' + _id + '"\n              type="icon"\n              style="width:' + mediaIconSize + 'px;\n                     height:' + mediaIconSize + 'px;\n                     top:' + (scaleHeight - mediaIconSize) / 2 + 'px;\n                     left:' + (scaleWidth - mediaIconSize) / 2 + 'px;\n                     position:absolute;background-image:url(images/icons/web_hotspot.png)">\n         </div>';
     }
 
@@ -65966,7 +66113,7 @@ var Media = {
  * @return {[type]}      [description]
  */
 function path$2(fileName, widgetId) {
-  return config.getWidgetPath() + widgetId + '/' + fileName;
+  return config$1.getWidgetPath() + widgetId + '/' + fileName;
 }
 
 /**
@@ -66873,7 +67020,7 @@ var iframeWidget = function () {
       var _this2 = this;
 
       var ifr = document.createElement('iframe');
-      var path = config.data.rootPath + '/widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key;
+      var path = config$1.data.rootPath + '/widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key;
       ifr.id = 'iframe_' + this.id;
       ifr.src = path;
       ifr.style.width = '100%';
@@ -67212,7 +67359,7 @@ function Adapter(para) {
   /*缩放比值*/
   data = calculateSize(data, pageStyle);
 
-  data.inputPara.uuid = config.data.appId + '-' + data.activityId; //唯一ID标示
+  data.inputPara.uuid = config$1.data.appId + '-' + data.activityId; //唯一ID标示
   data.inputPara.id = data.activityId;
   data.inputPara.screenSize = pageVisualSize;
 
@@ -67220,7 +67367,7 @@ function Adapter(para) {
   data.inputPara.contentPrefix = Xut.Presentation.GetContentPrefix(data.pageIndex, data.pageType);
 
   //画轴模式
-  data.scrollPaintingMode = config.launch.visualMode === 4;
+  data.scrollPaintingMode = config$1.launch.visualMode === 4;
   data.calculate = pageVisualSize;
 
   //执行类构建
@@ -67306,7 +67453,7 @@ var ShowNote$1 = function () {
       var that = this,
           note = this.data.note,
           prop = Xut.config.proportion,
-          width = Math.round((prop.width + prop.height) / 2 * config.data.iconHeight),
+          width = Math.round((prop.width + prop.height) / 2 * config$1.data.iconHeight),
           space = Math.round(width / 2);
 
       var retStr = '<div class="xut-shownote-box" style="z-index:' + Xut.zIndexlevel() + '">' + '<div class="close" style="width:' + width + 'px;height:' + width + 'px;top:-' + space + 'px;right:-' + space + 'px"></div>' + '<div class="content">' + note + '</div>' + '</div>';
@@ -67397,7 +67544,7 @@ var ShowNote$$1 = {
         scaleTop = _ref.scaleTop,
         scaleLeft = _ref.scaleLeft;
 
-    var newWidth = (scaleWidth + scaleHeight) / 2 * config.data.iconHeight;
+    var newWidth = (scaleWidth + scaleHeight) / 2 * config$1.data.iconHeight;
     return String.styleFormat('<div id="ShowNote_' + _id + '"\n            class="xut-showNote"\n            data-belong ="' + pageType + '"\n            data-delegate="shownote"\n            style="width:' + newWidth + 'px;height:' + newWidth + 'px">\n       </div>');
   }
 
@@ -67645,7 +67792,7 @@ var transitionDuration$1 = Xut.style.transitionDuration;
  */
 var setTranslate = function setTranslate(node, distance, speed, callback) {
   if (node) {
-    if (config.launch.scrollMode === 'v') {
+    if (config$1.launch.scrollMode === 'v') {
       Xut.style.setTranslate({ node: node, speed: speed, y: distance });
     } else {
       Xut.style.setTranslate({ node: node, speed: speed, x: distance });
@@ -67661,7 +67808,7 @@ var setTranslate = function setTranslate(node, distance, speed, callback) {
  */
 var set$1 = function set(node, value) {
   if (node) {
-    if (config.launch.scrollMode === 'v') {
+    if (config$1.launch.scrollMode === 'v') {
       Xut.style.setTranslate({ node: node, y: value });
     } else {
       Xut.style.setTranslate({ node: node, x: value });
@@ -67721,7 +67868,7 @@ var translation = {
    * @return {[type]}        [description]
    */
 };var createTranslate = function createTranslate(value) {
-  if (config.launch.scrollMode === 'v') {
+  if (config$1.launch.scrollMode === 'v') {
     return Xut.style.setTranslateStyle(0, value);
   }
   return Xut.style.setTranslateStyle(value, 0);
@@ -67734,11 +67881,11 @@ var translation = {
  */
 function fix($node, action) {
   var translate = void 0;
-  if (config.launch.scrollMode === 'v') {
-    var visualHight = config.visualSize.height;
+  if (config$1.launch.scrollMode === 'v') {
+    var visualHight = config$1.visualSize.height;
     translate = action === 'prevEffect' ? createTranslate(-visualHight) : createTranslate(visualHight);
   } else {
-    var visualWidth = config.visualSize.width;
+    var visualWidth = config$1.visualSize.width;
     translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth);
   }
   $node.css(Xut.style.transform, translate);
@@ -68091,7 +68238,7 @@ var getSingle = function getSingle(_ref) {
   /*如果没有传递布方向，就取页面
   flow中没有定义，这个在全局接口中处理*/
   if (!orientation) {
-    orientation = config.launch.scrollMode;
+    orientation = config$1.launch.scrollMode;
   }
 
   var front = 0;
@@ -68169,7 +68316,7 @@ var getDouble = function getDouble(_ref2) {
   var middle = 0;
   var right = 0;
   var view = middleIndex;
-  var screenWidth = config.screenSize.width;
+  var screenWidth = config$1.screenSize.width;
   if (direction === 'next') {
     /*滑动,反弹，需要叠加当期之前之前所有页面的距离综合，
     因为索引从0开始，所以middleIndex就是之前的总和页面数*/
@@ -68190,7 +68337,7 @@ var getDouble = function getDouble(_ref2) {
  * @return {[type]} [description]
  */
 function getVisualDistance(options) {
-  return config.launch.doublePageMode ? getDouble(options) : getSingle(options);
+  return config$1.launch.doublePageMode ? getDouble(options) : getSingle(options);
 }
 
 /**
@@ -68489,7 +68636,7 @@ function api(Swiper) {
       };
 
       /*启动了预加载模式*/
-      if (config.launch.preload) {
+      if (config$1.launch.preload) {
         var status = requestInterrupt({
           type: 'linear',
           direction: 'prev',
@@ -68534,7 +68681,7 @@ function api(Swiper) {
       };
 
       /*启动了预加载模式*/
-      if (config.launch.preload) {
+      if (config$1.launch.preload) {
         var status = requestInterrupt({
           type: 'linear',
           direction: 'next',
@@ -69307,14 +69454,14 @@ var Swiper = function (_Observer) {
       /*提供swiperConfig快速配置文件,关键配置*/
       var scrollX = true;
       var scrollY = false;
-      if (config.launch.scrollMode === 'v') {
+      if (config$1.launch.scrollMode === 'v') {
         scrollX = false;
         scrollY = true;
       }
       return {
         scrollY: scrollY,
         scrollX: scrollX,
-        banMove: config.launch.gestureSwipe === false ? true : false
+        banMove: config$1.launch.gestureSwipe === false ? true : false
       };
     }
 
@@ -69776,7 +69923,7 @@ var Swiper = function (_Observer) {
 
       /*如果是Y轴移动，发送请求,并且不是mouseleave事件，在PC上mouseleave离开非可视区重复触发*/
       if (this._behavior === 'reverse' && e.type !== 'mouseleave') {
-        config.sendTrackCode('swipe', {
+        config$1.sendTrackCode('swipe', {
           'direction': orientation,
           'pageId': this.visualIndex + 1
         });
@@ -69825,7 +69972,7 @@ var Swiper = function (_Observer) {
        * 如果还在预加载中，强制翻页为反弹
        * 然后记录动作，等加载结束后处理
        */
-      if (actionType === 'flipOver' && config.launch.preload) {
+      if (actionType === 'flipOver' && config$1.launch.preload) {
         var status = requestInterrupt({
           type: 'linear',
           direction: this.direction,
@@ -70227,7 +70374,7 @@ function swiperHook(e, node) {
   var hasTyperlink = false;
   if (dataType === 'hyperlink') {
     hasTyperlink = true;
-    config.sendTrackCode('hot', {
+    config$1.sendTrackCode('hot', {
       id: node.getAttribute('data-id'),
       pageId: node.getAttribute('data-page-id'),
       type: 'hyperlink',
@@ -70238,7 +70385,7 @@ function swiperHook(e, node) {
   var nodeName = node.nodeName.toLowerCase();
 
   //如果是移动端的情况下 && 支持二维码 && 是图片 && 是二维码标记
-  if (config.launch.supportQR && Xut.plat.hasTouch && nodeName === "img" && dataType === 'qrcode') {
+  if (config$1.launch.supportQR && Xut.plat.hasTouch && nodeName === "img" && dataType === 'qrcode') {
     return 'qrcode';
   } else {
     if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG && nodeName !== 'a' && //并且不是a标签(在cloumn中有a标签，需要跳转)
@@ -70441,9 +70588,9 @@ var ColumnClass = function () {
       container: rootNode,
       content: this.$container
     }, function () {
-      if (config.launch.scrollMode === 'h') {
+      if (config$1.launch.scrollMode === 'h') {
         _this._initX();
-      } else if (config.launch.scrollMode === 'v') {
+      } else if (config$1.launch.scrollMode === 'v') {
         _this._initY();
       }
       callback();
@@ -71064,9 +71211,9 @@ var ColumnClass = function () {
       var newColumnCount = getColumnCount$1(this.seasonId, this.chapterId);
       /*假如分栏数有变化*/
       if (newColumnCount > this.columnCount) {
-        if (config.launch.scrollMode === 'h') {
+        if (config$1.launch.scrollMode === 'h') {
           this._resetX(newColumnCount);
-        } else if (config.launch.scrollMode === 'v') {
+        } else if (config$1.launch.scrollMode === 'v') {
           this._resetY(newColumnCount);
         }
       }
@@ -71497,7 +71644,7 @@ function initThreadtasks(instance) {
       2.flow页面不允许缩放
        */
       var createScale = function createScale() {
-        var salePageType = config.launch.salePageType;
+        var salePageType = config$1.launch.salePageType;
         if (isPageType && (salePageType === 'page' || salePageType === 'all')) {
           instance._pageScaleObj = initPageScale(instance.getScaleNode(), instance.pageIndex);
         }
@@ -71754,7 +71901,7 @@ var initstate = function (baseProto) {
      * 收集滑动委托对象，针对事件合集触发处理
      * 2016.11.8
      */
-    if (config.launch.swipeDelegate) {
+    if (config$1.launch.swipeDelegate) {
       this.swipeSequence = {
         swipeleft: [],
         swiperight: [],
@@ -71808,7 +71955,7 @@ var initstate = function (baseProto) {
        * 开始column观察器
        */
       threadtaskComplete: function threadtaskComplete() {
-        watchColumn(instance, config);
+        watchColumn(instance, config$1);
       },
 
 
@@ -72119,7 +72266,7 @@ var threadExternal = function (baseProto) {
       return function () {
         /*当创建完容器后，就允许快速翻页了
         如果此时是快速打开，并且是翻页的动作*/
-        if (config.launch.quickFlip && isFlipAction) {
+        if (config$1.launch.quickFlip && isFlipAction) {
           callback();
         } else {
           /*如果不是快速翻页，那么就继续往下分解任务*/
@@ -72682,7 +72829,7 @@ var movePage = function (baseProto) {
       1.gestureSwipe，关闭了翻页效果,直接跳页面，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if (isVisual && (fixQuickFlip || !config.launch.gestureSwipe)) {
+      if (isVisual && (fixQuickFlip || !config$1.launch.gestureSwipe)) {
         Xut.View.SetSwiperFilpComplete(pageNode, true);
         return true;
       }
@@ -72920,7 +73067,7 @@ destroy$1(baseProto);
  *   所以根据全局的scrollMode参数而定
  */
 function getPosition(createIndex, visualIndex) {
-  var isVertical = config.launch.scrollMode === 'v';
+  var isVertical = config$1.launch.scrollMode === 'v';
   var direction = void 0;
   if (createIndex < visualIndex) {
     direction = isVertical ? 'top' : 'left';
@@ -73056,7 +73203,7 @@ function converDoublePage(createPointer, needTotal) {
     return createDoublePage;
   }
 
-  if (config.launch.doublePageMode) {
+  if (config$1.launch.doublePageMode) {
     var base = void 0,
         left = void 0,
         right = void 0;
@@ -73099,7 +73246,7 @@ function getRealPage(pageIndex, type) {
     return [];
   }
 
-  if (config.launch.doublePageMode) {
+  if (config$1.launch.doublePageMode) {
     /*转化后的页面合集*/
     var pageIds = converDoublePage(pageIndex);
     /*双页*/
@@ -73224,7 +73371,7 @@ var PageMgr = function (_ManageSuper) {
     双页模式，给父节点绑定一个翻页监听事件
     如果翻页完成，手动触发翻页事件
     */
-    if (config.launch.doublePageMode) {
+    if (config$1.launch.doublePageMode) {
       $on(rootNode, {
         transitionend: function transitionend() {
           Xut.View.SetSwiperFilpComplete();
@@ -73240,8 +73387,8 @@ var PageMgr = function (_ManageSuper) {
   createClass(PageMgr, [{
     key: 'setInitTranslate',
     value: function setInitTranslate(pageIndex) {
-      if (config.launch.doublePageMode) {
-        var distance = config.screenSize.width * pageIndex;
+      if (config$1.launch.doublePageMode) {
+        var distance = config$1.screenSize.width * pageIndex;
         Xut.style.setTranslate({
           x: -distance,
           node: this.rootNode
@@ -73301,7 +73448,7 @@ var PageMgr = function (_ManageSuper) {
 
       /*双页模式，移动父容器*/
 
-      if (config.launch.doublePageMode) {
+      if (config$1.launch.doublePageMode) {
         this._moveContainer(moveDistance[1], speed);
       } else {
         /*单页模式，移动每个独立的页面*/
@@ -73330,8 +73477,9 @@ var PageMgr = function (_ManageSuper) {
 
       /*如果有代码跟踪*/
       if (suspendPageObj.startupTime) {
-        config.sendTrackCode('flip', {
+        config$1.sendTrackCode('flip', {
           pageId: suspendPageObj.chapterId,
+          pageAttr: suspendPageObj.pageAttr,
           time: +new Date() - suspendPageObj.startupTime
         });
       }
@@ -73445,8 +73593,14 @@ var PageMgr = function (_ManageSuper) {
       /*检测页面是否已经完全创建完毕，并且返回页面对象*/
       this._checkTaskCompleted(middleIndex, function (activatePageObj) {
 
-        /*跟踪，每个页面的停留时间，开始*/
-        if (config.hasTrackCode('flip')) {
+        //进入每次页面触发
+        config$1.sendTrackCode('enter', {
+          pageId: activatePageObj.chapterId,
+          pageAttr: activatePageObj.pageAttr
+        });
+
+        //跟踪，每个页面的停留时间，开始
+        if (config$1.hasTrackCode('flip')) {
           activatePageObj.startupTime = +new Date();
         }
 
@@ -73516,7 +73670,7 @@ var PageMgr = function (_ManageSuper) {
       this._$$destroyBaseGroup();
 
       //销毁事件
-      if (config.launch.doublePageMode) {
+      if (config$1.launch.doublePageMode) {
         $off(this.rootNode);
       }
 
@@ -73642,8 +73796,8 @@ var MasterMgr = function (_ManageSuper) {
 
     var _this = possibleConstructorReturn(this, (MasterMgr.__proto__ || Object.getPrototypeOf(MasterMgr)).call(this));
 
-    _this.visualWidth = config.visualSize.width;
-    _this.visualHeight = config.visualSize.height;
+    _this.visualWidth = config$1.visualSize.width;
+    _this.visualHeight = config$1.visualSize.height;
 
     _this.pageType = 'master';
 
@@ -74530,14 +74684,14 @@ function getVisualSize$1(styleDataset) {
 
   //默认的config.launch.visualMode
 
-  var visualSize = config.visualSize;
+  var visualSize = config$1.visualSize;
   var hasRecalculate = false;
 
   /*
   如果页面模式不跟页面保持一致或者是模式3的情况的
   就需要重新计算
   */
-  if (pageVisualMode && pageVisualMode !== config.launch.visualMode || pageVisualMode === 3) {
+  if (pageVisualMode && pageVisualMode !== config$1.launch.visualMode || pageVisualMode === 3) {
     visualSize = resetVisualLayout(pageVisualMode);
     hasRecalculate = true;
   }
@@ -74579,7 +74733,7 @@ function getPageProportion(data) {
       left: data.visualLeft
     });
   } else {
-    return config.proportion;
+    return config$1.proportion;
   }
 }
 
@@ -74761,7 +74915,7 @@ function setCustomStyle(styleDataset) {
     styleDataset['_' + data.position].push(data.chapterIndex);
   });
 
-  if (!config.launch.doublePageMode) {
+  if (!config$1.launch.doublePageMode) {
 
     /**
      * 获取指定页面样式
@@ -74813,7 +74967,7 @@ function getVisualMode(chapterData) {
 
   //反向模式设置
   //如果是全局模式1，并且是竖向横显示
-  if (config.launch.visualMode === 1 && config.verticalToHorizontalVisual) {
+  if (config$1.launch.visualMode === 1 && config$1.verticalToHorizontalVisual) {
     return 1;
   }
 
@@ -74832,7 +74986,7 @@ function getVisualMode(chapterData) {
   }
 
   //返回全局页面模式
-  return config.launch.visualMode || 1;
+  return config$1.launch.visualMode || 1;
 }
 
 /*********************************************************************
@@ -75183,7 +75337,7 @@ var Scheduler = function () {
       //用户强制直接切换模式
       //禁止页面跟随滑动
 
-      if (!config.launch.gestureSwipe && action == 'flipMove') {
+      if (!config$1.launch.gestureSwipe && action == 'flipMove') {
         return;
       }
 
@@ -75193,7 +75347,7 @@ var Scheduler = function () {
       //mini杂志功能
       //一次是拦截
       //一次是触发动作
-      if (config.launch.swipeDelegate && visualObj) {
+      if (config$1.launch.swipeDelegate && visualObj) {
 
         //如果是swipe就全局处理
         if (action === 'swipe') {
@@ -75420,7 +75574,7 @@ var Scheduler = function () {
          */
         buildComplete: function buildComplete(seasonId) {
 
-          if (config.launch.historyMode && !options.isInApp) {
+          if (config$1.launch.historyMode && !options.isInApp) {
 
             //如果是主页面，删除历史记录
             if (options.isMain) {
@@ -75499,7 +75653,7 @@ var Scheduler = function () {
        * 线性结构
        * 保存目录索引
        */
-      if (config.launch && config.launch.historyMode && !options.hasMultiScene) {
+      if (config$1.launch && config$1.launch.historyMode && !options.hasMultiScene) {
         $setStorage("pageIndex", middleIndex);
       }
 
@@ -76173,7 +76327,7 @@ function extendView($$mediator, access, $$globalSwiper) {
   Xut.View.InsertAfter = function (originalChapterId, targetChapterId) {
 
     //这个模式必须是禁止手势滑动的
-    if (config.launch.gestureSwipe) {
+    if (config$1.launch.gestureSwipe) {
       $warn({
         type: 'api',
         content: 'gestureSwipe启动了，Xut.View.InsertAfter不生效',
@@ -76262,7 +76416,7 @@ function extendView($$mediator, access, $$globalSwiper) {
     $$globalSwiper.setDirection(distance);
 
     /*如果没有传递布方向，就取页面，这个在全局接口中处理*/
-    orientation = orientation || config.launch.scrollMode;
+    orientation = orientation || config$1.launch.scrollMode;
 
     $$mediator.$$scheduler.movePageBases({
       action: action,
@@ -76285,11 +76439,28 @@ function extendView($$mediator, access, $$globalSwiper) {
 function extendAssist(access, $$globalSwiper) {
 
   /**
+   * 制作PostMessage闭包
+   * @return {[type]} [description]
+   */
+  function getPostMessage(type) {
+    if (window.parent && type) {
+      return function (data) {
+        return sendPostMessage(type, data);
+      };
+    }
+  }
+
+  /**
    * 标记讨论区状态
    * @type {Boolean}
    */
   Xut.Assist.ForumStatus = false;
 
+  /**
+   * 设置讨论区
+   * @param {Function} fn    [description]
+   * @param {[type]}   state [description]
+   */
   function setForum(fn, state) {
     if (fn) {
       //从1开始算
@@ -76301,26 +76472,11 @@ function extendAssist(access, $$globalSwiper) {
   }
 
   /**
-   * 跨域问题，定义postMessage
-   * @return {[type]} [description]
-   */
-  function getGolbalForumFn(name) {
-    if (window.parent) {
-      return function (data) {
-        window.parent.postMessage({
-          type: name,
-          content: data
-        }, '*');
-      };
-    }
-  }
-
-  /**
    * 针对秒秒学的api
    * 打开讨论区
    */
   Xut.Assist.ForumOpen = function () {
-    return setForum(getGolbalForumFn('forumOpen'), true);
+    return setForum(getPostMessage('forumOpen'), true);
   };
 
   /**
@@ -76328,7 +76484,36 @@ function extendAssist(access, $$globalSwiper) {
    * 关闭讨论区
    */
   Xut.Assist.ForumClose = function () {
-    return setForum(getGolbalForumFn('forumClose'), false);
+    return setForum(getPostMessage('forumClose'), false);
+  };
+
+  /**
+   * 设置答题卡的正确错误率
+   */
+  function setAnswer(fn) {
+    if (fn) {
+      var pageBase = Xut.Presentation.GetPageBase();
+      fn({
+        appId: config.data.originalAppId,
+        pageId: pageBase.chapterId
+      });
+    }
+  }
+
+  /**
+   * 秒秒学答题卡
+   * 正确性
+   */
+  Xut.Assist.Correct = function () {
+    return setAnswer(getPostMessage('Correct'));
+  };
+
+  /**
+   * 秒秒学答题卡
+   * 错误性
+   */
+  Xut.Assist.Incorrect = function () {
+    return setAnswer(getPostMessage('Incorrect'));
   };
 
   /**
@@ -76681,7 +76866,7 @@ function extendCamera(access, $$globalSwiper) {
      delay 延时执行时间
    */
   Xut.Camera.MoveX = function (position, speed, delay) {
-    if (config.launch.visualMode === 5) {
+    if (config$1.launch.visualMode === 5) {
       $$globalSwiper.scrollToPosition(position, speed, delay);
     }
   };
@@ -76774,14 +76959,14 @@ function configMultiple(options) {
     var pageMode = Number(options.pageMode);
 
     //如果是禁止翻页，然后还要看是不是有pageMode的设置
-    if (!config.launch.gestureSwipe) {
+    if (!config$1.launch.gestureSwipe) {
 
       //喵喵学模式比较特别
       //在数据里中设定了filpMode为1
       //那么就是锁定了不允许翻页，但是还要能支持左右跳页面
       //这里就需要按照多页面的模式处理
       //强制是多页面的方式创建，但是锁住翻页而已
-      if (config.launch.pageFlip) {
+      if (config$1.launch.pageFlip) {
         options.hasMultiPage = true;
         return;
       }
@@ -76853,7 +77038,7 @@ var Mediator = function (_Observer) {
 
     //启用内部滚动模式
     var insideScroll = false;
-    if (config.launch.visualMode === 5) {
+    if (config$1.launch.visualMode === 5) {
       insideScroll = true;
     }
 
@@ -76865,20 +77050,20 @@ var Mediator = function (_Observer) {
       container: options.sceneNode,
       visualIndex: options.initIndex,
       totalIndex: options.pageTotal,
-      actualWidth: config.visualSize.width,
-      actualHeight: config.visualSize.height,
-      visualWidth: config.screenSize.width, //可视区的宽度
+      actualWidth: config$1.visualSize.width,
+      actualHeight: config$1.visualSize.height,
+      visualWidth: config$1.screenSize.width, //可视区的宽度
       hasMultiPage: options.hasMultiPage, //多页面
       sectionRang: options.sectionRang //分段值
 
 
       /*如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式*/
-    };if (config.launch.mouseWheel !== false && config.launch.scrollMode === 'v') {
+    };if (config$1.launch.mouseWheel !== false && config$1.launch.scrollMode === 'v') {
       setOptions.mouseWheel = true;
     }
 
     /*虚拟摄像头模式，关闭边界反弹*/
-    if (config.launch.visualMode === 5) {
+    if (config$1.launch.visualMode === 5) {
       setOptions.borderBounce = false;
     }
 
@@ -76914,9 +77099,9 @@ var Mediator = function (_Observer) {
       //并且是虚拟模式2的话
       //默认允许滑动
       if (!handlerObj) {
-        if (config.launch.visualMode === 2) {
+        if (config$1.launch.visualMode === 2) {
           return;
-        } else if (config.launch.visualMode === 5) {
+        } else if (config$1.launch.visualMode === 5) {
           return;
         }
       }
@@ -77227,9 +77412,9 @@ var isBrowser$1 = Xut.plat.isBrowser;
  * @return {[type]} [description]
  */
 var getArrowStyle = function getArrowStyle() {
-  var height = config.data.iconHeight;
+  var height = config$1.data.iconHeight;
   var styleText = 'height:' + height + 'px;width:' + height + 'px';
-  var setTable = config.data.settings;
+  var setTable = config$1.data.settings;
   if (setTable) {
     switch (setTable.NavbarPos) {
       case 0:
@@ -77270,19 +77455,19 @@ var BarSuper = function () {
 
     //获取高度缩放比
     //自动选择缩放比例
-    var prop = config.proportion;
-    this.$$propHeight = config.layoutMode == "horizontal" ? prop.width : prop.height;
+    var prop = config$1.proportion;
+    this.$$propHeight = config$1.layoutMode == "horizontal" ? prop.width : prop.height;
 
     //获取图标高度
     //工具栏图标高度
-    var iconHeight = config.data.iconHeight;
+    var iconHeight = config$1.data.iconHeight;
     this.$$iconHeight = isIOS$2 ? iconHeight : Math.round(this.$$propHeight * iconHeight);
 
     //应用标题
-    this.$$appName = config.data.shortName;
+    this.$$appName = config$1.data.shortName;
 
     //应用默认配置
-    this.$$setTable = config.data.settings;
+    this.$$setTable = config$1.data.settings;
 
     /*模板*/
     this._initState();
@@ -77298,7 +77483,7 @@ var BarSuper = function () {
     value: function _$$getArrowOption() {
       var style = getArrowStyle();
       var state = this.barStatus ? '' : 'hide';
-      var height = config.data.iconHeight;
+      var height = config$1.data.iconHeight;
       return {
         style: style,
         state: state,
@@ -77318,8 +77503,8 @@ var BarSuper = function () {
       var state = this.toolBarStatus ? '' : 'hide';
 
       //默认图标路径
-      var leftStyle = style + ';background-image:url(images/icons/pageforward_' + config.data.appId + '.svg);background-size:cover';
-      var rightStyle = style + ';background-image:url(images/icons/pageback_' + config.data.appId + '.svg);background-size:cover';
+      var leftStyle = style + ';background-image:url(images/icons/pageforward_' + config$1.data.appId + '.svg);background-size:cover';
+      var rightStyle = style + ';background-image:url(images/icons/pageback_' + config$1.data.appId + '.svg);background-size:cover';
 
       return '<div name="prevArrow"\n                 class="xut-flip-control xut-flip-control-left ' + state + '"\n                 style="' + leftStyle + '">\n           </div>\n           <div name="nextArrow"\n                class="xut-flip-control xut-flip-control-right ' + state + '"\n                style="' + rightStyle + '">\n           </div>';
     }
@@ -77626,12 +77811,12 @@ var TOP = isIOS$3 ? 20 : 0;
 
 var getNavOptions = function getNavOptions() {
 
-  var iconHeight = config.data.iconHeight;
-  var proportion = config.proportion;
-  var visualSize = config.visualSize;
+  var iconHeight = config$1.data.iconHeight;
+  var proportion = config$1.proportion;
+  var visualSize = config$1.visualSize;
 
   //横版模式
-  var isHorizontal = config.layoutMode == 'horizontal';
+  var isHorizontal = config$1.layoutMode == 'horizontal';
 
   proportion = isHorizontal ? proportion.width : proportion.height;
   iconHeight = isIOS$3 ? iconHeight : round$1(proportion * iconHeight);
@@ -77684,7 +77869,7 @@ var getWrapper = function getWrapper(seasonlist) {
   var sWidth = options.sWidth;
   var sHeight = options.sHeight;
 
-  if (config.layoutMode == 'horizontal') {
+  if (config$1.layoutMode == 'horizontal') {
     height = round$1(navHeight * 0.9);
     width = round$1(height * sWidth / sHeight); //保持缩略图的宽高比
     blank = round$1(navHeight * 0.05); //缩略图之间的间距
@@ -77751,7 +77936,7 @@ var Section = function () {
   function Section(data) {
     classCallCheck(this, Section);
 
-    this._isHorizontal = config.layoutMode === 'horizontal';
+    this._isHorizontal = config$1.layoutMode === 'horizontal';
     this._pagedata = data;
     this._$section = $('#xut-nav-section-list');
     this._$list = this._$section.find("li");
@@ -78584,7 +78769,7 @@ var fnBar = function (_BarSuper) {
       var width = 2.5 * size; //圆点间距
       var tipsWidth = chapters * width; //圆点总宽度
       var top = (height - size) / 2; //保持圆点垂直居中
-      var left = (config.visualSize.width - tipsWidth) / 2; //保持圆点水平居中
+      var left = (config$1.visualSize.width - tipsWidth) / 2; //保持圆点水平居中
 
 
       for (var i = 1; i <= chapters; i++) {
@@ -78871,7 +79056,7 @@ var Mark = function () {
     this.pageId = pageId;
     this.seasonId = seasonId;
 
-    var visualSize = config.visualSize;
+    var visualSize = config$1.visualSize;
     this.sHeight = visualSize.height;
     this.sWidth = visualSize.width;
 
@@ -79959,8 +80144,8 @@ var Digital = function (_MiniSuper) {
     value: function _createHTML() {
       //存在模式3的情况，所以页码要处理溢出的情况。left值
       var right = 0;
-      if (config.visualSize.overflowWidth) {
-        right = Math.abs(config.visualSize.left * 2) + 'px';
+      if (config$1.visualSize.overflowWidth) {
+        right = Math.abs(config$1.visualSize.left * 2) + 'px';
       }
       return '<div class="xut-page-number"style="right:' + right + ';bottom:0;">\n                  <div>1</div>\n                  <strong>/</strong>\n                  <div>' + this.pageTotal + '</div>\n            </div>';
     }
@@ -80170,13 +80355,13 @@ var Scrollbar = function (_MiniSuper) {
   createClass(Scrollbar, [{
     key: '_init',
     value: function _init() {
-      this.visualHeight = config.visualSize.height;
-      this.visualWidth = config.visualSize.width;
+      this.visualHeight = config$1.visualSize.height;
+      this.visualWidth = config$1.visualSize.width;
     }
   }, {
     key: '_parseBar',
     value: function _parseBar() {
-      this.direction = this.pageBar.direction || config.launch.scrollMode;
+      this.direction = this.pageBar.direction || config$1.launch.scrollMode;
     }
   }, {
     key: '_createHTML',
@@ -80490,12 +80675,12 @@ var TOP$1 = isIOS$5 ? 20 : 0;
  * @return {[type]} [description]
  */
 function mainScene() {
-  var layoutMode = config.layoutMode,
-      iconHeight = config.iconHeight,
-      proportion = config.proportion,
-      screenSize = config.screenSize,
-      visualSize = config.visualSize,
-      originalVisualSize = config.originalVisualSize;
+  var layoutMode = config$1.layoutMode,
+      iconHeight = config$1.iconHeight,
+      proportion = config$1.proportion,
+      screenSize = config$1.screenSize,
+      visualSize = config$1.visualSize,
+      originalVisualSize = config$1.originalVisualSize;
   var sWidth = visualSize.sWidth,
       sHeight = visualSize.sHeight;
 
@@ -80531,7 +80716,7 @@ function mainScene() {
 
   //如果启动了双页模式
   //那么可视区的宽度是就是全屏的宽度了，因为有2个页面拼接
-  var width = config.launch.doublePageMode ? config.screenSize.width : visualSize.width;
+  var width = config$1.launch.doublePageMode ? config$1.screenSize.width : visualSize.width;
 
   return String.styleFormat('<div id="xut-main-scene"\n          style="width:' + width + 'px;\n                 height:' + screenSize.height + 'px;\n                 top:0;\n                 left:' + originalVisualSize.left + 'px;\n                 position:absolute;\n                 z-index:' + sceneController.createIndex() + ';\n                 overflow:hidden;">\n\n        <div id="xut-control-bar" class="xut-control-bar"></div>\n        <ul id="xut-page-container" class="xut-flip"></ul>\n        <ul id="xut-master-container" class="xut-master xut-flip"></ul>\n        ' + navBarHTML + '\n        <div id="xut-tool-tip"></div>\n    </div>');
 }
@@ -80542,8 +80727,8 @@ function mainScene() {
  * @return {[type]}         [description]
  */
 function deputyScene(id) {
-  var visualSize = config.visualSize,
-      originalVisualSize = config.originalVisualSize;
+  var visualSize = config$1.visualSize,
+      originalVisualSize = config$1.originalVisualSize;
 
 
   return String.styleFormat('<div id="' + ('scenario-' + id) + '"\n          style="width:' + visualSize.width + 'px;\n                 height:100%;\n                 top:0;\n                 left:' + originalVisualSize.left + 'px;\n                 z-index:' + sceneController.createIndex() + ';\n                 position:absolute;\n                 overflow:hidden;">\n        <ul id="' + ('scenarioPage-' + id) + '" class="xut-flip" style="z-index:2"></ul>\n        <ul id="' + ('scenarioMaster-' + id) + '" class="xut-flip" style="z-index:1"></ul>\n    </div>');
@@ -80571,9 +80756,9 @@ function findContainer($context, id, isMain) {
 function checkHistory(history, callback) {
 
   //直接启用快捷调试模式
-  if (config.debug.locationPage) {
+  if (config$1.debug.locationPage) {
     console.log('启动了debug.locationPage,如果进不去，需要检测定位的坐标');
-    Xut.View.LoadScenario(config.debug.locationPage, callback);
+    Xut.View.LoadScenario(config$1.debug.locationPage, callback);
     return;
   }
 
@@ -80742,7 +80927,7 @@ var SceneFactory = function () {
       var columnCounts = getColumnCount$1(this.seasonId);
 
       //如果是min平台强制启动
-      if (config.launch.platform === 'mini' || config.debug.toolType.number !== false && columnCounts) {
+      if (config$1.launch.platform === 'mini' || config$1.debug.toolType.number !== false && columnCounts) {
 
         /*获取页面总数*/
         var getPageTotal = function getPageTotal(again) {
@@ -80757,14 +80942,14 @@ var SceneFactory = function () {
           return columnCounts ? pageTotal + columnCounts - columnChapterCount : pageTotal;
         };
 
-        this.miniBar = MiniBar(config.launch.pageBar, {
+        this.miniBar = MiniBar(config$1.launch.pageBar, {
           $sceneNode: $sceneNode,
           visualIndex: pageIndex,
           pageTotal: getPageTotal()
         });
 
         /*页面总数改变*/
-        if (config.launch.columnCheck) {
+        if (config$1.launch.columnCheck) {
           Xut.Application.Watch('change:number:total', function () {
             _this2._eachMiniBar(function () {
               this.updateTotal(getPageTotal(true));
@@ -80988,7 +81173,7 @@ var SceneFactory = function () {
     key: 'destroy',
     value: function destroy() {
 
-      if (config.launch.columnCheck) {
+      if (config$1.launch.columnCheck) {
         Xut.Application.unWatch('change:number:total');
       }
 
@@ -81061,7 +81246,7 @@ function initView() {
      * 需要处理跳转的页面预加载逻辑
      */
     var chapterId = toNumber(options.chapterId);
-    if (!options.main && chapterId && config.launch.preload) {
+    if (!options.main && chapterId && config$1.launch.preload) {
       var status = requestInterrupt({
         chapterId: chapterId,
         type: 'nolinear',
@@ -81472,7 +81657,7 @@ function clearResult(isRefresh) {
  * action 可能是
  * 1 exit 默认，单页面切换，只做销毁。但是代码还是同一份
  * 2 refresh 刷新，旋转切换（需要做一些数据保留，比如外联json数据）
- * 3 destory 退出应用，所以这个应该是全销毁
+ * 3 destory 销毁整个上下文，退出iframe的时候
  * @param {[type]} action [description]
  */
 function Destroy() {
@@ -81486,8 +81671,10 @@ function Destroy() {
   //修复的音频对象
   //数据的结果集
   if (action === 'destory') {
-    //修复的音频对象
+    //销毁修复的音频对象
     clearFixAudio();
+    //销毁默认全局事件
+    clearGlobalEvent();
   }
 
   // refresh状态不删除结果集
@@ -81503,9 +81690,6 @@ function Destroy() {
       $flowNode = null;
     }
   }
-
-  //默认全局事件
-  clearGlobalEvent();
 
   //config路径缓存
   clearConfig();
@@ -81553,7 +81737,7 @@ function Destroy() {
   clearColumnDetection();
 
   //启动配置文件去掉
-  config.launch = null;
+  config$1.launch = null;
 
   Xut.Application.Notify('appDestory');
 }
@@ -81662,9 +81846,9 @@ function initApplication() {
    */
   Xut.Application.Exit = function () {
     //判断重复调用
-    if (config.launch) {
+    if (config$1.launch) {
       /*启动代码用户操作跟踪*/
-      config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
+      config$1.sendTrackCode('exit', { time: +new Date() - config$1.launch.launchTime });
       Destroy('exit');
     }
   };
@@ -81706,7 +81890,7 @@ function initApplication() {
     /**
      * 通过launch启动动态配置
      */
-    if (config.launch.lauchMode === 1) {
+    if (config$1.launch.lauchMode === 1) {
       destroy();
       return;
     }
@@ -81923,7 +82107,7 @@ function initMain(novelData) {
    * 如果启动recordHistory记录
    */
   var pageIndex = Number($getStorage('pageIndex'));
-  if (config.launch.historyMode && pageIndex !== undefined) {
+  if (config$1.launch.historyMode && pageIndex !== undefined) {
     var novelId = parseInt($getStorage("novelId"));
     if (novelId) {
       return initMainScene({
@@ -82001,10 +82185,10 @@ function entrance(options) {
         initApp();
       } else {
         //mobile(apk or ipa)
-        window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
+        window.openDatabase(config$1.data.dbName, "1.0", "Xxtebook Database", config$1.data.dbSize);
         document.addEventListener("deviceready", function () {
           Xut.plat.hasPlugin = true; //支持插件
-          Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function () {});
+          Xut.Plugin.XXTEbookInit.startup(config$1.data.dbName, bindPlatEvent, function () {});
         }, false);
       }
     }
@@ -82023,7 +82207,7 @@ var delayTimer = null;
 /**
  * 横竖切换
  */
-var bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function () {
+var bindOrientateMode = Xut.plat.isBrowser && config$1.orientateMode ? function () {
   $(window).on('orientationchange', function (e) {
 
     /**
@@ -82067,7 +82251,7 @@ var bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function ()
  * 新版本加载
  */
 Xut.Application.Launch = function (option) {
-  if (config.launch) {
+  if (config$1.launch) {
     return;
   }
   var setConfig = Xut.Application.setConfig;
@@ -82075,12 +82259,12 @@ Xut.Application.Launch = function (option) {
     mixGolbalConfig(setConfig);
     /*当前的launch配置文件，用于横竖切换处理*/
     cacheOptions = [option];
-    config.launch = $.extend(true, { launchTime: +new Date() }, option);
+    config$1.launch = $.extend(true, { launchTime: +new Date() }, option);
     if (option.path) {
       _.each(option.path, function (value, key) {
-        config.launch[key] = key === 'resource' ? removeSlash(value) : value;
+        config$1.launch[key] = key === 'resource' ? removeSlash(value) : value;
       });
-      delete config.launch.path;
+      delete config$1.launch.path;
     }
     bindOrientateMode();
     entrance();
@@ -82114,7 +82298,7 @@ setTimeout(function () {
     }
     mixGolbalConfig(setConfig);
     /*保证兼容，不需要判断launch存在，初始空对象*/
-    config.launch = {};
+    config$1.launch = {};
     entrance();
   }
 }, 100);

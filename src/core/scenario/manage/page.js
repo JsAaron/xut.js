@@ -139,6 +139,7 @@ export default class PageMgr extends ManageSuper {
     if (suspendPageObj.startupTime) {
       config.sendTrackCode('flip', {
         pageId: suspendPageObj.chapterId,
+        pageAttr: suspendPageObj.pageAttr,
         time: (+new Date) - suspendPageObj.startupTime
       })
     }
@@ -246,7 +247,13 @@ export default class PageMgr extends ManageSuper {
     /*检测页面是否已经完全创建完毕，并且返回页面对象*/
     this._checkTaskCompleted(middleIndex, function(activatePageObj) {
 
-      /*跟踪，每个页面的停留时间，开始*/
+      //进入每次页面触发
+      config.sendTrackCode('enter', {
+        pageId: activatePageObj.chapterId,
+        pageAttr: activatePageObj.pageAttr
+      })
+
+      //跟踪，每个页面的停留时间，开始
       if (config.hasTrackCode('flip')) {
         activatePageObj.startupTime = +new Date
       }

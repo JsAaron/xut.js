@@ -18,7 +18,7 @@ import { clearCache, clearResult } from 'database/destroy'
  * action 可能是
  * 1 exit 默认，单页面切换，只做销毁。但是代码还是同一份
  * 2 refresh 刷新，旋转切换（需要做一些数据保留，比如外联json数据）
- * 3 destory 退出应用，所以这个应该是全销毁
+ * 3 destory 销毁整个上下文，退出iframe的时候
  * @param {[type]} action [description]
  */
 export default function Destroy(action = 'exit') {
@@ -30,8 +30,10 @@ export default function Destroy(action = 'exit') {
   //修复的音频对象
   //数据的结果集
   if (action === 'destory') {
-    //修复的音频对象
+    //销毁修复的音频对象
     clearFixAudio()
+    //销毁默认全局事件
+    clearGlobalEvent()
   }
 
   // refresh状态不删除结果集
@@ -47,9 +49,6 @@ export default function Destroy(action = 'exit') {
       $flowNode = null
     }
   }
-
-  //默认全局事件
-  clearGlobalEvent()
 
   //config路径缓存
   clearConfig()

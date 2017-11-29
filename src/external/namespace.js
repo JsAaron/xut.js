@@ -31,12 +31,12 @@ Xut.style = {}
  * @return {[type]}        [description]
  */
 Xut.mixin = function(target, source) {
-  if(!source) {
+  if (!source) {
     source = target
     target = this
   }
-  for(var p in source) {
-    if(source.hasOwnProperty(p)) {
+  for (var p in source) {
+    if (source.hasOwnProperty(p)) {
       target[p] = source[p]
     }
   }
@@ -65,8 +65,8 @@ Xut.mixin({
    * @return {[type]}     [description]
    */
   guid: function(mark) {
-    var id = (+new Date()) + (Math.random() + '').slice(-8);
-    return mark ? (mark + id) : id
+    var id = (+new Date()) + (Math.random() + '').slice(-1);
+    return mark ? (mark + id) : Number(id)
   },
 
   /**

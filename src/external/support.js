@@ -117,22 +117,36 @@
      * @type {[type]}
      */
     fixWebkitAutoAudio: (function() {
+
       //微信用自己api播放
       if (isWeiXin) {
         return false
       }
 
+      var localhost = /localhost/ig.test(window.location.href)
+
       //2017.11.28
       //读库客户端支持自动播放
       //只有ios的客户端才可以，客户端内部通过浏览器打开
-      if (window.DUKUCONFIG && isIOS && /localhost/ig.test(window.location.href)) {
+      if (window.DUKUCONFIG && isIOS && localhost) {
         return false
       }
 
-      //移动端ipad 手机不支持自动播放
-      if(isBrowser && (device.mobile() || device.tablet())){
-        return true
+      //浏览器打开
+      if (isBrowser) {
+
+        //pc端测试
+        if (localhost) {
+          return false
+        }
+
+        //移动端ipad 手机不支持自动播放
+        if (device.mobile() || device.tablet()) {
+          return true
+        }
+
       }
+
     })(),
 
     /**

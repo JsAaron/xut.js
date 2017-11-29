@@ -152,6 +152,7 @@ export const showTextBusy = (txt) => {
 export const resetCursor = (data) => {
   path = null
   delayTime = 500
+  node = null
 }
 
 

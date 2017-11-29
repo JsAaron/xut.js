@@ -26,6 +26,10 @@
 
 </html>
 <script type="text/javascript">
+
+
+
+
 Xut.Application.setConfig = {
   lauchMode: 1,
   preload: false,
@@ -62,6 +66,7 @@ Xut.Application.setConfig = {
   // columnCheck:false, //分栏检测
   // doublePageMode: false //双页模式
   // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
+  trackCode:['enter','flip'],
   pageBar: {
     type: ['scrollbar', 'digital']
     // direction:''
@@ -88,20 +93,20 @@ Xut.Application.setConfig = {
   // convert: 'svg', //转化资源svg转化成js
 };
 
-Xut.Application.Watch('initComplete', function() {
-  // console.log('initComplete')
-})
+// Xut.Application.Watch('initComplete', function() {
+//   // console.log('initComplete')
+// })
 
-Xut.Application.Watch('appDestory', function() {
-  console.log('appDestory')
-})
+// Xut.Application.Watch('appDestory', function() {
+//   console.log('appDestory')
+// })
 
-Xut.Application.Watch('trackCode', function(type, options) {
-  console.log(type,options)
-})
+// Xut.Application.Watch('trackCode', function(type, options) {
+//   console.log(type,options)
+// })
 
 
-var appId = 133 //306
+var appId = 130 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

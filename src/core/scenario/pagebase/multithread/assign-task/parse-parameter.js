@@ -16,9 +16,10 @@
    if (parameter) {
      try {
        parameter = JSON.parse(parameter)
+
        if (parameter) {
 
-         //parameter
+         //contentMode
          if (parameter.contentMode && parameter.contentMode == 1) {
            //非强制dom模式
            if (!config.debug.onlyDomMode) {
@@ -27,6 +28,7 @@
            }
          }
 
+         //秒秒学使用
          //lastPage如果是最后一页处理
          if (parameter.lastPage && base.pageType === 'page') {
            //运行应用运行时间
@@ -35,8 +37,6 @@
              let timeout
              if (runTime) {
                timeout = setTimeout(() => {
-                 //发送跨域的postMessage消息
-                 window.parent && window.parent.postMessage({ type: 'complete' }, '*');
                  Xut.Application.Notify('complete')
                }, runTime * 1000) //转成秒
              }
@@ -47,11 +47,12 @@
                }
              }
            }
-
          }
 
          //页面属性
          //2017.11.23
+         //页面属性
+         //秒秒学使用 2017.11.29
          if (parameter.pageAttr) {
            base.pageAttr = parameter.pageAttr
          }

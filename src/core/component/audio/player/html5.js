@@ -64,8 +64,10 @@ export class HTML5Audio extends AudioSuper {
     this._needFix = false
 
     setTimeout(() => {
-      this.audio.src = this.$$url;
-      this._initPlay()
+      if (this.audio) { //可能已经调动了销毁
+        this.audio.src = this.$$url;
+        this._initPlay()
+      }
     }, 0)
   }
 

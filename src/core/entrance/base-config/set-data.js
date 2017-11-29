@@ -39,6 +39,7 @@ export default function initDefaults(setData) {
   }
 
   _.extend(config.data, {
+    originalAppId: Number(data.appId),
     //应用的唯一标识符
     //生成时间+appid
     appId: data.adUpdateTime ? data.appId + '-' + /\S*/.exec(data.adUpdateTime)[0] : data.appId,

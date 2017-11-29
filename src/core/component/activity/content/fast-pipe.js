@@ -108,6 +108,8 @@ export default function fastPipe(data, base) {
 
   return _.extend(data, {
 
+    constructor:'fastPipe',
+
     init() {
       //预显示跳过动画创建
       prepVisible && $contentNode.css({ 'visibility': prepVisible })
