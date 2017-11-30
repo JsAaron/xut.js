@@ -30,7 +30,7 @@ const createScope = function(base, contentId, chapterIndex, actName, parameter, 
   var pageType = base.pageType
   var contentName
   var canvasDom
-  var contentData = base.relatedData.contentDataset[contentId]
+  var contentData = base.dataRelated.contentDataset[contentId]
 
   //如果启动了canvas模式
   //改成作用域的一些数据
@@ -46,7 +46,7 @@ const createScope = function(base, contentId, chapterIndex, actName, parameter, 
       } else {
         // $contentNode = Context(contentData, canvasDom, base.pageIndex)
         //保存canvas pixi的上下文引用
-        // base.relatedData.contentDataset[contentId].$contentNode = $contentNode
+        // base.dataRelated.contentDataset[contentId].$contentNode = $contentNode
       }
       data.type = 'canvas';
       data.canvasMode = true;
@@ -115,11 +115,11 @@ const createScope = function(base, contentId, chapterIndex, actName, parameter, 
 
   //生成视觉差对象
   if(data.processType === 'parallax') {
-    return Parallax(data, base.relatedData, base.getStyle)
+    return Parallax(data, base.dataRelated, base.getStyle)
   }
 
   //数据预处理
-  let hasPipe = preTreatment(data, base.eventData.eventName)
+  let hasPipe = preTreatment(data, base.eventRelated.eventName)
   if(hasPipe) {
     return FastPipe(data, base)
   } else {

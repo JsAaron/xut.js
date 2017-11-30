@@ -204,10 +204,10 @@ export function bindContentEvent(data) {
 /**
  * 销毁对象事件
  */
-export function destroyContentEvent(eventData, eventName) {
-  if(eventData.eventReference) {
-    eventData.eventReference.off(eventName || eventData.eventName, eventData.eventHandler)
-    eventData.eventReference = null;
-    eventData.eventHandler = null
+export function destroyContentEvent(eventRelated, eventName) {
+  if(eventRelated.eventReference) {
+    eventRelated.eventReference.off(eventName || eventRelated.eventName, eventRelated.eventHandler)
+    eventRelated.eventReference = null;
+    eventRelated.eventHandler = null
   }
 }

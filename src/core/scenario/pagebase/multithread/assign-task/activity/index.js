@@ -11,7 +11,7 @@ import { textFx } from './text-fx'
 import { compileActivity } from './compile-activity'
 import { zoomPicture } from './zoom-picture'
 import { contentParser } from './parser/content'
-import { parseBehavior } from './parser/behavior'
+import { parseParameter } from './parser/parameter'
 import { activityParser } from './parser/activity'
 import { contentStructure } from './structure/index'
 import { sceneController } from '../../../../../scenario/control'
@@ -103,8 +103,8 @@ export default class TaskActivitys extends TaskSuper {
   _dataAfterCheck(pipeData) {
     this._checkNextTask('dataAfter', () => {
 
-      /*解析点击反馈，点击缩放*/
-      parseBehavior(pipeData)
+      /*解析Parameter*/
+      parseParameter(pipeData)
 
       /*构建页面content类型结构*/
       contentStructure(pipeData, this.$$floatDivertor, userData => {

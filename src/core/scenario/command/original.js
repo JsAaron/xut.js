@@ -32,7 +32,18 @@ export function $original(pageBase) {
   access(pageBase, (pageBase, contentObjs, componentObjs) => {
 
     //母版对象不还原
-    if (pageBase.pageType === 'master') return;
+    if (pageBase.pageType === 'master') {
+      //因为苗苗学的问题，需要单独处理hasForumClose的还原
+      //2017.11.30
+      contentObjs && _.each(contentObjs, (obj) => {
+        if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+          if (obj.dataRelated && obj.dataRelated.hasForumClose) {
+            obj.reset && obj.reset();
+          }
+        }
+      })
+      return
+    };
 
     var $containsNode
 

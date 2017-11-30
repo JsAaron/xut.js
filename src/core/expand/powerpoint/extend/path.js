@@ -1,9 +1,9 @@
 import {
   calculateDistance,
   calculateDirection
-} from '../util'
+} from './util'
 
-import MoveMent from '../move.ment'
+import MoveMent from './move.ment'
 
 const hasTouch = Xut.plat.hasTouch
 

@@ -47,7 +47,7 @@ export function compileActivity(callback, pipeData, contentDataset, $$floatDiver
   }(floatMasterDivertor.ids, pipeData.getStyle.offset);
 
   //相关回调
-  const relatedCallback = {
+  const callbackRelated = {
     /*绑定卷滚条钩子*/
     'iscrollHooks': [],
     /*contetn钩子回调*/
@@ -60,8 +60,9 @@ export function compileActivity(callback, pipeData, contentDataset, $$floatDiver
     'swipeDelegateContents': pageBaseHooks.swipeDelegateContents
   }
 
+
   //相关数据
-  const relatedData = {
+  const dataRelated = {
     floatMasterDivertor,
     'seasonId': pipeData.chpaterData.seasonId,
     'pageId': pageId,
@@ -88,8 +89,8 @@ export function compileActivity(callback, pipeData, contentDataset, $$floatDiver
       pageBaseHooks.eventBinding && pageBaseHooks.eventBinding(eventRelated)
     }
     //删除钩子
-    delete relatedCallback.contentsHooks;
-    callback(relatedCallback)
+    delete callbackRelated.contentsHooks;
+    callback(callbackRelated)
   }
 
 
@@ -99,12 +100,21 @@ export function compileActivity(callback, pipeData, contentDataset, $$floatDiver
    */
   const makeActivity = function(compiler) {
     return function(callback) {
-      var filters;
-      var imageId = compiler.imageIds; //父id
-      var activity = compiler.activity;
-      var eventType = activity.eventType;
-      var dragdropPara = activity.para1;
-      var eventContentId = imageId;
+      let filters;
+      let imageId = compiler.imageIds; //父id
+      let activity = compiler.activity;
+      let eventType = activity.eventType;
+      let dragdropPara = activity.para1;
+      let eventContentId = imageId;
+      let activityId = activity._id
+
+      //如果存在关闭按钮
+      //秒秒学
+      //2017.11.30
+      dataRelated.hasForumClose = false
+      if (pipeData.forumCloses && pipeData.forumCloses[activityId]) {
+        dataRelated.hasForumClose = true
+      }
 
       /**
        * 多事件数据过滤
@@ -129,20 +139,20 @@ export function compileActivity(callback, pipeData, contentDataset, $$floatDiver
         new ActivityClass({
           'noticeComplete': callback, //监听完成
           'pageIndex': pipeData.pageIndex,
-          'canvasRelated': pipeData.canvasRelated, //父类引用
           'id': imageId || autoUUID(),
           "type": 'Content',
           'pageId': pageId,
           'getStyle': pipeData.getStyle,
-          'activityId': activity._id,
+          'activityId': activityId,
           '$containsNode': $containsNode,
           'pageType': compiler.pageType, //构建类型 page/master
           'dataset': compiler.dataset, //动画表数据 or 视觉差表数据
           "chapterIndex": chapterIndex, //页码
           /*需要绑定事件的数据*/
-          'eventData': { eventContentId, eventType, dragdropPara, feedbackBehavior },
-          'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
-          'relatedCallback': relatedCallback //相关回调
+          'eventRelated': { eventContentId, eventType, dragdropPara, feedbackBehavior },
+          'dataRelated': dataRelated, //相关数据,所有子作用域Activity对象共享
+          'canvasRelated': pipeData.canvasRelated, //父类引用
+          'callbackRelated': callbackRelated //相关回调
         })
       )
     }

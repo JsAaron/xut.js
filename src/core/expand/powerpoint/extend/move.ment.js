@@ -2,7 +2,7 @@
 
 const hasTouch = Xut.plat.hasTouch
 
-import { $on, $off, $handle } from '../../util/event'
+import { $on, $off, $handle } from '../../../util/event'
 
 
 export default class MoveMent {

@@ -11,8 +11,8 @@ export default function(activitProto) {
    */
   activitProto._htmlTextBox = function() {
     var self = this;
-    var relatedData = this.relatedData;
-    var contentHtmlBoxIds = relatedData.contentHtmlBoxIds;
+    var dataRelated = this.dataRelated;
+    var contentHtmlBoxIds = dataRelated.contentHtmlBoxIds;
     var contentId;
     var contentName;
     var $contentNode;
@@ -21,8 +21,8 @@ export default function(activitProto) {
     this.htmlBoxInstance = [];
 
     //创建文本框对象
-    if(contentHtmlBoxIds.length && relatedData.contentDataset) {
-      _.each(relatedData.contentDataset, function(data) {
+    if(contentHtmlBoxIds.length && dataRelated.contentDataset) {
+      _.each(dataRelated.contentDataset, function(data) {
         if(~contentHtmlBoxIds.indexOf(data._id)) {
           contentId = data._id;
           contentName = self.makePrefix('Content', self.chapterIndex, contentId);

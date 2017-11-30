@@ -1,6 +1,6 @@
 import {
   colorHexToRGB
-} from '../util'
+} from './util'
 
 const filter = Xut.style.filter
 

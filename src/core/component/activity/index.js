@@ -27,9 +27,9 @@ import { IScroll } from '../../expand/iscroll'
  * 处理拖动对象
  * @return {[type]} [description]
  */
-function accessDrop(eventData, callback) {
-  if (eventData && eventData.dragDrop) {
-    callback(eventData.dragDrop)
+function accessDrop(eventRelated, callback) {
+  if (eventRelated && eventRelated.dragDrop) {
+    callback(eventRelated.dragDrop)
   }
 }
 
@@ -65,7 +65,7 @@ export default class Activity {
     /**
      * 保存子对象content
      */
-    this._contentGroup = createContent(this)
+    this.contentGroup = createContent(this)
 
     /**
      * 处理html文本框
@@ -90,7 +90,7 @@ export default class Activity {
      * 点击效果的音频处理
      * @type {Array}
      */
-    this._fixAudio = []
+    this.fixAudio = []
 
     /**
      * 2016.11.2
@@ -98,7 +98,7 @@ export default class Activity {
      * 这样用于优化重复点击按钮的时候触发音频
      * @type {Array}
      */
-    this._cacheBehaviorAudio = {}
+    this.cacheBehaviorAudio = {}
 
     /**
      * 如果存在content
@@ -116,6 +116,7 @@ export default class Activity {
      * 同步代码直接完成
      */
     this.noticeComplete();
+
   }
 
 
@@ -125,9 +126,9 @@ export default class Activity {
    */
   _initContents() {
 
-    const pageId = this.relatedData.pageId
+    const pageId = this.dataRelated.pageId
     const $containsNode = this.$containsNode
-    const collectorHooks = this.relatedCallback.contentsHooks
+    const collectorHooks = this.callbackRelated.contentsHooks
     const pageType = this.pageType
 
     this.eachAssistContents(scope => {
@@ -156,13 +157,13 @@ export default class Activity {
    * @return {[type]} [description]
    */
   _toRepeatBind(id, $contentNode, scope, collectorHooks) {
-    let relatedData = this.relatedData
-    let indexOf = relatedData.createContentIds.indexOf(id)
+    let dataRelated = this.dataRelated
+    let indexOf = dataRelated.createContentIds.indexOf(id)
 
     //过滤重复关系
     //每个元素只绑定一次
     if (-1 !== indexOf) {
-      relatedData.createContentIds.splice(indexOf, 1); //删除,去重
+      dataRelated.createContentIds.splice(indexOf, 1); //删除,去重
       collectorHooks(scope.chapterIndex, id, scope); //收集每一个content注册
       this._iscrollBind(scope, $contentNode); //增加翻页特性
     }
@@ -241,7 +242,7 @@ export default class Activity {
     const bind = () => {
       $contentNode.css('overflow', 'hidden') //增加元素溢出隐藏处理
       $contentNode.children().css('height', '') //去掉子元素高度，因为有滚动文本框
-      this.relatedCallback.iscrollHooks.push(linkFunction($contentNode[0]))
+      this.callbackRelated.iscrollHooks.push(linkFunction($contentNode[0]))
     }
 
     //增加卷滚条标记
@@ -289,12 +290,12 @@ export default class Activity {
     let node, $node, containerPrefix, contentsFragment
 
     //dom模式
-    contentsFragment = this.relatedData.contentsFragment;
+    contentsFragment = this.dataRelated.contentsFragment;
     if (node = (contentsFragment[prefix])) {
       $node = $(node)
     } else {
       //容器处理
-      if (containerPrefix = this.relatedData.containerPrefix) {
+      if (containerPrefix = this.dataRelated.containerPrefix) {
         _.each(containerPrefix, function(containerName) {
           node = contentsFragment[containerName];
           $node = $(node).find('#' + prefix);
@@ -316,7 +317,7 @@ export default class Activity {
    */
   _resetAloneAnim() {
     //复位拖动对象
-    accessDrop(this.eventData, function(drop) {
+    accessDrop(this.eventRelated, function(drop) {
       drop.reset();
     })
   }
@@ -334,14 +335,14 @@ export default class Activity {
     var scenarioInfo, eventContentId
 
     //触发事件的content id
-    if (this.eventData) {
-      eventContentId = this.eventData.eventContentId;
+    if (this.eventRelated) {
+      eventContentId = this.eventRelated.eventContentId;
     }
 
     if (eventContentId) {
 
       //查找出当前节的所有信息
-      if (scenarioInfo = this.relatedData.seasonRelated[eventContentId]) {
+      if (scenarioInfo = this.dataRelated.seasonRelated[eventContentId]) {
 
         //如果存在搜索栏触发
         if (scenarioInfo.SearchBar) {
@@ -375,7 +376,7 @@ export default class Activity {
    * @return {[type]} [description]
    */
   eachAssistContents(callback) {
-    _.each(this._contentGroup, function(scope) {
+    _.each(this.contentGroup, function(scope) {
       callback.call(this, scope)
     }, this)
   }
@@ -390,7 +391,7 @@ export default class Activity {
   runAnimation(outComplete, evenyClick) {
 
     let self = this
-    let pageId = this.relatedData.pageId
+    let pageId = this.dataRelated.pageId
 
     if (evenyClick) {
       this.preventRepeat = false;
@@ -453,7 +454,8 @@ export default class Activity {
         }
 
       }
-    }(this._contentGroup.length);
+    }(this.contentGroup.length);
+
 
     //执行动画
     this.eachAssistContents(function(scope) {
@@ -476,7 +478,7 @@ export default class Activity {
    * @return {[type]} [description]
    */
   stopAnimation() {
-    var pageId = this.relatedData.pageId;
+    var pageId = this.dataRelated.pageId;
     this.runState = false;
     this.eachAssistContents(function(scope) {
       scope.stop && scope.stop(pageId);
@@ -491,11 +493,11 @@ export default class Activity {
    */
   _destroyAnimation(elementCallback) {
     //销毁拖动对象
-    accessDrop(this.eventData, function(drop) {
+    accessDrop(this.eventRelated, function(drop) {
       drop.destroy();
     })
     this.eachAssistContents(scope => {
-      scope.destroy && scope.destroy(this.relatedData.pageId)
+      scope.destroy && scope.destroy(this.dataRelated.pageId)
       elementCallback && elementCallback(scope)
     })
   }
@@ -507,8 +509,8 @@ export default class Activity {
    * @return {[type]}             [description]
    */
   autoPlay(outComplete) {
-    var eventData = this.eventData;
-    if (eventData && eventData.eventName === 'auto') {
+    var eventRelated = this.eventRelated;
+    if (eventRelated && eventRelated.eventName === 'auto') {
       this.runAnimation(outComplete);
     } else {
       outComplete();
@@ -548,13 +550,13 @@ export default class Activity {
     //修复妙妙客户端
     //没有点击音频结束的回调
     //最多允许播放5秒
-    if (this._fixAudio.length) {
-      _.each(this._fixAudio, function(instance) {
+    if (this.fixAudio.length) {
+      _.each(this.fixAudio, function(instance) {
         setTimeout(function() {
           instance.destroy();
         }, 5000)
       })
-      this._fixAudio = [];
+      this.fixAudio = [];
     }
   }
 
@@ -565,9 +567,9 @@ export default class Activity {
   destroy(elementCallback) {
 
     //销毁绑定事件
-    if (this.eventData.eventContext) {
-      destroyContentEvent(this.eventData);
-      this.eventData.eventContext = null;
+    if (this.eventRelated.eventContext) {
+      destroyContentEvent(this.eventRelated);
+      this.eventRelated.eventContext = null;
     }
 
     //2016.1.7
@@ -583,7 +585,7 @@ export default class Activity {
 
     //销毁动画
     this._destroyAnimation(elementCallback);
-    this._contentGroup = null
+    this.contentGroup = null
 
     //iscroll销毁
     if (this.iscroll) {
@@ -604,12 +606,12 @@ export default class Activity {
     }
 
     //如果有点击音频
-    if (Object.keys(this._cacheBehaviorAudio).length) {
-      for (let key in this._cacheBehaviorAudio) {
-        let audio = this._cacheBehaviorAudio[key]
+    if (Object.keys(this.cacheBehaviorAudio).length) {
+      for (let key in this.cacheBehaviorAudio) {
+        let audio = this.cacheBehaviorAudio[key]
         if (audio) {
           audio.destroy()
-          this._cacheBehaviorAudio[key] = null
+          this.cacheBehaviorAudio[key] = null
         }
       }
     }

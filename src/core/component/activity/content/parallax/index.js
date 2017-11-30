@@ -59,7 +59,7 @@ const getFlowFange = function(pageIndex) {
   }
 }
 
-export default function index(data, relatedData, getStyle) {
+export default function index(data, dataRelated, getStyle) {
 
   //转化所有css特效的参数的比例
   let targetProperty = parseJSON(data.getParameter()[0]['parameter'])
@@ -87,7 +87,7 @@ export default function index(data, relatedData, getStyle) {
     //页面偏移量
     //["3", "6", "4"]
     //表示第4次采用了这个母板，中间有其他模板间隔开了的情况
-    let pageOffset = relatedData.pageOffset && relatedData.pageOffset.split("-");
+    let pageOffset = dataRelated.pageOffset && dataRelated.pageOffset.split("-");
     //开始的nodes值
     currPageOffset = parseInt(pageOffset[0]);
     //范围区域
@@ -125,7 +125,7 @@ export default function index(data, relatedData, getStyle) {
   let nodeRatio = 1 / (pageRange - 1)
 
   //初始化视觉差对象的坐标偏移量
-  let transformOffset = relatedData.getTransformOffset(data.id)
+  let transformOffset = dataRelated.getTransformOffset(data.id)
   let parallaxOffset = setTransformNodes(data.$contentNode, lastProperty, transformOffset)
 
   /**

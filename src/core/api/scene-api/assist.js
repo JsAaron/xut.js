@@ -60,27 +60,21 @@ export function extendAssist(access, $$globalSwiper) {
   /**
    * 设置答题卡的正确错误率
    */
-  function setAnswer(fn) {
-    if (fn) {
-      var pageBase = Xut.Presentation.GetPageBase()
-      fn({
-        appId: config.data.originalAppId,
-        pageId: pageBase.chapterId
-      })
-    }
+  function setAnswer(event) {
+    console.log(event)
   }
 
   /**
    * 秒秒学答题卡
    * 正确性
    */
-  Xut.Assist.Correct = () => setAnswer(getPostMessage('Correct'))
+  Xut.Assist.AnswerRight = () => setAnswer('right')
 
   /**
    * 秒秒学答题卡
    * 错误性
    */
-  Xut.Assist.Incorrect = () => setAnswer(getPostMessage('Incorrect'))
+  Xut.Assist.AnswerError = () => setAnswer('error')
 
 
   /**

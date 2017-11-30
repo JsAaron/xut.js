@@ -41217,8 +41217,8 @@ var defaultWidgetPath = "content/widget/";
  * @type {String}
  */
 var getSourcePath = function getSourcePath() {
-  if (config$1.launch.resource) {
-    return config$1.launch.resource + '/gallery/';
+  if (config.launch.resource) {
+    return config.launch.resource + '/gallery/';
   } else {
     return defaultSourcePath;
   }
@@ -41230,8 +41230,8 @@ var getSourcePath = function getSourcePath() {
  * @return {[type]}          [description]
  */
 var getWidgetPath = function getWidgetPath() {
-  if (config$1.launch.resource) {
-    return config$1.launch.resource + '/widget/';
+  if (config.launch.resource) {
+    return config.launch.resource + '/widget/';
   } else {
     return defaultWidgetPath;
   }
@@ -42221,7 +42221,7 @@ var count = 0;
 
 function $warn(data, content, level, color) {
 
-  var silent = config$1.debug.silent;
+  var silent = config.debug.silent;
 
   if (!silent) {
     return;
@@ -42249,7 +42249,7 @@ function $warn(data, content, level, color) {
       ++count;
 
       //远程debug输出
-      if (config$1.debug.terminal) {
+      if (config.debug.terminal) {
         var errListener = function errListener(error) {
           var msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
           return debug.error(msg.join("<br/>"));
@@ -42469,9 +42469,9 @@ function getSize() {
 
   //配置可视区窗口
   //用户在外部指定了可视区域
-  if (config$1.launch.visualHeight) {
-    config$1.launch.visualTop = clientHeight - config$1.launch.visualHeight;
-    clientHeight = config$1.launch.visualHeight;
+  if (config.launch.visualHeight) {
+    config.launch.visualTop = clientHeight - config.launch.visualHeight;
+    clientHeight = config.launch.visualHeight;
   }
 
   return {
@@ -43072,7 +43072,7 @@ var GLOBALIFRAME = window.GLOBALIFRAME;
 var CLIENTCONFIGT = window.CLIENTCONFIGT;
 var MMXCONFIG = window.MMXCONFIG;
 
-var config$1 = {};
+var config = {};
 
 var layoutMode = void 0;
 var proportion = void 0;
@@ -43087,7 +43087,7 @@ Xut.zIndexlevel = function () {
 //通过新学堂加载
 //用于处理iframe窗口去全屏
 if (/xinxuetang/.test(window.location.href)) {
-  config$1.iframeFullScreen = true;
+  config.iframeFullScreen = true;
 }
 
 /**
@@ -43116,7 +43116,7 @@ var desktopPlat = function desktopPlat() {
 
   //2016.9.13
   //新增动态模式
-  if (config$1.launch.resource) {
+  if (config.launch.resource) {
     return getSourcePath();
   }
 
@@ -43133,8 +43133,8 @@ var desktopPlat = function desktopPlat() {
     // * storageMode 存放的位置
     // * 0 APK应用本身
     // 1 外置SD卡
-    if (Number(config$1.launch.storageMode)) {
-      return "sdcard/" + config$1.data.appId + "/" + getSourcePath();
+    if (Number(config.launch.storageMode)) {
+      return "sdcard/" + config.data.appId + "/" + getSourcePath();
     } else {
       return getSourcePath();
     }
@@ -43162,7 +43162,7 @@ var runMode = function () {
  * @return {[type]} [description]
  */
 var _rsourcesPath = function _rsourcesPath() {
-  return isBrowser ? desktopPlat() : GLOBALIFRAME ? iframeConfig.resources(config$1) : nativeConfig.resources(config$1);
+  return isBrowser ? desktopPlat() : GLOBALIFRAME ? iframeConfig.resources(config) : nativeConfig.resources(config);
 };
 
 /**
@@ -43205,7 +43205,7 @@ var _jsWidgetPath = function _jsWidgetPath() {
  * 全局配置文件
  * @type {Boolean}
  */
-_.extend(config$1, {
+_.extend(config, {
 
   /**
    * 应用横竖自适应切换
@@ -43284,7 +43284,7 @@ _.extend(config$1, {
   golbal: improtGolbalConfig
 });
 
-Xut.config = config$1;
+Xut.config = config;
 
 /**
  * 销毁配置
@@ -43308,10 +43308,10 @@ function initPathAddress() {
   isCacheJsWidgetPath = false;
 
   /*资源路径*/
-  config$1.data.pathAddress = _rsourcesPath();
+  config.data.pathAddress = _rsourcesPath();
 
   /*根路径*/
-  config$1.data.rootPath = config$1.data.pathAddress.replace('/gallery/', '');
+  config.data.rootPath = config.data.pathAddress.replace('/gallery/', '');
 }
 
 /**
@@ -43321,8 +43321,8 @@ function initPathAddress() {
 var resetProportion = function resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue) {
   //获取全屏比值，用来设定view的尺寸
   //根据分辨率与PPT排版的比值来确定
-  fullProportion = getFullProportion(config$1, pptWidth, pptHeight);
-  var visualSize = config$1.visualSize = getVisualSize(config$1, fullProportion, setVisualMode, noModifyValue);
+  fullProportion = getFullProportion(config, pptWidth, pptHeight);
+  var visualSize = config.visualSize = getVisualSize(config, fullProportion, setVisualMode, noModifyValue);
 
   //溢出宽度
   visualSize.overflowWidth = false;
@@ -43335,21 +43335,21 @@ var resetProportion = function resetProportion(pptWidth, pptHeight, setVisualMod
     visualSize.overflowHeight = true;
   }
   //获取全局缩放比
-  proportion = config$1.proportion = getRealProportion(config$1, visualSize, fullProportion);
+  proportion = config.proportion = getRealProportion(config, visualSize, fullProportion);
 };
 
 /*获取基本尺寸*/
 var getBasicSize = function getBasicSize(pptWidth, pptHeight, screenSize) {
   //获取分辨率
-  config$1.screenSize = screenSize || getSize();
+  config.screenSize = screenSize || getSize();
   //根据设备判断设备的横竖屏
-  config$1.screenHorizontal = config$1.screenSize.width > config$1.screenSize.height ? true : false;
-  config$1.screenVertical = !config$1.screenHorizontal;
-  layoutMode = config$1.layoutMode = getLayerMode(config$1.screenSize);
+  config.screenHorizontal = config.screenSize.width > config.screenSize.height ? true : false;
+  config.screenVertical = !config.screenHorizontal;
+  layoutMode = config.layoutMode = getLayerMode(config.screenSize);
   //数据ppt排版设计
   if (pptWidth && pptHeight) {
-    config$1.pptHorizontal = pptWidth > pptHeight ? true : false;
-    config$1.pptVertical = !config$1.pptHorizontal;
+    config.pptHorizontal = pptWidth > pptHeight ? true : false;
+    config.pptVertical = !config.pptHorizontal;
   }
 };
 
@@ -43373,19 +43373,19 @@ function initConfig(pptWidth, pptHeight) {
   ////////////////////////////////////
   /// 横版PPT，竖版显示，强制为竖版双页面
   ////////////////////////////////////
-  if (config$1.launch.visualMode === 5) {
+  if (config.launch.visualMode === 5) {
 
-    resetProportion(pptWidth, pptHeight, config$1.launch.visualMode);
-    config$1.originalVisualSize = config$1.visualSize;
+    resetProportion(pptWidth, pptHeight, config.launch.visualMode);
+    config.originalVisualSize = config.visualSize;
     return;
   }
 
   ////////////////////////////////////
   /// 竖版PPT，横版显示，并启动了双页模式
   ////////////////////////////////////
-  if (config$1.launch.doublePageMode && config$1.pptVertical && config$1.screenHorizontal) {
-    resetProportion(pptWidth, pptHeight, config$1.launch.visualMode === 3 ? 2 : config$1.launch.visualMode);
-    config$1.originalVisualSize = config$1.visualSize;
+  if (config.launch.doublePageMode && config.pptVertical && config.screenHorizontal) {
+    resetProportion(pptWidth, pptHeight, config.launch.visualMode === 3 ? 2 : config.launch.visualMode);
+    config.originalVisualSize = config.visualSize;
     return;
   }
 
@@ -43401,52 +43401,52 @@ function initConfig(pptWidth, pptHeight) {
   //如果是横版PPT，横版显示的情况下，并且是全局模式3的情况
   //可能存在宽度，不能铺满全屏的情况
   //所以可能存在要修改尺寸
-  if (config$1.pptHorizontal && config$1.screenHorizontal && config$1.launch.visualMode === 3) {
+  if (config.pptHorizontal && config.screenHorizontal && config.launch.visualMode === 3) {
     //可能会修改全局布局尺寸，所以采用3模式探测
-    resetProportion(pptWidth, pptHeight, config$1.launch.visualMode, true);
+    resetProportion(pptWidth, pptHeight, config.launch.visualMode, true);
   } else {
     //强制检测是否是反向显示模式
     //模式3的情况下，用2检测
-    resetProportion(pptWidth, pptHeight, config$1.launch.visualMode === 3 ? 2 : config$1.launch.visualMode);
+    resetProportion(pptWidth, pptHeight, config.launch.visualMode === 3 ? 2 : config.launch.visualMode);
   }
 
   //如果是PPT与设备反向显示
   //这里可能会溢出left的值
   //那么把每个visual就当做一个整体处理
   // config.originalScreenSize = config.screenSize
-  config$1.originalVisualSize = config$1.visualSize;
+  config.originalVisualSize = config.visualSize;
 
   //竖版PPT,横版显示
-  if (config$1.pptVertical && config$1.screenHorizontal) {
-    config$1.verticalToHorizontalVisual = true;
+  if (config.pptVertical && config.screenHorizontal) {
+    config.verticalToHorizontalVisual = true;
   }
 
   //横版PPT,竖版显示
-  if (config$1.pptHorizontal && config$1.screenVertical) {
-    config$1.horizontalToVerticalVisual = true;
+  if (config.pptHorizontal && config.screenVertical) {
+    config.horizontalToVerticalVisual = true;
   }
 
   /*******************************
    *   受反向检测影响了，需要修正config
    * ******************************/
-  if (config$1.launch.visualMode === 2) {
+  if (config.launch.visualMode === 2) {
     //如果是反向模式
     //强制设置visualSize=screenSize
     //从新计算config依赖比值
-    if (config$1.visualSize.left) {
+    if (config.visualSize.left) {
       resetConfig(pptWidth, pptHeight, {
-        width: config$1.visualSize.width,
-        height: config$1.visualSize.height
-      }, config$1.launch.visualMode);
+        width: config.visualSize.width,
+        height: config.visualSize.height
+      }, config.launch.visualMode);
     }
-  } else if (config$1.launch.visualMode === 3) {
+  } else if (config.launch.visualMode === 3) {
     //反模式下，重置高度
     //已经尺寸因为探测已经被改过一次了
     //实际使用的时候，需要还原
-    if (config$1.visualSize.left) {
+    if (config.visualSize.left) {
       resetConfig(pptWidth, pptHeight, {
-        width: config$1.visualSize.width,
-        height: config$1.visualSize.height
+        width: config.visualSize.width,
+        height: config.visualSize.height
       }, 1);
     } else {
       //重新把3模式下按照正常1的情况设置
@@ -43461,7 +43461,7 @@ function initConfig(pptWidth, pptHeight) {
  * 每个页面可以重写页面的view
  */
 function resetVisualLayout(setVisualMode) {
-  return getVisualSize(config$1, fullProportion, setVisualMode);
+  return getVisualSize(config, fullProportion, setVisualMode);
 }
 
 /**
@@ -43469,7 +43469,7 @@ function resetVisualLayout(setVisualMode) {
  * 每个页面可以重写页面的元素缩放比
  */
 function resetVisualProportion(newVisualSize) {
-  return getRealProportion(config$1, newVisualSize, fullProportion);
+  return getRealProportion(config, newVisualSize, fullProportion);
 }
 
 //定义属性
@@ -43867,12 +43867,12 @@ var filter = function filter(key) {
   if (onlyId) {
     return key + onlyId;
   } else {
-    if (!config$1.data.appId) {
-      config$1.data.appId = 'aaron-' + new Date().getDate();
+    if (!config.data.appId) {
+      config.data.appId = 'aaron-' + new Date().getDate();
     }
     //子文档标记
     var sub = window.SUbCONFIGT && window.SUbCONFIGT.dbId ? "-" + window.SUbCONFIGT.dbId : '';
-    onlyId = "-" + config$1.data.appId + sub;
+    onlyId = "-" + config.data.appId + sub;
   }
   return key + onlyId;
 };
@@ -44121,12 +44121,12 @@ function showWarn(data) {
 function converUrlName(src) {
   var result = void 0;
   var hdName = void 0; //高清图名
-  var brModeType = config$1.launch.brModeType;
-  var baseImageSuffix = config$1.launch.baseImageSuffix;
+  var brModeType = config.launch.brModeType;
+  var baseImageSuffix = config.launch.baseImageSuffix;
 
   //如果支持高清图
   //判断出高清图后缀
-  var hdPostfix = config$1.launch.useHDImageZoom && config$1.launch.imageSuffix && config$1.launch.imageSuffix['1440'];
+  var hdPostfix = config.launch.useHDImageZoom && config.launch.imageSuffix && config.launch.imageSuffix['1440'];
 
   //没有任何后缀
   //"1d7949a5585942ed.jpg"
@@ -44241,8 +44241,8 @@ function converImageURL(url, supportBrMode, supportSuffix) {
     return '';
   }
 
-  var brModeType = supportBrMode ? supportBrMode : config$1.launch.brModeType;
-  var baseImageSuffix = supportSuffix ? supportSuffix : config$1.launch.baseImageSuffix;
+  var brModeType = supportBrMode ? supportBrMode : config.launch.brModeType;
+  var baseImageSuffix = supportSuffix ? supportSuffix : config.launch.baseImageSuffix;
 
   //不需要转换
   if (!brModeType && !baseImageSuffix) {
@@ -44288,7 +44288,7 @@ function removeSlash(resource) {
  * @return {[type]} [description]
  */
 function loadGolbalStyle(fileName, callback) {
-  var path = config$1.launch.resource ? config$1.launch.resource + '/gallery/' + fileName + '.css' : config$1.data.pathAddress + fileName + '.css';
+  var path = config.launch.resource ? config.launch.resource + '/gallery/' + fileName + '.css' : config.data.pathAddress + fileName + '.css';
   var node = loadFile(path, callback);
   node && node.setAttribute('data-type', fileName);
 }
@@ -44325,7 +44325,7 @@ function getFileFullPath(fileName, debugType, isGif) {
   // 'd048193365eac224_a'
   // 'd048193365eac224_i'
   if (splitNumber === 1) {
-    return config$1.data.pathAddress + fileName;
+    return config.data.pathAddress + fileName;
   }
 
   //有2个点
@@ -44333,7 +44333,7 @@ function getFileFullPath(fileName, debugType, isGif) {
   // 'b9ba3dfc39ddd207.hi.jpg'
   // 'b9ba3dfc39ddd207.mi.jpg'
   if (splitNumber === 3) {
-    return config$1.data.pathAddress + fileName;
+    return config.data.pathAddress + fileName;
   }
 
   //只有一个点
@@ -44352,7 +44352,7 @@ function getFileFullPath(fileName, debugType, isGif) {
     //排除非图片的情况
     //9b7adc63c04af0651a60a211ed03085c.svg
     if (!hasImages(fileName)) {
-      return config$1.data.pathAddress + fileName;
+      return config.data.pathAddress + fileName;
     }
 
     //如果包含已经包含了执行的后缀
@@ -44362,12 +44362,12 @@ function getFileFullPath(fileName, debugType, isGif) {
     // 'd048193365eac224_a.hi'
     // 'd048193365eac224_a.mi
     if (/_[ia]\.(mi|hi)$/.test(fileName)) {
-      return config$1.data.pathAddress + fileName;
+      return config.data.pathAddress + fileName;
     }
 
     //仅仅是正常的png jpg gif图片
     //需要生成新的后缀
-    return config$1.data.pathAddress + converImageURL(fileName);
+    return config.data.pathAddress + converImageURL(fileName);
   }
 }
 
@@ -44429,10 +44429,10 @@ function createRandomImg(url) {
  * @return {[type]} [description]
  */
 function replacePath(svgstr) {
-  if (config$1.launch.lauchMode === 1) {
+  if (config.launch.lauchMode === 1) {
     //如果能找到对应的默认路径，则替换
     if (-1 !== svgstr.indexOf('content/gallery/')) {
-      svgstr = svgstr.replace(/content\/gallery/ig, config$1.data.pathAddress);
+      svgstr = svgstr.replace(/content\/gallery/ig, config.data.pathAddress);
     }
   }
   return svgstr;
@@ -44457,7 +44457,7 @@ var converProportion = function converProportion(_ref) {
       type: 'util',
       content: '没有传递缩放比,取全局config'
     });
-    proportion = config$1.proportion;
+    proportion = config.proportion;
   }
 
   //页眉，保持横纵比
@@ -44594,7 +44594,7 @@ function reviseSize(_ref2) {
  */
 function mixGolbalConfig(setConfig) {
   if (setConfig) {
-    Xut.mixin(config$1.golbal, setConfig);
+    Xut.mixin(config.golbal, setConfig);
   }
 }
 
@@ -44892,7 +44892,7 @@ Xut.nextTick = nextTick;
  */
 function randomUrl(url) {
   /*启动了预览，就必须要要缓存*/
-  if (config$1.launch.preload) {
+  if (config.launch.preload) {
     return url;
   } else {
     return url + '?r=' + new Date().getTime();
@@ -44934,7 +44934,7 @@ function readFileContent(path, callback, type) {
   //如果是js动态文件
   //content的html结构
   if (type === "js") {
-    paths = config$1.getSvgPath() + path;
+    paths = config.getSvgPath() + path;
     name = path.replace(".js", '');
     loadJs(paths, name);
     return;
@@ -44945,10 +44945,10 @@ function readFileContent(path, callback, type) {
    * crossDomain = true
    * 那么所有的svg文件就强制转化成js读取
    */
-  if (config$1.launch.crossDomain || config$1.launch.convert === 'svg') {
+  if (config.launch.crossDomain || config.launch.convert === 'svg') {
     path = path.replace('.svg', '.js');
     name = path.replace(".js", '');
-    svgUrl = config$1.getSvgPath() + path;
+    svgUrl = config.getSvgPath() + path;
     loadJs(svgUrl, name); //直接采用脚本加载
     return;
   }
@@ -44963,7 +44963,7 @@ function readFileContent(path, callback, type) {
       path = path.replace(".svg", '.js');
     }
     //全路径
-    paths = config$1.getSvgPath().replace("svg", 'js') + path;
+    paths = config.getSvgPath().replace("svg", 'js') + path;
     //文件名
     name = path.replace(".js", '');
     //加载脚本
@@ -44986,13 +44986,13 @@ function readFileContent(path, callback, type) {
 
   //svg文件
   //游览器模式 && 非强制插件模式
-  if (Xut.plat.isBrowser && !config$1.isPlugin) {
+  if (Xut.plat.isBrowser && !config.isPlugin) {
     //默认的地址
-    svgUrl = config$1.getSvgPath().replace("www/", "") + path;
+    svgUrl = config.getSvgPath().replace("www/", "") + path;
 
     //mini杂志的情况，不处理目录的www
-    if (config$1.launch.resource) {
-      svgUrl = config$1.getSvgPath() + path;
+    if (config.launch.resource) {
+      svgUrl = config.getSvgPath() + path;
     }
 
     $.ajax({
@@ -45017,7 +45017,7 @@ function readFileContent(path, callback, type) {
    * 插件读取
    * 手机客户端模式
    */
-  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config$1.getSvgPath() + path, function (svgContent) {
+  Xut.Plugin.ReadAssetsFile.readAssetsFileAction(config.getSvgPath() + path, function (svgContent) {
     callback(svgContent);
   }, function (err) {
     callback('');
@@ -45126,9 +45126,9 @@ fileName + brModeType + baseSuffix + type
  */
 function parseFileName(fileName, baseSuffix, type) {
   //如果启动了模式
-  if (config$1.launch.brModeType) {
+  if (config.launch.brModeType) {
     //增加brModeType，增加后缀，去掉类型
-    return '' + fileName + config$1.launch.brModeType + baseSuffix;
+    return '' + fileName + config.launch.brModeType + baseSuffix;
   }
   //如果只加了baseSuffix模式处理
   return '' + fileName + baseSuffix + type;
@@ -45160,15 +45160,15 @@ function filterJsonData() {
 
   //配置了远程地址
   //需要把flow的给处理掉
-  if (config$1.launch.resource && result.FlowData) {
+  if (config.launch.resource && result.FlowData) {
 
     /*如果没有强制关闭，并且有flow数据，那么就默认启动*/
-    if (config$1.launch.columnCheck !== false) {
-      config$1.launch.columnCheck = true;
+    if (config.launch.columnCheck !== false) {
+      config.launch.columnCheck = true;
     }
 
     //有基础后缀，需要补上所有的图片地址
-    var baseSuffix = config$1.launch.baseImageSuffix ? '.' + config$1.launch.baseImageSuffix : '';
+    var baseSuffix = config.launch.baseImageSuffix ? '.' + config.launch.baseImageSuffix : '';
 
     //xlink:href
     //<img src
@@ -45177,14 +45177,14 @@ function filterJsonData() {
     //xlink:href="content/310/gallery/696c9e701f5e3fd82510d86e174c46a0.png"
     //img src="content/11/gallery/b9ba3dfc39ddd207_a.hi
     result.FlowData = result.FlowData.replace(urlRE, function (a, prefix, fileName, type) {
-      return prefix + '="' + config$1.launch.resource + '/gallery/' + parseFileName(fileName, baseSuffix, type);
+      return prefix + '="' + config.launch.resource + '/gallery/' + parseFileName(fileName, baseSuffix, type);
     });
   }
 
   window.SQLResult = null;
 
   //标记有Flow数据处理
-  config$1.launch.hasFlowData = true;
+  config.launch.hasFlowData = true;
 
   return result;
 }
@@ -45213,7 +45213,7 @@ function filterJsonData() {
  * 2 缓存
  */
 function importJsonDatabase(callback) {
-  var path = config$1.launch.database;
+  var path = config.launch.database;
   //如果外联指定路径json数据
   if (path && /.js$/.test(path)) {
     //防止外部链接影响
@@ -45298,7 +45298,7 @@ function executeDB(sql, callback, errorCB, tName) {
   //否则直接ajax php
   else {
       $.ajax({
-        url: config$1.data.onlineModeUrl,
+        url: config.data.onlineModeUrl,
         dataType: 'json',
         data: {
           xxtsql: sql
@@ -45322,7 +45322,7 @@ function executeDB(sql, callback, errorCB, tName) {
 //建立sql查询
 function execute(selectSql, callback) {
 
-  var database = config$1.data.db,
+  var database = config.data.db,
       tableName,
       //表名
   successResults = {},
@@ -45816,19 +45816,19 @@ var supportTransaction = function supportTransaction(callback) {
   if (window.openDatabase) {
     try {
       //数据库链接对象
-      config$1.data.db = window.openDatabase(config$1.data.dbName, "1.0", "Xxtebook Database", config$1.data.dbSize);
+      config.data.db = window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
     } catch (err) {
       console.log('window.openDatabase出错');
     }
   }
 
   //如果读不出数据
-  if (config$1.data.db) {
-    config$1.data.db.transaction(function (tx) {
+  if (config.data.db) {
+    config.data.db.transaction(function (tx) {
       tx.executeSql('SELECT * FROM Novel', [], function (tx, rs) {
         callback();
       }, function () {
-        config$1.data.db = null;
+        config.data.db = null;
         callback();
       });
     });
@@ -45852,7 +45852,7 @@ var initStore = function initStore(callback) {
  */
 var initDatabse = function (hasResults, callback) {
   if (hasResults) {
-    config$1.data.db = null;
+    config.data.db = null;
     initStore(callback);
     return;
   }
@@ -45899,7 +45899,7 @@ var defaults$1 = {
     setConfig[i] = Number(data[i]);
   }
 
-  _.extend(config$1.data, {
+  _.extend(config.data, {
     originalAppId: Number(data.appId),
     //应用的唯一标识符
     //生成时间+appid
@@ -45967,8 +45967,8 @@ var path = void 0;
  */
 function createCursor() {
   if (isDisable) return;
-  var sWidth = config$1.visualSize.width;
-  var sHeight = config$1.visualSize.height;
+  var sWidth = config.visualSize.width;
+  var sHeight = config.visualSize.height;
   var width = Math.min(sWidth, sHeight) / 4;
   var space = Math.round((sHeight - width) / 2);
   var delay = [0, 0.9167, 0.833, 0.75, 0.667, 0.5833, 0.5, 0.41667, 0.333, 0.25, 0.1667, 0.0833];
@@ -45988,7 +45988,7 @@ function createCursor() {
     container = '<div class="xut-busy-middle">' + container + '</div>';
   }
 
-  return '<div class="xut-busy-icon xut-fullscreen">\n            <div style="width:' + width + 'px;height:' + width + 'px;margin:' + space + 'px auto;margin-top:' + (config$1.visualSize.top + space) + 'px;">\n                <div style="height:30%;"></div>\n                  ' + container + '\n                <div class="xut-busy-text"></div>\n             </div>\n          </div>';
+  return '<div class="xut-busy-icon xut-fullscreen">\n            <div style="width:' + width + 'px;height:' + width + 'px;margin:' + space + 'px auto;margin-top:' + (config.visualSize.top + space) + 'px;">\n                <div style="height:30%;"></div>\n                  ' + container + '\n                <div class="xut-busy-text"></div>\n             </div>\n          </div>';
 }
 
 var clear = function clear() {
@@ -46109,12 +46109,12 @@ function getBusyHTML() {
 function getContentHTML() {
   var coverStyle = '';
   //mini平台不要背景图
-  if (config$1.launch.platform === 'mini') {} else {
+  if (config.launch.platform === 'mini') {} else {
     //默认背景图
     var coverUrl = './content/gallery/cover.jpg';
     //重写背景图
-    if (config$1.launch.resource) {
-      coverUrl = config$1.launch.resource + '/gallery/cover.jpg';
+    if (config.launch.resource) {
+      coverUrl = config.launch.resource + '/gallery/cover.jpg';
     }
     //背景样式
     coverStyle = 'style="background-image: url(' + coverUrl + ');"';
@@ -46181,7 +46181,7 @@ function removeCover(callback) {
     //是否配置启动动画关闭
 
 
-    if (config$1.launch.launchAnim === false) {
+    if (config.launch.launchAnim === false) {
       complete();
     } else {
       //有动画
@@ -46379,7 +46379,7 @@ function detectColumn($seasons, columnCollection, callback, checkCount) {
     }, 500);
   } else {
     //如果探测完毕就强制关闭检测了
-    config$1.launch.columnCheck = false;
+    config.launch.columnCheck = false;
     clearColumnDetection();
     callback();
   }
@@ -46445,7 +46445,7 @@ function createStr(chapterId, data, visualWidth, visualHeight, margin) {
     data = $(data).find("#columns-content").html();
   }
 
-  if (config$1.launch.scrollMode === 'v') {
+  if (config.launch.scrollMode === 'v') {
     /*竖版的情况下，不需要分栏了，直接处理*/
     var columnGap = COLUMNTAP + ':' + negativeWidth + 'px';
     var columnWidth = COLUMNWIDTH + ':' + containerWidth + 'px';
@@ -46531,9 +46531,9 @@ function getColumnData($seasons, callback) {
       if (tag) {
         var chapterId = tag.match(/\d+/)[0];
         var count = void 0;
-        if (config$1.launch.scrollMode === 'h') {
+        if (config.launch.scrollMode === 'h') {
           count = getColumnCount(node, '#columns-content');
-        } else if (config$1.launch.scrollMode === 'v') {
+        } else if (config.launch.scrollMode === 'v') {
           count = getColumnCount(node, '#scroller-section');
         }
         callback(seasonsId, chapterId, count);
@@ -46589,7 +46589,7 @@ function initColumn(callback) {
 
       //第一次获取分栏数与高度 analysis
       getColumnData($seasons, function (seasonsId, chapterId, count) {
-        if (debug$1 && config$1.launch.columnCheck) {
+        if (debug$1 && config.launch.columnCheck) {
           count = simulateCount;
         }
         columnData[seasonsId][chapterId] = count;
@@ -46598,7 +46598,7 @@ function initColumn(callback) {
       addCache(columnData);
 
       //检测分栏是否丢失，补充
-      if (config$1.launch.columnCheck) {
+      if (config.launch.columnCheck) {
         startColumnDetect($seasons, $.extend(true, {}, columnData), function () {
           $container.hide();
         });
@@ -47077,7 +47077,7 @@ var pathHooks = {
    * 文本图片
    */
   content: function content(data) {
-    return formatString(data, config$1.data.pathAddress);
+    return formatString(data, config.data.pathAddress);
   },
 
 
@@ -47086,10 +47086,10 @@ var pathHooks = {
    * @type {[type]}
    */
   audio: function audio(data) {
-    return formatString(data, config$1.data.pathAddress);
+    return formatString(data, config.data.pathAddress);
   },
   video: function video(data) {
-    return formatString(data, config$1.data.pathAddress);
+    return formatString(data, config.data.pathAddress);
   },
 
 
@@ -47097,7 +47097,7 @@ var pathHooks = {
    * svg
    */
   svg: function svg(data) {
-    return formatString(data, config$1.data.pathAddress);
+    return formatString(data, config.data.pathAddress);
   },
 
 
@@ -47105,7 +47105,7 @@ var pathHooks = {
    * 零件图片
    */
   widget: function widget(data) {
-    return formatString(data, config$1.data.rootPath + '/widget/gallery/');
+    return formatString(data, config.data.rootPath + '/widget/gallery/');
   },
 
 
@@ -47117,7 +47117,7 @@ var pathHooks = {
    * }
    */
   autoSprite: function autoSprite(data) {
-    return formatObject(data, config$1.data.pathAddress);
+    return formatObject(data, config.data.pathAddress);
   },
 
 
@@ -47129,7 +47129,7 @@ var pathHooks = {
     }
   */
   seniorSprite: function seniorSprite(data) {
-    return formatObject(data, config$1.data.rootPath + '/widget/gallery/');
+    return formatObject(data, config.data.rootPath + '/widget/gallery/');
   }
 };
 
@@ -47665,10 +47665,10 @@ function deleteResource(chaperId) {
  */
 function getNumber() {
   //退出清理的情况下
-  if (!config$1.launch) {
+  if (!config.launch) {
     return false;
   }
-  return typeof config$1.launch.preload === 'number' ? config$1.launch.preload : 5;
+  return typeof config.launch.preload === 'number' ? config.launch.preload : 5;
 }
 
 /**
@@ -47907,7 +47907,7 @@ function nextTask(chapterId, callback) {
  * @return {Boolean} [description]
  */
 function loadPrelaod(callback) {
-  loadFile(config$1.data.pathAddress + 'preload.js', function () {
+  loadFile(config.data.pathAddress + 'preload.js', function () {
     if (window.preloadData) {
       callback(true, window.globalBrMode);
     } else {
@@ -47957,7 +47957,7 @@ function watchPreloadInit() {
 function initPreload(total, callback) {
 
   function exit() {
-    config$1.launch.preload = null;
+    config.launch.preload = null;
     callback(false);
   }
 
@@ -48084,9 +48084,9 @@ function adaptiveImage() {
   var $adaptiveImageNode = $('.xut-adaptive-image');
   if ($adaptiveImageNode.length) {
     var baseImageType = $adaptiveImageNode.width();
-    var type = config$1.launch.imageSuffix[baseImageType];
+    var type = config.launch.imageSuffix[baseImageType];
     if (type) {
-      config$1.launch.baseImageSuffix = type;
+      config.launch.baseImageSuffix = type;
       return;
     }
   }
@@ -48098,8 +48098,8 @@ function adaptiveImage() {
  * @return {[type]} [description]
  */
 function getMaxWidth() {
-  if (config$1.visualSize) {
-    return config$1.visualSize.width;
+  if (config.visualSize) {
+    return config.visualSize.width;
   }
   return window.screen.width > document.documentElement.clientWidth ? window.screen.width : document.documentElement.clientWidth;
 }
@@ -48118,14 +48118,14 @@ function setDefaultSuffix() {
     var ratio = window.devicePixelRatio || 1;
     var maxWidth = getMaxWidth() * ratio;
     if (maxWidth >= 1080 && maxWidth < 1439) {
-      config$1.launch.baseImageSuffix = config$1.launch.imageSuffix['1080'];
+      config.launch.baseImageSuffix = config.launch.imageSuffix['1080'];
     }
     if (maxWidth >= 1440) {
-      config$1.launch.baseImageSuffix = config$1.launch.imageSuffix['1440'];
+      config.launch.baseImageSuffix = config.launch.imageSuffix['1440'];
     }
     $warn({
       type: 'config',
-      content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config$1.launch.baseImageSuffix
+      content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix
     });
   }
 }
@@ -48136,8 +48136,8 @@ function setDefaultSuffix() {
 function setTrack(launch, golbal) {
 
   var trackTypes = launch && launch.trackCode || golbal.trackCode;
-  config$1.sendTrackCode = function () {};
-  config$1.hasTrackCode = function () {};
+  config.sendTrackCode = function () {};
+  config.hasTrackCode = function () {};
   /*
   'launch'
   'init'
@@ -48158,7 +48158,7 @@ function setTrack(launch, golbal) {
     var uuid = Xut.guid();
 
     /*检测是否有代码追踪*/
-    config$1.hasTrackCode = function (type) {
+    config.hasTrackCode = function (type) {
       if (launch && launch.trackCode && launch.trackCode[type]) {
         return true;
       }
@@ -48174,18 +48174,18 @@ function setTrack(launch, golbal) {
     };
 
     /*发送代码追踪数据*/
-    config$1.sendTrackCode = function (type) {
+    config.sendTrackCode = function (type) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      if (config$1.hasTrackCode(type)) {
+      if (config.hasTrackCode(type)) {
         if (options.time) {
           //转化秒
           options.time = Math.round(options.time % (1000 * 60) / 1000);
         }
         Xut.Application.Notify('trackCode', getTrackName(type), _.extend(options || {}, {
           uuid: uuid,
-          appId: config$1.data.originalAppId,
-          appName: config$1.data.shortName
+          appId: config.data.originalAppId,
+          appName: config.data.shortName
         }));
       }
     };
@@ -48230,13 +48230,13 @@ function setCursor(launch, golbal) {
  */
 function setHistory(data) {
   //Launch接口定义
-  if (config$1.launch.historyMode !== undefined) {
+  if (config.launch.historyMode !== undefined) {
     return;
   }
 
   //数据库定义 && == 1
   if (data.recordHistory !== undefined && Number(data.recordHistory)) {
-    config$1.launch.historyMode = true;
+    config.launch.historyMode = true;
     return;
   }
 }
@@ -48264,24 +48264,24 @@ function setGestureSwipe(novelData) {
   if (novelData.parameter) {
     var parameter = parseJSON(novelData.parameter);
     /*全局优先设置覆盖*/
-    if (config$1.launch.gestureSwipe === undefined && parameter.pageflip !== undefined) {
+    if (config.launch.gestureSwipe === undefined && parameter.pageflip !== undefined) {
       switch (Number(parameter.pageflip)) {
         case 0:
           //滑动翻页
-          config$1.launch.gestureSwipe = true;
+          config.launch.gestureSwipe = true;
           break;
         case 1:
           //直接换
-          config$1.launch.pageFlip = true;
-          config$1.launch.gestureSwipe = false;
+          config.launch.pageFlip = true;
+          config.launch.gestureSwipe = false;
           break;
       }
     }
   }
 
   /*默认不锁定页面，支持手势滑动*/
-  if (config$1.launch.gestureSwipe === undefined) {
-    config$1.launch.gestureSwipe = true;
+  if (config.launch.gestureSwipe === undefined) {
+    config.launch.gestureSwipe = true;
   }
 }
 
@@ -48313,10 +48313,10 @@ function setBrType(launch, golbal) {
 function resetBrMode(hasPreFile, globalBrMode) {
   //如果在没有hasPreFile，并且没有hasFlowData，那么就是兼容读库的旧版的处理
   //如果没有hasPreFile，但是有hasFlowData，那么就是迷你杂志，不能去掉
-  if (!hasPreFile && !config$1.launch.hasFlowData) {
-    config$1.launch.brMode = '';
-    config$1.launch.brModel = '被resetBrMode清空了';
-    config$1.launch.brModeType = '';
+  if (!hasPreFile && !config.launch.hasFlowData) {
+    config.launch.brMode = '';
+    config.launch.brModel = '被resetBrMode清空了';
+    config.launch.brModeType = '';
     return;
   }
 
@@ -48325,14 +48325,14 @@ function resetBrMode(hasPreFile, globalBrMode) {
   //globalBrMode:混合模式 2 =>_i _a
   if (globalBrMode === 1) {
     /*如果用单模式，但是判断出来是混合模式，那么直接清空*/
-    if (config$1.launch.brModeType) {
-      config$1.launch.brMode = '';
-      config$1.launch.brModeType = '';
+    if (config.launch.brModeType) {
+      config.launch.brMode = '';
+      config.launch.brModeType = '';
     }
   } else if (globalBrMode === 2) {
     /*如果是混合模式，判断出来是单模式，需要重新处理*/
-    if (!config$1.launch.brModeType) {
-      config$1.launch.brModeType = getBrType(1);
+    if (!config.launch.brModeType) {
+      config.launch.brModeType = getBrType(1);
     }
   }
 }
@@ -48410,8 +48410,8 @@ function getBrType(mode) {
 function setVisualMode() {
 
   //竖版的情况下，页面模式都强制为1
-  if (config$1.launch.scrollMode === 'v') {
-    config$1.launch.visualMode = 1;
+  if (config.launch.scrollMode === 'v') {
+    config.launch.visualMode = 1;
     return;
   }
 
@@ -48419,20 +48419,20 @@ function setVisualMode() {
   //那么优先数据库
   //因为数据库默认写1了。所以1排除
   //只是有一种情况，就是你全局设了模式3，然后编辑想某些页面或者应用，用模式1，就会出现问题了
-  if (config$1.data.visualMode !== undefined && config$1.data.visualMode != 1) {
-    config$1.launch.visualMode = config$1.data.visualMode;
+  if (config.data.visualMode !== undefined && config.data.visualMode != 1) {
+    config.launch.visualMode = config.data.visualMode;
   }
 
   //默认为1
-  if (config$1.launch.visualMode === undefined) {
-    config$1.launch.visualMode = 1;
+  if (config.launch.visualMode === undefined) {
+    config.launch.visualMode = 1;
   }
 
   //模式5 只在竖版下使用
-  if (config$1.launch.visualMode === 5) {
+  if (config.launch.visualMode === 5) {
     var screen = getSize();
     if (screen.height < screen.width) {
-      config$1.launch.visualMode = 1;
+      config.launch.visualMode = 1;
     }
   }
 }
@@ -48442,8 +48442,8 @@ function setVisualMode() {
  * @return {[type]} [description]
  */
 function resetDelegate() {
-  if (config$1.launch.swipeDelegate !== false) {
-    config$1.launch.swipeDelegate = true;
+  if (config.launch.swipeDelegate !== false) {
+    config.launch.swipeDelegate = true;
   }
 }
 
@@ -48452,8 +48452,8 @@ function resetDelegate() {
  * @param {[type]} data [description]
  */
 function setPaintingMode(data) {
-  if (!config$1.launch.visualMode && Number(data.scrollPaintingMode)) {
-    config$1.launch.visualMode = 4;
+  if (!config.launch.visualMode && Number(data.scrollPaintingMode)) {
+    config.launch.visualMode = 4;
   }
 }
 
@@ -48474,8 +48474,8 @@ function setPaintingMode(data) {
 function setLaunch(novelData) {
 
   /*独立app与全局配置文件*/
-  var launch = config$1.launch;
-  var golbal = config$1.golbal;
+  var launch = config.launch;
+  var golbal = config.golbal;
 
   //////////////////////////////////
   /// brModel命名被修改该了
@@ -48491,7 +48491,7 @@ function setLaunch(novelData) {
   //debug模式
   for (var key in golbal.debug) {
     if (golbal.debug[key] !== undefined) {
-      config$1.debug[key] = golbal.debug[key];
+      config.debug[key] = golbal.debug[key];
     }
   }
 
@@ -48514,7 +48514,7 @@ function setLaunch(novelData) {
   //如果不是浏览器模式
   //强制关闭预加载模式
   if (!Xut.plat.isBrowser) {
-    config$1.launch.preload = null;
+    config.launch.preload = null;
   }
 
   //配置VisualMode
@@ -48564,7 +48564,7 @@ function baseConfig(callback) {
    */
   function ccreateRoot(callback) {
     //根节点
-    var _initRootNode = initRootNode(config$1.launch.el, config$1.launch.cursor),
+    var _initRootNode = initRootNode(config.launch.el, config.launch.cursor),
         $rootNode = _initRootNode.$rootNode,
         $contentNode = _initRootNode.$contentNode;
 
@@ -48597,7 +48597,7 @@ function baseConfig(callback) {
       configColumn(function () {
         //如果启动预加载配置
         //先探测下是否能支持
-        if (config$1.launch.preload) {
+        if (config.launch.preload) {
           initPreload(chapterTotal, function () {
             return callback(novelData);
           });
@@ -48615,7 +48615,7 @@ function baseConfig(callback) {
 function configInit(novelData, tempSettingData) {
 
   /*启动代码用户操作跟踪:启动*/
-  config$1.sendTrackCode('launch');
+  config.sendTrackCode('launch');
 
   //创建过滤器
   Xut.CreateFilter = contentFilter('createFilter');
@@ -48653,12 +48653,12 @@ function configColumn(callback) {
 function configImage() {
   //mini杂志设置
   //如果是pad的情况下设置font为125%
-  if (config$1.launch.platform === 'mini' && Xut.plat.isTablet) {
+  if (config.launch.platform === 'mini' && Xut.plat.isTablet) {
     $('body').css('font-size', '125%');
   }
 
   /*图片分辨了自适应*/
-  if (config$1.launch.imageSuffix) {
+  if (config.launch.imageSuffix) {
     adaptiveImage();
   }
 }
@@ -48667,8 +48667,8 @@ function configImage() {
  * 设置缓存，必须要可设置
  */
 var saveData = function saveData() {
-  if (config$1.launch.historyMode) {
-    var data = config$1.data;
+  if (config.launch.historyMode) {
+    var data = config.data;
     $setStorage({ "pageIndex": data.pageIndex, "novelId": data.novelId });
   } else {
     //清理
@@ -48707,8 +48707,8 @@ var initMainScene = function (options) {
 
   options = initDefaultValues(options || {});
 
-  config$1.data.novelId = options.novelId;
-  config$1.data.pageIndex = options.pageIndex;
+  config.data.novelId = options.novelId;
+  config.data.pageIndex = options.pageIndex;
 
   //设置缓存
   saveData();
@@ -48746,7 +48746,7 @@ var initMainScene = function (options) {
     Xut.Application.Notify('initComplete');
 
     /*发送初始化完毕代码跟踪*/
-    config$1.sendTrackCode('init', { time: +new Date() - config$1.launch.launchTime });
+    config.sendTrackCode('init', { time: +new Date() - config.launch.launchTime });
   });
 };
 
@@ -48789,7 +48789,7 @@ function createVideoWrap(type, options) {
 
 /*获取视频文件路径*/
 function getFilePath(url) {
-  return config$1.getVideoPath() + url;
+  return config.getVideoPath() + url;
 }
 
 /**
@@ -48901,7 +48901,7 @@ var FlarePlayer = function () {
         options.startBoot();
       }
       /*非迷你平台关闭视频*/
-      if (config$1.launch.platform !== 'mini') {
+      if (config.launch.platform !== 'mini') {
         removeVideo(options.chapterId);
       }
     });
@@ -49424,7 +49424,7 @@ function initGlobalEvent() {
       2、如果是刷新，取消之前的延迟，提交刷新提示。
       */
       $(window).on('beforeunload', function () {
-        config$1.sendTrackCode('exit', { time: +new Date() - config$1.launch.launchTime });
+        config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
       });
     }
   }
@@ -49620,7 +49620,7 @@ var Subtitle = function () {
     value: function _createDom(data) {
 
       //屏幕分辨率
-      var proportion = config$1.proportion;
+      var proportion = config.proportion;
       var proportionWidth = proportion.width;
       var proportionHeight = proportion.height;
 
@@ -49768,7 +49768,7 @@ var AudioSuper = function () {
     value: function _$$preRelated(options) {
 
       /*匹配URL地址*/
-      this.$$url = config$1.getAudioPath() + options.url;
+      this.$$url = config.getAudioPath() + options.url;
 
       //在manager中附加，播放一次后删除这个对象
       this.innerCallback = options.innerCallback;
@@ -51442,8 +51442,8 @@ var deployVideo = function deployVideo(videoData, options, columnData) {
     var layerSize = setProportion({
       getStyle: getStyle,
       proportion: getStyle.pageProportion,
-      width: videoData.width || config$1.visualSize.width,
-      height: videoData.height || config$1.visualSize.height,
+      width: videoData.width || config.visualSize.width,
+      height: videoData.height || config.visualSize.height,
       left: videoData.left,
       top: videoData.top,
       padding: videoData.padding
@@ -52304,11 +52304,11 @@ function bindContentEvent(data) {
 /**
  * 销毁对象事件
  */
-function destroyContentEvent(eventData, eventName) {
-  if (eventData.eventReference) {
-    eventData.eventReference.off(eventName || eventData.eventName, eventData.eventHandler);
-    eventData.eventReference = null;
-    eventData.eventHandler = null;
+function destroyContentEvent(eventRelated, eventName) {
+  if (eventRelated.eventReference) {
+    eventRelated.eventReference.off(eventName || eventRelated.eventName, eventRelated.eventHandler);
+    eventRelated.eventReference = null;
+    eventRelated.eventHandler = null;
   }
 }
 
@@ -52709,7 +52709,7 @@ function parseChapterParameter(pageData, base) {
         //contentMode
         if (parameter.contentMode && parameter.contentMode == 1) {
           //非强制dom模式
-          if (!config$1.debug.onlyDomMode) {
+          if (!config.debug.onlyDomMode) {
             //启动dom模式
             base.canvasRelated.enable = true;
           }
@@ -52720,7 +52720,7 @@ function parseChapterParameter(pageData, base) {
         if (parameter.lastPage && base.pageType === 'page') {
           //运行应用运行时间
           base.runLastPageAction = function () {
-            var runTime = Number(config$1.data.delayTime);
+            var runTime = Number(config.data.delayTime);
             var timeout = void 0;
             if (runTime) {
               timeout = setTimeout(function () {
@@ -53099,7 +53099,7 @@ var maskBoxImage = Xut.style.maskBoxImage;
  */
 var setDataSize = function setDataSize(data) {
   //缩放比
-  var proportion = config$1.proportion;
+  var proportion = config.proportion;
 
   if (data.imageWidth) {
     data.imageWidth = data.imageWidth * proportion.width;
@@ -53126,7 +53126,7 @@ var getOffset = function getOffset(pageSide) {
       background = 'background-position:0';
       break;
     case 2:
-      background = 'background-position:' + config$1.screenSize.width + 'px';
+      background = 'background-position:' + config.screenSize.width + 'px';
       break;
   }
   return background;
@@ -53574,7 +53574,7 @@ function IScroll(node, options, delegate) {
   ///////////////////////////////
   /// 竖版禁止上下滑动的冒泡，并且不是强制的横屏滑动模式
   ///////////////////////////////
-  if (delegate && config$1.launch.scrollMode === 'v') {
+  if (delegate && config.launch.scrollMode === 'v') {
     /*如果是竖版滑动，那么就需要代理下，竖版滑动后，上下翻页*/
     if (!options.scrollX || options.scrollY) {
       return new delegateScrollY(node, options);
@@ -53636,7 +53636,7 @@ var whiteObject = {
 };var sizeArray = ["1", "1.5", "2.0"];
 
 var getFontSize = function getFontSize() {
-  newFontSize = defaultFontSize * config$1.proportion.width;
+  newFontSize = defaultFontSize * config.proportion.width;
   return [Math.floor(newFontSize * 1.5), Math.floor(newFontSize * 2.0), Math.floor(newFontSize * 2.5)];
 };
 
@@ -53705,7 +53705,7 @@ var HtmlBox = function () {
       var iscrollName = "htmlbox-iscroll-" + contentId;
 
       //缓存名
-      this.storageName = iscrollName + config$1.data.appId;
+      this.storageName = iscrollName + config.data.appId;
 
       var fontSize = getFontSize();
 
@@ -53859,7 +53859,7 @@ var HtmlBox = function () {
     key: '_relocateToolbar',
     value: function _relocateToolbar(iscrollName) {
       //修正模式2下屏幕溢出高度
-      var visualSize = config$1.visualSize;
+      var visualSize = config.visualSize;
       var left = visualSize.overflowWidth && Math.abs(visualSize.left) || 0;
       var top = visualSize.overflowHeight && Math.abs(visualSize.top) || 0;
       this.$htmlbox[0].style.cssText += "margin-top:" + top + "px";
@@ -53958,8 +53958,8 @@ var textBoxMixin = function (activitProto) {
    */
   activitProto._htmlTextBox = function () {
     var self = this;
-    var relatedData = this.relatedData;
-    var contentHtmlBoxIds = relatedData.contentHtmlBoxIds;
+    var dataRelated = this.dataRelated;
+    var contentHtmlBoxIds = dataRelated.contentHtmlBoxIds;
     var contentId;
     var contentName;
     var $contentNode;
@@ -53968,8 +53968,8 @@ var textBoxMixin = function (activitProto) {
     this.htmlBoxInstance = [];
 
     //创建文本框对象
-    if (contentHtmlBoxIds.length && relatedData.contentDataset) {
-      _.each(relatedData.contentDataset, function (data) {
+    if (contentHtmlBoxIds.length && dataRelated.contentDataset) {
+      _.each(dataRelated.contentDataset, function (data) {
         if (~contentHtmlBoxIds.indexOf(data._id)) {
           contentId = data._id;
           contentName = self.makePrefix('Content', self.chapterIndex, contentId);
@@ -54324,12 +54324,12 @@ var bookMarkMixin = function (activitProto) {
     if (this.pageType === 'master') {
       //模板取对应的页面上的数据
       pageData = Xut.Presentation.GetPageData();
-      node = this.relatedData.floatMasterDivertor.container;
+      node = this.dataRelated.floatMasterDivertor.container;
       pageId = pageData._id;
       seasonId = pageData.seasonId;
     } else {
       node = this.$containsNode;
-      seasonId = this.relatedData.seasonId;
+      seasonId = this.dataRelated.seasonId;
       pageId = this.pageId;
     }
     var options = {
@@ -54565,7 +54565,7 @@ var eventMixin = function (activitProto) {
    * 解析出事件类型
    */
   activitProto._initEvents = function () {
-    this.eventData.eventName = conversionEventType(this.eventData.eventType);
+    this.eventRelated.eventName = conversionEventType(this.eventRelated.eventType);
   };
 
   /**
@@ -54576,15 +54576,15 @@ var eventMixin = function (activitProto) {
     var _this = this;
 
     var contentName = void 0;
-    var eventData = this.eventData;
+    var eventRelated = this.eventRelated;
 
     //dom
     //找到对应绑定事件的元素
     var parseDom = function parseDom() {
       contentName = _this.makePrefix('Content', chapterIndex, contentId);
-      eventData.type = 'dom';
-      eventData.canvasMode = false;
-      eventData.domMode = true;
+      eventRelated.type = 'dom';
+      eventRelated.canvasMode = false;
+      eventRelated.domMode = true;
     };
 
     //canvas模式非常特别
@@ -54592,9 +54592,9 @@ var eventMixin = function (activitProto) {
     //所以事件绑定在最外面
     var parseCanavs = function parseCanavs() {
       contentName = _this.makePrefix('canvas', chapterIndex, contentId);
-      eventData.type = 'canvas';
-      eventData.canvasMode = true;
-      eventData.domMode = false;
+      eventRelated.type = 'canvas';
+      eventRelated.canvasMode = true;
+      eventRelated.domMode = false;
     };
 
     //canvas事件
@@ -54614,32 +54614,32 @@ var eventMixin = function (activitProto) {
    */
   activitProto._parseEventContext = function () {
     //事件上下文对象
-    var eventData = this.eventData;
-    var eventId = eventData.eventContentId;
-    var eventContext = eventData.eventContext;
+    var eventRelated = this.eventRelated;
+    var eventId = eventRelated.eventContentId;
+    var eventContext = eventRelated.eventContext;
 
     if (eventId) {
       if (!eventContext) {
         //被重写过的事件
-        var contentId = eventData.rewrite ? eventId : this.id;
+        var contentId = eventRelated.rewrite ? eventId : this.id;
         var contentName = this._findContentName(this.chapterIndex, contentId, eventId);
         eventContext = this.getContextNode(contentName);
-        eventData.eventContext = eventContext;
+        eventRelated.eventContext = eventContext;
       }
       if (eventContext) {
         //绑定事件加入到content钩子
-        this.relatedCallback.contentsHooks(this.chapterIndex, eventId, {
+        this.callbackRelated.contentsHooks(this.chapterIndex, eventId, {
           $contentNode: eventContext,
           //增加外部判断
           isBindEventHooks: true,
-          type: eventData.type
+          type: eventRelated.type
         });
       } else {
         /**
          * 针对动态事件处理
          * 快捷方式引用到父对象
          */
-        eventData.parent = this;
+        eventRelated.parent = this;
       }
     }
 
@@ -54652,19 +54652,19 @@ var eventMixin = function (activitProto) {
    */
   activitProto._bindEvents = function (callback) {
     var self = this;
-    var eventData = this.eventData;
-    var eventName = eventData.eventName;
+    var eventRelated = this.eventRelated;
+    var eventName = eventRelated.eventName;
     var eventContext = this._parseEventContext();
 
     /**
      * 运行动画
      * @return {[type]} [description]
      */
-    var startRunAnim = function startRunAnim() {
+    function startRunAnim() {
       //当前事件对象没有动画的时候才能触发关联动作
       var animOffset = void 0;
       var boundary = 5; //边界值
-      if (eventData.domMode && (animOffset = eventContext.prop('animOffset'))) {
+      if (eventRelated.domMode && (animOffset = eventContext.prop('animOffset'))) {
         var originalLeft = animOffset.left;
         var originalTop = animOffset.top;
         var newOffset = eventContext.offset();
@@ -54679,20 +54679,20 @@ var eventMixin = function (activitProto) {
       } else {
         self.runAnimation();
       }
-    };
+    }
 
     /**
      * 设置按钮的行为
      * 音频
      * 反弹
      */
-    var setBehavior = function setBehavior(feedbackBehavior) {
+    function setBehavior(feedbackBehavior) {
       var behaviorSound = void 0;
       //音频地址
       if (behaviorSound = feedbackBehavior.behaviorSound) {
         //妙妙学客户端强制删除
         if (window.MMXCONFIG && window.audioHandler) {
-          self._fixAudio.push(new AudioPlayer({
+          self.fixAudio.push(new AudioPlayer({
             url: behaviorSound,
             trackId: 9999,
             audioId: '一次性行点击',
@@ -54703,7 +54703,7 @@ var eventMixin = function (activitProto) {
         } else {
           //其余平台,如果存在点击过的
           //这里主要是防止重复点击创建
-          var audio = self._cacheBehaviorAudio[behaviorSound];
+          var audio = self.cacheBehaviorAudio[behaviorSound];
           if (audio) {
             audio.play();
           } else {
@@ -54713,7 +54713,7 @@ var eventMixin = function (activitProto) {
               url: behaviorSound,
               audioId: '一次性行点击'
             });
-            self._cacheBehaviorAudio[behaviorSound] = audio;
+            self.cacheBehaviorAudio[behaviorSound] = audio;
           }
         }
       }
@@ -54721,7 +54721,7 @@ var eventMixin = function (activitProto) {
       //反弹效果
       if (feedbackBehavior.isButton) {
         //div通过css实现反弹
-        if (eventData.domMode) {
+        if (eventRelated.domMode) {
           eventContext.addClass('xut-behavior');
           setTimeout(function () {
             eventContext.removeClass('xut-behavior');
@@ -54733,7 +54733,7 @@ var eventMixin = function (activitProto) {
       } else {
         startRunAnim();
       }
-    };
+    }
 
     /**
      * 事件引用钩子
@@ -54742,7 +54742,7 @@ var eventMixin = function (activitProto) {
     var eventDrop = {
       //保存引用,方便直接销毁
       init: function init(drag) {
-        eventData.dragDrop = drag;
+        eventRelated.dragDrop = drag;
       },
       //拖拽开始的处理
       startRun: function startRun() {},
@@ -54759,52 +54759,52 @@ var eventMixin = function (activitProto) {
        * 除去拖动拖住外的所有事件
        * 点击,双击,滑动等等....
        */
-    };var eventRun = function eventRun() {
+    };function eventRun() {
 
       /*
       跟踪点击动作
       1. 必须配置config
       2. 而且content要有标记
       */
-      var contentData = self.relatedData.contentDataset[self.id];
+      var contentData = self.dataRelated.contentDataset[self.id];
       if (contentData && contentData.trackCode) {
-        config$1.sendTrackCode('content', {
+        config.sendTrackCode('content', {
           pageId: self.pageId,
           id: self.id,
           type: self.type,
-          eventName: eventData.eventName
+          eventName: eventRelated.eventName
         });
       }
 
       //脚本动画
-      if (eventData.rewrite) {
+      if (eventRelated.rewrite) {
         self.runAnimation();
         return;
       }
       //如果存在反馈动作
       //优先于动画执行
-      var feedbackBehavior = eventData.feedbackBehavior[eventData.eventContentId];
+      var feedbackBehavior = eventRelated.feedbackBehavior[eventRelated.eventContentId];
       if (feedbackBehavior) {
         setBehavior(feedbackBehavior);
       } else {
         startRunAnim();
       }
-    };
+    }
 
     /**
      * 事件对象引用
      */
-    var eventHandler = function eventHandler(eventReference, _eventHandler) {
-      eventData.eventReference = eventReference;
-      eventData.eventHandler = _eventHandler;
-    };
+    function eventHandler(eventReference, eventHandler) {
+      eventRelated.eventReference = eventReference;
+      eventRelated.eventHandler = eventHandler;
+    }
 
     //绑定用户自定义事件
     if (eventContext && eventName) {
       //如果是翻页委托启动了
       //这里处理swiperight与swipeleft
-      if (config$1.launch.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
-        self.relatedCallback.swipeDelegateContents(eventName, function (callback) {
+      if (config.launch.swipeDelegate && (eventName === 'swiperight' || eventName === 'swipeleft')) {
+        self.callbackRelated.swipeDelegateContents(eventName, function (callback) {
           self.runAnimation(callback);
         });
       }
@@ -54815,7 +54815,7 @@ var eventMixin = function (activitProto) {
           var target = void 0;
           var dragdropPara = void 0;
 
-          dragdropPara = eventData.dragdropPara;
+          dragdropPara = eventRelated.dragdropPara;
 
           //获取拖拽目标对象
           if (eventName === 'dragTag') {
@@ -54825,7 +54825,7 @@ var eventMixin = function (activitProto) {
 
           //增加事件绑定标示
           //针对动态加载节点事件的行为过滤
-          eventData.isBind = true;
+          eventRelated.isBind = true;
 
           bindContentEvent({
             target: target,
@@ -54835,7 +54835,7 @@ var eventMixin = function (activitProto) {
             eventHandler: eventHandler,
             eventContext: eventContext,
             'parameter': dragdropPara,
-            'domMode': eventData.domMode
+            'domMode': eventRelated.domMode
           });
         }
     }
@@ -54895,7 +54895,7 @@ var _class$1 = function () {
     this.originalImageList = pa.ImageList;
 
     /**webp图片的后缀*/
-    var brModeType = config$1.launch.brModeType;
+    var brModeType = config.launch.brModeType;
     if (brModeType) {
       _.each(this.originalImageList, function (imageData) {
         if (imageData.name) {
@@ -55238,7 +55238,7 @@ var spiritObjs = {};
  */
 var getData = function getData(inputPara, contents) {
   var option = void 0;
-  var resourcePath = config$1.getWidgetPath() + "gallery/" + inputPara.id + "/";
+  var resourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
   var xhr = new XMLHttpRequest();
   xhr.open('GET', resourcePath + 'app.json', false);
   xhr.send(null);
@@ -55286,7 +55286,7 @@ function updateAction(id, params) {
 
 var AdvSprite = function (inputPara, contents) {
   var option = getData(inputPara, contents);
-  var ResourcePath = config$1.getWidgetPath() + "gallery/" + inputPara.id + "/";
+  var ResourcePath = config.getWidgetPath() + "gallery/" + inputPara.id + "/";
   var contentPrefix = inputPara.contentPrefix;
   var ids = [];
   var options = {};
@@ -60100,9 +60100,9 @@ function fastPipe(data, base) {
   /////////////////////////////
 
   if (prepScript) {
-    base.eventData.rewrite = true;
-    base.eventData.eventName = 'click';
-    base.eventData.eventContentId = id;
+    base.eventRelated.rewrite = true;
+    base.eventRelated.eventName = 'click';
+    base.eventRelated.eventContentId = id;
   }
 
   /////////////////////////////
@@ -60136,13 +60136,13 @@ function fastPipe(data, base) {
 
         //如果有回调，就绑定事件
         if (preCode[1] && _.isFunction(preCode[1])) {
-          base.eventData.eventContext = contentNode.find('a');
-          base.eventData.rewrite = true;
-          base.eventData.eventName = 'tap';
-          base.eventData.eventContentId = id;
+          base.eventRelated.eventContext = contentNode.find('a');
+          base.eventRelated.rewrite = true;
+          base.eventRelated.eventName = 'tap';
+          base.eventRelated.eventContentId = id;
         } else {
           //清空auto动作
-          base.eventData.eventName = '';
+          base.eventRelated.eventName = '';
         }
       }
     }
@@ -60153,7 +60153,7 @@ function fastPipe(data, base) {
    */
   var setPrepVisible = function setPrepVisible() {
     //创建的无行为content
-    var partContentRelated = base.relatedData.partContentRelated;
+    var partContentRelated = base.dataRelated.partContentRelated;
     //针对空跳过处理
     if (partContentRelated && partContentRelated.length && -1 !== partContentRelated.indexOf(id)) {} else {
       if (canvasMode) {
@@ -60464,7 +60464,7 @@ function getStepProperty(_ref2) {
 
   //这里有页面模式的配置处理
   //获取的页面翻页的区域值不一样
-  var size = isColumn ? config$1.screenSize : config$1.visualSize;
+  var size = isColumn ? config.screenSize : config.visualSize;
   var width = size.width;
   var height = size.height;
 
@@ -60595,7 +60595,7 @@ var getFlowFange = function getFlowFange(pageIndex) {
   }
 };
 
-function index$1(data, relatedData, getStyle) {
+function index$1(data, dataRelated, getStyle) {
 
   //转化所有css特效的参数的比例
   var targetProperty = parseJSON(data.getParameter()[0]['parameter']);
@@ -60623,7 +60623,7 @@ function index$1(data, relatedData, getStyle) {
     //页面偏移量
     //["3", "6", "4"]
     //表示第4次采用了这个母板，中间有其他模板间隔开了的情况
-    var pageOffset = relatedData.pageOffset && relatedData.pageOffset.split("-");
+    var pageOffset = dataRelated.pageOffset && dataRelated.pageOffset.split("-");
     //开始的nodes值
     currPageOffset = parseInt(pageOffset[0]);
     //范围区域
@@ -60661,7 +60661,7 @@ function index$1(data, relatedData, getStyle) {
   var nodeRatio = 1 / (pageRange - 1);
 
   //初始化视觉差对象的坐标偏移量
-  var transformOffset = relatedData.getTransformOffset(data.id);
+  var transformOffset = dataRelated.getTransformOffset(data.id);
   var parallaxOffset = setTransformNodes(data.$contentNode, lastProperty, transformOffset);
 
   /**
@@ -60808,7 +60808,7 @@ var createScope = function createScope(base, contentId, chapterIndex, actName, p
   var pageType = base.pageType;
   var contentName;
   var canvasDom;
-  var contentData = base.relatedData.contentDataset[contentId];
+  var contentData = base.dataRelated.contentDataset[contentId];
 
   //如果启动了canvas模式
   //改成作用域的一些数据
@@ -60824,7 +60824,7 @@ var createScope = function createScope(base, contentId, chapterIndex, actName, p
       } else {
         // $contentNode = Context(contentData, canvasDom, base.pageIndex)
         //保存canvas pixi的上下文引用
-        // base.relatedData.contentDataset[contentId].$contentNode = $contentNode
+        // base.dataRelated.contentDataset[contentId].$contentNode = $contentNode
       }
       data.type = 'canvas';
       data.canvasMode = true;
@@ -60892,11 +60892,11 @@ var createScope = function createScope(base, contentId, chapterIndex, actName, p
 
   //生成视觉差对象
   if (data.processType === 'parallax') {
-    return index$1(data, base.relatedData, base.getStyle);
+    return index$1(data, base.dataRelated, base.getStyle);
   }
 
   //数据预处理
-  var hasPipe = pretreatment(data, base.eventData.eventName);
+  var hasPipe = pretreatment(data, base.eventRelated.eventName);
   if (hasPipe) {
     return fastPipe(data, base);
   } else {
@@ -61129,9 +61129,9 @@ var createTask = function (callback) {
  * 处理拖动对象
  * @return {[type]} [description]
  */
-function accessDrop(eventData, callback) {
-  if (eventData && eventData.dragDrop) {
-    callback(eventData.dragDrop);
+function accessDrop(eventRelated, callback) {
+  if (eventRelated && eventRelated.dragDrop) {
+    callback(eventRelated.dragDrop);
   }
 }
 
@@ -61167,7 +61167,7 @@ var Activity = function () {
     /**
      * 保存子对象content
      */
-    this._contentGroup = createContent(this);
+    this.contentGroup = createContent(this);
 
     /**
      * 处理html文本框
@@ -61192,7 +61192,7 @@ var Activity = function () {
      * 点击效果的音频处理
      * @type {Array}
      */
-    this._fixAudio = [];
+    this.fixAudio = [];
 
     /**
      * 2016.11.2
@@ -61200,7 +61200,7 @@ var Activity = function () {
      * 这样用于优化重复点击按钮的时候触发音频
      * @type {Array}
      */
-    this._cacheBehaviorAudio = {};
+    this.cacheBehaviorAudio = {};
 
     /**
      * 如果存在content
@@ -61231,9 +61231,9 @@ var Activity = function () {
     value: function _initContents() {
       var _this = this;
 
-      var pageId = this.relatedData.pageId;
+      var pageId = this.dataRelated.pageId;
       var $containsNode = this.$containsNode;
-      var collectorHooks = this.relatedCallback.contentsHooks;
+      var collectorHooks = this.callbackRelated.contentsHooks;
       var pageType = this.pageType;
 
       this.eachAssistContents(function (scope) {
@@ -61264,13 +61264,13 @@ var Activity = function () {
   }, {
     key: '_toRepeatBind',
     value: function _toRepeatBind(id, $contentNode, scope, collectorHooks) {
-      var relatedData = this.relatedData;
-      var indexOf = relatedData.createContentIds.indexOf(id);
+      var dataRelated = this.dataRelated;
+      var indexOf = dataRelated.createContentIds.indexOf(id);
 
       //过滤重复关系
       //每个元素只绑定一次
       if (-1 !== indexOf) {
-        relatedData.createContentIds.splice(indexOf, 1); //删除,去重
+        dataRelated.createContentIds.splice(indexOf, 1); //删除,去重
         collectorHooks(scope.chapterIndex, id, scope); //收集每一个content注册
         this._iscrollBind(scope, $contentNode); //增加翻页特性
       }
@@ -61336,7 +61336,7 @@ var Activity = function () {
             fadeScrollbars: true
 
             /*迷你平台，工具栏不消失*/
-          };if (config$1.launch.platform === 'mini') {
+          };if (config.launch.platform === 'mini') {
             option.fadeScrollbars = false;
           }
 
@@ -61356,7 +61356,7 @@ var Activity = function () {
       var bind = function bind() {
         $contentNode.css('overflow', 'hidden'); //增加元素溢出隐藏处理
         $contentNode.children().css('height', ''); //去掉子元素高度，因为有滚动文本框
-        _this2.relatedCallback.iscrollHooks.push(linkFunction($contentNode[0]));
+        _this2.callbackRelated.iscrollHooks.push(linkFunction($contentNode[0]));
       };
 
       //增加卷滚条标记
@@ -61411,12 +61411,12 @@ var Activity = function () {
           contentsFragment = void 0;
 
       //dom模式
-      contentsFragment = this.relatedData.contentsFragment;
+      contentsFragment = this.dataRelated.contentsFragment;
       if (node = contentsFragment[prefix]) {
         $node = $(node);
       } else {
         //容器处理
-        if (containerPrefix = this.relatedData.containerPrefix) {
+        if (containerPrefix = this.dataRelated.containerPrefix) {
           _.each(containerPrefix, function (containerName) {
             node = contentsFragment[containerName];
             $node = $(node).find('#' + prefix);
@@ -61439,7 +61439,7 @@ var Activity = function () {
     key: '_resetAloneAnim',
     value: function _resetAloneAnim() {
       //复位拖动对象
-      accessDrop(this.eventData, function (drop) {
+      accessDrop(this.eventRelated, function (drop) {
         drop.reset();
       });
     }
@@ -61459,14 +61459,14 @@ var Activity = function () {
       var scenarioInfo, eventContentId;
 
       //触发事件的content id
-      if (this.eventData) {
-        eventContentId = this.eventData.eventContentId;
+      if (this.eventRelated) {
+        eventContentId = this.eventRelated.eventContentId;
       }
 
       if (eventContentId) {
 
         //查找出当前节的所有信息
-        if (scenarioInfo = this.relatedData.seasonRelated[eventContentId]) {
+        if (scenarioInfo = this.dataRelated.seasonRelated[eventContentId]) {
 
           //如果存在搜索栏触发
           if (scenarioInfo.SearchBar) {
@@ -61502,7 +61502,7 @@ var Activity = function () {
   }, {
     key: 'eachAssistContents',
     value: function eachAssistContents(callback) {
-      _.each(this._contentGroup, function (scope) {
+      _.each(this.contentGroup, function (scope) {
         callback.call(this, scope);
       }, this);
     }
@@ -61519,7 +61519,7 @@ var Activity = function () {
     value: function runAnimation(outComplete, evenyClick) {
 
       var self = this;
-      var pageId = this.relatedData.pageId;
+      var pageId = this.dataRelated.pageId;
 
       if (evenyClick) {
         this.preventRepeat = false;
@@ -61578,7 +61578,7 @@ var Activity = function () {
             --counts;
           }
         };
-      }(this._contentGroup.length);
+      }(this.contentGroup.length);
 
       //执行动画
       this.eachAssistContents(function (scope) {
@@ -61603,7 +61603,7 @@ var Activity = function () {
   }, {
     key: 'stopAnimation',
     value: function stopAnimation() {
-      var pageId = this.relatedData.pageId;
+      var pageId = this.dataRelated.pageId;
       this.runState = false;
       this.eachAssistContents(function (scope) {
         scope.stop && scope.stop(pageId);
@@ -61622,11 +61622,11 @@ var Activity = function () {
       var _this3 = this;
 
       //销毁拖动对象
-      accessDrop(this.eventData, function (drop) {
+      accessDrop(this.eventRelated, function (drop) {
         drop.destroy();
       });
       this.eachAssistContents(function (scope) {
-        scope.destroy && scope.destroy(_this3.relatedData.pageId);
+        scope.destroy && scope.destroy(_this3.dataRelated.pageId);
         elementCallback && elementCallback(scope);
       });
     }
@@ -61640,8 +61640,8 @@ var Activity = function () {
   }, {
     key: 'autoPlay',
     value: function autoPlay(outComplete) {
-      var eventData = this.eventData;
-      if (eventData && eventData.eventName === 'auto') {
+      var eventRelated = this.eventRelated;
+      if (eventRelated && eventRelated.eventName === 'auto') {
         this.runAnimation(outComplete);
       } else {
         outComplete();
@@ -61685,13 +61685,13 @@ var Activity = function () {
       //修复妙妙客户端
       //没有点击音频结束的回调
       //最多允许播放5秒
-      if (this._fixAudio.length) {
-        _.each(this._fixAudio, function (instance) {
+      if (this.fixAudio.length) {
+        _.each(this.fixAudio, function (instance) {
           setTimeout(function () {
             instance.destroy();
           }, 5000);
         });
-        this._fixAudio = [];
+        this.fixAudio = [];
       }
     }
 
@@ -61704,9 +61704,9 @@ var Activity = function () {
     value: function destroy(elementCallback) {
 
       //销毁绑定事件
-      if (this.eventData.eventContext) {
-        destroyContentEvent(this.eventData);
-        this.eventData.eventContext = null;
+      if (this.eventRelated.eventContext) {
+        destroyContentEvent(this.eventRelated);
+        this.eventRelated.eventContext = null;
       }
 
       //2016.1.7
@@ -61722,7 +61722,7 @@ var Activity = function () {
 
       //销毁动画
       this._destroyAnimation(elementCallback);
-      this._contentGroup = null;
+      this.contentGroup = null;
 
       //iscroll销毁
       if (this.iscroll) {
@@ -61743,12 +61743,12 @@ var Activity = function () {
       }
 
       //如果有点击音频
-      if (Object.keys(this._cacheBehaviorAudio).length) {
-        for (var key in this._cacheBehaviorAudio) {
-          var audio = this._cacheBehaviorAudio[key];
+      if (Object.keys(this.cacheBehaviorAudio).length) {
+        for (var key in this.cacheBehaviorAudio) {
+          var audio = this.cacheBehaviorAudio[key];
           if (audio) {
             audio.destroy();
-            this._cacheBehaviorAudio[key] = null;
+            this.cacheBehaviorAudio[key] = null;
           }
         }
       }
@@ -61813,7 +61813,7 @@ function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
   }(floatMasterDivertor.ids, pipeData.getStyle.offset);
 
   //相关回调
-  var relatedCallback = {
+  var callbackRelated = {
     /*绑定卷滚条钩子*/
     'iscrollHooks': [],
     /*contetn钩子回调*/
@@ -61826,7 +61826,7 @@ function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
     'swipeDelegateContents': pageBaseHooks.swipeDelegateContents
 
     //相关数据
-  };var relatedData = {
+  };var dataRelated = {
     floatMasterDivertor: floatMasterDivertor,
     'seasonId': pipeData.chpaterData.seasonId,
     'pageId': pageId,
@@ -61852,8 +61852,8 @@ function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
       pageBaseHooks.eventBinding && pageBaseHooks.eventBinding(eventRelated);
     }
     //删除钩子
-    delete relatedCallback.contentsHooks;
-    callback(relatedCallback);
+    delete callbackRelated.contentsHooks;
+    callback(callbackRelated);
   };
 
   /**
@@ -61862,12 +61862,21 @@ function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
    */
   var makeActivity = function makeActivity(compiler) {
     return function (callback) {
-      var filters;
+      var filters = void 0;
       var imageId = compiler.imageIds; //父id
       var activity = compiler.activity;
       var eventType = activity.eventType;
       var dragdropPara = activity.para1;
       var eventContentId = imageId;
+      var activityId = activity._id;
+
+      //如果存在关闭按钮
+      //秒秒学
+      //2017.11.30
+      dataRelated.hasForumClose = false;
+      if (pipeData.forumCloses && pipeData.forumCloses[activityId]) {
+        dataRelated.hasForumClose = true;
+      }
 
       /**
        * 多事件数据过滤
@@ -61891,20 +61900,20 @@ function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
       pageBaseHooks.cacheActivity(new Activity({
         'noticeComplete': callback, //监听完成
         'pageIndex': pipeData.pageIndex,
-        'canvasRelated': pipeData.canvasRelated, //父类引用
         'id': imageId || autoUUID(),
         "type": 'Content',
         'pageId': pageId,
         'getStyle': pipeData.getStyle,
-        'activityId': activity._id,
+        'activityId': activityId,
         '$containsNode': $containsNode,
         'pageType': compiler.pageType, //构建类型 page/master
         'dataset': compiler.dataset, //动画表数据 or 视觉差表数据
         "chapterIndex": chapterIndex, //页码
         /*需要绑定事件的数据*/
-        'eventData': { eventContentId: eventContentId, eventType: eventType, dragdropPara: dragdropPara, feedbackBehavior: feedbackBehavior },
-        'relatedData': relatedData, //相关数据,所有子作用域Activity对象共享
-        'relatedCallback': relatedCallback //相关回调
+        'eventRelated': { eventContentId: eventContentId, eventType: eventType, dragdropPara: dragdropPara, feedbackBehavior: feedbackBehavior },
+        'dataRelated': dataRelated, //相关数据,所有子作用域Activity对象共享
+        'canvasRelated': pipeData.canvasRelated, //父类引用
+        'callbackRelated': callbackRelated //相关回调
       }));
     };
   };
@@ -62005,7 +62014,7 @@ var ScalePan = function () {
        * 最大缩放值
        * @type {Number}
        */
-      this.maxScale = config$1.launch.salePictureMultiples || 4;
+      this.maxScale = config.launch.salePictureMultiples || 4;
 
       /**
        * 允许溢出值
@@ -62315,7 +62324,7 @@ var ScalePan = function () {
     value: function _createPinchButton() {
       var _this4 = this;
 
-      var visualSize = config$1.visualSize;
+      var visualSize = config.visualSize;
       var left = visualSize.overflowWidth && Math.abs(visualSize.left) || 0;
       var top = visualSize.overflowHeight && Math.abs(visualSize.top) || 0;
       var $node = closeButton(function () {
@@ -62709,7 +62718,7 @@ function getFinalSizePosition(imageSize, wrapperSize) {
  */
 function createContainerView(imgContainer) {
   var html = void 0;
-  var visualSize = config$1.visualSize;
+  var visualSize = config.visualSize;
   var right = visualSize.overflowWidth && Math.abs(visualSize.right) || 0;
   var top = visualSize.overflowHeight && Math.abs(visualSize.top) || 0;
   var rightCopy = right + 4;
@@ -62718,7 +62727,7 @@ function createContainerView(imgContainer) {
 
   var zoomImg = '<img class="xut-zoom-fly"\n                      src="' + imgContainer.originSrc + '"\n                      style="width:' + imgContainer.width + 'px;\n                             height:' + imgContainer.height + 'px;\n                             top:' + imgContainer.top + 'px;\n                             left:' + imgContainer.left + 'px;" />';
 
-  if (config$1.screenHorizontal) {
+  if (config.screenHorizontal) {
     html = '<div class="xut-zoom-view">\n                <div class="xut-zoom-overlay"></div>\n                <div class="xut-zoom-close" style="right:' + rightCopy + 'px;top:' + topCopy + 'px;">\n                    <div class="si-icon Flaticon xut-flaticon-error" style="font-size:5vw;border-radius:50%;right:0">\n                    </div>\n                </div>\n                ' + zoomImg + '\n            </div>';
   } else {
     //竖屏
@@ -62823,7 +62832,7 @@ var ScalePicture = function () {
     //所以坐标的算法是有区别了
     var containerLeft = 0;
     var containerTop = 0;
-    var visualSize = config$1.visualSize;
+    var visualSize = config.visualSize;
     if (visualSize.left) {
       containerLeft = visualSize.left;
       containerTop = visualSize.top;
@@ -62840,7 +62849,7 @@ var ScalePicture = function () {
 
     var offset = element.offset();
     this.originImgLeft = offset.left - containerLeft;
-    this.originImgTop = offset.top - containerTop - config$1.launch.visualTop;
+    this.originImgTop = offset.top - containerTop - config.launch.visualTop;
 
     //关闭动画中执行中
     this.isCloseAniming = false;
@@ -62910,19 +62919,19 @@ var ScalePicture = function () {
     key: '_getData',
     value: function _getData() {
 
-      var view = config$1.screenSize;
+      var view = config.screenSize;
       var overflowLeft = 0;
 
       //如果有宽度溢出
       //就是说用了窗口指定模式
-      if (config$1.visualSize.left) {
-        view = config$1.visualSize;
+      if (config.visualSize.left) {
+        view = config.visualSize;
       }
 
       //虚拟模拟3下，宽度可能溢出，所以需要取屏幕宽度
-      if (config$1.launch.visualMode === 3) {
-        view = config$1.screenSize;
-        overflowLeft = config$1.visualSize.left;
+      if (config.launch.visualMode === 3) {
+        view = config.screenSize;
+        overflowLeft = config.visualSize.left;
       }
 
       return getImgConfig({
@@ -63040,7 +63049,7 @@ var ScalePicture = function () {
     value: function _bindPan($imgNode) {
       var _this3 = this;
 
-      if (!this.slideObj && Xut.plat.hasTouch && config$1.launch.salePicture) {
+      if (!this.slideObj && Xut.plat.hasTouch && config.launch.salePicture) {
         var tapCallabck = function tapCallabck() {
           return _this3._closeSingleView();
         };
@@ -63309,7 +63318,7 @@ var ScalePicture = function () {
 //////////////////////////
 /*图片*/
 function createHTML$1() {
-  var size = config$1.screenSize.width > config$1.screenSize.height ? '2vw' : '2vh';
+  var size = config.screenSize.width > config.screenSize.height ? '2vw' : '2vh';
   return '<div class="xut-icon-maximize"style="font-size:' + size + ';position:absolute;right:0;"></div>';
 }
 
@@ -63912,7 +63921,7 @@ function contentParser(compileActivitys, pipeData) {
  *  2016.12.6
  *     增加，点击放大 zoom
  */
-function parseBehavior(pipeData) {
+function parseParameter(pipeData) {
   var parameter = void 0;
   var soundSrc = void 0;
   var contentId = void 0;
@@ -63927,6 +63936,15 @@ function parseBehavior(pipeData) {
   _.each(pipeData.activitys, function (activitys) {
     if (activitys.parameter && (parameter = parseJSON(activitys.parameter))) {
       contentId = activitys.imageId;
+
+      //如果这个是讨论区的关闭事件activity组
+      if (parameter['forum'] === 'close') {
+        if (!pipeData['forumCloses']) {
+          pipeData['forumCloses'] = {};
+        }
+        //收集关闭合集
+        pipeData['forumCloses'][activitys._id] = true;
+      }
 
       //视觉反馈
       if (isButton = parameter['isButton']) {
@@ -64016,7 +64034,7 @@ var maskContent = function maskContent(data, wrapObj) {
       restr += String.styleFormat('<img data-type="' + (data.qrCode ? 'qrcode' : 'mask') + '"\n              class="inherit-size fullscreen-background edges"\n              ' + getImgSrc() + '/>');
     } else {
       //canvas
-      restr += String.styleFormat('<canvas class="inherit-size fullscreen-background edges"\n                 src="' + resourcePath + '"\n                 mask="' + isMaskImg + '"\n                 width="' + data.scaleWidth + '"\n                 height="' + data.scaleHeight + '"\n                 style="opacity:0;' + (config$1.data.pathAddress.replace(/\//g, "\/") + data.mask) + '"/>');
+      restr += String.styleFormat('<canvas class="inherit-size fullscreen-background edges"\n                 src="' + resourcePath + '"\n                 mask="' + isMaskImg + '"\n                 width="' + data.scaleWidth + '"\n                 height="' + data.scaleHeight + '"\n                 style="opacity:0;' + (config.data.pathAddress.replace(/\//g, "\/") + data.mask) + '"/>');
     }
 
     //精灵图
@@ -64538,7 +64556,7 @@ var analysisPath = function analysisPath(wrapObj, conData) {
     var fileFullPath = getFileFullPath(fileName, 'content', isGif);
 
     /*如果启动了预加载，去掉随机后缀*/
-    if (config$1.launch.preload) {
+    if (config.launch.preload) {
       resourcePath = fileFullPath;
     } else {
       //如果没有启动preload，需要随机，保证不缓存
@@ -64913,7 +64931,7 @@ function contentStructure(pipeData, $$floatDivertor, callback) {
         } else if (overflowMode === 'all') {
           //左右都溢出
           //强制全屏
-          var _baseRatio2 = config$1.screenSize.width / sizeResults.scaleWidth;
+          var _baseRatio2 = config.screenSize.width / sizeResults.scaleWidth;
           setRatio(setPageProportion(_baseRatio2));
           sizeResults.scaleLeft = visualLeftInteger;
           sizeResults.scaleTop = originalTop + (originalHeight - sizeResults.scaleHeight) / 2;
@@ -65037,8 +65055,8 @@ var TaskActivitys = function (_TaskSuper) {
 
       this._checkNextTask('dataAfter', function () {
 
-        /*解析点击反馈，点击缩放*/
-        parseBehavior(pipeData);
+        /*解析Parameter*/
+        parseParameter(pipeData);
 
         /*构建页面content类型结构*/
         contentStructure(pipeData, _this2.$$floatDivertor, function (userData) {
@@ -65585,7 +65603,7 @@ function $trigger(_ref, columnData) {
       var data = { id: id, key: key, type: type, rootNode: rootNode, target: target, pageIndex: pageIndex, pageType: pageType, "activityId": id, columnData: columnData
 
         /*如果有代码跟踪*/
-      };config$1.sendTrackCode('hot', {
+      };config.sendTrackCode('hot', {
         id: id,
         type: type,
         pageId: Xut.Presentation.GetPageId(pageType, pageIndex),
@@ -65670,7 +65688,7 @@ function $suspend(pageBase, pageId, allHandle) {
  * @return {[type]}      [description]
  */
 var hasOptimize = function hasOptimize(fn) {
-  if (!config$1.launch.visualMode !== 4) {
+  if (!config.launch.visualMode !== 4) {
     fn && fn();
   }
 };
@@ -65688,7 +65706,18 @@ function $original(pageBase) {
   access$2(pageBase, function (pageBase, contentObjs, componentObjs) {
 
     //母版对象不还原
-    if (pageBase.pageType === 'master') return;
+    if (pageBase.pageType === 'master') {
+      //因为苗苗学的问题，需要单独处理hasForumClose的还原
+      //2017.11.30
+      contentObjs && _.each(contentObjs, function (obj) {
+        if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
+          if (obj.dataRelated && obj.dataRelated.hasForumClose) {
+            obj.reset && obj.reset();
+          }
+        }
+      });
+      return;
+    }
 
     var $containsNode;
 
@@ -65956,7 +65985,7 @@ var Media = {
 
     //只针对网页插件增加单独的点击界面
     //如果有视频图标
-    if (category == 'webpage' && scaleWidth > 200 && scaleHeight > 100 && scaleWidth <= config$1.visualSize.width && scaleHeight <= config$1.visualSize.height) {
+    if (category == 'webpage' && scaleWidth > 200 && scaleHeight > 100 && scaleWidth <= config.visualSize.width && scaleHeight <= config.visualSize.height) {
       mediaIcon = '<div id="icon_' + _id + '"\n              type="icon"\n              style="width:' + mediaIconSize + 'px;\n                     height:' + mediaIconSize + 'px;\n                     top:' + (scaleHeight - mediaIconSize) / 2 + 'px;\n                     left:' + (scaleWidth - mediaIconSize) / 2 + 'px;\n                     position:absolute;background-image:url(images/icons/web_hotspot.png)">\n         </div>';
     }
 
@@ -66113,7 +66142,7 @@ var Media = {
  * @return {[type]}      [description]
  */
 function path$2(fileName, widgetId) {
-  return config$1.getWidgetPath() + widgetId + '/' + fileName;
+  return config.getWidgetPath() + widgetId + '/' + fileName;
 }
 
 /**
@@ -67020,7 +67049,7 @@ var iframeWidget = function () {
       var _this2 = this;
 
       var ifr = document.createElement('iframe');
-      var path = config$1.data.rootPath + '/widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key;
+      var path = config.data.rootPath + '/widget/' + this.widgetId + '/index.html?xxtParaIn=' + this.key;
       ifr.id = 'iframe_' + this.id;
       ifr.src = path;
       ifr.style.width = '100%';
@@ -67359,7 +67388,7 @@ function Adapter(para) {
   /*缩放比值*/
   data = calculateSize(data, pageStyle);
 
-  data.inputPara.uuid = config$1.data.appId + '-' + data.activityId; //唯一ID标示
+  data.inputPara.uuid = config.data.appId + '-' + data.activityId; //唯一ID标示
   data.inputPara.id = data.activityId;
   data.inputPara.screenSize = pageVisualSize;
 
@@ -67367,7 +67396,7 @@ function Adapter(para) {
   data.inputPara.contentPrefix = Xut.Presentation.GetContentPrefix(data.pageIndex, data.pageType);
 
   //画轴模式
-  data.scrollPaintingMode = config$1.launch.visualMode === 4;
+  data.scrollPaintingMode = config.launch.visualMode === 4;
   data.calculate = pageVisualSize;
 
   //执行类构建
@@ -67453,7 +67482,7 @@ var ShowNote$1 = function () {
       var that = this,
           note = this.data.note,
           prop = Xut.config.proportion,
-          width = Math.round((prop.width + prop.height) / 2 * config$1.data.iconHeight),
+          width = Math.round((prop.width + prop.height) / 2 * config.data.iconHeight),
           space = Math.round(width / 2);
 
       var retStr = '<div class="xut-shownote-box" style="z-index:' + Xut.zIndexlevel() + '">' + '<div class="close" style="width:' + width + 'px;height:' + width + 'px;top:-' + space + 'px;right:-' + space + 'px"></div>' + '<div class="content">' + note + '</div>' + '</div>';
@@ -67544,7 +67573,7 @@ var ShowNote$$1 = {
         scaleTop = _ref.scaleTop,
         scaleLeft = _ref.scaleLeft;
 
-    var newWidth = (scaleWidth + scaleHeight) / 2 * config$1.data.iconHeight;
+    var newWidth = (scaleWidth + scaleHeight) / 2 * config.data.iconHeight;
     return String.styleFormat('<div id="ShowNote_' + _id + '"\n            class="xut-showNote"\n            data-belong ="' + pageType + '"\n            data-delegate="shownote"\n            style="width:' + newWidth + 'px;height:' + newWidth + 'px">\n       </div>');
   }
 
@@ -67792,7 +67821,7 @@ var transitionDuration$1 = Xut.style.transitionDuration;
  */
 var setTranslate = function setTranslate(node, distance, speed, callback) {
   if (node) {
-    if (config$1.launch.scrollMode === 'v') {
+    if (config.launch.scrollMode === 'v') {
       Xut.style.setTranslate({ node: node, speed: speed, y: distance });
     } else {
       Xut.style.setTranslate({ node: node, speed: speed, x: distance });
@@ -67808,7 +67837,7 @@ var setTranslate = function setTranslate(node, distance, speed, callback) {
  */
 var set$1 = function set(node, value) {
   if (node) {
-    if (config$1.launch.scrollMode === 'v') {
+    if (config.launch.scrollMode === 'v') {
       Xut.style.setTranslate({ node: node, y: value });
     } else {
       Xut.style.setTranslate({ node: node, x: value });
@@ -67868,7 +67897,7 @@ var translation = {
    * @return {[type]}        [description]
    */
 };var createTranslate = function createTranslate(value) {
-  if (config$1.launch.scrollMode === 'v') {
+  if (config.launch.scrollMode === 'v') {
     return Xut.style.setTranslateStyle(0, value);
   }
   return Xut.style.setTranslateStyle(value, 0);
@@ -67881,11 +67910,11 @@ var translation = {
  */
 function fix($node, action) {
   var translate = void 0;
-  if (config$1.launch.scrollMode === 'v') {
-    var visualHight = config$1.visualSize.height;
+  if (config.launch.scrollMode === 'v') {
+    var visualHight = config.visualSize.height;
     translate = action === 'prevEffect' ? createTranslate(-visualHight) : createTranslate(visualHight);
   } else {
-    var visualWidth = config$1.visualSize.width;
+    var visualWidth = config.visualSize.width;
     translate = action === 'prevEffect' ? createTranslate(-visualWidth) : createTranslate(visualWidth);
   }
   $node.css(Xut.style.transform, translate);
@@ -68238,7 +68267,7 @@ var getSingle = function getSingle(_ref) {
   /*如果没有传递布方向，就取页面
   flow中没有定义，这个在全局接口中处理*/
   if (!orientation) {
-    orientation = config$1.launch.scrollMode;
+    orientation = config.launch.scrollMode;
   }
 
   var front = 0;
@@ -68316,7 +68345,7 @@ var getDouble = function getDouble(_ref2) {
   var middle = 0;
   var right = 0;
   var view = middleIndex;
-  var screenWidth = config$1.screenSize.width;
+  var screenWidth = config.screenSize.width;
   if (direction === 'next') {
     /*滑动,反弹，需要叠加当期之前之前所有页面的距离综合，
     因为索引从0开始，所以middleIndex就是之前的总和页面数*/
@@ -68337,7 +68366,7 @@ var getDouble = function getDouble(_ref2) {
  * @return {[type]} [description]
  */
 function getVisualDistance(options) {
-  return config$1.launch.doublePageMode ? getDouble(options) : getSingle(options);
+  return config.launch.doublePageMode ? getDouble(options) : getSingle(options);
 }
 
 /**
@@ -68636,7 +68665,7 @@ function api(Swiper) {
       };
 
       /*启动了预加载模式*/
-      if (config$1.launch.preload) {
+      if (config.launch.preload) {
         var status = requestInterrupt({
           type: 'linear',
           direction: 'prev',
@@ -68681,7 +68710,7 @@ function api(Swiper) {
       };
 
       /*启动了预加载模式*/
-      if (config$1.launch.preload) {
+      if (config.launch.preload) {
         var status = requestInterrupt({
           type: 'linear',
           direction: 'next',
@@ -69454,14 +69483,14 @@ var Swiper = function (_Observer) {
       /*提供swiperConfig快速配置文件,关键配置*/
       var scrollX = true;
       var scrollY = false;
-      if (config$1.launch.scrollMode === 'v') {
+      if (config.launch.scrollMode === 'v') {
         scrollX = false;
         scrollY = true;
       }
       return {
         scrollY: scrollY,
         scrollX: scrollX,
-        banMove: config$1.launch.gestureSwipe === false ? true : false
+        banMove: config.launch.gestureSwipe === false ? true : false
       };
     }
 
@@ -69923,7 +69952,7 @@ var Swiper = function (_Observer) {
 
       /*如果是Y轴移动，发送请求,并且不是mouseleave事件，在PC上mouseleave离开非可视区重复触发*/
       if (this._behavior === 'reverse' && e.type !== 'mouseleave') {
-        config$1.sendTrackCode('swipe', {
+        config.sendTrackCode('swipe', {
           'direction': orientation,
           'pageId': this.visualIndex + 1
         });
@@ -69972,7 +70001,7 @@ var Swiper = function (_Observer) {
        * 如果还在预加载中，强制翻页为反弹
        * 然后记录动作，等加载结束后处理
        */
-      if (actionType === 'flipOver' && config$1.launch.preload) {
+      if (actionType === 'flipOver' && config.launch.preload) {
         var status = requestInterrupt({
           type: 'linear',
           direction: this.direction,
@@ -70374,7 +70403,7 @@ function swiperHook(e, node) {
   var hasTyperlink = false;
   if (dataType === 'hyperlink') {
     hasTyperlink = true;
-    config$1.sendTrackCode('hot', {
+    config.sendTrackCode('hot', {
       id: node.getAttribute('data-id'),
       pageId: node.getAttribute('data-page-id'),
       type: 'hyperlink',
@@ -70385,7 +70414,7 @@ function swiperHook(e, node) {
   var nodeName = node.nodeName.toLowerCase();
 
   //如果是移动端的情况下 && 支持二维码 && 是图片 && 是二维码标记
-  if (config$1.launch.supportQR && Xut.plat.hasTouch && nodeName === "img" && dataType === 'qrcode') {
+  if (config.launch.supportQR && Xut.plat.hasTouch && nodeName === "img" && dataType === 'qrcode') {
     return 'qrcode';
   } else {
     if (Xut.plat.isBrowser && !Xut.IBooks.Enabled && !window.MMXCONFIG && !window.DUKUCONFIG && nodeName !== 'a' && //并且不是a标签(在cloumn中有a标签，需要跳转)
@@ -70588,9 +70617,9 @@ var ColumnClass = function () {
       container: rootNode,
       content: this.$container
     }, function () {
-      if (config$1.launch.scrollMode === 'h') {
+      if (config.launch.scrollMode === 'h') {
         _this._initX();
-      } else if (config$1.launch.scrollMode === 'v') {
+      } else if (config.launch.scrollMode === 'v') {
         _this._initY();
       }
       callback();
@@ -71211,9 +71240,9 @@ var ColumnClass = function () {
       var newColumnCount = getColumnCount$1(this.seasonId, this.chapterId);
       /*假如分栏数有变化*/
       if (newColumnCount > this.columnCount) {
-        if (config$1.launch.scrollMode === 'h') {
+        if (config.launch.scrollMode === 'h') {
           this._resetX(newColumnCount);
-        } else if (config$1.launch.scrollMode === 'v') {
+        } else if (config.launch.scrollMode === 'v') {
           this._resetY(newColumnCount);
         }
       }
@@ -71644,7 +71673,7 @@ function initThreadtasks(instance) {
       2.flow页面不允许缩放
        */
       var createScale = function createScale() {
-        var salePageType = config$1.launch.salePageType;
+        var salePageType = config.launch.salePageType;
         if (isPageType && (salePageType === 'page' || salePageType === 'all')) {
           instance._pageScaleObj = initPageScale(instance.getScaleNode(), instance.pageIndex);
         }
@@ -71901,7 +71930,7 @@ var initstate = function (baseProto) {
      * 收集滑动委托对象，针对事件合集触发处理
      * 2016.11.8
      */
-    if (config$1.launch.swipeDelegate) {
+    if (config.launch.swipeDelegate) {
       this.swipeSequence = {
         swipeleft: [],
         swiperight: [],
@@ -71955,7 +71984,7 @@ var initstate = function (baseProto) {
        * 开始column观察器
        */
       threadtaskComplete: function threadtaskComplete() {
-        watchColumn(instance, config$1);
+        watchColumn(instance, config);
       },
 
 
@@ -72266,7 +72295,7 @@ var threadExternal = function (baseProto) {
       return function () {
         /*当创建完容器后，就允许快速翻页了
         如果此时是快速打开，并且是翻页的动作*/
-        if (config$1.launch.quickFlip && isFlipAction) {
+        if (config.launch.quickFlip && isFlipAction) {
           callback();
         } else {
           /*如果不是快速翻页，那么就继续往下分解任务*/
@@ -72829,7 +72858,7 @@ var movePage = function (baseProto) {
       1.gestureSwipe，关闭了翻页效果,直接跳页面，并且是可视区页面
       2.超快翻页的时候丢失了动画回调，并且是可视区页面
        */
-      if (isVisual && (fixQuickFlip || !config$1.launch.gestureSwipe)) {
+      if (isVisual && (fixQuickFlip || !config.launch.gestureSwipe)) {
         Xut.View.SetSwiperFilpComplete(pageNode, true);
         return true;
       }
@@ -73067,7 +73096,7 @@ destroy$1(baseProto);
  *   所以根据全局的scrollMode参数而定
  */
 function getPosition(createIndex, visualIndex) {
-  var isVertical = config$1.launch.scrollMode === 'v';
+  var isVertical = config.launch.scrollMode === 'v';
   var direction = void 0;
   if (createIndex < visualIndex) {
     direction = isVertical ? 'top' : 'left';
@@ -73203,7 +73232,7 @@ function converDoublePage(createPointer, needTotal) {
     return createDoublePage;
   }
 
-  if (config$1.launch.doublePageMode) {
+  if (config.launch.doublePageMode) {
     var base = void 0,
         left = void 0,
         right = void 0;
@@ -73246,7 +73275,7 @@ function getRealPage(pageIndex, type) {
     return [];
   }
 
-  if (config$1.launch.doublePageMode) {
+  if (config.launch.doublePageMode) {
     /*转化后的页面合集*/
     var pageIds = converDoublePage(pageIndex);
     /*双页*/
@@ -73371,7 +73400,7 @@ var PageMgr = function (_ManageSuper) {
     双页模式，给父节点绑定一个翻页监听事件
     如果翻页完成，手动触发翻页事件
     */
-    if (config$1.launch.doublePageMode) {
+    if (config.launch.doublePageMode) {
       $on(rootNode, {
         transitionend: function transitionend() {
           Xut.View.SetSwiperFilpComplete();
@@ -73387,8 +73416,8 @@ var PageMgr = function (_ManageSuper) {
   createClass(PageMgr, [{
     key: 'setInitTranslate',
     value: function setInitTranslate(pageIndex) {
-      if (config$1.launch.doublePageMode) {
-        var distance = config$1.screenSize.width * pageIndex;
+      if (config.launch.doublePageMode) {
+        var distance = config.screenSize.width * pageIndex;
         Xut.style.setTranslate({
           x: -distance,
           node: this.rootNode
@@ -73448,7 +73477,7 @@ var PageMgr = function (_ManageSuper) {
 
       /*双页模式，移动父容器*/
 
-      if (config$1.launch.doublePageMode) {
+      if (config.launch.doublePageMode) {
         this._moveContainer(moveDistance[1], speed);
       } else {
         /*单页模式，移动每个独立的页面*/
@@ -73477,7 +73506,7 @@ var PageMgr = function (_ManageSuper) {
 
       /*如果有代码跟踪*/
       if (suspendPageObj.startupTime) {
-        config$1.sendTrackCode('flip', {
+        config.sendTrackCode('flip', {
           pageId: suspendPageObj.chapterId,
           pageAttr: suspendPageObj.pageAttr,
           time: +new Date() - suspendPageObj.startupTime
@@ -73594,13 +73623,13 @@ var PageMgr = function (_ManageSuper) {
       this._checkTaskCompleted(middleIndex, function (activatePageObj) {
 
         //进入每次页面触发
-        config$1.sendTrackCode('enter', {
+        config.sendTrackCode('enter', {
           pageId: activatePageObj.chapterId,
           pageAttr: activatePageObj.pageAttr
         });
 
         //跟踪，每个页面的停留时间，开始
-        if (config$1.hasTrackCode('flip')) {
+        if (config.hasTrackCode('flip')) {
           activatePageObj.startupTime = +new Date();
         }
 
@@ -73670,7 +73699,7 @@ var PageMgr = function (_ManageSuper) {
       this._$$destroyBaseGroup();
 
       //销毁事件
-      if (config$1.launch.doublePageMode) {
+      if (config.launch.doublePageMode) {
         $off(this.rootNode);
       }
 
@@ -73796,8 +73825,8 @@ var MasterMgr = function (_ManageSuper) {
 
     var _this = possibleConstructorReturn(this, (MasterMgr.__proto__ || Object.getPrototypeOf(MasterMgr)).call(this));
 
-    _this.visualWidth = config$1.visualSize.width;
-    _this.visualHeight = config$1.visualSize.height;
+    _this.visualWidth = config.visualSize.width;
+    _this.visualHeight = config.visualSize.height;
 
     _this.pageType = 'master';
 
@@ -74684,14 +74713,14 @@ function getVisualSize$1(styleDataset) {
 
   //默认的config.launch.visualMode
 
-  var visualSize = config$1.visualSize;
+  var visualSize = config.visualSize;
   var hasRecalculate = false;
 
   /*
   如果页面模式不跟页面保持一致或者是模式3的情况的
   就需要重新计算
   */
-  if (pageVisualMode && pageVisualMode !== config$1.launch.visualMode || pageVisualMode === 3) {
+  if (pageVisualMode && pageVisualMode !== config.launch.visualMode || pageVisualMode === 3) {
     visualSize = resetVisualLayout(pageVisualMode);
     hasRecalculate = true;
   }
@@ -74733,7 +74762,7 @@ function getPageProportion(data) {
       left: data.visualLeft
     });
   } else {
-    return config$1.proportion;
+    return config.proportion;
   }
 }
 
@@ -74915,7 +74944,7 @@ function setCustomStyle(styleDataset) {
     styleDataset['_' + data.position].push(data.chapterIndex);
   });
 
-  if (!config$1.launch.doublePageMode) {
+  if (!config.launch.doublePageMode) {
 
     /**
      * 获取指定页面样式
@@ -74967,7 +74996,7 @@ function getVisualMode(chapterData) {
 
   //反向模式设置
   //如果是全局模式1，并且是竖向横显示
-  if (config$1.launch.visualMode === 1 && config$1.verticalToHorizontalVisual) {
+  if (config.launch.visualMode === 1 && config.verticalToHorizontalVisual) {
     return 1;
   }
 
@@ -74986,7 +75015,7 @@ function getVisualMode(chapterData) {
   }
 
   //返回全局页面模式
-  return config$1.launch.visualMode || 1;
+  return config.launch.visualMode || 1;
 }
 
 /*********************************************************************
@@ -75337,7 +75366,7 @@ var Scheduler = function () {
       //用户强制直接切换模式
       //禁止页面跟随滑动
 
-      if (!config$1.launch.gestureSwipe && action == 'flipMove') {
+      if (!config.launch.gestureSwipe && action == 'flipMove') {
         return;
       }
 
@@ -75347,7 +75376,7 @@ var Scheduler = function () {
       //mini杂志功能
       //一次是拦截
       //一次是触发动作
-      if (config$1.launch.swipeDelegate && visualObj) {
+      if (config.launch.swipeDelegate && visualObj) {
 
         //如果是swipe就全局处理
         if (action === 'swipe') {
@@ -75574,7 +75603,7 @@ var Scheduler = function () {
          */
         buildComplete: function buildComplete(seasonId) {
 
-          if (config$1.launch.historyMode && !options.isInApp) {
+          if (config.launch.historyMode && !options.isInApp) {
 
             //如果是主页面，删除历史记录
             if (options.isMain) {
@@ -75653,7 +75682,7 @@ var Scheduler = function () {
        * 线性结构
        * 保存目录索引
        */
-      if (config$1.launch && config$1.launch.historyMode && !options.hasMultiScene) {
+      if (config.launch && config.launch.historyMode && !options.hasMultiScene) {
         $setStorage("pageIndex", middleIndex);
       }
 
@@ -76327,7 +76356,7 @@ function extendView($$mediator, access, $$globalSwiper) {
   Xut.View.InsertAfter = function (originalChapterId, targetChapterId) {
 
     //这个模式必须是禁止手势滑动的
-    if (config$1.launch.gestureSwipe) {
+    if (config.launch.gestureSwipe) {
       $warn({
         type: 'api',
         content: 'gestureSwipe启动了，Xut.View.InsertAfter不生效',
@@ -76416,7 +76445,7 @@ function extendView($$mediator, access, $$globalSwiper) {
     $$globalSwiper.setDirection(distance);
 
     /*如果没有传递布方向，就取页面，这个在全局接口中处理*/
-    orientation = orientation || config$1.launch.scrollMode;
+    orientation = orientation || config.launch.scrollMode;
 
     $$mediator.$$scheduler.movePageBases({
       action: action,
@@ -76490,30 +76519,24 @@ function extendAssist(access, $$globalSwiper) {
   /**
    * 设置答题卡的正确错误率
    */
-  function setAnswer(fn) {
-    if (fn) {
-      var pageBase = Xut.Presentation.GetPageBase();
-      fn({
-        appId: config.data.originalAppId,
-        pageId: pageBase.chapterId
-      });
-    }
+  function setAnswer(event) {
+    console.log(event);
   }
 
   /**
    * 秒秒学答题卡
    * 正确性
    */
-  Xut.Assist.Correct = function () {
-    return setAnswer(getPostMessage('Correct'));
+  Xut.Assist.AnswerRight = function () {
+    return setAnswer('right');
   };
 
   /**
    * 秒秒学答题卡
    * 错误性
    */
-  Xut.Assist.Incorrect = function () {
-    return setAnswer(getPostMessage('Incorrect'));
+  Xut.Assist.AnswerError = function () {
+    return setAnswer('error');
   };
 
   /**
@@ -76866,7 +76889,7 @@ function extendCamera(access, $$globalSwiper) {
      delay 延时执行时间
    */
   Xut.Camera.MoveX = function (position, speed, delay) {
-    if (config$1.launch.visualMode === 5) {
+    if (config.launch.visualMode === 5) {
       $$globalSwiper.scrollToPosition(position, speed, delay);
     }
   };
@@ -76959,14 +76982,14 @@ function configMultiple(options) {
     var pageMode = Number(options.pageMode);
 
     //如果是禁止翻页，然后还要看是不是有pageMode的设置
-    if (!config$1.launch.gestureSwipe) {
+    if (!config.launch.gestureSwipe) {
 
       //喵喵学模式比较特别
       //在数据里中设定了filpMode为1
       //那么就是锁定了不允许翻页，但是还要能支持左右跳页面
       //这里就需要按照多页面的模式处理
       //强制是多页面的方式创建，但是锁住翻页而已
-      if (config$1.launch.pageFlip) {
+      if (config.launch.pageFlip) {
         options.hasMultiPage = true;
         return;
       }
@@ -77038,7 +77061,7 @@ var Mediator = function (_Observer) {
 
     //启用内部滚动模式
     var insideScroll = false;
-    if (config$1.launch.visualMode === 5) {
+    if (config.launch.visualMode === 5) {
       insideScroll = true;
     }
 
@@ -77050,20 +77073,20 @@ var Mediator = function (_Observer) {
       container: options.sceneNode,
       visualIndex: options.initIndex,
       totalIndex: options.pageTotal,
-      actualWidth: config$1.visualSize.width,
-      actualHeight: config$1.visualSize.height,
-      visualWidth: config$1.screenSize.width, //可视区的宽度
+      actualWidth: config.visualSize.width,
+      actualHeight: config.visualSize.height,
+      visualWidth: config.screenSize.width, //可视区的宽度
       hasMultiPage: options.hasMultiPage, //多页面
       sectionRang: options.sectionRang //分段值
 
 
       /*如果没有强制关闭，并且是竖版的情况下，会启动鼠标滚动模式*/
-    };if (config$1.launch.mouseWheel !== false && config$1.launch.scrollMode === 'v') {
+    };if (config.launch.mouseWheel !== false && config.launch.scrollMode === 'v') {
       setOptions.mouseWheel = true;
     }
 
     /*虚拟摄像头模式，关闭边界反弹*/
-    if (config$1.launch.visualMode === 5) {
+    if (config.launch.visualMode === 5) {
       setOptions.borderBounce = false;
     }
 
@@ -77099,9 +77122,9 @@ var Mediator = function (_Observer) {
       //并且是虚拟模式2的话
       //默认允许滑动
       if (!handlerObj) {
-        if (config$1.launch.visualMode === 2) {
+        if (config.launch.visualMode === 2) {
           return;
-        } else if (config$1.launch.visualMode === 5) {
+        } else if (config.launch.visualMode === 5) {
           return;
         }
       }
@@ -77412,9 +77435,9 @@ var isBrowser$1 = Xut.plat.isBrowser;
  * @return {[type]} [description]
  */
 var getArrowStyle = function getArrowStyle() {
-  var height = config$1.data.iconHeight;
+  var height = config.data.iconHeight;
   var styleText = 'height:' + height + 'px;width:' + height + 'px';
-  var setTable = config$1.data.settings;
+  var setTable = config.data.settings;
   if (setTable) {
     switch (setTable.NavbarPos) {
       case 0:
@@ -77455,19 +77478,19 @@ var BarSuper = function () {
 
     //获取高度缩放比
     //自动选择缩放比例
-    var prop = config$1.proportion;
-    this.$$propHeight = config$1.layoutMode == "horizontal" ? prop.width : prop.height;
+    var prop = config.proportion;
+    this.$$propHeight = config.layoutMode == "horizontal" ? prop.width : prop.height;
 
     //获取图标高度
     //工具栏图标高度
-    var iconHeight = config$1.data.iconHeight;
+    var iconHeight = config.data.iconHeight;
     this.$$iconHeight = isIOS$2 ? iconHeight : Math.round(this.$$propHeight * iconHeight);
 
     //应用标题
-    this.$$appName = config$1.data.shortName;
+    this.$$appName = config.data.shortName;
 
     //应用默认配置
-    this.$$setTable = config$1.data.settings;
+    this.$$setTable = config.data.settings;
 
     /*模板*/
     this._initState();
@@ -77483,7 +77506,7 @@ var BarSuper = function () {
     value: function _$$getArrowOption() {
       var style = getArrowStyle();
       var state = this.barStatus ? '' : 'hide';
-      var height = config$1.data.iconHeight;
+      var height = config.data.iconHeight;
       return {
         style: style,
         state: state,
@@ -77503,8 +77526,8 @@ var BarSuper = function () {
       var state = this.toolBarStatus ? '' : 'hide';
 
       //默认图标路径
-      var leftStyle = style + ';background-image:url(images/icons/pageforward_' + config$1.data.appId + '.svg);background-size:cover';
-      var rightStyle = style + ';background-image:url(images/icons/pageback_' + config$1.data.appId + '.svg);background-size:cover';
+      var leftStyle = style + ';background-image:url(images/icons/pageforward_' + config.data.appId + '.svg);background-size:cover';
+      var rightStyle = style + ';background-image:url(images/icons/pageback_' + config.data.appId + '.svg);background-size:cover';
 
       return '<div name="prevArrow"\n                 class="xut-flip-control xut-flip-control-left ' + state + '"\n                 style="' + leftStyle + '">\n           </div>\n           <div name="nextArrow"\n                class="xut-flip-control xut-flip-control-right ' + state + '"\n                style="' + rightStyle + '">\n           </div>';
     }
@@ -77811,12 +77834,12 @@ var TOP = isIOS$3 ? 20 : 0;
 
 var getNavOptions = function getNavOptions() {
 
-  var iconHeight = config$1.data.iconHeight;
-  var proportion = config$1.proportion;
-  var visualSize = config$1.visualSize;
+  var iconHeight = config.data.iconHeight;
+  var proportion = config.proportion;
+  var visualSize = config.visualSize;
 
   //横版模式
-  var isHorizontal = config$1.layoutMode == 'horizontal';
+  var isHorizontal = config.layoutMode == 'horizontal';
 
   proportion = isHorizontal ? proportion.width : proportion.height;
   iconHeight = isIOS$3 ? iconHeight : round$1(proportion * iconHeight);
@@ -77869,7 +77892,7 @@ var getWrapper = function getWrapper(seasonlist) {
   var sWidth = options.sWidth;
   var sHeight = options.sHeight;
 
-  if (config$1.layoutMode == 'horizontal') {
+  if (config.layoutMode == 'horizontal') {
     height = round$1(navHeight * 0.9);
     width = round$1(height * sWidth / sHeight); //保持缩略图的宽高比
     blank = round$1(navHeight * 0.05); //缩略图之间的间距
@@ -77936,7 +77959,7 @@ var Section = function () {
   function Section(data) {
     classCallCheck(this, Section);
 
-    this._isHorizontal = config$1.layoutMode === 'horizontal';
+    this._isHorizontal = config.layoutMode === 'horizontal';
     this._pagedata = data;
     this._$section = $('#xut-nav-section-list');
     this._$list = this._$section.find("li");
@@ -78769,7 +78792,7 @@ var fnBar = function (_BarSuper) {
       var width = 2.5 * size; //圆点间距
       var tipsWidth = chapters * width; //圆点总宽度
       var top = (height - size) / 2; //保持圆点垂直居中
-      var left = (config$1.visualSize.width - tipsWidth) / 2; //保持圆点水平居中
+      var left = (config.visualSize.width - tipsWidth) / 2; //保持圆点水平居中
 
 
       for (var i = 1; i <= chapters; i++) {
@@ -79056,7 +79079,7 @@ var Mark = function () {
     this.pageId = pageId;
     this.seasonId = seasonId;
 
-    var visualSize = config$1.visualSize;
+    var visualSize = config.visualSize;
     this.sHeight = visualSize.height;
     this.sWidth = visualSize.width;
 
@@ -80144,8 +80167,8 @@ var Digital = function (_MiniSuper) {
     value: function _createHTML() {
       //存在模式3的情况，所以页码要处理溢出的情况。left值
       var right = 0;
-      if (config$1.visualSize.overflowWidth) {
-        right = Math.abs(config$1.visualSize.left * 2) + 'px';
+      if (config.visualSize.overflowWidth) {
+        right = Math.abs(config.visualSize.left * 2) + 'px';
       }
       return '<div class="xut-page-number"style="right:' + right + ';bottom:0;">\n                  <div>1</div>\n                  <strong>/</strong>\n                  <div>' + this.pageTotal + '</div>\n            </div>';
     }
@@ -80355,13 +80378,13 @@ var Scrollbar = function (_MiniSuper) {
   createClass(Scrollbar, [{
     key: '_init',
     value: function _init() {
-      this.visualHeight = config$1.visualSize.height;
-      this.visualWidth = config$1.visualSize.width;
+      this.visualHeight = config.visualSize.height;
+      this.visualWidth = config.visualSize.width;
     }
   }, {
     key: '_parseBar',
     value: function _parseBar() {
-      this.direction = this.pageBar.direction || config$1.launch.scrollMode;
+      this.direction = this.pageBar.direction || config.launch.scrollMode;
     }
   }, {
     key: '_createHTML',
@@ -80675,12 +80698,12 @@ var TOP$1 = isIOS$5 ? 20 : 0;
  * @return {[type]} [description]
  */
 function mainScene() {
-  var layoutMode = config$1.layoutMode,
-      iconHeight = config$1.iconHeight,
-      proportion = config$1.proportion,
-      screenSize = config$1.screenSize,
-      visualSize = config$1.visualSize,
-      originalVisualSize = config$1.originalVisualSize;
+  var layoutMode = config.layoutMode,
+      iconHeight = config.iconHeight,
+      proportion = config.proportion,
+      screenSize = config.screenSize,
+      visualSize = config.visualSize,
+      originalVisualSize = config.originalVisualSize;
   var sWidth = visualSize.sWidth,
       sHeight = visualSize.sHeight;
 
@@ -80716,7 +80739,7 @@ function mainScene() {
 
   //如果启动了双页模式
   //那么可视区的宽度是就是全屏的宽度了，因为有2个页面拼接
-  var width = config$1.launch.doublePageMode ? config$1.screenSize.width : visualSize.width;
+  var width = config.launch.doublePageMode ? config.screenSize.width : visualSize.width;
 
   return String.styleFormat('<div id="xut-main-scene"\n          style="width:' + width + 'px;\n                 height:' + screenSize.height + 'px;\n                 top:0;\n                 left:' + originalVisualSize.left + 'px;\n                 position:absolute;\n                 z-index:' + sceneController.createIndex() + ';\n                 overflow:hidden;">\n\n        <div id="xut-control-bar" class="xut-control-bar"></div>\n        <ul id="xut-page-container" class="xut-flip"></ul>\n        <ul id="xut-master-container" class="xut-master xut-flip"></ul>\n        ' + navBarHTML + '\n        <div id="xut-tool-tip"></div>\n    </div>');
 }
@@ -80727,8 +80750,8 @@ function mainScene() {
  * @return {[type]}         [description]
  */
 function deputyScene(id) {
-  var visualSize = config$1.visualSize,
-      originalVisualSize = config$1.originalVisualSize;
+  var visualSize = config.visualSize,
+      originalVisualSize = config.originalVisualSize;
 
 
   return String.styleFormat('<div id="' + ('scenario-' + id) + '"\n          style="width:' + visualSize.width + 'px;\n                 height:100%;\n                 top:0;\n                 left:' + originalVisualSize.left + 'px;\n                 z-index:' + sceneController.createIndex() + ';\n                 position:absolute;\n                 overflow:hidden;">\n        <ul id="' + ('scenarioPage-' + id) + '" class="xut-flip" style="z-index:2"></ul>\n        <ul id="' + ('scenarioMaster-' + id) + '" class="xut-flip" style="z-index:1"></ul>\n    </div>');
@@ -80756,9 +80779,9 @@ function findContainer($context, id, isMain) {
 function checkHistory(history, callback) {
 
   //直接启用快捷调试模式
-  if (config$1.debug.locationPage) {
+  if (config.debug.locationPage) {
     console.log('启动了debug.locationPage,如果进不去，需要检测定位的坐标');
-    Xut.View.LoadScenario(config$1.debug.locationPage, callback);
+    Xut.View.LoadScenario(config.debug.locationPage, callback);
     return;
   }
 
@@ -80927,7 +80950,7 @@ var SceneFactory = function () {
       var columnCounts = getColumnCount$1(this.seasonId);
 
       //如果是min平台强制启动
-      if (config$1.launch.platform === 'mini' || config$1.debug.toolType.number !== false && columnCounts) {
+      if (config.launch.platform === 'mini' || config.debug.toolType.number !== false && columnCounts) {
 
         /*获取页面总数*/
         var getPageTotal = function getPageTotal(again) {
@@ -80942,14 +80965,14 @@ var SceneFactory = function () {
           return columnCounts ? pageTotal + columnCounts - columnChapterCount : pageTotal;
         };
 
-        this.miniBar = MiniBar(config$1.launch.pageBar, {
+        this.miniBar = MiniBar(config.launch.pageBar, {
           $sceneNode: $sceneNode,
           visualIndex: pageIndex,
           pageTotal: getPageTotal()
         });
 
         /*页面总数改变*/
-        if (config$1.launch.columnCheck) {
+        if (config.launch.columnCheck) {
           Xut.Application.Watch('change:number:total', function () {
             _this2._eachMiniBar(function () {
               this.updateTotal(getPageTotal(true));
@@ -81173,7 +81196,7 @@ var SceneFactory = function () {
     key: 'destroy',
     value: function destroy() {
 
-      if (config$1.launch.columnCheck) {
+      if (config.launch.columnCheck) {
         Xut.Application.unWatch('change:number:total');
       }
 
@@ -81246,7 +81269,7 @@ function initView() {
      * 需要处理跳转的页面预加载逻辑
      */
     var chapterId = toNumber(options.chapterId);
-    if (!options.main && chapterId && config$1.launch.preload) {
+    if (!options.main && chapterId && config.launch.preload) {
       var status = requestInterrupt({
         chapterId: chapterId,
         type: 'nolinear',
@@ -81737,7 +81760,7 @@ function Destroy() {
   clearColumnDetection();
 
   //启动配置文件去掉
-  config$1.launch = null;
+  config.launch = null;
 
   Xut.Application.Notify('appDestory');
 }
@@ -81846,9 +81869,9 @@ function initApplication() {
    */
   Xut.Application.Exit = function () {
     //判断重复调用
-    if (config$1.launch) {
+    if (config.launch) {
       /*启动代码用户操作跟踪*/
-      config$1.sendTrackCode('exit', { time: +new Date() - config$1.launch.launchTime });
+      config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
       Destroy('exit');
     }
   };
@@ -81890,7 +81913,7 @@ function initApplication() {
     /**
      * 通过launch启动动态配置
      */
-    if (config$1.launch.lauchMode === 1) {
+    if (config.launch.lauchMode === 1) {
       destroy();
       return;
     }
@@ -82107,7 +82130,7 @@ function initMain(novelData) {
    * 如果启动recordHistory记录
    */
   var pageIndex = Number($getStorage('pageIndex'));
-  if (config$1.launch.historyMode && pageIndex !== undefined) {
+  if (config.launch.historyMode && pageIndex !== undefined) {
     var novelId = parseInt($getStorage("novelId"));
     if (novelId) {
       return initMainScene({
@@ -82185,10 +82208,10 @@ function entrance(options) {
         initApp();
       } else {
         //mobile(apk or ipa)
-        window.openDatabase(config$1.data.dbName, "1.0", "Xxtebook Database", config$1.data.dbSize);
+        window.openDatabase(config.data.dbName, "1.0", "Xxtebook Database", config.data.dbSize);
         document.addEventListener("deviceready", function () {
           Xut.plat.hasPlugin = true; //支持插件
-          Xut.Plugin.XXTEbookInit.startup(config$1.data.dbName, bindPlatEvent, function () {});
+          Xut.Plugin.XXTEbookInit.startup(config.data.dbName, bindPlatEvent, function () {});
         }, false);
       }
     }
@@ -82198,7 +82221,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.1;
+Xut.Version = 892.2;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
@@ -82207,7 +82230,7 @@ var delayTimer = null;
 /**
  * 横竖切换
  */
-var bindOrientateMode = Xut.plat.isBrowser && config$1.orientateMode ? function () {
+var bindOrientateMode = Xut.plat.isBrowser && config.orientateMode ? function () {
   $(window).on('orientationchange', function (e) {
 
     /**
@@ -82251,7 +82274,7 @@ var bindOrientateMode = Xut.plat.isBrowser && config$1.orientateMode ? function 
  * 新版本加载
  */
 Xut.Application.Launch = function (option) {
-  if (config$1.launch) {
+  if (config.launch) {
     return;
   }
   var setConfig = Xut.Application.setConfig;
@@ -82259,12 +82282,12 @@ Xut.Application.Launch = function (option) {
     mixGolbalConfig(setConfig);
     /*当前的launch配置文件，用于横竖切换处理*/
     cacheOptions = [option];
-    config$1.launch = $.extend(true, { launchTime: +new Date() }, option);
+    config.launch = $.extend(true, { launchTime: +new Date() }, option);
     if (option.path) {
       _.each(option.path, function (value, key) {
-        config$1.launch[key] = key === 'resource' ? removeSlash(value) : value;
+        config.launch[key] = key === 'resource' ? removeSlash(value) : value;
       });
-      delete config$1.launch.path;
+      delete config.launch.path;
     }
     bindOrientateMode();
     entrance();
@@ -82298,7 +82321,7 @@ setTimeout(function () {
     }
     mixGolbalConfig(setConfig);
     /*保证兼容，不需要判断launch存在，初始空对象*/
-    config$1.launch = {};
+    config.launch = {};
     entrance();
   }
 }, 100);

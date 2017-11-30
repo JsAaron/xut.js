@@ -23,9 +23,9 @@ export default function fastPipe(data, base) {
   ///改动脚本auto为click事件
   /////////////////////////////
   if(prepScript) {
-    base.eventData.rewrite = true
-    base.eventData.eventName = 'click'
-    base.eventData.eventContentId = id
+    base.eventRelated.rewrite = true
+    base.eventRelated.eventName = 'click'
+    base.eventRelated.eventContentId = id
   }
 
   /////////////////////////////
@@ -69,13 +69,13 @@ export default function fastPipe(data, base) {
 
         //如果有回调，就绑定事件
         if(preCode[1] && _.isFunction(preCode[1])) {
-          base.eventData.eventContext = contentNode.find('a')
-          base.eventData.rewrite = true
-          base.eventData.eventName = 'tap'
-          base.eventData.eventContentId = id
+          base.eventRelated.eventContext = contentNode.find('a')
+          base.eventRelated.rewrite = true
+          base.eventRelated.eventName = 'tap'
+          base.eventRelated.eventContentId = id
         } else {
           //清空auto动作
-          base.eventData.eventName = ''
+          base.eventRelated.eventName = ''
         }
       }
     }
@@ -86,7 +86,7 @@ export default function fastPipe(data, base) {
    */
   const setPrepVisible = () => {
     //创建的无行为content
-    const partContentRelated = base.relatedData.partContentRelated
+    const partContentRelated = base.dataRelated.partContentRelated
       //针对空跳过处理
     if(partContentRelated && partContentRelated.length && (-1 !== partContentRelated.indexOf(id))) {} else {
       if(canvasMode) {
