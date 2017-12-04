@@ -1,0 +1,24 @@
+/**
+ * 全局工具栏
+ */
+
+.xut-global-bar {}
+
+.xut-global-bar li {
+  float: left;
+  list-style: none;
+  height: 100%;
+}
+
+.xut-global-bar-dir{
+  background-image: url(../images/global-bar/dir.png);
+}
+
+.xut-global-bar-cover{
+  background-image: url(../images/global-bar/cover.png);
+}
+
+.xut-global-bar-dir ,
+.xut-global-bar-cover  {
+  background-size: 100% 100%;
+}
