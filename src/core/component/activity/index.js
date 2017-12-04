@@ -456,7 +456,6 @@ export default class Activity {
       }
     }(this.contentGroup.length);
 
-
     //执行动画
     this.eachAssistContents(function(scope) {
 

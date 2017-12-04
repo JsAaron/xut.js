@@ -3,7 +3,7 @@
  * @return {[type]} [description]
  */
 import { initAsyn } from './asyn'
-import { initGlobalEvent } from './golbal-event'
+import { initGlobalEvent } from './global-event'
 import { initAudio } from '../../component/audio/api'
 import { initVideo } from '../../component/video/api'
 import { initGlobalAPI } from '../../api/global-api/index'

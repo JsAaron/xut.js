@@ -57,7 +57,7 @@ export function mainScene() {
     navBarHTML =
       `<div class="xut-nav-bar"
           style="width:${navBarWidth};
-                 height:${navBarHeight}px;
+                 height:${navBarHeight || 0}px;
                  ${navBarTop}
                  ${navBarLeft}
                  ${navBarBottom}
@@ -74,6 +74,8 @@ export function mainScene() {
   //那么可视区的宽度是就是全屏的宽度了，因为有2个页面拼接
   const width = config.launch.doublePageMode ? config.screenSize.width : visualSize.width
 
+  //2017.12.4
+  //新增全局工具栏容器
   return String.styleFormat(
     `<div id="xut-main-scene"
           style="width:${width}px;

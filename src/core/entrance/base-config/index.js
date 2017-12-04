@@ -2,7 +2,7 @@ import initDatabse from './init-database'
 import getSetData from './set-data'
 
 import { importJsonDatabase } from 'database/result'
-import { $warn, loadGolbalStyle, nextTick } from '../../util/index'
+import { $warn, loadGlobalStyle, nextTick } from '../../util/index'
 import { initRootNode } from '../../expand/root-node'
 import { initColumn } from '../../component/column/init'
 import { contentFilter } from '../../component/activity/content/content-filter'
@@ -84,7 +84,7 @@ export default function baseConfig(callback) {
    */
   function loadStyle(novelData, chapterTotal) {
     /*加载svg的样式*/
-    loadGolbalStyle('svgsheet', function() {
+    loadGlobalStyle('svgsheet', function() {
       //判断是否有分栏处理
       configColumn(function() {
         //如果启动预加载配置

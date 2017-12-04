@@ -17,7 +17,7 @@ import { getFullProportion, getRealProportion } from './view-config/proportion'
 3 依赖数据
  */
 import {
-  improtGolbalConfig,
+  improtGlobalConfig,
   improtDebugConfig,
   improtDataConfig
 } from '../api/config-api/index'
@@ -260,7 +260,7 @@ _.extend(config, {
   /*全局debug配置*/
   debug: improtDebugConfig,
   /*默认全局配置*/
-  golbal: improtGolbalConfig
+  global: improtGlobalConfig
 })
 
 Xut.config = config
@@ -301,10 +301,11 @@ export function initPathAddress() {
  * 默认设置
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
  */
-const resetProportion = function (pptWidth, pptHeight, setVisualMode, noModifyValue) {
+function resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue) {
   //获取全屏比值，用来设定view的尺寸
   //根据分辨率与PPT排版的比值来确定
   fullProportion = getFullProportion(config, pptWidth, pptHeight)
+
   const visualSize = config.visualSize = getVisualSize(config, fullProportion, setVisualMode, noModifyValue)
 
   //溢出宽度
@@ -321,30 +322,44 @@ const resetProportion = function (pptWidth, pptHeight, setVisualMode, noModifyVa
   proportion = config.proportion = getRealProportion(config, visualSize, fullProportion)
 }
 
-/*获取基本尺寸*/
-const getBasicSize = function (pptWidth, pptHeight, screenSize) {
+/**
+ * 获取基本尺寸
+ * @param  {[type]} pptWidth   [description]
+ * @param  {[type]} pptHeight  [description]
+ * @param  {[type]} screenSize [description]
+ * @return {[type]}            [description]
+ */
+function getBasicSize(pptWidth, pptHeight, screenSize) {
   //获取分辨率
-  config.screenSize = screenSize || getSize()
-    //根据设备判断设备的横竖屏
+  config.screenSize = screenSize || getSize();
+  //根据设备判断设备的横竖屏
   config.screenHorizontal = config.screenSize.width > config.screenSize.height ? true : false
   config.screenVertical = !config.screenHorizontal
-  layoutMode = config.layoutMode = getLayerMode(config.screenSize)
-    //数据ppt排版设计
+  layoutMode = config.layoutMode = getLayerMode(config.screenSize);
+  //数据ppt排版设计
   if (pptWidth && pptHeight) {
     config.pptHorizontal = pptWidth > pptHeight ? true : false
     config.pptVertical = !config.pptHorizontal
   }
 }
 
-/*重新设置config*/
-const resetConfig = function (pptWidth, pptHeight, screenSize, setVisualMode, noModifyValue) {
+/**
+ * 重新设置config
+ * @param  {[type]} pptWidth      [description]
+ * @param  {[type]} pptHeight     [description]
+ * @param  {[type]} screenSize    [description]
+ * @param  {[type]} setVisualMode [description]
+ * @param  {[type]} noModifyValue [description]
+ * @return {[type]}               [description]
+ */
+function resetConfig(pptWidth, pptHeight, screenSize, setVisualMode, noModifyValue) {
   getBasicSize(pptWidth, pptHeight, screenSize)
   resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue)
 }
 
 
 /****************************************
- *  反向模式探测(PPT设置与显示相反,列入竖版PPT=>横版显示)
+ *  反向模式探测(PPT设置与显示相反,例如竖版PPT=>横版显示)
  *  为了在originalVisualSize中重置容器的布局
  *  让容器的布局是反向模式的等比缩放的尺寸
  *  这样算法可以保持兼容正向一致
@@ -354,11 +369,11 @@ export function initConfig(pptWidth, pptHeight) {
   //第一次探测实际的PPT与屏幕尺寸
   getBasicSize(pptWidth, pptHeight)
 
+
   ////////////////////////////////////
   /// 横版PPT，竖版显示，强制为竖版双页面
   ////////////////////////////////////
   if (config.launch.visualMode === 5) {
-
     resetProportion(pptWidth, pptHeight, config.launch.visualMode)
     config.originalVisualSize = config.visualSize
     return
@@ -384,15 +399,15 @@ export function initConfig(pptWidth, pptHeight) {
   /// 屏幕尺寸与显示范围是不一样的，按照竖版的比例，等比缩小了
   //////////////////////////////////////////////////////////
 
-  //如果是横版PPT，横版显示的情况下，并且是全局模式3的情况
-  //可能存在宽度，不能铺满全屏的情况
-  //所以可能存在要修改尺寸
   if (config.pptHorizontal && config.screenHorizontal && config.launch.visualMode === 3) {
+    //如果是横版PPT，横版显示的情况下，并且是全局模式3的情况
+    //可能存在宽度，不能铺满全屏的情况
+    //所以可能存在要修改尺寸
     //可能会修改全局布局尺寸，所以采用3模式探测
     resetProportion(pptWidth, pptHeight, config.launch.visualMode, true)
   } else {
     //强制检测是否是反向显示模式
-    //模式3的情况下，用2检测
+    //如果是模式3的情况下，用2检测
     resetProportion(pptWidth, pptHeight, config.launch.visualMode === 3 ? 2 : config.launch.visualMode)
   }
 

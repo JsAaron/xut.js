@@ -3,9 +3,9 @@ import { config } from '../../config/index'
 //////////////////////////////////
 /// 如果启动了代码追踪，配置基本信息
 //////////////////////////////////
-export default function setTrack(launch, golbal) {
+export default function setTrack(launch, global) {
 
-  const trackTypes = launch && launch.trackCode || golbal.trackCode
+  const trackTypes = launch && launch.trackCode || global.trackCode
   config.sendTrackCode = () => {}
   config.hasTrackCode = () => {}
   /*

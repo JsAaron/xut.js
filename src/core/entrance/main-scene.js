@@ -4,7 +4,7 @@ import { $setStorage, $getStorage, $removeStorage, execScript, $warn } from '../
 /**
  * 设置缓存，必须要可设置
  */
-const saveData = () => {
+function saveData() {
   if (config.launch.historyMode) {
     const data = config.data
     $setStorage({ "pageIndex": data.pageIndex, "novelId": data.novelId })
@@ -21,7 +21,7 @@ const saveData = () => {
  * 初始化值
  * @param {[type]} options [description]
  */
-const initDefaultValues = (options) => {
+function initDefaultValues(options) {
   return {
     'novelId': Number(options.novelId),
     'pageIndex': Number(options.pageIndex),
@@ -34,13 +34,18 @@ const initDefaultValues = (options) => {
  * 检测脚本注入
  * @return {[type]} [description]
  */
-const runScript = () => {
+function runScript() {
   let preCode, novels = Xut.data.query('Novel')
   if (preCode = novels.preCode) {
     execScript(preCode, 'novelpre脚本')
   }
 }
 
+/**
+ * 加载主场景
+ * @param  {[type]} options [description]
+ * @return {[type]}         [description]
+ */
 export default function(options) {
 
   options = initDefaultValues(options || {});

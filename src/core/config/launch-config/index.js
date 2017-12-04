@@ -29,7 +29,7 @@ export function setLaunch(novelData) {
 
   /*独立app与全局配置文件*/
   const launch = config.launch
-  const golbal = config.golbal
+  const global = config.global
 
   //////////////////////////////////
   /// brModel命名被修改该了
@@ -38,30 +38,30 @@ export function setLaunch(novelData) {
   if (launch.brModel && !launch.brMode) {
     launch.brMode = launch.brModel
   }
-  if (golbal.brModel && !golbal.brMode) {
-    golbal.brMode = golbal.brModel
+  if (global.brModel && !global.brMode) {
+    global.brMode = global.brModel
   }
 
   //debug模式
-  for (let key in golbal.debug) {
-    if (golbal.debug[key] !== undefined) {
-      config.debug[key] = golbal.debug[key]
+  for (let key in global.debug) {
+    if (global.debug[key] !== undefined) {
+      config.debug[key] = global.debug[key]
     }
   }
 
   //忙碌光标
-  setCursor(launch, golbal)
+  setCursor(launch, global)
 
   //如果启动了代码追踪，配置基本信息
-  setTrack(launch, golbal)
+  setTrack(launch, global)
 
   //设置图片模式webp
-  setBrType(launch, golbal)
+  setBrType(launch, global)
 
-  //golbal混入到launch中
-  for (let key in golbal) {
+  //global混入到launch中
+  for (let key in global) {
     if (launch[key] === undefined) {
-      launch[key] = golbal[key]
+      launch[key] = global[key]
     }
   }
 

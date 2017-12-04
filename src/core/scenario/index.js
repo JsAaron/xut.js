@@ -6,6 +6,7 @@ import MainBar from '../toolbar/ppt/main-iosbar/index'
 import DeputyBar from '../toolbar/ppt/deputy-fnbar'
 import BookBar from '../toolbar/ppt/word-bookbar/index'
 import MiniBar from '../toolbar/mini/index'
+import GlobalBar from '../toolbar/mmx/index'
 
 import { getMainBar, getDeputyBar } from './config/set-bar'
 import { mainScene, deputyScene } from './config/layout'
@@ -123,6 +124,7 @@ export class SceneFactory {
     )
 
     this._initMiniBar(pageIndex, pageTotal, $sceneNode)
+    this._initGlobalbar(pageIndex, pageTotal, $sceneNode)
   }
 
 
@@ -181,6 +183,20 @@ export class SceneFactory {
     return barConfig
   }
 
+  /**
+   * 初始化全局工具栏，秒秒学
+   * 2017.12.4
+   * @return {[type]} [description]
+   */
+  _initGlobalbar(pageIndex, pageTotal, $sceneNode) {
+    if (config.launch.pageBar && config.launch.pageBar.type === 'globalBar') {
+      this.globalToolbar = new GlobalBar({
+        $sceneNode: $sceneNode,
+        pageTotal: pageTotal,
+        currentPage: pageIndex + 1
+      })
+    }
+  }
 
   /**
    * 初始化迷你工具栏

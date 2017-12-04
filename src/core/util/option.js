@@ -24,7 +24,7 @@ export function removeSlash(resource) {
  * 动态加载link
  * @return {[type]} [description]
  */
-export function loadGolbalStyle(fileName, callback) {
+export function loadGlobalStyle(fileName, callback) {
   const path = config.launch.resource ?
     config.launch.resource + '/gallery/' + fileName + '.css' :
     config.data.pathAddress + fileName + '.css'
@@ -339,9 +339,9 @@ export function reviseSize({
 /**
  * 提供全局配置文件
  */
-export function mixGolbalConfig(setConfig) {
+export function mixGlobalConfig(setConfig) {
   if (setConfig) {
-    Xut.mixin(config.golbal, setConfig)
+    Xut.mixin(config.global, setConfig)
   }
 }
 

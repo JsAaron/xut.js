@@ -6,7 +6,7 @@ import { clearFixAudio } from '../component/audio/fix'
 import { config, clearConfig } from '../config/index'
 import { clearId } from '../util/stroage/api'
 import { clearAndroid } from '../entrance/initialize/button'
-import { clearGlobalEvent } from '../entrance/initialize/golbal-event'
+import { clearGlobalEvent } from '../entrance/initialize/global-event'
 import { clearRootNode } from '../expand/root-node'
 import { $stopAutoWatch } from '../scenario/command/auto'
 

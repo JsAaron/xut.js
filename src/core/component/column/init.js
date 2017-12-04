@@ -1,5 +1,5 @@
 import { config, resetVisualLayout } from '../../config/index'
-import { defAccess, nextTick, $warn, loadGolbalStyle } from '../../util/index'
+import { defAccess, nextTick, $warn, loadGlobalStyle } from '../../util/index'
 import { getResults, removeColumnData } from 'database/result'
 import { startColumnDetect, simulateCount, debug } from './detect'
 import { addCache } from './api'
@@ -240,7 +240,7 @@ export function initColumn(callback) {
     let visualHeight = newViewHight = visuals.height
 
     //加载flow样式
-    loadGolbalStyle('xxtflow', function() {
+    loadGlobalStyle('xxtflow', function() {
       $container = $(results.FlowData)
       removeColumnData() //删除flowdata，优化缓存
       setInit(visuals.width, visualHeight)

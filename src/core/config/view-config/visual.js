@@ -13,11 +13,26 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
 
   let screenWidth = config.screenSize.width
   let screenHeight = config.screenSize.height
+  let newBottom = 0
+  let newTop = 0
+  let newLeft = 0
+
+  //2017.12.4
+  //秒秒学的全局工具栏，这个比较特殊
+  //因为设计到工具栏合并页面，所以需要修改页面的显示值了
+  //默认秒秒学工具栏是1/17
+  //如果没有float就是合并一个整体页面
+  //如果有float，就是浮动在页面上，这里就不需改变值了
+  let pageBar = config.launch.pageBar
+  if (pageBar && pageBar.type === 'globalBar' && !pageBar.float) {
+    newBottom = Math.round(screenHeight / 17)
+    screenHeight = screenHeight - newBottom
+    config.launch.pageBar.bottom = newBottom
+  }
 
   let newWidth = screenWidth
   let newHeight = screenHeight
-  let newTop = 0
-  let newLeft = 0
+
 
   if (!setVisualMode) {
     $warn({
@@ -145,7 +160,8 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
     width: CEIL(newWidth),
     height: CEIL(newHeight),
     left: CEIL(newLeft),
-    top: CEIL(newTop)
+    top: CEIL(newTop),
+    bottom: newBottom
   }
 
 }

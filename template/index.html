@@ -63,7 +63,8 @@ Xut.Application.setConfig = {
   // doublePageMode: false //双页模式
   // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
   pageBar: {
-    type: ['scrollbar', 'digital']
+    type:'globalBar'
+    // type: ['scrollbar', 'digital']
     // direction:''
     // mode: 1,
     // position: {
@@ -101,7 +102,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 330 //306
+var appId = 345 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

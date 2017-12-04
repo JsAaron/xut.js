@@ -4,10 +4,10 @@ import { config } from '../../config/index'
 /// 图片模式webp
 /// 需要兼容老版本的png模式，base-config会重设
 //////////////////////////////////
-export default function setBrType(launch, golbal) {
+export default function setBrType(launch, global) {
   if (launch) {
-    if (!launch.brMode && golbal.brMode) {
-      launch.brMode = golbal.brMode
+    if (!launch.brMode && global.brMode) {
+      launch.brMode = global.brMode
     }
 
     /*预先判断出基础类型*/

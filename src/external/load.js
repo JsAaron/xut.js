@@ -5,6 +5,7 @@ var cssName = [
   'css/vertical.css',
   'css/adaptive-image.css',
   'css/css3-filters.css',
+  'css/global-bar.css',
 
   'css/font-dot.css',
   'css/font-flaticon.css',

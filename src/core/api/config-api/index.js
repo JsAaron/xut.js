@@ -1,9 +1,9 @@
-import improtGolbalConfig from './global-config'
+import improtGlobalConfig from './global-config'
 import improtDebugConfig from './debug-config'
 import improtDataConfig from './data-config'
 
 export {
-  improtGolbalConfig,
+  improtGlobalConfig,
   improtDebugConfig,
   improtDataConfig
 }

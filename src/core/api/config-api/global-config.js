@@ -216,6 +216,17 @@ export default {
    *
    * 组合模式['digital','circular','scrollbar']
    * @type {Object}
+   *
+   * 2017.12.4
+   * 新增秒秒学全局工具栏
+   *
+   * pageBar：{
+   *   type:'globalBar'
+   *   mode:1/2/3/4/5/6
+   *   float:true //是否全局浮动
+   * }
+   *
+   *
    */
   pageBar: {
     type: 'digital',

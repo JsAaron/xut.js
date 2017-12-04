@@ -1,6 +1,6 @@
 import enterApp from './entrance/index'
 import { config } from './config/index'
-import { removeSlash, mixGolbalConfig } from './util/index'
+import { removeSlash, mixGlobalConfig } from './util/index'
 
 /////////////////
 ////  版本号  ////
@@ -65,7 +65,7 @@ Xut.Application.Launch = option => {
   }
   const setConfig = Xut.Application.setConfig
   if (setConfig && setConfig.lauchMode === 1) {
-    mixGolbalConfig(setConfig);
+    mixGlobalConfig(setConfig);
     /*当前的launch配置文件，用于横竖切换处理*/
     cacheOptions = [option]
     config.launch = $.extend(true, { launchTime: (+new Date) }, option)
@@ -107,7 +107,7 @@ setTimeout(() => {
     if (hasLaunch()) {
       return
     }
-    mixGolbalConfig(setConfig)
+    mixGlobalConfig(setConfig)
     /*保证兼容，不需要判断launch存在，初始空对象*/
     config.launch = {}
     enterApp()
