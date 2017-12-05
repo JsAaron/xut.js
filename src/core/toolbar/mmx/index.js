@@ -1,13 +1,19 @@
 /**
  * 秒秒学定制工具栏
  */
-import { config } from '../../config/index'
+import {
+  config
+} from '../../config/index'
+import {
+  getPostMessageFn
+} from '../../api/post-message'
 import {
   hash,
   $on,
   $off,
   $handle,
-  $target
+  $target,
+  defAccess
 } from '../../util/index'
 
 /**
@@ -25,15 +31,12 @@ export default class GlobalBar {
     this._initContainer()
     this._dirButton()
     this._coverButton()
-    this._prevButton()
-    this._titleButton()
-    this._nextButton()
-    this._forumButton()
-    this._forumPage()
-    this.$sceneNode.append(this.container)
+    this._centerView()
+    this._rightView()
     this._bindEvent()
+    this.pageElement = this.container.find('.g-page > a:first')
+    this.$sceneNode.append(this.container)
   }
-
 
   /**
    * 绑定事件
@@ -43,20 +46,46 @@ export default class GlobalBar {
     const self = this
     $on(this.container, {
       end: function(event) {
-        switch (event.target.className) {
-          case "xut-global-bar-cover":
+        event.stopPropagation()
+
+        let className
+        if (event.target.tagName.toLowerCase() === 'a') {
+          className = event.target.parentNode.className
+        } else {
+          className = event.target.className
+        }
+
+        switch (className) {
+          case "g-cover":
             Xut.View.GotoSlide(1)
             break;
-          case "xut-global-bar-dir":
-            console.log(2)
+          case "g-dir":
+            Xut.Assist.GlobalDirToggle({
+              open: function() {
+                console.log(1)
+              },
+              close: function() {
+                console.log(2)
+              }
+            })
             break;
-          case "xut-global-bar-prev":
+          case "g-prev":
+            Xut.View.GotoPrevSlide()
             break;
-          case "xut-global-bar-next":
+          case "g-next":
+            Xut.View.GotoNextSlide()
             break;
-          case "xut-global-bar-forum":
+          case "g-forum":
+            Xut.Assist.ForumToggle({
+              open: function() {
+                console.log(1)
+              },
+              close: function() {
+                console.log(2)
+              }
+            })
             break;
-          case "xut-global-bar-page":
+          case "g-page":
             break;
         }
       }
@@ -64,8 +93,12 @@ export default class GlobalBar {
   }
 
   _initData() {
-    //工具栏的高度
+    this.basePadding = 3 //基础值
+    this.currentPage = 1 //当前页面
+      //工具栏的高度
     this.barHeight = config.launch.pageBar.bottom || Math.round(config.visualSize.height / 17)
+      //设置了padding的top与bottom 所以height需要*2
+    this.baseHeight = this.barHeight - this.basePadding * 2
   }
 
   /**
@@ -74,11 +107,20 @@ export default class GlobalBar {
    */
   _getSize(width, height) {
     //根据高度获取缩放比
-    const ratio = this.barHeight / height
+    const ratio = this.baseHeight / height
     return {
-      width: width * ratio,
-      height: this.barHeight
+      width: Math.round(width * ratio),
+      height: this.baseHeight
     }
+  }
+
+  /**
+   * 获取基础style
+   * @return {[type]} [description]
+   */
+  _getBaseStyle(width, height) {
+    const size = this._getSize(width, height)
+    return `width:${size.width}px;height:${size.height}px`
   }
 
   /**
@@ -86,7 +128,8 @@ export default class GlobalBar {
    * @return {[type]} [description]
    */
   _initContainer() {
-    const style = `position:absolute;z-index:9999;bottom:0;width:100%;height:${this.barHeight};background:#ccc;`
+    //设置了padding的top与bottom 所以height需要*2
+    const style = `height:${this.baseHeight}px;padding:${this.basePadding}px 0;`
     this.container = $(`<ul class="xut-global-bar" style="${style}"></ul>`)
   }
 
@@ -96,75 +139,81 @@ export default class GlobalBar {
    * background-image:url(images/icons/global-bar.png);
    */
   _dirButton() {
-    const size = this._getSize(66, 44)
-    const style = `width:${size.width}px;height:${size.height}px`
-    const html = `<li class="xut-global-bar-dir" style="${style}"></li>`
+    const html = `<li class="g-dir" style="${this._getBaseStyle(66, 44)}"></li>`
     this.container.append(html)
   }
 
   /**
-   * 封面
+   * 封面页面
    * @return {[type]} [description]
-   * background-image:url(images/icons/global-bar.png);
    */
   _coverButton() {
-    const size = this._getSize(66, 44)
-    const style = `width:${size.width}px;height:${size.height}px`
-    const html = `<li class="xut-global-bar-cover" style="${style}"></li>`
+    const html = `<li class="g-cover" style="${this._getBaseStyle(66, 44)}"></li>`
     this.container.append(html)
   }
 
   /**
-   * 上一页
+   * 中间区域，拼接问题
+   * 所以合并到一个li中
    * @return {[type]} [description]
    */
-  _prevButton() {
-    const style = `width:32%;background:yellow`
-    const html = `<li class="xut-global-bar-prev" style="${style}"></li>`
-    this.container.append(html)
+  _centerView() {
+    const html =
+      `<li class="g-center" style="height:${this.baseHeight}px;line-height:${this.baseHeight}px;">
+         <a class="g-prev" style="${this._getBaseStyle(59, 44)}"></a>
+         <div>
+            <a class="g-title">${config.data.shortName}</a>
+         </div>
+         <a class="g-next" style="${this._getBaseStyle(59, 44)}"></a>
+       </li>`
+    this.container.append(String.styleFormat(html))
+  }
+
+  /**
+   * 右边区域
+   * @return {[type]} [description]
+   */
+  _rightView() {
+    const style = `height:${this.baseHeight}px`
+    const html =
+      `<li class="g-right" style="${style}">
+          <div class="g-section" style="${style}"><a></a></div>
+          <div class="g-work" style="${style}"><a></a></div>
+          <div class="g-forum" style="${style}"><a></a></div>
+          <div class="g-page" style="${style}">
+            <div>
+              <a>${this.currentPage}</a>
+              <a>${this.pageTotal}</a>
+            </div>
+          </div>
+       </li>`
+    this.container.append(String.styleFormat(html))
   }
 
 
   /**
-   * 标题
+   * 更新页码
    * @return {[type]} [description]
    */
-  _titleButton() {
-    const style = `width:16%;background:red`
-    const html = `<li class="xut-global-bar-title" style="${style}"></li>`
-    this.container.append(html)
-  }
-
-
-  /**
-   * 下一页
-   * @return {[type]} [description]
-   */
-  _nextButton() {
-    const style = `width:22%;background:yellow`
-    const html = `<li class="xut-global-bar-next" style="${style}"></li>`
-    this.container.append(html)
-  }
-
-
-  /**
-   * 讨论区
-   * @return {[type]} [description]
-   */
-  _forumButton() {
-    const style = `width:10%;background:red`
-    const html = `<li class="xut-global-bar-forum" style="${style}"></li>`
-    this.container.append(html)
+  updatePointer({
+    parentIndex
+  }) {
+    ++parentIndex //从1开始索引，parentIndex默认从0开始
+    if (parentIndex !== undefined && parentIndex !== this.$currentPage) {
+      this.$currentPage = parentIndex
+      this.pageElement.html(parentIndex)
+    }
   }
 
   /**
-   * 页码
+   * 销毁
    * @return {[type]} [description]
    */
-  _forumPage() {
-    const style = `width:10%;background:blue`
-    const html = `<li class="xut-global-bar-page" style="${style}"></li>`
-    this.container.append(html)
+  destroy() {
+    $off(this.container)
+    this.$sceneNode = null
+    this.container = null
+    this.pageElement = null
   }
 
 }

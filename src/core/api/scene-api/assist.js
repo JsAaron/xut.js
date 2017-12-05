@@ -3,59 +3,111 @@
  * 辅助对象
  ********************************************/
 
-import { sendPostMessage } from '../post-message'
+import { getPostMessageFn } from '../post-message'
 
 
 export function extendAssist(access, $$globalSwiper) {
 
-  /**
-   * 制作PostMessage闭包
-   * @return {[type]} [description]
-   */
-  function getPostMessage(type) {
-    if (window.parent && type) {
-      return function(data) {
-        return sendPostMessage(type, data)
-      }
-    }
-  }
 
+  //========================
+  //  讨论区
+  //========================
 
   /**
    * 标记讨论区状态
    * @type {Boolean}
    */
-  Xut.Assist.ForumStatus = false
+  let forumStatus = false
 
   /**
    * 设置讨论区
    * @param {Function} fn    [description]
    * @param {[type]}   state [description]
    */
-  function setForum(fn, state) {
-    if (fn) {
+  function setForum(callback, fn, state) {
+    //互斥可以相互关闭
+    //并且排除重复调用
+    if (fn && forumStatus !== state) {
       //从1开始算
-      const pageIndex = Xut.Presentation.GetPageIndex() + 1
+      fn({ pageIndex: Xut.Presentation.GetPageIndex() + 1 })
       //标记状态，提供关闭
-      Xut.Assist.ForumStatus = state
-      fn({ pageIndex })
+      forumStatus = state
+      callback && callback()
     }
   }
-
 
   /**
    * 针对秒秒学的api
    * 打开讨论区
    */
-  Xut.Assist.ForumOpen = () => setForum(getPostMessage('forumOpen'), true)
-
+  Xut.Assist.ForumOpen = (callback) => setForum(callback, getPostMessageFn('forumOpen'), true)
 
   /**
    * 针对秒秒学的api
    * 关闭讨论区
    */
-  Xut.Assist.ForumClose = () => setForum(getPostMessage('forumClose'), false)
+  Xut.Assist.ForumClose = (callback) => setForum(callback, getPostMessageFn('forumClose'), false)
 
+  /**
+   * 讨论区切换
+   * @param {[type]} options.open  [description]
+   * @param {[type]} options.close [description]
+   */
+  Xut.Assist.ForumToggle = function({
+    open,
+    close
+  }) {
+    if (forumStatus) {
+      Xut.Assist.ForumClose(close)
+    } else {
+      Xut.Assist.ForumOpen(open)
+    }
+  }
+
+
+  //========================
+  //  全局工具栏目录
+  //========================
+
+  let globalDirStatus = false
+
+  function setBarDir(callback, fn, state) {
+    if (fn && globalDirStatus !== state) {
+      fn()
+      globalDirStatus = state
+      callback && callback()
+    }
+  }
+
+  /**
+   * 打开全局工具栏目录
+   * @return {[type]} [description]
+   */
+  Xut.Assist.GlobalDirOpen = (callback) => setBarDir(callback, getPostMessageFn('globalDirOpen'), true)
+
+  /**
+   * 关闭全局工具栏目录
+   * @return {[type]} [description]
+   */
+  Xut.Assist.GlobalDirClose = (callback) => setBarDir(callback, getPostMessageFn('globalDirClose'), false)
+
+  /**
+   * 自动切换
+   */
+  Xut.Assist.GlobalDirToggle = function({
+    open,
+    close
+  }) {
+    if (globalDirStatus) {
+      Xut.Assist.GlobalDirClose(close)
+    } else {
+      Xut.Assist.GlobalDirOpen(open)
+    }
+  }
+
+  //========================
+  //  答题卡
+  //========================
 
   /**
    * 设置答题卡的正确错误率
@@ -76,6 +128,11 @@ export function extendAssist(access, $$globalSwiper) {
    */
   Xut.Assist.AnswerError = () => setAnswer('error')
 
+
+
+  //========================
+  //  其他
+  //========================
 
   /**
    * 滤镜渐变动画

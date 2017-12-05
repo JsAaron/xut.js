@@ -16,7 +16,7 @@ export default class Digital extends MiniSuper {
     if (config.visualSize.overflowWidth) {
       right = Math.abs(config.visualSize.left * 2) + 'px'
     }
-    return `<div class="xut-page-number"style="right:${right};bottom:0;">
+    return `<div class="xut-page-number" style="right:${right};bottom:0;">
                   <div>1</div>
                   <strong>/</strong>
                   <div>${this.pageTotal}</div>

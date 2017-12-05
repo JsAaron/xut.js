@@ -72,7 +72,14 @@ export function mainScene() {
 
   //如果启动了双页模式
   //那么可视区的宽度是就是全屏的宽度了，因为有2个页面拼接
-  const width = config.launch.doublePageMode ? config.screenSize.width : visualSize.width
+  const width = config.launch.doublePageMode ? screenSize.width : visualSize.width
+
+  //如果有拼接的页面高度
+  //这边是为秒秒学处理的
+  let style = ''
+  if (config.launch.pageBar && config.launch.pageBar.bottom) {
+    style = `style="height:${visualSize.height}px;"`
+  }
 
   //2017.12.4
   //新增全局工具栏容器
@@ -86,11 +93,11 @@ export function mainScene() {
                  z-index:${sceneController.createIndex()};
                  overflow:hidden;">
 
-        <div id="xut-control-bar" class="xut-control-bar"></div>
-        <ul id="xut-page-container" class="xut-flip"></ul>
-        <ul id="xut-master-container" class="xut-master xut-flip"></ul>
+        <ul class="xut-page-container xut-flip" ${style}></ul>
+        <ul class="xut-master-container xut-master xut-flip" ${style}></ul>
+        <div class="xut-control-bar"></div>
+        <div class="xut-tool-tip"></div>
         ${navBarHTML}
-        <div id="xut-tool-tip"></div>
     </div>`
   )
 }

@@ -20,9 +20,9 @@ function findContainer($context, id, isMain) {
   return function(pane, parallax) {
     var node;
     if (isMain) {
-      node = '#' + pane;
+      node = '.' + pane;
     } else {
-      node = '#' + parallax + id;
+      node = '.' + parallax + id;
     }
     return $context.find(node)[0];
   }
@@ -309,6 +309,7 @@ export class SceneFactory {
      */
     $$mediator.$bind('updatePage', (...arg) => {
       pptBar && pptBar.updatePointer(...arg)
+      this.globalToolbar && this.globalToolbar.updatePointer(...arg)
       this._eachMiniBar(function() {
         this.updatePointer(...arg)
       })
@@ -455,6 +456,11 @@ export class SceneFactory {
     this._eachMiniBar(function() {
       this.destroy()
     })
+    if(this.globalToolbar){
+      this.globalToolbar.destroy()
+      this.globalToolbar = null
+    }
+
     this.$$mediator.miniBar = null
 
     //销毁当前场景

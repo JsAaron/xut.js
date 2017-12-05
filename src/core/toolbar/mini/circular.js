@@ -58,7 +58,7 @@ export default class Circular extends MiniSuper {
     while (countPage--) {
       dotString += `<span class="slider-pager-page"><i class= ${this.dotStyleClass}></i></span>`;
     }
-    return `<div class="xut-page-number"style="${this.position};">${dotString}</div>`
+    return `<div class="xut-page-number" style="${this.position};">${dotString}</div>`
   }
 
   _getContextNode() {

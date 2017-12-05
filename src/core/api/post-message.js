@@ -18,11 +18,24 @@ import { makeJsonPack, $warn } from '../util/index'
  * @param  {[type]} type [description]
  * @return {[type]}      [description]
  */
-export function sendPostMessage(type, data = {}) {
+function sendPostMessage(type, data = {}) {
   return type && window.parent && window.parent.postMessage({
     type: type,
     content: data
   }, '*');
+}
+
+
+/**
+ * 制作PostMessage闭包
+ * @return {[type]} [description]
+ */
+export function getPostMessageFn(type) {
+  if (window.parent && type) {
+    return function(data) {
+      return sendPostMessage(type, data)
+    }
+  }
 }
 
 
