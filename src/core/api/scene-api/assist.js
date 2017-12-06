@@ -56,7 +56,7 @@ export function extendAssist(access, $$globalSwiper) {
   Xut.Assist.ForumToggle = function({
     open,
     close
-  }) {
+  } = {}) {
     if (forumStatus) {
       Xut.Assist.ForumClose(close)
     } else {
@@ -73,7 +73,8 @@ export function extendAssist(access, $$globalSwiper) {
 
   function setBarDir(callback, fn, state) {
     if (fn && globalDirStatus !== state) {
-      fn()
+      //从1开始算
+      fn({ pageIndex: Xut.Presentation.GetPageIndex() + 1 })
       globalDirStatus = state
       callback && callback()
     }
@@ -97,7 +98,7 @@ export function extendAssist(access, $$globalSwiper) {
   Xut.Assist.GlobalDirToggle = function({
     open,
     close
-  }) {
+  } = {}) {
     if (globalDirStatus) {
       Xut.Assist.GlobalDirClose(close)
     } else {

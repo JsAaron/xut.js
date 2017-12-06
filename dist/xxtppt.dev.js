@@ -42314,11 +42314,25 @@ function getVisualSize(config, fullProportion, setVisualMode, noModifyValue) {
 
   var screenWidth = config.screenSize.width;
   var screenHeight = config.screenSize.height;
+  var newBottom = 0;
+  var newTop = 0;
+  var newLeft = 0;
+
+  //2017.12.4
+  //秒秒学的全局工具栏，这个比较特殊
+  //因为设计到工具栏合并页面，所以需要修改页面的显示值了
+  //默认秒秒学工具栏是1/17
+  //如果没有float就是合并一个整体页面
+  //如果有float，就是浮动在页面上，这里就不需改变值了
+  var pageBar = config.launch.pageBar;
+  if (pageBar && pageBar.type === 'globalBar' && !pageBar.float) {
+    newBottom = Math.round(screenHeight / 17);
+    screenHeight = screenHeight - newBottom;
+    config.launch.pageBar.bottom = newBottom;
+  }
 
   var newWidth = screenWidth;
   var newHeight = screenHeight;
-  var newTop = 0;
-  var newLeft = 0;
 
   if (!setVisualMode) {
     $warn({
@@ -42444,7 +42458,8 @@ function getVisualSize(config, fullProportion, setVisualMode, noModifyValue) {
     width: CEIL(newWidth),
     height: CEIL(newHeight),
     left: CEIL(newLeft),
-    top: CEIL(newTop)
+    top: CEIL(newTop),
+    bottom: newBottom
   };
 }
 
@@ -42563,7 +42578,7 @@ function getRealProportion(config, visualSize, fullProportion) {
 
 var DEFAULT = undefined;
 
-var improtGolbalConfig = {
+var improtGlobalConfig = {
 
   /**
    * 应用的加载模式
@@ -42763,6 +42778,17 @@ var improtGolbalConfig = {
    *
    * 组合模式['digital','circular','scrollbar']
    * @type {Object}
+   *
+   * 2017.12.4
+   * 新增秒秒学全局工具栏
+   *
+   * pageBar：{
+   *   type:'globalBar'
+   *   mode:1/2/3/4/5/6
+   *   float:true //是否全局浮动
+   * }
+   *
+   *
    */
   pageBar: {
     type: 'digital',
@@ -43281,7 +43307,7 @@ _.extend(config, {
   /*全局debug配置*/
   debug: improtDebugConfig,
   /*默认全局配置*/
-  golbal: improtGolbalConfig
+  global: improtGlobalConfig
 });
 
 Xut.config = config;
@@ -43318,10 +43344,11 @@ function initPathAddress() {
  * 默认设置
  * 通过数据库中的设置的模板尺寸与实际尺寸修复
  */
-var resetProportion = function resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue) {
+function resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue) {
   //获取全屏比值，用来设定view的尺寸
   //根据分辨率与PPT排版的比值来确定
   fullProportion = getFullProportion(config, pptWidth, pptHeight);
+
   var visualSize = config.visualSize = getVisualSize(config, fullProportion, setVisualMode, noModifyValue);
 
   //溢出宽度
@@ -43336,10 +43363,16 @@ var resetProportion = function resetProportion(pptWidth, pptHeight, setVisualMod
   }
   //获取全局缩放比
   proportion = config.proportion = getRealProportion(config, visualSize, fullProportion);
-};
+}
 
-/*获取基本尺寸*/
-var getBasicSize = function getBasicSize(pptWidth, pptHeight, screenSize) {
+/**
+ * 获取基本尺寸
+ * @param  {[type]} pptWidth   [description]
+ * @param  {[type]} pptHeight  [description]
+ * @param  {[type]} screenSize [description]
+ * @return {[type]}            [description]
+ */
+function getBasicSize(pptWidth, pptHeight, screenSize) {
   //获取分辨率
   config.screenSize = screenSize || getSize();
   //根据设备判断设备的横竖屏
@@ -43351,16 +43384,24 @@ var getBasicSize = function getBasicSize(pptWidth, pptHeight, screenSize) {
     config.pptHorizontal = pptWidth > pptHeight ? true : false;
     config.pptVertical = !config.pptHorizontal;
   }
-};
+}
 
-/*重新设置config*/
-var resetConfig = function resetConfig(pptWidth, pptHeight, screenSize, setVisualMode, noModifyValue) {
+/**
+ * 重新设置config
+ * @param  {[type]} pptWidth      [description]
+ * @param  {[type]} pptHeight     [description]
+ * @param  {[type]} screenSize    [description]
+ * @param  {[type]} setVisualMode [description]
+ * @param  {[type]} noModifyValue [description]
+ * @return {[type]}               [description]
+ */
+function resetConfig(pptWidth, pptHeight, screenSize, setVisualMode, noModifyValue) {
   getBasicSize(pptWidth, pptHeight, screenSize);
   resetProportion(pptWidth, pptHeight, setVisualMode, noModifyValue);
-};
+}
 
 /****************************************
- *  反向模式探测(PPT设置与显示相反,列入竖版PPT=>横版显示)
+ *  反向模式探测(PPT设置与显示相反,例如竖版PPT=>横版显示)
  *  为了在originalVisualSize中重置容器的布局
  *  让容器的布局是反向模式的等比缩放的尺寸
  *  这样算法可以保持兼容正向一致
@@ -43374,7 +43415,6 @@ function initConfig(pptWidth, pptHeight) {
   /// 横版PPT，竖版显示，强制为竖版双页面
   ////////////////////////////////////
   if (config.launch.visualMode === 5) {
-
     resetProportion(pptWidth, pptHeight, config.launch.visualMode);
     config.originalVisualSize = config.visualSize;
     return;
@@ -43398,15 +43438,15 @@ function initConfig(pptWidth, pptHeight) {
   /// 屏幕尺寸与显示范围是不一样的，按照竖版的比例，等比缩小了
   //////////////////////////////////////////////////////////
 
-  //如果是横版PPT，横版显示的情况下，并且是全局模式3的情况
-  //可能存在宽度，不能铺满全屏的情况
-  //所以可能存在要修改尺寸
   if (config.pptHorizontal && config.screenHorizontal && config.launch.visualMode === 3) {
+    //如果是横版PPT，横版显示的情况下，并且是全局模式3的情况
+    //可能存在宽度，不能铺满全屏的情况
+    //所以可能存在要修改尺寸
     //可能会修改全局布局尺寸，所以采用3模式探测
     resetProportion(pptWidth, pptHeight, config.launch.visualMode, true);
   } else {
     //强制检测是否是反向显示模式
-    //模式3的情况下，用2检测
+    //如果是模式3的情况下，用2检测
     resetProportion(pptWidth, pptHeight, config.launch.visualMode === 3 ? 2 : config.launch.visualMode);
   }
 
@@ -44287,7 +44327,7 @@ function removeSlash(resource) {
  * 动态加载link
  * @return {[type]} [description]
  */
-function loadGolbalStyle(fileName, callback) {
+function loadGlobalStyle(fileName, callback) {
   var path = config.launch.resource ? config.launch.resource + '/gallery/' + fileName + '.css' : config.data.pathAddress + fileName + '.css';
   var node = loadFile(path, callback);
   node && node.setAttribute('data-type', fileName);
@@ -44592,9 +44632,9 @@ function reviseSize(_ref2) {
 /**
  * 提供全局配置文件
  */
-function mixGolbalConfig(setConfig) {
+function mixGlobalConfig(setConfig) {
   if (setConfig) {
-    Xut.mixin(config.golbal, setConfig);
+    Xut.mixin(config.global, setConfig);
   }
 }
 
@@ -46620,7 +46660,7 @@ function initColumn(callback) {
     var visualHeight = newViewHight = visuals.height;
 
     //加载flow样式
-    loadGolbalStyle('xxtflow', function () {
+    loadGlobalStyle('xxtflow', function () {
       $container = $(results.FlowData);
       removeColumnData(); //删除flowdata，优化缓存
       setInit(visuals.width, visualHeight);
@@ -48133,9 +48173,9 @@ function setDefaultSuffix() {
 //////////////////////////////////
 /// 如果启动了代码追踪，配置基本信息
 //////////////////////////////////
-function setTrack(launch, golbal) {
+function setTrack(launch, global) {
 
-  var trackTypes = launch && launch.trackCode || golbal.trackCode;
+  var trackTypes = launch && launch.trackCode || global.trackCode;
   config.sendTrackCode = function () {};
   config.hasTrackCode = function () {};
   /*
@@ -48195,11 +48235,11 @@ function setTrack(launch, golbal) {
 //////////////////////////////////
 /// 忙碌光标
 //////////////////////////////////
-function setCursor(launch, golbal) {
+function setCursor(launch, global) {
 
   if (launch) {
     /*因为光标可以配置false 关闭，所以这里需要注意判断*/
-    var cursor = launch.cursor || launch.cursor === false ? launch.cursor : golbal.cursor;
+    var cursor = launch.cursor || launch.cursor === false ? launch.cursor : global.cursor;
 
     /*每次配置光标之前都重置，可能被上个给覆盖默认的*/
     resetCursor();
@@ -48289,10 +48329,10 @@ function setGestureSwipe(novelData) {
 /// 图片模式webp
 /// 需要兼容老版本的png模式，base-config会重设
 //////////////////////////////////
-function setBrType(launch, golbal) {
+function setBrType(launch, global) {
   if (launch) {
-    if (!launch.brMode && golbal.brMode) {
-      launch.brMode = golbal.brMode;
+    if (!launch.brMode && global.brMode) {
+      launch.brMode = global.brMode;
     }
 
     /*预先判断出基础类型*/
@@ -48475,7 +48515,7 @@ function setLaunch(novelData) {
 
   /*独立app与全局配置文件*/
   var launch = config.launch;
-  var golbal = config.golbal;
+  var global = config.global;
 
   //////////////////////////////////
   /// brModel命名被修改该了
@@ -48484,30 +48524,30 @@ function setLaunch(novelData) {
   if (launch.brModel && !launch.brMode) {
     launch.brMode = launch.brModel;
   }
-  if (golbal.brModel && !golbal.brMode) {
-    golbal.brMode = golbal.brModel;
+  if (global.brModel && !global.brMode) {
+    global.brMode = global.brModel;
   }
 
   //debug模式
-  for (var key in golbal.debug) {
-    if (golbal.debug[key] !== undefined) {
-      config.debug[key] = golbal.debug[key];
+  for (var key in global.debug) {
+    if (global.debug[key] !== undefined) {
+      config.debug[key] = global.debug[key];
     }
   }
 
   //忙碌光标
-  setCursor(launch, golbal);
+  setCursor(launch, global);
 
   //如果启动了代码追踪，配置基本信息
-  setTrack(launch, golbal);
+  setTrack(launch, global);
 
   //设置图片模式webp
-  setBrType(launch, golbal);
+  setBrType(launch, global);
 
-  //golbal混入到launch中
-  for (var _key in golbal) {
+  //global混入到launch中
+  for (var _key in global) {
     if (launch[_key] === undefined) {
-      launch[_key] = golbal[_key];
+      launch[_key] = global[_key];
     }
   }
 
@@ -48592,7 +48632,7 @@ function baseConfig(callback) {
    */
   function loadStyle(novelData, chapterTotal) {
     /*加载svg的样式*/
-    loadGolbalStyle('svgsheet', function () {
+    loadGlobalStyle('svgsheet', function () {
       //判断是否有分栏处理
       configColumn(function () {
         //如果启动预加载配置
@@ -48666,7 +48706,7 @@ function configImage() {
 /**
  * 设置缓存，必须要可设置
  */
-var saveData = function saveData() {
+function saveData() {
   if (config.launch.historyMode) {
     var data = config.data;
     $setStorage({ "pageIndex": data.pageIndex, "novelId": data.novelId });
@@ -48677,32 +48717,37 @@ var saveData = function saveData() {
       $removeStorage('novelId');
     }
   }
-};
+}
 
 /**a
  * 初始化值
  * @param {[type]} options [description]
  */
-var initDefaultValues = function initDefaultValues(options) {
+function initDefaultValues(options) {
   return {
     'novelId': Number(options.novelId),
     'pageIndex': Number(options.pageIndex),
     'history': options.history
   };
-};
+}
 
 /**
  * 检测脚本注入
  * @return {[type]} [description]
  */
-var runScript = function runScript() {
+function runScript() {
   var preCode = void 0,
       novels = Xut.data.query('Novel');
   if (preCode = novels.preCode) {
     execScript(preCode, 'novelpre脚本');
   }
-};
+}
 
+/**
+ * 加载主场景
+ * @param  {[type]} options [description]
+ * @return {[type]}         [description]
+ */
 var initMainScene = function (options) {
 
   options = initDefaultValues(options || {});
@@ -49284,6 +49329,18 @@ function sendPostMessage(type) {
     type: type,
     content: data
   }, '*');
+}
+
+/**
+ * 制作PostMessage闭包
+ * @return {[type]} [description]
+ */
+function getPostMessageFn(type) {
+  if (window.parent && type) {
+    return function (data) {
+      return sendPostMessage(type, data);
+    };
+  }
 }
 
 /**
@@ -75479,10 +75536,11 @@ var Scheduler = function () {
       /*暂停*/
       var suspendAction = function suspendAction(front, middle, back, stop) {
 
-        //每次翻页都要探测一次是否启动了评论区域
-        if (Xut.Assist.ForumStatus) {
-          Xut.Assist.ForumClose();
-        }
+        //秒秒学的单独处理
+        //在iframe外部加了自己的显示区域
+        //翻页需要关闭
+        Xut.Assist.ForumClose();
+        Xut.Assist.GlobalDirClose();
 
         _this.pageMgr.suspend(front, middle, back, stop);
         _this.getMasterContext(function () {
@@ -76467,36 +76525,30 @@ function extendView($$mediator, access, $$globalSwiper) {
 
 function extendAssist(access, $$globalSwiper) {
 
-  /**
-   * 制作PostMessage闭包
-   * @return {[type]} [description]
-   */
-  function getPostMessage(type) {
-    if (window.parent && type) {
-      return function (data) {
-        return sendPostMessage(type, data);
-      };
-    }
-  }
+  //========================
+  //  讨论区
+  //========================
 
   /**
    * 标记讨论区状态
    * @type {Boolean}
    */
-  Xut.Assist.ForumStatus = false;
+  var forumStatus = false;
 
   /**
    * 设置讨论区
    * @param {Function} fn    [description]
    * @param {[type]}   state [description]
    */
-  function setForum(fn, state) {
-    if (fn) {
+  function setForum(callback, fn, state) {
+    //互斥可以相互关闭
+    //并且排除重复调用
+    if (fn && forumStatus !== state) {
       //从1开始算
-      var pageIndex = Xut.Presentation.GetPageIndex() + 1;
+      fn({ pageIndex: Xut.Presentation.GetPageIndex() + 1 });
       //标记状态，提供关闭
-      Xut.Assist.ForumStatus = state;
-      fn({ pageIndex: pageIndex });
+      forumStatus = state;
+      callback && callback();
     }
   }
 
@@ -76504,17 +76556,82 @@ function extendAssist(access, $$globalSwiper) {
    * 针对秒秒学的api
    * 打开讨论区
    */
-  Xut.Assist.ForumOpen = function () {
-    return setForum(getPostMessage('forumOpen'), true);
+  Xut.Assist.ForumOpen = function (callback) {
+    return setForum(callback, getPostMessageFn('forumOpen'), true);
   };
 
   /**
    * 针对秒秒学的api
    * 关闭讨论区
    */
-  Xut.Assist.ForumClose = function () {
-    return setForum(getPostMessage('forumClose'), false);
+  Xut.Assist.ForumClose = function (callback) {
+    return setForum(callback, getPostMessageFn('forumClose'), false);
   };
+
+  /**
+   * 讨论区切换
+   * @param {[type]} options.open  [description]
+   * @param {[type]} options.close [description]
+   */
+  Xut.Assist.ForumToggle = function (_ref) {
+    var open = _ref.open,
+        close = _ref.close;
+
+    if (forumStatus) {
+      Xut.Assist.ForumClose(close);
+    } else {
+      Xut.Assist.ForumOpen(open);
+    }
+  };
+
+  //========================
+  //  全局工具栏目录
+  //========================
+
+  var globalDirStatus = false;
+
+  function setBarDir(callback, fn, state) {
+    if (fn && globalDirStatus !== state) {
+      //从1开始算
+      fn({ pageIndex: Xut.Presentation.GetPageIndex() + 1 });
+      globalDirStatus = state;
+      callback && callback();
+    }
+  }
+
+  /**
+   * 打开全局工具栏目录
+   * @return {[type]} [description]
+   */
+  Xut.Assist.GlobalDirOpen = function (callback) {
+    return setBarDir(callback, getPostMessageFn('globalDirOpen'), true);
+  };
+
+  /**
+   * 关闭全局工具栏目录
+   * @return {[type]} [description]
+   */
+  Xut.Assist.GlobalDirClose = function (callback) {
+    return setBarDir(callback, getPostMessageFn('globalDirClose'), false);
+  };
+
+  /**
+   * 自动切换
+   */
+  Xut.Assist.GlobalDirToggle = function (_ref2) {
+    var open = _ref2.open,
+        close = _ref2.close;
+
+    if (globalDirStatus) {
+      Xut.Assist.GlobalDirClose(close);
+    } else {
+      Xut.Assist.GlobalDirOpen(open);
+    }
+  };
+
+  //========================
+  //  答题卡
+  //========================
 
   /**
    * 设置答题卡的正确错误率
@@ -76538,6 +76655,10 @@ function extendAssist(access, $$globalSwiper) {
   Xut.Assist.AnswerError = function () {
     return setAnswer('error');
   };
+
+  //========================
+  //  其他
+  //========================
 
   /**
    * 滤镜渐变动画
@@ -80170,7 +80291,7 @@ var Digital = function (_MiniSuper) {
       if (config.visualSize.overflowWidth) {
         right = Math.abs(config.visualSize.left * 2) + 'px';
       }
-      return '<div class="xut-page-number"style="right:' + right + ';bottom:0;">\n                  <div>1</div>\n                  <strong>/</strong>\n                  <div>' + this.pageTotal + '</div>\n            </div>';
+      return '<div class="xut-page-number" style="right:' + right + ';bottom:0;">\n                  <div>1</div>\n                  <strong>/</strong>\n                  <div>' + this.pageTotal + '</div>\n            </div>';
     }
   }, {
     key: '_getContextNode',
@@ -80288,7 +80409,7 @@ var Circular = function (_MiniSuper) {
       while (countPage--) {
         dotString += "<span class=\"slider-pager-page\"><i class= " + this.dotStyleClass + "></i></span>";
       }
-      return "<div class=\"xut-page-number\"style=\"" + this.position + ";\">" + dotString + "</div>";
+      return "<div class=\"xut-page-number\" style=\"" + this.position + ";\">" + dotString + "</div>";
     }
   }, {
     key: "_getContextNode",
@@ -80612,6 +80733,194 @@ function MiniBar() {
 }
 
 /**
+ * 秒秒学定制工具栏
+ */
+/**
+ * 全局工具栏
+ */
+
+var GlobalBar = function () {
+  function GlobalBar(options) {
+    classCallCheck(this, GlobalBar);
+
+    _.extend(this, options);
+    this._init();
+  }
+
+  createClass(GlobalBar, [{
+    key: '_init',
+    value: function _init() {
+      this._initData();
+      this._initContainer();
+      this._leftView();
+      this._centerView();
+      this._rightView();
+      this._bindEvent();
+      this.pageElement = this.container.find('.g-page .g-page-current');
+      this.$sceneNode.append(this.container);
+    }
+
+    /**
+     * 绑定事件
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_bindEvent',
+    value: function _bindEvent() {
+      var self = this;
+      $on(this.container, {
+        end: function end(event) {
+          event.stopPropagation();
+          switch (event.target.className) {
+            case "g-cover":
+              Xut.View.GotoSlide(1);
+              break;
+            case "g-dir":
+              Xut.Assist.GlobalDirToggle();
+              break;
+            case "g-prev":
+              Xut.View.GotoPrevSlide();
+              break;
+            case "g-next":
+              Xut.View.GotoNextSlide();
+              break;
+            case "g-learn-click":
+              break;
+            case "g-work-click":
+              break;
+            case "g-forum-click":
+              Xut.Assist.ForumToggle();
+              break;
+          }
+        }
+      });
+    }
+  }, {
+    key: '_initData',
+    value: function _initData() {
+      this.basePadding = 3; //基础值
+      this.currentPage = 1; //当前页面
+      //工具栏的高度
+      this.barHeight = config.launch.pageBar.bottom || Math.round(config.visualSize.height / 17);
+      //设置了padding的top与bottom 所以height需要*2
+      this.baseHeight = this.barHeight - this.basePadding * 2;
+    }
+
+    /**
+     * 获取缩放尺寸
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_getSize',
+    value: function _getSize(width, height) {
+      //根据高度获取缩放比
+      var ratio = this.baseHeight / height;
+      return {
+        width: Math.round(width * ratio),
+        height: this.baseHeight
+      };
+    }
+
+    /**
+     * 获取基础style
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_getBaseStyle',
+    value: function _getBaseStyle(width, height) {
+      var size = this._getSize(width, height);
+      return 'width:' + size.width + 'px;height:' + size.height + 'px';
+    }
+
+    /**
+     * 容器
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_initContainer',
+    value: function _initContainer() {
+      //设置了padding的top与bottom 所以height需要*2
+      var style = 'height:' + this.baseHeight + 'px;padding:' + this.basePadding + 'px 0;';
+      this.container = $('<ul class="xut-global-bar" style="' + style + '"></ul>');
+    }
+
+    /**
+     * 左边区域
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_leftView',
+    value: function _leftView() {
+      var html = '<li class="g-left" style="height:' + this.baseHeight + 'px;">\n          <div><a class="g-dir" style="' + this._getBaseStyle(66, 44) + '"></a></div>\n          <div><a class="g-cover" style="' + this._getBaseStyle(66, 44) + '"></a></div>\n       </li>';
+      this.container.append(String.styleFormat(html));
+    }
+
+    /**
+     * 中间区域，拼接问题
+     * 所以合并到一个li中
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_centerView',
+    value: function _centerView() {
+      var html = '<li class="g-center" style="height:' + this.baseHeight + 'px;line-height:' + this.baseHeight + 'px;">\n         <a class="g-prev" style="' + this._getBaseStyle(109, 44) + '"></a>\n         <div><a class="g-title">' + config.data.shortName + '</a></div>\n         <a class="g-next" style="' + this._getBaseStyle(109, 44) + '"></a>\n       </li>';
+      this.container.append(String.styleFormat(html));
+    }
+
+    /**
+     * 右边区域
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_rightView',
+    value: function _rightView() {
+      var style = 'height:' + this.baseHeight + 'px';
+      var html = '<li class="g-right" style="' + style + '">\n          <div class="g-learn" style="' + style + '"><a class="g-learn-click" style="' + this._getBaseStyle(109, 44) + '"></a></div>\n          <div class="g-work" style="' + style + '"><a class="g-work-click" style="' + this._getBaseStyle(109, 44) + '"></a></div>\n          <div class="g-forum" style="' + style + '"><a class="g-forum-click" style="' + this._getBaseStyle(109, 44) + '"></a></div>\n          <div class="g-page" style="' + style + '">\n            <div style="' + this._getBaseStyle(109, 44) + '">\n              <a class="g-page-current">' + this.currentPage + '</a>\n              <a>' + this.pageTotal + '</a>\n            </div>\n          </div>\n       </li>';
+      this.container.append(String.styleFormat(html));
+    }
+
+    /**
+     * 更新页码
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'updatePointer',
+    value: function updatePointer(_ref) {
+      var parentIndex = _ref.parentIndex;
+
+      ++parentIndex; //从1开始索引，parentIndex默认从0开始
+      if (parentIndex !== undefined && parentIndex !== this.$currentPage) {
+        this.$currentPage = parentIndex;
+        this.pageElement.html(parentIndex);
+      }
+    }
+
+    /**
+     * 销毁
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      $off(this.container);
+      this.$sceneNode = null;
+      this.container = null;
+      this.pageElement = null;
+    }
+  }]);
+  return GlobalBar;
+}();
+
+/**
  *
  * 配置工具栏行为
  *  1.  工具栏类型
@@ -80732,16 +81041,25 @@ function mainScene() {
   //导航
   var navBarHTML = void 0;
   if (navBarWidth || navBarHeight) {
-    navBarHTML = '<div class="xut-nav-bar"\n          style="width:' + navBarWidth + ';\n                 height:' + navBarHeight + 'px;\n                 ' + navBarTop + '\n                 ' + navBarLeft + '\n                 ' + navBarBottom + '\n                 background-color:white;\n                 border-top:1px solid rgba(0,0,0,0.1);\n                 overflow:' + navBaroOverflow + ';">\n    </div>';
+    navBarHTML = '<div class="xut-nav-bar"\n          style="width:' + navBarWidth + ';\n                 height:' + (navBarHeight || 0) + 'px;\n                 ' + navBarTop + '\n                 ' + navBarLeft + '\n                 ' + navBarBottom + '\n                 background-color:white;\n                 border-top:1px solid rgba(0,0,0,0.1);\n                 overflow:' + navBaroOverflow + ';">\n    </div>';
   } else {
     navBarHTML = '<div class="xut-nav-bar"></div>';
   }
 
   //如果启动了双页模式
   //那么可视区的宽度是就是全屏的宽度了，因为有2个页面拼接
-  var width = config.launch.doublePageMode ? config.screenSize.width : visualSize.width;
+  var width = config.launch.doublePageMode ? screenSize.width : visualSize.width;
 
-  return String.styleFormat('<div id="xut-main-scene"\n          style="width:' + width + 'px;\n                 height:' + screenSize.height + 'px;\n                 top:0;\n                 left:' + originalVisualSize.left + 'px;\n                 position:absolute;\n                 z-index:' + sceneController.createIndex() + ';\n                 overflow:hidden;">\n\n        <div id="xut-control-bar" class="xut-control-bar"></div>\n        <ul id="xut-page-container" class="xut-flip"></ul>\n        <ul id="xut-master-container" class="xut-master xut-flip"></ul>\n        ' + navBarHTML + '\n        <div id="xut-tool-tip"></div>\n    </div>');
+  //如果有拼接的页面高度
+  //这边是为秒秒学处理的
+  var style = '';
+  if (config.launch.pageBar && config.launch.pageBar.bottom) {
+    style = 'style="height:' + visualSize.height + 'px;"';
+  }
+
+  //2017.12.4
+  //新增全局工具栏容器
+  return String.styleFormat('<div id="xut-main-scene"\n          style="width:' + width + 'px;\n                 height:' + screenSize.height + 'px;\n                 top:0;\n                 left:' + originalVisualSize.left + 'px;\n                 position:absolute;\n                 z-index:' + sceneController.createIndex() + ';\n                 overflow:hidden;">\n\n        <ul class="xut-page-container xut-flip" ' + style + '></ul>\n        <ul class="xut-master-container xut-master xut-flip" ' + style + '></ul>\n        <div class="xut-control-bar"></div>\n        <div class="xut-tool-tip"></div>\n        ' + navBarHTML + '\n    </div>');
 }
 
 /**
@@ -80764,9 +81082,9 @@ function findContainer($context, id, isMain) {
   return function (pane, parallax) {
     var node;
     if (isMain) {
-      node = '#' + pane;
+      node = '.' + pane;
     } else {
-      node = '#' + parallax + id;
+      node = '.' + parallax + id;
     }
     return $context.find(node)[0];
   };
@@ -80871,6 +81189,7 @@ var SceneFactory = function () {
       _.extend(this, this._initDefaultBar(pageIndex, pageTotal, $sceneNode, seasonId));
 
       this._initMiniBar(pageIndex, pageTotal, $sceneNode);
+      this._initGlobalbar(pageIndex, pageTotal, $sceneNode);
     }
 
     /**
@@ -80929,6 +81248,24 @@ var SceneFactory = function () {
       }
 
       return barConfig;
+    }
+
+    /**
+     * 初始化全局工具栏，秒秒学
+     * 2017.12.4
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_initGlobalbar',
+    value: function _initGlobalbar(pageIndex, pageTotal, $sceneNode) {
+      if (config.launch.pageBar && config.launch.pageBar.type === 'globalBar') {
+        this.globalToolbar = new GlobalBar({
+          $sceneNode: $sceneNode,
+          pageTotal: pageTotal,
+          currentPage: pageIndex + 1
+        });
+      }
     }
 
     /**
@@ -81050,11 +81387,14 @@ var SceneFactory = function () {
        * @return {[type]} [description]
        */
       $$mediator.$bind('updatePage', function () {
+        var _globalToolbar;
+
         for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
           arg[_key] = arguments[_key];
         }
 
         pptBar && pptBar.updatePointer.apply(pptBar, arg);
+        _this3.globalToolbar && (_globalToolbar = _this3.globalToolbar).updatePointer.apply(_globalToolbar, arg);
         _this3._eachMiniBar(function () {
           this.updatePointer.apply(this, arg);
         });
@@ -81208,6 +81548,11 @@ var SceneFactory = function () {
       this._eachMiniBar(function () {
         this.destroy();
       });
+      if (this.globalToolbar) {
+        this.globalToolbar.destroy();
+        this.globalToolbar = null;
+      }
+
       this.$$mediator.miniBar = null;
 
       //销毁当前场景
@@ -82221,7 +82566,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.2;
+Xut.Version = 892.3;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
@@ -82279,7 +82624,7 @@ Xut.Application.Launch = function (option) {
   }
   var setConfig = Xut.Application.setConfig;
   if (setConfig && setConfig.lauchMode === 1) {
-    mixGolbalConfig(setConfig);
+    mixGlobalConfig(setConfig);
     /*当前的launch配置文件，用于横竖切换处理*/
     cacheOptions = [option];
     config.launch = $.extend(true, { launchTime: +new Date() }, option);
@@ -82319,7 +82664,7 @@ setTimeout(function () {
     if (hasLaunch()) {
       return;
     }
-    mixGolbalConfig(setConfig);
+    mixGlobalConfig(setConfig);
     /*保证兼容，不需要判断launch存在，初始空对象*/
     config.launch = {};
     entrance();

@@ -16,7 +16,7 @@ import { setVisualMode } from './set-mode'
 
 //导出其余模式
 export * from './set-mode'
-export {resetBrMode, setHistory }
+export { resetBrMode, setHistory }
 
 /*
   获取真实的配置文件 priority
@@ -30,6 +30,12 @@ export function setLaunch(novelData) {
   /*独立app与全局配置文件*/
   const launch = config.launch
   const global = config.global
+  const postMessage = config.postMessage
+
+  /*通过postMessage的配置重写全局配置文件*/
+  for (let key in postMessage) {
+    global[key] = postMessage[key]
+  }
 
   //////////////////////////////////
   /// brModel命名被修改该了
@@ -59,11 +65,13 @@ export function setLaunch(novelData) {
   setBrType(launch, global)
 
   //global混入到launch中
+  //优先级数据库>launch>postMessage>global
   for (let key in global) {
     if (launch[key] === undefined) {
       launch[key] = global[key]
     }
   }
+
 
   //如果不是浏览器模式
   //强制关闭预加载模式

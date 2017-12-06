@@ -4,7 +4,9 @@
  * 会有通讯跨域的问题
  * 这里统一解决问题的接口
  */
-import { makeJsonPack, $warn } from '../util/index'
+import { makeJsonPack, $warn, mixGlobalConfig } from '../util/index'
+import { config } from '../config/index'
+
 
 /////////////////////////
 ///
@@ -23,6 +25,14 @@ function sendPostMessage(type, data = {}) {
     type: type,
     content: data
   }, '*');
+}
+
+/**
+ * 获取iframe中的配置文件
+ * @return {[type]} [description]
+ */
+export function getIframeConfig() {
+  sendPostMessage('getConfig')
 }
 
 
@@ -86,17 +96,35 @@ export function unBindMessage() {
  * @param {[type]} event [description]
  */
 function handleMessage(event) {
-  if (event.data && event.data.type) {
-    //外部调用内部API处理
-    if (event.data.type === 'api' && event.data.content) {
-      try {
-        makeJsonPack(event.data.content)()
-      } catch (err) {
-        $warn({
-          type: 'api',
-          content: `跨域message接受API出错 ${event.data.content}`
-        })
+
+  if (event.data) {
+    const type = event.data.type
+
+    if (type) {
+      //外部设置配置文件
+      if (type === 'config') {
+        try {
+          Xut.mixin(config.postMessage, JSON.parse(event.data.content))
+        } catch (err) {
+          $warn({
+            type: 'config',
+            content: `跨域message接受config出错 ${event.data.content}`
+          })
+        }
       }
+
+      //外部调用内部API处理
+      if (type === 'api' && event.data.content) {
+        try {
+          makeJsonPack(event.data.content)()
+        } catch (err) {
+          $warn({
+            type: 'api',
+            content: `跨域message接受API出错 ${event.data.content}`
+          })
+        }
+      }
+
     }
   }
 }

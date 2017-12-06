@@ -29,12 +29,11 @@ export default class GlobalBar {
   _init() {
     this._initData()
     this._initContainer()
-    this._dirButton()
-    this._coverButton()
+    this._leftView()
     this._centerView()
     this._rightView()
     this._bindEvent()
-    this.pageElement = this.container.find('.g-page > a:first')
+    this.pageElement = this.container.find('.g-page .g-page-current')
     this.$sceneNode.append(this.container)
   }
 
@@ -47,27 +46,12 @@ export default class GlobalBar {
     $on(this.container, {
       end: function(event) {
         event.stopPropagation()
-
-        let className
-        if (event.target.tagName.toLowerCase() === 'a') {
-          className = event.target.parentNode.className
-        } else {
-          className = event.target.className
-        }
-
-        switch (className) {
+        switch (event.target.className) {
           case "g-cover":
             Xut.View.GotoSlide(1)
             break;
           case "g-dir":
-            Xut.Assist.GlobalDirToggle({
-              open: function() {
-                console.log(1)
-              },
-              close: function() {
-                console.log(2)
-              }
-            })
+            Xut.Assist.GlobalDirToggle()
             break;
           case "g-prev":
             Xut.View.GotoPrevSlide()
@@ -75,17 +59,12 @@ export default class GlobalBar {
           case "g-next":
             Xut.View.GotoNextSlide()
             break;
-          case "g-forum":
-            Xut.Assist.ForumToggle({
-              open: function() {
-                console.log(1)
-              },
-              close: function() {
-                console.log(2)
-              }
-            })
+          case "g-learn-click":
             break;
-          case "g-page":
+          case "g-work-click":
+            break;
+          case "g-forum-click":
+            Xut.Assist.ForumToggle()
             break;
         }
       }
@@ -129,27 +108,21 @@ export default class GlobalBar {
    */
   _initContainer() {
     //设置了padding的top与bottom 所以height需要*2
-    const style = `height:${this.baseHeight}px;padding:${this.basePadding}px 0;`
-    this.container = $(`<ul class="xut-global-bar" style="${style}"></ul>`)
+    const style = `height:${this.barHeight}px;`
+    this.container = $(`<ul class="xut-global-bar"></ul>`)
   }
 
   /**
-   * 目录
-   * @return {[type]} [description]
-   * background-image:url(images/icons/global-bar.png);
-   */
-  _dirButton() {
-    const html = `<li class="g-dir" style="${this._getBaseStyle(66, 44)}"></li>`
-    this.container.append(html)
-  }
-
-  /**
-   * 封面页面
+   * 左边区域
    * @return {[type]} [description]
    */
-  _coverButton() {
-    const html = `<li class="g-cover" style="${this._getBaseStyle(66, 44)}"></li>`
-    this.container.append(html)
+  _leftView(){
+    const html =
+      `<li class="g-left">
+          <div><a class="g-dir"></a></div>
+          <div><a class="g-cover"></a></div>
+       </li>`
+    this.container.append(String.styleFormat(html))
   }
 
   /**
@@ -159,12 +132,10 @@ export default class GlobalBar {
    */
   _centerView() {
     const html =
-      `<li class="g-center" style="height:${this.baseHeight}px;line-height:${this.baseHeight}px;">
-         <a class="g-prev" style="${this._getBaseStyle(59, 44)}"></a>
-         <div>
-            <a class="g-title">${config.data.shortName}</a>
-         </div>
-         <a class="g-next" style="${this._getBaseStyle(59, 44)}"></a>
+      `<li class="g-center">
+         <a class="g-prev"></a>
+         <div><a class="g-title">${config.data.shortName}</a></div>
+         <a class="g-next"></a>
        </li>`
     this.container.append(String.styleFormat(html))
   }
@@ -174,15 +145,14 @@ export default class GlobalBar {
    * @return {[type]} [description]
    */
   _rightView() {
-    const style = `height:${this.baseHeight}px`
     const html =
-      `<li class="g-right" style="${style}">
-          <div class="g-section" style="${style}"><a></a></div>
-          <div class="g-work" style="${style}"><a></a></div>
-          <div class="g-forum" style="${style}"><a></a></div>
-          <div class="g-page" style="${style}">
+      `<li class="g-right">
+          <div class="g-learn"><a class="g-learn-click"></a></div>
+          <div class="g-work"><a class="g-work-click"></a></div>
+          <div class="g-forum"><a class="g-forum-click"></a></div>
+          <div class="g-page">
             <div>
-              <a>${this.currentPage}</a>
+              <a class="g-page-current">${this.currentPage}</a>
               <a>${this.pageTotal}</a>
             </div>
           </div>

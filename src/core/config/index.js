@@ -260,7 +260,9 @@ _.extend(config, {
   /*全局debug配置*/
   debug: improtDebugConfig,
   /*默认全局配置*/
-  global: improtGlobalConfig
+  global: improtGlobalConfig,
+  /*默认的提供postMessage的方式配置*/
+  postMessage:{}
 })
 
 Xut.config = config
