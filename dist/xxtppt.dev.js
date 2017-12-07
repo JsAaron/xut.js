@@ -42786,6 +42786,11 @@ var improtGlobalConfig = {
    *   type:'globalBar'
    *   mode:1/2/3/4/5/6
    *   float:true //是否全局浮动
+   *   button:{
+   *     work   提交作业
+   *     section 下一节
+   *   }
+   *   hasNextSection:是否有下一个ppt  这个给苗苗学使用，是否用来显示原点
    * }
    *
    *
@@ -43307,7 +43312,9 @@ _.extend(config, {
   /*全局debug配置*/
   debug: improtDebugConfig,
   /*默认全局配置*/
-  global: improtGlobalConfig
+  global: improtGlobalConfig,
+  /*默认的提供postMessage的方式配置*/
+  postMessage: {}
 });
 
 Xut.config = config;
@@ -48516,6 +48523,12 @@ function setLaunch(novelData) {
   /*独立app与全局配置文件*/
   var launch = config.launch;
   var global = config.global;
+  var postMessage = config.postMessage;
+
+  /*通过postMessage的配置重写全局配置文件*/
+  for (var key in postMessage) {
+    global[key] = postMessage[key];
+  }
 
   //////////////////////////////////
   /// brModel命名被修改该了
@@ -48529,9 +48542,9 @@ function setLaunch(novelData) {
   }
 
   //debug模式
-  for (var key in global.debug) {
-    if (global.debug[key] !== undefined) {
-      config.debug[key] = global.debug[key];
+  for (var _key in global.debug) {
+    if (global.debug[_key] !== undefined) {
+      config.debug[_key] = global.debug[_key];
     }
   }
 
@@ -48545,9 +48558,10 @@ function setLaunch(novelData) {
   setBrType(launch, global);
 
   //global混入到launch中
-  for (var _key in global) {
-    if (launch[_key] === undefined) {
-      launch[_key] = global[_key];
+  //优先级数据库>launch>postMessage>global
+  for (var _key2 in global) {
+    if (launch[_key2] === undefined) {
+      launch[_key2] = global[_key2];
     }
   }
 
@@ -49180,325 +49194,6 @@ function initAsyn(callback) {
     Xut.plat.supportWebp = state;
     callback();
   });
-}
-
-////////////////////////////////////////////
-///
-/// 修复采用img的图片错误问题
-///   修复错误的图片加载
-///   图片错误了，会先隐藏，然后再去请求一次
-///   如果还是错误，就抛弃，正确就显示出来
-///   queue:{
-///     chpaerId:[1.png,2.png,3.png]
-///     ................
-///   }
-///   特别注意，这里是动态加入的
-///   所以，有可能是边解析边加入新的
-///
-///////////////////////////////////////////
-
-var queue = {};
-var waiting = false;
-
-/**
- * 检测一个chpater中的图片加载是否完成
- * @param  {[type]} chapterIndex [description]
- * @return {[type]}              [description]
- */
-function checkFigure$1(chapterIndex, callback) {
-  var length = queue[chapterIndex].length;
-
-  if (!length) {
-    callback();
-    return;
-  }
-
-  var count = length;
-  var complete = function complete() {
-    if (count === 1) {
-      callback();
-      return;
-    }
-    --count;
-  };
-
-  var data = void 0;
-  while (data = queue[chapterIndex].shift()) {
-    data(complete);
-  }
-}
-
-/*
-  运行队列
-  1.因为queue的对象结构通过chapterId做页面的标记，保存所有每个页面图片的索引
-  2.在这个chapter去检测图片的时候，如果成功了就处理图片显示，然后要删除这个检测的fn
-  3.因为是动态加入的，所以每个chapter检测完毕后，还要根据列表是否有值，在去处理
-  4.最后通过runBatcherQueue在递归一次检测，最终每个chapter是否都处理完毕了
- */
-function runBatcherQueue() {
-  var keys = Object.keys(queue);
-  if (keys.length) {
-    var chapterIndex = keys.shift();
-    if (chapterIndex.length) {
-      checkFigure$1(chapterIndex, function () {
-        /*如果列表没有数据了*/
-        if (!queue[chapterIndex].length) {
-          delete queue[chapterIndex];
-        }
-        /*如果列表还有后续新加入的继续修复当前这个列表*/
-        runBatcherQueue();
-      });
-    } else {
-      delete queue[chapterIndex];
-    }
-  } else {
-    waiting = false;
-  }
-}
-
-/**
- * 修复错误的图片加载
- * @return {[type]} [description]
- */
-function repairImage(node, chapterIndex, src) {
-
-  if (!node) {
-    return;
-  }
-  /*先隐藏错误节点*/
-  node.style.display = "none";
-
-  /*根据页面chpater加入列表*/
-  if (!queue[chapterIndex]) {
-    queue[chapterIndex] = [];
-  }
-
-  /*做一次错误节点的预加载处理*/
-  queue[chapterIndex].push(function (callback) {
-    loadFigure(src, function (data) {
-      /*如果请求成功，修改图片状态*/
-      if (data.state === 'success') {
-        if (node && node.style) {
-          node.style.display = "block";
-        }
-      }
-      node = null;
-      callback();
-    });
-  });
-
-  if (!waiting) {
-    waiting = true;
-    runBatcherQueue();
-  }
-}
-
-/**
- * 清理错误检测的图片
- * @return {[type]} [description]
- */
-function clearRepairImage(chapterIndex) {
-  if (queue && queue[chapterIndex]) {
-    queue[chapterIndex].length = 0;
-    delete queue[chapterIndex];
-  }
-}
-
-/**
- * 读库服务器网址
- * 通过iframe加载本地localhost地址的时候
- * 会有通讯跨域的问题
- * 这里统一解决问题的接口
- */
-/////////////////////////
-///
-/// 发送外部消息
-///
-////////////////////////
-
-
-/**
- * 发送通讯接口
- * @param  {[type]} type [description]
- * @return {[type]}      [description]
- */
-function sendPostMessage(type) {
-  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  return type && window.parent && window.parent.postMessage({
-    type: type,
-    content: data
-  }, '*');
-}
-
-/**
- * 制作PostMessage闭包
- * @return {[type]} [description]
- */
-function getPostMessageFn(type) {
-  if (window.parent && type) {
-    return function (data) {
-      return sendPostMessage(type, data);
-    };
-  }
-}
-
-/**
- * 监控内部的watch，转化成外部的PostMessage
- * @return {[type]} [description]
- */
-function watchPostMessage() {
-  //秒秒学，完成通知
-  Xut.Application.Watch('complete', function () {
-    sendPostMessage('complete');
-  });
-
-  //秒秒学收集用户信息通知
-  Xut.Application.Watch('trackCode', function (type, options) {
-    sendPostMessage(type, options);
-  });
-}
-
-function unWatchPostMessage() {
-  Xut.Application.unWatch('complete');
-  Xut.Application.unWatch('trackCode');
-}
-
-/////////////////////////
-///
-/// 接收外部消息后处理
-///
-////////////////////////
-
-
-/**
- * 监听跨域的外部事件
- * 秒秒学使用
- * 2017.11.28
- */
-function bindMessage() {
-  window.addEventListener('message', handleMessage, false);
-}
-
-function unBindMessage() {
-  window.removeEventListener('message', handleMessage, false);
-}
-
-/**
- * 接收外部通讯，设置
- * @param {[type]} event [description]
- */
-function handleMessage(event) {
-  if (event.data && event.data.type) {
-    //外部调用内部API处理
-    if (event.data.type === 'api' && event.data.content) {
-      try {
-        makeJsonPack(event.data.content)();
-      } catch (err) {
-        $warn({
-          type: 'api',
-          content: '\u8DE8\u57DFmessage\u63A5\u53D7API\u51FA\u9519 ' + event.data.content
-        });
-      }
-    }
-  }
-}
-
-/////////////////////////////
-/// 初始化页面默认行为
-/////////////////////////////
-
-/**
- * 特殊的一个方法，用来修正图片资源错误的
- * dom中的事件onerror触发，所以直接
- * @return {[type]} [description]
- */
-window.fixNodeError = function (type, node, chapterIndex, src) {
-  if (type === 'image') {
-    repairImage(node, chapterIndex, src);
-  }
-};
-
-//只初始一次
-//横竖切换要判断
-var onceBind = false;
-
-/**
- * 全局事件
- * 只有完全退出整个应用
- * 或者退出iframe的情况下才使用
- *
- * 只是动态切换应用
- * 或者横竖切换不销毁
- * @return {[type]} [description]
- */
-function initGlobalEvent() {
-  if (!onceBind) {
-
-    onceBind = true;
-
-    watchPostMessage();
-    bindMessage();
-
-    //禁止全局的缩放处理
-    $('body').on('touchmove', function (event) {
-      event.preventDefault && event.preventDefault();
-    });
-
-    /*防止快速刷新，会触发Original时间*/
-    setTimeout(function () {
-      /*Home键音频动作处理*/
-      $(document).on('visibilitychange', function (event) {
-        /*home 后台*/
-        if (document.visibilityState === 'hidden') {
-          Xut.Application.Original();
-        } else {
-          /*如果不是嵌套iframe，激活*/
-          if (!window.GLOBALIFRAME) {
-            Xut.Application.Activate();
-          }
-        }
-      });
-    }, 1500);
-
-    if (Xut.plat.isBrowser) {
-
-      //桌面鼠标控制翻页
-      $(document).keyup(function (event) {
-        switch (event.keyCode) {
-          case 37:
-            Xut.View.GotoPrevSlide();
-            break;
-          case 39:
-            Xut.View.GotoNextSlide();
-            break;
-        }
-      });
-
-      /*
-      启动代码用户操作跟踪
-      1、先不判断，一律按关闭提交（要有延迟）。
-      2、如果是刷新，取消之前的延迟，提交刷新提示。
-      */
-      $(window).on('beforeunload', function () {
-        config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
-      });
-    }
-  }
-}
-
-/*
-移除全局绑定
- */
-function clearGlobalEvent() {
-  if (onceBind) {
-    unBindMessage();
-    unWatchPostMessage();
-    $('body').off(); //touchmove 禁止全局的缩放处理
-    $(document).off(); //keyup 左右按钮
-    $(window).off(); //beforeunload,orientationchange
-    onceBind = false;
-  }
 }
 
 //动作标示
@@ -58718,44 +58413,17 @@ var Powepoint = function () {
   }
 
   /**
-   * 过滤出论坛脚本
-   * @return {[type]} [description]
-   * Xut.Assist.ForumOpen();
-   * Xut.Assist.ForumClose();
+   * 解析脚本代码
+   * 包装能函数
    */
 
 
   createClass(Powepoint, [{
-    key: '_filterCode',
-    value: function _filterCode(code) {
-      //过滤出论坛的脚本
-      //因为翻页需要关闭
-      //母版上不会操作复位，需要手动过滤
-      if (this.pageType === 'master') {
-        //打开
-        if (/ForumOpen/ig.test(code)) {
-          this.forumOpen = true;
-        }
-        //关闭
-        if (/ForumClose/ig.test(code)) {
-          this.forumClose = true;
-        }
-      }
-    }
-
-    /**
-     * 解析脚本代码
-     * 包装能函数
-     */
-
-  }, {
     key: '_parseCode',
     value: function _parseCode(code1, code2) {
       if (code1 && code1.length > 0) {
-        this._filterCode(code1);
         return makeJsonPack(code1);
       } else if (code2 && code2.length > 0) {
-        this._filterCode(code2);
         return makeJsonPack(code2);
       }
     }
@@ -65407,14 +65075,14 @@ var allowNext$1 = allowNext();
 提供给auto运行动作的延时触发处理
 需要注意快速翻页要立马清理，因为定时器在延后触发
  */
-var queue$1 = {};
+var queue = {};
 var timer$1 = null;
 
 /*
 重设状态
  */
 function resetBatcherState() {
-  queue$1 = {};
+  queue = {};
   if (timer$1) {
     clearTimeout(timer$1);
     timer$1 = null;
@@ -65424,9 +65092,9 @@ function resetBatcherState() {
 /*
   运行队列
  */
-function runBatcherQueue$1() {
-  for (var key in queue$1) {
-    var watchers = queue$1[key];
+function runBatcherQueue() {
+  for (var key in queue) {
+    var watchers = queue[key];
     if (watchers.length) {
       var wather = void 0;
       while (wather = watchers.shift()) {
@@ -65442,21 +65110,21 @@ function runBatcherQueue$1() {
  */
 function pushWatcher(pageIndex, watcher) {
   //如果存在了
-  if (queue$1[pageIndex]) {
-    queue$1[pageIndex].push(watcher);
+  if (queue[pageIndex]) {
+    queue[pageIndex].push(watcher);
   } else {
     //如果找不到
     //并且存在了上一个处理，清空
-    if (Object.keys(queue$1).length) {
+    if (Object.keys(queue).length) {
       resetBatcherState();
     }
-    queue$1[pageIndex] = [watcher];
+    queue[pageIndex] = [watcher];
   }
 
   if (!timer$1) {
     //只第一次调用开始执行
     timer$1 = setTimeout(function () {
-      runBatcherQueue$1();
+      runBatcherQueue();
       resetBatcherState();
     }, 500);
   }
@@ -72707,6 +72375,128 @@ var dataExternal = function (baseProto) {
   };
 };
 
+////////////////////////////////////////////
+///
+/// 修复采用img的图片错误问题
+///   修复错误的图片加载
+///   图片错误了，会先隐藏，然后再去请求一次
+///   如果还是错误，就抛弃，正确就显示出来
+///   queue:{
+///     chpaerId:[1.png,2.png,3.png]
+///     ................
+///   }
+///   特别注意，这里是动态加入的
+///   所以，有可能是边解析边加入新的
+///
+///////////////////////////////////////////
+
+var queue$1 = {};
+var waiting = false;
+
+/**
+ * 检测一个chpater中的图片加载是否完成
+ * @param  {[type]} chapterIndex [description]
+ * @return {[type]}              [description]
+ */
+function checkFigure$1(chapterIndex, callback) {
+  var length = queue$1[chapterIndex].length;
+
+  if (!length) {
+    callback();
+    return;
+  }
+
+  var count = length;
+  var complete = function complete() {
+    if (count === 1) {
+      callback();
+      return;
+    }
+    --count;
+  };
+
+  var data = void 0;
+  while (data = queue$1[chapterIndex].shift()) {
+    data(complete);
+  }
+}
+
+/*
+  运行队列
+  1.因为queue的对象结构通过chapterId做页面的标记，保存所有每个页面图片的索引
+  2.在这个chapter去检测图片的时候，如果成功了就处理图片显示，然后要删除这个检测的fn
+  3.因为是动态加入的，所以每个chapter检测完毕后，还要根据列表是否有值，在去处理
+  4.最后通过runBatcherQueue在递归一次检测，最终每个chapter是否都处理完毕了
+ */
+function runBatcherQueue$1() {
+  var keys = Object.keys(queue$1);
+  if (keys.length) {
+    var chapterIndex = keys.shift();
+    if (chapterIndex.length) {
+      checkFigure$1(chapterIndex, function () {
+        /*如果列表没有数据了*/
+        if (!queue$1[chapterIndex].length) {
+          delete queue$1[chapterIndex];
+        }
+        /*如果列表还有后续新加入的继续修复当前这个列表*/
+        runBatcherQueue$1();
+      });
+    } else {
+      delete queue$1[chapterIndex];
+    }
+  } else {
+    waiting = false;
+  }
+}
+
+/**
+ * 修复错误的图片加载
+ * @return {[type]} [description]
+ */
+function repairImage(node, chapterIndex, src) {
+
+  if (!node) {
+    return;
+  }
+  /*先隐藏错误节点*/
+  node.style.display = "none";
+
+  /*根据页面chpater加入列表*/
+  if (!queue$1[chapterIndex]) {
+    queue$1[chapterIndex] = [];
+  }
+
+  /*做一次错误节点的预加载处理*/
+  queue$1[chapterIndex].push(function (callback) {
+    loadFigure(src, function (data) {
+      /*如果请求成功，修改图片状态*/
+      if (data.state === 'success') {
+        if (node && node.style) {
+          node.style.display = "block";
+        }
+      }
+      node = null;
+      callback();
+    });
+  });
+
+  if (!waiting) {
+    waiting = true;
+    runBatcherQueue$1();
+  }
+}
+
+/**
+ * 清理错误检测的图片
+ * @return {[type]} [description]
+ */
+function clearRepairImage(chapterIndex) {
+  if (queue$1 && queue$1[chapterIndex]) {
+    queue$1[chapterIndex].length = 0;
+    delete queue$1[chapterIndex];
+  }
+}
+
 var destroy$1 = function (baseProto) {
 
   /**
@@ -75539,7 +75329,7 @@ var Scheduler = function () {
         //秒秒学的单独处理
         //在iframe外部加了自己的显示区域
         //翻页需要关闭
-        Xut.Assist.ForumClose();
+        Xut.Assist.GlobalForumClose();
         Xut.Assist.GlobalDirClose();
 
         _this.pageMgr.suspend(front, middle, back, stop);
@@ -76518,6 +76308,138 @@ function extendView($$mediator, access, $$globalSwiper) {
   };
 }
 
+/**
+ * 读库服务器网址
+ * 通过iframe加载本地localhost地址的时候
+ * 会有通讯跨域的问题
+ * 这里统一解决问题的接口
+ */
+/////////////////////////
+///
+/// 发送外部消息
+///
+////////////////////////
+
+
+/**
+ * 发送通讯接口
+ * @param  {[type]} type [description]
+ * @return {[type]}      [description]
+ */
+function sendPostMessage(type) {
+  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  return type && window.parent && window.parent.postMessage({
+    type: type,
+    content: data
+  }, '*');
+}
+
+/**
+ * 获取iframe中的配置文件
+ * @return {[type]} [description]
+ */
+
+
+/**
+ * 制作PostMessage闭包
+ * @return {[type]} [description]
+ */
+function getPostMessageFn(type) {
+  if (window.parent && type) {
+    return function (data) {
+      return sendPostMessage(type, data);
+    };
+  }
+}
+
+/**
+ * 监控内部的watch，转化成外部的PostMessage
+ * @return {[type]} [description]
+ */
+function watchPostMessage() {
+  //秒秒学，完成通知
+  Xut.Application.Watch('complete', function () {
+    sendPostMessage('complete');
+  });
+
+  //秒秒学收集用户信息通知
+  Xut.Application.Watch('trackCode', function (type, options) {
+    sendPostMessage(type, options);
+  });
+}
+
+function unWatchPostMessage() {
+  Xut.Application.unWatch('complete');
+  Xut.Application.unWatch('trackCode');
+}
+
+/////////////////////////
+///
+/// 接收外部消息后处理
+///
+////////////////////////
+
+
+/**
+ * 监听跨域的外部事件
+ * 秒秒学使用
+ * 2017.11.28
+ */
+function bindMessage() {
+  window.addEventListener('message', handleMessage, false);
+}
+
+function unBindMessage() {
+  window.removeEventListener('message', handleMessage, false);
+}
+
+/**
+ * 接收外部通讯，设置
+ * @param {[type]} event [description]
+ */
+function handleMessage(event) {
+
+  if (event.data) {
+    var type = event.data.type;
+
+    if (type) {
+
+      //外部设置配置文件
+      if (type === 'config') {
+        try {
+          Xut.mixin(config.postMessage, JSON.parse(event.data.content));
+        } catch (err) {
+          $warn({
+            type: 'config',
+            content: '\u8DE8\u57DFmessage\u63A5\u53D7config\u51FA\u9519 ' + event.data.content
+          });
+        }
+      }
+
+      //圆点状态
+      if (type === 'forumDot') {
+        Xut.Application.Notify('globalForumDot', JSON.parse(event.data.content));
+      }
+      if (type === 'commitWorkDot') {
+        Xut.Application.Notify('globalCommitWorkDot', JSON.parse(event.data.content));
+      }
+
+      //外部调用内部API处理
+      if (type === 'api' && event.data.content) {
+        try {
+          makeJsonPack(event.data.content)();
+        } catch (err) {
+          $warn({
+            type: 'api',
+            content: '\u8DE8\u57DFmessage\u63A5\u53D7API\u51FA\u9519 ' + event.data.content
+          });
+        }
+      }
+    }
+  }
+}
+
 /********************************************
  * 场景API
  * 辅助对象
@@ -76526,7 +76448,7 @@ function extendView($$mediator, access, $$globalSwiper) {
 function extendAssist(access, $$globalSwiper) {
 
   //========================
-  //  讨论区
+  //  秒秒学嵌套Iframe 讨论区
   //========================
 
   /**
@@ -76556,7 +76478,7 @@ function extendAssist(access, $$globalSwiper) {
    * 针对秒秒学的api
    * 打开讨论区
    */
-  Xut.Assist.ForumOpen = function (callback) {
+  Xut.Assist.GlobalForumOpen = function (callback) {
     return setForum(callback, getPostMessageFn('forumOpen'), true);
   };
 
@@ -76564,8 +76486,21 @@ function extendAssist(access, $$globalSwiper) {
    * 针对秒秒学的api
    * 关闭讨论区
    */
-  Xut.Assist.ForumClose = function (callback) {
+  Xut.Assist.GlobalForumClose = function (callback) {
     return setForum(callback, getPostMessageFn('forumClose'), false);
+  };
+
+  /**
+   * 发送圆点状态请求
+   * type
+   *   forumDot
+   *   commitWorkDot
+   */
+  Xut.Assist.RequestDot = function (type, pageIndex) {
+    var fn = getPostMessageFn(type);
+    if (fn) {
+      fn({ pageIndex: pageIndex });
+    }
   };
 
   /**
@@ -76573,27 +76508,28 @@ function extendAssist(access, $$globalSwiper) {
    * @param {[type]} options.open  [description]
    * @param {[type]} options.close [description]
    */
-  Xut.Assist.ForumToggle = function (_ref) {
-    var open = _ref.open,
+  Xut.Assist.GlobalForumToggle = function () {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        open = _ref.open,
         close = _ref.close;
 
     if (forumStatus) {
-      Xut.Assist.ForumClose(close);
+      Xut.Assist.GlobalForumClose(close);
     } else {
-      Xut.Assist.ForumOpen(open);
+      Xut.Assist.GlobalForumOpen(open);
     }
   };
 
-  //========================
-  //  全局工具栏目录
-  //========================
+  //===============================
+  //  秒秒学嵌套Iframe 全局工具栏目录
+  //===============================
 
   var globalDirStatus = false;
 
   function setBarDir(callback, fn, state) {
     if (fn && globalDirStatus !== state) {
       //从1开始算
-      fn({ pageIndex: Xut.Presentation.GetPageIndex() + 1 });
+      fn();
       globalDirStatus = state;
       callback && callback();
     }
@@ -76604,7 +76540,7 @@ function extendAssist(access, $$globalSwiper) {
    * @return {[type]} [description]
    */
   Xut.Assist.GlobalDirOpen = function (callback) {
-    return setBarDir(callback, getPostMessageFn('globalDirOpen'), true);
+    return setBarDir(callback, getPostMessageFn('dirOpen'), true);
   };
 
   /**
@@ -76612,14 +76548,15 @@ function extendAssist(access, $$globalSwiper) {
    * @return {[type]} [description]
    */
   Xut.Assist.GlobalDirClose = function (callback) {
-    return setBarDir(callback, getPostMessageFn('globalDirClose'), false);
+    return setBarDir(callback, getPostMessageFn('dirClose'), false);
   };
 
   /**
    * 自动切换
    */
-  Xut.Assist.GlobalDirToggle = function (_ref2) {
-    var open = _ref2.open,
+  Xut.Assist.GlobalDirToggle = function () {
+    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        open = _ref2.open,
         close = _ref2.close;
 
     if (globalDirStatus) {
@@ -76629,8 +76566,18 @@ function extendAssist(access, $$globalSwiper) {
     }
   };
 
+  //==========================
+  //  秒秒学嵌套Iframe 继续学习
+  //==========================
+  Xut.Assist.GlobalKeepLearn = function () {
+    var fn = getPostMessageFn('keepLearn');
+    if (fn) {
+      fn();
+    }
+  };
+
   //========================
-  //  答题卡
+  // 秒秒学嵌套Iframe  答题卡
   //========================
 
   /**
@@ -80740,10 +80687,17 @@ function MiniBar() {
  */
 
 var GlobalBar = function () {
-  function GlobalBar(options) {
+  function GlobalBar() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        $sceneNode = _ref.$sceneNode,
+        pageTotal = _ref.pageTotal,
+        currentPage = _ref.currentPage;
+
     classCallCheck(this, GlobalBar);
 
-    _.extend(this, options);
+    this.$sceneNode = $sceneNode;
+    this.pageTotal = pageTotal;
+    this.currentPage = currentPage;
     this._init();
   }
 
@@ -80769,14 +80723,61 @@ var GlobalBar = function () {
     key: '_bindEvent',
     value: function _bindEvent() {
       var self = this;
+
+      /**
+       * 设置小圆点的变化
+       */
+      function setDot(className) {
+        //通过接收外部的状态
+        //修改本身的圆点
+        //data.dot /show /hide
+        var dotStatus = 'hide'; //默认隐藏
+        var element = self.container.find(className);
+        return function (pageIndex, newState, className) {
+          //只处理当前页面
+          if (pageIndex && pageIndex == self.currentPage) {
+            if (newState && newState !== dotStatus) {
+              if (newState === 'show') {
+                element.removeClass(className + '-defalut');
+                element.addClass(className + '-message');
+              }
+              if (newState === 'hide') {
+                element.removeClass(className + '-message');
+                element.addClass(className + '-defalut');
+              }
+              dotStatus = newState; //更新状态
+            }
+          }
+        };
+      }
+
+      //如果配置了答题讨论
+      //才提供可更新
+      if (this.bottomConfig && this.bottomConfig.forum) {
+        var updateDot = setDot('.g-forum-click');
+        Xut.Application.Watch('globalForumDot', function (data) {
+          updateDot(data.pageIndex, data.dot, 'forum');
+        });
+      }
+
+      //提交作业
+      if (this.bottomConfig && this.bottomConfig.commitWork) {
+        var _updateDot = setDot('.g-work-click');
+        Xut.Application.Watch('globalCommitWorkDot', function (data) {
+          _updateDot(data.pageIndex, data.dot, 'commitWork');
+        });
+      }
+
       $on(this.container, {
         end: function end(event) {
           event.stopPropagation();
           switch (event.target.className) {
             case "g-cover":
+              //回主页
               Xut.View.GotoSlide(1);
               break;
             case "g-dir":
+              //打开目录
               Xut.Assist.GlobalDirToggle();
               break;
             case "g-prev":
@@ -80786,11 +80787,15 @@ var GlobalBar = function () {
               Xut.View.GotoNextSlide();
               break;
             case "g-learn-click":
+              //继续学习
+              Xut.Assist.GlobalKeepLearn();
               break;
             case "g-work-click":
+              //提交作业
               break;
             case "g-forum-click":
-              Xut.Assist.ForumToggle();
+              //答题讨论
+              Xut.Assist.GlobalForumToggle();
               break;
           }
         }
@@ -80799,40 +80804,9 @@ var GlobalBar = function () {
   }, {
     key: '_initData',
     value: function _initData() {
-      this.basePadding = 3; //基础值
-      this.currentPage = 1; //当前页面
+      this.learnButtonClassName = ''; //学习按钮的样式
       //工具栏的高度
       this.barHeight = config.launch.pageBar.bottom || Math.round(config.visualSize.height / 17);
-      //设置了padding的top与bottom 所以height需要*2
-      this.baseHeight = this.barHeight - this.basePadding * 2;
-    }
-
-    /**
-     * 获取缩放尺寸
-     * @return {[type]} [description]
-     */
-
-  }, {
-    key: '_getSize',
-    value: function _getSize(width, height) {
-      //根据高度获取缩放比
-      var ratio = this.baseHeight / height;
-      return {
-        width: Math.round(width * ratio),
-        height: this.baseHeight
-      };
-    }
-
-    /**
-     * 获取基础style
-     * @return {[type]} [description]
-     */
-
-  }, {
-    key: '_getBaseStyle',
-    value: function _getBaseStyle(width, height) {
-      var size = this._getSize(width, height);
-      return 'width:' + size.width + 'px;height:' + size.height + 'px';
     }
 
     /**
@@ -80843,9 +80817,7 @@ var GlobalBar = function () {
   }, {
     key: '_initContainer',
     value: function _initContainer() {
-      //设置了padding的top与bottom 所以height需要*2
-      var style = 'height:' + this.baseHeight + 'px;padding:' + this.basePadding + 'px 0;';
-      this.container = $('<ul class="xut-global-bar" style="' + style + '"></ul>');
+      this.container = $('<ul class="xut-global-bar"></ul>');
     }
 
     /**
@@ -80856,7 +80828,7 @@ var GlobalBar = function () {
   }, {
     key: '_leftView',
     value: function _leftView() {
-      var html = '<li class="g-left" style="height:' + this.baseHeight + 'px;">\n          <div><a class="g-dir" style="' + this._getBaseStyle(66, 44) + '"></a></div>\n          <div><a class="g-cover" style="' + this._getBaseStyle(66, 44) + '"></a></div>\n       </li>';
+      var html = '<li class="g-left">\n          <div><a class="g-dir"></a></div>\n          <div><a class="g-cover"></a></div>\n       </li>';
       this.container.append(String.styleFormat(html));
     }
 
@@ -80869,8 +80841,40 @@ var GlobalBar = function () {
   }, {
     key: '_centerView',
     value: function _centerView() {
-      var html = '<li class="g-center" style="height:' + this.baseHeight + 'px;line-height:' + this.baseHeight + 'px;">\n         <a class="g-prev" style="' + this._getBaseStyle(109, 44) + '"></a>\n         <div><a class="g-title">' + config.data.shortName + '</a></div>\n         <a class="g-next" style="' + this._getBaseStyle(109, 44) + '"></a>\n       </li>';
+      var html = '<li class="g-center">\n         <a class="g-prev"></a>\n         <div><a class="g-title">' + config.data.shortName + '</a></div>\n         <a class="g-next"></a>\n       </li>';
       this.container.append(String.styleFormat(html));
+    }
+
+    /**
+     * 获取学习按钮的状态
+     */
+
+  }, {
+    key: '_getLearnButtonClassName',
+    value: function _getLearnButtonClassName() {
+      //如果是最后一页或倒数第二页，允许点击
+      if (this.currentPage >= this.pageTotal - 1) {
+        return 'on-click';
+      }
+      return 'no-click';
+    }
+
+    /**
+     * 设置学习按钮
+     */
+
+  }, {
+    key: '_setLearnButton',
+    value: function _setLearnButton() {
+      //如果状态不对，就需要重新设置
+      var className = this._getLearnButtonClassName();
+      if (className !== this.learnButtonClassName) {
+        var element = this.container.find('.g-learn-click');
+        //移除旧样式 增加新的
+        element.removeClass(this.learnButtonClassName);
+        element.addClass(className);
+        this.learnButtonClassName = className;
+      }
     }
 
     /**
@@ -80881,8 +80885,45 @@ var GlobalBar = function () {
   }, {
     key: '_rightView',
     value: function _rightView() {
-      var style = 'height:' + this.baseHeight + 'px';
-      var html = '<li class="g-right" style="' + style + '">\n          <div class="g-learn" style="' + style + '"><a class="g-learn-click" style="' + this._getBaseStyle(109, 44) + '"></a></div>\n          <div class="g-work" style="' + style + '"><a class="g-work-click" style="' + this._getBaseStyle(109, 44) + '"></a></div>\n          <div class="g-forum" style="' + style + '"><a class="g-forum-click" style="' + this._getBaseStyle(109, 44) + '"></a></div>\n          <div class="g-page" style="' + style + '">\n            <div style="' + this._getBaseStyle(109, 44) + '">\n              <a class="g-page-current">' + this.currentPage + '</a>\n              <a>' + this.pageTotal + '</a>\n            </div>\n          </div>\n       </li>';
+      //根据iframe的配置，确定是否显示继续学习
+      //如果没有则占空位
+      var button = this.bottomConfig = config.launch.pageBar && config.launch.pageBar.button;
+
+      var goLearnHtml = '';
+      var commitWorkHtml = '';
+      var forumHTML = '';
+
+      if (button) {
+        //下一节，继续学习
+        if (button.keepLearn) {
+          var getLearn = function getLearn(clickClass) {
+            return '<div class="g-learn"><a class="g-learn-click ' + clickClass + '"></a></div>';
+          };
+          //如果是最后一页或倒数第二页，允许点击
+
+
+          if (this._getLearnButtonClassName() === 'on-click') {
+            this.learnButtonClassName = 'on-click';
+            goLearnHtml = getLearn('on-click');
+          } else {
+            this.learnButtonClassName = 'no-click';
+            goLearnHtml = getLearn('no-click');
+          }
+        }
+
+        //提交作业
+        if (button.commitWork) {
+          //commitWork-defalut commitWork-message
+          commitWorkHtml = '<div class="g-work"><a class="g-work-click commitWork-defalut"></a></div>';
+        }
+
+        //答题讨论
+        if (button.forum) {
+          forumHTML = '<div class="g-forum"><a class="g-forum-click forum-defalut"></a></div>';
+        }
+      }
+
+      var html = '<li class="g-right">\n          <div class="g-page">\n            <div>\n              <a class="g-page-current">' + this.currentPage + '</a>\n              <a>' + this.pageTotal + '</a>\n            </div>\n          </div>\n          ' + forumHTML + '\n          ' + commitWorkHtml + '\n          ' + goLearnHtml + '\n       </li>';
       this.container.append(String.styleFormat(html));
     }
 
@@ -80893,13 +80934,21 @@ var GlobalBar = function () {
 
   }, {
     key: 'updatePointer',
-    value: function updatePointer(_ref) {
-      var parentIndex = _ref.parentIndex;
+    value: function updatePointer(_ref2) {
+      var parentIndex = _ref2.parentIndex;
 
       ++parentIndex; //从1开始索引，parentIndex默认从0开始
-      if (parentIndex !== undefined && parentIndex !== this.$currentPage) {
-        this.$currentPage = parentIndex;
+      if (parentIndex !== undefined && parentIndex !== this.currentPage) {
+        this.currentPage = parentIndex;
         this.pageElement.html(parentIndex);
+        this._setLearnButton();
+      }
+      //圆点状态请求
+      if (this.bottomConfig.forum) {
+        Xut.Assist.RequestDot('forumDot', this.currentPage);
+      }
+      if (this.bottomConfig.commitWork) {
+        Xut.Assist.RequestDot('commitWorkDot', this.currentPage);
       }
     }
 
@@ -80911,6 +80960,8 @@ var GlobalBar = function () {
   }, {
     key: 'destroy',
     value: function destroy() {
+      Xut.Application.unWatch('globalForumDot');
+      Xut.Application.unWatch('globalCommitWorkDot');
       $off(this.container);
       this.$sceneNode = null;
       this.container = null;
@@ -82004,6 +82055,103 @@ function initContents() {
   };
 }
 
+/////////////////////////////
+/// 初始化页面默认行为
+/////////////////////////////
+
+/**
+ * 特殊的一个方法，用来修正图片资源错误的
+ * dom中的事件onerror触发，所以直接
+ * @return {[type]} [description]
+ */
+window.fixNodeError = function (type, node, chapterIndex, src) {
+  if (type === 'image') {
+    repairImage(node, chapterIndex, src);
+  }
+};
+
+//只初始一次
+//横竖切换要判断
+var onceBind = false;
+
+/**
+ * 全局事件
+ * 只有完全退出整个应用
+ * 或者退出iframe的情况下才使用
+ *
+ * 只是动态切换应用
+ * 或者横竖切换不销毁
+ * @return {[type]} [description]
+ */
+function initGlobalEvent() {
+  if (!onceBind) {
+
+    onceBind = true;
+
+    watchPostMessage();
+    bindMessage();
+
+    //禁止全局的缩放处理
+    $('body').on('touchmove', function (event) {
+      event.preventDefault && event.preventDefault();
+    });
+
+    /*防止快速刷新，会触发Original时间*/
+    setTimeout(function () {
+      /*Home键音频动作处理*/
+      $(document).on('visibilitychange', function (event) {
+        /*home 后台*/
+        if (document.visibilityState === 'hidden') {
+          Xut.Application.Original();
+        } else {
+          /*如果不是嵌套iframe，激活*/
+          if (!window.GLOBALIFRAME) {
+            Xut.Application.Activate();
+          }
+        }
+      });
+    }, 1500);
+
+    if (Xut.plat.isBrowser) {
+
+      //桌面鼠标控制翻页
+      $(document).keyup(function (event) {
+        switch (event.keyCode) {
+          case 37:
+            Xut.View.GotoPrevSlide();
+            break;
+          case 39:
+            Xut.View.GotoNextSlide();
+            break;
+        }
+      });
+
+      /*
+      启动代码用户操作跟踪
+      1、先不判断，一律按关闭提交（要有延迟）。
+      2、如果是刷新，取消之前的延迟，提交刷新提示。
+      */
+      $(window).on('beforeunload', function () {
+        config.sendTrackCode('exit', { time: +new Date() - config.launch.launchTime });
+      });
+    }
+  }
+}
+
+/*
+移除全局绑定
+ */
+function clearGlobalEvent() {
+  if (onceBind) {
+    unBindMessage();
+    unWatchPostMessage();
+    $('body').off(); //touchmove 禁止全局的缩放处理
+    $(document).off(); //keyup 左右按钮
+    $(window).off(); //beforeunload,orientationchange
+    onceBind = false;
+  }
+}
+
 /**
  * 销毁缓存
  */
@@ -82445,11 +82593,17 @@ initAudio();
 initVideo();
 initGlobalAPI();
 
+initGlobalEvent();
+
 function initApp$1(callback) {
   /*针对异步的代码以前检测出来*/
   initAsyn(function () {
-    //全局的一些事件处理
-    initGlobalEvent();
+    if (window.parent) {
+      //读库上iframe跨域报错处理
+      //一个服务器域，一个是本地域，所以parent无法访问了
+      //通过一个定时器延迟，等待第一次config.postMessage的配置
+      return setTimeout(callback, 0);
+    }
     callback();
   });
 }

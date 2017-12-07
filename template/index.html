@@ -31,7 +31,7 @@ Xut.Application.setConfig = {
   preload: false,
   visualMode: 1,
   // platform: 'mini',
-  historyMode: false,
+  historyMode: true,
   launchAnim: false,
   // convert: 'svg',
 
@@ -63,7 +63,11 @@ Xut.Application.setConfig = {
   // doublePageMode: false //双页模式
   // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
   pageBar: {
-    type:'globalBar'
+    type:'globalBar',
+    button:{
+      commitWork:true,
+      keepLearn:true
+    }
     // float:true
     // type: ['scrollbar', 'digital']
     // direction:''

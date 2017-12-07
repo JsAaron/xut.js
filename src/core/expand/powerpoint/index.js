@@ -112,27 +112,6 @@ export default class Powepoint {
 
   }
 
-  /**
-   * 过滤出论坛脚本
-   * @return {[type]} [description]
-   * Xut.Assist.ForumOpen();
-   * Xut.Assist.ForumClose();
-   */
-  _filterCode(code) {
-    //过滤出论坛的脚本
-    //因为翻页需要关闭
-    //母版上不会操作复位，需要手动过滤
-    if (this.pageType === 'master') {
-      //打开
-      if (/ForumOpen/ig.test(code)) {
-        this.forumOpen = true
-      }
-      //关闭
-      if (/ForumClose/ig.test(code)) {
-        this.forumClose = true
-      }
-    }
-  }
 
   /**
    * 解析脚本代码
@@ -140,10 +119,8 @@ export default class Powepoint {
    */
   _parseCode(code1, code2) {
     if (code1 && code1.length > 0) {
-      this._filterCode(code1)
       return makeJsonPack(code1)
     } else if (code2 && code2.length > 0) {
-      this._filterCode(code2)
       return makeJsonPack(code2)
     }
   }

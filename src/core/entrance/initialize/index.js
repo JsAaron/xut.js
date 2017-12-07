@@ -22,14 +22,10 @@ export default function initApp(callback) {
   /*针对异步的代码以前检测出来*/
   initAsyn(() => {
     if (window.parent) {
-      try {
-        window.parent['abc']
-      } catch (err) {
-        //读库上iframe跨域报错处理
-        //一个服务器域，一个是本地域，所以parent无法访问了
-        //通过一个定时器延迟，等待第一次config.postMessage的配置
-        return setTimeout(callback, 0)
-      }
+      //读库上iframe跨域报错处理
+      //一个服务器域，一个是本地域，所以parent无法访问了
+      //通过一个定时器延迟，等待第一次config.postMessage的配置
+      return setTimeout(callback, 0)
     }
     callback()
   })

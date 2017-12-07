@@ -10,7 +10,7 @@ export function extendAssist(access, $$globalSwiper) {
 
 
   //========================
-  //  讨论区
+  //  秒秒学嵌套Iframe 讨论区
   //========================
 
   /**
@@ -40,41 +40,55 @@ export function extendAssist(access, $$globalSwiper) {
    * 针对秒秒学的api
    * 打开讨论区
    */
-  Xut.Assist.ForumOpen = (callback) => setForum(callback, getPostMessageFn('forumOpen'), true)
+  Xut.Assist.GlobalForumOpen = (callback) => setForum(callback, getPostMessageFn('forumOpen'), true)
 
   /**
    * 针对秒秒学的api
    * 关闭讨论区
    */
-  Xut.Assist.ForumClose = (callback) => setForum(callback, getPostMessageFn('forumClose'), false)
+  Xut.Assist.GlobalForumClose = (callback) => setForum(callback, getPostMessageFn('forumClose'), false)
+
+
+  /**
+   * 发送圆点状态请求
+   * type
+   *   forumDot
+   *   commitWorkDot
+   */
+  Xut.Assist.RequestDot = function(type, pageIndex) {
+    const fn = getPostMessageFn(type)
+    if (fn) {
+      fn({ pageIndex })
+    }
+  }
 
   /**
    * 讨论区切换
    * @param {[type]} options.open  [description]
    * @param {[type]} options.close [description]
    */
-  Xut.Assist.ForumToggle = function({
+  Xut.Assist.GlobalForumToggle = function({
     open,
     close
   } = {}) {
     if (forumStatus) {
-      Xut.Assist.ForumClose(close)
+      Xut.Assist.GlobalForumClose(close)
     } else {
-      Xut.Assist.ForumOpen(open)
+      Xut.Assist.GlobalForumOpen(open)
     }
   }
 
 
-  //========================
-  //  全局工具栏目录
-  //========================
+  //===============================
+  //  秒秒学嵌套Iframe 全局工具栏目录
+  //===============================
 
   let globalDirStatus = false
 
   function setBarDir(callback, fn, state) {
     if (fn && globalDirStatus !== state) {
       //从1开始算
-      fn({ pageIndex: Xut.Presentation.GetPageIndex() + 1 })
+      fn()
       globalDirStatus = state
       callback && callback()
     }
@@ -84,13 +98,13 @@ export function extendAssist(access, $$globalSwiper) {
    * 打开全局工具栏目录
    * @return {[type]} [description]
    */
-  Xut.Assist.GlobalDirOpen = (callback) => setBarDir(callback, getPostMessageFn('globalDirOpen'), true)
+  Xut.Assist.GlobalDirOpen = (callback) => setBarDir(callback, getPostMessageFn('dirOpen'), true)
 
   /**
    * 关闭全局工具栏目录
    * @return {[type]} [description]
    */
-  Xut.Assist.GlobalDirClose = (callback) => setBarDir(callback, getPostMessageFn('globalDirClose'), false)
+  Xut.Assist.GlobalDirClose = (callback) => setBarDir(callback, getPostMessageFn('dirClose'), false)
 
   /**
    * 自动切换
@@ -106,8 +120,20 @@ export function extendAssist(access, $$globalSwiper) {
     }
   }
 
+
+  //==========================
+  //  秒秒学嵌套Iframe 继续学习
+  //==========================
+  Xut.Assist.GlobalKeepLearn = function() {
+    const fn = getPostMessageFn('keepLearn')
+    if (fn) {
+      fn()
+    }
+  }
+
+
   //========================
-  //  答题卡
+  // 秒秒学嵌套Iframe  答题卡
   //========================
 
   /**

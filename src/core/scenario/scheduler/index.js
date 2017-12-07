@@ -472,7 +472,7 @@ export default class Scheduler {
       //秒秒学的单独处理
       //在iframe外部加了自己的显示区域
       //翻页需要关闭
-      Xut.Assist.ForumClose()
+      Xut.Assist.GlobalForumClose()
       Xut.Assist.GlobalDirClose()
 
       this.pageMgr.suspend(front, middle, back, stop)

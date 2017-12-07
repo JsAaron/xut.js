@@ -101,6 +101,7 @@ function handleMessage(event) {
     const type = event.data.type
 
     if (type) {
+
       //外部设置配置文件
       if (type === 'config') {
         try {
@@ -112,6 +113,15 @@ function handleMessage(event) {
           })
         }
       }
+
+      //圆点状态
+      if (type === 'forumDot') {
+        Xut.Application.Notify('globalForumDot', JSON.parse(event.data.content))
+      }
+      if (type === 'commitWorkDot') {
+        Xut.Application.Notify('globalCommitWorkDot', JSON.parse(event.data.content))
+      }
+
 
       //外部调用内部API处理
       if (type === 'api' && event.data.content) {

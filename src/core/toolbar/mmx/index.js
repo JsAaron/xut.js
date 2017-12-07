@@ -1,12 +1,8 @@
 /**
  * 秒秒学定制工具栏
  */
-import {
-  config
-} from '../../config/index'
-import {
-  getPostMessageFn
-} from '../../api/post-message'
+import { config } from '../../config/index'
+import { getPostMessageFn } from '../../api/post-message'
 import {
   hash,
   $on,
@@ -21,8 +17,14 @@ import {
  */
 export default class GlobalBar {
 
-  constructor(options) {
-    _.extend(this, options)
+  constructor({
+    $sceneNode,
+    pageTotal,
+    currentPage
+  } = {}) {
+    this.$sceneNode = $sceneNode
+    this.pageTotal = pageTotal
+    this.currentPage = currentPage
     this._init()
   }
 
@@ -43,14 +45,60 @@ export default class GlobalBar {
    */
   _bindEvent() {
     const self = this
+
+    /**
+     * 设置小圆点的变化
+     */
+    function setDot(className) {
+      //通过接收外部的状态
+      //修改本身的圆点
+      //data.dot /show /hide
+      let dotStatus = 'hide' //默认隐藏
+      let element = self.container.find(className)
+      return function(pageIndex, newState, className) {
+        //只处理当前页面
+        if (pageIndex && pageIndex == self.currentPage) {
+          if (newState && newState !== dotStatus) {
+            if (newState === 'show') {
+              element.removeClass(className + '-defalut')
+              element.addClass(className + '-message')
+            }
+            if (newState === 'hide') {
+              element.removeClass(className + '-message')
+              element.addClass(className + '-defalut')
+            }
+            dotStatus = newState //更新状态
+          }
+        }
+      }
+    }
+
+    //如果配置了答题讨论
+    //才提供可更新
+    if (this.bottomConfig && this.bottomConfig.forum) {
+      const updateDot = setDot('.g-forum-click')
+      Xut.Application.Watch('globalForumDot', function(data) {
+        updateDot(data.pageIndex, data.dot, 'forum')
+      })
+    }
+
+    //提交作业
+    if (this.bottomConfig && this.bottomConfig.commitWork) {
+      const updateDot = setDot('.g-work-click')
+      Xut.Application.Watch('globalCommitWorkDot', function(data) {
+        updateDot(data.pageIndex, data.dot, 'commitWork')
+      })
+    }
+
+
     $on(this.container, {
       end: function(event) {
         event.stopPropagation()
         switch (event.target.className) {
-          case "g-cover":
+          case "g-cover": //回主页
             Xut.View.GotoSlide(1)
             break;
-          case "g-dir":
+          case "g-dir": //打开目录
             Xut.Assist.GlobalDirToggle()
             break;
           case "g-prev":
@@ -59,12 +107,13 @@ export default class GlobalBar {
           case "g-next":
             Xut.View.GotoNextSlide()
             break;
-          case "g-learn-click":
+          case "g-learn-click": //继续学习
+            Xut.Assist.GlobalKeepLearn()
             break;
-          case "g-work-click":
+          case "g-work-click": //提交作业
             break;
-          case "g-forum-click":
-            Xut.Assist.ForumToggle()
+          case "g-forum-click": //答题讨论
+            Xut.Assist.GlobalForumToggle()
             break;
         }
       }
@@ -72,43 +121,17 @@ export default class GlobalBar {
   }
 
   _initData() {
-    this.basePadding = 3 //基础值
-    this.currentPage = 1 //当前页面
-      //工具栏的高度
+    this.learnButtonClassName = '' //学习按钮的样式
+    //工具栏的高度
     this.barHeight = config.launch.pageBar.bottom || Math.round(config.visualSize.height / 17)
-      //设置了padding的top与bottom 所以height需要*2
-    this.baseHeight = this.barHeight - this.basePadding * 2
   }
 
-  /**
-   * 获取缩放尺寸
-   * @return {[type]} [description]
-   */
-  _getSize(width, height) {
-    //根据高度获取缩放比
-    const ratio = this.baseHeight / height
-    return {
-      width: Math.round(width * ratio),
-      height: this.baseHeight
-    }
-  }
-
-  /**
-   * 获取基础style
-   * @return {[type]} [description]
-   */
-  _getBaseStyle(width, height) {
-    const size = this._getSize(width, height)
-    return `width:${size.width}px;height:${size.height}px`
-  }
 
   /**
    * 容器
    * @return {[type]} [description]
    */
   _initContainer() {
-    //设置了padding的top与bottom 所以height需要*2
-    const style = `height:${this.barHeight}px;`
     this.container = $(`<ul class="xut-global-bar"></ul>`)
   }
 
@@ -116,7 +139,7 @@ export default class GlobalBar {
    * 左边区域
    * @return {[type]} [description]
    */
-  _leftView(){
+  _leftView() {
     const html =
       `<li class="g-left">
           <div><a class="g-dir"></a></div>
@@ -141,21 +164,85 @@ export default class GlobalBar {
   }
 
   /**
+   * 获取学习按钮的状态
+   */
+  _getLearnButtonClassName() {
+    //如果是最后一页或倒数第二页，允许点击
+    if (this.currentPage >= this.pageTotal - 1) {
+      return 'on-click'
+    }
+    return 'no-click'
+  }
+
+  /**
+   * 设置学习按钮
+   */
+  _setLearnButton() {
+    //如果状态不对，就需要重新设置
+    const className = this._getLearnButtonClassName()
+    if (className !== this.learnButtonClassName) {
+      const element = this.container.find('.g-learn-click')
+      //移除旧样式 增加新的
+      element.removeClass(this.learnButtonClassName)
+      element.addClass(className)
+      this.learnButtonClassName = className
+    }
+  }
+
+  /**
    * 右边区域
    * @return {[type]} [description]
    */
   _rightView() {
+    //根据iframe的配置，确定是否显示继续学习
+    //如果没有则占空位
+    const button = this.bottomConfig = config.launch.pageBar && config.launch.pageBar.button
+
+    let goLearnHtml = ''
+    let commitWorkHtml = ''
+    let forumHTML = ''
+
+    if (button) {
+      //下一节，继续学习
+      if (button.keepLearn) {
+        function getLearn(clickClass) {
+          return `<div class="g-learn"><a class="g-learn-click ${clickClass}"></a></div>`
+        }
+        //如果是最后一页或倒数第二页，允许点击
+        if (this._getLearnButtonClassName() === 'on-click') {
+          this.learnButtonClassName = 'on-click'
+          goLearnHtml = getLearn('on-click')
+        } else {
+          this.learnButtonClassName = 'no-click'
+          goLearnHtml = getLearn('no-click')
+        }
+      }
+
+      //提交作业
+      if (button.commitWork) {
+        //commitWork-defalut commitWork-message
+        commitWorkHtml = `<div class="g-work"><a class="g-work-click commitWork-defalut"></a></div>`
+      }
+
+      //答题讨论
+      if (button.forum) {
+        forumHTML = `<div class="g-forum"><a class="g-forum-click forum-defalut"></a></div>`
+      }
+
+    }
+
+
     const html =
       `<li class="g-right">
-          <div class="g-learn"><a class="g-learn-click"></a></div>
-          <div class="g-work"><a class="g-work-click"></a></div>
-          <div class="g-forum"><a class="g-forum-click"></a></div>
           <div class="g-page">
             <div>
               <a class="g-page-current">${this.currentPage}</a>
               <a>${this.pageTotal}</a>
             </div>
           </div>
+          ${forumHTML}
+          ${commitWorkHtml}
+          ${goLearnHtml}
        </li>`
     this.container.append(String.styleFormat(html))
   }
@@ -169,9 +256,17 @@ export default class GlobalBar {
     parentIndex
   }) {
     ++parentIndex //从1开始索引，parentIndex默认从0开始
-    if (parentIndex !== undefined && parentIndex !== this.$currentPage) {
-      this.$currentPage = parentIndex
+    if (parentIndex !== undefined && parentIndex !== this.currentPage) {
+      this.currentPage = parentIndex
       this.pageElement.html(parentIndex)
+      this._setLearnButton()
+    }
+    //圆点状态请求
+    if (this.bottomConfig.forum) {
+      Xut.Assist.RequestDot('forumDot', this.currentPage)
+    }
+    if (this.bottomConfig.commitWork) {
+      Xut.Assist.RequestDot('commitWorkDot', this.currentPage)
     }
   }
 
@@ -180,6 +275,8 @@ export default class GlobalBar {
    * @return {[type]} [description]
    */
   destroy() {
+    Xut.Application.unWatch('globalForumDot')
+    Xut.Application.unWatch('globalCommitWorkDot')
     $off(this.container)
     this.$sceneNode = null
     this.container = null
