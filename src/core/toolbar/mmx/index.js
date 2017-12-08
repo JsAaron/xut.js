@@ -35,15 +35,17 @@ export default class GlobalBar {
     this._centerView()
     this._rightView()
     this._bindEvent()
+    this._bindWatch()
     this.pageElement = this.container.find('.g-page .g-page-current')
     this.$sceneNode.append(this.container)
   }
 
   /**
-   * 绑定事件
+   * 绑定监听
    * @return {[type]} [description]
    */
-  _bindEvent() {
+  _bindWatch() {
+
     const self = this
 
     /**
@@ -73,28 +75,40 @@ export default class GlobalBar {
       }
     }
 
-    //如果配置了答题讨论
-    //才提供可更新
-    if (this.bottomConfig && this.bottomConfig.forum) {
-      const updateDot = setDot('.g-forum-click')
-      Xut.Application.Watch('globalForumDot', function(data) {
-        updateDot(data.pageIndex, data.dot, 'forum')
-      })
+    if (this.bottomConfig) {
+      //如果配置了答题讨论
+      //才提供可更新
+      if (this.bottomConfig.forum) {
+        const updateDot = setDot('.g-forum-click')
+        Xut.Application.Watch('globalForumDot', function(data) {
+          updateDot(data.pageIndex, data.dot, 'forum')
+        })
+      }
+
+      //提交作业
+      if (this.bottomConfig.commitWork) {
+        const updateDot = setDot('.g-work-click')
+        Xut.Application.Watch('globalCommitWorkDot', function(data) {
+          updateDot(data.pageIndex, data.dot, 'commitWork')
+        })
+      }
     }
 
-    //提交作业
-    if (this.bottomConfig && this.bottomConfig.commitWork) {
-      const updateDot = setDot('.g-work-click')
-      Xut.Application.Watch('globalCommitWorkDot', function(data) {
-        updateDot(data.pageIndex, data.dot, 'commitWork')
-      })
-    }
+  }
 
-
+  /**
+   * 绑定事件
+   * @return {[type]} [description]
+   */
+  _bindEvent() {
+    const self = this
     $on(this.container, {
       end: function(event) {
         event.stopPropagation()
-        switch (event.target.className) {
+        //有3个按钮样式有多个样式
+        //只取第一个
+        const classNames = event.target.className.split(' ')
+        switch (classNames[0]) {
           case "g-cover": //回主页
             Xut.View.GotoSlide(1)
             break;
@@ -108,9 +122,12 @@ export default class GlobalBar {
             Xut.View.GotoNextSlide()
             break;
           case "g-learn-click": //继续学习
-            Xut.Assist.GlobalKeepLearn()
+            if (classNames[1] === 'on-click') {//必须要可点击
+              Xut.Assist.GlobalKeepLearn()
+            }
             break;
           case "g-work-click": //提交作业
+            Xut.Assist.GlobalCommitWork()
             break;
           case "g-forum-click": //答题讨论
             Xut.Assist.GlobalForumToggle()
@@ -155,12 +172,52 @@ export default class GlobalBar {
    */
   _centerView() {
     const html =
-      `<li class="g-center">
-         <a class="g-prev"></a>
+      `<li class="g-center g-direction-first">
+         <a class="g-prev g-prev-noclick"></a>
          <div><a class="g-title">${config.data.shortName}</a></div>
-         <a class="g-next"></a>
+         <a class="g-next g-next-noclick"></a>
        </li>`
     this.container.append(String.styleFormat(html))
+
+    const self = this
+
+    //控制前进后退按钮
+    function setIcon() {
+      let rootElement = self.container.find('.g-center')
+      let isFirst = true
+      let isEnd = true
+      return function() {
+        //首页
+        if (self.currentPage === 1) {
+          if (isEnd) { //直接重尾页跳到首页
+            isEnd = false
+            rootElement.removeClass('g-direction-end')
+          }
+          isFirst = true
+          rootElement.addClass('g-direction-first')
+        } else if (self.currentPage === self.pageTotal) {
+          if (isFirst) { //直接重首页跳到尾页
+            isFirst = false
+            rootElement.removeClass('g-direction-first')
+          }
+          isEnd = true
+          rootElement.addClass('g-direction-end')
+        } else {
+          if (isFirst) {
+            isFirst = false
+            rootElement.removeClass('g-direction-first')
+          }
+          if (isEnd) {
+            isEnd = false
+            rootElement.removeClass('g-direction-end')
+          }
+        }
+      }
+    }
+
+    //控制方向图片
+    //前进或者后退
+    this._setDirectionIcon = setIcon()
   }
 
   /**
@@ -261,12 +318,18 @@ export default class GlobalBar {
       this.pageElement.html(parentIndex)
       this._setLearnButton()
     }
-    //圆点状态请求
-    if (this.bottomConfig.forum) {
-      Xut.Assist.RequestDot('forumDot', this.currentPage)
-    }
-    if (this.bottomConfig.commitWork) {
-      Xut.Assist.RequestDot('commitWorkDot', this.currentPage)
+
+    //首尾，控制方向图片
+    this._setDirectionIcon()
+
+    //每次翻页需要圆点状态请求
+    if (this.bottomConfig) {
+      if (this.bottomConfig.forum) {
+        Xut.Assist.RequestDot('forumDot', this.currentPage)
+      }
+      if (this.bottomConfig.commitWork) {
+        Xut.Assist.RequestDot('commitWorkDot', this.currentPage)
+      }
     }
   }
 
@@ -277,6 +340,7 @@ export default class GlobalBar {
   destroy() {
     Xut.Application.unWatch('globalForumDot')
     Xut.Application.unWatch('globalCommitWorkDot')
+    this._setDirectionIcon = null
     $off(this.container)
     this.$sceneNode = null
     this.container = null

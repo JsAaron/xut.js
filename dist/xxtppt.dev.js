@@ -42787,8 +42787,9 @@ var improtGlobalConfig = {
    *   mode:1/2/3/4/5/6
    *   float:true //是否全局浮动
    *   button:{
-   *     work   提交作业
-   *     section 下一节
+   *     keepLearn  继续学习
+   *     commitWork 提交作业
+   *     forum
    *   }
    *   hasNextSection:是否有下一个ppt  这个给苗苗学使用，是否用来显示原点
    * }
@@ -76394,6 +76395,13 @@ function unBindMessage() {
   window.removeEventListener('message', handleMessage, false);
 }
 
+function parse(data) {
+  if (typeof data === 'string') {
+    return JSON.parse(data);
+  }
+  return data;
+}
+
 /**
  * 接收外部通讯，设置
  * @param {[type]} event [description]
@@ -76408,7 +76416,7 @@ function handleMessage(event) {
       //外部设置配置文件
       if (type === 'config') {
         try {
-          Xut.mixin(config.postMessage, JSON.parse(event.data.content));
+          Xut.mixin(config.postMessage, parse(event.data.content));
         } catch (err) {
           $warn({
             type: 'config',
@@ -76419,10 +76427,10 @@ function handleMessage(event) {
 
       //圆点状态
       if (type === 'forumDot') {
-        Xut.Application.Notify('globalForumDot', JSON.parse(event.data.content));
+        Xut.Application.Notify('globalForumDot', parse(event.data.content));
       }
       if (type === 'commitWorkDot') {
-        Xut.Application.Notify('globalCommitWorkDot', JSON.parse(event.data.content));
+        Xut.Application.Notify('globalCommitWorkDot', parse(event.data.content));
       }
 
       //外部调用内部API处理
@@ -76571,6 +76579,16 @@ function extendAssist(access, $$globalSwiper) {
   //==========================
   Xut.Assist.GlobalKeepLearn = function () {
     var fn = getPostMessageFn('keepLearn');
+    if (fn) {
+      fn();
+    }
+  };
+
+  //==========================
+  //  秒秒学嵌套Iframe 提交作业
+  //==========================
+  Xut.Assist.GlobalCommitWork = function () {
+    var fn = getPostMessageFn('commitWork');
     if (fn) {
       fn();
     }
@@ -80710,18 +80728,20 @@ var GlobalBar = function () {
       this._centerView();
       this._rightView();
       this._bindEvent();
+      this._bindWatch();
       this.pageElement = this.container.find('.g-page .g-page-current');
       this.$sceneNode.append(this.container);
     }
 
     /**
-     * 绑定事件
+     * 绑定监听
      * @return {[type]} [description]
      */
 
   }, {
-    key: '_bindEvent',
-    value: function _bindEvent() {
+    key: '_bindWatch',
+    value: function _bindWatch() {
+
       var self = this;
 
       /**
@@ -80751,27 +80771,42 @@ var GlobalBar = function () {
         };
       }
 
-      //如果配置了答题讨论
-      //才提供可更新
-      if (this.bottomConfig && this.bottomConfig.forum) {
-        var updateDot = setDot('.g-forum-click');
-        Xut.Application.Watch('globalForumDot', function (data) {
-          updateDot(data.pageIndex, data.dot, 'forum');
-        });
-      }
+      if (this.bottomConfig) {
+        //如果配置了答题讨论
+        //才提供可更新
+        if (this.bottomConfig.forum) {
+          var updateDot = setDot('.g-forum-click');
+          Xut.Application.Watch('globalForumDot', function (data) {
+            updateDot(data.pageIndex, data.dot, 'forum');
+          });
+        }
 
-      //提交作业
-      if (this.bottomConfig && this.bottomConfig.commitWork) {
-        var _updateDot = setDot('.g-work-click');
-        Xut.Application.Watch('globalCommitWorkDot', function (data) {
-          _updateDot(data.pageIndex, data.dot, 'commitWork');
-        });
+        //提交作业
+        if (this.bottomConfig.commitWork) {
+          var _updateDot = setDot('.g-work-click');
+          Xut.Application.Watch('globalCommitWorkDot', function (data) {
+            _updateDot(data.pageIndex, data.dot, 'commitWork');
+          });
+        }
       }
+    }
 
+    /**
+     * 绑定事件
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: '_bindEvent',
+    value: function _bindEvent() {
+      var self = this;
       $on(this.container, {
         end: function end(event) {
           event.stopPropagation();
-          switch (event.target.className) {
+          //有3个按钮样式有多个样式
+          //只取第一个
+          var classNames = event.target.className.split(' ');
+          switch (classNames[0]) {
             case "g-cover":
               //回主页
               Xut.View.GotoSlide(1);
@@ -80788,10 +80823,14 @@ var GlobalBar = function () {
               break;
             case "g-learn-click":
               //继续学习
-              Xut.Assist.GlobalKeepLearn();
+              if (classNames[1] === 'on-click') {
+                //必须要可点击
+                Xut.Assist.GlobalKeepLearn();
+              }
               break;
             case "g-work-click":
               //提交作业
+              Xut.Assist.GlobalCommitWork();
               break;
             case "g-forum-click":
               //答题讨论
@@ -80841,8 +80880,50 @@ var GlobalBar = function () {
   }, {
     key: '_centerView',
     value: function _centerView() {
-      var html = '<li class="g-center">\n         <a class="g-prev"></a>\n         <div><a class="g-title">' + config.data.shortName + '</a></div>\n         <a class="g-next"></a>\n       </li>';
+      var html = '<li class="g-center g-direction-first">\n         <a class="g-prev g-prev-noclick"></a>\n         <div><a class="g-title">' + config.data.shortName + '</a></div>\n         <a class="g-next g-next-noclick"></a>\n       </li>';
       this.container.append(String.styleFormat(html));
+
+      var self = this;
+
+      //控制前进后退按钮
+      function setIcon() {
+        var rootElement = self.container.find('.g-center');
+        var isFirst = true;
+        var isEnd = true;
+        return function () {
+          //首页
+          if (self.currentPage === 1) {
+            if (isEnd) {
+              //直接重尾页跳到首页
+              isEnd = false;
+              rootElement.removeClass('g-direction-end');
+            }
+            isFirst = true;
+            rootElement.addClass('g-direction-first');
+          } else if (self.currentPage === self.pageTotal) {
+            if (isFirst) {
+              //直接重首页跳到尾页
+              isFirst = false;
+              rootElement.removeClass('g-direction-first');
+            }
+            isEnd = true;
+            rootElement.addClass('g-direction-end');
+          } else {
+            if (isFirst) {
+              isFirst = false;
+              rootElement.removeClass('g-direction-first');
+            }
+            if (isEnd) {
+              isEnd = false;
+              rootElement.removeClass('g-direction-end');
+            }
+          }
+        };
+      }
+
+      //控制方向图片
+      //前进或者后退
+      this._setDirectionIcon = setIcon();
     }
 
     /**
@@ -80943,12 +81024,18 @@ var GlobalBar = function () {
         this.pageElement.html(parentIndex);
         this._setLearnButton();
       }
-      //圆点状态请求
-      if (this.bottomConfig.forum) {
-        Xut.Assist.RequestDot('forumDot', this.currentPage);
-      }
-      if (this.bottomConfig.commitWork) {
-        Xut.Assist.RequestDot('commitWorkDot', this.currentPage);
+
+      //首尾，控制方向图片
+      this._setDirectionIcon();
+
+      //每次翻页需要圆点状态请求
+      if (this.bottomConfig) {
+        if (this.bottomConfig.forum) {
+          Xut.Assist.RequestDot('forumDot', this.currentPage);
+        }
+        if (this.bottomConfig.commitWork) {
+          Xut.Assist.RequestDot('commitWorkDot', this.currentPage);
+        }
       }
     }
 
@@ -80962,6 +81049,7 @@ var GlobalBar = function () {
     value: function destroy() {
       Xut.Application.unWatch('globalForumDot');
       Xut.Application.unWatch('globalCommitWorkDot');
+      this._setDirectionIcon = null;
       $off(this.container);
       this.$sceneNode = null;
       this.container = null;

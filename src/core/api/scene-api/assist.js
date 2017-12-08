@@ -132,6 +132,16 @@ export function extendAssist(access, $$globalSwiper) {
   }
 
 
+  //==========================
+  //  秒秒学嵌套Iframe 提交作业
+  //==========================
+  Xut.Assist.GlobalCommitWork = function() {
+    const fn = getPostMessageFn('commitWork')
+    if (fn) {
+      fn()
+    }
+  }
+
   //========================
   // 秒秒学嵌套Iframe  答题卡
   //========================

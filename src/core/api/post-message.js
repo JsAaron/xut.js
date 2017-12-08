@@ -91,6 +91,13 @@ export function unBindMessage() {
   window.removeEventListener('message', handleMessage, false);
 }
 
+function parse(data) {
+  if (typeof data === 'string') {
+    return JSON.parse(data)
+  }
+  return data
+}
+
 /**
  * 接收外部通讯，设置
  * @param {[type]} event [description]
@@ -105,7 +112,7 @@ function handleMessage(event) {
       //外部设置配置文件
       if (type === 'config') {
         try {
-          Xut.mixin(config.postMessage, JSON.parse(event.data.content))
+          Xut.mixin(config.postMessage, parse(event.data.content))
         } catch (err) {
           $warn({
             type: 'config',
@@ -116,10 +123,10 @@ function handleMessage(event) {
 
       //圆点状态
       if (type === 'forumDot') {
-        Xut.Application.Notify('globalForumDot', JSON.parse(event.data.content))
+        Xut.Application.Notify('globalForumDot', parse(event.data.content))
       }
       if (type === 'commitWorkDot') {
-        Xut.Application.Notify('globalCommitWorkDot', JSON.parse(event.data.content))
+        Xut.Application.Notify('globalCommitWorkDot', parse(event.data.content))
       }
 
 

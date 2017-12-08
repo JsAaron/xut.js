@@ -225,8 +225,9 @@ export default {
    *   mode:1/2/3/4/5/6
    *   float:true //是否全局浮动
    *   button:{
-   *     work   提交作业
-   *     section 下一节
+   *     keepLearn  继续学习
+   *     commitWork 提交作业
+   *     forum
    *   }
    *   hasNextSection:是否有下一个ppt  这个给苗苗学使用，是否用来显示原点
    * }
