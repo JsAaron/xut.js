@@ -174,7 +174,7 @@ export default class GlobalBar {
     const html =
       `<li class="g-center g-direction-first">
          <a class="g-prev g-prev-noclick"></a>
-         <div><a class="g-title">${config.data.shortName}</a></div>
+         <div><a class="g-title">${ config.launch.pageBar.title || config.data.shortName}</a></div>
          <a class="g-next g-next-noclick"></a>
        </li>`
     this.container.append(String.styleFormat(html))
