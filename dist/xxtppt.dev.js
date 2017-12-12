@@ -80880,7 +80880,7 @@ var GlobalBar = function () {
   }, {
     key: '_centerView',
     value: function _centerView() {
-      var html = '<li class="g-center g-direction-first">\n         <a class="g-prev g-prev-noclick"></a>\n         <div><a class="g-title">' + config.data.shortName + '</a></div>\n         <a class="g-next g-next-noclick"></a>\n       </li>';
+      var html = '<li class="g-center g-direction-first">\n         <a class="g-prev g-prev-noclick"></a>\n         <div><a class="g-title">' + (config.launch.pageBar.title || config.data.shortName) + '</a></div>\n         <a class="g-next g-next-noclick"></a>\n       </li>';
       this.container.append(String.styleFormat(html));
 
       var self = this;
@@ -82808,7 +82808,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.3;
+Xut.Version = 892.4;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
