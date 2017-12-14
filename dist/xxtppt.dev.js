@@ -48980,6 +48980,17 @@ var FlarePlayer = function () {
     fv.bind('close', function () {
       removeVideo(options.chapterId);
     });
+
+    /*如果启动了浮动工具栏，那么需要调节播放器控制器的高度*/
+    if (config.launch.pageBar && config.launch.pageBar.type === 'globalBar' && config.launch.pageBar.float) {
+
+      //溢出高度
+      //保护工具栏能显示
+      var spillover = top + height - config.visualSize.height;
+      if (spillover && spillover > 0) {
+        fv.controls.css('bottom', spillover + config.launch.pageBar.height);
+      }
+    }
   }
 
   createClass(FlarePlayer, [{
@@ -80731,6 +80742,8 @@ var GlobalBar = function () {
       this._bindWatch();
       this.pageElement = this.container.find('.g-page .g-page-current');
       this.$sceneNode.append(this.container);
+      var offset = this.container.offset();
+      config.launch.pageBar.height = config.visualSize.height - offset.top;
     }
 
     /**
@@ -82808,7 +82821,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.4;
+Xut.Version = 892.5;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

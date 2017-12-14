@@ -38,6 +38,8 @@ export default class GlobalBar {
     this._bindWatch()
     this.pageElement = this.container.find('.g-page .g-page-current')
     this.$sceneNode.append(this.container)
+    const offset = this.container.offset()
+    config.launch.pageBar.height = config.visualSize.height - offset.top
   }
 
   /**
@@ -122,7 +124,7 @@ export default class GlobalBar {
             Xut.View.GotoNextSlide()
             break;
           case "g-learn-click": //继续学习
-            if (classNames[1] === 'on-click') {//必须要可点击
+            if (classNames[1] === 'on-click') { //必须要可点击
               Xut.Assist.GlobalKeepLearn()
             }
             break;

@@ -95,6 +95,18 @@ export default class FlarePlayer {
       removeVideo(options.chapterId);
     })
 
+    /*如果启动了浮动工具栏，那么需要调节播放器控制器的高度*/
+    if (config.launch.pageBar &&
+      config.launch.pageBar.type === 'globalBar' &&
+      config.launch.pageBar.float) {
+
+      //溢出高度
+      //保护工具栏能显示
+      let spillover = top + height - config.visualSize.height
+      if (spillover && spillover > 0) {
+        fv.controls.css('bottom', spillover + config.launch.pageBar.height)
+      }
+    }
   }
 
   play() {
