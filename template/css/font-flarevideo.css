@@ -17,23 +17,18 @@
     overflow: hidden;
 }
 
-.flareVideo video,
-.flareVideo .video {
+.flareVideo video, .flareVideo .video {
     display: block;
     width: 100%;
-    height: 100%;
-/*    object-fit: fill;兼容性不行， IOS上无效，安卓要判断全屏退出*/
+    height: 100%;/*    object-fit: fill;兼容性不行， IOS上无效，安卓要判断全屏退出*/
 }
 
-.flareVideo embed,
-.flareVideo object {
+.flareVideo embed, .flareVideo object {
     z-index: 100;
 }
 
-
 /* jQuery UI Slider
 ----------------------------------*/
-
 .flareVideo .ui-slider {
     position: relative;
     text-align: left;
@@ -55,12 +50,9 @@
     background-position: 0 0;
 }
 
-
-
 /************
 * 控制工具栏
 *************/
-
 .flareVideo .controls {
     position: absolute;
     bottom: 0;
@@ -84,25 +76,17 @@
     opacity: 0;
 }
 
-.flareVideo .controls .play,
-.flareVideo.playing .controls .pause,
-.flareVideo .controls .close,
-.flareVideo .controls .fullScreen,
-.flareVideo .controls .seek {
+.flareVideo .controls .play, .flareVideo.playing .controls .pause, .flareVideo .controls .close, .flareVideo .controls .fullScreen, .flareVideo .controls .seek {
     display: table-cell;
     vertical-align: middle;
+    text-align: center;
 }
 
-.flareVideo .controls .play,
-.flareVideo .controls .pause,
-.flareVideo .controls .close,
-.flareVideo .controls .fullScreen {
+.flareVideo .controls .play, .flareVideo .controls .pause, .flareVideo .controls .close, .flareVideo .controls .fullScreen {
     width: 10%;
 }
 
-
 /**播放按钮***/
-
 .flareVideo .controls .play {
     padding-left: 2%;
 }
@@ -112,6 +96,7 @@
 }
 
 .flareVideo .controls .play:before {
+
     /* use !important to prevent issues with browser extensions that change fonts */
     font-family: 'xut-flareicon' !important;
     speak: none;
@@ -120,23 +105,21 @@
     font-variant: normal;
     text-transform: none;
     line-height: 1;
-    color: #5c5c5c;
-    /* Better Font Rendering =========== */
+    color: #5c5c5c;    /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     content: "\e903";
 }
 
-
 /**暂停按钮***/
-
 .flareVideo .controls .pause {
     display: none;
     padding-left: 2%;
 }
 
 .flareVideo .controls .pause:before {
+
     /* use !important to prevent issues with browser extensions that change fonts */
     font-family: 'xut-flareicon' !important;
     speak: none;
@@ -145,44 +128,41 @@
     font-variant: normal;
     text-transform: none;
     line-height: 1;
-    color: #5c5c5c;
-    /* Better Font Rendering =========== */
+    color: #5c5c5c;    /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     content: "\e900";
 }
 
-
 /**显示时间**/
-
 .flareVideo .controls .scheduleTime {
     padding-right: 3%;
-    width: 20%;
+    width: 10%;
+    max-width: 20%;
     display: table-cell;
     vertical-align: middle;
 }
 
-.flareVideo .controls .timeUn,
-.flareVideo .controls .timeChange,
-.flareVideo .controls .timeMax {
+.flareVideo .controls .timeUn, .flareVideo .controls .timeChange, .flareVideo .controls .timeMax {
     font-family: Apex, "Helvetica Neue", "HelveticaNeue", helvetica, sans-serif;
     font-size: 12px;
     color: #5c5c5c;
     transform: scale(0.9);
     width: 9%;
-    display: table-cell
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .flareVideo .controls .timeUn {
     width: 1%;
 }
 
-
 /**拖动条***/
-
 .flareVideo .controls .seek {
     width: 40%;
+    max-width: 60%;
 }
 
 .flareVideo .controls .seek .seekRange {
@@ -190,12 +170,12 @@
 }
 
 .flareVideo .ui-slider-horizontal .ui-slider-handle {
-    outline: none;
-    /*去掉默认的黄色边框*/
+    outline: none;    /*去掉默认的黄色边框*/
     margin-left: -10px;
 }
 
 .flareVideo .controls .seek .seekRange .ui-slider-handle:before {
+
     /* use !important to prevent issues with browser extensions that change fonts */
     font-family: 'xut-flareicon' !important;
     speak: none;
@@ -204,8 +184,7 @@
     font-variant: normal;
     text-transform: none;
     line-height: 1;
-    color: #4d7eff;
-    /* Better Font Rendering =========== */
+    color: #4d7eff;    /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     display: block;
@@ -214,8 +193,7 @@
     content: "\e902";
 }
 
-.flareVideo .controls input[type="range"],
-.flareVideo .controls .ui-slider {
+.flareVideo .controls input[type="range"], .flareVideo .controls .ui-slider {
     -khtml-appearance: none;
     border: 1px solid #1B1B1B;
     border-top-color: #060606;
@@ -227,9 +205,7 @@
     -moz-border-radius: 8px;
 }
 
-
 /**全屏按钮*/
-
 .flareVideo .controls .fullScreen {
     padding-left: 4%;
 }
@@ -242,17 +218,14 @@
     font-variant: normal;
     text-transform: none;
     line-height: 1;
-    color: #5c5c5c;
-    /* Better Font Rendering =========== */
+    color: #5c5c5c;    /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     content: '\e905';
 }
 
-
 /**关闭按钮**/
-
 .flareVideo .controls .close {
     padding-right: 2%;
 }
@@ -265,38 +238,30 @@
     font-variant: normal;
     text-transform: none;
     line-height: 1;
-    color: #5c5c5c;
-    /* Better Font Rendering =========== */
+    color: #5c5c5c;    /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     content: '\e904';
 }
 
-
 /**设置图标的尺寸**/
-
 .flareVideo .controls .fullScreen:before {
     font-size: 1em;
 }
 
-.flareVideo .controls .close:before,
-.flareVideo .controls .seek .seekRange .ui-slider-handle:before,
-.flareVideo .controls .pause:before,
-.flareVideo .controls .play:before {
+.flareVideo .controls .close:before, .flareVideo .controls .seek .seekRange .ui-slider-handle:before, .flareVideo .controls .pause:before, .flareVideo .controls .play:before {
     font-size: 1.5em;
 }
 
-
 /* 判断ipad，重设图片的相对尺寸em的值 */
-
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+@media only screen and (min-device-width:768px) and (max-device-width:1024px) {
     .flareVideo .controls {
         font-size: 1.5em;
     }
-    .flareVideo .controls .timeMax,
-    .flareVideo .controls .timeChange,
-    .flareVideo .controls .timeUn {
+
+    .flareVideo .controls .timeMax, .flareVideo .controls .timeChange, .flareVideo .controls .timeUn {
         font-size: 1em;
     }
+
 }

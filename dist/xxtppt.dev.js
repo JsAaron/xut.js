@@ -48982,13 +48982,14 @@ var FlarePlayer = function () {
     });
 
     /*如果启动了浮动工具栏，那么需要调节播放器控制器的高度*/
-    if (config.launch.pageBar && config.launch.pageBar.type === 'globalBar' && config.launch.pageBar.float) {
+    var pageBar = config.launch.pageBar;
+    if (pageBar && pageBar.type === 'globalBar' && pageBar.float) {
 
       //溢出高度
       //保护工具栏能显示
-      var spillover = top + height - config.visualSize.height;
-      if (spillover && spillover > 0) {
-        fv.controls.css('bottom', spillover + config.launch.pageBar.height);
+      var overflowHeight = top + height - (config.visualSize.height - pageBar.height);
+      if (overflowHeight && overflowHeight > 0) {
+        fv.controls.css('bottom', overflowHeight);
       }
     }
   }
@@ -51098,7 +51099,10 @@ if (Xut.plat.isBrowser) {
   if (Xut.plat.isIOS || Xut.plat.isAndroid) {
     VideoPlayer = FlarePlayer;
   } else {
-    VideoPlayer = HTML5Player;
+    //pc播放器一律采用FlarePlayer
+    //因为秒秒学的浮动工具栏的问题，导致默认播放器不能改控制条的高度
+    //所以默认都用一个统一了
+    VideoPlayer = FlarePlayer;
   }
 } else {
   //apk ipa
@@ -82821,7 +82825,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.5;
+Xut.Version = 892.6;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
