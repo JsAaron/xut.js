@@ -14,6 +14,7 @@
     "release:upload": "node build/release/index.js upload",
     "svn": "node build/shell/svn.js",
     "copy": "node build/copy/index.js",
+    "compress": "node build/shell/compress.js",
     "build:widget": "node build/build/compiler.widget.js",
     "remote": "node build/remote/index.js",
     "lint": "eslint dist/xxtppt.dev.js",

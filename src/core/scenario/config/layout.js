@@ -93,8 +93,8 @@ export function mainScene() {
                  z-index:${sceneController.createIndex()};
                  overflow:hidden;">
 
-        <ul class="xut-page-container xut-flip" ${style}></ul>
-        <ul class="xut-master-container xut-master xut-flip" ${style}></ul>
+        <ul id="xut-page-container" class="xut-flip" ${style}></ul>
+        <ul id="xut-master-container" class="xut-master xut-flip" ${style}></ul>
         <div class="xut-control-bar"></div>
         <div class="xut-tool-tip"></div>
         ${navBarHTML}

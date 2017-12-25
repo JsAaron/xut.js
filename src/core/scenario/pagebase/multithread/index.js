@@ -38,10 +38,10 @@ function initPageScale(rootNode, pageIndex) {
  * 2 构建绘制页面
  * @type {Object}
  */
-function registerCacheTask(threadtasks) {
+function registerCacheTask(tasks) {
   /*设置缓存的任务名*/
   const cache = {};
-  Object.keys(threadtasks).forEach(function(taskName) {
+  Object.keys(tasks).forEach(function(taskName) {
     cache[taskName] = false
   })
   return cache
@@ -138,7 +138,6 @@ export default function initThreadtasks(instance) {
       createAssignTask('assign-background', function() {
         threadTaskRelated.isPreCreateBackground = false;
         setNextTaskName('column')
-
         //针对当前页面的检测
         //没有背景挂起，或者是母版继续往下创建
         if (!threadTaskRelated.taskHangFn || instance.isMaster) {
@@ -149,7 +148,6 @@ export default function initThreadtasks(instance) {
             }
           })
         }
-
         //如果有挂起任务，则继续执行
         if (threadTaskRelated.taskHangFn) {
           threadTaskRelated.taskHangFn();

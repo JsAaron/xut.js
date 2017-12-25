@@ -42269,7 +42269,7 @@ function $warn(data, content, level, color) {
       //console输出
       var command = console[level] || console.log;
       if (stringType) {
-        command('%c' + count + ' \u7C7B\u578B:%c' + type + ' %c\u5185\u5BB9:%c' + content, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color);
+        command('%c' + count + ' \u7C7B\u578B:%c' + type + ' %c\u5185\u5BB9:%c' + String.styleFormat(content), "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color);
       } else {
         command(count + ' \u7C7B\u578B:' + type + ' \u5185\u5BB9:', content);
       }
@@ -42956,6 +42956,7 @@ var improtDebugConfig = {
    * ['all','api','preload','column','visual','scale',
    *   'config','pagebase','swiper','event','util','database','logic',html5Audio]
    * api 级别
+   * create 创建相关
    * preload 预加载处理
    * column 根流式布局相关的
    * visual 跟visualMode相关的
@@ -42967,6 +42968,7 @@ var improtDebugConfig = {
    * util 工具处理相关
    * database 数据库处理相关
    * logic 跟逻辑相关的，流程跑通测试
+   * html5Audio html5音频相关
    */
   silent: null,
 
@@ -52527,6 +52529,35 @@ function parseChapterParameter(pageData, base) {
  *      2 创建完毕
  *      3 创建失败
  */
+var TaskContainer = function (base, pageData, taskCallback) {
+
+  var $pageNode = void 0;
+  var $pseudoElement = void 0;
+
+  var prefix = Xut.View.GetPageNodeIdName(base.pageType, base.pageIndex, base.chapterId);
+  var getStyle = base.getStyle;
+
+  //iboosk编译
+  //在执行的时候节点已经存在
+  //不需要在创建
+  if (Xut.IBooks.runMode()) {
+    $pageNode = $("#" + prefix);
+    taskCallback($pageNode, $pseudoElement);
+    return;
+  }
+
+  //创建的li结构体
+  $pageNode = createContainer(base, pageData, getStyle, prefix);
+
+  Xut.nextTick({
+    container: base.rootNode,
+    content: $pageNode,
+    position: getStyle.position === 'left' || getStyle.position === 'top' ? 'first' : 'last'
+  }, function () {
+    taskCallback($pageNode, $pseudoElement);
+  });
+};
+
 /**
  * 创建页面容器li
  */
@@ -52583,35 +52614,6 @@ function createContainer(base, pageData, getStyle, prefix) {
     background: background
   }));
 }
-
-var TaskContainer = function (base, pageData, taskCallback) {
-
-  var $pageNode = void 0;
-  var $pseudoElement = void 0;
-
-  var prefix = Xut.View.GetPageNodeIdName(base.pageType, base.pageIndex, base.chapterId);
-  var getStyle = base.getStyle;
-
-  //iboosk编译
-  //在执行的时候节点已经存在
-  //不需要在创建
-  if (Xut.IBooks.runMode()) {
-    $pageNode = $("#" + prefix);
-    taskCallback($pageNode, $pseudoElement);
-    return;
-  }
-
-  //创建的li结构体
-  $pageNode = createContainer(base, pageData, getStyle, prefix);
-
-  Xut.nextTick({
-    container: base.rootNode,
-    content: $pageNode,
-    position: getStyle.position === 'left' || getStyle.position === 'top' ? 'first' : 'last'
-  }, function () {
-    return taskCallback($pageNode, $pseudoElement);
-  });
-};
 
 /**
  *创建浮动相关的信息
@@ -71279,10 +71281,10 @@ function initPageScale(rootNode, pageIndex) {
  * 2 构建绘制页面
  * @type {Object}
  */
-function registerCacheTask(threadtasks) {
+function registerCacheTask(tasks) {
   /*设置缓存的任务名*/
   var cache = {};
-  Object.keys(threadtasks).forEach(function (taskName) {
+  Object.keys(tasks).forEach(function (taskName) {
     cache[taskName] = false;
   });
   return cache;
@@ -71378,7 +71380,6 @@ function initThreadtasks(instance) {
       createAssignTask('assign-background', function () {
         threadTaskRelated.isPreCreateBackground = false;
         setNextTaskName('column');
-
         //针对当前页面的检测
         //没有背景挂起，或者是母版继续往下创建
         if (!threadTaskRelated.taskHangFn || instance.isMaster) {
@@ -71389,7 +71390,6 @@ function initThreadtasks(instance) {
             }
           });
         }
-
         //如果有挂起任务，则继续执行
         if (threadTaskRelated.taskHangFn) {
           threadTaskRelated.taskHangFn();
@@ -71917,10 +71917,15 @@ function threadCheck(baseProto) {
 
   /**
    * 任务调度，自动创建下个任务
+   * container/background/column/component/activity
    */
   baseProto.dispatchTasks = function () {
     var threadtasks = this.threadtasks[this.threadTaskRelated.nextTaskName];
     if (threadtasks) {
+      Xut.$warn({
+        type: 'create',
+        content: '\u5F00\u59CB\u8C03\u5EA6\u4EFB\u52A1' + this.threadTaskRelated.nextTaskName
+      });
       threadtasks.apply(undefined, arguments);
     }
   };
@@ -72027,10 +72032,10 @@ var threadExternal = function (baseProto) {
   baseProto.startThreadTask = function (isFlipAction, callback) {
     var _this = this;
 
-    /*
-    构建container任务完成后的一次调用
-    1 如果是快速翻頁，並且是翻頁動作
-    2 否則則繼續創建剩下的任務
+    /**
+     * 构建container任务完成后的一次调用
+     *   1 如果是快速翻頁，並且是翻頁動作
+     *   2 否則則繼續創建剩下的任務
      */
     this.threadTaskRelated.preforkComplete = function () {
       return function () {
@@ -74509,6 +74514,17 @@ var Stack = function () {
     }
 
     /**
+     * 获取总数
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: "getTotal",
+    value: function getTotal() {
+      return this._cache.length;
+    }
+
+    /**
      * 加入尾部
      * @param  {Function} fn [description]
      * @return {[type]}      [description]
@@ -75144,8 +75160,16 @@ var Scheduler = function () {
             /// 延迟创建,先处理style规则
             ///////////////////////////
           };return function (pageStyle) {
-            //创建新的页面管理，masterFilter 母板过滤器回调函数
-            var _createPageBase = function _createPageBase(masterFilter) {
+
+            /**
+             * 创建新的页面管理，masterFilter 母板过滤器回调函数
+             */
+            function _createPB(masterFilter) {
+
+              Xut.$warn({
+                type: 'create',
+                content: '-----\u5F00\u59CB\u521B\u5EFA\u9875\u9762,\u9875\u7801:' + pageIndex + '-----'
+              });
 
               //初始化构建页面对象
               //1:page，2:master
@@ -75160,7 +75184,7 @@ var Scheduler = function () {
                 if (shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                   $warn({
                     type: 'pagebase',
-                    content: '\u6BCD\u7248\u4E0E\u9875\u9762VisualMode\u4E0D\u4E00\u81F4,\u9519\u8BEF\u9875\u7801:' + (pageIndex + 1) + ',\u6BCD\u7248visualMode:' + shareMaster.getStyle.pageVisualMode + ',\u9875\u9762visualMode:' + currentStyle.pageVisualMode
+                    content: '\u6BCD\u7248\u4E0E\u9875\u9762VisualMode\u4E0D\u4E00\u81F4,\n                            \u9519\u8BEF\u9875\u7801:' + (pageIndex + 1) + ',\n                            \u6BCD\u7248visualMode:' + shareMaster.getStyle.pageVisualMode + ',\n                            \u9875\u9762visualMode:' + currentStyle.pageVisualMode
                   });
                 }
               });
@@ -75170,6 +75194,10 @@ var Scheduler = function () {
               if (pageBase) {
                 //开始线程任务，如果是翻页模式,支持快速创建
                 pageBase.startThreadTask(isFlipAction, function () {
+                  $warn({
+                    type: 'create',
+                    content: '-----\u9875\u9762\u521B\u5EFA\u5B8C\u6BD5,\u9875\u7801:' + pageIndex + '-----'
+                  });
                   callbackAction[action]();
                 });
 
@@ -75178,23 +75206,32 @@ var Scheduler = function () {
                   collectPageBase.push(pageBase);
                 }
               }
-            };
+            }
 
             //创建母版层
             if (chapterData.pptMaster && self.masterMgr) {
-              _createPageBase.call(self.masterMgr, function () {
+              _createPB.call(self.masterMgr, function () {
                 //母版是否创建等待通知
                 //母版是共享的所以不一定每次翻页都会创建
                 //如果需要创建,则叠加总数
                 ++createTotal;
                 createMaster = true;
+                $warn({
+                  type: 'create',
+                  content: '\u68C0\u6D4B' + pageIndex + '\u9875\u6709\u6BCD\u7248\uFF0C\u521B\u5EFA\u603B\u6570\u88AB\u6539\u53D8' + createTotal
+                });
               });
             }
 
             //创建页面层
-            _createPageBase.call(self.pageMgr);
+            _createPB.call(self.pageMgr);
           };
         }());
+      });
+
+      $warn({
+        type: 'create',
+        content: '\u521B\u5EFA\u9875\u9762\u603B\u6570:' + createTotal
       });
 
       /**
@@ -81215,7 +81252,7 @@ function mainScene() {
 
   //2017.12.4
   //新增全局工具栏容器
-  return String.styleFormat('<div id="xut-main-scene"\n          style="width:' + width + 'px;\n                 height:' + screenSize.height + 'px;\n                 top:0;\n                 left:' + originalVisualSize.left + 'px;\n                 position:absolute;\n                 z-index:' + sceneController.createIndex() + ';\n                 overflow:hidden;">\n\n        <ul class="xut-page-container xut-flip" ' + style + '></ul>\n        <ul class="xut-master-container xut-master xut-flip" ' + style + '></ul>\n        <div class="xut-control-bar"></div>\n        <div class="xut-tool-tip"></div>\n        ' + navBarHTML + '\n    </div>');
+  return String.styleFormat('<div id="xut-main-scene"\n          style="width:' + width + 'px;\n                 height:' + screenSize.height + 'px;\n                 top:0;\n                 left:' + originalVisualSize.left + 'px;\n                 position:absolute;\n                 z-index:' + sceneController.createIndex() + ';\n                 overflow:hidden;">\n\n        <ul id="xut-page-container" class="xut-flip" ' + style + '></ul>\n        <ul id="xut-master-container" class="xut-master xut-flip" ' + style + '></ul>\n        <div class="xut-control-bar"></div>\n        <div class="xut-tool-tip"></div>\n        ' + navBarHTML + '\n    </div>');
 }
 
 /**
@@ -81238,9 +81275,9 @@ function findContainer($context, id, isMain) {
   return function (pane, parallax) {
     var node;
     if (isMain) {
-      node = '.' + pane;
+      node = '#' + pane;
     } else {
-      node = '.' + parallax + id;
+      node = '#' + parallax + id;
     }
     return $context.find(node)[0];
   };
@@ -81511,6 +81548,11 @@ var SceneFactory = function () {
       var scenePageNode = tempfind('xut-page-container', 'scenarioPage-');
       var sceneMasterNode = tempfind('xut-master-container', 'scenarioMaster-');
 
+      Xut.$warn({
+        type: 'create',
+        content: '\u521B\u5EFA\u65B0\u573A\u666F,\n      seasonId:' + seasonId + ',\n      chapterId:' + this.chapterId + ',\n      pageIndex:' + pageIndex + ',\n      pageTotal:' + pageTotal
+      });
+
       //场景容器对象
       var $$mediator = this.$$mediator = new Mediator({
         scenePageNode: scenePageNode,
@@ -81620,6 +81662,12 @@ var SceneFactory = function () {
        * 监听内部管理页面创建完成
        */
       $$mediator.$bind('createPageComplete', function (nextAction) {
+
+        Xut.$warn({
+          type: 'create',
+          content: '\u521B\u5EFA\u65B0\u573A\u666F\u5B8C\u6210,seasonId:' + seasonId
+        });
+
         //主场景
         if (isMain) {
           //1 回到SceneFactory处理完成，历史记录
@@ -82825,7 +82873,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.6;
+Xut.Version = 892.7;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

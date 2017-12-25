@@ -66,7 +66,7 @@ function $warn(data, content, level, color) {
       //console输出
       const command = console[level] || console.log
       if (stringType) {
-        command(`%c${count} 类型:%c${type} %c内容:%c${content}`, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color)
+        command(`%c${count} 类型:%c${type} %c内容:%c${String.styleFormat(content)}`, "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color)
       } else {
         command(`${count} 类型:${type} 内容:`, content)
       }

@@ -1,3 +1,7 @@
+import { config } from '../../../../../config/index'
+import { hasValue } from '../../../../../util/lang'
+import { getFileFullPath } from '../../../../../util/option'
+
 /**
  *  创建主容器任务片
  *  state状态
@@ -6,9 +10,36 @@
  *      2 创建完毕
  *      3 创建失败
  */
-import { config } from '../../../../../config/index'
-import { hasValue } from '../../../../../util/lang'
-import { getFileFullPath } from '../../../../../util/option'
+export default function(base, pageData, taskCallback) {
+
+  let $pageNode
+  let $pseudoElement
+
+  const prefix = Xut.View.GetPageNodeIdName(base.pageType, base.pageIndex, base.chapterId)
+  const getStyle = base.getStyle
+
+  //iboosk编译
+  //在执行的时候节点已经存在
+  //不需要在创建
+  if (Xut.IBooks.runMode()) {
+    $pageNode = $("#" + prefix)
+    taskCallback($pageNode, $pseudoElement)
+    return
+  }
+
+  //创建的li结构体
+  $pageNode = createContainer(base, pageData, getStyle, prefix)
+
+  Xut.nextTick({
+    container: base.rootNode,
+    content: $pageNode,
+    position: (getStyle.position === 'left' || getStyle.position === 'top') ? 'first' : 'last'
+  }, function() {
+    taskCallback($pageNode, $pseudoElement)
+  })
+
+}
+
 
 /**
  * 创建页面容器li
@@ -84,37 +115,3 @@ function createContainer(base, pageData, getStyle, prefix) {
     background
   }))
 }
-
-
-export default function(base, pageData, taskCallback) {
-
-  let $pageNode
-  let $pseudoElement
-
-  const prefix = Xut.View.GetPageNodeIdName(base.pageType, base.pageIndex, base.chapterId)
-  const getStyle = base.getStyle
-
-  //iboosk编译
-  //在执行的时候节点已经存在
-  //不需要在创建
-  if (Xut.IBooks.runMode()) {
-    $pageNode = $("#" + prefix)
-    taskCallback($pageNode, $pseudoElement)
-    return
-  }
-
-  //创建的li结构体
-  $pageNode = createContainer(base, pageData, getStyle, prefix)
-
-  Xut.nextTick({
-    container: base.rootNode,
-    content: $pageNode,
-    position: (getStyle.position === 'left' || getStyle.position === 'top') ? 'first' : 'last'
-  }, () => taskCallback($pageNode, $pseudoElement))
-
-}
-
-
-
-
-

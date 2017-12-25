@@ -39,10 +39,15 @@ export default function threadCheck(baseProto) {
 
   /**
    * 任务调度，自动创建下个任务
+   * container/background/column/component/activity
    */
   baseProto.dispatchTasks = function(...arg) {
     const threadtasks = this.threadtasks[this.threadTaskRelated.nextTaskName]
     if (threadtasks) {
+      Xut.$warn({
+        type: 'create',
+        content: `开始调度任务${this.threadTaskRelated.nextTaskName}`
+      })
       threadtasks(...arg)
     }
   }

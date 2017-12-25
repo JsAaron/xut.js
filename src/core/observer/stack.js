@@ -16,6 +16,14 @@ export default class Stack {
   }
 
   /**
+   * 获取总数
+   * @return {[type]} [description]
+   */
+  getTotal(){
+    return this._cache.length
+  }
+
+  /**
    * 加入尾部
    * @param  {Function} fn [description]
    * @return {[type]}      [description]

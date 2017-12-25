@@ -25,6 +25,8 @@ const common = {
   distDirPath: resolve('dist'),
   //template
   templateDirPath: resolve('template'),
+  //资源发布目录
+  releaseDirPath:resolve('release'),
 
   //上传目录，build后直接更新js与css
   uploadJsPath: resolve('release/upload/www/lib'),
@@ -162,11 +164,17 @@ function getNowFormatDate() {
 
 
 module.exports = function(modeName) {
+
+  if(!modeName){
+    console.log('必须传递modeName')
+    return
+  }
+
   let options
   if (typeof builds[modeName] === 'function') {
     options = builds[modeName]()
   } else {
-    options = builds[modeName]
+    options = builds[modeName || 'webpack-full-dev']
   }
   for (var key in common) {
     options[key] = common[key]

@@ -17,10 +17,10 @@ export default function(baseProto) {
    */
   baseProto.startThreadTask = function(isFlipAction, callback) {
 
-    /*
-    构建container任务完成后的一次调用
-    1 如果是快速翻頁，並且是翻頁動作
-    2 否則則繼續創建剩下的任務
+    /**
+     * 构建container任务完成后的一次调用
+     *   1 如果是快速翻頁，並且是翻頁動作
+     *   2 否則則繼續創建剩下的任務
      */
     this.threadTaskRelated.preforkComplete = (() => {
       return () => {

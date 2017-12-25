@@ -20,9 +20,9 @@ function findContainer($context, id, isMain) {
   return function(pane, parallax) {
     var node;
     if (isMain) {
-      node = '.' + pane;
+      node = '#' + pane;
     } else {
-      node = '.' + parallax + id;
+      node = '#' + parallax + id;
     }
     return $context.find(node)[0];
   }
@@ -275,6 +275,16 @@ export class SceneFactory {
     const scenePageNode = tempfind('xut-page-container', 'scenarioPage-');
     const sceneMasterNode = tempfind('xut-master-container', 'scenarioMaster-');
 
+    Xut.$warn({
+      type: 'create',
+      content: `创建新场景,
+      seasonId:${seasonId},
+      chapterId:${this.chapterId},
+      pageIndex:${pageIndex},
+      pageTotal:${pageTotal}`
+    })
+
+
     //场景容器对象
     const $$mediator = this.$$mediator = new Mediator({
       scenePageNode,
@@ -376,6 +386,12 @@ export class SceneFactory {
      * 监听内部管理页面创建完成
      */
     $$mediator.$bind('createPageComplete', (nextAction) => {
+
+      Xut.$warn({
+        type: 'create',
+        content: `创建新场景完成,seasonId:${seasonId}`
+      })
+
       //主场景
       if (isMain) {
         //1 回到SceneFactory处理完成，历史记录
@@ -456,7 +472,7 @@ export class SceneFactory {
     this._eachMiniBar(function() {
       this.destroy()
     })
-    if(this.globalToolbar){
+    if (this.globalToolbar) {
       this.globalToolbar.destroy()
       this.globalToolbar = null
     }

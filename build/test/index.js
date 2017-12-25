@@ -13,7 +13,7 @@ killOccupied(prot, () => {
   const bs = browserSync({
     port: prot,
     server: {
-      baseDir: './test/' + baseDir,
+      baseDir: './test/www/',
       index: "index.html"
     },
     open: true

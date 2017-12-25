@@ -275,8 +275,16 @@ export default class Scheduler {
         /// 延迟创建,先处理style规则
         ///////////////////////////
         return pageStyle => {
-          //创建新的页面管理，masterFilter 母板过滤器回调函数
-          const _createPageBase = function(masterFilter) {
+
+          /**
+           * 创建新的页面管理，masterFilter 母板过滤器回调函数
+           */
+          function _createPB(masterFilter) {
+
+            Xut.$warn({
+              type: 'create',
+              content: `-----开始创建页面,页码:${pageIndex}-----`
+            })
 
             //初始化构建页面对象
             //1:page，2:master
@@ -291,7 +299,10 @@ export default class Scheduler {
               if (shareMaster.getStyle.pageVisualMode !== currentStyle.pageVisualMode) {
                 $warn({
                   type: 'pagebase',
-                  content: `母版与页面VisualMode不一致,错误页码:${pageIndex+1},母版visualMode:${shareMaster.getStyle.pageVisualMode},页面visualMode:${currentStyle.pageVisualMode}`
+                  content: `母版与页面VisualMode不一致,
+                            错误页码:${pageIndex+1},
+                            母版visualMode:${shareMaster.getStyle.pageVisualMode},
+                            页面visualMode:${currentStyle.pageVisualMode}`
                 })
               }
             })
@@ -301,6 +312,10 @@ export default class Scheduler {
             if (pageBase) {
               //开始线程任务，如果是翻页模式,支持快速创建
               pageBase.startThreadTask(isFlipAction, () => {
+                $warn({
+                  type: 'create',
+                  content: `-----页面创建完毕,页码:${pageIndex}-----`
+                })
                 callbackAction[action]()
               })
 
@@ -313,22 +328,30 @@ export default class Scheduler {
 
           //创建母版层
           if (chapterData.pptMaster && self.masterMgr) {
-            _createPageBase.call(self.masterMgr, () => {
+            _createPB.call(self.masterMgr, () => {
               //母版是否创建等待通知
               //母版是共享的所以不一定每次翻页都会创建
               //如果需要创建,则叠加总数
               ++createTotal
               createMaster = true
+              $warn({
+                type: 'create',
+                content: `检测${pageIndex}页有母版，创建总数被改变${createTotal}`
+              })
             })
           }
 
           //创建页面层
-          _createPageBase.call(self.pageMgr)
+          _createPB.call(self.pageMgr)
         }
 
       })())
     })
 
+    $warn({
+      type: 'create',
+      content: `创建页面总数:${createTotal}`
+    })
 
     /**
      * 创建页面的样式与翻页的布局

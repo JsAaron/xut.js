@@ -27,6 +27,7 @@ export default {
    * ['all','api','preload','column','visual','scale',
    *   'config','pagebase','swiper','event','util','database','logic',html5Audio]
    * api 级别
+   * create 创建相关
    * preload 预加载处理
    * column 根流式布局相关的
    * visual 跟visualMode相关的
@@ -38,6 +39,7 @@ export default {
    * util 工具处理相关
    * database 数据库处理相关
    * logic 跟逻辑相关的，流程跑通测试
+   * html5Audio html5音频相关
    */
   silent: null,
 
