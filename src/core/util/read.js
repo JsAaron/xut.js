@@ -9,7 +9,6 @@
 
 import { loadFile } from './loader/file'
 import { config } from '../config/index'
-import { $warn } from './debug/index'
 
 /**
  * 随机Url地址
@@ -47,7 +46,7 @@ export function readFileContent(path, callback, type) {
         callback(data)
         delete window.HTMLCONFIG[fileName];
       } else {
-        $warn({
+        Xut.$warn({
           type: 'util',
           content: 'js文件加载失败，文件名:' + path
         })
@@ -103,7 +102,7 @@ export function readFileContent(path, callback, type) {
         delete window.HTMLCONFIG[name];
         delete window.IBOOKSCONFIG[name]
       } else {
-        $warn({
+        Xut.$warn({
           type: 'util',
           content: '编译:脚本加载失败，文件名:' + name
         })
@@ -133,7 +132,7 @@ export function readFileContent(path, callback, type) {
         callback(svgContent);
       },
       error: function(xhr, type) {
-        $warn({
+        Xut.$warn({
           type: 'util',
           content: 'svg文件解释出错，文件名:' + path
         })

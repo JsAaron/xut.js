@@ -1,6 +1,5 @@
 import AudioSuper from './super'
 import { hasFixAudio, getAudioContext } from '../fix'
-import { $warn } from '../../../util/debug/index'
 
 /**
  * 使用html5的audio播放
@@ -178,7 +177,7 @@ export class HTML5Audio extends AudioSuper {
     //需要修复
     if (this._needFix) {
 
-      $warn({
+      Xut.$warn({
         type: 'html5Audio',
         content: `修复未自动播放对象,audio的id:${this.options.audioId}`
       })

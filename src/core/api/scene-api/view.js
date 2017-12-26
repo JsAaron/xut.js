@@ -1,5 +1,4 @@
 import { config } from '../../config/index'
-import { $warn } from '../../util/debug/index'
 import { $autoRun } from '../../scenario/command/index'
 
 /********************************************
@@ -318,7 +317,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
 
     //这个模式必须是禁止手势滑动的
     if (config.launch.gestureSwipe) {
-      $warn({
+      Xut.$warn({
         type: 'api',
         content: 'gestureSwipe启动了，Xut.View.InsertAfter不生效',
         color: 'red'

@@ -1,7 +1,6 @@
 import { errorTable } from 'database/cache'
 import { query } from 'database/query'
 import { config } from '../../config/index'
-import { $warn } from '../../util/debug/index'
 
 /**
  * 判断是否能整除2

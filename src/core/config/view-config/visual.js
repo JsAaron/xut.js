@@ -1,4 +1,3 @@
-import { $warn } from '../../util/debug/index'
 
 const FLOOR = Math.floor
 const CEIL = Math.ceil
@@ -35,7 +34,7 @@ export function getVisualSize(config, fullProportion, setVisualMode, noModifyVal
 
 
   if (!setVisualMode) {
-    $warn({
+    Xut.$warn({
       type: 'visual',
       content: 'getVisualSize没有提供setVisualMode'
     })

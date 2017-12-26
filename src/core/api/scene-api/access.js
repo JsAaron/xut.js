@@ -1,4 +1,3 @@
-import { $warn } from '../../util/debug/index'
 import { typeFilter } from './page-type'
 
 /**
@@ -28,7 +27,7 @@ export function createaAccess(mgr) {
     if (mgr[pageType]) {
       return callback(mgr[pageType], pageType, args, eachContext)
     } else {
-      $warn({
+      Xut.$warn({
         type: 'api',
         content: `传递到access的pageType错误，pageType=${pageType}`,
         color: 'red'

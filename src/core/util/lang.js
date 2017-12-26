@@ -1,4 +1,3 @@
-import { $warn } from './debug/index'
 
 //定义属性
 var def = Object.defineProperty;
@@ -87,7 +86,7 @@ export function $extend(object, config) {
   for (var i in config) {
     if (i) {
       if (object[i]) {
-        $warn({
+        Xut.$warn({
           type: 'util',
           content: `'接口方法重复', 'Key->' + i, 'Value->' + object[i]`
         })
@@ -109,7 +108,7 @@ export function parseJSON(parameter) {
   try {
     json = JSON.parse(parameter)
   } catch (error) {
-    $warn({
+    Xut.$warn({
       type: 'util',
       content: `parseJSON失败:${parameter}`
     })
@@ -138,7 +137,7 @@ export function makeJsonPack(code) {
     let post = "(function(){" + enterReplace(code) + "})"
     return (new Function("return " + post))();
   } catch (error) {
-    $warn({
+    Xut.$warn({
       type: 'util',
       content: '解析json出错' + code
     })

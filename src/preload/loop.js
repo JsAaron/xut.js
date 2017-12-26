@@ -2,7 +2,6 @@
 /// 资源加载错误后，开始循环检测2次
 /// 分别是6秒 - 12秒的时间
 ///////////////////////////////
-import { $warn } from 'core/util/index'
 
 /**
  * 循环的列表对象
@@ -17,7 +16,7 @@ let loopQueue = {}
  */
 export function addLoop(filePath, detect) {
   if (loopQueue[filePath]) {
-    $warn({
+    Xut.$warn({
       type: 'preload',
       content: `重复增加,文件已经存在循环列表 ${filePath}`,
       level: 'error'

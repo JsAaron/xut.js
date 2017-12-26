@@ -6,11 +6,10 @@
 ///
 ////////////////////////////////////////////////////
 
-import { $warn } from './debug/index'
 import { config } from '../config/index'
 
 function showWarn(data) {
-  $warn({
+  Xut.$warn({
     type: 'util',
     content: data
   })

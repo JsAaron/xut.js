@@ -1,5 +1,4 @@
 import { config } from '../../../config/index'
-import { $warn } from '../../../util/debug/index'
 import { translation } from './translation'
 
 /**
@@ -88,7 +87,7 @@ export default function(baseProto) {
           clearTimeout(timer)
           timer = null
           if (pageNode.getAttribute('data-visual')) {
-            $warn({
+            Xut.$warn({
               type: 'pagebase',
               content: '翻页translate回调丢失了，通过定时器手动调用修复'
             })

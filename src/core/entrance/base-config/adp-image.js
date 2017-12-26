@@ -1,5 +1,4 @@
 import { config } from '../../config/index'
-import { $warn } from '../../util/index'
 
 /**
  * 自适应图片
@@ -52,7 +51,7 @@ function setDefaultSuffix() {
     if (maxWidth >= 1440) {
       config.launch.baseImageSuffix = config.launch.imageSuffix['1440']
     }
-    $warn({
+    Xut.$warn({
       type: 'config',
       content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix
     })

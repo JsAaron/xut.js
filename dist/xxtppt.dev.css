@@ -4490,41 +4490,44 @@ video {
   left: 30%;
   top: 10%;
   height: 80%;
-  display: table;
-  text-align: center;
 }
 
-/*标题*/
-.xut-global-bar .g-center div {
-  width: 100%;
+.xut-global-bar .g-center > div {
+  display: inline-block;
+  width: 22%;
   height: 100%;
+  float: left;
   background-color: #252525;
-}
-
-.xut-global-bar .g-center div a {
-  white-space: nowrap;
-  display: block;
-  position: relative;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-          transform: translateY(-50%);
-  font-size: .3rem;
-/*  -webkit-transform: scale(0.7);
-  transform: scale(0.7);*/
-}
-
-.xut-global-bar .g-center > a {
-  width: 25%;
-  height: 100%;
-  display: table-cell;
-  vertical-align: middle;
   background-size: 100% 100%;
+}
+
+.xut-global-bar .g-center >div.g-title {
+  width: 54%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;/*Flex布局*/
+  display: -webkit-flex; /* Safari */
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;/*指定垂直居中*/
+}
+
+.xut-global-bar .g-center >div.g-title > a {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-bottom: 0;
+  font-size: .5em;
+  padding: 0 1%;
+  text-align: center;
 }
 
 /*上一页*/
 .xut-global-bar .g-center .g-prev {
   background-image: url(../images/global-bar/prev-default.png);
 }
+
 .xut-global-bar .g-center .g-prev:active {
   background-image: url('../images/global-bar/prev-default-active.png');
 }
@@ -4533,6 +4536,7 @@ video {
 .xut-global-bar .g-center .g-next {
   background-image: url('../images/global-bar/next-default.png');
 }
+
 .xut-global-bar .g-center .g-next:active {
   background-image: url('../images/global-bar/next-default-active.png');
 }
@@ -4541,6 +4545,7 @@ video {
 .xut-global-bar .g-direction-first .g-prev-noclick {
   background-image: url('../images/global-bar/prev-default-active.png');
 }
+
 .xut-global-bar .g-direction-end .g-next-noclick {
   background-image: url('../images/global-bar/next-default-active.png');
 }
@@ -4591,7 +4596,8 @@ video {
 .xut-global-bar .g-work .commitWork-defalut {
   background-image: url('../images/global-bar/work-defalut.png');
 }
-.xut-global-bar .g-work .commitWork-defalut:active{
+
+.xut-global-bar .g-work .commitWork-defalut:active {
   background-image: url('../images/global-bar/work-defalut-active.png');
 }
 
@@ -4607,45 +4613,43 @@ video {
 .xut-global-bar .g-right a.forum-defalut {
   background-image: url('../images/global-bar/forum-defalut.png');
 }
-.xut-global-bar .g-right a.forum-defalut:active{
+
+.xut-global-bar .g-right a.forum-defalut:active {
   background-image: url('../images/global-bar/forum-defalut-active.png');
 }
 
 .xut-global-bar .g-right a.forum-message {
   background-image: url('../images/global-bar/forum-message.png');
 }
+
 .xut-global-bar .g-right a.forum-message:active {
   background-image: url('../images/global-bar/forum-message-active.png');
 }
-
-
 
 /*页码区域*/
 .xut-global-bar .g-right .g-page > div {
   width: 90%;
   height: 100%;
   margin: 0 auto;
+  display: table;
   background-size: 100% 100%;
   background-image: url('../images/global-bar/page.png');
-  display: table;
 }
 
 .xut-global-bar .g-right .g-page a {
+  text-align: center;
   width: 50%;
   display: table-cell;
   vertical-align: middle;
-  -webkit-transform: scale(0.8);
-  transform: scale(0.8);
+  font-size:.7em;
 }
 
 .xut-global-bar .g-right .g-page a:first-child {
   color: #428bca;
-  text-align: center
 }
 
 .xut-global-bar .g-right .g-page a:last-child {
   color: #999999;
-  text-align: center
 }
 
 [class^="xut-dotIcon-"],

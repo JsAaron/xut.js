@@ -41555,753 +41555,6 @@ var iframeConfig = {
   }
 };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
-
-
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-
-
-
-
-
-
-
-
-
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-/**
- * 2015.3.24
- * 1 isBrowser
- * 2 isMobile
- * 3 isMouseTouch
- */
-var transitionEnd = Xut.style.transitionEnd;
-
-//2015.3.23
-//可以点击与触摸
-var isMouseTouch = Xut.plat.isMouseTouch;
-var hasTouch = Xut.plat.hasTouch;
-
-//触发事件名
-var touchList = ['click', 'touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd];
-var mouseList = ['click', 'mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseleave'];
-
-//绑定事件名排序
-var orderName = {
-  click: 0,
-  start: 1,
-  move: 2,
-  end: 3,
-  cancel: 4,
-  transitionend: 5,
-  leave: 6
-};
-
-var eventNames = function () {
-  if (isMouseTouch) {
-    return {
-      touch: touchList,
-      mouse: mouseList
-    };
-  }
-  return hasTouch ? touchList : mouseList;
-}();
-
-/**
- * 事件数据缓存
- * @type {Object}
- */
-var eventDataCache = {};
-var guid = 1;
-
-/**
- * 增加缓存句柄
- * @param {[type]} element   [description]
- * @param {[type]} eventName [description]
- * @param {[type]} handler   [description]
- */
-function addHandler(element, eventName, handler, capture) {
-  if (element.xutHandler) {
-    var uuid = element.xutHandler;
-    var dataCache = eventDataCache[uuid];
-    if (dataCache) {
-      if (dataCache[eventName]) {
-        //如果是isMouseTouch支持同样的事件
-        //所以transitionend就比较特殊了，因为都是同一个事件名称
-        //所以只要一份，所以重复绑定就需要去掉
-        if (eventName !== 'transitionend') {
-          $warn({
-            type: 'event',
-            content: eventName + '：事件重复绑定添加'
-          });
-        }
-      } else {
-        dataCache[eventName] = [handler, capture];
-      }
-    }
-  } else {
-    eventDataCache[guid] = defineProperty({}, eventName, [handler, capture]);
-    element.xutHandler = guid++;
-  }
-}
-
-var eachApply = function eachApply(events, callbacks, processor, isRmove) {
-  _.each(callbacks, function (handler, key) {
-    var eventName = void 0;
-    if (isRmove) {
-      //如果是移除，callbacks是数组
-      //转化事件名
-      if (eventName = events[orderName[handler]]) {
-        processor(eventName);
-      }
-    } else {
-      eventName = events[orderName[key]];
-      //on的情况，需要传递handler
-      handler && eventName && processor(eventName, handler);
-    }
-  });
-};
-
-/**
- * 合并事件绑定处理
- * 因为isMouseTouch设备上
- * 要同时支持2种方式
- * @return {[type]} [description]
- */
-var addEvent = function addEvent(element, events, callbacks, capture) {
-  eachApply(events, callbacks, function (eventName, handler) {
-    addHandler(element, eventName, handler, capture);
-    element.addEventListener(eventName, handler, capture);
-  });
-};
-
-/**
- * 移除所有事件
- * @param  {[type]} element [description]
- * @return {[type]}         [description]
- */
-function removeAll(element) {
-  var uuid = element.xutHandler;
-  var dataCache = eventDataCache[uuid];
-  if (!dataCache) {
-
-    $warn({
-      type: 'event',
-      content: '移除所有事件出错'
-    });
-
-    return;
-  }
-  _.each(dataCache, function (data, eventName) {
-    if (data) {
-      element.removeEventListener(eventName, data[0], data[1]);
-      dataCache[eventName] = null;
-    }
-  });
-  delete eventDataCache[uuid];
-}
-
-/**
- * 移除指定的事件
- * @return {[type]} [description]
- */
-function removeone(element, eventName) {
-  var uuid = element.xutHandler;
-  var dataCache = eventDataCache[uuid];
-  if (!dataCache) {
-    $warn({
-      type: 'event',
-      content: '移除事件' + eventName + '出错'
-    });
-    return;
-  }
-  var data = dataCache[eventName];
-  if (data) {
-    element.removeEventListener(eventName, data[0], data[1]);
-    dataCache[eventName] = null;
-    delete dataCache[eventName];
-  } else {
-    $warn({
-      type: 'event',
-      content: '移除事件' + eventName + '出错'
-    });
-  }
-
-  //如果没有数据
-  if (!Object.keys(dataCache).length) {
-    delete eventDataCache[uuid];
-  }
-}
-
-/**
- * 销毁事件绑定处理
- * 因为isMouseTouch设备上
- * 要同时支持2种方式
- * @return {[type]} [description]
- */
-var removeEvent = function removeEvent(element, events, callbacks) {
-  eachApply(events, callbacks, function (eventName) {
-    removeone(element, eventName);
-  }, 'remove');
-};
-
-/**
- * 多设备绑定
- * @param  {[type]}   processor    [处理器]
- * @param  {[type]}   eventContext [上下文]
- * @param  {Function} callback     [回调函数]
- * @return {[type]}                [description]
- */
-var compatibility = function compatibility(controller, element, callbacks, capture) {
-  //如果两者都支持
-  //鼠标与触摸
-  if (isMouseTouch) {
-    _.each(eventNames, function (events) {
-      controller(element, events, callbacks, capture);
-    });
-  } else {
-    controller(element, eventNames, callbacks, capture);
-  }
-};
-
-/**
- * 变成节点对象
- * @param  {[type]} element [description]
- * @return {[type]}         [description]
- */
-function toNodeObj(element) {
-  if (element.length) {
-    element = element[0];
-  }
-  return element;
-}
-
-/**
- * 检测end事件，默认要绑定cancel
- * @return {[type]} [description]
- */
-var checkBindCancel = function checkBindCancel(callbacks) {
-  if (callbacks && callbacks.end && !callbacks.cancel) {
-    callbacks.cancel = callbacks.end;
-  }
-};
-
-/**
- * 合并事件绑定处理
- * 因为isMouseTouch设备上
- * 要同时支持2种方式
- * bindTap(eventContext,{
- *     start   : start,
- *     move    : move,
- *     end     : end
- * })
- * capture 默认是冒泡，提供捕获处理
- * @return {[type]} [description]
- */
-function $on(element, callbacks) {
-  var capture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-  checkBindCancel(callbacks);
-  compatibility(addEvent, toNodeObj(element), callbacks, capture);
-}
-
-/**
- * 移除tap事件
- * @param  {[type]} context [description]
- * @param  {[type]} opts    [description]
- * @return {[type]}         [description]
- */
-function $off(element, callbacks) {
-
-  if (!element) {
-    $warn({
-      type: 'event',
-      content: '移除事件对象不存在'
-    });
-    return;
-  }
-
-  element = toNodeObj(element);
-
-  //全部移除
-  if (arguments.length === 1) {
-    removeAll(element);
-    return;
-  }
-
-  if (!_.isArray(callbacks)) {
-    $warn({
-      type: 'event',
-      content: '移除的事件句柄参数，必须是数组'
-    });
-    return;
-  }
-
-  checkBindCancel(callbacks);
-  compatibility(removeEvent, element, callbacks);
-}
-
-/**
- * 如果是$on绑定的，那么获取事件就可能是多点的
- * 所以需要$hanle方法
- * @param  {[type]} callbacks [description]
- * @param  {[type]} context   [description]
- * @param  {[type]} event     [description]
- * @return {[type]}           [description]
- */
-function $handle(callbacks, context, event) {
-  switch (event.type) {
-    case 'touchstart':
-    case 'mousedown':
-      callbacks.start && callbacks.start.call(context, event);
-      break;
-    case 'touchmove':
-    case 'mousemove':
-      callbacks.move && callbacks.move.call(context, event);
-      break;
-    case 'touchend':
-    case 'mouseup':
-    case 'mousecancel':
-    case 'touchcancel':
-    case 'mouseleave':
-      callbacks.end && callbacks.end.call(context, event);
-      break;
-    case 'transitionend':
-    case 'webkitTransitionEnd':
-    case 'oTransitionEnd':
-    case 'MSTransitionEnd':
-      callbacks.transitionend && callbacks.transitionend.call(context, event);
-      break;
-  }
-}
-
-function $target(event, original) {
-  var currTouches = null;
-  if (hasTouch) {
-    currTouches = event.touches;
-    if (currTouches && currTouches.length > 0) {
-      event = currTouches[0];
-    }
-  }
-  return original ? event : event.target;
-}
-
-/**
- * 兼容事件对象
- * @return {[type]}   [description]
- */
-function $event(e) {
-  return e.touches && e.touches[0] ? e.touches[0] : e;
-}
-
-////////////////////////
-//
-//  window debug调试信息
-//
-////////////////////////
-
-var NULL = null;
-
-var dom = document.querySelectorAll;
-var toString = {}.toString;
-
-function isNull(val) {
-  return val === NULL;
-}
-
-var isArray = Array.isArray || function (val) {
-  return val && "[object Array]" === toString.call(val);
-};
-
-function isObejct(val) {
-  return (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === "object" && !isArray(val) && !isNull(val);
-}
-
-function getBody() {
-  var ref, ref1;
-  return document["body"] || ((ref = dom("body")) != null ? ref[0] : void 0) || ((ref1 = dom("html")) != null ? ref1[0] : void 0);
-}
-
-var debugMap = {
-  log: "0074cc",
-  danger: "da4f49",
-  warn: "faa732",
-  success: "5bb75b",
-  error: "bd362f"
-};
-
-function render(msg) {
-  var arr, i, item, len, text;
-  text = "";
-  arr = [];
-  if (isArray(msg)) {
-    for (i = 0, len = msg.length; i < len; i++) {
-      item = msg[i];
-      if ((typeof item === 'undefined' ? 'undefined' : _typeof(item)) === "object") {
-        arr.push(render(item));
-        text = "[" + arr.join(',') + "]";
-      } else {
-        arr.push("" + item);
-        text = "[" + arr.join(',') + "]";
-      }
-    }
-  } else if (isObejct(msg)) {
-    for (item in msg) {
-      if (_typeof(msg[item]) === "object") {
-        arr.push(item + ": " + render(msg[item]));
-        text = "{" + arr.join(',') + "}";
-      } else {
-        arr.push(item + ": " + msg[item]);
-        text = "{" + arr.join(',') + "}";
-      }
-    }
-  } else {
-    text = String(msg);
-  }
-  return text;
-}
-
-function translate(el, y) {
-  el.style.webkitTransform = "translate3d(0," + y + ",0)";
-  return el.style.transform = "translate3d(0," + y + ",0)";
-}
-
-function joinCss(css) {
-  return css.join(";");
-}
-
-var parentBottom = 50;
-var publicCss = ["-webkit-transition: all .3s ease", "transition: all .3s ease"];
-var childCss = ["margin-top:-1px", "padding:1px", "border-top:1px solid rgba(255,255,255,.1)", "margin:0", "max-width:" + (window.outerWidth - 20) + "px"].concat(publicCss);
-var parentCss = ["-webkit-overflow-scrolling:touch", "overflow-y:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:55%"].concat(publicCss);
-var clearCSS = "text-align:right;font-size:16px;color:white;margin-top:30px;margin-right:10px;position:absolute;right:0;";
-var clearCountCSS = "text-align:right;font-size:16px;;color:white;margin-right:10px;margin-top:30px;position:absolute;right:50px;";
-
-var showNodeCSS = "text-align:right;font-size:16px;;color:white;margin-right:70px;margin-top:30px;position:absolute;right:50px;";
-var hideNodeCSS = "text-align:right;font-size:16px;;color:white;margin-right:120px;position:absolute;right:50px;margin-top:30px;";
-
-var containerCSS = "width:100%;height:90%;padding:10px";
-
-function Debug() {
-  this.isInit = this.isHide = false;
-  this.msg = this.fn = this.color = "";
-  this.el = NULL;
-}
-
-Debug.prototype.init = function () {
-  var body, el;
-  var self = this;
-
-  el = this.el = document.createElement("div");
-
-  var clearNode = document.createElement("a");
-  var clearCount = document.createElement("a");
-  var showNode = document.createElement("a");
-  var hideNode = document.createElement("a");
-
-  this.container = document.createElement("div");
-  this.container.setAttribute("style", containerCSS);
-
-  showNode.textContent = '显示';
-  hideNode.textContent = '隐藏';
-  clearNode.textContent = '清屏';
-  clearCount.textContent = '清计数';
-
-  clearNode.setAttribute("style", clearCSS);
-  clearCount.setAttribute("style", clearCountCSS);
-  showNode.setAttribute("style", showNodeCSS);
-  hideNode.setAttribute("style", hideNodeCSS);
-
-  el.setAttribute("style", joinCss(parentCss));
-  el.appendChild(this.container);
-  el.appendChild(clearNode);
-  el.appendChild(clearCount);
-  el.appendChild(showNode);
-  el.appendChild(hideNode);
-
-  body = getBody();
-  body.appendChild(el);
-
-  translate(el, 0);
-
-  function setColor(node) {
-    node.style.backgroundColor = 'red';
-    setTimeout(function () {
-      node.style.backgroundColor = '';
-    }, 50);
-  }
-
-  $on(clearCount, {
-    end: function end(e) {
-      setColor(clearCount);
-      e.stopPropagation();
-      resetCount();
-    }
-  });
-
-  $on(clearNode, {
-    end: function end(e) {
-      setColor(clearNode);
-      e.stopPropagation();
-      self.container.innerHTML = '';
-    }
-  });
-
-  $on(showNode, {
-    end: function end(e) {
-      setColor(showNode);
-      e.stopPropagation();
-      self.show();
-    }
-  });
-
-  $on(hideNode, {
-    end: function end(e) {
-      setColor(hideNode);
-      e.stopPropagation();
-      self.hide();
-    }
-  });
-
-  this.isInit = true;
-  return this;
-};
-
-Debug.prototype.print = function () {
-  var child, css;
-  if (!this.isInit) {
-    this.init();
-  }
-
-  if (this.isHide) {
-    this.show();
-  }
-
-  css = childCss.concat(["color:#" + this.color]);
-  child = document.createElement("p");
-  child.setAttribute("style", joinCss(css));
-  child.innerHTML = this.msg;
-  /*只显示一半的区域，然后可以被重复的替换*/
-  if (this.container.offsetHeight > document.documentElement.clientHeight / 2) {
-    var node = this.container.firstChild;
-    if (node.nodeName === 'P') {
-      this.container.removeChild(node);
-    }
-  }
-  this.container.appendChild(child);
-  return this;
-};
-
-Debug.prototype.toggle = function (event) {
-  return (this.isHide ? this.show : this.hide).call(this, event);
-};
-
-Debug.prototype.show = function (event) {
-  translate(this.el, 0);
-  this.isHide = false;
-  return this;
-};
-
-Debug.prototype.hide = function (event) {
-  translate(this.el, "-" + (this.el.offsetHeight - parentBottom) + "px");
-  this.isHide = true;
-  return this;
-};
-
-var _loop = function _loop(fn) {
-  Debug.prototype[fn] = function (msg) {
-    this.fn = fn;
-    this.msg = render(msg);
-    this.color = debugMap[fn];
-    return this.print();
-  };
-};
-
-for (var fn in debugMap) {
-  _loop(fn);
-}
-
-/*
-  $warn('hello');
-  $warn('信息','info');
-  $warn('错误','error');
-  $warn('警告','warn');
-
-  debug.success("This is success message:)");
-  debug.error("This is error message:)");
-  debug.log("This is primary message:)");
-  debug.log({a: 1, b: 2});
-  debug.log([1,2,3]);
- */
-var hasConsole = typeof console !== 'undefined';
-
-var debug = void 0;
-var count = 0;
-
-function $warn(data, content, level, color) {
-
-  var silent = config.debug.silent;
-
-  if (!silent) {
-    return;
-  }
-
-  if (!hasConsole) {
-    return;
-  }
-
-  var dataType = typeof data === 'undefined' ? 'undefined' : _typeof(data);
-
-  /**
-   * 输出日志
-   * @return {[type]} [description]
-   */
-  function outlog(type, content, level, color) {
-
-    //如果启动了全部处理
-    //如果能找到对应的处理
-    //silent：['all','preload'.....]
-    if (~silent.indexOf('all') || ~silent.indexOf(type)) {
-
-      var stringType = typeof content === 'string';
-
-      ++count;
-
-      //远程debug输出
-      if (config.debug.terminal) {
-        var errListener = function errListener(error) {
-          var msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
-          return debug.error(msg.join("<br/>"));
-        };
-        //监听错误
-
-
-        if (!debug) {
-          debug = new Debug();
-        }
-
-        window.addEventListener('error', errListener, false);
-        debug.log(count + ' \u7C7B\u578B:' + type + ' \u5185\u5BB9:' + content);
-        return;
-      }
-
-      //console输出
-      var command = console[level] || console.log;
-      if (stringType) {
-        command('%c' + count + ' \u7C7B\u578B:%c' + type + ' %c\u5185\u5BB9:%c' + String.styleFormat(content), "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color);
-      } else {
-        command(count + ' \u7C7B\u578B:' + type + ' \u5185\u5BB9:', content);
-      }
-    }
-  }
-
-  //如果是对象数据
-  //data = {
-  //  type
-  //  content
-  //  level
-  //  color
-  //}
-  if (dataType === 'object') {
-    var type = data.type;
-    var _content = data.content;
-    var _level = data.level;
-    var _color = data.color;
-    outlog(type, _content, _level, _color);
-  } else {
-    //传递的是普通类型
-    //$warn(type,content,level,color)
-    outlog(data, content, level, color);
-  }
-}
-
-function resetCount() {
-  count = 0;
-}
-
-Xut.$warn = $warn;
-
 var CEIL = Math.ceil;
 
 /**
@@ -42335,7 +41588,7 @@ function getVisualSize(config, fullProportion, setVisualMode, noModifyValue) {
   var newHeight = screenHeight;
 
   if (!setVisualMode) {
-    $warn({
+    Xut.$warn({
       type: 'visual',
       content: 'getVisualSize没有提供setVisualMode'
     });
@@ -43606,7 +42859,7 @@ function $extend(object, config) {
   for (var i in config) {
     if (i) {
       if (object[i]) {
-        $warn({
+        Xut.$warn({
           type: 'util',
           content: '\'\u63A5\u53E3\u65B9\u6CD5\u91CD\u590D\', \'Key->\' + i, \'Value->\' + object[i]'
         });
@@ -43627,7 +42880,7 @@ function parseJSON(parameter) {
   try {
     json = JSON.parse(parameter);
   } catch (error) {
-    $warn({
+    Xut.$warn({
       type: 'util',
       content: 'parseJSON\u5931\u8D25:' + parameter
     });
@@ -43654,7 +42907,7 @@ function makeJsonPack(code) {
     var post = "(function(){" + enterReplace(code) + "})";
     return new Function("return " + post)();
   } catch (error) {
-    $warn({
+    Xut.$warn({
       type: 'util',
       content: '解析json出错' + code
     });
@@ -43686,6 +42939,426 @@ function arrayUnique(arr) {
  *  文件路径拼接
  * @return {[type]} [description]
  */
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
+
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+};
+
+
+
+
+
+
+
+
+
+
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
+/**
+ * 2015.3.24
+ * 1 isBrowser
+ * 2 isMobile
+ * 3 isMouseTouch
+ */
+var transitionEnd = Xut.style.transitionEnd;
+
+//2015.3.23
+//可以点击与触摸
+var isMouseTouch = Xut.plat.isMouseTouch;
+var hasTouch = Xut.plat.hasTouch;
+
+//触发事件名
+var touchList = ['click', 'touchstart', 'touchmove', 'touchend', 'touchcancel', transitionEnd];
+var mouseList = ['click', 'mousedown', 'mousemove', 'mouseup', 'mousecancel', transitionEnd, 'mouseleave'];
+
+//绑定事件名排序
+var orderName = {
+  click: 0,
+  start: 1,
+  move: 2,
+  end: 3,
+  cancel: 4,
+  transitionend: 5,
+  leave: 6
+};
+
+var eventNames = function () {
+  if (isMouseTouch) {
+    return {
+      touch: touchList,
+      mouse: mouseList
+    };
+  }
+  return hasTouch ? touchList : mouseList;
+}();
+
+/**
+ * 事件数据缓存
+ * @type {Object}
+ */
+var eventDataCache = {};
+var guid = 1;
+
+/**
+ * 增加缓存句柄
+ * @param {[type]} element   [description]
+ * @param {[type]} eventName [description]
+ * @param {[type]} handler   [description]
+ */
+function addHandler(element, eventName, handler, capture) {
+  if (element.xutHandler) {
+    var uuid = element.xutHandler;
+    var dataCache = eventDataCache[uuid];
+    if (dataCache) {
+      if (dataCache[eventName]) {
+        //如果是isMouseTouch支持同样的事件
+        //所以transitionend就比较特殊了，因为都是同一个事件名称
+        //所以只要一份，所以重复绑定就需要去掉
+        if (eventName !== 'transitionend') {
+          Xut.$warn({
+            type: 'event',
+            content: eventName + '：事件重复绑定添加'
+          });
+        }
+      } else {
+        dataCache[eventName] = [handler, capture];
+      }
+    }
+  } else {
+    eventDataCache[guid] = defineProperty({}, eventName, [handler, capture]);
+    element.xutHandler = guid++;
+  }
+}
+
+var eachApply = function eachApply(events, callbacks, processor, isRmove) {
+  _.each(callbacks, function (handler, key) {
+    var eventName = void 0;
+    if (isRmove) {
+      //如果是移除，callbacks是数组
+      //转化事件名
+      if (eventName = events[orderName[handler]]) {
+        processor(eventName);
+      }
+    } else {
+      eventName = events[orderName[key]];
+      //on的情况，需要传递handler
+      handler && eventName && processor(eventName, handler);
+    }
+  });
+};
+
+/**
+ * 合并事件绑定处理
+ * 因为isMouseTouch设备上
+ * 要同时支持2种方式
+ * @return {[type]} [description]
+ */
+var addEvent = function addEvent(element, events, callbacks, capture) {
+  eachApply(events, callbacks, function (eventName, handler) {
+    addHandler(element, eventName, handler, capture);
+    element.addEventListener(eventName, handler, capture);
+  });
+};
+
+/**
+ * 移除所有事件
+ * @param  {[type]} element [description]
+ * @return {[type]}         [description]
+ */
+function removeAll(element) {
+  var uuid = element.xutHandler;
+  var dataCache = eventDataCache[uuid];
+  if (!dataCache) {
+
+    Xut.$warn({
+      type: 'event',
+      content: '移除所有事件出错'
+    });
+
+    return;
+  }
+  _.each(dataCache, function (data, eventName) {
+    if (data) {
+      element.removeEventListener(eventName, data[0], data[1]);
+      dataCache[eventName] = null;
+    }
+  });
+  delete eventDataCache[uuid];
+}
+
+/**
+ * 移除指定的事件
+ * @return {[type]} [description]
+ */
+function removeone(element, eventName) {
+  var uuid = element.xutHandler;
+  var dataCache = eventDataCache[uuid];
+  if (!dataCache) {
+    Xut.$warn({
+      type: 'event',
+      content: '移除事件' + eventName + '出错'
+    });
+    return;
+  }
+  var data = dataCache[eventName];
+  if (data) {
+    element.removeEventListener(eventName, data[0], data[1]);
+    dataCache[eventName] = null;
+    delete dataCache[eventName];
+  } else {
+    Xut.$warn({
+      type: 'event',
+      content: '移除事件' + eventName + '出错'
+    });
+  }
+
+  //如果没有数据
+  if (!Object.keys(dataCache).length) {
+    delete eventDataCache[uuid];
+  }
+}
+
+/**
+ * 销毁事件绑定处理
+ * 因为isMouseTouch设备上
+ * 要同时支持2种方式
+ * @return {[type]} [description]
+ */
+var removeEvent = function removeEvent(element, events, callbacks) {
+  eachApply(events, callbacks, function (eventName) {
+    removeone(element, eventName);
+  }, 'remove');
+};
+
+/**
+ * 多设备绑定
+ * @param  {[type]}   processor    [处理器]
+ * @param  {[type]}   eventContext [上下文]
+ * @param  {Function} callback     [回调函数]
+ * @return {[type]}                [description]
+ */
+var compatibility = function compatibility(controller, element, callbacks, capture) {
+  //如果两者都支持
+  //鼠标与触摸
+  if (isMouseTouch) {
+    _.each(eventNames, function (events) {
+      controller(element, events, callbacks, capture);
+    });
+  } else {
+    controller(element, eventNames, callbacks, capture);
+  }
+};
+
+/**
+ * 变成节点对象
+ * @param  {[type]} element [description]
+ * @return {[type]}         [description]
+ */
+function toNodeObj(element) {
+  if (element.length) {
+    element = element[0];
+  }
+  return element;
+}
+
+/**
+ * 检测end事件，默认要绑定cancel
+ * @return {[type]} [description]
+ */
+var checkBindCancel = function checkBindCancel(callbacks) {
+  if (callbacks && callbacks.end && !callbacks.cancel) {
+    callbacks.cancel = callbacks.end;
+  }
+};
+
+/**
+ * 合并事件绑定处理
+ * 因为isMouseTouch设备上
+ * 要同时支持2种方式
+ * bindTap(eventContext,{
+ *     start   : start,
+ *     move    : move,
+ *     end     : end
+ * })
+ * capture 默认是冒泡，提供捕获处理
+ * @return {[type]} [description]
+ */
+function $on(element, callbacks) {
+  var capture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+  checkBindCancel(callbacks);
+  compatibility(addEvent, toNodeObj(element), callbacks, capture);
+}
+
+/**
+ * 移除tap事件
+ * @param  {[type]} context [description]
+ * @param  {[type]} opts    [description]
+ * @return {[type]}         [description]
+ */
+function $off(element, callbacks) {
+
+  if (!element) {
+    Xut.$warn({
+      type: 'event',
+      content: '移除事件对象不存在'
+    });
+    return;
+  }
+
+  element = toNodeObj(element);
+
+  //全部移除
+  if (arguments.length === 1) {
+    removeAll(element);
+    return;
+  }
+
+  if (!_.isArray(callbacks)) {
+    Xut.$warn({
+      type: 'event',
+      content: '移除的事件句柄参数，必须是数组'
+    });
+    return;
+  }
+
+  checkBindCancel(callbacks);
+  compatibility(removeEvent, element, callbacks);
+}
+
+/**
+ * 如果是$on绑定的，那么获取事件就可能是多点的
+ * 所以需要$hanle方法
+ * @param  {[type]} callbacks [description]
+ * @param  {[type]} context   [description]
+ * @param  {[type]} event     [description]
+ * @return {[type]}           [description]
+ */
+function $handle(callbacks, context, event) {
+  switch (event.type) {
+    case 'touchstart':
+    case 'mousedown':
+      callbacks.start && callbacks.start.call(context, event);
+      break;
+    case 'touchmove':
+    case 'mousemove':
+      callbacks.move && callbacks.move.call(context, event);
+      break;
+    case 'touchend':
+    case 'mouseup':
+    case 'mousecancel':
+    case 'touchcancel':
+    case 'mouseleave':
+      callbacks.end && callbacks.end.call(context, event);
+      break;
+    case 'transitionend':
+    case 'webkitTransitionEnd':
+    case 'oTransitionEnd':
+    case 'MSTransitionEnd':
+      callbacks.transitionend && callbacks.transitionend.call(context, event);
+      break;
+  }
+}
+
+function $target(event, original) {
+  var currTouches = null;
+  if (hasTouch) {
+    currTouches = event.touches;
+    if (currTouches && currTouches.length > 0) {
+      event = currTouches[0];
+    }
+  }
+  return original ? event : event.target;
+}
+
+/**
+ * 兼容事件对象
+ * @return {[type]}   [description]
+ */
+function $event(e) {
+  return e.touches && e.touches[0] ? e.touches[0] : e;
+}
 
 /**
  *  加载文件
@@ -43802,6 +43475,333 @@ function loadFile(url, callback, charset) {
 
   return node;
 }
+
+////////////////////////
+//
+//  window debug调试信息
+//
+////////////////////////
+
+var NULL = null;
+
+var dom = document.querySelectorAll;
+var toString = {}.toString;
+
+function isNull(val) {
+  return val === NULL;
+}
+
+var isArray = Array.isArray || function (val) {
+  return val && "[object Array]" === toString.call(val);
+};
+
+function isObejct(val) {
+  return (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === "object" && !isArray(val) && !isNull(val);
+}
+
+function getBody() {
+  var ref, ref1;
+  return document["body"] || ((ref = dom("body")) != null ? ref[0] : void 0) || ((ref1 = dom("html")) != null ? ref1[0] : void 0);
+}
+
+var debugMap = {
+  log: "0074cc",
+  danger: "da4f49",
+  warn: "faa732",
+  success: "5bb75b",
+  error: "bd362f"
+};
+
+function render(msg) {
+  var arr, i, item, len, text;
+  text = "";
+  arr = [];
+  if (isArray(msg)) {
+    for (i = 0, len = msg.length; i < len; i++) {
+      item = msg[i];
+      if ((typeof item === 'undefined' ? 'undefined' : _typeof(item)) === "object") {
+        arr.push(render(item));
+        text = "[" + arr.join(',') + "]";
+      } else {
+        arr.push("" + item);
+        text = "[" + arr.join(',') + "]";
+      }
+    }
+  } else if (isObejct(msg)) {
+    for (item in msg) {
+      if (_typeof(msg[item]) === "object") {
+        arr.push(item + ": " + render(msg[item]));
+        text = "{" + arr.join(',') + "}";
+      } else {
+        arr.push(item + ": " + msg[item]);
+        text = "{" + arr.join(',') + "}";
+      }
+    }
+  } else {
+    text = String(msg);
+  }
+  return text;
+}
+
+function translate(el, y) {
+  el.style.webkitTransform = "translate3d(0," + y + ",0)";
+  return el.style.transform = "translate3d(0," + y + ",0)";
+}
+
+function joinCss(css) {
+  return css.join(";");
+}
+
+var parentBottom = 50;
+var publicCss = ["-webkit-transition: all .3s ease", "transition: all .3s ease"];
+var childCss = ["margin-top:-1px", "padding:1px", "border-top:1px solid rgba(255,255,255,.1)", "margin:0", "max-width:" + (window.outerWidth - 20) + "px"].concat(publicCss);
+var parentCss = ["-webkit-overflow-scrolling:touch", "overflow-y:scroll", "line-height:1.2", "z-index:5000", "position:fixed", "left:0", "top:0", "font-size:11px", "background:rgba(0,0,0,.8)", "color:#fff", "width:100%", "padding-bottom:" + parentBottom + "px", "max-height:55%"].concat(publicCss);
+var clearCSS = "text-align:right;font-size:16px;color:white;margin-top:30px;margin-right:10px;position:absolute;right:0;";
+var clearCountCSS = "text-align:right;font-size:16px;;color:white;margin-right:10px;margin-top:30px;position:absolute;right:50px;";
+
+var showNodeCSS = "text-align:right;font-size:16px;;color:white;margin-right:70px;margin-top:30px;position:absolute;right:50px;";
+var hideNodeCSS = "text-align:right;font-size:16px;;color:white;margin-right:120px;position:absolute;right:50px;margin-top:30px;";
+
+var containerCSS = "width:100%;height:90%;padding:10px";
+
+function Debug() {
+  this.isInit = this.isHide = false;
+  this.msg = this.fn = this.color = "";
+  this.el = NULL;
+}
+
+Debug.prototype.init = function () {
+  var body, el;
+  var self = this;
+
+  el = this.el = document.createElement("div");
+
+  var clearNode = document.createElement("a");
+  var clearCount = document.createElement("a");
+  var showNode = document.createElement("a");
+  var hideNode = document.createElement("a");
+
+  this.container = document.createElement("div");
+  this.container.setAttribute("style", containerCSS);
+
+  showNode.textContent = '显示';
+  hideNode.textContent = '隐藏';
+  clearNode.textContent = '清屏';
+  clearCount.textContent = '清计数';
+
+  clearNode.setAttribute("style", clearCSS);
+  clearCount.setAttribute("style", clearCountCSS);
+  showNode.setAttribute("style", showNodeCSS);
+  hideNode.setAttribute("style", hideNodeCSS);
+
+  el.setAttribute("style", joinCss(parentCss));
+  el.appendChild(this.container);
+  el.appendChild(clearNode);
+  el.appendChild(clearCount);
+  el.appendChild(showNode);
+  el.appendChild(hideNode);
+
+  body = getBody();
+  body.appendChild(el);
+
+  translate(el, 0);
+
+  function setColor(node) {
+    node.style.backgroundColor = 'red';
+    setTimeout(function () {
+      node.style.backgroundColor = '';
+    }, 50);
+  }
+
+  $on(clearCount, {
+    end: function end(e) {
+      setColor(clearCount);
+      e.stopPropagation();
+      resetCount();
+    }
+  });
+
+  $on(clearNode, {
+    end: function end(e) {
+      setColor(clearNode);
+      e.stopPropagation();
+      self.container.innerHTML = '';
+    }
+  });
+
+  $on(showNode, {
+    end: function end(e) {
+      setColor(showNode);
+      e.stopPropagation();
+      self.show();
+    }
+  });
+
+  $on(hideNode, {
+    end: function end(e) {
+      setColor(hideNode);
+      e.stopPropagation();
+      self.hide();
+    }
+  });
+
+  this.isInit = true;
+  return this;
+};
+
+Debug.prototype.print = function () {
+  var child, css;
+  if (!this.isInit) {
+    this.init();
+  }
+
+  if (this.isHide) {
+    this.show();
+  }
+
+  css = childCss.concat(["color:#" + this.color]);
+  child = document.createElement("p");
+  child.setAttribute("style", joinCss(css));
+  child.innerHTML = this.msg;
+  /*只显示一半的区域，然后可以被重复的替换*/
+  if (this.container.offsetHeight > document.documentElement.clientHeight / 2) {
+    var node = this.container.firstChild;
+    if (node.nodeName === 'P') {
+      this.container.removeChild(node);
+    }
+  }
+  this.container.appendChild(child);
+  return this;
+};
+
+Debug.prototype.toggle = function (event) {
+  return (this.isHide ? this.show : this.hide).call(this, event);
+};
+
+Debug.prototype.show = function (event) {
+  translate(this.el, 0);
+  this.isHide = false;
+  return this;
+};
+
+Debug.prototype.hide = function (event) {
+  translate(this.el, "-" + (this.el.offsetHeight - parentBottom) + "px");
+  this.isHide = true;
+  return this;
+};
+
+var _loop = function _loop(fn) {
+  Debug.prototype[fn] = function (msg) {
+    this.fn = fn;
+    this.msg = render(msg);
+    this.color = debugMap[fn];
+    return this.print();
+  };
+};
+
+for (var fn in debugMap) {
+  _loop(fn);
+}
+
+/*
+  $warn('hello');
+  $warn('信息','info');
+  $warn('错误','error');
+  $warn('警告','warn');
+
+  debug.success("This is success message:)");
+  debug.error("This is error message:)");
+  debug.log("This is primary message:)");
+  debug.log({a: 1, b: 2});
+  debug.log([1,2,3]);
+ */
+var hasConsole = typeof console !== 'undefined';
+
+var debug = void 0;
+var count = 0;
+
+function $warn(data, content, level, color) {
+
+  var silent = config.debug.silent;
+
+  if (!silent) {
+    return;
+  }
+
+  if (!hasConsole) {
+    return;
+  }
+
+  var dataType = typeof data === 'undefined' ? 'undefined' : _typeof(data);
+
+  /**
+   * 输出日志
+   * @return {[type]} [description]
+   */
+  function outlog(type, content, level, color) {
+
+    //如果启动了全部处理
+    //如果能找到对应的处理
+    //silent：['all','preload'.....]
+    if (~silent.indexOf('all') || ~silent.indexOf(type)) {
+
+      var stringType = typeof content === 'string';
+
+      ++count;
+
+      //远程debug输出
+      if (config.debug.terminal) {
+        var errListener = function errListener(error) {
+          var msg = ["Error:", "filename: " + error.filename, "lineno: " + error.lineno, "message: " + error.message, "type: " + error.type];
+          return debug.error(msg.join("<br/>"));
+        };
+        //监听错误
+
+
+        if (!debug) {
+          debug = new Debug();
+        }
+
+        window.addEventListener('error', errListener, false);
+        debug.log(count + ' \u7C7B\u578B:' + type + ' \u5185\u5BB9:' + content);
+        return;
+      }
+
+      //console输出
+      var command = console[level] || console.log;
+      if (stringType) {
+        command('%c' + count + ' \u7C7B\u578B:%c' + type + ' %c\u5185\u5BB9:%c' + String.styleFormat(content), "color:#A0522D", "color:" + color, "color:#A0522D", "color:" + color);
+      } else {
+        command(count + ' \u7C7B\u578B:' + type + ' \u5185\u5BB9:', content);
+      }
+    }
+  }
+
+  //如果是对象数据
+  //data = {
+  //  type
+  //  content
+  //  level
+  //  color
+  //}
+  if (dataType === 'object') {
+    var type = data.type;
+    var _content = data.content;
+    var _level = data.level;
+    var _color = data.color;
+    outlog(type, _content, _level, _color);
+  } else {
+    //传递的是普通类型
+    //$warn(type,content,level,color)
+    outlog(data, content, level, color);
+  }
+}
+
+function resetCount() {
+  count = 0;
+}
+
+Xut.$warn = $warn;
 
 /**
  * callback(1,2)
@@ -44133,7 +44133,7 @@ function clearId() {
 ////////////////////////////////////////////////////
 
 function showWarn(data) {
-  $warn({
+  Xut.$warn({
     type: 'util',
     content: data
   });
@@ -44454,7 +44454,7 @@ function execScript(code, type) {
   try {
     new Function(enterReplace$$1(code))();
   } catch (e) {
-    $warn({
+    Xut.$warn({
       type: 'util',
       content: '加载脚本错误'
     });
@@ -44503,7 +44503,7 @@ var converProportion = function converProportion(_ref) {
 
 
   if (!proportion) {
-    $warn({
+    Xut.$warn({
       type: 'util',
       content: '没有传递缩放比,取全局config'
     });
@@ -44970,7 +44970,7 @@ function readFileContent(path, callback, type) {
         callback(data);
         delete window.HTMLCONFIG[fileName];
       } else {
-        $warn({
+        Xut.$warn({
           type: 'util',
           content: 'js文件加载失败，文件名:' + path
         });
@@ -45024,7 +45024,7 @@ function readFileContent(path, callback, type) {
         delete window.HTMLCONFIG[name];
         delete window.IBOOKSCONFIG[name];
       } else {
-        $warn({
+        Xut.$warn({
           type: 'util',
           content: '编译:脚本加载失败，文件名:' + name
         });
@@ -45053,7 +45053,7 @@ function readFileContent(path, callback, type) {
         callback(svgContent);
       },
       error: function error(xhr, type) {
-        $warn({
+        Xut.$warn({
           type: 'util',
           content: 'svg文件解释出错，文件名:' + path
         });
@@ -47399,6 +47399,7 @@ var AsyAccess = function (_Observer) {
 /// 资源加载错误后，开始循环检测2次
 /// 分别是6秒 - 12秒的时间
 ///////////////////////////////
+
 /**
  * 循环的列表对象
  * @type {Array}
@@ -47411,7 +47412,7 @@ var loopQueue = {};
  */
 function addLoop(filePath, detect) {
   if (loopQueue[filePath]) {
-    $warn({
+    Xut.$warn({
       type: 'preload',
       content: '\u91CD\u590D\u589E\u52A0,\u6587\u4EF6\u5DF2\u7ECF\u5B58\u5728\u5FAA\u73AF\u5217\u8868 ' + filePath,
       level: 'error'
@@ -48173,7 +48174,7 @@ function setDefaultSuffix() {
     if (maxWidth >= 1440) {
       config.launch.baseImageSuffix = config.launch.imageSuffix['1440'];
     }
-    $warn({
+    Xut.$warn({
       type: 'config',
       content: 'css media匹配suffix失败，采用js采用计算 config.launch.baseImageSuffix = ' + config.launch.baseImageSuffix
     });
@@ -49679,7 +49680,7 @@ var AudioSuper = function () {
         if (weixinJSBridge) {
           weixinJSBridge.invoke('getNetworkType', {}, function (e) {
             if (_this2.audio) {
-              $warn({
+              Xut.$warn({
                 type: 'weixinJSBridgeAudio',
                 content: '+\u64AD\u653E\u97F3\u9891,audio\u7684id:' + _this2.options.audioId
               });
@@ -49689,7 +49690,7 @@ var AudioSuper = function () {
         } else {
           //秒秒学提示play不存在
           if (this.audio.play) {
-            $warn({
+            Xut.$warn({
               type: 'html5Audio',
               content: '+\u64AD\u653E\u97F3\u9891,audio\u7684id:' + this.options.audioId
             });
@@ -49762,7 +49763,7 @@ var AudioSuper = function () {
         this.acitonObj = null;
       }
 
-      $warn({
+      Xut.$warn({
         type: 'html5Audio',
         content: '-\u9500\u6BC1\u97F3\u9891,audio\u7684id:' + this.options.audioId
       });
@@ -50238,7 +50239,7 @@ var HTML5Audio = function (_AudioSuper) {
       //需要修复
       if (this._needFix) {
 
-        $warn({
+        Xut.$warn({
           type: 'html5Audio',
           content: '\u4FEE\u590D\u672A\u81EA\u52A8\u64AD\u653E\u5BF9\u8C61,audio\u7684id:' + this.options.audioId
         });
@@ -71763,7 +71764,7 @@ var initstate = function (baseProto) {
 
         /*component与activity共享了一个Container，所以只能处理一次*/
         if (divertor && floatGroup.pageContainer) {
-          $warn({
+          Xut.$warn({
             type: 'pagebase',
             content: 'floatPages重复pageContainer'
           });
@@ -71781,7 +71782,7 @@ var initstate = function (baseProto) {
               }
               floatGroup.pageGroup[id] = contentObj;
             } else {
-              $warn({
+              Xut.$warn({
                 type: 'pagebase',
                 content: '页面浮动对象找不到'
               });
@@ -71801,7 +71802,7 @@ var initstate = function (baseProto) {
 
         /*component与activity共享了一个Container，所以只能处理一次*/
         if (divertor && floatGroup.masterContainer) {
-          $warn({
+          Xut.$warn({
             type: 'pagebase',
             content: 'floatMasters重复masterContainer'
           });
@@ -72708,7 +72709,7 @@ var movePage = function (baseProto) {
           clearTimeout(timer);
           timer = null;
           if (pageNode.getAttribute('data-visual')) {
-            $warn({
+            Xut.$warn({
               type: 'pagebase',
               content: '翻页translate回调丢失了，通过定时器手动调用修复'
             });
@@ -75781,6 +75782,7 @@ var Scheduler = function () {
  * 场景API
  * 数据接口。和电子杂志的数据相关的接口，都在这里。
  ********************************************/
+
 /**
  * 命名前缀
  * @type {String}
@@ -75846,9 +75848,9 @@ function extendPresentation(access, $$globalSwiper) {
     if (pageObj.floatGroup[containerName].length) {
       return pageObj.floatGroup[containerName];
     } else {
-      $warn({
+      Xut.$warn({
         type: 'api',
-        content: '\u6D6E\u52A8\u6839\u8282\u70B9\u6CA1\u6709\u627E\u5230, pageType:' + pageType,
+        content: "\u6D6E\u52A8\u6839\u8282\u70B9\u6CA1\u6709\u627E\u5230, pageType:" + pageType,
         color: 'red'
       });
     }
@@ -75882,9 +75884,9 @@ function extendPresentation(access, $$globalSwiper) {
     if (pageBase && pageBase.getStyle) {
       return pageBase.getStyle;
     } else {
-      $warn({
+      Xut.$warn({
         type: 'api',
-        content: '\u9875\u9762Style\u914D\u7F6E\u6587\u4EF6\u83B7\u53D6\u5931\u8D25, pageIndex:' + pageIndex,
+        content: "\u9875\u9762Style\u914D\u7F6E\u6587\u4EF6\u83B7\u53D6\u5931\u8D25, pageIndex:" + pageIndex,
         color: 'red'
       });
     }
@@ -76258,7 +76260,7 @@ function extendView($$mediator, access, $$globalSwiper) {
 
     //这个模式必须是禁止手势滑动的
     if (config.launch.gestureSwipe) {
-      $warn({
+      Xut.$warn({
         type: 'api',
         content: 'gestureSwipe启动了，Xut.View.InsertAfter不生效',
         color: 'red'
@@ -77060,7 +77062,7 @@ function createaAccess(mgr) {
     if (mgr[pageType]) {
       return callback(mgr[pageType], pageType, args, eachContext);
     } else {
-      $warn({
+      Xut.$warn({
         type: 'api',
         content: '\u4F20\u9012\u5230access\u7684pageType\u9519\u8BEF\uFF0CpageType=' + pageType,
         color: 'red'
@@ -80934,7 +80936,7 @@ var GlobalBar = function () {
   }, {
     key: '_centerView',
     value: function _centerView() {
-      var html = '<li class="g-center g-direction-first">\n         <a class="g-prev g-prev-noclick"></a>\n         <div><a class="g-title">' + (config.launch.pageBar.title || config.data.shortName) + '</a></div>\n         <a class="g-next g-next-noclick"></a>\n       </li>';
+      var html = '<li class="g-center g-direction-first">\n         <div class="g-prev g-prev-noclick"></div>\n         <div class="g-title"><a>' + (config.launch.pageBar.title || config.data.shortName) + '</a></div>\n         <div class="g-next g-next-noclick"></div>\n       </li>';
       this.container.append(String.styleFormat(html));
 
       var self = this;
@@ -82873,7 +82875,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.7;
+Xut.Version = 892.8;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

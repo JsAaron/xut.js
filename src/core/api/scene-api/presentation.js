@@ -2,7 +2,6 @@
  * 场景API
  * 数据接口。和电子杂志的数据相关的接口，都在这里。
  ********************************************/
-import { $warn } from '../../util/debug/index'
 
 /**
  * 命名前缀
@@ -75,7 +74,7 @@ export function extendPresentation(access, $$globalSwiper) {
     if (pageObj.floatGroup[containerName].length) {
       return pageObj.floatGroup[containerName]
     } else {
-      $warn({
+      Xut.$warn({
         type: 'api',
         content: `浮动根节点没有找到, pageType:${pageType}`,
         color: 'red'
@@ -111,7 +110,7 @@ export function extendPresentation(access, $$globalSwiper) {
     if (pageBase && pageBase.getStyle) {
       return pageBase.getStyle
     } else {
-      $warn({
+      Xut.$warn({
         type: 'api',
         content: `页面Style配置文件获取失败, pageIndex:${pageIndex}`,
         color: 'red'

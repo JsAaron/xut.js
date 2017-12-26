@@ -1,4 +1,3 @@
-import { $warn } from '../../../util/debug/index'
 import { config } from '../../../config/index'
 import { create } from '../depend/multievent'
 import Collection from '../depend/collection'
@@ -182,7 +181,7 @@ export default function(baseProto) {
 
         /*component与activity共享了一个Container，所以只能处理一次*/
         if (divertor && floatGroup.pageContainer) {
-          $warn({
+          Xut.$warn({
             type: 'pagebase',
             content: 'floatPages重复pageContainer'
           })
@@ -200,7 +199,7 @@ export default function(baseProto) {
               }
               floatGroup.pageGroup[id] = contentObj
             } else {
-              $warn({
+              Xut.$warn({
                 type: 'pagebase',
                 content: '页面浮动对象找不到'
               })
@@ -219,7 +218,7 @@ export default function(baseProto) {
 
         /*component与activity共享了一个Container，所以只能处理一次*/
         if (divertor && floatGroup.masterContainer) {
-          $warn({
+          Xut.$warn({
             type: 'pagebase',
             content: 'floatMasters重复masterContainer'
           })

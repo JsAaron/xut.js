@@ -1,4 +1,3 @@
-import { $warn } from './debug/index'
 
 /**
  * 2015.3.24
@@ -63,7 +62,7 @@ function addHandler(element, eventName, handler, capture) {
         //所以transitionend就比较特殊了，因为都是同一个事件名称
         //所以只要一份，所以重复绑定就需要去掉
         if (eventName !== 'transitionend') {
-          $warn({
+          Xut.$warn({
             type: 'event',
             content: eventName + '：事件重复绑定添加'
           })
@@ -120,7 +119,7 @@ function removeAll(element) {
   let dataCache = eventDataCache[uuid]
   if (!dataCache) {
 
-    $warn({
+    Xut.$warn({
       type: 'event',
       content: '移除所有事件出错'
     })
@@ -145,7 +144,7 @@ function removeone(element, eventName) {
   let uuid = element.xutHandler
   let dataCache = eventDataCache[uuid]
   if (!dataCache) {
-    $warn({
+    Xut.$warn({
       type: 'event',
       content: '移除事件' + eventName + '出错'
     })
@@ -157,7 +156,7 @@ function removeone(element, eventName) {
     dataCache[eventName] = null
     delete dataCache[eventName]
   } else {
-    $warn({
+    Xut.$warn({
       type: 'event',
       content: '移除事件' + eventName + '出错'
     })
@@ -250,7 +249,7 @@ export function $on(element, callbacks, capture = false) {
 export function $off(element, callbacks) {
 
   if (!element) {
-    $warn({
+    Xut.$warn({
       type: 'event',
       content: '移除事件对象不存在'
     })
@@ -266,7 +265,7 @@ export function $off(element, callbacks) {
   }
 
   if (!_.isArray(callbacks)) {
-    $warn({
+    Xut.$warn({
       type: 'event',
       content: '移除的事件句柄参数，必须是数组'
     })

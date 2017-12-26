@@ -1,5 +1,4 @@
 import { loadFile } from './loader/file'
-import { $warn } from './debug/index'
 import { parseJSON } from './lang'
 import { converImageURL } from './url'
 import { config, resetVisualProportion } from '../config/index'
@@ -146,7 +145,7 @@ export function execScript(code, type) {
   try {
     new Function(enterReplace(code))()
   } catch (e) {
-    $warn({
+    Xut.$warn({
       type: 'util',
       content: '加载脚本错误'
     })
@@ -195,7 +194,7 @@ const converProportion = function({
 }) {
 
   if (!proportion) {
-    $warn({
+    Xut.$warn({
       type: 'util',
       content: '没有传递缩放比,取全局config'
     })

@@ -1,7 +1,6 @@
 import { config } from '../../../config/index'
 import { Action } from '../action'
 import { Subtitle } from '../subtitle'
-import { $warn } from '../../../util/debug/index'
 
 /**
  * 音频工厂类
@@ -165,7 +164,7 @@ export default class AudioSuper {
       if (weixinJSBridge) {
         weixinJSBridge.invoke('getNetworkType', {}, (e) => {
           if (this.audio) {
-            $warn({
+            Xut.$warn({
               type: 'weixinJSBridgeAudio',
               content: `+播放音频,audio的id:${this.options.audioId}`
             })
@@ -175,7 +174,7 @@ export default class AudioSuper {
       } else {
         //秒秒学提示play不存在
         if (this.audio.play) {
-          $warn({
+          Xut.$warn({
             type: 'html5Audio',
             content: `+播放音频,audio的id:${this.options.audioId}`
           })
@@ -241,7 +240,7 @@ export default class AudioSuper {
       this.acitonObj = null;
     }
 
-    $warn({
+    Xut.$warn({
       type: 'html5Audio',
       content: `-销毁音频,audio的id:${this.options.audioId}`
     })
