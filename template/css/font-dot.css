@@ -1,0 +1,41 @@
+[class^="xut-dotIcon-"],
+[class*=" xut-dotIcon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'xut-dotStyle' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: bold;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  color: #444444;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.xut-dotIcon-stop:before {
+  content: "\e902";
+}
+
+.xut-dotIcon-circle-full:before {
+  content: "\e903";
+}
+
+.xut-dotIcon-cd:before {
+  content: "\e904";
+}
+
+.xut-dotIcon-adjust:before {
+  content: "\e39e";
+}
+
+.xut-dotIcon-brightness_1:before {
+  content: "\e3a6";
+}
+
+.xut-dotIcon-record:before {
+  content: "\e049";
+}

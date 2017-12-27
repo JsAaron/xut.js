@@ -1,0 +1,231 @@
+/**
+ * 全局工具栏
+ */
+.xut-global-bar {
+  border: 0;
+  background-color: #1f1f1f;
+  background-size: 100% 100%;
+  position: absolute;
+  z-index: 999999;
+  bottom: 0;
+  width: 100%;
+  height: 3.78%;
+  padding: .4% 0;
+}
+
+.xut-global-bar li {
+  float: left;
+  list-style: none;
+}
+
+/*********************
+ * 左边区域
+ *********************/
+.xut-global-bar .g-left {
+  position: absolute;
+  color: #999999;
+  width: 20%;
+  height: 80%;
+  top: 10%;
+}
+
+.xut-global-bar .g-left > div {
+  width: 45%;
+  height: 100%;
+  display: inline-block;
+  float: left;
+}
+
+.xut-global-bar .g-left > div a {
+  width: 50%;
+  height: 100%;
+  display: block;
+  background-size: 100% 100%;
+}
+
+/*目录*/
+.xut-global-bar .g-dir {
+  margin: 0 auto;
+  background-image: url(../images/global-bar/dir-default.png);
+}
+
+.xut-global-bar .g-dir:active {
+  background-image: url(../images/global-bar/dir-default-active.png);
+}
+
+/* 封面*/
+.xut-global-bar .g-cover {
+  background-image: url(../images/global-bar/cover-default.png);
+}
+
+.xut-global-bar .g-cover:active {
+  background-image: url(../images/global-bar/cover-default-active.png);
+}
+
+/*********************
+ * 中间区域
+ *********************/
+.xut-global-bar .g-center {
+  position: absolute;
+  color: #999999;
+  width: 30%;
+  left: 30%;
+  top: 10%;
+  height: 80%;
+}
+
+.xut-global-bar .g-center > div {
+  display: inline-block;
+  width: 22%;
+  height: 100%;
+  float: left;
+  background-color: #252525;
+  background-size: 100% 100%;
+}
+
+.xut-global-bar .g-center >div.g-title {
+  width: 54%;
+  display: flex;/*Flex布局*/
+  display: -webkit-flex; /* Safari */
+  align-items: center;/*指定垂直居中*/
+}
+
+.xut-global-bar .g-center >div.g-title > a {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-bottom: 0;
+  font-size: .5em;
+  padding: 0 1%;
+  text-align: center;
+}
+
+/*上一页*/
+.xut-global-bar .g-center .g-prev {
+  background-image: url(../images/global-bar/prev-default.png);
+}
+
+.xut-global-bar .g-center .g-prev:active {
+  background-image: url('../images/global-bar/prev-default-active.png');
+}
+
+/*下一页*/
+.xut-global-bar .g-center .g-next {
+  background-image: url('../images/global-bar/next-default.png');
+}
+
+.xut-global-bar .g-center .g-next:active {
+  background-image: url('../images/global-bar/next-default-active.png');
+}
+
+/*首尾页面样式*/
+.xut-global-bar .g-direction-first .g-prev-noclick {
+  background-image: url('../images/global-bar/prev-default-active.png');
+}
+
+.xut-global-bar .g-direction-end .g-next-noclick {
+  background-image: url('../images/global-bar/next-default-active.png');
+}
+
+/*********************
+ * 右边区域
+ *********************/
+.xut-global-bar .g-right {
+  position: absolute;
+  right: 0;
+  width: 40%;
+  height: 80%;
+  top: 10%;
+}
+
+.xut-global-bar .g-right > div {
+  border: 0;
+  width: 25%;
+  height: 100%;
+  display: inline-block;
+  float: right;
+}
+
+.xut-global-bar .g-right > div a {
+  width: 90%;
+  height: 100%;
+  max-width: 80%;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+  background-size: 100% 100%;
+}
+
+/*继续学习*/
+.xut-global-bar .g-learn .no-click {
+  background-image: url('../images/global-bar/learn-no-click.png');
+}
+
+.xut-global-bar .g-learn .on-click {
+  background-image: url('../images/global-bar/learn-on-click.png');
+}
+
+.xut-global-bar .g-learn .on-click:active {
+  background-image: url('../images/global-bar/learn-no-click.png');
+}
+
+/*提交作业*/
+.xut-global-bar .g-work .commitWork-defalut {
+  background-image: url('../images/global-bar/work-defalut.png');
+}
+
+.xut-global-bar .g-work .commitWork-defalut:active {
+  background-image: url('../images/global-bar/work-defalut-active.png');
+}
+
+.xut-global-bar .g-work .commitWork-message {
+  background-image: url('../images/global-bar/work-message.png');
+}
+
+.xut-global-bar .g-work .commitWork-message:active {
+  background-image: url('../images/global-bar/work-message-active.png');
+}
+
+/*讨论区*/
+.xut-global-bar .g-right a.forum-defalut {
+  background-image: url('../images/global-bar/forum-defalut.png');
+}
+
+.xut-global-bar .g-right a.forum-defalut:active {
+  background-image: url('../images/global-bar/forum-defalut-active.png');
+}
+
+.xut-global-bar .g-right a.forum-message {
+  background-image: url('../images/global-bar/forum-message.png');
+}
+
+.xut-global-bar .g-right a.forum-message:active {
+  background-image: url('../images/global-bar/forum-message-active.png');
+}
+
+/*页码区域*/
+.xut-global-bar .g-right .g-page > div {
+  width: 90%;
+  height: 100%;
+  margin: 0 auto;
+  display: table;
+  background-size: 100% 100%;
+  background-image: url('../images/global-bar/page.png');
+}
+
+.xut-global-bar .g-right .g-page a {
+  text-align: center;
+  width: 50%;
+  display: table-cell;
+  vertical-align: middle;
+  font-size:.7em;
+}
+
+.xut-global-bar .g-right .g-page a:first-child {
+  color: #428bca;
+}
+
+.xut-global-bar .g-right .g-page a:last-child {
+  color: #999999;
+}

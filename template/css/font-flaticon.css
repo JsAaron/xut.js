@@ -1,0 +1,27 @@
+/******************
+*   视频播放器图标
+* *******************/
+[class^="xut-flaticon-"],
+[class*=" xut-flaticon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'xut-flaticon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    color: #007aff;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+.xut-flaticon-error:before {
+    content: "\f100";
+    color: #000;
+    /* background-color: rgba(0, 0, 0, 0.25);*/
+    border-radius: 100%;
+}

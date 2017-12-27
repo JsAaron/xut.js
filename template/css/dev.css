@@ -1,0 +1,19 @@
+* {
+    touch-action: none;
+}
+
+#testButton {
+    position: absolute;
+    width: 50%;
+    height: auto;
+    left:25%;
+    z-index: 9999999;
+}
+
+#testButton button {
+    width: 20%;
+    display: inline-block;
+    border: 1px solid red;
+    transform: scale(.8);
+}
+

@@ -4,10 +4,9 @@
  ********************************************/
 
 import { getPostMessageFn } from '../post-message'
-
+import { Recorder } from '../../expand/recorder/index'
 
 export function extendAssist(access, $$globalSwiper) {
-
 
   //========================
   //  秒秒学嵌套Iframe 讨论区
@@ -164,6 +163,51 @@ export function extendAssist(access, $$globalSwiper) {
    * 错误性
    */
   Xut.Assist.AnswerError = () => setAnswer('error')
+
+
+  //========================
+  //  音频类
+  //========================
+
+// var recorder = new Recorder({
+//     sampleRate: 44100, //采样频率，默认为44100Hz(标准MP3采样率)
+//     bitRate: 128, //比特率，默认为128kbps(标准MP3质量)
+//     success: function(){ //成功回调函数
+//     },
+//     error: function(msg){ //失败回调函数
+//     },
+//     fix: function(msg){ //不支持H5录音回调函数
+//     }
+// });
+
+// setTimeout(function(){
+//   recorder.start()
+// },1000)
+
+
+
+  /**
+   * 开始录音
+   */
+  Xut.Assist.Record = function(id, time) {
+
+  }
+
+  /**
+   * 播放录音
+   */
+  Xut.Assist.RecordPlay = function(id) {
+
+  }
+
+  /**
+   * 停止录音
+   * @param {[type]} id   [description]
+   * @param {[type]} time [description]
+   */
+  Xut.Assist.RecordStop = function(id, time) {
+
+  }
 
 
 

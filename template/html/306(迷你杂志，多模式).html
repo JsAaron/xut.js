@@ -1,0 +1,68 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta content="email=no" name="format-detection" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <title>AppCarrier</title>
+    <style type="text/css">
+    button {
+        position: absolute;
+        z-index: 99999
+    }
+    #closeMini {
+        left: 100px;
+    }
+    </style>
+    <script type="text/javascript" src="lib/external.js"></script>
+</head>
+
+<body>
+    <button id="launchMini">加载新的图书</button>
+    <button id="closeMini">关闭图书</button>
+    <div id="xxtppt-app-container" class="xut-fullscreen xut-overflow-hidden"></div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+Xut.Application.setConfig = {
+    // visualHeight: window.innerHeight - 44,
+    lauchMode: 1,
+    historyMode:false,
+    platform: 'mini',
+    historyMode: true,
+    visualMode: 2,
+    salePageType: 'page',
+    // cursor: {
+    //     url: 'images/icons/busyIcon.gif',
+    //     delayTime: 300
+    // },
+    hqUrlSuffix: 'hi',
+    supportQR: true,
+    swipeDelegate: true
+};
+
+var appId = 306
+$("#launchMini").click(function() {
+    Xut.Application.Launch({
+        el: '#xxtppt-app-container', //根节点
+        launchAnim: false, //关闭启动动画
+        // convert: 'svg', //转化资源svg转化成js
+        path: {
+            resource: 'content/' + appId,
+            database: 'content/' + appId + '/SQLResult.js'
+        }
+    });
+})
+$("#launchMini").trigger('click')
+
+$("#closeMini").click(function() {
+    Xut.Application.Exit()
+})
+</script>
