@@ -169,35 +169,30 @@ export function extendAssist(access, $$globalSwiper) {
   //  音频类
   //========================
 
-// var recorder = new Recorder({
-//     sampleRate: 44100, //采样频率，默认为44100Hz(标准MP3采样率)
-//     bitRate: 128, //比特率，默认为128kbps(标准MP3质量)
-//     success: function(){ //成功回调函数
-//     },
-//     error: function(msg){ //失败回调函数
-//     },
-//     fix: function(msg){ //不支持H5录音回调函数
-//     }
-// });
+  // var recorder = new Recorder({
+  //     sampleRate: 44100, //采样频率，默认为44100Hz(标准MP3采样率)
+  //     bitRate: 128, //比特率，默认为128kbps(标准MP3质量)
+  //     success: function(){ //成功回调函数
+  //     },
+  //     error: function(msg){ //失败回调函数
+  //     },
+  //     fix: function(msg){ //不支持H5录音回调函数
+  //     }
+  // });
 
-// setTimeout(function(){
-//   recorder.start()
-// },1000)
+  // setTimeout(function(){
+  //   recorder.start()
+  // },1000)
 
 
 
   /**
    * 开始录音
    */
-  Xut.Assist.Record = function(id, time) {
-
-  }
-
-  /**
-   * 播放录音
-   */
-  Xut.Assist.RecordPlay = function(id) {
-
+  Xut.Assist.RecordStart = function(id, time) {
+    // Record(id,time,function(){
+    //   //完成回调
+    // })
   }
 
   /**
@@ -205,10 +200,24 @@ export function extendAssist(access, $$globalSwiper) {
    * @param {[type]} id   [description]
    * @param {[type]} time [description]
    */
-  Xut.Assist.RecordStop = function(id, time) {
+  Xut.Assist.RecordStop = function(id) {
 
   }
 
+  /**
+   * 播放录音
+   */
+  Xut.Assist.RecordPlay = function(id) {
+    play(id)
+  }
+
+  /**
+   * 播放停止
+   * @param {[type]} id [description]
+   */
+  Xut.Assist.RecordPlayStop = function(id) {
+    play(id)
+  }
 
 
   //========================

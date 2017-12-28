@@ -56,6 +56,7 @@ var jsName = [
 
 
   'src/plugin/cordova/cordova.js',
+  'src/plugin/cordova/record.js',
   'src/plugin/cordova/readAssetsFilePlugin.js',
   'src/plugin/cordova/initDatabase.js',
   'src/plugin/cordova/web.js',
