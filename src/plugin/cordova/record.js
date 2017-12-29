@@ -5,18 +5,34 @@
 Xut.Plugin.Recorder = {
   // 开始录音
   startRecord: function(id, time, successCallback, errorCallback) {
-    return XXT.plugin_exec(successCallback, errorCallback, "XXTRecord", "startRecord", [id, time]);
+    if (GLOBALIFRAME) {
+      return GLOBALCONTEXT.Recorder.startRecord(id, time, successCallback, errorCallback);
+    } else {
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "startRecord", [id, time])
+    }
   },
   // 结束录音
   stopRecord: function(successCallback, errorCallback) {
-    return XXT.plugin_exec(successCallback, errorCallback, "XXTRecord", "stopRecord", []);
+    if (GLOBALIFRAME) {
+      return GLOBALCONTEXT.Recorder.stopRecord();
+    } else {
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "stopRecord", [])
+    }
   },
   // 开始播放
   startPlay: function(id, successCallback, errorCallback) {
-    return XXT.plugin_exec(successCallback, errorCallback, "XXTRecord", "startPlay", [id]);
+    if (GLOBALIFRAME) {
+      return GLOBALCONTEXT.Recorder.startPlay(id, successCallback, errorCallback);
+    } else {
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "startPlay", [id])
+    }
   },
   // 结束播放
   stopPlay: function(id, successCallback, errorCallback) {
-    return XXT.plugin_exec(successCallback, errorCallback, "XXTRecord", "stopPlay", [id]);
+    if (GLOBALIFRAME) {
+      return GLOBALCONTEXT.Recorder.stopPlay(id);
+    } else {
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "stopPlay", [id])
+    }
   }
 }

@@ -44,7 +44,7 @@ Xut.Application.setConfig = {
 
   debug:{
     // terminal:true,
-    // silent:['all']
+    silent:['record']
   },
 
   // debug: {
@@ -63,13 +63,13 @@ Xut.Application.setConfig = {
   // doublePageMode: false //双页模式
   // trackCode: ['launch', 'init', 'exit', 'flip', 'content', 'hot', 'swipe'], //代码跟踪
   pageBar: {
-    type:'globalBar',
-    button:{
-      commitWork:true,
-      keepLearn:true,
-      forum:true
-    },
-    float:true
+    // type:'globalBar',
+    // button:{
+    //   commitWork:true,
+    //   keepLearn:true,
+    //   forum:true
+    // },
+    // float:true
     // type: ['scrollbar', 'digital']
     // direction:''
     // mode: 1,
@@ -108,7 +108,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 326 //306
+var appId = 53 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

@@ -40,6 +40,7 @@ export default {
    * database 数据库处理相关
    * logic 跟逻辑相关的，流程跑通测试
    * html5Audio html5音频相关
+   * record 录音相关
    */
   silent: null,
 

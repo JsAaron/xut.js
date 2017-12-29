@@ -169,30 +169,28 @@ export function extendAssist(access, $$globalSwiper) {
   //  音频类
   //========================
 
-  // var recorder = new Recorder({
-  //     sampleRate: 44100, //采样频率，默认为44100Hz(标准MP3采样率)
-  //     bitRate: 128, //比特率，默认为128kbps(标准MP3质量)
-  //     success: function(){ //成功回调函数
-  //     },
-  //     error: function(msg){ //失败回调函数
-  //     },
-  //     fix: function(msg){ //不支持H5录音回调函数
-  //     }
-  // });
-
-  // setTimeout(function(){
-  //   recorder.start()
-  // },1000)
-
-
 
   /**
    * 开始录音
    */
   Xut.Assist.RecordStart = function(id, time) {
-    // Record(id,time,function(){
-    //   //完成回调
-    // })
+    if (!id) {
+      Xut.$warn({
+        type: 'record',
+        content: `RecordPlay失败,id:${id}`
+      })
+      return
+    }
+    Xut.$warn({
+      type: 'record',
+      content: `开始录音,id:${id},time:${time}`
+    })
+    Xut.Plugin.Recorder && Xut.Plugin.Recorder.startRecord(id, time, function() {
+      Xut.$warn({
+        type: 'record',
+        content: `RecordStart完成,id:${id}`
+      })
+    })
   }
 
   /**
@@ -208,7 +206,18 @@ export function extendAssist(access, $$globalSwiper) {
    * 播放录音
    */
   Xut.Assist.RecordPlay = function(id) {
-    play(id)
+    if (!id) {
+      Xut.$warn({
+        type: 'record',
+        content: `RecordPlay失败,id:${id}`
+      })
+      return
+    }
+    Xut.$warn({
+      type: 'record',
+      content: `RecordPlay开始,id:${id}`
+    })
+    Xut.Plugin.Recorder && Xut.Plugin.Recorder.startPlay(id)
   }
 
   /**
@@ -216,7 +225,18 @@ export function extendAssist(access, $$globalSwiper) {
    * @param {[type]} id [description]
    */
   Xut.Assist.RecordPlayStop = function(id) {
-    play(id)
+    if (!id) {
+      Xut.$warn({
+        type: 'record',
+        content: `RecordPlayStop,id:${id}`
+      })
+      return
+    }
+    Xut.$warn({
+      type: 'record',
+      content: `RecordPlayStop,id:${id}`
+    })
+    Xut.Plugin.Recorder && Xut.Plugin.Recorder.stopPlay(id)
   }
 
 

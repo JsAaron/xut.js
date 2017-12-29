@@ -30476,6 +30476,45 @@ if(!Xut.plat.isBrowser && !MMXCONFIG) {
   }
 }
 /**
+ * 录音插件
+ * @type {Object}
+ */
+Xut.Plugin.Recorder = {
+  // 开始录音
+  startRecord: function(id, time, successCallback, errorCallback) {
+    if (GLOBALIFRAME) {
+      return GLOBALCONTEXT.Recorder.startRecord(id, time, successCallback, errorCallback);
+    } else {
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "startRecord", [id, time])
+    }
+  },
+  // 结束录音
+  stopRecord: function(successCallback, errorCallback) {
+    if (GLOBALIFRAME) {
+      return GLOBALCONTEXT.Recorder.stopRecord();
+    } else {
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "stopRecord", [])
+    }
+  },
+  // 开始播放
+  startPlay: function(id, successCallback, errorCallback) {
+    if (GLOBALIFRAME) {
+      return GLOBALCONTEXT.Recorder.startPlay(id, successCallback, errorCallback);
+    } else {
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "startPlay", [id])
+    }
+  },
+  // 结束播放
+  stopPlay: function(id, successCallback, errorCallback) {
+    if (GLOBALIFRAME) {
+      return GLOBALCONTEXT.Recorder.stopPlay(id);
+    } else {
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "stopPlay", [id])
+    }
+  }
+}
+
+/**
  *     readAssetsFilePlugin.js
  *     readAssetsFilePlugin PhoneGap plugin (Android)
  *
@@ -42222,6 +42261,7 @@ var improtDebugConfig = {
    * database 数据库处理相关
    * logic 跟逻辑相关的，流程跑通测试
    * html5Audio html5音频相关
+   * record 录音相关
    */
   silent: null,
 
@@ -58402,24 +58442,6 @@ var Powepoint = function () {
     this.isExit0 = false;
 
     /**
-     * 动画前脚本
-     * @type {String}
-     */
-    this.preCode = '';
-
-    /**
-     * 动画后脚本
-     * @type {String}
-     */
-    this.postCode = '';
-
-    /**
-     * 延时
-     * @type {Number}
-     */
-    this.codeDelay = 0;
-
-    /**
      * 是否完全执行过(用于解决重复执行问题)
      * @type {Boolean}
      */
@@ -58479,15 +58501,6 @@ var Powepoint = function () {
       this.parameter0.pageIndex = this.pageIndex;
 
       this.isExit0 = this.parameter0.exit ? this.parameter0.exit.toLowerCase() == "true" : false;
-
-      //获取动画前脚本
-      this.preCode = this._parseCode(data.preCode, this.parameter0.preCode);
-
-      //获取动画后脚本
-      this.postCode = this._parseCode(data.postCode, this.parameter0.postCode);
-
-      //获取延时时间
-      this.codeDelay = this._parseDelayCode(data.codeDelay, this.parameter0.codeDelay);
 
       //给元素增加ppt属性标记
       if (!this.element.attr("data-pptAnimation")) {
@@ -58576,6 +58589,207 @@ var Powepoint = function () {
     }
 
     /**
+     * 返回动画对象
+     */
+
+  }, {
+    key: '_getTimeline',
+    value: function _getTimeline(data, index, completeAction) {
+      var object = this.element;
+      var parameter = this.parameter0;
+      var isExit = this.isExit0;
+
+      ////////////////////////
+      /// 如果有多个动画序列参数
+      ///////////////////////
+      if (index > 0 || this.parameter0 == null) {
+        parameter = parseJSON(data.parameter);
+        isExit = parameter.exit ? parameter.exit.toLowerCase() == "true" : false; //false:进入 true:消失
+        if (index == 0) {
+          this.parameter0 = parameter;
+          this.isExit0 = isExit;
+        }
+      }
+      var duration = data.speed / 1000; //执行时间
+      var delay = data.delay / 1000; //延时时间
+      if (navigator.epubReadingSystem) {
+        //如果是epub阅读器则动画延时0.15秒
+        delay += 0.15;
+      }
+      var repeat = data.repeat >= 0 ? data.repeat - 1 : 0; //重复次数
+      parameter.pageType = this.pageType;
+      parameter.chapterId = this.chapterId;
+      parameter.animationName = data.animationName;
+      //赋给动画音频Id
+      parameter.videoId = data.videoId;
+      //子动画中如果遇到停止了
+      //就直接调用退出通知
+      parameter.completeAction = completeAction;
+
+      ////////////////////////////////////
+      /// 赋予脚本处理代码
+      /// 每个对象数据都可以带脚本代码
+      /// 所以需要把脚本匹配到每一个子动画中
+      ///////////////////////////////////
+      //获取动画前脚本
+      parameter.preCode = this._parseCode(data.preCode);
+      //获取动画后脚本
+      parameter.postCode = this._parseCode(data.postCode);
+      //获取延时时间
+      parameter.codeDelay = this._parseDelayCode(data.codeDelay);
+      //赋予父对象的引用
+      parameter.parent = this;
+
+      var animationName = parameter.animationName;
+      var arg1 = [parameter, object, isExit, duration, delay, repeat];
+      var arg2 = [parameter, object, duration, delay, repeat];
+
+      //文字动画
+      if (animationName === "xxtTextEffect") {
+        return this.getTextAnimation.apply(this, arg2);
+      }
+
+      //路径动画
+      if (animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
+        return this.getPathAnimation.apply(this, arg2);
+      }
+
+      switch (animationName) {
+        case "EffectFade":
+          //淡出
+          return this.getEffectFade.apply(this, arg1);
+        case "EffectFly":
+          //飞入/飞出
+          return this.getEffectFly.apply(this, arg1);
+        case "EffectAscend":
+          //浮入/浮出(上升)
+          return this.getEffectAscend.apply(this, arg1);
+        case "EffectDescend":
+          //浮入/浮出(下降)
+          return this.getEffectDescend.apply(this, arg1);
+        case "EffectSplit":
+          //劈裂(分割)
+          return this.getEffectSplit.apply(this, arg1);
+        case "EffectWipe":
+          //擦除
+          return this.getEffectWipe.apply(this, arg1);
+        case "EffectCircle":
+          //形状一(圆)
+          return this.getEffectCircle.apply(this, arg1);
+        case "EffectBox":
+          //形状二(方框)
+          return this.getEffectBox.apply(this, arg1);
+        case "EffectDiamond":
+          //形状三(菱形)
+          return this.getEffectDiamond.apply(this, arg1);
+        case "EffectPlus":
+          //形状四(加号)
+          return this.getEffectPlus.apply(this, arg1);
+        case "EffectGrowAndTurn":
+          //翻转式由远及近
+          return this.getEffectGrowAndTurn.apply(this, arg1);
+        case "EffectZoom":
+          //基本缩放
+          return this.getEffectZoom.apply(this, arg1);
+        case "EffectFadedZoom":
+          //淡出式缩放
+          return this.getEffectFadedZoom.apply(this, arg1);
+        case "EffectSwivel":
+          //基本旋转
+          return this.getEffectSwivel.apply(this, arg1);
+        case "EffectFadedSwivel":
+          //旋转(淡出式回旋)
+          return this.getEffectFadedSwivel.apply(this, arg1);
+        case "EffectBounce":
+          //弹跳
+          return this.getEffectBounce.apply(this, arg1);
+        case "EffectBlinds":
+          //百叶窗
+          return this.getEffectBlinds.apply(this, arg1);
+        case "EffectPeek":
+          //切入/出
+          return this.getEffectPeek.apply(this, arg1);
+        case "EffectExpand":
+          //展开/收缩
+          return this.getEffectExpand.apply(this, arg1);
+        case "EffectRiseUp":
+          //升起/下沉
+          return this.getEffectRiseUp.apply(this, arg1);
+        case "EffectCenterRevolve":
+          //中心旋转
+          return this.getEffectCenterRevolve.apply(this, arg1);
+        case "EffectSpinner":
+          //回旋
+          return this.getEffectSpinner.apply(this, arg1);
+        case "EffectFloat":
+          //浮动
+          return this.getEffectFloat.apply(this, arg1);
+        case "EffectSpiral":
+          //螺旋飞入/出
+          return this.getEffectSpiral.apply(this, arg1);
+        case "EffectPinwheel":
+          //玩具风车
+          return this.getEffectPinwheel.apply(this, arg1);
+        case "EffectCredits":
+          //字幕式
+          return this.getEffectCredits.apply(this, arg1);
+        case "EffectBoomerang":
+          //飞旋
+          return this.getEffectBoomerang.apply(this, arg1);
+        case "EffectArcUp":
+          //曲线向上/下
+          return this.getEffectArcUp.apply(this, arg1);
+        case "EffectFlashBulb":
+          //脉冲
+          return this.getEffectFlashBulb.apply(this, arg2);
+        case "EffectFlicker":
+          //彩色脉冲
+          return this.getEffectFlicker.apply(this, arg2);
+        case "EffectTeeter":
+          //跷跷板
+          return this.getEffectTeeter.apply(this, arg2);
+        case "EffectSpin":
+          //陀螺旋转
+          return this.getEffectSpin.apply(this, arg2);
+        case "EffectGrowShrink":
+          //放大/缩小
+          return this.getEffectGrowShrink.apply(this, arg2);
+        case "EffectDesaturate":
+          //不饱和
+          return this.getEffectDesaturate.apply(this, arg2);
+        case "EffectDarken":
+          //加深
+          return this.getEffectDarken.apply(this, arg2);
+        case "EffectLighten":
+          //变淡
+          return this.getEffectLighten.apply(this, arg2);
+        case "EffectTransparency":
+          //透明
+          return this.getEffectTransparency.apply(this, arg2);
+        case "EffectColorBlend":
+          //对象颜色
+          return new TimelineMax();
+        case "EffectComplementaryColor":
+          //补色
+          return this.getEffectComplementaryColor.apply(this, arg2);
+        case "EffectChangeLineColor":
+          //线条颜色
+          return new TimelineMax();
+        case "EffectChangeFillColor":
+          //填允颜色
+          return new TimelineMax();
+        case "EffectFlashOnce":
+          //闪烁(一次)
+          return this.getEffectFlashOnce.apply(this, arg2);
+        //进入退出动画
+        default:
+        case "EffectAppear":
+          //出现/消失
+          return this.getEffectAppear.apply(this, arg1);
+      }
+    }
+
+    /**
      * 子动画通用开始事件
      */
 
@@ -58625,26 +58839,40 @@ var Powepoint = function () {
         createContentAudio(parameter.chapterId, parameter.videoId);
       }
 
-      /*eslint-disable */
-
       //ppt动画扩展处理
-      if (parameter.pptanimation && parameter.pptanimation.pptapi) {
-
-        var params = parameter.pptanimation.parameters ? parameter.pptanimation.parameters : {};
-        switch (parameter.pptanimation.pptapi) {
-          case "bonesWidget":
-            //骨骼动画
-            bonesWidget.updateAction(object.attr("id"), params.actList);
-            break;
-          case "spiritWidget":
-            // if (window.spiritWidget) {
-            updateAction(object.attr("id"), params);
-            // }
-            break;
+      var pptanimation = parameter.pptanimation;
+      if (pptanimation && pptanimation.pptapi) {
+        var _params = pptanimation.parameters ? pptanimation.parameters : {};
+        if (pptanimation.pptapi === 'bonesWidget') {
+          //骨骼动画
+          bonesWidget.updateAction(object.attr("id"), _params.actList);
+        } else if (pptanimation.pptapi === 'spiritWidget') {
+          //零件，高级精灵
+          updateAction(object.attr("id"), _params);
         }
       }
 
-      /*eslint-enable */
+      //////////////////
+      ///开始脚本动画
+      ///1 保持父引用的操作
+      //////////////////
+      var preCode = parameter.preCode;
+      if (preCode && _.isFunction(preCode)) {
+        parameter.parent.animation.pause();
+        var result = false;
+        try {
+          result = preCode();
+        } catch (error) {
+          console.log("Run preCode is error in startHandler:" + error);
+        }
+        if (result == true) parameter.parent.animation.resume();else {
+          //如果遇到停止了
+          //动画直接退出
+          //调用外部通知接口
+          parameter.parent.animation.stop();
+          parameter.completeAction();
+        }
+      }
     }
 
     /**
@@ -58691,265 +58919,65 @@ var Powepoint = function () {
             break;
         }
       }
-    }
 
-    /**
-     * 返回动画对象
-     */
-
-  }, {
-    key: '_getTimeline',
-    value: function _getTimeline(data, index) {
-      var object = this.element;
-      var parameter = this.parameter0;
-      var isExit = this.isExit0;
-      if (index > 0 || this.parameter0 == null) {
-        parameter = parseJSON(data.parameter);
-        isExit = parameter.exit ? parameter.exit.toLowerCase() == "true" : false; //false:进入 true:消失
-        if (index == 0) {
-          this.parameter0 = parameter;
-          this.isExit0 = isExit;
+      //延迟执行postCode代码
+      var postCode = parameter.postCode;
+      if (postCode) {
+        try {
+          //简单判断是函数可执行
+          if (_.isFunction(postCode)) {
+            var codeDelay = parameter.codeDelay;
+            if (codeDelay > 0) {
+              setTimeout(postCode, codeDelay);
+            } else {
+              postCode();
+            }
+          }
+        } catch (error) {
+          console.log("Run postCode is error in completeHandler:" + error);
         }
-      }
-      var duration = data.speed / 1000; //执行时间
-      var delay = data.delay / 1000; //延时时间
-      if (navigator.epubReadingSystem) {
-        //如果是epub阅读器则动画延时0.15秒
-        delay += 0.15;
-      }
-      var repeat = data.repeat >= 0 ? data.repeat - 1 : 0; //重复次数
-      parameter.pageType = this.pageType;
-      parameter.chapterId = this.chapterId;
-      parameter.animationName = data.animationName;
-      //赋给动画音频Id
-      parameter.videoId = data.videoId;
-
-      var animationName = parameter.animationName;
-
-      //文字动画
-      if (animationName == "xxtTextEffect") {
-        return this.getTextAnimation(parameter, object, duration, delay, repeat);
-      }
-
-      //路径动画
-      if (animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
-        return this.getPathAnimation(parameter, object, duration, delay, repeat);
-      }
-
-      switch (animationName) {
-        case "EffectFade":
-          //淡出
-          return this.getEffectFade(parameter, object, isExit, duration, delay, repeat);
-        case "EffectFly":
-          //飞入/飞出
-          return this.getEffectFly(parameter, object, isExit, duration, delay, repeat);
-        case "EffectAscend":
-          //浮入/浮出(上升)
-          return this.getEffectAscend(parameter, object, isExit, duration, delay, repeat);
-        case "EffectDescend":
-          //浮入/浮出(下降)
-          return this.getEffectDescend(parameter, object, isExit, duration, delay, repeat);
-        case "EffectSplit":
-          //劈裂(分割)
-          return this.getEffectSplit(parameter, object, isExit, duration, delay, repeat);
-        case "EffectWipe":
-          //擦除
-          return this.getEffectWipe(parameter, object, isExit, duration, delay, repeat);
-        case "EffectCircle":
-          //形状一(圆)
-          return this.getEffectCircle(parameter, object, isExit, duration, delay, repeat);
-        case "EffectBox":
-          //形状二(方框)
-          return this.getEffectBox(parameter, object, isExit, duration, delay, repeat);
-        case "EffectDiamond":
-          //形状三(菱形)
-          return this.getEffectDiamond(parameter, object, isExit, duration, delay, repeat);
-        case "EffectPlus":
-          //形状四(加号)
-          return this.getEffectPlus(parameter, object, isExit, duration, delay, repeat);
-        case "EffectGrowAndTurn":
-          //翻转式由远及近
-          return this.getEffectGrowAndTurn(parameter, object, isExit, duration, delay, repeat);
-        case "EffectZoom":
-          //基本缩放
-          return this.getEffectZoom(parameter, object, isExit, duration, delay, repeat);
-        case "EffectFadedZoom":
-          //淡出式缩放
-          return this.getEffectFadedZoom(parameter, object, isExit, duration, delay, repeat);
-        case "EffectSwivel":
-          //基本旋转
-          return this.getEffectSwivel(parameter, object, isExit, duration, delay, repeat);
-        case "EffectFadedSwivel":
-          //旋转(淡出式回旋)
-          return this.getEffectFadedSwivel(parameter, object, isExit, duration, delay, repeat);
-        case "EffectBounce":
-          //弹跳
-          return this.getEffectBounce(parameter, object, isExit, duration, delay, repeat);
-        case "EffectBlinds":
-          //百叶窗
-          return this.getEffectBlinds(parameter, object, isExit, duration, delay, repeat);
-        case "EffectPeek":
-          //切入/出
-          return this.getEffectPeek(parameter, object, isExit, duration, delay, repeat);
-        case "EffectExpand":
-          //展开/收缩
-          return this.getEffectExpand(parameter, object, isExit, duration, delay, repeat);
-        case "EffectRiseUp":
-          //升起/下沉
-          return this.getEffectRiseUp(parameter, object, isExit, duration, delay, repeat);
-        case "EffectCenterRevolve":
-          //中心旋转
-          return this.getEffectCenterRevolve(parameter, object, isExit, duration, delay, repeat);
-        case "EffectSpinner":
-          //回旋
-          return this.getEffectSpinner(parameter, object, isExit, duration, delay, repeat);
-        case "EffectFloat":
-          //浮动
-          return this.getEffectFloat(parameter, object, isExit, duration, delay, repeat);
-        case "EffectSpiral":
-          //螺旋飞入/出
-          return this.getEffectSpiral(parameter, object, isExit, duration, delay, repeat);
-        case "EffectPinwheel":
-          //玩具风车
-          return this.getEffectPinwheel(parameter, object, isExit, duration, delay, repeat);
-        case "EffectCredits":
-          //字幕式
-          return this.getEffectCredits(parameter, object, isExit, duration, delay, repeat);
-        case "EffectBoomerang":
-          //飞旋
-          return this.getEffectBoomerang(parameter, object, isExit, duration, delay, repeat);
-        case "EffectArcUp":
-          //曲线向上/下
-          return this.getEffectArcUp(parameter, object, isExit, duration, delay, repeat);
-        case "EffectFlashBulb":
-          //脉冲
-          return this.getEffectFlashBulb(parameter, object, duration, delay, repeat);
-        case "EffectFlicker":
-          //彩色脉冲
-          return this.getEffectFlicker(parameter, object, duration, delay, repeat);
-        case "EffectTeeter":
-          //跷跷板
-          return this.getEffectTeeter(parameter, object, duration, delay, repeat);
-        case "EffectSpin":
-          //陀螺旋转
-          return this.getEffectSpin(parameter, object, duration, delay, repeat);
-        case "EffectGrowShrink":
-          //放大/缩小
-          return this.getEffectGrowShrink(parameter, object, duration, delay, repeat);
-        case "EffectDesaturate":
-          //不饱和
-          return this.getEffectDesaturate(parameter, object, duration, delay, repeat);
-        case "EffectDarken":
-          //加深
-          return this.getEffectDarken(parameter, object, duration, delay, repeat);
-        case "EffectLighten":
-          //变淡
-          return this.getEffectLighten(parameter, object, duration, delay, repeat);
-        case "EffectTransparency":
-          //透明
-          return this.getEffectTransparency(parameter, object, duration, delay, repeat);
-        case "EffectColorBlend":
-          //对象颜色
-          return new TimelineMax();
-        case "EffectComplementaryColor":
-          //补色
-          return this.getEffectComplementaryColor(parameter, object, duration, delay, repeat);
-        case "EffectChangeLineColor":
-          //线条颜色
-          return new TimelineMax();
-        case "EffectChangeFillColor":
-          //填允颜色
-          return new TimelineMax();
-        case "EffectFlashOnce":
-          //闪烁(一次)
-          return this.getEffectFlashOnce(parameter, object, duration, delay, repeat);
-        //进入退出动画
-        default:
-        case "EffectAppear":
-          //出现/消失
-          return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
       }
     }
 
     /**
      * 初始化
-     * @param  {[type]} startEvent    [description]
-     * @param  {[type]} completeEvent [description]
-     * @return {[type]}               [description]
      */
 
   }, {
     key: '_initAnimation',
-    value: function _initAnimation(completeEvent) {
+    value: function _initAnimation(callback) {
       var self = this;
 
       /**
        * 整个动画完成事件(动画不需继续执行视为执行完成)
-       * @return {[type]} [description]
+       * 1 子动画中，有任意的脚本遇到停止，那么就提前调用完成
+       * 2 全部动画完成户调用此接口
        */
-      var completeAction = function completeAction() {
-        if (completeEvent && _.isFunction(completeEvent)) {
-          completeEvent();
+      function completeAction() {
+        if (callback && _.isFunction(callback)) {
+          callback();
         }
-      };
+      }
 
       var tl = new TimelineLite({
         paused: true,
-        onStartParams: [this.preCode],
-        onCompleteParams: [this.postCode, this.codeDelay],
-        /**
-         * 动画执行前的初始化
-         */
-        onStart: function onStart(preCode) {
-          //条件判断动画是否执行
-          if (preCode && _.isFunction(preCode)) {
-            self.animation.pause();
-            var result = false;
-            try {
-              result = preCode();
-            } catch (error) {
-              console.log("Run preCode is error in startHandler:" + error);
-            }
-            if (result == true) self.animation.resume();else {
-              self.animation.stop();
-              completeAction();
-            }
-          }
-        },
-
-        /**
-         * 动画完成
-         */
-        onComplete: function onComplete(postCode, codeDelay) {
+        //动画全部完成
+        onComplete: function onComplete() {
           self.isCompleted = true;
-          //延迟执行postCode代码
-          if (postCode) {
-            try {
-              //简单判断是函数可执行
-              if (_.isFunction(postCode)) {
-                if (codeDelay > 0) {
-                  setTimeout(postCode, codeDelay);
-                } else {
-                  postCode();
-                }
-              }
-            } catch (error) {
-              console.log("Run postCode is error in completeHandler:" + error);
-            }
-          }
           completeAction();
         }
       });
 
       for (var i = 0; i < this.options.length; i++) {
         if (i == 0) {
-          tl.add(this._getTimeline(this.options[i], i), "shape0");
+          tl.add(this._getTimeline(this.options[i], i, completeAction), "shape0");
         } else {
           var invokeMode = this.options[i].invokeMode;
           if (invokeMode == 2) {
-            tl.add(this._getTimeline(this.options[i], i));
+            tl.add(this._getTimeline(this.options[i], i, completeAction));
           } else {
-            tl.add(this._getTimeline(this.options[i], i), "shape0"); //"shape"+(i-1)
+            //"shape"+(i-1)
+            tl.add(this._getTimeline(this.options[i], i, completeAction), "shape0");
           }
         }
       }
@@ -76502,6 +76530,13 @@ function handleMessage(event) {
   }
 }
 
+//公共方法
+/**
+ * 构造函数
+ * @param  {[type]} config [description]
+ * @return {[type]}        [description]
+ */
+
 /********************************************
  * 场景API
  * 辅助对象
@@ -76673,6 +76708,78 @@ function extendAssist(access, $$globalSwiper) {
    */
   Xut.Assist.AnswerError = function () {
     return setAnswer('error');
+  };
+
+  //========================
+  //  音频类
+  //========================
+
+
+  /**
+   * 开始录音
+   */
+  Xut.Assist.RecordStart = function (id, time) {
+    if (!id) {
+      Xut.$warn({
+        type: 'record',
+        content: 'RecordPlay\u5931\u8D25,id:' + id
+      });
+      return;
+    }
+    Xut.$warn({
+      type: 'record',
+      content: '\u5F00\u59CB\u5F55\u97F3,id:' + id + ',time:' + time
+    });
+    Xut.Plugin.Recorder && Xut.Plugin.Recorder.startRecord(id, time, function () {
+      Xut.$warn({
+        type: 'record',
+        content: 'RecordStart\u5B8C\u6210,id:' + id
+      });
+    });
+  };
+
+  /**
+   * 停止录音
+   * @param {[type]} id   [description]
+   * @param {[type]} time [description]
+   */
+  Xut.Assist.RecordStop = function (id) {};
+
+  /**
+   * 播放录音
+   */
+  Xut.Assist.RecordPlay = function (id) {
+    if (!id) {
+      Xut.$warn({
+        type: 'record',
+        content: 'RecordPlay\u5931\u8D25,id:' + id
+      });
+      return;
+    }
+    Xut.$warn({
+      type: 'record',
+      content: 'RecordPlay\u5F00\u59CB,id:' + id
+    });
+    Xut.Plugin.Recorder && Xut.Plugin.Recorder.startPlay(id);
+  };
+
+  /**
+   * 播放停止
+   * @param {[type]} id [description]
+   */
+  Xut.Assist.RecordPlayStop = function (id) {
+    if (!id) {
+      Xut.$warn({
+        type: 'record',
+        content: 'RecordPlayStop,id:' + id
+      });
+      return;
+    }
+    Xut.$warn({
+      type: 'record',
+      content: 'RecordPlayStop,id:' + id
+    });
+    Xut.Plugin.Recorder && Xut.Plugin.Recorder.stopPlay(id);
   };
 
   //========================
