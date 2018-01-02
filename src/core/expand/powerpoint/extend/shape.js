@@ -6,8 +6,8 @@
 export default function shape(animproto) {
 
   //形状一(圆)
-  animproto.getEffectCircle = function(parameter, object, isExit, duration, delay, repeat) {
-    if(this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectCircle = function(parameter, object, duration, delay, repeat, isExit) {
+    if(this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向(DirectionIn、DirectionOut)
     var t1 = new TimelineMax({
@@ -78,7 +78,7 @@ export default function shape(animproto) {
   }
 
   //形状二(方框)
-  animproto.getEffectBox = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectBox = function(parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(DirectionIn、DirectionOut)
     if(this.useMask == false) direction = "DirectionOut";
 
@@ -145,8 +145,8 @@ export default function shape(animproto) {
   }
 
   //形状三(菱形)
-  animproto.getEffectDiamond = function(parameter, object, isExit, duration, delay, repeat) {
-    if(this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectDiamond = function(parameter, object, duration, delay, repeat, isExit) {
+    if(this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向(DirectionIn、DirectionOut)
     var t1 = new TimelineMax({
@@ -199,8 +199,8 @@ export default function shape(animproto) {
   }
 
   //形状四(加号)
-  animproto.getEffectPlus = function(parameter, object, isExit, duration, delay, repeat) {
-    if(this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectPlus = function(parameter, object, duration, delay, repeat, isExit) {
+    if(this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向(DirectionIn、DirectionOut)
     var t1 = new TimelineMax({

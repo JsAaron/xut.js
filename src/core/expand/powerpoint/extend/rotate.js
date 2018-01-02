@@ -8,7 +8,7 @@ const transformOrigin = Xut.style.transformOrigin
 export default function rotate(animproto) {
 
   //基本旋转
-  animproto.getEffectSwivel = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectSwivel = function(parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向（水平：DirectionHorizontal、垂直：DirectionVertical
     var t1 = null;
     var easeString = Linear.easeNone;
@@ -144,7 +144,7 @@ export default function rotate(animproto) {
   }
 
   //飞旋
-  animproto.getEffectBoomerang = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectBoomerang = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var time = duration / 3;
     if(isExit == false) {
@@ -204,7 +204,7 @@ export default function rotate(animproto) {
   }
 
   //中心旋转
-  animproto.getEffectCenterRevolve = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectCenterRevolve = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var easeString = Power1.easeInOut;
     if(parameter.tweenEase && parameter.tweenEase.length > 0) easeString = parameter.tweenEase;
@@ -273,7 +273,7 @@ export default function rotate(animproto) {
   }
 
   //回旋
-  animproto.getEffectSpinner = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectSpinner = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var easeString = Expo.easeOut;
     if(parameter.tweenEase && parameter.tweenEase.length > 0) easeString = parameter.tweenEase;
@@ -316,7 +316,7 @@ export default function rotate(animproto) {
   }
 
   //旋转(淡出式回旋)
-  animproto.getEffectFadedSwivel = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFadedSwivel = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var easeString = Linear.easeNone;
     var degree = Math.abs(parameter.degree) > 0 ? Number(parameter.degree) : 90;

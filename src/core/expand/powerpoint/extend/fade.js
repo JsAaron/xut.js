@@ -8,7 +8,7 @@ const filter = Xut.style.filter
 export default function fade(animproto) {
 
   //出现/消失
-  animproto.getEffectAppear = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectAppear = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = new TimelineMax({
       delay: delay,
       repeat: repeat,
@@ -17,7 +17,7 @@ export default function fade(animproto) {
       onComplete: this._completeHandler,
       onCompleteParams: [parameter, object]
     });
-    if(isExit == false)
+    if (isExit == false)
       t1.to(object, 0.001, {
         autoAlpha: 1
       });
@@ -31,9 +31,9 @@ export default function fade(animproto) {
   }
 
   //淡出
-  animproto.getEffectFade = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFade = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
-    if(isExit == false) {
+    if (isExit == false) {
       t1 = new TimelineMax({
         delay: delay,
         repeat: repeat,
@@ -91,7 +91,7 @@ export default function fade(animproto) {
 
   //不饱和
   animproto.getEffectDesaturate = function(parameter, object, duration, delay, repeat) {
-    if(!(filter in object[0].style)) return new TimelineMax();
+    if (!(filter in object[0].style)) return new TimelineMax();
     var saturation = parameter.saturation ? parameter.saturation : 0.5; //饱和度
     var t1 = new TimelineMax({
       delay: delay,
@@ -118,7 +118,7 @@ export default function fade(animproto) {
 
   //加深
   animproto.getEffectDarken = function(parameter, object, duration, delay, repeat) {
-    if(!(filter in object[0].style)) return new TimelineMax();
+    if (!(filter in object[0].style)) return new TimelineMax();
     var brightness = (parameter.brightness && parameter.brightness < 1) ? brightness.saturation : 0.5; //亮度
     var t1 = new TimelineMax({
       delay: delay,
@@ -145,7 +145,7 @@ export default function fade(animproto) {
 
   //变淡
   animproto.getEffectLighten = function(parameter, object, duration, delay, repeat) {
-    if(!(filter in object[0].style)) return new TimelineMax();
+    if (!(filter in object[0].style)) return new TimelineMax();
     var brightness = (parameter.brightness && parameter.brightness > 1) ? parameter.brightness : 1.5; //亮度
     var t1 = new TimelineMax({
       delay: delay,

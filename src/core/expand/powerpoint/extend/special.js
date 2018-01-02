@@ -86,8 +86,8 @@ export default function special(animproto) {
   }
 
   //百叶窗
-  animproto.getEffectBlinds = function(parameter, object, isExit, duration, delay, repeat) {
-    if(this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectBlinds = function(parameter, object, duration, delay, repeat, isExit) {
+    if(this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向（水平：DirectionHorizontal、垂直：DirectionVertical）
     var t1 = new TimelineMax({
@@ -169,8 +169,8 @@ export default function special(animproto) {
   }
 
   //劈裂
-  animproto.getEffectSplit = function(parameter, object, isExit, duration, delay, repeat) {
-    if(this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectSplit = function(parameter, object, duration, delay, repeat, isExit) {
+    if(this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向(DirectionVerticalIn、DirectionHorizontalIn、DirectionHorizontalOut、DirectionVerticalOut)
     var t1 = new TimelineMax({
@@ -243,7 +243,7 @@ export default function special(animproto) {
   }
 
   //擦除
-  animproto.getEffectWipe = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectWipe = function(parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(上下左右)
     var t1 = new TimelineMax({
       delay: delay,
@@ -273,7 +273,7 @@ export default function special(animproto) {
   }
 
   //翻转式由远及近
-  animproto.getEffectGrowAndTurn = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectGrowAndTurn = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if(isExit == false) {
       t1 = new TimelineMax({
@@ -315,7 +315,7 @@ export default function special(animproto) {
   }
 
   //玩具风车
-  animproto.getEffectPinwheel = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectPinwheel = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if(isExit == false) {
       t1 = new TimelineMax({
@@ -356,7 +356,7 @@ export default function special(animproto) {
   }
 
   //展开/收缩
-  animproto.getEffectExpand = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectExpand = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if(isExit == false) {
       t1 = new TimelineMax({
@@ -394,7 +394,7 @@ export default function special(animproto) {
   }
 
   //浮动
-  animproto.getEffectFloat = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFloat = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var objInfo = this._getObjectInfo(object);
     var x, y
@@ -441,7 +441,7 @@ export default function special(animproto) {
   }
 
   //字幕式
-  animproto.getEffectCredits = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectCredits = function(parameter, object, duration, delay, repeat, isExit) {
     var objInfo = this._getObjectInfo(object);
     var y = 0,
       top = 0;
@@ -473,7 +473,7 @@ export default function special(animproto) {
   }
 
   //弹跳
-  animproto.getEffectBounce = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectBounce = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = new TimelineMax({
       delay: delay,
       repeat: repeat,

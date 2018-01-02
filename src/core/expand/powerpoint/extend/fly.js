@@ -6,7 +6,7 @@
 export default function fly(animproto) {
 
   //飞入效果
-  animproto.getEffectFly = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFly = function(parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(上、下、左、右、左上、左下、右上、右下)
     var t1 = null;
     var objInfo = this._getObjectInfo(object);
@@ -206,7 +206,7 @@ export default function fly(animproto) {
   }
 
   //浮入/浮出(下方)
-  animproto.getEffectAscend = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectAscend = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if(isExit == false) {
       t1 = new TimelineMax({
@@ -247,7 +247,7 @@ export default function fly(animproto) {
   }
 
   //浮入/浮出(上方)
-  animproto.getEffectDescend = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectDescend = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if(isExit == false) {
       t1 = new TimelineMax({
@@ -287,7 +287,7 @@ export default function fly(animproto) {
   }
 
   //切入/出
-  animproto.getEffectPeek = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectPeek = function(parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(上下左右)
     var t1 = null;
     var objInfo = this._getObjectInfo(object);
@@ -390,7 +390,7 @@ export default function fly(animproto) {
   }
 
   //螺旋飞入/出
-  animproto.getEffectSpiral = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectSpiral = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = new TimelineMax({
       delay: delay,
       repeat: repeat,
@@ -450,7 +450,7 @@ export default function fly(animproto) {
   }
 
   //曲线向上/下
-  animproto.getEffectArcUp = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectArcUp = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var easeString = Power1.easeInOut;
     if(parameter.tweenEase && parameter.tweenEase.length > 0) easeString = parameter.tweenEase;
@@ -523,7 +523,7 @@ export default function fly(animproto) {
   }
 
   //升起/下沉
-  animproto.getEffectRiseUp = function(parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectRiseUp = function(parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var objInfo = this._getObjectInfo(object);
     var y = objInfo.offsetBottom + objInfo.height;

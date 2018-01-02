@@ -8,7 +8,7 @@ const filter = Xut.style.filter
 export default function zoom(animproto) {
 
   //基本缩放
-  animproto.getEffectZoom = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectZoom = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(放大:DirectionIn、屏幕中心放大:DirectionInCenter、轻微放大:DirectionInSlightly、缩小:DirectionOut、屏幕底部缩小:DirectionOutBottom、轻微缩小:DirectionOutSlightly)
     var t1 = null;
     var result
@@ -131,7 +131,7 @@ export default function zoom(animproto) {
   }
 
   //缩放 淡出式缩放
-  animproto.getEffectFadedZoom = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFadedZoom = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(对象中心DirectionIn、幻灯片中心DirectionInCenter)
     var t1 = null;
     object.css(Xut.style.transformOrigin, "center"); //设置缩放基点(默认是正中心点)
