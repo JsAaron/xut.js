@@ -10,6 +10,7 @@
     "test:duku-online": "node build/test/index.js duku-online",
     "test:miaomiaoxue-online": "node build/test/index.js miaomiaoxue-online",
     "test:ppt-template": "node build/test/index.js ppt-template",
+    "test:game": "node build/test/index.js game",
     "release:download": "node build/release/index.js download",
     "release:upload": "node build/release/index.js upload",
     "svn": "node build/shell/svn.js",

@@ -6,14 +6,14 @@ const watch = require('gulp-watch');
 const buildName = process.argv[process.argv.length - 1]
 
 killOccupied(prot, () => {
-  let baseDir = 'ppt-template'
+  let baseDir = 'www'
   if (buildName) {
     baseDir = buildName
   }
   const bs = browserSync({
     port: prot,
     server: {
-      baseDir: './test/www/',
+      baseDir: `./test/${baseDir}`,
       index: "index.html"
     },
     open: true

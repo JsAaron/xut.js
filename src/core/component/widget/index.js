@@ -118,6 +118,7 @@ const parsePara = (data) => {
 }
 
 export function Adapter(para) {
+
   //获取数据
   let data = getWidgetData(_.extend({}, para))
 
