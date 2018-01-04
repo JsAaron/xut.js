@@ -55153,7 +55153,7 @@ var filter$1 = Xut.style.filter;
 function fade(animproto) {
 
   //出现/消失
-  animproto.getEffectAppear = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectAppear = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = new TimelineMax({
       delay: delay,
       repeat: repeat,
@@ -55173,7 +55173,7 @@ function fade(animproto) {
   };
 
   //淡出
-  animproto.getEffectFade = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFade = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if (isExit == false) {
       t1 = new TimelineMax({
@@ -55339,7 +55339,7 @@ function fade(animproto) {
 function fly(animproto) {
 
   //飞入效果
-  animproto.getEffectFly = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFly = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(上、下、左、右、左上、左下、右上、右下)
     var t1 = null;
     var objInfo = this._getObjectInfo(object);
@@ -55536,7 +55536,7 @@ function fly(animproto) {
   };
 
   //浮入/浮出(下方)
-  animproto.getEffectAscend = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectAscend = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if (isExit == false) {
       t1 = new TimelineMax({
@@ -55577,7 +55577,7 @@ function fly(animproto) {
   };
 
   //浮入/浮出(上方)
-  animproto.getEffectDescend = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectDescend = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if (isExit == false) {
       t1 = new TimelineMax({
@@ -55617,7 +55617,7 @@ function fly(animproto) {
   };
 
   //切入/出
-  animproto.getEffectPeek = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectPeek = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(上下左右)
     var t1 = null;
     var objInfo = this._getObjectInfo(object);
@@ -55720,7 +55720,7 @@ function fly(animproto) {
   };
 
   //螺旋飞入/出
-  animproto.getEffectSpiral = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectSpiral = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = new TimelineMax({
       delay: delay,
       repeat: repeat,
@@ -55780,7 +55780,7 @@ function fly(animproto) {
   };
 
   //曲线向上/下
-  animproto.getEffectArcUp = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectArcUp = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var easeString = Power1.easeInOut;
     if (parameter.tweenEase && parameter.tweenEase.length > 0) easeString = parameter.tweenEase;
@@ -55853,7 +55853,7 @@ function fly(animproto) {
   };
 
   //升起/下沉
-  animproto.getEffectRiseUp = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectRiseUp = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var objInfo = this._getObjectInfo(object);
     var y = objInfo.offsetBottom + objInfo.height;
@@ -56450,7 +56450,7 @@ var transformOrigin = Xut.style.transformOrigin;
 function rotate(animproto) {
 
   //基本旋转
-  animproto.getEffectSwivel = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectSwivel = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向（水平：DirectionHorizontal、垂直：DirectionVertical
     var t1 = null;
     var easeString = Linear.easeNone;
@@ -56597,7 +56597,7 @@ function rotate(animproto) {
   };
 
   //飞旋
-  animproto.getEffectBoomerang = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectBoomerang = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var time = duration / 3;
     if (isExit == false) {
@@ -56657,7 +56657,7 @@ function rotate(animproto) {
   };
 
   //中心旋转
-  animproto.getEffectCenterRevolve = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectCenterRevolve = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var easeString = Power1.easeInOut;
     if (parameter.tweenEase && parameter.tweenEase.length > 0) easeString = parameter.tweenEase;
@@ -56726,7 +56726,7 @@ function rotate(animproto) {
   };
 
   //回旋
-  animproto.getEffectSpinner = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectSpinner = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var easeString = Expo.easeOut;
     if (parameter.tweenEase && parameter.tweenEase.length > 0) easeString = parameter.tweenEase;
@@ -56769,7 +56769,7 @@ function rotate(animproto) {
   };
 
   //旋转(淡出式回旋)
-  animproto.getEffectFadedSwivel = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFadedSwivel = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var easeString = Linear.easeNone;
     var degree = Math.abs(parameter.degree) > 0 ? Number(parameter.degree) : 90;
@@ -56983,8 +56983,8 @@ function special(animproto) {
   };
 
   //百叶窗
-  animproto.getEffectBlinds = function (parameter, object, isExit, duration, delay, repeat) {
-    if (this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectBlinds = function (parameter, object, duration, delay, repeat, isExit) {
+    if (this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向（水平：DirectionHorizontal、垂直：DirectionVertical）
     var t1 = new TimelineMax({
@@ -57070,8 +57070,8 @@ function special(animproto) {
   };
 
   //劈裂
-  animproto.getEffectSplit = function (parameter, object, isExit, duration, delay, repeat) {
-    if (this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectSplit = function (parameter, object, duration, delay, repeat, isExit) {
+    if (this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向(DirectionVerticalIn、DirectionHorizontalIn、DirectionHorizontalOut、DirectionVerticalOut)
     var t1 = new TimelineMax({
@@ -57153,7 +57153,7 @@ function special(animproto) {
   };
 
   //擦除
-  animproto.getEffectWipe = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectWipe = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(上下左右)
     var t1 = new TimelineMax({
       delay: delay,
@@ -57183,7 +57183,7 @@ function special(animproto) {
   };
 
   //翻转式由远及近
-  animproto.getEffectGrowAndTurn = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectGrowAndTurn = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if (isExit == false) {
       t1 = new TimelineMax({
@@ -57225,7 +57225,7 @@ function special(animproto) {
   };
 
   //玩具风车
-  animproto.getEffectPinwheel = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectPinwheel = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if (isExit == false) {
       t1 = new TimelineMax({
@@ -57266,7 +57266,7 @@ function special(animproto) {
   };
 
   //展开/收缩
-  animproto.getEffectExpand = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectExpand = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     if (isExit == false) {
       t1 = new TimelineMax({
@@ -57304,7 +57304,7 @@ function special(animproto) {
   };
 
   //浮动
-  animproto.getEffectFloat = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFloat = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = null;
     var objInfo = this._getObjectInfo(object);
     var x, y;
@@ -57351,7 +57351,7 @@ function special(animproto) {
   };
 
   //字幕式
-  animproto.getEffectCredits = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectCredits = function (parameter, object, duration, delay, repeat, isExit) {
     var objInfo = this._getObjectInfo(object);
     var y = 0,
         top = 0;
@@ -57383,7 +57383,7 @@ function special(animproto) {
   };
 
   //弹跳
-  animproto.getEffectBounce = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectBounce = function (parameter, object, duration, delay, repeat, isExit) {
     var t1 = new TimelineMax({
       delay: delay,
       repeat: repeat,
@@ -57773,7 +57773,7 @@ function special(animproto) {
 function zoom(animproto) {
 
   //基本缩放
-  animproto.getEffectZoom = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectZoom = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(放大:DirectionIn、屏幕中心放大:DirectionInCenter、轻微放大:DirectionInSlightly、缩小:DirectionOut、屏幕底部缩小:DirectionOutBottom、轻微缩小:DirectionOutSlightly)
     var t1 = null;
     var result;
@@ -57896,7 +57896,7 @@ function zoom(animproto) {
   };
 
   //缩放 淡出式缩放
-  animproto.getEffectFadedZoom = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectFadedZoom = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(对象中心DirectionIn、幻灯片中心DirectionInCenter)
     var t1 = null;
     object.css(Xut.style.transformOrigin, "center"); //设置缩放基点(默认是正中心点)
@@ -58120,8 +58120,8 @@ function zoom(animproto) {
 function shape(animproto) {
 
   //形状一(圆)
-  animproto.getEffectCircle = function (parameter, object, isExit, duration, delay, repeat) {
-    if (this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectCircle = function (parameter, object, duration, delay, repeat, isExit) {
+    if (this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向(DirectionIn、DirectionOut)
     var t1 = new TimelineMax({
@@ -58196,7 +58196,7 @@ function shape(animproto) {
   };
 
   //形状二(方框)
-  animproto.getEffectBox = function (parameter, object, isExit, duration, delay, repeat) {
+  animproto.getEffectBox = function (parameter, object, duration, delay, repeat, isExit) {
     var direction = parameter.direction; //方向(DirectionIn、DirectionOut)
     if (this.useMask == false) direction = "DirectionOut";
 
@@ -58263,8 +58263,8 @@ function shape(animproto) {
   };
 
   //形状三(菱形)
-  animproto.getEffectDiamond = function (parameter, object, isExit, duration, delay, repeat) {
-    if (this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectDiamond = function (parameter, object, duration, delay, repeat, isExit) {
+    if (this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向(DirectionIn、DirectionOut)
     var t1 = new TimelineMax({
@@ -58317,8 +58317,8 @@ function shape(animproto) {
   };
 
   //形状四(加号)
-  animproto.getEffectPlus = function (parameter, object, isExit, duration, delay, repeat) {
-    if (this.useMask == false) return this.getEffectAppear(parameter, object, isExit, duration, delay, repeat);
+  animproto.getEffectPlus = function (parameter, object, duration, delay, repeat, isExit) {
+    if (this.useMask == false) return this.getEffectAppear(parameter, object, duration, delay, repeat, isExit);
 
     var direction = parameter.direction; //方向(DirectionIn、DirectionOut)
     var t1 = new TimelineMax({
@@ -58375,6 +58375,69 @@ var CEIL$2 = Math.ceil;
 
 var isMacOS = Xut.plat.isMacOS;
 var isDesktop = Xut.plat.isDesktop;
+
+/**
+ * 解析脚本代码
+ * 包装能函数
+ */
+function parseCode(code) {
+  if (code && code.length > 0) {
+    return makeJsonPack(code);
+  }
+}
+
+/**
+ * 子动画回调中
+ * 设置参数
+ */
+function setParams(object, params) {
+  for (var item in params) {
+    switch (item) {
+      case "x":
+        TweenLite.set(object, {
+          x: params[item]
+        });
+        break;
+      case "y":
+        TweenLite.set(object, {
+          y: params[item]
+        });
+        break;
+      case "rotation":
+        TweenLite.set(object, {
+          rotation: params[item]
+        });
+        break;
+      case "rotationX":
+        TweenLite.set(object, {
+          rotationX: params[item]
+        });
+        break;
+      case "rotationY":
+        TweenLite.set(object, {
+          rotationY: params[item]
+        });
+        break;
+      case "scale":
+        TweenLite.set(object, {
+          scale: params[item]
+        });
+        break;
+      default:
+        object.css(item, params[item]);
+        break;
+    }
+  }
+}
+
+/**
+ * 获取默认的状态
+ * false:进入 true:消失
+ * @return {[type]} [description]
+ */
+function getExit(parameter) {
+  return parameter.exit ? parameter.exit.toLowerCase() == "true" : false;
+}
 
 /**
  * 参数说明
@@ -58454,53 +58517,25 @@ var Powepoint = function () {
   }
 
   /**
-   * 解析脚本代码
-   * 包装能函数
+   * 根据数据库的设置
+   * 对象初始化(visibility)
    */
 
 
   createClass(Powepoint, [{
-    key: '_parseCode',
-    value: function _parseCode(code1, code2) {
-      if (code1 && code1.length > 0) {
-        return makeJsonPack(code1);
-      } else if (code2 && code2.length > 0) {
-        return makeJsonPack(code2);
-      }
-    }
-
-    /**
-     * 解析延时脚本
-     */
-
-  }, {
-    key: '_parseDelayCode',
-    value: function _parseDelayCode(code1, code2) {
-      if (code1 && code1.length > 0) {
-        return code1;
-      } else if (code2 && code2.length > 0) {
-        return code2;
-      }
-    }
-
-    /**
-     * 根据数据库的设置
-     * 对象初始化(visibility)
-     */
-
-  }, {
     key: '_initElement',
     value: function _initElement() {
 
+      //合集动画参数
+      //取第一个作为默认设置
       var data = this.options[0];
-      this.parameter0 = parseJSON(data.parameter);
 
       //为高级动画修改增加
       //2016.3.16
+      this.parameter0 = parseJSON(data.parameter);
       this.parameter0.pageType = this.pageType;
       this.parameter0.pageIndex = this.pageIndex;
-
-      this.isExit0 = this.parameter0.exit ? this.parameter0.exit.toLowerCase() == "true" : false;
+      this.isExit0 = getExit(this.parameter0);
 
       //给元素增加ppt属性标记
       if (!this.element.attr("data-pptAnimation")) {
@@ -58510,7 +58545,6 @@ var Powepoint = function () {
         if (animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
           this.element.css("visibility", "visible");
         } else {
-
           switch (animationName) {
             //强调动画默认显示
             case "EffectFlashBulb": //脉冲
@@ -58589,253 +58623,18 @@ var Powepoint = function () {
     }
 
     /**
-     * 返回动画对象
-     */
-
-  }, {
-    key: '_getTimeline',
-    value: function _getTimeline(data, index, completeAction) {
-      var object = this.element;
-      var parameter = this.parameter0;
-      var isExit = this.isExit0;
-
-      ////////////////////////
-      /// 如果有多个动画序列参数
-      ///////////////////////
-      if (index > 0 || this.parameter0 == null) {
-        parameter = parseJSON(data.parameter);
-        isExit = parameter.exit ? parameter.exit.toLowerCase() == "true" : false; //false:进入 true:消失
-        if (index == 0) {
-          this.parameter0 = parameter;
-          this.isExit0 = isExit;
-        }
-      }
-      var duration = data.speed / 1000; //执行时间
-      var delay = data.delay / 1000; //延时时间
-      if (navigator.epubReadingSystem) {
-        //如果是epub阅读器则动画延时0.15秒
-        delay += 0.15;
-      }
-      var repeat = data.repeat >= 0 ? data.repeat - 1 : 0; //重复次数
-      parameter.pageType = this.pageType;
-      parameter.chapterId = this.chapterId;
-      parameter.animationName = data.animationName;
-      //赋给动画音频Id
-      parameter.videoId = data.videoId;
-      //子动画中如果遇到停止了
-      //就直接调用退出通知
-      parameter.completeAction = completeAction;
-
-      ////////////////////////////////////
-      /// 赋予脚本处理代码
-      /// 每个对象数据都可以带脚本代码
-      /// 所以需要把脚本匹配到每一个子动画中
-      ///////////////////////////////////
-      //获取动画前脚本
-      parameter.preCode = this._parseCode(data.preCode);
-      //获取动画后脚本
-      parameter.postCode = this._parseCode(data.postCode);
-      //获取延时时间
-      parameter.codeDelay = this._parseDelayCode(data.codeDelay);
-      //赋予父对象的引用
-      parameter.parent = this;
-
-      var animationName = parameter.animationName;
-      var arg1 = [parameter, object, isExit, duration, delay, repeat];
-      var arg2 = [parameter, object, duration, delay, repeat];
-
-      //文字动画
-      if (animationName === "xxtTextEffect") {
-        return this.getTextAnimation.apply(this, arg2);
-      }
-
-      //路径动画
-      if (animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
-        return this.getPathAnimation.apply(this, arg2);
-      }
-
-      switch (animationName) {
-        case "EffectFade":
-          //淡出
-          return this.getEffectFade.apply(this, arg1);
-        case "EffectFly":
-          //飞入/飞出
-          return this.getEffectFly.apply(this, arg1);
-        case "EffectAscend":
-          //浮入/浮出(上升)
-          return this.getEffectAscend.apply(this, arg1);
-        case "EffectDescend":
-          //浮入/浮出(下降)
-          return this.getEffectDescend.apply(this, arg1);
-        case "EffectSplit":
-          //劈裂(分割)
-          return this.getEffectSplit.apply(this, arg1);
-        case "EffectWipe":
-          //擦除
-          return this.getEffectWipe.apply(this, arg1);
-        case "EffectCircle":
-          //形状一(圆)
-          return this.getEffectCircle.apply(this, arg1);
-        case "EffectBox":
-          //形状二(方框)
-          return this.getEffectBox.apply(this, arg1);
-        case "EffectDiamond":
-          //形状三(菱形)
-          return this.getEffectDiamond.apply(this, arg1);
-        case "EffectPlus":
-          //形状四(加号)
-          return this.getEffectPlus.apply(this, arg1);
-        case "EffectGrowAndTurn":
-          //翻转式由远及近
-          return this.getEffectGrowAndTurn.apply(this, arg1);
-        case "EffectZoom":
-          //基本缩放
-          return this.getEffectZoom.apply(this, arg1);
-        case "EffectFadedZoom":
-          //淡出式缩放
-          return this.getEffectFadedZoom.apply(this, arg1);
-        case "EffectSwivel":
-          //基本旋转
-          return this.getEffectSwivel.apply(this, arg1);
-        case "EffectFadedSwivel":
-          //旋转(淡出式回旋)
-          return this.getEffectFadedSwivel.apply(this, arg1);
-        case "EffectBounce":
-          //弹跳
-          return this.getEffectBounce.apply(this, arg1);
-        case "EffectBlinds":
-          //百叶窗
-          return this.getEffectBlinds.apply(this, arg1);
-        case "EffectPeek":
-          //切入/出
-          return this.getEffectPeek.apply(this, arg1);
-        case "EffectExpand":
-          //展开/收缩
-          return this.getEffectExpand.apply(this, arg1);
-        case "EffectRiseUp":
-          //升起/下沉
-          return this.getEffectRiseUp.apply(this, arg1);
-        case "EffectCenterRevolve":
-          //中心旋转
-          return this.getEffectCenterRevolve.apply(this, arg1);
-        case "EffectSpinner":
-          //回旋
-          return this.getEffectSpinner.apply(this, arg1);
-        case "EffectFloat":
-          //浮动
-          return this.getEffectFloat.apply(this, arg1);
-        case "EffectSpiral":
-          //螺旋飞入/出
-          return this.getEffectSpiral.apply(this, arg1);
-        case "EffectPinwheel":
-          //玩具风车
-          return this.getEffectPinwheel.apply(this, arg1);
-        case "EffectCredits":
-          //字幕式
-          return this.getEffectCredits.apply(this, arg1);
-        case "EffectBoomerang":
-          //飞旋
-          return this.getEffectBoomerang.apply(this, arg1);
-        case "EffectArcUp":
-          //曲线向上/下
-          return this.getEffectArcUp.apply(this, arg1);
-        case "EffectFlashBulb":
-          //脉冲
-          return this.getEffectFlashBulb.apply(this, arg2);
-        case "EffectFlicker":
-          //彩色脉冲
-          return this.getEffectFlicker.apply(this, arg2);
-        case "EffectTeeter":
-          //跷跷板
-          return this.getEffectTeeter.apply(this, arg2);
-        case "EffectSpin":
-          //陀螺旋转
-          return this.getEffectSpin.apply(this, arg2);
-        case "EffectGrowShrink":
-          //放大/缩小
-          return this.getEffectGrowShrink.apply(this, arg2);
-        case "EffectDesaturate":
-          //不饱和
-          return this.getEffectDesaturate.apply(this, arg2);
-        case "EffectDarken":
-          //加深
-          return this.getEffectDarken.apply(this, arg2);
-        case "EffectLighten":
-          //变淡
-          return this.getEffectLighten.apply(this, arg2);
-        case "EffectTransparency":
-          //透明
-          return this.getEffectTransparency.apply(this, arg2);
-        case "EffectColorBlend":
-          //对象颜色
-          return new TimelineMax();
-        case "EffectComplementaryColor":
-          //补色
-          return this.getEffectComplementaryColor.apply(this, arg2);
-        case "EffectChangeLineColor":
-          //线条颜色
-          return new TimelineMax();
-        case "EffectChangeFillColor":
-          //填允颜色
-          return new TimelineMax();
-        case "EffectFlashOnce":
-          //闪烁(一次)
-          return this.getEffectFlashOnce.apply(this, arg2);
-        //进入退出动画
-        default:
-        case "EffectAppear":
-          //出现/消失
-          return this.getEffectAppear.apply(this, arg1);
-      }
-    }
-
-    /**
      * 子动画通用开始事件
      */
 
   }, {
     key: '_startHandler',
     value: function _startHandler(parameter, object, params) {
-      for (var item in params) {
-        switch (item) {
-          case "x":
-            TweenLite.set(object, {
-              x: params[item]
-            });
-            break;
-          case "y":
-            TweenLite.set(object, {
-              y: params[item]
-            });
-            break;
-          case "rotation":
-            TweenLite.set(object, {
-              rotation: params[item]
-            });
-            break;
-          case "rotationX":
-            TweenLite.set(object, {
-              rotationX: params[item]
-            });
-            break;
-          case "rotationY":
-            TweenLite.set(object, {
-              rotationY: params[item]
-            });
-            break;
-          case "scale":
-            TweenLite.set(object, {
-              scale: params[item]
-            });
-            break;
-          default:
-            object.css(item, params[item]);
-            break;
-        }
-      }
+
+      //设置参数
+      setParams(object, params);
 
       //ppt动画音频
-      if (parameter.videoId > 0) {
+      if (parameter.videoId) {
         createContentAudio(parameter.chapterId, parameter.videoId);
       }
 
@@ -58882,43 +58681,9 @@ var Powepoint = function () {
   }, {
     key: '_completeHandler',
     value: function _completeHandler(parameter, object, params) {
-      for (var item in params) {
-        switch (item) {
-          case "x":
-            TweenLite.set(object, {
-              x: params[item]
-            });
-            break;
-          case "y":
-            TweenLite.set(object, {
-              y: params[item]
-            });
-            break;
-          case "rotation":
-            TweenLite.set(object, {
-              rotation: params[item]
-            });
-            break;
-          case "rotationX":
-            TweenLite.set(object, {
-              rotationX: params[item]
-            });
-            break;
-          case "rotationY":
-            TweenLite.set(object, {
-              rotationY: params[item]
-            });
-            break;
-          case "scale":
-            TweenLite.set(object, {
-              scale: params[item]
-            });
-            break;
-          default:
-            object.css(item, params[item]);
-            break;
-        }
-      }
+
+      //设置参数
+      setParams(object, params);
 
       //延迟执行postCode代码
       var postCode = parameter.postCode;
@@ -58936,6 +58701,209 @@ var Powepoint = function () {
         } catch (error) {
           console.log("Run postCode is error in completeHandler:" + error);
         }
+      }
+    }
+
+    /**
+     * 返回动画对象
+     */
+
+  }, {
+    key: '_getTimeline',
+    value: function _getTimeline(data, index, completeAction) {
+      var object = this.element;
+      var parameter = this.parameter0;
+      var isExit = this.isExit0;
+
+      ////////////////////////
+      /// 如果有多个动画序列参数
+      /// 从第二个开始取新数据
+      ///////////////////////
+      if (index > 0 || this.parameter0 == null) {
+        parameter = parseJSON(data.parameter);
+        isExit = getExit(parameter);
+        //有多个动画，并且后面的动画序列没有参数设置
+        //采用默认的第一个
+        if (index == 0) {
+          this.parameter0 = parameter;
+          this.isExit0 = isExit;
+        }
+      }
+      var duration = data.speed / 1000; //执行时间
+      var delay = data.delay / 1000; //延时时间
+      if (navigator.epubReadingSystem) {
+        //如果是epub阅读器则动画延时0.15秒
+        delay += 0.15;
+      }
+      var repeat = data.repeat >= 0 ? data.repeat - 1 : 0; //重复次数
+      parameter.pageType = this.pageType;
+      parameter.chapterId = this.chapterId;
+      parameter.animationName = data.animationName;
+      //赋给动画音频Id
+      parameter.videoId = data.videoId;
+      //子动画中如果遇到停止了
+      //就直接调用退出通知
+      parameter.completeAction = completeAction;
+
+      ////////////////////////////////////
+      /// 赋予脚本处理代码
+      /// 每个对象数据都可以带脚本代码
+      /// 所以需要把脚本匹配到每一个子动画中
+      ///////////////////////////////////
+      //获取动画前脚本
+      parameter.preCode = parseCode(data.preCode);
+      //获取动画后脚本
+      parameter.postCode = parseCode(data.postCode);
+      //获取延时时间
+      parameter.codeDelay = data.codeDelay;
+      //赋予父对象的引用
+      parameter.parent = this;
+
+      var animationName = parameter.animationName;
+      var args = [parameter, object, duration, delay, repeat, isExit];
+
+      //文字动画
+      if (animationName === "xxtTextEffect") {
+        return this.getTextAnimation.apply(this, args);
+      }
+
+      //路径动画
+      if (animationName.indexOf("EffectPath") == 0 || animationName == "EffectCustom") {
+        return this.getPathAnimation.apply(this, args);
+      }
+
+      switch (animationName) {
+        case "EffectFade":
+          //淡出
+          return this.getEffectFade.apply(this, args);
+        case "EffectFly":
+          //飞入/飞出
+          return this.getEffectFly.apply(this, args);
+        case "EffectAscend":
+          //浮入/浮出(上升)
+          return this.getEffectAscend.apply(this, args);
+        case "EffectDescend":
+          //浮入/浮出(下降)
+          return this.getEffectDescend.apply(this, args);
+        case "EffectSplit":
+          //劈裂(分割)
+          return this.getEffectSplit.apply(this, args);
+        case "EffectWipe":
+          //擦除
+          return this.getEffectWipe.apply(this, args);
+        case "EffectCircle":
+          //形状一(圆)
+          return this.getEffectCircle.apply(this, args);
+        case "EffectBox":
+          //形状二(方框)
+          return this.getEffectBox.apply(this, args);
+        case "EffectDiamond":
+          //形状三(菱形)
+          return this.getEffectDiamond.apply(this, args);
+        case "EffectPlus":
+          //形状四(加号)
+          return this.getEffectPlus.apply(this, args);
+        case "EffectGrowAndTurn":
+          //翻转式由远及近
+          return this.getEffectGrowAndTurn.apply(this, args);
+        case "EffectZoom":
+          //基本缩放
+          return this.getEffectZoom.apply(this, args);
+        case "EffectFadedZoom":
+          //淡出式缩放
+          return this.getEffectFadedZoom.apply(this, args);
+        case "EffectSwivel":
+          //基本旋转
+          return this.getEffectSwivel.apply(this, args);
+        case "EffectFadedSwivel":
+          //旋转(淡出式回旋)
+          return this.getEffectFadedSwivel.apply(this, args);
+        case "EffectBounce":
+          //弹跳
+          return this.getEffectBounce.apply(this, args);
+        case "EffectBlinds":
+          //百叶窗
+          return this.getEffectBlinds.apply(this, args);
+        case "EffectPeek":
+          //切入/出
+          return this.getEffectPeek.apply(this, args);
+        case "EffectExpand":
+          //展开/收缩
+          return this.getEffectExpand.apply(this, args);
+        case "EffectRiseUp":
+          //升起/下沉
+          return this.getEffectRiseUp.apply(this, args);
+        case "EffectCenterRevolve":
+          //中心旋转
+          return this.getEffectCenterRevolve.apply(this, args);
+        case "EffectSpinner":
+          //回旋
+          return this.getEffectSpinner.apply(this, args);
+        case "EffectFloat":
+          //浮动
+          return this.getEffectFloat.apply(this, args);
+        case "EffectSpiral":
+          //螺旋飞入/出
+          return this.getEffectSpiral.apply(this, args);
+        case "EffectPinwheel":
+          //玩具风车
+          return this.getEffectPinwheel.apply(this, args);
+        case "EffectCredits":
+          //字幕式
+          return this.getEffectCredits.apply(this, args);
+        case "EffectBoomerang":
+          //飞旋
+          return this.getEffectBoomerang.apply(this, args);
+        case "EffectArcUp":
+          //曲线向上/下
+          return this.getEffectArcUp.apply(this, args);
+        case "EffectFlashBulb":
+          //脉冲
+          return this.getEffectFlashBulb.apply(this, args);
+        case "EffectFlicker":
+          //彩色脉冲
+          return this.getEffectFlicker.apply(this, args);
+        case "EffectTeeter":
+          //跷跷板
+          return this.getEffectTeeter.apply(this, args);
+        case "EffectSpin":
+          //陀螺旋转
+          return this.getEffectSpin.apply(this, args);
+        case "EffectGrowShrink":
+          //放大/缩小
+          return this.getEffectGrowShrink.apply(this, args);
+        case "EffectDesaturate":
+          //不饱和
+          return this.getEffectDesaturate.apply(this, args);
+        case "EffectDarken":
+          //加深
+          return this.getEffectDarken.apply(this, args);
+        case "EffectLighten":
+          //变淡
+          return this.getEffectLighten.apply(this, args);
+        case "EffectTransparency":
+          //透明
+          return this.getEffectTransparency.apply(this, args);
+        case "EffectColorBlend":
+          //对象颜色
+          return new TimelineMax();
+        case "EffectComplementaryColor":
+          //补色
+          return this.getEffectComplementaryColor.apply(this, args);
+        case "EffectChangeLineColor":
+          //线条颜色
+          return new TimelineMax();
+        case "EffectChangeFillColor":
+          //填允颜色
+          return new TimelineMax();
+        case "EffectFlashOnce":
+          //闪烁(一次)
+          return this.getEffectFlashOnce.apply(this, args);
+        //进入退出动画
+        default:
+        case "EffectAppear":
+          //出现/消失
+          return this.getEffectAppear.apply(this, args);
       }
     }
 
@@ -66547,13 +66515,13 @@ var ScrollArea = function () {
  * 解析数据,获取content对象
  * @return {[type]} [description]
  */
-var parseContentObjs = function parseContentObjs(pageType, inputPara, pageProportion) {
+function parseContentObjs(pageType, inputPara, pageProportion) {
   var contentIds = [];
   inputPara.content && _.each(inputPara.content, function (contentId) {
     contentIds.push(contentId);
   });
   return Xut.Contents.GetPageWidgetData(pageType, contentIds, pageProportion);
-};
+}
 
 /**
  * 页面零件
@@ -66570,13 +66538,50 @@ var PageWidget = function () {
   }
 
   /**
-   * 获取参数
-   * 得到content对象与数据
+   * 初始化,加载文件
    * @return {[type]} [description]
    */
 
 
   createClass(PageWidget, [{
+    key: '_init',
+    value: function _init() {
+      //滚动区域
+      if (this.widgetId == 60 && this.widgetName == "scrollarea") {
+        var arg = this._getOptions();
+        var resetStyle = this._resetOpacityVisibility(arg[0], arg[1]);
+        this.pageObj = new ScrollArea(arg[0], arg[1]);
+        //还原原有样式
+        _.each(resetStyle, function (resetFunction, value) {
+          resetFunction();
+        });
+        resetStyle = null;
+      }
+      //Load the localized code first
+      //Combined advanced Sprite
+      else if (this.widgetId == 72 && this.widgetName == "spirit") {
+          var arg = this._getOptions();
+          this.pageObj = AdvSprite(arg[0], arg[1]);
+        }
+        //直接扩展加载
+        else {
+            //If there is no
+            if (typeof window[this.widgetName + "Widget"] != "function") {
+              this.hasload = true;
+              fileLoad(this._executive, this);
+            } else {
+              this._executive();
+            }
+          }
+    }
+
+    /**
+     * 获取参数
+     * 得到content对象与数据
+     * @return {[type]} [description]
+     */
+
+  }, {
     key: '_getOptions',
     value: function _getOptions() {
       return [createData(this.inputPara, this.scrollPaintingMode, this.calculate), parseContentObjs(this.pageType, this.inputPara, this.pageProportion)];
@@ -66658,43 +66663,6 @@ var PageWidget = function () {
       }
 
       return resetStyle;
-    }
-
-    /**
-     * 初始化,加载文件
-     * @return {[type]} [description]
-     */
-
-  }, {
-    key: '_init',
-    value: function _init() {
-      //滚动区域
-      if (this.widgetId == 60 && this.widgetName == "scrollarea") {
-        var arg = this._getOptions();
-        var resetStyle = this._resetOpacityVisibility(arg[0], arg[1]);
-        this.pageObj = new ScrollArea(arg[0], arg[1]);
-        //还原原有样式
-        _.each(resetStyle, function (resetFunction, value) {
-          resetFunction();
-        });
-        resetStyle = null;
-      }
-      //Load the localized code first
-      //Combined advanced Sprite
-      else if (this.widgetId == 72 && this.widgetName == "spirit") {
-          var arg = this._getOptions();
-          this.pageObj = AdvSprite(arg[0], arg[1]);
-        }
-        //直接扩展加载
-        else {
-            //If there is no
-            if (typeof window[this.widgetName + "Widget"] != "function") {
-              this.hasload = true;
-              fileLoad(this._executive, this);
-            } else {
-              this._executive();
-            }
-          }
     }
 
     /**
@@ -67136,6 +67104,7 @@ var parsePara = function parsePara(data) {
 };
 
 function Adapter(para) {
+
   //获取数据
   var data = getWidgetData(_.extend({}, para));
 
@@ -76530,19 +76499,30 @@ function handleMessage(event) {
   }
 }
 
-//公共方法
-/**
- * 构造函数
- * @param  {[type]} config [description]
- * @return {[type]}        [description]
- */
-
 /********************************************
  * 场景API
  * 辅助对象
  ********************************************/
 
 function extendAssist(access, $$globalSwiper) {
+
+  //========================
+  //  翻页的通知api
+  //========================
+
+  /**
+   * 允许翻页
+   */
+  //最大的翻页索引标记
+  //这个是顺序
+  var maxFlipIndex = 0;
+  Xut.Assist.EnableFlip = function () {
+    var pageIndex = Xut.Presentation.GetPageIndex();
+    if (pageIndex > maxFlipIndex) {
+      maxFlipIndex = pageIndex;
+      Xut.Application.Notify('enableFlip', maxFlipIndex);
+    }
+  };
 
   //========================
   //  秒秒学嵌套Iframe 讨论区
@@ -80883,6 +80863,8 @@ var GlobalBar = function () {
   createClass(GlobalBar, [{
     key: '_init',
     value: function _init() {
+      //标记最大的索引号
+      this._maxIndex = 0;
       this._initData();
       this._initContainer();
       this._leftView();
@@ -80892,8 +80874,7 @@ var GlobalBar = function () {
       this._bindWatch();
       this.pageElement = this.container.find('.g-page .g-page-current');
       this.$sceneNode.append(this.container);
-      var offset = this.container.offset();
-      config.launch.pageBar.height = config.visualSize.height - offset.top;
+      config.launch.pageBar.height = config.visualSize.height - this.container.offset().top;
     }
 
     /**
@@ -80952,6 +80933,11 @@ var GlobalBar = function () {
           });
         }
       }
+
+      //停止关闭下一个翻页箭头控制
+      Xut.Application.Watch('enableFlip', function (pageIndex) {
+        self._directionArrows && self._directionArrows.resetNext(pageIndex);
+      });
     }
 
     /**
@@ -80982,6 +80968,10 @@ var GlobalBar = function () {
               Xut.View.GotoPrevSlide();
               break;
             case "g-next":
+              //如果不允许跳转
+              if (~event.target.parentNode.className.indexOf('g-direction-end')) {
+                return;
+              }
               Xut.View.GotoNextSlide();
               break;
             case "g-learn-click":
@@ -81043,42 +81033,104 @@ var GlobalBar = function () {
   }, {
     key: '_centerView',
     value: function _centerView() {
+
       var html = '<li class="g-center g-direction-first">\n         <div class="g-prev g-prev-noclick"></div>\n         <div class="g-title"><a>' + (config.launch.pageBar.title || config.data.shortName) + '</a></div>\n         <div class="g-next g-next-noclick"></div>\n       </li>';
+
       this.container.append(String.styleFormat(html));
 
       var self = this;
 
-      //控制前进后退按钮
+      /**
+       * 根据页面的类型
+       * 设置是否显示下一页箭头可点击
+       * 必须要练习题页面
+       */
+      function setNextArrows(rootElement, pageIndex) {
+        var pb = Xut.Presentation.GetPageBase(self.currentPage - 1);
+
+        //如果已经游览过的页面
+        //跳过设置
+        if (self._maxIndex >= pageIndex) {
+          return false;
+        }
+
+        if (pb && pb.pageAttr === 'practicepage') {
+          rootElement.addClass('g-direction-end');
+          return true;
+        }
+      }
+
+      //控制按钮状态
       function setIcon() {
         var rootElement = self.container.find('.g-center');
         var isFirst = true;
         var isEnd = true;
-        return function () {
-          //首页
-          if (self.currentPage === 1) {
-            if (isEnd) {
-              //直接重尾页跳到首页
-              isEnd = false;
-              rootElement.removeClass('g-direction-end');
+        var addClass = function addClass(className) {
+          return rootElement.addClass(className);
+        };
+        var removeClass = function removeClass(className) {
+          return rootElement.removeClass(className);
+        };
+        return {
+          /**
+           * 设置默认状态
+           */
+          default: function _default(pageIndex) {
+            //每次都复位练习，重新设置题状态
+            var nextState = false;
+            //首页
+            if (self.currentPage === 1) {
+              if (isEnd) {
+                //直接重尾页跳到首页
+                isEnd = false;
+                removeClass('g-direction-end');
+              }
+              isFirst = true;
+              addClass('g-direction-first');
             }
-            isFirst = true;
-            rootElement.addClass('g-direction-first');
-          } else if (self.currentPage === self.pageTotal) {
-            if (isFirst) {
-              //直接重首页跳到尾页
-              isFirst = false;
-              rootElement.removeClass('g-direction-first');
-            }
-            isEnd = true;
-            rootElement.addClass('g-direction-end');
-          } else {
-            if (isFirst) {
-              isFirst = false;
-              rootElement.removeClass('g-direction-first');
-            }
-            if (isEnd) {
-              isEnd = false;
-              rootElement.removeClass('g-direction-end');
+            //尾页
+            else if (self.currentPage === self.pageTotal) {
+                if (isFirst) {
+                  //直接重首页跳到尾页
+                  isFirst = false;
+                  removeClass('g-direction-first');
+                }
+                isEnd = true;
+                addClass('g-direction-end');
+              } else {
+
+                //如果是练习题就标记
+                //否则就还清状态
+                if (setNextArrows(rootElement, pageIndex)) {
+                  nextState = true;
+                }
+
+                //中间页面
+                if (isFirst) {
+                  isFirst = false;
+                  removeClass('g-direction-first');
+                }
+
+                if (isEnd) {
+                  isEnd = false;
+                  removeClass('g-direction-end');
+                }
+
+                if (nextState) {
+                  addClass('g-direction-end');
+                } else {
+                  removeClass('g-direction-end');
+                }
+              }
+          },
+          /**
+           * 重设下一页状态
+           */
+          resetNext: function resetNext(pageIndex) {
+            self._maxIndex = ++pageIndex;
+            //如果不是尾页设置
+            if (self.currentPage !== self.pageTotal) {
+              removeClass('g-direction-end');
             }
           }
         };
@@ -81086,7 +81138,7 @@ var GlobalBar = function () {
 
       //控制方向图片
       //前进或者后退
-      this._setDirectionIcon = setIcon();
+      this._directionArrows = setIcon();
     }
 
     /**
@@ -81189,7 +81241,7 @@ var GlobalBar = function () {
       }
 
       //首尾，控制方向图片
-      this._setDirectionIcon();
+      this._directionArrows.default(parentIndex);
 
       //每次翻页需要圆点状态请求
       if (this.bottomConfig) {
@@ -81212,7 +81264,8 @@ var GlobalBar = function () {
     value: function destroy() {
       Xut.Application.unWatch('globalForumDot');
       Xut.Application.unWatch('globalCommitWorkDot');
-      this._setDirectionIcon = null;
+      Xut.Application.unWatch('enableFlip');
+      this._directionArrows = null;
       $off(this.container);
       this.$sceneNode = null;
       this.container = null;
@@ -82982,7 +83035,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.8;
+Xut.Version = 892.9;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

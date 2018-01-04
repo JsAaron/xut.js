@@ -4,9 +4,27 @@
  ********************************************/
 
 import { getPostMessageFn } from '../post-message'
-import { Recorder } from '../../expand/recorder/index'
 
 export function extendAssist(access, $$globalSwiper) {
+
+  //========================
+  //  翻页的通知api
+  //========================
+
+  /**
+   * 允许翻页
+   */
+  //最大的翻页索引标记
+  //这个是顺序
+  let maxFlipIndex = 0
+  Xut.Assist.EnableFlip = function() {
+    let pageIndex = Xut.Presentation.GetPageIndex()
+    if (pageIndex > maxFlipIndex) {
+      maxFlipIndex = pageIndex
+      Xut.Application.Notify('enableFlip', maxFlipIndex)
+    }
+  }
+
 
   //========================
   //  秒秒学嵌套Iframe 讨论区
@@ -169,7 +187,6 @@ export function extendAssist(access, $$globalSwiper) {
   //  音频类
   //========================
 
-
   /**
    * 开始录音
    */
@@ -185,6 +202,7 @@ export function extendAssist(access, $$globalSwiper) {
       type: 'record',
       content: `开始录音,id:${id},time:${time}`
     })
+    Xut.Assist.RecordStop()
     Xut.Plugin.Recorder && Xut.Plugin.Recorder.startRecord(id, time, function() {
       Xut.$warn({
         type: 'record',
@@ -199,7 +217,13 @@ export function extendAssist(access, $$globalSwiper) {
    * @param {[type]} time [description]
    */
   Xut.Assist.RecordStop = function(id) {
-
+    if (Xut.Plugin.Recorder) {
+      Xut.Plugin.Recorder.startRecord()
+      Xut.$warn({
+        type: 'record',
+        content: `RecordStart完成,id:${id}`
+      })
+    }
   }
 
   /**

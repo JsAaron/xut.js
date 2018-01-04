@@ -29,6 +29,8 @@ export default class GlobalBar {
   }
 
   _init() {
+    //标记最大的索引号
+    this._maxIndex = 0
     this._initData()
     this._initContainer()
     this._leftView()
@@ -38,8 +40,7 @@ export default class GlobalBar {
     this._bindWatch()
     this.pageElement = this.container.find('.g-page .g-page-current')
     this.$sceneNode.append(this.container)
-    const offset = this.container.offset()
-    config.launch.pageBar.height = config.visualSize.height - offset.top
+    config.launch.pageBar.height = config.visualSize.height - this.container.offset().top
   }
 
   /**
@@ -96,6 +97,11 @@ export default class GlobalBar {
       }
     }
 
+    //停止关闭下一个翻页箭头控制
+    Xut.Application.Watch('enableFlip', function(pageIndex) {
+      self._directionArrows && self._directionArrows.resetNext(pageIndex)
+    })
+
   }
 
   /**
@@ -121,6 +127,10 @@ export default class GlobalBar {
             Xut.View.GotoPrevSlide()
             break;
           case "g-next":
+            //如果不允许跳转
+            if (~event.target.parentNode.className.indexOf('g-direction-end')) {
+              return
+            }
             Xut.View.GotoNextSlide()
             break;
           case "g-learn-click": //继续学习
@@ -173,45 +183,103 @@ export default class GlobalBar {
    * @return {[type]} [description]
    */
   _centerView() {
+
     const html =
       `<li class="g-center g-direction-first">
          <div class="g-prev g-prev-noclick"></div>
          <div class="g-title"><a>${config.launch.pageBar.title || config.data.shortName}</a></div>
          <div class="g-next g-next-noclick"></div>
        </li>`
+
     this.container.append(String.styleFormat(html))
 
-    const self = this
+    let self = this
 
-    //控制前进后退按钮
+    /**
+     * 根据页面的类型
+     * 设置是否显示下一页箭头可点击
+     * 必须要练习题页面
+     */
+    function setNextArrows(rootElement, pageIndex) {
+      const pb = Xut.Presentation.GetPageBase(self.currentPage - 1)
+
+      //如果已经游览过的页面
+      //跳过设置
+      if (self._maxIndex >= pageIndex) {
+        return false
+      }
+
+      if (pb && pb.pageAttr === 'practicepage') {
+        rootElement.addClass('g-direction-end')
+        return true
+      }
+    }
+
+    //控制按钮状态
     function setIcon() {
       let rootElement = self.container.find('.g-center')
       let isFirst = true
       let isEnd = true
-      return function() {
-        //首页
-        if (self.currentPage === 1) {
-          if (isEnd) { //直接重尾页跳到首页
-            isEnd = false
-            rootElement.removeClass('g-direction-end')
+      let addClass = (className) => rootElement.addClass(className)
+      let removeClass = (className) => rootElement.removeClass(className)
+      return {
+        /**
+         * 设置默认状态
+         */
+        default: function(pageIndex) {
+          //每次都复位练习，重新设置题状态
+          let nextState = false
+          //首页
+          if (self.currentPage === 1) {
+            if (isEnd) { //直接重尾页跳到首页
+              isEnd = false
+              removeClass('g-direction-end')
+            }
+            isFirst = true
+            addClass('g-direction-first')
           }
-          isFirst = true
-          rootElement.addClass('g-direction-first')
-        } else if (self.currentPage === self.pageTotal) {
-          if (isFirst) { //直接重首页跳到尾页
-            isFirst = false
-            rootElement.removeClass('g-direction-first')
+          //尾页
+          else if (self.currentPage === self.pageTotal) {
+            if (isFirst) { //直接重首页跳到尾页
+              isFirst = false
+              removeClass('g-direction-first')
+            }
+            isEnd = true
+            addClass('g-direction-end')
+          } else {
+
+            //如果是练习题就标记
+            //否则就还清状态
+            if (setNextArrows(rootElement, pageIndex)) {
+              nextState = true
+            }
+
+            //中间页面
+            if (isFirst) {
+              isFirst = false
+              removeClass('g-direction-first')
+            }
+
+            if (isEnd) {
+              isEnd = false
+              removeClass('g-direction-end')
+            }
+
+            if (nextState) {
+              addClass('g-direction-end')
+            } else {
+              removeClass('g-direction-end')
+            }
           }
-          isEnd = true
-          rootElement.addClass('g-direction-end')
-        } else {
-          if (isFirst) {
-            isFirst = false
-            rootElement.removeClass('g-direction-first')
-          }
-          if (isEnd) {
-            isEnd = false
-            rootElement.removeClass('g-direction-end')
+        },
+        /**
+         * 重设下一页状态
+         */
+        resetNext(pageIndex) {
+          self._maxIndex = ++pageIndex
+          //如果不是尾页设置
+          if (self.currentPage !== self.pageTotal) {
+            removeClass('g-direction-end')
           }
         }
       }
@@ -219,7 +287,7 @@ export default class GlobalBar {
 
     //控制方向图片
     //前进或者后退
-    this._setDirectionIcon = setIcon()
+    this._directionArrows = setIcon()
   }
 
   /**
@@ -306,7 +374,6 @@ export default class GlobalBar {
     this.container.append(String.styleFormat(html))
   }
 
-
   /**
    * 更新页码
    * @return {[type]} [description]
@@ -322,7 +389,7 @@ export default class GlobalBar {
     }
 
     //首尾，控制方向图片
-    this._setDirectionIcon()
+    this._directionArrows.default(parentIndex)
 
     //每次翻页需要圆点状态请求
     if (this.bottomConfig) {
@@ -342,7 +409,8 @@ export default class GlobalBar {
   destroy() {
     Xut.Application.unWatch('globalForumDot')
     Xut.Application.unWatch('globalCommitWorkDot')
-    this._setDirectionIcon = null
+    Xut.Application.unWatch('enableFlip')
+    this._directionArrows = null
     $off(this.container)
     this.$sceneNode = null
     this.container = null

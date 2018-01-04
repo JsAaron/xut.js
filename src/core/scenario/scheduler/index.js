@@ -482,6 +482,8 @@ export default class Scheduler {
 
     let { frontIndex, middleIndex, backIndex, stopIndex } = options
 
+    //翻页停止录音
+    Xut.Assist.RecordStop()
 
     $warn({
       type: 'logic',
