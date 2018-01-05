@@ -5,7 +5,7 @@ import { removeSlash, mixGlobalConfig } from './util/index'
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.9
+Xut.Version = 893
 
 
 //接口接在参数,用户横竖切换刷新

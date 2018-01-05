@@ -188,13 +188,24 @@ export function extendAssist(access, $$globalSwiper) {
   //========================
 
   /**
+   * 是否存在插件
+   * @return {Boolean} [description]
+   */
+  function isExistRecord(callback) {
+    if (window.cordova && Xut.Plugin.Recorder) {
+      callback()
+    }
+  }
+
+  /**
    * 开始录音
    */
+  let recordState = false
   Xut.Assist.RecordStart = function(id, time) {
     if (!id) {
       Xut.$warn({
         type: 'record',
-        content: `RecordPlay失败,id:${id}`
+        content: `没有传递录音的编号id:${id}`
       })
       return
     }
@@ -202,11 +213,15 @@ export function extendAssist(access, $$globalSwiper) {
       type: 'record',
       content: `开始录音,id:${id},time:${time}`
     })
-    Xut.Assist.RecordStop()
-    Xut.Plugin.Recorder && Xut.Plugin.Recorder.startRecord(id, time, function() {
-      Xut.$warn({
-        type: 'record',
-        content: `RecordStart完成,id:${id}`
+    isExistRecord(function() {
+      Xut.Assist.RecordStop()
+      recordState = true
+      Xut.Plugin.Recorder.startRecord(id, time, function() {
+        recordState = false
+        Xut.$warn({
+          type: 'record',
+          content: `录音完成,id:${id}`
+        })
       })
     })
   }
@@ -216,13 +231,14 @@ export function extendAssist(access, $$globalSwiper) {
    * @param {[type]} id   [description]
    * @param {[type]} time [description]
    */
-  Xut.Assist.RecordStop = function(id) {
-    if (Xut.Plugin.Recorder) {
-      Xut.Plugin.Recorder.startRecord()
+  Xut.Assist.RecordStop = function() {
+    if (recordState && window.cordova && Xut.Plugin.Recorder) {
       Xut.$warn({
         type: 'record',
-        content: `RecordStart完成,id:${id}`
+        content: `录音停止`
       })
+      recordState = false
+      Xut.Plugin.Recorder.stopRecord()
     }
   }
 
@@ -233,15 +249,17 @@ export function extendAssist(access, $$globalSwiper) {
     if (!id) {
       Xut.$warn({
         type: 'record',
-        content: `RecordPlay失败,id:${id}`
+        content: `没有传递播放录音的编号id:${id}`
       })
       return
     }
     Xut.$warn({
       type: 'record',
-      content: `RecordPlay开始,id:${id}`
+      content: `播放录音,id:${id}`
     })
-    Xut.Plugin.Recorder && Xut.Plugin.Recorder.startPlay(id)
+    isExistRecord(function() {
+      Xut.Plugin.Recorder.startPlay(id)
+    })
   }
 
   /**
@@ -252,15 +270,17 @@ export function extendAssist(access, $$globalSwiper) {
     if (!id) {
       Xut.$warn({
         type: 'record',
-        content: `RecordPlayStop,id:${id}`
+        content: `没有传递停止播放录音的编号id:${id}`
       })
       return
     }
-    Xut.$warn({
-      type: 'record',
-      content: `RecordPlayStop,id:${id}`
+    isExistRecord(function() {
+      Xut.$warn({
+        type: 'record',
+        content: `播放录音停止,id:${id}`
+      })
+      Xut.Plugin.Recorder.stopPlay(id)
     })
-    Xut.Plugin.Recorder && Xut.Plugin.Recorder.stopPlay(id)
   }
 
 

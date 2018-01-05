@@ -75368,6 +75368,9 @@ var Scheduler = function () {
           backIndex = options.backIndex,
           stopIndex = options.stopIndex;
 
+      //翻页停止录音
+
+      Xut.Assist.RecordStop();
 
       $warn({
         type: 'logic',
@@ -76694,15 +76697,25 @@ function extendAssist(access, $$globalSwiper) {
   //  音频类
   //========================
 
+  /**
+   * 是否存在插件
+   * @return {Boolean} [description]
+   */
+  function isExistRecord(callback) {
+    if (window.cordova && Xut.Plugin.Recorder) {
+      callback();
+    }
+  }
 
   /**
    * 开始录音
    */
+  var recordState = false;
   Xut.Assist.RecordStart = function (id, time) {
     if (!id) {
       Xut.$warn({
         type: 'record',
-        content: 'RecordPlay\u5931\u8D25,id:' + id
+        content: '\u6CA1\u6709\u4F20\u9012\u5F55\u97F3\u7684\u7F16\u53F7id:' + id
       });
       return;
     }
@@ -76710,10 +76723,15 @@ function extendAssist(access, $$globalSwiper) {
       type: 'record',
       content: '\u5F00\u59CB\u5F55\u97F3,id:' + id + ',time:' + time
     });
-    Xut.Plugin.Recorder && Xut.Plugin.Recorder.startRecord(id, time, function () {
-      Xut.$warn({
-        type: 'record',
-        content: 'RecordStart\u5B8C\u6210,id:' + id
+    isExistRecord(function () {
+      Xut.Assist.RecordStop();
+      recordState = true;
+      Xut.Plugin.Recorder.startRecord(id, time, function () {
+        recordState = false;
+        Xut.$warn({
+          type: 'record',
+          content: '\u5F55\u97F3\u5B8C\u6210,id:' + id
+        });
       });
     });
   };
@@ -76723,7 +76741,16 @@ function extendAssist(access, $$globalSwiper) {
    * @param {[type]} id   [description]
    * @param {[type]} time [description]
    */
-  Xut.Assist.RecordStop = function (id) {};
+  Xut.Assist.RecordStop = function () {
+    if (recordState && window.cordova && Xut.Plugin.Recorder) {
+      Xut.$warn({
+        type: 'record',
+        content: '\u5F55\u97F3\u505C\u6B62'
+      });
+      recordState = false;
+      Xut.Plugin.Recorder.stopRecord();
+    }
+  };
 
   /**
    * 播放录音
@@ -76732,15 +76759,17 @@ function extendAssist(access, $$globalSwiper) {
     if (!id) {
       Xut.$warn({
         type: 'record',
-        content: 'RecordPlay\u5931\u8D25,id:' + id
+        content: '\u6CA1\u6709\u4F20\u9012\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id
       });
       return;
     }
     Xut.$warn({
       type: 'record',
-      content: 'RecordPlay\u5F00\u59CB,id:' + id
+      content: '\u64AD\u653E\u5F55\u97F3,id:' + id
     });
-    Xut.Plugin.Recorder && Xut.Plugin.Recorder.startPlay(id);
+    isExistRecord(function () {
+      Xut.Plugin.Recorder.startPlay(id);
+    });
   };
 
   /**
@@ -76751,15 +76780,17 @@ function extendAssist(access, $$globalSwiper) {
     if (!id) {
       Xut.$warn({
         type: 'record',
-        content: 'RecordPlayStop,id:' + id
+        content: '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id
       });
       return;
     }
-    Xut.$warn({
-      type: 'record',
-      content: 'RecordPlayStop,id:' + id
+    isExistRecord(function () {
+      Xut.$warn({
+        type: 'record',
+        content: '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + id
+      });
+      Xut.Plugin.Recorder.stopPlay(id);
     });
-    Xut.Plugin.Recorder && Xut.Plugin.Recorder.stopPlay(id);
   };
 
   //========================
@@ -83035,7 +83066,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 892.9;
+Xut.Version = 893;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;
