@@ -202,13 +202,11 @@ export default class GlobalBar {
      */
     function setNextArrows(rootElement, pageIndex) {
       const pb = Xut.Presentation.GetPageBase(self.currentPage - 1)
-
       //如果已经游览过的页面
       //跳过设置
       if (self._maxIndex >= pageIndex) {
         return false
       }
-
       if (pb && pb.pageAttr === 'practicepage') {
         rootElement.addClass('g-direction-end')
         return true
@@ -228,7 +226,8 @@ export default class GlobalBar {
          */
         default: function(pageIndex) {
           //每次都复位练习，重新设置题状态
-          let nextState = false
+          //默认下一页箭头显示
+          let nextArrowsShow = true
           //首页
           if (self.currentPage === 1) {
             if (isEnd) { //直接重尾页跳到首页
@@ -251,7 +250,7 @@ export default class GlobalBar {
             //如果是练习题就标记
             //否则就还清状态
             if (setNextArrows(rootElement, pageIndex)) {
-              nextState = true
+              nextArrowsShow = false
             }
 
             //中间页面
@@ -265,10 +264,12 @@ export default class GlobalBar {
               removeClass('g-direction-end')
             }
 
-            if (nextState) {
-              addClass('g-direction-end')
-            } else {
+            if (nextArrowsShow) {
+              //如果显示下一页箭头
               removeClass('g-direction-end')
+            } else {
+              //隐藏下一页箭头
+              addClass('g-direction-end')
             }
           }
         },

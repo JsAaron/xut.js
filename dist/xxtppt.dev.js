@@ -61322,7 +61322,6 @@ var Activity = function () {
 
       //执行动画
       this.eachAssistContents(function (scope) {
-
         //标记动画正在运行
         scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
           'animOffset': scope.$contentNode.offset()
@@ -81078,13 +81077,11 @@ var GlobalBar = function () {
        */
       function setNextArrows(rootElement, pageIndex) {
         var pb = Xut.Presentation.GetPageBase(self.currentPage - 1);
-
         //如果已经游览过的页面
         //跳过设置
         if (self._maxIndex >= pageIndex) {
           return false;
         }
-
         if (pb && pb.pageAttr === 'practicepage') {
           rootElement.addClass('g-direction-end');
           return true;
@@ -81108,7 +81105,8 @@ var GlobalBar = function () {
            */
           default: function _default(pageIndex) {
             //每次都复位练习，重新设置题状态
-            var nextState = false;
+            //默认下一页箭头显示
+            var nextArrowsShow = true;
             //首页
             if (self.currentPage === 1) {
               if (isEnd) {
@@ -81133,7 +81131,7 @@ var GlobalBar = function () {
                 //如果是练习题就标记
                 //否则就还清状态
                 if (setNextArrows(rootElement, pageIndex)) {
-                  nextState = true;
+                  nextArrowsShow = false;
                 }
 
                 //中间页面
@@ -81147,10 +81145,12 @@ var GlobalBar = function () {
                   removeClass('g-direction-end');
                 }
 
-                if (nextState) {
-                  addClass('g-direction-end');
-                } else {
+                if (nextArrowsShow) {
+                  //如果显示下一页箭头
                   removeClass('g-direction-end');
+                } else {
+                  //隐藏下一页箭头
+                  addClass('g-direction-end');
                 }
               }
           },
@@ -83066,7 +83066,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 893;
+Xut.Version = 893.1;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

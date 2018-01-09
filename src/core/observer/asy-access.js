@@ -5,7 +5,6 @@ import { Observer } from './index'
  *  用于异步任务创建
  *  转化同步处理的一个类
  */
-
 export class AsyAccess extends Observer {
 
   constructor() {
