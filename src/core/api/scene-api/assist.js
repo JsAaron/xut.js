@@ -198,46 +198,71 @@ export function extendAssist(access, $$globalSwiper) {
   }
 
   /**
+   * 给录音的回调动作
+   * 增加一个当前页面接管的全局接口
+   * 意思就是用户再不录音的情况下，失败的动作中
+   * 会弹出一个可以继续往下走的动作，而不会造成死循环
+   * 跳到下一个默认录音动作
+   * 这样代码默认会绑定最后一个录音的成功动作
+   */
+  Xut.Assist.RecordNextAction = function() {
+
+  }
+
+  /**
+   * 重复录音
+   * 自动定位到当前失败的录音上
+   */
+  Xut.Assist.RecordRepeat = function() {
+
+  }
+
+  /**
    * 开始录音
    */
-  let recordState = false
-  Xut.Assist.RecordStart = function(id, time) {
+  let startRecord = false
+
+  // Xut.Assist.RecordStart(id, {
+  //   succeed: function() {
+  //     Xut.Assist.Run(1)
+  //   },
+  //   fail: function() {
+  //     Xut.Assist.Run(2)
+  //   }
+  // })
+  Xut.Assist.RecordStart = function(id, callback = {}) {
     if (!id) {
-      Xut.$warn({
-        type: 'record',
-        content: `没有传递录音的编号id:${id}`
-      })
+      Xut.$warn('record', `没有传递录音的编号id,id:${id}`)
       return
     }
-    Xut.$warn({
-      type: 'record',
-      content: `开始录音,id:${id},time:${time}`
-    })
+    Xut.$warn('record', `开始录音,id:${id}`)
     isExistRecord(function() {
       Xut.Assist.RecordStop()
-      recordState = true
-      Xut.Plugin.Recorder.startRecord(id, time, function() {
-        recordState = false
-        Xut.$warn({
-          type: 'record',
-          content: `录音完成,id:${id}`
-        })
+      startRecord = true
+      Xut.Plugin.Recorder.startRecord(id, function() {
+        //成功
+        startRecord = false
+        Xut.$warn('record', `录音完成,id:${id}`)
+        callback.succeed && callback.succeed()
+      }, function() {
+        //失败
+        startRecord = false
+        Xut.$warn('record', `录音失败,id:${id}`)
+        callback.fail && callback.fail()
       })
     })
   }
 
   /**
    * 停止录音
-   * @param {[type]} id   [description]
-   * @param {[type]} time [description]
    */
   Xut.Assist.RecordStop = function() {
-    if (recordState && window.cordova && Xut.Plugin.Recorder) {
+    if (startRecord && window.cordova && Xut.Plugin.Recorder) {
       Xut.$warn({
         type: 'record',
         content: `录音停止`
       })
-      recordState = false
+      startRecord = false
       Xut.Plugin.Recorder.stopRecord()
     }
   }

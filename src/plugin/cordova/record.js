@@ -4,11 +4,11 @@
  */
 Xut.Plugin.Recorder = {
   // 开始录音
-  startRecord: function(id, time, successCallback, errorCallback) {
+  startRecord: function(id, successCallback, errorCallback) {
     if (GLOBALIFRAME) {
-      return GLOBALCONTEXT.Recorder.startRecord(id, time, successCallback, errorCallback);
+      return GLOBALCONTEXT.Recorder.startRecord(id, successCallback, errorCallback);
     } else {
-      return cordova.exec(successCallback, errorCallback, "XXTRecord", "startRecord", [id, time])
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "startRecord", [id])
     }
   },
   // 结束录音
