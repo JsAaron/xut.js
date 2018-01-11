@@ -270,6 +270,9 @@ export default function(baseProto) {
           if (actionName == 'Stop') {
             contentObj.stopAnimation(outCallBack);
           }
+          if (actionName == 'Hide') {
+            contentObj.hideAnimation(outCallBack);
+          }
         }
       }, this);
     }

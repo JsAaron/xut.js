@@ -123,7 +123,7 @@ export function extendView($$mediator, access, $$globalSwiper) {
      prev
      next
    */
-  const gotoPage = function(data, direction) {
+  function gotoPage(data, direction) {
     let seasonId, chapterId, callback, speed
 
     /**

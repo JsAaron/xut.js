@@ -483,6 +483,17 @@ export default class Activity {
     })
   }
 
+  /**
+   * 隐藏动画元素
+   * @return {[type]} [description]
+   */
+  hideAnimation() {
+    var pageId = this.dataRelated.pageId;
+    this.runState = false;
+    this.eachAssistContents(function(scope) {
+      scope.$contentNode.css('visibility', 'hidden')
+    })
+  }
 
   /**
    * 销毁动画
