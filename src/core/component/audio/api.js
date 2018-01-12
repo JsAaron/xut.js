@@ -90,7 +90,6 @@ export function createContentAudio(pageId, audioId) {
   })
 }
 
-
 const accessAudio = function(pageId, queryId, callback) {
   const playBox = getPlayBox()
   if (playBox[CONTENT]) {

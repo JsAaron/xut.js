@@ -30481,11 +30481,11 @@ if(!Xut.plat.isBrowser && !MMXCONFIG) {
  */
 Xut.Plugin.Recorder = {
   // 开始录音
-  startRecord: function(id, time, successCallback, errorCallback) {
+  startRecord: function(id, successCallback, errorCallback) {
     if (GLOBALIFRAME) {
-      return GLOBALCONTEXT.Recorder.startRecord(id, time, successCallback, errorCallback);
+      return GLOBALCONTEXT.Recorder.startRecord(id, successCallback, errorCallback);
     } else {
-      return cordova.exec(successCallback, errorCallback, "XXTRecord", "startRecord", [id, time])
+      return cordova.exec(successCallback, errorCallback, "XXTRecord", "startRecord", [id])
     }
   },
   // 结束录音
@@ -42947,10 +42947,7 @@ function makeJsonPack(code) {
     var post = "(function(){" + enterReplace(code) + "})";
     return new Function("return " + post)();
   } catch (error) {
-    Xut.$warn({
-      type: 'util',
-      content: '解析json出错' + code
-    });
+    Xut.$warn('util', '解析json出错' + code);
   }
 }
 
@@ -45180,6 +45177,21 @@ function addEdges() {
   }
 }
 
+/**
+ * 一些特殊的功能函数
+ */
+
+/**
+ * 捕获完成
+ * 用于多组回调循环
+ * 只捕获到唯一的回调
+ * count次数
+ * callback={
+ *   pre  回调处理
+ *   post 后回调处理
+ * }
+ */
+
 //替换url
 //1. 路径
 //2. 基础后缀
@@ -47373,7 +47385,6 @@ var Observer = function () {
  *  用于异步任务创建
  *  转化同步处理的一个类
  */
-
 var AsyAccess = function (_Observer) {
   inherits(AsyAccess, _Observer);
 
@@ -51412,7 +51423,7 @@ var ManageSuper = function () {
     classCallCheck(this, ManageSuper);
 
     //初始化容器
-    this._group = {};
+    this.pageBaseGroup = {};
 
     /*数据快速获取接口，首字母直接大写的快捷方式*/
     this.$$GetPageId = this.$$getPageId;
@@ -51433,7 +51444,7 @@ var ManageSuper = function () {
   createClass(ManageSuper, [{
     key: '_$$addBaseGroup',
     value: function _$$addBaseGroup(pageIndex, pageObj) {
-      this._group[pageIndex] = pageObj;
+      this.pageBaseGroup[pageIndex] = pageObj;
     }
 
     /**
@@ -51443,7 +51454,7 @@ var ManageSuper = function () {
   }, {
     key: '_$$getBaseGroup',
     value: function _$$getBaseGroup() {
-      return this._group;
+      return this.pageBaseGroup;
     }
 
     /**
@@ -51453,7 +51464,7 @@ var ManageSuper = function () {
   }, {
     key: '_$$removeBaseGroup',
     value: function _$$removeBaseGroup(pageIndex) {
-      delete this._group[pageIndex];
+      delete this.pageBaseGroup[pageIndex];
     }
 
     /**
@@ -51464,11 +51475,11 @@ var ManageSuper = function () {
     key: '_$$destroyBaseGroup',
     value: function _$$destroyBaseGroup() {
       var k = void 0,
-          _group = this._group;
-      for (k in _group) {
-        _group[k].baseDestroy();
+          pageBaseGroup = this.pageBaseGroup;
+      for (k in pageBaseGroup) {
+        pageBaseGroup[k].baseDestroy();
       }
-      this._group = null;
+      this.pageBaseGroup = null;
     }
 
     //===============================
@@ -51559,7 +51570,7 @@ var ManageSuper = function () {
           pageIndex = this.converMasterId(pageIndex);
         }
       }
-      return this._group && this._group[pageIndex];
+      return this.pageBaseGroup && this.pageBaseGroup[pageIndex];
     }
 
     /**
@@ -58372,16 +58383,41 @@ function shape(animproto) {
 
 var ROUND = Math.round;
 var CEIL$2 = Math.ceil;
-
 var isMacOS = Xut.plat.isMacOS;
 var isDesktop = Xut.plat.isDesktop;
 
 /**
- * 解析脚本代码
- * 包装能函数
+ * 代码过滤器
+ * 针对代码脚本做处理
+ * Xut.Assist.RecordPlay(1)
+ * =>   Xut.Assist.RecordPlay(1,function(){
+           createContentAudio(2, 7)
+        })
  */
-function parseCode(code) {
-  if (code && code.length > 0) {
+function codeFilter(code, parameter) {
+  //如果有音频，并且包含了RecordPlay接口的脚本
+  //找到对应的脚本，需要针对这个脚本注入新的代码
+  if (code) {
+
+    //开始录音脚本处理
+    if (~code.indexOf('Xut.Assist.RecordStart')) {}
+    // console.log(parameter)
+
+
+    //播放录音脚本处理
+    if (parameter.videoId && ~code.indexOf('Xut.Assist.RecordPlay')) {
+      var recordREG = code.match(/Xut.Assist.RecordPlay\((\w+)\)/);
+      if (recordREG.length) {
+        var full = recordREG[0];
+        var id = recordREG[1];
+        var inject = 'Xut.Assist.RecordPlay(' + id + ',function(){\n           Xut.Assist.ContentAudioCreate(' + parameter.chapterId + ', ' + parameter.videoId + ')\n        })';
+        //重新组合新的脚本代码
+        code = code.replace(full, inject);
+        //如果遇到对应的脚本
+        //那么就清理音频
+        parameter.videoId = null;
+      }
+    }
     return makeJsonPack(code);
   }
 }
@@ -58465,54 +58501,25 @@ var Powepoint = function () {
 
     this.visualWidth = getStyle.visualWidth;
     this.visualHeight = getStyle.visualHeight;
-
     this.container = container || $(document.body); //父容器(主要用于手势控制路径动画)
-    this.isDebug = false; //是否显示调试信息
-
     this.pageIndex = pageIndex;
     this.pageType = pageType;
     this.chapterId = chapterId;
     this.element = element;
 
-    /**
-     * 动画对象默认样式
-     * @type {String}
-     */
+    //动画对象默认样式
     this.elementStyle = '';
-
-    /**
-     * 初始化后对象状态
-     * @type {String}
-     */
+    //初始化后对象状态
     this.elementVisibility = 'visible';
-
-    /**
-     * 是否使用CSS渐变效果
-     * @type {[type]}
-     */
+    //是否使用CSS渐变效果
     this.useMask = isDesktop || isMacOS ? true : false;
-
-    /**
-     * 第一个动画参数（默认支持多个动画作用于一个对象）
-     * @type {[type]}
-     */
+    //第一个动画参数（默认支持多个动画作用于一个对象）
     this.parameter0 = null;
-
-    /**
-     * 第一个动画类型（进入/退出）
-     * @type {Boolean}
-     */
+    //第一个动画类型（进入/退出）
     this.isExit0 = false;
-
-    /**
-     * 是否完全执行过(用于解决重复执行问题)
-     * @type {Boolean}
-     */
+    //是否完全执行过(用于解决重复执行问题)
     this.isCompleted = false;
-
-    /**
-     * 初始对象状态:opacity(visibility)
-     */
+    //初始对象状态:opacity(visibility)
     this._initElement();
   }
 
@@ -58547,7 +58554,14 @@ var Powepoint = function () {
         } else {
           switch (animationName) {
             //强调动画默认显示
-            case "EffectFlashBulb": //脉冲
+            case "EffectFlashBulb":
+              //脉冲
+              if (this.isExit0 || this.isExit0 === undefined) {
+                this.element.css("visibility", "visible");
+              } else {
+                this.element.css("visibility", "hidden");
+              }
+              break;
             case "EffectFlicker": //彩色脉冲
             case "EffectTeeter": //跷跷板
             case "EffectSpin": //陀螺旋转
@@ -58569,8 +58583,11 @@ var Powepoint = function () {
               this.element.css("visibility", "hidden");
               break;
             default:
-              if (this.isExit0) this.element.css("visibility", "visible"); //退出动画默认显示
-              else this.element.css("visibility", "hidden"); //进入动画默认隐藏
+              if (this.isExit0) {
+                this.element.css("visibility", "visible"); //退出动画默认显示
+              } else {
+                this.element.css("visibility", "hidden"); //进入动画默认隐藏
+              }
               break;
           }
         }
@@ -58751,9 +58768,9 @@ var Powepoint = function () {
       /// 所以需要把脚本匹配到每一个子动画中
       ///////////////////////////////////
       //获取动画前脚本
-      parameter.preCode = parseCode(data.preCode);
+      parameter.preCode = codeFilter(data.preCode, parameter);
       //获取动画后脚本
-      parameter.postCode = parseCode(data.postCode);
+      parameter.postCode = codeFilter(data.postCode, parameter);
       //获取延时时间
       parameter.codeDelay = data.codeDelay;
       //赋予父对象的引用
@@ -61346,6 +61363,21 @@ var Activity = function () {
       this.runState = false;
       this.eachAssistContents(function (scope) {
         scope.stop && scope.stop(pageId);
+      });
+    }
+
+    /**
+     * 隐藏动画元素
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'hideAnimation',
+    value: function hideAnimation() {
+      var pageId = this.dataRelated.pageId;
+      this.runState = false;
+      this.eachAssistContents(function (scope) {
+        scope.$contentNode.css('visibility', 'hidden');
       });
     }
 
@@ -72387,6 +72419,9 @@ var dataExternal = function (baseProto) {
           if (actionName == 'Stop') {
             contentObj.stopAnimation(outCallBack);
           }
+          if (actionName == 'Hide') {
+            contentObj.hideAnimation(outCallBack);
+          }
         }
       }, this);
     }
@@ -75370,6 +75405,8 @@ var Scheduler = function () {
       //翻页停止录音
 
       Xut.Assist.RecordStop();
+      //停止录音播放
+      Xut.Assist.RecordPlayStop();
 
       $warn({
         type: 'logic',
@@ -76066,7 +76103,7 @@ function extendView($$mediator, access, $$globalSwiper) {
      prev
      next
    */
-  var gotoPage = function gotoPage(data, direction) {
+  function gotoPage(data, direction) {
     var seasonId = void 0,
         chapterId = void 0,
         callback = void 0,
@@ -76107,7 +76144,7 @@ function extendView($$mediator, access, $$globalSwiper) {
     }
 
     options.hasMultiPage && $$globalSwiper[direction]({ callback: callback, speed: speed });
-  };
+  }
 
   /**
    * 跳转到上一个页面
@@ -76362,6 +76399,164 @@ function extendView($$mediator, access, $$globalSwiper) {
   };
 }
 
+//========================
+// 录音接口相关
+//========================
+
+/**
+ * 是否存在音频插件
+ * @return {Boolean} [description]
+ */
+function hasRecordPlugin(callback, id) {
+  if (window.cordova && Xut.Plugin.Recorder) {
+    callback(Xut.config.data.originalAppId + '-' + id);
+  }
+}
+
+function extendRecord(access, $$globalSwiper) {
+
+  //开始录音
+  //用于翻页判断是否关闭
+  var startRecord = false;
+
+  //记录上一个录音的成功回调
+  //用于处理直接跳转的接口
+  var currentSucceedCallback = null;
+
+  //录音播放的id
+  var recordPlayId = null;
+
+  /**
+   * 给录音的回调动作
+   * 增加一个当前页面接管的全局接口
+   * 意思就是用户再不录音的情况下，失败的动作中
+   * 会弹出一个可以继续往下走的动作，而不会造成死循环
+   * 跳到下一个默认录音动作
+   * 这样代码默认会绑定最后一个录音的成功动作
+   */
+  Xut.Assist.RecordNextAction = function (callback) {
+    //执行自己的隐藏
+    if (callback) {
+      callback();
+    }
+    setTimeout(function () {
+      //执行当前成功的回调
+      currentSucceedCallback && currentSucceedCallback();
+    }, 1000);
+  };
+
+  /**
+   * 重复录音
+   * 自动定位到当前失败的录音上
+   * callback 是成功回调的关闭
+   */
+  Xut.Assist.RecordRepeat = function (callback) {
+    //执行自己的隐藏
+    callback && callback();
+    // Xut.Assist.Run(12)
+    console.log(2);
+  };
+
+  // Xut.Assist.RecordStart(id, {
+  //   succeed: function() {
+  //     Xut.Assist.Run(1)
+  //   },
+  //   fail: function() {
+  //     Xut.Assist.Run(2)
+  //   }
+  // })
+  Xut.Assist.RecordStart = function (id) {
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!id) {
+      Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u5F55\u97F3\u7684\u7F16\u53F7id,id:' + id);
+      return;
+    }
+    hasRecordPlugin(function (onlyId) {
+      Xut.Assist.RecordStop();
+      //保存成功回调
+      if (callback.succeed) {
+        currentSucceedCallback = callback.succeed;
+      }
+      Xut.$warn('record', '\u5F00\u59CB\u5F55\u97F3,id:' + onlyId);
+      startRecord = true;
+      Xut.Plugin.Recorder.startRecord(onlyId, function () {
+        //成功
+        startRecord = false;
+        Xut.$warn('record', '\u5F55\u97F3\u5B8C\u6210,id:' + onlyId);
+        callback.succeed && callback.succeed();
+      }, function () {
+        //失败
+        startRecord = false;
+        Xut.$warn('record', '\u5F55\u97F3\u5931\u8D25,id:' + onlyId);
+        callback.fail && callback.fail();
+      });
+    }, id);
+  };
+
+  /**
+   * 停止录音
+   * 每次翻页都会调用一次
+   * 1 清空记录
+   * 2 判断如果还有录音的，强制停止
+   */
+  Xut.Assist.RecordStop = function () {
+    //翻页清空
+    currentSucceedCallback = null;
+    if (startRecord) {
+      hasRecordPlugin(function () {
+        Xut.$warn('record', '\u5F55\u97F3\u505C\u6B62');
+        startRecord = false;
+        Xut.Plugin.Recorder.stopRecord();
+      });
+    }
+  };
+
+  /**
+   * 播放录音
+   * failCallback 播放录音失败回调
+   * 播放成功与播放失败
+   */
+  Xut.Assist.RecordPlay = function (id, failCallback) {
+    if (!id) {
+      Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id);
+      return;
+    }
+    hasRecordPlugin(function (onlyId) {
+      //如果上一个还在播，先停止，保持只播一个
+      if (recordPlayId) {
+        Xut.Assist.RecordPlayStop(id);
+      }
+      recordPlayId = id;
+      Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3,id:' + onlyId);
+      Xut.Plugin.Recorder.startPlay(onlyId, function () {
+        recordPlayId = null;
+      }, function () {
+        recordPlayId = null;
+        Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u5931\u8D25,\u64AD\u653E\u53EF\u80FD\u5B58\u5728\u7684\u9ED8\u8BA4\u56DE\u8C03:' + onlyId);
+        failCallback && failCallback();
+      });
+    }, id);
+  };
+
+  /**
+   * 播放停止
+   */
+  Xut.Assist.RecordPlayStop = function (id) {
+    //停止指定的，或者之前播放的
+    id = id || recordPlayId;
+    if (!id) {
+      Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id);
+      return;
+    }
+    hasRecordPlugin(function (onlyId) {
+      recordPlayId = null;
+      Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + onlyId);
+      Xut.Plugin.Recorder.stopPlay(onlyId);
+    }, id);
+  };
+}
+
 /**
  * 读库服务器网址
  * 通过iframe加载本地localhost地址的时候
@@ -76501,34 +76696,11 @@ function handleMessage(event) {
   }
 }
 
-/********************************************
- * 场景API
- * 辅助对象
- ********************************************/
+//========================
+//  秒秒学嵌套Iframe 讨论区
+//========================
 
-function extendAssist(access, $$globalSwiper) {
-
-  //========================
-  //  翻页的通知api
-  //========================
-
-  /**
-   * 允许翻页
-   */
-  //最大的翻页索引标记
-  //这个是顺序
-  var maxFlipIndex = 0;
-  Xut.Assist.EnableFlip = function () {
-    var pageIndex = Xut.Presentation.GetPageIndex();
-    if (pageIndex > maxFlipIndex) {
-      maxFlipIndex = pageIndex;
-      Xut.Application.Notify('enableFlip', maxFlipIndex);
-    }
-  };
-
-  //========================
-  //  秒秒学嵌套Iframe 讨论区
-  //========================
+function extendGlobal(access, $$globalSwiper) {
 
   /**
    * 标记讨论区状态
@@ -76664,10 +76836,13 @@ function extendAssist(access, $$globalSwiper) {
       fn();
     }
   };
+}
 
-  //========================
-  // 秒秒学嵌套Iframe  答题卡
-  //========================
+//========================
+// 秒秒学嵌套Iframe  答题卡
+//========================
+
+function extendAnswer(access, $$globalSwiper) {
 
   /**
    * 设置答题卡的正确错误率
@@ -76691,110 +76866,38 @@ function extendAssist(access, $$globalSwiper) {
   Xut.Assist.AnswerError = function () {
     return setAnswer('error');
   };
+}
+
+/********************************************
+ * 场景API
+ * 辅助对象
+ ********************************************/
+function extendAssist(access, $$globalSwiper) {
+
+  //录音接口相关
+  extendRecord(access, $$globalSwiper);
+  //继承全局接口相关
+  extendGlobal(access, $$globalSwiper);
+  //继承答题接口
+  extendAnswer(access, $$globalSwiper);
 
   //========================
-  //  音频类
+  //  其他平台接口
   //========================
 
   /**
-   * 是否存在插件
-   * @return {Boolean} [description]
+   * 允许翻页
    */
-  function isExistRecord(callback) {
-    if (window.cordova && Xut.Plugin.Recorder) {
-      callback();
-    }
-  }
-
-  /**
-   * 开始录音
-   */
-  var recordState = false;
-  Xut.Assist.RecordStart = function (id, time) {
-    if (!id) {
-      Xut.$warn({
-        type: 'record',
-        content: '\u6CA1\u6709\u4F20\u9012\u5F55\u97F3\u7684\u7F16\u53F7id:' + id
-      });
-      return;
-    }
-    Xut.$warn({
-      type: 'record',
-      content: '\u5F00\u59CB\u5F55\u97F3,id:' + id + ',time:' + time
-    });
-    isExistRecord(function () {
-      Xut.Assist.RecordStop();
-      recordState = true;
-      Xut.Plugin.Recorder.startRecord(id, time, function () {
-        recordState = false;
-        Xut.$warn({
-          type: 'record',
-          content: '\u5F55\u97F3\u5B8C\u6210,id:' + id
-        });
-      });
-    });
-  };
-
-  /**
-   * 停止录音
-   * @param {[type]} id   [description]
-   * @param {[type]} time [description]
-   */
-  Xut.Assist.RecordStop = function () {
-    if (recordState && window.cordova && Xut.Plugin.Recorder) {
-      Xut.$warn({
-        type: 'record',
-        content: '\u5F55\u97F3\u505C\u6B62'
-      });
-      recordState = false;
-      Xut.Plugin.Recorder.stopRecord();
+  //最大的翻页索引标记
+  //这个是顺序
+  var maxFlipIndex = 0;
+  Xut.Assist.EnableFlip = function () {
+    var pageIndex = Xut.Presentation.GetPageIndex();
+    if (pageIndex > maxFlipIndex) {
+      maxFlipIndex = pageIndex;
+      Xut.Application.Notify('enableFlip', maxFlipIndex);
     }
   };
-
-  /**
-   * 播放录音
-   */
-  Xut.Assist.RecordPlay = function (id) {
-    if (!id) {
-      Xut.$warn({
-        type: 'record',
-        content: '\u6CA1\u6709\u4F20\u9012\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id
-      });
-      return;
-    }
-    Xut.$warn({
-      type: 'record',
-      content: '\u64AD\u653E\u5F55\u97F3,id:' + id
-    });
-    isExistRecord(function () {
-      Xut.Plugin.Recorder.startPlay(id);
-    });
-  };
-
-  /**
-   * 播放停止
-   * @param {[type]} id [description]
-   */
-  Xut.Assist.RecordPlayStop = function (id) {
-    if (!id) {
-      Xut.$warn({
-        type: 'record',
-        content: '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id
-      });
-      return;
-    }
-    isExistRecord(function () {
-      Xut.$warn({
-        type: 'record',
-        content: '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + id
-      });
-      Xut.Plugin.Recorder.stopPlay(id);
-    });
-  };
-
-  //========================
-  //  其他
-  //========================
 
   /**
    * 滤镜渐变动画
@@ -76859,15 +76962,19 @@ function extendAssist(access, $$globalSwiper) {
    * 辅助对象的activityId,或者合集activityId
    * Run
    * stop
+   * Hide隐藏动画元素
    * 1 零件
    * 2 音频动画
    */
-  _.each(["Run", "Stop"], function (apiName) {
+  _.each(["Run", "Stop", "Hide"], function (apiName) {
     Xut.Assist[apiName] = function (pageType, activityId, outCallBack) {
       access(function (manager, pageType, activityId, outCallBack) {
+        function assistAppoint(id, callback) {
+          manager.assistAppoint(Number(id), $$globalSwiper.getVisualIndex(), callback, apiName);
+        }
+
         //数组
         if (_.isArray(activityId)) {
-          //完成通知
           var markComplete = function () {
             var completeStatistics = activityId.length; //动画完成统计
             return function () {
@@ -76879,10 +76986,10 @@ function extendAssist(access, $$globalSwiper) {
             };
           }();
           _.each(activityId, function (id) {
-            manager.assistAppoint(id, $$globalSwiper.getVisualIndex(), markComplete, apiName);
+            assistAppoint(id, markComplete);
           });
         } else {
-          manager.assistAppoint(activityId, $$globalSwiper.getVisualIndex(), outCallBack, apiName);
+          assistAppoint(activityId, outCallBack);
         }
       }, pageType, activityId, outCallBack);
     };
@@ -82223,6 +82330,9 @@ function initView() {
 
 function initAsset() {
 
+  //ppt动画需要扩展音频api，所以挂到辅助中
+  Xut.Assist.ContentAudioCreate = createContentAudio;
+
   /**
    * 跳转接口
    * @param {[type]} seasonId  [description]
@@ -83066,7 +83176,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 893.1;
+Xut.Version = 893.2;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

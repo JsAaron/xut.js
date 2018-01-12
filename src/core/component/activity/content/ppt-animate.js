@@ -194,7 +194,14 @@ export default class Animation {
     let create = (constr, newContext) => {
       let element = newContext || $contentNode
       if (element.length) {
-        return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode, this.getStyle);
+        return new constr(
+          pageIndex,
+          pageType,
+          chapterId,
+          element,
+          parameter,
+          $containsNode,
+          this.getStyle);
       } else {
         console.log(`创建:${constr}失败`)
       }

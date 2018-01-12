@@ -6,7 +6,7 @@ export class ManageSuper {
 
   constructor() {
     //初始化容器
-    this._group = {}
+    this.pageBaseGroup = {}
 
     /*数据快速获取接口，首字母直接大写的快捷方式*/
     this.$$GetPageId = this.$$getPageId
@@ -24,32 +24,32 @@ export class ManageSuper {
    * 增加合集管理
    */
   _$$addBaseGroup(pageIndex, pageObj) {
-    this._group[pageIndex] = pageObj
+    this.pageBaseGroup[pageIndex] = pageObj
   }
 
   /**
    * 得到页面合集
    */
   _$$getBaseGroup() {
-    return this._group
+    return this.pageBaseGroup
   }
 
   /**
    * 删除合集管理
    */
   _$$removeBaseGroup(pageIndex) {
-    delete this._group[pageIndex]
+    delete this.pageBaseGroup[pageIndex]
   }
 
   /**
    * 销毁合集
    */
   _$$destroyBaseGroup() {
-    let k, _group = this._group
-    for (k in _group) {
-      _group[k].baseDestroy()
+    let k, pageBaseGroup = this.pageBaseGroup
+    for (k in pageBaseGroup) {
+      pageBaseGroup[k].baseDestroy()
     }
-    this._group = null;
+    this.pageBaseGroup = null;
   }
 
 
@@ -129,7 +129,7 @@ export class ManageSuper {
         pageIndex = this.converMasterId(pageIndex)
       }
     }
-    return this._group && this._group[pageIndex]
+    return this.pageBaseGroup && this.pageBaseGroup[pageIndex]
   }
 
 

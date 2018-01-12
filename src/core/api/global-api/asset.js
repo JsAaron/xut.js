@@ -1,6 +1,10 @@
 import { $setStorage, $getStorage } from '../../util/index'
+import { createContentAudio } from '../../component/audio/api'
 
 export function initAsset() {
+
+  //ppt动画需要扩展音频api，所以挂到辅助中
+  Xut.Assist.ContentAudioCreate = createContentAudio
 
   /**
    * 跳转接口

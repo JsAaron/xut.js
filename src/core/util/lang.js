@@ -1,4 +1,3 @@
-
 //定义属性
 var def = Object.defineProperty;
 
@@ -137,10 +136,7 @@ export function makeJsonPack(code) {
     let post = "(function(){" + enterReplace(code) + "})"
     return (new Function("return " + post))();
   } catch (error) {
-    Xut.$warn({
-      type: 'util',
-      content: '解析json出错' + code
-    })
+    Xut.$warn('util', '解析json出错' + code)
   }
 }
 

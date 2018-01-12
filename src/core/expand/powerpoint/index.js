@@ -1,7 +1,7 @@
 import { config } from '../../config/index'
 import { updateAction } from '../../component/widget/page/extend/adv.sprite'
 import { createContentAudio } from '../../component/audio/api'
-
+import { parseJSON, makeJsonPack } from '../../util/lang'
 import fade from './extend/fade'
 import fly from './extend/fly'
 import path from './extend/path'
@@ -10,23 +10,50 @@ import special from './extend/special'
 import zoom from './extend/zoom'
 import shape from './extend/shape'
 
-import { parseJSON, makeJsonPack } from '../../util/lang'
-
 const ROUND = Math.round
 const CEIL = Math.ceil
-
 const isMacOS = Xut.plat.isMacOS
 const isDesktop = Xut.plat.isDesktop
 
 /**
- * 解析脚本代码
- * 包装能函数
+ * 代码过滤器
+ * 针对代码脚本做处理
+ * Xut.Assist.RecordPlay(1)
+ * =>   Xut.Assist.RecordPlay(1,function(){
+           createContentAudio(2, 7)
+        })
  */
-function parseCode(code) {
-  if (code && code.length > 0) {
+function codeFilter(code, parameter) {
+  //如果有音频，并且包含了RecordPlay接口的脚本
+  //找到对应的脚本，需要针对这个脚本注入新的代码
+  if (code) {
+
+    //开始录音脚本处理
+    if(~code.indexOf('Xut.Assist.RecordStart')){
+      // console.log(parameter)
+    }
+
+
+    //播放录音脚本处理
+    if (parameter.videoId && ~code.indexOf('Xut.Assist.RecordPlay')) {
+      const recordREG = code.match(/Xut.Assist.RecordPlay\((\w+)\)/)
+      if (recordREG.length) {
+        const full = recordREG[0]
+        const id = recordREG[1]
+        const inject = `Xut.Assist.RecordPlay(${id},function(){
+           Xut.Assist.ContentAudioCreate(${parameter.chapterId}, ${parameter.videoId})
+        })`
+        //重新组合新的脚本代码
+        code = code.replace(full, inject)
+        //如果遇到对应的脚本
+        //那么就清理音频
+        parameter.videoId = null
+      }
+    }
     return makeJsonPack(code)
   }
 }
+
 
 /**
  * 子动画回调中
@@ -97,7 +124,14 @@ function getExit(parameter) {
  **/
 export default class Powepoint {
 
-  constructor(pageIndex, pageType, chapterId, element, parameter, container, getStyle) {
+  constructor(
+    pageIndex,
+    pageType,
+    chapterId,
+    element,
+    parameter,
+    container,
+    getStyle) {
 
     if (_.isArray(parameter) && parameter.length) {
       this.options = parameter
@@ -108,56 +142,26 @@ export default class Powepoint {
 
     this.visualWidth = getStyle.visualWidth
     this.visualHeight = getStyle.visualHeight
-
     this.container = container || $(document.body); //父容器(主要用于手势控制路径动画)
-    this.isDebug = false; //是否显示调试信息
-
     this.pageIndex = pageIndex;
     this.pageType = pageType;
     this.chapterId = chapterId;
     this.element = element;
 
-    /**
-     * 动画对象默认样式
-     * @type {String}
-     */
+    //动画对象默认样式
     this.elementStyle = '';
-
-    /**
-     * 初始化后对象状态
-     * @type {String}
-     */
+    //初始化后对象状态
     this.elementVisibility = 'visible'
-
-    /**
-     * 是否使用CSS渐变效果
-     * @type {[type]}
-     */
+    //是否使用CSS渐变效果
     this.useMask = (isDesktop || isMacOS) ? true : false
-
-    /**
-     * 第一个动画参数（默认支持多个动画作用于一个对象）
-     * @type {[type]}
-     */
+    //第一个动画参数（默认支持多个动画作用于一个对象）
     this.parameter0 = null
-
-    /**
-     * 第一个动画类型（进入/退出）
-     * @type {Boolean}
-     */
+    //第一个动画类型（进入/退出）
     this.isExit0 = false
-
-    /**
-     * 是否完全执行过(用于解决重复执行问题)
-     * @type {Boolean}
-     */
+    //是否完全执行过(用于解决重复执行问题)
     this.isCompleted = false
-
-    /**
-     * 初始对象状态:opacity(visibility)
-     */
+    //初始对象状态:opacity(visibility)
     this._initElement();
-
   }
 
   /**
@@ -188,6 +192,12 @@ export default class Powepoint {
         switch (animationName) {
           //强调动画默认显示
           case "EffectFlashBulb": //脉冲
+            if (this.isExit0 || this.isExit0 === undefined) {
+              this.element.css("visibility", "visible");
+            } else {
+              this.element.css("visibility", "hidden");
+            }
+            break;
           case "EffectFlicker": //彩色脉冲
           case "EffectTeeter": //跷跷板
           case "EffectSpin": //陀螺旋转
@@ -207,10 +217,11 @@ export default class Powepoint {
             this.element.css("visibility", "hidden");
             break;
           default:
-            if (this.isExit0)
+            if (this.isExit0) {
               this.element.css("visibility", "visible"); //退出动画默认显示
-            else
+            } else {
               this.element.css("visibility", "hidden"); //进入动画默认隐藏
+            }
             break;
         }
       }
@@ -381,9 +392,9 @@ export default class Powepoint {
     /// 所以需要把脚本匹配到每一个子动画中
     ///////////////////////////////////
     //获取动画前脚本
-    parameter.preCode = parseCode(data.preCode)
+    parameter.preCode = codeFilter(data.preCode, parameter)
     //获取动画后脚本
-    parameter.postCode = parseCode(data.postCode)
+    parameter.postCode = codeFilter(data.postCode, parameter)
     //获取延时时间
     parameter.codeDelay = data.codeDelay
     //赋予父对象的引用

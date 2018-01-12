@@ -484,6 +484,8 @@ export default class Scheduler {
 
     //翻页停止录音
     Xut.Assist.RecordStop()
+    //停止录音播放
+    Xut.Assist.RecordPlayStop()
 
     $warn({
       type: 'logic',

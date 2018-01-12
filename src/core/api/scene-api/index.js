@@ -7,7 +7,7 @@
 
 import { extendPresentation } from './presentation'
 import { extendView } from './view'
-import { extendAssist } from './assist'
+import { extendAssist } from './assist/index'
 import { extendContent } from './content'
 import { extendApplication } from './application'
 import { extendCamera } from './camera'
