@@ -1,6 +1,6 @@
 /*!
  * Xut.js v893.2
- * Release date 2018-01-12 15:50:7
+ * Release date 2018-01-12 16:16:36
  * (c) 2010-2018
  * author @by【Aaron】
  * For internal use only

@@ -475,24 +475,25 @@ export default class Activity {
    * 停止动画
    * @return {[type]} [description]
    */
-  stopAnimation() {
+  stopAnimation(outComplete) {
     var pageId = this.dataRelated.pageId;
     this.runState = false;
     this.eachAssistContents(function(scope) {
       scope.stop && scope.stop(pageId);
     })
+    outComplete && outComplete()
   }
 
   /**
    * 隐藏动画元素
    * @return {[type]} [description]
    */
-  hideAnimation() {
-    var pageId = this.dataRelated.pageId;
-    this.runState = false;
+  hideAnimation(outComplete) {
+    this.stopAnimation() //先停止，再隐藏
     this.eachAssistContents(function(scope) {
-      scope.$contentNode.css('visibility', 'hidden')
+      scope.hide && scope.hide();
     })
+    outComplete && outComplete()
   }
 
   /**

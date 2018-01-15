@@ -29,7 +29,7 @@ function codeFilter(code, parameter) {
   if (code) {
 
     //开始录音脚本处理
-    if(~code.indexOf('Xut.Assist.RecordStart')){
+    if (~code.indexOf('Xut.Assist.RecordStart')) {
       // console.log(parameter)
     }
 
@@ -556,9 +556,7 @@ export default class Powepoint {
     if (this.isCompleted) {
       this.reset()
     }
-    if (this.animation) {
-      this.stop();
-    }
+    this.stop();
     this.animation = this._initAnimation(animComplete)
     this.animation.play()
   }
@@ -573,8 +571,19 @@ export default class Powepoint {
       this.animation.kill()
       this.animation.clear()
       this.animation.vars = null
+      this.animation = null;
     }
-    this.animation = null;
+  }
+
+  /**
+   * 隐藏接口
+   * @return {[type]} [description]
+   */
+  hide() {
+    this.stop();
+    if (this.element) {
+      this.element.css('visibility', 'hidden')
+    }
   }
 
 

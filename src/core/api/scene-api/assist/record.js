@@ -36,9 +36,7 @@ export function extendRecord(access, $$globalSwiper) {
    */
   Xut.Assist.RecordNextAction = function(callback) {
     //执行自己的隐藏
-    if (callback) {
-      callback();
-    }
+    callback && callback()
     setTimeout(function() {
       //执行当前成功的回调
       currentSucceedCallback && currentSucceedCallback()
@@ -57,6 +55,7 @@ export function extendRecord(access, $$globalSwiper) {
     console.log(2)
   }
 
+
   // Xut.Assist.RecordStart(id, {
   //   succeed: function() {
   //     Xut.Assist.Run(1)
@@ -70,6 +69,7 @@ export function extendRecord(access, $$globalSwiper) {
       Xut.$warn('record', `没有传递录音的编号id,id:${id}`)
       return
     }
+    callback.fail && callback.fail()
     hasRecordPlugin(function(onlyId) {
       Xut.Assist.RecordStop()
       //保存成功回调

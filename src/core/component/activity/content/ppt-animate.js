@@ -275,6 +275,22 @@ export default class Animation {
 
 
   /**
+   * 隐藏动画
+   * @param  {[type]} chapterId [description]
+   * @return {[type]}           [description]
+   */
+  hide() {
+    access((key) => {
+      if (this[key]) {
+        if (this[key].hide) {
+          this[key].hide()
+        }
+      }
+    })
+  }
+
+
+  /**
    * 翻页结束，复位上一页动画
    * @return {[type]} [description]
    */
