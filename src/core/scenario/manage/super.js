@@ -74,10 +74,10 @@ export class ManageSuper {
   /**
    * 执行辅助对象事件
    */
-  assistAppoint(activityId, currIndex, outCallBack, actionName) {
+  assistAppoint(activityId, currIndex, outCallBack, actionName, contentId) {
     var pageObj;
     if (pageObj = this.$$getPageBase(currIndex)) {
-      return pageObj.baseAssistRun(activityId, outCallBack, actionName);
+      return pageObj.baseAssistRun(activityId, outCallBack, actionName, contentId);
     }
   }
 

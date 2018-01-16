@@ -60,10 +60,10 @@ export function compileActivity(callback, pipeData, contentDataset, $$floatDiver
     'swipeDelegateContents': pageBaseHooks.swipeDelegateContents
   }
 
-
   //相关数据
   const dataRelated = {
     floatMasterDivertor,
+    'activityId': pipeData.chpaterData._id,
     'seasonId': pipeData.chpaterData.seasonId,
     'pageId': pageId,
     'contentDataset': contentDataset, //所有的content数据合集

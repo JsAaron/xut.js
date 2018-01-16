@@ -51509,10 +51509,10 @@ var ManageSuper = function () {
 
   }, {
     key: 'assistAppoint',
-    value: function assistAppoint(activityId, currIndex, outCallBack, actionName) {
+    value: function assistAppoint(activityId, currIndex, outCallBack, actionName, contentId) {
       var pageObj;
       if (pageObj = this.$$getPageBase(currIndex)) {
-        return pageObj.baseAssistRun(activityId, outCallBack, actionName);
+        return pageObj.baseAssistRun(activityId, outCallBack, actionName, contentId);
       }
     }
 
@@ -58394,25 +58394,29 @@ var isDesktop = Xut.plat.isDesktop;
            createContentAudio(2, 7)
         })
  */
-function codeFilter(code, parameter) {
+function codeFilter(code, parameter, parentContext) {
   //如果有音频，并且包含了RecordPlay接口的脚本
   //找到对应的脚本，需要针对这个脚本注入新的代码
   if (code) {
 
+    //扩展录音脚本
+    //往前缀加载重复回调的处理
     //开始录音脚本处理
-    if (~code.indexOf('Xut.Assist.RecordStart')) {}
-    // console.log(parameter)
+    if (~code.indexOf('Xut.Assist.RecordStart')) {
+      var inject = 'Xut.Assist.RecordStart(function(){\n        Xut.Assist.RunContent(' + parentContext.activityId + ',' + parentContext.contentId + ')\n      },';
+      code = code.replace('Xut.Assist.RecordStart(', inject);
+    }
 
-
-    //播放录音脚本处理
+    //扩展播放录音脚本处理
+    //如果没有用户录音，就取自身的音频
     if (parameter.videoId && ~code.indexOf('Xut.Assist.RecordPlay')) {
       var recordREG = code.match(/Xut.Assist.RecordPlay\((\w+)\)/);
       if (recordREG.length) {
         var full = recordREG[0];
         var id = recordREG[1];
-        var inject = 'Xut.Assist.RecordPlay(' + id + ',function(){\n           Xut.Assist.ContentAudioCreate(' + parameter.chapterId + ', ' + parameter.videoId + ')\n        })';
+        var _inject = 'Xut.Assist.RecordPlay(' + id + ',function(){\n           Xut.Assist.ContentAudioCreate(' + parameter.chapterId + ', ' + parameter.videoId + ')\n        })';
         //重新组合新的脚本代码
-        code = code.replace(full, inject);
+        code = code.replace(full, _inject);
         //如果遇到对应的脚本
         //那么就清理音频
         parameter.videoId = null;
@@ -58488,7 +58492,7 @@ function getExit(parameter) {
  **/
 
 var Powepoint = function () {
-  function Powepoint(pageIndex, pageType, chapterId, element, parameter, container, getStyle) {
+  function Powepoint(pageIndex, pageType, chapterId, element, parameter, container, getStyle, contentId, activityId) {
     classCallCheck(this, Powepoint);
 
 
@@ -58506,6 +58510,8 @@ var Powepoint = function () {
     this.pageType = pageType;
     this.chapterId = chapterId;
     this.element = element;
+    this.contentId = contentId;
+    this.activityId = activityId;
 
     //动画对象默认样式
     this.elementStyle = '';
@@ -58727,7 +58733,7 @@ var Powepoint = function () {
 
   }, {
     key: '_getTimeline',
-    value: function _getTimeline(data, index, completeAction) {
+    value: function _getTimeline(data, index, completeAction, parentContext) {
       var object = this.element;
       var parameter = this.parameter0;
       var isExit = this.isExit0;
@@ -58768,9 +58774,9 @@ var Powepoint = function () {
       /// 所以需要把脚本匹配到每一个子动画中
       ///////////////////////////////////
       //获取动画前脚本
-      parameter.preCode = codeFilter(data.preCode, parameter);
+      parameter.preCode = codeFilter(data.preCode, parameter, parentContext);
       //获取动画后脚本
-      parameter.postCode = codeFilter(data.postCode, parameter);
+      parameter.postCode = codeFilter(data.postCode, parameter, parentContext);
       //获取延时时间
       parameter.codeDelay = data.codeDelay;
       //赋予父对象的引用
@@ -58955,14 +58961,14 @@ var Powepoint = function () {
 
       for (var i = 0; i < this.options.length; i++) {
         if (i == 0) {
-          tl.add(this._getTimeline(this.options[i], i, completeAction), "shape0");
+          tl.add(this._getTimeline(this.options[i], i, completeAction, this), "shape0");
         } else {
           var invokeMode = this.options[i].invokeMode;
           if (invokeMode == 2) {
-            tl.add(this._getTimeline(this.options[i], i, completeAction));
+            tl.add(this._getTimeline(this.options[i], i, completeAction, this));
           } else {
             //"shape"+(i-1)
-            tl.add(this._getTimeline(this.options[i], i, completeAction), "shape0");
+            tl.add(this._getTimeline(this.options[i], i, completeAction, this), "shape0");
           }
         }
       }
@@ -58981,9 +58987,7 @@ var Powepoint = function () {
       if (this.isCompleted) {
         this.reset();
       }
-      if (this.animation) {
-        this.stop();
-      }
+      this.stop();
       this.animation = this._initAnimation(animComplete);
       this.animation.play();
     }
@@ -59001,8 +59005,22 @@ var Powepoint = function () {
         this.animation.kill();
         this.animation.clear();
         this.animation.vars = null;
+        this.animation = null;
       }
-      this.animation = null;
+    }
+
+    /**
+     * 隐藏接口
+     * @return {[type]} [description]
+     */
+
+  }, {
+    key: 'hide',
+    value: function hide() {
+      this.stop();
+      if (this.element) {
+        this.element.css('visibility', 'hidden');
+      }
     }
 
     /**
@@ -59693,7 +59711,7 @@ var Animation = function () {
 
   }, {
     key: 'init',
-    value: function init(id, $contentNode, $containsNode, chapterId, parameter, pageType) {
+    value: function init(contentId, $contentNode, $containsNode, chapterId, parameter, pageType, activityId) {
       var _this2 = this;
 
       var category = this.contentData.category;
@@ -59701,12 +59719,12 @@ var Animation = function () {
       var create = function create(constr, newContext) {
         var element = newContext || $contentNode;
         if (element.length) {
-          return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode, _this2.getStyle);
+          return new constr(pageIndex, pageType, chapterId, element, parameter, $containsNode, _this2.getStyle, contentId, activityId);
         } else {
           console.log('\u521B\u5EFA:' + constr + '\u5931\u8D25');
         }
       };
-      this.domMode ? this._createDom(category, create) : this._createCanvas(id, parameter, category, create);
+      this.domMode ? this._createDom(category, create) : this._createCanvas(contentId, parameter, category, create);
     }
 
     /**
@@ -59782,6 +59800,26 @@ var Animation = function () {
     }
 
     /**
+     * 隐藏动画
+     * @param  {[type]} chapterId [description]
+     * @return {[type]}           [description]
+     */
+
+  }, {
+    key: 'hide',
+    value: function hide() {
+      var _this5 = this;
+
+      access$1(function (key) {
+        if (_this5[key]) {
+          if (_this5[key].hide) {
+            _this5[key].hide();
+          }
+        }
+      });
+    }
+
+    /**
      * 翻页结束，复位上一页动画
      * @return {[type]} [description]
      */
@@ -59789,15 +59827,15 @@ var Animation = function () {
   }, {
     key: 'reset',
     value: function reset() {
-      var _this5 = this;
+      var _this6 = this;
 
       access$1(function (key) {
-        if (_this5[key]) {
+        if (_this6[key]) {
           //如果是一次性动画，需要动态处理
-          if (_this5.useDynamicDiagram) {
-            cleanImage(_this5.$contentNode);
+          if (_this6.useDynamicDiagram) {
+            cleanImage(_this6.$contentNode);
           }
-          _this5[key].reset && _this5[key].reset();
+          _this6[key].reset && _this6[key].reset();
         }
       });
     }
@@ -59810,10 +59848,10 @@ var Animation = function () {
   }, {
     key: 'destroy',
     value: function destroy(chapterId) {
-      var _this6 = this;
+      var _this7 = this;
 
       access$1(function (key) {
-        _this6[key] && _this6[key].destroy && _this6[key].destroy();
+        _this7[key] && _this7[key].destroy && _this7[key].destroy();
       });
 
       //销毁renderer = new PIXI.WebGLRenderer
@@ -59827,7 +59865,7 @@ var Animation = function () {
       }
 
       access$1(function (key) {
-        _this6[key] = null;
+        _this7[key] = null;
       });
 
       this.$contentNode = null;
@@ -60992,21 +61030,22 @@ var Activity = function () {
       var $containsNode = this.$containsNode;
       var collectorHooks = this.callbackRelated.contentsHooks;
       var pageType = this.pageType;
+      var activityId = this.activityId;
 
       this.eachAssistContents(function (scope) {
         //针对必须创建
-        var id = scope.id;
+        var contentId = scope.id;
         var $contentNode = scope.$contentNode;
 
         //如果是视觉差对象，也需要实现收集器
         if (scope.processType === 'parallax') {
-          collectorHooks(scope.chapterIndex, scope.id, scope);
+          collectorHooks(scope.chapterIndex, contentId, scope);
           return;
         }
 
         //初始化动画
-        scope.init(id, $contentNode, $containsNode, pageId, scope.getParameter(), pageType);
-        _this._toRepeatBind(id, $contentNode, scope, collectorHooks);
+        scope.init(contentId, $contentNode, $containsNode, pageId, scope.getParameter(), pageType, activityId);
+        _this._toRepeatBind(contentId, $contentNode, scope, collectorHooks);
       });
     }
 
@@ -61020,15 +61059,15 @@ var Activity = function () {
 
   }, {
     key: '_toRepeatBind',
-    value: function _toRepeatBind(id, $contentNode, scope, collectorHooks) {
+    value: function _toRepeatBind(contentId, $contentNode, scope, collectorHooks) {
       var dataRelated = this.dataRelated;
-      var indexOf = dataRelated.createContentIds.indexOf(id);
+      var indexOf = dataRelated.createContentIds.indexOf(contentId);
 
       //过滤重复关系
       //每个元素只绑定一次
       if (-1 !== indexOf) {
         dataRelated.createContentIds.splice(indexOf, 1); //删除,去重
-        collectorHooks(scope.chapterIndex, id, scope); //收集每一个content注册
+        collectorHooks(scope.chapterIndex, contentId, scope); //收集每一个content注册
         this._iscrollBind(scope, $contentNode); //增加翻页特性
       }
     }
@@ -61269,11 +61308,12 @@ var Activity = function () {
      * @param  {[type]} outComplete [动画回调]
      * @return {[type]}             [description]
      * evenyClick 每次都算有效点击
+     * onlyRunContentId 仅仅运行指定contentId的对象
      */
 
   }, {
     key: 'runAnimation',
-    value: function runAnimation(outComplete, evenyClick) {
+    value: function runAnimation(outComplete, evenyClick, onlyRunContentId) {
 
       var self = this;
       var pageId = this.dataRelated.pageId;
@@ -61295,6 +61335,11 @@ var Activity = function () {
         this._relevantOperation();
         return;
       }
+
+      //监控执行动画的长度
+      //如果onlyRunContentId存在则只需要检测一次
+      //否就是默认activityId下的所有content对象
+      var watchCompleteCount = onlyRunContentId ? 1 : this.contentGroup.length;
 
       //制作作用于内动画完成
       //等待动画完毕后执行动作or场景切换
@@ -61335,10 +61380,9 @@ var Activity = function () {
             --counts;
           }
         };
-      }(this.contentGroup.length);
+      }(watchCompleteCount);
 
-      //执行动画
-      this.eachAssistContents(function (scope) {
+      function scopePlay(scope) {
         //标记动画正在运行
         scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
           'animOffset': scope.$contentNode.offset()
@@ -61346,6 +61390,18 @@ var Activity = function () {
         scope.play(function () {
           captureAnimComplete(scope);
         });
+      }
+
+      //执行动画
+      this.eachAssistContents(function (scope) {
+        if (onlyRunContentId) {
+          //只执行指定的编号
+          if (onlyRunContentId === scope.id) {
+            scopePlay(scope);
+          }
+        } else {
+          scopePlay(scope);
+        }
       });
 
       this.runState = true;
@@ -61358,12 +61414,13 @@ var Activity = function () {
 
   }, {
     key: 'stopAnimation',
-    value: function stopAnimation() {
+    value: function stopAnimation(outComplete) {
       var pageId = this.dataRelated.pageId;
       this.runState = false;
       this.eachAssistContents(function (scope) {
         scope.stop && scope.stop(pageId);
       });
+      outComplete && outComplete();
     }
 
     /**
@@ -61373,12 +61430,12 @@ var Activity = function () {
 
   }, {
     key: 'hideAnimation',
-    value: function hideAnimation() {
-      var pageId = this.dataRelated.pageId;
-      this.runState = false;
+    value: function hideAnimation(outComplete) {
+      this.stopAnimation(); //先停止，再隐藏
       this.eachAssistContents(function (scope) {
-        scope.$contentNode.css('visibility', 'hidden');
+        scope.hide && scope.hide();
       });
+      outComplete && outComplete();
     }
 
     /**
@@ -61599,6 +61656,7 @@ function compileActivity(callback, pipeData, contentDataset, $$floatDivertor) {
     //相关数据
   };var dataRelated = {
     floatMasterDivertor: floatMasterDivertor,
+    'activityId': pipeData.chpaterData._id,
     'seasonId': pipeData.chpaterData.seasonId,
     'pageId': pageId,
     'contentDataset': contentDataset, //所有的content数据合集
@@ -72403,18 +72461,17 @@ var dataExternal = function (baseProto) {
 
   /**
    *  运行辅助对象事件
-   * @param  {[type]} activityId  [description]
-   * @param  {[type]} outCallBack [description]
-   * @param  {[type]} actionName  [description]
-   * @return {[type]}             [description]
+   *  执行运行对象的动画
+   *  但是如果提供contentID，那么就是只运行这组序列动画中的
+   *  指定contentID的这个动画
    */
-  baseProto.baseAssistRun = function (activityId, outCallBack, actionName) {
+  baseProto.baseAssistRun = function (activityId, outCallBack, actionName, contentId) {
     var activity;
     if (activity = this.activityGroup) {
       _.each(activity.get(), function (contentObj, index) {
         if (activityId == contentObj.activityId) {
           if (actionName == 'Run') {
-            contentObj.runAnimation(outCallBack, true);
+            contentObj.runAnimation(outCallBack, true, contentId);
           }
           if (actionName == 'Stop') {
             contentObj.stopAnimation(outCallBack);
@@ -76422,6 +76479,8 @@ function extendRecord(access, $$globalSwiper) {
   //记录上一个录音的成功回调
   //用于处理直接跳转的接口
   var currentSucceedCallback = null;
+  //当前运行的重复执行方法
+  var cuurentRepeatCallback = null;
 
   //录音播放的id
   var recordPlayId = null;
@@ -76436,13 +76495,15 @@ function extendRecord(access, $$globalSwiper) {
    */
   Xut.Assist.RecordNextAction = function (callback) {
     //执行自己的隐藏
-    if (callback) {
-      callback();
+    callback && callback();
+    if (currentSucceedCallback) {
+      setTimeout(function () {
+        //执行当前成功的回调
+        currentSucceedCallback();
+      }, 1000);
+    } else {
+      Xut.$warn('record', '\u6CA1\u6709currentSucceedCallback,\u65E0\u6CD5\u7EE7\u7EED\u4E0B\u4E2A\u52A8\u753B');
     }
-    setTimeout(function () {
-      //执行当前成功的回调
-      currentSucceedCallback && currentSucceedCallback();
-    }, 1000);
   };
 
   /**
@@ -76453,8 +76514,14 @@ function extendRecord(access, $$globalSwiper) {
   Xut.Assist.RecordRepeat = function (callback) {
     //执行自己的隐藏
     callback && callback();
-    // Xut.Assist.Run(12)
-    console.log(2);
+    if (cuurentRepeatCallback) {
+      setTimeout(function () {
+        //执行当前成功的回调
+        cuurentRepeatCallback();
+      }, 500);
+    } else {
+      Xut.$warn('record', '\u6CA1\u6709cuurentRepeatCallback,\u65E0\u6CD5\u91CD\u590D\u5F53\u524D\u52A8\u753B');
+    }
   };
 
   // Xut.Assist.RecordStart(id, {
@@ -76465,18 +76532,33 @@ function extendRecord(access, $$globalSwiper) {
   //     Xut.Assist.Run(2)
   //   }
   // })
-  Xut.Assist.RecordStart = function (id) {
-    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  //
+  // injectFn 是在PPT动画中，注入的回调
+  //
+  Xut.Assist.RecordStart = function (injectFn, id) {
+    var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-    if (!id) {
-      Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u5F55\u97F3\u7684\u7F16\u53F7id,id:' + id);
+
+    if (!injectFn) {
+      Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u5F55\u97F3\u7684\u5FC5\u8981\u6570\u636E' + injectFn);
       return;
     }
+
+    //如果只传递了2个参数id/callback
+    if (typeof injectFn !== 'function') {
+      var a = id;
+      id = injectFn;
+      callback = a;
+    }
+
     hasRecordPlugin(function (onlyId) {
       Xut.Assist.RecordStop();
       //保存成功回调
       if (callback.succeed) {
         currentSucceedCallback = callback.succeed;
+      }
+      if (injectFn) {
+        cuurentRepeatCallback = injectFn;
       }
       Xut.$warn('record', '\u5F00\u59CB\u5F55\u97F3,id:' + onlyId);
       startRecord = true;
@@ -76503,6 +76585,7 @@ function extendRecord(access, $$globalSwiper) {
   Xut.Assist.RecordStop = function () {
     //翻页清空
     currentSucceedCallback = null;
+    cuurentRepeatCallback = null;
     if (startRecord) {
       hasRecordPlugin(function () {
         Xut.$warn('record', '\u5F55\u97F3\u505C\u6B62');
@@ -76545,11 +76628,11 @@ function extendRecord(access, $$globalSwiper) {
   Xut.Assist.RecordPlayStop = function (id) {
     //停止指定的，或者之前播放的
     id = id || recordPlayId;
-    if (!id) {
-      Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id);
-      return;
-    }
     hasRecordPlugin(function (onlyId) {
+      if (!onlyId) {
+        Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + onlyId);
+        return;
+      }
       recordPlayId = null;
       Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + onlyId);
       Xut.Plugin.Recorder.stopPlay(onlyId);
@@ -76957,6 +77040,18 @@ function extendAssist(access, $$globalSwiper) {
   };
 
   /**
+   * 运行独立的content动画
+   */
+  Xut.Assist.RunContent = function (activityId, contentId) {
+    if (!activityId && !contentId) {
+      Xut.$Warn('content', '缺少运行RunContent接口的数据');
+      return;
+    }
+    //执行运行页面母版上activityId中为activityId的动画
+    Xut.Assist.Run('page', activityId, null, contentId);
+  };
+
+  /**
    * 辅助对象的控制接口
    * 运行辅助动画
    * 辅助对象的activityId,或者合集activityId
@@ -76967,10 +77062,10 @@ function extendAssist(access, $$globalSwiper) {
    * 2 音频动画
    */
   _.each(["Run", "Stop", "Hide"], function (apiName) {
-    Xut.Assist[apiName] = function (pageType, activityId, outCallBack) {
+    Xut.Assist[apiName] = function (pageType, activityId, outCallBack, contentId) {
       access(function (manager, pageType, activityId, outCallBack) {
         function assistAppoint(id, callback) {
-          manager.assistAppoint(Number(id), $$globalSwiper.getVisualIndex(), callback, apiName);
+          manager.assistAppoint(Number(id), $$globalSwiper.getVisualIndex(), callback, apiName, contentId);
         }
 
         //数组
@@ -83176,7 +83271,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 893.2;
+Xut.Version = 893.3;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

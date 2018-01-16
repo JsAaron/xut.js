@@ -254,18 +254,17 @@ export default function(baseProto) {
 
   /**
    *  运行辅助对象事件
-   * @param  {[type]} activityId  [description]
-   * @param  {[type]} outCallBack [description]
-   * @param  {[type]} actionName  [description]
-   * @return {[type]}             [description]
+   *  执行运行对象的动画
+   *  但是如果提供contentID，那么就是只运行这组序列动画中的
+   *  指定contentID的这个动画
    */
-  baseProto.baseAssistRun = function(activityId, outCallBack, actionName) {
+  baseProto.baseAssistRun = function(activityId, outCallBack, actionName, contentId) {
     var activity;
     if (activity = this.activityGroup) {
       _.each(activity.get(), function(contentObj, index) {
         if (activityId == contentObj.activityId) {
           if (actionName == 'Run') {
-            contentObj.runAnimation(outCallBack, true);
+            contentObj.runAnimation(outCallBack, true, contentId);
           }
           if (actionName == 'Stop') {
             contentObj.stopAnimation(outCallBack);

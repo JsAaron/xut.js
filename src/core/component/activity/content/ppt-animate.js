@@ -188,7 +188,13 @@ export default class Animation {
    *  1 dom动画
    *  2 canvas动画
    */
-  init(id, $contentNode, $containsNode, chapterId, parameter, pageType) {
+  init(contentId,
+    $contentNode,
+    $containsNode,
+    chapterId,
+    parameter,
+    pageType,
+    activityId) {
     let category = this.contentData.category
     let pageIndex = this.pageIndex
     let create = (constr, newContext) => {
@@ -201,12 +207,16 @@ export default class Animation {
           element,
           parameter,
           $containsNode,
-          this.getStyle);
+          this.getStyle,
+          contentId,
+          activityId);
       } else {
         console.log(`创建:${constr}失败`)
       }
     }
-    this.domMode ? this._createDom(category, create) : this._createCanvas(id, parameter, category, create)
+    this.domMode ?
+      this._createDom(category, create) :
+      this._createCanvas(contentId, parameter, category, create)
   }
 
 

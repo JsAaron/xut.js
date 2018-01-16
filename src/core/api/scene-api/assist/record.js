@@ -22,6 +22,8 @@ export function extendRecord(access, $$globalSwiper) {
   //记录上一个录音的成功回调
   //用于处理直接跳转的接口
   let currentSucceedCallback = null
+  //当前运行的重复执行方法
+  let cuurentRepeatCallback = null
 
   //录音播放的id
   let recordPlayId = null
@@ -37,10 +39,14 @@ export function extendRecord(access, $$globalSwiper) {
   Xut.Assist.RecordNextAction = function(callback) {
     //执行自己的隐藏
     callback && callback()
-    setTimeout(function() {
-      //执行当前成功的回调
-      currentSucceedCallback && currentSucceedCallback()
-    }, 1000)
+    if (currentSucceedCallback) {
+      setTimeout(function() {
+        //执行当前成功的回调
+        currentSucceedCallback()
+      }, 1000)
+    } else {
+      Xut.$warn('record', `没有currentSucceedCallback,无法继续下个动画`)
+    }
   }
 
   /**
@@ -51,8 +57,14 @@ export function extendRecord(access, $$globalSwiper) {
   Xut.Assist.RecordRepeat = function(callback) {
     //执行自己的隐藏
     callback && callback()
-    // Xut.Assist.Run(12)
-    console.log(2)
+    if (cuurentRepeatCallback) {
+      setTimeout(function() {
+        //执行当前成功的回调
+        cuurentRepeatCallback()
+      }, 500)
+    } else {
+      Xut.$warn('record', `没有cuurentRepeatCallback,无法重复当前动画`)
+    }
   }
 
 
@@ -64,17 +76,31 @@ export function extendRecord(access, $$globalSwiper) {
   //     Xut.Assist.Run(2)
   //   }
   // })
-  Xut.Assist.RecordStart = function(id, callback = {}) {
-    if (!id) {
-      Xut.$warn('record', `没有传递录音的编号id,id:${id}`)
+  //
+  // injectFn 是在PPT动画中，注入的回调
+  //
+  Xut.Assist.RecordStart = function(injectFn, id, callback = {}) {
+
+    if (!injectFn) {
+      Xut.$warn('record', `没有传递录音的必要数据${injectFn}`)
       return
     }
-    callback.fail && callback.fail()
+
+    //如果只传递了2个参数id/callback
+    if (typeof injectFn !== 'function') {
+      let a = id
+      id = injectFn
+      callback = a
+    }
+
     hasRecordPlugin(function(onlyId) {
       Xut.Assist.RecordStop()
       //保存成功回调
       if (callback.succeed) {
         currentSucceedCallback = callback.succeed
+      }
+      if (injectFn) {
+        cuurentRepeatCallback = injectFn
       }
       Xut.$warn('record', `开始录音,id:${onlyId}`)
       startRecord = true
@@ -101,6 +127,7 @@ export function extendRecord(access, $$globalSwiper) {
   Xut.Assist.RecordStop = function() {
     //翻页清空
     currentSucceedCallback = null
+    cuurentRepeatCallback = null
     if (startRecord) {
       hasRecordPlugin(function() {
         Xut.$warn('record', `录音停止`)
@@ -143,11 +170,11 @@ export function extendRecord(access, $$globalSwiper) {
   Xut.Assist.RecordPlayStop = function(id) {
     //停止指定的，或者之前播放的
     id = id || recordPlayId
-    if (!id) {
-      Xut.$warn('record', `没有传递停止播放录音的编号id:${id}`)
-      return
-    }
     hasRecordPlugin(function(onlyId) {
+      if (!onlyId) {
+        Xut.$warn('record', `没有传递停止播放录音的编号id:${onlyId}`)
+        return
+      }
       recordPlayId = null
       Xut.$warn('record', `播放录音停止,id:${onlyId}`)
       Xut.Plugin.Recorder.stopPlay(onlyId)

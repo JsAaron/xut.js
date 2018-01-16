@@ -91,6 +91,18 @@ export function extendAssist(access, $$globalSwiper) {
   }
 
   /**
+   * 运行独立的content动画
+   */
+  Xut.Assist.RunContent = function(activityId, contentId) {
+    if (!activityId && !contentId) {
+      Xut.$Warn('content', '缺少运行RunContent接口的数据')
+      return
+    }
+    //执行运行页面母版上activityId中为activityId的动画
+    Xut.Assist.Run('page', activityId, null, contentId)
+  }
+
+  /**
    * 辅助对象的控制接口
    * 运行辅助动画
    * 辅助对象的activityId,或者合集activityId
@@ -105,14 +117,15 @@ export function extendAssist(access, $$globalSwiper) {
     "Stop",
     "Hide"
   ], function(apiName) {
-    Xut.Assist[apiName] = function(pageType, activityId, outCallBack) {
+    Xut.Assist[apiName] = function(pageType, activityId, outCallBack, contentId) {
       access(function(manager, pageType, activityId, outCallBack) {
         function assistAppoint(id, callback) {
           manager.assistAppoint(
             Number(id),
             $$globalSwiper.getVisualIndex(),
             callback,
-            apiName
+            apiName,
+            contentId
           );
         }
 

@@ -130,21 +130,29 @@ export default class Activity {
     const $containsNode = this.$containsNode
     const collectorHooks = this.callbackRelated.contentsHooks
     const pageType = this.pageType
+    const activityId = this.activityId
 
     this.eachAssistContents(scope => {
       //针对必须创建
-      const id = scope.id
+      const contentId = scope.id
       const $contentNode = scope.$contentNode
 
       //如果是视觉差对象，也需要实现收集器
       if (scope.processType === 'parallax') {
-        collectorHooks(scope.chapterIndex, scope.id, scope);
+        collectorHooks(scope.chapterIndex, contentId, scope);
         return;
       }
 
       //初始化动画
-      scope.init(id, $contentNode, $containsNode, pageId, scope.getParameter(), pageType);
-      this._toRepeatBind(id, $contentNode, scope, collectorHooks);
+      scope.init(contentId,
+        $contentNode,
+        $containsNode,
+        pageId,
+        scope.getParameter(),
+        pageType,
+        activityId
+      )
+      this._toRepeatBind(contentId, $contentNode, scope, collectorHooks);
     });
 
   }
@@ -156,15 +164,15 @@ export default class Activity {
    * 2 注册钩子
    * @return {[type]} [description]
    */
-  _toRepeatBind(id, $contentNode, scope, collectorHooks) {
+  _toRepeatBind(contentId, $contentNode, scope, collectorHooks) {
     let dataRelated = this.dataRelated
-    let indexOf = dataRelated.createContentIds.indexOf(id)
+    let indexOf = dataRelated.createContentIds.indexOf(contentId)
 
     //过滤重复关系
     //每个元素只绑定一次
     if (-1 !== indexOf) {
       dataRelated.createContentIds.splice(indexOf, 1); //删除,去重
-      collectorHooks(scope.chapterIndex, id, scope); //收集每一个content注册
+      collectorHooks(scope.chapterIndex, contentId, scope); //收集每一个content注册
       this._iscrollBind(scope, $contentNode); //增加翻页特性
     }
   }
@@ -387,8 +395,9 @@ export default class Activity {
    * @param  {[type]} outComplete [动画回调]
    * @return {[type]}             [description]
    * evenyClick 每次都算有效点击
+   * onlyRunContentId 仅仅运行指定contentId的对象
    */
-  runAnimation(outComplete, evenyClick) {
+  runAnimation(outComplete, evenyClick, onlyRunContentId) {
 
     let self = this
     let pageId = this.dataRelated.pageId
@@ -410,6 +419,11 @@ export default class Activity {
       this._relevantOperation();
       return;
     }
+
+    //监控执行动画的长度
+    //如果onlyRunContentId存在则只需要检测一次
+    //否就是默认activityId下的所有content对象
+    let watchCompleteCount = onlyRunContentId ? 1 : this.contentGroup.length
 
     //制作作用于内动画完成
     //等待动画完毕后执行动作or场景切换
@@ -454,10 +468,10 @@ export default class Activity {
         }
 
       }
-    }(this.contentGroup.length);
+    }(watchCompleteCount);
 
-    //执行动画
-    this.eachAssistContents(function(scope) {
+
+    function scopePlay(scope) {
       //标记动画正在运行
       scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
         'animOffset': scope.$contentNode.offset()
@@ -465,6 +479,19 @@ export default class Activity {
       scope.play(function() {
         captureAnimComplete(scope);
       });
+    }
+
+
+    //执行动画
+    this.eachAssistContents(function(scope) {
+      if (onlyRunContentId) {
+        //只执行指定的编号
+        if (onlyRunContentId === scope.id) {
+          scopePlay(scope)
+        }
+      } else {
+        scopePlay(scope)
+      }
     })
 
     this.runState = true;

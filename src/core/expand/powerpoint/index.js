@@ -23,18 +23,23 @@ const isDesktop = Xut.plat.isDesktop
            createContentAudio(2, 7)
         })
  */
-function codeFilter(code, parameter) {
+function codeFilter(code, parameter, parentContext) {
   //如果有音频，并且包含了RecordPlay接口的脚本
   //找到对应的脚本，需要针对这个脚本注入新的代码
   if (code) {
 
+    //扩展录音脚本
+    //往前缀加载重复回调的处理
     //开始录音脚本处理
     if (~code.indexOf('Xut.Assist.RecordStart')) {
-      // console.log(parameter)
+      const inject = `Xut.Assist.RecordStart(function(){
+        Xut.Assist.RunContent(${parentContext.activityId},${parentContext.contentId})
+      },`
+      code = code.replace('Xut.Assist.RecordStart(', inject)
     }
 
-
-    //播放录音脚本处理
+    //扩展播放录音脚本处理
+    //如果没有用户录音，就取自身的音频
     if (parameter.videoId && ~code.indexOf('Xut.Assist.RecordPlay')) {
       const recordREG = code.match(/Xut.Assist.RecordPlay\((\w+)\)/)
       if (recordREG.length) {
@@ -131,7 +136,9 @@ export default class Powepoint {
     element,
     parameter,
     container,
-    getStyle) {
+    getStyle,
+    contentId,
+    activityId) {
 
     if (_.isArray(parameter) && parameter.length) {
       this.options = parameter
@@ -147,6 +154,8 @@ export default class Powepoint {
     this.pageType = pageType;
     this.chapterId = chapterId;
     this.element = element;
+    this.contentId = contentId
+    this.activityId = activityId
 
     //动画对象默认样式
     this.elementStyle = '';
@@ -352,7 +361,7 @@ export default class Powepoint {
   /**
    * 返回动画对象
    */
-  _getTimeline(data, index, completeAction) {
+  _getTimeline(data, index, completeAction, parentContext) {
     var object = this.element;
     var parameter = this.parameter0;
     var isExit = this.isExit0;
@@ -392,9 +401,9 @@ export default class Powepoint {
     /// 所以需要把脚本匹配到每一个子动画中
     ///////////////////////////////////
     //获取动画前脚本
-    parameter.preCode = codeFilter(data.preCode, parameter)
+    parameter.preCode = codeFilter(data.preCode, parameter, parentContext)
     //获取动画后脚本
-    parameter.postCode = codeFilter(data.postCode, parameter)
+    parameter.postCode = codeFilter(data.postCode, parameter, parentContext)
     //获取延时时间
     parameter.codeDelay = data.codeDelay
     //赋予父对象的引用
@@ -533,14 +542,14 @@ export default class Powepoint {
 
     for (var i = 0; i < this.options.length; i++) {
       if (i == 0) {
-        tl.add(this._getTimeline(this.options[i], i, completeAction), "shape0");
+        tl.add(this._getTimeline(this.options[i], i, completeAction, this), "shape0");
       } else {
         var invokeMode = this.options[i].invokeMode;
         if (invokeMode == 2) {
-          tl.add(this._getTimeline(this.options[i], i, completeAction));
+          tl.add(this._getTimeline(this.options[i], i, completeAction, this));
         } else {
           //"shape"+(i-1)
-          tl.add(this._getTimeline(this.options[i], i, completeAction), "shape0");
+          tl.add(this._getTimeline(this.options[i], i, completeAction, this), "shape0");
         }
       }
     }
