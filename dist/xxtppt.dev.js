@@ -76475,15 +76475,12 @@ function extendRecord(access, $$globalSwiper) {
   //开始录音
   //用于翻页判断是否关闭
   var startRecord = false;
-
-  //记录上一个录音的成功回调
-  //用于处理直接跳转的接口
-  var currentSucceedCallback = null;
-  //当前运行的重复执行方法
-  var cuurentRepeatCallback = null;
-
   //录音播放的id
   var recordPlayId = null;
+  //下一个动作的回调
+  var currentNextCallback = null;
+  //当前运行的重复执行方法
+  var cuurentRepeatCallback = null;
 
   /**
    * 给录音的回调动作
@@ -76496,10 +76493,10 @@ function extendRecord(access, $$globalSwiper) {
   Xut.Assist.RecordNextAction = function (callback) {
     //执行自己的隐藏
     callback && callback();
-    if (currentSucceedCallback) {
+    if (currentNextCallback) {
       setTimeout(function () {
         //执行当前成功的回调
-        currentSucceedCallback();
+        currentNextCallback();
       }, 1000);
     } else {
       Xut.$warn('record', '\u6CA1\u6709currentSucceedCallback,\u65E0\u6CD5\u7EE7\u7EED\u4E0B\u4E2A\u52A8\u753B');
@@ -76524,17 +76521,20 @@ function extendRecord(access, $$globalSwiper) {
     }
   };
 
-  // Xut.Assist.RecordStart(id, {
-  //   succeed: function() {
-  //     Xut.Assist.Run(1)
-  //   },
-  //   fail: function() {
-  //     Xut.Assist.Run(2)
-  //   }
-  // })
-  //
-  // injectFn 是在PPT动画中，注入的回调
-  //
+  /**
+   * 脚本函数
+   * 1:id
+   * 2:提供成功与失败回调
+   * 3：injectFn可以注入处理函数
+   * Xut.Assist.RecordStart(id, {
+   *   succeed: function() {
+   *     Xut.Assist.Run(1)
+   *   },
+   *   fail: function() {
+   *     Xut.Assist.Run(2)
+   *   }
+   * })
+   */
   Xut.Assist.RecordStart = function (injectFn, id) {
     var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -76544,6 +76544,7 @@ function extendRecord(access, $$globalSwiper) {
       return;
     }
 
+    //如果不通过ppt处理，那么只会传递2个参数
     //如果只传递了2个参数id/callback
     if (typeof injectFn !== 'function') {
       var a = id;
@@ -76553,17 +76554,19 @@ function extendRecord(access, $$globalSwiper) {
 
     hasRecordPlugin(function (onlyId) {
       Xut.Assist.RecordStop();
-      //保存成功回调
+      //如果有执行成功回调
       if (callback.succeed) {
-        currentSucceedCallback = callback.succeed;
+        currentNextCallback = callback.succeed;
       }
+      //如果有注入重新运行的回调
       if (injectFn) {
         cuurentRepeatCallback = injectFn;
       }
       Xut.$warn('record', '\u5F00\u59CB\u5F55\u97F3,id:' + onlyId);
       startRecord = true;
-      Xut.Plugin.Recorder.startRecord(onlyId, function () {
-        //成功
+      Xut.Plugin.Recorder.startRecord(onlyId,
+      //成功
+      function () {
         startRecord = false;
         Xut.$warn('record', '\u5F55\u97F3\u5B8C\u6210,id:' + onlyId);
         callback.succeed && callback.succeed();
@@ -76584,7 +76587,7 @@ function extendRecord(access, $$globalSwiper) {
    */
   Xut.Assist.RecordStop = function () {
     //翻页清空
-    currentSucceedCallback = null;
+    currentNextCallback = null;
     cuurentRepeatCallback = null;
     if (startRecord) {
       hasRecordPlugin(function () {
