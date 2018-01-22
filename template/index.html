@@ -43,8 +43,9 @@ Xut.Application.setConfig = {
   // },
 
   debug:{
+    //'util','record','preload'
     // terminal:true,
-    silent:['util','record']
+    silent:['util','record','preload']
   },
 
   // debug: {
@@ -108,7 +109,7 @@ Xut.Application.Watch('trackCode', function(type, options) {
 })
 
 
-var appId = 1 //306
+var appId = 6 //306
 function play() {
   Xut.Application.Launch({
     // trackCode: ['swipe'], //代码跟踪

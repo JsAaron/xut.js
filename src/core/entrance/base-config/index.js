@@ -20,12 +20,15 @@ import {
 
 
 export default function baseConfig(callback) {
+
   //导入数据库
   importJsonDatabase((results) => {
     setDatabse(results)
   })
 
-  //根据数据库的配置设置
+  /**
+   * 根据数据库的配置设置
+   */
   function setDatabse(results) {
     initDatabse(results, function(dataRet) {
       $warn('logic', '初始化数据库完成')
@@ -48,7 +51,7 @@ export default function baseConfig(callback) {
     configImage();
     //创建根节点
     //开始预加载文件
-    ccreateRoot(() => initPrelaod(novelData, chapterTotal));
+    createRoot(() => initPrelaod(novelData, chapterTotal));
   }
 
 
@@ -56,7 +59,7 @@ export default function baseConfig(callback) {
    * 创建根节点
    * @return {[type]} [description]
    */
-  function ccreateRoot(callback) {
+  function createRoot(callback) {
     //根节点
     const { $rootNode, $contentNode } = initRootNode(config.launch.el, config.launch.cursor);
     $warn('logic', '初始化设置参数完成')

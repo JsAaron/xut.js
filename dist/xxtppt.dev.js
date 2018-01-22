@@ -76476,7 +76476,7 @@ function extendRecord(access, $$globalSwiper) {
   //用于翻页判断是否关闭
   var startRecord = false;
   //录音播放的id
-  var recordPlayId = null;
+  var prevRecordPlayId = null;
   //下一个动作的回调
   var currentNextCallback = null;
   //当前运行的重复执行方法
@@ -76552,7 +76552,7 @@ function extendRecord(access, $$globalSwiper) {
       callback = a;
     }
 
-    hasRecordPlugin(function (onlyId) {
+    hasRecordPlugin(function (newId) {
       Xut.Assist.RecordStop();
       //如果有执行成功回调
       if (callback.succeed) {
@@ -76562,18 +76562,18 @@ function extendRecord(access, $$globalSwiper) {
       if (injectFn) {
         cuurentRepeatCallback = injectFn;
       }
-      Xut.$warn('record', '\u5F00\u59CB\u5F55\u97F3,id:' + onlyId);
+      Xut.$warn('record', '\u5F00\u59CB\u5F55\u97F3,id:' + newId);
       startRecord = true;
-      Xut.Plugin.Recorder.startRecord(onlyId,
+      Xut.Plugin.Recorder.startRecord(newId,
       //成功
       function () {
         startRecord = false;
-        Xut.$warn('record', '\u5F55\u97F3\u5B8C\u6210,id:' + onlyId);
+        Xut.$warn('record', '\u5F55\u97F3\u5B8C\u6210,id:' + newId);
         callback.succeed && callback.succeed();
       }, function () {
         //失败
         startRecord = false;
-        Xut.$warn('record', '\u5F55\u97F3\u5931\u8D25,id:' + onlyId);
+        Xut.$warn('record', '\u5F55\u97F3\u5931\u8D25,id:' + newId);
         callback.fail && callback.fail();
       });
     }, id);
@@ -76608,18 +76608,18 @@ function extendRecord(access, $$globalSwiper) {
       Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id);
       return;
     }
-    hasRecordPlugin(function (onlyId) {
+    hasRecordPlugin(function (newId) {
       //如果上一个还在播，先停止，保持只播一个
-      if (recordPlayId) {
+      if (prevRecordPlayId) {
         Xut.Assist.RecordPlayStop(id);
       }
-      recordPlayId = id;
-      Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3,id:' + onlyId);
-      Xut.Plugin.Recorder.startPlay(onlyId, function () {
-        recordPlayId = null;
+      prevRecordPlayId = id;
+      Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3,id:' + newId);
+      Xut.Plugin.Recorder.startPlay(newId, function () {
+        prevRecordPlayId = null;
       }, function () {
-        recordPlayId = null;
-        Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u5931\u8D25,\u64AD\u653E\u53EF\u80FD\u5B58\u5728\u7684\u9ED8\u8BA4\u56DE\u8C03:' + onlyId);
+        prevRecordPlayId = null;
+        Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u5931\u8D25,\u64AD\u653E\u53EF\u80FD\u5B58\u5728\u7684\u9ED8\u8BA4\u56DE\u8C03:' + newId);
         failCallback && failCallback();
       });
     }, id);
@@ -76630,15 +76630,15 @@ function extendRecord(access, $$globalSwiper) {
    */
   Xut.Assist.RecordPlayStop = function (id) {
     //停止指定的，或者之前播放的
-    id = id || recordPlayId;
-    hasRecordPlugin(function (onlyId) {
-      if (!onlyId) {
-        Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + onlyId);
+    id = id || prevRecordPlayId;
+    hasRecordPlugin(function (newId) {
+      if (!newId) {
+        Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + newId);
         return;
       }
-      recordPlayId = null;
-      Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + onlyId);
-      Xut.Plugin.Recorder.stopPlay(onlyId);
+      prevRecordPlayId = null;
+      Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + newId);
+      Xut.Plugin.Recorder.stopPlay(newId);
     }, id);
   };
 }
@@ -83274,7 +83274,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 893.3;
+Xut.Version = 893.4;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

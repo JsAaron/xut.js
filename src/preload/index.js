@@ -141,6 +141,7 @@ function masterHandle(childData) {
 function pageHandle(type, childData, parser) {
   childData = pathHooks[type](childData)
   let total = childData.length
+
   return function(callback) {
     let section = getNumber()
 
@@ -406,7 +407,7 @@ function watchPreloadInit() {
  */
 export function initPreload(total, callback) {
 
-  function exit() {
+  function exitFn() {
     config.launch.preload = null
     callback(false)
   }
@@ -415,12 +416,12 @@ export function initPreload(total, callback) {
    * 初始化，只预加载第一次的内容
    */
   function firstDownload() {
+    $warn({
+      type: 'preload',
+      content: `开始执行资源预加载`
+    })
+    /*监听预加载初始化*/
     nextTask('', function() {
-      $warn({
-        type: 'preload',
-        content: `需预加载${total}页资源`
-      })
-      /*监听预加载初始化*/
       watchPreloadInit()
       callback(true);
     })
@@ -454,9 +455,9 @@ export function initPreload(total, callback) {
 
   if (window.preloadData) {
     chapterIdCount = total
-    checkCache(firstDownload, exit)
+    checkCache(firstDownload, exitFn)
   } else {
-    exit()
+    exitFn()
   }
 }
 
