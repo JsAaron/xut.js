@@ -23,7 +23,7 @@ export function $suspend(pageBase, pageId, allHandle) {
   //零件对象翻页就直接销毁了
   //无需暂时
   //这里只处理音频 + content类型
-  access(pageBase, (pageBase, contentObjs) => {
+  access(pageBase, (pageBase, activityObjs) => {
 
     /*停止预加载*/
     // stopPreload()
@@ -42,7 +42,7 @@ export function $suspend(pageBase, pageId, allHandle) {
     }
 
     //content类型
-    contentObjs && _.each(contentObjs, (obj) => {
+    activityObjs && _.each(activityObjs, (obj) => {
       obj.stop && obj.stop();
     })
 

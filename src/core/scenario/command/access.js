@@ -14,10 +14,10 @@ export default function access(pageBase, callback) {
   }
 
   if (pageBase) {
-    const contents = pageBase.baseGetContent();
+    const activitys = pageBase.baseGetActivity();
     const components = pageBase.baseGetComponent();
     const pageType = pageBase.pageType || 'page';
-    const flag = callback(pageBase, contents.length && contents, components.length && components, pageType)
+    const flag = callback(pageBase, activitys, components.length && components, pageType)
     return flag
   }
 }

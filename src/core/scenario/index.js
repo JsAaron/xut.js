@@ -213,10 +213,11 @@ export class SceneFactory {
     let columnCounts = getColumnCount(this.seasonId)
 
     //如果是min平台强制启动
-    if (config.launch.platform === 'mini' || (config.debug.toolType.number !== false && columnCounts)) {
+    if (config.launch.platform === 'mini' ||
+      (config.debug.toolType.number !== false && columnCounts)) {
 
-      /*获取页面总数*/
-      const getPageTotal = again => {
+      //获取页面总数
+      let getPageTotal = again => {
         if (again) {
           //高度变化后，重新获取
           columnCounts = getColumnCount(this.seasonId)
@@ -234,7 +235,7 @@ export class SceneFactory {
         pageTotal: getPageTotal()
       })
 
-      /*页面总数改变*/
+      //页面总数改变
       if (config.launch.columnCheck) {
         Xut.Application.Watch('change:number:total', () => {
           this._eachMiniBar(function() {

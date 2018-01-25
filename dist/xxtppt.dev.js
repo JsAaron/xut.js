@@ -42395,7 +42395,7 @@ var improtDataConfig = {
 3 依赖数据
  */
 var isBrowser = Xut.plat.isBrowser;
-var GLOBALIFRAME = window.GLOBALIFRAME;
+var GLOBALIFRAME$1 = window.GLOBALIFRAME;
 var CLIENTCONFIGT = window.CLIENTCONFIGT;
 var MMXCONFIG = window.MMXCONFIG;
 
@@ -42449,7 +42449,7 @@ var desktopPlat = function desktopPlat() {
 
   //如果是iframe加载
   //而且是客户端模式
-  if (GLOBALIFRAME && CLIENTCONFIGT) {
+  if (GLOBALIFRAME$1 && CLIENTCONFIGT) {
     return CLIENTCONFIGT.path;
   }
 
@@ -42489,7 +42489,7 @@ var runMode = function () {
  * @return {[type]} [description]
  */
 var _rsourcesPath = function _rsourcesPath() {
-  return isBrowser ? desktopPlat() : GLOBALIFRAME ? iframeConfig.resources(config) : nativeConfig.resources(config);
+  return isBrowser ? desktopPlat() : GLOBALIFRAME$1 ? iframeConfig.resources(config) : nativeConfig.resources(config);
 };
 
 /**
@@ -42499,7 +42499,7 @@ var _rsourcesPath = function _rsourcesPath() {
  * @return {[type]} [description]
  */
 var _videoPath = function _videoPath() {
-  return runMode ? desktopPlat() : GLOBALIFRAME ? iframeConfig.video() : nativeConfig.video();
+  return runMode ? desktopPlat() : GLOBALIFRAME$1 ? iframeConfig.video() : nativeConfig.video();
 };
 
 /**
@@ -42507,7 +42507,7 @@ var _videoPath = function _videoPath() {
  * @return {[type]} [description]
  */
 var _audioPath = function _audioPath() {
-  return runMode ? desktopPlat() : GLOBALIFRAME ? iframeConfig.audio() : nativeConfig.audio();
+  return runMode ? desktopPlat() : GLOBALIFRAME$1 ? iframeConfig.audio() : nativeConfig.audio();
 };
 
 /**
@@ -42515,7 +42515,7 @@ var _audioPath = function _audioPath() {
  * @return {[type]} [description]
  */
 var _svgPath = function _svgPath() {
-  return isBrowser ? desktopPlat() : GLOBALIFRAME ? iframeConfig.svg() : nativeConfig.svg();
+  return isBrowser ? desktopPlat() : GLOBALIFRAME$1 ? iframeConfig.svg() : nativeConfig.svg();
 };
 
 /**
@@ -42525,7 +42525,7 @@ var _svgPath = function _svgPath() {
  * @return {[type]} [description]
  */
 var _jsWidgetPath = function _jsWidgetPath() {
-  return isBrowser ? getWidgetPath() : GLOBALIFRAME ? iframeConfig.jsWidget() : nativeConfig.jsWidget();
+  return isBrowser ? getWidgetPath() : GLOBALIFRAME$1 ? iframeConfig.jsWidget() : nativeConfig.jsWidget();
 };
 
 /**
@@ -42819,6 +42819,21 @@ function resetVisualProportion(newVisualSize) {
 var def = Object.defineProperty;
 
 /**
+//  * var emp = ['abs','dsf','sdf','fd']
+//  * emp.remove('fd');
+//  * @param  {[type]} val [description]
+//  * @return {[type]}     [description]
+//  */
+function removeArray(array, val, callback) {
+  var index = array.indexOf(val);
+  //如果找到
+  if (index > -1) {
+    callback && callback();
+    array.splice(index, 1);
+  }
+}
+
+/**
  * 定义一个新的对象
  * 重写属性
  */
@@ -42848,7 +42863,7 @@ function defAccess(obj, key, access) {
  *  string.charAt(0).toUpperCase() + string.slice(1);
  */
 function titleCase(category) {
-  return category.replace(/(\w)/, function (v) {
+  return category && category.replace(/(\w)/, function (v) {
     return v.toUpperCase();
   });
 }
@@ -44735,7 +44750,7 @@ function cleanImage(context, action) {
  * @param {[type]} context [description]
  * @param {[type]} path    [description]
  */
-function setImage(context, path) {
+function setImage$1(context, path) {
   if (!context) {
     return;
   }
@@ -47800,6 +47815,7 @@ function masterHandle(childData) {
 function pageHandle(type, childData, parser) {
   childData = pathHooks[type](childData);
   var total = childData.length;
+
   return function (callback) {
     var section = getNumber();
 
@@ -48058,7 +48074,7 @@ function watchPreloadInit() {
  */
 function initPreload(total, callback) {
 
-  function exit() {
+  function exitFn() {
     config.launch.preload = null;
     callback(false);
   }
@@ -48067,12 +48083,12 @@ function initPreload(total, callback) {
    * 初始化，只预加载第一次的内容
    */
   function firstDownload() {
+    $warn({
+      type: 'preload',
+      content: '\u5F00\u59CB\u6267\u884C\u8D44\u6E90\u9884\u52A0\u8F7D'
+    });
+    /*监听预加载初始化*/
     nextTask('', function () {
-      $warn({
-        type: 'preload',
-        content: '\u9700\u9884\u52A0\u8F7D' + total + '\u9875\u8D44\u6E90'
-      });
-      /*监听预加载初始化*/
       watchPreloadInit();
       callback(true);
     });
@@ -48106,9 +48122,9 @@ function initPreload(total, callback) {
 
   if (window.preloadData) {
     chapterIdCount = total;
-    checkCache(firstDownload, exit);
+    checkCache(firstDownload, exitFn);
   } else {
-    exit();
+    exitFn();
   }
 }
 
@@ -48634,54 +48650,40 @@ function setLaunch(novelData) {
 }
 
 function baseConfig(callback) {
+
   //导入数据库
   importJsonDatabase(function (results) {
-    setDatabse(results);
+    return setDatabse(results);
   });
 
-  //根据数据库的配置设置
+  /**
+   * 根据数据库的配置设置
+   */
   function setDatabse(results) {
     initDatabse(results, function (dataRet) {
       $warn('logic', '初始化数据库完成');
       var novelData = dataRet.Novel.item(0);
-      var data = initDefaults(dataRet.Setting);
+      var setData = initDefaults(dataRet.Setting);
       var chapterTotal = dataRet.Chapter.length;
-      setBaseConfig(novelData, data, chapterTotal);
+      setBaseConfig(novelData, setData, chapterTotal);
     });
   }
 
   /**
    * 设置一些基础配置
    */
-  function setBaseConfig(novelData, data, chapterTotal) {
+  function setBaseConfig(novelData, setData, chapterTotal) {
     //配置lanuch
     setLaunch(novelData);
     //配置config
-    configInit(novelData, data);
+    setConfig(novelData, setData);
     //配置图片
-    configImage();
+    setImage();
     //创建根节点
     //开始预加载文件
-    ccreateRoot(function () {
+    createRoot(function () {
       return initPrelaod(novelData, chapterTotal);
     });
-  }
-
-  /**
-   * 创建根节点
-   * @return {[type]} [description]
-   */
-  function ccreateRoot(callback) {
-    //根节点
-    var _initRootNode = initRootNode(config.launch.el, config.launch.cursor),
-        $rootNode = _initRootNode.$rootNode,
-        $contentNode = _initRootNode.$contentNode;
-
-    $warn('logic', '初始化设置参数完成');
-    nextTick({
-      container: $rootNode,
-      content: $contentNode
-    }, callback);
   }
 
   /**
@@ -48703,7 +48705,7 @@ function baseConfig(callback) {
     /*加载svg的样式*/
     loadGlobalStyle('svgsheet', function () {
       //判断是否有分栏处理
-      configColumn(function () {
+      setColumn(function () {
         //如果启动预加载配置
         //先探测下是否能支持
         if (config.launch.preload) {
@@ -48718,29 +48720,40 @@ function baseConfig(callback) {
   }
 }
 
+/**
+ * 创建根节点
+ * @return {[type]} [description]
+ */
+function createRoot(complete) {
+  //根节点
+  var _initRootNode = initRootNode(config.launch.el, config.launch.cursor),
+      $rootNode = _initRootNode.$rootNode,
+      $contentNode = _initRootNode.$contentNode;
+
+  $warn('logic', '初始化设置参数完成');
+  nextTick({
+    container: $rootNode,
+    content: $contentNode
+  }, complete);
+}
+
 /*
   配置初始化
  */
-function configInit(novelData, tempSettingData) {
-
+function setConfig(novelData, tempSettingData) {
   /*启动代码用户操作跟踪:启动*/
   config.sendTrackCode('launch');
-
   //创建过滤器
   Xut.CreateFilter = contentFilter('createFilter');
   Xut.TransformFilter = contentFilter('transformFilter');
-
   //初始化配置一些信息
   initConfig(novelData.pptWidth, novelData.pptHeight);
-
   //新增模式,用于记录浏览器退出记录
   //如果强制配置文件recordHistory = false则跳过数据库的给值
   setHistory(tempSettingData);
-
   //2015.2.26
   //启动画轴模式
   setPaintingMode(tempSettingData);
-
   //初始资源地址
   initPathAddress();
 }
@@ -48750,7 +48763,7 @@ function configInit(novelData, tempSettingData) {
  * 嵌入index分栏
  * 默认有并且没有强制设置关闭的情况，打开缩放
  */
-function configColumn(callback) {
+function setColumn(callback) {
   initColumn(function (haColumnCounts) {
     if (haColumnCounts) {
       resetDelegate();
@@ -48759,13 +48772,12 @@ function configColumn(callback) {
   });
 }
 
-function configImage() {
+function setImage() {
   //mini杂志设置
   //如果是pad的情况下设置font为125%
   if (config.launch.platform === 'mini' && Xut.plat.isTablet) {
     $('body').css('font-size', '125%');
   }
-
   /*图片分辨了自适应*/
   if (config.launch.imageSuffix) {
     adaptiveImage();
@@ -55154,6 +55166,46 @@ var AdvSprite = function (inputPara, contents) {
   };
 };
 
+/**
+ * 代码过滤器
+ * 针对代码脚本做处理
+ * Xut.Assist.RecordPlay(1)
+ * =>   Xut.Assist.RecordPlay(1,function(){
+           createContentAudio(2, 7)
+        })
+ */
+function injectCode(code, parameter, parentContext) {
+  //如果有音频，并且包含了RecordPlay接口的脚本
+  //找到对应的脚本，需要针对这个脚本注入新的代码
+  if (code) {
+
+    //扩展录音脚本
+    //往前缀加载重复回调的处理
+    //开始录音脚本处理
+    if (~code.indexOf('Xut.Assist.RecordStart')) {
+      var inject = 'Xut.Assist.RecordStart(function(){\n        Xut.Assist.Run(' + parentContext.activityId + ')\n      },';
+      code = code.replace('Xut.Assist.RecordStart(', inject);
+    }
+
+    //扩展播放录音脚本处理
+    //如果没有用户录音，就取自身的音频
+    if (parameter.videoId && ~code.indexOf('Xut.Assist.RecordPlay')) {
+      var recordREG = code.match(/Xut.Assist.RecordPlay\((\w+)\)/);
+      if (recordREG.length) {
+        var full = recordREG[0];
+        var id = recordREG[1];
+        var _inject = 'Xut.Assist.RecordPlay(' + id + ',function(){\n           Xut.Assist.ContentAudioCreate(' + parameter.chapterId + ', ' + parameter.videoId + ')\n        })';
+        //重新组合新的脚本代码
+        code = code.replace(full, _inject);
+        //如果遇到对应的脚本
+        //那么就清理音频
+        parameter.videoId = null;
+      }
+    }
+    return makeJsonPack(code);
+  }
+}
+
 var filter$1 = Xut.style.filter;
 
 /**
@@ -58387,46 +58439,6 @@ var isMacOS = Xut.plat.isMacOS;
 var isDesktop = Xut.plat.isDesktop;
 
 /**
- * 代码过滤器
- * 针对代码脚本做处理
- * Xut.Assist.RecordPlay(1)
- * =>   Xut.Assist.RecordPlay(1,function(){
-           createContentAudio(2, 7)
-        })
- */
-function codeFilter(code, parameter, parentContext) {
-  //如果有音频，并且包含了RecordPlay接口的脚本
-  //找到对应的脚本，需要针对这个脚本注入新的代码
-  if (code) {
-
-    //扩展录音脚本
-    //往前缀加载重复回调的处理
-    //开始录音脚本处理
-    if (~code.indexOf('Xut.Assist.RecordStart')) {
-      var inject = 'Xut.Assist.RecordStart(function(){\n        Xut.Assist.RunContent(' + parentContext.activityId + ',' + parentContext.contentId + ')\n      },';
-      code = code.replace('Xut.Assist.RecordStart(', inject);
-    }
-
-    //扩展播放录音脚本处理
-    //如果没有用户录音，就取自身的音频
-    if (parameter.videoId && ~code.indexOf('Xut.Assist.RecordPlay')) {
-      var recordREG = code.match(/Xut.Assist.RecordPlay\((\w+)\)/);
-      if (recordREG.length) {
-        var full = recordREG[0];
-        var id = recordREG[1];
-        var _inject = 'Xut.Assist.RecordPlay(' + id + ',function(){\n           Xut.Assist.ContentAudioCreate(' + parameter.chapterId + ', ' + parameter.videoId + ')\n        })';
-        //重新组合新的脚本代码
-        code = code.replace(full, _inject);
-        //如果遇到对应的脚本
-        //那么就清理音频
-        parameter.videoId = null;
-      }
-    }
-    return makeJsonPack(code);
-  }
-}
-
-/**
  * 子动画回调中
  * 设置参数
  */
@@ -58774,9 +58786,9 @@ var Powepoint = function () {
       /// 所以需要把脚本匹配到每一个子动画中
       ///////////////////////////////////
       //获取动画前脚本
-      parameter.preCode = codeFilter(data.preCode, parameter, parentContext);
+      parameter.preCode = injectCode(data.preCode, parameter, parentContext);
       //获取动画后脚本
-      parameter.postCode = codeFilter(data.postCode, parameter, parentContext);
+      parameter.postCode = injectCode(data.postCode, parameter, parentContext);
       //获取延时时间
       parameter.codeDelay = data.codeDelay;
       //赋予父对象的引用
@@ -59764,7 +59776,7 @@ var Animation = function () {
             //重新给img的src赋值
             //解决闪动问题
             if (_this3.$contentNode) {
-              setImage(_this3.$contentNode, _this3.contentData.resourcePath);
+              setImage$1(_this3.$contentNode, _this3.contentData.resourcePath);
             }
             if (_this3[key]) {
               _this3[key].play && _this3[key].play(playComplete);
@@ -65147,10 +65159,10 @@ function access$2(pageBase, callback) {
   }
 
   if (pageBase) {
-    var contents = pageBase.baseGetContent();
+    var activitys = pageBase.baseGetActivity();
     var components = pageBase.baseGetComponent();
     var pageType = pageBase.pageType || 'page';
-    var flag = callback(pageBase, contents.length && contents, components.length && components, pageType);
+    var flag = callback(pageBase, activitys, components.length && components, pageType);
     return flag;
   }
 }
@@ -65249,13 +65261,13 @@ function clearWatcher() {
 var noop = function noop() {};
 
 /**
- * 运行自动的content对象
+ * 运行自动的Activity对象
  * 延时500毫秒执行
  * @return {[type]} [description]
  */
-function autoContents(contentObjs, taskAnimCallback) {
+function autoActivitys(activityObjs, taskAnimCallback) {
   var markComplete = function () {
-    var completeStatistics = contentObjs.length; //动画完成统计
+    var completeStatistics = activityObjs.length; //动画完成统计
     return function () {
       if (completeStatistics === 1) {
         taskAnimCallback && taskAnimCallback();
@@ -65265,7 +65277,7 @@ function autoContents(contentObjs, taskAnimCallback) {
     };
   }();
 
-  _.each(contentObjs, function (obj, index) {
+  _.each(activityObjs, function (obj, index) {
     if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
       //同一个对象类型
       //直接调用对象接口
@@ -65370,7 +65382,7 @@ function $autoRun(pageBase, pageIndex, taskAnimCallback) {
   //pageType
   //用于区别触发类型
   //页面还是母版
-  access$2(pageBase, function (pageBase, contentObjs, componentObjs, pageType) {
+  access$2(pageBase, function (pageBase, activityObjs, componentObjs, pageType) {
 
     //如果是母版对象，一次生命周期种只激活一次
     if (pageBase.onceMaster) {
@@ -65388,11 +65400,11 @@ function $autoRun(pageBase, pageIndex, taskAnimCallback) {
       });
     }
 
-    /*自动content*/
-    if (contentObjs) {
+    /*自动Activity*/
+    if (activityObjs) {
       delayWatcher(pageIndex, function () {
         setMaster(pageBase);
-        autoContents(contentObjs, taskAnimCallback);
+        autoActivitys(activityObjs, taskAnimCallback);
       });
     } else {
       taskAnimCallback(); //无动画
@@ -65472,7 +65484,7 @@ function $suspend(pageBase, pageId, allHandle) {
   //零件对象翻页就直接销毁了
   //无需暂时
   //这里只处理音频 + content类型
-  access$2(pageBase, function (pageBase, contentObjs) {
+  access$2(pageBase, function (pageBase, activityObjs) {
 
     /*停止预加载*/
     // stopPreload()
@@ -65491,7 +65503,7 @@ function $suspend(pageBase, pageId, allHandle) {
     }
 
     //content类型
-    contentObjs && _.each(contentObjs, function (obj) {
+    activityObjs && _.each(activityObjs, function (obj) {
       obj.stop && obj.stop();
     });
 
@@ -65532,13 +65544,13 @@ var hasOptimize = function hasOptimize(fn) {
  */
 function $original(pageBase) {
 
-  access$2(pageBase, function (pageBase, contentObjs, componentObjs) {
+  access$2(pageBase, function (pageBase, activityObjs, componentObjs) {
 
     //母版对象不还原
     if (pageBase.pageType === 'master') {
       //因为苗苗学的问题，需要单独处理hasForumClose的还原
       //2017.11.30
-      contentObjs && _.each(contentObjs, function (obj) {
+      activityObjs && _.each(activityObjs, function (obj) {
         if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
           if (obj.dataRelated && obj.dataRelated.hasForumClose) {
             obj.reset && obj.reset();
@@ -65559,7 +65571,7 @@ function $original(pageBase) {
       });
 
       //content类型复位
-      contentObjs && _.each(contentObjs, function (obj) {
+      activityObjs && _.each(activityObjs, function (obj) {
         if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
           obj.reset && obj.reset();
         }
@@ -65623,13 +65635,13 @@ function $stop(skipAudio) {
   $stopAutoWatch();
 
   //停止热点
-  return access$2(function (pageBase, contentObjs, componentObjs) {
+  return access$2(function (pageBase, activityObjs, componentObjs) {
 
     //如果返回值是false,则是算热点处理行为
     var falg = false;
 
     //content类型
-    contentObjs && _.each(contentObjs, function (obj) {
+    activityObjs && _.each(activityObjs, function (obj) {
       if (obj.stop && obj.stop()) {
         falg = true;
       }
@@ -72411,17 +72423,23 @@ var dataExternal = function (baseProto) {
     }
   };
 
-  //content接口
-  _.each(["Get", "Specified"], function (type) {
-    baseProto['base' + type + 'Content'] = function (data) {
-      switch (type) {
-        case 'Get':
-          return this.activityGroup.get();
-        case 'Specified':
-          return this.activityGroup.specified(data);
+  //获取Activity对象
+  baseProto.baseGetActivity = function (callback) {
+    var activitys = this.activityGroup.get();
+    if (activitys && activitys.length) {
+      if (callback) {
+        _.each(activitys, function (obj) {
+          return callback(obj);
+        });
+      } else {
+        return activitys;
       }
-    };
-  });
+    }
+  };
+
+  baseProto.baseSpecifiedContent = function (data) {
+    return this.activityGroup.specified(data);
+  };
 
   /**
    * 隐藏li节点
@@ -72935,9 +72953,9 @@ var moveParallax = function (baseProto) {
 
 
     var base = this;
-    var baseContents = this.baseGetContent();
+    var activitys = this.baseGetActivity();
 
-    if (!baseContents) {
+    if (!activitys) {
       return;
     }
 
@@ -72948,7 +72966,7 @@ var moveParallax = function (baseProto) {
     var distance = moveDistance.length ? moveDistance[1] : moveDistance;
 
     //遍历所有活动对象
-    _.each(baseContents, function (content) {
+    _.each(activitys, function (content) {
       content.eachAssistContents(function (scope) {
         //如果是视察对象移动
         if (scope.parallax) {
@@ -74292,7 +74310,7 @@ var MasterMgr = function (_ManageSuper) {
     key: '_fixParallaxPox',
     value: function _fixParallaxPox(parallaxObj, currPageIndex, targetIndex) {
       var self = this;
-      var contentObjs = void 0;
+      var activitys = void 0;
       var prevNodes = void 0;
       var nodes = void 0;
 
@@ -74330,10 +74348,10 @@ var MasterMgr = function (_ManageSuper) {
         cacheProperty(property, lastProperty);
       };
 
-      if (contentObjs = parallaxObj.baseGetContent()) {
+      if (activitys = parallaxObj.baseGetActivity()) {
         //获取到页面nodes
         nodes = Xut.Presentation.GetPageNode(targetIndex - 1);
-        contentObjs.forEach(function (contentObj) {
+        activitys.forEach(function (contentObj) {
           contentObj.eachAssistContents(function (scope) {
             if (scope.parallax) {
               repairNodes(scope.parallax);
@@ -76459,12 +76477,19 @@ function extendView($$mediator, access, $$globalSwiper) {
 //========================
 // 录音接口相关
 //========================
-
 /**
  * 是否存在音频插件
  * @return {Boolean} [description]
  */
 function hasRecordPlugin(callback, id) {
+  //iframe模式下插件的查找
+  if (GLOBALIFRAME) {
+    if (GLOBALCONTEXT.Recorder) {
+      callback(Xut.config.data.originalAppId + '-' + id);
+    }
+    return;
+  }
+  //单独apk情况下
   if (window.cordova && Xut.Plugin.Recorder) {
     callback(Xut.config.data.originalAppId + '-' + id);
   }
@@ -76475,12 +76500,12 @@ function extendRecord(access, $$globalSwiper) {
   //开始录音
   //用于翻页判断是否关闭
   var startRecord = false;
-  //录音播放的id
-  var prevRecordPlayId = null;
   //下一个动作的回调
   var currentNextCallback = null;
   //当前运行的重复执行方法
   var cuurentRepeatCallback = null;
+  //播放的id合集
+  var playIds = [];
 
   /**
    * 给录音的回调动作
@@ -76610,16 +76635,15 @@ function extendRecord(access, $$globalSwiper) {
     }
     hasRecordPlugin(function (newId) {
       //如果上一个还在播，先停止，保持只播一个
-      if (prevRecordPlayId) {
-        Xut.Assist.RecordPlayStop(id);
-      }
-      prevRecordPlayId = id;
+      Xut.Assist.RecordPlayStop();
+      playIds.push(newId);
       Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3,id:' + newId);
       Xut.Plugin.Recorder.startPlay(newId, function () {
-        prevRecordPlayId = null;
+        removeArray(playIds, newId);
+        Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u6210\u529F:' + newId + ',id\u5408\u96C6\u7F16\u53F7:' + playIds.toString() + ',\u6570\u91CF:' + playIds.length);
       }, function () {
-        prevRecordPlayId = null;
-        Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u5931\u8D25,\u64AD\u653E\u53EF\u80FD\u5B58\u5728\u7684\u9ED8\u8BA4\u56DE\u8C03:' + newId);
+        removeArray(playIds, newId);
+        Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u5931\u8D25,id\u5408\u96C6\u7F16\u53F7:' + playIds.toString());
         failCallback && failCallback();
       });
     }, id);
@@ -76627,19 +76651,32 @@ function extendRecord(access, $$globalSwiper) {
 
   /**
    * 播放停止
+   * ids  一个或者数组
+   * 1 播放之前停止
+   * 2 翻页停止
+   * 3 强制停止
    */
   Xut.Assist.RecordPlayStop = function (id) {
-    //停止指定的，或者之前播放的
-    id = id || prevRecordPlayId;
-    hasRecordPlugin(function (newId) {
-      if (!newId) {
-        Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + newId);
-        return;
-      }
-      prevRecordPlayId = null;
-      Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + newId);
-      Xut.Plugin.Recorder.stopPlay(newId);
-    }, id);
+    //强制停止,传递是外部接口的直接id
+    if (id) {
+      hasRecordPlugin(function (newId) {
+        if (!newId) {
+          Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + newId);
+          return;
+        }
+        Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + newId);
+        Xut.Plugin.Recorder.stopPlay(newId);
+      }, id);
+    } else if (playIds.length) {
+      Xut.$warn('record', '\u505C\u6B62\u64AD\u653E\u97F3\u4E50,id\u5408\u96C6\u7F16\u53F7:' + playIds.toString() + ',\u6570\u91CF:' + playIds.length);
+      //翻页停止，或者播放之前停止，传递是封装后的id
+      hasRecordPlugin(function () {
+        playIds.forEach(function (id) {
+          Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + id);
+          Xut.Plugin.Recorder.stopPlay(id);
+        });
+      });
+    }
   };
 }
 
@@ -76954,6 +76991,64 @@ function extendAnswer(access, $$globalSwiper) {
   };
 }
 
+//========================
+// 控制content接口
+//========================
+
+function extendContent(access, $$globalSwiper) {
+
+  /**
+   * 运行独立的content动画
+   */
+  Xut.Assist.RunContent = function (activityId, contentId) {
+    if (!activityId && !contentId) {
+      Xut.$Warn('content', '缺少运行RunContent接口的数据');
+      return;
+    }
+    //执行运行页面母版上activityId中为activityId的动画
+    Xut.Assist.Run('page', activityId, null, contentId);
+  };
+
+  /**
+   * 辅助对象的控制接口
+   * 运行辅助动画
+   * 辅助对象的activityId,或者合集activityId
+   * Run
+   * stop
+   * Hide隐藏动画元素
+   * 1 零件
+   * 2 音频动画
+   */
+  _.each(["Run", "Stop", "Hide"], function (apiName) {
+    Xut.Assist[apiName] = function (pageType, activityId, outCallBack, contentId) {
+      access(function (manager, pageType, activityId, outCallBack) {
+        function assistAppoint(id, callback) {
+          manager.assistAppoint(Number(id), $$globalSwiper.getVisualIndex(), callback, apiName, contentId);
+        }
+
+        //数组
+        if (_.isArray(activityId)) {
+          var markComplete = function () {
+            var completeStatistics = activityId.length; //动画完成统计
+            return function () {
+              if (completeStatistics === 1) {
+                outCallBack && outCallBack();
+                markComplete = null;
+              }
+              completeStatistics--;
+            };
+          }();
+          _.each(activityId, function (id) {
+            assistAppoint(id, markComplete);
+          });
+        } else {
+          assistAppoint(activityId, outCallBack);
+        }
+      }, pageType, activityId, outCallBack);
+    };
+  });
+}
+
 /********************************************
  * 场景API
  * 辅助对象
@@ -76966,6 +77061,8 @@ function extendAssist(access, $$globalSwiper) {
   extendGlobal(access, $$globalSwiper);
   //继承答题接口
   extendAnswer(access, $$globalSwiper);
+  //content
+  extendContent(access, $$globalSwiper);
 
   //========================
   //  其他平台接口
@@ -77041,57 +77138,6 @@ function extendAssist(access, $$globalSwiper) {
       fxObj.play();
     }
   };
-
-  /**
-   * 运行独立的content动画
-   */
-  Xut.Assist.RunContent = function (activityId, contentId) {
-    if (!activityId && !contentId) {
-      Xut.$Warn('content', '缺少运行RunContent接口的数据');
-      return;
-    }
-    //执行运行页面母版上activityId中为activityId的动画
-    Xut.Assist.Run('page', activityId, null, contentId);
-  };
-
-  /**
-   * 辅助对象的控制接口
-   * 运行辅助动画
-   * 辅助对象的activityId,或者合集activityId
-   * Run
-   * stop
-   * Hide隐藏动画元素
-   * 1 零件
-   * 2 音频动画
-   */
-  _.each(["Run", "Stop", "Hide"], function (apiName) {
-    Xut.Assist[apiName] = function (pageType, activityId, outCallBack, contentId) {
-      access(function (manager, pageType, activityId, outCallBack) {
-        function assistAppoint(id, callback) {
-          manager.assistAppoint(Number(id), $$globalSwiper.getVisualIndex(), callback, apiName, contentId);
-        }
-
-        //数组
-        if (_.isArray(activityId)) {
-          var markComplete = function () {
-            var completeStatistics = activityId.length; //动画完成统计
-            return function () {
-              if (completeStatistics === 1) {
-                outCallBack && outCallBack();
-                markComplete = null;
-              }
-              completeStatistics--;
-            };
-          }();
-          _.each(activityId, function (id) {
-            assistAppoint(id, markComplete);
-          });
-        } else {
-          assistAppoint(activityId, outCallBack);
-        }
-      }, pageType, activityId, outCallBack);
-    };
-  });
 }
 
 var typeFilter = ['page', 'master'];
@@ -77100,7 +77146,7 @@ var typeFilter = ['page', 'master'];
  * 场景API
  * 针对page页面的content类型操作接口
  ********************************************/
-function extendContent(access, $$globalSwiper) {
+function extendContent$1(access, $$globalSwiper) {
 
   /**
    * 获取指定的对象
@@ -77412,7 +77458,7 @@ function initSceneApi($$mediator) {
   extendPresentation(access, $$globalSwiper); //数据接口
   extendView($$mediator, access, $$globalSwiper); //视图接口
   extendAssist(access, $$globalSwiper); // 辅助对象
-  extendContent(access, $$globalSwiper); //content对象
+  extendContent$1(access, $$globalSwiper); //content对象
   extendApplication(access, $$mediator, $$globalSwiper); //app应用接口
 
   return function () {
@@ -81880,7 +81926,7 @@ var SceneFactory = function () {
       //如果是min平台强制启动
       if (config.launch.platform === 'mini' || config.debug.toolType.number !== false && columnCounts) {
 
-        /*获取页面总数*/
+        //获取页面总数
         var getPageTotal = function getPageTotal(again) {
           if (again) {
             //高度变化后，重新获取
@@ -81899,7 +81945,7 @@ var SceneFactory = function () {
           pageTotal: getPageTotal()
         });
 
-        /*页面总数改变*/
+        //页面总数改变
         if (config.launch.columnCheck) {
           Xut.Application.Watch('change:number:total', function () {
             _this2._eachMiniBar(function () {
@@ -83274,7 +83320,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 893.4;
+Xut.Version = 893.8;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

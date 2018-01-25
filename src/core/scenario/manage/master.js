@@ -521,7 +521,7 @@ export default class MasterMgr extends ManageSuper {
    */
   _fixParallaxPox(parallaxObj, currPageIndex, targetIndex) {
     let self = this
-    let contentObjs
+    let activitys
     let prevNodes
     let nodes
 
@@ -560,10 +560,10 @@ export default class MasterMgr extends ManageSuper {
     }
 
 
-    if (contentObjs = parallaxObj.baseGetContent()) {
+    if (activitys = parallaxObj.baseGetActivity()) {
       //获取到页面nodes
       nodes = Xut.Presentation.GetPageNode(targetIndex - 1);
-      contentObjs.forEach(function(contentObj) {
+      activitys.forEach(function(contentObj) {
         contentObj.eachAssistContents(function(scope) {
           if (scope.parallax) {
             repairNodes(scope.parallax)

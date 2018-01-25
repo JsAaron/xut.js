@@ -12,13 +12,13 @@ import { pushWatcher, clearWatcher } from '../../observer/batcher'
 const noop = function() {}
 
 /**
- * 运行自动的content对象
+ * 运行自动的Activity对象
  * 延时500毫秒执行
  * @return {[type]} [description]
  */
-function autoContents(contentObjs, taskAnimCallback) {
+function autoActivitys(activityObjs, taskAnimCallback) {
   let markComplete = (() => {
-    let completeStatistics = contentObjs.length; //动画完成统计
+    let completeStatistics = activityObjs.length; //动画完成统计
     return () => {
       if (completeStatistics === 1) {
         taskAnimCallback && taskAnimCallback();
@@ -28,7 +28,7 @@ function autoContents(contentObjs, taskAnimCallback) {
     }
   })()
 
-  _.each(contentObjs, (obj, index) => {
+  _.each(activityObjs, (obj, index) => {
     if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
       //同一个对象类型
       //直接调用对象接口
@@ -135,7 +135,7 @@ export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
   //pageType
   //用于区别触发类型
   //页面还是母版
-  access(pageBase, (pageBase, contentObjs, componentObjs, pageType) => {
+  access(pageBase, (pageBase, activityObjs, componentObjs, pageType) => {
 
     //如果是母版对象，一次生命周期种只激活一次
     if (pageBase.onceMaster) {
@@ -153,11 +153,11 @@ export function $autoRun(pageBase, pageIndex, taskAnimCallback) {
       })
     }
 
-    /*自动content*/
-    if (contentObjs) {
+    /*自动Activity*/
+    if (activityObjs) {
       delayWatcher(pageIndex, function() {
         setMaster(pageBase)
-        autoContents(contentObjs, taskAnimCallback)
+        autoActivitys(activityObjs, taskAnimCallback)
       })
     } else {
       taskAnimCallback(); //无动画

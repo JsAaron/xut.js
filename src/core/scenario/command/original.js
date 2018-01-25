@@ -29,13 +29,13 @@ let hasOptimize = (fn) => {
  */
 export function $original(pageBase) {
 
-  access(pageBase, (pageBase, contentObjs, componentObjs) => {
+  access(pageBase, (pageBase, activityObjs, componentObjs) => {
 
     //母版对象不还原
     if (pageBase.pageType === 'master') {
       //因为苗苗学的问题，需要单独处理hasForumClose的还原
       //2017.11.30
-      contentObjs && _.each(contentObjs, (obj) => {
+      activityObjs && _.each(activityObjs, (obj) => {
         if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
           if (obj.dataRelated && obj.dataRelated.hasForumClose) {
             obj.reset && obj.reset();
@@ -56,7 +56,7 @@ export function $original(pageBase) {
       })
 
       //content类型复位
-      contentObjs && _.each(contentObjs, (obj) => {
+      activityObjs && _.each(activityObjs, (obj) => {
         if (!Xut.CreateFilter.has(obj.pageId, obj.id)) {
           obj.reset && obj.reset();
         }

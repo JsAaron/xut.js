@@ -1,16 +1,26 @@
 //========================
 // 录音接口相关
 //========================
+import { removeArray } from '../../../util/lang'
 
 /**
  * 是否存在音频插件
  * @return {Boolean} [description]
  */
 function hasRecordPlugin(callback, id) {
+  //iframe模式下插件的查找
+  if (GLOBALIFRAME) {
+    if (GLOBALCONTEXT.Recorder) {
+      callback(`${Xut.config.data.originalAppId}-${id}`)
+    }
+    return
+  }
+  //单独apk情况下
   if (window.cordova && Xut.Plugin.Recorder) {
     callback(`${Xut.config.data.originalAppId}-${id}`)
   }
 }
+
 
 
 export function extendRecord(access, $$globalSwiper) {
@@ -18,12 +28,12 @@ export function extendRecord(access, $$globalSwiper) {
   //开始录音
   //用于翻页判断是否关闭
   let startRecord = false
-  //录音播放的id
-  let prevRecordPlayId = null
   //下一个动作的回调
   let currentNextCallback = null
   //当前运行的重复执行方法
   let cuurentRepeatCallback = null
+  //播放的id合集
+  let playIds = []
 
   /**
    * 给录音的回调动作
@@ -63,6 +73,7 @@ export function extendRecord(access, $$globalSwiper) {
       Xut.$warn('record', `没有cuurentRepeatCallback,无法重复当前动画`)
     }
   }
+
 
   /**
    * 脚本函数
@@ -140,6 +151,7 @@ export function extendRecord(access, $$globalSwiper) {
     }
   }
 
+
   /**
    * 播放录音
    * failCallback 播放录音失败回调
@@ -152,16 +164,15 @@ export function extendRecord(access, $$globalSwiper) {
     }
     hasRecordPlugin(function(newId) {
       //如果上一个还在播，先停止，保持只播一个
-      if (prevRecordPlayId) {
-        Xut.Assist.RecordPlayStop(id)
-      }
-      prevRecordPlayId = id
+      Xut.Assist.RecordPlayStop()
+      playIds.push(newId)
       Xut.$warn('record', `播放录音,id:${newId}`)
       Xut.Plugin.Recorder.startPlay(newId, function() {
-        prevRecordPlayId = null
+        removeArray(playIds, newId)
+        Xut.$warn('record', `播放录音成功:${newId},id合集编号:${playIds.toString()},数量:${playIds.length}`)
       }, function() {
-        prevRecordPlayId = null
-        Xut.$warn('record', `播放录音失败,播放可能存在的默认回调:${newId}`)
+        removeArray(playIds, newId)
+        Xut.$warn('record', `播放录音失败,id合集编号:${playIds.toString()}`)
         failCallback && failCallback()
       })
     }, id)
@@ -169,19 +180,32 @@ export function extendRecord(access, $$globalSwiper) {
 
   /**
    * 播放停止
+   * ids  一个或者数组
+   * 1 播放之前停止
+   * 2 翻页停止
+   * 3 强制停止
    */
   Xut.Assist.RecordPlayStop = function(id) {
-    //停止指定的，或者之前播放的
-    id = id || prevRecordPlayId
-    hasRecordPlugin(function(newId) {
-      if (!newId) {
-        Xut.$warn('record', `没有传递停止播放录音的编号id:${newId}`)
-        return
-      }
-      prevRecordPlayId = null
-      Xut.$warn('record', `播放录音停止,id:${newId}`)
-      Xut.Plugin.Recorder.stopPlay(newId)
-    }, id)
+    //强制停止,传递是外部接口的直接id
+    if (id) {
+      hasRecordPlugin(function(newId) {
+        if (!newId) {
+          Xut.$warn('record', `没有传递停止播放录音的编号id:${newId}`)
+          return
+        }
+        Xut.$warn('record', `播放录音停止,id:${newId}`)
+        Xut.Plugin.Recorder.stopPlay(newId)
+      }, id)
+    } else if (playIds.length) {
+      Xut.$warn('record', `停止播放音乐,id合集编号:${playIds.toString()},数量:${playIds.length}`)
+      //翻页停止，或者播放之前停止，传递是封装后的id
+      hasRecordPlugin(function() {
+        playIds.forEach(function(id) {
+          Xut.$warn('record', `播放录音停止,id:${id}`)
+          Xut.Plugin.Recorder.stopPlay(id)
+        })
+      })
+    }
   }
 
 }

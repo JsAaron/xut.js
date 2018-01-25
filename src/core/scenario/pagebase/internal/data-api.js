@@ -194,20 +194,23 @@ export default function(baseProto) {
   }
 
 
-  //content接口
-  _.each([
-    "Get",
-    "Specified"
-  ], function(type) {
-    baseProto['base' + type + 'Content'] = function(data) {
-      switch (type) {
-        case 'Get':
-          return this.activityGroup.get();
-        case 'Specified':
-          return this.activityGroup.specified(data);
+  //获取Activity对象
+  baseProto.baseGetActivity = function(callback) {
+    let activitys = this.activityGroup.get();
+    if (activitys && activitys.length) {
+      if (callback) {
+        _.each(activitys, obj => callback(obj))
+      } else {
+        return activitys
       }
     }
-  })
+  }
+
+
+  baseProto.baseSpecifiedContent = function(data) {
+    return this.activityGroup.specified(data);
+  }
+
 
   /**
    * 隐藏li节点

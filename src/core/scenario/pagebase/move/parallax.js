@@ -117,9 +117,9 @@ export default function(baseProto) {
   }) {
 
     let base = this
-    let baseContents = this.baseGetContent()
+    let activitys = this.baseGetActivity()
 
-    if(!baseContents) {
+    if(!activitys) {
       return
     }
 
@@ -130,7 +130,7 @@ export default function(baseProto) {
     let distance = moveDistance.length ? moveDistance[1] : moveDistance
 
     //遍历所有活动对象
-    _.each(baseContents, content => {
+    _.each(activitys, content => {
       content.eachAssistContents(scope => {
         //如果是视察对象移动
         if(scope.parallax) {

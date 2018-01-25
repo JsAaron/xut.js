@@ -1,6 +1,22 @@
 //定义属性
 var def = Object.defineProperty;
 
+
+/**
+//  * var emp = ['abs','dsf','sdf','fd']
+//  * emp.remove('fd');
+//  * @param  {[type]} val [description]
+//  * @return {[type]}     [description]
+//  */
+export function removeArray(array, val, callback) {
+  var index = array.indexOf(val);
+  //如果找到
+  if (index > -1) {
+    callback && callback()
+    array.splice(index, 1);
+  }
+}
+
 /**
  * 定义一个新的对象
  * 重写属性
@@ -31,7 +47,7 @@ export function defAccess(obj, key, access) {
  *  string.charAt(0).toUpperCase() + string.slice(1);
  */
 export function titleCase(category) {
-  return category.replace(/(\w)/, v => v.toUpperCase())
+  return category && category.replace(/(\w)/, v => v.toUpperCase())
 }
 
 

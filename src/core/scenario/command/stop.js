@@ -44,13 +44,13 @@ export function $stop(skipAudio) {
   $stopAutoWatch()
 
   //停止热点
-  return access(function(pageBase, contentObjs, componentObjs) {
+  return access(function(pageBase, activityObjs, componentObjs) {
 
     //如果返回值是false,则是算热点处理行为
     let falg = false
 
     //content类型
-    contentObjs && _.each(contentObjs, function(obj) {
+    activityObjs && _.each(activityObjs, function(obj) {
       if (obj.stop && obj.stop()) {
         falg = true
       }
