@@ -76642,8 +76642,8 @@ function extendRecord(access, $$globalSwiper) {
         removeArray(playIds, newId);
         Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u6210\u529F:' + newId + ',id\u5408\u96C6\u7F16\u53F7:' + playIds.toString() + ',\u6570\u91CF:' + playIds.length);
       }, function () {
-        removeArray(playIds, newId);
         Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u5931\u8D25,id\u5408\u96C6\u7F16\u53F7:' + playIds.toString());
+        removeArray(playIds, newId);
         failCallback && failCallback();
       });
     }, id);
@@ -76664,6 +76664,7 @@ function extendRecord(access, $$globalSwiper) {
           Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + newId);
           return;
         }
+        removeArray(playIds, newId);
         Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + newId);
         Xut.Plugin.Recorder.stopPlay(newId);
       }, id);
@@ -76671,9 +76672,10 @@ function extendRecord(access, $$globalSwiper) {
       Xut.$warn('record', '\u505C\u6B62\u64AD\u653E\u97F3\u4E50,id\u5408\u96C6\u7F16\u53F7:' + playIds.toString() + ',\u6570\u91CF:' + playIds.length);
       //翻页停止，或者播放之前停止，传递是封装后的id
       hasRecordPlugin(function () {
-        playIds.forEach(function (id) {
-          Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + id);
-          Xut.Plugin.Recorder.stopPlay(id);
+        playIds.forEach(function (newId) {
+          Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u505C\u6B62,id:' + newId);
+          Xut.Plugin.Recorder.stopPlay(newId);
+          removeArray(playIds, newId);
         });
       });
     }
@@ -83320,7 +83322,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 893.8;
+Xut.Version = 893.9;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

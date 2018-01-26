@@ -171,8 +171,8 @@ export function extendRecord(access, $$globalSwiper) {
         removeArray(playIds, newId)
         Xut.$warn('record', `播放录音成功:${newId},id合集编号:${playIds.toString()},数量:${playIds.length}`)
       }, function() {
-        removeArray(playIds, newId)
         Xut.$warn('record', `播放录音失败,id合集编号:${playIds.toString()}`)
+        removeArray(playIds, newId)
         failCallback && failCallback()
       })
     }, id)
@@ -193,6 +193,7 @@ export function extendRecord(access, $$globalSwiper) {
           Xut.$warn('record', `没有传递停止播放录音的编号id:${newId}`)
           return
         }
+        removeArray(playIds, newId)
         Xut.$warn('record', `播放录音停止,id:${newId}`)
         Xut.Plugin.Recorder.stopPlay(newId)
       }, id)
@@ -200,9 +201,10 @@ export function extendRecord(access, $$globalSwiper) {
       Xut.$warn('record', `停止播放音乐,id合集编号:${playIds.toString()},数量:${playIds.length}`)
       //翻页停止，或者播放之前停止，传递是封装后的id
       hasRecordPlugin(function() {
-        playIds.forEach(function(id) {
-          Xut.$warn('record', `播放录音停止,id:${id}`)
-          Xut.Plugin.Recorder.stopPlay(id)
+        playIds.forEach(function(newId) {
+          Xut.$warn('record', `播放录音停止,id:${newId}`)
+          Xut.Plugin.Recorder.stopPlay(newId)
+          removeArray(playIds, newId)
         })
       })
     }
