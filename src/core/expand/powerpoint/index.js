@@ -157,12 +157,13 @@ export default class Powepoint {
         switch (animationName) {
           //强调动画默认显示
           case "EffectFlashBulb": //脉冲
-            if (this.isExit0 || this.isExit0 === undefined) {
-              this.element.css("visibility", "visible");
-            } else {
-              this.element.css("visibility", "hidden");
-            }
-            break;
+            // //脉冲只显示
+            // if (this.isExit0 || this.isExit0 === undefined) {
+            //   this.element.css("visibility", "visible");
+            // } else {
+            //   this.element.css("visibility", "hidden");
+            // }
+            // break;
           case "EffectFlicker": //彩色脉冲
           case "EffectTeeter": //跷跷板
           case "EffectSpin": //陀螺旋转

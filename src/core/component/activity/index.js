@@ -423,7 +423,14 @@ export default class Activity {
     //监控执行动画的长度
     //如果onlyRunContentId存在则只需要检测一次
     //否就是默认activityId下的所有content对象
-    let watchCompleteCount = onlyRunContentId ? 1 : this.contentGroup.length
+    let watchCompleteCount = 0
+    if (onlyRunContentId) {
+      watchCompleteCount = 1
+    } else {
+      if (this.contentGroup) {
+        watchCompleteCount = this.contentGroup.length
+      }
+    }
 
     //制作作用于内动画完成
     //等待动画完毕后执行动作or场景切换
@@ -454,7 +461,7 @@ export default class Activity {
         }
 
         //捕获动画状态
-        if (counts === 1) {
+        if (counts === 1 || counts === 0) {
           if (closeAnim) {
             //复位动画
             self._resetAloneAnim();

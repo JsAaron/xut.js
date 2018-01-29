@@ -16,14 +16,6 @@ export function extendContent(access, $$globalSwiper) {
     Xut.Assist.Run('page', activityId, null, contentId)
   }
 
-
-  Xut.Assist.Run(12, function() {
-    Xut.Assist.Run(13, function() {
-      Xut.Assist.Run(14, function() {
-        //.....
-      })
-    })
-  })
   /**
    * 辅助对象的控制接口
    * 运行辅助动画
