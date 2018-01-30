@@ -7,7 +7,6 @@ import { removeSlash, mixGlobalConfig } from './util/index'
 /////////////////
 Xut.Version = 894
 
-
 //接口接在参数,用户横竖切换刷新
 let cacheOptions
 let delayTimer = null

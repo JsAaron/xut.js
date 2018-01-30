@@ -51854,7 +51854,7 @@ function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) {
 
     //如果有move事件，则取消tap事件
     /*三星S6上就算不移动也会给一个-0.6左右的值，所以这里强制加20PX的判断*/
-    if (Math.abs(deltaX) > 10) {
+    if (Math.abs(deltaX) > 5) {
       hasTap = false;
       setCanvasMove(supportSwipe);
     }
@@ -66120,16 +66120,16 @@ var ScrollArea = function () {
       var prefix = this.data.contentPrefix;
       //创建多个眷滚区域
       for (var i = 0; i < content.length; i++) {
-        var obj = this._create(content[i], prefix);
-        if (obj) {
-          this.scrolls.push(obj);
+        var iscroll = this._create(content[i], prefix);
+        if (iscroll) {
+          this.scrolls.push(iscroll);
         }
       }
     }
   }, {
     key: '_createWrapper',
     value: function _createWrapper() {
-      return String.styleFormat('<div data-type="area-wrapper"\n                  style="position:absolute;width:100%; height:100%;overflow:hidden;">\n                <ul data-type="area-scroller"\n                     data-behavior="disable"\n                     style="position:absolute; width:100%; height:100%;overflow:hidden;">\n                </ul>\n             </div>');
+      return String.styleFormat('<div data-type="area-wrapper" style="position:absolute;width:100%; height:100%;overflow:hidden;">\n          <ul data-type="area-scroller"\n               data-behavior="disable"\n               style="position:absolute; width:100%; height:100%;overflow:hidden;">\n          </ul>\n       </div>');
     }
   }, {
     key: '_create',
@@ -66217,6 +66217,7 @@ var ScrollArea = function () {
           childObj.appendTo(snapContainer[Math.floor(j / colsObj.contentsPerSnapX)]);
         }
       }
+
       if (scrollY) {
         for (var j = 0; j < obj.length; j++) {
           var childId = prefix + obj[j];
@@ -66259,13 +66260,15 @@ var ScrollArea = function () {
           scrollX: hasScrollX ? true : false,
           scrollY: hasScrollY ? true : false,
           snap: ".contentsContainer" + contentId,
-          scrollbars: 'custom'
+          scrollbars: 'custom',
+          probeType: 2
         });
       } else {
         return IScroll(wrapper, {
           scrollX: hasScrollX ? true : false,
           scrollY: hasScrollY ? true : false,
-          scrollbars: 'custom'
+          scrollbars: 'custom',
+          probeType: 2
         });
       }
     }
@@ -66385,13 +66388,6 @@ var ScrollArea = function () {
     /**
      * 重设各个子content的left top值 以包裹他们的父容器为基准
      * 并且得到snapContainer的个数 宽度 以及每个snapContainer中可以放的content个数
-     * @param  {[type]} obj         [description]
-     * @param  {[type]} prefix      [description]
-     * @param  {[type]} contentSize [description]
-     * @param  {[type]} scrollX     [description]
-     * @param  {[type]} scrollY     [description]
-     * @param  {[type]} min         [description]
-     * @return {[type]}             [description]
      */
 
   }, {
@@ -66403,19 +66399,23 @@ var ScrollArea = function () {
           snapYCount = void 0,
           snapContainerWidth = void 0,
           snapContainerHeight = void 0;
+
       var contentsXTemp = 0;
       var contentsYTemp = 0;
       var leftArray = new Array();
       var topArray = new Array();
+
       var contentsLength = obj.length;
 
       for (var j = 0; j < contentsLength; j++) {
         var childId = prefix + obj[j];
         var childObj = $("#" + childId);
+
         Xut.Contents.ResetDefaultControl("page", childId, "");
         if (childObj.attr("data-iscroll") == "true") {
           continue;
         }
+
         var childLeft = parseInt(childObj.css("left"));
         var childTop = parseInt(childObj.css("top"));
         var childWidth = parseInt(childObj.css("width"));
@@ -66470,11 +66470,14 @@ var ScrollArea = function () {
           snapXCount = Math.ceil(obj.length / contentsPerSnapX);
         }
       }
+
       //y轴卷滚
       if (scrollY) {
         for (var i = 0; i < topArray.length; i++) {
           var temp = topArray[i];
-          if (temp < contentSize.h) {
+          //contentSize.h 有1px的差距，在不同设备下
+          //导致布局出错，所以这里减去1
+          if (temp < contentSize.h - 1) {
             contentsYTemp++;
           } else {
             if (!contentsPerSnapY) {
@@ -66569,7 +66572,7 @@ var ScrollArea = function () {
           } else {
             containerWidth = snapContainerWidth;
           }
-          snapContainer += '<li class="contentsContainer' + contentId + '"\n                                      style=\'width:' + containerWidth + 'px;height:100%;float:left;\'>\n                                  </li>';
+          snapContainer += '<li class="contentsContainer' + contentId + '"\n                              style=\'width:' + containerWidth + 'px;height:100%;float:left;\'>\n                          </li>';
         }
       }
       //Y轴滚动
@@ -66579,7 +66582,7 @@ var ScrollArea = function () {
           var snapContainerHeight = colsObj.snapContainerHeight;
           var lastSnapContainerHeight = scrollerHeight - (snapYCount - 1) * snapContainerHeight;
           for (var i = 0; i < colsObj.snapYCount; i++) {
-            snapContainer += '<li class="contentsContainer' + contentId + '"\n                                      style=\'height:' + snapContainerHeight + 'px;width:100%;float:left;\'>\n                                  </li>';
+            snapContainer += '<li class="contentsContainer' + contentId + '"\n                              style=\'height:' + snapContainerHeight + 'px;width:100%;float:left;\'>\n                          </li>';
           }
         }
 

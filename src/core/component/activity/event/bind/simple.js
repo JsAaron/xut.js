@@ -66,7 +66,7 @@ export function simpleEvent(eventName, eventContext, eventHandle, supportSwipe) 
 
     //如果有move事件，则取消tap事件
     /*三星S6上就算不移动也会给一个-0.6左右的值，所以这里强制加20PX的判断*/
-    if (Math.abs(deltaX) > 10) {
+    if (Math.abs(deltaX) > 5) {
       hasTap = false;
       setCanvasMove(supportSwipe);
     }

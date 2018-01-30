@@ -166,13 +166,15 @@ export default class ScrollArea {
         scrollX: hasScrollX ? true : false,
         scrollY: hasScrollY ? true : false,
         snap: ".contentsContainer" + contentId,
-        scrollbars: 'custom'
+        scrollbars: 'custom',
+        probeType: 2
       })
     } else {
       return IScroll(wrapper, {
         scrollX: hasScrollX ? true : false,
         scrollY: hasScrollY ? true : false,
-        scrollbars: 'custom'
+        scrollbars: 'custom',
+        probeType: 2
       })
     }
 
@@ -342,6 +344,7 @@ export default class ScrollArea {
       childObj.attr("data-iscroll", "true")
     }
 
+
     //将left值进行冒泡排序处理 以便后面比较left值与content宽之间的大小 确定一个snap容器中可以放几个content以及snap容器的宽度
     //将top值进行冒泡排序处理 以便后面比较top值与content高之间的大小 确定一个snap容器中可以放几个content以及snap容器的高度
     leftArray = this._bubbleSort(leftArray)
@@ -375,7 +378,9 @@ export default class ScrollArea {
     if (scrollY) {
       for (var i = 0; i < topArray.length; i++) {
         var temp = topArray[i];
-        if (temp < contentSize.h) {
+        //contentSize.h 有1px的差距，在不同设备下
+        //导致布局出错，所以这里减去1
+        if (temp < contentSize.h - 1) {
           contentsYTemp++;
         } else {
           if (!contentsPerSnapY) {
