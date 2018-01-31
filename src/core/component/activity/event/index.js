@@ -100,21 +100,21 @@ export default function(activitProto) {
 
     /**
      * 运行动画
-     * @return {[type]} [description]
      */
     function startRunAnim() {
       //当前事件对象没有动画的时候才能触发关联动作
       let animOffset
-      let boundary = 5 //边界值
+      let boundary = 15 //边界值
       if (eventRelated.domMode && (animOffset = eventContext.prop('animOffset'))) {
         let originalLeft = animOffset.left;
         let originalTop = animOffset.top;
         let newOffset = eventContext.offset();
         let newLeft = newOffset.left;
         let newTop = newOffset.top;
+
         //在合理的动画范围是允许点击的
         //比如对象只是一个小范围的内的改变
-        //正负10px的移动是允许接受的
+        //正负30px的移动是允许接受的
         if (originalLeft > (newLeft - boundary) &&
           originalLeft < (newLeft + boundary) || originalTop > (newTop - boundary) &&
           originalTop < (newTop + boundary)) {

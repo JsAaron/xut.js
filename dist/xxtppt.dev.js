@@ -54492,21 +54492,21 @@ var eventMixin = function (activitProto) {
 
     /**
      * 运行动画
-     * @return {[type]} [description]
      */
     function startRunAnim() {
       //当前事件对象没有动画的时候才能触发关联动作
       var animOffset = void 0;
-      var boundary = 5; //边界值
+      var boundary = 15; //边界值
       if (eventRelated.domMode && (animOffset = eventContext.prop('animOffset'))) {
         var originalLeft = animOffset.left;
         var originalTop = animOffset.top;
         var newOffset = eventContext.offset();
         var newLeft = newOffset.left;
         var newTop = newOffset.top;
+
         //在合理的动画范围是允许点击的
         //比如对象只是一个小范围的内的改变
-        //正负10px的移动是允许接受的
+        //正负30px的移动是允许接受的
         if (originalLeft > newLeft - boundary && originalLeft < newLeft + boundary || originalTop > newTop - boundary && originalTop < newTop + boundary) {
           self.runAnimation();
         }
@@ -58572,14 +58572,15 @@ var Powepoint = function () {
         } else {
           switch (animationName) {
             //强调动画默认显示
-            case "EffectFlashBulb": //脉冲
-            // //脉冲只显示
-            // if (this.isExit0 || this.isExit0 === undefined) {
-            //   this.element.css("visibility", "visible");
-            // } else {
-            //   this.element.css("visibility", "hidden");
-            // }
-            // break;
+            case "EffectFlashBulb":
+              //脉冲
+              //脉冲
+              if (this.isExit0 || this.isExit0 === undefined) {
+                this.element.css("visibility", "visible");
+              } else {
+                this.element.css("visibility", "hidden");
+              }
+              break;
             case "EffectFlicker": //彩色脉冲
             case "EffectTeeter": //跷跷板
             case "EffectSpin": //陀螺旋转
@@ -61401,8 +61402,8 @@ var Activity = function () {
         };
       }(watchCompleteCount);
 
-      function scopePlay(scope) {
-        //标记动画正在运行
+      function runScope(scope) {
+        //标记动画正在运行，标记初始化坐标
         scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
           'animOffset': scope.$contentNode.offset()
         });
@@ -61416,10 +61417,10 @@ var Activity = function () {
         if (onlyRunContentId) {
           //只执行指定的编号
           if (onlyRunContentId === scope.id) {
-            scopePlay(scope);
+            runScope(scope);
           }
         } else {
-          scopePlay(scope);
+          runScope(scope);
         }
       });
 
@@ -83332,7 +83333,7 @@ function entrance(options) {
 /////////////////
 ////  版本号  ////
 /////////////////
-Xut.Version = 894;
+Xut.Version = 894.2;
 
 //接口接在参数,用户横竖切换刷新
 var cacheOptions = void 0;

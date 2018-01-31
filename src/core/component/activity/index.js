@@ -478,8 +478,8 @@ export default class Activity {
     }(watchCompleteCount);
 
 
-    function scopePlay(scope) {
-      //标记动画正在运行
+    function runScope(scope) {
+      //标记动画正在运行，标记初始化坐标
       scope.$contentNode && scope.$contentNode.prop && scope.$contentNode.prop({
         'animOffset': scope.$contentNode.offset()
       })
@@ -494,10 +494,10 @@ export default class Activity {
       if (onlyRunContentId) {
         //只执行指定的编号
         if (onlyRunContentId === scope.id) {
-          scopePlay(scope)
+          runScope(scope)
         }
       } else {
-        scopePlay(scope)
+        runScope(scope)
       }
     })
 
