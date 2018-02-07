@@ -58572,15 +58572,14 @@ var Powepoint = function () {
         } else {
           switch (animationName) {
             //强调动画默认显示
-            case "EffectFlashBulb":
-              //脉冲
-              //脉冲
-              if (this.isExit0 || this.isExit0 === undefined) {
-                this.element.css("visibility", "visible");
-              } else {
-                this.element.css("visibility", "hidden");
-              }
-              break;
+            case "EffectFlashBulb": //脉冲
+            // //脉冲只显示
+            // if (this.isExit0 || this.isExit0 === undefined) {
+            //   this.element.css("visibility", "visible");
+            // } else {
+            //   this.element.css("visibility", "hidden");
+            // }
+            // break;
             case "EffectFlicker": //彩色脉冲
             case "EffectTeeter": //跷跷板
             case "EffectSpin": //陀螺旋转
@@ -75490,7 +75489,9 @@ var Scheduler = function () {
 
       //翻页停止录音
 
-      Xut.Assist.RecordStop();
+      Xut.Assist.RecordStop(function () {
+        Xut.$warn('record', '\u7FFB\u9875\u6709\u5F55\u97F3\u52A8\u4F5C\uFF0C\u5F3A\u5236\u505C\u6B62');
+      });
       //停止录音播放
       Xut.Assist.RecordPlayStop();
 
@@ -76508,9 +76509,8 @@ function hasRecordPlugin(callback, id) {
 
 function extendRecord(access, $$globalSwiper) {
 
-  //开始录音
-  //用于翻页判断是否关闭
-  var startRecord = false;
+  //正在录音中
+  var recording = false;
   //下一个动作的回调
   var currentNextCallback = null;
   //当前运行的重复执行方法
@@ -76589,7 +76589,10 @@ function extendRecord(access, $$globalSwiper) {
     }
 
     hasRecordPlugin(function (newId) {
-      Xut.Assist.RecordStop();
+      Xut.Assist.RecordStop(function () {
+        Xut.$warn('record', '\u5F53\u524D\u6709\u97F3\u9891\u5728\u5F55\u5236\uFF0C\u5148\u5F3A\u5236\u505C\u6B62');
+      });
+      Xut.$warn('record', '\u5F00\u59CB\u5F55\u97F3,id:' + newId);
       //如果有执行成功回调
       if (callback.succeed) {
         currentNextCallback = callback.succeed;
@@ -76598,17 +76601,16 @@ function extendRecord(access, $$globalSwiper) {
       if (injectFn) {
         cuurentRepeatCallback = injectFn;
       }
-      Xut.$warn('record', '\u5F00\u59CB\u5F55\u97F3,id:' + newId);
-      startRecord = true;
+      recording = true;
       Xut.Plugin.Recorder.startRecord(newId,
       //成功
       function () {
-        startRecord = false;
+        recording = false;
         Xut.$warn('record', '\u5F55\u97F3\u5B8C\u6210,id:' + newId);
         callback.succeed && callback.succeed();
       }, function () {
         //失败
-        startRecord = false;
+        recording = false;
         Xut.$warn('record', '\u5F55\u97F3\u5931\u8D25,id:' + newId);
         callback.fail && callback.fail();
       });
@@ -76621,14 +76623,14 @@ function extendRecord(access, $$globalSwiper) {
    * 1 清空记录
    * 2 判断如果还有录音的，强制停止
    */
-  Xut.Assist.RecordStop = function () {
+  Xut.Assist.RecordStop = function (callback) {
     //翻页清空
     currentNextCallback = null;
     cuurentRepeatCallback = null;
-    if (startRecord) {
+    if (recording) {
       hasRecordPlugin(function () {
-        Xut.$warn('record', '\u5F55\u97F3\u505C\u6B62');
-        startRecord = false;
+        callback && callback;
+        recording = false;
         Xut.Plugin.Recorder.stopRecord();
       });
     }
@@ -76641,7 +76643,7 @@ function extendRecord(access, $$globalSwiper) {
    */
   Xut.Assist.RecordPlay = function (id, failCallback) {
     if (!id) {
-      Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + id);
+      Xut.$warn('record', '\u64AD\u653E\u5F55\u97F3\u5931\u8D25,\u7F3A\u5C11id:' + id);
       return;
     }
     hasRecordPlugin(function (newId) {
@@ -76672,7 +76674,7 @@ function extendRecord(access, $$globalSwiper) {
     if (id) {
       hasRecordPlugin(function (newId) {
         if (!newId) {
-          Xut.$warn('record', '\u6CA1\u6709\u4F20\u9012\u505C\u6B62\u64AD\u653E\u5F55\u97F3\u7684\u7F16\u53F7id:' + newId);
+          Xut.$warn('record', '\u505C\u6B62\u5F55\u97F3\u5931\u8D25,\u7F3A\u5C11id:' + id);
           return;
         }
         removeArray(playIds, newId);

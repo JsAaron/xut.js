@@ -483,7 +483,9 @@ export default class Scheduler {
     let { frontIndex, middleIndex, backIndex, stopIndex } = options
 
     //翻页停止录音
-    Xut.Assist.RecordStop()
+    Xut.Assist.RecordStop(function(){
+      Xut.$warn('record', `翻页有录音动作，强制停止`)
+    })
     //停止录音播放
     Xut.Assist.RecordPlayStop()
 

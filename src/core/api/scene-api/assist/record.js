@@ -25,9 +25,8 @@ function hasRecordPlugin(callback, id) {
 
 export function extendRecord(access, $$globalSwiper) {
 
-  //开始录音
-  //用于翻页判断是否关闭
-  let startRecord = false
+  //正在录音中
+  let recording = false
   //下一个动作的回调
   let currentNextCallback = null
   //当前运行的重复执行方法
@@ -104,8 +103,12 @@ export function extendRecord(access, $$globalSwiper) {
       callback = a
     }
 
+
     hasRecordPlugin(function(newId) {
-      Xut.Assist.RecordStop()
+      Xut.Assist.RecordStop(function() {
+        Xut.$warn('record', `当前有音频在录制，先强制停止`)
+      })
+      Xut.$warn('record', `开始录音,id:${newId}`)
       //如果有执行成功回调
       if (callback.succeed) {
         currentNextCallback = callback.succeed
@@ -114,18 +117,17 @@ export function extendRecord(access, $$globalSwiper) {
       if (injectFn) {
         cuurentRepeatCallback = injectFn
       }
-      Xut.$warn('record', `开始录音,id:${newId}`)
-      startRecord = true
+      recording = true
       Xut.Plugin.Recorder.startRecord(newId,
         //成功
         function() {
-          startRecord = false
+          recording = false
           Xut.$warn('record', `录音完成,id:${newId}`)
           callback.succeed && callback.succeed()
         },
         function() {
           //失败
-          startRecord = false
+          recording = false
           Xut.$warn('record', `录音失败,id:${newId}`)
           callback.fail && callback.fail()
         })
@@ -138,14 +140,14 @@ export function extendRecord(access, $$globalSwiper) {
    * 1 清空记录
    * 2 判断如果还有录音的，强制停止
    */
-  Xut.Assist.RecordStop = function() {
+  Xut.Assist.RecordStop = function(callback) {
     //翻页清空
     currentNextCallback = null
     cuurentRepeatCallback = null
-    if (startRecord) {
+    if (recording) {
       hasRecordPlugin(function() {
-        Xut.$warn('record', `录音停止`)
-        startRecord = false
+        callback && callback
+        recording = false
         Xut.Plugin.Recorder.stopRecord()
       })
     }
@@ -159,7 +161,7 @@ export function extendRecord(access, $$globalSwiper) {
    */
   Xut.Assist.RecordPlay = function(id, failCallback) {
     if (!id) {
-      Xut.$warn('record', `没有传递播放录音的编号id:${id}`)
+      Xut.$warn('record', `播放录音失败,缺少id:${id}`)
       return
     }
     hasRecordPlugin(function(newId) {
@@ -190,7 +192,7 @@ export function extendRecord(access, $$globalSwiper) {
     if (id) {
       hasRecordPlugin(function(newId) {
         if (!newId) {
-          Xut.$warn('record', `没有传递停止播放录音的编号id:${newId}`)
+          Xut.$warn('record', `停止录音失败,缺少id:${id}`)
           return
         }
         removeArray(playIds, newId)
