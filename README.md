@@ -1,8 +1,9 @@
-What can a front-end developer do?
+前端开发人员可以做什么?
 -----------------------------------
 
-Front-end can not only write pages, but also to do web applications, mobile, and even desktop programs
-Here, I use the front-end implementation of the project core
+前端不仅可以写页面，还可以做web应用，移动，甚至桌面程序
+在这里，我使用了项目核心的前端实现(项目已停，源码无依赖)
+
 
 <p align="center">
   <a href="http://www.miaomiaoxue.com">
@@ -36,12 +37,13 @@ Here, I use the front-end implementation of the project core
 
 What is xut.js?
 -----------------------------------
-This is a template program, used to batch production of app, using the front end of the technology to achieve the simulation of the original app effect. Through the combination of various modules, integrated into a customized app applications
+这是一个模板程序，用于批量生产app，利用前端的技术实现了模拟原始app的效果。通过各种模块的组合，集成成定制化的应用程序
 
 Preview
 -----------------------------------
-* Cross-platform. There is the platform based on webkit, including PC/ios/android/wp
-* Through templates, easily implement the application
+*跨平台。有基于webkit的平台，包括PC/ios/android/wp
+*通过模板，轻松实现应用程序
+
 
 ![](https://github.com/JsAaron/res/blob/master/horizontal.gif)
 
@@ -52,26 +54,21 @@ Integrated Right into Your PowerPoint
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt4.jpg)
 ![PowerPoint](https://github.com/JsAaron/res/blob/master/ppt3.jpg)
 
-Notice
------------------------------------
-It is not a open source project, cannot be used as a business after copying, only provide reference for the front-end learning exchange
-
-
 The support of the Xut.js
 -----------------------------------
-* can be mass production of apk/ipa/epub/pc and other cross platform application software
-* using hybrid technology SPA, based on the cordova+h5+css3+webgl architecture
-* code more than 100 thousand lines, simulation of a variety of native applications, to achieve a hundred kinds of animation effects and 14 events, but also to achieve some of the webgl adaptation
-* specific introduction can refer to the blog link introduced App [Hybrid application production and cross platform solutions (http://www.cnblogs.com/aaronjs/p/4255232.html)
+*可批量生产apk/ipa/epub/pc等跨平台应用软件
+*采用SPA混合技术，基于cordova+h5+css3+webgl架构
+*代码超过10万行，模拟各种原生应用，实现百种动画效果和14个事件，还能实现部分webgl适配
+*具体介绍可以参考博客链接介绍App【混合应用制作和跨平台解决方案】(http://www.cnblogs.com/aaronjs/p/4255232.html)
 
 
 Technology
 -----------------------------------
-Integration of the latest technology point node/es6/gulp/webpack/rollup/eslint/karma and so on
-* development: Based on ES6
-* test: Based on the webpack+express+rollup+gulp build, there is a hot replacement function
-* release: Based on gulp+rollup single file package
-* test: Based on karma+mocha+chai
+集成了最新的技术点节点/es6/gulp/webpack/rollup/eslint/karma等等
+*开发:基于ES6
+*测试:基于webpack+express+rollup+gulp构建，有热替换功能
+*版本:基于gulp+rollup的单文件包
+*测试:基于karma+mocha+chai
 
 Blog
 -----------------------------------
